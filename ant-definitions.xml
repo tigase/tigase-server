@@ -1,0 +1,155 @@
+<project name="tigase-defs">
+
+  <macrodef name="compile">
+    <attribute name="srcdir"/>
+    <attribute name="excldir" default=""/>
+    <attribute name="deprecation" default="off"/>
+    <attribute name="xlint" default="-Xlint:-all"/>
+    <sequential>
+      <mkdir dir="${build}"/>
+      <javac
+        srcdir="@{srcdir}"
+        excludes="@{excldir}"
+        destdir="${build}"
+        debug="on"
+        deprecation="@{deprecation}">
+        <compilerarg line="@{xlint}"/>
+      </javac>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="jarfile">
+    <attribute name="excludes" default=""/>
+    <attribute name="filename"/>
+    <attribute name="manifest" default="MANIFEST.MF"/>
+    <sequential>
+      <replaceregexp
+        file="@{manifest}"
+        match="^(Specification-Version: ).*$"
+        replace="\1${ver}"
+        byline="true"/>
+      <replaceregexp
+        file="@{manifest}"
+        match="^(Implementation-Version: ).*$"
+        replace="\1${version}"
+        byline="true"/>
+      <replaceregexp
+        file="@{manifest}"
+        match="^(Tigase-Version: ).*$"
+        replace="\1${version}"
+        byline="true"/>
+      <mkdir dir="${jars}"/>
+      <jar jarfile="${jars}/@{filename}.jar"
+        manifest="@{manifest}"
+        basedir="${build}"
+        excludes="@{excludes}"/>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="docs">
+    <attribute name="packages" default=""/>
+    <attribute name="excludepackages" default=""/>
+    <attribute name="destdir" default="docs"/>
+    <sequential>
+      <mkdir dir="@{destdir}/api"/>
+      <javadoc
+        sourcepath="${src}"
+        packagenames="@{packages}"
+        excludepackagenames="@{excludepackages}"
+        destdir="@{destdir}/api"
+        windowtitle="${javadoc-windowtitle}"
+        overview="package.html"
+        failonerror="yes"
+        use="true"
+        author="true"
+        version="true"
+        verbose="false"
+        protected="true"
+        bottom="${javadoc-copyright}">
+        <link offline="true" href="http://java.sun.com/j2se/1.5.0/docs/api/"
+          packagelistLoc="package-list"/>
+      </javadoc>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="distbin">
+    <attribute name="packagename"/>
+    <attribute name="docsdir" default="docs"/>
+    <sequential>
+      <delete file="@{packagename}-${version}.zip"/>
+      <delete file="@{packagename}-${version}.tar.gz"/>
+      <delete dir="dist"/>
+      <mkdir dir="${dist}/@{packagename}-${version}/${jars}"/>
+      <mkdir dir="${dist}/@{packagename}-${version}/bin"/>
+      <copy
+        file="${jars}/@{packagename}.jar"
+        tofile="${dist}/@{packagename}-${version}/${jars}/@{packagename}.jar"/>
+      <exec executable="sed" output="${dist}/@{packagename}-${version}/README">
+        <arg value="-e"/>
+        <arg value="s/&lt;[^>]*>//g"/>
+        <arg value="-e"/>
+        <arg value="s/&#60;[^>]*>//g"/>
+        <arg value="www/README.html"/>
+      </exec>
+      <copy
+        file="www/README.html"
+        tofile="${dist}/@{packagename}-${version}/README.html"/>
+      <copy
+        file="scripts/start_server.sh"
+        tofile="${dist}/@{packagename}-${version}/bin/start_server.sh"/>
+      <copy
+        file="www/serverfeatures.html"
+        tofile="${dist}/@{packagename}-${version}/serverfeatures.html"/>
+      <move todir="${dist}/@{packagename}-${version}/docs">
+        <fileset dir="@{docsdir}"/>
+      </move>
+      <copy todir="${dist}/@{packagename}-${version}">
+        <fileset dir="." includes="CHANGES*"/>
+      </copy>
+      <zip zipfile="@{packagename}-${version}.zip" basedir="${dist}"/>
+      <tar tarfile="@{packagename}-${version}.tar" basedir="${dist}"/>
+      <gzip
+        zipfile="@{packagename}-${version}.tar.gz"
+        src="@{packagename}-${version}.tar"/>
+      <delete file="@{packagename}-${version}.tar"/>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="distsrc">
+    <attribute name="packagename"/>
+    <attribute name="cvsroot"/>
+    <attribute name="cvspackage"/>
+    <sequential>
+      <delete dir="@{packagename}-${version}.src"/>
+      <delete file="@{packagename}-${version}.src.tar.gz"/>
+      <delete file="@{packagename}-${version}.src.zip"/>
+      <exec executable="svn">
+        <arg line="export --non-interactive @{cvsroot} @{packagename}"/>
+      </exec>
+<!--       <cvs cvsRoot="@{cvsroot}" -->
+<!--         package="@{cvspackage}" -->
+<!--         command="export" -->
+<!--         date="today"/> -->
+      <mkdir dir="@{packagename}-${version}.src/@{packagename}-${version}.src"/>
+      <move todir="@{packagename}-${version}.src/@{packagename}-${version}.src">
+        <fileset dir="@{cvspackage}"/>
+      </move>
+      <zip
+        zipfile="@{packagename}-${version}.src.zip"
+        basedir="@{packagename}-${version}.src"/>
+      <tar
+        tarfile="@{packagename}-${version}.src.tar"
+        basedir="@{packagename}-${version}.src"/>
+      <gzip
+        zipfile="@{packagename}-${version}.src.tar.gz"
+        src="@{packagename}-${version}.src.tar"/>
+      <delete file="@{packagename}-${version}.src.tar"/>
+      <delete dir="@{packagename}-${version}.src"/>
+    </sequential>
+  </macrodef>
+
+  <taskdef name="unitgen"
+    classpath="${libs}/unittestsgen.jar"
+    classname="testsgen.taskant.UnitTestsGen"/>
+
+</project>
