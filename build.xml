@@ -1,4 +1,4 @@
-<project name="tigase" default="jar-unittests" basedir=".">
+<project name="tigase" default="jar" basedir=".">
 
   <property file="build.properties"/>
 
@@ -31,7 +31,7 @@
     <property name="dist" value="dist/${projectname}-${jarfile}-${version}"/>
   </target>
 
-  <target name="jar-${jarfile}" depends="prepare,prepare-dist"
+  <target name="jar" depends="prepare,prepare-dist"
       description="Build jar file for ${projectname} ${jarfile}">
     <compile srcdir="${src}"/>
     <jarfile
@@ -55,23 +55,20 @@
     </unitgen>
   </target>
 
-  <target name="jar-all" depends="clean,prepare,jar-${jarfile},jar-unittests"
+  <target name="jar-all" depends="clean,prepare,jar,jar-unittests"
     description="Builds all jar for the project.">
   </target>
 
-  <target name="docs-${jarfile}" depends="prepare"
+  <target name="docs" depends="prepare"
     description="Make Server javadoc">
     <docs packages="${javadoc-package}" destdir="docs-${jarfile}"/>
   </target>
 
-  <target name="dist-${jarfile}"
-    depends="clean-all,prepare-dist,jar-${jarfile},docs-${jarfile}"
+  <target name="dist"
+    depends="clean-all,prepare-dist,jar,docs"
     description="Create ${projectname} ${jarfile} binary distribution file">
     <distbin packagename="${projectname}" docsdir="docs-${jarfile}"/>
   </target>
-
-  <target name="dist" depends="clean-all,dist-${jarfile}"
-    description="Create all binary distribution files"/>
 
   <target name="dist-src" depends="prepare,prepare-dist"
     description="Create distribution package with all source files">

@@ -18,34 +18,38 @@
  *  Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
  * $Rev$
- * Last modified by $Author: .*\$$
- * $Date:  .*\$$
+ * Last modified by $Author$
+ * $Date$
  */
 
 package tigase.server;
 
 /**
  * Interface MessageReceiver
- * Objects of this type can receive messages. They can be in fact routing destination depending on target address. Message are routed to proper destination in MessageRouter class.
+ *
+ * Objects of this type can receive messages. They can be in fact routing
+ * destination depending on target address. Message are routed to proper
+ * destination in MessageRouter class.
+ *
+ * Created: Tue Nov 22 07:07:11 2005
+ *
+ * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
+ * @version $Rev$
  */
-public interface MessageReceiver extends ServerComponentIfc {
-  // Methods
-  // Constructors
-  // Accessor Methods
-  // Operations
-  /**
-   * Returns array of Strings. Each String should be a regular expression defining destination addresses for which this receiver can process messages. There can be more than one message receiver for each messages.
-   */
-  public String routingAddresses ( );
-    
-  
-  /**
-   * 
-   * @param packet 
-   * @return   
-   */
-  public  addMessage ( tigase.server.Packet packet);
-    
-  
-}
+public interface MessageReceiver extends ServerComponent {
 
+  /**
+   * Returns array of Strings. Each String should be a regular expression
+   * defining destination addresses for which this receiver can process
+   * messages. There can be more than one message receiver for each messages.
+   */
+  String routingAddresses();
+
+  /**
+   *
+   * @param packet
+   * @return
+   */
+  void addMessage(Packet packet);
+
+}

@@ -18,20 +18,35 @@
  *  Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
  * $Rev$
- * Last modified by $Author: .*\$$
- * $Date:  .*\$$
+ * Last modified by $Author$
+ * $Date$
  */
 
-package tigase.http;
+package tigase.server;
 
 /**
- * Interface HttpServiceIfc
- * 
+ * Interface ComponentRegistrator
+ *
+ * Collects information about all ServerComponents connected to MessageRouter
+ *
+ * Created: Tue Nov 22 07:07:11 2005
+ *
+ * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
+ * @version $Rev$
  */
-public interface HttpServiceIfc {
-  // Methods
-  // Constructors
-  // Accessor Methods
-  // Operations
-}
+public interface ComponentRegistrator extends ServerComponent {
 
+  /**
+   *
+   * @param component
+   * @return
+   */
+	void addComponent(ServerComponent component);
+
+  /**
+   *
+   * @return tigase.server.ServerComponent
+   */
+	void deleteComponent(ServerComponent component);
+
+}

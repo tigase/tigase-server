@@ -18,28 +18,54 @@
  *  Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
  * $Rev$
- * Last modified by $Author: .*\$$
- * $Date:  .*\$$
+ * Last modified by $Author$
+ * $Date$
  */
 
 package tigase.server.xmppclient;
 
-
-import tigase.stats.StatisticsContainerIfc;
-import tigase.server.MessageReceiver;
+import tigase.stats.StatisticsContainer;
+import tigase.server.AbstractMessageReceiver;
 import tigase.conf.Configurable;
 import tigase.server.XMPPService;
+import java.util.Map;
+
 /**
  * Class ClientConnectionManager
- * 
+ *
+ * Created: Tue Nov 22 07:07:11 2005
+ *
+ * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
+ * @version $Rev$
  */
-public class ClientConnectionManager implements StatisticsContainerIfc, MessageReceiver, Configurable, XMPPService, XMPPService {
-  // Fields
-  // Methods
-  // Constructors
-  // Empty Constructor
-  public ClientConnectionManager ( ) { }
-  // Accessor Methods
-  // Operations
-}
+public class ClientConnectionManager extends AbstractMessageReceiver
+	implements StatisticsContainer, Configurable, XMPPService {
 
+  public ClientConnectionManager ( ) { }
+
+  /**
+   * Get object id. This id corresponds to entry in configuration.
+   */
+	public String getId() { return null; }
+
+  /**
+   * Sets configuration property to object.
+   */
+	public void setProperty(String name, String value) {}
+
+  /**
+   * Sets all configuration properties for object.
+   */
+	public void setProperties() {}
+
+  /**
+   * Returns defualt configuration settings for this object.
+   */
+	public Map<String, String> getStatistics() { return null; }
+
+  /**
+   * Returns defualt configuration settings for this object.
+   */
+	public Map<String, String> getDefaults() { return null; }
+
+}

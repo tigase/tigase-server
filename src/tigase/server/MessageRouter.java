@@ -18,28 +18,51 @@
  *  Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
  * $Rev$
- * Last modified by $Author: .*\$$
- * $Date:  .*\$$
+ * Last modified by $Author$
+ * $Date$
  */
 
 package tigase.server;
 
 import tigase.conf.Configurable;
-import tigase.stats.StatisticsContainerIfc;
+import tigase.stats.StatisticsContainer;
+import java.util.Map;
 
 /**
  * Class MessageRouter
  *
+ *
+ * Created: Tue Nov 22 07:07:11 2005
+ *
+ * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
+ * @version $Rev$
  */
-public class MessageRouter
-	implements
-		XMPPService, MessageReceiver, Configurable, StatisticsContainerIfc {
-	// Fields
-	// Methods
-	// Constructors
-	// Empty Constructor
+public class MessageRouter extends AbstractMessageReceiver
+	implements XMPPService, Configurable, StatisticsContainer {
+
 	public MessageRouter() { }
-	// Accessor Methods
-	// Operations
+
+  /**
+   * Get object id. This id corresponds to entry in configuration.
+   */
+	public String getId() { return null; }
+
+  /**
+   * Sets configuration property to object.
+   */
+	public void setProperty(String name, String value) {}
+
+  /**
+   * Sets all configuration properties for object.
+   */
+	public void setProperties() {}
+
+  /**
+   * Returns defualt configuration settings for this object.
+   */
+	public Map<String, String> getDefaults() { return null; }
+
+	public Map<String, String> getStatistics() { return null; }
+
 }
 

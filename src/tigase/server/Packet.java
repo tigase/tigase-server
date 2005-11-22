@@ -18,48 +18,54 @@
  *  Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
  * $Rev$
- * Last modified by $Author: .*\$$
- * $Date:  .*\$$
+ * Last modified by $Author$
+ * $Date$
  */
 
 package tigase.server;
 
 /**
  * Class Packet
+ *
  * Represent one XMPP packet.
+ *
+ * Created: Tue Nov 22 07:07:11 2005
+ *
+ * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
+ * @version $Rev$
  */
 public class Packet {
-  // Fields
-  // Methods
-  // Constructors
-  // Empty Constructor
-  public Packet ( ) { }
-  // Accessor Methods
-  // Operations
+
+  public Packet() {}
+
   /**
    * Returns packet destination address.
    */
-  public String getTo ( ) {
-    
+  public String getTo() {
+    return null;
   }
+
   /**
    * Returns packet source address.
    */
-  public String getFrom ( ) {
-    
+  public String getFrom() {
+    return null;
   }
-  /**
-   * Tells whether data kept by this packet has been already parsed or if they in raw format.
-   */
-  public boolean isParsed ( ) {
-    
-  }
-  /**
-   * 
-   * @return byte  
-   */
-  public byte getData ( ) {
-    
-  }
-}
 
+  /**
+   * Tells whether data kept by this packet has been already parsed or if they
+   * in raw format.
+   */
+  public boolean isParsed() {
+    return false;
+  }
+
+  /**
+   *
+   * @return byte
+   */
+  public byte[] getData() {
+    return null;
+  }
+
+}

@@ -18,29 +18,27 @@
  *  Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
  * $Rev$
- * Last modified by $Author: .*\$$
- * $Date:  .*\$$
+ * Last modified by $Author$
+ * $Date$
  */
 
 package tigase.server;
 
 /**
- * Interface ComponentRegistratorIfc
- * Collects information about all ServerComponentsIfc connected to MessageRouter
+ * Interface ServerComponent
+ *
+ * Object of this type can be managed by MessageRouter. All classes which are
+ * loaded by MessageRouter must inherit this interface.
+ *
+ * Created: Tue Nov 22 07:07:11 2005
+ *
+ * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
+ * @version $Rev$
  */
-public interface ComponentRegistratorIfc extends ServerComponentIfc {
-
-  /**
-   *
-   * @param component
-   * @return
-   */
-  public void addComponent(ServerComponentIfc component);
-
-  /**
-   *
-   * @return tigase.server.ServerComponentIfc
-   */
-  public void deleteComponent(ServerComponentIfc component);
-
+public interface ServerComponent {
+  // Methods
+  // Constructors
+  // Accessor Methods
+  // Operations
 }
+

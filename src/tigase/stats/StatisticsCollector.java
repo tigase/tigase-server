@@ -18,26 +18,30 @@
  *  Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
  * $Rev$
- * Last modified by $Author: .*\$$
- * $Date:  .*\$$
+ * Last modified by $Author$
+ * $Date$
  */
 
 package tigase.stats;
 
-
-import tigase.server.ComponentRegistratorIfc;
+import tigase.server.AbstractComponentRegistrator;
 import tigase.server.XMPPService;
+import java.util.Map;
+
 /**
  * Class StatisticsCollector
- * 
+ *
+ *
+ * Created: Tue Nov 22 07:07:11 2005
+ *
+ * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
+ * @version $Rev$
  */
-public class StatisticsCollector implements ComponentRegistratorIfc, XMPPService {
-  // Fields
-  // Methods
-  // Constructors
-  // Empty Constructor
-  public StatisticsCollector ( ) { }
-  // Accessor Methods
-  // Operations
-}
+public class StatisticsCollector extends AbstractComponentRegistrator
+	implements XMPPService {
 
+  public StatisticsCollector() {}
+
+	public Map<String, String> getStatistics() { return null; }
+
+}

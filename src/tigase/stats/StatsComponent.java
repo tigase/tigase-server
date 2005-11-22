@@ -18,25 +18,24 @@
  *  Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
  * $Rev$
- * Last modified by $Author: .*\$$
- * $Date:  .*\$$
+ * Last modified by $Author$
+ * $Date$
  */
 
 package tigase.stats;
 
-
 import tigase.ui.UIComponent;
+
 /**
  * Class StatsComponent
- * 
+ *
+ * Created: Tue Nov 22 07:07:11 2005
+ *
+ * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
+ * @version $Rev$
  */
-public class StatsComponent implements WebComponent {
-  // Fields
-  // Methods
-  // Constructors
-  // Empty Constructor
-  public StatsComponent ( ) { }
-  // Accessor Methods
-  // Operations
-}
+public class StatsComponent implements UIComponent {
 
+  public StatsComponent() {}
+
+}

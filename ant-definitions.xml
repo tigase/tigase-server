@@ -14,6 +14,11 @@
         debug="on"
         deprecation="@{deprecation}">
         <compilerarg line="@{xlint}"/>
+	<classpath>
+	  <fileset dir="${libs}">
+	    <include name="**/*.jar"/>
+	  </fileset>
+	</classpath>
       </javac>
     </sequential>
   </macrodef>

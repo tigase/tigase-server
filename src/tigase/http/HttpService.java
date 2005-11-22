@@ -22,18 +22,20 @@
  * $Date$
  */
 
-package tigase.ui;
+package tigase.http;
 
 /**
- * Class XMPPServiceComponent
+ * Interface HttpService
+ *
  *
  * Created: Tue Nov 22 07:07:11 2005
  *
  * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class XMPPServiceComponent implements UIComponent {
-
-  public XMPPServiceComponent() {}
-
+public interface HttpService {
+  // Methods
+  // Constructors
+  // Accessor Methods
+  // Operations
 }

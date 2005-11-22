@@ -18,25 +18,27 @@
  *  Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
  * $Rev$
- * Last modified by $Author: .*\$$
- * $Date:  .*\$$
+ * Last modified by $Author$
+ * $Date$
  */
 
 package tigase.conf;
 
+import tigase.server.AbstractComponentRegistrator;
+import tigase.server.XMPPService;
+import tigase.server.ServerComponent;
 
-import tigase.server.ComponentRegistratorIfc;
 /**
  * Class Configurator
- * 
+ *
+ * Created: Tue Nov 22 07:07:11 2005
+ *
+ * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
+ * @version $Rev$
  */
-public class Configurator implements ComponentRegistratorIfc, ComponentRegistratorIfc, XMPPService {
-  // Fields
-  // Methods
-  // Constructors
-  // Empty Constructor
-  public Configurator ( ) { }
-  // Accessor Methods
-  // Operations
-}
+public class Configurator extends AbstractComponentRegistrator
+	implements XMPPService {
 
+  public Configurator() {}
+
+}

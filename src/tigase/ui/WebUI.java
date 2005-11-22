@@ -18,25 +18,25 @@
  *  Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
  * $Rev$
- * Last modified by $Author: .*\$$
- * $Date:  .*\$$
+ * Last modified by $Author$
+ * $Date$
  */
 
 package tigase.ui;
 
+import tigase.http.HttpService;
 
-import tigase.http.HttpServiceIfc;
 /**
  * Class WebUI
- * 
+ *
+ * Created: Tue Nov 22 07:07:11 2005
+ *
+ * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
+ * @version $Rev$
  */
-public class WebUI implements HttpServiceIfc {
-  // Fields
-  // Methods
-  // Constructors
-  // Empty Constructor
-  public WebUI ( ) { }
-  // Accessor Methods
-  // Operations
+public class WebUI implements HttpService {
+
+  public WebUI() {}
+
 }
 

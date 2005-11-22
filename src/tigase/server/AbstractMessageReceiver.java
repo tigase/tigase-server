@@ -1,7 +1,6 @@
-/*
- *  Package Tigase XMPP/Jabber Server
- *  Copyright (C) 2004, 2005, 2006
- *  "Artur Hefczyc" <artur.hefczyc@gmail.com>
+/*  Package Jabber Server
+ *  Copyright (C) 2001, 2002, 2003, 2004, 2005
+ *  "Artur Hefczyc" <kobit@users.sourceforge.net>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -21,19 +20,34 @@
  * Last modified by $Author$
  * $Date$
  */
-
-package tigase.ui;
+package tigase.server;
 
 /**
- * Class XMPPServiceComponent
+ * Describe class AbstractMessageReceiver here.
+ *
  *
  * Created: Tue Nov 22 07:07:11 2005
  *
  * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class XMPPServiceComponent implements UIComponent {
+public class AbstractMessageReceiver implements MessageReceiver {
 
-  public XMPPServiceComponent() {}
+  /**
+	 * Describe <code>routingAddresses</code> method here.
+   * Returns array of Strings. Each String should be a regular expression
+   * defining destination addresses for which this receiver can process
+   * messages. There can be more than one message receiver for each messages.
+	 *
+	 * @return a <code>String</code> value
+	 */
+	public String routingAddresses() { return null; }
 
-}
+  /**
+	 * Describe <code>addMessage</code> method here.
+	 *
+	 * @param packet a <code>Packet</code> value
+	 */
+	public void addMessage(Packet packet) {}
+
+} // AbstractMessageReceiver

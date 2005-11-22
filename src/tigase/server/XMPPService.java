@@ -26,7 +26,14 @@ package tigase.server;
 
 /**
  * Interface XMPPService
- * Objects of which inherit this interface can response to "ServiceDiscovery" requests. All such requests are managed by XMPPServiceCollector object.
+ *
+ * Objects of which inherit this interface can response to "ServiceDiscovery"
+ * requests. All such requests are managed by XMPPServiceCollector object.
+ *
+ * Created: Tue Nov 22 07:07:11 2005
+ *
+ * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
+ * @version $Rev$
  */
 public interface XMPPService {
   // Methods

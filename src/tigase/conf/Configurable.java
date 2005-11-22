@@ -18,45 +18,47 @@
  *  Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
  * $Rev$
- * Last modified by $Author: .*\$$
- * $Date:  .*\$$
+ * Last modified by $Author$
+ * $Date$
  */
 
 package tigase.conf;
 
+import java.util.Map;
+
 /**
  * Interface Configurable
- * Objects inheriting this interface can be configured. In Tigase system object can't request configuration properties. Configuration of the object is passed to it at some time. Actually it can be passed at any time. This allows dynamic system reconfiguration at runtime.
- * 
+ *
+ * Objects inheriting this interface can be configured. In Tigase system object
+ * can't request configuration properties. Configuration of the object is passed
+ * to it at some time. Actually it can be passed at any time. This allows
+ * dynamic system reconfiguration at runtime.
+ *
+ * Created: Tue Nov 22 07:07:11 2005
+ *
+ * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
+ * @version $Rev$
  */
 public interface Configurable {
-  // Methods
-  // Constructors
-  // Accessor Methods
-  // Operations
+
   /**
    * Get object id. This id corresponds to entry in configuration.
    */
-  public String getId ( );
-    
-  
+	String getId();
+
   /**
    * Sets configuration property to object.
    */
-  public void setProperty ( string name, string value);
-    
-  
+	void setProperty(String name, String value);
+
   /**
    * Sets all configuration properties for object.
    */
-  public void setProperties ( );
-    
-  
+	void setProperties();
+
   /**
    * Returns defualt configuration settings for this object.
    */
-  public String getDefaults ( );
-    
-  
-}
+	Map<String, String> getDefaults();
 
+}
