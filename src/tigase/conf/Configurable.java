@@ -54,7 +54,7 @@ public interface Configurable {
   /**
    * Sets all configuration properties for object.
    */
-	void setProperties();
+	void setProperties(Map<String, String> properties);
 
   /**
    * Returns defualt configuration settings for this object.

@@ -58,7 +58,7 @@ public class ClientConnectionManager extends AbstractMessageReceiver
   /**
    * Sets all configuration properties for object.
    */
-	public void setProperties() {}
+	public void setProperties(Map<String, String> properties) {}
 
   /**
    * Returns defualt configuration settings for this object.
