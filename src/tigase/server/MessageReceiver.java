@@ -24,6 +24,8 @@
 
 package tigase.server;
 
+import java.util.Queue;
+
 /**
  * Interface MessageReceiver
  *
@@ -42,14 +44,20 @@ public interface MessageReceiver extends ServerComponent {
    * Returns array of Strings. Each String should be a regular expression
    * defining destination addresses for which this receiver can process
    * messages. There can be more than one message receiver for each messages.
+   *
+   * @return a <code>String[]</code> value
    */
-  String routingAddresses();
+  String[] routingAddresses();
 
   /**
+	 * Describe <code>addMessage</code> method here.
    *
-   * @param packet
-   * @return
-   */
-  void addMessage(Packet packet);
+	 * @param packet a <code>Packet</code> value
+	 * @return a <code>boolean</code> value <code>true</code> if packet has been
+	 * successfully added, <code>false</code> otherwise.
+	 */
+	boolean addMessage(Packet packet, boolean blocking);
+
+	boolean addMessages(Queue<Packet> packets, boolean blocking);
 
 }

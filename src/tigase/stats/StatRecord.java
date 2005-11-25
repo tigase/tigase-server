@@ -1,7 +1,6 @@
-/*
- *  Package Tigase XMPP/Jabber Server
- *  Copyright (C) 2004, 2005, 2006
- *  "Artur Hefczyc" <artur.hefczyc@gmail.com>
+/*  Package Jabber Server
+ *  Copyright (C) 2001, 2002, 2003, 2004, 2005
+ *  "Artur Hefczyc" <kobit@users.sourceforge.net>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -21,25 +20,46 @@
  * Last modified by $Author$
  * $Date$
  */
-
 package tigase.stats;
 
-import java.util.List;
-
 /**
- * Interface StatisticsContainer
+ * Describe class StatRecord here.
  *
- * Objects which inherits this type can return runtime statistics. Any object
- * can collect job statistics and implementing this interface guarantees that
- * statistics will be presented in configured way to user who wants to see them.
  *
- * Created: Tue Nov 22 07:07:11 2005
+ * Created: Wed Nov 23 21:28:53 2005
  *
  * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
  * @version $Rev$
  */
-public interface StatisticsContainer {
+public class StatRecord {
 
-  public List<StatRecord> getStatistics();
+	private StatisticType type = null;
+	private long longValue = -1;
+	private int intValue = -1;
 
-}
+	private String description = null;
+	private String unit = null;
+
+	/**
+	 * Creates a new <code>StatRecord</code> instance.
+	 *
+	 * @param type a <code>StatisticType</code> value
+	 * @param value a <code>long</code> value
+	 */
+	public StatRecord(StatisticType type, long value) {
+		this.type = type;
+		longValue = value;
+	}
+
+	public StatRecord(StatisticType type, int value) {
+		this.type = type;
+		intValue = value;
+	}
+
+	public StatRecord(String description, String unit, int value) {
+		this.description = description;
+		this.unit = unit;
+		intValue = value;
+	}
+
+} // StatRecord

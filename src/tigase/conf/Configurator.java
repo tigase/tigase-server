@@ -27,6 +27,8 @@ package tigase.conf;
 import tigase.server.AbstractComponentRegistrator;
 import tigase.server.XMPPService;
 import tigase.server.ServerComponent;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Class Configurator
@@ -40,5 +42,17 @@ public class Configurator extends AbstractComponentRegistrator
 	implements XMPPService {
 
   public Configurator() {}
+
+  /**
+   * Returns defualt configuration settings in case if there is no
+   * config file.
+   */
+	public Map<String, String> getDefaults() {
+		Map<String, String> defaults = new TreeMap<String, String>();
+		defaults.put("tigase.message-router.id", "router");
+		defaults.put("tigase.message-router.class",
+			"tigase.server.MessageRouter");
+		return defaults;
+	}
 
 }

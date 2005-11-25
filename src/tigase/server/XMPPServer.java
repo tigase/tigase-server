@@ -1,7 +1,6 @@
-/*
- *  Package Tigase XMPP/Jabber Server
- *  Copyright (C) 2004, 2005, 2006
- *  "Artur Hefczyc" <artur.hefczyc@gmail.com>
+/*  Package Jabber Server
+ *  Copyright (C) 2001, 2002, 2003, 2004, 2005
+ *  "Artur Hefczyc" <kobit@users.sourceforge.net>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -21,48 +20,35 @@
  * Last modified by $Author$
  * $Date$
  */
-
 package tigase.server;
 
-import tigase.conf.Configurable;
-import java.util.Map;
-import java.util.Queue;
-
 /**
- * Class MessageRouter
+ * Describe class XMPPServer here.
  *
  *
- * Created: Tue Nov 22 07:07:11 2005
+ * Created: Wed Nov 23 07:04:18 2005
  *
  * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class MessageRouter extends AbstractMessageReceiver
-	implements XMPPService, Configurable {
+public class XMPPServer {
 
-	public MessageRouter(String[] addresses, int maxQueueSize,
-		MessageReceiver parent) {
-		super(addresses, maxQueueSize, parent);
+	/**
+	 * Creates a new <code>XMPPServer</code> instance.
+	 *
+	 */
+	public XMPPServer() {
+
 	}
 
-  /**
-   * Sets configuration property to object.
-   */
-	public void setProperty(String name, String value) {}
+	/**
+	 * Describe <code>main</code> method here.
+	 *
+	 * @param args a <code>String[]</code> value
+	 */
+	public static void main(final String[] args) {
 
-  /**
-   * Sets all configuration properties for object.
-   */
-	public void setProperties() {}
-
-  /**
-   * Returns defualt configuration settings for this object.
-   */
-	public Map<String, String> getDefaults() { return null; }
-
-	public Queue<Packet> processPacket(Packet packet) {
-		return null;
 	}
 
-}
 
+} // XMPPServer

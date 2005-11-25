@@ -24,11 +24,15 @@
 
 package tigase.server.xmppclient;
 
-import tigase.stats.StatisticsContainer;
-import tigase.server.AbstractMessageReceiver;
-import tigase.conf.Configurable;
-import tigase.server.XMPPService;
 import java.util.Map;
+import java.util.Queue;
+
+import tigase.conf.Configurable;
+import tigase.server.AbstractMessageReceiver;
+import tigase.server.MessageReceiver;
+import tigase.server.XMPPService;
+import tigase.server.Packet;
+
 
 /**
  * Class ClientConnectionManager
@@ -39,14 +43,12 @@ import java.util.Map;
  * @version $Rev$
  */
 public class ClientConnectionManager extends AbstractMessageReceiver
-	implements StatisticsContainer, Configurable, XMPPService {
+	implements Configurable, XMPPService {
 
-  public ClientConnectionManager ( ) { }
-
-  /**
-   * Get object id. This id corresponds to entry in configuration.
-   */
-	public String getId() { return null; }
+  public ClientConnectionManager(String[] addresses, int maxQueueSize,
+		MessageReceiver parent) {
+		super(addresses, maxQueueSize, parent);
+	}
 
   /**
    * Sets configuration property to object.
@@ -61,11 +63,10 @@ public class ClientConnectionManager extends AbstractMessageReceiver
   /**
    * Returns defualt configuration settings for this object.
    */
-	public Map<String, String> getStatistics() { return null; }
-
-  /**
-   * Returns defualt configuration settings for this object.
-   */
 	public Map<String, String> getDefaults() { return null; }
+
+	public Queue<Packet> processPacket(Packet packet) {
+		return null;
+	}
 
 }

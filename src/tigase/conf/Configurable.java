@@ -44,7 +44,7 @@ public interface Configurable {
   /**
    * Get object id. This id corresponds to entry in configuration.
    */
-	String getId();
+	String getName();
 
   /**
    * Sets configuration property to object.
