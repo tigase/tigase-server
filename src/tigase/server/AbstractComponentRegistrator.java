@@ -22,6 +22,9 @@
  */
 package tigase.server;
 
+import java.util.List;
+import java.util.ArrayList;
+
 /**
  * Describe class AbstractComponentRegistrator here.
  *
@@ -33,20 +36,24 @@ package tigase.server;
  */
 public class AbstractComponentRegistrator implements ComponentRegistrator {
 
+	private List<ServerComponent> components = new ArrayList<ServerComponent>();
+
 	/**
 	 * Creates a new <code>AbstractComponentRegistrator</code> instance.
 	 *
 	 */
-	public AbstractComponentRegistrator() {
+	public AbstractComponentRegistrator() {}
 
+	public boolean addComponent(ServerComponent component) {
+		return components.add(component);
 	}
-
-	public void addComponent(ServerComponent component) {}
 
   /**
    *
    * @return tigase.server.ServerComponent
    */
-	public void deleteComponent(ServerComponent component) {}
+	public boolean deleteComponent(ServerComponent component) {
+		return components.remove(component);
+	}
 
 } // AbstractComponentRegistrator

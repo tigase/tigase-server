@@ -45,25 +45,9 @@ import tigase.server.Packet;
 public class SessionManager extends AbstractMessageReceiver
 	implements Configurable, XMPPService {
 
-  public SessionManager(String[] addresses, int maxQueueSize,
-		MessageReceiver parent) {
-		super(addresses, maxQueueSize, parent);
+  public SessionManager(MessageReceiver parent) {
+		super(parent);
 	}
-
-  /**
-   * Sets configuration property to object.
-   */
-	public void setProperty(String name, String value) {}
-
-  /**
-   * Sets all configuration properties for object.
-   */
-	public void setProperties(Map<String, String> properties) {}
-
-  /**
-   * Returns defualt configuration settings for this object.
-   */
-	public Map<String, String> getDefaults() { return null; }
 
 	public Queue<Packet> processPacket(Packet packet) {
 		return null;

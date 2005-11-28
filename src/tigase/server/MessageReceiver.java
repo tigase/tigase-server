@@ -47,7 +47,7 @@ public interface MessageReceiver extends ServerComponent {
    *
    * @return a <code>String[]</code> value
    */
-  String[] routingAddresses();
+  String[] getRoutingAddresses();
 
   /**
 	 * Describe <code>addMessage</code> method here.
@@ -58,6 +58,12 @@ public interface MessageReceiver extends ServerComponent {
 	 */
 	boolean addMessage(Packet packet, boolean blocking);
 
+	/**
+	 * Describe <code>addMessages</code> method here.
+	 *
+	 * @param blocking a <code>boolean</code> value
+	 * @return a <code>boolean</code> value
+	 */
 	boolean addMessages(Queue<Packet> packets, boolean blocking);
 
 }

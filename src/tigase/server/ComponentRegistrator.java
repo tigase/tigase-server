@@ -41,12 +41,12 @@ public interface ComponentRegistrator extends ServerComponent {
    * @param component
    * @return
    */
-	void addComponent(ServerComponent component);
+	boolean addComponent(ServerComponent component);
 
   /**
    *
    * @return tigase.server.ServerComponent
    */
-	void deleteComponent(ServerComponent component);
+	boolean deleteComponent(ServerComponent component);
 
 }

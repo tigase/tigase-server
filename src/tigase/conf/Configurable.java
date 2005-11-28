@@ -42,23 +42,20 @@ import java.util.Map;
 public interface Configurable {
 
   /**
-   * Get object id. This id corresponds to entry in configuration.
-   */
+	 * Get object name. This name corresponds to section in configuration.
+	 *
+	 * @return a <code>String</code> value of object name.
+	 */
 	String getName();
 
   /**
-   * Sets configuration property to object.
+   * Sets all configuration properties for the object.
    */
-	void setProperty(String name, String value);
-
-  /**
-   * Sets all configuration properties for object.
-   */
-	void setProperties(Map<String, String> properties);
+	void setProperties(Map<String, ?> properties);
 
   /**
    * Returns defualt configuration settings for this object.
    */
-	Map<String, String> getDefaults();
+	Map<String, ?> getDefaults();
 
 }

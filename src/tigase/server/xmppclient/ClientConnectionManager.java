@@ -27,12 +27,10 @@ package tigase.server.xmppclient;
 import java.util.Map;
 import java.util.Queue;
 
-import tigase.conf.Configurable;
 import tigase.server.AbstractMessageReceiver;
 import tigase.server.MessageReceiver;
 import tigase.server.XMPPService;
 import tigase.server.Packet;
-
 
 /**
  * Class ClientConnectionManager
@@ -43,27 +41,11 @@ import tigase.server.Packet;
  * @version $Rev$
  */
 public class ClientConnectionManager extends AbstractMessageReceiver
-	implements Configurable, XMPPService {
+	implements XMPPService {
 
-  public ClientConnectionManager(String[] addresses, int maxQueueSize,
-		MessageReceiver parent) {
-		super(addresses, maxQueueSize, parent);
+  public ClientConnectionManager(MessageReceiver parent) {
+		super(parent);
 	}
-
-  /**
-   * Sets configuration property to object.
-   */
-	public void setProperty(String name, String value) {}
-
-  /**
-   * Sets all configuration properties for object.
-   */
-	public void setProperties(Map<String, String> properties) {}
-
-  /**
-   * Returns defualt configuration settings for this object.
-   */
-	public Map<String, String> getDefaults() { return null; }
 
 	public Queue<Packet> processPacket(Packet packet) {
 		return null;
