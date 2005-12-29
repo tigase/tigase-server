@@ -34,7 +34,8 @@ import java.util.ArrayList;
  * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class AbstractComponentRegistrator implements ComponentRegistrator {
+public abstract class AbstractComponentRegistrator
+	implements ComponentRegistrator {
 
 	private List<ServerComponent> components = new ArrayList<ServerComponent>();
 
@@ -45,15 +46,27 @@ public class AbstractComponentRegistrator implements ComponentRegistrator {
 	public AbstractComponentRegistrator() {}
 
 	public boolean addComponent(ServerComponent component) {
-		return components.add(component);
+		boolean result = components.add(component);
+		if (result) {
+			componentAdded(component);
+		} // end of if (result)
+		return result;
 	}
+
+	public abstract void componentAdded(ServerComponent component);
 
   /**
    *
    * @return tigase.server.ServerComponent
    */
 	public boolean deleteComponent(ServerComponent component) {
-		return components.remove(component);
+		boolean result = components.remove(component);
+		if (result) {
+			componentRemoved(component);
+		} // end of if (result)
+		return result;
 	}
+
+	public abstract void componentRemoved(ServerComponent component);
 
 } // AbstractComponentRegistrator

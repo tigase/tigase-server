@@ -24,6 +24,7 @@
 
 package tigase.server;
 
+import java.util.logging.Logger;
 import java.util.Queue;
 import java.util.List;
 import java.util.ArrayList;
@@ -39,6 +40,9 @@ import java.util.ArrayList;
  */
 public class MessageRouter extends AbstractMessageReceiver
 	implements XMPPService {
+
+  private static final Logger log =
+    Logger.getLogger("tigase.server.MessageRouter");
 
 	private List<ServerComponent> components =
 		new ArrayList<ServerComponent>();
@@ -56,6 +60,7 @@ public class MessageRouter extends AbstractMessageReceiver
 	}
 
 	public void addRegistrator(ComponentRegistrator registr) {
+		log.info("Adding registrator: " + registr.getClass().getSimpleName());
 		registrators.add(registr);
 		addComponent(registr);
 		for (ServerComponent comp : components) {
@@ -66,11 +71,13 @@ public class MessageRouter extends AbstractMessageReceiver
 	}
 
 	public void addRouter(MessageReceiver receiver) {
+		log.info("Adding receiver: " + receiver.getClass().getSimpleName());
 		addComponent(receiver);
 		receivers.add(receiver);
 	}
 
 	public void addComponent(ServerComponent component) {
+		log.info("Adding component: " + component.getClass().getSimpleName());
 		for (ComponentRegistrator registr : registrators) {
 			if (registr != component) {
 				registr.addComponent(component);

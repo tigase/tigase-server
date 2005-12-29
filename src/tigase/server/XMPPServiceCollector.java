@@ -36,4 +36,8 @@ public class XMPPServiceCollector extends AbstractComponentRegistrator {
 
   public XMPPServiceCollector() {}
 
+	public void componentAdded(ServerComponent component) {	}
+
+	public void componentRemoved(ServerComponent component) {}
+
 }

@@ -111,7 +111,12 @@ public class XMPPServer {
 	public static void main(final String[] args) {
 
     parseParams(args);
+		System.out.println("Class name: " + args.getClass().getCanonicalName());
+
 		Configurator config = new Configurator(config_file);
+		MessageRouter router = new MessageRouter();
+		router.addRegistrator(config);
+		router.start();
 
 	}
 

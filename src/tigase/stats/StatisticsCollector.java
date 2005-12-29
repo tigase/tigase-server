@@ -26,6 +26,7 @@ package tigase.stats;
 
 import tigase.server.AbstractComponentRegistrator;
 import tigase.server.XMPPService;
+import tigase.server.ServerComponent;
 import java.util.Map;
 
 /**
@@ -43,5 +44,9 @@ public class StatisticsCollector extends AbstractComponentRegistrator
   public StatisticsCollector() {}
 
 	public Map<String, String> getStatistics() { return null; }
+
+	public void componentAdded(ServerComponent component) {	}
+
+	public void componentRemoved(ServerComponent component) {}
 
 }
