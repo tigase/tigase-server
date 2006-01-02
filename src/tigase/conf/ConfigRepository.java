@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.logging.Logger;
 import tigase.annotations.TODO;
 import tigase.xml.db.NodeNotFoundException;
@@ -125,17 +126,28 @@ public class ConfigRepository {
 			subnode = nodeId.substring(idx+1);
 		} // end of if (idx >= 0)
 		log.config("Looking for properties for " + root + " in " + subnode + " node.");
-		List<String> allNodes = getSubnodes(new ArrayList<String>(), root, subnode);
+		List<String> allNodes = new ArrayList<String>();
+		getSubnodes(allNodes, root, subnode);
 		Map<String, Object> props = new TreeMap<String, Object>();
+		String[] keys = getKeys(root, null);
+		log.config("Found keys: " + Arrays.toString(keys));
+		addVals(props, root, null, keys);
 		for (String node : allNodes) {
-			String[] keys = getKeys(root, node);
-			if (keys != null) {
-				for (String key : keys) {
-					props.put(node + "." + key, get(root, node, key));
-				} // end of for (String key : keys)
-			} // end of if (keys != null)
+			keys = getKeys(root, node);
+			log.config("In node : '" + node + "' found keys: " + Arrays.toString(keys));
+			addVals(props, root, node, keys);
 		} // end of for (String node : allNodes)
 		return props;
+	}
+
+	private void addVals(Map<String, Object> props, String root, String node,
+		String[] keys) {
+		if (keys != null) {
+			for (String key : keys) {
+				String node_tmp = (node == null || node.equals("")) ? "" : node + ".";
+				props.put(node_tmp + key, get(root, node, key, null));
+			} // end of for (String key : keys)
+		} // end of if (keys != null)
 	}
 
 	public void putProperties(String nodeId, Map<String, ?> props) {
@@ -164,15 +176,16 @@ public class ConfigRepository {
 		} // end of for ()
 	}
 
-	private List<String> getSubnodes(List<String> result, String root,
-		String node) {
+	private void getSubnodes(List<String> result, String root, String node) {
 		String[] subnodes = getSubnodes(root, node);
-		for (String subnode : subnodes) {
-			result.add(subnode);
-			log.config("Adding subnode: " + subnode);
-			getSubnodes(result, root, node + "." + subnode);
-		} // end of for (String subnode : subnodes)
-		return result;
+		String node_tmp = (node.equals("") ? node : node + ".");
+		if (subnodes != null) {
+			for (String subnode : subnodes) {
+				result.add(node_tmp + subnode);
+				log.config("Adding subnode: " + node_tmp + subnode);
+				getSubnodes(result, root, node_tmp + subnode);
+			} // end of for (String subnode : subnodes)
+		} // end of if (subnodes != null)
 	}
 
 	public void sync() throws IOException {

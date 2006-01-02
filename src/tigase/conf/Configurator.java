@@ -29,6 +29,7 @@ import tigase.server.XMPPService;
 import tigase.server.ServerComponent;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.Arrays;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
@@ -123,10 +124,67 @@ public class Configurator extends AbstractComponentRegistrator
 		props.put("double", 12.34);
 		props.put("doubles", new double[] {1.2, 2.3, 3.4, 4.5});
 
-		ConfigRepository testRep = ConfigRepository.getConfigRepository(testConfig);
-		testRep.putProperties(compName1, props);
-		testRep.putProperties(compName2, props);
-		testRep.sync();
+		ConfigRepository testRep1 =
+			ConfigRepository.getConfigRepository(testConfig);
+		testRep1.putProperties(compName1, props);
+		// 		testRep1.putProperties(compName2, props);
+		testRep1.sync();
+
+		ConfigRepository testRep2 =
+			ConfigRepository.getConfigRepository(testConfig);
+		Map<String, ?> props_r = testRep2.getProperties(compName1);
+
+		String key = "";
+		String val_s = (String)props_r.get(key);
+		pr("'" + key + "'=" + val_s);
+
+		key = "int_12345";
+		int val_i = (Integer)props_r.get(key);
+		pr("'" + key + "'=" + val_i);
+
+		key = "ints_12345";
+		int[] val_ia = (int[])props_r.get(key);
+		pr("'" + key + "'=" + Arrays.toString(val_ia));
+
+		key = "bool_true";
+		boolean val_b = (Boolean)props_r.get(key);
+		pr("'" + key + "'=" + val_b);
+
+		key = "bool_false";
+		val_b = (Boolean)props_r.get(key);
+		pr("'" + key + "'=" + val_b);
+
+		key = "bools";
+		boolean[] val_ba = (boolean[])props_r.get(key);
+		pr("'" + key + "'=" + Arrays.toString(val_ba));
+
+		key = "string";
+		val_s = (String)props_r.get(key);
+		pr("'" + key + "'=" + val_s);
+
+		key = "strings";
+		String[] val_sa = (String[])props_r.get(key);
+		pr("'" + key + "'=" + Arrays.toString(val_sa));
+
+		key = "double";
+		double val_d = (Double)props_r.get(key);
+		pr("'" + key + "'=" + val_d);
+
+		key = "doubles";
+		double[] val_da = (double[])props_r.get(key);
+		pr("'" + key + "'=" + Arrays.toString(val_da));
+
+		key = "server.params.int_12345";
+		val_i = (Integer)props_r.get(key);
+		pr("'" + key + "'=" + val_i);
+
+		key = "component.accept";
+		val_b = (Boolean)props_r.get(key);
+		pr("'" + key + "'=" + val_b);
+	}
+
+	private static void pr(String msg) {
+		System.out.println(msg);
 	}
 
 }

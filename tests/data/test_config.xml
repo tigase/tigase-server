@@ -32,21 +32,20 @@
     <item value='str_3'/>
    </entry>
   </map>
+  <node name='component'>
+   <map>
+    <entry key='accept' value='true' type='Boolean'/>
+    <entry key='ports' type='int[]'>
+     <item value='1'/>
+     <item value='22'/>
+     <item value='333'/>
+     <item value='4444'/>
+    </entry>
+    <entry key='treshold' value='12.34' type='Double'/>
+   </map>
+  </node>
   <node name='server'>
    <map/>
-   <node name='component'>
-    <map>
-     <entry key='accept' value='true' type='Boolean'/>
-     <entry key='name' value='muc' type='String'/>
-     <entry key='ports' type='int[]'>
-      <item value='1'/>
-      <item value='22'/>
-      <item value='333'/>
-      <item value='4444'/>
-     </entry>
-     <entry key='treshold' value='12.34' type='Double'/>
-    </map>
-   </node>
    <node name='params'>
     <map>
      <entry key='bool_false' value='false' type='Boolean'/>
@@ -77,115 +76,6 @@
       <item value='str_3'/>
      </entry>
     </map>
-   </node>
-  </node>
-  <node name='component'>
-   <map>
-    <entry key='accept' value='true' type='Boolean'/>
-    <entry key='ports' type='int[]'>
-     <item value='1'/>
-     <item value='22'/>
-     <item value='333'/>
-     <item value='4444'/>
-    </entry>
-    <entry key='treshold' value='12.34' type='Double'/>
-   </map>
-  </node>
- </root>
- <root name='test_2_Component'>
-  <map/>
-  <node name='node1'>
-   <map/>
-   <node name='node2'>
-    <map>
-     <entry key='' value='muc' type='String'/>
-     <entry key='bool_false' value='false' type='Boolean'/>
-     <entry key='bool_true' value='true' type='Boolean'/>
-     <entry key='bools' type='boolean[]'>
-      <item value='true'/>
-      <item value='false'/>
-     </entry>
-     <entry key='double' value='12.34' type='Double'/>
-     <entry key='doubles' type='double[]'>
-      <item value='1.2'/>
-      <item value='2.3'/>
-      <item value='3.4'/>
-      <item value='4.5'/>
-     </entry>
-     <entry key='int_12345' value='12345' type='Integer'/>
-     <entry key='ints_12345' type='int[]'>
-      <item value='1'/>
-      <item value='2'/>
-      <item value='3'/>
-      <item value='4'/>
-      <item value='5'/>
-     </entry>
-     <entry key='string' value='Just a string.' type='String'/>
-     <entry key='strings' type='String[]'>
-      <item value='str_1'/>
-      <item value='str_2'/>
-      <item value='str_3'/>
-     </entry>
-    </map>
-    <node name='server'>
-     <map/>
-     <node name='component'>
-      <map>
-       <entry key='accept' value='true' type='Boolean'/>
-       <entry key='name' value='muc' type='String'/>
-       <entry key='ports' type='int[]'>
-        <item value='1'/>
-        <item value='22'/>
-        <item value='333'/>
-        <item value='4444'/>
-       </entry>
-       <entry key='treshold' value='12.34' type='Double'/>
-      </map>
-     </node>
-     <node name='params'>
-      <map>
-       <entry key='bool_false' value='false' type='Boolean'/>
-       <entry key='bool_true' value='true' type='Boolean'/>
-       <entry key='bools' type='boolean[]'>
-        <item value='true'/>
-        <item value='false'/>
-       </entry>
-       <entry key='double' value='12.34' type='Double'/>
-       <entry key='doubles' type='double[]'>
-        <item value='1.2'/>
-        <item value='2.3'/>
-        <item value='3.4'/>
-        <item value='4.5'/>
-       </entry>
-       <entry key='int_12345' value='12345' type='Integer'/>
-       <entry key='ints_12345' type='int[]'>
-        <item value='1'/>
-        <item value='2'/>
-        <item value='3'/>
-        <item value='4'/>
-        <item value='5'/>
-       </entry>
-       <entry key='string' value='Just a string.' type='String'/>
-       <entry key='strings' type='String[]'>
-        <item value='str_1'/>
-        <item value='str_2'/>
-        <item value='str_3'/>
-       </entry>
-      </map>
-     </node>
-    </node>
-    <node name='component'>
-     <map>
-      <entry key='accept' value='true' type='Boolean'/>
-      <entry key='ports' type='int[]'>
-       <item value='1'/>
-       <item value='22'/>
-       <item value='333'/>
-       <item value='4444'/>
-      </entry>
-      <entry key='treshold' value='12.34' type='Double'/>
-     </map>
-    </node>
    </node>
   </node>
  </root>
