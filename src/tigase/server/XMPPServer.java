@@ -36,6 +36,7 @@ import tigase.conf.Configurator;
 public class XMPPServer {
 
   static String config_file = "tigase-config.xml";
+	static String server_name = "tigase-xmpp-server";
   static boolean debug = false;
   static boolean monit = false;
 
@@ -53,6 +54,7 @@ public class XMPPServer {
       + " -c file           location of configuration file\n"
       + " -d [true|false]   turn on|off debug mode\n"
       + " -m                turn on server monitor\n"
+			+ " -n server-name    sets server name\n"
       ;
   }
 
@@ -86,6 +88,15 @@ public class XMPPServer {
             config_file = args[++i];
           } // end of else
         } // end of if (args[i].equals("-h"))
+        if (args[i].equals("-n")) {
+          if (i+1 == args.length) {
+            System.out.print(help());
+            System.exit(1);
+          } // end of if (i+1 == args.length)
+          else {
+            server_name = args[++i];
+          } // end of else
+        } // end of if (args[i].equals("-h"))
         if (args[i].equals("-d")) {
           if (i+1 == args.length) {
             debug = true;
@@ -111,10 +122,10 @@ public class XMPPServer {
 	public static void main(final String[] args) {
 
     parseParams(args);
-		System.out.println("Class name: " + args.getClass().getCanonicalName());
 
 		Configurator config = new Configurator(config_file);
 		MessageRouter router = new MessageRouter();
+		router.setName(server_name);
 		router.addRegistrator(config);
 		router.start();
 

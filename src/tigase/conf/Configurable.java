@@ -51,11 +51,11 @@ public interface Configurable {
   /**
    * Sets all configuration properties for the object.
    */
-	void setProperties(Map<String, ?> properties);
+	void setProperties(Map<String, Object> properties);
 
   /**
    * Returns defualt configuration settings for this object.
    */
-	Map<String, ?> getDefaults();
+	Map<String, Object> getDefaults();
 
 }

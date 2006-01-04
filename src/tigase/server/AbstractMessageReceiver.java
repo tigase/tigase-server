@@ -48,9 +48,9 @@ import tigase.conf.Configurable;
 public abstract class AbstractMessageReceiver extends Thread
 	implements StatisticsContainer, MessageReceiver, Configurable {
 
-	public static final String MAX_QUEUE_SIZE_PROP_NAME = "max-queue-size";
+	public static final String MAX_QUEUE_SIZE_PROP_KEY = "max-queue-size";
 	public static final Integer MAX_QUEUE_SIZE_PROP_VALUE = Integer.MAX_VALUE;
-	public static final String ROUTING_ADDRESSES_PROP_NAME = "routing-addresses";
+	public static final String ROUTING_ADDRESSES_PROP_KEY = "routing-addresses";
 	public static final String[] ROUTING_ADDRESSES_PROP_VALUE =	{"*"};
 
 	private MessageReceiver parent = null;
@@ -154,12 +154,12 @@ public abstract class AbstractMessageReceiver extends Thread
   /**
    * Sets all configuration properties for object.
    */
-	public void setProperties(Map<String, ?> properties) {
-		Integer queueSize = (Integer)properties.get(MAX_QUEUE_SIZE_PROP_NAME);
+	public void setProperties(Map<String, Object> properties) {
+		Integer queueSize = (Integer)properties.get(MAX_QUEUE_SIZE_PROP_KEY);
 		if (queueSize != null) {
 			setMaxQueueSize(queueSize);
 		} // end of if (queueSize == null)
-		String[] addresses = (String[])properties.get(ROUTING_ADDRESSES_PROP_VALUE);
+		String[] addresses = (String[])properties.get(ROUTING_ADDRESSES_PROP_KEY);
 		if (addresses != null) {
 			setRoutingAddresses(addresses);
 		} // end of if (addresses != null)
@@ -184,10 +184,10 @@ public abstract class AbstractMessageReceiver extends Thread
   /**
    * Returns defualt configuration settings for this object.
    */
-	public Map<String, ?> getDefaults() {
+	public Map<String, Object> getDefaults() {
 		Map<String, Object> defs = new TreeMap<String, Object>();
-		defs.put(MAX_QUEUE_SIZE_PROP_NAME, MAX_QUEUE_SIZE_PROP_VALUE);
-		defs.put(ROUTING_ADDRESSES_PROP_NAME, ROUTING_ADDRESSES_PROP_VALUE);
+		defs.put(MAX_QUEUE_SIZE_PROP_KEY, MAX_QUEUE_SIZE_PROP_VALUE);
+		defs.put(ROUTING_ADDRESSES_PROP_KEY, ROUTING_ADDRESSES_PROP_VALUE);
 		return defs;
 	}
 

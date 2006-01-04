@@ -50,8 +50,10 @@
     <jarfile filename="unittests-${projectname}-${jarfile}"/>
     <unitgen input="${src}" output="${unittests}" update="true">
       <classpath>
-        <pathelement location="${libs}/junit.jar"/>
-        <pathelement location="${build}"/>
+        <pathelement location="${jars}/unittests-${projectname}-${jarfile}.jar"/>
+	<fileset dir="${libs}">
+	  <include name="**/*.jar"/>
+	</fileset>
       </classpath>
     </unitgen>
   </target>
@@ -92,7 +94,10 @@
     <mkdir dir="${reports}"/>
     <junit printsummary="yes" haltonfailure="no">
       <classpath>
-        <pathelement location="${jars}/unittests-${projectname}-${jarfile}.jar" />
+        <pathelement location="${jars}/unittests-${projectname}-${jarfile}.jar"/>
+	<fileset dir="${libs}">
+	  <include name="**/*.jar"/>
+	</fileset>
       </classpath>
 
       <batchtest fork="yes" todir="${reports}">

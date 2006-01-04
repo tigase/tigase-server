@@ -116,7 +116,7 @@ public class ConfigRepository {
     configs.put(config_file, this);
   }
 
-	public Map<String, ?> getProperties(String nodeId) {
+	public Map<String, Object> getProperties(String nodeId) {
 		log.config("Reading properties for: " + nodeId);
 		String root = nodeId;
 		String subnode = "";

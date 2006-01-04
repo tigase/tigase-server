@@ -28,6 +28,7 @@ import tigase.server.AbstractComponentRegistrator;
 import tigase.server.XMPPService;
 import tigase.server.ServerComponent;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.Arrays;
 import java.util.logging.ConsoleHandler;
@@ -63,7 +64,25 @@ public class Configurator extends AbstractComponentRegistrator
 
 	public void setup(Configurable component) {
 		String compId = component.getName();
-		Map<String, ?> prop = repository.getProperties(compId);
+		Map<String, Object> prop = repository.getProperties(compId);
+		Map<String, Object> defs = component.getDefaults();
+		Set<Map.Entry<String, Object>> defs_entries = defs.entrySet();
+		boolean modified = false;
+		for (Map.Entry<String, Object> entry : defs_entries) {
+			if (!prop.containsKey(entry.getKey())) {
+				prop.put(entry.getKey(), entry.getValue());
+				modified = true;
+			} // end of if ()
+		} // end of for ()
+		if (modified) {
+			repository.putProperties(compId, prop);
+			try {
+				repository.sync();
+			} // end of try
+			catch (Exception e) {
+				e.printStackTrace();
+			} // end of try-catch
+		} // end of if (modified)
 		component.setProperties(prop);
 	}
 
@@ -71,7 +90,7 @@ public class Configurator extends AbstractComponentRegistrator
    * Returns defualt configuration settings in case if there is no
    * config file.
    */
-	public Map<String, ?> getDefaults() {
+	public Map<String, Object> getDefaults() {
 		Map<String, Object> defaults = new TreeMap<String, Object>();
 		defaults.put("tigase.message-router.id", "router");
 		defaults.put("tigase.message-router.class",
@@ -88,9 +107,9 @@ public class Configurator extends AbstractComponentRegistrator
 
 		Logger log = Logger.global.getParent();
 		ConsoleHandler console = new ConsoleHandler();
-    console.setLevel(Level.ALL);
+    console.setLevel(Level.WARNING);
     log.addHandler(console);
-		log.setLevel(Level.ALL);
+		log.setLevel(Level.WARNING);
 
 		String testConfig = "tests/data/test_config.xml";
 		String compName1 = "test_1_Component";
@@ -134,57 +153,81 @@ public class Configurator extends AbstractComponentRegistrator
 			ConfigRepository.getConfigRepository(testConfig);
 		Map<String, ?> props_r = testRep2.getProperties(compName1);
 
-		String key = "";
-		String val_s = (String)props_r.get(key);
-		pr("'" + key + "'=" + val_s);
-
-		key = "int_12345";
-		int val_i = (Integer)props_r.get(key);
-		pr("'" + key + "'=" + val_i);
-
-		key = "ints_12345";
-		int[] val_ia = (int[])props_r.get(key);
-		pr("'" + key + "'=" + Arrays.toString(val_ia));
-
-		key = "bool_true";
-		boolean val_b = (Boolean)props_r.get(key);
-		pr("'" + key + "'=" + val_b);
-
-		key = "bool_false";
-		val_b = (Boolean)props_r.get(key);
-		pr("'" + key + "'=" + val_b);
-
-		key = "bools";
-		boolean[] val_ba = (boolean[])props_r.get(key);
-		pr("'" + key + "'=" + Arrays.toString(val_ba));
-
-		key = "string";
-		val_s = (String)props_r.get(key);
-		pr("'" + key + "'=" + val_s);
-
-		key = "strings";
-		String[] val_sa = (String[])props_r.get(key);
-		pr("'" + key + "'=" + Arrays.toString(val_sa));
-
-		key = "double";
-		double val_d = (Double)props_r.get(key);
-		pr("'" + key + "'=" + val_d);
-
-		key = "doubles";
-		double[] val_da = (double[])props_r.get(key);
-		pr("'" + key + "'=" + Arrays.toString(val_da));
-
-		key = "server.params.int_12345";
-		val_i = (Integer)props_r.get(key);
-		pr("'" + key + "'=" + val_i);
-
-		key = "component.accept";
-		val_b = (Boolean)props_r.get(key);
-		pr("'" + key + "'=" + val_b);
+		pr_eq("", "muc", props_r);
+		pr_eq("component.accept", true, props_r);
+		pr_eq("component.ports", new int[] {1, 22, 333, 4444}, props_r);
+		pr_eq("component.treshold", 12.34, props_r);
+		pr_eq("int_12345", 12345, props_r);
+		pr_eq("ints_12345", new int[] {1, 2, 3, 4, 5}, props_r);
+		pr_eq("bool_true", true, props_r);
+		pr_eq("bool_false", false, props_r);
+		pr_eq("bools", new boolean[] {true, false}, props_r);
+		pr_eq("string", "Just a string.", props_r);
+		pr_eq("strings", new String[] {"str_1", "str_2", "str_3"}, props_r);
+		pr_eq("double", 12.34, props_r);
+		pr_eq("doubles", new double[] {1.2, 2.3, 3.4, 4.5}, props_r);
+		pr_eq("server.params.int_12345", 12345, props_r);
+		pr_eq("server.params.ints_12345", new int[] {1, 2, 3, 4, 5}, props_r);
+		pr_eq("server.params.bool_true", true, props_r);
+		pr_eq("server.params.bool_false", false, props_r);
+		pr_eq("server.params.bools", new boolean[] {true, false}, props_r);
+		pr_eq("server.params.string", "Just a string.", props_r);
+		pr_eq("server.params.strings",
+			new String[] {"str_1", "str_2", "str_3"}, props_r);
+		pr_eq("server.params.double", 12.34, props_r);
+		pr_eq("server.params.doubles", new double[] {1.2, 2.3, 3.4, 4.5}, props_r);
 	}
 
-	private static void pr(String msg) {
-		System.out.println(msg);
+	private static void pr_eq(String key, String val, Map<String, ?> props) {
+		String val_t = (String)props.get(key);
+		System.out.println("'" + key + "'=" + val_t + ", " +
+			(val.equals(val_t) ? "OK" : "ERR, should be: " + val));
+	}
+
+	private static void pr_eq(String key, int val, Map<String, ?> props) {
+		int val_t = (Integer)props.get(key);
+		System.out.println("'" + key + "'=" + val_t + ", " +
+			(val == val_t ? "OK" : "ERR, should be: " + val));
+	}
+
+	private static void pr_eq(String key, double val, Map<String, ?> props) {
+		double val_t = (Double)props.get(key);
+		System.out.println("'" + key + "'=" + val_t + ", " +
+			(val == val_t ? "OK" : "ERR, should be: " + val));
+	}
+
+	private static void pr_eq(String key, boolean val, Map<String, ?> props) {
+		boolean val_t = (Boolean)props.get(key);
+		System.out.println("'" + key + "'=" + val_t + ", " +
+			(val == val_t ? "OK" : "ERR, should be: " + val));
+	}
+
+	private static void pr_eq(String key, String[] val, Map<String, ?> props) {
+		String[] val_t = (String[])props.get(key);
+		System.out.println("'" + key + "'=" + Arrays.toString(val_t) + ", " +
+			(Arrays.equals(val, val_t) ? "OK" : "ERR, should be: " +
+				Arrays.toString(val)));
+	}
+
+	private static void pr_eq(String key, int[] val, Map<String, ?> props) {
+		int[] val_t = (int[])props.get(key);
+		System.out.println("'" + key + "'=" + Arrays.toString(val_t) + ", " +
+			(Arrays.equals(val, val_t) ? "OK" : "ERR, should be: " +
+				Arrays.toString(val)));
+	}
+
+	private static void pr_eq(String key, double[] val, Map<String, ?> props) {
+		double[] val_t = (double[])props.get(key);
+		System.out.println("'" + key + "'=" + Arrays.toString(val_t) + ", " +
+			(Arrays.equals(val, val_t) ? "OK" : "ERR, should be: " +
+				Arrays.toString(val)));
+	}
+
+	private static void pr_eq(String key, boolean[] val, Map<String, ?> props) {
+		boolean[] val_t = (boolean[])props.get(key);
+		System.out.println("'" + key + "'=" + Arrays.toString(val_t) + ", " +
+			(Arrays.equals(val, val_t) ? "OK" : "ERR, should be: " +
+				Arrays.toString(val)));
 	}
 
 }
