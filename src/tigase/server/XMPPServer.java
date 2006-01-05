@@ -123,6 +123,13 @@ public class XMPPServer {
 
     parseParams(args);
 
+		String initial_config =
+			".level=ALL\n"
+			+ "handlers=java.util.logging.ConsoleHandler\n"
+			+ "java.util.logging.ConsoleHandler.formatter=tigase.util.LogFormatter\n"
+			;
+		tigase.conf.Configurator.loadLogManagerConfig(initial_config);
+
 		Configurator config = new Configurator(config_file);
 		MessageRouter router = new MessageRouter();
 		router.setName(server_name);

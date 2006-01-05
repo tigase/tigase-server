@@ -35,6 +35,9 @@ import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Class Configurator
@@ -45,7 +48,12 @@ import java.util.logging.Logger;
  * @version $Rev$
  */
 public class Configurator extends AbstractComponentRegistrator
-	implements XMPPService {
+	implements XMPPService, Configurable {
+
+	private static final String LOGGING_KEY = "logging/";
+
+  private static final Logger log =
+    Logger.getLogger("tigase.conf.Configurator");
 
 	private ConfigRepository repository = null;
 
@@ -86,16 +94,69 @@ public class Configurator extends AbstractComponentRegistrator
 		component.setProperties(prop);
 	}
 
-  /**
+	public String getName() {
+		return "basic-conf";
+	}
+
+	/**
    * Returns defualt configuration settings in case if there is no
    * config file.
    */
 	public Map<String, Object> getDefaults() {
 		Map<String, Object> defaults = new TreeMap<String, Object>();
-		defaults.put("tigase.message-router.id", "router");
-		defaults.put("tigase.message-router.class",
-			"tigase.server.MessageRouter");
+		defaults.put(LOGGING_KEY + ".level", "FINE");
+		defaults.put(LOGGING_KEY + "handlers", "java.util.logging.ConsoleHandler");
+		defaults.put(LOGGING_KEY + "java.util.logging.ConsoleHandler.formatter",
+			"tigase.util.LogFormatter");
+		defaults.put(LOGGING_KEY + "java.util.logging.ConsoleHandler.level",
+			"WARNING");
+		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.append", "true");
+		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.count", "5");
+		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.formatter",
+			"tigase.util.LogFormatter");
+		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.level", "ALL");
+		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.limit", "100000");
+		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.pattern",
+			"logs/java_%g.log");
+		defaults.put(LOGGING_KEY + "tigase.handlers",
+			"java.util.logging.FileHandler");
+		defaults.put(LOGGING_KEY + "tigase.useParentHandlers", "true");
 		return defaults;
+	}
+
+  /**
+   * Sets all configuration properties for object.
+   */
+	public void setProperties(Map<String, Object> properties) {
+		setupLogManager(properties);
+	}
+
+	private void setupLogManager(Map<String, Object> properties) {
+		Set<Map.Entry<String, Object>> entries = properties.entrySet();
+		StringBuilder buff = new StringBuilder();
+		for (Map.Entry<String, Object> entry : entries) {
+			if (entry.getKey().startsWith(LOGGING_KEY)) {
+				String key = entry.getKey().substring(LOGGING_KEY.length());
+				buff.append(key + "=" +	entry.getValue() + "\n");
+				if (key.equals("java.util.logging.FileHandler.pattern")) {
+					File log_path = new File(entry.getValue().toString()).getParentFile();
+					if (!log_path.exists()) { log_path.mkdirs(); }
+				} // end of if (key.equals())
+			} // end of if (entry.getKey().startsWith(LOGGING_KEY))
+		}
+		loadLogManagerConfig(buff.toString());
+		log.warning("DONE");
+	}
+
+	public static void loadLogManagerConfig(String config) {
+    try {
+      final ByteArrayInputStream bis =
+        new ByteArrayInputStream(config.getBytes());
+      LogManager.getLogManager().readConfiguration(bis);
+      bis.close();
+    } catch (IOException e) {
+      log.log(Level.SEVERE, "Can not configure logManager", e);
+    } // end of try-catch
 	}
 
 	/**
@@ -113,25 +174,25 @@ public class Configurator extends AbstractComponentRegistrator
 
 		String testConfig = "tests/data/test_config.xml";
 		String compName1 = "test_1_Component";
-		String compName2 = "test_2_Component.node1.node2";
+		String compName2 = "test_2_Component/node1/node2";
 
 		Map<String, Object> props = new TreeMap<String, Object>();
 
 		props.put("", "muc");
-		props.put("component.accept", true);
-		props.put("component.ports", new int[] {1, 22, 333, 4444});
-		props.put("component.treshold", 12.34);
+		props.put("component/.accept", true);
+		props.put("component/ports", new int[] {1, 22, 333, 4444});
+		props.put("component/treshold", 12.34);
 
-		props.put("server.params.int_12345", 12345);
-		props.put("server.params.ints_12345", new int[] {1, 2, 3, 4, 5});
-		props.put("server.params.bool_true", true);
-		props.put("server.params.bool_false", false);
-		props.put("server.params.bools", new boolean[] {true, false});
-		props.put("server.params.string", "Just a string.");
-		props.put("server.params.strings",
+		props.put("server/params/int_12345", 12345);
+		props.put("server/params/ints_12345", new int[] {1, 2, 3, 4, 5});
+		props.put("server/params/bool_true", true);
+		props.put("server/params/bool_false", false);
+		props.put("server/params/bools", new boolean[] {true, false});
+		props.put("server/params/string", "Just a string.");
+		props.put("server/params/strings",
 			new String[] {"str_1", "str_2", "str_3"});
-		props.put("server.params.double", 12.34);
-		props.put("server.params.doubles", new double[] {1.2, 2.3, 3.4, 4.5});
+		props.put("server/params/double", 12.34);
+		props.put("server/params/doubles", new double[] {1.2, 2.3, 3.4, 4.5});
 
 		props.put("int_12345", 12345);
 		props.put("ints_12345", new int[] {1, 2, 3, 4, 5});
@@ -154,9 +215,9 @@ public class Configurator extends AbstractComponentRegistrator
 		Map<String, ?> props_r = testRep2.getProperties(compName1);
 
 		pr_eq("", "muc", props_r);
-		pr_eq("component.accept", true, props_r);
-		pr_eq("component.ports", new int[] {1, 22, 333, 4444}, props_r);
-		pr_eq("component.treshold", 12.34, props_r);
+		pr_eq("component/.accept", true, props_r);
+		pr_eq("component/ports", new int[] {1, 22, 333, 4444}, props_r);
+		pr_eq("component/treshold", 12.34, props_r);
 		pr_eq("int_12345", 12345, props_r);
 		pr_eq("ints_12345", new int[] {1, 2, 3, 4, 5}, props_r);
 		pr_eq("bool_true", true, props_r);
@@ -166,16 +227,16 @@ public class Configurator extends AbstractComponentRegistrator
 		pr_eq("strings", new String[] {"str_1", "str_2", "str_3"}, props_r);
 		pr_eq("double", 12.34, props_r);
 		pr_eq("doubles", new double[] {1.2, 2.3, 3.4, 4.5}, props_r);
-		pr_eq("server.params.int_12345", 12345, props_r);
-		pr_eq("server.params.ints_12345", new int[] {1, 2, 3, 4, 5}, props_r);
-		pr_eq("server.params.bool_true", true, props_r);
-		pr_eq("server.params.bool_false", false, props_r);
-		pr_eq("server.params.bools", new boolean[] {true, false}, props_r);
-		pr_eq("server.params.string", "Just a string.", props_r);
-		pr_eq("server.params.strings",
+		pr_eq("server/params/int_12345", 12345, props_r);
+		pr_eq("server/params/ints_12345", new int[] {1, 2, 3, 4, 5}, props_r);
+		pr_eq("server/params/bool_true", true, props_r);
+		pr_eq("server/params/bool_false", false, props_r);
+		pr_eq("server/params/bools", new boolean[] {true, false}, props_r);
+		pr_eq("server/params/string", "Just a string.", props_r);
+		pr_eq("server/params/strings",
 			new String[] {"str_1", "str_2", "str_3"}, props_r);
-		pr_eq("server.params.double", 12.34, props_r);
-		pr_eq("server.params.doubles", new double[] {1.2, 2.3, 3.4, 4.5}, props_r);
+		pr_eq("server/params/double", 12.34, props_r);
+		pr_eq("server/params/doubles", new double[] {1.2, 2.3, 3.4, 4.5}, props_r);
 	}
 
 	private static void pr_eq(String key, String val, Map<String, ?> props) {

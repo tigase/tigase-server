@@ -34,7 +34,7 @@
   </map>
   <node name='component'>
    <map>
-    <entry key='accept' value='true' type='Boolean'/>
+    <entry key='.accept' value='true' type='Boolean'/>
     <entry key='ports' type='int[]'>
      <item value='1'/>
      <item value='22'/>

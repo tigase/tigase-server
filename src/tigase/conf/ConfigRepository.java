@@ -120,7 +120,7 @@ public class ConfigRepository {
 		log.config("Reading properties for: " + nodeId);
 		String root = nodeId;
 		String subnode = "";
-		int idx = nodeId.indexOf('.');
+		int idx = nodeId.indexOf('/');
 		if (idx >= 0) {
 			root = nodeId.substring(0, idx);
 			subnode = nodeId.substring(idx+1);
@@ -144,7 +144,7 @@ public class ConfigRepository {
 		String[] keys) {
 		if (keys != null) {
 			for (String key : keys) {
-				String node_tmp = (node == null || node.equals("")) ? "" : node + ".";
+				String node_tmp = (node == null || node.equals("")) ? "" : node + "/";
 				props.put(node_tmp + key, get(root, node, key, null));
 			} // end of for (String key : keys)
 		} // end of if (keys != null)
@@ -154,17 +154,17 @@ public class ConfigRepository {
 		log.config("Saving properties for: " + nodeId);
 		String root = nodeId;
 		String subnode = "";
-		int idx = nodeId.indexOf('.');
+		int idx = nodeId.indexOf('/');
 		if (idx >= 0) {
 			root = nodeId.substring(0, idx);
-			subnode = nodeId.substring(idx+1) + ".";
+			subnode = nodeId.substring(idx+1) + "/";
 		} // end of if (idx >= 0)
 		try {	xmldb.addNode1(root);
 		} catch (NodeExistsException e) {	} // end of try-catch
 		for (Map.Entry<String, ?> entry : props.entrySet()) {
 			String node = null;
 			String key = subnode + entry.getKey();
-			idx = key.lastIndexOf('.');
+			idx = key.lastIndexOf('/');
 			if (idx >= 0) {
 				node = key.substring(0, idx);
 				key = key.substring(idx+1);
@@ -178,7 +178,7 @@ public class ConfigRepository {
 
 	private void getSubnodes(List<String> result, String root, String node) {
 		String[] subnodes = getSubnodes(root, node);
-		String node_tmp = (node.equals("") ? node : node + ".");
+		String node_tmp = (node.equals("") ? node : node + "/");
 		if (subnodes != null) {
 			for (String subnode : subnodes) {
 				result.add(node_tmp + subnode);

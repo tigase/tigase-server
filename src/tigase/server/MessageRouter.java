@@ -64,9 +64,9 @@ public class MessageRouter extends AbstractMessageReceiver
 		registrators.add(registr);
 		addComponent(registr);
 		for (ServerComponent comp : components) {
-			if (comp != registr) {
+// 			if (comp != registr) {
 				registr.addComponent(comp);
-			} // end of if (comp != registr)
+// 			} // end of if (comp != registr)
 		} // end of for (ServerComponent comp : components)
 	}
 
