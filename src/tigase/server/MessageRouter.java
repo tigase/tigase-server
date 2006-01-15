@@ -27,6 +27,8 @@ package tigase.server;
 import java.util.logging.Logger;
 import java.util.Queue;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.ArrayList;
 
 /**
@@ -44,26 +46,30 @@ public class MessageRouter extends AbstractMessageReceiver
   private static final Logger log =
     Logger.getLogger("tigase.server.MessageRouter");
 
-	private List<ServerComponent> components =
-		new ArrayList<ServerComponent>();
-	private List<ComponentRegistrator> registrators =
-		new ArrayList<ComponentRegistrator>();
-	private List<MessageReceiver> receivers = new ArrayList<MessageReceiver>();
+	private ComponentRegistrator config = null;
 
-	public MessageRouter() {
-		super(null);
-		components.add(this);
-	}
+	private Map<String, ServerComponent> components =
+		new TreeMap<String, ServerComponent>();
+	private Map<String, ComponentRegistrator> registrators =
+		new TreeMap<String, ComponentRegistrator>();
+	private Map<String, MessageReceiver> receivers =
+		new TreeMap<String, MessageReceiver>();
 
 	public Queue<Packet> processPacket(Packet packet) {
 		return null;
 	}
 
+	public void setConfig(ComponentRegistrator config) {
+		components.put(getName(), this);
+		this.config = config;
+		addRegistrator(config);
+	}
+
 	public void addRegistrator(ComponentRegistrator registr) {
 		log.info("Adding registrator: " + registr.getClass().getSimpleName());
-		registrators.add(registr);
+		registrators.put(registr.getName(), registr);
 		addComponent(registr);
-		for (ServerComponent comp : components) {
+		for (ServerComponent comp : components.values()) {
 // 			if (comp != registr) {
 				registr.addComponent(comp);
 // 			} // end of if (comp != registr)
@@ -73,18 +79,76 @@ public class MessageRouter extends AbstractMessageReceiver
 	public void addRouter(MessageReceiver receiver) {
 		log.info("Adding receiver: " + receiver.getClass().getSimpleName());
 		addComponent(receiver);
-		receivers.add(receiver);
+		receivers.put(receiver.getName(), receiver);
 	}
 
 	public void addComponent(ServerComponent component) {
 		log.info("Adding component: " + component.getClass().getSimpleName());
-		for (ComponentRegistrator registr : registrators) {
+		for (ComponentRegistrator registr : registrators.values()) {
 			if (registr != component) {
 				registr.addComponent(component);
 			} // end of if (reg != component)
 		} // end of for ()
-		components.add(component);
+		components.put(component.getName(), component);
+	}
+
+	public Map<String, Object> getDefaults() {
+		Map<String, Object> defs = super.getDefaults();
+		MessageRouterConfig.getDefaults(defs);
+		return defs;
+	}
+
+	private boolean inProperties = false;
+	public void setProperties(Map<String, Object> props) {
+
+		if (inProperties) {
+			return;
+		} // end of if (inProperties)
+		else {
+			inProperties = true;
+		} // end of if (inProperties) else
+
+		super.setProperties(props);
+		Map<String, ComponentRegistrator> tmp_reg = registrators;
+		Map<String, MessageReceiver> tmp_rec = receivers;
+		components = new TreeMap<String, ServerComponent>();
+		registrators = new TreeMap<String, ComponentRegistrator>();
+		receivers = new TreeMap<String, MessageReceiver>();
+		setConfig(config);
+
+		MessageRouterConfig conf = new MessageRouterConfig(props);
+		String[] reg_names = conf.getRegistrNames();
+		for (String name: reg_names) {
+			ComponentRegistrator cr = tmp_reg.get(name);
+			try {
+				if (cr == null) {
+					cr = conf.getRegistrInstance(name);
+					cr.setName(name);
+				} // end of if (cr == null)
+				addRegistrator(cr);
+			} // end of try
+			catch (Exception e) {
+				e.printStackTrace();
+			} // end of try-catch
+		} // end of for (String name: reg_names)
+
+		String[] msgrcv_names = conf.getMsgRcvNames();
+		for (String name: msgrcv_names) {
+			MessageReceiver mr = tmp_rec.get(name);
+			try {
+				if (mr == null) {
+					mr = conf.getMsgRcvInstance(name);
+					mr.setName(name);
+					mr.setParent(this);
+				} // end of if (cr == null)
+				addRouter(mr);
+			} // end of try
+			catch (Exception e) {
+				e.printStackTrace();
+			} // end of try-catch
+		} // end of for (String name: reg_names)
+
+		inProperties = false;
 	}
 
 }
-

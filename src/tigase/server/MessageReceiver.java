@@ -66,4 +66,11 @@ public interface MessageReceiver extends ServerComponent {
 	 */
 	boolean addMessages(Queue<Packet> packets, boolean blocking);
 
+	/**
+	 * Describe <code>setParent</code> method here.
+	 *
+	 * @param msg_rec a <code>MessageReceiver</code> value
+	 */
+	void setParent(MessageReceiver msg_rec);
+
 }

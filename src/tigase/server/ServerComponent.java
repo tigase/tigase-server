@@ -37,6 +37,13 @@ package tigase.server;
  */
 public interface ServerComponent {
   // Methods
+
+  void setName(String name);
+
+  String getName();
+
+  void release();
+
   // Constructors
   // Accessor Methods
   // Operations

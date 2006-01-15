@@ -45,10 +45,6 @@ import tigase.server.Packet;
 public class SessionManager extends AbstractMessageReceiver
 	implements Configurable, XMPPService {
 
-  public SessionManager(MessageReceiver parent) {
-		super(parent);
-	}
-
 	public Queue<Packet> processPacket(Packet packet) {
 		return null;
 	}

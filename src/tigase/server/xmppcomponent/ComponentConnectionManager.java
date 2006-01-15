@@ -43,10 +43,6 @@ import tigase.server.Packet;
 public class ComponentConnectionManager extends AbstractMessageReceiver
 	implements XMPPService {
 
-  public ComponentConnectionManager(MessageReceiver parent) {
-		super(parent);
-	}
-
 	public Queue<Packet> processPacket(Packet packet) {
 		return null;
 	}

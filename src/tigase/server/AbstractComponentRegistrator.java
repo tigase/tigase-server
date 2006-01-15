@@ -37,6 +37,7 @@ import java.util.ArrayList;
 public abstract class AbstractComponentRegistrator
 	implements ComponentRegistrator {
 
+	private String name = null;
 	private List<ServerComponent> components = new ArrayList<ServerComponent>();
 
 	/**
@@ -65,6 +66,16 @@ public abstract class AbstractComponentRegistrator
 			componentRemoved(component);
 		} // end of if (result)
 		return result;
+	}
+
+	public void release() {}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getName() {
+		return name;
 	}
 
 	public abstract void componentRemoved(ServerComponent component);

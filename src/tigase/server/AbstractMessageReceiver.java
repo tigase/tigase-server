@@ -71,10 +71,6 @@ public abstract class AbstractMessageReceiver extends Thread
 	 */
 	private long statAddedMessagesEr = 0;
 
-	public AbstractMessageReceiver(MessageReceiver parent) {
-		this.parent = parent;
-	}
-
   /**
 	 * Method <code>routingAddresses</code> returns array of Strings.
 	 * Each String should be a regular expression
@@ -155,10 +151,8 @@ public abstract class AbstractMessageReceiver extends Thread
    * Sets all configuration properties for object.
    */
 	public void setProperties(Map<String, Object> properties) {
-		Integer queueSize = (Integer)properties.get(MAX_QUEUE_SIZE_PROP_KEY);
-		if (queueSize != null) {
-			setMaxQueueSize(queueSize);
-		} // end of if (queueSize == null)
+		int queueSize = (Integer)properties.get(MAX_QUEUE_SIZE_PROP_KEY);
+		setMaxQueueSize(queueSize);
 		String[] addresses = (String[])properties.get(ROUTING_ADDRESSES_PROP_KEY);
 		if (addresses != null) {
 			setRoutingAddresses(addresses);
@@ -190,5 +184,15 @@ public abstract class AbstractMessageReceiver extends Thread
 		defs.put(ROUTING_ADDRESSES_PROP_KEY, ROUTING_ADDRESSES_PROP_VALUE);
 		return defs;
 	}
+
+	public void release() {
+		stopped = true;
+		queue.notifyAll();
+	}
+
+	public void setParent(MessageReceiver parent) {
+		this.parent = parent;
+	}
+
 
 } // AbstractMessageReceiver

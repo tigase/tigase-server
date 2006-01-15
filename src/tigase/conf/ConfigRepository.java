@@ -51,7 +51,8 @@ public class ConfigRepository {
   public static final String XMPP_CONFIG_FILE_PROPERTY_KEY = "xmpp.config.file";
   public static final String XMPP_CONFIG_FILE_PROPERTY_VAL = "xmpp_server.xml";
 
-  public static final String DEF_ROOT_NODE = "tigase";
+	public static final String ROOT_NODE = "tigase-config";
+  public static final String COMPONENT_NODE = "component";
   private static final Logger log =
     Logger.getLogger("tigase.conf.ConfigRepository");
 
@@ -111,7 +112,7 @@ public class ConfigRepository {
     } catch (IOException e) {
       log.warning("Can not open existing configuration file, creating new one, "
         + e);
-      xmldb = XMLDB.createDB(config_file, "preferences", "root");
+      xmldb = XMLDB.createDB(config_file, ROOT_NODE, COMPONENT_NODE);
     } // end of try-catch
     configs.put(config_file, this);
   }
@@ -201,7 +202,7 @@ public class ConfigRepository {
   }
 
   public Object get(final String node, final String key, final Object def) {
-    return get(DEF_ROOT_NODE, node, key, def);
+    return get(COMPONENT_NODE, node, key, def);
   }
 
   public Object get(final String root, final String node, final String key,
@@ -221,7 +222,7 @@ public class ConfigRepository {
   }
 
   public void set(final String node, final String key, final Object value) {
-    set(DEF_ROOT_NODE, node, key, value);
+    set(COMPONENT_NODE, node, key, value);
   }
 
   public void set(final String root, final String node, final String key,
@@ -242,7 +243,7 @@ public class ConfigRepository {
 //   }
 
 //   public void setInt(final String node, final String key, final int value) {
-//     setInt(DEF_ROOT_NODE, node, key, value);
+//     setInt(COMPONENT_NODE, node, key, value);
 //   }
 
 //   public void setInt(final String root, final String node, final String key,
@@ -255,7 +256,7 @@ public class ConfigRepository {
 //   }
 
 //   public int getInt(final String node, final String key, final int def) {
-//     return getInt(DEF_ROOT_NODE, node, key, def);
+//     return getInt(COMPONENT_NODE, node, key, def);
 //   }
 
 //   public int getInt(final String root, final String node, final String key,
@@ -270,7 +271,7 @@ public class ConfigRepository {
 
 //   public boolean getBoolean(final String node, final String key,
 //     final boolean def) {
-//     return getBoolean(DEF_ROOT_NODE, node, key, def);
+//     return getBoolean(COMPONENT_NODE, node, key, def);
 //   }
 
 //   public boolean getBoolean(final String root, final String node,
@@ -288,7 +289,7 @@ public class ConfigRepository {
 
 //   public void setList(final String node, final String key,
 //     final String[] list) {
-//     setList(DEF_ROOT_NODE, node, key, list);
+//     setList(COMPONENT_NODE, node, key, list);
 //   }
 
 //   public void setList(final String root, final String node, final String key,
@@ -309,7 +310,7 @@ public class ConfigRepository {
 //   }
 
 //   public String[] getList(final String node, final String key) {
-//     return getList(DEF_ROOT_NODE, node, key);
+//     return getList(COMPONENT_NODE, node, key);
 //   }
 
 //   public String[] getList(final String root, final String node,
@@ -327,7 +328,7 @@ public class ConfigRepository {
   }
 
   public String[] getSubnodes(final String node) {
-    return getSubnodes(DEF_ROOT_NODE, node);
+    return getSubnodes(COMPONENT_NODE, node);
   }
 
   public String[] getSubnodes(final String root, final String node) {
@@ -344,7 +345,7 @@ public class ConfigRepository {
   }
 
   public String[] getKeys(final String node) {
-    return getKeys(DEF_ROOT_NODE, node);
+    return getKeys(COMPONENT_NODE, node);
   }
 
   public String[] getKeys(final String root, final String node) {
@@ -361,7 +362,7 @@ public class ConfigRepository {
   }
 
   public void removeData(final String node, final String key) {
-    removeData(DEF_ROOT_NODE, node, key);
+    removeData(COMPONENT_NODE, node, key);
   }
 
   public void removeData(final String root, final String node,
@@ -376,7 +377,7 @@ public class ConfigRepository {
   }
 
   public void removeSubnode(final String node) {
-    removeSubnode(DEF_ROOT_NODE, node);
+    removeSubnode(COMPONENT_NODE, node);
   }
 
   public void removeSubnode(final String root, final String node) {
