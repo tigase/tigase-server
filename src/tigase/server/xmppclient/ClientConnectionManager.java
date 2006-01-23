@@ -27,7 +27,7 @@ package tigase.server.xmppclient;
 import java.util.Map;
 import java.util.Queue;
 
-import tigase.server.AbstractMessageReceiver;
+import tigase.server.ConnectionManager;
 import tigase.server.MessageReceiver;
 import tigase.server.XMPPService;
 import tigase.server.Packet;
@@ -40,11 +40,33 @@ import tigase.server.Packet;
  * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class ClientConnectionManager extends AbstractMessageReceiver
+public class ClientConnectionManager extends ConnectionManager
 	implements XMPPService {
 
 	public Queue<Packet> processPacket(Packet packet) {
 		return null;
+	}
+
+	public Map<String, Object> getDefaults() {
+		Map<String, Object> props = super.getDefaults();
+		
+		return props;
+	}
+
+	public void setProperties(Map<String, Object> props) {
+		super.setProperties(props);
+	}
+
+	protected int[] getDefPlainPorts() {
+		return new int[] {5222};
+	}
+
+	protected int[] getDefSSLPorts() {
+		return new int[] {5223};
+	}
+
+	protected String getDefPortClass() {
+		return "tigase.xmpp.XMPPClient";
 	}
 
 }
