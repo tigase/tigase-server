@@ -1,6 +1,5 @@
-/*
- *  Package Tigase XMPP/Jabber Server
- *  Copyright (C) 2004, 2005, 2006
+/*  Package Tigase XMPP/Jabber Server
+ *  Copyright (C) 2001, 2002, 2003, 2004, 2005
  *  "Artur Hefczyc" <artur.hefczyc@gmail.com>
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -21,30 +20,32 @@
  * Last modified by $Author$
  * $Date$
  */
-
-package tigase.server.xmppserver;
-
-import java.util.Map;
-import java.util.Queue;
-
-import tigase.server.AbstractMessageReceiver;
-import tigase.server.MessageReceiver;
-import tigase.server.XMPPService;
-import tigase.server.Packet;
+package tigase.net;
 
 /**
- * Class ServerConnectionManager
+ * <code>ServiceCommand</code> is enumerated type defining all possible
+ * commands related to <code>ServiceData</code> instances.
+ * These commands are processed by <code>MessageDispatcher</code>
+ * implementations. Some commands are related to data encapsulated in
+ * <code>ServiceData</code> instance like <code>SEND_MESSAGE</code> or
+ * <code>BROADCAST</code> others are related to <code>ServerService</code>
+ * sending or receiving this message like:
+ * <code>STOP</code>, <code>CONNECTED</code> and so on. Please refer to detailed
+ * API documentation for more information.
  *
- *
- * Created: Tue Nov 22 07:07:11 2005
- *
+ * <p>
+ * Created: Sun Oct 17 22:32:22 2004
+ * </p>
  * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class ServerConnectionManager extends AbstractMessageReceiver
-	implements XMPPService {
+public enum ServiceCommand {
 
-	public void processPacket(Packet packet) {
-	}
+  STOP,
+  STOPPED,
+  CONNECT,
+  CONNECTED,
+  SEND_MESSAGE,
+  BROADCAST;
 
-}
+} // ServiceCommand

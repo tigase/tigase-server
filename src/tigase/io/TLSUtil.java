@@ -1,7 +1,6 @@
-/*
- *  Package Tigase XMPP/Jabber Server
- *  Copyright (C) 2004, 2005, 2006
- *  "Artur Hefczyc" <artur.hefczyc@gmail.com>
+/*  Package Jabber Server
+ *  Copyright (C) 2001, 2002, 2003, 2004, 2005
+ *  "Artur Hefczyc" <kobit@users.sourceforge.net>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -21,30 +20,38 @@
  * Last modified by $Author$
  * $Date$
  */
-
-package tigase.server.xmppserver;
+package tigase.io;
 
 import java.util.Map;
-import java.util.Queue;
-
-import tigase.server.AbstractMessageReceiver;
-import tigase.server.MessageReceiver;
-import tigase.server.XMPPService;
-import tigase.server.Packet;
+import java.util.HashMap;
+import javax.net.ssl.SSLContext;
+import java.util.logging.Logger;
 
 /**
- * Class ServerConnectionManager
+ * Describe class TLSUtil here.
  *
  *
- * Created: Tue Nov 22 07:07:11 2005
+ * Created: Mon Jan 23 14:21:31 2006
  *
  * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class ServerConnectionManager extends AbstractMessageReceiver
-	implements XMPPService {
+public abstract class TLSUtil {
 
-	public void processPacket(Packet packet) {
+  private static final Logger log = Logger.getLogger("tigase.io.TLSUtil");
+
+	private static Map<String, SSLContextContainer> sslContexts =
+		new HashMap<String, SSLContextContainer>();
+
+  public static void configureSSLContext(String id,
+		String k_store, String k_passwd, String t_store, String t_passwd) {
+		SSLContextContainer sslCC =
+			new SSLContextContainer(k_store, k_passwd, t_store, t_passwd);
+		sslContexts.put(id, sslCC);
+  }
+
+	public static SSLContext getSSLContext(String id, String protocol) {
+		return sslContexts.get(id).getSSLContext(protocol);
 	}
 
-}
+} // TLSUtil

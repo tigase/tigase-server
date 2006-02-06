@@ -25,6 +25,7 @@
 package tigase.server;
 
 import java.util.Queue;
+import java.util.Set;
 
 /**
  * Interface MessageReceiver
@@ -40,31 +41,32 @@ import java.util.Queue;
  */
 public interface MessageReceiver extends ServerComponent {
 
-  /**
-   * Returns array of Strings. Each String should be a regular expression
-   * defining destination addresses for which this receiver can process
-   * messages. There can be more than one message receiver for each messages.
-   *
-   * @return a <code>String[]</code> value
-   */
-  String[] getRoutingAddresses();
+//   /**
+//    * Returns array of Strings. Each String should be a regular expression
+//    * defining destination addresses for which this receiver can process
+//    * messages. There can be more than one message receiver for each messages.
+//    *
+//    * @return a <code>String[]</code> value
+//    */
+//   String[] getLocalAddresses();
+
+	Set<String> getRoutings();
 
   /**
-	 * Describe <code>addMessage</code> method here.
+	 * Describe <code>addPacket</code> method here.
    *
 	 * @param packet a <code>Packet</code> value
 	 * @return a <code>boolean</code> value <code>true</code> if packet has been
 	 * successfully added, <code>false</code> otherwise.
 	 */
-	boolean addMessage(Packet packet, boolean blocking);
+	boolean addPacket(Packet packet);
 
 	/**
-	 * Describe <code>addMessages</code> method here.
+	 * Describe <code>addPackets</code> method here.
 	 *
-	 * @param blocking a <code>boolean</code> value
 	 * @return a <code>boolean</code> value
 	 */
-	boolean addMessages(Queue<Packet> packets, boolean blocking);
+	boolean addPackets(Queue<Packet> packets);
 
 	/**
 	 * Describe <code>setParent</code> method here.
@@ -72,5 +74,9 @@ public interface MessageReceiver extends ServerComponent {
 	 * @param msg_rec a <code>MessageReceiver</code> value
 	 */
 	void setParent(MessageReceiver msg_rec);
+
+	String getDefHostName();
+
+	void start();
 
 }

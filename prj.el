@@ -8,7 +8,9 @@
     (
      "$JAVA_HOME/jre/lib/rt.jar"
      "$PROJECTS_HOME/tigase/server/classes/"
-     "$PROJECTS_HOME/tigase/server/libs/junit.jar")))
+     "$PROJECTS_HOME/tigase/server/libs/junit.jar"
+     "$PROJECTS_HOME/tigase/server/libs/tigase-xmltools.jar"
+     )))
  '(jde-sourcepath
    (quote
     (

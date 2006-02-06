@@ -24,12 +24,18 @@
 
 package tigase.server;
 
-import java.util.logging.Logger;
-import java.util.Queue;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
 import java.util.TreeMap;
-import java.util.ArrayList;
+import java.util.logging.Logger;
+import static tigase.server.MessageRouterConfig.*;
+import tigase.util.JID;
 
 /**
  * Class MessageRouter
@@ -46,6 +52,8 @@ public class MessageRouter extends AbstractMessageReceiver
   private static final Logger log =
     Logger.getLogger("tigase.server.MessageRouter");
 
+  private String[] localAddresses = LOCAL_ADDRESSES_PROP_VALUE;
+
   private ComponentRegistrator config = null;
 
   private Map<String, ServerComponent> components =
@@ -55,8 +63,78 @@ public class MessageRouter extends AbstractMessageReceiver
   private Map<String, MessageReceiver> receivers =
     new TreeMap<String, MessageReceiver>();
 
-  public Queue<Packet> processPacket(Packet packet) {
-    return null;
+  public void processPacket(Packet packet) {
+		log.finest("Processing packet: " + packet.getStringData()
+			+ ", to: " + packet.getTo()
+			+ ", from: " + packet.getFrom());
+		String host = JID.getNodeHost(packet.getTo());
+		String ip = null;
+		try {
+			ip = InetAddress.getByName(host).getHostAddress();
+		} catch (UnknownHostException e) {
+			ip = host;
+		} // end of try-catch
+		String nick = JID.getNodeNick(packet.getTo());
+		// Let's try to find message receiver quick way
+		// In case if packet is handled internally:
+		MessageReceiver first = receivers.get(nick);
+		if (first != null) {
+			// Well, I found something. Now we need to make sure it is
+			// indeed to this receiver and it is not just accidental
+			// nick name match, so we are checking routing hosts.
+			Set<String> routings = first.getRoutings();
+			if (routings != null) {
+				log.finest(first.getName() + ": Looking for host: " + host +
+					" or ip: " + ip + " in " + routings.toString());
+				if (routings.contains(host) || routings.contains(ip)) {
+					log.finest("Found receiver: " + first.getName());
+					first.addPacket(packet);
+					return;
+				} // end of if (routings.contains())
+			} // end of if (routings != null)
+			else {
+				log.severe("Routings are null for: " + first.getName());
+			} // end of if (routings != null) else
+		} // end of if (mr != null)
+		// This packet is not processed localy, so let's find receiver
+		// which will send it to correct destination:
+		MessageReceiver s2s = null;
+		for (MessageReceiver mr: receivers.values()) {
+			Set<String> routings = mr.getRoutings();
+			if (routings != null) {
+				log.finest(mr.getName() + ": Looking for host: " + host +
+					" or ip: " + ip + " in " + routings.toString());
+				if (routings.contains(host) || routings.contains(ip)) {
+					log.finest("Found receiver: " + mr.getName());
+					mr.addPacket(packet);
+					return;
+				} // end of if (routings.contains())
+				if (routings.contains("*")) {
+					// I found s2s receiver, remember it for later....
+					s2s = mr;
+				} // end of if (routings.contains())
+			} // end of if (routings != null)
+			else {
+				log.severe("Routings are null for: " + mr.getName());
+			} // end of if (routings != null) else
+		} // end of for (MessageReceiver mr: receivers.values())
+		// It is not for any local host, so maybe it is for some
+		// remote server, let's try sending it through s2s service:
+		if (s2s != null) {
+			s2s.addPacket(packet);
+		} // end of if (s2s != null)
+
+		// 		int idx = Arrays.binarySearch(localAddresses, host);
+		// 		if (idx >= 0) {
+		// 			MessageReceiver mr = receivers.get(nick);
+		// 			if (mr != null) {
+		// 				mr.addPacket(packet);
+		// 			} // end of if (mr != null)
+		// 		} // end of if (idx >= 0)
+		// 		else {
+		// 			log.info("This packet is not to local server: " +
+		// 				packet.getStringData());
+		// 		} // end of else
   }
 
   public void setConfig(ComponentRegistrator config) {
@@ -98,6 +176,18 @@ public class MessageRouter extends AbstractMessageReceiver
     return defs;
   }
 
+//   public void run() {
+//     while (! stopped) {
+//       try {
+// 				synchronized(this) { this.wait(); }
+//       } catch (InterruptedException e) { } // end of try-catch
+// 			Packet packet = null;
+// 			while ((packet = inQueue.poll()) != null) {
+// 				processPacket(packet);
+// 			} // end of while ((packet = inQueue.poll()) != null)
+//     } // end of while (! stopped)
+//   }
+
   private boolean inProperties = false;
   public void setProperties(Map<String, Object> props) {
 
@@ -110,6 +200,8 @@ public class MessageRouter extends AbstractMessageReceiver
 
     try {
       super.setProperties(props);
+			localAddresses = (String[])props.get(LOCAL_ADDRESSES_PROP_KEY);
+			Arrays.sort(localAddresses);
       Map<String, ComponentRegistrator> tmp_reg = registrators;
       Map<String, MessageReceiver> tmp_rec = receivers;
       components = new TreeMap<String, ServerComponent>();
@@ -143,8 +235,8 @@ public class MessageRouter extends AbstractMessageReceiver
 				try {
 					if (mr == null) {
 						mr = conf.getMsgRcvInstance(name);
-						mr.setName(name);
 						mr.setParent(this);
+						mr.setName(name);
 					} // end of if (cr == null)
 					addRouter(mr);
 				} // end of try
@@ -156,9 +248,16 @@ public class MessageRouter extends AbstractMessageReceiver
 				mr.release();
 			} // end of for ()
 			tmp_rec.clear();
+			for (MessageReceiver mr: receivers.values()) {
+				mr.start();
+			} // end of for (MessageReceiver mr: receivers)
     } finally {
       inProperties = false;
     } // end of try-finally
   }
+
+	public String getDefHostName() {
+		return localAddresses[0];
+	}
 
 }

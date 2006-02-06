@@ -24,14 +24,17 @@
 
 package tigase.server.xmppsession;
 
+
 import java.util.Map;
 import java.util.Queue;
-
+import java.util.logging.Logger;
 import tigase.conf.Configurable;
 import tigase.server.AbstractMessageReceiver;
 import tigase.server.MessageReceiver;
-import tigase.server.XMPPService;
 import tigase.server.Packet;
+import tigase.server.XMPPService;
+import tigase.xml.Element;
+import tigase.util.JID;
 
 /**
  * Class SessionManager
@@ -45,8 +48,22 @@ import tigase.server.Packet;
 public class SessionManager extends AbstractMessageReceiver
 	implements Configurable, XMPPService {
 
-	public Queue<Packet> processPacket(Packet packet) {
-		return null;
+  /**
+   * Variable <code>log</code> is a class logger.
+   */
+  private static final Logger log =
+    Logger.getLogger("tigase.server.xmppsession.SessionManager");
+
+	public void processPacket(Packet packet) {
+		log.finest("Processing packet: " + packet.getStringData());
+		Packet reply = new Packet(new Element("OK", "From: " + getName()));
+		if (packet.isRouted()) {
+			reply = reply.packRouted(packet.getElemFrom(),
+				JID.getNodeID(getName(), getDefHostName()));
+		} // end of if (packet.isRouted())
+		reply.setTo(packet.getFrom());
+		reply.setFrom(getName());
+		addOutPacket(reply);
 	}
 
 }

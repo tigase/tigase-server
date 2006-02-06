@@ -24,13 +24,18 @@
 
 package tigase.server.xmppclient;
 
+
 import java.util.Map;
 import java.util.Queue;
-
+import java.util.LinkedList;
+import java.util.concurrent.ConcurrentMap;
+import java.util.logging.Logger;
 import tigase.server.ConnectionManager;
 import tigase.server.MessageReceiver;
-import tigase.server.XMPPService;
 import tigase.server.Packet;
+import tigase.server.XMPPService;
+import tigase.xml.Element;
+import tigase.util.JID;
 
 /**
  * Class ClientConnectionManager
@@ -43,18 +48,53 @@ import tigase.server.Packet;
 public class ClientConnectionManager extends ConnectionManager
 	implements XMPPService {
 
-	public Queue<Packet> processPacket(Packet packet) {
+  /**
+   * Variable <code>log</code> is a class logger.
+   */
+  private static final Logger log =
+    Logger.getLogger("tigase.server.xmppclient.ClientConnectionManager");
+
+  public static final String ROUTE_ADDRESS_PROP_KEY = "route-address";
+  public static final String ROUTE_ADDRESS_PROP_VAL =	"session_1@localhost";
+
+	private String routeAddress = ROUTE_ADDRESS_PROP_VAL;
+
+
+	public void processPacket(Packet packet) {
+		if (packet.isRouted()) {
+			Packet res = packet.unpackRouted();
+			res.setTo(packet.getElemTo());
+			writePacketToSocket(res);
+		} // end of if (packet.isRouted())
+		else {
+			writePacketToSocket(packet);
+		} // end of if (packet.isRouted()) else
+	}
+
+	public Queue<Packet> processSocketData(String id,
+		ConcurrentMap<String, Object> sessionData, Queue<Packet> packets) {
+// 		Queue<Packet> results = new LinkedList<Packet>();
+		Packet p = null;
+		while ((p = packets.poll()) != null) {
+			log.finest("Processing socket data: " + p.getStringData());
+			p.setFrom(JID.getJID(getName(), getDefHostName(), id));
+			p.setTo(getDefRoutingAddress());
+			addOutPacket(p);
+			// 			results.offer(new Packet(new Element("OK")));
+		} // end of while ()
+// 		return results;
 		return null;
 	}
 
 	public Map<String, Object> getDefaults() {
 		Map<String, Object> props = super.getDefaults();
-		
+    props.put(ROUTE_ADDRESS_PROP_KEY, ROUTE_ADDRESS_PROP_VAL);
 		return props;
 	}
 
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
+		routeAddress = (String)props.get(ROUTE_ADDRESS_PROP_KEY);
 	}
 
 	protected int[] getDefPlainPorts() {
@@ -67,6 +107,10 @@ public class ClientConnectionManager extends ConnectionManager
 
 	protected String getDefPortClass() {
 		return "tigase.xmpp.XMPPClient";
+	}
+
+	protected String getDefRoutingAddress() {
+		return routeAddress;
 	}
 
 }

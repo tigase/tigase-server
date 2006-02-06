@@ -22,19 +22,22 @@
  */
 package tigase.server;
 
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.Queue;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
 import java.util.TreeMap;
-import java.util.ArrayList;
-
+import java.util.TreeSet;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.logging.Logger;
 import tigase.annotations.TODO;
-
-import tigase.stats.StatisticsContainer;
+import tigase.conf.Configurable;
 import tigase.stats.StatRecord;
 import tigase.stats.StatisticType;
-import tigase.conf.Configurable;
+import tigase.stats.StatisticsContainer;
+import tigase.util.JID;
 
 /**
  * Describe class AbstractMessageReceiver here.
@@ -48,17 +51,26 @@ import tigase.conf.Configurable;
 public abstract class AbstractMessageReceiver
   implements Runnable, StatisticsContainer, MessageReceiver, Configurable {
 
-  public static final String MAX_QUEUE_SIZE_PROP_KEY = "max-queue-size";
-  public static final Integer MAX_QUEUE_SIZE_PROP_VALUE = Integer.MAX_VALUE;
-  public static final String ROUTING_ADDRESSES_PROP_KEY = "routing-addresses";
-  public static final String[] ROUTING_ADDRESSES_PROP_VALUE =	{"*"};
+	public static final String MAX_QUEUE_SIZE_PROP_KEY = "max-queue-size";
+	//  public static final Integer MAX_QUEUE_SIZE_PROP_VAL = Integer.MAX_VALUE;
+  public static final Integer MAX_QUEUE_SIZE_PROP_VAL = 1000;
+
+  /**
+   * Variable <code>log</code> is a class logger.
+   */
+  private static final Logger log =
+    Logger.getLogger("tigase.server.AbstractMessageReceiver");
+
+  private int maxQueueSize = MAX_QUEUE_SIZE_PROP_VAL;
 
   private MessageReceiver parent = null;
-  private String[] routingAddresses = ROUTING_ADDRESSES_PROP_VALUE;
-  private int maxQueueSize = MAX_QUEUE_SIZE_PROP_VALUE;
 
-  private LinkedBlockingQueue<Packet> queue = null;
+  private LinkedBlockingQueue<QueueElement> queue =
+		new LinkedBlockingQueue<QueueElement>(maxQueueSize);
+	private Thread thread = null;
   private boolean stopped = false;
+  private String name = null;
+	private Set<String> routings = new TreeSet<String>();
 
   /**
    * Variable <code>statAddedMessagesOk</code> keeps counter of successfuly
@@ -71,68 +83,100 @@ public abstract class AbstractMessageReceiver
    */
   private long statAddedMessagesEr = 0;
 
-  /**
-   * Method <code>routingAddresses</code> returns array of Strings.
-   * Each String should be a regular expression
-   * defining destination addresses for which this receiver can process
-   * messages. There can be more than one message receiver for each messages.
-   *
-   * @return a <code>String</code> value
-   */
-  public String[] getRoutingAddresses() { return routingAddresses; }
+//   /**
+//    * Method <code>localAddresses</code> returns array of Strings.
+//    * Each String should be a regular expression
+//    * defining destination addresses for which this receiver can process
+//    * messages. There can be more than one message receiver for each messages.
+//    *
+//    * @return a <code>String</code> value
+//    */
+//   public String[] getLocalAddresses() { return localAddresses; }
 
   /**
    * Describe <code>addMessage</code> method here.
    *
    * @param packet a <code>Packet</code> value
    */
-  public boolean addMessage(Packet packet, boolean blocking) {
-    boolean result = true;
-    if (blocking) {
-      try {
-				queue.put(packet);
-      } // end of try
-      catch (InterruptedException e) {
-				result = false;
-      } // end of try-catch
-    } // end of if (blocking)
-    else {
-      result = queue.offer(packet);
-    } // end of if (blocking) else
-    if (result) ++statAddedMessagesOk; else ++statAddedMessagesEr;
-    return result;
+  public boolean addPacket(Packet packet) {
+    return prAddPacket(packet);
   }
 
-  @TODO(note="Consider better implementation for a case when addMessage fails, maybe packet which couldn't be handled should be put back to input queue.")
-  public boolean addMessages(Queue<Packet> packets, boolean blocking) {
-    if (packets == null || packets.size() == 0) {
-      return false;
-    } // end of if (packets != null && packets.size() > 0)
-    Packet packet = null;
-    boolean result = true;
-    while (result && ((packet = packets.poll()) != null)) {
-      result = addMessage(packet, blocking);
-    } // end of while (result && (packet = packets.poll()) != null)
-    return result;
+  public boolean addPackets(Queue<Packet> packets) {
+		Packet p = null;
+		boolean result = true;
+		while ((p = packets.peek()) != null) {
+			result = prAddPacket(p);
+			if (result) {
+				packets.poll();
+
+			} // end of if (result)
+			else {
+				return false;
+			} // end of if (result) else
+		} // end of while ()
+    return true;
   }
+
+	private boolean prAddPacket(Packet packet) {
+		try {
+			log.finest(">" + getName() + "<  " +
+				"Added packet to inQueue: " + packet.getStringData());
+			queue.put(new QueueElement(QueueElementType.IN_QUEUE, packet));
+			++statAddedMessagesOk;
+		} // end of try
+		catch (InterruptedException e) {
+			++statAddedMessagesEr;
+			return false;
+		} // end of try-catch
+		return true;
+  }
+
+	protected boolean addOutPacket(Packet packet) {
+		try {
+			log.finest(">" + getName() + "<  " +
+				"Added packet to outQueue: " + packet.getStringData());
+			queue.put(new QueueElement(QueueElementType.OUT_QUEUE, packet));
+			++statAddedMessagesOk;
+		} // end of try
+		catch (InterruptedException e) {
+			++statAddedMessagesEr;
+			return false;
+		} // end of try-catch
+		return true;
+	}
 
   public void run() {
-    queue = new LinkedBlockingQueue<Packet>(maxQueueSize);
     while (! stopped) {
       try {
-				Packet packet = queue.take();
-				Queue<Packet> result = processPacket(packet);
-				parent.addMessages(result, true);
-      } // end of try
-      catch (InterruptedException e) {
+				QueueElement qel = queue.take();
+				switch (qel.type) {
+				case IN_QUEUE:
+					processPacket(qel.packet);
+					break;
+				case OUT_QUEUE:
+					if (parent != null) {
+						log.finest(">" + getName() + "<  " +
+							"Sending outQueue to parent: " + parent.getName());
+						parent.addPacket(qel.packet);
+					} // end of if (parent != null)
+					else {
+						log.warning(">" + getName() + "<  " + "No parent!");
+					} // end of else
+					break;
+				default:
+					log.severe("Unknown queue element type: " + qel.type);
+					break;
+				} // end of switch (qel.type)
+      } catch (InterruptedException e) {
 				stopped = true;
-      } // end of try-catch
+			} // end of try-catch
     } // end of while (! stopped)
   }
 
-  public abstract Queue<Packet> processPacket(Packet packet);
+  public abstract void processPacket(Packet packet);
 
-  public int queueSize() { return queue.size(); }
+	//   public int queueSize() { return inQueue.size(); }
 
   /**
    * Returns defualt configuration settings for this object.
@@ -153,35 +197,30 @@ public abstract class AbstractMessageReceiver
   public void setProperties(Map<String, Object> properties) {
     int queueSize = (Integer)properties.get(MAX_QUEUE_SIZE_PROP_KEY);
     setMaxQueueSize(queueSize);
-    String[] addresses = (String[])properties.get(ROUTING_ADDRESSES_PROP_KEY);
-    if (addresses != null) {
-      setRoutingAddresses(addresses);
-    } // end of if (addresses != null)
   }
 
   public void setMaxQueueSize(int maxQueueSize) {
     if (this.maxQueueSize != maxQueueSize) {
       this.maxQueueSize = maxQueueSize;
       if (queue != null) {
-				LinkedBlockingQueue<Packet> newQueue =
-					new LinkedBlockingQueue<Packet>(maxQueueSize);
+				LinkedBlockingQueue<QueueElement> newQueue =
+					new LinkedBlockingQueue<QueueElement>(maxQueueSize);
 				newQueue.addAll(queue);
 				queue = newQueue;
       } // end of if (queue != null)
     } // end of if (this.maxQueueSize != maxQueueSize)
   }
 
-  public void setRoutingAddresses(String[] addresses) {
-    routingAddresses = addresses;
-  }
+//   public void setLocalAddresses(String[] addresses) {
+//     localAddresses = addresses;
+//   }
 
   /**
    * Returns defualt configuration settings for this object.
    */
   public Map<String, Object> getDefaults() {
     Map<String, Object> defs = new TreeMap<String, Object>();
-    defs.put(MAX_QUEUE_SIZE_PROP_KEY, MAX_QUEUE_SIZE_PROP_VALUE);
-    defs.put(ROUTING_ADDRESSES_PROP_KEY, ROUTING_ADDRESSES_PROP_VALUE);
+		defs.put(MAX_QUEUE_SIZE_PROP_KEY, MAX_QUEUE_SIZE_PROP_VAL);
     return defs;
   }
 
@@ -191,9 +230,9 @@ public abstract class AbstractMessageReceiver
 
   public void setParent(MessageReceiver parent) {
     this.parent = parent;
+		addRouting(getDefHostName());
   }
 
-  private String name = null;
   public void setName(String name) {
     this.name = name;
   }
@@ -203,14 +242,51 @@ public abstract class AbstractMessageReceiver
   }
 
   public void start() {
-    Thread t = new Thread(this);
-    t.setName(name);
-    t.start();
+		if (thread == null || ! thread.isAlive()) {
+			stopped = false;
+			thread = new Thread(this);
+			thread.setName(name);
+			thread.start();
+		} // end of if (thread == null || ! thread.isAlive())
   }
 
   public void stop() {
     stopped = true;
-    queue.notifyAll();
+		queue.notifyAll();
   }
+
+	public String getDefHostName() {
+		if (parent != null) {
+			return parent.getDefHostName();
+		} // end of if (parent != null)
+		else {
+			return null;
+		} // end of if (parent != null) else
+	}
+
+	public Set<String> getRoutings() {
+		return routings;
+	}
+
+	public void addRouting(String address) {
+		routings.add(address);
+	}
+
+	public boolean removeRouting(String address) {
+		return routings.remove(address);
+	}
+
+	private enum QueueElementType { IN_QUEUE, OUT_QUEUE }
+
+	private class QueueElement {
+		private QueueElementType type = null;
+		private Packet packet = null;
+
+		private QueueElement(QueueElementType type, Packet packet) {
+			this.type = type;
+			this.packet = packet;
+		}
+
+	}
 
 } // AbstractMessageReceiver

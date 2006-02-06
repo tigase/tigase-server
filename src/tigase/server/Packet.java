@@ -24,6 +24,8 @@
 
 package tigase.server;
 
+import tigase.xml.Element;
+
 /**
  * Class Packet
  *
@@ -36,36 +38,97 @@ package tigase.server;
  */
 public class Packet {
 
-  public Packet() {}
+	private Element elem = null;
+	private String to = null;
+	private String from = null;
 
-  /**
+  public Packet(Element elem) {
+		if (elem == null) {
+			throw new NullPointerException();
+		} // end of if (elem == null)
+		this.elem = elem;
+	}
+
+	public String getTo() {
+		return to != null ? to : getElemTo();
+	}
+
+	public void setTo(String to) {
+		this.to = to;
+	}
+
+	public String getFrom() {
+		return from != null ? from : getElemFrom();
+	}
+
+	public void setFrom(String from) {
+		this.from = from;
+	}
+
+	/**
    * Returns packet destination address.
    */
-  public String getTo() {
-    return null;
+  public String getElemTo() {
+    return elem.getAttribute("to");
   }
 
   /**
    * Returns packet source address.
    */
-  public String getFrom() {
-    return null;
+  public String getElemFrom() {
+    return elem.getAttribute("from");
   }
 
-  /**
-   * Tells whether data kept by this packet has been already parsed or if they
-   * in raw format.
-   */
-  public boolean isParsed() {
-    return false;
+  public byte[] getByteData() {
+    return elem.toString().getBytes();
   }
 
-  /**
-   *
-   * @return byte
-   */
-  public byte[] getData() {
-    return null;
+  public String getStringData() {
+    return elem.toString();
   }
+
+  public char[] getCharData() {
+    return elem.toString().toCharArray();
+  }
+
+	public boolean isRouted() {
+		return elem.getName().equals("route");
+	}
+
+	public Packet unpackRouted() {
+		return new Packet(elem.getChildren().get(0));
+	}
+
+	public Packet packRouted(String to, String from) {
+		Element routed = new Element("route", null, new String[] {"to", "from"},
+			new String[] {to, from});
+		routed.addChild(elem);
+		return new Packet(routed);
+	}
+
+	public Packet packRouted() {
+		Element routed = new Element("route", null, new String[] {"to", "from"},
+			new String[] {getTo(), getFrom()});
+		routed.addChild(elem);
+		return new Packet(routed);
+	}
+
+	public Packet swapFromTo(Element el) {
+		Packet packet = new Packet(el);
+		packet.setTo(getFrom());
+		packet.setFrom(getTo());
+		return packet;
+	}
+
+	public Packet swapElemFromTo() {
+		Element copy = (Element)elem.clone();
+		copy.setAttribute("to", getElemFrom());
+		copy.setAttribute("from", getElemTo());
+		return new Packet(copy);
+	}
+
+//   public PacketType getType() {
+//     return null;
+//   }
 
 }

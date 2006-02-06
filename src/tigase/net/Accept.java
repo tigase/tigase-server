@@ -1,7 +1,6 @@
-/*
- *  Package Tigase XMPP/Jabber Server
- *  Copyright (C) 2004, 2005, 2006
- *  "Artur Hefczyc" <artur.hefczyc@gmail.com>
+/*  Package Jabber Server
+ *  Copyright (C) 2001, 2002, 2003, 2004, 2005
+ *  "Artur Hefczyc" <kobit@users.sourceforge.net>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -21,30 +20,22 @@
  * Last modified by $Author$
  * $Date$
  */
+package tigase.net;
 
-package tigase.server.xmppserver;
-
-import java.util.Map;
-import java.util.Queue;
-
-import tigase.server.AbstractMessageReceiver;
-import tigase.server.MessageReceiver;
-import tigase.server.XMPPService;
-import tigase.server.Packet;
+import java.io.IOException;
+import java.nio.channels.SocketChannel;
 
 /**
- * Class ServerConnectionManager
+ * Describe interface Accept here.
  *
  *
- * Created: Tue Nov 22 07:07:11 2005
+ * Created: Sat May 14 07:00:16 2005
  *
  * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class ServerConnectionManager extends AbstractMessageReceiver
-	implements XMPPService {
+public interface Accept {
 
-	public void processPacket(Packet packet) {
-	}
+  void accept(final SocketChannel sc) throws IOException;
 
-}
+} // Accept

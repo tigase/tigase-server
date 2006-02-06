@@ -1,7 +1,6 @@
-/*
- *  Package Tigase XMPP/Jabber Server
- *  Copyright (C) 2004, 2005, 2006
- *  "Artur Hefczyc" <artur.hefczyc@gmail.com>
+/*  Package Jabber Server
+ *  Copyright (C) 2001, 2002, 2003, 2004, 2005
+ *  "Artur Hefczyc" <kobit@users.sourceforge.net>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -21,30 +20,19 @@
  * Last modified by $Author$
  * $Date$
  */
-
-package tigase.server.xmppserver;
-
-import java.util.Map;
-import java.util.Queue;
-
-import tigase.server.AbstractMessageReceiver;
-import tigase.server.MessageReceiver;
-import tigase.server.XMPPService;
-import tigase.server.Packet;
+package tigase.net;
 
 /**
- * Class ServerConnectionManager
+ * Describe class SocketType here.
  *
  *
- * Created: Tue Nov 22 07:07:11 2005
+ * Created: Sun Feb  5 09:27:34 2006
  *
  * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class ServerConnectionManager extends AbstractMessageReceiver
-	implements XMPPService {
+public enum SocketType {
 
-	public void processPacket(Packet packet) {
-	}
+	plain, ssl;
 
-}
+} // SocketType

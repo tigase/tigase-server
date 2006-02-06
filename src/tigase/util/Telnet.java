@@ -20,55 +20,60 @@
  * Last modified by $Author$
  * $Date$
  */
-package tigase.server;
+package tigase.util;
 
-import tigase.conf.Configurator;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.Socket;
 
 /**
- * Describe class XMPPServer here.
+ * Describe class Telnet here.
  *
  *
- * Created: Wed Nov 23 07:04:18 2005
+ * Created: Sat Jan 28 21:18:46 2006
  *
  * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class XMPPServer {
+public class Telnet {
 
-  private static String config_file = "tigase-config.xml";
-	private static String server_name = "tigase-xmpp-server";
-  private static boolean debug = false;
-  private static boolean monit = false;
+	private static int port = 5222;
+	private static String hostname = "localhost";
+	private static boolean debug = false;
+	private static boolean stopped = false;
+	private static String file = null;
 
 	/**
-	 * Creates a new <code>XMPPServer</code> instance.
+	 * Creates a new <code>Telnet</code> instance.
 	 *
 	 */
-	protected XMPPServer() {}
+	public Telnet() {	}
 
-  public static String help() {
+	public static String help() {
     return "\n"
       + "Parameters:\n"
       + " -h                this help message\n"
+      + " -n hostname       host name\n"
+      + " -p port           port number\n"
+      + " -c file           file with content to send to remote host\n"
       + " -v                prints server version info\n"
-      + " -c file           location of configuration file\n"
       + " -d [true|false]   turn on|off debug mode\n"
-      + " -m                turn on server monitor\n"
-			+ " -n server-name    sets server name\n"
       ;
   }
 
   public static String version() {
     return "\n"
       + "-- \n"
-      + "Tigase XMPP Server, version: "
-      + XMPPServer.class.getPackage().getImplementationVersion() + "\n"
+      + "Tigase XMPP Telnet, version: "
+      + Telnet.class.getPackage().getImplementationVersion() + "\n"
       + "Author:	Artur Hefczyc <artur.hefczyc@gmail.com>\n"
       + "-- \n"
       ;
   }
 
-  public static void parseParams(final String[] args) {
+  public static void parseParams(final String[] args) throws Exception {
     if (args != null && args.length > 0) {
       for (int i = 0; i < args.length; i++) {
         if (args[i].equals("-h")) {
@@ -85,7 +90,7 @@ public class XMPPServer {
             System.exit(1);
           } // end of if (i+1 == args.length)
           else {
-            config_file = args[++i];
+            file = args[++i];
           } // end of else
         } // end of if (args[i].equals("-h"))
         if (args[i].equals("-n")) {
@@ -94,7 +99,16 @@ public class XMPPServer {
             System.exit(1);
           } // end of if (i+1 == args.length)
           else {
-            server_name = args[++i];
+            hostname = args[++i];
+          } // end of else
+        } // end of if (args[i].equals("-h"))
+        if (args[i].equals("-p")) {
+          if (i+1 == args.length) {
+            System.out.print(help());
+            System.exit(1);
+          } // end of if (i+1 == args.length)
+          else {
+            port = Integer.decode(args[++i]);
           } // end of else
         } // end of if (args[i].equals("-h"))
         if (args[i].equals("-d")) {
@@ -107,9 +121,6 @@ public class XMPPServer {
               (args[i].equals("true") || args[i].equals("yes"));
           } // end of else
         } // end of if (args[i].equals("-d"))
-        if (args[i].equals("-m")) {
-          monit = true;
-        } // end of if (args[i].equals("-m"))
       } // end of for (int i = 0; i < args.length; i++)
     }
   }
@@ -119,26 +130,66 @@ public class XMPPServer {
 	 *
 	 * @param args a <code>String[]</code> value
 	 */
-	public static void main(final String[] args) {
+	public static void main(final String[] args) throws Exception {
+		parseParams(args);
+		String data = null;
+		if (file != null) {
+			FileReader fr = new FileReader(file);
+			char[] buff = new char[16*1024];
+			int res = -1;
+			StringBuilder sb = new StringBuilder();
+			while ((res = fr.read(buff)) != -1) {
+				sb.append(buff, 0, res);
+			} // end of while ((res = fr.read(buff)) != -1)
+			fr.close();
+			data = sb.toString();
+		} // end of if (file != null)
+		Socket sock = new Socket(hostname, port);
+		new Telnet(sock, data);
+	}
 
-		Thread.setDefaultUncaughtExceptionHandler(new ThreadExceptionHandler());
+	public Telnet(Socket sock, String data) throws IOException {
+		StreamListener sl1 =
+			new StreamListener(sock.getInputStream(), System.out,
+				"Hello, this Tigase Telnet program, type your input...\n");
+		StreamListener sl2 =
+			new StreamListener(System.in, sock.getOutputStream(), data);
+		new Thread(sl1).start();
+		new Thread(sl2).start();
+	}
 
-    parseParams(args);
+	private class StreamListener implements Runnable {
 
-		String initial_config =
-			".level=ALL\n"
-			+ "handlers=java.util.logging.ConsoleHandler\n"
-			+ "java.util.logging.ConsoleHandler.formatter=tigase.util.LogFormatter\n"
-			;
-		Configurator.loadLogManagerConfig(initial_config);
+		private InputStream is = null;
+		private OutputStream os = null;
+		private String data = null;
 
-		Configurator config = new Configurator(config_file);
-		MessageRouter router = new MessageRouter();
-		router.setName(server_name);
-		router.setConfig(config);
-		router.start();
+		private StreamListener(InputStream is, OutputStream os, String data) {
+			this.is = is;
+			this.os = os;
+			this.data = data;
+		}
+
+		public void run() {
+			try {
+				if (data != null) {
+					os.write(data.getBytes());
+				} // end of if (data != null)
+				while (!stopped) {
+					int chr = is.read();
+					if (chr == -1) {
+						break;
+					} // end of if (chr == -1)
+					os.write(chr);
+					os.flush();
+				} // end of while (true)
+			} catch (IOException e) {
+				e.printStackTrace();
+			} // end of try-catch
+			System.exit(1);
+		}
 
 	}
 
 
-} // XMPPServer
+} // Telnet

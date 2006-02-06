@@ -41,6 +41,9 @@ public class MessageRouterConfig {
   private static final Logger log =
     Logger.getLogger("tigase.server.MessageRouterConfig");
 
+  public static final String LOCAL_ADDRESSES_PROP_KEY = "local-addresses";
+  public static final String[] LOCAL_ADDRESSES_PROP_VALUE =	{"localhost"};
+
 	public static final String MSG_RECEIVERS_PROP_KEY =
 		"components/msg-receivers/";
 	public static final String MSG_RECEIVERS_NAMES_PROP_KEY =
@@ -121,6 +124,7 @@ public class MessageRouterConfig {
 		defs.put(STAT_1_ACTIVE_PROP_KEY, STAT_1_ACTIVE_PROP_VAL);
 		defs.put(SERVICE_1_CLASS_PROP_KEY, SERVICE_1_CLASS_PROP_VAL);
 		defs.put(SERVICE_1_ACTIVE_PROP_KEY, SERVICE_1_ACTIVE_PROP_VAL);
+    defs.put(LOCAL_ADDRESSES_PROP_KEY, LOCAL_ADDRESSES_PROP_VALUE);
 	}
 
 	private Map<String, Object> props = null;
