@@ -22,6 +22,7 @@
  */
 package tigase.server;
 
+//import tigase.net.IOService;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.nio.channels.SocketChannel;
@@ -91,7 +92,7 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 		ConnectionOpenThread.getInstance();
 	private static SocketReadThread readThread = SocketReadThread.getInstance();
 	private static Timer delayedTasks = new Timer("DelayedTasks", true);
-	private Map<String, IOService> services = new TreeMap<String, IOService>();
+	private Map<String, IOService> services =	new TreeMap<String, IOService>();
 	protected static long connectionDelay = 5000;
 
 	public Map<String, Object> getDefaults() {
@@ -223,7 +224,7 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 		log.finest("packetsReady called");
 		writePacketsToSocket(s,
 			processSocketData(getUniqueId(s), s.getSessionData(),
-				s.getReceivedPackets()));
+				((XMPPIOService)s).getReceivedPackets()));
 	}
 
 	protected void writePacketsToSocket(IOService s, Queue<Packet> packets)
@@ -231,7 +232,7 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 		if (packets != null && packets.size() > 0) {
 			Packet p = null;
 			while ((p = packets.poll()) != null) {
-				s.addPacketToSend(p);
+				((XMPPIOService)s).addPacketToSend(p);
 			} // end of for ()
 			s.processWaitingPackets();
 		}
@@ -241,7 +242,7 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 		log.finest("Writing packet to: " + p.getTo());
 		IOService ios = services.get(getServiceId(p));
 		if (ios != null) {
-			ios.addPacketToSend(p);
+			((XMPPIOService)ios).addPacketToSend(p);
 			try {
 				ios.processWaitingPackets();
 			} catch (Exception e) {
@@ -249,7 +250,7 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 					log.log(Level.WARNING, "Exception during writing packets: ", e);
 					ios.stop();
 				} catch (Exception e1) {
-					log.log(Level.WARNING, "Exception stopping IOService: ", e1);
+					log.log(Level.WARNING, "Exception stopping XMPPIOService: ", e1);
 				} // end of try-catch
 			} // end of try-catch
 		} // end of if (ios != null)
@@ -316,7 +317,7 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 		}
 
 		public void accept(SocketChannel sc) {
-			IOService serv = new IOService();
+			XMPPIOService serv = new XMPPIOService();
 			serv.setSSLId(getName());
 			serv.setIOServiceListener(ConnectionManager.this);
 			serv.setSessionData(port_props);
