@@ -1,0 +1,56 @@
+;; Object auth/
+;; SEMANTICDB Tags save file
+(semanticdb-project-database-file "auth/"
+  :tables (list 
+   (semanticdb-table "TigaseConfiguration.java"
+    :major-mode 'jde-mode
+    :tags '(("tigase.auth" package nil nil [912 932]) ("java.util.Map" include nil nil [934 955]) ("javax.security.auth.login.AppConfigurationEntry" include nil nil [956 1011]) ("javax.security.auth.login.Configuration" include nil nil [1012 1059]) ("TigaseConfiguration" type (:typemodifiers ("public") :superclasses "Configuration" :members (("TigaseConfiguration" function (:constructor-flag t :typemodifiers ("public")) (reparse-symbol class_member_declaration) [1444 1551]) ("getAppConfigurationEntry" function (:typemodifiers ("public") :arguments (("name" variable (:typemodifiers ("final") :type "String") (reparse-symbol formal_parameters) [1610 1627])) :type "AppConfigurationEntry[]") (reparse-symbol class_member_declaration) [1554 1667]) ("refresh" function (:typemodifiers ("public") :type "void") (reparse-symbol class_member_declaration) [1670 1694])) :type "class") nil [1249 1697]))
+    :file "TigaseConfiguration.java"
+    :pointmax 1721
+    :unmatched-syntax 'nil
+    )
+   (semanticdb-table "CommitHandler.java"
+    :major-mode 'jde-mode
+    :tags '(("tigase.auth" package nil nil [912 932]) ("tigase.xmpp.XMPPResourceConnection" include nil nil [934 976]) ("CommitHandler" type (:typemodifiers ("public") :members (("COMMIT_HANDLER_KEY" variable (:typemodifiers ("public" "static" "final") :type "String") (reparse-symbol interface_member_declaration) [1199 1266]) ("handleLoginCommit" function (:arguments (("userName" variable (:type "String") (reparse-symbol formal_parameters) [1292 1307]) ("conn" variable (:type "XMPPResourceConnection") (reparse-symbol formal_parameters) [1309 1336])) :type "void") (reparse-symbol interface_member_declaration) [1269 1338])) :type "interface") nil [1164 1341]))
+    :file "CommitHandler.java"
+    :pointmax 1359
+    :unmatched-syntax 'nil
+    )
+   (semanticdb-table "PlainAuth.java"
+    :major-mode 'jde-mode
+    :tags '(("tigase.auth" package nil nil [912 932]) ("java.io.IOException" include nil nil [934 961]) ("java.security.NoSuchAlgorithmException" include nil nil [962 1008]) ("java.util.Map" include nil nil [1009 1030]) ("java.util.logging.Logger" include nil nil [1031 1063]) ("javax.security.auth.Subject" include nil nil [1064 1099]) ("javax.security.auth.callback.Callback" include nil nil [1100 1145]) ("javax.security.auth.callback.CallbackHandler" include nil nil [1146 1198]) ("javax.security.auth.callback.NameCallback" include nil nil [1199 1248]) ("javax.security.auth.callback.PasswordCallback" include nil nil [1249 1302]) ("javax.security.auth.callback.UnsupportedCallbackException" include nil nil [1303 1368]) ("javax.security.auth.login.LoginException" include nil nil [1369 1417]) ("javax.security.auth.spi.LoginModule" include nil nil [1418 1461]) ("tigase.db.UserNotFoundException" include nil nil [1462 1501]) ("tigase.db.UserRepository" include nil nil [1502 1534]) ("tigase.util.JID" include nil nil [1535 1558]) ("tigase.xmpp.XMPPResourceConnection" include nil nil [1559 1601]) ("PlainAuth" type (:typemodifiers ("public") :interfaces ("LoginModule") :members (("log" variable (:typemodifiers ("private" "static" "final") :type "Logger") (reparse-symbol class_member_declaration) [1894 1972]) ("subject" variable (:typemodifiers ("private") :type "Subject") (reparse-symbol class_member_declaration) [1975 2006]) ("callbackHandler" variable (:typemodifiers ("private") :type "CallbackHandler") (reparse-symbol class_member_declaration) [2008 2055]) ("commitHandler" variable (:typemodifiers ("private") :type "CommitHandler") (reparse-symbol class_member_declaration) [2141 2184]) ("repository" variable (:typemodifiers ("private") :type "UserRepository") (reparse-symbol class_member_declaration) [2186 2227]) ("user_name" variable (:typemodifiers ("private") :type "String") (reparse-symbol class_member_declaration) [2230 2262]) ("user_pass" variable (:typemodifiers ("private") :type "String") (reparse-symbol class_member_declaration) [2264 2296]) ("user_raw_pass" variable (:typemodifiers ("private") :type "String") (reparse-symbol class_member_declaration) [2298 2334]) ("connection" variable (:typemodifiers ("protected") :type "XMPPResourceConnection") (reparse-symbol class_member_declaration) [2336 2387]) ("loginSuccessful" variable (:typemodifiers ("private") :type "boolean") (reparse-symbol class_member_declaration) [2390 2430]) ("initialize" function (:typemodifiers ("public") :arguments (("subject" variable (:typemodifiers ("final") :type "Subject") (reparse-symbol formal_parameters) [2783 2804]) ("callbackHandler" variable (:typemodifiers ("final") :type "CallbackHandler") (reparse-symbol formal_parameters) [2808 2845])) :type "void") (reparse-symbol class_member_declaration) [2760 3223]) ("abort" function (:throws ("LoginException") :typemodifiers ("public") :type "boolean") (reparse-symbol class_member_declaration) [3375 3439]) ("commit" function (:throws ("LoginException") :typemodifiers ("public") :type "boolean") (reparse-symbol class_member_declaration) [3592 3767]) ("login" function (:throws ("LoginException") :typemodifiers ("public") :type "boolean") (reparse-symbol class_member_declaration) [3919 5716]) ("passwordsEqual" function (:throws ("NoSuchAlgorithmException") :typemodifiers ("protected") :arguments (("given_password" variable (:typemodifiers ("final") :type "String") (reparse-symbol formal_parameters) [5752 5779]) ("db_password" variable (:typemodifiers ("final") :type "String") (reparse-symbol formal_parameters) [5783 5807])) :type "boolean") (reparse-symbol class_member_declaration) [5719 5890]) ("logout" function (:throws ("LoginException") :typemodifiers ("public") :type "boolean") (reparse-symbol class_member_declaration) [6043 6108])) :type "class") nil [1781 6111]))
+    :file "PlainAuth.java"
+    :pointmax 6125
+    :unmatched-syntax 'nil
+    )
+   (semanticdb-table "DigestAuth.java"
+    :major-mode 'jde-mode
+    :tags '(("tigase.auth" package nil nil [912 932]) ("java.security.NoSuchAlgorithmException" include nil nil [934 980]) ("tigase.util.Algorithms" include nil nil [981 1011]) ("DigestAuth" type (:typemodifiers ("public") :superclasses "PlainAuth" :members (("passwordsEqual" function (:throws ("NoSuchAlgorithmException") :typemodifiers ("protected") :arguments (("given_password" variable (:typemodifiers ("final") :type "String") (reparse-symbol formal_parameters) [1271 1298]) ("db_password" variable (:typemodifiers ("final") :type "String") (reparse-symbol formal_parameters) [1302 1326])) :type "boolean") (reparse-symbol class_member_declaration) [1238 1513])) :type "class") nil [1192 1517]))
+    :file "DigestAuth.java"
+    :pointmax 1532
+    :unmatched-syntax 'nil
+    )
+   (semanticdb-table "ResourceConnectionCallback.java"
+    :major-mode 'jde-mode
+    :tags '(("tigase.auth" package nil nil [912 932]) ("javax.security.auth.callback.Callback" include nil nil [934 979]) ("tigase.xmpp.XMPPResourceConnection" include nil nil [980 1022]) ("ResourceConnectionCallback" type (:typemodifiers ("public") :interfaces ("Callback") :members (("connection" variable (:typemodifiers ("private") :type "XMPPResourceConnection") (reparse-symbol class_member_declaration) [1283 1332]) ("setResourceConnection" function (:typemodifiers ("public") :arguments (("connection" variable (:typemodifiers ("final") :type "XMPPResourceConnection") (reparse-symbol formal_parameters) [1369 1408])) :type "void") (reparse-symbol class_member_declaration) [1335 1446]) ("getResourceConnection" function (:typemodifiers ("public") :type "XMPPResourceConnection") (reparse-symbol class_member_declaration) [1449 1528])) :type "class") nil [1219 1531]))
+    :file "ResourceConnectionCallback.java"
+    :pointmax 1562
+    :unmatched-syntax 'nil
+    )
+   (semanticdb-table "TigaseSasl.java"
+    :major-mode 'jde-mode
+    :tags '(("tigase.auth" package nil nil [912 932]) ("java.util.Map" include nil nil [934 955]) ("javax.security.auth.login.AppConfigurationEntry" include nil nil [956 1011]) ("javax.security.sasl.Sasl" include nil nil [1012 1044]) ("javax.security.sasl.SaslServer" include nil nil [1045 1083]) ("tigase.xmpp.XMPPResourceConnection" include nil nil [1084 1126]) ("TigaseSasl" type (:typemodifiers ("public") :members (("createSaslServer" function (:typemodifiers ("public" "static") :arguments (("mechanism" variable (:typemodifiers ("final") :type "String") (reparse-symbol formal_parameters) [1377 1399]) ("protocol" variable (:typemodifiers ("final") :type "String") (reparse-symbol formal_parameters) [1403 1424]) ("serverName" variable (:typemodifiers ("final") :type "String") (reparse-symbol formal_parameters) [1426 1449]) ("connection" variable (:typemodifiers ("final") :type "XMPPResourceConnection") (reparse-symbol formal_parameters) [1480 1519])) :type "SaslServer") (reparse-symbol class_member_declaration) [1335 1794])) :type "class") nil [1307 1797]))
+    :file "TigaseSasl.java"
+    :pointmax 1812
+    )
+   (semanticdb-table "SaslCallbackHandler.java"
+    :major-mode 'jde-mode
+    :tags '(("tigase.auth" package nil nil [912 932]) ("java.io.IOException" include nil nil [934 961]) ("java.util.Map" include nil nil [962 983]) ("javax.security.auth.callback.Callback" include nil nil [984 1029]) ("javax.security.auth.callback.CallbackHandler" include nil nil [1030 1082]) ("javax.security.auth.callback.UnsupportedCallbackException" include nil nil [1083 1148]) ("tigase.db.UserRepository" include nil nil [1149 1181]) ("tigase.xmpp.XMPPResourceConnection" include nil nil [1182 1224]) ("SaslCallbackHandler" type (:typemodifiers ("public") :interfaces ("CallbackHandler") :members (("commitHandler" variable (:typemodifiers ("private") :type "CommitHandler") (reparse-symbol class_member_declaration) [1518 1561]) ("repository" variable (:typemodifiers ("private") :type "UserRepository") (reparse-symbol class_member_declaration) [1563 1604]) ("connection" variable (:typemodifiers ("protected") :type "XMPPResourceConnection") (reparse-symbol class_member_declaration) [1606 1657]) ("user_name" variable (:typemodifiers ("private") :type "String") (reparse-symbol class_member_declaration) [1660 1692]) ("user_raw_pass" variable (:typemodifiers ("private") :type "String") (reparse-symbol class_member_declaration) [1724 1760]) ("SaslCallbackHandler" function (:constructor-flag t :typemodifiers ("public") :arguments (("connection" variable (:typemodifiers ("final") :type "XMPPResourceConnection") (reparse-symbol formal_parameters) [1897 1936]))) (reparse-symbol class_member_declaration) [1838 2178]) ("handle" function (:throws ("IOException" "UnsupportedCallbackException") :typemodifiers ("public") :arguments (("callbackArray" variable (:typemodifiers ("final") :type "Callback[]") (reparse-symbol formal_parameters) [2494 2524])) :type "void") (reparse-symbol class_member_declaration) [2475 4881])) :type "class") nil [1414 4881]))
+    :file "SaslCallbackHandler.java"
+    :pointmax 4905
+    )
+   )
+  :file "semantic.cache"
+  :semantic-tag-version "2.0beta3"
+  :semanticdb-version "2.0beta3"
+  )
