@@ -73,10 +73,10 @@ public class SessionManager extends AbstractMessageReceiver
 	public static final String USER_REPOSITORY_PROP_VAL = "user-repository.xml";
 	public static final String COMPONENTS_PROP_KEY = "components";
 	public static final String[] COMPONENTS_PROP_VAL =
-	{"jabber:iq:register", "jabber:iq:auth"};
+	{"jabber:iq:register", "jabber:iq:auth", "urn:ietf:params:xml:ns:xmpp-sasl"};
 
 	public static final String SECURITY_PROP_KEY = "security";
-	
+
 	public static final String AUTHENTICATION_IDS_PROP_KEY = "authentication-ids";
 	public static final String[] AUTHENTICATION_IDS_PROP_VAL =
 	{"auth-plain", "auth-digest"};
@@ -156,18 +156,25 @@ public class SessionManager extends AbstractMessageReceiver
 		log.finer(pc.getCommand().toString() + " command from: " + pc.getFrom());
 		switch (pc.getCommand()) {
 		case STREAM_OPENED:
-			log.finer("Adding resource connection for: " + pc.getFrom());
-			XMPPResourceConnection connection =
-				new XMPPResourceConnection(pc.getFrom(), repository);
-			final String hostname = pc.getElemCData("/STREAM_OPENED/hostname");
-			if (hostname != null) {
-				connection.setDomain(hostname);
-			} // end of if (hostname != null)
-			else {
-				connection.setDomain(getDefHostName());
-			} // end of if (hostname != null) else
-			connection.setSessionId(pc.getElemCData("/STREAM_OPENED/session-id"));
-			connectionsByFrom.put(pc.getFrom(), connection);
+			// It maybe existing opened stream after TLS/SASL authorization
+			XMPPResourceConnection connection =	connectionsByFrom.get(pc.getFrom());
+			// If not, it means this is new stream
+			if (connection == null) {
+				log.finer("Adding resource connection for: " + pc.getFrom());
+				final String hostname = pc.getElemCData("/STREAM_OPENED/hostname");
+				connection = new XMPPResourceConnection(pc.getFrom(), repository);
+				if (hostname != null) {
+					connection.setDomain(hostname);
+				} // end of if (hostname != null)
+				else {
+					connection.setDomain(getDefHostName());
+				} // end of if (hostname != null) else
+				connection.setSessionId(pc.getElemCData("/STREAM_OPENED/session-id"));
+				connectionsByFrom.put(pc.getFrom(), connection);
+			} else {
+				log.finest("Stream opened for existing session, authorized: "
+					+ connection.isAuthorized());
+			} // end of else
 			break;
 		case GETFEATURES:
 			if (pc.getType() == IqType.get) {

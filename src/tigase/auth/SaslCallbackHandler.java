@@ -34,8 +34,9 @@ import javax.security.sasl.AuthorizeCallback;
 import javax.security.sasl.RealmCallback;
 import tigase.db.UserNotFoundException;
 import tigase.db.UserRepository;
-import tigase.xmpp.XMPPResourceConnection;
 import tigase.util.JID;
+import tigase.xmpp.Authorization;
+import tigase.xmpp.XMPPResourceConnection;
 
 /**
  * Describe class SaslCallbackHandler here.
@@ -117,7 +118,7 @@ public class SaslCallbackHandler implements CallbackHandler {
 			} else if (callbacks[i] instanceof PasswordCallback) {
 				PasswordCallback pc = (PasswordCallback)callbacks[i];
 				try {
-					final String user_raw_pass =
+					user_raw_pass =
 						repository.getData(JID.getNodeID(user_name, realm), "password");
 					pc.setPassword(user_raw_pass.toCharArray());
 					log.finest("PasswordCallback: " + user_raw_pass);
@@ -131,9 +132,11 @@ public class SaslCallbackHandler implements CallbackHandler {
 				String authorId = authCallback.getAuthorizationID();
 				log.finest("AuthorizeCallback: authorId: " + authorId);
 				if (authenId.equals(authorId)) {
+					Authorization result =
+						connection.authorize(user_name, user_raw_pass);
+					log.finest("Authorization result: " + result);
 					authCallback.setAuthorized(true);
 					authCallback.setAuthorizedID(authorId);
-					connection.authorize(user_name, user_raw_pass);
 					commitHandler.handleLoginCommit(user_name, connection);
 				} // end of if (authenId.equals(authorId))
 			} else {

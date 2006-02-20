@@ -22,19 +22,21 @@
  */
 package tigase.xmpp.impl;
 
+import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import java.lang.annotation.ElementType;
 import java.util.Map;
 import java.util.Queue;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import javax.security.sasl.Sasl;
 import javax.security.sasl.SaslException;
 import javax.security.sasl.SaslServer;
 import tigase.auth.TigaseSasl;
+import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.xml.Element;
+import tigase.xmpp.IqType;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPResourceConnection;
 
@@ -71,7 +73,8 @@ public class SaslAuth extends XMPPProcessor {
     abort,
     response,
     challenge,
-		failure;
+		failure,
+		success;
   }
 
 	public String id() { return ID; }
@@ -88,71 +91,84 @@ public class SaslAuth extends XMPPProcessor {
     } // end of if (session.isAuthorized()) else
 	}
 
-  public void processRequest(final Packet packet,
-		final XMPPResourceConnection session,	final Queue<Packet> results) {
-    ElementType type = ElementType.valueOf(request.getRootName());
+  public void process(final Packet packet, final XMPPResourceConnection session,
+		final Queue<Packet> results) {
 		Element request = packet.getElement();
+    ElementType type = ElementType.valueOf(request.getName());
+		boolean failure = false;
     switch (type) {
-    case AUTH:
+    case auth:
       String mechanism = request.getAttribute("/auth", "mechanism");
       try {
         Map<String, String> props = new TreeMap<String, String>();
         props.put(Sasl.QOP, "auth");
         SaslServer ss = TigaseSasl.createSaslServer(mechanism, "xmpp",
-          user_data.getDomain(), props, session);
+          session.getDomain(), props, session);
         // evaluateResponse doesn't like null parameter
         byte[] challenge = ss.evaluateResponse(new byte[0]);
         log.finest("challenge: " + new String(challenge));
-        String reply = "<challenge xmlns='" + XMLNS + "'>" +
-          Base64.encode(challenge) + "</challenge>";
-        addReply(reply);
-        user_data.setSessionData("SaslServer", ss);
+				results.offer(packet.swapFromTo(createReply(ElementType.challenge,
+							Base64.encode(challenge))));
+        session.putSessionData("SaslServer", ss);
       } // end of try
       catch (SaslException e) {
         log.log(Level.WARNING, "SaslException", e);
-        addReply("<failure xmlns='" + XMLNS + "'>"
-          + "<temporary-auth-failure/></failure></stream:stream>");
+				failure = true;
       } // end of try-catch
       break;
-    case ABORT:
-      log.fine("Abort received, terminating...");
-      addReply("<failure xmlns='" + XMLNS + "'>"
-        + "<temporary-auth-failure/></failure></stream:stream>");
-      addReply(Reply.Type.STOP);
+    case abort:
+      log.finer("Abort received, terminating...");
+			failure = true;
       break;
-    case RESPONSE:
-      SaslServer ss = (SaslServer)user_data.getSessionData("SaslServer");
+    case response:
+      SaslServer ss = (SaslServer)session.getSessionData("SaslServer");
       if (ss != null) {
         try {
           byte[] data = Base64.decode(request.getChildCData("/response"));
+					log.finest("SASL response: " + new String(data));
           // evaluateResponse doesn't like null parameter
           if (data == null) { data = new byte[0]; } // end of if (data == null)
           byte[] challenge = ss.evaluateResponse(data);
+					log.finest("SASL challenge: " + new String(challenge));
           String reply = null;
           if (ss.isComplete()) {
-            reply = "<success xmlns='" + XMLNS + "'/>";
-          } // end of if (ss.isComplete())
-          else {
-            reply = "<challenge xmlns='" + XMLNS + "'>" +
-              Base64.encode(challenge) + "</challenge>";
+						results.offer(packet.swapFromTo(createReply(ElementType.success,
+									null)));
+						if (!session.isAuthorized()) {
+							log.severe("!!!!!! Session not authorized after sasl success.");
+						} // end of if (!session.isAuthorized())
+          } else {
+						results.offer(packet.swapFromTo(createReply(ElementType.challenge,
+									Base64.encode(challenge))));
           } // end of if (ss.isComplete()) else
-          addReply(reply);
         } catch (SaslException e) {
           log.log(Level.FINEST, "SaslException", e);
-          addReply("<failure xmlns='" + XMLNS + "'>"
-            + "<temporary-auth-failure/></failure></stream:stream>");
-          addReply(Reply.Type.STOP);
+					failure = true;
         } // end of try-catch
-      } // end of if (ss != null)
-      else {
+      } else {
         log.severe("SaslServer == null, should be valid object instead.");
-        addReply(Reply.Type.STOP);
+				failure = true;
       } // end of else
       break;
     default:
       // Ignore
       break;
     } // end of switch (type)
+		if (failure) {
+			results.offer(packet.swapFromTo(createReply(ElementType.failure,
+						"<temporary-auth-failure/>")));
+			results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
+					IqType.set, packet.getElemId()));
+		} // end of if (failure)
   }
+
+	private Element createReply(final ElementType type, final String cdata) {
+		Element reply = new Element(type.toString());
+		reply.setXMLNS(XMLNS);
+		if (cdata != null) {
+			reply.setCData(cdata);
+		} // end of if (cdata != null)
+		return reply;
+	}
 
 } // SaslAuth

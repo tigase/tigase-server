@@ -65,7 +65,7 @@ public class JabberIqAuth extends XMPPProcessor {
 	protected static final String[] ELEMENTS = {"query"};
   protected static final String[] XMLNSS = {"jabber:iq:auth"};
   protected static final String[] FEATURES = {
-    "<register xmlns='http://jabber.org/features/iq-register'/>"};
+    "<auth xmlns='http://jabber.org/features/iq-auth'/>"};
 
 	public String id() { return ID; }
 

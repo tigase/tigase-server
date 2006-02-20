@@ -22,6 +22,7 @@
  */
 package tigase.xmpp;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -86,7 +87,44 @@ public class XMPPResourceConnection {
 	public XMPPResourceConnection(String connectionId, UserRepository rep) {
 		this.connectionId = connectionId;
 		this.repository = rep;
+    sessionData = new HashMap<String, Object>();
 	}
+
+  /**
+   * Saves given session data. Data are saved to temporary storage only and are
+   * accessible during this session life only and only from this session
+   * instance.<br/>
+   * Any <code>Object</code> can be stored and retrieved through
+   * <code>getSessionData(...)</code>.<br/>
+   * To access permanent storage to keep data between session instances you must
+   * use one of <code>get/setData...(...)</code> methods familly. They gives you
+   * access to hierachical permanent data base. Permanent data base however can
+   * be accessed after successuf authorization while session storage is availble
+   * all the time.
+   *
+   * @param key a <code>String</code> value of stored data key ID.
+   * @param value a <code>Object</code> value of data stored in session.
+   * @see #getSessionData(String)
+   * @see #getData(String)
+   * @see #setData(String, String)
+   */
+  public final void putSessionData(final String key, final Object value) {
+    sessionData.put(key, value);
+  }
+
+  /**
+   * Retrieves session data.
+   * This method gives access to temporary session data only.
+   * You can retrieve earlier saved data giving key ID to receive needed
+   * value. Please see <code>putSessionData</code> description for more details.
+   *
+   * @param key a <code>String</code> value of stored data ID.
+   * @return a <code>Object</code> value of data for given key.
+   * @see #putSessionData(String, Object)
+   */
+  public final Object getSessionData(final String key) {
+    return sessionData.get(key);
+  }
 
 	public void streamClosed() {
 		if (parentSession != null) {

@@ -33,6 +33,6 @@ package tigase.xmpp;
  */
 public enum IqType {
 
-	get, set, result, error;
+	get, set, result, error, unavailable;
 
 } // IqType

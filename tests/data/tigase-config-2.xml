@@ -7,6 +7,7 @@
    <map>
     <entry key=".level" value="FINER" type="String"/>
     <entry key="tigase.xml.level" value="INFO" type="String"/>
+    <entry key="tigase.auth.level" value="ALL" type="String"/>
     <entry key="tigase.xmpp.impl.level" value="ALL" type="String"/>
     <entry key="tigase.server.xmppcomponent.level" value="INFO" type="String"/>
     <entry key="tigase.server.xmppsession.level" value="ALL" type="String"/>
@@ -109,6 +110,7 @@
    <entry key="components" type="String[]">
     <item value="jabber:iq:register"/>
     <item value="jabber:iq:auth"/>
+    <item value="urn:ietf:params:xml:ns:xmpp-sasl"/>
    </entry>
   </map>
   <node name="security">
@@ -116,6 +118,7 @@
     <entry key="authentication-ids" type="String[]">
      <item value="auth-plain"/>
      <item value="auth-digest"/>
+     <item value="auth-sasl"/>
     </entry>
    </map>
    <node name="auth-digest">
@@ -127,6 +130,12 @@
    <node name="auth-plain">
     <map>
      <entry key="class" value="tigase.auth.PlainAuth" type="String"/>
+     <entry key="flag" value="sufficient" type="String"/>
+    </map>
+   </node>
+   <node name="auth-sasl">
+    <map>
+     <entry key="class" value="None" type="String"/>
      <entry key="flag" value="sufficient" type="String"/>
     </map>
    </node>
