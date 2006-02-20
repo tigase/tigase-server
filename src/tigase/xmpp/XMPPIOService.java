@@ -20,16 +20,17 @@
  * Last modified by $Author$
  * $Date$
  */
-package tigase.server;
+package tigase.xmpp;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Logger;
 import tigase.net.IOService;
-import tigase.xml.DomBuilderHandler;
+import tigase.server.Packet;
 import tigase.xml.Element;
 import tigase.xml.SimpleParser;
 import tigase.xml.SingletonFactory;
@@ -51,8 +52,9 @@ public class XMPPIOService extends IOService {
   private static final Logger log =
 		Logger.getLogger("tigase.server.XMPPIOService");
 
-  private DomBuilderHandler domHandler = new DomBuilderHandler();
+  private XMPPDomBuilderHandler domHandler = null;
 	private SimpleParser parser = SingletonFactory.getParserInstance();
+	private XMPPIOServiceListener serviceListener = null;
 
   /**
    * The <code>waitingPackets</code> queue keeps data which have to be processed.
@@ -82,10 +84,53 @@ public class XMPPIOService extends IOService {
 	 *
 	 */
 	public XMPPIOService() {
-
+		domHandler = new XMPPDomBuilderHandler(this);
 	}
 
-  /**
+	public void setIOServiceListener(XMPPIOServiceListener sl) {
+		this.serviceListener = sl;
+		super.setIOServiceListener(sl);
+	}
+
+	protected void xmppStreamOpened(Map<String, String> attribs) {
+		String response = serviceListener.xmppStreamOpened(this, attribs);
+    writeLock.lock();
+    try {
+			log.finest("Sending data: " + response);
+			writeData(response);
+		} catch (IOException e) {
+			log.warning("Error sending stream open data: " + e);
+			try {
+				stop();
+			} // end of try
+			catch (IOException ex) {
+				log.warning("Error stopping service: " + e);
+			} // end of try-catch
+    } finally {
+      writeLock.unlock();
+    }
+	}
+
+	protected void xmppStreamClosed() {
+		serviceListener.xmppStreamClosed(this);
+    writeLock.lock();
+    try {
+			log.finest("Sending data: </stream:stream>");
+			writeData("</stream:stream>");
+		} catch (IOException e) {
+			log.warning("Error sending stream closed data: " + e);
+    } finally {
+      writeLock.unlock();
+    }
+		try {
+			stop();
+		} // end of try
+		catch (IOException e) {
+			log.warning("Error stopping service: " + e);
+		} // end of try-catch
+	}
+
+	/**
    * Method <code>addPacketToSend</code> adds new data which will be processed
    * during next run.
    * Data are kept in proper order like in <em>FIFO</em> queue.
@@ -117,7 +162,7 @@ public class XMPPIOService extends IOService {
     }
   }
 
-  /**
+	/**
    * Describe <code>processSocketData</code> method here.
    *
    * @exception IOException if an error occurs

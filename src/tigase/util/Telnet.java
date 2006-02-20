@@ -44,6 +44,8 @@ public class Telnet {
 	private static boolean debug = false;
 	private static boolean stopped = false;
 	private static String file = null;
+	private static boolean continuous = false;
+	private static long delay = 100;
 
 	/**
 	 * Creates a new <code>Telnet</code> instance.
@@ -57,7 +59,9 @@ public class Telnet {
       + " -h                this help message\n"
       + " -n hostname       host name\n"
       + " -p port           port number\n"
-      + " -c file           file with content to send to remote host\n"
+      + " -f file           file with content to send to remote host\n"
+			+ " -c                continuous sending file content\n"
+			+ " -t millis         delay between sending file content\n"
       + " -v                prints server version info\n"
       + " -d [true|false]   turn on|off debug mode\n"
       ;
@@ -84,7 +88,7 @@ public class Telnet {
           System.out.print(version());
           System.exit(0);
         } // end of if (args[i].equals("-h"))
-        if (args[i].equals("-c")) {
+        if (args[i].equals("-f")) {
           if (i+1 == args.length) {
             System.out.print(help());
             System.exit(1);
@@ -112,12 +116,22 @@ public class Telnet {
           } // end of else
         } // end of if (args[i].equals("-h"))
         if (args[i].equals("-d")) {
-          if (i+1 == args.length) {
+          if (i+1 == args.length || args[i+1].startsWith("-")) {
             debug = true;
           } // end of if (i+1 == args.length)
           else {
             ++i;
             debug = args[i].charAt(0) != '-' &&
+              (args[i].equals("true") || args[i].equals("yes"));
+          } // end of else
+        } // end of if (args[i].equals("-d"))
+        if (args[i].equals("-c")) {
+          if (i+1 == args.length || args[i+1].startsWith("-")) {
+            continuous = true;
+          } // end of if (i+1 == args.length)
+          else {
+            ++i;
+            continuous = args[i].charAt(0) != '-' &&
               (args[i].equals("true") || args[i].equals("yes"));
           } // end of else
         } // end of if (args[i].equals("-d"))
@@ -175,6 +189,13 @@ public class Telnet {
 				if (data != null) {
 					os.write(data.getBytes());
 				} // end of if (data != null)
+				while (data != null && continuous && !stopped) {
+					os.write(data.getBytes());
+					if (os == System.out) {
+						break;
+					} // end of if (os == System.out)
+					Thread.currentThread().sleep(delay);
+				} // end of while (continuous && !stopped)
 				while (!stopped) {
 					int chr = is.read();
 					if (chr == -1) {
@@ -183,7 +204,7 @@ public class Telnet {
 					os.write(chr);
 					os.flush();
 				} // end of while (true)
-			} catch (IOException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			} // end of try-catch
 			System.exit(1);

@@ -24,18 +24,27 @@
 
 package tigase.server.xmppclient;
 
-
+import java.io.IOException;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
-import java.util.LinkedList;
+import java.util.TreeMap;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import tigase.server.Command;
 import tigase.server.ConnectionManager;
 import tigase.server.MessageReceiver;
 import tigase.server.Packet;
 import tigase.server.XMPPService;
-import tigase.xml.Element;
 import tigase.util.JID;
+import tigase.util.RoutingsContainer;
+import tigase.xml.Element;
+import tigase.xmpp.IqType;
+import tigase.xmpp.XMPPIOService;
+import tigase.xmpp.XMPPProcessorIfc;
+import tigase.xmpp.XMPPResourceConnection;
 
 /**
  * Class ClientConnectionManager
@@ -54,21 +63,73 @@ public class ClientConnectionManager extends ConnectionManager
   private static final Logger log =
     Logger.getLogger("tigase.server.xmppclient.ClientConnectionManager");
 
-  public static final String ROUTE_ADDRESS_PROP_KEY = "route-address";
-  public static final String ROUTE_ADDRESS_PROP_VAL =	"session_1@localhost";
+	private static final String ROUTINGS_PROP_KEY = "routings";
+	public static final String ROUTING_MODE_PROP_KEY = "multi-mode";
+	public static final boolean ROUTING_MODE_PROP_VAL = true;
+	public static final String ROUTING_ENTRY_PROP_KEY = ".+@localhost";
+	public static final String ROUTING_ENTRY_PROP_VAL = "session_1@localhost";
 
-	private String routeAddress = ROUTE_ADDRESS_PROP_VAL;
+	private RoutingsContainer routings = null;
 
+	private Map<String, XMPPProcessorIfc> processors =
+		new TreeMap<String, XMPPProcessorIfc>();
 
-	public void processPacket(Packet packet) {
+	public void processPacket(final Packet packet) {
+		log.finest("Processing packet: " + packet.getStringData());
+		Packet pc = packet;
 		if (packet.isRouted()) {
-			Packet res = packet.unpackRouted();
-			res.setTo(packet.getElemTo());
-			writePacketToSocket(res);
+			pc = packet.unpackRouted();
 		} // end of if (packet.isRouted())
+		if (pc.isCommand()) {
+			processCommand(pc, packet);
+		} // end of if (pc.isCommand())
 		else {
-			writePacketToSocket(packet);
-		} // end of if (packet.isRouted()) else
+			writePacketToSocket(pc);
+		} // end of else
+	}
+
+	private void processCommand(final Packet packet, final Packet routed) {
+		Packet pc = packet;
+		if (routed != null) {
+			pc = routed;
+		} // end of if (routed != null)
+		switch (packet.getCommand()) {
+		case GETFEATURES:
+			if (packet.getType() == IqType.result) {
+				String features = getFeatures(getXMPPSession(pc));
+				Element elem_features = new Element("stream:features");
+				elem_features.setCData(features);
+				elem_features.addChildren(packet.getElement().getChildren());
+				Packet result = new Packet(elem_features);
+				result.setTo(packet.getTo());
+				writePacketToSocket(result);
+			} // end of if (pc.getType() == IqType.get)
+			break;
+		case STREAM_CLOSED:
+
+			break;
+		case GETDISCO:
+
+			break;
+		case CLOSE:
+			XMPPIOService serv = getXMPPIOService(pc);
+			if (serv != null) {
+				try {
+					serv.stop();
+				} // end of try
+				catch (IOException e) {
+					log.log(Level.WARNING, "Error stopping service: ", e);
+				} // end of try-catch
+			} // end of if (serv != null)
+			else {
+				log.fine("Attempt to stop non-existen service for packet: "
+					+ pc.getStringData()
+					+ ", Service already stopped?");
+			} // end of if (serv != null) else
+			break;
+		default:
+			break;
+		} // end of switch (pc.getCommand())
 	}
 
 	public Queue<Packet> processSocketData(String id,
@@ -78,7 +139,7 @@ public class ClientConnectionManager extends ConnectionManager
 		while ((p = packets.poll()) != null) {
 			log.finest("Processing socket data: " + p.getStringData());
 			p.setFrom(JID.getJID(getName(), getDefHostName(), id));
-			p.setTo(getDefRoutingAddress());
+			p.setTo(routings.computeRouting(p.getElemTo()));
 			addOutPacket(p);
 			// 			results.offer(new Packet(new Element("OK")));
 		} // end of while ()
@@ -88,13 +149,45 @@ public class ClientConnectionManager extends ConnectionManager
 
 	public Map<String, Object> getDefaults() {
 		Map<String, Object> props = super.getDefaults();
-    props.put(ROUTE_ADDRESS_PROP_KEY, ROUTE_ADDRESS_PROP_VAL);
+		props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_MODE_PROP_KEY,
+			ROUTING_MODE_PROP_VAL);
+		props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_ENTRY_PROP_KEY,
+			ROUTING_ENTRY_PROP_VAL);
 		return props;
 	}
 
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
-		routeAddress = (String)props.get(ROUTE_ADDRESS_PROP_KEY);
+		boolean routing_mode =
+			(Boolean)props.get(ROUTINGS_PROP_KEY + "/" + ROUTING_MODE_PROP_KEY);
+		routings = new RoutingsContainer(routing_mode);
+		int idx = (ROUTINGS_PROP_KEY + "/").length();
+		for (Map.Entry<String, Object> entry: props.entrySet()) {
+			if (entry.getKey().startsWith(ROUTINGS_PROP_KEY + "/")
+				&& !entry.getKey().equals(ROUTINGS_PROP_KEY + "/" +
+					ROUTING_MODE_PROP_KEY)) {
+				routings.addRouting(entry.getKey().substring(idx),
+					(String)entry.getValue());
+			} // end of if (entry.getKey().startsWith(ROUTINGS_PROP_KEY + "/"))
+		} // end of for ()
+	}
+
+	private XMPPResourceConnection getXMPPSession(Packet p) {
+		XMPPIOService serv = getXMPPIOService(p);
+		return (XMPPResourceConnection)serv.getSessionData().get("xmpp-session");
+	}
+
+	private String getFeatures(XMPPResourceConnection session) {
+		StringBuilder sb = new StringBuilder();
+		for (XMPPProcessorIfc proc: processors.values()) {
+			String[] features = proc.supStreamFeatures(session);
+			if (features != null) {
+				for (String f: features) {
+					sb.append(f);
+				} // end of for ()
+			} // end of if (features != null)
+		} // end of for ()
+		return sb.toString();
 	}
 
 	protected int[] getDefPlainPorts() {
@@ -109,8 +202,38 @@ public class ClientConnectionManager extends ConnectionManager
 		return "tigase.xmpp.XMPPClient";
 	}
 
-	protected String getDefRoutingAddress() {
-		return routeAddress;
+	public String xmppStreamOpened(XMPPIOService serv,
+		Map<String, String> attribs) {
+		log.finer("Stream opened: " + attribs.toString());
+		final String hostname = attribs.get("to");
+		final String id = UUID.randomUUID().toString();
+		StringBuilder sb = new StringBuilder();
+		sb.append("<session-id>" + id + "</session-id>");
+		if (hostname != null) {
+			sb.append("<hostname>" + hostname + "</hostname>");
+		} // end of if (hostname != null)
+		serv.getSessionData().put(serv.SESSION_ID, id);
+		addOutPacket(Command.STREAM_OPENED.getPacket(
+									 JID.getJID(getName(), getDefHostName(), getUniqueId(serv)),
+									 routings.computeRouting(hostname), IqType.set, "sess1",
+									 sb.toString()));
+		if (attribs.get("version") != null) {
+			addOutPacket(Command.GETFEATURES.getPacket(
+										 JID.getJID(getName(), getDefHostName(), getUniqueId(serv)),
+										 routings.computeRouting(null), IqType.get, "sess1"));
+		} // end of if (attribs.get("version") != null)
+		return "<stream:stream version='1.0' xml:lang='en'"
+			+ " to='kobit'"
+			+ " id='" + id + "'"
+			+ " xmlns='jabber:client'"
+			+ " xmlns:stream='http://etherx.jabber.org/streams'>";
+	}
+
+	public void xmppStreamClosed(XMPPIOService serv) {
+		log.finer("Stream closed.");
+		addOutPacket(Command.STREAM_CLOSED.getPacket(
+									 JID.getJID(getName(), getDefHostName(), getUniqueId(serv)),
+									 routings.computeRouting(null), IqType.set, "sess1"));
 	}
 
 }

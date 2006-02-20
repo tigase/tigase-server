@@ -26,6 +26,7 @@ package tigase.server;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.nio.channels.SocketChannel;
+import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Queue;
@@ -40,10 +41,11 @@ import tigase.net.ConnectionOpenListener;
 import tigase.net.ConnectionOpenThread;
 import tigase.net.ConnectionType;
 import tigase.net.IOService;
-import tigase.net.IOServiceListener;
 import tigase.net.SocketReadThread;
 import tigase.net.SocketType;
 import tigase.util.JID;
+import tigase.xmpp.XMPPIOService;
+import tigase.xmpp.XMPPIOServiceListener;
 
 /**
  * Describe class ConnectionManager here.
@@ -55,7 +57,7 @@ import tigase.util.JID;
  * @version $Rev$
  */
 public abstract class ConnectionManager extends AbstractMessageReceiver
-	implements IOServiceListener {
+	implements XMPPIOServiceListener {
 
 	private static final Logger log =
     Logger.getLogger("tigase.server.ConnectionManager");
@@ -73,7 +75,7 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 	public static final String TLS_PROP_KEY = PROP_KEY + "tls/";
 	public static final String TLS_USE_PROP_KEY = TLS_PROP_KEY + "use";
 	public static final boolean TLS_USE_PROP_VAL = true;
-	public static final String TLS_REQUIRED_PROP_KEY = TLS_PROP_KEY + "required";
+	public static final String TLS_REQUIRED_PROP_KEY = "tls/required";
 	public static final boolean TLS_REQUIRED_PROP_VAL = false;
 	public static final String TLS_KEYS_STORE_PROP_KEY =
 		TLS_PROP_KEY + "keys-store";
@@ -98,7 +100,6 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 	public Map<String, Object> getDefaults() {
 		Map<String, Object> props = super.getDefaults();
 		props.put(TLS_USE_PROP_KEY, TLS_USE_PROP_VAL);
-		props.put(TLS_REQUIRED_PROP_KEY, TLS_REQUIRED_PROP_VAL);
 		props.put(TLS_KEYS_STORE_PROP_KEY, TLS_KEYS_STORE_PROP_VAL);
 		props.put(TLS_KEYS_STORE_PASSWD_PROP_KEY, TLS_KEYS_STORE_PASSWD_PROP_VAL);
 		props.put(TLS_TRUSTS_STORE_PROP_KEY, TLS_TRUSTS_STORE_PROP_VAL);
@@ -147,6 +148,8 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 		//		props.put(PROP_KEY + port + "/" + PORT_CLASS_PROP_KEY, getDefPortClass());
 		props.put(PROP_KEY + port + "/" + PORT_REMOTE_HOST_PROP_KEY,
 			PORT_REMOTE_HOST_PROP_VAL);
+		props.put(PROP_KEY + port + "/" + TLS_REQUIRED_PROP_KEY,
+			TLS_REQUIRED_PROP_VAL);
 		Map<String, Object> extra = getParamsForPort(port);
 		if (extra != null) {
 			for (Map.Entry<String, Object> entry : extra.entrySet()) {
@@ -240,7 +243,7 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 
 	protected void writePacketToSocket(Packet p) {
 		log.finest("Writing packet to: " + p.getTo());
-		IOService ios = services.get(getServiceId(p));
+		IOService ios = getXMPPIOService(p);
 		if (ios != null) {
 			((XMPPIOService)ios).addPacketToSend(p);
 			try {
@@ -258,6 +261,10 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 			log.warning("Can't find service for packet: " + p.getTo()
 				+ ", service id: " + getServiceId(p));
 		} // end of if (ios != null) else
+	}
+
+	protected XMPPIOService getXMPPIOService(Packet p) {
+		return (XMPPIOService)services.get(getServiceId(p));
 	}
 
 	public void processPacket(Packet packet) {

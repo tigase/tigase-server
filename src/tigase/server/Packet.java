@@ -25,6 +25,7 @@
 package tigase.server;
 
 import tigase.xml.Element;
+import tigase.xmpp.IqType;
 
 /**
  * Class Packet
@@ -38,22 +39,60 @@ import tigase.xml.Element;
  */
 public class Packet {
 
-	private Element elem = null;
+  private static final String ERROR_NS = "urn:ietf:params:xml:ns:xmpp-stanzas";
+
+	private final Element elem;
+	private final Command command;
+	private final IqType type;
+	private final boolean routed;
 	private String to = null;
 	private String from = null;
 
-  public Packet(Element elem) {
+  public Packet(final Element elem) {
 		if (elem == null) {
 			throw new NullPointerException();
 		} // end of if (elem == null)
 		this.elem = elem;
+		if (elem.getXMLNS() != null && elem.getXMLNS().equals("tigase:command")) {
+			command = Command.valueOf(elem.getName());
+		} else {
+			command = null;
+		} // end of else
+		if (elem.getAttribute("type") != null) {
+			type = IqType.valueOf(elem.getAttribute("type"));
+		} // end of if (elem.getAttribute("type") != null)
+		else {
+			type = null;
+		} // end of if (elem.getAttribute("type") != null) else
+		if (elem.getName().equals("route")) {
+			routed = true;
+		} // end of if (elem.getName().equals("route"))
+		else {
+			routed = false;
+		} // end of if (elem.getName().equals("route")) else
+	}
+
+	public Command getCommand() {
+		return command;
+	}
+
+	public IqType getType() {
+		return type;
+	}
+
+	public Element getElement() {
+		return elem;
+	}
+
+	public boolean isCommand() {
+		return command != null;
 	}
 
 	public String getTo() {
 		return to != null ? to : getElemTo();
 	}
 
-	public void setTo(String to) {
+	public void setTo(final String to) {
 		this.to = to;
 	}
 
@@ -61,7 +100,7 @@ public class Packet {
 		return from != null ? from : getElemFrom();
 	}
 
-	public void setFrom(String from) {
+	public void setFrom(final String from) {
 		this.from = from;
 	}
 
@@ -79,6 +118,14 @@ public class Packet {
     return elem.getAttribute("from");
   }
 
+	public String getElemId() {
+    return elem.getAttribute("id");
+	}
+
+	public String getElemCData(final String path) {
+		return elem.getCData(path);
+	}
+
   public byte[] getByteData() {
     return elem.toString().getBytes();
   }
@@ -92,14 +139,18 @@ public class Packet {
   }
 
 	public boolean isRouted() {
-		return elem.getName().equals("route");
+		return routed;
 	}
 
 	public Packet unpackRouted() {
-		return new Packet(elem.getChildren().get(0));
+		Packet result = new Packet(elem.getChildren().get(0));
+		if (result.getTo() == null) {
+			result.setTo(getTo());
+		} // end of if (result.getTo() == null)
+		return result;
 	}
 
-	public Packet packRouted(String to, String from) {
+	public Packet packRouted(final String to, final String from) {
 		Element routed = new Element("route", null, new String[] {"to", "from"},
 			new String[] {to, from});
 		routed.addChild(elem);
@@ -113,11 +164,62 @@ public class Packet {
 		return new Packet(routed);
 	}
 
-	public Packet swapFromTo(Element el) {
+	public Packet swapFromTo(final Element el) {
 		Packet packet = new Packet(el);
 		packet.setTo(getFrom());
 		packet.setFrom(getTo());
 		return packet;
+	}
+
+	public Packet commandResult(final String data) {
+		Packet result = command.getPacket(getTo(), getFrom(),
+			IqType.result, elem.getAttribute("id"));
+		result.getElement().setCData(data);
+		return result;
+	}
+
+	public Packet errorResult(final String errorType, final String errorCondition,
+		final String errorText, final boolean includeOriginalXML) {
+		Element reply = new Element(elem.getName());
+		reply.setAttribute("type", IqType.error.toString());
+		if (getElemFrom() != null) {
+			reply.setAttribute("to", getElemFrom());
+		} // end of if (getElemFrom() != null)
+		if (getElemId() != null) {
+			reply.setAttribute("id", getElemId());
+		} // end of if (getElemId() != null)
+		if (includeOriginalXML) {
+			reply.addChildren(elem.getChildren());
+		} // end of if (includeOriginalXML)
+		Element error = new Element("error");
+		error.setAttribute("type", errorType);
+		Element cond = new Element(errorCondition);
+		cond.setXMLNS(ERROR_NS);
+		error.addChild(cond);
+		if (errorText != null && errorText.length() > 0) {
+			Element t = new Element("text");
+			t.setAttribute("xml:lang", "en");
+			t.setXMLNS(ERROR_NS);
+			t.setCData(errorText);
+			error.addChild(t);
+		} // end of if (text != null && text.length() > 0)
+		reply.addChild(error);
+		return swapFromTo(reply);
+	}
+
+	public Packet okResult(final String includeXML) {
+		Element reply = new Element(elem.getName());
+		reply.setAttribute("type", IqType.result.toString());
+		if (getElemFrom() != null) {
+			reply.setAttribute("to", getElemFrom());
+		} // end of if (getElemFrom() != null)
+		if (getElemId() != null) {
+			reply.setAttribute("id", getElemId());
+		} // end of if (getElemId() != null)
+		if (includeXML != null) {
+			reply.setCData(includeXML);
+		} // end of if (includeOriginalXML)
+		return swapFromTo(reply);
 	}
 
 	public Packet swapElemFromTo() {
@@ -126,9 +228,5 @@ public class Packet {
 		copy.setAttribute("from", getElemTo());
 		return new Packet(copy);
 	}
-
-//   public PacketType getType() {
-//     return null;
-//   }
 
 }

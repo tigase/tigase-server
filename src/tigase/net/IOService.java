@@ -71,6 +71,13 @@ public abstract class IOService implements Callable<IOService> {
    */
   private static final Logger log = Logger.getLogger("tigase.net.IOService");
 
+  /**
+   * This is key used to store session ID in temporary session data storage.
+   * As it is used by many components it is required that all components access
+   * session ID with this constant.
+   */
+  public static final String SESSION_ID = "sessionID";
+
   private IOInterface socketIO = null;
 	private String sslId = null;
 	private String id = null;

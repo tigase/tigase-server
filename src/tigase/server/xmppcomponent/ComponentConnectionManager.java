@@ -24,7 +24,7 @@
 
 package tigase.server.xmppcomponent;
 
-
+import java.util.UUID;
 import java.util.Map;
 import java.util.Queue;
 import java.util.TreeMap;
@@ -37,6 +37,7 @@ import tigase.server.MessageReceiver;
 import tigase.server.Packet;
 import tigase.server.XMPPService;
 import tigase.util.JID;
+import tigase.xmpp.XMPPIOService;
 
 /**
  * Class ComponentConnectionManager
@@ -59,6 +60,7 @@ public class ComponentConnectionManager extends ConnectionManager
     Logger.getLogger("tigase.server.xmppcomponent.ComponentConnectionManager");
 
 	public void processPacket(Packet packet) {
+		log.finest("Processing packet: " + packet.getStringData());
 		if (packet.isRouted()) {
 			writePacketToSocket(packet);
 		} // end of if (packet.isRouted())
@@ -127,6 +129,22 @@ public class ComponentConnectionManager extends ConnectionManager
 
 	protected String getServiceId(Packet packet) {
 		return JID.getNodeHost(packet.getTo());
+	}
+
+	public String xmppStreamOpened(XMPPIOService serv,
+		Map<String, String> attribs) {
+		log.finer("Stream opened: " + attribs.toString());
+		String id = UUID.randomUUID().toString();
+		serv.getSessionData().put(serv.SESSION_ID, id);
+		return "<stream:stream version='1.0' xml:lang='en'"
+			+ " to='kobit'"
+			+ " id='" + id + "'"
+			+ " xmlns='jabber:component:accept'"
+			+ " xmlns:stream='http://etherx.jabber.org/streams'>";
+	}
+
+	public void xmppStreamClosed(XMPPIOService serv) {
+		log.finer("Stream closed.");
 	}
 
 }
