@@ -23,6 +23,7 @@
 package tigase.auth;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.logging.Logger;
 import tigase.util.Algorithms;
 
 /**
@@ -36,10 +37,17 @@ import tigase.util.Algorithms;
  */
 public class DigestAuth extends PlainAuth {
 
+  /**
+   * Variable <code>log</code> is a class logger.
+   */
+  private static final Logger log = Logger.getLogger("tigase.auth.DigestAuth");
+
 	protected boolean passwordsEqual(final String given_password,
 		final String db_password) throws NoSuchAlgorithmException {
 		final String digest_db_pass =
 			Algorithms.digest(connection.getSessionId(), db_password, "SHA");
+		log.finest("Comparing passwords, given: " + given_password
+			+ ", db: " + digest_db_pass);
 		return given_password.equals(digest_db_pass);
 	}
 

@@ -51,9 +51,9 @@ import tigase.xmpp.XMPPResourceConnection;
  */
 public class SaslAuth extends XMPPProcessor {
 
-  private final static String XMLNS = "urn:ietf:params:xml:ns:xmpp-sasl";
+  private static final String XMLNS = "urn:ietf:params:xml:ns:xmpp-sasl";
 
-  private static Logger log = Logger.getLogger("tigase.xmpp.impl.AuthXmppSasl");
+  private static final Logger log = Logger.getLogger("tigase.xmpp.impl.SaslAuth");
 
 	protected static final String ID = XMLNS;
   protected static final String[] ELEMENTS = {

@@ -48,7 +48,7 @@ public enum Authorization {
     public int getErrorCode() { return 0; }
     public String getErrorType() { return null; }
     public Packet getResponseMessage(Packet p, String t, boolean i) {
-			return p.okResult(t);
+			return p.okResult(t, 0);
     }
   },
   BAD_REQUEST {

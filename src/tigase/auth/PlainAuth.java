@@ -53,7 +53,7 @@ public class PlainAuth implements LoginModule {
   /**
    * Variable <code>log</code> is a class logger.
    */
-  private static final Logger log = Logger.getLogger("tigase.auth.LoginModule");
+  private static final Logger log = Logger.getLogger("tigase.auth.PlainAuth");
 
 	private Subject subject = null;
 	private CallbackHandler callbackHandler = null;
@@ -167,7 +167,10 @@ public class PlainAuth implements LoginModule {
 					"password");
 			if (passwordsEqual(user_pass, user_raw_pass)) {
 				loginSuccessful = true;
-			}
+				log.finest("Login successful.");
+			} else {
+				log.finest("Login unsuccessful, password incorrect.");
+			} // end of else
 		} catch (UserNotFoundException e) {
 			loginSuccessful = false;
 		} catch (NoSuchAlgorithmException e) {
@@ -179,6 +182,8 @@ public class PlainAuth implements LoginModule {
 
 	protected boolean passwordsEqual(final String given_password,
 		final String db_password) throws NoSuchAlgorithmException {
+		log.finest("Comparing passwords, given: " + given_password
+			+ ", db: " + db_password);
 		return given_password.equals(db_password);
 	}
 

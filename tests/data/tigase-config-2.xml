@@ -111,6 +111,8 @@
     <item value="jabber:iq:register"/>
     <item value="jabber:iq:auth"/>
     <item value="urn:ietf:params:xml:ns:xmpp-sasl"/>
+    <item value="urn:ietf:params:xml:ns:xmpp-bind"/>
+    <item value="urn:ietf:params:xml:ns:xmpp-session"/>
    </entry>
   </map>
   <node name="security">

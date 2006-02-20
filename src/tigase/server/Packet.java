@@ -207,7 +207,7 @@ public class Packet {
 		return swapFromTo(reply);
 	}
 
-	public Packet okResult(final String includeXML) {
+	public Packet okResult(final String includeXML, final int originalXML) {
 		Element reply = new Element(elem.getName());
 		reply.setAttribute("type", IqType.result.toString());
 		if (getElemFrom() != null) {
@@ -216,8 +216,17 @@ public class Packet {
 		if (getElemId() != null) {
 			reply.setAttribute("id", getElemId());
 		} // end of if (getElemId() != null)
+		Element old_child = elem;
+		Element new_child = reply;
+		for (int i = 0; i < originalXML; i++) {
+			old_child = old_child.getChildren().get(0);
+			Element tmp = new Element(old_child.getName());
+			tmp.setXMLNS(old_child.getXMLNS());
+			new_child.addChild(tmp);
+			new_child = tmp;
+		} // end of for (int i = 0; i < originalXML; i++)
 		if (includeXML != null) {
-			reply.setCData(includeXML);
+			new_child.setCData(includeXML);
 		} // end of if (includeOriginalXML)
 		return swapFromTo(reply);
 	}

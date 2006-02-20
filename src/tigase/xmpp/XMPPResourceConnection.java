@@ -42,6 +42,9 @@ import tigase.util.JID;
  */
 public class XMPPResourceConnection {
 
+  private static final String NOT_AUTHORIZED_MSG =
+    "Session has not been yet authorised.";
+
   /**
    * Private logger for class instancess.
    */
@@ -145,6 +148,42 @@ public class XMPPResourceConnection {
 	public XMPPSession getParentSession() {
 		return parentSession;
 	}
+
+  /**
+   * Returns full user JID for this session or throws
+   * <code>NotAuthorizedException</code> if session is not authorized yet and
+   * therefore user name and resource is not known yet.
+   *
+   * @return a <code>String</code> value of calculated user full JID for this
+   * session including resource name.
+   * @exception NotAuthorizedException when this session has not
+   * been authorized yet and some parts of user JID are not known yet.
+   */
+  public final String getJID() throws NotAuthorizedException {
+    return getUserID() + "/" + resource;
+  }
+
+  /**
+   * Returns user JID but without <em>resource</em> part. This is real user ID
+   * not session ID.
+   * To retrieve session ID - full JID refer to <code>getJID()</code>
+   * method.<br/>
+   * If session has not been authorized yet this method throws
+   * <code>NotAuthorizedException</code>.
+   *
+   * @return a <code>String</code> value of user ID - this is user JID without
+   * resource part. To obtain full user JID please refer to <code>getJID</code>
+   * method.
+   * @exception NotAuthorizedException when this session has not
+   * been authorized yet and some parts of user JID are not known yet.
+   * @see #getJID()
+   */
+  public final String getUserID() throws NotAuthorizedException {
+    if (parentSession == null) {
+      throw new NotAuthorizedException(NOT_AUTHORIZED_MSG);
+    } // end of if (username == null)
+    return JID.getNodeID(parentSession.getUserName(), domain);
+  }
 
 	public void setDomain(final String domain) {
 		this.domain = domain;
@@ -273,7 +312,7 @@ public class XMPPResourceConnection {
     }
 
     try {
-      repository.addUser(JID.getNodeID(user_name, getDomain()));
+      repository.addUser(JID.getNodeID(user_name, domain));
       setRegistration(user_name, pass_param, email_param);
       return Authorization.AUTHORIZED;
     } catch (UserExistsException e) {
@@ -300,10 +339,10 @@ public class XMPPResourceConnection {
   private void setRegistration(final String name_param,
     final String pass_param, final String email_param) {
     try {
-      repository.setData(JID.getNodeID(name_param, getDomain()),
+      repository.setData(JID.getNodeID(name_param, domain),
         "password", pass_param);
       if (email_param != null && !email_param.equals("")) {
-        repository.setData(JID.getNodeID(name_param, getDomain()),
+        repository.setData(JID.getNodeID(name_param, domain),
           "email", email_param);
       }
     } catch (UserNotFoundException e) {
@@ -342,7 +381,7 @@ public class XMPPResourceConnection {
 			} // end of if (user_mame == null || user_name.equals(""))
 			try {
 				String pattern =
-					repository.getData(JID.getNodeID(user_name, getDomain()), "password");
+					repository.getData(JID.getNodeID(user_name, domain), "password");
 				if (password.equals(pattern)) {
 					this.resource = resource;
 					authState = Authorization.AUTHORIZED;

@@ -24,6 +24,7 @@ package tigase.xmpp.impl;
 
 import java.io.IOException;
 import java.util.Queue;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -33,6 +34,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.LoginContext;
 import javax.security.sasl.AuthorizeCallback;
 import javax.security.sasl.RealmCallback;
+import tigase.auth.ResourceConnectionCallback;
 import tigase.db.UserNotFoundException;
 import tigase.server.Command;
 import tigase.server.Packet;
@@ -42,7 +44,6 @@ import tigase.xmpp.Authorization;
 import tigase.xmpp.IqType;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPResourceConnection;
-import tigase.auth.ResourceConnectionCallback;
 
 /**
  * Describe class JabberIqAuth here.
@@ -90,10 +91,9 @@ public class JabberIqAuth extends XMPPProcessor {
 		switch (type) {
 		case get:
 			results.offer(packet.okResult(
-											"<query xmlns=\"jabber:iq:auth\">"
-											+ "<username/><password/><digest/><resource/>"
-											+ "<username/><password/><resource/>"
-											+ "</query>"));
+											//"<username/><password/><digest/><resource/>",
+											"<username/><password/><resource/>",
+											1));
 			break;
 		case set:
       String user_name = request.getChildCData("/iq/query/username");
@@ -120,7 +120,7 @@ public class JabberIqAuth extends XMPPProcessor {
 				results.offer(session.getAuthState().getResponseMessage(packet,
 					"Authentication successful.", false));
 			} catch (Exception e) {
-				log.warning("Authentication failed: " + e);
+				log.log(Level.WARNING, "Authentication failed: ", e);
 				results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 					"Authentication failed", false));
 				results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),

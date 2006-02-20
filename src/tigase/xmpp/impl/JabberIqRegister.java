@@ -110,7 +110,7 @@ public class JabberIqRegister extends XMPPProcessor {
                  "</instructions>" +
                  "<username/>" +
                  "<password/>" +
-                 "<email/>"));
+                 "<email/>", 1));
 			break;
 		default:
 			results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
