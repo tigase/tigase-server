@@ -1,0 +1,3 @@
+<stream:stream to="kobit" id="abc1" version="1.0" xml:lang="en"
+xmlns="jabber:client" xmlns:stream="http://etherx.jabber.org/streams">
+<hello to="artur@kobit" from="tus@kobit"/>
