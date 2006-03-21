@@ -61,12 +61,7 @@ public class ComponentConnectionManager extends ConnectionManager
 
 	public void processPacket(Packet packet) {
 		log.finest("Processing packet: " + packet.getStringData());
-		if (packet.isRouted()) {
-			writePacketToSocket(packet);
-		} // end of if (packet.isRouted())
-		else {
-			writePacketToSocket(packet.packRouted());
-		} // end of if (packet.isRouted()) else
+		writePacketToSocket(packet.packRouted());
 	}
 
 	public Queue<Packet> processSocketData(String id,
@@ -74,6 +69,9 @@ public class ComponentConnectionManager extends ConnectionManager
 		Packet p = null;
 		while ((p = packets.poll()) != null) {
 			log.finest("Processing socket data: " + p.getStringData());
+			if (p.isRouted()) {
+				p = p.unpackRouted();
+			} // end of if (p.isRouted())
 			addOutPacket(p);
 		} // end of while ()
 		return null;

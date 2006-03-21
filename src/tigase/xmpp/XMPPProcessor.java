@@ -26,6 +26,7 @@ package tigase.xmpp;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
+import tigase.server.Packet;
 
 /**
  * <code>XMPPProcessor</code> abstract class contains basic definition for
@@ -85,7 +86,12 @@ public abstract class XMPPProcessor
 
   public static XMPPProcessor getInstance() { return inst; }
 
-  // Implementation of java.lang.Comparable
+	public void stopped(final XMPPResourceConnection session,
+		final Queue<Packet> results) {
+		// By default do nothing...
+	}
+
+	// Implementation of java.lang.Comparable
 
   /**
    * Method <code>compareTo</code> is used to perform

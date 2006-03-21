@@ -25,7 +25,7 @@
 package tigase.server;
 
 import tigase.xml.Element;
-import tigase.xmpp.IqType;
+import tigase.xmpp.StanzaType;
 
 /**
  * Class Packet
@@ -43,7 +43,7 @@ public class Packet {
 
 	private final Element elem;
 	private final Command command;
-	private final IqType type;
+	private final StanzaType type;
 	private final boolean routed;
 	private String to = null;
 	private String from = null;
@@ -59,7 +59,7 @@ public class Packet {
 			command = null;
 		} // end of else
 		if (elem.getAttribute("type") != null) {
-			type = IqType.valueOf(elem.getAttribute("type"));
+			type = StanzaType.valueOf(elem.getAttribute("type"));
 		} // end of if (elem.getAttribute("type") != null)
 		else {
 			type = null;
@@ -76,7 +76,7 @@ public class Packet {
 		return command;
 	}
 
-	public IqType getType() {
+	public StanzaType getType() {
 		return type;
 	}
 
@@ -144,9 +144,8 @@ public class Packet {
 
 	public Packet unpackRouted() {
 		Packet result = new Packet(elem.getChildren().get(0));
-		if (result.getTo() == null) {
-			result.setTo(getTo());
-		} // end of if (result.getTo() == null)
+		result.setTo(getTo());
+		result.setFrom(getFrom());
 		return result;
 	}
 
@@ -173,7 +172,7 @@ public class Packet {
 
 	public Packet commandResult(final String data) {
 		Packet result = command.getPacket(getTo(), getFrom(),
-			IqType.result, elem.getAttribute("id"));
+			StanzaType.result, elem.getAttribute("id"));
 		result.getElement().setCData(data);
 		return result;
 	}
@@ -181,7 +180,7 @@ public class Packet {
 	public Packet errorResult(final String errorType, final String errorCondition,
 		final String errorText, final boolean includeOriginalXML) {
 		Element reply = new Element(elem.getName());
-		reply.setAttribute("type", IqType.error.toString());
+		reply.setAttribute("type", StanzaType.error.toString());
 		if (getElemFrom() != null) {
 			reply.setAttribute("to", getElemFrom());
 		} // end of if (getElemFrom() != null)
@@ -209,7 +208,7 @@ public class Packet {
 
 	public Packet okResult(final String includeXML, final int originalXML) {
 		Element reply = new Element(elem.getName());
-		reply.setAttribute("type", IqType.result.toString());
+		reply.setAttribute("type", StanzaType.result.toString());
 		if (getElemFrom() != null) {
 			reply.setAttribute("to", getElemFrom());
 		} // end of if (getElemFrom() != null)

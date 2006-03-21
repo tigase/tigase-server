@@ -27,7 +27,7 @@ import java.util.Queue;
 import tigase.server.Packet;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
-import tigase.xmpp.IqType;
+import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.NotAuthorizedException;
@@ -67,7 +67,7 @@ public class JabberIqRegister extends XMPPProcessor {
 
     Authorization result = Authorization.NOT_AUTHORIZED;
 		Element request = packet.getElement();
-    IqType type = packet.getType();
+    StanzaType type = packet.getType();
 		switch (type) {
 		case set:
       // Is it registration cancel request?

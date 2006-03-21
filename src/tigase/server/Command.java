@@ -23,7 +23,7 @@
 package tigase.server;
 
 import tigase.xml.Element;
-import tigase.xmpp.IqType;
+import tigase.xmpp.StanzaType;
 
 /**
  * Describe enum Command here.
@@ -44,7 +44,7 @@ public enum Command {
 		CLOSE;
 
 	public Packet getPacket(final String from, final String to,
-		final IqType type, final String id) {
+		final StanzaType type, final String id) {
 		Element elem = new Element(this.toString());
 		elem.setAttribute("type", type.toString());
 		elem.setAttribute("from", from);
@@ -55,7 +55,7 @@ public enum Command {
 	}
 
 	public Packet getPacket(final String from, final String to,
-		final IqType type, final String id, final String cdata) {
+		final StanzaType type, final String id, final String cdata) {
 		Packet packet = getPacket(from, to, type, id);
 		if (cdata != null) {
 			packet.getElement().setCData(cdata);

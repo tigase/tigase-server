@@ -23,6 +23,7 @@
 package tigase.xmpp;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -44,6 +45,8 @@ public class XMPPResourceConnection {
 
   private static final String NOT_AUTHORIZED_MSG =
     "Session has not been yet authorised.";
+  private static final String NO_ACCESS_TO_REP_MSG =
+    "Can not access user repository.";
 
   /**
    * Private logger for class instancess.
@@ -67,6 +70,9 @@ public class XMPPResourceConnection {
 	private String domain = null;
 
 	private String connectionId = null;
+
+	private int priority = 0;
+
   /**
    * Current authorization state - initialy session i <code>NOT_AUTHORIZED</code>.
    * It becomes <code>AUTHORIZED</code>
@@ -112,6 +118,7 @@ public class XMPPResourceConnection {
    * @see #setData(String, String)
    */
   public final void putSessionData(final String key, final Object value) {
+    lastAccessed = System.currentTimeMillis();
     sessionData.put(key, value);
   }
 
@@ -126,8 +133,17 @@ public class XMPPResourceConnection {
    * @see #putSessionData(String, Object)
    */
   public final Object getSessionData(final String key) {
+    lastAccessed = System.currentTimeMillis();
     return sessionData.get(key);
   }
+
+	public void setPriority(final int priority) {
+		this.priority = priority;
+	}
+
+	public int getPriority() {
+		return priority;
+	}
 
 	public void streamClosed() {
 		if (parentSession != null) {
@@ -160,7 +176,7 @@ public class XMPPResourceConnection {
    * been authorized yet and some parts of user JID are not known yet.
    */
   public final String getJID() throws NotAuthorizedException {
-    return getUserID() + "/" + resource;
+    return getUserId() + "/" + resource;
   }
 
   /**
@@ -178,12 +194,27 @@ public class XMPPResourceConnection {
    * been authorized yet and some parts of user JID are not known yet.
    * @see #getJID()
    */
-  public final String getUserID() throws NotAuthorizedException {
+  public final String getUserId() throws NotAuthorizedException {
     if (parentSession == null) {
       throw new NotAuthorizedException(NOT_AUTHORIZED_MSG);
     } // end of if (username == null)
     return JID.getNodeID(parentSession.getUserName(), domain);
   }
+
+	public List<XMPPResourceConnection> getActiveSessions()
+		throws NotAuthorizedException {
+    if (parentSession == null) {
+      throw new NotAuthorizedException(NOT_AUTHORIZED_MSG);
+    } // end of if (username == null)
+		return parentSession.getActiveResources();
+	}
+
+	public String[] getAllResourcesJIDs() throws NotAuthorizedException {
+    if (parentSession == null) {
+      throw new NotAuthorizedException(NOT_AUTHORIZED_MSG);
+    } // end of if (username == null)
+		return parentSession.getJIDs();
+	}
 
 	public void setDomain(final String domain) {
 		this.domain = domain;
@@ -253,6 +284,7 @@ public class XMPPResourceConnection {
 	 * @return the value of connectionId
 	 */
 	public String getConnectionId() {
+    lastAccessed = System.currentTimeMillis();
 		return this.connectionId;
 	}
 
@@ -385,6 +417,7 @@ public class XMPPResourceConnection {
 				if (password.equals(pattern)) {
 					this.resource = resource;
 					authState = Authorization.AUTHORIZED;
+					lastAccessed = System.currentTimeMillis();
 				} else {
 					authState = Authorization.NOT_AUTHORIZED;
 				}
@@ -394,6 +427,189 @@ public class XMPPResourceConnection {
 			} // end of try-catch
     }
     return authState;
+  }
+
+  /**
+   * This method allows to retrieve list of values associated with one key.
+   * As it is possible to store many values with one key there are a few methods
+   * which provides this functionality. If given key does not exists in given
+   * subnode <code>null</code> is returned.
+   *
+   * @param subnode a <code>String</code> value pointing to specific subnode in
+   * user reposiotry where data have to be stored.
+   * @param key a <code>String</code> value of data key ID.
+   * @return a <code>String[]</code> array containing all values found for
+   * given key.
+   * @exception NotAuthorizedException is thrown when session
+   * has not been authorized yet and there is no access to permanent storage.
+   * @see #setData(String, String, String)
+   * @see #setData(String, String)
+   */
+  public final String[] getDataList(final String subnode, final String key)
+    throws NotAuthorizedException {
+    try { return repository.getDataList(getUserId(), subnode, key);
+    } catch (UserNotFoundException e) {
+      log.log(Level.SEVERE, "Problem accessing to reposiotry: ", e);
+      throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
+    } // end of try-catch
+  }
+
+  /**
+   * <code>getData</code> method is a twin sister (brother?) of
+   * <code>setData(String, String, String)</code> method.
+   * It allows you to retrieve data stored with above method. It is data stored
+   * in given node with given key identifier. If there are no data associated
+   * with given key or given node does not exist given <code>def</code> value
+   * is returned.
+   *
+   * @param subnode a <code>String</code> value is path to node where pair
+   * <code>(key, value)</code> are stored.
+   * @param key a <code>String</code> value of key ID for data to retrieve.
+   * @param def a <code>String</code> value of default returned if there is
+   * nothing stored with given key. <code>def</code> can be set to any value
+   * you wish to have back as default value or <code>null</code> if you want
+   * to have back <code>null</code> if no data was found. If you set
+   * <code>def</code> to <code>null</code> it has exactly the
+   * same effect as if you use <code>getData(String)</code> method.
+   * @return a <code>String</code> value of data found for given key or
+   * <code>def</code> if there was no data associated with given key.
+   * @exception NotAuthorizedException is thrown when session
+   * has not been authorized yet and there is no access to permanent storage.
+   * @see #setData(String, String, String)
+   */
+  public final String getData(final String subnode,
+    final String key, final String def) throws NotAuthorizedException {
+    try { return repository.getData(getUserId(), subnode, key, def);
+    } catch (UserNotFoundException e) {
+      log.log(Level.SEVERE, "Problem accessing to reposiotry: ", e);
+      throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
+    } // end of try-catch
+  }
+
+  /**
+   * This method stores given data in permanent storage in given point of
+   * hierarchy of data base.
+   * This method is similar to <code>setData(String, String)</code> and
+   * differs in one additional parameter which point to user data base subnode
+   * where data must be stored. It helps to organize user data in more logical
+   * hierarchy.<br/>
+   * User data is kind of tree where you can store data in each tree node. The
+   * most relevant sample might be structure like typical file system or
+   * XML like or LDAP data base. The first implementation is actually done as
+   * XML file to make it easier test application and deploy simple installation
+   * where there is no more users than 1000.<br/>
+   * To find out more about user repository refer to <code>UserRepository</code>
+   * interface for general info and to <code>XMLRepository</code> for detailed
+   * explanation regarding XML implementation of user repository.
+   * <p>
+   * Thus <code>subnode</code> is kind of path to data node. If you specify
+   * <code>null</code> or empty node data will be stored in root user node.
+   * This has exactly the same effect as you call
+   * <code>setData(String, String)</code>. If you want to store data in
+   * different node you must just specify node path like you do it to directory
+   * on most file systems:
+   * <pre>
+   * /roster
+   * </pre>
+   * Or, if you need access deeper node:
+   * <pre>
+   * /just/like/path/to/file
+   * </pre>
+   * </p>
+   * If given node does not yet exist it will be automaticaly created with all
+   * nodes in given path so there is no need for developer to perform additional
+   * action to create node. There is, however method
+   * <code>removeDataGroup(String)</code> for deleting specified node as nodes
+   * are not automaticaly deleted.
+   *
+   * @param subnode a <code>String</code> value pointing to specific subnode in
+   * user reposiotry where data have to be stored.
+   * @param key a <code>String</code> value of data key ID.
+   * @param value a <code>String</code> actual data stored in user repository.
+   * @exception NotAuthorizedException is thrown when session
+   * has not been authorized yet and there is no access to permanent storage.
+   * @see #removeDataGroup(String)
+   * @see UserRepository
+   * @see tigase.xmpp.rep.xml.XMLRepository
+   */
+  public final void setData(final String subnode,
+    final String key, final String value) throws NotAuthorizedException {
+    try { repository.setData(getUserId(), subnode, key, value);
+    } catch (UserNotFoundException e) {
+      log.log(Level.SEVERE, "Problem accessing reposiotry: ", e);
+      throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
+    } // end of try-catch
+  }
+
+  /**
+   * This method retrieves list of all direct subnodes for given node.
+   * It works in similar way as <code>ls</code> unix command or <code>dir</code>
+   * under DOS/Windows systems.
+   *
+   * @param subnode a <code>String</code> value of path to node for which we
+   * want to retrieve list of direct subnodes.
+   * @return a <code>String[]</code> array of direct subnodes names for given
+   * node.
+   * @exception NotAuthorizedException is thrown when session
+   * has not been authorized yet and there is no access to permanent storage.
+   * @see #setData(String, String, String)
+   */
+  public final String[] getDataGroups(final String subnode)
+    throws NotAuthorizedException {
+    try { return repository.getSubnodes(getUserId(), subnode);
+    } catch (UserNotFoundException e) {
+      log.log(Level.SEVERE, "Problem accessing reposiotry: ", e);
+      throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
+    } // end of try-catch
+  }
+
+  /**
+   * Removes the last data node given in subnode path as parameter to this
+   * method.
+   * All subnodes are moved as well an all data stored as
+   * <code>(key, val)</code> are removed as well. Changes are commited to
+   * repository immediatelly and there is no way to undo this operation so
+   * use it with care.
+   *
+   * @param subnode a <code>String</code> value of path to node which has
+   * to be removed.
+   * @exception NotAuthorizedException is thrown when session
+   * has not been authorized yet and there is no access to permanent storage.
+   * @see #setData(String, String, String)
+   */
+  public final void removeDataGroup(final String subnode)
+    throws NotAuthorizedException {
+    try { repository.removeSubnode(getUserId(), subnode);
+    } catch (UserNotFoundException e) {
+      log.log(Level.SEVERE, "Problem accessing reposiotry: ", e);
+      throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
+    } // end of try-catch
+  }
+
+  /**
+   * This method allows to store list of values under one key ID reference.
+   * It is often necessary to keep set of values which can be refered by one
+   * key. As an example might be list of groups for specific buddy in roster.
+   * There is no actual need to store each group with separate key because
+   * we usually need to acces whole list of groups.
+   *
+   * @param subnode a <code>String</code> value pointing to specific subnode in
+   * user reposiotry where data have to be stored.
+   * @param key a <code>String</code> value of data key ID.
+   * @param list a <code>String[]</code> keeping list of actual data to be
+   * stored in user repository.
+   * @exception NotAuthorizedException is thrown when session
+   * has not been authorized yet and there is no access to permanent storage.
+   * @see #setData(String, String, String)
+   * @see #setData(String, String)
+   */
+  public final void setDataList(final String subnode, final String key,
+    final String[] list) throws NotAuthorizedException {
+    try { repository.setDataList(getUserId(), subnode, key, list);
+    } catch (UserNotFoundException e) {
+      log.log(Level.SEVERE, "Problem accessing to reposiotry: ", e);
+      throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
+    } // end of try-catch
   }
 
 } // XMPPResourceConnection

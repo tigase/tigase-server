@@ -41,10 +41,11 @@ import tigase.server.XMPPService;
 import tigase.util.JID;
 import tigase.util.RoutingsContainer;
 import tigase.xml.Element;
-import tigase.xmpp.IqType;
+import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPIOService;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
+import tigase.net.IOService;
 
 /**
  * Class ClientConnectionManager
@@ -69,6 +70,9 @@ public class ClientConnectionManager extends ConnectionManager
 	public static final String ROUTING_ENTRY_PROP_KEY = ".+@localhost";
 	public static final String ROUTING_ENTRY_PROP_VAL = "session_1@localhost";
 
+	public static final String HOSTNAMES_PROP_KEY = "hostnames";
+	public static final String[] HOSTNAMES_PROP_VAL =	{"localhost-1"};
+
 	private RoutingsContainer routings = null;
 
 	private Map<String, XMPPProcessorIfc> processors =
@@ -76,34 +80,25 @@ public class ClientConnectionManager extends ConnectionManager
 
 	public void processPacket(final Packet packet) {
 		log.finest("Processing packet: " + packet.getStringData());
-		Packet pc = packet;
-		if (packet.isRouted()) {
-			pc = packet.unpackRouted();
-		} // end of if (packet.isRouted())
-		if (pc.isCommand()) {
-			processCommand(pc, packet);
-		} // end of if (pc.isCommand())
-		else {
-			writePacketToSocket(pc);
+		if (packet.isCommand()) {
+			processCommand(packet);
+		} else {
+			writePacketToSocket(packet);
 		} // end of else
 	}
 
-	private void processCommand(final Packet packet, final Packet routed) {
-		Packet pc = packet;
-		if (routed != null) {
-			pc = routed;
-		} // end of if (routed != null)
+	private void processCommand(final Packet packet) {
 		switch (packet.getCommand()) {
 		case GETFEATURES:
-			if (packet.getType() == IqType.result) {
-				String features = getFeatures(getXMPPSession(pc));
+			if (packet.getType() == StanzaType.result) {
+				String features = getFeatures(getXMPPSession(packet));
 				Element elem_features = new Element("stream:features");
 				elem_features.setCData(features);
 				elem_features.addChildren(packet.getElement().getChildren());
 				Packet result = new Packet(elem_features);
 				result.setTo(packet.getTo());
 				writePacketToSocket(result);
-			} // end of if (pc.getType() == IqType.get)
+			} // end of if (packet.getType() == StanzaType.get)
 			break;
 		case STREAM_CLOSED:
 
@@ -112,7 +107,7 @@ public class ClientConnectionManager extends ConnectionManager
 
 			break;
 		case CLOSE:
-			XMPPIOService serv = getXMPPIOService(pc);
+			XMPPIOService serv = getXMPPIOService(packet);
 			if (serv != null) {
 				try {
 					serv.stop();
@@ -123,7 +118,7 @@ public class ClientConnectionManager extends ConnectionManager
 			} // end of if (serv != null)
 			else {
 				log.fine("Attempt to stop non-existen service for packet: "
-					+ pc.getStringData()
+					+ packet.getStringData()
 					+ ", Service already stopped?");
 			} // end of if (serv != null) else
 			break;
@@ -149,6 +144,7 @@ public class ClientConnectionManager extends ConnectionManager
 
 	public Map<String, Object> getDefaults() {
 		Map<String, Object> props = super.getDefaults();
+		props.put(HOSTNAMES_PROP_KEY, HOSTNAMES_PROP_VAL);
 		props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_MODE_PROP_KEY,
 			ROUTING_MODE_PROP_VAL);
 		props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_ENTRY_PROP_KEY,
@@ -169,6 +165,11 @@ public class ClientConnectionManager extends ConnectionManager
 				routings.addRouting(entry.getKey().substring(idx),
 					(String)entry.getValue());
 			} // end of if (entry.getKey().startsWith(ROUTINGS_PROP_KEY + "/"))
+		} // end of for ()
+		String[] hostnames = (String[])props.get(HOSTNAMES_PROP_KEY);
+		clearRoutings();
+		for (String host: hostnames) {
+			addRouting(host);
 		} // end of for ()
 	}
 
@@ -215,12 +216,12 @@ public class ClientConnectionManager extends ConnectionManager
 		serv.getSessionData().put(serv.SESSION_ID, id);
 		addOutPacket(Command.STREAM_OPENED.getPacket(
 									 JID.getJID(getName(), getDefHostName(), getUniqueId(serv)),
-									 routings.computeRouting(hostname), IqType.set, "sess1",
+									 routings.computeRouting(hostname), StanzaType.set, "sess1",
 									 sb.toString()));
 		if (attribs.get("version") != null) {
 			addOutPacket(Command.GETFEATURES.getPacket(
 										 JID.getJID(getName(), getDefHostName(), getUniqueId(serv)),
-										 routings.computeRouting(null), IqType.get, "sess1"));
+										 routings.computeRouting(null), StanzaType.get, "sess1"));
 		} // end of if (attribs.get("version") != null)
 		return "<stream:stream version='1.0' xml:lang='en'"
 			+ " to='kobit'"
@@ -229,11 +230,16 @@ public class ClientConnectionManager extends ConnectionManager
 			+ " xmlns:stream='http://etherx.jabber.org/streams'>";
 	}
 
-	public void xmppStreamClosed(XMPPIOService serv) {
-		log.finer("Stream closed.");
+	public void serviceStopped(final IOService service) {
+		super.serviceStopped(service);
+		XMPPIOService serv = (XMPPIOService)service;
 		addOutPacket(Command.STREAM_CLOSED.getPacket(
 									 JID.getJID(getName(), getDefHostName(), getUniqueId(serv)),
-									 routings.computeRouting(null), IqType.set, "sess1"));
+									 routings.computeRouting(null), StanzaType.set, "sess1"));
+	}
+
+	public void xmppStreamClosed(XMPPIOService serv) {
+		log.finer("Stream closed.");
 	}
 
 }

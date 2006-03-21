@@ -51,4 +51,6 @@ public interface XMPPProcessorIfc {
 	void process(Packet packet, XMPPResourceConnection session,
 		Queue<Packet> results);
 
+	void stopped(XMPPResourceConnection session, Queue<Packet> results);
+
 } // XMPPProcessorIfc

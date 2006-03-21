@@ -27,7 +27,7 @@ import java.util.logging.Logger;
 import tigase.server.Packet;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
-import tigase.xmpp.IqType;
+import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPResourceConnection;
 
@@ -80,7 +80,7 @@ public class SessionBind extends XMPPProcessor {
 		} // end of if (!session.isAuthorized())
 
 		Element request = packet.getElement();
-    IqType type = packet.getType();
+    StanzaType type = packet.getType();
 		switch (type) {
 		case set:
 			session.putSessionData(SESSION_KEY, "true");

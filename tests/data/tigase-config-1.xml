@@ -11,6 +11,7 @@
     <entry key="tigase.util.level" value="INFO" type="String"/>
     <entry key="tigase.io.level" value="ALL" type="String"/>
     <entry key="tigase.server.xmppcomponent.level" value="INFO" type="String"/>
+    <entry key="tigase.server.MessageRouter.level" value="ALL" type="String"/>
     <entry key="tigase.xmpp.XMPPDomBuilderHandler.level" value="INFO" type="String"/>
     <entry key="tigase.server.xmppcomponent.level" value="ALL" type="String"/>
     <entry key="handlers" value="java.util.logging.ConsoleHandler" type="String"/>
@@ -71,6 +72,9 @@
  <component name="client_1">
   <map>
    <entry key="max-queue-size" value="2147483647" type="Integer"/>
+   <entry key="hostnames" type="String[]">
+    <item value="localhost-1"/>
+   </entry>
   </map>
   <node name="routings">
    <map>

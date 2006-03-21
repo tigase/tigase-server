@@ -36,7 +36,7 @@ import tigase.auth.TigaseSasl;
 import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.xml.Element;
-import tigase.xmpp.IqType;
+import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPResourceConnection;
 
@@ -158,7 +158,7 @@ public class SaslAuth extends XMPPProcessor {
 			results.offer(packet.swapFromTo(createReply(ElementType.failure,
 						"<temporary-auth-failure/>")));
 			results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
-					IqType.set, packet.getElemId()));
+					StanzaType.set, packet.getElemId()));
 		} // end of if (failure)
   }
 

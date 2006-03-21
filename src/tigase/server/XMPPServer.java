@@ -58,11 +58,15 @@ public class XMPPServer {
       ;
   }
 
-  public static String version() {
+	public static String getImplementationVersion() {
+		return XMPPServer.class.getPackage().getImplementationVersion();
+	}
+
+	public static String version() {
     return "\n"
       + "-- \n"
       + "Tigase XMPP Server, version: "
-      + XMPPServer.class.getPackage().getImplementationVersion() + "\n"
+      + getImplementationVersion() + "\n"
       + "Author:	Artur Hefczyc <artur.hefczyc@gmail.com>\n"
       + "-- \n"
       ;

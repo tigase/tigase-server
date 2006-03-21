@@ -230,7 +230,7 @@ public abstract class AbstractMessageReceiver
 
   public void setParent(MessageReceiver parent) {
     this.parent = parent;
-		addRouting(getDefHostName());
+		//addRouting(getDefHostName());
   }
 
   public void setName(String name) {
@@ -270,10 +270,15 @@ public abstract class AbstractMessageReceiver
 
 	public void addRouting(String address) {
 		routings.add(address);
+		log.fine(getName() + " - added routing: " + address);
 	}
 
 	public boolean removeRouting(String address) {
 		return routings.remove(address);
+	}
+
+	public void clearRoutings() {
+		routings.clear();
 	}
 
 	private enum QueueElementType { IN_QUEUE, OUT_QUEUE }

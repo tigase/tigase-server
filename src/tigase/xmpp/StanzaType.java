@@ -23,7 +23,7 @@
 package tigase.xmpp;
 
 /**
- * Describe class IqType here.
+ * Describe class StanzaType here.
  *
  *
  * Created: Fri Feb 10 13:13:50 2006
@@ -31,8 +31,12 @@ package tigase.xmpp;
  * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
  * @version $Rev$
  */
-public enum IqType {
+public enum StanzaType {
 
-	get, set, result, error, unavailable, available;
+	error,                                      // Common type
+		get, set, result,                         // iq types
+		available, unavailable, probe, subscribe, // presence types
+		subscribed, unsubscribe, unsubscribed,    // presence types
+		chat, groupchat, headline, normal;        // message types
 
-} // IqType
+} // StanzaType

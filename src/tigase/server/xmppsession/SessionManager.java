@@ -43,11 +43,12 @@ import tigase.server.Packet;
 import tigase.server.XMPPService;
 import tigase.util.JID;
 import tigase.xml.Element;
-import tigase.xmpp.IqType;
+import tigase.xmpp.StanzaType;
 import tigase.xmpp.ProcessorFactory;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.XMPPSession;
+import tigase.xmpp.NotAuthorizedException;
 import tigase.auth.TigaseConfiguration;
 import tigase.auth.CommitHandler;
 
@@ -73,7 +74,12 @@ public class SessionManager extends AbstractMessageReceiver
 	public static final String USER_REPOSITORY_PROP_VAL = "user-repository.xml";
 	public static final String COMPONENTS_PROP_KEY = "components";
 	public static final String[] COMPONENTS_PROP_VAL =
-	{"jabber:iq:register", "jabber:iq:auth", "urn:ietf:params:xml:ns:xmpp-sasl"};
+	{"jabber:iq:register", "jabber:iq:auth", "urn:ietf:params:xml:ns:xmpp-sasl",
+	 "urn:ietf:params:xml:ns:xmpp-bind", "urn:ietf:params:xml:ns:xmpp-session",
+	 "message", "jabber:iq:roster", "presence", "jabber:iq:version"};
+
+	public static final String HOSTNAMES_PROP_KEY = "hostnames";
+	public static final String[] HOSTNAMES_PROP_VAL =	{"localhost-2"};
 
 	public static final String SECURITY_PROP_KEY = "security";
 
@@ -111,26 +117,39 @@ public class SessionManager extends AbstractMessageReceiver
 
 	public void processPacket(final Packet packet) {
 		log.finest("Processing packet: " + packet.getStringData());
-		Packet pc = packet;
-		if (packet.isRouted()) {
-			pc = packet.unpackRouted();
-		} // end of if (packet.isRouted())
-		if (pc.isCommand()) {
-			processCommand(pc, packet.isRouted());
+		if (packet.isCommand()) {
+			processCommand(packet);
 		} // end of if (pc.isCommand())
 		else {
 			XMPPResourceConnection conn = getXMPPResourceConnection(packet);
-			Queue<Packet> results = new LinkedList<Packet>();
-			walk(pc, conn, pc.getElement(), results);
-			for (Packet res: results) {
-				log.finest("Handling response: " + res.getStringData());
-				if (packet.isRouted()) {
-					addOutPacket(res.packRouted(packet.getFrom(), packet.getTo()));
-				} // end of if (packet.isRouted())
-				else {
+			if (conn == null) {
+				// It might be a message _to_ some user on this server
+				// so let's look for established session for this user...
+				final String to = packet.getElemTo();
+				if (to != null) {
+					XMPPSession session =	sessionsByNodeId.get(JID.getNodeID(to));
+					if (session != null) {
+						conn = session.getResourceConnection(packet.getElemTo());
+					} else {
+						// It might be a message for off-line user....
+						// I will put support for off-line message retrieval here...
+					} // end of if (session != null) else
+				} else {
+					// It might be presence message for already off-line user...
+					// Just ignore for now...
+				} // end of else
+			} // end of if (conn == null)
+			if (conn != null) {
+				Queue<Packet> results = new LinkedList<Packet>();
+				walk(packet, conn, packet.getElement(), results);
+				for (Packet res: results) {
+					log.finest("Handling response: " + res.getStringData());
 					addOutPacket(res);
-				} // end of if (packet.isRouted()) else
-			} // end of for ()
+				} // end of for ()
+			} else {
+				// It might be a message or something else for off-line user....
+				// Just ignore for now...
+			} // end of else
 		} // end of else
 	}
 
@@ -138,7 +157,9 @@ public class SessionManager extends AbstractMessageReceiver
 		final XMPPResourceConnection connection, final Element elem,
 		final Queue<Packet> results) {
 		for (XMPPProcessorIfc proc: processors.values()) {
-			if (proc.isSupporting(elem.getName(), elem.getXMLNS())) {
+			String xmlns = elem.getXMLNS();
+			if (xmlns == null) { xmlns = "jabber:client";	}
+			if (proc.isSupporting(elem.getName(), xmlns)) {
 				log.finest("XMPPProcessorIfc: "+proc.getClass().getSimpleName()+
 					" ("+proc.id()+")"+"\n Request: "+elem.toString());
 				proc.process(packet, connection, results);
@@ -152,7 +173,7 @@ public class SessionManager extends AbstractMessageReceiver
 		} // end of if (children != null)
 	}
 
-	private void processCommand(Packet pc, boolean routed) {
+	private void processCommand(Packet pc) {
 		log.finer(pc.getCommand().toString() + " command from: " + pc.getFrom());
 		switch (pc.getCommand()) {
 		case STREAM_OPENED:
@@ -169,26 +190,40 @@ public class SessionManager extends AbstractMessageReceiver
 				else {
 					connection.setDomain(getDefHostName());
 				} // end of if (hostname != null) else
-				connection.setSessionId(pc.getElemCData("/STREAM_OPENED/session-id"));
 				connectionsByFrom.put(pc.getFrom(), connection);
 			} else {
 				log.finest("Stream opened for existing session, authorized: "
 					+ connection.isAuthorized());
 			} // end of else
+			connection.setSessionId(pc.getElemCData("/STREAM_OPENED/session-id"));
 			break;
 		case GETFEATURES:
-			if (pc.getType() == IqType.get) {
+			if (pc.getType() == StanzaType.get) {
 				String features = getFeatures(connectionsByFrom.get(pc.getFrom()));
 				Packet result = pc.commandResult(features);
-				if (routed) {
-					result = result.packRouted();
-				} // end of if (packet.isRouted())
 				addOutPacket(result);
-			} // end of if (pc.getType() == IqType.get)
+			} // end of if (pc.getType() == StanzaType.get)
 			break;
 		case STREAM_CLOSED:
 			XMPPResourceConnection conn = connectionsByFrom.remove(pc.getFrom());
 			if (conn != null) {
+				Queue<Packet> results = new LinkedList<Packet>();
+				for (XMPPProcessorIfc proc: processors.values()) {
+					proc.stopped(conn, results);
+				} // end of for ()
+				for (Packet res: results) {
+					log.finest("Handling response: " + res.getStringData());
+					addOutPacket(res);
+				} // end of for ()
+				try {
+					final String userId = conn.getUserId();
+					final XMPPSession session = conn.getParentSession();
+					if (session.getActiveResourcesSize() == 0) {
+						sessionsByNodeId.remove(userId);
+					} // end of if (session.getActiveResourcesSize() == 0)
+				} catch (NotAuthorizedException e) {
+					// Intentionally ignore this exception
+				}
 				conn.streamClosed();
 			} // end of if (conn != null)
 			else {
@@ -229,6 +264,7 @@ public class SessionManager extends AbstractMessageReceiver
 		Map<String, Object> props = super.getDefaults();
 		props.put(USER_REPOSITORY_PROP_KEY, USER_REPOSITORY_PROP_VAL);
 		props.put(COMPONENTS_PROP_KEY, COMPONENTS_PROP_VAL);
+		props.put(HOSTNAMES_PROP_KEY, HOSTNAMES_PROP_VAL);
 		props.put(SECURITY_PROP_KEY + "/" + AUTHENTICATION_IDS_PROP_KEY,
 			AUTHENTICATION_IDS_PROP_VAL);
 		props.put(SECURITY_PROP_KEY + "/" + AUTH_PLAIN_CLASS_PROP_KEY,
@@ -248,8 +284,16 @@ public class SessionManager extends AbstractMessageReceiver
 		String[] components = (String[])props.get(COMPONENTS_PROP_KEY);
 		processors.clear();
 		for (String comp_id: components) {
-			processors.put(comp_id, ProcessorFactory.getProcessor(comp_id));
+			XMPPProcessorIfc proc = ProcessorFactory.getProcessor(comp_id);
+			processors.put(comp_id, proc);
+			log.config("Added processor: " + proc.getClass().getSimpleName()
+				+ " for component id: " + comp_id);
 		} // end of for (String comp_id: components)
+		String[] hostnames = (String[])props.get(HOSTNAMES_PROP_KEY);
+		clearRoutings();
+		for (String host: hostnames) {
+			addRouting(host);
+		} // end of for ()
 
 		String[] auth_ids = (String[])props.get(SECURITY_PROP_KEY + "/" +
 			AUTHENTICATION_IDS_PROP_KEY);
@@ -264,6 +308,8 @@ public class SessionManager extends AbstractMessageReceiver
 			AppConfigurationEntry ace =
 				new AppConfigurationEntry(class_name, parseFlag(flag), options);
 			config.put(id, new AppConfigurationEntry[] {ace});
+			log.config("Added security module: " + class_name
+				+ " for auth id: " + id + ", flag: " + flag);
 		} // end of for ()
 		authConfig = new TigaseConfiguration(config);
 		Configuration.setConfiguration(authConfig);
@@ -287,6 +333,7 @@ public class SessionManager extends AbstractMessageReceiver
 			sessionsByNodeId.get(JID.getNodeID(userName, conn.getDomain()));
 		if (session == null) {
 			session = new XMPPSession(userName);
+			sessionsByNodeId.put(JID.getNodeID(userName, conn.getDomain()), session);
 		} // end of if (session == null)
 		session.addResourceConnection(conn);
 	}

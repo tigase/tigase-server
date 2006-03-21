@@ -41,7 +41,7 @@ import tigase.server.Packet;
 import tigase.util.JID;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
-import tigase.xmpp.IqType;
+import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPResourceConnection;
 
@@ -85,9 +85,8 @@ public class JabberIqAuth extends XMPPProcessor {
 	public void process(final Packet packet, final XMPPResourceConnection session,
 		final Queue<Packet> results) {
 
-    String result = null;
 		Element request = packet.getElement();
-    IqType type = packet.getType();
+    StanzaType type = packet.getType();
 		switch (type) {
 		case get:
 			results.offer(packet.okResult(
@@ -124,14 +123,14 @@ public class JabberIqAuth extends XMPPProcessor {
 				results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 					"Authentication failed", false));
 				results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
-						IqType.set, packet.getElemId()));
+						StanzaType.set, packet.getElemId()));
 			}
 			break;
 		default:
 			results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
 					"Message type is incorrect", false));
 				results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
-						IqType.set, packet.getElemId()));
+						StanzaType.set, packet.getElemId()));
 			break;
 		} // end of switch (type)
 
