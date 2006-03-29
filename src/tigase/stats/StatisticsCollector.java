@@ -24,10 +24,14 @@
 
 package tigase.stats;
 
-import tigase.server.AbstractComponentRegistrator;
-import tigase.server.XMPPService;
-import tigase.server.ServerComponent;
+import tigase.xml.Element;
 import java.util.Map;
+import java.util.Queue;
+import java.util.List;
+import tigase.server.AbstractComponentRegistrator;
+import tigase.server.Packet;
+import tigase.server.ServerComponent;
+import tigase.server.XMPPService;
 
 /**
  * Class StatisticsCollector
@@ -38,8 +42,8 @@ import java.util.Map;
  * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class StatisticsCollector extends AbstractComponentRegistrator
-	implements XMPPService {
+public class StatisticsCollector extends AbstractComponentRegistrator {
+	//	implements XMPPService {
 
   public StatisticsCollector() {}
 
@@ -48,5 +52,34 @@ public class StatisticsCollector extends AbstractComponentRegistrator
 	public void componentAdded(ServerComponent component) {	}
 
 	public void componentRemoved(ServerComponent component) {}
+
+	public void processCommand(final Packet packet, final Queue<Packet> results) {
+		switch (packet.getCommand()) {
+		case GETSTATS:
+			Element statistics = new Element("statistics");
+			for (ServerComponent comp: components) {
+				if (comp instanceof StatisticsContainer) {
+					List<StatRecord> stats =
+						((StatisticsContainer)comp).getStatistics();
+					if (stats != null && stats.size() > 0) {
+						Element component = new Element("component");
+						component.setAttribute("name", comp.getName());
+						for (StatRecord record: stats) {
+							Element item = new Element("item");
+							item.addAttribute("description", record.getDescription());
+							item.addAttribute("unit", record.getUnit());
+							item.addAttribute("value", record.getValue());
+							component.addChild(item);
+						} // end of for ()
+						statistics.addChild(component);
+					} // end of if (stats != null && stats.count() > 0)
+				} // end of if (component instanceof Configurable)
+			} // end of for ()
+			results.offer(packet.commandResult(statistics));
+			break;
+		default:
+			break;
+		} // end of switch (packet.getCommand())
+	}
 
 }

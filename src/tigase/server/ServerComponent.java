@@ -24,6 +24,8 @@
 
 package tigase.server;
 
+import java.util.Queue;
+
 /**
  * Interface ServerComponent
  *
@@ -44,8 +46,7 @@ public interface ServerComponent {
 
   void release();
 
-  // Constructors
-  // Accessor Methods
-  // Operations
+  void processCommand(Packet packet, Queue<Packet> results);
+
 }
 

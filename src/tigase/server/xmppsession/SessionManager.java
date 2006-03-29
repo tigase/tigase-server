@@ -24,9 +24,11 @@
 
 package tigase.server.xmppsession;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.TreeMap;
@@ -34,6 +36,8 @@ import java.util.logging.Logger;
 import javax.security.auth.login.AppConfigurationEntry.LoginModuleControlFlag;
 import javax.security.auth.login.AppConfigurationEntry;
 import javax.security.auth.login.Configuration;
+import tigase.auth.CommitHandler;
+import tigase.auth.TigaseConfiguration;
 import tigase.conf.Configurable;
 import tigase.db.UserRepository;
 import tigase.db.xml.XMLRepository;
@@ -43,14 +47,12 @@ import tigase.server.Packet;
 import tigase.server.XMPPService;
 import tigase.util.JID;
 import tigase.xml.Element;
-import tigase.xmpp.StanzaType;
+import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.ProcessorFactory;
+import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.XMPPSession;
-import tigase.xmpp.NotAuthorizedException;
-import tigase.auth.TigaseConfiguration;
-import tigase.auth.CommitHandler;
 
 /**
  * Class SessionManager
@@ -76,7 +78,8 @@ public class SessionManager extends AbstractMessageReceiver
 	public static final String[] COMPONENTS_PROP_VAL =
 	{"jabber:iq:register", "jabber:iq:auth", "urn:ietf:params:xml:ns:xmpp-sasl",
 	 "urn:ietf:params:xml:ns:xmpp-bind", "urn:ietf:params:xml:ns:xmpp-session",
-	 "message", "jabber:iq:roster", "presence", "jabber:iq:version"};
+	 "message", "jabber:iq:roster", "presence", "jabber:iq:version",
+	 "jabber:iq:stats", "starttls", "disco"};
 
 	public static final String HOSTNAMES_PROP_KEY = "hostnames";
 	public static final String[] HOSTNAMES_PROP_VAL =	{"localhost-2"};
@@ -120,36 +123,34 @@ public class SessionManager extends AbstractMessageReceiver
 		if (packet.isCommand()) {
 			processCommand(packet);
 		} // end of if (pc.isCommand())
-		else {
-			XMPPResourceConnection conn = getXMPPResourceConnection(packet);
-			if (conn == null) {
-				// It might be a message _to_ some user on this server
-				// so let's look for established session for this user...
-				final String to = packet.getElemTo();
-				if (to != null) {
-					XMPPSession session =	sessionsByNodeId.get(JID.getNodeID(to));
-					if (session != null) {
-						conn = session.getResourceConnection(packet.getElemTo());
-					} else {
-						// It might be a message for off-line user....
-						// I will put support for off-line message retrieval here...
-					} // end of if (session != null) else
+		XMPPResourceConnection conn = getXMPPResourceConnection(packet);
+		if (conn == null) {
+			// It might be a message _to_ some user on this server
+			// so let's look for established session for this user...
+			final String to = packet.getElemTo();
+			if (to != null) {
+				XMPPSession session =	sessionsByNodeId.get(JID.getNodeID(to));
+				if (session != null) {
+					conn = session.getResourceConnection(packet.getElemTo());
 				} else {
-					// It might be presence message for already off-line user...
-					// Just ignore for now...
-				} // end of else
-			} // end of if (conn == null)
-			if (conn != null) {
-				Queue<Packet> results = new LinkedList<Packet>();
-				walk(packet, conn, packet.getElement(), results);
-				for (Packet res: results) {
-					log.finest("Handling response: " + res.getStringData());
-					addOutPacket(res);
-				} // end of for ()
+					// It might be a message for off-line user....
+					// I will put support for off-line message retrieval here...
+				} // end of if (session != null) else
 			} else {
-				// It might be a message or something else for off-line user....
+				// It might be presence message for already off-line user...
 				// Just ignore for now...
 			} // end of else
+		} // end of if (conn == null)
+		if (conn != null) {
+			Queue<Packet> results = new LinkedList<Packet>();
+			walk(packet, conn, packet.getElement(), results);
+			for (Packet res: results) {
+				log.finest("Handling response: " + res.getStringData());
+				addOutPacket(res);
+			} // end of for ()
+		} else {
+			// It might be a message or something else for off-line user....
+			// Just ignore for now...
 		} // end of else
 	}
 
@@ -336,6 +337,17 @@ public class SessionManager extends AbstractMessageReceiver
 			sessionsByNodeId.put(JID.getNodeID(userName, conn.getDomain()), session);
 		} // end of if (session == null)
 		session.addResourceConnection(conn);
+	}
+
+	public List<String> getDiscoFeatures() {
+		List<String> results = new LinkedList<String>();
+		for (XMPPProcessorIfc proc: processors.values()) {
+			String[] discoFeatures = proc.supDiscoFeatures(null);
+			if (discoFeatures != null) {
+				results.addAll(Arrays.asList(discoFeatures));
+			} // end of if (discoFeatures != null)
+		}
+		return results;
 	}
 
 }

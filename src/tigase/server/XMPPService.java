@@ -24,10 +24,12 @@
 
 package tigase.server;
 
+import java.util.List;
+
 /**
  * Interface XMPPService
  *
- * Objects of which inherit this interface can response to "ServiceDiscovery"
+ * Objects of which inherit this interface can respond to "ServiceDiscovery"
  * requests. All such requests are managed by XMPPServiceCollector object.
  *
  * Created: Tue Nov 22 07:07:11 2005
@@ -36,9 +38,8 @@ package tigase.server;
  * @version $Rev$
  */
 public interface XMPPService {
-  // Methods
-  // Constructors
-  // Accessor Methods
-  // Operations
+
+	List<String> getDiscoFeatures();
+
 }
 

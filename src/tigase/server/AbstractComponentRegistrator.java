@@ -38,7 +38,7 @@ public abstract class AbstractComponentRegistrator
 	implements ComponentRegistrator {
 
 	private String name = null;
-	private List<ServerComponent> components = new ArrayList<ServerComponent>();
+	protected List<ServerComponent> components = new ArrayList<ServerComponent>();
 
 	/**
 	 * Creates a new <code>AbstractComponentRegistrator</code> instance.

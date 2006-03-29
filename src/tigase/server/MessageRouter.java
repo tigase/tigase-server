@@ -28,11 +28,13 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.logging.Logger;
 import static tigase.server.MessageRouterConfig.*;
 import tigase.util.JID;
@@ -46,13 +48,14 @@ import tigase.util.JID;
  * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class MessageRouter extends AbstractMessageReceiver
-  implements XMPPService {
+public class MessageRouter extends AbstractMessageReceiver {
+	//  implements XMPPService {
 
   private static final Logger log =
     Logger.getLogger("tigase.server.MessageRouter");
 
-  private String[] localAddresses = LOCAL_ADDRESSES_PROP_VALUE;
+	private String defHostName = null;
+	private TreeSet<String> localAddresses = new TreeSet<String>();
 
   private ComponentRegistrator config = null;
 
@@ -63,10 +66,28 @@ public class MessageRouter extends AbstractMessageReceiver
   private Map<String, MessageReceiver> receivers =
     new TreeMap<String, MessageReceiver>();
 
+	public void processCommand(final Packet packet, final Queue<Packet> r) {
+		Queue<Packet> results = new LinkedList<Packet>();
+		for (ServerComponent comp: components.values()) {
+			if (comp != this) {
+				comp.processCommand(packet, results);
+			} // end of if (comp != this)
+		} // end of for ()
+		for (Packet res: results) {
+			processPacket(res);
+		} // end of for ()
+	}
+
   public void processPacket(Packet packet) {
 		log.finest("Processing packet: " + packet.getStringData()
 			+ ", to: " + packet.getTo()
 			+ ", from: " + packet.getFrom());
+
+		if (packet.isCommand() && localAddresses.contains(packet.getTo())) {
+			processCommand(packet, null);
+			return;
+		} // end of if (packet.isCommand() && localAddresses.contains(packet.getTo()))
+
 		String host = JID.getNodeHost(packet.getTo());
 		String ip = null;
 		try {
@@ -200,8 +221,16 @@ public class MessageRouter extends AbstractMessageReceiver
 
     try {
       super.setProperties(props);
-			localAddresses = (String[])props.get(LOCAL_ADDRESSES_PROP_KEY);
-			Arrays.sort(localAddresses);
+			String[] localAddresses = (String[])props.get(LOCAL_ADDRESSES_PROP_KEY);
+			this.localAddresses.clear();
+			if (localAddresses != null && localAddresses.length > 0) {
+				defHostName = localAddresses[0];
+				for (String host: localAddresses) {
+					this.localAddresses.add(host);
+				} // end of for ()
+			} else {
+				defHostName = "localhost";
+			} // end of else
       Map<String, ComponentRegistrator> tmp_reg = registrators;
       Map<String, MessageReceiver> tmp_rec = receivers;
       components = new TreeMap<String, ServerComponent>();
@@ -257,7 +286,7 @@ public class MessageRouter extends AbstractMessageReceiver
   }
 
 	public String getDefHostName() {
-		return localAddresses[0];
+		return defHostName;
 	}
 
 }

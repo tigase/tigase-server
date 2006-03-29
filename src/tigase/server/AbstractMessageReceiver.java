@@ -281,6 +281,9 @@ public abstract class AbstractMessageReceiver
 		routings.clear();
 	}
 
+	public void processCommand(final Packet packet, final Queue<Packet> results)
+	{}
+
 	private enum QueueElementType { IN_QUEUE, OUT_QUEUE }
 
 	private class QueueElement {

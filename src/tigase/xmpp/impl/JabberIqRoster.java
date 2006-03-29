@@ -39,6 +39,7 @@ import static tigase.xmpp.impl.Roster.SubscriptionType;
 /**
  * Class <code>JabberIqRoster</code> implements part of <em>RFC-3921</em> -
  * <em>XMPP Instant Messaging</em> specification describing roster management.
+ * 7.  Roster Management
  *
  *
  * Created: Tue Feb 21 17:42:53 2006

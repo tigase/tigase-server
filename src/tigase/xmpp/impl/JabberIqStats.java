@@ -25,31 +25,37 @@ package tigase.xmpp.impl;
 import java.util.Queue;
 import java.util.logging.Logger;
 import tigase.server.Packet;
-import tigase.server.XMPPServer;
+import tigase.server.Command;
 import tigase.xml.Element;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.StanzaType;
+import tigase.xmpp.Authorization;
 import tigase.util.JID;
+import tigase.util.ElementUtils;
 
 /**
- * JEP-0092: Software Version
+ * Based on JEP-0092: Software Version, Implementation for
+ * XMPP entity statistics collection.
  *
  *
- * Created: Tue Mar 21 06:45:51 2006
+ * Created: Sat Mar 25 06:45:00 2006
  *
  * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class JabberIqVersion extends XMPPProcessor {
+public class JabberIqStats extends XMPPProcessor {
 
   private static final Logger log =
-    Logger.getLogger("tigase.xmpp.impl.JabberIQVersion");
+    Logger.getLogger("tigase.xmpp.impl.JabberIQStats");
 
-	protected static final String ID = "jabber:iq:version";
-  protected static final String[] ELEMENTS = {"query"};
-  protected static final String[] XMLNSS = {"jabber:iq:version"};
-  protected static final String[] DISCO_FEATURES = {"jabber:iq:version"};
+	protected static final String ID = "jabber:iq:stats";
+  protected static final String[] ELEMENTS =
+	{"query", Command.GETSTATS.toString()};
+  protected static final String[] XMLNSS =
+	{"jabber:iq:stats", Command.XMLNS};
+  protected static final String[] DISCO_FEATURES = {"jabber:iq:stats"};
 
 	public String id() { return ID; }
 
@@ -62,37 +68,37 @@ public class JabberIqVersion extends XMPPProcessor {
 
 	public void process(final Packet packet, final XMPPResourceConnection session,
 		final Queue<Packet> results) {
-		// Maybe it is message to admininstrator:
-		String id = JID.getNodeID(packet.getElemTo());
-		// If ID part of user account contains only host name
-		// and this is local domain it is message to admin
-		if (id == null || id.equals("")
-			|| id.equalsIgnoreCase(session.getDomain())) {
-
-			StringBuilder reply = new StringBuilder();
-			reply.append("<name>Tigase</name>");
-			reply.append(
-				"<version>"
-				+ XMPPServer.getImplementationVersion()
-				+ "</version>");
-			reply.append(
-				"<os>"
-				+ System.getProperty("os.name")
-				+ "-" + System.getProperty("os.arch")
-				+ "-" + System.getProperty("os.version")
-				+ ", " + System.getProperty("java.vm.name")
-				+ "-" + System.getProperty("java.vm.version")
-				+ "-" + System.getProperty("java.vm.vendor")
-				+ "</os>"
-									 );
-			results.offer(packet.okResult(reply.toString(), 0));
-			return;
-		}
 
 		try {
-			// According to JEP-0092 user doesn't need to be logged in to
-			// retrieve server version information, so this part is executed
-			// after checking if this message is just to local server
+			// Maybe it is message to admininstrator:
+			String id = JID.getNodeID(packet.getElemTo());
+
+			if (packet.isCommand() && packet.getCommand() == Command.GETSTATS
+				&& packet.getType() == StanzaType.result) {
+				// Send it back to user.
+				Element iq =
+					ElementUtils.createIqQuery(session.getDomain(), session.getJID(),
+						StanzaType.result, packet.getElemId(), XMLNSS[0]);
+				Element query = iq.getChild("query");
+				query.addChild(packet.getElement().getChild("statistics"));
+				Packet result = new Packet(iq);
+				result.setTo(session.getConnectionId());
+				results.offer(result);
+				return;
+			} // end of if (packet.isCommand()
+				// && packet.getCommand() == Command.GETSTATS
+				// && packet.getType() == StanzaType.result)
+
+
+			// If ID part of user account contains only host name
+			// and this is local domain it is message to admin
+			if (id == null || id.equals("")
+				|| id.equalsIgnoreCase(session.getDomain())) {
+				results.offer(Command.GETSTATS.getPacket(session.getJID(),
+						session.getDomain(), StanzaType.get, packet.getElemId()));
+				return;
+			}
+
 			if (id.equals(session.getUserId())) {
 				// Yes this is message to 'this' client
 				Element elem = (Element)packet.getElement().clone();
@@ -112,10 +118,12 @@ public class JabberIqVersion extends XMPPProcessor {
 				results.offer(new Packet(result));
 			} // end of else
 		} catch (NotAuthorizedException e) {
-			// Do nothing, shouldn't happen....
-			log.warning("NotAuthorizedException for packet: "
-				+ packet.getStringData());
+      log.warning(
+				"Received stats request but user session is not authorized yet: " +
+        packet.getStringData());
+			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
+					"You must authorize session first.", true));
 		} // end of try-catch
 	}
 
-} // JabberIqVersion
+} // JabberIqStats

@@ -46,7 +46,7 @@ import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPResourceConnection;
 
 /**
- * Describe class JabberIqAuth here.
+ * JEP-0078: Non-SASL Authentication
  *
  *
  * Created: Thu Feb 16 17:46:16 2006

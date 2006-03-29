@@ -39,6 +39,7 @@ public class StatRecord {
 
 	private String description = null;
 	private String unit = null;
+	private String value = null;
 
 	/**
 	 * Creates a new <code>StatRecord</code> instance.
@@ -49,17 +50,36 @@ public class StatRecord {
 	public StatRecord(StatisticType type, long value) {
 		this.type = type;
 		longValue = value;
+		this.description = type.getDescription();
+		this.unit = type.getUnit();
+		this.value = "" + value;
 	}
 
 	public StatRecord(StatisticType type, int value) {
 		this.type = type;
 		intValue = value;
+		this.description = type.getDescription();
+		this.unit = type.getUnit();
+		this.value = "" + value;
 	}
 
 	public StatRecord(String description, String unit, int value) {
 		this.description = description;
 		this.unit = unit;
 		intValue = value;
+		this.value = "" + value;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public String getUnit() {
+		return unit;
+	}
+
+	public String getValue() {
+		return value;
 	}
 
 } // StatRecord

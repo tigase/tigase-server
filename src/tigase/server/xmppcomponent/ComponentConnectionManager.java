@@ -47,8 +47,8 @@ import tigase.xmpp.XMPPIOService;
  * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class ComponentConnectionManager extends ConnectionManager
-	implements XMPPService {
+public class ComponentConnectionManager extends ConnectionManager {
+	//	implements XMPPService {
 
   public static final String SECRET_PROP_KEY = "secret";
   public static final String SECRET_PROP_VAL =	"someSecret";

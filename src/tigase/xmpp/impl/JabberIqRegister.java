@@ -33,7 +33,7 @@ import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.NotAuthorizedException;
 
 /**
- * Describe class JabberIqRegister here.
+ * JEP-0077: In-Band Registration
  *
  *
  * Created: Thu Feb 16 13:14:06 2006

@@ -41,8 +41,8 @@ import tigase.server.Packet;
  * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class ServerConnectionManager extends AbstractMessageReceiver
-	implements XMPPService {
+public class ServerConnectionManager extends AbstractMessageReceiver {
+	//	implements XMPPService {
 
 	public void processPacket(Packet packet) {
 	}

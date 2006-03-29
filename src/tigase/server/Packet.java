@@ -149,12 +149,12 @@ public class Packet {
 		return result;
 	}
 
-	public Packet packRouted(final String to, final String from) {
-		Element routed = new Element("route", null, new String[] {"to", "from"},
-			new String[] {to, from});
-		routed.addChild(elem);
-		return new Packet(routed);
-	}
+// 	public Packet packRouted(final String from, final String to) {
+// 		Element routed = new Element("route", null, new String[] {"to", "from"},
+// 			new String[] {to, from});
+// 		routed.addChild(elem);
+// 		return new Packet(routed);
+// 	}
 
 	public Packet packRouted() {
 		Element routed = new Element("route", null, new String[] {"to", "from"},
@@ -172,8 +172,16 @@ public class Packet {
 
 	public Packet commandResult(final String data) {
 		Packet result = command.getPacket(getTo(), getFrom(),
-			StanzaType.result, elem.getAttribute("id"));
+			StanzaType.result, elem.getAttribute("id"), data);
+		//		result.getElement().setCData(data);
 		result.getElement().setCData(data);
+		return result;
+	}
+
+	public Packet commandResult(final Element data) {
+		Packet result = command.getPacket(getTo(), getFrom(),
+			StanzaType.result, elem.getAttribute("id"));
+		result.getElement().addChild(data);
 		return result;
 	}
 
@@ -196,10 +204,9 @@ public class Packet {
 		cond.setXMLNS(ERROR_NS);
 		error.addChild(cond);
 		if (errorText != null && errorText.length() > 0) {
-			Element t = new Element("text");
-			t.setAttribute("xml:lang", "en");
-			t.setXMLNS(ERROR_NS);
-			t.setCData(errorText);
+			Element t = new Element("text", errorText,
+				new String[] {"xml:lang", "xmlns"},
+				new String[] {"en", ERROR_NS});
 			error.addChild(t);
 		} // end of if (text != null && text.length() > 0)
 		reply.addChild(error);

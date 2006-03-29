@@ -55,8 +55,8 @@ import tigase.net.IOService;
  * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class ClientConnectionManager extends ConnectionManager
-	implements XMPPService {
+public class ClientConnectionManager extends ConnectionManager {
+	//	implements XMPPService {
 
   /**
    * Variable <code>log</code> is a class logger.
@@ -88,6 +88,7 @@ public class ClientConnectionManager extends ConnectionManager
 	}
 
 	private void processCommand(final Packet packet) {
+		XMPPIOService serv = getXMPPIOService(packet);
 		switch (packet.getCommand()) {
 		case GETFEATURES:
 			if (packet.getType() == StanzaType.result) {
@@ -100,6 +101,14 @@ public class ClientConnectionManager extends ConnectionManager
 				writePacketToSocket(result);
 			} // end of if (packet.getType() == StanzaType.get)
 			break;
+		case STARTTLS:
+			if (serv != null) {
+				serv.startTLS();
+			} else {
+				log.warning("Can't find sevice for STARTTLS command: " +
+					packet.getStringData());
+			} // end of else
+			break;
 		case STREAM_CLOSED:
 
 			break;
@@ -107,7 +116,6 @@ public class ClientConnectionManager extends ConnectionManager
 
 			break;
 		case CLOSE:
-			XMPPIOService serv = getXMPPIOService(packet);
 			if (serv != null) {
 				try {
 					serv.stop();
@@ -175,7 +183,8 @@ public class ClientConnectionManager extends ConnectionManager
 
 	private XMPPResourceConnection getXMPPSession(Packet p) {
 		XMPPIOService serv = getXMPPIOService(p);
-		return (XMPPResourceConnection)serv.getSessionData().get("xmpp-session");
+		return serv == null ? null :
+			(XMPPResourceConnection)serv.getSessionData().get("xmpp-session");
 	}
 
 	private String getFeatures(XMPPResourceConnection session) {
@@ -224,7 +233,7 @@ public class ClientConnectionManager extends ConnectionManager
 										 routings.computeRouting(null), StanzaType.get, "sess1"));
 		} // end of if (attribs.get("version") != null)
 		return "<stream:stream version='1.0' xml:lang='en'"
-			+ " to='kobit'"
+			+ " from='" + hostname + "'"
 			+ " id='" + id + "'"
 			+ " xmlns='jabber:client'"
 			+ " xmlns:stream='http://etherx.jabber.org/streams'>";

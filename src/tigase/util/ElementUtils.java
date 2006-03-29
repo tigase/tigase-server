@@ -20,48 +20,40 @@
  * Last modified by $Author$
  * $Date$
  */
-package tigase.server;
+package tigase.util;
 
 import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
 
 /**
- * Describe enum Command here.
+ * Describe class ElementUtils here.
  *
  *
- * Created: Thu Feb  9 20:52:02 2006
+ * Created: Sat Mar 25 20:08:17 2006
  *
  * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
  * @version $Rev$
  */
-public enum Command {
+public class ElementUtils {
 
-	STREAM_OPENED,
-		STREAM_CLOSED,
-		STARTTLS,
-		GETFEATURES,
-		GETDISCO,
-		CLOSE,
-		GETSTATS;
-
-	public static final String XMLNS = "tigase:command";
-
-	public Packet getPacket(final String from, final String to,
-		final StanzaType type, final String id) {
-		Element elem =
-			new Element(this.toString(), null,
-				new String[] {"type", "from", "to", "id", "xmlns"},
-				new String[] {type.toString(), from, to, id, XMLNS});
-		return new Packet(elem);
+	public static Element createIqQuery(final String from, final String to,
+		final StanzaType type, final String id, final String xmlns) {
+		Element iq = new Element("iq", null,
+			new String[] {"from", "to", "type", "id"},
+			new String[] {from, to, type.toString(), id});
+		Element query = new Element("query");
+		query.setXMLNS(xmlns);
+		iq.addChild(query);
+		return iq;
 	}
 
-	public Packet getPacket(final String from, final String to,
-		final StanzaType type, final String id, final String cdata) {
-		Packet packet = getPacket(from, to, type, id);
-		if (cdata != null) {
-			packet.getElement().setCData(cdata);
-		} // end of if (cdata != null)
-		return packet;
+	public static Element createIqQuery(final String from, final String to,
+		final StanzaType type, final String id, final Element query) {
+		Element iq = new Element("iq", null,
+			new String[] {"from", "to", "type", "id"},
+			new String[] {from, to, type.toString(), id});
+		iq.addChild(query);
+		return iq;
 	}
 
-} // Command
+} // ElementUtils

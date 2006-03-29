@@ -33,7 +33,7 @@ import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPResourceConnection;
 
 /**
- * Describe class BindResource here.
+ * RFC-3920, 7. Resource Binding
  *
  *
  * Created: Mon Feb 20 21:07:29 2006

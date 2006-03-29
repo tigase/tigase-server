@@ -24,20 +24,22 @@
 
 package tigase.conf;
 
-import tigase.server.AbstractComponentRegistrator;
-import tigase.server.XMPPService;
-import tigase.server.ServerComponent;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.Arrays;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
+import tigase.server.AbstractComponentRegistrator;
+import tigase.server.Packet;
+import tigase.server.ServerComponent;
+import tigase.server.XMPPService;
 
 /**
  * Class Configurator
@@ -48,7 +50,7 @@ import java.io.IOException;
  * @version $Rev$
  */
 public class Configurator extends AbstractComponentRegistrator
-	implements XMPPService, Configurable {
+	implements Configurable {
 
 	private static final String LOGGING_KEY = "logging/";
 
@@ -290,5 +292,8 @@ public class Configurator extends AbstractComponentRegistrator
 			(Arrays.equals(val, val_t) ? "OK" : "ERR, should be: " +
 				Arrays.toString(val)));
 	}
+
+	public void processCommand(final Packet packet, final Queue<Packet> results)
+	{}
 
 }

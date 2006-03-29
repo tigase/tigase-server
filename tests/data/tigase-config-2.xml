@@ -118,6 +118,9 @@
     <item value="jabber:iq:roster"/>
     <item value="presence"/>
     <item value="jabber:iq:version"/>
+    <item value="jabber:iq:stats"/>
+    <item value="starttls"/>
+    <item value="disco"/>
    </entry>
    <entry key="hostnames" type="String[]">
     <item value="localhost-2"/>
