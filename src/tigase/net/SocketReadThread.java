@@ -24,6 +24,7 @@ package tigase.net;
 
 import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
+import java.nio.channels.CancelledKeyException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
@@ -61,6 +62,8 @@ public class SocketReadThread implements Runnable {
 
   private final ConcurrentLinkedQueue<IOService> waiting =
     new ConcurrentLinkedQueue<IOService>();
+  private final ConcurrentLinkedQueue<IOService> for_removal =
+    new ConcurrentLinkedQueue<IOService>();
   private Selector clientsSel = null;
 	private ThreadPoolExecutor executor = null;
   /**
@@ -83,8 +86,7 @@ public class SocketReadThread implements Runnable {
 				0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
 			completionService =
 				new ExecutorCompletionService<IOService>(executor);
-		} // end of try
-		catch (Exception e) {
+		} catch (Exception e) {
 			log.log(Level.SEVERE, "Server I/O error, can't continue my work.", e);
 			stopping = true;
 		} // end of try-catch
@@ -104,8 +106,7 @@ public class SocketReadThread implements Runnable {
 
 	public void setMaxThreadPerCPU(int threads) {
 		int cpus = Runtime.getRuntime().availableProcessors();
-		executor.setCorePoolSize(cpus * threads);
-		executor.setMaximumPoolSize(cpus * threads);
+		setMaxThread(threads * cpus);
 	}
 
 	public void setMaxThread(int threads) {
@@ -118,6 +119,13 @@ public class SocketReadThread implements Runnable {
     clientsSel.wakeup();
 	}
 
+	public void removeSocketService(IOService s) {
+		SelectionKey key = s.getSocketChannel().keyFor(clientsSel);
+		if (key != null && key.attachment() == s) {
+			key.cancel();
+		} // end of if (key != null)
+	}
+
   private void addAllWaiting() throws IOException {
 
     IOService s = null;
@@ -125,9 +133,11 @@ public class SocketReadThread implements Runnable {
       final SocketChannel sc = s.getSocketChannel();
       try {
         sc.register(clientsSel, SelectionKey.OP_READ, s);
-      } // end of try
-      catch (ClosedChannelException e) {
+				log.finest("ADDED: " + s.getUniqueId());
+			} catch (Exception e) {
         // Ignore such channel
+				log.finest("ERROR adding channel for: " + s.getUniqueId()
+					+ ", exception: " + e);
       } // end of try-catch
     } // end of for ()
 
@@ -150,13 +160,16 @@ public class SocketReadThread implements Runnable {
           // we do cancel() on this key so removing is somehow redundant
           // and causes concurrency exception if a few calls are performed
           // at the same time.
-          // selected_keys.remove(sk);
+          //selected_keys.remove(sk);
           IOService s = (IOService)sk.attachment();
-          sk.cancel();
+					sk.cancel();
+					log.finest("AWAKEN: " + s.getUniqueId());
           completionService.submit(s);
         }
+				// Clean-up cancelled keys...
+        clientsSel.selectNow();
         addAllWaiting();
-      } catch (IOException e) {
+      } catch (Exception e) {
         log.log(Level.SEVERE, "Server I/O error, can't continue my work.", e);
         stopping = true;
       }
@@ -176,10 +189,14 @@ public class SocketReadThread implements Runnable {
       for (;;) {
         try {
           final IOService service = completionService.take().get();
-          if (service.isConnected() &&
-            !service.getSocketChannel().isRegistered()) {
+          if (service.isConnected()
+						//&& !service.getSocketChannel().isRegistered()
+							) {
+						log.finest("COMPLETED: " + service.getUniqueId());
             addSocketService(service);
-          } // end of if (!service.getSocketChannel().isRegistered())
+          } else {
+						log.finest("REMOVED: " + service.getUniqueId());
+					} // end of else
         }
         catch (ExecutionException e) {
           log.log(Level.WARNING, "Protocol execution exception.", e);

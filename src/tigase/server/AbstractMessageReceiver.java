@@ -32,6 +32,7 @@ import java.util.TreeSet;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 import tigase.annotations.TODO;
 import tigase.conf.Configurable;
 import tigase.stats.StatRecord;
@@ -147,8 +148,8 @@ public abstract class AbstractMessageReceiver
 	}
 
   public void run() {
-    while (! stopped) {
-      try {
+		while (! stopped) {
+			try {
 				QueueElement qel = queue.take();
 				switch (qel.type) {
 				case IN_QUEUE:
@@ -168,10 +169,12 @@ public abstract class AbstractMessageReceiver
 					log.severe("Unknown queue element type: " + qel.type);
 					break;
 				} // end of switch (qel.type)
-      } catch (InterruptedException e) {
+			} catch (InterruptedException e) {
 				stopped = true;
+			} catch (Exception e) {
+				log.log(Level.WARNING, "Exception during packet processing: ", e);
 			} // end of try-catch
-    } // end of while (! stopped)
+		} // end of while (! stopped)
   }
 
   public abstract void processPacket(Packet packet);

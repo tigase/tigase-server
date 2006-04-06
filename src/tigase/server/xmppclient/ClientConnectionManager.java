@@ -46,6 +46,7 @@ import tigase.xmpp.XMPPIOService;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.net.IOService;
+import tigase.net.SocketReadThread;
 
 /**
  * Class ClientConnectionManager
@@ -79,6 +80,8 @@ public class ClientConnectionManager extends ConnectionManager {
 		new TreeMap<String, XMPPProcessorIfc>();
 
 	public void processPacket(final Packet packet) {
+		log.finer("Processing packet: " + packet.getElemName()
+			+ ", type: " + packet.getType());
 		log.finest("Processing packet: " + packet.getStringData());
 		if (packet.isCommand()) {
 			processCommand(packet);
@@ -103,7 +106,27 @@ public class ClientConnectionManager extends ConnectionManager {
 			break;
 		case STARTTLS:
 			if (serv != null) {
-				serv.startTLS();
+				log.finer("Starting TLS for connection: " + serv.getUniqueId());
+				try {
+					// Note:
+					// If you send <proceed> packet to client you must expect
+					// instant response from the client with TLS handshaking data
+					// before you will call startTLS() on server side.
+					// So the initial handshaking data might be lost as they will
+					// be processed in another thread reading data from the socket.
+					// That's why below code first removes service from reading
+					// threads pool and then sends <proceed> packet and starts TLS.
+					SocketReadThread readThread = SocketReadThread.getInstance();
+					readThread.removeSocketService(serv);
+					Element proceed = packet.getElement().getChild("proceed");
+					Packet p_proceed = new Packet(proceed);
+					serv.addPacketToSend(p_proceed);
+					serv.processWaitingPackets();
+					serv.startTLS();
+					readThread.addSocketService(serv);
+				} catch (IOException e) {
+					log.warning("Error starting TLS: " + e);
+				} // end of try-catch
 			} else {
 				log.warning("Can't find sevice for STARTTLS command: " +
 					packet.getStringData());
@@ -140,6 +163,8 @@ public class ClientConnectionManager extends ConnectionManager {
 // 		Queue<Packet> results = new LinkedList<Packet>();
 		Packet p = null;
 		while ((p = packets.poll()) != null) {
+			log.finer("Processing packet: " + p.getElemName()
+				+ ", type: " + p.getType());
 			log.finest("Processing socket data: " + p.getStringData());
 			p.setFrom(JID.getJID(getName(), getDefHostName(), id));
 			p.setTo(routings.computeRouting(p.getElemTo()));

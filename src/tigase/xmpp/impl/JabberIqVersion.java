@@ -70,7 +70,7 @@ public class JabberIqVersion extends XMPPProcessor {
 			|| id.equalsIgnoreCase(session.getDomain())) {
 
 			StringBuilder reply = new StringBuilder();
-			reply.append("<name>Tigase</name>");
+			reply.append("<name>" + XMPPServer.NAME + "</name>");
 			reply.append(
 				"<version>"
 				+ XMPPServer.getImplementationVersion()
@@ -85,7 +85,7 @@ public class JabberIqVersion extends XMPPProcessor {
 				+ "-" + System.getProperty("java.vm.vendor")
 				+ "</os>"
 									 );
-			results.offer(packet.okResult(reply.toString(), 0));
+			results.offer(packet.okResult(reply.toString(), 1));
 			return;
 		}
 

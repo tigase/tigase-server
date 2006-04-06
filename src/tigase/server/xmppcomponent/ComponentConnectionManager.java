@@ -60,6 +60,8 @@ public class ComponentConnectionManager extends ConnectionManager {
     Logger.getLogger("tigase.server.xmppcomponent.ComponentConnectionManager");
 
 	public void processPacket(Packet packet) {
+		log.finer("Processing packet: " + packet.getElemName()
+			+ ", type: " + packet.getType());
 		log.finest("Processing packet: " + packet.getStringData());
 		writePacketToSocket(packet.packRouted());
 	}
@@ -68,6 +70,8 @@ public class ComponentConnectionManager extends ConnectionManager {
 		ConcurrentMap<String, Object> sessionData, Queue<Packet> packets) {
 		Packet p = null;
 		while ((p = packets.poll()) != null) {
+			log.finer("Processing packet: " + p.getElemName()
+				+ ", type: " + p.getType());
 			log.finest("Processing socket data: " + p.getStringData());
 			if (p.isRouted()) {
 				p = p.unpackRouted();

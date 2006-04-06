@@ -79,6 +79,8 @@ public class MessageRouter extends AbstractMessageReceiver {
 	}
 
   public void processPacket(Packet packet) {
+		log.finer("Processing packet: " + packet.getElemName()
+			+ ", type: " + packet.getType());
 		log.finest("Processing packet: " + packet.getStringData()
 			+ ", to: " + packet.getTo()
 			+ ", from: " + packet.getFrom());

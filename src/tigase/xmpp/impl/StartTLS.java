@@ -90,9 +90,9 @@ public class StartTLS extends XMPPProcessor {
 		final Queue<Packet> results) {
 		if (packet.getElement().getName().equals("starttls")) {
 			session.putSessionData(TLS_STARTED_KEY, "true");
-			results.offer(packet.swapFromTo(proceed));
+			//results.offer(packet.swapFromTo(proceed));
 			results.offer(Command.STARTTLS.getPacket(packet.getTo(),
-					packet.getFrom(), StanzaType.set, "1"));
+					packet.getFrom(), StanzaType.set, "1", proceed.toString()));
 		} // end of if (packet.getElement().getName().equals("starttls"))
 		else {
       log.warning("Unknown TLS element: " + packet.getStringData());

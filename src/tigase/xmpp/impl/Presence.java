@@ -115,7 +115,12 @@ public class Presence extends XMPPProcessor {
 		Element presence = null;
 		if (pres == null) {
 			presence = new Element("presence");
-			presence.setAttribute("type", t.toString());
+			if (t != null) {
+				presence.setAttribute("type", t.toString());
+			} // end of if (t != null)
+			else {
+				presence.setAttribute("type", StanzaType.unavailable.toString());
+			} // end of if (t != null) else
 		} // end of if (pres == null)
 		else {
 			presence = (Element)pres.clone();

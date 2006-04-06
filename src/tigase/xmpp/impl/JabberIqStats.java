@@ -48,7 +48,7 @@ import tigase.util.ElementUtils;
 public class JabberIqStats extends XMPPProcessor {
 
   private static final Logger log =
-    Logger.getLogger("tigase.xmpp.impl.JabberIQStats");
+    Logger.getLogger("tigase.xmpp.impl.JabberIqStats");
 
 	protected static final String ID = "jabber:iq:stats";
   protected static final String[] ELEMENTS =
@@ -73,6 +73,8 @@ public class JabberIqStats extends XMPPProcessor {
 			// Maybe it is message to admininstrator:
 			String id = JID.getNodeID(packet.getElemTo());
 
+			log.finest("Received packet: " + packet.getStringData());
+
 			if (packet.isCommand() && packet.getCommand() == Command.GETSTATS
 				&& packet.getType() == StanzaType.result) {
 				// Send it back to user.
@@ -84,6 +86,7 @@ public class JabberIqStats extends XMPPProcessor {
 				Packet result = new Packet(iq);
 				result.setTo(session.getConnectionId());
 				results.offer(result);
+				log.finest("Sending result: " + result.getStringData());
 				return;
 			} // end of if (packet.isCommand()
 				// && packet.getCommand() == Command.GETSTATS
@@ -94,8 +97,10 @@ public class JabberIqStats extends XMPPProcessor {
 			// and this is local domain it is message to admin
 			if (id == null || id.equals("")
 				|| id.equalsIgnoreCase(session.getDomain())) {
-				results.offer(Command.GETSTATS.getPacket(session.getJID(),
-						session.getDomain(), StanzaType.get, packet.getElemId()));
+				Packet result = Command.GETSTATS.getPacket(session.getJID(),
+					session.getDomain(), StanzaType.get, packet.getElemId());
+				results.offer(result);
+				log.finest("Sending result: " + result.getStringData());
 				return;
 			}
 
@@ -106,16 +111,19 @@ public class JabberIqStats extends XMPPProcessor {
 				result.setTo(session.getConnectionId());
 				result.setFrom(packet.getTo());
 				results.offer(result);
+				log.finest("Sending result: " + result.getStringData());
 			} else {
 				// This is message to some other client so I need to
 				// set proper 'from' attribute whatever it is set to now.
 				// Actually processor should not modify request but in this
 				// case it is absolutely safe and recommended to set 'from'
 				// attribute
-				Element result = (Element)packet.getElement().clone();
+				Element el_res = (Element)packet.getElement().clone();
 				// According to spec we must set proper FROM attribute
-				result.setAttribute("from", session.getJID());
-				results.offer(new Packet(result));
+				el_res.setAttribute("from", session.getJID());
+				Packet result = new Packet(el_res);
+				results.offer(result);
+				log.finest("Sending result: " + result.getStringData());
 			} // end of else
 		} catch (NotAuthorizedException e) {
       log.warning(

@@ -35,7 +35,9 @@ import tigase.conf.Configurator;
  */
 public class XMPPServer {
 
-  private static String config_file = "tigase-config.xml";
+	public static final String NAME = "Tigase 2";
+
+	private static String config_file = "tigase-config.xml";
 	private static String server_name = "tigase-xmpp-server";
   private static boolean debug = false;
   private static boolean monit = false;
@@ -65,7 +67,7 @@ public class XMPPServer {
 	public static String version() {
     return "\n"
       + "-- \n"
-      + "Tigase XMPP Server, version: "
+      + NAME + " XMPP Server, version: "
       + getImplementationVersion() + "\n"
       + "Author:	Artur Hefczyc <artur.hefczyc@gmail.com>\n"
       + "-- \n"

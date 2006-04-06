@@ -242,6 +242,8 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 	}
 
 	protected void writePacketToSocket(Packet p) {
+		log.finer("Processing packet: " + p.getElemName()
+			+ ", type: " + p.getType());
 		log.finest("Writing packet to: " + p.getTo());
 		IOService ios = getXMPPIOService(p);
 		if (ios != null) {
@@ -249,8 +251,8 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 			try {
 				ios.processWaitingPackets();
 			} catch (Exception e) {
+				log.log(Level.WARNING, "Exception during writing packets: ", e);
 				try {
-					log.log(Level.WARNING, "Exception during writing packets: ", e);
 					ios.stop();
 				} catch (Exception e1) {
 					log.log(Level.WARNING, "Exception stopping XMPPIOService: ", e1);
@@ -258,7 +260,8 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 			} // end of try-catch
 		} // end of if (ios != null)
 		else {
-			log.warning("Can't find service for packet: " + p.getTo()
+			log.warning("Can't find service for packet: <"
+				+ p.getElemName() + "> " + p.getTo()
 				+ ", service id: " + getServiceId(p));
 		} // end of if (ios != null) else
 	}

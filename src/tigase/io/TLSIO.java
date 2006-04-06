@@ -42,7 +42,7 @@ public class TLSIO implements IOInterface {
   /**
    * Variable <code>log</code> is a class logger.
    */
-  private static Logger log = Logger.getLogger("tigase.services.TLSIO");
+  private static Logger log = Logger.getLogger("tigase.io.TLSIO");
 
   private IOInterface io = null;
   /**
@@ -76,6 +76,7 @@ public class TLSIO implements IOInterface {
     tlsWrapper = wrapper;
     tlsInput = ByteBuffer.allocate(tlsWrapper.getAppBuffSize());
     tlsOutput = ByteBuffer.allocate(tlsWrapper.getNetBuffSize());
+		log.finer("TLS Socket created.");
   }
 
   private ByteBuffer decodeData(final ByteBuffer input) throws IOException {
@@ -83,6 +84,7 @@ public class TLSIO implements IOInterface {
     do_loop:
     do {
       input.flip();
+			log.finer("Decoding data: " + input.remaining());
       tlsInput = tlsWrapper.unwrap(input, tlsInput);
       if (input.hasRemaining()) {
         input.compact();
@@ -114,7 +116,8 @@ public class TLSIO implements IOInterface {
 
   public ByteBuffer read(ByteBuffer buff) throws IOException {
     buff = io.read(buff);
-    if (bytesRead() > 0) {
+		if (bytesRead() > 0) {
+			log.finer("Read bytes: " + bytesRead());
       return decodeData(buff);
     } else {
       return null;
@@ -124,7 +127,7 @@ public class TLSIO implements IOInterface {
   public int write(final ByteBuffer buff) throws IOException {
     int result = 0;
     ByteBuffer tlsBuffer = null;
-    log.finest("TLS - Writing data, remaining: " + buff.remaining());
+    log.finer("TLS - Writing data, remaining: " + buff.remaining());
     do {
       tlsBuffer = ByteBuffer.allocate(Math.min(buff.remaining(),
           tlsWrapper.getAppBuffSize()));

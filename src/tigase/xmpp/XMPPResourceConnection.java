@@ -322,7 +322,27 @@ public class XMPPResourceConnection {
 
 	public Authorization unregister(final String name_param)
 		throws NotAuthorizedException{
-		return Authorization.NOT_ALLOWED;
+    if (!isAuthorized()) {
+      return Authorization.FORBIDDEN;
+    }
+    // Some clients send plain user name and others send
+    // jid as user name. Let's resolve this here.
+    String user_name = JID.getNodeNick(name_param);
+    if (user_name == null || user_name.equals("")) {
+      user_name = name_param;
+    } // end of if (user_mame == null || user_name.equals(""))
+    if (parentSession.getUserName().equals(user_name)) {
+			try {
+				repository.getData(JID.getNodeID(user_name, getDomain()), "password");
+        repository.removeUser(JID.getNodeID(user_name, getDomain()));
+				streamClosed();
+				return Authorization.AUTHORIZED;
+			} catch (UserNotFoundException e) {
+				return Authorization.REGISTRATION_REQUIRED;
+			} // end of try-catch
+    } else {
+      return Authorization.FORBIDDEN;
+    }
 	}
 
 	public Authorization register(final String name_param,

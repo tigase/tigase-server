@@ -50,7 +50,7 @@ public class XMPPIOService extends IOService {
    * Variable <code>log</code> is a class logger.
    */
   private static final Logger log =
-		Logger.getLogger("tigase.server.XMPPIOService");
+		Logger.getLogger("tigase.xmpp.XMPPIOService");
 
   private XMPPDomBuilderHandler domHandler = null;
 	private SimpleParser parser = SingletonFactory.getParserInstance();
@@ -93,11 +93,11 @@ public class XMPPIOService extends IOService {
 	}
 
 	protected void xmppStreamOpened(Map<String, String> attribs) {
-    writeLock.lock();
+//     writeLock.lock();
 		final String response = serviceListener.xmppStreamOpened(this, attribs);
     try {
 			log.finest("Sending data: " + response);
-			assert debug(response + "\n");
+			//assert debug(response + "\n");
 			writeData(response);
 		} catch (IOException e) {
 			log.warning("Error sending stream open data: " + e);
@@ -108,20 +108,20 @@ public class XMPPIOService extends IOService {
 				log.warning("Error stopping service: " + e);
 			} // end of try-catch
     } finally {
-      writeLock.unlock();
+//       writeLock.unlock();
     }
 	}
 
 	protected void xmppStreamClosed() {
 		serviceListener.xmppStreamClosed(this);
-    writeLock.lock();
+//     writeLock.lock();
     try {
 			log.finest("Sending data: </stream:stream>");
 			writeData("</stream:stream>");
 		} catch (IOException e) {
 			log.warning("Error sending stream closed data: " + e);
     } finally {
-      writeLock.unlock();
+//       writeLock.unlock();
     }
 		try {
 			stop();
@@ -151,16 +151,21 @@ public class XMPPIOService extends IOService {
    *
    */
   public void processWaitingPackets() throws IOException {
-    writeLock.lock();
+    // We change state of this object in this method
+    // It can be called by many threads simultanously
+    // so we need to make it thread-safe
+//     writeLock.lock();
     try {
 			Packet packet = null;
 			while ((packet = waitingPackets.poll()) != null) {
+				log.finer("Processing packet: " + packet.getElemName()
+					+ ", type: " + packet.getType());
 				log.finest("Sending packet: " + packet.getStringData());
-				assert debug(packet.getStringData() + "\n");
+				//				assert debug(packet.getStringData() + "\n");
 				writeData(packet.getStringData());
 			} // end of while (packet = waitingPackets.poll() != null)
     } finally {
-      writeLock.unlock();
+//       writeLock.unlock();
     }
   }
 
@@ -170,7 +175,11 @@ public class XMPPIOService extends IOService {
    * @exception IOException if an error occurs
    */
   protected void processSocketData() throws IOException {
-		readLock.lock();
+    // We change state of this object in this method
+    // It can be called by many threads simultanously
+    // so we need to make it thread-safe
+		log.finer("About to read socket data.");
+// 		readLock.lock();
     try {
 			if (isConnected()) {
 				final char[] data = readData();
@@ -186,19 +195,19 @@ public class XMPPIOService extends IOService {
 						Queue<Element> elems = domHandler.getParsedElements();
 						Element elem = null;
 						while ((elem = elems.poll()) != null) {
-							assert debug(elem.toString() + "\n");
-							log.finest("Received packet: " + elem.toString());
+							//							assert debug(elem.toString() + "\n");
+							log.finer("Read element: " + elem.getName());
+							log.finest("Read packet: " + elem.toString());
 							addReceivedPacket(new Packet(elem));
 						} // end of while ((elem = elems.poll()) != null)
-					} // end of try
-					catch (Exception ex) {
+					}	catch (Exception ex) {
 						ex.printStackTrace();
 						try { stop(); } catch (Exception e) { } // NOPMD
 					} // end of try-catch
 				} // end of if (isConnected() && data != null)
 			}
     } finally {
-      readLock.unlock();
+//       readLock.unlock();
     }
   }
 

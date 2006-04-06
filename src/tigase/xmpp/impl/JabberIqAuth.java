@@ -75,7 +75,7 @@ public class JabberIqAuth extends XMPPProcessor {
   public String[] supNamespaces() { return XMLNSS; }
 
   public String[] supStreamFeatures(final XMPPResourceConnection session)	{
-    if (session.isAuthorized()) {
+    if (session != null && session.isAuthorized()) {
       return null;
     } else {
       return FEATURES;
@@ -119,7 +119,8 @@ public class JabberIqAuth extends XMPPProcessor {
 				results.offer(session.getAuthState().getResponseMessage(packet,
 					"Authentication successful.", false));
 			} catch (Exception e) {
-				log.log(Level.WARNING, "Authentication failed: ", e);
+				log.info("Authentication failed: " + user_name);
+				log.log(Level.FINER, "Authentication failed: ", e);
 				results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 					"Authentication failed", false));
 				results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
@@ -160,17 +161,17 @@ public class JabberIqAuth extends XMPPProcessor {
       throws IOException, UnsupportedCallbackException {
 
       for (int i = 0; i < callbacks.length; i++) {
-        log.fine("Callback: " + callbacks[i].getClass().getSimpleName());
+        log.finest("Callback: " + callbacks[i].getClass().getSimpleName());
 				if (callbacks[i] instanceof NameCallback) {
-          log.fine("NameCallback: " + name);
+          log.finest("NameCallback: " + name);
 					NameCallback nc = (NameCallback)callbacks[i];
 					nc.setName(name);
         } else if (callbacks[i] instanceof PasswordCallback) {
-          log.fine("NameCallback: " + password);
+          log.finest("NameCallback: " + password);
 					PasswordCallback pc = (PasswordCallback)callbacks[i];
 					pc.setPassword(password.toCharArray());
         } else if (callbacks[i] instanceof ResourceConnectionCallback) {
-          log.fine("ResourceConnectionCallback: "
+          log.finest("ResourceConnectionCallback: "
 						+ connection.getConnectionId());
 					ResourceConnectionCallback rcc =
 						(ResourceConnectionCallback)callbacks[i];

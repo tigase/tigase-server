@@ -103,7 +103,7 @@ public abstract class IOService implements Callable<IOService> {
 			new TLSWrapper(TLSUtil.getSSLContext(sslId, "SSL")));
   }
 
-  public void startTLS() {
+  public synchronized void startTLS() {
     socketIO = new TLSIO(socketIO,
 			new TLSWrapper(TLSUtil.getSSLContext(sslId, "TLS")));
   }
@@ -183,10 +183,10 @@ public abstract class IOService implements Callable<IOService> {
    */
   @TODO(note="Maybe we can do more intelligent locking.")
   public IOService call() throws IOException {
-    // We change state of this object in this method
-    // It can be called by many threads simultanously
-    // so we need to make it thread-safe
-		processWaitingPackets();
+		// It is not safe to call below function here....
+		// It might be already executing in different thread...
+		// and we don't want to put any locking or synchronization
+		//		processWaitingPackets();
 		processSocketData();
 		if (receivedPackets() > 0) {
 			serviceListener.packetsReady(this);
@@ -215,8 +215,7 @@ public abstract class IOService implements Callable<IOService> {
         cb = coder.decode(tmpBuffer);
         tmpBuffer.clear();
       } // end of if (socketIO.bytesRead() > 0)
-    } // end of try
-    catch (Exception eof) {
+    } catch (Exception eof) {
       try { stop(); } catch (Exception e) { } // NOPMD
     } // end of try-catch
     return cb != null ? cb.array() : null;
@@ -228,7 +227,7 @@ public abstract class IOService implements Callable<IOService> {
    * @param data a <code>String</code> value
    * @exception IOException if an error occurs
    */
-  protected void writeData(final String data) throws IOException {
+  protected synchronized void writeData(final String data) throws IOException {
     ByteBuffer dataBuffer = null;
     if (data != null || data.length() > 0) {
       dataBuffer = coder.encode(CharBuffer.wrap(data));

@@ -84,6 +84,10 @@ public class Packet {
 		return elem;
 	}
 
+	public String getElemName() {
+		return elem.getName();
+	}
+
 	public boolean isCommand() {
 		return command != null;
 	}

@@ -5,15 +5,20 @@
   <map/>
   <node name="logging">
    <map>
-    <entry key=".level" value="FINER" type="String"/>
+    <entry key=".level" value="INFO" type="String"/>
     <entry key="tigase.xml.level" value="INFO" type="String"/>
     <entry key="tigase.xmpp.level" value="INFO" type="String"/>
     <entry key="tigase.util.level" value="INFO" type="String"/>
-    <entry key="tigase.io.level" value="ALL" type="String"/>
-    <entry key="tigase.server.xmppcomponent.level" value="INFO" type="String"/>
-    <entry key="tigase.server.MessageRouter.level" value="ALL" type="String"/>
+    <entry key="tigase.io.level" value="FINE" type="String"/>
+    <entry key="tigase.io.TLSIO.level" value="FINE" type="String"/>
+    <entry key="tigase.net.level" value="FINE" type="String"/>
+    <entry key="tigase.net.IOService.level" value="FINE" type="String"/>
+    <entry key="tigase.xmpp.XMPPIOService.level" value="FINE" type="String"/>
+    <entry key="tigase.server.xmppcomponent.level" value="FINE" type="String"/>
+    <entry key="tigase.server.xmppclient.level" value="FINE" type="String"/>
+    <entry key="tigase.server.MessageRouter.level" value="FINE" type="String"/>
+    <entry key="tigase.server.ConnectionManager.level" value="FINE" type="String"/>
     <entry key="tigase.xmpp.XMPPDomBuilderHandler.level" value="INFO" type="String"/>
-    <entry key="tigase.server.xmppcomponent.level" value="ALL" type="String"/>
     <entry key="handlers" value="java.util.logging.ConsoleHandler" type="String"/>
     <entry key="java.util.logging.ConsoleHandler.formatter" value="tigase.util.LogFormatter" type="String"/>
     <entry key="java.util.logging.ConsoleHandler.level" value="ALL" type="String"/>
