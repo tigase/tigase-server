@@ -28,6 +28,7 @@ import java.nio.channels.CancelledKeyException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -153,8 +154,11 @@ public class SocketReadThread implements Runnable {
     while (!stopping) {
       try {
         clientsSel.select();
-        Set<SelectionKey> selected_keys = clientsSel.selectedKeys();
-        for (SelectionKey sk : selected_keys) {
+//         Set<SelectionKey> selected_keys = clientsSel.selectedKeys();
+//         for (SelectionKey sk : selected_keys) {
+        for (Iterator i = clientsSel.selectedKeys().iterator(); i.hasNext();) {
+					SelectionKey sk = (SelectionKey)i.next();
+					i.remove();
           // According to most guides we should use below code
           // removing SelectionKey from iterator, however a little later
           // we do cancel() on this key so removing is somehow redundant

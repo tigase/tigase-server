@@ -32,6 +32,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.Iterator;
 import javax.sound.sampled.Port;
 
 /**
@@ -137,17 +138,19 @@ public class ConnectionOpenThread implements Runnable {
     while (!stopping) {
       try {
         selector.select();
-        Set<SelectionKey> selected_keys = selector.selectedKeys();
-        for (SelectionKey sk : selected_keys) {
+				//        Set<SelectionKey> selected_keys = selector.selectedKeys();
+				//        for (SelectionKey sk : selected_keys) {
+        for (Iterator i = selector.selectedKeys().iterator(); i.hasNext();) {
+					SelectionKey sk = (SelectionKey)i.next();
+					i.remove();
 					SocketChannel sc = null;
 					if ((sk.readyOps() & SelectionKey.OP_ACCEPT) != 0) {
 						ServerSocketChannel nextReady = (ServerSocketChannel)sk.channel();
 						sc = nextReady.accept();
-						selected_keys.remove(sk);
 					} // end of if (sk.readyOps() & SelectionKey.OP_ACCEPT)
 					if ((sk.readyOps() & SelectionKey.OP_CONNECT) != 0) {
-						sc = (SocketChannel)sk.channel();
 						sk.cancel();
+						sc = (SocketChannel)sk.channel();
 					} // end of if (sk.readyOps() & SelectionKey.OP_ACCEPT)
 					if (sc != null) {
 						sc.configureBlocking(false);

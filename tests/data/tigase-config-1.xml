@@ -113,7 +113,7 @@
    <node name="5223">
     <map>
      <entry key="ifc" type="String[]">
-      <item value="localhost"/>
+      <item value="127.0.0.1"/>
      </entry>
      <entry key="remote-host" value="localhost-1" type="String"/>
      <entry key="socket" value="ssl" type="String"/>
@@ -154,7 +154,7 @@
    <node name="5555">
     <map>
      <entry key="ifc" type="String[]">
-      <item value="localhost"/>
+      <item value="127.0.0.1"/>
      </entry>
      <entry key="remote-host" value="localhost-2" type="String"/>
      <entry key="secret" value="someSecret" type="String"/>
