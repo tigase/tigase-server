@@ -59,6 +59,8 @@ public class Message extends XMPPProcessor {
 	public void process(final Packet packet, final XMPPResourceConnection session,
 		final Queue<Packet> results) {
 
+		log.finest("INPUT: " + packet.getStringData());
+
 		final String jid;
 		try {
 			jid = session.getJID();
@@ -81,6 +83,9 @@ public class Message extends XMPPProcessor {
 			result.setTo(session.getConnectionId());
 			result.setFrom(packet.getTo());
 			results.offer(result);
+
+			log.finest("OUTPUT: " + result.getStringData());
+
 			return;
 		} // end of if (nodeid.equals(session.getUserId()))
 
@@ -89,6 +94,8 @@ public class Message extends XMPPProcessor {
 		// According to spec we must set proper FROM attribute
 		result.setAttribute("from", jid);
 		results.offer(new Packet(result));
+
+		log.finest("OUTPUT: " + result.toString());
 
 	}
 

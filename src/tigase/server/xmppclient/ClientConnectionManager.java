@@ -31,6 +31,7 @@ import java.util.Queue;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.server.Command;
@@ -77,7 +78,7 @@ public class ClientConnectionManager extends ConnectionManager {
 	private RoutingsContainer routings = null;
 
 	private Map<String, XMPPProcessorIfc> processors =
-		new TreeMap<String, XMPPProcessorIfc>();
+		new ConcurrentSkipListMap<String, XMPPProcessorIfc>();
 
 	public void processPacket(final Packet packet) {
 		log.finer("Processing packet: " + packet.getElemName()

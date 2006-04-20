@@ -69,8 +69,8 @@ public class Presence extends XMPPProcessor {
 	public void stopped(final XMPPResourceConnection session,
 		final Queue<Packet> results) {
     try {
-      sendPresenceBroadcast(StanzaType.unavailable, session,
-        FROM_SUBSCRIBED, results, null);
+			sendPresenceBroadcast(StanzaType.unavailable, session,
+				FROM_SUBSCRIBED, results, null);
     } catch (NotAuthorizedException e) { } // end of try-catch
 	}
 

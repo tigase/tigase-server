@@ -79,6 +79,8 @@ public class XMPPIOService extends IOService {
   private final Lock writeLock = new ReentrantLock();
 	private final Lock readLock = new ReentrantLock();
 
+	private boolean streamClosed = false;
+
 	/**
 	 * Creates a new <code>XMPPIOService</code> instance.
 	 *
@@ -112,7 +114,21 @@ public class XMPPIOService extends IOService {
     }
 	}
 
+  /**
+   * Describe <code>stop</code> method here.
+   *
+   * @exception IOException if an error occurs
+   */
+  public void stop() throws IOException {
+		if (!streamClosed) {
+			streamClosed = true;
+			serviceListener.xmppStreamClosed(this);
+		} // end of if (!streamClosed)
+		super.stop();
+  }
+
 	protected void xmppStreamClosed() {
+		streamClosed = true;
 		serviceListener.xmppStreamClosed(this);
 //     writeLock.lock();
     try {

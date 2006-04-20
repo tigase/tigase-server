@@ -181,9 +181,6 @@ public abstract class AbstractMessageReceiver
 
 	//   public int queueSize() { return inQueue.size(); }
 
-  /**
-   * Returns defualt configuration settings for this object.
-   */
   public List<StatRecord> getStatistics() {
     List<StatRecord> stats = new ArrayList<StatRecord>();
     stats.add(new StatRecord(StatisticType.QUEUE_SIZE, queue.size()));

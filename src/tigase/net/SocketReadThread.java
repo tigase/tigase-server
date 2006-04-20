@@ -186,7 +186,10 @@ public class SocketReadThread implements Runnable {
   @TODO(note="ExecutionException is poorly implemented.")
   protected class ResultsListener extends Thread {
 
-    public ResultsListener() { }
+    public ResultsListener() {
+			super();
+			setName("SocketReadThread$ResultsListener");
+		}
 
     public void run() {
 

@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.TreeMap;
 import java.util.logging.Logger;
+import java.util.concurrent.ConcurrentSkipListMap;
 import javax.security.auth.login.AppConfigurationEntry.LoginModuleControlFlag;
 import javax.security.auth.login.AppConfigurationEntry;
 import javax.security.auth.login.Configuration;
@@ -53,6 +54,7 @@ import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.XMPPSession;
+import tigase.stats.StatRecord;
 
 /**
  * Class SessionManager
@@ -111,12 +113,14 @@ public class SessionManager extends AbstractMessageReceiver
 	private UserRepository repository = null;
 
 	private Map<String, XMPPSession> sessionsByNodeId =
-		new TreeMap<String, XMPPSession>();
+		new ConcurrentSkipListMap<String, XMPPSession>();
 	private Map<String, XMPPResourceConnection> connectionsByFrom =
-		new TreeMap<String, XMPPResourceConnection>();
+		new ConcurrentSkipListMap<String, XMPPResourceConnection>();
 	private Map<String, XMPPProcessorIfc> processors =
-		new TreeMap<String, XMPPProcessorIfc>();
+		new ConcurrentSkipListMap<String, XMPPProcessorIfc>();
 	private TigaseConfiguration authConfig = null;
+
+	private long closedConnections = 0;
 
 	public void processPacket(final Packet packet) {
 		log.finest("Processing packet: " + packet.getStringData());
@@ -206,8 +210,19 @@ public class SessionManager extends AbstractMessageReceiver
 			} // end of if (pc.getType() == StanzaType.get)
 			break;
 		case STREAM_CLOSED:
-			XMPPResourceConnection conn = connectionsByFrom.remove(pc.getFrom());
+			++closedConnections;
+			final XMPPResourceConnection conn =
+				connectionsByFrom.remove(pc.getFrom());
 			if (conn != null) {
+				try {
+					String userId = conn.getUserId();
+					XMPPSession session = conn.getParentSession();
+					if (session != null) {
+						if (session.getActiveResourcesSize() == 1) {
+							sessionsByNodeId.remove(userId);
+						}
+					} // end of if (session.getActiveResourcesSize() == 0)
+				} catch (NotAuthorizedException e) {}
 				Queue<Packet> results = new LinkedList<Packet>();
 				for (XMPPProcessorIfc proc: processors.values()) {
 					proc.stopped(conn, results);
@@ -216,15 +231,6 @@ public class SessionManager extends AbstractMessageReceiver
 					log.finest("Handling response: " + res.getStringData());
 					addOutPacket(res);
 				} // end of for ()
-				try {
-					final String userId = conn.getUserId();
-					final XMPPSession session = conn.getParentSession();
-					if (session.getActiveResourcesSize() == 0) {
-						sessionsByNodeId.remove(userId);
-					} // end of if (session.getActiveResourcesSize() == 0)
-				} catch (NotAuthorizedException e) {
-					// Intentionally ignore this exception
-				}
 				conn.streamClosed();
 			} // end of if (conn != null)
 			else {
@@ -339,6 +345,15 @@ public class SessionManager extends AbstractMessageReceiver
 		session.addResourceConnection(conn);
 	}
 
+	public void handleLogout(final String userName,
+		final XMPPResourceConnection conn) {
+		String userId = JID.getNodeID(userName, conn.getDomain());
+		XMPPSession session = sessionsByNodeId.get(userId);
+		if (session != null && session.getActiveResourcesSize() == 0) {
+			sessionsByNodeId.remove(userId);
+		} // end of if (session.getActiveResourcesSize() == 0)
+	}
+
 	public List<String> getDiscoFeatures() {
 		List<String> results = new LinkedList<String>();
 		for (XMPPProcessorIfc proc: processors.values()) {
@@ -349,5 +364,16 @@ public class SessionManager extends AbstractMessageReceiver
 		}
 		return results;
 	}
+
+	public List<StatRecord> getStatistics() {
+		List<StatRecord> stats = super.getStatistics();
+		stats.add(new StatRecord("Open connections", "int",
+				connectionsByFrom.size()));
+		stats.add(new StatRecord("Open authorized sessions", "int",
+				sessionsByNodeId.size()));
+		stats.add(new StatRecord("Closed connections", "long", closedConnections));
+		return stats;
+	}
+
 
 }

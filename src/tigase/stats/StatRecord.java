@@ -33,7 +33,7 @@ package tigase.stats;
  */
 public class StatRecord {
 
-	private StatisticType type = null;
+	private StatisticType type = StatisticType.OTHER;
 	private long longValue = -1;
 	private int intValue = -1;
 
@@ -67,6 +67,13 @@ public class StatRecord {
 		this.description = description;
 		this.unit = unit;
 		intValue = value;
+		this.value = "" + value;
+	}
+
+	public StatRecord(String description, String unit, long value) {
+		this.description = description;
+		this.unit = unit;
+		longValue = value;
 		this.value = "" + value;
 	}
 

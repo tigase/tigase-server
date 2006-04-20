@@ -31,6 +31,8 @@ import tigase.db.UserExistsException;
 import tigase.db.UserNotFoundException;
 import tigase.db.UserRepository;
 import tigase.util.JID;
+import javax.security.auth.login.LoginContext;
+import javax.security.auth.login.LoginException;
 
 /**
  * Describe class XMPPResourceConnection here.
@@ -55,6 +57,7 @@ public class XMPPResourceConnection {
 		Logger.getLogger("tigase.xmpp.XMPPResourceConnection");
 
 	private XMPPSession parentSession = null;
+	private LoginContext loginContext = null;
 
 	private String sessionId = null;
   /**
@@ -153,7 +156,7 @@ public class XMPPResourceConnection {
 		authState = Authorization.NOT_AUTHORIZED;
 		resource = null;
 		sessionId = null;
-		domain = null;
+		//		domain = null;
 		repository = null;
 	}
 
@@ -321,7 +324,7 @@ public class XMPPResourceConnection {
   }
 
 	public Authorization unregister(final String name_param)
-		throws NotAuthorizedException{
+		throws NotAuthorizedException {
     if (!isAuthorized()) {
       return Authorization.FORBIDDEN;
     }
@@ -333,9 +336,16 @@ public class XMPPResourceConnection {
     } // end of if (user_mame == null || user_name.equals(""))
     if (parentSession.getUserName().equals(user_name)) {
 			try {
+				List<XMPPResourceConnection> res_conn =
+					parentSession.getActiveResources();
+				for (XMPPResourceConnection res: res_conn) {
+					if (res != this) {
+						res.logout();
+					} // end of if (res != this)
+				} // end of for (XMPPResourceConnection res: res_conn)
 				repository.getData(JID.getNodeID(user_name, getDomain()), "password");
         repository.removeUser(JID.getNodeID(user_name, getDomain()));
-				streamClosed();
+				logout();
 				return Authorization.AUTHORIZED;
 			} catch (UserNotFoundException e) {
 				return Authorization.REGISTRATION_REQUIRED;
@@ -403,7 +413,7 @@ public class XMPPResourceConnection {
   }
 
   /**
-   * <code>authorizePlain</code> method performs authorization with given
+   * <code>authorize</code> method performs authorization with given
    * password as plain text.
    * If <code>AUTHORIZED</code> has been returned it means authorization
    * process is successful and session has been activated, otherwise session
@@ -418,38 +428,25 @@ public class XMPPResourceConnection {
    * session is binded after successful authorization.
    * @return a <code>Authorization</code> value of result code.
    */
-  public final Authorization authorize(final String user,
-		final String password) {
+  public final Authorization login() throws LoginException {
 
-    if (user == null || user.equals("")
-      || password == null || password.equals("")) {
-      authState = Authorization.NOT_ACCEPTABLE;
-    } else {
-			// Some clients send plain user name and others send
-			// jid as user name. Let's resolve this here.
-			String user_name = JID.getNodeNick(user);
-			if (user_name == null || user_name.equals("")) {
-				user_name = user;
-			} // end of if (user_mame == null || user_name.equals(""))
-			try {
-				String pattern =
-					repository.getData(JID.getNodeID(user_name, domain), "password");
-				if (password.equals(pattern)) {
-					this.resource = resource;
-					authState = Authorization.AUTHORIZED;
-					lastAccessed = System.currentTimeMillis();
-				} else {
-					authState = Authorization.NOT_AUTHORIZED;
-				}
-			} // end of try
-			catch (UserNotFoundException e) {
-				return Authorization.NOT_AUTHORIZED;
-			} // end of try-catch
-    }
+		loginContext.login();
+		authState = Authorization.AUTHORIZED;
     return authState;
   }
 
-  /**
+	public final void logout() {
+		streamClosed();
+		try {
+			loginContext.logout();
+		} catch (LoginException e) {} // end of try-catch
+	}
+
+	public void setLoginContext(final LoginContext lc) {
+		loginContext = lc;
+	}
+
+	/**
    * This method allows to retrieve list of values associated with one key.
    * As it is possible to store many values with one key there are a few methods
    * which provides this functionality. If given key does not exists in given

@@ -39,4 +39,6 @@ public interface CommitHandler {
 
 	void handleLoginCommit(String userName, XMPPResourceConnection conn);
 
+	void handleLogout(String userName, XMPPResourceConnection conn);
+
 } // CommitHandler

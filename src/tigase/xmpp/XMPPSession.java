@@ -69,7 +69,7 @@ public class XMPPSession {
 	}
 
 	public List<XMPPResourceConnection> getActiveResources() {
-		return Collections.unmodifiableList(activeResources);
+		return (List<XMPPResourceConnection>)activeResources.clone();
 	}
 
 	public int getActiveResourcesSize() {

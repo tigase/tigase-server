@@ -13,6 +13,7 @@
     <entry key="tigase.net.level" value="FINE" type="String"/>
     <entry key="tigase.xmpp.XMPPIOService.level" value="FINE" type="String"/>
     <entry key="tigase.xmpp.impl.JabberIqStats.level" value="FINE" type="String"/>
+    <entry key="tigase.xmpp.impl.Message.level" value="FINE" type="String"/>
     <entry key="tigase.server.xmppcomponent.level" value="FINE" type="String"/>
     <entry key="tigase.server.xmppsession.level" value="FINE" type="String"/>
     <entry key="tigase.server.ConnectionManager.level" value="FINE" type="String"/>

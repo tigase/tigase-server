@@ -30,6 +30,7 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.security.auth.login.LoginContext;
 import javax.security.sasl.AuthorizeCallback;
 import javax.security.sasl.RealmCallback;
 import tigase.db.UserNotFoundException;
@@ -132,12 +133,18 @@ public class SaslCallbackHandler implements CallbackHandler {
 				String authorId = authCallback.getAuthorizationID();
 				log.finest("AuthorizeCallback: authorId: " + authorId);
 				if (authenId.equals(authorId)) {
-					Authorization result =
-						connection.authorize(user_name, user_raw_pass);
-					log.finest("Authorization result: " + result);
-					authCallback.setAuthorized(true);
-					authCallback.setAuthorizedID(authorId);
-					commitHandler.handleLoginCommit(user_name, connection);
+					CallbackHandler cbh =
+						new AuthCallbackHandler(user_name, user_raw_pass, null, connection);
+					LoginContext lc = null;
+					try {
+						lc = new LoginContext("auth-plain", cbh);
+						connection.setLoginContext(lc);
+						Authorization result = connection.login();
+						log.finest("Authorization result: " + result);
+						authCallback.setAuthorized(true);
+						authCallback.setAuthorizedID(authorId);
+					} catch (Exception e) {
+					}
 				} // end of if (authenId.equals(authorId))
 			} else {
 				throw new UnsupportedCallbackException
@@ -145,5 +152,54 @@ public class SaslCallbackHandler implements CallbackHandler {
 			}
 		}
 	}
+
+  private class AuthCallbackHandler implements CallbackHandler {
+
+		private String name = null;
+		private String password = null;
+		private String resource = null;
+		private XMPPResourceConnection connection = null;
+
+		public AuthCallbackHandler(final String name, final String pass,
+			final String resource, final XMPPResourceConnection connection) {
+			// Some Jabber/XMPP clients send user name as full JID, others
+			// send just nick name. Let's resolve this here.
+			this.name = JID.getNodeNick(name);
+			if (this.name == null || this.name.equals("")) {
+				this.name = name;
+			} // end of if (name == null || name.equals(""))
+			this.password = pass;
+			this.resource = resource;
+			this.connection = connection;
+		}
+
+		public void handle(final Callback[] callbacks)
+      throws IOException, UnsupportedCallbackException {
+
+      for (int i = 0; i < callbacks.length; i++) {
+        log.finest("Callback: " + callbacks[i].getClass().getSimpleName());
+				if (callbacks[i] instanceof NameCallback) {
+          log.finest("NameCallback: " + name);
+					NameCallback nc = (NameCallback)callbacks[i];
+					nc.setName(name);
+        } else if (callbacks[i] instanceof PasswordCallback) {
+          log.finest("NameCallback: " + password);
+					PasswordCallback pc = (PasswordCallback)callbacks[i];
+					pc.setPassword(password.toCharArray());
+        } else if (callbacks[i] instanceof ResourceConnectionCallback) {
+          log.finest("ResourceConnectionCallback: "
+						+ connection.getConnectionId());
+					ResourceConnectionCallback rcc =
+						(ResourceConnectionCallback)callbacks[i];
+					rcc.setResourceConnection(connection);
+        } else {
+          throw new UnsupportedCallbackException(callbacks[i],
+						"Unrecognized Callback");
+        }
+      }
+
+    }
+
+  }
 
 } // SaslCallbackHandler

@@ -33,6 +33,7 @@ import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -94,7 +95,8 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 		ConnectionOpenThread.getInstance();
 	private static SocketReadThread readThread = SocketReadThread.getInstance();
 	private static Timer delayedTasks = new Timer("DelayedTasks", true);
-	private Map<String, IOService> services =	new TreeMap<String, IOService>();
+	private Map<String, IOService> services =
+		new ConcurrentSkipListMap<String, IOService>();
 	protected static long connectionDelay = 5000;
 
 	public Map<String, Object> getDefaults() {

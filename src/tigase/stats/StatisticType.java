@@ -36,7 +36,7 @@ public enum StatisticType {
 	QUEUE_SIZE("Queue size", "int"),
 	MSG_RECEIVED_OK("Messages received", "long"),
 	QUEUE_OVERFLOW("Queue overflow", "long"),
-	Other(null, null);
+	OTHER(null, null);
 
 
 	private String description = null;

@@ -110,7 +110,7 @@ public class PlainAuth implements LoginModule {
 	 */
 	public boolean commit() throws LoginException {
 
-		connection.authorize(user_name, user_raw_pass);
+		//		connection.authorize(user_name, user_raw_pass);
 		commitHandler.handleLoginCommit(user_name, connection);
 
 		return true;
@@ -194,6 +194,7 @@ public class PlainAuth implements LoginModule {
 	 * @exception LoginException if an error occurs
 	 */
 	public boolean logout() throws LoginException {
+		commitHandler.handleLogout(user_name, connection);
 		return true;
 	}
 

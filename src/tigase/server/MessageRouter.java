@@ -35,6 +35,8 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Logger;
 import static tigase.server.MessageRouterConfig.*;
 import tigase.util.JID;
@@ -55,16 +57,16 @@ public class MessageRouter extends AbstractMessageReceiver {
     Logger.getLogger("tigase.server.MessageRouter");
 
 	private String defHostName = null;
-	private TreeSet<String> localAddresses = new TreeSet<String>();
+	private Set<String> localAddresses = new ConcurrentSkipListSet<String>();
 
   private ComponentRegistrator config = null;
 
   private Map<String, ServerComponent> components =
-    new TreeMap<String, ServerComponent>();
+    new ConcurrentSkipListMap<String, ServerComponent>();
   private Map<String, ComponentRegistrator> registrators =
-    new TreeMap<String, ComponentRegistrator>();
+    new ConcurrentSkipListMap<String, ComponentRegistrator>();
   private Map<String, MessageReceiver> receivers =
-    new TreeMap<String, MessageReceiver>();
+    new ConcurrentSkipListMap<String, MessageReceiver>();
 
 	public void processCommand(final Packet packet, final Queue<Packet> r) {
 		Queue<Packet> results = new LinkedList<Packet>();
