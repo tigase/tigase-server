@@ -95,7 +95,7 @@ public class XMPPIOService extends IOService {
 	}
 
 	protected void xmppStreamOpened(Map<String, String> attribs) {
-//     writeLock.lock();
+		writeLock.lock();
 		final String response = serviceListener.xmppStreamOpened(this, attribs);
     try {
 			log.finest("Sending data: " + response);
@@ -110,7 +110,7 @@ public class XMPPIOService extends IOService {
 				log.warning("Error stopping service: " + e);
 			} // end of try-catch
     } finally {
-//       writeLock.unlock();
+			writeLock.unlock();
     }
 	}
 
@@ -130,14 +130,14 @@ public class XMPPIOService extends IOService {
 	protected void xmppStreamClosed() {
 		streamClosed = true;
 		serviceListener.xmppStreamClosed(this);
-//     writeLock.lock();
+		writeLock.lock();
     try {
 			log.finest("Sending data: </stream:stream>");
 			writeData("</stream:stream>");
 		} catch (IOException e) {
 			log.warning("Error sending stream closed data: " + e);
     } finally {
-//       writeLock.unlock();
+			writeLock.unlock();
     }
 		try {
 			stop();
@@ -170,7 +170,7 @@ public class XMPPIOService extends IOService {
     // We change state of this object in this method
     // It can be called by many threads simultanously
     // so we need to make it thread-safe
-//     writeLock.lock();
+		writeLock.lock();
     try {
 			Packet packet = null;
 			while ((packet = waitingPackets.poll()) != null) {
@@ -181,7 +181,7 @@ public class XMPPIOService extends IOService {
 				writeData(packet.getStringData());
 			} // end of while (packet = waitingPackets.poll() != null)
     } finally {
-//       writeLock.unlock();
+			writeLock.unlock();
     }
   }
 

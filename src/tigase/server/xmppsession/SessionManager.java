@@ -84,13 +84,13 @@ public class SessionManager extends AbstractMessageReceiver
 	 "jabber:iq:stats", "starttls", "disco"};
 
 	public static final String HOSTNAMES_PROP_KEY = "hostnames";
-	public static final String[] HOSTNAMES_PROP_VAL =	{"localhost-2"};
+	public static final String[] HOSTNAMES_PROP_VAL =	{"localhost"};
 
 	public static final String SECURITY_PROP_KEY = "security";
 
 	public static final String AUTHENTICATION_IDS_PROP_KEY = "authentication-ids";
 	public static final String[] AUTHENTICATION_IDS_PROP_VAL =
-	{"auth-plain", "auth-digest"};
+	{"auth-plain", "auth-digest", "auth-sasl"};
 
 	public static final String AUTH_PLAIN_CLASS_PROP_KEY = "auth-plain/class";
 	public static final String AUTH_PLAIN_CLASS_PROP_VAL =
@@ -105,8 +105,7 @@ public class SessionManager extends AbstractMessageReceiver
 	public static final String AUTH_DIGEST_FLAG_PROP_VAL =	"sufficient";
 
 	public static final String AUTH_SASL_CLASS_PROP_KEY = "auth-sasl/class";
-	public static final String AUTH_SASL_CLASS_PROP_VAL =
-		"tigase.auth.SaslAuth";
+	public static final String AUTH_SASL_CLASS_PROP_VAL =	"None";
 	public static final String AUTH_SASL_FLAG_PROP_KEY = "auth-sasl/flag";
 	public static final String AUTH_SASL_FLAG_PROP_VAL =	"sufficient";
 

@@ -68,6 +68,7 @@ public class XMPPSession {
 		return username;
 	}
 
+	@SuppressWarnings({"unchecked"})
 	public List<XMPPResourceConnection> getActiveResources() {
 		return (List<XMPPResourceConnection>)activeResources.clone();
 	}

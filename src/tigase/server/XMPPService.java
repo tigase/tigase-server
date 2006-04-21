@@ -18,8 +18,8 @@
  *  Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
  * $Rev$
- * Last modified by $Author: .*\$$
- * $Date:  .*\$$
+ * Last modified by $Author$$
+ * $Date$$
  */
 
 package tigase.server;

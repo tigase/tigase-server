@@ -69,13 +69,14 @@ public class ClientConnectionManager extends ConnectionManager {
 	private static final String ROUTINGS_PROP_KEY = "routings";
 	public static final String ROUTING_MODE_PROP_KEY = "multi-mode";
 	public static final boolean ROUTING_MODE_PROP_VAL = true;
-	public static final String ROUTING_ENTRY_PROP_KEY = ".+@localhost";
+	public static final String ROUTING_ENTRY_PROP_KEY = ".+";
 	public static final String ROUTING_ENTRY_PROP_VAL = "session_1@localhost";
 
 	public static final String HOSTNAMES_PROP_KEY = "hostnames";
-	public static final String[] HOSTNAMES_PROP_VAL =	{"localhost-1"};
+	public static final String[] HOSTNAMES_PROP_VAL =	{"localhost-client1"};
 
 	private RoutingsContainer routings = null;
+	private String defHostName = null;
 
 	private Map<String, XMPPProcessorIfc> processors =
 		new ConcurrentSkipListMap<String, XMPPProcessorIfc>();
@@ -120,6 +121,7 @@ public class ClientConnectionManager extends ConnectionManager {
 					SocketReadThread readThread = SocketReadThread.getInstance();
 					readThread.removeSocketService(serv);
 					Element proceed = packet.getElement().getChild("proceed");
+					log.finest("Packet: " + packet.getElement().toString());
 					Packet p_proceed = new Packet(proceed);
 					serv.addPacketToSend(p_proceed);
 					serv.processWaitingPackets();
@@ -202,8 +204,12 @@ public class ClientConnectionManager extends ConnectionManager {
 		} // end of for ()
 		String[] hostnames = (String[])props.get(HOSTNAMES_PROP_KEY);
 		clearRoutings();
+		defHostName = null;
 		for (String host: hostnames) {
 			addRouting(host);
+			if (defHostName == null) {
+				defHostName = host;
+			} // end of if (defHostName == null)
 		} // end of for ()
 	}
 
@@ -275,6 +281,10 @@ public class ClientConnectionManager extends ConnectionManager {
 
 	public void xmppStreamClosed(XMPPIOService serv) {
 		log.finer("Stream closed.");
+	}
+
+	public String getDefHostName() {
+		return defHostName == null ? super.getDefHostName() : defHostName;
 	}
 
 }

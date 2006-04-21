@@ -1,153 +1,182 @@
 <?xml version='1.0' encoding='UTF-8'?>
 
 <tigase-config>
- <component name='tigase-xmpp-server'>
-  <map>
-   <entry key='local-addresses' type='String[]'>
-    <item value='localhost'/>
-   </entry>
-   <entry key='max-queue-size' value='1000000' type='Integer'/>
-  </map>
-  <node name='components'>
-   <map/>
-   <node name='msg-receivers'>
-    <map>
-     <entry key='id-names' type='String[]'>
-      <item value='client_1'/>
-      <item value='server_1'/>
-      <item value='comp_1'/>
-      <item value='session_1'/>
-     </entry>
-     <entry key='client_1.active' value='true' type='Boolean'/>
-     <entry key='client_1.class' value='tigase.server.xmppclient.ClientConnectionManager' type='String'/>
-     <entry key='comp_1.active' value='true' type='Boolean'/>
-     <entry key='comp_1.class' value='tigase.server.xmppcomponent.ComponentConnectionManager' type='String'/>
-     <entry key='server_1.active' value='true' type='Boolean'/>
-     <entry key='server_1.class' value='tigase.server.xmppserver.ServerConnectionManager' type='String'/>
-     <entry key='session_1.active' value='true' type='Boolean'/>
-     <entry key='session_1.class' value='tigase.server.xmppsession.SessionManager' type='String'/>
-    </map>
-   </node>
-   <node name='registrators'>
-    <map>
-     <entry key='id-names' type='String[]'>
-      <item value='stat_1'/>
-      <item value='service_1'/>
-     </entry>
-     <entry key='service_1.active' value='true' type='Boolean'/>
-     <entry key='service_1.class' value='tigase.server.XMPPServiceCollector' type='String'/>
-     <entry key='stat_1.active' value='true' type='Boolean'/>
-     <entry key='stat_1.class' value='tigase.stats.StatisticsCollector' type='String'/>
-    </map>
-   </node>
-  </node>
- </component>
- <component name='basic-conf'>
+ <component name="basic-conf">
   <map/>
-  <node name='logging'>
+  <node name="logging">
    <map>
-    <entry key='.level' value='ALL' type='String'/>
-    <entry key='tigase.server.level' value='ALL' type='String'/>
-    <entry key='tigase.net.level' value='ALL' type='String'/>
-    <entry key='handlers' value='java.util.logging.ConsoleHandler' type='String'/>
-    <entry key='java.util.logging.ConsoleHandler.formatter' value='tigase.util.LogFormatter' type='String'/>
-    <entry key='java.util.logging.ConsoleHandler.level' value='ALL' type='String'/>
-    <entry key='java.util.logging.FileHandler.append' value='true' type='String'/>
-    <entry key='java.util.logging.FileHandler.count' value='5' type='String'/>
-    <entry key='java.util.logging.FileHandler.formatter' value='tigase.util.LogFormatter' type='String'/>
-    <entry key='java.util.logging.FileHandler.level' value='ALL' type='String'/>
-    <entry key='java.util.logging.FileHandler.limit' value='100000' type='String'/>
-    <entry key='java.util.logging.FileHandler.pattern' value='logs/java_%g.log' type='String'/>
-    <entry key='tigase.handlers' value='java.util.logging.FileHandler' type='String'/>
-    <entry key='tigase.useParentHandlers' value='true' type='String'/>
+    <entry key=".level" value="INFO" type="String"/>
+    <entry key="handlers" value="java.util.logging.ConsoleHandler" type="String"/>
+    <entry key="tigase.server.xmppclient.level" value="FINE" type="String"/>
+    <entry key="tigase.server.MessageRouter.level" value="FINE" type="String"/>
+    <entry key="java.util.logging.ConsoleHandler.formatter" value="tigase.util.LogFormatter" type="String"/>
+    <entry key="java.util.logging.ConsoleHandler.level" value="ALL" type="String"/>
+    <entry key="java.util.logging.FileHandler.append" value="true" type="String"/>
+    <entry key="java.util.logging.FileHandler.count" value="5" type="String"/>
+    <entry key="java.util.logging.FileHandler.formatter" value="tigase.util.LogFormatter" type="String"/>
+    <entry key="java.util.logging.FileHandler.level" value="ALL" type="String"/>
+    <entry key="java.util.logging.FileHandler.limit" value="100000" type="String"/>
+    <entry key="java.util.logging.FileHandler.pattern" value="logs/java_%g.log" type="String"/>
+    <entry key="tigase.handlers" value="java.util.logging.FileHandler" type="String"/>
+    <entry key="tigase.useParentHandlers" value="true" type="String"/>
    </map>
   </node>
  </component>
- <component name='client_1'>
+ <component name="tigase-xmpp-server">
   <map>
-   <entry key='route-address' value='session_1@localhost' type='String'/>
-   <entry key='max-queue-size' value='1000' type='Integer'/>
+   <entry key="local-addresses" type="String[]">
+    <item value="localhost"/>
+   </entry>
+   <entry key="max-queue-size" value="1000" type="Integer"/>
   </map>
-  <node name='connections'>
+  <node name="components">
+   <map/>
+   <node name="msg-receivers">
+    <map>
+     <entry key="client_1.active" value="true" type="Boolean"/>
+     <entry key="client_1.class" value="tigase.server.xmppclient.ClientConnectionManager" type="String"/>
+     <entry key="comp_1.active" value="false" type="Boolean"/>
+     <entry key="comp_1.class" value="tigase.server.xmppcomponent.ComponentConnectionManager" type="String"/>
+     <entry key="id-names" type="String[]">
+      <item value="client_1"/>
+      <item value="server_1"/>
+      <item value="comp_1"/>
+      <item value="session_1"/>
+     </entry>
+     <entry key="server_1.active" value="true" type="Boolean"/>
+     <entry key="server_1.class" value="tigase.server.xmppserver.ServerConnectionManager" type="String"/>
+     <entry key="session_1.active" value="true" type="Boolean"/>
+     <entry key="session_1.class" value="tigase.server.xmppsession.SessionManager" type="String"/>
+    </map>
+   </node>
+   <node name="registrators">
+    <map>
+     <entry key="id-names" type="String[]">
+      <item value="stat_1"/>
+      <item value="service_1"/>
+     </entry>
+     <entry key="service_1.active" value="true" type="Boolean"/>
+     <entry key="service_1.class" value="tigase.server.XMPPServiceCollector" type="String"/>
+     <entry key="stat_1.active" value="true" type="Boolean"/>
+     <entry key="stat_1.class" value="tigase.stats.StatisticsCollector" type="String"/>
+    </map>
+   </node>
+  </node>
+ </component>
+ <component name="client_1">
+  <map>
+   <entry key="hostnames" type="String[]">
+    <item value="localhost-tmp"/>
+   </entry>
+   <entry key="max-queue-size" value="1000" type="Integer"/>
+  </map>
+  <node name="connections">
    <map>
-    <entry key='ports' type='int[]'>
-     <item value='5222'/>
-     <item value='5223'/>
+    <entry key="ports" type="int[]">
+     <item value="5222"/>
+     <item value="5223"/>
     </entry>
    </map>
-   <node name='5222'>
+   <node name="5222">
     <map>
-     <entry key='socket' value='plain' type='String'/>
-     <entry key='type' value='accept' type='String'/>
-     <entry key='ifc' type='String[]'>
-      <item value='*'/>
+     <entry key="ifc" type="String[]">
+      <item value="*"/>
      </entry>
-     <entry key='remote-host' value='localhost' type='String'/>
+     <entry key="remote-host" value="localhost" type="String"/>
+     <entry key="socket" value="plain" type="String"/>
+     <entry key="type" value="accept" type="String"/>
     </map>
+    <node name="tls">
+     <map>
+      <entry key="required" value="false" type="Boolean"/>
+     </map>
+    </node>
    </node>
-   <node name='5223'>
+   <node name="5223">
     <map>
-     <entry key='socket' value='ssl' type='String'/>
-     <entry key='type' value='accept' type='String'/>
-     <entry key='ifc' type='String[]'>
-      <item value='*'/>
+     <entry key="ifc" type="String[]">
+      <item value="*"/>
      </entry>
-     <entry key='remote-host' value='localhost' type='String'/>
+     <entry key="remote-host" value="localhost" type="String"/>
+     <entry key="socket" value="ssl" type="String"/>
+     <entry key="type" value="accept" type="String"/>
     </map>
+    <node name="tls">
+     <map>
+      <entry key="required" value="false" type="Boolean"/>
+     </map>
+    </node>
    </node>
-   <node name='tls'>
+   <node name="tls">
     <map>
-     <entry key='keys-store' value='certs/keystore' type='String'/>
-     <entry key='required' value='false' type='Boolean'/>
-     <entry key='trusts-store' value='certs/truststore' type='String'/>
-     <entry key='use' value='true' type='Boolean'/>
-     <entry key='keys-store-password' value='keystore' type='String'/>
-     <entry key='trusts-store-password' value='truststore' type='String'/>
+     <entry key="keys-store" value="certs/keystore" type="String"/>
+     <entry key="keys-store-password" value="keystore" type="String"/>
+     <entry key="trusts-store" value="certs/truststore" type="String"/>
+     <entry key="trusts-store-password" value="truststore" type="String"/>
+     <entry key="use" value="true" type="Boolean"/>
     </map>
    </node>
   </node>
- </component>
- <component name='server_1'>
-  <map>
-   <entry key='max-queue-size' value='1000' type='Integer'/>
-  </map>
- </component>
- <component name='comp_1'>
-  <map>
-   <entry key='max-queue-size' value='1000' type='Integer'/>
-  </map>
-  <node name='connections'>
+  <node name="routings">
    <map>
-    <entry key='ports' type='int[]'>
-     <item value='5555'/>
+    <entry key=".+" value="session_1@localhost" type="String"/>
+    <entry key="multi-mode" value="true" type="Boolean"/>
+   </map>
+  </node>
+ </component>
+ <component name="server_1">
+  <map>
+   <entry key="max-queue-size" value="1000" type="Integer"/>
+  </map>
+ </component>
+ <component name="session_1">
+  <map>
+   <entry key="components" type="String[]">
+    <item value="jabber:iq:register"/>
+    <item value="jabber:iq:auth"/>
+    <item value="urn:ietf:params:xml:ns:xmpp-sasl"/>
+    <item value="urn:ietf:params:xml:ns:xmpp-bind"/>
+    <item value="urn:ietf:params:xml:ns:xmpp-session"/>
+    <item value="message"/>
+    <item value="jabber:iq:roster"/>
+    <item value="presence"/>
+    <item value="jabber:iq:version"/>
+    <item value="jabber:iq:stats"/>
+    <item value="starttls"/>
+    <item value="disco"/>
+   </entry>
+   <entry key="hostnames" type="String[]">
+    <item value="localhost"/>
+   </entry>
+   <entry key="max-queue-size" value="1000" type="Integer"/>
+   <entry key="repository-url" value="user-repository.xml" type="String"/>
+  </map>
+  <node name="security">
+   <map>
+    <entry key="authentication-ids" type="String[]">
+     <item value="auth-plain"/>
+     <item value="auth-digest"/>
+     <item value="auth-sasl"/>
     </entry>
    </map>
-   <node name='tls'>
+   <node name="auth-digest">
     <map>
-     <entry key='keys-store' value='certs/keystore' type='String'/>
-     <entry key='keys-store-password' value='keystore' type='String'/>
-     <entry key='required' value='false' type='Boolean'/>
-     <entry key='trusts-store' value='certs/truststore' type='String'/>
-     <entry key='trusts-store-password' value='truststore' type='String'/>
-     <entry key='use' value='true' type='Boolean'/>
+     <entry key="class" value="tigase.auth.DigestAuth" type="String"/>
+     <entry key="flag" value="sufficient" type="String"/>
     </map>
    </node>
-   <node name='5555'>
+   <node name="auth-plain">
     <map>
-     <entry key='ifc' type='String[]'>
-      <item value='*'/>
-     </entry>
-     <entry key='remote-host' value='localhost' type='String'/>
-     <entry key='secret' value='someSecret' type='String'/>
-     <entry key='socket' value='plain' type='String'/>
-     <entry key='type' value='accept' type='String'/>
+     <entry key="class" value="tigase.auth.PlainAuth" type="String"/>
+     <entry key="flag" value="sufficient" type="String"/>
+    </map>
+   </node>
+   <node name="auth-sasl">
+    <map>
+     <entry key="class" value="None" type="String"/>
+     <entry key="flag" value="sufficient" type="String"/>
     </map>
    </node>
   </node>
- </component>
- <component name='session_1'>
-  <map>
-   <entry key='max-queue-size' value='1000' type='Integer'/>
-  </map>
  </component>
 </tigase-config>

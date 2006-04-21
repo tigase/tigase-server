@@ -64,4 +64,13 @@ public enum Command {
 		return packet;
 	}
 
+	public Packet getPacket(final String from, final String to,
+		final StanzaType type, final String id, final Element child) {
+		Packet packet = getPacket(from, to, type, id);
+		if (child != null) {
+			packet.getElement().addChild(child);
+		} // end of if (cdata != null)
+		return packet;
+	}
+
 } // Command

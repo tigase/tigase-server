@@ -105,7 +105,7 @@ public class RoutingsContainer {
 
 		public String computeRouting(final String address) {
 			if (address == null) {
-				log.finer("For null address returing default routing: " + def);
+				log.finer("For null address returning default routing: " + def);
 				return def;
 			} // end of if (address == null)
 			for (Map.Entry<Pattern, String> entry: routings.entrySet()) {
@@ -115,7 +115,7 @@ public class RoutingsContainer {
 					return entry.getValue();
 				} // end of if (pattern.matcher(address).find())
 			} // end of for ()
-			return null;
+			return def;
 		}
 
 	}

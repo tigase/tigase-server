@@ -113,7 +113,7 @@
    <node name="5223">
     <map>
      <entry key="ifc" type="String[]">
-      <item value="127.0.0.1"/>
+      <item value="*"/>
      </entry>
      <entry key="remote-host" value="localhost-1" type="String"/>
      <entry key="socket" value="ssl" type="String"/>
