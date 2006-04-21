@@ -59,14 +59,14 @@ public class XMPPIOService extends IOService {
   /**
    * The <code>waitingPackets</code> queue keeps data which have to be processed.
    */
-  private final ConcurrentLinkedQueue<Packet> waitingPackets =
+  private ConcurrentLinkedQueue<Packet> waitingPackets =
     new ConcurrentLinkedQueue<Packet>();
 
   /**
    * The <code>readyPackets</code> queue keeps data which have been already
    * processed and they are actual processing results.
    */
-  private final ConcurrentLinkedQueue<Packet> receivedPackets =
+  private ConcurrentLinkedQueue<Packet> receivedPackets =
     new ConcurrentLinkedQueue<Packet>();
 
   /**
@@ -76,8 +76,8 @@ public class XMPPIOService extends IOService {
    * methods to be executed concurrently as they process data received from
    * socket and the data should be processed in proper order.
    */
-  private final Lock writeLock = new ReentrantLock();
-	private final Lock readLock = new ReentrantLock();
+  private Lock writeLock = new ReentrantLock();
+	private Lock readLock = new ReentrantLock();
 
 	private boolean streamClosed = false;
 
