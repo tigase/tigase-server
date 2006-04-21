@@ -281,6 +281,10 @@ public class SessionManager extends AbstractMessageReceiver
 			AUTH_DIGEST_CLASS_PROP_VAL);
 		props.put(SECURITY_PROP_KEY + "/" + AUTH_DIGEST_FLAG_PROP_KEY,
 			AUTH_DIGEST_FLAG_PROP_VAL);
+		props.put(SECURITY_PROP_KEY + "/" + AUTH_SASL_CLASS_PROP_KEY,
+			AUTH_SASL_CLASS_PROP_VAL);
+		props.put(SECURITY_PROP_KEY + "/" + AUTH_SASL_FLAG_PROP_KEY,
+			AUTH_SASL_FLAG_PROP_VAL);
 		return props;
 	}
 
