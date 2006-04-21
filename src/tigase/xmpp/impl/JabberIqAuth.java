@@ -90,8 +90,8 @@ public class JabberIqAuth extends XMPPProcessor {
 		switch (type) {
 		case get:
 			results.offer(packet.okResult(
-											//"<username/><password/><digest/><resource/>",
-											"<username/><password/><resource/>",
+											"<username/><password/><digest/><resource/>",
+											//"<username/><password/><resource/>",
 											1));
 			break;
 		case set:
