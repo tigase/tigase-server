@@ -59,13 +59,17 @@ public class TLSWrapper {
    * Creates a new <code>TLSWrapper</code> instance.
    *
    */
-  public TLSWrapper(SSLContext sslc) {
+  public TLSWrapper(SSLContext sslc, boolean clientMode) {
     this.protocol = protocol;
     tlsEngine = sslc.createSSLEngine();
-    tlsEngine.setUseClientMode(false);
+    tlsEngine.setUseClientMode(clientMode);
     netBuffSize = tlsEngine.getSession().getPacketBufferSize();
     appBuffSize = tlsEngine.getSession().getApplicationBufferSize();
   }
+
+	public boolean isClientMode() {
+		return tlsEngine.getUseClientMode();
+	}
 
   public void close() throws SSLException {
     tlsEngine.closeOutbound();

@@ -98,14 +98,18 @@ public abstract class IOService implements Callable<IOService> {
     sslId = id;
   }
 
-  public void startSSL() {
-    socketIO = new TLSIO(socketIO,
-			new TLSWrapper(TLSUtil.getSSLContext(sslId, "SSL")));
+  public synchronized void startSSL(final boolean clientMode)
+    throws IOException {
+
+		socketIO = new TLSIO(socketIO,
+			new TLSWrapper(TLSUtil.getSSLContext(sslId, "SSL"), clientMode));
   }
 
-  public synchronized void startTLS() {
-    socketIO = new TLSIO(socketIO,
-			new TLSWrapper(TLSUtil.getSSLContext(sslId, "TLS")));
+  public synchronized void startTLS(final boolean clientMode)
+    throws IOException {
+
+		socketIO = new TLSIO(socketIO,
+			new TLSWrapper(TLSUtil.getSSLContext(sslId, "TLS"), clientMode));
   }
 
 	public void setIOServiceListener(IOServiceListener sl) {

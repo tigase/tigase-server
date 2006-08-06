@@ -19,6 +19,6 @@
      "$JAVA_HOME/share/src"
      "$JAVA_HOME/share/tests/src")))
  '(jde-gen-k&r t)
- '(user-mail-address "artur.hefczyc@gmail.com")
+ '(user-mail-address "artur.hefczyc@tigase.org")
  '(indent-tabs-mode t)
 )

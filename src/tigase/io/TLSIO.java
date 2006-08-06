@@ -71,12 +71,18 @@ public class TLSIO implements IOInterface {
 //     tlsOutput = ByteBuffer.allocate(tlsWrapper.getNetBuffSize());
 //   }
 
-  public TLSIO(final IOInterface ioi, final TLSWrapper wrapper) {
-    io = ioi;
+  public TLSIO(final IOInterface ioi, final TLSWrapper wrapper)
+		throws IOException {
+		io = ioi;
     tlsWrapper = wrapper;
     tlsInput = ByteBuffer.allocate(tlsWrapper.getAppBuffSize());
     tlsOutput = ByteBuffer.allocate(tlsWrapper.getNetBuffSize());
 		log.finer("TLS Socket created.");
+		if (tlsWrapper.isClientMode()) {
+			log.finer("TLS - client mode, starting handshaking now...");
+			write(ByteBuffer.allocate(0));
+			log.finer("Handshaking completed, you can send data now.");
+		} // end of if (tlsWrapper.isClientMode())
   }
 
   private ByteBuffer decodeData(final ByteBuffer input) throws IOException {

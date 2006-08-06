@@ -125,7 +125,7 @@ public class ClientConnectionManager extends ConnectionManager {
 					Packet p_proceed = new Packet(proceed);
 					serv.addPacketToSend(p_proceed);
 					serv.processWaitingPackets();
-					serv.startTLS();
+					serv.startTLS(false);
 					readThread.addSocketService(serv);
 				} catch (IOException e) {
 					log.warning("Error starting TLS: " + e);

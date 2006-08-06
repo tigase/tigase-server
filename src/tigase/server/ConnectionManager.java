@@ -336,7 +336,7 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 			try {
 				serv.accept(sc);
 				if (getSocketType() == SocketType.ssl) {
-					serv.startSSL();
+					serv.startSSL(false);
 				} // end of if (socket == SocketType.ssl)
 				readThread.addSocketService(serv);
 				serviceStarted(serv);
