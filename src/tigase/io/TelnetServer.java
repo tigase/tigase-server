@@ -22,6 +22,7 @@
  */
 package tigase.io;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
@@ -31,8 +32,12 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import java.util.logging.SocketHandler;
 
@@ -100,11 +105,11 @@ public class TelnetServer implements SampleSocketThread.SocketHandler {
 
 	public void run() throws IOException {
 		InputStreamReader reader = new InputStreamReader(System.in);
-		char[] buff = new char[1];
+		char[] buff = new char[1024];
 		for (;;) {
-			reader.read(buff);
+			int res = reader.read(buff);
 			if (iosock != null) {
-				ByteBuffer dataBuffer = coder.encode(CharBuffer.wrap(buff));
+				ByteBuffer dataBuffer = coder.encode(CharBuffer.wrap(buff, 0, res));
 				iosock.write(dataBuffer);
 			} // end of if (ioscok != null)
 			else {
@@ -120,6 +125,9 @@ public class TelnetServer implements SampleSocketThread.SocketHandler {
 	 */
 	public static void main(final String[] args) throws Exception {
 		parseParams(args);
+		if (debug) {
+			turnDebugOn();
+		} // end of if (debug)
 		if (ssl) {
 			TLSUtil.configureSSLContext(sslId, "certs/keystore", "keystore",
 				"certs/truststore", "truststore");
@@ -224,5 +232,27 @@ public class TelnetServer implements SampleSocketThread.SocketHandler {
       } // end of for (int i = 0; i < args.length; i++)
     }
   }
+
+	public static void turnDebugOn() {
+		Map<String, String> properties = new HashMap<String, String>();
+		properties.put(".level", "ALL");
+		properties.put("handlers", "java.util.logging.ConsoleHandler");
+		properties.put("java.util.logging.ConsoleHandler.formatter",
+			"tigase.util.LogFormatter");
+		properties.put("java.util.logging.ConsoleHandler.level", "ALL");
+		Set<Map.Entry<String, String>> entries = properties.entrySet();
+		StringBuilder buff = new StringBuilder();
+		for (Map.Entry<String, String> entry : entries) {
+			buff.append(entry.getKey() + "=" +	entry.getValue() + "\n");
+		}
+    try {
+      final ByteArrayInputStream bis =
+        new ByteArrayInputStream(buff.toString().getBytes());
+      LogManager.getLogManager().readConfiguration(bis);
+      bis.close();
+    } catch (IOException e) {
+      log.log(Level.SEVERE, "Can not configure logManager", e);
+    } // end of try-catch
+	}
 
 } // Telnetserver
