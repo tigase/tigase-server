@@ -42,7 +42,7 @@ import tigase.util.ElementUtils;
  *
  * Created: Sat Mar 25 06:45:00 2006
  *
- * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
+ * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class JabberIqStats extends XMPPProcessor {

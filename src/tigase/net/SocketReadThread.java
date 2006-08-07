@@ -47,7 +47,7 @@ import tigase.annotations.TODO;
  *
  * Created: Mon Jan 30 12:01:17 2006
  *
- * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
+ * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class SocketReadThread implements Runnable {

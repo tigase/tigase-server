@@ -34,7 +34,7 @@ import java.util.logging.Logger;
  *
  * Created: Sat May 14 07:43:30 2005
  *
- * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
+ * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class TLSIO implements IOInterface {

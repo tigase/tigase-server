@@ -45,7 +45,7 @@ import tigase.xmpp.XMPPResourceConnection;
  *
  * Created: Sat Feb 18 13:53:55 2006
  *
- * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
+ * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class PlainAuth implements LoginModule {

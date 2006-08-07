@@ -30,7 +30,7 @@ import tigase.conf.Configurator;
  *
  * Created: Wed Nov 23 07:04:18 2005
  *
- * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
+ * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class XMPPServer {
@@ -69,7 +69,7 @@ public class XMPPServer {
       + "-- \n"
       + NAME + " XMPP Server, version: "
       + getImplementationVersion() + "\n"
-      + "Author:	Artur Hefczyc <artur.hefczyc@gmail.com>\n"
+      + "Author:	Artur Hefczyc <artur.hefczyc@tigase.org>\n"
       + "-- \n"
       ;
   }

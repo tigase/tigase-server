@@ -38,7 +38,7 @@ import tigase.xmpp.XMPPResourceConnection;
  *
  * Created: Tue Feb 21 15:49:08 2006
  *
- * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
+ * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class Message extends XMPPProcessor {

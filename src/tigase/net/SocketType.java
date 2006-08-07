@@ -28,7 +28,7 @@ package tigase.net;
  *
  * Created: Sun Feb  5 09:27:34 2006
  *
- * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
+ * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public enum SocketType {

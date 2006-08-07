@@ -33,7 +33,7 @@ import java.util.Arrays;
  *
  * Created: Fri Jan  6 14:54:21 2006
  *
- * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
+ * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class MessageRouterConfig {

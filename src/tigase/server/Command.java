@@ -31,7 +31,7 @@ import tigase.xmpp.StanzaType;
  *
  * Created: Thu Feb  9 20:52:02 2006
  *
- * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
+ * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public enum Command {

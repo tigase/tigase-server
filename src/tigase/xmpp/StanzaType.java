@@ -28,7 +28,7 @@ package tigase.xmpp;
  *
  * Created: Fri Feb 10 13:13:50 2006
  *
- * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
+ * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public enum StanzaType {

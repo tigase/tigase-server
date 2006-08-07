@@ -34,7 +34,7 @@ import java.util.regex.Pattern;
  *
  * Created: Sat Feb 11 16:30:42 2006
  *
- * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
+ * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class RoutingsContainer {

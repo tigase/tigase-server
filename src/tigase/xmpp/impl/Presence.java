@@ -44,7 +44,7 @@ import static tigase.xmpp.impl.Roster.FROM_SUBSCRIBED;
  *
  * Created: Wed Feb 22 07:30:03 2006
  *
- * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
+ * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class Presence extends XMPPProcessor {

@@ -1,7 +1,7 @@
 /*
  *  Package Tigase XMPP/Jabber Server
  *  Copyright (C) 2004, 2005, 2006
- *  "Artur Hefczyc" <artur.hefczyc@gmail.com>
+ *  "Artur Hefczyc" <artur.hefczyc@tigase.org>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ import tigase.server.Packet;
  *
  * Created: Tue Nov 22 07:07:11 2005
  *
- * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
+ * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class ServerConnectionManager extends AbstractMessageReceiver {

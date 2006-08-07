@@ -46,7 +46,7 @@ import tigase.xmpp.XMPPResourceConnection;
  *
  * Created: Mon Feb 20 16:28:13 2006
  *
- * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
+ * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class SaslAuth extends XMPPProcessor {

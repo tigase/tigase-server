@@ -34,7 +34,7 @@ import tigase.util.JID;
  *
  * Created: Wed Feb  8 22:14:28 2006
  *
- * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
+ * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class XMPPSession {

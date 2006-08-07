@@ -1,6 +1,6 @@
 /*  Package Tigase XMPP/Jabber Server
  *  Copyright (C) 2001, 2002, 2003, 2004, 2005
- *  "Artur Hefczyc" <artur.hefczyc@gmail.com>
+ *  "Artur Hefczyc" <artur.hefczyc@tigase.org>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ package tigase.db;
  * <p>
  * Created: Wed Oct 27 14:17:44 2004
  * </p>
- * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
+ * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class UserExistsException extends Exception {

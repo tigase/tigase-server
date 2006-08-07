@@ -51,7 +51,7 @@ import tigase.xmpp.XMPPResourceConnection;
  *
  * Created: Thu Feb 16 17:46:16 2006
  *
- * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
+ * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class JabberIqAuth extends XMPPProcessor {

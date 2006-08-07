@@ -31,7 +31,7 @@ import java.nio.channels.SocketChannel;
  *
  * Created: Sat May 14 07:00:16 2005
  *
- * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
+ * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public interface Accept {

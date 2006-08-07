@@ -31,7 +31,7 @@ import tigase.xmpp.XMPPResourceConnection;
  *
  * Created: Sat Feb 18 14:13:34 2006
  *
- * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
+ * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class ResourceConnectionCallback implements Callback {

@@ -31,7 +31,7 @@ import java.util.ArrayList;
  *
  * Created: Tue Nov 22 22:57:44 2005
  *
- * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
+ * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public abstract class AbstractComponentRegistrator

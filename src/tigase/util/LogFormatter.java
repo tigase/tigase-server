@@ -34,7 +34,7 @@ import java.util.logging.LogRecord;
  *
  * Created: Thu Jan  5 22:58:02 2006
  *
- * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
+ * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class LogFormatter extends Formatter {

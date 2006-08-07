@@ -42,7 +42,7 @@ import tigase.util.JID;
  *
  * Created: Tue Feb 21 18:05:53 2006
  *
- * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
+ * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class Roster {

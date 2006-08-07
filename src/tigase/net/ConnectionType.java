@@ -28,7 +28,7 @@ package tigase.net;
  *
  * Created: Sun Feb  5 09:26:44 2006
  *
- * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
+ * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public enum ConnectionType {

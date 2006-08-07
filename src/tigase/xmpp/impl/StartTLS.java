@@ -37,7 +37,7 @@ import tigase.xmpp.XMPPResourceConnection;
  *
  * Created: Fri Mar 24 07:22:57 2006
  *
- * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
+ * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class StartTLS extends XMPPProcessor {

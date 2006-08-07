@@ -54,7 +54,7 @@ import tigase.xmpp.XMPPIOServiceListener;
  *
  * Created: Sun Jan 22 22:52:58 2006
  *
- * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
+ * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public abstract class ConnectionManager extends AbstractMessageReceiver

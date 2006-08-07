@@ -31,7 +31,7 @@ import tigase.server.Packet;
  *
  * Created: Wed Feb  8 13:47:56 2006
  *
- * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
+ * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public interface XMPPProcessorIfc {

@@ -32,7 +32,7 @@ import javax.security.auth.login.Configuration;
  *
  * Created: Fri Feb 17 16:47:02 2006
  *
- * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
+ * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class TigaseConfiguration extends Configuration {

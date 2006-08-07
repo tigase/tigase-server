@@ -38,7 +38,7 @@ import tigase.util.JID;
  *
  * Created: Tue Mar 21 06:45:51 2006
  *
- * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
+ * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class JabberIqVersion extends XMPPProcessor {

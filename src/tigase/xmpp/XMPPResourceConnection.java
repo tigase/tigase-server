@@ -40,7 +40,7 @@ import javax.security.auth.login.LoginException;
  *
  * Created: Wed Feb  8 22:30:37 2006
  *
- * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
+ * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class XMPPResourceConnection {

@@ -41,7 +41,7 @@ import tigase.xml.SingletonFactory;
  *
  * Created: Tue Feb  7 07:15:02 2006
  *
- * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
+ * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class XMPPIOService extends IOService {
