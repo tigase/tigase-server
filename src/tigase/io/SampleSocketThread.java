@@ -121,9 +121,6 @@ public class SampleSocketThread extends Thread {
 					if ((sk.readyOps() & SelectionKey.OP_ACCEPT) != 0) {
 						ServerSocketChannel nextReady = (ServerSocketChannel)sk.channel();
 						SocketChannel sc = nextReady.accept();
-						sc.configureBlocking(false);
-						sc.socket().setSoLinger(false, 0);
-						sc.socket().setReuseAddress(true);
 						log.finer("Registered new client socket: "+sc);
 						handler.handleSocketAccept(sc);
 					}

@@ -80,7 +80,7 @@ public class TelnetServer implements SampleSocketThread.SocketHandler {
 		reader.addIOInterface(ioifc);
 	}
 
-	public void handleSocketAccept(SocketChannel sc) {
+	public void handleSocketAccept(SocketChannel sc) throws IOException {
 		iosock = new SocketIO(sc);
 		reader.addIOInterface(iosock);
 	}

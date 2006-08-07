@@ -46,37 +46,54 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class TelnetClient {
+public class TelnetClient implements SampleSocketThread.SocketHandler {
 
   private static final Logger log =	Logger.getLogger("tigase.io.TelnetClient");
   private static final Charset coder = Charset.forName("UTF-8");
 
-	private ReaderThread reader = null;
-	private IOInterface io = null;
+	private SampleSocketThread reader = null;
+	private IOInterface iosock = null;
 
 	/**
 	 * Creates a new <code>TelnetClient</code> instance.
 	 *
 	 */
 	public TelnetClient(String hostname, int port) throws Exception {
+		reader = new SampleSocketThread(this);
+		reader.start();
 		SocketChannel sc =
 			SocketChannel.open(new InetSocketAddress(hostname, port));
 		// Basic channel configuration
-		sc.configureBlocking(false);
-		sc.socket().setSoLinger(false, 0);
-		sc.socket().setReuseAddress(true);
+		iosock = new SocketIO(sc);
+		reader.addIOInterface(iosock);
 		log.finer("Registered new client socket: " + sc);
-		io = new SocketIO(sc);
-		reader = new ReaderThread(io);
-		reader.start();
 	}
 
 	public void writeData(String data) throws IOException {
     ByteBuffer dataBuffer = null;
     if (data != null || data.length() > 0) {
       dataBuffer = coder.encode(CharBuffer.wrap(data));
-      io.write(dataBuffer);
+      iosock.write(dataBuffer);
     } // end of if (data == null || data.equals("")) else
+	}
+
+	public void handleSocketAccept(SocketChannel sc) {
+		// Empty, not needed any implementation for that
+	}
+
+	public void handleIOInterface(IOInterface ioifc) throws IOException {
+		ByteBuffer socketInput =
+			ByteBuffer.allocate(ioifc.getSocketChannel().socket().getReceiveBufferSize());
+		ByteBuffer tmpBuffer = ioifc.read(socketInput);
+		if (ioifc.bytesRead() > 0) {
+			tmpBuffer.flip();
+			CharBuffer cb = coder.decode(tmpBuffer);
+			tmpBuffer.clear();
+			if (cb != null) {
+				System.out.print(new String(cb.array()));
+			} // end of if (cb != null)
+		} // end of if (socketIO.bytesRead() > 0)
+		reader.addIOInterface(ioifc);
 	}
 
 	/**
@@ -89,52 +106,12 @@ public class TelnetClient {
 		String hostname = "localhost"; // We are connecting to service on
 																	 // this machine
 		TelnetClient client = new TelnetClient(hostname, port);
-		InputStreamReader reader = new InputStreamReader(System.in);
+		InputStreamReader str_reader = new InputStreamReader(System.in);
 		char[] buff = new char[1];
 		for (;;) {
-			reader.read(buff);
+			str_reader.read(buff);
 			client.writeData(new String(buff));
 		} // end of for (;;)
-	}
-
-	protected class ReaderThread extends Thread {
-
-		private Selector readerSelector = null;
-
-		public ReaderThread(IOInterface io) throws Exception {
-			super();
-			setName("ReaderThread");
-			readerSelector = Selector.open();
-			io.getSocketChannel().register(readerSelector, SelectionKey.OP_READ, io);
-		}
-
-		public void run() {
-      for (;;) {
-				try {
-					readerSelector.select();
-					for (Iterator i = readerSelector.selectedKeys().iterator(); i.hasNext();) {
-						SelectionKey sk = (SelectionKey)i.next();
-						i.remove();
-						// Read what is wating for reading
-						IOInterface s = (IOInterface)sk.attachment();
-						ByteBuffer socketInput =
-							ByteBuffer.allocate(s.getSocketChannel().socket().getReceiveBufferSize());
-						ByteBuffer tmpBuffer = s.read(socketInput);
-						if (s.bytesRead() > 0) {
-							tmpBuffer.flip();
-							CharBuffer cb = coder.decode(tmpBuffer);
-							tmpBuffer.clear();
-							if (cb != null) {
-								System.out.print(new String(cb.array()));
-							} // end of if (cb != null)
-						} // end of if (socketIO.bytesRead() > 0)
-					}
-				} catch (Exception e) {
-					log.log(Level.SEVERE, "Server I/O error, can't continue my work.", e);
-				}
-      } // end of for ()
-		}
-
 	}
 
 } // TelnetClient
