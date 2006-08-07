@@ -48,8 +48,11 @@ public class SocketIO implements IOInterface {
    * Creates a new <code>SocketIO</code> instance.
    *
    */
-  public SocketIO(final SocketChannel sock) {
+  public SocketIO(final SocketChannel sock) throws IOException {
     channel = sock;
+		channel.configureBlocking(false);
+		channel.socket().setSoLinger(false, 0);
+		channel.socket().setReuseAddress(true);
   }
 
   public SocketChannel getSocketChannel() {
