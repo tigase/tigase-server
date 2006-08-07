@@ -137,7 +137,8 @@ public class SampleSocketThread extends Thread {
         clientSel.selectNow();
         addAllWaiting();
       } catch (Exception e) {
-        log.log(Level.SEVERE, "Server I/O error, can't continue my work.", e);
+        log.log(Level.SEVERE,
+					"SampleSocketThread I/O error, can't continue my work.", e);
         stopping = true;
       }
     }
