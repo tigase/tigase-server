@@ -23,16 +23,18 @@
 package tigase.io;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
+import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
- * Describe class SimpleReaderThread here.
+ * Describe class SampleSocketThread here.
  *
  *
  * Created: Sun Aug  6 22:34:40 2006
@@ -40,38 +42,45 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class SimpleReaderThread extends Thread {
+public class SampleSocketThread extends Thread {
 
   private static final Logger log =
-		Logger.getLogger("tigase.io.SimpleReaderThread");
+		Logger.getLogger("tigase.io.SampleSocketThread");
 
   private boolean stopping = false;
 
   private final ConcurrentLinkedQueue<IOInterface> waiting =
     new ConcurrentLinkedQueue<IOInterface>();
+	private final ConcurrentLinkedQueue<InetSocketAddress> waiting_accept =
+    new ConcurrentLinkedQueue<InetSocketAddress>();
   private final ConcurrentLinkedQueue<IOInterface> for_removal =
     new ConcurrentLinkedQueue<IOInterface>();
 
-  private Selector clientsSel = null;
-	private IOInterfaceHandler handler = null;
+  private Selector clientSel = null;
+	private SocketHandler handler = null;
 
 	/**
-	 * Creates a new <code>SimpleReaderThread</code> instance.
+	 * Creates a new <code>SampleSocketThread</code> instance.
 	 *
 	 */
-	public SimpleReaderThread(IOInterfaceHandler handler) throws IOException {
+	public SampleSocketThread(SocketHandler handler) throws IOException {
 		this.handler = handler;
-		clientsSel = Selector.open();
-		setName("SimpleReaderThread");
+		clientSel = Selector.open();
+		setName("SampleSocketThread");
 	}
 
 	public void addIOInterface(IOInterface s) {
     waiting.offer(s);
-    clientsSel.wakeup();
+    clientSel.wakeup();
+	}
+
+	public void addForAccept(InetSocketAddress isa) {
+		waiting_accept.offer(isa);
+		clientSel.wakeup();
 	}
 
 	public void removeIOInterface(IOInterface s) {
-		SelectionKey key = s.getSocketChannel().keyFor(clientsSel);
+		SelectionKey key = s.getSocketChannel().keyFor(clientSel);
 		if (key != null && key.attachment() == s) {
 			key.cancel();
 		} // end of if (key != null)
@@ -82,11 +91,18 @@ public class SimpleReaderThread extends Thread {
     while ((s = waiting.poll()) != null) {
       final SocketChannel sc = s.getSocketChannel();
       try {
-        sc.register(clientsSel, SelectionKey.OP_READ, s);
+        sc.register(clientSel, SelectionKey.OP_READ, s);
 			} catch (Exception e) {
         // Ignore such channel
       } // end of try-catch
     } // end of for ()
+		InetSocketAddress isa = null;
+		while ((isa = waiting_accept.poll()) != null) {
+			ServerSocketChannel ssc = ServerSocketChannel.open();
+			ssc.configureBlocking(false);
+			ssc.socket().bind(isa);
+			ssc.register(clientSel, SelectionKey.OP_ACCEPT, null);
+		} // end of while (isa = waiting_accept.poll() != null)
   }
 
 	// Implementation of java.lang.Runnable
@@ -98,30 +114,46 @@ public class SimpleReaderThread extends Thread {
 	public void run() {
     while (!stopping) {
       try {
-        clientsSel.select();
-        for (Iterator i = clientsSel.selectedKeys().iterator(); i.hasNext();) {
+        clientSel.select();
+        for (Iterator i = clientSel.selectedKeys().iterator(); i.hasNext();) {
 					SelectionKey sk = (SelectionKey)i.next();
 					i.remove();
-          IOInterface s = (IOInterface)sk.attachment();
-					sk.cancel();
-					handler.handleIOInterface(s);
+					if ((sk.readyOps() & SelectionKey.OP_ACCEPT) != 0) {
+						ServerSocketChannel nextReady = (ServerSocketChannel)sk.channel();
+						SocketChannel sc = nextReady.accept();
+						sc.configureBlocking(false);
+						sc.socket().setSoLinger(false, 0);
+						sc.socket().setReuseAddress(true);
+						log.finer("Registered new client socket: "+sc);
+						handler.handleSocketAccept(sc);
+					}
+					if ((sk.readyOps() & SelectionKey.OP_CONNECT) != 0) {
+						// Not implemented yet
+					}
+					if ((sk.readyOps() & SelectionKey.OP_READ) != 0) {
+						IOInterface s = (IOInterface)sk.attachment();
+						sk.cancel();
+						handler.handleIOInterface(s);
+					}
         }
 				// Clean-up cancelled keys...
-        clientsSel.selectNow();
+        clientSel.selectNow();
         addAllWaiting();
       } catch (Exception e) {
         log.log(Level.SEVERE, "Server I/O error, can't continue my work.", e);
         stopping = true;
       }
     }
-    System.err.println("SimpleReaderThread stopped!");
+    System.err.println("SampleSocketThread stopped!");
     System.exit(2);
 	}
 
-	public interface IOInterfaceHandler {
+	public interface SocketHandler {
 
-		void handleIOInterface(IOInterface ioIfc);
+		void handleIOInterface(IOInterface ioIfc) throws IOException;
+
+		void handleSocketAccept(SocketChannel sc) throws IOException;
 
 	}
 
-} // SimpleReaderThread
+} // SampleSocketThread
