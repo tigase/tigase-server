@@ -51,6 +51,15 @@ public class TelnetClient implements SampleSocketThread.SocketHandler {
   private static final Logger log =	Logger.getLogger("tigase.io.TelnetClient");
   private static final Charset coder = Charset.forName("UTF-8");
 
+	private static int port = 7777;
+	private static String hostname = "localhost";
+	private static boolean debug = false;
+	private static String file = null;
+	private static boolean continuous = false;
+	private static long delay = 100;
+	private static boolean ssl = false;
+	private static String sslId = "TelnetClient";
+
 	private SampleSocketThread reader = null;
 	private IOInterface iosock = null;
 
@@ -65,6 +74,10 @@ public class TelnetClient implements SampleSocketThread.SocketHandler {
 			SocketChannel.open(new InetSocketAddress(hostname, port));
 		// Basic channel configuration
 		iosock = new SocketIO(sc);
+		if (ssl) {
+			iosock = new TLSIO(iosock,
+				new TLSWrapper(TLSUtil.getSSLContext(sslId, "SSL"), false));
+		} // end of if (ssl)
 		reader.addIOInterface(iosock);
 		log.finer("Registered new client socket: " + sc);
 	}
@@ -102,9 +115,11 @@ public class TelnetClient implements SampleSocketThread.SocketHandler {
 	 * @param args a <code>String[]</code> value
 	 */
 	public static void main(final String[] args) throws Exception {
-		int port = 7777; // We are connecting to service on this port number.
-		String hostname = "localhost"; // We are connecting to service on
-																	 // this machine
+		parseParams(args);
+		if (ssl) {
+			TLSUtil.configureSSLContext(sslId, "certs/keystore", "keystore",
+				"certs/truststore", "truststore");
+		} // end of if (ssl)
 		TelnetClient client = new TelnetClient(hostname, port);
 		InputStreamReader str_reader = new InputStreamReader(System.in);
 		char[] buff = new char[1];
@@ -113,5 +128,102 @@ public class TelnetClient implements SampleSocketThread.SocketHandler {
 			client.writeData(new String(buff));
 		} // end of for (;;)
 	}
+
+	public static String help() {
+    return "\n"
+      + "Parameters:\n"
+      + " -?                this help message\n"
+			+ " -h hostname       host name\n"
+      + " -p port           port number\n"
+			+ " -ssl              turn SSL on for all connections\n"
+			+ " -f file           file with content to send to remote host\n"
+			+ " -c                continuous sending file content\n"
+			+ " -t millis         delay between sending file content\n"
+      + " -v                prints server version info\n"
+      + " -d [true|false]   turn on|off debug mode\n"
+      ;
+  }
+
+  public static String version() {
+    return "\n"
+      + "-- \n"
+      + "Tigase XMPP Telnet, version: "
+      + TelnetClient.class.getPackage().getImplementationVersion() + "\n"
+      + "Author:	Artur Hefczyc <artur.hefczyc@tigase.org>\n"
+      + "-- \n"
+      ;
+  }
+
+  public static void parseParams(final String[] args) throws Exception {
+    if (args != null && args.length > 0) {
+      for (int i = 0; i < args.length; i++) {
+        if (args[i].equals("-?")) {
+          System.out.print(help());
+          System.exit(0);
+        } // end of if (args[i].equals("-h"))
+        if (args[i].equals("-v")) {
+          System.out.print(version());
+          System.exit(0);
+        } // end of if (args[i].equals("-h"))
+        if (args[i].equals("-f")) {
+          if (i+1 == args.length) {
+            System.out.print(help());
+            System.exit(1);
+          } // end of if (i+1 == args.length)
+          else {
+            file = args[++i];
+          } // end of else
+        } // end of if (args[i].equals("-h"))
+        if (args[i].equals("-h")) {
+          if (i+1 == args.length) {
+            System.out.print(help());
+            System.exit(1);
+          } // end of if (i+1 == args.length)
+          else {
+            hostname = args[++i];
+          } // end of else
+        } // end of if (args[i].equals("-h"))
+        if (args[i].equals("-p")) {
+          if (i+1 == args.length) {
+            System.out.print(help());
+            System.exit(1);
+          } // end of if (i+1 == args.length)
+          else {
+            port = Integer.decode(args[++i]);
+          } // end of else
+        } // end of if (args[i].equals("-h"))
+        if (args[i].equals("-d")) {
+          if (i+1 == args.length || args[i+1].startsWith("-")) {
+            debug = true;
+          } // end of if (i+1 == args.length)
+          else {
+            ++i;
+            debug = args[i].charAt(0) != '-' &&
+              (args[i].equals("true") || args[i].equals("yes"));
+          } // end of else
+        } // end of if (args[i].equals("-d"))
+        if (args[i].equals("-c")) {
+          if (i+1 == args.length || args[i+1].startsWith("-")) {
+            continuous = true;
+          } // end of if (i+1 == args.length)
+          else {
+            ++i;
+            continuous = args[i].charAt(0) != '-' &&
+              (args[i].equals("true") || args[i].equals("yes"));
+          } // end of else
+        } // end of if (args[i].equals("-c"))
+        if (args[i].equals("-ssl")) {
+          if (i+1 == args.length || args[i+1].startsWith("-")) {
+            ssl = true;
+          } // end of if (i+1 == args.length)
+          else {
+            ++i;
+            ssl = args[i].charAt(0) != '-' &&
+              (args[i].equals("true") || args[i].equals("yes"));
+          } // end of else
+        } // end of if (args[i].equals("-ssl"))
+      } // end of for (int i = 0; i < args.length; i++)
+    }
+  }
 
 } // TelnetClient
