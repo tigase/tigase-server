@@ -53,6 +53,7 @@ public class TelnetServer implements SampleSocketThread.SocketHandler {
   private static final Charset coder = Charset.forName("UTF-8");
 
 	private SampleSocketThread reader = null;
+	private IOInterface iosock = null;
 
 	/**
 	 * Creates a new <code>TelnetServer</code> instance.
@@ -61,6 +62,7 @@ public class TelnetServer implements SampleSocketThread.SocketHandler {
 	public TelnetServer(int port) throws IOException {
 		reader = new SampleSocketThread(this);
 		reader.start();
+		reader.addForAccept(new InetSocketAddress(port));
 	}
 
 	public void handleIOInterface(IOInterface ioifc) throws IOException {
@@ -79,11 +81,23 @@ public class TelnetServer implements SampleSocketThread.SocketHandler {
 	}
 
 	public void handleSocketAccept(SocketChannel sc) {
-		
+		iosock = new SocketIO(sc);
+		reader.addIOInterface(iosock);
 	}
 
-	public void run() {
-		
+	public void run() throws IOException {
+		InputStreamReader reader = new InputStreamReader(System.in);
+		char[] buff = new char[1];
+		for (;;) {
+			reader.read(buff);
+			if (iosock != null) {
+				ByteBuffer dataBuffer = coder.encode(CharBuffer.wrap(buff));
+				iosock.write(dataBuffer);
+			} // end of if (ioscok != null)
+			else {
+				System.err.println("Can't write to socket, no open socket.");
+			} // end of if (ioscok != null) else
+		} // end of for (;;)
 	}
 
 	/**
