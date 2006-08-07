@@ -54,13 +54,11 @@ public class TLSWrapper {
   private int netBuffSize = 0;
   private int appBuffSize = 0;
   private String protocol = null;
-
   /**
    * Creates a new <code>TLSWrapper</code> instance.
    *
    */
   public TLSWrapper(SSLContext sslc, boolean clientMode) {
-    this.protocol = protocol;
     tlsEngine = sslc.createSSLEngine();
     tlsEngine.setUseClientMode(clientMode);
     netBuffSize = tlsEngine.getSession().getPacketBufferSize();
@@ -116,33 +114,28 @@ public class TLSWrapper {
     ByteBuffer out = app;
       out = resizeApplicationBuffer(out);
       tlsEngineResult = tlsEngine.unwrap(net, out);
-      log.finest(protocol + " - unwrap() \ntlsEngineRsult.getStatus() = "
+      log.finest("unwrap() \ntlsEngineRsult.getStatus() = "
         + tlsEngineResult.getStatus()
         + "\ntlsEngineRsult.getHandshakeStatus() = "
         + tlsEngineResult.getHandshakeStatus());
       if (tlsEngineResult.getHandshakeStatus() == HandshakeStatus.NEED_TASK) {
         doTasks();
-        log.finest(protocol + " - unwrap() doTasks(), handshake: " +
-          tlsEngine.getHandshakeStatus());
+        log.finest("unwrap() doTasks(), handshake: " +
+					tlsEngine.getHandshakeStatus());
       }
     return out;
   }
 
   public void wrap(ByteBuffer app, ByteBuffer net) throws SSLException {
     tlsEngineResult = tlsEngine.wrap(app, net);
-    log.finest(protocol + " - wrap() \ntlsEngineRsult.getStatus() = "
+    log.finest("wrap() \ntlsEngineRsult.getStatus() = "
       + tlsEngineResult.getStatus()
       + "\ntlsEngineRsult.getHandshakeStatus() = "
       + tlsEngineResult.getHandshakeStatus());
     if (tlsEngineResult.getHandshakeStatus() == HandshakeStatus.NEED_TASK) {
       doTasks();
-      log.finest(protocol + " - wrap() doTasks(): " +
-        tlsEngine.getHandshakeStatus());
+      log.finest("wrap() doTasks(): " + tlsEngine.getHandshakeStatus());
     }
-  }
-
-  public String getProtocol() {
-    return protocol;
   }
 
   /**

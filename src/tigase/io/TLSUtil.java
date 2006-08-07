@@ -50,6 +50,17 @@ public abstract class TLSUtil {
 		sslContexts.put(id, sslCC);
   }
 
+  public static void configureSSLContext(String id,
+		String k_store, String k_passwd) {
+		SSLContextContainer sslCC =	new SSLContextContainer(k_store, k_passwd);
+		sslContexts.put(id, sslCC);
+	}
+
+  public static void configureSSLContext(String id) {
+		SSLContextContainer sslCC =	new SSLContextContainer();
+		sslContexts.put(id, sslCC);
+	}
+
 	public static SSLContext getSSLContext(String id, String protocol) {
 		return sslContexts.get(id).getSSLContext(protocol);
 	}

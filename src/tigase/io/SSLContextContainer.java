@@ -23,16 +23,18 @@
 package tigase.io;
 
 import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.security.KeyStore;
 import java.security.SecureRandom;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
 
 /**
  * Describe class SSLContextContainer here.
@@ -54,22 +56,41 @@ public class SSLContextContainer {
 	private KeyManagerFactory kmf = null;
 	private TrustManagerFactory tmf = null;
 
+	public SSLContextContainer() {
+		log.config("Initializing SSL library (trust all certs mode)...");
+		init(null, null, null, null);
+	}
+
+	public SSLContextContainer(String k_store, String k_passwd) {
+		log.config("Initializing SSL library (trust all certs mode)...");
+		init(k_store, k_passwd, null, null);
+	}
+
 	public SSLContextContainer(String k_store, String k_passwd,
 		String t_store, String t_passwd) {
 
 		log.config("Initializing SSL library...");
-		final char[] keys_password = k_passwd.toCharArray();
-		final char[] trusts_password = t_passwd.toCharArray();
-		try {
-			final KeyStore keys = KeyStore.getInstance("JKS");
-			keys.load(new	FileInputStream(k_store),	keys_password);
-			final KeyStore trusts = KeyStore.getInstance("JKS");
-			trusts.load(new	FileInputStream(t_store), trusts_password);
+		init(k_store, k_passwd, t_store, t_passwd);
+	}
 
-			kmf = KeyManagerFactory.getInstance("SunX509");
-			kmf.init(keys, keys_password);
-			tmf = TrustManagerFactory.getInstance("SunX509");
-			tmf.init(trusts);
+	private void init(String k_store, String k_passwd,
+		String t_store, String t_passwd) {
+		try {
+			if (k_store != null && k_passwd != null) {
+				final KeyStore keys = KeyStore.getInstance("JKS");
+				final char[] keys_password = k_passwd.toCharArray();
+				keys.load(new	FileInputStream(k_store),	keys_password);
+				kmf = KeyManagerFactory.getInstance("SunX509");
+				kmf.init(keys, keys_password);
+			} // end of if (k_store != null && k_passwd != null)
+
+			if (t_store != null && t_passwd != null) {
+				final KeyStore trusts = KeyStore.getInstance("JKS");
+				final char[] trusts_password = t_passwd.toCharArray();
+				trusts.load(new	FileInputStream(t_store), trusts_password);
+				tmf = TrustManagerFactory.getInstance("SunX509");
+				tmf.init(trusts);
+			} // end of if (t_store != null && t_passwd != null)
 
 			secureRandom = new SecureRandom();
 			secureRandom.nextInt();
@@ -86,8 +107,14 @@ public class SSLContextContainer {
 		if (sslContext == null) {
 			try {
 				sslContext = SSLContext.getInstance(protocol);
-				sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(),
-					secureRandom);
+				if (kmf != null && tmf != null) {
+					sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(),
+						secureRandom);
+				} // end of if (kmf != null && tmf != null)
+				else {
+					sslContext.init(kmf != null ? kmf.getKeyManagers() : null,
+						new X509TrustManager[] {new FakeTrustManager()}, secureRandom);
+				} // end of if (kmf != null && tmf != null) else
 				sslContexts.put(protocol, sslContext);
 				log.config("Created SSL context for: " + sslContext.getProtocol());
 			} // end of try
@@ -98,5 +125,25 @@ public class SSLContextContainer {
 		} // end of if (sslContext == null)
 		return sslContext;
 	}
+
+  private class FakeTrustManager implements X509TrustManager {
+
+    private X509Certificate[] acceptedIssuers = null;
+
+    public FakeTrustManager(X509Certificate[] ai) { acceptedIssuers = ai; }
+
+    public FakeTrustManager() { }
+
+    // Implementation of javax.net.ssl.X509TrustManager
+
+    public void checkClientTrusted(final X509Certificate[] x509CertificateArray,
+      final String string) throws CertificateException { }
+
+    public void checkServerTrusted(final X509Certificate[] x509CertificateArray,
+      final String string) throws CertificateException { }
+
+    public X509Certificate[] getAcceptedIssuers() { return acceptedIssuers; }
+
+  }
 
 } // SSLContextContainer
