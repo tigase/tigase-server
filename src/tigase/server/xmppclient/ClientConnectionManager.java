@@ -46,7 +46,7 @@ import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPIOService;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
-import tigase.net.IOService;
+//import tigase.net.IOService;
 import tigase.net.SocketReadThread;
 
 /**
@@ -271,11 +271,11 @@ public class ClientConnectionManager extends ConnectionManager {
 			+ " xmlns:stream='http://etherx.jabber.org/streams'>";
 	}
 
-	public void serviceStopped(final IOService service) {
+	public void serviceStopped(XMPPIOService service) {
 		super.serviceStopped(service);
-		XMPPIOService serv = (XMPPIOService)service;
+		//		XMPPIOService serv = (XMPPIOService)service;
 		addOutPacket(Command.STREAM_CLOSED.getPacket(
-									 JID.getJID(getName(), getDefHostName(), getUniqueId(serv)),
+									 JID.getJID(getName(), getDefHostName(), getUniqueId(service)),
 									 routings.computeRouting(null), StanzaType.set, "sess1"));
 	}
 

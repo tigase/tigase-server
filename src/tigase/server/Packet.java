@@ -248,4 +248,12 @@ public class Packet {
 		return new Packet(copy);
 	}
 
+	public Packet swapElemFromTo(final StanzaType type) {
+		Element copy = (Element)elem.clone();
+		copy.setAttribute("to", getElemFrom());
+		copy.setAttribute("from", getElemTo());
+		copy.setAttribute("type", type.toString());
+		return new Packet(copy);
+	}
+
 }

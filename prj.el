@@ -10,11 +10,14 @@
      "$PROJECTS_HOME/tigase/server/classes/"
      "$PROJECTS_HOME/tigase/server/libs/junit.jar"
      "$PROJECTS_HOME/tigase/server/libs/tigase-xmltools.jar"
+     "$PROJECTS_HOME/tigase/server/libs/tigase-utils.jar"
      )))
  '(jde-sourcepath
    (quote
     (
      "$PROJECTS_HOME/tigase/server/src"
+     "$PROJECTS_HOME/tigase/xmltools/src"
+     "$PROJECTS_HOME/tigase/utils/src"
      "$PROJECTS_HOME/tigase/server/tests/unittests/src"
      "$JAVA_HOME/share/src"
      "$JAVA_HOME/share/tests/src")))

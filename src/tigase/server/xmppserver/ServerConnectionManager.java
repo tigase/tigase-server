@@ -24,13 +24,29 @@
 
 package tigase.server.xmppserver;
 
+
+//import tigase.net.IOService;
+import java.io.IOException;
 import java.util.Map;
 import java.util.Queue;
-
-import tigase.server.AbstractMessageReceiver;
+import java.util.UUID;
+import java.util.LinkedList;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import tigase.net.SocketReadThread;
+import tigase.server.ConnectionManager;
 import tigase.server.MessageReceiver;
-import tigase.server.XMPPService;
 import tigase.server.Packet;
+import tigase.server.XMPPService;
+import tigase.util.JID;
+import tigase.xml.Element;
+import tigase.xmpp.StanzaType;
+import tigase.xmpp.XMPPIOService;
+import tigase.xmpp.XMPPProcessorIfc;
+import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.ProcessorFactory;
 
 /**
  * Class ServerConnectionManager
@@ -41,10 +57,198 @@ import tigase.server.Packet;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class ServerConnectionManager extends AbstractMessageReceiver {
+public class ServerConnectionManager extends ConnectionManager {
+
+	/**
+   * Variable <code>log</code> is a class logger.
+   */
+  private static final Logger log =
+    Logger.getLogger("tigase.server.xmppserver.ServerConnectionManager");
+
+	public static final String COMPONENTS_PROP_KEY = "components";
+	public static final String[] COMPONENTS_PROP_VAL =
+	{
+		"urn:ietf:params:xml:ns:xmpp-sasl", "jabber:iq:version",
+		"jabber:iq:stats", "starttls", "jabber:server"
+	};
+	public static final String HOSTNAMES_PROP_KEY = "hostnames";
+	public static final String[] HOSTNAMES_PROP_VAL =
+	{"localhost", "tigase.org", "hefczyc.net"};
+
+	private String[] hostnames = HOSTNAMES_PROP_VAL;
+
 	//	implements XMPPService {
 
+	private Map<String, XMPPProcessorIfc> processors =
+		new ConcurrentSkipListMap<String, XMPPProcessorIfc>();
+	private Map<String, XMPPResourceConnection> connectionsByFrom =
+		new ConcurrentSkipListMap<String, XMPPResourceConnection>();
+	private Map<String, XMPPResourceConnection> connectionsByTo =
+		new ConcurrentSkipListMap<String, XMPPResourceConnection>();
+
 	public void processPacket(Packet packet) {
+		log.finer("Processing packet: " + packet.getElemName()
+			+ ", type: " + packet.getType());
+		log.finest("Processing packet: " + packet.getStringData());
+		if (packet.isCommand()) {
+			processCommand(packet);
+		} else {
+			writePacketToSocket(packet);
+		} // end of else
+	}
+
+	private void processCommand(final Packet packet) {
+		XMPPIOService serv = getXMPPIOService(packet);
+		switch (packet.getCommand()) {
+		case STARTTLS:
+			if (serv != null) {
+				log.finer("Starting TLS for connection: " + serv.getUniqueId());
+				try {
+					// Note:
+					// If you send <proceed> packet to client you must expect
+					// instant response from the client with TLS handshaking data
+					// before you will call startTLS() on server side.
+					// So the initial handshaking data might be lost as they will
+					// be processed in another thread reading data from the socket.
+					// That's why below code first removes service from reading
+					// threads pool and then sends <proceed> packet and starts TLS.
+					SocketReadThread readThread = SocketReadThread.getInstance();
+					readThread.removeSocketService(serv);
+					Element proceed = packet.getElement().getChild("proceed");
+					log.finest("Packet: " + packet.getElement().toString());
+					Packet p_proceed = new Packet(proceed);
+					serv.addPacketToSend(p_proceed);
+					serv.processWaitingPackets();
+					serv.startTLS(false);
+					readThread.addSocketService(serv);
+				} catch (IOException e) {
+					log.warning("Error starting TLS: " + e);
+				} // end of try-catch
+			} else {
+				log.warning("Can't find sevice for STARTTLS command: " +
+					packet.getStringData());
+			} // end of else
+			break;
+		case STREAM_CLOSED:
+
+			break;
+		case GETDISCO:
+
+			break;
+		case CLOSE:
+			if (serv != null) {
+				try {
+					serv.stop();
+				} // end of try
+				catch (IOException e) {
+					log.log(Level.WARNING, "Error stopping service: ", e);
+				} // end of try-catch
+			} // end of if (serv != null)
+			else {
+				log.fine("Attempt to stop non-existen service for packet: "
+					+ packet.getStringData()
+					+ ", Service already stopped?");
+			} // end of if (serv != null) else
+			break;
+		default:
+			break;
+		} // end of switch (pc.getCommand())
+	}
+
+	private XMPPResourceConnection getXMPPSession(Packet p) {
+		XMPPIOService serv = getXMPPIOService(p);
+		return serv == null ? null :
+			(XMPPResourceConnection)serv.getSessionData().get("xmpp-session");
+	}
+
+	public Queue<Packet> processSocketData(String id,
+		ConcurrentMap<String, Object> sessionData, Queue<Packet> packets) {
+// 		Queue<Packet> results = new LinkedList<Packet>();
+		Packet p = null;
+		while ((p = packets.poll()) != null) {
+			log.finer("Processing packet: " + p.getElemName()
+				+ ", type: " + p.getType());
+			log.finest("Processing socket data: " + p.getStringData());
+			p.setFrom(JID.getJID(getName(), getDefHostName(), id));
+			p.setTo(p.getElemTo());
+			addOutPacket(p);
+			// 			results.offer(new Packet(new Element("OK")));
+		} // end of while ()
+// 		return results;
+		return null;
+	}
+
+	public String xmppStreamOpened(XMPPIOService serv,
+		Map<String, String> attribs) {
+		XMPPProcessorIfc proc = processors.get("jabber:server:dialback");
+		String remote_id = attribs.get("id");
+		if (remote_id != null) {
+			XMPPResourceConnection conn = connectionsByTo.get("Remote IP Address???");
+			conn.setSessionId(remote_id);
+			if (proc != null) {
+				Queue<Packet> results = new LinkedList<Packet>();
+				proc.process(null, conn, results);
+				try {
+					writePacketsToSocket(serv, results);
+				} // end of try
+				catch (IOException e) {
+					log.log(Level.WARNING, "Can not send response to remote server.", e);
+				} // end of try-catch
+			} // end of if (proc != null)
+			else {
+				// Server MUST generate an <invalid-namespace/> stream error condition
+				// and terminate both the XML stream and the underlying TCP connection.
+			} // end of if (proc != null) else
+			return null;
+		} // end of if (remote_id != null)
+		else {
+			log.finer("Stream opened: " + attribs.toString());
+			final String id = UUID.randomUUID().toString();
+			serv.getSessionData().put(serv.SESSION_ID, id);
+			return "<stream:stream"
+				+ " xmlns:stream='http://etherx.jabber.org/streams'"
+				+ " xmlns='jabber:server'"
+				+ (proc != null ? " xmlns:db='jabber:server:dialback'" : "")
+				+ " id='" + id + "'"
+				+ ">"
+				;
+		} // end of if (remote_id != null) else
+	}
+
+	public void xmppStreamClosed(XMPPIOService serv) {
+		log.finer("Stream closed.");
+	}
+
+	protected String getUniqueId(XMPPIOService serv) {
+		return serv.getRemoteHost();
+	}
+
+	protected String getServiceId(Packet packet) {
+		return JID.getNodeHost(packet.getTo());
+	}
+
+	public Map<String, Object> getDefaults() {
+		Map<String, Object> props = super.getDefaults();
+		props.put(HOSTNAMES_PROP_KEY, HOSTNAMES_PROP_VAL);
+		props.put(COMPONENTS_PROP_KEY, COMPONENTS_PROP_VAL);
+		return props;
+	}
+
+	public void setProperties(Map<String, Object> props) {
+		super.setProperties(props);
+		String[] components = (String[])props.get(COMPONENTS_PROP_KEY);
+		processors.clear();
+		for (String comp_id: components) {
+			XMPPProcessorIfc proc = ProcessorFactory.getProcessor(comp_id);
+			processors.put(comp_id, proc);
+			log.config("Added processor: " + proc.getClass().getSimpleName()
+				+ " for component id: " + comp_id);
+		} // end of for (String comp_id: components)
+		hostnames = (String[])props.get(HOSTNAMES_PROP_KEY);
+		if (hostnames == null || hostnames.length == 0) {
+			log.warning("Hostnames definition is empty, setting 'localhost'");
+			hostnames = new String[] {"localhost"};
+		} // end of if (hostnames == null || hostnames.length == 0)
 	}
 
 }
