@@ -168,7 +168,7 @@ public class Configurator extends AbstractComponentRegistrator
 	 */
 	public static void main(final String[] args) throws Exception {
 
-		Logger log = Logger.global.getParent();
+		Logger log = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).getParent();
 		ConsoleHandler console = new ConsoleHandler();
     console.setLevel(Level.WARNING);
     log.addHandler(console);
