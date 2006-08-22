@@ -76,11 +76,15 @@ public abstract class IOService implements Callable<IOService> {
    * As it is used by many components it is required that all components access
    * session ID with this constant.
    */
-  public static final String SESSION_ID = "sessionID";
+  public static final String SESSION_ID_KEY = "sessionID";
+	public static final String PORT_TYPE_PROP_KEY = "type";
 
   private IOInterface socketIO = null;
 	private String sslId = null;
 	private String id = null;
+	private ConnectionType connectionType = null;
+	private String local_address = null;
+	private String remote_address = null;
 
 	private IOServiceListener serviceListener = null;
 
@@ -120,12 +124,18 @@ public abstract class IOService implements Callable<IOService> {
 		return id;
 	}
 
+	public ConnectionType connectionType() {
+		return this.connectionType;
+	}
+
 	public ConcurrentMap<String, Object> getSessionData() {
 		return sessionData;
 	}
 
 	public void setSessionData(Map<String, Object> props) {
 		sessionData = new ConcurrentHashMap<String, Object>(props);
+		connectionType =
+			ConnectionType.valueOf(sessionData.get(PORT_TYPE_PROP_KEY).toString());
 	}
 
   /**
@@ -137,9 +147,12 @@ public abstract class IOService implements Callable<IOService> {
     return socketIO == null ? false : socketIO.isConnected();
   }
 
-	public String getRemoteHost() {
-		return
-			socketIO.getSocketChannel().socket().getInetAddress().getHostAddress();
+	public String getRemoteAddress() {
+		return remote_address;
+	}
+
+	public String getLocalAddress() {
+		return local_address;
 	}
 
 	/**
@@ -156,10 +169,10 @@ public abstract class IOService implements Callable<IOService> {
     socketInput =
       ByteBuffer.allocate(socketChannel.socket().getReceiveBufferSize());
 		Socket sock = socketIO.getSocketChannel().socket();
-		InetAddress local = sock.getLocalAddress();
-		InetAddress remote = sock.getInetAddress();
-		id = local.getHostAddress() + "_" + sock.getLocalPort()
-			+ "_" + remote.getHostAddress() + "_" + sock.getPort();
+		local_address = sock.getLocalAddress().getHostAddress();
+		remote_address = sock.getInetAddress().getHostAddress();
+		id = local_address + "_" + sock.getLocalPort()
+			+ "_" + remote_address + "_" + sock.getPort();
   }
 
   /**
