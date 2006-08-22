@@ -254,7 +254,7 @@ public class ClientConnectionManager extends ConnectionManager {
 		if (hostname != null) {
 			sb.append("<hostname>" + hostname + "</hostname>");
 		} // end of if (hostname != null)
-		serv.getSessionData().put(serv.SESSION_ID, id);
+		serv.getSessionData().put(serv.SESSION_ID_KEY, id);
 		addOutPacket(Command.STREAM_OPENED.getPacket(
 									 JID.getJID(getName(), getDefHostName(), getUniqueId(serv)),
 									 routings.computeRouting(hostname), StanzaType.set, "sess1",
