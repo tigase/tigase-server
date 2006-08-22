@@ -72,6 +72,9 @@ public class XMPPResourceConnection {
 
 	private String domain = null;
 
+	/**
+	 * This variable is to keep relates XMPPIOService ID only.
+	 */
 	private String connectionId = null;
 
 	private int priority = 0;
