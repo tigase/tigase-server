@@ -137,7 +137,7 @@ public class ComponentConnectionManager extends ConnectionManager {
 		Map<String, String> attribs) {
 		log.finer("Stream opened: " + attribs.toString());
 		String id = UUID.randomUUID().toString();
-		serv.getSessionData().put(serv.SESSION_ID, id);
+		serv.getSessionData().put(serv.SESSION_ID_KEY, id);
 		return "<stream:stream version='1.0' xml:lang='en'"
 			+ " to='kobit'"
 			+ " id='" + id + "'"
