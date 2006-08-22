@@ -47,6 +47,7 @@ import tigase.net.SocketType;
 import tigase.util.JID;
 import tigase.xmpp.XMPPIOService;
 import tigase.xmpp.XMPPIOServiceListener;
+import tigase.annotations.TODO;
 
 /**
  * Describe class ConnectionManager here.
@@ -287,6 +288,7 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 		}
 	}
 
+	@TODO(note="Do something if service with the same unique ID is already started, possibly kill the old one...")
 	public void serviceStarted(final IOService service) {
 		synchronized(services) {
 			log.finer(">>" + getName() +
