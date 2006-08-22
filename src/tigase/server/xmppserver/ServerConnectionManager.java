@@ -81,6 +81,7 @@ public class ServerConnectionManager extends ConnectionManager {
 
 	private Map<String, XMPPProcessorIfc> processors =
 		new ConcurrentSkipListMap<String, XMPPProcessorIfc>();
+
 	private Map<String, XMPPResourceConnection> connectionsByFrom =
 		new ConcurrentSkipListMap<String, XMPPResourceConnection>();
 	private Map<String, XMPPResourceConnection> connectionsByTo =
@@ -204,7 +205,7 @@ public class ServerConnectionManager extends ConnectionManager {
 		else {
 			log.finer("Stream opened: " + attribs.toString());
 			final String id = UUID.randomUUID().toString();
-			serv.getSessionData().put(serv.SESSION_ID, id);
+			serv.getSessionData().put(serv.SESSION_ID_KEY, id);
 			return "<stream:stream"
 				+ " xmlns:stream='http://etherx.jabber.org/streams'"
 				+ " xmlns='jabber:server'"
@@ -220,7 +221,7 @@ public class ServerConnectionManager extends ConnectionManager {
 	}
 
 	protected String getUniqueId(XMPPIOService serv) {
-		return serv.getRemoteHost();
+		return serv.getRemoteAddress() + "-" + serv.connectionType().toString();
 	}
 
 	protected String getServiceId(Packet packet) {
