@@ -23,6 +23,7 @@
 package tigase.io;
 
 import java.io.ByteArrayInputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
@@ -101,6 +102,17 @@ public class TelnetServer implements SampleSocketThread.SocketHandler {
 				new TLSWrapper(TLSUtil.getSSLContext(sslId, "SSL"), false));
 		} // end of if (ssl)
 		reader.addIOInterface(iosock);
+		if (file != null) {
+			FileReader fr = new FileReader(file);
+			char[] file_buff = new char[64*1024];
+			int res = -1;
+			while ((res = fr.read(file_buff)) != -1) {
+				ByteBuffer dataBuffer =
+					coder.encode(CharBuffer.wrap(file_buff, 0, res));
+				iosock.write(dataBuffer);
+			} // end of while ((res = fr.read(buff)) != -1)
+			fr.close();
+		} // end of if (file != null)
 	}
 
 	public void run() throws IOException {
