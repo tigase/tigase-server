@@ -47,7 +47,7 @@ public class Dialback extends XMPPProcessor {
 	protected static final String ID = XMLNS + ":dialback";
   protected static final String[] ELEMENTS =
 	{"db:result", "db:verify"};
-  protected static final String[] XMLNSS = {XMLNS};
+  protected static final String[] XMLNSS = {XMLNS, XMLNS};
 
 	public String id() { return ID; }
 

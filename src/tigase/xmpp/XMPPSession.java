@@ -96,6 +96,18 @@ public class XMPPSession {
 		return result;
 	}
 
+	public XMPPResourceConnection getResourceForJID(final String jid) {
+		final String resource = JID.getNodeResource(jid);
+		if (resource.length() > 0) {
+			for (XMPPResourceConnection conn: activeResources) {
+				if (resource.equals(conn.getResource())) {
+					return conn;
+				} // end of if (resource.equals(conn.getResource()))
+			} // end of for (XMPPResourceConnection conn: activeResources)
+		} // end of if (resource.length() > 0)
+		return null;
+	}
+
 	public XMPPResourceConnection getResourceConnection(final String jid) {
 
 		if (activeResources.size() == 0) {
@@ -106,14 +118,8 @@ public class XMPPSession {
 			return activeResources.get(0);
 		} // end of if (activeResources.size() == 1)
 
-		final String resource = JID.getNodeResource(jid);
-		if (resource.length() > 0) {
-			for (XMPPResourceConnection conn: activeResources) {
-				if (resource.equals(conn.getResource())) {
-					return conn;
-				} // end of if (resource.equals(conn.getResource()))
-			} // end of for (XMPPResourceConnection conn: activeResources)
-		} // end of if (resource.length() > 0)
+		XMPPResourceConnection conn = getResourceForJID(jid);
+		if (conn != null) {	return conn; } // end of if (conn != null)
 
 		// There is no active resource for this jid, so let's return
 		// connection with the highest priority:

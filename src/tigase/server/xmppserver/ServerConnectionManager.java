@@ -27,14 +27,20 @@ package tigase.server.xmppserver;
 
 //import tigase.net.IOService;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 import java.util.UUID;
-import java.util.LinkedList;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.security.auth.login.AppConfigurationEntry.LoginModuleControlFlag;
+import javax.security.auth.login.AppConfigurationEntry;
+import tigase.auth.CommitHandler;
+import tigase.auth.TigaseConfiguration;
+import tigase.db.UserRepository;
 import tigase.net.SocketReadThread;
 import tigase.server.ConnectionManager;
 import tigase.server.MessageReceiver;
@@ -42,11 +48,12 @@ import tigase.server.Packet;
 import tigase.server.XMPPService;
 import tigase.util.JID;
 import tigase.xml.Element;
+import tigase.xmpp.ProcessorFactory;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPIOService;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
-import tigase.xmpp.ProcessorFactory;
+import tigase.xmpp.XMPPSession;
 
 /**
  * Class ServerConnectionManager
@@ -57,7 +64,8 @@ import tigase.xmpp.ProcessorFactory;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class ServerConnectionManager extends ConnectionManager {
+public class ServerConnectionManager extends ConnectionManager
+	implements CommitHandler {
 
 	/**
    * Variable <code>log</code> is a class logger.
@@ -69,11 +77,19 @@ public class ServerConnectionManager extends ConnectionManager {
 	public static final String[] COMPONENTS_PROP_VAL =
 	{
 		"urn:ietf:params:xml:ns:xmpp-sasl", "jabber:iq:version",
-		"jabber:iq:stats", "starttls", "jabber:server"
+		"jabber:iq:stats", "starttls", "jabber:server:dialback"
 	};
 	public static final String HOSTNAMES_PROP_KEY = "hostnames";
 	public static final String[] HOSTNAMES_PROP_VAL =
 	{"localhost", "tigase.org", "hefczyc.net"};
+	public static final String SECURITY_PROP_KEY = "security";
+	public static final String AUTHENTICATION_IDS_PROP_KEY = "authentication-ids";
+	public static final String[] AUTHENTICATION_IDS_PROP_VAL = {"dialback"};
+	public static final String DIALBACK_CLASS_PROP_KEY = "dialback/class";
+	public static final String DIALBACK_CLASS_PROP_VAL =
+		"tigase.auth.DialbackAuth";
+	public static final String DIALBACK_FLAG_PROP_KEY = "dialback/flag";
+	public static final String DIALBACK_FLAG_PROP_VAL =	"sufficient";
 
 	private String[] hostnames = HOSTNAMES_PROP_VAL;
 
@@ -82,9 +98,10 @@ public class ServerConnectionManager extends ConnectionManager {
 	private Map<String, XMPPProcessorIfc> processors =
 		new ConcurrentSkipListMap<String, XMPPProcessorIfc>();
 
-	private Map<String, XMPPResourceConnection> connectionsByFrom =
-		new ConcurrentSkipListMap<String, XMPPResourceConnection>();
-	private Map<String, XMPPResourceConnection> connectionsByTo =
+	private Map<String, XMPPSession> sessionsByHostIP =
+		new ConcurrentSkipListMap<String, XMPPSession>();
+
+	private Map<String, XMPPResourceConnection> connectionsByHostIP_ConnType =
 		new ConcurrentSkipListMap<String, XMPPResourceConnection>();
 
 	public void processPacket(Packet packet) {
@@ -156,12 +173,6 @@ public class ServerConnectionManager extends ConnectionManager {
 		} // end of switch (pc.getCommand())
 	}
 
-	private XMPPResourceConnection getXMPPSession(Packet p) {
-		XMPPIOService serv = getXMPPIOService(p);
-		return serv == null ? null :
-			(XMPPResourceConnection)serv.getSessionData().get("xmpp-session");
-	}
-
 	public Queue<Packet> processSocketData(String id,
 		ConcurrentMap<String, Object> sessionData, Queue<Packet> packets) {
 // 		Queue<Packet> results = new LinkedList<Packet>();
@@ -181,10 +192,13 @@ public class ServerConnectionManager extends ConnectionManager {
 
 	public String xmppStreamOpened(XMPPIOService serv,
 		Map<String, String> attribs) {
+		String remote_host = serv.getRemoteAddress();
+		String conn_jid = JID.getJID(null, remote_host,
+			serv.connectionType().toString());
 		XMPPProcessorIfc proc = processors.get("jabber:server:dialback");
 		String remote_id = attribs.get("id");
 		if (remote_id != null) {
-			XMPPResourceConnection conn = connectionsByTo.get("Remote IP Address???");
+			XMPPResourceConnection conn =	connectionsByHostIP_ConnType.get(conn_jid);
 			conn.setSessionId(remote_id);
 			if (proc != null) {
 				Queue<Packet> results = new LinkedList<Packet>();
@@ -206,6 +220,17 @@ public class ServerConnectionManager extends ConnectionManager {
 			log.finer("Stream opened: " + attribs.toString());
 			final String id = UUID.randomUUID().toString();
 			serv.getSessionData().put(serv.SESSION_ID_KEY, id);
+// 			XMPPSession session = sessionsByHostIP.get(remote_host);
+// 			if (session == null) {
+// 				session = new XMPPSession(remote_host);
+// 				sessionsByHostIP.put(remote_host, session);
+// 			} // end of if (session == null)
+//  			XMPPResourceConnection conn =	session.getResourceForJID(conn_jid);
+			XMPPResourceConnection conn =	connectionsByHostIP_ConnType.get(conn_jid);
+ 			if (conn != null) { conn.streamClosed(); } // end of if (conn != null)
+			conn = new XMPPResourceConnection(serv.getUniqueId(), null);
+// 			session.addResourceConnection(conn);
+			connectionsByHostIP_ConnType.put(conn_jid, conn);
 			return "<stream:stream"
 				+ " xmlns:stream='http://etherx.jabber.org/streams'"
 				+ " xmlns='jabber:server'"
@@ -221,7 +246,8 @@ public class ServerConnectionManager extends ConnectionManager {
 	}
 
 	protected String getUniqueId(XMPPIOService serv) {
-		return serv.getRemoteAddress() + "-" + serv.connectionType().toString();
+		return JID.getJID(null, serv.getRemoteAddress(),
+			serv.connectionType().toString());
 	}
 
 	protected String getServiceId(Packet packet) {
@@ -232,6 +258,12 @@ public class ServerConnectionManager extends ConnectionManager {
 		Map<String, Object> props = super.getDefaults();
 		props.put(HOSTNAMES_PROP_KEY, HOSTNAMES_PROP_VAL);
 		props.put(COMPONENTS_PROP_KEY, COMPONENTS_PROP_VAL);
+		props.put(SECURITY_PROP_KEY + "/" + AUTHENTICATION_IDS_PROP_KEY,
+			AUTHENTICATION_IDS_PROP_VAL);
+		props.put(SECURITY_PROP_KEY + "/" + DIALBACK_CLASS_PROP_KEY,
+			DIALBACK_CLASS_PROP_VAL);
+		props.put(SECURITY_PROP_KEY + "/" + DIALBACK_FLAG_PROP_KEY,
+			DIALBACK_FLAG_PROP_VAL);
 		return props;
 	}
 
@@ -250,6 +282,44 @@ public class ServerConnectionManager extends ConnectionManager {
 			log.warning("Hostnames definition is empty, setting 'localhost'");
 			hostnames = new String[] {"localhost"};
 		} // end of if (hostnames == null || hostnames.length == 0)
+
+		String[] auth_ids = (String[])props.get(SECURITY_PROP_KEY + "/" +
+			AUTHENTICATION_IDS_PROP_KEY);
+		TigaseConfiguration authConfig = TigaseConfiguration.getConfiguration();
+		for (String id: auth_ids) {
+			String class_name = (String)props.get(SECURITY_PROP_KEY + "/" + id + "/class");
+			String flag = (String)props.get(SECURITY_PROP_KEY + "/" + id + "/flag");
+			Map<String, Object> options = new HashMap<String, Object>();
+			options.put(CommitHandler.COMMIT_HANDLER_KEY, this);
+			AppConfigurationEntry ace =
+				new AppConfigurationEntry(class_name, parseFlag(flag), options);
+			authConfig.putAppConfigurationEntry(id,
+				new AppConfigurationEntry[] {ace});
+			log.config("Added security module: " + class_name
+				+ " for auth id: " + id + ", flag: " + flag);
+		} // end of for ()
+	}
+
+	private LoginModuleControlFlag parseFlag(final String flag) {
+		if (flag.equalsIgnoreCase("REQUIRED"))
+			return LoginModuleControlFlag.REQUIRED;
+		else if (flag.equalsIgnoreCase("REQUISITE"))
+			return LoginModuleControlFlag.REQUISITE;
+		else if (flag.equalsIgnoreCase("SUFFICIENT"))
+			return LoginModuleControlFlag.SUFFICIENT;
+		else if (flag.equalsIgnoreCase("OPTIONAL"))
+			return LoginModuleControlFlag.OPTIONAL;
+		return null;
+	}
+
+	public void handleLoginCommit(final String userName,
+		final XMPPResourceConnection conn) {
+		
+	}
+
+	public void handleLogout(final String userName,
+		final XMPPResourceConnection conn) {
+		
 	}
 
 }

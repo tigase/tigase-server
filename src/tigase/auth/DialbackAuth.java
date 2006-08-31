@@ -24,18 +24,17 @@ package tigase.auth;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.logging.Logger;
-import tigase.util.Algorithms;
 
 /**
- * Describe class DigestAuth here.
+ * Describe class DialbackAuth here.
  *
  *
- * Created: Sat Feb 18 13:54:21 2006
+ * Created: Mon Aug 28 11:45:17 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class DigestAuth extends PlainAuth {
+public class DialbackAuth extends PlainAuth {
 
   /**
    * Variable <code>log</code> is a class logger.
@@ -44,11 +43,7 @@ public class DigestAuth extends PlainAuth {
 
 	protected boolean passwordsEqual(final String given_password,
 		final String db_password) throws NoSuchAlgorithmException {
-		final String digest_db_pass =
-			Algorithms.digest(connection.getSessionId(), db_password, "SHA");
-		log.finest("Comparing passwords, given: " + given_password
-			+ ", db: " + digest_db_pass);
-		return given_password.equals(digest_db_pass);
+		return true;
 	}
 
-} // DigestAuth
+} // DialbackAuth
