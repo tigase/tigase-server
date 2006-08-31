@@ -22,6 +22,7 @@
  */
 package tigase.auth;
 
+import java.util.HashMap;
 import java.util.Map;
 import javax.security.auth.login.AppConfigurationEntry;
 import javax.security.auth.login.Configuration;
@@ -37,20 +38,34 @@ import javax.security.auth.login.Configuration;
  */
 public class TigaseConfiguration extends Configuration {
 
-	Map<String, AppConfigurationEntry[]> configuration = null;
+	private Map<String, AppConfigurationEntry[]> configuration = null;
+	private static TigaseConfiguration tigaseConfig = null;
 
 	/**
 	 * Creates a new <code>TigaseConfiguration</code> instance.
 	 *
 	 */
-	public TigaseConfiguration(Map<String, AppConfigurationEntry[]> config) {
-		this.configuration = config;
+	private TigaseConfiguration() {
+		this.configuration = new HashMap<String, AppConfigurationEntry[]>();
 	}
 
 	public AppConfigurationEntry[] getAppConfigurationEntry(final String name) {
 		return configuration.get(name);
 	}
 
+	public void putAppConfigurationEntry(String name,
+		AppConfigurationEntry[] entry) {
+		configuration.put(name, entry);
+	}
+
 	public void refresh() {}
 
-} // TigaseConfiguration
+	public static TigaseConfiguration	getConfiguration() {
+		if (tigaseConfig == null) {
+			tigaseConfig = new TigaseConfiguration();
+			Configuration.setConfiguration(tigaseConfig);
+		} // end of if (tigaseConfig == null)
+		return tigaseConfig;
+	}
+
+	} // TigaseConfiguration

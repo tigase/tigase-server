@@ -117,7 +117,7 @@ public class SessionManager extends AbstractMessageReceiver
 		new ConcurrentSkipListMap<String, XMPPResourceConnection>();
 	private Map<String, XMPPProcessorIfc> processors =
 		new ConcurrentSkipListMap<String, XMPPProcessorIfc>();
-	private TigaseConfiguration authConfig = null;
+	//	private TigaseConfiguration authConfig = null;
 
 	private long closedConnections = 0;
 
@@ -307,8 +307,7 @@ public class SessionManager extends AbstractMessageReceiver
 
 		String[] auth_ids = (String[])props.get(SECURITY_PROP_KEY + "/" +
 			AUTHENTICATION_IDS_PROP_KEY);
-		Map<String, AppConfigurationEntry[]> config =
-			new HashMap<String, AppConfigurationEntry[]>();
+		TigaseConfiguration authConfig = TigaseConfiguration.getConfiguration();
 		for (String id: auth_ids) {
 			String class_name = (String)props.get(SECURITY_PROP_KEY + "/" + id + "/class");
 			String flag = (String)props.get(SECURITY_PROP_KEY + "/" + id + "/flag");
@@ -317,12 +316,11 @@ public class SessionManager extends AbstractMessageReceiver
 			options.put(UserRepository.class.getSimpleName(), repository);
 			AppConfigurationEntry ace =
 				new AppConfigurationEntry(class_name, parseFlag(flag), options);
-			config.put(id, new AppConfigurationEntry[] {ace});
+			authConfig.putAppConfigurationEntry(id,
+				new AppConfigurationEntry[] {ace});
 			log.config("Added security module: " + class_name
 				+ " for auth id: " + id + ", flag: " + flag);
 		} // end of for ()
-		authConfig = new TigaseConfiguration(config);
-		Configuration.setConfiguration(authConfig);
 	}
 
 	private LoginModuleControlFlag parseFlag(final String flag) {
