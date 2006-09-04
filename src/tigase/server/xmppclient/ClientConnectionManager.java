@@ -249,16 +249,21 @@ public class ClientConnectionManager extends ConnectionManager {
 		log.finer("Stream opened: " + attribs.toString());
 		final String hostname = attribs.get("to");
 		final String id = UUID.randomUUID().toString();
-		StringBuilder sb = new StringBuilder();
-		sb.append("<session-id>" + id + "</session-id>");
-		if (hostname != null) {
-			sb.append("<hostname>" + hostname + "</hostname>");
-		} // end of if (hostname != null)
+
+// 		StringBuilder sb = new StringBuilder();
+// 		sb.append("<session-id>" + id + "</session-id>");
+// 		if (hostname != null) {
+// 			sb.append("<hostname>" + hostname + "</hostname>");
+// 		} // end of if (hostname != null)
 		serv.getSessionData().put(serv.SESSION_ID_KEY, id);
-		addOutPacket(Command.STREAM_OPENED.getPacket(
+		Packet streamOpen = Command.STREAM_OPENED.getPacket(
 									 JID.getJID(getName(), getDefHostName(), getUniqueId(serv)),
 									 routings.computeRouting(hostname), StanzaType.set, "sess1",
-									 sb.toString()));
+									 new Element("session-id", id));
+		if (hostname != null) {
+			streamOpen.getElement().addChild(new Element("hostname", hostname));
+		} // end of if (hostname != null)
+		addOutPacket(streamOpen);
 		if (attribs.get("version") != null) {
 			addOutPacket(Command.GETFEATURES.getPacket(
 										 JID.getJID(getName(), getDefHostName(), getUniqueId(serv)),
