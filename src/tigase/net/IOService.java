@@ -245,8 +245,8 @@ public abstract class IOService implements Callable<IOService> {
    * @exception IOException if an error occurs
    */
   protected synchronized void writeData(final String data) throws IOException {
-    ByteBuffer dataBuffer = null;
-    if (data != null || data.length() > 0) {
+    if (data != null && data.length() > 0) {
+			ByteBuffer dataBuffer = null;
       dataBuffer = coder.encode(CharBuffer.wrap(data));
       socketIO.write(dataBuffer);
     } // end of if (data == null || data.equals("")) else
