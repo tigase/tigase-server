@@ -244,11 +244,7 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 		}
 	}
 
-	protected void writePacketToSocket(Packet p) {
-		log.finer("Processing packet: " + p.getElemName()
-			+ ", type: " + p.getType());
-		log.finest("Writing packet to: " + p.getTo());
-		IOService ios = getXMPPIOService(p);
+	protected void writePacketToSocket(IOService ios, Packet p) {
 		if (ios != null) {
 			((XMPPIOService)ios).addPacketToSend(p);
 			try {
@@ -267,6 +263,26 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 				+ p.getElemName() + "> " + p.getTo()
 				+ ", service id: " + getServiceId(p));
 		} // end of if (ios != null) else
+	}
+
+	protected void writePacketToSocket(Packet p) {
+		log.finer("Processing packet: " + p.getElemName()
+			+ ", type: " + p.getType());
+		log.finest("Writing packet to: " + p.getTo());
+		IOService ios = getXMPPIOService(p);
+		writePacketToSocket(ios, p);
+	}
+
+	protected void writePacketToSocket(Packet p, String serviceId) {
+		log.finer("Processing packet: " + p.getElemName()
+			+ ", type: " + p.getType());
+		log.finest("Writing packet to: " + p.getTo());
+		IOService ios = getXMPPIOService(serviceId);
+		writePacketToSocket(ios, p);
+	}
+
+	protected XMPPIOService getXMPPIOService(String serviceId) {
+		return (XMPPIOService)services.get(serviceId);
 	}
 
 	protected XMPPIOService getXMPPIOService(Packet p) {

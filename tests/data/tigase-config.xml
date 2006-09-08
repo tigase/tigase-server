@@ -6,7 +6,12 @@
   <node name="logging">
    <map>
     <entry value="WARNING" type="String" key=".level"/>
-    <entry key="tigase.server.xmppserver.level" value="FINE" type="String"/>
+    <entry value="ALL" type="String" key="tigase.server.xmppserver.level"/>
+    <entry value="ALL" type="String" key="tigase.server.xmppsession.level"/>
+    <entry value="ALL" type="String" key="tigase.server.MessageRouter.level"/>
+    <entry value="ALL" type="String" key="tigase.xmpp.impl.level"/>
+    <entry value="ALL" type="String" key="tigase.auth.level"/>
+    <entry value="ALL" type="String" key="tigase.net.level"/>
     <entry value="java.util.logging.ConsoleHandler" type="String" key="handlers"/>
     <entry value="tigase.util.LogFormatter" type="String" key="java.util.logging.ConsoleHandler.formatter"/>
     <entry value="ALL" type="String" key="java.util.logging.ConsoleHandler.level"/>
@@ -24,7 +29,7 @@
  <component name="tigase-xmpp-server">
   <map>
    <entry type="String[]" key="local-addresses">
-    <item value="localhost"/>
+    <item value="dell"/>
    </entry>
    <entry value="1000" type="Integer" key="max-queue-size"/>
   </map>
@@ -65,7 +70,7 @@
  <component name="client_1">
   <map>
    <entry type="String[]" key="hostnames">
-    <item value="localhost-client1"/>
+    <item value="dell"/>
    </entry>
    <entry value="1000" type="Integer" key="max-queue-size"/>
   </map>
@@ -81,7 +86,7 @@
      <entry type="String[]" key="ifc">
       <item value="*"/>
      </entry>
-     <entry value="localhost" type="String" key="remote-host"/>
+     <entry value="dell" type="String" key="remote-host"/>
      <entry value="plain" type="String" key="socket"/>
      <entry value="accept" type="String" key="type"/>
     </map>
@@ -96,7 +101,7 @@
      <entry type="String[]" key="ifc">
       <item value="*"/>
      </entry>
-     <entry value="localhost" type="String" key="remote-host"/>
+     <entry value="dell" type="String" key="remote-host"/>
      <entry value="ssl" type="String" key="socket"/>
      <entry value="accept" type="String" key="type"/>
     </map>
@@ -118,7 +123,7 @@
   </node>
   <node name="routings">
    <map>
-    <entry value="session_1@localhost" type="String" key=".+"/>
+    <entry value="session_1@dell" type="String" key=".+"/>
     <entry value="true" type="Boolean" key="multi-mode"/>
    </map>
   </node>
@@ -133,7 +138,7 @@
     <item value="jabber:server:dialback"/>
    </entry>
    <entry type="String[]" key="hostnames">
-    <item value="localhost"/>
+    <item value="dell"/>
     <item value="tigase.org"/>
     <item value="hefczyc.net"/>
    </entry>
@@ -148,6 +153,19 @@
      <entry value="certs/truststore" type="String" key="trusts-store"/>
      <entry value="truststore" type="String" key="trusts-store-password"/>
      <entry value="true" type="Boolean" key="use"/>
+    </map>
+   </node>
+  </node>
+  <node name="security">
+   <map>
+    <entry type="String[]" key="authentication-ids">
+     <item value="dialback"/>
+    </entry>
+   </map>
+   <node name="dialback">
+    <map>
+     <entry value="tigase.auth.DialbackAuth" type="String" key="class"/>
+     <entry value="sufficient" type="String" key="flag"/>
     </map>
    </node>
   </node>
@@ -167,7 +185,7 @@
      <entry type="String[]" key="ifc">
       <item value="*"/>
      </entry>
-     <entry value="localhost" type="String" key="remote-host"/>
+     <entry value="dell" type="String" key="remote-host"/>
      <entry value="someSecret" type="String" key="secret"/>
      <entry value="plain" type="String" key="socket"/>
      <entry value="accept" type="String" key="type"/>
@@ -206,7 +224,7 @@
     <item value="disco"/>
    </entry>
    <entry type="String[]" key="hostnames">
-    <item value="localhost"/>
+    <item value="dell"/>
    </entry>
    <entry value="1000" type="Integer" key="max-queue-size"/>
    <entry value="user-repository.xml" type="String" key="repository-url"/>

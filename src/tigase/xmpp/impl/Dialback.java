@@ -68,7 +68,7 @@ public class Dialback extends XMPPProcessor {
 			results.offer(new Packet(elem));
 		} // end of if (packet == null)
 
-		
+		// Verification result
 
 		// Process verification request
 		if (packet != null && packet.getElemName().equals("db:verify")

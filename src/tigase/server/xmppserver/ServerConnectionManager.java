@@ -27,10 +27,12 @@ package tigase.server.xmppserver;
 
 //import tigase.net.IOService;
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
+import java.util.TreeMap;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -41,7 +43,9 @@ import javax.security.auth.login.AppConfigurationEntry;
 import tigase.auth.CommitHandler;
 import tigase.auth.TigaseConfiguration;
 import tigase.db.UserRepository;
+import tigase.net.ConnectionType;
 import tigase.net.SocketReadThread;
+import tigase.net.IOService;
 import tigase.server.ConnectionManager;
 import tigase.server.MessageReceiver;
 import tigase.server.Packet;
@@ -101,8 +105,11 @@ public class ServerConnectionManager extends ConnectionManager
 	private Map<String, XMPPSession> sessionsByHostIP =
 		new ConcurrentSkipListMap<String, XMPPSession>();
 
-	private Map<String, XMPPResourceConnection> connectionsByHostIP_ConnType =
-		new ConcurrentSkipListMap<String, XMPPResourceConnection>();
+	private Map<String, Packet> waitingPackets =
+		new ConcurrentSkipListMap<String, Packet>();
+
+	// 	private Map<String, XMPPResourceConnection> connectionsByHostIP_ConnType =
+// 		new ConcurrentSkipListMap<String, XMPPResourceConnection>();
 
 	public void processPacket(Packet packet) {
 		log.finer("Processing packet: " + packet.getElemName()
@@ -111,8 +118,47 @@ public class ServerConnectionManager extends ConnectionManager
 		if (packet.isCommand()) {
 			processCommand(packet);
 		} else {
-			writePacketToSocket(packet);
+			try {
+				String ipAddress = JID.getNodeHostIP(packet.getTo());
+				log.finest("Remote server IP address is: " + ipAddress);
+				XMPPSession session =	sessionsByHostIP.get(ipAddress);
+				if (session == null) {
+					waitingPackets.put(ipAddress, packet);
+					// Open new s2s connection
+					Map<String, Object> port_props = new TreeMap<String, Object>();
+					port_props.put("remote-host", ipAddress);
+					port_props.put("ifc", new String[] {ipAddress});
+					port_props.put("socket", "plain");
+					port_props.put("type", "connect");
+					port_props.put("port-no", 5269);
+					startService(port_props);
+				} // end of if (session == null)
+				else {
+					writePacketToSocket(packet, JID.getJID(null, ipAddress,
+							ConnectionType.connect.toString()));
+				} // end of if (session == null) else
+			} // end of try
+			catch (UnknownHostException e) {
+				log.warning("UnknownHostException: " + e);
+			} // end of try-catch
 		} // end of else
+	}
+
+	public Queue<Packet> processSocketData(String id,
+		ConcurrentMap<String, Object> sessionData, Queue<Packet> packets) {
+// 		Queue<Packet> results = new LinkedList<Packet>();
+		Packet p = null;
+		while ((p = packets.poll()) != null) {
+			log.finer("Processing packet: " + p.getElemName()
+				+ ", type: " + p.getType());
+			log.finest("Processing socket data: " + p.getStringData());
+			p.setFrom(JID.getJID(getName(), getDefHostName(), id));
+			p.setTo(p.getElemTo());
+			addOutPacket(p);
+			// 			results.offer(new Packet(new Element("OK")));
+		} // end of while ()
+// 		return results;
+		return null;
 	}
 
 	private void processCommand(final Packet packet) {
@@ -173,32 +219,17 @@ public class ServerConnectionManager extends ConnectionManager
 		} // end of switch (pc.getCommand())
 	}
 
-	public Queue<Packet> processSocketData(String id,
-		ConcurrentMap<String, Object> sessionData, Queue<Packet> packets) {
-// 		Queue<Packet> results = new LinkedList<Packet>();
-		Packet p = null;
-		while ((p = packets.poll()) != null) {
-			log.finer("Processing packet: " + p.getElemName()
-				+ ", type: " + p.getType());
-			log.finest("Processing socket data: " + p.getStringData());
-			p.setFrom(JID.getJID(getName(), getDefHostName(), id));
-			p.setTo(p.getElemTo());
-			addOutPacket(p);
-			// 			results.offer(new Packet(new Element("OK")));
-		} // end of while ()
-// 		return results;
-		return null;
-	}
-
 	public String xmppStreamOpened(XMPPIOService serv,
 		Map<String, String> attribs) {
-		String remote_host = serv.getRemoteAddress();
-		String conn_jid = JID.getJID(null, remote_host,
+		String remote_ip = serv.getRemoteAddress();
+		String conn_jid = JID.getJID(null, remote_ip,
 			serv.connectionType().toString());
+		XMPPSession session = sessionsByHostIP.get(remote_ip);
+		XMPPResourceConnection conn =	session.getResourceForJID(conn_jid);
 		XMPPProcessorIfc proc = processors.get("jabber:server:dialback");
-		String remote_id = attribs.get("id");
-		if (remote_id != null) {
-			XMPPResourceConnection conn =	connectionsByHostIP_ConnType.get(conn_jid);
+		switch (serv.connectionType()) {
+		case connect:
+			String remote_id = attribs.get("id");
 			conn.setSessionId(remote_id);
 			if (proc != null) {
 				Queue<Packet> results = new LinkedList<Packet>();
@@ -214,23 +245,12 @@ public class ServerConnectionManager extends ConnectionManager
 				// Server MUST generate an <invalid-namespace/> stream error condition
 				// and terminate both the XML stream and the underlying TCP connection.
 			} // end of if (proc != null) else
-			return null;
-		} // end of if (remote_id != null)
-		else {
+			break;
+		case accept:
 			log.finer("Stream opened: " + attribs.toString());
 			final String id = UUID.randomUUID().toString();
 			serv.getSessionData().put(serv.SESSION_ID_KEY, id);
-// 			XMPPSession session = sessionsByHostIP.get(remote_host);
-// 			if (session == null) {
-// 				session = new XMPPSession(remote_host);
-// 				sessionsByHostIP.put(remote_host, session);
-// 			} // end of if (session == null)
-//  			XMPPResourceConnection conn =	session.getResourceForJID(conn_jid);
-			XMPPResourceConnection conn =	connectionsByHostIP_ConnType.get(conn_jid);
- 			if (conn != null) { conn.streamClosed(); } // end of if (conn != null)
-			conn = new XMPPResourceConnection(serv.getUniqueId(), null);
-// 			session.addResourceConnection(conn);
-			connectionsByHostIP_ConnType.put(conn_jid, conn);
+			conn.setSessionId(id);
 			return "<stream:stream"
 				+ " xmlns:stream='http://etherx.jabber.org/streams'"
 				+ " xmlns='jabber:server'"
@@ -238,7 +258,11 @@ public class ServerConnectionManager extends ConnectionManager
 				+ " id='" + id + "'"
 				+ ">"
 				;
-		} // end of if (remote_id != null) else
+		default:
+			log.severe("Warning, program shouldn't reach that point.");
+			break;
+		} // end of switch (serv.connectionType())
+		return null;
 	}
 
 	public void xmppStreamClosed(XMPPIOService serv) {
@@ -250,9 +274,9 @@ public class ServerConnectionManager extends ConnectionManager
 			serv.connectionType().toString());
 	}
 
-	protected String getServiceId(Packet packet) {
-		return JID.getNodeHost(packet.getTo());
-	}
+// 	protected String getServiceId(Packet packet) {
+// 		return JID.getNodeHost(packet.getTo());
+// 	}
 
 	public Map<String, Object> getDefaults() {
 		Map<String, Object> props = super.getDefaults();
@@ -298,6 +322,7 @@ public class ServerConnectionManager extends ConnectionManager
 			log.config("Added security module: " + class_name
 				+ " for auth id: " + id + ", flag: " + flag);
 		} // end of for ()
+		addRouting("*");
 	}
 
 	private LoginModuleControlFlag parseFlag(final String flag) {
@@ -310,6 +335,49 @@ public class ServerConnectionManager extends ConnectionManager
 		else if (flag.equalsIgnoreCase("OPTIONAL"))
 			return LoginModuleControlFlag.OPTIONAL;
 		return null;
+	}
+
+	public void serviceStarted(final IOService service) {
+		super.serviceStarted(service);
+		log.finest("s2s connection opened: " + service.getRemoteAddress());
+		initSession(service);
+		switch (service.connectionType()) {
+		case connect:
+			// Send init xmpp stream here
+			XMPPIOService serv = (XMPPIOService)service;
+			XMPPProcessorIfc proc = processors.get("jabber:server:dialback");
+			serv.xmppStreamOpen("<stream:stream"
+				+ " xmlns:stream='http://etherx.jabber.org/streams'"
+				+ " xmlns='jabber:server'"
+				+ (proc != null ? " xmlns:db='jabber:server:dialback'" : "")
+				+ ">"
+				);
+			break;
+		default:
+			// Do nothing, more data should come soon...
+			break;
+		} // end of switch (service.connectionType())
+	}
+
+	private void initSession(final IOService service) {
+		String remote_ip = service.getRemoteAddress();
+		String conn_jid = JID.getJID(null, remote_ip,
+			service.connectionType().toString());
+		XMPPSession session = sessionsByHostIP.get(remote_ip);
+		if (session == null) {
+			session = new XMPPSession(remote_ip);
+			sessionsByHostIP.put(remote_ip, session);
+		} // end of if (session == null)
+		XMPPResourceConnection conn =	session.getResourceForJID(conn_jid);
+		//XMPPResourceConnection conn =	connectionsByHostIP_ConnType.get(conn_jid);
+		if (conn != null) { conn.streamClosed(); } // end of if (conn != null)
+		conn = new XMPPResourceConnection(service.getUniqueId(), null);
+		conn.setResource(service.connectionType().toString());
+		session.addResourceConnection(conn);
+	}
+
+	public void serviceStopped(final IOService service) {
+		super.serviceStopped(service);
 	}
 
 	public void handleLoginCommit(final String userName,
