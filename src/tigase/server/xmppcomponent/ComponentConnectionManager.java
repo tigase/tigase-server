@@ -121,8 +121,7 @@ public class ComponentConnectionManager extends ConnectionManager {
 		Map<String, Object> sessionData = service.getSessionData();
 		String addr =	(String)sessionData.get(PORT_REMOTE_HOST_PROP_KEY);
 		removeRouting(addr);
-		ConnectionType type =
-			ConnectionType.valueOf(sessionData.get(PORT_TYPE_PROP_KEY).toString());
+		ConnectionType type = service.connectionType();
 		if (type == ConnectionType.connect) {
 			reconnectService(sessionData);
 		} // end of if (type == ConnectionType.connect)
