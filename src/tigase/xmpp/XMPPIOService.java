@@ -114,7 +114,26 @@ public class XMPPIOService extends IOService {
     }
 	}
 
-  /**
+	public void xmppStreamOpen(final String data) {
+		writeLock.lock();
+    try {
+			log.finest("Sending data: " + data);
+			//assert debug(response + "\n");
+			writeData(data);
+		} catch (IOException e) {
+			log.warning("Error sending stream open data: " + e);
+			try {
+				stop();
+			} // end of try
+			catch (IOException ex) {
+				log.warning("Error stopping service: " + e);
+			} // end of try-catch
+    } finally {
+			writeLock.unlock();
+    }
+	}
+
+	/**
    * Describe <code>stop</code> method here.
    *
    * @exception IOException if an error occurs
@@ -201,7 +220,7 @@ public class XMPPIOService extends IOService {
 				final char[] data = readData();
 				// This is log for debuging only,
 				// in normal mode don't even call below code
-				// assert debug(data);
+				assert debug(data);
 
 				// Yes check again if we are still connected as
 				// servce might be disconnected during data read
