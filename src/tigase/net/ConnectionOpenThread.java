@@ -107,12 +107,15 @@ public class ConnectionOpenThread implements Runnable {
 		throws IOException {
 		switch (al.getConnectionType()) {
 		case accept:
+			log.finest("Setting up 'accept' channel...");
 			ServerSocketChannel ssc = ServerSocketChannel.open();
 			ssc.configureBlocking(false);
 			ssc.socket().bind(isa);
 			ssc.register(selector, SelectionKey.OP_ACCEPT, al);
 			break;
 		case connect:
+			log.finest("Setting up 'connect' channel for: "
+				+ isa.getAddress() + "/" + isa.getPort());
 			SocketChannel sc = SocketChannel.open();
 			sc.configureBlocking(false);
 			sc.connect(isa);
@@ -147,10 +150,12 @@ public class ConnectionOpenThread implements Runnable {
 					if ((sk.readyOps() & SelectionKey.OP_ACCEPT) != 0) {
 						ServerSocketChannel nextReady = (ServerSocketChannel)sk.channel();
 						sc = nextReady.accept();
+						log.finest("OP_ACCEPT");
 					} // end of if (sk.readyOps() & SelectionKey.OP_ACCEPT)
 					if ((sk.readyOps() & SelectionKey.OP_CONNECT) != 0) {
 						sk.cancel();
 						sc = (SocketChannel)sk.channel();
+						log.finest("OP_CONNECT");
 					} // end of if (sk.readyOps() & SelectionKey.OP_ACCEPT)
 					if (sc != null) {
 						sc.configureBlocking(false);
