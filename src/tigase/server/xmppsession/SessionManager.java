@@ -189,6 +189,8 @@ public class SessionManager extends AbstractMessageReceiver
 				final String hostname = pc.getElemCData("/STREAM_OPENED/hostname");
 				connection = new XMPPResourceConnection(pc.getFrom(), repository);
 				if (hostname != null) {
+					log.finest("Setting hostname " + hostname
+						+ " for connection: " + connection.getConnectionId());
 					connection.setDomain(hostname);
 				} // end of if (hostname != null)
 				else {
@@ -200,6 +202,8 @@ public class SessionManager extends AbstractMessageReceiver
 					+ connection.isAuthorized());
 			} // end of else
 			connection.setSessionId(pc.getElemCData("/STREAM_OPENED/session-id"));
+			log.finest("Setting session-id " + connection.getSessionId()
+				+ " for connection: " + connection.getConnectionId());
 			break;
 		case GETFEATURES:
 			if (pc.getType() == StanzaType.get) {
