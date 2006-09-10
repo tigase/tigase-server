@@ -23,18 +23,18 @@
 package tigase.auth;
 
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.logging.Logger;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
+import tigase.net.ConnectionType;
+import tigase.util.JID;
 import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.XMPPSession;
 
 /**
  * Describe class DialbackAuth here.
@@ -54,9 +54,8 @@ public class DialbackAuth implements LoginModule {
 
 	private CallbackHandler callbackHandler = null;
 	private CommitHandler commitHandler = null;
-	private String user_name = null;
-	private String user_pass = null;
-	private String user_raw_pass = null;
+	private String ipAddress = null;
+	protected XMPPSession session = null;
 	protected XMPPResourceConnection connection = null;
 
 	private boolean loginSuccessful = false;
@@ -67,6 +66,7 @@ public class DialbackAuth implements LoginModule {
 
 		this.commitHandler =
 			(CommitHandler)options.get(CommitHandler.COMMIT_HANDLER_KEY);
+		this.callbackHandler = callbackHandler;
 
 	}
 
@@ -79,26 +79,14 @@ public class DialbackAuth implements LoginModule {
 	    throw new LoginException("Error: no CommitHanlder available.");
 		} // end of if (commitHandler == null)
 
-		Callback[] callbacks = new Callback[3];
-		NameCallback nc = new NameCallback("User name: ");
-		callbacks[0] = nc;
-		PasswordCallback pc = new PasswordCallback("Password: ", false);
-		callbacks[1] = pc;
-		ResourceConnectionCallback rcc = new ResourceConnectionCallback();
-		callbacks[2] = rcc;
+		Callback[] callbacks = new Callback[1];
+		SessionCallback sc = new SessionCallback();
+		callbacks[0] = sc;
 
 		try {
 			callbackHandler.handle(callbacks);
-			user_name = nc.getName();
-			char[] password = pc.getPassword();
-			if (password == null) {
-				password = new char[0];
-			} // end of if (password == null)
-			user_pass = new String(password);
-			pc.clearPassword();
-			connection = rcc.getResourceConnection();
-			log.finest("User name: " + user_name + ", password: " + user_pass
-				+ ", connection: " + connection.getConnectionId());
+			session = sc.getSession();
+			log.finest("connection: " + session.getUserName());
 		} catch (IOException ioe) {
 	    throw new LoginException(ioe.toString());
 		} catch (UnsupportedCallbackException uce) {
@@ -106,17 +94,10 @@ public class DialbackAuth implements LoginModule {
 				" handler not available, can not authenticate user.");
 		}
 
-		try {
-			if (passwordsEqual(user_pass, user_raw_pass)) {
-				loginSuccessful = true;
-				log.finest("Login successful.");
-			} else {
-				log.finest("Login unsuccessful, password incorrect.");
-			} // end of else
-
-		} catch (NoSuchAlgorithmException e) {
-			loginSuccessful = false;
-		}
+		ipAddress = session.getUserName();
+		connection = session.getResourceForJID(JID.getJID(null, ipAddress,
+				ConnectionType.connect.toString()));
+		loginSuccessful = true;
 
 		return loginSuccessful;
 	}
@@ -127,19 +108,13 @@ public class DialbackAuth implements LoginModule {
 
 	public boolean commit() throws LoginException {
 
-		//		connection.authorize(user_name, user_raw_pass);
-		commitHandler.handleLoginCommit(user_name, connection);
+		commitHandler.handleLoginCommit(ipAddress, connection);
 
 		return true;
 	}
 
 	public boolean logout() throws LoginException {
-		commitHandler.handleLogout(user_name, connection);
-		return true;
-	}
-
-	protected boolean passwordsEqual(final String given_password,
-		final String db_password) throws NoSuchAlgorithmException {
+		commitHandler.handleLogout(ipAddress, connection);
 		return true;
 	}
 

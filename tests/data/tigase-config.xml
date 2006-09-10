@@ -7,11 +7,13 @@
    <map>
     <entry value="WARNING" type="String" key=".level"/>
     <entry value="ALL" type="String" key="tigase.server.xmppserver.level"/>
-    <entry value="ALL" type="String" key="tigase.server.xmppsession.level"/>
+    <entry value="WARNING" type="String" key="tigase.server.xmppsession.level"/>
     <entry value="ALL" type="String" key="tigase.server.MessageRouter.level"/>
-    <entry value="ALL" type="String" key="tigase.xmpp.impl.level"/>
-    <entry value="ALL" type="String" key="tigase.auth.level"/>
-    <entry value="ALL" type="String" key="tigase.net.level"/>
+    <entry value="ALL" type="String" key="tigase.xmpp.impl.Presence.level"/>
+    <entry value="WARNING" type="String" key="tigase.xmpp.impl.level"/>
+    <entry value="WARNING" type="String" key="tigase.xmpp.XMPPDomBuilderHandler.level"/>
+    <entry value="WARNING" type="String" key="tigase.auth.level"/>
+    <entry value="WARNING" type="String" key="tigase.net.level"/>
     <entry value="java.util.logging.ConsoleHandler" type="String" key="handlers"/>
     <entry value="tigase.util.LogFormatter" type="String" key="java.util.logging.ConsoleHandler.formatter"/>
     <entry value="ALL" type="String" key="java.util.logging.ConsoleHandler.level"/>
@@ -39,7 +41,7 @@
     <map>
      <entry value="true" type="Boolean" key="client_1.active"/>
      <entry value="tigase.server.xmppclient.ClientConnectionManager" type="String" key="client_1.class"/>
-     <entry value="true" type="Boolean" key="comp_1.active"/>
+     <entry value="false" type="Boolean" key="comp_1.active"/>
      <entry value="tigase.server.xmppcomponent.ComponentConnectionManager" type="String" key="comp_1.class"/>
      <entry type="String[]" key="id-names">
       <item value="client_1"/>
@@ -70,7 +72,7 @@
  <component name="client_1">
   <map>
    <entry type="String[]" key="hostnames">
-    <item value="dell"/>
+    <item value="dell-1"/>
    </entry>
    <entry value="1000" type="Integer" key="max-queue-size"/>
   </map>
@@ -145,7 +147,11 @@
    <entry value="1000" type="Integer" key="max-queue-size"/>
   </map>
   <node name="connections">
-   <map/>
+   <map>
+    <entry type="int[]" key="ports">
+     <item value="5269"/>
+    </entry>
+   </map>
    <node name="tls">
     <map>
      <entry value="certs/keystore" type="String" key="keys-store"/>
@@ -154,6 +160,21 @@
      <entry value="truststore" type="String" key="trusts-store-password"/>
      <entry value="true" type="Boolean" key="use"/>
     </map>
+   </node>
+   <node name="5269">
+    <map>
+     <entry type="String[]" key="ifc">
+      <item value="*"/>
+     </entry>
+     <entry value="localhost" type="String" key="remote-host"/>
+     <entry value="plain" type="String" key="socket"/>
+     <entry value="accept" type="String" key="type"/>
+    </map>
+    <node name="tls">
+     <map>
+      <entry value="false" type="Boolean" key="required"/>
+     </map>
+    </node>
    </node>
   </node>
   <node name="security">
