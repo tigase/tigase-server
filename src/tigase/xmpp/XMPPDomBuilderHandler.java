@@ -29,6 +29,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Stack;
+import java.util.TreeMap;
 import java.util.logging.Logger;
 import tigase.xml.DefaultElementFactory;
 import tigase.xml.Element;
@@ -73,6 +74,7 @@ public class XMPPDomBuilderHandler implements SimpleHandler {
 
   private LinkedList<Element> all_roots = new LinkedList<Element>();
   private Stack<Element> el_stack = new Stack<Element>();
+	private Map<String, String> namespaces = new TreeMap<String, String>();
 
   public XMPPDomBuilderHandler(XMPPIOService ioserv, ElementFactory factory) {
     customFactory = factory;
@@ -103,6 +105,18 @@ public class XMPPDomBuilderHandler implements SimpleHandler {
     log.finest("Element attributes names: "+Arrays.toString(attr_names));
     log.finest("Element attributes values: "+Arrays.toString(attr_values));
 
+		// Look for 'xmlns:' declarations:
+		if (attr_names != null) {
+			for (int i = 0; i < attr_names.length; ++i) {
+				if (attr_names[i] != null
+					&& attr_names[i].toString().startsWith("xmlns:")) {
+					namespaces.put(attr_names[i].substring("xmlns:".length(),
+							attr_names[i].length()),
+						attr_values[i].toString());
+				} // end of if (att_name.startsWith("xmlns:"))
+			} // end of for (String att_name : attnames)
+		} // end of if (attr_names != null)
+
     String tmp_name = name.toString();
 		if (tmp_name.equals(ELEM_STREAM_STREAM)) {
 			Map<String, String> attribs = new HashMap<String, String>();
@@ -121,6 +135,11 @@ public class XMPPDomBuilderHandler implements SimpleHandler {
 		} // end of if (tmp_name.equals(ELEM_STREAM_STREAM))
 
     Element elem = newElement(tmp_name, null, attr_names, attr_values);
+		for (String xmlns: namespaces.keySet()) {
+			if (tmp_name.startsWith(xmlns)) {
+				elem.setDefXMLNS(namespaces.get(xmlns));
+			} // end of if (tmp_name.startsWith(xmlns))
+		} // end of for (String xmlns: namespaces.keys())
     String ns = elem.getXMLNS();
     if (ns == null) {
       elem.setDefXMLNS(def_xmlns);
@@ -129,10 +148,6 @@ public class XMPPDomBuilderHandler implements SimpleHandler {
       def_xmlns = ns;
     } // end of if (ns == null) else
     el_stack.push(elem);
-//     if (tmp_name.equals(ELEM_STREAM_STREAM)) {
-//       top_xmlns = elem.getXMLNS();
-//       endElement(name);
-//     } // end of if (tmp_name.equals())
   }
 
   public void elementCData(StringBuilder cdata) {
