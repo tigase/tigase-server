@@ -356,8 +356,8 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 				if (getSocketType() == SocketType.ssl) {
 					serv.startSSL(false);
 				} // end of if (socket == SocketType.ssl)
-				readThread.addSocketService(serv);
 				serviceStarted(serv);
+				readThread.addSocketService(serv);
 			} catch (ConnectException e) {
 				// Accept side for component service is not ready yet?
 				// Let's wait for a few secs and try again.
