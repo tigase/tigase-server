@@ -99,8 +99,9 @@ public class XMPPIOService extends IOService {
 		final String response = serviceListener.xmppStreamOpened(this, attribs);
     try {
 			log.finest("Sending data: " + response);
-			//assert debug(response + "\n");
 			writeData(response);
+			assert debug("\n" + connectionType().toString()
+				+ "--SENT:\n" + response + "\n\n");
 		} catch (IOException e) {
 			log.warning("Error sending stream open data: " + e);
 			try {
@@ -118,8 +119,9 @@ public class XMPPIOService extends IOService {
 		writeLock.lock();
     try {
 			log.finest("Sending data: " + data);
-			//assert debug(response + "\n");
 			writeData(data);
+			assert debug("\n" + connectionType().toString()
+				+ "--SENT:\n" + data + "\n\n");
 		} catch (IOException e) {
 			log.warning("Error sending stream open data: " + e);
 			try {
@@ -196,8 +198,9 @@ public class XMPPIOService extends IOService {
 				log.finer("Processing packet: " + packet.getElemName()
 					+ ", type: " + packet.getType());
 				log.finest("Sending packet: " + packet.getStringData());
-				//				assert debug(packet.getStringData() + "\n");
 				writeData(packet.getStringData());
+				assert debug("\n" + connectionType().toString()
+					+ "--SENT:\n" + packet.getStringData() + "\n\n");
 			} // end of while (packet = waitingPackets.poll() != null)
     } finally {
 			writeLock.unlock();
@@ -218,19 +221,21 @@ public class XMPPIOService extends IOService {
     try {
 			if (isConnected()) {
 				final char[] data = readData();
-				// This is log for debuging only,
-				// in normal mode don't even call below code
-				assert debug(data);
 
 				// Yes check again if we are still connected as
 				// servce might be disconnected during data read
 				if (isConnected() && data != null) {
+					// This is log for debuging only,
+					// in normal mode don't even call below code
+					assert debug("\n" + (connectionType() != null ?
+							connectionType().toString() : "null-type")
+						+ "--RECEIVED:\n" + new String(data) + "\n\n");
 					try {
 						parser.parse(domHandler, data, 0, data.length);
 						Queue<Element> elems = domHandler.getParsedElements();
 						Element elem = null;
 						while ((elem = elems.poll()) != null) {
-							//							assert debug(elem.toString() + "\n");
+							//	assert debug(elem.toString() + "\n");
 							log.finer("Read element: " + elem.getName());
 							log.finest("Read packet: " + elem.toString());
 							addReceivedPacket(new Packet(elem));
