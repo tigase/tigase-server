@@ -130,6 +130,10 @@ public class Packet {
 		return elem.getCData(path);
 	}
 
+	public String getElemCData() {
+		return elem.getCData();
+	}
+
   public byte[] getByteData() {
     return elem.toString().getBytes();
   }
