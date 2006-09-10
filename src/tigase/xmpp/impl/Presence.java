@@ -188,11 +188,11 @@ public class Presence extends XMPPProcessor {
 			case out_unsubscribed:
 				subscr_changed = Roster.updateBuddySubscription(session, pres_type,
 					packet.getElemTo());
-				if (subscr_changed) {
+				//				if (subscr_changed) {
 					Roster.updateBuddyChange(session, results,
 						Roster.getBuddyItem(session, packet.getElemTo()));
 					forwardPresence(results, packet, session.getUserId());
-				} // end of if (subscr_changed)
+					//				} // end of if (subscr_changed)
 				break;
 			case in_initial:
 				// If other users are in 'to' or 'both' contacts, broadcast
