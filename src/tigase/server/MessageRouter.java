@@ -81,6 +81,13 @@ public class MessageRouter extends AbstractMessageReceiver {
 	}
 
   public void processPacket(Packet packet) {
+
+		if (packet.getTo() == null) {
+			log.warning("Packet with TO attribute set to NULL: "
+				+	packet.getStringData());
+			return;
+		} // end of if (packet.getTo() == null)
+
 		log.finer("Processing packet: " + packet.getElemName()
 			+ ", type: " + packet.getType());
 		log.finest("Processing packet: " + packet.getStringData()
@@ -95,7 +102,7 @@ public class MessageRouter extends AbstractMessageReceiver {
 		String host = JID.getNodeHost(packet.getTo());
 		String ip = null;
 		try {
-			ip = InetAddress.getByName(host).getHostAddress();
+			ip = JID.getNodeHostIP(packet.getTo());
 		} catch (UnknownHostException e) {
 			ip = host;
 		} // end of try-catch
