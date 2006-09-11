@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.logging.Logger;
 import tigase.server.Packet;
 import tigase.xml.Element;
 import tigase.xmpp.NotAuthorizedException;
@@ -46,6 +47,11 @@ import tigase.util.JID;
  * @version $Rev$
  */
 public class Roster {
+
+	/**
+   * Private logger for class instancess.
+   */
+  private static Logger log =	Logger.getLogger("tigase.xmpp.impl.Roster");
 
   protected static final String ROSTER_XMLNS = "jabber:iq:roster";
   protected static final String ROSTER = "roster";
@@ -346,7 +352,11 @@ public class Roster {
 		}
 
 		public SubscriptionType getStateTransition(PresenceType pres_type) {
-			return stateTransition.get(pres_type);
+			SubscriptionType res = stateTransition.get(pres_type);
+			log.finest("this="+this.toString()
+				+", pres_type="+pres_type
+				+", res="+res);
+				return res;
 		}
 
 	}
@@ -516,14 +526,17 @@ public class Roster {
 	public static boolean updateBuddySubscription(
 		final XMPPResourceConnection session,	final PresenceType presence,
 		final String jid) throws NotAuthorizedException {
-		SubscriptionType current_subscription =
-			getBuddySubscription(session, jid);
+		SubscriptionType current_subscription =	getBuddySubscription(session, jid);
+		log.finest("current_subscription="+current_subscription
+			+" for jid="+jid);
 		if (current_subscription == null) {
 			current_subscription = SubscriptionType.none;
 			addBuddy(session, jid);
 		} // end of if (current_subscription == null)
 		final SubscriptionType new_subscription =
 			getStateTransition(current_subscription, presence);
+		log.finest("new_subscription="+new_subscription
+			+" for presence="+presence);
 		if (current_subscription != new_subscription) {
 			setBuddySubscription(session, new_subscription, jid);
 			return true;
