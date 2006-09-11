@@ -30,7 +30,7 @@ import javax.naming.directory.*;
 import java.util.*;
 
 /**
- * Describe class AllAddresses here.
+ * Describe class DNSResolver here.
  *
  *
  * Created: Mon Sep 11 09:59:02 2006
@@ -38,9 +38,9 @@ import java.util.*;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class AllAddresses {
+public class DNSResolver {
 
-	public static String getHostSRV_IP(String hostname)
+	public static String getHostSRV_IP(final String hostname)
 		throws UnknownHostException {
 
 		String result_host = hostname;
@@ -113,4 +113,4 @@ public class AllAddresses {
 	}
 
 
-} // AllAddresses
+} // DNSResolver
