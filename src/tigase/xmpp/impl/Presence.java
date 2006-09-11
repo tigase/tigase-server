@@ -106,6 +106,7 @@ public class Presence extends XMPPProcessor {
 		Element result = (Element)packet.getElement().clone();
 		// According to spec we must set proper FROM attribute
 		result.setAttribute("from", from);
+		log.finest("\n\nFORWARD presence: " + result.toString());
 		results.offer(new Packet(result));
 	}
 
@@ -188,11 +189,13 @@ public class Presence extends XMPPProcessor {
 			case out_unsubscribed:
 				subscr_changed = Roster.updateBuddySubscription(session, pres_type,
 					packet.getElemTo());
-				//				if (subscr_changed) {
+				if (subscr_changed) {
 					Roster.updateBuddyChange(session, results,
 						Roster.getBuddyItem(session, packet.getElemTo()));
 					forwardPresence(results, packet, session.getUserId());
-					//				} // end of if (subscr_changed)
+					sendPresence(StanzaType.available, packet.getElemTo(),
+						session.getUserId(), results, null);
+				} // end of if (subscr_changed)
 				break;
 			case in_initial:
 				// If other users are in 'to' or 'both' contacts, broadcast
