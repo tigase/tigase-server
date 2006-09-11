@@ -23,6 +23,7 @@
 package tigase.net;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 import javax.naming.*;
 import javax.naming.directory.*;
@@ -39,6 +40,35 @@ import java.util.*;
  */
 public class AllAddresses {
 
+	public static String getHostSRV_IP(String hostname)
+		throws UnknownHostException {
+
+		String result_host = hostname;
+
+		try {
+			Hashtable<String, String> env = new Hashtable<String, String>();
+			env.put("java.naming.factory.initial",
+				"com.sun.jndi.dns.DnsContextFactory");
+			DirContext ctx = new InitialDirContext(env);
+			Attributes attrs =
+				ctx.getAttributes("_xmpp-server._tcp." + hostname, new String[] {"SRV"});
+			Attribute att = attrs.get("SRV");
+			if (att != null) {
+				String res = att.get().toString();
+				int idx = res.lastIndexOf(" ");
+				result_host = res.substring(idx + 1, res.length());
+			} // end of if (att != null)
+			ctx.close();
+		} // end of try
+		catch (NamingException e) {
+			result_host = hostname;
+		} // end of try-catch
+
+		InetAddress[] all = InetAddress.getAllByName(result_host);
+
+		return all[0].getHostAddress();
+	}
+
 	/**
 	 * Describe <code>main</code> method here.
 	 *
@@ -47,28 +77,39 @@ public class AllAddresses {
 	public static void main(final String[] args) throws Exception {
 
 		String host = "gmail.com";
-		if (args.length > 0) {
-			host = args[0];
-		} // end of if (args.length > 1)
+		if (args.length > 0) { host = args[0]; }
 
-		InetAddress[] all = InetAddress.getAllByName(host);
-		for (InetAddress ia: all) {
-			System.out.println("Host: " + ia.toString());
-		} // end of for (InetAddress ia: all)
+		System.out.println("IP: " + getHostSRV_IP(host));
 
-		Hashtable env = new Hashtable();
-		env.put("java.naming.factory.initial", "com.sun.jndi.dns.DnsContextFactory");
-		//		env.put("java.naming.provider.url", "dns://10.75.32.10");
-		DirContext ctx = new InitialDirContext(env);
-		Attributes attrs = ctx.getAttributes("_xmpp-server._tcp." + host,
-			new String[] {"SRV"});
-		for (NamingEnumeration ae = attrs.getAll();ae.hasMoreElements();) {
-			Attribute attr = (Attribute)ae.next();
-			String attrId = attr.getID();
-			for (Enumeration vals = attr.getAll(); vals.hasMoreElements();
-					 System.out.println(attrId + ": " + vals.nextElement()));
-		}
-		ctx.close();
+// 		InetAddress[] all = InetAddress.getAllByName(host);
+// 		for (InetAddress ia: all) {
+// 			System.out.println("Host: " + ia.toString());
+// 		} // end of for (InetAddress ia: all)
+
+// 		Hashtable env = new Hashtable();
+// 		env.put("java.naming.factory.initial", "com.sun.jndi.dns.DnsContextFactory");
+// 		//		env.put("java.naming.provider.url", "dns://10.75.32.10");
+// 		DirContext ctx = new InitialDirContext(env);
+// 		Attributes attrs =
+// 			ctx.getAttributes("_xmpp-server._tcp." + host,
+// 				new String[] {"SRV", "A"});
+
+// 		String id = "SRV";
+// 		Attribute att = attrs.get(id);
+// 		if (att == null) {
+// 			id = "A";
+// 			att = attrs.get(id);
+// 		} // end of if (attr == null)
+// 		System.out.println(id + ": " + att.get(0));
+// 		System.out.println("Class: " + att.get(0).getClass().getSimpleName());
+
+// 		for (NamingEnumeration ae = attrs.getAll(); ae.hasMoreElements(); ) {
+// 			Attribute attr = (Attribute)ae.next();
+// 			String attrId = attr.getID();
+// 			for (Enumeration vals = attr.getAll(); vals.hasMoreElements();
+// 					 System.out.println(attrId + ": " + vals.nextElement()));
+// 		}
+// 		ctx.close();
 	}
 
 
