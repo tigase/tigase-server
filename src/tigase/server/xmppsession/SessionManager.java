@@ -34,6 +34,8 @@ import java.util.Queue;
 import java.util.TreeMap;
 import java.util.logging.Logger;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import javax.security.auth.login.AppConfigurationEntry.LoginModuleControlFlag;
 import javax.security.auth.login.AppConfigurationEntry;
 import javax.security.auth.login.Configuration;
@@ -84,7 +86,7 @@ public class SessionManager extends AbstractMessageReceiver
 	 "jabber:iq:stats", "starttls", "disco"};
 
 	public static final String HOSTNAMES_PROP_KEY = "hostnames";
-	public static final String[] HOSTNAMES_PROP_VAL =	{"localhost"};
+	public static String[] HOSTNAMES_PROP_VAL =	{"localhost", "hostname"};
 
 	public static final String SECURITY_PROP_KEY = "security";
 
@@ -274,6 +276,16 @@ public class SessionManager extends AbstractMessageReceiver
 		Map<String, Object> props = super.getDefaults();
 		props.put(USER_REPOSITORY_PROP_KEY, USER_REPOSITORY_PROP_VAL);
 		props.put(COMPONENTS_PROP_KEY, COMPONENTS_PROP_VAL);
+		try {
+			HOSTNAMES_PROP_VAL = new String[2];
+			HOSTNAMES_PROP_VAL[0] = "localhost";
+			HOSTNAMES_PROP_VAL[1] = InetAddress.getLocalHost().getHostName();
+			log.fine("Local hostname is: " + HOSTNAMES_PROP_VAL[1]);
+		} // end of try
+		catch (UnknownHostException e) {
+			log.warning("Can not detect local hostname, using 'localhost'");
+			HOSTNAMES_PROP_VAL = new String[] {"localhost"};
+		} // end of try-catch
 		props.put(HOSTNAMES_PROP_KEY, HOSTNAMES_PROP_VAL);
 		props.put(SECURITY_PROP_KEY + "/" + AUTHENTICATION_IDS_PROP_KEY,
 			AUTHENTICATION_IDS_PROP_VAL);
