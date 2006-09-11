@@ -54,6 +54,7 @@ import tigase.server.MessageReceiver;
 import tigase.server.Packet;
 import tigase.server.XMPPService;
 import tigase.util.JID;
+import tigase.util.DNSResolver;
 import tigase.xml.Element;
 import tigase.xmpp.ProcessorFactory;
 import tigase.xmpp.StanzaType;
@@ -87,8 +88,7 @@ public class ServerConnectionManager extends ConnectionManager
 		"jabber:iq:stats", "starttls", "jabber:server:dialback"
 	};
 	public static final String HOSTNAMES_PROP_KEY = "hostnames";
-	public static final String[] HOSTNAMES_PROP_VAL =
-	{"localhost", "tigase.org", "hefczyc.net"};
+	public static String[] HOSTNAMES_PROP_VAL =	{"localhost", "hostname"};
 	public static final String SECURITY_PROP_KEY = "security";
 	public static final String AUTHENTICATION_IDS_PROP_KEY = "authentication-ids";
 	public static final String[] AUTHENTICATION_IDS_PROP_VAL = {"dialback"};
@@ -325,6 +325,7 @@ public class ServerConnectionManager extends ConnectionManager
 
 	public Map<String, Object> getDefaults() {
 		Map<String, Object> props = super.getDefaults();
+		HOSTNAMES_PROP_VAL = DNSResolver.getDefHostNames();
 		props.put(HOSTNAMES_PROP_KEY, HOSTNAMES_PROP_VAL);
 		props.put(COMPONENTS_PROP_KEY, COMPONENTS_PROP_VAL);
 		props.put(SECURITY_PROP_KEY + "/" + AUTHENTICATION_IDS_PROP_KEY,

@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.Arrays;
+import tigase.util.DNSResolver;
 
 /**
  * Describe class MessageRouterConfig here.
@@ -42,7 +43,7 @@ public class MessageRouterConfig {
     Logger.getLogger("tigase.server.MessageRouterConfig");
 
   public static final String LOCAL_ADDRESSES_PROP_KEY = "local-addresses";
-  public static final String[] LOCAL_ADDRESSES_PROP_VALUE =	{"localhost"};
+  public static String[] LOCAL_ADDRESSES_PROP_VALUE =	{"localhost", "hostname"};
 
 	public static final String MSG_RECEIVERS_PROP_KEY =
 		"components/msg-receivers/";
@@ -124,6 +125,7 @@ public class MessageRouterConfig {
 		defs.put(STAT_1_ACTIVE_PROP_KEY, STAT_1_ACTIVE_PROP_VAL);
 		defs.put(SERVICE_1_CLASS_PROP_KEY, SERVICE_1_CLASS_PROP_VAL);
 		defs.put(SERVICE_1_ACTIVE_PROP_KEY, SERVICE_1_ACTIVE_PROP_VAL);
+		LOCAL_ADDRESSES_PROP_VALUE = DNSResolver.getDefHostNames();
     defs.put(LOCAL_ADDRESSES_PROP_KEY, LOCAL_ADDRESSES_PROP_VALUE);
 	}
 
