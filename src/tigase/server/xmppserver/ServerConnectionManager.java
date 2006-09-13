@@ -24,26 +24,24 @@
 
 package tigase.server.xmppserver;
 
-
-//import tigase.net.IOService;
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.security.auth.login.AppConfigurationEntry.LoginModuleControlFlag;
-import javax.security.auth.login.AppConfigurationEntry;
-import tigase.auth.CommitHandler;
-import tigase.auth.TigaseConfiguration;
 import tigase.db.UserRepository;
 import tigase.net.ConnectionType;
 import tigase.net.IOService;
@@ -53,15 +51,12 @@ import tigase.server.ConnectionManager;
 import tigase.server.MessageReceiver;
 import tigase.server.Packet;
 import tigase.server.XMPPService;
-import tigase.util.JID;
+import tigase.util.Algorithms;
 import tigase.util.DNSResolver;
+import tigase.util.JID;
 import tigase.xml.Element;
-import tigase.xmpp.ProcessorFactory;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPIOService;
-import tigase.xmpp.XMPPProcessorIfc;
-import tigase.xmpp.XMPPResourceConnection;
-import tigase.xmpp.XMPPSession;
 
 /**
  * Class ServerConnectionManager
@@ -72,8 +67,7 @@ import tigase.xmpp.XMPPSession;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class ServerConnectionManager extends ConnectionManager
-	implements CommitHandler {
+public class ServerConnectionManager extends ConnectionManager {
 
 	/**
    * Variable <code>log</code> is a class logger.
@@ -81,43 +75,49 @@ public class ServerConnectionManager extends ConnectionManager
   private static final Logger log =
     Logger.getLogger("tigase.server.xmppserver.ServerConnectionManager");
 
-	public static final String COMPONENTS_PROP_KEY = "components";
-	public static final String[] COMPONENTS_PROP_VAL =
-	{
-		"urn:ietf:params:xml:ns:xmpp-sasl", "jabber:iq:version",
-		"jabber:iq:stats", "starttls", "jabber:server:dialback"
-	};
 	public static final String HOSTNAMES_PROP_KEY = "hostnames";
 	public static String[] HOSTNAMES_PROP_VAL =	{"localhost", "hostname"};
-	public static final String SECURITY_PROP_KEY = "security";
-	public static final String AUTHENTICATION_IDS_PROP_KEY = "authentication-ids";
-	public static final String[] AUTHENTICATION_IDS_PROP_VAL = {"dialback"};
-	public static final String DIALBACK_CLASS_PROP_KEY = "dialback/class";
-	public static final String DIALBACK_CLASS_PROP_VAL =
-		"tigase.auth.DialbackAuth";
-	public static final String DIALBACK_FLAG_PROP_KEY = "dialback/flag";
-	public static final String DIALBACK_FLAG_PROP_VAL =	"sufficient";
 
 	private String[] hostnames = HOSTNAMES_PROP_VAL;
 
-	//	implements XMPPService {
+	/**
+	 * Services connected and autorized/autenticated
+	 */
+	private Map<String, XMPPIOService> servicesByHost_Type =
+		new HashMap<String, XMPPIOService>();
 
-	private Map<String, XMPPProcessorIfc> processors =
-		new ConcurrentSkipListMap<String, XMPPProcessorIfc>();
+	/**
+	 * Services connected and autorized/autenticated
+	 */
+	private Map<String, XMPPIOService> handshakingByHost_Type =
+		new HashMap<String, XMPPIOService>();
 
-	private Map<String, XMPPSession> sessionsByHostIP =
-		new ConcurrentSkipListMap<String, XMPPSession>();
+	/**
+	 * Services which are in process of connecting
+	 */
+	private Set<String> connectingByHost_Type = new HashSet<String>();
 
-	// Normal packets between users on different servers
-	private Map<String, Packet> waitingPackets =
-		new ConcurrentSkipListMap<String, Packet>();
+	/**
+	 * Normal packets between users on different servers
+	 */
+	private Map<String, Queue<Packet>> waitingPackets =
+		new ConcurrentSkipListMap<String, Queue<Packet>>();
 
-	// Controll packets for s2s connection establishing
-	private Map<String, Packet> waitingControllPackets =
-		new ConcurrentSkipListMap<String, Packet>();
+	/**
+	 * Controll packets for s2s connection establishing
+	 */
+	private Map<String, Queue<Packet>> waitingControlPackets =
+		new ConcurrentSkipListMap<String, Queue<Packet>>();
 
-	// 	private Map<String, XMPPResourceConnection> connectionsByHostIP_ConnType =
-// 		new ConcurrentSkipListMap<String, XMPPResourceConnection>();
+	/**
+	 * Data shared between sessions. Some servers (like google for example)
+	 * use different IP address for outgoing and ingoing data and as sessions
+	 * are identified by IP address we have to create 2 separate sessions
+	 * objects for such server. These sessions have to share session ID and
+	 * dialback key.
+	 */
+	private Map<String, Object> sharedSessionData =
+		new ConcurrentSkipListMap<String, Object>();
 
 	public void processPacket(Packet packet) {
 		log.finer("Processing packet: " + packet.getElemName()
@@ -126,115 +126,93 @@ public class ServerConnectionManager extends ConnectionManager
 		if (packet.isCommand()) {
 			processCommand(packet);
 		} else {
-			try {
-				String ipAddress = JID.getNodeHostIP(packet.getTo());
-				String hostName = JID.getNodeHost(packet.getTo());
-				log.finest("Remote server IP address is: " + ipAddress);
-				XMPPSession session =	sessionsByHostIP.get(ipAddress);
-				if (session == null) {
-					waitingPackets.put(ipAddress, packet);
-					// Open new s2s connection
-					connectRemoteServer(ipAddress, hostName, SocketType.plain);
-				} // end of if (session == null)
-				else {
-					writePacketToSocket(packet, JID.getJID(null, ipAddress,
-							ConnectionType.connect.toString()));
-				} // end of if (session == null) else
-			} // end of try
-			catch (UnknownHostException e) {
-				log.warning("UnknownHostException: " + e);
-			} // end of try-catch
+			String hostName = JID.getNodeHost(packet.getTo());
+			String out_jid = JID.getJID(null, hostName,
+				ConnectionType.connect.toString());
+			log.finest("Remote server hostname is: " + hostName);
+			synchronized(servicesByHost_Type) {
+				XMPPIOService serv = servicesByHost_Type.get(out_jid);
+				if (serv != null) {
+					writePacketToSocket(serv, packet);
+				} else {
+					addWaitingPacket(out_jid, packet, waitingPackets);
+				} // end of if (serv != null) else
+			}
 		} // end of else
 	}
 
-	private void connectRemoteServer(String ipAddress, String hostName,
-		SocketType socket) {
+	private void addWaitingPacket(String jid, Packet packet,
+		Map<String, Queue<Packet>> waitingPacketsMap) {
 
-		Map<String, Object> port_props = new TreeMap<String, Object>();
-		port_props.put("remote-ip", ipAddress);
-		if (hostName != null) {
+		// Ups service is not started yet....
+		synchronized (connectingByHost_Type) {
+			boolean connecting = connectingByHost_Type.contains(jid);
+			if (!connecting) {
+				String hostName = JID.getNodeHost(jid);
+				if (connecting = openNewServerConnection(hostName)) {
+					connectingByHost_Type.add(jid);
+				}
+			} // end of if (serv == null)
+			if (connecting) {
+				Queue<Packet> queue = waitingPacketsMap.get(jid);
+				if (queue == null) {
+					queue = new ConcurrentLinkedQueue<Packet>();
+					waitingPacketsMap.put(jid, queue);
+				} // end of if (queue == null)
+				queue.offer(packet);
+			} // end of if (connecting)
+			else {
+				log.warning("Discarding packet: " + packet.getStringData());
+			} // end of if (connecting) else
+		}
+	}
+
+	private boolean openNewServerConnection(String hostName) {
+
+		try {
+			String ipAddress = DNSResolver.getHostSRV_IP(hostName);
+			Map<String, Object> port_props = new TreeMap<String, Object>();
+			port_props.put("remote-ip", ipAddress);
 			port_props.put("remote-hostname", hostName);
-		} // end of if (hostName != null)
-		port_props.put("ifc", new String[] {ipAddress});
-		port_props.put("socket", socket);
-		port_props.put("type", ConnectionType.connect);
-		switch (socket) {
-		case plain:
+			port_props.put("ifc", new String[] {ipAddress});
+			port_props.put("socket", SocketType.plain);
+			port_props.put("type", ConnectionType.connect);
 			port_props.put("port-no", 5269);
-			break;
-		case ssl:
-			port_props.put("port-no", 5270);
-			break;
-		default:
-			break;
-		} // end of switch (socket)
-		startService(port_props);
+			startService(port_props);
+			return true;
+		} catch (UnknownHostException e) {
+			log.warning("UnknownHostException for host: " + hostName);
+			return false;
+		} // end of try-catch
 
 	}
 
-	public Queue<Packet> processSocketData(String id,
-		ConcurrentMap<String, Object> sessionData, Queue<Packet> packets) {
- 		Queue<Packet> results = new LinkedList<Packet>();
+	public Queue<Packet> processSocketData(XMPPIOService serv) {
+		Queue<Packet> packets = serv.getReceivedPackets();
 		Packet p = null;
 		while ((p = packets.poll()) != null) {
 			log.finer("Processing packet: " + p.getElemName()
 				+ ", type: " + p.getType());
 			log.finest("Processing socket data: " + p.getStringData());
-			String ipAddress = (String)sessionData.get("remote-ip");
-			String connType = sessionData.get("type").toString();
-			XMPPSession session =	sessionsByHostIP.get(ipAddress);
-			XMPPResourceConnection conn =
-				session.getResourceForJID(JID.getJID(null, ipAddress, connType));
-			if (!walk(p, conn, p.getElement(), results)) {
-				addOutPacket(p);
-			}	else {
+
+			if (p.getElement().getXMLNS().equals("jabber:server:dialback")) {
+				Queue<Packet> results = new LinkedList<Packet>();
+				processDialback(p, serv, results);
 				for (Packet res: results) {
-					XMPPIOService serv = getXMPPIOService(res.getTo());
-					if (serv != null) {
-						writePacketToSocket(serv, res);
+					XMPPIOService sender = handshakingByHost_Type.get(res.getTo());
+					if (sender != null) {
+						writePacketToSocket(sender, res);
 					} else {
-						// Ups service is not started yet....
-						waitingControllPackets.put(res.getTo(), res);
-						String ip_address = null;
-						try {
-							ip_address = JID.getNodeHostIP(res.getElemTo());
-						} catch (UnknownHostException e) {
-							ip_address = JID.getNodeHost(res.getElemTo());
-						} // end of try-catch
-						String hostName = JID.getNodeHost(res.getElemTo());
-						connectRemoteServer(ip_address, hostName,	SocketType.plain);
+						// I am assuming here that it can't happen that the packet is
+						// to accept channel and it doesn't exist
+						addWaitingPacket(res.getTo(), res, waitingControlPackets);
 					} // end of else
 				} // end of for (Packet p: results)
+			} else {
+				addOutPacket(p);
 			} // end of else
 		} // end of while ()
  		return null;
-	}
-
-	private boolean walk(final Packet packet,
-		final XMPPResourceConnection connection, final Element elem,
-		final Queue<Packet> results) {
-		boolean result = false;
-		for (XMPPProcessorIfc proc: processors.values()) {
-			String xmlns = elem.getXMLNS();
-			log.finest("Element XMLNS="+xmlns);
-			log.finest("Processor: id="+proc.id()
-				+", supElements="+Arrays.toString(proc.supElements())
-				+", supNamespaces="+Arrays.toString(proc.supNamespaces()));
-			if (xmlns == null) { xmlns = "jabber:server";	}
-			if (proc.isSupporting(elem.getName(), xmlns)) {
-				log.finest("XMPPProcessorIfc: "+proc.getClass().getSimpleName()+
-					" ("+proc.id()+")"+"\n Request: "+elem.toString());
-				proc.process(packet, connection, results);
-				result = true;
-			} // end of if (proc.isSupporting(elem.getName(), elem.getXMLNS()))
-		} // end of for ()
-		Collection<Element> children = elem.getChildren();
-		if (children != null) {
-			for (Element child: children) {
-				result |= walk(packet, connection, child, results);
-			} // end of for (Element child: children)
-		} // end of if (children != null)
-		return result;
 	}
 
 	private void processCommand(final Packet packet) {
@@ -255,51 +233,51 @@ public class ServerConnectionManager extends ConnectionManager
 
 	public String xmppStreamOpened(XMPPIOService serv,
 		Map<String, String> attribs) {
-		String remote_ip = serv.getRemoteAddress();
-		String conn_jid = JID.getJID(null, remote_ip,
-			serv.connectionType().toString());
-		XMPPSession session = sessionsByHostIP.get(remote_ip);
-		XMPPResourceConnection conn =	session.getResourceForJID(conn_jid);
-		XMPPProcessorIfc proc = processors.get("jabber:server:dialback");
+
 		switch (serv.connectionType()) {
 		case connect:
+			// It must be always set for connect connection type
+			String remote_hostname =
+				(String)serv.getSessionData().get("remote-hostname");
+			String connect_jid = JID.getJID(null, remote_hostname,
+				ConnectionType.connect.toString());
+			handshakingByHost_Type.put(connect_jid, serv);
 			String remote_id = attribs.get("id");
-			conn.setSessionId(remote_id);
-			if (proc != null) {
-				Queue<Packet> results = new LinkedList<Packet>();
-				proc.process(null, conn, results);
-				StringBuilder sb = new StringBuilder();
-				for (Packet p: results) {
-					sb.append(p.getStringData());
-				} // end of for (Packet p: results)
-				// Attach also all controll packets which are wating to send
-				Packet p = null;
-				while ((p = waitingControllPackets.remove(conn_jid)) != null) {
+			sharedSessionData.put(remote_hostname+"-session-id", remote_id);
+			String uuid = UUID.randomUUID().toString();
+			String key = null;
+			try {
+				key = Algorithms.digest(remote_id, uuid, "SHA");
+			} catch (NoSuchAlgorithmException e) {
+				key = uuid;
+			} // end of try-catch
+			sharedSessionData.put(remote_hostname+"-dialback-key", key);
+			Element elem = new Element("db:result", key);
+			elem.addAttribute("to", remote_hostname);
+			elem.addAttribute("from", hostnames[0]);
+
+			StringBuilder sb = new StringBuilder();
+			sb.append(elem.toString());
+			// Attach also all controll packets which are wating to send
+			Packet p = null;
+			Queue<Packet> waiting =	waitingControlPackets.get(connect_jid);
+			if (waiting != null) {
+				while ((p = waiting.poll()) != null) {
 					log.finest("Sending packet: " + p.getStringData());
 					sb.append(p.getStringData());
 				} // end of while (p = waitingPackets.remove(ipAddress) != null)
-				return sb.toString();
-// 				try {
-// 					writePacketsToSocket(serv, results);
-// 				} // end of try
-// 				catch (IOException e) {
-// 					log.log(Level.WARNING, "Can not send response to remote server.", e);
-// 				} // end of try-catch
-			} // end of if (proc != null)
-			else {
-				// Server MUST generate an <invalid-namespace/> stream error condition
-				// and terminate both the XML stream and the underlying TCP connection.
-			} // end of if (proc != null) else
-			break;
+			} // end of if (waiting != null)
+			return sb.toString();
 		case accept:
 			log.finer("Stream opened: " + attribs.toString());
-			final String id = UUID.randomUUID().toString();
+			String id = UUID.randomUUID().toString();
+			// We don't know hostname yet so we have to save session-id in
+			// connection temp data
 			serv.getSessionData().put(serv.SESSION_ID_KEY, id);
-			conn.setSessionId(id);
 			return "<stream:stream"
 				+ " xmlns:stream='http://etherx.jabber.org/streams'"
 				+ " xmlns='jabber:server'"
-				+ (proc != null ? " xmlns:db='jabber:server:dialback'" : "")
+				+ " xmlns:db='jabber:server:dialback'"
 				+ " id='" + id + "'"
 				+ ">"
 				;
@@ -326,14 +304,8 @@ public class ServerConnectionManager extends ConnectionManager
 	public Map<String, Object> getDefaults() {
 		Map<String, Object> props = super.getDefaults();
 		HOSTNAMES_PROP_VAL = DNSResolver.getDefHostNames();
+		hostnames = HOSTNAMES_PROP_VAL;
 		props.put(HOSTNAMES_PROP_KEY, HOSTNAMES_PROP_VAL);
-		props.put(COMPONENTS_PROP_KEY, COMPONENTS_PROP_VAL);
-		props.put(SECURITY_PROP_KEY + "/" + AUTHENTICATION_IDS_PROP_KEY,
-			AUTHENTICATION_IDS_PROP_VAL);
-		props.put(SECURITY_PROP_KEY + "/" + DIALBACK_CLASS_PROP_KEY,
-			DIALBACK_CLASS_PROP_VAL);
-		props.put(SECURITY_PROP_KEY + "/" + DIALBACK_FLAG_PROP_KEY,
-			DIALBACK_FLAG_PROP_VAL);
 		return props;
 	}
 
@@ -343,63 +315,26 @@ public class ServerConnectionManager extends ConnectionManager
 
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
-		String[] components = (String[])props.get(COMPONENTS_PROP_KEY);
-		processors.clear();
-		for (String comp_id: components) {
-			XMPPProcessorIfc proc = ProcessorFactory.getProcessor(comp_id);
-			processors.put(comp_id, proc);
-			log.config("Added processor: " + proc.getClass().getSimpleName()
-				+ " for component id: " + comp_id);
-		} // end of for (String comp_id: components)
 		hostnames = (String[])props.get(HOSTNAMES_PROP_KEY);
 		if (hostnames == null || hostnames.length == 0) {
 			log.warning("Hostnames definition is empty, setting 'localhost'");
 			hostnames = new String[] {"localhost"};
 		} // end of if (hostnames == null || hostnames.length == 0)
 
-		String[] auth_ids = (String[])props.get(SECURITY_PROP_KEY + "/" +
-			AUTHENTICATION_IDS_PROP_KEY);
-		TigaseConfiguration authConfig = TigaseConfiguration.getConfiguration();
-		for (String id: auth_ids) {
-			String class_name = (String)props.get(SECURITY_PROP_KEY + "/" + id + "/class");
-			String flag = (String)props.get(SECURITY_PROP_KEY + "/" + id + "/flag");
-			Map<String, Object> options = new HashMap<String, Object>();
-			options.put(CommitHandler.COMMIT_HANDLER_KEY, this);
-			AppConfigurationEntry ace =
-				new AppConfigurationEntry(class_name, parseFlag(flag), options);
-			authConfig.putAppConfigurationEntry(id,
-				new AppConfigurationEntry[] {ace});
-			log.config("Added security module: " + class_name
-				+ " for auth id: " + id + ", flag: " + flag);
-		} // end of for ()
 		addRouting("*");
-	}
-
-	private LoginModuleControlFlag parseFlag(final String flag) {
-		if (flag.equalsIgnoreCase("REQUIRED"))
-			return LoginModuleControlFlag.REQUIRED;
-		else if (flag.equalsIgnoreCase("REQUISITE"))
-			return LoginModuleControlFlag.REQUISITE;
-		else if (flag.equalsIgnoreCase("SUFFICIENT"))
-			return LoginModuleControlFlag.SUFFICIENT;
-		else if (flag.equalsIgnoreCase("OPTIONAL"))
-			return LoginModuleControlFlag.OPTIONAL;
-		return null;
 	}
 
 	public void serviceStarted(final IOService service) {
 		super.serviceStarted(service);
 		log.finest("s2s connection opened: " + service.getRemoteAddress());
-		initSession(service);
 		switch (service.connectionType()) {
 		case connect:
 			// Send init xmpp stream here
 			XMPPIOService serv = (XMPPIOService)service;
-			XMPPProcessorIfc proc = processors.get("jabber:server:dialback");
 			serv.xmppStreamOpen("<stream:stream"
 				+ " xmlns:stream='http://etherx.jabber.org/streams'"
 				+ " xmlns='jabber:server'"
-				+ (proc != null ? " xmlns:db='jabber:server:dialback'" : "")
+				+ " xmlns:db='jabber:server:dialback'"
 				+ ">"
 				);
 			break;
@@ -409,65 +344,101 @@ public class ServerConnectionManager extends ConnectionManager
 		} // end of switch (service.connectionType())
 	}
 
-	private void initSession(final IOService service) {
-		String remote_ip = service.getRemoteAddress();
-		service.getSessionData().put("remote-ip", remote_ip);
-		String conn_jid = JID.getJID(null, remote_ip,
-			service.connectionType().toString());
-		log.finest("remote_ip="+remote_ip+", conn_jid="+conn_jid);
-		XMPPSession session = sessionsByHostIP.get(remote_ip);
-		if (session == null) {
-			log.finest("No session found for "+remote_ip+" IP address, creating new one.");
-			session = new XMPPSession(remote_ip);
-			sessionsByHostIP.put(remote_ip, session);
-		} // end of if (session == null)
-		else {
-			log.finest("Found old session for "+remote_ip+" IP address.");
-		} // end of else
-		XMPPResourceConnection conn =	session.getResourceForJID(conn_jid);
-		//XMPPResourceConnection conn =	connectionsByHostIP_ConnType.get(conn_jid);
-		if (conn != null) { conn.streamClosed(); } // end of if (conn != null)
-		conn = new XMPPResourceConnection(service.getUniqueId(), null);
-		conn.setResource(service.connectionType().toString());
-		conn.putSessionData("remote-hostname",
-			service.getSessionData().get("remote-hostname"));
-		conn.setDomain(hostnames[0]);
-		log.finest("Setting variables for connection:"
-			+ " resource=" + service.connectionType().toString()
-			+ ", remote-hostname=" + service.getSessionData().get("remote-hostname")
-			+ ", domain=" + hostnames[0]);
-		session.addResourceConnection(conn);
-// 		if (service.connectionType() == ConnectionType.accept) {
-// 			String jid = JID.getJID(null, remote_ip,
-// 				ConnectionType.connect.toString());
-// 			if (session.getResourceForJID(jid) == null) {
-// 				connectRemoteServer(remote_ip,
-// 					(String)service.getSessionData().get("remote-hostname"),
-// 					SocketType.plain);
-// 			} // end of if (session.getResourceForJID(jid) == null)
-// 		} // end of if (service.connectionType() == ConnectionType.accept)
-	}
-
 	public void serviceStopped(final IOService service) {
 		super.serviceStopped(service);
 	}
 
-	public void handleLoginCommit(final String userName,
-		final XMPPResourceConnection conn) {
-		final String ipAddress = conn.getParentSession().getUserName();
-		final String jid = JID.getJID(null, ipAddress, conn.getResource());
+	public void handleDialbackSuccess(final String connect_jid) {
+		log.finest("handleDialbackSuccess: connect_jid="+connect_jid);
 		Packet p = null;
-		log.finest("handleLoginCommit: ipAddress="+ipAddress
-			+", jid="+jid);
-		while ((p = waitingPackets.remove(ipAddress)) != null) {
+		Queue<Packet> waiting =	waitingPackets.get(connect_jid);
+		while ((p = waiting.poll()) != null) {
 			log.finest("Sending packet: " + p.getStringData());
-			writePacketToSocket(p, jid);
+			writePacketToSocket(p, connect_jid);
 		} // end of while (p = waitingPackets.remove(ipAddress) != null)
 	}
 
-	public void handleLogout(final String userName,
-		final XMPPResourceConnection conn) {
-		
+	public void processDialback(Packet packet, XMPPIOService serv,
+		Queue<Packet> results) {
+
+		String remote_hostname = JID.getNodeHost(packet.getElemFrom());
+		String connect_jid = JID.getJID(null, remote_hostname,
+			ConnectionType.connect.toString());
+		String accept_jid = JID.getJID(null, remote_hostname,
+			ConnectionType.accept.toString());
+
+		// <db:result>
+		if (packet.getElemName().equals("db:result")) {
+			if (packet.getType() == null) {
+				// db:result with key to validate from accept connection
+				// Assuming this is the first packet from that connection which
+				// tells us for what domain this connection is we have to map
+				// somehow this IP address to hostname
+				sharedSessionData.put(remote_hostname + "-session-id",
+					serv.getSessionData().get(serv.SESSION_ID_KEY));
+				sharedSessionData.put(remote_hostname + "-dialback-key",
+					packet.getElemCData());
+				handshakingByHost_Type.put(accept_jid, serv);
+
+				// <db:result> with CDATA containing KEY
+				Element elem = new Element("db:verify", packet.getElemCData(),
+					new String[] {"id", "to", "from"},
+					new String[] {packet.getElemId(), packet.getElemFrom(),
+												packet.getElemTo()});
+				Packet result = new Packet(elem);
+				result.setTo(connect_jid);
+				results.offer(result);
+			} else {
+				// <db:result> with type 'valid' or 'invalid'
+				// It means that session has been validated now....
+				switch (packet.getType()) {
+				case valid:
+					servicesByHost_Type.put(connect_jid,
+						handshakingByHost_Type.remove(connect_jid));
+					connectingByHost_Type.remove(connect_jid);
+					handleDialbackSuccess(connect_jid);
+					break;
+				case invalid:
+				default:
+					break;
+				} // end of switch (packet.getType())
+			} // end of if (packet.getType() != null) else
+		} // end of if (packet != null && packet.getElemName().equals("db:result"))
+
+		// <db:verify> with type 'valid' or 'invalid'
+		if (packet.getElemName().equals("db:verify")) {
+			if (packet.getType() == null) {
+				if (packet.getElemId() != null && packet.getElemCData() != null) {
+
+					final String key = packet.getElemCData();
+
+					final String local_key =
+						(String)sharedSessionData.get(remote_hostname+"-dialback-key");
+
+					Packet result = null;
+
+					if (key.equals(local_key)) {
+						result = packet.swapElemFromTo(StanzaType.valid);
+					} else {
+						result = packet.swapElemFromTo(StanzaType.invalid);
+					} // end of if (key.equals(local_key)) else
+					result.getElement().setCData(null);
+					result.setTo(accept_jid);
+					results.offer(result);
+				} // end of if (packet.getElemName().equals("db:verify"))
+			}	else {
+				Element elem = new Element("db:result", null,
+					new String[] {"type", "to", "from"},
+					new String[] {packet.getType().toString(),
+												packet.getElemFrom(), packet.getElemTo()});
+				Packet result = new Packet(elem);
+				result.setTo(accept_jid);
+				results.offer(result);
+				handshakingByHost_Type.remove(accept_jid);
+				connectingByHost_Type.remove(accept_jid);
+			} // end of if (packet.getType() == null) else
+		} // end of if (packet != null && packet.getType() != null)
+
 	}
 
 }

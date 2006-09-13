@@ -228,9 +228,11 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 	 */
 	public void packetsReady(IOService s) throws IOException {
 		log.finest("packetsReady called");
-		writePacketsToSocket(s,
-			processSocketData(getUniqueId(s), s.getSessionData(),
-				((XMPPIOService)s).getReceivedPackets()));
+		XMPPIOService serv = (XMPPIOService)s;
+		writePacketsToSocket(serv, processSocketData(serv));
+// 		writePacketsToSocket(s,
+// 			processSocketData(getUniqueId(s), s.getSessionData(),
+// 				((XMPPIOService)s).getReceivedPackets()));
 	}
 
 	protected void writePacketsToSocket(IOService s, Queue<Packet> packets)
@@ -293,8 +295,7 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 		writePacketToSocket(packet);
 	}
 
-	public abstract Queue<Packet> processSocketData(String id,
-		ConcurrentMap<String, Object> sessionData, Queue<Packet> packets);
+	public abstract Queue<Packet> processSocketData(XMPPIOService serv);
 
 	public void serviceStopped(final IOService service) {
 		synchronized(service) {

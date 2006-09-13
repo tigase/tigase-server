@@ -161,11 +161,15 @@ public class ClientConnectionManager extends ConnectionManager {
 		} // end of switch (pc.getCommand())
 	}
 
-	public Queue<Packet> processSocketData(String id,
-		ConcurrentMap<String, Object> sessionData, Queue<Packet> packets) {
+	public Queue<Packet> processSocketData(XMPPIOService serv) {
+// 		String id,
+// 		ConcurrentMap<String, Object> sessionData, Queue<Packet> packets) {
 // 		Queue<Packet> results = new LinkedList<Packet>();
+
+		String id = getUniqueId(serv);
+
 		Packet p = null;
-		while ((p = packets.poll()) != null) {
+		while ((p = serv.getReceivedPackets().poll()) != null) {
 			log.finer("Processing packet: " + p.getElemName()
 				+ ", type: " + p.getType());
 			log.finest("Processing socket data: " + p.getStringData());

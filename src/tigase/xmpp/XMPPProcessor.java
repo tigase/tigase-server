@@ -84,7 +84,13 @@ public abstract class XMPPProcessor
     return false;
   }
 
-  public static XMPPProcessor getInstance() { return inst; }
+// 	/**
+// 	 * Dummy/empty implementation - this method is used in s2s implementation.
+// 	 */
+// 	public void process(Packet packet, Map<String, Object> sessionData,
+// 		Queue<Packet> results) {}
+
+	public static XMPPProcessor getInstance() { return inst; }
 
 	public void stopped(final XMPPResourceConnection session,
 		final Queue<Packet> results) {

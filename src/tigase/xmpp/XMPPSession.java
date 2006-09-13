@@ -25,6 +25,8 @@ package tigase.xmpp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Logger;
 import tigase.util.JID;
 
@@ -52,12 +54,33 @@ public class XMPPSession {
 	private ArrayList<XMPPResourceConnection> activeResources = null;
 
 	/**
+	 * This map keeps data shared between different sessions. It is used
+	 * mainly by the s2s implementation where for each IP address there is
+	 * a separate session object created. Unfortunatelly google uses 2 IP
+	 * addresses for each s2s session so sometimes sessions need to share
+	 * some data.
+	 */
+	private Map<String, Object> sharedSessionData = null;
+
+	/**
 	 * Creates a new <code>XMPPSession</code> instance.
 	 *
 	 */
 	public XMPPSession(final String username) {
 		activeResources = new ArrayList<XMPPResourceConnection>();
 		this.username = username;
+	}
+
+	public void setSharedSessionData(Map<String, Object> sharedData) {
+		this.sharedSessionData = sharedData;
+	}
+
+	public void putSharedObject(final String key, final Object val) {
+		sharedSessionData.put(key, val);
+	}
+
+	public Object getSharedObject(final String key) {
+		return sharedSessionData.get(key);
 	}
 
 	public void streamClosed(XMPPResourceConnection conn) {

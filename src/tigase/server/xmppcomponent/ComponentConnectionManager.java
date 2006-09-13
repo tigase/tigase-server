@@ -66,10 +66,12 @@ public class ComponentConnectionManager extends ConnectionManager {
 		writePacketToSocket(packet.packRouted());
 	}
 
-	public Queue<Packet> processSocketData(String id,
-		ConcurrentMap<String, Object> sessionData, Queue<Packet> packets) {
+	public Queue<Packet> processSocketData(XMPPIOService serv) {
+// 		String id,
+// 		ConcurrentMap<String, Object> sessionData, Queue<Packet> packets) {
+
 		Packet p = null;
-		while ((p = packets.poll()) != null) {
+		while ((p = serv.getReceivedPackets().poll()) != null) {
 			log.finer("Processing packet: " + p.getElemName()
 				+ ", type: " + p.getType());
 			log.finest("Processing socket data: " + p.getStringData());
