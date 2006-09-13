@@ -76,129 +76,228 @@ public class Dialback extends XMPPProcessor {
 
   public String[] supNamespaces() { return XMLNSS; }
 
-  public void process(final Packet packet, final XMPPResourceConnection session,
-		final Queue<Packet> results) {
+// 	public void process(Packet packet, Map<String, Object> sessionData,
+// 		Queue<Packet> results) {
 
-		final String ipAddress = session.getParentSession().getUserName();
+// 		String remote_hostname = JID.getNodeHost(packet.getElemFrom());
+// 		String connect_jid = JID.getJID(null, remote_hostname,
+// 			ConnectionType.connect.toString());
 
-		// <stream:stream> response
-		if (packet == null) {
-			// Well, I have to send db:result with unique session ID
-			String remote_hostname =
-				(String)session.getSessionData(REMOTE_HOSTNAME_KEY);
-			final String id = UUID.randomUUID().toString();
-			String key = null;
-			try {
-				key = Algorithms.digest(session.getSessionId(), id, "SHA");
-			} catch (NoSuchAlgorithmException e) {
-				key = id;
-			} // end of try-catch
-			session.putSessionData("dialback-key", key);
-			Element elem = new Element("db:result", key);
-			elem.addAttribute("to", remote_hostname);
-			elem.addAttribute("from", session.getDomain());
-			Packet result = new Packet(elem);
-			result.setTo(JID.getJID(null, ipAddress,
-					ConnectionType.connect.toString()));
-			results.offer(result);
-		} // end of if (packet == null)
+// 		// <db:result>
+// 		if (packet != null && packet.getElemName().equals("db:result")) {
+// 			if (packet.getType() == null) {
+// 				// db:result with key to validate from accept connection
+// 				// Assuming this is the first packet from that connection which
+// 				// tells us for what domain this connection is we have to map
+// 				// somehow this IP address to hostname
+// 				sessionData.put(remote_hostname + "-session-id",
+// 					packet.getElemId());
+// 				sessionData.put(remote_hostname + "-dialback-key",
+// 					packet.getElemCData());
 
-		// <db:result> with type 'valid' or 'invalid'
-		if (packet != null && packet.getElemName().equals("db:result")) {
-			if (packet.getType() == null) {
-				// <db:result> with CDATA containing KEY
-				Element elem = new Element("db:verify", packet.getElemCData(),
-					new String[] {"id", "to", "from"},
-					new String[] {session.getSessionId(), packet.getElemFrom(),
-												packet.getElemTo()});
-				Packet result = new Packet(elem);
-				result.setTo(JID.getJID(null, ipAddress,
-						ConnectionType.connect.toString()));
-				results.offer(result);
-			} else {
-				switch (packet.getType()) {
-				case valid:
-					CallbackHandler cbh =
-						new AuthCallbackHandler(session.getParentSession());
-					try {
-						LoginContext lc = new LoginContext("dialback", cbh);
-						session.setLoginContext(lc);
-						session.login();
-					} catch (LoginException e) { e.printStackTrace(); }
-					break;
-				case invalid:
-				default:
-					break;
-				} // end of switch (packet.getType())
-			} // end of if (packet.getType() != null) else
-		} // end of if (packet != null && packet.getElemName().equals("db:result"))
+// 				// <db:result> with CDATA containing KEY
+// 				Element elem = new Element("db:verify", packet.getElemCData(),
+// 					new String[] {"id", "to", "from"},
+// 					new String[] {packet.getElemId(), packet.getElemFrom(),
+// 												packet.getElemTo()});
+// 				Packet result = new Packet(elem);
+// 				result.setTo(connect_jid);
+// 				results.offer(result);
+// 			} else {
+// 				// <db:result> with type 'valid' or 'invalid'
+// 				// It means that session has been validated now....
+// 				switch (packet.getType()) {
+// 				case valid:
+// 					CallbackHandler cbh =
+// 						new AuthCallbackHandler(conn.getParentSession());
+// 					try {
+// 						LoginContext lc = new LoginContext("dialback", cbh);
+// 						conn.setLoginContext(lc);
+// 						conn.login();
+// 					} catch (LoginException e) { e.printStackTrace(); }
+// 					break;
+// 				case invalid:
+// 				default:
+// 					break;
+// 				} // end of switch (packet.getType())
+// 			} // end of if (packet.getType() != null) else
+// 		} // end of if (packet != null && packet.getElemName().equals("db:result"))
 
-		// <db:verify> with type 'valid' or 'invalid'
-		if (packet != null && packet.getElemName().equals("db:verify")
-			&& packet.getType() != null) {
-			Element elem = new Element("db:result", null,
-				new String[] {"type", "to", "from"},
-				new String[] {packet.getType().toString(),
-											packet.getElemFrom(), packet.getElemTo()});
-			Packet result = new Packet(elem);
-			result.setTo(JID.getJID(null, ipAddress,
-						ConnectionType.accept.toString()));
-			results.offer(result);
-		} // end of if (packet != null && packet.getType() != null)
+// 		// <db:verify> with type 'valid' or 'invalid'
+// 		if (packet != null && packet.getElemName().equals("db:verify")
+// 			&& packet.getType() != null) {
+// 			Element elem = new Element("db:result", null,
+// 				new String[] {"type", "to", "from"},
+// 				new String[] {packet.getType().toString(),
+// 											packet.getElemFrom(), packet.getElemTo()});
+// 			Packet result = new Packet(elem);
+// 			result.setTo(JID.getJID(null, ipAddress,
+// 						ConnectionType.accept.toString()));
+// 			results.offer(result);
+// 		} // end of if (packet != null && packet.getType() != null)
 
-		// <db:verify> with ID and CDATA containing KEY
-		if (packet != null && packet.getType() == null) {
-			if (packet.getElemName().equals("db:verify")
-				&& packet.getElemId() != null
-				&& packet.getElemCData("db:verify") != null) {
+// 		// <db:verify> with ID and CDATA containing KEY
+// 		if (packet != null && packet.getType() == null) {
+// 			if (packet.getElemName().equals("db:verify")
+// 				&& packet.getElemId() != null
+// 				&& packet.getElemCData("db:verify") != null) {
 
-				final String key = packet.getElemCData("db:verify");
+// 				final String key = packet.getElemCData("db:verify");
 
-				final XMPPResourceConnection connect_conn =
-					session.getParentSession().getResourceForJID(JID.getJID(null,
-							ipAddress, ConnectionType.connect.toString()));
-				final String local_key =
-					(String)connect_conn.getSessionData("dialback-key");
-				Packet result = null;
-				if (key.equals(local_key)) {
-					result = packet.swapElemFromTo(StanzaType.valid);
-				} // end of if (key.equals(local_key))
-				else {
-					result = packet.swapElemFromTo(StanzaType.invalid);
-				} // end of if (key.equals(local_key)) else
-				result.getElement().setCData(null);
-				result.setTo(JID.getJID(null, ipAddress,
-						ConnectionType.accept.toString()));
-				results.offer(result);
-			} // end of if (packet.getElemName().equals("db:verify"))
-		} // end of if (packet != null && packet.getType() == null)
-	}
+// 				final XMPPResourceConnection connect_conn =
+// 					conn.getParentSession().getResourceForJID(JID.getJID(null,
+// 							ipAddress, ConnectionType.connect.toString()));
 
-  private class AuthCallbackHandler implements CallbackHandler {
+// 				if (connect_conn == null) {
+// 					log.warning("!!!!! connect_conn == NULL for session="
+// 						+conn.getParentSession().getUserName());
+// 				} // end of if (connect_conn == null)
 
-		private XMPPSession session = null;
+// 				final String local_key =
+// 					(String)session.getSharedObject("-dialback-key");
 
-		public AuthCallbackHandler(final XMPPSession session) {
-			this.session = session;
-		}
+// 				Packet result = null;
 
-		public void handle(final Callback[] callbacks)
-      throws IOException, UnsupportedCallbackException {
+// 				if (key.equals(local_key)) {
+// 					result = packet.swapElemFromTo(StanzaType.valid);
+// 				} // end of if (key.equals(local_key))
+// 				else {
+// 					result = packet.swapElemFromTo(StanzaType.invalid);
+// 				} // end of if (key.equals(local_key)) else
+// 				result.getElement().setCData(null);
+// 				result.setTo(JID.getJID(null, ipAddress,
+// 						ConnectionType.accept.toString()));
+// 				results.offer(result);
+// 			} // end of if (packet.getElemName().equals("db:verify"))
+// 		} // end of if (packet != null && packet.getType() == null)
 
-      for (int i = 0; i < callbacks.length; i++) {
-        log.finest("Callback: " + callbacks[i].getClass().getSimpleName());
-				if (callbacks[i] instanceof SessionCallback) {
-          log.finest("SessionCallback: " + session.getUserName());
-					SessionCallback sc = (SessionCallback)callbacks[i];
-					sc.setSession(session);
-        } else {
-          throw new UnsupportedCallbackException(callbacks[i],
-						"Unrecognized Callback");
-        }
-      }
+// 	}
 
-    }
+	public void process(Packet packet, XMPPResourceConnection session,
+		Queue<Packet> results) { }
 
-  }
+// 	public void process(final Packet packet, final Map<String, Object> sessionData,
+// 		final Queue<Packet> results) {
+
+// 		XMPPSession session = conn.getParentSession();
+// 		String ipAddress = session.getUserName();
+// 		String connect_jid = JID.getJID(null, ipAddress,
+// 			ConnectionType.connect.toString());
+// 		String remote_hostname = null;
+// 		if (packet != null) {
+// 			remote_hostname = JID.getNodeHost(packet.getElemFrom());
+// 		} // end of if (packet != null)
+
+
+// 		// <db:result>
+// 		if (packet != null && packet.getElemName().equals("db:result")) {
+// 			if (packet.getType() == null) {
+// 				session.putSharedObject(remote_hostname + "-session-id",
+// 					conn.getSessionId());
+// 				session.putSharedObject(remote_hostname + "-dialback-key",
+// 					packet.getElemCData());
+
+// 				// <db:result> with CDATA containing KEY
+// 				Element elem = new Element("db:verify", packet.getElemCData(),
+// 					new String[] {"id", "to", "from"},
+// 					new String[] {conn.getSessionId(), packet.getElemFrom(),
+// 												packet.getElemTo()});
+// 				Packet result = new Packet(elem);
+// 				result.setTo(connect_jid);
+// 				results.offer(result);
+// 			} else {
+// 				// <db:result> with type 'valid' or 'invalid'
+// 				switch (packet.getType()) {
+// 				case valid:
+// 					CallbackHandler cbh =
+// 						new AuthCallbackHandler(conn.getParentSession());
+// 					try {
+// 						LoginContext lc = new LoginContext("dialback", cbh);
+// 						conn.setLoginContext(lc);
+// 						conn.login();
+// 					} catch (LoginException e) { e.printStackTrace(); }
+// 					break;
+// 				case invalid:
+// 				default:
+// 					break;
+// 				} // end of switch (packet.getType())
+// 			} // end of if (packet.getType() != null) else
+// 		} // end of if (packet != null && packet.getElemName().equals("db:result"))
+
+// 		// <db:verify> with type 'valid' or 'invalid'
+// 		if (packet != null && packet.getElemName().equals("db:verify")
+// 			&& packet.getType() != null) {
+// 			Element elem = new Element("db:result", null,
+// 				new String[] {"type", "to", "from"},
+// 				new String[] {packet.getType().toString(),
+// 											packet.getElemFrom(), packet.getElemTo()});
+// 			Packet result = new Packet(elem);
+// 			result.setTo(JID.getJID(null, ipAddress,
+// 						ConnectionType.accept.toString()));
+// 			results.offer(result);
+// 		} // end of if (packet != null && packet.getType() != null)
+
+// 		// <db:verify> with ID and CDATA containing KEY
+// 		if (packet != null && packet.getType() == null) {
+// 			if (packet.getElemName().equals("db:verify")
+// 				&& packet.getElemId() != null
+// 				&& packet.getElemCData("db:verify") != null) {
+
+// 				final String key = packet.getElemCData("db:verify");
+
+// 				final XMPPResourceConnection connect_conn =
+// 					conn.getParentSession().getResourceForJID(JID.getJID(null,
+// 							ipAddress, ConnectionType.connect.toString()));
+
+// 				if (connect_conn == null) {
+// 					log.warning("!!!!! connect_conn == NULL for session="
+// 						+conn.getParentSession().getUserName());
+// 				} // end of if (connect_conn == null)
+
+// 				final String local_key =
+// 					(String)session.getSharedObject("-dialback-key");
+
+// 				Packet result = null;
+
+// 				if (key.equals(local_key)) {
+// 					result = packet.swapElemFromTo(StanzaType.valid);
+// 				} // end of if (key.equals(local_key))
+// 				else {
+// 					result = packet.swapElemFromTo(StanzaType.invalid);
+// 				} // end of if (key.equals(local_key)) else
+// 				result.getElement().setCData(null);
+// 				result.setTo(JID.getJID(null, ipAddress,
+// 						ConnectionType.accept.toString()));
+// 				results.offer(result);
+// 			} // end of if (packet.getElemName().equals("db:verify"))
+// 		} // end of if (packet != null && packet.getType() == null)
+// 	}
+
+//   private class AuthCallbackHandler implements CallbackHandler {
+
+// 		private XMPPSession session = null;
+
+// 		public AuthCallbackHandler(final XMPPSession session) {
+// 			this.session = session;
+// 		}
+
+// 		public void handle(final Callback[] callbacks)
+//       throws IOException, UnsupportedCallbackException {
+
+//       for (int i = 0; i < callbacks.length; i++) {
+//         log.finest("Callback: " + callbacks[i].getClass().getSimpleName());
+// 				if (callbacks[i] instanceof SessionCallback) {
+//           log.finest("SessionCallback: " + session.getUserName());
+// 					SessionCallback sc = (SessionCallback)callbacks[i];
+// 					sc.setSession(session);
+//         } else {
+//           throw new UnsupportedCallbackException(callbacks[i],
+// 						"Unrecognized Callback");
+//         }
+//       }
+
+//     }
+
+//   }
 
 } // Dialback
