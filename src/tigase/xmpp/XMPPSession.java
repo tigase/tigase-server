@@ -54,33 +54,12 @@ public class XMPPSession {
 	private ArrayList<XMPPResourceConnection> activeResources = null;
 
 	/**
-	 * This map keeps data shared between different sessions. It is used
-	 * mainly by the s2s implementation where for each IP address there is
-	 * a separate session object created. Unfortunatelly google uses 2 IP
-	 * addresses for each s2s session so sometimes sessions need to share
-	 * some data.
-	 */
-	private Map<String, Object> sharedSessionData = null;
-
-	/**
 	 * Creates a new <code>XMPPSession</code> instance.
 	 *
 	 */
 	public XMPPSession(final String username) {
 		activeResources = new ArrayList<XMPPResourceConnection>();
 		this.username = username;
-	}
-
-	public void setSharedSessionData(Map<String, Object> sharedData) {
-		this.sharedSessionData = sharedData;
-	}
-
-	public void putSharedObject(final String key, final Object val) {
-		sharedSessionData.put(key, val);
-	}
-
-	public Object getSharedObject(final String key) {
-		return sharedSessionData.get(key);
 	}
 
 	public void streamClosed(XMPPResourceConnection conn) {
@@ -101,8 +80,22 @@ public class XMPPSession {
 	}
 
 	public void addResourceConnection(XMPPResourceConnection conn) {
+		log.finest("Adding resource connection for id: " + conn.getConnectionId());
+		XMPPResourceConnection old_res = getResourceForResource(conn.getResource());
+		if (old_res != null) {
+			log.finest("Found old resource connection, id: "+old_res.getConnectionId());
+			activeResources.remove(old_res);
+		} // end of if (old_res != null)
 		activeResources.add(conn);
 		conn.setParentSession(this);
+		log.finest("Number of active resources is: " + activeResources.size());
+		if (activeResources.size() > 1) {
+			int i = 0;
+			for (XMPPResourceConnection res: activeResources) {
+				log.finest("RES " + (++i) + ": " + res.getResource() + ", "
+					+ res.getConnectionId());
+			} // end of for (XMPPResourceConnection res: activeResources)
+		} // end of if (activeResources.size() > 1)
 	}
 
 	public void removeResourceConnection(XMPPResourceConnection conn) {
@@ -119,9 +112,8 @@ public class XMPPSession {
 		return result;
 	}
 
-	public XMPPResourceConnection getResourceForJID(final String jid) {
-		final String resource = JID.getNodeResource(jid);
-		if (resource.length() > 0) {
+	public XMPPResourceConnection getResourceForResource(final String resource) {
+		if (resource != null && resource.length() > 0) {
 			for (XMPPResourceConnection conn: activeResources) {
 				if (resource.equals(conn.getResource())) {
 					return conn;
@@ -129,6 +121,11 @@ public class XMPPSession {
 			} // end of for (XMPPResourceConnection conn: activeResources)
 		} // end of if (resource.length() > 0)
 		return null;
+	}
+
+	public XMPPResourceConnection getResourceForJID(final String jid) {
+		final String resource = JID.getNodeResource(jid);
+		return getResourceForResource(resource);
 	}
 
 	public XMPPResourceConnection getResourceConnection(final String jid) {

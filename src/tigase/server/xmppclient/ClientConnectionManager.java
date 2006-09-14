@@ -162,9 +162,6 @@ public class ClientConnectionManager extends ConnectionManager {
 	}
 
 	public Queue<Packet> processSocketData(XMPPIOService serv) {
-// 		String id,
-// 		ConcurrentMap<String, Object> sessionData, Queue<Packet> packets) {
-// 		Queue<Packet> results = new LinkedList<Packet>();
 
 		String id = getUniqueId(serv);
 
