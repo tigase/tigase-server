@@ -79,6 +79,20 @@ public class XMPPSession {
 		return activeResources.size();
 	}
 
+	/**
+	 * This method is called each time the resource is set for connection.
+	 */
+	public void resourceSet(XMPPResourceConnection conn) {
+		activeResources.remove(conn);
+		String cur_res = conn.getResource();
+		XMPPResourceConnection old_conn = getResourceForResource(cur_res);
+		if (old_conn != null) {
+			log.finest("Found old resource connection, id: "+old_conn.getConnectionId());
+			activeResources.remove(old_conn);
+		} // end of if (old_res != null)
+		activeResources.add(conn);
+	}
+
 	public void addResourceConnection(XMPPResourceConnection conn) {
 		log.finest("Adding resource connection for id: " + conn.getConnectionId());
 		XMPPResourceConnection old_res = getResourceForResource(conn.getResource());

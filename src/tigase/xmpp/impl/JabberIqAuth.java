@@ -113,10 +113,10 @@ public class JabberIqAuth extends XMPPProcessor {
 				new AuthCallbackHandler(user_name, user_pass, resource, session);
 			LoginContext lc = null;
 			try {
-				session.setResource(resource);
 				lc = new LoginContext(auth_mod, cbh);
 				session.setLoginContext(lc);
 				session.login();
+				session.setResource(resource);
 				results.offer(session.getAuthState().getResponseMessage(packet,
 					"Authentication successful.", false));
 			} catch (Exception e) {

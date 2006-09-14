@@ -264,6 +264,7 @@ public class XMPPResourceConnection {
 	 */
 	public void setResource(final String argResource) {
 		this.resource = argResource;
+		parentSession.resourceSet(this);
 	}
 
 	/**
