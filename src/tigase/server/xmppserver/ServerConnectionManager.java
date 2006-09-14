@@ -195,7 +195,8 @@ public class ServerConnectionManager extends ConnectionManager {
 				+ ", type: " + p.getType());
 			log.finest("Processing socket data: " + p.getStringData());
 
-			if (p.getElement().getXMLNS().equals("jabber:server:dialback")) {
+			if (p.getElement().getXMLNS() != null &&
+				p.getElement().getXMLNS().equals("jabber:server:dialback")) {
 				Queue<Packet> results = new LinkedList<Packet>();
 				processDialback(p, serv, results);
 				for (Packet res: results) {
@@ -243,7 +244,7 @@ public class ServerConnectionManager extends ConnectionManager {
 				ConnectionType.connect.toString());
 			handshakingByHost_Type.put(connect_jid, serv);
 			String remote_id = attribs.get("id");
-			sharedSessionData.put(remote_hostname+"-session-id", remote_id);
+			sharedSessionData.put(connect_jid+"-session-id", remote_id);
 			String uuid = UUID.randomUUID().toString();
 			String key = null;
 			try {
@@ -251,7 +252,7 @@ public class ServerConnectionManager extends ConnectionManager {
 			} catch (NoSuchAlgorithmException e) {
 				key = uuid;
 			} // end of try-catch
-			sharedSessionData.put(remote_hostname+"-dialback-key", key);
+			sharedSessionData.put(connect_jid+"-dialback-key", key);
 			Element elem = new Element("db:result", key);
 			elem.addAttribute("to", remote_hostname);
 			elem.addAttribute("from", hostnames[0]);
@@ -351,10 +352,11 @@ public class ServerConnectionManager extends ConnectionManager {
 	public void handleDialbackSuccess(final String connect_jid) {
 		log.finest("handleDialbackSuccess: connect_jid="+connect_jid);
 		Packet p = null;
+		XMPPIOService serv = servicesByHost_Type.get(connect_jid);
 		Queue<Packet> waiting =	waitingPackets.get(connect_jid);
 		while ((p = waiting.poll()) != null) {
 			log.finest("Sending packet: " + p.getStringData());
-			writePacketToSocket(p, connect_jid);
+			writePacketToSocket(serv, p);
 		} // end of while (p = waitingPackets.remove(ipAddress) != null)
 	}
 
@@ -374,16 +376,17 @@ public class ServerConnectionManager extends ConnectionManager {
 				// Assuming this is the first packet from that connection which
 				// tells us for what domain this connection is we have to map
 				// somehow this IP address to hostname
-				sharedSessionData.put(remote_hostname + "-session-id",
+				sharedSessionData.put(accept_jid + "-session-id",
 					serv.getSessionData().get(serv.SESSION_ID_KEY));
-				sharedSessionData.put(remote_hostname + "-dialback-key",
+				sharedSessionData.put(accept_jid + "-dialback-key",
 					packet.getElemCData());
 				handshakingByHost_Type.put(accept_jid, serv);
 
 				// <db:result> with CDATA containing KEY
 				Element elem = new Element("db:verify", packet.getElemCData(),
 					new String[] {"id", "to", "from"},
-					new String[] {packet.getElemId(), packet.getElemFrom(),
+					new String[] {(String)serv.getSessionData().get(serv.SESSION_ID_KEY),
+												packet.getElemFrom(),
 												packet.getElemTo()});
 				Packet result = new Packet(elem);
 				result.setTo(connect_jid);
@@ -397,6 +400,8 @@ public class ServerConnectionManager extends ConnectionManager {
 						handshakingByHost_Type.remove(connect_jid));
 					connectingByHost_Type.remove(connect_jid);
 					handleDialbackSuccess(connect_jid);
+					handshakingByHost_Type.remove(accept_jid);
+					connectingByHost_Type.remove(accept_jid);
 					break;
 				case invalid:
 				default:
@@ -410,10 +415,11 @@ public class ServerConnectionManager extends ConnectionManager {
 			if (packet.getType() == null) {
 				if (packet.getElemId() != null && packet.getElemCData() != null) {
 
+					final String id = packet.getElemId();
 					final String key = packet.getElemCData();
 
 					final String local_key =
-						(String)sharedSessionData.get(remote_hostname+"-dialback-key");
+						(String)sharedSessionData.get(connect_jid+"-dialback-key");
 
 					Packet result = null;
 
@@ -434,8 +440,6 @@ public class ServerConnectionManager extends ConnectionManager {
 				Packet result = new Packet(elem);
 				result.setTo(accept_jid);
 				results.offer(result);
-				handshakingByHost_Type.remove(accept_jid);
-				connectingByHost_Type.remove(accept_jid);
 			} // end of if (packet.getType() == null) else
 		} // end of if (packet != null && packet.getType() != null)
 
