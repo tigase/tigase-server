@@ -51,8 +51,9 @@ public class BindResource extends XMPPProcessor {
 	protected static final String ID = XMLNS;
   protected static final String[] ELEMENTS = {"bind"};
   protected static final String[] XMLNSS = {XMLNS};
-  protected static final String[] FEATURES = {
-    "<bind xmlns='urn:ietf:params:xml:ns:xmpp-bind'/>"};
+  protected static final Element[] FEATURES = {
+		new Element("bind",	new String[] {"xmlns"}, new String[] {XMLNS})
+	};
 
   private static int resGenerator = 0;
 
@@ -62,7 +63,7 @@ public class BindResource extends XMPPProcessor {
 
   public String[] supNamespaces() { return XMLNSS; }
 
-  public String[] supStreamFeatures(final XMPPResourceConnection session)	{
+  public Element[] supStreamFeatures(final XMPPResourceConnection session)	{
     if (session.getSessionData(RESOURCE_KEY) != null) {
       return null;
     } else {

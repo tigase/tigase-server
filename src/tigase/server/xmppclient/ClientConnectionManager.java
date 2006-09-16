@@ -25,6 +25,8 @@
 package tigase.server.xmppclient;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
@@ -47,6 +49,7 @@ import tigase.xmpp.XMPPIOService;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 //import tigase.net.IOService;
+import tigase.net.IOService;
 import tigase.net.SocketReadThread;
 
 /**
@@ -97,9 +100,9 @@ public class ClientConnectionManager extends ConnectionManager {
 		switch (packet.getCommand()) {
 		case GETFEATURES:
 			if (packet.getType() == StanzaType.result) {
-				String features = getFeatures(getXMPPSession(packet));
+				List<Element> features = getFeatures(getXMPPSession(packet));
 				Element elem_features = new Element("stream:features");
-				elem_features.setCData(features);
+				elem_features.addChildren(features);
 				elem_features.addChildren(packet.getElement().getChildren());
 				Packet result = new Packet(elem_features);
 				result.setTo(packet.getTo());
@@ -220,17 +223,15 @@ public class ClientConnectionManager extends ConnectionManager {
 			(XMPPResourceConnection)serv.getSessionData().get("xmpp-session");
 	}
 
-	private String getFeatures(XMPPResourceConnection session) {
-		StringBuilder sb = new StringBuilder();
+	private List<Element> getFeatures(XMPPResourceConnection session) {
+		List<Element> results = new LinkedList<Element>();
 		for (XMPPProcessorIfc proc: processors.values()) {
-			String[] features = proc.supStreamFeatures(session);
+			Element[] features = proc.supStreamFeatures(session);
 			if (features != null) {
-				for (String f: features) {
-					sb.append(f);
-				} // end of for ()
+				results.addAll(Arrays.asList(features));
 			} // end of if (features != null)
 		} // end of for ()
-		return sb.toString();
+		return results;
 	}
 
 	protected int[] getDefPlainPorts() {
@@ -277,12 +278,14 @@ public class ClientConnectionManager extends ConnectionManager {
 			+ " xmlns:stream='http://etherx.jabber.org/streams'>";
 	}
 
-	public void serviceStopped(XMPPIOService service) {
+	public void serviceStopped(IOService service) {
 		super.serviceStopped(service);
 		//		XMPPIOService serv = (XMPPIOService)service;
-		addOutPacket(Command.STREAM_CLOSED.getPacket(
-									 JID.getJID(getName(), getDefHostName(), getUniqueId(service)),
-									 routings.computeRouting(null), StanzaType.set, "sess1"));
+		Packet command = Command.STREAM_CLOSED.getPacket(
+			JID.getJID(getName(), getDefHostName(), getUniqueId(service)),
+			routings.computeRouting(null), StanzaType.set, "sess1");
+		addOutPacket(command);
+		log.fine("Service stopped, sending packet: " + command.getStringData());
 	}
 
 	public void xmppStreamClosed(XMPPIOService serv) {

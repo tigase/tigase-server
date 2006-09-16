@@ -38,7 +38,7 @@ public class ElementUtils {
 
 	public static Element createIqQuery(final String from, final String to,
 		final StanzaType type, final String id, final String xmlns) {
-		Element iq = new Element("iq", null,
+		Element iq = new Element("iq",
 			new String[] {"from", "to", "type", "id"},
 			new String[] {from, to, type.toString(), id});
 		Element query = new Element("query");
@@ -49,7 +49,7 @@ public class ElementUtils {
 
 	public static Element createIqQuery(final String from, final String to,
 		final StanzaType type, final String id, final Element query) {
-		Element iq = new Element("iq", null,
+		Element iq = new Element("iq",
 			new String[] {"from", "to", "type", "id"},
 			new String[] {from, to, type.toString(), id});
 		iq.addChild(query);

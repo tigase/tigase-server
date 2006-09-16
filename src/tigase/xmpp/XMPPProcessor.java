@@ -27,6 +27,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 import tigase.server.Packet;
+import tigase.xml.Element;
 
 /**
  * <code>XMPPProcessor</code> abstract class contains basic definition for
@@ -65,7 +66,7 @@ public abstract class XMPPProcessor
 
   public String[] supNamespaces() { return null; }
 
-  public String[] supStreamFeatures(final XMPPResourceConnection session)
+  public Element[] supStreamFeatures(final XMPPResourceConnection session)
 	{ return null; }
 
   public String[] supDiscoFeatures(final XMPPResourceConnection session)

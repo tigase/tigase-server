@@ -39,7 +39,19 @@ package tigase.db;
  */
 public interface UserRepository {
 
-  /**
+	/**
+	 * Method <code>userExists</code> checks whether specified user exists in
+	 * repository. Return <code>true</code> if user exists, <code>false</code>
+	 * otherwise.
+	 *
+	 * @param user a <code>String</code> value if user node it that is
+	 * user <em>JID</em> without resource part.
+	 * @return a <code>boolean</code> value of <code>true</code> if user exists
+	 * and <code>false</code> otherwise.
+	 */
+	boolean userExists(String user);
+
+	/**
    * This <code>addUser</code> method allows to add new user to reposiotry.
    * It <b>must</b> throw en exception <code>UserExistsException</code> if such
    * user already exists because user <b>must</b> be unique within user
@@ -128,6 +140,26 @@ public interface UserRepository {
    * @exception UserNotFoundException if user id hasn't been found in reository.
    */
   void setDataList(String user, String subnode, String key, String[] list)
+    throws UserNotFoundException;
+
+	/**
+	 * <code>addDataList</code> method adds mode entries to existing data list
+	 * associated with given key in repository under given node path.
+	 * This method is very similar to <code>setDataList(...)</code> except it
+	 * doesn't remove existing data.
+	 *
+   * @param user a <code>String</code> value of user ID for which data must be
+   * stored. User ID consists of user name and domain name.
+   * @param subnode a <code>String</code> value is a node path where data is
+   * stored. Node path has the same form as directory path on file system:
+   * <pre>/root/subnode1/subnode2</pre>.
+   * @param key a <code>String</code> with which the specified values list is to
+   * be associated.
+   * @param list a <code>String[]</code> is an array of values to be assosiated
+   * with the specified key.
+   * @exception UserNotFoundException if user id hasn't been found in reository.
+	 */
+	void addDataList(String user, String subnode, String key, String[] list)
     throws UserNotFoundException;
 
   /**

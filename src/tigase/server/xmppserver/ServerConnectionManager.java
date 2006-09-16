@@ -347,6 +347,12 @@ public class ServerConnectionManager extends ConnectionManager {
 
 	public void serviceStopped(final IOService service) {
 		super.serviceStopped(service);
+		String remote_hostname =
+			(String)service.getSessionData().get("remote-hostname");
+		String id = JID.getJID(null, remote_hostname,
+			service.connectionType().toString());
+		servicesByHost_Type.remove(id);
+		log.fine("s2s stopped: " + id);
 	}
 
 	public void handleDialbackSuccess(final String connect_jid) {
@@ -354,10 +360,12 @@ public class ServerConnectionManager extends ConnectionManager {
 		Packet p = null;
 		XMPPIOService serv = servicesByHost_Type.get(connect_jid);
 		Queue<Packet> waiting =	waitingPackets.get(connect_jid);
-		while ((p = waiting.poll()) != null) {
-			log.finest("Sending packet: " + p.getStringData());
-			writePacketToSocket(serv, p);
-		} // end of while (p = waitingPackets.remove(ipAddress) != null)
+		if (waiting != null) {
+			while ((p = waiting.poll()) != null) {
+				log.finest("Sending packet: " + p.getStringData());
+				writePacketToSocket(serv, p);
+			} // end of while (p = waitingPackets.remove(ipAddress) != null)
+		} // end of if (waiting != null)
 	}
 
 	public void processDialback(Packet packet, XMPPIOService serv,
@@ -380,6 +388,7 @@ public class ServerConnectionManager extends ConnectionManager {
 					serv.getSessionData().get(serv.SESSION_ID_KEY));
 				sharedSessionData.put(accept_jid + "-dialback-key",
 					packet.getElemCData());
+				serv.getSessionData().put("remote-hostname", remote_hostname);
 				handshakingByHost_Type.put(accept_jid, serv);
 
 				// <db:result> with CDATA containing KEY
@@ -433,7 +442,7 @@ public class ServerConnectionManager extends ConnectionManager {
 					results.offer(result);
 				} // end of if (packet.getElemName().equals("db:verify"))
 			}	else {
-				Element elem = new Element("db:result", null,
+				Element elem = new Element("db:result",
 					new String[] {"type", "to", "from"},
 					new String[] {packet.getType().toString(),
 												packet.getElemFrom(), packet.getElemTo()});

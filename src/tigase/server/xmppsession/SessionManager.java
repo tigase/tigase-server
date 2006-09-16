@@ -25,14 +25,15 @@
 package tigase.server.xmppsession;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.TreeMap;
 import java.util.logging.Logger;
+import tigase.db.UserNotFoundException;
 import java.util.concurrent.ConcurrentSkipListMap;
 import tigase.util.DNSResolver;
 import java.net.UnknownHostException;
@@ -51,11 +52,13 @@ import tigase.server.XMPPService;
 import tigase.util.JID;
 import tigase.xml.Element;
 import tigase.xmpp.NotAuthorizedException;
+import tigase.db.UserNotFoundException;
 import tigase.xmpp.ProcessorFactory;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.XMPPSession;
+import tigase.xmpp.OfflineMessageStorage;
 import tigase.stats.StatRecord;
 
 /**
@@ -112,6 +115,7 @@ public class SessionManager extends AbstractMessageReceiver
 	public static final String AUTH_SASL_FLAG_PROP_VAL =	"sufficient";
 
 	private UserRepository repository = null;
+	private OfflineMessageStorage offlineMessages = null;
 
 	private Map<String, XMPPSession> sessionsByNodeId =
 		new ConcurrentSkipListMap<String, XMPPSession>();
@@ -127,6 +131,8 @@ public class SessionManager extends AbstractMessageReceiver
 		log.finest("Processing packet: " + packet.getStringData());
 		if (packet.isCommand()) {
 			processCommand(packet);
+			// No more processing is needed for command packet
+			return;
 		} // end of if (pc.isCommand())
 		XMPPResourceConnection conn = getXMPPResourceConnection(packet);
 		if (conn == null) {
@@ -140,6 +146,17 @@ public class SessionManager extends AbstractMessageReceiver
 				} else {
 					// It might be a message for off-line user....
 					// I will put support for off-line message retrieval here...
+					if (offlineMessages != null) {
+						try {
+							offlineMessages.savePacketForOffLineUser(packet);
+						} // end of try
+						catch (UserNotFoundException e) {
+							log.fine("Problem saving off-line message: " + e
+								+ ", for packet: " + packet.getStringData());
+						} // end of try-catch
+					} // end of if (offlineMessages != null)
+					// No more processing is needed....
+					return;
 				} // end of if (session != null) else
 			} else {
 				// It might be presence message for already off-line user...
@@ -209,12 +226,14 @@ public class SessionManager extends AbstractMessageReceiver
 			break;
 		case GETFEATURES:
 			if (pc.getType() == StanzaType.get) {
-				String features = getFeatures(connectionsByFrom.get(pc.getFrom()));
+				List<Element> features =
+					getFeatures(connectionsByFrom.get(pc.getFrom()));
 				Packet result = pc.commandResult(features);
 				addOutPacket(result);
 			} // end of if (pc.getType() == StanzaType.get)
 			break;
 		case STREAM_CLOSED:
+			log.fine("Stream closed from: " + pc.getFrom());
 			++closedConnections;
 			final XMPPResourceConnection conn =
 				connectionsByFrom.remove(pc.getFrom());
@@ -259,17 +278,15 @@ public class SessionManager extends AbstractMessageReceiver
 		return connectionsByFrom.get(p.getFrom()).getParentSession();
 	}
 
-	private String getFeatures(XMPPResourceConnection session) {
-		StringBuilder sb = new StringBuilder();
+	private List<Element> getFeatures(XMPPResourceConnection session) {
+		List<Element> results = new LinkedList<Element>();
 		for (XMPPProcessorIfc proc: processors.values()) {
-			String[] features = proc.supStreamFeatures(session);
+			Element[] features = proc.supStreamFeatures(session);
 			if (features != null) {
-				for (String f: features) {
-					sb.append(f);
-				} // end of for ()
+				results.addAll(Arrays.asList(features));
 			} // end of if (features != null)
 		} // end of for ()
-		return sb.toString();
+		return results;
 	}
 
 	public Map<String, Object> getDefaults() {
@@ -298,6 +315,7 @@ public class SessionManager extends AbstractMessageReceiver
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
 		repository = new XMLRepository((String)props.get(USER_REPOSITORY_PROP_KEY));
+		offlineMessages = new OfflineMessageStorage(repository);
 		String[] components = (String[])props.get(COMPONENTS_PROP_KEY);
 		processors.clear();
 		for (String comp_id: components) {
@@ -344,13 +362,27 @@ public class SessionManager extends AbstractMessageReceiver
 
 	public void handleLoginCommit(final String userName,
 		final XMPPResourceConnection conn) {
-		XMPPSession session =
-			sessionsByNodeId.get(JID.getNodeID(userName, conn.getDomain()));
+		String userId = JID.getNodeID(userName, conn.getDomain());
+		XMPPSession session = sessionsByNodeId.get(userId);
 		if (session == null) {
 			session = new XMPPSession(userName);
-			sessionsByNodeId.put(JID.getNodeID(userName, conn.getDomain()), session);
+			sessionsByNodeId.put(userId, session);
 		} // end of if (session == null)
 		session.addResourceConnection(conn);
+		try {
+			Queue<Packet> packets =
+				offlineMessages.restorePacketForOffLineUser(userId);
+ 			if (packets != null) {
+				addPackets(packets);
+// 				Packet p = null;
+// 				while ((p = packets.poll()) != null) {
+// 					processPacket(p);
+// 				} // end of while ((p = packets.poll()) != null)
+ 			} // end of if (packets != null)
+		} // end of try
+		catch (UserNotFoundException e) {
+
+		} // end of try-catch
 	}
 
 	public void handleLogout(final String userName,
@@ -382,6 +414,5 @@ public class SessionManager extends AbstractMessageReceiver
 		stats.add(new StatRecord("Closed connections", "long", closedConnections));
 		return stats;
 	}
-
 
 }

@@ -65,8 +65,10 @@ public class JabberIqAuth extends XMPPProcessor {
 	protected static final String ID = "jabber:iq:auth";
 	protected static final String[] ELEMENTS = {"query"};
   protected static final String[] XMLNSS = {"jabber:iq:auth"};
-  protected static final String[] FEATURES = {
-    "<auth xmlns='http://jabber.org/features/iq-auth'/>"};
+  protected static final Element[] FEATURES = {
+		new Element("auth",	new String[] {"xmlns"},
+			new String[] {"http://jabber.org/features/iq-auth"})
+	};
 
 	public String id() { return ID; }
 
@@ -74,7 +76,7 @@ public class JabberIqAuth extends XMPPProcessor {
 
   public String[] supNamespaces() { return XMLNSS; }
 
-  public String[] supStreamFeatures(final XMPPResourceConnection session)	{
+  public Element[] supStreamFeatures(final XMPPResourceConnection session)	{
     if (session != null && session.isAuthorized()) {
       return null;
     } else {
@@ -90,9 +92,9 @@ public class JabberIqAuth extends XMPPProcessor {
 		switch (type) {
 		case get:
 			results.offer(packet.okResult(
-											"<username/><password/><digest/><resource/>",
-											//"<username/><password/><resource/>",
-											1));
+					"<username/><password/><digest/><resource/>",
+					//"<username/><password/><resource/>",
+					1));
 			break;
 		case set:
       String user_name = request.getChildCData("/iq/query/username");

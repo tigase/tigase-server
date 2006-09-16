@@ -51,8 +51,8 @@ public class SessionBind extends XMPPProcessor {
 	protected static final String ID = XMLNS;
   protected static final String[] ELEMENTS = {"session"};
   protected static final String[] XMLNSS = {XMLNS};
-  protected static final String[] FEATURES = {
-    "<session xmlns='urn:ietf:params:xml:ns:xmpp-session'/>"};
+  protected static final Element[] FEATURES = {
+		new Element("session", new String[] {"xmlns"}, new String[] {XMLNS})};
 
   private static int resGenerator = 0;
 
@@ -62,7 +62,7 @@ public class SessionBind extends XMPPProcessor {
 
   public String[] supNamespaces() { return XMLNSS; }
 
-  public String[] supStreamFeatures(final XMPPResourceConnection session)	{
+  public Element[] supStreamFeatures(final XMPPResourceConnection session)	{
     if (session.getSessionData(SESSION_KEY) != null) {
       return null;
     } else {

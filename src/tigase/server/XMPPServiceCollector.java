@@ -58,7 +58,7 @@ public class XMPPServiceCollector extends AbstractComponentRegistrator {
 			String xmlns = packet.getElement().getAttribute("query");
 			query.setXMLNS(xmlns);
 			if (xmlns.equals(INFO_XMLNS)) {
-				Element identity = new Element("identity", null,
+				Element identity = new Element("identity",
 					new String[] {"category", "type", "name"},
 					new String[] {"server", "im", "Tigase"});
 				query.addChild(identity);
@@ -68,7 +68,7 @@ public class XMPPServiceCollector extends AbstractComponentRegistrator {
 							((XMPPService)comp).getDiscoFeatures();
 						if (features != null && features.size() > 0) {
 							for (String f: features) {
-								Element feature = new Element("feature", null,
+								Element feature = new Element("feature",
 									new String[] {"var"}, new String[] {f});
 								query.addChild(feature);
 							} // end of for ()

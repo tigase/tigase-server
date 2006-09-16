@@ -24,6 +24,7 @@ package tigase.xmpp;
 
 import java.util.Queue;
 import tigase.server.Packet;
+import tigase.xml.Element;
 
 /**
  * Describe interface XMPPProcessorIfc here.
@@ -42,7 +43,7 @@ public interface XMPPProcessorIfc {
 
 	String[] supNamespaces();
 
-	String[] supStreamFeatures(XMPPResourceConnection session);
+	Element[] supStreamFeatures(XMPPResourceConnection session);
 
 	String[] supDiscoFeatures(XMPPResourceConnection session);
 

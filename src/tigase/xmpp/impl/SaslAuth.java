@@ -60,12 +60,13 @@ public class SaslAuth extends XMPPProcessor {
     "auth", "response", "challenge", "failure", "success", "abort"};
   protected static final String[] XMLNSS = {
     XMLNS, XMLNS, XMLNS, XMLNS, XMLNS, XMLNS};
-  protected static final String[] FEATURES = {
-    "<mechanisms xmlns='" + XMLNS + "'>"
-    + "<mechanism>CRAM-MD5</mechanism>"
-    + "<mechanism>DIGEST-MD5</mechanism>"
-    + "<mechanism>PLAIN</mechanism>"
-    + "</mechanisms>"
+  protected static final Element[] FEATURES = {
+		new Element("mechanisms",
+			new Element[] {
+				new Element("mechanism", "CRAM-MD5"),
+				new Element("mechanism", "DIGEST-MD5"),
+				new Element("mechanism", "PLAIN")},
+			new String[] {"xmlns"}, new String[] {XMLNS})
   };
 
   public enum ElementType {
@@ -83,7 +84,7 @@ public class SaslAuth extends XMPPProcessor {
 
   public String[] supNamespaces() { return XMLNSS; }
 
-  public String[] supStreamFeatures(final XMPPResourceConnection session)	{
+  public Element[] supStreamFeatures(final XMPPResourceConnection session)	{
     if (session.isAuthorized()) {
       return null;
     } else {

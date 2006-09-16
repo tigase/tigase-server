@@ -24,6 +24,7 @@
 
 package tigase.server;
 
+import java.util.List;
 import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
 
@@ -165,7 +166,7 @@ public class Packet {
 // 	}
 
 	public Packet packRouted() {
-		Element routed = new Element("route", null, new String[] {"to", "from"},
+		Element routed = new Element("route", new String[] {"to", "from"},
 			new String[] {getTo(), getFrom()});
 		routed.addChild(elem);
 		return new Packet(routed);
@@ -186,10 +187,17 @@ public class Packet {
 		return result;
 	}
 
-	public Packet commandResult(final Element data) {
+	public Packet commandResult(final Element child) {
 		Packet result = command.getPacket(getTo(), getFrom(),
 			StanzaType.result, elem.getAttribute("id"));
-		result.getElement().addChild(data);
+		result.getElement().addChild(child);
+		return result;
+	}
+
+	public Packet commandResult(final List<Element> children) {
+		Packet result = command.getPacket(getTo(), getFrom(),
+			StanzaType.result, elem.getAttribute("id"));
+		result.getElement().addChildren(children);
 		return result;
 	}
 

@@ -271,10 +271,13 @@ public abstract class IOService implements Callable<IOService> {
    * @param msg a <code>String</code> value
    * @return a <code>boolean</code> value
    */
-  protected boolean debug(final String msg) {
-    if (msg != null) {
-			System.out.print(msg);
-			//      log.finest(msg);
+  protected boolean debug(final String msg, final String prefix) {
+    if (msg != null && msg.trim().length() > 0) {
+			String log_msg = "\n"
+				+ (connectionType() != null ?	connectionType().toString() : "null-type")
+				+ " " + prefix + "\n" + msg + "\n";
+				//			System.out.print(log_msg);
+				log.finest(log_msg);
     }
     return true;
   }

@@ -141,8 +141,7 @@ public class XMLRepository implements UserRepository {
       xmldb.setData(user, subnode, key, value);
     } // end of try
     catch (NodeNotFoundException e) {
-      throw new UserNotFoundException(USER_STR+user+
-        NOT_FOUND_STR, e);
+      throw new UserNotFoundException(USER_STR+user+NOT_FOUND_STR, e);
     } // end of try-catch
   }
 
@@ -191,6 +190,44 @@ public class XMLRepository implements UserRepository {
     throws UserNotFoundException {
     try {
       xmldb.setData(user, subnode, key, list);
+    } // end of try
+    catch (NodeNotFoundException e) {
+      throw new UserNotFoundException(USER_STR+user+
+        NOT_FOUND_STR, e);
+    } // end of try-catch
+  }
+
+	/**
+	 * <code>addDataList</code> method adds mode entries to existing data list
+	 * associated with given key in repository under given node path.
+	 * This method is very similar to <code>setDataList(...)</code> except it
+	 * doesn't remove existing data.
+	 *
+   * @param user a <code>String</code> value of user ID for which data must be
+   * stored. User ID consists of user name and domain name.
+   * @param subnode a <code>String</code> value is a node path where data is
+   * stored. Node path has the same form as directory path on file system:
+   * <pre>/root/subnode1/subnode2</pre>.
+   * @param key a <code>String</code> with which the specified values list is to
+   * be associated.
+   * @param list a <code>String[]</code> is an array of values to be assosiated
+   * with the specified key.
+   * @exception UserNotFoundException if user id hasn't been found in reository.
+	 */
+  public final void addDataList(final String user, final String subnode,
+    final String key, final String[] list)
+    throws UserNotFoundException {
+    try {
+			String[] old_data = getDataList(user, subnode, key);
+			String[] all = null;
+			if (old_data != null) {
+				all = new String[old_data.length+list.length];
+				System.arraycopy(old_data, 0, all, 0, old_data.length);
+				System.arraycopy(list, 0, all, old_data.length, list.length);
+				xmldb.setData(user, subnode, key, all);
+			} else {
+				xmldb.setData(user, subnode, key, list);
+			} // end of else
     } // end of try
     catch (NodeNotFoundException e) {
       throw new UserNotFoundException(USER_STR+user+
@@ -249,8 +286,7 @@ public class XMLRepository implements UserRepository {
       return (String)xmldb.getData(user, subnode, key, def);
     } // end of try
     catch (NodeNotFoundException e) {
-      throw new UserNotFoundException(USER_STR+user+
-        NOT_FOUND_STR, e);
+      throw new UserNotFoundException(USER_STR+user+NOT_FOUND_STR, e);
     } // end of try-catch
   }
 
@@ -310,8 +346,7 @@ public class XMLRepository implements UserRepository {
       return xmldb.getSubnodes(user, subnode);
     } // end of try
     catch (NodeNotFoundException e) {
-      throw new UserNotFoundException(USER_STR+user+
-        NOT_FOUND_STR, e);
+      throw new UserNotFoundException(USER_STR+user+NOT_FOUND_STR, e);
     } // end of try-catch
   }
 
@@ -351,8 +386,7 @@ public class XMLRepository implements UserRepository {
       return xmldb.getKeys(user, subnode);
     } // end of try
     catch (NodeNotFoundException e) {
-      throw new UserNotFoundException(USER_STR+user+
-        NOT_FOUND_STR, e);
+      throw new UserNotFoundException(USER_STR+user+NOT_FOUND_STR, e);
     } // end of try-catch
   }
 
@@ -396,8 +430,7 @@ public class XMLRepository implements UserRepository {
       xmldb.removeData(user, subnode, key);
     } // end of try
     catch (NodeNotFoundException e) {
-      throw new UserNotFoundException(USER_STR+user+
-        NOT_FOUND_STR, e);
+      throw new UserNotFoundException(USER_STR+user+NOT_FOUND_STR, e);
     } // end of try-catch
   }
 
@@ -437,9 +470,22 @@ public class XMLRepository implements UserRepository {
       xmldb.removeSubnode(user, subnode);
     } // end of try
     catch (NodeNotFoundException e) {
-      throw new UserNotFoundException(USER_STR+user+
-        NOT_FOUND_STR, e);
+      throw new UserNotFoundException(USER_STR+user+NOT_FOUND_STR, e);
     } // end of try-catch
   }
+
+	/**
+	 * Method <code>userExists</code> checks whether specified user exists in
+	 * repository. Return <code>true</code> if user exists, <code>false</code>
+	 * otherwise.
+	 *
+	 * @param user a <code>String</code> value if user node it that is
+	 * user <em>JID</em> without resource part.
+	 * @return a <code>boolean</code> value of <code>true</code> if user exists
+	 * and <code>false</code> otherwise.
+	 */
+	public boolean userExists(String user) {
+		return xmldb.findNode1(user) != null ? true : false;
+	}
 
 } // XMLRepository

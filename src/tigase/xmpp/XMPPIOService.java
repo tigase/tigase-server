@@ -53,7 +53,7 @@ public class XMPPIOService extends IOService {
 		Logger.getLogger("tigase.xmpp.XMPPIOService");
 
   private XMPPDomBuilderHandler domHandler = null;
-	private SimpleParser parser = SingletonFactory.getParserInstance();
+	private static SimpleParser parser = SingletonFactory.getParserInstance();
 	private XMPPIOServiceListener serviceListener = null;
 
   /**
@@ -100,8 +100,7 @@ public class XMPPIOService extends IOService {
     try {
 			log.finest("Sending data: " + response);
 			writeData(response);
-			assert debug("\n" + connectionType().toString()
-				+ "--SENT:\n" + response + "\n\n");
+			assert debug(response, "--SENT:");
 		} catch (IOException e) {
 			log.warning("Error sending stream open data: " + e);
 			try {
@@ -120,8 +119,7 @@ public class XMPPIOService extends IOService {
     try {
 			log.finest("Sending data: " + data);
 			writeData(data);
-			assert debug("\n" + connectionType().toString()
-				+ "--SENT:\n" + data + "\n\n");
+			assert debug(data, "--SENT:");
 		} catch (IOException e) {
 			log.warning("Error sending stream open data: " + e);
 			try {
@@ -199,8 +197,7 @@ public class XMPPIOService extends IOService {
 					+ ", type: " + packet.getType());
 				log.finest("Sending packet: " + packet.getStringData());
 				writeData(packet.getStringData());
-				assert debug("\n" + connectionType().toString()
-					+ "--SENT:\n" + packet.getStringData() + "\n\n");
+				assert debug(packet.getStringData(), "--SENT:");
 			} // end of while (packet = waitingPackets.poll() != null)
     } finally {
 			writeLock.unlock();
@@ -227,9 +224,7 @@ public class XMPPIOService extends IOService {
 				if (isConnected() && data != null) {
 					// This is log for debuging only,
 					// in normal mode don't even call below code
-					assert debug("\n" + (connectionType() != null ?
-							connectionType().toString() : "null-type")
-						+ "--RECEIVED:\n" + new String(data) + "\n\n");
+					assert debug(new String(data), "--RECEIVED:");
 					try {
 						parser.parse(domHandler, data, 0, data.length);
 						Queue<Element> elems = domHandler.getParsedElements();

@@ -51,10 +51,12 @@ public class StartTLS extends XMPPProcessor {
 	protected static final String ID = "starttls";
   protected static final String[] ELEMENTS = {"starttls", "proceed", "failure"};
   protected static final String[] XMLNSS = {XMLNS, XMLNS, XMLNS};
-  protected static final String[] F_REQUIRED = {
-    "<starttls xmlns='" + XMLNS + "'><required/></starttls>"};
-  protected static final String[] F_NOT_REQUIRED = {
-    "<starttls xmlns='" + XMLNS + "'/>"};
+  protected static final Element[] F_REQUIRED = {
+		new Element("starttls",
+			new Element[] { new Element("required") },
+			new String[] {"xmlns"}, new String[] {XMLNS})};
+  protected static final Element[] F_NOT_REQUIRED = {
+		new Element("starttls", new String[] {"xmlns"}, new String[] {XMLNS})};
 
 	protected Element proceed = null;
 	protected Element failure = null;
@@ -72,7 +74,7 @@ public class StartTLS extends XMPPProcessor {
 
   public String[] supNamespaces() { return XMLNSS; }
 
-  public String[] supStreamFeatures(final XMPPResourceConnection session)	{
+  public Element[] supStreamFeatures(final XMPPResourceConnection session)	{
     if (session.getSessionData(TLS_STARTED_KEY) == null) {
       if (session.getSessionData(TLS_REQUIRED_KEY) != null
 				&& session.getSessionData(TLS_REQUIRED_KEY).equals("true")) {

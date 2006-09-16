@@ -49,7 +49,7 @@ public enum Command {
 	public Packet getPacket(final String from, final String to,
 		final StanzaType type, final String id) {
 		Element elem =
-			new Element(this.toString(), null,
+			new Element(this.toString(),
 				new String[] {"type", "from", "to", "id", "xmlns"},
 				new String[] {type.toString(), from, to, id, XMLNS});
 		return new Packet(elem);
