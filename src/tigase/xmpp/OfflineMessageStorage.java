@@ -59,10 +59,13 @@ public class OfflineMessageStorage {
 
 	public boolean savePacketForOffLineUser(Packet packet)
 		throws UserNotFoundException {
-		String user_id = JID.getNodeID(packet.getElemTo());
-		repository.addDataList(user_id, "off-line",
-			"messages", new String[] {packet.getStringData()});
-		return true;
+		if (packet.getElemName().equals("message")) {
+			String user_id = JID.getNodeID(packet.getElemTo());
+			repository.addDataList(user_id, "off-line",
+				"messages", new String[] {packet.getStringData()});
+			return true;
+		} // end of if (packet.getElemName().equals("message"))
+		return false;
 	}
 
 	public Queue<Packet> restorePacketForOffLineUser(String userId)
