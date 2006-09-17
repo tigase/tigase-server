@@ -352,6 +352,8 @@ public class ServerConnectionManager extends ConnectionManager {
 		String id = JID.getJID(null, remote_hostname,
 			service.connectionType().toString());
 		servicesByHost_Type.remove(id);
+		handshakingByHost_Type.remove(id);
+		connectingByHost_Type.remove(id);
 		log.fine("s2s stopped: " + id);
 	}
 
