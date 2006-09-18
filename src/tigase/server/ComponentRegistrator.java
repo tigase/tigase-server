@@ -39,13 +39,15 @@ public interface ComponentRegistrator extends ServerComponent {
   /**
    *
    * @param component
-   * @return
+   * @return a <code>boolean</code> value indicating whehether component has
+   * been successfuly added or not.
    */
 	boolean addComponent(ServerComponent component);
 
   /**
    *
-   * @return tigase.server.ServerComponent
+   * @return a <code>boolean</code> value indicating whehether component has
+   * been successfuly removed or not.
    */
 	boolean deleteComponent(ServerComponent component);
 
