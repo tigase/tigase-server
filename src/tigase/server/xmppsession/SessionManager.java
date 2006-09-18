@@ -59,6 +59,7 @@ import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.XMPPSession;
 import tigase.xmpp.OfflineMessageStorage;
+import tigase.xmpp.Authorization;
 import tigase.stats.StatRecord;
 
 /**
@@ -165,20 +166,27 @@ public class SessionManager extends AbstractMessageReceiver
 		} // end of if (conn == null)
 		if (conn != null) {
 			Queue<Packet> results = new LinkedList<Packet>();
-			walk(packet, conn, packet.getElement(), results);
-			for (Packet res: results) {
-				log.finest("Handling response: " + res.getStringData());
-				addOutPacket(res);
-			} // end of for ()
+			boolean result = walk(packet, conn, packet.getElement(), results);
+			if (result) {
+				for (Packet res: results) {
+					log.finest("Handling response: " + res.getStringData());
+					addOutPacket(res);
+				} // end of for ()
+			} else {
+				addOutPacket(
+					Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
+						"Feature not supported yet.", true));
+			} // end of if (result) else
 		} else {
 			// It might be a message or something else for off-line user....
 			// Just ignore for now...
 		} // end of else
 	}
 
-	private void walk(final Packet packet,
+	private boolean walk(final Packet packet,
 		final XMPPResourceConnection connection, final Element elem,
 		final Queue<Packet> results) {
+		boolean result = false;
 		for (XMPPProcessorIfc proc: processors.values()) {
 			String xmlns = elem.getXMLNS();
 			if (xmlns == null) { xmlns = "jabber:client";	}
@@ -186,14 +194,16 @@ public class SessionManager extends AbstractMessageReceiver
 				log.finest("XMPPProcessorIfc: "+proc.getClass().getSimpleName()+
 					" ("+proc.id()+")"+"\n Request: "+elem.toString());
 				proc.process(packet, connection, results);
+				result = true;
 			} // end of if (proc.isSupporting(elem.getName(), elem.getXMLNS()))
 		} // end of for ()
 		Collection<Element> children = elem.getChildren();
 		if (children != null) {
 			for (Element child: children) {
-				walk(packet, connection, child, results);
+				result |= walk(packet, connection, child, results);
 			} // end of for (Element child: children)
 		} // end of if (children != null)
+		return result;
 	}
 
 	private void processCommand(Packet pc) {

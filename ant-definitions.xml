@@ -73,6 +73,11 @@
         bottom="${javadoc-copyright}">
         <link offline="true" href="http://java.sun.com/j2se/1.5.0/docs/api/"
           packagelistLoc="package-list"/>
+	<classpath>
+	  <fileset dir="${libs}">
+	    <include name="**/*.jar"/>
+	  </fileset>
+	</classpath>
       </javadoc>
     </sequential>
   </macrodef>
