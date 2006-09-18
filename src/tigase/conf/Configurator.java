@@ -88,8 +88,7 @@ public class Configurator extends AbstractComponentRegistrator
 			repository.putProperties(compId, prop);
 			try {
 				repository.sync();
-			} // end of try
-			catch (Exception e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			} // end of try-catch
 		} // end of if (modified)
@@ -120,7 +119,7 @@ public class Configurator extends AbstractComponentRegistrator
 		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.level", "ALL");
 		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.limit", "100000");
 		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.pattern",
-			"logs/java_%g.log");
+			"logs/tigase.log");
 // 		defaults.put(LOGGING_KEY + "tigase.handlers",
 // 			"java.util.logging.FileHandler");
 		defaults.put(LOGGING_KEY + "tigase.useParentHandlers", "true");
@@ -143,7 +142,7 @@ public class Configurator extends AbstractComponentRegistrator
 				buff.append(key + "=" +	entry.getValue() + "\n");
 				if (key.equals("java.util.logging.FileHandler.pattern")) {
 					File log_path = new File(entry.getValue().toString()).getParentFile();
-					if (!log_path.exists()) { log_path.mkdirs(); }
+					if(!log_path.exists()) { log_path.mkdirs(); }
 				} // end of if (key.equals())
 			} // end of if (entry.getKey().startsWith(LOGGING_KEY))
 		}
