@@ -64,13 +64,15 @@
 
   <target name="docs" depends="prepare"
     description="Make Server javadoc">
-    <docs packages="${javadoc-package}" destdir="docs-${jarfile}"/>
+    <docs packages="${javadoc-package}"
+	  destdir="docs-${projectname}-${jarfile}"/>
   </target>
 
   <target name="dist"
     depends="clean-all,prepare-dist,jar,docs"
     description="Create ${projectname} ${jarfile} binary distribution file">
-    <distbin packagename="${projectname}" docsdir="docs-${jarfile}"/>
+    <distbin packagename="${projectname}-${jarfile}"
+	     docsdir="docs-${projectname}-${jarfile}"/>
   </target>
 
   <target name="dist-src" depends="prepare,prepare-dist"

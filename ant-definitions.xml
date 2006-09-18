@@ -102,14 +102,19 @@
         <arg value="www/README.html"/>
       </exec>
       <copy
-        file="www/README.html"
+        file="package.html"
         tofile="${dist}/@{packagename}-${version}/README.html"/>
+      <mkdir dir="${dist}/@{packagename}-${version}/certs"/>
+      <copy todir="${dist}/@{packagename}-${version}/certs">
+        <fileset dir="certs" includes="*"/>
+      </copy>
+      <mkdir dir="${dist}/@{packagename}-${version}/libs"/>
+      <copy todir="${dist}/@{packagename}-${version}/libs">
+        <fileset dir="libs" includes="*"/>
+      </copy>
       <copy
-        file="scripts/start_server.sh"
-        tofile="${dist}/@{packagename}-${version}/bin/start_server.sh"/>
-      <copy
-        file="www/serverfeatures.html"
-        tofile="${dist}/@{packagename}-${version}/serverfeatures.html"/>
+        file="scripts/run-server.sh"
+        tofile="${dist}/@{packagename}-${version}/bin/run-server.sh"/>
       <move todir="${dist}/@{packagename}-${version}/docs">
         <fileset dir="@{docsdir}"/>
       </move>
