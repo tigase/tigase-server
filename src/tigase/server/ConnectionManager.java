@@ -81,7 +81,7 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 	public static final boolean TLS_REQUIRED_PROP_VAL = false;
 	public static final String TLS_KEYS_STORE_PROP_KEY =
 		TLS_PROP_KEY + "keys-store";
-	public static final String TLS_KEYS_STORE_PROP_VAL = "certs/keystore";
+	public static final String TLS_KEYS_STORE_PROP_VAL = "certs/rsa-keystore";
 	public static final String TLS_KEYS_STORE_PASSWD_PROP_KEY =
 		TLS_PROP_KEY + "keys-store-password";
 	public static final String TLS_KEYS_STORE_PASSWD_PROP_VAL =	"keystore";
