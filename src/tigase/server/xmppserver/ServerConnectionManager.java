@@ -355,6 +355,36 @@ public class ServerConnectionManager extends ConnectionManager {
 		handshakingByHost_Type.remove(id);
 		connectingByHost_Type.remove(id);
 		log.fine("s2s stopped: " + id);
+		// Some servers close just 1 of dialback connections and even though
+		// other connection is still open they don't accept any data on that
+		// connections. So the solution is: if one of pair connection is closed
+		// close the other connection as well.
+		// Find other connection:
+		String other_id = null;
+		switch (service.connectionType()) {
+		case accept:
+			other_id = JID.getJID(null, remote_hostname,
+				ConnectionType.connect.toString());
+			break;
+		case connect:
+		default:
+			other_id = JID.getJID(null, remote_hostname,
+				ConnectionType.accept.toString());
+			break;
+		} // end of switch (service.connectionType())
+		XMPPIOService other_service = servicesByHost_Type.get(other_id);
+		if (other_service == null) {
+			other_service = handshakingByHost_Type.get(other_id);
+		} // end of if (other_service == null)
+		if (other_service != null) {
+			log.fine("Stopping other service: " + other_id);
+			servicesByHost_Type.remove(other_id);
+			handshakingByHost_Type.remove(other_id);
+			connectingByHost_Type.remove(other_id);
+			try {
+				other_service.stop();
+			} catch (IOException e) {	} // end of try-catch
+		} // end of if (other_service != null)
 	}
 
 	public void handleDialbackSuccess(final String connect_jid) {
