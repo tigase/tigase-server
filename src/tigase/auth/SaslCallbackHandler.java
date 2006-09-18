@@ -84,7 +84,7 @@ public class SaslCallbackHandler implements CallbackHandler {
 	/**
 	 * Describe <code>handle</code> method here.
 	 *
-	 * @param callbackArray a <code>Callback[]</code> value
+	 * @param callbacks a <code>Callback[]</code> value
 	 * @exception IOException if an error occurs
 	 * @exception UnsupportedCallbackException if an error occurs
 	 */
