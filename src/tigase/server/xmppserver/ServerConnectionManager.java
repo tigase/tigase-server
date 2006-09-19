@@ -378,9 +378,9 @@ public class ServerConnectionManager extends ConnectionManager {
 		} // end of if (other_service == null)
 		if (other_service != null) {
 			log.fine("Stopping other service: " + other_id);
-			servicesByHost_Type.remove(other_id);
-			handshakingByHost_Type.remove(other_id);
-			connectingByHost_Type.remove(other_id);
+// 			servicesByHost_Type.remove(other_id);
+// 			handshakingByHost_Type.remove(other_id);
+// 			connectingByHost_Type.remove(other_id);
 			try {
 				other_service.stop();
 			} catch (IOException e) {	} // end of try-catch
@@ -441,7 +441,8 @@ public class ServerConnectionManager extends ConnectionManager {
 						handshakingByHost_Type.remove(connect_jid));
 					connectingByHost_Type.remove(connect_jid);
 					handleDialbackSuccess(connect_jid);
-					handshakingByHost_Type.remove(accept_jid);
+					servicesByHost_Type.put(accept_jid,
+						handshakingByHost_Type.remove(accept_jid));
 					connectingByHost_Type.remove(accept_jid);
 					break;
 				case invalid:
