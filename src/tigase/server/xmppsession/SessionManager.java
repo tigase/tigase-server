@@ -330,9 +330,14 @@ public class SessionManager extends AbstractMessageReceiver
 		processors.clear();
 		for (String comp_id: components) {
 			XMPPProcessorIfc proc = ProcessorFactory.getProcessor(comp_id);
-			processors.put(comp_id, proc);
-			log.config("Added processor: " + proc.getClass().getSimpleName()
-				+ " for component id: " + comp_id);
+			if (proc != null) {
+				processors.put(comp_id, proc);
+				log.config("Added processor: " + proc.getClass().getSimpleName()
+					+ " for component id: " + comp_id);
+			} else {
+				log.config("Processor: " + proc.getClass().getSimpleName()
+					+ " not found for component id: " + comp_id);
+			} // end of else
 		} // end of for (String comp_id: components)
 		String[] hostnames = (String[])props.get(HOSTNAMES_PROP_KEY);
 		clearRoutings();
