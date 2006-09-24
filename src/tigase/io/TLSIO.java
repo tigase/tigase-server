@@ -85,22 +85,31 @@ public class TLSIO implements IOInterface {
 		} // end of if (tlsWrapper.isClientMode())
   }
 
-  private ByteBuffer decodeData(final ByteBuffer input) throws IOException {
+  private ByteBuffer decodeData(ByteBuffer input) throws IOException {
     TLSStatus stat = null;
+		input.flip();
     do_loop:
     do {
-      input.flip();
 			log.finer("Decoding data: " + input.remaining());
       tlsInput = tlsWrapper.unwrap(input, tlsInput);
-      if (input.hasRemaining()) {
-        input.compact();
-      } // end of if (input.hasRemaining())
+//       if (input.hasRemaining()) {
+//         input.compact();
+//       } // end of if (input.hasRemaining())
       switch (tlsWrapper.getStatus()) {
       case NEED_WRITE:
         write(ByteBuffer.allocate(0));
         break;
       case UNDERFLOW:
-        break do_loop;
+				log.finer("tlsWrapper.getStatus() = UNDERFLOW");
+ 				int netSize = tlsWrapper.getPacketBuffSize();
+				log.finer("PacketBuffSize="+netSize);
+				log.finer("input.capacity()="+input.capacity());
+				log.finer("tlsInput.capacity()="+tlsInput.capacity());
+				log.finer("input.remaining()="+input.remaining());
+				log.finer("tlsInput.remaining()="+tlsInput.remaining());
+				// Obtain more inbound network data for src,
+				// then retry the operation.
+				throw new BufferUnderflowException();
       case CLOSED:
         if (tlsWrapper.getStatus() == TLSStatus.CLOSED) {
           throw new EOFException("Socket has been closed.");
@@ -122,7 +131,7 @@ public class TLSIO implements IOInterface {
 
   public ByteBuffer read(ByteBuffer buff) throws IOException {
     buff = io.read(buff);
-		if (bytesRead() > 0) {
+		if (io.bytesRead() > 0) {
 			log.finer("Read bytes: " + bytesRead());
       return decodeData(buff);
     } else {
@@ -174,5 +183,9 @@ public class TLSIO implements IOInterface {
   public int bytesRead() {
     return io.bytesRead();
   }
+
+	public int getInputPacketSize() throws IOException {
+		return tlsWrapper.getPacketBuffSize();
+	}
 
 } // TLSIO

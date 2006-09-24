@@ -23,32 +23,16 @@
 package tigase.io;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.SocketChannel;
 
 /**
- * Describe interface IOInterface here.
+ * Describe class BufferUnderflowException here.
  *
  *
- * Created: Sat May 14 08:07:38 2005
+ * Created: Sun Sep 24 22:32:37 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public interface IOInterface {
-
-  SocketChannel getSocketChannel();
-
-  void stop() throws IOException;
-
-  boolean isConnected();
-
-  int write(final ByteBuffer buff) throws IOException;
-
-  ByteBuffer read(final ByteBuffer buff) throws IOException;
-
-  int bytesRead();
-
-	int getInputPacketSize() throws IOException;
-
-} // IOInterface
+public class BufferUnderflowException extends IOException {
+  private static final long serialVersionUID = 1L;
+}

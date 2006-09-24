@@ -1,139 +1,139 @@
 <project name="tigase" default="jar" basedir=".">
 
-  <property file="build.properties"/>
+ <property file="build.properties"/>
 
-  <import file="ant-definitions.xml"/>
+ <import file="ant-definitions.xml"/>
 
-  <taskdef resource="net/sf/antcontrib/antlib.xml"/>
-<!--  <taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask"/> -->
+ <taskdef resource="net/sf/antcontrib/antlib.xml"/>
+ <!--  <taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask"/> -->
 
-  <!-- Global properties for this build -->
-  <property name="cvs-package" value="${projectname}"/>
+ <!-- Global properties for this build -->
+ <property name="cvs-package" value="${projectname}"/>
 
-  <target name="prepare" description="Prepare build structures">
-    <tstamp/>
+ <target name="prepare" description="Prepare build structures">
+  <tstamp/>
+ </target>
+
+ <target name="prepare-dist" description="Calculate build version">
+  <!-- Get revision number -->
+  <exec executable="svn">
+   <arg line="status -u --non-interactive"/>
+   <redirector outputproperty="build-no" errorproperty="error-property">
+    <outputfilterchain>
+     <tokenfilter>
+      <containsregex
+       pattern=".*Status against revision:\s*([0-9]+).*" replace="\1"/>
+     </tokenfilter>
+    </outputfilterchain>
+   </redirector>
+  </exec>
+  <property name="version" value="${ver}-b${build-no}"/>
+  <property name="dist" value="dist/${projectname}-${jarfile}-${version}"/>
+ </target>
+
+ <target name="jar" depends="prepare,prepare-dist"
+  description="Build jar file for ${projectname} ${jarfile}">
+  <compile srcdir="${src}"
+   xlint="-Xlint:all"/>
+  <jarfile
+   filename="${projectname}-${jarfile}"
+   excludes="**/*TestCase*.*,TestAll.*"/>
   </target>
 
-  <target name="prepare-dist" description="Calculate build version">
-    <!-- Get revision number -->
-    <exec executable="svn">
-      <arg line="status -u --non-interactive"/>
-      <redirector outputproperty="build-no" errorproperty="error-property">
-        <outputfilterchain>
-          <tokenfilter>
-            <containsregex
-              pattern=".*Status against revision:\s*([0-9]+).*" replace="\1"/>
-          </tokenfilter>
-        </outputfilterchain>
-      </redirector>
-    </exec>
-    <property name="version" value="${ver}-b${build-no}"/>
-    <property name="dist" value="dist/${projectname}-${jarfile}-${version}"/>
-  </target>
+ <target name="jar-unittests" depends="prepare"
+  description="Prepare jar file with all classes including unittests classes">
+  <delete dir="${build}"/>
+  <compile
+   srcdir="${src}:${unittests}"
+   deprecation="on"
+   xlint="-Xlint:all"/>
+  <jarfile filename="unittests-${projectname}-${jarfile}"/>
+  <unitgen input="${src}" output="${unittests}" update="true">
+   <classpath>
+    <pathelement location="${jars}/unittests-${projectname}-${jarfile}.jar"/>
+    <fileset dir="${libs}">
+     <include name="**/*.jar"/>
+    </fileset>
+   </classpath>
+  </unitgen>
+ </target>
 
-  <target name="jar" depends="prepare,prepare-dist"
-      description="Build jar file for ${projectname} ${jarfile}">
-    <compile srcdir="${src}"
-      xlint="-Xlint:all"/>
-    <jarfile
-      filename="${projectname}-${jarfile}"
-      excludes="**/*TestCase*.*,TestAll.*"/>
-  </target>
+ <target name="jar-all" depends="clean,prepare,jar,jar-unittests"
+  description="Builds all jar for the project.">
+ </target>
 
-  <target name="jar-unittests" depends="prepare"
-    description="Prepare jar file with all classes including unittests classes">
-    <delete dir="${build}"/>
-    <compile
-      srcdir="${src}:${unittests}"
-      deprecation="on"
-      xlint="-Xlint:all"/>
-    <jarfile filename="unittests-${projectname}-${jarfile}"/>
-    <unitgen input="${src}" output="${unittests}" update="true">
-      <classpath>
-        <pathelement location="${jars}/unittests-${projectname}-${jarfile}.jar"/>
-	<fileset dir="${libs}">
-	  <include name="**/*.jar"/>
-	</fileset>
-      </classpath>
-    </unitgen>
-  </target>
+ <target name="docs" depends="prepare"
+  description="Make Server javadoc">
+  <docs packages="${javadoc-package}"
+   destdir="docs-${projectname}-${jarfile}"/>
+ </target>
 
-  <target name="jar-all" depends="clean,prepare,jar,jar-unittests"
-    description="Builds all jar for the project.">
-  </target>
+ <target name="dist"
+  depends="clean-all,prepare-dist,jar,docs"
+  description="Create ${projectname} ${jarfile} binary distribution file">
+  <distbin packagename="${projectname}-${jarfile}"
+   docsdir="docs-${projectname}-${jarfile}"/>
+ </target>
 
-  <target name="docs" depends="prepare"
-    description="Make Server javadoc">
-    <docs packages="${javadoc-package}"
-	  destdir="docs-${projectname}-${jarfile}"/>
-  </target>
-
-  <target name="dist"
-    depends="clean-all,prepare-dist,jar,docs"
-    description="Create ${projectname} ${jarfile} binary distribution file">
-    <distbin packagename="${projectname}-${jarfile}"
-	     docsdir="docs-${projectname}-${jarfile}"/>
-  </target>
-
-  <target name="dist-src" depends="prepare,prepare-dist"
-    description="Create distribution package with all source files">
-    <distsrc packagename="${projectname}" cvsroot="${svnroot}"
-      cvspackage="${cvspackage}"/>
-  </target>
+ <target name="dist-src" depends="prepare,prepare-dist"
+  description="Create distribution package with all source files">
+  <distsrc packagename="${projectname}" cvsroot="${svnroot}"
+   cvspackage="${cvspackage}"/>
+ </target>
 
 <!--
-  <target name="pmd">
-    <pmd rulesetfiles="rulesets/imports.xml">
-      <formatter type="html" toFile="pmd_report.html"/>
-      <fileset dir="${src}">
-          <include name="**/*.java"/>
+ <target name="pmd">
+ <pmd rulesetfiles="rulesets/imports.xml">
+ <formatter type="html" toFile="pmd_report.html"/>
+ <fileset dir="${src}">
+ <include name="**/*.java"/>
       </fileset>
     </pmd>
   </target>
--->
-  <target name="run-unittests" depends="prepare,jar-unittests"
-    description="Run all JUnit tests for built package">
-    <mkdir dir="${reports}"/>
-    <junit printsummary="yes" haltonfailure="no">
-      <classpath>
-        <pathelement location="${jars}/unittests-${projectname}-${jarfile}.jar"/>
-	<fileset dir="${libs}">
-	  <include name="**/*.jar"/>
-	</fileset>
-      </classpath>
+ -->
+ <target name="run-unittests" depends="prepare,jar-unittests"
+  description="Run all JUnit tests for built package">
+  <mkdir dir="${reports}"/>
+  <junit printsummary="yes" haltonfailure="no">
+   <classpath>
+    <pathelement location="${jars}/unittests-${projectname}-${jarfile}.jar"/>
+    <fileset dir="${libs}">
+     <include name="**/*.jar"/>
+    </fileset>
+   </classpath>
 
-      <batchtest fork="yes" todir="${reports}">
-        <formatter type="xml"/>
-        <fileset dir="${build}">
-          <include name="**/*TestCase.class"/>
-          <exclude name="**/TestAll.class"/>
-        </fileset>
-      </batchtest>
-    </junit>
+   <batchtest fork="yes" todir="${reports}">
+    <formatter type="xml"/>
+    <fileset dir="${build}">
+     <include name="**/*TestCase.class"/>
+     <exclude name="**/TestAll.class"/>
+    </fileset>
+   </batchtest>
+  </junit>
 
-    <junitreport>
-      <fileset dir="${reports}">
-        <include name="TEST-*.xml"/>
-      </fileset>
-      <report format="noframes"/>
-    </junitreport>
-  </target>
+  <junitreport>
+   <fileset dir="${reports}">
+    <include name="TEST-*.xml"/>
+   </fileset>
+   <report format="noframes"/>
+  </junitreport>
+ </target>
 
-  <target name="clean" description="Clean build directories">
-    <delete dir="${build}"/>
-  </target>
+ <target name="clean" description="Clean build directories">
+  <delete dir="${build}"/>
+ </target>
 
-  <target name="clean-all" depends="clean" description="Clean all extra files">
-    <delete file="sample-junit-target.xml"/>
-    <delete dir="${jars}"/>
-    <delete dir="dist"/>
-    <delete dir="docs-${jarfile}"/>
-    <delete dir="target"/>
-    <delete dir="logs"/>
-    <delete>
-      <fileset dir="." includes="*.log"/>
-      <fileset dir="." includes="*.lck"/>
-      <fileset dir="." includes="*.cache"/>
-    </delete>
-  </target>
+ <target name="clean-all" depends="clean" description="Clean all extra files">
+  <delete file="sample-junit-target.xml"/>
+  <delete dir="${jars}"/>
+  <delete dir="dist"/>
+  <delete dir="docs-${jarfile}"/>
+  <delete dir="target"/>
+  <delete dir="logs"/>
+  <delete>
+   <fileset dir="." includes="*.log"/>
+   <fileset dir="." includes="*.lck"/>
+   <fileset dir="." includes="*.cache"/>
+  </delete>
+ </target>
 </project>

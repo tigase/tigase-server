@@ -41,6 +41,7 @@ import tigase.io.SocketIO;
 import tigase.io.TLSIO;
 import tigase.io.TLSUtil;
 import tigase.io.TLSWrapper;
+import tigase.io.BufferUnderflowException;
 
 /**
  * <code>IOService</code> offers thread thread safe
@@ -165,8 +166,7 @@ public abstract class IOService implements Callable<IOService> {
 			socketChannel.finishConnect();
 		} // end of if (socketChannel.isConnecyionPending())
     socketIO = new SocketIO(socketChannel);
-    socketInput =
-      ByteBuffer.allocate(socketChannel.socket().getReceiveBufferSize());
+    socketInput = ByteBuffer.allocate(socketIO.getInputPacketSize());
 		Socket sock = socketIO.getSocketChannel().socket();
 		local_address = sock.getLocalAddress().getHostAddress();
 		remote_address = sock.getInetAddress().getHostAddress();
@@ -216,7 +216,20 @@ public abstract class IOService implements Callable<IOService> {
 
 	protected abstract int receivedPackets();
 
-  /**
+	private void resizeInputBuffer() throws IOException {
+		int netSize = socketIO.getInputPacketSize();
+		// Resize buffer if needed.
+		if (netSize > socketInput.remaining()) {
+			log.fine("Resizing buffer to "
+				+ (netSize + socketInput.capacity())
+				+ " bytes.");
+			ByteBuffer b = ByteBuffer.allocate(netSize+socketInput.capacity());
+			b.put(socketInput);
+			socketInput = b;
+		}
+	}
+
+	/**
    * Describe <code>readData</code> method here.
    *
    * @return a <code>char[]</code> value
@@ -225,14 +238,21 @@ public abstract class IOService implements Callable<IOService> {
   protected char[] readData() throws IOException {
     CharBuffer cb = null;
     try {
+			//			resizeInputBuffer();
       ByteBuffer tmpBuffer = socketIO.read(socketInput);
       if (socketIO.bytesRead() > 0) {
         tmpBuffer.flip();
         cb = coder.decode(tmpBuffer);
         tmpBuffer.clear();
       } // end of if (socketIO.bytesRead() > 0)
+    } catch (BufferUnderflowException underfl) {
+			// Obtain more inbound network data for src,
+			// then retry the operation.
+			resizeInputBuffer();
+			return null;
     } catch (Exception eof) {
-      try { stop(); } catch (Exception e) { } // NOPMD
+			eof.printStackTrace();
+			try { stop(); } catch (Exception e) { } // NOPMD
     } // end of try-catch
     return cb != null ? cb.array() : null;
   }

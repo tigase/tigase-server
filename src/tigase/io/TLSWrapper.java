@@ -82,6 +82,10 @@ public class TLSWrapper {
     return appBuffSize;
   }
 
+	public int getPacketBuffSize() {
+		return tlsEngine.getSession().getPacketBufferSize();
+	}
+
   public TLSStatus getStatus() {
     TLSStatus status = null;
     if (tlsEngineResult != null &&
