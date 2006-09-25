@@ -52,7 +52,6 @@ import tigase.server.XMPPService;
 import tigase.util.JID;
 import tigase.xml.Element;
 import tigase.xmpp.NotAuthorizedException;
-import tigase.db.UserNotFoundException;
 import tigase.xmpp.ProcessorFactory;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPProcessorIfc;
@@ -147,15 +146,7 @@ public class SessionManager extends AbstractMessageReceiver
 				} else {
 					// It might be a message for off-line user....
 					// I will put support for off-line message retrieval here...
-					if (offlineMessages != null) {
-						try {
-							offlineMessages.savePacketForOffLineUser(packet);
-						} // end of try
-						catch (UserNotFoundException e) {
-							log.fine("Problem saving off-line message: " + e
-								+ ", for packet: " + packet.getStringData());
-						} // end of try-catch
-					} // end of if (offlineMessages != null)
+					saveOfflineMessage(packet);
 					// No more processing is needed....
 					return;
 				} // end of if (session != null) else
@@ -208,10 +199,10 @@ public class SessionManager extends AbstractMessageReceiver
 
 	private void processCommand(Packet pc) {
 		log.finer(pc.getCommand().toString() + " command from: " + pc.getFrom());
+		XMPPResourceConnection connection =	connectionsByFrom.get(pc.getFrom());
 		switch (pc.getCommand()) {
 		case STREAM_OPENED:
-			// It maybe existing opened stream after TLS/SASL authorization
-			XMPPResourceConnection connection =	connectionsByFrom.get(pc.getFrom());
+			// It might be existing opened stream after TLS/SASL authorization
 			// If not, it means this is new stream
 			if (connection == null) {
 				log.finer("Adding resource connection for: " + pc.getFrom());
@@ -384,21 +375,9 @@ public class SessionManager extends AbstractMessageReceiver
 			sessionsByNodeId.put(userId, session);
 		} // end of if (session == null)
 		session.addResourceConnection(conn);
-		try {
-			Queue<Packet> packets =
-				offlineMessages.restorePacketForOffLineUser(userId);
- 			if (packets != null) {
-				addPackets(packets);
-// 				Packet p = null;
-// 				while ((p = packets.poll()) != null) {
-// 					processPacket(p);
-// 				} // end of while ((p = packets.poll()) != null)
- 			} // end of if (packets != null)
-		} // end of try
-		catch (UserNotFoundException e) {
-
-		} // end of try-catch
+		conn.putSessionData("offline-messages", offlineMessages);
 	}
+
 
 	public void handleLogout(final String userName,
 		final XMPPResourceConnection conn) {
@@ -428,6 +407,17 @@ public class SessionManager extends AbstractMessageReceiver
 				sessionsByNodeId.size()));
 		stats.add(new StatRecord("Closed connections", "long", closedConnections));
 		return stats;
+	}
+
+	private void saveOfflineMessage(Packet p) {
+		if (offlineMessages != null) {
+			try {
+				offlineMessages.savePacketForOffLineUser(p);
+			} catch (UserNotFoundException e) {
+				log.fine("Problem saving off-line message: " + e
+					+ ", for packet: " + p.getStringData());
+			} // end of try-catch
+		} // end of if (offlineMessages != null)
 	}
 
 }

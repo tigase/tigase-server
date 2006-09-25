@@ -111,8 +111,8 @@ public class SaslAuth extends XMPPProcessor {
 				results.offer(packet.swapFromTo(createReply(ElementType.challenge,
 							Base64.encode(challenge))));
         session.putSessionData("SaslServer", ss);
-      } // end of try
-      catch (SaslException e) {
+				session.putSessionData("is-sasl", true);
+      } catch (SaslException e) {
         log.log(Level.WARNING, "SaslException", e);
 				failure = true;
       } // end of try-catch

@@ -32,6 +32,8 @@ import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.server.Packet;
+import tigase.xmpp.OfflineMessageStorage;
+import tigase.db.UserNotFoundException;
 
 import static tigase.xmpp.impl.Roster.SubscriptionType;
 import static tigase.xmpp.impl.Roster.PresenceType;
@@ -171,6 +173,13 @@ public class Presence extends XMPPProcessor {
 				Element presence = (Element)packet.getElement().clone();
 				presence.setAttribute("from", session.getJID());
 				updatePresenceChange(presence, session, results);
+				// Should we send off-line messages now?
+				// Let's try to do it here and maybe later I find better place.
+				OfflineMessageStorage offlineMessages =
+          (OfflineMessageStorage)session.getSessionData("offline-messages");
+				if (offlineMessages != null) {
+					processOffLineMessages(offlineMessages, session.getUserId(), results);
+				} // end of if (offlineMessages != null)
 				break;
 			case out_subscribe:
 			case out_unsubscribe:
@@ -277,6 +286,18 @@ public class Presence extends XMPPProcessor {
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 					"You must authorize session first.", true));
 		} // end of try-catch
+	}
+
+	private void processOffLineMessages(OfflineMessageStorage offlineMessages,
+		String userId, Queue<Packet> results) {
+		try {
+			Queue<Packet> packets =
+				offlineMessages.restorePacketForOffLineUser(userId);
+ 			if (packets != null) {
+				log.finer("Sending off-line messages: " + packets.size());
+				results.addAll(packets);
+ 			} // end of if (packets != null)
+		} catch (UserNotFoundException e) {	} // end of try-catch
 	}
 
 } // Presence
