@@ -64,14 +64,20 @@ public class Message extends XMPPProcessor {
 		final String jid;
 		try {
 			jid = session.getJID();
-		} // end of try
-		catch (NotAuthorizedException e) {
+		} catch (NotAuthorizedException e) {
       log.warning("Received message but user session is not authorized yet: " +
         packet.getStringData());
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 					"You must authorize session first.", true));
 			return;
 		} // end of try-catch
+
+		// For all messages coming from the owner of this account set
+		// proper 'from' attribute. This is actually needed for the case
+		// when the user sends a message to himself.
+		if (packet.getFrom().equals(session.getConnectionId())) {
+			packet.getElement().setAttribute("from", jid);
+		} // end of if (packet.getFrom().equals(session.getConnectionId()))
 
 		// Is it incoming or outgoing message?
 		// It might be incoming message without specified resource part
@@ -92,7 +98,8 @@ public class Message extends XMPPProcessor {
 		// Assuming this is outgoing message
 		Element result = (Element)packet.getElement().clone();
 		// According to spec we must set proper FROM attribute
-		result.setAttribute("from", jid);
+		// It has been already set above....
+		//		result.setAttribute("from", jid);
 		results.offer(new Packet(result));
 
 		log.finest("OUTPUT: " + result.toString());
