@@ -151,6 +151,12 @@ public class Presence extends XMPPProcessor {
 				type = StanzaType.available;
 			} // end of if (type == null)
 
+			// For all messages coming from the owner of this account set
+			// proper 'from' attribute
+			if (packet.getFrom().equals(session.getConnectionId())) {
+				packet.getElement().setAttribute("from", session.getUserId());
+			} // end of if (packet.getFrom().equals(session.getConnectionId()))
+
 			log.finest(pres_type + " presence found.");
 			boolean subscr_changed = false;
 			switch (pres_type) {
@@ -178,7 +184,18 @@ public class Presence extends XMPPProcessor {
 				OfflineMessageStorage offlineMessages =
           (OfflineMessageStorage)session.getSessionData("offline-messages");
 				if (offlineMessages != null) {
-					processOffLineMessages(offlineMessages, session.getUserId(), results);
+					String priority_str = packet.getElemCData("/presence/priority");
+					int priority = 0;
+					if (priority_str != null) {
+						try {
+							priority = Integer.parseInt(priority_str);
+						} catch (NumberFormatException e) {
+							priority = 0;
+						} // end of try-catch
+					} // end of if (priority != null)
+					if (priority >= 0) {
+						processOffLineMessages(offlineMessages, session.getUserId(), results);
+					} // end of if (priority >= 0)
 				} // end of if (offlineMessages != null)
 				break;
 			case out_subscribe:
