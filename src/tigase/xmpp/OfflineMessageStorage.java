@@ -24,6 +24,8 @@ package tigase.xmpp;
 
 import java.util.LinkedList;
 import java.util.Queue;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import tigase.util.JID;
 import tigase.db.UserNotFoundException;
 import tigase.db.UserRepository;
@@ -47,6 +49,7 @@ public class OfflineMessageStorage {
   private DomBuilderHandler domHandler = null;
 	private static SimpleParser parser = SingletonFactory.getParserInstance();
 	private UserRepository repository = null;
+	private SimpleDateFormat formater = null;
 
 	/**
 	 * Creates a new <code>OfflineMessageStorage</code> instance.
@@ -55,15 +58,33 @@ public class OfflineMessageStorage {
 	public OfflineMessageStorage(UserRepository repository) {
 		domHandler = new DomBuilderHandler();
 		this.repository = repository;
+		formater = new SimpleDateFormat("yyyyMMdd'T'HH:mm:ss");
 	}
 
 	public boolean savePacketForOffLineUser(Packet packet)
 		throws UserNotFoundException {
 		if (packet.getElemName().equals("message")) {
-			String user_id = JID.getNodeID(packet.getElemTo());
-			repository.addDataList(user_id, "off-line",
-				"messages", new String[] {packet.getStringData()});
+			StanzaType type = packet.getType();
+			if (type == null || type == StanzaType.normal || type == StanzaType.chat) {
+
+// 	<x from='capulet.com' stamp='20020910T23:08:25' xmlns='jabber:x:delay'>
+//     Offline Storage
+//   </x>
+				String stamp = null;
+				synchronized (formater) {
+					stamp = formater.format(new Date());
+				}
+				String from = JID.getNodeHost(packet.getElemTo());
+				Element x = new Element("x", "Offline Storage",
+					new String[] {"from", "stamp", "xmlns"},
+					new String[] {from, stamp, "jabber:x:delay"});
+				Element msg = packet.getElement();
+				msg.addChild(x);
+				String user_id = JID.getNodeID(packet.getElemTo());
+				repository.addDataList(user_id, "off-line",
+					"messages", new String[] {packet.getStringData()});
 			return true;
+			}
 		} // end of if (packet.getElemName().equals("message"))
 		return false;
 	}
