@@ -39,7 +39,7 @@ import java.util.logging.Logger;
  */
 public class SocketIO implements IOInterface {
 
-  private static Logger log = Logger.getLogger("tigase.services.SocketIO");
+  private static Logger log = Logger.getLogger("tigase.io.SocketIO");
 
   private SocketChannel channel = null;
   private int bytesRead = 0;
@@ -82,7 +82,7 @@ public class SocketIO implements IOInterface {
 
   public ByteBuffer read(final ByteBuffer buff) throws IOException {
     bytesRead = channel.read(buff);
-    log.fine("Read from channel " + bytesRead + " bytes.");
+    log.finest("Read from channel " + bytesRead + " bytes.");
     if (bytesRead == -1) {
       throw new EOFException("Channel has been closed.");
     } // end of if (result == -1)

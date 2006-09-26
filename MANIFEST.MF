@@ -2,5 +2,5 @@ Manifest-Version: 1.0
 Created-By: "Artur Hefczyc"
 Main-Class: tigase.server.XMPPServer
 Specification-Version: 2.2.3
-Implementation-Version: 2.2.3-b
-Tigase-Version: 2.2.3-b
+Implementation-Version: 2.2.3-b114
+Tigase-Version: 2.2.3-b114
