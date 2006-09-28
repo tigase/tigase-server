@@ -50,6 +50,7 @@ import tigase.server.MessageReceiver;
 import tigase.server.Packet;
 import tigase.server.XMPPService;
 import tigase.util.JID;
+import tigase.util.ElementUtils;
 import tigase.xml.Element;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.ProcessorFactory;
@@ -116,6 +117,7 @@ public class SessionManager extends AbstractMessageReceiver
 
 	private UserRepository repository = null;
 	private OfflineMessageStorage offlineMessages = null;
+	private String[] DISCO_FEATURES = {"msgoffline"};
 
 	private Map<String, XMPPSession> sessionsByNodeId =
 		new ConcurrentSkipListMap<String, XMPPSession>();
@@ -140,10 +142,8 @@ public class SessionManager extends AbstractMessageReceiver
 			// so let's look for established session for this user...
 			final String to = packet.getElemTo();
 			if (to != null) {
-				XMPPSession session =	sessionsByNodeId.get(JID.getNodeID(to));
-				if (session != null) {
-					conn = session.getResourceConnection(packet.getElemTo());
-				} else {
+				conn = getResourceConnection(to);
+				if (conn == null) {
 					// It might be a message for off-line user....
 					// I will put support for off-line message retrieval here...
 					saveOfflineMessage(packet);
@@ -172,6 +172,26 @@ public class SessionManager extends AbstractMessageReceiver
 			// It might be a message or something else for off-line user....
 			// Just ignore for now...
 		} // end of else
+	}
+
+	private XMPPSession getSession(String jid) {
+		return sessionsByNodeId.get(JID.getNodeID(jid));
+	}
+
+	private XMPPResourceConnection getResourceConnection(String jid) {
+		XMPPSession session = getSession(jid);
+		if (session != null) {
+			return session.getResourceConnection(jid);
+		} // end of if (session != null)
+		return null;
+	}
+
+	private String getConnectionId(String jid) {
+		XMPPResourceConnection res = getResourceConnection(jid);
+		if (res != null) {
+			return res.getConnectionId();
+		} // end of if (res != null)
+		return null;
 	}
 
 	private boolean walk(final Packet packet,
@@ -264,7 +284,24 @@ public class SessionManager extends AbstractMessageReceiver
 			} // end of if (conn != null) else
 			break;
 		case GETDISCO:
-
+			if (pc.getType() != null && pc.getType() == StanzaType.result) {
+				Element iq = ElementUtils.createIqQuery(pc.getElemFrom(),
+					pc.getElemTo(), pc.getType(), pc.getElemId(),
+					pc.getElement().getChild("query"));
+				Packet result = new Packet(iq);
+				result.setTo(getConnectionId(pc.getElemTo()));
+				addOutPacket(result);
+			} // end of if (pc.getType() != null && pc.getType() == StanzaType.result)
+			break;
+		case GETSTATS:
+			if (pc.getType() != null && pc.getType() == StanzaType.result) {
+				Element iq = ElementUtils.createIqQuery(pc.getElemFrom(),
+					pc.getElemTo(), pc.getType(), pc.getElemId(), "jabber:iq:stats");
+				iq.getChild("query").addChild(pc.getElement().getChild("statistics"));
+				Packet result = new Packet(iq);
+				result.setTo(getConnectionId(pc.getElemTo()));
+				addOutPacket(result);
+			} // end of if (pc.getType() != null && pc.getType() == StanzaType.result)
 			break;
 		default:
 			break;
@@ -396,6 +433,7 @@ public class SessionManager extends AbstractMessageReceiver
 				results.addAll(Arrays.asList(discoFeatures));
 			} // end of if (discoFeatures != null)
 		}
+		results.addAll(Arrays.asList(DISCO_FEATURES));
 		return results;
 	}
 

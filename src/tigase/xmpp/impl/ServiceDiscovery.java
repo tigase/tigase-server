@@ -37,7 +37,7 @@ import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPResourceConnection;
 
 /**
- * Describe class ServiceDiscovery here.
+ * Implementation of JEP-030.
  *
  *
  * Created: Mon Mar 27 20:45:36 2006

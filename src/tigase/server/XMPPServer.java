@@ -41,6 +41,7 @@ public class XMPPServer {
 	private static String server_name = "tigase-xmpp-server";
   private static boolean debug = false;
   private static boolean monit = false;
+	private static String tigaseVersion = null;
 
 	/**
 	 * Creates a new <code>XMPPServer</code> instance.
@@ -61,6 +62,20 @@ public class XMPPServer {
   }
 
 	public static String getImplementationVersion() {
+// 		System.out.println("package.getName()="
+// 			+XMPPServer.class.getPackage().getName());
+// 		System.out.println("package.getSpecificationTitle()="
+// 			+XMPPServer.class.getPackage().getSpecificationTitle());
+// 		System.out.println("package.getSpecificationVersion()="
+// 			+XMPPServer.class.getPackage().getSpecificationVersion());
+// 		System.out.println("package.getSpecificationVendor()="
+// 			+XMPPServer.class.getPackage().getSpecificationVendor());
+// 		System.out.println("package.getImplementationTitle()="
+// 			+XMPPServer.class.getPackage().getImplementationTitle());
+// 		System.out.println("package.getImplementationVersion()="
+// 			+XMPPServer.class.getPackage().getImplementationVersion());
+// 		System.out.println("package.getImplementationVendor()="
+// 			+XMPPServer.class.getPackage().getImplementationVendor());
 		return XMPPServer.class.getPackage().getImplementationVersion();
 	}
 
@@ -126,6 +141,8 @@ public class XMPPServer {
 	 * @param args a <code>String[]</code> value
 	 */
 	public static void main(final String[] args) {
+
+		//		getImplementationVersion();
 
 		Thread.setDefaultUncaughtExceptionHandler(new ThreadExceptionHandler());
 

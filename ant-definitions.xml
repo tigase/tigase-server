@@ -40,6 +40,11 @@
         byline="true"/>
       <replaceregexp
         file="@{manifest}"
+        match="^(Package-Version: ).*$"
+        replace="\1build${build-no}"
+        byline="true"/>
+      <replaceregexp
+        file="@{manifest}"
         match="^(Tigase-Version: ).*$"
         replace="\1${version}"
         byline="true"/>

@@ -252,11 +252,6 @@ public class ClientConnectionManager extends ConnectionManager {
 		final String hostname = attribs.get("to");
 		final String id = UUID.randomUUID().toString();
 
-// 		StringBuilder sb = new StringBuilder();
-// 		sb.append("<session-id>" + id + "</session-id>");
-// 		if (hostname != null) {
-// 			sb.append("<hostname>" + hostname + "</hostname>");
-// 		} // end of if (hostname != null)
 		serv.getSessionData().put(serv.SESSION_ID_KEY, id);
 		Packet streamOpen = Command.STREAM_OPENED.getPacket(
 									 JID.getJID(getName(), getDefHostName(), getUniqueId(serv)),
