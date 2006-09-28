@@ -251,7 +251,7 @@ public abstract class IOService implements Callable<IOService> {
 			resizeInputBuffer();
 			return null;
     } catch (Exception eof) {
-			eof.printStackTrace();
+			//			eof.printStackTrace();
 			try { stop(); } catch (Exception e) { } // NOPMD
     } // end of try-catch
     return cb != null ? cb.array() : null;
