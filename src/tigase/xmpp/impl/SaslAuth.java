@@ -125,23 +125,27 @@ public class SaslAuth extends XMPPProcessor {
       SaslServer ss = (SaslServer)session.getSessionData("SaslServer");
       if (ss != null) {
         try {
-          byte[] data = Base64.decode(request.getChildCData("/response"));
-					log.finest("SASL response: " + new String(data));
-          // evaluateResponse doesn't like null parameter
-          if (data == null) { data = new byte[0]; } // end of if (data == null)
-          byte[] challenge = ss.evaluateResponse(data);
-					log.finest("SASL challenge: " + new String(challenge));
-          String reply = null;
-          if (ss.isComplete()) {
+					String challenge_data = null;
+					if (request.getChildCData("/response") != null) {
+						byte[] data = Base64.decode(request.getChildCData("/response"));
+						log.finest("SASL response: " + new String(data));
+						// evaluateResponse doesn't like null parameter
+						if (data == null) { data = new byte[0]; } // end of if (data == null)
+						byte[] challenge = ss.evaluateResponse(data);
+						log.finest("SASL challenge: " + new String(challenge));
+						challenge_data = (challenge != null && challenge.length > 0
+							? Base64.encode(challenge) : null);
+					}
+					if (ss.isComplete()) {
 						results.offer(packet.swapFromTo(createReply(ElementType.success,
-									null)));
+									challenge_data)));
 						if (!session.isAuthorized()) {
 							log.severe("!!!!!! Session not authorized after sasl success.");
 						} // end of if (!session.isAuthorized())
-          } else {
+					} else {
 						results.offer(packet.swapFromTo(createReply(ElementType.challenge,
-									Base64.encode(challenge))));
-          } // end of if (ss.isComplete()) else
+									challenge_data)));
+					} // end of if (ss.isComplete()) else
         } catch (SaslException e) {
           log.log(Level.FINEST, "SaslException", e);
 					failure = true;
