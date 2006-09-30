@@ -281,6 +281,10 @@ public abstract class AbstractMessageReceiver
 		routings.clear();
 	}
 
+	public boolean isInRoutings(String host) {
+		return routings.contains(host);
+	}
+
 	public void processCommand(final Packet packet, final Queue<Packet> results)
 	{}
 

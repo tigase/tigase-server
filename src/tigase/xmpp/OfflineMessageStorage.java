@@ -61,31 +61,32 @@ public class OfflineMessageStorage {
 		formater = new SimpleDateFormat("yyyyMMdd'T'HH:mm:ss");
 	}
 
-	public boolean savePacketForOffLineUser(Packet packet)
+	public boolean savePacketForOffLineUser(Packet pac, String jid)
 		throws UserNotFoundException {
-		if (packet.getElemName().equals("message")) {
-			StanzaType type = packet.getType();
+		if (pac.getElemName().equals("message")) {
+			StanzaType type = pac.getType();
 			if (type == null || type == StanzaType.normal || type == StanzaType.chat) {
-
-// 	<x from='capulet.com' stamp='20020910T23:08:25' xmlns='jabber:x:delay'>
-//     Offline Storage
-//   </x>
+				Element packet = (Element)pac.getElement().clone();
 				String stamp = null;
 				synchronized (formater) {
 					stamp = formater.format(new Date());
 				}
-				String from = JID.getNodeHost(packet.getElemTo());
+				String from = JID.getNodeHost(pac.getElemTo());
 				Element x = new Element("x", "Offline Storage",
 					new String[] {"from", "stamp", "xmlns"},
 					new String[] {from, stamp, "jabber:x:delay"});
-				Element msg = packet.getElement();
-				msg.addChild(x);
-				String user_id = JID.getNodeID(packet.getElemTo());
+				packet.addChild(x);
+				String user_id = null;
+				if (jid == null) {
+					user_id = JID.getNodeID(pac.getElemTo());
+				} else {
+					user_id = JID.getNodeID(jid);
+				} // end of if (jid == null) else
 				repository.addDataList(user_id, "off-line",
-					"messages", new String[] {packet.getStringData()});
+					"messages", new String[] {packet.toString()});
 			return true;
 			}
-		} // end of if (packet.getElemName().equals("message"))
+		} // end of if (pac.getElemName().equals("message"))
 		return false;
 	}
 

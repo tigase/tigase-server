@@ -92,6 +92,9 @@ public class SessionManager extends AbstractMessageReceiver
 	public static final String HOSTNAMES_PROP_KEY = "hostnames";
 	public static String[] HOSTNAMES_PROP_VAL =	{"localhost", "hostname"};
 
+	public static final String ADMINS_PROP_KEY = "admins";
+	public static String[] ADMINS_PROP_VAL =	{"admin@localhost", "admin@hostname"};
+
 	public static final String SECURITY_PROP_KEY = "security";
 
 	public static final String AUTHENTICATION_IDS_PROP_KEY = "authentication-ids";
@@ -118,6 +121,7 @@ public class SessionManager extends AbstractMessageReceiver
 	private UserRepository repository = null;
 	private OfflineMessageStorage offlineMessages = null;
 	private String[] DISCO_FEATURES = {"msgoffline"};
+	private String[] admins = {"admin@localhost"};
 
 	private Map<String, XMPPSession> sessionsByNodeId =
 		new ConcurrentSkipListMap<String, XMPPSession>();
@@ -146,7 +150,26 @@ public class SessionManager extends AbstractMessageReceiver
 				if (conn == null) {
 					// It might be a message for off-line user....
 					// I will put support for off-line message retrieval here...
-					saveOfflineMessage(packet);
+					boolean res = saveOfflineMessage(packet, null);
+					if (!res) {
+						// Hm, there was not such user in DB, then it might be
+						// message to admin
+						if (isInRoutings(to)) {
+							// Yes this packet is for admin....
+							log.finer("Packet to admin: " + packet.getStringData());
+							for (String admin: admins) {
+								conn = getResourceConnection(admin);
+								if (conn == null) {
+									saveOfflineMessage(packet, admin);
+								} else {
+									log.finer("Sending packet to admin: " + admin);
+									Packet admin_pac = new Packet(packet.getElement());
+									admin_pac.setTo(conn.getConnectionId());
+									addOutPacket(admin_pac);
+								} // end of else
+							} // end of for (String admin: admins)
+						} // end of if (isInRoutings(to))
+					} // end of if (!res))
 					// No more processing is needed....
 					return;
 				} // end of if (session != null) else
@@ -332,7 +355,12 @@ public class SessionManager extends AbstractMessageReceiver
 		props.put(USER_REPOSITORY_PROP_KEY, USER_REPOSITORY_PROP_VAL);
 		props.put(COMPONENTS_PROP_KEY, COMPONENTS_PROP_VAL);
 		HOSTNAMES_PROP_VAL = DNSResolver.getDefHostNames();
+		ADMINS_PROP_VAL = new String[HOSTNAMES_PROP_VAL.length];
+		for (int i = 0; i < ADMINS_PROP_VAL.length; i++) {
+			ADMINS_PROP_VAL[i] = "admin@"+HOSTNAMES_PROP_VAL[i];
+		} // end of for (int i = 0; i < ADMINS_PROP_VAL.length; i++)
 		props.put(HOSTNAMES_PROP_KEY, HOSTNAMES_PROP_VAL);
+		props.put(ADMINS_PROP_KEY, ADMINS_PROP_VAL);
 		props.put(SECURITY_PROP_KEY + "/" + AUTHENTICATION_IDS_PROP_KEY,
 			AUTHENTICATION_IDS_PROP_VAL);
 		props.put(SECURITY_PROP_KEY + "/" + AUTH_PLAIN_CLASS_PROP_KEY,
@@ -372,6 +400,8 @@ public class SessionManager extends AbstractMessageReceiver
 		for (String host: hostnames) {
 			addRouting(host);
 		} // end of for ()
+
+		admins = (String[])props.get(ADMINS_PROP_KEY);
 
 		String[] auth_ids = (String[])props.get(SECURITY_PROP_KEY + "/" +
 			AUTHENTICATION_IDS_PROP_KEY);
@@ -447,15 +477,18 @@ public class SessionManager extends AbstractMessageReceiver
 		return stats;
 	}
 
-	private void saveOfflineMessage(Packet p) {
+	private boolean saveOfflineMessage(Packet p, String jid) {
 		if (offlineMessages != null) {
 			try {
-				offlineMessages.savePacketForOffLineUser(p);
+				offlineMessages.savePacketForOffLineUser(p, jid);
+				return true;
 			} catch (UserNotFoundException e) {
 				log.fine("Problem saving off-line message: " + e
 					+ ", for packet: " + p.getStringData());
+				return false;
 			} // end of try-catch
 		} // end of if (offlineMessages != null)
+		return false;
 	}
 
 }
