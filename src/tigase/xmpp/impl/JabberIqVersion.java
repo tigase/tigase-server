@@ -63,7 +63,10 @@ public class JabberIqVersion extends XMPPProcessor {
 	public void process(final Packet packet, final XMPPResourceConnection session,
 		final Queue<Packet> results) {
 		// Maybe it is message to admininstrator:
-		String id = JID.getNodeID(packet.getElemTo());
+		String id = session.getDomain();
+		if (packet.getElemTo() != null) {
+			id = JID.getNodeID(packet.getElemTo());
+		} // end of if (packet.getElemTo() != null)
 		// If ID part of user account contains only host name
 		// and this is local domain it is message to admin
 		if (id == null || id.equals("")
