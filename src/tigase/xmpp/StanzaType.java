@@ -38,6 +38,7 @@ public enum StanzaType {
 		available, unavailable, probe, subscribe, // presence types
 		subscribed, unsubscribe, unsubscribed,    // presence types
 		chat, groupchat, headline, normal,        // message types
-		valid, invalid;                           // Dialback verification packets
+		valid, invalid,                           // Dialback verification packets
+    invisible;                                // Other unknown types...
 
 } // StanzaType
