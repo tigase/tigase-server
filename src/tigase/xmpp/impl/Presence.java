@@ -73,6 +73,7 @@ public class Presence extends XMPPProcessor {
     try {
 			sendPresenceBroadcast(StanzaType.unavailable, session,
 				FROM_SUBSCRIBED, results, null);
+			updateOfflineChange(session, results);
     } catch (NotAuthorizedException e) { } // end of try-catch
 	}
 
@@ -89,17 +90,48 @@ public class Presence extends XMPPProcessor {
     } // end of if (buddies == null)
   }
 
+	protected void updateOfflineChange(final XMPPResourceConnection session,
+		final Queue<Packet> results)
+		throws NotAuthorizedException {
+		for (XMPPResourceConnection conn: session.getActiveSessions()) {
+			log.finer("Update presence change to: " + conn.getJID());
+			if (conn != session) {
+				// Send to old resource presence about new resource
+				Element pres_update = new Element("presence");
+				pres_update.setAttribute("from", session.getJID());
+				pres_update.setAttribute("to", conn.getJID());
+				pres_update.setAttribute("type", StanzaType.unavailable.toString());
+				Packet pack_update = new Packet(pres_update);
+				pack_update.setTo(conn.getConnectionId());
+				results.offer(pack_update);
+			} else {
+				log.finer("Skipping presence update to: " + conn.getJID());
+			} // end of else
+		} // end of for (XMPPResourceConnection conn: sessions)
+	}
+
 	protected void updatePresenceChange(final Element presence,
     final XMPPResourceConnection session, final Queue<Packet> results)
 		throws NotAuthorizedException {
 		for (XMPPResourceConnection conn: session.getActiveSessions()) {
-			//			if (conn != session) {
+			log.finer("Update presence change to: " + conn.getJID());
+			if (conn != session) {
+				// Send to old resource presence about new resource
 				Element pres_update = (Element)presence.clone();
 				pres_update.setAttribute("to", conn.getJID());
 				Packet pack_update = new Packet(pres_update);
 				pack_update.setTo(conn.getConnectionId());
 				results.offer(pack_update);
-				//			} // end of if (conn != session)
+				// Send to new resource presence about old resource
+				pres_update = (Element)presence.clone();
+				pres_update.setAttribute("to", session.getJID());
+				pres_update.setAttribute("from", conn.getJID());
+				pack_update = new Packet(pres_update);
+				pack_update.setTo(session.getConnectionId());
+				results.offer(pack_update);
+			} else {
+				log.finer("Skipping presence update to: " + conn.getJID());
+			} // end of else
 		} // end of for (XMPPResourceConnection conn: sessions)
 	}
 
@@ -154,7 +186,7 @@ public class Presence extends XMPPProcessor {
 			// For all messages coming from the owner of this account set
 			// proper 'from' attribute
 			if (packet.getFrom().equals(session.getConnectionId())) {
-				packet.getElement().setAttribute("from", session.getUserId());
+				packet.getElement().setAttribute("from", session.getJID());
 			} // end of if (packet.getFrom().equals(session.getConnectionId()))
 
 			log.finest(pres_type + " presence found.");
@@ -177,7 +209,8 @@ public class Presence extends XMPPProcessor {
 					results, packet.getElement());
  				// Broadcast initial presence to other available user resources
 				Element presence = (Element)packet.getElement().clone();
-				presence.setAttribute("from", session.getJID());
+				// Already done above, don't need to set it again here
+				// presence.setAttribute("from", session.getJID());
 				updatePresenceChange(presence, session, results);
 				// Should we send off-line messages now?
 				// Let's try to do it here and maybe later I find better place.
