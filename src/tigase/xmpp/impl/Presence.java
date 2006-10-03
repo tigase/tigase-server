@@ -110,28 +110,36 @@ public class Presence extends XMPPProcessor {
 		} // end of for (XMPPResourceConnection conn: sessions)
 	}
 
-	protected void updatePresenceChange(final Element presence,
+	protected void updateUserResources(final Element presence,
     final XMPPResourceConnection session, final Queue<Packet> results)
 		throws NotAuthorizedException {
 		for (XMPPResourceConnection conn: session.getActiveSessions()) {
 			log.finer("Update presence change to: " + conn.getJID());
 			if (conn != session) {
-				// Send to old resource presence about new resource
-				Element pres_update = (Element)presence.clone();
-				pres_update.setAttribute("to", conn.getJID());
-				Packet pack_update = new Packet(pres_update);
-				pack_update.setTo(conn.getConnectionId());
-				results.offer(pack_update);
 				// Send to new resource presence about old resource
-				pres_update = (Element)presence.clone();
+				Element pres_update = (Element)presence.clone();
 				pres_update.setAttribute("to", session.getJID());
 				pres_update.setAttribute("from", conn.getJID());
-				pack_update = new Packet(pres_update);
+				Packet pack_update = new Packet(pres_update);
 				pack_update.setTo(session.getConnectionId());
 				results.offer(pack_update);
 			} else {
 				log.finer("Skipping presence update to: " + conn.getJID());
 			} // end of else
+		} // end of for (XMPPResourceConnection conn: sessions)
+	}
+
+	protected void updatePresenceChange(final Element presence,
+    final XMPPResourceConnection session, final Queue<Packet> results)
+		throws NotAuthorizedException {
+		for (XMPPResourceConnection conn: session.getActiveSessions()) {
+			log.finer("Update presence change to: " + conn.getJID());
+			// Send to old resource presence about new resource
+			Element pres_update = (Element)presence.clone();
+			pres_update.setAttribute("to", conn.getJID());
+			Packet pack_update = new Packet(pres_update);
+			pack_update.setTo(conn.getConnectionId());
+			results.offer(pack_update);
 		} // end of for (XMPPResourceConnection conn: sessions)
 	}
 
@@ -207,11 +215,13 @@ public class Presence extends XMPPProcessor {
  				// Broadcast initial presence to 'from' or 'both' contacts
 				sendPresenceBroadcast(type, session, FROM_SUBSCRIBED,
 					results, packet.getElement());
+
  				// Broadcast initial presence to other available user resources
-				Element presence = (Element)packet.getElement().clone();
+				//				Element presence = (Element)packet.getElement().clone();
 				// Already done above, don't need to set it again here
 				// presence.setAttribute("from", session.getJID());
-				updatePresenceChange(presence, session, results);
+				updatePresenceChange(packet.getElement(), session, results);
+				updateUserResources(packet.getElement(), session, results);
 				// Should we send off-line messages now?
 				// Let's try to do it here and maybe later I find better place.
 				OfflineMessageStorage offlineMessages =

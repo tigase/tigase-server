@@ -44,7 +44,7 @@ public class Packet {
 
 	private final Element elem;
 	private final Command command;
-	private final StanzaType type;
+	private StanzaType type;
 	private final boolean routed;
 	private String to = null;
 	private String from = null;
@@ -60,9 +60,13 @@ public class Packet {
 			command = null;
 		} // end of else
 		if (elem.getAttribute("type") != null) {
-			type = StanzaType.valueOf(elem.getAttribute("type"));
-		} // end of if (elem.getAttribute("type") != null)
-		else {
+			try {
+				type = StanzaType.valueOf(elem.getAttribute("type"));
+			} catch (IllegalArgumentException e) {
+				// Unknown stanza type
+				type = null;
+			} // end of try-catch
+		} else {
 			type = null;
 		} // end of if (elem.getAttribute("type") != null) else
 		if (elem.getName().equals("route")) {

@@ -95,7 +95,17 @@ public class SaslAuth extends XMPPProcessor {
   public void process(final Packet packet, final XMPPResourceConnection session,
 		final Queue<Packet> results) {
 		Element request = packet.getElement();
-    ElementType type = ElementType.valueOf(request.getName());
+		ElementType type = null;
+		try {
+			type = ElementType.valueOf(request.getName());
+		} catch (IllegalArgumentException e) {
+			log.warning("Incorrect stanza type: " + request.getName());
+			results.offer(packet.swapFromTo(createReply(ElementType.failure,
+						"<temporary-auth-failure/>")));
+			results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
+					StanzaType.set, packet.getElemId()));
+			return;
+		} // end of try-catch
 		boolean failure = false;
     switch (type) {
     case auth:
