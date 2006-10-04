@@ -168,8 +168,4 @@
     </sequential>
   </macrodef>
 
-  <taskdef name="unitgen"
-    classpath="${libs}/unittestsgen.jar"
-    classname="testsgen.taskant.UnitTestsGen"/>
-
 </project>

@@ -17,12 +17,12 @@
  <target name="prepare-dist" description="Calculate build version">
   <!-- Get revision number -->
   <exec executable="svn">
-   <arg line="status -u --non-interactive"/>
+   <arg line="info --non-interactive MANIFEST.MF"/>
    <redirector outputproperty="build-no" errorproperty="error-property">
     <outputfilterchain>
      <tokenfilter>
       <containsregex
-       pattern=".*Status against revision:\s*([0-9]+).*" replace="\1"/>
+       pattern=".*Revision:\s*([0-9]+).*" replace="\1"/>
      </tokenfilter>
     </outputfilterchain>
    </redirector>
