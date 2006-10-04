@@ -77,7 +77,10 @@ public class ServiceDiscovery extends XMPPProcessor {
 
 		try {
 			// Maybe it is message to admininstrator:
-			String nodeId = JID.getNodeID(packet.getElemTo());
+			String nodeId = null;
+			if (packet.getElemTo() != null) {
+				nodeId = JID.getNodeID(packet.getElemTo());
+			} // end of if (packet.getElemTo() != null)
 
 			if (packet.isCommand() && packet.getCommand() == Command.GETDISCO
 				&& packet.getType() == StanzaType.result) {
