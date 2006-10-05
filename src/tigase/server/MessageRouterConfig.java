@@ -42,7 +42,7 @@ public class MessageRouterConfig {
   private static final Logger log =
     Logger.getLogger("tigase.server.MessageRouterConfig");
 
-  public static final String LOCAL_ADDRESSES_PROP_KEY = "local-addresses";
+  public static final String LOCAL_ADDRESSES_PROP_KEY = "hostnames";
   public static String[] LOCAL_ADDRESSES_PROP_VALUE =	{"localhost", "hostname"};
 
 	public static final String MSG_RECEIVERS_PROP_KEY =

@@ -41,6 +41,7 @@ import tigase.server.ConnectionManager;
 import tigase.server.MessageReceiver;
 import tigase.server.Packet;
 import tigase.server.XMPPService;
+import tigase.util.DNSResolver;
 import tigase.util.JID;
 import tigase.util.RoutingsContainer;
 import tigase.xml.Element;
@@ -76,7 +77,7 @@ public class ClientConnectionManager extends ConnectionManager {
 	public static final String ROUTING_ENTRY_PROP_VAL = "session_1@localhost";
 
 	public static final String HOSTNAMES_PROP_KEY = "hostnames";
-	public static final String[] HOSTNAMES_PROP_VAL =	{"localhost-client1"};
+	public static String[] HOSTNAMES_PROP_VAL =	{"localhost", "hostname"};
 
 	private RoutingsContainer routings = null;
 	private String defHostName = null;
@@ -173,7 +174,7 @@ public class ClientConnectionManager extends ConnectionManager {
 			log.finer("Processing packet: " + p.getElemName()
 				+ ", type: " + p.getType());
 			log.finest("Processing socket data: " + p.getStringData());
-			p.setFrom(JID.getJID(getName(), getDefHostName(), id));
+			p.setFrom(getFromAddress(id));
 			p.setTo(routings.computeRouting(p.getElemTo()));
 			addOutPacket(p);
 			// 			results.offer(new Packet(new Element("OK")));
@@ -184,6 +185,7 @@ public class ClientConnectionManager extends ConnectionManager {
 
 	public Map<String, Object> getDefaults() {
 		Map<String, Object> props = super.getDefaults();
+		HOSTNAMES_PROP_VAL = DNSResolver.getDefHostNames();
 		props.put(HOSTNAMES_PROP_KEY, HOSTNAMES_PROP_VAL);
 		props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_MODE_PROP_KEY,
 			ROUTING_MODE_PROP_VAL);
@@ -210,7 +212,7 @@ public class ClientConnectionManager extends ConnectionManager {
 		clearRoutings();
 		defHostName = null;
 		for (String host: hostnames) {
-			addRouting(host);
+			addRouting(getName() + "." + host);
 			if (defHostName == null) {
 				defHostName = host;
 			} // end of if (defHostName == null)
@@ -246,6 +248,10 @@ public class ClientConnectionManager extends ConnectionManager {
 		return "tigase.xmpp.XMPPClient";
 	}
 
+	private String getFromAddress(String id) {
+		return JID.getJID(id, getName() + "." + getDefHostName(), null);
+	}
+
 	public String xmppStreamOpened(XMPPIOService serv,
 		Map<String, String> attribs) {
 		log.finer("Stream opened: " + attribs.toString());
@@ -254,17 +260,17 @@ public class ClientConnectionManager extends ConnectionManager {
 
 		serv.getSessionData().put(serv.SESSION_ID_KEY, id);
 		Packet streamOpen = Command.STREAM_OPENED.getPacket(
-									 JID.getJID(getName(), getDefHostName(), getUniqueId(serv)),
-									 routings.computeRouting(hostname), StanzaType.set, "sess1",
-									 new Element("session-id", id));
+			getFromAddress(getUniqueId(serv)),
+			routings.computeRouting(hostname), StanzaType.set, "sess1",
+			new Element("session-id", id));
 		if (hostname != null) {
 			streamOpen.getElement().addChild(new Element("hostname", hostname));
 		} // end of if (hostname != null)
 		addOutPacket(streamOpen);
 		if (attribs.get("version") != null) {
 			addOutPacket(Command.GETFEATURES.getPacket(
-										 JID.getJID(getName(), getDefHostName(), getUniqueId(serv)),
-										 routings.computeRouting(null), StanzaType.get, "sess1"));
+					getFromAddress(getUniqueId(serv)),
+					routings.computeRouting(null), StanzaType.get, "sess1"));
 		} // end of if (attribs.get("version") != null)
 		return "<stream:stream version='1.0' xml:lang='en'"
 			+ " from='" + hostname + "'"
@@ -277,7 +283,7 @@ public class ClientConnectionManager extends ConnectionManager {
 		super.serviceStopped(service);
 		//		XMPPIOService serv = (XMPPIOService)service;
 		Packet command = Command.STREAM_CLOSED.getPacket(
-			JID.getJID(getName(), getDefHostName(), getUniqueId(service)),
+			getFromAddress(getUniqueId(service)),
 			routings.computeRouting(null), StanzaType.set, "sess1");
 		addOutPacket(command);
 		log.fine("Service stopped, sending packet: " + command.getStringData());
