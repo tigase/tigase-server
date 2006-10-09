@@ -1,0 +1,523 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+ <head>
+  <title>Package: tigase.server - compilation, installation and
+    configuration.</title>
+<!--
+
+  Package Tigase XMPP/Jabber Server
+  Copyright (C) 2001, 2002, 2003, 2004, 2005
+  "Artur Hefczyc" <artur.hefczyc@gmail.com>
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software Foundation,
+  Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+  $Rev: 68 $
+  $Author: kobit $
+  $Date: 2005/04/25 09:25:41 $
+
+-->
+ </head>
+ <body bgcolor="white">
+  <h1>Package: tigase.server - compilation, installation and configuration.</h1>
+  <h2>About</h2>
+  <p><strong>Tigase Jabber/XMPP Server</strong> is <strong>Open Source and Free
+    (GPL2)</strong> <a href="http://java.sun.com">Java</a> based server. The
+   goals behind the design and implementation of the server are: </p>
+  <ol>
+   <li>Make the server robust and reliable.</li>
+   <li>Make the server secure communication platform.</li>
+   <li>Make flexible server which can be applied to different use cases.</li>
+   <li>Make extensible server which takes full advantage of XMPP protocol
+    extensibility.</li>
+   <li>Make the server easy to setup and maintain.</li>
+  </ol>
+  <dl>
+   <dt><strong>Robust and reliable.</strong></dt>
+   <dd><p>By robust and reliable server I mean the server which can handle many
+     concurrent requests/connections and can run for a log time. By many
+     concurrent requests/connections I mean as many as it is needed. The server
+     is designed and implemented to handle milions of simultanous
+     connections.</p> <p>It is not enough however to design and implement high
+     load server and hope it will run well. The main focus in the project is put
+     in tests. Tests are taken so seriously that dedicated <a
+      href="http://testsuite.tigase.org/">testing framework</a> has been
+     implemented. All server functions are considered as implemented only when
+     they pass testing cycle. The testing cycle consists of 3 fundamental
+     tests:</p>
+    <ol>
+     <li><strong>Functional tests - </strong> checking whether the function
+      works at all.</li>
+     <li><strong>Performance tests - </strong> checking whether the function
+      performs well enough.</li>
+     <li><strong>Stability tests - </strong> checking whether the function
+      behaves well in long term run. It must handle hundreds of requests a
+      second in several hours server run.</li>
+    </ol>
+   </dd>
+   <dt><strong>Secure</strong></dt>
+   <dd><p>There are a few elements of the security related to Jabber/XMPP
+     server: secure data transmissions which is met by the implementation of
+     <strong>SSL</strong> or <strong>TLS</strong> protocol, secure user
+     authorization which is met by the implementation of <strong>DIGEST</strong>
+     or <strong>SASL</strong> user authorization and secure deplyoment which is
+     met by component architecture.</p> <p><strong>Secure deployment</strong> is
+     a software installation which doesn't impact network security. Companies
+     usually have their networks divided into 2 parts: <strong>DMZ</strong>
+     which is partially open to outside world and <strong>Private
+      network</strong> which is closed to outside world.</p> <p>If the
+     Jabber/XMPP server have to provide effective way of communication between
+     company eployees regardles they are in company office or outside (perhaps
+     at customer site) it needs to accept connections from outside world. So the
+     natural place for server deployment is a <strong>DMZ</strong> part. There
+     is an issue however with such installation. Each company has normally
+     established network users base and integrated authorization mechanizms. So
+     it would be very good if Jabber server could use this mechanizms for users
+     authorizations as well. Usually, however, authorization information is not
+     available in <strong>DMZ</strong> and it shouldn't be.</p>
+    <p><strong>Tigase server</strong> offers solution for such case. With it's
+     component structure it can be easily deployed on any number machines and
+     from the user point of view it is seen as a one logical Jabber server. So
+     in our case we can install <em>Session Manager</em> module in
+     <strong>private</strong> network part and <em>Client Connection
+      Manager</em> with <em>Server Connection Manager</em> in
+     <strong>DMZ</strong>.<br/> <em>Session Manager</em> connects to
+     <strong>DMZ</strong> and receives all packets from users. Thus is can
+     sacurely realize users authorization based on company authorization
+     mechanizms. </p></dd>
+   <dt><strong>Flexibile</strong></dt>
+   <dd>There are many different Jabber/XMPP server use cases. The most obvious
+    are:
+    <ul>
+     <li>Used as bussiness communication platform in small and medium companies
+      server is not under heavy load. Instead for such deployments security is a
+      key feature.</li>
+     <li>Fo huge community websites or internet portals server is on the other
+      side usually under very heavy load and have to support tousands or
+      millions of simultanous connections and for such deployment we talk about
+      different kind of security as the service is open to public anyway.</li>
+     <li>For very small community deployments or for small home networks the key
+      factor is ease to deploy and maintain.</li>
+    </ul> <p>Architecture based on components allows you to run selected modules
+     on separate machines so the server can be easily applied to all
+     scenarious.<br/> For simple installation server generates config file which
+     can be used almost stright away with very few modifications or sometimes
+     even no config editing is required. For complex deployments though you can
+     tweak configuration to your needs and setup Jabber server on as many
+     physical machines as you need.</p>
+   </dd>
+   <dt><strong>Extensibile</strong></dt>
+   <dd><p>The world changes all the time so people needs change as well.
+     Jabber/XMPP protocol has been designed to be extensible to make it easy
+     adding new features and apply it to different needs. As a result Jabber is
+     a very effective platform not only for sending messages to mates. It can
+     also be extended for sending instant notifications about events, it can be
+     useful platform for on-line customer service, voice communication and all
+     other cases where sending information instantly to other people is
+     needed.</p> <p><strong>Tigase server</strong> has been designed to be
+     extensible as well. Of course modular architecture makes it extensible as
+     you can easily replace component which doesn't fullfill your requirements
+     with another one better fiiting your needs. But this is not all. Another
+     factor of extensibility is how easy is to replace component or add new
+     extensions. The great focus has been put in server design API to make it
+     easy for other software developers to create extensions and implement new
+     features.</p></dd>
+   <dt><strong>Easy</strong></dt>
+   <dd><p>Complex computer networks consisting of many servers with different
+     services are hard to maintain. There is no other way than employing
+     professional staff and looking after the network.</p> <p>Not all networks
+     are so complex however. Most small companies have just a few servers for
+     their needs with services like e-mail, <code>HTTP</code> server with
+     company website and that's it. They might want to add Jabber server to the
+     collection of their services and don't want to dedicate much resources on
+     setting it up and later maintanance. For such users default configuration
+     is pretty much what they need. If operating system on the server is well
+     configured then Tigase should pickup correct hostname.</p> <p>Tigase server
+     is designed and implemnted to allow dynamic reconfiguration at runtime so
+     there is no need for restarting server each time you want to change a
+     configuration settings.</p> <p>There are also interfaces and handlers
+     available to make it easy to implement web user interface for server
+     monitoring and configuring. Such user interface will included in one of
+     future releases.</p></dd>
+  </dl>
+  <p>How <strong>Tigase</strong> fits in above needs? Look at use cases
+   scenarios.</p>
+  <p>The server is divided into logic components and each component can be
+   deployed separately.</p>
+
+  <h2>Compilation</h2>
+
+  <p>Although the server doesn't need any third-party libraies apart from
+   <em>Java 6.0 (1.6beta2)</em> compliant JVM to run, <a
+    href="http://ant.apache.org/">Apache Ant</a> tool and <a
+    href="http://ant-contrib.sourceforge.net/">Ant-Contrib</a> are used to build
+   binaries of <strong>Tigase</strong> applications and libraries. Another tools
+   which is needed is a <a href="http://subversion.tigris.org/">Subversion</a> which is
+   required to download the most recent sources from <strong>Tigase</strong>
+   repository. <br/>
+   To make it a list, again:</p>
+  <ol>
+   <li><a
+     href="http://java.sun.com/javase/6/webnotes/install/index.html">JDK-1.6</a>
+    - Java SDK to compile and run <strong>Tigase</strong> applications.</li>
+   <li><a href="http://ant.apache.org/">Apache Ant</a> - the build tool.</li>
+   <li><a href="http://ant-contrib.sourceforge.net/">Ant-Contrib</a> -
+    <strong>Apache Ant</strong> extensions used by build script.</li>
+   <li><a href="http://subversion.tigris.org/">Subversion</a> - version
+    control system used by <strong>Tigase</strong>.</li>
+  </ol>
+  <p>Install all above in standard way, appropriate for your operating
+   system. It is enough if they are available in system <code>PATH</code>
+   variable so you can execute them from command line.</p>
+  <p><strong>Tigase Server</strong> has been divided into a few smaller
+   subprojects some time ago. In order to have it all working together we need
+   to compile them one by one. Here is step by step instruction how to do
+   it. Assuming you already run command line shell and changed to directory
+   where you want to keep all <strong>Tigase</strong> files do as follows:</p>
+  <ol>
+   <li>Get <strong>tigase-utils</strong> sources and compile them:
+    <pre>svn co https://svn.tigase.org/reps/tigase-utils/trunk/ utils
+cd utils
+ant clean jar
+cd ..</pre>
+   </li>
+   <li>Get <strong>tigase-xmltools</strong> sources and compile them:
+    <pre>svn co https://svn.tigase.org/reps/tigase-xmltools/trunk/ xmltools
+cd xmltools
+ant clean jar
+cd ..</pre>
+   </li>
+   <li>Get <strong>tigase-server</strong> sources and compile them:
+    <pre>svn co https://svn.tigase.org/reps/tigase-server/trunk/ server
+cp xmltools/jars/tigase-xmltools.jar server/libs/
+cp utils/jars/tigase-utils.jar server/libs/
+cd server
+ant clean jar</pre>
+   </li>
+  </ol>
+  <p>Now you have <strong>Tigase Server</strong> compiled and ready to run. To
+  check and make sure it is indeed compiled and can be executed you can try to
+  start the server. Assuming you are in the directory where you executed the
+  last compilation command for server sources run following command:</p>
+  <p>On Linux system:</p>
+  <pre>java -cp "libs/tigase-utils.jar:libs/tigase-xmltools.jar:jars/tigase-server.jar" tigase.server.XMPPServer</pre>
+  <p>On MS Windows system:</p>
+  <pre>java -cp "libs/tigase-utils.jar;libs/tigase-xmltools.jar;jars/tigase-server.jar" tigase.server.XMPPServer</pre>
+  <p>If it all worked correctly you should see output similar to presented below:</p>
+<pre>2006-10-04 17:00:38  ConfigRepository.init()             WARNING:  Can not open existing configuration file, creating new one
+2006-10-04 17:00:38  XMLDB.setupNewDB()                  INFO:     Create empty DB.
+2006-10-04 17:00:38  MessageRouter.addRegistrator()      INFO:     Adding registrator: Configurator
+2006-10-04 17:00:38  MessageRouter.addComponent()        INFO:     Adding component: Configurator
+2006-10-04 17:00:38  Configurator.setupLogManager()      WARNING:  DONE
+2006-10-04 17:00:38  Configurator.setupLogManager()      WARNING:  DONE
+2006-10-04 17:00:39  XMLRepository.<init>()              WARNING:  Can not open existing user repository file, creating new one</pre>
+  <p>Now you can proceed to configuration document to learn how to tweak server
+  settings or you can just start hacking server code and do experiments.</p>
+
+  <h2>Installation</h2>
+  <p>To get server up and running you have to download from our site the most
+   recent version of the binary package. Unpack it with the following
+   command:</p>
+  <p>On Unix like system:</p>
+  <pre>tar -xzvf tigase-server-x.x.x-bx.tar.gz</pre>
+  <p>On MS Windows system use any application which can handle either
+   <code>zip</code> files or <code>tar.gz</code> files and unpack server package
+   to selected directory.</p>
+  <p>Sometimes after unpacking package on unix system startup script doesn't
+   have execution permissions. To fix the problem you have to run following
+   command:</p>
+  <pre>chmod u+x ./bin/run-server.sh</pre>
+  <p>Now all you need is <em>Java 6 (1.6 beta at the moment)</em> compilant
+   virtual machine. You can run server from command line with simple
+   command:</p>
+  <pre>./bin/run-server.sh</pre>
+  <p>You can see now a few messages with warning about missing configuration
+   file and missin user repository file. These 2 files will be automaticaly
+   created. Config file will be created just during first execution of the
+   server and user repository file will be created when the first user is added
+   to the system.</p>
+  <p>You should be able now to connect to the server with Jabber/XMPP client of
+   your choice.</p>
+  <p>All possible command line parameters are:</p>
+  <ul>
+   <li><code>-h</code> - prints help message about starting server.</li>
+   <li><code>-v</code> - prints information about server version.</li>
+   <li><code>-c file.xml</code> - defines location and name of <em>XML</em>
+    configuration file. Default is <code>xmpp_server.xml</code> file in current
+    directory. If you don't have config file it will be automaticaly created
+    during first run with all default settings. It is very easy then to
+    customize server to your own needs.</li>
+   <li><code>-d [true|yes|false|no]</code> - turn on/off debug mode. Putting
+    just '<code>-d</code>' without extra parameter is equal to "<code>-d
+     true</code>".</li>
+  </ul>
+  <p>You can now proceed to configuration section. Although in simple case
+   installation most if default options should be correct sometimes you need to
+   change server domain name if automatic detection didn't work.</p>
+
+  <h2>Configuration</h2>
+  <h3>Basic configuation.</h3>
+  <p>Configuration settings are kept in <em>XML</em> file very similar in it's
+   structure to <em>Java 5.0</em> <code>preferences</code> file. The most
+   significant difference is possibility to assign multiple values to one key
+   (entry). Another difference is that in configuration file all values are
+   uuencoded so it is possible to keep different data in configuration even if
+   they could cause xml parsing errors.</p>
+  <p>If you need sample configuration file containing all used defaults
+   just run server in usual way. If configuration file can not be found it is
+   created with default settings. And even if there is an old configuration
+   file with some settings missing server automaticly adds missing entries
+   at startup time.</p>
+  <p>Configuration file was not designed for manual editing so it
+   is not recommended to do so. Unfortunately there are no user friendly
+   interfaces available at the moment so here is a description how to edit the
+   file and what to change.</p>
+
+  <h4>Short configuration guide.</h4>
+
+  <p>Options you most likely have to change at deployment time are:</p>
+  <ol>
+   <li><strong>Admin accounts - </strong> account names where all admin messages
+   are sent.</li>
+   <li><strong>Hostnames - </strong> real and virtual hostnames your server has
+   to serve for.</li>
+   <li><strong>Logs - </strong> setting related to log file location
+    and how much information should be logged there.</li>
+  </ol>
+  <p>Please let me know if you think more options should be described here.</p>
+
+  <p>At the moment the only way to change configuration is to manually edit xml
+   config file. So be prepared for tough times. The good news it that more user
+   friendly interfaces are scheduled for next release. And it will be also
+   reconfigure server at runtime without need to restart service.</p>
+
+  <dl>
+   <dt><strong>Admin accounts</strong></dt>
+   <dd><p>This is the most likely thing to change after you install server and
+     generate default configuration. Actually it is also the easiest option to
+     customize.</p>
+    <p>Open <code>tigase-config.xml</code> in you favourite text editor and search
+     for string: <strong>"admins"</strong>. You should find section looking like
+     this:</p>
+    <pre>   &#60;entry type="String[]" key="admins">
+    &#60;item value="admin%40your.hostname.com"/>
+    &#60;item value="admin%40localhost"/>
+   &#60;/entry></pre>
+    <p>Characters "%40" stand for '@'. So assuming you have just 1 admin account
+     on your installation which is: "frank@jabber.example.com" you need to
+     replace above code with:</p>
+    <pre>   &#60;entry type="String[]" key="admins">
+    &#60;item value="frank%40jabber.example.com"/>
+   &#60;/entry></pre>
+    <p>And yes, you can just remove second entry with admin account:
+     "admin@localhost" unless you really want to keep it. Be aware though all
+     system messages will be sent to <strong>ALL</strong> admin accounts.<br/>
+     Well, if the account does not exists the message is discarded and a
+     warning is be printed in log file. Again, read it again, the previous
+     sentence...<br/>
+     It means that the admin account has to be also created in normal way on the
+     Jabber server. Just register it using your Jabber client. The admin
+     accounts setting works just as a forward instruction. So as a result all
+     system and admin messages are forwarded to all admin accounts if they
+     exist.<br/>
+     Obviously you can have admin accounts as many as you like:</p>
+    <pre>   &#60;entry type="String[]" key="admins">
+    &#60;item value="frank%40jabber.example.com"/>
+    &#60;item value="lucy%40jabber.example.com"/>
+    &#60;item value="mark%40jabber.example.com"/>
+    &#60;item value="brenda%40jabber.example.com"/>
+    &#60;item value="luck%40jabber.example.com"/>
+   &#60;/entry></pre>
+   </dd>
+   <dt><strong>Hostnames</strong></dt>
+   <dd><p>This one might be a little bit more tricky than previous
+    as <strong>hostnames</strong> setting has to be changed in a few
+    places. Don't ask why now as this is <em>"Short configuration guide"</em>,
+    you remember. Here we focus on <strong>how</strong> not
+    on <strong>why</strong>.</p>
+    <p>You have to search configuration file for
+     string <strong>"hostnames"</strong>. There are more than one such sections
+     and you have to find <strong>ALL</strong> sections looking like:</p>
+    <pre>   &#60;entry type="String[]" key="hostnames">
+    &#60;item value="your.hostname.com"/>
+    &#60;item value="localhost"/>
+   &#60;/entry></pre>
+    <p>It may also look like:</p>
+    <pre>   &#60;entry type="String[]" key="hostnames">
+    &#60;item value="localhost"/>
+   &#60;/entry></pre>
+    <p>Depending how successful was mechanism for automatic hostname
+     detection. It of course does not depends on your luck. It depends on network
+     configuration on your server.</p>
+    <p>The first form is more useful as it includes also hostname recognized in
+     network environment. If it is correct then you can just leave it as it
+     is. If it is incorrect you have to change it. Please remember, if you want
+     your server to be able to communicate with other <em>Jabber/XMPP</em>
+     servers the hostname you put there must resolve in DNS to your Jabber
+     server machine IP address. In other words. If you try to connect from the
+     Internet to machine with this hostname the connection should reach your
+     Jabber server.</p>
+    <p>And remember your Jabber server users' <em>JIDs (Jabber IDs)</em> can
+     include only those hostnames which are included in the configuration. So
+     for our case you can use only <em>JIDs</em>:
+     <em>"user2@your.hostname.com"</em>, <em>"user1@your.hostname.com"</em> and
+     so on.</p>
+    <p>If you server have more Internet addresses (virtual domains) assigned to
+     it your Jabber server can use them all. So your configuration may look like:</p>
+    <pre>   &#60;entry type="String[]" key="hostnames">
+    &#60;item value="your.hostname.com"/>
+    &#60;item value="clien1.hostname.com"/>
+    &#60;item value="another.hostname.com"/>
+    &#60;item value="jabber.sample-domain.com"/>
+    &#60;item value="jabber.some-project.org"/>
+    &#60;item value="localhost"/>
+   &#60;/entry></pre>
+    <p>In such case users' <em>JIDs</em> on your Jabber server may include any
+     of defined above domains like: <em>"user1@your.hostname.com"</em>,
+     <em>"user1@clien1.hostname.com"</em>,
+     <em>"user1@jabber.sample-domain.com"</em>. Each of these 3
+     sample <em>JIDs</em> refer to different user account.</p>
+    <p>Your server will accept connections only for domains defined in
+     configuration file.</p>
+    <p>In majority cases it does not matter whether you
+     leave <strong>"localhost"</strong> or remove it. It is sometimes better to
+     leave it though. So if you are not sure if you can remove it in your
+     environment just leave it as is.</p>
+   </dd>
+   <dt><strong>Logs</strong></dt>
+   <dd><p>Logging mechanism is very flexible in Tigase server. You can adjust
+     separate logging level for each single component. You can also direct
+     loggin to many different destinations like console, file, network socket
+     and so on. Unfortunately it also mean it is a bit complex. The general
+     idea however is quite simple so once you understand it it shouldn'd be
+     difficult for you anymore. This guide however describes logging very
+     briefly. Loot at full configuration documentation for detailed
+     explanation.</p>
+    <p>In standard sever configuration you usually want to turn off all logging
+     to console and all warning and more serious notices directed to log
+     file. Let's say logs will be written
+     to <code>/var/log/tigase-server.log</code> which shouldn't get bigger than
+     10MB and 5 old logs will be preserved. Here are instructions how to set
+     options.</p>
+    <p>Open <code>tigase-config.xml</code> in you favourite text editor and
+     search for string: <strong>"logging"</strong>. You should find section
+     looking like this:</p>
+    <pre>  &#60;node name="logging">
+   &#60;map>
+    &#60;entry value="FINE" type="String" key=".level"/>
+    &#60;entry value="java.util.logging.ConsoleHandler+java.util.logging.FileHandler" type="String" key="handlers"/>
+    &#60;entry value="tigase.util.LogFormatter" type="String" key="java.util.logging.ConsoleHandler.formatter"/>
+    &#60;entry value="WARNING" type="String" key="java.util.logging.ConsoleHandler.level"/>
+    &#60;entry value="true" type="String" key="java.util.logging.FileHandler.append"/>
+    &#60;entry value="5" type="String" key="java.util.logging.FileHandler.count"/>
+    &#60;entry value="tigase.util.LogFormatter" type="String" key="java.util.logging.FileHandler.formatter"/>
+    &#60;entry value="ALL" type="String" key="java.util.logging.FileHandler.level"/>
+    &#60;entry value="100000" type="String" key="java.util.logging.FileHandler.limit"/>
+    &#60;entry value="logs%2Ftigase.log" type="String" key="java.util.logging.FileHandler.pattern"/>
+    &#60;entry value="true" type="String" key="tigase.useParentHandlers"/>
+   &#60;/map>
+  &#60;/node></pre>
+    <p>Assuming we make this guide easy and strightforward let me show how this
+    section should look like after modification. So you could just copy and
+    paste it to your config file without going into details. After the
+    configuration code I will briefly explain what each line means so you
+    should be able to further adjust settings for your needs.</p>
+    <pre>  &#60;node name="logging">
+   &#60;map>
+    &#60;entry value="WARNING" type="String" key=".level"/>
+    &#60;entry value="java.util.logging.ConsoleHandler+java.util.logging.FileHandler" type="String" key="handlers"/>
+    &#60;entry value="tigase.util.LogFormatter" type="String" key="java.util.logging.ConsoleHandler.formatter"/>
+    &#60;entry value="tigase.util.LogFormatter" type="String" key="java.util.logging.FileHandler.formatter"/>
+    &#60;entry value="OFF" type="String" key="java.util.logging.ConsoleHandler.level"/>
+    &#60;entry value="true" type="String" key="java.util.logging.FileHandler.append"/>
+    &#60;entry value="5" type="String" key="java.util.logging.FileHandler.count"/>
+    &#60;entry value="ALL" type="String" key="java.util.logging.FileHandler.level"/>
+    &#60;entry value="10000000" type="String" key="java.util.logging.FileHandler.limit"/>
+    &#60;entry value="%2Fvar%2Flog%2Ftigase-server.log" type="String" key="java.util.logging.FileHandler.pattern"/>
+    &#60;entry value="true" type="String" key="tigase.useParentHandlers"/>
+   &#60;/map>
+  &#60;/node></pre>
+    <p>Each line explained:</p>
+
+    <pre><strong>&#60;entry value="WARNING" type="String" key=".level"/></strong></pre>
+    <p>Effectively we set <code>WARNING</code> level for all possible logs for
+     all possible <code>components</code>. So more detailed logging information will
+     be discarded. All possible log levels
+     are: <code>OFF</code>, <code>SEVERE</code>, <code>WARNING</code>,
+     <code>INFO</code>, <code>CONFIG</code>, <code>FINE</code>,
+     <code>FINER</code>, <code>FINEST</code>, <code>ALL</code>.</p>
+
+    <pre><strong>&#60;entry value="java.util.logging.ConsoleHandler+java.util.logging.FileHandler" type="String" key="handlers"/></strong></pre>
+
+    <p>We set 2 handlers for logging information: console and file handler. As
+     we are going to turn off logging to console we could remove all
+     configuration settings for console handler as well. It would simplify
+     configuration file. I don't recommend it though. If there are any problems
+     with your installation switching console logging on might be very helpful
+     and if you remove these settings from config file it may be difficult to
+     bring them back. Hm... maybe not with such excellent documentation.... ;-)</p>
+
+    <pre><strong>&#60;entry value="tigase.util.LogFormatter" type="String" key="java.util.logging.ConsoleHandler.formatter"/>
+&#60;entry value="tigase.util.LogFormatter" type="String" key="java.util.logging.FileHandler.formatter"/></strong></pre>
+
+    <p>We set here log formatter for console and file handler. Standard Java
+     handlers print each log message in 2 lines. Tigase formatter prints all
+     logging info in 1 line which make it much easier to filter logs by log
+     type, logging component or log level or whatever you wish. You can just use
+     simple <code>sed</code> command and that's it.</p>
+
+    <pre><strong>&#60;entry value="OFF" type="String" key="java.util.logging.ConsoleHandler.level"/></strong></pre>
+
+    <p>Here we just switch console handler off. To switch it on back set
+     any different level from the list above.</p>
+
+    <pre><strong>&#60;entry value="true" type="String" key="java.util.logging.FileHandler.append"/></strong></pre>
+
+    <p>This settings is to controll whether we want to append logs into old log
+     file or we want to create new log file (removing old content) each time
+     server is restarted.</p>
+
+    <pre><strong>&#60;entry value="5" type="String" key="java.util.logging.FileHandler.count"/></strong></pre>
+
+    <p>Sets number of old log files to preserve to <code>5</code>.</p>
+
+    <pre><strong>&#60;entry value="ALL" type="String" key="java.util.logging.FileHandler.level"/></strong></pre>
+
+    <p>This line sets the logging level for file handler. Here we set that we
+     want all possible logs to be written to the file. The global level setting
+     however says that only <code>WARNING</code> logs will be generated. So if
+     you want to have more detailed logs you need to adjust global logging level.</p>
+
+    <pre><strong>&#60;entry value="10000000" type="String" key="java.util.logging.FileHandler.limit"/></strong></pre>
+
+    <p>Log file maximum size set to 10MB. After reaching this size the log file
+     is closed and new file is created.</p>
+
+    <pre><strong>&#60;entry value="%2Fvar%2Flog%2Ftigase-server.log" type="String" key="java.util.logging.FileHandler.pattern"/></strong></pre>
+
+    <p>Location of the log file and file name:
+     <code>/var/log/tigase-server.log</code>. Please note <strong>%2F</strong>
+     instead of <strong>'/'</strong> character.</p>
+
+    <pre><strong>&#60;entry value="true" type="String" key="tigase.useParentHandlers"/></strong></pre>
+
+    <p>This setting requires going into more details so it is explained in
+     comprehensive configuration guide.</p>
+
+   </dd>
+  </dl>
+
+ </body>
+</html>
