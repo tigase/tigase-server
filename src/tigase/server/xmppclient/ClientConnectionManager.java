@@ -212,7 +212,7 @@ public class ClientConnectionManager extends ConnectionManager {
 		clearRoutings();
 		defHostName = null;
 		for (String host: hostnames) {
-			addRouting(getName() + "." + host);
+			addRouting(getName() + "@" + host);
 			if (defHostName == null) {
 				defHostName = host;
 			} // end of if (defHostName == null)
@@ -249,7 +249,7 @@ public class ClientConnectionManager extends ConnectionManager {
 	}
 
 	private String getFromAddress(String id) {
-		return JID.getJID(id, getName() + "." + getDefHostName(), null);
+		return JID.getJID(getName(), getDefHostName(), id);
 	}
 
 	public String xmppStreamOpened(XMPPIOService serv,
