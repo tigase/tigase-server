@@ -100,13 +100,14 @@ public class MessageRouter extends AbstractMessageReceiver {
 		} // end of if (packet.isCommand() && localAddresses.contains(packet.getTo()))
 
 		String host = JID.getNodeHost(packet.getTo());
+		String id =  JID.getNodeID(packet.getTo());
+		String nick = JID.getNodeNick(packet.getTo());
 		String ip = null;
 		try {
 			ip = JID.getNodeHostIP(packet.getTo());
 		} catch (UnknownHostException e) {
 			ip = host;
 		} // end of try-catch
-		String nick = JID.getNodeNick(packet.getTo());
 		// Let's try to find message receiver quick way
 		// In case if packet is handled internally:
 		MessageReceiver first = receivers.get(nick);
@@ -136,7 +137,8 @@ public class MessageRouter extends AbstractMessageReceiver {
 			if (routings != null) {
 				log.finest(mr.getName() + ": Looking for host: " + host +
 					" or ip: " + ip + " in " + routings.toString());
-				if (routings.contains(host) || routings.contains(ip)) {
+				if (routings.contains(host) || routings.contains(ip)
+						|| routings.contains(id)) {
 					log.finest("Found receiver: " + mr.getName());
 					mr.addPacket(packet);
 					return;

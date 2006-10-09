@@ -319,7 +319,7 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 	}
 
 	protected String getServiceId(Packet packet) {
-		return JID.getNodeNick(packet.getTo());
+		return JID.getNodeResource(packet.getTo());
 	}
 
 	private class ConnectionListenerImpl implements ConnectionOpenListener {
