@@ -23,13 +23,15 @@
 package tigase.db.xml;
 
 import java.io.IOException;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Logger;
-import tigase.xml.db.NodeExistsException;
-import tigase.xml.db.NodeNotFoundException;
-import tigase.xml.db.XMLDB;
 import tigase.db.UserExistsException;
 import tigase.db.UserNotFoundException;
 import tigase.db.UserRepository;
+import tigase.xml.db.NodeExistsException;
+import tigase.xml.db.NodeNotFoundException;
+import tigase.xml.db.XMLDB;
 
 /**
  * Class <code>XMLRepository</code> is a <em>XML</em> implementation of
@@ -53,13 +55,16 @@ public class XMLRepository implements UserRepository {
   private static final Logger log =
     Logger.getLogger("tigase.xmpp.rep.xml.XMLRepository");
 
-  private XMLDB xmldb = null; // NOPMD
+	private static ConcurrentMap<String, UserRepository> instances =
+		new ConcurrentHashMap<String, UserRepository>();
+
+	private XMLDB xmldb = null; // NOPMD
 
   /**
    * Creates a new <code>XMLRepository</code> instance using default repository
    * <em>XML</em> file name.
    */
-  public XMLRepository(final String file_name) {
+  private XMLRepository(final String file_name) {
     try {
       xmldb = new XMLDB(file_name);
     } catch (Exception e) {
@@ -70,6 +75,15 @@ public class XMLRepository implements UserRepository {
   }
 
   // Implementation of tigase.xmpp.rep.UserRepository
+
+	public static UserRepository getInstance(String resource) {
+		UserRepository rep = instances.get(resource);
+		if (rep == null) {
+			rep = new XMLRepository(resource);
+			instances.put(resource, rep);
+		} // end of if (rep == null)
+		return rep;
+	}
 
   /**
    * This <code>addUser</code> method allows to add new user to reposiotry.
