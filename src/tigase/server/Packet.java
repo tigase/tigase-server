@@ -135,6 +135,10 @@ public class Packet {
 		return elem.getCData(path);
 	}
 
+	public List<Element> getElemChildren(final String path) {
+		return elem.getChildren(path);
+	}
+
 	public String getElemCData() {
 		return elem.getCData();
 	}
@@ -253,6 +257,30 @@ public class Packet {
 		} // end of for (int i = 0; i < originalXML; i++)
 		if (includeXML != null) {
 			new_child.setCData(includeXML);
+		} // end of if (includeOriginalXML)
+		return swapFromTo(reply);
+	}
+
+	public Packet okResult(final Element includeXML, final int originalXML) {
+		Element reply = new Element(elem.getName());
+		reply.setAttribute("type", StanzaType.result.toString());
+		if (getElemFrom() != null) {
+			reply.setAttribute("to", getElemFrom());
+		} // end of if (getElemFrom() != null)
+		if (getElemId() != null) {
+			reply.setAttribute("id", getElemId());
+		} // end of if (getElemId() != null)
+		Element old_child = elem;
+		Element new_child = reply;
+		for (int i = 0; i < originalXML; i++) {
+			old_child = old_child.getChildren().get(0);
+			Element tmp = new Element(old_child.getName());
+			tmp.setXMLNS(old_child.getXMLNS());
+			new_child.addChild(tmp);
+			new_child = tmp;
+		} // end of for (int i = 0; i < originalXML; i++)
+		if (includeXML != null) {
+			new_child.addChild(includeXML);
 		} // end of if (includeOriginalXML)
 		return swapFromTo(reply);
 	}
