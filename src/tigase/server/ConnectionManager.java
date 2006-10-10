@@ -98,7 +98,7 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 	private static Timer delayedTasks = new Timer("DelayedTasks", true);
 	private Map<String, IOService> services =
 		new ConcurrentSkipListMap<String, IOService>();
-	protected static long connectionDelay = 5000;
+	protected static long connectionDelay = 10000;
 
 	public Map<String, Object> getDefaults() {
 		Map<String, Object> props = super.getDefaults();
@@ -176,7 +176,7 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 					} // end of if (entry.getKey().startsWith())
 				} // end of for ()
 				port_props.put(PORT_KEY, ports[i]);
-				startService(port_props);
+				reconnectService(port_props, connectionDelay);
 			} // end of for (int i = 0; i < ports.length; i++)
 		} // end of if (ports != null)
     if ((Boolean)props.get(TLS_USE_PROP_KEY)) {
@@ -193,14 +193,15 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 		connectThread.addConnectionOpenListener(cli);
 	}
 
-	protected void reconnectService(final Map<String, Object> port_props) {
+	protected void reconnectService(final Map<String, Object> port_props,
+		long delay) {
 		log.finer("Reconnecting service for: " + getName()
-			+ ", scheduling next try in " + (connectionDelay / 1000) + "secs");
+			+ ", scheduling next try in " + (delay / 1000) + "secs");
 		delayedTasks.schedule(new TimerTask() {
 				public void run() {
 					startService(port_props);
 				}
-			}, connectionDelay);
+			}, delay);
 	}
 
 	protected int[] getDefPlainPorts() {
@@ -362,7 +363,14 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 			} catch (ConnectException e) {
 				// Accept side for component service is not ready yet?
 				// Let's wait for a few secs and try again.
-				reconnectService(port_props);
+				Long reconnects = (Long)port_props.get("reconnects");
+				if (reconnects != null) {
+					long recon = reconnects.longValue();
+					if (recon != 0) {
+						port_props.put("reconnects", (--recon));
+						reconnectService(port_props, connectionDelay);
+					} // end of if (recon != 0)
+				} // end of if (reconnects != null)
 			} catch (Exception e) {
 				log.log(Level.WARNING, "Can not accept connection.", e);
 			} // end of try-catch
