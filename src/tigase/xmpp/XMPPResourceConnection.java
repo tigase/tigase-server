@@ -412,7 +412,7 @@ public class XMPPResourceConnection {
           "email", email_param);
       }
     } catch (UserNotFoundException e) {
-      log.log(Level.SEVERE, "Problem accessing reposiotry: ", e);
+      log.log(Level.WARNING, "Problem accessing reposiotry: ", e);
     } // end of try-catch
   }
 
@@ -470,7 +470,7 @@ public class XMPPResourceConnection {
     throws NotAuthorizedException {
     try { return repository.getDataList(getUserId(), subnode, key);
     } catch (UserNotFoundException e) {
-      log.log(Level.SEVERE, "Problem accessing to reposiotry: ", e);
+      log.log(Level.WARNING, "Problem accessing to reposiotry: ", e);
       throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
     } // end of try-catch
   }
@@ -502,7 +502,7 @@ public class XMPPResourceConnection {
     final String key, final String def) throws NotAuthorizedException {
     try { return repository.getData(getUserId(), subnode, key, def);
     } catch (UserNotFoundException e) {
-      log.log(Level.SEVERE, "Problem accessing to reposiotry: ", e);
+      log.log(Level.WARNING, "Problem accessing to reposiotry: ", e);
       throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
     } // end of try-catch
   }
@@ -557,7 +557,7 @@ public class XMPPResourceConnection {
     final String key, final String value) throws NotAuthorizedException {
     try { repository.setData(getUserId(), subnode, key, value);
     } catch (UserNotFoundException e) {
-      log.log(Level.SEVERE, "Problem accessing reposiotry: ", e);
+      log.log(Level.WARNING, "Problem accessing reposiotry: ", e);
       throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
     } // end of try-catch
   }
@@ -579,7 +579,32 @@ public class XMPPResourceConnection {
     throws NotAuthorizedException {
     try { return repository.getSubnodes(getUserId(), subnode);
     } catch (UserNotFoundException e) {
-      log.log(Level.SEVERE, "Problem accessing reposiotry: ", e);
+      log.log(Level.WARNING, "Problem accessing reposiotry: ", e);
+      throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
+    } // end of try-catch
+  }
+
+  /**
+   * This method returns all data keys available in permanent storage in given
+   * node.
+   * There is not though any information what kind of data is stored with this
+   * key. This is up to user (developer) to determine what data type is
+   * associated with key and what is it's meaning.
+   *
+   * @param subnode a <code>String</code> value pointing to specific subnode in
+   * user reposiotry where data have to be stored.
+   * @return a <code>String[]</code> array containing all data keys found in
+   * given subnode.
+   * @exception NotAuthorizedException is thrown when session
+   * has not been authorized yet and there is no access to permanent storage.
+   * @see #setData(String, String, String)
+   * @see #setData(String, String)
+   */
+  public final String[] getDataKeys(final String subnode)
+    throws NotAuthorizedException {
+    try { return repository.getKeys(getUserId(), subnode);
+    } catch (UserNotFoundException e) {
+      log.log(Level.WARNING, "Problem accessing to reposiotry: ", e);
       throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
     } // end of try-catch
   }
@@ -602,7 +627,7 @@ public class XMPPResourceConnection {
     throws NotAuthorizedException {
     try { repository.removeSubnode(getUserId(), subnode);
     } catch (UserNotFoundException e) {
-      log.log(Level.SEVERE, "Problem accessing reposiotry: ", e);
+      log.log(Level.WARNING, "Problem accessing reposiotry: ", e);
       throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
     } // end of try-catch
   }
@@ -628,7 +653,7 @@ public class XMPPResourceConnection {
     final String[] list) throws NotAuthorizedException {
     try { repository.setDataList(getUserId(), subnode, key, list);
     } catch (UserNotFoundException e) {
-      log.log(Level.SEVERE, "Problem accessing to reposiotry: ", e);
+      log.log(Level.WARNING, "Problem accessing to reposiotry: ", e);
       throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
     } // end of try-catch
   }
