@@ -84,7 +84,7 @@ public class SessionBind extends XMPPProcessor {
 		switch (type) {
 		case set:
 			session.putSessionData(SESSION_KEY, "true");
-			results.offer(packet.okResult(null, 0));
+			results.offer(packet.okResult((String)null, 0));
 			break;
 		default:
 			results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,

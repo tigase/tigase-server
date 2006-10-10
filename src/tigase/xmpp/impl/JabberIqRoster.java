@@ -77,7 +77,7 @@ public class JabberIqRoster extends XMPPProcessor {
     String subscription = item.getAttribute("subscription");
     if (subscription != null && subscription.equals("remove")) {
 			Roster.removeBuddy(session, buddy);
-      results.offer(packet.okResult(null, 0));
+      results.offer(packet.okResult((String)null, 0));
 			Element it = new Element("item");
 			it.setAttribute("jid", buddy);
 			it.setAttribute("subscription", "remove");
@@ -100,7 +100,7 @@ public class JabberIqRoster extends XMPPProcessor {
         } // end of for (ElementData group : groups)
         session.setDataList(Roster.groupNode(buddy), Roster.GROUPS, gr);
       } // end of if (groups != null)
-      results.offer(packet.okResult(null, 0));
+      results.offer(packet.okResult((String)null, 0));
       Roster.updateBuddyChange(session, results,
 				Roster.getBuddyItem(session, buddy));
     } // end of else
@@ -118,7 +118,7 @@ public class JabberIqRoster extends XMPPProcessor {
       results.offer(packet.okResult(items.toString(), 1));
     } // end of if (buddies != null)
     else {
-      results.offer(packet.okResult(null, 1));
+      results.offer(packet.okResult((String)null, 1));
     } // end of if (buddies != null) else
   }
 
