@@ -125,7 +125,7 @@ public class ComponentConnectionManager extends ConnectionManager {
 		removeRouting(addr);
 		ConnectionType type = service.connectionType();
 		if (type == ConnectionType.connect) {
-			reconnectService(sessionData);
+			reconnectService(sessionData, connectionDelay);
 		} // end of if (type == ConnectionType.connect)
 		//		removeRouting(serv.getRemoteHost());
 	}
