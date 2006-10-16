@@ -29,6 +29,7 @@ import tigase.server.Packet;
 import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPProcessor;
+import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 
 /**
@@ -40,7 +41,8 @@ import tigase.xmpp.XMPPResourceConnection;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class StartTLS extends XMPPProcessor {
+public class StartTLS extends XMPPProcessor
+	implements XMPPProcessorIfc {
 
   private static Logger log = Logger.getLogger("tigase.xmpp.impl.StartTLS");
 

@@ -24,19 +24,20 @@ package tigase.xmpp;
 
 import java.util.Queue;
 import tigase.server.Packet;
+import tigase.db.WriteOnlyUserRepository;
 
 /**
- * Describe interface XMPPProcessorIfc here.
+ * Describe interface XMPPStopListener here.
  *
  *
- * Created: Wed Feb  8 13:47:56 2006
+ * Created: Sat Oct 14 16:14:18 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public interface XMPPProcessorIfc extends XMPPImplIfc {
+public interface XMPPStopListenerIfc extends XMPPImplIfc {
 
-	void process(Packet packet, XMPPResourceConnection session,
+	void stopped(XMPPResourceConnection session, WriteOnlyUserRepository repo,
 		Queue<Packet> results);
 
-} // XMPPProcessorIfc
+} // XMPPStopListener

@@ -28,11 +28,11 @@ import java.util.logging.Logger;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.XMPPProcessor;
+import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.server.Packet;
-import tigase.xmpp.OfflineMessageStorage;
 import tigase.db.UserNotFoundException;
 
 import static tigase.xmpp.impl.Roster.SubscriptionType;
@@ -49,7 +49,8 @@ import static tigase.xmpp.impl.Roster.FROM_SUBSCRIBED;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class Presence extends XMPPProcessor {
+public class Presence extends XMPPProcessor
+	implements XMPPProcessorIfc {
 
 	private static final String PRESENCE_KEY = "user-presence";
 
@@ -222,24 +223,6 @@ public class Presence extends XMPPProcessor {
 				// presence.setAttribute("from", session.getJID());
 				updatePresenceChange(packet.getElement(), session, results);
 				updateUserResources(packet.getElement(), session, results);
-				// Should we send off-line messages now?
-				// Let's try to do it here and maybe later I find better place.
-				OfflineMessageStorage offlineMessages =
-          (OfflineMessageStorage)session.getSessionData("offline-messages");
-				if (offlineMessages != null) {
-					String priority_str = packet.getElemCData("/presence/priority");
-					int priority = 0;
-					if (priority_str != null) {
-						try {
-							priority = Integer.parseInt(priority_str);
-						} catch (NumberFormatException e) {
-							priority = 0;
-						} // end of try-catch
-					} // end of if (priority != null)
-					if (priority >= 0) {
-						processOffLineMessages(offlineMessages, session.getUserId(), results);
-					} // end of if (priority >= 0)
-				} // end of if (offlineMessages != null)
 				break;
 			case out_subscribe:
 			case out_unsubscribe:
@@ -349,18 +332,6 @@ public class Presence extends XMPPProcessor {
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 					"You must authorize session first.", true));
 		} // end of try-catch
-	}
-
-	private void processOffLineMessages(OfflineMessageStorage offlineMessages,
-		String userId, Queue<Packet> results) {
-		try {
-			Queue<Packet> packets =
-				offlineMessages.restorePacketForOffLineUser(userId);
- 			if (packets != null) {
-				log.finer("Sending off-line messages: " + packets.size());
-				results.addAll(packets);
- 			} // end of if (packets != null)
-		} catch (UserNotFoundException e) {	} // end of try-catch
 	}
 
 } // Presence

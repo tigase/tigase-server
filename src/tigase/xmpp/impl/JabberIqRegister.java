@@ -29,6 +29,7 @@ import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPProcessor;
+import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.NotAuthorizedException;
 
@@ -41,7 +42,8 @@ import tigase.xmpp.NotAuthorizedException;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class JabberIqRegister extends XMPPProcessor {
+public class JabberIqRegister extends XMPPProcessor
+	implements XMPPProcessorIfc {
 
 	protected static final String ID = "jabber:iq:register";
 	protected static final String[] ELEMENTS = {"query"};

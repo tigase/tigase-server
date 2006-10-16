@@ -56,7 +56,7 @@ import tigase.xml.Element;
  * @version $Rev$
  */
 public abstract class XMPPProcessor
-	implements XMPPProcessorIfc, Comparable<XMPPProcessor> {
+	implements XMPPImplIfc, Comparable<XMPPProcessor> {
 
 	private static XMPPProcessor inst = null;
 
@@ -85,18 +85,7 @@ public abstract class XMPPProcessor
     return false;
   }
 
-// 	/**
-// 	 * Dummy/empty implementation - this method is used in s2s implementation.
-// 	 */
-// 	public void process(Packet packet, Map<String, Object> sessionData,
-// 		Queue<Packet> results) {}
-
 	public static XMPPProcessor getInstance() { return inst; }
-
-	public void stopped(final XMPPResourceConnection session,
-		final Queue<Packet> results) {
-		// By default do nothing...
-	}
 
 	// Implementation of java.lang.Comparable
 

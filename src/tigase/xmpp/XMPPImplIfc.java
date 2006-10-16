@@ -22,21 +22,29 @@
  */
 package tigase.xmpp;
 
-import java.util.Queue;
-import tigase.server.Packet;
+import tigase.xml.Element;
 
 /**
- * Describe interface XMPPProcessorIfc here.
+ * Describe interface XMPPImplIfc here.
  *
  *
- * Created: Wed Feb  8 13:47:56 2006
+ * Created: Sat Oct 14 16:11:22 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public interface XMPPProcessorIfc extends XMPPImplIfc {
+public interface XMPPImplIfc {
 
-	void process(Packet packet, XMPPResourceConnection session,
-		Queue<Packet> results);
+	String id();
 
-} // XMPPProcessorIfc
+	String[] supElements();
+
+	String[] supNamespaces();
+
+	Element[] supStreamFeatures(XMPPResourceConnection session);
+
+	String[] supDiscoFeatures(XMPPResourceConnection session);
+
+	boolean isSupporting(String elem, String ns);
+
+} // XMPPImplIfc

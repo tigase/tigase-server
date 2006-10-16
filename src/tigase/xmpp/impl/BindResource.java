@@ -30,6 +30,7 @@ import tigase.xmpp.Authorization;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPProcessor;
+import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 
 /**
@@ -41,7 +42,8 @@ import tigase.xmpp.XMPPResourceConnection;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class BindResource extends XMPPProcessor {
+public class BindResource extends XMPPProcessor
+	implements XMPPProcessorIfc {
 
   private static final String RESOURCE_KEY = "Resource-Binded";
   private static final String XMLNS = "urn:ietf:params:xml:ns:xmpp-bind";

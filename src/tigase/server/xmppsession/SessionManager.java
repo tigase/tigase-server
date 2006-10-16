@@ -43,6 +43,7 @@ import tigase.auth.CommitHandler;
 import tigase.auth.TigaseConfiguration;
 import tigase.conf.Configurable;
 import tigase.db.UserRepository;
+import tigase.db.WriteOnlyUserRepository;
 import tigase.db.xml.XMLRepository;
 import tigase.server.AbstractMessageReceiver;
 import tigase.server.MessageReceiver;
@@ -56,9 +57,11 @@ import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.ProcessorFactory;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPProcessorIfc;
+import tigase.xmpp.XMPPPreprocessorIfc;
+import tigase.xmpp.XMPPPostprocessorIfc;
+import tigase.xmpp.XMPPStopListenerIfc;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.XMPPSession;
-import tigase.xmpp.OfflineMessageStorage;
 import tigase.xmpp.Authorization;
 import tigase.stats.StatRecord;
 
@@ -86,7 +89,7 @@ public class SessionManager extends AbstractMessageReceiver
 	public static final String[] COMPONENTS_PROP_VAL =
 	{"jabber:iq:register", "jabber:iq:auth", "urn:ietf:params:xml:ns:xmpp-sasl",
 	 "urn:ietf:params:xml:ns:xmpp-bind", "urn:ietf:params:xml:ns:xmpp-session",
-	 "message", "jabber:iq:roster", "jabber:iq:privacy", "presence",
+	 "message", "jabber:iq:roster", "jabber:iq:privacy", "presence", "msgoffline",
 	 "jabber:iq:version", "jabber:iq:stats", "starttls", "disco"};
 
 	public static final String HOSTNAMES_PROP_KEY = "hostnames";
@@ -119,21 +122,28 @@ public class SessionManager extends AbstractMessageReceiver
 	public static final String AUTH_SASL_FLAG_PROP_VAL =	"sufficient";
 
 	private UserRepository repository = null;
-	private OfflineMessageStorage offlineMessages = null;
-	private String[] DISCO_FEATURES = {"msgoffline"};
+	private WriteOnlyUserRepository woRepository = null;
+	//	private OfflineMessageStorage offlineMessages = null;
+	private String[] DISCO_FEATURES = {};
 	private String[] admins = {"admin@localhost"};
 
 	private Map<String, XMPPSession> sessionsByNodeId =
 		new ConcurrentSkipListMap<String, XMPPSession>();
 	private Map<String, XMPPResourceConnection> connectionsByFrom =
 		new ConcurrentSkipListMap<String, XMPPResourceConnection>();
+
+	private Map<String, XMPPPreprocessorIfc> preProcessors =
+		new ConcurrentSkipListMap<String, XMPPPreprocessorIfc>();
 	private Map<String, XMPPProcessorIfc> processors =
 		new ConcurrentSkipListMap<String, XMPPProcessorIfc>();
-	//	private TigaseConfiguration authConfig = null;
+	private Map<String, XMPPPostprocessorIfc> postProcessors =
+		new ConcurrentSkipListMap<String, XMPPPostprocessorIfc>();
+	private Map<String, XMPPStopListenerIfc> stopListeners =
+		new ConcurrentSkipListMap<String, XMPPStopListenerIfc>();
 
 	private long closedConnections = 0;
 
-	public void processPacket(final Packet packet) {
+	public void processPacket(Packet packet) {
 		log.finest("Processing packet: " + packet.getStringData());
 		if (packet.isCommand()) {
 			processCommand(packet);
@@ -148,53 +158,79 @@ public class SessionManager extends AbstractMessageReceiver
 			if (to != null) {
 				conn = getResourceConnection(to);
 				if (conn == null) {
-					// It might be a message for off-line user....
-					// I will put support for off-line message retrieval here...
-					boolean res = saveOfflineMessage(packet, null);
-					if (!res) {
-						// Hm, there was not such user in DB, then it might be
-						// message to admin
-						if (isInRoutings(to)) {
-							// Yes this packet is for admin....
-							log.finer("Packet to admin: " + packet.getStringData());
-							for (String admin: admins) {
-								conn = getResourceConnection(admin);
-								if (conn == null) {
-									saveOfflineMessage(packet, admin);
-								} else {
-									log.finer("Sending packet to admin: " + admin);
-									Packet admin_pac = new Packet(packet.getElement());
-									admin_pac.setTo(conn.getConnectionId());
-									addOutPacket(admin_pac);
-								} // end of else
-							} // end of for (String admin: admins)
-						} // end of if (isInRoutings(to))
-					} // end of if (!res))
-					// No more processing is needed....
-					return;
-				} // end of if (session != null) else
+					// It might be message to admin
+					if (processAdmins(packet)) {
+						// No more processing is needed....
+						return;
+					}
+				}
 			} else {
-				// It might be presence message for already off-line user...
-				// Just ignore for now...
+				// Hm, not sure what should I do now....
+				// Maybe I should treat it as message to admin....
+				log.info("Message without TO attribute set, don't know what to do wih this: "
+					+ packet.getStringData());
 			} // end of else
 		} // end of if (conn == null)
-		if (conn != null) {
-			Queue<Packet> results = new LinkedList<Packet>();
-			boolean result = walk(packet, conn, packet.getElement(), results);
-			if (result) {
-				for (Packet res: results) {
-					log.finest("Handling response: " + res.getStringData());
-					addOutPacket(res);
-				} // end of for ()
-			} else {
-				addOutPacket(
-					Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
-						"Feature not supported yet.", true));
-			} // end of if (result) else
-		} else {
-			// It might be a message or something else for off-line user....
-			// Just ignore for now...
+
+		// Preprocess..., all preprocessors get all messages to look at.
+		// I am not sure if this is correct for now, let's try to do it this
+		// way and maybe change it later.
+		// If any of them returns true - it means processing should stop now.
+		// That is needed for preprocessors like privacy lists which should
+		// block certain packets.
+
+		Queue<Packet> results = new LinkedList<Packet>();
+
+		boolean stop = false;
+		for (XMPPPreprocessorIfc preproc: preProcessors.values()) {
+			stop |= preproc.preProcess(packet, conn, woRepository, results);
+		} // end of for (XMPPPreprocessorIfc preproc: preProcessors)
+
+
+		if (!stop && conn != null) {
+			walk(packet, conn, packet.getElement(), results);
+		}
+
+		if (!stop) {
+			for (XMPPPostprocessorIfc postproc: postProcessors.values()) {
+				postproc.postProcess(packet, conn, woRepository, results);
+			} // end of for (XMPPPostprocessorIfc postproc: postProcessors)
+		} // end of if (!stop)
+
+		addOutPackets(results);
+
+		if (!packet.wasProcessed()) {
+			addOutPacket(
+				Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
+					"Feature not supported yet.", true));
+		} // end of if (result) else
+		else {
+			log.info("Packet processed by: " + packet.getProcessorsIds().toString());
 		} // end of else
+	}
+
+	private void addOutPackets(Queue<Packet> packets) {
+		for (Packet res: packets) {
+			log.finest("Handling response: " + res.getStringData());
+			addOutPacket(res);
+		} // end of for ()
+	}
+
+	private boolean processAdmins(Packet packet) {
+		final String to = packet.getElemTo();
+		if (isInRoutings(to)) {
+			// Yes this packet is for admin....
+			log.finer("Packet for admin: " + packet.getStringData());
+			for (String admin: admins) {
+				log.finer("Sending packet to admin: " + admin);
+				Packet admin_pac =
+          new Packet((Element)packet.getElement().clone());
+				admin_pac.getElement().setAttribute("to", admin);
+				processPacket(admin_pac);
+			} // end of for (String admin: admins)
+			return true;
+		} // end of if (isInRoutings(to))
+		return false;
 	}
 
 	private XMPPSession getSession(String jid) {
@@ -217,10 +253,9 @@ public class SessionManager extends AbstractMessageReceiver
 		return null;
 	}
 
-	private boolean walk(final Packet packet,
+	private void walk(final Packet packet,
 		final XMPPResourceConnection connection, final Element elem,
 		final Queue<Packet> results) {
-		boolean result = false;
 		for (XMPPProcessorIfc proc: processors.values()) {
 			String xmlns = elem.getXMLNS();
 			if (xmlns == null) { xmlns = "jabber:client";	}
@@ -228,16 +263,15 @@ public class SessionManager extends AbstractMessageReceiver
 				log.finest("XMPPProcessorIfc: "+proc.getClass().getSimpleName()+
 					" ("+proc.id()+")"+"\n Request: "+elem.toString());
 				proc.process(packet, connection, results);
-				result = true;
+				packet.processedBy(proc.id());
 			} // end of if (proc.isSupporting(elem.getName(), elem.getXMLNS()))
 		} // end of for ()
 		Collection<Element> children = elem.getChildren();
 		if (children != null) {
 			for (Element child: children) {
-				result |= walk(packet, connection, child, results);
+				walk(packet, connection, child, results);
 			} // end of for (Element child: children)
 		} // end of if (children != null)
-		return result;
 	}
 
 	private void processCommand(Packet pc) {
@@ -292,8 +326,8 @@ public class SessionManager extends AbstractMessageReceiver
 					} // end of if (session.getActiveResourcesSize() == 0)
 				} catch (NotAuthorizedException e) {}
 				Queue<Packet> results = new LinkedList<Packet>();
-				for (XMPPProcessorIfc proc: processors.values()) {
-					proc.stopped(conn, results);
+				for (XMPPStopListenerIfc stopProc: stopListeners.values()) {
+					stopProc.stopped(conn, woRepository, results);
 				} // end of for ()
 				for (Packet res: results) {
 					log.finest("Handling response: " + res.getStringData());
@@ -378,23 +412,51 @@ public class SessionManager extends AbstractMessageReceiver
 		return props;
 	}
 
+	private void addComponent(String comp_id) {
+		XMPPProcessorIfc proc = ProcessorFactory.getProcessor(comp_id);
+		boolean loaded = false;
+		if (proc != null) {
+			processors.put(comp_id, proc);
+			log.config("Added processor: " + proc.getClass().getSimpleName()
+				+ " for component id: " + comp_id);
+			loaded = true;
+		}
+		XMPPPreprocessorIfc preproc = ProcessorFactory.getPreprocessor(comp_id);
+		if (preproc != null) {
+			preProcessors.put(comp_id, preproc);
+			log.config("Added preprocessor: " + preproc.getClass().getSimpleName()
+				+ " for component id: " + comp_id);
+			loaded = true;
+		}
+		XMPPPostprocessorIfc postproc = ProcessorFactory.getPostprocessor(comp_id);
+		if (postproc != null) {
+			postProcessors.put(comp_id, postproc);
+			log.config("Added postprocessor: " + postproc.getClass().getSimpleName()
+				+ " for component id: " + comp_id);
+			loaded = true;
+		}
+		XMPPStopListenerIfc stoplist = ProcessorFactory.getStopListener(comp_id);
+		if (stoplist != null) {
+			stopListeners.put(comp_id, stoplist);
+			log.config("Added stopped processor: " + stoplist.getClass().getSimpleName()
+				+ " for component id: " + comp_id);
+			loaded = true;
+		}
+		if (!loaded) {
+			log.warning("No implementation found for component id: " + comp_id);
+		} // end of if (!loaded)
+	}
+
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
 		repository =
 			XMLRepository.getInstance((String)props.get(USER_REPOSITORY_PROP_KEY));
-		offlineMessages = new OfflineMessageStorage(repository);
+		woRepository = repository;
+		//		offlineMessages = new OfflineMessageStorage(repository);
 		String[] components = (String[])props.get(COMPONENTS_PROP_KEY);
 		processors.clear();
 		for (String comp_id: components) {
-			XMPPProcessorIfc proc = ProcessorFactory.getProcessor(comp_id);
-			if (proc != null) {
-				processors.put(comp_id, proc);
-				log.config("Added processor: " + proc.getClass().getSimpleName()
-					+ " for component id: " + comp_id);
-			} else {
-				log.config("Processor: " + proc.getClass().getSimpleName()
-					+ " not found for component id: " + comp_id);
-			} // end of else
+			addComponent(comp_id);
 		} // end of for (String comp_id: components)
 		String[] hostnames = (String[])props.get(HOSTNAMES_PROP_KEY);
 		clearRoutings();
@@ -443,7 +505,6 @@ public class SessionManager extends AbstractMessageReceiver
 			sessionsByNodeId.put(userId, session);
 		} // end of if (session == null)
 		session.addResourceConnection(conn);
-		conn.putSessionData("offline-messages", offlineMessages);
 	}
 
 
@@ -476,20 +537,6 @@ public class SessionManager extends AbstractMessageReceiver
 				sessionsByNodeId.size()));
 		stats.add(new StatRecord("Closed connections", "long", closedConnections));
 		return stats;
-	}
-
-	private boolean saveOfflineMessage(Packet p, String jid) {
-		if (offlineMessages != null) {
-			try {
-				offlineMessages.savePacketForOffLineUser(p, jid);
-				return true;
-			} catch (UserNotFoundException e) {
-				log.fine("Problem saving off-line message: " + e
-					+ ", for packet: " + p.getStringData());
-				return false;
-			} // end of try-catch
-		} // end of if (offlineMessages != null)
-		return false;
 	}
 
 }

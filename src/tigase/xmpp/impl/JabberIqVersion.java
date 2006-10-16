@@ -29,6 +29,7 @@ import tigase.server.XMPPServer;
 import tigase.xml.Element;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPProcessor;
+import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.util.JID;
 
@@ -41,7 +42,8 @@ import tigase.util.JID;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class JabberIqVersion extends XMPPProcessor {
+public class JabberIqVersion extends XMPPProcessor
+	implements XMPPProcessorIfc {
 
   private static final Logger log =
     Logger.getLogger("tigase.xmpp.impl.JabberIQVersion");

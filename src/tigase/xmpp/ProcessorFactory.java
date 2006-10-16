@@ -61,18 +61,18 @@ import tigase.util.ClassUtil;
 public class ProcessorFactory {
 
   private static Logger log = Logger.getLogger("tigase.xmpp.ProcessorFactory");
-  private static Map<String, XMPPProcessor> processors = null;
+  private static Map<String, XMPPImplIfc> processors = null;
 
   static {
     try {
-			Set<Class<XMPPProcessor>> procs =
-				ClassUtil.getClassesImplementing(XMPPProcessor.class);
+			Set<Class<XMPPImplIfc>> procs =
+				ClassUtil.getClassesImplementing(XMPPImplIfc.class);
 
-			processors = new TreeMap<String, XMPPProcessor>();
+			processors = new TreeMap<String, XMPPImplIfc>();
 
       LinkedList<String> elems = new LinkedList<String>();
-      for (Class<XMPPProcessor> cproc: procs) {
- 				XMPPProcessor xproc = cproc.newInstance();
+      for (Class<XMPPImplIfc> cproc: procs) {
+ 				XMPPImplIfc xproc = cproc.newInstance();
 				processors.put(xproc.id(), xproc);
         String[] els = xproc.supElements();
         String[] nss = xproc.supNamespaces();
@@ -97,8 +97,36 @@ public class ProcessorFactory {
 
   private ProcessorFactory() {}
 
-  public static XMPPProcessor getProcessor(String id) {
-		return processors.get(id);
+  public static XMPPProcessorIfc getProcessor(String id) {
+		XMPPImplIfc imp = processors.get(id);
+		if (imp instanceof XMPPProcessorIfc) {
+			return (XMPPProcessorIfc)imp;
+		}
+		return null;
+  }
+
+  public static XMPPPreprocessorIfc getPreprocessor(String id) {
+		XMPPImplIfc imp = processors.get(id);
+		if (imp instanceof XMPPPreprocessorIfc) {
+			return (XMPPPreprocessorIfc)imp;
+		}
+		return null;
+  }
+
+  public static XMPPPostprocessorIfc getPostprocessor(String id) {
+		XMPPImplIfc imp = processors.get(id);
+		if (imp instanceof XMPPPostprocessorIfc) {
+			return (XMPPPostprocessorIfc)imp;
+		}
+		return null;
+  }
+
+  public static XMPPStopListenerIfc getStopListener(String id) {
+		XMPPImplIfc imp = processors.get(id);
+		if (imp instanceof XMPPStopListenerIfc) {
+			return (XMPPStopListenerIfc)imp;
+		}
+		return null;
   }
 
 }// ProcessorFactory

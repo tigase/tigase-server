@@ -25,6 +25,8 @@
 package tigase.server;
 
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
 import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
 
@@ -41,6 +43,8 @@ import tigase.xmpp.StanzaType;
 public class Packet {
 
   private static final String ERROR_NS = "urn:ietf:params:xml:ns:xmpp-stanzas";
+
+	private Set<String> processorsIds = new HashSet<String>();
 
 	private final Element elem;
 	private final Command command;
@@ -75,6 +79,22 @@ public class Packet {
 		else {
 			routed = false;
 		} // end of if (elem.getName().equals("route")) else
+	}
+
+	public void processedBy(String id) {
+		processorsIds.add(id);
+	}
+
+	public boolean wasProcessed() {
+		return processorsIds.size() > 0;
+	}
+
+	public boolean wasProcessedBy(String id) {
+		return processorsIds.contains(id);
+	}
+
+	public Set<String> getProcessorsIds() {
+		return processorsIds;
 	}
 
 	public Command getCommand() {

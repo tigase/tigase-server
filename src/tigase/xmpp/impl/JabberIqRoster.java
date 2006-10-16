@@ -32,6 +32,7 @@ import tigase.xmpp.Authorization;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPProcessor;
+import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 
 import static tigase.xmpp.impl.Roster.SubscriptionType;
@@ -47,7 +48,8 @@ import static tigase.xmpp.impl.Roster.SubscriptionType;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class JabberIqRoster extends XMPPProcessor {
+public class JabberIqRoster extends XMPPProcessor
+	implements XMPPProcessorIfc {
 
   /**
    * Private logger for class instancess.

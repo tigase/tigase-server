@@ -38,6 +38,7 @@ import tigase.server.Packet;
 import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPProcessor;
+import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 
 /**
@@ -49,7 +50,8 @@ import tigase.xmpp.XMPPResourceConnection;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class SaslAuth extends XMPPProcessor {
+public class SaslAuth extends XMPPProcessor
+	implements XMPPProcessorIfc {
 
   private static final String XMLNS = "urn:ietf:params:xml:ns:xmpp-sasl";
 

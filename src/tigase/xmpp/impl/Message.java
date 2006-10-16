@@ -30,6 +30,7 @@ import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPProcessor;
+import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 
 /**
@@ -41,7 +42,8 @@ import tigase.xmpp.XMPPResourceConnection;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class Message extends XMPPProcessor {
+public class Message extends XMPPProcessor
+	implements XMPPProcessorIfc {
 
   private static final Logger log =
 		Logger.getLogger("tigase.xmpp.impl.Message");
