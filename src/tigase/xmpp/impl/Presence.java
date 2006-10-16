@@ -29,6 +29,7 @@ import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
+import tigase.xmpp.XMPPStopListenerIfc;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.NotAuthorizedException;
@@ -50,7 +51,7 @@ import static tigase.xmpp.impl.Roster.FROM_SUBSCRIBED;
  * @version $Rev$
  */
 public class Presence extends XMPPProcessor
-	implements XMPPProcessorIfc {
+	implements XMPPProcessorIfc, XMPPStopListenerIfc {
 
 	private static final String PRESENCE_KEY = "user-presence";
 

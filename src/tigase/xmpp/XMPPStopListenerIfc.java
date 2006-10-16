@@ -37,7 +37,6 @@ import tigase.db.WriteOnlyUserRepository;
  */
 public interface XMPPStopListenerIfc extends XMPPImplIfc {
 
-	void stopped(XMPPResourceConnection session, WriteOnlyUserRepository repo,
-		Queue<Packet> results);
+	void stopped(XMPPResourceConnection session, Queue<Packet> results);
 
 } // XMPPStopListener

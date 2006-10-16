@@ -41,7 +41,6 @@ import tigase.xmpp.XMPPPostprocessorIfc;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
-import tigase.xmpp.OfflineMessageStorage;
 import tigase.xmpp.NotAuthorizedException;
 
 /**

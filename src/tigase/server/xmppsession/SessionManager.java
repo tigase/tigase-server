@@ -327,7 +327,7 @@ public class SessionManager extends AbstractMessageReceiver
 				} catch (NotAuthorizedException e) {}
 				Queue<Packet> results = new LinkedList<Packet>();
 				for (XMPPStopListenerIfc stopProc: stopListeners.values()) {
-					stopProc.stopped(conn, woRepository, results);
+					stopProc.stopped(conn, results);
 				} // end of for ()
 				for (Packet res: results) {
 					log.finest("Handling response: " + res.getStringData());
