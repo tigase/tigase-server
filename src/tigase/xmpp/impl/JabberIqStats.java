@@ -71,6 +71,10 @@ public class JabberIqStats extends XMPPProcessor
 	public void process(final Packet packet, final XMPPResourceConnection session,
 		final Queue<Packet> results) {
 
+		if (session == null) {
+			return;
+		} // end of if (session == null)
+
 		try {
 			// Maybe it is message to admininstrator:
 			String id = JID.getNodeID(packet.getElemTo());

@@ -179,8 +179,12 @@ public class Presence extends XMPPProcessor
 
   public void process(final Packet packet, final XMPPResourceConnection session,
 		final Queue<Packet> results) {
-		try {
 
+		if (session == null) {
+			return;
+		} // end of if (session == null)
+
+		try {
 			final String jid = session.getJID();
 			PresenceType pres_type = Roster.getPresenceType(session, packet);
 			if (pres_type == null) {

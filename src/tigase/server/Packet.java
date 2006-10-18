@@ -247,7 +247,7 @@ public class Packet {
 		Element cond = new Element(errorCondition);
 		cond.setXMLNS(ERROR_NS);
 		error.addChild(cond);
-		if (errorText != null && errorText.length() > 0) {
+		if (errorText != null) {
 			Element t = new Element("text", errorText,
 				new String[] {"xml:lang", "xmlns"},
 				new String[] {"en", ERROR_NS});

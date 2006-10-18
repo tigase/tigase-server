@@ -187,7 +187,7 @@ public class SessionManager extends AbstractMessageReceiver
 		} // end of for (XMPPPreprocessorIfc preproc: preProcessors)
 
 
-		if (!stop && conn != null) {
+		if (!stop) {
 			walk(packet, conn, packet.getElement(), results);
 		}
 
@@ -200,9 +200,15 @@ public class SessionManager extends AbstractMessageReceiver
 		addOutPackets(results);
 
 		if (!packet.wasProcessed()) {
-			addOutPacket(
-				Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
-					"Feature not supported yet.", true));
+			if (stop) {
+				addOutPacket(
+					Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet,
+						"Service not available.", true));
+			} else {
+				addOutPacket(
+					Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
+						"Feature not supported yet.", true));
+			} // end of if (stop) else
 		} // end of if (result) else
 		else {
 			log.info("Packet processed by: " + packet.getProcessorsIds().toString());
@@ -334,8 +340,7 @@ public class SessionManager extends AbstractMessageReceiver
 					addOutPacket(res);
 				} // end of for ()
 				conn.streamClosed();
-			} // end of if (conn != null)
-			else {
+			} else {
 				log.warning("Can not find resource connection for packet: " +
 					pc.toString());
 			} // end of if (conn != null) else

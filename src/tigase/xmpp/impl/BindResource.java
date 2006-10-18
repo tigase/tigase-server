@@ -76,6 +76,10 @@ public class BindResource extends XMPPProcessor
   public void process(final Packet packet, final XMPPResourceConnection session,
 		final Queue<Packet> results) {
 
+		if (session == null) {
+			return;
+		} // end of if (session == null)
+
 		if (!session.isAuthorized()) {
       results.offer(session.getAuthState().getResponseMessage(packet,
           "Session is not yet authorized.", false));

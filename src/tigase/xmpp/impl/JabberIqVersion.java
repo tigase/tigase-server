@@ -64,6 +64,11 @@ public class JabberIqVersion extends XMPPProcessor
 
 	public void process(final Packet packet, final XMPPResourceConnection session,
 		final Queue<Packet> results) {
+
+		if (session == null) {
+			return;
+		} // end of if (session == null)
+
 		// Maybe it is message to admininstrator:
 		String id = session.getDomain();
 		if (packet.getElemTo() != null) {

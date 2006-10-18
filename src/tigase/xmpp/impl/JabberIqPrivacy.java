@@ -25,14 +25,18 @@ package tigase.xmpp.impl;
 import java.util.List;
 import java.util.Queue;
 import java.util.logging.Logger;
+import java.util.Comparator;
+import java.util.Collections;
 import tigase.server.Packet;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
+import tigase.xmpp.XMPPPreprocessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xml.Element;
+import tigase.db.WriteOnlyUserRepository;
 
 import static tigase.xmpp.impl.Privacy.*;
 
@@ -46,7 +50,7 @@ import static tigase.xmpp.impl.Privacy.*;
  * @version $Rev$
  */
 public class JabberIqPrivacy extends XMPPProcessor
-	implements XMPPProcessorIfc {
+	implements XMPPProcessorIfc, XMPPPreprocessorIfc {
 
   /**
    * Private logger for class instancess.
@@ -59,16 +63,163 @@ public class JabberIqPrivacy extends XMPPProcessor
 	protected static final String[] ELEMENTS = {"query"};
   protected static final String[] XMLNSS = {XMLNS};
 
+	private enum ITEM_TYPE { jid, group, subscription, all };
+	private enum ITEM_ACTION { allow, deny };
+	private enum ITEM_SUBSCRIPTIONS { both, to, from, none };
+
+	private static final Comparator<Element> compar =
+		new Comparator<Element>() {
+		public int compare(Element el1, Element el2) {
+			String or1 = el1.getAttribute(ORDER);
+			String or2 = el2.getAttribute(ORDER);
+			return or1.compareTo(or2);
+		}
+		};
+
 	public String id() { return ID; }
 
 	public String[] supElements() { return ELEMENTS; }
 
   public String[] supNamespaces() { return XMLNSS; }
 
+	/**
+	 * <code>preProcess</code> method checks only incoming stanzas
+	 * so it doesn't check for presence-out at all.
+	 *
+	 * @param packet a <code>Packet</code> value
+	 * @param session a <code>XMPPResourceConnection</code> value
+	 * @param repo a <code>WriteOnlyUserRepository</code> value
+	 * @return a <code>boolean</code> value
+	 */
+	public boolean preProcess(Packet packet, XMPPResourceConnection session,
+		WriteOnlyUserRepository repo,	Queue<Packet> results) {
+
+		if (session == null) {
+			return false;
+		} // end of if (session == null)
+
+		try {
+			String lName = Privacy.getActiveList(session);
+			if (lName == null) {
+				lName = Privacy.getDefaultList(session);
+			} // end of if (lName == null)
+			if (lName != null) {
+				Element list = Privacy.getList(session, lName);
+				if (list != null) {
+					List<Element> items = list.getChildren();
+					Collections.sort(items, compar);
+					for (Element item: items) {
+						boolean type_matched = false;
+						boolean elem_matched = false;
+						ITEM_TYPE type = ITEM_TYPE.all;
+						if (item.getAttribute(TYPE) != null) {
+							type = ITEM_TYPE.valueOf(item.getAttribute(TYPE));
+						} // end of if (item.getAttribute(TYPE) != null)
+						String value = item.getAttribute(VALUE);
+						String from = packet.getElemFrom();
+						if (from != null) {
+							switch (type) {
+							case jid:
+								type_matched = from.contains(value);
+								break;
+							case group:
+								String[] groups = Roster.getBuddyGroups(session, from);
+								for (String group: groups) {
+									if (type_matched = group.equals(value)) {
+										break;
+									} // end of if (group.equals(value))
+								} // end of for (String group: groups)
+								break;
+							case subscription:
+								ITEM_SUBSCRIPTIONS subscr = ITEM_SUBSCRIPTIONS.valueOf(value);
+								switch (subscr) {
+								case to:
+									type_matched = Roster.isSubscribedTo(session, from);
+									break;
+								case from:
+									type_matched = Roster.isSubscribedFrom(session, from);
+									break;
+								case none:
+									type_matched = (!Roster.isSubscribedFrom(session, from)
+										&& !Roster.isSubscribedTo(session, from));
+									break;
+								case both:
+									type_matched = (Roster.isSubscribedFrom(session, from)
+										&& Roster.isSubscribedTo(session, from));
+									break;
+								default:
+									break;
+								} // end of switch (subscr)
+								break;
+							case all:
+							default:
+								type_matched = true;
+								break;
+							} // end of switch (type)
+						} else {
+							if (type == ITEM_TYPE.all) {
+								type_matched = true;
+							}
+						} // end of if (from != null) else
+						if (!type_matched) {
+							break;
+						} // end of if (!type_matched)
+
+						List<Element> elems = item.getChildren();
+						if (elems == null || elems.size() == 0) {
+							elem_matched = true;
+						} else {
+							for (Element elem: elems) {
+								if (elem.getName().equals("presence-in")) {
+									if (packet.getElemName().equals("presence")
+										&& (packet.getType() == null
+											|| packet.getType() == StanzaType.unavailable)) {
+										elem_matched = true;
+										break;
+									}
+								} else {
+									if (elem.getName().equals(packet.getElemName())) {
+										elem_matched = true;
+										break;
+									} // end of if (elem.getName().equals(packet.getElemName()))
+								} // end of if (elem.getName().equals("presence-in")) else
+							} // end of for (Element elem: elems)
+						} // end of else
+						if (!elem_matched) {
+							break;
+						} // end of if (!elem_matched)
+
+						ITEM_ACTION action = ITEM_ACTION.valueOf(item.getAttribute(ACTION));
+						switch (action) {
+						case allow:
+							return false;
+						case deny:
+							return true;
+						default:
+							break;
+						} // end of switch (action)
+					} // end of for (Element item: items)
+				} else {
+					log.finer("List " + lName + " does not exists for user: "
+						+ session.getUserId());
+				} // end of else
+			} // end of if (lName != null)
+		} catch (NotAuthorizedException e) {
+// 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
+// 					"You must authorize session first.", true));
+		} // end of try-catch
+
+		return false;
+	}
+
   public void process(final Packet packet, final XMPPResourceConnection session,
 		final Queue<Packet> results) {
-		try {
 
+		if (session == null) {
+			return;
+		} // end of if (session == null)
+
+		try {
 			StanzaType type = packet.getType();
 			switch (type) {
 			case get:

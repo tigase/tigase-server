@@ -72,6 +72,10 @@ public class JabberIqRoster extends XMPPProcessor
 		final XMPPResourceConnection session,	final Queue<Packet> results)
     throws NotAuthorizedException {
 
+		if (session == null) {
+			return;
+		} // end of if (session == null)
+
 		Element request = packet.getElement();
 
     String buddy = request.getAttribute("/iq/query/item", "jid");

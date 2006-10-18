@@ -116,6 +116,10 @@ public class OfflineMessages extends XMPPProcessor
 	public void process(final Packet packet,
 		final XMPPResourceConnection conn, final Queue<Packet> results) {
 
+		if (conn == null) {
+			return;
+		} // end of if (session == null)
+
 		StanzaType type = packet.getType();
 		if (type == null || type == StanzaType.available) {
 			// Should we send off-line messages now?
@@ -155,19 +159,20 @@ public class OfflineMessages extends XMPPProcessor
 	public void postProcess(final Packet packet,
 		final XMPPResourceConnection conn,	final WriteOnlyUserRepository woRep,
 		final Queue<Packet> queue) {
-		if (!packet.wasProcessed()) {
+		if (conn == null) {
 			try {
-				savePacketForOffLineUser(packet, woRep);
-				packet.processedBy(ID);
+				if (savePacketForOffLineUser(packet, woRep)) {
+					packet.processedBy(ID);
+				}
 			} catch (UserNotFoundException e) {
 				log.finest("UserNotFoundException at trying to save packet for off-line user."
 					+ packet.getStringData());
 			} // end of try-catch
-		} // end of if (!packet.wasProcessed())
+		} // end of if (conn == null)
 	}
 
-	public void savePacketForOffLineUser(Packet pac, WriteOnlyUserRepository woRep)
-		throws UserNotFoundException {
+	public boolean savePacketForOffLineUser(Packet pac,
+		WriteOnlyUserRepository woRep) throws UserNotFoundException {
 
 		StanzaType type = pac.getType();
 
@@ -189,7 +194,9 @@ public class OfflineMessages extends XMPPProcessor
 			String user_id = JID.getNodeID(pac.getElemTo());
 			woRep.addDataList(user_id, "off-line",
 				"messages", new String[] {packet.toString()});
+			return true;
 		} // end of if (pac.getElemName().equals("message"))
+		return false;
 	}
 
 	public Queue<Packet> restorePacketForOffLineUser(XMPPResourceConnection conn)

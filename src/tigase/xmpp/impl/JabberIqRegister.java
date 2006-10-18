@@ -69,6 +69,10 @@ public class JabberIqRegister extends XMPPProcessor
 	public void process(final Packet packet, final XMPPResourceConnection session,
 		final Queue<Packet> results) {
 
+		if (session == null) {
+			return;
+		} // end of if (session == null)
+
     Authorization result = Authorization.NOT_AUTHORIZED;
 		Element request = packet.getElement();
     StanzaType type = packet.getType();

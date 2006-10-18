@@ -61,6 +61,10 @@ public class Message extends XMPPProcessor
 	public void process(final Packet packet, final XMPPResourceConnection session,
 		final Queue<Packet> results) {
 
+		if (session == null) {
+			return;
+		} // end of if (session == null)
+
 		log.finest("INPUT: " + packet.getStringData());
 
 		final String jid;
