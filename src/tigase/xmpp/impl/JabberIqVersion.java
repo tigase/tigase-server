@@ -69,6 +69,19 @@ public class JabberIqVersion extends XMPPProcessor
 			return;
 		} // end of if (session == null)
 
+// 		// For some reason Psi sends version request to itself
+// 		// I am assuming it wants version of the jabber server
+// 		// so let's try pickup this case
+// 		try {
+// 			final String jid = session.getJID();
+// 			if (packet.getFrom().equals(session.getConnectionId())) {
+// 				packet.getElement().setAttribute("from", jid);
+// 			} // end of if (packet.getFrom().equals(session.getConnectionId()))
+// 		} catch (NotAuthorizedException e) {
+// 			// Just ignore user doesn't have to be autorized to retrieve
+// 			// server version.
+// 		} // end of try-catch
+
 		// Maybe it is message to admininstrator:
 		String id = session.getDomain();
 		if (packet.getElemTo() != null) {
@@ -77,7 +90,10 @@ public class JabberIqVersion extends XMPPProcessor
 		// If ID part of user account contains only host name
 		// and this is local domain it is message to admin
 		if (id == null || id.equals("")
-			|| id.equalsIgnoreCase(session.getDomain())) {
+			|| id.equalsIgnoreCase(session.getDomain())
+// 			|| (packet.getElemTo() != null && packet.getElemFrom() != null
+// 				&& packet.getElemTo().equals(packet.getElemFrom()))
+				) {
 
 			StringBuilder reply = new StringBuilder();
 			reply.append("<name>" + XMPPServer.NAME + "</name>");
@@ -100,6 +116,13 @@ public class JabberIqVersion extends XMPPProcessor
 		}
 
 		try {
+			// For all messages coming from the owner of this account set
+			// proper 'from' attribute. This is actually needed for the case
+			// when the user sends a message to himself.
+			if (packet.getFrom().equals(session.getConnectionId())) {
+				packet.getElement().setAttribute("from", session.getJID());
+			} // end of if (packet.getFrom().equals(session.getConnectionId()))
+
 			// According to JEP-0092 user doesn't need to be logged in to
 			// retrieve server version information, so this part is executed
 			// after checking if this message is just to local server
