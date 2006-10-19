@@ -98,14 +98,16 @@ public class JabberIqRoster extends XMPPProcessor
         Roster.setBuddySubscription(session, SubscriptionType.none, buddy);
       } // end of if (getBuddySubscription(session, buddy) == null)
       List<Element> groups = item.getChildren();
-      if (groups != null) {
+      if (groups != null && groups.size() > 0) {
         String[] gr = new String[groups.size()];
         int cnt = 0;
         for (Element group : groups) {
           gr[cnt++] = group.getCData();
         } // end of for (ElementData group : groups)
         session.setDataList(Roster.groupNode(buddy), Roster.GROUPS, gr);
-      } // end of if (groups != null)
+      } else {
+				session.removeData(Roster.groupNode(buddy), Roster.GROUPS);
+			} // end of else
       results.offer(packet.okResult((String)null, 0));
       Roster.updateBuddyChange(session, results,
 				Roster.getBuddyItem(session, buddy));

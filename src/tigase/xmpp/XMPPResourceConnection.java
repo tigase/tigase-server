@@ -562,6 +562,15 @@ public class XMPPResourceConnection {
     } // end of try-catch
   }
 
+  public final void removeData(final String subnode, final String key)
+		throws NotAuthorizedException {
+    try { repository.removeData(getUserId(), subnode, key);
+    } catch (UserNotFoundException e) {
+      log.log(Level.WARNING, "Problem accessing reposiotry: ", e);
+      throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
+    } // end of try-catch
+  }
+
   /**
    * This method retrieves list of all direct subnodes for given node.
    * It works in similar way as <code>ls</code> unix command or <code>dir</code>
