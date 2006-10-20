@@ -200,19 +200,22 @@ public class SessionManager extends AbstractMessageReceiver
 		addOutPackets(results);
 
 		if (!packet.wasProcessed()) {
+			Packet error = null;
 			if (stop) {
-				addOutPacket(
-					Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet,
-						"Service not available.", true));
+				error =	Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet,
+					"Service not available.", true);
 			} else {
-				if (packet.getElemFrom() != null) {
-					addOutPacket(
-						Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
-							"Feature not supported yet.", true));
+				if (packet.getElemFrom() != null || conn != null) {
+					error =	Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
+							"Feature not supported yet.", true);
 				} else {
 					log.warning("Lost packet: " + packet.getStringData());
 				} // end of else
 			} // end of if (stop) else
+			if (conn != null) {
+				error.setTo(conn.getConnectionId());
+			} // end of if (conn != null)
+			addOutPacket(error);
 		} // end of if (result) else
 		else {
 			log.info("Packet processed by: " + packet.getProcessorsIds().toString());
