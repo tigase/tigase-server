@@ -90,7 +90,7 @@ public class SessionManager extends AbstractMessageReceiver
 	{"jabber:iq:register", "jabber:iq:auth", "urn:ietf:params:xml:ns:xmpp-sasl",
 	 "urn:ietf:params:xml:ns:xmpp-bind", "urn:ietf:params:xml:ns:xmpp-session",
 	 "message", "jabber:iq:roster", "jabber:iq:privacy", "presence", "msgoffline",
-	 "jabber:iq:version", "jabber:iq:stats", "starttls", "disco"};
+	 "jabber:iq:version", "jabber:iq:stats", "starttls", "disco", "vcard-temp"};
 
 	public static final String HOSTNAMES_PROP_KEY = "hostnames";
 	public static String[] HOSTNAMES_PROP_VAL =	{"localhost", "hostname"};
@@ -205,9 +205,13 @@ public class SessionManager extends AbstractMessageReceiver
 					Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet,
 						"Service not available.", true));
 			} else {
-				addOutPacket(
-					Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
-						"Feature not supported yet.", true));
+				if (packet.getElemFrom() != null) {
+					addOutPacket(
+						Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
+							"Feature not supported yet.", true));
+				} else {
+					log.warning("Lost packet: " + packet.getStringData());
+				} // end of else
 			} // end of if (stop) else
 		} // end of if (result) else
 		else {
