@@ -141,7 +141,7 @@ public class JabberIqVersion extends XMPPProcessor
 				// attribute
 				Element result = (Element)packet.getElement().clone();
 				// According to spec we must set proper FROM attribute
-				result.setAttribute("from", session.getJID());
+				//				result.setAttribute("from", session.getJID());
 				results.offer(new Packet(result));
 			} // end of else
 		} catch (NotAuthorizedException e) {
