@@ -38,6 +38,7 @@ import tigase.xmpp.Authorization;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.util.JID;
 import tigase.db.NonAuthUserRepository;
+import tigase.db.UserNotFoundException;
 
 /**
  * Describe class VCardTemp here.
@@ -89,7 +90,15 @@ public class VCardTemp extends XMPPProcessor implements XMPPProcessorIfc {
 
 		if (session == null && packet.getType() != null
 			&& packet.getType() == StanzaType.get) {
-			
+			try {
+				String strvCard =
+					repo.getPublicData(JID.getNodeID(packet.getElemTo()), ID, VCARD_KEY, null);
+				if (strvCard != null) {
+					results.offer(parseVCard(strvCard, packet));
+				} // end of if (vcard != null)
+			} catch (UserNotFoundException e) {
+				// Just ignore....
+			} // end of try-catch
 			return;
 		} // end of if (session == null)
 
@@ -108,17 +117,8 @@ public class VCardTemp extends XMPPProcessor implements XMPPProcessorIfc {
 				case get:
 					String strvCard = session.getPublicData(ID, VCARD_KEY, null);
 					if (strvCard != null) {
-						DomBuilderHandler domHandler = new DomBuilderHandler();
-						parser.parse(domHandler, strvCard.toCharArray(), 0,
-							strvCard.length());
-						Queue<Element> elems = domHandler.getParsedElements();
-						Packet result = packet.okResult((Element)null, 0);
-						for (Element el: elems) {
-							result.getElement().addChild(el);
-						} // end of for (Element el: elems)
-						results.offer(result);
-					} // end of if (vcard != null)
-					else {
+						results.offer(parseVCard(strvCard, packet));
+					} else {
 						results.offer(packet.okResult((String)null, 1));
 					} // end of if (vcard != null) else
 					break;
@@ -164,6 +164,17 @@ public class VCardTemp extends XMPPProcessor implements XMPPProcessorIfc {
 					"You must authorize session first.", true));
 		} // end of try-catch
 
+	}
+
+	private Packet parseVCard(String vcard, Packet packet) {
+		DomBuilderHandler domHandler = new DomBuilderHandler();
+		parser.parse(domHandler, vcard.toCharArray(), 0, vcard.length());
+		Queue<Element> elems = domHandler.getParsedElements();
+		Packet result = packet.okResult((Element)null, 0);
+		for (Element el: elems) {
+			result.getElement().addChild(el);
+		} // end of for (Element el: elems)
+		return result;
 	}
 
 } // VCardTemp
