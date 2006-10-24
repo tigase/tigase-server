@@ -36,7 +36,7 @@ import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPPreprocessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xml.Element;
-import tigase.db.WriteOnlyUserRepository;
+import tigase.db.NonAuthUserRepository;
 
 import static tigase.xmpp.impl.Privacy.*;
 
@@ -88,11 +88,11 @@ public class JabberIqPrivacy extends XMPPProcessor
 	 *
 	 * @param packet a <code>Packet</code> value
 	 * @param session a <code>XMPPResourceConnection</code> value
-	 * @param repo a <code>WriteOnlyUserRepository</code> value
+	 * @param repo a <code>NonAuthUserRepository</code> value
 	 * @return a <code>boolean</code> value
 	 */
 	public boolean preProcess(Packet packet, XMPPResourceConnection session,
-		WriteOnlyUserRepository repo,	Queue<Packet> results) {
+		NonAuthUserRepository repo,	Queue<Packet> results) {
 
 		if (session == null) {
 			return false;
@@ -213,7 +213,7 @@ public class JabberIqPrivacy extends XMPPProcessor
 	}
 
   public void process(final Packet packet, final XMPPResourceConnection session,
-		final Queue<Packet> results) {
+		final NonAuthUserRepository repo, final Queue<Packet> results) {
 
 		if (session == null) {
 			return;

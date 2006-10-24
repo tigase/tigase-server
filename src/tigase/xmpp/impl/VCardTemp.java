@@ -37,6 +37,7 @@ import tigase.xmpp.StanzaType;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.util.JID;
+import tigase.db.NonAuthUserRepository;
 
 /**
  * Describe class VCardTemp here.
@@ -49,7 +50,9 @@ import tigase.util.JID;
  */
 public class VCardTemp extends XMPPProcessor implements XMPPProcessorIfc {
 
-  /**
+	public static final String VCARD_KEY = "vCard";
+
+	/**
    * Private logger for class instancess.
    */
   private static Logger log =
@@ -62,14 +65,6 @@ public class VCardTemp extends XMPPProcessor implements XMPPProcessorIfc {
 
 	private static final SimpleParser parser =
 		SingletonFactory.getParserInstance();
-
-	/**
-	 * Creates a new <code>VCardTemp</code> instance.
-	 *
-	 */
-	public VCardTemp() {
-
-	}
 
 	// Implementation of tigase.xmpp.XMPPImplIfc
 
@@ -89,10 +84,12 @@ public class VCardTemp extends XMPPProcessor implements XMPPProcessorIfc {
 	 * @param XMPPResourceConnection a <code>XMPPResourceConnection</code> value
 	 * @param queue a <code>Queue</code> value
 	 */
-	public void process(final Packet packet,
-		final XMPPResourceConnection session, final Queue<Packet> results) {
+	public void process(Packet packet, XMPPResourceConnection session,
+		NonAuthUserRepository repo, Queue<Packet> results) {
 
-		if (session == null) {
+		if (session == null && packet.getType() != null
+			&& packet.getType() == StanzaType.get) {
+			
 			return;
 		} // end of if (session == null)
 
@@ -109,7 +106,7 @@ public class VCardTemp extends XMPPProcessor implements XMPPProcessorIfc {
 				StanzaType type = packet.getType();
 				switch (type) {
 				case get:
-					String strvCard = session.getData("extras", "vcard-temp", null);
+					String strvCard = session.getPublicData(ID, VCARD_KEY, null);
 					if (strvCard != null) {
 						DomBuilderHandler domHandler = new DomBuilderHandler();
 						parser.parse(domHandler, strvCard.toCharArray(), 0,
@@ -130,10 +127,10 @@ public class VCardTemp extends XMPPProcessor implements XMPPProcessorIfc {
 						Element elvCard = packet.getElement().getChild("vCard");
 						if (elvCard != null) {
 							log.finer("Adding vCard: " + elvCard.toString());
-							session.setData("extras", "vcard-temp", elvCard.toString());
+							session.setPublicData(ID, VCARD_KEY, elvCard.toString());
 						} else {
 							log.finer("Removing vCard");
-							session.removeData("extras", "vcard-temp");
+							session.removePublicData(ID, VCARD_KEY);
 						} // end of else
 						results.offer(packet.okResult((String)null, 0));
 					} else {

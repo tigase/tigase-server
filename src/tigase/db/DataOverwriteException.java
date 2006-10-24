@@ -1,6 +1,6 @@
-/*  Package Jabber Server
+/*  Package Tigase XMPP/Jabber Server
  *  Copyright (C) 2001, 2002, 2003, 2004, 2005
- *  "Artur Hefczyc" <kobit@users.sourceforge.net>
+ *  "Artur Hefczyc" <artur.hefczyc@tigase.org>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -20,24 +20,33 @@
  * Last modified by $Author$
  * $Date$
  */
-package tigase.xmpp;
-
-import java.util.Queue;
-import tigase.server.Packet;
-import tigase.db.NonAuthUserRepository;
+package tigase.db;
 
 /**
- * Describe interface XMPPProcessorIfc here.
- *
- *
- * Created: Wed Feb  8 13:47:56 2006
- *
+ * The <code>DataOverwriteException</code> exception is thrown when application
+ * tries to ovrewrite data in repository but does not have permission to do so.
+ * <p>
+ * Created: Wed Oct 27 14:17:44 2004
+ * </p>
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public interface XMPPProcessorIfc extends XMPPImplIfc {
+public class DataOverwriteException extends Exception {
 
-	void process(Packet packet, XMPPResourceConnection session,
-		NonAuthUserRepository repo,	Queue<Packet> results);
+  private static final long serialVersionUID = 1L;
 
-} // XMPPProcessorIfc
+  /**
+   * Creates a new <code>DataOverwriteException</code> instance.
+   *
+   */
+  public DataOverwriteException(String message) { super(message); }
+
+  /**
+   * Creates a new <code>DataOverwriteException</code> instance.
+   *
+   */
+  public DataOverwriteException(String message, Throwable cause) {
+    super(message, cause);
+  }
+
+} // DataOverwriteException

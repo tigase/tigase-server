@@ -31,6 +31,7 @@ import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
+import tigase.db.NonAuthUserRepository;
 
 /**
  * Describe class StartTLS here.
@@ -91,7 +92,7 @@ public class StartTLS extends XMPPProcessor
 	}
 
   public void process(final Packet packet, final XMPPResourceConnection session,
-		final Queue<Packet> results) {
+		final NonAuthUserRepository repo, final Queue<Packet> results) {
 
 		if (session == null) {
 			return;

@@ -28,7 +28,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.text.SimpleDateFormat;
 import tigase.util.JID;
-import tigase.db.WriteOnlyUserRepository;
+import tigase.db.NonAuthUserRepository;
 import tigase.db.UserNotFoundException;
 import tigase.server.Packet;
 import tigase.xml.Element;
@@ -113,8 +113,8 @@ public class OfflineMessages extends XMPPProcessor
 	 * @param XMPPResourceConnection a <code>XMPPResourceConnection</code> value
 	 * @param queue a <code>Queue</code> value
 	 */
-	public void process(final Packet packet,
-		final XMPPResourceConnection conn, final Queue<Packet> results) {
+	public void process(final Packet packet, final XMPPResourceConnection conn,
+		final NonAuthUserRepository repo, final Queue<Packet> results) {
 
 		if (conn == null) {
 			return;
@@ -153,15 +153,15 @@ public class OfflineMessages extends XMPPProcessor
 	 *
 	 * @param packet a <code>Packet</code> value
 	 * @param XMPPResourceConnection a <code>XMPPResourceConnection</code> value
-	 * @param writeOnlyUserRepository a <code>WriteOnlyUserRepository</code> value
+	 * @param writeOnlyUserRepository a <code>NonAuthUserRepository</code> value
 	 * @param queue a <code>Queue</code> value
 	 */
 	public void postProcess(final Packet packet,
-		final XMPPResourceConnection conn,	final WriteOnlyUserRepository woRep,
+		final XMPPResourceConnection conn,	final NonAuthUserRepository repo,
 		final Queue<Packet> queue) {
 		if (conn == null) {
 			try {
-				if (savePacketForOffLineUser(packet, woRep)) {
+				if (savePacketForOffLineUser(packet, repo)) {
 					packet.processedBy(ID);
 				}
 			} catch (UserNotFoundException e) {
@@ -172,7 +172,7 @@ public class OfflineMessages extends XMPPProcessor
 	}
 
 	public boolean savePacketForOffLineUser(Packet pac,
-		WriteOnlyUserRepository woRep) throws UserNotFoundException {
+		NonAuthUserRepository repo) throws UserNotFoundException {
 
 		StanzaType type = pac.getType();
 
@@ -192,7 +192,7 @@ public class OfflineMessages extends XMPPProcessor
 				new String[] {from, stamp, "jabber:x:delay"});
 			packet.addChild(x);
 			String user_id = JID.getNodeID(pac.getElemTo());
-			woRep.addDataList(user_id, "off-line",
+			repo.addOfflineDataList(user_id, ID,
 				"messages", new String[] {packet.toString()});
 			return true;
 		} // end of if (pac.getElemName().equals("message"))
@@ -202,9 +202,9 @@ public class OfflineMessages extends XMPPProcessor
 	public Queue<Packet> restorePacketForOffLineUser(XMPPResourceConnection conn)
 		throws NotAuthorizedException {
 		DomBuilderHandler domHandler = new DomBuilderHandler();
-		String[] msgs = conn.getDataList("off-line", "messages");
+		String[] msgs = conn.getOfflineDataList(ID, "messages");
 		if (msgs != null && msgs.length > 0) {
-			conn.removeDataGroup("off-line");
+			conn.removeOfflineDataGroup(ID);
 			Queue<Packet> pacs = new LinkedList<Packet>();
 			for (String msg: msgs) {
 				char[] data = msg.toCharArray();

@@ -24,7 +24,7 @@ package tigase.xmpp;
 
 import java.util.Queue;
 import tigase.server.Packet;
-import tigase.db.WriteOnlyUserRepository;
+import tigase.db.NonAuthUserRepository;
 
 /**
  * Describe interface XMPPPostprocessorIfc here.
@@ -38,6 +38,6 @@ import tigase.db.WriteOnlyUserRepository;
 public interface XMPPPostprocessorIfc extends XMPPImplIfc {
 
 	void postProcess(Packet packet, XMPPResourceConnection session,
-		WriteOnlyUserRepository repo, Queue<Packet> results);
+		NonAuthUserRepository repo, Queue<Packet> results);
 
 } // XMPPPostprocessorIfc

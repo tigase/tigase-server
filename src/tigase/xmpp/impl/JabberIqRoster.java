@@ -34,6 +34,7 @@ import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
+import tigase.db.NonAuthUserRepository;
 
 import static tigase.xmpp.impl.Roster.SubscriptionType;
 
@@ -131,7 +132,7 @@ public class JabberIqRoster extends XMPPProcessor
   }
 
   public void process(final Packet packet, final XMPPResourceConnection session,
-		final Queue<Packet> results) {
+		final NonAuthUserRepository repo, final Queue<Packet> results) {
 
 		try {
 			if (packet.getElemFrom() != null

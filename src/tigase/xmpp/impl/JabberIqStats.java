@@ -35,6 +35,7 @@ import tigase.xmpp.StanzaType;
 import tigase.xmpp.Authorization;
 import tigase.util.JID;
 import tigase.util.ElementUtils;
+import tigase.db.NonAuthUserRepository;
 
 /**
  * Based on JEP-0092: Software Version, Implementation for
@@ -69,7 +70,7 @@ public class JabberIqStats extends XMPPProcessor
 	{ return DISCO_FEATURES; }
 
 	public void process(final Packet packet, final XMPPResourceConnection session,
-		final Queue<Packet> results) {
+		final NonAuthUserRepository repo, final Queue<Packet> results) {
 
 		if (session == null) {
 			return;

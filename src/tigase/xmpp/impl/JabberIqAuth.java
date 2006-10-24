@@ -36,6 +36,7 @@ import javax.security.sasl.AuthorizeCallback;
 import javax.security.sasl.RealmCallback;
 import tigase.auth.ResourceConnectionCallback;
 import tigase.db.UserNotFoundException;
+import tigase.db.NonAuthUserRepository;
 import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.util.JID;
@@ -87,7 +88,7 @@ public class JabberIqAuth extends XMPPProcessor
 	}
 
 	public void process(final Packet packet, final XMPPResourceConnection session,
-		final Queue<Packet> results) {
+		final NonAuthUserRepository repo, final Queue<Packet> results) {
 
 		if (session == null) {
 			return;

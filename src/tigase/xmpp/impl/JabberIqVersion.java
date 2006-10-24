@@ -32,6 +32,7 @@ import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.util.JID;
+import tigase.db.NonAuthUserRepository;
 
 /**
  * JEP-0092: Software Version
@@ -63,7 +64,7 @@ public class JabberIqVersion extends XMPPProcessor
 	{ return DISCO_FEATURES; }
 
 	public void process(final Packet packet, final XMPPResourceConnection session,
-		final Queue<Packet> results) {
+		final NonAuthUserRepository repo, final Queue<Packet> results) {
 
 		if (session == null) {
 			return;

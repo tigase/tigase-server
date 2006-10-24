@@ -35,6 +35,7 @@ import tigase.xmpp.StanzaType;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.server.Packet;
 import tigase.db.UserNotFoundException;
+import tigase.db.NonAuthUserRepository;
 
 import static tigase.xmpp.impl.Roster.SubscriptionType;
 import static tigase.xmpp.impl.Roster.PresenceType;
@@ -178,7 +179,7 @@ public class Presence extends XMPPProcessor
   }
 
   public void process(final Packet packet, final XMPPResourceConnection session,
-		final Queue<Packet> results) {
+		final NonAuthUserRepository repo, final Queue<Packet> results) {
 
 		if (session == null) {
 			return;

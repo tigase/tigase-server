@@ -32,6 +32,7 @@ import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.NotAuthorizedException;
+import tigase.db.NonAuthUserRepository;
 
 /**
  * JEP-0077: In-Band Registration
@@ -67,64 +68,69 @@ public class JabberIqRegister extends XMPPProcessor
 	{ return DISCO_FEATURES; }
 
 	public void process(final Packet packet, final XMPPResourceConnection session,
-		final Queue<Packet> results) {
+		final NonAuthUserRepository repo, final Queue<Packet> results) {
 
 		if (session == null) {
 			return;
 		} // end of if (session == null)
 
-    Authorization result = Authorization.NOT_AUTHORIZED;
-		Element request = packet.getElement();
-    StanzaType type = packet.getType();
-		switch (type) {
-		case set:
-      // Is it registration cancel request?
-      Element elem = request.findChild("/iq/query/remove");
-      if (elem != null) {
-        // Yes this is registration cancel request
-        // According to JEP-0077 there must not be any
-        // more subelemets apart from <remove/>
-        elem = request.findChild("/iq/query");
-        if (elem.getChildren().size() > 1) {
-          result = Authorization.BAD_REQUEST;
-        } else {
-          try {
-            result = session.unregister(packet.getElemFrom());
-          } catch (NotAuthorizedException e) {
-						results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-                "You must authorize session first.", true));
-          } // end of try-catch
-        }
-      } else {
-        // No, so assuming this is registration of new
-        // user or change registration details for existing user
-        String user_name = request.getChildCData("/iq/query/username");
-        String password = request.getChildCData("/iq/query/password");
-        String email = request.getChildCData("/iq/query/email");
-        result = session.register(user_name, password, email);
-      }
-      if (result == Authorization.AUTHORIZED) {
-        results.offer(result.getResponseMessage(packet, null, false));
-      } else {
-        results.offer(result.getResponseMessage(packet,
-            "Unsuccessful registration attempt", true));
-      }
-			break;
-		case get:
-      results.offer(packet.okResult(
-                 "<instructions>" +
-                 "Choose a user name and password for use with this service." +
-                 "Please provide also your e-mail address." +
-                 "</instructions>" +
-                 "<username/>" +
-                 "<password/>" +
-                 "<email/>", 1));
-			break;
-		default:
-			results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
-					"Message type is incorrect", true));
-			break;
-		} // end of switch (type)
+		try {
+			Authorization result = Authorization.NOT_AUTHORIZED;
+			Element request = packet.getElement();
+			StanzaType type = packet.getType();
+			switch (type) {
+			case set:
+				// Is it registration cancel request?
+				Element elem = request.findChild("/iq/query/remove");
+				if (elem != null) {
+					// Yes this is registration cancel request
+					// According to JEP-0077 there must not be any
+					// more subelemets apart from <remove/>
+					elem = request.findChild("/iq/query");
+					if (elem.getChildren().size() > 1) {
+						result = Authorization.BAD_REQUEST;
+					} else {
+						try {
+							result = session.unregister(packet.getElemFrom());
+						} catch (NotAuthorizedException e) {
+							results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
+									"You must authorize session first.", true));
+						} // end of try-catch
+					}
+				} else {
+					// No, so assuming this is registration of new
+					// user or change registration details for existing user
+					String user_name = request.getChildCData("/iq/query/username");
+					String password = request.getChildCData("/iq/query/password");
+					String email = request.getChildCData("/iq/query/email");
+					result = session.register(user_name, password, email);
+				}
+				if (result == Authorization.AUTHORIZED) {
+					results.offer(result.getResponseMessage(packet, null, false));
+				} else {
+					results.offer(result.getResponseMessage(packet,
+							"Unsuccessful registration attempt", true));
+				}
+				break;
+			case get:
+				results.offer(packet.okResult(
+						"<instructions>" +
+						"Choose a user name and password for use with this service." +
+						"Please provide also your e-mail address." +
+						"</instructions>" +
+						"<username/>" +
+						"<password/>" +
+						"<email/>", 1));
+				break;
+			default:
+				results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
+						"Message type is incorrect", true));
+				break;
+			} // end of switch (type)
+		} catch (NotAuthorizedException e) {
+			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
+					"You are not authorized to change registration settings.", true));
+		} // end of try-catch
 	}
 
 } // JabberIqRegister

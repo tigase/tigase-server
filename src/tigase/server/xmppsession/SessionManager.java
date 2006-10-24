@@ -33,7 +33,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.TreeMap;
 import java.util.logging.Logger;
-import tigase.db.UserNotFoundException;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.net.UnknownHostException;
 import javax.security.auth.login.AppConfigurationEntry.LoginModuleControlFlag;
@@ -43,7 +42,9 @@ import tigase.auth.CommitHandler;
 import tigase.auth.TigaseConfiguration;
 import tigase.conf.Configurable;
 import tigase.db.UserRepository;
-import tigase.db.WriteOnlyUserRepository;
+import tigase.db.NonAuthUserRepository;
+import tigase.db.UserNotFoundException;
+import tigase.db.DataOverwriteException;
 import tigase.db.xml.XMLRepository;
 import tigase.server.AbstractMessageReceiver;
 import tigase.server.MessageReceiver;
@@ -122,7 +123,7 @@ public class SessionManager extends AbstractMessageReceiver
 	public static final String AUTH_SASL_FLAG_PROP_VAL =	"sufficient";
 
 	private UserRepository repository = null;
-	private WriteOnlyUserRepository woRepository = null;
+	private NonAuthUserRepository naUserRepository = null;
 	//	private OfflineMessageStorage offlineMessages = null;
 	private String[] DISCO_FEATURES = {};
 	private String[] admins = {"admin@localhost"};
@@ -183,7 +184,7 @@ public class SessionManager extends AbstractMessageReceiver
 
 		boolean stop = false;
 		for (XMPPPreprocessorIfc preproc: preProcessors.values()) {
-			stop |= preproc.preProcess(packet, conn, woRepository, results);
+			stop |= preproc.preProcess(packet, conn, naUserRepository, results);
 		} // end of for (XMPPPreprocessorIfc preproc: preProcessors)
 
 
@@ -193,7 +194,7 @@ public class SessionManager extends AbstractMessageReceiver
 
 		if (!stop) {
 			for (XMPPPostprocessorIfc postproc: postProcessors.values()) {
-				postproc.postProcess(packet, conn, woRepository, results);
+				postproc.postProcess(packet, conn, naUserRepository, results);
 			} // end of for (XMPPPostprocessorIfc postproc: postProcessors)
 		} // end of if (!stop)
 
@@ -275,7 +276,7 @@ public class SessionManager extends AbstractMessageReceiver
 			if (proc.isSupporting(elem.getName(), xmlns)) {
 				log.finest("XMPPProcessorIfc: "+proc.getClass().getSimpleName()+
 					" ("+proc.id()+")"+"\n Request: "+elem.toString());
-				proc.process(packet, connection, results);
+				proc.process(packet, connection, naUserRepository, results);
 				packet.processedBy(proc.id());
 			} // end of if (proc.isSupporting(elem.getName(), elem.getXMLNS()))
 		} // end of for ()
@@ -463,8 +464,7 @@ public class SessionManager extends AbstractMessageReceiver
 		super.setProperties(props);
 		repository =
 			XMLRepository.getInstance((String)props.get(USER_REPOSITORY_PROP_KEY));
-		woRepository = repository;
-		//		offlineMessages = new OfflineMessageStorage(repository);
+		naUserRepository = new NARepository(repository);
 		String[] components = (String[])props.get(COMPONENTS_PROP_KEY);
 		processors.clear();
 		for (String comp_id: components) {
@@ -549,6 +549,52 @@ public class SessionManager extends AbstractMessageReceiver
 				sessionsByNodeId.size()));
 		stats.add(new StatRecord("Closed connections", "long", closedConnections));
 		return stats;
+	}
+
+	private class NARepository implements NonAuthUserRepository {
+
+		UserRepository rep = null;
+
+		NARepository(UserRepository userRep) {
+			rep = userRep;
+		}
+
+		private String calcNode(String base, String subnode) {
+			if (subnode == null) {
+				return base;
+			} // end of if (subnode == null)
+			return base + "/" + subnode;
+		}
+
+		public String getPublicData(String user, String subnode, String key,
+			String def)	throws UserNotFoundException {
+			return rep.getData(user,
+				calcNode(PUBLIC_DATA_NODE, subnode), key, def);
+		}
+
+		public String[] getPublicDataList(String user, String subnode, String key)
+			throws UserNotFoundException {
+				return rep.getDataList(user,
+					calcNode(PUBLIC_DATA_NODE, subnode), key);
+		}
+
+		public void addOfflineDataList(String user, String subnode, String key,
+			String[] list) throws UserNotFoundException {
+			rep.addDataList(user,
+				calcNode(OFFLINE_DATA_NODE, subnode), key, list);
+		}
+
+		public void addOfflineData(String user, String subnode, String key,
+			String value) throws UserNotFoundException, DataOverwriteException {
+			String node = calcNode(OFFLINE_DATA_NODE, subnode);
+			String data = rep.getData(user,	node, key);
+			if (data == null) {
+				rep.setData(user,	node, key, value);
+			} else {
+				throw new DataOverwriteException("Not authorized attempt to overwrite data.");
+			} // end of if (data == null) else
+		}
+
 	}
 
 }

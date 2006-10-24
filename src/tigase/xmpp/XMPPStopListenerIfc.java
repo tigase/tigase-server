@@ -24,7 +24,7 @@ package tigase.xmpp;
 
 import java.util.Queue;
 import tigase.server.Packet;
-import tigase.db.WriteOnlyUserRepository;
+import tigase.db.NonAuthUserRepository;
 
 /**
  * Describe interface XMPPStopListener here.
