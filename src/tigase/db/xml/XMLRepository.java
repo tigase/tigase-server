@@ -23,8 +23,6 @@
 package tigase.db.xml;
 
 import java.io.IOException;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Logger;
 import tigase.db.UserExistsException;
 import tigase.db.UserNotFoundException;
@@ -48,8 +46,6 @@ import tigase.xml.db.XMLDB;
  */
 public class XMLRepository implements UserRepository {
 
-	//	public static final String PUBLIC_DATA_NODE = "public";
-
 	private static final String USER_STR = "User: ";
   private static final String NOT_FOUND_STR =
     " has not been found in repository.";
@@ -57,16 +53,11 @@ public class XMLRepository implements UserRepository {
   private static final Logger log =
     Logger.getLogger("tigase.xmpp.rep.xml.XMLRepository");
 
-	private static ConcurrentMap<String, UserRepository> instances =
-		new ConcurrentHashMap<String, UserRepository>();
-
 	private XMLDB xmldb = null; // NOPMD
 
-  /**
-   * Creates a new <code>XMLRepository</code> instance using default repository
-   * <em>XML</em> file name.
-   */
-  private XMLRepository(final String file_name) {
+  // Implementation of tigase.xmpp.rep.UserRepository
+
+	public void initRepository(String file_name) {
     try {
       xmldb = new XMLDB(file_name);
     } catch (Exception e) {
@@ -74,17 +65,6 @@ public class XMLRepository implements UserRepository {
         + e);
       xmldb = XMLDB.createDB(file_name, "users", "user");
     } // end of try-catch
-  }
-
-  // Implementation of tigase.xmpp.rep.UserRepository
-
-	public static UserRepository getInstance(String resource) {
-		UserRepository rep = instances.get(resource);
-		if (rep == null) {
-			rep = new XMLRepository(resource);
-			instances.put(resource, rep);
-		} // end of if (rep == null)
-		return rep;
 	}
 
   /**
@@ -103,8 +83,7 @@ public class XMLRepository implements UserRepository {
   public final void addUser(final String user) throws UserExistsException {
     try {
       xmldb.addNode1(user);
-    } // end of try
-    catch (NodeExistsException e) {
+    } catch (NodeExistsException e) {
       throw new UserExistsException(USER_STR+user+" already exists.", e);
     } // end of try-catch
   }
@@ -124,8 +103,7 @@ public class XMLRepository implements UserRepository {
   public final void removeUser(final String user) throws UserNotFoundException {
     try {
       xmldb.removeNode1(user);
-    } // end of try
-    catch (NodeNotFoundException e) {
+    } catch (NodeNotFoundException e) {
       throw new UserNotFoundException(USER_STR+user+
         NOT_FOUND_STR, e);
     } // end of try-catch
@@ -155,8 +133,7 @@ public class XMLRepository implements UserRepository {
     throws UserNotFoundException {
     try {
       xmldb.setData(user, subnode, key, value);
-    } // end of try
-    catch (NodeNotFoundException e) {
+    } catch (NodeNotFoundException e) {
       throw new UserNotFoundException(USER_STR+user+NOT_FOUND_STR, e);
     } // end of try-catch
   }
@@ -206,8 +183,7 @@ public class XMLRepository implements UserRepository {
     throws UserNotFoundException {
     try {
       xmldb.setData(user, subnode, key, list);
-    } // end of try
-    catch (NodeNotFoundException e) {
+    } catch (NodeNotFoundException e) {
       throw new UserNotFoundException(USER_STR+user+
         NOT_FOUND_STR, e);
     } // end of try-catch
@@ -244,8 +220,7 @@ public class XMLRepository implements UserRepository {
 			} else {
 				xmldb.setData(user, subnode, key, list);
 			} // end of else
-    } // end of try
-    catch (NodeNotFoundException e) {
+    } catch (NodeNotFoundException e) {
       throw new UserNotFoundException(USER_STR+user+
         NOT_FOUND_STR, e);
     } // end of try-catch
@@ -271,8 +246,7 @@ public class XMLRepository implements UserRepository {
     throws UserNotFoundException {
     try {
       return xmldb.getDataList(user, subnode, key);
-    } // end of try
-    catch (NodeNotFoundException e) {
+    } catch (NodeNotFoundException e) {
       throw new UserNotFoundException(USER_STR+user+
         NOT_FOUND_STR, e);
     } // end of try-catch
@@ -300,8 +274,7 @@ public class XMLRepository implements UserRepository {
     throws UserNotFoundException {
     try {
       return (String)xmldb.getData(user, subnode, key, def);
-    } // end of try
-    catch (NodeNotFoundException e) {
+    } catch (NodeNotFoundException e) {
       throw new UserNotFoundException(USER_STR+user+NOT_FOUND_STR, e);
     } // end of try-catch
   }
@@ -360,8 +333,7 @@ public class XMLRepository implements UserRepository {
     throws UserNotFoundException {
     try {
       return xmldb.getSubnodes(user, subnode);
-    } // end of try
-    catch (NodeNotFoundException e) {
+    } catch (NodeNotFoundException e) {
       throw new UserNotFoundException(USER_STR+user+NOT_FOUND_STR, e);
     } // end of try-catch
   }
@@ -400,8 +372,7 @@ public class XMLRepository implements UserRepository {
     throws UserNotFoundException {
     try {
       return xmldb.getKeys(user, subnode);
-    } // end of try
-    catch (NodeNotFoundException e) {
+    } catch (NodeNotFoundException e) {
       throw new UserNotFoundException(USER_STR+user+NOT_FOUND_STR, e);
     } // end of try-catch
   }
@@ -444,8 +415,7 @@ public class XMLRepository implements UserRepository {
     throws UserNotFoundException {
     try {
       xmldb.removeData(user, subnode, key);
-    } // end of try
-    catch (NodeNotFoundException e) {
+    } catch (NodeNotFoundException e) {
       throw new UserNotFoundException(USER_STR+user+NOT_FOUND_STR, e);
     } // end of try-catch
   }
@@ -484,196 +454,9 @@ public class XMLRepository implements UserRepository {
     throws UserNotFoundException {
     try {
       xmldb.removeSubnode(user, subnode);
-    } // end of try
-    catch (NodeNotFoundException e) {
+    } catch (NodeNotFoundException e) {
       throw new UserNotFoundException(USER_STR+user+NOT_FOUND_STR, e);
     } // end of try-catch
   }
-
-// 	/**
-// 	 * Method <code>userExists</code> checks whether specified user exists in
-// 	 * repository. Return <code>true</code> if user exists, <code>false</code>
-// 	 * otherwise.
-// 	 *
-// 	 * @param user a <code>String</code> value if user node it that is
-// 	 * user <em>JID</em> without resource part.
-// 	 * @return a <code>boolean</code> value of <code>true</code> if user exists
-// 	 * and <code>false</code> otherwise.
-// 	 */
-// 	public boolean userExists(String user) {
-// 		return xmldb.findNode1(user) != null ? true : false;
-// 	}
-
-//   /**
-//    * <code>setData</code> method <!-- beauty loves beast --> sets data value for
-//    * given user ID in repository under given node path and associates it with
-//    * given key.
-//    * If there already exists value for given key in given node, old value is
-//    * replaced with new value. No warning or exception is thrown in case if
-//    * methods overwrites old value.
-//    *
-//    * @param user a <code>String</code> value of user ID for which data must be
-//    * stored. User ID consists of user name and domain name.
-//    * @param subnode a <code>String</code> value is a node path where data is
-//    * stored. Node path has the same form as directory path on file system:
-//    * <pre>/root/subnode1/subnode2</pre>.
-//    * @param key a <code>String</code> with which the specified value is to be
-//    * associated.
-//    * @param value a <code>String</code> value to be associated with the
-//    * specified key.
-//    * @exception UserNotFoundException if user id hasn't been found in reository.
-//    */
-//   public void setPublicData(String user, String subnode, String key,
-// 		String value) throws UserNotFoundException {
-// 		if (subnode != null) {
-// 			setData(user, PUBLIC_DATA_NODE + "/" + subnode, key, value);
-// 		} else {
-// 			setData(user, PUBLIC_DATA_NODE, key, value);
-// 		} // end of if (subnode != null) else
-// 	}
-
-//   /**
-//    * <code>setDataList</code> method sets list of values for given user
-//    * associated given key in repository under given node path.
-//    * If there already exist values for given key in given node, all old values are
-//    * replaced with new values. No warning or exception is thrown in case if
-//    * methods overwrites old value.
-//    *
-//    * @param user a <code>String</code> value of user ID for which data must be
-//    * stored. User ID consists of user name and domain name.
-//    * @param subnode a <code>String</code> value is a node path where data is
-//    * stored. Node path has the same form as directory path on file system:
-//    * <pre>/root/subnode1/subnode2</pre>.
-//    * @param key a <code>String</code> with which the specified values list is to
-//    * be associated.
-//    * @param list a <code>String[]</code> is an array of values to be assosiated
-//    * with the specified key.
-//    * @exception UserNotFoundException if user id hasn't been found in reository.
-//    */
-//   public void setPublicDataList(String user, String subnode, String key,
-// 		String[] list) throws UserNotFoundException {
-// 		if (subnode != null) {
-// 			setDataList(user, PUBLIC_DATA_NODE + "/" + subnode, key, list);
-// 		} else {
-// 			setDataList(user, PUBLIC_DATA_NODE, key, list);
-// 		} // end of if (subnode != null) else
-// 	}
-
-// 	/**
-// 	 * <code>addDataList</code> method adds mode entries to existing data list
-// 	 * associated with given key in repository under given node path.
-// 	 * This method is very similar to <code>setDataList(...)</code> except it
-// 	 * doesn't remove existing data.
-// 	 *
-//    * @param user a <code>String</code> value of user ID for which data must be
-//    * stored. User ID consists of user name and domain name.
-//    * @param subnode a <code>String</code> value is a node path where data is
-//    * stored. Node path has the same form as directory path on file system:
-//    * <pre>/root/subnode1/subnode2</pre>.
-//    * @param key a <code>String</code> with which the specified values list is to
-//    * be associated.
-//    * @param list a <code>String[]</code> is an array of values to be assosiated
-//    * with the specified key.
-//    * @exception UserNotFoundException if user id hasn't been found in reository.
-// 	 */
-// 	public void addPublicDataList(String user, String subnode, String key,
-// 		String[] list) throws UserNotFoundException {
-// 		if (subnode != null) {
-// 			addDataList(user, PUBLIC_DATA_NODE + "/" + subnode, key, list);
-// 		} else {
-// 			addDataList(user, PUBLIC_DATA_NODE, key, list);
-// 		} // end of if (subnode != null) else
-// 	}
-
-//   /**
-//    * <code>getData</code> method returns a value associated with given key for
-//    * user repository in given subnode.
-//    * If key is not found in repository given default value is returned.
-//    *
-//    * @param user a <code>String</code> value of user ID for which data must be
-//    * stored. User ID consists of user name and domain name.
-//    * @param subnode a <code>String</code> value is a node path where data is
-//    * stored. Node path has the same form as directory path on file system:
-//    * <pre>/root/subnode1/subnode2</pre>.
-//    * @param key a <code>String</code> with which the needed value is
-//    * associated.
-//    * @param def a <code>String</code> value which is returned in case if data
-//    * for specified key does not exixist in repository.
-//    * @return a <code>String</code> value
-//    * @exception UserNotFoundException if user id hasn't been found in reository.
-//    */
-//   public String getPublicData(String user, String subnode, String key,
-// 		String def) throws UserNotFoundException {
-// 		if (subnode != null) {
-// 			return getData(user, PUBLIC_DATA_NODE + "/" + subnode, key, def);
-// 		} else {
-// 			return getData(user, PUBLIC_DATA_NODE, key, def);
-// 		} // end of if (subnode != null) else
-// 	}
-
-//   /**
-//    * <code>getDataList</code> method returns array of values associated with
-//    * given key or <code>null</code> if given key does not exist for given user
-//    * ID in given node path.
-//    *
-//    * @param user a <code>String</code> value of user ID for which data must be
-//    * stored. User ID consists of user name and domain name.
-//    * @param subnode a <code>String</code> value is a node path where data is
-//    * stored. Node path has the same form as directory path on file system:
-//    * <pre>/root/subnode1/subnode2</pre>.
-//    * @param key a <code>String</code> with which the needed values list is
-//    * associated.
-//    * @return a <code>String[]</code> value
-//    * @exception UserNotFoundException if user id hasn't been found in reository.
-//    */
-//   public String[] getPublicDataList(String user, String subnode, String key)
-//     throws UserNotFoundException {
-// 		if (subnode != null) {
-// 			return getDataList(user, PUBLIC_DATA_NODE + "/" + subnode, key);
-// 		} else {
-// 			return getDataList(user, PUBLIC_DATA_NODE, key);
-// 		} // end of if (subnode != null) else
-// 	}
-
-//   /**
-//    * <code>removeData</code> method removes pair (key, value) from user
-//    * reposiotry in default repository node.
-//    * If the key exists in user repository there is always a value
-//    * associated with this key - even empty <code>String</code>. If key does not
-//    * exist the <code>null</code> value is returned from repository backend or
-//    * given default value.
-//    *
-//    * @param user a <code>String</code> value of user ID for which data must be
-//    * stored. User ID consists of user name and domain name.
-//    * @param key a <code>String</code> for which the value is to be removed.
-//    * @exception UserNotFoundException if user id hasn't been found in reository.
-//    */
-//   public void removePublicData(String user, String subnode, String key)
-//     throws UserNotFoundException {
-// 		if (subnode != null) {
-// 			removeData(user, PUBLIC_DATA_NODE + "/" + subnode, key);
-// 		} else {
-// 			removeData(user, PUBLIC_DATA_NODE, key);
-// 		} // end of if (subnode != null) else
-// 	}
-
-//   /**
-//    * <code>removeSubnode</code> method removes given subnode with all subnodes
-//    * in this node and all data stored in this node and in all subnodes.
-//    * Effectively it removes entire repository tree starting from given node.
-//    *
-//    * @param user a <code>String</code> value of user ID for which data must be
-//    * stored. User ID consists of user name and domain name.
-//    * @param subnode a <code>String</code> value is a node path to subnode which
-//    * has to be removed. Node path has the same form as directory path on file
-//    * system: <pre>/root/subnode1/subnode2</pre>.
-//    * @exception UserNotFoundException if user id hasn't been found in reository.
-//    */
-//   public void removePublicSubnode(String user, String subnode)
-//     throws UserNotFoundException {
-// 		if (subnode != null) {
-// 			removeSubnode(user, PUBLIC_DATA_NODE + "/" + subnode);
-// 		}
-// 	}
 
 } // XMLRepository

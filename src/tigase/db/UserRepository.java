@@ -38,34 +38,8 @@ package tigase.db;
  * @version $Rev$
  */
 public interface UserRepository {
-	//	extends UserPrivateData, UserPublicData {
 
-// 	/**
-// 	 * <code>getInstance</code> method returns repository instance. This is to
-// 	 * multiple instances for the same resource like file. In such cases data
-// 	 * might become out of sync. So instead of creating instance using constructor
-// 	 * implementation of this interface must provide save function to access
-// 	 * repository data from different components/threads.
-// 	 *
-// 	 * @param resource a <code>String</code> value keeping data resource
-// 	 * representation. It is implementation dependant value and it might be a
-// 	 * filename, database connection string or whatever is required by
-// 	 * implementation.
-// 	 * @return an <code>UserRepository</code> value is a UserRepository instance.
-// 	 */
-// 	UserRepository getInstance(String resource);
-
-// 	/**
-// 	 * Method <code>userExists</code> checks whether specified user exists in
-// 	 * repository. Return <code>true</code> if user exists, <code>false</code>
-// 	 * otherwise.
-// 	 *
-// 	 * @param user a <code>String</code> value if user node it that is
-// 	 * user <em>JID</em> without resource part.
-// 	 * @return a <code>boolean</code> value of <code>true</code> if user exists
-// 	 * and <code>false</code> otherwise.
-// 	 */
-// 	boolean userExists(String user);
+	void initRepository(String resource_uri);
 
 	/**
    * This <code>addUser</code> method allows to add new user to reposiotry.

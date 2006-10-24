@@ -98,7 +98,7 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 	private static Timer delayedTasks = new Timer("DelayedTasks", true);
 	private Map<String, IOService> services =
 		new ConcurrentSkipListMap<String, IOService>();
-	protected static long connectionDelay = 10000;
+	protected static long connectionDelay = 2000;
 
 	public Map<String, Object> getDefaults() {
 		Map<String, Object> props = super.getDefaults();

@@ -45,12 +45,11 @@ import tigase.db.UserRepository;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.UserNotFoundException;
 import tigase.db.DataOverwriteException;
-import tigase.db.xml.XMLRepository;
+import tigase.db.RepositoryFactory;
 import tigase.server.AbstractMessageReceiver;
 import tigase.server.MessageReceiver;
 import tigase.server.Packet;
 import tigase.server.XMPPService;
-import tigase.util.DNSResolver;
 import tigase.util.JID;
 import tigase.util.ElementUtils;
 import tigase.xml.Element;
@@ -65,6 +64,8 @@ import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.XMPPSession;
 import tigase.xmpp.Authorization;
 import tigase.stats.StatRecord;
+
+import static tigase.server.xmppsession.SessionManagerConfig.*;
 
 /**
  * Class SessionManager
@@ -84,47 +85,10 @@ public class SessionManager extends AbstractMessageReceiver
   private static final Logger log =
     Logger.getLogger("tigase.server.xmppsession.SessionManager");
 
-	public static final String USER_REPOSITORY_PROP_KEY = "repository-url";
-	public static final String USER_REPOSITORY_PROP_VAL = "user-repository.xml";
-	public static final String COMPONENTS_PROP_KEY = "components";
-	public static final String[] COMPONENTS_PROP_VAL =
-	{"jabber:iq:register", "jabber:iq:auth", "urn:ietf:params:xml:ns:xmpp-sasl",
-	 "urn:ietf:params:xml:ns:xmpp-bind", "urn:ietf:params:xml:ns:xmpp-session",
-	 "message", "jabber:iq:roster", "jabber:iq:privacy", "presence", "msgoffline",
-	 "jabber:iq:version", "jabber:iq:stats", "starttls", "disco", "vcard-temp"};
-
-	public static final String HOSTNAMES_PROP_KEY = "hostnames";
-	public static String[] HOSTNAMES_PROP_VAL =	{"localhost", "hostname"};
-
-	public static final String ADMINS_PROP_KEY = "admins";
-	public static String[] ADMINS_PROP_VAL =	{"admin@localhost", "admin@hostname"};
-
-	public static final String SECURITY_PROP_KEY = "security";
-
-	public static final String AUTHENTICATION_IDS_PROP_KEY = "authentication-ids";
-	public static final String[] AUTHENTICATION_IDS_PROP_VAL =
-	{"auth-plain", "auth-digest", "auth-sasl"};
-
-	public static final String AUTH_PLAIN_CLASS_PROP_KEY = "auth-plain/class";
-	public static final String AUTH_PLAIN_CLASS_PROP_VAL =
-		"tigase.auth.PlainAuth";
-	public static final String AUTH_PLAIN_FLAG_PROP_KEY = "auth-plain/flag";
-	public static final String AUTH_PLAIN_FLAG_PROP_VAL =	"sufficient";
-
-	public static final String AUTH_DIGEST_CLASS_PROP_KEY = "auth-digest/class";
-	public static final String AUTH_DIGEST_CLASS_PROP_VAL =
-		"tigase.auth.DigestAuth";
-	public static final String AUTH_DIGEST_FLAG_PROP_KEY = "auth-digest/flag";
-	public static final String AUTH_DIGEST_FLAG_PROP_VAL =	"sufficient";
-
-	public static final String AUTH_SASL_CLASS_PROP_KEY = "auth-sasl/class";
-	public static final String AUTH_SASL_CLASS_PROP_VAL =	"None";
-	public static final String AUTH_SASL_FLAG_PROP_KEY = "auth-sasl/flag";
-	public static final String AUTH_SASL_FLAG_PROP_VAL =	"sufficient";
-
-	private UserRepository repository = null;
+	private UserRepository user_repository = null;
+	private UserRepository auth_repository = null;
 	private NonAuthUserRepository naUserRepository = null;
-	//	private OfflineMessageStorage offlineMessages = null;
+
 	private String[] DISCO_FEATURES = {};
 	private String[] admins = {"admin@localhost"};
 
@@ -298,7 +262,8 @@ public class SessionManager extends AbstractMessageReceiver
 			if (connection == null) {
 				log.finer("Adding resource connection for: " + pc.getFrom());
 				final String hostname = pc.getElemCData("/STREAM_OPENED/hostname");
-				connection = new XMPPResourceConnection(pc.getFrom(), repository);
+				connection = new XMPPResourceConnection(pc.getFrom(),
+					user_repository);
 				if (hostname != null) {
 					log.finest("Setting hostname " + hostname
 						+ " for connection: " + connection.getConnectionId());
@@ -399,29 +364,7 @@ public class SessionManager extends AbstractMessageReceiver
 
 	public Map<String, Object> getDefaults() {
 		Map<String, Object> props = super.getDefaults();
-		props.put(USER_REPOSITORY_PROP_KEY, USER_REPOSITORY_PROP_VAL);
-		props.put(COMPONENTS_PROP_KEY, COMPONENTS_PROP_VAL);
-		HOSTNAMES_PROP_VAL = DNSResolver.getDefHostNames();
-		ADMINS_PROP_VAL = new String[HOSTNAMES_PROP_VAL.length];
-		for (int i = 0; i < ADMINS_PROP_VAL.length; i++) {
-			ADMINS_PROP_VAL[i] = "admin@"+HOSTNAMES_PROP_VAL[i];
-		} // end of for (int i = 0; i < ADMINS_PROP_VAL.length; i++)
-		props.put(HOSTNAMES_PROP_KEY, HOSTNAMES_PROP_VAL);
-		props.put(ADMINS_PROP_KEY, ADMINS_PROP_VAL);
-		props.put(SECURITY_PROP_KEY + "/" + AUTHENTICATION_IDS_PROP_KEY,
-			AUTHENTICATION_IDS_PROP_VAL);
-		props.put(SECURITY_PROP_KEY + "/" + AUTH_PLAIN_CLASS_PROP_KEY,
-			AUTH_PLAIN_CLASS_PROP_VAL);
-		props.put(SECURITY_PROP_KEY + "/" + AUTH_PLAIN_FLAG_PROP_KEY,
-			AUTH_PLAIN_FLAG_PROP_VAL);
-		props.put(SECURITY_PROP_KEY + "/" + AUTH_DIGEST_CLASS_PROP_KEY,
-			AUTH_DIGEST_CLASS_PROP_VAL);
-		props.put(SECURITY_PROP_KEY + "/" + AUTH_DIGEST_FLAG_PROP_KEY,
-			AUTH_DIGEST_FLAG_PROP_VAL);
-		props.put(SECURITY_PROP_KEY + "/" + AUTH_SASL_CLASS_PROP_KEY,
-			AUTH_SASL_CLASS_PROP_VAL);
-		props.put(SECURITY_PROP_KEY + "/" + AUTH_SASL_FLAG_PROP_KEY,
-			AUTH_SASL_FLAG_PROP_VAL);
+		SessionManagerConfig.getDefaults(props);
 		return props;
 	}
 
@@ -462,9 +405,28 @@ public class SessionManager extends AbstractMessageReceiver
 
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
-		repository =
-			XMLRepository.getInstance((String)props.get(USER_REPOSITORY_PROP_KEY));
-		naUserRepository = new NARepository(repository);
+		try {
+			String cls_name = (String)props.get(USER_REPO_CLASS_PROP_KEY);
+			String res_uri = (String)props.get(USER_REPO_URL_PROP_KEY);
+			user_repository = RepositoryFactory.getInstance(cls_name, res_uri);
+			log.config("Initialized " + cls_name + " as user repository: " + res_uri);
+		} catch (Exception e) {
+			log.severe("Can't initialize user repository: " + e);
+			e.printStackTrace();
+			System.exit(1);
+		} // end of try-catch
+		try {
+			String cls_name = (String)props.get(AUTH_REPO_CLASS_PROP_KEY);
+			String res_uri = (String)props.get(AUTH_REPO_URL_PROP_KEY);
+			auth_repository =	RepositoryFactory.getInstance(cls_name, res_uri);
+			log.config("Initialized " + cls_name + " as auth repository: " + res_uri);
+		} catch (Exception e) {
+			log.severe("Can't initialize auth repository: " + e);
+			e.printStackTrace();
+			System.exit(1);
+		} // end of try-catch
+
+		naUserRepository = new NARepository(user_repository);
 		String[] components = (String[])props.get(COMPONENTS_PROP_KEY);
 		processors.clear();
 		for (String comp_id: components) {
@@ -486,7 +448,7 @@ public class SessionManager extends AbstractMessageReceiver
 			String flag = (String)props.get(SECURITY_PROP_KEY + "/" + id + "/flag");
 			Map<String, Object> options = new HashMap<String, Object>();
 			options.put(CommitHandler.COMMIT_HANDLER_KEY, this);
-			options.put(UserRepository.class.getSimpleName(), repository);
+			options.put(UserRepository.class.getSimpleName(), auth_repository);
 			AppConfigurationEntry ace =
 				new AppConfigurationEntry(class_name, parseFlag(flag), options);
 			authConfig.putAppConfigurationEntry(id,
