@@ -74,6 +74,89 @@ public abstract class RepositoryAccess {
 
 	public abstract boolean isAuthorized();
 
+	public Authorization unregister(final String name_param)
+		throws NotAuthorizedException {
+    if (!isAuthorized()) {
+      return Authorization.FORBIDDEN;
+    }
+    // Some clients send plain user name and others send
+    // jid as user name. Let's resolve this here.
+    String user_name = JID.getNodeNick(name_param);
+    if (user_name == null || user_name.equals("")) {
+      user_name = name_param;
+    } // end of if (user_mame == null || user_name.equals(""))
+    if (getUserName().equals(user_name)) {
+			try {
+				repo.getData(JID.getNodeID(user_name, getDomain()), "password");
+        repo.removeUser(JID.getNodeID(user_name, getDomain()));
+				return Authorization.AUTHORIZED;
+			} catch (UserNotFoundException e) {
+				return Authorization.REGISTRATION_REQUIRED;
+			} // end of try-catch
+    } else {
+      return Authorization.FORBIDDEN;
+    }
+	}
+
+	public Authorization register(final String name_param,
+		final String pass_param, final String email_param)
+		throws NotAuthorizedException {
+    // Some clients send plain user name and others send
+    // jid as user name. Let's resolve this here.
+    String user_name = JID.getNodeNick(name_param);
+    if (user_name == null || user_name.equals("")) {
+      user_name = name_param;
+    } // end of if (user_mame == null || user_name.equals(""))
+
+    if (isAuthorized()) {
+      return changeRegistration(user_name, pass_param, email_param);
+    }
+
+    if (user_name == null || user_name.equals("")
+      || pass_param == null || pass_param.equals("")) {
+      return Authorization.NOT_ACCEPTABLE;
+    }
+
+    try {
+      repo.addUser(JID.getNodeID(user_name, getDomain()));
+      setRegistration(user_name, pass_param, email_param);
+      return Authorization.AUTHORIZED;
+    } catch (UserExistsException e) {
+      return Authorization.CONFLICT;
+    } // end of try-catch
+	}
+
+  private Authorization changeRegistration(final String name_param,
+    final String pass_param, final String email_param)
+		throws NotAuthorizedException {
+
+    if (name_param == null || name_param.equals("")
+      || pass_param == null || pass_param.equals("")) {
+      return Authorization.BAD_REQUEST;
+    }
+
+    if (getUserName().equals(name_param)) {
+      setRegistration(name_param, pass_param, email_param);
+      return Authorization.AUTHORIZED;
+    } else {
+      return Authorization.NOT_AUTHORIZED;
+    }
+  }
+
+  private void setRegistration(final String name_param,
+    final String pass_param, final String email_param) {
+    try {
+      repo.setData(JID.getNodeID(name_param, getDomain()),
+        "password", pass_param);
+      if (email_param != null && !email_param.equals("")) {
+        repo.setData(JID.getNodeID(name_param, getDomain()),
+          "email", email_param);
+      }
+    } catch (UserNotFoundException e) {
+      log.log(Level.WARNING, "Problem accessing reposiotry: ", e);
+    } // end of try-catch
+  }
+
 	/**
    * This method allows to retrieve list of values associated with one key.
    * As it is possible to store many values with one key there are a few methods
@@ -297,89 +380,6 @@ public abstract class RepositoryAccess {
     } catch (UserNotFoundException e) {
       log.log(Level.WARNING, "Problem accessing reposiotry: ", e);
       throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
-    } // end of try-catch
-  }
-
-	public Authorization unregister(final String name_param)
-		throws NotAuthorizedException {
-    if (!isAuthorized()) {
-      return Authorization.FORBIDDEN;
-    }
-    // Some clients send plain user name and others send
-    // jid as user name. Let's resolve this here.
-    String user_name = JID.getNodeNick(name_param);
-    if (user_name == null || user_name.equals("")) {
-      user_name = name_param;
-    } // end of if (user_mame == null || user_name.equals(""))
-    if (getUserName().equals(user_name)) {
-			try {
-				repo.getData(JID.getNodeID(user_name, getDomain()), "password");
-        repo.removeUser(JID.getNodeID(user_name, getDomain()));
-				return Authorization.AUTHORIZED;
-			} catch (UserNotFoundException e) {
-				return Authorization.REGISTRATION_REQUIRED;
-			} // end of try-catch
-    } else {
-      return Authorization.FORBIDDEN;
-    }
-	}
-
-	public Authorization register(final String name_param,
-		final String pass_param, final String email_param)
-		throws NotAuthorizedException {
-    // Some clients send plain user name and others send
-    // jid as user name. Let's resolve this here.
-    String user_name = JID.getNodeNick(name_param);
-    if (user_name == null || user_name.equals("")) {
-      user_name = name_param;
-    } // end of if (user_mame == null || user_name.equals(""))
-
-    if (isAuthorized()) {
-      return changeRegistration(user_name, pass_param, email_param);
-    }
-
-    if (user_name == null || user_name.equals("")
-      || pass_param == null || pass_param.equals("")) {
-      return Authorization.NOT_ACCEPTABLE;
-    }
-
-    try {
-      repo.addUser(JID.getNodeID(user_name, getDomain()));
-      setRegistration(user_name, pass_param, email_param);
-      return Authorization.AUTHORIZED;
-    } catch (UserExistsException e) {
-      return Authorization.CONFLICT;
-    } // end of try-catch
-	}
-
-  private Authorization changeRegistration(final String name_param,
-    final String pass_param, final String email_param)
-		throws NotAuthorizedException {
-
-    if (name_param == null || name_param.equals("")
-      || pass_param == null || pass_param.equals("")) {
-      return Authorization.BAD_REQUEST;
-    }
-
-    if (getUserName().equals(name_param)) {
-      setRegistration(name_param, pass_param, email_param);
-      return Authorization.AUTHORIZED;
-    } else {
-      return Authorization.NOT_AUTHORIZED;
-    }
-  }
-
-  private void setRegistration(final String name_param,
-    final String pass_param, final String email_param) {
-    try {
-      repo.setData(JID.getNodeID(name_param, getDomain()),
-        "password", pass_param);
-      if (email_param != null && !email_param.equals("")) {
-        repo.setData(JID.getNodeID(name_param, getDomain()),
-          "email", email_param);
-      }
-    } catch (UserNotFoundException e) {
-      log.log(Level.WARNING, "Problem accessing reposiotry: ", e);
     } // end of try-catch
   }
 

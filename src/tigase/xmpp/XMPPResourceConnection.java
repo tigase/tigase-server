@@ -147,8 +147,6 @@ public class XMPPResourceConnection extends RepositoryAccess {
 		authState = Authorization.NOT_AUTHORIZED;
 		resource = null;
 		sessionId = null;
-		//		domain = null;
-		//		repository = null;
 	}
 
 	public void setParentSession(final XMPPSession parent) {

@@ -22,6 +22,8 @@
  */
 package tigase.db;
 
+import java.util.List;
+
 /**
  * <code>UserRepository</code> interface defines all functionalities required
  * to store user data.
@@ -40,6 +42,8 @@ package tigase.db;
 public interface UserRepository {
 
 	void initRepository(String resource_uri);
+
+	List<String> getUsers();
 
 	/**
    * This <code>addUser</code> method allows to add new user to reposiotry.

@@ -1,6 +1,6 @@
 create table tig_users (
        uid bigint unsigned NOT NULL,
-
+       
        user_id varchar(128) NOT NULL,
        user_pass varchar(64) NOT NULL,
 
@@ -115,8 +115,8 @@ insert into max_ids (max_uid, max_nid) values (2, 3);
 --     select nid as pnid from nodes, users
 --       where ('user1@hostname' = user_id)
 --         AND (nodes.uid = users.uid)
---     	AND (parent_nid is null)
---     	AND (node = 'privacy')
+--         AND (parent_nid is null)
+--         AND (node = 'privacy')
 --   ) ptab where (parent_nid = pnid)
 --       AND (node = 'default')
 -- ) dtab where (parent_nid = dnid);

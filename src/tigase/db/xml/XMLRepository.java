@@ -23,6 +23,7 @@
 package tigase.db.xml;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.logging.Logger;
 import tigase.db.UserExistsException;
 import tigase.db.UserNotFoundException;
@@ -108,6 +109,10 @@ public class XMLRepository implements UserRepository {
         NOT_FOUND_STR, e);
     } // end of try-catch
   }
+
+	public List<String> getUsers() {
+		return xmldb.getAllNode1s();
+	}
 
   /**
    * <code>setData</code> method <!-- beauty loves beast --> sets data value for
