@@ -41,9 +41,9 @@ import java.util.List;
  */
 public interface UserRepository {
 
-	void initRepository(String resource_uri);
+	void initRepository(String resource_uri) throws DBInitException;
 
-	List<String> getUsers();
+	List<String> getUsers() throws TigaseDBException;
 
 	/**
    * This <code>addUser</code> method allows to add new user to reposiotry.
@@ -58,7 +58,7 @@ public interface UserRepository {
    * and domain address.
    * @exception UserExistsException if user with the same id already exists.
    */
-  void addUser(String user) throws UserExistsException;
+  void addUser(String user) throws UserExistsException, TigaseDBException;
 
   /**
    * This <code>removeUser</code> method allows to remove user and all his data
@@ -72,7 +72,7 @@ public interface UserRepository {
    * and domain address.
    * @exception UserNotFoundException if user id hasn't been found in reository.
    */
-  void removeUser(String user) throws UserNotFoundException;
+  void removeUser(String user) throws UserNotFoundException, TigaseDBException;
 
   /**
    * <code>getDataList</code> method returns array of values associated with
@@ -90,7 +90,7 @@ public interface UserRepository {
    * @exception UserNotFoundException if user id hasn't been found in reository.
    */
   String[] getDataList(String user, String subnode, String key)
-    throws UserNotFoundException;
+    throws UserNotFoundException, TigaseDBException;
 
   /**
    * <code>getData</code> method returns a value associated with given key for
@@ -110,7 +110,7 @@ public interface UserRepository {
    * @exception UserNotFoundException if user id hasn't been found in reository.
    */
   String getData(String user, String subnode, String key, String def)
-    throws UserNotFoundException;
+    throws UserNotFoundException, TigaseDBException;
 
   /**
    * <code>getData</code> method returns a value associated with given key for
@@ -128,7 +128,7 @@ public interface UserRepository {
    * @exception UserNotFoundException if user id hasn't been found in reository.
    */
   String getData(String user, String subnode, String key)
-    throws UserNotFoundException;
+    throws UserNotFoundException, TigaseDBException;
 
   /**
    * <code>getData</code> method returns a value associated with given key for
@@ -143,7 +143,7 @@ public interface UserRepository {
    * @exception UserNotFoundException if user id hasn't been found in reository.
    */
   String getData(String user, String key)
-    throws UserNotFoundException;
+    throws UserNotFoundException, TigaseDBException;
 
   /**
    * <code>getSubnodes</code> method returns list of all direct subnodes from
@@ -158,7 +158,7 @@ public interface UserRepository {
    * @exception UserNotFoundException if user id hasn't been found in reository.
    */
   String[] getSubnodes(String user, String subnode)
-    throws UserNotFoundException;
+    throws UserNotFoundException, TigaseDBException;
 
   /**
    * <code>getSubnodes</code> method returns list of all <em>root</em> nodes for
@@ -170,7 +170,8 @@ public interface UserRepository {
    * nodes for given user.
    * @exception UserNotFoundException if user id hasn't been found in reository.
    */
-  String[] getSubnodes(String user) throws UserNotFoundException;
+  String[] getSubnodes(String user)
+		throws UserNotFoundException, TigaseDBException;
 
   /**
    * <code>getKeys</code> method returns list of all keys stored in given
@@ -188,7 +189,7 @@ public interface UserRepository {
    * @exception UserNotFoundException if user id hasn't been found in reository.
    */
   String[] getKeys(String user, String subnode)
-    throws UserNotFoundException;
+    throws UserNotFoundException, TigaseDBException;
 
   /**
    * <code>getKeys</code> method returns list of all keys stored in default user
@@ -203,7 +204,7 @@ public interface UserRepository {
    * @exception UserNotFoundException if user id hasn't been found in reository.
    */
   String[] getKeys(String user)
-    throws UserNotFoundException;
+    throws UserNotFoundException, TigaseDBException;
 
   /**
    * <code>removeData</code> method removes pair (key, value) from user
@@ -222,7 +223,7 @@ public interface UserRepository {
    * @exception UserNotFoundException if user id hasn't been found in reository.
    */
   void removeData(String user, String subnode, String key)
-    throws UserNotFoundException;
+    throws UserNotFoundException, TigaseDBException;
 
   /**
    * <code>removeData</code> method removes pair (key, value) from user
@@ -238,7 +239,7 @@ public interface UserRepository {
    * @exception UserNotFoundException if user id hasn't been found in reository.
    */
   void removeData(String user, String key)
-    throws UserNotFoundException;
+    throws UserNotFoundException, TigaseDBException;
 
   /**
    * <code>removeSubnode</code> method removes given subnode with all subnodes
@@ -253,7 +254,7 @@ public interface UserRepository {
    * @exception UserNotFoundException if user id hasn't been found in reository.
    */
   void removeSubnode(String user, String subnode)
-    throws UserNotFoundException;
+    throws UserNotFoundException, TigaseDBException;
 
   /**
    * <code>setData</code> method sets data value for given user ID in repository
@@ -274,7 +275,7 @@ public interface UserRepository {
    * @exception UserNotFoundException if user id hasn't been found in reository.
    */
   void setData(String user, String subnode, String key, String value)
-    throws UserNotFoundException;
+    throws UserNotFoundException, TigaseDBException;
 
   /**
    * This <code>setData</code> method sets data value for given user ID
@@ -293,7 +294,7 @@ public interface UserRepository {
    * @exception UserNotFoundException if user id hasn't been found in reository.
    */
   void setData(String user, String key, String value)
-    throws UserNotFoundException;
+    throws UserNotFoundException, TigaseDBException;
 
   /**
    * <code>setDataList</code> method sets list of values for given user
@@ -314,7 +315,7 @@ public interface UserRepository {
    * @exception UserNotFoundException if user id hasn't been found in reository.
    */
   void setDataList(String user, String subnode, String key, String[] list)
-    throws UserNotFoundException;
+    throws UserNotFoundException, TigaseDBException;
 
 	/**
 	 * <code>addDataList</code> method adds mode entries to existing data list
@@ -334,6 +335,6 @@ public interface UserRepository {
    * @exception UserNotFoundException if user id hasn't been found in reository.
 	 */
 	void addDataList(String user, String subnode, String key, String[] list)
-    throws UserNotFoundException;
+    throws UserNotFoundException, TigaseDBException;
 
 } // UserRepository

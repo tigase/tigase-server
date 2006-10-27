@@ -52,7 +52,7 @@ public class XMLRepository implements UserRepository {
     " has not been found in repository.";
 
   private static final Logger log =
-    Logger.getLogger("tigase.xmpp.rep.xml.XMLRepository");
+    Logger.getLogger("tigase.db.xml.XMLRepository");
 
 	private XMLDB xmldb = null; // NOPMD
 

@@ -33,7 +33,7 @@ package tigase.db;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class UserExistsException extends Exception {
+public class UserExistsException extends TigaseDBException {
 
   private static final long serialVersionUID = 1L;
 

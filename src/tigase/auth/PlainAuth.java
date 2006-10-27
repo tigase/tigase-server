@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -36,6 +37,7 @@ import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
 import tigase.db.UserNotFoundException;
 import tigase.db.UserRepository;
+import tigase.db.TigaseDBException;
 import tigase.util.JID;
 import tigase.xmpp.XMPPResourceConnection;
 
@@ -175,7 +177,10 @@ public class PlainAuth implements LoginModule {
 			loginSuccessful = false;
 		} catch (NoSuchAlgorithmException e) {
 			loginSuccessful = false;
-		}
+		} catch (TigaseDBException e) {
+			log.log(Level.SEVERE, "Repository access exception.", e);
+			loginSuccessful = false;
+		} // end of try-catch
 
 		return loginSuccessful;
 	}

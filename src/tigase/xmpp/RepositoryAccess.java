@@ -26,6 +26,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.util.JID;
 import tigase.db.UserRepository;
+import tigase.db.TigaseDBException;
 import tigase.db.UserExistsException;
 import tigase.db.UserNotFoundException;
 
@@ -92,7 +93,10 @@ public abstract class RepositoryAccess {
 				return Authorization.AUTHORIZED;
 			} catch (UserNotFoundException e) {
 				return Authorization.REGISTRATION_REQUIRED;
-			} // end of try-catch
+			} catch (TigaseDBException e) {
+				log.log(Level.SEVERE, "Repository access exception.", e);
+				return Authorization.INTERNAL_SERVER_ERROR;
+			} // end of catch
     } else {
       return Authorization.FORBIDDEN;
     }
@@ -123,7 +127,10 @@ public abstract class RepositoryAccess {
       return Authorization.AUTHORIZED;
     } catch (UserExistsException e) {
       return Authorization.CONFLICT;
-    } // end of try-catch
+    } catch (TigaseDBException e) {
+			log.log(Level.SEVERE, "Repository access exception.", e);
+			return Authorization.INTERNAL_SERVER_ERROR;
+		} // end of try-catch
 	}
 
   private Authorization changeRegistration(final String name_param,
@@ -154,7 +161,9 @@ public abstract class RepositoryAccess {
       }
     } catch (UserNotFoundException e) {
       log.log(Level.WARNING, "Problem accessing reposiotry: ", e);
-    } // end of try-catch
+    } catch (TigaseDBException e) {
+			log.log(Level.SEVERE, "Repository access exception.", e);
+		} // end of try-catch
   }
 
 	/**
@@ -179,7 +188,10 @@ public abstract class RepositoryAccess {
     } catch (UserNotFoundException e) {
       log.log(Level.WARNING, "Problem accessing reposiotry: ", e);
       throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
-    } // end of try-catch
+    } catch (TigaseDBException e) {
+			log.log(Level.SEVERE, "Repository access exception.", e);
+		} // end of try-catch
+		return null;
   }
 
   /**
@@ -211,7 +223,10 @@ public abstract class RepositoryAccess {
     } catch (UserNotFoundException e) {
       log.log(Level.WARNING, "Problem accessing reposiotry: ", e);
       throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
-    } // end of try-catch
+    } catch (TigaseDBException e) {
+			log.log(Level.SEVERE, "Repository access exception.", e);
+		} // end of try-catch
+		return null;
   }
 
   /**
@@ -266,7 +281,9 @@ public abstract class RepositoryAccess {
     } catch (UserNotFoundException e) {
       log.log(Level.WARNING, "Problem accessing reposiotry: ", e);
       throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
-    } // end of try-catch
+    } catch (TigaseDBException e) {
+			log.log(Level.SEVERE, "Repository access exception.", e);
+		} // end of try-catch
   }
 
   public final void removeData(final String subnode, final String key)
@@ -275,7 +292,9 @@ public abstract class RepositoryAccess {
     } catch (UserNotFoundException e) {
       log.log(Level.WARNING, "Problem accessing reposiotry: ", e);
       throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
-    } // end of try-catch
+    } catch (TigaseDBException e) {
+			log.log(Level.SEVERE, "Repository access exception.", e);
+		} // end of try-catch
   }
 
   /**
@@ -297,7 +316,10 @@ public abstract class RepositoryAccess {
     } catch (UserNotFoundException e) {
       log.log(Level.WARNING, "Problem accessing reposiotry: ", e);
       throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
-    } // end of try-catch
+    } catch (TigaseDBException e) {
+			log.log(Level.SEVERE, "Repository access exception.", e);
+		} // end of try-catch
+		return null;
   }
 
   /**
@@ -322,7 +344,10 @@ public abstract class RepositoryAccess {
     } catch (UserNotFoundException e) {
       log.log(Level.WARNING, "Problem accessing reposiotry: ", e);
       throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
-    } // end of try-catch
+    } catch (TigaseDBException e) {
+			log.log(Level.SEVERE, "Repository access exception.", e);
+		} // end of try-catch
+		return null;
   }
 
   /**
@@ -345,7 +370,9 @@ public abstract class RepositoryAccess {
     } catch (UserNotFoundException e) {
       log.log(Level.WARNING, "Problem accessing reposiotry: ", e);
       throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
-    } // end of try-catch
+    } catch (TigaseDBException e) {
+			log.log(Level.SEVERE, "Repository access exception.", e);
+		} // end of try-catch
   }
 
   /**
@@ -371,7 +398,9 @@ public abstract class RepositoryAccess {
     } catch (UserNotFoundException e) {
       log.log(Level.WARNING, "Problem accessing reposiotry: ", e);
       throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
-    } // end of try-catch
+    } catch (TigaseDBException e) {
+			log.log(Level.SEVERE, "Repository access exception.", e);
+		} // end of try-catch
   }
 
   public final void addDataList(final String subnode, final String key,
@@ -380,7 +409,9 @@ public abstract class RepositoryAccess {
     } catch (UserNotFoundException e) {
       log.log(Level.WARNING, "Problem accessing reposiotry: ", e);
       throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
-    } // end of try-catch
+    } catch (TigaseDBException e) {
+			log.log(Level.SEVERE, "Repository access exception.", e);
+		} // end of try-catch
   }
 
 	private String calcNode(String base, String subnode) {

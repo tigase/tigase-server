@@ -22,35 +22,27 @@
  */
 package tigase.db;
 
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
 /**
- * Describe class RepositoryFactory here.
+ * Describe class TigaseDBException here.
  *
  *
- * Created: Tue Oct 24 22:13:52 2006
+ * Created: Thu Oct 26 12:15:36 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class RepositoryFactory {
+public class TigaseDBException extends Exception {
 
-	private static ConcurrentMap<String, UserRepository> instances =
-		new ConcurrentHashMap<String, UserRepository>();
+  private static final long serialVersionUID = 1L;
 
-	public static UserRepository getInstance(String class_name, String resource)
-		throws ClassNotFoundException, InstantiationException,
-					 IllegalAccessException, DBInitException {
-		UserRepository rep = instances.get(resource);
-		if (rep == null) {
-			rep = (UserRepository)Class.forName(class_name).newInstance();
-			rep.initRepository(resource);
-			instances.put(resource, rep);
-		} // end of if (rep == null)
-		return rep;
-	}
+	/**
+	 * Creates a new <code>TigaseDBException</code> instance.
+	 *
+	 */
+	public TigaseDBException(String message) { super(message); }
 
+  public TigaseDBException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
-
-} // RepositoryFactory
+} // TigaseDBException

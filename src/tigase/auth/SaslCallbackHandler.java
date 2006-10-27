@@ -25,6 +25,7 @@ package tigase.auth;
 import java.io.IOException;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.NameCallback;
@@ -35,6 +36,7 @@ import javax.security.sasl.AuthorizeCallback;
 import javax.security.sasl.RealmCallback;
 import tigase.db.UserNotFoundException;
 import tigase.db.UserRepository;
+import tigase.db.TigaseDBException;
 import tigase.util.JID;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.XMPPResourceConnection;
@@ -124,7 +126,10 @@ public class SaslCallbackHandler implements CallbackHandler {
 					pc.setPassword(user_raw_pass.toCharArray());
 					log.finest("PasswordCallback: " + user_raw_pass);
 				} catch (UserNotFoundException e) {
-					throw new IOException(e.toString());
+					throw new IOException(e.toString(), e);
+				} catch (TigaseDBException e) {
+					log.log(Level.SEVERE, "Repository access exception.", e);
+					throw new IOException("Repository access exception.", e);
 				} // end of try-catch
 			} else if (callbacks[i] instanceof AuthorizeCallback) {
 				AuthorizeCallback authCallback = ((AuthorizeCallback)callbacks[i]);

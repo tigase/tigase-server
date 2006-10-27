@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.TreeMap;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.net.UnknownHostException;
 import javax.security.auth.login.AppConfigurationEntry.LoginModuleControlFlag;
@@ -45,6 +46,7 @@ import tigase.db.UserRepository;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.UserNotFoundException;
 import tigase.db.DataOverwriteException;
+import tigase.db.TigaseDBException;
 import tigase.db.RepositoryFactory;
 import tigase.server.AbstractMessageReceiver;
 import tigase.server.MessageReceiver;
@@ -530,31 +532,47 @@ public class SessionManager extends AbstractMessageReceiver
 
 		public String getPublicData(String user, String subnode, String key,
 			String def)	throws UserNotFoundException {
-			return rep.getData(user,
-				calcNode(PUBLIC_DATA_NODE, subnode), key, def);
+			try {
+				return rep.getData(user, calcNode(PUBLIC_DATA_NODE, subnode), key, def);
+			}	catch (TigaseDBException e) {
+				log.log(Level.SEVERE, "Problem accessing repository data.", e);
+				return null;
+			} // end of try-catch
 		}
 
 		public String[] getPublicDataList(String user, String subnode, String key)
 			throws UserNotFoundException {
-				return rep.getDataList(user,
-					calcNode(PUBLIC_DATA_NODE, subnode), key);
+			try {
+				return rep.getDataList(user, calcNode(PUBLIC_DATA_NODE, subnode), key);
+			}	catch (TigaseDBException e) {
+				log.log(Level.SEVERE, "Problem accessing repository data.", e);
+				return null;
+			} // end of try-catch
 		}
 
 		public void addOfflineDataList(String user, String subnode, String key,
 			String[] list) throws UserNotFoundException {
-			rep.addDataList(user,
-				calcNode(OFFLINE_DATA_NODE, subnode), key, list);
+			try {
+				rep.addDataList(user, calcNode(OFFLINE_DATA_NODE, subnode), key, list);
+			}	catch (TigaseDBException e) {
+				log.log(Level.SEVERE, "Problem accessing repository data.", e);
+			} // end of try-catch
 		}
 
 		public void addOfflineData(String user, String subnode, String key,
 			String value) throws UserNotFoundException, DataOverwriteException {
 			String node = calcNode(OFFLINE_DATA_NODE, subnode);
-			String data = rep.getData(user,	node, key);
-			if (data == null) {
-				rep.setData(user,	node, key, value);
-			} else {
-				throw new DataOverwriteException("Not authorized attempt to overwrite data.");
-			} // end of if (data == null) else
+			try {
+				String data = rep.getData(user,	node, key);
+				if (data == null) {
+					rep.setData(user,	node, key, value);
+				} else {
+					throw new
+						DataOverwriteException("Not authorized attempt to overwrite data.");
+				} // end of if (data == null) else
+			}	catch (TigaseDBException e) {
+				log.log(Level.SEVERE, "Problem accessing repository data.", e);
+			} // end of try-catch
 		}
 
 	}

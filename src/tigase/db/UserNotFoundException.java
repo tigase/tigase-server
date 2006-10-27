@@ -31,7 +31,7 @@ package tigase.db;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class UserNotFoundException extends Exception {
+public class UserNotFoundException extends TigaseDBException {
 
   private static final long serialVersionUID = 1L;
 
