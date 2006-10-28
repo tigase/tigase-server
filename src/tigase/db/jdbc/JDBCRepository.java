@@ -75,6 +75,8 @@ public class JDBCRepository implements UserRepository {
 	private PreparedStatement data_for_node_st = null;
 	private PreparedStatement keys_for_node_st = null;
 	private PreparedStatement nodes_for_node_st = null;
+	private PreparedStatement insert_key_val_st = null;
+	private PreparedStatement remove_key_data_st = null;
 
 	private long max_uid = 0;
 	private long max_nid = 0;
@@ -96,13 +98,15 @@ public class JDBCRepository implements UserRepository {
 		throws SQLException, UserNotFoundException {
 		ResultSet rs = null;
 		try {
-			uid_st.setString(1, user_id);
-			rs = uid_st.executeQuery();
-			if (rs.next()) {
-				return rs.getLong(1);
-			} else {
-				throw new UserNotFoundException("User does not exist: " + user_id);
-			} // end of if (isnext) else
+			synchronized (uid_st) {
+				uid_st.setString(1, user_id);
+				rs = uid_st.executeQuery();
+				if (rs.next()) {
+					return rs.getLong(1);
+				} else {
+					throw new UserNotFoundException("User does not exist: " + user_id);
+				} // end of if (isnext) else
+			}
 		} finally {
 			release(null, rs);
 		}
@@ -136,7 +140,7 @@ public class JDBCRepository implements UserRepository {
 		String query =
 			"select nid as nid1 from " + nodes_tbl
 			+ " where (uid = " + uid + ")"
-			+ " AND (parent_nid = null)"
+			+ " AND (parent_nid is null)"
 			+ " AND (node = '" + root_node + "')";
 		if (node_path == null) {
 			return query;
@@ -159,6 +163,7 @@ public class JDBCRepository implements UserRepository {
 	private long getNodeNID(long uid, String node_path)
 		throws SQLException, UserNotFoundException {
 		String query = buildNodeQuery(uid, node_path);
+		//		System.out.println(query);
 		Statement stmt = null;
 		ResultSet rs = null;
 		try {
@@ -184,11 +189,13 @@ public class JDBCRepository implements UserRepository {
 	private long addNode(long uid, long parent_nid, String node_name)
 		throws SQLException {
 		long new_nid = max_nid++;
-		node_add_st.setLong(1, new_nid);
-		node_add_st.setLong(2, parent_nid);
-		node_add_st.setLong(3, uid);
-		node_add_st.setString(4, node_name);
-		node_add_st.executeUpdate();
+		synchronized (node_add_st) {
+			node_add_st.setLong(1, new_nid);
+			node_add_st.setLong(2, parent_nid);
+			node_add_st.setLong(3, uid);
+			node_add_st.setString(4, node_name);
+			node_add_st.executeUpdate();
+		}
 		incrementMaxNID();
 		return new_nid;
 	}
@@ -237,6 +244,14 @@ public class JDBCRepository implements UserRepository {
 		query = "select nid, node from " + nodes_tbl
 			+ " where parent_nid = ?;";
 		nodes_for_node_st = conn.prepareStatement(query);
+
+		query =  "insert into " + pairs_tbl	+ " (nid, uid, pkey, pval) "
+			+ " values (?, ?, ?, ?)";
+		insert_key_val_st = conn.prepareStatement(query);
+
+		query =  "delete from " + pairs_tbl
+			+ " where (nid = ?) AND (key = ?)";
+		remove_key_data_st = conn.prepareStatement(query);
 	}
 
 	// Implementation of tigase.db.UserRepository
@@ -376,12 +391,14 @@ public class JDBCRepository implements UserRepository {
 		try {
 			long nid = getNodeNID(user_id, subnode);
 			if (nid > 0) {
-				data_for_node_st.setLong(1, nid);
-				data_for_node_st.setString(2, key);
-				rs = data_for_node_st.executeQuery();
 				List<String> results = new ArrayList<String>();
-				while (rs.next()) {
-					results.add(rs.getString(1));
+				synchronized (data_for_node_st) {
+					data_for_node_st.setLong(1, nid);
+					data_for_node_st.setString(2, key);
+					rs = data_for_node_st.executeQuery();
+					while (rs.next()) {
+						results.add(rs.getString(1));
+					}
 				}
 				return results.size() == 0 ? null :
 					results.toArray(new String[results.size()]);
@@ -409,11 +426,13 @@ public class JDBCRepository implements UserRepository {
 		try {
 			long nid = getNodeNID(user_id, subnode);
 			if (nid > 0) {
-				nodes_for_node_st.setLong(1, nid);
-				rs = nodes_for_node_st.executeQuery();
 				List<String> results = new ArrayList<String>();
-				while (rs.next()) {
-					results.add(rs.getString(2));
+				synchronized (nodes_for_node_st) {
+					nodes_for_node_st.setLong(1, nid);
+					rs = nodes_for_node_st.executeQuery();
+					while (rs.next()) {
+						results.add(rs.getString(2));
+					}
 				}
 				return results.size() == 0 ? null :
 					results.toArray(new String[results.size()]);
@@ -439,6 +458,27 @@ public class JDBCRepository implements UserRepository {
 		return getSubnodes(user_id, null);
 	}
 
+	private void deleteSubnode(long nid) throws SQLException {
+		Statement stmt = null;
+		ResultSet rs = null;
+		String query = null;
+		try {
+			stmt = conn.createStatement();
+			query = "delete from " + nodes_tbl + " where nid = " + nid;
+			stmt.executeUpdate(query);
+			query = "delete from " + pairs_tbl + " where nid = " + nid;
+			stmt.executeUpdate(query);
+			query = "select nid from " + nodes_tbl + " where parent_nid = " + nid;
+			rs = stmt.executeQuery(query);
+			while (rs.next()) {
+				long subnode_nid = rs.getLong(1);
+				deleteSubnode(subnode_nid);
+			} // end of while (rs.next())
+		} finally {
+			release(stmt, rs);
+		}
+	}
+
 	/**
 	 * Describe <code>removeSubnode</code> method here.
 	 *
@@ -448,7 +488,17 @@ public class JDBCRepository implements UserRepository {
 	 */
 	public void removeSubnode(final String user_id,	final String subnode)
 		throws UserNotFoundException, TigaseDBException {
-
+		if (subnode == null) {
+			return;
+		} // end of if (subnode == null)
+		try {
+			long nid = getNodeNID(user_id, subnode);
+			if (nid > 0) {
+				deleteSubnode(nid);
+			}
+		} catch (SQLException e) {
+			throw new TigaseDBException("Error getting subnodes list.", e);
+		}
 	}
 
 	/**
@@ -463,7 +513,8 @@ public class JDBCRepository implements UserRepository {
 	public void setDataList(final String user_id, final String subnode,
 		final String key, final String[] list)
 		throws UserNotFoundException, TigaseDBException {
-
+		removeData(user_id, subnode, key);
+		addDataList(user_id, subnode, key, list);
 	}
 
 	/**
@@ -478,7 +529,24 @@ public class JDBCRepository implements UserRepository {
 	public void addDataList(final String user_id, final String subnode,
 		final String key, final String[] list)
 		throws UserNotFoundException, TigaseDBException {
-
+		try {
+			long uid = getUserUID(user_id);
+			long nid = getNodeNID(uid, subnode);
+			if (nid < 0) {
+				nid = createNodePath(user_id, subnode);
+			}
+			synchronized (insert_key_val_st) {
+				insert_key_val_st.setLong(1, nid);
+				insert_key_val_st.setLong(2, uid);
+				insert_key_val_st.setString(3, key);
+				for (String val: list) {
+					insert_key_val_st.setString(4, val);
+					insert_key_val_st.executeUpdate();
+				} // end of for (String val: list)
+			}
+		} catch (SQLException e) {
+			throw new TigaseDBException("Error getting subnodes list.", e);
+		}
 	}
 
 	/**
@@ -495,11 +563,13 @@ public class JDBCRepository implements UserRepository {
 		try {
 			long nid = getNodeNID(user_id, subnode);
 			if (nid > 0) {
-				keys_for_node_st.setLong(1, nid);
-				rs = keys_for_node_st.executeQuery();
 				List<String> results = new ArrayList<String>();
-				while (rs.next()) {
-					results.add(rs.getString(2));
+				synchronized (keys_for_node_st) {
+					keys_for_node_st.setLong(1, nid);
+					rs = keys_for_node_st.executeQuery();
+					while (rs.next()) {
+						results.add(rs.getString(1));
+					}
 				}
 				return results.size() == 0 ? null :
 					results.toArray(new String[results.size()]);
@@ -542,14 +612,16 @@ public class JDBCRepository implements UserRepository {
 		try {
 			long nid = getNodeNID(user_id, subnode);
 			if (nid > 0) {
-				data_for_node_st.setLong(1, nid);
-				data_for_node_st.setString(2, key);
-				rs = data_for_node_st.executeQuery();
-				if (rs.next()) {
-					return rs.getString(1);
-				} else {
-					return def;
-				} // end of else
+				String result = def;
+				synchronized (data_for_node_st) {
+					data_for_node_st.setLong(1, nid);
+					data_for_node_st.setString(2, key);
+					rs = data_for_node_st.executeQuery();
+					if (rs.next()) {
+						result = rs.getString(1);
+					}
+				}
+				return result;
 			} else {
 				return def;
 			} // end of if (nid > 0) else
@@ -599,7 +671,7 @@ public class JDBCRepository implements UserRepository {
 	public void setData(final String user_id, final String subnode,
 		final String key, final String value)
 		throws UserNotFoundException, TigaseDBException {
-
+		setDataList(user_id, subnode, key, new String[] {value});
 	}
 
 	/**
@@ -627,7 +699,18 @@ public class JDBCRepository implements UserRepository {
 	public void removeData(final String user_id, final String subnode,
 		final String key)
 		throws UserNotFoundException, TigaseDBException {
-
+		try {
+			long nid = getNodeNID(user_id, subnode);
+			if (nid > 0) {
+				synchronized (remove_key_data_st) {
+					remove_key_data_st.setLong(1, nid);
+					remove_key_data_st.setString(2, key);
+					remove_key_data_st.executeUpdate();
+				}
+			}
+		} catch (SQLException e) {
+			throw new TigaseDBException("Error getting subnodes list.", e);
+		}
 	}
 
 	/**
@@ -668,11 +751,43 @@ public class JDBCRepository implements UserRepository {
 		String[] node_paths = new String[]
 			{null, "roster", "roster/user2@hostname"
 			 , "privacy", "privacy/default", "privacy/default/24"};
+// 		String[] node_paths = new String[]
+// 			{null};
+// 		for (String node_path: node_paths) {
+// 			long nid = repo.getNodeNID(user, node_path);
+// 			System.out.println("Node id for user: " + user
+// 				+ " and node_path: " + node_path + " is: " + nid);
+// 		} // end of for (String node_path: node_paths)
 		for (String node_path: node_paths) {
-			long nid = repo.getNodeNID(user, node_path);
-			System.out.println("Node id for user: " + user
-				+ " and node_path: " + node_path + " is: " + nid);
-		} // end of for (String node_path: node_paths)
+			System.out.println("" + node_path);
+			String[] subnodes = repo.getSubnodes(user, node_path);
+			if (subnodes == null) {
+				System.out.println("  No subnodes found");
+			} else {
+				System.out.println("  subnodes:");
+				for (String subnode: subnodes) {
+					System.out.println("    " + subnode);
+				} // end of for (String subnode: subnodes)
+			} // end of if (subnodes == null) else
+			String[] keys = repo.getKeys(user, node_path);
+			if (keys == null) {
+				System.out.println("  No keys found");
+			} else {
+				System.out.println("  keys:");
+				for (String key: keys) {
+					String[] vals = repo.getDataList(user, node_path, key);
+					if (vals != null) {
+						String valstr = "";
+						for (String val: vals) {
+							valstr = valstr + " " + val;
+						} // end of for (String val: vals)
+						System.out.println("    " + key + " = " + valstr);
+					} else {
+						System.out.println("    " + key);
+					} // end of if (vals != null) else
+				} // end of for (String subnode: subnodes)
+			} // end of if (subnodes == null) else
+		}
 	}
 
 } // JDBCRepository
