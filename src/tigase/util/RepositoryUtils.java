@@ -117,7 +117,7 @@ public class RepositoryUtils {
 	 */
 	public static void main(final String[] args) throws Exception {
 		String repo_url =
-			"jdbc:mysql://localhost/tigase?user=root&password=admin12";
+			"jdbc:mysql://localhost/tigase?user=root&password=admin";
 		String repo_class = "tigase.db.jdbc.JDBCRepository";
 		UserRepository repo =
 			RepositoryFactory.getInstance(repo_class, repo_url);
