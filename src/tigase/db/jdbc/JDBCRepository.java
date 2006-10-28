@@ -31,6 +31,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Select;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -191,7 +192,11 @@ public class JDBCRepository implements UserRepository {
 		long new_nid = max_nid++;
 		synchronized (node_add_st) {
 			node_add_st.setLong(1, new_nid);
-			node_add_st.setLong(2, parent_nid);
+			if (parent_nid < 0) {
+				node_add_st.setNull(2, Types.BIGINT);
+			} else {
+				node_add_st.setLong(2, parent_nid);
+			} // end of else
 			node_add_st.setLong(3, uid);
 			node_add_st.setString(4, node_name);
 			node_add_st.executeUpdate();
@@ -214,6 +219,8 @@ public class JDBCRepository implements UserRepository {
 			String token = strtok.nextToken();
 			built_path = built_path + "/" + token;
 			long cur_nid = getNodeNID(uid, built_path);
+			System.out.println("built_path: " + built_path
+				+ ", token: " + token + ", nid: " + nid);
 			if (cur_nid > 0) {
 				nid = cur_nid;
 			} else {
@@ -250,7 +257,7 @@ public class JDBCRepository implements UserRepository {
 		insert_key_val_st = conn.prepareStatement(query);
 
 		query =  "delete from " + pairs_tbl
-			+ " where (nid = ?) AND (key = ?)";
+			+ " where (nid = ?) AND (pkey = ?)";
 		remove_key_data_st = conn.prepareStatement(query);
 	}
 
@@ -328,12 +335,14 @@ public class JDBCRepository implements UserRepository {
 		Statement stmt = null;
 		String query = null;
 		try {
+			long uid = max_uid++;
 			stmt = conn.createStatement();
 			// Add user into database.
 			query = "insert into " + users_tbl + " (uid, user_id) values ("
-				+ (max_uid++) + ", '" + user_id + "');";
+				+ uid + ", '" + user_id + "');";
 			stmt.executeUpdate(query);
 			incrementMaxUID();
+			addNode(uid, -1, root_node);
 		} catch (SQLException e) {
 			throw new UserExistsException("Error adding user to repository: "
 				+ query, e);
@@ -723,71 +732,6 @@ public class JDBCRepository implements UserRepository {
 	public void removeData(final String user_id, final String key)
 		throws UserNotFoundException, TigaseDBException {
 		removeData(user_id, null, key);
-	}
-
-	/**
-	 * Describe <code>main</code> method here.
-	 *
-	 * @param args a <code>String[]</code> value
-	 */
-	public static void main(final String[] args) throws Exception {
-		String jdbc_url =
-			"jdbc:mysql://localhost/tigase?user=root&password=admin12";
-		String jdbc_class = "tigase.db.jdbc.JDBCRepository";
-		JDBCRepository repo =
-			(JDBCRepository)RepositoryFactory.getInstance(jdbc_class, jdbc_url);
-		List<String> users = repo.getUsers();
-		for (String user: users) {
-			System.out.println(user);
-		} // end of for (String user: users)
-		repo.addUser("user2@hostname");
-		users = repo.getUsers();
-		for (String user: users) {
-			System.out.println(user);
-		} // end of for (String user: users)
-		repo.removeUser("user2@hostname");
-
-		String user = "user1@hostname";
-		String[] node_paths = new String[]
-			{null, "roster", "roster/user2@hostname"
-			 , "privacy", "privacy/default", "privacy/default/24"};
-// 		String[] node_paths = new String[]
-// 			{null};
-// 		for (String node_path: node_paths) {
-// 			long nid = repo.getNodeNID(user, node_path);
-// 			System.out.println("Node id for user: " + user
-// 				+ " and node_path: " + node_path + " is: " + nid);
-// 		} // end of for (String node_path: node_paths)
-		for (String node_path: node_paths) {
-			System.out.println("" + node_path);
-			String[] subnodes = repo.getSubnodes(user, node_path);
-			if (subnodes == null) {
-				System.out.println("  No subnodes found");
-			} else {
-				System.out.println("  subnodes:");
-				for (String subnode: subnodes) {
-					System.out.println("    " + subnode);
-				} // end of for (String subnode: subnodes)
-			} // end of if (subnodes == null) else
-			String[] keys = repo.getKeys(user, node_path);
-			if (keys == null) {
-				System.out.println("  No keys found");
-			} else {
-				System.out.println("  keys:");
-				for (String key: keys) {
-					String[] vals = repo.getDataList(user, node_path, key);
-					if (vals != null) {
-						String valstr = "";
-						for (String val: vals) {
-							valstr = valstr + " " + val;
-						} // end of for (String val: vals)
-						System.out.println("    " + key + " = " + valstr);
-					} else {
-						System.out.println("    " + key);
-					} // end of if (vals != null) else
-				} // end of for (String subnode: subnodes)
-			} // end of if (subnodes == null) else
-		}
 	}
 
 } // JDBCRepository
