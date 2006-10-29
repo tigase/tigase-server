@@ -208,13 +208,18 @@ public class Presence extends XMPPProcessor
 			boolean subscr_changed = false;
 			switch (pres_type) {
 			case out_initial:
+				boolean first = false;
+				if (session.getSessionData(PRESENCE_KEY) == null) {
+					first = true;
+				}
+
 				// Store user presence for later time...
 				// To send response to presence probes for example.
 				session.putSessionData(PRESENCE_KEY, packet.getElement());
 
 				// Send presence probes to 'to' or 'both' contacts if this is
  				// availability presence
-				if (type == StanzaType.available) {
+				if (first && type == StanzaType.available) {
 					sendPresenceBroadcast(StanzaType.probe, session, TO_SUBSCRIBED,
 						results, null);
 				} // end of if (type == StanzaType.available)
