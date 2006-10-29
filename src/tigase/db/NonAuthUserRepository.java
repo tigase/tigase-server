@@ -107,7 +107,7 @@ public interface NonAuthUserRepository {
    * <pre>/root/subnode1/subnode2</pre>.
    * @param key a <code>String</code> with which the specified values list is to
    * be associated.
-   * @param list a <code>String[]</code> is an array of values to be assosiated
+   * @param value a <code>String</code> is an array of values to be assosiated
    * with the specified key.
    * @exception UserNotFoundException if user id hasn't been found in reository.
 	 */

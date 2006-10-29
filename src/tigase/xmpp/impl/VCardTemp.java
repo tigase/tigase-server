@@ -82,8 +82,9 @@ public class VCardTemp extends XMPPProcessor implements XMPPProcessorIfc {
 	 * Describe <code>process</code> method here.
 	 *
 	 * @param packet a <code>Packet</code> value
-	 * @param XMPPResourceConnection a <code>XMPPResourceConnection</code> value
-	 * @param queue a <code>Queue</code> value
+	 * @param session a <code>XMPPResourceConnection</code> value
+	 * @param repo a <code>NonAuthUserRepository</code> value
+	 * @param results a <code>Queue</code> value
 	 */
 	public void process(Packet packet, XMPPResourceConnection session,
 		NonAuthUserRepository repo, Queue<Packet> results) {

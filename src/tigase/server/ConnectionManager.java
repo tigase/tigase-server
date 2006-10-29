@@ -225,7 +225,7 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 	/**
 	 * Describe <code>packetsReady</code> method here.
 	 *
-	 * @param IOService an <code>IOService</code> value
+	 * @param s an <code>IOService</code> value
 	 */
 	public void packetsReady(IOService s) throws IOException {
 		log.finest("packetsReady called");

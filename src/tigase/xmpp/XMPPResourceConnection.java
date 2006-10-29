@@ -108,8 +108,6 @@ public class XMPPResourceConnection extends RepositoryAccess {
    * @param key a <code>String</code> value of stored data key ID.
    * @param value a <code>Object</code> value of data stored in session.
    * @see #getSessionData(String)
-   * @see #getData(String)
-   * @see #setData(String, String)
    */
   public final void putSessionData(final String key, final Object value) {
     lastAccessed = System.currentTimeMillis();
@@ -329,11 +327,6 @@ public class XMPPResourceConnection extends RepositoryAccess {
    * of fail reason. Please refer to <code>Authorizaion</code> documentation for
    * more details.
    *
-   * @param user a <code>String</code> value of user ID for which authorization
-   * is performed.
-   * @param password a <code>String</code> value of plain text user password.
-   * @param resource a <code>String</code> value of resource to which this
-   * session is binded after successful authorization.
    * @return a <code>Authorization</code> value of result code.
    */
   public final Authorization login() throws LoginException {

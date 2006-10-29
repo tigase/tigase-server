@@ -180,7 +180,6 @@ public abstract class RepositoryAccess {
    * @exception NotAuthorizedException is thrown when session
    * has not been authorized yet and there is no access to permanent storage.
    * @see #setData(String, String, String)
-   * @see #setData(String, String)
    */
   public final String[] getDataList(final String subnode, final String key)
     throws NotAuthorizedException {
@@ -273,7 +272,6 @@ public abstract class RepositoryAccess {
    * has not been authorized yet and there is no access to permanent storage.
    * @see #removeDataGroup(String)
    * @see UserRepository
-   * @see tigase.xmpp.rep.xml.XMLRepository
    */
   public final void setData(final String subnode,
     final String key, final String value) throws NotAuthorizedException {
@@ -336,7 +334,6 @@ public abstract class RepositoryAccess {
    * @exception NotAuthorizedException is thrown when session
    * has not been authorized yet and there is no access to permanent storage.
    * @see #setData(String, String, String)
-   * @see #setData(String, String)
    */
   public final String[] getDataKeys(final String subnode)
     throws NotAuthorizedException {
@@ -390,7 +387,6 @@ public abstract class RepositoryAccess {
    * @exception NotAuthorizedException is thrown when session
    * has not been authorized yet and there is no access to permanent storage.
    * @see #setData(String, String, String)
-   * @see #setData(String, String)
    */
   public final void setDataList(final String subnode, final String key,
     final String[] list) throws NotAuthorizedException {

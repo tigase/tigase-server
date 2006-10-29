@@ -91,7 +91,7 @@ public class OfflineMessages extends XMPPProcessor
 	/**
 	 * Describe <code>supDiscoFeatures</code> method here.
 	 *
-	 * @param XMPPResourceConnection a <code>XMPPResourceConnection</code> value
+	 * @param session a <code>XMPPResourceConnection</code> value
 	 * @return a <code>String[]</code> value
 	 */
   public String[] supDiscoFeatures(final XMPPResourceConnection session)
@@ -110,8 +110,9 @@ public class OfflineMessages extends XMPPProcessor
 	 * Describe <code>process</code> method here.
 	 *
 	 * @param packet a <code>Packet</code> value
-	 * @param XMPPResourceConnection a <code>XMPPResourceConnection</code> value
-	 * @param queue a <code>Queue</code> value
+	 * @param conn a <code>XMPPResourceConnection</code> value
+	 * @param repo a <code>NonAuthUserRepository</code> value
+	 * @param results a <code>Queue</code> value
 	 */
 	public void process(final Packet packet, final XMPPResourceConnection conn,
 		final NonAuthUserRepository repo, final Queue<Packet> results) {
@@ -152,8 +153,8 @@ public class OfflineMessages extends XMPPProcessor
 	 * Describe <code>postProcess</code> method here.
 	 *
 	 * @param packet a <code>Packet</code> value
-	 * @param XMPPResourceConnection a <code>XMPPResourceConnection</code> value
-	 * @param writeOnlyUserRepository a <code>NonAuthUserRepository</code> value
+	 * @param conn a <code>XMPPResourceConnection</code> value
+	 * @param repo a <code>NonAuthUserRepository</code> value
 	 * @param queue a <code>Queue</code> value
 	 */
 	public void postProcess(final Packet packet,
