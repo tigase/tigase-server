@@ -38,6 +38,34 @@ import tigase.db.UserExistsException;
  */
 public class RepositoryUtils {
 
+	public static void copyNode(String user, String node,
+		UserRepository src, UserRepository dst) throws Exception {
+		String[] keys = src.getKeys(user, node);
+		if (keys != null) {
+			for (String key: keys) {
+				String[] vals = src.getDataList(user, node, key);
+				if (vals != null) {
+					dst.setDataList(user, node, key, vals);
+				} // end of if (vals != null) else
+			} // end of for (String key: keys)
+		} // end of if (keys != null)
+		String[] nodes = src.getSubnodes(user, node);
+		if (nodes != null) {
+			for (String subnode: nodes) {
+				copyNode(user,
+					(node != null ? node + "/" + subnode : subnode),
+					src, dst);
+			} // end of for (String node: nodes)
+		} // end of if (ndoes != null)
+	}
+
+	public static void copyUser(String user, UserRepository src, UserRepository dst)
+		throws Exception {
+		System.out.println("Copying user: " + user);
+		try { dst.addUser(user); } catch (UserExistsException e) {	}
+		copyNode(user, null, src, dst);
+	}
+
 	public static void printNode(String user, UserRepository repo,
 		String prefix, String node)	throws Exception {
 		System.out.println(prefix + "node: " + node);
@@ -59,7 +87,8 @@ public class RepositoryUtils {
 		String[] nodes = repo.getSubnodes(user, node);
 		if (nodes != null) {
 			for (String subnode: nodes) {
-				printNode(user, repo, prefix + "  ", node + "/" + subnode);
+				printNode(user, repo, prefix + "  ",
+					(node != null ? node + "/" + subnode : subnode));
 			} // end of for (String node: nodes)
 		} // end of if (ndoes != null)
 	}
@@ -70,12 +99,13 @@ public class RepositoryUtils {
 		if (users != null) {
 			for (String user: users) {
 				System.out.println(user);
-				String[] nodes = repo.getSubnodes(user, null);
-				if (nodes != null) {
-					for (String node: nodes) {
-						printNode(user, repo, "  ", node);
-					} // end of for (String node: nodes)
-				} // end of if (ndoes != null)
+				printNode(user, repo, "  ", null);
+// 				String[] nodes = repo.getSubnodes(user, null);
+// 				if (nodes != null) {
+// 					for (String node: nodes) {
+// 						printNode(user, repo, "  ", node);
+// 					} // end of for (String node: nodes)
+// 				} // end of if (ndoes != null)
 			} // end of for (String user: users)
 		} else {
 			System.out.println("There are no user accounts in repository.");
@@ -110,22 +140,192 @@ public class RepositoryUtils {
 			new String[] {"family", "home"});
 	}
 
+	public static void simpleTest(UserRepository repo) throws Exception {
+		printRepoContent(repo);
+		loadTestData(repo);
+		printRepoContent(repo);
+		removeTestData(repo);
+		printRepoContent(repo);
+	}
+
+	private static String help() {
+		return "\n"
+			+ "Parameters:\n"
+      + " -h          this help message\n"
+			+ " -sc class   source repository class name\n"
+			+ " -su uri     source repository init string\n"
+			+ " -dc class   destination repository class name\n"
+			+ " -du uri     destination repository init string\n"
+			+ " -dt string  data content to set/remove in repository\n"
+			+ " -u user     user ID, if given all operations are only for that ID\n"
+			+ " -st         perform simple test on repository\n"
+			+ " -cp         copy content from source to destination repository\n"
+			+ " -pr         print content of the repository\n"
+			+ " -n          data content string is a node string\n"
+			+ " -kv         data content string is node/key=value string\n"
+			+ " -add        add data content to repository\n"
+			+ " -del        delete data content from repository\n"
+			;
+	}
+
+	private static String src_class = "tigase.db.jdbc.JDBCRepository";
+	private static String src_uri = null;
+	private static String dst_class = null;
+	private static String dst_uri = null;
+	private static String content = null;
+	private static String user = null;
+	private static boolean simple_test = false;
+	private static boolean copy_repos = false;
+	private static boolean print_repo = false;
+	private static boolean add = false;
+	private static boolean del = false;
+	private static boolean node = false;
+	private static boolean key_val = false;
+
+	private static String subnode = null;
+	private static String key = null;
+	private static String value = null;
+
+	public static void copyRepositories(UserRepository src, UserRepository dst)
+		throws Exception {
+		if (user != null) {
+			copyUser(user, src, dst);
+		} else {
+			List<String> users = src.getUsers();
+			if (users != null) {
+				for (String usr: users) {
+					copyUser(usr, src, dst);
+				} // end of for (String user: users)
+			} else {
+				System.out.println("There are no user accounts in source repository.");
+			} // end of else
+		} // end of if (user != null) else
+	}
+
+	private static void parseNodeKeyValue(String data) {
+		int val_idx = data.indexOf('=');
+		value = data.substring(val_idx+1);
+		String tmp_str = data.substring(0, val_idx);
+		int key_idx = tmp_str.lastIndexOf('/');
+		if (key_idx >= 0) {
+			key = tmp_str.substring(key_idx+1);
+			subnode = tmp_str.substring(0, key_idx);
+		} // end of if (key_idx >= 0)
+		else {
+			key = tmp_str;
+		} // end of if (key_idx >= 0) else
+	}
+
+	public static void parseParams(final String[] args) {
+    if (args != null && args.length > 0) {
+      for (int i = 0; i < args.length; i++) {
+        if (args[i].equals("-h")) {
+          System.out.print(help());
+          System.exit(0);
+        } // end of if (args[i].equals("-h"))
+        if (args[i].equals("-sc")) {
+					src_class = args[++i];
+        } // end of if (args[i].equals("-h"))
+        if (args[i].equals("-su")) {
+					src_uri = args[++i];
+        } // end of if (args[i].equals("-h"))
+        if (args[i].equals("-dc")) {
+					dst_class = args[++i];
+        } // end of if (args[i].equals("-h"))
+        if (args[i].equals("-du")) {
+					dst_uri = args[++i];
+        } // end of if (args[i].equals("-h"))
+        if (args[i].equals("-dt")) {
+					content = args[++i];
+        } // end of if (args[i].equals("-h"))
+        if (args[i].equals("-st")) {
+					simple_test = true;
+        } // end of if (args[i].equals("-h"))
+        if (args[i].equals("-cp")) {
+					copy_repos = true;
+        } // end of if (args[i].equals("-h"))
+        if (args[i].equals("-pr")) {
+					print_repo = true;
+        } // end of if (args[i].equals("-h"))
+        if (args[i].equals("-u")) {
+					user = args[++i];
+        } // end of if (args[i].equals("-h"))
+        if (args[i].equals("-n")) {
+					node = true;
+        } // end of if (args[i].equals("-h"))
+        if (args[i].equals("-kv")) {
+					key_val = true;
+        } // end of if (args[i].equals("-h"))
+        if (args[i].equals("-add")) {
+					add = true;
+        } // end of if (args[i].equals("-h"))
+        if (args[i].equals("-del")) {
+					del = true;
+        } // end of if (args[i].equals("-h"))
+      } // end of for (int i = 0; i < args.length; i++)
+    }
+  }
+
 	/**
 	 * Describe <code>main</code> method here.
 	 *
 	 * @param args a <code>String[]</code> value
 	 */
 	public static void main(final String[] args) throws Exception {
-		String repo_url =
-			"jdbc:mysql://localhost/tigase?user=root&password=admin";
-		String repo_class = "tigase.db.jdbc.JDBCRepository";
-		UserRepository repo =
-			RepositoryFactory.getInstance(repo_class, repo_url);
-		printRepoContent(repo);
-		loadTestData(repo);
-		printRepoContent(repo);
-		removeTestData(repo);
-		printRepoContent(repo);
+
+		parseParams(args);
+
+		UserRepository src_repo =
+			RepositoryFactory.getInstance(src_class, src_uri);
+
+		if (print_repo) {
+			System.out.println("Printing repository:");
+			printRepoContent(src_repo);
+		} // end of if (print_repo)
+
+		if (simple_test) {
+			System.out.println("Simple test on repository:");
+			simpleTest(src_repo);
+		} // end of if (simple_test)
+
+		if (add) {
+			if (key_val) {
+				System.out.println("Adding key=value: " + content);
+				parseNodeKeyValue(content);
+				System.out.println("Parsed parameters: user=" + user
+					+ ", node=" + subnode + ", key=" + key + ", value=" + value);
+				src_repo.setData(user, subnode, key, value);
+			} else {
+				System.out.println("Adding user: " + user);
+				src_repo.addUser(user);
+			} // end of else
+		} // end of if (add)
+
+		if (del) {
+			if (key_val || node) {
+				if (key_val) {
+					System.out.println("Deleting data: " + content);
+					parseNodeKeyValue(content);
+					System.out.println("Parsed parameters: user=" + user
+						+ ", node=" + subnode + ", key=" + key + ", value=" + value);
+					src_repo.removeData(user, subnode, key);
+				} // end of if (key_val)
+				if (node) {
+					System.out.println("Deleting data node: " + content);
+					src_repo.removeSubnode(user, content);
+				} // end of if (node)
+			} else {
+				System.out.println("Deleting user: " + user);
+				src_repo.removeUser(user);
+			} // end of else
+		} // end of if (del)
+
+		if (copy_repos) {
+			UserRepository dst_repo =
+				RepositoryFactory.getInstance(dst_class, dst_uri);
+			copyRepositories(src_repo, dst_repo);
+		} // end of if (copy_repos)
+
 	}
 
 } // RepositoryUtils

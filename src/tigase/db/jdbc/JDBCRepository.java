@@ -219,8 +219,6 @@ public class JDBCRepository implements UserRepository {
 			String token = strtok.nextToken();
 			built_path = built_path + "/" + token;
 			long cur_nid = getNodeNID(uid, built_path);
-			System.out.println("built_path: " + built_path
-				+ ", token: " + token + ", nid: " + nid);
 			if (cur_nid > 0) {
 				nid = cur_nid;
 			} else {

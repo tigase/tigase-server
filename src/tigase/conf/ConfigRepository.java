@@ -107,7 +107,6 @@ public class ConfigRepository {
 
   private void init() {
     try {
-      //      xmldb = new XMLDB(config_file, "preferences", "root");
       xmldb = new XMLDB(config_file);
     } catch (IOException e) {
       log.warning("Can not open existing configuration file, creating new one, "
@@ -229,8 +228,7 @@ public class ConfigRepository {
     final Object value) {
     try {
       xmldb.setData(root, node, key, value);
-    } // end of try
-    catch (NodeNotFoundException e1) {
+    } catch (NodeNotFoundException e1) {
       try {
         xmldb.addNode1(root);
         xmldb.setData(root, node, key, value);
@@ -324,7 +322,11 @@ public class ConfigRepository {
 //   }
 
   public String[] getSubnodes() {
-    return getSubnodes(null);
+		List<String> comps = xmldb.getAllNode1s();
+		if (comps != null) {
+			return comps.toArray(new String[comps.size()]);
+		} // end of if (comps != null)
+    return null;
   }
 
   public String[] getSubnodes(final String node) {
@@ -334,8 +336,7 @@ public class ConfigRepository {
   public String[] getSubnodes(final String root, final String node) {
     try {
       return xmldb.getSubnodes(root, node);
-    } // end of try
-    catch (NodeNotFoundException e) {
+    } catch (NodeNotFoundException e) {
       return null;
     } // end of try-catch
   }

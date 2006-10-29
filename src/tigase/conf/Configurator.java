@@ -161,6 +161,45 @@ public class Configurator extends AbstractComponentRegistrator
     } // end of try-catch
 	}
 
+	public Map<String, Object> getProperties(String nodeId) {
+		return repository.getProperties(nodeId);
+	}
+
+	public String[] getComponents() {
+		return repository.getSubnodes();
+	}
+
+	public void setValue(String node_key, String value) throws Exception {
+		int root_idx = node_key.indexOf('/');
+		String root = node_key.substring(0, root_idx);
+		int key_idx = node_key.lastIndexOf('/');
+		String key = node_key.substring(key_idx+1);
+		String subnode = null;
+		if (root_idx != key_idx) {
+			subnode = node_key.substring(root_idx+1, key_idx);
+		}
+		repository.set(root, subnode, key, value);
+		repository.sync();
+	}
+
+	private static String help() {
+		return "\n"
+			+ "Parameters:\n"
+      + " -h             this help message\n"
+			+ " -c file        configuration file\n"
+			+ " -key key       node/key for the value to set\n"
+			+ " -value value   value to set in configuration file\n"
+			+ " -set           set given value for given key\n"
+			+ " -print         print content of all configuration settings or of given node/key\n"
+			;
+	}
+
+	private static String config_file = null;
+	private static String key = null;
+	private static String value = null;
+	private static boolean set = false;
+	private static boolean print = false;
+
 	/**
 	 * Describe <code>main</code> method here.
 	 *
@@ -168,77 +207,124 @@ public class Configurator extends AbstractComponentRegistrator
 	 */
 	public static void main(final String[] args) throws Exception {
 
-		Logger log = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).getParent();
-		ConsoleHandler console = new ConsoleHandler();
-    console.setLevel(Level.WARNING);
-    log.addHandler(console);
-		log.setLevel(Level.WARNING);
+    if (args != null && args.length > 0) {
+      for (int i = 0; i < args.length; i++) {
+        if (args[i].equals("-h")) {
+          System.out.print(help());
+          System.exit(0);
+        } // end of if (args[i].equals("-h"))
+        if (args[i].equals("-c")) {
+					config_file = args[++i];
+        } // end of if (args[i].equals("-h"))
+        if (args[i].equals("-key")) {
+					key = args[++i];
+        } // end of if (args[i].equals("-h"))
+        if (args[i].equals("-value")) {
+					value = args[++i];
+        } // end of if (args[i].equals("-h"))
+        if (args[i].equals("-set")) {
+					set = true;
+        } // end of if (args[i].equals("-h"))
+        if (args[i].equals("-print")) {
+					print = true;
+        } // end of if (args[i].equals("-h"))
+      } // end of for (int i = 0; i < args.length; i++)
+		}
 
-		String testConfig = "tests/data/test_config.xml";
-		String compName1 = "test_1_Component";
-		String compName2 = "test_2_Component/node1/node2";
+		Configurator conf = new Configurator(config_file);
 
-		Map<String, Object> props = new TreeMap<String, Object>();
+		if (set) {
+			conf.setValue(key, value);
+		} // end of if (set)
 
-		props.put("", "muc");
-		props.put("component/.accept", true);
-		props.put("component/ports", new int[] {1, 22, 333, 4444});
-		props.put("component/treshold", 12.34);
+		if (print) {
+			String[] comps = conf.getComponents();
+			for (String comp: comps) {
+				Map<String, Object> prop = conf.getProperties(comp);
+				for (Map.Entry<String, Object> entry: prop.entrySet()) {
+					String entry_key = comp + "/" + entry.getKey();
+					if (key == null) {
+						System.out.println(entry_key + " = " + entry.getValue().toString());
+					} else {
+						if (entry_key.startsWith(key)) {
+							System.out.println(entry_key + " = " + entry.getValue().toString());
+						} // end of if (entry_key.startsWith(key))
+					} // end of if (key == null) else
+				} // end of for (Map.Entry entry: prop.entrySet())
+			} // end of for (String comp: comps)
+		} // end of if (print)
 
-		props.put("server/params/int_12345", 12345);
-		props.put("server/params/ints_12345", new int[] {1, 2, 3, 4, 5});
-		props.put("server/params/bool_true", true);
-		props.put("server/params/bool_false", false);
-		props.put("server/params/bools", new boolean[] {true, false});
-		props.put("server/params/string", "Just a string.");
-		props.put("server/params/strings",
-			new String[] {"str_1", "str_2", "str_3"});
-		props.put("server/params/double", 12.34);
-		props.put("server/params/doubles", new double[] {1.2, 2.3, 3.4, 4.5});
+// 		Logger log = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).getParent();
+// 		ConsoleHandler console = new ConsoleHandler();
+//     console.setLevel(Level.WARNING);
+//     log.addHandler(console);
+// 		log.setLevel(Level.WARNING);
 
-		props.put("int_12345", 12345);
-		props.put("ints_12345", new int[] {1, 2, 3, 4, 5});
-		props.put("bool_true", true);
-		props.put("bool_false", false);
-		props.put("bools", new boolean[] {true, false});
-		props.put("string", "Just a string.");
-		props.put("strings", new String[] {"str_1", "str_2", "str_3"});
-		props.put("double", 12.34);
-		props.put("doubles", new double[] {1.2, 2.3, 3.4, 4.5});
+// 		String testConfig = "tests/data/test_config.xml";
+// 		String compName1 = "test_1_Component";
+// 		String compName2 = "test_2_Component/node1/node2";
 
-		ConfigRepository testRep1 =
-			ConfigRepository.getConfigRepository(testConfig);
-		testRep1.putProperties(compName1, props);
-		// 		testRep1.putProperties(compName2, props);
-		testRep1.sync();
+// 		Map<String, Object> props = new TreeMap<String, Object>();
 
-		ConfigRepository testRep2 =
-			ConfigRepository.getConfigRepository(testConfig);
-		Map<String, ?> props_r = testRep2.getProperties(compName1);
+// 		props.put("", "muc");
+// 		props.put("component/.accept", true);
+// 		props.put("component/ports", new int[] {1, 22, 333, 4444});
+// 		props.put("component/treshold", 12.34);
 
-		pr_eq("", "muc", props_r);
-		pr_eq("component/.accept", true, props_r);
-		pr_eq("component/ports", new int[] {1, 22, 333, 4444}, props_r);
-		pr_eq("component/treshold", 12.34, props_r);
-		pr_eq("int_12345", 12345, props_r);
-		pr_eq("ints_12345", new int[] {1, 2, 3, 4, 5}, props_r);
-		pr_eq("bool_true", true, props_r);
-		pr_eq("bool_false", false, props_r);
-		pr_eq("bools", new boolean[] {true, false}, props_r);
-		pr_eq("string", "Just a string.", props_r);
-		pr_eq("strings", new String[] {"str_1", "str_2", "str_3"}, props_r);
-		pr_eq("double", 12.34, props_r);
-		pr_eq("doubles", new double[] {1.2, 2.3, 3.4, 4.5}, props_r);
-		pr_eq("server/params/int_12345", 12345, props_r);
-		pr_eq("server/params/ints_12345", new int[] {1, 2, 3, 4, 5}, props_r);
-		pr_eq("server/params/bool_true", true, props_r);
-		pr_eq("server/params/bool_false", false, props_r);
-		pr_eq("server/params/bools", new boolean[] {true, false}, props_r);
-		pr_eq("server/params/string", "Just a string.", props_r);
-		pr_eq("server/params/strings",
-			new String[] {"str_1", "str_2", "str_3"}, props_r);
-		pr_eq("server/params/double", 12.34, props_r);
-		pr_eq("server/params/doubles", new double[] {1.2, 2.3, 3.4, 4.5}, props_r);
+// 		props.put("server/params/int_12345", 12345);
+// 		props.put("server/params/ints_12345", new int[] {1, 2, 3, 4, 5});
+// 		props.put("server/params/bool_true", true);
+// 		props.put("server/params/bool_false", false);
+// 		props.put("server/params/bools", new boolean[] {true, false});
+// 		props.put("server/params/string", "Just a string.");
+// 		props.put("server/params/strings",
+// 			new String[] {"str_1", "str_2", "str_3"});
+// 		props.put("server/params/double", 12.34);
+// 		props.put("server/params/doubles", new double[] {1.2, 2.3, 3.4, 4.5});
+
+// 		props.put("int_12345", 12345);
+// 		props.put("ints_12345", new int[] {1, 2, 3, 4, 5});
+// 		props.put("bool_true", true);
+// 		props.put("bool_false", false);
+// 		props.put("bools", new boolean[] {true, false});
+// 		props.put("string", "Just a string.");
+// 		props.put("strings", new String[] {"str_1", "str_2", "str_3"});
+// 		props.put("double", 12.34);
+// 		props.put("doubles", new double[] {1.2, 2.3, 3.4, 4.5});
+
+// 		ConfigRepository testRep1 =
+// 			ConfigRepository.getConfigRepository(testConfig);
+// 		testRep1.putProperties(compName1, props);
+// 		// 		testRep1.putProperties(compName2, props);
+// 		testRep1.sync();
+
+// 		ConfigRepository testRep2 =
+// 			ConfigRepository.getConfigRepository(testConfig);
+// 		Map<String, ?> props_r = testRep2.getProperties(compName1);
+
+// 		pr_eq("", "muc", props_r);
+// 		pr_eq("component/.accept", true, props_r);
+// 		pr_eq("component/ports", new int[] {1, 22, 333, 4444}, props_r);
+// 		pr_eq("component/treshold", 12.34, props_r);
+// 		pr_eq("int_12345", 12345, props_r);
+// 		pr_eq("ints_12345", new int[] {1, 2, 3, 4, 5}, props_r);
+// 		pr_eq("bool_true", true, props_r);
+// 		pr_eq("bool_false", false, props_r);
+// 		pr_eq("bools", new boolean[] {true, false}, props_r);
+// 		pr_eq("string", "Just a string.", props_r);
+// 		pr_eq("strings", new String[] {"str_1", "str_2", "str_3"}, props_r);
+// 		pr_eq("double", 12.34, props_r);
+// 		pr_eq("doubles", new double[] {1.2, 2.3, 3.4, 4.5}, props_r);
+// 		pr_eq("server/params/int_12345", 12345, props_r);
+// 		pr_eq("server/params/ints_12345", new int[] {1, 2, 3, 4, 5}, props_r);
+// 		pr_eq("server/params/bool_true", true, props_r);
+// 		pr_eq("server/params/bool_false", false, props_r);
+// 		pr_eq("server/params/bools", new boolean[] {true, false}, props_r);
+// 		pr_eq("server/params/string", "Just a string.", props_r);
+// 		pr_eq("server/params/strings",
+// 			new String[] {"str_1", "str_2", "str_3"}, props_r);
+// 		pr_eq("server/params/double", 12.34, props_r);
+// 		pr_eq("server/params/doubles", new double[] {1.2, 2.3, 3.4, 4.5}, props_r);
 	}
 
 	private static void pr_eq(String key, String val, Map<String, ?> props) {

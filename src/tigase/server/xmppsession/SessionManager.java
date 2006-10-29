@@ -371,6 +371,7 @@ public class SessionManager extends AbstractMessageReceiver
 	}
 
 	private void addComponent(String comp_id) {
+		System.out.println("Loading component: " + comp_id + " ...");
 		XMPPProcessorIfc proc = ProcessorFactory.getProcessor(comp_id);
 		boolean loaded = false;
 		if (proc != null) {

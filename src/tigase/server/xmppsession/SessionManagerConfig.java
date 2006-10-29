@@ -39,13 +39,13 @@ public class SessionManagerConfig {
 	public static final String USER_REPO_CLASS_PROP_KEY = "user-repo-class";
 	public static final String USER_REPO_CLASS_PROP_VAL =
 		"tigase.db.xml.XMLRepository";
-	public static final String USER_REPO_URL_PROP_KEY = "user-repository-url";
+	public static final String USER_REPO_URL_PROP_KEY = "user-repo-url";
 	public static final String USER_REPO_URL_PROP_VAL = "user-repository.xml";
 
 	public static final String AUTH_REPO_CLASS_PROP_KEY = "auth-repo-class";
 	public static final String AUTH_REPO_CLASS_PROP_VAL =
 		"tigase.db.xml.XMLRepository";
-	public static final String AUTH_REPO_URL_PROP_KEY = "auth-repository-url";
+	public static final String AUTH_REPO_URL_PROP_KEY = "auth-repo-url";
 	public static final String AUTH_REPO_URL_PROP_VAL = "user-repository.xml";
 
 	public static final String COMPONENTS_PROP_KEY = "components";
