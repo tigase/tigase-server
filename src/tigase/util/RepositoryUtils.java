@@ -68,7 +68,9 @@ public class RepositoryUtils {
 
 	public static void printNode(String user, UserRepository repo,
 		String prefix, String node)	throws Exception {
-		System.out.println(prefix + "node: " + node);
+		if (node != null) {
+			System.out.println(prefix + "node: " + node);
+		} // end of if (node != null)
 		String[] keys = repo.getKeys(user, node);
 		if (keys != null) {
 			for (String key: keys) {
@@ -95,21 +97,19 @@ public class RepositoryUtils {
 
 	public static void printRepoContent(UserRepository repo)
 		throws Exception {
-		List<String> users = repo.getUsers();
-		if (users != null) {
-			for (String user: users) {
-				System.out.println(user);
-				printNode(user, repo, "  ", null);
-// 				String[] nodes = repo.getSubnodes(user, null);
-// 				if (nodes != null) {
-// 					for (String node: nodes) {
-// 						printNode(user, repo, "  ", node);
-// 					} // end of for (String node: nodes)
-// 				} // end of if (ndoes != null)
-			} // end of for (String user: users)
+		if (user != null) {
+			printNode(user, repo, "  ", null);
 		} else {
-			System.out.println("There are no user accounts in repository.");
-		} // end of else
+			List<String> users = repo.getUsers();
+			if (users != null) {
+				for (String usr: users) {
+					System.out.println(usr);
+					printNode(usr, repo, "  ", null);
+				} // end of for (String user: users)
+			} else {
+				System.out.println("There are no user accounts in repository.");
+			} // end of else
+		}
 	}
 
 	private static String user1 = "user111@hostname";
