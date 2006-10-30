@@ -529,10 +529,10 @@ public class Roster {
 		SubscriptionType current_subscription =	getBuddySubscription(session, jid);
 		log.finest("current_subscription="+current_subscription
 			+" for jid="+jid);
-		if (current_subscription == null) {
-			current_subscription = SubscriptionType.none;
-			addBuddy(session, jid);
-		} // end of if (current_subscription == null)
+// 		if (current_subscription == null) {
+// 			current_subscription = SubscriptionType.none;
+// 			addBuddy(session, jid);
+// 		} // end of if (current_subscription == null)
 		final SubscriptionType new_subscription =
 			getStateTransition(current_subscription, presence);
 		log.finest("new_subscription="+new_subscription

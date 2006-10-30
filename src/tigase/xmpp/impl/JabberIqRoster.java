@@ -79,16 +79,35 @@ public class JabberIqRoster extends XMPPProcessor
 
 		Element request = packet.getElement();
 
-    String buddy = request.getAttribute("/iq/query/item", "jid");
+    String buddy =
+			JID.getNodeID(request.getAttribute("/iq/query/item", "jid"));
     Element item =  request.findChild("/iq/query/item");
     String subscription = item.getAttribute("subscription");
     if (subscription != null && subscription.equals("remove")) {
+			SubscriptionType sub = Roster.getBuddySubscription(session, buddy);
+			if (sub != null && sub != SubscriptionType.none) {
+				Element it = new Element("item");
+				it.setAttribute("jid", buddy);
+				it.setAttribute("subscription", "remove");
+				Roster.updateBuddyChange(session, results, it);
+				Element pres = new Element("presence");
+				pres.setAttribute("to", buddy);
+				pres.setAttribute("from", session.getUserId());
+				pres.setAttribute("type", "unsubscribe");
+				results.offer(new Packet(pres));
+				pres = new Element("presence");
+				pres.setAttribute("to", buddy);
+				pres.setAttribute("from", session.getUserId());
+				pres.setAttribute("type", "unsubscribed");
+				results.offer(new Packet(pres));
+				pres = new Element("presence");
+				pres.setAttribute("to", buddy);
+				pres.setAttribute("from", session.getJID());
+				pres.setAttribute("type", "unavailable");
+				results.offer(new Packet(pres));
+			} // end of if (sub != null && sub != SubscriptionType.none)
 			Roster.removeBuddy(session, buddy);
       results.offer(packet.okResult((String)null, 0));
-			Element it = new Element("item");
-			it.setAttribute("jid", buddy);
-			it.setAttribute("subscription", "remove");
-			Roster.updateBuddyChange(session, results, it);
     } else {
       String name = request.getAttribute("/iq/query/item", "name");
       if (name == null) {

@@ -274,6 +274,12 @@ public class Presence extends XMPPProcessor
 					sendPresence(StanzaType.subscribed, packet.getElemFrom(),
 						session.getJID(), results, null);
 				} else {
+					SubscriptionType curr_sub =
+						Roster.getBuddySubscription(session, packet.getElemFrom());
+					if (curr_sub == null) {
+						curr_sub = SubscriptionType.none;
+						Roster.addBuddy(session, packet.getElemFrom());
+					} // end of if (curr_sub == null)
 					subscr_changed = Roster.updateBuddySubscription(session, pres_type,
 						packet.getElemFrom());
 					if (subscr_changed) {
@@ -292,8 +298,13 @@ public class Presence extends XMPPProcessor
 						Roster.getBuddyItem(session, packet.getElemFrom()));
 				}
 				break;
-			case in_subscribed:
-			case in_unsubscribed:
+			case in_subscribed: {
+				SubscriptionType curr_sub =
+					Roster.getBuddySubscription(session, packet.getElemFrom());
+				if (curr_sub == null) {
+					curr_sub = SubscriptionType.none;
+					Roster.addBuddy(session, packet.getElemFrom());
+				} // end of if (curr_sub == null)
 				subscr_changed = Roster.updateBuddySubscription(session, pres_type,
 					packet.getElemFrom());
 				if (subscr_changed) {
@@ -301,6 +312,21 @@ public class Presence extends XMPPProcessor
 					Roster.updateBuddyChange(session, results,
 						Roster.getBuddyItem(session, packet.getElemFrom()));
 				}
+			}
+				break;
+			case in_unsubscribed: {
+				SubscriptionType curr_sub =
+					Roster.getBuddySubscription(session, packet.getElemFrom());
+				if (curr_sub != null) {
+					subscr_changed = Roster.updateBuddySubscription(session, pres_type,
+						packet.getElemFrom());
+					if (subscr_changed) {
+						updatePresenceChange(packet.getElement(), session, results);
+						Roster.updateBuddyChange(session, results,
+							Roster.getBuddyItem(session, packet.getElemFrom()));
+					}
+				}
+			}
 				break;
 			case in_probe:
 				SubscriptionType buddy_subscr =
