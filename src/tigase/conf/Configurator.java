@@ -40,6 +40,7 @@ import tigase.server.AbstractComponentRegistrator;
 import tigase.server.Packet;
 import tigase.server.ServerComponent;
 import tigase.server.XMPPService;
+import tigase.xml.db.Types.DataType;
 
 /**
  * Class Configurator
@@ -169,7 +170,14 @@ public class Configurator extends AbstractComponentRegistrator
 		return repository.getSubnodes();
 	}
 
-	public void setValue(String node_key, String value) throws Exception {
+	private boolean parseBoolean(String val) {
+		return val.equalsIgnoreCase("true")
+			|| val.equalsIgnoreCase("yes")
+			|| val.equalsIgnoreCase("on")
+			;
+	}
+
+	public void setValue(String node_key, String value, boolean add) throws Exception {
 		int root_idx = node_key.indexOf('/');
 		String root = node_key.substring(0, root_idx);
 		int key_idx = node_key.lastIndexOf('/');
@@ -178,8 +186,75 @@ public class Configurator extends AbstractComponentRegistrator
 		if (root_idx != key_idx) {
 			subnode = node_key.substring(root_idx+1, key_idx);
 		}
-		repository.set(root, subnode, key, value);
-		repository.sync();
+		Object old_val = repository.get(root, subnode, key, null);
+		if (old_val != null) {
+			Object new_val = null;
+			DataType type = DataType.valueof(old_val.getClass().getSimpleName());
+			switch (type) {
+			case INTEGER:
+				new_val = Integer.decode(value);
+				break;
+			case INTEGER_ARR:
+				if (add) {
+					int old_len = ((int[])old_val).length;
+					new_val = Arrays.copyOf((int[])old_val, old_len + 1);
+					((int[])new_val)[old_len] = Integer.decode(value);
+				} else {
+					new_val = new int[] {Integer.decode(value)};
+				} // end of if (add) else
+				break;
+			case STRING:
+				new_val = value;
+				break;
+			case STRING_ARR:
+				if (add) {
+					int old_len = ((String[])old_val).length;
+					new_val = Arrays.copyOf((String[])old_val, old_len + 1);
+					((String[])new_val)[old_len] = value;
+				} else {
+					new_val = new String[] {value};
+				} // end of if (add) else
+				break;
+			case DOUBLE:
+				new_val = new Double(Double.parseDouble(value));
+				break;
+			case DOUBLE_ARR:
+				if (add) {
+					int old_len = ((double[])old_val).length;
+					new_val = Arrays.copyOf((double[])old_val, old_len + 1);
+					((double[])new_val)[old_len] = Double.parseDouble(value);
+				} else {
+					new_val = new double[] {new Double(Double.parseDouble(value))};
+				}
+				break;
+			case BOOLEAN:
+				new_val = new Boolean(parseBoolean(value));
+				break;
+			case BOOLEAN_ARR:
+				if (add) {
+					int old_len = ((boolean[])old_val).length;
+					new_val = Arrays.copyOf((boolean[])old_val, old_len + 1);
+					((boolean[])new_val)[old_len] = parseBoolean(value);
+				} else {
+					new_val = new boolean[] {new Boolean(parseBoolean(value))};
+				}
+				break;
+			default:
+				break;
+			} // end of switch (type)
+			repository.set(root, subnode, key, new_val);
+			repository.sync();
+		} else {
+			if (force) {
+				repository.set(root, subnode, key, value);
+				repository.sync();
+				System.out.println("Forced to set new key=value: " + key + "=" + value);
+			} else {
+				System.out.println("Error, given key does not exist in config yet.");
+				System.out.println("You can only modify existing values, you can add new.");
+				System.out.println("Use '-f' switch to force creation of the new property.");
+			} // end of if (force) else
+		} // end of else
 	}
 
 	private static String help() {
@@ -190,15 +265,79 @@ public class Configurator extends AbstractComponentRegistrator
 			+ " -key key       node/key for the value to set\n"
 			+ " -value value   value to set in configuration file\n"
 			+ " -set           set given value for given key\n"
+			+ " -add           add given value to the values list for given key\n"
 			+ " -print         print content of all configuration settings or of given node/key\n"
+			+ " -f             force creation of the new property - dangerous option...\n"
+			+ "Samples:\n"
+			+ " Setting admin account - overwriting any previous value(s)\n"
+			+ " $ ./scripts/config.sh -c tigase-config.xml -print -set session_1/admins -value admin1@localhost\n"
+			+ " Adding next admin account leaving old value(s)\n"
+			+ " $ ./scripts/config.sh -c tigase-config.xml -print -add session_1/admins -value admin2@localhost\n"
+			+ "\n"
+			+ "Note: adding -print option is useful always, even with -set or -add\n"
+			+ "      option as it prints set value afterwards.\n"
 			;
+	}
+
+	private static void print(String key, Object value) {
+		String val_str = null;
+		DataType type = DataType.valueof(value.getClass().getSimpleName());
+		try {
+			switch (type) {
+			case STRING_ARR:
+				for (String s: (String[])value) {
+					if (val_str == null) {
+						val_str = s;
+					} else {
+						val_str = val_str + ", " + s;
+					} // end of else
+				} // end of for (String s: (String[])value)
+				break;
+			case INTEGER_ARR:
+				for (Integer s: (int[])value) {
+					if (val_str == null) {
+						val_str = s.toString();
+					} else {
+						val_str = val_str + ", " + s.toString();
+					} // end of else
+				} // end of for (String s: (String[])value)
+				break;
+			case DOUBLE_ARR:
+				for (Double s: (double[])value) {
+					if (val_str == null) {
+						val_str = s.toString();
+					} else {
+						val_str = val_str + ", " + s.toString();
+					} // end of else
+				} // end of for (String s: (String[])value)
+				break;
+			case BOOLEAN_ARR:
+				for (Boolean s: (boolean[])value) {
+					if (val_str == null) {
+						val_str = s.toString();
+					} else {
+						val_str = val_str + ", " + s.toString();
+					} // end of else
+				} // end of for (String s: (String[])value)
+				break;
+			default:
+				val_str = value.toString();
+				break;
+			} // end of switch (type)
+		} catch (ClassCastException e) {
+			System.out.println("ERROR! Problem with type casting for property: " + key);
+			System.exit(1);
+		} // end of try-catch
+		System.out.println(key + " = " + val_str);
 	}
 
 	private static String config_file = null;
 	private static String key = null;
 	private static String value = null;
 	private static boolean set = false;
+	private static boolean add = false;
 	private static boolean print = false;
+	private static boolean force = false;
 
 	/**
 	 * Describe <code>main</code> method here.
@@ -225,16 +364,22 @@ public class Configurator extends AbstractComponentRegistrator
         if (args[i].equals("-set")) {
 					set = true;
         } // end of if (args[i].equals("-h"))
+        if (args[i].equals("-add")) {
+					add = true;
+        } // end of if (args[i].equals("-h"))
         if (args[i].equals("-print")) {
 					print = true;
+        } // end of if (args[i].equals("-h"))
+        if (args[i].equals("-f")) {
+					force = true;
         } // end of if (args[i].equals("-h"))
       } // end of for (int i = 0; i < args.length; i++)
 		}
 
 		Configurator conf = new Configurator(config_file);
 
-		if (set) {
-			conf.setValue(key, value);
+		if (set || add) {
+			conf.setValue(key, value, add);
 		} // end of if (set)
 
 		if (print) {
@@ -244,139 +389,15 @@ public class Configurator extends AbstractComponentRegistrator
 				for (Map.Entry<String, Object> entry: prop.entrySet()) {
 					String entry_key = comp + "/" + entry.getKey();
 					if (key == null) {
-						System.out.println(entry_key + " = " + entry.getValue().toString());
+						print(entry_key, entry.getValue());
 					} else {
 						if (entry_key.startsWith(key)) {
-							System.out.println(entry_key + " = " + entry.getValue().toString());
+							print(entry_key, entry.getValue());
 						} // end of if (entry_key.startsWith(key))
 					} // end of if (key == null) else
 				} // end of for (Map.Entry entry: prop.entrySet())
 			} // end of for (String comp: comps)
 		} // end of if (print)
-
-// 		Logger log = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).getParent();
-// 		ConsoleHandler console = new ConsoleHandler();
-//     console.setLevel(Level.WARNING);
-//     log.addHandler(console);
-// 		log.setLevel(Level.WARNING);
-
-// 		String testConfig = "tests/data/test_config.xml";
-// 		String compName1 = "test_1_Component";
-// 		String compName2 = "test_2_Component/node1/node2";
-
-// 		Map<String, Object> props = new TreeMap<String, Object>();
-
-// 		props.put("", "muc");
-// 		props.put("component/.accept", true);
-// 		props.put("component/ports", new int[] {1, 22, 333, 4444});
-// 		props.put("component/treshold", 12.34);
-
-// 		props.put("server/params/int_12345", 12345);
-// 		props.put("server/params/ints_12345", new int[] {1, 2, 3, 4, 5});
-// 		props.put("server/params/bool_true", true);
-// 		props.put("server/params/bool_false", false);
-// 		props.put("server/params/bools", new boolean[] {true, false});
-// 		props.put("server/params/string", "Just a string.");
-// 		props.put("server/params/strings",
-// 			new String[] {"str_1", "str_2", "str_3"});
-// 		props.put("server/params/double", 12.34);
-// 		props.put("server/params/doubles", new double[] {1.2, 2.3, 3.4, 4.5});
-
-// 		props.put("int_12345", 12345);
-// 		props.put("ints_12345", new int[] {1, 2, 3, 4, 5});
-// 		props.put("bool_true", true);
-// 		props.put("bool_false", false);
-// 		props.put("bools", new boolean[] {true, false});
-// 		props.put("string", "Just a string.");
-// 		props.put("strings", new String[] {"str_1", "str_2", "str_3"});
-// 		props.put("double", 12.34);
-// 		props.put("doubles", new double[] {1.2, 2.3, 3.4, 4.5});
-
-// 		ConfigRepository testRep1 =
-// 			ConfigRepository.getConfigRepository(testConfig);
-// 		testRep1.putProperties(compName1, props);
-// 		// 		testRep1.putProperties(compName2, props);
-// 		testRep1.sync();
-
-// 		ConfigRepository testRep2 =
-// 			ConfigRepository.getConfigRepository(testConfig);
-// 		Map<String, ?> props_r = testRep2.getProperties(compName1);
-
-// 		pr_eq("", "muc", props_r);
-// 		pr_eq("component/.accept", true, props_r);
-// 		pr_eq("component/ports", new int[] {1, 22, 333, 4444}, props_r);
-// 		pr_eq("component/treshold", 12.34, props_r);
-// 		pr_eq("int_12345", 12345, props_r);
-// 		pr_eq("ints_12345", new int[] {1, 2, 3, 4, 5}, props_r);
-// 		pr_eq("bool_true", true, props_r);
-// 		pr_eq("bool_false", false, props_r);
-// 		pr_eq("bools", new boolean[] {true, false}, props_r);
-// 		pr_eq("string", "Just a string.", props_r);
-// 		pr_eq("strings", new String[] {"str_1", "str_2", "str_3"}, props_r);
-// 		pr_eq("double", 12.34, props_r);
-// 		pr_eq("doubles", new double[] {1.2, 2.3, 3.4, 4.5}, props_r);
-// 		pr_eq("server/params/int_12345", 12345, props_r);
-// 		pr_eq("server/params/ints_12345", new int[] {1, 2, 3, 4, 5}, props_r);
-// 		pr_eq("server/params/bool_true", true, props_r);
-// 		pr_eq("server/params/bool_false", false, props_r);
-// 		pr_eq("server/params/bools", new boolean[] {true, false}, props_r);
-// 		pr_eq("server/params/string", "Just a string.", props_r);
-// 		pr_eq("server/params/strings",
-// 			new String[] {"str_1", "str_2", "str_3"}, props_r);
-// 		pr_eq("server/params/double", 12.34, props_r);
-// 		pr_eq("server/params/doubles", new double[] {1.2, 2.3, 3.4, 4.5}, props_r);
-	}
-
-	private static void pr_eq(String key, String val, Map<String, ?> props) {
-		String val_t = (String)props.get(key);
-		System.out.println("'" + key + "'=" + val_t + ", " +
-			(val.equals(val_t) ? "OK" : "ERR, should be: " + val));
-	}
-
-	private static void pr_eq(String key, int val, Map<String, ?> props) {
-		int val_t = (Integer)props.get(key);
-		System.out.println("'" + key + "'=" + val_t + ", " +
-			(val == val_t ? "OK" : "ERR, should be: " + val));
-	}
-
-	private static void pr_eq(String key, double val, Map<String, ?> props) {
-		double val_t = (Double)props.get(key);
-		System.out.println("'" + key + "'=" + val_t + ", " +
-			(val == val_t ? "OK" : "ERR, should be: " + val));
-	}
-
-	private static void pr_eq(String key, boolean val, Map<String, ?> props) {
-		boolean val_t = (Boolean)props.get(key);
-		System.out.println("'" + key + "'=" + val_t + ", " +
-			(val == val_t ? "OK" : "ERR, should be: " + val));
-	}
-
-	private static void pr_eq(String key, String[] val, Map<String, ?> props) {
-		String[] val_t = (String[])props.get(key);
-		System.out.println("'" + key + "'=" + Arrays.toString(val_t) + ", " +
-			(Arrays.equals(val, val_t) ? "OK" : "ERR, should be: " +
-				Arrays.toString(val)));
-	}
-
-	private static void pr_eq(String key, int[] val, Map<String, ?> props) {
-		int[] val_t = (int[])props.get(key);
-		System.out.println("'" + key + "'=" + Arrays.toString(val_t) + ", " +
-			(Arrays.equals(val, val_t) ? "OK" : "ERR, should be: " +
-				Arrays.toString(val)));
-	}
-
-	private static void pr_eq(String key, double[] val, Map<String, ?> props) {
-		double[] val_t = (double[])props.get(key);
-		System.out.println("'" + key + "'=" + Arrays.toString(val_t) + ", " +
-			(Arrays.equals(val, val_t) ? "OK" : "ERR, should be: " +
-				Arrays.toString(val)));
-	}
-
-	private static void pr_eq(String key, boolean[] val, Map<String, ?> props) {
-		boolean[] val_t = (boolean[])props.get(key);
-		System.out.println("'" + key + "'=" + Arrays.toString(val_t) + ", " +
-			(Arrays.equals(val, val_t) ? "OK" : "ERR, should be: " +
-				Arrays.toString(val)));
 	}
 
 	public void processCommand(final Packet packet, final Queue<Packet> results)
