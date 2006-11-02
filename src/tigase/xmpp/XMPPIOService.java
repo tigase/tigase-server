@@ -101,6 +101,9 @@ public class XMPPIOService extends IOService {
 			log.finest("Sending data: " + response);
 			writeData(response);
 			assert debug(response, "--SENT:");
+			if (response.endsWith("</stream:stream>")) {
+				stop();
+			} // end of if (response.endsWith())
 		} catch (IOException e) {
 			log.warning("Error sending stream open data: " + e);
 			try {

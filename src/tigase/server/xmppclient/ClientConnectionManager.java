@@ -25,6 +25,8 @@
 package tigase.server.xmppclient;
 
 import java.io.IOException;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.Arrays;
 import java.util.List;
 import java.util.LinkedList;
@@ -81,6 +83,7 @@ public class ClientConnectionManager extends ConnectionManager {
 
 	private RoutingsContainer routings = null;
 	private String defHostName = null;
+	private Set<String> hostnames = new TreeSet<String>();
 
 	private Map<String, XMPPProcessorIfc> processors =
 		new ConcurrentSkipListMap<String, XMPPProcessorIfc>();
@@ -208,11 +211,13 @@ public class ClientConnectionManager extends ConnectionManager {
 					(String)entry.getValue());
 			} // end of if (entry.getKey().startsWith(ROUTINGS_PROP_KEY + "/"))
 		} // end of for ()
-		String[] hostnames = (String[])props.get(HOSTNAMES_PROP_KEY);
+		String[] hnames = (String[])props.get(HOSTNAMES_PROP_KEY);
 		clearRoutings();
+		hostnames.clear();
 		defHostName = null;
-		for (String host: hostnames) {
+		for (String host: hnames) {
 			addRouting(getName() + "@" + host);
+			hostnames.add(host);
 			if (defHostName == null) {
 				defHostName = host;
 			} // end of if (defHostName == null)
@@ -257,6 +262,31 @@ public class ClientConnectionManager extends ConnectionManager {
 		log.finer("Stream opened: " + attribs.toString());
 		final String hostname = attribs.get("to");
 		final String id = UUID.randomUUID().toString();
+		if (hostname == null) {
+			return "<stream:stream version='1.0' xml:lang='en'"
+				+ " from='" + defHostName + "'"
+				+ " id='" + id + "'"
+				+ " xmlns='jabber:client'"
+				+ " xmlns:stream='http://etherx.jabber.org/streams'>"
+				+ "<stream:error>"
+				+ "<improper-addressing xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>"
+				+ "</stream:error>"
+				+ "</stream:stream>"
+				;
+		} // end of if (hostname == null)
+
+		if (!hostnames.contains(hostname)) {
+			return "<stream:stream version='1.0' xml:lang='en'"
+				+ " from='" + defHostName + "'"
+				+ " id='" + id + "'"
+				+ " xmlns='jabber:client'"
+				+ " xmlns:stream='http://etherx.jabber.org/streams'>"
+				+ "<stream:error>"
+				+ "<host-unknown xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>"
+				+ "</stream:error>"
+				+ "</stream:stream>"
+				;
+		} // end of if (!hostnames.contains(hostname))
 
 		serv.getSessionData().put(serv.SESSION_ID_KEY, id);
 		Packet streamOpen = Command.STREAM_OPENED.getPacket(
