@@ -276,7 +276,7 @@ public class RepositoryUtils {
 		parseParams(args);
 
 		UserRepository src_repo =
-			RepositoryFactory.getInstance(src_class, src_uri);
+			RepositoryFactory.getUserRepository(src_class, src_uri);
 
 		if (print_repo) {
 			System.out.println("Printing repository:");
@@ -322,7 +322,7 @@ public class RepositoryUtils {
 
 		if (copy_repos) {
 			UserRepository dst_repo =
-				RepositoryFactory.getInstance(dst_class, dst_uri);
+				RepositoryFactory.getUserRepository(dst_class, dst_uri);
 			copyRepositories(src_repo, dst_repo);
 		} // end of if (copy_repos)
 

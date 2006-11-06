@@ -20,30 +20,39 @@
  * Last modified by $Author$
  * $Date$
  */
-package tigase.auth;
+package tigase.db;
 
-import javax.security.auth.callback.Callback;
-import tigase.xmpp.XMPPSession;
+import java.util.Map;
+import java.security.NoSuchAlgorithmException;
 
 /**
- * Describe class SessionCallback here.
+ * Describe interface UserAuthRepository here.
  *
  *
- * Created: Sat Sep  9 14:38:48 2006
+ * Created: Sun Nov  5 21:15:46 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class SessionCallback implements Callback {
+public interface UserAuthRepository {
 
-	private XMPPSession session = null;
+	void initRepository(String resource_uri) throws DBInitException;
 
-	public void setSession(final XMPPSession session) {
-		this.session = session;
-	}
+	boolean plainAuth(String user, String password)
+		throws UserNotFoundException, TigaseDBException;
 
-	public XMPPSession getSession() {
-		return session;
-	}
+	boolean digestAuth(String user, String digest, String id, String alg)
+		throws UserNotFoundException, TigaseDBException, NoSuchAlgorithmException;
 
-} // SessionCallback
+	boolean otherAuth(Map<String, Object> authProps)
+		throws UserNotFoundException, TigaseDBException, NoSuchAlgorithmException;
+
+  void addUser(String user, String password)
+		throws UserExistsException, TigaseDBException;
+
+  void updatePassword(String user, String password)
+		throws UserExistsException, TigaseDBException;
+
+  void removeUser(String user) throws UserNotFoundException, TigaseDBException;
+
+} // UserAuthRepository

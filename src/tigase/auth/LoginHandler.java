@@ -22,33 +22,23 @@
  */
 package tigase.auth;
 
-import java.util.Map;
-import javax.security.auth.login.AppConfigurationEntry;
-import javax.security.auth.login.Configuration;
-import javax.security.sasl.Sasl;
-import javax.security.sasl.SaslException;
-import javax.security.sasl.SaslServer;
 import tigase.xmpp.XMPPResourceConnection;
 
 /**
- * Describe class TigaseSasl here.
+ * Describe interface LoginHandler here.
  *
  *
- * Created: Sun Feb 19 10:22:54 2006
+ * Created: Sat Feb 18 13:27:58 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class TigaseSasl {
+public interface LoginHandler {
 
-	public static SaslServer createSaslServer(final String mechanism,
-		final String protocol, final String serverName, final Map<String,?> props,
-		final XMPPResourceConnection connection) throws SaslException {
-// 		AppConfigurationEntry[] saslConfig =
-// 			Configuration.getConfiguration().getAppConfigurationEntry("auth-sasl");
-// 		SaslCallbackHandler sch =
-// 			new SaslCallbackHandler(saslConfig[0].getOptions(), connection);
-		return Sasl.createSaslServer(mechanism, protocol, serverName, props, null);
-	}
+	public static final String COMMIT_HANDLER_KEY = "LoginHandlerKey";
 
-} // TigaseSasl
+	void handleLogin(String userName, XMPPResourceConnection conn);
+
+	void handleLogout(String userName, XMPPResourceConnection conn);
+
+} // LoginHandler

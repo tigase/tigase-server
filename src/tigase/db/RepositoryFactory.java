@@ -36,21 +36,44 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class RepositoryFactory {
 
-	private static ConcurrentMap<String, UserRepository> instances =
+	private static ConcurrentMap<String, UserRepository> user_repos =
 		new ConcurrentHashMap<String, UserRepository>();
+	private static ConcurrentMap<String, UserAuthRepository> auth_repos =
+		new ConcurrentHashMap<String, UserAuthRepository>();
 
-	public static UserRepository getInstance(String class_name, String resource)
-		throws ClassNotFoundException, InstantiationException,
-					 IllegalAccessException, DBInitException {
-		UserRepository rep = instances.get(resource);
+	public static UserRepository getUserRepository(String class_name,
+		String resource) throws ClassNotFoundException, InstantiationException,
+														IllegalAccessException, DBInitException {
+		UserRepository rep = user_repos.get(resource);
 		if (rep == null) {
 			rep = (UserRepository)Class.forName(class_name).newInstance();
 			rep.initRepository(resource);
-			instances.put(resource, rep);
+			user_repos.put(resource, rep);
 		} // end of if (rep == null)
 		return rep;
 	}
 
+	public static UserAuthRepository getAuthRepository(String class_name,
+		String resource) throws ClassNotFoundException, InstantiationException,
+														IllegalAccessException, DBInitException {
+		UserAuthRepository rep = auth_repos.get(resource);
+		if (rep == null) {
+			rep = (UserAuthRepository)Class.forName(class_name).newInstance();
+			rep.initRepository(resource);
+			auth_repos.put(resource, rep);
+		} // end of if (rep == null)
+		return rep;
+	}
 
+	private static UserAuthRepository tryCastUserRepository(String resource) {
+		// There might be a repository class implementing both interfaces
+		// it is always better access repositories through single instance
+		// due to possible caching problems
+		UserRepository rep = user_repos.get(resource);
+		if (rep != null) {
+			try {	return (UserAuthRepository)rep;	} catch (Exception e) {	}
+		}
+		return null;
+	}
 
 } // RepositoryFactory

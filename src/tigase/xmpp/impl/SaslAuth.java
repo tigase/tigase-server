@@ -32,7 +32,9 @@ import java.util.logging.Logger;
 import javax.security.sasl.Sasl;
 import javax.security.sasl.SaslException;
 import javax.security.sasl.SaslServer;
-import tigase.auth.TigaseSasl;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.UnsupportedCallbackException;
 import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.xml.Element;
@@ -41,6 +43,7 @@ import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.db.NonAuthUserRepository;
+import tigase.auth.ResourceConnectionCallback;
 
 /**
  * Describe class SaslAuth here.
@@ -66,8 +69,8 @@ public class SaslAuth extends XMPPProcessor
   protected static final Element[] FEATURES = {
 		new Element("mechanisms",
 			new Element[] {
-				new Element("mechanism", "CRAM-MD5"),
-				new Element("mechanism", "DIGEST-MD5"),
+				//				new Element("mechanism", "CRAM-MD5"),
+				//				new Element("mechanism", "DIGEST-MD5"),
 				new Element("mechanism", "PLAIN")},
 			new String[] {"xmlns"}, new String[] {XMLNS})
   };
@@ -119,15 +122,24 @@ public class SaslAuth extends XMPPProcessor
     case auth:
       String mechanism = request.getAttribute("/auth", "mechanism");
       try {
+				String challenge_data = null;
         Map<String, String> props = new TreeMap<String, String>();
         props.put(Sasl.QOP, "auth");
-        SaslServer ss = TigaseSasl.createSaslServer(mechanism, "xmpp",
-          session.getDomain(), props, session);
+        SaslServer ss = Sasl.createSaslServer(mechanism, "xmpp",
+          session.getDomain(), props, new SaslCallbackHandler(session));
+				byte[] data = null;
+				if (request.getChildCData("/auth") != null) {
+					data = Base64.decode(request.getChildCData("/auth"));
+					log.finest("SASL auth: " + new String(data));
+				} else {
+					data = new byte[0];
+				} // end of else
         // evaluateResponse doesn't like null parameter
-        byte[] challenge = ss.evaluateResponse(new byte[0]);
+        byte[] challenge = ss.evaluateResponse(data);
         log.finest("challenge: " + new String(challenge));
-				results.offer(packet.swapFromTo(createReply(ElementType.challenge,
-							Base64.encode(challenge))));
+				challenge_data = (challenge != null && challenge.length > 0
+					? Base64.encode(challenge) : null);
+				reply(ss, packet, challenge_data, session, results);
         session.putSessionData("SaslServer", ss);
 				session.putSessionData("is-sasl", true);
       } catch (SaslException e) {
@@ -154,16 +166,7 @@ public class SaslAuth extends XMPPProcessor
 						challenge_data = (challenge != null && challenge.length > 0
 							? Base64.encode(challenge) : null);
 					}
-					if (ss.isComplete()) {
-						results.offer(packet.swapFromTo(createReply(ElementType.success,
-									challenge_data)));
-						if (!session.isAuthorized()) {
-							log.severe("!!!!!! Session not authorized after sasl success.");
-						} // end of if (!session.isAuthorized())
-					} else {
-						results.offer(packet.swapFromTo(createReply(ElementType.challenge,
-									challenge_data)));
-					} // end of if (ss.isComplete()) else
+					reply(ss, packet, challenge_data, session, results);
         } catch (SaslException e) {
           log.log(Level.FINEST, "SaslException", e);
 					failure = true;
@@ -185,6 +188,20 @@ public class SaslAuth extends XMPPProcessor
 		} // end of if (failure)
   }
 
+	private void reply(SaslServer ss, Packet packet, String challenge_data,
+		XMPPResourceConnection session, Queue<Packet> results) {
+		if (ss.isComplete()) {
+			results.offer(packet.swapFromTo(createReply(ElementType.success,
+						challenge_data)));
+			if (!session.isAuthorized()) {
+				log.severe("!!!!!! Session not authorized after sasl success.");
+			} // end of if (!session.isAuthorized())
+		} else {
+			results.offer(packet.swapFromTo(createReply(ElementType.challenge,
+						challenge_data)));
+		} // end of if (ss.isComplete()) else
+	}
+
 	private Element createReply(final ElementType type, final String cdata) {
 		Element reply = new Element(type.toString());
 		reply.setXMLNS(XMLNS);
@@ -192,6 +209,32 @@ public class SaslAuth extends XMPPProcessor
 			reply.setCData(cdata);
 		} // end of if (cdata != null)
 		return reply;
+	}
+
+	private class SaslCallbackHandler implements CallbackHandler {
+
+		private XMPPResourceConnection session = null;
+
+		private SaslCallbackHandler(XMPPResourceConnection session) {
+			this.session = session;
+		}
+
+		public void handle(Callback[] callbacks)
+			throws UnsupportedCallbackException {
+			for (int i = 0; i < callbacks.length; i++) {
+				log.finest("Callback: " + callbacks[i].getClass().getSimpleName());
+				if (callbacks[i] instanceof ResourceConnectionCallback) {
+					log.finest("ResourceConnectionCallback: "
+						+ session.getConnectionId());
+					ResourceConnectionCallback rcc =
+						(ResourceConnectionCallback)callbacks[i];
+					rcc.setResourceConnection(session);
+				} else {
+					throw new UnsupportedCallbackException(callbacks[i],
+						"Unrecognized Callback");
+				}
+			}
+		}
 	}
 
 } // SaslAuth

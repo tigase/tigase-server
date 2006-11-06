@@ -24,48 +24,51 @@
 
 package tigase.server.xmppsession;
 
+import java.net.UnknownHostException;
+import java.security.Security;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.TreeMap;
-import java.util.logging.Logger;
-import java.util.logging.Level;
 import java.util.concurrent.ConcurrentSkipListMap;
-import java.net.UnknownHostException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.security.auth.login.AppConfigurationEntry.LoginModuleControlFlag;
 import javax.security.auth.login.AppConfigurationEntry;
 import javax.security.auth.login.Configuration;
-import tigase.auth.CommitHandler;
-import tigase.auth.TigaseConfiguration;
+import tigase.auth.LoginHandler;
+import tigase.auth.TigaseSaslProvider;
+//import tigase.auth.TigaseConfiguration;
 import tigase.conf.Configurable;
-import tigase.db.UserRepository;
-import tigase.db.NonAuthUserRepository;
-import tigase.db.UserNotFoundException;
 import tigase.db.DataOverwriteException;
-import tigase.db.TigaseDBException;
+import tigase.db.NonAuthUserRepository;
 import tigase.db.RepositoryFactory;
+import tigase.db.TigaseDBException;
+import tigase.db.UserNotFoundException;
+import tigase.db.UserRepository;
+import tigase.db.UserAuthRepository;
 import tigase.server.AbstractMessageReceiver;
 import tigase.server.MessageReceiver;
 import tigase.server.Packet;
 import tigase.server.XMPPService;
-import tigase.util.JID;
+import tigase.stats.StatRecord;
 import tigase.util.ElementUtils;
+import tigase.util.JID;
 import tigase.xml.Element;
+import tigase.xmpp.Authorization;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.ProcessorFactory;
 import tigase.xmpp.StanzaType;
-import tigase.xmpp.XMPPProcessorIfc;
-import tigase.xmpp.XMPPPreprocessorIfc;
 import tigase.xmpp.XMPPPostprocessorIfc;
-import tigase.xmpp.XMPPStopListenerIfc;
+import tigase.xmpp.XMPPPreprocessorIfc;
+import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.XMPPSession;
-import tigase.xmpp.Authorization;
-import tigase.stats.StatRecord;
+import tigase.xmpp.XMPPStopListenerIfc;
 
 import static tigase.server.xmppsession.SessionManagerConfig.*;
 
@@ -79,7 +82,7 @@ import static tigase.server.xmppsession.SessionManagerConfig.*;
  * @version $Rev$
  */
 public class SessionManager extends AbstractMessageReceiver
-	implements Configurable, XMPPService, CommitHandler {
+	implements Configurable, XMPPService, LoginHandler {
 
   /**
    * Variable <code>log</code> is a class logger.
@@ -88,7 +91,7 @@ public class SessionManager extends AbstractMessageReceiver
     Logger.getLogger("tigase.server.xmppsession.SessionManager");
 
 	private UserRepository user_repository = null;
-	private UserRepository auth_repository = null;
+	private UserAuthRepository auth_repository = null;
 	private NonAuthUserRepository naUserRepository = null;
 
 	private String[] DISCO_FEATURES = {};
@@ -265,7 +268,7 @@ public class SessionManager extends AbstractMessageReceiver
 				log.finer("Adding resource connection for: " + pc.getFrom());
 				final String hostname = pc.getElemCData("/STREAM_OPENED/hostname");
 				connection = new XMPPResourceConnection(pc.getFrom(),
-					user_repository);
+					user_repository, auth_repository, this);
 				if (hostname != null) {
 					log.finest("Setting hostname " + hostname
 						+ " for connection: " + connection.getConnectionId());
@@ -408,10 +411,13 @@ public class SessionManager extends AbstractMessageReceiver
 
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
+
+		Security.insertProviderAt(new TigaseSaslProvider(), 6);
+
 		try {
 			String cls_name = (String)props.get(USER_REPO_CLASS_PROP_KEY);
 			String res_uri = (String)props.get(USER_REPO_URL_PROP_KEY);
-			user_repository = RepositoryFactory.getInstance(cls_name, res_uri);
+			user_repository = RepositoryFactory.getUserRepository(cls_name, res_uri);
 			log.config("Initialized " + cls_name + " as user repository: " + res_uri);
 		} catch (Exception e) {
 			log.severe("Can't initialize user repository: " + e);
@@ -421,7 +427,7 @@ public class SessionManager extends AbstractMessageReceiver
 		try {
 			String cls_name = (String)props.get(AUTH_REPO_CLASS_PROP_KEY);
 			String res_uri = (String)props.get(AUTH_REPO_URL_PROP_KEY);
-			auth_repository =	RepositoryFactory.getInstance(cls_name, res_uri);
+			auth_repository =	RepositoryFactory.getAuthRepository(cls_name, res_uri);
 			log.config("Initialized " + cls_name + " as auth repository: " + res_uri);
 		} catch (Exception e) {
 			log.severe("Can't initialize auth repository: " + e);
@@ -443,22 +449,22 @@ public class SessionManager extends AbstractMessageReceiver
 
 		admins = (String[])props.get(ADMINS_PROP_KEY);
 
-		String[] auth_ids = (String[])props.get(SECURITY_PROP_KEY + "/" +
-			AUTHENTICATION_IDS_PROP_KEY);
-		TigaseConfiguration authConfig = TigaseConfiguration.getConfiguration();
-		for (String id: auth_ids) {
-			String class_name = (String)props.get(SECURITY_PROP_KEY + "/" + id + "/class");
-			String flag = (String)props.get(SECURITY_PROP_KEY + "/" + id + "/flag");
-			Map<String, Object> options = new HashMap<String, Object>();
-			options.put(CommitHandler.COMMIT_HANDLER_KEY, this);
-			options.put(UserRepository.class.getSimpleName(), auth_repository);
-			AppConfigurationEntry ace =
-				new AppConfigurationEntry(class_name, parseFlag(flag), options);
-			authConfig.putAppConfigurationEntry(id,
-				new AppConfigurationEntry[] {ace});
-			log.config("Added security module: " + class_name
-				+ " for auth id: " + id + ", flag: " + flag);
-		} // end of for ()
+// 		String[] auth_ids = (String[])props.get(SECURITY_PROP_KEY + "/" +
+// 			AUTHENTICATION_IDS_PROP_KEY);
+// 		TigaseConfiguration authConfig = TigaseConfiguration.getConfiguration();
+// 		for (String id: auth_ids) {
+// 			String class_name = (String)props.get(SECURITY_PROP_KEY + "/" + id + "/class");
+// 			String flag = (String)props.get(SECURITY_PROP_KEY + "/" + id + "/flag");
+// 			Map<String, Object> options = new HashMap<String, Object>();
+// 			options.put(CommitHandler.COMMIT_HANDLER_KEY, this);
+// 			options.put(UserRepository.class.getSimpleName(), auth_repository);
+// 			AppConfigurationEntry ace =
+// 				new AppConfigurationEntry(class_name, parseFlag(flag), options);
+// 			authConfig.putAppConfigurationEntry(id,
+// 				new AppConfigurationEntry[] {ace});
+// 			log.config("Added security module: " + class_name
+// 				+ " for auth id: " + id + ", flag: " + flag);
+// 		} // end of for ()
 	}
 
 	private LoginModuleControlFlag parseFlag(final String flag) {
@@ -473,7 +479,7 @@ public class SessionManager extends AbstractMessageReceiver
 		return null;
 	}
 
-	public void handleLoginCommit(final String userName,
+	public void handleLogin(final String userName,
 		final XMPPResourceConnection conn) {
 		String userId = JID.getNodeID(userName, conn.getDomain());
 		XMPPSession session = sessionsByNodeId.get(userId);

@@ -61,28 +61,28 @@ public class SessionManagerConfig {
 	public static final String ADMINS_PROP_KEY = "admins";
 	public static String[] ADMINS_PROP_VAL =	{"admin@localhost", "admin@hostname"};
 
-	public static final String SECURITY_PROP_KEY = "security";
+// 	public static final String SECURITY_PROP_KEY = "security";
 
-	public static final String AUTHENTICATION_IDS_PROP_KEY = "authentication-ids";
-	public static final String[] AUTHENTICATION_IDS_PROP_VAL =
-	{"auth-plain", "auth-digest", "auth-sasl"};
+// 	public static final String AUTHENTICATION_IDS_PROP_KEY = "authentication-ids";
+// 	public static final String[] AUTHENTICATION_IDS_PROP_VAL =
+// 	{"auth-plain", "auth-digest", "auth-sasl"};
 
-	public static final String AUTH_PLAIN_CLASS_PROP_KEY = "auth-plain/class";
-	public static final String AUTH_PLAIN_CLASS_PROP_VAL =
-		"tigase.auth.PlainAuth";
-	public static final String AUTH_PLAIN_FLAG_PROP_KEY = "auth-plain/flag";
-	public static final String AUTH_PLAIN_FLAG_PROP_VAL =	"sufficient";
+// 	public static final String AUTH_PLAIN_CLASS_PROP_KEY = "auth-plain/class";
+// 	public static final String AUTH_PLAIN_CLASS_PROP_VAL =
+// 		"tigase.auth.PlainAuth";
+// 	public static final String AUTH_PLAIN_FLAG_PROP_KEY = "auth-plain/flag";
+// 	public static final String AUTH_PLAIN_FLAG_PROP_VAL =	"sufficient";
 
-	public static final String AUTH_DIGEST_CLASS_PROP_KEY = "auth-digest/class";
-	public static final String AUTH_DIGEST_CLASS_PROP_VAL =
-		"tigase.auth.DigestAuth";
-	public static final String AUTH_DIGEST_FLAG_PROP_KEY = "auth-digest/flag";
-	public static final String AUTH_DIGEST_FLAG_PROP_VAL =	"sufficient";
+// 	public static final String AUTH_DIGEST_CLASS_PROP_KEY = "auth-digest/class";
+// 	public static final String AUTH_DIGEST_CLASS_PROP_VAL =
+// 		"tigase.auth.DigestAuth";
+// 	public static final String AUTH_DIGEST_FLAG_PROP_KEY = "auth-digest/flag";
+// 	public static final String AUTH_DIGEST_FLAG_PROP_VAL =	"sufficient";
 
-	public static final String AUTH_SASL_CLASS_PROP_KEY = "auth-sasl/class";
-	public static final String AUTH_SASL_CLASS_PROP_VAL =	"None";
-	public static final String AUTH_SASL_FLAG_PROP_KEY = "auth-sasl/flag";
-	public static final String AUTH_SASL_FLAG_PROP_VAL =	"sufficient";
+// 	public static final String AUTH_SASL_CLASS_PROP_KEY = "auth-sasl/class";
+// 	public static final String AUTH_SASL_CLASS_PROP_VAL =	"None";
+// 	public static final String AUTH_SASL_FLAG_PROP_KEY = "auth-sasl/flag";
+// 	public static final String AUTH_SASL_FLAG_PROP_VAL =	"sufficient";
 
 	public static void getDefaults(Map<String, Object> props) {
 	  props.put(USER_REPO_CLASS_PROP_KEY, USER_REPO_CLASS_PROP_VAL);
@@ -99,20 +99,20 @@ public class SessionManagerConfig {
 		} // end of for (int i = 0; i < ADMINS_PROP_VAL.length; i++)
 		props.put(HOSTNAMES_PROP_KEY, HOSTNAMES_PROP_VAL);
 		props.put(ADMINS_PROP_KEY, ADMINS_PROP_VAL);
-		props.put(SECURITY_PROP_KEY + "/" + AUTHENTICATION_IDS_PROP_KEY,
-			AUTHENTICATION_IDS_PROP_VAL);
-		props.put(SECURITY_PROP_KEY + "/" + AUTH_PLAIN_CLASS_PROP_KEY,
-			AUTH_PLAIN_CLASS_PROP_VAL);
-		props.put(SECURITY_PROP_KEY + "/" + AUTH_PLAIN_FLAG_PROP_KEY,
-			AUTH_PLAIN_FLAG_PROP_VAL);
-		props.put(SECURITY_PROP_KEY + "/" + AUTH_DIGEST_CLASS_PROP_KEY,
-			AUTH_DIGEST_CLASS_PROP_VAL);
-		props.put(SECURITY_PROP_KEY + "/" + AUTH_DIGEST_FLAG_PROP_KEY,
-			AUTH_DIGEST_FLAG_PROP_VAL);
-		props.put(SECURITY_PROP_KEY + "/" + AUTH_SASL_CLASS_PROP_KEY,
-			AUTH_SASL_CLASS_PROP_VAL);
-		props.put(SECURITY_PROP_KEY + "/" + AUTH_SASL_FLAG_PROP_KEY,
-			AUTH_SASL_FLAG_PROP_VAL);
+// 		props.put(SECURITY_PROP_KEY + "/" + AUTHENTICATION_IDS_PROP_KEY,
+// 			AUTHENTICATION_IDS_PROP_VAL);
+// 		props.put(SECURITY_PROP_KEY + "/" + AUTH_PLAIN_CLASS_PROP_KEY,
+// 			AUTH_PLAIN_CLASS_PROP_VAL);
+// 		props.put(SECURITY_PROP_KEY + "/" + AUTH_PLAIN_FLAG_PROP_KEY,
+// 			AUTH_PLAIN_FLAG_PROP_VAL);
+// 		props.put(SECURITY_PROP_KEY + "/" + AUTH_DIGEST_CLASS_PROP_KEY,
+// 			AUTH_DIGEST_CLASS_PROP_VAL);
+// 		props.put(SECURITY_PROP_KEY + "/" + AUTH_DIGEST_FLAG_PROP_KEY,
+// 			AUTH_DIGEST_FLAG_PROP_VAL);
+// 		props.put(SECURITY_PROP_KEY + "/" + AUTH_SASL_CLASS_PROP_KEY,
+// 			AUTH_SASL_CLASS_PROP_VAL);
+// 		props.put(SECURITY_PROP_KEY + "/" + AUTH_SASL_FLAG_PROP_KEY,
+// 			AUTH_SASL_FLAG_PROP_VAL);
 	}
 
 } // SessionManagerConfig

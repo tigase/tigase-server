@@ -26,8 +26,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.util.JID;
 import tigase.db.UserRepository;
-import tigase.db.TigaseDBException;
 import tigase.db.UserExistsException;
+import tigase.db.TigaseDBException;
 import tigase.db.UserNotFoundException;
 
 import static tigase.db.NonAuthUserRepository.*;

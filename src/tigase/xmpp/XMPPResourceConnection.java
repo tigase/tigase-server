@@ -29,8 +29,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.util.JID;
 import tigase.db.UserRepository;
-import javax.security.auth.login.LoginContext;
-import javax.security.auth.login.LoginException;
+import tigase.db.UserAuthRepository;
+import tigase.db.TigaseDBException;
+import tigase.db.UserNotFoundException;
+import tigase.auth.LoginHandler;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * Describe class XMPPResourceConnection here.
@@ -49,8 +52,11 @@ public class XMPPResourceConnection extends RepositoryAccess {
   private static final Logger log =
 		Logger.getLogger("tigase.xmpp.XMPPResourceConnection");
 
+	private LoginHandler loginHandler = null;
 	private XMPPSession parentSession = null;
-	private LoginContext loginContext = null;
+	private UserAuthRepository authRepo = null;
+
+	//private LoginContext loginContext = null;
 
 	private String sessionId = null;
   /**
@@ -87,9 +93,12 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	 * Creates a new <code>XMPPResourceConnection</code> instance.
 	 *
 	 */
-	public XMPPResourceConnection(String connectionId, UserRepository rep) {
+	public XMPPResourceConnection(String connectionId, UserRepository rep,
+		UserAuthRepository authRepo, LoginHandler loginHandler) {
 		super(rep);
 		this.connectionId = connectionId;
+		this.authRepo = authRepo;
+		this.loginHandler = loginHandler;
     sessionData = new HashMap<String, Object>();
 	}
 
@@ -329,22 +338,46 @@ public class XMPPResourceConnection extends RepositoryAccess {
    *
    * @return a <code>Authorization</code> value of result code.
    */
-  public final Authorization login() throws LoginException {
-
-		loginContext.login();
-		authState = Authorization.AUTHORIZED;
-    return authState;
+  public final Authorization loginPlain(String user, String password)
+		throws NotAuthorizedException {
+		try {
+			if (authRepo.plainAuth(JID.getNodeID(user, getDomain()), password)) {
+				authState = Authorization.AUTHORIZED;
+				loginHandler.handleLogin(user, this);
+			} // end of if (authRepo.loginPlain())auth.login();
+			return authState;
+    } catch (UserNotFoundException e) {
+      log.log(Level.WARNING, "Problem accessing reposiotry: ", e);
+      throw new NotAuthorizedException("Authorization failed", e);
+    } catch (TigaseDBException e) {
+			log.log(Level.SEVERE, "Repository access exception.", e);
+      throw new NotAuthorizedException("Authorization failed", e);
+		} // end of try-catch
   }
 
-	public final void logout() {
-		streamClosed();
+  public final Authorization loginDigest(String user, String digest,
+		String id, String alg)
+		throws NotAuthorizedException, NoSuchAlgorithmException {
 		try {
-			loginContext.logout();
-		} catch (LoginException e) {} // end of try-catch
-	}
+			if (authRepo.digestAuth(JID.getNodeID(user, getDomain()), digest,
+					id, alg)) {
+				authState = Authorization.AUTHORIZED;
+				loginHandler.handleLogin(user, this);
+			} // end of if (authRepo.loginPlain())auth.login();
+			return authState;
+    } catch (UserNotFoundException e) {
+      log.log(Level.WARNING, "Problem accessing reposiotry: ", e);
+      throw new NotAuthorizedException("Authorization failed", e);
+    } catch (TigaseDBException e) {
+			log.log(Level.SEVERE, "Repository access exception.", e);
+      throw new NotAuthorizedException("Authorization failed", e);
+		} // end of try-catch
+  }
 
-	public void setLoginContext(final LoginContext lc) {
-		loginContext = lc;
+	public final void logout()
+		throws NotAuthorizedException {
+		loginHandler.handleLogout(getUserName(), this);
+		streamClosed();
 	}
 
 	public Authorization unregister(final String name_param)

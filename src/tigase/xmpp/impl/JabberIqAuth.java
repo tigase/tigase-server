@@ -26,15 +26,15 @@ import java.io.IOException;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
-import javax.security.auth.callback.UnsupportedCallbackException;
-import javax.security.auth.login.LoginContext;
-import javax.security.sasl.AuthorizeCallback;
-import javax.security.sasl.RealmCallback;
-import tigase.auth.ResourceConnectionCallback;
+// import javax.security.auth.callback.Callback;
+// import javax.security.auth.callback.CallbackHandler;
+// import javax.security.auth.callback.NameCallback;
+// import javax.security.auth.callback.PasswordCallback;
+// import javax.security.auth.callback.UnsupportedCallbackException;
+// import javax.security.auth.login.LoginContext;
+// import javax.security.sasl.AuthorizeCallback;
+// import javax.security.sasl.RealmCallback;
+// import tigase.auth.ResourceConnectionCallback;
 import tigase.db.UserNotFoundException;
 import tigase.db.NonAuthUserRepository;
 import tigase.server.Command;
@@ -110,24 +110,25 @@ public class JabberIqAuth extends XMPPProcessor
 			String digest = request.getChildCData("/iq/query/digest");
 			String user_pass = null;
 			String auth_mod = null;
-			if (password != null) {
-				user_pass = password;
-				auth_mod = "auth-plain";
-			} // end of if (password != null)
-			if (digest != null) {
-				user_pass = digest;
-				auth_mod = "auth-digest";
-			} // end of if (digest != null)
-			CallbackHandler cbh =
-				new AuthCallbackHandler(user_name, user_pass, resource, session);
-			LoginContext lc = null;
 			try {
-				lc = new LoginContext(auth_mod, cbh);
-				session.setLoginContext(lc);
-				session.login();
-				session.setResource(resource);
-				results.offer(session.getAuthState().getResponseMessage(packet,
-					"Authentication successful.", false));
+				Authorization result = null;
+				if (password != null) {
+					user_pass = password;
+					result = session.loginPlain(user_name, user_pass);
+				} // end of if (password != null)
+				if (digest != null) {
+					user_pass = digest;
+					result = session.loginDigest(user_name, digest,
+						session.getSessionId(), "SHA");
+				} // end of if (digest != null)
+				if (result == Authorization.AUTHORIZED) {
+					session.setResource(resource);
+					results.offer(session.getAuthState().getResponseMessage(packet,
+							"Authentication successful.", false));
+				} else {
+					results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
+							"Authentication failed", false));
+				} // end of else
 			} catch (Exception e) {
 				log.info("Authentication failed: " + user_name);
 				log.log(Level.FINER, "Authentication failed: ", e);
@@ -146,54 +147,5 @@ public class JabberIqAuth extends XMPPProcessor
 		} // end of switch (type)
 
 	}
-
-  private class AuthCallbackHandler implements CallbackHandler {
-
-		private String name = null;
-		private String password = null;
-		private String resource = null;
-		private XMPPResourceConnection connection = null;
-
-		public AuthCallbackHandler(final String name, final String pass,
-			final String resource, final XMPPResourceConnection connection) {
-			// Some Jabber/XMPP clients send user name as full JID, others
-			// send just nick name. Let's resolve this here.
-			this.name = JID.getNodeNick(name);
-			if (this.name == null || this.name.equals("")) {
-				this.name = name;
-			} // end of if (name == null || name.equals(""))
-			this.password = pass;
-			this.resource = resource;
-			this.connection = connection;
-		}
-
-		public void handle(final Callback[] callbacks)
-      throws IOException, UnsupportedCallbackException {
-
-      for (int i = 0; i < callbacks.length; i++) {
-        log.finest("Callback: " + callbacks[i].getClass().getSimpleName());
-				if (callbacks[i] instanceof NameCallback) {
-          log.finest("NameCallback: " + name);
-					NameCallback nc = (NameCallback)callbacks[i];
-					nc.setName(name);
-        } else if (callbacks[i] instanceof PasswordCallback) {
-          log.finest("NameCallback: " + password);
-					PasswordCallback pc = (PasswordCallback)callbacks[i];
-					pc.setPassword(password.toCharArray());
-        } else if (callbacks[i] instanceof ResourceConnectionCallback) {
-          log.finest("ResourceConnectionCallback: "
-						+ connection.getConnectionId());
-					ResourceConnectionCallback rcc =
-						(ResourceConnectionCallback)callbacks[i];
-					rcc.setResourceConnection(connection);
-        } else {
-          throw new UnsupportedCallbackException(callbacks[i],
-						"Unrecognized Callback");
-        }
-      }
-
-    }
-
-  }
 
 } // JabberIqAuth

@@ -24,13 +24,21 @@ package tigase.db.xml;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
+import tigase.db.DBInitException;
+import tigase.db.TigaseDBException;
+import tigase.db.UserAuthRepository;
 import tigase.db.UserExistsException;
+import tigase.db.UserExistsException;
+import tigase.db.UserNotFoundException;
 import tigase.db.UserNotFoundException;
 import tigase.db.UserRepository;
 import tigase.xml.db.NodeExistsException;
 import tigase.xml.db.NodeNotFoundException;
 import tigase.xml.db.XMLDB;
+import tigase.util.Algorithms;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * Class <code>XMLRepository</code> is a <em>XML</em> implementation of
@@ -45,8 +53,9 @@ import tigase.xml.db.XMLDB;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class XMLRepository implements UserRepository {
+public class XMLRepository implements UserAuthRepository, UserRepository {
 
+	private static final String PASSWORD_KEY = "password";
 	private static final String USER_STR = "User: ";
   private static final String NOT_FOUND_STR =
     " has not been found in repository.";
@@ -82,11 +91,7 @@ public class XMLRepository implements UserRepository {
    * @exception UserExistsException if user with the same id already exists.
    */
   public final void addUser(final String user) throws UserExistsException {
-    try {
-      xmldb.addNode1(user);
-    } catch (NodeExistsException e) {
-      throw new UserExistsException(USER_STR+user+" already exists.", e);
-    } // end of try-catch
+		// Empty, see addUser(user, password) method
   }
 
   /**
@@ -463,5 +468,78 @@ public class XMLRepository implements UserRepository {
       throw new UserNotFoundException(USER_STR+user+NOT_FOUND_STR, e);
     } // end of try-catch
   }
+
+	// Implementation of tigase.db.UserAuthRepository
+
+	/**
+	 * Describe <code>plainAuth</code> method here.
+	 *
+	 * @param user a <code>String</code> value
+	 * @param password a <code>String</code> value
+	 * @return a <code>boolean</code> value
+	 * @exception UserNotFoundException if an error occurs
+	 * @exception TigaseDBException if an error occurs
+	 */
+	public boolean plainAuth(final String user, final String password)
+		throws UserNotFoundException, TigaseDBException {
+		String db_password = getData(user, PASSWORD_KEY);
+		return db_password.equals(password);
+	}
+
+	/**
+	 * Describe <code>digestAuth</code> method here.
+	 *
+	 * @param user a <code>String</code> value
+	 * @param digest a <code>String</code> value
+	 * @param id a <code>String</code> value
+	 * @return a <code>boolean</code> value
+	 * @exception UserNotFoundException if an error occurs
+	 * @exception TigaseDBException if an error occurs
+	 */
+	public boolean digestAuth(final String user, final String digest,
+		final String id, final String alg)
+		throws UserNotFoundException, TigaseDBException, NoSuchAlgorithmException {
+		final String db_password = getData(user, PASSWORD_KEY);
+		final String digest_db_pass =	Algorithms.digest(id, db_password, alg);
+		log.finest("Comparing passwords, given: " + digest
+			+ ", db: " + digest_db_pass);
+		return digest.equals(digest_db_pass);
+	}
+
+	/**
+	 * Describe <code>otherAuth</code> method here.
+	 *
+	 * @param map a <code>Map</code> value
+	 * @return a <code>boolean</code> value
+	 * @exception UserNotFoundException if an error occurs
+	 * @exception TigaseDBException if an error occurs
+	 */
+	public boolean otherAuth(final Map map)
+		throws UserNotFoundException, TigaseDBException {
+		return false;
+	}
+
+	public void updatePassword(final String user, final String password)
+		throws UserExistsException, TigaseDBException {
+		setData(user, PASSWORD_KEY, password);
+	}
+
+	/**
+	 * Describe <code>addUser</code> method here.
+	 *
+	 * @param user a <code>String</code> value
+	 * @param password a <code>String</code> value
+	 * @exception UserExistsException if an error occurs
+	 * @exception TigaseDBException if an error occurs
+	 */
+	public void addUser(final String user, final String password)
+		throws UserExistsException, TigaseDBException {
+    try {
+      xmldb.addNode1(user);
+    } catch (NodeExistsException e) {
+      throw new UserExistsException(USER_STR+user+" already exists.", e);
+    } // end of try-catch
+		setData(user, PASSWORD_KEY, password);
+	}
 
 } // XMLRepository
