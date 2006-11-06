@@ -44,11 +44,11 @@ public class TigaseSasl {
 	public static SaslServer createSaslServer(final String mechanism,
 		final String protocol, final String serverName, final Map<String,?> props,
 		final XMPPResourceConnection connection) throws SaslException {
-		AppConfigurationEntry[] saslConfig =
-			Configuration.getConfiguration().getAppConfigurationEntry("auth-sasl");
-		SaslCallbackHandler sch =
-			new SaslCallbackHandler(saslConfig[0].getOptions(), connection);
-		return Sasl.createSaslServer(mechanism, protocol, serverName, props, sch);
+// 		AppConfigurationEntry[] saslConfig =
+// 			Configuration.getConfiguration().getAppConfigurationEntry("auth-sasl");
+// 		SaslCallbackHandler sch =
+// 			new SaslCallbackHandler(saslConfig[0].getOptions(), connection);
+		return Sasl.createSaslServer(mechanism, protocol, serverName, props, null);
 	}
 
 } // TigaseSasl
