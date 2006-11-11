@@ -62,7 +62,13 @@ public class TigaseSaslServerFactory implements SaslServerFactory {
 		final String protocol, final String serverName,
 		final Map<? super String,?> props, final CallbackHandler callbackHandler)
 		throws SaslException {
-		return new SaslPLAIN(props, callbackHandler);
+		if (mechanism.equals("PLAIN")) {
+			return new SaslPLAIN(props, callbackHandler);
+		} // end of if (mechanism.equals("PLAIN"))
+// 		if (mechanism.equals("DIGEST-MD5")) {
+// 			return new SaslDigestMD5(props, callbackHandler);
+// 		} // end of if (mechanism.equals("PLAIN"))
+		throw new SaslException("Mechanism not supported yet.");
 	}
 
 	/**

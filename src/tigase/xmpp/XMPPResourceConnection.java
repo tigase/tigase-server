@@ -33,7 +33,7 @@ import tigase.db.UserAuthRepository;
 import tigase.db.TigaseDBException;
 import tigase.db.UserNotFoundException;
 import tigase.auth.LoginHandler;
-import java.security.NoSuchAlgorithmException;
+import tigase.db.AuthorizationException;
 
 /**
  * Describe class XMPPResourceConnection here.
@@ -54,7 +54,6 @@ public class XMPPResourceConnection extends RepositoryAccess {
 
 	private LoginHandler loginHandler = null;
 	private XMPPSession parentSession = null;
-	private UserAuthRepository authRepo = null;
 
 	//private LoginContext loginContext = null;
 
@@ -78,11 +77,6 @@ public class XMPPResourceConnection extends RepositoryAccess {
 
 	private int priority = 0;
 
-  /**
-   * Current authorization state - initialy session i <code>NOT_AUTHORIZED</code>.
-   * It becomes <code>AUTHORIZED</code>
-   */
-	private Authorization authState = Authorization.NOT_AUTHORIZED;
 	/**
 	 * Session temporary data. All data stored in this <code>Map</code> disapear
 	 * when session finishes.
@@ -95,9 +89,8 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	 */
 	public XMPPResourceConnection(String connectionId, UserRepository rep,
 		UserAuthRepository authRepo, LoginHandler loginHandler) {
-		super(rep);
+		super(rep, authRepo);
 		this.connectionId = connectionId;
-		this.authRepo = authRepo;
 		this.loginHandler = loginHandler;
     sessionData = new HashMap<String, Object>();
 	}
@@ -151,7 +144,6 @@ public class XMPPResourceConnection extends RepositoryAccess {
 			parentSession.streamClosed(this);
 		} // end of if (parentSession != null)
 		parentSession = null;
-		authState = Authorization.NOT_AUTHORIZED;
 		resource = null;
 		sessionId = null;
 	}
@@ -295,89 +287,11 @@ public class XMPPResourceConnection extends RepositoryAccess {
 		return this.connectionId;
 	}
 
-	/**
-	 * Gets the value of authState
-	 *
-	 * @return the value of authState
-	 */
-	public Authorization getAuthState() {
-		return this.authState;
-	}
-
-	/**
-	 * Sets the value of authState
-	 *
-	 * @param argAuthState Value to assign to this.authState
-	 */
-	private void setAuthState(final Authorization argAuthState) {
-		this.authState = argAuthState;
-	}
-
-  /**
-   * This method allows you test this session if it already has been authorized.
-   * If <code>true</code> is returned as method result it means session has
-   * already been authorized, if <code>false</code> however session is still not
-   * authorized.
-   *
-   * @return a <code>boolean</code> value which informs whether this session has
-   * been already authorized or not.
-   */
-  public final boolean isAuthorized() {
-    lastAccessed = System.currentTimeMillis();
-    return authState == Authorization.AUTHORIZED;
-  }
-
-  /**
-   * <code>authorize</code> method performs authorization with given
-   * password as plain text.
-   * If <code>AUTHORIZED</code> has been returned it means authorization
-   * process is successful and session has been activated, otherwise session
-   * hasn't been authorized and return code gives more detailed information
-   * of fail reason. Please refer to <code>Authorizaion</code> documentation for
-   * more details.
-   *
-   * @return a <code>Authorization</code> value of result code.
-   */
-  public final Authorization loginPlain(String user, String password)
-		throws NotAuthorizedException {
-		try {
-			if (authRepo.plainAuth(JID.getNodeID(user, getDomain()), password)) {
-				authState = Authorization.AUTHORIZED;
-				loginHandler.handleLogin(user, this);
-			} // end of if (authRepo.loginPlain())auth.login();
-			return authState;
-    } catch (UserNotFoundException e) {
-      log.log(Level.WARNING, "Problem accessing reposiotry: ", e);
-      throw new NotAuthorizedException("Authorization failed", e);
-    } catch (TigaseDBException e) {
-			log.log(Level.SEVERE, "Repository access exception.", e);
-      throw new NotAuthorizedException("Authorization failed", e);
-		} // end of try-catch
-  }
-
-  public final Authorization loginDigest(String user, String digest,
-		String id, String alg)
-		throws NotAuthorizedException, NoSuchAlgorithmException {
-		try {
-			if (authRepo.digestAuth(JID.getNodeID(user, getDomain()), digest,
-					id, alg)) {
-				authState = Authorization.AUTHORIZED;
-				loginHandler.handleLogin(user, this);
-			} // end of if (authRepo.loginPlain())auth.login();
-			return authState;
-    } catch (UserNotFoundException e) {
-      log.log(Level.WARNING, "Problem accessing reposiotry: ", e);
-      throw new NotAuthorizedException("Authorization failed", e);
-    } catch (TigaseDBException e) {
-			log.log(Level.SEVERE, "Repository access exception.", e);
-      throw new NotAuthorizedException("Authorization failed", e);
-		} // end of try-catch
-  }
-
 	public final void logout()
 		throws NotAuthorizedException {
 		loginHandler.handleLogout(getUserName(), this);
 		streamClosed();
+		super.logout();
 	}
 
 	public Authorization unregister(final String name_param)
@@ -394,6 +308,39 @@ public class XMPPResourceConnection extends RepositoryAccess {
 			logout();
 		} // end of if (res == Authorization.AUTHORIZED)
 		return auth_res;
+	}
+
+  public final Authorization loginPlain(String user, String password)
+		throws NotAuthorizedException {
+		Authorization result = super.loginPlain(user, password);
+		if (result == Authorization.AUTHORIZED) {
+			loginHandler.handleLogin(user, this);
+		} // end of if (result == Authorization.AUTHORIZED)
+		return result;
+	}
+
+  public final Authorization loginDigest(String user, String digest,
+		String id, String alg)
+		throws NotAuthorizedException, AuthorizationException {
+		Authorization result = super.loginDigest(user, digest, id, alg);
+		if (result == Authorization.AUTHORIZED) {
+			loginHandler.handleLogin(user, this);
+		} // end of if (result == Authorization.AUTHORIZED)
+		return result;
+	}
+
+  public final Authorization loginOther(Map<String, Object> props)
+		throws NotAuthorizedException, AuthorizationException {
+		Authorization result = super.loginOther(props);
+		if (result == Authorization.AUTHORIZED) {
+			String user = (String)props.get(UserAuthRepository.USER_ID_KEY);
+			String nick = JID.getNodeNick(user);
+			if (nick == null) {
+				nick = user;
+			} // end of if (nick == null)
+			loginHandler.handleLogin(nick, this);
+		} // end of if (result == Authorization.AUTHORIZED)
+		return result;
 	}
 
 } // XMPPResourceConnection

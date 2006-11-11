@@ -22,14 +22,15 @@
  */
 package tigase.auth;
 
+import java.util.Arrays;
 import java.util.Map;
+import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.NameCallback;
+import javax.security.auth.callback.PasswordCallback;
+import javax.security.sasl.AuthorizeCallback;
 import javax.security.sasl.SaslException;
 import javax.security.sasl.SaslServer;
-import javax.security.auth.callback.Callback;
-
-import tigase.xmpp.Authorization;
-import tigase.xmpp.XMPPResourceConnection;
 
 /**
  * Describe class SaslPLAIN here.
@@ -46,9 +47,6 @@ public class SaslPLAIN implements SaslServer {
 
 	private Map<? super String,?> props = null;
 	private CallbackHandler callbackHandler = null;
-	private String authoriz = null;
-	private String user_id = null;
-	private String passwd = null;
 
 	private boolean auth_ok = false;
 
@@ -93,30 +91,42 @@ public class SaslPLAIN implements SaslServer {
 		int auth_idx = 0;
 		while (byteArray[auth_idx] != 0 && auth_idx < byteArray.length)
 		{ ++auth_idx;	}
-		authoriz = new String(byteArray, 0, auth_idx);
+		String authoriz = new String(byteArray, 0, auth_idx);
 		int user_idx = ++auth_idx;
 		while (byteArray[user_idx] != 0 && user_idx < byteArray.length)
 		{ ++user_idx;	}
-		user_id = new String(byteArray, auth_idx, user_idx - auth_idx);
+		String user_id = new String(byteArray, auth_idx, user_idx - auth_idx);
 		++user_idx;
-		passwd = new String(byteArray, user_idx, byteArray.length - user_idx);
+		String passwd =
+			new String(byteArray, user_idx, byteArray.length - user_idx);
 
 		if (callbackHandler == null) {
 			throw new SaslException("Error: no CallbackHandler available.");
 		}
-		Callback[] callbacks = new Callback[1];
-		ResourceConnectionCallback rcc = new ResourceConnectionCallback();
-		callbacks[0] = rcc;
+		Callback[] callbacks = new Callback[3];
+		NameCallback nc = new NameCallback("User name", user_id);
+		PasswordCallback pc = new PasswordCallback("User password", false);
+		AuthorizeCallback ac = new AuthorizeCallback(user_id, authoriz);
+		callbacks[0] = nc;
+		callbacks[1] = pc;
+		callbacks[2] = ac;
 		try {
 			callbackHandler.handle(callbacks);
-			XMPPResourceConnection session = rcc.getResourceConnection();
-			Authorization auth = session.loginPlain(user_id, passwd);
-			if (auth == Authorization.AUTHORIZED) {
-				auth_ok = true;
-			}
-		} catch (Exception e) {	} // end of try-catch
+			if (ac.isAuthorized()) {
+				char[] real_password = pc.getPassword();
+				if (Arrays.equals(real_password, passwd.toCharArray())) {
+					auth_ok = true;
+				} else {
+					throw new SaslException("Password missmatch.");
+				}
+			} else {
+				throw new SaslException("Not authorized.");
+			} // end of else
+		} catch (Exception e) {
+			throw new SaslException("Authorization error.", e);
+		} // end of try-catch
 
-		return new byte[0];
+		return null;
 	}
 
 	/**
@@ -178,9 +188,6 @@ public class SaslPLAIN implements SaslServer {
 	public void dispose() throws SaslException {
 		props = null;
 		callbackHandler = null;
-		authoriz = null;
-		user_id = null;
-		passwd = null;
 	}
 
 } // SaslPLAIN

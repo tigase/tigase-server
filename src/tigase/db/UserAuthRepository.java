@@ -36,18 +36,33 @@ import java.security.NoSuchAlgorithmException;
  */
 public interface UserAuthRepository {
 
+	// Query params (and otherAuth)
+	public static final String PROTOCOL_KEY = "protocol";
+	public static final String PROTOCOL_VAL_SASL = "sasl";
+	public static final String PROTOCOL_VAL_NONSASL = "nonsasl";
+	public static final String RESULT_KEY = "result";
+
+	// otherAuth params
+	public static final String MACHANISM_KEY = "mechanism";
+	public static final String REALM_KEY = "realm";
+	public static final String SERVER_NAME_KEY = "server-name";
+	public static final String DATA_KEY = "data";
+	public static final String USER_ID_KEY = "user-id";
+
+	void queryAuth(Map<String, Object> authProps);
+
 	void initRepository(String resource_uri) throws DBInitException;
 
 	boolean plainAuth(String user, String password)
 		throws UserNotFoundException, TigaseDBException;
 
 	boolean digestAuth(String user, String digest, String id, String alg)
-		throws UserNotFoundException, TigaseDBException, NoSuchAlgorithmException;
+		throws UserNotFoundException, TigaseDBException, AuthorizationException;
 
 	boolean otherAuth(Map<String, Object> authProps)
-		throws UserNotFoundException, TigaseDBException, NoSuchAlgorithmException;
+		throws UserNotFoundException, TigaseDBException, AuthorizationException;
 
-  void addUser(String user, String password)
+	void addUser(String user, String password)
 		throws UserExistsException, TigaseDBException;
 
   void updatePassword(String user, String password)

@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 import tigase.db.DBInitException;
 import tigase.db.RepositoryFactory;
 import tigase.db.TigaseDBException;
@@ -79,6 +80,8 @@ public class JDBCRepository implements UserRepository {
 	private PreparedStatement insert_key_val_st = null;
 	private PreparedStatement remove_key_data_st = null;
 
+	private boolean autoCreateUser = true;
+
 	private long max_uid = 0;
 	private long max_nid = 0;
 
@@ -105,7 +108,11 @@ public class JDBCRepository implements UserRepository {
 				if (rs.next()) {
 					return rs.getLong(1);
 				} else {
-					throw new UserNotFoundException("User does not exist: " + user_id);
+					if (autoCreateUser) {
+						return addUserRepo(user_id);
+					} else {
+						throw new UserNotFoundException("User does not exist: " + user_id);
+					} // end of if (autoCreateUser) else
 				} // end of if (isnext) else
 			}
 		} finally {
@@ -322,6 +329,25 @@ public class JDBCRepository implements UserRepository {
 		}
 	}
 
+	private long addUserRepo(final String user_id) throws SQLException {
+		Statement stmt = null;
+		String query = null;
+		long uid = max_uid++;
+		try {
+			stmt = conn.createStatement();
+			// Add user into database.
+			query = "insert into " + users_tbl + " (uid, user_id) values ("
+				+ uid + ", '" + user_id + "');";
+			stmt.executeUpdate(query);
+			incrementMaxUID();
+			addNode(uid, -1, root_node);
+		} finally {
+			release(stmt, null);
+			stmt = null;
+		}
+		return uid;
+	}
+
 	/**
 	 * Describe <code>addUser</code> method here.
 	 *
@@ -330,23 +356,10 @@ public class JDBCRepository implements UserRepository {
 	 */
 	public void addUser(final String user_id)
 		throws UserExistsException, TigaseDBException {
-		Statement stmt = null;
-		String query = null;
 		try {
-			long uid = max_uid++;
-			stmt = conn.createStatement();
-			// Add user into database.
-			query = "insert into " + users_tbl + " (uid, user_id) values ("
-				+ uid + ", '" + user_id + "');";
-			stmt.executeUpdate(query);
-			incrementMaxUID();
-			addNode(uid, -1, root_node);
+			addUserRepo(user_id);
 		} catch (SQLException e) {
-			throw new UserExistsException("Error adding user to repository: "
-				+ query, e);
-		} finally {
-			release(stmt, null);
-			stmt = null;
+			throw new UserExistsException("Error adding user to repository: ", e);
 		}
 	}
 

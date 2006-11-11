@@ -22,10 +22,6 @@
  */
 package tigase.xmpp.impl;
 
-import java.io.IOException;
-import java.util.Queue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 // import javax.security.auth.callback.Callback;
 // import javax.security.auth.callback.CallbackHandler;
 // import javax.security.auth.callback.NameCallback;
@@ -35,8 +31,15 @@ import java.util.logging.Logger;
 // import javax.security.sasl.AuthorizeCallback;
 // import javax.security.sasl.RealmCallback;
 // import tigase.auth.ResourceConnectionCallback;
-import tigase.db.UserNotFoundException;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import tigase.db.NonAuthUserRepository;
+import tigase.db.UserAuthRepository;
+import tigase.db.UserNotFoundException;
 import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.util.JID;
@@ -98,10 +101,17 @@ public class JabberIqAuth extends XMPPProcessor
     StanzaType type = packet.getType();
 		switch (type) {
 		case get:
-			results.offer(packet.okResult(
-					"<username/><password/><digest/><resource/>",
-					//"<username/><password/><resource/>",
-					1));
+			Map<String, Object> query = new HashMap<String, Object>();
+			query.put(UserAuthRepository.PROTOCOL_KEY,
+				UserAuthRepository.PROTOCOL_VAL_NONSASL);
+			session.queryAuth(query);
+			String[] auth_mechs = (String[])query.get(UserAuthRepository.RESULT_KEY);
+			String response = "<username/>";
+			for (String mech: auth_mechs) {
+				response += "<" + mech + "/>";
+			} // end of for (String mech: auth_mechs)
+			response += "<resource/>";
+			results.offer(packet.okResult(response, 1));
 			break;
 		case set:
       String user_name = request.getChildCData("/iq/query/username");

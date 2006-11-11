@@ -24,11 +24,14 @@ package tigase.xmpp;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.Map;
 import tigase.util.JID;
 import tigase.db.UserRepository;
+import tigase.db.UserAuthRepository;
 import tigase.db.UserExistsException;
 import tigase.db.TigaseDBException;
 import tigase.db.UserNotFoundException;
+import tigase.db.AuthorizationException;
 
 import static tigase.db.NonAuthUserRepository.*;
 
@@ -58,13 +61,21 @@ public abstract class RepositoryAccess {
    * Handle to user repository - permanent data base for storing user data.
    */
   private UserRepository repo = null;
+	private UserAuthRepository authRepo = null;
+
+  /**
+   * Current authorization state - initialy session i <code>NOT_AUTHORIZED</code>.
+   * It becomes <code>AUTHORIZED</code>
+   */
+	private Authorization authState = Authorization.NOT_AUTHORIZED;
 
 	/**
 	 * Creates a new <code>RepositoryAccess</code> instance.
 	 *
 	 */
-	public RepositoryAccess(UserRepository rep) {
+	public RepositoryAccess(UserRepository rep, UserAuthRepository auth) {
 		repo = rep;
+		authRepo = auth;
 	}
 
 	public abstract String getUserId() throws NotAuthorizedException;
@@ -72,8 +83,6 @@ public abstract class RepositoryAccess {
 	public abstract String getUserName() throws NotAuthorizedException;
 
 	public abstract String getDomain();
-
-	public abstract boolean isAuthorized();
 
 	public Authorization unregister(final String name_param)
 		throws NotAuthorizedException {
@@ -88,8 +97,7 @@ public abstract class RepositoryAccess {
     } // end of if (user_mame == null || user_name.equals(""))
     if (getUserName().equals(user_name)) {
 			try {
-				repo.getData(JID.getNodeID(user_name, getDomain()), "password");
-        repo.removeUser(JID.getNodeID(user_name, getDomain()));
+        authRepo.removeUser(JID.getNodeID(user_name, getDomain()));
 				return Authorization.AUTHORIZED;
 			} catch (UserNotFoundException e) {
 				return Authorization.REGISTRATION_REQUIRED;
@@ -102,7 +110,7 @@ public abstract class RepositoryAccess {
     }
 	}
 
-	public Authorization register(final String name_param,
+	public final Authorization register(final String name_param,
 		final String pass_param, final String email_param)
 		throws NotAuthorizedException {
     // Some clients send plain user name and others send
@@ -122,7 +130,7 @@ public abstract class RepositoryAccess {
     }
 
     try {
-      repo.addUser(JID.getNodeID(user_name, getDomain()));
+      authRepo.addUser(JID.getNodeID(user_name, getDomain()), pass_param);
       setRegistration(user_name, pass_param, email_param);
       return Authorization.AUTHORIZED;
     } catch (UserExistsException e) {
@@ -153,8 +161,8 @@ public abstract class RepositoryAccess {
   private void setRegistration(final String name_param,
     final String pass_param, final String email_param) {
     try {
-      repo.setData(JID.getNodeID(name_param, getDomain()),
-        "password", pass_param);
+      authRepo.updatePassword(JID.getNodeID(name_param, getDomain()),
+				pass_param);
       if (email_param != null && !email_param.equals("")) {
         repo.setData(JID.getNodeID(name_param, getDomain()),
           "email", email_param);
@@ -165,6 +173,107 @@ public abstract class RepositoryAccess {
 			log.log(Level.SEVERE, "Repository access exception.", e);
 		} // end of try-catch
   }
+
+	/**
+	 * Gets the value of authState
+	 *
+	 * @return the value of authState
+	 */
+	public final Authorization getAuthState() {
+		return this.authState;
+	}
+
+// 	/**
+// 	 * Sets the value of authState
+// 	 *
+// 	 * @param argAuthState Value to assign to this.authState
+// 	 */
+// 	protected void setAuthState(final Authorization argAuthState) {
+// 		this.authState = argAuthState;
+// 	}
+
+  /**
+   * This method allows you test this session if it already has been authorized.
+   * If <code>true</code> is returned as method result it means session has
+   * already been authorized, if <code>false</code> however session is still not
+   * authorized.
+   *
+   * @return a <code>boolean</code> value which informs whether this session has
+   * been already authorized or not.
+   */
+  public final boolean isAuthorized() {
+    return authState == Authorization.AUTHORIZED;
+  }
+
+  /**
+   * <code>authorize</code> method performs authorization with given
+   * password as plain text.
+   * If <code>AUTHORIZED</code> has been returned it means authorization
+   * process is successful and session has been activated, otherwise session
+   * hasn't been authorized and return code gives more detailed information
+   * of fail reason. Please refer to <code>Authorizaion</code> documentation for
+   * more details.
+   *
+   * @return a <code>Authorization</code> value of result code.
+   */
+  public Authorization loginPlain(String user, String password)
+		throws NotAuthorizedException {
+		try {
+			if (authRepo.plainAuth(JID.getNodeID(user, getDomain()), password)) {
+				authState = Authorization.AUTHORIZED;
+			} // end of if (authRepo.loginPlain())auth.login();
+			return authState;
+    } catch (UserNotFoundException e) {
+      log.log(Level.WARNING, "Problem accessing reposiotry: ", e);
+      throw new NotAuthorizedException("Authorization failed", e);
+    } catch (TigaseDBException e) {
+			log.log(Level.SEVERE, "Repository access exception.", e);
+      throw new NotAuthorizedException("Authorization failed", e);
+		} // end of try-catch
+  }
+
+  public Authorization loginOther(Map<String, Object> props)
+		throws NotAuthorizedException, AuthorizationException {
+		try {
+			if (authRepo.otherAuth(props)) {
+				authState = Authorization.AUTHORIZED;
+			} // end of if (authRepo.loginPlain())auth.login();
+			return authState;
+    } catch (UserNotFoundException e) {
+      log.log(Level.WARNING, "Problem accessing reposiotry: ", e);
+      throw new NotAuthorizedException("Authorization failed", e);
+    } catch (TigaseDBException e) {
+			log.log(Level.SEVERE, "Repository access exception.", e);
+      throw new NotAuthorizedException("Authorization failed", e);
+		} // end of try-catch
+  }
+
+  public Authorization loginDigest(String user, String digest,
+		String id, String alg)
+		throws NotAuthorizedException, AuthorizationException {
+		try {
+			if (authRepo.digestAuth(JID.getNodeID(user, getDomain()), digest,
+					id, alg)) {
+				authState = Authorization.AUTHORIZED;
+			} // end of if (authRepo.loginPlain())auth.login();
+			return authState;
+    } catch (UserNotFoundException e) {
+      log.log(Level.WARNING, "Problem accessing reposiotry: ", e);
+      throw new NotAuthorizedException("Authorization failed", e);
+    } catch (TigaseDBException e) {
+			log.log(Level.SEVERE, "Repository access exception.", e);
+      throw new NotAuthorizedException("Authorization failed", e);
+		} // end of try-catch
+  }
+
+	public void queryAuth(Map<String, Object> authProps) {
+		authRepo.queryAuth(authProps);
+	}
+
+	public void logout()
+		throws NotAuthorizedException {
+		authState = Authorization.NOT_AUTHORIZED;
+	}
 
 	/**
    * This method allows to retrieve list of values associated with one key.
