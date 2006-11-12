@@ -311,7 +311,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	}
 
   public final Authorization loginPlain(String user, String password)
-		throws NotAuthorizedException {
+		throws NotAuthorizedException, AuthorizationException {
 		Authorization result = super.loginPlain(user, password);
 		if (result == Authorization.AUTHORIZED) {
 			loginHandler.handleLogin(user, this);

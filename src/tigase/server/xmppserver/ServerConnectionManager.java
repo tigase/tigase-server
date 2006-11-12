@@ -248,7 +248,7 @@ public class ServerConnectionManager extends ConnectionManager {
 			String uuid = UUID.randomUUID().toString();
 			String key = null;
 			try {
-				key = Algorithms.digest(remote_id, uuid, "SHA");
+				key = Algorithms.hexDigest(remote_id, uuid, "SHA");
 			} catch (NoSuchAlgorithmException e) {
 				key = uuid;
 			} // end of try-catch

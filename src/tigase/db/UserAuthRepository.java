@@ -54,7 +54,7 @@ public interface UserAuthRepository {
 	void initRepository(String resource_uri) throws DBInitException;
 
 	boolean plainAuth(String user, String password)
-		throws UserNotFoundException, TigaseDBException;
+		throws UserNotFoundException, TigaseDBException, AuthorizationException;
 
 	boolean digestAuth(String user, String digest, String id, String alg)
 		throws UserNotFoundException, TigaseDBException, AuthorizationException;

@@ -217,7 +217,7 @@ public abstract class RepositoryAccess {
    * @return a <code>Authorization</code> value of result code.
    */
   public Authorization loginPlain(String user, String password)
-		throws NotAuthorizedException {
+		throws NotAuthorizedException, AuthorizationException {
 		try {
 			if (authRepo.plainAuth(JID.getNodeID(user, getDomain()), password)) {
 				authState = Authorization.AUTHORIZED;

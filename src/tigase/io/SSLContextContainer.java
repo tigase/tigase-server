@@ -82,7 +82,6 @@ public class SSLContextContainer {
 				keys.load(new	FileInputStream(k_store),	keys_password);
 				kmf = KeyManagerFactory.getInstance("SunX509");
 				kmf.init(keys, keys_password);
-				//				kmf.init(keys, new char[0]);
 			} // end of if (k_store != null && k_passwd != null)
 
 			if (t_store != null && t_passwd != null) {

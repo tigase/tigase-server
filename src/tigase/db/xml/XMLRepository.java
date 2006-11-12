@@ -22,37 +22,23 @@
  */
 package tigase.db.xml;
 
-import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Logger;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
-import javax.security.auth.callback.UnsupportedCallbackException;
-import javax.security.sasl.AuthorizeCallback;
-import javax.security.sasl.RealmCallback;
-import javax.security.sasl.Sasl;
-import javax.security.sasl.SaslException;
-import javax.security.sasl.SaslServer;
+
+import tigase.db.AuthorizationException;
 import tigase.db.DBInitException;
 import tigase.db.TigaseDBException;
 import tigase.db.UserAuthRepository;
+import tigase.db.UserAuthRepositoryImpl;
 import tigase.db.UserExistsException;
 import tigase.db.UserNotFoundException;
-import tigase.db.AuthorizationException;
 import tigase.db.UserRepository;
-import tigase.util.JID;
-import tigase.util.Algorithms;
 import tigase.xml.db.NodeExistsException;
 import tigase.xml.db.NodeNotFoundException;
 import tigase.xml.db.XMLDB;
-
-import static tigase.db.UserAuthRepository.*;
 
 /**
  * Class <code>XMLRepository</code> is a <em>XML</em> implementation of
@@ -69,7 +55,6 @@ import static tigase.db.UserAuthRepository.*;
  */
 public class XMLRepository implements UserAuthRepository, UserRepository {
 
-	private static final String PASSWORD_KEY = "password";
 	private static final String USER_STR = "User: ";
   private static final String NOT_FOUND_STR =
     " has not been found in repository.";
@@ -77,13 +62,15 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
   private static final Logger log =
     Logger.getLogger("tigase.db.xml.XMLRepository");
 
-	private XMLDB xmldb = null; // NOPMD
+	private XMLDB xmldb = null;
+	private UserAuthRepository auth = null;
 
   // Implementation of tigase.xmpp.rep.UserRepository
 
 	public void initRepository(String file_name) {
     try {
       xmldb = new XMLDB(file_name);
+			auth = new UserAuthRepositoryImpl(this);
     } catch (Exception e) {
       log.warning("Can not open existing user repository file, creating new one, "
         + e);
@@ -105,7 +92,11 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
    * @exception UserExistsException if user with the same id already exists.
    */
   public final void addUser(final String user) throws UserExistsException {
-		// Empty, see addUser(user, password) method
+    try {
+      xmldb.addNode1(user);
+    } catch (NodeExistsException e) {
+      throw new UserExistsException(USER_STR+user+" already exists.", e);
+    } // end of try-catch
   }
 
   /**
@@ -124,8 +115,7 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
     try {
       xmldb.removeNode1(user);
     } catch (NodeNotFoundException e) {
-      throw new UserNotFoundException(USER_STR+user+
-        NOT_FOUND_STR, e);
+      throw new UserNotFoundException(USER_STR + user + NOT_FOUND_STR, e);
     } // end of try-catch
   }
 
@@ -485,11 +475,6 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
 
 	// Implementation of tigase.db.UserAuthRepository
 
-	private String getPassword(final String user)
-		throws UserNotFoundException, TigaseDBException {
-		return getData(user, PASSWORD_KEY);
-	}
-
 	/**
 	 * Describe <code>plainAuth</code> method here.
 	 *
@@ -500,9 +485,8 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
 	 * @exception TigaseDBException if an error occurs
 	 */
 	public boolean plainAuth(final String user, final String password)
-		throws UserNotFoundException, TigaseDBException {
-		String db_password = getPassword(user);
-		return db_password.equals(password);
+		throws UserNotFoundException, TigaseDBException, AuthorizationException {
+		return auth.plainAuth(user, password);
 	}
 
 	/**
@@ -511,6 +495,7 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
 	 * @param user a <code>String</code> value
 	 * @param digest a <code>String</code> value
 	 * @param id a <code>String</code> value
+	 * @param alg a <code>String</code> value
 	 * @return a <code>boolean</code> value
 	 * @exception UserNotFoundException if an error occurs
 	 * @exception TigaseDBException if an error occurs
@@ -518,15 +503,7 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
 	public boolean digestAuth(final String user, final String digest,
 		final String id, final String alg)
 		throws UserNotFoundException, TigaseDBException, AuthorizationException {
-		final String db_password = getPassword(user);
-		try {
-			final String digest_db_pass =	Algorithms.digest(id, db_password, alg);
-			log.finest("Comparing passwords, given: " + digest
-				+ ", db: " + digest_db_pass);
-			return digest.equals(digest_db_pass);
-		} catch (NoSuchAlgorithmException e) {
-			throw new AuthorizationException("No such algorithm.", e);
-		} // end of try-catch
+		return auth.digestAuth(user, digest, id, alg);
 	}
 
 	/**
@@ -536,24 +513,17 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
 	 * @return a <code>boolean</code> value
 	 * @exception UserNotFoundException if an error occurs
 	 * @exception TigaseDBException if an error occurs
+	 * @exception AuthorizationException if an error occurs
 	 */
 	public boolean otherAuth(final Map<String, Object> props)
 		throws UserNotFoundException, TigaseDBException, AuthorizationException {
-		String proto = (String)props.get(PROTOCOL_KEY);
-		if (proto.equals(PROTOCOL_VAL_SASL)) {
-			return saslAuth(props);
-		} // end of if (proto.equals(PROTOCOL_VAL_SASL))
-		return false;
+		return auth.otherAuth(props);
 	}
 
 	public void updatePassword(final String user, final String password)
 		throws UserExistsException, TigaseDBException {
-		setData(user, PASSWORD_KEY, password);
+		auth.updatePassword(user, password);
 	}
-
-	private static final String[] non_sasl_mechs = {"password", "digest"};
-	private static final String[] sasl_mechs =
-	{"PLAIN", "DIGEST-MD5", "CRAM-MD5"};
 
 	/**
 	 * Describe <code>addUser</code> method here.
@@ -565,118 +535,11 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
 	 */
 	public void addUser(final String user, final String password)
 		throws UserExistsException, TigaseDBException {
-    try {
-      xmldb.addNode1(user);
-    } catch (NodeExistsException e) {
-      throw new UserExistsException(USER_STR+user+" already exists.", e);
-    } // end of try-catch
-		setData(user, PASSWORD_KEY, password);
+		auth.addUser(user, password);
 	}
 
 	public void queryAuth(Map<String, Object> authProps) {
-		String protocol = (String)authProps.get(PROTOCOL_KEY);
-		if (protocol.equals(PROTOCOL_VAL_NONSASL)) {
-			authProps.put(RESULT_KEY, non_sasl_mechs);
-		} // end of if (protocol.equals(PROTOCOL_VAL_NONSASL))
-		if (protocol.equals(PROTOCOL_VAL_SASL)) {
-			authProps.put(RESULT_KEY, sasl_mechs);
-		} // end of if (protocol.equals(PROTOCOL_VAL_NONSASL))
-	}
-
-	private boolean saslAuth(final Map<String, Object> props)
-		throws AuthorizationException {
-		try {
-			SaslServer ss = (SaslServer)props.get("SaslServer");
-			if (ss == null) {
-				Map<String, String> sasl_props = new TreeMap<String, String>();
-				sasl_props.put(Sasl.QOP, "auth");
-				ss = Sasl.createSaslServer((String)props.get(MACHANISM_KEY),
-					"xmpp",	(String)props.get(SERVER_NAME_KEY),
-					sasl_props, new SaslCallbackHandler(props));
-				props.put("SaslServer", ss);
-			} // end of if (ss == null)
-			String data_str = (String)props.get(DATA_KEY);
-			byte[] in_data =
-				(data_str != null ? Base64.decode(data_str) : new byte[0]);
-			byte[] challenge = ss.evaluateResponse(in_data);
-			log.finest("challenge: " +
-				(challenge != null ? new String(challenge) : "null"));
-			String challenge_str = (challenge != null && challenge.length > 0
-				? Base64.encode(challenge) : null);
-			props.put(RESULT_KEY, challenge_str);
-			if (ss.isComplete()) {
-				return true;
-			} else {
-				return false;
-			} // end of if (ss.isComplete()) else
-		} catch (SaslException e) {
-			throw new AuthorizationException("Sasl exception.", e);
-		} // end of try-catch
-	}
-
-	private class SaslCallbackHandler implements CallbackHandler {
-
-		private Map<String, Object> options = null;
-
-		private SaslCallbackHandler(final Map<String, Object> options) {
-			this.options = options;
-		}
-
-		// Implementation of javax.security.auth.callback.CallbackHandler
-		/**
-		 * Describe <code>handle</code> method here.
-		 *
-		 * @param callbacks a <code>Callback[]</code> value
-		 * @exception IOException if an error occurs
-		 * @exception UnsupportedCallbackException if an error occurs
-		 */
-		public void handle(final Callback[] callbacks)
-			throws IOException, UnsupportedCallbackException {
-
-			String jid = null;
-
-			for (int i = 0; i < callbacks.length; i++) {
-				log.finest("Callback: " + callbacks[i].getClass().getSimpleName());
-				if (callbacks[i] instanceof RealmCallback) {
-					RealmCallback rc = (RealmCallback)callbacks[i];
-					String realm = (String)options.get(REALM_KEY);
-					if (realm == null) {
-						rc.setText(realm);
-					} // end of if (realm == null)
-					log.finest("RealmCallback: " + realm);
-				} else if (callbacks[i] instanceof NameCallback) {
-					NameCallback nc = (NameCallback)callbacks[i];
-					String user_name = nc.getName();
-					if (user_name == null) {
-						user_name = nc.getDefaultName();
-					} // end of if (name == null)
-					jid = JID.getNodeID(user_name, (String)options.get(REALM_KEY));
-					options.put(USER_ID_KEY, jid);
-					log.finest("NameCallback: " + user_name);
-				} else if (callbacks[i] instanceof PasswordCallback) {
-					PasswordCallback pc = (PasswordCallback)callbacks[i];
-					try {
-						String passwd = getPassword(jid);
-						pc.setPassword(passwd.toCharArray());
-						log.finest("PasswordCallback: " +	passwd);
-					} catch (Exception e) {
-						throw new IOException("Password retrieving problem.", e);
-					} // end of try-catch
-				} else if (callbacks[i] instanceof AuthorizeCallback) {
-					AuthorizeCallback authCallback = ((AuthorizeCallback)callbacks[i]);
-					String authenId = authCallback.getAuthenticationID();
-					log.finest("AuthorizeCallback: authenId: " + authenId);
-					String authorId = authCallback.getAuthorizationID();
-					log.finest("AuthorizeCallback: authorId: " + authorId);
-					if (authenId.equals(authorId)) {
-						authCallback.setAuthorized(true);
-					} // end of if (authenId.equals(authorId))
-				} else {
-					throw new UnsupportedCallbackException
-						(callbacks[i], "Unrecognized Callback");
-				}
-			}
-		}
+		auth.queryAuth(authProps);
 	}
 
 } // SaslCallbackHandler} // XMLRepository

@@ -22,6 +22,7 @@
  */
 package tigase.db.jdbc;
 
+import java.io.IOException;
 import java.sql.BaseQuery;
 import java.sql.Connection;
 import java.sql.DataSet;
@@ -34,12 +35,18 @@ import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
-import java.util.logging.Logger;
+import java.util.TreeMap;
 import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import tigase.db.AuthorizationException;
 import tigase.db.DBInitException;
 import tigase.db.RepositoryFactory;
 import tigase.db.TigaseDBException;
+import tigase.db.UserAuthRepository;
+import tigase.db.UserAuthRepositoryImpl;
 import tigase.db.UserExistsException;
 import tigase.db.UserNotFoundException;
 import tigase.db.UserRepository;
@@ -53,7 +60,7 @@ import tigase.db.UserRepository;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class JDBCRepository implements UserRepository {
+public class JDBCRepository implements UserAuthRepository, UserRepository {
 
   private static final Logger log =
     Logger.getLogger("tigase.db.jdbc.JDBCRepository");
@@ -64,12 +71,15 @@ public class JDBCRepository implements UserRepository {
 	public static final String DEF_MAXIDS_TBL = "tig_max_ids";
 	public static final String DEF_ROOT_NODE = "root";
 
+	private static final String USER_STR = "User: ";
+
 	private String users_tbl = DEF_USERS_TBL;
 	private String nodes_tbl = DEF_NODES_TBL;
 	private String pairs_tbl = DEF_PAIRS_TBL;
 	private String maxids_tbl = DEF_MAXIDS_TBL;
 	private String root_node = DEF_ROOT_NODE;
 
+	private UserAuthRepository auth = null;
 	private String db_conn = null;
 	private Connection conn = null;
 	private PreparedStatement uid_st = null;
@@ -171,7 +181,6 @@ public class JDBCRepository implements UserRepository {
 	private long getNodeNID(long uid, String node_path)
 		throws SQLException, UserNotFoundException {
 		String query = buildNodeQuery(uid, node_path);
-		//		System.out.println(query);
 		Statement stmt = null;
 		ResultSet rs = null;
 		try {
@@ -281,6 +290,7 @@ public class JDBCRepository implements UserRepository {
 		try {
 			conn = DriverManager.getConnection(db_conn);
 			initPreparedStatements();
+			auth = new UserAuthRepositoryImpl(this);
 		} catch (SQLException e) {
 			conn = null;
 			throw	new DBInitException("Problem initializing jdbc connection: "
@@ -743,6 +753,75 @@ public class JDBCRepository implements UserRepository {
 	public void removeData(final String user_id, final String key)
 		throws UserNotFoundException, TigaseDBException {
 		removeData(user_id, null, key);
+	}
+
+	// Implementation of tigase.db.UserAuthRepository
+
+	/**
+	 * Describe <code>plainAuth</code> method here.
+	 *
+	 * @param user a <code>String</code> value
+	 * @param password a <code>String</code> value
+	 * @return a <code>boolean</code> value
+	 * @exception UserNotFoundException if an error occurs
+	 * @exception TigaseDBException if an error occurs
+	 */
+	public boolean plainAuth(final String user, final String password)
+		throws UserNotFoundException, TigaseDBException, AuthorizationException {
+		return auth.plainAuth(user, password);
+	}
+
+	/**
+	 * Describe <code>digestAuth</code> method here.
+	 *
+	 * @param user a <code>String</code> value
+	 * @param digest a <code>String</code> value
+	 * @param id a <code>String</code> value
+	 * @param alg a <code>String</code> value
+	 * @return a <code>boolean</code> value
+	 * @exception UserNotFoundException if an error occurs
+	 * @exception TigaseDBException if an error occurs
+	 */
+	public boolean digestAuth(final String user, final String digest,
+		final String id, final String alg)
+		throws UserNotFoundException, TigaseDBException, AuthorizationException {
+		return auth.digestAuth(user, digest, id, alg);
+	}
+
+	/**
+	 * Describe <code>otherAuth</code> method here.
+	 *
+	 * @param props a <code>Map</code> value
+	 * @return a <code>boolean</code> value
+	 * @exception UserNotFoundException if an error occurs
+	 * @exception TigaseDBException if an error occurs
+	 * @exception AuthorizationException if an error occurs
+	 */
+	public boolean otherAuth(final Map<String, Object> props)
+		throws UserNotFoundException, TigaseDBException, AuthorizationException {
+		return auth.otherAuth(props);
+	}
+
+	public void updatePassword(final String user, final String password)
+		throws UserExistsException, TigaseDBException {
+		auth.updatePassword(user, password);
+	}
+
+	/**
+	 * Describe <code>addUser</code> method here.
+	 *
+	 * @param user a <code>String</code> value
+	 * @param password a <code>String</code> value
+	 * @exception UserExistsException if an error occurs
+	 * @exception TigaseDBException if an error occurs
+	 */
+	public void addUser(final String user, final String password)
+		throws UserExistsException, TigaseDBException {
+		auth.addUser(user, password);
+	}
+
+	public void queryAuth(Map<String, Object> authProps) {
+		auth.queryAuth(authProps);
 	}
 
 } // JDBCRepository

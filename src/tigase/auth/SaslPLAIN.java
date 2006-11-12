@@ -29,8 +29,12 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 import javax.security.sasl.AuthorizeCallback;
+import javax.security.sasl.RealmCallback;
 import javax.security.sasl.SaslException;
 import javax.security.sasl.SaslServer;
+import java.security.NoSuchAlgorithmException;
+import tigase.util.Algorithms;
+import tigase.util.JID;
 
 /**
  * Describe class SaslPLAIN here.
@@ -43,9 +47,14 @@ import javax.security.sasl.SaslServer;
  */
 public class SaslPLAIN implements SaslServer {
 
+	public static final String ENCRYPTION_KEY = "password-encryption";
+	public static final String ENCRYPTION_PLAIN = "PLAIN";
+	public static final String ENCRYPTION_MD5 = "MD5";
+	public static final String ENCRYPTION_SHA = "SHA";
+
 	private static final String MECHANISM = "PLAIN";
 
-	private Map<? super String,?> props = null;
+	private Map<? super String, ?> props = null;
 	private CallbackHandler callbackHandler = null;
 
 	private boolean auth_ok = false;
@@ -56,7 +65,7 @@ public class SaslPLAIN implements SaslServer {
 	 */
 	public SaslPLAIN() {}
 
-	protected SaslPLAIN(Map<? super String,?> props,
+	protected SaslPLAIN(Map<? super String, ?> props,
 		CallbackHandler callbackHandler) {
 		this.props = props;
 		this.callbackHandler = callbackHandler;
@@ -99,6 +108,18 @@ public class SaslPLAIN implements SaslServer {
 		++user_idx;
 		String passwd =
 			new String(byteArray, user_idx, byteArray.length - user_idx);
+		if (passwd != null) {
+			String alg = (String)props.get(ENCRYPTION_KEY);
+			if (alg != null && !alg.equals(ENCRYPTION_PLAIN)) {
+				try {
+					passwd = Algorithms.hexDigest("", passwd, alg);
+				} catch (NoSuchAlgorithmException e) {
+					throw
+						new SaslException("Password encrypting algorithm is not supported.",
+							e);
+				} // end of try-catch
+			} // end of if (alg != null && !alg.equals())
+		} // end of if (passwd != null)
 
 		if (callbackHandler == null) {
 			throw new SaslException("Error: no CallbackHandler available.");
@@ -106,19 +127,24 @@ public class SaslPLAIN implements SaslServer {
 		Callback[] callbacks = new Callback[3];
 		NameCallback nc = new NameCallback("User name", user_id);
 		PasswordCallback pc = new PasswordCallback("User password", false);
-		AuthorizeCallback ac = new AuthorizeCallback(user_id, authoriz);
+		RealmCallback rc = new RealmCallback("Put domain as realm.");
 		callbacks[0] = nc;
 		callbacks[1] = pc;
-		callbacks[2] = ac;
+		callbacks[2] = rc;
 		try {
 			callbackHandler.handle(callbacks);
+			char[] real_password = pc.getPassword();
+			if (!Arrays.equals(real_password, passwd.toCharArray())) {
+				throw new SaslException("Password missmatch.");
+			}
+			String realm = rc.getText();
+			callbacks = new Callback[1];
+			AuthorizeCallback ac =
+				new AuthorizeCallback(JID.getNodeID(user_id, realm), authoriz);
+			callbacks[0] = ac;
+			callbackHandler.handle(callbacks);
 			if (ac.isAuthorized()) {
-				char[] real_password = pc.getPassword();
-				if (Arrays.equals(real_password, passwd.toCharArray())) {
-					auth_ok = true;
-				} else {
-					throw new SaslException("Password missmatch.");
-				}
+				auth_ok = true;
 			} else {
 				throw new SaslException("Not authorized.");
 			} // end of else
