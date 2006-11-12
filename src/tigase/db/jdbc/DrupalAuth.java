@@ -79,11 +79,27 @@ public class DrupalAuth implements UserAuthRepository {
 	private String db_conn = null;
 	private Connection conn = null;
 	private PreparedStatement pass_st = null;
+	private PreparedStatement status_st = null;
+	private PreparedStatement user_add_st = null;
+	private PreparedStatement max_uid_st = null;
 
 	private void initPreparedStatements() throws SQLException {
 		String query = "select pass from " + users_tbl
 			+ " where name = ?;";
 		pass_st = conn.prepareStatement(query);
+
+		query = "select status from " + users_tbl
+			+ " where name = ?;";
+		status_st = conn.prepareStatement(query);
+
+		query = "insert into " + users_tbl
+			+ " (uid, name, pass, status)"
+			+ " values (?, ?, ?, 1);";
+		user_add_st = conn.prepareStatement(query);
+
+		query = "select max(uid) from " + users_tbl;
+		max_uid_st = conn.prepareStatement(query);
+
 	}
 
 	private void release(Statement stmt, ResultSet rs) {
@@ -96,6 +112,36 @@ public class DrupalAuth implements UserAuthRepository {
 			try {
 				stmt.close();
 			} catch (SQLException sqlEx) { }
+		}
+	}
+
+	private boolean isActive(final String user)
+		throws SQLException, UserNotFoundException {
+		ResultSet rs = null;
+		try {
+			status_st.setString(1, JID.getNodeNick(user));
+			rs = status_st.executeQuery();
+			if (rs.next()) {
+				return (rs.getInt(1) == 1);
+			} else {
+				throw new UserNotFoundException("User does not exist: " + user);
+			} // end of if (isnext) else
+		} finally {
+			release(null, rs);
+		}
+	}
+
+	private long getMaxUID() throws SQLException {
+		ResultSet rs = null;
+		try {
+			rs = max_uid_st.executeQuery();
+			if (rs.next()) {
+				return rs.getLong(1);
+			} else {
+				return -1;
+			} // end of else
+		} finally {
+			release(null, rs);
 		}
 	}
 
@@ -163,6 +209,9 @@ public class DrupalAuth implements UserAuthRepository {
 	public boolean plainAuth(final String user, final String password)
 		throws UserNotFoundException, TigaseDBException, AuthorizationException {
 		try {
+			if (!isActive(user)) {
+				throw new AuthorizationException("User account has been blocked.");
+			} // end of if (!isActive(user))
 			String enc_passwd = Algorithms.hexDigest("", password, "MD5");
 			String db_password = getPassword(user);
 			return db_password.equals(enc_passwd);
@@ -225,7 +274,21 @@ public class DrupalAuth implements UserAuthRepository {
 	 */
 	public void addUser(final String user, final String password)
 		throws UserExistsException, TigaseDBException {
-		throw new TigaseDBException("Adding new user is not supported.");
+		ResultSet rs = null;
+		try {
+			user_add_st.setLong(1, getMaxUID()+1);
+			user_add_st.setString(2, JID.getNodeNick(user));
+			user_add_st.setString(3, Algorithms.hexDigest("", password, "MD5"));
+			user_add_st.executeUpdate();
+		} catch (NoSuchAlgorithmException e) {
+			throw
+				new TigaseDBException("Password encoding algorithm is not supported.",
+					e);
+		} catch (SQLException e) {
+			throw new UserExistsException("Error while adding user to repository, user exists?", e);
+		} finally {
+			release(null, rs);
+		}
 	}
 
 	/**
