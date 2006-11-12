@@ -23,9 +23,10 @@
 package tigase.util;
 
 import java.util.List;
-import tigase.db.UserRepository;
 import tigase.db.RepositoryFactory;
+import tigase.db.UserAuthRepository;
 import tigase.db.UserExistsException;
+import tigase.db.UserRepository;
 
 /**
  * Describe class RepositoryUtils here.
@@ -61,9 +62,27 @@ public class RepositoryUtils {
 
 	public static void copyUser(String user, UserRepository src, UserRepository dst)
 		throws Exception {
-		System.out.println("Copying user: " + user);
-		try { dst.addUser(user); } catch (UserExistsException e) {	}
-		copyNode(user, null, src, dst);
+		System.out.print("Copying user: " + user + "...");
+		try {
+			dst.addUser(user);
+			copyNode(user, null, src, dst);
+			System.out.println("OK");
+		} catch (UserExistsException e) {
+			System.out.println("ERROR, user already exists.");
+		}
+	}
+
+	public static void copyUser(String user, UserRepository src,
+		UserAuthRepository dst)
+		throws Exception {
+		System.out.print("Copying user: " + user + "...");
+		String password = src.getData(user, "password");
+		try {
+			dst.addUser(user, password);
+			System.out.println("OK");
+		} catch (UserExistsException e) {
+			System.out.println("ERROR, user already exists.");
+		}
 	}
 
 	public static void printNode(String user, UserRepository repo,
@@ -158,6 +177,8 @@ public class RepositoryUtils {
 			+ " -du uri     destination repository init string\n"
 			+ " -dt string  data content to set/remove in repository\n"
 			+ " -u user     user ID, if given all operations are only for that ID\n"
+			+ "             if you want to add user to AuthRepository parameter must\n"
+			+ "             in form: \"user:password\"\n"
 			+ " -st         perform simple test on repository\n"
 			+ " -cp         copy content from source to destination repository\n"
 			+ " -pr         print content of the repository\n"
@@ -165,6 +186,12 @@ public class RepositoryUtils {
 			+ " -kv         data content string is node/key=value string\n"
 			+ " -add        add data content to repository\n"
 			+ " -del        delete data content from repository\n"
+			+ "\n"
+			+ "Note! If you put UserAuthRepository implementation as a class name\n"
+			+ "      some operation are not allowed and will be silently skipped.\n"
+			+ "      Have a look at UserAuthRepository to see what operations are\n"
+			+ "      possible or what operation does make sense.\n"
+			+ "      Alternatively look for admin tools guide on web site."
 			;
 	}
 
@@ -187,6 +214,22 @@ public class RepositoryUtils {
 	private static String value = null;
 
 	public static void copyRepositories(UserRepository src, UserRepository dst)
+		throws Exception {
+		if (user != null) {
+			copyUser(user, src, dst);
+		} else {
+			List<String> users = src.getUsers();
+			if (users != null) {
+				for (String usr: users) {
+					copyUser(usr, src, dst);
+				} // end of for (String user: users)
+			} else {
+				System.out.println("There are no user accounts in source repository.");
+			} // end of else
+		} // end of if (user != null) else
+	}
+
+	public static void copyRepositories(UserRepository src, UserAuthRepository dst)
 		throws Exception {
 		if (user != null) {
 			copyUser(user, src, dst);
@@ -275,21 +318,45 @@ public class RepositoryUtils {
 
 		parseParams(args);
 
-		UserRepository src_repo =
-			RepositoryFactory.getUserRepository(src_class, src_uri);
+		Exception repo_exc = null;
+		UserRepository src_repo = null;
+		UserAuthRepository src_auth = null;
 
-		if (print_repo) {
+		try {
+			src_repo = RepositoryFactory.getUserRepository(src_class, src_uri);
+		} catch (Exception e) {
+			repo_exc = e;
+			src_repo = null;
+		} // end of try-catch
+
+		// Unsuccessful UserRepository initialization
+		// Let's try with AuthRepository....
+		if (src_repo == null) {
+			try {
+				src_auth = RepositoryFactory.getAuthRepository(src_class, src_uri);
+			} catch (Exception e) {
+				System.out.println("Incorrect source class name given (or connection URI).");
+				System.out.println("class: " + src_class);
+				System.out.println("uri: " + src_uri);
+				System.out.println("Can't initialize repository:");
+				repo_exc.printStackTrace();
+				e.printStackTrace();
+				System.exit(-1);
+			} // end of try-catch
+		} // end of if (src_repo == null)
+
+		if (print_repo && src_repo != null) {
 			System.out.println("Printing repository:");
 			printRepoContent(src_repo);
 		} // end of if (print_repo)
 
-		if (simple_test) {
+		if (simple_test && src_repo != null) {
 			System.out.println("Simple test on repository:");
 			simpleTest(src_repo);
 		} // end of if (simple_test)
 
 		if (add) {
-			if (key_val) {
+			if (key_val && src_repo != null) {
 				System.out.println("Adding key=value: " + content);
 				parseNodeKeyValue(content);
 				System.out.println("Parsed parameters: user=" + user
@@ -297,7 +364,19 @@ public class RepositoryUtils {
 				src_repo.setData(user, subnode, key, value);
 			} else {
 				System.out.println("Adding user: " + user);
-				src_repo.addUser(user);
+				if (src_repo != null) {
+					src_repo.addUser(user);
+				}
+				if (src_auth != null) {
+					int idx = user.indexOf(':');
+					String name = user;
+					String password = "";
+					if (idx >= 0) {
+						name = user.substring(0, idx);
+						password = user.substring(idx+1, user.length());
+					}
+					src_auth.addUser(name, password);
+				}
 			} // end of else
 		} // end of if (add)
 
@@ -316,14 +395,38 @@ public class RepositoryUtils {
 				} // end of if (node)
 			} else {
 				System.out.println("Deleting user: " + user);
-				src_repo.removeUser(user);
+				if (src_repo != null) {
+					src_repo.removeUser(user);
+				}
+				if (src_auth != null) {
+					src_auth.removeUser(user);
+				}
 			} // end of else
 		} // end of if (del)
 
 		if (copy_repos) {
-			UserRepository dst_repo =
-				RepositoryFactory.getUserRepository(dst_class, dst_uri);
-			copyRepositories(src_repo, dst_repo);
+			UserRepository dst_repo = null;
+			Exception dst_exc = null;
+			UserAuthRepository dst_auth = null;
+			try {
+				dst_repo = RepositoryFactory.getUserRepository(dst_class, dst_uri);
+				copyRepositories(src_repo, dst_repo);
+			} catch (Exception e) {
+				dst_exc = e;
+				dst_repo = null;
+			} // end of try-catch
+			if (dst_repo == null) {
+				try {
+					dst_auth = RepositoryFactory.getAuthRepository(dst_class, dst_uri);
+				} catch (Exception e) {
+					System.out.println("Incorrect destination class name given (or connection URI).");
+					System.out.println("Can't initialize repository:");
+					dst_exc.printStackTrace();
+					e.printStackTrace();
+					System.exit(-1);
+				} // end of try-catch
+				copyRepositories(src_repo, dst_auth);
+			} // end of if (dst_repo == null)
 		} // end of if (copy_repos)
 
 	}
