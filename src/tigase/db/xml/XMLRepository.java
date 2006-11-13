@@ -69,8 +69,8 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
 
 	public void initRepository(String file_name) {
     try {
-      xmldb = new XMLDB(file_name);
 			auth = new UserAuthRepositoryImpl(this);
+      xmldb = new XMLDB(file_name);
     } catch (Exception e) {
       log.warning("Can not open existing user repository file, creating new one, "
         + e);
