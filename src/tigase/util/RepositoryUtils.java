@@ -161,10 +161,23 @@ public class RepositoryUtils {
 
 	public static void simpleTest(UserRepository repo) throws Exception {
 		printRepoContent(repo);
-		loadTestData(repo);
+		try { repo.addUser(user1); } catch (UserExistsException e) {	}
 		printRepoContent(repo);
 		removeTestData(repo);
 		printRepoContent(repo);
+	}
+
+	public static void userAddTest(UserRepository re) throws Exception {
+		UserAuthRepository repo = (UserAuthRepository)re;
+		String test_user = "test111@localhost";
+		printRepoContent(re);
+		try { repo.addUser(test_user, "some-pass"); }
+		catch (UserExistsException e) { e.printStackTrace();	}
+		printRepoContent(re);
+		System.out.println(
+			re.getData(test_user, "privacy", "default-list", null));
+		repo.removeUser(test_user);
+		printRepoContent(re);
 	}
 
 	private static String help() {
@@ -180,6 +193,7 @@ public class RepositoryUtils {
 			+ "             if you want to add user to AuthRepository parameter must\n"
 			+ "             in form: \"user:password\"\n"
 			+ " -st         perform simple test on repository\n"
+			+ " -at         simple test for adding and removing user\n"
 			+ " -cp         copy content from source to destination repository\n"
 			+ " -pr         print content of the repository\n"
 			+ " -n          data content string is a node string\n"
@@ -191,7 +205,7 @@ public class RepositoryUtils {
 			+ "      some operation are not allowed and will be silently skipped.\n"
 			+ "      Have a look at UserAuthRepository to see what operations are\n"
 			+ "      possible or what operation does make sense.\n"
-			+ "      Alternatively look for admin tools guide on web site."
+			+ "      Alternatively look for admin tools guide on web site.\n"
 			;
 	}
 
@@ -202,6 +216,7 @@ public class RepositoryUtils {
 	private static String content = null;
 	private static String user = null;
 	private static boolean simple_test = false;
+	private static boolean add_user_test = false;
 	private static boolean copy_repos = false;
 	private static boolean print_repo = false;
 	private static boolean add = false;
@@ -284,6 +299,9 @@ public class RepositoryUtils {
         if (args[i].equals("-st")) {
 					simple_test = true;
         } // end of if (args[i].equals("-h"))
+        if (args[i].equals("-at")) {
+					add_user_test = true;
+        } // end of if (args[i].equals("-h"))
         if (args[i].equals("-cp")) {
 					copy_repos = true;
         } // end of if (args[i].equals("-h"))
@@ -345,14 +363,14 @@ public class RepositoryUtils {
 			} // end of try-catch
 		} // end of if (src_repo == null)
 
-		if (print_repo && src_repo != null) {
-			System.out.println("Printing repository:");
-			printRepoContent(src_repo);
-		} // end of if (print_repo)
-
-		if (simple_test && src_repo != null) {
+		if (simple_test) {
 			System.out.println("Simple test on repository:");
 			simpleTest(src_repo);
+		} // end of if (simple_test)
+
+		if (add_user_test) {
+			System.out.println("Simple test on repository:");
+			userAddTest(src_repo);
 		} // end of if (simple_test)
 
 		if (add) {
@@ -428,6 +446,26 @@ public class RepositoryUtils {
 				copyRepositories(src_repo, dst_auth);
 			} // end of if (dst_repo == null)
 		} // end of if (copy_repos)
+
+		if (print_repo && src_repo != null) {
+			System.out.println("Printing repository:");
+			if (content != null) {
+				parseNodeKeyValue(content);
+			} // end of if (content != null)
+			if (user != null) {
+				if (key_val) {
+					System.out.println(src_repo.getData(user, subnode, key, null));
+				} else {
+					if (node) {
+						printNode(user, src_repo, "  ", subnode);
+					} else {
+						printNode(user, src_repo, "", null);
+					} // end of else
+				} // end of else
+			} else {
+				printRepoContent(src_repo);
+			} // end of else
+		} // end of if (print_repo)
 
 	}
 
