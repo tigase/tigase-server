@@ -124,7 +124,7 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
 	}
 
   /**
-   * <code>setData</code> method <!-- beauty loves beast --> sets data value for
+   * <code>setData</code> method sets data value for
    * given user ID in repository under given node path and associates it with
    * given key.
    * If there already exists value for given key in given node, old value is
