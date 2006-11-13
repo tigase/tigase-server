@@ -58,9 +58,12 @@ public class RepositoryFactory {
 														IllegalAccessException, DBInitException {
 		UserAuthRepository rep = auth_repos.get(resource);
 		if (rep == null) {
-			rep = (UserAuthRepository)Class.forName(class_name).newInstance();
-			rep.initRepository(resource);
-			auth_repos.put(resource, rep);
+			rep = tryCastUserRepository(resource);
+			if (rep == null) {
+				rep = (UserAuthRepository)Class.forName(class_name).newInstance();
+				rep.initRepository(resource);
+				auth_repos.put(resource, rep);
+			} // end of if (rep == null)
 		} // end of if (rep == null)
 		return rep;
 	}
@@ -71,7 +74,8 @@ public class RepositoryFactory {
 		// due to possible caching problems
 		UserRepository rep = user_repos.get(resource);
 		if (rep != null) {
-			try {	return (UserAuthRepository)rep;	} catch (Exception e) {	}
+			try {	return (UserAuthRepository)rep;	}
+			catch (Exception e) {	}
 		}
 		return null;
 	}
