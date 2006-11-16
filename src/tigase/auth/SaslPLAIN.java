@@ -137,17 +137,21 @@ public class SaslPLAIN implements SaslServer {
 			if (!Arrays.equals(real_password, passwd.toCharArray())) {
 				throw new SaslException("Password missmatch.");
 			}
-			String realm = rc.getText();
-			callbacks = new Callback[1];
-			AuthorizeCallback ac =
-				new AuthorizeCallback(JID.getNodeID(user_id, realm), authoriz);
-			callbacks[0] = ac;
-			callbackHandler.handle(callbacks);
-			if (ac.isAuthorized()) {
-				auth_ok = true;
+			if (authoriz != null && !authoriz.isEmpty()) {
+				String realm = rc.getText();
+				callbacks = new Callback[1];
+				AuthorizeCallback ac =
+					new AuthorizeCallback(JID.getNodeID(user_id, realm), authoriz);
+				callbacks[0] = ac;
+				callbackHandler.handle(callbacks);
+				if (ac.isAuthorized()) {
+					auth_ok = true;
+				} else {
+					throw new SaslException("Not authorized.");
+				} // end of else
 			} else {
-				throw new SaslException("Not authorized.");
-			} // end of else
+				auth_ok = true;
+			} // end of if (authoriz != null && !authoriz.empty()) else
 		} catch (Exception e) {
 			throw new SaslException("Authorization error.", e);
 		} // end of try-catch
