@@ -342,6 +342,11 @@ public class RepositoryUtils {
 
 		try {
 			src_repo = RepositoryFactory.getUserRepository(src_class, src_uri);
+			System.out.println(
+				"Loaded src_repo " + src_repo.getClass().getName()
+				+ " for parameters:"
+				+ "\n   src_class=" + src_class
+				+ "\n   src_uri=" + src_uri);
 		} catch (Exception e) {
 			repo_exc = e;
 			src_repo = null;
@@ -352,6 +357,11 @@ public class RepositoryUtils {
 		if (src_repo == null) {
 			try {
 				src_auth = RepositoryFactory.getAuthRepository(src_class, src_uri);
+				System.out.println(
+					"Loaded src_auth " + src_auth.getClass().getName()
+					+ " for parameters:"
+					+ "\n   src_class=" + src_class
+					+ "\n   src_uri=" + src_uri);
 			} catch (Exception e) {
 				System.out.println("Incorrect source class name given (or connection URI).");
 				System.out.println("class: " + src_class);
@@ -428,6 +438,11 @@ public class RepositoryUtils {
 			UserAuthRepository dst_auth = null;
 			try {
 				dst_repo = RepositoryFactory.getUserRepository(dst_class, dst_uri);
+				System.out.println(
+					"Loaded dst_repo " + dst_repo.getClass().getName()
+					+ " for parameters:"
+					+ "\n   src_class=" + dst_class
+					+ "\n   src_uri=" + dst_uri);
 				copyRepositories(src_repo, dst_repo);
 			} catch (Exception e) {
 				dst_exc = e;
@@ -436,6 +451,11 @@ public class RepositoryUtils {
 			if (dst_repo == null) {
 				try {
 					dst_auth = RepositoryFactory.getAuthRepository(dst_class, dst_uri);
+					System.out.println(
+						"Loaded dst_auth " + dst_auth.getClass().getName()
+						+ " for parameters:"
+						+ "\n   src_class=" + dst_class
+						+ "\n   src_uri=" + dst_uri);
 				} catch (Exception e) {
 					System.out.println("Incorrect destination class name given (or connection URI).");
 					System.out.println("Can't initialize repository:");

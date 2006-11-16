@@ -22,6 +22,7 @@
  */
 package tigase.db.jdbc;
 
+import java.math.BigDecimal;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
@@ -136,8 +137,11 @@ public class DrupalAuth implements UserAuthRepository {
 		try {
 			rs = max_uid_st.executeQuery();
 			if (rs.next()) {
-				return rs.getLong(1);
+				BigDecimal max_uid = rs.getBigDecimal(1);
+				System.out.println("MAX UID = " + max_uid.longValue());
+				return max_uid.longValue();
 			} else {
+				System.out.println("MAX UID = -1!!!!");
 				return -1;
 			} // end of else
 		} finally {
@@ -276,7 +280,8 @@ public class DrupalAuth implements UserAuthRepository {
 		throws UserExistsException, TigaseDBException {
 		ResultSet rs = null;
 		try {
-			user_add_st.setLong(1, getMaxUID()+1);
+			long uid = getMaxUID()+1;
+			user_add_st.setLong(1, uid);
 			user_add_st.setString(2, JID.getNodeNick(user));
 			user_add_st.setString(3, Algorithms.hexDigest("", password, "MD5"));
 			user_add_st.executeUpdate();

@@ -102,6 +102,9 @@ public class MessageRouter extends AbstractMessageReceiver {
 		String host = JID.getNodeHost(packet.getTo());
 		String id =  JID.getNodeID(packet.getTo());
 		String nick = JID.getNodeNick(packet.getTo());
+// 		if (nick == null) {
+// 			log.warning("nick=null for packet: " + packet.toString());
+// 		} // end of if (nick == null)
 		String ip = null;
 		try {
 			ip = JID.getNodeHostIP(packet.getTo());
@@ -110,7 +113,10 @@ public class MessageRouter extends AbstractMessageReceiver {
 		} // end of try-catch
 		// Let's try to find message receiver quick way
 		// In case if packet is handled internally:
-		MessageReceiver first = receivers.get(nick);
+		MessageReceiver first = null;
+		if (nick != null) {
+			first = receivers.get(nick);
+		} // end of if (nick != null)
 		if (first != null) {
 			// Well, I found something. Now we need to make sure it is
 			// indeed to this receiver and it is not just accidental

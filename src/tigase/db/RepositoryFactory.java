@@ -59,6 +59,9 @@ public class RepositoryFactory {
 		UserAuthRepository rep = auth_repos.get(resource);
 		if (rep == null) {
 			rep = tryCastUserRepository(resource);
+			if (rep != null && !rep.getClass().getName().equals(class_name)) {
+				rep = null;
+			} // end of if (!rep.getClass().getName().equals(class_name))
 			if (rep == null) {
 				rep = (UserAuthRepository)Class.forName(class_name).newInstance();
 				rep.initRepository(resource);

@@ -175,6 +175,10 @@ public class Packet {
     return elem.toString().toCharArray();
   }
 
+	public String toString() {
+		return "to="+to+", from="+from+", data="+elem.toString();
+	}
+
 	public boolean isRouted() {
 		return routed;
 	}
