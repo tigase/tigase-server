@@ -39,7 +39,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.UserAuthRepository;
-import tigase.db.UserNotFoundException;
+import tigase.xmpp.NotAuthorizedException;
 import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.util.JID;
@@ -139,9 +139,15 @@ public class JabberIqAuth extends XMPPProcessor
 					results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 							"Authentication failed", false));
 				} // end of else
+			} catch (NotAuthorizedException e) {
+				log.info("Authentication failed: " + user_name);
+				results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
+						e.getMessage(), false));
+				results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
+						StanzaType.set, packet.getElemId()));
 			} catch (Exception e) {
 				log.info("Authentication failed: " + user_name);
-				log.log(Level.FINER, "Authentication failed: ", e);
+				log.log(Level.WARNING, "Authentication failed: ", e);
 				results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 						e.getMessage(), false));
 				results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),

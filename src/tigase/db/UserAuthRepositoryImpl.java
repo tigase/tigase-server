@@ -181,7 +181,9 @@ public class UserAuthRepositoryImpl implements UserAuthRepository {
 	public void addUser(final String user, final String password)
 		throws UserExistsException, TigaseDBException {
 		repo.addUser(user);
+		log.info("Repo user added: " + user);
 		updatePassword(user, password);
+		log.info("Password updated: " + user + ":" + password);
 	}
 
 	/**
@@ -193,7 +195,7 @@ public class UserAuthRepositoryImpl implements UserAuthRepository {
 	 * @exception TigaseDBException if an error occurs
 	 */
 	public void updatePassword(final String user, final String password)
-		throws UserExistsException, TigaseDBException {
+		throws TigaseDBException {
 		repo.setData(user, PASSWORD_KEY, password);
 	}
 

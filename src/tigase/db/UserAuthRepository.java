@@ -66,7 +66,7 @@ public interface UserAuthRepository {
 		throws UserExistsException, TigaseDBException;
 
   void updatePassword(String user, String password)
-		throws UserExistsException, TigaseDBException;
+		throws TigaseDBException;
 
   void removeUser(String user) throws UserNotFoundException, TigaseDBException;
 

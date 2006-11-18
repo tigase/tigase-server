@@ -302,13 +302,20 @@ public class SessionManager extends AbstractMessageReceiver
 			if (conn != null) {
 				try {
 					String userId = conn.getUserId();
+					log.info("Closing connection for: " + userId);
 					XMPPSession session = conn.getParentSession();
 					if (session != null) {
-						if (session.getActiveResourcesSize() == 1) {
-							sessionsByNodeId.remove(userId);
+						log.info("Found parent session for: " + userId);
+						if (session.getActiveResourcesSize() <= 1) {
+							session = sessionsByNodeId.remove(userId);
+							if (session == null) {
+								log.warning("UPS can't remove session, not found in map: " + userId);
+							} // end of if (session == null)
 						}
 					} // end of if (session.getActiveResourcesSize() == 0)
-				} catch (NotAuthorizedException e) {}
+				} catch (NotAuthorizedException e) {
+					log.info("Closed not authorized session: " + e);
+				}
 				Queue<Packet> results = new LinkedList<Packet>();
 				for (XMPPStopListenerIfc stopProc: stopListeners.values()) {
 					stopProc.stopped(conn, results);

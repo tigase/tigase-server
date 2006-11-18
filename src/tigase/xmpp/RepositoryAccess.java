@@ -131,7 +131,11 @@ public abstract class RepositoryAccess {
 
     try {
       authRepo.addUser(JID.getNodeID(user_name, getDomain()), pass_param);
+			log.info("User added: " + JID.getNodeID(user_name, getDomain())
+				+ ", pass: " + pass_param);
       setRegistration(user_name, pass_param, email_param);
+			log.info("Registration data set for: " + JID.getNodeID(user_name, getDomain())
+				+ ", pass: " + pass_param + ", email: " + email_param);
       return Authorization.AUTHORIZED;
     } catch (UserExistsException e) {
       return Authorization.CONFLICT;
@@ -224,7 +228,7 @@ public abstract class RepositoryAccess {
 			} // end of if (authRepo.loginPlain())auth.login();
 			return authState;
     } catch (UserNotFoundException e) {
-      log.log(Level.WARNING, "Problem accessing reposiotry: ", e);
+      log.info("User not found, authorization failed: " + user);
       throw new NotAuthorizedException("Authorization failed", e);
     } catch (TigaseDBException e) {
 			log.log(Level.SEVERE, "Repository access exception.", e);
@@ -240,7 +244,7 @@ public abstract class RepositoryAccess {
 			} // end of if (authRepo.loginPlain())auth.login();
 			return authState;
     } catch (UserNotFoundException e) {
-      log.log(Level.WARNING, "Problem accessing reposiotry: ", e);
+      log.log(Level.INFO, "Problem accessing reposiotry: ", e);
       throw new NotAuthorizedException("Authorization failed", e);
     } catch (TigaseDBException e) {
 			log.log(Level.SEVERE, "Repository access exception.", e);

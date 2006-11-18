@@ -83,6 +83,10 @@ public class DrupalAuth implements UserAuthRepository {
 	private PreparedStatement status_st = null;
 	private PreparedStatement user_add_st = null;
 	private PreparedStatement max_uid_st = null;
+	private PreparedStatement conn_valid_st = null;
+
+	private long lastConnectionValidated = 0;
+	private long connectionValidateInterval = 1000*60;
 
 	private void initPreparedStatements() throws SQLException {
 		String query = "select pass from " + users_tbl
@@ -101,6 +105,24 @@ public class DrupalAuth implements UserAuthRepository {
 		query = "select max(uid) from " + users_tbl;
 		max_uid_st = conn.prepareStatement(query);
 
+		query = "select count(*) from " + users_tbl;
+		conn_valid_st = conn.prepareStatement(query);
+	}
+
+	private boolean checkConnection() throws SQLException {
+		try {
+// 			if (!conn.isValid(5)) {
+// 				initRepo();
+// 			} // end of if (!conn.isValid())
+			long tmp = System.currentTimeMillis();
+			if ((tmp - lastConnectionValidated) >= connectionValidateInterval) {
+				conn_valid_st.executeQuery();
+				lastConnectionValidated = tmp;
+			} // end of if ()
+		} catch (Exception e) {
+			initRepo();
+		} // end of try-catch
+		return true;
 	}
 
 	private void release(Statement stmt, ResultSet rs) {
@@ -153,6 +175,7 @@ public class DrupalAuth implements UserAuthRepository {
 		throws SQLException, UserNotFoundException {
 		ResultSet rs = null;
 		try {
+			checkConnection();
 			pass_st.setString(1, JID.getNodeNick(user));
 			rs = pass_st.executeQuery();
 			if (rs.next()) {
@@ -182,6 +205,11 @@ public class DrupalAuth implements UserAuthRepository {
 		} // end of if (protocol.equals(PROTOCOL_VAL_NONSASL))
 	}
 
+	private void initRepo() throws SQLException {
+		conn = DriverManager.getConnection(db_conn);
+		initPreparedStatements();
+	}
+
 	/**
 	 * Describe <code>initRepository</code> method here.
 	 *
@@ -192,8 +220,7 @@ public class DrupalAuth implements UserAuthRepository {
 		throws DBInitException {
 		db_conn = connection_str;
 		try {
-			conn = DriverManager.getConnection(db_conn);
-			initPreparedStatements();
+			initRepo();
 		} catch (SQLException e) {
 			conn = null;
 			throw	new DBInitException("Problem initializing jdbc connection: "
@@ -213,6 +240,7 @@ public class DrupalAuth implements UserAuthRepository {
 	public boolean plainAuth(final String user, final String password)
 		throws UserNotFoundException, TigaseDBException, AuthorizationException {
 		try {
+			checkConnection();
 			if (!isActive(user)) {
 				throw new AuthorizationException("User account has been blocked.");
 			} // end of if (!isActive(user))
@@ -280,6 +308,7 @@ public class DrupalAuth implements UserAuthRepository {
 		throws UserExistsException, TigaseDBException {
 		ResultSet rs = null;
 		try {
+			checkConnection();
 			long uid = getMaxUID()+1;
 			user_add_st.setLong(1, uid);
 			user_add_st.setString(2, JID.getNodeNick(user));

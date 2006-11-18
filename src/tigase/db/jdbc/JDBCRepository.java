@@ -89,8 +89,12 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	private PreparedStatement nodes_for_node_st = null;
 	private PreparedStatement insert_key_val_st = null;
 	private PreparedStatement remove_key_data_st = null;
+	private PreparedStatement conn_valid_st = null;
 
-	private boolean autoCreateUser = true;
+	private long lastConnectionValidated = 0;
+	private long connectionValidateInterval = 1000*60;
+
+	private boolean autoCreateUser = false;
 
 	private long max_uid = 0;
 	private long max_nid = 0;
@@ -106,6 +110,22 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 				stmt.close();
 			} catch (SQLException sqlEx) { }
 		}
+	}
+
+	private boolean checkConnection() throws SQLException {
+		try {
+// 			if (!conn.isValid(5)) {
+// 				initRepo();
+// 			} // end of if (!conn.isValid())
+			long tmp = System.currentTimeMillis();
+			if ((tmp - lastConnectionValidated) >= connectionValidateInterval) {
+				conn_valid_st.executeQuery();
+				lastConnectionValidated = tmp;
+			} // end of if ()
+		} catch (Exception e) {
+			initRepo();
+		} // end of try-catch
+		return true;
 	}
 
 	private long getUserUID(String user_id)
@@ -273,9 +293,33 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		query =  "delete from " + pairs_tbl
 			+ " where (nid = ?) AND (pkey = ?)";
 		remove_key_data_st = conn.prepareStatement(query);
+
+		query = "select count(*) from " + users_tbl;
+		conn_valid_st = conn.prepareStatement(query);
 	}
 
 	// Implementation of tigase.db.UserRepository
+
+	private void initRepo() throws SQLException {
+		Statement stmt = null;
+		ResultSet rs = null;
+		try {
+			conn = DriverManager.getConnection(db_conn);
+			initPreparedStatements();
+			auth = new UserAuthRepositoryImpl(this);
+			stmt = conn.createStatement();
+			// load maximum ids
+			String query = "SELECT max_uid, max_nid FROM " + maxids_tbl;
+			rs = stmt.executeQuery(query);
+			rs.next();
+			max_uid = rs.getLong("max_uid");
+			max_nid = rs.getLong("max_nid");
+		} finally {
+			release(stmt, rs);
+			stmt = null; rs = null;
+		}
+	}
+
 
 	/**
 	 * Describe <code>initRepository</code> method here.
@@ -285,32 +329,16 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	public void initRepository(final String connection_str)
 		throws DBInitException {
 		db_conn = connection_str;
-		Statement stmt = null;
-		ResultSet rs = null;
+		if (db_conn.contains("autoCreateUser=true")) {
+			autoCreateUser=true;
+		} // end of if (db_conn.contains())
 		try {
-			conn = DriverManager.getConnection(db_conn);
-			initPreparedStatements();
-			auth = new UserAuthRepositoryImpl(this);
+			initRepo();
+			log.info("Initialized database connection: " + connection_str);
 		} catch (SQLException e) {
 			conn = null;
 			throw	new DBInitException("Problem initializing jdbc connection: "
 				+ db_conn, e);
-		}
-		String query = null;
-		try {
-			stmt = conn.createStatement();
-			// load maximum ids
-			query = "SELECT max_uid, max_nid FROM " + maxids_tbl;
-			rs = stmt.executeQuery(query);
-			rs.next();
-			max_uid = rs.getLong("max_uid");
-			max_nid = rs.getLong("max_nid");
-		} catch (SQLException e){
-			conn = null;
-			throw	new DBInitException("Problem loading init data: " + query, e);
-		} finally {
-			release(stmt, rs);
-			stmt = null; rs = null;
 		}
 	}
 
@@ -340,6 +368,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	}
 
 	private long addUserRepo(final String user_id) throws SQLException {
+		checkConnection();
 		Statement stmt = null;
 		String query = null;
 		long uid = max_uid++;
@@ -385,6 +414,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		ResultSet rs = null;
 		String query = null;
 		try {
+			checkConnection();
 			stmt = conn.createStatement();
 			// Get user account uid
 			long uid = getUserUID(user_id);
@@ -419,6 +449,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		final String key) throws UserNotFoundException, TigaseDBException {
 		ResultSet rs = null;
 		try {
+			checkConnection();
 			long nid = getNodeNID(user_id, subnode);
 			if (nid > 0) {
 				List<String> results = new ArrayList<String>();
@@ -454,6 +485,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		throws UserNotFoundException, TigaseDBException {
 		ResultSet rs = null;
 		try {
+			checkConnection();
 			long nid = getNodeNID(user_id, subnode);
 			if (nid > 0) {
 				List<String> results = new ArrayList<String>();
@@ -522,6 +554,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 			return;
 		} // end of if (subnode == null)
 		try {
+			checkConnection();
 			long nid = getNodeNID(user_id, subnode);
 			if (nid > 0) {
 				deleteSubnode(nid);
@@ -560,6 +593,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		final String key, final String[] list)
 		throws UserNotFoundException, TigaseDBException {
 		try {
+			checkConnection();
 			long uid = getUserUID(user_id);
 			long nid = getNodeNID(uid, subnode);
 			if (nid < 0) {
@@ -591,6 +625,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		throws UserNotFoundException, TigaseDBException {
 		ResultSet rs = null;
 		try {
+			checkConnection();
 			long nid = getNodeNID(user_id, subnode);
 			if (nid > 0) {
 				List<String> results = new ArrayList<String>();
@@ -640,6 +675,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		throws UserNotFoundException, TigaseDBException {
 		ResultSet rs = null;
 		try {
+			checkConnection();
 			long nid = getNodeNID(user_id, subnode);
 			if (nid > 0) {
 				String result = def;
@@ -730,6 +766,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		final String key)
 		throws UserNotFoundException, TigaseDBException {
 		try {
+			checkConnection();
 			long nid = getNodeNID(user_id, subnode);
 			if (nid > 0) {
 				synchronized (remove_key_data_st) {
@@ -803,7 +840,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	}
 
 	public void updatePassword(final String user, final String password)
-		throws UserExistsException, TigaseDBException {
+		throws TigaseDBException {
 		auth.updatePassword(user, password);
 	}
 
