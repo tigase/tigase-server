@@ -151,7 +151,7 @@ public class SaslAuth extends XMPPProcessor
 							challenge_data)));
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			results.offer(packet.swapFromTo(createReply(ElementType.failure,
  						"<not-authorized/>")));
 		} // end of try-catch
