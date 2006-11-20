@@ -310,8 +310,14 @@ public class SessionManager extends AbstractMessageReceiver
 							session = sessionsByNodeId.remove(userId);
 							if (session == null) {
 								log.warning("UPS can't remove session, not found in map: " + userId);
-							} // end of if (session == null)
-						}
+							} else {
+								log.finer("Number of authorized connections: "
+									+ sessionsByNodeId.size());
+							} // end of else
+						} else {
+							log.finer("Number of connections is "
+								+ session.getActiveResourcesSize() + " for the user: " + userId);
+						} // end of else
 					} // end of if (session.getActiveResourcesSize() == 0)
 				} catch (NotAuthorizedException e) {
 					log.info("Closed not authorized session: " + e);
@@ -456,34 +462,6 @@ public class SessionManager extends AbstractMessageReceiver
 
 		admins = (String[])props.get(ADMINS_PROP_KEY);
 
-// 		String[] auth_ids = (String[])props.get(SECURITY_PROP_KEY + "/" +
-// 			AUTHENTICATION_IDS_PROP_KEY);
-// 		TigaseConfiguration authConfig = TigaseConfiguration.getConfiguration();
-// 		for (String id: auth_ids) {
-// 			String class_name = (String)props.get(SECURITY_PROP_KEY + "/" + id + "/class");
-// 			String flag = (String)props.get(SECURITY_PROP_KEY + "/" + id + "/flag");
-// 			Map<String, Object> options = new HashMap<String, Object>();
-// 			options.put(CommitHandler.COMMIT_HANDLER_KEY, this);
-// 			options.put(UserRepository.class.getSimpleName(), auth_repository);
-// 			AppConfigurationEntry ace =
-// 				new AppConfigurationEntry(class_name, parseFlag(flag), options);
-// 			authConfig.putAppConfigurationEntry(id,
-// 				new AppConfigurationEntry[] {ace});
-// 			log.config("Added security module: " + class_name
-// 				+ " for auth id: " + id + ", flag: " + flag);
-// 		} // end of for ()
-	}
-
-	private LoginModuleControlFlag parseFlag(final String flag) {
-		if (flag.equalsIgnoreCase("REQUIRED"))
-			return LoginModuleControlFlag.REQUIRED;
-		else if (flag.equalsIgnoreCase("REQUISITE"))
-			return LoginModuleControlFlag.REQUISITE;
-		else if (flag.equalsIgnoreCase("SUFFICIENT"))
-			return LoginModuleControlFlag.SUFFICIENT;
-		else if (flag.equalsIgnoreCase("OPTIONAL"))
-			return LoginModuleControlFlag.OPTIONAL;
-		return null;
 	}
 
 	public void handleLogin(final String userName,
@@ -502,7 +480,7 @@ public class SessionManager extends AbstractMessageReceiver
 		final XMPPResourceConnection conn) {
 		String userId = JID.getNodeID(userName, conn.getDomain());
 		XMPPSession session = sessionsByNodeId.get(userId);
-		if (session != null && session.getActiveResourcesSize() == 0) {
+		if (session != null && session.getActiveResourcesSize() <= 1) {
 			sessionsByNodeId.remove(userId);
 		} // end of if (session.getActiveResourcesSize() == 0)
 	}
@@ -525,6 +503,9 @@ public class SessionManager extends AbstractMessageReceiver
 				connectionsByFrom.size()));
 		stats.add(new StatRecord("Open authorized sessions", "int",
 				sessionsByNodeId.size()));
+// 		if (sessionsByNodeId.size() > 10) {
+// 			System.out.println(sessionsByNodeId.toString());
+// 		} // end of if (sessionsByNodeId.size() > 10)
 		stats.add(new StatRecord("Closed connections", "long", closedConnections));
 		return stats;
 	}

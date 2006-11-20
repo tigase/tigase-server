@@ -7,21 +7,21 @@ Specification-Title: Tigase Jabber Server
 Specification-Version: 2.2.3
 Specification-Vendor: tigase.org
 Implementation-Title: tigase.server
-Implementation-Version: 2.2.3-b188
+Implementation-Version: 2.2.3-b190
 Implementation-Vendor: tigase.org
 Package-Title: tigase.server
-Package-Version: build188
+Package-Version: build190
 Package-Vendor: tigase.org
-Tigase-Version: 2.2.3-b188
+Tigase-Version: 2.2.3-b190
 
 Name: tigase/
 Specification-Title: Tigase Jabber Server
 Specification-Version: 2.2.3
 Specification-Vendor: tigase.org
 Implementation-Title: tigase
-Implementation-Version: 2.2.3-b188
+Implementation-Version: 2.2.3-b190
 Implementation-Vendor: tigase.org
 Package-Title: tigase
-Package-Version: build188
+Package-Version: build190
 Package-Vendor: tigase.org
-Tigase-Version: 2.2.3-b188
+Tigase-Version: 2.2.3-b190
