@@ -118,8 +118,8 @@
         <fileset dir="libs" includes="*"/>
       </copy>
       <copy
-        file="scripts/run-server.sh"
-        tofile="${dist}/@{packagename}-${version}/bin/run-server.sh"/>
+        file="scripts/tigase.sh"
+        tofile="${dist}/@{packagename}-${version}/bin/tigase.sh"/>
       <move todir="${dist}/@{packagename}-${version}/docs">
         <fileset dir="@{docsdir}"/>
       </move>
