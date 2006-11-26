@@ -17,7 +17,7 @@
  <target name="prepare-dist" description="Calculate build version">
   <!-- Get revision number -->
   <exec executable="svn">
-   <arg line="info --non-interactive MANIFEST.MF"/>
+   <arg line="info --non-interactive build.properties"/>
    <redirector outputproperty="build-no" errorproperty="error-property">
     <outputfilterchain>
      <tokenfilter>
