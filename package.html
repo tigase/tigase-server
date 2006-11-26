@@ -238,11 +238,14 @@ ant clean jar</pre>
   <p>Sometimes after unpacking package on unix system startup script doesn't
    have execution permissions. To fix the problem you have to run following
    command:</p>
-  <pre>chmod u+x ./bin/run-server.sh</pre>
-  <p>Now all you need is <em>Java 6 (1.6 beta at the moment)</em> compilant
+  <pre>chmod u+x ./bin/tigase.sh</pre>
+  <p>As there are also other useful scripts you could just set executable bit
+   for all of them at the same time:</p>
+  <pre>chmod u+x ./bin/*</pre>
+  <p>Now all you need is <em>Java 6 (1.6 beta2 at the moment)</em> compilant
    virtual machine. You can run server from command line with simple
    command:</p>
-  <pre>./bin/run-server.sh</pre>
+  <pre>./bin/tigase.sh run etc/tigase.conf</pre>
   <p>You can see now a few messages with warning about missing configuration
    file and missin user repository file. These 2 files will be automaticaly
    created. Config file will be created just during first execution of the
@@ -250,21 +253,66 @@ ant clean jar</pre>
    to the system.</p>
   <p>You should be able now to connect to the server with Jabber/XMPP client of
    your choice.</p>
-  <p>All possible command line parameters are:</p>
+  <p>First parameter is a command, second parameter is a config file for startup
+   script. Possible commands are:</p>
   <ul>
-   <li><code>-h</code> - prints help message about starting server.</li>
-   <li><code>-v</code> - prints information about server version.</li>
-   <li><code>-c file.xml</code> - defines location and name of <em>XML</em>
-    configuration file. Default is <code>xmpp_server.xml</code> file in current
-    directory. If you don't have config file it will be automaticaly created
-    during first run with all default settings. It is very easy then to
-    customize server to your own needs.</li>
-   <li><code>-d [true|yes|false|no]</code> - turn on/off debug mode. Putting
-    just '<code>-d</code>' without extra parameter is equal to "<code>-d
-     true</code>".</li>
+   <li><strong><code>start</code></strong> - Starts server in background
+    redirecting all console messages to separate log file.</li>
+   <li><strong><code>stop</code></strong> - Stops the last started server Be
+    carefull with this command if the server has been stopped in different way
+    but the script still thinks the server is running. The script detects that
+    the server has been started by looking for <code>tigase.pid</code> file.
+    Than it reads server PID from the file and sends <code>kill</code> signal to
+    the process. It may happen that the server is not running but there is
+    another process with this PID. If you know that you server is not running
+    but the script claims it is, it means that the script finds
+    old <code>tigase.pid</code> file. In such case to make it possible to start
+    server again you should either remove the file manually or run script
+    with <strong><code>zap</code></strong> command.</li>
+   <li><strong><code>run</code></strong> - Starts the server as foreground
+    process with all console messages printed onto console. To stop the server
+    simply press <code>Ctrl-C</code>. It does not
+    create <code>tigase.pid</code> file.</li>
+   <li><strong><code>restart</code></strong> - Restarts currently running
+    server. It simply calls the script first
+    with <strong><code>stop</code></strong> command and then
+    with <strong><code>start</code></strong> command.</li>
+   <li><strong><code>check</code></strong> - This commands simply prints all
+    the settings which would be used to start or stop the server. It is strongly
+    recommended to use this command before the first server run.</li>
+  </ul>
+  <p>Config file for startup script simply sets number of environment variables
+   with location of required components. Possible variables to set in this file
+   are:</p>
+  <ul>
+   <li><strong><code>JAVA_HOME</code></strong> - location of Java installation
+    home directory. <strong><em>Must be set.</em></strong></li>
+   <li><strong><code>TIGASE_HOME</code></strong> - location of Tigase
+    installation home directory. <em>By default script try to find this
+    location by searching directories from the location where the script has
+    been run.</em></li>
+   <li><strong><code>TIGASE_CONSOLE_LOG</code></strong> - file to which all
+    console messages will be redirected if server is run in
+    background. <em>By default it will
+     be: <code>TIGASE_HOME/logs/tigase-console.log</code>. <strong>If this
+    file/directory is not writable by Tigase process all console messages will
+      be redirected to <code>/dev/null</code></strong></em></li>
+   <li><strong><code>TIGASE_PID</code></strong> location of the file with server
+    PID number. <em>By default it will
+    be <code>TIGASE_HOME/logs/tigase.pid</code>.</em></li>
+   <li><strong><code>TIGASE_CONFIG</code></strong> - location of the Tigase
+   server config file. This is main config XML file. Not to be confused with
+    startup script parameters file. <em>If not set script trys to find it in
+     following locations in given
+     order: <code>/etc/conf.d/tigase-server.xml</code>,
+     <code>/etc/tigase-server.xml</code>,
+     <code>/etc/tigase/tigase-server.xml</code> or finally in
+     <code>TIGASE_HOME/etc/tigase-server.xml</code></em></li>
+   <li><strong><code>JAVA_OPTIONS</code></strong> - options for JVM like size
+    of RAM allocated for the JVM, properties and so on.</li>
   </ul>
   <p>You can now proceed to configuration section. Although in simple case
-   installation most if default options should be correct sometimes you need to
+   installations most of default options should be correct sometimes you need to
    change server domain name if automatic detection didn't work.</p>
 
   <h2>Configuration</h2>
@@ -281,11 +329,11 @@ ant clean jar</pre>
    file with some settings missing server automaticly adds missing entries
    at startup time.</p>
   <p>Configuration file was not designed for manual editing so it
-   is not recommended to do so. Unfortunately there are no user friendly
-   interfaces available at the moment so here is a description how to edit the
-   file and what to change.</p>
-
-  <h4>Short configuration guide.</h4>
+   is not recommended to do so. There is a command line tool for changing
+   configuration settings and this tool should be used whenever possible.
+   If for some reason you can not use command line tool or the tool does not
+   work for you please refer to <em>Changing configuration manually</em>
+   section below.</p>
 
   <p>Options you most likely have to change at deployment time are:</p>
   <ol>
@@ -298,10 +346,126 @@ ant clean jar</pre>
   </ol>
   <p>Please let me know if you think more options should be described here.</p>
 
-  <p>At the moment the only way to change configuration is to manually edit xml
-   config file. So be prepared for tough times. The good news it that more user
-   friendly interfaces are scheduled for next release. And it will be also
-   reconfigure server at runtime without need to restart service.</p>
+  <h3>Changing configuration using command line tool.</h3>
+
+  <p>Detailed description of configuration management tool in on project site
+   on the: <a href="http://www.tigase.org/node/111">Configuration management
+   tool page.</a></p>
+
+  <dl>
+   <dt><strong>Admin accounts</strong></dt>
+   <dd><p>This is the most likely thing to change after you install server and
+     generate default configuration. Actually it is also the easiest option to
+     customize.</p>
+    <p>And yes, you can just remove entry with admin account:
+     <code>"admin@localhost"</code> unless you really want to keep it. Be aware
+     though all system messages will be sent to <strong>ALL</strong> admin
+     accounts.<br/>
+     Well, if the account does not exists the message is discarded and a
+     warning is be printed in log file. Again, read it again, the previous
+     sentence...<br/>
+     It means that the admin account has to be also created in normal way on the
+     Jabber server. Just register it using your Jabber client. The admin
+     accounts setting works just as a forward instruction. So as a result all
+     system and admin messages are forwarded to all admin accounts if they
+     exist.<br/>
+     Obviously you can have as many admin accounts as you like:</p>
+    <pre>session_1/admins = frank@jabber.example.com, lucy@jabber.example.com,
+    mark@jabber.example.com, brenda@jabber.example.com, luck@jabber.example.com</pre>
+    <p>Now, how to do it. First things is to find current settings. To see what
+    are current admin accounts execute the command:</p>
+    <pre>./bin/config.sh -c etc/tigase-server.xml -print -key session_1/admins</pre>
+    <p>As a result you can see something like this:</p>
+    <pre>session_1/admins = admin@yourhost, admin@localhost</pre>
+    <p>As you could read in configuration management too
+     guide <code>'-add'</code> command adds new entries to the
+     list, <code>'-set'</code> command removes old values and sets new one.<br/>
+     As we want to create new admins list for the installation first command
+     would be <code>'-set'</code> command. Let's say we want
+     set <em>jack@yourhost</em> as your first admin account:</p>
+    <pre>./bin/config.sh -c etc/tigase-server.xml -print -key session_1/admins -set -value "jack@yourhost"</pre>
+    <p>As a result program prints new setting:</p>
+    <pre>session_1/admins = jack@yourhost</pre>
+    <p>All old accounts have been replaced with new account. Now if you wich to
+     add next admin account <em>john@yourhost</em> to the list execute slightly
+     modified command <em>(Note - '-add' instead of '-set')</em>:</p>
+    <pre>./bin/config.sh -c etc/tigase-server.xml -print -key session_1/admins -add -value "john@yourhost"</pre>
+    <p>And result:</p>
+    <pre>session_1/admins = jack@yourhost, john@yourhost</pre>
+    <p>And... this is it. You can add more admin accounts the same way.</p>
+   </dd>
+   <dt><strong>Hostnames</strong></dt>
+   <dd><p>This one might be a little bit more tricky than previous
+    as <strong>hostnames</strong> setting has to be changed in a few
+    places. Don't ask why now as this is the <em>"Short configuration guide"</em>,
+    you remember. Here we focus on <strong>how</strong> not
+    on <strong>why</strong>.</p>
+    <p>The best way to find all places where hostnames should be changes
+     execute following command:</p>
+    <pre>./bin/config.sh -c etc/tigase-server.xml -print | grep hostnames</pre>
+    <p>As a result you can see something like this:</p>
+    <pre>tigase-xmpp-server/hostnames = yourhost, localhost
+client_1/hostnames = yourhost, localhost
+server_1/hostnames = yourhost, localhost
+session_1/hostnames = yourhost, localhost</pre>
+    <p>It may also look:</p>
+    <pre>tigase-xmpp-server/hostnames = localhost
+client_1/hostnames = localhost
+server_1/hostnames = localhost
+session_1/hostnames = localhost</pre>
+    <p>Depending how successful was mechanism for automatic hostname
+     detection. It of course does not depends on your luck. It depends on network
+     configuration on your server.</p>
+    <p>The first form is more useful as it includes also hostname recognized in
+     network environment. If it is correct then you can just leave it as it
+     is. If it is incorrect you have to change it. Please remember, if you want
+     your server to be able to communicate with other <em>Jabber/XMPP</em>
+     servers the hostname you put there must resolve in DNS to your Jabber
+     server machine IP address. In other words. If you try to connect from the
+     Internet to machine with this hostname the connection should reach your
+     Jabber server.</p>
+    <p>And remember your Jabber server users' <em>JIDs (Jabber IDs)</em> can
+     include only those hostnames which are included in the configuration. So
+     for our case you can use only <em>JIDs</em>:
+     <em>"user2@your.hostname.com"</em>, <em>"user1@your.hostname.com"</em> and
+     so on.</p>
+    <p>If you server have more Internet addresses (virtual domains) assigned to
+     it your Jabber server can use them all. So your configuration may look like:</p>
+    <pre>tigase-xmpp-server/hostnames = yourhost, localhost, your.hostname.com, clien1.hostname.com
+client_1/hostnames = yourhost, localhost, your.hostname.com, clien1.hostname.com
+server_1/hostnames = yourhost, localhost, your.hostname.com, clien1.hostname.com
+session_1/hostnames = yourhost, localhost, your.hostname.com, clien1.hostname.com</pre>
+    <p>In such case users' <em>JIDs</em> on your Jabber server may include any
+     of defined above domains like: <em>"user1@your.hostname.com"</em>,
+     <em>"user1@clien1.hostname.com"</em>, <em>"user1@yourhost"</em>. Each of
+     these 3 sample <em>JIDs</em> refer to different user account.</p>
+    <p>Your server will accept connections only for domains defined in
+     configuration file.</p>
+    <p>In majority cases it does not matter whether you
+     leave <strong>"localhost"</strong> or remove it. It is sometimes better to
+     leave it though. So if you are not sure if you can remove it in your
+     environment just leave it as is.</p>
+    <p>Now it is a time to change hostnames. Assuming default configuration is
+     not what you need than first you have to set all these settings to accept
+     connections from <code>localhost</code>:</p>
+    <pre>./bin/config.sh -c etc/tigase-server.xml -print -key tigase-xmpp-server/hostnames -value localhost -set
+./bin/config.sh -c etc/tigase-server.xml -print -key client_1/hostnames -value localhost -set
+./bin/config.sh -c etc/tigase-server.xml -print -key server_1/hostnames -value localhost -set
+./bin/config.sh -c etc/tigase-server.xml -print -key session_1/hostnames -value localhost -set</pre>
+    <p>Now we can add you "real" host name, let's say it
+     is <strong><code>yourhost</code></strong>:</p>
+    <pre>./bin/config.sh -c etc/tigase-server.xml -print -key tigase-xmpp-server/hostnames -value yourhost -add
+./bin/config.sh -c etc/tigase-server.xml -print -key client_1/hostnames -value yourhost -add
+./bin/config.sh -c etc/tigase-server.xml -print -key server_1/hostnames -value yourhost -add
+./bin/config.sh -c etc/tigase-server.xml -print -key session_1/hostnames -value yourhost -add</pre>
+    <p>The same way you can add more virtual hosts to you configuration.</p>
+   </dd>
+  </dl>
+
+  <h3>Changing configuration manually.</h3>
+
+  <p>Here are instructions how to change configuration manually editing XML
+   configuration file.</p>
 
   <dl>
    <dt><strong>Admin accounts</strong></dt>
@@ -401,9 +565,9 @@ ant clean jar</pre>
      separate logging level for each single component. You can also direct
      loggin to many different destinations like console, file, network socket
      and so on. Unfortunately it also mean it is a bit complex. The general
-     idea however is quite simple so once you understand it it shouldn'd be
+     idea however is quite simple so once you understand that, it shouldn'd be
      difficult for you anymore. This guide however describes logging very
-     briefly. Loot at full configuration documentation for detailed
+     briefly. Look at full configuration documentation for detailed
      explanation.</p>
     <p>In standard sever configuration you usually want to turn off all logging
      to console and all warning and more serious notices directed to log

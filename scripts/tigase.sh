@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # This is Tigase (http://www.tigase.org) server startup file.
-# 
+#
 # First parameter is a command (start, stop and so on...),
 # second parameters is parameters file - the file where from
 # environment variables are read like:
@@ -84,10 +84,11 @@ if [ -z "${TIGASE_CONFIG}"] ; then
     elif [ -f "${TIGASE_HOME}/etc/${DEF_CONF}" ] ; then
 	TIGASE_CONFIG="${TIGASE_HOME}/etc/${DEF_CONF}"
     else
+	TIGASE_CONFIG="${TIGASE_HOME}/etc/${DEF_CONF}"
 	echo "Can't find server configuration file."
 	echo "Should be set in TIGASE_CONFIG variable"
-	echo "Please set it to correct value before starting the sever."
-	exit 1
+	echo "Creating new configuration file in location:"
+	echo "${TIGASE_CONFIG}"
     fi
 fi
 
@@ -134,9 +135,9 @@ case "${1}" in
         ;;
 
   restart)
-        $0 stop $*
+        $0 stop $2
         sleep 5
-        $0 start $*
+        $0 start $2
         ;;
 
   run)

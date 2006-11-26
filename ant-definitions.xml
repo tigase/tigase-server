@@ -104,7 +104,7 @@
         <arg value="s/&lt;[^>]*>//g"/>
         <arg value="-e"/>
         <arg value="s/&#60;[^>]*>//g"/>
-        <arg value="www/README.html"/>
+        <arg value="package.html"/>
       </exec>
       <copy
         file="package.html"
@@ -113,6 +113,10 @@
       <copy todir="${dist}/@{packagename}-${version}/certs">
         <fileset dir="certs" includes="*"/>
       </copy>
+      <mkdir dir="${dist}/@{packagename}-${version}/etc"/>
+      <copy
+        file="etc/tigase.conf"
+        tofile="${dist}/@{packagename}-${version}/etc/tigase.conf"/>
       <mkdir dir="${dist}/@{packagename}-${version}/libs"/>
       <copy todir="${dist}/@{packagename}-${version}/libs">
         <fileset dir="libs" includes="*"/>
@@ -120,6 +124,12 @@
       <copy
         file="scripts/tigase.sh"
         tofile="${dist}/@{packagename}-${version}/bin/tigase.sh"/>
+      <copy
+        file="scripts/config.sh"
+        tofile="${dist}/@{packagename}-${version}/bin/config.sh"/>
+      <copy
+        file="scripts/repo.sh"
+        tofile="${dist}/@{packagename}-${version}/bin/repo.sh"/>
       <move todir="${dist}/@{packagename}-${version}/docs">
         <fileset dir="@{docsdir}"/>
       </move>

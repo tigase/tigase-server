@@ -129,7 +129,6 @@
   <delete dir="dist"/>
   <delete dir="docs-${jarfile}"/>
   <delete dir="target"/>
-  <delete dir="logs"/>
   <delete>
    <fileset dir="." includes="*.log"/>
    <fileset dir="." includes="*.lck"/>

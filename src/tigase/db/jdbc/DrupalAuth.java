@@ -84,6 +84,7 @@ public class DrupalAuth implements UserAuthRepository {
 	private PreparedStatement user_add_st = null;
 	private PreparedStatement max_uid_st = null;
 	private PreparedStatement conn_valid_st = null;
+	private PreparedStatement update_last_login_st = null;
 
 	private long lastConnectionValidated = 0;
 	private long connectionValidateInterval = 1000*60;
@@ -107,6 +108,9 @@ public class DrupalAuth implements UserAuthRepository {
 
 		query = "select count(*) from " + users_tbl;
 		conn_valid_st = conn.prepareStatement(query);
+
+		query = "update " + users_tbl + " set access=?, login=? where name=?;";
+		update_last_login_st = conn.prepareStatement(query);
 	}
 
 	private boolean checkConnection() throws SQLException {
@@ -136,6 +140,18 @@ public class DrupalAuth implements UserAuthRepository {
 				stmt.close();
 			} catch (SQLException sqlEx) { }
 		}
+	}
+
+	private void updateLastLogin(String user) throws TigaseDBException {
+		try {
+			BigDecimal bd = new BigDecimal((System.currentTimeMillis()/1000));
+			update_last_login_st.setBigDecimal(1, bd);
+			update_last_login_st.setBigDecimal(2, bd);
+			update_last_login_st.setString(3, JID.getNodeNick(user));
+			update_last_login_st.executeUpdate();
+		} catch (SQLException e) {
+			throw new TigaseDBException("Error accessin repository.", e);
+		} // end of try-catch
 	}
 
 	private boolean isActive(final String user)
@@ -246,7 +262,11 @@ public class DrupalAuth implements UserAuthRepository {
 			} // end of if (!isActive(user))
 			String enc_passwd = Algorithms.hexDigest("", password, "MD5");
 			String db_password = getPassword(user);
-			return db_password.equals(enc_passwd);
+			boolean login_ok = db_password.equals(enc_passwd);
+			if (login_ok) {
+				updateLastLogin(user);
+			} // end of if (login_ok)
+			return login_ok;
 		} catch (NoSuchAlgorithmException e) {
 			throw
 				new AuthorizationException("Password encoding algorithm is not supported.",
@@ -289,7 +309,12 @@ public class DrupalAuth implements UserAuthRepository {
 		if (proto.equals(PROTOCOL_VAL_SASL)) {
 			String mech = (String)props.get(MACHANISM_KEY);
 			if (mech.equals("PLAIN")) {
-				return saslAuth(props);
+				boolean login_ok = saslAuth(props);
+				if (login_ok) {
+					String user = (String)props.get(USER_ID_KEY);
+					updateLastLogin(user);
+				} // end of if (login_ok)
+				return login_ok;
 			} // end of if (mech.equals("PLAIN"))
 			throw new AuthorizationException("Mechanism is not supported: " + mech);
 		} // end of if (proto.equals(PROTOCOL_VAL_SASL))
