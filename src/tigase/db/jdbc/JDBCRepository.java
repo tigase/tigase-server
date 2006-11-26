@@ -50,6 +50,7 @@ import tigase.db.UserAuthRepositoryImpl;
 import tigase.db.UserExistsException;
 import tigase.db.UserNotFoundException;
 import tigase.db.UserRepository;
+import tigase.util.SimpleCache;
 
 /**
  * Describe class JDBCRepository here.
@@ -91,6 +92,8 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	private PreparedStatement remove_key_data_st = null;
 	private PreparedStatement conn_valid_st = null;
 
+	private SimpleCache<String, Object> cache = null;
+
 	private long lastConnectionValidated = 0;
 	private long connectionValidateInterval = 1000*60;
 
@@ -130,16 +133,21 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 
 	private long getUserUID(String user_id)
 		throws SQLException, UserNotFoundException {
+		Long cache_res = (Long)cache.get(user_id);
+		if (cache_res != null) {
+			return cache_res.longValue();
+		} // end of if (result != null)
 		ResultSet rs = null;
+		long result = -1;
 		try {
 			synchronized (uid_st) {
 				uid_st.setString(1, user_id);
 				rs = uid_st.executeQuery();
 				if (rs.next()) {
-					return rs.getLong(1);
+					result = rs.getLong(1);
 				} else {
 					if (autoCreateUser) {
-						return addUserRepo(user_id);
+						result = addUserRepo(user_id);
 					} else {
 						throw new UserNotFoundException("User does not exist: " + user_id);
 					} // end of if (autoCreateUser) else
@@ -148,6 +156,8 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		} finally {
 			release(null, rs);
 		}
+		cache.put(user_id, new Long(result));
+		return result;
 	}
 
 	private void incrementMaxUID() throws SQLException {
@@ -219,8 +229,16 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 
 	private long getNodeNID(String user_id, String node_path)
 		throws SQLException, UserNotFoundException {
+		Long cache_res = (Long)cache.get(user_id+"/"+node_path);
+		if (cache_res != null) {
+			return cache_res.longValue();
+		} // end of if (result != null)
 		long uid = getUserUID(user_id);
-		return getNodeNID(uid, node_path);
+		long result = getNodeNID(uid, node_path);
+		if (result > 0) {
+			cache.put(user_id+"/"+node_path, new Long(result));
+		} // end of if (result > 0)
+		return result;
 	}
 
 	private long addNode(long uid, long parent_nid, String node_name)
@@ -314,6 +332,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 			rs.next();
 			max_uid = rs.getLong("max_uid");
 			max_nid = rs.getLong("max_nid");
+			cache = new SimpleCache<String, Object>(1000);
 		} finally {
 			release(stmt, rs);
 			stmt = null; rs = null;
@@ -384,6 +403,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 			release(stmt, null);
 			stmt = null;
 		}
+		cache.put(user_id, new Long(uid));
 		return uid;
 	}
 
@@ -433,6 +453,8 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		} finally {
 			release(stmt, rs);
 			stmt = null;
+			// cache.remove(user_id);
+			cache.clear();
 		}
 	}
 
@@ -447,6 +469,10 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	 */
 	public String[] getDataList(final String user_id, final String subnode,
 		final String key) throws UserNotFoundException, TigaseDBException {
+// 		String[] cache_res = (String[])cache.get(user_id+"/"+subnode+"/"+key);
+// 		if (cache_res != null) {
+// 			return cache_res;
+// 		} // end of if (result != null)
 		ResultSet rs = null;
 		try {
 			checkConnection();
@@ -461,8 +487,10 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 						results.add(rs.getString(1));
 					}
 				}
-				return results.size() == 0 ? null :
+				String[] result = results.size() == 0 ? null :
 					results.toArray(new String[results.size()]);
+				//				cache.put(user_id+"/"+subnode+"/"+key, result);
+				return result;
 			} else {
 				return null;
 			} // end of if (nid > 0) else
@@ -558,6 +586,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 			long nid = getNodeNID(user_id, subnode);
 			if (nid > 0) {
 				deleteSubnode(nid);
+				cache.remove(user_id+"/"+subnode);
 			}
 		} catch (SQLException e) {
 			throw new TigaseDBException("Error getting subnodes list.", e);
@@ -611,6 +640,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		} catch (SQLException e) {
 			throw new TigaseDBException("Error getting subnodes list.", e);
 		}
+		//		cache.put(user_id+"/"+subnode+"/"+key, list);
 	}
 
 	/**
@@ -673,6 +703,10 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	public String getData(final String user_id, final String subnode,
 		final String key, final String def)
 		throws UserNotFoundException, TigaseDBException {
+// 		String[] cache_res = (String[])cache.get(user_id+"/"+subnode+"/"+key);
+// 		if (cache_res != null) {
+// 			return cache_res[0];
+// 		} // end of if (result != null)
 		ResultSet rs = null;
 		try {
 			checkConnection();
@@ -687,6 +721,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 						result = rs.getString(1);
 					}
 				}
+				//				cache.put(user_id+"/"+subnode+"/"+key, new String[] {result});
 				return result;
 			} else {
 				return def;
@@ -765,6 +800,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	public void removeData(final String user_id, final String subnode,
 		final String key)
 		throws UserNotFoundException, TigaseDBException {
+		//		cache.remove(user_id+"/"+subnode+"/"+key);
 		try {
 			checkConnection();
 			long nid = getNodeNID(user_id, subnode);
