@@ -22,6 +22,7 @@
  */
 package tigase.db.jdbc;
 
+
 import java.io.IOException;
 import java.sql.BaseQuery;
 import java.sql.Connection;
@@ -34,13 +35,13 @@ import java.sql.Select;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import tigase.db.AuthorizationException;
 import tigase.db.DBInitException;
 import tigase.db.RepositoryFactory;
@@ -92,7 +93,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	private PreparedStatement remove_key_data_st = null;
 	private PreparedStatement conn_valid_st = null;
 
-	private SimpleCache<String, Object> cache = null;
+	private Map<String, Object> cache = null;
 
 	private long lastConnectionValidated = 0;
 	private long connectionValidateInterval = 1000*60;
@@ -332,7 +333,8 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 			rs.next();
 			max_uid = rs.getLong("max_uid");
 			max_nid = rs.getLong("max_nid");
-			cache = new SimpleCache<String, Object>(1000);
+			cache =
+				Collections.synchronizedMap(new SimpleCache<String, Object>(1000));
 		} finally {
 			release(stmt, rs);
 			stmt = null; rs = null;
