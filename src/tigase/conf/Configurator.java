@@ -32,6 +32,8 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
@@ -59,6 +61,7 @@ public class Configurator extends AbstractComponentRegistrator
     Logger.getLogger("tigase.conf.Configurator");
 
 	private ConfigRepository repository = null;
+	private Timer delayedTask = new Timer("ConfiguratorTask", true);
 
 	public Configurator(String fileName) {
 		repository = ConfigRepository.getConfigRepository(fileName);
@@ -130,8 +133,14 @@ public class Configurator extends AbstractComponentRegistrator
   /**
    * Sets all configuration properties for object.
    */
-	public void setProperties(Map<String, Object> properties) {
+	public void setProperties(final Map<String, Object> properties) {
 		setupLogManager(properties);
+// 		delayedTask.schedule(new TimerTask() {
+// 				public void run() {
+// 					properties.put(LOGGING_KEY + "tigase.server.level", "ALL");
+// 					setupLogManager(properties);
+// 				}
+// 			}, 30000);
 	}
 
 	private void setupLogManager(Map<String, Object> properties) {
