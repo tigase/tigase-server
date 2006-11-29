@@ -54,7 +54,8 @@ import tigase.db.UserRepository;
 import tigase.util.SimpleCache;
 
 /**
- * Describe class JDBCRepository here.
+ * Not synchronized implementation!
+ * Mustn't be used by more than one thread a time.
  *
  *
  * Created: Thu Oct 26 11:48:53 2006
@@ -117,17 +118,15 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	}
 
 	private boolean checkConnection() throws SQLException {
-		synchronized (conn_valid_st) {
-			try {
-				long tmp = System.currentTimeMillis();
-				if ((tmp - lastConnectionValidated) >= connectionValidateInterval) {
-					conn_valid_st.executeQuery();
-					lastConnectionValidated = tmp;
-				} // end of if ()
-			} catch (Exception e) {
-				initRepo();
-			} // end of try-catch
-		}
+		try {
+			long tmp = System.currentTimeMillis();
+			if ((tmp - lastConnectionValidated) >= connectionValidateInterval) {
+				conn_valid_st.executeQuery();
+				lastConnectionValidated = tmp;
+			} // end of if ()
+		} catch (Exception e) {
+			initRepo();
+		} // end of try-catch
 		return true;
 	}
 
@@ -140,19 +139,17 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		ResultSet rs = null;
 		long result = -1;
 		try {
-			synchronized (uid_st) {
-				uid_st.setString(1, user_id);
-				rs = uid_st.executeQuery();
-				if (rs.next()) {
-					result = rs.getLong(1);
+			uid_st.setString(1, user_id);
+			rs = uid_st.executeQuery();
+			if (rs.next()) {
+				result = rs.getLong(1);
+			} else {
+				if (autoCreateUser) {
+					result = addUserRepo(user_id);
 				} else {
-					if (autoCreateUser) {
-						result = addUserRepo(user_id);
-					} else {
-						throw new UserNotFoundException("User does not exist: " + user_id);
-					} // end of if (autoCreateUser) else
-				} // end of if (isnext) else
-			}
+					throw new UserNotFoundException("User does not exist: " + user_id);
+				} // end of if (autoCreateUser) else
+			} // end of if (isnext) else
 		} finally {
 			release(null, rs);
 		}
@@ -244,17 +241,15 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	private long addNode(long uid, long parent_nid, String node_name)
 		throws SQLException {
 		long new_nid = max_nid++;
-		synchronized (node_add_st) {
-			node_add_st.setLong(1, new_nid);
-			if (parent_nid < 0) {
-				node_add_st.setNull(2, Types.BIGINT);
-			} else {
-				node_add_st.setLong(2, parent_nid);
-			} // end of else
-			node_add_st.setLong(3, uid);
-			node_add_st.setString(4, node_name);
-			node_add_st.executeUpdate();
-		}
+		node_add_st.setLong(1, new_nid);
+		if (parent_nid < 0) {
+			node_add_st.setNull(2, Types.BIGINT);
+		} else {
+			node_add_st.setLong(2, parent_nid);
+		} // end of else
+		node_add_st.setLong(3, uid);
+		node_add_st.setString(4, node_name);
+		node_add_st.executeUpdate();
 		incrementMaxNID();
 		return new_nid;
 	}
@@ -332,8 +327,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 			rs.next();
 			max_uid = rs.getLong("max_uid");
 			max_nid = rs.getLong("max_nid");
-			cache =
-				Collections.synchronizedMap(new SimpleCache<String, Object>(1000));
+			cache = new SimpleCache<String, Object>(1000);
 		} finally {
 			release(stmt, rs);
 			stmt = null; rs = null;
@@ -480,13 +474,11 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 			long nid = getNodeNID(user_id, subnode);
 			if (nid > 0) {
 				List<String> results = new ArrayList<String>();
-				synchronized (data_for_node_st) {
-					data_for_node_st.setLong(1, nid);
-					data_for_node_st.setString(2, key);
-					rs = data_for_node_st.executeQuery();
-					while (rs.next()) {
-						results.add(rs.getString(1));
-					}
+				data_for_node_st.setLong(1, nid);
+				data_for_node_st.setString(2, key);
+				rs = data_for_node_st.executeQuery();
+				while (rs.next()) {
+					results.add(rs.getString(1));
 				}
 				String[] result = results.size() == 0 ? null :
 					results.toArray(new String[results.size()]);
@@ -518,12 +510,10 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 			long nid = getNodeNID(user_id, subnode);
 			if (nid > 0) {
 				List<String> results = new ArrayList<String>();
-				synchronized (nodes_for_node_st) {
-					nodes_for_node_st.setLong(1, nid);
-					rs = nodes_for_node_st.executeQuery();
-					while (rs.next()) {
-						results.add(rs.getString(2));
-					}
+				nodes_for_node_st.setLong(1, nid);
+				rs = nodes_for_node_st.executeQuery();
+				while (rs.next()) {
+					results.add(rs.getString(2));
 				}
 				return results.size() == 0 ? null :
 					results.toArray(new String[results.size()]);
@@ -629,15 +619,13 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 			if (nid < 0) {
 				nid = createNodePath(user_id, subnode);
 			}
-			synchronized (insert_key_val_st) {
-				insert_key_val_st.setLong(1, nid);
-				insert_key_val_st.setLong(2, uid);
-				insert_key_val_st.setString(3, key);
-				for (String val: list) {
-					insert_key_val_st.setString(4, val);
-					insert_key_val_st.executeUpdate();
-				} // end of for (String val: list)
-			}
+			insert_key_val_st.setLong(1, nid);
+			insert_key_val_st.setLong(2, uid);
+			insert_key_val_st.setString(3, key);
+			for (String val: list) {
+				insert_key_val_st.setString(4, val);
+				insert_key_val_st.executeUpdate();
+			} // end of for (String val: list)
 		} catch (SQLException e) {
 			throw new TigaseDBException("Error getting subnodes list.", e);
 		}
@@ -660,12 +648,10 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 			long nid = getNodeNID(user_id, subnode);
 			if (nid > 0) {
 				List<String> results = new ArrayList<String>();
-				synchronized (keys_for_node_st) {
-					keys_for_node_st.setLong(1, nid);
-					rs = keys_for_node_st.executeQuery();
-					while (rs.next()) {
-						results.add(rs.getString(1));
-					}
+				keys_for_node_st.setLong(1, nid);
+				rs = keys_for_node_st.executeQuery();
+				while (rs.next()) {
+					results.add(rs.getString(1));
 				}
 				return results.size() == 0 ? null :
 					results.toArray(new String[results.size()]);
@@ -714,13 +700,11 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 			long nid = getNodeNID(user_id, subnode);
 			if (nid > 0) {
 				String result = def;
-				synchronized (data_for_node_st) {
-					data_for_node_st.setLong(1, nid);
-					data_for_node_st.setString(2, key);
-					rs = data_for_node_st.executeQuery();
-					if (rs.next()) {
-						result = rs.getString(1);
-					}
+				data_for_node_st.setLong(1, nid);
+				data_for_node_st.setString(2, key);
+				rs = data_for_node_st.executeQuery();
+				if (rs.next()) {
+					result = rs.getString(1);
 				}
 				//				cache.put(user_id+"/"+subnode+"/"+key, new String[] {result});
 				return result;
@@ -806,11 +790,9 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 			checkConnection();
 			long nid = getNodeNID(user_id, subnode);
 			if (nid > 0) {
-				synchronized (remove_key_data_st) {
-					remove_key_data_st.setLong(1, nid);
-					remove_key_data_st.setString(2, key);
-					remove_key_data_st.executeUpdate();
-				}
+				remove_key_data_st.setLong(1, nid);
+				remove_key_data_st.setString(2, key);
+				remove_key_data_st.executeUpdate();
 			}
 		} catch (SQLException e) {
 			throw new TigaseDBException("Error getting subnodes list.", e);
