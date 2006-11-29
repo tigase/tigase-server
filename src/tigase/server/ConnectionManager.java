@@ -22,7 +22,6 @@
  */
 package tigase.server;
 
-//import tigase.net.IOService;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.nio.channels.SocketChannel;
@@ -262,7 +261,7 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 			} // end of try-catch
 		} // end of if (ios != null)
 		else {
-			log.warning("Can't find service for packet: <"
+			log.info("Can't find service for packet: <"
 				+ p.getElemName() + "> " + p.getTo()
 				+ ", service id: " + getServiceId(p));
 		} // end of if (ios != null) else
