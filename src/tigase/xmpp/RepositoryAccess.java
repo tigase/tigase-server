@@ -244,7 +244,7 @@ public abstract class RepositoryAccess {
 			} // end of if (authRepo.loginPlain())auth.login();
 			return authState;
     } catch (UserNotFoundException e) {
-      log.log(Level.INFO, "Problem accessing reposiotry: ", e);
+      log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
       throw new NotAuthorizedException("Authorization failed", e);
     } catch (TigaseDBException e) {
 			log.log(Level.SEVERE, "Repository access exception.", e);
@@ -262,7 +262,7 @@ public abstract class RepositoryAccess {
 			} // end of if (authRepo.loginPlain())auth.login();
 			return authState;
     } catch (UserNotFoundException e) {
-      log.log(Level.WARNING, "Problem accessing reposiotry: ", e);
+      log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
       throw new NotAuthorizedException("Authorization failed", e);
     } catch (TigaseDBException e) {
 			log.log(Level.SEVERE, "Repository access exception.", e);
@@ -298,7 +298,7 @@ public abstract class RepositoryAccess {
     throws NotAuthorizedException {
     try { return repo.getDataList(getUserId(), subnode, key);
     } catch (UserNotFoundException e) {
-      log.log(Level.WARNING, "Problem accessing reposiotry: ", e);
+      log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
       throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
     } catch (TigaseDBException e) {
 			log.log(Level.SEVERE, "Repository access exception.", e);
@@ -333,7 +333,7 @@ public abstract class RepositoryAccess {
     final String key, final String def) throws NotAuthorizedException {
     try { return repo.getData(getUserId(), subnode, key, def);
     } catch (UserNotFoundException e) {
-      log.log(Level.WARNING, "Problem accessing reposiotry: ", e);
+      log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
       throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
     } catch (TigaseDBException e) {
 			log.log(Level.SEVERE, "Repository access exception.", e);
@@ -390,7 +390,7 @@ public abstract class RepositoryAccess {
     final String key, final String value) throws NotAuthorizedException {
     try { repo.setData(getUserId(), subnode, key, value);
     } catch (UserNotFoundException e) {
-      log.log(Level.WARNING, "Problem accessing reposiotry: ", e);
+      log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
       throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
     } catch (TigaseDBException e) {
 			log.log(Level.SEVERE, "Repository access exception.", e);
@@ -401,7 +401,7 @@ public abstract class RepositoryAccess {
 		throws NotAuthorizedException {
     try { repo.removeData(getUserId(), subnode, key);
     } catch (UserNotFoundException e) {
-      log.log(Level.WARNING, "Problem accessing reposiotry: ", e);
+      log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
       throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
     } catch (TigaseDBException e) {
 			log.log(Level.SEVERE, "Repository access exception.", e);
@@ -425,7 +425,7 @@ public abstract class RepositoryAccess {
     throws NotAuthorizedException {
     try { return repo.getSubnodes(getUserId(), subnode);
     } catch (UserNotFoundException e) {
-      log.log(Level.WARNING, "Problem accessing reposiotry: ", e);
+      log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
       throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
     } catch (TigaseDBException e) {
 			log.log(Level.SEVERE, "Repository access exception.", e);
@@ -452,7 +452,7 @@ public abstract class RepositoryAccess {
     throws NotAuthorizedException {
     try { return repo.getKeys(getUserId(), subnode);
     } catch (UserNotFoundException e) {
-      log.log(Level.WARNING, "Problem accessing reposiotry: ", e);
+      log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
       throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
     } catch (TigaseDBException e) {
 			log.log(Level.SEVERE, "Repository access exception.", e);
@@ -478,7 +478,7 @@ public abstract class RepositoryAccess {
     throws NotAuthorizedException {
     try { repo.removeSubnode(getUserId(), subnode);
     } catch (UserNotFoundException e) {
-      log.log(Level.WARNING, "Problem accessing reposiotry: ", e);
+      log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
       throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
     } catch (TigaseDBException e) {
 			log.log(Level.SEVERE, "Repository access exception.", e);
@@ -505,7 +505,7 @@ public abstract class RepositoryAccess {
     final String[] list) throws NotAuthorizedException {
     try { repo.setDataList(getUserId(), subnode, key, list);
     } catch (UserNotFoundException e) {
-      log.log(Level.WARNING, "Problem accessing reposiotry: ", e);
+      log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
       throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
     } catch (TigaseDBException e) {
 			log.log(Level.SEVERE, "Repository access exception.", e);
@@ -516,7 +516,7 @@ public abstract class RepositoryAccess {
     final String[] list) throws NotAuthorizedException {
     try { repo.addDataList(getUserId(), subnode, key, list);
     } catch (UserNotFoundException e) {
-      log.log(Level.WARNING, "Problem accessing reposiotry: ", e);
+      log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
       throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
     } catch (TigaseDBException e) {
 			log.log(Level.SEVERE, "Repository access exception.", e);
