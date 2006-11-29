@@ -51,7 +51,6 @@ import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPIOService;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
-//import tigase.net.IOService;
 import tigase.net.IOService;
 import tigase.net.SocketReadThread;
 
