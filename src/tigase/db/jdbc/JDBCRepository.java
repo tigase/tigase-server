@@ -117,18 +117,17 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	}
 
 	private boolean checkConnection() throws SQLException {
-		try {
-// 			if (!conn.isValid(5)) {
-// 				initRepo();
-// 			} // end of if (!conn.isValid())
-			long tmp = System.currentTimeMillis();
-			if ((tmp - lastConnectionValidated) >= connectionValidateInterval) {
-				conn_valid_st.executeQuery();
-				lastConnectionValidated = tmp;
-			} // end of if ()
-		} catch (Exception e) {
-			initRepo();
-		} // end of try-catch
+		synchronized (conn_valid_st) {
+			try {
+				long tmp = System.currentTimeMillis();
+				if ((tmp - lastConnectionValidated) >= connectionValidateInterval) {
+					conn_valid_st.executeQuery();
+					lastConnectionValidated = tmp;
+				} // end of if ()
+			} catch (Exception e) {
+				initRepo();
+			} // end of try-catch
+		}
 		return true;
 	}
 
