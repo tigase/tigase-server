@@ -309,7 +309,7 @@ public class SessionManager extends AbstractMessageReceiver
 						if (session.getActiveResourcesSize() <= 1) {
 							session = sessionsByNodeId.remove(userId);
 							if (session == null) {
-								log.warning("UPS can't remove session, not found in map: " + userId);
+								log.info("UPS can't remove session, not found in map: " + userId);
 							} else {
 								log.finer("Number of authorized connections: "
 									+ sessionsByNodeId.size());
