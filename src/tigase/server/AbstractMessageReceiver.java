@@ -29,6 +29,8 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+// import java.util.Timer;
+// import java.util.TimerTask;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Logger;
@@ -50,7 +52,7 @@ import tigase.util.JID;
  * @version $Rev$
  */
 public abstract class AbstractMessageReceiver
-  implements Runnable, StatisticsContainer, MessageReceiver, Configurable {
+  implements StatisticsContainer, MessageReceiver, Configurable {
 
 	public static final String MAX_QUEUE_SIZE_PROP_KEY = "max-queue-size";
 	//  public static final Integer MAX_QUEUE_SIZE_PROP_VAL = Integer.MAX_VALUE;
@@ -65,10 +67,17 @@ public abstract class AbstractMessageReceiver
   private int maxQueueSize = MAX_QUEUE_SIZE_PROP_VAL;
 
   private MessageReceiver parent = null;
+	//	private Timer delayedTask = new Timer("MessageReceiverTask", true);
 
-  private LinkedBlockingQueue<QueueElement> queue =
+  private LinkedBlockingQueue<QueueElement> in_queue =
 		new LinkedBlockingQueue<QueueElement>(maxQueueSize);
-	private Thread thread = null;
+  private LinkedBlockingQueue<QueueElement> out_queue =
+		new LinkedBlockingQueue<QueueElement>(maxQueueSize);
+
+// 	private String sync = "SyncObject";
+
+	private Thread in_thread = null;
+	private Thread out_thread = null;
   private boolean stopped = false;
   private String name = null;
 	private Set<String> routings = new TreeSet<String>();
@@ -110,9 +119,7 @@ public abstract class AbstractMessageReceiver
 			result = prAddPacket(p);
 			if (result) {
 				packets.poll();
-
-			} // end of if (result)
-			else {
+			} else {
 				return false;
 			} // end of if (result) else
 		} // end of while ()
@@ -122,9 +129,12 @@ public abstract class AbstractMessageReceiver
 	private boolean prAddPacket(Packet packet) {
 		try {
 			log.finest(">" + getName() + "<  " +
-				"Added packet to inQueue: " + packet.getStringData());
-			queue.put(new QueueElement(QueueElementType.IN_QUEUE, packet));
+				"Adding packet to inQueue: " + packet.getStringData());
+			in_queue.put(new QueueElement(QueueElementType.IN_QUEUE, packet));
 			++statAddedMessagesOk;
+// 			synchronized (sync) {
+// 				sync.notifyAll();
+// 			}
 		} // end of try
 		catch (InterruptedException e) {
 			++statAddedMessagesEr;
@@ -136,9 +146,12 @@ public abstract class AbstractMessageReceiver
 	protected boolean addOutPacket(Packet packet) {
 		try {
 			log.finest(">" + getName() + "<  " +
-				"Added packet to outQueue: " + packet.getStringData());
-			queue.put(new QueueElement(QueueElementType.OUT_QUEUE, packet));
+				"Adding packet to outQueue: " + packet.getStringData());
+			out_queue.put(new QueueElement(QueueElementType.OUT_QUEUE, packet));
 			++statAddedMessagesOk;
+// 			synchronized (sync) {
+// 				sync.notifyAll();
+// 			}
 		} // end of try
 		catch (InterruptedException e) {
 			++statAddedMessagesEr;
@@ -147,43 +160,14 @@ public abstract class AbstractMessageReceiver
 		return true;
 	}
 
-  public void run() {
-		while (! stopped) {
-			try {
-				QueueElement qel = queue.take();
-				switch (qel.type) {
-				case IN_QUEUE:
-					processPacket(qel.packet);
-					break;
-				case OUT_QUEUE:
-					if (parent != null) {
-						log.finest(">" + getName() + "<  " +
-							"Sending outQueue to parent: " + parent.getName());
-						parent.addPacket(qel.packet);
-					} // end of if (parent != null)
-					else {
-						log.warning(">" + getName() + "<  " + "No parent!");
-					} // end of else
-					break;
-				default:
-					log.severe("Unknown queue element type: " + qel.type);
-					break;
-				} // end of switch (qel.type)
-			} catch (InterruptedException e) {
-				stopped = true;
-			} catch (Exception e) {
-				log.log(Level.WARNING, "Exception during packet processing: ", e);
-			} // end of try-catch
-		} // end of while (! stopped)
-  }
-
   public abstract void processPacket(Packet packet);
 
 	//   public int queueSize() { return inQueue.size(); }
 
   public List<StatRecord> getStatistics() {
     List<StatRecord> stats = new ArrayList<StatRecord>();
-    stats.add(new StatRecord(StatisticType.QUEUE_SIZE, queue.size()));
+    stats.add(new StatRecord(StatisticType.QUEUE_SIZE,
+				(in_queue.size() + out_queue.size())));
     stats.add(new StatRecord(StatisticType.MSG_RECEIVED_OK,
 				statAddedMessagesOk));
     stats.add(new StatRecord(StatisticType.QUEUE_OVERFLOW,
@@ -202,11 +186,17 @@ public abstract class AbstractMessageReceiver
   public void setMaxQueueSize(int maxQueueSize) {
     if (this.maxQueueSize != maxQueueSize) {
       this.maxQueueSize = maxQueueSize;
-      if (queue != null) {
+      if (in_queue != null) {
 				LinkedBlockingQueue<QueueElement> newQueue =
 					new LinkedBlockingQueue<QueueElement>(maxQueueSize);
-				newQueue.addAll(queue);
-				queue = newQueue;
+				newQueue.addAll(in_queue);
+				in_queue = newQueue;
+      } // end of if (queue != null)
+      if (out_queue != null) {
+				LinkedBlockingQueue<QueueElement> newQueue =
+					new LinkedBlockingQueue<QueueElement>(maxQueueSize);
+				newQueue.addAll(out_queue);
+				out_queue = newQueue;
       } // end of if (queue != null)
     } // end of if (this.maxQueueSize != maxQueueSize)
   }
@@ -242,17 +232,24 @@ public abstract class AbstractMessageReceiver
   }
 
   public void start() {
-		if (thread == null || ! thread.isAlive()) {
+		if (in_thread == null || ! in_thread.isAlive()) {
 			stopped = false;
-			thread = new Thread(this);
-			thread.setName(name);
-			thread.start();
+			in_thread = new Thread(new QueueListener(in_queue));
+			in_thread.setName("in_" + name);
+			in_thread.start();
+		} // end of if (thread == null || ! thread.isAlive())
+		if (out_thread == null || ! out_thread.isAlive()) {
+			stopped = false;
+			out_thread = new Thread(new QueueListener(out_queue));
+			out_thread.setName("out_" + name);
+			out_thread.start();
 		} // end of if (thread == null || ! thread.isAlive())
   }
 
   public void stop() {
     stopped = true;
-		queue.notifyAll();
+		in_queue.notifyAll();
+		out_queue.notifyAll();
   }
 
 	public String getDefHostName() {
@@ -297,6 +294,47 @@ public abstract class AbstractMessageReceiver
 		private QueueElement(QueueElementType type, Packet packet) {
 			this.type = type;
 			this.packet = packet;
+		}
+
+	}
+
+	private class QueueListener implements Runnable {
+
+		private LinkedBlockingQueue<QueueElement> queue = null;
+
+		private QueueListener(LinkedBlockingQueue<QueueElement> q) {
+			this.queue = q;
+		}
+
+		public void run() {
+			while (! stopped) {
+				try {
+					QueueElement qel = queue.take();
+					switch (qel.type) {
+					case IN_QUEUE:
+						processPacket(qel.packet);
+						break;
+					case OUT_QUEUE:
+						if (parent != null) {
+							log.finest(">" + getName() + "<  " +
+								"Sending outQueue to parent: " + parent.getName());
+							parent.addPacket(qel.packet);
+						} // end of if (parent != null)
+						else {
+							log.warning(">" + getName() + "<  " + "No parent!");
+						} // end of else
+						break;
+					default:
+						log.severe("Unknown queue element type: " + qel.type);
+						break;
+					} // end of switch (qel.type)
+				} catch (InterruptedException e) {
+					//log.log(Level.SEVERE, "Exception during packet processing: ", e);
+					//				stopped = true;
+				} catch (Exception e) {
+					log.log(Level.SEVERE, "Exception during packet processing: ", e);
+				} // end of try-catch
+			} // end of while (! stopped)
 		}
 
 	}
