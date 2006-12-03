@@ -61,8 +61,9 @@ public abstract class TLSUtil {
 		sslContexts.put(id, sslCC);
 	}
 
-	public static SSLContext getSSLContext(String id, String protocol) {
-		return sslContexts.get(id).getSSLContext(protocol);
+	public static SSLContext getSSLContext(String id, String protocol,
+		String hostname) {
+		return sslContexts.get(id).getSSLContext(protocol, hostname);
 	}
 
 } // TLSUtil

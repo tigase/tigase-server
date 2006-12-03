@@ -78,6 +78,7 @@ public abstract class IOService implements Callable<IOService> {
    */
   public static final String SESSION_ID_KEY = "sessionID";
 	public static final String PORT_TYPE_PROP_KEY = "type";
+	public static final String HOSTNAME_KEY = "hostname-key";
 
   private IOInterface socketIO = null;
 	private String sslId = null;
@@ -106,14 +107,16 @@ public abstract class IOService implements Callable<IOService> {
     throws IOException {
 
 		socketIO = new TLSIO(socketIO,
-			new TLSWrapper(TLSUtil.getSSLContext(sslId, "SSL"), clientMode));
+			new TLSWrapper(TLSUtil.getSSLContext(sslId, "SSL",
+					(String)sessionData.get(HOSTNAME_KEY)), clientMode));
   }
 
   public synchronized void startTLS(final boolean clientMode)
     throws IOException {
 
 		socketIO = new TLSIO(socketIO,
-			new TLSWrapper(TLSUtil.getSSLContext(sslId, "TLS"), clientMode));
+			new TLSWrapper(TLSUtil.getSSLContext(sslId, "TLS",
+					(String)sessionData.get(HOSTNAME_KEY)), clientMode));
   }
 
 	public void setIOServiceListener(IOServiceListener sl) {

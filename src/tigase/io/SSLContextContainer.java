@@ -27,6 +27,7 @@ import java.security.KeyStore;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -53,7 +54,9 @@ public class SSLContextContainer {
 	private SecureRandom secureRandom = null;
 	private Map<String, SSLContext> sslContexts =
 		new HashMap<String, SSLContext>();
-	private KeyManagerFactory kmf = null;
+	private Map<String, KeyManagerFactory> kmfs =
+		new HashMap<String, KeyManagerFactory>();
+// 	private KeyManagerFactory kmf = null;
 	private TrustManagerFactory tmf = null;
 
 	public SSLContextContainer() {
@@ -80,8 +83,24 @@ public class SSLContextContainer {
 				final KeyStore keys = KeyStore.getInstance("JKS");
 				final char[] keys_password = k_passwd.toCharArray();
 				keys.load(new	FileInputStream(k_store),	keys_password);
-				kmf = KeyManagerFactory.getInstance("SunX509");
+				KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
 				kmf.init(keys, keys_password);
+				kmfs.put(null, kmf);
+				Enumeration<String> aliases = keys.aliases();
+				KeyStore.PasswordProtection pass_param =
+					new KeyStore.PasswordProtection(keys_password);
+				if (aliases != null) {
+					while (aliases.hasMoreElements()) {
+						String alias = aliases.nextElement();
+						KeyStore.Entry entry = keys.getEntry(alias, pass_param);
+						KeyStore alias_keys = KeyStore.getInstance("JKS");
+						alias_keys.load(null,	keys_password);
+						alias_keys.setEntry(alias, entry, pass_param);
+						kmf = KeyManagerFactory.getInstance("SunX509");
+						kmf.init(alias_keys, keys_password);
+						kmfs.put(alias, kmf);
+					} // end of while (aliases.hasMoreElements())
+				} // end of if (aliases != null)
 			} // end of if (k_store != null && k_passwd != null)
 
 			if (t_store != null && t_passwd != null) {
@@ -102,20 +121,24 @@ public class SSLContextContainer {
 		} // end of try-catch
 	}
 
-	public SSLContext getSSLContext(final String protocol) {
-		SSLContext sslContext = sslContexts.get(protocol);
+	public SSLContext getSSLContext(final String protocol, final String hostname) {
+		String map_key = hostname != null ? hostname+protocol : protocol;
+		SSLContext sslContext = sslContexts.get(map_key);
 		if (sslContext == null) {
 			try {
 				sslContext = SSLContext.getInstance(protocol);
+				KeyManagerFactory kmf = kmfs.get(hostname);
 				if (kmf != null && tmf != null) {
 					sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(),
 						secureRandom);
-				} // end of if (kmf != null && tmf != null)
-				else {
+				} else {
+					if (kmf == null) {
+						log.warning("No certificate found for host: " + hostname);
+					} // end of if (kmf == null)
 					sslContext.init(kmf != null ? kmf.getKeyManagers() : null,
 						new X509TrustManager[] {new FakeTrustManager()}, secureRandom);
 				} // end of if (kmf != null && tmf != null) else
-				sslContexts.put(protocol, sslContext);
+				sslContexts.put(map_key, sslContext);
 				log.config("Created SSL context for: " + sslContext.getProtocol());
 			} // end of try
 			catch (Exception e) {

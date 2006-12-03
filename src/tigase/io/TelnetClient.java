@@ -84,7 +84,7 @@ public class TelnetClient implements SampleSocketThread.SocketHandler {
 		iosock = new SocketIO(sc);
 		if (ssl) {
 			iosock = new TLSIO(iosock,
-				new TLSWrapper(TLSUtil.getSSLContext(sslId, "SSL"), true));
+				new TLSWrapper(TLSUtil.getSSLContext(sslId, "SSL", null), true));
 		} // end of if (ssl)
 		reader.addIOInterface(iosock);
 		log.finer("Registered new client socket: " + sc);

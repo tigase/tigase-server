@@ -288,13 +288,12 @@ public class ClientConnectionManager extends ConnectionManager {
 		} // end of if (!hostnames.contains(hostname))
 
 		serv.getSessionData().put(serv.SESSION_ID_KEY, id);
+		serv.getSessionData().put(serv.HOSTNAME_KEY, hostname);
 		Packet streamOpen = Command.STREAM_OPENED.getPacket(
 			getFromAddress(getUniqueId(serv)),
 			routings.computeRouting(hostname), StanzaType.set, "sess1",
 			new Element("session-id", id));
-		if (hostname != null) {
-			streamOpen.getElement().addChild(new Element("hostname", hostname));
-		} // end of if (hostname != null)
+		streamOpen.getElement().addChild(new Element("hostname", hostname));
 		addOutPacket(streamOpen);
 		if (attribs.get("version") != null) {
 			addOutPacket(Command.GETFEATURES.getPacket(
