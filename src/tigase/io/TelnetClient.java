@@ -128,7 +128,7 @@ public class TelnetClient implements SampleSocketThread.SocketHandler {
 			turnDebugOn();
 		} // end of if (debug)
 		if (ssl) {
-			TLSUtil.configureSSLContext(sslId, "certs/keystore", "keystore");
+			TLSUtil.configureSSLContext(sslId, "certs/keystore", "keystore", null);
 		} // end of if (ssl)
 		TelnetClient client = new TelnetClient(hostname, port);
 		InputStreamReader str_reader = new InputStreamReader(System.in);

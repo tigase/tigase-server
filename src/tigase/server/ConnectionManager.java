@@ -81,6 +81,9 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 	public static final String TLS_KEYS_STORE_PROP_KEY =
 		TLS_PROP_KEY + "keys-store";
 	public static final String TLS_KEYS_STORE_PROP_VAL = "certs/rsa-keystore";
+	public static final String TLS_DEF_CERT_PROP_KEY =
+		TLS_PROP_KEY + "def-cert-alias";
+	public static final String TLS_DEF_CERT_PROP_VAL = "default";
 	public static final String TLS_KEYS_STORE_PASSWD_PROP_KEY =
 		TLS_PROP_KEY + "keys-store-password";
 	public static final String TLS_KEYS_STORE_PASSWD_PROP_VAL =	"keystore";
@@ -102,6 +105,7 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 	public Map<String, Object> getDefaults() {
 		Map<String, Object> props = super.getDefaults();
 		props.put(TLS_USE_PROP_KEY, TLS_USE_PROP_VAL);
+		props.put(TLS_DEF_CERT_PROP_KEY, TLS_DEF_CERT_PROP_VAL);
 		props.put(TLS_KEYS_STORE_PROP_KEY, TLS_KEYS_STORE_PROP_VAL);
 		props.put(TLS_KEYS_STORE_PASSWD_PROP_KEY, TLS_KEYS_STORE_PASSWD_PROP_VAL);
 		props.put(TLS_TRUSTS_STORE_PROP_KEY, TLS_TRUSTS_STORE_PROP_VAL);
@@ -183,7 +187,8 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 				(String)props.get(TLS_KEYS_STORE_PROP_KEY),
 				(String)props.get(TLS_KEYS_STORE_PASSWD_PROP_KEY),
 				(String)props.get(TLS_TRUSTS_STORE_PROP_KEY),
-				(String)props.get(TLS_TRUSTS_STORE_PASSWD_PROP_KEY));
+				(String)props.get(TLS_TRUSTS_STORE_PASSWD_PROP_KEY),
+				(String)props.get(TLS_DEF_CERT_PROP_KEY));
     } // end of if (use.equalsIgnoreCase())
 	}
 

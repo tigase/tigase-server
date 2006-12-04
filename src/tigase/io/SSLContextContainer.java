@@ -58,21 +58,25 @@ public class SSLContextContainer {
 		new HashMap<String, KeyManagerFactory>();
 // 	private KeyManagerFactory kmf = null;
 	private TrustManagerFactory tmf = null;
+	private String def_cert_alias = null;
 
 	public SSLContextContainer() {
 		log.config("Initializing SSL library (trust all certs mode)...");
 		init(null, null, null, null);
 	}
 
-	public SSLContextContainer(String k_store, String k_passwd) {
+	public SSLContextContainer(String k_store, String k_passwd,
+		String def_cert_alias) {
 		log.config("Initializing SSL library (trust all certs mode)...");
+		this.def_cert_alias = def_cert_alias;
 		init(k_store, k_passwd, null, null);
 	}
 
 	public SSLContextContainer(String k_store, String k_passwd,
-		String t_store, String t_passwd) {
+		String t_store, String t_passwd, String def_cert_alias) {
 
 		log.config("Initializing SSL library...");
+		this.def_cert_alias = def_cert_alias;
 		init(k_store, k_passwd, t_store, t_passwd);
 	}
 
@@ -121,13 +125,19 @@ public class SSLContextContainer {
 		} // end of try-catch
 	}
 
-	public SSLContext getSSLContext(final String protocol, final String hostname) {
-		String map_key = hostname != null ? hostname+protocol : protocol;
+	public SSLContext getSSLContext(final String protocol, String hostname) {
+		if (hostname == null) {
+			hostname = def_cert_alias;
+		} // end of if (hostname == null)
+		String map_key = hostname+protocol;
 		SSLContext sslContext = sslContexts.get(map_key);
 		if (sslContext == null) {
 			try {
 				sslContext = SSLContext.getInstance(protocol);
 				KeyManagerFactory kmf = kmfs.get(hostname);
+				if (kmf == null) {
+					kmf = kmfs.get(def_cert_alias);
+				} // end of if (kmf == null)
 				if (kmf != null && tmf != null) {
 					sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(),
 						secureRandom);

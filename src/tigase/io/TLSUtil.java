@@ -44,15 +44,18 @@ public abstract class TLSUtil {
 		new HashMap<String, SSLContextContainer>();
 
   public static void configureSSLContext(String id,
-		String k_store, String k_passwd, String t_store, String t_passwd) {
+		String k_store, String k_passwd, String t_store, String t_passwd,
+		String def_cert_alias) {
 		SSLContextContainer sslCC =
-			new SSLContextContainer(k_store, k_passwd, t_store, t_passwd);
+			new SSLContextContainer(k_store, k_passwd, t_store, t_passwd,
+				def_cert_alias);
 		sslContexts.put(id, sslCC);
   }
 
   public static void configureSSLContext(String id,
-		String k_store, String k_passwd) {
-		SSLContextContainer sslCC =	new SSLContextContainer(k_store, k_passwd);
+		String k_store, String k_passwd, String def_cert_alias) {
+		SSLContextContainer sslCC =
+			new SSLContextContainer(k_store, k_passwd, def_cert_alias);
 		sslContexts.put(id, sslCC);
 	}
 

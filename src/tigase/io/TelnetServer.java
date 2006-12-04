@@ -142,7 +142,7 @@ public class TelnetServer implements SampleSocketThread.SocketHandler {
 		} // end of if (debug)
 		if (ssl) {
 			TLSUtil.configureSSLContext(sslId, "certs/keystore", "keystore",
-				"certs/truststore", "truststore");
+				"certs/truststore", "truststore", null);
 		} // end of if (ssl)
 		TelnetServer server = new TelnetServer(port);
 		server.run();
