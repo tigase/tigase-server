@@ -351,9 +351,11 @@ public class Presence extends XMPPProcessor
 					break;
 				} // end of switch (buddy_subscr)
 				if (Roster.isSubscribedFrom(session, packet.getElemFrom())) {
-					Element pres = (Element)session.getSessionData(PRESENCE_KEY);
-					sendPresence(null, packet.getElemFrom(), session.getJID(), results,
-						pres);
+					for (XMPPResourceConnection conn: session.getActiveSessions()) {
+						Element pres = (Element)conn.getSessionData(PRESENCE_KEY);
+						sendPresence(null, packet.getElemFrom(), conn.getJID(),
+							results, pres);
+					}
 				} // end of if (Roster.isSubscribedFrom(session, packet.getElemFrom()))
 				break;
 			default:
