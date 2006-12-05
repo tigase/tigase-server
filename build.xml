@@ -16,13 +16,12 @@
 
  <target name="prepare-dist" description="Calculate build version">
   <!-- Get revision number -->
-  <exec executable="svn">
-   <arg line="info --non-interactive build.properties"/>
+  <exec executable="svnversion">
    <redirector outputproperty="build-no" errorproperty="error-property">
     <outputfilterchain>
      <tokenfilter>
       <containsregex
-       pattern=".*Revision:\s*([0-9]+).*" replace="\1"/>
+       pattern="[^0-9]*([0-9]+).*" replace="\1"/>
      </tokenfilter>
     </outputfilterchain>
    </redirector>
