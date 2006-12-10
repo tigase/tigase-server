@@ -120,8 +120,8 @@ public class ServerConnectionManager extends ConnectionManager {
 		new ConcurrentSkipListMap<String, Object>();
 
 	public void processPacket(Packet packet) {
-		log.finer("Processing packet: " + packet.getElemName()
-			+ ", type: " + packet.getType());
+// 		log.finer("Processing packet: " + packet.getElemName()
+// 			+ ", type: " + packet.getType());
 		log.finest("Processing packet: " + packet.getStringData());
 		if (packet.isCommand()) {
 			processCommand(packet);
@@ -178,6 +178,10 @@ public class ServerConnectionManager extends ConnectionManager {
 			port_props.put("socket", SocketType.plain);
 			port_props.put("type", ConnectionType.connect);
 			port_props.put("port-no", 5269);
+			String cid =
+				getConnectionId(localhost, remotehost, ConnectionType.connect);
+			port_props.put("cid", cid);
+			log.finest("STARTING new connection: " + cid);
 			startService(port_props);
 			return true;
 		} catch (UnknownHostException e) {
@@ -210,8 +214,8 @@ public class ServerConnectionManager extends ConnectionManager {
 		Queue<Packet> packets = serv.getReceivedPackets();
 		Packet p = null;
 		while ((p = packets.poll()) != null) {
-			log.finer("Processing packet: " + p.getElemName()
-				+ ", type: " + p.getType());
+// 			log.finer("Processing packet: " + p.getElemName()
+// 				+ ", type: " + p.getType());
 			log.finest("Processing socket data: " + p.getStringData());
 
 			if (p.getElement().getXMLNS() != null &&
@@ -219,10 +223,11 @@ public class ServerConnectionManager extends ConnectionManager {
 				Queue<Packet> results = new LinkedList<Packet>();
 				processDialback(p, serv, results);
 				for (Packet res: results) {
-					String cid = getConnectionId(res);
-					XMPPIOService sender =
-						handshakingByHost_Type.get(cid);
+					String cid = res.getTo();
+					XMPPIOService sender = handshakingByHost_Type.get(cid);
 					if (sender != null) {
+						log.finest("cid: " + cid
+							+ ", writing packet to socket: " + res.getStringData());
 						writePacketToSocket(sender, res);
 					} else {
 						// I am assuming here that it can't happen that the packet is
@@ -291,7 +296,7 @@ public class ServerConnectionManager extends ConnectionManager {
 					sb.append(p.getStringData());
 				} // end of while (p = waitingPackets.remove(ipAddress) != null)
 			} // end of if (waiting != null)
-			log.finest("Type: " + serv.connectionType()
+			log.finest("cid: " + (String)serv.getSessionData().get("cid")
 				+ ", sending: " + sb.toString());
 			return sb.toString();
 		case accept:
@@ -364,7 +369,8 @@ public class ServerConnectionManager extends ConnectionManager {
 				+ " xmlns='jabber:server'"
 				+ " xmlns:db='jabber:server:dialback'"
 				+ ">";
-			log.finest("Type: " + serv.connectionType()	+ ", sending: " + data);
+			log.finest("cid: " + (String)serv.getSessionData().get("cid")
+				+ ", sending: " + data);
 			serv.xmppStreamOpen(data);
 			break;
 		default:
