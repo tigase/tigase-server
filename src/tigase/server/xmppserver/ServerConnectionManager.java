@@ -126,38 +126,36 @@ public class ServerConnectionManager extends ConnectionManager {
 		if (packet.isCommand()) {
 			processCommand(packet);
 		} else {
-			String hostName = JID.getNodeHost(packet.getTo());
-			String out_jid = JID.getJID(null, hostName,
-				ConnectionType.connect.toString());
-			log.finest("Remote server hostname is: " + hostName);
+			String cid = getConnectionId(packet);
+			log.finest("Connection ID is: " + cid);
 			synchronized(servicesByHost_Type) {
-				XMPPIOService serv = servicesByHost_Type.get(out_jid);
+				XMPPIOService serv = servicesByHost_Type.get(cid);
 				if (serv != null) {
 					writePacketToSocket(serv, packet);
 				} else {
-					addWaitingPacket(out_jid, packet, waitingPackets);
+					addWaitingPacket(cid, packet, waitingPackets);
 				} // end of if (serv != null) else
 			}
 		} // end of else
 	}
 
-	private void addWaitingPacket(String jid, Packet packet,
+	private void addWaitingPacket(String cid, Packet packet,
 		Map<String, Queue<Packet>> waitingPacketsMap) {
 
-		// Ups service is not started yet....
 		synchronized (connectingByHost_Type) {
-			boolean connecting = connectingByHost_Type.contains(jid);
+			boolean connecting = connectingByHost_Type.contains(cid);
 			if (!connecting) {
-				String hostName = JID.getNodeHost(jid);
-				if (connecting = openNewServerConnection(hostName)) {
-					connectingByHost_Type.add(jid);
+				String localhost = JID.getNodeHost(packet.getFrom());
+				String remotehost = JID.getNodeHost(packet.getTo());
+				if (connecting = openNewServerConnection(localhost, remotehost)) {
+					connectingByHost_Type.add(cid);
 				}
 			} // end of if (serv == null)
 			if (connecting) {
-				Queue<Packet> queue = waitingPacketsMap.get(jid);
+				Queue<Packet> queue = waitingPacketsMap.get(cid);
 				if (queue == null) {
 					queue = new ConcurrentLinkedQueue<Packet>();
-					waitingPacketsMap.put(jid, queue);
+					waitingPacketsMap.put(cid, queue);
 				} // end of if (queue == null)
 				queue.offer(packet);
 			} // end of if (connecting)
@@ -167,13 +165,15 @@ public class ServerConnectionManager extends ConnectionManager {
 		}
 	}
 
-	private boolean openNewServerConnection(String hostName) {
+	private boolean openNewServerConnection(String localhost,
+		String remotehost) {
 
 		try {
-			String ipAddress = DNSResolver.getHostSRV_IP(hostName);
+			String ipAddress = DNSResolver.getHostSRV_IP(remotehost);
 			Map<String, Object> port_props = new TreeMap<String, Object>();
 			port_props.put("remote-ip", ipAddress);
-			port_props.put("remote-hostname", hostName);
+			port_props.put("local-hostname", localhost);
+			port_props.put("remote-hostname", remotehost);
 			port_props.put("ifc", new String[] {ipAddress});
 			port_props.put("socket", SocketType.plain);
 			port_props.put("type", ConnectionType.connect);
@@ -181,11 +181,30 @@ public class ServerConnectionManager extends ConnectionManager {
 			startService(port_props);
 			return true;
 		} catch (UnknownHostException e) {
-			log.warning("UnknownHostException for host: " + hostName);
+			log.warning("UnknownHostException for host: " + remotehost);
 			return false;
 		} // end of try-catch
 
 	}
+
+	private String getConnectionId(String localhost, String remotehost,
+		ConnectionType connection) {
+		return JID.getJID(localhost, remotehost, connection.toString());
+	}
+
+	private String getConnectionId(Packet packet) {
+		return JID.getJID(JID.getNodeHost(packet.getFrom()),
+			JID.getNodeHost(packet.getTo()),
+			ConnectionType.connect.toString());
+	}
+
+// 	private String getHandshakingId(String localhost, String remotehost) {
+// 		return JID.getJID(localhost, remotehost, null);
+// 	}
+
+// 	private String getHandshakingId(Packet packet) {
+// 		return JID.getJID(packet.getFrom(), packet.getTo(), null);
+// 	}
 
 	public Queue<Packet> processSocketData(XMPPIOService serv) {
 		Queue<Packet> packets = serv.getReceivedPackets();
@@ -200,13 +219,15 @@ public class ServerConnectionManager extends ConnectionManager {
 				Queue<Packet> results = new LinkedList<Packet>();
 				processDialback(p, serv, results);
 				for (Packet res: results) {
-					XMPPIOService sender = handshakingByHost_Type.get(res.getTo());
+					String cid = getConnectionId(res);
+					XMPPIOService sender =
+						handshakingByHost_Type.get(cid);
 					if (sender != null) {
 						writePacketToSocket(sender, res);
 					} else {
 						// I am assuming here that it can't happen that the packet is
 						// to accept channel and it doesn't exist
-						addWaitingPacket(res.getTo(), res, waitingControlPackets);
+						addWaitingPacket(cid, res, waitingControlPackets);
 					} // end of else
 				} // end of for (Packet p: results)
 			} else {
@@ -240,11 +261,13 @@ public class ServerConnectionManager extends ConnectionManager {
 			// It must be always set for connect connection type
 			String remote_hostname =
 				(String)serv.getSessionData().get("remote-hostname");
-			String connect_jid = JID.getJID(null, remote_hostname,
-				ConnectionType.connect.toString());
-			handshakingByHost_Type.put(connect_jid, serv);
+			String local_hostname =
+				(String)serv.getSessionData().get("local-hostname");
+			String cid = getConnectionId(local_hostname, remote_hostname,
+				ConnectionType.connect);
+			handshakingByHost_Type.put(cid, serv);
 			String remote_id = attribs.get("id");
-			sharedSessionData.put(connect_jid+"-session-id", remote_id);
+			sharedSessionData.put(cid+"-session-id", remote_id);
 			String uuid = UUID.randomUUID().toString();
 			String key = null;
 			try {
@@ -252,22 +275,24 @@ public class ServerConnectionManager extends ConnectionManager {
 			} catch (NoSuchAlgorithmException e) {
 				key = uuid;
 			} // end of try-catch
-			sharedSessionData.put(connect_jid+"-dialback-key", key);
+			sharedSessionData.put(cid+"-dialback-key", key);
 			Element elem = new Element("db:result", key);
 			elem.addAttribute("to", remote_hostname);
-			elem.addAttribute("from", hostnames[0]);
+			elem.addAttribute("from", local_hostname);
 
 			StringBuilder sb = new StringBuilder();
 			sb.append(elem.toString());
 			// Attach also all controll packets which are wating to send
 			Packet p = null;
-			Queue<Packet> waiting =	waitingControlPackets.get(connect_jid);
+			Queue<Packet> waiting =	waitingControlPackets.get(cid);
 			if (waiting != null) {
 				while ((p = waiting.poll()) != null) {
 					log.finest("Sending packet: " + p.getStringData());
 					sb.append(p.getStringData());
 				} // end of while (p = waitingPackets.remove(ipAddress) != null)
 			} // end of if (waiting != null)
+			log.finest("Type: " + serv.connectionType()
+				+ ", sending: " + sb.toString());
 			return sb.toString();
 		case accept:
 			log.finer("Stream opened: " + attribs.toString());
@@ -293,10 +318,10 @@ public class ServerConnectionManager extends ConnectionManager {
 		log.finer("Stream closed.");
 	}
 
-	protected String getUniqueId(IOService serv) {
-		return JID.getJID(null, serv.getRemoteAddress(),
-			serv.connectionType().toString());
-	}
+// 	protected String getUniqueId(IOService serv) {
+// 		return JID.getJID(null, serv.getRemoteAddress(),
+// 			serv.connectionType().toString());
+// 	}
 
 // 	protected String getServiceId(Packet packet) {
 // 		return JID.getNodeHost(packet.getTo());
@@ -327,17 +352,20 @@ public class ServerConnectionManager extends ConnectionManager {
 
 	public void serviceStarted(final IOService service) {
 		super.serviceStarted(service);
-		log.finest("s2s connection opened: " + service.getRemoteAddress());
+		log.finest("s2s connection opened: " + service.getRemoteAddress()
+			+ ", type: " + service.connectionType().toString()
+			+ ", id=" + service.getUniqueId());
 		switch (service.connectionType()) {
 		case connect:
 			// Send init xmpp stream here
 			XMPPIOService serv = (XMPPIOService)service;
-			serv.xmppStreamOpen("<stream:stream"
+			String data = "<stream:stream"
 				+ " xmlns:stream='http://etherx.jabber.org/streams'"
 				+ " xmlns='jabber:server'"
 				+ " xmlns:db='jabber:server:dialback'"
-				+ ">"
-				);
+				+ ">";
+			log.finest("Type: " + serv.connectionType()	+ ", sending: " + data);
+			serv.xmppStreamOpen(data);
 			break;
 		default:
 			// Do nothing, more data should come soon...
@@ -347,14 +375,16 @@ public class ServerConnectionManager extends ConnectionManager {
 
 	public void serviceStopped(final IOService service) {
 		super.serviceStopped(service);
+		String local_hostname =
+			(String)service.getSessionData().get("local-hostname");
 		String remote_hostname =
 			(String)service.getSessionData().get("remote-hostname");
-		String id = JID.getJID(null, remote_hostname,
-			service.connectionType().toString());
-		servicesByHost_Type.remove(id);
-		handshakingByHost_Type.remove(id);
-		connectingByHost_Type.remove(id);
-		log.fine("s2s stopped: " + id);
+		String cid = getConnectionId(local_hostname, remote_hostname,
+			service.connectionType());
+		servicesByHost_Type.remove(cid);
+		handshakingByHost_Type.remove(cid);
+		connectingByHost_Type.remove(cid);
+		log.fine("s2s stopped: " + cid);
 		// Some servers close just 1 of dialback connections and even though
 		// other connection is still open they don't accept any data on that
 		// connections. So the solution is: if one of pair connection is closed
@@ -363,13 +393,13 @@ public class ServerConnectionManager extends ConnectionManager {
 		String other_id = null;
 		switch (service.connectionType()) {
 		case accept:
-			other_id = JID.getJID(null, remote_hostname,
-				ConnectionType.connect.toString());
+			other_id = getConnectionId(local_hostname, remote_hostname,
+				ConnectionType.connect);
 			break;
 		case connect:
 		default:
-			other_id = JID.getJID(null, remote_hostname,
-				ConnectionType.accept.toString());
+			other_id = getConnectionId(local_hostname, remote_hostname,
+				ConnectionType.accept);
 			break;
 		} // end of switch (service.connectionType())
 		XMPPIOService other_service = servicesByHost_Type.get(other_id);
@@ -403,11 +433,12 @@ public class ServerConnectionManager extends ConnectionManager {
 	public void processDialback(Packet packet, XMPPIOService serv,
 		Queue<Packet> results) {
 
+		String local_hostname = JID.getNodeHost(packet.getElemTo());
 		String remote_hostname = JID.getNodeHost(packet.getElemFrom());
-		String connect_jid = JID.getJID(null, remote_hostname,
-			ConnectionType.connect.toString());
-		String accept_jid = JID.getJID(null, remote_hostname,
-			ConnectionType.accept.toString());
+		String connect_jid = getConnectionId(local_hostname, remote_hostname,
+			ConnectionType.connect);
+		String accept_jid = getConnectionId(local_hostname, remote_hostname,
+			ConnectionType.accept);
 
 		// <db:result>
 		if (packet.getElemName().equals("db:result")) {
@@ -420,6 +451,7 @@ public class ServerConnectionManager extends ConnectionManager {
 					serv.getSessionData().get(serv.SESSION_ID_KEY));
 				sharedSessionData.put(accept_jid + "-dialback-key",
 					packet.getElemCData());
+				serv.getSessionData().put("local-hostname", local_hostname);
 				serv.getSessionData().put("remote-hostname", remote_hostname);
 				handshakingByHost_Type.put(accept_jid, serv);
 
@@ -457,11 +489,15 @@ public class ServerConnectionManager extends ConnectionManager {
 			if (packet.getType() == null) {
 				if (packet.getElemId() != null && packet.getElemCData() != null) {
 
+					log.fine("Verifying dialback - " + packet.getStringData());
+
 					final String id = packet.getElemId();
 					final String key = packet.getElemCData();
 
 					final String local_key =
 						(String)sharedSessionData.get(connect_jid+"-dialback-key");
+
+					log.fine("Local key for cid=" + connect_jid + " is " + local_key);
 
 					Packet result = null;
 
