@@ -29,6 +29,7 @@ import java.security.SecureRandom;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -93,20 +94,33 @@ public class SSLContextContainer {
 				kmf.init(keys, keys_password);
 				kmfs.put(null, kmf);
 				Enumeration<String> aliases = keys.aliases();
+				ArrayList<String> certlist = null;
+				if (aliases != null) {
+					certlist = new ArrayList<String>();
+					while (aliases.hasMoreElements()) {
+						String alias = aliases.nextElement();
+						if (keys.isCertificateEntry(alias)) {
+							certlist.add(alias);
+						} // end of if (keys.isCertificateEntry(alias))
+					}
+				}
+				aliases = keys.aliases();
 				KeyStore.PasswordProtection pass_param =
 					new KeyStore.PasswordProtection(keys_password);
-				Certificate root = keys.getCertificate("root");
 				if (aliases != null) {
 					while (aliases.hasMoreElements()) {
 						String alias = aliases.nextElement();
-						if (!alias.equals("root") && keys.isKeyEntry(alias)) {
+						if (keys.isKeyEntry(alias)) {
 							KeyStore.Entry entry = keys.getEntry(alias, pass_param);
 							//KeyStore.Entry entry = keys.getEntry(alias, null);
 							KeyStore alias_keys = KeyStore.getInstance("JKS");
 							alias_keys.load(null,	keys_password);
 							alias_keys.setEntry(alias, entry, pass_param);
-							if (root != null) {
-								alias_keys.setCertificateEntry("root", root);
+							if (certlist != null) {
+								for (String certal: certlist) {
+									alias_keys.setCertificateEntry(certal,
+										keys.getCertificate(certal));
+								} // end of for (String certal: certlist)
 							} // end of if (root != null)
 							//alias_keys.setEntry(alias, entry, null);
 							kmf = KeyManagerFactory.getInstance("SunX509");
