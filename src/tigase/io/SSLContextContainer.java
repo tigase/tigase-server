@@ -23,8 +23,10 @@
 package tigase.io;
 
 import java.io.FileInputStream;
+import java.security.KeyStore.PasswordProtection;
 import java.security.KeyStore;
 import java.security.SecureRandom;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
@@ -93,16 +95,24 @@ public class SSLContextContainer {
 				Enumeration<String> aliases = keys.aliases();
 				KeyStore.PasswordProtection pass_param =
 					new KeyStore.PasswordProtection(keys_password);
+				Certificate root = keys.getCertificate("root");
 				if (aliases != null) {
 					while (aliases.hasMoreElements()) {
 						String alias = aliases.nextElement();
-						KeyStore.Entry entry = keys.getEntry(alias, pass_param);
-						KeyStore alias_keys = KeyStore.getInstance("JKS");
-						alias_keys.load(null,	keys_password);
-						alias_keys.setEntry(alias, entry, pass_param);
-						kmf = KeyManagerFactory.getInstance("SunX509");
-						kmf.init(alias_keys, keys_password);
-						kmfs.put(alias, kmf);
+						if (!alias.equals("root") && keys.isKeyEntry(alias)) {
+							KeyStore.Entry entry = keys.getEntry(alias, pass_param);
+							//KeyStore.Entry entry = keys.getEntry(alias, null);
+							KeyStore alias_keys = KeyStore.getInstance("JKS");
+							alias_keys.load(null,	keys_password);
+							alias_keys.setEntry(alias, entry, pass_param);
+							if (root != null) {
+								alias_keys.setCertificateEntry("root", root);
+							} // end of if (root != null)
+							//alias_keys.setEntry(alias, entry, null);
+							kmf = KeyManagerFactory.getInstance("SunX509");
+							kmf.init(alias_keys, keys_password);
+							kmfs.put(alias, kmf);
+						} // end of if (!alias.equals("root"))
 					} // end of while (aliases.hasMoreElements())
 				} // end of if (aliases != null)
 			} // end of if (k_store != null && k_passwd != null)
