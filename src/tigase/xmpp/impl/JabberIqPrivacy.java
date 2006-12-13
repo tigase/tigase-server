@@ -265,9 +265,11 @@ public class JabberIqPrivacy extends XMPPProcessor
 			} // end of if (child.getName().equals("list))
 			if (child.getName().equals("default")) {
 				Privacy.setDefaultList(session, child);
+				results.offer(packet.okResult((String)null, 0));
 			} // end of if (child.getName().equals("list))
 			if (child.getName().equals("active")) {
 				Privacy.setActiveList(session, child);
+				results.offer(packet.okResult((String)null, 0));
 			} // end of if (child.getName().equals("list))
 		} else {
 			results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,

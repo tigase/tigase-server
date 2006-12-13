@@ -120,8 +120,12 @@ public class Privacy {
 		if (list.getChildren() != null && list.getChildren().size() > 0) {
 			for (Element item: list.getChildren()) {
 				String iNode = lNode + "/" + item.getAttribute(ORDER);
-				session.setData(iNode, TYPE, item.getAttribute(TYPE));
-				session.setData(iNode, VALUE, item.getAttribute(VALUE));
+				if (item.getAttribute(TYPE) != null) {
+					session.setData(iNode, TYPE, item.getAttribute(TYPE));
+				} // end of if (item.getAttribute(TYPE) != null)
+				if (item.getAttribute(VALUE) != null) {
+					session.setData(iNode, VALUE, item.getAttribute(VALUE));
+				} // end of if (item.getAttribute(VALUE) != null)
 				session.setData(iNode, ACTION, item.getAttribute(ACTION));
 				List<Element> stanzas_list = item.getChildren();
 				if (stanzas_list != null && stanzas_list.size() > 0) {
@@ -150,8 +154,14 @@ public class Privacy {
 				String action = session.getData(iNode, ACTION, null);
 				String[] stanzas = session.getDataList(iNode, STANZAS);
 				Element eItem = new Element(ITEM,
-					new String[] {ORDER, TYPE, VALUE, ACTION},
-					new String[] {item, type, value, action});
+					new String[] {ORDER, ACTION},
+					new String[] {item, action});
+				if (type != null) {
+					eItem.addAttribute(TYPE, type);
+				} // end of if (type != null)
+				if (value != null) {
+					eItem.addAttribute(VALUE, value);
+				} // end of if (value != null)
 				if (stanzas != null) {
 					for (String stanza: stanzas) {
 					eItem.addChild(new Element(stanza));
