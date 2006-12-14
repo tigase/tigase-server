@@ -97,14 +97,26 @@ public class Privacy {
 		return session.getData(PRIVACY, DEFAULT, null);
 	}
 
-	public static void setActiveList(XMPPResourceConnection session, Element list)
+	public static void setActiveList(XMPPResourceConnection session, String lName)
     throws NotAuthorizedException {
-		session.putSessionData(ACTIVE, list.getAttribute(NAME));
+		Element list = getList(session, lName);
+		//list.getAttribute(NAME)
+		session.putSessionData(ACTIVE, list);
 	}
 
-	public static String getActiveList(XMPPResourceConnection session)
+	public static Element getActiveList(XMPPResourceConnection session)
     throws NotAuthorizedException {
-		return (String)session.getSessionData(ACTIVE);
+		return (Element)session.getSessionData(ACTIVE);
+	}
+
+	public static String getActiveListName(XMPPResourceConnection session)
+    throws NotAuthorizedException {
+		Element list = getActiveList(session);
+		if (list != null) {
+			return list.getAttribute(NAME);
+		} else {
+			return null;
+		} // end of if (list != null) else
 	}
 
 	public static void addList(XMPPResourceConnection session,

@@ -99,110 +99,108 @@ public class JabberIqPrivacy extends XMPPProcessor
 		} // end of if (session == null)
 
 		try {
-			String lName = Privacy.getActiveList(session);
-			if (lName == null) {
-				lName = Privacy.getDefaultList(session);
+			Element list = Privacy.getActiveList(session);
+			if (list == null) {
+				String lName = Privacy.getDefaultList(session);
+				if (lName != null) {
+					Privacy.setActiveList(session, lName);
+					list = Privacy.getActiveList(session);
+				} // end of if (lName != null)
 			} // end of if (lName == null)
-			if (lName != null) {
-				Element list = Privacy.getList(session, lName);
-				if (list != null) {
-					List<Element> items = list.getChildren();
-					Collections.sort(items, compar);
-					for (Element item: items) {
-						boolean type_matched = false;
-						boolean elem_matched = false;
-						ITEM_TYPE type = ITEM_TYPE.all;
-						if (item.getAttribute(TYPE) != null) {
-							type = ITEM_TYPE.valueOf(item.getAttribute(TYPE));
-						} // end of if (item.getAttribute(TYPE) != null)
-						String value = item.getAttribute(VALUE);
-						String from = packet.getElemFrom();
-						if (from != null) {
-							switch (type) {
-							case jid:
-								type_matched = from.contains(value);
+			if (list != null) {
+				List<Element> items = list.getChildren();
+				Collections.sort(items, compar);
+				for (Element item: items) {
+					boolean type_matched = false;
+					boolean elem_matched = false;
+					ITEM_TYPE type = ITEM_TYPE.all;
+					if (item.getAttribute(TYPE) != null) {
+						type = ITEM_TYPE.valueOf(item.getAttribute(TYPE));
+					} // end of if (item.getAttribute(TYPE) != null)
+					String value = item.getAttribute(VALUE);
+					String from = packet.getElemFrom();
+					if (from != null) {
+						switch (type) {
+						case jid:
+							type_matched = from.contains(value);
+							break;
+						case group:
+							String[] groups = Roster.getBuddyGroups(session, from);
+							for (String group: groups) {
+								if (type_matched = group.equals(value)) {
+									break;
+								} // end of if (group.equals(value))
+							} // end of for (String group: groups)
+							break;
+						case subscription:
+							ITEM_SUBSCRIPTIONS subscr = ITEM_SUBSCRIPTIONS.valueOf(value);
+							switch (subscr) {
+							case to:
+								type_matched = Roster.isSubscribedTo(session, from);
 								break;
-							case group:
-								String[] groups = Roster.getBuddyGroups(session, from);
-								for (String group: groups) {
-									if (type_matched = group.equals(value)) {
-										break;
-									} // end of if (group.equals(value))
-								} // end of for (String group: groups)
+							case from:
+								type_matched = Roster.isSubscribedFrom(session, from);
 								break;
-							case subscription:
-								ITEM_SUBSCRIPTIONS subscr = ITEM_SUBSCRIPTIONS.valueOf(value);
-								switch (subscr) {
-								case to:
-									type_matched = Roster.isSubscribedTo(session, from);
-									break;
-								case from:
-									type_matched = Roster.isSubscribedFrom(session, from);
-									break;
-								case none:
-									type_matched = (!Roster.isSubscribedFrom(session, from)
-										&& !Roster.isSubscribedTo(session, from));
-									break;
-								case both:
-									type_matched = (Roster.isSubscribedFrom(session, from)
-										&& Roster.isSubscribedTo(session, from));
-									break;
-								default:
-									break;
-								} // end of switch (subscr)
+							case none:
+								type_matched = (!Roster.isSubscribedFrom(session, from)
+									&& !Roster.isSubscribedTo(session, from));
 								break;
-							case all:
+							case both:
+								type_matched = (Roster.isSubscribedFrom(session, from)
+									&& Roster.isSubscribedTo(session, from));
+								break;
 							default:
-								type_matched = true;
 								break;
-							} // end of switch (type)
-						} else {
-							if (type == ITEM_TYPE.all) {
-								type_matched = true;
-							}
-						} // end of if (from != null) else
-						if (!type_matched) {
+							} // end of switch (subscr)
 							break;
-						} // end of if (!type_matched)
-
-						List<Element> elems = item.getChildren();
-						if (elems == null || elems.size() == 0) {
-							elem_matched = true;
-						} else {
-							for (Element elem: elems) {
-								if (elem.getName().equals("presence-in")) {
-									if (packet.getElemName().equals("presence")
-										&& (packet.getType() == null
-											|| packet.getType() == StanzaType.unavailable)) {
-										elem_matched = true;
-										break;
-									}
-								} else {
-									if (elem.getName().equals(packet.getElemName())) {
-										elem_matched = true;
-										break;
-									} // end of if (elem.getName().equals(packet.getElemName()))
-								} // end of if (elem.getName().equals("presence-in")) else
-							} // end of for (Element elem: elems)
-						} // end of else
-						if (!elem_matched) {
-							break;
-						} // end of if (!elem_matched)
-
-						ITEM_ACTION action = ITEM_ACTION.valueOf(item.getAttribute(ACTION));
-						switch (action) {
-						case allow:
-							return false;
-						case deny:
-							return true;
+						case all:
 						default:
+							type_matched = true;
 							break;
-						} // end of switch (action)
-					} // end of for (Element item: items)
-				} else {
-					log.finer("List " + lName + " does not exists for user: "
-						+ session.getUserId());
-				} // end of else
+						} // end of switch (type)
+					} else {
+						if (type == ITEM_TYPE.all) {
+							type_matched = true;
+						}
+					} // end of if (from != null) else
+					if (!type_matched) {
+						break;
+					} // end of if (!type_matched)
+
+					List<Element> elems = item.getChildren();
+					if (elems == null || elems.size() == 0) {
+						elem_matched = true;
+					} else {
+						for (Element elem: elems) {
+							if (elem.getName().equals("presence-in")) {
+								if (packet.getElemName().equals("presence")
+									&& (packet.getType() == null
+										|| packet.getType() == StanzaType.unavailable)) {
+									elem_matched = true;
+									break;
+								}
+							} else {
+								if (elem.getName().equals(packet.getElemName())) {
+									elem_matched = true;
+									break;
+								} // end of if (elem.getName().equals(packet.getElemName()))
+							} // end of if (elem.getName().equals("presence-in")) else
+						} // end of for (Element elem: elems)
+					} // end of else
+					if (!elem_matched) {
+						break;
+					} // end of if (!elem_matched)
+
+					ITEM_ACTION action = ITEM_ACTION.valueOf(item.getAttribute(ACTION));
+					switch (action) {
+					case allow:
+						return false;
+					case deny:
+						return true;
+					default:
+						break;
+					} // end of switch (action)
+				} // end of for (Element item: items)
 			} // end of if (lName != null)
 		} catch (NotAuthorizedException e) {
 // 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
@@ -268,7 +266,7 @@ public class JabberIqPrivacy extends XMPPProcessor
 				results.offer(packet.okResult((String)null, 0));
 			} // end of if (child.getName().equals("list))
 			if (child.getName().equals("active")) {
-				Privacy.setActiveList(session, child);
+				Privacy.setActiveList(session, child.getAttribute(NAME));
 				results.offer(packet.okResult((String)null, 0));
 			} // end of if (child.getName().equals("list))
 		} else {
@@ -292,7 +290,7 @@ public class JabberIqPrivacy extends XMPPProcessor
 				if (list != null) {
 					sblists.append("<default name=\"" + list + "\"/>");
 				} // end of if (defList != null)
-				list = Privacy.getActiveList(session);
+				list = Privacy.getActiveListName(session);
 				if (list != null) {
 					sblists.append("<active name=\"" + list + "\"/>");
 				} // end of if (defList != null)
