@@ -24,11 +24,13 @@
 
 package tigase.server.xmppcomponent;
 
-import java.util.UUID;
+import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.Queue;
 import java.util.TreeMap;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.net.ConnectionType;
 import tigase.net.IOService;
@@ -36,6 +38,7 @@ import tigase.server.ConnectionManager;
 import tigase.server.MessageReceiver;
 import tigase.server.Packet;
 import tigase.server.XMPPService;
+import tigase.util.Algorithms;
 import tigase.util.JID;
 import tigase.xmpp.XMPPIOService;
 
@@ -163,31 +166,37 @@ public class ComponentConnectionManager extends ConnectionManager {
 	public String xmppStreamOpened(XMPPIOService service,
 		Map<String, String> attribs) {
 
-		switch (servce.connectionType()) {
-		case connect:
+		switch (service.connectionType()) {
+		case connect: {
 			String id = attribs.get("id");
-			service.getSessionData().put(serv.SESSION_ID_KEY, id);
+			service.getSessionData().put(service.SESSION_ID_KEY, id);
 			String secret =
 				(String)service.getSessionData().get(SECRET_PROP_KEY);
-			String digest = Algorithms.hexDigest(id, secret, "SHA");
-			return "<handshake>" + digest + "</handshake>";
-			break;
-		case accept:
+			try {
+				String digest = Algorithms.hexDigest(id, secret, "SHA");
+				return "<handshake>" + digest + "</handshake>";
+			} catch (NoSuchAlgorithmException e) {
+				log.log(Level.SEVERE, "Can not generate digest for pass phrase.", e);
+				return null;
+			}
+		}
+		case accept: {
 			log.finer("Stream opened: " + attribs.toString());
 			String hostname = attribs.get("to");
 			String id = UUID.randomUUID().toString();
-			service.getSessionData().put(serv.SESSION_ID_KEY, id);
+			service.getSessionData().put(service.SESSION_ID_KEY, id);
 			return "<stream:stream"
 				+ " xmlns='jabber:component:accept'"
 				+ " xmlns:stream='http://etherx.jabber.org/streams'"
 				+ " from='" + hostname + "'"
 				+ " id='" + id + "'"
 				+ ">";
-			break;
+		}
 		default:
 			// Do nothing, more data should come soon...
 			break;
 		} // end of switch (service.connectionType())
+		return null;
 	}
 
 	public void xmppStreamClosed(XMPPIOService serv) {
