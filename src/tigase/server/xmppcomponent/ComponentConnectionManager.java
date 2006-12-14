@@ -52,6 +52,8 @@ public class ComponentConnectionManager extends ConnectionManager {
 
   public static final String SECRET_PROP_KEY = "secret";
   public static final String SECRET_PROP_VAL =	"someSecret";
+	public static final String COMPONENT_NAME_KEY = "comp-name";
+	public static final String COMPONENT_NAME_VAL = "comp_1.localhost";
 
   /**
    * Variable <code>log</code> is a class logger.
@@ -100,6 +102,7 @@ public class ComponentConnectionManager extends ConnectionManager {
 	protected Map<String, Object> getParamsForPort(int port) {
     Map<String, Object> defs = new TreeMap<String, Object>();
 		defs.put(SECRET_PROP_KEY, SECRET_PROP_VAL);
+		defs.put(COMPONENT_NAME_KEY, COMPONENT_NAME_VAL);
 		return defs;
 	}
 
@@ -108,14 +111,6 @@ public class ComponentConnectionManager extends ConnectionManager {
 			(String)serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
 		return addr;
 		// 		return serv.getRemoteHost();
-	}
-
-	public void serviceStarted(final IOService service) {
-		super.serviceStarted(service);
-		String addr =
-			(String)service.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
-		addRouting(addr);
-		//		addRouting(serv.getRemoteHost());
 	}
 
 	public void serviceStopped(final IOService service) {
@@ -134,16 +129,65 @@ public class ComponentConnectionManager extends ConnectionManager {
 		return JID.getNodeHost(packet.getTo());
 	}
 
-	public String xmppStreamOpened(XMPPIOService serv,
+	public void serviceStarted(final IOService service) {
+		super.serviceStarted(service);
+		log.finest("c2c connection opened: " + service.getRemoteAddress()
+			+ ", type: " + service.connectionType().toString()
+			+ ", id=" + service.getUniqueId());
+// 		String addr =
+// 			(String)service.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
+// 		addRouting(addr);
+		//		addRouting(serv.getRemoteHost());
+		switch (service.connectionType()) {
+		case connect:
+			// Send init xmpp stream here
+			XMPPIOService serv = (XMPPIOService)service;
+			String compName =
+				(String)service.getSessionData().get(COMPONENT_NAME_KEY);
+			String data =
+				"<stream:stream"
+				+ " xmlns='jabber:component:accept'"
+				+ " xmlns:stream='http://etherx.jabber.org/streams'"
+				+ " to='" + compName + "'>"
+				+ ">";
+			log.finest("cid: " + (String)serv.getSessionData().get("cid")
+				+ ", sending: " + data);
+			serv.xmppStreamOpen(data);
+			break;
+		default:
+			// Do nothing, more data should come soon...
+			break;
+		} // end of switch (service.connectionType())
+	}
+
+	public String xmppStreamOpened(XMPPIOService service,
 		Map<String, String> attribs) {
-		log.finer("Stream opened: " + attribs.toString());
-		String id = UUID.randomUUID().toString();
-		serv.getSessionData().put(serv.SESSION_ID_KEY, id);
-		return "<stream:stream version='1.0' xml:lang='en'"
-			+ " to='kobit'"
-			+ " id='" + id + "'"
-			+ " xmlns='jabber:component:accept'"
-			+ " xmlns:stream='http://etherx.jabber.org/streams'>";
+
+		switch (servce.connectionType()) {
+		case connect:
+			String id = attribs.get("id");
+			service.getSessionData().put(serv.SESSION_ID_KEY, id);
+			String secret =
+				(String)service.getSessionData().get(SECRET_PROP_KEY);
+			String digest = Algorithms.hexDigest(id, secret, "SHA");
+			return "<handshake>" + digest + "</handshake>";
+			break;
+		case accept:
+			log.finer("Stream opened: " + attribs.toString());
+			String hostname = attribs.get("to");
+			String id = UUID.randomUUID().toString();
+			service.getSessionData().put(serv.SESSION_ID_KEY, id);
+			return "<stream:stream"
+				+ " xmlns='jabber:component:accept'"
+				+ " xmlns:stream='http://etherx.jabber.org/streams'"
+				+ " from='" + hostname + "'"
+				+ " id='" + id + "'"
+				+ ">";
+			break;
+		default:
+			// Do nothing, more data should come soon...
+			break;
+		} // end of switch (service.connectionType())
 	}
 
 	public void xmppStreamClosed(XMPPIOService serv) {
