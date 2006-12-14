@@ -60,7 +60,7 @@ public class TigaseSaslServerFactory implements SaslServerFactory {
 	 */
 	public SaslServer createSaslServer(final String mechanism,
 		final String protocol, final String serverName,
-		final Map<? super String,?> props, final CallbackHandler callbackHandler)
+		final Map<String,?> props, final CallbackHandler callbackHandler)
 		throws SaslException {
 		if (mechanism.equals("PLAIN")) {
 			return new SaslPLAIN(props, callbackHandler);

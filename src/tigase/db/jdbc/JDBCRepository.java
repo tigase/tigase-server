@@ -24,14 +24,11 @@ package tigase.db.jdbc;
 
 
 import java.io.IOException;
-import java.sql.BaseQuery;
 import java.sql.Connection;
-import java.sql.DataSet;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Select;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
