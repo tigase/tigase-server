@@ -45,7 +45,7 @@ import javax.security.sasl.Sasl;
 import javax.security.sasl.SaslException;
 import javax.security.sasl.SaslServer;
 
-import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
+import tigase.util.Base64;
 import tigase.auth.SaslPLAIN;
 import tigase.db.AuthorizationException;
 import tigase.db.DBInitException;

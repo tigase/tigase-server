@@ -38,7 +38,7 @@ import javax.security.sasl.Sasl;
 import javax.security.sasl.SaslException;
 import javax.security.sasl.SaslServer;
 
-import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
+import tigase.util.Base64;
 import tigase.util.Algorithms;
 import tigase.util.JID;
 

@@ -115,13 +115,13 @@ public class SSLContextContainer {
 							//KeyStore.Entry entry = keys.getEntry(alias, null);
 							KeyStore alias_keys = KeyStore.getInstance("JKS");
 							alias_keys.load(null,	keys_password);
-							alias_keys.setEntry(alias, entry, pass_param);
 							if (certlist != null) {
 								for (String certal: certlist) {
 									alias_keys.setCertificateEntry(certal,
 										keys.getCertificate(certal));
 								} // end of for (String certal: certlist)
 							} // end of if (root != null)
+							alias_keys.setEntry(alias, entry, pass_param);
 							//alias_keys.setEntry(alias, entry, null);
 							kmf = KeyManagerFactory.getInstance("SunX509");
 							kmf.init(alias_keys, keys_password);
