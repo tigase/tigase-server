@@ -123,7 +123,8 @@ public class UserAuthRepositoryImpl implements UserAuthRepository {
 	public boolean plainAuth(final String user, final String password)
 		throws UserNotFoundException, TigaseDBException {
 		String db_password = getPassword(user);
-		return db_password.equals(password);
+		return password != null && db_password != null &&
+			db_password.equals(password);
 	}
 
 	/**

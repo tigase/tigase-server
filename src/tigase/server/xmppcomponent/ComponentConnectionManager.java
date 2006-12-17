@@ -40,6 +40,7 @@ import tigase.server.Packet;
 import tigase.server.XMPPService;
 import tigase.util.Algorithms;
 import tigase.util.JID;
+import tigase.xml.Element;
 import tigase.xmpp.XMPPIOService;
 
 /**
@@ -80,12 +81,46 @@ public class ComponentConnectionManager extends ConnectionManager {
 			log.finer("Processing packet: " + p.getElemName()
 				+ ", type: " + p.getType());
 			log.finest("Processing socket data: " + p.getStringData());
-			if (p.isRouted()) {
-				p = p.unpackRouted();
-			} // end of if (p.isRouted())
-			addOutPacket(p);
+			if (p.getElemName().equals("handshake")) {
+				processHandshake(p, serv);
+			} else {
+				if (p.isRouted()) {
+					p = p.unpackRouted();
+				} // end of if (p.isRouted())
+				addOutPacket(p);
+			}
 		} // end of while ()
 		return null;
+	}
+
+	private void processHandshake(Packet p, XMPPIOService serv) {
+		switch (serv.connectionType()) {
+		case connect: {
+			break;
+		}
+		case accept: {
+			String digest = p.getElemCData();
+			String id =
+				(String)serv.getSessionData().get(serv.SESSION_ID_KEY);
+			String secret =
+				(String)serv.getSessionData().get(SECRET_PROP_KEY);
+			try {
+				String loc_digest = Algorithms.hexDigest(id, secret, "SHA");
+				if (digest != null && digest.equals(loc_digest)) {
+					Packet resp = new Packet(new Element("handshake"));
+					writePacketToSocket(serv, resp);
+				} else {
+					serv.stop();
+				}
+			} catch (Exception e) {
+				log.log(Level.SEVERE, "Handshaking error.", e);
+			}
+			break;
+		}
+		default:
+			// Do nothing, more data should come soon...
+			break;
+		} // end of switch (service.connectionType())
 	}
 
 	public Map<String, Object> getDefaults() {
