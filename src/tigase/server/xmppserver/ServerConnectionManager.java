@@ -243,7 +243,7 @@ public class ServerConnectionManager extends ConnectionManager {
 	}
 
 	private void processCommand(final Packet packet) {
-		XMPPIOService serv = getXMPPIOService(packet);
+		//		XMPPIOService serv = getXMPPIOService(packet);
 		switch (packet.getCommand()) {
 		case STARTTLS:
 			break;
