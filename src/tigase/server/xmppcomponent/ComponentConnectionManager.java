@@ -96,6 +96,14 @@ public class ComponentConnectionManager extends ConnectionManager {
 	private void processHandshake(Packet p, XMPPIOService serv) {
 		switch (serv.connectionType()) {
 		case connect: {
+			String data = p.getElemCData();
+			if (data == null) {
+				String addr =
+					(String)serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
+				addRouting(addr);
+			} else {
+				log.warning("Incorrect packet received: " + p.getStringData());
+			}
 			break;
 		}
 		case accept: {
@@ -109,6 +117,7 @@ public class ComponentConnectionManager extends ConnectionManager {
 				if (digest != null && digest.equals(loc_digest)) {
 					Packet resp = new Packet(new Element("handshake"));
 					writePacketToSocket(serv, resp);
+					addRouting((String)serv.getSessionData().get(serv.HOSTNAME_KEY));
 				} else {
 					serv.stop();
 				}
@@ -218,6 +227,7 @@ public class ComponentConnectionManager extends ConnectionManager {
 		case accept: {
 			log.finer("Stream opened: " + attribs.toString());
 			String hostname = attribs.get("to");
+			service.getSessionData().put(service.HOSTNAME_KEY, hostname);
 			String id = UUID.randomUUID().toString();
 			service.getSessionData().put(service.SESSION_ID_KEY, id);
 			return "<stream:stream"
