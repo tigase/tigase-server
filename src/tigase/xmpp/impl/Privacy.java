@@ -89,7 +89,11 @@ public class Privacy {
 
 	public static void setDefaultList(XMPPResourceConnection session,
 		Element list) throws NotAuthorizedException {
-		session.setData(PRIVACY, DEFAULT, list.getAttribute(NAME));
+		if (list.getAttribute(NAME) != null) {
+			session.setData(PRIVACY, DEFAULT, list.getAttribute(NAME));
+		} else {
+			session.removeData(PRIVACY, DEFAULT);
+		}
 	}
 
 	public static String getDefaultList(XMPPResourceConnection session)
@@ -99,9 +103,12 @@ public class Privacy {
 
 	public static void setActiveList(XMPPResourceConnection session, String lName)
     throws NotAuthorizedException {
-		Element list = getList(session, lName);
-		//list.getAttribute(NAME)
-		session.putSessionData(ACTIVE, list);
+		if (lName != null) {
+			Element list = getList(session, lName);
+			session.putSessionData(ACTIVE, list);
+		} else {
+			session.putSessionData(ACTIVE, null);
+		}
 	}
 
 	public static Element getActiveList(XMPPResourceConnection session)

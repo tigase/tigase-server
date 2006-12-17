@@ -332,7 +332,7 @@ public class SessionManager extends AbstractMessageReceiver
 				} // end of for ()
 				conn.streamClosed();
 			} else {
-				log.warning("Can not find resource connection for packet: " +
+				log.info("Can not find resource connection for packet: " +
 					pc.toString());
 			} // end of if (conn != null) else
 			break;

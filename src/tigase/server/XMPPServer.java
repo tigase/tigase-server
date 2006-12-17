@@ -22,6 +22,7 @@
  */
 package tigase.server;
 
+import java.util.Locale;
 import tigase.conf.Configurator;
 
 /**
