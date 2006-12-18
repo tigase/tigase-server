@@ -227,6 +227,7 @@ public class UserAuthRepositoryImpl implements UserAuthRepository {
 			String data_str = (String)props.get(DATA_KEY);
 			byte[] in_data =
 				(data_str != null ? Base64.decode(data_str) : new byte[0]);
+			log.finest("response: " + new String(in_data));
 			byte[] challenge = ss.evaluateResponse(in_data);
 			log.finest("challenge: " +
 				(challenge != null ? new String(challenge) : "null"));

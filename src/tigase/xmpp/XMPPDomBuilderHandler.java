@@ -24,6 +24,7 @@
 package tigase.xmpp;
 
 import java.util.Arrays;
+import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -153,8 +154,12 @@ public class XMPPDomBuilderHandler implements SimpleHandler {
 
   public void elementCData(StringBuilder cdata) {
     log.finest("Element CDATA: "+cdata);
-
-    el_stack.peek().setCData(cdata.toString());
+		try {
+			el_stack.peek().setCData(cdata.toString());
+		} catch (EmptyStackException e) {
+			// Do nothing here, it happens sometimes that client sends
+			// some white characters after sending open stream data....
+		}
   }
 
   public void endElement(StringBuilder name) {
