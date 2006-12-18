@@ -315,6 +315,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		ResultSet rs = null;
 		try {
 			conn = DriverManager.getConnection(db_conn);
+			conn.setAutoCommit(true);
 			initPreparedStatements();
 			auth = new UserAuthRepositoryImpl(this);
 			stmt = conn.createStatement();
