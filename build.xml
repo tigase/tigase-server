@@ -30,14 +30,28 @@
   <property name="dist" value="dist/${projectname}-${jarfile}-${version}"/>
  </target>
 
- <target name="jar" depends="prepare,prepare-dist"
-  description="Build jar file for ${projectname} ${jarfile}">
+ <target name="prepare-dev" description="Create development version">
+  <!-- Get revision number -->
+  <property name="build-no" value="DEV"/>
+  <property name="version" value="${ver}-b${build-no}"/>
+  <property name="dist" value="dist/${projectname}-${jarfile}-${version}"/>
+ </target>
+
+ <target name="jar-file" description="Create jar file, called from other targets">
   <compile srcdir="${src}"
    xlint="-Xlint:all"/>
   <jarfile
    filename="${projectname}-${jarfile}"
    excludes="**/*TestCase*.*,TestAll.*"/>
-  </target>
+ </target>
+
+ <target name="jar" depends="prepare,prepare-dev,jar-file"
+  description="Build jar file for ${projectname} ${jarfile}">
+ </target>
+
+ <target name="jar-dist" depends="prepare,prepare-dist,jar-file"
+  description="Build jar file for ${projectname} ${jarfile}">
+ </target>
 
  <target name="jar-unittests" depends="prepare"
   description="Prepare jar file with all classes including unittests classes">
@@ -68,7 +82,7 @@
  </target>
 
  <target name="dist"
-  depends="clean-all,prepare-dist,jar,docs"
+  depends="clean-all,prepare-dist,jar-dist,docs"
   description="Create ${projectname} ${jarfile} binary distribution file">
   <distbin packagename="${projectname}-${jarfile}"
    docsdir="docs-${projectname}-${jarfile}"/>

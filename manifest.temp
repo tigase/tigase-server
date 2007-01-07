@@ -1,0 +1,27 @@
+Manifest-Version: 1.0
+Created-By: Artur Hefczyc
+Main-Class: tigase.server.XMPPServer
+
+Name: tigase/server/
+Specification-Title: Tigase Jabber Server
+Specification-Version: 1.0.0
+Specification-Vendor: tigase.org
+Implementation-Title: tigase.server
+Implementation-Version: 1.0.0-b111
+Implementation-Vendor: tigase.org
+Package-Title: tigase.server
+Package-Version: build111
+Package-Vendor: tigase.org
+Tigase-Version: 1.0.0-b111
+
+Name: tigase/
+Specification-Title: Tigase Jabber Server
+Specification-Version: 1.0.0
+Specification-Vendor: tigase.org
+Implementation-Title: tigase
+Implementation-Version: 1.0.0-b111
+Implementation-Vendor: tigase.org
+Package-Title: tigase
+Package-Version: build111
+Package-Vendor: tigase.org
+Tigase-Version: 1.0.0-b111
