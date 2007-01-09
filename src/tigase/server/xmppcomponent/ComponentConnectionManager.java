@@ -69,7 +69,8 @@ public class ComponentConnectionManager extends ConnectionManager {
 		log.finer("Processing packet: " + packet.getElemName()
 			+ ", type: " + packet.getType());
 		log.finest("Processing packet: " + packet.getStringData());
-		writePacketToSocket(packet.packRouted());
+		//		writePacketToSocket(packet.packRouted());
+		writePacketToSocket(packet);
 	}
 
 	public Queue<Packet> processSocketData(XMPPIOService serv) {
@@ -84,9 +85,9 @@ public class ComponentConnectionManager extends ConnectionManager {
 			if (p.getElemName().equals("handshake")) {
 				processHandshake(p, serv);
 			} else {
-				if (p.isRouted()) {
-					p = p.unpackRouted();
-				} // end of if (p.isRouted())
+// 				if (p.isRouted()) {
+// 					p = p.unpackRouted();
+// 				} // end of if (p.isRouted())
 				addOutPacket(p);
 			}
 		} // end of while ()
