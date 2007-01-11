@@ -204,6 +204,7 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 			+ ", scheduling next try in " + (delay / 1000) + "secs");
 		delayedTasks.schedule(new TimerTask() {
 				public void run() {
+					log.fine("Reconnecting service " + getName());
 					startService(port_props);
 				}
 			}, delay);
