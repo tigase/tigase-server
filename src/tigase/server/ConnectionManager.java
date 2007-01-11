@@ -174,7 +174,8 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 					if (entry.getKey().startsWith(PROP_KEY + ports[i])) {
 						int idx = entry.getKey().lastIndexOf('/');
 						String key = entry.getKey().substring(idx + 1);
-						log.config("Adding port property key: " + key);
+						log.config("Adding port property key: "
+							+ key + "=" + entry.getValue());
 						port_props.put(key, entry.getValue());
 					} // end of if (entry.getKey().startsWith())
 				} // end of for ()

@@ -72,7 +72,7 @@ if [ -z "${TIGASE_PID}" ] ; then
 	fi
     fi
 fi
-if [ -z "${TIGASE_CONFIG}"] ; then
+if [ -z "${TIGASE_CONFIG}" ] ; then
     DEF_CONF="tigase-server.xml"
     # Gentoo style config location
     if [ -f "/etc/conf.d/${DEF_CONF}" ] ; then
