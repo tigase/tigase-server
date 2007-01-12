@@ -185,7 +185,9 @@ public class SessionManager extends AbstractMessageReceiver
 			if (conn != null) {
 				error.setTo(conn.getConnectionId());
 			} // end of if (conn != null)
-			addOutPacket(error);
+			if (error != null) {
+				addOutPacket(error);
+			}
 		} // end of if (result) else
 		else {
 			log.info("Packet processed by: " + packet.getProcessorsIds().toString());

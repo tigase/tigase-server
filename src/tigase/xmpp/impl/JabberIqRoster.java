@@ -154,8 +154,9 @@ public class JabberIqRoster extends XMPPProcessor
 		final NonAuthUserRepository repo, final Queue<Packet> results) {
 
 		try {
-			if (packet.getElemFrom() != null
-				&& !session.getUserId().equals(JID.getNodeID(packet.getElemFrom()))) {
+			if (session == null
+				|| (packet.getElemFrom() != null
+					&& !session.getUserId().equals(JID.getNodeID(packet.getElemFrom())))) {
 				// RFC says: ignore such request
 				log.warning(
 					"Roster request 'from' attribute doesn't match session userid: "
