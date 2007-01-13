@@ -58,6 +58,10 @@ public class ComponentConnectionManager extends ConnectionManager {
   public static final String SECRET_PROP_VAL =	"someSecret";
 	public static final String COMPONENT_NAME_KEY = "comp-name";
 	public static final String COMPONENT_NAME_VAL = "comp_1.localhost";
+	public static final String PACK_ROUTED_KEY = "pack-routed";
+	public static final boolean PACK_ROUTED_VAL = false;
+
+	private boolean pack_routed = false;
 
   /**
    * Variable <code>log</code> is a class logger.
@@ -69,14 +73,14 @@ public class ComponentConnectionManager extends ConnectionManager {
 		log.finer("Processing packet: " + packet.getElemName()
 			+ ", type: " + packet.getType());
 		log.finest("Processing packet: " + packet.getStringData());
-		//		writePacketToSocket(packet.packRouted());
-		writePacketToSocket(packet);
+		if (pack_routed) {
+			writePacketToSocket(packet.packRouted());
+		} else {
+			writePacketToSocket(packet);
+		}
 	}
 
 	public Queue<Packet> processSocketData(XMPPIOService serv) {
-// 		String id,
-// 		ConcurrentMap<String, Object> sessionData, Queue<Packet> packets) {
-
 		Packet p = null;
 		while ((p = serv.getReceivedPackets().poll()) != null) {
 			log.finer("Processing packet: " + p.getElemName()
@@ -85,9 +89,9 @@ public class ComponentConnectionManager extends ConnectionManager {
 			if (p.getElemName().equals("handshake")) {
 				processHandshake(p, serv);
 			} else {
-// 				if (p.isRouted()) {
-// 					p = p.unpackRouted();
-// 				} // end of if (p.isRouted())
+				if (p.isRouted()) {
+					p = p.unpackRouted();
+				} // end of if (p.isRouted())
 				addOutPacket(p);
 			}
 		} // end of while ()
@@ -135,12 +139,13 @@ public class ComponentConnectionManager extends ConnectionManager {
 
 	public Map<String, Object> getDefaults() {
 		Map<String, Object> props = super.getDefaults();
-
+		props.put(PACK_ROUTED_KEY, PACK_ROUTED_VAL);
 		return props;
 	}
 
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
+		pack_routed = (Boolean)props.get(PACK_ROUTED_KEY);
 	}
 
 	protected int[] getDefPlainPorts() {

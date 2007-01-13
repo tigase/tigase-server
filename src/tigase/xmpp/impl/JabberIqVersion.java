@@ -35,7 +35,7 @@ import tigase.util.JID;
 import tigase.db.NonAuthUserRepository;
 
 /**
- * JEP-0092: Software Version
+ * XEP-0092: Software Version
  *
  *
  * Created: Tue Mar 21 06:45:51 2006
@@ -49,10 +49,11 @@ public class JabberIqVersion extends XMPPProcessor
   private static final Logger log =
     Logger.getLogger("tigase.xmpp.impl.JabberIQVersion");
 
-	protected static final String ID = "jabber:iq:version";
+  protected static final String XMLNS = "jabber:iq:version";
+	protected static final String ID = XMLNS;
   protected static final String[] ELEMENTS = {"query"};
-  protected static final String[] XMLNSS = {"jabber:iq:version"};
-  protected static final String[] DISCO_FEATURES = {"jabber:iq:version"};
+  protected static final String[] XMLNSS = {XMLNS};
+  protected static final String[] DISCO_FEATURES = {XMLNS};
 
 	public String id() { return ID; }
 
@@ -88,6 +89,7 @@ public class JabberIqVersion extends XMPPProcessor
 		if (packet.getElemTo() != null) {
 			id = JID.getNodeID(packet.getElemTo());
 		} // end of if (packet.getElemTo() != null)
+
 		// If ID part of user account contains only host name
 		// and this is local domain it is message to admin
 		if (id == null || id.equals("")

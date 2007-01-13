@@ -4,7 +4,7 @@
  '(jde-enable-abbrev-mode t)
  '(jde-gen-k&r t)
  '(indent-tabs-mode t)
- '(user-mail-address "artur.hefczyc@gmail.com")
+ '(user-mail-address "artur.hefczyc@tigase.org")
  '(jde-global-classpath
    (quote
     ("$JAVA_HOME/jre/lib/rt.jar"

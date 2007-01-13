@@ -22,35 +22,30 @@
  */
 package tigase.xmpp.impl;
 
-import java.util.Queue;
 import java.util.logging.Logger;
-import tigase.server.Packet;
-import tigase.util.JID;
-import tigase.xml.Element;
-import tigase.xmpp.Authorization;
-import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
-import tigase.db.NonAuthUserRepository;
 
 /**
- * Describe class Message here.
+ * XEP-0096: File Transfer
  *
  *
- * Created: Tue Feb 21 15:49:08 2006
+ * Created: Sat Jan 13 18:45:57 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class Message extends SimpleForwarder {
+public class JabberIqSi extends SimpleForwarder {
 
   private static final Logger log =
-		Logger.getLogger("tigase.xmpp.impl.Message");
+		Logger.getLogger("tigase.xmpp.impl.JabberIqSi");
 
-
-  protected static final String XMLNS = "jabber:client";
-	protected static final String ID = "message";
-  protected static final String[] ELEMENTS = {"message"};
+  protected static final String XMLNS = "http://jabber.org/protocol/si";
+	protected static final String ID = XMLNS;
+  protected static final String[] ELEMENTS = {"si"};
   protected static final String[] XMLNSS = {XMLNS};
+  protected static final String[] DISCO_FEATURES =
+	{"http://jabber.org/protocol/si",
+	 "http://jabber.org/protocol/si/profile/file-transfer"};
 
 	public String id() { return ID; }
 
@@ -58,4 +53,7 @@ public class Message extends SimpleForwarder {
 
   public String[] supNamespaces() { return XMLNSS; }
 
-} // Message
+  public String[] supDiscoFeatures(final XMPPResourceConnection session)
+	{ return DISCO_FEATURES; }
+
+}

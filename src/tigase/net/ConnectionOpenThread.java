@@ -134,8 +134,7 @@ public class ConnectionOpenThread implements Runnable {
     while ((al = waiting.poll()) != null) {
 			try {
 				addPort(al);
-			} // end of try
-			catch (SocketException e) {
+			} catch (SocketException e) {
 				log.warning("Error: " + e + " creating connection for: " + al.getPort());
 			} // end of try-catch
     } // end of for ()

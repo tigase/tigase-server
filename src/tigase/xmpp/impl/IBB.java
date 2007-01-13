@@ -24,38 +24,38 @@ package tigase.xmpp.impl;
 
 import java.util.Queue;
 import java.util.logging.Logger;
-import tigase.server.Packet;
-import tigase.util.JID;
-import tigase.xml.Element;
-import tigase.xmpp.Authorization;
-import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.XMPPResourceConnection;
 import tigase.db.NonAuthUserRepository;
+import tigase.server.Packet;
+import tigase.xml.Element;
+import tigase.xmpp.XMPPResourceConnection;
 
 /**
- * Describe class Message here.
+ * XEP-0047: In-Band Bytestreams (IBB)
  *
  *
- * Created: Tue Feb 21 15:49:08 2006
+ * Created: Sat Jan 13 16:37:29 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class Message extends SimpleForwarder {
+public class IBB extends SimpleForwarder {
 
-  private static final Logger log =
-		Logger.getLogger("tigase.xmpp.impl.Message");
+  /**
+   * Private logger for class instancess.
+   */
+  private static Logger log = Logger.getLogger("tigase.xmpp.impl.IBB");
 
+  protected static final String XMLNS = "http://jabber.org/protocol/ibb";
+	protected static final String ID = XMLNS;
+	protected static final String[] ELEMENTS = {"open", "data", "close"};
+  protected static final String[] XMLNSS = {XMLNS, XMLNS, XMLNS};
 
-  protected static final String XMLNS = "jabber:client";
-	protected static final String ID = "message";
-  protected static final String[] ELEMENTS = {"message"};
-  protected static final String[] XMLNSS = {XMLNS};
+	// Implementation of tigase.xmpp.XMPPImplIfc
 
 	public String id() { return ID; }
 
 	public String[] supElements() { return ELEMENTS; }
 
-  public String[] supNamespaces() { return XMLNSS; }
+	public String[] supNamespaces() { return XMLNSS; }
 
-} // Message
+}

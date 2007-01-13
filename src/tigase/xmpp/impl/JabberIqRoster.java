@@ -73,10 +73,6 @@ public class JabberIqRoster extends XMPPProcessor
 		final XMPPResourceConnection session,	final Queue<Packet> results)
     throws NotAuthorizedException {
 
-		if (session == null) {
-			return;
-		} // end of if (session == null)
-
 		Element request = packet.getElement();
 
     String buddy =
@@ -153,10 +149,13 @@ public class JabberIqRoster extends XMPPProcessor
   public void process(final Packet packet, final XMPPResourceConnection session,
 		final NonAuthUserRepository repo, final Queue<Packet> results) {
 
+		if (session == null) {
+			return;
+		} // end of if (session == null)
+
 		try {
-			if (session == null
-				|| (packet.getElemFrom() != null
-					&& !session.getUserId().equals(JID.getNodeID(packet.getElemFrom())))) {
+			if (packet.getElemFrom() != null
+				&& !session.getUserId().equals(JID.getNodeID(packet.getElemFrom()))) {
 				// RFC says: ignore such request
 				log.warning(
 					"Roster request 'from' attribute doesn't match session userid: "

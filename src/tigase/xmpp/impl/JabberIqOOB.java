@@ -22,34 +22,25 @@
  */
 package tigase.xmpp.impl;
 
-import java.util.Queue;
 import java.util.logging.Logger;
-import tigase.server.Packet;
-import tigase.util.JID;
-import tigase.xml.Element;
-import tigase.xmpp.Authorization;
-import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.XMPPResourceConnection;
-import tigase.db.NonAuthUserRepository;
 
 /**
- * Describe class Message here.
+ * Describe class JabberIqOOB here.
  *
  *
- * Created: Tue Feb 21 15:49:08 2006
+ * Created: Sat Jan 13 21:55:46 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class Message extends SimpleForwarder {
+public class JabberIqOOB extends SimpleForwarder {
 
   private static final Logger log =
-		Logger.getLogger("tigase.xmpp.impl.Message");
+    Logger.getLogger("tigase.xmpp.impl.JabberIqOOB");
 
-
-  protected static final String XMLNS = "jabber:client";
-	protected static final String ID = "message";
-  protected static final String[] ELEMENTS = {"message"};
+  protected static final String XMLNS = "jabber:iq:oob";
+	protected static final String ID = XMLNS;
+  protected static final String[] ELEMENTS = {"query"};
   protected static final String[] XMLNSS = {XMLNS};
 
 	public String id() { return ID; }
@@ -58,4 +49,4 @@ public class Message extends SimpleForwarder {
 
   public String[] supNamespaces() { return XMLNSS; }
 
-} // Message
+}
