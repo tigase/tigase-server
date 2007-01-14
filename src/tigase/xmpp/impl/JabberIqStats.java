@@ -38,9 +38,8 @@ import tigase.util.ElementUtils;
 import tigase.db.NonAuthUserRepository;
 
 /**
- * Based on JEP-0092: Software Version, Implementation for
- * XMPP entity statistics collection.
- *
+ * XEP-0039: Statistics Gathering.
+ * http://www.xmpp.org/extensions/xep-0039.html
  *
  * Created: Sat Mar 25 06:45:00 2006
  *
@@ -53,12 +52,13 @@ public class JabberIqStats extends XMPPProcessor
   private static final Logger log =
     Logger.getLogger("tigase.xmpp.impl.JabberIqStats");
 
-	protected static final String ID = "jabber:iq:stats";
+  protected static final String XMLNS = "http://jabber.org/protocol/stats";
+	protected static final String ID = XMLNS;
   protected static final String[] ELEMENTS =
 	{"query", Command.GETSTATS.toString()};
   protected static final String[] XMLNSS =
-	{"jabber:iq:stats", Command.XMLNS};
-  protected static final String[] DISCO_FEATURES = {"jabber:iq:stats"};
+	{XMLNS, Command.XMLNS};
+  protected static final String[] DISCO_FEATURES = {XMLNS};
 
 	public String id() { return ID; }
 
@@ -87,9 +87,9 @@ public class JabberIqStats extends XMPPProcessor
 				// Send it back to user.
 				Element iq =
 					ElementUtils.createIqQuery(session.getDomain(), session.getJID(),
-						StanzaType.result, packet.getElemId(), XMLNSS[0]);
+						StanzaType.result, packet.getElemId(), XMLNS);
 				Element query = iq.getChild("query");
-				query.addChild(packet.getElement().getChild("statistics"));
+				query.addChildren(packet.getElement().getChildren("/GETSTATS/statistics"));
 				Packet result = new Packet(iq);
 				result.setTo(session.getConnectionId());
 				results.offer(result);

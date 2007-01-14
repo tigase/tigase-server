@@ -62,16 +62,17 @@ public class StatisticsCollector extends AbstractComponentRegistrator {
 					List<StatRecord> stats =
 						((StatisticsContainer)comp).getStatistics();
 					if (stats != null && stats.size() > 0) {
-						Element component = new Element("component");
-						component.setAttribute("name", comp.getName());
+// 						Element component = new Element("component");
+// 						component.setAttribute("name", comp.getName());
 						for (StatRecord record: stats) {
-							Element item = new Element("item");
-							item.addAttribute("description", record.getDescription());
-							item.addAttribute("unit", record.getUnit());
+							Element item = new Element("stat");
+							item.addAttribute("name", comp.getName() + "/"
+								+ record.getDescription());
+							item.addAttribute("units", record.getUnit());
 							item.addAttribute("value", record.getValue());
-							component.addChild(item);
+							statistics.addChild(item);
 						} // end of for ()
-						statistics.addChild(component);
+// 						statistics.addChild(component);
 					} // end of if (stats != null && stats.count() > 0)
 				} // end of if (component instanceof Configurable)
 			} // end of for ()

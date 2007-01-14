@@ -117,8 +117,9 @@ public class SessionManager extends AbstractMessageReceiver
 		log.finest("Processing packet: " + packet.getStringData());
 		if (packet.isCommand()) {
 			processCommand(packet);
+			packet.processedBy("SessionManager");
 			// No more processing is needed for command packet
-			return;
+// 			return;
 		} // end of if (pc.isCommand())
 		XMPPResourceConnection conn = getXMPPResourceConnection(packet);
 		if (conn == null) {
@@ -348,16 +349,16 @@ public class SessionManager extends AbstractMessageReceiver
 				addOutPacket(result);
 			} // end of if (pc.getType() != null && pc.getType() == StanzaType.result)
 			break;
-		case GETSTATS:
-			if (pc.getType() != null && pc.getType() == StanzaType.result) {
-				Element iq = ElementUtils.createIqQuery(pc.getElemFrom(),
-					pc.getElemTo(), pc.getType(), pc.getElemId(), "jabber:iq:stats");
-				iq.getChild("query").addChild(pc.getElement().getChild("statistics"));
-				Packet result = new Packet(iq);
-				result.setTo(getConnectionId(pc.getElemTo()));
-				addOutPacket(result);
-			} // end of if (pc.getType() != null && pc.getType() == StanzaType.result)
-			break;
+// 		case GETSTATS:
+// 			if (pc.getType() != null && pc.getType() == StanzaType.result) {
+// 				Element iq = ElementUtils.createIqQuery(pc.getElemFrom(),
+// 					pc.getElemTo(), pc.getType(), pc.getElemId(), "jabber:iq:stats");
+// 				iq.getChild("query").addChild(pc.getElement().getChild("statistics"));
+// 				Packet result = new Packet(iq);
+// 				result.setTo(getConnectionId(pc.getElemTo()));
+// 				addOutPacket(result);
+// 			} // end of if (pc.getType() != null && pc.getType() == StanzaType.result)
+// 			break;
 		default:
 			break;
 		} // end of switch (pc.getCommand())
