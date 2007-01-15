@@ -81,6 +81,8 @@ public class UserAuthRepositoryImpl implements UserAuthRepository {
 		this.repo = repo;
 	}
 
+	public String getResourceUri() { return repo.getResourceUri(); }
+
 	private String getPassword(final String user)
 		throws UserNotFoundException, TigaseDBException {
 		return repo.getData(user, PASSWORD_KEY);

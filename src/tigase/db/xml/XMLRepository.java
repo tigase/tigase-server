@@ -78,6 +78,8 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
     } // end of try-catch
 	}
 
+	public String getResourceUri() { return xmldb.getDBFileName(); }
+
   /**
    * This <code>addUser</code> method allows to add new user to reposiotry.
    * It <b>must</b> throw en exception <code>UserExistsException</code> if such

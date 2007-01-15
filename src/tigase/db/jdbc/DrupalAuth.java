@@ -244,6 +244,8 @@ public class DrupalAuth implements UserAuthRepository {
 		}
 	}
 
+	public String getResourceUri() { return db_conn; }
+
 	/**
 	 * Describe <code>plainAuth</code> method here.
 	 *

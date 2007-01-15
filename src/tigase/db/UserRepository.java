@@ -43,6 +43,8 @@ public interface UserRepository {
 
 	void initRepository(String resource_uri) throws DBInitException;
 
+	String getResourceUri();
+
 	List<String> getUsers() throws TigaseDBException;
 
 	/**

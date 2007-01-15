@@ -332,6 +332,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		}
 	}
 
+	public String getResourceUri() { return db_conn; }
 
 	/**
 	 * Describe <code>initRepository</code> method here.
