@@ -510,6 +510,14 @@ public class SessionManager extends AbstractMessageReceiver
 // 			System.out.println(sessionsByNodeId.toString());
 // 		} // end of if (sessionsByNodeId.size() > 10)
 		stats.add(new StatRecord("Closed connections", "long", closedConnections));
+		stats.add(new StatRecord("UserAuthRepository implementation", "text",
+				auth_repository.getClass().getSimpleName()));
+		stats.add(new StatRecord("UserAuthRepository connection string", "text",
+				auth_repository.getResourceUri()));
+		stats.add(new StatRecord("UserRepository implementation", "text",
+				user_repository.getClass().getSimpleName()));
+		stats.add(new StatRecord("UserRepository connection string", "text",
+				user_repository.getResourceUri()));
 		return stats;
 	}
 

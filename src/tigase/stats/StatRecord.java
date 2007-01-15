@@ -77,6 +77,12 @@ public class StatRecord {
 		this.value = "" + value;
 	}
 
+	public StatRecord(String description, String unit, String value) {
+		this.description = description;
+		this.unit = unit;
+		this.value = value;
+	}
+
 	public String getDescription() {
 		return description;
 	}
