@@ -48,7 +48,9 @@ public class Packet {
 
 	private final Element elem;
 	private final Command command;
-	private StanzaType type;
+	private final String strCommand;
+	private final boolean cmd;
+	private final StanzaType type;
 	private final boolean routed;
 	private String to = null;
 	private String from = null;
@@ -58,18 +60,24 @@ public class Packet {
 			throw new NullPointerException();
 		} // end of if (elem == null)
 		this.elem = elem;
-		if (elem.getXMLNS() != null && elem.getXMLNS().equals("tigase:command")) {
-			command = Command.valueOf(elem.getName());
+		if (elem.getName().equals("iq")) {
+			Element child = elem.getChild("command", Command.XMLNS);
+			if (child != null) {
+				cmd = true;
+				strCommand = child.getAttribute("action");
+				command = Command.valueof(strCommand);
+			} else {
+				strCommand = null;
+				command = null;
+				cmd = false;
+			}
 		} else {
+			strCommand = null;
 			command = null;
-		} // end of else
+			cmd = false;
+		}
 		if (elem.getAttribute("type") != null) {
-			try {
-				type = StanzaType.valueOf(elem.getAttribute("type"));
-			} catch (IllegalArgumentException e) {
-				// Unknown stanza type
-				type = null;
-			} // end of try-catch
+			type = StanzaType.valueof(elem.getAttribute("type"));
 		} else {
 			type = null;
 		} // end of if (elem.getAttribute("type") != null) else
@@ -101,6 +109,10 @@ public class Packet {
 		return command;
 	}
 
+	public String getStrCommand() {
+		return strCommand;
+	}
+
 	public StanzaType getType() {
 		return type;
 	}
@@ -114,7 +126,7 @@ public class Packet {
 	}
 
 	public boolean isCommand() {
-		return command != null;
+		return cmd;
 	}
 
 	public String getTo() {
@@ -211,27 +223,33 @@ public class Packet {
 		return packet;
 	}
 
-	public Packet commandResult(final String data) {
+// 	public Packet commandResult(final String data) {
+// 		Packet result = command.getPacket(getTo(), getFrom(),
+// 			StanzaType.result, elem.getAttribute("id"), data);
+// 		//		result.getElement().setCData(data);
+// 		result.getElement().setCData(data);
+// 		return result;
+// 	}
+
+	public Packet commandResult() {
 		Packet result = command.getPacket(getTo(), getFrom(),
-			StanzaType.result, elem.getAttribute("id"), data);
-		//		result.getElement().setCData(data);
-		result.getElement().setCData(data);
+			StanzaType.result, elem.getAttribute("id"));
 		return result;
 	}
 
-	public Packet commandResult(final Element child) {
-		Packet result = command.getPacket(getTo(), getFrom(),
-			StanzaType.result, elem.getAttribute("id"));
-		result.getElement().addChild(child);
-		return result;
-	}
+// 	public Packet commandResult(final Element child) {
+// 		Packet result = command.getPacket(getTo(), getFrom(),
+// 			StanzaType.result, elem.getAttribute("id"));
+// 		result.getElement().addChild(child);
+// 		return result;
+// 	}
 
-	public Packet commandResult(final List<Element> children) {
-		Packet result = command.getPacket(getTo(), getFrom(),
-			StanzaType.result, elem.getAttribute("id"));
-		result.getElement().addChildren(children);
-		return result;
-	}
+// 	public Packet commandResult(final List<Element> children) {
+// 		Packet result = command.getPacket(getTo(), getFrom(),
+// 			StanzaType.result, elem.getAttribute("id"));
+// 		result.getElement().addChildren(children);
+// 		return result;
+// 	}
 
 	public Packet errorResult(final String errorType, final String errorCondition,
 		final String errorText, final boolean includeOriginalXML) {

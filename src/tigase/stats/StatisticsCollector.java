@@ -32,6 +32,7 @@ import tigase.server.AbstractComponentRegistrator;
 import tigase.server.Packet;
 import tigase.server.ServerComponent;
 import tigase.server.XMPPService;
+import tigase.server.Command;
 
 /**
  * Class StatisticsCollector
@@ -76,7 +77,9 @@ public class StatisticsCollector extends AbstractComponentRegistrator {
 					} // end of if (stats != null && stats.count() > 0)
 				} // end of if (component instanceof Configurable)
 			} // end of for ()
-			results.offer(packet.commandResult(statistics));
+			Packet result = packet.commandResult();
+			Command.setData(result, statistics);
+			results.offer(result);
 			break;
 		default:
 			break;

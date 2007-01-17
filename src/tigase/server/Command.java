@@ -22,6 +22,8 @@
  */
 package tigase.server;
 
+import java.util.List;
+import java.util.logging.Logger;
 import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
 
@@ -42,35 +44,131 @@ public enum Command {
 		GETFEATURES,
 		GETDISCO,
 		CLOSE,
-		GETSTATS;
+		GETSTATS,
+		USER_STATUS,
+		OTHER;
 
-	public static final String XMLNS = "tigase:command";
+  /**
+   * Variable <code>log</code> is a class logger.
+   */
+  private static final Logger log = Logger.getLogger("tigase.server.Command");
+
+	public static final String XMLNS = "http://jabber.org/protocol/commands";
+
+	public static Command valueof(String cmd) {
+		try {
+			return Command.valueOf(cmd);
+		} catch (IllegalArgumentException e) {
+			return OTHER;
+		} // end of try-catch
+	}
 
 	public Packet getPacket(final String from, final String to,
 		final StanzaType type, final String id) {
-		Element elem =
-			new Element(this.toString(),
-				new String[] {"type", "from", "to", "id", "xmlns"},
-				new String[] {type.toString(), from, to, id, XMLNS});
+		Element elem = createIqCommand(from, to, type, id, this.toString());
 		return new Packet(elem);
 	}
 
-	public Packet getPacket(final String from, final String to,
-		final StanzaType type, final String id, final String cdata) {
-		Packet packet = getPacket(from, to, type, id);
-		if (cdata != null) {
-			packet.getElement().setCData(cdata);
-		} // end of if (cdata != null)
-		return packet;
+	public static Element createIqCommand(final String from, final String to,
+		final StanzaType type, final String id,	final String action) {
+		Element iq = new Element("iq",
+			new String[] {"from", "to", "type", "id"},
+			new String[] {from, to, type.toString(), id});
+		Element command = new Element("command",
+			new String[] {"xmlns", "action"},
+			new String[] {XMLNS, action});
+		iq.addChild(command);
+		return iq;
 	}
 
-	public Packet getPacket(final String from, final String to,
-		final StanzaType type, final String id, final Element child) {
-		Packet packet = getPacket(from, to, type, id);
-		if (child != null) {
-			packet.getElement().addChild(child);
-		} // end of if (cdata != null)
-		return packet;
+	public static void addFieldValue(final Packet packet,
+		final String f_name, final String f_value) {
+		Element iq = packet.getElement();
+		Element command = iq.getChild("command");
+		Element x = command.getChild("x", "jabber:x:data");
+		if (x == null) {
+			x = new Element("x",
+				new String[] {"xmlns", "type"},
+				new String[] {"jabber:x:data", "submit"});
+			command.addChild(x);
+		}
+		Element field = new Element("field",
+			new Element[] {new Element("value", f_value)},
+			new String[] {"var"},
+			new String[] {f_name});
+		x.addChild(field);
+	}
+
+	public static void setData(final Packet packet, final Element data) {
+		Element iq = packet.getElement();
+		Element command = iq.getChild("command");
+		command.addChild(data);
+	}
+
+	public static void setData(final Packet packet,
+		final List<Element> data) {
+		Element iq = packet.getElement();
+		Element command = iq.getChild("command");
+		command.addChildren(data);
+	}
+
+	public static String getFieldValue(final Packet packet,
+		final String f_name) {
+		Element iq = packet.getElement();
+		Element command = iq.getChild("command", XMLNS);
+		Element x = command.getChild("x", "jabber:x:data");
+		if (x == null) {
+			return null;
+		}
+		List<Element> children = x.getChildren();
+		for (Element child: children) {
+			if (child.getName().equals("field")
+				&& child.getAttribute("var").equals(f_name)) {
+				return child.getChildCData("/field/value");
+			}
+		}
+		return null;
+	}
+
+	public static String getFieldValue(final Packet packet,
+		final String f_name, boolean debug) {
+		Element iq = packet.getElement();
+		log.info("Command iq: " + iq.toString());
+		Element command = iq.getChild("command", XMLNS);
+		log.info("Command command: " + command.toString());
+		Element x = command.getChild("x", "jabber:x:data");
+		if (x == null) {
+			log.info("Command x: NULL");
+			return null;
+		}
+		log.info("Command x: " + x.toString());
+		List<Element> children = x.getChildren();
+		for (Element child: children) {
+			log.info("Command form child: " + child.toString());
+			if (child.getName().equals("field")
+				&& child.getAttribute("var").equals(f_name)) {
+				log.info("Command found: field=" + f_name
+					+ ", value=" + child.getChildCData("/field/value"));
+				return child.getChildCData("value");
+			} else {
+				log.info("Command not found: field=" + f_name
+					+ ", value=" + child.getChildCData("/field/value"));
+			}
+		}
+		return null;
+	}
+
+	public static List<Element> getData(final Packet packet) {
+		Element iq = packet.getElement();
+		Element command = iq.getChild("command");
+		return command.getChildren();
+	}
+
+	public static Element getData(final Packet packet, final String el_name,
+		final String xmlns) {
+		Element iq = packet.getElement();
+		Element command = iq.getChild("command");
+		return command.getChild(el_name, xmlns);
 	}
 
 } // Command

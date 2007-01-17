@@ -124,11 +124,10 @@ public class ClientConnectionManager extends ConnectionManager {
 					// be processed in another thread reading data from the socket.
 					// That's why below code first removes service from reading
 					// threads pool and then sends <proceed> packet and starts TLS.
+					Element proceed = Command.getData(packet, "proceed", null);
+					Packet p_proceed = new Packet(proceed);
 					SocketReadThread readThread = SocketReadThread.getInstance();
 					readThread.removeSocketService(serv);
-					Element proceed = packet.getElement().getChild("proceed");
-					log.finest("Packet: " + packet.getElement().toString());
-					Packet p_proceed = new Packet(proceed);
 					serv.addPacketToSend(p_proceed);
 					serv.processWaitingPackets();
 					serv.startTLS(false);
@@ -248,10 +247,6 @@ public class ClientConnectionManager extends ConnectionManager {
 		return new int[] {5223};
 	}
 
-	protected String getDefPortClass() {
-		return "tigase.xmpp.XMPPClient";
-	}
-
 	private String getFromAddress(String id) {
 		return JID.getJID(getName(), getDefHostName(), id);
 	}
@@ -291,9 +286,9 @@ public class ClientConnectionManager extends ConnectionManager {
 		serv.getSessionData().put(serv.HOSTNAME_KEY, hostname);
 		Packet streamOpen = Command.STREAM_OPENED.getPacket(
 			getFromAddress(getUniqueId(serv)),
-			routings.computeRouting(hostname), StanzaType.set, "sess1",
-			new Element("session-id", id));
-		streamOpen.getElement().addChild(new Element("hostname", hostname));
+			routings.computeRouting(hostname), StanzaType.set, "sess1");
+		Command.addFieldValue(streamOpen, "session-id", id);
+		Command.addFieldValue(streamOpen, "hostname", hostname);
 		addOutPacket(streamOpen);
 		if (attribs.get("version") != null) {
 			addOutPacket(Command.GETFEATURES.getPacket(

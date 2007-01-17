@@ -41,4 +41,12 @@ public enum StanzaType {
 		valid, invalid,                           // Dialback verification packets
     invisible;                                // Other unknown types...
 
+	public static StanzaType valueof(String cmd) {
+		try {
+			return StanzaType.valueOf(cmd);
+		} catch (IllegalArgumentException e) {
+			return null;
+		} // end of try-catch
+	}
+
 } // StanzaType

@@ -23,6 +23,7 @@
 package tigase.xmpp.impl;
 
 import java.util.Queue;
+import java.util.List;
 import java.util.logging.Logger;
 import tigase.server.Command;
 import tigase.server.Packet;
@@ -92,7 +93,7 @@ public class ServiceDiscovery extends XMPPProcessor
 			if (packet.isCommand() && packet.getCommand() == Command.GETDISCO
 				&& packet.getType() == StanzaType.result) {
 				// Send it back to user.
-				Element query = packet.getElement().getChild("query");
+				Element query = Command.getData(packet, "query", null);
 				Element iq =
 					ElementUtils.createIqQuery(session.getDomain(), session.getJID(),
 						StanzaType.result, packet.getElemId(), query);
@@ -112,10 +113,9 @@ public class ServiceDiscovery extends XMPPProcessor
 				Element query = packet.getElement().getChild("query");
 				Packet discoCommand = Command.GETDISCO.getPacket(session.getJID(),
 					session.getDomain(), StanzaType.get, packet.getElemId());
-				Element commandElement = discoCommand.getElement();
-				commandElement.setAttribute("query", query.getXMLNS());
+				Command.addFieldValue(discoCommand, "xmlns", query.getXMLNS());
 				if (query.getAttribute("node") != null) {
-					commandElement.setAttribute("node", query.getAttribute("node"));
+					Command.addFieldValue(discoCommand, "node", query.getAttribute("node"));
 				} // end of if (query.getAttribute("node") != null)
 				results.offer(discoCommand);
 				return;

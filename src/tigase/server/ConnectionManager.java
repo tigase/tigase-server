@@ -151,7 +151,6 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 			ConnectionType.accept);
 		props.put(PROP_KEY + port + "/" + PORT_SOCKET_PROP_KEY,	sock);
 		props.put(PROP_KEY + port + "/" + PORT_IFC_PROP_KEY, PORT_IFC_PROP_VAL);
-		//		props.put(PROP_KEY + port + "/" + PORT_CLASS_PROP_KEY, getDefPortClass());
 		props.put(PROP_KEY + port + "/" + PORT_REMOTE_HOST_PROP_KEY,
 			PORT_REMOTE_HOST_PROP_VAL);
 		props.put(PROP_KEY + port + "/" + TLS_REQUIRED_PROP_KEY,
@@ -215,10 +214,6 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 	}
 
 	protected int[] getDefSSLPorts() {
-		return null;
-	}
-
-	protected String getDefPortClass() {
 		return null;
 	}
 

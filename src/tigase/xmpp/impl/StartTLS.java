@@ -101,8 +101,12 @@ public class StartTLS extends XMPPProcessor
 		if (packet.getElement().getName().equals("starttls")) {
 			session.putSessionData(TLS_STARTED_KEY, "true");
 			//results.offer(packet.swapFromTo(proceed));
-			results.offer(Command.STARTTLS.getPacket(packet.getTo(),
-					packet.getFrom(), StanzaType.set, "1", proceed));
+			Packet result = Command.STARTTLS.getPacket(packet.getTo(),
+				packet.getFrom(), StanzaType.set, "1");
+			Command.setData(result, new Element("proceed",
+					new String[] {"xmlns"},
+					new String[] {"urn:ietf:params:xml:ns:xmpp-tls"}));
+			results.offer(result);
 		} // end of if (packet.getElement().getName().equals("starttls"))
 		else {
       log.warning("Unknown TLS element: " + packet.getStringData());

@@ -26,6 +26,8 @@ package tigase.server;
 
 import java.util.List;
 import java.util.Queue;
+import java.util.logging.Logger;
+import tigase.server.Command;
 import tigase.stats.StatRecord;
 import tigase.stats.StatisticsContainer;
 import tigase.xml.Element;
@@ -39,6 +41,12 @@ import tigase.xml.Element;
  * @version $Rev$
  */
 public class XMPPServiceCollector extends AbstractComponentRegistrator {
+
+  /**
+   * Variable <code>log</code> is a class logger.
+   */
+  private static final Logger log =
+    Logger.getLogger("tigase.server.XMPPServiceCollector");
 
 	public static final String INFO_XMLNS =
 		"http://jabber.org/protocol/disco#info";
@@ -55,9 +63,9 @@ public class XMPPServiceCollector extends AbstractComponentRegistrator {
 		switch (packet.getCommand()) {
 		case GETDISCO:
 			Element query = new Element("query");
-			String xmlns = packet.getElement().getAttribute("query");
+			String xmlns = Command.getFieldValue(packet, "xmlns");
 			query.setXMLNS(xmlns);
-			if (xmlns.equals(INFO_XMLNS)) {
+			if (xmlns != null && xmlns.equals(INFO_XMLNS)) {
 				Element identity = new Element("identity",
 					new String[] {"category", "type", "name"},
 					new String[] {"server", "im", "Tigase"});
@@ -75,8 +83,13 @@ public class XMPPServiceCollector extends AbstractComponentRegistrator {
 						} // end of if (stats != null && stats.count() > 0)
 					} // end of if (component instanceof Configurable)
 				} // end of for ()
-			} // end of if (xmlns.equals())
-			results.offer(packet.commandResult(query));
+			} else {
+				log.warning("Unknown GETDISCO xmlns: " + xmlns);
+				xmlns = Command.getFieldValue(packet, "xmlns", true);
+			}
+			Packet result = packet.commandResult();
+			Command.setData(result, query);
+			results.offer(result);
 			break;
 		default:
 			break;

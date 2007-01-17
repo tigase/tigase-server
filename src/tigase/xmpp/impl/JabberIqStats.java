@@ -23,6 +23,7 @@
 package tigase.xmpp.impl;
 
 import java.util.Queue;
+import java.util.List;
 import java.util.logging.Logger;
 import tigase.server.Packet;
 import tigase.server.Command;
@@ -55,7 +56,7 @@ public class JabberIqStats extends XMPPProcessor
   protected static final String XMLNS = "http://jabber.org/protocol/stats";
 	protected static final String ID = XMLNS;
   protected static final String[] ELEMENTS =
-	{"query", Command.GETSTATS.toString()};
+	{"query", "command"};
   protected static final String[] XMLNSS =
 	{XMLNS, Command.XMLNS};
   protected static final String[] DISCO_FEATURES = {XMLNS};
@@ -82,22 +83,25 @@ public class JabberIqStats extends XMPPProcessor
 
 			log.finest("Received packet: " + packet.getStringData());
 
-			if (packet.isCommand() && packet.getCommand() == Command.GETSTATS
-				&& packet.getType() == StanzaType.result) {
-				// Send it back to user.
-				Element iq =
-					ElementUtils.createIqQuery(session.getDomain(), session.getJID(),
-						StanzaType.result, packet.getElemId(), XMLNS);
-				Element query = iq.getChild("query");
-				query.addChildren(packet.getElement().getChildren("/GETSTATS/statistics"));
-				Packet result = new Packet(iq);
-				result.setTo(session.getConnectionId());
-				results.offer(result);
-				log.finest("Sending result: " + result.getStringData());
-				return;
+			if (packet.isCommand()) {
+				if (packet.getCommand() == Command.GETSTATS
+					&& packet.getType() == StanzaType.result) {
+					// Send it back to user.
+					Element iq =
+						ElementUtils.createIqQuery(session.getDomain(), session.getJID(),
+							StanzaType.result, packet.getElemId(), XMLNS);
+					Element query = iq.getChild("query");
+					Element stats = Command.getData(packet, "statistics", null);
+					query.addChildren(stats.getChildren());
+					Packet result = new Packet(iq);
+					result.setTo(session.getConnectionId());
+					results.offer(result);
+					log.finest("Sending result: " + result.getStringData());
+					return;
+				} else {
+					return;
+				}
 			} // end of if (packet.isCommand()
-				// && packet.getCommand() == Command.GETSTATS
-				// && packet.getType() == StanzaType.result)
 
 
 			// If ID part of user account contains only host name

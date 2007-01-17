@@ -24,6 +24,7 @@
 
 package tigase.server.xmppsession;
 
+//import tigase.auth.TigaseConfiguration;
 import java.net.UnknownHostException;
 import java.security.Security;
 import java.util.Arrays;
@@ -42,18 +43,18 @@ import javax.security.auth.login.AppConfigurationEntry;
 import javax.security.auth.login.Configuration;
 import tigase.auth.LoginHandler;
 import tigase.auth.TigaseSaslProvider;
-//import tigase.auth.TigaseConfiguration;
 import tigase.conf.Configurable;
 import tigase.db.DataOverwriteException;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.RepositoryFactory;
 import tigase.db.TigaseDBException;
+import tigase.db.UserAuthRepository;
 import tigase.db.UserNotFoundException;
 import tigase.db.UserRepository;
-import tigase.db.UserAuthRepository;
 import tigase.server.AbstractMessageReceiver;
 import tigase.server.MessageReceiver;
 import tigase.server.Packet;
+import tigase.server.Command;
 import tigase.server.XMPPService;
 import tigase.stats.StatRecord;
 import tigase.util.ElementUtils;
@@ -262,14 +263,15 @@ public class SessionManager extends AbstractMessageReceiver
 
 	private void processCommand(Packet pc) {
 		log.finer(pc.getCommand().toString() + " command from: " + pc.getFrom());
-		XMPPResourceConnection connection =	connectionsByFrom.get(pc.getFrom());
+		Element command = pc.getElement();
 		switch (pc.getCommand()) {
 		case STREAM_OPENED:
 			// It might be existing opened stream after TLS/SASL authorization
 			// If not, it means this is new stream
+			XMPPResourceConnection connection =	connectionsByFrom.get(pc.getFrom());
 			if (connection == null) {
 				log.finer("Adding resource connection for: " + pc.getFrom());
-				final String hostname = pc.getElemCData("/STREAM_OPENED/hostname");
+				final String hostname = Command.getFieldValue(pc, "hostname");
 				connection = new XMPPResourceConnection(pc.getFrom(),
 					user_repository, auth_repository, this);
 				if (hostname != null) {
@@ -285,83 +287,106 @@ public class SessionManager extends AbstractMessageReceiver
 				log.finest("Stream opened for existing session, authorized: "
 					+ connection.isAuthorized());
 			} // end of else
-			connection.setSessionId(pc.getElemCData("/STREAM_OPENED/session-id"));
+			connection.setSessionId(Command.getFieldValue(pc, "session-id"));
 			log.finest("Setting session-id " + connection.getSessionId()
 				+ " for connection: " + connection.getConnectionId());
+			break;
+		case USER_STATUS:
+			String user_jid = Command.getFieldValue(pc, "jid");
+			String hostname = JID.getNodeHost(user_jid);
+			String av = Command.getFieldValue(pc, "available");
+			boolean available = !(av != null && av.equalsIgnoreCase("false"));
+			if (available) {
+				connection = connectionsByFrom.get(pc.getElemFrom());
+				if (connection == null) {
+					connection = new XMPPResourceConnection(pc.getElemFrom(),
+						user_repository, auth_repository, this);
+					connection.setDomain(hostname);
+					// Dummy session ID, we might decide later to set real thing here
+					connection.setSessionId("session-id");
+					connectionsByFrom.put(pc.getElemFrom(), connection);
+					handleLogin(JID.getNodeNick(user_jid), connection);
+					connection.setResource(JID.getNodeResource(user_jid));
+					Packet presence =
+						new Packet(new Element("presence",
+								new Element[] {new Element("priority", "-1")}, null, null));
+					presence.setFrom(pc.getElemFrom());
+					presence.setTo(pc.getTo());
+					addOutPacket(presence);
+				} else {
+					log.finest("USER_STATUS set to true for user who is already available: "
+						+ pc.toString());
+				}
+			} else {
+				connection = connectionsByFrom.remove(pc.getElemFrom());
+				if (connection != null) {
+					closeSession(connection);
+				} else {
+					log.info("Can not find resource connection for packet: " +
+						pc.toString());
+				}
+			}
 			break;
 		case GETFEATURES:
 			if (pc.getType() == StanzaType.get) {
 				List<Element> features =
 					getFeatures(connectionsByFrom.get(pc.getFrom()));
-				Packet result = pc.commandResult(features);
+				Packet result = pc.commandResult();
+				Command.setData(result, features);
 				addOutPacket(result);
 			} // end of if (pc.getType() == StanzaType.get)
 			break;
 		case STREAM_CLOSED:
 			log.fine("Stream closed from: " + pc.getFrom());
 			++closedConnections;
-			final XMPPResourceConnection conn =
-				connectionsByFrom.remove(pc.getFrom());
-			if (conn != null) {
-				try {
-					String userId = conn.getUserId();
-					log.info("Closing connection for: " + userId);
-					XMPPSession session = conn.getParentSession();
-					if (session != null) {
-						log.info("Found parent session for: " + userId);
-						if (session.getActiveResourcesSize() <= 1) {
-							session = sessionsByNodeId.remove(userId);
-							if (session == null) {
-								log.info("UPS can't remove session, not found in map: " + userId);
-							} else {
-								log.finer("Number of authorized connections: "
-									+ sessionsByNodeId.size());
-							} // end of else
-						} else {
-							log.finer("Number of connections is "
-								+ session.getActiveResourcesSize() + " for the user: " + userId);
-						} // end of else
-					} // end of if (session.getActiveResourcesSize() == 0)
-				} catch (NotAuthorizedException e) {
-					log.info("Closed not authorized session: " + e);
-				}
-				Queue<Packet> results = new LinkedList<Packet>();
-				for (XMPPStopListenerIfc stopProc: stopListeners.values()) {
-					stopProc.stopped(conn, results);
-				} // end of for ()
-				for (Packet res: results) {
-					log.finest("Handling response: " + res.getStringData());
-					addOutPacket(res);
-				} // end of for ()
-				conn.streamClosed();
+			connection = connectionsByFrom.remove(pc.getFrom());
+			if (connection != null) {
+				closeSession(connection);
 			} else {
 				log.info("Can not find resource connection for packet: " +
 					pc.toString());
 			} // end of if (conn != null) else
 			break;
-		case GETDISCO:
-			if (pc.getType() != null && pc.getType() == StanzaType.result) {
-				Element iq = ElementUtils.createIqQuery(pc.getElemFrom(),
-					pc.getElemTo(), pc.getType(), pc.getElemId(),
-					pc.getElement().getChild("query"));
-				Packet result = new Packet(iq);
-				result.setTo(getConnectionId(pc.getElemTo()));
-				addOutPacket(result);
-			} // end of if (pc.getType() != null && pc.getType() == StanzaType.result)
+		case OTHER:
+			log.info("Other command found: " + pc.getStrCommand());
 			break;
-// 		case GETSTATS:
-// 			if (pc.getType() != null && pc.getType() == StanzaType.result) {
-// 				Element iq = ElementUtils.createIqQuery(pc.getElemFrom(),
-// 					pc.getElemTo(), pc.getType(), pc.getElemId(), "jabber:iq:stats");
-// 				iq.getChild("query").addChild(pc.getElement().getChild("statistics"));
-// 				Packet result = new Packet(iq);
-// 				result.setTo(getConnectionId(pc.getElemTo()));
-// 				addOutPacket(result);
-// 			} // end of if (pc.getType() != null && pc.getType() == StanzaType.result)
-// 			break;
 		default:
 			break;
 		} // end of switch (pc.getCommand())
+	}
+
+	private void closeSession(XMPPResourceConnection conn) {
+		try {
+			String userId = conn.getUserId();
+			log.info("Closing connection for: " + userId);
+			XMPPSession session = conn.getParentSession();
+			if (session != null) {
+				log.info("Found parent session for: " + userId);
+				if (session.getActiveResourcesSize() <= 1) {
+					session = sessionsByNodeId.remove(userId);
+					if (session == null) {
+						log.info("UPS can't remove session, not found in map: " + userId);
+					} else {
+						log.finer("Number of authorized connections: "
+							+ sessionsByNodeId.size());
+					} // end of else
+				} else {
+					log.finer("Number of connections is "
+						+ session.getActiveResourcesSize() + " for the user: " + userId);
+				} // end of else
+			} // end of if (session.getActiveResourcesSize() == 0)
+		} catch (NotAuthorizedException e) {
+			log.info("Closed not authorized session: " + e);
+		}
+		Queue<Packet> results = new LinkedList<Packet>();
+		for (XMPPStopListenerIfc stopProc: stopListeners.values()) {
+			stopProc.stopped(conn, results);
+		} // end of for ()
+		for (Packet res: results) {
+			log.finest("Handling response: " + res.getStringData());
+			addOutPacket(res);
+		} // end of for ()
+		conn.streamClosed();
 	}
 
 	private XMPPResourceConnection getXMPPResourceConnection(Packet p) {
@@ -510,14 +535,14 @@ public class SessionManager extends AbstractMessageReceiver
 // 			System.out.println(sessionsByNodeId.toString());
 // 		} // end of if (sessionsByNodeId.size() > 10)
 		stats.add(new StatRecord("Closed connections", "long", closedConnections));
-		stats.add(new StatRecord("UserAuthRepository implementation", "text",
-				auth_repository.getClass().getSimpleName()));
-		stats.add(new StatRecord("UserAuthRepository connection string", "text",
-				auth_repository.getResourceUri()));
-		stats.add(new StatRecord("UserRepository implementation", "text",
-				user_repository.getClass().getSimpleName()));
-		stats.add(new StatRecord("UserRepository connection string", "text",
-				user_repository.getResourceUri()));
+// 		stats.add(new StatRecord("UserAuthRepository implementation", "text",
+// 				auth_repository.getClass().getSimpleName()));
+// 		stats.add(new StatRecord("UserAuthRepository connection string", "text",
+// 				auth_repository.getResourceUri()));
+// 		stats.add(new StatRecord("UserRepository implementation", "text",
+// 				user_repository.getClass().getSimpleName()));
+// 		stats.add(new StatRecord("UserRepository connection string", "text",
+// 				user_repository.getResourceUri()));
 		return stats;
 	}
 
