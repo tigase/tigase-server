@@ -184,14 +184,25 @@ public class ClientConnectionManager extends ConnectionManager {
 		return null;
 	}
 
-	public Map<String, Object> getDefaults() {
-		Map<String, Object> props = super.getDefaults();
-		HOSTNAMES_PROP_VAL = DNSResolver.getDefHostNames();
+	public Map<String, Object> getDefaults(Map<String, Object> params) {
+		Map<String, Object> props = super.getDefaults(params);
+		if (params.get("--virt-hosts") != null) {
+			HOSTNAMES_PROP_VAL = ((String)params.get("--virt-hosts")).split(",");
+		} else {
+			HOSTNAMES_PROP_VAL = DNSResolver.getDefHostNames();
+		}
 		props.put(HOSTNAMES_PROP_KEY, HOSTNAMES_PROP_VAL);
 		props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_MODE_PROP_KEY,
 			ROUTING_MODE_PROP_VAL);
-		props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_ENTRY_PROP_KEY,
-			ROUTING_ENTRY_PROP_VAL);
+		if (params.get("config-type").equals("--gen-config-cs")
+			&& params.get("--ext-comp") != null) {
+			String[] comp_params = ((String)params.get("--ext-comp")).split(",");
+			props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_ENTRY_PROP_KEY,
+				"session_1@" + comp_params[1]);
+		} else {
+			props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_ENTRY_PROP_KEY,
+				ROUTING_ENTRY_PROP_VAL);
+		}
 		return props;
 	}
 

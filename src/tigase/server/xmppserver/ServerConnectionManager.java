@@ -332,9 +332,13 @@ public class ServerConnectionManager extends ConnectionManager {
 // 		return JID.getNodeHost(packet.getTo());
 // 	}
 
-	public Map<String, Object> getDefaults() {
-		Map<String, Object> props = super.getDefaults();
-		HOSTNAMES_PROP_VAL = DNSResolver.getDefHostNames();
+	public Map<String, Object> getDefaults(Map<String, Object> params) {
+		Map<String, Object> props = super.getDefaults(params);
+		if (params.get("--virt-hosts") != null) {
+			HOSTNAMES_PROP_VAL = ((String)params.get("--virt-hosts")).split(",");
+		} else {
+			HOSTNAMES_PROP_VAL = DNSResolver.getDefHostNames();
+		}
 		hostnames = HOSTNAMES_PROP_VAL;
 		props.put(HOSTNAMES_PROP_KEY, HOSTNAMES_PROP_VAL);
 		return props;

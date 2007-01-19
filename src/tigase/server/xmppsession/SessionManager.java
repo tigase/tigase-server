@@ -95,7 +95,7 @@ public class SessionManager extends AbstractMessageReceiver
 	private UserAuthRepository auth_repository = null;
 	private NonAuthUserRepository naUserRepository = null;
 
-	private String[] DISCO_FEATURES = {};
+	private String[] DISCO_FEATURES = {"http://jabber.org/protocol/commands"};
 	private String[] admins = {"admin@localhost"};
 
 	private Map<String, XMPPSession> sessionsByNodeId =
@@ -408,9 +408,9 @@ public class SessionManager extends AbstractMessageReceiver
 		return results;
 	}
 
-	public Map<String, Object> getDefaults() {
-		Map<String, Object> props = super.getDefaults();
-		SessionManagerConfig.getDefaults(props);
+	public Map<String, Object> getDefaults(Map<String, Object> params) {
+		Map<String, Object> props = super.getDefaults(params);
+		SessionManagerConfig.getDefaults(props, params);
 		return props;
 	}
 

@@ -28,12 +28,13 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.TreeMap;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
@@ -58,12 +59,35 @@ public class Configurator extends AbstractComponentRegistrator
 	private static final String LOGGING_KEY = "logging/";
 
   private static final Logger log =
-    Logger.getLogger("tigase.conf.Configurator");
+		Logger.getLogger("tigase.conf.Configurator");
 
 	private ConfigRepository repository = null;
 	private Timer delayedTask = new Timer("ConfiguratorTask", true);
+	private Map<String, Object> defConfigParams = new HashMap<String, Object>();
 
-	public Configurator(String fileName) {
+  public void parseArgs(final String[] args) {
+		defConfigParams.put("--test", new Boolean(false));
+		defConfigParams.put("config-type", "--gen-config-default");
+    if (args != null && args.length > 0) {
+      for (int i = 0; i < args.length; i++) {
+				if (args[i].startsWith("--gen-config")) {
+					defConfigParams.put("config-type", args[i]);
+				}
+				if (args[i].startsWith("--test")) {
+					defConfigParams.put(args[i], new Boolean(true));
+				}
+				if (args[i].equals("--user-db") || args[i].equals("--user-db-uri")
+					|| args[i].equals("--auth-db") || args[i].equals("--auth-db-uri")
+					|| args[i].equals("--ext-comp") || args[i].equals("--virt-hosts")
+					|| args[i].equals("--admins") || args[i].equals("--debug")) {
+					defConfigParams.put(args[i], args[++i]);
+				}
+      } // end of for (int i = 0; i < args.length; i++)
+    }
+  }
+
+	public Configurator(String fileName, String[] args) {
+		parseArgs(args);
 		repository = ConfigRepository.getConfigRepository(fileName);
 	}
 
@@ -79,7 +103,7 @@ public class Configurator extends AbstractComponentRegistrator
 	public void setup(Configurable component) {
 		String compId = component.getName();
 		Map<String, Object> prop = repository.getProperties(compId);
-		Map<String, Object> defs = component.getDefaults();
+		Map<String, Object> defs = component.getDefaults(defConfigParams);
 		Set<Map.Entry<String, Object>> defs_entries = defs.entrySet();
 		boolean modified = false;
 		for (Map.Entry<String, Object> entry : defs_entries) {
@@ -107,9 +131,15 @@ public class Configurator extends AbstractComponentRegistrator
    * Returns defualt configuration settings in case if there is no
    * config file.
    */
-	public Map<String, Object> getDefaults() {
+	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> defaults = new TreeMap<String, Object>();
-		defaults.put(LOGGING_KEY + ".level", "FINE");
+		if ((Boolean)params.get("--test")) {
+			defaults.put(LOGGING_KEY + ".level", "WARNING");
+			defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.level", "WARNING");
+		} else {
+			defaults.put(LOGGING_KEY + ".level", "FINE");
+			defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.level", "ALL");
+		}
 		defaults.put(LOGGING_KEY + "handlers",
 			"java.util.logging.ConsoleHandler java.util.logging.FileHandler");
 		defaults.put(LOGGING_KEY + "java.util.logging.ConsoleHandler.formatter",
@@ -120,13 +150,16 @@ public class Configurator extends AbstractComponentRegistrator
 		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.count", "5");
 		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.formatter",
 			"tigase.util.LogFormatter");
-		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.level", "ALL");
 		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.limit", "100000");
 		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.pattern",
 			"logs/tigase.log");
-// 		defaults.put(LOGGING_KEY + "tigase.handlers",
-// 			"java.util.logging.FileHandler");
 		defaults.put(LOGGING_KEY + "tigase.useParentHandlers", "true");
+		if (params.get("--debug") != null) {
+			defaults.put(LOGGING_KEY + ".level", "FINE");
+			defaults.put(LOGGING_KEY + "tigase."+params.get("--debug")+".level", "ALL");
+			defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.level", "ALL");
+			defaults.put(LOGGING_KEY + "java.util.logging.ConsoleHandler.level", "ALL");
+		}
 		return defaults;
 	}
 
@@ -385,7 +418,7 @@ public class Configurator extends AbstractComponentRegistrator
       } // end of for (int i = 0; i < args.length; i++)
 		}
 
-		Configurator conf = new Configurator(config_file);
+		Configurator conf = new Configurator(config_file, args);
 
 		if (set || add) {
 			conf.setValue(key, value, add);

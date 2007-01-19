@@ -34,6 +34,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.net.ConnectionType;
 import tigase.net.IOService;
+import tigase.net.SocketType;
 import tigase.server.ConnectionManager;
 import tigase.server.MessageReceiver;
 import tigase.server.Packet;
@@ -54,14 +55,20 @@ import tigase.xmpp.XMPPIOService;
 public class ComponentConnectionManager extends ConnectionManager {
 	//	implements XMPPService {
 
+	public static int[] PORTS = {5555};
+	public static ConnectionType PORT_TYPE_PROP_VAL = ConnectionType.accept;
+	public static SocketType PORT_SOCKET_PROP_VAL = SocketType.plain;
   public static final String SECRET_PROP_KEY = "secret";
-  public static final String SECRET_PROP_VAL =	"someSecret";
+  public static String SECRET_PROP_VAL =	"someSecret";
 	public static final String COMPONENT_NAME_KEY = "comp-name";
-	public static final String COMPONENT_NAME_VAL = "comp_1.localhost";
+	public static String COMPONENT_NAME_VAL = "comp_1.localhost";
+	public static String PORT_REMOTE_HOST_PROP_VAL = "localhost";
+	public static String[] PORT_IFC_PROP_VAL = {"*"};
 	public static final String PACK_ROUTED_KEY = "pack-routed";
-	public static final boolean PACK_ROUTED_VAL = false;
+	public static boolean PACK_ROUTED_VAL = false;
 
 	private boolean pack_routed = false;
+	private String remote_host = null;
 
   /**
    * Variable <code>log</code> is a class logger.
@@ -137,8 +144,54 @@ public class ComponentConnectionManager extends ConnectionManager {
 		} // end of switch (service.connectionType())
 	}
 
-	public Map<String, Object> getDefaults() {
-		Map<String, Object> props = super.getDefaults();
+	public Map<String, Object> getDefaults(Map<String, Object> params) {
+		String config_type = (String)params.get("config-type");
+		if (config_type.equals("--gen-config-sm")) {
+			PACK_ROUTED_VAL = true;
+			PORT_TYPE_PROP_VAL = ConnectionType.accept;
+		}
+		if (config_type.equals("--gen-config-cs")) {
+			PACK_ROUTED_VAL = true;
+			PORT_TYPE_PROP_VAL = ConnectionType.connect;
+			PORT_IFC_PROP_VAL = new String[] {"localhost"};
+		}
+		if (params.get("--ext-comp") != null) {
+			String[] comp_params = ((String)params.get("--ext-comp")).split(",");
+			int idx = 0;
+			if (comp_params.length >= idx + 1) {
+				COMPONENT_NAME_VAL = comp_params[idx++];
+			}
+			if (comp_params.length >= idx + 1) {
+				PORT_REMOTE_HOST_PROP_VAL = comp_params[idx++];
+				if (config_type.equals("--gen-config-cs")) {
+					PORT_IFC_PROP_VAL = new String[] {PORT_REMOTE_HOST_PROP_VAL};
+				}
+			}
+			if (comp_params.length >= idx + 1) {
+				try {
+					PORTS[0] = Integer.decode(comp_params[idx++]);
+				} catch (NumberFormatException e) {
+					log.warning("Incorrect component port number: " + comp_params[idx-1]);
+					PORTS[0] = 5555;
+				}
+			}
+			if (comp_params.length >= idx + 1) {
+				SECRET_PROP_VAL = comp_params[idx++];
+			}
+			if (comp_params.length >= idx + 1) {
+				if (comp_params[idx++].equals("ssl")) {
+					PORT_SOCKET_PROP_VAL = SocketType.plain;
+				}
+			}
+			if (comp_params.length >= idx + 1) {
+				if (comp_params[idx++].equals("accept")) {
+					PORT_TYPE_PROP_VAL = ConnectionType.accept;
+				} else {
+					PORT_TYPE_PROP_VAL = ConnectionType.connect;
+				}
+			}
+		}
+		Map<String, Object> props = super.getDefaults(params);
 		props.put(PACK_ROUTED_KEY, PACK_ROUTED_VAL);
 		return props;
 	}
@@ -149,20 +202,24 @@ public class ComponentConnectionManager extends ConnectionManager {
 	}
 
 	protected int[] getDefPlainPorts() {
-		return new int[] {5555};
+		return PORTS;
 	}
 
 	protected Map<String, Object> getParamsForPort(int port) {
     Map<String, Object> defs = new TreeMap<String, Object>();
 		defs.put(SECRET_PROP_KEY, SECRET_PROP_VAL);
 		defs.put(COMPONENT_NAME_KEY, COMPONENT_NAME_VAL);
+		defs.put(PORT_TYPE_PROP_KEY, PORT_TYPE_PROP_VAL);
+		defs.put(PORT_SOCKET_PROP_KEY, PORT_SOCKET_PROP_VAL);
+		defs.put(PORT_REMOTE_HOST_PROP_KEY, PORT_REMOTE_HOST_PROP_VAL);
+		defs.put(PORT_IFC_PROP_KEY, PORT_IFC_PROP_VAL);
 		return defs;
 	}
 
 	protected String getUniqueId(IOService serv) {
-		String addr =
+		remote_host =
 			(String)serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
-		return addr;
+		return remote_host;
 		// 		return serv.getRemoteHost();
 	}
 
@@ -179,7 +236,7 @@ public class ComponentConnectionManager extends ConnectionManager {
 	}
 
 	protected String getServiceId(Packet packet) {
-		return JID.getNodeHost(packet.getTo());
+		return JID.getNodeHost(remote_host);
 	}
 
 	public void serviceStarted(final IOService service) {

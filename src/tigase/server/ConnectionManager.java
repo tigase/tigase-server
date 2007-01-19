@@ -102,8 +102,8 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 		new ConcurrentSkipListMap<String, IOService>();
 	protected static long connectionDelay = 2000;
 
-	public Map<String, Object> getDefaults() {
-		Map<String, Object> props = super.getDefaults();
+	public Map<String, Object> getDefaults(Map<String, Object> params) {
+		Map<String, Object> props = super.getDefaults(params);
 		props.put(TLS_USE_PROP_KEY, TLS_USE_PROP_VAL);
 		props.put(TLS_DEF_CERT_PROP_KEY, TLS_DEF_CERT_PROP_VAL);
 		props.put(TLS_KEYS_STORE_PROP_KEY, TLS_KEYS_STORE_PROP_VAL);
@@ -179,6 +179,7 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 					} // end of if (entry.getKey().startsWith())
 				} // end of for ()
 				port_props.put(PORT_KEY, ports[i]);
+				port_props.put("reconnects", 18000l);
 				reconnectService(port_props, connectionDelay);
 			} // end of for (int i = 0; i < ports.length; i++)
 		} // end of if (ports != null)
@@ -350,6 +351,11 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 		}
 
 		public void accept(SocketChannel sc) {
+
+// 			if (!(sc.isConnectionPending() || sc.isConnected())) {
+// 				return;
+// 			}
+
 			XMPPIOService serv = new XMPPIOService();
 			serv.setSSLId(getName());
 			serv.setIOServiceListener(ConnectionManager.this);

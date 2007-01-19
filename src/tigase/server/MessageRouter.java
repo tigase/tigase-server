@@ -163,18 +163,6 @@ public class MessageRouter extends AbstractMessageReceiver {
 		if (s2s != null) {
 			s2s.addPacket(packet);
 		} // end of if (s2s != null)
-
-		// 		int idx = Arrays.binarySearch(localAddresses, host);
-		// 		if (idx >= 0) {
-		// 			MessageReceiver mr = receivers.get(nick);
-		// 			if (mr != null) {
-		// 				mr.addPacket(packet);
-		// 			} // end of if (mr != null)
-		// 		} // end of if (idx >= 0)
-		// 		else {
-		// 			log.info("This packet is not to local server: " +
-		// 				packet.getStringData());
-		// 		} // end of else
   }
 
   public void setConfig(ComponentRegistrator config) {
@@ -210,31 +198,18 @@ public class MessageRouter extends AbstractMessageReceiver {
     components.put(component.getName(), component);
   }
 
-  public Map<String, Object> getDefaults() {
-    Map<String, Object> defs = super.getDefaults();
-    MessageRouterConfig.getDefaults(defs);
+  public Map<String, Object> getDefaults(Map<String, Object> params) {
+    Map<String, Object> defs = super.getDefaults(params);
+    MessageRouterConfig.getDefaults(defs, params);
     return defs;
   }
-
-//   public void run() {
-//     while (! stopped) {
-//       try {
-// 				synchronized(this) { this.wait(); }
-//       } catch (InterruptedException e) { } // end of try-catch
-// 			Packet packet = null;
-// 			while ((packet = inQueue.poll()) != null) {
-// 				processPacket(packet);
-// 			} // end of while ((packet = inQueue.poll()) != null)
-//     } // end of while (! stopped)
-//   }
 
   private boolean inProperties = false;
   public void setProperties(Map<String, Object> props) {
 
     if (inProperties) {
       return;
-    } // end of if (inProperties)
-    else {
+    } else {
       inProperties = true;
     } // end of if (inProperties) else
 

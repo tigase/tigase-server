@@ -169,8 +169,7 @@ public class ConnectionOpenThread implements Runnable {
 						log.finer("Registered new client socket: "+sc);
 						ConnectionOpenListener al = (ConnectionOpenListener)sk.attachment();
 						al.accept(sc);
-					} // end of if (sc != null)
-					else {
+					} else {
 						log.warning("Can't obtain socket channel from selection key.");
 					} // end of if (sc != null) else
           ++accept_counter;

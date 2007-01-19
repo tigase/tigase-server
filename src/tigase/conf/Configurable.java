@@ -56,6 +56,6 @@ public interface Configurable {
   /**
    * Returns defualt configuration settings for this object.
    */
-	Map<String, Object> getDefaults();
+	Map<String, Object> getDefaults(Map<String, Object> params);
 
 }

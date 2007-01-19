@@ -93,7 +93,7 @@ if [ -z "${TIGASE_CONFIG}" ] ; then
 fi
 
 [[ -z "${TIGASE_RUN}" ]] && \
-    TIGASE_RUN="tigase.server.XMPPServer -c ${TIGASE_CONFIG}"
+    TIGASE_RUN="tigase.server.XMPPServer -c ${TIGASE_CONFIG}  ${TIGASE_OPTIONS}"
 
 [[ -z "${JAVA}" ]] && JAVA="${JAVA_HOME}/bin/java"
 
@@ -159,6 +159,7 @@ case "${1}" in
         echo "TIGASE_CONFIG   =  $TIGASE_CONFIG"
         echo "TIGASE_RUN      =  $TIGASE_RUN"
         echo "TIGASE_PID      =  $TIGASE_PID"
+	echo "TIGASE_OPTIONS  =  $TIGASE_OPTIONS"
         echo "JAVA_OPTIONS    =  $JAVA_OPTIONS"
         echo "JAVA            =  $JAVA"
         echo "JAVA_CMD        =  $JAVA_CMD"

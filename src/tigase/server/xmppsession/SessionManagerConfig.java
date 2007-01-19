@@ -37,16 +37,25 @@ import java.util.Map;
 public class SessionManagerConfig {
 
 	public static final String USER_REPO_CLASS_PROP_KEY = "user-repo-class";
-	public static final String USER_REPO_CLASS_PROP_VAL =
+	public static final String XML_REPO_CLASS_PROP_VAL =
 		"tigase.db.xml.XMLRepository";
+	public static final String MYSQL_REPO_CLASS_PROP_VAL =
+		"tigase.db.jdbc.JDBCRepository";
+	public static final String PGSQL_REPO_CLASS_PROP_VAL =
+		"tigase.db.jdbc.JDBCRepository";
+	public static final String DRUPAL_REPO_CLASS_PROP_VAL =
+		"tigase.db.jdbc.DrupalAuth";
 	public static final String USER_REPO_URL_PROP_KEY = "user-repo-url";
-	public static final String USER_REPO_URL_PROP_VAL = "user-repository.xml";
+	public static final String XML_REPO_URL_PROP_VAL = "user-repository.xml";
+	public static final String MYSQL_REPO_URL_PROP_VAL =
+		"jdbc:mysql://localhost/tigase?user=root&password=admin12";
+	public static final String PGSQL_REPO_URL_PROP_VAL =
+		"jdbc:postgresql://localhost/tigase?user=tigase";
+	public static final String DRUPAL_REPO_URL_PROP_VAL =
+		"jdbc:mysql://localhost/drupal?user=root&password=admin12";
 
 	public static final String AUTH_REPO_CLASS_PROP_KEY = "auth-repo-class";
-	public static final String AUTH_REPO_CLASS_PROP_VAL =
-		"tigase.db.xml.XMLRepository";
 	public static final String AUTH_REPO_URL_PROP_KEY = "auth-repo-url";
-	public static final String AUTH_REPO_URL_PROP_VAL = "user-repository.xml";
 
 	public static final String COMPONENTS_PROP_KEY = "components";
 	public static final String[] COMPONENTS_PROP_VAL =
@@ -64,58 +73,66 @@ public class SessionManagerConfig {
 	public static final String ADMINS_PROP_KEY = "admins";
 	public static String[] ADMINS_PROP_VAL =	{"admin@localhost", "admin@hostname"};
 
-// 	public static final String SECURITY_PROP_KEY = "security";
+	public static void getDefaults(Map<String, Object> props,
+		Map<String, Object> params) {
 
-// 	public static final String AUTHENTICATION_IDS_PROP_KEY = "authentication-ids";
-// 	public static final String[] AUTHENTICATION_IDS_PROP_VAL =
-// 	{"auth-plain", "auth-digest", "auth-sasl"};
+		String user_repo_class = XML_REPO_CLASS_PROP_VAL;
+		String user_repo_url = XML_REPO_URL_PROP_VAL;
+		String auth_repo_class = XML_REPO_CLASS_PROP_VAL;
+		String auth_repo_url = XML_REPO_URL_PROP_VAL;
+		if (params.get("--user-db") != null) {
+			if (params.get("--user-db").equals("mysql")) {
+				user_repo_class = MYSQL_REPO_CLASS_PROP_VAL;
+				user_repo_url = MYSQL_REPO_URL_PROP_VAL;
+				auth_repo_class = MYSQL_REPO_CLASS_PROP_VAL;
+				auth_repo_url = MYSQL_REPO_URL_PROP_VAL;
+			}
+			if (params.get("--user-db").equals("pgsql")) {
+				user_repo_class = PGSQL_REPO_CLASS_PROP_VAL;
+				user_repo_url = PGSQL_REPO_URL_PROP_VAL;
+				auth_repo_class = PGSQL_REPO_CLASS_PROP_VAL;
+				auth_repo_url = PGSQL_REPO_URL_PROP_VAL;
+			}
+		}
+		if (params.get("--user-db-uri") != null) {
+			user_repo_url = (String)params.get("--user-db-uri");
+		}
+		if (params.get("--auth-db") != null) {
+			if (params.get("--auth-db").equals("mysql")) {
+				auth_repo_class = MYSQL_REPO_CLASS_PROP_VAL;
+				auth_repo_url = MYSQL_REPO_URL_PROP_VAL;
+			}
+			if (params.get("--auth-db").equals("pgsql")) {
+				auth_repo_class = PGSQL_REPO_CLASS_PROP_VAL;
+				auth_repo_url = PGSQL_REPO_URL_PROP_VAL;
+			}
+		}
+		if (params.get("--auth-db-uri") != null) {
+			auth_repo_url = (String)params.get("--auth-db-uri");
+		}
 
-// 	public static final String AUTH_PLAIN_CLASS_PROP_KEY = "auth-plain/class";
-// 	public static final String AUTH_PLAIN_CLASS_PROP_VAL =
-// 		"tigase.auth.PlainAuth";
-// 	public static final String AUTH_PLAIN_FLAG_PROP_KEY = "auth-plain/flag";
-// 	public static final String AUTH_PLAIN_FLAG_PROP_VAL =	"sufficient";
+		props.put(USER_REPO_CLASS_PROP_KEY, user_repo_class);
+	  props.put(USER_REPO_URL_PROP_KEY, user_repo_url);
 
-// 	public static final String AUTH_DIGEST_CLASS_PROP_KEY = "auth-digest/class";
-// 	public static final String AUTH_DIGEST_CLASS_PROP_VAL =
-// 		"tigase.auth.DigestAuth";
-// 	public static final String AUTH_DIGEST_FLAG_PROP_KEY = "auth-digest/flag";
-// 	public static final String AUTH_DIGEST_FLAG_PROP_VAL =	"sufficient";
-
-// 	public static final String AUTH_SASL_CLASS_PROP_KEY = "auth-sasl/class";
-// 	public static final String AUTH_SASL_CLASS_PROP_VAL =	"None";
-// 	public static final String AUTH_SASL_FLAG_PROP_KEY = "auth-sasl/flag";
-// 	public static final String AUTH_SASL_FLAG_PROP_VAL =	"sufficient";
-
-	public static void getDefaults(Map<String, Object> props) {
-	  props.put(USER_REPO_CLASS_PROP_KEY, USER_REPO_CLASS_PROP_VAL);
-	  props.put(USER_REPO_URL_PROP_KEY, USER_REPO_URL_PROP_VAL);
-
-	  props.put(AUTH_REPO_CLASS_PROP_KEY, AUTH_REPO_CLASS_PROP_VAL);
-	  props.put(AUTH_REPO_URL_PROP_KEY, AUTH_REPO_URL_PROP_VAL);
+	  props.put(AUTH_REPO_CLASS_PROP_KEY, auth_repo_class);
+	  props.put(AUTH_REPO_URL_PROP_KEY, auth_repo_url);
 
 		props.put(COMPONENTS_PROP_KEY, COMPONENTS_PROP_VAL);
-		HOSTNAMES_PROP_VAL = DNSResolver.getDefHostNames();
-		ADMINS_PROP_VAL = new String[HOSTNAMES_PROP_VAL.length];
-		for (int i = 0; i < ADMINS_PROP_VAL.length; i++) {
-			ADMINS_PROP_VAL[i] = "admin@"+HOSTNAMES_PROP_VAL[i];
-		} // end of for (int i = 0; i < ADMINS_PROP_VAL.length; i++)
+		if (params.get("--virt-hosts") != null) {
+			HOSTNAMES_PROP_VAL = ((String)params.get("--virt-hosts")).split(",");
+		} else {
+			HOSTNAMES_PROP_VAL = DNSResolver.getDefHostNames();
+		}
 		props.put(HOSTNAMES_PROP_KEY, HOSTNAMES_PROP_VAL);
+		if (params.get("--admins") != null) {
+			ADMINS_PROP_VAL = ((String)params.get("--admins")).split(",");
+		} else {
+			ADMINS_PROP_VAL = new String[HOSTNAMES_PROP_VAL.length];
+			for (int i = 0; i < ADMINS_PROP_VAL.length; i++) {
+				ADMINS_PROP_VAL[i] = "admin@"+HOSTNAMES_PROP_VAL[i];
+			} // end of for (int i = 0; i < ADMINS_PROP_VAL.length; i++)
+		}
 		props.put(ADMINS_PROP_KEY, ADMINS_PROP_VAL);
-// 		props.put(SECURITY_PROP_KEY + "/" + AUTHENTICATION_IDS_PROP_KEY,
-// 			AUTHENTICATION_IDS_PROP_VAL);
-// 		props.put(SECURITY_PROP_KEY + "/" + AUTH_PLAIN_CLASS_PROP_KEY,
-// 			AUTH_PLAIN_CLASS_PROP_VAL);
-// 		props.put(SECURITY_PROP_KEY + "/" + AUTH_PLAIN_FLAG_PROP_KEY,
-// 			AUTH_PLAIN_FLAG_PROP_VAL);
-// 		props.put(SECURITY_PROP_KEY + "/" + AUTH_DIGEST_CLASS_PROP_KEY,
-// 			AUTH_DIGEST_CLASS_PROP_VAL);
-// 		props.put(SECURITY_PROP_KEY + "/" + AUTH_DIGEST_FLAG_PROP_KEY,
-// 			AUTH_DIGEST_FLAG_PROP_VAL);
-// 		props.put(SECURITY_PROP_KEY + "/" + AUTH_SASL_CLASS_PROP_KEY,
-// 			AUTH_SASL_CLASS_PROP_VAL);
-// 		props.put(SECURITY_PROP_KEY + "/" + AUTH_SASL_FLAG_PROP_KEY,
-// 			AUTH_SASL_FLAG_PROP_VAL);
 	}
 
 } // SessionManagerConfig

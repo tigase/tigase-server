@@ -208,7 +208,7 @@ public abstract class AbstractMessageReceiver
   /**
    * Returns defualt configuration settings for this object.
    */
-  public Map<String, Object> getDefaults() {
+  public Map<String, Object> getDefaults(Map<String, Object> params) {
     Map<String, Object> defs = new TreeMap<String, Object>();
 		defs.put(MAX_QUEUE_SIZE_PROP_KEY, MAX_QUEUE_SIZE_PROP_VAL);
     return defs;

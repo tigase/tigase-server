@@ -43,6 +43,7 @@ public class XMPPServer {
   private static boolean debug = false;
   private static boolean monit = false;
 	private static String tigaseVersion = null;
+	private static boolean gen_config = false;
 
 	/**
 	 * Creates a new <code>XMPPServer</code> instance.
@@ -63,20 +64,6 @@ public class XMPPServer {
   }
 
 	public static String getImplementationVersion() {
-// 		System.out.println("package.getName()="
-// 			+XMPPServer.class.getPackage().getName());
-// 		System.out.println("package.getSpecificationTitle()="
-// 			+XMPPServer.class.getPackage().getSpecificationTitle());
-// 		System.out.println("package.getSpecificationVersion()="
-// 			+XMPPServer.class.getPackage().getSpecificationVersion());
-// 		System.out.println("package.getSpecificationVendor()="
-// 			+XMPPServer.class.getPackage().getSpecificationVendor());
-// 		System.out.println("package.getImplementationTitle()="
-// 			+XMPPServer.class.getPackage().getImplementationTitle());
-// 		System.out.println("package.getImplementationVersion()="
-// 			+XMPPServer.class.getPackage().getImplementationVersion());
-// 		System.out.println("package.getImplementationVendor()="
-// 			+XMPPServer.class.getPackage().getImplementationVendor());
 		return XMPPServer.class.getPackage().getImplementationVersion();
 	}
 
@@ -132,6 +119,9 @@ public class XMPPServer {
         if (args[i].equals("-m")) {
           monit = true;
         } // end of if (args[i].equals("-m"))
+				if (args[i].startsWith("--gen-config")) {
+					gen_config = true;
+				}
       } // end of for (int i = 0; i < args.length; i++)
     }
   }
@@ -156,10 +146,11 @@ public class XMPPServer {
 			;
 		Configurator.loadLogManagerConfig(initial_config);
 
-		Configurator config = new Configurator(config_file);
+		Configurator config = new Configurator(config_file, args);
 		MessageRouter router = new MessageRouter();
 		router.setName(server_name);
 		router.setConfig(config);
+
 		router.start();
 
 	}
