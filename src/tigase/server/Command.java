@@ -70,13 +70,13 @@ public enum Command {
 	}
 
 	public static Element createIqCommand(final String from, final String to,
-		final StanzaType type, final String id,	final String action) {
+		final StanzaType type, final String id,	final String node) {
 		Element iq = new Element("iq",
 			new String[] {"from", "to", "type", "id"},
 			new String[] {from, to, type.toString(), id});
 		Element command = new Element("command",
-			new String[] {"xmlns", "action"},
-			new String[] {XMLNS, action});
+			new String[] {"xmlns", "node"},
+			new String[] {XMLNS, node});
 		iq.addChild(command);
 		return iq;
 	}

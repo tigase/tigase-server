@@ -64,7 +64,7 @@ public class Packet {
 			Element child = elem.getChild("command", Command.XMLNS);
 			if (child != null) {
 				cmd = true;
-				strCommand = child.getAttribute("action");
+				strCommand = child.getAttribute("node");
 				command = Command.valueof(strCommand);
 			} else {
 				strCommand = null;
