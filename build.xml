@@ -94,16 +94,24 @@
    cvspackage="${cvspackage}"/>
  </target>
 
-<!--
  <target name="pmd">
- <pmd rulesetfiles="rulesets/imports.xml">
- <formatter type="html" toFile="pmd_report.html"/>
- <fileset dir="${src}">
- <include name="**/*.java"/>
-      </fileset>
-    </pmd>
-  </target>
- -->
+  <taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask"/>
+  <pmd shortFilenames="true" targetjdk="1.5">
+   <ruleset>unusedcode</ruleset>
+   <ruleset>basic</ruleset>
+   <ruleset>design</ruleset>
+   <ruleset>logging-java</ruleset>
+   <ruleset>naming</ruleset>
+   <ruleset>optimizations</ruleset>
+   <ruleset>strings</ruleset>
+   <ruleset>sunsecure</ruleset>
+   <formatter type="html" toFile="pmd_report.html"/>
+   <fileset dir="${src}">
+    <include name="**/*.java"/>
+   </fileset>
+  </pmd>
+ </target>
+
  <target name="run-unittests" depends="prepare,jar-unittests"
   description="Run all JUnit tests for built package">
   <mkdir dir="${reports}"/>

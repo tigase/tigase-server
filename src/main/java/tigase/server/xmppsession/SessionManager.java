@@ -95,7 +95,7 @@ public class SessionManager extends AbstractMessageReceiver
 	private UserAuthRepository auth_repository = null;
 	private NonAuthUserRepository naUserRepository = null;
 
-	private String[] DISCO_FEATURES = {"http://jabber.org/protocol/commands"};
+	private String[] DISCO_FEATURES = {};
 	private String[] admins = {"admin@localhost"};
 
 	private Map<String, XMPPSession> sessionsByNodeId =
@@ -523,6 +523,10 @@ public class SessionManager extends AbstractMessageReceiver
 		}
 		results.addAll(Arrays.asList(DISCO_FEATURES));
 		return results;
+	}
+
+	public List<Element> getDiscoItems(String node) {
+		return null;
 	}
 
 	public List<StatRecord> getStatistics() {

@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
@@ -43,6 +44,7 @@ import tigase.server.AbstractComponentRegistrator;
 import tigase.server.Packet;
 import tigase.server.ServerComponent;
 import tigase.server.XMPPService;
+import tigase.xml.Element;
 import tigase.xml.db.Types.DataType;
 
 /**
@@ -54,7 +56,7 @@ import tigase.xml.db.Types.DataType;
  * @version $Rev$
  */
 public class Configurator extends AbstractComponentRegistrator
-	implements Configurable {
+	implements Configurable, XMPPService {
 
 	private static final String LOGGING_KEY = "logging/";
 
@@ -444,5 +446,15 @@ public class Configurator extends AbstractComponentRegistrator
 
 	public void processCommand(final Packet packet, final Queue<Packet> results)
 	{}
+
+	private String[] DISCO_FEATURES = {"http://jabber.org/protocol/commands"};
+
+	public List<String> getDiscoFeatures() {
+		return Arrays.asList(DISCO_FEATURES);
+	}
+
+	public List<Element> getDiscoItems(String node) {
+		return null;
+	}
 
 }

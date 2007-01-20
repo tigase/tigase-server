@@ -56,7 +56,7 @@ public class ServiceDiscovery extends XMPPProcessor
 
 	protected static final String ID = "disco";
   protected static final String[] ELEMENTS =
-	{"query", "query", Command.GETDISCO.toString()};
+	{"query", "query", "query"};
   protected static final String[] XMLNSS = {
     XMPPServiceCollector.INFO_XMLNS,
 		XMPPServiceCollector.ITEMS_XMLNS,
@@ -90,21 +90,22 @@ public class ServiceDiscovery extends XMPPProcessor
 				nodeId = JID.getNodeID(packet.getElemTo());
 			} // end of if (packet.getElemTo() != null)
 
-			if (packet.isCommand() && packet.getCommand() == Command.GETDISCO
-				&& packet.getType() == StanzaType.result) {
-				// Send it back to user.
-				Element query = Command.getData(packet, "query", null);
-				Element iq =
-					ElementUtils.createIqQuery(session.getDomain(), session.getJID(),
-						StanzaType.result, packet.getElemId(), query);
-				Packet result = new Packet(iq);
-				result.setTo(session.getConnectionId());
-				results.offer(result);
-				return;
-			} // end of if (packet.isCommand()
-				// && packet.getCommand() == Command.GETSTATS
-				// && packet.getType() == StanzaType.result)
-
+			if (packet.isCommand()) {
+				if (packet.getCommand() == Command.GETDISCO
+					&& packet.getType() == StanzaType.result) {
+					// Send it back to user.
+					Element query = Command.getData(packet, "query", null);
+					Element iq =
+						ElementUtils.createIqQuery(session.getDomain(), session.getJID(),
+							StanzaType.result, packet.getElemId(), query);
+					Packet result = new Packet(iq);
+					result.setTo(session.getConnectionId());
+					results.offer(result);
+					return;
+				} else {
+					return;
+				}
+			}
 
 			// If ID part of user account contains only host name
 			// and this is local domain it is message to admin

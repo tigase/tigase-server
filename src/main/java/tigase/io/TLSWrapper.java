@@ -116,17 +116,17 @@ public class TLSWrapper {
 
   public ByteBuffer unwrap(ByteBuffer net, ByteBuffer app) throws SSLException {
     ByteBuffer out = app;
-      out = resizeApplicationBuffer(out);
-      tlsEngineResult = tlsEngine.unwrap(net, out);
-      log.finest("unwrap() \ntlsEngineRsult.getStatus() = "
-        + tlsEngineResult.getStatus()
+		out = resizeApplicationBuffer(out);
+		tlsEngineResult = tlsEngine.unwrap(net, out);
+		log.finest("unwrap() \ntlsEngineRsult.getStatus() = "
+			+ tlsEngineResult.getStatus()
         + "\ntlsEngineRsult.getHandshakeStatus() = "
-        + tlsEngineResult.getHandshakeStatus());
-      if (tlsEngineResult.getHandshakeStatus() == HandshakeStatus.NEED_TASK) {
-        doTasks();
-        log.finest("unwrap() doTasks(), handshake: " +
-					tlsEngine.getHandshakeStatus());
-      }
+			+ tlsEngineResult.getHandshakeStatus());
+		if (tlsEngineResult.getHandshakeStatus() == HandshakeStatus.NEED_TASK) {
+			doTasks();
+			log.finest("unwrap() doTasks(), handshake: " +
+				tlsEngine.getHandshakeStatus());
+		}
     return out;
   }
 

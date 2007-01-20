@@ -24,6 +24,7 @@
 
 package tigase.server;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Queue;
 import java.util.logging.Logger;
@@ -70,18 +71,20 @@ public class XMPPServiceCollector extends AbstractComponentRegistrator {
 					new String[] {"category", "type", "name"},
 					new String[] {"server", "im", "Tigase"});
 				query.addChild(identity);
+				HashSet<String> all_features = new HashSet<String>();
 				for (ServerComponent comp: components) {
 					if (comp instanceof XMPPService) {
 						List<String> features =
 							((XMPPService)comp).getDiscoFeatures();
 						if (features != null && features.size() > 0) {
-							for (String f: features) {
-								Element feature = new Element("feature",
-									new String[] {"var"}, new String[] {f});
-								query.addChild(feature);
-							} // end of for ()
+							all_features.addAll(features);
 						} // end of if (stats != null && stats.count() > 0)
 					} // end of if (component instanceof Configurable)
+				} // end of for ()
+				for (String f: all_features) {
+					Element feature = new Element("feature",
+						new String[] {"var"}, new String[] {f});
+					query.addChild(feature);
 				} // end of for ()
 			} else {
 				log.warning("Unknown GETDISCO xmlns: " + xmlns);
