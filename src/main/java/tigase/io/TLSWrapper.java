@@ -120,7 +120,7 @@ public class TLSWrapper {
 		tlsEngineResult = tlsEngine.unwrap(net, out);
 		log.finest("unwrap() \ntlsEngineRsult.getStatus() = "
 			+ tlsEngineResult.getStatus()
-        + "\ntlsEngineRsult.getHandshakeStatus() = "
+			+ "\ntlsEngineRsult.getHandshakeStatus() = "
 			+ tlsEngineResult.getHandshakeStatus());
 		if (tlsEngineResult.getHandshakeStatus() == HandshakeStatus.NEED_TASK) {
 			doTasks();
