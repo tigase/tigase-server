@@ -35,16 +35,39 @@
 			<url>http://www.gnu.org/licenses/gpl.txt</url>
 		</license>
 	</licenses>
+	<repositories>
+	   <repository>
+	     <id>tigase</id>
+	     <name>Tigase rpos</name>
+	     <layout>default</layout>
+	     <url>http://maven.tigase.org</url>
+	     <snapshots>
+	       <enabled>true</enabled>
+	     </snapshots>
+	   </repository>
+	 </repositories>
+	<distributionManagement>
+		<repository>
+			<id>tigase</id>
+			<name>Tigase Repo</name>
+			<url>scpexe://tigase.org:/home/webapp/root/public_html/htdocs/drupal/files/maven-repository</url>
+		</repository>
+		<snapshotRepository>
+			<id>tigase</id>
+			<name>Tigase Repo</name>
+			<url>scpexe://tigase.org:/home/webapp/root/public_html/htdocs/drupal/files/maven-repository</url>
+		</snapshotRepository>
+	</distributionManagement>
 	<dependencies>
 		<dependency>
 			<groupId>tigase-utils</groupId>
 			<artifactId>tigase-utils</artifactId>
-			<version>2.2.0</version>
+			<version>2.2.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>tigase-xmltools</groupId>
 			<artifactId>tigase-xmltools</artifactId>
-			<version>2.2.0</version>
+			<version>2.2.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
