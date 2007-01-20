@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>tigase-server</groupId>
+	<artifactId>tigase-server</artifactId>
+	<version>2.3.4-SNAPSHOT</version>
+	<description>Tigase XMPP Server</description>
+	<name>TigaseXMPPServer</name>
+	<url>http://www.tigase.org/</url>
+	<organization>
+	    <name>Tigase</name>
+    	<url>http://www.tigase.org</url>
+	</organization>
+	<scm>
+		<connection>scm:svn:https://svn.tigase.org/reps/tigase-server/trunk</connection>
+		<developerConnection>scm:svn:https://svn.tigase.org/reps/tigase-server/trunk</developerConnection>
+		<url>https://svn.tigase.org/reps/tigase-server</url>
+	</scm>        
+	<developers>
+		<developer>
+			<name>Artur Hefczyc</name>
+			<roles>
+				<role>architect</role>
+				<role>developer</role>
+			</roles>
+		</developer>
+	</developers>
+  <issueManagement>
+    <system>Trac</system>
+    <url>http://server.tigase.org/</url>
+  </issueManagement>	
+	<licenses>
+		<license>
+ 	    	<name>GNU General Public License</name>
+			<url>http://www.gnu.org/licenses/gpl.txt</url>
+		</license>
+	</licenses>
+	<dependencies>
+		<dependency>
+			<groupId>tigase-utils</groupId>
+			<artifactId>tigase-utils</artifactId>
+			<version>2.2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>tigase-xmltools</groupId>
+			<artifactId>tigase-xmltools</artifactId>
+			<version>2.2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+</project>
