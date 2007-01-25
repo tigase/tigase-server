@@ -208,32 +208,38 @@ public class Presence extends XMPPProcessor
 			boolean subscr_changed = false;
 			switch (pres_type) {
 			case out_initial:
-				boolean first = false;
-				if (session.getSessionData(PRESENCE_KEY) == null) {
-					first = true;
+				if (packet.getElemTo() != null) {
+					// Send direct presence
+					Element result = (Element)packet.getElement().clone();
+					results.offer(new Packet(result));
+				} else {
+					boolean first = false;
+					if (session.getSessionData(PRESENCE_KEY) == null) {
+						first = true;
+					}
+
+					// Store user presence for later time...
+					// To send response to presence probes for example.
+					session.putSessionData(PRESENCE_KEY, packet.getElement());
+
+					// Send presence probes to 'to' or 'both' contacts if this is
+					// availability presence
+					if (first && type == StanzaType.available) {
+						sendPresenceBroadcast(StanzaType.probe, session, TO_SUBSCRIBED,
+							results, null);
+					} // end of if (type == StanzaType.available)
+
+					// Broadcast initial presence to 'from' or 'both' contacts
+					sendPresenceBroadcast(type, session, FROM_SUBSCRIBED,
+						results, packet.getElement());
+
+					// Broadcast initial presence to other available user resources
+					//				Element presence = (Element)packet.getElement().clone();
+					// Already done above, don't need to set it again here
+					// presence.setAttribute("from", session.getJID());
+					updatePresenceChange(packet.getElement(), session, results);
+					updateUserResources(packet.getElement(), session, results);
 				}
-
-				// Store user presence for later time...
-				// To send response to presence probes for example.
-				session.putSessionData(PRESENCE_KEY, packet.getElement());
-
-				// Send presence probes to 'to' or 'both' contacts if this is
- 				// availability presence
-				if (first && type == StanzaType.available) {
-					sendPresenceBroadcast(StanzaType.probe, session, TO_SUBSCRIBED,
-						results, null);
-				} // end of if (type == StanzaType.available)
-
- 				// Broadcast initial presence to 'from' or 'both' contacts
-				sendPresenceBroadcast(type, session, FROM_SUBSCRIBED,
-					results, packet.getElement());
-
- 				// Broadcast initial presence to other available user resources
-				//				Element presence = (Element)packet.getElement().clone();
-				// Already done above, don't need to set it again here
-				// presence.setAttribute("from", session.getJID());
-				updatePresenceChange(packet.getElement(), session, results);
-				updateUserResources(packet.getElement(), session, results);
 				break;
 			case out_subscribe:
 			case out_unsubscribe:
