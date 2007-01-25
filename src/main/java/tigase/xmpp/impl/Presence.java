@@ -271,7 +271,13 @@ public class Presence extends XMPPProcessor
 				// their preseces to all active resources
 				if (Roster.isSubscribedTo(session, packet.getElemFrom())) {
 					updatePresenceChange(packet.getElement(), session, results);
-				} // end of if (Roster.isSubscribedTo(session, packet.getElemFrom()))
+				} else {
+					Element elem = (Element)packet.getElement().clone();
+					Packet result = new Packet(elem);
+					result.setTo(session.getConnectionId());
+					result.setFrom(packet.getTo());
+					results.offer(result);
+				}
 				break;
 			case in_subscribe:
 				// If the buddy is already subscribed then auto-reply with sybscribed
