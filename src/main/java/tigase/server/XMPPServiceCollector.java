@@ -65,33 +65,56 @@ public class XMPPServiceCollector extends AbstractComponentRegistrator {
 		case GETDISCO:
 			Element query = new Element("query");
 			String xmlns = Command.getFieldValue(packet, "xmlns");
+			String node = Command.getFieldValue(packet, "node");
+			String jid = Command.getFieldValue(packet, "jid");
 			query.setXMLNS(xmlns);
-			if (xmlns != null && xmlns.equals(INFO_XMLNS)) {
-				Element identity = new Element("identity",
-					new String[] {"category", "type", "name"},
-					new String[] {"server", "im", "Tigase"});
-				query.addChild(identity);
-				HashSet<String> all_features = new HashSet<String>();
-				for (ServerComponent comp: components) {
-					if (comp instanceof XMPPService) {
-						List<String> features =
-							((XMPPService)comp).getDiscoFeatures();
-						if (features != null && features.size() > 0) {
-							all_features.addAll(features);
-						} // end of if (stats != null && stats.count() > 0)
-					} // end of if (component instanceof Configurable)
-				} // end of for ()
-				for (String f: all_features) {
-					Element feature = new Element("feature",
-						new String[] {"var"}, new String[] {f});
-					query.addChild(feature);
-				} // end of for ()
-			} else {
-				log.warning("Unknown GETDISCO xmlns: " + xmlns);
-				xmlns = Command.getFieldValue(packet, "xmlns", true);
+			if (node != null) {
+				query.setAttribute("node", node);
 			}
-			Packet result = packet.commandResult();
+			if (xmlns != null) {
+				if (xmlns.equals(INFO_XMLNS)) {
+					if (node == null) {
+						Element identity = new Element("identity",
+							new String[] {"category", "type", "name"},
+							new String[] {"server", "im", "Tigase"});
+						query.addChild(identity);
+					}
+					HashSet<Element> all_features = new HashSet<Element>();
+					for (ServerComponent comp: components) {
+						if (comp instanceof XMPPService) {
+							List<Element> features =
+								((XMPPService)comp).getDiscoFeatures(node, jid);
+							if (features != null && features.size() > 0) {
+								all_features.addAll(features);
+							} // end of if (stats != null && stats.count() > 0)
+						} // end of if (component instanceof Configurable)
+					} // end of for ()
+					for (Element f: all_features) {
+// 						Element feature = new Element("feature",
+// 							new String[] {"var"}, new String[] {f});
+						query.addChild(f);
+					}
+				} else {
+					if (xmlns.equals(ITEMS_XMLNS)) {
+						for (ServerComponent comp: components) {
+							if (comp instanceof XMPPService) {
+								List<Element> items =
+									((XMPPService)comp).getDiscoItems(node, jid);
+								if (items != null && items.size() > 0) {
+									query.addChildren(items);
+								} // end of if (stats != null && stats.count() > 0)
+							} // end of if (component instanceof Configurable)
+						} // end of for ()
+					} else {
+						log.warning("Uknown GETDISCO xmlns: " + xmlns);
+					}
+				}
+			} else {
+				log.warning("Wrong GETDISCO xmlns: " + xmlns);
+			}
+			Packet result = packet.commandResult("result");
 			Command.setData(result, query);
+			Command.addFieldValue(result, "jid", jid);
 			results.offer(result);
 			break;
 		default:

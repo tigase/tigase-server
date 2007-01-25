@@ -77,7 +77,7 @@ public class StatisticsCollector extends AbstractComponentRegistrator {
 					} // end of if (stats != null && stats.count() > 0)
 				} // end of if (component instanceof Configurable)
 			} // end of for ()
-			Packet result = packet.commandResult();
+			Packet result = packet.commandResult("result");
 			Command.setData(result, statistics);
 			results.offer(result);
 			break;

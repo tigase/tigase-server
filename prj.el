@@ -15,9 +15,9 @@
      "$PROJECTS_HOME/tigase/server/libs/tigase-utils.jar")))
  '(jde-sourcepath
    (quote
-    ("$PROJECTS_HOME/tigase/server/src"
-     "$PROJECTS_HOME/tigase/xmltools/src"
-     "$PROJECTS_HOME/tigase/utils/src"
+    ("$PROJECTS_HOME/tigase/server/src/main/java"
+     "$PROJECTS_HOME/tigase/xmltools/src/main/java"
+     "$PROJECTS_HOME/tigase/utils/src/main/java"
      "$PROJECTS_HOME/tigase/server/tests/unittests/src"
      "$JAVA_HOME/share/src" "$JAVA_HOME/share/tests/src")))
  '(jde-gen-buffer-boilerplate

@@ -20,31 +20,22 @@
  * Last modified by $Author$
  * $Date$
  */
-package tigase.xmpp;
-
-import tigase.xml.Element;
+package tigase.server;
 
 /**
- * Describe interface XMPPImplIfc here.
+ * Describe class Permissions here.
  *
  *
- * Created: Sat Oct 14 16:11:22 2006
+ * Created: Tue Jan 23 22:52:45 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public interface XMPPImplIfc {
+public enum Permissions {
 
-	String id();
+	NONE,     // Unknown user JID
+		LOCAL,  // This is local user JID but not authenticated yet
+		AUTH,   // Local authenticated and authorized user
+		ADMIN;  // Admin account already authenticated
 
-	String[] supElements();
-
-	String[] supNamespaces();
-
-	Element[] supStreamFeatures(XMPPResourceConnection session);
-
-	Element[] supDiscoFeatures(XMPPResourceConnection session);
-
-	boolean isSupporting(String elem, String ns);
-
-} // XMPPImplIfc
+}

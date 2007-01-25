@@ -54,6 +54,7 @@ public class Packet {
 	private final boolean routed;
 	private String to = null;
 	private String from = null;
+	private Permissions permissions = Permissions.NONE;
 
   public Packet(final Element elem) {
 		if (elem == null) {
@@ -87,6 +88,14 @@ public class Packet {
 		else {
 			routed = false;
 		} // end of if (elem.getName().equals("route")) else
+	}
+
+	public void setPermissions(Permissions perm) {
+		permissions = perm;
+	}
+
+	public Permissions getPermissions() {
+		return permissions;
 	}
 
 	public void processedBy(String id) {
@@ -223,33 +232,11 @@ public class Packet {
 		return packet;
 	}
 
-// 	public Packet commandResult(final String data) {
-// 		Packet result = command.getPacket(getTo(), getFrom(),
-// 			StanzaType.result, elem.getAttribute("id"), data);
-// 		//		result.getElement().setCData(data);
-// 		result.getElement().setCData(data);
-// 		return result;
-// 	}
-
-	public Packet commandResult() {
-		Packet result = command.getPacket(getTo(), getFrom(),
-			StanzaType.result, elem.getAttribute("id"));
+	public Packet commandResult(String cmd_type) {
+		Packet result = new Packet(command.createIqCommand(getTo(), getFrom(),
+				StanzaType.result, elem.getAttribute("id"), strCommand, cmd_type));
 		return result;
 	}
-
-// 	public Packet commandResult(final Element child) {
-// 		Packet result = command.getPacket(getTo(), getFrom(),
-// 			StanzaType.result, elem.getAttribute("id"));
-// 		result.getElement().addChild(child);
-// 		return result;
-// 	}
-
-// 	public Packet commandResult(final List<Element> children) {
-// 		Packet result = command.getPacket(getTo(), getFrom(),
-// 			StanzaType.result, elem.getAttribute("id"));
-// 		result.getElement().addChildren(children);
-// 		return result;
-// 	}
 
 	public Packet errorResult(final String errorType, final String errorCondition,
 		final String errorText, final boolean includeOriginalXML) {

@@ -44,8 +44,12 @@ import tigase.server.AbstractComponentRegistrator;
 import tigase.server.Packet;
 import tigase.server.ServerComponent;
 import tigase.server.XMPPService;
+import tigase.server.Command;
+import tigase.server.Permissions;
 import tigase.xml.Element;
+import tigase.xml.XMLUtils;
 import tigase.xml.db.Types.DataType;
+import tigase.xmpp.Authorization;
 
 /**
  * Class Configurator
@@ -214,6 +218,25 @@ public class Configurator extends AbstractComponentRegistrator
 		return repository.getSubnodes();
 	}
 
+	public Map<String, Object> getAllProperties(String key) {
+		Map<String, Object> result = new HashMap<String, Object>();
+		String[] comps = getComponents();
+		for (String comp: comps) {
+			Map<String, Object> prop = getProperties(comp);
+			for (Map.Entry<String, Object> entry: prop.entrySet()) {
+				String entry_key = comp + "/" + entry.getKey();
+				if (key == null) {
+					result.put(entry_key, entry.getValue());
+				} else {
+					if (entry_key.startsWith(key)) {
+						result.put(entry_key, entry.getValue());
+					} // end of if (entry_key.startsWith(key))
+				} // end of if (key == null) else
+			} // end of for (Map.Entry entry: prop.entrySet())
+		} // end of for (String comp: comps)
+		return result;
+	}
+
 	private boolean parseBoolean(String val) {
 		return val.equalsIgnoreCase("true")
 			|| val.equalsIgnoreCase("yes")
@@ -323,7 +346,7 @@ public class Configurator extends AbstractComponentRegistrator
 			;
 	}
 
-	private static void print(String key, Object value) {
+	private static String objectToString(Object value) {
 		String val_str = null;
 		DataType type = DataType.valueof(value.getClass().getSimpleName());
 		try {
@@ -369,10 +392,13 @@ public class Configurator extends AbstractComponentRegistrator
 				break;
 			} // end of switch (type)
 		} catch (ClassCastException e) {
-			System.out.println("ERROR! Problem with type casting for property: " + key);
-			System.exit(1);
+			log.warning("ERROR! Problem with type casting for property: " + key);
 		} // end of try-catch
-		System.out.println(key + " = " + val_str);
+		return val_str;
+	}
+
+	private static void print(String key, Object value) {
+		System.out.println(key + " = " + objectToString(value));
 	}
 
 	private static String config_file = null;
@@ -427,33 +453,134 @@ public class Configurator extends AbstractComponentRegistrator
 		} // end of if (set)
 
 		if (print) {
-			String[] comps = conf.getComponents();
-			for (String comp: comps) {
-				Map<String, Object> prop = conf.getProperties(comp);
-				for (Map.Entry<String, Object> entry: prop.entrySet()) {
-					String entry_key = comp + "/" + entry.getKey();
-					if (key == null) {
-						print(entry_key, entry.getValue());
-					} else {
-						if (entry_key.startsWith(key)) {
-							print(entry_key, entry.getValue());
-						} // end of if (entry_key.startsWith(key))
-					} // end of if (key == null) else
-				} // end of for (Map.Entry entry: prop.entrySet())
-			} // end of for (String comp: comps)
+			Map<String, Object> allprop = conf.getAllProperties(key);
+			for (Map.Entry<String, Object> entry: allprop.entrySet()) {
+				print(entry.getKey(), entry.getValue());
+			} // end of for (Map.Entry entry: prop.entrySet())
 		} // end of if (print)
 	}
 
-	public void processCommand(final Packet packet, final Queue<Packet> results)
-	{}
+	public void processCommand(final Packet packet, final Queue<Packet> results) {
 
-	private String[] DISCO_FEATURES = {"http://jabber.org/protocol/commands"};
+		if (!packet.getTo().startsWith(getName())) return;
 
-	public List<String> getDiscoFeatures() {
-		return Arrays.asList(DISCO_FEATURES);
+		if (packet.getPermissions() != Permissions.ADMIN) {
+			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
+					"You are not authorized for this action.", true));
+			return;
+		}
+
+		log.finest("Command received: " + packet.getStringData());
+		switch (packet.getCommand()) {
+		case OTHER:
+			if (packet.getStrCommand() != null) {
+				if (packet.getStrCommand().startsWith("list/")) {
+					String[] spl = packet.getStrCommand().split("/");
+					Packet result = packet.commandResult("result");
+					Map<String, Object> allprop = getAllProperties(spl[1]);
+					for (Map.Entry<String, Object> entry: allprop.entrySet()) {
+						Command.addFieldValue(result, XMLUtils.escape(entry.getKey()),
+							XMLUtils.escape(objectToString(entry.getValue())));
+					} // end of for (Map.Entry entry: prop.entrySet())
+					results.offer(result);
+				}
+			}
+			break;
+		default:
+			break;
+		}
 	}
 
-	public List<Element> getDiscoItems(String node) {
+	private static final Element[] DISCO_FEATURES =
+	{
+		new Element("feature",
+			new String[] {"var"},
+			new String[] {"http://jabber.org/protocol/commands"})
+	};
+	private static final Element[] DISCO_FEATURES_FOR_NODE =
+	{
+		new Element("identity",
+			new String[] {"category", "type"},
+			new String[] {"automation", "command-list"})
+	};
+	private static final Element[] TOP_DISCO_ITEMS =
+	{
+		new Element("item",
+			new String[] {"jid", "node", "name"},
+			new String[] {"config", "http://jabber.org/protocol/commands",
+										"Server configuration"})
+	};
+	private static final Element[] DISCO_ITEMS =
+	{
+// 		new Element("item",
+// 			new String[] {"jid", "node", "name"},
+// 			new String[] {"config", "get", "Get configuration item"}),
+// 		new Element("item",
+// 			new String[] {"jid", "node", "name"},
+// 			new String[] {"config", "set", "Set configuration item"}),
+		new Element("item",
+			new String[] {"jid", "node", "name"},
+			new String[] {"config", "list", "Components"})
+	};
+	private static final Element ITEM_IDENTITY =
+		new Element("identity",
+			new String[] {"name", "category", "type"},
+			new String[] {"Component: ", "automation", "command-node"});
+	private static final Element[] CONFIG_LIST_INFO =
+	{
+		ITEM_IDENTITY,
+		new Element("feature",
+			new String[] {"var"},
+			new String[] {"http://jabber.org/protocol/commands"})
+	};
+
+
+	public List<Element> getDiscoFeatures(String node, String jid) {
+		if (node == null) {
+			return Arrays.asList(DISCO_FEATURES);
+		}
+		if (jid.startsWith(getName())) {
+			if (node.equals("http://jabber.org/protocol/commands")) {
+				return Arrays.asList(DISCO_FEATURES_FOR_NODE);
+			}
+			if (node.equals("list")) {
+				return Arrays.asList(DISCO_FEATURES_FOR_NODE);
+			}
+			if (node.startsWith("list/")) {
+				String comp_name = node.substring("list/".length());
+				ITEM_IDENTITY.setAttribute("name", "Component: " + comp_name);
+				return Arrays.asList(CONFIG_LIST_INFO);
+			}
+		}
+		return null;
+	}
+
+	public List<Element> getDiscoItems(String node, String jid) {
+		if (node == null) {
+			for (Element item: TOP_DISCO_ITEMS) {
+				item.setAttribute("jid", getName() + "." + jid);
+			}
+			return Arrays.asList(TOP_DISCO_ITEMS);
+		}
+		if (jid.startsWith(getName())) {
+			if (node.equals("http://jabber.org/protocol/commands")) {
+				for (Element item: DISCO_ITEMS) {
+					//item.setAttribute("jid", getName() + "." + jid);
+					item.setAttribute("jid", jid);
+				}
+				return Arrays.asList(DISCO_ITEMS);
+			}
+			if (node.equals("list")) {
+				String[] comps = getComponents();
+				Element[] items = new Element[comps.length];
+				for (int i = 0; i < comps.length; i++) {
+					items[i] = new Element("item",
+						new String[] {"jid", "node", "name"},
+						new String[] {jid, node + "/" + comps[i], comps[i]});
+				}
+				return Arrays.asList(items);
+			}
+		}
 		return null;
 	}
 

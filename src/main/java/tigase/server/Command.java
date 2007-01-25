@@ -65,18 +65,36 @@ public enum Command {
 
 	public Packet getPacket(final String from, final String to,
 		final StanzaType type, final String id) {
-		Element elem = createIqCommand(from, to, type, id, this.toString());
+		Element elem =
+			createIqCommand(from, to, type, id, this.toString(), null);
+		return new Packet(elem);
+	}
+
+	public Packet getPacket(final String from, final String to,
+		final StanzaType type, final String id, final String data_type) {
+		Element elem =
+			createIqCommand(from, to, type, id, this.toString(), data_type);
 		return new Packet(elem);
 	}
 
 	public static Element createIqCommand(final String from, final String to,
-		final StanzaType type, final String id,	final String node) {
+		final StanzaType type, final String id,	final String node,
+		final String data_type) {
 		Element iq = new Element("iq",
 			new String[] {"from", "to", "type", "id"},
 			new String[] {from, to, type.toString(), id});
 		Element command = new Element("command",
 			new String[] {"xmlns", "node"},
 			new String[] {XMLNS, node});
+		if (data_type != null) {
+			Element x = new Element("x",
+				new String[] {"xmlns", "type"},
+				new String[] {"jabber:x:data", data_type});
+			command.addChild(x);
+			if (data_type.equals("result")) {
+				command.setAttribute("status", "completed");
+			}
+		}
 		iq.addChild(command);
 		return iq;
 	}
@@ -117,17 +135,37 @@ public enum Command {
 		Element iq = packet.getElement();
 		Element command = iq.getChild("command", XMLNS);
 		Element x = command.getChild("x", "jabber:x:data");
-		if (x == null) {
-			return null;
-		}
-		List<Element> children = x.getChildren();
-		for (Element child: children) {
-			if (child.getName().equals("field")
-				&& child.getAttribute("var").equals(f_name)) {
-				return child.getChildCData("/field/value");
+		if (x != null) {
+			List<Element> children = x.getChildren();
+			if (children != null) {
+				for (Element child: children) {
+					if (child.getName().equals("field")
+						&& child.getAttribute("var").equals(f_name)) {
+						return child.getChildCData("/field/value");
+					}
+				}
 			}
 		}
 		return null;
+	}
+
+	public static boolean removeFieldValue(final Packet packet,
+		final String f_name) {
+		Element iq = packet.getElement();
+		Element command = iq.getChild("command", XMLNS);
+		Element x = command.getChild("x", "jabber:x:data");
+		if (x != null) {
+			List<Element> children = x.getChildren();
+			if (children != null) {
+				for (Element child: children) {
+					if (child.getName().equals("field")
+						&& child.getAttribute("var").equals(f_name)) {
+						return x.removeChild(child);
+					}
+				}
+			}
+		}
+		return false;
 	}
 
 	public static String getFieldValue(final Packet packet,

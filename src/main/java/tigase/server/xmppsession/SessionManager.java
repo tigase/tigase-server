@@ -56,6 +56,7 @@ import tigase.server.MessageReceiver;
 import tigase.server.Packet;
 import tigase.server.Command;
 import tigase.server.XMPPService;
+import tigase.server.Permissions;
 import tigase.stats.StatRecord;
 import tigase.util.ElementUtils;
 import tigase.util.JID;
@@ -95,7 +96,7 @@ public class SessionManager extends AbstractMessageReceiver
 	private UserAuthRepository auth_repository = null;
 	private NonAuthUserRepository naUserRepository = null;
 
-	private String[] DISCO_FEATURES = {};
+	private Element[] DISCO_FEATURES = {};
 	private String[] admins = {"admin@localhost"};
 
 	private Map<String, XMPPSession> sessionsByNodeId =
@@ -120,7 +121,7 @@ public class SessionManager extends AbstractMessageReceiver
 			processCommand(packet);
 			packet.processedBy("SessionManager");
 			// No more processing is needed for command packet
-// 			return;
+			// 			return;
 		} // end of if (pc.isCommand())
 		XMPPResourceConnection conn = getXMPPResourceConnection(packet);
 		if (conn == null) {
@@ -161,6 +162,7 @@ public class SessionManager extends AbstractMessageReceiver
 
 		if (!stop) {
 			walk(packet, conn, packet.getElement(), results);
+			setPermissions(conn, results);
 		}
 
 		if (!stop) {
@@ -196,11 +198,42 @@ public class SessionManager extends AbstractMessageReceiver
 		} // end of else
 	}
 
+	private void setPermissions(XMPPResourceConnection conn,
+		Queue<Packet> results) {
+		Permissions perms = Permissions.NONE;
+		if (conn != null) {
+			perms = Permissions.LOCAL;
+			if (conn.isAuthorized()) {
+				perms = Permissions.AUTH;
+				try {
+					String id = conn.getUserId();
+					if (isAdmin(id)) {
+						perms = Permissions.ADMIN;
+					}
+				} catch (NotAuthorizedException e) {
+					perms = Permissions.NONE;
+				}
+			}
+		}
+		for (Packet res: results) {
+			res.setPermissions(perms);
+		}
+	}
+
 	private void addOutPackets(Queue<Packet> packets) {
 		for (Packet res: packets) {
 			log.finest("Handling response: " + res.getStringData());
 			addOutPacket(res);
 		} // end of for ()
+	}
+
+	private boolean isAdmin(String jid) {
+		for (String adm: admins) {
+			if (adm.equals(JID.getNodeID(jid))) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private boolean processAdmins(Packet packet) {
@@ -331,7 +364,7 @@ public class SessionManager extends AbstractMessageReceiver
 			if (pc.getType() == StanzaType.get) {
 				List<Element> features =
 					getFeatures(connectionsByFrom.get(pc.getFrom()));
-				Packet result = pc.commandResult();
+				Packet result = pc.commandResult("result");
 				Command.setData(result, features);
 				addOutPacket(result);
 			} // end of if (pc.getType() == StanzaType.get)
@@ -390,7 +423,10 @@ public class SessionManager extends AbstractMessageReceiver
 	}
 
 	private XMPPResourceConnection getXMPPResourceConnection(Packet p) {
-		return connectionsByFrom.get(p.getFrom());
+		if (p.getFrom() != null) {
+			return connectionsByFrom.get(p.getFrom());
+		}
+		return null;
 	}
 
 	private XMPPSession getXMPPSession(Packet p) {
@@ -513,19 +549,22 @@ public class SessionManager extends AbstractMessageReceiver
 		} // end of if (session.getActiveResourcesSize() == 0)
 	}
 
-	public List<String> getDiscoFeatures() {
-		List<String> results = new LinkedList<String>();
-		for (XMPPProcessorIfc proc: processors.values()) {
-			String[] discoFeatures = proc.supDiscoFeatures(null);
-			if (discoFeatures != null) {
-				results.addAll(Arrays.asList(discoFeatures));
-			} // end of if (discoFeatures != null)
+	public List<Element> getDiscoFeatures(String node, String jid) {
+		if (node == null) {
+			List<Element> results = new LinkedList<Element>();
+			for (XMPPProcessorIfc proc: processors.values()) {
+				Element[] discoFeatures = proc.supDiscoFeatures(null);
+				if (discoFeatures != null) {
+					results.addAll(Arrays.asList(discoFeatures));
+				} // end of if (discoFeatures != null)
+			}
+			results.addAll(Arrays.asList(DISCO_FEATURES));
+			return results;
 		}
-		results.addAll(Arrays.asList(DISCO_FEATURES));
-		return results;
+		return null;
 	}
 
-	public List<Element> getDiscoItems(String node) {
+	public List<Element> getDiscoItems(String node, String jid) {
 		return null;
 	}
 

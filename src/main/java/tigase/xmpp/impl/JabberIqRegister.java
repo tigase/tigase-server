@@ -53,7 +53,12 @@ public class JabberIqRegister extends XMPPProcessor
 		new Element("register", new String[] {"xmlns"},
 			new String[] {"http://jabber.org/features/iq-register"})
 	};
-  protected static final String[] DISCO_FEATURES = {"jabber:iq:register"};
+  protected static final Element[] DISCO_FEATURES =
+	{
+		new Element("feature",
+			new String[] {"var"},
+			new String[] {"jabber:iq:register"})
+	};
 
 	public String id() { return ID; }
 
@@ -64,7 +69,7 @@ public class JabberIqRegister extends XMPPProcessor
   public Element[] supStreamFeatures(final XMPPResourceConnection session)
 	{ return FEATURES; }
 
-  public String[] supDiscoFeatures(final XMPPResourceConnection session)
+  public Element[] supDiscoFeatures(final XMPPResourceConnection session)
 	{ return DISCO_FEATURES; }
 
 	public void process(final Packet packet, final XMPPResourceConnection session,

@@ -65,7 +65,8 @@ public class OfflineMessages extends XMPPProcessor
   protected static final String XMLNS = "jabber:client";
 	protected static final String[] ELEMENTS = {"presence"};
   protected static final String[] XMLNSS = {XMLNS};
-  protected static final String[] DISCO_FEATURES = {"msgoffline"};
+  protected static final Element[] DISCO_FEATURES =
+	{new Element("feature",	new String[] {"var"},	new String[] {"msgoffline"})};
 
 	private static final SimpleParser parser =
 		SingletonFactory.getParserInstance();
@@ -94,7 +95,7 @@ public class OfflineMessages extends XMPPProcessor
 	 * @param session a <code>XMPPResourceConnection</code> value
 	 * @return a <code>String[]</code> value
 	 */
-  public String[] supDiscoFeatures(final XMPPResourceConnection session)
+  public Element[] supDiscoFeatures(final XMPPResourceConnection session)
 	{ return DISCO_FEATURES; }
 
 	/**

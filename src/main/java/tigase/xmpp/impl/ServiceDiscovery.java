@@ -62,9 +62,13 @@ public class ServiceDiscovery extends XMPPProcessor
 		XMPPServiceCollector.ITEMS_XMLNS,
 		Command.XMLNS
 	};
-  protected static final String[] DISCO_FEATURES = {
-    XMPPServiceCollector.INFO_XMLNS,
-		XMPPServiceCollector.ITEMS_XMLNS
+  protected static final Element[] DISCO_FEATURES = {
+    new Element("feature",
+			new String[] {"var"},
+			new String[] {XMPPServiceCollector.INFO_XMLNS}),
+		new Element("feature",
+			new String[] {"var"},
+			new String[] {XMPPServiceCollector.ITEMS_XMLNS})
 	};
 
 	public String id() { return ID; }
@@ -73,7 +77,7 @@ public class ServiceDiscovery extends XMPPProcessor
 
   public String[] supNamespaces() { return XMLNSS; }
 
-  public String[] supDiscoFeatures(final XMPPResourceConnection session)
+  public Element[] supDiscoFeatures(final XMPPResourceConnection session)
 	{ return DISCO_FEATURES; }
 
 	public void process(final Packet packet, final XMPPResourceConnection session,
@@ -86,8 +90,10 @@ public class ServiceDiscovery extends XMPPProcessor
 		try {
 			// Maybe it is message to admininstrator:
 			String nodeId = null;
+			String nodeNick = null;
 			if (packet.getElemTo() != null) {
 				nodeId = JID.getNodeID(packet.getElemTo());
+				nodeNick = JID.getNodeNick(packet.getElemTo());
 			} // end of if (packet.getElemTo() != null)
 
 			if (packet.isCommand()) {
@@ -100,6 +106,8 @@ public class ServiceDiscovery extends XMPPProcessor
 							StanzaType.result, packet.getElemId(), query);
 					Packet result = new Packet(iq);
 					result.setTo(session.getConnectionId());
+					result.getElement().setAttribute("from",
+						Command.getFieldValue(packet,	"jid"));
 					results.offer(result);
 					return;
 				} else {
@@ -110,11 +118,12 @@ public class ServiceDiscovery extends XMPPProcessor
 			// If ID part of user account contains only host name
 			// and this is local domain it is message to admin
 			if (nodeId == null || nodeId.equals("")
-				|| nodeId.equalsIgnoreCase(session.getDomain())) {
+				|| (nodeNick == null && nodeId.endsWith(session.getDomain()))) {
 				Element query = packet.getElement().getChild("query");
 				Packet discoCommand = Command.GETDISCO.getPacket(session.getJID(),
-					session.getDomain(), StanzaType.get, packet.getElemId());
+					session.getDomain(), StanzaType.get, packet.getElemId(), "submit");
 				Command.addFieldValue(discoCommand, "xmlns", query.getXMLNS());
+				Command.addFieldValue(discoCommand, "jid", packet.getElemTo());
 				if (query.getAttribute("node") != null) {
 					Command.addFieldValue(discoCommand, "node", query.getAttribute("node"));
 				} // end of if (query.getAttribute("node") != null)

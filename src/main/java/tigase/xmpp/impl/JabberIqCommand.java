@@ -23,42 +23,38 @@
 package tigase.xmpp.impl;
 
 import java.util.Queue;
-import java.util.List;
 import java.util.logging.Logger;
-import tigase.server.Packet;
+import tigase.db.NonAuthUserRepository;
 import tigase.server.Command;
+import tigase.server.Packet;
 import tigase.xml.Element;
+import tigase.xmpp.Authorization;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
-import tigase.xmpp.StanzaType;
-import tigase.xmpp.Authorization;
 import tigase.util.JID;
-import tigase.util.ElementUtils;
-import tigase.db.NonAuthUserRepository;
 
 /**
- * XEP-0039: Statistics Gathering.
- * http://www.xmpp.org/extensions/xep-0039.html
+ * Describe class JabberIqCommand here.
  *
- * Created: Sat Mar 25 06:45:00 2006
+ *
+ * Created: Mon Jan 22 22:41:17 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class JabberIqStats extends XMPPProcessor
-	implements XMPPProcessorIfc {
+public class JabberIqCommand extends XMPPProcessor implements XMPPProcessorIfc {
 
   private static final Logger log =
-    Logger.getLogger("tigase.xmpp.impl.JabberIqStats");
+    Logger.getLogger("tigase.xmpp.impl.JabberIqCommand");
 
-  protected static final String XMLNS = "http://jabber.org/protocol/stats";
+  protected static final String XMLNS = Command.XMLNS;
 	protected static final String ID = XMLNS;
   protected static final String[] ELEMENTS =
-	{"query", "command"};
+	{"command"};
   protected static final String[] XMLNSS =
-	{XMLNS, Command.XMLNS};
+	{Command.XMLNS};
   protected static final Element[] DISCO_FEATURES =
 	{new Element("feature",	new String[] {"var"},	new String[] {XMLNS})};
 
@@ -76,43 +72,23 @@ public class JabberIqStats extends XMPPProcessor
 
 		if (session == null) { return; }
 
-		try {
-			// Maybe it is message to admininstrator:
-			String id = JID.getNodeID(packet.getElemTo());
+		// Processing only commands (that should be quaranteed by name space)
+		// and only unknown commands. All known commands are processed elsewhere
+		if (!packet.isCommand() || packet.getCommand() != Command.OTHER) {
+			return;
+		}
 
+		try {
 			log.finest("Received packet: " + packet.getStringData());
 
-			if (packet.isCommand()) {
-				if (packet.getCommand() == Command.GETSTATS
-					&& packet.getType() == StanzaType.result) {
-					// Send it back to user.
-					Element iq =
-						ElementUtils.createIqQuery(session.getDomain(), session.getJID(),
-							StanzaType.result, packet.getElemId(), XMLNS);
-					Element query = iq.getChild("query");
-					Element stats = Command.getData(packet, "statistics", null);
-					query.addChildren(stats.getChildren());
-					Packet result = new Packet(iq);
-					result.setTo(session.getConnectionId());
-					results.offer(result);
-					log.finest("Sending result: " + result.getStringData());
-					return;
-				} else {
-					return;
-				}
-			} // end of if (packet.isCommand()
+			// For all messages coming from the owner of this account set
+			// proper 'from' attribute. This is actually needed for the case
+			// when the user sends a message to himself.
+			if (packet.getFrom().equals(session.getConnectionId())) {
+				packet.getElement().setAttribute("from", session.getJID());
+			} // end of if (packet.getFrom().equals(session.getConnectionId()))
 
-
-			// If ID part of user account contains only host name
-			// and this is local domain it is message to admin
-			if (id == null || id.equals("")
-				|| id.equalsIgnoreCase(session.getDomain())) {
-				Packet result = Command.GETSTATS.getPacket(session.getJID(),
-					session.getDomain(), StanzaType.get, packet.getElemId());
-				results.offer(result);
-				log.finest("Sending result: " + result.getStringData());
-				return;
-			}
+			String id = JID.getNodeID(packet.getElemTo());
 
 			if (id.equals(session.getUserId())) {
 				// Yes this is message to 'this' client
@@ -121,27 +97,16 @@ public class JabberIqStats extends XMPPProcessor
 				result.setTo(session.getConnectionId());
 				result.setFrom(packet.getTo());
 				results.offer(result);
-				log.finest("Sending result: " + result.getStringData());
 			} else {
-				// This is message to some other client so I need to
-				// set proper 'from' attribute whatever it is set to now.
-				// Actually processor should not modify request but in this
-				// case it is absolutely safe and recommended to set 'from'
-				// attribute
-				Element el_res = (Element)packet.getElement().clone();
-				// According to spec we must set proper FROM attribute
-				el_res.setAttribute("from", session.getJID());
-				Packet result = new Packet(el_res);
-				results.offer(result);
-				log.finest("Sending result: " + result.getStringData());
+				// This is message to some other client
+				Element result = (Element)packet.getElement().clone();
+				results.offer(new Packet(result));
 			} // end of else
 		} catch (NotAuthorizedException e) {
-      log.warning(
-				"Received stats request but user session is not authorized yet: " +
-        packet.getStringData());
+			log.warning("NotAuthorizedException for packet: "	+ packet.getStringData());
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 					"You must authorize session first.", true));
 		} // end of try-catch
 	}
 
-} // JabberIqStats
+}

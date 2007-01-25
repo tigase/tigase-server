@@ -40,9 +40,9 @@ import tigase.xml.Element;
  */
 public interface XMPPService {
 
-	List<String> getDiscoFeatures();
+	List<Element> getDiscoFeatures(String node, String jid);
 
-	List<Element> getDiscoItems(String node);
+	List<Element> getDiscoItems(String node, String jid);
 
 }
 

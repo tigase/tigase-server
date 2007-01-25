@@ -91,7 +91,7 @@ public class ClientConnectionManager extends ConnectionManager {
 		log.finer("Processing packet: " + packet.getElemName()
 			+ ", type: " + packet.getType());
 		log.finest("Processing packet: " + packet.getStringData());
-		if (packet.isCommand()) {
+		if (packet.isCommand() && packet.getCommand() != Command.OTHER) {
 			processCommand(packet);
 		} else {
 			writePacketToSocket(packet);
@@ -201,7 +201,7 @@ public class ClientConnectionManager extends ConnectionManager {
 				"session_1@" + comp_params[1]);
 		} else {
 			props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_ENTRY_PROP_KEY,
-				ROUTING_ENTRY_PROP_VAL);
+				"session_1@" + HOSTNAMES_PROP_VAL[0]);
 		}
 		return props;
 	}
@@ -297,14 +297,14 @@ public class ClientConnectionManager extends ConnectionManager {
 		serv.getSessionData().put(serv.HOSTNAME_KEY, hostname);
 		Packet streamOpen = Command.STREAM_OPENED.getPacket(
 			getFromAddress(getUniqueId(serv)),
-			routings.computeRouting(hostname), StanzaType.set, "sess1");
+			routings.computeRouting(hostname), StanzaType.set, "sess1", "submit");
 		Command.addFieldValue(streamOpen, "session-id", id);
 		Command.addFieldValue(streamOpen, "hostname", hostname);
 		addOutPacket(streamOpen);
 		if (attribs.get("version") != null) {
 			addOutPacket(Command.GETFEATURES.getPacket(
 					getFromAddress(getUniqueId(serv)),
-					routings.computeRouting(null), StanzaType.get, "sess1"));
+					routings.computeRouting(null), StanzaType.get, "sess1", null));
 		} // end of if (attribs.get("version") != null)
 		return "<stream:stream version='1.0' xml:lang='en'"
 			+ " from='" + hostname + "'"

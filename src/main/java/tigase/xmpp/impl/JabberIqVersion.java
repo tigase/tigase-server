@@ -53,7 +53,8 @@ public class JabberIqVersion extends XMPPProcessor
 	protected static final String ID = XMLNS;
   protected static final String[] ELEMENTS = {"query"};
   protected static final String[] XMLNSS = {XMLNS};
-  protected static final String[] DISCO_FEATURES = {XMLNS};
+  protected static final Element[] DISCO_FEATURES =
+	{new Element("feature",	new String[] {"var"},	new String[] {XMLNS})};
 
 	public String id() { return ID; }
 
@@ -61,7 +62,7 @@ public class JabberIqVersion extends XMPPProcessor
 
   public String[] supNamespaces() { return XMLNSS; }
 
-  public String[] supDiscoFeatures(final XMPPResourceConnection session)
+  public Element[] supDiscoFeatures(final XMPPResourceConnection session)
 	{ return DISCO_FEATURES; }
 
 	public void process(final Packet packet, final XMPPResourceConnection session,

@@ -35,11 +35,16 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Logger;
-import static tigase.server.MessageRouterConfig.*;
+import tigase.xml.Element;
 import tigase.util.JID;
+import tigase.xmpp.Authorization;
+
+import static tigase.server.MessageRouterConfig.*;
 
 /**
  * Class MessageRouter
@@ -50,8 +55,8 @@ import tigase.util.JID;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class MessageRouter extends AbstractMessageReceiver {
-	//  implements XMPPService {
+public class MessageRouter extends AbstractMessageReceiver
+	implements XMPPService {
 
   private static final Logger log =
     Logger.getLogger("tigase.server.MessageRouter");
@@ -69,6 +74,7 @@ public class MessageRouter extends AbstractMessageReceiver {
     new ConcurrentSkipListMap<String, MessageReceiver>();
 
 	public void processCommand(final Packet packet, final Queue<Packet> r) {
+		String to = packet.getTo();
 		Queue<Packet> results = new LinkedList<Packet>();
 		for (ServerComponent comp: components.values()) {
 			if (comp != this) {
@@ -78,9 +84,52 @@ public class MessageRouter extends AbstractMessageReceiver {
 		for (Packet res: results) {
 			processPacket(res);
 		} // end of for ()
+
+		if (!to.startsWith(getName())) return;
+
+		if (packet.getPermissions() != Permissions.ADMIN) {
+			Packet res = Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
+				"You are not authorized for this action.", true);
+			processPacket(res);
+			return;
+		}
+
+		log.finest("Command received: " + packet.getStringData());
+		switch (packet.getCommand()) {
+		case OTHER:
+			if (packet.getStrCommand() != null) {
+				if (packet.getStrCommand().startsWith("controll/")) {
+					String[] spl = packet.getStrCommand().split("/");
+					String cmd = spl[1];
+					if (cmd.equals("stop")) {
+						Packet result = packet.commandResult("result");
+						processPacket(result);
+						new Timer("Stopping...", true).schedule(new TimerTask() {
+								public void run() {
+									System.exit(0);
+								}
+							}, 2000);
+					}
+				}
+			}
+			break;
+		default:
+			break;
+		}
 	}
 
-  public void processPacket(Packet packet) {
+	private boolean isToLocalComponent(String jid) {
+		for (String name: components.keySet()) {
+			for (String hostname: localAddresses) {
+				if (jid.equals(name + "." + hostname)) {
+					return true;
+				}
+			}
+		} // end of for ()
+		return false;
+	}
+
+	public void processPacket(Packet packet) {
 
 		if (packet.getTo() == null) {
 			log.warning("Packet with TO attribute set to NULL: "
@@ -94,7 +143,9 @@ public class MessageRouter extends AbstractMessageReceiver {
 			+ ", to: " + packet.getTo()
 			+ ", from: " + packet.getFrom());
 
-		if (packet.isCommand() && localAddresses.contains(packet.getTo())) {
+		if (packet.isCommand()
+			&& (localAddresses.contains(packet.getTo())
+				|| isToLocalComponent(packet.getTo()))) {
 			processCommand(packet, null);
 			return;
 		} // end of if (packet.isCommand() && localAddresses.contains(packet.getTo()))
@@ -281,6 +332,98 @@ public class MessageRouter extends AbstractMessageReceiver {
 
 	public String getDefHostName() {
 		return defHostName;
+	}
+
+	private static final Element[] DISCO_FEATURES =
+	{
+		new Element("feature",
+			new String[] {"var"},
+			new String[] {"http://jabber.org/protocol/commands"})
+	};
+	private static final Element[] DISCO_FEATURES_FOR_NODE =
+	{
+		new Element("identity",
+			new String[] {"category", "type"},
+			new String[] {"automation", "server-controll"})
+	};
+	private static final Element[] TOP_DISCO_ITEMS =
+	{
+		new Element("item",
+			new String[] {"jid", "node", "name"},
+			new String[] {"server", "http://jabber.org/protocol/commands",
+										"Server administration"})
+	};
+	private static final Element[] DISCO_ITEMS =
+	{
+// 		new Element("item",
+// 			new String[] {"jid", "node", "name"},
+// 			new String[] {"config", "get", "Get configuration item"}),
+// 		new Element("item",
+// 			new String[] {"jid", "node", "name"},
+// 			new String[] {"config", "set", "Set configuration item"}),
+		new Element("item",
+			new String[] {"jid", "node", "name"},
+			new String[] {"server", "controll", "Commands"})
+	};
+	private static final Element ITEM_IDENTITY =
+		new Element("identity",
+			new String[] {"name", "category", "type"},
+			new String[] {"Command: ", "automation", "command-node"});
+	private static final Element[] CONFIG_LIST_INFO =
+	{
+		ITEM_IDENTITY,
+		new Element("feature",
+			new String[] {"var"},
+			new String[] {"http://jabber.org/protocol/commands"})
+	};
+
+	public List<Element> getDiscoFeatures(String node, String jid) {
+		if (node == null) {
+			return Arrays.asList(DISCO_FEATURES);
+		}
+		if (jid.startsWith(getName())) {
+			if (node.equals("http://jabber.org/protocol/commands")) {
+				return Arrays.asList(DISCO_FEATURES_FOR_NODE);
+			}
+			if (node.equals("controll")) {
+				return Arrays.asList(DISCO_FEATURES_FOR_NODE);
+			}
+			if (node.startsWith("controll/")) {
+				String comp_name = node.substring("controll/".length());
+				ITEM_IDENTITY.setAttribute("name", "Component: " + comp_name);
+				return Arrays.asList(CONFIG_LIST_INFO);
+			}
+		}
+		return null;
+	}
+
+	public List<Element> getDiscoItems(String node, String jid) {
+		if (node == null) {
+			for (Element item: TOP_DISCO_ITEMS) {
+				item.setAttribute("jid", getName() + "." + jid);
+			}
+			return Arrays.asList(TOP_DISCO_ITEMS);
+		}
+		if (jid.startsWith(getName())) {
+			if (node.equals("http://jabber.org/protocol/commands")) {
+				for (Element item: DISCO_ITEMS) {
+					//item.setAttribute("jid", getName() + "." + jid);
+					item.setAttribute("jid", jid);
+				}
+				return Arrays.asList(DISCO_ITEMS);
+			}
+			if (node.equals("controll")) {
+				String[] comps = new String[] {"stop"};
+				Element[] items = new Element[comps.length];
+				for (int i = 0; i < comps.length; i++) {
+					items[i] = new Element("item",
+						new String[] {"jid", "node", "name"},
+						new String[] {jid, node + "/" + comps[i], comps[i]});
+				}
+				return Arrays.asList(items);
+			}
+		}
+		return null;
 	}
 
 }

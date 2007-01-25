@@ -69,7 +69,7 @@ public abstract class XMPPProcessor
   public Element[] supStreamFeatures(final XMPPResourceConnection session)
 	{ return null; }
 
-  public String[] supDiscoFeatures(final XMPPResourceConnection session)
+  public Element[] supDiscoFeatures(final XMPPResourceConnection session)
 	{ return null; }
 
   public boolean isSupporting(final String element, final String ns) {
@@ -97,7 +97,7 @@ public abstract class XMPPProcessor
    */
   public final int compareTo(final XMPPProcessor proc) {
     return
-      getClass().getSimpleName().compareTo(proc.getClass().getSimpleName());
+      getClass().getName().compareTo(proc.getClass().getName());
   }
 
 }// XMPPProcessor

@@ -48,11 +48,11 @@ public class SessionManagerConfig {
 	public static final String USER_REPO_URL_PROP_KEY = "user-repo-url";
 	public static final String XML_REPO_URL_PROP_VAL = "user-repository.xml";
 	public static final String MYSQL_REPO_URL_PROP_VAL =
-		"jdbc:mysql://localhost/tigase?user=root&password=admin12";
+		"jdbc:mysql://localhost/tigase?user=root&password=mypass";
 	public static final String PGSQL_REPO_URL_PROP_VAL =
 		"jdbc:postgresql://localhost/tigase?user=tigase";
 	public static final String DRUPAL_REPO_URL_PROP_VAL =
-		"jdbc:mysql://localhost/drupal?user=root&password=admin12";
+		"jdbc:mysql://localhost/drupal?user=root&password=mypass";
 
 	public static final String AUTH_REPO_CLASS_PROP_KEY = "auth-repo-class";
 	public static final String AUTH_REPO_URL_PROP_KEY = "auth-repo-url";
@@ -65,7 +65,7 @@ public class SessionManagerConfig {
 	 "jabber:iq:version", "http://jabber.org/protocol/stats", "starttls", "disco",
 	 "vcard-temp", "http://jabber.org/protocol/bytestreams",
 	 "http://jabber.org/protocol/ibb", "http://jabber.org/protocol/si",
-	 "jabber:iq:oob"};
+	 "jabber:iq:oob", "http://jabber.org/protocol/commands"};
 
 	public static final String HOSTNAMES_PROP_KEY = "hostnames";
 	public static String[] HOSTNAMES_PROP_VAL =	{"localhost", "hostname"};

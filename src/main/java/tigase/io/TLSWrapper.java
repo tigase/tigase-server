@@ -46,14 +46,14 @@ public class TLSWrapper {
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
-	private static Logger log =
-		Logger.getLogger("tigase.io.TLSWrapper");
+	private static Logger log = Logger.getLogger("tigase.io.TLSWrapper");
 
 	private SSLEngine tlsEngine = null;
 	private SSLEngineResult tlsEngineResult = null;
 	private int netBuffSize = 0;
 	private int appBuffSize = 0;
 	private String protocol = null;
+
 	/**
 	 * Creates a new <code>TLSWrapper</code> instance.
 	 *

@@ -102,7 +102,7 @@ public class StartTLS extends XMPPProcessor
 			session.putSessionData(TLS_STARTED_KEY, "true");
 			//results.offer(packet.swapFromTo(proceed));
 			Packet result = Command.STARTTLS.getPacket(packet.getTo(),
-				packet.getFrom(), StanzaType.set, "1");
+				packet.getFrom(), StanzaType.set, "1", "submit");
 			Command.setData(result, new Element("proceed",
 					new String[] {"xmlns"},
 					new String[] {"urn:ietf:params:xml:ns:xmpp-tls"}));

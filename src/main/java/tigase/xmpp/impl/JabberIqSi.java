@@ -24,6 +24,7 @@ package tigase.xmpp.impl;
 
 import java.util.logging.Logger;
 import tigase.xmpp.XMPPResourceConnection;
+import tigase.xml.Element;
 
 /**
  * XEP-0096: File Transfer
@@ -43,9 +44,15 @@ public class JabberIqSi extends SimpleForwarder {
 	protected static final String ID = XMLNS;
   protected static final String[] ELEMENTS = {"si"};
   protected static final String[] XMLNSS = {XMLNS};
-  protected static final String[] DISCO_FEATURES =
-	{"http://jabber.org/protocol/si",
-	 "http://jabber.org/protocol/si/profile/file-transfer"};
+  protected static final Element[] DISCO_FEATURES =
+	{
+		new Element("feature",
+			new String[] {"var"},
+			new String[] {"http://jabber.org/protocol/si"}),
+		new Element("feature",
+			new String[] {"var"},
+			new String[] {"http://jabber.org/protocol/si/profile/file-transfer"})
+	};
 
 	public String id() { return ID; }
 
@@ -53,7 +60,7 @@ public class JabberIqSi extends SimpleForwarder {
 
   public String[] supNamespaces() { return XMLNSS; }
 
-  public String[] supDiscoFeatures(final XMPPResourceConnection session)
+  public Element[] supDiscoFeatures(final XMPPResourceConnection session)
 	{ return DISCO_FEATURES; }
 
 }
