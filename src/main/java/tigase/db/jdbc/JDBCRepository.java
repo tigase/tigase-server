@@ -325,7 +325,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 			rs.next();
 			max_uid = rs.getLong("max_uid");
 			max_nid = rs.getLong("max_nid");
-			cache = new SimpleCache<String, Object>(10000);
+			cache = new SimpleCache<String, Object>(50000);
 		} finally {
 			release(stmt, rs);
 			stmt = null; rs = null;
