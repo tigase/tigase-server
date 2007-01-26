@@ -179,7 +179,7 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 					} // end of if (entry.getKey().startsWith())
 				} // end of for ()
 				port_props.put(PORT_KEY, ports[i]);
-				port_props.put("reconnects", 18000l);
+				port_props.put("reconnects", 1800000l);
 				reconnectService(port_props, connectionDelay);
 			} // end of for (int i = 0; i < ports.length; i++)
 		} // end of if (ports != null)
