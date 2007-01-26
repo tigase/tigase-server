@@ -96,6 +96,7 @@ public class SessionManagerConfig {
 		}
 		if (params.get("--user-db-uri") != null) {
 			user_repo_url = (String)params.get("--user-db-uri");
+			auth_repo_url = user_repo_url;
 		}
 		if (params.get("--auth-db") != null) {
 			if (params.get("--auth-db").equals("mysql")) {
