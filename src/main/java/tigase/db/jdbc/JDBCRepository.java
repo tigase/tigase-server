@@ -325,7 +325,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 			rs.next();
 			max_uid = rs.getLong("max_uid");
 			max_nid = rs.getLong("max_nid");
-			cache = new SimpleCache<String, Object>(50000);
+			cache = new SimpleCache<String, Object>(10000);
 		} finally {
 			release(stmt, rs);
 			stmt = null; rs = null;
@@ -463,10 +463,10 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	 */
 	public String[] getDataList(final String user_id, final String subnode,
 		final String key) throws UserNotFoundException, TigaseDBException {
-// 		String[] cache_res = (String[])cache.get(user_id+"/"+subnode+"/"+key);
-// 		if (cache_res != null) {
-// 			return cache_res;
-// 		} // end of if (result != null)
+		String[] cache_res = (String[])cache.get(user_id+"/"+subnode+"/"+key);
+		if (cache_res != null) {
+			return cache_res;
+		} // end of if (result != null)
 		ResultSet rs = null;
 		try {
 			checkConnection();
@@ -481,7 +481,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 				}
 				String[] result = results.size() == 0 ? null :
 					results.toArray(new String[results.size()]);
-				//				cache.put(user_id+"/"+subnode+"/"+key, result);
+				cache.put(user_id+"/"+subnode+"/"+key, result);
 				return result;
 			} else {
 				return null;
@@ -689,10 +689,10 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	public String getData(final String user_id, final String subnode,
 		final String key, final String def)
 		throws UserNotFoundException, TigaseDBException {
-// 		String[] cache_res = (String[])cache.get(user_id+"/"+subnode+"/"+key);
-// 		if (cache_res != null) {
-// 			return cache_res[0];
-// 		} // end of if (result != null)
+		String[] cache_res = (String[])cache.get(user_id+"/"+subnode+"/"+key);
+		if (cache_res != null) {
+			return cache_res[0];
+		} // end of if (result != null)
 		ResultSet rs = null;
 		try {
 			checkConnection();
@@ -705,7 +705,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 				if (rs.next()) {
 					result = rs.getString(1);
 				}
-				//				cache.put(user_id+"/"+subnode+"/"+key, new String[] {result});
+				cache.put(user_id+"/"+subnode+"/"+key, new String[] {result});
 				return result;
 			} else {
 				return def;
