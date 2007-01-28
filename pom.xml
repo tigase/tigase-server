@@ -52,7 +52,7 @@
           <descriptors>
             <descriptor>src/main/assembly/prodenv.xml</descriptor>
           </descriptors>
-          <finalName>${artifactId}-PROD</finalName>
+          <finalName>${artifactId}-${version}</finalName>
         </configuration>
       </plugin>
     </plugins>
