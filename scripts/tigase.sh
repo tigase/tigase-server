@@ -48,7 +48,14 @@ fi
 if [ -z "${TIGASE_HOME}" ] ; then
     TIGASE_HOME=`dirname ${0}`
     TIGASE_HOME=`dirname ${TIGASE_HOME}`
-    if [ ! -f "${TIGASE_HOME}/jars/tigase-server.jar" ] ; then
+    TIGASE_JAR=""
+    for j in ${TIGASE_HOME}/jars/tigase-server*.jar ; do
+	if [ -f ${j} ] ; then
+	    TIGASE_JAR=${j}
+	    break
+	fi
+    done
+    if [ -z ${TIGASE_JAR} ] ; then
 	echo "TIGASE_HOME is not set."
 	echo "Please set it to correct value before starting the sever."
 	exit 1
@@ -99,7 +106,7 @@ fi
 
 [[ -z "${CLASSPATH}" ]] || CLASSPATH="${CLASSPATH}:"
 
-CLASSPATH="${CLASSPATH}${TIGASE_HOME}/jars/tigase-server.jar"
+CLASSPATH="${CLASSPATH}${TIGASE_JAR}"
 
 for lib in ${TIGASE_HOME}/libs/* ; do
     CLASSPATH="${CLASSPATH}:$lib"

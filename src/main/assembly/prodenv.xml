@@ -3,6 +3,7 @@
    <id>prodenv</id>
    <formats>
        <format>zip</format>
+       <format>tar.gz</format>
    </formats>
    <fileSets>
        <fileSet>
@@ -21,14 +22,29 @@
            <directory>scripts</directory>
            <outputDirectory>bin</outputDirectory>
            <includes>
-               <include>*.sh</include>
+               <include>tigase.sh</include>
+               <include>config.sh</include>
+               <include>repo.sh</include>
+               <include>run-telnet-client.sh</include>
+               <include>run-telnet-server.sh</include>
            </includes>
        </fileSet>
        <fileSet>
            <directory>certs</directory>
            <outputDirectory>certs</outputDirectory>
            <includes>
-               <include>*</include>
+               <include>dummy.cer</include>
+               <include>rsa-keystore</include>
+               <include>truststore</include>
+           </includes>
+       </fileSet>
+       <fileSet>
+           <directory>etc</directory>
+           <outputDirectory>etc</outputDirectory>
+           <includes>
+               <include>tigase-pgsql.conf</include>
+               <include>tigase-mysql.conf</include>
+               <include>tigase.conf</include>
            </includes>
        </fileSet>
    </fileSets>
