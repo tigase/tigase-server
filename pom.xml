@@ -1,92 +1,121 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project>
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>tigase-server</groupId>
-	<artifactId>tigase-server</artifactId>
-	<version>2.4.0-SNAPSHOT</version>
-	<description>Tigase XMPP Server</description>
-	<name>TigaseXMPPServer</name>
-	<url>http://www.tigase.org/</url>
-	<organization>
-	    <name>Tigase</name>
-    	<url>http://www.tigase.org</url>
-	</organization>
-	<scm>
-		<connection>scm:svn:https://svn.tigase.org/reps/tigase-server/trunk</connection>
-		<developerConnection>scm:svn:https://svn.tigase.org/reps/tigase-server/trunk</developerConnection>
-		<url>https://svn.tigase.org/reps/tigase-server</url>
-	</scm>        
-	<developers>
-		<developer>
-			<name>Artur Hefczyc</name>
-			<roles>
-				<role>architect</role>
-				<role>developer</role>
-			</roles>
-		</developer>
-	</developers>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>tigase-server</groupId>
+  <artifactId>tigase-server</artifactId>
+  <name>TigaseXMPPServer</name>
+  <version>2.4.0-SNAPSHOT</version>
+  <description>Tigase XMPP Server</description>
+  <url>http://www.tigase.org/</url>
   <issueManagement>
     <system>Trac</system>
     <url>http://server.tigase.org/</url>
-  </issueManagement>	
-	<licenses>
-		<license>
- 	    	<name>GNU General Public License</name>
-			<url>http://www.gnu.org/licenses/gpl.txt</url>
-		</license>
-	</licenses>
-	<repositories>
-	   <repository>
-	     <id>tigase</id>
-	     <name>Tigase rpos</name>
-	     <layout>default</layout>
-	     <url>http://maven.tigase.org</url>
-	     <snapshots>
-	       <enabled>true</enabled>
-	     </snapshots>
-	   </repository>
-	 </repositories>
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
-					<encoding>UTF-8</encoding>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>	 
-	<distributionManagement>
-		<repository>
-			<id>tigase</id>
-			<name>Tigase Repo</name>
-			<url>scpexe://tigase.org:/home/webapp/root/public_html/htdocs/drupal/files/maven-repository</url>
-		</repository>
-		<snapshotRepository>
-			<id>tigase</id>
-			<name>Tigase Repo</name>
-			<url>scpexe://tigase.org:/home/webapp/root/public_html/htdocs/drupal/files/maven-repository</url>
-		</snapshotRepository>
-	</distributionManagement>
-	<dependencies>
-		<dependency>
-			<groupId>tigase-utils</groupId>
-			<artifactId>tigase-utils</artifactId>
-			<version>2.3.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>tigase-xmltools</groupId>
-			<artifactId>tigase-xmltools</artifactId>
-			<version>2.3.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>3.8.1</version>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
+  </issueManagement>
+  <developers>
+    <developer>
+      <name>Artur Hefczyc</name>
+      <roles>
+        <role>architect</role>
+        <role>developer</role>
+      </roles>
+    </developer>
+  </developers>
+  <licenses>
+    <license>
+      <name>GNU General Public License</name>
+      <url>http://www.gnu.org/licenses/gpl.txt</url>
+    </license>
+  </licenses>
+  <scm>
+    <connection>scm:svn:https://svn.tigase.org/reps/tigase-server/trunk</connection>
+    <developerConnection>scm:svn:https://svn.tigase.org/reps/tigase-server/trunk</developerConnection>
+    <url>https://svn.tigase.org/reps/tigase-server</url>
+  </scm>
+  <organization>
+    <name>Tigase</name>
+    <url>http://www.tigase.org</url>
+  </organization>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+          <encoding>UTF-8</encoding>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.0.1</version>
+        <configuration>
+          <descriptors>
+            <descriptor>src/main/assembly/prodenv.xml</descriptor>
+          </descriptors>
+          <finalName>${artifactId}-PROD</finalName>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  <repositories>
+    <repository>
+      <snapshots />
+      <id>tigase</id>
+      <name>Tigase rpos</name>
+      <url>http://maven.tigase.org</url>
+    </repository>
+    <repository>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>central</id>
+      <name>Maven Repository Switchboard</name>
+      <url>http://repo1.maven.org/maven2</url>
+    </repository>
+  </repositories>
+  <dependencies>
+    <dependency>
+      <groupId>tigase-utils</groupId>
+      <artifactId>tigase-utils</artifactId>
+      <version>2.3.0-SNAPSHOT</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>tigase-xmltools</groupId>
+      <artifactId>tigase-xmltools</artifactId>
+      <version>2.3.0-SNAPSHOT</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>7.4.1-jdbc3</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <version>5.0.2</version>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
+  <distributionManagement>
+    <repository>
+      <id>tigase</id>
+      <name>Tigase Repo</name>
+      <url>scpexe://tigase.org:/home/webapp/root/public_html/htdocs/drupal/files/maven-repository</url>
+    </repository>
+    <snapshotRepository>
+      <id>tigase</id>
+      <name>Tigase Repo</name>
+      <url>scpexe://tigase.org:/home/webapp/root/public_html/htdocs/drupal/files/maven-repository</url>
+    </snapshotRepository>
+  </distributionManagement>
 </project>
+

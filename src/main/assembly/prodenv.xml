@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly>
+   <id>prodenv</id>
+   <formats>
+       <format>zip</format>
+   </formats>
+   <fileSets>
+       <fileSet>
+           <includes>
+               <include>README*</include>
+           </includes>
+       </fileSet>
+       <fileSet>
+           <directory>target</directory>
+           <outputDirectory>jars</outputDirectory>
+           <includes>
+               <include>*.jar</include>
+           </includes>
+       </fileSet>
+       <fileSet>
+           <directory>scripts</directory>
+           <outputDirectory>bin</outputDirectory>
+           <includes>
+               <include>*.sh</include>
+           </includes>
+       </fileSet>
+       <fileSet>
+           <directory>certs</directory>
+           <outputDirectory>certs</outputDirectory>
+           <includes>
+               <include>*</include>
+           </includes>
+       </fileSet>
+   </fileSets>
+   <dependencySets>
+       <dependencySet>
+           <outputDirectory>libs</outputDirectory>
+           <unpack>false</unpack>
+           <scope>runtime</scope>
+           <excludes>
+               <exclude>junit:junit</exclude>
+           </excludes>
+       </dependencySet>
+   </dependencySets>
+</assembly>
