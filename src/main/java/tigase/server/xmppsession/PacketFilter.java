@@ -72,6 +72,11 @@ public class PacketFilter {
 				packet.getElement().setAttribute("from", session.getJID());
 			} // end of if (packet.getFrom().equals(session.getConnectionId()))
 
+			if (packet.getElemTo() == null) {
+				log.warning("No 'to' address, droping packet: " + packet.getStringData());
+				return false;
+			}
+
 			String id = JID.getNodeID(packet.getElemTo());
 
 			if (id.equals(session.getUserId())) {
