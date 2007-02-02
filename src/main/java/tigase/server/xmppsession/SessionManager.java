@@ -364,7 +364,7 @@ public class SessionManager extends AbstractMessageReceiver
 			if (pc.getType() == StanzaType.get) {
 				List<Element> features =
 					getFeatures(connectionsByFrom.get(pc.getFrom()));
-				Packet result = pc.commandResult("result");
+				Packet result = pc.commandResult(null);
 				Command.setData(result, features);
 				addOutPacket(result);
 			} // end of if (pc.getType() == StanzaType.get)

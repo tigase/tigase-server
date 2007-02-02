@@ -106,7 +106,7 @@ public class ClientConnectionManager extends ConnectionManager {
 				List<Element> features = getFeatures(getXMPPSession(packet));
 				Element elem_features = new Element("stream:features");
 				elem_features.addChildren(features);
-				elem_features.addChildren(packet.getElement().getChildren());
+				elem_features.addChildren(Command.getData(packet));
 				Packet result = new Packet(elem_features);
 				result.setTo(packet.getTo());
 				writePacketToSocket(result);
