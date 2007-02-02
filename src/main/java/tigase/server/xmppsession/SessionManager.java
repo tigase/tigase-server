@@ -95,6 +95,7 @@ public class SessionManager extends AbstractMessageReceiver
 	private UserRepository user_repository = null;
 	private UserAuthRepository auth_repository = null;
 	private NonAuthUserRepository naUserRepository = null;
+	private PacketFilter filter = null;
 
 	private Element[] DISCO_FEATURES = {};
 	private String[] admins = {"admin@localhost"};
@@ -171,6 +172,11 @@ public class SessionManager extends AbstractMessageReceiver
 			} // end of for (XMPPPostprocessorIfc postproc: postProcessors)
 		} // end of if (!stop)
 
+		if (!packet.wasProcessed()
+			&& filter.process(packet, conn, naUserRepository, results)) {
+			packet.processedBy("packet-filter");
+		}
+
 		addOutPackets(results);
 
 		if (!packet.wasProcessed()) {
@@ -181,15 +187,15 @@ public class SessionManager extends AbstractMessageReceiver
 			} else {
 				if (packet.getElemFrom() != null || conn != null) {
 					error =	Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
-							"Feature not supported yet.", true);
+						"Feature not supported yet.", true);
 				} else {
 					log.warning("Lost packet: " + packet.getStringData());
 				} // end of else
 			} // end of if (stop) else
-			if (conn != null) {
-				error.setTo(conn.getConnectionId());
-			} // end of if (conn != null)
 			if (error != null) {
+				if (conn != null) {
+					error.setTo(conn.getConnectionId());
+				} // end of if (conn != null)
 				addOutPacket(error);
 			}
 		} // end of if (result) else
@@ -491,6 +497,8 @@ public class SessionManager extends AbstractMessageReceiver
 
 		Security.insertProviderAt(new TigaseSaslProvider(), 6);
 
+		filter = new PacketFilter();
+
 		try {
 			String cls_name = (String)props.get(USER_REPO_CLASS_PROP_KEY);
 			String res_uri = (String)props.get(USER_REPO_URL_PROP_KEY);
@@ -574,18 +582,7 @@ public class SessionManager extends AbstractMessageReceiver
 				connectionsByFrom.size()));
 		stats.add(new StatRecord("Open authorized sessions", "int",
 				sessionsByNodeId.size()));
-// 		if (sessionsByNodeId.size() > 10) {
-// 			System.out.println(sessionsByNodeId.toString());
-// 		} // end of if (sessionsByNodeId.size() > 10)
 		stats.add(new StatRecord("Closed connections", "long", closedConnections));
-// 		stats.add(new StatRecord("UserAuthRepository implementation", "text",
-// 				auth_repository.getClass().getSimpleName()));
-// 		stats.add(new StatRecord("UserAuthRepository connection string", "text",
-// 				auth_repository.getResourceUri()));
-// 		stats.add(new StatRecord("UserRepository implementation", "text",
-// 				user_repository.getClass().getSimpleName()));
-// 		stats.add(new StatRecord("UserRepository connection string", "text",
-// 				user_repository.getResourceUri()));
 		return stats;
 	}
 

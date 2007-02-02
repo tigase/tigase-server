@@ -31,14 +31,21 @@ import tigase.xmpp.XMPPResourceConnection;
 
 /**
  * XEP-0047: In-Band Bytestreams (IBB)
+ * The class is not abstract in fact. Is has been made abstract artificially
+ * to prevent from loading the class.
  *
  *
  * Created: Sat Jan 13 16:37:29 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
+ * @deprecated This class has been deprecated and replaced with
+ * <code>tigase.server.xmppsession.PacketFilter</code> code. The class is left
+ * for educational purpose only and should not be used. It may be removed in
+ * future releases.
  */
-public class IBB extends SimpleForwarder {
+@Deprecated
+public abstract class IBB extends SimpleForwarder {
 
   /**
    * Private logger for class instancess.

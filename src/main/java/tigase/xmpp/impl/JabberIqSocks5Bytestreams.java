@@ -32,14 +32,21 @@ import tigase.xmpp.XMPPResourceConnection;
 
 /**
  * XEP-0065: SOCKS5 Bytestreams
+ * The class is not abstract in fact. Is has been made abstract artificially
+ * to prevent from loading the class.
  *
  *
  * Created: Fri Jan 12 21:37:05 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
+ * @deprecated This class has been deprecated and replaced with
+ * <code>tigase.server.xmppsession.PacketFilter</code> code. The class is left
+ * for educational purpose only and should not be used. It may be removed in
+ * future releases.
  */
-public class JabberIqSocks5Bytestreams extends SimpleForwarder {
+@Deprecated
+public abstract class JabberIqSocks5Bytestreams extends SimpleForwarder {
 
   /**
    * Private logger for class instancess.
