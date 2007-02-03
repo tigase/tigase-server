@@ -76,7 +76,8 @@ public class XMPPServiceCollector extends AbstractComponentRegistrator {
 					if (node == null) {
 						Element identity = new Element("identity",
 							new String[] {"category", "type", "name"},
-							new String[] {"server", "im", "Tigase"});
+							new String[] {"server", "im", XMPPServer.NAME +
+														" ver. " + XMPPServer.getImplementationVersion()});
 						query.addChild(identity);
 					}
 					HashSet<Element> all_features = new HashSet<Element>();

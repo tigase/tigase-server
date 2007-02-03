@@ -36,7 +36,7 @@ import tigase.conf.Configurator;
  */
 public class XMPPServer {
 
-	public static final String NAME = "Tigase 2";
+	public static final String NAME = "Tigase";
 
 	private static String config_file = "tigase-config.xml";
 	private static String server_name = "tigase-xmpp-server";
