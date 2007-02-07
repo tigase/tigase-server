@@ -108,7 +108,7 @@ public abstract class IOService implements Callable<IOService> {
 
 		socketIO = new TLSIO(socketIO,
 			new TLSWrapper(TLSUtil.getSSLContext(sslId, "SSL",
-					(String)sessionData.get(HOSTNAME_KEY)), clientMode));
+					(String)sessionData.get(HOSTNAME_KEY)), null, clientMode));
   }
 
   public synchronized void startTLS(final boolean clientMode)
@@ -116,7 +116,7 @@ public abstract class IOService implements Callable<IOService> {
 
 		socketIO = new TLSIO(socketIO,
 			new TLSWrapper(TLSUtil.getSSLContext(sslId, "TLS",
-					(String)sessionData.get(HOSTNAME_KEY)), clientMode));
+					(String)sessionData.get(HOSTNAME_KEY)), null, clientMode));
   }
 
 	public void setIOServiceListener(IOServiceListener sl) {

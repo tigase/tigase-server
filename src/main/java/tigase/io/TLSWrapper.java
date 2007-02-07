@@ -53,16 +53,19 @@ public class TLSWrapper {
 	private int netBuffSize = 0;
 	private int appBuffSize = 0;
 	private String protocol = null;
+	private TLSEventHandler eventHandler = null;
 
 	/**
 	 * Creates a new <code>TLSWrapper</code> instance.
 	 *
 	 */
-	public TLSWrapper(SSLContext sslc, boolean clientMode) {
+	public TLSWrapper(SSLContext sslc, TLSEventHandler eventHandler,
+		boolean clientMode) {
 		tlsEngine = sslc.createSSLEngine();
 		tlsEngine.setUseClientMode(clientMode);
 		netBuffSize = tlsEngine.getSession().getPacketBufferSize();
 		appBuffSize = tlsEngine.getSession().getApplicationBufferSize();
+		this.eventHandler = eventHandler;
 	}
 
 	public boolean isClientMode() {
@@ -105,6 +108,11 @@ public class TLSWrapper {
 				case NEED_UNWRAP:
 					status = TLSStatus.NEED_READ;
 					break;
+				case FINISHED:
+					if (eventHandler != null) {
+						eventHandler.handshakeCompleted();
+					}
+					break;
 				default:
 					status = TLSStatus.OK;
 					break;
@@ -140,6 +148,10 @@ public class TLSWrapper {
 			doTasks();
 			log.finest("wrap() doTasks(): " + tlsEngine.getHandshakeStatus());
 		}
+	}
+
+	public int bytesConsumed() {
+		return tlsEngineResult.bytesConsumed();
 	}
 
 	/**

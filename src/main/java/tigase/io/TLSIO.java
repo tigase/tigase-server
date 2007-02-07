@@ -140,26 +140,16 @@ public class TLSIO implements IOInterface {
   }
 
   public int write(final ByteBuffer buff) throws IOException {
-    int result = 0;
-    ByteBuffer tlsBuffer = null;
+    int result = buff.remaining();
     log.finer("TLS - Writing data, remaining: " + buff.remaining());
     do {
-      tlsBuffer = ByteBuffer.allocate(Math.min(buff.remaining(),
-          tlsWrapper.getAppBuffSize()));
-      // How to do it more efficiently???
-      // Or how to get from source buffer only specific number of bytes??
-      while (tlsBuffer.hasRemaining() && buff.hasRemaining()) {
-        tlsBuffer.put(buff.get());
-        ++result;
-      } // end of while (tmpBuffer.hasRemaining() && dataBuffer.hasRemaining())
-      tlsBuffer.flip();
-      tlsWrapper.wrap(tlsBuffer, tlsOutput);
+      tlsOutput.clear();
+      tlsWrapper.wrap(buff, tlsOutput);
       if (tlsWrapper.getStatus() == TLSStatus.CLOSED) {
         throw new EOFException("Socket has been closed.");
       } // end of if (tlsWrapper.getStatus() == TLSStatus.CLOSED)
       tlsOutput.flip();
-      io.write(tlsOutput);
-      tlsOutput.clear();
+			io.write(tlsOutput);
     } while (buff.hasRemaining());
     if (tlsWrapper.getStatus() == TLSStatus.NEED_WRITE) {
       write(ByteBuffer.allocate(0));

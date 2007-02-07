@@ -236,6 +236,7 @@ public class XMPPIOService extends IOService {
 							//	assert debug(elem.toString() + "\n");
 							log.finer("Read element: " + elem.getName());
 							log.finest("Read packet: " + elem.toString());
+							//							System.out.print(elem.toString());
 							addReceivedPacket(new Packet(elem));
 						} // end of while ((elem = elems.poll()) != null)
 					}	catch (Exception ex) {

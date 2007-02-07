@@ -99,7 +99,7 @@ public class TelnetServer implements SampleSocketThread.SocketHandler {
 		iosock = new SocketIO(sc);
 		if (ssl) {
 			iosock = new TLSIO(iosock,
-				new TLSWrapper(TLSUtil.getSSLContext(sslId, "SSL", null), false));
+				new TLSWrapper(TLSUtil.getSSLContext(sslId, "SSL", null), null, false));
 		} // end of if (ssl)
 		reader.addIOInterface(iosock);
 		if (file != null) {
