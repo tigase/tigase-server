@@ -57,6 +57,8 @@ import tigase.server.Packet;
 import tigase.server.Command;
 import tigase.server.XMPPService;
 import tigase.server.Permissions;
+import tigase.server.ServiceEntity;
+import tigase.server.ServiceIdentity;
 import tigase.stats.StatRecord;
 import tigase.util.ElementUtils;
 import tigase.util.JID;
@@ -97,7 +99,6 @@ public class SessionManager extends AbstractMessageReceiver
 	private NonAuthUserRepository naUserRepository = null;
 	private PacketFilter filter = null;
 
-	private Element[] DISCO_FEATURES = {};
 	private String[] admins = {"admin@localhost"};
 
 	private Map<String, XMPPSession> sessionsByNodeId =
@@ -114,7 +115,17 @@ public class SessionManager extends AbstractMessageReceiver
 	private Map<String, XMPPStopListenerIfc> stopListeners =
 		new ConcurrentSkipListMap<String, XMPPStopListenerIfc>();
 
+	private ServiceEntity serviceEntity = null;
+
 	private long closedConnections = 0;
+
+	public void setName(String name) {
+		super.setName(name);
+		serviceEntity = new ServiceEntity(name, "server", "Session manager");
+		serviceEntity.addIdentities(new ServiceIdentity[] {
+				new ServiceIdentity("server", "im", tigase.server.XMPPServer.NAME +
+					" ver. " + tigase.server.XMPPServer.getImplementationVersion())});
+	}
 
 	public void processPacket(Packet packet) {
 		log.finest("Processing packet: " + packet.getStringData());
@@ -557,17 +568,17 @@ public class SessionManager extends AbstractMessageReceiver
 		} // end of if (session.getActiveResourcesSize() == 0)
 	}
 
-	public List<Element> getDiscoFeatures(String node, String jid) {
-		if (node == null) {
+	public Element getDiscoInfo(String node, String jid) {
+		if (node == null && jid != null && isInRoutings(jid)) {
+			Element query = serviceEntity.getDiscoInfo(node);
 			List<Element> results = new LinkedList<Element>();
 			for (XMPPProcessorIfc proc: processors.values()) {
 				Element[] discoFeatures = proc.supDiscoFeatures(null);
 				if (discoFeatures != null) {
-					results.addAll(Arrays.asList(discoFeatures));
+					query.addChildren(Arrays.asList(discoFeatures));
 				} // end of if (discoFeatures != null)
 			}
-			results.addAll(Arrays.asList(DISCO_FEATURES));
-			return results;
+			return query;
 		}
 		return null;
 	}

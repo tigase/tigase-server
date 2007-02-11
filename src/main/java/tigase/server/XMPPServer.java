@@ -147,6 +147,7 @@ public class XMPPServer {
 		Configurator.loadLogManagerConfig(initial_config);
 
 		Configurator config = new Configurator(config_file, args);
+		config.setName("basic-conf");
 		MessageRouter router = new MessageRouter();
 		router.setName(server_name);
 		router.setConfig(config);

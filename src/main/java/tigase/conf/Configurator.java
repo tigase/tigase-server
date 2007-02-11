@@ -46,6 +46,8 @@ import tigase.server.ServerComponent;
 import tigase.server.XMPPService;
 import tigase.server.Command;
 import tigase.server.Permissions;
+import tigase.server.ServiceEntity;
+import tigase.server.ServiceIdentity;
 import tigase.xml.Element;
 import tigase.xml.XMLUtils;
 import tigase.xml.db.Types.DataType;
@@ -59,7 +61,7 @@ import tigase.xmpp.Authorization;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class Configurator extends AbstractComponentRegistrator
+public class Configurator extends AbstractComponentRegistrator<Configurable>
 	implements Configurable, XMPPService {
 
 	private static final String LOGGING_KEY = "logging/";
@@ -70,8 +72,34 @@ public class Configurator extends AbstractComponentRegistrator
 	private ConfigRepository repository = null;
 	private Timer delayedTask = new Timer("ConfiguratorTask", true);
 	private Map<String, Object> defConfigParams = new HashMap<String, Object>();
+	private ServiceEntity serviceEntity = null;
+	private ServiceEntity config_list = null;
+	private ServiceEntity config_set = null;
 
-  public void parseArgs(final String[] args) {
+	private String[] DEF_FEATURES =
+	{"http://jabber.org/protocol/commands", "jabber:x:data"};
+
+	public void setName(String name) {
+		super.setName(name);
+		serviceEntity = new ServiceEntity(name, "config", "Server configuration");
+		serviceEntity.addIdentities(new ServiceIdentity[] {
+				new ServiceIdentity("automation", "command-list",
+					"Configuration commands")});
+		//		serviceEntity.addFeatures(DEF_FEATURES);
+		config_list = new ServiceEntity(name, "list", "List");
+		config_list.addIdentities(new ServiceIdentity[] {
+				new ServiceIdentity("automation", "command-list",
+					"Config listings")});
+		//		config_list.addFeatures(DEF_FEATURES);
+		config_set = new ServiceEntity(name, "set", "Set");
+		config_set.addIdentities(new ServiceIdentity[] {
+				new ServiceIdentity("automation", "command-list",
+					"Config settings")});
+		//		config_set.addFeatures(DEF_FEATURES);
+		serviceEntity.addItems(new ServiceEntity[] {config_list, config_set});
+	}
+
+	public void parseArgs(final String[] args) {
 		defConfigParams.put("--test", new Boolean(false));
 		defConfigParams.put("config-type", "--gen-config-default");
     if (args != null && args.length > 0) {
@@ -97,13 +125,28 @@ public class Configurator extends AbstractComponentRegistrator
 		repository = ConfigRepository.getConfigRepository(fileName);
 	}
 
-	public void componentAdded(ServerComponent component) {
-		if (component instanceof Configurable) {
-			setup((Configurable)component);
-		} // end of if (component instanceof Configurable)
+	public boolean isCorrectType(ServerComponent component) {
+		return component instanceof Configurable;
 	}
 
-	public void componentRemoved(ServerComponent component) {}
+	public void componentAdded(Configurable component) {
+		ServiceEntity item = config_list.findNode(component.getName());
+		if (item == null) {
+			item = new ServiceEntity(getName(), component.getName(),
+				"Component: " + component.getName());
+			item.addFeatures(DEF_FEATURES);
+			item.addIdentities(new ServiceIdentity[] {
+					new ServiceIdentity("automation", "command-list",
+						"Component: " + component.getName())});
+			config_list.addItems(new ServiceEntity[] {item});
+		}
+		if (config_set.findNode(component.getName()) == null) {
+			config_set.addItems(new ServiceEntity[] {item});
+		}
+		setup(component);
+	}
+
+	public void componentRemoved(Configurable component) {}
 
 
 	public void setup(Configurable component) {
@@ -129,9 +172,9 @@ public class Configurator extends AbstractComponentRegistrator
 		component.setProperties(prop);
 	}
 
-	public String getName() {
-		return "basic-conf";
-	}
+// 	public String getName() {
+// 		return "basic-conf";
+// 	}
 
 	/**
    * Returns defualt configuration settings in case if there is no
@@ -462,7 +505,7 @@ public class Configurator extends AbstractComponentRegistrator
 
 	public void processCommand(final Packet packet, final Queue<Packet> results) {
 
-		if (!packet.getTo().startsWith(getName())) return;
+		if (!packet.getTo().startsWith(getName()+".")) return;
 
 		if (packet.getPermissions() != Permissions.ADMIN) {
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
@@ -474,10 +517,10 @@ public class Configurator extends AbstractComponentRegistrator
 		switch (packet.getCommand()) {
 		case OTHER:
 			if (packet.getStrCommand() != null) {
-				if (packet.getStrCommand().startsWith("list/")) {
+				if (packet.getStrCommand().startsWith("config/list/")) {
 					String[] spl = packet.getStrCommand().split("/");
 					Packet result = packet.commandResult("result");
-					Map<String, Object> allprop = getAllProperties(spl[1]);
+					Map<String, Object> allprop = getAllProperties(spl[2]);
 					for (Map.Entry<String, Object> entry: allprop.entrySet()) {
 						Command.addFieldValue(result, XMLUtils.escape(entry.getKey()),
 							XMLUtils.escape(objectToString(entry.getValue())));
@@ -491,95 +534,19 @@ public class Configurator extends AbstractComponentRegistrator
 		}
 	}
 
-	private static final Element[] DISCO_FEATURES =
-	{
-		new Element("feature",
-			new String[] {"var"},
-			new String[] {"http://jabber.org/protocol/commands"})
-	};
-	private static final Element[] DISCO_FEATURES_FOR_NODE =
-	{
-		new Element("identity",
-			new String[] {"category", "type"},
-			new String[] {"automation", "command-list"})
-	};
-	private static final Element[] TOP_DISCO_ITEMS =
-	{
-		new Element("item",
-			new String[] {"jid", "node", "name"},
-			new String[] {"config", "http://jabber.org/protocol/commands",
-										"Server configuration"})
-	};
-	private static final Element[] DISCO_ITEMS =
-	{
-// 		new Element("item",
-// 			new String[] {"jid", "node", "name"},
-// 			new String[] {"config", "get", "Get configuration item"}),
-// 		new Element("item",
-// 			new String[] {"jid", "node", "name"},
-// 			new String[] {"config", "set", "Set configuration item"}),
-		new Element("item",
-			new String[] {"jid", "node", "name"},
-			new String[] {"config", "list", "Components"})
-	};
-	private static final Element ITEM_IDENTITY =
-		new Element("identity",
-			new String[] {"name", "category", "type"},
-			new String[] {"Component: ", "automation", "command-node"});
-	private static final Element[] CONFIG_LIST_INFO =
-	{
-		ITEM_IDENTITY,
-		new Element("feature",
-			new String[] {"var"},
-			new String[] {"http://jabber.org/protocol/commands"})
-	};
-
-
-	public List<Element> getDiscoFeatures(String node, String jid) {
-		if (node == null) {
-			return Arrays.asList(DISCO_FEATURES);
-		}
-		if (jid.startsWith(getName())) {
-			if (node.equals("http://jabber.org/protocol/commands")) {
-				return Arrays.asList(DISCO_FEATURES_FOR_NODE);
-			}
-			if (node.equals("list")) {
-				return Arrays.asList(DISCO_FEATURES_FOR_NODE);
-			}
-			if (node.startsWith("list/")) {
-				String comp_name = node.substring("list/".length());
-				ITEM_IDENTITY.setAttribute("name", "Component: " + comp_name);
-				return Arrays.asList(CONFIG_LIST_INFO);
-			}
+	public Element getDiscoInfo(String node, String jid) {
+		if (jid.startsWith(getName()+".")) {
+			return serviceEntity.getDiscoInfo(node);
 		}
 		return null;
 	}
 
 	public List<Element> getDiscoItems(String node, String jid) {
 		if (node == null) {
-			for (Element item: TOP_DISCO_ITEMS) {
-				item.setAttribute("jid", getName() + "." + jid);
-			}
-			return Arrays.asList(TOP_DISCO_ITEMS);
+			return Arrays.asList(serviceEntity.getDiscoItem(null, getName() + "." + jid));
 		}
-		if (jid.startsWith(getName())) {
-			if (node.equals("http://jabber.org/protocol/commands")) {
-				for (Element item: DISCO_ITEMS) {
-					//item.setAttribute("jid", getName() + "." + jid);
-					item.setAttribute("jid", jid);
-				}
-				return Arrays.asList(DISCO_ITEMS);
-			}
-			if (node.equals("list")) {
-				String[] comps = getComponents();
-				Element[] items = new Element[comps.length];
-				for (int i = 0; i < comps.length; i++) {
-					items[i] = new Element("item",
-						new String[] {"jid", "node", "name"},
-						new String[] {jid, node + "/" + comps[i], comps[i]});
-				}
-				return Arrays.asList(items);
-			}
+		if (jid.startsWith(getName()+".")) {
+			return serviceEntity.getDiscoItems(node, jid);
 		}
 		return null;
 	}

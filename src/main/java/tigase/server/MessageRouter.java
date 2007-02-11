@@ -334,95 +334,95 @@ public class MessageRouter extends AbstractMessageReceiver
 		return defHostName;
 	}
 
-	private static final Element[] DISCO_FEATURES =
-	{
-		new Element("feature",
-			new String[] {"var"},
-			new String[] {"http://jabber.org/protocol/commands"})
-	};
-	private static final Element[] DISCO_FEATURES_FOR_NODE =
-	{
-		new Element("identity",
-			new String[] {"category", "type"},
-			new String[] {"automation", "server-controll"})
-	};
-	private static final Element[] TOP_DISCO_ITEMS =
-	{
-		new Element("item",
-			new String[] {"jid", "node", "name"},
-			new String[] {"server", "http://jabber.org/protocol/commands",
-										"Server administration"})
-	};
-	private static final Element[] DISCO_ITEMS =
-	{
+// 	private static final Element[] DISCO_FEATURES =
+// 	{
+// 		new Element("feature",
+// 			new String[] {"var"},
+// 			new String[] {"http://jabber.org/protocol/commands"})
+// 	};
+// 	private static final Element[] DISCO_FEATURES_FOR_NODE =
+// 	{
+// 		new Element("identity",
+// 			new String[] {"category", "type"},
+// 			new String[] {"automation", "server-controll"})
+// 	};
+// 	private static final Element[] TOP_DISCO_ITEMS =
+// 	{
 // 		new Element("item",
 // 			new String[] {"jid", "node", "name"},
-// 			new String[] {"config", "get", "Get configuration item"}),
+// 			new String[] {"server", "http://jabber.org/protocol/commands",
+// 										"Server administration"})
+// 	};
+// 	private static final Element[] DISCO_ITEMS =
+// 	{
+// // 		new Element("item",
+// // 			new String[] {"jid", "node", "name"},
+// // 			new String[] {"config", "get", "Get configuration item"}),
+// // 		new Element("item",
+// // 			new String[] {"jid", "node", "name"},
+// // 			new String[] {"config", "set", "Set configuration item"}),
 // 		new Element("item",
 // 			new String[] {"jid", "node", "name"},
-// 			new String[] {"config", "set", "Set configuration item"}),
-		new Element("item",
-			new String[] {"jid", "node", "name"},
-			new String[] {"server", "controll", "Commands"})
-	};
-	private static final Element ITEM_IDENTITY =
-		new Element("identity",
-			new String[] {"name", "category", "type"},
-			new String[] {"Command: ", "automation", "command-node"});
-	private static final Element[] CONFIG_LIST_INFO =
-	{
-		ITEM_IDENTITY,
-		new Element("feature",
-			new String[] {"var"},
-			new String[] {"http://jabber.org/protocol/commands"})
-	};
+// 			new String[] {"server", "controll", "Commands"})
+// 	};
+// 	private static final Element ITEM_IDENTITY =
+// 		new Element("identity",
+// 			new String[] {"name", "category", "type"},
+// 			new String[] {"Command: ", "automation", "command-node"});
+// 	private static final Element[] CONFIG_LIST_INFO =
+// 	{
+// 		ITEM_IDENTITY,
+// 		new Element("feature",
+// 			new String[] {"var"},
+// 			new String[] {"http://jabber.org/protocol/commands"})
+// 	};
 
-	public List<Element> getDiscoFeatures(String node, String jid) {
-		if (node == null) {
-			return Arrays.asList(DISCO_FEATURES);
-		}
-		if (jid.startsWith(getName())) {
-			if (node.equals("http://jabber.org/protocol/commands")) {
-				return Arrays.asList(DISCO_FEATURES_FOR_NODE);
-			}
-			if (node.equals("controll")) {
-				return Arrays.asList(DISCO_FEATURES_FOR_NODE);
-			}
-			if (node.startsWith("controll/")) {
-				String comp_name = node.substring("controll/".length());
-				ITEM_IDENTITY.setAttribute("name", "Component: " + comp_name);
-				return Arrays.asList(CONFIG_LIST_INFO);
-			}
-		}
+	public Element getDiscoInfo(String node, String jid) {
+// 		if (node == null) {
+// 			return Arrays.asList(DISCO_FEATURES);
+// 		}
+// 		if (jid.startsWith(getName())) {
+// 			if (node.equals("http://jabber.org/protocol/commands")) {
+// 				return Arrays.asList(DISCO_FEATURES_FOR_NODE);
+// 			}
+// 			if (node.equals("controll")) {
+// 				return Arrays.asList(DISCO_FEATURES_FOR_NODE);
+// 			}
+// 			if (node.startsWith("controll/")) {
+// 				String comp_name = node.substring("controll/".length());
+// 				ITEM_IDENTITY.setAttribute("name", "Component: " + comp_name);
+// 				return Arrays.asList(CONFIG_LIST_INFO);
+// 			}
+// 		}
 		return null;
 	}
 
 	public List<Element> getDiscoItems(String node, String jid) {
-		if (node == null) {
-			for (Element item: TOP_DISCO_ITEMS) {
-				item.setAttribute("jid", getName() + "." + jid);
-			}
-			return Arrays.asList(TOP_DISCO_ITEMS);
-		}
-		if (jid.startsWith(getName())) {
-			if (node.equals("http://jabber.org/protocol/commands")) {
-				for (Element item: DISCO_ITEMS) {
-					//item.setAttribute("jid", getName() + "." + jid);
-					item.setAttribute("jid", jid);
-				}
-				return Arrays.asList(DISCO_ITEMS);
-			}
-			if (node.equals("controll")) {
-				String[] comps = new String[] {"stop"};
-				Element[] items = new Element[comps.length];
-				for (int i = 0; i < comps.length; i++) {
-					items[i] = new Element("item",
-						new String[] {"jid", "node", "name"},
-						new String[] {jid, node + "/" + comps[i], comps[i]});
-				}
-				return Arrays.asList(items);
-			}
-		}
+// 		if (node == null) {
+// 			for (Element item: TOP_DISCO_ITEMS) {
+// 				item.setAttribute("jid", getName() + "." + jid);
+// 			}
+// 			return Arrays.asList(TOP_DISCO_ITEMS);
+// 		}
+// 		if (jid.startsWith(getName())) {
+// 			if (node.equals("http://jabber.org/protocol/commands")) {
+// 				for (Element item: DISCO_ITEMS) {
+// 					//item.setAttribute("jid", getName() + "." + jid);
+// 					item.setAttribute("jid", jid);
+// 				}
+// 				return Arrays.asList(DISCO_ITEMS);
+// 			}
+// 			if (node.equals("controll")) {
+// 				String[] comps = new String[] {"stop"};
+// 				Element[] items = new Element[comps.length];
+// 				for (int i = 0; i < comps.length; i++) {
+// 					items[i] = new Element("item",
+// 						new String[] {"jid", "node", "name"},
+// 						new String[] {jid, node + "/" + comps[i], comps[i]});
+// 				}
+// 				return Arrays.asList(items);
+// 			}
+// 		}
 		return null;
 	}
 

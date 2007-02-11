@@ -26,6 +26,7 @@ package tigase.server;
 
 import java.util.List;
 import tigase.xml.Element;
+import tigase.server.ServerComponent;
 
 /**
  * Interface XMPPService
@@ -38,9 +39,9 @@ import tigase.xml.Element;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public interface XMPPService {
+public interface XMPPService extends ServerComponent {
 
-	List<Element> getDiscoFeatures(String node, String jid);
+	Element getDiscoInfo(String node, String jid);
 
 	List<Element> getDiscoItems(String node, String jid);
 

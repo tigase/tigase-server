@@ -41,7 +41,8 @@ import tigase.xml.Element;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class XMPPServiceCollector extends AbstractComponentRegistrator {
+public class XMPPServiceCollector
+	extends AbstractComponentRegistrator<XMPPService> {
 
   /**
    * Variable <code>log</code> is a class logger.
@@ -56,9 +57,13 @@ public class XMPPServiceCollector extends AbstractComponentRegistrator {
 
 	public XMPPServiceCollector() {}
 
-	public void componentAdded(ServerComponent component) {	}
+	public void componentAdded(XMPPService component) {	}
 
-	public void componentRemoved(ServerComponent component) {}
+	public boolean isCorrectType(ServerComponent component) {
+		return component instanceof XMPPService;
+	}
+
+	public void componentRemoved(XMPPService component) {}
 
 	public void processCommand(final Packet packet, final Queue<Packet> results) {
 		switch (packet.getCommand()) {
@@ -73,38 +78,20 @@ public class XMPPServiceCollector extends AbstractComponentRegistrator {
 			}
 			if (xmlns != null) {
 				if (xmlns.equals(INFO_XMLNS)) {
-					if (node == null) {
-						Element identity = new Element("identity",
-							new String[] {"category", "type", "name"},
-							new String[] {"server", "im", XMPPServer.NAME +
-														" ver. " + XMPPServer.getImplementationVersion()});
-						query.addChild(identity);
-					}
-					HashSet<Element> all_features = new HashSet<Element>();
-					for (ServerComponent comp: components) {
-						if (comp instanceof XMPPService) {
-							List<Element> features =
-								((XMPPService)comp).getDiscoFeatures(node, jid);
-							if (features != null && features.size() > 0) {
-								all_features.addAll(features);
-							} // end of if (stats != null && stats.count() > 0)
-						} // end of if (component instanceof Configurable)
+					for (XMPPService comp: components) {
+						Element resp = comp.getDiscoInfo(node, jid);
+						if (resp != null) {
+							query = resp;
+							break;
+						}
 					} // end of for ()
-					for (Element f: all_features) {
-// 						Element feature = new Element("feature",
-// 							new String[] {"var"}, new String[] {f});
-						query.addChild(f);
-					}
 				} else {
 					if (xmlns.equals(ITEMS_XMLNS)) {
-						for (ServerComponent comp: components) {
-							if (comp instanceof XMPPService) {
-								List<Element> items =
-									((XMPPService)comp).getDiscoItems(node, jid);
-								if (items != null && items.size() > 0) {
+						for (XMPPService comp: components) {
+							List<Element> items =	comp.getDiscoItems(node, jid);
+							if (items != null && items.size() > 0) {
 									query.addChildren(items);
-								} // end of if (stats != null && stats.count() > 0)
-							} // end of if (component instanceof Configurable)
+							} // end of if (stats != null && stats.count() > 0)
 						} // end of for ()
 					} else {
 						log.warning("Uknown GETDISCO xmlns: " + xmlns);

@@ -25,6 +25,7 @@
 package tigase.conf;
 
 import java.util.Map;
+import tigase.server.ServerComponent;
 
 /**
  * Interface Configurable
@@ -39,7 +40,7 @@ import java.util.Map;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public interface Configurable {
+public interface Configurable extends ServerComponent {
 
   /**
 	 * Get object name. This name corresponds to section in configuration.

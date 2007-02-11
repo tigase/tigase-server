@@ -1,6 +1,5 @@
-/*
- *  Package Tigase XMPP/Jabber Server
- *  Copyright (C) 2004, 2005, 2006
+/*  Package Jabber Server
+ *  Copyright (C) 2001, 2002, 2003, 2004, 2005
  *  "Artur Hefczyc" <artur.hefczyc@tigase.org>
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -21,26 +20,51 @@
  * Last modified by $Author$
  * $Date$
  */
+package tigase.server;
 
-package tigase.stats;
-
-import java.util.List;
-import tigase.server.ServerComponent;
+import tigase.xml.Element;
 
 /**
- * Interface StatisticsContainer
+ * Describe class ServiceIdentity here.
  *
- * Objects which inherits this type can return runtime statistics. Any object
- * can collect job statistics and implementing this interface guarantees that
- * statistics will be presented in configured way to user who wants to see them.
  *
- * Created: Tue Nov 22 07:07:11 2005
+ * Created: Sat Feb 10 13:34:54 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public interface StatisticsContainer extends ServerComponent {
+public class ServiceIdentity {
 
-  public List<StatRecord> getStatistics();
+	private String category = null;
+	private String type = null;
+	private String name = null;
+
+	/**
+	 * Creates a new <code>ServiceIdentity</code> instance.
+	 *
+	 */
+	public ServiceIdentity(String category, String type, String name) {
+		this.category = category;
+		this.type = type;
+		this.name = name;
+	}
+
+	public String getCategory() {
+		return category;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public Element getElement() {
+		return new Element("identity",
+			new String[] {"category", "type", "name"},
+			new String[] {category, type, name});
+	}
 
 }

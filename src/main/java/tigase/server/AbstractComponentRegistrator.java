@@ -34,11 +34,11 @@ import java.util.ArrayList;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public abstract class AbstractComponentRegistrator
+public abstract class AbstractComponentRegistrator<E extends ServerComponent>
 	implements ComponentRegistrator {
 
 	private String name = null;
-	protected List<ServerComponent> components = new ArrayList<ServerComponent>();
+	protected List<E> components = new ArrayList<E>();
 
 	/**
 	 * Creates a new <code>AbstractComponentRegistrator</code> instance.
@@ -46,24 +46,33 @@ public abstract class AbstractComponentRegistrator
 	 */
 	public AbstractComponentRegistrator() {}
 
+
+	public abstract boolean isCorrectType(ServerComponent component);
+
+	@SuppressWarnings("unchecked")
 	public boolean addComponent(ServerComponent component) {
-		boolean result = components.add(component);
-		if (result) {
-			componentAdded(component);
-		} // end of if (result)
-		return result;
+		if (isCorrectType(component)) {
+			boolean result = components.add((E)component);
+			if (result) {
+				componentAdded((E)component);
+			} // end of if (result)
+			return result;
+		} else {
+			return false;
+		}
 	}
 
-	public abstract void componentAdded(ServerComponent component);
+	public abstract void componentAdded(E component);
 
   /**
    *
    * @return tigase.server.ServerComponent
    */
+  @SuppressWarnings("unchecked")
 	public boolean deleteComponent(ServerComponent component) {
 		boolean result = components.remove(component);
 		if (result) {
-			componentRemoved(component);
+			componentRemoved((E)component);
 		} // end of if (result)
 		return result;
 	}
@@ -78,6 +87,6 @@ public abstract class AbstractComponentRegistrator
 		return name;
 	}
 
-	public abstract void componentRemoved(ServerComponent component);
+	public abstract void componentRemoved(E component);
 
 } // AbstractComponentRegistrator
