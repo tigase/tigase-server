@@ -103,6 +103,11 @@ public class VCardTemp extends XMPPProcessor implements XMPPProcessorIfc {
 			return;
 		} // end of if (session == null)
 
+		if (session == null) {
+			log.info("Session null, dropping packet: " + packet.getStringData());
+			return;
+		} // end of if (session == null)
+
 		try {
 			if (packet.getFrom().equals(session.getConnectionId())) {
 				packet.getElement().setAttribute("from", session.getJID());
