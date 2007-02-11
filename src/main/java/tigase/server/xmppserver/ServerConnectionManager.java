@@ -50,7 +50,7 @@ import tigase.net.SocketType;
 import tigase.server.ConnectionManager;
 import tigase.server.MessageReceiver;
 import tigase.server.Packet;
-import tigase.server.XMPPService;
+import tigase.disco.XMPPService;
 import tigase.util.Algorithms;
 import tigase.util.DNSResolver;
 import tigase.util.JID;

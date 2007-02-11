@@ -31,7 +31,7 @@ import java.util.List;
 import tigase.server.AbstractComponentRegistrator;
 import tigase.server.Packet;
 import tigase.server.ServerComponent;
-import tigase.server.XMPPService;
+import tigase.disco.XMPPService;
 import tigase.server.Command;
 
 /**

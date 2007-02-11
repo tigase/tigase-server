@@ -124,7 +124,7 @@ public class MessageRouterConfig {
 	public static final String SERVICE_1_CLASS_PROP_KEY =
 		REGISTRATOR_PROP_KEY + "service_1.class";
 	public static final String SERVICE_1_CLASS_PROP_VAL =
-		"tigase.server.XMPPServiceCollector";
+		"tigase.disco.XMPPServiceCollector";
 	public static final String SERVICE_1_ACTIVE_PROP_KEY =
 		REGISTRATOR_PROP_KEY + "service_1.active";
 	public static final boolean SERVICE_1_ACTIVE_PROP_VAL = true;
@@ -207,6 +207,13 @@ public class MessageRouterConfig {
 		ClassNotFoundException, InstantiationException, IllegalAccessException {
 
 		String cls_name = (String)props.get(REGISTRATOR_PROP_KEY + name + ".class");
+		// I changed location for the XMPPServiceCollector class
+		// to avoid problems with old configuration files let's detect it here
+		// and silently convert it to new package name:
+		if (cls_name.equals("tigase.server.XMPPServiceCollector")) {
+			log.warning("Old package name for XMPPServiceCollector class, please correct it to new, correct location: tigase.disco.XMPPServiceCollector");
+			cls_name = "tigase.disco.XMPPServiceCollector";
+		}
 		return (ComponentRegistrator)Class.forName(cls_name).newInstance();
 	}
 

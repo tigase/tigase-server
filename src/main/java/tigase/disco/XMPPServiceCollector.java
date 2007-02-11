@@ -22,13 +22,16 @@
  * $Date$
  */
 
-package tigase.server;
+package tigase.disco;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Queue;
 import java.util.logging.Logger;
+import tigase.server.ServerComponent;
 import tigase.server.Command;
+import tigase.server.Packet;
+import tigase.server.AbstractComponentRegistrator;
 import tigase.stats.StatRecord;
 import tigase.stats.StatisticsContainer;
 import tigase.xml.Element;

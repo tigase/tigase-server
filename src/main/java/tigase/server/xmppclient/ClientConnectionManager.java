@@ -42,7 +42,7 @@ import tigase.server.Command;
 import tigase.server.ConnectionManager;
 import tigase.server.MessageReceiver;
 import tigase.server.Packet;
-import tigase.server.XMPPService;
+import tigase.disco.XMPPService;
 import tigase.util.DNSResolver;
 import tigase.util.JID;
 import tigase.util.RoutingsContainer;

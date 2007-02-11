@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import tigase.server.Command;
 import tigase.server.Packet;
-import tigase.server.XMPPServiceCollector;
+import tigase.disco.XMPPServiceCollector;
 import tigase.util.JID;
 import tigase.util.ElementUtils;
 import tigase.xml.Element;

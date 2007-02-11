@@ -20,7 +20,7 @@
  * Last modified by $Author$
  * $Date$
  */
-package tigase.server;
+package tigase.disco;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -43,11 +43,11 @@ import java.util.logging.Logger;
 import tigase.server.AbstractComponentRegistrator;
 import tigase.server.Packet;
 import tigase.server.ServerComponent;
-import tigase.server.XMPPService;
 import tigase.server.Command;
 import tigase.server.Permissions;
-import tigase.server.ServiceEntity;
-import tigase.server.ServiceIdentity;
+import tigase.disco.XMPPService;
+import tigase.disco.ServiceEntity;
+import tigase.disco.ServiceIdentity;
 import tigase.xml.Element;
 import tigase.xml.XMLUtils;
 import tigase.xml.db.Types.DataType;
@@ -77,6 +77,9 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 	private ServiceEntity config_set = null;
 
 	private String[] DEF_FEATURES =
+	{"http://jabber.org/protocol/disco#info",
+	 "http://jabber.org/protocol/disco#items"};
+	private String[] CMD_FEATURES =
 	{"http://jabber.org/protocol/commands", "jabber:x:data"};
 
 	public void setName(String name) {
@@ -85,17 +88,17 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 		serviceEntity.addIdentities(new ServiceIdentity[] {
 				new ServiceIdentity("automation", "command-list",
 					"Configuration commands")});
-		//		serviceEntity.addFeatures(DEF_FEATURES);
+		serviceEntity.addFeatures(DEF_FEATURES);
 		config_list = new ServiceEntity(name, "list", "List");
 		config_list.addIdentities(new ServiceIdentity[] {
 				new ServiceIdentity("automation", "command-list",
 					"Config listings")});
-		//		config_list.addFeatures(DEF_FEATURES);
+		config_list.addFeatures(DEF_FEATURES);
 		config_set = new ServiceEntity(name, "set", "Set");
 		config_set.addIdentities(new ServiceIdentity[] {
 				new ServiceIdentity("automation", "command-list",
 					"Config settings")});
-		//		config_set.addFeatures(DEF_FEATURES);
+		config_set.addFeatures(DEF_FEATURES);
 		serviceEntity.addItems(new ServiceEntity[] {config_list, config_set});
 	}
 
@@ -134,7 +137,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 		if (item == null) {
 			item = new ServiceEntity(getName(), component.getName(),
 				"Component: " + component.getName());
-			item.addFeatures(DEF_FEATURES);
+			item.addFeatures(CMD_FEATURES);
 			item.addIdentities(new ServiceIdentity[] {
 					new ServiceIdentity("automation", "command-list",
 						"Component: " + component.getName())});
@@ -535,7 +538,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 	}
 
 	public Element getDiscoInfo(String node, String jid) {
-		if (jid.startsWith(getName()+".")) {
+		if (jid != null && jid.startsWith(getName()+".")) {
 			return serviceEntity.getDiscoInfo(node);
 		}
 		return null;

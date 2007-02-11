@@ -22,7 +22,7 @@
  * $Date$$
  */
 
-package tigase.server;
+package tigase.disco;
 
 import java.util.List;
 import tigase.xml.Element;

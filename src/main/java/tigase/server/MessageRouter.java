@@ -43,6 +43,7 @@ import java.util.logging.Logger;
 import tigase.xml.Element;
 import tigase.util.JID;
 import tigase.xmpp.Authorization;
+import tigase.disco.XMPPService;
 
 import static tigase.server.MessageRouterConfig.*;
 
