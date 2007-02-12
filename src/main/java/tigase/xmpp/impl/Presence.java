@@ -222,6 +222,20 @@ public class Presence extends XMPPProcessor
 					// To send response to presence probes for example.
 					session.putSessionData(PRESENCE_KEY, packet.getElement());
 
+					// Parse resource priority:
+					String priority = packet.getElemCData("/presence/priority");
+					if (priority != null) {
+						int pr = 1;
+						try {
+							pr = Integer.parseInt(priority);
+						} catch (NumberFormatException e) {
+							log.finer("Incorrect priority value: " + priority
+								+ ", setting 1 as default.");
+							pr = 1;
+						}
+						session.setPriority(pr);
+					}
+
 					// Send presence probes to 'to' or 'both' contacts if this is
 					// availability presence
 					if (first && type == StanzaType.available) {
