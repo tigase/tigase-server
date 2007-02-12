@@ -121,8 +121,8 @@ public class Presence extends XMPPProcessor
 			if (conn != session) {
 				// Send to new resource presence about old resource
 				Element pres_update = (Element)presence.clone();
-				pres_update.setAttribute("to", session.getJID());
-				pres_update.setAttribute("from", conn.getJID());
+				pres_update.setAttribute("to", conn.getJID());
+				pres_update.setAttribute("from", session.getJID());
 				Packet pack_update = new Packet(pres_update);
 				pack_update.setTo(session.getConnectionId());
 				results.offer(pack_update);
