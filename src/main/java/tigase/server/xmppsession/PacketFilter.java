@@ -30,6 +30,7 @@ import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.StanzaType;
 import tigase.util.JID;
 
 /**
@@ -73,7 +74,16 @@ public class PacketFilter {
 				packet.getElement().setAttribute("from", session.getJID());
 			} // end of if (packet.getFrom().equals(session.getConnectionId()))
 
+			// Can not forward packet if there is no destination address
 			if (packet.getElemTo() == null) {
+				// If this is simple <iq type="result"/> then ignore it
+				// and consider it OK
+				if (packet.getElemName().equals("iq")
+					&& packet.getType() != null
+					&& packet.getType() == StanzaType.result) {
+					// Nothing to do....
+					return true;
+				}
 				log.warning("No 'to' address, droping packet: " + packet.getStringData());
 				return false;
 			}
