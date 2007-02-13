@@ -29,6 +29,8 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
+import java.nio.charset.CharsetDecoder;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
@@ -97,7 +99,10 @@ public abstract class IOService implements Callable<IOService> {
    */
   private ByteBuffer socketInput = null;
 
-  private static final Charset coder = Charset.forName("UTF-8");
+  private static final CharsetEncoder encoder =
+		Charset.forName("UTF-8").newEncoder();
+  private static final CharsetDecoder decoder =
+		Charset.forName("UTF-8").newDecoder();
 
   public void setSSLId(final String id) {
     sslId = id;
@@ -245,7 +250,7 @@ public abstract class IOService implements Callable<IOService> {
       ByteBuffer tmpBuffer = socketIO.read(socketInput);
       if (socketIO.bytesRead() > 0) {
         tmpBuffer.flip();
-        cb = coder.decode(tmpBuffer);
+        cb = decoder.decode(tmpBuffer);
         tmpBuffer.clear();
       } // end of if (socketIO.bytesRead() > 0)
     } catch (BufferUnderflowException underfl) {
@@ -269,7 +274,7 @@ public abstract class IOService implements Callable<IOService> {
   protected synchronized void writeData(final String data) throws IOException {
     if (data != null && data.length() > 0) {
 			ByteBuffer dataBuffer = null;
-      dataBuffer = coder.encode(CharBuffer.wrap(data));
+      dataBuffer = encoder.encode(CharBuffer.wrap(data));
       socketIO.write(dataBuffer);
     } // end of if (data == null || data.equals("")) else
   }

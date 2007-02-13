@@ -81,7 +81,7 @@ public class XMPPServiceCollector
 			}
 			if (xmlns != null) {
 				if (xmlns.equals(INFO_XMLNS)) {
-					for (XMPPService comp: components) {
+					for (XMPPService comp: components.values()) {
 						Element resp = comp.getDiscoInfo(node, jid);
 						if (resp != null) {
 							query = resp;
@@ -90,7 +90,7 @@ public class XMPPServiceCollector
 					} // end of for ()
 				} else {
 					if (xmlns.equals(ITEMS_XMLNS)) {
-						for (XMPPService comp: components) {
+						for (XMPPService comp: components.values()) {
 							List<Element> items =	comp.getDiscoItems(node, jid);
 							if (items != null && items.size() > 0) {
 									query.addChildren(items);

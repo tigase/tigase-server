@@ -227,7 +227,7 @@ public class Presence extends XMPPProcessor
 					if (priority != null) {
 						int pr = 1;
 						try {
-							pr = Integer.parseInt(priority);
+							pr = Integer.decode(priority);
 						} catch (NumberFormatException e) {
 							log.finer("Incorrect priority value: " + priority
 								+ ", setting 1 as default.");

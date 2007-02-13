@@ -130,7 +130,7 @@ public class OfflineMessages extends XMPPProcessor
 			int priority = 0;
 			if (priority_str != null) {
 				try {
-					priority = Integer.parseInt(priority_str);
+					priority = Integer.decode(priority_str);
 				} catch (NumberFormatException e) {
 					priority = 0;
 				} // end of try-catch

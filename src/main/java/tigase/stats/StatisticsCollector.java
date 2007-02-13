@@ -63,7 +63,7 @@ public class StatisticsCollector
 		switch (packet.getCommand()) {
 		case GETSTATS:
 			Element statistics = new Element("statistics");
-			for (StatisticsContainer comp: components) {
+			for (StatisticsContainer comp: components.values()) {
 				List<StatRecord> stats = comp.getStatistics();
 				if (stats != null && stats.size() > 0) {
 					// 						Element component = new Element("component");

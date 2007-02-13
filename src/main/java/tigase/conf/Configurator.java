@@ -75,6 +75,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 	private ServiceEntity serviceEntity = null;
 	private ServiceEntity config_list = null;
 	private ServiceEntity config_set = null;
+	private boolean demoMode = false;
 
 	private String[] DEF_FEATURES =
 	{"http://jabber.org/protocol/disco#info",
@@ -151,6 +152,10 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 
 	public void componentRemoved(Configurable component) {}
 
+	public void setup(String name) {
+		Configurable component = getComponent(name);
+		setup(component);
+	}
 
 	public void setup(Configurable component) {
 		String compId = component.getName();
@@ -212,6 +217,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 			defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.level", "ALL");
 			defaults.put(LOGGING_KEY + "java.util.logging.ConsoleHandler.level", "ALL");
 		}
+		defaults.put("demo-mode", demoMode);
 		return defaults;
 	}
 
@@ -220,12 +226,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
    */
 	public void setProperties(final Map<String, Object> properties) {
 		setupLogManager(properties);
-// 		delayedTask.schedule(new TimerTask() {
-// 				public void run() {
-// 					properties.put(LOGGING_KEY + "tigase.server.level", "ALL");
-// 					setupLogManager(properties);
-// 				}
-// 			}, 30000);
+		demoMode = (Boolean)properties.get("demo-mode");
 	}
 
 	private void setupLogManager(Map<String, Object> properties) {
@@ -290,7 +291,8 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 			;
 	}
 
-	public void setValue(String node_key, String value, boolean add) throws Exception {
+	public boolean setValue(String node_key, String value,
+		boolean add, boolean feedback) throws Exception {
 		int root_idx = node_key.indexOf('/');
 		String root = node_key.substring(0, root_idx);
 		int key_idx = node_key.lastIndexOf('/');
@@ -313,7 +315,11 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 					new_val = Arrays.copyOf((int[])old_val, old_len + 1);
 					((int[])new_val)[old_len] = Integer.decode(value);
 				} else {
-					new_val = new int[] {Integer.decode(value)};
+					String[] spl = value.split(",");
+					new_val = new int[spl.length];
+					for (int i = 0; i < spl.length; i++) {
+						((int[])new_val)[i] = Integer.decode(spl[i].trim());
+					}
 				} // end of if (add) else
 				break;
 			case STRING:
@@ -325,7 +331,11 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 					new_val = Arrays.copyOf((String[])old_val, old_len + 1);
 					((String[])new_val)[old_len] = value;
 				} else {
-					new_val = new String[] {value};
+					String[] spl = value.split(",");
+					new_val = new String[spl.length];
+					for (int i = 0; i < spl.length; i++) {
+						((String[])new_val)[i] = spl[i].trim();
+					}
 				} // end of if (add) else
 				break;
 			case DOUBLE:
@@ -337,7 +347,11 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 					new_val = Arrays.copyOf((double[])old_val, old_len + 1);
 					((double[])new_val)[old_len] = Double.parseDouble(value);
 				} else {
-					new_val = new double[] {new Double(Double.parseDouble(value))};
+					String[] spl = value.split(",");
+					new_val = new double[spl.length];
+					for (int i = 0; i < spl.length; i++) {
+						((double[])new_val)[i] = Double.parseDouble(spl[i].trim());
+					}
 				}
 				break;
 			case BOOLEAN:
@@ -349,7 +363,11 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 					new_val = Arrays.copyOf((boolean[])old_val, old_len + 1);
 					((boolean[])new_val)[old_len] = parseBoolean(value);
 				} else {
-					new_val = new boolean[] {new Boolean(parseBoolean(value))};
+					String[] spl = value.split(",");
+					new_val = new boolean[spl.length];
+					for (int i = 0; i < spl.length; i++) {
+						((boolean[])new_val)[i] = parseBoolean(spl[i].trim());
+					}
 				}
 				break;
 			default:
@@ -357,15 +375,22 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 			} // end of switch (type)
 			repository.set(root, subnode, key, new_val);
 			repository.sync();
+			return true;
 		} else {
 			if (force) {
 				repository.set(root, subnode, key, value);
 				repository.sync();
-				System.out.println("Forced to set new key=value: " + key + "=" + value);
+				if (feedback) {
+					System.out.println("Forced to set new key=value: " + key + "=" + value);
+				}
+				return true;
 			} else {
-				System.out.println("Error, given key does not exist in config yet.");
-				System.out.println("You can only modify existing values, you can add new.");
-				System.out.println("Use '-f' switch to force creation of the new property.");
+				if (feedback) {
+					System.out.println("Error, given key does not exist in config yet.");
+					System.out.println("You can only modify existing values, you can add new.");
+					System.out.println("Use '-f' switch to force creation of the new property.");
+				}
+				return false;
 			} // end of if (force) else
 		} // end of else
 	}
@@ -495,7 +520,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 		Configurator conf = new Configurator(config_file, args);
 
 		if (set || add) {
-			conf.setValue(key, value, add);
+			conf.setValue(key, value, add, true);
 		} // end of if (set)
 
 		if (print) {
@@ -510,19 +535,46 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 
 		if (!packet.getTo().startsWith(getName()+".")) return;
 
+		String msg = "Please be careful, you are service admin and all changes you make are instantly applied to live system!";
+		boolean admin = true;
 		if (packet.getPermissions() != Permissions.ADMIN) {
-			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-					"You are not authorized for this action.", true));
-			return;
+			if (demoMode) {
+				admin = false;
+				msg = "You are not admin. You can safely play with the settings as you can not change anything.";
+				if (packet.getStrCommand() != null
+					&& packet.getStrCommand().endsWith("session_1")) {
+					Packet result = packet.commandResult("result");
+					Command.addFieldValue(result, "Note",	msg, "fixed");
+					Command.addFieldValue(result, "Note",
+						"Restricted area, only admin can see these settings.", "fixed");
+					results.offer(result);
+					return;
+				}
+			} else {
+				results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
+						"You are not authorized for this action.", true));
+				return;
+			}
 		}
 
 		log.finest("Command received: " + packet.getStringData());
+
+		String action = Command.getAction(packet);
+		if (action != null && action.equals("cancel")) {
+			Packet result = packet.commandResult("result");
+			Command.addFieldValue(result, "Note",
+				"Last command has been cancelled.", "fixed");
+			results.offer(result);
+			return;
+		}
+
 		switch (packet.getCommand()) {
 		case OTHER:
 			if (packet.getStrCommand() != null) {
 				if (packet.getStrCommand().startsWith("config/list/")) {
 					String[] spl = packet.getStrCommand().split("/");
 					Packet result = packet.commandResult("result");
+					Command.addFieldValue(result, "Note",	msg, "fixed");
 					Map<String, Object> allprop = getAllProperties(spl[2]);
 					for (Map.Entry<String, Object> entry: allprop.entrySet()) {
 						Command.addFieldValue(result, XMLUtils.escape(entry.getKey()),
@@ -530,10 +582,81 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 					} // end of for (Map.Entry entry: prop.entrySet())
 					results.offer(result);
 				}
+				if (packet.getStrCommand().startsWith("config/set/")) {
+					String[] spl = packet.getStrCommand().split("/");
+					Packet result = packet.commandResult("result");
+					Command.addFieldValue(result, "Note",	msg, "fixed");
+					if (Command.getData(packet) == null) {
+						Command.setStatus(result, "executing");
+						Command.addAction(result, "complete");
+						Map<String, Object> allprop = getAllProperties(spl[2]);
+						for (Map.Entry<String, Object> entry: allprop.entrySet()) {
+							Command.addFieldValue(result, XMLUtils.escape(entry.getKey()),
+								XMLUtils.escape(objectToString(entry.getValue())));
+						} // end of for (Map.Entry entry: prop.entrySet())
+						Command.addFieldValue(result, XMLUtils.escape("new-prop-name"),
+							XMLUtils.escape(spl[2] + "/"), "text-single", "New property name");
+						Command.addFieldValue(result, XMLUtils.escape("new-prop-value"),
+							"", "text-single", "New property value");
+						results.offer(result);
+					} else {
+						Command.addNote(result, "You changed following settings:");
+						Command.addFieldValue(result, "Note",
+								"You changed following settings:", "fixed");
+						Map<String, Object> allprop = getAllProperties(spl[2]);
+						boolean changed = false;
+						for (Map.Entry<String, Object> entry: allprop.entrySet()) {
+							String tmp_val = Command.getFieldValue(packet,
+								XMLUtils.escape(entry.getKey()));
+							String old_val = objectToString(entry.getValue());
+							String new_val = old_val;
+							if (tmp_val != null) {
+								new_val = XMLUtils.unescape(tmp_val);
+							}
+							if (new_val != null && old_val != null
+								&& !new_val.equals(old_val)) {
+								setPropertyValue(entry.getKey(), new_val, result, admin);
+								changed = true;
+							}
+						} // end of for (Map.Entry entry: prop.entrySet())
+						String prop_value = Command.getFieldValue(packet, "new-prop-value");
+						if (prop_value != null &&	prop_value.trim().length() > 0) {
+							setPropertyValue(
+								XMLUtils.unescape(Command.getFieldValue(packet, "new-prop-name")),
+								XMLUtils.unescape(prop_value), result, admin);
+							changed = true;
+						}
+						if (changed && admin) {
+							setup(spl[2]);
+						}
+						results.offer(result);
+					}
+				}
 			}
 			break;
 		default:
 			break;
+		}
+	}
+
+	public void setPropertyValue(String key, String val, Packet result,
+		boolean admin) {
+		try {
+			boolean res = true;
+			if (admin) {
+				res = setValue(key, val, false, true);
+			}
+			if (res) {
+				Command.addFieldValue(result, XMLUtils.escape(key),
+					XMLUtils.escape(val));
+			} else {
+				Command.addFieldValue(result, "Note",
+					"You can not set new properties yet, you can just modify existing ones.",
+					"fixed");
+			}
+		} catch (Exception e) {
+			Command.addFieldValue(result, "Note",
+				"Error setting property: " + e, "fixed");
 		}
 	}
 

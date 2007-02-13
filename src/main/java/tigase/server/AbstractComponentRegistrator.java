@@ -22,8 +22,8 @@
  */
 package tigase.server;
 
-import java.util.List;
-import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * Describe class AbstractComponentRegistrator here.
@@ -38,7 +38,7 @@ public abstract class AbstractComponentRegistrator<E extends ServerComponent>
 	implements ComponentRegistrator {
 
 	private String name = null;
-	protected List<E> components = new ArrayList<E>();
+	protected Map<String, E> components = new HashMap<String, E>();
 
 	/**
 	 * Creates a new <code>AbstractComponentRegistrator</code> instance.
@@ -52,14 +52,16 @@ public abstract class AbstractComponentRegistrator<E extends ServerComponent>
 	@SuppressWarnings("unchecked")
 	public boolean addComponent(ServerComponent component) {
 		if (isCorrectType(component)) {
-			boolean result = components.add((E)component);
-			if (result) {
-				componentAdded((E)component);
-			} // end of if (result)
-			return result;
+			components.put(component.getName(), (E)component);
+			componentAdded((E)component);
+			return true;
 		} else {
 			return false;
 		}
+	}
+
+	public E getComponent(String name) {
+		return components.get(name);
 	}
 
 	public abstract void componentAdded(E component);
@@ -70,11 +72,9 @@ public abstract class AbstractComponentRegistrator<E extends ServerComponent>
    */
   @SuppressWarnings("unchecked")
 	public boolean deleteComponent(ServerComponent component) {
-		boolean result = components.remove(component);
-		if (result) {
-			componentRemoved((E)component);
-		} // end of if (result)
-		return result;
+		components.remove(component.getName());
+		componentRemoved((E)component);
+		return true;
 	}
 
 	public void release() {}

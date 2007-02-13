@@ -99,6 +99,42 @@ public enum Command {
 		return iq;
 	}
 
+	public static void setStatus(final Packet packet, final String status) {
+		Element iq = packet.getElement();
+		Element command = iq.getChild("command");
+		command.setAttribute("status", status);
+	}
+
+	public static void addAction(final Packet packet, final String action) {
+		Element iq = packet.getElement();
+		Element command = iq.getChild("command");
+		Element actions = command.getChild("actions");
+		if (actions == null) {
+			actions = new Element("actions",
+				new String[] {"execute"},
+				new String[] {action});
+			command.addChild(actions);
+		}
+		actions.addChild(new Element(action));
+	}
+
+	public static String getAction(final Packet packet) {
+		return packet.getElement().getAttribute("/iq/command", "action");
+	}
+
+	public static void addNote(final Packet packet, final String note) {
+		Element iq = packet.getElement();
+		Element command = iq.getChild("command");
+		Element notes = command.getChild("note");
+		if (notes == null) {
+			notes = new Element("note",
+				new String[] {"type"},
+				new String[] {"info"});
+			command.addChild(notes);
+		}
+		notes.setCData(note);
+	}
+
 	public static void addFieldValue(final Packet packet,
 		final String f_name, final String f_value) {
 		Element iq = packet.getElement();
@@ -114,6 +150,43 @@ public enum Command {
 			new Element[] {new Element("value", f_value)},
 			new String[] {"var"},
 			new String[] {f_name});
+		x.addChild(field);
+	}
+
+	public static void addFieldValue(final Packet packet,
+		final String f_name, final String f_value, final String type) {
+		Element iq = packet.getElement();
+		Element command = iq.getChild("command");
+		Element x = command.getChild("x", "jabber:x:data");
+		if (x == null) {
+			x = new Element("x",
+				new String[] {"xmlns", "type"},
+				new String[] {"jabber:x:data", "submit"});
+			command.addChild(x);
+		}
+		Element field = new Element("field",
+			new Element[] {new Element("value", f_value)},
+			new String[] {"var", "type"},
+			new String[] {f_name, type});
+		x.addChild(field);
+	}
+
+	public static void addFieldValue(final Packet packet,
+		final String f_name, final String f_value,
+		final String type, final String label) {
+		Element iq = packet.getElement();
+		Element command = iq.getChild("command");
+		Element x = command.getChild("x", "jabber:x:data");
+		if (x == null) {
+			x = new Element("x",
+				new String[] {"xmlns", "type"},
+				new String[] {"jabber:x:data", "submit"});
+			command.addChild(x);
+		}
+		Element field = new Element("field",
+			new Element[] {new Element("value", f_value)},
+			new String[] {"var", "type", "label"},
+			new String[] {f_name, type, label});
 		x.addChild(field);
 	}
 
