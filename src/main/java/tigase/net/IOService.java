@@ -99,10 +99,8 @@ public abstract class IOService implements Callable<IOService> {
    */
   private ByteBuffer socketInput = null;
 
-  private static final CharsetEncoder encoder =
-		Charset.forName("UTF-8").newEncoder();
-  private static final CharsetDecoder decoder =
-		Charset.forName("UTF-8").newDecoder();
+  private CharsetEncoder encoder = Charset.forName("UTF-8").newEncoder();
+  private CharsetDecoder decoder = Charset.forName("UTF-8").newDecoder();
 
   public void setSSLId(final String id) {
     sslId = id;
@@ -237,6 +235,10 @@ public abstract class IOService implements Callable<IOService> {
 		}
 	}
 
+	protected void readCompleted() {
+		decoder.reset();
+	}
+
 	/**
    * Describe <code>readData</code> method here.
    *
@@ -274,7 +276,9 @@ public abstract class IOService implements Callable<IOService> {
   protected synchronized void writeData(final String data) throws IOException {
     if (data != null && data.length() > 0) {
 			ByteBuffer dataBuffer = null;
+			encoder.reset();
       dataBuffer = encoder.encode(CharBuffer.wrap(data));
+			encoder.flush(dataBuffer);
       socketIO.write(dataBuffer);
     } // end of if (data == null || data.equals("")) else
   }

@@ -231,6 +231,9 @@ public class XMPPIOService extends IOService {
 					try {
 						parser.parse(domHandler, data, 0, data.length);
 						Queue<Element> elems = domHandler.getParsedElements();
+						if (elems.size() > 0) {
+							readCompleted();
+						}
 						Element elem = null;
 						while ((elem = elems.poll()) != null) {
 							//	assert debug(elem.toString() + "\n");
