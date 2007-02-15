@@ -166,12 +166,12 @@ public abstract class AbstractMessageReceiver
 
   public List<StatRecord> getStatistics() {
     List<StatRecord> stats = new ArrayList<StatRecord>();
-    stats.add(new StatRecord(StatisticType.QUEUE_SIZE,
-				(in_queue.size() + out_queue.size())));
-    stats.add(new StatRecord(StatisticType.MSG_RECEIVED_OK,
-				statAddedMessagesOk));
-    stats.add(new StatRecord(StatisticType.QUEUE_OVERFLOW,
-				statAddedMessagesEr));
+    stats.add(new StatRecord(getName(), StatisticType.QUEUE_SIZE,
+				(in_queue.size() + out_queue.size()), Level.FINEST));
+    stats.add(new StatRecord(getName(), StatisticType.MSG_RECEIVED_OK,
+				statAddedMessagesOk, Level.FINE));
+    stats.add(new StatRecord(getName(), StatisticType.QUEUE_OVERFLOW,
+				statAddedMessagesEr, Level.FINEST));
     return stats;
   }
 

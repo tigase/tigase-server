@@ -31,6 +31,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
@@ -57,6 +58,7 @@ import tigase.util.JID;
 import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPIOService;
+import tigase.stats.StatRecord;
 
 /**
  * Class ServerConnectionManager
@@ -381,6 +383,17 @@ public class ServerConnectionManager extends ConnectionManager {
 			// Do nothing, more data should come soon...
 			break;
 		} // end of switch (service.connectionType())
+	}
+
+	public List<StatRecord> getStatistics() {
+		List<StatRecord> stats = super.getStatistics();
+		stats.add(new StatRecord(getName(), "Open s2s connections", "int",
+				servicesByHost_Type.size(), Level.INFO));
+		for (String key: servicesByHost_Type.keySet()) {
+			stats.add(new StatRecord(getName(), "s2s connection", "int",
+					key, Level.FINEST));
+		}
+		return stats;
 	}
 
 	public void serviceStopped(final IOService service) {

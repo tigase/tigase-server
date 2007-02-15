@@ -25,13 +25,20 @@
 package tigase.stats;
 
 import tigase.xml.Element;
+import tigase.xml.XMLUtils;
 import java.util.Map;
 import java.util.Queue;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 import tigase.server.AbstractComponentRegistrator;
 import tigase.server.Packet;
 import tigase.server.ServerComponent;
 import tigase.disco.XMPPService;
+import tigase.disco.ServiceEntity;
+import tigase.disco.ServiceIdentity;
 import tigase.server.Command;
 
 /**
@@ -44,14 +51,38 @@ import tigase.server.Command;
  * @version $Rev$
  */
 public class StatisticsCollector
-	extends AbstractComponentRegistrator<StatisticsContainer> {
-	//	implements XMPPService {
+	extends AbstractComponentRegistrator<StatisticsContainer>
+	implements XMPPService {
 
-  public StatisticsCollector() {}
+  private static final Logger log =
+		Logger.getLogger("tigase.stats.StatisticsCollector");
 
-	public Map<String, String> getStatistics() { return null; }
+	private ServiceEntity serviceEntity = null;
+	private ServiceEntity stats_modules = null;
+	private Level statsLevel = Level.INFO;
 
-	public void componentAdded(StatisticsContainer component) {	}
+	public void setName(String name) {
+		super.setName(name);
+		serviceEntity = new ServiceEntity(name, "stats", "Server statistics");
+		serviceEntity.addIdentities(new ServiceIdentity[] {
+				new ServiceIdentity("automation", "command-list",
+					"Statistics retrieving commands")});
+		serviceEntity.addFeatures(DEF_FEATURES);
+		serviceEntity.addFeatures(CMD_FEATURES);
+	}
+
+	public void componentAdded(StatisticsContainer component) {
+		ServiceEntity item = serviceEntity.findNode(component.getName());
+		if (item == null) {
+			item = new ServiceEntity(getName(), component.getName(),
+				"Component: " + component.getName());
+			item.addFeatures(CMD_FEATURES);
+			item.addIdentities(new ServiceIdentity[] {
+					new ServiceIdentity("automation", "command-list",
+						"Component: " + component.getName())});
+			serviceEntity.addItems(new ServiceEntity[] {item});
+		}
+	}
 
 	public boolean isCorrectType(ServerComponent component) {
 		return component instanceof StatisticsContainer;
@@ -59,33 +90,96 @@ public class StatisticsCollector
 
 	public void componentRemoved(StatisticsContainer component) {}
 
+	private List<StatRecord> getAllStats() {
+		List<StatRecord> result = new ArrayList<StatRecord>();
+		for (StatisticsContainer comp: components.values()) {
+			result.addAll(comp.getStatistics());
+		}
+		return result;
+	}
+
 	public void processCommand(final Packet packet, final Queue<Packet> results) {
 		switch (packet.getCommand()) {
-		case GETSTATS:
+		case GETSTATS: {
+			log.finest("Command received: " + packet.getStringData());
 			Element statistics = new Element("statistics");
-			for (StatisticsContainer comp: components.values()) {
-				List<StatRecord> stats = comp.getStatistics();
-				if (stats != null && stats.size() > 0) {
-					// 						Element component = new Element("component");
-					// 						component.setAttribute("name", comp.getName());
-					for (StatRecord record: stats) {
-						Element item = new Element("stat");
-						item.addAttribute("name", comp.getName() + "/"
-							+ record.getDescription());
-						item.addAttribute("units", record.getUnit());
-						item.addAttribute("value", record.getValue());
-						statistics.addChild(item);
-					} // end of for ()
-					// 						statistics.addChild(component);
-				} // end of if (stats != null && stats.count() > 0)
-			} // end of for ()
+			List<StatRecord> stats = getAllStats();
+			if (stats != null && stats.size() > 0) {
+				for (StatRecord record: stats) {
+					Element item = new Element("stat");
+					item.addAttribute("name", record.getComponent() + "/"
+						+ record.getDescription());
+					item.addAttribute("units", record.getUnit());
+					item.addAttribute("value", record.getValue());
+					statistics.addChild(item);
+				} // end of for ()
+			} // end of if (stats != null && stats.count() > 0)
 			Packet result = packet.commandResult("result");
 			Command.setData(result, statistics);
 			results.offer(result);
 			break;
+		}
+		case OTHER: {
+			if (packet.getStrCommand() == null) return;
+			if (!packet.getTo().startsWith(getName()+".")) return;
+			String action = Command.getAction(packet);
+			if (action != null && action.equals("cancel")) {
+				Packet result = packet.commandResult(null);
+				results.offer(result);
+				return;
+			}
+			log.finest("Command received: " + packet.getStringData());
+			List<StatRecord> stats = null;
+			if (packet.getStrCommand().equals("stats")) {
+				stats = getAllStats();
+			} else {
+				String[] spl = packet.getStrCommand().split("/");
+				stats = getComponent(spl[1]).getStatistics();
+			}
+			String tmp_val = Command.getFieldValue(packet, "Stats level");
+			if (tmp_val != null) {
+				statsLevel = Level.parse(tmp_val);
+			}
+			if (stats != null && stats.size() > 0) {
+				Packet result = packet.commandResult("result");
+				Command.setStatus(result, "executing");
+				Command.addAction(result, "next");
+				for (StatRecord rec: stats) {
+					if (rec.getLevel().intValue() >= statsLevel.intValue()) {
+						Command.addFieldValue(result,
+							XMLUtils.escape(rec.getComponent() + "/" + rec.getDescription()),
+							XMLUtils.escape(rec.getValue()));
+					}
+				}
+				Command.addFieldValue(result, "Stats level", statsLevel.getName(),
+					new String[] {Level.INFO.getName(), Level.FINE.getName(),
+												Level.FINER.getName(), Level.FINEST.getName()},
+					new String[] {Level.INFO.getName(), Level.FINE.getName(),
+												Level.FINER.getName(), Level.FINEST.getName()});
+				results.offer(result);
+			}
+			break;
+		}
 		default:
 			break;
 		} // end of switch (packet.getCommand())
+	}
+
+	public Element getDiscoInfo(String node, String jid) {
+		if (jid != null && jid.startsWith(getName()+".")) {
+			return serviceEntity.getDiscoInfo(node);
+		}
+		return null;
+	}
+
+	public List<Element> getDiscoItems(String node, String jid) {
+		if (node == null) {
+			return Arrays.asList(serviceEntity.getDiscoItem(null, getName() + "." + jid));
+		}
+		if (jid.startsWith(getName()+".")) {
+			return serviceEntity.getDiscoItems(node, jid);
+		}
+		return null;
 	}
 
 }

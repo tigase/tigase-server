@@ -589,11 +589,12 @@ public class SessionManager extends AbstractMessageReceiver
 
 	public List<StatRecord> getStatistics() {
 		List<StatRecord> stats = super.getStatistics();
-		stats.add(new StatRecord("Open connections", "int",
-				connectionsByFrom.size()));
-		stats.add(new StatRecord("Open authorized sessions", "int",
-				sessionsByNodeId.size()));
-		stats.add(new StatRecord("Closed connections", "long", closedConnections));
+		stats.add(new StatRecord(getName(), "Open connections", "int",
+				connectionsByFrom.size(), Level.FINE));
+		stats.add(new StatRecord(getName(), "Open authorized sessions", "int",
+				sessionsByNodeId.size(), Level.INFO));
+		stats.add(new StatRecord(getName(), "Closed connections", "long",
+				closedConnections, Level.FINER));
 		return stats;
 	}
 

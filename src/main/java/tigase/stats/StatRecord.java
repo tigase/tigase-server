@@ -22,6 +22,8 @@
  */
 package tigase.stats;
 
+import java.util.logging.Level;
+
 /**
  * Describe class StatRecord here.
  *
@@ -34,12 +36,14 @@ package tigase.stats;
 public class StatRecord {
 
 	private StatisticType type = StatisticType.OTHER;
+	private Level level = Level.INFO;
 	private long longValue = -1;
 	private int intValue = -1;
 
 	private String description = null;
 	private String unit = null;
 	private String value = null;
+	private String component = null;
 
 	/**
 	 * Creates a new <code>StatRecord</code> instance.
@@ -47,40 +51,53 @@ public class StatRecord {
 	 * @param type a <code>StatisticType</code> value
 	 * @param value a <code>long</code> value
 	 */
-	public StatRecord(StatisticType type, long value) {
+	public StatRecord(String comp, StatisticType type, long value, Level level) {
 		this.type = type;
 		longValue = value;
 		this.description = type.getDescription();
 		this.unit = type.getUnit();
 		this.value = "" + value;
+		this.level = level;
+		this.component = comp;
 	}
 
-	public StatRecord(StatisticType type, int value) {
+	public StatRecord(String comp, StatisticType type, int value, Level level) {
 		this.type = type;
 		intValue = value;
 		this.description = type.getDescription();
 		this.unit = type.getUnit();
 		this.value = "" + value;
+		this.level = level;
+		this.component = comp;
 	}
 
-	public StatRecord(String description, String unit, int value) {
+	public StatRecord(String comp, String description, String unit, int value,
+		Level level) {
 		this.description = description;
 		this.unit = unit;
 		intValue = value;
 		this.value = "" + value;
+		this.level = level;
+		this.component = comp;
 	}
 
-	public StatRecord(String description, String unit, long value) {
+	public StatRecord(String comp, String description, String unit, long value,
+		Level level) {
 		this.description = description;
 		this.unit = unit;
 		longValue = value;
 		this.value = "" + value;
+		this.level = level;
+		this.component = comp;
 	}
 
-	public StatRecord(String description, String unit, String value) {
+	public StatRecord(String comp, String description, String unit,	String value,
+		Level level) {
 		this.description = description;
 		this.unit = unit;
 		this.value = value;
+		this.level = level;
+		this.component = comp;
 	}
 
 	public String getDescription() {
@@ -93,6 +110,14 @@ public class StatRecord {
 
 	public String getValue() {
 		return value;
+	}
+
+	public Level getLevel() {
+		return level;
+	}
+
+	public String getComponent() {
+		return component;
 	}
 
 } // StatRecord

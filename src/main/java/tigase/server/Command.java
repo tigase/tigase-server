@@ -154,6 +154,31 @@ public enum Command {
 	}
 
 	public static void addFieldValue(final Packet packet,
+		final String f_name, final String f_value,
+		final String[] labels, final String[] options) {
+		Element iq = packet.getElement();
+		Element command = iq.getChild("command");
+		Element x = command.getChild("x", "jabber:x:data");
+		if (x == null) {
+			x = new Element("x",
+				new String[] {"xmlns", "type"},
+				new String[] {"jabber:x:data", "submit"});
+			command.addChild(x);
+		}
+		Element field = new Element("field",
+			new Element[] {new Element("value", f_value)},
+			new String[] {"var", "type"},
+			new String[] {f_name, "list-single"});
+		for (int i = 0; i < labels.length; i++) {
+			field.addChild(new Element("option",
+					new Element[] {new Element("value", options[i])},
+					new String[] {"label"},
+					new String[] {labels[i]}));
+		}
+		x.addChild(field);
+	}
+
+	public static void addFieldValue(final Packet packet,
 		final String f_name, final String f_value, final String type) {
 		Element iq = packet.getElement();
 		Element command = iq.getChild("command");

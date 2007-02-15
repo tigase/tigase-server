@@ -77,12 +77,6 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 	private ServiceEntity config_set = null;
 	private boolean demoMode = false;
 
-	private String[] DEF_FEATURES =
-	{"http://jabber.org/protocol/disco#info",
-	 "http://jabber.org/protocol/disco#items"};
-	private String[] CMD_FEATURES =
-	{"http://jabber.org/protocol/commands", "jabber:x:data"};
-
 	public void setName(String name) {
 		super.setName(name);
 		serviceEntity = new ServiceEntity(name, "config", "Server configuration");
@@ -535,12 +529,14 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 
 		if (!packet.getTo().startsWith(getName()+".")) return;
 
-		String msg = "Please be careful, you are service admin and all changes you make are instantly applied to live system!";
+		String msg = "Please be careful, you are service admin and all changes"
+			+ " you make are instantly applied to live system!";
 		boolean admin = true;
 		if (packet.getPermissions() != Permissions.ADMIN) {
 			if (demoMode) {
 				admin = false;
-				msg = "You are not admin. You can safely play with the settings as you can not change anything.";
+				msg = "You are not admin. You can safely play with the settings as"
+					+ " you can not change anything.";
 				if (packet.getStrCommand() != null
 					&& packet.getStrCommand().endsWith("session_1")) {
 					Packet result = packet.commandResult("result");
@@ -561,9 +557,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 
 		String action = Command.getAction(packet);
 		if (action != null && action.equals("cancel")) {
-			Packet result = packet.commandResult("result");
-			Command.addFieldValue(result, "Note",
-				"Last command has been cancelled.", "fixed");
+			Packet result = packet.commandResult(null);
 			results.offer(result);
 			return;
 		}
