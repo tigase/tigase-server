@@ -311,6 +311,52 @@ public class SessionManager extends AbstractMessageReceiver
 		} // end of if (children != null)
 	}
 
+	public void processCommand(final Packet pc,	final Queue<Packet> results) {
+		log.finest("Command received: " + pc.getStringData());
+		XMPPResourceConnection connection = null;
+		switch (pc.getCommand()) {
+		case USER_STATUS:
+			String user_jid = Command.getFieldValue(pc, "jid");
+			String hostname = JID.getNodeHost(user_jid);
+			String av = Command.getFieldValue(pc, "available");
+			boolean available = !(av != null && av.equalsIgnoreCase("false"));
+			if (available) {
+				connection = connectionsByFrom.get(pc.getElemFrom());
+				if (connection == null) {
+					connection = new XMPPResourceConnection(pc.getElemFrom(),
+						user_repository, auth_repository, this);
+					connection.setDomain(hostname);
+					// Dummy session ID, we might decide later to set real thing here
+					connection.setSessionId("session-id");
+					connectionsByFrom.put(pc.getElemFrom(), connection);
+					handleLogin(JID.getNodeNick(user_jid), connection);
+					connection.setResource(JID.getNodeResource(user_jid));
+					Packet presence =
+						new Packet(new Element("presence",
+								new Element[] {new Element("priority", "-1")}, null, null));
+					presence.setFrom(pc.getElemFrom());
+					presence.setTo(pc.getTo());
+					results.offer(presence);
+				} else {
+					log.finest("USER_STATUS set to true for user who is already available: "
+						+ pc.toString());
+				}
+			} else {
+				connection = connectionsByFrom.remove(pc.getElemFrom());
+				if (connection != null) {
+					closeSession(connection);
+				} else {
+					log.info("Can not find resource connection for packet: " +
+						pc.toString());
+				}
+			}
+			break;
+		default:
+			break;
+		} // end of switch (pc.getCommand())
+	}
+
+
 	private void processCommand(Packet pc) {
 		log.finer(pc.getCommand().toString() + " command from: " + pc.getFrom());
 		Element command = pc.getElement();
@@ -340,42 +386,6 @@ public class SessionManager extends AbstractMessageReceiver
 			connection.setSessionId(Command.getFieldValue(pc, "session-id"));
 			log.finest("Setting session-id " + connection.getSessionId()
 				+ " for connection: " + connection.getConnectionId());
-			break;
-		case USER_STATUS:
-			String user_jid = Command.getFieldValue(pc, "jid");
-			String hostname = JID.getNodeHost(user_jid);
-			String av = Command.getFieldValue(pc, "available");
-			boolean available = !(av != null && av.equalsIgnoreCase("false"));
-			if (available) {
-				connection = connectionsByFrom.get(pc.getElemFrom());
-				if (connection == null) {
-					connection = new XMPPResourceConnection(pc.getElemFrom(),
-						user_repository, auth_repository, this);
-					connection.setDomain(hostname);
-					// Dummy session ID, we might decide later to set real thing here
-					connection.setSessionId("session-id");
-					connectionsByFrom.put(pc.getElemFrom(), connection);
-					handleLogin(JID.getNodeNick(user_jid), connection);
-					connection.setResource(JID.getNodeResource(user_jid));
-					Packet presence =
-						new Packet(new Element("presence",
-								new Element[] {new Element("priority", "-1")}, null, null));
-					presence.setFrom(pc.getElemFrom());
-					presence.setTo(pc.getTo());
-					addOutPacket(presence);
-				} else {
-					log.finest("USER_STATUS set to true for user who is already available: "
-						+ pc.toString());
-				}
-			} else {
-				connection = connectionsByFrom.remove(pc.getElemFrom());
-				if (connection != null) {
-					closeSession(connection);
-				} else {
-					log.info("Can not find resource connection for packet: " +
-						pc.toString());
-				}
-			}
 			break;
 		case GETFEATURES:
 			if (pc.getType() == StanzaType.get) {

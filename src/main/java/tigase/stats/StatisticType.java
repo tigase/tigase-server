@@ -34,7 +34,7 @@ package tigase.stats;
 public enum StatisticType {
 
 	QUEUE_SIZE("Queue size", "int"),
-	MSG_RECEIVED_OK("Messages received", "long"),
+	MSG_RECEIVED_OK("Packets received", "long"),
 	QUEUE_OVERFLOW("Queue overflow", "long"),
 	OTHER(null, null);
 
