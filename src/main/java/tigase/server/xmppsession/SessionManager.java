@@ -328,6 +328,7 @@ public class SessionManager extends AbstractMessageReceiver
 					connection.setDomain(hostname);
 					// Dummy session ID, we might decide later to set real thing here
 					connection.setSessionId("session-id");
+					connection.putSessionData("jingle", "active");
 					connectionsByFrom.put(pc.getElemFrom(), connection);
 					handleLogin(JID.getNodeNick(user_jid), connection);
 					connection.setResource(JID.getNodeResource(user_jid));
