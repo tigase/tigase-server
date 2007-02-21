@@ -336,7 +336,7 @@ public class SessionManager extends AbstractMessageReceiver
 								new Element[] {new Element("priority", "-1")}, null, null));
 					presence.setFrom(pc.getElemFrom());
 					presence.setTo(pc.getTo());
-					results.offer(presence);
+					addOutPacket(presence);
 				} else {
 					log.finest("USER_STATUS set to true for user who is already available: "
 						+ pc.toString());
