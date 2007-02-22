@@ -71,6 +71,11 @@ public class Presence extends XMPPProcessor
 
   public String[] supNamespaces() { return XMLNSS; }
 
+	/**
+	 * Describe <code>stopped</code> method here.
+	 *
+	 * @param session a <code>XMPPResourceConnection</code> value
+	 */
 	public void stopped(final XMPPResourceConnection session,
 		final Queue<Packet> results) {
     try {
@@ -80,7 +85,15 @@ public class Presence extends XMPPProcessor
     } catch (NotAuthorizedException e) { } // end of try-catch
 	}
 
-  protected void sendPresenceBroadcast(final StanzaType t,
+  /**
+	 * Describe <code>sendPresenceBroadcast</code> method here.
+	 *
+	 * @param t a <code>StanzaType</code> value
+	 * @param session a <code>XMPPResourceConnection</code> value
+	 * @param pres an <code>Element</code> value
+	 * @exception NotAuthorizedException if an error occurs
+	 */
+	protected void sendPresenceBroadcast(final StanzaType t,
     final XMPPResourceConnection session,
 		final EnumSet<SubscriptionType> subscrs,
 		final Queue<Packet> results, final Element pres)
@@ -93,6 +106,12 @@ public class Presence extends XMPPProcessor
     } // end of if (buddies == null)
   }
 
+	/**
+	 * Describe <code>updateOfflineChange</code> method here.
+	 *
+	 * @param session a <code>XMPPResourceConnection</code> value
+	 * @exception NotAuthorizedException if an error occurs
+	 */
 	protected void updateOfflineChange(final XMPPResourceConnection session,
 		final Queue<Packet> results)
 		throws NotAuthorizedException {
@@ -113,6 +132,18 @@ public class Presence extends XMPPProcessor
 		} // end of for (XMPPResourceConnection conn: sessions)
 	}
 
+	/**
+	 * <code>updateUserResources</code> method is used to broadcast to all
+	 * <strong>other</strong> resources presence stanza from one user resource.
+	 * So if new resource connects this method updates presence information about
+	 * new resource to old resources and about old resources to new resource.
+	 *
+	 * @param presence an <code>Element</code> presence received from other users,
+	 * we have to change 'to' attribute to full resource JID.
+	 * @param session a <code>XMPPResourceConnection</code> value keeping
+	 * connection session object.
+	 * @exception NotAuthorizedException if an error occurs
+	 */
 	protected void updateUserResources(final Element presence,
     final XMPPResourceConnection session, final Queue<Packet> results)
 		throws NotAuthorizedException {
@@ -124,6 +155,13 @@ public class Presence extends XMPPProcessor
 				pres_update.setAttribute("to", conn.getJID());
 				pres_update.setAttribute("from", session.getJID());
 				Packet pack_update = new Packet(pres_update);
+				pack_update.setTo(conn.getConnectionId());
+				results.offer(pack_update);
+				pres_update =
+					(Element)((Element)conn.getSessionData(PRESENCE_KEY)).clone();
+				pres_update.setAttribute("to", session.getJID());
+				pres_update.setAttribute("from", conn.getJID());
+				pack_update = new Packet(pres_update);
 				pack_update.setTo(session.getConnectionId());
 				results.offer(pack_update);
 			} else {
@@ -132,6 +170,17 @@ public class Presence extends XMPPProcessor
 		} // end of for (XMPPResourceConnection conn: sessions)
 	}
 
+	/**
+	 * <code>updatePresenceChange</code> method is used to broadcast
+	 * to all active resources presence stanza received from other users, like
+	 * incoming avaiability presence, subscription presence and so on...
+	 *
+	 * @param presence an <code>Element</code> presence received from other users,
+	 * we have to change 'to' attribute to full resource JID.
+	 * @param session a <code>XMPPResourceConnection</code> value keeping
+	 * connection session object.
+	 * @exception NotAuthorizedException if an error occurs
+	 */
 	protected void updatePresenceChange(final Element presence,
     final XMPPResourceConnection session, final Queue<Packet> results)
 		throws NotAuthorizedException {
@@ -251,7 +300,6 @@ public class Presence extends XMPPProcessor
 					//				Element presence = (Element)packet.getElement().clone();
 					// Already done above, don't need to set it again here
 					// presence.setAttribute("from", session.getJID());
-					updatePresenceChange(packet.getElement(), session, results);
 					updateUserResources(packet.getElement(), session, results);
 				}
 				break;
