@@ -146,9 +146,15 @@ public class StatisticsCollector
 				Command.addAction(result, "next");
 				for (StatRecord rec: stats) {
 					if (rec.getLevel().intValue() >= statsLevel.intValue()) {
-						Command.addFieldValue(result,
-							XMLUtils.escape(rec.getComponent() + "/" + rec.getDescription()),
-							XMLUtils.escape(rec.getValue()));
+						if (rec.getType() == StatisticType.LIST) {
+							Command.addFieldMultiValue(result,
+								XMLUtils.escape(rec.getComponent() + "/" + rec.getDescription()),
+								rec.getListValue());
+						} else {
+							Command.addFieldValue(result,
+								XMLUtils.escape(rec.getComponent() + "/" + rec.getDescription()),
+								XMLUtils.escape(rec.getValue()));
+						}
 					}
 				}
 				Command.addFieldValue(result, "Stats level", statsLevel.getName(),

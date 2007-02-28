@@ -153,6 +153,29 @@ public enum Command {
 		x.addChild(field);
 	}
 
+	public static void addFieldMultiValue(final Packet packet,
+		final String f_name, final List<String> f_value) {
+		Element iq = packet.getElement();
+		Element command = iq.getChild("command");
+		Element x = command.getChild("x", "jabber:x:data");
+		if (x == null) {
+			x = new Element("x",
+				new String[] {"xmlns", "type"},
+				new String[] {"jabber:x:data", "submit"});
+			command.addChild(x);
+		}
+		if (f_value != null && f_value.size() > 0) {
+			Element field = new Element("field",
+				new String[] {"var", "type"},
+				new String[] {f_name, "text-multi"});
+			for (String val: f_value) {
+				Element value = new Element("value", val);
+				field.addChild(value);
+			}
+			x.addChild(field);
+		}
+	}
+
 	public static void addFieldValue(final Packet packet,
 		final String f_name, final String f_value,
 		final String[] labels, final String[] options) {

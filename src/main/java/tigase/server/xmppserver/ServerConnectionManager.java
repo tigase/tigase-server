@@ -89,13 +89,13 @@ public class ServerConnectionManager extends ConnectionManager {
 		new HashMap<String, XMPPIOService>();
 
 	/**
-	 * Services connected and autorized/autenticated
+	 * Services which are in process of establishing s2s connection
 	 */
 	private Map<String, XMPPIOService> handshakingByHost_Type =
 		new HashMap<String, XMPPIOService>();
 
 	/**
-	 * Services which are in process of connecting
+	 * Connections IDs (cids) of services which are in process of connecting
 	 */
 	private Set<String> connectingByHost_Type = new HashSet<String>();
 
@@ -389,10 +389,27 @@ public class ServerConnectionManager extends ConnectionManager {
 		List<StatRecord> stats = super.getStatistics();
 		stats.add(new StatRecord(getName(), "Open s2s connections", "int",
 				servicesByHost_Type.size(), Level.INFO));
-		for (String key: servicesByHost_Type.keySet()) {
-			stats.add(new StatRecord(getName(), "s2s connection", "int",
-					key, Level.FINEST));
+		int waiting = 0;
+		for (Queue<Packet> q: waitingPackets.values()) {
+			waiting += q.size();
 		}
+		stats.add(new StatRecord(getName(), "Packets queued", "int",
+				waiting, Level.INFO));
+		stats.add(new StatRecord(getName(), "Handshaking s2s connections", "int",
+				handshakingByHost_Type.size(), Level.FINE));
+		LinkedList<String> waiting_qs = new LinkedList<String>();
+		for (Map.Entry<String, Queue<Packet>> entry: waitingPackets.entrySet()) {
+			if (entry.getValue().size() > 0) {
+				waiting_qs.add(entry.getKey() + ":  " + entry.getValue().size());
+			}
+		}
+		if (waiting_qs.size() > 0) {
+			stats.add(new StatRecord(getName(), "Packets queued for each connection",
+					waiting_qs,	Level.FINER));
+		}
+		stats.add(new StatRecord(getName(), "s2s connections",
+				new LinkedList<String>(servicesByHost_Type.keySet()),
+				Level.FINEST));
 		return stats;
 	}
 
@@ -402,6 +419,17 @@ public class ServerConnectionManager extends ConnectionManager {
 			(String)service.getSessionData().get("local-hostname");
 		String remote_hostname =
 			(String)service.getSessionData().get("remote-hostname");
+		if (remote_hostname == null) {
+			// There is something wrong...
+			// It may happen only when remote host connecting to Tigase
+			// closed connection before it send any db:... packet
+			// so remote domain is not known.
+			// Let's do nothing for now.
+			log.info("remote-hostname is NULL, local-hostname: " + local_hostname
+				+ ", local address: " + service.getLocalAddress()
+				+ ", remote address: " + service.getRemoteAddress());
+			return;
+		}
 		String cid = getConnectionId(local_hostname, remote_hostname,
 			service.connectionType());
 		servicesByHost_Type.remove(cid);

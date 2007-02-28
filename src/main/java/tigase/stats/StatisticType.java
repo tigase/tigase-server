@@ -36,6 +36,7 @@ public enum StatisticType {
 	QUEUE_SIZE("Queue size", "int"),
 	MSG_RECEIVED_OK("Packets received", "long"),
 	QUEUE_OVERFLOW("Queue overflow", "long"),
+	LIST(null, "list"),
 	OTHER(null, null);
 
 

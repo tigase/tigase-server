@@ -23,6 +23,7 @@
 package tigase.stats;
 
 import java.util.logging.Level;
+import java.util.List;
 
 /**
  * Describe class StatRecord here.
@@ -43,6 +44,7 @@ public class StatRecord {
 	private String description = null;
 	private String unit = null;
 	private String value = null;
+	private List<String> listValue = null;
 	private String component = null;
 
 	/**
@@ -81,6 +83,16 @@ public class StatRecord {
 		this.component = comp;
 	}
 
+	public StatRecord(String comp, String description, List<String> value,
+		Level level) {
+		this.type = StatisticType.LIST;
+		this.unit = type.getUnit();
+		this.component = comp;
+		this.description = description;
+		this.listValue = value;
+		this.level = level;
+	}
+
 	public StatRecord(String comp, String description, String unit, long value,
 		Level level) {
 		this.description = description;
@@ -110,6 +122,14 @@ public class StatRecord {
 
 	public String getValue() {
 		return value;
+	}
+
+	public StatisticType getType() {
+		return type;
+	}
+
+	public List<String> getListValue() {
+		return listValue;
 	}
 
 	public Level getLevel() {
