@@ -33,6 +33,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
@@ -407,9 +409,9 @@ public class ServerConnectionManager extends ConnectionManager {
 			stats.add(new StatRecord(getName(), "Packets queued for each connection",
 					waiting_qs,	Level.FINER));
 		}
-		stats.add(new StatRecord(getName(), "s2s connections",
-				new LinkedList<String>(servicesByHost_Type.keySet()),
-				Level.FINEST));
+		ArrayList<String> all_s2s = new ArrayList<String>(servicesByHost_Type.keySet());
+		Collections.sort(all_s2s);
+		stats.add(new StatRecord(getName(), "s2s connections", all_s2s,	Level.FINEST));
 		return stats;
 	}
 
