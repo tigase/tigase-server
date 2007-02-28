@@ -149,8 +149,8 @@ public class ServerConnectionManager extends ConnectionManager {
 		synchronized (connectingByHost_Type) {
 			boolean connecting = connectingByHost_Type.contains(cid);
 			if (!connecting) {
-				String localhost = JID.getNodeHost(packet.getFrom());
-				String remotehost = JID.getNodeHost(packet.getTo());
+				String localhost = JID.getNodeNick(cid);
+				String remotehost = JID.getNodeHost(cid);
 				boolean reconnect = (packet == null);
 				if (connecting =
 					openNewServerConnection(localhost, remotehost, reconnect)) {
