@@ -249,7 +249,11 @@ public class ServerConnectionManager extends ConnectionManager {
 					} // end of else
 				} // end of for (Packet p: results)
 			} else {
-				addOutPacket(p);
+				if (p.getElemName().equals("stream:error")) {
+					try {	serv.stop(); } catch (Exception e) {	}
+				} else {
+					addOutPacket(p);
+				}
 			} // end of else
 		} // end of while ()
  		return null;
