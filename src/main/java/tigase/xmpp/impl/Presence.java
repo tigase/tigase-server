@@ -157,13 +157,15 @@ public class Presence extends XMPPProcessor
 				Packet pack_update = new Packet(pres_update);
 				pack_update.setTo(conn.getConnectionId());
 				results.offer(pack_update);
-				pres_update =
-					(Element)((Element)conn.getSessionData(PRESENCE_KEY)).clone();
-				pres_update.setAttribute("to", session.getJID());
-				pres_update.setAttribute("from", conn.getJID());
-				pack_update = new Packet(pres_update);
-				pack_update.setTo(session.getConnectionId());
-				results.offer(pack_update);
+				Element presence_el = (Element)conn.getSessionData(PRESENCE_KEY);
+				if (presence_el != null) {
+					pres_update = (Element)(presence_el).clone();
+					pres_update.setAttribute("to", session.getJID());
+					pres_update.setAttribute("from", conn.getJID());
+					pack_update = new Packet(pres_update);
+					pack_update.setTo(session.getConnectionId());
+					results.offer(pack_update);
+				}
 			} else {
 				log.finer("Skipping presence update to: " + conn.getJID());
 			} // end of else
