@@ -195,8 +195,11 @@ public abstract class IOService implements Callable<IOService> {
    * @exception IOException if an error occurs
    */
   public void stop() throws IOException {
-    socketIO.stop();
-		serviceListener.serviceStopped(this);
+		try {
+			socketIO.stop();
+		} finally {
+			serviceListener.serviceStopped(this);
+		}
   }
 
   /**

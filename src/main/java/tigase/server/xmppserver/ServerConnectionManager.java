@@ -151,26 +151,31 @@ public class ServerConnectionManager extends ConnectionManager {
 			if (!connecting) {
 				String localhost = JID.getNodeHost(packet.getFrom());
 				String remotehost = JID.getNodeHost(packet.getTo());
-				if (connecting = openNewServerConnection(localhost, remotehost)) {
+				boolean reconnect = (packet == null);
+				if (connecting =
+					openNewServerConnection(localhost, remotehost, reconnect)) {
 					connectingByHost_Type.add(cid);
 				}
 			} // end of if (serv == null)
 			if (connecting) {
-				Queue<Packet> queue = waitingPacketsMap.get(cid);
-				if (queue == null) {
-					queue = new ConcurrentLinkedQueue<Packet>();
-					waitingPacketsMap.put(cid, queue);
-				} // end of if (queue == null)
-				queue.offer(packet);
-			} // end of if (connecting)
-			else {
+				// The packet may be null if first try to connect to remote
+				// server failed and now Tigase is retrying to connect
+				if (packet != null) {
+					Queue<Packet> queue = waitingPacketsMap.get(cid);
+					if (queue == null) {
+						queue = new ConcurrentLinkedQueue<Packet>();
+						waitingPacketsMap.put(cid, queue);
+					} // end of if (queue == null)
+					queue.offer(packet);
+				}
+			} else {
 				log.warning("Discarding packet: " + packet.getStringData());
 			} // end of if (connecting) else
 		}
 	}
 
 	private boolean openNewServerConnection(String localhost,
-		String remotehost) {
+		String remotehost, boolean reconnect) {
 
 		try {
 			String ipAddress = DNSResolver.getHostSRV_IP(remotehost);
@@ -186,7 +191,11 @@ public class ServerConnectionManager extends ConnectionManager {
 				getConnectionId(localhost, remotehost, ConnectionType.connect);
 			port_props.put("cid", cid);
 			log.finest("STARTING new connection: " + cid);
-			startService(port_props);
+			if (reconnect) {
+				reconnectService(port_props, 15000);
+			} else {
+				startService(port_props);
+			}
 			return true;
 		} catch (UnknownHostException e) {
 			log.warning("UnknownHostException for host: " + remotehost);
@@ -437,6 +446,7 @@ public class ServerConnectionManager extends ConnectionManager {
 		servicesByHost_Type.remove(cid);
 		handshakingByHost_Type.remove(cid);
 		connectingByHost_Type.remove(cid);
+		waitingControlPackets.remove(cid);
 		log.fine("s2s stopped: " + cid);
 		// Some servers close just 1 of dialback connections and even though
 		// other connection is still open they don't accept any data on that
@@ -468,6 +478,10 @@ public class ServerConnectionManager extends ConnectionManager {
 				other_service.stop();
 			} catch (IOException e) {	} // end of try-catch
 		} // end of if (other_service != null)
+		Queue<Packet> waiting =	waitingPackets.get(cid);
+		if (waiting != null && waiting.size() > 0) {
+			addWaitingPacket(cid, null, waitingPackets);
+		}
 	}
 
 	public void handleDialbackSuccess(final String connect_jid) {

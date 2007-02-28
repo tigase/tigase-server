@@ -127,8 +127,7 @@ public class XMPPIOService extends IOService {
 			log.warning("Error sending stream open data: " + e);
 			try {
 				stop();
-			} // end of try
-			catch (IOException ex) {
+			} catch (IOException ex) {
 				log.warning("Error stopping service: " + e);
 			} // end of try-catch
     } finally {
