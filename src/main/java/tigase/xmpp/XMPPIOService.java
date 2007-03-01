@@ -215,7 +215,7 @@ public class XMPPIOService extends IOService {
     // We change state of this object in this method
     // It can be called by many threads simultanously
     // so we need to make it thread-safe
-		log.finer("About to read socket data.");
+		//log.finer("About to read socket data.");
 // 		readLock.lock();
     try {
 			if (isConnected()) {
@@ -224,6 +224,7 @@ public class XMPPIOService extends IOService {
 				// Yes check again if we are still connected as
 				// servce might be disconnected during data read
 				if (isConnected() && data != null) {
+					log.finest("READ:\n" + new String(data));
 					// This is log for debuging only,
 					// in normal mode don't even call below code
 					assert debug(new String(data), "--RECEIVED:");

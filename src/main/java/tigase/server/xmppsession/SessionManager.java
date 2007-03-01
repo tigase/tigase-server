@@ -127,6 +127,12 @@ public class SessionManager extends AbstractMessageReceiver
 					" ver. " + tigase.server.XMPPServer.getImplementationVersion())});
 	}
 
+	private void debug_packet(String msg, Packet packet, String to) {
+		if (packet.getElemTo().equals(to)) {
+			log.finest(msg + ", packet: " + packet.getStringData());
+		}
+	}
+
 	public void processPacket(Packet packet) {
 		log.finest("Processing packet: " + packet.getStringData());
 		if (packet.isCommand()) {
@@ -214,8 +220,7 @@ public class SessionManager extends AbstractMessageReceiver
 				} // end of if (conn != null)
 				addOutPacket(error);
 			}
-		} // end of if (result) else
-		else {
+		} else {
 			log.info("Packet processed by: " + packet.getProcessorsIds().toString());
 		} // end of else
 	}

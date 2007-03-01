@@ -76,13 +76,13 @@ public class SocketIO implements IOInterface {
       } // end of if (res == -1)
       result += res;
     } // end of while (out.hasRemaining())
-    log.fine("Wrote to channel " + result + " bytes.");
+    log.finer("Wrote to channel " + result + " bytes.");
     return result;
   }
 
   public ByteBuffer read(final ByteBuffer buff) throws IOException {
     bytesRead = channel.read(buff);
-    log.finest("Read from channel " + bytesRead + " bytes.");
+    log.finer("Read from channel " + bytesRead + " bytes.");
     if (bytesRead == -1) {
       throw new EOFException("Channel has been closed.");
     } // end of if (result == -1)

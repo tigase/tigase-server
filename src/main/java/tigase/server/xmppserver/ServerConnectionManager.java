@@ -251,6 +251,7 @@ public class ServerConnectionManager extends ConnectionManager {
 			} else {
 				if (p.getElemName().equals("stream:error")) {
 					try {	serv.stop(); } catch (Exception e) {	}
+					break;
 				} else {
 					addOutPacket(p);
 				}
