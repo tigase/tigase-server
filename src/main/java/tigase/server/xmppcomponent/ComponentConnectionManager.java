@@ -213,6 +213,7 @@ public class ComponentConnectionManager extends ConnectionManager {
 		defs.put(PORT_SOCKET_PROP_KEY, PORT_SOCKET_PROP_VAL);
 		defs.put(PORT_REMOTE_HOST_PROP_KEY, PORT_REMOTE_HOST_PROP_VAL);
 		defs.put(PORT_IFC_PROP_KEY, PORT_IFC_PROP_VAL);
+		defs.put(MAX_RECONNECTS_PROP_KEY, 1800000l);
 		return defs;
 	}
 

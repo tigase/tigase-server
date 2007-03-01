@@ -95,6 +95,7 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 	public static final String TLS_TRUSTS_STORE_PROP_KEY =
 		TLS_PROP_KEY + "trusts-store";
 	public static final String TLS_TRUSTS_STORE_PROP_VAL = "certs/truststore";
+	public static final String MAX_RECONNECTS_PROP_KEY = "max-reconnects";
 
 	private static ConnectionOpenThread connectThread =
 		ConnectionOpenThread.getInstance();
@@ -111,8 +112,7 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 		props.put(TLS_KEYS_STORE_PROP_KEY, TLS_KEYS_STORE_PROP_VAL);
 		props.put(TLS_KEYS_STORE_PASSWD_PROP_KEY, TLS_KEYS_STORE_PASSWD_PROP_VAL);
 		props.put(TLS_TRUSTS_STORE_PROP_KEY, TLS_TRUSTS_STORE_PROP_VAL);
-		props.put(TLS_TRUSTS_STORE_PASSWD_PROP_KEY,
-			TLS_TRUSTS_STORE_PASSWD_PROP_VAL);
+		props.put(TLS_TRUSTS_STORE_PASSWD_PROP_KEY, TLS_TRUSTS_STORE_PASSWD_PROP_VAL);
 
 		int ports_size = 0;
 		int[] ports = null;
@@ -181,7 +181,6 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 					} // end of if (entry.getKey().startsWith())
 				} // end of for ()
 				port_props.put(PORT_KEY, ports[i]);
-				port_props.put("reconnects", 1800000l);
 				reconnectService(port_props, connectionDelay);
 			} // end of for (int i = 0; i < ports.length; i++)
 		} // end of if (ports != null)
@@ -379,11 +378,11 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 			} catch (ConnectException e) {
 				// Accept side for component service is not ready yet?
 				// Let's wait for a few secs and try again.
-				Long reconnects = (Long)port_props.get("reconnects");
+				Long reconnects = (Long)port_props.get(MAX_RECONNECTS_PROP_KEY);
 				if (reconnects != null) {
 					long recon = reconnects.longValue();
 					if (recon != 0) {
-						port_props.put("reconnects", (--recon));
+						port_props.put(MAX_RECONNECTS_PROP_KEY, (--recon));
 						reconnectService(port_props, connectionDelay);
 					} // end of if (recon != 0)
 				} // end of if (reconnects != null)

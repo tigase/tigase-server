@@ -155,6 +155,9 @@ public class ServerConnectionManager extends ConnectionManager {
 				if (connecting =
 					openNewServerConnection(localhost, remotehost, reconnect)) {
 					connectingByHost_Type.add(cid);
+				} else {
+					// Can't establish connection...., unknown host??
+					waitingPacketsMap.remove(cid);
 				}
 			} // end of if (serv == null)
 			if (connecting) {
