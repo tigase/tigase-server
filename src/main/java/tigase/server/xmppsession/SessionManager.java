@@ -191,11 +191,12 @@ public class SessionManager extends AbstractMessageReceiver
 		addOutPackets(results);
 
 		if (!packet.wasProcessed()) {
+			log.finest("Packet not processed: " + packet.getStringData());
 			Packet error = null;
 			if (stop
-				|| (packet.getElemFrom() != null && packet.getElemTo() != null
-					&&
-					(packet.getElemName().equals("iq")
+				|| (conn == null
+					&& packet.getElemFrom() != null && packet.getElemTo() != null
+					&& (packet.getElemName().equals("iq")
 						|| packet.getElemName().equals("message")))) {
 				error =	Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet,
 					"Service not available.", true);
