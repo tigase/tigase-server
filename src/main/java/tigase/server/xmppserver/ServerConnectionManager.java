@@ -416,6 +416,15 @@ public class ServerConnectionManager extends ConnectionManager {
 				waiting, Level.INFO));
 		stats.add(new StatRecord(getName(), "Handshaking s2s connections", "int",
 				handshakingByHost_Type.size(), Level.FINE));
+		StringBuilder sb = new StringBuilder("Handshaking: ");
+		for (IOService serv: handshakingByHost_Type.values()) {
+			sb.append("\nService ID: " + getUniqueId(serv)
+				+ ", local-hostname: " + serv.getSessionData().get("local-hostname")
+				+ ", remote-hostname: " + serv.getSessionData().get("remote-hostname")
+				+ ", is-connected: " + serv.isConnected()
+				+ ", connection-type: " + serv.connectionType());
+		}
+		log.finest(sb.toString());
 		LinkedList<String> waiting_qs = new LinkedList<String>();
 		for (Map.Entry<String, Queue<Packet>> entry: waitingPackets.entrySet()) {
 			if (entry.getValue().size() > 0) {
