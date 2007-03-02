@@ -330,6 +330,15 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 		List<StatRecord> stats = super.getStatistics();
 		stats.add(new StatRecord(getName(), "Open connections", "int",
 				services.size(), Level.FINE));
+		StringBuilder sb = new StringBuilder();
+		for (IOService serv: services.values()) {
+			sb.append("\nService ID: " + getUniqueId(serv)
+				+ ", local-hostname: " + serv.getSessionData().get("local-hostname")
+				+ ", remote-hostname: " + serv.getSessionData().get("remote-hostname")
+				+ ", is-connected: " + serv.isConnected()
+				+ ", connection-type: " + serv.connectionType());
+		}
+		log.finest(sb.toString());
 		return stats;
 	}
 

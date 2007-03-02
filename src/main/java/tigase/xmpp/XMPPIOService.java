@@ -141,10 +141,10 @@ public class XMPPIOService extends IOService {
    * @exception IOException if an error occurs
    */
   public void stop() throws IOException {
-		if (!streamClosed) {
-			streamClosed = true;
-			serviceListener.xmppStreamClosed(this);
-		} // end of if (!streamClosed)
+// 		if (!streamClosed) {
+// 			streamClosed = true;
+// 			serviceListener.xmppStreamClosed(this);
+// 		} // end of if (!streamClosed)
 		super.stop();
   }
 
@@ -160,12 +160,11 @@ public class XMPPIOService extends IOService {
     } finally {
 			writeLock.unlock();
     }
-		try {
-			stop();
-		} // end of try
-		catch (IOException e) {
-			log.warning("Error stopping service: " + e);
-		} // end of try-catch
+// 		try {
+// 			stop();
+// 		} catch (IOException e) {
+// 			log.warning("Error stopping service: " + e);
+// 		} // end of try-catch
 	}
 
 	/**
