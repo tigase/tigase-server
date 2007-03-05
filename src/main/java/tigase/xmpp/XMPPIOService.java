@@ -142,14 +142,11 @@ public class XMPPIOService extends IOService {
 	protected void xmppStreamClosed() {
 		streamClosed = true;
 		serviceListener.xmppStreamClosed(this);
-		writeLock.lock();
     try {
 			log.finest("Sending data: </stream:stream>");
-			writeData("</stream:stream>");
+			writeRawData("</stream:stream>");
 		} catch (IOException e) {
 			log.warning("Error sending stream closed data: " + e);
-    } finally {
-			writeLock.unlock();
     }
 // 		try {
 // 			stop();
@@ -178,23 +175,27 @@ public class XMPPIOService extends IOService {
    *
    */
   public void processWaitingPackets() throws IOException {
+		Packet packet = null;
+		while ((packet = waitingPackets.poll()) != null) {
+			log.finer("Processing packet: " + packet.getElemName()
+				+ ", type: " + packet.getType());
+			log.finest("Sending packet: " + packet.getStringData());
+			writeRawData(packet.getStringData());
+			assert debug(packet.getStringData(), "--SENT:");
+		} // end of while (packet = waitingPackets.poll() != null)
+  }
+
+	public void writeRawData(String data) throws IOException {
     // We change state of this object in this method
     // It can be called by many threads simultanously
     // so we need to make it thread-safe
 		writeLock.lock();
     try {
-			Packet packet = null;
-			while ((packet = waitingPackets.poll()) != null) {
-				log.finer("Processing packet: " + packet.getElemName()
-					+ ", type: " + packet.getType());
-				log.finest("Sending packet: " + packet.getStringData());
-				writeData(packet.getStringData());
-				assert debug(packet.getStringData(), "--SENT:");
-			} // end of while (packet = waitingPackets.poll() != null)
+			writeData(data);
     } finally {
 			writeLock.unlock();
     }
-  }
+	}
 
 	/**
    * Describe <code>processSocketData</code> method here.
