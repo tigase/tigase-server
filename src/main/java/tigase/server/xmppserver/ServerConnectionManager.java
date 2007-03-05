@@ -60,6 +60,7 @@ import tigase.util.JID;
 import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPIOService;
+import tigase.xmpp.Authorization;
 import tigase.stats.StatRecord;
 
 /**
@@ -218,6 +219,17 @@ public class ServerConnectionManager extends ConnectionManager {
 			ConnectionType.connect.toString());
 	}
 
+	private String getConnectionId(XMPPIOService service) {
+		String local_hostname =
+			(String)service.getSessionData().get("local-hostname");
+		String remote_hostname =
+			(String)service.getSessionData().get("remote-hostname");
+		String cid = getConnectionId(local_hostname,
+			(remote_hostname != null ? remote_hostname : "NULL"),
+			service.connectionType());
+		return cid;
+	}
+
 // 	private String getHandshakingId(String localhost, String remotehost) {
 // 		return JID.getJID(localhost, remotehost, null);
 // 	}
@@ -253,14 +265,56 @@ public class ServerConnectionManager extends ConnectionManager {
 				} // end of for (Packet p: results)
 			} else {
 				if (p.getElemName().equals("stream:error")) {
-					serv.stop();
-					break;
+					processStreamError(p, serv);
+					return null;
 				} else {
-					addOutPacket(p);
+					if (checkPacket(p, serv)) {
+						addOutPacket(p);
+					} else {
+						return null;
+					}
 				}
 			} // end of else
 		} // end of while ()
  		return null;
+	}
+
+	private void processStreamError(Packet packet, XMPPIOService serv) {
+		Authorization author = Authorization.RECIPIENT_UNAVAILABLE;
+		if (packet.getElement().getChild("host-unknown") != null) {
+			author = Authorization.REMOTE_SERVER_NOT_FOUND;
+		}
+		String cid = getConnectionId(serv);
+		Queue<Packet> waiting =	waitingPackets.remove(cid);
+		if (waiting != null) {
+			Packet p = null;
+			while ((p = waiting.poll()) != null) {
+				log.finest("Sending packet back: " + p.getStringData());
+				addOutPacket(author.getResponseMessage(p, "S2S - not delivered", true));
+			} // end of while (p = waitingPackets.remove(ipAddress) != null)
+		} // end of if (waiting != null)
+		serv.stop();
+	}
+
+	private boolean checkPacket(Packet packet, XMPPIOService serv) {
+		String packet_from = packet.getElemFrom();
+		String packet_to = packet.getElemTo();
+		if (packet_from == null || packet_to == null) {
+			generateStreamError("improper-addressing", serv);
+			return false;
+		}
+		String remote_hostname =
+			(String)serv.getSessionData().get("remote-hostname");
+		if (!JID.getNodeHost(packet_from).equals(remote_hostname)) {
+			generateStreamError("invalid-from", serv);
+			return false;
+		}
+		String local_hostname =	(String)serv.getSessionData().get("local-hostname");
+		if (!JID.getNodeHost(packet_to).equals(local_hostname)) {
+			generateStreamError("host-unknown", serv);
+			return false;
+		}
+		return true;
 	}
 
 	private void processCommand(final Packet packet) {
@@ -376,6 +430,7 @@ public class ServerConnectionManager extends ConnectionManager {
 			log.warning("Hostnames definition is empty, setting 'localhost'");
 			hostnames = new String[] {"localhost"};
 		} // end of if (hostnames == null || hostnames.length == 0)
+		Arrays.sort(hostnames);
 
 		addRouting("*");
 	}
@@ -530,10 +585,33 @@ public class ServerConnectionManager extends ConnectionManager {
 		} // end of if (waiting != null)
 	}
 
+	private void generateStreamError(String error_el, XMPPIOService serv) {
+			Packet error = new Packet(new Element("stream:error",
+					new Element[] {
+						new Element(error_el,
+							new String[] {"xmlns"},
+							new String[] {"urn:ietf:params:xml:ns:xmpp-streams"})
+					}, null, null));
+			try {
+				writePacketToSocket(serv, error);
+				serv.writeRawData("</stream:stream>");
+				serv.stop();
+			} catch (Exception e) {
+				serv.stop();
+			}
+	}
+
 	public void processDialback(Packet packet, XMPPIOService serv,
 		Queue<Packet> results) {
 
 		String local_hostname = JID.getNodeHost(packet.getElemTo());
+		// Check whether this is correct local host name...
+		if (Arrays.binarySearch(hostnames, local_hostname) < 0) {
+			// Ups, this hostname is not served by this server, return stream
+			// error and close the connection....
+			generateStreamError("host-unknown", serv);
+			return;
+		}
 		String remote_hostname = JID.getNodeHost(packet.getElemFrom());
 		String connect_jid = getConnectionId(local_hostname, remote_hostname,
 			ConnectionType.connect);
@@ -621,6 +699,17 @@ public class ServerConnectionManager extends ConnectionManager {
 			} // end of if (packet.getType() == null) else
 		} // end of if (packet != null && packet.getType() != null)
 
+	}
+
+	/**
+	 * Method <code>getMaxInactiveTime</code> returns max keep-alive time
+	 * for inactive connection. Let's assume s2s should send something
+	 * at least once every 15 minutes....
+	 *
+	 * @return a <code>long</code> value
+	 */
+	protected long getMaxInactiveTime() {
+		return 15*MINUTE;
 	}
 
 }
