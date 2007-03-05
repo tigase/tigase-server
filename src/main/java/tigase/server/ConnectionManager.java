@@ -458,6 +458,9 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 						if (curr_time - lastTransfer >= getMaxInactiveTime()) {
 							// Stop the service is max keep-alive time is acceeded
 							// for non-active connections.
+							log.info(getName()
+								+ ": Max inactive time exceeded, stopping: "
+								+ getUniqueId(service));
 							service.stop();
 						} else {
 							if (curr_time - lastTransfer >= HOUR) {
@@ -471,6 +474,9 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 					// Close the service....
 					try {
 						if (service != null) {
+							log.info(getName()
+								+ "Found dead connection, stopping: "
+								+ getUniqueId(service));
 							service.stop();
 						}
 					} catch (Exception ignore) {
