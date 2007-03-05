@@ -520,6 +520,7 @@ public class ServerConnectionManager extends ConnectionManager {
 		// This checking is necessary due to specific s2s behaviour which
 		// I don't fully understand yet, possible bug in my s2s implementation
 		if (serv == service) {
+			stopped = true;
 			servicesByHost_Type.remove(cid);
 		} else {
 			log.info("Stopped non-active service for CID: " + cid);
@@ -527,12 +528,15 @@ public class ServerConnectionManager extends ConnectionManager {
 		serv = handshakingByHost_Type.get(cid);
 		// This checking is necessary due to specific s2s behaviour which
 		// I don't fully understand yet, possible bug in my s2s implementation
-		if (serv == service) {
+		if (!stopped && serv == service) {
+			stopped = true;
 			handshakingByHost_Type.remove(cid);
 			connectingByHost_Type.remove(cid);
 			waitingControlPackets.remove(cid);
 		} else {
-			log.info("Stopped non-handshaking service for CID: " + cid);
+			if (!stopped) {
+				log.info("Stopped non-handshaking service for CID: " + cid);
+			}
 		}
 		if (!stopped) {
 			return;

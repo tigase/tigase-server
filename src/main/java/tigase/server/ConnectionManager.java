@@ -441,6 +441,18 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 	 *
 	 */
 	private class Watchdog implements Runnable {
+
+		private String getCID(XMPPIOService service) {
+			String local_hostname =
+				(String)service.getSessionData().get("local-hostname");
+			String remote_hostname =
+				(String)service.getSessionData().get("remote-hostname");
+			return JID.getJID(
+				(local_hostname != null ? local_hostname : "NULL"),
+				(remote_hostname != null ? remote_hostname : "NULL"),
+				service.connectionType().toString());
+		}
+
 		public void run() {
 			while (true) {
 				XMPPIOService service = null;
@@ -460,7 +472,8 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 							// for non-active connections.
 							log.info(getName()
 								+ ": Max inactive time exceeded, stopping: "
-								+ getUniqueId(service));
+								+ getUniqueId(service)
+								+ ", CID: " + getCID(service));
 							service.stop();
 						} else {
 							if (curr_time - lastTransfer >= HOUR) {
@@ -476,7 +489,8 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 						if (service != null) {
 							log.info(getName()
 								+ "Found dead connection, stopping: "
-								+ getUniqueId(service));
+								+ getUniqueId(service)
+								+ ", CID: " + getCID(service));
 							service.stop();
 						}
 					} catch (Exception ignore) {
