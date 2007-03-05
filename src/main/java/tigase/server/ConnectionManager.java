@@ -336,11 +336,18 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 			String id = getUniqueId(service);
 			XMPPIOService serv = (XMPPIOService)services.get(id);
 			if (serv != null) {
-				serv.stop();
-			} else {
-				// Is it at all possible to happen???
-				// let's log it for now....
-				log.warning("Attempt to add service with the same ID: " + id);
+				if (serv == service) {
+					log.warning(getName()
+						+ ": That would explain a lot, adding the same service twice, ID: "
+						+ id);
+				} else {
+					// Is it at all possible to happen???
+					// let's log it for now....
+					log.warning(getName()
+						+ ": Attempt to add different service with the same ID: " + id);
+					// And stop the old service....
+					serv.stop();
+				}
 			}
 			services.put(id, service);
 		}
