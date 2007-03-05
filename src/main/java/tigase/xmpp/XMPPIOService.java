@@ -106,12 +106,7 @@ public class XMPPIOService extends IOService {
 			} // end of if (response.endsWith())
 		} catch (IOException e) {
 			log.warning("Error sending stream open data: " + e);
-			try {
-				stop();
-			} // end of try
-			catch (IOException ex) {
-				log.warning("Error stopping service: " + e);
-			} // end of try-catch
+			stop();
     } finally {
 			writeLock.unlock();
     }
@@ -125,11 +120,7 @@ public class XMPPIOService extends IOService {
 			assert debug(data, "--SENT:");
 		} catch (IOException e) {
 			log.warning("Error sending stream open data: " + e);
-			try {
-				stop();
-			} catch (IOException ex) {
-				log.warning("Error stopping service: " + e);
-			} // end of try-catch
+			stop();
     } finally {
 			writeLock.unlock();
     }
@@ -140,7 +131,7 @@ public class XMPPIOService extends IOService {
    *
    * @exception IOException if an error occurs
    */
-  public void stop() throws IOException {
+  public void stop() {
 // 		if (!streamClosed) {
 // 			streamClosed = true;
 // 			serviceListener.xmppStreamClosed(this);
@@ -243,7 +234,7 @@ public class XMPPIOService extends IOService {
 						} // end of while ((elem = elems.poll()) != null)
 					}	catch (Exception ex) {
 						ex.printStackTrace();
-						try { stop(); } catch (Exception e) { } // NOPMD
+						stop();
 					} // end of try-catch
 				} // end of if (isConnected() && data != null)
 			}

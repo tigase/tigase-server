@@ -88,6 +88,11 @@ public abstract class IOService implements Callable<IOService> {
 	private ConnectionType connectionType = null;
 	private String local_address = null;
 	private String remote_address = null;
+  /**
+	 * This variable keeps the time of last transfer in any direction
+	 * it is used to help detect dead connections.
+   */
+	private long lastTransferTime = 0;
 
 	private IOServiceListener serviceListener = null;
 
@@ -106,12 +111,25 @@ public abstract class IOService implements Callable<IOService> {
     sslId = id;
   }
 
+  /**
+	 * This method returns the time of last transfer in any direction
+	 * through this service. It is used to help detect dead connections.
+   */
+	public long getLastTransferTime() {
+		return lastTransferTime;
+	}
+
+	private void setLastTransferTime() {
+		lastTransferTime = System.currentTimeMillis();
+	}
+
   public synchronized void startSSL(final boolean clientMode)
     throws IOException {
 
 		socketIO = new TLSIO(socketIO,
 			new TLSWrapper(TLSUtil.getSSLContext(sslId, "SSL",
 					(String)sessionData.get(HOSTNAME_KEY)), null, clientMode));
+		setLastTransferTime();
   }
 
   public synchronized void startTLS(final boolean clientMode)
@@ -120,6 +138,7 @@ public abstract class IOService implements Callable<IOService> {
 		socketIO = new TLSIO(socketIO,
 			new TLSWrapper(TLSUtil.getSSLContext(sslId, "TLS",
 					(String)sessionData.get(HOSTNAME_KEY)), null, clientMode));
+		setLastTransferTime();
   }
 
 	public void setIOServiceListener(IOServiceListener sl) {
@@ -178,6 +197,7 @@ public abstract class IOService implements Callable<IOService> {
 		remote_address = sock.getInetAddress().getHostAddress();
 		id = local_address + "_" + sock.getLocalPort()
 			+ "_" + remote_address + "_" + sock.getPort();
+		setLastTransferTime();
   }
 
   /**
@@ -194,9 +214,11 @@ public abstract class IOService implements Callable<IOService> {
    *
    * @exception IOException if an error occurs
    */
-  public void stop() throws IOException {
+  public void stop() {
 		try {
 			socketIO.stop();
+		} catch (IOException e) {
+			// Well, do nothing, we are closing the connection anyway....
 		} finally {
 			serviceListener.serviceStopped(this);
 		}
@@ -249,6 +271,7 @@ public abstract class IOService implements Callable<IOService> {
    * @exception IOException if an error occurs
    */
   protected char[] readData() throws IOException {
+		setLastTransferTime();
     CharBuffer cb = null;
     try {
 			//			resizeInputBuffer();
@@ -265,7 +288,7 @@ public abstract class IOService implements Callable<IOService> {
 			return null;
     } catch (Exception eof) {
 			//			eof.printStackTrace();
-			try { stop(); } catch (Exception e) { } // NOPMD
+			stop();
     } // end of try-catch
     return cb != null ? cb.array() : null;
   }
@@ -284,6 +307,7 @@ public abstract class IOService implements Callable<IOService> {
 			encoder.flush(dataBuffer);
       socketIO.write(dataBuffer);
     } // end of if (data == null || data.equals("")) else
+		setLastTransferTime();
   }
 
   /**

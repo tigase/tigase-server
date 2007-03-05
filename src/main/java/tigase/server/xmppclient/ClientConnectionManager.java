@@ -148,14 +148,8 @@ public class ClientConnectionManager extends ConnectionManager {
 			break;
 		case CLOSE:
 			if (serv != null) {
-				try {
-					serv.stop();
-				} // end of try
-				catch (IOException e) {
-					log.log(Level.WARNING, "Error stopping service: ", e);
-				} // end of try-catch
-			} // end of if (serv != null)
-			else {
+				serv.stop();
+			} else {
 				log.fine("Attempt to stop non-existen service for packet: "
 					+ packet.getStringData()
 					+ ", Service already stopped?");

@@ -263,8 +263,7 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 					log.log(Level.WARNING, "Exception stopping XMPPIOService: ", e1);
 				} // end of try-catch
 			} // end of try-catch
-		} // end of if (ios != null)
-		else {
+		} else {
 			log.info("Can't find service for packet: <"
 				+ p.getElemName() + "> " + p.getTo()
 				+ ", service id: " + getServiceId(p));
@@ -305,7 +304,15 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 		synchronized(service) {
 			log.finer(">>" + getName() +
 				"<< Connection stopped: " + getUniqueId(service));
-			services.remove(getUniqueId(service));
+			String id = getUniqueId(service);
+			XMPPIOService serv = (XMPPIOService)services.get(id);
+			if (serv == service) {
+				services.remove(id);
+			} else {
+				// Is it at all possible to happen???
+				// let's log it for now....
+				log.warning("Attempt to stop incorrect service: " + id);
+			}
 		}
 	}
 
@@ -314,7 +321,16 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 		synchronized(services) {
 			log.finer(">>" + getName() +
 				"<< Connection started: " + getUniqueId(service));
-			services.put(getUniqueId(service), service);
+			String id = getUniqueId(service);
+			XMPPIOService serv = (XMPPIOService)services.get(id);
+			if (serv != null) {
+				serv.stop();
+			} else {
+				// Is it at all possible to happen???
+				// let's log it for now....
+				log.warning("Attempt to add service with the same ID: " + id);
+			}
+			services.put(id, service);
 		}
 	}
 
@@ -369,10 +385,6 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 
 		public void accept(SocketChannel sc) {
 
-// 			if (!(sc.isConnectionPending() || sc.isConnected())) {
-// 				return;
-// 			}
-
 			XMPPIOService serv = new XMPPIOService();
 			serv.setSSLId(getName());
 			serv.setIOServiceListener(ConnectionManager.this);
@@ -400,6 +412,27 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 			} // end of try-catch
 		}
 
+	}
+
+	/**
+	 * Looks in all established connections and checks whether any of them
+	 * is dead....
+	 *
+	 */
+	private class Watchdog implements Runnable {
+		public void run() {
+			while (true) {
+				try {
+					// Sleep for 1 minute
+					Thread.sleep(60000);
+					// Walk through all connections and check whether they are
+					// really alive...., try to send space and close the service
+					// on Exception
+				} catch (Exception e) {
+					// Ignore... I expect exceptions to happen here...
+				}
+			}
+		}
 	}
 
 } // ConnectionManager

@@ -253,7 +253,7 @@ public class ServerConnectionManager extends ConnectionManager {
 				} // end of for (Packet p: results)
 			} else {
 				if (p.getElemName().equals("stream:error")) {
-					try {	serv.stop(); } catch (Exception e) {	}
+					serv.stop();
 					break;
 				} else {
 					addOutPacket(p);
@@ -460,10 +460,28 @@ public class ServerConnectionManager extends ConnectionManager {
 		}
 		String cid = getConnectionId(local_hostname, remote_hostname,
 			service.connectionType());
-		servicesByHost_Type.remove(cid);
-		handshakingByHost_Type.remove(cid);
-		connectingByHost_Type.remove(cid);
-		waitingControlPackets.remove(cid);
+		boolean stopped = false;
+		IOService serv = servicesByHost_Type.get(cid);
+		// This checking is necessary due to specific s2s behaviour which
+		// I don't fully understand yet, possible bug in my s2s implementation
+		if (serv == service) {
+			servicesByHost_Type.remove(cid);
+		} else {
+			log.info("Stopped non-active service for CID: " + cid);
+		}
+		serv = handshakingByHost_Type.get(cid);
+		// This checking is necessary due to specific s2s behaviour which
+		// I don't fully understand yet, possible bug in my s2s implementation
+		if (serv == service) {
+			handshakingByHost_Type.remove(cid);
+			connectingByHost_Type.remove(cid);
+			waitingControlPackets.remove(cid);
+		} else {
+			log.info("Stopped non-handshaking service for CID: " + cid);
+		}
+		if (!stopped) {
+			return;
+		}
 		log.fine("s2s stopped: " + cid);
 		// Some servers close just 1 of dialback connections and even though
 		// other connection is still open they don't accept any data on that
@@ -491,9 +509,7 @@ public class ServerConnectionManager extends ConnectionManager {
 // 			servicesByHost_Type.remove(other_id);
 // 			handshakingByHost_Type.remove(other_id);
 // 			connectingByHost_Type.remove(other_id);
-			try {
-				other_service.stop();
-			} catch (IOException e) {	} // end of try-catch
+			other_service.stop();
 		} // end of if (other_service != null)
 		Queue<Packet> waiting =	waitingPackets.get(cid);
 		if (waiting != null && waiting.size() > 0) {
@@ -556,10 +572,10 @@ public class ServerConnectionManager extends ConnectionManager {
 					servicesByHost_Type.put(connect_jid,
 						handshakingByHost_Type.remove(connect_jid));
 					connectingByHost_Type.remove(connect_jid);
-					handleDialbackSuccess(connect_jid);
 					servicesByHost_Type.put(accept_jid,
 						handshakingByHost_Type.remove(accept_jid));
 					connectingByHost_Type.remove(accept_jid);
+					handleDialbackSuccess(connect_jid);
 					break;
 				case invalid:
 				default:
