@@ -325,4 +325,15 @@ public class ClientConnectionManager extends ConnectionManager {
 		return defHostName == null ? super.getDefHostName() : defHostName;
 	}
 
+	/**
+	 * Method <code>getMaxInactiveTime</code> returns max keep-alive time
+	 * for inactive connection. Let's assume user should send something
+	 * at least once every 24 hours....
+	 *
+	 * @return a <code>long</code> value
+	 */
+	protected long getMaxInactiveTime() {
+		return 24*HOUR;
+	}
+
 }

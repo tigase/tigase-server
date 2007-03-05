@@ -213,7 +213,7 @@ public class ComponentConnectionManager extends ConnectionManager {
 		defs.put(PORT_SOCKET_PROP_KEY, PORT_SOCKET_PROP_VAL);
 		defs.put(PORT_REMOTE_HOST_PROP_KEY, PORT_REMOTE_HOST_PROP_VAL);
 		defs.put(PORT_IFC_PROP_KEY, PORT_IFC_PROP_VAL);
-		defs.put(MAX_RECONNECTS_PROP_KEY, 1800000l);
+		defs.put(MAX_RECONNECTS_PROP_KEY, 30*MINUTE);
 		return defs;
 	}
 
@@ -310,6 +310,17 @@ public class ComponentConnectionManager extends ConnectionManager {
 
 	public void xmppStreamClosed(XMPPIOService serv) {
 		log.finer("Stream closed.");
+	}
+
+	/**
+	 * Method <code>getMaxInactiveTime</code> returns max keep-alive time
+	 * for inactive connection. we shoulnd not really close external component
+	 * connection at all, so let's say something like: 1000 days...
+	 *
+	 * @return a <code>long</code> value
+	 */
+	protected long getMaxInactiveTime() {
+		return 1000*24*HOUR;
 	}
 
 }
