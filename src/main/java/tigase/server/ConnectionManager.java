@@ -97,13 +97,25 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 	public static final String TLS_TRUSTS_STORE_PROP_VAL = "certs/truststore";
 	public static final String MAX_RECONNECTS_PROP_KEY = "max-reconnects";
 
+	protected static final long SECOND = 1000;
+	protected static final long MINUTE = 60*SECOND;
+	protected static final long HOUR = 60*MINUTE;
+
 	private static ConnectionOpenThread connectThread =
 		ConnectionOpenThread.getInstance();
 	private static SocketReadThread readThread = SocketReadThread.getInstance();
 	private static Timer delayedTasks = new Timer("DelayedTasks", true);
+	private Thread watchdog = null;
 	private Map<String, IOService> services =
 		new ConcurrentSkipListMap<String, IOService>();
-	protected static long connectionDelay = 2000;
+	protected long connectionDelay = 2000;
+
+	public void setName(String name) {
+		super.setName(name);
+		watchdog = new Thread(new Watchdog(), "Watchdog - " + name);
+		watchdog.setDaemon(true);
+		watchdog.start();
+	}
 
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> props = super.getDefaults(params);
@@ -414,6 +426,8 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 
 	}
 
+	protected abstract long getMaxInactiveTime();
+
 	/**
 	 * Looks in all established connections and checks whether any of them
 	 * is dead....
@@ -422,14 +436,39 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 	private class Watchdog implements Runnable {
 		public void run() {
 			while (true) {
+				XMPPIOService service = null;
 				try {
 					// Sleep for 1 minute
-					Thread.sleep(60000);
+					Thread.sleep(MINUTE);
 					// Walk through all connections and check whether they are
-					// really alive...., try to send space and close the service
+					// really alive...., try to send space for each service which
+					// is inactive for hour or more and close the service
 					// on Exception
+					long curr_time = System.currentTimeMillis();
+					for (IOService serv: services.values()) {
+						service = (XMPPIOService)serv;
+						long lastTransfer = serv.getLastTransferTime();
+						if (curr_time - lastTransfer >= getMaxInactiveTime()) {
+							// Stop the service is max keep-alive time is acceeded
+							// for non-active connections.
+							service.stop();
+						} else {
+							if (curr_time - lastTransfer >= HOUR) {
+								// At least once an hour check if the connection is
+								// still alive.
+								service.writeRawData(" ");
+							}
+						}
+					}
 				} catch (Exception e) {
-					// Ignore... I expect exceptions to happen here...
+					// Close the service....
+					try {
+						if (service != null) {
+							service.stop();
+						}
+					} catch (Exception ignore) {
+						// Do nothing here as we expect Exception to be thrown here...
+					}
 				}
 			}
 		}
