@@ -157,12 +157,6 @@ public class MessageRouter extends AbstractMessageReceiver
 // 		if (nick == null) {
 // 			log.warning("nick=null for packet: " + packet.toString());
 // 		} // end of if (nick == null)
-		String ip = null;
-		try {
-			ip = JID.getNodeHostIP(packet.getTo());
-		} catch (UnknownHostException e) {
-			ip = host;
-		} // end of try-catch
 		// Let's try to find message receiver quick way
 		// In case if packet is handled internally:
 		MessageReceiver first = null;
@@ -175,9 +169,9 @@ public class MessageRouter extends AbstractMessageReceiver
 			// nick name match, so we are checking routing hosts.
 			Set<String> routings = first.getRoutings();
 			if (routings != null) {
-				log.finest(first.getName() + ": Looking for host: " + host +
-					" or ip: " + ip + " in " + routings.toString());
-				if (routings.contains(host) || routings.contains(ip)) {
+				log.finest(first.getName() + ": Looking for host: " + host
+					+ " in " + routings.toString());
+				if (routings.contains(host)) {
 					log.finest("Found receiver: " + first.getName());
 					first.addPacket(packet);
 					return;
@@ -194,9 +188,8 @@ public class MessageRouter extends AbstractMessageReceiver
 			Set<String> routings = mr.getRoutings();
 			if (routings != null) {
 				log.finest(mr.getName() + ": Looking for host: " + host +
-					" or ip: " + ip + " in " + routings.toString());
-				if (routings.contains(host) || routings.contains(ip)
-						|| routings.contains(id)) {
+					" in " + routings.toString());
+				if (routings.contains(host) || routings.contains(id)) {
 					log.finest("Found receiver: " + mr.getName());
 					mr.addPacket(packet);
 					return;
