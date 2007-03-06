@@ -245,6 +245,9 @@ public class Packet {
 		if (getElemFrom() != null) {
 			reply.setAttribute("to", getElemFrom());
 		} // end of if (getElemFrom() != null)
+		if (getElemTo() != null) {
+			reply.setAttribute("from", getElemTo());
+		} // end of if (getElemTo() != null)
 		if (getElemId() != null) {
 			reply.setAttribute("id", getElemId());
 		} // end of if (getElemId() != null)

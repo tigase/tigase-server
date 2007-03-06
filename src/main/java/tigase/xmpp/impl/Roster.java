@@ -70,7 +70,8 @@ public class Roster {
 			in_unsubscribe,
 			in_subscribed,
 			in_unsubscribed,
-			in_probe;
+			in_probe,
+			error;
 	}
 
 	public enum SubscriptionType {
@@ -400,7 +401,11 @@ public class Roster {
 		StanzaType type = packet.getType();
 		if (type == null) {
 			type = StanzaType.available;
-		} // end of if (type == null)
+		} else {
+			if (type == StanzaType.error) {
+				return PresenceType.error;
+			}
+		}
 
 		if (to == null || !to.equals(session.getUserId())) {
 			if (INITIAL_PRESENCES.contains(type)) {

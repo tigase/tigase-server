@@ -434,6 +434,15 @@ public class Presence extends XMPPProcessor
 					}
 				} // end of if (Roster.isSubscribedFrom(session, packet.getElemFrom()))
 				break;
+			case error: {
+				// This is message to 'this' client probably
+				Element elem = (Element)packet.getElement().clone();
+				Packet result = new Packet(elem);
+				result.setTo(session.getConnectionId());
+				result.setFrom(packet.getTo());
+				results.offer(result);
+			}
+				break;
 			default:
 				results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
 						"Request type is incorrect", false));
