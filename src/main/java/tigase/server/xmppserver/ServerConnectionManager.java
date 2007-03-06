@@ -105,14 +105,14 @@ public class ServerConnectionManager extends ConnectionManager {
 	/**
 	 * Normal packets between users on different servers
 	 */
-	private Map<String, Queue<Packet>> waitingPackets =
-		new ConcurrentSkipListMap<String, Queue<Packet>>();
+	private Map<String, ServerPacketQueue> waitingPackets =
+		new ConcurrentSkipListMap<String, ServerPacketQueue>();
 
 	/**
 	 * Controll packets for s2s connection establishing
 	 */
-	private Map<String, Queue<Packet>> waitingControlPackets =
-		new ConcurrentSkipListMap<String, Queue<Packet>>();
+	private Map<String, ServerPacketQueue> waitingControlPackets =
+		new ConcurrentSkipListMap<String, ServerPacketQueue>();
 
 	/**
 	 * Data shared between sessions. Some servers (like google for example)
@@ -145,7 +145,7 @@ public class ServerConnectionManager extends ConnectionManager {
 	}
 
 	private void addWaitingPacket(String cid, Packet packet,
-		Map<String, Queue<Packet>> waitingPacketsMap) {
+		Map<String, ServerPacketQueue> waitingPacketsMap) {
 
 		synchronized (connectingByHost_Type) {
 			boolean connecting = connectingByHost_Type.contains(cid);
@@ -165,9 +165,9 @@ public class ServerConnectionManager extends ConnectionManager {
 				// The packet may be null if first try to connect to remote
 				// server failed and now Tigase is retrying to connect
 				if (packet != null) {
-					Queue<Packet> queue = waitingPacketsMap.get(cid);
+					ServerPacketQueue queue = waitingPacketsMap.get(cid);
 					if (queue == null) {
-						queue = new ConcurrentLinkedQueue<Packet>();
+						queue = new ServerPacketQueue();
 						waitingPacketsMap.put(cid, queue);
 					} // end of if (queue == null)
 					queue.offer(packet);
@@ -196,7 +196,7 @@ public class ServerConnectionManager extends ConnectionManager {
 			port_props.put("cid", cid);
 			log.finest("STARTING new connection: " + cid);
 			if (reconnect) {
-				reconnectService(port_props, 15000);
+				reconnectService(port_props, 15*SECOND);
 			} else {
 				startService(port_props);
 			}
@@ -398,15 +398,6 @@ public class ServerConnectionManager extends ConnectionManager {
 		log.finer("Stream closed.");
 	}
 
-// 	protected String getUniqueId(IOService serv) {
-// 		return JID.getJID(null, serv.getRemoteAddress(),
-// 			serv.connectionType().toString());
-// 	}
-
-// 	protected String getServiceId(Packet packet) {
-// 		return JID.getNodeHost(packet.getTo());
-// 	}
-
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> props = super.getDefaults(params);
 		if (params.get("--virt-hosts") != null) {
@@ -469,8 +460,10 @@ public class ServerConnectionManager extends ConnectionManager {
 		}
 		stats.add(new StatRecord(getName(), "Packets queued", "int",
 				waiting, Level.INFO));
+		stats.add(new StatRecord(getName(), "Connecting s2s connections", "int",
+				connectingByHost_Type.size(), Level.FINE));
 		stats.add(new StatRecord(getName(), "Handshaking s2s connections", "int",
-				handshakingByHost_Type.size(), Level.FINE));
+				handshakingByHost_Type.size(), Level.FINER));
 		StringBuilder sb = new StringBuilder("Handshaking: ");
 		for (IOService serv: handshakingByHost_Type.values()) {
 			sb.append("\nService ID: " + getUniqueId(serv)
@@ -481,7 +474,7 @@ public class ServerConnectionManager extends ConnectionManager {
 		}
 		log.finest(sb.toString());
 		LinkedList<String> waiting_qs = new LinkedList<String>();
-		for (Map.Entry<String, Queue<Packet>> entry: waitingPackets.entrySet()) {
+		for (Map.Entry<String, ServerPacketQueue> entry: waitingPackets.entrySet()) {
 			if (entry.getValue().size() > 0) {
 				waiting_qs.add(entry.getKey() + ":  " + entry.getValue().size());
 			}
@@ -496,7 +489,7 @@ public class ServerConnectionManager extends ConnectionManager {
 		return stats;
 	}
 
-	public void serviceStopped(final IOService service) {
+	public synchronized void serviceStopped(final IOService service) {
 		super.serviceStopped(service);
 		String local_hostname =
 			(String)service.getSessionData().get("local-hostname");
@@ -580,7 +573,7 @@ public class ServerConnectionManager extends ConnectionManager {
 		log.finest("handleDialbackSuccess: connect_jid="+connect_jid);
 		Packet p = null;
 		XMPPIOService serv = servicesByHost_Type.get(connect_jid);
-		Queue<Packet> waiting =	waitingPackets.get(connect_jid);
+		Queue<Packet> waiting =	waitingPackets.remove(connect_jid);
 		if (waiting != null) {
 			while ((p = waiting.poll()) != null) {
 				log.finest("Sending packet: " + p.getStringData());
@@ -658,6 +651,8 @@ public class ServerConnectionManager extends ConnectionManager {
 						handshakingByHost_Type.remove(accept_jid));
 					connectingByHost_Type.remove(accept_jid);
 					handleDialbackSuccess(connect_jid);
+					waitingControlPackets.remove(connect_jid);
+					waitingControlPackets.remove(accept_jid);
 					break;
 				case invalid:
 				default:
@@ -703,6 +698,10 @@ public class ServerConnectionManager extends ConnectionManager {
 			} // end of if (packet.getType() == null) else
 		} // end of if (packet != null && packet.getType() != null)
 
+	}
+
+	private class ServerPacketQueue extends ConcurrentLinkedQueue<Packet> {
+		private static final long serialVersionUID = 1L;
 	}
 
 	/**
