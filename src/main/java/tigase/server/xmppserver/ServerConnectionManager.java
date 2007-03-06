@@ -661,20 +661,16 @@ public class ServerConnectionManager extends ConnectionManager {
 			} else {
 				// <db:result> with type 'valid' or 'invalid'
 				// It means that session has been validated now....
+				XMPPIOService connect_serv = handshakingByHost_Type.remove(connect_jid);
+				connectingByHost_Type.remove(connect_jid);
+				waitingControlPackets.remove(connect_jid);
 				switch (packet.getType()) {
 				case valid:
-					servicesByHost_Type.put(connect_jid,
-						handshakingByHost_Type.remove(connect_jid));
-					connectingByHost_Type.remove(connect_jid);
-					servicesByHost_Type.put(accept_jid,
-						handshakingByHost_Type.remove(accept_jid));
-					connectingByHost_Type.remove(accept_jid);
+					servicesByHost_Type.put(connect_jid, connect_serv);
 					handleDialbackSuccess(connect_jid);
-					waitingControlPackets.remove(connect_jid);
-					waitingControlPackets.remove(accept_jid);
 					break;
-				case invalid:
 				default:
+					connect_serv.stop();
 					break;
 				} // end of switch (packet.getType())
 			} // end of if (packet.getType() != null) else
@@ -683,8 +679,10 @@ public class ServerConnectionManager extends ConnectionManager {
 		// <db:verify> with type 'valid' or 'invalid'
 		if (packet.getElemName().equals("db:verify")) {
 			if (packet.getType() == null) {
+				// When type is NULL then it means this packet contains
+				// data for verification
 				if (packet.getElemId() != null && packet.getElemCData() != null) {
-
+					// Yes data for verification are available in packet
 					final String id = packet.getElemId();
 					final String key = packet.getElemCData();
 
@@ -705,13 +703,35 @@ public class ServerConnectionManager extends ConnectionManager {
 					results.offer(result);
 				} // end of if (packet.getElemName().equals("db:verify"))
 			}	else {
+				// Type is not null so this is packet with verification result.
+				// If the type is valid it means accept connection has been
+				// validated and we can now receive data from this channel.
+
 				Element elem = new Element("db:result",
 					new String[] {"type", "to", "from"},
 					new String[] {packet.getType().toString(),
 												packet.getElemFrom(), packet.getElemTo()});
-				Packet result = new Packet(elem);
-				result.setTo(accept_jid);
-				results.offer(result);
+
+				XMPPIOService accept_serv = handshakingByHost_Type.remove(accept_jid);
+				connectingByHost_Type.remove(accept_jid);
+				waitingControlPackets.remove(accept_jid);
+
+				try {
+					accept_serv.writeRawData(elem.toString());
+					switch (packet.getType()) {
+					case valid:
+						servicesByHost_Type.put(accept_jid, accept_serv);
+						break;
+					default:
+						// Ups, verification failed, let's stop the service now.
+						accept_serv.writeRawData("</stream:stream>");
+						accept_serv.stop();
+						break;
+					}
+				} catch (Exception e) {
+					accept_serv.stop();
+				}
+
 			} // end of if (packet.getType() == null) else
 		} // end of if (packet != null && packet.getType() != null)
 
