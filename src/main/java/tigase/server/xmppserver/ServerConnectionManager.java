@@ -253,6 +253,9 @@ public class ServerConnectionManager extends ConnectionManager {
 				for (Packet res: results) {
 					String cid = res.getTo();
 					XMPPIOService sender = handshakingByHost_Type.get(cid);
+					if (sender == null) {
+						sender = servicesByHost_Type.get(cid);
+					}
 					if (sender != null) {
 						log.finest("cid: " + cid
 							+ ", writing packet to socket: " + res.getStringData());
