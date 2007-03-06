@@ -598,8 +598,10 @@ public class ServerConnectionManager extends ConnectionManager {
 			}
 	}
 
-	public void processDialback(Packet packet, XMPPIOService serv,
+	public synchronized void processDialback(Packet packet, XMPPIOService serv,
 		Queue<Packet> results) {
+
+		log.finest("DIALBACK - " + packet.getStringData());
 
 		String local_hostname = JID.getNodeHost(packet.getElemTo());
 		// Check whether this is correct local host name...
@@ -665,8 +667,6 @@ public class ServerConnectionManager extends ConnectionManager {
 		if (packet.getElemName().equals("db:verify")) {
 			if (packet.getType() == null) {
 				if (packet.getElemId() != null && packet.getElemCData() != null) {
-
-					log.fine("Verifying dialback - " + packet.getStringData());
 
 					final String id = packet.getElemId();
 					final String key = packet.getElemCData();
