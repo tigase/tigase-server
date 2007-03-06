@@ -336,8 +336,10 @@ public class ServerConnectionManager extends ConnectionManager {
 	public String xmppStreamOpened(XMPPIOService serv,
 		Map<String, String> attribs) {
 
+		log.finer("Stream opened: " + attribs.toString());
+
 		switch (serv.connectionType()) {
-		case connect:
+		case connect: {
 			// It must be always set for connect connection type
 			String remote_hostname =
 				(String)serv.getSessionData().get("remote-hostname");
@@ -345,6 +347,7 @@ public class ServerConnectionManager extends ConnectionManager {
 				(String)serv.getSessionData().get("local-hostname");
 			String cid = getConnectionId(local_hostname, remote_hostname,
 				ConnectionType.connect);
+			log.finest("Stream opened for: " + cid);
 			handshakingByHost_Type.put(cid, serv);
 			String remote_id = attribs.get("id");
 			sharedSessionData.put(cid+"-session-id", remote_id);
@@ -374,8 +377,21 @@ public class ServerConnectionManager extends ConnectionManager {
 			log.finest("cid: " + (String)serv.getSessionData().get("cid")
 				+ ", sending: " + sb.toString());
 			return sb.toString();
-		case accept:
-			log.finer("Stream opened: " + attribs.toString());
+		}
+		case accept: {
+			String remote_hostname =
+				(String)serv.getSessionData().get("remote-hostname");
+			String local_hostname =
+				(String)serv.getSessionData().get("local-hostname");
+			String cid = getConnectionId(
+				(local_hostname != null ? local_hostname : "NULL"),
+				(remote_hostname != null ? remote_hostname : "NULL"),
+				ConnectionType.accept);
+			log.finest("Stream opened for: " + cid);
+			if (remote_hostname != null) {
+				log.fine("Opening stream for already established connection...., trying to turn on TLS????");
+			}
+
 			String id = UUID.randomUUID().toString();
 			// We don't know hostname yet so we have to save session-id in
 			// connection temp data
@@ -387,6 +403,7 @@ public class ServerConnectionManager extends ConnectionManager {
 				+ " id='" + id + "'"
 				+ ">"
 				;
+		}
 		default:
 			log.severe("Warning, program shouldn't reach that point.");
 			break;
