@@ -666,10 +666,12 @@ public class ServerConnectionManager extends ConnectionManager {
 				waitingControlPackets.remove(connect_jid);
 				switch (packet.getType()) {
 				case valid:
+					log.finer("Connection: " + connect_jid + " is valid, adding to available services.");
 					servicesByHost_Type.put(connect_jid, connect_serv);
 					handleDialbackSuccess(connect_jid);
 					break;
 				default:
+					log.finer("Connection: " + connect_jid + " is invalid!! Stopping...");
 					connect_serv.stop();
 					break;
 				} // end of switch (packet.getType())
@@ -694,8 +696,12 @@ public class ServerConnectionManager extends ConnectionManager {
 					Packet result = null;
 
 					if (key.equals(local_key)) {
+						log.finer("Verification for " + accept_jid
+							+ " succeeded, sending valid.");
 						result = packet.swapElemFromTo(StanzaType.valid);
 					} else {
+						log.finer("Verification for " + accept_jid
+							+ " failed, sending invalid.");
 						result = packet.swapElemFromTo(StanzaType.invalid);
 					} // end of if (key.equals(local_key)) else
 					result.getElement().setCData(null);
@@ -720,10 +726,14 @@ public class ServerConnectionManager extends ConnectionManager {
 					accept_serv.writeRawData(elem.toString());
 					switch (packet.getType()) {
 					case valid:
+						log.finer("Received " + packet.getType().toString()
+							+ " validation result, adding connection to active services.");
 						servicesByHost_Type.put(accept_jid, accept_serv);
 						break;
 					default:
 						// Ups, verification failed, let's stop the service now.
+						log.finer("Received " + packet.getType().toString()
+							+ " validation result, stopping service, closing connection.");
 						accept_serv.writeRawData("</stream:stream>");
 						accept_serv.stop();
 						break;
