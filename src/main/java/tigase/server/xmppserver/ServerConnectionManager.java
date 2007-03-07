@@ -750,8 +750,12 @@ public class ServerConnectionManager extends ConnectionManager {
 												packet.getElemFrom(), packet.getElemTo()});
 
 				XMPPIOService accept_serv = handshakingByHost_Type.remove(accept_jid);
-				connectingByHost_Type.remove(accept_jid);
-				waitingControlPackets.remove(accept_jid);
+				if (accept_serv == null) {
+					accept_serv = servicesByHost_Type.get(accept_jid);
+				} else {
+					connectingByHost_Type.remove(accept_jid);
+					waitingControlPackets.remove(accept_jid);
+				}
 
 				try {
 					accept_serv.writeRawData(elem.toString());
