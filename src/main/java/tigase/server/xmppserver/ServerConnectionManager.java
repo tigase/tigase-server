@@ -175,16 +175,22 @@ public class ServerConnectionManager extends ConnectionManager {
 					} // end of if (queue == null)
 					queue.offer(packet);
 				}
-			} else {
-				log.warning("Discarding packet: " + packet.getStringData());
 			} // end of if (connecting) else
 		}
+	}
+
+	private void dumpCurrentStack(StackTraceElement[] stack) {
+		StringBuilder sb = new StringBuilder();
+		for (StackTraceElement st_el: stack) {
+			sb.append("\n" + st_el.toString());
+		}
+		log.finest(sb.toString());
 	}
 
 	private boolean openNewServerConnection(String localhost,
 		String remotehost, boolean reconnect) {
 
-		Thread.currentThread().dumpStack();
+		dumpCurrentStack(Thread.currentThread().getStackTrace());
 
 		try {
 			String ipAddress = DNSResolver.getHostSRV_IP(remotehost);
@@ -256,8 +262,9 @@ public class ServerConnectionManager extends ConnectionManager {
 				Queue<Packet> results = new LinkedList<Packet>();
 				processDialback(p, serv, results);
 				for (Packet res: results) {
-					log.finest("Sending dialback result: " + res.getStringData());
 					String cid = res.getTo();
+					log.finest("Sending dialback result: " + res.getStringData()
+						+ " to " + cid);
 					XMPPIOService sender = handshakingByHost_Type.get(cid);
 					if (sender == null) {
 						sender = servicesByHost_Type.get(cid);
@@ -624,6 +631,19 @@ public class ServerConnectionManager extends ConnectionManager {
 			}
 	}
 
+	private void initServiceMaping(String local_hostname, String remote_hostname,
+		String cid, XMPPIOService serv) {
+		// Assuming this is the first packet from that connection which
+		// tells us for what domain this connection is we have to map
+		// somehow this IP address to hostname
+		if (handshakingByHost_Type.get(cid) == null
+			&& servicesByHost_Type.get(cid) == null) {
+			serv.getSessionData().put("local-hostname", local_hostname);
+			serv.getSessionData().put("remote-hostname", remote_hostname);
+			handshakingByHost_Type.put(cid, serv);
+		}
+	}
+
 	public synchronized void processDialback(Packet packet, XMPPIOService serv,
 		Queue<Packet> results) {
 
@@ -647,16 +667,11 @@ public class ServerConnectionManager extends ConnectionManager {
 		if (packet.getElemName().equals("db:result")) {
 			if (packet.getType() == null) {
 				// db:result with key to validate from accept connection
-				// Assuming this is the first packet from that connection which
-				// tells us for what domain this connection is we have to map
-				// somehow this IP address to hostname
 				sharedSessionData.put(accept_jid + "-session-id",
 					serv.getSessionData().get(serv.SESSION_ID_KEY));
 				sharedSessionData.put(accept_jid + "-dialback-key",
 					packet.getElemCData());
-				serv.getSessionData().put("local-hostname", local_hostname);
-				serv.getSessionData().put("remote-hostname", remote_hostname);
-				handshakingByHost_Type.put(accept_jid, serv);
+				initServiceMaping(local_hostname, remote_hostname, accept_jid, serv);
 
 				// <db:result> with CDATA containing KEY
 				Element elem = new Element("db:verify", packet.getElemCData(),
@@ -695,6 +710,9 @@ public class ServerConnectionManager extends ConnectionManager {
 				// When type is NULL then it means this packet contains
 				// data for verification
 				if (packet.getElemId() != null && packet.getElemCData() != null) {
+					// This might be the first dialback packet from remote server
+					initServiceMaping(local_hostname, remote_hostname, accept_jid, serv);
+
 					// Yes data for verification are available in packet
 					final String id = packet.getElemId();
 					final String key = packet.getElemCData();
@@ -717,6 +735,8 @@ public class ServerConnectionManager extends ConnectionManager {
 					} // end of if (key.equals(local_key)) else
 					result.getElement().setCData(null);
 					result.setTo(accept_jid);
+					log.finest("Adding result packet: " + result.getStringData()
+						+ " to " + result.getTo());
 					results.offer(result);
 				} // end of if (packet.getElemName().equals("db:verify"))
 			}	else {
