@@ -159,6 +159,9 @@ public class ServerConnectionManager extends ConnectionManager {
 				} else {
 					// Can't establish connection...., unknown host??
 					waitingPacketsMap.remove(cid);
+					addOutPacket(
+						Authorization.REMOTE_SERVER_NOT_FOUND.getResponseMessage(packet,
+							"S2S - destination host not found", true));
 				}
 			} // end of if (serv == null)
 			if (connecting) {
@@ -180,6 +183,8 @@ public class ServerConnectionManager extends ConnectionManager {
 
 	private boolean openNewServerConnection(String localhost,
 		String remotehost, boolean reconnect) {
+
+		Thread.currentThread().dumpStack();
 
 		try {
 			String ipAddress = DNSResolver.getHostSRV_IP(remotehost);
@@ -251,6 +256,7 @@ public class ServerConnectionManager extends ConnectionManager {
 				Queue<Packet> results = new LinkedList<Packet>();
 				processDialback(p, serv, results);
 				for (Packet res: results) {
+					log.finest("Sending dialback result: " + res.getStringData());
 					String cid = res.getTo();
 					XMPPIOService sender = handshakingByHost_Type.get(cid);
 					if (sender == null) {
@@ -664,13 +670,15 @@ public class ServerConnectionManager extends ConnectionManager {
 			} else {
 				// <db:result> with type 'valid' or 'invalid'
 				// It means that session has been validated now....
-				XMPPIOService connect_serv = handshakingByHost_Type.remove(connect_jid);
-				connectingByHost_Type.remove(connect_jid);
-				waitingControlPackets.remove(connect_jid);
+				XMPPIOService connect_serv = handshakingByHost_Type.get(connect_jid);
 				switch (packet.getType()) {
 				case valid:
-					log.finer("Connection: " + connect_jid + " is valid, adding to available services.");
+					log.finer("Connection: " + connect_jid
+						+ " is valid, adding to available services.");
 					servicesByHost_Type.put(connect_jid, connect_serv);
+					handshakingByHost_Type.remove(connect_jid);
+					connectingByHost_Type.remove(connect_jid);
+					waitingControlPackets.remove(connect_jid);
 					handleDialbackSuccess(connect_jid);
 					break;
 				default:
