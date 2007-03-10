@@ -762,6 +762,13 @@ public class ServerConnectionManager extends ConnectionManager {
 					waitingControlPackets.remove(accept_jid);
 				}
 
+				if (accept_serv == null) {
+					// UPS, no such connection do send a packet, I give up
+					log.fine("Connection closed before handshaking completed: "
+						+ accept_jid
+						+ ", can't send packet: " + elem.toString());
+					return;
+				}
 				try {
 					accept_serv.writeRawData(elem.toString());
 					switch (packet.getType()) {
