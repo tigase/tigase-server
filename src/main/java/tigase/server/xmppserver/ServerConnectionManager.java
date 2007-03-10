@@ -179,18 +179,18 @@ public class ServerConnectionManager extends ConnectionManager {
 		}
 	}
 
-	private void dumpCurrentStack(StackTraceElement[] stack) {
-		StringBuilder sb = new StringBuilder();
-		for (StackTraceElement st_el: stack) {
-			sb.append("\n" + st_el.toString());
-		}
-		log.finest(sb.toString());
-	}
+// 	private void dumpCurrentStack(StackTraceElement[] stack) {
+// 		StringBuilder sb = new StringBuilder();
+// 		for (StackTraceElement st_el: stack) {
+// 			sb.append("\n" + st_el.toString());
+// 		}
+// 		log.finest(sb.toString());
+// 	}
 
 	private boolean openNewServerConnection(String localhost,
 		String remotehost, boolean reconnect) {
 
-		dumpCurrentStack(Thread.currentThread().getStackTrace());
+		//		dumpCurrentStack(Thread.currentThread().getStackTrace());
 
 		try {
 			String ipAddress = DNSResolver.getHostSRV_IP(remotehost);
@@ -497,15 +497,15 @@ public class ServerConnectionManager extends ConnectionManager {
 				connectingByHost_Type.size(), Level.FINE));
 		stats.add(new StatRecord(getName(), "Handshaking s2s connections", "int",
 				handshakingByHost_Type.size(), Level.FINER));
-		StringBuilder sb = new StringBuilder("Handshaking: ");
-		for (IOService serv: handshakingByHost_Type.values()) {
-			sb.append("\nService ID: " + getUniqueId(serv)
-				+ ", local-hostname: " + serv.getSessionData().get("local-hostname")
-				+ ", remote-hostname: " + serv.getSessionData().get("remote-hostname")
-				+ ", is-connected: " + serv.isConnected()
-				+ ", connection-type: " + serv.connectionType());
-		}
-		log.finest(sb.toString());
+// 		StringBuilder sb = new StringBuilder("Handshaking: ");
+// 		for (IOService serv: handshakingByHost_Type.values()) {
+// 			sb.append("\nService ID: " + getUniqueId(serv)
+// 				+ ", local-hostname: " + serv.getSessionData().get("local-hostname")
+// 				+ ", remote-hostname: " + serv.getSessionData().get("remote-hostname")
+// 				+ ", is-connected: " + serv.isConnected()
+// 				+ ", connection-type: " + serv.connectionType());
+// 		}
+// 		log.finest(sb.toString());
 		LinkedList<String> waiting_qs = new LinkedList<String>();
 		for (Map.Entry<String, ServerPacketQueue> entry: waitingPackets.entrySet()) {
 			if (entry.getValue().size() > 0) {
@@ -522,7 +522,7 @@ public class ServerConnectionManager extends ConnectionManager {
 		return stats;
 	}
 
-	public synchronized void serviceStopped(final IOService service) {
+	public void serviceStopped(final IOService service) {
 		super.serviceStopped(service);
 		String local_hostname =
 			(String)service.getSessionData().get("local-hostname");
@@ -636,11 +636,15 @@ public class ServerConnectionManager extends ConnectionManager {
 		// Assuming this is the first packet from that connection which
 		// tells us for what domain this connection is we have to map
 		// somehow this IP address to hostname
-		if (handshakingByHost_Type.get(cid) == null
-			&& servicesByHost_Type.get(cid) == null) {
+		XMPPIOService old_serv = (handshakingByHost_Type.get(cid) != null ?
+			handshakingByHost_Type.get(cid) : servicesByHost_Type.get(cid));
+		if (old_serv != serv) {
 			serv.getSessionData().put("local-hostname", local_hostname);
 			serv.getSessionData().put("remote-hostname", remote_hostname);
 			handshakingByHost_Type.put(cid, serv);
+			if (old_serv != null) {
+				old_serv.stop();
+			}
 		}
 	}
 
