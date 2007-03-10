@@ -380,7 +380,6 @@ public class ServerConnectionManager extends ConnectionManager {
 			elem.addAttribute("from", local_hostname);
 
 			StringBuilder sb = new StringBuilder();
-			sb.append(elem.toString());
 			// Attach also all controll packets which are wating to send
 			Packet p = null;
 			Queue<Packet> waiting =	waitingControlPackets.get(cid);
@@ -390,6 +389,7 @@ public class ServerConnectionManager extends ConnectionManager {
 					sb.append(p.getStringData());
 				} // end of while (p = waitingPackets.remove(ipAddress) != null)
 			} // end of if (waiting != null)
+			sb.append(elem.toString());
 			log.finest("cid: " + (String)serv.getSessionData().get("cid")
 				+ ", sending: " + sb.toString());
 			return sb.toString();
