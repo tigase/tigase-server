@@ -643,6 +643,7 @@ public class ServerConnectionManager extends ConnectionManager {
 			serv.getSessionData().put("remote-hostname", remote_hostname);
 			handshakingByHost_Type.put(cid, serv);
 			if (old_serv != null) {
+				log.finest("Stopping old connection for: " + cid);
 				old_serv.stop();
 			}
 		}
