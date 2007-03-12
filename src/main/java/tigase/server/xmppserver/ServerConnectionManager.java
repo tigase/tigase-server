@@ -135,9 +135,7 @@ public class ServerConnectionManager extends ConnectionManager {
 			log.finest("Connection ID is: " + cid);
 			synchronized(servicesByHost_Type) {
 				XMPPIOService serv = servicesByHost_Type.get(cid);
-				if (serv != null) {
-					writePacketToSocket(serv, packet);
-				} else {
+				if (serv == null || !writePacketToSocket(serv, packet)) {
 					addWaitingPacket(cid, packet, waitingPackets);
 				} // end of if (serv != null) else
 			}
@@ -269,11 +267,9 @@ public class ServerConnectionManager extends ConnectionManager {
 					if (sender == null) {
 						sender = servicesByHost_Type.get(cid);
 					}
-					if (sender != null) {
-						log.finest("cid: " + cid
-							+ ", writing packet to socket: " + res.getStringData());
-						writePacketToSocket(sender, res);
-					} else {
+					log.finest("cid: " + cid
+						+ ", writing packet to socket: " + res.getStringData());
+					if (sender == null || !writePacketToSocket(sender, res)) {
 						// I am assuming here that it can't happen that the packet is
 						// to accept channel and it doesn't exist
 						addWaitingPacket(cid, res, waitingControlPackets);
@@ -573,29 +569,32 @@ public class ServerConnectionManager extends ConnectionManager {
 		// connections. So the solution is: if one of pair connection is closed
 		// close the other connection as well.
 		// Find other connection:
-		String other_id = null;
-		switch (service.connectionType()) {
-		case accept:
-			other_id = getConnectionId(local_hostname, remote_hostname,
-				ConnectionType.connect);
-			break;
-		case connect:
-		default:
-			other_id = getConnectionId(local_hostname, remote_hostname,
-				ConnectionType.accept);
-			break;
-		} // end of switch (service.connectionType())
-		XMPPIOService other_service = servicesByHost_Type.get(other_id);
-		if (other_service == null) {
-			other_service = handshakingByHost_Type.get(other_id);
-		} // end of if (other_service == null)
-		if (other_service != null) {
-			log.fine("Stopping other service: " + other_id);
-// 			servicesByHost_Type.remove(other_id);
-// 			handshakingByHost_Type.remove(other_id);
-// 			connectingByHost_Type.remove(other_id);
-			other_service.stop();
-		} // end of if (other_service != null)
+
+		// Hm it doesn't work very well, let's comment it out for now.
+
+// 		String other_id = null;
+// 		switch (service.connectionType()) {
+// 		case accept:
+// 			other_id = getConnectionId(local_hostname, remote_hostname,
+// 				ConnectionType.connect);
+// 			break;
+// 		case connect:
+// 		default:
+// 			other_id = getConnectionId(local_hostname, remote_hostname,
+// 				ConnectionType.accept);
+// 			break;
+// 		} // end of switch (service.connectionType())
+// 		XMPPIOService other_service = servicesByHost_Type.get(other_id);
+// 		if (other_service == null) {
+// 			other_service = handshakingByHost_Type.get(other_id);
+// 		} // end of if (other_service == null)
+// 		if (other_service != null) {
+// 			log.fine("Stopping other service: " + other_id);
+// // 			servicesByHost_Type.remove(other_id);
+// // 			handshakingByHost_Type.remove(other_id);
+// // 			connectingByHost_Type.remove(other_id);
+// 			other_service.stop();
+// 		} // end of if (other_service != null)
 		Queue<Packet> waiting =	waitingPackets.get(cid);
 		if (waiting != null && waiting.size() > 0) {
 			addWaitingPacket(cid, null, waitingPackets);

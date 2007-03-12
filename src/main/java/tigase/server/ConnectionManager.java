@@ -262,11 +262,12 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 		}
 	}
 
-	protected void writePacketToSocket(IOService ios, Packet p) {
+	protected boolean writePacketToSocket(IOService ios, Packet p) {
 		if (ios != null) {
 			((XMPPIOService)ios).addPacketToSend(p);
 			try {
 				ios.processWaitingPackets();
+				return true;
 			} catch (Exception e) {
 				log.log(Level.WARNING, "Exception during writing packets: ", e);
 				try {
@@ -280,6 +281,7 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 				+ p.getElemName() + "> " + p.getTo()
 				+ ", service id: " + getServiceId(p));
 		} // end of if (ios != null) else
+		return false;
 	}
 
 	protected void writePacketToSocket(Packet p) {
