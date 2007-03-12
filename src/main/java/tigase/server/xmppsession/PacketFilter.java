@@ -66,14 +66,6 @@ public class PacketFilter {
 		log.finest("Processing packet: " + packet.getStringData());
 
 		try {
-			// For all messages coming from the owner of this account set
-			// proper 'from' attribute. This is actually needed for the case
-			// when the user sends a message to himself.
-			if (packet.getFrom() != null
-				&& packet.getFrom().equals(session.getConnectionId())) {
-				packet.getElement().setAttribute("from", session.getJID());
-			} // end of if (packet.getFrom().equals(session.getConnectionId()))
-
 			// Can not forward packet if there is no destination address
 			if (packet.getElemTo() == null) {
 				// If this is simple <iq type="result"/> then ignore it
@@ -88,13 +80,22 @@ public class PacketFilter {
 				return false;
 			}
 
+			// For all messages coming from the owner of this account set
+			// proper 'from' attribute. This is actually needed for the case
+			// when the user sends a message to himself.
+			if (packet.getFrom() != null
+				&& packet.getFrom().equals(session.getConnectionId())) {
+				packet.getElement().setAttribute("from", session.getJID());
+			} // end of if (packet.getFrom().equals(session.getConnectionId()))
+
 			String id = JID.getNodeID(packet.getElemTo());
 
 			if (id.equals(session.getUserId())) {
 				// Yes this is message to 'this' client
 				Element elem = (Element)packet.getElement().clone();
 				Packet result = new Packet(elem);
-				result.setTo(session.getConnectionId());
+				result.setTo(session.getParentSession().
+					getResourceConnection(packet.getElemTo()).getConnectionId());
 				result.setFrom(packet.getTo());
 				results.offer(result);
 			} else {
