@@ -563,6 +563,7 @@ public class ServerConnectionManager extends ConnectionManager {
 		if (serv == null && connectingByHost_Type.contains(cid)) {
 			connectingByHost_Type.remove(cid);
 			waitingControlPackets.remove(cid);
+			stopped = true;
 		}
 		if (!stopped) {
 			return;
