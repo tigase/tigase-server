@@ -427,9 +427,12 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 						port_props.put(MAX_RECONNECTS_PROP_KEY, (--recon));
 						reconnectService(port_props, connectionDelay);
 					} // end of if (recon != 0)
-				} // end of if (reconnects != null)
+				} else {
+					serv.stop();
+				}
 			} catch (Exception e) {
 				log.log(Level.WARNING, "Can not accept connection.", e);
+				serv.stop();
 			} // end of try-catch
 		}
 

@@ -560,6 +560,10 @@ public class ServerConnectionManager extends ConnectionManager {
 				log.info("Stopped non-handshaking service for CID: " + cid);
 			}
 		}
+		if (serv == null && connectingByHost_Type.contains(cid)) {
+			connectingByHost_Type.remove(cid);
+			waitingControlPackets.remove(cid);
+		}
 		if (!stopped) {
 			return;
 		}
@@ -615,19 +619,19 @@ public class ServerConnectionManager extends ConnectionManager {
 	}
 
 	private void generateStreamError(String error_el, XMPPIOService serv) {
-			Packet error = new Packet(new Element("stream:error",
-					new Element[] {
-						new Element(error_el,
-							new String[] {"xmlns"},
-							new String[] {"urn:ietf:params:xml:ns:xmpp-streams"})
-					}, null, null));
-			try {
-				writePacketToSocket(serv, error);
-				serv.writeRawData("</stream:stream>");
-				serv.stop();
-			} catch (Exception e) {
-				serv.stop();
-			}
+		Packet error = new Packet(new Element("stream:error",
+				new Element[] {
+					new Element(error_el,
+						new String[] {"xmlns"},
+						new String[] {"urn:ietf:params:xml:ns:xmpp-streams"})
+				}, null, null));
+		try {
+			writePacketToSocket(serv, error);
+			serv.writeRawData("</stream:stream>");
+			serv.stop();
+		} catch (Exception e) {
+			serv.stop();
+		}
 	}
 
 	private void initServiceMaping(String local_hostname, String remote_hostname,
