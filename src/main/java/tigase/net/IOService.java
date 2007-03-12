@@ -217,7 +217,7 @@ public abstract class IOService implements Callable<IOService> {
   public void stop() {
 		try {
 			socketIO.stop();
-		} catch (IOException e) {
+		} catch (Exception e) {
 			// Well, do nothing, we are closing the connection anyway....
 		} finally {
 			serviceListener.serviceStopped(this);
