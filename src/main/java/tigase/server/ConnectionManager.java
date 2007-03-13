@@ -319,6 +319,8 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 			log.finer(">>" + getName() +
 				"<< Connection stopped: " + getUniqueId(service));
 			String id = getUniqueId(service);
+			// id might be null if service is stopped in accept method due to
+			// an exception during establishing TCP/IP connection
 			XMPPIOService serv = (id != null ? (XMPPIOService)services.get(id) : null);
 			if (serv == service) {
 				services.remove(id);
