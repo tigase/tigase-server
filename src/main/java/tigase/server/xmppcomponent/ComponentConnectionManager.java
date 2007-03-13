@@ -26,6 +26,7 @@ package tigase.server.xmppcomponent;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
+import java.util.List;
 import java.util.Queue;
 import java.util.TreeMap;
 import java.util.UUID;
@@ -39,6 +40,7 @@ import tigase.server.ConnectionManager;
 import tigase.server.MessageReceiver;
 import tigase.server.Packet;
 import tigase.disco.XMPPService;
+import tigase.disco.ServiceEntity;
 import tigase.util.Algorithms;
 import tigase.util.JID;
 import tigase.xml.Element;
@@ -52,8 +54,8 @@ import tigase.xmpp.XMPPIOService;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class ComponentConnectionManager extends ConnectionManager {
-	//	implements XMPPService {
+public class ComponentConnectionManager extends ConnectionManager
+	implements XMPPService {
 
 	public static int[] PORTS = {5555};
 	public static ConnectionType PORT_TYPE_PROP_VAL = ConnectionType.accept;
@@ -66,8 +68,12 @@ public class ComponentConnectionManager extends ConnectionManager {
 	public static String[] PORT_IFC_PROP_VAL = {"*"};
 	public static final String PACK_ROUTED_KEY = "pack-routed";
 	public static boolean PACK_ROUTED_VAL = false;
+	public static final String RETURN_SERVICE_DISCO_KEY = "service-disco";
+	public static final boolean RETURN_SERVICE_DISCO_VAL = true;
 
+	private ServiceEntity serviceEntity = null;
 	private boolean pack_routed = false;
+	private boolean service_disco = true;
 	private String remote_host = null;
 
   /**
@@ -193,12 +199,14 @@ public class ComponentConnectionManager extends ConnectionManager {
 		}
 		Map<String, Object> props = super.getDefaults(params);
 		props.put(PACK_ROUTED_KEY, PACK_ROUTED_VAL);
+		props.put(RETURN_SERVICE_DISCO_KEY, RETURN_SERVICE_DISCO_VAL);
 		return props;
 	}
 
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
 		pack_routed = (Boolean)props.get(PACK_ROUTED_KEY);
+		service_disco = (Boolean)props.get(RETURN_SERVICE_DISCO_KEY);
 	}
 
 	protected int[] getDefPlainPorts() {
@@ -321,6 +329,18 @@ public class ComponentConnectionManager extends ConnectionManager {
 	 */
 	protected long getMaxInactiveTime() {
 		return 1000*24*HOUR;
+	}
+
+	public Element getDiscoInfo(String node, String jid) {
+		if (node == null && jid != null && isInRoutings(jid)) {
+			Element query = serviceEntity.getDiscoInfo(node);
+			return query;
+		}
+		return null;
+	}
+
+	public List<Element> getDiscoItems(String node, String jid) {
+		return null;
 	}
 
 }
