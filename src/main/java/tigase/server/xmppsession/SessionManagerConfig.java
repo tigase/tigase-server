@@ -45,6 +45,8 @@ public class SessionManagerConfig {
 		"tigase.db.jdbc.JDBCRepository";
 	public static final String DRUPAL_REPO_CLASS_PROP_VAL =
 		"tigase.db.jdbc.DrupalAuth";
+	public static final String LIBRESOURCE_REPO_CLASS_PROP_VAL =
+		"tigase.db.jdbc.LibreSourceAuth";
 	public static final String USER_REPO_URL_PROP_KEY = "user-repo-url";
 	public static final String XML_REPO_URL_PROP_VAL = "user-repository.xml";
 	public static final String MYSQL_REPO_URL_PROP_VAL =
@@ -53,6 +55,8 @@ public class SessionManagerConfig {
 		"jdbc:postgresql://localhost/tigase?user=tigase";
 	public static final String DRUPAL_REPO_URL_PROP_VAL =
 		"jdbc:mysql://localhost/drupal?user=root&password=mypass";
+	public static final String LIBRESOURCE_REPO_URL_PROP_VAL =
+		"jdbc:postgresql://localhost/libresource?user=demo";
 
 	public static final String AUTH_REPO_CLASS_PROP_KEY = "auth-repo-class";
 	public static final String AUTH_REPO_URL_PROP_KEY = "auth-repo-url";
@@ -104,6 +108,14 @@ public class SessionManagerConfig {
 			if (params.get("--auth-db").equals("pgsql")) {
 				auth_repo_class = PGSQL_REPO_CLASS_PROP_VAL;
 				auth_repo_url = PGSQL_REPO_URL_PROP_VAL;
+			}
+			if (params.get("--auth-db").equals("drupal")) {
+				auth_repo_class = DRUPAL_REPO_CLASS_PROP_VAL;
+				auth_repo_url = DRUPAL_REPO_URL_PROP_VAL;
+			}
+			if (params.get("--auth-db").equals("libresource")) {
+				auth_repo_class = LIBRESOURCE_REPO_CLASS_PROP_VAL;
+				auth_repo_url = LIBRESOURCE_REPO_URL_PROP_VAL;
 			}
 		}
 		if (params.get("--auth-db-uri") != null) {
