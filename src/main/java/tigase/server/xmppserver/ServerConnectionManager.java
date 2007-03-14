@@ -291,12 +291,7 @@ public class ServerConnectionManager extends ConnectionManager {
  		return null;
 	}
 
-	private void processStreamError(Packet packet, XMPPIOService serv) {
-		Authorization author = Authorization.RECIPIENT_UNAVAILABLE;
-		if (packet.getElement().getChild("host-unknown") != null) {
-			author = Authorization.REMOTE_SERVER_NOT_FOUND;
-		}
-		String cid = getConnectionId(serv);
+	private void bouncePacketsBack(Authorization author, String cid) {
 		Queue<Packet> waiting =	waitingPackets.remove(cid);
 		if (waiting != null) {
 			Packet p = null;
@@ -305,6 +300,16 @@ public class ServerConnectionManager extends ConnectionManager {
 				addOutPacket(author.getResponseMessage(p, "S2S - not delivered", true));
 			} // end of while (p = waitingPackets.remove(ipAddress) != null)
 		} // end of if (waiting != null)
+	}
+
+
+	private void processStreamError(Packet packet, XMPPIOService serv) {
+		Authorization author = Authorization.RECIPIENT_UNAVAILABLE;
+		if (packet.getElement().getChild("host-unknown") != null) {
+			author = Authorization.REMOTE_SERVER_NOT_FOUND;
+		}
+		String cid = getConnectionId(serv);
+		bouncePacketsBack(author, cid);
 		serv.stop();
 	}
 
@@ -620,14 +625,14 @@ public class ServerConnectionManager extends ConnectionManager {
 	}
 
 	private void generateStreamError(String error_el, XMPPIOService serv) {
-		Packet error = new Packet(new Element("stream:error",
+		Element error = new Element("stream:error",
 				new Element[] {
 					new Element(error_el,
 						new String[] {"xmlns"},
 						new String[] {"urn:ietf:params:xml:ns:xmpp-streams"})
-				}, null, null));
+				}, null, null);
 		try {
-			writePacketToSocket(serv, error);
+			serv.writeRawData(error.toString());
 			serv.writeRawData("</stream:stream>");
 			serv.stop();
 		} catch (Exception e) {
@@ -675,22 +680,31 @@ public class ServerConnectionManager extends ConnectionManager {
 		// <db:result>
 		if (packet.getElemName().equals("db:result")) {
 			if (packet.getType() == null) {
-				// db:result with key to validate from accept connection
-				sharedSessionData.put(accept_jid + "-session-id",
-					serv.getSessionData().get(serv.SESSION_ID_KEY));
-				sharedSessionData.put(accept_jid + "-dialback-key",
-					packet.getElemCData());
-				initServiceMaping(local_hostname, remote_hostname, accept_jid, serv);
+				if (packet.getElemCData() != null) {
+					// db:result with key to validate from accept connection
+					sharedSessionData.put(accept_jid + "-session-id",
+						serv.getSessionData().get(serv.SESSION_ID_KEY));
+					sharedSessionData.put(accept_jid + "-dialback-key",
+						packet.getElemCData());
+					initServiceMaping(local_hostname, remote_hostname, accept_jid, serv);
 
-				// <db:result> with CDATA containing KEY
-				Element elem = new Element("db:verify", packet.getElemCData(),
-					new String[] {"id", "to", "from"},
-					new String[] {(String)serv.getSessionData().get(serv.SESSION_ID_KEY),
-												packet.getElemFrom(),
-												packet.getElemTo()});
-				Packet result = new Packet(elem);
-				result.setTo(connect_jid);
-				results.offer(result);
+					// <db:result> with CDATA containing KEY
+					Element elem = new Element("db:verify", packet.getElemCData(),
+						new String[] {"id", "to", "from"},
+						new String[] {(String)serv.getSessionData().get(serv.SESSION_ID_KEY),
+													packet.getElemFrom(),
+													packet.getElemTo()});
+					Packet result = new Packet(elem);
+					result.setTo(connect_jid);
+					results.offer(result);
+				} else {
+					// Incorrect dialback packet, it happens for some servers....
+					// I don't know yet what software they use.
+					// Let's just disconnect and signal unrecoverable conection error
+					log.finer("Incorrect diablack packet: " + packet.getStringData());
+					bouncePacketsBack(Authorization.SERVICE_UNAVAILABLE, connect_jid);
+					generateStreamError("bad-format", serv);
+				}
 			} else {
 				// <db:result> with type 'valid' or 'invalid'
 				// It means that session has been validated now....
