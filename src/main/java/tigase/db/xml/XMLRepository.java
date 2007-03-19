@@ -522,6 +522,11 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
 		return auth.otherAuth(props);
 	}
 
+	public void logout(final String user)
+		throws UserNotFoundException, TigaseDBException {
+		auth.logout(user);
+	}
+
 	public void updatePassword(final String user, final String password)
 		throws UserExistsException, TigaseDBException {
 		auth.updatePassword(user, password);

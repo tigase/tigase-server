@@ -72,4 +72,6 @@ public interface UserAuthRepository {
 
   void removeUser(String user) throws UserNotFoundException, TigaseDBException;
 
+	void logout(String user) throws UserNotFoundException, TigaseDBException;
+
 } // UserAuthRepository

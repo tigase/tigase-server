@@ -323,6 +323,8 @@ public class DrupalAuth implements UserAuthRepository {
 		throw new AuthorizationException("Protocol is not supported: " + proto);
 	}
 
+	public void logout(final String user) {}
+
 	/**
 	 * Describe <code>addUser</code> method here.
 	 *

@@ -173,6 +173,8 @@ public class UserAuthRepositoryImpl implements UserAuthRepository {
 		throw new AuthorizationException("Protocol is not supported.");
 	}
 
+	public void logout(final String user) {}
+
 	/**
 	 * Describe <code>addUser</code> method here.
 	 *

@@ -31,6 +31,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Date;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Logger;
@@ -75,8 +76,10 @@ public class LibreSourceAuth implements UserAuthRepository {
 	private static final String[] sasl_mechs = {"PLAIN"};
 
 	public static final String DEF_USERS_TBL = "casusers_";
+	public static final String DEF_PROFILES_TBL = "profileresource_";
 
 	private String users_tbl = DEF_USERS_TBL;
+	private String profiles_tbl = DEF_PROFILES_TBL;
 	private String db_conn = null;
 	private Connection conn = null;
 	private PreparedStatement pass_st = null;
@@ -85,6 +88,7 @@ public class LibreSourceAuth implements UserAuthRepository {
 	private PreparedStatement max_uid_st = null;
 	private PreparedStatement conn_valid_st = null;
 	private PreparedStatement update_last_login_st = null;
+	private PreparedStatement update_online_status = null;
 
 	private long lastConnectionValidated = 0;
 	private long connectionValidateInterval = 1000*60;
@@ -94,33 +98,26 @@ public class LibreSourceAuth implements UserAuthRepository {
 			+ " where username_ = ?;";
 		pass_st = conn.prepareStatement(query);
 
-// 		query = "select status from " + users_tbl
-// 			+ " where username_ = ?;";
-// 		status_st = conn.prepareStatement(query);
+		query = "select accountstatus_ from " + profiles_tbl
+			+ " where id_ = ?;";
+		status_st = conn.prepareStatement(query);
 
-// 		query = "insert into " + users_tbl
-// 			+ " (uid, username_, passworddigest_, status)"
-// 			+ " values (?, ?, ?, 1);";
 		query = "insert into " + users_tbl
 			+ " (username_, passworddigest_)"
 			+ " values (?, ?);";
 		user_add_st = conn.prepareStatement(query);
 
-// 		query = "select max(uid) from " + users_tbl;
-// 		max_uid_st = conn.prepareStatement(query);
-
 		query = "select count(*) from " + users_tbl;
 		conn_valid_st = conn.prepareStatement(query);
 
-// 		query = "update " + users_tbl + " set access=?, login=? where name=?;";
-// 		update_last_login_st = conn.prepareStatement(query);
+		query = "update " + profiles_tbl + " set lastlogintime_ = ? where id_ = ?;";
+		update_last_login_st = conn.prepareStatement(query);
+		query = "update " + profiles_tbl + " set onlinestatus_ = ? where id_ = ?;";
+		update_online_status = conn.prepareStatement(query);
 	}
 
 	private boolean checkConnection() throws SQLException {
 		try {
-// 			if (!conn.isValid(5)) {
-// 				initRepo();
-// 			} // end of if (!conn.isValid())
 			long tmp = System.currentTimeMillis();
 			if ((tmp - lastConnectionValidated) >= connectionValidateInterval) {
 				conn_valid_st.executeQuery();
@@ -146,50 +143,42 @@ public class LibreSourceAuth implements UserAuthRepository {
 	}
 
 	private void updateLastLogin(String user) throws TigaseDBException {
-		// 		try {
-// 			BigDecimal bd = new BigDecimal((System.currentTimeMillis()/1000));
-// 			update_last_login_st.setBigDecimal(1, bd);
-// 			update_last_login_st.setBigDecimal(2, bd);
-// 			update_last_login_st.setString(3, JID.getNodeNick(user));
-// 			update_last_login_st.executeUpdate();
-// 		} catch (SQLException e) {
-// 			throw new TigaseDBException("Error accessin repository.", e);
-// 		} // end of try-catch
+		try {
+			update_last_login_st.setDate(1, new Date(System.currentTimeMillis()));
+			update_last_login_st.setString(2, JID.getNodeNick(user));
+			update_last_login_st.executeUpdate();
+		} catch (SQLException e) {
+			throw new TigaseDBException("Error accessin repository.", e);
+		} // end of try-catch
+	}
+
+	private void updateOnlineStatus(String user, int status)
+		throws TigaseDBException {
+		try {
+			update_online_status.setInt(1, status);
+			update_online_status.setString(2, JID.getNodeNick(user));
+			update_online_status.executeUpdate();
+		} catch (SQLException e) {
+			throw new TigaseDBException("Error accessin repository.", e);
+		} // end of try-catch
 	}
 
 	private boolean isActive(final String user)
 		throws SQLException, UserNotFoundException {
-		return true;
-		// 		ResultSet rs = null;
-// 		try {
-// 			status_st.setString(1, JID.getNodeNick(user));
-// 			rs = status_st.executeQuery();
-// 			if (rs.next()) {
-// 				return (rs.getInt(1) == 1);
-// 			} else {
-// 				throw new UserNotFoundException("User does not exist: " + user);
-// 			} // end of if (isnext) else
-// 		} finally {
-// 			release(null, rs);
-// 		}
+		ResultSet rs = null;
+		try {
+			status_st.setString(1, JID.getNodeNick(user));
+			rs = status_st.executeQuery();
+			if (rs.next()) {
+				int res = rs.getInt(1);
+				return (rs.wasNull() || res == 0);
+			} else {
+				throw new UserNotFoundException("User does not exist: " + user);
+			} // end of if (isnext) else
+		} finally {
+			release(null, rs);
+		}
 	}
-
-// 	private long getMaxUID() throws SQLException {
-// 		ResultSet rs = null;
-// 		try {
-// 			rs = max_uid_st.executeQuery();
-// 			if (rs.next()) {
-// 				BigDecimal max_uid = rs.getBigDecimal(1);
-// 				System.out.println("MAX UID = " + max_uid.longValue());
-// 				return max_uid.longValue();
-// 			} else {
-// 				System.out.println("MAX UID = -1!!!!");
-// 				return -1;
-// 			} // end of else
-// 		} finally {
-// 			release(null, rs);
-// 		}
-// 	}
 
 	private String getPassword(final String user)
 		throws SQLException, UserNotFoundException {
@@ -287,12 +276,23 @@ public class LibreSourceAuth implements UserAuthRepository {
 			boolean login_ok = db_password.equals(enc_passwd);
 			if (login_ok) {
 				updateLastLogin(user);
+				updateOnlineStatus(user, 1);
 			} // end of if (login_ok)
 			return login_ok;
 		} catch (NoSuchAlgorithmException e) {
 			throw
 				new AuthorizationException("Password encoding algorithm is not supported.",
 					e);
+		} catch (SQLException e) {
+			throw new TigaseDBException("Problem accessing repository.", e);
+		} // end of catch
+	}
+
+	public void logout(final String user)
+		throws UserNotFoundException, TigaseDBException {
+		try {
+			checkConnection();
+			updateOnlineStatus(user, 0);
 		} catch (SQLException e) {
 			throw new TigaseDBException("Problem accessing repository.", e);
 		} // end of catch
@@ -335,6 +335,7 @@ public class LibreSourceAuth implements UserAuthRepository {
 				if (login_ok) {
 					String user = (String)props.get(USER_ID_KEY);
 					updateLastLogin(user);
+					updateOnlineStatus(user, 1);
 				} // end of if (login_ok)
 				return login_ok;
 			} // end of if (mech.equals("PLAIN"))

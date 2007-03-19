@@ -441,6 +441,7 @@ public class SessionManager extends AbstractMessageReceiver
 						log.finer("Number of authorized connections: "
 							+ sessionsByNodeId.size());
 					} // end of else
+					auth_repository.logout(userId);
 				} else {
 					log.finer("Number of connections is "
 						+ session.getActiveResourcesSize() + " for the user: " + userId);
@@ -448,6 +449,8 @@ public class SessionManager extends AbstractMessageReceiver
 			} // end of if (session.getActiveResourcesSize() == 0)
 		} catch (NotAuthorizedException e) {
 			log.info("Closed not authorized session: " + e);
+		} catch (Exception e) {
+			log.info("Exception closing session... " + e);
 		}
 		Queue<Packet> results = new LinkedList<Packet>();
 		for (XMPPStopListenerIfc stopProc: stopListeners.values()) {

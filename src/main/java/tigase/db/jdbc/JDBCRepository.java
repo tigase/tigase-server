@@ -862,6 +862,11 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		auth.updatePassword(user, password);
 	}
 
+	public void logout(final String user)
+		throws UserNotFoundException, TigaseDBException {
+		auth.logout(user);
+	}
+
 	/**
 	 * Describe <code>addUser</code> method here.
 	 *

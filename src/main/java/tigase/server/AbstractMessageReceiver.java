@@ -166,8 +166,8 @@ public abstract class AbstractMessageReceiver
   }
 
   public void setMaxQueueSize(int maxQueueSize) {
-		stopThreads();
     if (this.maxQueueSize != maxQueueSize) {
+			stopThreads();
       this.maxQueueSize = maxQueueSize;
       if (in_queue != null) {
 				LinkedBlockingQueue<QueueElement> newQueue =
@@ -181,8 +181,8 @@ public abstract class AbstractMessageReceiver
 				newQueue.addAll(out_queue);
 				out_queue = newQueue;
       } // end of if (queue != null)
+			startThreads();
     } // end of if (this.maxQueueSize != maxQueueSize)
-		startThreads();
   }
 
 //   public void setLocalAddresses(String[] addresses) {
