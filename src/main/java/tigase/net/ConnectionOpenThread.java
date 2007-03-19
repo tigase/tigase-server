@@ -25,15 +25,16 @@ package tigase.net;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
+import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.Iterator;
 import javax.sound.sampled.Port;
 
 /**
@@ -67,8 +68,7 @@ public class ConnectionOpenThread implements Runnable {
 	private ConnectionOpenThread() {
 		try {
 			selector = Selector.open();
-		} // end of try
-		catch (Exception e) {
+		} catch (Exception e) {
 			log.log(Level.SEVERE, "Server I/O error, can't continue my work.", e);
 			stopping = true;
 		} // end of try-catch
@@ -88,6 +88,22 @@ public class ConnectionOpenThread implements Runnable {
 	public void addConnectionOpenListener(ConnectionOpenListener al) {
     waiting.offer(al);
 		selector.wakeup();
+	}
+
+	public void removeConnectionOpenListener(ConnectionOpenListener al) {
+		for (SelectionKey key: selector.keys()) {
+			if (al == key.attachment()) {
+				try {
+					key.cancel();
+					SelectableChannel channel = key.channel();
+					channel.close();
+				} catch (Exception e) {
+					log.log(Level.WARNING,
+						"Exception during removing connection listener.", e);
+				}
+				break;
+			}
+		}
 	}
 
 	private void addPort(ConnectionOpenListener al)

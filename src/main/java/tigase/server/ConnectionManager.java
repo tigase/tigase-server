@@ -27,16 +27,20 @@ import java.net.ConnectException;
 import java.nio.channels.SocketChannel;
 import java.security.SecureRandom;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 import java.util.Timer;
-import java.util.List;
 import java.util.TimerTask;
 import java.util.TreeMap;
-import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import tigase.annotations.TODO;
 import tigase.io.TLSUtil;
 import tigase.net.ConnectionOpenListener;
 import tigase.net.ConnectionOpenThread;
@@ -44,11 +48,10 @@ import tigase.net.ConnectionType;
 import tigase.net.IOService;
 import tigase.net.SocketReadThread;
 import tigase.net.SocketType;
+import tigase.stats.StatRecord;
 import tigase.util.JID;
 import tigase.xmpp.XMPPIOService;
 import tigase.xmpp.XMPPIOServiceListener;
-import tigase.stats.StatRecord;
-import tigase.annotations.TODO;
 
 /**
  * Describe class ConnectionManager here.
@@ -104,10 +107,12 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 	private static ConnectionOpenThread connectThread =
 		ConnectionOpenThread.getInstance();
 	private static SocketReadThread readThread = SocketReadThread.getInstance();
-	private static Timer delayedTasks = new Timer("DelayedTasks", true);
+	private Timer delayedTasks = null;
 	private Thread watchdog = null;
 	private Map<String, IOService> services =
 		new ConcurrentSkipListMap<String, IOService>();
+	private Set<ConnectionListenerImpl> pending_open =
+		Collections.synchronizedSet(new HashSet<ConnectionListenerImpl>());;
 	protected long connectionDelay = 2000;
 
 	public void setName(String name) {
@@ -127,35 +132,42 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 		props.put(TLS_TRUSTS_STORE_PASSWD_PROP_KEY, TLS_TRUSTS_STORE_PASSWD_PROP_VAL);
 
 		int ports_size = 0;
-		int[] ports = null;
-		int[] plains = getDefPlainPorts();
-		if (plains != null) {
-			ports_size += plains.length;
-		} // end of if (plains != null)
-		int[] ssls = getDefSSLPorts();
-		if (ssls != null) {
-			ports_size += ssls.length;
-		} // end of if (ssls != null)
-		if (ports_size > 0) {
-			ports = new int[ports_size];
-		} // end of if (ports_size > 0)
+		int[] ports = (int[])params.get(getName() + "/" + PORTS_PROP_KEY);
 		if (ports != null) {
-			int idx = 0;
-			if (plains != null) {
-				idx = plains.length;
-				for (int i = 0; i < idx; i++) {
-					ports[i] = plains[i];
-					putDefPortParams(props, ports[i], SocketType.plain);
-				} // end of for (int i = 0; i < idx; i++)
-			} // end of if (plains != null)
-			if (ssls != null) {
-				for (int i = idx; i < idx + ssls.length; i++) {
-					ports[i] = ssls[i-idx];
-					putDefPortParams(props, ports[i], SocketType.ssl);
-				} // end of for (int i = 0; i < idx + ssls.length; i++)
-			} // end of if (ssls != null)
+			for (int port: ports) {
+				putDefPortParams(props, port, SocketType.plain);
+			} // end of for (int i = 0; i < idx; i++)
 			props.put(PORTS_PROP_KEY, ports);
-		} // end of if (ports != null)
+		} else {
+			int[] plains = getDefPlainPorts();
+			if (plains != null) {
+				ports_size += plains.length;
+			} // end of if (plains != null)
+			int[] ssls = getDefSSLPorts();
+			if (ssls != null) {
+				ports_size += ssls.length;
+			} // end of if (ssls != null)
+			if (ports_size > 0) {
+				ports = new int[ports_size];
+			} // end of if (ports_size > 0)
+			if (ports != null) {
+				int idx = 0;
+				if (plains != null) {
+					idx = plains.length;
+					for (int i = 0; i < idx; i++) {
+						ports[i] = plains[i];
+						putDefPortParams(props, ports[i], SocketType.plain);
+					} // end of for (int i = 0; i < idx; i++)
+				} // end of if (plains != null)
+				if (ssls != null) {
+					for (int i = idx; i < idx + ssls.length; i++) {
+						ports[i] = ssls[i-idx];
+						putDefPortParams(props, ports[i], SocketType.ssl);
+					} // end of for (int i = 0; i < idx + ssls.length; i++)
+				} // end of if (ssls != null)
+				props.put(PORTS_PROP_KEY, ports);
+			} // end of if (ports != null)
+		}
 		return props;
 	}
 
@@ -177,8 +189,27 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 		} // end of if (extra != null)
 	}
 
+	private void releaseListeners() {
+		for (ConnectionListenerImpl cli: pending_open) {
+			connectThread.removeConnectionOpenListener(cli);
+		}
+		pending_open.clear();
+	}
+
+	public void release() {
+		delayedTasks.cancel();
+		releaseListeners();
+		super.release();
+	}
+
+	public void start() {
+		super.start();
+		delayedTasks = new Timer("DelayedTasks", true);
+	}
+
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
+		releaseListeners();
 		int[] ports = (int[])props.get(PORTS_PROP_KEY);
 		if (ports != null) {
 			for (int i = 0; i < ports.length; i++) {
@@ -208,6 +239,9 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 
 	protected void startService(Map<String, Object> port_props) {
 		ConnectionListenerImpl cli = new ConnectionListenerImpl(port_props);
+		if (cli.getConnectionType() == ConnectionType.accept) {
+			pending_open.add(cli);
+		}
 		connectThread.addConnectionOpenListener(cli);
 	}
 
@@ -398,8 +432,14 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 		}
 
 		public ConnectionType getConnectionType() {
-			return
-				ConnectionType.valueOf(port_props.get(PORT_TYPE_PROP_KEY).toString());
+			String type = null;
+			if (port_props.get(PORT_TYPE_PROP_KEY) == null) {
+				log.warning(getName() + ": connection type is null: "
+					+ port_props.get(PORT_KEY).toString());
+			} else {
+				type = port_props.get(PORT_TYPE_PROP_KEY).toString();
+			}
+			return ConnectionType.valueOf(type);
 		}
 
 		public SocketType getSocketType() {

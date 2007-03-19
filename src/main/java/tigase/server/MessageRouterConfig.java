@@ -130,24 +130,33 @@ public class MessageRouterConfig {
 	public static final boolean SERVICE_1_ACTIVE_PROP_VAL = true;
 
 	public static void getDefaults(Map<String, Object> defs,
-		Map<String, Object> params) {
+		Map<String, Object> params, String comp_name) {
 
 		String config_type = (String)params.get("config-type");
 		String[] rcv_names = DEF_MSG_RECEIVERS_NAMES_PROP_VAL;
-		if (config_type.equals("--gen-config-all")) {
-			rcv_names = ALL_MSG_RECEIVERS_NAMES_PROP_VAL;
-		}
-		if (config_type.equals("--gen-config-sm")) {
-			rcv_names = SM_MSG_RECEIVERS_NAMES_PROP_VAL;
-		}
-		if (config_type.equals("--gen-config-cs")) {
-			rcv_names = CS_MSG_RECEIVERS_NAMES_PROP_VAL;
+		Object par_names =
+			params.get(comp_name + "/" + MSG_RECEIVERS_NAMES_PROP_KEY);
+		if (par_names != null) {
+			rcv_names = (String[])par_names;
+		} else {
+			if (config_type.equals("--gen-config-all")) {
+				rcv_names = ALL_MSG_RECEIVERS_NAMES_PROP_VAL;
+			}
+			if (config_type.equals("--gen-config-sm")) {
+				rcv_names = SM_MSG_RECEIVERS_NAMES_PROP_VAL;
+			}
+			if (config_type.equals("--gen-config-cs")) {
+				rcv_names = CS_MSG_RECEIVERS_NAMES_PROP_VAL;
+			}
 		}
 
 		defs.put(MSG_RECEIVERS_NAMES_PROP_KEY, rcv_names);
 		for (String name: rcv_names) {
-			defs.put(MSG_RECEIVERS_PROP_KEY + name + ".class",
-				MSG_RCV_CLASSES.get(name));
+			String def_class = MSG_RCV_CLASSES.get(name);
+			if (def_class == null) {
+				def_class = "tigase.server.xmppcomponent.ComponentConnectionManager";
+			}
+			defs.put(MSG_RECEIVERS_PROP_KEY + name + ".class", def_class);
 			defs.put(MSG_RECEIVERS_PROP_KEY + name + ".active", true);
 		}
 // 		defs.put(CLIENT_1_CLASS_PROP_KEY, CLIENT_1_CLASS_PROP_VAL);
@@ -196,9 +205,10 @@ public class MessageRouterConfig {
 		log.config(Arrays.toString(names));
 		ArrayList<String> al = new ArrayList<String>();
 		for (String name: names) {
-			if ((Boolean)props.get(MSG_RECEIVERS_PROP_KEY + name + ".active")) {
+			if (props.get(MSG_RECEIVERS_PROP_KEY + name + ".active") != null
+				&& (Boolean)props.get(MSG_RECEIVERS_PROP_KEY + name + ".active")) {
 				al.add(name);
-			} // end of if ((Boolean)props.get())
+			}
 		} // end of for (String name: names)
 		return al.toArray(new String[al.size()]);
 	}

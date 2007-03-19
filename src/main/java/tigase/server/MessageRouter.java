@@ -237,6 +237,8 @@ public class MessageRouter extends AbstractMessageReceiver
     log.info("Adding component: " + component.getClass().getSimpleName());
     for (ComponentRegistrator registr : registrators.values()) {
       if (registr != component) {
+				log.finer("Adding: " + component.getName() + " component to "
+					+ registr.getName() + " registrator.");
 				registr.addComponent(component);
       } // end of if (reg != component)
     } // end of for ()
@@ -245,7 +247,7 @@ public class MessageRouter extends AbstractMessageReceiver
 
   public Map<String, Object> getDefaults(Map<String, Object> params) {
     Map<String, Object> defs = super.getDefaults(params);
-    MessageRouterConfig.getDefaults(defs, params);
+    MessageRouterConfig.getDefaults(defs, params, getName());
     return defs;
   }
 
@@ -281,8 +283,13 @@ public class MessageRouter extends AbstractMessageReceiver
       String[] reg_names = conf.getRegistrNames();
       for (String name: reg_names) {
 				ComponentRegistrator cr = tmp_reg.remove(name);
+				String cls_name =
+					(String)props.get(REGISTRATOR_PROP_KEY + name + ".class");
 				try {
-					if (cr == null) {
+					if (cr == null || !cr.getClass().getName().equals(cls_name)) {
+						if (cr != null) {
+							cr.release();
+						}
 						cr = conf.getRegistrInstance(name);
 						cr.setName(name);
 					} // end of if (cr == null)
@@ -299,12 +306,19 @@ public class MessageRouter extends AbstractMessageReceiver
 
       String[] msgrcv_names = conf.getMsgRcvNames();
       for (String name: msgrcv_names) {
+				log.finer("Loading and registering message receiver: " + name);
 				MessageReceiver mr = tmp_rec.remove(name);
+				String cls_name =
+					(String)props.get(MSG_RECEIVERS_PROP_KEY + name + ".class");
 				try {
-					if (mr == null) {
+					if (mr == null || !mr.getClass().getName().equals(cls_name)) {
+						if (mr != null) {
+							mr.release();
+						}
 						mr = conf.getMsgRcvInstance(name);
 						mr.setParent(this);
 						mr.setName(name);
+						mr.start();
 					} // end of if (cr == null)
 					addRouter(mr);
 				} // end of try
@@ -316,9 +330,6 @@ public class MessageRouter extends AbstractMessageReceiver
 				mr.release();
 			} // end of for ()
 			tmp_rec.clear();
-			for (MessageReceiver mr: receivers.values()) {
-				mr.start();
-			} // end of for (MessageReceiver mr: receivers)
     } finally {
       inProperties = false;
     } // end of try-finally

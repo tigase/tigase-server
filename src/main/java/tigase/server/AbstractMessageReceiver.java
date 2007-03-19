@@ -93,16 +93,6 @@ public abstract class AbstractMessageReceiver
    */
   private long statAddedMessagesEr = 0;
 
-//   /**
-//    * Method <code>localAddresses</code> returns array of Strings.
-//    * Each String should be a regular expression
-//    * defining destination addresses for which this receiver can process
-//    * messages. There can be more than one message receiver for each messages.
-//    *
-//    * @return a <code>String</code> value
-//    */
-//   public String[] getLocalAddresses() { return localAddresses; }
-
   /**
    * Describe <code>addMessage</code> method here.
    *
@@ -132,9 +122,6 @@ public abstract class AbstractMessageReceiver
 				"Adding packet to inQueue: " + packet.getStringData());
 			in_queue.put(new QueueElement(QueueElementType.IN_QUEUE, packet));
 			++statAddedMessagesOk;
-// 			synchronized (sync) {
-// 				sync.notifyAll();
-// 			}
 		} // end of try
 		catch (InterruptedException e) {
 			++statAddedMessagesEr;
@@ -149,9 +136,6 @@ public abstract class AbstractMessageReceiver
 				"Adding packet to outQueue: " + packet.getStringData());
 			out_queue.put(new QueueElement(QueueElementType.OUT_QUEUE, packet));
 			++statAddedMessagesOk;
-// 			synchronized (sync) {
-// 				sync.notifyAll();
-// 			}
 		} // end of try
 		catch (InterruptedException e) {
 			++statAddedMessagesEr;
@@ -161,8 +145,6 @@ public abstract class AbstractMessageReceiver
 	}
 
   public abstract void processPacket(Packet packet);
-
-	//   public int queueSize() { return inQueue.size(); }
 
   public List<StatRecord> getStatistics() {
     List<StatRecord> stats = new ArrayList<StatRecord>();
@@ -184,6 +166,7 @@ public abstract class AbstractMessageReceiver
   }
 
   public void setMaxQueueSize(int maxQueueSize) {
+		stopThreads();
     if (this.maxQueueSize != maxQueueSize) {
       this.maxQueueSize = maxQueueSize;
       if (in_queue != null) {
@@ -199,6 +182,7 @@ public abstract class AbstractMessageReceiver
 				out_queue = newQueue;
       } // end of if (queue != null)
     } // end of if (this.maxQueueSize != maxQueueSize)
+		startThreads();
   }
 
 //   public void setLocalAddresses(String[] addresses) {
@@ -231,7 +215,27 @@ public abstract class AbstractMessageReceiver
     return name;
   }
 
-  public void start() {
+	private void stopThreads() {
+    stopped = true;
+		try {
+			if (in_thread != null) {
+				in_thread.interrupt();
+				while (in_thread.isAlive()) {
+					Thread.sleep(100);
+				}
+			}
+			if (out_thread != null) {
+				out_thread.interrupt();
+				while (out_thread.isAlive()) {
+					Thread.sleep(100);
+				}
+			}
+		} catch (InterruptedException e) {}
+		in_thread = null;
+		out_thread = null;
+	}
+
+	private void startThreads() {
 		if (in_thread == null || ! in_thread.isAlive()) {
 			stopped = false;
 			in_thread = new Thread(new QueueListener(in_queue));
@@ -244,12 +248,16 @@ public abstract class AbstractMessageReceiver
 			out_thread.setName("out_" + name);
 			out_thread.start();
 		} // end of if (thread == null || ! thread.isAlive())
+	}
+
+	public void start() {
+		log.finer(getName() + ": starting queue management threads ...");
+		startThreads();
   }
 
   public void stop() {
-    stopped = true;
-		in_queue.notifyAll();
-		out_queue.notifyAll();
+		log.finer(getName() + ": stopping queue management threads ...");
+		stopThreads();
   }
 
 	public String getDefHostName() {

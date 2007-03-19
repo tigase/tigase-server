@@ -332,10 +332,10 @@ public class ComponentConnectionManager extends ConnectionManager
 	}
 
 	public Element getDiscoInfo(String node, String jid) {
-		if (node == null && jid != null && isInRoutings(jid)) {
-			Element query = serviceEntity.getDiscoInfo(node);
-			return query;
-		}
+// 		if (node == null && jid != null && isInRoutings(jid)) {
+// 			Element query = serviceEntity.getDiscoInfo(node);
+// 			return query;
+// 		}
 		return null;
 	}
 

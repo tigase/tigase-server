@@ -121,6 +121,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 	public Configurator(String fileName, String[] args) {
 		parseArgs(args);
 		repository = ConfigRepository.getConfigRepository(fileName);
+		defConfigParams.putAll(getAllProperties(null));
 	}
 
 	public boolean isCorrectType(ServerComponent component) {
@@ -128,6 +129,8 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 	}
 
 	public void componentAdded(Configurable component) {
+		System.out.println(" component: " + component.getName());
+		log.finer(" component: " + component.getName());
 		ServiceEntity item = config_list.findNode(component.getName());
 		if (item == null) {
 			item = new ServiceEntity(getName(), component.getName(),
@@ -285,7 +288,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 			;
 	}
 
-	public boolean setValue(String node_key, String value,
+	public Object setValue(String node_key, String value,
 		boolean add, boolean feedback) throws Exception {
 		int root_idx = node_key.indexOf('/');
 		String root = node_key.substring(0, root_idx);
@@ -369,7 +372,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 			} // end of switch (type)
 			repository.set(root, subnode, key, new_val);
 			repository.sync();
-			return true;
+			return new_val;
 		} else {
 			if (force) {
 				repository.set(root, subnode, key, value);
@@ -377,14 +380,14 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 				if (feedback) {
 					System.out.println("Forced to set new key=value: " + key + "=" + value);
 				}
-				return true;
+				return value;
 			} else {
 				if (feedback) {
 					System.out.println("Error, given key does not exist in config yet.");
 					System.out.println("You can only modify existing values, you can add new.");
 					System.out.println("Use '-f' switch to force creation of the new property.");
 				}
-				return false;
+				return null;
 			} // end of if (force) else
 		} // end of else
 	}
@@ -472,7 +475,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 	private static boolean set = false;
 	private static boolean add = false;
 	private static boolean print = false;
-	private static boolean force = false;
+	private static boolean force = true;
 
 	/**
 	 * Describe <code>main</code> method here.
@@ -481,7 +484,9 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 	 */
 	public static void main(final String[] args) throws Exception {
 
-    if (args != null && args.length > 0) {
+		force = false;
+
+		if (args != null && args.length > 0) {
       for (int i = 0; i < args.length; i++) {
         if (args[i].equals("-h")) {
           System.out.print(help());
@@ -609,7 +614,8 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 							}
 							if (new_val != null && old_val != null
 								&& !new_val.equals(old_val)) {
-								setPropertyValue(entry.getKey(), new_val, result, admin);
+								defConfigParams.put(entry.getKey(),
+									setPropertyValue(entry.getKey(), new_val, result, admin));
 								changed = true;
 							}
 						} // end of for (Map.Entry entry: prop.entrySet())
@@ -633,25 +639,26 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 		}
 	}
 
-	public void setPropertyValue(String key, String val, Packet result,
+	public Object setPropertyValue(String key, String val, Packet result_pack,
 		boolean admin) {
+		Object result = null;
 		try {
-			boolean res = true;
 			if (admin) {
-				res = setValue(key, val, false, true);
+				result = setValue(key, val, false, false);
 			}
-			if (res) {
-				Command.addFieldValue(result, XMLUtils.escape(key),
+			if (result != null) {
+				Command.addFieldValue(result_pack, XMLUtils.escape(key),
 					XMLUtils.escape(val));
 			} else {
-				Command.addFieldValue(result, "Note",
+				Command.addFieldValue(result_pack, "Note",
 					"You can not set new properties yet, you can just modify existing ones.",
 					"fixed");
 			}
 		} catch (Exception e) {
-			Command.addFieldValue(result, "Note",
+			Command.addFieldValue(result_pack, "Note",
 				"Error setting property: " + e, "fixed");
 		}
+		return result;
 	}
 
 	public Element getDiscoInfo(String node, String jid) {

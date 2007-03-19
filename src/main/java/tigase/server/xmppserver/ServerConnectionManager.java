@@ -626,11 +626,11 @@ public class ServerConnectionManager extends ConnectionManager {
 
 	private void generateStreamError(String error_el, XMPPIOService serv) {
 		Element error = new Element("stream:error",
-				new Element[] {
-					new Element(error_el,
-						new String[] {"xmlns"},
-						new String[] {"urn:ietf:params:xml:ns:xmpp-streams"})
-				}, null, null);
+			new Element[] {
+				new Element(error_el,
+					new String[] {"xmlns"},
+					new String[] {"urn:ietf:params:xml:ns:xmpp-streams"})
+			}, null, null);
 		try {
 			serv.writeRawData(error.toString());
 			serv.writeRawData("</stream:stream>");
