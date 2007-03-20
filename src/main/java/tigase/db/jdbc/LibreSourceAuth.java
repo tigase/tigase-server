@@ -84,9 +84,11 @@ public class LibreSourceAuth implements UserAuthRepository {
 	private Connection conn = null;
 	private PreparedStatement pass_st = null;
 	private PreparedStatement status_st = null;
-	private PreparedStatement user_add_st = null;
+// 	private PreparedStatement user_add_st = null;
+// 	private PreparedStatement user_del_st = null;
 	private PreparedStatement max_uid_st = null;
 	private PreparedStatement conn_valid_st = null;
+	private PreparedStatement update_password = null;
 	private PreparedStatement update_last_login_st = null;
 	private PreparedStatement update_online_status = null;
 
@@ -102,14 +104,19 @@ public class LibreSourceAuth implements UserAuthRepository {
 			+ " where id_ = ?;";
 		status_st = conn.prepareStatement(query);
 
-		query = "insert into " + users_tbl
-			+ " (username_, passworddigest_)"
-			+ " values (?, ?);";
-		user_add_st = conn.prepareStatement(query);
+// 		query = "insert into " + users_tbl
+// 			+ " (username_, passworddigest_)"
+// 			+ " values (?, ?);";
+// 		user_add_st = conn.prepareStatement(query);
+
+// 		query = "delete from " + users_tbl + " where username_ = ?;";
+// 		user_del_st = conn.prepareStatement(query);
 
 		query = "select count(*) from " + users_tbl;
 		conn_valid_st = conn.prepareStatement(query);
 
+		query = "update " + users_tbl + " set passworddigest_ = ? where username_ = ?;";
+		update_password = conn.prepareStatement(query);
 		query = "update " + profiles_tbl + " set lastlogintime_ = ? where id_ = ?;";
 		update_last_login_st = conn.prepareStatement(query);
 		query = "update " + profiles_tbl + " set onlinestatus_ = ? where id_ = ?;";
@@ -184,7 +191,6 @@ public class LibreSourceAuth implements UserAuthRepository {
 		throws SQLException, UserNotFoundException {
 		ResultSet rs = null;
 		try {
-			checkConnection();
 			pass_st.setString(1, JID.getNodeNick(user));
 			rs = pass_st.executeQuery();
 			if (rs.next()) {
@@ -354,12 +360,19 @@ public class LibreSourceAuth implements UserAuthRepository {
 	 */
 	public void addUser(final String user, final String password)
 		throws UserExistsException, TigaseDBException {
-		ResultSet rs = null;
+		Statement stmt = null;
 		try {
 			checkConnection();
-			user_add_st.setString(2, JID.getNodeNick(user));
-			user_add_st.setString(3, ls_digest(password));
-			user_add_st.executeUpdate();
+			stmt = conn.createStatement();
+			String query = "insert into " + users_tbl
+				+ " (username_, passworddigest_)"
+				+ " values ('" + JID.getNodeNick(user)
+				+ "', '" + ls_digest(password) + "');";
+			stmt.executeUpdate(query);
+			query = "insert into " + profiles_tbl
+				+ " (id_, accountstatus_)"
+				+ " values ('" + JID.getNodeNick(user) + "', 0);";
+			stmt.executeUpdate(query);
 		} catch (NoSuchAlgorithmException e) {
 			throw
 				new TigaseDBException("Password encoding algorithm is not supported.",
@@ -367,7 +380,8 @@ public class LibreSourceAuth implements UserAuthRepository {
 		} catch (SQLException e) {
 			throw new UserExistsException("Error while adding user to repository, user exists?", e);
 		} finally {
-			release(null, rs);
+			release(stmt, null);
+			stmt = null;
 		}
 	}
 
@@ -381,7 +395,14 @@ public class LibreSourceAuth implements UserAuthRepository {
 	 */
 	public void updatePassword(final String user, final String password)
 		throws UserExistsException, TigaseDBException {
-		throw new TigaseDBException("Updatin user password is not supported.");
+		try {
+			checkConnection();
+			update_password.setString(1, password);
+			update_password.setString(2, JID.getNodeNick(user));
+			update_password.executeUpdate();
+		} catch (SQLException e) {
+			throw new TigaseDBException("Error accessin repository.", e);
+		} // end of try-catch
 	}
 
 	/**
@@ -393,7 +414,22 @@ public class LibreSourceAuth implements UserAuthRepository {
 	 */
 	public void removeUser(final String user)
 		throws UserNotFoundException, TigaseDBException {
-		throw new TigaseDBException("Removing user is not supported.");
+		Statement stmt = null;
+		try {
+			checkConnection();
+			stmt = conn.createStatement();
+			String query = "delete from " + users_tbl
+				+ " where (username_ = '" + JID.getNodeNick(user)	+ "');";
+			stmt.executeUpdate(query);
+			query = "delete from " + profiles_tbl
+				+ " where (id_ = '" + JID.getNodeNick(user)	+ "');";
+			stmt.executeUpdate(query);
+		} catch (SQLException e) {
+			throw new UserExistsException("Error while adding user to repository, user exists?", e);
+		} finally {
+			release(stmt, null);
+			stmt = null;
+		}
 	}
 
 	private boolean saslAuth(final Map<String, Object> props)
