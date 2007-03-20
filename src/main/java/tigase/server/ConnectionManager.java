@@ -462,9 +462,9 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 			} catch (ConnectException e) {
 				// Accept side for component service is not ready yet?
 				// Let's wait for a few secs and try again.
-				Long reconnects = (Long)port_props.get(MAX_RECONNECTS_PROP_KEY);
+				Integer reconnects = (Integer)port_props.get(MAX_RECONNECTS_PROP_KEY);
 				if (reconnects != null) {
-					long recon = reconnects.longValue();
+					int recon = reconnects.intValue();
 					if (recon != 0) {
 						port_props.put(MAX_RECONNECTS_PROP_KEY, (--recon));
 						reconnectService(port_props, connectionDelay);
