@@ -112,7 +112,7 @@ public class LibreSourceAuth implements UserAuthRepository {
 // 		query = "delete from " + users_tbl + " where username_ = ?;";
 // 		user_del_st = conn.prepareStatement(query);
 
-		query = "select count(*) from " + users_tbl;
+		query = "select localtime;";
 		conn_valid_st = conn.prepareStatement(query);
 
 		query = "update " + users_tbl + " set passworddigest_ = ? where username_ = ?;";
