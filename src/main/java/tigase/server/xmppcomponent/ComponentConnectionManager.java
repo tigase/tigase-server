@@ -72,10 +72,13 @@ public class ComponentConnectionManager extends ConnectionManager
 	public static boolean PACK_ROUTED_VAL = false;
 	public static final String RETURN_SERVICE_DISCO_KEY = "service-disco";
 	public static final boolean RETURN_SERVICE_DISCO_VAL = true;
+	public static final String IDENTITY_TYPE_KEY = "identity-type";
+	public static final String IDENTITY_TYPE_VAL = "generic";
 
 	private ServiceEntity serviceEntity = null;
-	private boolean pack_routed = false;
-	private boolean service_disco = true;
+	private boolean pack_routed = PACK_ROUTED_VAL;
+	private boolean service_disco = RETURN_SERVICE_DISCO_VAL;
+	private String identity_type = IDENTITY_TYPE_VAL;
 	private String remote_host = null;
 
   /**
@@ -121,6 +124,9 @@ public class ComponentConnectionManager extends ConnectionManager
 				String addr =
 					(String)serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
 				addRouting(addr);
+				serviceEntity = new ServiceEntity(getName(), "external", "XEP-0114");
+				serviceEntity.addIdentities(new ServiceIdentity[] {
+						new ServiceIdentity("component", identity_type, addr)});
 			} else {
 				log.warning("Incorrect packet received: " + p.getStringData());
 			}
@@ -137,7 +143,11 @@ public class ComponentConnectionManager extends ConnectionManager
 				if (digest != null && digest.equals(loc_digest)) {
 					Packet resp = new Packet(new Element("handshake"));
 					writePacketToSocket(serv, resp);
-					addRouting((String)serv.getSessionData().get(serv.HOSTNAME_KEY));
+					String addr = (String)serv.getSessionData().get(serv.HOSTNAME_KEY);
+					addRouting(addr);
+					serviceEntity = new ServiceEntity(getName(), "external", "XEP-0114");
+					serviceEntity.addIdentities(new ServiceIdentity[] {
+							new ServiceIdentity("component", identity_type, addr)});
 				} else {
 					serv.stop();
 				}
@@ -202,6 +212,7 @@ public class ComponentConnectionManager extends ConnectionManager
 		Map<String, Object> props = super.getDefaults(params);
 		props.put(PACK_ROUTED_KEY, PACK_ROUTED_VAL);
 		props.put(RETURN_SERVICE_DISCO_KEY, RETURN_SERVICE_DISCO_VAL);
+		props.put(IDENTITY_TYPE_KEY, IDENTITY_TYPE_VAL);
 		return props;
 	}
 
@@ -209,6 +220,11 @@ public class ComponentConnectionManager extends ConnectionManager
 		super.setProperties(props);
 		pack_routed = (Boolean)props.get(PACK_ROUTED_KEY);
 		service_disco = (Boolean)props.get(RETURN_SERVICE_DISCO_KEY);
+		identity_type = (String)props.get(IDENTITY_TYPE_KEY);
+
+		serviceEntity = new ServiceEntity(getName(), "external", "XEP-0114");
+		serviceEntity.addIdentities(new ServiceIdentity[] {
+				new ServiceIdentity("component", identity_type, "disconnected")});
 	}
 
 	protected int[] getDefPlainPorts() {
@@ -244,6 +260,9 @@ public class ComponentConnectionManager extends ConnectionManager
 			reconnectService(sessionData, connectionDelay);
 		} // end of if (type == ConnectionType.connect)
 		//		removeRouting(serv.getRemoteHost());
+		serviceEntity = new ServiceEntity(getName(), "external", "XEP-0114");
+		serviceEntity.addIdentities(new ServiceIdentity[] {
+				new ServiceIdentity("component", identity_type, "disconnected")});
 	}
 
 	protected String getServiceId(Packet packet) {
@@ -331,13 +350,6 @@ public class ComponentConnectionManager extends ConnectionManager
 	 */
 	protected long getMaxInactiveTime() {
 		return 1000*24*HOUR;
-	}
-
-	public void setName(String name) {
-		super.setName(name);
-		serviceEntity = new ServiceEntity(name, "external", "XEP-0114");
-		serviceEntity.addIdentities(new ServiceIdentity[] {
-				new ServiceIdentity("component", "ext", "Noname")});
 	}
 
 	public Element getDiscoInfo(String node, String jid) {
