@@ -265,19 +265,21 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 	public Map<String, Object> getAllProperties(String key) {
 		Map<String, Object> result = new HashMap<String, Object>();
 		String[] comps = getComponents();
-		for (String comp: comps) {
-			Map<String, Object> prop = getProperties(comp);
-			for (Map.Entry<String, Object> entry: prop.entrySet()) {
-				String entry_key = comp + "/" + entry.getKey();
-				if (key == null) {
-					result.put(entry_key, entry.getValue());
-				} else {
-					if (entry_key.startsWith(key)) {
+		if (comps != null) {
+			for (String comp: comps) {
+				Map<String, Object> prop = getProperties(comp);
+				for (Map.Entry<String, Object> entry: prop.entrySet()) {
+					String entry_key = comp + "/" + entry.getKey();
+					if (key == null) {
 						result.put(entry_key, entry.getValue());
-					} // end of if (entry_key.startsWith(key))
-				} // end of if (key == null) else
-			} // end of for (Map.Entry entry: prop.entrySet())
-		} // end of for (String comp: comps)
+					} else {
+						if (entry_key.startsWith(key)) {
+							result.put(entry_key, entry.getValue());
+						} // end of if (entry_key.startsWith(key))
+					} // end of if (key == null) else
+				} // end of for (Map.Entry entry: prop.entrySet())
+			} // end of for (String comp: comps)
+		}
 		return result;
 	}
 
