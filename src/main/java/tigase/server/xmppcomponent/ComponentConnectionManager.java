@@ -25,6 +25,7 @@
 package tigase.server.xmppcomponent;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.List;
 import java.util.Queue;
@@ -41,6 +42,7 @@ import tigase.server.MessageReceiver;
 import tigase.server.Packet;
 import tigase.disco.XMPPService;
 import tigase.disco.ServiceEntity;
+import tigase.disco.ServiceIdentity;
 import tigase.util.Algorithms;
 import tigase.util.JID;
 import tigase.xml.Element;
@@ -331,15 +333,24 @@ public class ComponentConnectionManager extends ConnectionManager
 		return 1000*24*HOUR;
 	}
 
+	public void setName(String name) {
+		super.setName(name);
+		serviceEntity = new ServiceEntity(name, "external", "XEP-0114");
+		serviceEntity.addIdentities(new ServiceIdentity[] {
+				new ServiceIdentity("component", "ext", "Noname")});
+	}
+
 	public Element getDiscoInfo(String node, String jid) {
-// 		if (node == null && jid != null && isInRoutings(jid)) {
-// 			Element query = serviceEntity.getDiscoInfo(node);
-// 			return query;
-// 		}
+		if (jid != null && jid.startsWith(getName()+".")) {
+			return serviceEntity.getDiscoInfo(node);
+		}
 		return null;
 	}
 
 	public List<Element> getDiscoItems(String node, String jid) {
+		if (node == null) {
+			return Arrays.asList(serviceEntity.getDiscoItem(null, getName() + "." + jid));
+		}
 		return null;
 	}
 
