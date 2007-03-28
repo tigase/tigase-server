@@ -138,6 +138,14 @@ public class Packet {
 		return cmd;
 	}
 
+	public boolean isXMLNS(String elementPath, String xmlns) {
+		String this_xmlns = elem.getXMLNS(elementPath);
+		if (this_xmlns != null && this_xmlns.equals(xmlns)) {
+			return true;
+		}
+		return false;
+	}
+
 	public String getTo() {
 		return to != null ? to : getElemTo();
 	}
@@ -160,6 +168,10 @@ public class Packet {
   public String getElemTo() {
     return elem.getAttribute("to");
   }
+
+	public String getAttribute(String path, String attr_name) {
+		return elem.getAttribute(path, attr_name);
+	}
 
   /**
    * Returns packet source address.

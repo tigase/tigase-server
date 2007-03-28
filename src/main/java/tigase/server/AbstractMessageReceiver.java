@@ -290,7 +290,7 @@ public abstract class AbstractMessageReceiver
 		return routings.contains(host);
 	}
 
-	public void processCommand(final Packet packet, final Queue<Packet> results)
+	public void processPacket(final Packet packet, final Queue<Packet> results)
 	{}
 
 	private enum QueueElementType { IN_QUEUE, OUT_QUEUE }

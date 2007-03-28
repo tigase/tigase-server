@@ -56,6 +56,7 @@ import tigase.server.MessageReceiver;
 import tigase.server.Packet;
 import tigase.server.Command;
 import tigase.server.Permissions;
+import tigase.server.MessageRouter;
 import tigase.disco.XMPPService;
 import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
@@ -121,10 +122,9 @@ public class SessionManager extends AbstractMessageReceiver
 
 	public void setName(String name) {
 		super.setName(name);
-		serviceEntity = new ServiceEntity(name, "server", "Session manager");
-		serviceEntity.addIdentities(new ServiceIdentity[] {
-				new ServiceIdentity("server", "im", tigase.server.XMPPServer.NAME +
-					" ver. " + tigase.server.XMPPServer.getImplementationVersion())});
+		serviceEntity = new ServiceEntity(name, "sm", "Session manager");
+		serviceEntity.addIdentities(
+			new ServiceIdentity("component", "sm", "Session manager"));
 	}
 
 	private void debug_packet(String msg, Packet packet, String to) {
@@ -321,7 +321,12 @@ public class SessionManager extends AbstractMessageReceiver
 		} // end of if (children != null)
 	}
 
-	public void processCommand(final Packet pc,	final Queue<Packet> results) {
+	public void processPacket(final Packet pc, final Queue<Packet> results) {
+
+		if (!pc.isCommand()) {
+			return;
+		}
+
 		log.finest("Command received: " + pc.getStringData());
 		XMPPResourceConnection connection = null;
 		switch (pc.getCommand()) {
@@ -593,7 +598,7 @@ public class SessionManager extends AbstractMessageReceiver
 	}
 
 	public Element getDiscoInfo(String node, String jid) {
-		if (node == null && jid != null && isInRoutings(jid)) {
+		if (jid != null && jid.startsWith(getName()+".")) {
 			Element query = serviceEntity.getDiscoInfo(node);
 			List<Element> results = new LinkedList<Element>();
 			for (XMPPProcessorIfc proc: processors.values()) {
@@ -608,6 +613,13 @@ public class SessionManager extends AbstractMessageReceiver
 	}
 
 	public List<Element> getDiscoItems(String node, String jid) {
+		if (node == null && MessageRouter.isLocalDomain(jid)) {
+			return
+				Arrays.asList(serviceEntity.getDiscoItem(null, getName() + "." + jid));
+		}
+		if (jid != null && jid.startsWith(getName()+".")) {
+			return serviceEntity.getDiscoItems(node, jid);
+		}
 		return null;
 	}
 

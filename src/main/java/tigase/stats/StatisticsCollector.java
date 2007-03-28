@@ -36,6 +36,7 @@ import java.util.logging.Level;
 import tigase.server.AbstractComponentRegistrator;
 import tigase.server.Packet;
 import tigase.server.ServerComponent;
+import tigase.server.MessageRouter;
 import tigase.disco.XMPPService;
 import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
@@ -64,9 +65,11 @@ public class StatisticsCollector
 	public void setName(String name) {
 		super.setName(name);
 		serviceEntity = new ServiceEntity(name, "stats", "Server statistics");
-		serviceEntity.addIdentities(new ServiceIdentity[] {
-				new ServiceIdentity("automation", "command-list",
-					"Statistics retrieving commands")});
+		serviceEntity.addIdentities(
+			new ServiceIdentity("component", "stats",	"Server statistics"),
+			new ServiceIdentity("automation", "command-node",	"All statistics"),
+			new ServiceIdentity("automation", "command-list",
+				"Statistics retrieving commands"));
 		serviceEntity.addFeatures(DEF_FEATURES);
 		serviceEntity.addFeatures(CMD_FEATURES);
 	}
@@ -77,10 +80,9 @@ public class StatisticsCollector
 			item = new ServiceEntity(getName(), component.getName(),
 				"Component: " + component.getName());
 			item.addFeatures(CMD_FEATURES);
-			item.addIdentities(new ServiceIdentity[] {
-					new ServiceIdentity("automation", "command-list",
-						"Component: " + component.getName())});
-			serviceEntity.addItems(new ServiceEntity[] {item});
+			item.addIdentities(new ServiceIdentity("automation", "command-node",
+						"Component: " + component.getName()));
+			serviceEntity.addItems(item);
 		}
 	}
 
@@ -98,7 +100,12 @@ public class StatisticsCollector
 		return result;
 	}
 
-	public void processCommand(final Packet packet, final Queue<Packet> results) {
+	public void processPacket(final Packet packet, final Queue<Packet> results) {
+
+		if (!packet.isCommand()) {
+			return;
+		}
+
 		switch (packet.getCommand()) {
 		case GETSTATS: {
 			log.finest("Command received: " + packet.getStringData());
@@ -179,7 +186,7 @@ public class StatisticsCollector
 	}
 
 	public List<Element> getDiscoItems(String node, String jid) {
-		if (node == null) {
+		if (node == null && MessageRouter.isLocalDomain(jid)) {
 			return Arrays.asList(serviceEntity.getDiscoItem(null, getName() + "." + jid));
 		}
 		if (jid.startsWith(getName()+".")) {

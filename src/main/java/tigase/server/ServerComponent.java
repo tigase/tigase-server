@@ -46,7 +46,7 @@ public interface ServerComponent {
 
   void release();
 
-  void processCommand(Packet packet, Queue<Packet> results);
+  void processPacket(Packet packet, Queue<Packet> results);
 
 }
 

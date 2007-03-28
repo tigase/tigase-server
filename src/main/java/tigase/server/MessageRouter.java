@@ -37,13 +37,16 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.Collections;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Logger;
 import tigase.xml.Element;
 import tigase.util.JID;
 import tigase.xmpp.Authorization;
-import tigase.disco.XMPPService;
+// import tigase.disco.XMPPService;
+// import tigase.disco.ServiceEntity;
+// import tigase.disco.ServiceIdentity;
 
 import static tigase.server.MessageRouterConfig.*;
 
@@ -56,14 +59,14 @@ import static tigase.server.MessageRouterConfig.*;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class MessageRouter extends AbstractMessageReceiver
-	implements XMPPService {
+public class MessageRouter extends AbstractMessageReceiver {
+	//	implements XMPPService {
 
   private static final Logger log =
     Logger.getLogger("tigase.server.MessageRouter");
 
 	private String defHostName = null;
-	private Set<String> localAddresses = new ConcurrentSkipListSet<String>();
+	private static Set<String> localAddresses =	new CopyOnWriteArraySet<String>();
 
   private ComponentRegistrator config = null;
 
@@ -74,12 +77,12 @@ public class MessageRouter extends AbstractMessageReceiver
   private Map<String, MessageReceiver> receivers =
     new ConcurrentSkipListMap<String, MessageReceiver>();
 
-	public void processCommand(final Packet packet, final Queue<Packet> r) {
+	public void processPacket(final Packet packet, final Queue<Packet> r) {
 		String to = packet.getTo();
 		Queue<Packet> results = new LinkedList<Packet>();
 		for (ServerComponent comp: components.values()) {
 			if (comp != this) {
-				comp.processCommand(packet, results);
+				comp.processPacket(packet, results);
 			} // end of if (comp != this)
 		} // end of for ()
 		for (Packet res: results) {
@@ -130,6 +133,10 @@ public class MessageRouter extends AbstractMessageReceiver
 		return false;
 	}
 
+	public static boolean isLocalDomain(String domain) {
+		return localAddresses.contains(domain);
+	}
+
 	public void processPacket(Packet packet) {
 
 		if (packet.getTo() == null) {
@@ -144,19 +151,16 @@ public class MessageRouter extends AbstractMessageReceiver
 			+ ", to: " + packet.getTo()
 			+ ", from: " + packet.getFrom());
 
-		if (packet.isCommand()
-			&& (localAddresses.contains(packet.getTo())
-				|| isToLocalComponent(packet.getTo()))) {
-			processCommand(packet, null);
+		if (localAddresses.contains(packet.getTo())
+			|| isToLocalComponent(packet.getTo())) {
+			log.finest("This packet is addressed to server itself.");
+			processPacket(packet, null);
 			return;
-		} // end of if (packet.isCommand() && localAddresses.contains(packet.getTo()))
+		}
 
 		String host = JID.getNodeHost(packet.getTo());
 		String id =  JID.getNodeID(packet.getTo());
 		String nick = JID.getNodeNick(packet.getTo());
-// 		if (nick == null) {
-// 			log.warning("nick=null for packet: " + packet.toString());
-// 		} // end of if (nick == null)
 		// Let's try to find message receiver quick way
 		// In case if packet is handled internally:
 		MessageReceiver first = null;
@@ -266,9 +270,7 @@ public class MessageRouter extends AbstractMessageReceiver
 			this.localAddresses.clear();
 			if (localAddresses != null && localAddresses.length > 0) {
 				defHostName = localAddresses[0];
-				for (String host: localAddresses) {
-					this.localAddresses.add(host);
-				} // end of for ()
+				Collections.addAll(this.localAddresses, localAddresses);
 			} else {
 				defHostName = "localhost";
 			} // end of else
@@ -339,96 +341,17 @@ public class MessageRouter extends AbstractMessageReceiver
 		return defHostName;
 	}
 
-// 	private static final Element[] DISCO_FEATURES =
-// 	{
-// 		new Element("feature",
-// 			new String[] {"var"},
-// 			new String[] {"http://jabber.org/protocol/commands"})
-// 	};
-// 	private static final Element[] DISCO_FEATURES_FOR_NODE =
-// 	{
-// 		new Element("identity",
-// 			new String[] {"category", "type"},
-// 			new String[] {"automation", "server-controll"})
-// 	};
-// 	private static final Element[] TOP_DISCO_ITEMS =
-// 	{
-// 		new Element("item",
-// 			new String[] {"jid", "node", "name"},
-// 			new String[] {"server", "http://jabber.org/protocol/commands",
-// 										"Server administration"})
-// 	};
-// 	private static final Element[] DISCO_ITEMS =
-// 	{
-// // 		new Element("item",
-// // 			new String[] {"jid", "node", "name"},
-// // 			new String[] {"config", "get", "Get configuration item"}),
-// // 		new Element("item",
-// // 			new String[] {"jid", "node", "name"},
-// // 			new String[] {"config", "set", "Set configuration item"}),
-// 		new Element("item",
-// 			new String[] {"jid", "node", "name"},
-// 			new String[] {"server", "controll", "Commands"})
-// 	};
-// 	private static final Element ITEM_IDENTITY =
-// 		new Element("identity",
-// 			new String[] {"name", "category", "type"},
-// 			new String[] {"Command: ", "automation", "command-node"});
-// 	private static final Element[] CONFIG_LIST_INFO =
-// 	{
-// 		ITEM_IDENTITY,
-// 		new Element("feature",
-// 			new String[] {"var"},
-// 			new String[] {"http://jabber.org/protocol/commands"})
-// 	};
+// 	public Element getDiscoInfo(String node, String jid) {
+// 		if (jid != null && localAddresses.contains(jid)) {
+// 			Element query = serviceEntity.getDiscoInfo(null);
+// 			log.finest("Returing disco-info: " + query.toString());
+// 			return query;
+// 		}
+// 		return null;
+// 	}
 
-	public Element getDiscoInfo(String node, String jid) {
-// 		if (node == null) {
-// 			return Arrays.asList(DISCO_FEATURES);
-// 		}
-// 		if (jid.startsWith(getName())) {
-// 			if (node.equals("http://jabber.org/protocol/commands")) {
-// 				return Arrays.asList(DISCO_FEATURES_FOR_NODE);
-// 			}
-// 			if (node.equals("controll")) {
-// 				return Arrays.asList(DISCO_FEATURES_FOR_NODE);
-// 			}
-// 			if (node.startsWith("controll/")) {
-// 				String comp_name = node.substring("controll/".length());
-// 				ITEM_IDENTITY.setAttribute("name", "Component: " + comp_name);
-// 				return Arrays.asList(CONFIG_LIST_INFO);
-// 			}
-// 		}
-		return null;
-	}
-
-	public List<Element> getDiscoItems(String node, String jid) {
-// 		if (node == null) {
-// 			for (Element item: TOP_DISCO_ITEMS) {
-// 				item.setAttribute("jid", getName() + "." + jid);
-// 			}
-// 			return Arrays.asList(TOP_DISCO_ITEMS);
-// 		}
-// 		if (jid.startsWith(getName())) {
-// 			if (node.equals("http://jabber.org/protocol/commands")) {
-// 				for (Element item: DISCO_ITEMS) {
-// 					//item.setAttribute("jid", getName() + "." + jid);
-// 					item.setAttribute("jid", jid);
-// 				}
-// 				return Arrays.asList(DISCO_ITEMS);
-// 			}
-// 			if (node.equals("controll")) {
-// 				String[] comps = new String[] {"stop"};
-// 				Element[] items = new Element[comps.length];
-// 				for (int i = 0; i < comps.length; i++) {
-// 					items[i] = new Element("item",
-// 						new String[] {"jid", "node", "name"},
-// 						new String[] {jid, node + "/" + comps[i], comps[i]});
-// 				}
-// 				return Arrays.asList(items);
-// 			}
-// 		}
-		return null;
-	}
+// 	public List<Element> getDiscoItems(String node, String jid) {
+// 		return null;
+// 	}
 
 }

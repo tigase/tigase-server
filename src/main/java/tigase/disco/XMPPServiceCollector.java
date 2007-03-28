@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 import tigase.server.ServerComponent;
 import tigase.server.Command;
 import tigase.server.Packet;
+import tigase.server.MessageRouter;
 import tigase.server.AbstractComponentRegistrator;
 import tigase.stats.StatRecord;
 import tigase.stats.StatisticsContainer;
@@ -58,7 +59,14 @@ public class XMPPServiceCollector
 	public static final String ITEMS_XMLNS =
 		"http://jabber.org/protocol/disco#items";
 
-	public XMPPServiceCollector() {}
+	private ServiceEntity serviceEntity = null;
+
+	public XMPPServiceCollector() {
+		serviceEntity = new ServiceEntity("Tigase", "server", "Session manager");
+		serviceEntity.addIdentities(new ServiceIdentity[] {
+				new ServiceIdentity("server", "im", tigase.server.XMPPServer.NAME +
+					" ver. " + tigase.server.XMPPServer.getImplementationVersion())});
+	}
 
 	public void componentAdded(XMPPService component) {	}
 
@@ -68,19 +76,20 @@ public class XMPPServiceCollector
 
 	public void componentRemoved(XMPPService component) {}
 
-	public void processCommand(final Packet packet, final Queue<Packet> results) {
-		switch (packet.getCommand()) {
-		case GETDISCO:
-			Element query = new Element("query");
-			String xmlns = Command.getFieldValue(packet, "xmlns");
-			String node = Command.getFieldValue(packet, "node");
-			String jid = Command.getFieldValue(packet, "jid");
-			query.setXMLNS(xmlns);
-			if (node != null) {
-				query.setAttribute("node", node);
-			}
-			if (xmlns != null) {
-				if (xmlns.equals(INFO_XMLNS)) {
+	public void processPacket(final Packet packet, final Queue<Packet> results) {
+
+		if (packet.isXMLNS("/iq/query", INFO_XMLNS)
+			|| packet.isXMLNS("/iq/query", ITEMS_XMLNS)) {
+
+			String jid = packet.getElemTo();
+			String node = packet.getAttribute("/iq/query", "node");
+			Element query =
+				(Element)packet.getElement().getChild("query").clone();
+
+			if (packet.isXMLNS("/iq/query", INFO_XMLNS)) {
+				if (node == null && MessageRouter.isLocalDomain(jid)) {
+					query = serviceEntity.getDiscoInfo(null);
+				} else {
 					for (XMPPService comp: components.values()) {
 						Element resp = comp.getDiscoInfo(node, jid);
 						if (resp != null) {
@@ -88,29 +97,20 @@ public class XMPPServiceCollector
 							break;
 						}
 					} // end of for ()
-				} else {
-					if (xmlns.equals(ITEMS_XMLNS)) {
-						for (XMPPService comp: components.values()) {
-							List<Element> items =	comp.getDiscoItems(node, jid);
-							if (items != null && items.size() > 0) {
-									query.addChildren(items);
-							} // end of if (stats != null && stats.count() > 0)
-						} // end of for ()
-					} else {
-						log.warning("Uknown GETDISCO xmlns: " + xmlns);
-					}
 				}
-			} else {
-				log.warning("Wrong GETDISCO xmlns: " + xmlns);
 			}
-			Packet result = packet.commandResult("result");
-			Command.setData(result, query);
-			Command.addFieldValue(result, "jid", jid);
-			results.offer(result);
-			break;
-		default:
-			break;
-		} // end of switch (packet.getCommand())
+
+			if (packet.isXMLNS("/iq/query", ITEMS_XMLNS)) {
+				for (XMPPService comp: components.values()) {
+					List<Element> items =	comp.getDiscoItems(node, jid);
+					if (items != null && items.size() > 0) {
+						query.addChildren(items);
+					} // end of if (stats != null && stats.count() > 0)
+				} // end of for ()
+			}
+			results.offer(packet.okResult(query, 0));
+		}
+
 	}
 
 }

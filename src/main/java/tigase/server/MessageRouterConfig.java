@@ -51,25 +51,25 @@ public class MessageRouterConfig {
 	public static final String MSG_RECEIVERS_NAMES_PROP_KEY =
 		MSG_RECEIVERS_PROP_KEY + "id-names";
 	public static final String[] ALL_MSG_RECEIVERS_NAMES_PROP_VAL =
-	{	"client_1", "server_1", "comp_1", "session_1"	};
+	{	"c2s", "s2s", "ext_comp", "sess_man"	};
 	public static final String[] DEF_MSG_RECEIVERS_NAMES_PROP_VAL =
-	{	"client_1", "server_1", "session_1"	};
+	{	"c2s", "s2s", "sess_man"	};
 	public static final String[] SM_MSG_RECEIVERS_NAMES_PROP_VAL =
-	{	"comp_1", "session_1"	};
+	{	"ext_comp", "sess_man"	};
 	public static final String[] CS_MSG_RECEIVERS_NAMES_PROP_VAL =
-	{	"client_1", "server_1", "comp_1" };
+	{	"c2s", "s2s", "ext_comp" };
 
 	public static final Map<String, String> MSG_RCV_CLASSES =
 		new HashMap<String, String>();
 
 	static {
-		MSG_RCV_CLASSES.put("client_1",
+		MSG_RCV_CLASSES.put("c2s",
 			"tigase.server.xmppclient.ClientConnectionManager");
-		MSG_RCV_CLASSES.put("server_1",
+		MSG_RCV_CLASSES.put("s2s",
 			"tigase.server.xmppserver.ServerConnectionManager");
-		MSG_RCV_CLASSES.put("comp_1",
+		MSG_RCV_CLASSES.put("ext_comp",
 			"tigase.server.xmppcomponent.ComponentConnectionManager");
-		MSG_RCV_CLASSES.put("session_1",
+		MSG_RCV_CLASSES.put("sess_man",
 			"tigase.server.xmppsession.SessionManager");
 	}
 

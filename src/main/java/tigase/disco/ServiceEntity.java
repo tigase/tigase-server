@@ -25,6 +25,8 @@ package tigase.disco;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
 import tigase.xml.Element;
 
 /**
@@ -43,7 +45,7 @@ public class ServiceEntity {
 	private String name = null;
 	private List<String> features = null;
 	private List<ServiceIdentity> identities = null;
-	private List<ServiceEntity> items = null;
+	private Set<ServiceEntity> items = null;
 
 	/**
 	 * Creates a new <code>ServiceEntity</code> instance.
@@ -55,25 +57,52 @@ public class ServiceEntity {
 		this.name = name;
 	}
 
-	public void addFeatures(String[] features) {
+	/**
+	 * 2 ServiceEntities are equal of JIDs are equal and NODEs are equal.
+	 *
+	 * @param obj an <code>Object</code> value
+	 * @return a <code>boolean</code> value
+	 */
+	public boolean equals(Object obj) {
+		ServiceEntity se = (ServiceEntity)obj;
+		// Assuming here that jid can never be NULL
+		// Node can be NULL so we need to do more calculation on it
+		return 	(se == null ? false : jid.equals(se.jid))
+			&&
+			((node == se.node) ||
+				(node != null ? node.equals(se.node) : se.node.equals(node)));
+	}
+
+	public void addFeatures(String... features) {
 		if (this.features == null) {
 			this.features = new ArrayList<String>();
 		}
 		Collections.addAll(this.features, features);
 	}
 
-	public void addIdentities(ServiceIdentity[] identities) {
+	public void addIdentities(ServiceIdentity... identities) {
 		if (this.identities == null) {
 			this.identities = new ArrayList<ServiceIdentity>();
 		}
 		Collections.addAll(this.identities, identities);
 	}
 
-	public void addItems(ServiceEntity[] items) {
+	public void addItems(ServiceEntity... items) {
 		if (this.items == null) {
-			this.items = new ArrayList<ServiceEntity>();
+			this.items = new HashSet<ServiceEntity>();
 		}
-		Collections.addAll(this.items, items);
+		// It may look very strange but look at equals() method....
+		// So some items which might be the same from the Set point of
+		// view are not really the same. They may have different name.
+		// This is to allow "update" the service discovery with some changed
+		// info.... So in particular the "name" may contain some additional
+		// information which can change at runtime
+		for (ServiceEntity item: items) {
+			if (this.items.contains(item)) {
+				this.items.remove(item);
+			}
+			this.items.add(item);
+		}
 	}
 
 	public String getJID() {

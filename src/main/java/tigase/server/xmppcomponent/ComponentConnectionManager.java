@@ -40,6 +40,7 @@ import tigase.net.SocketType;
 import tigase.server.ConnectionManager;
 import tigase.server.MessageReceiver;
 import tigase.server.Packet;
+import tigase.server.MessageRouter;
 import tigase.disco.XMPPService;
 import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
@@ -124,9 +125,8 @@ public class ComponentConnectionManager extends ConnectionManager
 				String addr =
 					(String)serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
 				addRouting(addr);
-				serviceEntity = new ServiceEntity(getName(), "external", "XEP-0114");
-				serviceEntity.addIdentities(new ServiceIdentity[] {
-						new ServiceIdentity("component", identity_type, addr)});
+				log.fine("Connected to: " + addr);
+				updateServiceDiscovery(addr, "connected");
 			} else {
 				log.warning("Incorrect packet received: " + p.getStringData());
 			}
@@ -140,15 +140,17 @@ public class ComponentConnectionManager extends ConnectionManager
 				(String)serv.getSessionData().get(SECRET_PROP_KEY);
 			try {
 				String loc_digest = Algorithms.hexDigest(id, secret, "SHA");
+				log.finest("Calculating digest: id="+id+", secret="+secret
+					+", digest="+loc_digest);
 				if (digest != null && digest.equals(loc_digest)) {
 					Packet resp = new Packet(new Element("handshake"));
 					writePacketToSocket(serv, resp);
 					String addr = (String)serv.getSessionData().get(serv.HOSTNAME_KEY);
 					addRouting(addr);
-					serviceEntity = new ServiceEntity(getName(), "external", "XEP-0114");
-					serviceEntity.addIdentities(new ServiceIdentity[] {
-							new ServiceIdentity("component", identity_type, addr)});
+					log.fine("Connected to: " + addr);
+					updateServiceDiscovery(addr, "connected");
 				} else {
+					log.info("Handshaking passwords don't match, disconnecting...");
 					serv.stop();
 				}
 			} catch (Exception e) {
@@ -222,9 +224,10 @@ public class ComponentConnectionManager extends ConnectionManager
 		service_disco = (Boolean)props.get(RETURN_SERVICE_DISCO_KEY);
 		identity_type = (String)props.get(IDENTITY_TYPE_KEY);
 
-		serviceEntity = new ServiceEntity(getName(), "external", "XEP-0114");
-		serviceEntity.addIdentities(new ServiceIdentity[] {
-				new ServiceIdentity("component", identity_type, "disconnected")});
+		//serviceEntity = new ServiceEntity(getName(), "external", "XEP-0114");
+		serviceEntity = new ServiceEntity(getName(), null, "XEP-0114");
+		serviceEntity.addIdentities(
+			new ServiceIdentity("component", identity_type, getName()));
 	}
 
 	protected int[] getDefPlainPorts() {
@@ -260,9 +263,8 @@ public class ComponentConnectionManager extends ConnectionManager
 			reconnectService(sessionData, connectionDelay);
 		} // end of if (type == ConnectionType.connect)
 		//		removeRouting(serv.getRemoteHost());
-		serviceEntity = new ServiceEntity(getName(), "external", "XEP-0114");
-		serviceEntity.addIdentities(new ServiceIdentity[] {
-				new ServiceIdentity("component", identity_type, "disconnected")});
+		log.fine("Disonnected from: " + addr);
+		updateServiceDiscovery(addr, "disconnected");
 	}
 
 	protected String getServiceId(Packet packet) {
@@ -288,7 +290,7 @@ public class ComponentConnectionManager extends ConnectionManager
 				"<stream:stream"
 				+ " xmlns='jabber:component:accept'"
 				+ " xmlns:stream='http://etherx.jabber.org/streams'"
-				+ " to='" + compName + "'>"
+				+ " to='" + compName + "'"
 				+ ">";
 			log.finest("cid: " + (String)serv.getSessionData().get("cid")
 				+ ", sending: " + data);
@@ -303,6 +305,8 @@ public class ComponentConnectionManager extends ConnectionManager
 	public String xmppStreamOpened(XMPPIOService service,
 		Map<String, String> attribs) {
 
+		log.finer("Stream opened: " + attribs.toString());
+
 		switch (service.connectionType()) {
 		case connect: {
 			String id = attribs.get("id");
@@ -311,6 +315,8 @@ public class ComponentConnectionManager extends ConnectionManager
 				(String)service.getSessionData().get(SECRET_PROP_KEY);
 			try {
 				String digest = Algorithms.hexDigest(id, secret, "SHA");
+				log.finest("Calculating digest: id="+id+", secret="+secret
+					+", digest="+digest);
 				return "<handshake>" + digest + "</handshake>";
 			} catch (NoSuchAlgorithmException e) {
 				log.log(Level.SEVERE, "Can not generate digest for pass phrase.", e);
@@ -318,7 +324,6 @@ public class ComponentConnectionManager extends ConnectionManager
 			}
 		}
 		case accept: {
-			log.finer("Stream opened: " + attribs.toString());
 			String hostname = attribs.get("to");
 			service.getSessionData().put(service.HOSTNAME_KEY, hostname);
 			String id = UUID.randomUUID().toString();
@@ -352,6 +357,12 @@ public class ComponentConnectionManager extends ConnectionManager
 		return 1000*24*HOUR;
 	}
 
+	private void updateServiceDiscovery(String jid, String name) {
+		ServiceEntity item = new ServiceEntity(jid, null, "XEP-0114");
+		item.addIdentities(new ServiceIdentity("component", identity_type, name));
+		serviceEntity.addItems(item);
+	}
+
 	public Element getDiscoInfo(String node, String jid) {
 		if (jid != null && jid.startsWith(getName()+".")) {
 			return serviceEntity.getDiscoInfo(node);
@@ -360,8 +371,11 @@ public class ComponentConnectionManager extends ConnectionManager
 	}
 
 	public List<Element> getDiscoItems(String node, String jid) {
-		if (node == null) {
-			return Arrays.asList(serviceEntity.getDiscoItem(null, getName() + "." + jid));
+		if (node == null && MessageRouter.isLocalDomain(jid)) {
+ 			return Arrays.asList(serviceEntity.getDiscoItem(null, getName() + "." + jid));
+ 		}
+		if (jid.startsWith(getName()+".")) {
+			return serviceEntity.getDiscoItems(node, null);
 		}
 		return null;
 	}

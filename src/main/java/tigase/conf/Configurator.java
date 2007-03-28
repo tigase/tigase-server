@@ -45,6 +45,7 @@ import tigase.server.Packet;
 import tigase.server.ServerComponent;
 import tigase.server.Command;
 import tigase.server.Permissions;
+import tigase.server.MessageRouter;
 import tigase.disco.XMPPService;
 import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
@@ -129,7 +130,6 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 	}
 
 	public void componentAdded(Configurable component) {
-		System.out.println(" component: " + component.getName());
 		log.finer(" component: " + component.getName());
 		ServiceEntity item = config_list.findNode(component.getName());
 		if (item == null) {
@@ -137,7 +137,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 				"Component: " + component.getName());
 			item.addFeatures(CMD_FEATURES);
 			item.addIdentities(new ServiceIdentity[] {
-					new ServiceIdentity("automation", "command-list",
+					new ServiceIdentity("automation", "command-node",
 						"Component: " + component.getName())});
 			config_list.addItems(new ServiceEntity[] {item});
 		}
@@ -532,7 +532,11 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 		} // end of if (print)
 	}
 
-	public void processCommand(final Packet packet, final Queue<Packet> results) {
+	public void processPacket(final Packet packet, final Queue<Packet> results) {
+
+		if (!packet.isCommand()) {
+			return;
+		}
 
 		if (!packet.getTo().startsWith(getName()+".")) return;
 
@@ -671,7 +675,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 	}
 
 	public List<Element> getDiscoItems(String node, String jid) {
-		if (node == null) {
+		if (node == null && MessageRouter.isLocalDomain(jid)) {
 			return Arrays.asList(serviceEntity.getDiscoItem(null, getName() + "." + jid));
 		}
 		if (jid.startsWith(getName()+".")) {
