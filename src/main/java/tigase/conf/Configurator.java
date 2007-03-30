@@ -321,6 +321,22 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 					}
 				} // end of if (add) else
 				break;
+			case LONG:
+				new_val = Long.decode(value);
+				break;
+			case LONG_ARR:
+				if (add) {
+					int old_len = ((long[])old_val).length;
+					new_val = Arrays.copyOf((long[])old_val, old_len + 1);
+					((long[])new_val)[old_len] = Long.decode(value);
+				} else {
+					String[] spl = value.split(",");
+					new_val = new long[spl.length];
+					for (int i = 0; i < spl.length; i++) {
+						((long[])new_val)[i] = Long.decode(spl[i].trim());
+					}
+				} // end of if (add) else
+				break;
 			case STRING:
 				new_val = value;
 				break;
@@ -432,6 +448,15 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 				break;
 			case INTEGER_ARR:
 				for (Integer s: (int[])value) {
+					if (val_str == null) {
+						val_str = s.toString();
+					} else {
+						val_str = val_str + ", " + s.toString();
+					} // end of else
+				} // end of for (String s: (String[])value)
+				break;
+			case LONG_ARR:
+				for (Long s: (long[])value) {
 					if (val_str == null) {
 						val_str = s.toString();
 					} else {
