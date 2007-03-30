@@ -44,9 +44,9 @@ import java.util.logging.Logger;
 import tigase.xml.Element;
 import tigase.util.JID;
 import tigase.xmpp.Authorization;
-// import tigase.disco.XMPPService;
-// import tigase.disco.ServiceEntity;
-// import tigase.disco.ServiceIdentity;
+import tigase.disco.XMPPService;
+import tigase.disco.ServiceEntity;
+import tigase.disco.ServiceIdentity;
 
 import static tigase.server.MessageRouterConfig.*;
 
@@ -62,6 +62,11 @@ import static tigase.server.MessageRouterConfig.*;
 public class MessageRouter extends AbstractMessageReceiver {
 	//	implements XMPPService {
 
+	public static final String INFO_XMLNS =
+		"http://jabber.org/protocol/disco#info";
+	public static final String ITEMS_XMLNS =
+		"http://jabber.org/protocol/disco#items";
+
   private static final Logger log =
     Logger.getLogger("tigase.server.MessageRouter");
 
@@ -69,7 +74,10 @@ public class MessageRouter extends AbstractMessageReceiver {
 	private static Set<String> localAddresses =	new CopyOnWriteArraySet<String>();
 
   private ComponentRegistrator config = null;
+	private ServiceEntity serviceEntity = null;
 
+	private Map<String, XMPPService> xmppServices =
+		new ConcurrentSkipListMap<String, XMPPService>();
   private Map<String, ServerComponent> components =
     new ConcurrentSkipListMap<String, ServerComponent>();
   private Map<String, ComponentRegistrator> registrators =
@@ -85,6 +93,12 @@ public class MessageRouter extends AbstractMessageReceiver {
 				comp.processPacket(packet, results);
 			} // end of if (comp != this)
 		} // end of for ()
+		// There is no better way to do it outside MessageRouter for now.
+		if (packet.isXMLNS("/iq/query", INFO_XMLNS)
+			|| packet.isXMLNS("/iq/query", ITEMS_XMLNS)) {
+			processDiscoQuery(packet, results);
+		}
+
 		for (Packet res: results) {
 			processPacket(res);
 		} // end of for ()
@@ -133,7 +147,7 @@ public class MessageRouter extends AbstractMessageReceiver {
 		return false;
 	}
 
-	public static boolean isLocalDomain(String domain) {
+	private boolean isLocalDomain(String domain) {
 		return localAddresses.contains(domain);
 	}
 
@@ -198,6 +212,12 @@ public class MessageRouter extends AbstractMessageReceiver {
 					mr.addPacket(packet);
 					return;
 				} // end of if (routings.contains())
+				// Resolve wildchars routings....
+				if (mr.isInRegexRoutings(host)) {
+					log.finest("Found receiver: " + mr.getName());
+					mr.addPacket(packet);
+					return;
+				}
 				if (routings.contains("*")) {
 					// I found s2s receiver, remember it for later....
 					s2s = mr;
@@ -247,6 +267,9 @@ public class MessageRouter extends AbstractMessageReceiver {
       } // end of if (reg != component)
     } // end of for ()
     components.put(component.getName(), component);
+		if (component instanceof XMPPService) {
+			xmppServices.put(component.getName(), (XMPPService)component);
+		}
   }
 
   public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -263,6 +286,11 @@ public class MessageRouter extends AbstractMessageReceiver {
     } else {
       inProperties = true;
     } // end of if (inProperties) else
+
+		serviceEntity = new ServiceEntity("Tigase", "server", "Session manager");
+		serviceEntity.addIdentities(new ServiceIdentity[] {
+				new ServiceIdentity("server", "im", tigase.server.XMPPServer.NAME +
+					" ver. " + tigase.server.XMPPServer.getImplementationVersion())});
 
     try {
       super.setProperties(props);
@@ -341,17 +369,52 @@ public class MessageRouter extends AbstractMessageReceiver {
 		return defHostName;
 	}
 
-// 	public Element getDiscoInfo(String node, String jid) {
-// 		if (jid != null && localAddresses.contains(jid)) {
-// 			Element query = serviceEntity.getDiscoInfo(null);
-// 			log.finest("Returing disco-info: " + query.toString());
-// 			return query;
-// 		}
-// 		return null;
-// 	}
+	private void processDiscoQuery(final Packet packet,
+		final Queue<Packet> results) {
+			String jid = packet.getElemTo();
+			String node = packet.getAttribute("/iq/query", "node");
+			Element query =
+				(Element)packet.getElement().getChild("query").clone();
 
-// 	public List<Element> getDiscoItems(String node, String jid) {
-// 		return null;
-// 	}
+			if (packet.isXMLNS("/iq/query", INFO_XMLNS)) {
+				if (isLocalDomain(jid)) {
+					query = getDiscoInfo(node, jid);
+				} else {
+					for (XMPPService comp: xmppServices.values()) {
+						if (jid.startsWith(comp.getName() + ".")) {
+							Element resp = comp.getDiscoInfo(node, jid);
+							if (resp != null) {
+								query = resp;
+								break;
+							}
+						}
+					} // end of for ()
+				}
+			}
+
+			if (packet.isXMLNS("/iq/query", ITEMS_XMLNS)) {
+				boolean localDomain = isLocalDomain(jid);
+				for (XMPPService comp: xmppServices.values()) {
+					if (localDomain || jid.startsWith(comp.getName() + ".")) {
+						List<Element> items =	comp.getDiscoItems(node, jid);
+						if (items != null && items.size() > 0) {
+							query.addChildren(items);
+						} // end of if (stats != null && stats.count() > 0)
+					}
+				} // end of for ()
+			}
+			results.offer(packet.okResult(query, 0));
+	}
+
+
+	public Element getDiscoInfo(String node, String jid) {
+		Element query = serviceEntity.getDiscoInfo(null);
+		log.finest("Returing disco-info: " + query.toString());
+		return query;
+	}
+
+	public List<Element> getDiscoItems(String node, String jid) {
+		return null;
+	}
 
 }

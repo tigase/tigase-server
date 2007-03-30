@@ -27,14 +27,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.HashMap;
+import java.util.HashSet;
 // import java.util.Timer;
 // import java.util.TimerTask;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 import tigase.annotations.TODO;
 import tigase.conf.Configurable;
 import tigase.stats.StatRecord;
@@ -80,7 +82,8 @@ public abstract class AbstractMessageReceiver
 	private Thread out_thread = null;
   private boolean stopped = false;
   private String name = null;
-	private Set<String> routings = new TreeSet<String>();
+	private Set<String> routings = new HashSet<String>();
+	private Set<Pattern> regexRoutings = new HashSet<Pattern>();
 
   /**
    * Variable <code>statAddedMessagesOk</code> keeps counter of successfuly
@@ -193,7 +196,7 @@ public abstract class AbstractMessageReceiver
    * Returns defualt configuration settings for this object.
    */
   public Map<String, Object> getDefaults(Map<String, Object> params) {
-    Map<String, Object> defs = new TreeMap<String, Object>();
+    Map<String, Object> defs = new HashMap<String, Object>();
 		defs.put(MAX_QUEUE_SIZE_PROP_KEY, MAX_QUEUE_SIZE_PROP_VAL);
     return defs;
   }
@@ -273,6 +276,10 @@ public abstract class AbstractMessageReceiver
 		return routings;
 	}
 
+	public Set<Pattern> getRegexRoutings() {
+		return regexRoutings;
+	}
+
 	public void addRouting(String address) {
 		routings.add(address);
 		log.fine(getName() + " - added routing: " + address);
@@ -288,6 +295,30 @@ public abstract class AbstractMessageReceiver
 
 	public boolean isInRoutings(String host) {
 		return routings.contains(host);
+	}
+
+	public void addRegexRouting(String address) {
+		regexRoutings.add(Pattern.compile(address, Pattern.CASE_INSENSITIVE));
+	}
+
+	public boolean removeRegexRouting(String address) {
+		return regexRoutings.remove(Pattern.compile(address));
+	}
+
+	public void clearRegexRoutings() {
+		regexRoutings.clear();
+	}
+
+	public boolean isInRegexRoutings(String address) {
+		log.finest(getName() + " lokking for refex routings: " + address);
+		for (Pattern pat: regexRoutings) {
+			if (pat.matcher(address).matches()) {
+				log.finest(getName() + " matched against pattern: " + pat.toString());
+				return true;
+			}
+			log.finest(getName() + " matching failed against pattern: " + pat.toString());
+		}
+		return false;
 	}
 
 	public void processPacket(final Packet packet, final Queue<Packet> results)

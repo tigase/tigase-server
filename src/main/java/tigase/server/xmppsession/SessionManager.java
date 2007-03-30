@@ -613,14 +613,12 @@ public class SessionManager extends AbstractMessageReceiver
 	}
 
 	public List<Element> getDiscoItems(String node, String jid) {
-		if (node == null && MessageRouter.isLocalDomain(jid)) {
+		if (jid != null && jid.startsWith(getName()+".")) {
+			return serviceEntity.getDiscoItems(node, jid);
+		} else {
 			return
 				Arrays.asList(serviceEntity.getDiscoItem(null, getName() + "." + jid));
 		}
-		if (jid != null && jid.startsWith(getName()+".")) {
-			return serviceEntity.getDiscoItems(node, jid);
-		}
-		return null;
 	}
 
 	public List<StatRecord> getStatistics() {

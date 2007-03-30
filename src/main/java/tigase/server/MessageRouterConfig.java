@@ -108,10 +108,7 @@ public class MessageRouterConfig {
 	public static final String REGISTRATOR_PROP_KEY = "components/registrators/";
 	public static final String REGISTRATOR_NAMES_PROP_KEY =
 		REGISTRATOR_PROP_KEY + "id-names";
-	public static final String[] REGISTRATOR_NAMES_PROP_VAL =
-	{
-		"stat_1", "service_1"
-	};
+	public static final String[] REGISTRATOR_NAMES_PROP_VAL =	{	"stat_1" };
 
 	public static final String STAT_1_CLASS_PROP_KEY =
 		REGISTRATOR_PROP_KEY + "stat_1.class";
@@ -121,13 +118,13 @@ public class MessageRouterConfig {
 		REGISTRATOR_PROP_KEY + "stat_1.active";
 	public static final boolean STAT_1_ACTIVE_PROP_VAL = true;
 
-	public static final String SERVICE_1_CLASS_PROP_KEY =
-		REGISTRATOR_PROP_KEY + "service_1.class";
-	public static final String SERVICE_1_CLASS_PROP_VAL =
-		"tigase.disco.XMPPServiceCollector";
-	public static final String SERVICE_1_ACTIVE_PROP_KEY =
-		REGISTRATOR_PROP_KEY + "service_1.active";
-	public static final boolean SERVICE_1_ACTIVE_PROP_VAL = true;
+// 	public static final String SERVICE_1_CLASS_PROP_KEY =
+// 		REGISTRATOR_PROP_KEY + "service_1.class";
+// 	public static final String SERVICE_1_CLASS_PROP_VAL =
+// 		"tigase.disco.XMPPServiceCollector";
+// 	public static final String SERVICE_1_ACTIVE_PROP_KEY =
+// 		REGISTRATOR_PROP_KEY + "service_1.active";
+// 	public static final boolean SERVICE_1_ACTIVE_PROP_VAL = true;
 
 	public static void getDefaults(Map<String, Object> defs,
 		Map<String, Object> params, String comp_name) {
@@ -171,8 +168,8 @@ public class MessageRouterConfig {
 		defs.put(REGISTRATOR_NAMES_PROP_KEY, REGISTRATOR_NAMES_PROP_VAL);
 		defs.put(STAT_1_CLASS_PROP_KEY, STAT_1_CLASS_PROP_VAL);
 		defs.put(STAT_1_ACTIVE_PROP_KEY, STAT_1_ACTIVE_PROP_VAL);
-		defs.put(SERVICE_1_CLASS_PROP_KEY, SERVICE_1_CLASS_PROP_VAL);
-		defs.put(SERVICE_1_ACTIVE_PROP_KEY, SERVICE_1_ACTIVE_PROP_VAL);
+// 		defs.put(SERVICE_1_CLASS_PROP_KEY, SERVICE_1_CLASS_PROP_VAL);
+// 		defs.put(SERVICE_1_ACTIVE_PROP_KEY, SERVICE_1_ACTIVE_PROP_VAL);
 		if (params.get("--virt-hosts") != null) {
 			LOCAL_ADDRESSES_PROP_VALUE =
 				 ((String)params.get("--virt-hosts")).split(",");
@@ -220,9 +217,10 @@ public class MessageRouterConfig {
 		// I changed location for the XMPPServiceCollector class
 		// to avoid problems with old configuration files let's detect it here
 		// and silently convert it to new package name:
-		if (cls_name.equals("tigase.server.XMPPServiceCollector")) {
-			log.warning("Old package name for XMPPServiceCollector class, please correct it to new, correct location: tigase.disco.XMPPServiceCollector");
-			cls_name = "tigase.disco.XMPPServiceCollector";
+		if (cls_name.equals("tigase.server.XMPPServiceCollector")
+			|| cls_name.equals("tigase.disco.XMPPServiceCollector")) {
+			log.warning("This class is not used anymore. Correct your configuration please. Remove all references to class: XMPPServiceCollector.");
+			return null;
 		}
 		return (ComponentRegistrator)Class.forName(cls_name).newInstance();
 	}

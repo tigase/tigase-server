@@ -73,6 +73,11 @@ public class ServiceEntity {
 				(node != null ? node.equals(se.node) : se.node.equals(node)));
 	}
 
+	public int hashCode() {
+		return (jid != null ? jid.hashCode() : 0)
+			+ (node != null ? node.hashCode() : 0);
+	}
+
 	public void addFeatures(String... features) {
 		if (this.features == null) {
 			this.features = new ArrayList<String>();
@@ -214,6 +219,10 @@ public class ServiceEntity {
 			}
 		}
 		return null;
+	}
+
+	public String toString() {
+		return getDiscoItem(null, null).toString();
 	}
 
 }

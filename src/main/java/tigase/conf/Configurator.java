@@ -675,13 +675,11 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 	}
 
 	public List<Element> getDiscoItems(String node, String jid) {
-		if (node == null && MessageRouter.isLocalDomain(jid)) {
-			return Arrays.asList(serviceEntity.getDiscoItem(null, getName() + "." + jid));
-		}
 		if (jid.startsWith(getName()+".")) {
 			return serviceEntity.getDiscoItems(node, jid);
+		} else {
+			return Arrays.asList(serviceEntity.getDiscoItem(null, getName() + "." + jid));
 		}
-		return null;
 	}
 
 }

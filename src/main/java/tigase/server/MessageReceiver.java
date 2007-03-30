@@ -52,6 +52,8 @@ public interface MessageReceiver extends ServerComponent {
 
 	Set<String> getRoutings();
 
+	boolean isInRegexRoutings(String address);
+
   /**
 	 * Describe <code>addPacket</code> method here.
    *

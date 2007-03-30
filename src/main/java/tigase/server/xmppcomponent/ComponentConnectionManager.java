@@ -65,9 +65,12 @@ public class ComponentConnectionManager extends ConnectionManager
 	public static SocketType PORT_SOCKET_PROP_VAL = SocketType.plain;
   public static final String SECRET_PROP_KEY = "secret";
   public static String SECRET_PROP_VAL =	"someSecret";
-	public static final String COMPONENT_NAME_KEY = "comp-name";
-	public static String COMPONENT_NAME_VAL = "comp_1.localhost";
+	public static final String PORT_LOCAL_HOST_PROP_KEY = "local-host";
+	public static String PORT_LOCAL_HOST_PROP_VAL = "comp_1.localhost";
 	public static String PORT_REMOTE_HOST_PROP_VAL = "localhost";
+	public static final String PORT_ROUTING_TABLE_PROP_KEY = "routing-table";
+	public static String[] PORT_ROUTING_TABLE_PROP_VAL =
+	{ PORT_REMOTE_HOST_PROP_VAL };
 	public static String[] PORT_IFC_PROP_VAL = {"*"};
 	public static final String PACK_ROUTED_KEY = "pack-routed";
 	public static boolean PACK_ROUTED_VAL = false;
@@ -122,11 +125,13 @@ public class ComponentConnectionManager extends ConnectionManager
 		case connect: {
 			String data = p.getElemCData();
 			if (data == null) {
+				String[] routings =
+					(String[])serv.getSessionData().get(PORT_ROUTING_TABLE_PROP_KEY);
+				updateRoutings(routings, true);
 				String addr =
 					(String)serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
-				addRouting(addr);
 				log.fine("Connected to: " + addr);
-				updateServiceDiscovery(addr, "connected");
+				updateServiceDiscovery(addr, "XEP-0114 connected");
 			} else {
 				log.warning("Incorrect packet received: " + p.getStringData());
 			}
@@ -145,10 +150,12 @@ public class ComponentConnectionManager extends ConnectionManager
 				if (digest != null && digest.equals(loc_digest)) {
 					Packet resp = new Packet(new Element("handshake"));
 					writePacketToSocket(serv, resp);
+					String[] routings =
+						(String[])serv.getSessionData().get(PORT_ROUTING_TABLE_PROP_KEY);
+					updateRoutings(routings, true);
 					String addr = (String)serv.getSessionData().get(serv.HOSTNAME_KEY);
-					addRouting(addr);
 					log.fine("Connected to: " + addr);
-					updateServiceDiscovery(addr, "connected");
+					updateServiceDiscovery(addr, "XEP-0114 connected");
 				} else {
 					log.info("Handshaking passwords don't match, disconnecting...");
 					serv.stop();
@@ -179,10 +186,11 @@ public class ComponentConnectionManager extends ConnectionManager
 			String[] comp_params = ((String)params.get("--ext-comp")).split(",");
 			int idx = 0;
 			if (comp_params.length >= idx + 1) {
-				COMPONENT_NAME_VAL = comp_params[idx++];
+				PORT_LOCAL_HOST_PROP_VAL = comp_params[idx++];
 			}
 			if (comp_params.length >= idx + 1) {
 				PORT_REMOTE_HOST_PROP_VAL = comp_params[idx++];
+				PORT_ROUTING_TABLE_PROP_VAL = new String[] { PORT_REMOTE_HOST_PROP_VAL };
 				if (config_type.equals("--gen-config-cs")) {
 					PORT_IFC_PROP_VAL = new String[] {PORT_REMOTE_HOST_PROP_VAL};
 				}
@@ -210,6 +218,9 @@ public class ComponentConnectionManager extends ConnectionManager
 					PORT_TYPE_PROP_VAL = ConnectionType.connect;
 				}
 			}
+			if (comp_params.length >= idx + 1) {
+				PORT_ROUTING_TABLE_PROP_VAL = new String[] { comp_params[idx++] };
+			}
 		}
 		Map<String, Object> props = super.getDefaults(params);
 		props.put(PACK_ROUTED_KEY, PACK_ROUTED_VAL);
@@ -225,7 +236,7 @@ public class ComponentConnectionManager extends ConnectionManager
 		identity_type = (String)props.get(IDENTITY_TYPE_KEY);
 
 		//serviceEntity = new ServiceEntity(getName(), "external", "XEP-0114");
-		serviceEntity = new ServiceEntity(getName(), null, "XEP-0114");
+		serviceEntity = new ServiceEntity("XEP-0114 " + getName(), null, "XEP-0114");
 		serviceEntity.addIdentities(
 			new ServiceIdentity("component", identity_type, getName()));
 	}
@@ -237,7 +248,8 @@ public class ComponentConnectionManager extends ConnectionManager
 	protected Map<String, Object> getParamsForPort(int port) {
     Map<String, Object> defs = new TreeMap<String, Object>();
 		defs.put(SECRET_PROP_KEY, SECRET_PROP_VAL);
-		defs.put(COMPONENT_NAME_KEY, COMPONENT_NAME_VAL);
+		defs.put(PORT_LOCAL_HOST_PROP_KEY, PORT_LOCAL_HOST_PROP_VAL);
+		defs.put(PORT_ROUTING_TABLE_PROP_KEY, PORT_ROUTING_TABLE_PROP_VAL);
 		defs.put(PORT_TYPE_PROP_KEY, PORT_TYPE_PROP_VAL);
 		defs.put(PORT_SOCKET_PROP_KEY, PORT_SOCKET_PROP_VAL);
 		defs.put(PORT_REMOTE_HOST_PROP_KEY, PORT_REMOTE_HOST_PROP_VAL);
@@ -256,15 +268,16 @@ public class ComponentConnectionManager extends ConnectionManager
 	public void serviceStopped(final IOService service) {
 		super.serviceStopped(service);
 		Map<String, Object> sessionData = service.getSessionData();
-		String addr =	(String)sessionData.get(PORT_REMOTE_HOST_PROP_KEY);
-		removeRouting(addr);
+		String[] routings = (String[])sessionData.get(PORT_ROUTING_TABLE_PROP_KEY);
+		updateRoutings(routings, false);
 		ConnectionType type = service.connectionType();
 		if (type == ConnectionType.connect) {
 			reconnectService(sessionData, connectionDelay);
 		} // end of if (type == ConnectionType.connect)
 		//		removeRouting(serv.getRemoteHost());
+		String addr = (String)sessionData.get(PORT_REMOTE_HOST_PROP_KEY);
 		log.fine("Disonnected from: " + addr);
-		updateServiceDiscovery(addr, "disconnected");
+		updateServiceDiscovery(addr, "XEP-0114 disconnected");
 	}
 
 	protected String getServiceId(Packet packet) {
@@ -285,7 +298,7 @@ public class ComponentConnectionManager extends ConnectionManager
 			// Send init xmpp stream here
 			XMPPIOService serv = (XMPPIOService)service;
 			String compName =
-				(String)service.getSessionData().get(COMPONENT_NAME_KEY);
+				(String)service.getSessionData().get(PORT_LOCAL_HOST_PROP_KEY);
 			String data =
 				"<stream:stream"
 				+ " xmlns='jabber:component:accept'"
@@ -357,9 +370,30 @@ public class ComponentConnectionManager extends ConnectionManager
 		return 1000*24*HOUR;
 	}
 
+	private void updateRoutings(String[] routings, boolean add) {
+		if (add) {
+			for (String route: routings) {
+				try {
+					addRegexRouting(route);
+				} catch (Exception e) {
+					addRouting(route);
+				}
+			}
+		} else {
+			for (String route: routings) {
+				try {
+					removeRegexRouting(route);
+				} catch (Exception e) {
+					removeRouting(route);
+				}
+			}
+		}
+	}
+
 	private void updateServiceDiscovery(String jid, String name) {
-		ServiceEntity item = new ServiceEntity(jid, null, "XEP-0114");
-		item.addIdentities(new ServiceIdentity("component", identity_type, name));
+		ServiceEntity item = new ServiceEntity(jid, null, name);
+		//item.addIdentities(new ServiceIdentity("component", identity_type, name));
+		log.finest("Modifing service-discovery info: " + item.toString());
 		serviceEntity.addItems(item);
 	}
 
@@ -371,13 +405,11 @@ public class ComponentConnectionManager extends ConnectionManager
 	}
 
 	public List<Element> getDiscoItems(String node, String jid) {
-		if (node == null && MessageRouter.isLocalDomain(jid)) {
- 			return Arrays.asList(serviceEntity.getDiscoItem(null, getName() + "." + jid));
- 		}
 		if (jid.startsWith(getName()+".")) {
 			return serviceEntity.getDiscoItems(node, null);
+		} else {
+ 			return Arrays.asList(serviceEntity.getDiscoItem(null, getName() + "." + jid));
 		}
-		return null;
 	}
 
 }

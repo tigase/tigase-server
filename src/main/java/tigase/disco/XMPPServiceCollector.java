@@ -45,7 +45,7 @@ import tigase.xml.Element;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class XMPPServiceCollector
+public abstract class XMPPServiceCollector
 	extends AbstractComponentRegistrator<XMPPService> {
 
   /**
@@ -87,17 +87,13 @@ public class XMPPServiceCollector
 				(Element)packet.getElement().getChild("query").clone();
 
 			if (packet.isXMLNS("/iq/query", INFO_XMLNS)) {
-				if (node == null && MessageRouter.isLocalDomain(jid)) {
-					query = serviceEntity.getDiscoInfo(null);
-				} else {
-					for (XMPPService comp: components.values()) {
-						Element resp = comp.getDiscoInfo(node, jid);
-						if (resp != null) {
-							query = resp;
-							break;
-						}
-					} // end of for ()
-				}
+				for (XMPPService comp: components.values()) {
+					Element resp = comp.getDiscoInfo(node, jid);
+					if (resp != null) {
+						query = resp;
+						break;
+					}
+				} // end of for ()
 			}
 
 			if (packet.isXMLNS("/iq/query", ITEMS_XMLNS)) {
