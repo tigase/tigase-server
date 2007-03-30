@@ -238,7 +238,7 @@ public class ComponentConnectionManager extends ConnectionManager
 		//serviceEntity = new ServiceEntity(getName(), "external", "XEP-0114");
 		serviceEntity = new ServiceEntity("XEP-0114 " + getName(), null, "XEP-0114");
 		serviceEntity.addIdentities(
-			new ServiceIdentity("component", identity_type, getName()));
+			new ServiceIdentity("component", identity_type, "XEP-0114 " + getName()));
 	}
 
 	protected int[] getDefPlainPorts() {
