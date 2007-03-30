@@ -48,7 +48,7 @@ import tigase.db.NonAuthUserRepository;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class ServiceDiscovery extends XMPPProcessor
+public abstract class ServiceDiscovery extends XMPPProcessor
 	implements XMPPProcessorIfc {
 
 	private static final Logger log =

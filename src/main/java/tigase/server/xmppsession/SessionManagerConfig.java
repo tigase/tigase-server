@@ -66,7 +66,7 @@ public class SessionManagerConfig {
 	{"jabber:iq:register", "jabber:iq:auth", "urn:ietf:params:xml:ns:xmpp-sasl",
 	 "urn:ietf:params:xml:ns:xmpp-bind", "urn:ietf:params:xml:ns:xmpp-session",
 	 "jabber:iq:roster", "jabber:iq:privacy", "presence", "msgoffline",
-	 "jabber:iq:version", "http://jabber.org/protocol/stats", "starttls", "disco",
+	 "jabber:iq:version", "http://jabber.org/protocol/stats", "starttls",
 	 "vcard-temp", "http://jabber.org/protocol/commands"};
 
 	public static final String HOSTNAMES_PROP_KEY = "hostnames";
