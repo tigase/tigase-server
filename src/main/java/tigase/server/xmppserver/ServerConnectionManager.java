@@ -476,7 +476,7 @@ public class ServerConnectionManager extends ConnectionManager {
 		Arrays.sort(hostnames);
 
 		addRouting("*");
-		maxPacketWaitingTime = (Long)props.get(MAX_PACKET_WAITING_TIME_PROP_KEY);
+		//		maxPacketWaitingTime = (Long)props.get(MAX_PACKET_WAITING_TIME_PROP_KEY);
 	}
 
 	public void serviceStarted(final IOService service) {
