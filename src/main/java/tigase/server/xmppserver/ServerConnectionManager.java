@@ -82,8 +82,24 @@ public class ServerConnectionManager extends ConnectionManager {
 
 	public static final String HOSTNAMES_PROP_KEY = "hostnames";
 	public static String[] HOSTNAMES_PROP_VAL =	{"localhost", "hostname"};
+	public static final String MAX_PACKET_WAITING_TIME_PROP_KEY =
+		"max-packet-waiting-time";
+	public static final long MAX_PACKET_WAITING_TIME_PROP_VAL = 5*MINUTE;
 
 	private String[] hostnames = HOSTNAMES_PROP_VAL;
+
+	/**
+	 * <code>maxPacketWaitingTime</code> keeps the maximum time packets
+	 * can wait for sending in ServerPacketQueue. Packets are put in the
+	 * queue only when connection to remote server is not established so
+	 * effectively this timeout specifies the maximum time for connecting
+	 * to remote server. If this time is exceeded then no more reconnecting
+	 * attempts are performed and packets are sent back with error information.
+	 *
+	 * Default TCP/IP timeout is 300 seconds to we can follow this convention
+	 * but administrator can set different timeout in server configuration.
+	 */
+	private long maxPacketWaitingTime = MAX_PACKET_WAITING_TIME_PROP_VAL;
 
 	/**
 	 * Services connected and autorized/autenticated
@@ -441,6 +457,8 @@ public class ServerConnectionManager extends ConnectionManager {
 		}
 		hostnames = HOSTNAMES_PROP_VAL;
 		props.put(HOSTNAMES_PROP_KEY, HOSTNAMES_PROP_VAL);
+		props.put(MAX_PACKET_WAITING_TIME_PROP_KEY,
+			MAX_PACKET_WAITING_TIME_PROP_VAL);
 		return props;
 	}
 
@@ -458,6 +476,7 @@ public class ServerConnectionManager extends ConnectionManager {
 		Arrays.sort(hostnames);
 
 		addRouting("*");
+		maxPacketWaitingTime = (Long)props.get(MAX_PACKET_WAITING_TIME_PROP_KEY);
 	}
 
 	public void serviceStarted(final IOService service) {
@@ -605,9 +624,14 @@ public class ServerConnectionManager extends ConnectionManager {
 // // 			connectingByHost_Type.remove(other_id);
 // 			other_service.stop();
 // 		} // end of if (other_service != null)
-		Queue<Packet> waiting =	waitingPackets.get(cid);
+		ServerPacketQueue waiting =	waitingPackets.get(cid);
 		if (waiting != null && waiting.size() > 0) {
-			addWaitingPacket(cid, null, waitingPackets);
+			if (System.currentTimeMillis() - waiting.creationTime
+				> maxPacketWaitingTime) {
+				bouncePacketsBack(Authorization.REMOTE_SERVER_TIMEOUT, cid);
+			} else {
+				addWaitingPacket(cid, null, waitingPackets);
+			}
 		}
 	}
 
@@ -615,7 +639,7 @@ public class ServerConnectionManager extends ConnectionManager {
 		log.finest("handleDialbackSuccess: connect_jid="+connect_jid);
 		Packet p = null;
 		XMPPIOService serv = servicesByHost_Type.get(connect_jid);
-		Queue<Packet> waiting =	waitingPackets.remove(connect_jid);
+		ServerPacketQueue waiting = waitingPackets.remove(connect_jid);
 		if (waiting != null) {
 			while ((p = waiting.poll()) != null) {
 				log.finest("Sending packet: " + p.getStringData());
@@ -814,6 +838,19 @@ public class ServerConnectionManager extends ConnectionManager {
 
 	private class ServerPacketQueue extends ConcurrentLinkedQueue<Packet> {
 		private static final long serialVersionUID = 1L;
+
+		/**
+		 * Keeps the creation time. After some time the queue and all
+		 * packets waiting to send should become outdated and they
+		 * should be returned to sender and no more attempts to connect
+		 * to the remote server should be performed.
+		 */
+		private long creationTime = 0;
+
+		private ServerPacketQueue() {
+			super();
+			creationTime = System.currentTimeMillis();
+		}
 	}
 
 	/**
