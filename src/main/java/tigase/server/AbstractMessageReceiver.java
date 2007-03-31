@@ -310,7 +310,7 @@ public abstract class AbstractMessageReceiver
 	}
 
 	public boolean isInRegexRoutings(String address) {
-		log.finest(getName() + " lokking for refex routings: " + address);
+		log.finest(getName() + " looking for regex routings: " + address);
 		for (Pattern pat: regexRoutings) {
 			if (pat.matcher(address).matches()) {
 				log.finest(getName() + " matched against pattern: " + pat.toString());

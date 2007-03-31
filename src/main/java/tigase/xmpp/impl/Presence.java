@@ -78,11 +78,15 @@ public class Presence extends XMPPProcessor
 	 */
 	public void stopped(final XMPPResourceConnection session,
 		final Queue<Packet> results) {
-    try {
-			sendPresenceBroadcast(StanzaType.unavailable, session,
-				FROM_SUBSCRIBED, results, null);
-			updateOfflineChange(session, results);
-    } catch (NotAuthorizedException e) { } // end of try-catch
+		Element pres = (Element)session.getSessionData(PRESENCE_KEY);
+		if (pres == null || pres.getAttribute("type") == null
+			|| !pres.getAttribute("type").equals("unavailable")) {
+			try {
+				sendPresenceBroadcast(StanzaType.unavailable, session,
+					FROM_SUBSCRIBED, results, null);
+				updateOfflineChange(session, results);
+			} catch (NotAuthorizedException e) { } // end of try-catch
+		}
 	}
 
   /**
@@ -152,8 +156,8 @@ public class Presence extends XMPPProcessor
 			if (conn != session) {
 				// Send to new resource presence about old resource
 				Element pres_update = (Element)presence.clone();
-				pres_update.setAttribute("to", conn.getJID());
 				pres_update.setAttribute("from", session.getJID());
+				pres_update.setAttribute("to", conn.getJID());
 				Packet pack_update = new Packet(pres_update);
 				pack_update.setTo(conn.getConnectionId());
 				results.offer(pack_update);
@@ -259,8 +263,9 @@ public class Presence extends XMPPProcessor
 			boolean subscr_changed = false;
 			switch (pres_type) {
 			case out_initial:
+				// Is it direct presence to some entity on the network?
 				if (packet.getElemTo() != null) {
-					// Send direct presence
+					// Yes this is it, send direct presence
 					Element result = (Element)packet.getElement().clone();
 					results.offer(new Packet(result));
 				} else {
