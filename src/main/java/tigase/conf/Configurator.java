@@ -177,10 +177,6 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 		component.setProperties(prop);
 	}
 
-// 	public String getName() {
-// 		return "basic-conf";
-// 	}
-
 	/**
    * Returns defualt configuration settings in case if there is no
    * config file.
