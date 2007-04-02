@@ -1,5 +1,5 @@
 /*  Package Jabber Server
- *  Copyright (C) 2001, 2002, 2003, 2004, 2005
+ *  Copyright (C) 2001-2007
  *  "Artur Hefczyc" <artur.hefczyc@tigase.org>
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -62,11 +62,25 @@ public class SessionManagerConfig {
 	public static final String AUTH_REPO_URL_PROP_KEY = "auth-repo-url";
 
 	public static final String COMPONENTS_PROP_KEY = "components";
+	/**
+	 * List of default components loaded by the server. It can be changed later
+	 * in config file or at runtime.
+	 */
 	public static final String[] COMPONENTS_PROP_VAL =
 	{"jabber:iq:register", "jabber:iq:auth", "urn:ietf:params:xml:ns:xmpp-sasl",
 	 "urn:ietf:params:xml:ns:xmpp-bind", "urn:ietf:params:xml:ns:xmpp-session",
 	 "jabber:iq:roster", "jabber:iq:privacy", "presence", "msgoffline",
 	 "jabber:iq:version", "http://jabber.org/protocol/stats", "starttls",
+	 "vcard-temp", "http://jabber.org/protocol/commands"};
+	/**
+	 * List of components loaded when the server is loaded in test mode.
+	 * Some components like off-line message storage is disabled during tests.
+	 */
+	public static final String[] COMPONENTS_TEST_PROP_VAL =
+	{"jabber:iq:register", "jabber:iq:auth", "urn:ietf:params:xml:ns:xmpp-sasl",
+	 "urn:ietf:params:xml:ns:xmpp-bind", "urn:ietf:params:xml:ns:xmpp-session",
+	 "jabber:iq:roster", "jabber:iq:privacy", "presence", "jabber:iq:version",
+	 "http://jabber.org/protocol/stats", "starttls",
 	 "vcard-temp", "http://jabber.org/protocol/commands"};
 
 	public static final String HOSTNAMES_PROP_KEY = "hostnames";
@@ -128,7 +142,15 @@ public class SessionManagerConfig {
 	  props.put(AUTH_REPO_CLASS_PROP_KEY, auth_repo_class);
 	  props.put(AUTH_REPO_URL_PROP_KEY, auth_repo_url);
 
-		props.put(COMPONENTS_PROP_KEY, COMPONENTS_PROP_VAL);
+		if (params.get("--test") != null) {
+			// Some components are not loaded during tests at least until proper
+			// test cases are created for them. Sample case is off-line message
+			// storage which may impact some test cases.
+			props.put(COMPONENTS_PROP_KEY, COMPONENTS_TEST_PROP_VAL);
+		} else {
+			props.put(COMPONENTS_PROP_KEY, COMPONENTS_PROP_VAL);
+		}
+
 		if (params.get("--virt-hosts") != null) {
 			HOSTNAMES_PROP_VAL = ((String)params.get("--virt-hosts")).split(",");
 		} else {
