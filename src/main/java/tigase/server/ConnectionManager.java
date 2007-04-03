@@ -100,10 +100,6 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 	public static final String TLS_TRUSTS_STORE_PROP_VAL = "certs/truststore";
 	public static final String MAX_RECONNECTS_PROP_KEY = "max-reconnects";
 
-	protected static final long SECOND = 1000;
-	protected static final long MINUTE = 60*SECOND;
-	protected static final long HOUR = 60*MINUTE;
-
 	private static ConnectionOpenThread connectThread =
 		ConnectionOpenThread.getInstance();
 	private static SocketReadThread readThread = SocketReadThread.getInstance();
