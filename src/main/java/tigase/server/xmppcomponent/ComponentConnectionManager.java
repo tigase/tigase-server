@@ -220,6 +220,9 @@ public class ComponentConnectionManager extends ConnectionManager
 			}
 			if (comp_params.length >= idx + 1) {
 				PORT_ROUTING_TABLE_PROP_VAL = new String[] { comp_params[idx++] };
+			} else {
+				PORT_ROUTING_TABLE_PROP_VAL =
+					new String[] { ".*" + PORT_REMOTE_HOST_PROP_VAL };
 			}
 		}
 		Map<String, Object> props = super.getDefaults(params);
