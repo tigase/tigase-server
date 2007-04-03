@@ -56,6 +56,10 @@ import tigase.util.JID;
 public abstract class AbstractMessageReceiver
   implements StatisticsContainer, MessageReceiver, Configurable {
 
+	protected static final long SECOND = 1000;
+	protected static final long MINUTE = 60*SECOND;
+	protected static final long HOUR = 60*MINUTE;
+
 	public static final String MAX_QUEUE_SIZE_PROP_KEY = "max-queue-size";
 	//  public static final Integer MAX_QUEUE_SIZE_PROP_VAL = Integer.MAX_VALUE;
   public static final Integer MAX_QUEUE_SIZE_PROP_VAL = 1000;
@@ -125,8 +129,7 @@ public abstract class AbstractMessageReceiver
 				"Adding packet to inQueue: " + packet.getStringData());
 			in_queue.put(new QueueElement(QueueElementType.IN_QUEUE, packet));
 			++statAddedMessagesOk;
-		} // end of try
-		catch (InterruptedException e) {
+		} catch (InterruptedException e) {
 			++statAddedMessagesEr;
 			return false;
 		} // end of try-catch
@@ -139,8 +142,7 @@ public abstract class AbstractMessageReceiver
 				"Adding packet to outQueue: " + packet.getStringData());
 			out_queue.put(new QueueElement(QueueElementType.OUT_QUEUE, packet));
 			++statAddedMessagesOk;
-		} // end of try
-		catch (InterruptedException e) {
+		} catch (InterruptedException e) {
 			++statAddedMessagesEr;
 			return false;
 		} // end of try-catch
