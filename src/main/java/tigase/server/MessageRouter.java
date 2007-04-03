@@ -41,12 +41,16 @@ import java.util.Collections;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 import tigase.xml.Element;
 import tigase.util.JID;
 import tigase.xmpp.Authorization;
 import tigase.disco.XMPPService;
 import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
+import tigase.stats.StatRecord;
+import tigase.stats.StatisticType;
+import tigase.stats.StatisticsContainer;
 
 import static tigase.server.MessageRouterConfig.*;
 
@@ -69,6 +73,8 @@ public class MessageRouter extends AbstractMessageReceiver {
 
   private static final Logger log =
     Logger.getLogger("tigase.server.MessageRouter");
+
+	private static final long startupTime = System.currentTimeMillis();
 
 	private String defHostName = null;
 	private static Set<String> localAddresses =	new CopyOnWriteArraySet<String>();
@@ -399,7 +405,7 @@ public class MessageRouter extends AbstractMessageReceiver {
 						List<Element> items =	comp.getDiscoItems(node, jid);
 						if (items != null && items.size() > 0) {
 							query.addChildren(items);
-						} // end of if (stats != null && stats.count() > 0)
+						}
 					}
 				} // end of for ()
 			}
@@ -415,6 +421,24 @@ public class MessageRouter extends AbstractMessageReceiver {
 
 	public List<Element> getDiscoItems(String node, String jid) {
 		return null;
+	}
+
+	public List<StatRecord> getStatistics() {
+		List<StatRecord> stats = super.getStatistics();
+    long uptime = (System.currentTimeMillis() - startupTime);
+		long days = uptime / (24 * HOUR);
+		long hours = (uptime - (days * 24 * HOUR)) / HOUR;
+		long minutes = (uptime - (days * 24 * HOUR + hours * HOUR)) / MINUTE;
+		long seconds =
+			(uptime - (days * 24 * HOUR + hours * HOUR + minutes * MINUTE)) / SECOND;
+		StringBuilder sb = new StringBuilder();
+		stats.add(new StatRecord(getName(), "Uptime", "time",	""
+				+ (days > 0 ? days + " day, " : "")
+				+ (hours > 0 ? hours + " hour, " : "")
+				+ (minutes > 0 ? minutes + " min, " : "")
+				+ (seconds > 0 ? seconds + " sec" : "")
+				, Level.INFO));
+		return stats;
 	}
 
 }
