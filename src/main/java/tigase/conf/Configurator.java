@@ -185,9 +185,9 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 		Map<String, Object> defaults = new TreeMap<String, Object>();
 		if ((Boolean)params.get("--test")) {
 			defaults.put(LOGGING_KEY + ".level", "WARNING");
-			defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.level", "WARNING");
+			defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.level", "INFO");
 		} else {
-			defaults.put(LOGGING_KEY + ".level", "FINE");
+			defaults.put(LOGGING_KEY + ".level", "INFO");
 			defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.level", "ALL");
 		}
 		defaults.put(LOGGING_KEY + "handlers",
@@ -205,7 +205,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 			"logs/tigase.log");
 		defaults.put(LOGGING_KEY + "tigase.useParentHandlers", "true");
 		if (params.get("--debug") != null) {
-			defaults.put(LOGGING_KEY + ".level", "FINE");
+			defaults.put(LOGGING_KEY + ".level", "INFO");
 			defaults.put(LOGGING_KEY + "tigase."+params.get("--debug")+".level", "ALL");
 			defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.level", "ALL");
 			defaults.put(LOGGING_KEY + "java.util.logging.ConsoleHandler.level", "ALL");
