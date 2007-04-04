@@ -75,7 +75,7 @@ public class ClientConnectionManager extends ConnectionManager {
 	public static final String ROUTING_MODE_PROP_KEY = "multi-mode";
 	public static final boolean ROUTING_MODE_PROP_VAL = true;
 	public static final String ROUTING_ENTRY_PROP_KEY = ".+";
-	public static final String ROUTING_ENTRY_PROP_VAL = "session_1@localhost";
+	public static final String ROUTING_ENTRY_PROP_VAL = "sess_man@localhost";
 
 	public static final String HOSTNAMES_PROP_KEY = "hostnames";
 	public static String[] HOSTNAMES_PROP_VAL =	{"localhost", "hostname"};
