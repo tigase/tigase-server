@@ -183,6 +183,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
    */
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> defaults = new TreeMap<String, Object>();
+		defaults.put(LOGGING_KEY + "java.util.logging.ConsoleHandler.level", "WARNING");
 		if ((Boolean)params.get("--test")) {
 			defaults.put(LOGGING_KEY + ".level", "WARNING");
 			defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.level", "INFO");
