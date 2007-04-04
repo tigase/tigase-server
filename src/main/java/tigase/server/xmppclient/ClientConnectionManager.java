@@ -54,6 +54,8 @@ import tigase.xmpp.XMPPResourceConnection;
 import tigase.net.IOService;
 import tigase.net.SocketReadThread;
 
+import static tigase.server.MessageRouterConfig.DEF_SM_NAME;
+
 /**
  * Class ClientConnectionManager
  *
@@ -75,7 +77,7 @@ public class ClientConnectionManager extends ConnectionManager {
 	public static final String ROUTING_MODE_PROP_KEY = "multi-mode";
 	public static final boolean ROUTING_MODE_PROP_VAL = true;
 	public static final String ROUTING_ENTRY_PROP_KEY = ".+";
-	public static final String ROUTING_ENTRY_PROP_VAL = "sess_man@localhost";
+	public static final String ROUTING_ENTRY_PROP_VAL = DEF_SM_NAME + "@localhost";
 
 	public static final String HOSTNAMES_PROP_KEY = "hostnames";
 	public static String[] HOSTNAMES_PROP_VAL =	{"localhost", "hostname"};
@@ -192,10 +194,10 @@ public class ClientConnectionManager extends ConnectionManager {
 			&& params.get("--ext-comp") != null) {
 			String[] comp_params = ((String)params.get("--ext-comp")).split(",");
 			props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_ENTRY_PROP_KEY,
-				"session_1@" + comp_params[1]);
+				DEF_SM_NAME + "@" + comp_params[1]);
 		} else {
 			props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_ENTRY_PROP_KEY,
-				"session_1@" + HOSTNAMES_PROP_VAL[0]);
+				DEF_SM_NAME + "@" + HOSTNAMES_PROP_VAL[0]);
 		}
 		return props;
 	}

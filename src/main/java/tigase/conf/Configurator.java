@@ -54,6 +54,8 @@ import tigase.xml.XMLUtils;
 import tigase.xml.db.Types.DataType;
 import tigase.xmpp.Authorization;
 
+import static tigase.server.MessageRouterConfig.DEF_SM_NAME;
+
 /**
  * Class Configurator
  *
@@ -420,9 +422,11 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 			+ " -f             force creation of the new property - dangerous option...\n"
 			+ "Samples:\n"
 			+ " Setting admin account - overwriting any previous value(s)\n"
-			+ " $ ./scripts/config.sh -c tigase-config.xml -print -set -key session_1/admins -value admin1@localhost\n"
+			+ " $ ./scripts/config.sh -c tigase-config.xml -print -set -key "
+			+ DEF_SM_NAME + "/admins -value admin1@localhost\n"
 			+ " Adding next admin account leaving old value(s)\n"
-			+ " $ ./scripts/config.sh -c tigase-config.xml -print -add -key session_1/admins -value admin2@localhost\n"
+			+ " $ ./scripts/config.sh -c tigase-config.xml -print -add -key "
+			+ DEF_SM_NAME + "/admins -value admin2@localhost\n"
 			+ "\n"
 			+ "Note: adding -print option is useful always, even with -set or -add\n"
 			+ "      option as it prints set value afterwards.\n"
@@ -571,7 +575,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 				msg = "You are not admin. You can safely play with the settings as"
 					+ " you can not change anything.";
 				if (packet.getStrCommand() != null
-					&& packet.getStrCommand().endsWith("session_1")) {
+					&& packet.getStrCommand().endsWith(DEF_SM_NAME)) {
 					Packet result = packet.commandResult("result");
 					Command.addFieldValue(result, "Note",	msg, "fixed");
 					Command.addFieldValue(result, "Note",

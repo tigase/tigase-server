@@ -50,60 +50,33 @@ public class MessageRouterConfig {
 		"components/msg-receivers/";
 	public static final String MSG_RECEIVERS_NAMES_PROP_KEY =
 		MSG_RECEIVERS_PROP_KEY + "id-names";
+	public static final String DEF_SM_NAME = "sess_man";
+	public static final String DEF_C2S_NAME = "c2s";
+	public static final String DEF_S2S_NAME = "s2s";
+	public static final String DEF_EXT_COMP_NAME = "ext_comp";
+
 	public static final String[] ALL_MSG_RECEIVERS_NAMES_PROP_VAL =
-	{	"c2s", "s2s", "ext_comp", "sess_man"	};
+	{	DEF_C2S_NAME, DEF_S2S_NAME, DEF_EXT_COMP_NAME, DEF_SM_NAME };
 	public static final String[] DEF_MSG_RECEIVERS_NAMES_PROP_VAL =
-	{	"c2s", "s2s", "sess_man"	};
+	{	DEF_C2S_NAME, DEF_S2S_NAME, DEF_SM_NAME };
 	public static final String[] SM_MSG_RECEIVERS_NAMES_PROP_VAL =
-	{	"ext_comp", "sess_man"	};
+	{	DEF_EXT_COMP_NAME, DEF_SM_NAME };
 	public static final String[] CS_MSG_RECEIVERS_NAMES_PROP_VAL =
-	{	"c2s", "s2s", "ext_comp" };
+	{	DEF_C2S_NAME, DEF_S2S_NAME, DEF_EXT_COMP_NAME };
 
 	public static final Map<String, String> MSG_RCV_CLASSES =
 		new HashMap<String, String>();
 
 	static {
-		MSG_RCV_CLASSES.put("c2s",
+		MSG_RCV_CLASSES.put(DEF_C2S_NAME,
 			"tigase.server.xmppclient.ClientConnectionManager");
-		MSG_RCV_CLASSES.put("s2s",
+		MSG_RCV_CLASSES.put(DEF_S2S_NAME,
 			"tigase.server.xmppserver.ServerConnectionManager");
-		MSG_RCV_CLASSES.put("ext_comp",
+		MSG_RCV_CLASSES.put(DEF_EXT_COMP_NAME,
 			"tigase.server.xmppcomponent.ComponentConnectionManager");
-		MSG_RCV_CLASSES.put("sess_man",
+		MSG_RCV_CLASSES.put(DEF_SM_NAME,
 			"tigase.server.xmppsession.SessionManager");
 	}
-
-// 	public static final String CLIENT_1_CLASS_PROP_KEY =
-// 		MSG_RECEIVERS_PROP_KEY + "client_1.class";
-// 	public static final String CLIENT_1_CLASS_PROP_VAL =
-// 		"tigase.server.xmppclient.ClientConnectionManager";
-// 	public static final String CLIENT_1_ACTIVE_PROP_KEY =
-// 		MSG_RECEIVERS_PROP_KEY + "client_1.active";
-// 	public static final boolean CLIENT_1_ACTIVE_PROP_VAL = true;
-
-// 	public static final String SERVER_1_CLASS_PROP_KEY =
-// 		MSG_RECEIVERS_PROP_KEY + "server_1.class";
-// 	public static final String SERVER_1_CLASS_PROP_VAL =
-// 		"tigase.server.xmppserver.ServerConnectionManager";
-// 	public static final String SERVER_1_ACTIVE_PROP_KEY =
-// 		MSG_RECEIVERS_PROP_KEY + "server_1.active";
-// 	public static final boolean SERVER_1_ACTIVE_PROP_VAL = true;
-
-// 	public static final String COMPONENT_1_CLASS_PROP_KEY =
-// 		MSG_RECEIVERS_PROP_KEY + "comp_1.class";
-// 	public static final String COMPONENT_1_CLASS_PROP_VAL =
-// 		"tigase.server.xmppcomponent.ComponentConnectionManager";
-// 	public static final String COMPONENT_1_ACTIVE_PROP_KEY =
-// 		MSG_RECEIVERS_PROP_KEY + "comp_1.active";
-// 	public static final boolean COMPONENT_1_ACTIVE_PROP_VAL = true;
-
-// 	public static final String SESSION_1_CLASS_PROP_KEY =
-// 		MSG_RECEIVERS_PROP_KEY + "session_1.class";
-// 	public static final String SESSION_1_CLASS_PROP_VAL =
-// 		"tigase.server.xmppsession.SessionManager";
-// 	public static final String SESSION_1_ACTIVE_PROP_KEY =
-// 		MSG_RECEIVERS_PROP_KEY + "session_1.active";
-// 	public static final boolean SESSION_1_ACTIVE_PROP_VAL = true;
 
 	public static final String REGISTRATOR_PROP_KEY = "components/registrators/";
 	public static final String REGISTRATOR_NAMES_PROP_KEY =
@@ -117,14 +90,6 @@ public class MessageRouterConfig {
 	public static final String STAT_1_ACTIVE_PROP_KEY =
 		REGISTRATOR_PROP_KEY + "stat_1.active";
 	public static final boolean STAT_1_ACTIVE_PROP_VAL = true;
-
-// 	public static final String SERVICE_1_CLASS_PROP_KEY =
-// 		REGISTRATOR_PROP_KEY + "service_1.class";
-// 	public static final String SERVICE_1_CLASS_PROP_VAL =
-// 		"tigase.disco.XMPPServiceCollector";
-// 	public static final String SERVICE_1_ACTIVE_PROP_KEY =
-// 		REGISTRATOR_PROP_KEY + "service_1.active";
-// 	public static final boolean SERVICE_1_ACTIVE_PROP_VAL = true;
 
 	public static void getDefaults(Map<String, Object> defs,
 		Map<String, Object> params, String comp_name) {
@@ -156,20 +121,9 @@ public class MessageRouterConfig {
 			defs.put(MSG_RECEIVERS_PROP_KEY + name + ".class", def_class);
 			defs.put(MSG_RECEIVERS_PROP_KEY + name + ".active", true);
 		}
-// 		defs.put(CLIENT_1_CLASS_PROP_KEY, CLIENT_1_CLASS_PROP_VAL);
-// 		defs.put(CLIENT_1_ACTIVE_PROP_KEY, CLIENT_1_ACTIVE_PROP_VAL);
-// 		defs.put(SERVER_1_CLASS_PROP_KEY, SERVER_1_CLASS_PROP_VAL);
-// 		defs.put(SERVER_1_ACTIVE_PROP_KEY, SERVER_1_ACTIVE_PROP_VAL);
-// 		defs.put(COMPONENT_1_CLASS_PROP_KEY, COMPONENT_1_CLASS_PROP_VAL);
-// 		defs.put(COMPONENT_1_ACTIVE_PROP_KEY, COMPONENT_1_ACTIVE_PROP_VAL);
-// 		defs.put(SESSION_1_CLASS_PROP_KEY, SESSION_1_CLASS_PROP_VAL);
-// 		defs.put(SESSION_1_ACTIVE_PROP_KEY, SESSION_1_ACTIVE_PROP_VAL);
-
 		defs.put(REGISTRATOR_NAMES_PROP_KEY, REGISTRATOR_NAMES_PROP_VAL);
 		defs.put(STAT_1_CLASS_PROP_KEY, STAT_1_CLASS_PROP_VAL);
 		defs.put(STAT_1_ACTIVE_PROP_KEY, STAT_1_ACTIVE_PROP_VAL);
-// 		defs.put(SERVICE_1_CLASS_PROP_KEY, SERVICE_1_CLASS_PROP_VAL);
-// 		defs.put(SERVICE_1_ACTIVE_PROP_KEY, SERVICE_1_ACTIVE_PROP_VAL);
 		if (params.get("--virt-hosts") != null) {
 			LOCAL_ADDRESSES_PROP_VALUE =
 				 ((String)params.get("--virt-hosts")).split(",");
