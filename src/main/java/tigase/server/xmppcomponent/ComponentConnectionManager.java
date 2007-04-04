@@ -83,7 +83,6 @@ public class ComponentConnectionManager extends ConnectionManager
 	private boolean pack_routed = PACK_ROUTED_VAL;
 	private boolean service_disco = RETURN_SERVICE_DISCO_VAL;
 	private String identity_type = IDENTITY_TYPE_VAL;
-	private String remote_host = null;
 
   /**
    * Variable <code>log</code> is a class logger.
@@ -262,10 +261,7 @@ public class ComponentConnectionManager extends ConnectionManager
 	}
 
 	protected String getUniqueId(IOService serv) {
-		remote_host =
-			(String)serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
-		return remote_host;
-		// 		return serv.getRemoteHost();
+		return (String)serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
 	}
 
 	public void serviceStopped(final IOService service) {
@@ -284,7 +280,7 @@ public class ComponentConnectionManager extends ConnectionManager
 	}
 
 	protected String getServiceId(Packet packet) {
-		return JID.getNodeHost(remote_host);
+		return JID.getNodeHost(JID.getNodeHost(packet.getTo()));
 	}
 
 	public void serviceStarted(final IOService service) {
