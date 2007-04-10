@@ -142,7 +142,7 @@ public class SessionManagerConfig {
 	  props.put(AUTH_REPO_CLASS_PROP_KEY, auth_repo_class);
 	  props.put(AUTH_REPO_URL_PROP_KEY, auth_repo_url);
 
-		if (params.get("--test") != null) {
+		if ((Boolean)params.get("--test")) {
 			// Some components are not loaded during tests at least until proper
 			// test cases are created for them. Sample case is off-line message
 			// storage which may impact some test cases.
