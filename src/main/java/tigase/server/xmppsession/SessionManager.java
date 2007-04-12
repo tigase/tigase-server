@@ -51,6 +51,7 @@ import tigase.db.TigaseDBException;
 import tigase.db.UserAuthRepository;
 import tigase.db.UserNotFoundException;
 import tigase.db.UserRepository;
+import tigase.server.XMPPServer;
 import tigase.server.AbstractMessageReceiver;
 import tigase.server.MessageReceiver;
 import tigase.server.Packet;
@@ -349,7 +350,15 @@ public class SessionManager extends AbstractMessageReceiver
 					connection.setResource(JID.getNodeResource(user_jid));
 					Packet presence =
 						new Packet(new Element("presence",
-								new Element[] {new Element("priority", "-1")}, null, null));
+								new Element[] {
+									new Element("priority", "-1"),
+									new Element("c",
+										new String[] {"node", "ver", "ext", "xmlns"},
+										new String[] {"http://www.google.com/xmpp/client/caps",
+																	XMPPServer.getImplementationVersion(),
+																	"voice-v1",
+																	"http://jabber.org/protocol/caps"})},
+								null, null));
 					presence.setFrom(pc.getElemFrom());
 					presence.setTo(getName() + "@" + pc.getTo());
 					addOutPacket(presence);
