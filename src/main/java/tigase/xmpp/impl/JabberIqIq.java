@@ -135,7 +135,7 @@ public class JabberIqIq extends XMPPProcessor
 					} // end of else
 					break;
 				case result:
-					Element elem = (Element)packet.getElement().clone();
+					Element elem = packet.getElement().clone();
 					Packet result = new Packet(elem);
 					result.setTo(session.getConnectionId());
 					result.setFrom(packet.getTo());
@@ -147,7 +147,7 @@ public class JabberIqIq extends XMPPProcessor
 					break;
 				} // end of switch (type)
 			} else {
-				Element result = (Element)packet.getElement().clone();
+				Element result = packet.getElement().clone();
 				results.offer(new Packet(result));
 			} // end of else
 		} catch (NotAuthorizedException e) {

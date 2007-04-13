@@ -272,7 +272,7 @@ public class SessionManager extends AbstractMessageReceiver
 			for (String admin: admins) {
 				log.finer("Sending packet to admin: " + admin);
 				Packet admin_pac =
-          new Packet((Element)packet.getElement().clone());
+          new Packet(packet.getElement().clone());
 				admin_pac.getElement().setAttribute("to", admin);
 				processPacket(admin_pac);
 			} // end of for (String admin: admins)

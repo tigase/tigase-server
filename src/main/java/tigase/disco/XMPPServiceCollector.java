@@ -83,8 +83,7 @@ public abstract class XMPPServiceCollector
 
 			String jid = packet.getElemTo();
 			String node = packet.getAttribute("/iq/query", "node");
-			Element query =
-				(Element)packet.getElement().getChild("query").clone();
+			Element query = packet.getElement().getChild("query").clone();
 
 			if (packet.isXMLNS("/iq/query", INFO_XMLNS)) {
 				for (XMPPService comp: components.values()) {

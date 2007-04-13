@@ -587,7 +587,7 @@ public class Roster {
 		query.addChild(item);
 		update.addChild(query);
 		for (XMPPResourceConnection conn: session.getActiveSessions()) {
-			Element conn_update = (Element)update.clone();
+			Element conn_update = update.clone();
 			conn_update.setAttribute("to", conn.getJID());
 			conn_update.setAttribute("id", ""+(++iq_id));
 			Packet pack_update = new Packet(conn_update);

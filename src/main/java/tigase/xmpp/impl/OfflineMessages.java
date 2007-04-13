@@ -183,7 +183,7 @@ public class OfflineMessages extends XMPPProcessor
 			|| (pac.getElemName().equals("presence") &&
 					(type == StanzaType.subscribe || type == StanzaType.subscribed
 						|| type == StanzaType.unsubscribe || type == StanzaType.unsubscribed))) {
-			Element packet = (Element)pac.getElement().clone();
+			Element packet = pac.getElement().clone();
 			String stamp = null;
 			synchronized (formater) {
 				stamp = formater.format(new Date());

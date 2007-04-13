@@ -336,14 +336,14 @@ public class Packet {
 	}
 
 	public Packet swapElemFromTo() {
-		Element copy = (Element)elem.clone();
+		Element copy = elem.clone();
 		copy.setAttribute("to", getElemFrom());
 		copy.setAttribute("from", getElemTo());
 		return new Packet(copy);
 	}
 
 	public Packet swapElemFromTo(final StanzaType type) {
-		Element copy = (Element)elem.clone();
+		Element copy = elem.clone();
 		copy.setAttribute("to", getElemFrom());
 		copy.setAttribute("from", getElemTo());
 		copy.setAttribute("type", type.toString());

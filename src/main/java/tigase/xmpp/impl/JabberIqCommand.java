@@ -92,14 +92,14 @@ public class JabberIqCommand extends XMPPProcessor implements XMPPProcessorIfc {
 
 			if (id.equals(session.getUserId())) {
 				// Yes this is message to 'this' client
-				Element elem = (Element)packet.getElement().clone();
+				Element elem = packet.getElement().clone();
 				Packet result = new Packet(elem);
 				result.setTo(session.getConnectionId());
 				result.setFrom(packet.getTo());
 				results.offer(result);
 			} else {
 				// This is message to some other client
-				Element result = (Element)packet.getElement().clone();
+				Element result = packet.getElement().clone();
 				results.offer(new Packet(result));
 			} // end of else
 		} catch (NotAuthorizedException e) {

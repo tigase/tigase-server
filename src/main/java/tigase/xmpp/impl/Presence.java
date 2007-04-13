@@ -155,7 +155,7 @@ public class Presence extends XMPPProcessor
 			log.finer("Update presence change to: " + conn.getJID());
 			if (conn != session) {
 				// Send to new resource presence about old resource
-				Element pres_update = (Element)presence.clone();
+				Element pres_update = presence.clone();
 				pres_update.setAttribute("from", session.getJID());
 				pres_update.setAttribute("to", conn.getJID());
 				Packet pack_update = new Packet(pres_update);
@@ -163,7 +163,7 @@ public class Presence extends XMPPProcessor
 				results.offer(pack_update);
 				Element presence_el = (Element)conn.getSessionData(PRESENCE_KEY);
 				if (presence_el != null) {
-					pres_update = (Element)(presence_el).clone();
+					pres_update = presence_el.clone();
 					pres_update.setAttribute("to", session.getJID());
 					pres_update.setAttribute("from", conn.getJID());
 					pack_update = new Packet(pres_update);
@@ -193,7 +193,7 @@ public class Presence extends XMPPProcessor
 		for (XMPPResourceConnection conn: session.getActiveSessions()) {
 			log.finer("Update presence change to: " + conn.getJID());
 			// Send to old resource presence about new resource
-			Element pres_update = (Element)presence.clone();
+			Element pres_update = presence.clone();
 			pres_update.setAttribute("to", conn.getJID());
 			Packet pack_update = new Packet(pres_update);
 			pack_update.setTo(conn.getConnectionId());
@@ -203,7 +203,7 @@ public class Presence extends XMPPProcessor
 
 	protected void forwardPresence(final Queue<Packet> results,
 		final Packet packet, final String from) {
-		Element result = (Element)packet.getElement().clone();
+		Element result = packet.getElement().clone();
 		// According to spec we must set proper FROM attribute
 		result.setAttribute("from", from);
 		log.finest("\n\nFORWARD presence: " + result.toString());
@@ -224,7 +224,7 @@ public class Presence extends XMPPProcessor
 			} // end of if (t != null) else
 		} // end of if (pres == null)
 		else {
-			presence = (Element)pres.clone();
+			presence = pres.clone();
 		} // end of if (pres == null) else
 		presence.setAttribute("to", to);
 		presence.setAttribute("from", from);
@@ -266,7 +266,7 @@ public class Presence extends XMPPProcessor
 				// Is it direct presence to some entity on the network?
 				if (packet.getElemTo() != null) {
 					// Yes this is it, send direct presence
-					Element result = (Element)packet.getElement().clone();
+					Element result = packet.getElement().clone();
 					results.offer(new Packet(result));
 				} else {
 					boolean first = false;
@@ -304,7 +304,7 @@ public class Presence extends XMPPProcessor
 						results, packet.getElement());
 
 					// Broadcast initial presence to other available user resources
-					//				Element presence = (Element)packet.getElement().clone();
+					//				Element presence = packet.getElement().clone();
 					// Already done above, don't need to set it again here
 					// presence.setAttribute("from", session.getJID());
 					updateUserResources(packet.getElement(), session, results);
@@ -341,7 +341,7 @@ public class Presence extends XMPPProcessor
 				if (Roster.isSubscribedTo(session, packet.getElemFrom())) {
 					updatePresenceChange(packet.getElement(), session, results);
 				} else {
-					Element elem = (Element)packet.getElement().clone();
+					Element elem = packet.getElement().clone();
 					Packet result = new Packet(elem);
 					result.setTo(session.getConnectionId());
 					result.setFrom(packet.getTo());
@@ -441,7 +441,7 @@ public class Presence extends XMPPProcessor
 				break;
 			case error: {
 				// This is message to 'this' client probably
-				Element elem = (Element)packet.getElement().clone();
+				Element elem = packet.getElement().clone();
 				Packet result = new Packet(elem);
 				result.setTo(session.getConnectionId());
 				result.setFrom(packet.getTo());

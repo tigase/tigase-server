@@ -132,7 +132,7 @@ public class JabberIqVersion extends XMPPProcessor
 			// after checking if this message is just to local server
 			if (id.equals(session.getUserId())) {
 				// Yes this is message to 'this' client
-				Element elem = (Element)packet.getElement().clone();
+				Element elem = packet.getElement().clone();
 				Packet result = new Packet(elem);
 				result.setTo(session.getConnectionId());
 				result.setFrom(packet.getTo());
@@ -143,7 +143,7 @@ public class JabberIqVersion extends XMPPProcessor
 				// Actually processor should not modify request but in this
 				// case it is absolutely safe and recommended to set 'from'
 				// attribute
-				Element result = (Element)packet.getElement().clone();
+				Element result = packet.getElement().clone();
 				// According to spec we must set proper FROM attribute
 				//				result.setAttribute("from", session.getJID());
 				results.offer(new Packet(result));
