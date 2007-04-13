@@ -61,6 +61,8 @@ public class VCardTemp extends XMPPProcessor implements XMPPProcessorIfc {
 
   protected static final String XMLNS = "vcard-temp";
 	protected static final String ID = XMLNS;
+	// VCARD element is added to support old vCard protocol where element
+	// name was all upper cases. Now the plugin should catch both cases.
 	protected static final String[] ELEMENTS = {"vCard", "VCARD"};
   protected static final String[] XMLNSS = {XMLNS, XMLNS};
 
@@ -130,7 +132,13 @@ public class VCardTemp extends XMPPProcessor implements XMPPProcessorIfc {
 					break;
 				case set:
 					if (packet.getFrom().equals(session.getConnectionId())) {
-						Element elvCard = packet.getElement().getChild("vCard");
+						Element elvCard = packet.getElement().getChild(ELEMENTS[0]);
+						// This is added to support old vCard protocol where element
+						// name was all upper cases. So here I am checking both
+						// possibilities
+						if (elvCard == null) {
+							elvCard = packet.getElement().getChild(ELEMENTS[1]);
+						}
 						if (elvCard != null) {
 							log.finer("Adding vCard: " + elvCard.toString());
 							session.setPublicData(ID, VCARD_KEY, elvCard.toString());
