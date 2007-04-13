@@ -61,8 +61,8 @@ public class VCardTemp extends XMPPProcessor implements XMPPProcessorIfc {
 
   protected static final String XMLNS = "vcard-temp";
 	protected static final String ID = XMLNS;
-	protected static final String[] ELEMENTS = {"vCard"};
-  protected static final String[] XMLNSS = {XMLNS};
+	protected static final String[] ELEMENTS = {"vCard", "VCARD"};
+  protected static final String[] XMLNSS = {XMLNS, XMLNS};
 
 	private static final SimpleParser parser =
 		SingletonFactory.getParserInstance();
@@ -145,7 +145,7 @@ public class VCardTemp extends XMPPProcessor implements XMPPProcessorIfc {
 					} // end of else
 					break;
 				case result:
-					Element elem = (Element)packet.getElement().clone();
+					Element elem = packet.getElement().clone();
 					Packet result = new Packet(elem);
 					result.setTo(session.getConnectionId());
 					result.setFrom(packet.getTo());
@@ -157,7 +157,7 @@ public class VCardTemp extends XMPPProcessor implements XMPPProcessorIfc {
 					break;
 				} // end of switch (type)
 			} else {
-				Element result = (Element)packet.getElement().clone();
+				Element result = packet.getElement().clone();
 				// According to spec we must set proper FROM attribute
 				//				result.setAttribute("from", session.getJID());
 				results.offer(new Packet(result));
