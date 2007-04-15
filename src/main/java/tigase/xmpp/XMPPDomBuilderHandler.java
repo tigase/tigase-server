@@ -110,8 +110,9 @@ public class XMPPDomBuilderHandler implements SimpleHandler {
 		// Look for 'xmlns:' declarations:
 		if (attr_names != null) {
 			for (int i = 0; i < attr_names.length; ++i) {
-				if (attr_names[i] != null
-					&& attr_names[i].toString().startsWith("xmlns:")) {
+				// Exit the loop as soon as we reach end of attributes set
+				if (attr_names[i] == null) { break;	}
+				if (attr_names[i].toString().startsWith("xmlns:")) {
 					namespaces.put(attr_names[i].substring("xmlns:".length(),
 							attr_names[i].length()),
 						attr_values[i].toString());
@@ -126,8 +127,7 @@ public class XMPPDomBuilderHandler implements SimpleHandler {
 				for (int i = 0; i < attr_names.length; i++) {
 					if (attr_names[i] != null && attr_values[i] != null) {
 						attribs.put(attr_names[i].toString(), attr_values[i].toString());
-					} // end of if (attr_names[i] != null && attr_values[i] != null)
-					else {
+					} else {
 						break;
 					} // end of else
 				} // end of for (int i = 0; i < attr_names.length; i++)
@@ -136,19 +136,26 @@ public class XMPPDomBuilderHandler implements SimpleHandler {
 			return;
 		} // end of if (tmp_name.equals(ELEM_STREAM_STREAM))
 
-    Element elem = newElement(tmp_name, null, attr_names, attr_values);
-		for (String xmlns: namespaces.keySet()) {
-			if (tmp_name.startsWith(xmlns)) {
-				elem.setDefXMLNS(namespaces.get(xmlns));
+		String new_xmlns = null;
+		String prefix = null;
+		for (String pref: namespaces.keySet()) {
+			if (tmp_name.startsWith(pref)) {
+				new_xmlns = namespaces.get(pref);
+				tmp_name = tmp_name.substring(pref.length()+1, tmp_name.length());
+				prefix = pref;
 			} // end of if (tmp_name.startsWith(xmlns))
 		} // end of for (String xmlns: namespaces.keys())
+    Element elem = newElement(tmp_name, null, attr_names, attr_values);
     String ns = elem.getXMLNS();
     if (ns == null) {
       elem.setDefXMLNS(def_xmlns);
-    } // end of if (ns == null)
-    else {
+    } else {
       def_xmlns = ns;
     } // end of if (ns == null) else
+		if (new_xmlns != null) {
+			elem.setXMLNS(new_xmlns);
+			elem.removeAttribute("xmlns:" + prefix);
+		}
     el_stack.push(elem);
   }
 
