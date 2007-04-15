@@ -233,6 +233,7 @@ public class Presence extends XMPPProcessor
 		results.offer(packet);
   }
 
+	@SuppressWarnings("fallthrough")
   public void process(final Packet packet, final XMPPResourceConnection session,
 		final NonAuthUserRepository repo, final Queue<Packet> results) {
 
@@ -311,6 +312,11 @@ public class Presence extends XMPPProcessor
 				}
 				break;
 			case out_subscribe:
+				SubscriptionType current_subscription =
+					Roster.getBuddySubscription(session, packet.getElemTo());
+				if (current_subscription == null) {
+					Roster.addBuddy(session, packet.getElemTo());
+				} // end of if (current_subscription == null)
 			case out_unsubscribe:
 				subscr_changed = Roster.updateBuddySubscription(session, pres_type,
 					packet.getElemTo());
