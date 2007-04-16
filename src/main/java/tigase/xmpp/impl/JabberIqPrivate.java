@@ -64,8 +64,6 @@ public class JabberIqPrivate extends XMPPProcessor implements XMPPProcessorIfc {
 	private static final String PRIVATE_KEY = XMLNS;
 
 	protected static final String ID = XMLNS;
-	// VCARD element is added to support old vCard protocol where element
-	// name was all upper cases. Now the plugin should catch both cases.
 	protected static final String[] ELEMENTS = {"query"};
   protected static final String[] XMLNSS = {XMLNS};
 
@@ -100,54 +98,50 @@ public class JabberIqPrivate extends XMPPProcessor implements XMPPProcessorIfc {
 		} // end of if (session == null)
 
 		try {
-			String id = null;
-			if (packet.getElemTo() != null) {
-				id = JID.getNodeID(packet.getElemTo());
-			} // end of if (packet.getElemTo() != null)
-			// Yes, this packet is send by THIS user to the server
-			if (id == null || id.equals(session.getUserId())) {
+			if (packet.getElemTo() != null &&
+				!JID.getNodeID(packet.getElemTo()).equals(session.getUserId())) {
+				results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
+						"You are not authorized to access this private storage.", true));
+				return;
+			}
+			if (packet.getFrom().equals(session.getConnectionId())) {
 				List<Element> elems = packet.getElemChildren("/iq/query");
-				StanzaType type = packet.getType();
-				switch (type) {
-				case get:
-					if (elems != null && elems.size() > 0) {
-						Element elem = elems.get(0);
-						String priv = session.getData(PRIVATE_KEY, elem.getName(), null);
-						log.finest("Loaded private data for key: " + elem.getName()
-							+ ": " + priv);
+				if (elems != null && elems.size() > 0) {
+					Element elem = elems.get(0);
+					StanzaType type = packet.getType();
+					switch (type) {
+					case get:
+						String priv = session.getData(PRIVATE_KEY,
+							elem.getName()+elem.getXMLNS(), null);
+						log.finest("Loaded private data for key: "
+							+ elem.getName() + ": " + priv);
 						if (priv != null) {
 							results.offer(parseXMLData(priv, packet));
 							break;
 						}
-					}
-					results.offer(packet.okResult((String)null, 2));
-					break;
-				case set:
-					if (packet.getFrom().equals(session.getConnectionId())) {
-						if (elems != null && elems.size() > 0) {
-							Element elem = elems.get(0);
-							log.finest("Saving private data: " + elem.toString());
-							session.setData(PRIVATE_KEY, elem.getName(), elem.toString());
-							results.offer(packet.okResult((String)null, 0));
-						}
-					} else {
-						results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-								"You are not authorized to set vcard data.", true));
-					} // end of else
-					break;
-				case result:
-					// Should never happen, it is an error and should be ignored
-					break;
-				default:
-					results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
-							"Request type is incorrect", false));
-					break;
-				} // end of switch (type)
+						results.offer(packet.okResult((String)null, 2));
+						break;
+					case set:
+						log.finest("Saving private data: " + elem.toString());
+						session.setData(PRIVATE_KEY,
+							elem.getName()+elem.getXMLNS(), elem.toString());
+						results.offer(packet.okResult((String)null, 0));
+						break;
+					case result:
+						// Should never happen, it is an error and should be ignored
+						break;
+					default:
+						results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
+								"Request type is incorrect", false));
+						break;
+					} // end of switch (type)
+				} else {
+					results.offer(Authorization.NOT_ACCEPTABLE.getResponseMessage(packet,
+							"Missing query child element", true));
+				}
 			} else {
-				Element result = packet.getElement().clone();
-				// According to spec we must set proper FROM attribute
-				//				result.setAttribute("from", session.getJID());
-				results.offer(new Packet(result));
+				results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
+						"You are not authorized to access this private storage.", true));
 			} // end of else
 		} catch (NotAuthorizedException e) {
       log.warning(
