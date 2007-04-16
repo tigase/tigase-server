@@ -710,7 +710,7 @@ public class ServerConnectionManager extends ConnectionManager {
 			ConnectionType.accept);
 
 		// <db:result>
-		if (packet.getElemName().equals("db:result")) {
+		if (packet.getElemName().equals("result")) {
 			if (packet.getType() == null) {
 				if (packet.getElemCData() != null) {
 					// db:result with key to validate from accept connection
@@ -760,7 +760,7 @@ public class ServerConnectionManager extends ConnectionManager {
 		} // end of if (packet != null && packet.getElemName().equals("db:result"))
 
 		// <db:verify> with type 'valid' or 'invalid'
-		if (packet.getElemName().equals("db:verify")) {
+		if (packet.getElemName().equals("verify")) {
 			if (packet.getType() == null) {
 				// When type is NULL then it means this packet contains
 				// data for verification
