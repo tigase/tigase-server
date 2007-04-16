@@ -97,7 +97,7 @@ public class VCardTemp extends XMPPProcessor implements XMPPProcessorIfc {
 				String strvCard =
 					repo.getPublicData(JID.getNodeID(packet.getElemTo()), ID, VCARD_KEY, null);
 				if (strvCard != null) {
-					results.offer(parseVCard(strvCard, packet));
+					results.offer(parseXMLData(strvCard, packet));
 				} // end of if (vcard != null)
 			} catch (UserNotFoundException e) {
 				// Just ignore....
@@ -125,7 +125,7 @@ public class VCardTemp extends XMPPProcessor implements XMPPProcessorIfc {
 				case get:
 					String strvCard = session.getPublicData(ID, VCARD_KEY, null);
 					if (strvCard != null) {
-						results.offer(parseVCard(strvCard, packet));
+						results.offer(parseXMLData(strvCard, packet));
 					} else {
 						results.offer(packet.okResult((String)null, 1));
 					} // end of if (vcard != null) else
@@ -180,9 +180,9 @@ public class VCardTemp extends XMPPProcessor implements XMPPProcessorIfc {
 
 	}
 
-	private Packet parseVCard(String vcard, Packet packet) {
+	private Packet parseXMLData(String data, Packet packet) {
 		DomBuilderHandler domHandler = new DomBuilderHandler();
-		parser.parse(domHandler, vcard.toCharArray(), 0, vcard.length());
+		parser.parse(domHandler, data.toCharArray(), 0, data.length());
 		Queue<Element> elems = domHandler.getParsedElements();
 		Packet result = packet.okResult((Element)null, 0);
 		for (Element el: elems) {
