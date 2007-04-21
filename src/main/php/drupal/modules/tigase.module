@@ -1,0 +1,70 @@
+/*
+ *  Package Tigase XMPP/Jabber Server
+ *  Copyright (C) 2001-2007
+ *  "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software Foundation,
+ *  Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * $Rev:  $
+ * Last modified by $Author: $
+ * $Date:  $
+ */
+<?php
+
+	/**
+	 * Display help and module information
+	 * @param section which section of the site we're displaying help
+	 * @return help text for section
+	 */
+function tigase_help($section='') {
+
+	$output = '';
+
+	switch ($section) {
+	case "admin/modules#description":
+		$output = t("Integration with Tigase Jabber/XMPP server.");
+		break;
+	case "admin/help#tigase":
+		$output = t("Integration with Tigase Jabber/XMPP server.") . "\n"
+			. t("This is not a Jabber/XMPP client within Drupal. This is more like")
+			. t(" closer integration between Drupal and Tigase. The basic idea is to")
+			. t(" allow for full Jabber/XMPP account data management from Drupal site.")
+			. "\n" . t("The first step is to allow to display on-line user status on")
+			. t(" Drupal site in similar form to 'Online users' list.");
+		break;
+	}
+
+	return $output;
+}
+
+function tigase_perm() {
+  return array('access tigase');
+}
+
+/**
+* Generate list of users loggedin to Jabber server
+* @param op the operation from the URL
+* @param delta offset
+* @returns block HTML
+*/
+function onthisdate_block($op='list', $delta=0) {
+	// listing of blocks, such as on the admin/block page
+	if ($op == "list") {
+		$block[0]["info"] = t('Jabber online users');
+		return $block;
+	} else if ($op == 'view') {
+		
+	}
+}
