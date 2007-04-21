@@ -1,6 +1,6 @@
 /*
  *  Package Tigase XMPP/Jabber Server
- *  Copyright (C) 2004, 2005, 2006
+ *  Copyright (C) 2001-2007
  *  "Artur Hefczyc" <artur.hefczyc@tigase.org>
  *
  *  This program is free software; you can redistribute it and/or modify

@@ -52,6 +52,7 @@ import tigase.stats.StatRecord;
 import tigase.util.JID;
 import tigase.xmpp.XMPPIOService;
 import tigase.xmpp.XMPPIOServiceListener;
+import java.io.File;
 
 /**
  * Describe class ConnectionManager here.
@@ -85,7 +86,8 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 	public static final boolean TLS_REQUIRED_PROP_VAL = false;
 	public static final String TLS_KEYS_STORE_PROP_KEY =
 		TLS_PROP_KEY + "keys-store";
-	public static final String TLS_KEYS_STORE_PROP_VAL = "certs/rsa-keystore";
+	public static final String TLS_KEYS_STORE_PROP_VAL =
+		"certs" + File.separator + "rsa-keystore";
 	public static final String TLS_DEF_CERT_PROP_KEY =
 		TLS_PROP_KEY + "def-cert-alias";
 	public static final String TLS_DEF_CERT_PROP_VAL = "default";
@@ -97,7 +99,8 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 	public static final String TLS_TRUSTS_STORE_PASSWD_PROP_VAL =	"truststore";
 	public static final String TLS_TRUSTS_STORE_PROP_KEY =
 		TLS_PROP_KEY + "trusts-store";
-	public static final String TLS_TRUSTS_STORE_PROP_VAL = "certs/truststore";
+	public static final String TLS_TRUSTS_STORE_PROP_VAL =
+		"certs" + File.separator + "truststore";
 	public static final String MAX_RECONNECTS_PROP_KEY = "max-reconnects";
 
 	private static ConnectionOpenThread connectThread =

@@ -1,3 +1,11 @@
+create table xmpp_stanza (
+			 id bigint unsigned NOT NULL auto_increment,
+			 stanza text NOT NULL,
+
+			 primary key (id)
+)
+default character set utf8;
+
 create table tig_users (
        uid bigint unsigned NOT NULL,
 

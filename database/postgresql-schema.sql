@@ -30,6 +30,11 @@
 --  psql -q -U tigase -d tigase -f postgresql-schema.sql
 
 
+create table xmpp_stanza (
+			 id serial,
+			 stanza text NOT NULL
+);
+
 create table tig_users (
        uid bigint NOT NULL,
 

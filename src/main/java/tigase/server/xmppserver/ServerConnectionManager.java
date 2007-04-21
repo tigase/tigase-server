@@ -80,6 +80,7 @@ public class ServerConnectionManager extends ConnectionManager {
   private static final Logger log =
     Logger.getLogger("tigase.server.xmppserver.ServerConnectionManager");
 
+	private static final String DIALBACK_XMLNS = "jabber:server:dialback";
 	public static final String HOSTNAMES_PROP_KEY = "hostnames";
 	public static String[] HOSTNAMES_PROP_VAL =	{"localhost", "hostname"};
 	public static final String MAX_PACKET_WAITING_TIME_PROP_KEY =
@@ -297,6 +298,7 @@ public class ServerConnectionManager extends ConnectionManager {
 					return null;
 				} else {
 					if (checkPacket(p, serv)) {
+						log.finest("Adding packet out: " + p.getStringData());
 						addOutPacket(p);
 					} else {
 						return null;

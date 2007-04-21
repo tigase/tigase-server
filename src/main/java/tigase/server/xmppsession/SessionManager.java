@@ -205,8 +205,14 @@ public class SessionManager extends AbstractMessageReceiver
 					&& packet.getElemFrom() != null && packet.getElemTo() != null
 					&& (packet.getElemName().equals("iq")
 						|| packet.getElemName().equals("message")))) {
-				error =	Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet,
-					"Service not available.", true);
+				// Infinite loop detection code:
+				if (packet.getType() == StanzaType.error) {
+					// Let's just ignore all error stanzas if there is no plugin to process
+					// them and no alive connection to receive them.
+				} else {
+					error =	Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet,
+						"Service not available.", true);
+				}
 			} else {
 				if (packet.getElemFrom() != null || conn != null) {
 					error =	Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
