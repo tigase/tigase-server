@@ -38,21 +38,22 @@ import tigase.xmpp.XMPPResourceConnection;
  * XEP-0199: XMPP Ping
  * 
  * 
- * @author <a href="mailto:bmalkow@tigase.org">Bartosz Ma³kowski</a>
+ * @author <a href="mailto:bmalkow@tigase.org">Bartosz Ma‚³kowski</a>
  * @version $Rev$
  */
 public class UrnXmppPing extends XMPPProcessor implements XMPPProcessorIfc {
 
 	protected static final String XMLNS = "urn:xmpp:ping";
 
-	protected static final Element[] DISCO_FEATURES = { new Element("feature", new String[] { "var" },
-			new String[] { XMLNS }) };
+	protected static final Element[] DISCO_FEATURES =
+	{ new Element("feature", new String[] { "var" }, new String[] { XMLNS }) };
 
 	protected static final String[] ELEMENTS = { "ping" };
 
 	protected static final String ID = XMLNS;
 
-	private static final Logger log = Logger.getLogger("tigase.xmpp.impl.UrnXmppPing");
+	private static final Logger log =
+		Logger.getLogger("tigase.xmpp.impl.UrnXmppPing");
 
 	protected static final String[] XMLNSS = { XMLNS };
 
@@ -60,8 +61,8 @@ public class UrnXmppPing extends XMPPProcessor implements XMPPProcessorIfc {
 		return ID;
 	}
 
-	public void process(final Packet packet, final XMPPResourceConnection session, final NonAuthUserRepository repo,
-			final Queue<Packet> results) {
+	public void process(final Packet packet, final XMPPResourceConnection session,
+		final NonAuthUserRepository repo, final Queue<Packet> results) {
 
 		if (session == null) {
 			return;
@@ -86,7 +87,7 @@ public class UrnXmppPing extends XMPPProcessor implements XMPPProcessorIfc {
 				result.setFrom(packet.getTo());
 				results.offer(result);
 			} else {
-				Element result = (Element) packet.getElement().clone();
+				Element result = packet.getElement().clone();
 				results.offer(new Packet(result));
 			}
 		} catch (NotAuthorizedException e) {

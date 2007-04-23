@@ -1,27 +1,28 @@
 <project name="tigase-defs">
 
-  <macrodef name="compile">
-    <attribute name="srcdir"/>
-    <attribute name="excldir" default=""/>
-    <attribute name="deprecation" default="off"/>
-    <attribute name="xlint" default="-Xlint:-all"/>
-    <sequential>
-      <mkdir dir="${build}"/>
-      <javac
-        srcdir="@{srcdir}"
-        excludes="@{excldir}"
-        destdir="${build}"
-        debug="on"
-        deprecation="@{deprecation}">
-        <compilerarg line="@{xlint}"/>
-	<classpath>
-	  <fileset dir="${libs}">
+ <macrodef name="compile">
+	<attribute name="srcdir"/>
+	<attribute name="excldir" default=""/>
+	<attribute name="deprecation" default="off"/>
+	<attribute name="xlint" default="-Xlint:-all"/>
+	<sequential>
+	 <mkdir dir="${build}"/>
+	 <javac
+		srcdir="@{srcdir}"
+		excludes="@{excldir}"
+		destdir="${build}"
+		debug="on"
+		encoding="UTF-8"
+		deprecation="@{deprecation}">
+		<compilerarg line="@{xlint}"/>
+		<classpath>
+		 <fileset dir="${libs}">
 	    <include name="**/*.jar"/>
-	  </fileset>
-	</classpath>
-      </javac>
-    </sequential>
-  </macrodef>
+		 </fileset>
+		</classpath>
+	 </javac>
+	</sequential>
+ </macrodef>
 
   <macrodef name="jarfile">
     <attribute name="excludes" default=""/>
