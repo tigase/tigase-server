@@ -273,7 +273,8 @@ public class ServerConnectionManager extends ConnectionManager {
 			log.finest("Processing socket data: " + p.getStringData());
 
 			if (p.getElement().getXMLNS() != null &&
-				p.getElement().getXMLNS().equals("jabber:server:dialback")) {
+				p.getElement().getXMLNS().equals(DIALBACK_XMLNS)) {
+				log.finest("XMLNS: " + DIALBACK_XMLNS);
 				Queue<Packet> results = new LinkedList<Packet>();
 				processDialback(p, serv, results);
 				for (Packet res: results) {
@@ -293,7 +294,8 @@ public class ServerConnectionManager extends ConnectionManager {
 					} // end of else
 				} // end of for (Packet p: results)
 			} else {
-				if (p.getElemName().equals("stream:error")) {
+				log.finest("!!! NOT  XMLNS: " + DIALBACK_XMLNS);
+				if (p.getElemName().equals("error")) {
 					processStreamError(p, serv);
 					return null;
 				} else {
@@ -397,6 +399,7 @@ public class ServerConnectionManager extends ConnectionManager {
 			Element elem = new Element("db:result", key);
 			elem.addAttribute("to", remote_hostname);
 			elem.addAttribute("from", local_hostname);
+			elem.addAttribute("xmlns:db", DIALBACK_XMLNS);
 
 			StringBuilder sb = new StringBuilder();
 			// Attach also all controll packets which are wating to send
@@ -447,7 +450,7 @@ public class ServerConnectionManager extends ConnectionManager {
 	}
 
 	public void xmppStreamClosed(XMPPIOService serv) {
-		log.finer("Stream closed.");
+		log.finer("Stream closed: " + getConnectionId(serv));
 	}
 
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -724,10 +727,11 @@ public class ServerConnectionManager extends ConnectionManager {
 
 					// <db:result> with CDATA containing KEY
 					Element elem = new Element("db:verify", packet.getElemCData(),
-						new String[] {"id", "to", "from"},
+						new String[] {"id", "to", "from", "xmlns:db"},
 						new String[] {(String)serv.getSessionData().get(serv.SESSION_ID_KEY),
 													packet.getElemFrom(),
-													packet.getElemTo()});
+													packet.getElemTo(),
+													DIALBACK_XMLNS});
 					Packet result = new Packet(elem);
 					result.setTo(connect_jid);
 					results.offer(result);
@@ -779,18 +783,23 @@ public class ServerConnectionManager extends ConnectionManager {
 
 					log.fine("Local key for cid=" + connect_jid + " is " + local_key);
 
-					Packet result = null;
+					Element result_el = new Element("db:verify",
+						new String[] {"to", "from", "id", "xmlns:db"},
+						new String[] {packet.getElemFrom(), packet.getElemTo(),
+													packet.getElemId(), DIALBACK_XMLNS});
+					Packet result = new Packet(result_el);
 
 					if (key.equals(local_key)) {
 						log.finer("Verification for " + accept_jid
 							+ " succeeded, sending valid.");
-						result = packet.swapElemFromTo(StanzaType.valid);
+						result_el.setAttribute("type", "valid");
+						//result = packet.swapElemFromTo(StanzaType.valid);
 					} else {
 						log.finer("Verification for " + accept_jid
 							+ " failed, sending invalid.");
-						result = packet.swapElemFromTo(StanzaType.invalid);
+						result_el.setAttribute("type", "invalid");
+						//result = packet.swapElemFromTo(StanzaType.invalid);
 					} // end of if (key.equals(local_key)) else
-					result.getElement().setCData(null);
 					result.setTo(accept_jid);
 					log.finest("Adding result packet: " + result.getStringData()
 						+ " to " + result.getTo());
@@ -802,9 +811,10 @@ public class ServerConnectionManager extends ConnectionManager {
 				// validated and we can now receive data from this channel.
 
 				Element elem = new Element("db:result",
-					new String[] {"type", "to", "from"},
+					new String[] {"type", "to", "from", "xmlns:db"},
 					new String[] {packet.getType().toString(),
-												packet.getElemFrom(), packet.getElemTo()});
+												packet.getElemFrom(), packet.getElemTo(),
+												DIALBACK_XMLNS});
 
 				XMPPIOService accept_serv = handshakingByHost_Type.remove(accept_jid);
 				if (accept_serv == null) {
