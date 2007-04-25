@@ -100,7 +100,7 @@ public class JabberIqPrivate extends XMPPProcessor implements XMPPProcessorIfc {
 		try {
 			if (packet.getElemTo() != null &&
 				!JID.getNodeID(packet.getElemTo()).equals(session.getUserId())) {
-				results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
+				results.offer(Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet,
 						"You are not authorized to access this private storage.", true));
 				return;
 			}

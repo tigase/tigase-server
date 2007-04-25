@@ -22,7 +22,7 @@
      "$JAVA_HOME/share/src" "$JAVA_HOME/share/tests/src")))
  '(jde-gen-buffer-boilerplate
    (quote
-    ("/*  Package Jabber Server"
+    ("/*  Tigase Project"
      " *  Copyright (C) 2001-2007"
      " *  \"Artur Hefczyc\" <artur.hefczyc@tigase.org>"
      " *"
