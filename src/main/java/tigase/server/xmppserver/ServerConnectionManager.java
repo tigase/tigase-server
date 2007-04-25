@@ -274,7 +274,6 @@ public class ServerConnectionManager extends ConnectionManager {
 
 			if (p.getElement().getXMLNS() != null &&
 				p.getElement().getXMLNS().equals(DIALBACK_XMLNS)) {
-				log.finest("XMLNS: " + DIALBACK_XMLNS);
 				Queue<Packet> results = new LinkedList<Packet>();
 				processDialback(p, serv, results);
 				for (Packet res: results) {
@@ -294,7 +293,6 @@ public class ServerConnectionManager extends ConnectionManager {
 					} // end of else
 				} // end of for (Packet p: results)
 			} else {
-				log.finest("!!! NOT  XMLNS: " + DIALBACK_XMLNS);
 				if (p.getElemName().equals("error")) {
 					processStreamError(p, serv);
 					return null;
