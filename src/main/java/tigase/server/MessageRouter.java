@@ -109,7 +109,15 @@ public class MessageRouter extends AbstractMessageReceiver {
 			processPacket(res);
 		} // end of for ()
 
-		if (!to.startsWith(getName())) return;
+		if (!to.startsWith(getName())) {
+			if (results.size() == 0) {
+				Packet res =
+					Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
+						"Feature not supported yet.", true);
+				processPacket(res);
+			} // end of if (results.size() == null)
+			return;
+		}
 
 		if (packet.getPermissions() != Permissions.ADMIN) {
 			Packet res = Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
