@@ -71,7 +71,8 @@ public class SessionManagerConfig {
 	 "urn:ietf:params:xml:ns:xmpp-bind", "urn:ietf:params:xml:ns:xmpp-session",
 	 "jabber:iq:roster", "jabber:iq:privacy", "presence", "msgoffline",
 	 "jabber:iq:version", "http://jabber.org/protocol/stats", "starttls",
-	 "vcard-temp", "http://jabber.org/protocol/commands", "jabber:iq:private"};
+	 "vcard-temp", "http://jabber.org/protocol/commands", "jabber:iq:private",
+	 "urn:xmpp:ping"};
 	/**
 	 * List of components loaded when the server is loaded in test mode.
 	 * Some components like off-line message storage is disabled during tests.
@@ -81,7 +82,8 @@ public class SessionManagerConfig {
 	 "urn:ietf:params:xml:ns:xmpp-bind", "urn:ietf:params:xml:ns:xmpp-session",
 	 "jabber:iq:roster", "jabber:iq:privacy", "presence", "jabber:iq:version",
 	 "http://jabber.org/protocol/stats", "starttls", "msgoffline",
-	 "vcard-temp", "http://jabber.org/protocol/commands", "jabber:iq:private"};
+	 "vcard-temp", "http://jabber.org/protocol/commands", "jabber:iq:private",
+	 "urn:xmpp:ping"};
 
 	public static final String HOSTNAMES_PROP_KEY = "hostnames";
 	public static String[] HOSTNAMES_PROP_VAL =	{"localhost", "hostname"};
