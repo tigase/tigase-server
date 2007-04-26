@@ -125,6 +125,13 @@
       <copy todir="${dist}/@{packagename}-${version}/libs">
         <fileset dir="libs" includes="*"/>
       </copy>
+      <mkdir dir="${dist}/@{packagename}-${version}/database"/>
+      <copy
+        file="database/mysql-schema.sql"
+        tofile="${dist}/@{packagename}-${version}/database/mysql-schema.sql"/>
+      <copy
+        file="database/postgresql-schema.sql"
+        tofile="${dist}/@{packagename}-${version}/database/postgresql-schema.sql"/>
       <copy
         file="scripts/tigase.sh"
         tofile="${dist}/@{packagename}-${version}/bin/tigase.sh"/>
