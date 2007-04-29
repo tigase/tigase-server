@@ -87,16 +87,19 @@ public class PacketFilter {
 			if (packet.getFrom() != null
 				&& packet.getFrom().equals(session.getConnectionId())) {
 				packet.getElement().setAttribute("from", session.getJID());
+				log.finest("Setting correct from attribute: " + session.getJID());
 			} // end of if (packet.getFrom().equals(session.getConnectionId()))
 
 			String id = JID.getNodeID(packet.getElemTo());
 
 			if (id.equals(session.getUserId())) {
 				// Yes this is message to 'this' client
+				log.finest("Yes, this is packet to 'this' client: " + id);
 				Element elem = packet.getElement().clone();
 				Packet result = new Packet(elem);
 				result.setTo(session.getParentSession().
 					getResourceConnection(packet.getElemTo()).getConnectionId());
+				log.finest("Setting to: " + result.getTo());
 				result.setFrom(packet.getTo());
 				results.offer(result);
 			} else {

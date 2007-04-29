@@ -91,9 +91,8 @@ public class MessageRouter extends AbstractMessageReceiver {
   private Map<String, MessageReceiver> receivers =
     new ConcurrentSkipListMap<String, MessageReceiver>();
 
-	public void processPacket(final Packet packet, final Queue<Packet> r) {
+	public void processPacket(final Packet packet, final Queue<Packet> results) {
 		String to = packet.getTo();
-		Queue<Packet> results = new LinkedList<Packet>();
 		for (ServerComponent comp: components.values()) {
 			if (comp != this) {
 				comp.processPacket(packet, results);
@@ -105,24 +104,25 @@ public class MessageRouter extends AbstractMessageReceiver {
 			processDiscoQuery(packet, results);
 		}
 
-		for (Packet res: results) {
-			processPacket(res);
-		} // end of for ()
+// 		for (Packet res: results) {
+// 			processPacket(res);
+// 		} // end of for ()
 
 		if (!to.startsWith(getName())) {
-			if (results.size() == 0) {
-				Packet res =
-					Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
-						"Feature not supported yet.", true);
-				processPacket(res);
-			} // end of if (results.size() == null)
+// 			if (results.size() == 0) {
+// 				Packet res =
+// 					Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
+// 						"Feature not supported yet.", true);
+// 				processPacket(res);
+// 			} // end of if (results.size() == null)
 			return;
 		}
 
 		if (packet.getPermissions() != Permissions.ADMIN) {
 			Packet res = Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 				"You are not authorized for this action.", true);
-			processPacket(res);
+			results.offer(res);
+			//processPacket(res);
 			return;
 		}
 
@@ -135,7 +135,8 @@ public class MessageRouter extends AbstractMessageReceiver {
 					String cmd = spl[1];
 					if (cmd.equals("stop")) {
 						Packet result = packet.commandResult("result");
-						processPacket(result);
+						results.offer(result);
+						//processPacket(result);
 						new Timer("Stopping...", true).schedule(new TimerTask() {
 								public void run() {
 									System.exit(0);
@@ -182,8 +183,14 @@ public class MessageRouter extends AbstractMessageReceiver {
 		if (localAddresses.contains(packet.getTo())
 			|| isToLocalComponent(packet.getTo())) {
 			log.finest("This packet is addressed to server itself.");
-			processPacket(packet, null);
-			return;
+			Queue<Packet> results = new LinkedList<Packet>();
+			processPacket(packet, results);
+			if (results.size() > 0) {
+				for (Packet res: results) {
+					processPacket(res);
+				} // end of for ()
+				return;
+			}
 		}
 
 		String host = JID.getNodeHost(packet.getTo());

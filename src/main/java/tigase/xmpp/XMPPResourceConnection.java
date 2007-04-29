@@ -167,7 +167,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
    * been authorized yet and some parts of user JID are not known yet.
    */
   public final String getJID() throws NotAuthorizedException {
-    return getUserId() + "/" + resource;
+    return getUserId() + (resource != null ? ("/" + resource) : "");
   }
 
   /**

@@ -121,7 +121,7 @@ public class Presence extends XMPPProcessor
 		throws NotAuthorizedException {
 		for (XMPPResourceConnection conn: session.getActiveSessions()) {
 			log.finer("Update presence change to: " + conn.getJID());
-			if (conn != session) {
+			if (conn != session && !conn.getResource().equals(session.getResource())) {
 				// Send to old resource presence about new resource
 				Element pres_update = new Element("presence");
 				pres_update.setAttribute("from", session.getJID());

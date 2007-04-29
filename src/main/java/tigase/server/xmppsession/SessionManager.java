@@ -190,7 +190,7 @@ public class SessionManager extends AbstractMessageReceiver
 			} // end of for (XMPPPostprocessorIfc postproc: postProcessors)
 		} // end of if (!stop)
 
-		if (!stop && !packet.wasProcessed()
+		if (!stop && !packet.wasProcessed() && !isInRoutings(packet.getTo())
 			&& filter.process(packet, conn, naUserRepository, results)) {
 			packet.processedBy("packet-filter");
 		}
@@ -198,7 +198,7 @@ public class SessionManager extends AbstractMessageReceiver
 		addOutPackets(results);
 
 		if (!packet.wasProcessed()) {
-			log.finest("Packet not processed: " + packet.getStringData());
+			log.finest("Packet not processed: " + packet.toString());
 			Packet error = null;
 			if (stop
 				|| (conn == null
@@ -214,7 +214,8 @@ public class SessionManager extends AbstractMessageReceiver
 						"Service not available.", true);
 				}
 			} else {
-				if (packet.getElemFrom() != null || conn != null) {
+				if ((packet.getElemFrom() != null || conn != null)
+					&& packet.getType() != StanzaType.error) {
 					error =	Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
 						"Feature not supported yet.", true);
 				} else {
@@ -222,13 +223,16 @@ public class SessionManager extends AbstractMessageReceiver
 				} // end of else
 			} // end of if (stop) else
 			if (error != null) {
+				if (error.getElemTo() != null) {
+					conn = getResourceConnection(error.getElemTo());
+				} // end of if (error.getElemTo() != null)
 				if (conn != null) {
 					error.setTo(conn.getConnectionId());
 				} // end of if (conn != null)
 				addOutPacket(error);
 			}
 		} else {
-			log.info("Packet processed by: " + packet.getProcessorsIds().toString());
+			log.finest("Packet processed by: " + packet.getProcessorsIds().toString());
 		} // end of else
 	}
 
@@ -272,7 +276,7 @@ public class SessionManager extends AbstractMessageReceiver
 
 	private boolean processAdmins(Packet packet) {
 		final String to = packet.getElemTo();
-		if (isInRoutings(to)) {
+		if (isInRoutings(to) && packet.getElemName().equals("message")) {
 			// Yes this packet is for admin....
 			log.finer("Packet for admin: " + packet.getStringData());
 			for (String admin: admins) {
@@ -315,7 +319,8 @@ public class SessionManager extends AbstractMessageReceiver
 			if (xmlns == null) { xmlns = "jabber:client";	}
 			if (proc.isSupporting(elem.getName(), xmlns)) {
 				log.finest("XMPPProcessorIfc: "+proc.getClass().getSimpleName()+
-					" ("+proc.id()+")"+"\n Request: "+elem.toString());
+					" ("+proc.id()+")"+"\n Request: "+elem.toString()
+					+ (connection != null ? ", " + connection.getConnectionId() : " null"));
 				proc.process(packet, connection, naUserRepository, results);
 				packet.processedBy(proc.id());
 			} // end of if (proc.isSupporting(elem.getName(), elem.getXMLNS()))
@@ -345,15 +350,8 @@ public class SessionManager extends AbstractMessageReceiver
 			if (available) {
 				connection = connectionsByFrom.get(pc.getElemFrom());
 				if (connection == null) {
-					connection = new XMPPResourceConnection(pc.getElemFrom(),
-						user_repository, auth_repository, this);
-					connection.setDomain(hostname);
-					// Dummy session ID, we might decide later to set real thing here
-					connection.setSessionId("session-id");
+					connection = createUserSession(pc.getElemFrom(), hostname, user_jid);
 					connection.putSessionData("jingle", "active");
-					connectionsByFrom.put(pc.getElemFrom(), connection);
-					handleLogin(JID.getNodeNick(user_jid), connection);
-					connection.setResource(JID.getNodeResource(user_jid));
 					Packet presence =
 						new Packet(new Element("presence",
 								new Element[] {
@@ -385,6 +383,19 @@ public class SessionManager extends AbstractMessageReceiver
 		default:
 			break;
 		} // end of switch (pc.getCommand())
+	}
+
+	private XMPPResourceConnection createUserSession(String conn_id,
+		String domain, String user_jid) {
+		XMPPResourceConnection connection = new XMPPResourceConnection(conn_id,
+			user_repository, auth_repository, this);
+		connection.setDomain(domain);
+		// Dummy session ID, we might decide later to set real thing here
+		connection.setSessionId("session-id");
+		connectionsByFrom.put(conn_id, connection);
+		handleLogin(JID.getNodeNick(user_jid), connection);
+		connection.setResource(JID.getNodeResource(user_jid));
+		return connection;
 	}
 
 
@@ -585,6 +596,7 @@ public class SessionManager extends AbstractMessageReceiver
 		clearRoutings();
 		for (String host: hostnames) {
 			addRouting(host);
+ 			createUserSession(host + "-" + System.currentTimeMillis(), host, host);
 		} // end of for ()
 
 		admins = (String[])props.get(ADMINS_PROP_KEY);
@@ -598,6 +610,7 @@ public class SessionManager extends AbstractMessageReceiver
 		if (session == null) {
 			session = new XMPPSession(userName);
 			sessionsByNodeId.put(userId, session);
+			log.finest("Created new XMPPSession for: " + userId);
 		} // end of if (session == null)
 		session.addResourceConnection(conn);
 	}
