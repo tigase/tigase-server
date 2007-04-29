@@ -113,6 +113,9 @@
       <copy
         file="package.html"
         tofile="${dist}/@{packagename}-${version}/README.html"/>
+      <copy
+        file="ChangeLog"
+        tofile="${dist}/@{packagename}-${version}/ChangeLog"/>
       <mkdir dir="${dist}/@{packagename}-${version}/certs"/>
       <copy todir="${dist}/@{packagename}-${version}/certs">
         <fileset dir="certs" includes="*"/>
