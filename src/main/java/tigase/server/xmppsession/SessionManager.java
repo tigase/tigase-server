@@ -628,7 +628,6 @@ public class SessionManager extends AbstractMessageReceiver
 	public Element getDiscoInfo(String node, String jid) {
 		if (jid != null && jid.startsWith(getName()+".")) {
 			Element query = serviceEntity.getDiscoInfo(node);
-			List<Element> results = new LinkedList<Element>();
 			for (XMPPProcessorIfc proc: processors.values()) {
 				Element[] discoFeatures = proc.supDiscoFeatures(null);
 				if (discoFeatures != null) {
@@ -638,6 +637,17 @@ public class SessionManager extends AbstractMessageReceiver
 			return query;
 		}
 		return null;
+	}
+
+	public List<Element> getDiscoFeatures() {
+		List<Element> features = new LinkedList<Element>();
+		for (XMPPProcessorIfc proc: processors.values()) {
+			Element[] discoFeatures = proc.supDiscoFeatures(null);
+			if (discoFeatures != null) {
+				features.addAll(Arrays.asList(discoFeatures));
+			} // end of if (discoFeatures != null)
+		}
+		return features;
 	}
 
 	public List<Element> getDiscoItems(String node, String jid) {

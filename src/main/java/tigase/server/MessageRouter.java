@@ -312,6 +312,7 @@ public class MessageRouter extends AbstractMessageReceiver {
 		serviceEntity.addIdentities(new ServiceIdentity[] {
 				new ServiceIdentity("server", "im", tigase.server.XMPPServer.NAME +
 					" ver. " + tigase.server.XMPPServer.getImplementationVersion())});
+		serviceEntity.addFeatures(XMPPService.DEF_FEATURES);
 
     try {
       super.setProperties(props);
@@ -399,6 +400,12 @@ public class MessageRouter extends AbstractMessageReceiver {
 			if (packet.isXMLNS("/iq/query", INFO_XMLNS)) {
 				if (isLocalDomain(jid)) {
 					query = getDiscoInfo(node, jid);
+					for (XMPPService comp: xmppServices.values()) {
+						List<Element> features = comp.getDiscoFeatures();
+						if (features != null) {
+							query.addChildren(features);
+						}
+					} // end of for ()
 				} else {
 					for (XMPPService comp: xmppServices.values()) {
 						if (jid.startsWith(comp.getName() + ".")) {

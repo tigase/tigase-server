@@ -403,6 +403,8 @@ public class ComponentConnectionManager extends ConnectionManager
 		return null;
 	}
 
+	public 	List<Element> getDiscoFeatures() { return null; }
+
 	public List<Element> getDiscoItems(String node, String jid) {
 		if (jid.startsWith(getName()+".")) {
 			return serviceEntity.getDiscoItems(node, null);

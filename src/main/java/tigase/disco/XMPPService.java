@@ -52,5 +52,10 @@ public interface XMPPService extends ServerComponent {
 
 	List<Element> getDiscoItems(String node, String jid);
 
+	/**
+	 * Returns features for top level disco info
+	 */
+	List<Element> getDiscoFeatures();
+
 }
 
