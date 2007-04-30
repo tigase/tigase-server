@@ -72,8 +72,23 @@ public class LibreSourceAuth implements UserAuthRepository {
 
   private static final Logger log =
     Logger.getLogger("tigase.db.jdbc.LibreSourceAuth");
-	private static final String[] non_sasl_mechs = {"password"};
-	private static final String[] sasl_mechs = {"PLAIN"};
+
+	// Since now LS stores passwords in clear text all mechanisms
+	// are available.
+
+	private static final String[] non_sasl_mechs = {
+		"password"
+		, "digest"
+	};
+	private static final String[] sasl_mechs =
+	{
+		"PLAIN"
+		,	"DIGEST-MD5"
+		, "CRAM-MD5"
+	};
+
+// 	private static final String[] non_sasl_mechs = {"password"};
+// 	private static final String[] sasl_mechs = {"PLAIN"};
 
 	public static final String DEF_USERS_TBL = "casusers_";
 	public static final String DEF_PROFILES_TBL = "profileresource_";
@@ -84,8 +99,6 @@ public class LibreSourceAuth implements UserAuthRepository {
 	private Connection conn = null;
 	private PreparedStatement pass_st = null;
 	private PreparedStatement status_st = null;
-// 	private PreparedStatement user_add_st = null;
-// 	private PreparedStatement user_del_st = null;
 	private PreparedStatement max_uid_st = null;
 	private PreparedStatement conn_valid_st = null;
 	private PreparedStatement update_password = null;
@@ -103,14 +116,6 @@ public class LibreSourceAuth implements UserAuthRepository {
 		query = "select accountstatus_ from " + profiles_tbl
 			+ " where id_ = ?;";
 		status_st = conn.prepareStatement(query);
-
-// 		query = "insert into " + users_tbl
-// 			+ " (username_, passworddigest_)"
-// 			+ " values (?, ?);";
-// 		user_add_st = conn.prepareStatement(query);
-
-// 		query = "delete from " + users_tbl + " where username_ = ?;";
-// 		user_del_st = conn.prepareStatement(query);
 
 		query = "select localtime;";
 		conn_valid_st = conn.prepareStatement(query);
@@ -245,21 +250,21 @@ public class LibreSourceAuth implements UserAuthRepository {
 
 	public String getResourceUri() { return db_conn; }
 
-	/**
-	 * This is not fully correct HEX representation of digest sum but
-	 * this is how Libre Source does it so I have to be compatible with them.
-	 *
-	 * @param passwd a <code>String</code> value
-	 * @return a <code>String</code> value
-	 */
-	private String ls_digest(String passwd) throws NoSuchAlgorithmException {
-		byte[] md5 = Algorithms.digest("", passwd, "MD5");
-		StringBuilder sb = new StringBuilder();
-		for (byte b: md5) {
-			sb.append(Integer.toHexString(b));
-		}
-		return sb.toString();
-	}
+// 	/**
+// 	 * This is not fully correct HEX representation of digest sum but
+// 	 * this is how Libre Source does it so I have to be compatible with them.
+// 	 *
+// 	 * @param passwd a <code>String</code> value
+// 	 * @return a <code>String</code> value
+// 	 */
+// 	private String ls_digest(String passwd) throws NoSuchAlgorithmException {
+// 		byte[] md5 = Algorithms.digest("", passwd, "MD5");
+// 		StringBuilder sb = new StringBuilder();
+// 		for (byte b: md5) {
+// 			sb.append(Integer.toHexString(b));
+// 		}
+// 		return sb.toString();
+// 	}
 
 	/**
 	 * Describe <code>plainAuth</code> method here.
@@ -277,18 +282,14 @@ public class LibreSourceAuth implements UserAuthRepository {
 			if (!isActive(user)) {
 				throw new AuthorizationException("User account has been blocked.");
 			} // end of if (!isActive(user))
-			String enc_passwd = ls_digest(password);
+			//			String enc_passwd = ls_digest(password);
 			String db_password = getPassword(user);
-			boolean login_ok = db_password.equals(enc_passwd);
+			boolean login_ok = db_password.equals(password);
 			if (login_ok) {
 				updateLastLogin(user);
 				updateOnlineStatus(user, 1);
 			} // end of if (login_ok)
 			return login_ok;
-		} catch (NoSuchAlgorithmException e) {
-			throw
-				new AuthorizationException("Password encoding algorithm is not supported.",
-					e);
 		} catch (SQLException e) {
 			throw new TigaseDBException("Problem accessing repository.", e);
 		} // end of catch
@@ -319,7 +320,21 @@ public class LibreSourceAuth implements UserAuthRepository {
 	public boolean digestAuth(final String user, final String digest,
 		final String id, final String alg)
 		throws UserNotFoundException, TigaseDBException, AuthorizationException {
-		throw new AuthorizationException("Not supported.");
+		try {
+			checkConnection();
+			if (!isActive(user)) {
+				throw new AuthorizationException("User account has been blocked.");
+			} // end of if (!isActive(user))
+			final String db_password = getPassword(user);
+			final String digest_db_pass =	Algorithms.hexDigest(id, db_password, alg);
+			log.finest("Comparing passwords, given: " + digest
+				+ ", db: " + digest_db_pass);
+			return digest.equals(digest_db_pass);
+		} catch (NoSuchAlgorithmException e) {
+			throw new AuthorizationException("No such algorithm.", e);
+		} catch (SQLException e) {
+			throw new TigaseDBException("Problem accessing repository.", e);
+		} // end of catch
 	}
 
 	/**
@@ -335,8 +350,8 @@ public class LibreSourceAuth implements UserAuthRepository {
 		throws UserNotFoundException, TigaseDBException, AuthorizationException {
 		String proto = (String)props.get(PROTOCOL_KEY);
 		if (proto.equals(PROTOCOL_VAL_SASL)) {
-			String mech = (String)props.get(MACHANISM_KEY);
-			if (mech.equals("PLAIN")) {
+			//			String mech = (String)props.get(MACHANISM_KEY);
+			//			if (mech.equals("PLAIN")) {
 				boolean login_ok = saslAuth(props);
 				if (login_ok) {
 					String user = (String)props.get(USER_ID_KEY);
@@ -344,8 +359,8 @@ public class LibreSourceAuth implements UserAuthRepository {
 					updateOnlineStatus(user, 1);
 				} // end of if (login_ok)
 				return login_ok;
-			} // end of if (mech.equals("PLAIN"))
-			throw new AuthorizationException("Mechanism is not supported: " + mech);
+				//			} // end of if (mech.equals("PLAIN"))
+			//throw new AuthorizationException("Mechanism is not supported: " + mech);
 		} // end of if (proto.equals(PROTOCOL_VAL_SASL))
 		throw new AuthorizationException("Protocol is not supported: " + proto);
 	}
@@ -364,19 +379,19 @@ public class LibreSourceAuth implements UserAuthRepository {
 		try {
 			checkConnection();
 			stmt = conn.createStatement();
+// 			String query = "insert into " + users_tbl
+// 				+ " (username_, passworddigest_)"
+// 				+ " values ('" + JID.getNodeNick(user)
+// 				+ "', '" + ls_digest(password) + "');";
 			String query = "insert into " + users_tbl
 				+ " (username_, passworddigest_)"
 				+ " values ('" + JID.getNodeNick(user)
-				+ "', '" + ls_digest(password) + "');";
+				+ "', '" + password + "');";
 			stmt.executeUpdate(query);
 			query = "insert into " + profiles_tbl
 				+ " (id_, accountstatus_)"
 				+ " values ('" + JID.getNodeNick(user) + "', 0);";
 			stmt.executeUpdate(query);
-		} catch (NoSuchAlgorithmException e) {
-			throw
-				new TigaseDBException("Password encoding algorithm is not supported.",
-					e);
 		} catch (SQLException e) {
 			throw new UserExistsException("Error while adding user to repository, user exists?", e);
 		} finally {
@@ -439,7 +454,7 @@ public class LibreSourceAuth implements UserAuthRepository {
 			if (ss == null) {
 				Map<String, String> sasl_props = new TreeMap<String, String>();
 				sasl_props.put(Sasl.QOP, "auth");
-				sasl_props.put(SaslPLAIN.ENCRYPTION_KEY, SaslPLAIN.ENCRYPTION_LS_MD5);
+// 				sasl_props.put(SaslPLAIN.ENCRYPTION_KEY, SaslPLAIN.ENCRYPTION_LS_MD5);
 				ss = Sasl.createSaslServer((String)props.get(MACHANISM_KEY),
 					"xmpp",	(String)props.get(SERVER_NAME_KEY),
 					sasl_props, new SaslCallbackHandler(props));

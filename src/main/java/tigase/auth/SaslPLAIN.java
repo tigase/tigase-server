@@ -99,21 +99,21 @@ public class SaslPLAIN implements SaslServer {
 		return null;
 	}
 
-	/**
-	 * This is not fully correct HEX representation of digest sum but
-	 * this is how Libre Source does it so I have to be compatible with them.
-	 *
-	 * @param passwd a <code>String</code> value
-	 * @return a <code>String</code> value
-	 */
-	private String ls_digest(String passwd) throws NoSuchAlgorithmException {
-		byte[] md5 = Algorithms.digest("", passwd, "MD5");
-		StringBuilder sb = new StringBuilder();
-		for (byte b: md5) {
-			sb.append(Integer.toHexString(b));
-		}
-		return sb.toString();
-	}
+// 	/**
+// 	 * This is not fully correct HEX representation of digest sum but
+// 	 * this is how Libre Source does it so I have to be compatible with them.
+// 	 *
+// 	 * @param passwd a <code>String</code> value
+// 	 * @return a <code>String</code> value
+// 	 */
+// 	private String ls_digest(String passwd) throws NoSuchAlgorithmException {
+// 		byte[] md5 = Algorithms.digest("", passwd, "MD5");
+// 		StringBuilder sb = new StringBuilder();
+// 		for (byte b: md5) {
+// 			sb.append(Integer.toHexString(b));
+// 		}
+// 		return sb.toString();
+// 	}
 
 	/**
 	 * Describe <code>evaluateResponse</code> method here.
@@ -143,9 +143,9 @@ public class SaslPLAIN implements SaslServer {
 					if (alg.equals(ENCRYPTION_MD5) || alg.equals(ENCRYPTION_SHA)) {
 						passwd = Algorithms.hexDigest("", passwd, alg);
 					} // end of if (alg != null && !alg.equals())
-					if (alg.equals(ENCRYPTION_LS_MD5)) {
-						passwd = ls_digest(passwd);
-					} // end of if (alg != null && !alg.equals())
+// 					if (alg.equals(ENCRYPTION_LS_MD5)) {
+// 						passwd = ls_digest(passwd);
+// 					} // end of if (alg != null && !alg.equals())
 				} catch (NoSuchAlgorithmException e) {
 					throw
 						new SaslException("Password encrypting algorithm is not supported.",
