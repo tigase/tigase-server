@@ -182,7 +182,11 @@ public class ServerConnectionManager extends ConnectionManager {
 					// target domain and both are invalid, what then?
 					// The best option would be to drop the packet if it is already an
 					// error - remote-server-not-found....
-					if (packet.getType() != StanzaType.error
+					// For dialback packet just ignore the error completely as it means
+					// remote server tries to connect from domain which doesn't exist
+					// in DNS so no further action should be performed.
+					if (!packet.getElement().getXMLNS().equals(DIALBACK_XMLNS)
+						|| packet.getType() != StanzaType.error
 						|| packet.getErrorCondition() == null
 						|| !packet.getErrorCondition().equals(
 							Authorization.REMOTE_SERVER_NOT_FOUND.getCondition())) {
