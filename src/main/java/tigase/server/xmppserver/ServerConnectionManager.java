@@ -186,10 +186,10 @@ public class ServerConnectionManager extends ConnectionManager {
 					// remote server tries to connect from domain which doesn't exist
 					// in DNS so no further action should be performed.
 					if (!packet.getElement().getXMLNS().equals(DIALBACK_XMLNS)
-						|| packet.getType() != StanzaType.error
-						|| packet.getErrorCondition() == null
-						|| !packet.getErrorCondition().equals(
-							Authorization.REMOTE_SERVER_NOT_FOUND.getCondition())) {
+						&& (packet.getType() != StanzaType.error
+							|| packet.getErrorCondition() == null
+							|| !packet.getErrorCondition().equals(
+								Authorization.REMOTE_SERVER_NOT_FOUND.getCondition()))) {
 						addOutPacket(
 							Authorization.REMOTE_SERVER_NOT_FOUND.getResponseMessage(packet,
 								"S2S - destination host not found", true));
