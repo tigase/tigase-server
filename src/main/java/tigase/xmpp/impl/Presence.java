@@ -22,6 +22,8 @@
  */
 package tigase.xmpp.impl;
 
+import java.util.Set;
+import java.util.HashSet;
 import java.util.Queue;
 import java.util.EnumSet;
 import java.util.logging.Logger;
@@ -54,7 +56,19 @@ import static tigase.xmpp.impl.Roster.FROM_SUBSCRIBED;
 public class Presence extends XMPPProcessor
 	implements XMPPProcessorIfc, XMPPStopListenerIfc {
 
+	/**
+	 * Constant <code>PRESENCE_KEY</code> is a key in temporary session data
+	 * where the last presence sent by the userto server is stored,
+	 * either initial presence or off-line presence before disconnecting.
+	 */
 	private static final String PRESENCE_KEY = "user-presence";
+	/**
+	 * <code>DIRECT_PRESENCE</code> is a key in temporary session data for
+	 * the collection of JIDs where direct presence was sent.
+	 * To all these addresses unavailable presence must be sent when user
+	 * disconnects.
+	 */
+	private static final String DIRECT_PRESENCE = "direct-presences";
 
 	/**
    * Private logger for class instancess.
@@ -72,7 +86,7 @@ public class Presence extends XMPPProcessor
   public String[] supNamespaces() { return XMLNSS; }
 
 	/**
-	 * Describe <code>stopped</code> method here.
+	 * <code>stopped</code> method is called when user disconnects or logs-out.
 	 *
 	 * @param session a <code>XMPPResourceConnection</code> value
 	 */
@@ -90,13 +104,16 @@ public class Presence extends XMPPProcessor
 	}
 
   /**
-	 * Describe <code>sendPresenceBroadcast</code> method here.
+	 * <code>sendPresenceBroadcast</code> method broadcasts given presence
+	 * to all budies from roster and to all users to which direct presence
+	 * was sent.
 	 *
 	 * @param t a <code>StanzaType</code> value
 	 * @param session a <code>XMPPResourceConnection</code> value
 	 * @param pres an <code>Element</code> value
 	 * @exception NotAuthorizedException if an error occurs
 	 */
+	@SuppressWarnings({"unchecked"})
 	protected void sendPresenceBroadcast(final StanzaType t,
     final XMPPResourceConnection session,
 		final EnumSet<SubscriptionType> subscrs,
@@ -108,10 +125,19 @@ public class Presence extends XMPPProcessor
 				sendPresence(t, buddy, session.getJID(), results, pres);
 			} // end of for (String buddy: buddies)
     } // end of if (buddies == null)
+		Set<String> direct_presences =
+			(Set<String>)session.getSessionData(DIRECT_PRESENCE);
+		if (direct_presences != null) {
+			for (String buddy: direct_presences) {
+				log.finest("Updating direct presence for: " + buddy);
+				sendPresence(t, buddy, session.getJID(), results, pres);
+			} // end of for (String buddy: buddies)
+		} // end of if (direct_presence != null)
   }
 
 	/**
-	 * Describe <code>updateOfflineChange</code> method here.
+	 * <code>updateOfflineChange</code> method broadcast off-line presence
+	 * to all other user active resources.
 	 *
 	 * @param session a <code>XMPPResourceConnection</code> value
 	 * @exception NotAuthorizedException if an error occurs
@@ -233,6 +259,19 @@ public class Presence extends XMPPProcessor
 		results.offer(packet);
   }
 
+	@SuppressWarnings({"unchecked"})
+	protected void addDirectPresenceJID(String jid,
+		XMPPResourceConnection session ) {
+		Set<String> direct_presences =
+			(Set<String>)session.getSessionData(DIRECT_PRESENCE);
+		if (direct_presences == null) {
+			direct_presences = new HashSet<String>();
+			session.putSessionData(DIRECT_PRESENCE, direct_presences);
+		} // end of if (direct_presences == null)
+		direct_presences.add(jid);
+		log.finest("Added direct presence jid: " + jid);
+	}
+
 	@SuppressWarnings("fallthrough")
   public void process(final Packet packet, final XMPPResourceConnection session,
 		final NonAuthUserRepository repo, final Queue<Packet> results) {
@@ -260,7 +299,7 @@ public class Presence extends XMPPProcessor
 				packet.getElement().setAttribute("from", session.getJID());
 			} // end of if (packet.getFrom().equals(session.getConnectionId()))
 
-			log.finest(pres_type + " presence found.");
+			log.finest(pres_type + " presence found: " + packet.toString());
 			boolean subscr_changed = false;
 			switch (pres_type) {
 			case out_initial:
@@ -269,6 +308,7 @@ public class Presence extends XMPPProcessor
 					// Yes this is it, send direct presence
 					Element result = packet.getElement().clone();
 					results.offer(new Packet(result));
+					addDirectPresenceJID(packet.getElemTo(), session);
 				} else {
 					boolean first = false;
 					if (session.getSessionData(PRESENCE_KEY) == null) {
