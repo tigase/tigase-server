@@ -250,6 +250,18 @@ public class Packet {
 		return result;
 	}
 
+	public String getErrorCondition() {
+		List<Element> children = elem.getChildren(elem.getName() + "/error");
+		if (children != null) {
+			for (Element cond: children) {
+				if (!cond.getName().equals("text")) {
+					return cond.getName();
+				} // end of if (!cond.getName().equals("text"))
+			} // end of for (Element cond: children)
+		} // end of if (children == null) else
+		return null;
+	}
+
 	public Packet errorResult(final String errorType, final String errorCondition,
 		final String errorText, final boolean includeOriginalXML) {
 		Element reply = new Element(elem.getName());

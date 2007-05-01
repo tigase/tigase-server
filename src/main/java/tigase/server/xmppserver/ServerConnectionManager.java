@@ -174,9 +174,22 @@ public class ServerConnectionManager extends ConnectionManager {
 				} else {
 					// Can't establish connection...., unknown host??
 					waitingPacketsMap.remove(cid);
-					addOutPacket(
-						Authorization.REMOTE_SERVER_NOT_FOUND.getResponseMessage(packet,
-							"S2S - destination host not found", true));
+					// Well, is somebody injects a packet with the same sender and
+					// receiver domain and this domain is not valid then we have
+					// infinite loop here....
+					// Let's try to handle this by dropping such packet.
+					// It may happen as well that the source domain is different from
+					// target domain and both are invalid, what then?
+					// The best option would be to drop the packet if it is already an
+					// error - remote-server-not-found....
+					if (packet.getType() != StanzaType.error
+						|| packet.getErrorCondition() == null
+						|| !packet.getErrorCondition().equals(
+							Authorization.REMOTE_SERVER_NOT_FOUND.getCondition())) {
+						addOutPacket(
+							Authorization.REMOTE_SERVER_NOT_FOUND.getResponseMessage(packet,
+								"S2S - destination host not found", true));
+					}
 				}
 			} // end of if (serv == null)
 			if (connecting) {
