@@ -66,8 +66,8 @@ public class SessionManagerConfig {
 	 * List of default components loaded by the server. It can be changed later
 	 * in config file or at runtime.
 	 */
-	public static final String[] COMPONENTS_PROP_VAL =
-	{"jabber:iq:register", "jabber:iq:auth", "urn:ietf:params:xml:ns:xmpp-sasl",
+	public static final String[] COMPONENTS_NO_REG_PROP_VAL =
+	{"jabber:iq:auth", "urn:ietf:params:xml:ns:xmpp-sasl",
 	 "urn:ietf:params:xml:ns:xmpp-bind", "urn:ietf:params:xml:ns:xmpp-session",
 	 "jabber:iq:roster", "jabber:iq:privacy", "presence", "msgoffline",
 	 "jabber:iq:version", "http://jabber.org/protocol/stats", "starttls",
@@ -77,7 +77,7 @@ public class SessionManagerConfig {
 	 * List of components loaded when the server is loaded in test mode.
 	 * Some components like off-line message storage is disabled during tests.
 	 */
-	public static final String[] COMPONENTS_TEST_PROP_VAL =
+	public static final String[] COMPONENTS_FULL_PROP_VAL =
 	{"jabber:iq:register", "jabber:iq:auth", "urn:ietf:params:xml:ns:xmpp-sasl",
 	 "urn:ietf:params:xml:ns:xmpp-bind", "urn:ietf:params:xml:ns:xmpp-session",
 	 "jabber:iq:roster", "jabber:iq:privacy", "presence", "jabber:iq:version",
@@ -94,6 +94,7 @@ public class SessionManagerConfig {
 	public static void getDefaults(Map<String, Object> props,
 		Map<String, Object> params) {
 
+		boolean full_comps = true;
 		String user_repo_class = XML_REPO_CLASS_PROP_VAL;
 		String user_repo_url = XML_REPO_URL_PROP_VAL;
 		String auth_repo_class = XML_REPO_CLASS_PROP_VAL;
@@ -128,10 +129,12 @@ public class SessionManagerConfig {
 			if (params.get("--auth-db").equals("drupal")) {
 				auth_repo_class = DRUPAL_REPO_CLASS_PROP_VAL;
 				auth_repo_url = DRUPAL_REPO_URL_PROP_VAL;
+				full_comps = false;
 			}
 			if (params.get("--auth-db").equals("libresource")) {
 				auth_repo_class = LIBRESOURCE_REPO_CLASS_PROP_VAL;
 				auth_repo_url = LIBRESOURCE_REPO_URL_PROP_VAL;
+				full_comps = false;
 			}
 		}
 		if (params.get("--auth-db-uri") != null) {
@@ -144,13 +147,13 @@ public class SessionManagerConfig {
 	  props.put(AUTH_REPO_CLASS_PROP_KEY, auth_repo_class);
 	  props.put(AUTH_REPO_URL_PROP_KEY, auth_repo_url);
 
-		if ((Boolean)params.get("--test")) {
+		if (full_comps) {
 			// Some components are not loaded during tests at least until proper
 			// test cases are created for them. Sample case is off-line message
 			// storage which may impact some test cases.
-			props.put(COMPONENTS_PROP_KEY, COMPONENTS_TEST_PROP_VAL);
+			props.put(COMPONENTS_PROP_KEY, COMPONENTS_FULL_PROP_VAL);
 		} else {
-			props.put(COMPONENTS_PROP_KEY, COMPONENTS_PROP_VAL);
+			props.put(COMPONENTS_PROP_KEY, COMPONENTS_NO_REG_PROP_VAL);
 		}
 
 		if (params.get("--virt-hosts") != null) {
