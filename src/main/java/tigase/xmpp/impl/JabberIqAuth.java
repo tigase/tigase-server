@@ -53,16 +53,16 @@ import tigase.xmpp.XMPPResourceConnection;
 public class JabberIqAuth extends XMPPProcessor
 	implements XMPPProcessorIfc {
 
-  /**
-   * Private logger for class instancess.
-   */
-  private static final Logger log =
+	/**
+	 * Private logger for class instancess.
+	 */
+	private static final Logger log =
 		Logger.getLogger("tigase.xmpp.impl.JabberIqAuth");
 
 	protected static final String ID = "jabber:iq:auth";
 	protected static final String[] ELEMENTS = {"query"};
-  protected static final String[] XMLNSS = {"jabber:iq:auth"};
-  protected static final Element[] FEATURES = {
+	protected static final String[] XMLNSS = {"jabber:iq:auth"};
+	protected static final Element[] FEATURES = {
 		new Element("auth",	new String[] {"xmlns"},
 			new String[] {"http://jabber.org/features/iq-auth"})
 	};
@@ -71,14 +71,14 @@ public class JabberIqAuth extends XMPPProcessor
 
 	public String[] supElements() { return ELEMENTS; }
 
-  public String[] supNamespaces() { return XMLNSS; }
+	public String[] supNamespaces() { return XMLNSS; }
 
-  public Element[] supStreamFeatures(final XMPPResourceConnection session)	{
-    if (session != null && session.isAuthorized()) {
-      return null;
-    } else {
-      return FEATURES;
-    } // end of if (session.isAuthorized()) else
+	public Element[] supStreamFeatures(final XMPPResourceConnection session)	{
+		if (session != null && session.isAuthorized()) {
+			return null;
+		} else {
+			return FEATURES;
+		} // end of if (session.isAuthorized()) else
 	}
 
 	public void process(final Packet packet, final XMPPResourceConnection session,
@@ -89,7 +89,7 @@ public class JabberIqAuth extends XMPPProcessor
 		} // end of if (session == null)
 
 		Element request = packet.getElement();
-    StanzaType type = packet.getType();
+		StanzaType type = packet.getType();
 		switch (type) {
 		case get:
 			Map<String, Object> query = new HashMap<String, Object>();
@@ -105,9 +105,9 @@ public class JabberIqAuth extends XMPPProcessor
 			results.offer(packet.okResult(response, 1));
 			break;
 		case set:
-      String user_name = request.getChildCData("/iq/query/username");
-      String resource = request.getChildCData("/iq/query/resource");
-      String password = request.getChildCData("/iq/query/password");
+			String user_name = request.getChildCData("/iq/query/username");
+			String resource = request.getChildCData("/iq/query/resource");
+			String password = request.getChildCData("/iq/query/password");
 			String digest = request.getChildCData("/iq/query/digest");
 			String user_pass = null;
 			String auth_mod = null;
