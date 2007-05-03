@@ -148,8 +148,8 @@ public class JabberIqAuth extends XMPPProcessor
 		default:
 			results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
 					"Message type is incorrect", false));
-				results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
-						StanzaType.set, packet.getElemId()));
+			results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
+					StanzaType.set, packet.getElemId()));
 			break;
 		} // end of switch (type)
 
