@@ -129,11 +129,19 @@ public class SessionManagerConfig {
 			if (params.get("--auth-db").equals("drupal")) {
 				auth_repo_class = DRUPAL_REPO_CLASS_PROP_VAL;
 				auth_repo_url = DRUPAL_REPO_URL_PROP_VAL;
+				// For Drupal or LibreSource authentication all account
+				// management is done via Web interface so accounts containers
+				// for Jabber data have to be created automatically
+				user_repo_url += "&autoCreateUser=true"
 				full_comps = false;
 			}
 			if (params.get("--auth-db").equals("libresource")) {
 				auth_repo_class = LIBRESOURCE_REPO_CLASS_PROP_VAL;
 				auth_repo_url = LIBRESOURCE_REPO_URL_PROP_VAL;
+				// For Drupal or LibreSource authentication all account
+				// management is done via Web interface so accounts containers
+				// for Jabber data have to be created automatically
+				user_repo_url += "&autoCreateUser=true"
 				full_comps = false;
 			}
 		}
