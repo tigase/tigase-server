@@ -132,7 +132,7 @@ public class SessionManagerConfig {
 				// For Drupal or LibreSource authentication all account
 				// management is done via Web interface so accounts containers
 				// for Jabber data have to be created automatically
-				user_repo_url += "&autoCreateUser=true"
+				user_repo_url += "&autoCreateUser=true";
 				full_comps = false;
 			}
 			if (params.get("--auth-db").equals("libresource")) {
@@ -141,7 +141,7 @@ public class SessionManagerConfig {
 				// For Drupal or LibreSource authentication all account
 				// management is done via Web interface so accounts containers
 				// for Jabber data have to be created automatically
-				user_repo_url += "&autoCreateUser=true"
+				user_repo_url += "&autoCreateUser=true";
 				full_comps = false;
 			}
 		}
