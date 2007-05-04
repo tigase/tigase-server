@@ -38,7 +38,7 @@ import tigase.xmpp.XMPPResourceConnection;
  * XEP-0199: XMPP Ping
  * 
  * 
- * @author <a href="mailto:bmalkow@tigase.org">Bartosz Ma‚³kowski</a>
+ * @author <a href="mailto:bmalkow@tigase.org">Bartosz MaÅ‚kowski</a>
  * @version $Rev$
  */
 public class UrnXmppPing extends XMPPProcessor implements XMPPProcessorIfc {
