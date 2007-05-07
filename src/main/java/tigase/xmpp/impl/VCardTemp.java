@@ -65,6 +65,13 @@ public class VCardTemp extends XMPPProcessor implements XMPPProcessorIfc {
 	// name was all upper cases. Now the plugin should catch both cases.
 	protected static final String[] ELEMENTS = {"vCard", "VCARD"};
   protected static final String[] XMLNSS = {XMLNS, XMLNS};
+  protected static final Element[] DISCO_FEATURES =	{
+		new Element("feature", new String[] {"var"}, new String[] {XMLNS})
+	};
+
+  public Element[] supDiscoFeatures(final XMPPResourceConnection session)
+	{ return DISCO_FEATURES; }
+
 
 	private static final SimpleParser parser =
 		SingletonFactory.getParserInstance();

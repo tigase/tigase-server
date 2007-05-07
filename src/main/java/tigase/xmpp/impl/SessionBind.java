@@ -56,6 +56,13 @@ public class SessionBind extends XMPPProcessor
   protected static final String[] XMLNSS = {XMLNS};
   protected static final Element[] FEATURES = {
 		new Element("session", new String[] {"xmlns"}, new String[] {XMLNS})};
+  protected static final Element[] DISCO_FEATURES =	{
+		new Element("feature", new String[] {"var"}, new String[] {XMLNS})
+	};
+
+  public Element[] supDiscoFeatures(final XMPPResourceConnection session)
+	{ return DISCO_FEATURES; }
+
 
   private static int resGenerator = 0;
 

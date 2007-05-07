@@ -57,6 +57,9 @@ public class BindResource extends XMPPProcessor
   protected static final Element[] FEATURES = {
 		new Element("bind",	new String[] {"xmlns"}, new String[] {XMLNS})
 	};
+  protected static final Element[] DISCO_FEATURES = {
+		new Element("feature", new String[] {"var"}, new String[] {XMLNS})
+	};
 
   private static int resGenerator = 0;
 
@@ -73,6 +76,9 @@ public class BindResource extends XMPPProcessor
       return FEATURES;
     } // end of if (session.isAuthorized()) else
 	}
+
+  public Element[] supDiscoFeatures(final XMPPResourceConnection session)
+	{ return DISCO_FEATURES; }
 
   public void process(final Packet packet, final XMPPResourceConnection session,
 		final NonAuthUserRepository repo, final Queue<Packet> results) {

@@ -70,6 +70,13 @@ public class SaslAuth extends XMPPProcessor
     "auth", "response", "challenge", "failure", "success", "abort"};
   protected static final String[] XMLNSS = {
     XMLNS, XMLNS, XMLNS, XMLNS, XMLNS, XMLNS};
+  protected static final Element[] DISCO_FEATURES =	{
+		new Element("feature", new String[] {"var"}, new String[] {XMLNS})
+	};
+
+  public Element[] supDiscoFeatures(final XMPPResourceConnection session)
+	{ return DISCO_FEATURES; }
+
 
   public enum ElementType {
     auth,

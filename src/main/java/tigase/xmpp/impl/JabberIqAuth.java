@@ -59,13 +59,20 @@ public class JabberIqAuth extends XMPPProcessor
 	private static final Logger log =
 		Logger.getLogger("tigase.xmpp.impl.JabberIqAuth");
 
-	protected static final String ID = "jabber:iq:auth";
+	protected static final String XMLNS = "jabber:iq:auth";
+	protected static final String ID = XMLNS;
 	protected static final String[] ELEMENTS = {"query"};
-	protected static final String[] XMLNSS = {"jabber:iq:auth"};
+	protected static final String[] XMLNSS = {XMLNS};
 	protected static final Element[] FEATURES = {
 		new Element("auth",	new String[] {"xmlns"},
 			new String[] {"http://jabber.org/features/iq-auth"})
 	};
+  protected static final Element[] DISCO_FEATURES =	{
+		new Element("feature", new String[] {"var"}, new String[] {XMLNS})
+	};
+
+  public Element[] supDiscoFeatures(final XMPPResourceConnection session)
+	{ return DISCO_FEATURES; }
 
 	public String id() { return ID; }
 
