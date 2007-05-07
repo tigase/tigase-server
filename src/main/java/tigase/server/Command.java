@@ -58,7 +58,7 @@ public enum Command {
 	public static Command valueof(String cmd) {
 		try {
 			return Command.valueOf(cmd);
-		} catch (IllegalArgumentException e) {
+		} catch (Exception e) {
 			return OTHER;
 		} // end of try-catch
 	}
