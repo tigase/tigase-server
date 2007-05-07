@@ -33,6 +33,7 @@ import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.db.NonAuthUserRepository;
+import tigase.util.JID;
 
 /**
  * JEP-0077: In-Band Registration
@@ -79,59 +80,81 @@ public class JabberIqRegister extends XMPPProcessor
 			return;
 		} // end of if (session == null)
 
+		String id = session.getDomain();
+		if (packet.getElemTo() != null) {
+			id = JID.getNodeID(packet.getElemTo());
+		}
+
 		try {
-			Authorization result = Authorization.NOT_AUTHORIZED;
-			Element request = packet.getElement();
-			StanzaType type = packet.getType();
-			switch (type) {
-			case set:
-				// Is it registration cancel request?
-				Element elem = request.findChild("/iq/query/remove");
-				if (elem != null) {
-					// Yes this is registration cancel request
-					// According to JEP-0077 there must not be any
-					// more subelemets apart from <remove/>
-					elem = request.findChild("/iq/query");
-					if (elem.getChildren().size() > 1) {
-						result = Authorization.BAD_REQUEST;
+			if (packet.getFrom().equals(session.getConnectionId())) {
+				packet.getElement().setAttribute("from", session.getJID());
+			}
+
+			if (id.equals(session.getUserId())
+				|| id.equals(session.getDomain())) {
+				Authorization result = Authorization.NOT_AUTHORIZED;
+				Element request = packet.getElement();
+				StanzaType type = packet.getType();
+				switch (type) {
+				case set:
+					// Is it registration cancel request?
+					Element elem = request.findChild("/iq/query/remove");
+					if (elem != null) {
+						// Yes this is registration cancel request
+						// According to JEP-0077 there must not be any
+						// more subelemets apart from <remove/>
+						elem = request.findChild("/iq/query");
+						if (elem.getChildren().size() > 1) {
+							result = Authorization.BAD_REQUEST;
+						} else {
+							try {
+								result = session.unregister(packet.getElemFrom());
+							} catch (NotAuthorizedException e) {
+								results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
+										"You must authorize session first.", true));
+							} // end of try-catch
+						}
 					} else {
-						try {
-							result = session.unregister(packet.getElemFrom());
-						} catch (NotAuthorizedException e) {
-							results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-									"You must authorize session first.", true));
-						} // end of try-catch
+						// No, so assuming this is registration of new
+						// user or change registration details for existing user
+						String user_name = request.getChildCData("/iq/query/username");
+						String password = request.getChildCData("/iq/query/password");
+						String email = request.getChildCData("/iq/query/email");
+						result = session.register(user_name, password, email);
 					}
-				} else {
-					// No, so assuming this is registration of new
-					// user or change registration details for existing user
-					String user_name = request.getChildCData("/iq/query/username");
-					String password = request.getChildCData("/iq/query/password");
-					String email = request.getChildCData("/iq/query/email");
-					result = session.register(user_name, password, email);
-				}
-				if (result == Authorization.AUTHORIZED) {
-					results.offer(result.getResponseMessage(packet, null, false));
-				} else {
-					results.offer(result.getResponseMessage(packet,
-							"Unsuccessful registration attempt", true));
-				}
-				break;
-			case get:
-				results.offer(packet.okResult(
-						"<instructions>" +
-						"Choose a user name and password for use with this service." +
-						"Please provide also your e-mail address." +
-						"</instructions>" +
-						"<username/>" +
-						"<password/>" +
-						"<email/>", 1));
-				break;
-			default:
-				results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
-						"Message type is incorrect", true));
-				break;
-			} // end of switch (type)
+					if (result == Authorization.AUTHORIZED) {
+						results.offer(result.getResponseMessage(packet, null, false));
+					} else {
+						results.offer(result.getResponseMessage(packet,
+								"Unsuccessful registration attempt", true));
+					}
+					break;
+				case get:
+					results.offer(packet.okResult(
+							"<instructions>" +
+							"Choose a user name and password for use with this service." +
+							"Please provide also your e-mail address." +
+							"</instructions>" +
+							"<username/>" +
+							"<password/>" +
+							"<email/>", 1));
+					break;
+				case result:
+					// It might be a registration request from transport for example...
+					Element elem_res = packet.getElement().clone();
+					Packet pack_res = new Packet(elem_res);
+					pack_res.setTo(session.getConnectionId());
+					results.offer(pack_res);
+					break;
+				default:
+					results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
+							"Message type is incorrect", true));
+					break;
+				} // end of switch (type)
+			} else {
+				Element result = packet.getElement().clone();
+				results.offer(new Packet(result));
+			}
 		} catch (NotAuthorizedException e) {
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 					"You are not authorized to change registration settings.", true));
