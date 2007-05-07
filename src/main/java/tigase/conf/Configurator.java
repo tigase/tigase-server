@@ -97,6 +97,13 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 				new ServiceIdentity("automation", "command-list",
 					"Config settings")});
 		config_set.addFeatures(DEF_FEATURES);
+		ServiceEntity item = new ServiceEntity(getName(), "--none--",
+			"Add new component...");
+		item.addFeatures(CMD_FEATURES);
+		item.addIdentities(new ServiceIdentity[] {
+				new ServiceIdentity("automation", "command-node",
+					"Add new component...")});
+		config_set.addItems(new ServiceEntity[] {item});
 		serviceEntity.addItems(new ServiceEntity[] {config_list, config_set});
 	}
 
@@ -618,49 +625,10 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 					Packet result = packet.commandResult("result");
 					Command.addFieldValue(result, "Note",	msg, "fixed");
 					if (Command.getData(packet) == null) {
-						Command.setStatus(result, "executing");
-						Command.addAction(result, "complete");
-						Map<String, Object> allprop = getAllProperties(spl[2]);
-						for (Map.Entry<String, Object> entry: allprop.entrySet()) {
-							Command.addFieldValue(result, XMLUtils.escape(entry.getKey()),
-								XMLUtils.escape(objectToString(entry.getValue())));
-						} // end of for (Map.Entry entry: prop.entrySet())
-						Command.addFieldValue(result, XMLUtils.escape("new-prop-name"),
-							XMLUtils.escape(spl[2] + "/"), "text-single", "New property name");
-						Command.addFieldValue(result, XMLUtils.escape("new-prop-value"),
-							"", "text-single", "New property value");
+						prepareConfigData(result, spl[2]);
 						results.offer(result);
 					} else {
-						Command.addNote(result, "You changed following settings:");
-						Command.addFieldValue(result, "Note",
-								"You changed following settings:", "fixed");
-						Map<String, Object> allprop = getAllProperties(spl[2]);
-						boolean changed = false;
-						for (Map.Entry<String, Object> entry: allprop.entrySet()) {
-							String tmp_val = Command.getFieldValue(packet,
-								XMLUtils.escape(entry.getKey()));
-							String old_val = objectToString(entry.getValue());
-							String new_val = old_val;
-							if (tmp_val != null) {
-								new_val = XMLUtils.unescape(tmp_val);
-							}
-							if (new_val != null && old_val != null
-								&& !new_val.equals(old_val)) {
-								defConfigParams.put(entry.getKey(),
-									setPropertyValue(entry.getKey(), new_val, result, admin));
-								changed = true;
-							}
-						} // end of for (Map.Entry entry: prop.entrySet())
-						String prop_value = Command.getFieldValue(packet, "new-prop-value");
-						if (prop_value != null &&	prop_value.trim().length() > 0) {
-							setPropertyValue(
-								XMLUtils.unescape(Command.getFieldValue(packet, "new-prop-name")),
-								XMLUtils.unescape(prop_value), result, admin);
-							changed = true;
-						}
-						if (changed && admin) {
-							setup(spl[2]);
-						}
+						updateConfigChanges(packet, result, spl[2], admin);
 						results.offer(result);
 					}
 				}
@@ -668,6 +636,54 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 			break;
 		default:
 			break;
+		}
+	}
+
+	private void prepareConfigData(Packet result, String comp_name) {
+		Command.setStatus(result, "executing");
+		Command.addAction(result, "complete");
+		Map<String, Object> allprop = getAllProperties(comp_name);
+		for (Map.Entry<String, Object> entry: allprop.entrySet()) {
+			Command.addFieldValue(result, XMLUtils.escape(entry.getKey()),
+				XMLUtils.escape(objectToString(entry.getValue())));
+		} // end of for (Map.Entry entry: prop.entrySet())
+		Command.addFieldValue(result, XMLUtils.escape("new-prop-name"),
+			XMLUtils.escape(comp_name + "/"), "text-single", "New property name");
+		Command.addFieldValue(result, XMLUtils.escape("new-prop-value"),
+			"", "text-single", "New property value");
+	}
+
+	private void updateConfigChanges(Packet packet, Packet result,
+		String comp_name, boolean admin) {
+		Command.addNote(result, "You changed following settings:");
+		Command.addFieldValue(result, "Note",
+			"You changed following settings:", "fixed");
+		Map<String, Object> allprop = getAllProperties(comp_name);
+		boolean changed = false;
+		for (Map.Entry<String, Object> entry: allprop.entrySet()) {
+			String tmp_val = Command.getFieldValue(packet,
+				XMLUtils.escape(entry.getKey()));
+			String old_val = objectToString(entry.getValue());
+			String new_val = old_val;
+			if (tmp_val != null) {
+				new_val = XMLUtils.unescape(tmp_val);
+			}
+			if (new_val != null && old_val != null
+				&& !new_val.equals(old_val)) {
+				defConfigParams.put(entry.getKey(),
+					setPropertyValue(entry.getKey(), new_val, result, admin));
+				changed = true;
+			}
+		} // end of for (Map.Entry entry: prop.entrySet())
+		String prop_value = Command.getFieldValue(packet, "new-prop-value");
+		if (prop_value != null &&	prop_value.trim().length() > 0) {
+			setPropertyValue(
+				XMLUtils.unescape(Command.getFieldValue(packet, "new-prop-name")),
+				XMLUtils.unescape(prop_value), result, admin);
+			changed = true;
+		}
+		if (changed && admin) {
+			setup(comp_name);
 		}
 	}
 
