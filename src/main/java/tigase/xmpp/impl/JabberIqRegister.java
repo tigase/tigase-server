@@ -86,12 +86,12 @@ public class JabberIqRegister extends XMPPProcessor
 		}
 
 		try {
-			if (packet.getFrom().equals(session.getConnectionId())) {
-				packet.getElement().setAttribute("from", session.getJID());
-			}
+// 			if (packet.getFrom().equals(session.getConnectionId())) {
+// 				packet.getElement().setAttribute("from", session.getJID());
+// 			}
 
-			if (id.equals(session.getUserId())
-				|| id.equals(session.getDomain())) {
+			if (id.equals(session.getDomain())
+				|| id.equals(session.getUserId())) {
 				Authorization result = Authorization.NOT_AUTHORIZED;
 				Element request = packet.getElement();
 				StanzaType type = packet.getType();
