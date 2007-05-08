@@ -86,9 +86,10 @@ public class JabberIqRegister extends XMPPProcessor
 		}
 
 		try {
-// 			if (packet.getFrom().equals(session.getConnectionId())) {
-// 				packet.getElement().setAttribute("from", session.getJID());
-// 			}
+			if (session.isAuthorized()
+				&& packet.getFrom().equals(session.getConnectionId())) {
+				packet.getElement().setAttribute("from", session.getJID());
+			}
 
 			if (id.equals(session.getDomain())
 				|| id.equals(session.getUserId())) {
