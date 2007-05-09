@@ -87,6 +87,13 @@ import tigase.server.ServerComponent;
  * subscription.</li>
  * <li><strong>On line only</strong> - the task may distribute packets to online
  * users only.</li>
+ * <li><strong>Replace sender address</strong> - whether sender address should
+ * be replaced with task address. This might be useful depending where the
+ * responses should go. If the list is kind on announces board like new version
+ * release then maybe replies should go to the sender. If this is more like
+ * topic discussion group then the reply should go to all subscribers.</li>
+ * <li><strong>Message type</strong> - whether messages should be distributed
+ * as a <code>chat</code>, <code>headline</code> or <code>normal</code>.</li>
  * </ul>
  * There can be also some per task specific settings...
  * </p>
@@ -100,8 +107,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	implements Configurable {
 
 	public void processPacket(final Packet packet) {
-		// do nothing, this component is to send packets not to receive
-		// (for now)
+		// Not implemented yet...
 	}
 
 
