@@ -106,13 +106,7 @@ public class StanzaSender extends AbstractMessageReceiver
 	 * Describe <code>processPacket</code> method here.
 	 *
 	 * @param packet a <code>Packet</code> value
-	 * @param queue a <code>Queue</code> value
 	 */
-	public void processPacket(final Packet packet, final Queue<Packet> results) {
-		// do nothing, this component is to send packets not to receive
-		// (for now)
-	}
-
 	public void processPacket(final Packet packet) {
 		// do nothing, this component is to send packets not to receive
 		// (for now)
@@ -171,7 +165,7 @@ public class StanzaSender extends AbstractMessageReceiver
 		defs.put(INTERVAL_PROP_KEY, INTERVAL_PROP_VAL);
 		defs.put(STANZA_LISTENERS_PROP_KEY, STANZA_LISTENERS_PROP_VAL);
 
-		if ((Boolean)params.get("--test")) {
+		if ((Boolean)params.get(GEN_TEST)) {
 			defs.put(FILE_TASK_NAME + "/" + TASK_ACTIVE_PROP_KEY, true);
 		} else {
 			defs.put(FILE_TASK_NAME + "/" + TASK_ACTIVE_PROP_KEY, TASK_ACTIVE_PROP_VAL);
@@ -180,7 +174,7 @@ public class StanzaSender extends AbstractMessageReceiver
 		defs.put(FILE_TASK_NAME + "/" + TASK_INIT_PROP_KEY, FILE_TASK_INIT);
 		defs.put(FILE_TASK_NAME + "/" + TASK_INTERVAL_PROP_KEY, FILE_INTERVAL);
 
-		if ((Boolean)params.get("--test")) {
+		if ((Boolean)params.get(GEN_TEST)) {
 			defs.put(JDBC_TASK_NAME + "/" + TASK_ACTIVE_PROP_KEY, true);
 		} else {
 			defs.put(JDBC_TASK_NAME + "/" + TASK_ACTIVE_PROP_KEY, TASK_ACTIVE_PROP_VAL);

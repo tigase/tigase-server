@@ -172,57 +172,67 @@ public class ComponentConnectionManager extends ConnectionManager
 
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		String config_type = (String)params.get("config-type");
-		if (config_type.equals("--gen-config-sm")) {
+		if (config_type.equals(GEN_CONFIG_SM)) {
 			PACK_ROUTED_VAL = true;
 			PORT_TYPE_PROP_VAL = ConnectionType.accept;
 		}
-		if (config_type.equals("--gen-config-cs")) {
+		if (config_type.equals(GEN_CONFIG_CS)) {
 			PACK_ROUTED_VAL = true;
 			PORT_TYPE_PROP_VAL = ConnectionType.connect;
 			PORT_IFC_PROP_VAL = new String[] {"localhost"};
 		}
-		if (params.get("--ext-comp") != null) {
-			String[] comp_params = ((String)params.get("--ext-comp")).split(",");
-			int idx = 0;
-			if (comp_params.length >= idx + 1) {
-				PORT_LOCAL_HOST_PROP_VAL = comp_params[idx++];
-			}
-			if (comp_params.length >= idx + 1) {
-				PORT_REMOTE_HOST_PROP_VAL = comp_params[idx++];
-				PORT_ROUTING_TABLE_PROP_VAL = new String[] { PORT_REMOTE_HOST_PROP_VAL };
-				if (config_type.equals("--gen-config-cs")) {
-					PORT_IFC_PROP_VAL = new String[] {PORT_REMOTE_HOST_PROP_VAL};
+		for (String key: params.keySet()) {
+			String gen_ext_comp = GEN_EXT_COMP;
+			if (key.startsWith(GEN_EXT_COMP)) {
+				String end = key.substring(GEN_EXT_COMP.length());
+				if (getName().endsWith(end)) {
+					gen_ext_comp = key;
+				} // end of if (getName().endsWith(end))
+				if (params.get(gen_ext_comp) != null) {
+					String[] comp_params = ((String)params.get(gen_ext_comp)).split(",");
+					int idx = 0;
+					if (comp_params.length >= idx + 1) {
+						PORT_LOCAL_HOST_PROP_VAL = comp_params[idx++];
+					}
+					if (comp_params.length >= idx + 1) {
+						PORT_REMOTE_HOST_PROP_VAL = comp_params[idx++];
+						PORT_ROUTING_TABLE_PROP_VAL = new String[] { PORT_REMOTE_HOST_PROP_VAL };
+						if (config_type.equals(GEN_CONFIG_CS)) {
+							PORT_IFC_PROP_VAL = new String[] {PORT_REMOTE_HOST_PROP_VAL};
+						}
+					}
+					if (comp_params.length >= idx + 1) {
+						try {
+							PORTS[0] = Integer.decode(comp_params[idx++]);
+						} catch (NumberFormatException e) {
+							log.warning("Incorrect component port number: " + comp_params[idx-1]);
+							PORTS[0] = 5555;
+						}
+					}
+					if (comp_params.length >= idx + 1) {
+						SECRET_PROP_VAL = comp_params[idx++];
+					}
+					if (comp_params.length >= idx + 1) {
+						if (comp_params[idx++].equals("ssl")) {
+							PORT_SOCKET_PROP_VAL = SocketType.plain;
+						}
+					}
+					if (comp_params.length >= idx + 1) {
+						if (comp_params[idx++].equals("accept")) {
+							PORT_TYPE_PROP_VAL = ConnectionType.accept;
+						} else {
+							PORT_TYPE_PROP_VAL = ConnectionType.connect;
+						}
+					}
+					if (comp_params.length >= idx + 1) {
+						PORT_ROUTING_TABLE_PROP_VAL = new String[] { comp_params[idx++] };
+					} else {
+						PORT_ROUTING_TABLE_PROP_VAL =
+							new String[] { ".*" + PORT_REMOTE_HOST_PROP_VAL };
+					}
+					break;
 				}
-			}
-			if (comp_params.length >= idx + 1) {
-				try {
-					PORTS[0] = Integer.decode(comp_params[idx++]);
-				} catch (NumberFormatException e) {
-					log.warning("Incorrect component port number: " + comp_params[idx-1]);
-					PORTS[0] = 5555;
-				}
-			}
-			if (comp_params.length >= idx + 1) {
-				SECRET_PROP_VAL = comp_params[idx++];
-			}
-			if (comp_params.length >= idx + 1) {
-				if (comp_params[idx++].equals("ssl")) {
-					PORT_SOCKET_PROP_VAL = SocketType.plain;
-				}
-			}
-			if (comp_params.length >= idx + 1) {
-				if (comp_params[idx++].equals("accept")) {
-					PORT_TYPE_PROP_VAL = ConnectionType.accept;
-				} else {
-					PORT_TYPE_PROP_VAL = ConnectionType.connect;
-				}
-			}
-			if (comp_params.length >= idx + 1) {
-				PORT_ROUTING_TABLE_PROP_VAL = new String[] { comp_params[idx++] };
-			} else {
-				PORT_ROUTING_TABLE_PROP_VAL =
-					new String[] { ".*" + PORT_REMOTE_HOST_PROP_VAL };
-			}
+			} // end of if (key.startsWith(GEN_EXT_COMP))
 		}
 		Map<String, Object> props = super.getDefaults(params);
 		props.put(PACK_ROUTED_KEY, PACK_ROUTED_VAL);

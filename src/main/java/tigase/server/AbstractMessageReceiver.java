@@ -323,8 +323,10 @@ public abstract class AbstractMessageReceiver
 		return false;
 	}
 
-	public void processPacket(final Packet packet, final Queue<Packet> results)
-	{}
+	public void processPacket(final Packet packet, final Queue<Packet> results)	{
+		// do nothing, this method is called directly by MessageRouter
+		// and should not be used normally by the component.
+	}
 
 	private enum QueueElementType { IN_QUEUE, OUT_QUEUE }
 

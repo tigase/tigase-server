@@ -471,17 +471,21 @@ public class ServerConnectionManager extends ConnectionManager {
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> props = super.getDefaults(params);
 		// Usually we want the server to do s2s for the external component too:
-		if (params.get("--virt-hosts") != null) {
-			HOSTNAMES_PROP_VAL = ((String)params.get("--virt-hosts")).split(",");
+		if (params.get(GEN_VIRT_HOSTS) != null) {
+			HOSTNAMES_PROP_VAL = ((String)params.get(GEN_VIRT_HOSTS)).split(",");
 		} else {
 			HOSTNAMES_PROP_VAL = DNSResolver.getDefHostNames();
 		}
-		String ext_comp = (String)params.get("--ext-comp");
-		if (ext_comp != null) {
-			String[] comp_params = ext_comp.split(",");
-			HOSTNAMES_PROP_VAL = Arrays.copyOf(HOSTNAMES_PROP_VAL,
-				HOSTNAMES_PROP_VAL.length + 1);
-			HOSTNAMES_PROP_VAL[HOSTNAMES_PROP_VAL.length - 1] = comp_params[1];
+		for (String key: params.keySet()) {
+			if (key.startsWith(GEN_EXT_COMP)) {
+				String ext_comp = (String)params.get(key);
+				if (ext_comp != null) {
+					String[] comp_params = ext_comp.split(",");
+					HOSTNAMES_PROP_VAL = Arrays.copyOf(HOSTNAMES_PROP_VAL,
+						HOSTNAMES_PROP_VAL.length + 1);
+					HOSTNAMES_PROP_VAL[HOSTNAMES_PROP_VAL.length - 1] = comp_params[1];
+				}
+			}
 		}
 		hostnames = HOSTNAMES_PROP_VAL;
 		props.put(HOSTNAMES_PROP_KEY, HOSTNAMES_PROP_VAL);

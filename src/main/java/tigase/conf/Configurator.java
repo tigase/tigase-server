@@ -108,20 +108,20 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 	}
 
 	public void parseArgs(final String[] args) {
-		defConfigParams.put("--test", new Boolean(false));
-		defConfigParams.put("config-type", "--gen-config-default");
+		defConfigParams.put(GEN_TEST, new Boolean(false));
+		defConfigParams.put("config-type", GEN_CONFIG_DEF);
     if (args != null && args.length > 0) {
       for (int i = 0; i < args.length; i++) {
-				if (args[i].startsWith("--gen-config")) {
+				if (args[i].startsWith(GEN_CONFIG)) {
 					defConfigParams.put("config-type", args[i]);
 				}
-				if (args[i].startsWith("--test")) {
+				if (args[i].startsWith(GEN_TEST)) {
 					defConfigParams.put(args[i], new Boolean(true));
 				}
-				if (args[i].equals("--user-db") || args[i].equals("--user-db-uri")
-					|| args[i].equals("--auth-db") || args[i].equals("--auth-db-uri")
-					|| args[i].equals("--ext-comp") || args[i].equals("--virt-hosts")
-					|| args[i].equals("--admins") || args[i].equals("--debug")) {
+				if (args[i].equals(GEN_USER_DB) || args[i].equals(GEN_USER_DB_URI)
+					|| args[i].equals(GEN_AUTH_DB) || args[i].equals(GEN_AUTH_DB_URI)
+					|| args[i].startsWith(GEN_EXT_COMP) || args[i].equals(GEN_VIRT_HOSTS)
+					|| args[i].equals(GEN_ADMINS) || args[i].equals(GEN_DEBUG)) {
 					defConfigParams.put(args[i], args[++i]);
 				}
       } // end of for (int i = 0; i < args.length; i++)
@@ -193,7 +193,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> defaults = new TreeMap<String, Object>();
 		defaults.put(LOGGING_KEY + "java.util.logging.ConsoleHandler.level", "WARNING");
-		if ((Boolean)params.get("--test")) {
+		if ((Boolean)params.get(GEN_TEST)) {
 			defaults.put(LOGGING_KEY + ".level", "WARNING");
 			defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.level", "INFO");
 		} else {
@@ -214,9 +214,9 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.pattern",
 			"logs/tigase.log");
 		defaults.put(LOGGING_KEY + "tigase.useParentHandlers", "true");
-		if (params.get("--debug") != null) {
+		if (params.get(GEN_DEBUG) != null) {
 			defaults.put(LOGGING_KEY + ".level", "INFO");
-			defaults.put(LOGGING_KEY + "tigase."+params.get("--debug")+".level", "ALL");
+			defaults.put(LOGGING_KEY + "tigase."+params.get(GEN_DEBUG)+".level", "ALL");
 			defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.level", "ALL");
 			defaults.put(LOGGING_KEY + "java.util.logging.ConsoleHandler.level", "ALL");
 		}

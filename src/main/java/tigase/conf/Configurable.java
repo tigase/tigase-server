@@ -42,7 +42,23 @@ import tigase.server.ServerComponent;
  */
 public interface Configurable extends ServerComponent {
 
-  /**
+	public static final String GEN_CONFIG = "--gen-config";
+	public static final String GEN_CONFIG_ALL = "--gen-config-all";
+	public static final String GEN_CONFIG_SM = "--gen-config-sm";
+	public static final String GEN_CONFIG_CS = "--gen-config-cs";
+	public static final String GEN_CONFIG_DEF = "--gen-config-default";
+
+	public static final String GEN_TEST = "--test";
+	public static final String GEN_EXT_COMP = "--ext-comp";
+	public static final String GEN_USER_DB = "--user-db";
+	public static final String GEN_AUTH_DB = "--auth-db";
+	public static final String GEN_USER_DB_URI = "--user-db-uri";
+	public static final String GEN_AUTH_DB_URI = "--auth-db-uri";
+	public static final String GEN_ADMINS = "--admins";
+	public static final String GEN_VIRT_HOSTS = "--virt-hosts";
+	public static final String GEN_DEBUG = "--debug";
+
+	/**
 	 * Get object name. This name corresponds to section in configuration.
 	 *
 	 * @return a <code>String</code> value of object name.

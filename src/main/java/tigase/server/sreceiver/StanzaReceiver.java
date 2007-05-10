@@ -106,8 +106,28 @@ import tigase.server.ServerComponent;
 public class StanzaReceiver extends AbstractMessageReceiver
 	implements Configurable {
 
+	/**
+	 * Describe <code>processPacket</code> method here.
+	 *
+	 * @param packet a <code>Packet</code> value
+	 */
 	public void processPacket(final Packet packet) {
-		// Not implemented yet...
+		// do nothing, this component is to send packets not to receive
+		// (for now)
+	}
+
+	/**
+	 * Describe <code>setProperties</code> method here.
+	 *
+	 * @param props a <code>Map</code> value
+	 */
+	public void setProperties(final Map<String, Object> props) {
+		super.setProperties(props);
+	}
+
+	public Map<String, Object> getDefaults(final Map<String, Object> params) {
+		Map<String, Object> defs = super.getDefaults(params);
+		return defs;
 	}
 
 

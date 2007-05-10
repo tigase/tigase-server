@@ -29,6 +29,8 @@ import java.util.Map;
 import java.util.logging.Logger;
 import tigase.util.DNSResolver;
 
+import static tigase.conf.Configurable.*;
+
 /**
  * Describe class MessageRouterConfig here.
  *
@@ -57,7 +59,7 @@ public class MessageRouterConfig {
 	public static final String DEF_SSEND_NAME = "ssend";
 
 	public static final String[] ALL_MSG_RECEIVERS_NAMES_PROP_VAL =
-	{	DEF_C2S_NAME, DEF_S2S_NAME, DEF_EXT_COMP_NAME, DEF_SM_NAME, DEF_SSEND_NAME };
+	{	DEF_C2S_NAME, DEF_S2S_NAME, DEF_SM_NAME, DEF_SSEND_NAME };
 	public static final String[] DEF_MSG_RECEIVERS_NAMES_PROP_VAL =
 	{	DEF_C2S_NAME, DEF_S2S_NAME, DEF_SM_NAME };
 	public static final String[] SM_MSG_RECEIVERS_NAMES_PROP_VAL =
@@ -104,16 +106,25 @@ public class MessageRouterConfig {
 		if (par_names != null) {
 			rcv_names = (String[])par_names;
 		} else {
-			if (config_type.equals("--gen-config-all")) {
+			if (config_type.equals(GEN_CONFIG_ALL)) {
 				rcv_names = ALL_MSG_RECEIVERS_NAMES_PROP_VAL;
 			}
-			if (config_type.equals("--gen-config-sm")) {
+			if (config_type.equals(GEN_CONFIG_SM)) {
 				rcv_names = SM_MSG_RECEIVERS_NAMES_PROP_VAL;
 			}
-			if (config_type.equals("--gen-config-cs")) {
+			if (config_type.equals(GEN_CONFIG_CS)) {
 				rcv_names = CS_MSG_RECEIVERS_NAMES_PROP_VAL;
 			}
 		}
+
+		// Now init defaults for all external components:
+		for (String key: params.keySet()) {
+			if (key.startsWith(GEN_EXT_COMP)) {
+				rcv_names = Arrays.copyOf(rcv_names, rcv_names.length+1);
+				rcv_names[rcv_names.length-1] =
+					DEF_EXT_COMP_NAME + key.substring(GEN_EXT_COMP.length());
+			} // end of if (key.startsWith(GEN_EXT_COMP))
+		} // end of for ()
 
 		defs.put(MSG_RECEIVERS_NAMES_PROP_KEY, rcv_names);
 		for (String name: rcv_names) {
@@ -127,9 +138,9 @@ public class MessageRouterConfig {
 		defs.put(REGISTRATOR_NAMES_PROP_KEY, REGISTRATOR_NAMES_PROP_VAL);
 		defs.put(STAT_1_CLASS_PROP_KEY, STAT_1_CLASS_PROP_VAL);
 		defs.put(STAT_1_ACTIVE_PROP_KEY, STAT_1_ACTIVE_PROP_VAL);
-		if (params.get("--virt-hosts") != null) {
+		if (params.get(GEN_VIRT_HOSTS) != null) {
 			LOCAL_ADDRESSES_PROP_VALUE =
-				 ((String)params.get("--virt-hosts")).split(",");
+				 ((String)params.get(GEN_VIRT_HOSTS)).split(",");
 		} else {
 			LOCAL_ADDRESSES_PROP_VALUE = DNSResolver.getDefHostNames();
 		}

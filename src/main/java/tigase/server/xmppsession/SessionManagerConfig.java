@@ -25,6 +25,8 @@ package tigase.server.xmppsession;
 import tigase.util.DNSResolver;
 import java.util.Map;
 
+import static tigase.conf.Configurable.*;
+
 /**
  * Describe class SessionManagerConfig here.
  *
@@ -99,34 +101,34 @@ public class SessionManagerConfig {
 		String user_repo_url = XML_REPO_URL_PROP_VAL;
 		String auth_repo_class = XML_REPO_CLASS_PROP_VAL;
 		String auth_repo_url = XML_REPO_URL_PROP_VAL;
-		if (params.get("--user-db") != null) {
-			if (params.get("--user-db").equals("mysql")) {
+		if (params.get(GEN_USER_DB) != null) {
+			if (params.get(GEN_USER_DB).equals("mysql")) {
 				user_repo_class = MYSQL_REPO_CLASS_PROP_VAL;
 				user_repo_url = MYSQL_REPO_URL_PROP_VAL;
 				auth_repo_class = MYSQL_REPO_CLASS_PROP_VAL;
 				auth_repo_url = MYSQL_REPO_URL_PROP_VAL;
 			}
-			if (params.get("--user-db").equals("pgsql")) {
+			if (params.get(GEN_USER_DB).equals("pgsql")) {
 				user_repo_class = PGSQL_REPO_CLASS_PROP_VAL;
 				user_repo_url = PGSQL_REPO_URL_PROP_VAL;
 				auth_repo_class = PGSQL_REPO_CLASS_PROP_VAL;
 				auth_repo_url = PGSQL_REPO_URL_PROP_VAL;
 			}
 		}
-		if (params.get("--user-db-uri") != null) {
-			user_repo_url = (String)params.get("--user-db-uri");
+		if (params.get(GEN_USER_DB_URI) != null) {
+			user_repo_url = (String)params.get(GEN_USER_DB_URI);
 			auth_repo_url = user_repo_url;
 		}
-		if (params.get("--auth-db") != null) {
-			if (params.get("--auth-db").equals("mysql")) {
+		if (params.get(GEN_AUTH_DB) != null) {
+			if (params.get(GEN_AUTH_DB).equals("mysql")) {
 				auth_repo_class = MYSQL_REPO_CLASS_PROP_VAL;
 				auth_repo_url = MYSQL_REPO_URL_PROP_VAL;
 			}
-			if (params.get("--auth-db").equals("pgsql")) {
+			if (params.get(GEN_AUTH_DB).equals("pgsql")) {
 				auth_repo_class = PGSQL_REPO_CLASS_PROP_VAL;
 				auth_repo_url = PGSQL_REPO_URL_PROP_VAL;
 			}
-			if (params.get("--auth-db").equals("drupal")) {
+			if (params.get(GEN_AUTH_DB).equals("drupal")) {
 				auth_repo_class = DRUPAL_REPO_CLASS_PROP_VAL;
 				auth_repo_url = DRUPAL_REPO_URL_PROP_VAL;
 				// For Drupal or LibreSource authentication all account
@@ -135,7 +137,7 @@ public class SessionManagerConfig {
 				user_repo_url += "&autoCreateUser=true";
 				full_comps = false;
 			}
-			if (params.get("--auth-db").equals("libresource")) {
+			if (params.get(GEN_AUTH_DB).equals("libresource")) {
 				auth_repo_class = LIBRESOURCE_REPO_CLASS_PROP_VAL;
 				auth_repo_url = LIBRESOURCE_REPO_URL_PROP_VAL;
 				// For Drupal or LibreSource authentication all account
@@ -145,8 +147,8 @@ public class SessionManagerConfig {
 				full_comps = false;
 			}
 		}
-		if (params.get("--auth-db-uri") != null) {
-			auth_repo_url = (String)params.get("--auth-db-uri");
+		if (params.get(GEN_AUTH_DB_URI) != null) {
+			auth_repo_url = (String)params.get(GEN_AUTH_DB_URI);
 		}
 
 		props.put(USER_REPO_CLASS_PROP_KEY, user_repo_class);
@@ -164,14 +166,14 @@ public class SessionManagerConfig {
 			props.put(COMPONENTS_PROP_KEY, COMPONENTS_NO_REG_PROP_VAL);
 		}
 
-		if (params.get("--virt-hosts") != null) {
-			HOSTNAMES_PROP_VAL = ((String)params.get("--virt-hosts")).split(",");
+		if (params.get(GEN_VIRT_HOSTS) != null) {
+			HOSTNAMES_PROP_VAL = ((String)params.get(GEN_VIRT_HOSTS)).split(",");
 		} else {
 			HOSTNAMES_PROP_VAL = DNSResolver.getDefHostNames();
 		}
 		props.put(HOSTNAMES_PROP_KEY, HOSTNAMES_PROP_VAL);
-		if (params.get("--admins") != null) {
-			ADMINS_PROP_VAL = ((String)params.get("--admins")).split(",");
+		if (params.get(GEN_ADMINS) != null) {
+			ADMINS_PROP_VAL = ((String)params.get(GEN_ADMINS)).split(",");
 		} else {
 			ADMINS_PROP_VAL = new String[HOSTNAMES_PROP_VAL.length];
 			for (int i = 0; i < ADMINS_PROP_VAL.length; i++) {
