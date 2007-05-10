@@ -22,12 +22,20 @@
  */
 package tigase.server.sreceiver;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import tigase.conf.Configurable;
 import tigase.server.AbstractMessageReceiver;
 import tigase.server.Packet;
 import tigase.server.ServerComponent;
+import tigase.util.ClassUtil;
+
+import static tigase.server.sreceiver.ReceiverTaskIfc.*;
 
 /**
  * This is a sibbling of <code>StanzaSender</code> class and offers just
@@ -94,6 +102,9 @@ import tigase.server.ServerComponent;
  * topic discussion group then the reply should go to all subscribers.</li>
  * <li><strong>Message type</strong> - whether messages should be distributed
  * as a <code>chat</code>, <code>headline</code> or <code>normal</code>.</li>
+ * <li><strong>Who can post</strong> - who can send a message for processing,
+ * possible options are: <code>all</code>, <code>subscribed</code>,
+ * <code>owner</code>, <code>list</code></li>
  * </ul>
  * There can be also some per task specific settings...
  * </p>
@@ -106,14 +117,54 @@ import tigase.server.ServerComponent;
 public class StanzaReceiver extends AbstractMessageReceiver
 	implements Configurable {
 
+	public static final String TASKS_LIST_PROP_KEY = "tasks-list";
+	public static final String[] TASKS_LIST_PROP_VAL =
+	{"development-news", "service-news"};
+	public static final String TASK_ACTIVE_PROP_KEY = "active";
+	public static final boolean TASK_ACTIVE_PROP_VAL = true;
+	public static final String TASK_TYPE_PROP_KEY = "task-type";
+	public static final String TASK_TYPE_PROP_VAL = "News Distribution";
+
+	public static final Map<String, Object> DEFAULT_PROPS =
+		new HashMap<String, Object>();
+
+	static {
+		DEFAULT_PROPS.put(SUBSCR_LIST_PROP_KEY, SUBSCR_LIST_PROP_VAL);
+		DEFAULT_PROPS.put(SUBSCR_RESTRICTIONS_PROP_KEY, SUBSCR_RESTRICTIONS_PROP_VAL);
+		DEFAULT_PROPS.put(ONLINE_ONLY_PROP_KEY, ONLINE_ONLY_PROP_VAL);
+		DEFAULT_PROPS.put(REPLACE_SENDER_PROP_KEY, REPLACE_SENDER_PROP_VAL);
+		DEFAULT_PROPS.put(MESSAGE_TYPE_PROP_KEY, MESSAGE_TYPE_PROP_VAL);
+		DEFAULT_PROPS.put(ALLOWED_SENDERS_PROP_KEY, ALLOWED_SENDERS_PROP_VAL);
+		DEFAULT_PROPS.put(ALLOWED_SENDERS_LIST_PROP_KEY, ALLOWED_SENDERS_LIST_PROP_VAL);
+		DEFAULT_PROPS.put(DESCRIPTION_PROP_KEY, DESCRIPTION_PROP_VAL);
+	}
+
+  private static Logger log =
+		Logger.getLogger("tigase.server.sreceiver.StanzaReceiver");
+
+	/**
+	 * This maps keeps all available task types which can be instantiated
+	 * by the user.
+	 */
+	private Map<String, ReceiverTaskIfc> task_types =
+		new ConcurrentSkipListMap<String, ReceiverTaskIfc>();
+	/**
+	 * This map keeps all active tasks instances as pairs: (JabberID, task)
+	 */
+	private Map<String, ReceiverTaskIfc> task_instances =
+		new ConcurrentSkipListMap<String, ReceiverTaskIfc>();
+
 	/**
 	 * Describe <code>processPacket</code> method here.
 	 *
 	 * @param packet a <code>Packet</code> value
 	 */
 	public void processPacket(final Packet packet) {
-		// do nothing, this component is to send packets not to receive
-		// (for now)
+		
+	}
+
+	private String myDomain() {
+		return getName() + "." + getDefHostName();
 	}
 
 	/**
@@ -123,10 +174,47 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	 */
 	public void setProperties(final Map<String, Object> props) {
 		super.setProperties(props);
+		task_types.clear();
+		try {
+			Set<Class<ReceiverTaskIfc>> ctasks =
+				ClassUtil.getClassesImplementing(ReceiverTaskIfc.class);
+			for (Class<ReceiverTaskIfc> ctask: ctasks) {
+				ReceiverTaskIfc itask = ctask.newInstance();
+				task_types.put(itask.getType(), itask);
+			} // end of for (Class<ReceiverTaskIfc> ctask: ctasks)
+		} catch (Exception e) {
+      log.log(Level.SEVERE, "Can not load ReceiverTaskIfc implementations", e);
+		} // end of try-catch
+		String[] tasks_list = (String[])props.get(TASKS_LIST_PROP_KEY);
+		for (String task_name: tasks_list) {
+			String task_type =
+				(String)props.get(task_name + "/" + TASK_TYPE_PROP_KEY);
+			ReceiverTaskIfc ttask = task_types.get(task_type);
+			ReceiverTaskIfc new_task = ttask.getInstance();
+			new_task.setNickName(task_name);
+			Map<String, Object> task_params = new HashMap<String, Object>();
+			String prep = task_name + "/props/";
+			for (Map.Entry<String, Object> entry: props.entrySet()) {
+				if (entry.getKey().startsWith(prep)) {
+					task_params.put(entry.getKey().substring(prep.length()),
+						entry.getValue());
+				} // end of if (entry.getKey().startsWith())
+			} // end of for (Map.Entry entry: props.entrySet())
+			new_task.setParams(task_params);
+			task_instances.put(task_name + "@" + myDomain(),	new_task);
+		} // end of for (String task_name: tasks_list)
 	}
 
 	public Map<String, Object> getDefaults(final Map<String, Object> params) {
 		Map<String, Object> defs = super.getDefaults(params);
+		defs.put(TASKS_LIST_PROP_KEY, TASKS_LIST_PROP_VAL);
+		for (String task_name: TASKS_LIST_PROP_VAL) {
+			defs.put(task_name + "/" + TASK_ACTIVE_PROP_KEY, TASK_ACTIVE_PROP_VAL);
+			defs.put(task_name + "/" + TASK_TYPE_PROP_KEY, TASK_TYPE_PROP_VAL);
+			for (Map.Entry entry: DEFAULT_PROPS.entrySet()) {
+				defs.put(task_name + "/props/" + entry.getKey(), entry.getValue());
+			} // end of for ()
+		} // end of for (String task_name: TASKS_LIST_PROP_VAL)
 		return defs;
 	}
 
