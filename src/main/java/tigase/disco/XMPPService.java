@@ -41,9 +41,12 @@ import tigase.server.ServerComponent;
  */
 public interface XMPPService extends ServerComponent {
 
-	public static final String[] DEF_FEATURES =
-	{"http://jabber.org/protocol/disco#info",
-	 "http://jabber.org/protocol/disco#items"};
+	public static final String INFO_XMLNS =
+		"http://jabber.org/protocol/disco#info";
+	public static final String ITEMS_XMLNS =
+		"http://jabber.org/protocol/disco#items";
+
+	public static final String[] DEF_FEATURES =	{ INFO_XMLNS, ITEMS_XMLNS };
 
 	public static final String[] CMD_FEATURES =
 	{"http://jabber.org/protocol/commands", "jabber:x:data"};
