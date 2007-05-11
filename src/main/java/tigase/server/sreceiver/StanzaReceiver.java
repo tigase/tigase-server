@@ -25,6 +25,7 @@ package tigase.server.sreceiver;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
+import java.util.LinkedList;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Level;
@@ -160,7 +161,14 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	 * @param packet a <code>Packet</code> value
 	 */
 	public void processPacket(final Packet packet) {
-		
+		ReceiverTaskIfc task = task_instances.get(packet.getElemTo());
+		if (task != null) {
+			Queue<Packet> results = new LinkedList<Packet>();
+			task.processPacket(packet, results);
+			for (Packet res: results) {
+				addOutPacket(res);
+			} // end of for (Packet res: results)
+		} // end of if (task != null)
 	}
 
 	private String myDomain() {
@@ -191,7 +199,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 				(String)props.get(task_name + "/" + TASK_TYPE_PROP_KEY);
 			ReceiverTaskIfc ttask = task_types.get(task_type);
 			ReceiverTaskIfc new_task = ttask.getInstance();
-			new_task.setNickName(task_name);
+			new_task.setJID(task_name + "@" + myDomain());
 			Map<String, Object> task_params = new HashMap<String, Object>();
 			String prep = task_name + "/props/";
 			for (Map.Entry<String, Object> entry: props.entrySet()) {

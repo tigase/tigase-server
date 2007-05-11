@@ -87,14 +87,14 @@ public interface ReceiverTaskIfc {
 		"allowed-senders-list";
 	public static final String[] ALLOWED_SENDERS_LIST_PROP_VAL = {};
 	/**
-	 * Constant <code>setDescription</code> is a description for task instance.
+	 * Constant <code>DESCRIPTION_PROP_KEY</code> is a description for task instance.
 	 * Let's say the user want's to create new <em>Interest group</em> for
 	 * cyclists. This property allows to set some more detailed information about
 	 * the group like: <em>This is group of ppl interested in mountain cycling
 	 * near Cambridge.</em>
 	 */
 	public static final String DESCRIPTION_PROP_KEY = "description";
-	public static final String DESCRIPTION_PROP_VAL = "";
+	public static final String DESCRIPTION_PROP_VAL = "Abstract receiver task";
 
 	/**
 	 * <code>getType</code> method returns the task type name. This
@@ -130,28 +130,43 @@ public interface ReceiverTaskIfc {
 	ReceiverTaskIfc getInstance();
 
 	/**
-	 * <code>setNickName</code> method sets tasks <strong>nick</strong> name
-	 * which is used to form valid Jabber ID. Example of the resulting
+	 * <code>setJID</code> method sets tasks <strong>Jabber ID</strong>, unique
+	 * ID which is used to identify the task. Example of the resulting
 	 * Jabber ID for domain <code>tigase.org</code> and
 	 * <code>StanzaReceiver</code> component name <code>srec</code> would be:
-	 * <code>nick@srec.tigase.org</code>.
+	 * <code>devs@srec.tigase.org</code>.
 	 * There can be many tasks of the same type (having the same
-	 * <strong>TaskName</strong>) but they have to have distinct nick names.
-	 * Examples of possible nick names are: "<em>admin-forum</em>",
-	 * "<em>cycling-interest-group</em>".
+	 * <strong>TaskType</strong>) but they have to have distinct JIDs.
+	 * Examples of possible JIDs names are: "<em>admin-forum@srec.tigase.org</em>",
+	 * "<em>cycling-interest-group@srec.tigase.org</em>".
 	 *
-	 * @param nick a <code>String</code> value of the nick name.
+	 * @param jid a <code>String</code> value of the nick name.
 	 */
-	void setNickName(String nick);
+	void setJID(String jid);
 
 	/**
-	 * <code>getNickName</code> method returns task instance nick name. Refer
-	 * to corresponding <code>set</code> method for more details.
+	 * <code>getJID</code> method returns task instance
+	 * <strong>Jabber ID</strong>. Refer to corresponding <code>set</code>
+	 * method for more details.
 	 *
-	 * @return a <code>String</code> value of task instance nick name,
-	 * @see setNickName
+	 * @return a <code>String</code> value of task instance JID,
+	 * @see setJID
 	 */
-	String getNickName();
+	String getJID();
+
+	/**
+	 * <code>getDescription</code> method returns a description for task instance.
+	 * Let's say the user want's to create new <em>Interest group</em> for
+	 * cyclists. This property allows to set some more detailed information about
+	 * the group like: <em>This is group of ppl interested in mountain cycling
+	 * near Cambridge.</em>
+	 *
+	 * The description is set via properties using <code>DESCRIPTION_PROP_KEY</code>.
+	 *
+	 * @return a <code>String</code> value of task instance description;
+	 * @see DESCRIPTION_PROP_KEY
+	 */
+	String getDescription();
 
 	/**
 	 * <code>setParams</code> method sets <code>Map</code> with configuration

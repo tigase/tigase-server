@@ -57,9 +57,10 @@ public class MessageRouterConfig {
 	public static final String DEF_S2S_NAME = "s2s";
 	public static final String DEF_EXT_COMP_NAME = "ext_comp";
 	public static final String DEF_SSEND_NAME = "ssend";
+	public static final String DEF_SRECV_NAME = "srecv";
 
 	public static final String[] ALL_MSG_RECEIVERS_NAMES_PROP_VAL =
-	{	DEF_C2S_NAME, DEF_S2S_NAME, DEF_SM_NAME, DEF_SSEND_NAME };
+	{	DEF_C2S_NAME, DEF_S2S_NAME, DEF_SM_NAME, DEF_SSEND_NAME, DEF_SRECV_NAME };
 	public static final String[] DEF_MSG_RECEIVERS_NAMES_PROP_VAL =
 	{	DEF_C2S_NAME, DEF_S2S_NAME, DEF_SM_NAME };
 	public static final String[] SM_MSG_RECEIVERS_NAMES_PROP_VAL =
@@ -81,6 +82,8 @@ public class MessageRouterConfig {
 			"tigase.server.xmppsession.SessionManager");
 		MSG_RCV_CLASSES.put(DEF_SSEND_NAME,
 			"tigase.server.ssender.StanzaSender");
+		MSG_RCV_CLASSES.put(DEF_SRECV_NAME,
+			"tigase.server.sreceiver.StanzaReceiver");
 	}
 
 	public static final String REGISTRATOR_PROP_KEY = "components/registrators/";
