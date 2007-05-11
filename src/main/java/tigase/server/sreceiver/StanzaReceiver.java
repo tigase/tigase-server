@@ -22,26 +22,27 @@
  */
 package tigase.server.sreceiver;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.LinkedList;
 import java.util.Set;
-import java.util.List;
-import java.util.Arrays;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.conf.Configurable;
+import tigase.disco.ServiceEntity;
+import tigase.disco.ServiceIdentity;
+import tigase.disco.XMPPService;
 import tigase.server.AbstractMessageReceiver;
 import tigase.server.Packet;
 import tigase.server.ServerComponent;
 import tigase.util.ClassUtil;
 import tigase.util.JID;
 import tigase.xml.Element;
-import tigase.disco.XMPPService;
-import tigase.disco.ServiceEntity;
-import tigase.disco.ServiceIdentity;
+import tigase.xmpp.StanzaType;
 
 import static tigase.server.sreceiver.ReceiverTaskIfc.*;
 
@@ -164,8 +165,37 @@ public class StanzaReceiver extends AbstractMessageReceiver
 
 	private ServiceEntity serviceEntity = null;
 
+	/**
+	 * Describe <code>processIQPacket</code> method here.
+	 *
+	 * @param packet a <code>Packet</code> value
+	 * @return a <code>boolean</code> value
+	 */
 	private boolean processIQPacket(Packet packet) {
-		return true;
+		boolean processed = false;
+		Element iq = packet.getElement();
+		Element query = iq.getChild("query", INFO_XMLNS);
+		Element query_rep = null;
+		if (query != null && packet.getType() == StanzaType.get) {
+			query_rep =
+				serviceEntity.getDiscoInfo(JID.getNodeNick(packet.getElemTo()));
+			processed = true;
+		} // end of if (query != null && packet.getType() == StanzaType.get)
+		query = iq.getChild("query", ITEMS_XMLNS);
+		if (query != null && packet.getType() == StanzaType.get) {
+			query_rep = query.clone();
+			List<Element> items =
+				serviceEntity.getDiscoItems(JID.getNodeNick(packet.getElemTo()),
+					packet.getElemTo());
+			if (items != null && items.size() > 0) {
+				query_rep.addChildren(items);
+			} // end of if (items != null && items.size() > 0)
+			processed = true;
+		} // end of if (query != null && packet.getType() == StanzaType.get)
+		if (query_rep != null) {
+			addOutPacket(packet.okResult(query_rep, 0));
+		} // end of if (query_rep != null)
+		return processed;
 	}
 
 	/**
@@ -191,14 +221,24 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		} // end of if (task != null)
 	}
 
+	/**
+	 * Describe <code>myDomain</code> method here.
+	 *
+	 * @return a <code>String</code> value
+	 */
 	private String myDomain() {
 		return getName() + "." + getDefHostName();
 	}
 
+	/**
+	 * Describe <code>addTaskInstance</code> method here.
+	 *
+	 * @param task a <code>ReceiverTaskIfc</code> value
+	 */
 	private void addTaskInstance(ReceiverTaskIfc task) {
 		task_instances.put(task.getJID(),	task);
-		ServiceEntity item = new ServiceEntity(task.getJID(), null,
-			task.getDescription());
+		ServiceEntity item = new ServiceEntity(task.getJID(),
+			JID.getNodeNick(task.getJID()), task.getDescription());
 		serviceEntity.addItems(item);
 	}
 
@@ -257,6 +297,13 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		return defs;
 	}
 
+	/**
+	 * Describe <code>getDiscoInfo</code> method here.
+	 *
+	 * @param node a <code>String</code> value
+	 * @param jid a <code>String</code> value
+	 * @return an <code>Element</code> value
+	 */
 	public Element getDiscoInfo(String node, String jid) {
 		if (jid != null && JID.getNodeHost(jid).startsWith(getName()+".")) {
 			return serviceEntity.getDiscoInfo(node);
@@ -267,7 +314,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	public 	List<Element> getDiscoFeatures() { return null; }
 
 	public List<Element> getDiscoItems(String node, String jid) {
-		if (jid.startsWith(getName()+".")) {
+		if (JID.getNodeHost(jid).startsWith(getName()+".")) {
 			return serviceEntity.getDiscoItems(node, null);
 		} else {
  			return Arrays.asList(serviceEntity.getDiscoItem(null, getName() + "." + jid));
