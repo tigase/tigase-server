@@ -27,6 +27,8 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.LinkedList;
 import java.util.Set;
+import java.util.List;
+import java.util.Arrays;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,6 +37,11 @@ import tigase.server.AbstractMessageReceiver;
 import tigase.server.Packet;
 import tigase.server.ServerComponent;
 import tigase.util.ClassUtil;
+import tigase.util.JID;
+import tigase.xml.Element;
+import tigase.disco.XMPPService;
+import tigase.disco.ServiceEntity;
+import tigase.disco.ServiceIdentity;
 
 import static tigase.server.sreceiver.ReceiverTaskIfc.*;
 
@@ -116,7 +123,7 @@ import static tigase.server.sreceiver.ReceiverTaskIfc.*;
  * @version $Rev$
  */
 public class StanzaReceiver extends AbstractMessageReceiver
-	implements Configurable {
+	implements Configurable, XMPPService {
 
 	public static final String TASKS_LIST_PROP_KEY = "tasks-list";
 	public static final String[] TASKS_LIST_PROP_VAL =
@@ -155,14 +162,27 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	private Map<String, ReceiverTaskIfc> task_instances =
 		new ConcurrentSkipListMap<String, ReceiverTaskIfc>();
 
+	private ServiceEntity serviceEntity = null;
+
+	private boolean processIQPacket(Packet packet) {
+		return true;
+	}
+
 	/**
 	 * Describe <code>processPacket</code> method here.
 	 *
 	 * @param packet a <code>Packet</code> value
 	 */
 	public void processPacket(final Packet packet) {
+		log.finest("Processing packet: " + packet.toString());
+		if (packet.getElemName().equals("iq")) {
+			if (processIQPacket(packet)) {
+				return;
+			} // end of if (processIQPacket(packet))
+		} // end of if (packet.getElemName().equals("iq"))
 		ReceiverTaskIfc task = task_instances.get(packet.getElemTo());
 		if (task != null) {
+			log.finest("Found a task for packet: " + task.getJID());
 			Queue<Packet> results = new LinkedList<Packet>();
 			task.processPacket(packet, results);
 			for (Packet res: results) {
@@ -175,6 +195,13 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		return getName() + "." + getDefHostName();
 	}
 
+	private void addTaskInstance(ReceiverTaskIfc task) {
+		task_instances.put(task.getJID(),	task);
+		ServiceEntity item = new ServiceEntity(task.getJID(), null,
+			task.getDescription());
+		serviceEntity.addItems(item);
+	}
+
 	/**
 	 * Describe <code>setProperties</code> method here.
 	 *
@@ -182,6 +209,10 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	 */
 	public void setProperties(final Map<String, Object> props) {
 		super.setProperties(props);
+		addRouting(myDomain());
+		serviceEntity = new ServiceEntity(getName(), null, "Stanza Receiver");
+		serviceEntity.addIdentities(
+			new ServiceIdentity("component", "external", "Stanza Receiver"));
 		task_types.clear();
 		try {
 			Set<Class<ReceiverTaskIfc>> ctasks =
@@ -209,7 +240,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 				} // end of if (entry.getKey().startsWith())
 			} // end of for (Map.Entry entry: props.entrySet())
 			new_task.setParams(task_params);
-			task_instances.put(task_name + "@" + myDomain(),	new_task);
+			addTaskInstance(new_task);
 		} // end of for (String task_name: tasks_list)
 	}
 
@@ -226,5 +257,21 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		return defs;
 	}
 
+	public Element getDiscoInfo(String node, String jid) {
+		if (jid != null && JID.getNodeHost(jid).startsWith(getName()+".")) {
+			return serviceEntity.getDiscoInfo(node);
+		}
+		return null;
+	}
+
+	public 	List<Element> getDiscoFeatures() { return null; }
+
+	public List<Element> getDiscoItems(String node, String jid) {
+		if (jid.startsWith(getName()+".")) {
+			return serviceEntity.getDiscoItems(node, null);
+		} else {
+ 			return Arrays.asList(serviceEntity.getDiscoItem(null, getName() + "." + jid));
+		}
+	}
 
 } // StanzaReceiver
