@@ -90,6 +90,17 @@ public class Packet {
 		} // end of if (elem.getName().equals("route")) else
 	}
 
+	public Packet(String el_name, String from, String to, StanzaType type) {
+		this.elem = new Element(el_name,
+			new String[] {"from", "to", "type"},
+			new String[] {from, to, type.toString()});
+		this.type = type;
+		this.strCommand = null;
+		this.command = null;
+		this.cmd = false;
+		this.routed = false;
+	}
+
 	public void setPermissions(Permissions perm) {
 		permissions = perm;
 	}

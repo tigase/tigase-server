@@ -49,21 +49,21 @@ public interface ReceiverTaskIfc {
 		ALL, SUBSCRIBED, OWNER, LIST;
 	};
 
-	/**
-	 * Constant <code>SUBSCR_LIST_PROP_KEY</code> is a property key for task
-	 * instance configuration parameters. With this property you can provide
-	 * task with initial list of subscribers. These users however must accept
-	 * subscription first before any message is delivered to them. So you
-	 * can't force ppl to receive any messages using this setting.
-	 */
-	public static final String SUBSCR_LIST_PROP_KEY =
-		"subscription-list-key";
-	/**
-	 * Constant <code>SUBSCR_LIST_PROP_KEY</code> is a property value for a key
-	 * <strong>SUBSCR_LIST_PROP_KEY</strong>. Please refer to key description
-	 * for more details. Default value is an empty String array.
-	 */
-	public static final String[] SUBSCR_LIST_PROP_VAL = {};
+// 	/**
+// 	 * Constant <code>SUBSCR_LIST_PROP_KEY</code> is a property key for task
+// 	 * instance configuration parameters. With this property you can provide
+// 	 * task with initial list of subscribers. These users however must accept
+// 	 * subscription first before any message is delivered to them. So you
+// 	 * can't force ppl to receive any messages using this setting.
+// 	 */
+// 	public static final String SUBSCR_LIST_PROP_KEY =
+// 		"subscription-list-key";
+// 	/**
+// 	 * Constant <code>SUBSCR_LIST_PROP_KEY</code> is a property value for a key
+// 	 * <strong>SUBSCR_LIST_PROP_KEY</strong>. Please refer to key description
+// 	 * for more details. Default value is an empty String array.
+// 	 */
+// 	public static final String[] SUBSCR_LIST_PROP_VAL = {};
 	/**
 	 * Constant <code>SUBSCR_RESTRICTIONS_PROP_KEY</code> is a property key for task
 	 * instance configuration parameters. With this property you can decide who
@@ -74,15 +74,15 @@ public interface ReceiverTaskIfc {
 		"subscription-restrictions-key";
 	public static final SubscrRestrictions SUBSCR_RESTRICTIONS_PROP_VAL =
 		SubscrRestrictions.PUBLIC;
+	public static final String ALLOWED_SENDERS_PROP_KEY = "allowed-senders";
+	public static final SenderRestrictions ALLOWED_SENDERS_PROP_VAL =
+		SenderRestrictions.SUBSCRIBED;
+	public static final String MESSAGE_TYPE_PROP_KEY = "message-type";
+	public static final MessageType MESSAGE_TYPE_PROP_VAL = MessageType.CHAT;
 	public static final String ONLINE_ONLY_PROP_KEY = "online-users-only";
 	public static final boolean ONLINE_ONLY_PROP_VAL = false;
 	public static final String REPLACE_SENDER_PROP_KEY = "replace-sender";
 	public static final boolean REPLACE_SENDER_PROP_VAL = true;
-	public static final String MESSAGE_TYPE_PROP_KEY = "message-type";
-	public static final MessageType MESSAGE_TYPE_PROP_VAL = MessageType.CHAT;
-	public static final String ALLOWED_SENDERS_PROP_KEY = "allowed-senders";
-	public static final SenderRestrictions ALLOWED_SENDERS_PROP_VAL =
-		SenderRestrictions.SUBSCRIBED;
 	public static final String ALLOWED_SENDERS_LIST_PROP_KEY =
 		"allowed-senders-list";
 	public static final String[] ALLOWED_SENDERS_LIST_PROP_VAL = {};
@@ -95,6 +95,8 @@ public interface ReceiverTaskIfc {
 	 */
 	public static final String DESCRIPTION_PROP_KEY = "description";
 	public static final String DESCRIPTION_PROP_VAL = "Abstract receiver task";
+	public static final String TASK_OWNER_PROP_KEY = "task-owner";
+	public static final String TASK_OWNER_PROP_VAL = "admin@localhost";
 
 	/**
 	 * <code>getType</code> method returns the task type name. This

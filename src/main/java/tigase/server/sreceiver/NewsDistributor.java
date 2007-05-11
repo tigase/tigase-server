@@ -57,7 +57,7 @@ public class NewsDistributor extends AbstractReceiverTask {
 	 * @param packet a <code>Packet</code> value
 	 * @param results a <code>Queue</code> value
 	 */
-	public void processPacket(final Packet packet, final Queue results) {
+	public void processPacket(final Packet packet, final Queue<Packet> results) {
 		super.processPacket(packet, results);
 	}
 
