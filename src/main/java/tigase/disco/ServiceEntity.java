@@ -73,11 +73,20 @@ public class ServiceEntity {
 				(node != null ? node.equals(se.node) : se.node.equals(node)));
 	}
 
+	/**
+	 * Describe <code>hashCode</code> method here.
+	 *
+	 * @return an <code>int</code> value
+	 */
 	public int hashCode() {
 		return (jid != null ? jid.hashCode() : 0)
 			+ (node != null ? node.hashCode() : 0);
 	}
 
+	/**
+	 * Describe <code>addFeatures</code> method here.
+	 *
+	 */
 	public void addFeatures(String... features) {
 		if (this.features == null) {
 			this.features = new ArrayList<String>();
@@ -85,6 +94,10 @@ public class ServiceEntity {
 		Collections.addAll(this.features, features);
 	}
 
+	/**
+	 * Describe <code>addIdentities</code> method here.
+	 *
+	 */
 	public void addIdentities(ServiceIdentity... identities) {
 		if (this.identities == null) {
 			this.identities = new ArrayList<ServiceIdentity>();
@@ -92,6 +105,10 @@ public class ServiceEntity {
 		Collections.addAll(this.identities, identities);
 	}
 
+	/**
+	 * Describe <code>addItems</code> method here.
+	 *
+	 */
 	public void addItems(ServiceEntity... items) {
 		if (this.items == null) {
 			this.items = new HashSet<ServiceEntity>();
@@ -110,18 +127,39 @@ public class ServiceEntity {
 		}
 	}
 
+	/**
+	 * Describe <code>getJID</code> method here.
+	 *
+	 * @return a <code>String</code> value
+	 */
 	public String getJID() {
 		return jid;
 	}
 
+	/**
+	 * Describe <code>getNode</code> method here.
+	 *
+	 * @return a <code>String</code> value
+	 */
 	public String getNode() {
 		return node;
 	}
 
+	/**
+	 * Describe <code>getName</code> method here.
+	 *
+	 * @return a <code>String</code> value
+	 */
 	public String getName() {
 		return name;
 	}
 
+	/**
+	 * Describe <code>getDiscoInfo</code> method here.
+	 *
+	 * @param node a <code>String</code> value
+	 * @return an <code>Element</code> value
+	 */
 	public Element getDiscoInfo(String node) {
 		Element query = null;
 		if (node == null) {
@@ -150,6 +188,13 @@ public class ServiceEntity {
 		return query;
 	}
 
+	/**
+	 * Describe <code>getDiscoItem</code> method here.
+	 *
+	 * @param node a <code>String</code> value
+	 * @param jid a <code>String</code> value
+	 * @return an <code>Element</code> value
+	 */
 	public Element getDiscoItem(String node, String jid) {
 		Element item = new Element("item");
 		if (jid != null) {
@@ -196,6 +241,12 @@ public class ServiceEntity {
 		return result;
 	}
 
+	/**
+	 * Describe <code>findNode</code> method here.
+	 *
+	 * @param node a <code>String</code> value
+	 * @return a <code>ServiceEntity</code> value
+	 */
 	public ServiceEntity findNode(String node) {
 		if (this.node != null && this.node.equals(node)) {
 			return this;
@@ -221,6 +272,11 @@ public class ServiceEntity {
 		return null;
 	}
 
+	/**
+	 * Describe <code>toString</code> method here.
+	 *
+	 * @return a <code>String</code> value
+	 */
 	public String toString() {
 		return getDiscoItem(null, null).toString();
 	}
