@@ -522,39 +522,39 @@ public class SessionManager extends AbstractMessageReceiver
 		return props;
 	}
 
-	private void addComponent(String comp_id) {
-		System.out.println("Loading component: " + comp_id + " ...");
+	private void addPlugin(String comp_id) {
+		System.out.println("Loading plugin: " + comp_id + " ...");
 		XMPPProcessorIfc proc = ProcessorFactory.getProcessor(comp_id);
 		boolean loaded = false;
 		if (proc != null) {
 			processors.put(comp_id, proc);
 			log.config("Added processor: " + proc.getClass().getSimpleName()
-				+ " for component id: " + comp_id);
+				+ " for plugin id: " + comp_id);
 			loaded = true;
 		}
 		XMPPPreprocessorIfc preproc = ProcessorFactory.getPreprocessor(comp_id);
 		if (preproc != null) {
 			preProcessors.put(comp_id, preproc);
 			log.config("Added preprocessor: " + preproc.getClass().getSimpleName()
-				+ " for component id: " + comp_id);
+				+ " for plugin id: " + comp_id);
 			loaded = true;
 		}
 		XMPPPostprocessorIfc postproc = ProcessorFactory.getPostprocessor(comp_id);
 		if (postproc != null) {
 			postProcessors.put(comp_id, postproc);
 			log.config("Added postprocessor: " + postproc.getClass().getSimpleName()
-				+ " for component id: " + comp_id);
+				+ " for plugin id: " + comp_id);
 			loaded = true;
 		}
 		XMPPStopListenerIfc stoplist = ProcessorFactory.getStopListener(comp_id);
 		if (stoplist != null) {
 			stopListeners.put(comp_id, stoplist);
 			log.config("Added stopped processor: " + stoplist.getClass().getSimpleName()
-				+ " for component id: " + comp_id);
+				+ " for plugin id: " + comp_id);
 			loaded = true;
 		}
 		if (!loaded) {
-			log.warning("No implementation found for component id: " + comp_id);
+			log.warning("No implementation found for plugin id: " + comp_id);
 		} // end of if (!loaded)
 	}
 
@@ -568,7 +568,8 @@ public class SessionManager extends AbstractMessageReceiver
 		try {
 			String cls_name = (String)props.get(USER_REPO_CLASS_PROP_KEY);
 			String res_uri = (String)props.get(USER_REPO_URL_PROP_KEY);
-			user_repository = RepositoryFactory.getUserRepository(cls_name, res_uri);
+			user_repository = RepositoryFactory.getUserRepository(getName(),
+				cls_name, res_uri);
 			log.config("Initialized " + cls_name + " as user repository: " + res_uri);
 		} catch (Exception e) {
 			log.severe("Can't initialize user repository: " + e);
@@ -578,7 +579,8 @@ public class SessionManager extends AbstractMessageReceiver
 		try {
 			String cls_name = (String)props.get(AUTH_REPO_CLASS_PROP_KEY);
 			String res_uri = (String)props.get(AUTH_REPO_URL_PROP_KEY);
-			auth_repository =	RepositoryFactory.getAuthRepository(cls_name, res_uri);
+			auth_repository =	RepositoryFactory.getAuthRepository(getName(),
+				cls_name, res_uri);
 			log.config("Initialized " + cls_name + " as auth repository: " + res_uri);
 		} catch (Exception e) {
 			log.severe("Can't initialize auth repository: " + e);
@@ -587,11 +589,11 @@ public class SessionManager extends AbstractMessageReceiver
 		} // end of try-catch
 
 		naUserRepository = new NARepository(user_repository);
-		String[] components = (String[])props.get(COMPONENTS_PROP_KEY);
+		String[] plugins = (String[])props.get(PLUGINS_PROP_KEY);
 		processors.clear();
-		for (String comp_id: components) {
-			addComponent(comp_id);
-		} // end of for (String comp_id: components)
+		for (String comp_id: plugins) {
+			addPlugin(comp_id);
+		} // end of for (String comp_id: plugins)
 		String[] hostnames = (String[])props.get(HOSTNAMES_PROP_KEY);
 		clearRoutings();
 		for (String host: hostnames) {

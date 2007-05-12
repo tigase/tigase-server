@@ -36,46 +36,66 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class RepositoryFactory {
 
-	private static ConcurrentMap<String, UserRepository> user_repos =
-		new ConcurrentHashMap<String, UserRepository>();
-	private static ConcurrentMap<String, UserAuthRepository> auth_repos =
-		new ConcurrentHashMap<String, UserAuthRepository>();
+	private static ConcurrentMap<String, ConcurrentMap<String, UserRepository>>
+		user_repos =
+		new ConcurrentHashMap<String, ConcurrentMap<String, UserRepository>>();
+	private static ConcurrentMap<String, ConcurrentMap<String, UserAuthRepository>>
+		auth_repos =
+		new ConcurrentHashMap<String, ConcurrentMap<String, UserAuthRepository>>();
 
-	public static UserRepository getUserRepository(String class_name,
-		String resource) throws ClassNotFoundException, InstantiationException,
-														IllegalAccessException, DBInitException {
-		UserRepository rep = user_repos.get(resource);
+	public static UserRepository getUserRepository(String comp_name,
+		String class_name, String resource)
+		throws ClassNotFoundException, InstantiationException,
+					 IllegalAccessException, DBInitException {
+		ConcurrentMap<String, UserRepository> repo_map = user_repos.get(comp_name);
+		if (repo_map == null) {
+			repo_map = new ConcurrentHashMap<String, UserRepository>();
+			user_repos.put(comp_name, repo_map);
+		} // end of if (repo_map == null)
+		UserRepository rep = repo_map.get(resource);
 		if (rep == null) {
 			rep = (UserRepository)Class.forName(class_name).newInstance();
 			rep.initRepository(resource);
-			user_repos.put(resource, rep);
+			repo_map.put(resource, rep);
 		} // end of if (rep == null)
 		return rep;
 	}
 
-	public static UserAuthRepository getAuthRepository(String class_name,
-		String resource) throws ClassNotFoundException, InstantiationException,
-														IllegalAccessException, DBInitException {
-		UserAuthRepository rep = auth_repos.get(resource);
+	public static UserAuthRepository getAuthRepository(String comp_name,
+		String class_name, String resource)
+		throws ClassNotFoundException, InstantiationException,
+					 IllegalAccessException, DBInitException {
+		ConcurrentMap<String, UserAuthRepository> repo_map = auth_repos.get(comp_name);
+		if (repo_map == null) {
+			repo_map = new ConcurrentHashMap<String, UserAuthRepository>();
+			auth_repos.put(comp_name, repo_map);
+		} // end of if (repo_map == null)
+		UserAuthRepository rep = repo_map.get(resource);
 		if (rep == null) {
-			rep = tryCastUserRepository(resource);
+			rep = tryCastUserRepository(comp_name, resource);
 			if (rep != null && !rep.getClass().getName().equals(class_name)) {
 				rep = null;
 			} // end of if (!rep.getClass().getName().equals(class_name))
 			if (rep == null) {
 				rep = (UserAuthRepository)Class.forName(class_name).newInstance();
 				rep.initRepository(resource);
-				auth_repos.put(resource, rep);
+				repo_map.put(resource, rep);
 			} // end of if (rep == null)
 		} // end of if (rep == null)
 		return rep;
 	}
 
-	private static UserAuthRepository tryCastUserRepository(String resource) {
+	private static UserAuthRepository tryCastUserRepository(String comp_name,
+		String resource) {
 		// There might be a repository class implementing both interfaces
 		// it is always better access repositories through single instance
 		// due to possible caching problems
-		UserRepository rep = user_repos.get(resource);
+		ConcurrentMap<String, UserRepository> repo_map = user_repos.get(comp_name);
+		if (repo_map == null) {
+			repo_map = new ConcurrentHashMap<String, UserRepository>();
+			user_repos.put(comp_name, repo_map);
+		} // end of if (repo_map == null)
+		UserRepository rep = repo_map.get(resource);
 		if (rep != null) {
 			try {	return (UserAuthRepository)rep;	}
 			catch (Exception e) {	}
