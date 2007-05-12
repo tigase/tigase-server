@@ -39,36 +39,17 @@ import static tigase.conf.Configurable.*;
 public class SessionManagerConfig {
 
 	public static final String USER_REPO_CLASS_PROP_KEY = "user-repo-class";
-	public static final String XML_REPO_CLASS_PROP_VAL =
-		"tigase.db.xml.XMLRepository";
-	public static final String MYSQL_REPO_CLASS_PROP_VAL =
-		"tigase.db.jdbc.JDBCRepository";
-	public static final String PGSQL_REPO_CLASS_PROP_VAL =
-		"tigase.db.jdbc.JDBCRepository";
-	public static final String DRUPAL_REPO_CLASS_PROP_VAL =
-		"tigase.db.jdbc.DrupalAuth";
-	public static final String LIBRESOURCE_REPO_CLASS_PROP_VAL =
-		"tigase.db.jdbc.LibreSourceAuth";
 	public static final String USER_REPO_URL_PROP_KEY = "user-repo-url";
-	public static final String XML_REPO_URL_PROP_VAL = "user-repository.xml";
-	public static final String MYSQL_REPO_URL_PROP_VAL =
-		"jdbc:mysql://localhost/tigase?user=root&password=mypass";
-	public static final String PGSQL_REPO_URL_PROP_VAL =
-		"jdbc:postgresql://localhost/tigase?user=tigase";
-	public static final String DRUPAL_REPO_URL_PROP_VAL =
-		"jdbc:mysql://localhost/drupal?user=root&password=mypass";
-	public static final String LIBRESOURCE_REPO_URL_PROP_VAL =
-		"jdbc:postgresql://localhost/libresource?user=demo";
 
 	public static final String AUTH_REPO_CLASS_PROP_KEY = "auth-repo-class";
 	public static final String AUTH_REPO_URL_PROP_KEY = "auth-repo-url";
 
-	public static final String COMPONENTS_PROP_KEY = "components";
+	public static final String PLUGINS_PROP_KEY = "plugins";
 	/**
-	 * List of default components loaded by the server. It can be changed later
+	 * List of default plugins loaded by the server. It can be changed later
 	 * in config file or at runtime.
 	 */
-	public static final String[] COMPONENTS_NO_REG_PROP_VAL =
+	public static final String[] PLUGINS_NO_REG_PROP_VAL =
 	{"jabber:iq:auth", "urn:ietf:params:xml:ns:xmpp-sasl",
 	 "urn:ietf:params:xml:ns:xmpp-bind", "urn:ietf:params:xml:ns:xmpp-session",
 	 "jabber:iq:roster", "jabber:iq:privacy", "presence", "msgoffline",
@@ -76,10 +57,10 @@ public class SessionManagerConfig {
 	 "vcard-temp", "http://jabber.org/protocol/commands", "jabber:iq:private",
 	 "urn:xmpp:ping"};
 	/**
-	 * List of components loaded when the server is loaded in test mode.
-	 * Some components like off-line message storage is disabled during tests.
+	 * List of plugins loaded when the server is loaded in test mode.
+	 * Some plugins like off-line message storage is disabled during tests.
 	 */
-	public static final String[] COMPONENTS_FULL_PROP_VAL =
+	public static final String[] PLUGINS_FULL_PROP_VAL =
 	{"jabber:iq:register", "jabber:iq:auth", "urn:ietf:params:xml:ns:xmpp-sasl",
 	 "urn:ietf:params:xml:ns:xmpp-bind", "urn:ietf:params:xml:ns:xmpp-session",
 	 "jabber:iq:roster", "jabber:iq:privacy", "presence", "jabber:iq:version",
@@ -158,12 +139,12 @@ public class SessionManagerConfig {
 	  props.put(AUTH_REPO_URL_PROP_KEY, auth_repo_url);
 
 		if (full_comps) {
-			// Some components are not loaded during tests at least until proper
+			// Some plugins are not loaded during tests at least until proper
 			// test cases are created for them. Sample case is off-line message
 			// storage which may impact some test cases.
-			props.put(COMPONENTS_PROP_KEY, COMPONENTS_FULL_PROP_VAL);
+			props.put(PLUGINS_PROP_KEY, PLUGINS_FULL_PROP_VAL);
 		} else {
-			props.put(COMPONENTS_PROP_KEY, COMPONENTS_NO_REG_PROP_VAL);
+			props.put(PLUGINS_PROP_KEY, PLUGINS_NO_REG_PROP_VAL);
 		}
 
 		if (params.get(GEN_VIRT_HOSTS) != null) {
