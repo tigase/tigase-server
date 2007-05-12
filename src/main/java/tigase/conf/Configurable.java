@@ -48,6 +48,7 @@ public interface Configurable extends ServerComponent {
 	public static final String GEN_CONFIG_CS = "--gen-config-cs";
 	public static final String GEN_CONFIG_DEF = "--gen-config-default";
 
+	public static final String GEN_CONF = "--gen-";
 	public static final String GEN_TEST = "--test";
 	public static final String GEN_EXT_COMP = "--ext-comp";
 	public static final String GEN_USER_DB = "--user-db";
@@ -57,6 +58,31 @@ public interface Configurable extends ServerComponent {
 	public static final String GEN_ADMINS = "--admins";
 	public static final String GEN_VIRT_HOSTS = "--virt-hosts";
 	public static final String GEN_DEBUG = "--debug";
+
+	public static final String GEN_SREC_DB = "--gen-srec-db";
+	public static final String GEN_SREC_DB_URI = "--gen-srec-db-uri";
+	public static final String GEN_SREC_ADMINS = "--gen-srec-admins";
+
+	public static final String XML_REPO_CLASS_PROP_VAL =
+		"tigase.db.xml.XMLRepository";
+	public static final String MYSQL_REPO_CLASS_PROP_VAL =
+		"tigase.db.jdbc.JDBCRepository";
+	public static final String PGSQL_REPO_CLASS_PROP_VAL =
+		"tigase.db.jdbc.JDBCRepository";
+	public static final String DRUPAL_REPO_CLASS_PROP_VAL =
+		"tigase.db.jdbc.DrupalAuth";
+	public static final String LIBRESOURCE_REPO_CLASS_PROP_VAL =
+		"tigase.db.jdbc.LibreSourceAuth";
+
+	public static final String XML_REPO_URL_PROP_VAL = "user-repository.xml";
+	public static final String MYSQL_REPO_URL_PROP_VAL =
+		"jdbc:mysql://localhost/tigase?user=root&password=mypass";
+	public static final String PGSQL_REPO_URL_PROP_VAL =
+		"jdbc:postgresql://localhost/tigase?user=tigase";
+	public static final String DRUPAL_REPO_URL_PROP_VAL =
+		"jdbc:mysql://localhost/drupal?user=root&password=mypass";
+	public static final String LIBRESOURCE_REPO_URL_PROP_VAL =
+		"jdbc:postgresql://localhost/libresource?user=demo";
 
 	/**
 	 * Get object name. This name corresponds to section in configuration.
