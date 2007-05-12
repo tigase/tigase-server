@@ -121,7 +121,8 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 				if (args[i].equals(GEN_USER_DB) || args[i].equals(GEN_USER_DB_URI)
 					|| args[i].equals(GEN_AUTH_DB) || args[i].equals(GEN_AUTH_DB_URI)
 					|| args[i].startsWith(GEN_EXT_COMP) || args[i].equals(GEN_VIRT_HOSTS)
-					|| args[i].equals(GEN_ADMINS) || args[i].equals(GEN_DEBUG)) {
+					|| args[i].equals(GEN_ADMINS) || args[i].equals(GEN_DEBUG)
+					|| args[i].startsWith(GEN_CONF)) {
 					defConfigParams.put(args[i], args[++i]);
 				}
       } // end of for (int i = 0; i < args.length; i++)
