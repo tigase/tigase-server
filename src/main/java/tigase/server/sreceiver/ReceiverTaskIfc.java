@@ -79,6 +79,8 @@ public interface ReceiverTaskIfc {
 		SenderRestrictions.SUBSCRIBED;
 	public static final String MESSAGE_TYPE_PROP_KEY = "message-type";
 	public static final MessageType MESSAGE_TYPE_PROP_VAL = MessageType.CHAT;
+	public static final String SUBSCR_RESTR_REGEX_PROP_KEY = "subscription-regex";
+	public static final String SUBSCR_RESTR_REGEX_PROP_VAL = ".*";
 	public static final String ONLINE_ONLY_PROP_KEY = "online-users-only";
 	public static final boolean ONLINE_ONLY_PROP_VAL = false;
 	public static final String REPLACE_SENDER_PROP_KEY = "replace-sender";

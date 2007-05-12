@@ -185,7 +185,8 @@ public class ServerConnectionManager extends ConnectionManager {
 					// For dialback packet just ignore the error completely as it means
 					// remote server tries to connect from domain which doesn't exist
 					// in DNS so no further action should be performed.
-					if (!packet.getElement().getXMLNS().equals(DIALBACK_XMLNS)
+					if ((packet.getElement().getXMLNS() == null
+							|| !packet.getElement().getXMLNS().equals(DIALBACK_XMLNS))
 						&& (packet.getType() != StanzaType.error
 							|| packet.getErrorCondition() == null
 							|| !packet.getErrorCondition().equals(

@@ -38,6 +38,7 @@ public class RosterItem {
 	private boolean subscribed = false;
 	private boolean owner = false;
 	private boolean admin = false;
+	private boolean moderation_accepted = false;
 
 	/**
 	 * Creates a new <code>RosterItem</code> instance.
@@ -126,6 +127,24 @@ public class RosterItem {
 	 */
 	public void setAdmin(final boolean argAdmin) {
 		this.admin = argAdmin;
+	}
+
+	/**
+	 * Gets the value of moderation_accepted
+	 *
+	 * @return the value of moderation_accepted
+	 */
+	public boolean isModerationAccepted() {
+		return this.moderation_accepted;
+	}
+
+	/**
+	 * Sets the value of moderation_accepted
+	 *
+	 * @param argModeration_accepted Value to assign to this.moderation_accepted
+	 */
+	public void setModerationAccepted(final boolean argModeration_accepted) {
+		this.moderation_accepted = argModeration_accepted;
 	}
 
 } // RosterItem

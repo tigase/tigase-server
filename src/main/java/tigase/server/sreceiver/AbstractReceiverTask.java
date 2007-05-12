@@ -27,6 +27,8 @@ import java.util.HashMap;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 import tigase.server.Packet;
 import tigase.util.JID;
 import tigase.xml.Element;
@@ -47,6 +49,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 		Logger.getLogger("tigase.server.sreceiver.AbstractReceiverTask");
 
 	private String jid = null;
+	private String local_domain = null;
 	private String description = null;
 	private Map<String, Object> props = null;
 
@@ -55,6 +58,9 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 	private MessageType message_type = MESSAGE_TYPE_PROP_VAL;
 	private boolean send_to_online_only = ONLINE_ONLY_PROP_VAL;
 	private boolean replace_sender_address = REPLACE_SENDER_PROP_VAL;
+	private Pattern subscr_restr_regex =
+		Pattern.compile(SUBSCR_RESTR_REGEX_PROP_VAL);
+	private String owner = TASK_OWNER_PROP_VAL;
 
 	private Map<String, RosterItem> roster = new HashMap<String, RosterItem>();
 
@@ -82,6 +88,10 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 	 */
 	public void setJID(final String jid) {
 		this.jid = jid;
+		log.fine("JID set to: " + this.jid);
+		int idx = jid.indexOf(".");
+		this.local_domain = jid.substring(idx+1);
+		log.fine("Local domain set to: " + this.local_domain);
 	}
 
 	/**
@@ -103,13 +113,51 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 	}
 
 	public boolean isAllowedToSubscribe(String buddy) {
-		return true;
+		boolean result = false;
+		switch (subsc_restr) {
+		case LOCAL:
+			String buddy_domain = JID.getNodeHost(buddy);
+			if (buddy_domain.equals(local_domain)) {
+				result = true;
+			} // end of if (buddy_domain.equals(local_domain))
+			break;
+		case REGEX:
+			result = subscr_restr_regex.matcher(buddy).matches();
+			break;
+		default:
+			result = true;
+			break;
+		} // end of switch (subsc_restr)
+		return result;
+	}
+
+	public boolean isAllowedToPost(String buddy) {
+		boolean result = false;
+		RosterItem ri = getRosterItem(buddy);
+		switch (send_restr) {
+		case SUBSCRIBED:
+			result = ri != null && ri.isSubscribed() && ri.isModerationAccepted();
+			break;
+		case OWNER:
+			result = ri != null && ri.isOwner();
+			break;
+		default:
+			result = true;
+			break;
+		} // end of switch (send_restr)
+		return result;
 	}
 
 	private RosterItem addToRoster(String jid) {
 		String id = JID.getNodeID(jid);
 		RosterItem ri = new RosterItem(id);
 		roster.put(id, ri);
+		if (id.equals(owner)) {
+			ri.setOwner(true);
+		} // end of if (id.equals(owner))
+		if (subsc_restr != SubscrRestrictions.MODERATED) {
+			ri.setModerationAccepted(true);
+		} // end of if (subsc_restr != SubscrRestrictions.MODERATED)
 		return ri;
 	}
 
@@ -157,6 +205,9 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 		this.props = map;
 		description = ((String)props.get(DESCRIPTION_PROP_KEY) != null ?
 			(String)props.get(DESCRIPTION_PROP_KEY) : description);
+		subscr_restr_regex = ((String)props.get(SUBSCR_RESTR_REGEX_PROP_KEY) != null ?
+			Pattern.compile((String)props.get(SUBSCR_RESTR_REGEX_PROP_KEY))
+			: subscr_restr_regex);
 		String tmp = (String)props.get(SUBSCR_RESTRICTIONS_PROP_KEY);
 		if (tmp != null) {
 			subsc_restr = SubscrRestrictions.valueOf(tmp);
@@ -175,7 +226,8 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 			(Boolean)props.get(REPLACE_SENDER_PROP_KEY) : replace_sender_address);
 		tmp = (String)props.get(TASK_OWNER_PROP_KEY);
 		if (tmp != null) {
-			RosterItem ri = getRosterItem(tmp);
+			owner = JID.getNodeID(tmp);
+			RosterItem ri = getRosterItem(owner);
 			if (ri == null) {
 				ri = addToRoster(tmp);
 				ri.setOwner(true);
@@ -212,12 +264,12 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 		if (packet.getType() != null) {
 			presence_type = packet.getType();
 		}
+		RosterItem ri = getRosterItem(packet.getElemFrom());
 		switch (presence_type) {
 		case available:
 		case unavailable:
-			RosterItem ri = getRosterItem(packet.getElemFrom());
 			if (ri != null) {
-				ri.setOnline(true);
+				ri.setOnline(presence_type == StanzaType.available);
 				results.offer(packet.swapElemFromTo());
 			} // end of if (ri != null)
 			break;
@@ -225,6 +277,9 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 			addNewSubscribers(results, packet.getElemFrom());
 			break;
 		case subscribed:
+			if (ri != null) {
+				ri.setSubscribed(true);
+			} // end of if (ri != null)
 			results.offer(new Packet("presence", jid, packet.getElemFrom(),
 					StanzaType.available));
 			break;
@@ -238,7 +293,22 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 	}
 
 	private void processMessage(Packet packet, Queue<Packet> results) {
-		
+		for (RosterItem ri: roster.values()) {
+			if (ri.isSubscribed() && ri.isModerationAccepted()
+				&& (!send_to_online_only || ri.isOnline())) {
+				Element message = packet.getElement().clone();
+				message.setAttribute("to", ri.getJid());
+				message.setAttribute("type", message_type.toString().toLowerCase());
+				if (replace_sender_address) {
+					String old_from = message.getAttribute("from");
+					message.setAttribute("from", jid);
+					Element body = message.getChild("body");
+					String cdata = body.getCData();
+					body.setCData(old_from + " sends:\n\n" + cdata);
+				} // end of if (replace_sender_address)
+				results.offer(new Packet(message));
+			} // end of if (ri.isSubscribed() && ri.isModerationAccepted())
+		} // end of for (RosterItem ri: roster.values())
 	}
 
 } // AbstractReceiverTask
