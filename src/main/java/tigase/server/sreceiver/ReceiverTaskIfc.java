@@ -82,12 +82,12 @@ public interface ReceiverTaskIfc {
 	public static final String SUBSCR_RESTR_REGEX_PROP_KEY = "subscription-regex";
 	public static final String SUBSCR_RESTR_REGEX_PROP_VAL = ".*";
 	public static final String ONLINE_ONLY_PROP_KEY = "online-users-only";
-	public static final boolean ONLINE_ONLY_PROP_VAL = false;
+	public static final Boolean  ONLINE_ONLY_PROP_VAL = false;
 	public static final String REPLACE_SENDER_PROP_KEY = "replace-sender";
-	public static final boolean REPLACE_SENDER_PROP_VAL = true;
+	public static final Boolean REPLACE_SENDER_PROP_VAL = true;
 	public static final String ALLOWED_SENDERS_LIST_PROP_KEY =
 		"allowed-senders-list";
-	public static final String[] ALLOWED_SENDERS_LIST_PROP_VAL = {};
+	public static final String ALLOWED_SENDERS_LIST_PROP_VAL = "";
 	/**
 	 * Constant <code>DESCRIPTION_PROP_KEY</code> is a description for task instance.
 	 * Let's say the user want's to create new <em>Interest group</em> for
@@ -99,6 +99,8 @@ public interface ReceiverTaskIfc {
 	public static final String DESCRIPTION_PROP_VAL = "Abstract receiver task";
 	public static final String TASK_OWNER_PROP_KEY = "task-owner";
 	public static final String TASK_OWNER_PROP_VAL = "admin@localhost";
+
+	public static final String USER_REPOSITORY_PROP_KEY = "user-repository";
 
 	/**
 	 * <code>getType</code> method returns the task type name. This
@@ -183,9 +185,6 @@ public interface ReceiverTaskIfc {
 
 	/**
 	 * <code>getParams</code> method return task instance configuration parameters.
-	 * If parameters haven't been set before the method should return
-	 * <code>Map</code> with a list of possible parameters it may accept with
-	 * default values where appropriate.
 	 * For more detailed information about configuration parameters please refer
 	 * to corresponding <code>set</code> method.
 	 *
@@ -193,6 +192,22 @@ public interface ReceiverTaskIfc {
 	 * @see setParams
 	 */
 	Map<String, Object> getParams();
+
+	/**
+	 * <code>getDefaultParams</code> method return task instance default configuration
+	 * parameters. The map should contains all possible parameters accepted by
+	 * the task in <code>setParams</code> method. Values may be empty but may
+	 * not be <code>null</code>. All of parameters should be converted to
+	 * <code>String</code> type to make it possible to display them in ad-hoc
+	 * command x-form. Parameters then should be converted back to whatever format
+	 * is needed when passed back in <code>setParams</code> method.
+	 * For more detailed information about configuration parameters please refer
+	 * to <code>setParams</code> method.
+	 *
+	 * @return a <code>Map</code> value with task instance configuration parameters.
+	 * @see setParams
+	 */
+	Map<String, Object> getDefaultParams();
 
 	/**
 	 * <code>processPacket</code> method takes a packet addressed to this task

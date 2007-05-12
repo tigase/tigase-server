@@ -148,25 +148,41 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 		return result;
 	}
 
-	private RosterItem addToRoster(String jid) {
+	public void addToRoster(RosterItem ri) {
+		roster.put(ri.getJid(), ri);
+	}
+
+	public RosterItem addToRoster(String jid) {
 		String id = JID.getNodeID(jid);
 		RosterItem ri = new RosterItem(id);
-		roster.put(id, ri);
 		if (id.equals(owner)) {
 			ri.setOwner(true);
 		} // end of if (id.equals(owner))
 		if (subsc_restr != SubscrRestrictions.MODERATED) {
 			ri.setModerationAccepted(true);
 		} // end of if (subsc_restr != SubscrRestrictions.MODERATED)
+		addToRoster(ri);
 		return ri;
 	}
 
-	private RosterItem removeFromRoster(String jid) {
+	public RosterItem removeFromRoster(String jid) {
 		return roster.remove(JID.getNodeID(jid));
 	}
 
-	private RosterItem getRosterItem(String jid) {
+	public RosterItem getRosterItem(String jid) {
 		return roster.get(JID.getNodeID(jid));
+	}
+
+	public void setRosterItemOnline(RosterItem ri, boolean online) {
+		ri.setOnline(online);
+	}
+
+	public void setRosterItemSubscribed(RosterItem ri, boolean subscribed) {
+		ri.setSubscribed(subscribed);
+	}
+
+	public void setRosterItemModerationAccepted(RosterItem ri, boolean accepted) {
+		ri.setModerationAccepted(accepted);
 	}
 
 	/**
@@ -196,16 +212,27 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 		} // end of for (String buddy: new_subscr)
 	}
 
+	public boolean parseBool(final Object val) {
+		return val != null &&
+			(val.toString().equalsIgnoreCase("yes")
+				|| val.toString().equalsIgnoreCase("true")
+				|| val.toString().equalsIgnoreCase("on"));
+	}
+
 	/**
 	 * Describe <code>setParams</code> method here.
 	 *
 	 * @param map a <code>Map</code> value
 	 */
 	public void setParams(final Map<String, Object> map) {
-		this.props = map;
-		description = ((String)props.get(DESCRIPTION_PROP_KEY) != null ?
+		if (this.props == null) {
+			this.props = map;
+		} else {
+			this.props.putAll(map);
+		} // end of if (this.props == null) else
+		description = (props.get(DESCRIPTION_PROP_KEY) != null ?
 			(String)props.get(DESCRIPTION_PROP_KEY) : description);
-		subscr_restr_regex = ((String)props.get(SUBSCR_RESTR_REGEX_PROP_KEY) != null ?
+		subscr_restr_regex = (props.get(SUBSCR_RESTR_REGEX_PROP_KEY) != null ?
 			Pattern.compile((String)props.get(SUBSCR_RESTR_REGEX_PROP_KEY))
 			: subscr_restr_regex);
 		String tmp = (String)props.get(SUBSCR_RESTRICTIONS_PROP_KEY);
@@ -221,9 +248,9 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 			message_type = MessageType.valueOf(tmp);
 		} // end of if (tmp != null)
 		send_to_online_only =	(props.get(ONLINE_ONLY_PROP_KEY) != null ?
-			(Boolean)props.get(ONLINE_ONLY_PROP_KEY) : send_to_online_only);
+			parseBool(props.get(ONLINE_ONLY_PROP_KEY)) : send_to_online_only);
 		replace_sender_address = (props.get(REPLACE_SENDER_PROP_KEY) != null ?
-			(Boolean)props.get(REPLACE_SENDER_PROP_KEY) : replace_sender_address);
+			parseBool(props.get(REPLACE_SENDER_PROP_KEY)) : replace_sender_address);
 		tmp = (String)props.get(TASK_OWNER_PROP_KEY);
 		if (tmp != null) {
 			owner = JID.getNodeID(tmp);
@@ -242,6 +269,26 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 	 */
 	public Map<String, Object> getParams() {
 		return props;
+	}
+
+	public Map<String, Object> getDefaultParams() {
+		Map<String, Object> defs = new HashMap<String, Object>();
+		defs.put(SUBSCR_RESTRICTIONS_PROP_KEY,
+			SUBSCR_RESTRICTIONS_PROP_VAL.toString());
+		defs.put(MESSAGE_TYPE_PROP_KEY,
+			MESSAGE_TYPE_PROP_VAL.toString());
+		defs.put(ALLOWED_SENDERS_PROP_KEY,
+			ALLOWED_SENDERS_PROP_VAL.toString());
+		defs.put(SUBSCR_RESTR_REGEX_PROP_KEY,
+			SUBSCR_RESTR_REGEX_PROP_VAL.toString());
+		defs.put(ONLINE_ONLY_PROP_KEY, ONLINE_ONLY_PROP_VAL.toString());
+		defs.put(REPLACE_SENDER_PROP_KEY,
+			REPLACE_SENDER_PROP_VAL.toString());
+		defs.put(ALLOWED_SENDERS_LIST_PROP_KEY,
+			ALLOWED_SENDERS_LIST_PROP_VAL.toString());
+		defs.put(DESCRIPTION_PROP_KEY,
+			DESCRIPTION_PROP_VAL.toString());
+		return defs;
 	}
 
 	/**
@@ -267,10 +314,17 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 		RosterItem ri = getRosterItem(packet.getElemFrom());
 		switch (presence_type) {
 		case available:
+			if (ri != null) {
+				setRosterItemOnline(ri, true);
+				results.offer(new Packet("presence", jid, packet.getElemFrom(),
+						StanzaType.available));
+			} // end of if (ri != null)
+			break;
 		case unavailable:
 			if (ri != null) {
-				ri.setOnline(presence_type == StanzaType.available);
-				results.offer(packet.swapElemFromTo());
+				setRosterItemOnline(ri, false);
+				results.offer(new Packet("presence", jid, packet.getElemFrom(),
+						StanzaType.unavailable));
 			} // end of if (ri != null)
 			break;
 		case subscribe:
@@ -278,10 +332,10 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 			break;
 		case subscribed:
 			if (ri != null) {
-				ri.setSubscribed(true);
+				setRosterItemSubscribed(ri, true);
+				results.offer(new Packet("presence", jid, packet.getElemFrom(),
+						StanzaType.available));
 			} // end of if (ri != null)
-			results.offer(new Packet("presence", jid, packet.getElemFrom(),
-					StanzaType.available));
 			break;
 		case unsubscribe:
 		case unsubscribed:
@@ -295,14 +349,18 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 	private void processMessage(Packet packet, Queue<Packet> results) {
 		for (RosterItem ri: roster.values()) {
 			if (ri.isSubscribed() && ri.isModerationAccepted()
-				&& (!send_to_online_only || ri.isOnline())) {
+				&& (!send_to_online_only || ri.isOnline())
+				&& (!JID.getNodeID(packet.getElemFrom()).equals(ri.getJid()))) {
 				Element message = packet.getElement().clone();
+				Element body = message.getChild("body");
+				if (body == null) {
+					return;
+				} // end of if (body == null)
 				message.setAttribute("to", ri.getJid());
 				message.setAttribute("type", message_type.toString().toLowerCase());
 				if (replace_sender_address) {
 					String old_from = message.getAttribute("from");
 					message.setAttribute("from", jid);
-					Element body = message.getChild("body");
 					String cdata = body.getCData();
 					body.setCData(old_from + " sends:\n\n" + cdata);
 				} // end of if (replace_sender_address)

@@ -34,7 +34,7 @@ import tigase.server.Packet;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class NewsDistributor extends AbstractReceiverTask {
+public class NewsDistributor extends RepoRosterTask {
 
 	public static final String TASK_TYPE = "News Distribution";
 	public static final String TASK_HELP =
@@ -49,16 +49,6 @@ public class NewsDistributor extends AbstractReceiverTask {
 
 	public String getHelp() {
 		return TASK_HELP;
-	}
-
-	/**
-	 * Describe <code>processPacket</code> method here.
-	 *
-	 * @param packet a <code>Packet</code> value
-	 * @param results a <code>Queue</code> value
-	 */
-	public void processPacket(final Packet packet, final Queue<Packet> results) {
-		super.processPacket(packet, results);
 	}
 
 } // NewsDistributor

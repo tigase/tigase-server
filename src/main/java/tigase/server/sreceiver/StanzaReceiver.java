@@ -33,6 +33,8 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.conf.Configurable;
+import tigase.db.RepositoryFactory;
+import tigase.db.UserRepository;
 import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
 import tigase.disco.XMPPService;
@@ -43,6 +45,7 @@ import tigase.util.ClassUtil;
 import tigase.util.JID;
 import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
+import tigase.db.TigaseDBException;
 
 import static tigase.server.sreceiver.ReceiverTaskIfc.*;
 
@@ -133,24 +136,14 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	public static final boolean TASK_ACTIVE_PROP_VAL = true;
 	public static final String TASK_TYPE_PROP_KEY = "task-type";
 	public static final String TASK_TYPE_PROP_VAL = "News Distribution";
+	public static final String SREC_REPO_CLASS_PROP_KEY = "srec-repo-class";
+	public static final String SREC_REPO_URL_PROP_KEY = "srec-repo-url";
+	public static final String ADMINS_PROP_KEY = "admins";
+	public static String[] ADMINS_PROP_VAL =	{"admin@localhost", "admin@hostname"};
 
-	public static final Map<String, Object> DEFAULT_PROPS =
-		new HashMap<String, Object>();
-
-	static {
-		//		DEFAULT_PROPS.put(SUBSCR_LIST_PROP_KEY, SUBSCR_LIST_PROP_VAL);
-		DEFAULT_PROPS.put(SUBSCR_RESTRICTIONS_PROP_KEY,
-			SUBSCR_RESTRICTIONS_PROP_VAL.toString());
-		DEFAULT_PROPS.put(MESSAGE_TYPE_PROP_KEY,
-			MESSAGE_TYPE_PROP_VAL.toString());
-		DEFAULT_PROPS.put(ALLOWED_SENDERS_PROP_KEY,
-			ALLOWED_SENDERS_PROP_VAL.toString());
-		DEFAULT_PROPS.put(SUBSCR_RESTR_REGEX_PROP_KEY, SUBSCR_RESTR_REGEX_PROP_VAL);
-		DEFAULT_PROPS.put(ONLINE_ONLY_PROP_KEY, ONLINE_ONLY_PROP_VAL);
-		DEFAULT_PROPS.put(REPLACE_SENDER_PROP_KEY, REPLACE_SENDER_PROP_VAL);
-		DEFAULT_PROPS.put(ALLOWED_SENDERS_LIST_PROP_KEY, ALLOWED_SENDERS_LIST_PROP_VAL);
-		DEFAULT_PROPS.put(DESCRIPTION_PROP_KEY, DESCRIPTION_PROP_VAL);
-	}
+	private static final String tasks_node = "/tasks";
+	private static final String params_node = "/params";
+	private static final String task_type_key = "task-type";
 
   private static Logger log =
 		Logger.getLogger("tigase.server.sreceiver.StanzaReceiver");
@@ -168,6 +161,21 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		new ConcurrentSkipListMap<String, ReceiverTaskIfc>();
 
 	private ServiceEntity serviceEntity = null;
+	private String[] admins = {"admin@localhost"};
+	private UserRepository repository = null;
+
+	public StanzaReceiver() {
+		try {
+			Set<Class<ReceiverTaskIfc>> ctasks =
+				ClassUtil.getClassesImplementing(ReceiverTaskIfc.class);
+			for (Class<ReceiverTaskIfc> ctask: ctasks) {
+				ReceiverTaskIfc itask = ctask.newInstance();
+				task_types.put(itask.getType(), itask);
+			} // end of for (Class<ReceiverTaskIfc> ctask: ctasks)
+		} catch (Exception e) {
+      log.log(Level.SEVERE, "Can not load ReceiverTaskIfc implementations", e);
+		} // end of try-catch
+	}
 
 	/**
 	 * Describe <code>processIQPacket</code> method here.
@@ -210,9 +218,8 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	public void processPacket(final Packet packet) {
 		log.finest("Processing packet: " + packet.toString());
 		if (packet.getElemName().equals("iq")) {
-			if (processIQPacket(packet)) {
-				return;
-			} // end of if (processIQPacket(packet))
+			processIQPacket(packet);
+			return;
 		} // end of if (packet.getElemName().equals("iq"))
 		ReceiverTaskIfc task = task_instances.get(packet.getElemTo());
 		if (task != null) {
@@ -234,16 +241,75 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		return getName() + "." + getDefHostName();
 	}
 
+	private void addTaskToInstances(ReceiverTaskIfc task) {
+		task_instances.put(task.getJID(),	task);
+		ServiceEntity item = new ServiceEntity(task.getJID(),
+			JID.getNodeNick(task.getJID()), task.getDescription());
+		serviceEntity.addItems(item);
+	}
+
 	/**
 	 * Describe <code>addTaskInstance</code> method here.
 	 *
 	 * @param task a <code>ReceiverTaskIfc</code> value
 	 */
 	private void addTaskInstance(ReceiverTaskIfc task) {
-		task_instances.put(task.getJID(),	task);
-		ServiceEntity item = new ServiceEntity(task.getJID(),
-			JID.getNodeNick(task.getJID()), task.getDescription());
-		serviceEntity.addItems(item);
+		if (task_instances.get(task.getJID()) == null) {
+			addTaskToInstances(task);
+			try {
+				saveTaskToRepository(task);
+			} catch (TigaseDBException e) {
+				log.log(Level.SEVERE, "Problem with saving task to repository: "
+					+ task.getJID(), e);
+			} // end of try-catch
+		} else {
+			log.warning("Attempt to add another task with jid: " + task.getJID());
+		} // end of else
+	}
+
+	private void loadTasksFromRepository()
+	throws TigaseDBException {
+		String[] tasks_jids = repository.getSubnodes(myDomain(), tasks_node);
+		if (tasks_jids != null) {
+			for (String task_jid: tasks_jids) {
+				String repo_node = tasks_node + "/" + task_jid;
+				String task_type = repository.getData(myDomain(), repo_node,
+					task_type_key);
+				repo_node += params_node;
+				String[] keys = repository.getKeys(myDomain(), repo_node);
+				Map<String, Object> task_params = new HashMap<String, Object>();
+				if (keys != null) {
+					for (String key: keys) {
+						task_params.put(key, repository.getData(myDomain(), repo_node, key));
+					} // end of for (String key: keys)
+				} // end of if (keys != null)
+				addTaskToInstances(createTask(task_type, task_jid, task_params));
+			} // end of for (String task_jid: tasks_jids)
+		} // end of if (tasks_jids != null)
+	}
+
+	private void saveTaskToRepository(ReceiverTaskIfc task)
+	throws TigaseDBException {
+		String repo_node = tasks_node + "/" + task.getJID();
+		repository.setData(myDomain(), repo_node, task_type_key, task.getType());
+		Map<String, Object> task_params = task.getParams();
+		repo_node += params_node;
+		for (Map.Entry<String, Object> entry: task_params.entrySet()) {
+			if (!entry.getKey().equals(USER_REPOSITORY_PROP_KEY)) {
+				repository.setData(myDomain(), repo_node, entry.getKey(),
+					entry.getValue().toString());
+			} // end of if (!entry.getKey().equals(USER_REPOSITORY_PROP_KEY))
+		}
+	}
+
+	private ReceiverTaskIfc createTask(String task_type, String task_jid,
+		Map<String, Object> task_params ) {
+		ReceiverTaskIfc ttask = task_types.get(task_type);
+		ReceiverTaskIfc ntask = ttask.getInstance();
+		ntask.setJID(task_jid);
+		task_params.put(USER_REPOSITORY_PROP_KEY, repository);
+		ntask.setParams(task_params);
+		return ntask;
 	}
 
 	/**
@@ -253,28 +319,36 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	 */
 	public void setProperties(final Map<String, Object> props) {
 		super.setProperties(props);
+
 		addRouting(myDomain());
+
 		serviceEntity = new ServiceEntity(getName(), null, "Stanza Receiver");
 		serviceEntity.addIdentities(
 			new ServiceIdentity("component", "external", "Stanza Receiver"));
-		task_types.clear();
+
+		admins = (String[])props.get(ADMINS_PROP_KEY);
+
 		try {
-			Set<Class<ReceiverTaskIfc>> ctasks =
-				ClassUtil.getClassesImplementing(ReceiverTaskIfc.class);
-			for (Class<ReceiverTaskIfc> ctask: ctasks) {
-				ReceiverTaskIfc itask = ctask.newInstance();
-				task_types.put(itask.getType(), itask);
-			} // end of for (Class<ReceiverTaskIfc> ctask: ctasks)
+			String cls_name = (String)props.get(SREC_REPO_CLASS_PROP_KEY);
+			String res_uri = (String)props.get(SREC_REPO_URL_PROP_KEY);
+			if (!res_uri.contains("autoCreateUser=true")) {
+				res_uri += "&autoCreateUser=true";
+			} // end of if (!res_uri.contains("autoCreateUser=true"))
+			repository = RepositoryFactory.getUserRepository(getName(),
+				cls_name, res_uri);
+
+			loadTasksFromRepository();
+
 		} catch (Exception e) {
-      log.log(Level.SEVERE, "Can not load ReceiverTaskIfc implementations", e);
+			log.severe("Can't initialize repository: " + e);
+			e.printStackTrace();
+			System.exit(1);
 		} // end of try-catch
+
 		String[] tasks_list = (String[])props.get(TASKS_LIST_PROP_KEY);
 		for (String task_name: tasks_list) {
 			String task_type =
 				(String)props.get(task_name + "/" + TASK_TYPE_PROP_KEY);
-			ReceiverTaskIfc ttask = task_types.get(task_type);
-			ReceiverTaskIfc new_task = ttask.getInstance();
-			new_task.setJID(task_name + "@" + myDomain());
 			Map<String, Object> task_params = new HashMap<String, Object>();
 			String prep = task_name + "/props/";
 			for (Map.Entry<String, Object> entry: props.entrySet()) {
@@ -283,8 +357,8 @@ public class StanzaReceiver extends AbstractMessageReceiver
 						entry.getValue());
 				} // end of if (entry.getKey().startsWith())
 			} // end of for (Map.Entry entry: props.entrySet())
-			new_task.setParams(task_params);
-			addTaskInstance(new_task);
+			addTaskInstance(createTask(task_type, task_name + "@" + myDomain(),
+					task_params));
 		} // end of for (String task_name: tasks_list)
 	}
 
@@ -294,10 +368,53 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		for (String task_name: TASKS_LIST_PROP_VAL) {
 			defs.put(task_name + "/" + TASK_ACTIVE_PROP_KEY, TASK_ACTIVE_PROP_VAL);
 			defs.put(task_name + "/" + TASK_TYPE_PROP_KEY, TASK_TYPE_PROP_VAL);
-			for (Map.Entry entry: DEFAULT_PROPS.entrySet()) {
+			Map<String, Object> default_props =
+				task_types.get(TASK_TYPE_PROP_VAL).getDefaultParams();
+			for (Map.Entry entry: default_props.entrySet()) {
 				defs.put(task_name + "/props/" + entry.getKey(), entry.getValue());
 			} // end of for ()
 		} // end of for (String task_name: TASKS_LIST_PROP_VAL)
+
+		String srec_repo_class = XML_REPO_CLASS_PROP_VAL;
+		String srec_repo_uri = XML_REPO_URL_PROP_VAL;
+		String conf_srec_db = null;
+		if (params.get(GEN_SREC_DB) != null) {
+			conf_srec_db = (String)params.get(GEN_SREC_DB);
+		} else {
+			if (params.get(GEN_USER_DB) != null) {
+				conf_srec_db = (String)params.get(GEN_USER_DB);
+			} // end of if (params.get(GEN_USER_DB) != null)
+		} // end of if (params.get(GEN_SREC_DB) != null) else
+		if (conf_srec_db != null) {
+			if (conf_srec_db.equals("mysql")) {
+				srec_repo_class = MYSQL_REPO_CLASS_PROP_VAL;
+				srec_repo_uri = MYSQL_REPO_URL_PROP_VAL;
+			}
+			if (conf_srec_db.equals("pgsql")) {
+				srec_repo_class = PGSQL_REPO_CLASS_PROP_VAL;
+				srec_repo_uri = PGSQL_REPO_URL_PROP_VAL;
+			}
+		} // end of if (conf_srec_db != null)
+		if (params.get(GEN_SREC_DB_URI) != null) {
+			srec_repo_uri = (String)params.get(GEN_SREC_DB_URI);
+		} else {
+			if (params.get(GEN_USER_DB_URI) != null) {
+				srec_repo_uri = (String)params.get(GEN_USER_DB_URI);
+			} // end of if (params.get(GEN_USER_DB_URI) != null)
+		} // end of else
+		defs.put(SREC_REPO_CLASS_PROP_KEY, srec_repo_class);
+		defs.put(SREC_REPO_URL_PROP_KEY, srec_repo_uri);
+		if (params.get(GEN_SREC_ADMINS) != null) {
+			ADMINS_PROP_VAL = ((String)params.get(GEN_SREC_ADMINS)).split(",");
+		} else {
+			if (params.get(GEN_ADMINS) != null) {
+				ADMINS_PROP_VAL = ((String)params.get(GEN_ADMINS)).split(",");
+			} else {
+				ADMINS_PROP_VAL = new String[1];
+				ADMINS_PROP_VAL[0] = "admin@"+getDefHostName();
+			}
+		} // end of if (params.get(GEN_SREC_ADMINS) != null) else
+		defs.put(ADMINS_PROP_KEY, ADMINS_PROP_VAL);
 		return defs;
 	}
 
