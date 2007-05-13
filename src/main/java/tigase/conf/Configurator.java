@@ -112,19 +112,26 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 		defConfigParams.put("config-type", GEN_CONFIG_DEF);
     if (args != null && args.length > 0) {
       for (int i = 0; i < args.length; i++) {
+				String key = null;
+				Object val = null;
 				if (args[i].startsWith(GEN_CONFIG)) {
-					defConfigParams.put("config-type", args[i]);
+					key = "config-type";	val = args[i];
 				}
 				if (args[i].startsWith(GEN_TEST)) {
-					defConfigParams.put(args[i], new Boolean(true));
+					key = args[i];  val = new Boolean(true);
 				}
 				if (args[i].equals(GEN_USER_DB) || args[i].equals(GEN_USER_DB_URI)
 					|| args[i].equals(GEN_AUTH_DB) || args[i].equals(GEN_AUTH_DB_URI)
 					|| args[i].startsWith(GEN_EXT_COMP) || args[i].equals(GEN_VIRT_HOSTS)
 					|| args[i].equals(GEN_ADMINS) || args[i].equals(GEN_DEBUG)
-					|| args[i].startsWith(GEN_CONF)) {
-					defConfigParams.put(args[i], args[++i]);
+					|| (args[i].startsWith(GEN_CONF) && !args[i].startsWith(GEN_CONFIG))) {
+					key = args[i];  val = args[++i];
 				}
+				if (key != null) {
+					defConfigParams.put(key, val);
+					System.out.println("Setting defaults: " + key + "=" + val.toString());
+					log.config("Setting defaults: " + key + "=" + val.toString());
+				} // end of if (key != null)
       } // end of for (int i = 0; i < args.length; i++)
     }
   }
@@ -643,7 +650,10 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 	private void prepareConfigData(Packet result, String comp_name) {
 		Command.setStatus(result, "executing");
 		Command.addAction(result, "complete");
-		Map<String, Object> allprop = getAllProperties(comp_name);
+		// Let's try to sort them to make it easier to find options on
+		// configuration page.
+		Map<String, Object> allprop =
+			new TreeMap<String, Object>(getAllProperties(comp_name));
 		for (Map.Entry<String, Object> entry: allprop.entrySet()) {
 			Command.addFieldValue(result, XMLUtils.escape(entry.getKey()),
 				XMLUtils.escape(objectToString(entry.getValue())));
