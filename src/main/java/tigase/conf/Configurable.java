@@ -84,6 +84,19 @@ public interface Configurable extends ServerComponent {
 	public static final String LIBRESOURCE_REPO_URL_PROP_VAL =
 		"jdbc:postgresql://localhost/libresource?user=demo";
 
+	public static final String C2S_COMP_CLASS_NAME =
+		"tigase.server.xmppclient.ClientConnectionManager";
+	public static final String S2S_COMP_CLASS_NAME =
+		"tigase.server.xmppserver.ServerConnectionManager";
+	public static final String SM_COMP_CLASS_NAME =
+		"tigase.server.xmppsession.SessionManager";
+	public static final String EXT_COMP_CLASS_NAME =
+		"tigase.server.xmppcomponent.ComponentConnectionManager";
+	public static final String SSEND_COMP_CLASS_NAME =
+		"tigase.server.ssender.StanzaSender";
+	public static final String SRECV_COMP_CLASS_NAME =
+		"tigase.server.sreceiver.StanzaReceiver";
+
 	/**
 	 * Get object name. This name corresponds to section in configuration.
 	 *

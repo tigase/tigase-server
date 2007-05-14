@@ -72,18 +72,12 @@ public class MessageRouterConfig {
 		new HashMap<String, String>();
 
 	static {
-		MSG_RCV_CLASSES.put(DEF_C2S_NAME,
-			"tigase.server.xmppclient.ClientConnectionManager");
-		MSG_RCV_CLASSES.put(DEF_S2S_NAME,
-			"tigase.server.xmppserver.ServerConnectionManager");
-		MSG_RCV_CLASSES.put(DEF_EXT_COMP_NAME,
-			"tigase.server.xmppcomponent.ComponentConnectionManager");
-		MSG_RCV_CLASSES.put(DEF_SM_NAME,
-			"tigase.server.xmppsession.SessionManager");
-		MSG_RCV_CLASSES.put(DEF_SSEND_NAME,
-			"tigase.server.ssender.StanzaSender");
-		MSG_RCV_CLASSES.put(DEF_SRECV_NAME,
-			"tigase.server.sreceiver.StanzaReceiver");
+		MSG_RCV_CLASSES.put(DEF_C2S_NAME, C2S_COMP_CLASS_NAME);
+		MSG_RCV_CLASSES.put(DEF_S2S_NAME, S2S_COMP_CLASS_NAME);
+		MSG_RCV_CLASSES.put(DEF_EXT_COMP_NAME, EXT_COMP_CLASS_NAME);
+		MSG_RCV_CLASSES.put(DEF_SM_NAME, SM_COMP_CLASS_NAME);
+		MSG_RCV_CLASSES.put(DEF_SSEND_NAME, SSEND_COMP_CLASS_NAME);
+		MSG_RCV_CLASSES.put(DEF_SRECV_NAME, SRECV_COMP_CLASS_NAME);
 	}
 
 	public static final String REGISTRATOR_PROP_KEY = "components/registrators/";
@@ -133,7 +127,7 @@ public class MessageRouterConfig {
 		for (String name: rcv_names) {
 			String def_class = MSG_RCV_CLASSES.get(name);
 			if (def_class == null) {
-				def_class = "tigase.server.xmppcomponent.ComponentConnectionManager";
+				def_class = EXT_COMP_CLASS_NAME;
 			}
 			defs.put(MSG_RECEIVERS_PROP_KEY + name + ".class", def_class);
 			defs.put(MSG_RECEIVERS_PROP_KEY + name + ".active", true);
