@@ -245,6 +245,8 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		task_instances.put(task.getJID(),	task);
 		ServiceEntity item = new ServiceEntity(task.getJID(),
 			JID.getNodeNick(task.getJID()), task.getDescription());
+		item.addIdentities(
+			new ServiceIdentity("component", "generic", task.getJID()));
 		serviceEntity.addItems(item);
 	}
 
@@ -324,7 +326,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 
 		serviceEntity = new ServiceEntity(getName(), null, "Stanza Receiver");
 		serviceEntity.addIdentities(
-			new ServiceIdentity("component", "external", "Stanza Receiver"));
+			new ServiceIdentity("component", "generic", "Stanza Receiver"));
 
 		admins = (String[])props.get(ADMINS_PROP_KEY);
 
