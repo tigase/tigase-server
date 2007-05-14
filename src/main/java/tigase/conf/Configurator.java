@@ -40,15 +40,19 @@ import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
-import tigase.server.AbstractComponentRegistrator;
-import tigase.server.Packet;
-import tigase.server.ServerComponent;
-import tigase.server.Command;
-import tigase.server.Permissions;
-import tigase.server.MessageRouter;
-import tigase.disco.XMPPService;
 import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
+import tigase.disco.XMPPService;
+import tigase.server.AbstractComponentRegistrator;
+import tigase.server.Command;
+import tigase.server.MessageReceiver;
+import tigase.server.MessageRouter;
+import tigase.server.ConnectionManager;
+import tigase.server.MessageRouterConfig;
+import tigase.server.Packet;
+import tigase.server.Permissions;
+import tigase.server.ServerComponent;
+import tigase.util.ClassUtil;
 import tigase.xml.Element;
 import tigase.xml.XMLUtils;
 import tigase.xml.db.Types.DataType;
@@ -79,6 +83,11 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 	private ServiceEntity config_list = null;
 	private ServiceEntity config_set = null;
 	private boolean demoMode = false;
+	/**
+	 * This variable is used only for configuration at run-time to add new
+	 * components....
+	 */
+	private String routerCompName = null;
 
 	public void setName(String name) {
 		super.setName(name);
@@ -129,7 +138,6 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 				}
 				if (key != null) {
 					defConfigParams.put(key, val);
-					System.out.println("Setting defaults: " + key + "=" + val.toString());
 					log.config("Setting defaults: " + key + "=" + val.toString());
 				} // end of if (key != null)
       } // end of for (int i = 0; i < args.length; i++)
@@ -162,6 +170,9 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 			config_set.addItems(new ServiceEntity[] {item});
 		}
 		setup(component);
+		if (component.getClass().getName().equals(ROUTER_COMP_CLASS_NAME)) {
+			routerCompName = component.getName();
+		} // end of if (component.getClass().getName().equals())
 	}
 
 	public void componentRemoved(Configurable component) {}
@@ -305,16 +316,21 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 	}
 
 	public Object setValue(String node_key, String value,
-		boolean add, boolean feedback) throws Exception {
+		boolean add, boolean feedback, Map<String, Object> orig) throws Exception {
 		int root_idx = node_key.indexOf('/');
-		String root = node_key.substring(0, root_idx);
+		String root = root_idx > 0 ? node_key.substring(0, root_idx) : "";
 		int key_idx = node_key.lastIndexOf('/');
-		String key = node_key.substring(key_idx+1);
+		String key = key_idx > 0 ? node_key.substring(key_idx+1) : node_key;
 		String subnode = null;
 		if (root_idx != key_idx) {
 			subnode = node_key.substring(root_idx+1, key_idx);
 		}
-		Object old_val = repository.get(root, subnode, key, null);
+		Object old_val = null;
+		if (orig == null) {
+			old_val = repository.get(root, subnode, key, null);
+		} else {
+			old_val = orig.get(node_key);
+		} // end of if (orig == null) else
 		if (old_val != null) {
 			Object new_val = null;
 			DataType type = DataType.valueof(old_val.getClass().getSimpleName());
@@ -400,15 +416,24 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 				}
 				break;
 			default:
+				new_val = value;
 				break;
 			} // end of switch (type)
-			repository.set(root, subnode, key, new_val);
-			repository.sync();
+			if (orig == null) {
+				repository.set(root, subnode, key, new_val);
+				repository.sync();
+			} else {
+				orig.put(node_key, new_val);
+			} // end of if (orig == null) else
 			return new_val;
 		} else {
 			if (force) {
-				repository.set(root, subnode, key, value);
-				repository.sync();
+				if (orig == null) {
+					repository.set(root, subnode, key, value);
+					repository.sync();
+				} else {
+					orig.put(node_key, value);
+				} // end of if (orig == null) else
 				if (feedback) {
 					System.out.println("Forced to set new key=value: " + key + "=" + value);
 				}
@@ -562,7 +587,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 		Configurator conf = new Configurator(config_file, args);
 
 		if (set || add) {
-			conf.setValue(key, value, add, true);
+			conf.setValue(key, value, add, true, null);
 		} // end of if (set)
 
 		if (print) {
@@ -647,7 +672,221 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 		}
 	}
 
+	private void newComponentCommand(Packet result) {
+		Command.addFieldValue(result, "Info",	"Press:", "fixed");
+		Command.addFieldValue(result, "Info",
+			"'Next' to set all parameters for the new component.", "fixed");
+		Command.addFieldValue(result, "Info",
+			"'Finish' to create component with default parameters.", "fixed");
+		Command.setStatus(result, "executing");
+		Command.addAction(result, "next");
+		Command.addFieldValue(result, "Component name",
+			"", "text-single", "Component name");
+		try {
+			Set<Class<MessageReceiver>> receiv_cls =
+				ClassUtil.getClassesImplementing(MessageReceiver.class);
+			String[] receiv_cls_names = new String[receiv_cls.size()];
+			String[] receiv_cls_simple = new String[receiv_cls.size()];
+			int idx = 0;
+			for (Class<MessageReceiver> reciv: receiv_cls) {
+				receiv_cls_names[idx] = reciv.getName();
+				receiv_cls_simple[idx++] = reciv.getSimpleName();
+			} // end of for (MessageReceiver.class reciv: receiv_cls)
+			Command.addFieldValue(result, "Component class", EXT_COMP_CLASS_NAME,
+				receiv_cls_simple, receiv_cls_names);
+		} catch (Exception e) {
+			log.log(Level.SEVERE, "Problem loading MessageReceiver implementations", e);
+			Command.addFieldValue(result, "Component class",
+				"ERROR!! Problem loading MessageReceiver implementations, "
+				+ "look in log file for details...",
+				"text-single", "Component class");
+		} // end of try-catch
+	}
+
+	private boolean isValidCompName(String name) {
+		return !(name.contains(" ")
+			|| name.contains("\t")
+			|| name.contains("@")
+			|| name.contains("&"));
+	}
+
+	private boolean checkComponentName(Packet result, String name) {
+		if (name == null || name.length() == 0) {
+			Command.addFieldValue(result, "Info",
+				"Note!! Missing component name, please provide valid component name.",
+				"fixed");
+			newComponentCommand(result);
+			return false;
+		} // end of if (new_comp_name == null || new_comp_name.length() == 0)
+		if (!isValidCompName(name)) {
+			Command.addFieldValue(result, "Info",
+				"Note!! Incorrect component name, contains invalid characters.",
+				"fixed");
+			Command.addFieldValue(result, "Info",
+				"Please provide correct component name.",	"fixed");
+			newComponentCommand(result);
+			return false;
+		} // end of if (!isValidCompName(new_comp_name))
+		String[] comp_names = getComponents();
+		for (String comp_name: comp_names) {
+			if (comp_name.equals(name)) {
+				Command.addFieldValue(result, "Info",
+					"Note!! Component with provided name already exist.",
+					"fixed");
+				Command.addFieldValue(result, "Info",
+					"Please provide different component name.",	"fixed");
+				newComponentCommand(result);
+			return false;
+			} // end of if (comp_name.equals(new_comp_name))
+		} // end of for (String comp_name: comp_names)
+		return true;
+	}
+
+	private void createNewComponent(Packet packet, Packet result, boolean admin) {
+		String new_comp_name = Command.getFieldValue(packet, "Component name");
+		String new_comp_class = Command.getFieldValue(packet, "Component class");
+		try {
+			MessageReceiver mr =
+				(MessageReceiver)Class.forName(new_comp_class).newInstance();
+			mr.setName(new_comp_name);
+			if (mr instanceof Configurable) {
+				Map<String, Object> comp_props =
+					((Configurable)mr).getDefaults(defConfigParams);
+				Map<String, Object> new_params = new HashMap<String, Object>(comp_props);
+				// Convert String values to proper Objecy values
+				for (Map.Entry<String, Object> entry: comp_props.entrySet()) {
+					String val =
+						Command.getFieldValue(packet, XMLUtils.escape(entry.getKey()));
+					if (val == null) { val = ""; }
+					val = XMLUtils.unescape(val);
+					log.info("New component value: " + entry.getKey() + "=" + val);
+					setValue(entry.getKey(), val, false, false, new_params);
+				} // end of for (Map.Entry entry: prop.entrySet())
+				if (admin) {
+					// Now we can save all properties to config repository:
+					for (Map.Entry<String, Object> entry: new_params.entrySet()) {
+						String key = entry.getKey();
+						String subnode = null;
+						int key_idx = entry.getKey().lastIndexOf('/');
+						if (key_idx > 0) {
+							key = entry.getKey().substring(key_idx+1);
+							subnode = entry.getKey().substring(0, key_idx);
+						}
+						log.info("Saving property to repository: "
+							+ "root=" + new_comp_name
+							+ ", subnode=" + subnode
+							+ ", key=" + key
+							+ ", value=" + entry.getValue());
+						repository.set(new_comp_name, subnode, key, entry.getValue());
+					} // end of for (Map.Entry entry: prop.entrySet())
+					// And load the component itself.....
+					// Set class name for the component
+					repository.set(routerCompName, "/components/msg-receivers",
+						new_comp_name + ".class", new_comp_class);
+					// Activate the component
+					repository.set(routerCompName, "/components/msg-receivers",
+						new_comp_name + ".active", true);
+					// Add to the list of automaticaly loaded components
+					setValue(routerCompName + "/components/msg-receivers/id-names",
+						new_comp_name, true, false, null);
+					//repository.sync();
+					setup(routerCompName);
+				} // end of if (admin)
+			}
+			Command.addNote(result, "New component vreated: " + new_comp_name);
+			Command.addFieldValue(result, "Note",
+				"New component created: " + new_comp_name, "fixed");
+		} catch (Exception e) {
+			log.log(Level.SEVERE, "Problem instantiating component:", e);
+			Command.addFieldValue(result, "Component class",
+				"ERROR!! Problem instantiating component, "
+				+ "look in log file for details...",
+				"text-single", "Component class");
+		} // end of try-catch
+	}
+
+	private void newComponentCommand(Packet packet, Packet result, boolean admin) {
+		String params_set = Command.getFieldValue(packet, "Params set");
+		if (params_set != null) {
+			createNewComponent(packet, result, admin);
+			return;
+		} // end of if (params_set != null)
+		String new_comp_name = Command.getFieldValue(packet, "Component name");
+		String new_comp_class = Command.getFieldValue(packet, "Component class");
+		if (!checkComponentName(result, new_comp_name)) {
+			return;
+		} // end of if (!checkComponentName(new_comp_name))
+		Command.setStatus(result, "executing");
+		Command.addAction(result, "prev");
+		Command.addFieldValue(result, "Component name",	new_comp_name,	"hidden");
+		Command.addFieldValue(result, "Component class", new_comp_class, "hidden");
+		Command.addFieldValue(result, "Info1",	"Press:", "fixed");
+		Command.addFieldValue(result, "Info2",
+			"1. 'Finish' to create component with this parameters.", "fixed");
+		Command.addFieldValue(result, "Info3",
+			"2. 'Previous' to go back and select different component.", "fixed");
+		try {
+			MessageReceiver mr =
+				(MessageReceiver)Class.forName(new_comp_class).newInstance();
+			Command.addFieldValue(result, "Info4",
+				"Component name: " + new_comp_name
+				+ ", class: " + mr.getClass().getSimpleName(), "fixed");
+			if (mr instanceof ConnectionManager) {
+				String ports = Command.getFieldValue(packet, "TCP/IP ports");
+				if (ports == null) {
+					Command.addAction(result, "next");
+					Command.addFieldValue(result, "Info4",
+						"This component uses TCP/IP ports, please provide port numbers:",
+						"fixed");
+					Command.addFieldValue(result, "TCP/IP ports", "1234, 5678");
+					return;
+				} else {
+					String[] ports_arr = ports.split(",");
+					int[] ports_i = new int[ports_arr.length];
+					try {
+						for (int i = 0; i < ports_arr.length; i++) {
+							ports_i[i] = Integer.decode(ports_arr[i].trim());
+						} // end of for (int i = 0; i < ports_arr.length; i++)
+						defConfigParams.put(new_comp_name + "/connections/ports", ports_i);
+					} catch (Exception e) {
+						Command.addFieldValue(result, "Info4",
+							"Incorrect TCP/IP ports provided, please provide port numbers:",
+							"fixed");
+						Command.addFieldValue(result, "TCP/IP ports", ports);
+						return;
+					} // end of try-catch
+				} // end of else
+			}
+			Command.addAction(result, "complete");
+			mr.setName(new_comp_name);
+			if (mr instanceof Configurable) {
+				// Load defaults into sorted Map:
+				Map<String, Object> comp_props =
+					new TreeMap<String, Object>(((Configurable)mr).
+						getDefaults(defConfigParams));
+				for (Map.Entry<String, Object> entry: comp_props.entrySet()) {
+					Command.addFieldValue(result, XMLUtils.escape(entry.getKey()),
+						XMLUtils.escape(objectToString(entry.getValue())));
+				} // end of for (Map.Entry entry: prop.entrySet())
+			} else {
+				Command.addFieldValue(result, "Info6",
+					"Component is not configurable, do you want to create it?", "fixed");
+			} // end of else
+			Command.addFieldValue(result, "Params set", "true", "hidden");
+		} catch (Exception e) {
+			log.log(Level.SEVERE, "Problem instantiating component:", e);
+			Command.addFieldValue(result, "Component class",
+				"ERROR!! Problem instantiating component, "
+				+ "look in log file for details...",
+				"text-single", "Component class");
+		} // end of try-catch
+	}
+
 	private void prepareConfigData(Packet result, String comp_name) {
+		if (comp_name.equals("--none--")) {
+			newComponentCommand(result);
+			return;
+		} // end of if (comp_name.equals("--none--"))
 		Command.setStatus(result, "executing");
 		Command.addAction(result, "complete");
 		// Let's try to sort them to make it easier to find options on
@@ -666,6 +905,10 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 
 	private void updateConfigChanges(Packet packet, Packet result,
 		String comp_name, boolean admin) {
+		if (comp_name.equals("--none--")) {
+			newComponentCommand(packet, result, admin);
+			return;
+		} // end of if (comp_name.equals("--none--"))
 		Command.addNote(result, "You changed following settings:");
 		Command.addFieldValue(result, "Note",
 			"You changed following settings:", "fixed");
@@ -703,7 +946,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 		Object result = null;
 		try {
 			if (admin) {
-				result = setValue(key, val, false, false);
+				result = setValue(key, val, false, false, null);
 			}
 			if (result != null) {
 				Command.addFieldValue(result_pack, XMLUtils.escape(key),

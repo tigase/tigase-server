@@ -66,11 +66,11 @@ public class ComponentConnectionManager extends ConnectionManager
   public static final String SECRET_PROP_KEY = "secret";
   public static String SECRET_PROP_VAL =	"someSecret";
 	public static final String PORT_LOCAL_HOST_PROP_KEY = "local-host";
-	public static String PORT_LOCAL_HOST_PROP_VAL = "comp_1.localhost";
-	public static String PORT_REMOTE_HOST_PROP_VAL = "localhost";
+	public static String PORT_LOCAL_HOST_PROP_VAL = "localhost";
+	public static String PORT_REMOTE_HOST_PROP_VAL = "comp_1.localhost";
 	public static final String PORT_ROUTING_TABLE_PROP_KEY = "routing-table";
 	public static String[] PORT_ROUTING_TABLE_PROP_VAL =
-	{ PORT_REMOTE_HOST_PROP_VAL };
+	{ ".*" + PORT_REMOTE_HOST_PROP_VAL };
 	public static String[] PORT_IFC_PROP_VAL = {"*"};
 	public static final String PACK_ROUTED_KEY = "pack-routed";
 	public static boolean PACK_ROUTED_VAL = false;
@@ -181,6 +181,7 @@ public class ComponentConnectionManager extends ConnectionManager
 			PORT_TYPE_PROP_VAL = ConnectionType.connect;
 			PORT_IFC_PROP_VAL = new String[] {"localhost"};
 		}
+		boolean def_found = false;
 		for (String key: params.keySet()) {
 			String gen_ext_comp = GEN_EXT_COMP;
 			if (key.startsWith(GEN_EXT_COMP)) {
@@ -189,6 +190,7 @@ public class ComponentConnectionManager extends ConnectionManager
 					gen_ext_comp = key;
 				} // end of if (getName().endsWith(end))
 				if (params.get(gen_ext_comp) != null) {
+					def_found = true;
 					String[] comp_params = ((String)params.get(gen_ext_comp)).split(",");
 					int idx = 0;
 					if (comp_params.length >= idx + 1) {
@@ -232,8 +234,14 @@ public class ComponentConnectionManager extends ConnectionManager
 					}
 					break;
 				}
-			} // end of if (key.startsWith(GEN_EXT_COMP))
+			}
 		}
+		if (!def_found) {
+			PORT_LOCAL_HOST_PROP_VAL = "localhost";
+			PORT_REMOTE_HOST_PROP_VAL = getName() + ".localhost";
+			PORT_ROUTING_TABLE_PROP_VAL =
+				new String[] { ".*" + PORT_REMOTE_HOST_PROP_VAL };
+		} // end of if (!def_found)
 		Map<String, Object> props = super.getDefaults(params);
 		props.put(PACK_ROUTED_KEY, PACK_ROUTED_VAL);
 		props.put(RETURN_SERVICE_DISCO_KEY, RETURN_SERVICE_DISCO_VAL);

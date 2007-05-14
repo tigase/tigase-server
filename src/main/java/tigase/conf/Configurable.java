@@ -84,6 +84,8 @@ public interface Configurable extends ServerComponent {
 	public static final String LIBRESOURCE_REPO_URL_PROP_VAL =
 		"jdbc:postgresql://localhost/libresource?user=demo";
 
+	public static final String ROUTER_COMP_CLASS_NAME =
+		"tigase.server.MessageRouter";
 	public static final String C2S_COMP_CLASS_NAME =
 		"tigase.server.xmppclient.ClientConnectionManager";
 	public static final String S2S_COMP_CLASS_NAME =
