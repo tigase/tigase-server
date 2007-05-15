@@ -156,7 +156,7 @@ public interface ReceiverTaskIfc {
 	 * method for more details.
 	 *
 	 * @return a <code>String</code> value of task instance JID,
-	 * @see setJID
+	 * @see #setJID(String)
 	 */
 	String getJID();
 
@@ -170,7 +170,7 @@ public interface ReceiverTaskIfc {
 	 * The description is set via properties using <code>DESCRIPTION_PROP_KEY</code>.
 	 *
 	 * @return a <code>String</code> value of task instance description;
-	 * @see DESCRIPTION_PROP_KEY
+	 * @see #DESCRIPTION_PROP_KEY
 	 */
 	String getDescription();
 
@@ -189,7 +189,7 @@ public interface ReceiverTaskIfc {
 	 * to corresponding <code>set</code> method.
 	 *
 	 * @return a <code>Map</code> value with task instance configuration parameters.
-	 * @see setParams
+	 * @see #setParams(Map)
 	 */
 	Map<String, Object> getParams();
 
@@ -205,7 +205,7 @@ public interface ReceiverTaskIfc {
 	 * to <code>setParams</code> method.
 	 *
 	 * @return a <code>Map</code> value with task instance configuration parameters.
-	 * @see setParams
+	 * @see #setParams(Map)
 	 */
 	Map<String, Object> getDefaultParams();
 
