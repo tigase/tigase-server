@@ -39,7 +39,7 @@ public class XMPPServer {
 	public static final String NAME = "Tigase";
 
 	private static String config_file = "tigase-config.xml";
-	private static String server_name = "tigase-xmpp-server";
+	private static String server_name = "message-router";
   private static boolean debug = false;
   private static boolean monit = false;
 	private static String tigaseVersion = null;
