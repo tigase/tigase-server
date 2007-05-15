@@ -36,8 +36,8 @@ import tigase.xmpp.XMPPResourceConnection;
 
 /**
  * XEP-0199: XMPP Ping
- * 
- * 
+ *
+ *
  * @author <a href="mailto:bmalkow@tigase.org">Bartosz Małkowski</a>
  * @version $Rev$
  */
