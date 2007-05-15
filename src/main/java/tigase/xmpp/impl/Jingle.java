@@ -70,9 +70,9 @@ public class Jingle extends XMPPProcessor implements XMPPProcessorIfc {
 	 * Describe <code>process</code> method here.
 	 *
 	 * @param packet a <code>Packet</code> value
-	 * @param XMPPResourceConnection a <code>XMPPResourceConnection</code> value
-	 * @param nonAuthUserRepository a <code>NonAuthUserRepository</code> value
-	 * @param queue a <code>Queue</code> value
+	 * @param conn a <code>XMPPResourceConnection</code> value
+	 * @param nonAuthUserRepo a <code>NonAuthUserRepository</code> value
+	 * @param results a <code>Queue</code> value
 	 */
 	public void process(final Packet packet, final XMPPResourceConnection conn,
 		final NonAuthUserRepository nonAuthUserRepo, final Queue<Packet> results) {
