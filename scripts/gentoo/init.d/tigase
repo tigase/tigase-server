@@ -1,0 +1,31 @@
+#!/sbin/runscript
+
+#TIGASE_ENV="JAVA_HOME=${JAVA_HOME} JAVA_OPTIONS=\"${JAVA_OPTIONS}\""
+#TIGASE_ENV="${TIGASE_ENV} TIGASE_HOME=${TIGASE_HOME} TIGASE_CONFIG=${TIGASE_CONFIG}"
+#TIGASE_ENV="${TIGASE_ENV} TIGASE_OPTIONS=${TIGASE_OPTIONS}"
+
+depend() {
+	need net
+	use dns logger postgresql mysql
+}
+
+start()	{
+	ebegin "Starting Tigase"
+	su - ${TIGASE_USER} -c "${TIGASE_ENV} ${TIGASE_HOME}/bin/tigase.sh start ${TIGASE_HOME}/${TIGASE_CONF}"
+	eend $?
+}
+
+stop ()	{
+	ebegin "Stopping Tigase"
+	su - ${TIGASE_USER} -c "${TIGASE_ENV} ${TIGASE_HOME}/bin/tigase.sh stop ${TIGASE_HOME}/${TIGASE_CONF}"
+	sleep 2
+	eend $?
+}
+
+svc_restart () {
+	ebegin "Restarting Tigase"
+	su - ${TIGASE_USER} -c "${TIGASE_ENV} ${TIGASE_HOME}/bin/tigase.sh stop ${TIGASE_HOME}/${TIGASE_CONF}"
+	sleep 5
+	su - ${TIGASE_USER} -c "${TIGASE_ENV} ${TIGASE_HOME}/bin/tigase.sh start ${TIGASE_HOME}/${TIGASE_CONF}"
+	eend $?
+}

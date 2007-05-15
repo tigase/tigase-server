@@ -114,6 +114,8 @@ done
 
 TIGASE_CMD="${JAVA} ${JAVA_OPTIONS} -cp ${CLASSPATH} ${TIGASE_RUN}"
 
+cd "${TIGASE_HOME}"
+
 case "${1}" in
   start)
     echo "Starting Tigase: "

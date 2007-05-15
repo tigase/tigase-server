@@ -1,0 +1,3 @@
+TIGASE_HOME="/home/tigase/tigase-server"
+TIGASE_USER=tigase
+TIGASE_CONF="etc/tigase.conf"
