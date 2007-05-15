@@ -100,6 +100,7 @@
       <delete dir="dist"/>
       <mkdir dir="${dist}/@{packagename}-${version}/${jars}"/>
       <mkdir dir="${dist}/@{packagename}-${version}/bin"/>
+      <mkdir dir="${dist}/@{packagename}-${version}/bin/gentoo"/>
       <copy
         file="${jars}/@{packagename}.jar"
         tofile="${dist}/@{packagename}-${version}/${jars}/@{packagename}.jar"/>
@@ -144,6 +145,9 @@
       <copy
         file="scripts/repo.sh"
         tofile="${dist}/@{packagename}-${version}/bin/repo.sh"/>
+      <copy todir="${dist}/@{packagename}-${version}/bin/gentoo">
+        <fileset dir="scripts/gentoo"/>
+      </copy>
       <move todir="${dist}/@{packagename}-${version}/docs">
         <fileset dir="@{docsdir}"/>
       </move>
