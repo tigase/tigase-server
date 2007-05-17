@@ -109,11 +109,10 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 		ServiceEntity item = new ServiceEntity(getName(), "--none--",
 			"Add new component...");
 		item.addFeatures(CMD_FEATURES);
-		item.addIdentities(new ServiceIdentity[] {
-				new ServiceIdentity("automation", "command-node",
-					"Add new component...")});
-		config_set.addItems(new ServiceEntity[] {item});
-		serviceEntity.addItems(new ServiceEntity[] {config_list, config_set});
+		item.addIdentities(new ServiceIdentity("automation", "command-node",
+					"Add new component..."));
+		config_set.addItems(item);
+		serviceEntity.addItems(config_list, config_set);
 	}
 
 	public void parseArgs(final String[] args) {
@@ -676,8 +675,6 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 		Command.addFieldValue(result, "Info",	"Press:", "fixed");
 		Command.addFieldValue(result, "Info",
 			"'Next' to set all parameters for the new component.", "fixed");
-		Command.addFieldValue(result, "Info",
-			"'Finish' to create component with default parameters.", "fixed");
 		Command.setStatus(result, "executing");
 		Command.addAction(result, "next");
 		Command.addFieldValue(result, "Component name",
@@ -807,6 +804,11 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 
 	private void newComponentCommand(Packet packet, Packet result, boolean admin) {
 		String params_set = Command.getFieldValue(packet, "Params set");
+		if (Command.getAction(packet) != null &&
+			Command.getAction(packet).equals("prev")) {
+			newComponentCommand(result);
+			return;
+		} // end of if ()
 		if (params_set != null) {
 			createNewComponent(packet, result, admin);
 			return;
@@ -817,14 +819,9 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 			return;
 		} // end of if (!checkComponentName(new_comp_name))
 		Command.setStatus(result, "executing");
-		Command.addAction(result, "prev");
 		Command.addFieldValue(result, "Component name",	new_comp_name,	"hidden");
 		Command.addFieldValue(result, "Component class", new_comp_class, "hidden");
 		Command.addFieldValue(result, "Info1",	"Press:", "fixed");
-		Command.addFieldValue(result, "Info2",
-			"1. 'Finish' to create component with this parameters.", "fixed");
-		Command.addFieldValue(result, "Info3",
-			"2. 'Previous' to go back and select different component.", "fixed");
 		try {
 			MessageReceiver mr =
 				(MessageReceiver)Class.forName(new_comp_class).newInstance();
@@ -834,11 +831,16 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 			if (mr instanceof ConnectionManager) {
 				String ports = Command.getFieldValue(packet, "TCP/IP ports");
 				if (ports == null) {
+					Command.addFieldValue(result, "Info2",
+						"1. 'Next' to set more component parameters.", "fixed");
+					Command.addFieldValue(result, "Info3",
+						"2. 'Previous' to go back and select different component.", "fixed");
 					Command.addAction(result, "next");
+					Command.addAction(result, "prev");
 					Command.addFieldValue(result, "Info4",
 						"This component uses TCP/IP ports, please provide port numbers:",
 						"fixed");
-					Command.addFieldValue(result, "TCP/IP ports", "1234, 5678");
+					Command.addFieldValue(result, "TCP/IP ports", "5557");
 					return;
 				} else {
 					String[] ports_arr = ports.split(",");
@@ -849,6 +851,12 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 						} // end of for (int i = 0; i < ports_arr.length; i++)
 						defConfigParams.put(new_comp_name + "/connections/ports", ports_i);
 					} catch (Exception e) {
+						Command.addFieldValue(result, "Info2",
+							"1. 'Next' to set more component parameters.", "fixed");
+						Command.addFieldValue(result, "Info3",
+							"2. 'Previous' to go back and select different component.", "fixed");
+						Command.addAction(result, "next");
+						Command.addAction(result, "prev");
 						Command.addFieldValue(result, "Info4",
 							"Incorrect TCP/IP ports provided, please provide port numbers:",
 							"fixed");
@@ -857,7 +865,12 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 					} // end of try-catch
 				} // end of else
 			}
+			Command.addFieldValue(result, "Info2",
+				"1. 'Finish' to create component with this parameters.", "fixed");
+			Command.addFieldValue(result, "Info3",
+				"2. 'Previous' to go back and select different component.", "fixed");
 			Command.addAction(result, "complete");
+			Command.addAction(result, "prev");
 			mr.setName(new_comp_name);
 			if (mr instanceof Configurable) {
 				// Load defaults into sorted Map:
