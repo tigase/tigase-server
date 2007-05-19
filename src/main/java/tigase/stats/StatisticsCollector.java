@@ -165,6 +165,7 @@ public class StatisticsCollector
 					}
 				}
 				Command.addFieldValue(result, "Stats level", statsLevel.getName(),
+					"Stats level",
 					new String[] {Level.INFO.getName(), Level.FINE.getName(),
 												Level.FINER.getName(), Level.FINEST.getName()},
 					new String[] {Level.INFO.getName(), Level.FINE.getName(),
