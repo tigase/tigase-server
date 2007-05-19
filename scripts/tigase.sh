@@ -158,7 +158,7 @@ case "${1}" in
       exit 1
     fi
 
-    exec $TIGASE_CMD
+    sh -c "exec $TIGASE_CMD"
     ;;
 
   check)
