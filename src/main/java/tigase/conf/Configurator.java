@@ -53,6 +53,7 @@ import tigase.server.Packet;
 import tigase.server.Permissions;
 import tigase.server.ServerComponent;
 import tigase.util.ClassUtil;
+import tigase.util.JID;
 import tigase.xml.Element;
 import tigase.xml.XMLUtils;
 import tigase.xml.db.Types.DataType;
@@ -234,9 +235,12 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 		defaults.put(LOGGING_KEY + "tigase.useParentHandlers", "true");
 		if (params.get(GEN_DEBUG) != null) {
 			defaults.put(LOGGING_KEY + ".level", "INFO");
-			defaults.put(LOGGING_KEY + "tigase."+params.get(GEN_DEBUG)+".level", "ALL");
 			defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.level", "ALL");
 			defaults.put(LOGGING_KEY + "java.util.logging.ConsoleHandler.level", "ALL");
+			String[] packs = ((String)params.get(GEN_DEBUG)).split(",");
+			for (String pack: packs) {
+				defaults.put(LOGGING_KEY + "tigase."+pack+".level", "ALL");
+			} // end of for (String pack: packs)
 		}
 		defaults.put("demo-mode", demoMode);
 		return defaults;
@@ -682,15 +686,18 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 		try {
 			Set<Class<MessageReceiver>> receiv_cls =
 				ClassUtil.getClassesImplementing(MessageReceiver.class);
-			String[] receiv_cls_names = new String[receiv_cls.size()];
-			String[] receiv_cls_simple = new String[receiv_cls.size()];
+			// All message receivers except MessageRouter
+			String[] receiv_cls_names = new String[receiv_cls.size()-1];
+			String[] receiv_cls_simple = new String[receiv_cls.size()-1];
 			int idx = 0;
 			for (Class<MessageReceiver> reciv: receiv_cls) {
-				receiv_cls_names[idx] = reciv.getName();
-				receiv_cls_simple[idx++] = reciv.getSimpleName();
+				if (!reciv.getName().equals(ROUTER_COMP_CLASS_NAME)) {
+					receiv_cls_names[idx] = reciv.getName();
+					receiv_cls_simple[idx++] = reciv.getSimpleName();
+				} // end of if (!reciv.getName().equals(ROUTER_COMP_CLASS_NAME))
 			} // end of for (MessageReceiver.class reciv: receiv_cls)
 			Command.addFieldValue(result, "Component class", EXT_COMP_CLASS_NAME,
-				receiv_cls_simple, receiv_cls_names);
+				"Component class", receiv_cls_simple, receiv_cls_names);
 		} catch (Exception e) {
 			log.log(Level.SEVERE, "Problem loading MessageReceiver implementations", e);
 			Command.addFieldValue(result, "Component class",
@@ -700,40 +707,30 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 		} // end of try-catch
 	}
 
-	private boolean isValidCompName(String name) {
-		return !(name.contains(" ")
-			|| name.contains("\t")
-			|| name.contains("@")
-			|| name.contains("&"));
-	}
+// 	private boolean isValidCompName(String name) {
+// 		return !(name.contains(" ")
+// 			|| name.contains("\t")
+// 			|| name.contains("@")
+// 			|| name.contains("&"));
+// 	}
 
 	private boolean checkComponentName(Packet result, String name) {
-		if (name == null || name.length() == 0) {
+		String msg = JID.checkNickName(name);
+		if (msg != null) {
 			Command.addFieldValue(result, "Info",
-				"Note!! Missing component name, please provide valid component name.",
-				"fixed");
+				"Note!! " + msg + ", please provide valid component name.", "fixed");
 			newComponentCommand(result);
 			return false;
 		} // end of if (new_comp_name == null || new_comp_name.length() == 0)
-		if (!isValidCompName(name)) {
-			Command.addFieldValue(result, "Info",
-				"Note!! Incorrect component name, contains invalid characters.",
-				"fixed");
-			Command.addFieldValue(result, "Info",
-				"Please provide correct component name.",	"fixed");
-			newComponentCommand(result);
-			return false;
-		} // end of if (!isValidCompName(new_comp_name))
 		String[] comp_names = getComponents();
 		for (String comp_name: comp_names) {
 			if (comp_name.equals(name)) {
 				Command.addFieldValue(result, "Info",
-					"Note!! Component with provided name already exist.",
-					"fixed");
+					"Note!! Component with provided name already exists.",	"fixed");
 				Command.addFieldValue(result, "Info",
 					"Please provide different component name.",	"fixed");
 				newComponentCommand(result);
-			return false;
+				return false;
 			} // end of if (comp_name.equals(new_comp_name))
 		} // end of for (String comp_name: comp_names)
 		return true;
