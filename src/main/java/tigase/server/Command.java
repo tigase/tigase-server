@@ -177,7 +177,7 @@ public enum Command {
 	}
 
 	public static void addFieldValue(final Packet packet,
-		final String f_name, final String f_value,
+		final String f_name, final String f_value, final String label,
 		final String[] labels, final String[] options) {
 		Element iq = packet.getElement();
 		Element command = iq.getChild("command");
@@ -190,8 +190,8 @@ public enum Command {
 		}
 		Element field = new Element("field",
 			new Element[] {new Element("value", f_value)},
-			new String[] {"var", "type"},
-			new String[] {f_name, "list-single"});
+			new String[] {"var", "type", "label"},
+			new String[] {f_name, "list-single", label});
 		for (int i = 0; i < labels.length; i++) {
 			field.addChild(new Element("option",
 					new Element[] {new Element("value", options[i])},
