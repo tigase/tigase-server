@@ -258,13 +258,6 @@ public class SessionManager extends AbstractMessageReceiver
 		}
 	}
 
-	private void addOutPackets(Queue<Packet> packets) {
-		for (Packet res: packets) {
-			log.finest("Handling response: " + res.getStringData());
-			addOutPacket(res);
-		} // end of for ()
-	}
-
 	private boolean isAdmin(String jid) {
 		for (String adm: admins) {
 			if (adm.equals(JID.getNodeID(jid))) {
@@ -487,10 +480,7 @@ public class SessionManager extends AbstractMessageReceiver
 		for (XMPPStopListenerIfc stopProc: stopListeners.values()) {
 			stopProc.stopped(conn, results);
 		} // end of for ()
-		for (Packet res: results) {
-			log.finest("Handling response: " + res.getStringData());
-			addOutPacket(res);
-		} // end of for ()
+		addOutPackets(results);
 		conn.streamClosed();
 	}
 

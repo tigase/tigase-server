@@ -149,6 +149,20 @@ public abstract class AbstractMessageReceiver
 		return true;
 	}
 
+	protected boolean addOutPackets(Queue<Packet> packets) {
+		Packet p = null;
+		boolean result = true;
+		while ((p = packets.peek()) != null) {
+			result = addOutPacket(p);
+			if (result) {
+				packets.poll();
+			} else {
+				return false;
+			} // end of if (result) else
+		} // end of while ()
+    return true;
+	}
+
   public abstract void processPacket(Packet packet);
 
   public List<StatRecord> getStatistics() {
