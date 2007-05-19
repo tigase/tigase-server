@@ -39,69 +39,6 @@ import tigase.server.Packet;
  */
 public interface ReceiverTaskIfc {
 
-	public enum SubscrRestrictions {
-		PUBLIC,	LOCAL, REGEX, MODERATED;
-	};
-	public enum MessageType {
-		CHAT, HEADLINE, NORMAL;
-	};
-	public enum SenderRestrictions {
-		ALL, SUBSCRIBED, OWNER, LIST;
-	};
-
-// 	/**
-// 	 * Constant <code>SUBSCR_LIST_PROP_KEY</code> is a property key for task
-// 	 * instance configuration parameters. With this property you can provide
-// 	 * task with initial list of subscribers. These users however must accept
-// 	 * subscription first before any message is delivered to them. So you
-// 	 * can't force ppl to receive any messages using this setting.
-// 	 */
-// 	public static final String SUBSCR_LIST_PROP_KEY =
-// 		"subscription-list-key";
-// 	/**
-// 	 * Constant <code>SUBSCR_LIST_PROP_KEY</code> is a property value for a key
-// 	 * <strong>SUBSCR_LIST_PROP_KEY</strong>. Please refer to key description
-// 	 * for more details. Default value is an empty String array.
-// 	 */
-// 	public static final String[] SUBSCR_LIST_PROP_VAL = {};
-	/**
-	 * Constant <code>SUBSCR_RESTRICTIONS_PROP_KEY</code> is a property key for task
-	 * instance configuration parameters. With this property you can decide who
-	 * can subscribe to the task. Default value is <strong>PUBLIC</strong> so anybody
-	 * can subscribe.
-	 */
-	public static final String SUBSCR_RESTRICTIONS_PROP_KEY =
-		"subscription-restrictions-key";
-	public static final SubscrRestrictions SUBSCR_RESTRICTIONS_PROP_VAL =
-		SubscrRestrictions.PUBLIC;
-	public static final String ALLOWED_SENDERS_PROP_KEY = "allowed-senders";
-	public static final SenderRestrictions ALLOWED_SENDERS_PROP_VAL =
-		SenderRestrictions.SUBSCRIBED;
-	public static final String MESSAGE_TYPE_PROP_KEY = "message-type";
-	public static final MessageType MESSAGE_TYPE_PROP_VAL = MessageType.CHAT;
-	public static final String SUBSCR_RESTR_REGEX_PROP_KEY = "subscription-regex";
-	public static final String SUBSCR_RESTR_REGEX_PROP_VAL = ".*";
-	public static final String ONLINE_ONLY_PROP_KEY = "online-users-only";
-	public static final Boolean  ONLINE_ONLY_PROP_VAL = false;
-	public static final String REPLACE_SENDER_PROP_KEY = "replace-sender";
-	public static final Boolean REPLACE_SENDER_PROP_VAL = true;
-	public static final String ALLOWED_SENDERS_LIST_PROP_KEY =
-		"allowed-senders-list";
-	public static final String ALLOWED_SENDERS_LIST_PROP_VAL = "";
-	/**
-	 * Constant <code>DESCRIPTION_PROP_KEY</code> is a description for task instance.
-	 * Let's say the user want's to create new <em>Interest group</em> for
-	 * cyclists. This property allows to set some more detailed information about
-	 * the group like: <em>This is group of ppl interested in mountain cycling
-	 * near Cambridge.</em>
-	 */
-	public static final String DESCRIPTION_PROP_KEY = "description";
-	public static final String DESCRIPTION_PROP_VAL = "Abstract receiver task";
-	public static final String TASK_OWNER_PROP_KEY = "task-owner";
-	public static final String TASK_OWNER_PROP_VAL = "admin@localhost";
-
-	public static final String USER_REPOSITORY_PROP_KEY = "user-repository";
-
 	/**
 	 * <code>getType</code> method returns the task type name. This
 	 * name is displayed on the list of all tasks available for creation.
@@ -207,7 +144,18 @@ public interface ReceiverTaskIfc {
 	 * @return a <code>Map</code> value with task instance configuration parameters.
 	 * @see #setParams(Map)
 	 */
-	Map<String, Object> getDefaultParams();
+	Map<String, PropertyItem> getDefaultParams();
+
+	/**
+	 * <code>init</code> method initializes task. It allows also for a task to
+	 * send initial stanzas to user like <code>available</code>
+	 * <strong>presence</strong> or any other stanza which does make sense to
+	 * send at startup time.
+	 *
+	 * @param results a <code>Queue<Packet></code> is a collection of
+	 * result packets to send out.
+	 */
+	void init(Queue<Packet> results);
 
 	/**
 	 * <code>processPacket</code> method takes a packet addressed to this task

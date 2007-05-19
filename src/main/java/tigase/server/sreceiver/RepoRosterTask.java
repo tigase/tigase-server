@@ -28,6 +28,8 @@ import java.util.logging.Logger;
 import tigase.db.TigaseDBException;
 import tigase.db.UserRepository;
 
+import static tigase.server.sreceiver.PropertyConstants.*;
+
 /**
  * Describe class RepoRosterTask here.
  *
@@ -39,7 +41,7 @@ import tigase.db.UserRepository;
  */
 public abstract class RepoRosterTask extends AbstractReceiverTask {
 
-  private static Logger log =
+	private static Logger log =
 		Logger.getLogger("tigase.server.sreceiver.RepoRosterTask");
 
 	private boolean loaded = false;

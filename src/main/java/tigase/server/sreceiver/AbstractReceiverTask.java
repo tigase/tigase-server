@@ -23,6 +23,7 @@
 package tigase.server.sreceiver;
 
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.HashMap;
 import java.util.Queue;
 import java.util.logging.Level;
@@ -33,6 +34,8 @@ import tigase.server.Packet;
 import tigase.util.JID;
 import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
+
+import static tigase.server.sreceiver.PropertyConstants.*;
 
 /**
  * Describe class AbstractReceiverTask here.
@@ -192,14 +195,19 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 	 */
 	public void addNewSubscribers(Queue<Packet> results, String... new_subscr) {
 		for (String buddy: new_subscr) {
+			Packet presence = null;
 			if (isAllowedToSubscribe(buddy)) {
 				if (getRosterItem(buddy) == null) {
 					addToRoster(buddy);
 				} // end of if (getRosterItem(buddy) == null)
-				results.offer(new Packet("presence", jid, buddy, StanzaType.subscribe));
+				log.info("Adding buddy to roster: " + buddy);
+				presence = getPresence(buddy, jid, StanzaType.subscribe);
 			} else {
-				results.offer(new Packet("presence", jid, buddy, StanzaType.unsubscribed));
+				log.info("Not allowed to subscribe, rejecting: " + buddy);
+				presence = getPresence(buddy, jid, StanzaType.unsubscribed);
 			} // end of else
+			log.finest("Sending back: " + presence.toString());
+			results.offer(presence);
 		} // end of for (String buddy: new_subscr)
 	}
 
@@ -207,7 +215,8 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 		for (String buddy: new_subscr) {
 			RosterItem ri = removeFromRoster(buddy);
 			if (ri != null) {
-				results.offer(new Packet("presence", jid, buddy, StanzaType.unsubscribed));
+				log.info("Removing buddy from roster: " + buddy);
+				results.offer(getPresence(buddy, jid, StanzaType.unsubscribed));
 			} // end of if (getRosterItem(buddy) == null)
 		} // end of for (String buddy: new_subscr)
 	}
@@ -271,24 +280,65 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 		return props;
 	}
 
-	public Map<String, Object> getDefaultParams() {
-		Map<String, Object> defs = new HashMap<String, Object>();
+	public Map<String, PropertyItem> getDefaultParams() {
+		Map<String, PropertyItem> defs = new TreeMap<String, PropertyItem>();
 		defs.put(SUBSCR_RESTRICTIONS_PROP_KEY,
-			SUBSCR_RESTRICTIONS_PROP_VAL.toString());
+			new PropertyItem(SUBSCR_RESTRICTIONS_PROP_KEY,
+				SUBSCR_RESTRICTIONS_DISPL_NAME,
+				SUBSCR_RESTRICTIONS_PROP_VAL));
 		defs.put(MESSAGE_TYPE_PROP_KEY,
-			MESSAGE_TYPE_PROP_VAL.toString());
+			new PropertyItem(MESSAGE_TYPE_PROP_KEY,
+				MESSAGE_TYPE_DISPL_NAME,
+				MESSAGE_TYPE_PROP_VAL));
 		defs.put(ALLOWED_SENDERS_PROP_KEY,
-			ALLOWED_SENDERS_PROP_VAL.toString());
+			new PropertyItem(ALLOWED_SENDERS_PROP_KEY,
+				ALLOWED_SENDERS_DISPL_NAME,
+				ALLOWED_SENDERS_PROP_VAL));
 		defs.put(SUBSCR_RESTR_REGEX_PROP_KEY,
-			SUBSCR_RESTR_REGEX_PROP_VAL.toString());
-		defs.put(ONLINE_ONLY_PROP_KEY, ONLINE_ONLY_PROP_VAL.toString());
+			new PropertyItem(SUBSCR_RESTR_REGEX_PROP_KEY,
+				SUBSCR_RESTR_REGEX_DISPL_NAME,
+				SUBSCR_RESTR_REGEX_PROP_VAL));
+		defs.put(ONLINE_ONLY_PROP_KEY,
+			new PropertyItem(ONLINE_ONLY_PROP_KEY,
+				ONLINE_ONLY_DISPL_NAME,
+				ONLINE_ONLY_PROP_VAL));
 		defs.put(REPLACE_SENDER_PROP_KEY,
-			REPLACE_SENDER_PROP_VAL.toString());
+			new PropertyItem(REPLACE_SENDER_PROP_KEY,
+				REPLACE_SENDER_DISPL_NAME,
+				REPLACE_SENDER_PROP_VAL));
 		defs.put(ALLOWED_SENDERS_LIST_PROP_KEY,
-			ALLOWED_SENDERS_LIST_PROP_VAL.toString());
+			new PropertyItem(ALLOWED_SENDERS_LIST_PROP_KEY,
+				ALLOWED_SENDERS_LIST_DISPL_NAME,
+				ALLOWED_SENDERS_LIST_PROP_VAL));
 		defs.put(DESCRIPTION_PROP_KEY,
-			DESCRIPTION_PROP_VAL.toString());
+			new PropertyItem(DESCRIPTION_PROP_KEY,
+				DESCRIPTION_DISPL_NAME,
+				DESCRIPTION_PROP_VAL));
 		return defs;
+	}
+
+	public Packet getPresence(String to, String from, StanzaType type) {
+		Element presence = new Element("presence",
+			//<x xmlns="vcard-temp:x:update"><nickname>tus</nickname></x>
+			//<nick xmlns="http://jabber.org/protocol/nick">tus</nick>
+			new Element[] {new Element("nick", JID.getNodeNick(jid),
+					new String[] {"xmlns"},
+					new String[] {"http://jabber.org/protocol/nick"})},
+			new String[] {"to", "from", "type"},
+			new String[] {to, from, type.toString()});
+		return new Packet(presence);
+	}
+
+	public void init(final Queue<Packet> results) {
+		for (RosterItem ri: roster.values()) {
+			Packet presence = null;
+			if (ri.isSubscribed()) {
+				presence = getPresence(ri.getJid(), jid, StanzaType.available);
+			} else {
+				presence = getPresence(ri.getJid(), jid, StanzaType.subscribe);
+			} // end of if (ri.isSubscribed()) else
+			results.offer(presence);
+		}
 	}
 
 	/**
@@ -298,6 +348,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 	 * @param results a <code>Queue</code> value
 	 */
 	public void processPacket(final Packet packet, final Queue<Packet> results) {
+		log.finest("Processing packet: " + packet.toString());
 		if (packet.getElemName().equals("presence")) {
 			processPresence(packet, results);
 		} // end of if (packet.getElemName().equals("presence))
@@ -312,29 +363,28 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 			presence_type = packet.getType();
 		}
 		RosterItem ri = getRosterItem(packet.getElemFrom());
+		Packet presence = null;
 		switch (presence_type) {
 		case available:
 			if (ri != null) {
 				setRosterItemOnline(ri, true);
-				results.offer(new Packet("presence", jid, packet.getElemFrom(),
-						StanzaType.available));
+				presence = getPresence(packet.getElemFrom(), jid, StanzaType.available);
 			} // end of if (ri != null)
 			break;
 		case unavailable:
 			if (ri != null) {
 				setRosterItemOnline(ri, false);
-				results.offer(new Packet("presence", jid, packet.getElemFrom(),
-						StanzaType.unavailable));
+				presence = getPresence(packet.getElemFrom(), jid, StanzaType.unavailable);
 			} // end of if (ri != null)
 			break;
 		case subscribe:
 			addNewSubscribers(results, packet.getElemFrom());
+			presence = getPresence(packet.getElemFrom(), jid, StanzaType.subscribed);
 			break;
 		case subscribed:
 			if (ri != null) {
 				setRosterItemSubscribed(ri, true);
-				results.offer(new Packet("presence", jid, packet.getElemFrom(),
-						StanzaType.available));
+				presence = getPresence(packet.getElemFrom(), jid, StanzaType.available);
 			} // end of if (ri != null)
 			break;
 		case unsubscribe:
@@ -344,6 +394,10 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 		default:
 			break;
 		} // end of switch (packet.getType())
+		if (presence != null) {
+			log.finest("Sending back: " + presence.toString());
+			results.offer(presence);
+		} // end of if (presence != null)
 	}
 
 	private void processMessage(Packet packet, Queue<Packet> results) {

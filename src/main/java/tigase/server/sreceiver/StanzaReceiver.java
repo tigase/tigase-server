@@ -34,20 +34,21 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.conf.Configurable;
 import tigase.db.RepositoryFactory;
+import tigase.db.TigaseDBException;
 import tigase.db.UserRepository;
 import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
 import tigase.disco.XMPPService;
 import tigase.server.AbstractMessageReceiver;
+import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.server.ServerComponent;
 import tigase.util.ClassUtil;
 import tigase.util.JID;
 import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
-import tigase.db.TigaseDBException;
 
-import static tigase.server.sreceiver.ReceiverTaskIfc.*;
+import static tigase.server.sreceiver.PropertyConstants.*;
 
 /**
  * This is a sibbling of <code>StanzaSender</code> class and offers just
@@ -130,8 +131,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	implements Configurable, XMPPService {
 
 	public static final String TASKS_LIST_PROP_KEY = "tasks-list";
-	public static final String[] TASKS_LIST_PROP_VAL =
-	{"development-news", "service-news"};
+	public static final String[] TASKS_LIST_PROP_VAL = {"development-news"};
 	public static final String TASK_ACTIVE_PROP_KEY = "active";
 	public static final boolean TASK_ACTIVE_PROP_VAL = true;
 	public static final String TASK_TYPE_PROP_KEY = "task-type";
@@ -160,6 +160,9 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	private Map<String, ReceiverTaskIfc> task_instances =
 		new ConcurrentSkipListMap<String, ReceiverTaskIfc>();
 
+	private Map<String, TaskCommandIfc> commands =
+		new ConcurrentSkipListMap<String, TaskCommandIfc>();
+
 	private ServiceEntity serviceEntity = null;
 	private String[] admins = {"admin@localhost"};
 	private UserRepository repository = null;
@@ -175,61 +178,10 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		} catch (Exception e) {
       log.log(Level.SEVERE, "Can not load ReceiverTaskIfc implementations", e);
 		} // end of try-catch
-	}
-
-	/**
-	 * Describe <code>processIQPacket</code> method here.
-	 *
-	 * @param packet a <code>Packet</code> value
-	 * @return a <code>boolean</code> value
-	 */
-	private boolean processIQPacket(Packet packet) {
-		boolean processed = false;
-		Element iq = packet.getElement();
-		Element query = iq.getChild("query", INFO_XMLNS);
-		Element query_rep = null;
-		if (query != null && packet.getType() == StanzaType.get) {
-			query_rep =
-				serviceEntity.getDiscoInfo(JID.getNodeNick(packet.getElemTo()));
-			processed = true;
-		} // end of if (query != null && packet.getType() == StanzaType.get)
-		query = iq.getChild("query", ITEMS_XMLNS);
-		if (query != null && packet.getType() == StanzaType.get) {
-			query_rep = query.clone();
-			List<Element> items =
-				serviceEntity.getDiscoItems(JID.getNodeNick(packet.getElemTo()),
-					packet.getElemTo());
-			if (items != null && items.size() > 0) {
-				query_rep.addChildren(items);
-			} // end of if (items != null && items.size() > 0)
-			processed = true;
-		} // end of if (query != null && packet.getType() == StanzaType.get)
-		if (query_rep != null) {
-			addOutPacket(packet.okResult(query_rep, 0));
-		} // end of if (query_rep != null)
-		return processed;
-	}
-
-	/**
-	 * Describe <code>processPacket</code> method here.
-	 *
-	 * @param packet a <code>Packet</code> value
-	 */
-	public void processPacket(final Packet packet) {
-		log.finest("Processing packet: " + packet.toString());
-		if (packet.getElemName().equals("iq")) {
-			processIQPacket(packet);
-			return;
-		} // end of if (packet.getElemName().equals("iq"))
-		ReceiverTaskIfc task = task_instances.get(packet.getElemTo());
-		if (task != null) {
-			log.finest("Found a task for packet: " + task.getJID());
-			Queue<Packet> results = new LinkedList<Packet>();
-			task.processPacket(packet, results);
-			for (Packet res: results) {
-				addOutPacket(res);
-			} // end of for (Packet res: results)
-		} // end of if (task != null)
+		TaskCommandIfc new_task = new NewTaskCommand();
+		commands.put(new_task.getNodeName(), new_task);
+		new_task = new TaskInstanceCommand();
+		commands.put(new_task.getNodeName(), new_task);
 	}
 
 	/**
@@ -247,7 +199,17 @@ public class StanzaReceiver extends AbstractMessageReceiver
 			JID.getNodeNick(task.getJID()), task.getDescription());
 		item.addIdentities(
 			new ServiceIdentity("component", "generic", task.getJID()));
+		item.addFeatures(CMD_FEATURES);
 		serviceEntity.addItems(item);
+		Queue<Packet> results = new LinkedList<Packet>();
+		task.init(results);
+		addOutPackets(results);
+	}
+
+	protected void addTaskInstance(String task_type, String task_name,
+		Map<String, Object> task_params) {
+		addTaskInstance(createTask(task_type, task_name + "@" + myDomain(),
+					task_params));
 	}
 
 	/**
@@ -255,7 +217,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	 *
 	 * @param task a <code>ReceiverTaskIfc</code> value
 	 */
-	private void addTaskInstance(ReceiverTaskIfc task) {
+	protected void addTaskInstance(ReceiverTaskIfc task) {
 		if (task_instances.get(task.getJID()) == null) {
 			addTaskToInstances(task);
 			try {
@@ -269,8 +231,16 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		} // end of else
 	}
 
+	protected Map<String, ReceiverTaskIfc> getTaskTypes() {
+		return task_types;
+	}
+
+	protected Map<String, ReceiverTaskIfc> getTaskInstances() {
+		return task_instances;
+	}
+
 	private void loadTasksFromRepository()
-	throws TigaseDBException {
+		throws TigaseDBException {
 		String[] tasks_jids = repository.getSubnodes(myDomain(), tasks_node);
 		if (tasks_jids != null) {
 			for (String task_jid: tasks_jids) {
@@ -327,6 +297,22 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		serviceEntity = new ServiceEntity(getName(), null, "Stanza Receiver");
 		serviceEntity.addIdentities(
 			new ServiceIdentity("component", "generic", "Stanza Receiver"));
+		serviceEntity.addFeatures(DEF_FEATURES);
+		ServiceEntity com = new ServiceEntity(myDomain(), "commands",
+			"Tasks management commands");
+		com.addFeatures(DEF_FEATURES);
+		com.addIdentities(
+			new ServiceIdentity("automation", "command-list",
+				"Tasks management commands"));
+		serviceEntity.addItems(com);
+		for (TaskCommandIfc comm: commands.values()) {
+			ServiceEntity item = new ServiceEntity(myDomain(),
+				comm.getNodeName(), comm.getDescription());
+			item.addFeatures(CMD_FEATURES);
+			item.addIdentities(new ServiceIdentity("automation", "command-node",
+					comm.getDescription()));
+			com.addItems(item);
+		} // end of for (TaskCommandIfc comm: commands.values())
 
 		admins = (String[])props.get(ADMINS_PROP_KEY);
 
@@ -370,10 +356,11 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		for (String task_name: TASKS_LIST_PROP_VAL) {
 			defs.put(task_name + "/" + TASK_ACTIVE_PROP_KEY, TASK_ACTIVE_PROP_VAL);
 			defs.put(task_name + "/" + TASK_TYPE_PROP_KEY, TASK_TYPE_PROP_VAL);
-			Map<String, Object> default_props =
+			Map<String, PropertyItem> default_props =
 				task_types.get(TASK_TYPE_PROP_VAL).getDefaultParams();
-			for (Map.Entry entry: default_props.entrySet()) {
-				defs.put(task_name + "/props/" + entry.getKey(), entry.getValue());
+			for (Map.Entry<String, PropertyItem> entry: default_props.entrySet()) {
+				defs.put(task_name + "/props/" + entry.getKey(),
+					entry.getValue().toString());
 			} // end of for ()
 		} // end of for (String task_name: TASKS_LIST_PROP_VAL)
 
@@ -421,6 +408,113 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	}
 
 	/**
+	 * Describe <code>processIQPacket</code> method here.
+	 *
+	 * @param packet a <code>Packet</code> value
+	 * @return a <code>boolean</code> value
+	 */
+	private boolean processIQPacket(Packet packet) {
+		boolean processed = false;
+		Element iq = packet.getElement();
+		Element query = iq.getChild("query", INFO_XMLNS);
+		Element query_rep = null;
+		if (query != null && packet.getType() == StanzaType.get) {
+			query_rep =
+				serviceEntity.getDiscoInfo(JID.getNodeNick(packet.getElemTo()));
+			processed = true;
+		} // end of if (query != null && packet.getType() == StanzaType.get)
+		query = iq.getChild("query", ITEMS_XMLNS);
+		if (query != null && packet.getType() == StanzaType.get) {
+			query_rep = query.clone();
+			List<Element> items =
+				serviceEntity.getDiscoItems(JID.getNodeNick(packet.getElemTo()),
+					packet.getElemTo());
+			if (items != null && items.size() > 0) {
+				query_rep.addChildren(items);
+			} // end of if (items != null && items.size() > 0)
+			processed = true;
+		} // end of if (query != null && packet.getType() == StanzaType.get)
+		if (query_rep != null) {
+			addOutPacket(packet.okResult(query_rep, 0));
+		} // end of if (query_rep != null)
+		return processed;
+	}
+
+	/**
+	 * Describe <code>processPacket</code> method here.
+	 *
+	 * @param packet a <code>Packet</code> value
+	 */
+	public void processPacket(final Packet packet) {
+
+		if (packet.isCommand()) {
+			String action = Command.getAction(packet);
+			if (action != null && action.equals("cancel")) {
+				Packet result = packet.commandResult(null);
+				addOutPacket(result);
+				return;
+			}
+
+			Packet result = packet.commandResult("result");
+			TaskCommandIfc command = commands.get("*");
+			if (command != null) {
+				command.processCommand(packet, result, this);
+			} // end of if (command != null)
+			addOutPacket(result);
+			return;
+		}
+
+		log.finest("Processing packet: " + packet.toString());
+		if (packet.getElemName().equals("iq")) {
+			processIQPacket(packet);
+			return;
+		} // end of if (packet.getElemName().equals("iq"))
+		ReceiverTaskIfc task = task_instances.get(packet.getElemTo());
+		if (task != null) {
+			log.finest("Found a task for packet: " + task.getJID());
+			Queue<Packet> results = new LinkedList<Packet>();
+			task.processPacket(packet, results);
+			addOutPackets(results);
+		} // end of if (task != null)
+	}
+
+	/**
+	 * <code>processPacket</code> method is here to process packets addressed
+	 * directly to the hostname mainly commands, ad-hoc commands in particular.
+	 *
+	 * @param packet a <code>Packet</code> value is command for processing.
+	 */
+	public void processPacket(final Packet packet, final Queue<Packet> results) {
+
+		if (!packet.isCommand()) {
+			return;
+		}
+
+		if (!packet.getTo().startsWith(getName()+".")) return;
+
+		String action = Command.getAction(packet);
+		if (action != null && action.equals("cancel")) {
+			Packet result = packet.commandResult(null);
+			results.offer(result);
+			return;
+		}
+
+		Packet result = packet.commandResult("result");
+		String str_command = packet.getStrCommand();
+		if (str_command != null) {
+			String[] arr_command = str_command.split("/");
+			if (arr_command.length > 1) {
+				TaskCommandIfc command = commands.get(arr_command[1]);
+				if (command != null) {
+					command.processCommand(packet, result, this);
+				} // end of if (command != null)
+			} // end of if (arr_command.length > 1)
+		} // end of if (str_command != null)
+
+		results.offer(result);
+	}
+
+	/**
 	 * Describe <code>getDiscoInfo</code> method here.
 	 *
 	 * @param node a <code>String</code> value
@@ -428,7 +522,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	 * @return an <code>Element</code> value
 	 */
 	public Element getDiscoInfo(String node, String jid) {
-		if (jid != null && JID.getNodeHost(jid).startsWith(getName()+".")) {
+		if (jid != null && jid.startsWith(getName()+".")) {
 			return serviceEntity.getDiscoInfo(node);
 		}
 		return null;
@@ -437,10 +531,11 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	public 	List<Element> getDiscoFeatures() { return null; }
 
 	public List<Element> getDiscoItems(String node, String jid) {
-		if (JID.getNodeHost(jid).startsWith(getName()+".")) {
+		if (jid.startsWith(getName()+".")) {
 			return serviceEntity.getDiscoItems(node, null);
 		} else {
- 			return Arrays.asList(serviceEntity.getDiscoItem(null, getName() + "." + jid));
+ 			return
+				Arrays.asList(serviceEntity.getDiscoItem(null, getName() + "." + jid));
 		}
 	}
 
