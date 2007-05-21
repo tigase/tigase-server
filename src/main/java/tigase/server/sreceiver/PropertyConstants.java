@@ -69,21 +69,21 @@ public abstract class PropertyConstants {
 		}
 	};
 
-// 	/**
-// 	 * Constant <code>SUBSCR_LIST_PROP_KEY</code> is a property key for task
-// 	 * instance configuration parameters. With this property you can provide
-// 	 * task with initial list of subscribers. These users however must accept
-// 	 * subscription first before any message is delivered to them. So you
-// 	 * can't force ppl to receive any messages using this setting.
-// 	 */
-// 	public static final String SUBSCR_LIST_PROP_KEY =
-// 		"subscription-list-key";
-// 	/**
-// 	 * Constant <code>SUBSCR_LIST_PROP_KEY</code> is a property value for a key
-// 	 * <strong>SUBSCR_LIST_PROP_KEY</strong>. Please refer to key description
-// 	 * for more details. Default value is an empty String array.
-// 	 */
-// 	public static final String[] SUBSCR_LIST_PROP_VAL = {};
+	/**
+	 * Constant <code>SUBSCR_LIST_PROP_KEY</code> is a property key for task
+	 * instance configuration parameters. With this property you can provide
+	 * task with initial list of subscribers. These users however must accept
+	 * subscription first before any message is delivered to them. So you
+	 * can't force ppl to receive any messages using this setting.
+	 */
+	public static final String SUBSCR_LIST_PROP_KEY =
+		"subscription-list-key";
+	/**
+	 * Constant <code>SUBSCR_LIST_PROP_KEY</code> is a property value for a key
+	 * <strong>SUBSCR_LIST_PROP_KEY</strong>. Please refer to key description
+	 * for more details. Default value is an empty String array.
+	 */
+	public static final String[] SUBSCR_LIST_PROP_VAL = {};
 	/**
 	 * Constant <code>SUBSCR_RESTRICTIONS_PROP_KEY</code> is a property key for task
 	 * instance configuration parameters. With this property you can decide who
@@ -135,6 +135,10 @@ public abstract class PropertyConstants {
 	public static final String TASK_OWNER_PROP_KEY = "task-owner";
 	public static final String TASK_OWNER_DISPL_NAME = "Entity owner Jabber ID";
 	public static final String TASK_OWNER_PROP_VAL = "admin@localhost";
+
+	public static final String TASK_ADMINS_PROP_KEY = "task-admins";
+	public static final String TASK_ADMINS_DISPL_NAME = "Administrators";
+	public static final String TASK_ADMINS_PROP_VAL = "";
 
 	public static final String USER_REPOSITORY_PROP_KEY = "user-repository";
 

@@ -142,7 +142,7 @@ public class PropertyItem {
 	 *
 	 * @param argValue Value to assign to this.value
 	 */
-	public void setDef_value(final Object argValue) {
+	public void setValue(final Object argValue) {
 		this.value = argValue;
 	}
 

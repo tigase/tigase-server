@@ -130,7 +130,7 @@ public interface ReceiverTaskIfc {
 	 * @return a <code>Map</code> value with task instance configuration parameters.
 	 * @see #setParams(Map)
 	 */
-	Map<String, Object> getParams();
+	Map<String, PropertyItem> getParams();
 
 	/**
 	 * <code>getDefaultParams</code> method return task instance default configuration

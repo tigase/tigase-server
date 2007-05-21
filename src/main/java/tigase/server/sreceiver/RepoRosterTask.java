@@ -67,8 +67,10 @@ public abstract class RepoRosterTask extends AbstractReceiverTask {
 			repository.setData(getJID(), repo_node, moderation_accepted_key,
 				new Boolean(ri.isModerationAccepted()).toString());
 		} catch (TigaseDBException e) {
-			log.log(Level.SEVERE, "Problem saving roster data for: " +
-				ri.getJid(), e);
+			log.log(Level.SEVERE, "Problem saving roster data for: "
+				+	"JID = " + getJID()
+				+ ", node = " + repo_node
+				+ ", RosterItem = " +	ri.getJid(), e);
 		} // end of try-catch
 	}
 
@@ -136,8 +138,8 @@ public abstract class RepoRosterTask extends AbstractReceiverTask {
 	}
 
 	public void setParams(final Map<String, Object> map) {
-		super.setParams(map);
 		repository = (UserRepository)map.get(USER_REPOSITORY_PROP_KEY);
+		super.setParams(map);
 		if (repository != null && !loaded) {
 			loaded = true;
 			loadRoster();

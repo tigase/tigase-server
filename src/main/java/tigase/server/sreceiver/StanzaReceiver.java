@@ -281,9 +281,9 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	throws TigaseDBException {
 		String repo_node = tasks_node + "/" + task.getJID();
 		repository.setData(myDomain(), repo_node, task_type_key, task.getType());
-		Map<String, Object> task_params = task.getParams();
+		Map<String, PropertyItem> task_params = task.getParams();
 		repo_node += params_node;
-		for (Map.Entry<String, Object> entry: task_params.entrySet()) {
+		for (Map.Entry<String, PropertyItem> entry: task_params.entrySet()) {
 			if (!entry.getKey().equals(USER_REPOSITORY_PROP_KEY)) {
 				repository.setData(myDomain(), repo_node, entry.getKey(),
 					entry.getValue().toString());

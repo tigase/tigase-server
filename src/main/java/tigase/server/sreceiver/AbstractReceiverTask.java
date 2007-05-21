@@ -22,21 +22,27 @@
  */
 package tigase.server.sreceiver;
 
-import java.util.Map;
-import java.util.TreeMap;
+
 import java.util.HashMap;
-import java.util.Queue;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
-import tigase.server.Packet;
-import tigase.util.JID;
+import java.util.regex.Pattern;
 import tigase.xml.Element;
-import tigase.xmpp.StanzaType;
+import tigase.server.Packet;
+import tigase.server.sreceiver.PropertyConstants.SenderRestrictions;
+import tigase.server.sreceiver.PropertyConstants.SubscrRestrictions;
 import tigase.stats.StatRecord;
+import tigase.stats.StatRecord;
+import tigase.util.JID;
+import tigase.xmpp.StanzaType;
+import java.util.LinkedList;
 
 import static tigase.server.sreceiver.PropertyConstants.*;
 
@@ -57,7 +63,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 	private String jid = null;
 	private String local_domain = null;
 	private String description = null;
-	private Map<String, Object> props = null;
+	private Map<String, PropertyItem> props = null;
 
 	private SubscrRestrictions subsc_restr = SUBSCR_RESTRICTIONS_PROP_VAL;
 	private SenderRestrictions send_restr = ALLOWED_SENDERS_PROP_VAL;
@@ -67,6 +73,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 	private Pattern subscr_restr_regex =
 		Pattern.compile(SUBSCR_RESTR_REGEX_PROP_VAL);
 	private String owner = TASK_OWNER_PROP_VAL;
+	private String[] admins = {};
 
 	private long packets_received = 0;
 	private long packets_sent = 0;
@@ -240,40 +247,77 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 	 * @param map a <code>Map</code> value
 	 */
 	public void setParams(final Map<String, Object> map) {
-		if (this.props == null) {
-			this.props = map;
-		} else {
-			this.props.putAll(map);
-		} // end of if (this.props == null) else
-		description = (props.get(DESCRIPTION_PROP_KEY) != null ?
-			(String)props.get(DESCRIPTION_PROP_KEY) : description);
-		subscr_restr_regex = (props.get(SUBSCR_RESTR_REGEX_PROP_KEY) != null ?
-			Pattern.compile((String)props.get(SUBSCR_RESTR_REGEX_PROP_KEY))
-			: subscr_restr_regex);
-		String tmp = (String)props.get(SUBSCR_RESTRICTIONS_PROP_KEY);
+		if (props == null) {
+			props = new TreeMap<String, PropertyItem>();
+		} // end of if (props == null)
+		if (map.get(DESCRIPTION_PROP_KEY) != null) {
+			description = (String)map.get(DESCRIPTION_PROP_KEY);
+			props.put(DESCRIPTION_PROP_KEY, new PropertyItem(DESCRIPTION_PROP_KEY,
+					DESCRIPTION_DISPL_NAME, description));
+		} // end of if (map.get(DESCRIPTION_PROP_KEY) != null)
+		if (map.get(SUBSCR_RESTR_REGEX_PROP_KEY) != null) {
+			subscr_restr_regex =
+				Pattern.compile((String)map.get(SUBSCR_RESTR_REGEX_PROP_KEY));
+			props.put(SUBSCR_RESTR_REGEX_PROP_KEY,
+				new PropertyItem(SUBSCR_RESTR_REGEX_PROP_KEY,
+				SUBSCR_RESTR_REGEX_DISPL_NAME, subscr_restr_regex));
+		} // end of if (map.get(SUBSCR_RESTR_REGEX_PROP_KEY) != null)
+		String tmp = (String)map.get(SUBSCR_RESTRICTIONS_PROP_KEY);
 		if (tmp != null) {
 			subsc_restr = SubscrRestrictions.valueOf(tmp);
+			props.put(SUBSCR_RESTRICTIONS_PROP_KEY,
+				new PropertyItem(SUBSCR_RESTRICTIONS_PROP_KEY,
+					SUBSCR_RESTRICTIONS_DISPL_NAME, subsc_restr));
 		} // end of if (tmp != null)
-		tmp = (String)props.get(ALLOWED_SENDERS_PROP_KEY);
+		tmp = (String)map.get(ALLOWED_SENDERS_PROP_KEY);
 		if (tmp != null) {
 			send_restr = SenderRestrictions.valueOf(tmp);
+			props.put(ALLOWED_SENDERS_PROP_KEY,
+				new PropertyItem(ALLOWED_SENDERS_PROP_KEY,
+					ALLOWED_SENDERS_DISPL_NAME, send_restr));
 		} // end of if (tmp != null)
-		tmp = (String)props.get(MESSAGE_TYPE_PROP_KEY);
+		tmp = (String)map.get(MESSAGE_TYPE_PROP_KEY);
 		if (tmp != null) {
 			message_type = MessageType.valueOf(tmp);
+			props.put(MESSAGE_TYPE_PROP_KEY,
+				new PropertyItem(MESSAGE_TYPE_PROP_KEY,
+					MESSAGE_TYPE_DISPL_NAME, message_type));
 		} // end of if (tmp != null)
-		send_to_online_only =	(props.get(ONLINE_ONLY_PROP_KEY) != null ?
-			parseBool(props.get(ONLINE_ONLY_PROP_KEY)) : send_to_online_only);
-		replace_sender_address = (props.get(REPLACE_SENDER_PROP_KEY) != null ?
-			parseBool(props.get(REPLACE_SENDER_PROP_KEY)) : replace_sender_address);
-		tmp = (String)props.get(TASK_OWNER_PROP_KEY);
-		if (tmp != null) {
-			owner = JID.getNodeID(tmp);
+		if (map.get(ONLINE_ONLY_PROP_KEY) != null) {
+			send_to_online_only =	parseBool(map.get(ONLINE_ONLY_PROP_KEY));
+			props.put(ONLINE_ONLY_PROP_KEY,
+				new PropertyItem(ONLINE_ONLY_PROP_KEY,
+					ONLINE_ONLY_DISPL_NAME, send_to_online_only));
+		} // end of if (map.get(ONLINE_ONLY_PROP_KEY) != null)
+		if (map.get(REPLACE_SENDER_PROP_KEY) != null) {
+			replace_sender_address = parseBool(map.get(REPLACE_SENDER_PROP_KEY));
+			props.put(REPLACE_SENDER_PROP_KEY,
+				new PropertyItem(REPLACE_SENDER_PROP_KEY,
+					REPLACE_SENDER_DISPL_NAME, replace_sender_address));
+		} // end of if (map.get(REPLACE_SENDER_PROP_KEY) != null)
+		tmp = (String)map.get(TASK_OWNER_PROP_KEY);
+		if (tmp != null && tmp.length() > 0) {
+			owner = tmp.trim();
 			RosterItem ri = getRosterItem(owner);
 			if (ri == null) {
-				ri = addToRoster(tmp);
+				ri = addToRoster(owner);
 				ri.setOwner(true);
 			} // end of if (ri == null)
+			props.put(TASK_OWNER_PROP_KEY,
+				new PropertyItem(TASK_OWNER_PROP_KEY, TASK_OWNER_DISPL_NAME, owner));
+		} // end of if (tmp != null)
+		tmp = (String)map.get(TASK_ADMINS_PROP_KEY);
+		if (tmp != null && tmp.length() > 0) {
+			admins = tmp.split(",");
+			for (String admin: admins) {
+				RosterItem ri = getRosterItem(admin.trim());
+				if (ri == null) {
+					ri = addToRoster(admin.trim());
+					ri.setOwner(true);
+				} // end of if (ri == null)
+			} // end of for (String tmp_b: tmp_arr)
+			props.put(TASK_ADMINS_PROP_KEY,
+				new PropertyItem(TASK_ADMINS_PROP_KEY, TASK_ADMINS_DISPL_NAME, tmp));
 		} // end of if (tmp != null)
 	}
 
@@ -282,7 +326,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 	 *
 	 * @return a <code>Map</code> value
 	 */
-	public Map<String, Object> getParams() {
+	public Map<String, PropertyItem> getParams() {
 		return props;
 	}
 
@@ -290,36 +334,31 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 		Map<String, PropertyItem> defs = new TreeMap<String, PropertyItem>();
 		defs.put(SUBSCR_RESTRICTIONS_PROP_KEY,
 			new PropertyItem(SUBSCR_RESTRICTIONS_PROP_KEY,
-				SUBSCR_RESTRICTIONS_DISPL_NAME,
-				SUBSCR_RESTRICTIONS_PROP_VAL));
+				SUBSCR_RESTRICTIONS_DISPL_NAME, SUBSCR_RESTRICTIONS_PROP_VAL));
 		defs.put(MESSAGE_TYPE_PROP_KEY,
 			new PropertyItem(MESSAGE_TYPE_PROP_KEY,
-				MESSAGE_TYPE_DISPL_NAME,
-				MESSAGE_TYPE_PROP_VAL));
+				MESSAGE_TYPE_DISPL_NAME, MESSAGE_TYPE_PROP_VAL));
 		defs.put(ALLOWED_SENDERS_PROP_KEY,
 			new PropertyItem(ALLOWED_SENDERS_PROP_KEY,
-				ALLOWED_SENDERS_DISPL_NAME,
-				ALLOWED_SENDERS_PROP_VAL));
+				ALLOWED_SENDERS_DISPL_NAME, ALLOWED_SENDERS_PROP_VAL));
 		defs.put(SUBSCR_RESTR_REGEX_PROP_KEY,
 			new PropertyItem(SUBSCR_RESTR_REGEX_PROP_KEY,
-				SUBSCR_RESTR_REGEX_DISPL_NAME,
-				SUBSCR_RESTR_REGEX_PROP_VAL));
+				SUBSCR_RESTR_REGEX_DISPL_NAME, SUBSCR_RESTR_REGEX_PROP_VAL));
 		defs.put(ONLINE_ONLY_PROP_KEY,
 			new PropertyItem(ONLINE_ONLY_PROP_KEY,
-				ONLINE_ONLY_DISPL_NAME,
-				ONLINE_ONLY_PROP_VAL));
+				ONLINE_ONLY_DISPL_NAME, ONLINE_ONLY_PROP_VAL));
 		defs.put(REPLACE_SENDER_PROP_KEY,
 			new PropertyItem(REPLACE_SENDER_PROP_KEY,
-				REPLACE_SENDER_DISPL_NAME,
-				REPLACE_SENDER_PROP_VAL));
+				REPLACE_SENDER_DISPL_NAME, REPLACE_SENDER_PROP_VAL));
 		defs.put(ALLOWED_SENDERS_LIST_PROP_KEY,
 			new PropertyItem(ALLOWED_SENDERS_LIST_PROP_KEY,
-				ALLOWED_SENDERS_LIST_DISPL_NAME,
-				ALLOWED_SENDERS_LIST_PROP_VAL));
+				ALLOWED_SENDERS_LIST_DISPL_NAME, ALLOWED_SENDERS_LIST_PROP_VAL));
 		defs.put(DESCRIPTION_PROP_KEY,
 			new PropertyItem(DESCRIPTION_PROP_KEY,
-				DESCRIPTION_DISPL_NAME,
-				DESCRIPTION_PROP_VAL));
+				DESCRIPTION_DISPL_NAME, DESCRIPTION_PROP_VAL));
+		defs.put(TASK_ADMINS_PROP_KEY,
+			new PropertyItem(TASK_ADMINS_PROP_KEY,
+				TASK_ADMINS_DISPL_NAME, TASK_ADMINS_PROP_VAL));
 		return defs;
 	}
 

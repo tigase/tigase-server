@@ -31,6 +31,7 @@ import tigase.util.JID;
 import tigase.xml.XMLUtils;
 
 import static tigase.server.sreceiver.PropertyConstants.*;
+import static tigase.server.sreceiver.TaskCommandCommons.*;
 
 /**
  * Describe class NewTaskCommand here.
@@ -99,6 +100,21 @@ public class NewTaskCommand implements TaskCommandIfc {
 
 	private void newTask_Step2(String task_type, Packet result,
 		StanzaReceiver receiv) {
+		ReceiverTaskIfc task_t = receiv.getTaskTypes().get(task_type);
+		int start = 0;
+		int line_len = 60;
+		do {
+			int end = ((start + line_len < task_t.getHelp().length()) ?
+				start + line_len :
+				task_t.getHelp().length());
+			while (end < task_t.getHelp().length()
+				&& task_t.getHelp().charAt(end) != ' ') {
+				++end;
+			}
+			Command.addFieldValue(result, "task" + start,
+				task_t.getHelp().substring(start, end), "fixed");
+			start = end;
+		} while (start < task_t.getHelp().length());
 		Command.addFieldValue(result, "Info2",
 			"1. 'Finish' to create component with this parameters.", "fixed");
 		Command.addFieldValue(result, "Info3",
@@ -106,22 +122,8 @@ public class NewTaskCommand implements TaskCommandIfc {
 		Command.setStatus(result, "executing");
 		Command.addAction(result, "complete");
 		Command.addAction(result, "prev");
-		Map<String, PropertyItem> default_props =
-			receiv.getTaskTypes().get(task_type).getDefaultParams();
-		for (PropertyItem item: default_props.values()) {
-			if (item.getPossible_values() != null) {
-				Command.addFieldValue(result,
-					XMLUtils.escape(item.getName()),
-					XMLUtils.escape(item.getValue().toString()),
-					XMLUtils.escape(item.getDisplay_name()),
-					item.getPossible_values(), item.getPossible_values());
-			} else {
-				Command.addFieldValue(result,
-					XMLUtils.escape(item.getName()),
-					XMLUtils.escape(item.getValue().toString()),
-					"text-single", XMLUtils.escape(item.getDisplay_name()));
-			} // end of if (item.getPossible_values() != null) else
-		} // end of for (Map.Entry entry: prop.entrySet())
+		Map<String, PropertyItem> default_props = task_t.getDefaultParams();
+		propertyItems2Command(default_props, result);
 	}
 
 	private void newTask_Step3(Packet packet, Packet result,
