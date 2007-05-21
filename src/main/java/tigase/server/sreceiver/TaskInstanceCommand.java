@@ -22,8 +22,10 @@
  */
 package tigase.server.sreceiver;
 
+import java.util.List;
 import tigase.server.Command;
 import tigase.server.Packet;
+import tigase.stats.StatRecord;
 
 /**
  * Describe class TaskInstanceCommand here.
@@ -36,7 +38,20 @@ import tigase.server.Packet;
  */
 public class TaskInstanceCommand implements TaskCommandIfc {
 
-	// Implementation of tigase.server.sreceiver.TaskCommandIfc
+	protected static final String ACTION_FIELD = "action-field";
+	protected static final String CONFIRM = "confirm-field";
+
+	public enum ACTION {
+		TASK_CONFIGURATION, USER_MANAGEMENT, REMOVE_TASK;
+		public static String[] strValues() {
+			String[] possible_values = new String[values().length];
+			int i = 0;
+			for (Enum val: values()) {
+				possible_values[i++] = val.toString();
+			} // end of for (Enum en_v: en_val.values())
+			return possible_values;
+		}
+	};
 
 	/**
 	 * Describe <code>getNodeName</code> method here.
@@ -59,8 +74,41 @@ public class TaskInstanceCommand implements TaskCommandIfc {
 	private void taskMainScreen(Packet result, ReceiverTaskIfc task) {
 		Command.setStatus(result, "executing");
 		Command.addAction(result, "next");
-		Command.addFieldValue(result, TASK_NAME_FIELD,
-			"", "text-single", "Enter task JID");
+
+		List<StatRecord> stats = task.getStats();
+		if (stats != null) {
+			for (StatRecord rec: stats) {
+				Command.addFieldValue(result, "Info",
+					rec.getDescription() + ": " + rec.getValue()
+					, "fixed");
+			} // end of for (StatRecord rec: stats)
+		} // end of if (stats != null)
+
+		String[] actions = ACTION.strValues();
+		Command.addFieldValue(result, ACTION_FIELD, actions[0],
+			"Select action", actions, actions);
+
+	}
+
+	public void removeTask(Packet packet, Packet result,
+		StanzaReceiver receiv) {
+		String confirm = Command.getFieldValue(packet, CONFIRM);
+		String task_name = Command.getFieldValue(packet, TASK_NAME_FIELD);
+		if (confirm == null) {
+			Command.addFieldValue(result, CONFIRM, "true", "hidden");
+			Command.setStatus(result, "executing");
+			Command.addAction(result, "next");
+			Command.addFieldValue(result, "Info",
+				"Are you sure you want to remove task: "
+				+ task_name
+				+ " and all it's data?", "fixed");
+			Command.addFieldValue(result, "Info",
+				"Note! There is no undo for task deletion function", "fixed");
+			return;
+		} // end of if (confirm == null)
+		receiv.removeTaskInstance(receiv.getTaskInstances().get(task_name));
+		Command.addFieldValue(result, "Info",
+			"Task " + task_name + " has been removed.", "fixed");
 	}
 
 	/**
@@ -81,13 +129,35 @@ public class TaskInstanceCommand implements TaskCommandIfc {
 			} // end of if (task_name != null)
 		} // end of if (task == null)
 		if (task != null) {
+			if (!(receiv.isAdmin(packet.getElemFrom())
+					|| task.isAdmin(packet.getElemFrom()))) {
+				Command.addFieldValue(result, "Info",
+					"You are not administrator of: " + task_name + " task.", "fixed");
+				Command.addFieldValue(result, "Info",
+					"You can not execute task commands.", "fixed");
+				return;
+			}
 			Command.addFieldValue(result, TASK_NAME_FIELD, task_name, "hidden");
-			String step = Command.getFieldValue(packet, STEP);
-			if (step == null) {
-				Command.addFieldValue(result, STEP, "main-screen", "hidden");
+			String action_str = Command.getFieldValue(packet, ACTION_FIELD);
+			if (action_str == null) {
 				taskMainScreen(result, task);
 				return;
 			} // end of if (step == null)
+			Command.addFieldValue(result, ACTION_FIELD, action_str, "hidden");
+			ACTION action = ACTION.valueOf(action_str);
+			switch (action) {
+			case TASK_CONFIGURATION:
+
+				break;
+			case USER_MANAGEMENT:
+
+				break;
+			case REMOVE_TASK:
+				removeTask(packet, result, receiv);
+				break;
+			default:
+				break;
+			} // end of switch (action)
 		} else {
 			Command.setStatus(result, "executing");
 			Command.addAction(result, "next");

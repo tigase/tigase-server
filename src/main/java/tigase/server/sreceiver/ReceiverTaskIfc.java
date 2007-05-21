@@ -25,7 +25,9 @@ package tigase.server.sreceiver;
 import java.awt.TrayIcon.MessageType;
 import java.util.Map;
 import java.util.Queue;
+import java.util.List;
 import tigase.server.Packet;
+import tigase.stats.StatRecord;
 
 /**
  * This is <code>StanzaReceiver</code> task which can receive XMPP packets
@@ -158,6 +160,17 @@ public interface ReceiverTaskIfc {
 	void init(Queue<Packet> results);
 
 	/**
+	 * <code>destroy</code> method is called when the task is being permanently
+	 * deleted. The method should take care of sending notification to all
+	 * subscribed users that the task is being deleted and should also clear
+	 * databases from all task data.
+	 *
+	 * @param results a <code>Queue</code> value with all packets needed to send
+	 * upon task deletion.
+	 */
+	void destroy(Queue<Packet> results);
+
+	/**
 	 * <code>processPacket</code> method takes a packet addressed to this task
 	 * as a parameter and does something with the packet. If as a result of
 	 * input packet processing it generates some other packets to send they
@@ -168,5 +181,24 @@ public interface ReceiverTaskIfc {
 	 * result packets to send out.
 	 */
 	void processPacket(Packet packet, Queue<Packet> results);
+
+	/**
+	 * <code>getStats</code> method retorns list of statistics records. Have a look
+	 * at <code>StatRecord</code> description for more details.
+	 * @return a <code>List</code> of statistics records.
+	 * @see StatRecord
+	 */
+	List<StatRecord> getStats();
+
+	/**
+	 * <code>isAdmin</code> method checks whether user given as parameter is one
+	 * of defined admins. If user is the task owner it is also considered to be
+	 * task administrator.
+	 *
+	 * @param jid a <code>String</code> value of user JID.
+	 * @return a <code>boolean</code> value true if given user is either task admin
+	 * or task owner.
+	 */
+	boolean isAdmin(String jid);
 
 } // ReceiverTaskIfc

@@ -231,6 +231,23 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		} // end of else
 	}
 
+	protected void removeTaskInstance(ReceiverTaskIfc task) {
+		ServiceEntity item = new ServiceEntity(task.getJID(),
+			JID.getNodeNick(task.getJID()), task.getDescription());
+		serviceEntity.removeItems(item);
+		task_instances.remove(task.getJID());
+		Queue<Packet> results = new LinkedList<Packet>();
+		task.destroy(results);
+		addOutPackets(results);
+		try {
+			String repo_node = tasks_node + "/" + task.getJID();
+			repository.removeSubnode(myDomain(), repo_node);
+		} catch (TigaseDBException e) {
+			log.log(Level.SEVERE, "Problem removing task from repository: "
+				+ task.getJID(), e);
+		} // end of try-catch
+	}
+
 	protected Map<String, ReceiverTaskIfc> getTaskTypes() {
 		return task_types;
 	}
@@ -315,6 +332,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		} // end of for (TaskCommandIfc comm: commands.values())
 
 		admins = (String[])props.get(ADMINS_PROP_KEY);
+		Arrays.sort(admins);
 
 		try {
 			String cls_name = (String)props.get(SREC_REPO_CLASS_PROP_KEY);
@@ -440,6 +458,10 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		return processed;
 	}
 
+	protected boolean isAdmin(String jid) {
+		return Arrays.binarySearch(admins, JID.getNodeID(jid)) >= 0;
+	}
+
 	/**
 	 * Describe <code>processPacket</code> method here.
 	 *
@@ -469,6 +491,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 			processIQPacket(packet);
 			return;
 		} // end of if (packet.getElemName().equals("iq"))
+
 		ReceiverTaskIfc task = task_instances.get(packet.getElemTo());
 		if (task != null) {
 			log.finest("Found a task for packet: " + task.getJID());

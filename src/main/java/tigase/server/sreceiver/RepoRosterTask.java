@@ -23,10 +23,12 @@
 package tigase.server.sreceiver;
 
 import java.util.Map;
+import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.db.TigaseDBException;
 import tigase.db.UserRepository;
+import tigase.server.Packet;
 
 import static tigase.server.sreceiver.PropertyConstants.*;
 
@@ -140,6 +142,15 @@ public abstract class RepoRosterTask extends AbstractReceiverTask {
 			loaded = true;
 			loadRoster();
 		} // end of if (repository != null && !loaded)
+	}
+
+	public void destroy(Queue<Packet> results) {
+		super.destroy(results);
+		try {
+			repository.removeUser(getJID());
+		} catch (TigaseDBException e) {
+			log.log(Level.SEVERE, "Problem removing task data from repository", e);
+		} // end of try-catch
 	}
 
 } // RepoRosterTask

@@ -26,6 +26,8 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.HashMap;
 import java.util.Queue;
+import java.util.List;
+import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -34,6 +36,7 @@ import tigase.server.Packet;
 import tigase.util.JID;
 import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
+import tigase.stats.StatRecord;
 
 import static tigase.server.sreceiver.PropertyConstants.*;
 
@@ -64,6 +67,9 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 	private Pattern subscr_restr_regex =
 		Pattern.compile(SUBSCR_RESTR_REGEX_PROP_VAL);
 	private String owner = TASK_OWNER_PROP_VAL;
+
+	private long packets_received = 0;
+	private long packets_sent = 0;
 
 	private Map<String, RosterItem> roster = new HashMap<String, RosterItem>();
 
@@ -341,6 +347,15 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 		}
 	}
 
+	public void destroy(Queue<Packet> results) {
+		for (RosterItem ri: roster.values()) {
+			Packet presence = getPresence(ri.getJid(), jid, StanzaType.unsubscribe);
+			results.offer(presence);
+			presence = getPresence(ri.getJid(), jid, StanzaType.unsubscribed);
+			results.offer(presence);
+		}
+	}
+
 	/**
 	 * Describe <code>processPacket</code> method here.
 	 *
@@ -348,6 +363,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 	 * @param results a <code>Queue</code> value
 	 */
 	public void processPacket(final Packet packet, final Queue<Packet> results) {
+		++packets_received;
 		log.finest("Processing packet: " + packet.toString());
 		if (packet.getElemName().equals("presence")) {
 			processPresence(packet, results);
@@ -355,6 +371,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 		if (packet.getElemName().equals("message")) {
 			processMessage(packet, results);
 		} // end of if (packet.getElemName().equals("message"))
+		packets_sent += results.size();
 	}
 
 	private void processPresence(Packet packet, Queue<Packet> results) {
@@ -421,6 +438,28 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 				results.offer(new Packet(message));
 			} // end of if (ri.isSubscribed() && ri.isModerationAccepted())
 		} // end of for (RosterItem ri: roster.values())
+	}
+
+	public List<StatRecord> getStats() {
+    List<StatRecord> stats = new LinkedList<StatRecord>();
+    stats.add(new StatRecord(getJID(), "Roster size", "int",
+				roster.size(), Level.INFO));
+    stats.add(new StatRecord(getJID(), "Packets received", "long",
+				packets_received, Level.INFO));
+    stats.add(new StatRecord(getJID(), "Packets sent", "long",
+				packets_sent, Level.INFO));
+		int moderation_needed = 0;
+		for (RosterItem ri: roster.values()) {
+			moderation_needed += (ri.isModerationAccepted() ? 0 : 1);
+		} // end of for (RosterItem ri: roster)
+    stats.add(new StatRecord(getJID(), "Awaiting moderation", "int",
+				moderation_needed, Level.INFO));
+		return stats;
+	}
+
+	public boolean isAdmin(String jid) {
+		RosterItem ri = getRosterItem(jid);
+		return ri != null && (ri.isAdmin() || ri.isOwner());
 	}
 
 } // AbstractReceiverTask
