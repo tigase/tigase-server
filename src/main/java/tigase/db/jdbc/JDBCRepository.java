@@ -98,8 +98,8 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 
 	private boolean autoCreateUser = false;
 
-	private long max_uid = 0;
-	private long max_nid = 0;
+	private static long max_uid = 0;
+	private static long max_nid = 0;
 
 	private void release(Statement stmt, ResultSet rs) {
 		if (rs != null) {
@@ -264,6 +264,8 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		while (strtok.hasMoreTokens()) {
 			String token = strtok.nextToken();
 			built_path = built_path + "/" + token;
+			System.out.println("      TOKEN="+token
+				+", build_path="+built_path);
 			long cur_nid = getNodeNID(uid, built_path);
 			if (cur_nid > 0) {
 				nid = cur_nid;
