@@ -127,6 +127,21 @@ public class ServiceEntity {
 		}
 	}
 
+	public void removeItems(ServiceEntity... items) {
+		if (this.items == null) {
+			return;
+		}
+		// It may look very strange but look at equals() method....
+		// So some items which might be the same from the Set point of
+		// view are not really the same. They may have different name.
+		// This is to allow "update" the service discovery with some changed
+		// info.... So in particular the "name" may contain some additional
+		// information which can change at runtime
+		for (ServiceEntity item: items) {
+			this.items.remove(item);
+		}
+	}
+
 	/**
 	 * Describe <code>getJID</code> method here.
 	 *
