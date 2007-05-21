@@ -98,8 +98,9 @@ public class NewTaskCommand implements TaskCommandIfc {
 			TASK_TYPE_FIELD, task_types, task_types);
 	}
 
-	private void newTask_Step2(String task_type, Packet result,
+	private void newTask_Step2(Packet packet, Packet result,
 		StanzaReceiver receiv) {
+		String task_type = Command.getFieldValue(packet, TASK_TYPE_FIELD);
 		ReceiverTaskIfc task_t = receiv.getTaskTypes().get(task_type);
 		int start = 0;
 		int line_len = 60;
@@ -123,6 +124,10 @@ public class NewTaskCommand implements TaskCommandIfc {
 		Command.addAction(result, "complete");
 		Command.addAction(result, "prev");
 		Map<String, PropertyItem> default_props = task_t.getDefaultParams();
+		PropertyItem pi = default_props.get(TASK_OWNER_PROP_KEY);
+		if (pi != null) {
+			pi.setValue(JID.getNodeID(packet.getElemFrom()));
+		}
 		propertyItems2Command(default_props, result);
 	}
 
@@ -141,7 +146,6 @@ public class NewTaskCommand implements TaskCommandIfc {
 			value = XMLUtils.unescape(value);
 			new_params.put(key, value);
 		} // end of for (String key: default_props.keySet())
-		new_params.put(TASK_OWNER_PROP_KEY, JID.getNodeID(packet.getElemFrom()));
 		receiv.addTaskInstance(task_type, task_name, new_params);
 		Command.addFieldValue(result, "Info",
 			"Created task: " + task_name, "fixed");
@@ -170,7 +174,7 @@ public class NewTaskCommand implements TaskCommandIfc {
 		String step = Command.getFieldValue(packet, STEP);
 		if (step == null || step.equals("step1")) {
 			Command.addFieldValue(result, STEP, "step2", "hidden");
-			newTask_Step2(task_type, result, receiv);
+			newTask_Step2(packet, result, receiv);
 			return;
 		} // end of if (step == null || step.equals("step1"))
 		newTask_Step3(packet, result, receiv);

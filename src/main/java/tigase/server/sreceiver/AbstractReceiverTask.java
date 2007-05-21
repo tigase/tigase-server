@@ -193,6 +193,14 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 		ri.setOnline(online);
 	}
 
+	public void setRosterItemAdmin(RosterItem ri, boolean admin) {
+		ri.setAdmin(admin);
+	}
+
+	public void setRosterItemOwner(RosterItem ri, boolean owner) {
+		ri.setOwner(owner);
+	}
+
 	public void setRosterItemSubscribed(RosterItem ri, boolean subscribed) {
 		ri.setSubscribed(subscribed);
 	}
@@ -301,11 +309,11 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 			RosterItem ri = getRosterItem(owner);
 			if (ri == null) {
 				ri = addToRoster(owner);
-				ri.setOwner(true);
 			} // end of if (ri == null)
+			setRosterItemOwner(ri, true);
 			props.put(TASK_OWNER_PROP_KEY,
 				new PropertyItem(TASK_OWNER_PROP_KEY, TASK_OWNER_DISPL_NAME, owner));
-		} // end of if (tmp != null)
+		}
 		tmp = (String)map.get(TASK_ADMINS_PROP_KEY);
 		if (tmp != null && tmp.length() > 0) {
 			admins = tmp.split(",");
@@ -313,12 +321,12 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 				RosterItem ri = getRosterItem(admin.trim());
 				if (ri == null) {
 					ri = addToRoster(admin.trim());
-					ri.setOwner(true);
 				} // end of if (ri == null)
+				setRosterItemAdmin(ri, true);
 			} // end of for (String tmp_b: tmp_arr)
 			props.put(TASK_ADMINS_PROP_KEY,
 				new PropertyItem(TASK_ADMINS_PROP_KEY, TASK_ADMINS_DISPL_NAME, tmp));
-		} // end of if (tmp != null)
+		}
 	}
 
 	/**
@@ -359,6 +367,9 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 		defs.put(TASK_ADMINS_PROP_KEY,
 			new PropertyItem(TASK_ADMINS_PROP_KEY,
 				TASK_ADMINS_DISPL_NAME, TASK_ADMINS_PROP_VAL));
+		defs.put(TASK_OWNER_PROP_KEY,
+			new PropertyItem(TASK_OWNER_PROP_KEY,
+				TASK_OWNER_DISPL_NAME, TASK_OWNER_PROP_VAL));
 		return defs;
 	}
 

@@ -119,6 +119,16 @@ public abstract class RepoRosterTask extends AbstractReceiverTask {
 		saveToRepository(ri);
 	}
 
+	public void setRosterItemAdmin(RosterItem ri, boolean admin) {
+		super.setRosterItemAdmin(ri, admin);
+		saveToRepository(ri);
+	}
+
+	public void setRosterItemOwner(RosterItem ri, boolean owner) {
+		super.setRosterItemOwner(ri, owner);
+		saveToRepository(ri);
+	}
+
 	public void setRosterItemModerationAccepted(RosterItem ri, boolean accepted) {
 		super.setRosterItemModerationAccepted(ri, accepted);
 		saveToRepository(ri);
@@ -138,7 +148,9 @@ public abstract class RepoRosterTask extends AbstractReceiverTask {
 	}
 
 	public void setParams(final Map<String, Object> map) {
-		repository = (UserRepository)map.get(USER_REPOSITORY_PROP_KEY);
+		if (map.get(USER_REPOSITORY_PROP_KEY) != null) {
+			repository = (UserRepository)map.get(USER_REPOSITORY_PROP_KEY);
+		}
 		super.setParams(map);
 		if (repository != null && !loaded) {
 			loaded = true;

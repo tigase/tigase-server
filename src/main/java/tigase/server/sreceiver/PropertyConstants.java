@@ -133,7 +133,7 @@ public abstract class PropertyConstants {
 		"Description";
 	public static final String DESCRIPTION_PROP_VAL = "News distribution task";
 	public static final String TASK_OWNER_PROP_KEY = "task-owner";
-	public static final String TASK_OWNER_DISPL_NAME = "Entity owner Jabber ID";
+	public static final String TASK_OWNER_DISPL_NAME = "Owner";
 	public static final String TASK_OWNER_PROP_VAL = "admin@localhost";
 
 	public static final String TASK_ADMINS_PROP_KEY = "task-admins";

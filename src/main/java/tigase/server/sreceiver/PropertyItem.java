@@ -116,7 +116,7 @@ public class PropertyItem {
 	 * @return the value of display_name
 	 */
 	public String getDisplay_name() {
-		return this.display_name;
+		return (this.display_name != null ? this.display_name : this.name);
 	}
 
 	/**

@@ -277,8 +277,9 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		} // end of if (tasks_jids != null)
 	}
 
-	private void saveTaskToRepository(ReceiverTaskIfc task)
-	throws TigaseDBException {
+	protected void saveTaskToRepository(ReceiverTaskIfc task)
+		throws TigaseDBException {
+
 		String repo_node = tasks_node + "/" + task.getJID();
 		repository.setData(myDomain(), repo_node, task_type_key, task.getType());
 		Map<String, PropertyItem> task_params = task.getParams();
