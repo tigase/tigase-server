@@ -30,6 +30,8 @@ import tigase.server.Packet;
 import tigase.util.JID;
 import tigase.xml.XMLUtils;
 
+import static tigase.server.sreceiver.PropertyConstants.*;
+
 /**
  * Describe class NewTaskCommand here.
  *
@@ -137,6 +139,7 @@ public class NewTaskCommand implements TaskCommandIfc {
 			value = XMLUtils.unescape(value);
 			new_params.put(key, value);
 		} // end of for (String key: default_props.keySet())
+		new_params.put(TASK_OWNER_PROP_KEY, JID.getNodeID(packet.getElemFrom()));
 		receiv.addTaskInstance(task_type, task_name, new_params);
 		Command.addFieldValue(result, "Info",
 			"Created task: " + task_name, "fixed");
