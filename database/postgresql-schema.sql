@@ -47,7 +47,7 @@ create unique index user_id on tig_users ( user_id );
 create table tig_nodes (
        nid bigint NOT NULL,
        parent_nid bigint,
-       uid bigint NOT NULL,
+       uid bigint NOT NULL references tig_users(uid),
 
        node varchar(64) NOT NULL,
 
@@ -57,8 +57,8 @@ create unique index tnode on tig_nodes ( parent_nid, node );
 create index node on tig_nodes ( node );
 
 create table tig_pairs (
-       nid bigint,
-       uid bigint NOT NULL,
+       nid bigint references tig_nodes(nid),
+       uid bigint NOT NULL references tig_users(uid),
 
        pkey varchar(128) NOT NULL,
        pval varchar(65535)

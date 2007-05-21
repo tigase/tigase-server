@@ -1,10 +1,11 @@
+
 create table xmpp_stanza (
 			 id bigint unsigned NOT NULL auto_increment,
 			 stanza text NOT NULL,
 
 			 primary key (id)
 )
-default character set utf8;
+ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
 
 create table tig_users (
        uid bigint unsigned NOT NULL,
@@ -14,7 +15,7 @@ create table tig_users (
        primary key (uid),
        unique key user_id (user_id)
 )
-default character set utf8;
+ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
 
 create table tig_nodes (
        nid bigint unsigned NOT NULL,
@@ -25,9 +26,10 @@ create table tig_nodes (
 
        primary key (nid),
        unique key tnode (parent_nid, node),
-       key node (node)
+       key node (node),
+			 constraint tig_nodes_constr foreign key (uid) references tig_users (uid)
 )
-default character set utf8;
+ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
 
 create table tig_pairs (
        nid bigint unsigned,
@@ -37,14 +39,16 @@ create table tig_pairs (
        pval varchar(65535),
 
        key pkey (pkey)
+			 constraint tig_pairs_constr_1 foreign key (uid) references tig_users (uid)
+			 constraint tig_pairs_constr_2 foreign key (nid) references tig_nodes (nid)
 )
-default character set utf8;
+ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
 
 create table tig_max_ids (
        max_uid bigint unsigned,
        max_nid bigint unsigned
 )
-default character set utf8;
+ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
 
 insert into tig_max_ids (max_uid, max_nid) values (1, 1);
 
