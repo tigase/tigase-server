@@ -22,7 +22,7 @@
  */
 package tigase.server;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -166,7 +166,7 @@ public abstract class AbstractMessageReceiver
   public abstract void processPacket(Packet packet);
 
   public List<StatRecord> getStatistics() {
-    List<StatRecord> stats = new ArrayList<StatRecord>();
+    List<StatRecord> stats = new LinkedList<StatRecord>();
     stats.add(new StatRecord(getName(), StatisticType.QUEUE_SIZE,
 				(in_queue.size() + out_queue.size()), Level.FINEST));
     stats.add(new StatRecord(getName(), StatisticType.MSG_RECEIVED_OK,
