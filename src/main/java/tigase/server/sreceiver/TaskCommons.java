@@ -30,7 +30,7 @@ import tigase.xml.XMLUtils;
 import static tigase.server.sreceiver.PropertyConstants.*;
 
 /**
- * Describe class TaskCommandCommons here.
+ * Describe class TaskCommons here.
  *
  *
  * Created: Mon May 21 08:31:25 2007
@@ -38,7 +38,7 @@ import static tigase.server.sreceiver.PropertyConstants.*;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public abstract class TaskCommandCommons {
+public abstract class TaskCommons {
 
 	public static void propertyItems2Command(Map<String, PropertyItem> props,
 		Packet result) {
@@ -61,4 +61,27 @@ public abstract class TaskCommandCommons {
 		} // end of for (Map.Entry entry: prop.entrySet())
 	}
 
-} // TaskCommandCommons
+	public static Packet getPresence(String to, String from, StanzaType type) {
+		Element presence = new Element("presence",
+			//<x xmlns="vcard-temp:x:update"><nickname>tus</nickname></x>
+			//<nick xmlns="http://jabber.org/protocol/nick">tus</nick>
+			new Element[] {new Element("nick", JID.getNodeNick(jid),
+					new String[] {"xmlns"},
+					new String[] {"http://jabber.org/protocol/nick"})},
+			new String[] {"to", "from", "type"},
+			new String[] {to, from, type.toString()});
+		return new Packet(presence);
+	}
+
+	public static Packet getMessage(String to, String from, StanzaType type,
+		String body) {
+		Element message = new Element("message",
+			new Element[] {
+				new Element("subject", "Automatic system message"),
+				new Element("body", body)},
+			new String[] {"to", "from", "type"},
+			new String[] {to, from, type.toString()});
+		return new Packet(message);
+	}
+
+} // TaskCommons
