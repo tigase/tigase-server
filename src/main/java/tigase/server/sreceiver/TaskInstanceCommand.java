@@ -33,9 +33,10 @@ import tigase.server.Packet;
 import tigase.stats.StatRecord;
 import tigase.xml.XMLUtils;
 import tigase.db.TigaseDBException;
+import tigase.xmpp.StanzaType;
 
 import static tigase.server.sreceiver.PropertyConstants.*;
-import static tigase.server.sreceiver.TaskCommandCommons.*;
+import static tigase.server.sreceiver.TaskCommons.*;
 
 /**
  * Describe class TaskInstanceCommand here.
@@ -56,6 +57,8 @@ public class TaskInstanceCommand implements TaskCommandIfc {
 	protected static final String CONFIRM = "confirm-field";
 	protected static final String PENDING_MODERATIONS_FIELD =
 		"Pending moderations";
+	protected static final String SUBSCRIBERS_FIELD = "Subscribers";
+	protected static final String ROSTER_ACTION_FIELD = "roster-action-field";
 
 	public enum ACTION {
 		TASK_CONFIGURATION, USER_MANAGEMENT, REMOVE_TASK;
@@ -71,6 +74,18 @@ public class TaskInstanceCommand implements TaskCommandIfc {
 
 	public enum USER_ACTION {
 		APROVE_PENDING_MODERATIONS, REJECT_PENDING_MODERATIONS, SELECT_USER;
+		public static String[] strValues() {
+			String[] possible_values = new String[values().length];
+			int i = 0;
+			for (Enum val: values()) {
+				possible_values[i++] = val.toString();
+			} // end of for (Enum en_v: en_val.values())
+			return possible_values;
+		}
+	};
+
+	public enum ROSTER_ACTION {
+		UPDATE_DATA, REMOVE_USER;
 		public static String[] strValues() {
 			String[] possible_values = new String[values().length];
 			int i = 0;
@@ -190,8 +205,6 @@ public class TaskInstanceCommand implements TaskCommandIfc {
 			Command.addAction(result, "next");
 			Command.addFieldValue(result, "Info", "Select action and user:", "fixed");
 			String[] actions = USER_ACTION.strValues();
-			Command.addFieldValue(result, USER_ACTION_FIELD, actions[0],
-				"Select action", actions, actions);
 			List<String> moderated = new LinkedList<String>();
 			for (RosterItem ri: task.getRoster().values()) {
 				if (!ri.isModerationAccepted()) {
@@ -199,10 +212,14 @@ public class TaskInstanceCommand implements TaskCommandIfc {
 				}
 			}
 			if (moderated.size() > 0) {
+				Command.addFieldValue(result, USER_ACTION_FIELD, actions[0],
+					"Select action", actions, actions);
 				String[] moder = moderated.toArray(new String[0]);
 				Command.addFieldValue(result, PENDING_MODERATIONS_FIELD, moder[0],
 					PENDING_MODERATIONS_FIELD, moder, moder, "list-multi");
 			} else {
+				Command.addFieldValue(result, USER_ACTION_FIELD, actions[2],
+					"Select action", actions, actions);
 				Command.addFieldValue(result, "Info", "No pending moderations.", "fixed");
 			}
 			String[] all_subscr = new String[task.getRoster().values().size()];
@@ -210,9 +227,10 @@ public class TaskInstanceCommand implements TaskCommandIfc {
 			for (RosterItem ri: task.getRoster().values()) {
 				all_subscr[idx++] = ri.getJid();
 			}
-			Command.addFieldValue(result, "Subscribers", all_subscr[0],
-				"Subscribers", all_subscr, all_subscr);
+			Command.addFieldValue(result, SUBSCRIBERS_FIELD, all_subscr[0],
+				SUBSCRIBERS_FIELD, all_subscr, all_subscr);
 		} else {
+			Command.addFieldValue(result, USER_ACTION_FIELD, user_action, "hidden");
 			String[] jids =
 				Command.getFieldValues(packet, PENDING_MODERATIONS_FIELD);
 			switch (USER_ACTION.valueOf(user_action)) {
@@ -223,6 +241,8 @@ public class TaskInstanceCommand implements TaskCommandIfc {
 						RosterItem ri = roster.get(jid);
 						if (ri != null) {
 								task.setRosterItemModerationAccepted(ri, true);
+								receiv.addOutPacket(getMessage(ri.getJid(), task.getJID(),
+										StanzaType.headline, "Your subscription has been approved."));
 						} else {
 							log.warning("Missing jid: " + jid
 								+ " in task: " + task_name + " roster.");
@@ -237,6 +257,10 @@ public class TaskInstanceCommand implements TaskCommandIfc {
 				break;
 			case REJECT_PENDING_MODERATIONS:
 				if (jids != null) {
+					for (String jid: jids) {
+						receiv.addOutPacket(getMessage(jid, task.getJID(),
+								StanzaType.headline, "Your subscription has been rejected."));
+					}
 					receiv.removeTaskSubscribers(task, jids);
 					Command.addFieldValue(result, "Info",
 						"Subscriptions have been rejected.", "fixed");
@@ -246,6 +270,65 @@ public class TaskInstanceCommand implements TaskCommandIfc {
 				}
 				break;
 			case SELECT_USER:
+				String jid = Command.getFieldValue(packet, SUBSCRIBERS_FIELD);
+				RosterItem ri = task.getRoster().get(jid);
+				if (ri != null) {
+					String roster_action =
+						Command.getFieldValue(packet, ROSTER_ACTION_FIELD);
+					if (roster_action == null) {
+						Command.setStatus(result, "executing");
+						Command.addAction(result, "complete");
+						Command.addFieldValue(result, "Info",
+							"Update subscription data for: " + jid, "fixed");
+						Command.addFieldValue(result, SUBSCRIBERS_FIELD, jid, "hidden");
+						String[] actions = ROSTER_ACTION.strValues();
+						Command.addFieldValue(result, ROSTER_ACTION_FIELD, actions[0],
+							"Select action", actions, actions);
+						String[] bool_arr = new String[] {"true", "false"};
+						Command.addFieldValue(result, "subscribed-ri",
+							new Boolean(ri.isSubscribed()).toString(),
+							"Subscribed", bool_arr, bool_arr);
+						Command.addFieldValue(result, "moderation-ri",
+							new Boolean(ri.isModerationAccepted()).toString(),
+							"Moderation approved", bool_arr, bool_arr);
+						Command.addFieldValue(result, "owner-ri",
+							new Boolean(ri.isOwner()).toString(),
+							"Owner", bool_arr, bool_arr);
+						Command.addFieldValue(result, "admin-ri",
+							new Boolean(ri.isAdmin()).toString(),
+							"Admin", bool_arr, bool_arr);
+					} else {
+						Command.addFieldValue(result, ROSTER_ACTION_FIELD, roster_action,
+							"hidden");
+						switch (ROSTER_ACTION.valueOf(roster_action)) {
+						case UPDATE_DATA:
+							ri.setSubscribed(parseBool(Command.getFieldValue(packet,
+										"subscribed-ri")));
+							ri.setModerationAccepted(parseBool(Command.getFieldValue(packet,
+										"moderation-ri")));
+							ri.setOwner(parseBool(Command.getFieldValue(packet,
+										"owner-ri")));
+							ri.setAdmin(parseBool(Command.getFieldValue(packet,
+										"admin-ri")));
+							task.setRosterItemModerationAccepted(ri,
+								ri.isModerationAccepted());
+							Command.addFieldValue(result, "Info",
+								"Subscription data for user " + jid + " have been updated.",
+								"fixed");
+							break;
+						case REMOVE_USER:
+							receiv.removeTaskSubscribers(task, jid);
+							Command.addFieldValue(result, "Info",
+								"Subscription for user " + jid +  " has been removed.", "fixed");
+							break;
+						default:
+							break;
+						}
+					}
+				} else {
+					Command.addFieldValue(result, "Info",
+						"There was a problem accesing user subscription data.", "fixed");
+				}
 				break;
 			default:
 				break;

@@ -570,4 +570,8 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		}
 	}
 
+	protected boolean addOutPacket(Packet packet) {
+		return super.addOutPacket(packet);
+	}
+
 } // StanzaReceiver

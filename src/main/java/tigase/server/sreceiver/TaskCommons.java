@@ -26,6 +26,10 @@ import java.util.Map;
 import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.xml.XMLUtils;
+import tigase.xml.Element;
+import tigase.server.Packet;
+import tigase.util.JID;
+import tigase.xmpp.StanzaType;
 
 import static tigase.server.sreceiver.PropertyConstants.*;
 
@@ -65,7 +69,7 @@ public abstract class TaskCommons {
 		Element presence = new Element("presence",
 			//<x xmlns="vcard-temp:x:update"><nickname>tus</nickname></x>
 			//<nick xmlns="http://jabber.org/protocol/nick">tus</nick>
-			new Element[] {new Element("nick", JID.getNodeNick(jid),
+			new Element[] {new Element("nick", JID.getNodeNick(from),
 					new String[] {"xmlns"},
 					new String[] {"http://jabber.org/protocol/nick"})},
 			new String[] {"to", "from", "type"},
@@ -82,6 +86,13 @@ public abstract class TaskCommons {
 			new String[] {"to", "from", "type"},
 			new String[] {to, from, type.toString()});
 		return new Packet(message);
+	}
+
+	public static boolean parseBool(final Object val) {
+		return val != null &&
+			(val.toString().equalsIgnoreCase("yes")
+				|| val.toString().equalsIgnoreCase("true")
+				|| val.toString().equalsIgnoreCase("on"));
 	}
 
 } // TaskCommons

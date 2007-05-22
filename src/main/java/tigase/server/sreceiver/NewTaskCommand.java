@@ -31,7 +31,7 @@ import tigase.util.JID;
 import tigase.xml.XMLUtils;
 
 import static tigase.server.sreceiver.PropertyConstants.*;
-import static tigase.server.sreceiver.TaskCommandCommons.*;
+import static tigase.server.sreceiver.TaskCommons.*;
 
 /**
  * Describe class NewTaskCommand here.

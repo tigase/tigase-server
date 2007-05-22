@@ -31,6 +31,7 @@ import tigase.db.UserRepository;
 import tigase.server.Packet;
 
 import static tigase.server.sreceiver.PropertyConstants.*;
+import static tigase.server.sreceiver.TaskCommons.*;
 
 /**
  * Describe class RepoRosterTask here.
@@ -56,10 +57,13 @@ public abstract class RepoRosterTask extends AbstractReceiverTask {
 	private static final String moderation_accepted_key = "moderation-accepted";
 
 	private void saveToRepository(RosterItem ri) {
+		log.info(getJID() + ": Saving roster item for: " + ri.getJid());
+// 		Thread.dumpStack();
 		String repo_node = roster_node + "/" + ri.getJid();
 		try {
-			repository.setData(getJID(), repo_node, subscribed_key,
-				new Boolean(ri.isSubscribed()).toString());
+			String tmp = new Boolean(ri.isSubscribed()).toString();
+			log.info(getJID() + ": " + ri.getJid() + ": subscribed = " + tmp);
+			repository.setData(getJID(), repo_node, subscribed_key, tmp);
 			repository.setData(getJID(), repo_node, owner_key,
 				new Boolean(ri.isOwner()).toString());
 			repository.setData(getJID(), repo_node, admin_key,
@@ -75,10 +79,12 @@ public abstract class RepoRosterTask extends AbstractReceiverTask {
 	}
 
 	private RosterItem loadFromRepository(String jid) {
+		log.info(getJID() + ": Loading roster item for: " + jid);
 		String repo_node = roster_node + "/" + jid;
 		RosterItem ri = new RosterItem(jid);
 		try {
 			String tmp = repository.getData(getJID(), repo_node, subscribed_key);
+			log.info(getJID() + ": " + jid + ": subscribed = " + tmp);
 			ri.setSubscribed(parseBool(tmp));
 			tmp = repository.getData(getJID(), repo_node, owner_key);
 			ri.setOwner(parseBool(tmp));
@@ -116,6 +122,8 @@ public abstract class RepoRosterTask extends AbstractReceiverTask {
 
 	public void setRosterItemSubscribed(RosterItem ri, boolean subscribed) {
 		super.setRosterItemSubscribed(ri, subscribed);
+		log.fine(getJID() + ": " +
+			"Updating subscription for " + ri.getJid() + " to " + subscribed);
 		saveToRepository(ri);
 	}
 
@@ -139,6 +147,7 @@ public abstract class RepoRosterTask extends AbstractReceiverTask {
 			String[] roster = repository.getSubnodes(getJID(), roster_node);
 			if (roster != null) {
 				for (String jid: roster) {
+					log.fine(getJID() + ": " + " loadin from repository: " + jid);
 					addToRoster(loadFromRepository(jid));
 				} // end of for (String jid: roster)
 			} // end of if (roster != null)
@@ -151,11 +160,11 @@ public abstract class RepoRosterTask extends AbstractReceiverTask {
 		if (map.get(USER_REPOSITORY_PROP_KEY) != null) {
 			repository = (UserRepository)map.get(USER_REPOSITORY_PROP_KEY);
 		}
-		super.setParams(map);
 		if (repository != null && !loaded) {
 			loaded = true;
 			loadRoster();
 		} // end of if (repository != null && !loaded)
+		super.setParams(map);
 	}
 
 	public void destroy(Queue<Packet> results) {

@@ -36,9 +36,9 @@ public class RosterItem {
 	private String jid = null;
 	private boolean online = false;
 	private boolean subscribed = false;
+	private boolean moderation_accepted = false;
 	private boolean owner = false;
 	private boolean admin = false;
-	private boolean moderation_accepted = false;
 
 	/**
 	 * Creates a new <code>RosterItem</code> instance.
