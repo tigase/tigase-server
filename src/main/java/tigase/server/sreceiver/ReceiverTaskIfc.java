@@ -201,4 +201,16 @@ public interface ReceiverTaskIfc {
 	 */
 	boolean isAdmin(String jid);
 
+	/**
+	 * <code>getRoster</code> returns <code>roster</code> that is a collection with
+	 * all users subscribed to this task.
+	 *
+	 * @return a <code>Map</code> value with all user subscribed to this task.
+	 */
+	Map<String, RosterItem> getRoster();
+
+	void removeSubscribers(Queue<Packet> results, String... subscr);
+
+	void setRosterItemModerationAccepted(RosterItem ri, boolean accepted);
+
 } // ReceiverTaskIfc

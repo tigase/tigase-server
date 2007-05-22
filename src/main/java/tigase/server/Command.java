@@ -23,6 +23,7 @@
 package tigase.server;
 
 import java.util.List;
+import java.util.LinkedList;
 import java.util.logging.Logger;
 import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
@@ -202,6 +203,31 @@ public enum Command {
 	}
 
 	public static void addFieldValue(final Packet packet,
+		final String f_name, final String f_value, final String label,
+		final String[] labels, final String[] options, final String type) {
+		Element iq = packet.getElement();
+		Element command = iq.getChild("command");
+		Element x = command.getChild("x", "jabber:x:data");
+		if (x == null) {
+			x = new Element("x",
+				new String[] {"xmlns", "type"},
+				new String[] {"jabber:x:data", "submit"});
+			command.addChild(x);
+		}
+		Element field = new Element("field",
+			new Element[] {new Element("value", f_value)},
+			new String[] {"var", "type", "label"},
+			new String[] {f_name, type, label});
+		for (int i = 0; i < labels.length; i++) {
+			field.addChild(new Element("option",
+					new Element[] {new Element("value", options[i])},
+					new String[] {"label"},
+					new String[] {labels[i]}));
+		}
+		x.addChild(field);
+	}
+
+	public static void addFieldValue(final Packet packet,
 		final String f_name, final String f_value, final String type) {
 		Element iq = packet.getElement();
 		Element command = iq.getChild("command");
@@ -263,6 +289,32 @@ public enum Command {
 					if (child.getName().equals("field")
 						&& child.getAttribute("var").equals(f_name)) {
 						return child.getChildCData("/field/value");
+					}
+				}
+			}
+		}
+		return null;
+	}
+
+	public static String[] getFieldValues(final Packet packet,
+		final String f_name) {
+		Element iq = packet.getElement();
+		Element command = iq.getChild("command", XMLNS);
+		Element x = command.getChild("x", "jabber:x:data");
+		if (x != null) {
+			List<Element> children = x.getChildren();
+			if (children != null) {
+				for (Element child: children) {
+					if (child.getName().equals("field")
+						&& child.getAttribute("var").equals(f_name)) {
+						List<String> values = new LinkedList<String>();
+						List<Element> val_children = child.getChildren();
+						for (Element val_child: val_children) {
+							if (val_child.getName().equals("value")) {
+								values.add(val_child.getCData());
+							}
+						}
+						return values.toArray(new String[0]);
 					}
 				}
 			}

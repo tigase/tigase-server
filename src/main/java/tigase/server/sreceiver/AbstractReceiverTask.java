@@ -232,8 +232,8 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 		} // end of for (String buddy: new_subscr)
 	}
 
-	public void removeSubscribers(Queue<Packet> results, String... new_subscr) {
-		for (String buddy: new_subscr) {
+	public void removeSubscribers(Queue<Packet> results, String... subscr) {
+		for (String buddy: subscr) {
 			RosterItem ri = removeFromRoster(buddy);
 			if (ri != null) {
 				log.info("Removing buddy from roster: " + buddy);
@@ -311,6 +311,8 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 				ri = addToRoster(owner);
 			} // end of if (ri == null)
 			setRosterItemOwner(ri, true);
+			setRosterItemAdmin(ri, true);
+			setRosterItemModerationAccepted(ri, true);
 			props.put(TASK_OWNER_PROP_KEY,
 				new PropertyItem(TASK_OWNER_PROP_KEY, TASK_OWNER_DISPL_NAME, owner));
 		}
@@ -323,6 +325,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 					ri = addToRoster(admin.trim());
 				} // end of if (ri == null)
 				setRosterItemAdmin(ri, true);
+				setRosterItemModerationAccepted(ri, true);
 			} // end of for (String tmp_b: tmp_arr)
 			props.put(TASK_ADMINS_PROP_KEY,
 				new PropertyItem(TASK_ADMINS_PROP_KEY, TASK_ADMINS_DISPL_NAME, tmp));
@@ -468,6 +471,9 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 	}
 
 	private void processMessage(Packet packet, Queue<Packet> results) {
+		if (!isAllowedToPost(JID.getNodeID(packet.getElemFrom()))) {
+			return;
+		}
 		for (RosterItem ri: roster.values()) {
 			if (ri.isSubscribed() && ri.isModerationAccepted()
 				&& (!send_to_online_only || ri.isOnline())
@@ -510,6 +516,10 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 	public boolean isAdmin(String jid) {
 		RosterItem ri = getRosterItem(jid);
 		return ri != null && (ri.isAdmin() || ri.isOwner());
+	}
+
+	public Map<String, RosterItem> getRoster() {
+		return roster;
 	}
 
 } // AbstractReceiverTask

@@ -248,6 +248,13 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		} // end of try-catch
 	}
 
+	protected void removeTaskSubscribers(ReceiverTaskIfc task,
+		String... subscr) {
+		Queue<Packet> results = new LinkedList<Packet>();
+		task.removeSubscribers(results, subscr);
+		addOutPackets(results);
+	}
+
 	protected Map<String, ReceiverTaskIfc> getTaskTypes() {
 		return task_types;
 	}

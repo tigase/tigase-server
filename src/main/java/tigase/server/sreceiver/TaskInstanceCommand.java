@@ -25,6 +25,7 @@ package tigase.server.sreceiver;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import java.util.List;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.HashMap;
 import tigase.server.Command;
@@ -51,10 +52,25 @@ public class TaskInstanceCommand implements TaskCommandIfc {
 		Logger.getLogger("tigase.server.sreceiver.TaskInstanceCommand");
 
 	protected static final String ACTION_FIELD = "action-field";
+	protected static final String USER_ACTION_FIELD = "user-action-field";
 	protected static final String CONFIRM = "confirm-field";
+	protected static final String PENDING_MODERATIONS_FIELD =
+		"Pending moderations";
 
 	public enum ACTION {
 		TASK_CONFIGURATION, USER_MANAGEMENT, REMOVE_TASK;
+		public static String[] strValues() {
+			String[] possible_values = new String[values().length];
+			int i = 0;
+			for (Enum val: values()) {
+				possible_values[i++] = val.toString();
+			} // end of for (Enum en_v: en_val.values())
+			return possible_values;
+		}
+	};
+
+	public enum USER_ACTION {
+		APROVE_PENDING_MODERATIONS, REJECT_PENDING_MODERATIONS, SELECT_USER;
 		public static String[] strValues() {
 			String[] possible_values = new String[values().length];
 			int i = 0;
@@ -163,6 +179,80 @@ public class TaskInstanceCommand implements TaskCommandIfc {
 		}
 	}
 
+	private void manageUsers(Packet packet, Packet result,
+		StanzaReceiver receiv) {
+		String task_name = Command.getFieldValue(packet, TASK_NAME_FIELD);
+		ReceiverTaskIfc task = receiv.getTaskInstances().get(task_name);
+		String user_action = Command.getFieldValue(packet, USER_ACTION_FIELD);
+		if (user_action == null) {
+			Command.setStatus(result, "executing");
+			Command.addAction(result, "complete");
+			Command.addAction(result, "next");
+			Command.addFieldValue(result, "Info", "Select action and user:", "fixed");
+			String[] actions = USER_ACTION.strValues();
+			Command.addFieldValue(result, USER_ACTION_FIELD, actions[0],
+				"Select action", actions, actions);
+			List<String> moderated = new LinkedList<String>();
+			for (RosterItem ri: task.getRoster().values()) {
+				if (!ri.isModerationAccepted()) {
+					moderated.add(ri.getJid());
+				}
+			}
+			if (moderated.size() > 0) {
+				String[] moder = moderated.toArray(new String[0]);
+				Command.addFieldValue(result, PENDING_MODERATIONS_FIELD, moder[0],
+					PENDING_MODERATIONS_FIELD, moder, moder, "list-multi");
+			} else {
+				Command.addFieldValue(result, "Info", "No pending moderations.", "fixed");
+			}
+			String[] all_subscr = new String[task.getRoster().values().size()];
+			int idx = 0;
+			for (RosterItem ri: task.getRoster().values()) {
+				all_subscr[idx++] = ri.getJid();
+			}
+			Command.addFieldValue(result, "Subscribers", all_subscr[0],
+				"Subscribers", all_subscr, all_subscr);
+		} else {
+			String[] jids =
+				Command.getFieldValues(packet, PENDING_MODERATIONS_FIELD);
+			switch (USER_ACTION.valueOf(user_action)) {
+			case APROVE_PENDING_MODERATIONS:
+				if (jids != null) {
+					Map<String, RosterItem> roster = task.getRoster();
+					for (String jid: jids) {
+						RosterItem ri = roster.get(jid);
+						if (ri != null) {
+								task.setRosterItemModerationAccepted(ri, true);
+						} else {
+							log.warning("Missing jid: " + jid
+								+ " in task: " + task_name + " roster.");
+						}
+					}
+					Command.addFieldValue(result, "Info",
+						"Subscriptions have been approved.", "fixed");
+				} else {
+					Command.addFieldValue(result, "Info",
+						"No subscriptions to approve.", "fixed");
+				}
+				break;
+			case REJECT_PENDING_MODERATIONS:
+				if (jids != null) {
+					receiv.removeTaskSubscribers(task, jids);
+					Command.addFieldValue(result, "Info",
+						"Subscriptions have been rejected.", "fixed");
+				} else {
+					Command.addFieldValue(result, "Info",
+						"No subscriptions to reject.", "fixed");
+				}
+				break;
+			case SELECT_USER:
+				break;
+			default:
+				break;
+			}
+		}
+	}
+
 	/**
 	 * Describe <code>processCommand</code> method here.
 	 *
@@ -202,7 +292,7 @@ public class TaskInstanceCommand implements TaskCommandIfc {
 				editConfiguration(packet, result, receiv);
 				break;
 			case USER_MANAGEMENT:
-
+				manageUsers(packet, result, receiv);
 				break;
 			case REMOVE_TASK:
 				removeTask(packet, result, receiv);
