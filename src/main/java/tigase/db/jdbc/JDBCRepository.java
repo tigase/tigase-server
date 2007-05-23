@@ -98,8 +98,19 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 
 	private boolean autoCreateUser = false;
 
-	private static long max_uid = 0;
-	private static long max_nid = 0;
+// 	private static long max_uid = 0;
+// 	private static long max_nid = 0;
+
+	private static long var_max_uid = 0;
+	private static long var_max_nid = 0;
+
+	private long getMaxUid() {
+		return (System.currentTimeMillis() * 100) + ((var_max_uid++) % 100);
+	}
+
+	private long getMaxNid() {
+		return (System.currentTimeMillis() * 100) + ((var_max_nid++) % 100);
+	}
 
 	private void release(Statement stmt, ResultSet rs) {
 		if (rs != null) {
@@ -154,29 +165,29 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		return result;
 	}
 
-	private void incrementMaxUID() throws SQLException {
-		Statement stmt = null;
-		try {
-			stmt = conn.createStatement();
-			// Update max_uid to current value
-			stmt.executeUpdate("update " + maxids_tbl + " set max_uid=(max_uid+1);");
-		} finally {
-			release(stmt, null);
-			stmt = null;
-		}
-	}
+// 	private void incrementMaxUID() throws SQLException {
+// 		Statement stmt = null;
+// 		try {
+// 			stmt = conn.createStatement();
+// 			// Update max_uid to current value
+// 			stmt.executeUpdate("update " + maxids_tbl + " set max_uid=(max_uid+1);");
+// 		} finally {
+// 			release(stmt, null);
+// 			stmt = null;
+// 		}
+// 	}
 
-	private void incrementMaxNID() throws SQLException {
-		Statement stmt = null;
-		try {
-			stmt = conn.createStatement();
-			// Update max_uid to current value
-			stmt.executeUpdate("update " + maxids_tbl + " set max_nid=(max_nid+1);");
-		} finally {
-			release(stmt, null);
-			stmt = null;
-		}
-	}
+// 	private void incrementMaxNID() throws SQLException {
+// 		Statement stmt = null;
+// 		try {
+// 			stmt = conn.createStatement();
+// 			// Update max_uid to current value
+// 			stmt.executeUpdate("update " + maxids_tbl + " set max_nid=(max_nid+1);");
+// 		} finally {
+// 			release(stmt, null);
+// 			stmt = null;
+// 		}
+// 	}
 
 	private String buildNodeQuery(long uid, String node_path) {
 		String query =
@@ -237,7 +248,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 
 	private long addNode(long uid, long parent_nid, String node_name)
 		throws SQLException {
-		long new_nid = max_nid++;
+		long new_nid = getMaxNid();
 		node_add_st.setLong(1, new_nid);
 		if (parent_nid < 0) {
 			node_add_st.setNull(2, Types.BIGINT);
@@ -247,7 +258,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		node_add_st.setLong(3, uid);
 		node_add_st.setString(4, node_name);
 		node_add_st.executeUpdate();
-		incrementMaxNID();
+		//incrementMaxNID();
 		return new_nid;
 	}
 
@@ -321,12 +332,12 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 			initPreparedStatements();
 			auth = new UserAuthRepositoryImpl(this);
 			stmt = conn.createStatement();
-			// load maximum ids
-			String query = "SELECT max_uid, max_nid FROM " + maxids_tbl;
-			rs = stmt.executeQuery(query);
-			rs.next();
-			max_uid = rs.getLong("max_uid");
-			max_nid = rs.getLong("max_nid");
+// 			// load maximum ids
+// 			String query = "SELECT max_uid, max_nid FROM " + maxids_tbl;
+// 			rs = stmt.executeQuery(query);
+// 			rs.next();
+// 			max_uid = rs.getLong("max_uid");
+// 			max_nid = rs.getLong("max_nid");
 			cache = new SimpleCache<String, Object>(10000);
 		} finally {
 			release(stmt, rs);
@@ -386,14 +397,15 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		checkConnection();
 		Statement stmt = null;
 		String query = null;
-		long uid = max_uid++;
+		long uid = getMaxUid();
 		try {
 			stmt = conn.createStatement();
 			// Add user into database.
 			query = "insert into " + users_tbl + " (uid, user_id) values ("
 				+ uid + ", '" + user_id + "');";
+			System.out.println(query);
 			stmt.executeUpdate(query);
-			incrementMaxUID();
+			//			incrementMaxUID();
 			addNode(uid, -1, root_node);
 		} finally {
 			release(stmt, null);
@@ -414,6 +426,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		try {
 			addUserRepo(user_id);
 		} catch (SQLException e) {
+			e.printStackTrace();
 			throw new UserExistsException("Error adding user to repository: ", e);
 		}
 	}
