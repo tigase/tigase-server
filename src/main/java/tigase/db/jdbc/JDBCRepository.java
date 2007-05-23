@@ -54,10 +54,13 @@ import tigase.util.SimpleCache;
  * Not synchronized implementation!
  * Mustn't be used by more than one thread a time.
  *
+ * Thanks to Daniele for better handling unique IDs.
+ *
  *
  * Created: Thu Oct 26 11:48:53 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
+ * @author <a href="mailto:piras@tiscali.com">Daniele</a>
  * @version $Rev$
  */
 public class JDBCRepository implements UserAuthRepository, UserRepository {
@@ -104,10 +107,24 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	private static long var_max_uid = 0;
 	private static long var_max_nid = 0;
 
+	/**
+	 * Describe <code>getMaxUid</code> method handles unique IDs much better for
+	 * distributed environment than the old code.
+	 * Thank's to Daniele for the help and the code.
+	 * 
+	 * @return a <code>long</code> value
+	 */
 	private long getMaxUid() {
 		return (System.currentTimeMillis() * 100) + ((var_max_uid++) % 100);
 	}
 
+	/**
+	 * <code>getMaxNid</code> method handles unique IDs much better for
+	 * distributed environment than the old code.
+	 * Thank's to Daniele for the help and the code.
+	 *
+	 * @return a <code>long</code> value
+	 */
 	private long getMaxNid() {
 		return (System.currentTimeMillis() * 100) + ((var_max_nid++) % 100);
 	}
