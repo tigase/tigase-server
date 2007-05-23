@@ -275,8 +275,6 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		while (strtok.hasMoreTokens()) {
 			String token = strtok.nextToken();
 			built_path = built_path + "/" + token;
-			System.out.println("      TOKEN="+token
-				+", build_path="+built_path);
 			long cur_nid = getNodeNID(uid, built_path);
 			if (cur_nid > 0) {
 				nid = cur_nid;
@@ -403,7 +401,6 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 			// Add user into database.
 			query = "insert into " + users_tbl + " (uid, user_id) values ("
 				+ uid + ", '" + user_id + "');";
-			System.out.println(query);
 			stmt.executeUpdate(query);
 			//			incrementMaxUID();
 			addNode(uid, -1, root_node);
