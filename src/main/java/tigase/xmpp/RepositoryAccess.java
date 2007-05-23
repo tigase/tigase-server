@@ -138,7 +138,7 @@ public abstract class RepositoryAccess {
 				+ ", pass: " + pass_param + ", email: " + email_param);
       return Authorization.AUTHORIZED;
     } catch (UserExistsException e) {
-      return Authorization.CONFLICT;
+			return Authorization.CONFLICT;
     } catch (TigaseDBException e) {
 			log.log(Level.SEVERE, "Repository access exception.", e);
 			return Authorization.INTERNAL_SERVER_ERROR;
