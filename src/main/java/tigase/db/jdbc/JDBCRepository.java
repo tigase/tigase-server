@@ -426,7 +426,6 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		try {
 			addUserRepo(user_id);
 		} catch (SQLException e) {
-			e.printStackTrace();
 			throw new UserExistsException("Error adding user to repository: ", e);
 		}
 	}
