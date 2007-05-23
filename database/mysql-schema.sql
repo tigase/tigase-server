@@ -38,8 +38,8 @@ create table tig_pairs (
        pkey varchar(128) NOT NULL,
        pval varchar(65535),
 
-       key pkey (pkey)
-			 constraint tig_pairs_constr_1 foreign key (uid) references tig_users (uid)
+       key pkey (pkey),
+			 constraint tig_pairs_constr_1 foreign key (uid) references tig_users (uid),
 			 constraint tig_pairs_constr_2 foreign key (nid) references tig_nodes (nid)
 )
 ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
