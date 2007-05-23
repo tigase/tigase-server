@@ -54,7 +54,7 @@ import tigase.util.SimpleCache;
  * Not synchronized implementation!
  * Mustn't be used by more than one thread a time.
  *
- * Thanks to Daniele for better handling unique IDs.
+ * Thanks to Daniele for better unique IDs handling.
  *
  *
  * Created: Thu Oct 26 11:48:53 2006
