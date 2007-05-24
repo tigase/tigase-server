@@ -69,6 +69,18 @@ public abstract class PropertyConstants {
 		}
 	};
 
+	public enum SenderAddress implements DefaultValues {
+		REPLACE, LEAVE, REMOVE;
+		public String[] strValues() {
+			String[] possible_values = new String[values().length];
+			int i = 0;
+			for (Enum val: values()) {
+				possible_values[i++] = val.toString();
+			} // end of for (Enum en_v: en_val.values())
+			return possible_values;
+		}
+	};
+
 	/**
 	 * Constant <code>SUBSCR_LIST_PROP_KEY</code> is a property key for task
 	 * instance configuration parameters. With this property you can provide
@@ -115,7 +127,8 @@ public abstract class PropertyConstants {
 	public static final String REPLACE_SENDER_PROP_KEY = "replace-sender";
 	public static final String REPLACE_SENDER_DISPL_NAME =
 		"Replace sender address";
-	public static final Boolean REPLACE_SENDER_PROP_VAL = true;
+	public static final SenderAddress REPLACE_SENDER_PROP_VAL =
+		SenderAddress.REPLACE;
 	public static final String ALLOWED_SENDERS_LIST_PROP_KEY =
 		"allowed-senders-list";
 	public static final String ALLOWED_SENDERS_LIST_DISPL_NAME =
