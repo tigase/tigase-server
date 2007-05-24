@@ -378,7 +378,43 @@ public class StanzaReceiver extends AbstractMessageReceiver
 
 	public Map<String, Object> getDefaults(final Map<String, Object> params) {
 		Map<String, Object> defs = super.getDefaults(params);
-		defs.put(TASKS_LIST_PROP_KEY, TASKS_LIST_PROP_VAL);
+
+		List<String> conf_tasks = new LinkedList<String>();
+		conf_tasks.addAll(Arrays.asList(TASKS_LIST_PROP_VAL));
+
+		if (params.get(GEN_CONF + "ssend-forum-task") != null) {
+			String[] forum_ids =
+				((String)params.get(GEN_CONF + "ssend-forum-task")).split(",");
+			for (String id: forum_ids) {
+				String task_name = "forum-" + id;
+				conf_tasks.add(task_name);
+				defs.put(task_name + "/" + TASK_ACTIVE_PROP_KEY, true);
+				defs.put(task_name + "/" + TASK_TYPE_PROP_KEY, TASK_TYPE_PROP_VAL);
+				Map<String, PropertyItem> default_props =
+					task_types.get(TASK_TYPE_PROP_VAL).getDefaultParams();
+				for (Map.Entry<String, PropertyItem> entry: default_props.entrySet()) {
+					defs.put(task_name + "/props/" + entry.getKey(),
+						entry.getValue().toString());
+					if (entry.getKey().equals(ALLOWED_SENDERS_PROP_KEY)) {
+						defs.put(task_name + "/props/" + entry.getKey(),
+							SenderRestrictions.OWNER.toString());
+					}
+					if (entry.getKey().equals(MESSAGE_TYPE_PROP_KEY)) {
+						defs.put(task_name + "/props/" + entry.getKey(),
+							MessageType.NORMAL.toString());
+					}
+					if (entry.getKey().equals(REPLACE_SENDER_PROP_KEY)) {
+						defs.put(task_name + "/props/" + entry.getKey(),
+							SenderAddress.REMOVE.toString());
+					}
+					if (entry.getKey().equals(TASK_OWNER_PROP_KEY)) {
+						defs.put(task_name + "/props/" + entry.getKey(),
+							"drupal-forum-" + id + "@ssend." + getDefHostName());
+					}
+				} // end of for ()
+			}
+		}
+
 		for (String task_name: TASKS_LIST_PROP_VAL) {
 			defs.put(task_name + "/" + TASK_ACTIVE_PROP_KEY, TASK_ACTIVE_PROP_VAL);
 			defs.put(task_name + "/" + TASK_TYPE_PROP_KEY, TASK_TYPE_PROP_VAL);
@@ -389,6 +425,8 @@ public class StanzaReceiver extends AbstractMessageReceiver
 					entry.getValue().toString());
 			} // end of for ()
 		} // end of for (String task_name: TASKS_LIST_PROP_VAL)
+
+		defs.put(TASKS_LIST_PROP_KEY, conf_tasks.toArray(new String[0]));
 
 		String srec_repo_class = XML_REPO_CLASS_PROP_VAL;
 		String srec_repo_uri = XML_REPO_URL_PROP_VAL;
