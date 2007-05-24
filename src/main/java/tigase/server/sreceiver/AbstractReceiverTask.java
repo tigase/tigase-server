@@ -40,6 +40,7 @@ import tigase.server.sreceiver.PropertyConstants.SenderRestrictions;
 import tigase.stats.StatRecord;
 import tigase.util.JID;
 import tigase.xmpp.StanzaType;
+import tigase.xmpp.Authorization;
 import java.util.LinkedList;
 
 import static tigase.server.sreceiver.PropertyConstants.*;
@@ -68,7 +69,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 	private SenderRestrictions send_restr = ALLOWED_SENDERS_PROP_VAL;
 	private MessageType message_type = MESSAGE_TYPE_PROP_VAL;
 	private boolean send_to_online_only = ONLINE_ONLY_PROP_VAL;
-	private boolean replace_sender_address = REPLACE_SENDER_PROP_VAL;
+	private SenderAddress replace_sender_address = REPLACE_SENDER_PROP_VAL;
 	private Pattern subscr_restr_regex =
 		Pattern.compile(SUBSCR_RESTR_REGEX_PROP_VAL);
 	private String owner = TASK_OWNER_PROP_VAL;
@@ -223,7 +224,8 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 					addToRoster(buddy);
 				} // end of if (getRosterItem(buddy) == null)
 				log.info(getJID() + ": " + "Adding buddy to roster: " + buddy);
-				presence = getPresence(buddy, jid, StanzaType.subscribe);
+				presence = getPresence(buddy, jid, StanzaType.subscribe,
+					JID.getNodeNick(jid), null);
 			} else {
 				log.info(getJID() + ": " +
 					"Not allowed to subscribe, rejecting: " + buddy);
@@ -294,8 +296,9 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 				new PropertyItem(ONLINE_ONLY_PROP_KEY,
 					ONLINE_ONLY_DISPL_NAME, send_to_online_only));
 		} // end of if (map.get(ONLINE_ONLY_PROP_KEY) != null)
-		if (map.get(REPLACE_SENDER_PROP_KEY) != null) {
-			replace_sender_address = parseBool(map.get(REPLACE_SENDER_PROP_KEY));
+		tmp = (String)map.get(REPLACE_SENDER_PROP_KEY);
+		if (tmp != null) {
+			replace_sender_address = SenderAddress.valueOf(tmp);
 			props.put(REPLACE_SENDER_PROP_KEY,
 				new PropertyItem(REPLACE_SENDER_PROP_KEY,
 					REPLACE_SENDER_DISPL_NAME, replace_sender_address));
@@ -313,6 +316,10 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 			props.put(TASK_OWNER_PROP_KEY,
 				new PropertyItem(TASK_OWNER_PROP_KEY, TASK_OWNER_DISPL_NAME, owner));
 		}
+		if (props.get(TASK_OWNER_PROP_KEY) == null) {
+			props.put(TASK_OWNER_PROP_KEY,
+				new PropertyItem(TASK_OWNER_PROP_KEY, TASK_OWNER_DISPL_NAME, ""));
+		}
 		tmp = (String)map.get(TASK_ADMINS_PROP_KEY);
 		if (tmp != null && tmp.length() > 0) {
 			admins = tmp.split(",");
@@ -326,6 +333,10 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 			} // end of for (String tmp_b: tmp_arr)
 			props.put(TASK_ADMINS_PROP_KEY,
 				new PropertyItem(TASK_ADMINS_PROP_KEY, TASK_ADMINS_DISPL_NAME, tmp));
+		}
+		if (props.get(TASK_ADMINS_PROP_KEY) == null) {
+			props.put(TASK_ADMINS_PROP_KEY,
+				new PropertyItem(TASK_ADMINS_PROP_KEY, TASK_ADMINS_DISPL_NAME, ""));
 		}
 	}
 
@@ -377,9 +388,11 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 		for (RosterItem ri: roster.values()) {
 			Packet presence = null;
 			if (ri.isSubscribed()) {
-				presence = getPresence(ri.getJid(), jid, StanzaType.available);
+				presence = getPresence(ri.getJid(), jid, StanzaType.available,
+					null, getDescription());
 			} else {
-				presence = getPresence(ri.getJid(), jid, StanzaType.subscribe);
+				presence = getPresence(ri.getJid(), jid, StanzaType.subscribe,
+					JID.getNodeNick(jid), null);
 			} // end of if (ri.isSubscribed()) else
 			results.offer(presence);
 		}
@@ -424,7 +437,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 			if (ri != null) {
 				setRosterItemOnline(ri, true);
 				results.offer(getPresence(packet.getElemFrom(), jid,
-						StanzaType.available));
+						StanzaType.available, null, getDescription()));
 			} // end of if (ri != null)
 			break;
 		case unavailable:
@@ -443,7 +456,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 			if (ri != null) {
 				setRosterItemSubscribed(ri, true);
 				results.offer(getPresence(packet.getElemFrom(), jid,
-						StanzaType.available));
+						StanzaType.available, null, getDescription()));
 				if (!ri.isModerationAccepted()) {
 					results.offer(getMessage(packet.getElemFrom(), jid,
 							StanzaType.headline,
@@ -465,6 +478,8 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 
 	private void processMessage(Packet packet, Queue<Packet> results) {
 		if (!isAllowedToPost(JID.getNodeID(packet.getElemFrom()))) {
+			results.offer(Authorization.NOT_ALLOWED.getResponseMessage(packet,
+					"You are not allowed to post a message.", true));
 			return;
 		}
 		for (RosterItem ri: roster.values()) {
@@ -478,12 +493,19 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 				} // end of if (body == null)
 				message.setAttribute("to", ri.getJid());
 				message.setAttribute("type", message_type.toString().toLowerCase());
-				if (replace_sender_address) {
+				switch (replace_sender_address) {
+				case REPLACE:
 					String old_from = message.getAttribute("from");
 					message.setAttribute("from", jid);
 					String cdata = body.getCData();
 					body.setCData(old_from + " sends:\n\n" + cdata);
-				} // end of if (replace_sender_address)
+					break;
+				case REMOVE:
+					message.setAttribute("from", jid);
+					break;
+				default:
+					break;
+				}
 				results.offer(new Packet(message));
 			} // end of if (ri.isSubscribed() && ri.isModerationAccepted())
 		} // end of for (RosterItem ri: roster.values())
