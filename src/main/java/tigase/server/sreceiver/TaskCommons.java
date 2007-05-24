@@ -65,16 +65,26 @@ public abstract class TaskCommons {
 		} // end of for (Map.Entry entry: prop.entrySet())
 	}
 
-	public static Packet getPresence(String to, String from, StanzaType type) {
+	public static Packet getPresence(String to, String from, StanzaType type,
+		String nick, String status) {
 		Element presence = new Element("presence",
-			//<x xmlns="vcard-temp:x:update"><nickname>tus</nickname></x>
-			//<nick xmlns="http://jabber.org/protocol/nick">tus</nick>
-			new Element[] {new Element("nick", JID.getNodeNick(from),
-					new String[] {"xmlns"},
-					new String[] {"http://jabber.org/protocol/nick"})},
 			new String[] {"to", "from", "type"},
 			new String[] {to, from, type.toString()});
+		if (nick != null) {
+			//<x xmlns="vcard-temp:x:update"><nickname>tus</nickname></x>
+			//<nick xmlns="http://jabber.org/protocol/nick">tus</nick>
+			presence.addChild(new Element("nick", nick,
+					new String[] {"xmlns"},
+					new String[] {"http://jabber.org/protocol/nick"}));
+		}
+		if (status != null) {
+			presence.addChild(new Element("status", status));
+		}
 		return new Packet(presence);
+	}
+
+	public static Packet getPresence(String to, String from, StanzaType type) {
+		return getPresence(to, from, type, null, null);
 	}
 
 	public static Packet getMessage(String to, String from, StanzaType type,
