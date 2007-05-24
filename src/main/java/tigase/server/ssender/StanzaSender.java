@@ -102,6 +102,10 @@ public class StanzaSender extends AbstractMessageReceiver
 		super.release();
 	}
 
+	private String myDomain() {
+		return getName() + "." + getDefHostName();
+	}
+
 	/**
 	 * Describe <code>processPacket</code> method here.
 	 *
@@ -140,7 +144,7 @@ public class StanzaSender extends AbstractMessageReceiver
 					(Long)props.get(task_name + "/" + TASK_INTERVAL_PROP_KEY);
 				try {
 					SenderTask task = (SenderTask)Class.forName(task_class).newInstance();
-					task.setName(task_name);
+					task.setName(task_name + "@" + myDomain());
 					task.init(this, task_init);
 
 					// Install new task
@@ -189,11 +193,15 @@ public class StanzaSender extends AbstractMessageReceiver
 		parseXMLData(stanza);
 	}
 
+	public void handleStanzas(Queue<Packet> results) {
+		addOutPackets(results);
+	}
+
 	private void parseXMLData(String data) {
 		DomBuilderHandler domHandler = new DomBuilderHandler();
 		parser.parse(domHandler, data.toCharArray(), 0, data.length());
 		Queue<Element> elems = domHandler.getParsedElements();
-		if (elems != null && elems.size() > 0) {
+		while (elems != null && elems.size() > 0) {
 			Packet result = new Packet(elems.poll());
 			addOutPacket(result);
 		}
