@@ -29,7 +29,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Date;
+//import java.sql.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Queue;
@@ -38,6 +38,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.server.Packet;
 import tigase.xmpp.StanzaType;
+import tigase.xml.XMLUtils;
 
 /**
  * <code>DrupalForumTask</code> implements tasks for cyclic retrieving new
@@ -68,6 +69,8 @@ public class DrupalForumTask extends SenderTask {
    */
   private static final Logger log =
     Logger.getLogger("tigase.server.ssender.DrupalForumTask");
+
+	private static final long SECOND = 1000;
 
 	/**
 	 * <code>handler</code> is a reference to object processing stanza
@@ -117,14 +120,14 @@ public class DrupalForumTask extends SenderTask {
 	 * gets only new posts.
 	 *
 	 */
-	protected Date lastTopicsCheck = null;
+	protected long lastTopicsCheck = -1;
 
 	/**
 	 * <code>lastCheck</code> keeps time of last forum comments check so it
 	 * gets only new posts.
 	 *
 	 */
-	protected Date lastCommentsCheck = null;
+	protected long lastCommentsCheck = -1;
 
 	/**
 	 * <code>lastConnectionValidated</code> variable keeps time where the
@@ -240,8 +243,8 @@ public class DrupalForumTask extends SenderTask {
 		this.handler = handler;
 		db_conn = initString;
 		findExtraParams(db_conn);
-		lastTopicsCheck = new Date(System.currentTimeMillis());
-		lastCommentsCheck = new Date(System.currentTimeMillis());
+		lastTopicsCheck = System.currentTimeMillis() / SECOND;
+		lastCommentsCheck = System.currentTimeMillis() / SECOND;
 
 		try {
 			initRepo();
@@ -277,8 +280,8 @@ public class DrupalForumTask extends SenderTask {
 		ResultSet rs = null;
 		try {
 			checkConnection();
-			get_new_topics.setDate(1, lastTopicsCheck);
-			lastTopicsCheck = new Date(System.currentTimeMillis());
+			get_new_topics.setLong(1, lastTopicsCheck);
+			lastTopicsCheck = System.currentTimeMillis() / SECOND;
 			get_new_topics.setLong(2, forumId);
 			rs = get_new_topics.executeQuery();
 			while (rs.next()) {
@@ -286,7 +289,8 @@ public class DrupalForumTask extends SenderTask {
 				String title = rs.getString("title");
 				String body = rs.getString("body");
 				Packet msg = Packet.getMessage(jid, getName(), StanzaType.normal,
-					"New post from: " + name + "\n\n" + body, title, null);
+					"New post by " + name + ":\n\n" + XMLUtils.escape(body),
+					XMLUtils.escape(title), null);
 				log.fine("Sending new topic: " + msg.toString());
 				results.offer(msg);
 			}
@@ -306,8 +310,9 @@ public class DrupalForumTask extends SenderTask {
 		ResultSet rs = null;
 		try {
 			checkConnection();
-			get_new_comments.setDate(1, lastCommentsCheck);
-			lastCommentsCheck = new Date(System.currentTimeMillis());
+			//			log.info("timestamp = " + lastCommentsCheck.toString());
+			get_new_comments.setLong(1, lastCommentsCheck);
+			lastCommentsCheck = System.currentTimeMillis() / SECOND;
 			get_new_comments.setLong(2, forumId);
 			rs = get_new_comments.executeQuery();
 			while (rs.next()) {
@@ -316,7 +321,8 @@ public class DrupalForumTask extends SenderTask {
 				String subject = rs.getString("subject");
 				String comment = rs.getString("comment");
 				Packet msg = Packet.getMessage(jid, getName(), StanzaType.normal,
-					"New comment from: " + name + "\n\n" + comment, subject, thread);
+					"New comment by " + name + ":\n\n" + XMLUtils.escape(comment),
+					XMLUtils.escape(subject), thread);
 				log.fine("Sending new comment: " + msg.toString());
 				results.offer(msg);
 			}
@@ -343,6 +349,10 @@ public class DrupalForumTask extends SenderTask {
 	 * <code>run</code> method is where all task work is done.
 	 */
 	public void run() {
+// 		log.info("Task " + getName()
+//  			+ ", timestamp = " + lastCommentsCheck
+// // 			+ ", getTime() = " + lastCommentsCheck.getTime()
+// 			+ ", System.currentTimeMillis() = " + System.currentTimeMillis());
 		Queue<Packet> results = getNewPackets();
 		handler.handleStanzas(results);
 	}
