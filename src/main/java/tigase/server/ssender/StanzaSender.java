@@ -25,6 +25,8 @@ package tigase.server.ssender;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Timer;
@@ -69,6 +71,12 @@ public class StanzaSender extends AbstractMessageReceiver
 	public static final String JDBC_TASK_INIT =
 		"jdbc:mysql://localhost/tigase?user=root&password=mypass&table=xmpp_stanza";
 	public static final long JDBC_INTERVAL = 10;
+	public static final String DRUPAL_FORUM_TASK_NAME = "drupal-forum";
+	public static final String DRUPAL_FORUM_TASK_CLASS =
+		"tigase.server.ssender.DrupalForumTask";
+	public static final String DRUPAL_FORUM_TASK_INIT =
+		"drupal_forum:mysql://localhost/tigase?user=root&password=mypass";
+	public static final long DRUPAL_FORUM_INTERVAL = 30;
 	public static final String FILE_TASK_NAME = "file";
 	public static final String FILE_TASK_CLASS = "tigase.server.ssender.FileTask";
 	public static final String FILE_TASK_INIT =
@@ -151,6 +159,9 @@ public class StanzaSender extends AbstractMessageReceiver
 					tasks_list.put(task_name, task);
 					tasks.scheduleAtFixedRate(task, task_interval*SECOND,
 						task_interval*SECOND);
+
+					log.config("Initialized task: " + task_name + ", class: " + task_class
+						+ ", init: " + task_init + ", interval: " + task_interval);
 				} catch (Exception e) {
 					log.log(Level.SEVERE, "Can not initialize stanza listener: ", e);
 				}
@@ -167,7 +178,6 @@ public class StanzaSender extends AbstractMessageReceiver
 	public Map<String, Object> getDefaults(final Map<String, Object> params) {
 		Map<String, Object> defs = super.getDefaults(params);
 		defs.put(INTERVAL_PROP_KEY, INTERVAL_PROP_VAL);
-		defs.put(STANZA_LISTENERS_PROP_KEY, STANZA_LISTENERS_PROP_VAL);
 
 		if ((Boolean)params.get(GEN_TEST)) {
 			defs.put(FILE_TASK_NAME + "/" + TASK_ACTIVE_PROP_KEY, true);
@@ -186,6 +196,35 @@ public class StanzaSender extends AbstractMessageReceiver
 		defs.put(JDBC_TASK_NAME + "/" + TASK_CLASS_PROP_KEY, JDBC_TASK_CLASS);
 		defs.put(JDBC_TASK_NAME + "/" + TASK_INIT_PROP_KEY, JDBC_TASK_INIT);
 		defs.put(JDBC_TASK_NAME + "/" + TASK_INTERVAL_PROP_KEY, JDBC_INTERVAL);
+
+		String repo_uri = DRUPAL_FORUM_TASK_INIT;
+		if (params.get(GEN_CONF + "drupal-db-uri") != null) {
+				repo_uri = (String)params.get(GEN_CONF + "drupal-db-uri");
+		} else {
+			if (params.get(GEN_USER_DB_URI) != null) {
+				repo_uri = (String)params.get(GEN_USER_DB_URI);
+			} // end of if (params.get(GEN_USER_DB_URI) != null)
+		}
+
+		List<String> listeners = new ArrayList<String>();
+		listeners.addAll(Arrays.asList(STANZA_LISTENERS_PROP_VAL));
+
+		if (params.get(GEN_CONF + "ssend-forum-task") != null) {
+			String[] forum_ids =
+				((String)params.get(GEN_CONF + "ssend-forum-task")).split(",");
+			for (String id: forum_ids) {
+				String task_name = DRUPAL_FORUM_TASK_NAME + "-" + id;
+				listeners.add(task_name);
+				defs.put(task_name + "/" + TASK_ACTIVE_PROP_KEY, true);
+				defs.put(task_name + "/" + TASK_CLASS_PROP_KEY, DRUPAL_FORUM_TASK_CLASS);
+				defs.put(task_name + "/" + TASK_INTERVAL_PROP_KEY, DRUPAL_FORUM_INTERVAL);
+				defs.put(task_name + "/" + TASK_INIT_PROP_KEY,
+					repo_uri + "&forum=" + id + "&jid=forum-" + id
+					+ "@srecv." + getDefHostName());
+			}
+		}
+
+		defs.put(STANZA_LISTENERS_PROP_KEY, listeners.toArray(new String[0]));
 		return defs;
 	}
 
