@@ -373,4 +373,19 @@ public class Packet {
 		return new Packet(copy);
 	}
 
+	public static Packet getMessage(String to, String from, StanzaType type,
+		String body, String subject, String thread) {
+		Element message = new Element("message",
+			new Element[] {new Element("body", body)},
+			new String[] {"to", "from", "type"},
+			new String[] {to, from, type.toString()});
+		if (subject != null) {
+			message.addChild(new Element("subject", subject));
+		}
+		if (thread != null) {
+			message.addChild(new Element("thread", thread));
+		}
+		return new Packet(message);
+	}
+
 }
