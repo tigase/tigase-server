@@ -22,6 +22,9 @@
  */
 package tigase.server.ssender;
 
+import java.util.Queue;
+import tigase.server.Packet;
+
 /**
  * Describe interface StanzaHandler here.
  *
@@ -34,5 +37,7 @@ package tigase.server.ssender;
 public interface StanzaHandler {
 
 	void handleStanza(String stanza);
+
+	void handleStanzas(Queue<Packet> results);
 
 }
