@@ -52,10 +52,10 @@ public class MessageRouterConfig {
 		"components/msg-receivers/";
 	public static final String MSG_RECEIVERS_NAMES_PROP_KEY =
 		MSG_RECEIVERS_PROP_KEY + "id-names";
-	public static final String DEF_SM_NAME = "sess_man";
+	public static final String DEF_SM_NAME = "sess-man";
 	public static final String DEF_C2S_NAME = "c2s";
 	public static final String DEF_S2S_NAME = "s2s";
-	public static final String DEF_EXT_COMP_NAME = "ext_comp";
+	public static final String DEF_EXT_COMP_NAME = "ext-comp";
 	public static final String DEF_SSEND_NAME = "ssend";
 	public static final String DEF_SRECV_NAME = "srecv";
 
@@ -83,14 +83,14 @@ public class MessageRouterConfig {
 	public static final String REGISTRATOR_PROP_KEY = "components/registrators/";
 	public static final String REGISTRATOR_NAMES_PROP_KEY =
 		REGISTRATOR_PROP_KEY + "id-names";
-	public static final String[] REGISTRATOR_NAMES_PROP_VAL =	{	"stat_1" };
+	public static final String[] REGISTRATOR_NAMES_PROP_VAL =	{	"stat-1" };
 
 	public static final String STAT_1_CLASS_PROP_KEY =
-		REGISTRATOR_PROP_KEY + "stat_1.class";
+		REGISTRATOR_PROP_KEY + "stat-1.class";
 	public static final String STAT_1_CLASS_PROP_VAL =
 		"tigase.stats.StatisticsCollector";
 	public static final String STAT_1_ACTIVE_PROP_KEY =
-		REGISTRATOR_PROP_KEY + "stat_1.active";
+		REGISTRATOR_PROP_KEY + "stat-1.active";
 	public static final boolean STAT_1_ACTIVE_PROP_VAL = true;
 
 	public static void getDefaults(Map<String, Object> defs,
