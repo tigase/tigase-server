@@ -67,7 +67,7 @@ public class ComponentConnectionManager extends ConnectionManager
   public static String SECRET_PROP_VAL =	"someSecret";
 	public static final String PORT_LOCAL_HOST_PROP_KEY = "local-host";
 	public static String PORT_LOCAL_HOST_PROP_VAL = "localhost";
-	public static String PORT_REMOTE_HOST_PROP_VAL = "comp_1.localhost";
+	public static String PORT_REMOTE_HOST_PROP_VAL = "comp-1.localhost";
 	public static final String PORT_ROUTING_TABLE_PROP_KEY = "routing-table";
 	public static String[] PORT_ROUTING_TABLE_PROP_VAL =
 	{ ".*" + PORT_REMOTE_HOST_PROP_VAL };
