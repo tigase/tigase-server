@@ -40,7 +40,7 @@ import javax.security.sasl.SaslServer;
 
 import tigase.util.Base64;
 import tigase.util.Algorithms;
-import tigase.util.JID;
+import tigase.util.JIDUtils;
 
 import static tigase.db.UserAuthRepository.*;
 
@@ -284,7 +284,7 @@ public class UserAuthRepositoryImpl implements UserAuthRepository {
 					if (user_name == null) {
 						user_name = nc.getDefaultName();
 					} // end of if (name == null)
-					jid = JID.getNodeID(user_name, (String)options.get(REALM_KEY));
+					jid = JIDUtils.getNodeID(user_name, (String)options.get(REALM_KEY));
 					options.put(USER_ID_KEY, jid);
 					log.finest("NameCallback: " + user_name);
 				} else if (callbacks[i] instanceof PasswordCallback) {

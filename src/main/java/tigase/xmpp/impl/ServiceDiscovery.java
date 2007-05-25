@@ -28,7 +28,7 @@ import java.util.logging.Logger;
 import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.disco.XMPPServiceCollector;
-import tigase.util.JID;
+import tigase.util.JIDUtils;
 import tigase.util.ElementUtils;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
@@ -92,8 +92,8 @@ public abstract class ServiceDiscovery extends XMPPProcessor
 			String nodeId = null;
 			String nodeNick = null;
 			if (packet.getElemTo() != null) {
-				nodeId = JID.getNodeID(packet.getElemTo());
-				nodeNick = JID.getNodeNick(packet.getElemTo());
+				nodeId = JIDUtils.getNodeID(packet.getElemTo());
+				nodeNick = JIDUtils.getNodeNick(packet.getElemTo());
 			} // end of if (packet.getElemTo() != null)
 
 			if (packet.isCommand()) {

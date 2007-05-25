@@ -25,7 +25,7 @@ package tigase.xmpp;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Map;
-import tigase.util.JID;
+import tigase.util.JIDUtils;
 import tigase.db.UserRepository;
 import tigase.db.UserAuthRepository;
 import tigase.db.UserExistsException;
@@ -91,13 +91,13 @@ public abstract class RepositoryAccess {
     }
     // Some clients send plain user name and others send
     // jid as user name. Let's resolve this here.
-    String user_name = JID.getNodeNick(name_param);
+    String user_name = JIDUtils.getNodeNick(name_param);
     if (user_name == null || user_name.equals("")) {
       user_name = name_param;
     } // end of if (user_mame == null || user_name.equals(""))
     if (getUserName().equals(user_name)) {
 			try {
-        authRepo.removeUser(JID.getNodeID(user_name, getDomain()));
+        authRepo.removeUser(JIDUtils.getNodeID(user_name, getDomain()));
 				return Authorization.AUTHORIZED;
 			} catch (UserNotFoundException e) {
 				return Authorization.REGISTRATION_REQUIRED;
@@ -115,7 +115,7 @@ public abstract class RepositoryAccess {
 		throws NotAuthorizedException {
     // Some clients send plain user name and others send
     // jid as user name. Let's resolve this here.
-    String user_name = JID.getNodeNick(name_param);
+    String user_name = JIDUtils.getNodeNick(name_param);
     if (user_name == null || user_name.equals("")) {
       user_name = name_param;
     } // end of if (user_mame == null || user_name.equals(""))
@@ -130,11 +130,11 @@ public abstract class RepositoryAccess {
     }
 
     try {
-      authRepo.addUser(JID.getNodeID(user_name, getDomain()), pass_param);
-			log.info("User added: " + JID.getNodeID(user_name, getDomain())
+      authRepo.addUser(JIDUtils.getNodeID(user_name, getDomain()), pass_param);
+			log.info("User added: " + JIDUtils.getNodeID(user_name, getDomain())
 				+ ", pass: " + pass_param);
       setRegistration(user_name, pass_param, email_param);
-			log.info("Registration data set for: " + JID.getNodeID(user_name, getDomain())
+			log.info("Registration data set for: " + JIDUtils.getNodeID(user_name, getDomain())
 				+ ", pass: " + pass_param + ", email: " + email_param);
       return Authorization.AUTHORIZED;
     } catch (UserExistsException e) {
@@ -165,10 +165,10 @@ public abstract class RepositoryAccess {
   private void setRegistration(final String name_param,
     final String pass_param, final String email_param) {
     try {
-      authRepo.updatePassword(JID.getNodeID(name_param, getDomain()),
+      authRepo.updatePassword(JIDUtils.getNodeID(name_param, getDomain()),
 				pass_param);
       if (email_param != null && !email_param.equals("")) {
-        repo.setData(JID.getNodeID(name_param, getDomain()),
+        repo.setData(JIDUtils.getNodeID(name_param, getDomain()),
           "email", email_param);
       }
     } catch (UserNotFoundException e) {
@@ -223,7 +223,7 @@ public abstract class RepositoryAccess {
   public Authorization loginPlain(String user, String password)
 		throws NotAuthorizedException, AuthorizationException {
 		try {
-			if (authRepo.plainAuth(JID.getNodeID(user, getDomain()), password)) {
+			if (authRepo.plainAuth(JIDUtils.getNodeID(user, getDomain()), password)) {
 				authState = Authorization.AUTHORIZED;
 			} // end of if (authRepo.loginPlain())auth.login();
 			return authState;
@@ -256,7 +256,7 @@ public abstract class RepositoryAccess {
 		String id, String alg)
 		throws NotAuthorizedException, AuthorizationException {
 		try {
-			if (authRepo.digestAuth(JID.getNodeID(user, getDomain()), digest,
+			if (authRepo.digestAuth(JIDUtils.getNodeID(user, getDomain()), digest,
 					id, alg)) {
 				authState = Authorization.AUTHORIZED;
 			} // end of if (authRepo.loginPlain())auth.login();

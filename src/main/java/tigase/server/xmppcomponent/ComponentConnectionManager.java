@@ -45,7 +45,7 @@ import tigase.disco.XMPPService;
 import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
 import tigase.util.Algorithms;
-import tigase.util.JID;
+import tigase.util.JIDUtils;
 import tigase.xml.Element;
 import tigase.xmpp.XMPPIOService;
 
@@ -298,7 +298,7 @@ public class ComponentConnectionManager extends ConnectionManager
 	}
 
 	protected String getServiceId(Packet packet) {
-		return JID.getNodeHost(JID.getNodeHost(packet.getTo()));
+		return JIDUtils.getNodeHost(JIDUtils.getNodeHost(packet.getTo()));
 	}
 
 	public void serviceStarted(final IOService service) {

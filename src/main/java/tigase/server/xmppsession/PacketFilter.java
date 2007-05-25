@@ -31,7 +31,7 @@ import tigase.xmpp.Authorization;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.StanzaType;
-import tigase.util.JID;
+import tigase.util.JIDUtils;
 
 /**
  * Describe class PacketFilter here.
@@ -90,7 +90,7 @@ public class PacketFilter {
 				log.finest("Setting correct from attribute: " + session.getJID());
 			} // end of if (packet.getFrom().equals(session.getConnectionId()))
 
-			String id = JID.getNodeID(packet.getElemTo());
+			String id = JIDUtils.getNodeID(packet.getElemTo());
 
 			if (id.equals(session.getUserId())) {
 				// Yes this is message to 'this' client

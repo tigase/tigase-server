@@ -53,7 +53,7 @@ import tigase.server.Packet;
 import tigase.server.Permissions;
 import tigase.server.ServerComponent;
 import tigase.util.ClassUtil;
-import tigase.util.JID;
+import tigase.util.JIDUtils;
 import tigase.xml.Element;
 import tigase.xml.XMLUtils;
 import tigase.xml.db.Types.DataType;
@@ -715,7 +715,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 // 	}
 
 	private boolean checkComponentName(Packet result, String name) {
-		String msg = JID.checkNickName(name);
+		String msg = JIDUtils.checkNickName(name);
 		if (msg != null) {
 			Command.addFieldValue(result, "Info",
 				"Note!! " + msg + ", please provide valid component name.", "fixed");

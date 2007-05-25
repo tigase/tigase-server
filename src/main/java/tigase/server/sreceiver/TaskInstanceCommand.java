@@ -387,7 +387,7 @@ public class TaskInstanceCommand implements TaskCommandIfc {
 			Command.setStatus(result, "executing");
 			Command.addAction(result, "next");
 			Command.addFieldValue(result, TASK_NAME_FIELD,
-				"", "text-single", "Enter task JID");
+				"", "text-single", "Enter task JIDUtils");
 		} // end of if (task != null) else
 	}
 

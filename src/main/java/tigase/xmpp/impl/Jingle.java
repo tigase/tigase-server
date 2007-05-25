@@ -34,7 +34,7 @@ import tigase.xmpp.XMPPImplIfc;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
-import tigase.util.JID;
+import tigase.util.JIDUtils;
 
 /**
  * Describe class Jingle here.
@@ -89,7 +89,7 @@ public class Jingle extends XMPPProcessor implements XMPPProcessorIfc {
 				packet.getElement().setAttribute("from", conn.getJID());
 			} // end of if (packet.getFrom().equals(session.getConnectionId()))
 
-			String id = JID.getNodeID(packet.getElemTo());
+			String id = JIDUtils.getNodeID(packet.getElemTo());
 
 			if (id.equals(conn.getUserId())) {
 				// Yes this is message to 'this' client

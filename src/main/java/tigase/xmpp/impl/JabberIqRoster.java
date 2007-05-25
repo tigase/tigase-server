@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.logging.Logger;
 import tigase.server.Packet;
-import tigase.util.JID;
+import tigase.util.JIDUtils;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.NotAuthorizedException;
@@ -83,7 +83,7 @@ public class JabberIqRoster extends XMPPProcessor
 		Element request = packet.getElement();
 
     String buddy =
-			JID.getNodeID(request.getAttribute("/iq/query/item", "jid"));
+			JIDUtils.getNodeID(request.getAttribute("/iq/query/item", "jid"));
     Element item =  request.findChild("/iq/query/item");
     String subscription = item.getAttribute("subscription");
     if (subscription != null && subscription.equals("remove")) {
@@ -162,7 +162,7 @@ public class JabberIqRoster extends XMPPProcessor
 
 		try {
 			if (packet.getElemFrom() != null
-				&& !session.getUserId().equals(JID.getNodeID(packet.getElemFrom()))) {
+				&& !session.getUserId().equals(JIDUtils.getNodeID(packet.getElemFrom()))) {
 				// RFC says: ignore such request
 				log.warning(
 					"Roster request 'from' attribute doesn't match session userid: "
@@ -170,7 +170,7 @@ public class JabberIqRoster extends XMPPProcessor
 					+ ", request: " + packet.getStringData());
 				return;
 			} // end of if (packet.getElemFrom() != null
-				// && !session.getUserId().equals(JID.getNodeID(packet.getElemFrom())))
+				// && !session.getUserId().equals(JIDUtils.getNodeID(packet.getElemFrom())))
 
 			StanzaType type = packet.getType();
 			switch (type) {

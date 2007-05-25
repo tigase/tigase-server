@@ -25,7 +25,7 @@ package tigase.xmpp.impl;
 import java.util.Queue;
 import java.util.logging.Logger;
 import tigase.server.Packet;
-import tigase.util.JID;
+import tigase.util.JIDUtils;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.NotAuthorizedException;

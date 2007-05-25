@@ -43,7 +43,7 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import tigase.xml.Element;
-import tigase.util.JID;
+import tigase.util.JIDUtils;
 import tigase.xmpp.Authorization;
 import tigase.disco.XMPPService;
 import tigase.disco.ServiceEntity;
@@ -193,9 +193,9 @@ public class MessageRouter extends AbstractMessageReceiver {
 			}
 		}
 
-		String host = JID.getNodeHost(packet.getTo());
-		String id =  JID.getNodeID(packet.getTo());
-		String nick = JID.getNodeNick(packet.getTo());
+		String host = JIDUtils.getNodeHost(packet.getTo());
+		String id =  JIDUtils.getNodeID(packet.getTo());
+		String nick = JIDUtils.getNodeNick(packet.getTo());
 		// Let's try to find message receiver quick way
 		// In case if packet is handled internally:
 		MessageReceiver first = null;

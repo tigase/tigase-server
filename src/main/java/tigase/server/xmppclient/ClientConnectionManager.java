@@ -44,7 +44,7 @@ import tigase.server.MessageReceiver;
 import tigase.server.Packet;
 import tigase.disco.XMPPService;
 import tigase.util.DNSResolver;
-import tigase.util.JID;
+import tigase.util.JIDUtils;
 import tigase.util.RoutingsContainer;
 import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
@@ -255,7 +255,7 @@ public class ClientConnectionManager extends ConnectionManager {
 	}
 
 	private String getFromAddress(String id) {
-		return JID.getJID(getName(), getDefHostName(), id);
+		return JIDUtils.getJID(getName(), getDefHostName(), id);
 	}
 
 	public String xmppStreamOpened(XMPPIOService serv,

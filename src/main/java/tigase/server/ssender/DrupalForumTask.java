@@ -44,12 +44,12 @@ import tigase.xml.XMLUtils;
  * <code>DrupalForumTask</code> implements tasks for cyclic retrieving new
  * posts on selected <a href="http://drupal.org/">Drupal</a> forum.
  * It detects both new forum topics and new comments for forum topics.
- * Then it can sends this to one selected JID. Thus it should be used toghether
+ * Then it can sends this to one selected JIDUtils. Thus it should be used toghether
  * with StanzaReceiver task which can distribute this informatin to all interested
  * (subscribed) users.
  * <p>
  * You have to specify forum ID for monitoring in connection string as well as
- * destination JID where forum posts have to be sent. It is not very useful to
+ * destination JIDUtils where forum posts have to be sent. It is not very useful to
  * send post to just one person so to ditribute forum posts to biger number of
  * users this task should be paired with <code>StanzaReceiver</code> task which
  * can distribute it to all interested users.

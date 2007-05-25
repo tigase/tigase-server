@@ -42,7 +42,7 @@ import tigase.conf.Configurable;
 import tigase.stats.StatRecord;
 import tigase.stats.StatisticType;
 import tigase.stats.StatisticsContainer;
-import tigase.util.JID;
+import tigase.util.JIDUtils;
 
 /**
  * Describe class AbstractMessageReceiver here.

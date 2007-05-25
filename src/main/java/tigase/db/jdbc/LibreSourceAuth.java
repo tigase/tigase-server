@@ -55,7 +55,7 @@ import tigase.db.UserAuthRepository;
 import tigase.db.UserExistsException;
 import tigase.db.UserNotFoundException;
 import tigase.util.Algorithms;
-import tigase.util.JID;
+import tigase.util.JIDUtils;
 
 import static tigase.db.UserAuthRepository.*;
 
@@ -157,7 +157,7 @@ public class LibreSourceAuth implements UserAuthRepository {
 	private void updateLastLogin(String user) throws TigaseDBException {
 		try {
 			update_last_login_st.setDate(1, new Date(System.currentTimeMillis()));
-			update_last_login_st.setString(2, JID.getNodeNick(user));
+			update_last_login_st.setString(2, JIDUtils.getNodeNick(user));
 			update_last_login_st.executeUpdate();
 		} catch (SQLException e) {
 			throw new TigaseDBException("Error accessin repository.", e);
@@ -168,7 +168,7 @@ public class LibreSourceAuth implements UserAuthRepository {
 		throws TigaseDBException {
 		try {
 			update_online_status.setInt(1, status);
-			update_online_status.setString(2, JID.getNodeNick(user));
+			update_online_status.setString(2, JIDUtils.getNodeNick(user));
 			update_online_status.executeUpdate();
 		} catch (SQLException e) {
 			throw new TigaseDBException("Error accessin repository.", e);
@@ -179,7 +179,7 @@ public class LibreSourceAuth implements UserAuthRepository {
 		throws SQLException, UserNotFoundException {
 		ResultSet rs = null;
 		try {
-			status_st.setString(1, JID.getNodeNick(user));
+			status_st.setString(1, JIDUtils.getNodeNick(user));
 			rs = status_st.executeQuery();
 			if (rs.next()) {
 				int res = rs.getInt(1);
@@ -196,7 +196,7 @@ public class LibreSourceAuth implements UserAuthRepository {
 		throws SQLException, UserNotFoundException {
 		ResultSet rs = null;
 		try {
-			pass_st.setString(1, JID.getNodeNick(user));
+			pass_st.setString(1, JIDUtils.getNodeNick(user));
 			rs = pass_st.executeQuery();
 			if (rs.next()) {
 				return rs.getString(1);
@@ -381,16 +381,16 @@ public class LibreSourceAuth implements UserAuthRepository {
 			stmt = conn.createStatement();
 // 			String query = "insert into " + users_tbl
 // 				+ " (username_, passworddigest_)"
-// 				+ " values ('" + JID.getNodeNick(user)
+// 				+ " values ('" + JIDUtils.getNodeNick(user)
 // 				+ "', '" + ls_digest(password) + "');";
 			String query = "insert into " + users_tbl
 				+ " (username_, passworddigest_)"
-				+ " values ('" + JID.getNodeNick(user)
+				+ " values ('" + JIDUtils.getNodeNick(user)
 				+ "', '" + password + "');";
 			stmt.executeUpdate(query);
 			query = "insert into " + profiles_tbl
 				+ " (id_, accountstatus_)"
-				+ " values ('" + JID.getNodeNick(user) + "', 0);";
+				+ " values ('" + JIDUtils.getNodeNick(user) + "', 0);";
 			stmt.executeUpdate(query);
 		} catch (SQLException e) {
 			throw new UserExistsException("Error while adding user to repository, user exists?", e);
@@ -413,7 +413,7 @@ public class LibreSourceAuth implements UserAuthRepository {
 		try {
 			checkConnection();
 			update_password.setString(1, password);
-			update_password.setString(2, JID.getNodeNick(user));
+			update_password.setString(2, JIDUtils.getNodeNick(user));
 			update_password.executeUpdate();
 		} catch (SQLException e) {
 			throw new TigaseDBException("Error accessin repository.", e);
@@ -434,10 +434,10 @@ public class LibreSourceAuth implements UserAuthRepository {
 			checkConnection();
 			stmt = conn.createStatement();
 			String query = "delete from " + users_tbl
-				+ " where (username_ = '" + JID.getNodeNick(user)	+ "');";
+				+ " where (username_ = '" + JIDUtils.getNodeNick(user)	+ "');";
 			stmt.executeUpdate(query);
 			query = "delete from " + profiles_tbl
-				+ " where (id_ = '" + JID.getNodeNick(user)	+ "');";
+				+ " where (id_ = '" + JIDUtils.getNodeNick(user)	+ "');";
 			stmt.executeUpdate(query);
 		} catch (SQLException e) {
 			throw new UserExistsException("Error while adding user to repository, user exists?", e);
@@ -515,7 +515,7 @@ public class LibreSourceAuth implements UserAuthRepository {
 					if (user_name == null) {
 						user_name = nc.getDefaultName();
 					} // end of if (name == null)
-					jid = JID.getNodeID(user_name, (String)options.get(REALM_KEY));
+					jid = JIDUtils.getNodeID(user_name, (String)options.get(REALM_KEY));
 					options.put(USER_ID_KEY, jid);
 					log.finest("NameCallback: " + user_name);
 				} else if (callbacks[i] instanceof PasswordCallback) {

@@ -169,7 +169,7 @@ public class Presence extends XMPPProcessor
 	 * new resource to old resources and about old resources to new resource.
 	 *
 	 * @param presence an <code>Element</code> presence received from other users,
-	 * we have to change 'to' attribute to full resource JID.
+	 * we have to change 'to' attribute to full resource JIDUtils.
 	 * @param session a <code>XMPPResourceConnection</code> value keeping
 	 * connection session object.
 	 * @exception NotAuthorizedException if an error occurs
@@ -208,7 +208,7 @@ public class Presence extends XMPPProcessor
 	 * incoming avaiability presence, subscription presence and so on...
 	 *
 	 * @param presence an <code>Element</code> presence received from other users,
-	 * we have to change 'to' attribute to full resource JID.
+	 * we have to change 'to' attribute to full resource JIDUtils.
 	 * @param session a <code>XMPPResourceConnection</code> value keeping
 	 * connection session object.
 	 * @exception NotAuthorizedException if an error occurs

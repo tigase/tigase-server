@@ -27,7 +27,7 @@ import java.util.Queue;
 import java.util.Date;
 import java.util.LinkedList;
 import java.text.SimpleDateFormat;
-import tigase.util.JID;
+import tigase.util.JIDUtils;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.UserNotFoundException;
 import tigase.server.Packet;
@@ -188,12 +188,12 @@ public class OfflineMessages extends XMPPProcessor
 			synchronized (formater) {
 				stamp = formater.format(new Date());
 			}
-			String from = JID.getNodeHost(pac.getElemTo());
+			String from = JIDUtils.getNodeHost(pac.getElemTo());
 			Element x = new Element("x", "Offline Storage",
 				new String[] {"from", "stamp", "xmlns"},
 				new String[] {from, stamp, "jabber:x:delay"});
 			packet.addChild(x);
-			String user_id = JID.getNodeID(pac.getElemTo());
+			String user_id = JIDUtils.getNodeID(pac.getElemTo());
 			repo.addOfflineDataList(user_id, ID,
 				"messages", new String[] {packet.toString()});
 			return true;

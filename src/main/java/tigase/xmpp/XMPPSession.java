@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Logger;
-import tigase.util.JID;
+import tigase.util.JIDUtils;
 
 /**
  * Describe class XMPPSession here.
@@ -47,7 +47,7 @@ public class XMPPSession {
   private static Logger log = Logger.getLogger("tigase.xmpp.XMPPSession");
 
   /**
-   * User name - part of user's JID
+   * User name - part of user's JIDUtils
    */
   private String username = null;
 
@@ -138,7 +138,7 @@ public class XMPPSession {
 	}
 
 	public XMPPResourceConnection getResourceForJID(final String jid) {
-		final String resource = JID.getNodeResource(jid);
+		final String resource = JIDUtils.getNodeResource(jid);
 		return getResourceForResource(resource);
 	}
 

@@ -33,7 +33,7 @@ import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
-import tigase.util.JID;
+import tigase.util.JIDUtils;
 
 /**
  * Describe class JabberIqCommand here.
@@ -88,7 +88,7 @@ public class JabberIqCommand extends XMPPProcessor implements XMPPProcessorIfc {
 				packet.getElement().setAttribute("from", session.getJID());
 			} // end of if (packet.getFrom().equals(session.getConnectionId()))
 
-			String id = JID.getNodeID(packet.getElemTo());
+			String id = JIDUtils.getNodeID(packet.getElemTo());
 
 			if (id.equals(session.getUserId())) {
 				// Yes this is message to 'this' client

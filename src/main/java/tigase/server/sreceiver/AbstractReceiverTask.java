@@ -38,7 +38,7 @@ import tigase.xml.Element;
 import tigase.server.Packet;
 import tigase.server.sreceiver.PropertyConstants.SenderRestrictions;
 import tigase.stats.StatRecord;
-import tigase.util.JID;
+import tigase.util.JIDUtils;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.Authorization;
 import java.util.LinkedList;
@@ -104,7 +104,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 	 */
 	public void setJID(final String jid) {
 		this.jid = jid;
-		log.fine("JID set to: " + this.jid);
+		log.fine("JIDUtils set to: " + this.jid);
 		int idx = jid.indexOf(".");
 		this.local_domain = jid.substring(idx+1);
 		log.fine("Local domain set to: " + this.local_domain);
@@ -132,7 +132,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 		boolean result = false;
 		switch (subsc_restr) {
 		case LOCAL:
-			String buddy_domain = JID.getNodeHost(buddy);
+			String buddy_domain = JIDUtils.getNodeHost(buddy);
 			if (buddy_domain.equals(local_domain)) {
 				result = true;
 			} // end of if (buddy_domain.equals(local_domain))
@@ -169,7 +169,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 	}
 
 	public RosterItem addToRoster(String jid) {
-		String id = JID.getNodeID(jid);
+		String id = JIDUtils.getNodeID(jid);
 		RosterItem ri = new RosterItem(id);
 		if (id.equals(owner)) {
 			ri.setOwner(true);
@@ -182,11 +182,11 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 	}
 
 	public RosterItem removeFromRoster(String jid) {
-		return roster.remove(JID.getNodeID(jid));
+		return roster.remove(JIDUtils.getNodeID(jid));
 	}
 
 	public RosterItem getRosterItem(String jid) {
-		return roster.get(JID.getNodeID(jid));
+		return roster.get(JIDUtils.getNodeID(jid));
 	}
 
 	public void setRosterItemOnline(RosterItem ri, boolean online) {
@@ -225,7 +225,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 				} // end of if (getRosterItem(buddy) == null)
 				log.info(getJID() + ": " + "Adding buddy to roster: " + buddy);
 				presence = getPresence(buddy, jid, StanzaType.subscribe,
-					JID.getNodeNick(jid), null);
+					JIDUtils.getNodeNick(jid), null);
 			} else {
 				log.info(getJID() + ": " +
 					"Not allowed to subscribe, rejecting: " + buddy);
@@ -392,7 +392,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 					null, getDescription());
 			} else {
 				presence = getPresence(ri.getJid(), jid, StanzaType.subscribe,
-					JID.getNodeNick(jid), null);
+					JIDUtils.getNodeNick(jid), null);
 			} // end of if (ri.isSubscribed()) else
 			results.offer(presence);
 		}
@@ -477,7 +477,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 	}
 
 	private void processMessage(Packet packet, Queue<Packet> results) {
-		if (!isAllowedToPost(JID.getNodeID(packet.getElemFrom()))) {
+		if (!isAllowedToPost(JIDUtils.getNodeID(packet.getElemFrom()))) {
 			results.offer(Authorization.NOT_ALLOWED.getResponseMessage(packet,
 					"You are not allowed to post a message.", true));
 			return;
@@ -485,7 +485,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 		for (RosterItem ri: roster.values()) {
 			if (ri.isSubscribed() && ri.isModerationAccepted()
 				&& (!send_to_online_only || ri.isOnline())
-				&& (!JID.getNodeID(packet.getElemFrom()).equals(ri.getJid()))) {
+				&& (!JIDUtils.getNodeID(packet.getElemFrom()).equals(ri.getJid()))) {
 				Element message = packet.getElement().clone();
 				Element body = message.getChild("body");
 				if (body == null) {

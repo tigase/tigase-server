@@ -27,7 +27,7 @@ import java.util.logging.Logger;
 
 import tigase.db.NonAuthUserRepository;
 import tigase.server.Packet;
-import tigase.util.JID;
+import tigase.util.JIDUtils;
 import tigase.xml.Element;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPProcessor;
@@ -69,7 +69,7 @@ public class UrnXmppPing extends XMPPProcessor implements XMPPProcessorIfc {
 		}
 		String id = session.getDomain();
 		if (packet.getElemTo() != null) {
-			id = JID.getNodeID(packet.getElemTo());
+			id = JIDUtils.getNodeID(packet.getElemTo());
 		}
 		if (id == null || id.equals("") || id.equalsIgnoreCase(session.getDomain())) {
 			results.offer(packet.okResult((Element) null, 0));

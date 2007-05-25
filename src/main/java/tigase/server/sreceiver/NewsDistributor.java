@@ -39,9 +39,9 @@ public class NewsDistributor extends RepoRosterTask {
 	public static final String TASK_TYPE = "News Distribution";
 	public static final String TASK_HELP =
 		"The task acts as a newsletter over Jabber/XMPP protocol."
-		+ " Users can subscribe to the news just by adding task JID"
+		+ " Users can subscribe to the news just by adding task JIDUtils"
 		+ " to their roster, unsubscribing is equally simple - remove"
-		+ " JID from roster to stop receiving news.";
+		+ " JIDUtils from roster to stop receiving news.";
 
 	public String getType() {
 		return TASK_TYPE;

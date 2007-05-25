@@ -27,7 +27,7 @@ import java.util.HashMap;
 import java.util.logging.Logger;
 import tigase.server.Command;
 import tigase.server.Packet;
-import tigase.util.JID;
+import tigase.util.JIDUtils;
 import tigase.xml.XMLUtils;
 
 import static tigase.server.sreceiver.PropertyConstants.*;
@@ -67,7 +67,7 @@ public class NewTaskCommand implements TaskCommandIfc {
 
 	private boolean checkTaskName(String task_name, Packet result,
 		StanzaReceiver receiv) {
-		String msg = JID.checkNickName(task_name);
+		String msg = JIDUtils.checkNickName(task_name);
 		if (msg != null) {
 			Command.addFieldValue(result, "Info",
 				"Note!! " + msg + ", please provide valid task name.", "fixed");
@@ -126,7 +126,7 @@ public class NewTaskCommand implements TaskCommandIfc {
 		Map<String, PropertyItem> default_props = task_t.getDefaultParams();
 		PropertyItem pi = default_props.get(TASK_OWNER_PROP_KEY);
 		if (pi != null) {
-			pi.setValue(JID.getNodeID(packet.getElemFrom()));
+			pi.setValue(JIDUtils.getNodeID(packet.getElemFrom()));
 		}
 		propertyItems2Command(default_props, result);
 	}

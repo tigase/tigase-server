@@ -49,7 +49,7 @@ import tigase.net.IOService;
 import tigase.net.SocketReadThread;
 import tigase.net.SocketType;
 import tigase.stats.StatRecord;
-import tigase.util.JID;
+import tigase.util.JIDUtils;
 import tigase.xmpp.XMPPIOService;
 import tigase.xmpp.XMPPIOServiceListener;
 import java.io.File;
@@ -395,7 +395,7 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 	}
 
 	protected String getServiceId(Packet packet) {
-		return JID.getNodeResource(packet.getTo());
+		return JIDUtils.getNodeResource(packet.getTo());
 	}
 
 	public List<StatRecord> getStatistics() {
@@ -493,7 +493,7 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 				(String)service.getSessionData().get("local-hostname");
 			String remote_hostname =
 				(String)service.getSessionData().get("remote-hostname");
-			return JID.getJID(
+			return JIDUtils.getJID(
 				(local_hostname != null ? local_hostname : "NULL"),
 				(remote_hostname != null ? remote_hostname : "NULL"),
 				service.connectionType().toString());

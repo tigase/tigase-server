@@ -33,7 +33,7 @@ import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.db.NonAuthUserRepository;
-import tigase.util.JID;
+import tigase.util.JIDUtils;
 
 /**
  * JEP-0077: In-Band Registration
@@ -82,7 +82,7 @@ public class JabberIqRegister extends XMPPProcessor
 
 		String id = session.getDomain();
 		if (packet.getElemTo() != null) {
-			id = JID.getNodeID(packet.getElemTo());
+			id = JIDUtils.getNodeID(packet.getElemTo());
 		}
 
 		try {

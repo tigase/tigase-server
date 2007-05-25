@@ -44,7 +44,7 @@ import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.server.ServerComponent;
 import tigase.util.ClassUtil;
-import tigase.util.JID;
+import tigase.util.JIDUtils;
 import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
 
@@ -196,7 +196,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	private void addTaskToInstances(ReceiverTaskIfc task) {
 		task_instances.put(task.getJID(),	task);
 		ServiceEntity item = new ServiceEntity(task.getJID(),
-			JID.getNodeNick(task.getJID()), task.getDescription());
+			JIDUtils.getNodeNick(task.getJID()), task.getDescription());
 		item.addIdentities(
 			new ServiceIdentity("component", "generic", task.getJID()));
 		item.addFeatures(CMD_FEATURES);
@@ -233,7 +233,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 
 	protected void removeTaskInstance(ReceiverTaskIfc task) {
 		ServiceEntity item = new ServiceEntity(task.getJID(),
-			JID.getNodeNick(task.getJID()), task.getDescription());
+			JIDUtils.getNodeNick(task.getJID()), task.getDescription());
 		serviceEntity.removeItems(item);
 		task_instances.remove(task.getJID());
 		Queue<Packet> results = new LinkedList<Packet>();
@@ -484,14 +484,14 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		Element query_rep = null;
 		if (query != null && packet.getType() == StanzaType.get) {
 			query_rep =
-				serviceEntity.getDiscoInfo(JID.getNodeNick(packet.getElemTo()));
+				serviceEntity.getDiscoInfo(JIDUtils.getNodeNick(packet.getElemTo()));
 			processed = true;
 		} // end of if (query != null && packet.getType() == StanzaType.get)
 		query = iq.getChild("query", ITEMS_XMLNS);
 		if (query != null && packet.getType() == StanzaType.get) {
 			query_rep = query.clone();
 			List<Element> items =
-				serviceEntity.getDiscoItems(JID.getNodeNick(packet.getElemTo()),
+				serviceEntity.getDiscoItems(JIDUtils.getNodeNick(packet.getElemTo()),
 					packet.getElemTo());
 			if (items != null && items.size() > 0) {
 				query_rep.addChildren(items);
@@ -505,7 +505,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	}
 
 	protected boolean isAdmin(String jid) {
-		return Arrays.binarySearch(admins, JID.getNodeID(jid)) >= 0;
+		return Arrays.binarySearch(admins, JIDUtils.getNodeID(jid)) >= 0;
 	}
 
 	/**

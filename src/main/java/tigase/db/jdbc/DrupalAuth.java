@@ -54,7 +54,7 @@ import tigase.db.UserAuthRepository;
 import tigase.db.UserExistsException;
 import tigase.db.UserNotFoundException;
 import tigase.util.Algorithms;
-import tigase.util.JID;
+import tigase.util.JIDUtils;
 
 import static tigase.db.UserAuthRepository.*;
 
@@ -147,7 +147,7 @@ public class DrupalAuth implements UserAuthRepository {
 			BigDecimal bd = new BigDecimal((System.currentTimeMillis()/1000));
 			update_last_login_st.setBigDecimal(1, bd);
 			update_last_login_st.setBigDecimal(2, bd);
-			update_last_login_st.setString(3, JID.getNodeNick(user));
+			update_last_login_st.setString(3, JIDUtils.getNodeNick(user));
 			update_last_login_st.executeUpdate();
 		} catch (SQLException e) {
 			throw new TigaseDBException("Error accessin repository.", e);
@@ -158,7 +158,7 @@ public class DrupalAuth implements UserAuthRepository {
 		throws SQLException, UserNotFoundException {
 		ResultSet rs = null;
 		try {
-			status_st.setString(1, JID.getNodeNick(user));
+			status_st.setString(1, JIDUtils.getNodeNick(user));
 			rs = status_st.executeQuery();
 			if (rs.next()) {
 				return (rs.getInt(1) == 1);
@@ -192,7 +192,7 @@ public class DrupalAuth implements UserAuthRepository {
 		ResultSet rs = null;
 		try {
 			checkConnection();
-			pass_st.setString(1, JID.getNodeNick(user));
+			pass_st.setString(1, JIDUtils.getNodeNick(user));
 			rs = pass_st.executeQuery();
 			if (rs.next()) {
 				return rs.getString(1);
@@ -340,7 +340,7 @@ public class DrupalAuth implements UserAuthRepository {
 			checkConnection();
 			long uid = getMaxUID()+1;
 			user_add_st.setLong(1, uid);
-			user_add_st.setString(2, JID.getNodeNick(user));
+			user_add_st.setString(2, JIDUtils.getNodeNick(user));
 			user_add_st.setString(3, Algorithms.hexDigest("", password, "MD5"));
 			user_add_st.executeUpdate();
 		} catch (NoSuchAlgorithmException e) {
@@ -447,7 +447,7 @@ public class DrupalAuth implements UserAuthRepository {
 					if (user_name == null) {
 						user_name = nc.getDefaultName();
 					} // end of if (name == null)
-					jid = JID.getNodeID(user_name, (String)options.get(REALM_KEY));
+					jid = JIDUtils.getNodeID(user_name, (String)options.get(REALM_KEY));
 					options.put(USER_ID_KEY, jid);
 					log.finest("NameCallback: " + user_name);
 				} else if (callbacks[i] instanceof PasswordCallback) {

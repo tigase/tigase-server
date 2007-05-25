@@ -94,7 +94,7 @@ public interface ReceiverTaskIfc {
 	 * <strong>Jabber ID</strong>. Refer to corresponding <code>set</code>
 	 * method for more details.
 	 *
-	 * @return a <code>String</code> value of task instance JID,
+	 * @return a <code>String</code> value of task instance JIDUtils,
 	 * @see #setJID(String)
 	 */
 	String getJID();
@@ -195,7 +195,7 @@ public interface ReceiverTaskIfc {
 	 * of defined admins. If user is the task owner it is also considered to be
 	 * task administrator.
 	 *
-	 * @param jid a <code>String</code> value of user JID.
+	 * @param jid a <code>String</code> value of user JIDUtils.
 	 * @return a <code>boolean</code> value true if given user is either task admin
 	 * or task owner.
 	 */

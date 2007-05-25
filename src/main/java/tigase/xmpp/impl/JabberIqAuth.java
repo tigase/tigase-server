@@ -33,7 +33,7 @@ import tigase.db.UserAuthRepository;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.server.Command;
 import tigase.server.Packet;
-import tigase.util.JID;
+import tigase.util.JIDUtils;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.StanzaType;

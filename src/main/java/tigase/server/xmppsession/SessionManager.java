@@ -63,7 +63,7 @@ import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
 import tigase.stats.StatRecord;
 import tigase.util.ElementUtils;
-import tigase.util.JID;
+import tigase.util.JIDUtils;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.NotAuthorizedException;
@@ -260,7 +260,7 @@ public class SessionManager extends AbstractMessageReceiver
 
 	private boolean isAdmin(String jid) {
 		for (String adm: admins) {
-			if (adm.equals(JID.getNodeID(jid))) {
+			if (adm.equals(JIDUtils.getNodeID(jid))) {
 				return true;
 			}
 		}
@@ -285,7 +285,7 @@ public class SessionManager extends AbstractMessageReceiver
 	}
 
 	private XMPPSession getSession(String jid) {
-		return sessionsByNodeId.get(JID.getNodeID(jid));
+		return sessionsByNodeId.get(JIDUtils.getNodeID(jid));
 	}
 
 	private XMPPResourceConnection getResourceConnection(String jid) {
@@ -337,7 +337,7 @@ public class SessionManager extends AbstractMessageReceiver
 		switch (pc.getCommand()) {
 		case USER_STATUS:
 			String user_jid = Command.getFieldValue(pc, "jid");
-			String hostname = JID.getNodeHost(user_jid);
+			String hostname = JIDUtils.getNodeHost(user_jid);
 			String av = Command.getFieldValue(pc, "available");
 			boolean available = !(av != null && av.equalsIgnoreCase("false"));
 			if (available) {
@@ -386,8 +386,8 @@ public class SessionManager extends AbstractMessageReceiver
 		// Dummy session ID, we might decide later to set real thing here
 		connection.setSessionId("session-id");
 		connectionsByFrom.put(conn_id, connection);
-		handleLogin(JID.getNodeNick(user_jid), connection);
-		connection.setResource(JID.getNodeResource(user_jid));
+		handleLogin(JIDUtils.getNodeNick(user_jid), connection);
+		connection.setResource(JIDUtils.getNodeResource(user_jid));
 		return connection;
 	}
 
@@ -597,7 +597,7 @@ public class SessionManager extends AbstractMessageReceiver
 
 	public void handleLogin(final String userName,
 		final XMPPResourceConnection conn) {
-		String userId = JID.getNodeID(userName, conn.getDomain());
+		String userId = JIDUtils.getNodeID(userName, conn.getDomain());
 		XMPPSession session = sessionsByNodeId.get(userId);
 		if (session == null) {
 			session = new XMPPSession(userName);
@@ -610,7 +610,7 @@ public class SessionManager extends AbstractMessageReceiver
 
 	public void handleLogout(final String userName,
 		final XMPPResourceConnection conn) {
-		String userId = JID.getNodeID(userName, conn.getDomain());
+		String userId = JIDUtils.getNodeID(userName, conn.getDomain());
 		XMPPSession session = sessionsByNodeId.get(userId);
 		if (session != null && session.getActiveResourcesSize() <= 1) {
 			sessionsByNodeId.remove(userId);

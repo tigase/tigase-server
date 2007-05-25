@@ -56,7 +56,7 @@ import tigase.server.Packet;
 import tigase.disco.XMPPService;
 import tigase.util.Algorithms;
 import tigase.util.DNSResolver;
-import tigase.util.JID;
+import tigase.util.JIDUtils;
 import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPIOService;
@@ -165,8 +165,8 @@ public class ServerConnectionManager extends ConnectionManager {
 		synchronized (connectingByHost_Type) {
 			boolean connecting = connectingByHost_Type.contains(cid);
 			if (!connecting) {
-				String localhost = JID.getNodeNick(cid);
-				String remotehost = JID.getNodeHost(cid);
+				String localhost = JIDUtils.getNodeNick(cid);
+				String remotehost = JIDUtils.getNodeHost(cid);
 				boolean reconnect = (packet == null);
 				if (connecting =
 					openNewServerConnection(localhost, remotehost, reconnect)) {
@@ -254,12 +254,12 @@ public class ServerConnectionManager extends ConnectionManager {
 
 	private String getConnectionId(String localhost, String remotehost,
 		ConnectionType connection) {
-		return JID.getJID(localhost, remotehost, connection.toString());
+		return JIDUtils.getJID(localhost, remotehost, connection.toString());
 	}
 
 	private String getConnectionId(Packet packet) {
-		return JID.getJID(JID.getNodeHost(packet.getFrom()),
-			JID.getNodeHost(packet.getTo()),
+		return JIDUtils.getJID(JIDUtils.getNodeHost(packet.getFrom()),
+			JIDUtils.getNodeHost(packet.getTo()),
 			ConnectionType.connect.toString());
 	}
 
@@ -275,11 +275,11 @@ public class ServerConnectionManager extends ConnectionManager {
 	}
 
 // 	private String getHandshakingId(String localhost, String remotehost) {
-// 		return JID.getJID(localhost, remotehost, null);
+// 		return JIDUtils.getJID(localhost, remotehost, null);
 // 	}
 
 // 	private String getHandshakingId(Packet packet) {
-// 		return JID.getJID(packet.getFrom(), packet.getTo(), null);
+// 		return JIDUtils.getJID(packet.getFrom(), packet.getTo(), null);
 // 	}
 
 	public Queue<Packet> processSocketData(XMPPIOService serv) {
@@ -358,12 +358,12 @@ public class ServerConnectionManager extends ConnectionManager {
 		}
 		String remote_hostname =
 			(String)serv.getSessionData().get("remote-hostname");
-		if (!JID.getNodeHost(packet_from).equals(remote_hostname)) {
+		if (!JIDUtils.getNodeHost(packet_from).equals(remote_hostname)) {
 			generateStreamError("invalid-from", serv);
 			return false;
 		}
 		String local_hostname =	(String)serv.getSessionData().get("local-hostname");
-		if (!JID.getNodeHost(packet_to).equals(local_hostname)) {
+		if (!JIDUtils.getNodeHost(packet_to).equals(local_hostname)) {
 			generateStreamError("host-unknown", serv);
 			return false;
 		}
@@ -720,7 +720,7 @@ public class ServerConnectionManager extends ConnectionManager {
 
 		log.finest("DIALBACK - " + packet.getStringData());
 
-		String local_hostname = JID.getNodeHost(packet.getElemTo());
+		String local_hostname = JIDUtils.getNodeHost(packet.getElemTo());
 		// Check whether this is correct local host name...
 		if (Arrays.binarySearch(hostnames, local_hostname) < 0) {
 			// Ups, this hostname is not served by this server, return stream
@@ -728,7 +728,7 @@ public class ServerConnectionManager extends ConnectionManager {
 			generateStreamError("host-unknown", serv);
 			return;
 		}
-		String remote_hostname = JID.getNodeHost(packet.getElemFrom());
+		String remote_hostname = JIDUtils.getNodeHost(packet.getElemFrom());
 		String connect_jid = getConnectionId(local_hostname, remote_hostname,
 			ConnectionType.connect);
 		String accept_jid = getConnectionId(local_hostname, remote_hostname,

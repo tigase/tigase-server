@@ -35,7 +35,7 @@ import tigase.xml.Element;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPResourceConnection;
-import tigase.util.JID;
+import tigase.util.JIDUtils;
 
 /**
  * Describe class Roster here.
@@ -396,7 +396,7 @@ public class Roster {
 
 		String to = packet.getElemTo();
 		if (to != null) {
-			to = JID.getNodeID(to);
+			to = JIDUtils.getNodeID(to);
 		} // end of if (to != null)
 		StanzaType type = packet.getType();
 		if (type == null) {
@@ -463,7 +463,7 @@ public class Roster {
 	}
 
 	public static String groupNode(final String buddy) {
-    return ROSTER + "/" + JID.getNodeID(buddy);
+    return ROSTER + "/" + JIDUtils.getNodeID(buddy);
   }
 
   public static String[] getBuddies(final XMPPResourceConnection session)
@@ -523,7 +523,7 @@ public class Roster {
 
 	public static void addBuddy(final XMPPResourceConnection session,
 		final String jid) throws NotAuthorizedException {
-    session.setData(groupNode(jid), NAME, JID.getNodeNick(jid));
+    session.setData(groupNode(jid), NAME, JIDUtils.getNodeNick(jid));
     session.setData(groupNode(jid), SUBSCRIPTION,
 			SubscriptionType.none.toString());
 	}

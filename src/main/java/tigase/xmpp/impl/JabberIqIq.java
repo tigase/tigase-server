@@ -35,7 +35,7 @@ import tigase.xmpp.XMPPPreprocessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.Authorization;
-import tigase.util.JID;
+import tigase.util.JIDUtils;
 import tigase.util.Base64;
 import tigase.db.UserNotFoundException;
 
@@ -100,7 +100,7 @@ public class JabberIqIq extends XMPPProcessor
 			&& packet.getType() == StanzaType.get) {
 			try {
 				String iq_level =
-					repo.getPublicData(JID.getNodeID(packet.getElemTo()), ID, LEVEL, null);
+					repo.getPublicData(JIDUtils.getNodeID(packet.getElemTo()), ID, LEVEL, null);
 				results.offer(getResponsePacket(packet, iq_level));
 			} catch (UserNotFoundException e) {
 				// Just ignore....
@@ -120,7 +120,7 @@ public class JabberIqIq extends XMPPProcessor
 
 			String id = null;
 			if (packet.getElemTo() != null) {
-				id = JID.getNodeID(packet.getElemTo());
+				id = JIDUtils.getNodeID(packet.getElemTo());
 			} // end of if (packet.getElemTo() != null)
 			if (id == null || id.equals(session.getUserId())) {
 				StanzaType type = packet.getType();

@@ -34,7 +34,7 @@ import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.Authorization;
-import tigase.util.JID;
+import tigase.util.JIDUtils;
 import tigase.util.ElementUtils;
 import tigase.db.NonAuthUserRepository;
 
@@ -78,7 +78,7 @@ public class JabberIqStats extends XMPPProcessor
 
 		try {
 			// Maybe it is message to admininstrator:
-			String id = JID.getNodeID(packet.getElemTo());
+			String id = JIDUtils.getNodeID(packet.getElemTo());
 
 			log.finest("Received packet: " + packet.getStringData());
 

@@ -31,7 +31,7 @@ import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
-import tigase.util.JID;
+import tigase.util.JIDUtils;
 import tigase.db.NonAuthUserRepository;
 
 /**
@@ -88,7 +88,7 @@ public class JabberIqVersion extends XMPPProcessor
 		// Maybe it is message to admininstrator:
 		String id = session.getDomain();
 		if (packet.getElemTo() != null) {
-			id = JID.getNodeID(packet.getElemTo());
+			id = JIDUtils.getNodeID(packet.getElemTo());
 		} // end of if (packet.getElemTo() != null)
 
 		// If ID part of user account contains only host name

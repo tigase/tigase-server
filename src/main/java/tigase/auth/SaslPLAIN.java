@@ -34,7 +34,7 @@ import javax.security.sasl.SaslException;
 import javax.security.sasl.SaslServer;
 import java.security.NoSuchAlgorithmException;
 import tigase.util.Algorithms;
-import tigase.util.JID;
+import tigase.util.JIDUtils;
 
 /**
  * Describe class SaslPLAIN here.
@@ -176,7 +176,7 @@ public class SaslPLAIN implements SaslServer {
 				String realm = rc.getText();
 				callbacks = new Callback[1];
 				AuthorizeCallback ac =
-					new AuthorizeCallback(JID.getNodeID(user_id, realm), authoriz);
+					new AuthorizeCallback(JIDUtils.getNodeID(user_id, realm), authoriz);
 				callbacks[0] = ac;
 				callbackHandler.handle(callbacks);
 				if (ac.isAuthorized()) {

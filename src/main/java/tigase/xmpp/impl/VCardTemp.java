@@ -36,7 +36,7 @@ import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.NotAuthorizedException;
-import tigase.util.JID;
+import tigase.util.JIDUtils;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.UserNotFoundException;
 
@@ -102,7 +102,7 @@ public class VCardTemp extends XMPPProcessor implements XMPPProcessorIfc {
 			&& packet.getType() == StanzaType.get) {
 			try {
 				String strvCard =
-					repo.getPublicData(JID.getNodeID(packet.getElemTo()), ID, VCARD_KEY, null);
+					repo.getPublicData(JIDUtils.getNodeID(packet.getElemTo()), ID, VCARD_KEY, null);
 				if (strvCard != null) {
 					results.offer(parseXMLData(strvCard, packet));
 				} // end of if (vcard != null)
@@ -124,7 +124,7 @@ public class VCardTemp extends XMPPProcessor implements XMPPProcessorIfc {
 
 			String id = null;
 			if (packet.getElemTo() != null) {
-				id = JID.getNodeID(packet.getElemTo());
+				id = JIDUtils.getNodeID(packet.getElemTo());
 			} // end of if (packet.getElemTo() != null)
 			if (id == null || id.equals(session.getUserId())) {
 				StanzaType type = packet.getType();

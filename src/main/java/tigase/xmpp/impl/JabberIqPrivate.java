@@ -37,7 +37,7 @@ import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.StanzaType;
-import tigase.util.JID;
+import tigase.util.JIDUtils;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.UserNotFoundException;
@@ -106,7 +106,7 @@ public class JabberIqPrivate extends XMPPProcessor implements XMPPProcessorIfc {
 
 		try {
 			if (packet.getElemTo() != null &&
-				!JID.getNodeID(packet.getElemTo()).equals(session.getUserId())) {
+				!JIDUtils.getNodeID(packet.getElemTo()).equals(session.getUserId())) {
 				results.offer(Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet,
 						"You are not authorized to access this private storage.", true));
 				return;

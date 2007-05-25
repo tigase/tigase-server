@@ -28,7 +28,7 @@ import tigase.server.Packet;
 import tigase.xml.XMLUtils;
 import tigase.xml.Element;
 import tigase.server.Packet;
-import tigase.util.JID;
+import tigase.util.JIDUtils;
 import tigase.xmpp.StanzaType;
 
 import static tigase.server.sreceiver.PropertyConstants.*;
