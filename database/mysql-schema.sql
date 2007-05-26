@@ -1,3 +1,59 @@
+--  Tigase database schema for MySQL
+--
+--  Package Tigase XMPP/Jabber Server
+--  Copyright (C) 2004 - 2007
+--  "Artur Hefczyc" <artur.hefczyc@tigase.org>
+--
+--  This program is free software; you can redistribute it and/or modify
+--  it under the terms of the GNU General Public License as published by
+--  the Free Software Foundation; either version 2 of the License, or
+--  (at your option) any later version.
+--
+--  This program is distributed in the hope that it will be useful,
+--  but WITHOUT ANY WARRANTY; without even the implied warranty of
+--  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+--  GNU General Public License for more details.
+--
+--  You should have received a copy of the GNU General Public License
+--  along with this program; if not, write to the Free Software Foundation,
+--  Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+--
+-- $Rev: 367 $
+-- Last modified by $Author: kobit $
+-- $Date: 2007-04-03 19:40:48 +0100 (Tue, 03 Apr 2007) $
+--
+
+--  To load schema to MySQL database execute following commands:
+--
+--  mysqladmin -u root -pdbpass create tigase
+--  mysql -u root -pdbpass tigase < database/mysql-schema.sql
+--  echo "GRANT ALL ON tigase.* TO tigase_user@'%' \
+--                  IDENTIFIED BY 'tigase_passwd'; \
+--                  FLUSH PRIVILEGES;" | mysql -u root -pdbpass mysql
+--  echo "GRANT ALL ON tigase.* TO tigase_user@'localhost' \
+--                  IDENTIFIED BY 'tigase_passwd'; \
+--                  FLUSH PRIVILEGES;" | mysql -u root -pdbpass mysql
+--  echo "GRANT ALL ON tigase.* TO tigase_user \
+--                  IDENTIFIED BY 'tigase_passwd'; \
+--                  FLUSH PRIVILEGES;" | mysql -u root -pdbpass mysql
+
+
+create table short_news (
+  -- Automatic record ID
+  snid            bigint unsigned NOT NULL auto_increment,
+  -- Automaticly generated timestamp and automaticly updated on change
+  publishing_time timestamp,
+  -- Author JID
+  author          varchar(128) NOT NULL,
+  -- Short subject - this is short news, right?
+  subject         varchar(128) NOT NULL,
+  -- Short news message - this is short news, right?
+  body            varchar(1024) NOT NULL,
+  primary key(snid),
+  key publishing_date (publishing_date),
+  key author (author)
+)
+ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
 
 create table xmpp_stanza (
 			 id bigint unsigned NOT NULL auto_increment,
