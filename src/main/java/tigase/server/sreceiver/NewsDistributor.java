@@ -26,8 +26,7 @@ import java.util.Queue;
 import tigase.server.Packet;
 
 /**
- * Describe class NewsDistributor here.
- *
+ * Simple news distributor task.
  *
  * Created: Fri May 11 08:53:16 2007
  *
@@ -39,9 +38,9 @@ public class NewsDistributor extends RepoRosterTask {
 	public static final String TASK_TYPE = "News Distribution";
 	public static final String TASK_HELP =
 		"The task acts as a newsletter over Jabber/XMPP protocol."
-		+ " Users can subscribe to the news just by adding task JIDUtils"
+		+ " Users can subscribe to the news just by adding task JID"
 		+ " to their roster, unsubscribing is equally simple - remove"
-		+ " JIDUtils from roster to stop receiving news.";
+		+ " JID from roster to stop receiving news.";
 
 	public String getType() {
 		return TASK_TYPE;

@@ -47,7 +47,7 @@ public class XMPPSession {
   private static Logger log = Logger.getLogger("tigase.xmpp.XMPPSession");
 
   /**
-   * User name - part of user's JIDUtils
+   * User name - part of user's JID
    */
   private String username = null;
 

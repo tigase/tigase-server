@@ -104,7 +104,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 	 */
 	public void setJID(final String jid) {
 		this.jid = jid;
-		log.fine("JIDUtils set to: " + this.jid);
+		log.fine("JID set to: " + this.jid);
 		int idx = jid.indexOf(".");
 		this.local_domain = jid.substring(idx+1);
 		log.fine("Local domain set to: " + this.local_domain);

@@ -59,7 +59,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 
 	private String sessionId = null;
   /**
-   * Session resource - part of user's JIDUtils for this session
+   * Session resource - part of user's JID for this session
    */
 	private String resource = null;
   /**
@@ -157,32 +157,32 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	}
 
   /**
-   * Returns full user JIDUtils for this session or throws
+   * Returns full user JID for this session or throws
    * <code>NotAuthorizedException</code> if session is not authorized yet and
    * therefore user name and resource is not known yet.
    *
-   * @return a <code>String</code> value of calculated user full JIDUtils for this
+   * @return a <code>String</code> value of calculated user full JID for this
    * session including resource name.
    * @exception NotAuthorizedException when this session has not
-   * been authorized yet and some parts of user JIDUtils are not known yet.
+   * been authorized yet and some parts of user JID are not known yet.
    */
   public final String getJID() throws NotAuthorizedException {
     return getUserId() + (resource != null ? ("/" + resource) : "");
   }
 
   /**
-   * Returns user JIDUtils but without <em>resource</em> part. This is real user ID
+   * Returns user JID but without <em>resource</em> part. This is real user ID
    * not session ID.
-   * To retrieve session ID - full JIDUtils refer to <code>getJID()</code>
+   * To retrieve session ID - full JID refer to <code>getJID()</code>
    * method.<br/>
    * If session has not been authorized yet this method throws
    * <code>NotAuthorizedException</code>.
    *
-   * @return a <code>String</code> value of user ID - this is user JIDUtils without
-   * resource part. To obtain full user JIDUtils please refer to <code>getJID</code>
+   * @return a <code>String</code> value of user ID - this is user JID without
+   * resource part. To obtain full user JID please refer to <code>getJID</code>
    * method.
    * @exception NotAuthorizedException when this session has not
-   * been authorized yet and some parts of user JIDUtils are not known yet.
+   * been authorized yet and some parts of user JID are not known yet.
    * @see #getJID()
    */
   public final String getUserId() throws NotAuthorizedException {

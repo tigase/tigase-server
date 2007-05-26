@@ -33,8 +33,8 @@ package tigase.server;
  */
 public enum Permissions {
 
-	NONE,     // Unknown user JIDUtils
-		LOCAL,  // This is local user JIDUtils but not authenticated yet
+	NONE,     // Unknown user JID
+		LOCAL,  // This is local user JID but not authenticated yet
 		AUTH,   // Local authenticated and authorized user
 		ADMIN;  // Admin account already authenticated
 

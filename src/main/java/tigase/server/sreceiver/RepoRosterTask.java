@@ -72,7 +72,7 @@ public abstract class RepoRosterTask extends AbstractReceiverTask {
 				new Boolean(ri.isModerationAccepted()).toString());
 		} catch (TigaseDBException e) {
 			log.log(Level.SEVERE, "Problem saving roster data for: "
-				+	"JIDUtils = " + getJID()
+				+	"JID = " + getJID()
 				+ ", node = " + repo_node
 				+ ", RosterItem = " +	ri.getJid(), e);
 		} // end of try-catch

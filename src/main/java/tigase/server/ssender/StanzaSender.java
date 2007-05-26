@@ -133,6 +133,9 @@ public class StanzaSender extends AbstractMessageReceiver
 	 */
 	public void setProperties(final Map<String, Object> props) {
 		super.setProperties(props);
+
+		addRouting(myDomain());
+
 		interval = (Long)props.get(INTERVAL_PROP_KEY);
 		String[] config_tasks = (String[])props.get(STANZA_LISTENERS_PROP_KEY);
 		for (String task_name: config_tasks) {
