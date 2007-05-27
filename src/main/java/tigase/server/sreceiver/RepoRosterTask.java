@@ -116,7 +116,9 @@ public abstract class RepoRosterTask extends AbstractReceiverTask {
 
 	public RosterItem removeFromRoster(String jid) {
 		RosterItem ri = super.removeFromRoster(jid);
-		removeFromRepository(ri);
+		if (ri != null) {
+			removeFromRepository(ri);
+		}
 		return ri;
 	}
 
