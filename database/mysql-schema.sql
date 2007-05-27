@@ -43,6 +43,8 @@ create table short_news (
   snid            bigint unsigned NOT NULL auto_increment,
   -- Automaticly generated timestamp and automaticly updated on change
   publishing_time timestamp,
+	-- Optional news type: 'shorts', 'minis', 'techs', 'funs'....
+	news_type				varchar(10),
   -- Author JID
   author          varchar(128) NOT NULL,
   -- Short subject - this is short news, right?
@@ -50,8 +52,9 @@ create table short_news (
   -- Short news message - this is short news, right?
   body            varchar(1024) NOT NULL,
   primary key(snid),
-  key publishing_date (publishing_date),
+  key publishing_time (publishing_time),
   key author (author)
+  key news_type (news_type)
 )
 ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
 

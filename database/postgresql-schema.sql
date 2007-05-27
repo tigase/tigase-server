@@ -35,6 +35,8 @@ create table short_news (
   snid            serial,
   -- Automaticly generated timestamp and automaticly updated on change
   publishing_time timestamp default now(),
+	-- Optional news type: 'shorts', 'minis', 'techs', 'funs'....
+	news_type				varchar(10),
   -- Author JID
   author          varchar(128) NOT NULL,
   -- Short subject - this is short news, right?
@@ -43,8 +45,9 @@ create table short_news (
   body            varchar(1024) NOT NULL,
   primary key(snid),
 );
-create index publishing_date on short_news (publishing_date);
+create index publishing_time on short_news (publishing_time);
 create index author on short_news (author);
+create index news_type on short_news (news_type);
 
 create table xmpp_stanza (
 			 id serial,
