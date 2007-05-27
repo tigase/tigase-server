@@ -420,7 +420,12 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 			processPresence(packet, results);
 		} // end of if (packet.getElemName().equals("presence))
 		if (packet.getElemName().equals("message")) {
-			processMessage(packet, results);
+			if (isAllowedToPost(JIDUtils.getNodeID(packet.getElemFrom()))) {
+				processMessage(packet, results);
+			} else {
+				results.offer(Authorization.NOT_ALLOWED.getResponseMessage(packet,
+						"You are not allowed to post a message.", true));
+			}
 		} // end of if (packet.getElemName().equals("message"))
 		packets_sent += results.size();
 	}
@@ -476,12 +481,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 		} // end of switch (packet.getType())
 	}
 
-	private void processMessage(Packet packet, Queue<Packet> results) {
-		if (!isAllowedToPost(JIDUtils.getNodeID(packet.getElemFrom()))) {
-			results.offer(Authorization.NOT_ALLOWED.getResponseMessage(packet,
-					"You are not allowed to post a message.", true));
-			return;
-		}
+	protected void processMessage(Packet packet, Queue<Packet> results) {
 		for (RosterItem ri: roster.values()) {
 			if (ri.isSubscribed() && ri.isModerationAccepted()
 				&& (!send_to_online_only || ri.isOnline())
