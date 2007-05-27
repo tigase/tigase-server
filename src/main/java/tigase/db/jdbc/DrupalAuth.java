@@ -335,7 +335,6 @@ public class DrupalAuth implements UserAuthRepository {
 	 */
 	public void addUser(final String user, final String password)
 		throws UserExistsException, TigaseDBException {
-		ResultSet rs = null;
 		try {
 			checkConnection();
 			long uid = getMaxUID()+1;
@@ -349,8 +348,6 @@ public class DrupalAuth implements UserAuthRepository {
 					e);
 		} catch (SQLException e) {
 			throw new UserExistsException("Error while adding user to repository, user exists?", e);
-		} finally {
-			release(null, rs);
 		}
 	}
 
