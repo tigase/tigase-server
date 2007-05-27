@@ -35,8 +35,8 @@ import tigase.server.Packet;
  */
 public class NewsDistributor extends RepoRosterTask {
 
-	public static final String TASK_TYPE = "News Distribution";
-	public static final String TASK_HELP =
+	private static final String TASK_TYPE = "News Distribution";
+	private static final String TASK_HELP =
 		"The task acts as a newsletter over Jabber/XMPP protocol."
 		+ " Users can subscribe to the news just by adding task JID"
 		+ " to their roster, unsubscribing is equally simple - remove"
