@@ -145,7 +145,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	private static final String params_node = "/params";
 	private static final String task_type_key = "task-type";
 
-  private static Logger log =
+	private static Logger log =
 		Logger.getLogger("tigase.server.sreceiver.StanzaReceiver");
 
 	/**
