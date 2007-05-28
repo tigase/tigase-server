@@ -114,12 +114,16 @@ public class MessageRouterConfig {
 			}
 		}
 
+		Arrays.sort(rcv_names);
 		// Now init defaults for all external components:
 		for (String key: params.keySet()) {
 			if (key.startsWith(GEN_EXT_COMP)) {
-				rcv_names = Arrays.copyOf(rcv_names, rcv_names.length+1);
-				rcv_names[rcv_names.length-1] =
+				String new_comp_name =
 					DEF_EXT_COMP_NAME + key.substring(GEN_EXT_COMP.length());
+				if (Arrays.binarySearch(rcv_names, new_comp_name) < 0) {
+					rcv_names = Arrays.copyOf(rcv_names, rcv_names.length+1);
+					rcv_names[rcv_names.length-1] = new_comp_name;
+				}
 			} // end of if (key.startsWith(GEN_EXT_COMP))
 		} // end of for ()
 
