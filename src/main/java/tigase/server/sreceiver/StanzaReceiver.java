@@ -130,16 +130,28 @@ import static tigase.server.sreceiver.PropertyConstants.*;
 public class StanzaReceiver extends AbstractMessageReceiver
 	implements Configurable, XMPPService {
 
-	public static final String TASKS_LIST_PROP_KEY = "tasks-list";
-	public static final String[] TASKS_LIST_PROP_VAL = {"development-news"};
-	public static final String TASK_ACTIVE_PROP_KEY = "active";
-	public static final boolean TASK_ACTIVE_PROP_VAL = true;
-	public static final String TASK_TYPE_PROP_KEY = "task-type";
-	public static final String TASK_TYPE_PROP_VAL = "News Distribution";
-	public static final String SREC_REPO_CLASS_PROP_KEY = "srec-repo-class";
-	public static final String SREC_REPO_URL_PROP_KEY = "srec-repo-url";
-	public static final String ADMINS_PROP_KEY = "admins";
-	public static String[] ADMINS_PROP_VAL =	{"admin@localhost", "admin@hostname"};
+	private static final String TASKS_LIST_PROP_KEY = "tasks-list";
+	private static final String[] TASKS_LIST_PROP_VAL = {"development-news"};
+	private static final String TASK_ACTIVE_PROP_KEY = "active";
+	private static final boolean TASK_ACTIVE_PROP_VAL = true;
+	private static final String TASK_TYPE_PROP_KEY = "task-type";
+	private static final String TASK_TYPE_PROP_VAL = "News Distribution";
+	private static final String SREC_REPO_CLASS_PROP_KEY = "srec-repo-class";
+	private static final String SREC_REPO_URL_PROP_KEY = "srec-repo-url";
+	private static final String ADMINS_PROP_KEY = "admins";
+	private static String[] ADMINS_PROP_VAL =	{"admin@localhost", "admin@hostname"};
+
+	private static final String TASK_TYPES_PROP_NODE = "task-types/";
+	private static final String TASK_TYPES_PROP_KEY =
+		TASK_TYPES_PROP_NODE + "list";
+	private static final String[] TASK_TYPES_PROP_VAL = {TASK_TYPE_PROP_VAL};
+	private static final String CREATION_POLICY_PROP_KEY =
+		TASK_TYPES_PROP_NODE + "default-policy";
+	private static final TaskCreationPolicy CREATION_POLICY_PROP_VAL =
+		TaskCreationPolicy.ADMIN;
+	private static final String CREATION_MAX_NO_PROP_KEY =
+		TASK_TYPES_PROP_NODE + "default-max-number";
+	private static final int CREATION_MAX_NO_PROP_VAL = 1;
 
 	private static final String tasks_node = "/tasks";
 	private static final String params_node = "/params";
@@ -152,8 +164,8 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	 * This maps keeps all available task types which can be instantiated
 	 * by the user.
 	 */
-	private Map<String, ReceiverTaskIfc> task_types =
-		new ConcurrentSkipListMap<String, ReceiverTaskIfc>();
+	private Map<String, TaskType> task_types =
+		new ConcurrentSkipListMap<String, TaskType>();
 	/**
 	 * This map keeps all active tasks instances as pairs: (JabberID, task)
 	 */
@@ -166,6 +178,18 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	private ServiceEntity serviceEntity = null;
 	private String[] admins = {"admin@localhost"};
 	private UserRepository repository = null;
+	/**
+	 * Variable <code>defaultPolicy</code> specifies default task creation policy.
+	 * In other words who can create task. This is default setting for task types
+	 * not specified separately in configuration file.
+	 */
+	private TaskCreationPolicy defaultPolicy = CREATION_POLICY_PROP_VAL;
+	/**
+	 * Variable <code>defaultMaxTasksNo</code> specifies default max number of
+	 * tasks for a task type. This is default setting for task types not specified
+	 * separately in configuration file.
+	 */
+	private int defaultMaxTasksNo = CREATION_MAX_NO_PROP_VAL;
 
 	public StanzaReceiver() {
 		try {
@@ -173,7 +197,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 				ClassUtil.getClassesImplementing(ReceiverTaskIfc.class);
 			for (Class<ReceiverTaskIfc> ctask: ctasks) {
 				ReceiverTaskIfc itask = ctask.newInstance();
-				task_types.put(itask.getType(), itask);
+				task_types.put(itask.getType(), new TaskType(itask));
 			} // end of for (Class<ReceiverTaskIfc> ctask: ctasks)
 		} catch (Exception e) {
       log.log(Level.SEVERE, "Can not load ReceiverTaskIfc implementations", e);
@@ -193,6 +217,19 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		return getName() + "." + getDefHostName();
 	}
 
+	protected boolean isAllowedCreate(String jid, String task_type) {
+		TaskType tt = task_types.get(task_type);
+		switch (tt.getCreationPolicy()) {
+		case ADMIN:
+			return isAdmin(jid);
+		case LOCAL:
+			return myDomain().endsWith(JIDUtils.getNodeHost(jid));
+		default:
+			break;
+		}
+		return true;
+	}
+
 	private void addTaskToInstances(ReceiverTaskIfc task) {
 		task_instances.put(task.getJID(),	task);
 		ServiceEntity item = new ServiceEntity(task.getJID(),
@@ -204,6 +241,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		Queue<Packet> results = new LinkedList<Packet>();
 		task.init(results);
 		addOutPackets(results);
+		task_types.get(task.getType()).instanceAdded();
 	}
 
 	protected void addTaskInstance(String task_type, String task_name,
@@ -239,6 +277,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		Queue<Packet> results = new LinkedList<Packet>();
 		task.destroy(results);
 		addOutPackets(results);
+		task_types.get(task.getType()).instanceRemoved();
 		try {
 			String repo_node = tasks_node + "/" + task.getJID();
 			repository.removeSubnode(myDomain(), repo_node);
@@ -255,7 +294,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		addOutPackets(results);
 	}
 
-	protected Map<String, ReceiverTaskIfc> getTaskTypes() {
+	protected Map<String, TaskType> getTaskTypes() {
 		return task_types;
 	}
 
@@ -301,8 +340,8 @@ public class StanzaReceiver extends AbstractMessageReceiver
 
 	private ReceiverTaskIfc createTask(String task_type, String task_jid,
 		Map<String, Object> task_params ) {
-		ReceiverTaskIfc ttask = task_types.get(task_type);
-		ReceiverTaskIfc ntask = ttask.getInstance();
+		//		ReceiverTaskIfc ttask = task_types.get(task_type);
+		ReceiverTaskIfc ntask = task_types.get(task_type).getTaskInstance();
 		ntask.setJID(task_jid);
 		task_params.put(USER_REPOSITORY_PROP_KEY, repository);
 		ntask.setParams(task_params);
@@ -374,6 +413,23 @@ public class StanzaReceiver extends AbstractMessageReceiver
 			addTaskInstance(createTask(task_type, task_name + "@" + myDomain(),
 					task_params));
 		} // end of for (String task_name: tasks_list)
+
+	  defaultPolicy =
+			TaskCreationPolicy.valueOf((String)props.get(CREATION_POLICY_PROP_KEY));
+		defaultMaxTasksNo = (Integer)props.get(CREATION_MAX_NO_PROP_KEY);
+
+		String[] task_types_arr = (String[])props.get(TASK_TYPES_PROP_KEY);
+		for (String task_t: task_types_arr) {
+			TaskType tt = task_types.get(task_t);
+			if (tt != null) {
+				String policy_str =
+					(String)props.get(CREATION_POLICY_PROP_KEY + "/" + task_t);
+				TaskCreationPolicy policy = TaskCreationPolicy.valueOf(policy_str);
+				tt.setCreationPolicy(policy);
+				int max_inst = (Integer)props.get(CREATION_MAX_NO_PROP_KEY + "/" + task_t);
+				tt.setMaxInstancesNo(max_inst);
+			}
+		}
 	}
 
 	public Map<String, Object> getDefaults(final Map<String, Object> params) {
@@ -391,7 +447,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 				defs.put(task_name + "/" + TASK_ACTIVE_PROP_KEY, true);
 				defs.put(task_name + "/" + TASK_TYPE_PROP_KEY, TASK_TYPE_PROP_VAL);
 				Map<String, PropertyItem> default_props =
-					task_types.get(TASK_TYPE_PROP_VAL).getDefaultParams();
+					task_types.get(TASK_TYPE_PROP_VAL).getTaskType().getDefaultParams();
 				for (Map.Entry<String, PropertyItem> entry: default_props.entrySet()) {
 					defs.put(task_name + "/props/" + entry.getKey(),
 						entry.getValue().toString());
@@ -419,7 +475,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 			defs.put(task_name + "/" + TASK_ACTIVE_PROP_KEY, TASK_ACTIVE_PROP_VAL);
 			defs.put(task_name + "/" + TASK_TYPE_PROP_KEY, TASK_TYPE_PROP_VAL);
 			Map<String, PropertyItem> default_props =
-				task_types.get(TASK_TYPE_PROP_VAL).getDefaultParams();
+				task_types.get(TASK_TYPE_PROP_VAL).getTaskType().getDefaultParams();
 			for (Map.Entry<String, PropertyItem> entry: default_props.entrySet()) {
 				defs.put(task_name + "/props/" + entry.getKey(),
 					entry.getValue().toString());
@@ -468,6 +524,15 @@ public class StanzaReceiver extends AbstractMessageReceiver
 			}
 		} // end of if (params.get(GEN_SREC_ADMINS) != null) else
 		defs.put(ADMINS_PROP_KEY, ADMINS_PROP_VAL);
+
+		defs.put(TASK_TYPES_PROP_KEY, TASK_TYPES_PROP_VAL);
+		defs.put(CREATION_POLICY_PROP_KEY, CREATION_POLICY_PROP_VAL.toString());
+		defs.put(CREATION_MAX_NO_PROP_KEY, CREATION_MAX_NO_PROP_VAL);
+
+		defs.put(CREATION_POLICY_PROP_KEY + "/" + TASK_TYPE_PROP_VAL,
+			TaskCreationPolicy.ALL.toString());
+		defs.put(CREATION_MAX_NO_PROP_KEY + "/" + TASK_TYPE_PROP_VAL, 100);
+
 		return defs;
 	}
 

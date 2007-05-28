@@ -101,7 +101,8 @@ public class NewTaskCommand implements TaskCommandIfc {
 	private void newTask_Step2(Packet packet, Packet result,
 		StanzaReceiver receiv) {
 		String task_type = Command.getFieldValue(packet, TASK_TYPE_FIELD);
-		ReceiverTaskIfc task_t = receiv.getTaskTypes().get(task_type);
+		ReceiverTaskIfc task_t =
+			receiv.getTaskTypes().get(task_type).getTaskType();
 		int start = 0;
 		int line_len = 60;
 		do {
@@ -136,7 +137,7 @@ public class NewTaskCommand implements TaskCommandIfc {
 		String task_name = Command.getFieldValue(packet, TASK_NAME_FIELD);
 		String task_type = Command.getFieldValue(packet, TASK_TYPE_FIELD);
 		Map<String, PropertyItem> default_props =
-			receiv.getTaskTypes().get(task_type).getDefaultParams();
+			receiv.getTaskTypes().get(task_type).getTaskType().getDefaultParams();
 		Map<String, Object> new_params = new HashMap<String, Object>();
 		for (String key: default_props.keySet()) {
 			String value = Command.getFieldValue(packet, XMLUtils.escape(key));
@@ -169,6 +170,26 @@ public class NewTaskCommand implements TaskCommandIfc {
 			return;
 		} // end of if (!checkTaskName(receiv, task_name))
 		String task_type = Command.getFieldValue(packet, TASK_TYPE_FIELD);
+		TaskType tt = receiv.getTaskTypes().get(task_type);
+		if (tt == null) {
+			Command.addFieldValue(result, "Info",
+				"I am sorry there is a problem with instantiating task of this type: "
+				+ task_type, "fixed");
+			return;
+		}
+		if (tt.getMaxInstancesNo() <= tt.getInstancesNo()) {
+			Command.addFieldValue(result, "Info",
+				"I am sorry, maximum number of tasks instances for this type has been"
+				+ " exceeded: "
+				+ task_type, "fixed");
+			return;
+		}
+		if (!receiv.isAllowedCreate(packet.getFrom(), task_type)) {
+			Command.addFieldValue(result, "Info",
+				"I am sorry, you are not allowed to create task of this type: "
+				+ task_type, "fixed");
+			return;
+		}
 		Command.addFieldValue(result, TASK_NAME_FIELD, task_name, "hidden");
 		Command.addFieldValue(result, TASK_TYPE_FIELD, task_type, "hidden");
 		String step = Command.getFieldValue(packet, STEP);
