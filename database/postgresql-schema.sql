@@ -43,7 +43,7 @@ create table short_news (
   subject         varchar(128) NOT NULL,
   -- Short news message - this is short news, right?
   body            varchar(1024) NOT NULL,
-  primary key(snid),
+  primary key(snid)
 );
 create index publishing_time on short_news (publishing_time);
 create index author on short_news (author);
