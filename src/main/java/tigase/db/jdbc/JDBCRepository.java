@@ -99,9 +99,6 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 
 	private boolean autoCreateUser = false;
 
-// 	private static long max_uid = 0;
-// 	private static long max_nid = 0;
-
 	private static long var_max_uid = 0;
 	private static long var_max_nid = 0;
 
@@ -458,14 +455,14 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 			stmt = conn.createStatement();
 			// Get user account uid
 			long uid = getUserUID(user_id);
-			// Remove user account from users table
-			query = "delete from " + users_tbl + " where uid = " + uid;
+			// Remove all user enrties from pairs table
+			query = "delete from " + pairs_tbl + " where uid = " + uid;
 			stmt.executeUpdate(query);
 			// Remove all user entries from nodes table
 			query = "delete from " + nodes_tbl + " where uid = " + uid;
 			stmt.executeUpdate(query);
-			// Remove all user enrties from pairs table
-			query = "delete from " + pairs_tbl + " where uid = " + uid;
+			// Remove user account from users table
+			query = "delete from " + users_tbl + " where uid = " + uid;
 			stmt.executeUpdate(query);
 		} catch (SQLException e) {
 			throw new TigaseDBException("Error removing user from repository: "
@@ -570,16 +567,19 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		String query = null;
 		try {
 			stmt = conn.createStatement();
-			query = "delete from " + nodes_tbl + " where nid = " + nid;
-			stmt.executeUpdate(query);
 			query = "delete from " + pairs_tbl + " where nid = " + nid;
+			stmt.executeUpdate(query);
+			query = "delete from " + nodes_tbl + " where nid = " + nid;
 			stmt.executeUpdate(query);
 			query = "select nid from " + nodes_tbl + " where parent_nid = " + nid;
 			rs = stmt.executeQuery(query);
-			while (rs.next()) {
-				long subnode_nid = rs.getLong(1);
-				deleteSubnode(subnode_nid);
-			} // end of while (rs.next())
+			// I am not really sure if this is correct, besides it is not save for
+			// many JDBC drivers to call a query while reading results from another
+			// query.
+// 			while (rs.next()) {
+// 				long subnode_nid = rs.getLong(1);
+// 				deleteSubnode(subnode_nid);
+// 			} // end of while (rs.next())
 		} finally {
 			release(stmt, rs);
 		}
