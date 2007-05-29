@@ -149,6 +149,25 @@ public abstract class AbstractMessageReceiver
 		return true;
 	}
 
+	/**
+	 * Non blocking version of <code>addOutPacket</code>.
+	 *
+	 * @param packet a <code>Packet</code> value
+	 * @return a <code>boolean</code> value
+	 */
+	protected boolean addOutPacketNB(Packet packet) {
+		log.finest(">" + getName() + "<  " +
+			"Adding packet to outQueue: " + packet.getStringData());
+		boolean result =
+			out_queue.offer(new QueueElement(QueueElementType.OUT_QUEUE, packet));
+		if (result) {
+			++statAddedMessagesOk;
+		} else {
+			++statAddedMessagesEr;
+		}
+		return result;
+	}
+
 	protected boolean addOutPackets(Queue<Packet> packets) {
 		Packet p = null;
 		boolean result = true;
@@ -376,9 +395,10 @@ public abstract class AbstractMessageReceiver
 							log.finest(">" + getName() + "<  " +
 								"Sending outQueue to parent: " + parent.getName());
 							parent.addPacket(qel.packet);
-						} // end of if (parent != null)
-						else {
-							log.warning(">" + getName() + "<  " + "No parent!");
+						} else {
+							// It may happen for MessageRouter and this is intentional
+							prAddPacket(qel.packet);
+							//log.warning(">" + getName() + "<  " + "No parent!");
 						} // end of else
 						break;
 					default:
