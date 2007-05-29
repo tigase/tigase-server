@@ -42,6 +42,7 @@ import tigase.server.ServerComponent;
 import tigase.xml.Element;
 import tigase.xml.XMLUtils;
 import tigase.xmpp.StanzaType;
+import tigase.util.ElementUtils;
 
 /**
  * Class StatisticsCollector
@@ -58,6 +59,8 @@ public class StatisticsCollector
 
   private static final Logger log =
 		Logger.getLogger("tigase.stats.StatisticsCollector");
+
+  private static final String STATS_XMLNS = "http://jabber.org/protocol/stats";
 
 	private ServiceEntity serviceEntity = null;
 	private ServiceEntity stats_modules = null;
@@ -111,7 +114,11 @@ public class StatisticsCollector
 		switch (packet.getCommand()) {
 		case GETSTATS: {
 			log.finest("Command received: " + packet.getStringData());
-			Element statistics = new Element("statistics");
+			//			Element statistics = new Element("statistics");
+			Element iq =
+				ElementUtils.createIqQuery(packet.getElemTo(), packet.getElemFrom(),
+					StanzaType.result, packet.getElemId(), STATS_XMLNS);
+			Element query = iq.getChild("query");
 			List<StatRecord> stats = getAllStats();
 			if (stats != null && stats.size() > 0) {
 				for (StatRecord record: stats) {
@@ -120,11 +127,11 @@ public class StatisticsCollector
 						+ record.getDescription());
 					item.addAttribute("units", record.getUnit());
 					item.addAttribute("value", record.getValue());
-					statistics.addChild(item);
+					query.addChild(item);
 				} // end of for ()
 			} // end of if (stats != null && stats.count() > 0)
-			Packet result = packet.commandResult("result");
-			Command.setData(result, statistics);
+			Packet result = new Packet(iq);
+			//			Command.setData(result, statistics);
 			results.offer(result);
 			break;
 		}
