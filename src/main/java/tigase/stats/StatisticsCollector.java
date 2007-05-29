@@ -24,23 +24,24 @@
 
 package tigase.stats;
 
-import tigase.xml.Element;
-import tigase.xml.XMLUtils;
-import java.util.Map;
-import java.util.Queue;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.logging.Logger;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
 import java.util.logging.Level;
-import tigase.server.AbstractComponentRegistrator;
-import tigase.server.Packet;
-import tigase.server.ServerComponent;
-import tigase.server.MessageRouter;
-import tigase.disco.XMPPService;
+import java.util.logging.Logger;
 import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
+import tigase.disco.XMPPService;
+import tigase.server.AbstractComponentRegistrator;
 import tigase.server.Command;
+import tigase.server.MessageRouter;
+import tigase.server.Packet;
+import tigase.server.ServerComponent;
+import tigase.xml.Element;
+import tigase.xml.XMLUtils;
+import tigase.xmpp.StanzaType;
 
 /**
  * Class StatisticsCollector
@@ -102,7 +103,8 @@ public class StatisticsCollector
 
 	public void processPacket(final Packet packet, final Queue<Packet> results) {
 
-		if (!packet.isCommand()) {
+		if (!packet.isCommand()
+			|| (packet.getType() != null && packet.getType() == StanzaType.result)) {
 			return;
 		}
 
