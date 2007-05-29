@@ -1,4 +1,4 @@
-#define ver "2.9.1-b528";
+#define ver "2.9.2-b537";
 
 [Setup]
 AppName=Tigase Server

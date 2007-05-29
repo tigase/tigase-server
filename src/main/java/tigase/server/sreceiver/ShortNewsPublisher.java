@@ -274,7 +274,7 @@ public class ShortNewsPublisher extends RepoRosterTask {
 		return defs;
 	}
 
-	private void addPost(Packet packet) {
+	private void addPost(Packet packet, Queue<Packet> results) {
 		try {
 			checkConnection();
 			String author = JIDUtils.getNodeID(packet.getElemFrom());
@@ -285,10 +285,28 @@ public class ShortNewsPublisher extends RepoRosterTask {
 				insert_post.setString(2, XMLUtils.unescape(subject));
 				insert_post.setString(3, XMLUtils.unescape(body));
 				insert_post.executeUpdate();
+				results.offer(Packet.getMessage(packet.getElemFrom(),
+						packet.getElemTo(), StanzaType.normal,
+						"Your post has been successfuly submitted.",
+						"Short news submitions result.", null));
+			} else {
+				// if body is null it might be an empty message used for
+				// announcing other side that the user has just started typing
+				// message, such messages we just ignore
+				if (body != null) {
+					results.offer(Packet.getMessage(packet.getElemFrom(),
+							packet.getElemTo(), StanzaType.normal,
+							"Missing subject, post has NOT been submitted.",
+							"Short news submitions result.", null));
+				}
 			}
 		} catch (SQLException e) {
 			log.log(Level.SEVERE, "Problem inserting new post: "
 				+ packet.toString(), e);
+			results.offer(Packet.getMessage(packet.getElemFrom(),
+					packet.getElemTo(), StanzaType.normal,
+					"There was a problem with post submitting: " + e,
+					"Short news submitions result.", null));
 		}
 	}
 
@@ -379,11 +397,7 @@ public class ShortNewsPublisher extends RepoRosterTask {
 		if (isPostCommand(packet)) {
 			runCommand(packet, results);
 		} else {
-			addPost(packet);
-			results.offer(Packet.getMessage(packet.getElemFrom(),
-					packet.getElemTo(), StanzaType.normal,
-					"Your post has been successfuly submitted.",
-					"Short news submitions result.", null));
+			addPost(packet, results);
 		}
 	}
 
