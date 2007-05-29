@@ -107,7 +107,8 @@ public class JabberIqStats extends XMPPProcessor
 			// and this is local domain it is message to admin
 			if (id == null || id.equals("")
 				|| id.equalsIgnoreCase(session.getDomain())) {
-				Packet result = Command.GETSTATS.getPacket(session.getJID(),
+				Packet result =
+					Command.GETSTATS.getPacket(packet.getElemFrom(),
 					session.getDomain(), StanzaType.get, packet.getElemId());
 				results.offer(result);
 				log.finest("Sending result: " + result.getStringData());
