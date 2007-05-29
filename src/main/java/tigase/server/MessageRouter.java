@@ -182,12 +182,21 @@ public class MessageRouter extends AbstractMessageReceiver {
 
 		if (localAddresses.contains(packet.getTo())
 			|| isToLocalComponent(packet.getTo())) {
+			// Detect inifinite loop if from == to
+			if (packet.getFrom() != null &&
+				packet.getFrom().equals(packet.getTo())) {
+				log.warning("Possible infinite loop, dropping packet: "
+					+ packet.toString());
+				return;
+			}
 			log.finest("This packet is addressed to server itself.");
 			Queue<Packet> results = new LinkedList<Packet>();
 			processPacket(packet, results);
 			if (results.size() > 0) {
 				for (Packet res: results) {
-					processPacket(res);
+					// No more recurrential calls!!
+					addOutPacketNB(res);
+					//					processPacket(res);
 				} // end of for ()
 				return;
 			}
