@@ -380,6 +380,10 @@ public class ShortNewsPublisher extends RepoRosterTask {
 			runCommand(packet, results);
 		} else {
 			addPost(packet);
+			results.offer(Packet.getMessage(packet.getElemFrom(),
+					packet.getElemTo(), StanzaType.normal,
+					"Your post has been successfuly submitted.",
+					"Short news submitions result.", null));
 		}
 	}
 
