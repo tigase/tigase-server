@@ -145,9 +145,7 @@ public class ServerConnectionManager extends ConnectionManager {
 // 		log.finer("Processing packet: " + packet.getElemName()
 // 			+ ", type: " + packet.getType());
 		log.finest("Processing packet: " + packet.getStringData());
-		if (packet.isCommand()) {
-			processCommand(packet);
-		} else {
+		if (!packet.isCommand() || !processCommand(packet)) {
 			String cid = getConnectionId(packet);
 			log.finest("Connection ID is: " + cid);
 			synchronized(servicesByHost_Type) {
@@ -370,7 +368,7 @@ public class ServerConnectionManager extends ConnectionManager {
 		return true;
 	}
 
-	private void processCommand(final Packet packet) {
+	private boolean processCommand(final Packet packet) {
 		//		XMPPIOService serv = getXMPPIOService(packet);
 		switch (packet.getCommand()) {
 		case STARTTLS:
@@ -384,6 +382,7 @@ public class ServerConnectionManager extends ConnectionManager {
 		default:
 			break;
 		} // end of switch (pc.getCommand())
+		return false;
 	}
 
 	public String xmppStreamOpened(XMPPIOService serv,
