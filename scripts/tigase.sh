@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # This is Tigase (http://www.tigase.org) server startup file.
 #
