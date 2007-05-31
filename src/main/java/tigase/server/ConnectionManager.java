@@ -349,9 +349,8 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 
 	public void serviceStopped(final IOService service) {
 		synchronized(service) {
-			log.finer(">>" + getName() +
-				"<< Connection stopped: " + getUniqueId(service));
 			String id = getUniqueId(service);
+			log.finer(">>" + getName() + "<< Connection stopped: " + id);
 			// id might be null if service is stopped in accept method due to
 			// an exception during establishing TCP/IP connection
 			XMPPIOService serv = (id != null ? (XMPPIOService)services.get(id) : null);
@@ -368,9 +367,8 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 	@TODO(note="Do something if service with the same unique ID is already started, possibly kill the old one...")
 	public void serviceStarted(final IOService service) {
 		synchronized(services) {
-			log.finer(">>" + getName() +
-				"<< Connection started: " + getUniqueId(service));
 			String id = getUniqueId(service);
+			log.finer(">>" + getName() + "<< Connection started: " + id);
 			XMPPIOService serv = (XMPPIOService)services.get(id);
 			if (serv != null) {
 				if (serv == service) {
