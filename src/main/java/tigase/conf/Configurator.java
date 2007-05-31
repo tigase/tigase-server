@@ -131,6 +131,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 				}
 				if (args[i].equals(GEN_USER_DB) || args[i].equals(GEN_USER_DB_URI)
 					|| args[i].equals(GEN_AUTH_DB) || args[i].equals(GEN_AUTH_DB_URI)
+					|| args[i].equals(GEN_COMP_NAME) || args[i].equals(GEN_COMP_CLASS)
 					|| args[i].startsWith(GEN_EXT_COMP) || args[i].equals(GEN_VIRT_HOSTS)
 					|| args[i].equals(GEN_ADMINS) || args[i].equals(GEN_DEBUG)
 					|| (args[i].startsWith(GEN_CONF) && !args[i].startsWith(GEN_CONFIG))) {
@@ -138,6 +139,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 				}
 				if (key != null) {
 					defConfigParams.put(key, val);
+					//System.out.println("Setting defaults: " + key + "=" + val.toString());
 					log.config("Setting defaults: " + key + "=" + val.toString());
 				} // end of if (key != null)
       } // end of for (int i = 0; i < args.length; i++)
