@@ -83,6 +83,7 @@ public class ComponentConnectionManager extends ConnectionManager
 	private boolean pack_routed = PACK_ROUTED_VAL;
 	private boolean service_disco = RETURN_SERVICE_DISCO_VAL;
 	private String identity_type = IDENTITY_TYPE_VAL;
+	private String service_id = "it doesn't matter";
 
   /**
    * Variable <code>log</code> is a class logger.
@@ -229,8 +230,15 @@ public class ComponentConnectionManager extends ConnectionManager
 					if (comp_params.length >= idx + 1) {
 						PORT_ROUTING_TABLE_PROP_VAL = new String[] { comp_params[idx++] };
 					} else {
-						PORT_ROUTING_TABLE_PROP_VAL =
-							new String[] { ".*" + PORT_REMOTE_HOST_PROP_VAL };
+						if (config_type.equals(GEN_CONFIG_COMP)) {
+							// This is specialized configuration for a single
+							// external component so all traffic should go through
+							// the external component (it acts as like s2s component)
+							PORT_ROUTING_TABLE_PROP_VAL = new String[] { "*" };
+						} else {
+							PORT_ROUTING_TABLE_PROP_VAL =
+								new String[] { ".*" + PORT_REMOTE_HOST_PROP_VAL };
+						}
 					}
 					break;
 				}
@@ -279,7 +287,8 @@ public class ComponentConnectionManager extends ConnectionManager
 	}
 
 	protected String getUniqueId(IOService serv) {
-		return (String)serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
+		//		return (String)serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
+		return service_id;
 	}
 
 	public void serviceStopped(final IOService service) {
@@ -298,7 +307,7 @@ public class ComponentConnectionManager extends ConnectionManager
 	}
 
 	protected String getServiceId(Packet packet) {
-		return JIDUtils.getNodeHost(JIDUtils.getNodeHost(packet.getTo()));
+		return service_id;
 	}
 
 	public void serviceStarted(final IOService service) {
