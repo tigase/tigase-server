@@ -138,7 +138,6 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	private static final String TASK_TYPE_PROP_VAL = "News Distribution";
 	private static final String SREC_REPO_CLASS_PROP_KEY = "srec-repo-class";
 	private static final String SREC_REPO_URL_PROP_KEY = "srec-repo-url";
-	private static final String ADMINS_PROP_KEY = "admins";
 	private static String[] ADMINS_PROP_VAL =	{"admin@localhost", "admin@hostname"};
 
 	private static final String TASK_TYPES_PROP_NODE = "task-types/";
