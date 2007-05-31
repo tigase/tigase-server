@@ -393,10 +393,10 @@ public class ShortNewsPublisher extends RepoRosterTask {
 	}
 
 	protected void processMessage(Packet packet, Queue<Packet> results) {
-		super.processMessage(packet, results);
 		if (isPostCommand(packet)) {
 			runCommand(packet, results);
 		} else {
+			super.processMessage(packet, results);
 			addPost(packet, results);
 		}
 	}
