@@ -68,10 +68,8 @@ public class SessionManagerConfig {
 	 "vcard-temp", "http://jabber.org/protocol/commands", "jabber:iq:private",
 	 "urn:xmpp:ping"};
 
-	public static final String HOSTNAMES_PROP_KEY = "hostnames";
 	public static String[] HOSTNAMES_PROP_VAL =	{"localhost", "hostname"};
 
-	public static final String ADMINS_PROP_KEY = "admins";
 	public static String[] ADMINS_PROP_VAL =	{"admin@localhost", "admin@hostname"};
 
 	public static void getDefaults(Map<String, Object> props,
