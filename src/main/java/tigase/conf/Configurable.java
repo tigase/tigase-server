@@ -42,14 +42,46 @@ import tigase.server.ServerComponent;
  */
 public interface Configurable extends ServerComponent {
 
+	/**
+	 * Constant <code>GEN_CONFIG</code> keeps the string with which all
+	 * configuration types starts.
+	 */
 	public static final String GEN_CONFIG = "--gen-config";
-	public static final String GEN_CONFIG_ALL = "--gen-config-all";
-	public static final String GEN_CONFIG_SM = "--gen-config-sm";
-	public static final String GEN_CONFIG_CS = "--gen-config-cs";
-	public static final String GEN_CONFIG_DEF = "--gen-config-default";
+	/**
+	 * Constant <code>GEN_CONFIG_ALL</code> keeps parameter name for configuration
+	 * with all available components loaded directly to the server.
+	 */
+	public static final String GEN_CONFIG_ALL = GEN_CONFIG + "-all";
+	/**
+	 * Constant <code>GEN_CONFIG_SM</code> keeps parameter name for configuration
+	 * with SessionManager loaded and XEP-0114 component preconfigured to connect
+	 * to server instance with ClientConnectionManager.
+	 */
+	public static final String GEN_CONFIG_SM = GEN_CONFIG + "-sm";
+	/**
+	 * Constant <code>GEN_CONFIG_CS</code> keeps parameter name for configuration
+	 * with ClientConnectionManager loaded and XEP-0114 component preconfigured
+	 * to connect to server instance with SessionManager loaded.
+	 */
+	public static final String GEN_CONFIG_CS = GEN_CONFIG + "-cs";
+	/**
+	 * Constant <code>GEN_CONFIG_DEF</code> keeps parameter name for the most
+	 * typical configuration: SessionManager, ClientConnectionManager and
+	 * ServerConnectionManager loaded.
+	 */
+	public static final String GEN_CONFIG_DEF = GEN_CONFIG + "-default";
+	/**
+	 * Constant <code>GEN_CONFIG_COMP</code> keeps parameter name for
+	 * configuration with a single (given as an extra parameter) component
+	 * and XEP-0114 component loaded and preconfigured to connect to other
+	 * Jabber/XMPP server instance (either Tigase or any different server).
+	 */
+	public static final String GEN_CONFIG_COMP = GEN_CONFIG + "-comp";
 
 	public static final String GEN_CONF = "--gen-";
 	public static final String GEN_TEST = "--test";
+	public static final String GEN_COMP_NAME = "--comp-name";
+	public static final String GEN_COMP_CLASS = "--comp-class";
 	public static final String GEN_EXT_COMP = "--ext-comp";
 	public static final String GEN_USER_DB = "--user-db";
 	public static final String GEN_AUTH_DB = "--auth-db";
@@ -98,6 +130,9 @@ public interface Configurable extends ServerComponent {
 		"tigase.server.ssender.StanzaSender";
 	public static final String SRECV_COMP_CLASS_NAME =
 		"tigase.server.sreceiver.StanzaReceiver";
+
+	public static final String HOSTNAMES_PROP_KEY = "hostnames";
+	public static final String ADMINS_PROP_KEY = "admins";
 
 	/**
 	 * Get object name. This name corresponds to section in configuration.
