@@ -112,6 +112,13 @@ public class MessageRouterConfig {
 			if (config_type.equals(GEN_CONFIG_CS)) {
 				rcv_names = CS_MSG_RECEIVERS_NAMES_PROP_VAL;
 			}
+			if (config_type.equals(GEN_CONFIG_COMP)) {
+				String c_name = (String)params.get(GEN_COMP_NAME);
+				String c_class = (String)params.get(GEN_COMP_CLASS);
+				rcv_names = new String[] {c_name};
+				defs.put(MSG_RECEIVERS_PROP_KEY + c_name + ".class", c_class);
+				defs.put(MSG_RECEIVERS_PROP_KEY + c_name + ".active", true);
+			}
 		}
 
 		Arrays.sort(rcv_names);
@@ -129,12 +136,14 @@ public class MessageRouterConfig {
 
 		defs.put(MSG_RECEIVERS_NAMES_PROP_KEY, rcv_names);
 		for (String name: rcv_names) {
-			String def_class = MSG_RCV_CLASSES.get(name);
-			if (def_class == null) {
-				def_class = EXT_COMP_CLASS_NAME;
+			if (defs.get(MSG_RECEIVERS_PROP_KEY + name + ".class") == null) {
+				String def_class = MSG_RCV_CLASSES.get(name);
+				if (def_class == null) {
+					def_class = EXT_COMP_CLASS_NAME;
+				}
+				defs.put(MSG_RECEIVERS_PROP_KEY + name + ".class", def_class);
+				defs.put(MSG_RECEIVERS_PROP_KEY + name + ".active", true);
 			}
-			defs.put(MSG_RECEIVERS_PROP_KEY + name + ".class", def_class);
-			defs.put(MSG_RECEIVERS_PROP_KEY + name + ".active", true);
 		}
 		defs.put(REGISTRATOR_NAMES_PROP_KEY, REGISTRATOR_NAMES_PROP_VAL);
 		defs.put(STAT_1_CLASS_PROP_KEY, STAT_1_CLASS_PROP_VAL);
