@@ -70,7 +70,8 @@ public class ComponentConnectionManager extends ConnectionManager
 	public static String PORT_REMOTE_HOST_PROP_VAL = "comp-1.localhost";
 	public static final String PORT_ROUTING_TABLE_PROP_KEY = "routing-table";
 	public static String[] PORT_ROUTING_TABLE_PROP_VAL =
-	{ ".*@" + PORT_REMOTE_HOST_PROP_VAL };
+	{ PORT_REMOTE_HOST_PROP_VAL, ".*@" + PORT_REMOTE_HOST_PROP_VAL,
+		".*\\." + PORT_REMOTE_HOST_PROP_VAL };
 	public static String[] PORT_IFC_PROP_VAL = {"*"};
 	public static final String PACK_ROUTED_KEY = "pack-routed";
 	public static boolean PACK_ROUTED_VAL = false;
@@ -237,8 +238,9 @@ public class ComponentConnectionManager extends ConnectionManager
 							PORT_ROUTING_TABLE_PROP_VAL =	new String[] { "*" };
 						} else {
 							PORT_ROUTING_TABLE_PROP_VAL =
-								new String[] { ".*@" + PORT_REMOTE_HOST_PROP_VAL,
-															 PORT_REMOTE_HOST_PROP_VAL };
+								new String[] { PORT_REMOTE_HOST_PROP_VAL,
+															 ".*@" + PORT_REMOTE_HOST_PROP_VAL,
+															 ".*\\." + PORT_REMOTE_HOST_PROP_VAL	};
 						}
 					}
 					break;
@@ -249,8 +251,9 @@ public class ComponentConnectionManager extends ConnectionManager
 			PORT_LOCAL_HOST_PROP_VAL = "localhost";
 			PORT_REMOTE_HOST_PROP_VAL = getName() + ".localhost";
 			PORT_ROUTING_TABLE_PROP_VAL =
-				new String[] { ".*@" + PORT_REMOTE_HOST_PROP_VAL,
-											 PORT_REMOTE_HOST_PROP_VAL };
+				new String[] { PORT_REMOTE_HOST_PROP_VAL,
+											 ".*@" + PORT_REMOTE_HOST_PROP_VAL,
+											 ".*\\." + PORT_REMOTE_HOST_PROP_VAL	};
 		} // end of if (!def_found)
 		Map<String, Object> props = super.getDefaults(params);
 		props.put(PACK_ROUTED_KEY, PACK_ROUTED_VAL);
