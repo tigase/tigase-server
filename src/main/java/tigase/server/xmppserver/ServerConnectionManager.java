@@ -133,7 +133,7 @@ public class ServerConnectionManager extends ConnectionManager {
 
 	/**
 	 * Data shared between sessions. Some servers (like google for example)
-	 * use different IP address for outgoing and ingoing data and as sessions
+	 * use different IP address for outgoing and incoming data and as sessions
 	 * are identified by IP address we have to create 2 separate sessions
 	 * objects for such server. These sessions have to share session ID and
 	 * dialback key.
@@ -146,6 +146,23 @@ public class ServerConnectionManager extends ConnectionManager {
 // 			+ ", type: " + packet.getType());
 		log.finest("Processing packet: " + packet.getStringData());
 		if (!packet.isCommand() || !processCommand(packet)) {
+
+			// Check whether addressing is correct:
+			String to_hostname = JIDUtils.getNodeHost(packet.getElemTo());
+			// We don't send packets to local domains trough s2s, there
+			// must be something wrong with configuration
+			if (Arrays.binarySearch(hostnames, to_hostname) >= 0) {
+				// Ups, remote hostname is the same as one of local hostname??
+				// Internal loop possible, we don't want that....
+				// Let's send the packet back....
+				log.finest("Packet addresses to localhost, I am not processing it: "
+					+ packet.getStringData());
+				addOutPacket(
+					Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet,
+						"S2S - not delivered", true));
+				return;
+			}
+
 			String cid = getConnectionId(packet);
 			log.finest("Connection ID is: " + cid);
 			synchronized(servicesByHost_Type) {
@@ -696,7 +713,7 @@ public class ServerConnectionManager extends ConnectionManager {
 		}
 	}
 
-	private void initServiceMaping(String local_hostname, String remote_hostname,
+	private void initServiceMapping(String local_hostname, String remote_hostname,
 		String cid, XMPPIOService serv) {
 		// Assuming this is the first packet from that connection which
 		// tells us for what domain this connection is we have to map
@@ -728,6 +745,15 @@ public class ServerConnectionManager extends ConnectionManager {
 			return;
 		}
 		String remote_hostname = JIDUtils.getNodeHost(packet.getElemFrom());
+		// And we don't want to accept any connection which is from remote
+		// host name the same as one my localnames.......
+		if (Arrays.binarySearch(hostnames, remote_hostname) >= 0) {
+			// Ups, remote hostname is the same as one of local hostname??
+			// fake server or what? internal loop, we don't want that....
+			// error and close the connection....
+			generateStreamError("host-unknown", serv);
+			return;
+		}
 		String connect_jid = getConnectionId(local_hostname, remote_hostname,
 			ConnectionType.connect);
 		String accept_jid = getConnectionId(local_hostname, remote_hostname,
@@ -742,7 +768,7 @@ public class ServerConnectionManager extends ConnectionManager {
 						serv.getSessionData().get(serv.SESSION_ID_KEY));
 					sharedSessionData.put(accept_jid + "-dialback-key",
 						packet.getElemCData());
-					initServiceMaping(local_hostname, remote_hostname, accept_jid, serv);
+					initServiceMapping(local_hostname, remote_hostname, accept_jid, serv);
 
 					// <db:result> with CDATA containing KEY
 					Element elem = new Element("db:verify", packet.getElemCData(),
@@ -791,7 +817,7 @@ public class ServerConnectionManager extends ConnectionManager {
 				// data for verification
 				if (packet.getElemId() != null && packet.getElemCData() != null) {
 					// This might be the first dialback packet from remote server
-					initServiceMaping(local_hostname, remote_hostname, accept_jid, serv);
+					initServiceMapping(local_hostname, remote_hostname, accept_jid, serv);
 
 					// Yes data for verification are available in packet
 					final String id = packet.getElemId();
