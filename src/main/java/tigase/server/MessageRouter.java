@@ -243,7 +243,7 @@ public class MessageRouter extends AbstractMessageReceiver {
 					return;
 				} // end of if (routings.contains())
 				// Resolve wildchars routings....
-				if (mr.isInRegexRoutings(host)) {
+				if (mr.isInRegexRoutings(id)) {
 					log.finest("Found receiver: " + mr.getName());
 					mr.addPacket(packet);
 					return;
