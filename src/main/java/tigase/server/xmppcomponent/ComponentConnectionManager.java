@@ -234,10 +234,11 @@ public class ComponentConnectionManager extends ConnectionManager
 							// This is specialized configuration for a single
 							// external component so all traffic should go through
 							// the external component (it acts as like s2s component)
-							PORT_ROUTING_TABLE_PROP_VAL = new String[] { "*" };
+							PORT_ROUTING_TABLE_PROP_VAL =	new String[] { "*" };
 						} else {
 							PORT_ROUTING_TABLE_PROP_VAL =
-								new String[] { ".*@" + PORT_REMOTE_HOST_PROP_VAL };
+								new String[] { ".*@" + PORT_REMOTE_HOST_PROP_VAL,
+															 PORT_REMOTE_HOST_PROP_VAL };
 						}
 					}
 					break;
@@ -248,7 +249,8 @@ public class ComponentConnectionManager extends ConnectionManager
 			PORT_LOCAL_HOST_PROP_VAL = "localhost";
 			PORT_REMOTE_HOST_PROP_VAL = getName() + ".localhost";
 			PORT_ROUTING_TABLE_PROP_VAL =
-				new String[] { ".*@" + PORT_REMOTE_HOST_PROP_VAL };
+				new String[] { ".*@" + PORT_REMOTE_HOST_PROP_VAL,
+											 PORT_REMOTE_HOST_PROP_VAL };
 		} // end of if (!def_found)
 		Map<String, Object> props = super.getDefaults(params);
 		props.put(PACK_ROUTED_KEY, PACK_ROUTED_VAL);
