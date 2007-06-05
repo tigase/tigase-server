@@ -28,7 +28,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -58,6 +58,7 @@ import tigase.xml.Element;
 import tigase.xml.XMLUtils;
 import tigase.xml.db.Types.DataType;
 import tigase.xmpp.Authorization;
+import tigase.xmpp.StanzaType;
 
 import static tigase.server.MessageRouterConfig.DEF_SM_NAME;
 
@@ -79,7 +80,8 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 
 	private ConfigRepository repository = null;
 	private Timer delayedTask = new Timer("ConfiguratorTask", true);
-	private Map<String, Object> defConfigParams = new HashMap<String, Object>();
+	private Map<String, Object> defConfigParams =
+		new LinkedHashMap<String, Object>();
 	private ServiceEntity serviceEntity = null;
 	private ServiceEntity config_list = null;
 	private ServiceEntity config_set = null;
@@ -238,7 +240,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 		if (params.get(GEN_DEBUG) != null) {
 			defaults.put(LOGGING_KEY + ".level", "INFO");
 			defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.level", "ALL");
-			defaults.put(LOGGING_KEY + "java.util.logging.ConsoleHandler.level", "ALL");
+			defaults.put(LOGGING_KEY + "java.util.logging.ConsoleHandler.level", "FINER");
 			String[] packs = ((String)params.get(GEN_DEBUG)).split(",");
 			for (String pack: packs) {
 				defaults.put(LOGGING_KEY + "tigase."+pack+".level", "ALL");
@@ -293,7 +295,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 	}
 
 	public Map<String, Object> getAllProperties(String key) {
-		Map<String, Object> result = new HashMap<String, Object>();
+		Map<String, Object> result = new LinkedHashMap<String, Object>();
 		String[] comps = getComponents();
 		if (comps != null) {
 			for (String comp: comps) {
@@ -609,6 +611,11 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 			return;
 		}
 
+		if (packet.getType() != null && packet.getType() == StanzaType.error) {
+			log.warning("Ignoring error packet: " + packet.toString());
+			return;
+		}
+
 		if (!packet.getTo().startsWith(getName()+".")) return;
 
 		String msg = "Please be careful, you are service admin and all changes"
@@ -748,7 +755,8 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 			if (mr instanceof Configurable) {
 				Map<String, Object> comp_props =
 					((Configurable)mr).getDefaults(defConfigParams);
-				Map<String, Object> new_params = new HashMap<String, Object>(comp_props);
+				Map<String, Object> new_params =
+					new LinkedHashMap<String, Object>(comp_props);
 				// Convert String values to proper Objecy values
 				for (Map.Entry<String, Object> entry: comp_props.entrySet()) {
 					String val =
