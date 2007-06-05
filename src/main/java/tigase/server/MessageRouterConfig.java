@@ -24,7 +24,7 @@ package tigase.server;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 import tigase.util.DNSResolver;
@@ -58,18 +58,20 @@ public class MessageRouterConfig {
 	public static final String DEF_EXT_COMP_NAME = "ext-comp";
 	public static final String DEF_SSEND_NAME = "ssend";
 	public static final String DEF_SRECV_NAME = "srecv";
+	public static final String DEF_BOSH_NAME = "bosh";
 
 	public static final String[] ALL_MSG_RECEIVERS_NAMES_PROP_VAL =
-	{	DEF_C2S_NAME, DEF_S2S_NAME, DEF_SM_NAME, DEF_SSEND_NAME, DEF_SRECV_NAME };
+	{	DEF_C2S_NAME, DEF_S2S_NAME, DEF_SM_NAME,
+		DEF_SSEND_NAME, DEF_SRECV_NAME, DEF_BOSH_NAME};
 	public static final String[] DEF_MSG_RECEIVERS_NAMES_PROP_VAL =
-	{	DEF_C2S_NAME, DEF_S2S_NAME, DEF_SM_NAME };
+	{	DEF_C2S_NAME, DEF_S2S_NAME, DEF_SM_NAME, DEF_BOSH_NAME };
 	public static final String[] SM_MSG_RECEIVERS_NAMES_PROP_VAL =
 	{	DEF_EXT_COMP_NAME, DEF_SM_NAME };
 	public static final String[] CS_MSG_RECEIVERS_NAMES_PROP_VAL =
-	{	DEF_C2S_NAME, DEF_S2S_NAME, DEF_EXT_COMP_NAME };
+	{	DEF_C2S_NAME, DEF_S2S_NAME, DEF_EXT_COMP_NAME, DEF_BOSH_NAME };
 
 	public static final Map<String, String> MSG_RCV_CLASSES =
-		new HashMap<String, String>();
+		new LinkedHashMap<String, String>();
 
 	static {
 		MSG_RCV_CLASSES.put(DEF_C2S_NAME, C2S_COMP_CLASS_NAME);
@@ -78,6 +80,7 @@ public class MessageRouterConfig {
 		MSG_RCV_CLASSES.put(DEF_SM_NAME, SM_COMP_CLASS_NAME);
 		MSG_RCV_CLASSES.put(DEF_SSEND_NAME, SSEND_COMP_CLASS_NAME);
 		MSG_RCV_CLASSES.put(DEF_SRECV_NAME, SRECV_COMP_CLASS_NAME);
+		MSG_RCV_CLASSES.put(DEF_BOSH_NAME, BOSH_COMP_CLASS_NAME);
 	}
 
 	public static final String REGISTRATOR_PROP_KEY = "components/registrators/";
