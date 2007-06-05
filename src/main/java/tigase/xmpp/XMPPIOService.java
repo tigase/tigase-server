@@ -95,11 +95,10 @@ public class XMPPIOService extends IOService {
 	}
 
 	protected void xmppStreamOpened(Map<String, String> attribs) {
-		writeLock.lock();
 		final String response = serviceListener.xmppStreamOpened(this, attribs);
     try {
 			log.finest("Sending data: " + response);
-			writeData(response);
+			writeRawData(response);
 			assert debug(response, "--SENT:");
 			if (response.endsWith("</stream:stream>")) {
 				stop();
@@ -107,22 +106,17 @@ public class XMPPIOService extends IOService {
 		} catch (IOException e) {
 			log.warning("Error sending stream open data: " + e);
 			stop();
-    } finally {
-			writeLock.unlock();
     }
 	}
 
 	public void xmppStreamOpen(final String data) {
-		writeLock.lock();
     try {
 			log.finest("Sending data: " + data);
-			writeData(data);
+			writeRawData(data);
 			assert debug(data, "--SENT:");
 		} catch (IOException e) {
 			log.warning("Error sending stream open data: " + e);
 			stop();
-    } finally {
-			writeLock.unlock();
     }
 	}
 
