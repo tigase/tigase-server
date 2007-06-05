@@ -23,7 +23,7 @@
 package tigase.server.sreceiver;
 
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -311,7 +311,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 					task_type_key);
 				repo_node += params_node;
 				String[] keys = repository.getKeys(myDomain(), repo_node);
-				Map<String, Object> task_params = new HashMap<String, Object>();
+				Map<String, Object> task_params = new LinkedHashMap<String, Object>();
 				if (keys != null) {
 					for (String key: keys) {
 						task_params.put(key, repository.getData(myDomain(), repo_node, key));
@@ -401,7 +401,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		for (String task_name: tasks_list) {
 			String task_type =
 				(String)props.get(task_name + "/" + TASK_TYPE_PROP_KEY);
-			Map<String, Object> task_params = new HashMap<String, Object>();
+			Map<String, Object> task_params = new LinkedHashMap<String, Object>();
 			String prep = task_name + "/props/";
 			for (Map.Entry<String, Object> entry: props.entrySet()) {
 				if (entry.getKey().startsWith(prep)) {
