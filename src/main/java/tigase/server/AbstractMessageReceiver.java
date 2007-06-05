@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.HashSet;
 // import java.util.Timer;
 // import java.util.TimerTask;
@@ -231,7 +231,7 @@ public abstract class AbstractMessageReceiver
    * Returns defualt configuration settings for this object.
    */
   public Map<String, Object> getDefaults(Map<String, Object> params) {
-    Map<String, Object> defs = new HashMap<String, Object>();
+    Map<String, Object> defs = new LinkedHashMap<String, Object>();
 		defs.put(MAX_QUEUE_SIZE_PROP_KEY, MAX_QUEUE_SIZE_PROP_VAL);
     return defs;
   }
