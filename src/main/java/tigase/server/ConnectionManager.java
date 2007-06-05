@@ -412,6 +412,10 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 		return stats;
 	}
 
+	protected XMPPIOService getXMPPIOServiceInstance() {
+		return new XMPPIOService();
+	}
+
 	private class ConnectionListenerImpl implements ConnectionOpenListener {
 
 		private Map<String, Object> port_props = null;
@@ -445,7 +449,7 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 
 		public void accept(SocketChannel sc) {
 
-			XMPPIOService serv = new XMPPIOService();
+			XMPPIOService serv = getXMPPIOServiceInstance();
 			serv.setSSLId(getName());
 			serv.setIOServiceListener(ConnectionManager.this);
 			serv.setSessionData(port_props);
