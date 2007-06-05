@@ -23,7 +23,7 @@
 package tigase.server;
 
 import java.util.Map;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * Describe class AbstractComponentRegistrator here.
@@ -38,7 +38,7 @@ public abstract class AbstractComponentRegistrator<E extends ServerComponent>
 	implements ComponentRegistrator {
 
 	private String name = null;
-	protected Map<String, E> components = new HashMap<String, E>();
+	protected Map<String, E> components = new LinkedHashMap<String, E>();
 
 	/**
 	 * Creates a new <code>AbstractComponentRegistrator</code> instance.
