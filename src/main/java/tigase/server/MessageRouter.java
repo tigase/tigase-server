@@ -45,6 +45,7 @@ import java.util.logging.Level;
 import tigase.xml.Element;
 import tigase.util.JIDUtils;
 import tigase.xmpp.Authorization;
+import tigase.xmpp.StanzaType;
 import tigase.disco.XMPPService;
 import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
@@ -100,7 +101,8 @@ public class MessageRouter extends AbstractMessageReceiver {
 		} // end of for ()
 		// There is no better way to do it outside MessageRouter for now.
 		if (packet.isXMLNS("/iq/query", INFO_XMLNS)
-			|| packet.isXMLNS("/iq/query", ITEMS_XMLNS)) {
+			|| packet.isXMLNS("/iq/query", ITEMS_XMLNS)
+			&& (packet.getType() != null && packet.getType() == StanzaType.get)) {
 			processDiscoQuery(packet, results);
 		}
 
