@@ -24,7 +24,7 @@ package tigase.conf;
 
 import java.io.IOException;
 import java.util.TreeMap;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
@@ -61,7 +61,7 @@ public class ConfigRepository {
   private String config_file = null;
 
   private static Map<String, ConfigRepository> configs =
-    new HashMap<String, ConfigRepository>();
+    new LinkedHashMap<String, ConfigRepository>();
   private static ConfigRepository def_config = null;
 
   public static ConfigRepository getConfigRepository() {
