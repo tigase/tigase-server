@@ -130,6 +130,8 @@ public interface Configurable extends ServerComponent {
 		"tigase.server.ssender.StanzaSender";
 	public static final String SRECV_COMP_CLASS_NAME =
 		"tigase.server.sreceiver.StanzaReceiver";
+	public static final String BOSH_COMP_CLASS_NAME =
+		"tigase.server.bosh.BoshConnectionManager";
 
 	public static final String HOSTNAMES_PROP_KEY = "hostnames";
 	public static final String ADMINS_PROP_KEY = "admins";
