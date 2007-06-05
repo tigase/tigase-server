@@ -28,7 +28,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Queue;
 import java.util.Map;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.logging.Logger;
 import tigase.server.Packet;
 import tigase.xml.Element;
@@ -86,7 +86,7 @@ public class Roster {
 			both("both", null),
 			remove("remove", null);
 
-		private Map<String, String> attrs = new HashMap<String, String>();
+		private Map<String, String> attrs = new LinkedHashMap<String, String>();
 
 		private SubscriptionType(String subscr, String ask) {
 			attrs.put("subscription", subscr);
