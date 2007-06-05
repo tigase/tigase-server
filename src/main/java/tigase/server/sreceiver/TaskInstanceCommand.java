@@ -27,7 +27,7 @@ import java.util.logging.Level;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.stats.StatRecord;
@@ -168,7 +168,7 @@ public class TaskInstanceCommand implements TaskCommandIfc {
 			Command.addFieldValue(result, "Info",
 				"Changed parameters for " + task_name + ":", "fixed");
 			Map<String, PropertyItem> old_params = task.getParams();
-			Map<String, Object> new_params = new HashMap<String, Object>();
+			Map<String, Object> new_params = new LinkedHashMap<String, Object>();
 			for (String key: old_params.keySet()) {
 				String value = Command.getFieldValue(packet, XMLUtils.escape(key));
 				if (value == null) {
