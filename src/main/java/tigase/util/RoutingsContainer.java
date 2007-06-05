@@ -22,7 +22,7 @@
  */
 package tigase.util;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -92,7 +92,7 @@ public class RoutingsContainer {
 
 	protected class MultiMode implements RoutingComputer {
 
-		private Map<Pattern, String> routings =	new HashMap<Pattern, String>();
+		private Map<Pattern, String> routings =	new LinkedHashMap<Pattern, String>();
 		private String def = null;
 
 		public void addRouting(final String pattern, final String address) {
