@@ -23,7 +23,7 @@
 package tigase.server.ssender;
 
 import java.io.File;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -97,7 +97,8 @@ public class StanzaSender extends AbstractMessageReceiver
 	private static final SimpleParser parser =
 		SingletonFactory.getParserInstance();
 	private long interval = INTERVAL_PROP_VAL;
-	private Map<String, SenderTask> tasks_list = new HashMap<String, SenderTask>();
+	private Map<String, SenderTask> tasks_list =
+		new LinkedHashMap<String, SenderTask>();
 	private Timer tasks = new Timer("StanzaSender", true);
 
 	// Implementation of tigase.server.ServerComponent
