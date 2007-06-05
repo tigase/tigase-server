@@ -23,7 +23,7 @@
 package tigase.server.sreceiver;
 
 import java.util.Map;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.logging.Logger;
 import tigase.server.Command;
 import tigase.server.Packet;
@@ -138,7 +138,7 @@ public class NewTaskCommand implements TaskCommandIfc {
 		String task_type = Command.getFieldValue(packet, TASK_TYPE_FIELD);
 		Map<String, PropertyItem> default_props =
 			receiv.getTaskTypes().get(task_type).getTaskType().getDefaultParams();
-		Map<String, Object> new_params = new HashMap<String, Object>();
+		Map<String, Object> new_params = new LinkedHashMap<String, Object>();
 		for (String key: default_props.keySet()) {
 			String value = Command.getFieldValue(packet, XMLUtils.escape(key));
 			if (value == null) {
