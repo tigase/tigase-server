@@ -23,6 +23,9 @@
 package tigase.server.bosh;
 
 import java.util.UUID;
+import java.util.Map;
+import java.util.LinkedHashMap;
+import tigase.server.Packet;
 
 import static tigase.server.bosh.Constants.*;
 
@@ -38,13 +41,43 @@ import static tigase.server.bosh.Constants.*;
 public class BoshSession {
 
 	private UUID sid = null;
+	private Map<UUID, BoshIOService> connections =
+		new LinkedHashMap<UUID, BoshIOService>();
+	private long max_wait = MAX_WAIT_DEF_PROP_VAL;
+	private long min_pooling = MIN_POOLING_PROP_VAL;
+	private long max_inactivity = MAX_INACTIVITY_PROP_VAL;
+	private int concurrent_requests = CONCURRENT_REQUESTS_PROP_VAL;
+	private int hold_requests = HOLD_REQUESTS_PROP_VAL;
+	private long max_pause = MAX_PAUSE_PROP_VAL;
 
 	/**
 	 * Creates a new <code>BoshSession</code> instance.
 	 *
 	 */
-	public BoshSession(UUID sid) {
-		this.sid = sid;
+	public BoshSession() {
+		this.sid = UUID.randomUUID();
 	}
+
+	public Packet init(Packet packet, BoshIOService service,
+		long max_wait, long min_pooling, long max_inactivity,
+		int concurrent_requests, int hold_requests, long max_pause) {
+		long wait_l = max_wait;
+		String wait_s = packet.getAttribute("wait");
+		if (wait_s != null) {
+			try {
+				wait_l = Long.parseLong(wait_s);
+			} catch (NumberFormatException e) {
+				wait_l = max_wait;
+			}
+		}
+		this.max_wait = Math.min(wait_l, max_wait);
+		this.min_pooling = min_pooling;
+		this.max_inactivity = max_inactivity;
+		this.concurrent_requests = concurrent_requests;
+		this.hold_requests = hold_requests;
+		this.max_pause = max_pause;
+		return null;
+	}
+
 
 }
