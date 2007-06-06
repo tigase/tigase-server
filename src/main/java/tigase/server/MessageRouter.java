@@ -261,6 +261,12 @@ public class MessageRouter extends AbstractMessageReceiver {
 		} // end of for (MessageReceiver mr: receivers.values())
 		// It is not for any local host, so maybe it is for some
 		// remote server, let's try sending it through s2s service:
+		if (localAddresses.contains(JIDUtils.getNodeHost(packet.getTo()))) {
+			// This packet is to local domain, we don't want to send it out
+			addOutPacketNB(Authorization.ITEM_NOT_FOUND.getResponseMessage(packet,
+					"Destination receiving entity has not been found, can't deliver.", true));
+			return;
+		}
 		if (s2s != null) {
 			s2s.addPacket(packet);
 		} // end of if (s2s != null)
