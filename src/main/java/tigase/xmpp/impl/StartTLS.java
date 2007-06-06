@@ -22,6 +22,7 @@
  */
 package tigase.xmpp.impl;
 
+import java.util.Arrays;
 import java.util.Queue;
 import java.util.logging.Logger;
 import tigase.server.Command;
@@ -73,17 +74,19 @@ public class StartTLS extends XMPPProcessor
 
 	public String id() { return ID; }
 
-	public String[] supElements() { return ELEMENTS; }
+	public String[] supElements()
+	{ return Arrays.copyOf(ELEMENTS, ELEMENTS.length); }
 
-  public String[] supNamespaces() { return XMLNSS; }
+  public String[] supNamespaces()
+	{ return Arrays.copyOf(XMLNSS, XMLNSS.length); }
 
   public Element[] supStreamFeatures(final XMPPResourceConnection session)	{
     if (session.getSessionData(TLS_STARTED_KEY) == null) {
       if (session.getSessionData(TLS_REQUIRED_KEY) != null
 				&& session.getSessionData(TLS_REQUIRED_KEY).equals("true")) {
-        return F_REQUIRED;
+        return Arrays.copyOf(F_REQUIRED, F_REQUIRED.length);
       } else {
-        return F_NOT_REQUIRED;
+        return Arrays.copyOf(F_NOT_REQUIRED, F_NOT_REQUIRED.length);
       }
     } // end of if (session.isAuthorized())
     else {

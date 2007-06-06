@@ -22,6 +22,7 @@
  */
 package tigase.xmpp.impl;
 
+import java.util.Arrays;
 import java.util.Queue;
 import java.util.logging.Logger;
 import tigase.server.Packet;
@@ -61,22 +62,24 @@ public class SessionBind extends XMPPProcessor
 	};
 
   public Element[] supDiscoFeatures(final XMPPResourceConnection session)
-	{ return DISCO_FEATURES; }
+	{ return Arrays.copyOf(DISCO_FEATURES, DISCO_FEATURES.length); }
 
 
   private static int resGenerator = 0;
 
 	public String id() { return ID; }
 
-	public String[] supElements() { return ELEMENTS; }
+	public String[] supElements()
+	{ return Arrays.copyOf(ELEMENTS, ELEMENTS.length); }
 
-  public String[] supNamespaces() { return XMLNSS; }
+	public String[] supNamespaces()
+	{ return Arrays.copyOf(XMLNSS, XMLNSS.length); }
 
   public Element[] supStreamFeatures(final XMPPResourceConnection session)	{
     if (session.getSessionData(SESSION_KEY) != null) {
       return null;
     } else {
-      return FEATURES;
+      return Arrays.copyOf(FEATURES, FEATURES.length);
     } // end of if (session.isAuthorized()) else
 	}
 
