@@ -289,24 +289,30 @@ public class ClientConnectionManager extends ConnectionManager {
 				;
 		} // end of if (!hostnames.contains(hostname))
 
-		serv.getSessionData().put(serv.SESSION_ID_KEY, id);
-		serv.getSessionData().put(serv.HOSTNAME_KEY, hostname);
-		Packet streamOpen = Command.STREAM_OPENED.getPacket(
-			getFromAddress(getUniqueId(serv)),
-			routings.computeRouting(hostname), StanzaType.set, "sess1", "submit");
-		Command.addFieldValue(streamOpen, "session-id", id);
-		Command.addFieldValue(streamOpen, "hostname", hostname);
-		addOutPacket(streamOpen);
-		if (attribs.get("version") != null) {
-			addOutPacket(Command.GETFEATURES.getPacket(
+		try {
+			serv.writeRawData("<stream:stream version='1.0' xml:lang='en'"
+				+ " from='" + hostname + "'"
+				+ " id='" + id + "'"
+				+ " xmlns='jabber:client'"
+				+ " xmlns:stream='http://etherx.jabber.org/streams'>");
+			serv.getSessionData().put(serv.SESSION_ID_KEY, id);
+			serv.getSessionData().put(serv.HOSTNAME_KEY, hostname);
+			Packet streamOpen = Command.STREAM_OPENED.getPacket(
+				getFromAddress(getUniqueId(serv)),
+				routings.computeRouting(hostname), StanzaType.set, "sess1", "submit");
+			Command.addFieldValue(streamOpen, "session-id", id);
+			Command.addFieldValue(streamOpen, "hostname", hostname);
+			addOutPacket(streamOpen);
+			if (attribs.get("version") != null) {
+				addOutPacket(Command.GETFEATURES.getPacket(
 					getFromAddress(getUniqueId(serv)),
 					routings.computeRouting(null), StanzaType.get, "sess1", null));
-		} // end of if (attribs.get("version") != null)
-		return "<stream:stream version='1.0' xml:lang='en'"
-			+ " from='" + hostname + "'"
-			+ " id='" + id + "'"
-			+ " xmlns='jabber:client'"
-			+ " xmlns:stream='http://etherx.jabber.org/streams'>";
+			} // end of if (attribs.get("version") != null)
+		} catch (IOException e) {
+			serv.stop();
+		}
+
+		return null;
 	}
 
 	public void serviceStopped(IOService service) {
