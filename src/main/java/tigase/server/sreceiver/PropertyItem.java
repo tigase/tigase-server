@@ -22,6 +22,8 @@
  */
 package tigase.server.sreceiver;
 
+import java.util.Arrays;
+
 import static tigase.server.sreceiver.PropertyConstants.*;
 
 /**
@@ -50,7 +52,8 @@ public class PropertyItem {
 		this.name = name;
 		this.display_name = display_name;
 		this.value = def_value;
-		this.possible_values = possible_values;
+		this.possible_values =
+			Arrays.copyOf(possible_values, possible_values.length);
 		this.description = description;
 		if (possible_values == null && value != null) {
 			guessPossibleValues();
@@ -152,7 +155,7 @@ public class PropertyItem {
 	 * @return the value of possible_values
 	 */
 	public String[] getPossible_values() {
-		return this.possible_values;
+		return Arrays.copyOf(this.possible_values, this.possible_values.length);
 	}
 
 	/**

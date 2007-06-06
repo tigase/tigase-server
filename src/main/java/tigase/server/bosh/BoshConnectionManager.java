@@ -57,9 +57,9 @@ public class BoshConnectionManager extends ConnectionManager {
     Logger.getLogger("tigase.server.bosh.BoshConnectionManager");
 
 	private static final int DEF_PORT_NO = 5280;
-	private static int[] PORTS = {DEF_PORT_NO};
+	private int[] PORTS = {DEF_PORT_NO};
 	private static final String HOSTNAMES_PROP_KEY = "hostnames";
-	private static String[] HOSTNAMES_PROP_VAL =	{"localhost", "hostname"};
+	private String[] HOSTNAMES_PROP_VAL =	{"localhost", "hostname"};
 
 	private String defHostName = null;
 	private Set<String> hostnames = new TreeSet<String>();

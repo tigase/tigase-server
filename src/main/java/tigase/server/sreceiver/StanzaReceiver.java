@@ -130,6 +130,9 @@ import static tigase.server.sreceiver.PropertyConstants.*;
 public class StanzaReceiver extends AbstractMessageReceiver
 	implements Configurable, XMPPService {
 
+	private static final Logger log =
+		Logger.getLogger("tigase.server.sreceiver.StanzaReceiver");
+
 	private static final String TASKS_LIST_PROP_KEY = "tasks-list";
 	private static final String[] TASKS_LIST_PROP_VAL = {"development-news"};
 	private static final String TASK_ACTIVE_PROP_KEY = "active";
@@ -138,7 +141,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	private static final String TASK_TYPE_PROP_VAL = "News Distribution";
 	private static final String SREC_REPO_CLASS_PROP_KEY = "srec-repo-class";
 	private static final String SREC_REPO_URL_PROP_KEY = "srec-repo-url";
-	private static String[] ADMINS_PROP_VAL =	{"admin@localhost", "admin@hostname"};
+	private String[] ADMINS_PROP_VAL =	{"admin@localhost", "admin@hostname"};
 
 	private static final String TASK_TYPES_PROP_NODE = "task-types/";
 	private static final String TASK_TYPES_PROP_KEY =
@@ -155,9 +158,6 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	private static final String tasks_node = "/tasks";
 	private static final String params_node = "/params";
 	private static final String task_type_key = "task-type";
-
-	private static Logger log =
-		Logger.getLogger("tigase.server.sreceiver.StanzaReceiver");
 
 	/**
 	 * This maps keeps all available task types which can be instantiated

@@ -82,7 +82,7 @@ public class ServerConnectionManager extends ConnectionManager {
 
 	private static final String DIALBACK_XMLNS = "jabber:server:dialback";
 	public static final String HOSTNAMES_PROP_KEY = "hostnames";
-	public static String[] HOSTNAMES_PROP_VAL =	{"localhost", "hostname"};
+	public String[] HOSTNAMES_PROP_VAL =	{"localhost", "hostname"};
 	public static final String MAX_PACKET_WAITING_TIME_PROP_KEY =
 		"max-packet-waiting-time";
 	public static final long MAX_PACKET_WAITING_TIME_PROP_VAL = 5*MINUTE;

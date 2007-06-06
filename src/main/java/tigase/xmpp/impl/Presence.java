@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.Queue;
 import java.util.EnumSet;
+import java.util.Arrays;
 import java.util.logging.Logger;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
@@ -81,9 +82,9 @@ public class Presence extends XMPPProcessor
 
 	public String id() { return ID; }
 
-	public String[] supElements() { return ELEMENTS; }
+	public String[] supElements() { return Arrays.copyOf(ELEMENTS, ELEMENTS.length); }
 
-  public String[] supNamespaces() { return XMLNSS; }
+  public String[] supNamespaces() { return Arrays.copyOf(XMLNSS, XMLNSS.length); }
 
 	/**
 	 * <code>stopped</code> method is called when user disconnects or logs-out.
@@ -352,12 +353,14 @@ public class Presence extends XMPPProcessor
 				}
 				break;
 			case out_subscribe:
-				SubscriptionType current_subscription =
-					Roster.getBuddySubscription(session, packet.getElemTo());
-				if (current_subscription == null) {
-					Roster.addBuddy(session, packet.getElemTo());
-				} // end of if (current_subscription == null)
 			case out_unsubscribe:
+				if (pres_type == PresenceType.out_subscribe) {
+					SubscriptionType current_subscription =
+						Roster.getBuddySubscription(session, packet.getElemTo());
+					if (current_subscription == null) {
+						Roster.addBuddy(session, packet.getElemTo());
+					} // end of if (current_subscription == null)
+				}
 				subscr_changed = Roster.updateBuddySubscription(session, pres_type,
 					packet.getElemTo());
 				if (subscr_changed) {

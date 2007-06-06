@@ -80,7 +80,7 @@ public class ClientConnectionManager extends ConnectionManager {
 	public static final String ROUTING_ENTRY_PROP_VAL = DEF_SM_NAME + "@localhost";
 
 	public static final String HOSTNAMES_PROP_KEY = "hostnames";
-	public static String[] HOSTNAMES_PROP_VAL =	{"localhost", "hostname"};
+	public String[] HOSTNAMES_PROP_VAL =	{"localhost", "hostname"};
 
 	private RoutingsContainer routings = null;
 	private String defHostName = null;

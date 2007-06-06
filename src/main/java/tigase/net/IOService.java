@@ -107,7 +107,7 @@ public abstract class IOService implements Callable<IOService> {
   private CharsetEncoder encoder = Charset.forName("UTF-8").newEncoder();
   private CharsetDecoder decoder = Charset.forName("UTF-8").newDecoder();
 
-  public void setSSLId(final String id) {
+  public synchronized void setSSLId(final String id) {
     sslId = id;
   }
 
@@ -168,7 +168,7 @@ public abstract class IOService implements Callable<IOService> {
    *
    * @return a <code>boolean</code> value
    */
-  public boolean isConnected() {
+  public synchronized boolean isConnected() {
     return socketIO == null ? false : socketIO.isConnected();
   }
 
@@ -185,7 +185,7 @@ public abstract class IOService implements Callable<IOService> {
    *
    * @param socketChannel a <code>SocketChannel</code> value
    */
-  public void accept(final SocketChannel socketChannel)
+  public synchronized void accept(final SocketChannel socketChannel)
     throws IOException {
 		if (socketChannel.isConnectionPending()) {
 			socketChannel.finishConnect();
@@ -214,7 +214,7 @@ public abstract class IOService implements Callable<IOService> {
    *
    * @exception IOException if an error occurs
    */
-  public void stop() {
+  public synchronized void stop() {
 		try {
 			socketIO.stop();
 		} catch (Exception e) {
@@ -270,7 +270,7 @@ public abstract class IOService implements Callable<IOService> {
    * @return a <code>char[]</code> value
    * @exception IOException if an error occurs
    */
-  protected char[] readData() throws IOException {
+  protected synchronized char[] readData() throws IOException {
 		setLastTransferTime();
     CharBuffer cb = null;
     try {

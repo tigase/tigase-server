@@ -60,21 +60,21 @@ import tigase.xmpp.XMPPIOService;
 public class ComponentConnectionManager extends ConnectionManager
 	implements XMPPService {
 
-	public static int[] PORTS = {5555};
-	public static ConnectionType PORT_TYPE_PROP_VAL = ConnectionType.accept;
-	public static SocketType PORT_SOCKET_PROP_VAL = SocketType.plain;
+	public int[] PORTS = {5555};
+	public ConnectionType PORT_TYPE_PROP_VAL = ConnectionType.accept;
+	public SocketType PORT_SOCKET_PROP_VAL = SocketType.plain;
   public static final String SECRET_PROP_KEY = "secret";
-  public static String SECRET_PROP_VAL =	"someSecret";
+  public String SECRET_PROP_VAL =	"someSecret";
 	public static final String PORT_LOCAL_HOST_PROP_KEY = "local-host";
-	public static String PORT_LOCAL_HOST_PROP_VAL = "localhost";
-	public static String PORT_REMOTE_HOST_PROP_VAL = "comp-1.localhost";
+	public String PORT_LOCAL_HOST_PROP_VAL = "localhost";
+	public String PORT_REMOTE_HOST_PROP_VAL = "comp-1.localhost";
 	public static final String PORT_ROUTING_TABLE_PROP_KEY = "routing-table";
-	public static String[] PORT_ROUTING_TABLE_PROP_VAL =
+	public String[] PORT_ROUTING_TABLE_PROP_VAL =
 	{ PORT_REMOTE_HOST_PROP_VAL, ".*@" + PORT_REMOTE_HOST_PROP_VAL,
 		".*\\." + PORT_REMOTE_HOST_PROP_VAL };
-	public static String[] PORT_IFC_PROP_VAL = {"*"};
+	public String[] PORT_IFC_PROP_VAL = {"*"};
 	public static final String PACK_ROUTED_KEY = "pack-routed";
-	public static boolean PACK_ROUTED_VAL = false;
+	public boolean PACK_ROUTED_VAL = false;
 	public static final String RETURN_SERVICE_DISCO_KEY = "service-disco";
 	public static final boolean RETURN_SERVICE_DISCO_VAL = true;
 	public static final String IDENTITY_TYPE_KEY = "identity-type";

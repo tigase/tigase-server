@@ -25,6 +25,7 @@ package tigase.xmpp.impl;
 import java.util.logging.Logger;
 import java.util.Queue;
 import java.util.Date;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.text.SimpleDateFormat;
 import tigase.util.JIDUtils;
@@ -68,9 +69,8 @@ public class OfflineMessages extends XMPPProcessor
   protected static final Element[] DISCO_FEATURES =
 	{new Element("feature",	new String[] {"var"},	new String[] {"msgoffline"})};
 
-	private static final SimpleParser parser =
-		SingletonFactory.getParserInstance();
-	private static final SimpleDateFormat formater =
+	private SimpleParser parser = SingletonFactory.getParserInstance();
+	private SimpleDateFormat formater =
 		new SimpleDateFormat("yyyyMMdd'T'HH:mm:ss");
 
 	// Implementation of tigase.xmpp.XMPPImplIfc
@@ -80,14 +80,16 @@ public class OfflineMessages extends XMPPProcessor
 	 *
 	 * @return a <code>String[]</code> value
 	 */
-	public String[] supElements() { return ELEMENTS; }
+	public String[] supElements()
+	{ return Arrays.copyOf(ELEMENTS, ELEMENTS.length); }
 
 	/**
 	 * Describe <code>supNamespaces</code> method here.
 	 *
 	 * @return a <code>String[]</code> value
 	 */
-  public String[] supNamespaces() { return XMLNSS; }
+  public String[] supNamespaces()
+	{ return Arrays.copyOf(XMLNSS, XMLNSS.length); }
 
 	/**
 	 * Describe <code>supDiscoFeatures</code> method here.

@@ -58,7 +58,7 @@ import tigase.xml.Element;
 public abstract class XMPPProcessor
 	implements XMPPImplIfc, Comparable<XMPPProcessor> {
 
-	private static XMPPProcessor inst = null;
+	private XMPPProcessor inst = null;
 
 	protected XMPPProcessor() {	inst = this; }
 
@@ -85,7 +85,7 @@ public abstract class XMPPProcessor
     return false;
   }
 
-	public static XMPPProcessor getInstance() { return inst; }
+	public XMPPProcessor getInstance() { return inst; }
 
 	// Implementation of java.lang.Comparable
 
