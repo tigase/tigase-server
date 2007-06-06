@@ -469,7 +469,7 @@ public class MessageRouter extends AbstractMessageReceiver {
 		long minutes = (uptime - (days * 24 * HOUR + hours * HOUR)) / MINUTE;
 		long seconds =
 			(uptime - (days * 24 * HOUR + hours * HOUR + minutes * MINUTE)) / SECOND;
-		StringBuilder sb = new StringBuilder();
+		//		StringBuilder sb = new StringBuilder();
 		stats.add(new StatRecord(getName(), "Uptime", "time",	""
 				+ (days > 0 ? days + " day, " : "")
 				+ (hours > 0 ? hours + " hour, " : "")

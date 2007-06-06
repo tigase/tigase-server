@@ -393,7 +393,7 @@ public class SessionManager extends AbstractMessageReceiver
 
 	private void processCommand(Packet pc) {
 		log.finer(pc.getCommand().toString() + " command from: " + pc.getFrom());
-		Element command = pc.getElement();
+		//Element command = pc.getElement();
 		switch (pc.getCommand()) {
 		case STREAM_OPENED:
 			// It might be existing opened stream after TLS/SASL authorization

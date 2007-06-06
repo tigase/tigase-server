@@ -124,7 +124,7 @@ public class SaslPLAIN implements SaslServer {
 	 */
 	public byte[] evaluateResponse(final byte[] byteArray) throws SaslException {
 
-		StringBuilder authz = new StringBuilder();
+		//StringBuilder authz = new StringBuilder();
 		// fields are separated with \0 char so let's look for the char
 		// position....
 		int auth_idx = 0;

@@ -93,7 +93,7 @@ public class SessionBind extends XMPPProcessor
 			return;
 		} // end of if (!session.isAuthorized())
 
-		Element request = packet.getElement();
+		//Element request = packet.getElement();
     StanzaType type = packet.getType();
 		switch (type) {
 		case set:

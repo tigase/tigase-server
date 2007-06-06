@@ -121,17 +121,17 @@ public class SaslAuth extends XMPPProcessor
 		} // end of if (session == null)
 
 		Element request = packet.getElement();
-		ElementType type = null;
-		try {
-			type = ElementType.valueOf(request.getName());
-		} catch (IllegalArgumentException e) {
-			log.warning("Incorrect stanza type: " + request.getName());
-			results.offer(packet.swapFromTo(createReply(ElementType.failure,
-						"<temporary-auth-failure/>")));
-			results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
-					StanzaType.set, packet.getElemId()));
-			return;
-		} // end of try-catch
+// 		ElementType type = null;
+// 		try {
+// 			type = ElementType.valueOf(request.getName());
+// 		} catch (IllegalArgumentException e) {
+// 			log.warning("Incorrect stanza type: " + request.getName());
+// 			results.offer(packet.swapFromTo(createReply(ElementType.failure,
+// 						"<temporary-auth-failure/>")));
+// 			results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
+// 					StanzaType.set, packet.getElemId()));
+// 			return;
+// 		} // end of try-catch
 		Map<String, Object> authProps =
 			(Map<String, Object>)(session.getSessionData(XMLNS+"-authProps"));
 		if (authProps == null) {
@@ -144,7 +144,7 @@ public class SaslAuth extends XMPPProcessor
 			authProps.put(UserAuthRepository.SERVER_NAME_KEY, session.getDomain());
 			session.putSessionData(XMLNS+"-authProps", authProps);
 		} // end of if (authProps == null)
-		String user = (String)authProps.get(UserAuthRepository.USER_ID_KEY);
+		//		String user = (String)authProps.get(UserAuthRepository.USER_ID_KEY);
 		authProps.put(UserAuthRepository.DATA_KEY, request.getCData());
 		try {
 			Authorization result = session.loginOther(authProps);

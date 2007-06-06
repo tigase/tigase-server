@@ -116,16 +116,17 @@ public class JabberIqAuth extends XMPPProcessor
 			String resource = request.getChildCData("/iq/query/resource");
 			String password = request.getChildCData("/iq/query/password");
 			String digest = request.getChildCData("/iq/query/digest");
-			String user_pass = null;
+			//String user_pass = null;
 			String auth_mod = null;
 			try {
 				Authorization result = null;
 				if (password != null) {
-					user_pass = password;
-					result = session.loginPlain(user_name, user_pass);
+// 					user_pass = password;
+// 					result = session.loginPlain(user_name, user_pass);
+					result = session.loginPlain(user_name, password);
 				} // end of if (password != null)
 				if (digest != null) {
-					user_pass = digest;
+					//user_pass = digest;
 					result = session.loginDigest(user_name, digest,
 						session.getSessionId(), "SHA");
 				} // end of if (digest != null)
