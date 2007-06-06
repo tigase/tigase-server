@@ -493,9 +493,9 @@ public class ServerConnectionManager extends ConnectionManager {
 		} else {
 			HOSTNAMES_PROP_VAL = DNSResolver.getDefHostNames();
 		}
-		for (String key: params.keySet()) {
-			if (key.startsWith(GEN_EXT_COMP)) {
-				String ext_comp = (String)params.get(key);
+		for (Map.Entry<String, Object> entry: params.entrySet()) {
+			if (entry.getKey().startsWith(GEN_EXT_COMP)) {
+				String ext_comp = (String)entry.getValue();
 				if (ext_comp != null) {
 					String[] comp_params = ext_comp.split(",");
 					HOSTNAMES_PROP_VAL = Arrays.copyOf(HOSTNAMES_PROP_VAL,

@@ -407,7 +407,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 				}
 				break;
 			case BOOLEAN:
-				new_val = new Boolean(parseBoolean(value));
+				new_val = Boolean.valueOf(parseBoolean(value));
 				break;
 			case BOOLEAN_ARR:
 				if (add) {

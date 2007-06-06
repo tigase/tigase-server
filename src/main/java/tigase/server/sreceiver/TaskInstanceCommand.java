@@ -169,16 +169,17 @@ public class TaskInstanceCommand implements TaskCommandIfc {
 				"Changed parameters for " + task_name + ":", "fixed");
 			Map<String, PropertyItem> old_params = task.getParams();
 			Map<String, Object> new_params = new LinkedHashMap<String, Object>();
-			for (String key: old_params.keySet()) {
-				String value = Command.getFieldValue(packet, XMLUtils.escape(key));
+			for (Map.Entry<String, PropertyItem> entry: old_params.entrySet()) {
+				String value =
+					Command.getFieldValue(packet, XMLUtils.escape(entry.getKey()));
 				if (value == null) {
 					value = "";
 				} // end of if (value == null)
 				value = XMLUtils.unescape(value);
-				if (!value.equals(old_params.get(key).toString())) {
-					new_params.put(key, value);
+				if (!value.equals(entry.getValue().toString())) {
+					new_params.put(entry.getKey(), value);
 					Command.addFieldValue(result, "Info",
-						old_params.get(key).getDisplay_name() + ": " + value, "fixed");
+						entry.getValue().getDisplay_name() + ": " + value, "fixed");
 				}
 			} // end of for (String key: default_props.keySet())
 			try {
