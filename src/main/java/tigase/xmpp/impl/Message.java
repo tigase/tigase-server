@@ -53,10 +53,10 @@ public abstract class Message extends SimpleForwarder {
 		Logger.getLogger("tigase.xmpp.impl.Message");
 
 
-  protected static final String XMLNS = "jabber:client";
-	protected static final String ID = "message";
-  protected static final String[] ELEMENTS = {"message"};
-  protected static final String[] XMLNSS = {XMLNS};
+  private static final String XMLNS = "jabber:client";
+	private static final String ID = "message";
+  private static final String[] ELEMENTS = {"message"};
+  private static final String[] XMLNSS = {XMLNS};
 
 	public String id() { return ID; }
 

@@ -46,7 +46,7 @@ public class MessageRouterConfig {
     Logger.getLogger("tigase.server.MessageRouterConfig");
 
   public static final String LOCAL_ADDRESSES_PROP_KEY = "hostnames";
-  public static String[] LOCAL_ADDRESSES_PROP_VALUE =	{"localhost", "hostname"};
+  private static String[] LOCAL_ADDRESSES_PROP_VALUE =	{"localhost", "hostname"};
 
 	public static final String MSG_RECEIVERS_PROP_KEY =
 		"components/msg-receivers/";
@@ -60,17 +60,17 @@ public class MessageRouterConfig {
 	public static final String DEF_SRECV_NAME = "srecv";
 	public static final String DEF_BOSH_NAME = "bosh";
 
-	public static final String[] ALL_MSG_RECEIVERS_NAMES_PROP_VAL =
+	private static final String[] ALL_MSG_RECEIVERS_NAMES_PROP_VAL =
 	{	DEF_C2S_NAME, DEF_S2S_NAME, DEF_SM_NAME,
 		DEF_SSEND_NAME, DEF_SRECV_NAME, DEF_BOSH_NAME};
-	public static final String[] DEF_MSG_RECEIVERS_NAMES_PROP_VAL =
+	private static final String[] DEF_MSG_RECEIVERS_NAMES_PROP_VAL =
 	{	DEF_C2S_NAME, DEF_S2S_NAME, DEF_SM_NAME, DEF_BOSH_NAME };
-	public static final String[] SM_MSG_RECEIVERS_NAMES_PROP_VAL =
+	private static final String[] SM_MSG_RECEIVERS_NAMES_PROP_VAL =
 	{	DEF_EXT_COMP_NAME, DEF_SM_NAME };
-	public static final String[] CS_MSG_RECEIVERS_NAMES_PROP_VAL =
+	private static final String[] CS_MSG_RECEIVERS_NAMES_PROP_VAL =
 	{	DEF_C2S_NAME, DEF_S2S_NAME, DEF_EXT_COMP_NAME, DEF_BOSH_NAME };
 
-	public static final Map<String, String> MSG_RCV_CLASSES =
+	private static final Map<String, String> MSG_RCV_CLASSES =
 		new LinkedHashMap<String, String>();
 
 	static {
@@ -86,7 +86,7 @@ public class MessageRouterConfig {
 	public static final String REGISTRATOR_PROP_KEY = "components/registrators/";
 	public static final String REGISTRATOR_NAMES_PROP_KEY =
 		REGISTRATOR_PROP_KEY + "id-names";
-	public static final String[] REGISTRATOR_NAMES_PROP_VAL =	{	"stat-1" };
+	private static final String[] REGISTRATOR_NAMES_PROP_VAL =	{	"stat-1" };
 
 	public static final String STAT_1_CLASS_PROP_KEY =
 		REGISTRATOR_PROP_KEY + "stat-1.class";

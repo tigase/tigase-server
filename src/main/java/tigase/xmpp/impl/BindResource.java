@@ -52,13 +52,13 @@ public class BindResource extends XMPPProcessor
   private static final Logger log =
 		Logger.getLogger("tigase.xmpp.impl.BindResource");
 
-	protected static final String ID = XMLNS;
-  protected static final String[] ELEMENTS = {"bind"};
-  protected static final String[] XMLNSS = {XMLNS};
-  protected static final Element[] FEATURES = {
+	private static final String ID = XMLNS;
+  private static final String[] ELEMENTS = {"bind"};
+  private static final String[] XMLNSS = {XMLNS};
+  private static final Element[] FEATURES = {
 		new Element("bind",	new String[] {"xmlns"}, new String[] {XMLNS})
 	};
-  protected static final Element[] DISCO_FEATURES = {
+  private static final Element[] DISCO_FEATURES = {
 		new Element("feature", new String[] {"var"}, new String[] {XMLNS})
 	};
 

@@ -66,12 +66,12 @@ public class SaslAuth extends XMPPProcessor
 
   private static final Logger log = Logger.getLogger("tigase.xmpp.impl.SaslAuth");
 
-	protected static final String ID = XMLNS;
-  protected static final String[] ELEMENTS = {
+	private static final String ID = XMLNS;
+  private static final String[] ELEMENTS = {
     "auth", "response", "challenge", "failure", "success", "abort"};
-  protected static final String[] XMLNSS = {
+  private static final String[] XMLNSS = {
     XMLNS, XMLNS, XMLNS, XMLNS, XMLNS, XMLNS};
-  protected static final Element[] DISCO_FEATURES =	{
+  private static final Element[] DISCO_FEATURES =	{
 		new Element("feature", new String[] {"var"}, new String[] {XMLNS})
 	};
 

@@ -54,13 +54,13 @@ public class JabberIqStats extends XMPPProcessor
   private static final Logger log =
     Logger.getLogger("tigase.xmpp.impl.JabberIqStats");
 
-  protected static final String XMLNS = "http://jabber.org/protocol/stats";
-	protected static final String ID = XMLNS;
-  protected static final String[] ELEMENTS =
+  private static final String XMLNS = "http://jabber.org/protocol/stats";
+	private static final String ID = XMLNS;
+  private static final String[] ELEMENTS =
 	{"query", "command"};
-  protected static final String[] XMLNSS =
+  private static final String[] XMLNSS =
 	{XMLNS, Command.XMLNS};
-  protected static final Element[] DISCO_FEATURES =
+  private static final Element[] DISCO_FEATURES =
 	{new Element("feature",	new String[] {"var"},	new String[] {XMLNS})};
 
 	public String id() { return ID; }

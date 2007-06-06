@@ -60,33 +60,33 @@ import tigase.xml.SingletonFactory;
 public class StanzaSender extends AbstractMessageReceiver
 	implements Configurable, StanzaHandler {
 
-	public static final String INTERVAL_PROP_KEY = "default-interval";
-	public static final long INTERVAL_PROP_VAL = 10;
-	public static final String STANZA_LISTENERS_PROP_KEY = "stanza-listeners";
-	public static final String TASK_CLASS_PROP_KEY = "class-name";
-	public static final String TASK_INIT_PROP_KEY = "init-string";
-	public static final String TASK_INTERVAL_PROP_KEY = "interval";
-	public static final String JDBC_TASK_NAME = "jdbc";
-	public static final String JDBC_TASK_CLASS = "tigase.server.ssender.JDBCTask";
-	public static final String JDBC_TASK_INIT =
+	private static final String INTERVAL_PROP_KEY = "default-interval";
+	private static final long INTERVAL_PROP_VAL = 10;
+	private static final String STANZA_LISTENERS_PROP_KEY = "stanza-listeners";
+	private static final String TASK_CLASS_PROP_KEY = "class-name";
+	private static final String TASK_INIT_PROP_KEY = "init-string";
+	private static final String TASK_INTERVAL_PROP_KEY = "interval";
+	private static final String JDBC_TASK_NAME = "jdbc";
+	private static final String JDBC_TASK_CLASS = "tigase.server.ssender.JDBCTask";
+	private static final String JDBC_TASK_INIT =
 		"jdbc:mysql://localhost/tigase?user=root&password=mypass&table=xmpp_stanza";
-	public static final long JDBC_INTERVAL = 10;
-	public static final String DRUPAL_FORUM_TASK_NAME = "drupal-forum";
-	public static final String DRUPAL_FORUM_TASK_CLASS =
+	private static final long JDBC_INTERVAL = 10;
+	private static final String DRUPAL_FORUM_TASK_NAME = "drupal-forum";
+	private static final String DRUPAL_FORUM_TASK_CLASS =
 		"tigase.server.ssender.DrupalForumTask";
-	public static final String DRUPAL_FORUM_TASK_INIT =
+	private static final String DRUPAL_FORUM_TASK_INIT =
 		"drupal_forum:mysql://localhost/tigase?user=root&password=mypass";
-	public static final long DRUPAL_FORUM_INTERVAL = 30;
-	public static final String FILE_TASK_NAME = "file";
-	public static final String FILE_TASK_CLASS = "tigase.server.ssender.FileTask";
-	public static final String FILE_TASK_INIT =
+	private static final long DRUPAL_FORUM_INTERVAL = 30;
+	private static final String FILE_TASK_NAME = "file";
+	private static final String FILE_TASK_CLASS = "tigase.server.ssender.FileTask";
+	private static final String FILE_TASK_INIT =
 		File.separator + "var" + File.separator + "spool" + File.separator +
 		"jabber" + File.separator + "*.stanza";
-	public static final long FILE_INTERVAL = 10;
-	public static final String[] STANZA_LISTENERS_PROP_VAL =
+	private static final long FILE_INTERVAL = 10;
+	private static final String[] STANZA_LISTENERS_PROP_VAL =
 	{JDBC_TASK_NAME, FILE_TASK_NAME};
-	public static final String TASK_ACTIVE_PROP_KEY = "active";
-	public static final boolean TASK_ACTIVE_PROP_VAL = false;
+	private static final String TASK_ACTIVE_PROP_KEY = "active";
+	private static final boolean TASK_ACTIVE_PROP_VAL = false;
 
 	/**
    * Variable <code>log</code> is a class logger.

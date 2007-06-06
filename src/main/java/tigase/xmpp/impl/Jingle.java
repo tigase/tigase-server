@@ -50,10 +50,10 @@ public class Jingle extends XMPPProcessor implements XMPPProcessorIfc {
 
   private static final Logger log = Logger.getLogger("tigase.xmpp.impl.Jingle");
 
-	protected static final String ID = "http://jabber.org/protocol/jingle";
-  protected static final String[] ELEMENTS =
+	private static final String ID = "http://jabber.org/protocol/jingle";
+  private static final String[] ELEMENTS =
 	{"jingle", "jingle", "jingle", "session"};
-  protected static final String[] XMLNSS =
+  private static final String[] XMLNSS =
 	{"http://jabber.org/protocol/jingle",
 	 "http://www.xmpp.org/extensions/xep-0166.html#ns",
 	 "http://www.xmpp.org/extensions/xep-0167.html#ns",

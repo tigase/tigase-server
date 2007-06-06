@@ -52,13 +52,13 @@ public abstract class TaskCommons {
 				if (item.getPossible_values() != null) {
 					Command.addFieldValue(result,
 						XMLUtils.escape(item.getName()),
-						XMLUtils.escape(item.getValue().toString()),
+						XMLUtils.escape(item.toString()),
 						XMLUtils.escape(item.getDisplay_name()),
 						item.getPossible_values(), item.getPossible_values());
 				} else {
 					Command.addFieldValue(result,
 						XMLUtils.escape(item.getName()),
-						XMLUtils.escape(item.getValue().toString()),
+						XMLUtils.escape(item.toString()),
 						"text-single", XMLUtils.escape(item.getDisplay_name()));
 				} // end of if (item.getPossible_values() != null) else
 			} // end of if (!entry.getKey().equals(USER_REPOSITORY_PROP_KEY))

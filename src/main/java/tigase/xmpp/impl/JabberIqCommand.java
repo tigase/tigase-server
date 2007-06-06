@@ -50,13 +50,13 @@ public class JabberIqCommand extends XMPPProcessor implements XMPPProcessorIfc {
   private static final Logger log =
     Logger.getLogger("tigase.xmpp.impl.JabberIqCommand");
 
-  protected static final String XMLNS = Command.XMLNS;
-	protected static final String ID = XMLNS;
-  protected static final String[] ELEMENTS =
+  private static final String XMLNS = Command.XMLNS;
+	private static final String ID = XMLNS;
+  private static final String[] ELEMENTS =
 	{"command"};
-  protected static final String[] XMLNSS =
+  private static final String[] XMLNSS =
 	{Command.XMLNS};
-  protected static final Element[] DISCO_FEATURES =
+  private static final Element[] DISCO_FEATURES =
 	{new Element("feature",	new String[] {"var"},	new String[] {XMLNS})};
 
 	public String id() { return ID; }

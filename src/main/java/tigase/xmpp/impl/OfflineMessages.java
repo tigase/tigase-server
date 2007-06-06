@@ -62,11 +62,11 @@ public class OfflineMessages extends XMPPProcessor
   private static Logger log =
 		Logger.getLogger("tigase.xmpp.impl.OfflineMessage");
 
-	protected static final String ID = "msgoffline";
-  protected static final String XMLNS = "jabber:client";
-	protected static final String[] ELEMENTS = {"presence"};
-  protected static final String[] XMLNSS = {XMLNS};
-  protected static final Element[] DISCO_FEATURES =
+	private static final String ID = "msgoffline";
+  private static final String XMLNS = "jabber:client";
+	private static final String[] ELEMENTS = {"presence"};
+  private static final String[] XMLNSS = {XMLNS};
+  private static final Element[] DISCO_FEATURES =
 	{new Element("feature",	new String[] {"var"},	new String[] {"msgoffline"})};
 
 	private SimpleParser parser = SingletonFactory.getParserInstance();

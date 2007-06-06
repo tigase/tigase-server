@@ -51,7 +51,7 @@ public class ConnectionOpenThread implements Runnable {
   private static final Logger log =
 		Logger.getLogger("tigase.net.ConnectionOpenThread");
 
-  public static long accept_counter = 0;
+  protected long accept_counter = 0;
 
 	private static ConnectionOpenThread acceptThread = null;
 

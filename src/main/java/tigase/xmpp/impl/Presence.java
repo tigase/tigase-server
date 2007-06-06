@@ -76,9 +76,9 @@ public class Presence extends XMPPProcessor
    */
   private static Logger log =	Logger.getLogger("tigase.xmpp.impl.Presence");
 
-	protected static final String ID = "presence";
-  protected static final String[] ELEMENTS = {"presence"};
-  protected static final String[] XMLNSS = {"jabber:client"};
+	private static final String ID = "presence";
+  private static final String[] ELEMENTS = {"presence"};
+  private static final String[] XMLNSS = {"jabber:client"};
 
 	public String id() { return ID; }
 

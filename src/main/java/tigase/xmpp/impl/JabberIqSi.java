@@ -48,11 +48,11 @@ public abstract class JabberIqSi extends SimpleForwarder {
   private static final Logger log =
 		Logger.getLogger("tigase.xmpp.impl.JabberIqSi");
 
-  protected static final String XMLNS = "http://jabber.org/protocol/si";
-	protected static final String ID = XMLNS;
-  protected static final String[] ELEMENTS = {"si"};
-  protected static final String[] XMLNSS = {XMLNS};
-  protected static final Element[] DISCO_FEATURES =
+  private static final String XMLNS = "http://jabber.org/protocol/si";
+	private static final String ID = XMLNS;
+  private static final String[] ELEMENTS = {"si"};
+  private static final String[] XMLNSS = {XMLNS};
+  private static final Element[] DISCO_FEATURES =
 	{
 		new Element("feature",
 			new String[] {"var"},

@@ -59,11 +59,11 @@ public class JabberIqRoster extends XMPPProcessor
   private static Logger log =
 		Logger.getLogger("tigase.xmpp.impl.JabberIqRoster");
 
-  protected static final String XMLNS = "jabber:iq:roster";
-	protected static final String ID = XMLNS;
-	protected static final String[] ELEMENTS = {"query"};
-  protected static final String[] XMLNSS = {XMLNS};
-  protected static final Element[] DISCO_FEATURES =	{
+  private static final String XMLNS = "jabber:iq:roster";
+	private static final String ID = XMLNS;
+	private static final String[] ELEMENTS = {"query"};
+  private static final String[] XMLNSS = {XMLNS};
+  private static final Element[] DISCO_FEATURES =	{
 		new Element("feature", new String[] {"var"}, new String[] {XMLNS})
 	};
 

@@ -60,11 +60,11 @@ public class JabberIqIq extends XMPPProcessor
 
 	private static final String LEVEL = "level";
 
-	protected static final String XMLNS = "jabber:iq:iq";
-	protected static final String ID = XMLNS;
-	protected static final String[] ELEMENTS = {"query"};
-  protected static final String[] XMLNSS = {XMLNS};
-  protected static final Element[] DISCO_FEATURES =	{
+	private static final String XMLNS = "jabber:iq:iq";
+	private static final String ID = XMLNS;
+	private static final String[] ELEMENTS = {"query"};
+  private static final String[] XMLNSS = {XMLNS};
+  private static final Element[] DISCO_FEATURES =	{
 		new Element("feature", new String[] {"var"}, new String[] {XMLNS})
 	};
 

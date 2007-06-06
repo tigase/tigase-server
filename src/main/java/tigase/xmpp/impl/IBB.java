@@ -53,10 +53,10 @@ public abstract class IBB extends SimpleForwarder {
    */
   private static Logger log = Logger.getLogger("tigase.xmpp.impl.IBB");
 
-  protected static final String XMLNS = "http://jabber.org/protocol/ibb";
-	protected static final String ID = XMLNS;
-	protected static final String[] ELEMENTS = {"open", "data", "close"};
-  protected static final String[] XMLNSS = {XMLNS, XMLNS, XMLNS};
+  private static final String XMLNS = "http://jabber.org/protocol/ibb";
+	private static final String ID = XMLNS;
+	private static final String[] ELEMENTS = {"open", "data", "close"};
+  private static final String[] XMLNSS = {XMLNS, XMLNS, XMLNS};
 
 	// Implementation of tigase.xmpp.XMPPImplIfc
 

@@ -60,13 +60,13 @@ public class VCardTemp extends XMPPProcessor implements XMPPProcessorIfc {
   private static Logger log =
 		Logger.getLogger("tigase.xmpp.impl.VCardTemp");
 
-  protected static final String XMLNS = "vcard-temp";
-	protected static final String ID = XMLNS;
+  private static final String XMLNS = "vcard-temp";
+	private static final String ID = XMLNS;
 	// VCARD element is added to support old vCard protocol where element
 	// name was all upper cases. Now the plugin should catch both cases.
-	protected static final String[] ELEMENTS = {"vCard", "VCARD"};
-  protected static final String[] XMLNSS = {XMLNS, XMLNS};
-  protected static final Element[] DISCO_FEATURES =	{
+	private static final String[] ELEMENTS = {"vCard", "VCARD"};
+  private static final String[] XMLNSS = {XMLNS, XMLNS};
+  private static final Element[] DISCO_FEATURES =	{
 		new Element("feature", new String[] {"var"}, new String[] {XMLNS})
 	};
 

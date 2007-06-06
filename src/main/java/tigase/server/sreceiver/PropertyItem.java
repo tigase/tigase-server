@@ -52,12 +52,15 @@ public class PropertyItem {
 		this.name = name;
 		this.display_name = display_name;
 		this.value = def_value;
-		this.possible_values =
-			Arrays.copyOf(possible_values, possible_values.length);
 		this.description = description;
-		if (possible_values == null && value != null) {
-			guessPossibleValues();
-		} // end of if (possible_values == null && value != null)
+		if (possible_values != null) {
+			this.possible_values =
+				Arrays.copyOf(possible_values, possible_values.length);
+		} else {
+			if (value != null) {
+				guessPossibleValues();
+			} // end of if (possible_values == null && value != null)
+		}
 	}
 
 	/**
@@ -155,7 +158,9 @@ public class PropertyItem {
 	 * @return the value of possible_values
 	 */
 	public String[] getPossible_values() {
-		return Arrays.copyOf(this.possible_values, this.possible_values.length);
+		return (this.possible_values != null ?
+			Arrays.copyOf(this.possible_values, this.possible_values.length)
+			: null);
 	}
 
 	/**
@@ -164,7 +169,9 @@ public class PropertyItem {
 	 * @param argPossible_values Value to assign to this.possible_values
 	 */
 	public void setPossible_values(final String[] argPossible_values) {
-		this.possible_values = argPossible_values;
+		this.possible_values = (argPossible_values != null ?
+			Arrays.copyOf(argPossible_values, argPossible_values.length)
+			: null);
 	}
 
 	/**
@@ -186,7 +193,7 @@ public class PropertyItem {
 	}
 
 	public String toString() {
-		return value != null ? value.toString() : null;
+		return value != null ? value.toString() : "";
 	}
 
 } // PropertyItem

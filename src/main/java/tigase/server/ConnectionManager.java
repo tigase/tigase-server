@@ -69,39 +69,39 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 	private static final Logger log =
     Logger.getLogger("tigase.server.ConnectionManager");
 
-	public static final String PORT_KEY = "port-no";
-	public static final String PROP_KEY = "connections/";
-	public static final String PORTS_PROP_KEY = PROP_KEY + "ports";
-	public static final String PORT_TYPE_PROP_KEY = "type";
-	public static final String PORT_SOCKET_PROP_KEY = "socket";
-	public static final String PORT_IFC_PROP_KEY = "ifc";
-	public static final String[] PORT_IFC_PROP_VAL = {"*"};
-	public static final String PORT_CLASS_PROP_KEY = "class";
-	public static final String PORT_REMOTE_HOST_PROP_KEY = "remote-host";
-	public static final String PORT_REMOTE_HOST_PROP_VAL = "localhost";
-	public static final String TLS_PROP_KEY = PROP_KEY + "tls/";
-	public static final String TLS_USE_PROP_KEY = TLS_PROP_KEY + "use";
-	public static final boolean TLS_USE_PROP_VAL = true;
-	public static final String TLS_REQUIRED_PROP_KEY = "tls/required";
-	public static final boolean TLS_REQUIRED_PROP_VAL = false;
-	public static final String TLS_KEYS_STORE_PROP_KEY =
+	protected static final String PORT_KEY = "port-no";
+	protected static final String PROP_KEY = "connections/";
+	protected static final String PORTS_PROP_KEY = PROP_KEY + "ports";
+	protected static final String PORT_TYPE_PROP_KEY = "type";
+	protected static final String PORT_SOCKET_PROP_KEY = "socket";
+	protected static final String PORT_IFC_PROP_KEY = "ifc";
+	private static final String[] PORT_IFC_PROP_VAL = {"*"};
+	protected static final String PORT_CLASS_PROP_KEY = "class";
+	protected static final String PORT_REMOTE_HOST_PROP_KEY = "remote-host";
+	protected static final String PORT_REMOTE_HOST_PROP_VAL = "localhost";
+	protected static final String TLS_PROP_KEY = PROP_KEY + "tls/";
+	protected static final String TLS_USE_PROP_KEY = TLS_PROP_KEY + "use";
+	protected static final boolean TLS_USE_PROP_VAL = true;
+	protected static final String TLS_REQUIRED_PROP_KEY = "tls/required";
+	protected static final boolean TLS_REQUIRED_PROP_VAL = false;
+	protected static final String TLS_KEYS_STORE_PROP_KEY =
 		TLS_PROP_KEY + "keys-store";
-	public static final String TLS_KEYS_STORE_PROP_VAL =
+	protected static final String TLS_KEYS_STORE_PROP_VAL =
 		"certs" + File.separator + "rsa-keystore";
-	public static final String TLS_DEF_CERT_PROP_KEY =
+	protected static final String TLS_DEF_CERT_PROP_KEY =
 		TLS_PROP_KEY + "def-cert-alias";
-	public static final String TLS_DEF_CERT_PROP_VAL = "default";
-	public static final String TLS_KEYS_STORE_PASSWD_PROP_KEY =
+	protected static final String TLS_DEF_CERT_PROP_VAL = "default";
+	protected static final String TLS_KEYS_STORE_PASSWD_PROP_KEY =
 		TLS_PROP_KEY + "keys-store-password";
-	public static final String TLS_KEYS_STORE_PASSWD_PROP_VAL =	"keystore";
-	public static final String TLS_TRUSTS_STORE_PASSWD_PROP_KEY =
+	protected static final String TLS_KEYS_STORE_PASSWD_PROP_VAL =	"keystore";
+	protected static final String TLS_TRUSTS_STORE_PASSWD_PROP_KEY =
 		TLS_PROP_KEY + "trusts-store-password";
-	public static final String TLS_TRUSTS_STORE_PASSWD_PROP_VAL =	"truststore";
-	public static final String TLS_TRUSTS_STORE_PROP_KEY =
+	protected static final String TLS_TRUSTS_STORE_PASSWD_PROP_VAL =	"truststore";
+	protected static final String TLS_TRUSTS_STORE_PROP_KEY =
 		TLS_PROP_KEY + "trusts-store";
-	public static final String TLS_TRUSTS_STORE_PROP_VAL =
+	protected static final String TLS_TRUSTS_STORE_PROP_VAL =
 		"certs" + File.separator + "truststore";
-	public static final String MAX_RECONNECTS_PROP_KEY = "max-reconnects";
+	protected static final String MAX_RECONNECTS_PROP_KEY = "max-reconnects";
 
 	private static ConnectionOpenThread connectThread =
 		ConnectionOpenThread.getInstance();

@@ -64,13 +64,16 @@ public class ServiceEntity {
 	 * @return a <code>boolean</code> value
 	 */
 	public boolean equals(Object obj) {
-		ServiceEntity se = (ServiceEntity)obj;
-		// Assuming here that jid can never be NULL
-		// Node can be NULL so we need to do more calculation on it
-		return 	(se == null ? false : jid.equals(se.jid))
-			&&
-			((node == se.node) ||
-				(node != null ? node.equals(se.node) : se.node.equals(node)));
+		if (obj instanceof ServiceEntity) {
+			ServiceEntity se = (ServiceEntity)obj;
+			// Assuming here that jid can never be NULL
+			// Node can be NULL so we need to do more calculation on it
+			return 	(se == null ? false : jid.equals(se.jid))
+				&&
+				((node == se.node) ||
+					(node != null ? node.equals(se.node) : se.node.equals(node)));
+		}
+		return false;
 	}
 
 	/**

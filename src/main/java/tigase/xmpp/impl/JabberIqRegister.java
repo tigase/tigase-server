@@ -48,14 +48,14 @@ import tigase.util.JIDUtils;
 public class JabberIqRegister extends XMPPProcessor
 	implements XMPPProcessorIfc {
 
-	protected static final String ID = "jabber:iq:register";
-	protected static final String[] ELEMENTS = {"query"};
-  protected static final String[] XMLNSS = {"jabber:iq:register"};
-  protected static final Element[] FEATURES = {
+	private static final String ID = "jabber:iq:register";
+	private static final String[] ELEMENTS = {"query"};
+  private static final String[] XMLNSS = {"jabber:iq:register"};
+  private static final Element[] FEATURES = {
 		new Element("register", new String[] {"xmlns"},
 			new String[] {"http://jabber.org/features/iq-register"})
 	};
-  protected static final Element[] DISCO_FEATURES =
+  private static final Element[] DISCO_FEATURES =
 	{
 		new Element("feature",
 			new String[] {"var"},

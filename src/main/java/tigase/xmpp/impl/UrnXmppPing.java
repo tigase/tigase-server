@@ -44,19 +44,19 @@ import tigase.xmpp.XMPPResourceConnection;
  */
 public class UrnXmppPing extends XMPPProcessor implements XMPPProcessorIfc {
 
-	protected static final String XMLNS = "urn:xmpp:ping";
+	private static final String XMLNS = "urn:xmpp:ping";
 
-	protected static final Element[] DISCO_FEATURES =
+	private static final Element[] DISCO_FEATURES =
 	{ new Element("feature", new String[] { "var" }, new String[] { XMLNS }) };
 
-	protected static final String[] ELEMENTS = { "ping" };
+	private static final String[] ELEMENTS = { "ping" };
 
-	protected static final String ID = XMLNS;
+	private static final String ID = XMLNS;
 
 	private static final Logger log =
 		Logger.getLogger("tigase.xmpp.impl.UrnXmppPing");
 
-	protected static final String[] XMLNSS = { XMLNS };
+	private static final String[] XMLNSS = { XMLNS };
 
 	public String id() {
 		return ID;

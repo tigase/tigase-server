@@ -55,10 +55,10 @@ public abstract class JabberIqSocks5Bytestreams extends SimpleForwarder {
   private static Logger log =
 		Logger.getLogger("tigase.xmpp.impl.JabberIQSocks5Bytestreams");
 
-  protected static final String XMLNS = "http://jabber.org/protocol/bytestreams";
-	protected static final String ID = XMLNS;
-	protected static final String[] ELEMENTS = {"query"};
-  protected static final String[] XMLNSS = {XMLNS};
+  private static final String XMLNS = "http://jabber.org/protocol/bytestreams";
+	private static final String ID = XMLNS;
+	private static final String[] ELEMENTS = {"query"};
+  private static final String[] XMLNSS = {XMLNS};
 
 	// Implementation of tigase.xmpp.XMPPImplIfc
 
