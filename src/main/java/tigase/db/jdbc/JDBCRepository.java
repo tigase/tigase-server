@@ -77,7 +77,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	private String users_tbl = DEF_USERS_TBL;
 	private String nodes_tbl = DEF_NODES_TBL;
 	private String pairs_tbl = DEF_PAIRS_TBL;
-	private String maxids_tbl = DEF_MAXIDS_TBL;
+	//	private String maxids_tbl = DEF_MAXIDS_TBL;
 	private String root_node = DEF_ROOT_NODE;
 
 	private UserAuthRepository auth = null;
@@ -173,7 +173,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		} finally {
 			release(null, rs);
 		}
-		cache.put(user_id, new Long(result));
+		cache.put(user_id, Long.valueOf(result));
 		return result;
 	}
 
@@ -253,7 +253,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		long uid = getUserUID(user_id);
 		long result = getNodeNID(uid, node_path);
 		if (result > 0) {
-			cache.put(user_id+"/"+node_path, new Long(result));
+			cache.put(user_id+"/"+node_path, Long.valueOf(result));
 		} // end of if (result > 0)
 		return result;
 	}
@@ -283,11 +283,11 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		long uid = getUserUID(user_id);
 		long nid = getNodeNID(uid, null);
 		StringTokenizer strtok = new StringTokenizer(node_path, "/", false);
-		String built_path = "";
+		StringBuilder built_path = new StringBuilder();
 		while (strtok.hasMoreTokens()) {
 			String token = strtok.nextToken();
-			built_path = built_path + "/" + token;
-			long cur_nid = getNodeNID(uid, built_path);
+			built_path.append("/").append(token);
+			long cur_nid = getNodeNID(uid, built_path.toString());
 			if (cur_nid > 0) {
 				nid = cur_nid;
 			} else {
@@ -420,7 +420,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 			release(stmt, null);
 			stmt = null;
 		}
-		cache.put(user_id, new Long(uid));
+		cache.put(user_id, Long.valueOf(uid));
 		return uid;
 	}
 

@@ -63,7 +63,7 @@ public class StatisticsCollector
   private static final String STATS_XMLNS = "http://jabber.org/protocol/stats";
 
 	private ServiceEntity serviceEntity = null;
-	private ServiceEntity stats_modules = null;
+	//private ServiceEntity stats_modules = null;
 	private Level statsLevel = Level.INFO;
 
 	public void setName(String name) {

@@ -183,7 +183,7 @@ public class SSLContextContainer {
 		return sslContext;
 	}
 
-  private class FakeTrustManager implements X509TrustManager {
+  private static class FakeTrustManager implements X509TrustManager {
 
     private X509Certificate[] acceptedIssuers = null;
 

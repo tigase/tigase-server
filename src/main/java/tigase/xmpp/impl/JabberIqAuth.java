@@ -104,12 +104,12 @@ public class JabberIqAuth extends XMPPProcessor
 				UserAuthRepository.PROTOCOL_VAL_NONSASL);
 			session.queryAuth(query);
 			String[] auth_mechs = (String[])query.get(UserAuthRepository.RESULT_KEY);
-			String response = "<username/>";
+			StringBuilder response = new StringBuilder("<username/>");
 			for (String mech: auth_mechs) {
-				response += "<" + mech + "/>";
+				response.append("<").append(mech).append("/>");
 			} // end of for (String mech: auth_mechs)
-			response += "<resource/>";
-			results.offer(packet.okResult(response, 1));
+			response.append("<resource/>");
+			results.offer(packet.okResult(response.toString(), 1));
 			break;
 		case set:
 			String user_name = request.getChildCData("/iq/query/username");

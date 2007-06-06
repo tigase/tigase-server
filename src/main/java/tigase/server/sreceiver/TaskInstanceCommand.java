@@ -286,16 +286,16 @@ public class TaskInstanceCommand implements TaskCommandIfc {
 							"Select action", actions, actions);
 						String[] bool_arr = new String[] {"true", "false"};
 						Command.addFieldValue(result, "subscribed-ri",
-							new Boolean(ri.isSubscribed()).toString(),
+							Boolean.valueOf(ri.isSubscribed()).toString(),
 							"Subscribed", bool_arr, bool_arr);
 						Command.addFieldValue(result, "moderation-ri",
-							new Boolean(ri.isModerationAccepted()).toString(),
+							Boolean.valueOf(ri.isModerationAccepted()).toString(),
 							"Moderation approved", bool_arr, bool_arr);
 						Command.addFieldValue(result, "owner-ri",
-							new Boolean(ri.isOwner()).toString(),
+							Boolean.valueOf(ri.isOwner()).toString(),
 							"Owner", bool_arr, bool_arr);
 						Command.addFieldValue(result, "admin-ri",
-							new Boolean(ri.isAdmin()).toString(),
+							Boolean.valueOf(ri.isAdmin()).toString(),
 							"Admin", bool_arr, bool_arr);
 					} else {
 						Command.addFieldValue(result, ROSTER_ACTION_FIELD, roster_action,

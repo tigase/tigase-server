@@ -99,7 +99,7 @@ public class LibreSourceAuth implements UserAuthRepository {
 	private Connection conn = null;
 	private PreparedStatement pass_st = null;
 	private PreparedStatement status_st = null;
-	private PreparedStatement max_uid_st = null;
+	//	private PreparedStatement max_uid_st = null;
 	private PreparedStatement conn_valid_st = null;
 	private PreparedStatement update_password = null;
 	private PreparedStatement update_last_login_st = null;

@@ -76,7 +76,7 @@ public class RoutingsContainer {
 
 	}
 
-	protected class SingleMode implements RoutingComputer {
+	protected static class SingleMode implements RoutingComputer {
 
 		private String routing = null;
 
@@ -90,7 +90,7 @@ public class RoutingsContainer {
 
 	}
 
-	protected class MultiMode implements RoutingComputer {
+	protected static class MultiMode implements RoutingComputer {
 
 		private Map<Pattern, String> routings =	new LinkedHashMap<Pattern, String>();
 		private String def = null;

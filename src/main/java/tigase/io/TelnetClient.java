@@ -92,7 +92,7 @@ public class TelnetClient implements SampleSocketThread.SocketHandler {
 
 	public void writeData(String data) throws IOException {
     ByteBuffer dataBuffer = null;
-    if (data != null || data.length() > 0) {
+    if (data != null && data.length() > 0) {
       dataBuffer = coder.encode(CharBuffer.wrap(data));
       iosock.write(dataBuffer);
     } // end of if (data == null || data.equals("")) else

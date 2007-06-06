@@ -95,9 +95,9 @@ public class RepositoryUtils {
 			for (String key: keys) {
 				String[] vals = repo.getDataList(user, node, key);
 				if (vals != null) {
-					String valstr = "";
+					StringBuilder valstr = new StringBuilder();
 					for (String val: vals) {
-						valstr = valstr + " " + val;
+						valstr.append(" ").append(val);
 					} // end of for (String val: vals)
 					System.out.println(prefix + "  " + key + " = " + valstr);
 				} else {

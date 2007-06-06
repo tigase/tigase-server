@@ -173,6 +173,10 @@ public class Packet {
 		this.from = from;
 	}
 
+	public String getAttribute(final String key) {
+		return elem.getAttribute(key);
+	}
+
 	/**
    * Returns packet destination address.
    */

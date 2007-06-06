@@ -61,15 +61,15 @@ public abstract class RepoRosterTask extends AbstractReceiverTask {
 // 		Thread.dumpStack();
 		String repo_node = roster_node + "/" + ri.getJid();
 		try {
-			String tmp = new Boolean(ri.isSubscribed()).toString();
+			String tmp = Boolean.valueOf(ri.isSubscribed()).toString();
 			log.info(getJID() + ": " + ri.getJid() + ": subscribed = " + tmp);
 			repository.setData(getJID(), repo_node, subscribed_key, tmp);
 			repository.setData(getJID(), repo_node, owner_key,
-				new Boolean(ri.isOwner()).toString());
+				Boolean.valueOf(ri.isOwner()).toString());
 			repository.setData(getJID(), repo_node, admin_key,
-				new Boolean(ri.isAdmin()).toString());
+				Boolean.valueOf(ri.isAdmin()).toString());
 			repository.setData(getJID(), repo_node, moderation_accepted_key,
-				new Boolean(ri.isModerationAccepted()).toString());
+				Boolean.valueOf(ri.isModerationAccepted()).toString());
 		} catch (TigaseDBException e) {
 			log.log(Level.SEVERE, "Problem saving roster data for: "
 				+	"JID = " + getJID()

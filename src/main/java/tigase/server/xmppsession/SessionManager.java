@@ -661,7 +661,7 @@ public class SessionManager extends AbstractMessageReceiver
 		return stats;
 	}
 
-	private class NARepository implements NonAuthUserRepository {
+	private static class NARepository implements NonAuthUserRepository {
 
 		UserRepository rep = null;
 

@@ -52,7 +52,7 @@ public class TLSWrapper {
 	private SSLEngineResult tlsEngineResult = null;
 	private int netBuffSize = 0;
 	private int appBuffSize = 0;
-	private String protocol = null;
+	//	private String protocol = null;
 	private TLSEventHandler eventHandler = null;
 
 	/**

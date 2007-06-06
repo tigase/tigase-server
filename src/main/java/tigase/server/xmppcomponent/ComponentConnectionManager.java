@@ -82,7 +82,7 @@ public class ComponentConnectionManager extends ConnectionManager
 
 	private ServiceEntity serviceEntity = null;
 	private boolean pack_routed = PACK_ROUTED_VAL;
-	private boolean service_disco = RETURN_SERVICE_DISCO_VAL;
+	//private boolean service_disco = RETURN_SERVICE_DISCO_VAL;
 	private String identity_type = IDENTITY_TYPE_VAL;
 	private String service_id = "it doesn't matter";
 
@@ -265,7 +265,7 @@ public class ComponentConnectionManager extends ConnectionManager
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
 		pack_routed = (Boolean)props.get(PACK_ROUTED_KEY);
-		service_disco = (Boolean)props.get(RETURN_SERVICE_DISCO_KEY);
+		//service_disco = (Boolean)props.get(RETURN_SERVICE_DISCO_KEY);
 		identity_type = (String)props.get(IDENTITY_TYPE_KEY);
 
 		//serviceEntity = new ServiceEntity(getName(), "external", "XEP-0114");
@@ -287,7 +287,7 @@ public class ComponentConnectionManager extends ConnectionManager
 		defs.put(PORT_SOCKET_PROP_KEY, PORT_SOCKET_PROP_VAL);
 		defs.put(PORT_REMOTE_HOST_PROP_KEY, PORT_REMOTE_HOST_PROP_VAL);
 		defs.put(PORT_IFC_PROP_KEY, PORT_IFC_PROP_VAL);
-		defs.put(MAX_RECONNECTS_PROP_KEY, new Long(30*MINUTE).intValue());
+		defs.put(MAX_RECONNECTS_PROP_KEY, (int)(30*MINUTE));
 		return defs;
 	}
 

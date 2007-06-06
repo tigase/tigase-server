@@ -363,7 +363,7 @@ public abstract class AbstractMessageReceiver
 
 	private enum QueueElementType { IN_QUEUE, OUT_QUEUE }
 
-	private class QueueElement {
+	private static class QueueElement {
 		private QueueElementType type = null;
 		private Packet packet = null;
 

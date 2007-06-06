@@ -177,12 +177,12 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	private ServiceEntity serviceEntity = null;
 	private String[] admins = {"admin@localhost"};
 	private UserRepository repository = null;
-	/**
-	 * Variable <code>defaultPolicy</code> specifies default task creation policy.
-	 * In other words who can create task. This is default setting for task types
-	 * not specified separately in configuration file.
-	 */
-	private TaskCreationPolicy defaultPolicy = CREATION_POLICY_PROP_VAL;
+// 	/**
+// 	 * Variable <code>defaultPolicy</code> specifies default task creation policy.
+// 	 * In other words who can create task. This is default setting for task types
+// 	 * not specified separately in configuration file.
+// 	 */
+// 	private TaskCreationPolicy defaultPolicy = CREATION_POLICY_PROP_VAL;
 	/**
 	 * Variable <code>defaultMaxTasksNo</code> specifies default max number of
 	 * tasks for a task type. This is default setting for task types not specified
@@ -306,15 +306,16 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		String[] tasks_jids = repository.getSubnodes(myDomain(), tasks_node);
 		if (tasks_jids != null) {
 			for (String task_jid: tasks_jids) {
-				String repo_node = tasks_node + "/" + task_jid;
-				String task_type = repository.getData(myDomain(), repo_node,
+				StringBuilder repo_node = new StringBuilder(tasks_node + "/" + task_jid);
+				String task_type = repository.getData(myDomain(), repo_node.toString(),
 					task_type_key);
-				repo_node += params_node;
-				String[] keys = repository.getKeys(myDomain(), repo_node);
+				repo_node.append(params_node);
+				String[] keys = repository.getKeys(myDomain(), repo_node.toString());
 				Map<String, Object> task_params = new LinkedHashMap<String, Object>();
 				if (keys != null) {
 					for (String key: keys) {
-						task_params.put(key, repository.getData(myDomain(), repo_node, key));
+						task_params.put(key, repository.getData(myDomain(),
+								repo_node.toString(), key));
 					} // end of for (String key: keys)
 				} // end of if (keys != null)
 				addTaskToInstances(createTask(task_type, task_jid, task_params));
@@ -413,8 +414,8 @@ public class StanzaReceiver extends AbstractMessageReceiver
 					task_params));
 		} // end of for (String task_name: tasks_list)
 
-	  defaultPolicy =
-			TaskCreationPolicy.valueOf((String)props.get(CREATION_POLICY_PROP_KEY));
+// 	  defaultPolicy =
+// 			TaskCreationPolicy.valueOf((String)props.get(CREATION_POLICY_PROP_KEY));
 		defaultMaxTasksNo = (Integer)props.get(CREATION_MAX_NO_PROP_KEY);
 
 		String[] task_types_arr = (String[])props.get(TASK_TYPES_PROP_KEY);

@@ -314,12 +314,12 @@ public class ShortNewsPublisher extends RepoRosterTask {
 		checkConnection();
 		String subject = packet.getElemCData("/message/subject");
 		String body =  packet.getElemCData("/message/body");
-		int idx = body.indexOf('\n');
-		if (idx > 0 && (idx < body.length() - 1)
-			&& body.charAt(idx + 1) == '\r') {
-			++idx;
-		}
 		if (body != null && subject != null) {
+			int idx = body.indexOf('\n');
+			if (idx > 0 && (idx < body.length() - 1)
+				&& body.charAt(idx + 1) == '\r') {
+				++idx;
+			}
 			update_post.setString(1, XMLUtils.unescape(subject));
 			update_post.setString(2, XMLUtils.unescape(body.substring(idx)));
 			update_post.setLong(3, snid);

@@ -901,7 +901,7 @@ public class ServerConnectionManager extends ConnectionManager {
 
 	}
 
-	private class ServerPacketQueue extends ConcurrentLinkedQueue<Packet> {
+	private static class ServerPacketQueue extends ConcurrentLinkedQueue<Packet> {
 		private static final long serialVersionUID = 1L;
 
 		/**

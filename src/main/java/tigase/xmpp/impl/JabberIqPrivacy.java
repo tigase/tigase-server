@@ -255,7 +255,7 @@ public class JabberIqPrivacy extends XMPPProcessor
 		final XMPPResourceConnection session,	final Queue<Packet> results)
     throws NotAuthorizedException {
 		List<Element> children = packet.getElemChildren("/iq/query");
-		if (children != null || children.size() == 1) {
+		if (children != null && children.size() == 1) {
 			Element child = children.get(0);
 			if (child.getName().equals("list")) {
 				// Broken privacy implementation sends list without name set

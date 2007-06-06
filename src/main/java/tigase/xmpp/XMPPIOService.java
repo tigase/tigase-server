@@ -77,9 +77,9 @@ public class XMPPIOService extends IOService {
    * socket and the data should be processed in proper order.
    */
   private Lock writeLock = new ReentrantLock();
-	private Lock readLock = new ReentrantLock();
+	//private Lock readLock = new ReentrantLock();
 
-	private boolean streamClosed = false;
+	//private boolean streamClosed = false;
 
 	/**
 	 * Creates a new <code>XMPPIOService</code> instance.
@@ -134,7 +134,7 @@ public class XMPPIOService extends IOService {
   }
 
 	protected void xmppStreamClosed() {
-		streamClosed = true;
+		//streamClosed = true;
 		serviceListener.xmppStreamClosed(this);
     try {
 			log.finest("Sending data: </stream:stream>");

@@ -79,7 +79,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 		Logger.getLogger("tigase.conf.Configurator");
 
 	private ConfigRepository repository = null;
-	private Timer delayedTask = new Timer("ConfiguratorTask", true);
+	//	private Timer delayedTask = new Timer("ConfiguratorTask", true);
 	private Map<String, Object> defConfigParams =
 		new LinkedHashMap<String, Object>();
 	private ServiceEntity serviceEntity = null;
@@ -119,7 +119,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 	}
 
 	public void parseArgs(final String[] args) {
-		defConfigParams.put(GEN_TEST, new Boolean(false));
+		defConfigParams.put(GEN_TEST, Boolean.FALSE);
 		defConfigParams.put("config-type", GEN_CONFIG_DEF);
     if (args != null && args.length > 0) {
       for (int i = 0; i < args.length; i++) {
@@ -129,7 +129,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 					key = "config-type";	val = args[i];
 				}
 				if (args[i].startsWith(GEN_TEST)) {
-					key = args[i];  val = new Boolean(true);
+					key = args[i];  val = Boolean.TRUE;
 				}
 				if (args[i].equals(GEN_USER_DB) || args[i].equals(GEN_USER_DB_URI)
 					|| args[i].equals(GEN_AUTH_DB) || args[i].equals(GEN_AUTH_DB_URI)
@@ -484,51 +484,57 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 		String val_str = null;
 		DataType type = DataType.valueof(value.getClass().getSimpleName());
 		try {
+			StringBuilder sb = new StringBuilder();
 			switch (type) {
 			case STRING_ARR:
 				for (String s: (String[])value) {
-					if (val_str == null) {
-						val_str = s;
+					if (sb.length() == 0) {
+						sb.append(s);
 					} else {
-						val_str = val_str + ", " + s;
+						sb.append(", ").append(s);
 					} // end of else
 				} // end of for (String s: (String[])value)
+				val_str = sb.toString();
 				break;
 			case INTEGER_ARR:
-				for (Integer s: (int[])value) {
-					if (val_str == null) {
-						val_str = s.toString();
+				for (int s: (int[])value) {
+					if (sb.length() == 0) {
+						sb.append(s);
 					} else {
-						val_str = val_str + ", " + s.toString();
+						sb.append(", ").append(s);
 					} // end of else
 				} // end of for (String s: (String[])value)
+				val_str = sb.toString();
 				break;
 			case LONG_ARR:
-				for (Long s: (long[])value) {
-					if (val_str == null) {
-						val_str = s.toString();
+				for (long s: (long[])value) {
+					if (sb.length() == 0) {
+						sb.append(s);
 					} else {
-						val_str = val_str + ", " + s.toString();
+						sb.append(", ").append(s);
 					} // end of else
 				} // end of for (String s: (String[])value)
+				val_str = sb.toString();
 				break;
 			case DOUBLE_ARR:
-				for (Double s: (double[])value) {
-					if (val_str == null) {
-						val_str = s.toString();
+				for (double s: (double[])value) {
+					if (sb.length() == 0) {
+						sb.append(s);
 					} else {
-						val_str = val_str + ", " + s.toString();
+						sb.append(", ").append(s);
 					} // end of else
 				} // end of for (String s: (String[])value)
+				val_str = sb.toString();
 				break;
 			case BOOLEAN_ARR:
-				for (Boolean s: (boolean[])value) {
-					if (val_str == null) {
-						val_str = s.toString();
+				for (boolean s: (boolean[])value) {
+					if (sb.length() == 0) {
+						sb.append(s);
 					} else {
-						val_str = val_str + ", " + s.toString();
+						sb.append(", ").append(s);
 					} // end of else
 				} // end of for (String s: (String[])value)
+				val_str = sb.toString();
 				break;
 			default:
 				val_str = value.toString();

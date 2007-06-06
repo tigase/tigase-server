@@ -96,7 +96,7 @@ public class StanzaSender extends AbstractMessageReceiver
 
 	private static final SimpleParser parser =
 		SingletonFactory.getParserInstance();
-	private long interval = INTERVAL_PROP_VAL;
+	//private long interval = INTERVAL_PROP_VAL;
 	private Map<String, SenderTask> tasks_list =
 		new LinkedHashMap<String, SenderTask>();
 	private Timer tasks = new Timer("StanzaSender", true);
@@ -137,7 +137,7 @@ public class StanzaSender extends AbstractMessageReceiver
 
 		addRouting(myDomain());
 
-		interval = (Long)props.get(INTERVAL_PROP_KEY);
+		//interval = (Long)props.get(INTERVAL_PROP_KEY);
 		String[] config_tasks = (String[])props.get(STANZA_LISTENERS_PROP_KEY);
 		for (String task_name: config_tasks) {
 

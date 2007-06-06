@@ -142,6 +142,7 @@ public class FileTask extends SenderTask {
 			result.append(buff, 0, res);
 			res = fr.read(buff);
 		}
+		fr.close();
 		return result.toString();
 	}
 
@@ -170,7 +171,7 @@ public class FileTask extends SenderTask {
 		}
 	}
 
-	private class MaskFilter implements FilenameFilter {
+	private static class MaskFilter implements FilenameFilter {
 
 		private String mask = null;
 
