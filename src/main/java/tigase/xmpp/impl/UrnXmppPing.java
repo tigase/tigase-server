@@ -22,6 +22,7 @@
  */
 package tigase.xmpp.impl;
 
+import java.util.Arrays;
 import java.util.Queue;
 import java.util.logging.Logger;
 
@@ -97,15 +98,15 @@ public class UrnXmppPing extends XMPPProcessor implements XMPPProcessorIfc {
 	}
 
 	public Element[] supDiscoFeatures(final XMPPResourceConnection session) {
-		return DISCO_FEATURES;
+		return Arrays.copyOf(DISCO_FEATURES, DISCO_FEATURES.length);
 	}
 
 	public String[] supElements() {
-		return ELEMENTS;
+		return Arrays.copyOf(ELEMENTS, ELEMENTS.length);
 	}
 
 	public String[] supNamespaces() {
-		return XMLNSS;
+		return Arrays.copyOf(XMLNSS, XMLNSS.length);
 	}
 
 }
