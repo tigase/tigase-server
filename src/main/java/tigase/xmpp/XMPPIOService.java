@@ -69,14 +69,14 @@ public class XMPPIOService extends IOService {
   private ConcurrentLinkedQueue<Packet> receivedPackets =
     new ConcurrentLinkedQueue<Packet>();
 
-  /**
-   * Variable <code>lock</code> keeps reference to object lock.
-   * It supports multi-threaded processing and can be called simultanously from
-   * many threads. It is not recommended however as lock prevents most of
-   * methods to be executed concurrently as they process data received from
-   * socket and the data should be processed in proper order.
-   */
-  private Lock writeLock = new ReentrantLock();
+//   /**
+//    * Variable <code>lock</code> keeps reference to object lock.
+//    * It supports multi-threaded processing and can be called simultanously from
+//    * many threads. It is not recommended however as lock prevents most of
+//    * methods to be executed concurrently as they process data received from
+//    * socket and the data should be processed in proper order.
+//    */
+//   private Lock writeLock = new ReentrantLock();
 	//private Lock readLock = new ReentrantLock();
 
 	//private boolean streamClosed = false;
@@ -100,7 +100,7 @@ public class XMPPIOService extends IOService {
 			log.finest("Sending data: " + response);
 			writeRawData(response);
 			assert debug(response, "--SENT:");
-			if (response.endsWith("</stream:stream>")) {
+			if (response != null && response.endsWith("</stream:stream>")) {
 				stop();
 			} // end of if (response.endsWith())
 		} catch (IOException e) {
@@ -183,12 +183,12 @@ public class XMPPIOService extends IOService {
     // We change state of this object in this method
     // It can be called by many threads simultanously
     // so we need to make it thread-safe
-		writeLock.lock();
-    try {
+// 		writeLock.lock();
+//     try {
 			writeData(data);
-    } finally {
-			writeLock.unlock();
-    }
+//     } finally {
+// 			writeLock.unlock();
+//     }
 	}
 
 	/**
