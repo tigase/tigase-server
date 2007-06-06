@@ -1,0 +1,67 @@
+#!/bin/bash
+#
+# Startup script for SER
+#
+# chkconfig: 345 85 15
+# description: Ser is a fast SIP Proxy.
+#
+# processname: ser
+# pidfile: /var/run/ser.pid
+# config: /etc/ser/ser.cfg
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+export JAVA_HOME=/usr/java/jdk1.6.0
+export TIGASE_DIR=/opt/tigase/server/
+tigase=$TIGASE_DIR/scripts/tigase.sh
+prog=tigase
+config=$TIGASE_DIR/etc/tigase.conf
+RETVAL=0
+
+start() {
+        gprintf "Starting %s: " "$prog"
+        daemon $tigase start $config
+        RETVAL=$?
+        echo
+        [ $RETVAL = 0 ] 
+        return $RETVAL
+}
+
+stop() {
+	gprintf "Stopping %s: " "$prog"
+        daemon $tigase stop $config
+	RETVAL=$?
+	echo
+	[ $RETVAL = 0 ] 
+}
+
+
+# See how we were called.
+case "$1" in
+  start)
+	start
+	;;
+  stop)
+	stop
+	;;
+  status)
+        status $tigase
+	RETVAL=$?
+	;;
+  restart)
+	stop
+	start
+	;;
+  condrestart)
+	if [ -f /var/run/ser.pid ] ; then
+		stop
+		start
+	fi
+	;;
+  *)
+	gprintf "Usage: %s {start|stop|restart|status|help}\n" "$prog"
+	exit 1
+esac
+
+exit $RETVAL
