@@ -40,6 +40,10 @@ public class BoshIOService extends XMPPIOService {
 
 	private String content_type = "text/xml; charset=utf-8";
 
+	public void setContentType(String ct) {
+		this.content_type = ct;
+	}
+
 	public void writeRawData(String data) throws IOException {
 		StringBuilder sb = new StringBuilder();
 		sb.append("HTTP/1.1 200 OK" + EOL);

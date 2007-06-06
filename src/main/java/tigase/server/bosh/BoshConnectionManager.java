@@ -64,7 +64,7 @@ public class BoshConnectionManager extends ConnectionManager {
 	private String defHostName = null;
 	private Set<String> hostnames = new TreeSet<String>();
 	private long max_wait = MAX_WAIT_DEF_PROP_VAL;
-	private long min_pooling = MIN_POOLING_PROP_VAL;
+	private long min_polling = MIN_POLLING_PROP_VAL;
 	private long max_inactivity = MAX_INACTIVITY_PROP_VAL;
 	private int concurrent_requests = CONCURRENT_REQUESTS_PROP_VAL;
 	private int hold_requests = HOLD_REQUESTS_PROP_VAL;
@@ -110,7 +110,7 @@ public class BoshConnectionManager extends ConnectionManager {
 		}
 		props.put(HOSTNAMES_PROP_KEY, HOSTNAMES_PROP_VAL);
 		props.put(MAX_WAIT_DEF_PROP_KEY, MAX_WAIT_DEF_PROP_VAL);
-		props.put(MIN_POOLING_PROP_KEY, MIN_POOLING_PROP_VAL);
+		props.put(MIN_POLLING_PROP_KEY, MIN_POLLING_PROP_VAL);
 		props.put(MAX_INACTIVITY_PROP_KEY, MAX_INACTIVITY_PROP_VAL);
 		props.put(CONCURRENT_REQUESTS_PROP_KEY, CONCURRENT_REQUESTS_PROP_VAL);
 		props.put(HOLD_REQUESTS_PROP_KEY, HOLD_REQUESTS_PROP_VAL);
@@ -132,7 +132,7 @@ public class BoshConnectionManager extends ConnectionManager {
 			} // end of if (defHostName == null)
 		} // end of for ()
 		max_wait = (Long)props.get(MAX_WAIT_DEF_PROP_KEY);
-		min_pooling  = (Long)props.get(MIN_POOLING_PROP_KEY);
+		min_polling  = (Long)props.get(MIN_POLLING_PROP_KEY);
 		max_inactivity = (Long)props.get(MAX_INACTIVITY_PROP_KEY);
 		concurrent_requests = (Integer)props.get(CONCURRENT_REQUESTS_PROP_KEY);
 		hold_requests = (Integer)props.get(HOLD_REQUESTS_PROP_KEY);
