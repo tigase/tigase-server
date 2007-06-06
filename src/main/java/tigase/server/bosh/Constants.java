@@ -40,11 +40,13 @@ public abstract class Constants {
 	protected static final String MIN_POOLING_PROP_KEY = "min-pooling";
 	protected static final long MIN_POOLING_PROP_VAL = 10;
 	protected static final String MAX_INACTIVITY_PROP_KEY = "max-inactivity";
-	protected static final long MAX_INCTIVITY_PROP_VAL = 60;
+	protected static final long MAX_INACTIVITY_PROP_VAL = 60;
 	protected static final String CONCURRENT_REQUESTS_PROP_KEY =
 		"concurrent-requests";
 	protected static final int CONCURRENT_REQUESTS_PROP_VAL = 2;
 	protected static final String HOLD_REQUESTS_PROP_KEY = "hold-requests";
 	protected static final int HOLD_REQUESTS_PROP_VAL = 1;
+	protected static final String MAX_PAUSE_PROP_KEY = "max-inactivity";
+	protected static final long MAX_PAUSE_PROP_VAL = 120;
 
 }
