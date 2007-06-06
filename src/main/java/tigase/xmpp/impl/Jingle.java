@@ -22,6 +22,7 @@
  */
 package tigase.xmpp.impl;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Queue;
 import java.util.logging.Logger;
@@ -60,9 +61,11 @@ public class Jingle extends XMPPProcessor implements XMPPProcessorIfc {
 
 	public String id() { return ID; }
 
-	public String[] supElements() { return ELEMENTS; }
+	public String[] supElements()
+	{ return Arrays.copyOf(ELEMENTS, ELEMENTS.length); }
 
-  public String[] supNamespaces() { return XMLNSS; }
+  public String[] supNamespaces()
+	{ return Arrays.copyOf(XMLNSS, XMLNSS.length); }
 
 	// Implementation of tigase.xmpp.XMPPProcessorIfc
 

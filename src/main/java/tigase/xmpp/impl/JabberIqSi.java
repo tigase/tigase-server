@@ -22,6 +22,7 @@
  */
 package tigase.xmpp.impl;
 
+import java.util.Arrays;
 import java.util.logging.Logger;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xml.Element;
@@ -63,11 +64,13 @@ public abstract class JabberIqSi extends SimpleForwarder {
 
 	public String id() { return ID; }
 
-	public String[] supElements() { return ELEMENTS; }
+	public String[] supElements()
+	{ return Arrays.copyOf(ELEMENTS, ELEMENTS.length); }
 
-  public String[] supNamespaces() { return XMLNSS; }
+  public String[] supNamespaces()
+	{ return Arrays.copyOf(XMLNSS, XMLNSS.length); }
 
   public Element[] supDiscoFeatures(final XMPPResourceConnection session)
-	{ return DISCO_FEATURES; }
+	{ return Arrays.copyOf(DISCO_FEATURES, DISCO_FEATURES.length); }
 
 }

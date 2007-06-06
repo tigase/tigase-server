@@ -22,6 +22,7 @@
  */
 package tigase.xmpp.impl;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Queue;
 import tigase.server.Packet;
@@ -63,15 +64,17 @@ public class JabberIqRegister extends XMPPProcessor
 
 	public String id() { return ID; }
 
-	public String[] supElements() { return ELEMENTS; }
+	public String[] supElements()
+	{ return Arrays.copyOf(ELEMENTS, ELEMENTS.length); }
 
-  public String[] supNamespaces() { return XMLNSS; }
+	public String[] supNamespaces()
+	{ return Arrays.copyOf(XMLNSS, XMLNSS.length); }
 
   public Element[] supStreamFeatures(final XMPPResourceConnection session)
-	{ return FEATURES; }
+	{ return Arrays.copyOf(FEATURES, FEATURES.length); }
 
   public Element[] supDiscoFeatures(final XMPPResourceConnection session)
-	{ return DISCO_FEATURES; }
+	{ return Arrays.copyOf(DISCO_FEATURES, DISCO_FEATURES.length); }
 
 	public void process(final Packet packet, final XMPPResourceConnection session,
 		final NonAuthUserRepository repo, final Queue<Packet> results) {

@@ -22,6 +22,7 @@
  */
 package tigase.xmpp.impl;
 
+import java.util.Arrays;
 import java.util.Queue;
 import java.util.logging.Logger;
 import tigase.server.Packet;
@@ -59,8 +60,10 @@ public abstract class Message extends SimpleForwarder {
 
 	public String id() { return ID; }
 
-	public String[] supElements() { return ELEMENTS; }
+	public String[] supElements()
+	{ return Arrays.copyOf(ELEMENTS, ELEMENTS.length); }
 
-  public String[] supNamespaces() { return XMLNSS; }
+  public String[] supNamespaces()
+	{ return Arrays.copyOf(XMLNSS, XMLNSS.length); }
 
 } // Message

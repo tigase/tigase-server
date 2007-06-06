@@ -98,7 +98,7 @@ public class OfflineMessages extends XMPPProcessor
 	 * @return a <code>String[]</code> value
 	 */
   public Element[] supDiscoFeatures(final XMPPResourceConnection session)
-	{ return DISCO_FEATURES; }
+	{ return Arrays.copyOf(DISCO_FEATURES, DISCO_FEATURES.length); }
 
 	/**
 	 * Describe <code>id</code> method here.

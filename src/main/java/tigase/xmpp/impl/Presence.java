@@ -82,9 +82,11 @@ public class Presence extends XMPPProcessor
 
 	public String id() { return ID; }
 
-	public String[] supElements() { return Arrays.copyOf(ELEMENTS, ELEMENTS.length); }
+	public String[] supElements()
+	{ return Arrays.copyOf(ELEMENTS, ELEMENTS.length); }
 
-  public String[] supNamespaces() { return Arrays.copyOf(XMLNSS, XMLNSS.length); }
+  public String[] supNamespaces()
+	{ return Arrays.copyOf(XMLNSS, XMLNSS.length); }
 
 	/**
 	 * <code>stopped</code> method is called when user disconnects or logs-out.

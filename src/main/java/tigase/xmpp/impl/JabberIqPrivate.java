@@ -23,6 +23,7 @@
 package tigase.xmpp.impl;
 
 import java.util.logging.Logger;
+import java.util.Arrays;
 import java.util.Queue;
 import java.util.List;
 import tigase.db.NonAuthUserRepository;
@@ -71,7 +72,7 @@ public class JabberIqPrivate extends XMPPProcessor implements XMPPProcessorIfc {
 	};
 
   public Element[] supDiscoFeatures(final XMPPResourceConnection session)
-	{ return DISCO_FEATURES; }
+	{ return Arrays.copyOf(DISCO_FEATURES, DISCO_FEATURES.length); }
 
 
 	private static final SimpleParser parser =
@@ -81,9 +82,11 @@ public class JabberIqPrivate extends XMPPProcessor implements XMPPProcessorIfc {
 
 	public String id() { return ID; }
 
-	public String[] supElements() { return ELEMENTS; }
+	public String[] supElements()
+	{ return Arrays.copyOf(ELEMENTS, ELEMENTS.length); }
 
-  public String[] supNamespaces() { return XMLNSS; }
+  public String[] supNamespaces()
+	{ return Arrays.copyOf(XMLNSS, XMLNSS.length); }
 
 	// Implementation of tigase.xmpp.XMPPProcessorIfc
 

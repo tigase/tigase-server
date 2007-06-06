@@ -25,6 +25,7 @@ package tigase.xmpp.impl;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Arrays;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -72,19 +73,21 @@ public class JabberIqAuth extends XMPPProcessor
 	};
 
   public Element[] supDiscoFeatures(final XMPPResourceConnection session)
-	{ return DISCO_FEATURES; }
+	{ return Arrays.copyOf(DISCO_FEATURES, DISCO_FEATURES.length); }
 
 	public String id() { return ID; }
 
-	public String[] supElements() { return ELEMENTS; }
+	public String[] supElements()
+	{ return Arrays.copyOf(ELEMENTS, ELEMENTS.length); }
 
-	public String[] supNamespaces() { return XMLNSS; }
+	public String[] supNamespaces()
+	{ return Arrays.copyOf(XMLNSS, XMLNSS.length); }
 
 	public Element[] supStreamFeatures(final XMPPResourceConnection session)	{
 		if (session != null && session.isAuthorized()) {
 			return null;
 		} else {
-			return FEATURES;
+			return Arrays.copyOf(FEATURES, FEATURES.length);
 		} // end of if (session.isAuthorized()) else
 	}
 
