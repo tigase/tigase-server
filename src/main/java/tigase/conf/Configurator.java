@@ -233,7 +233,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.count", "5");
 		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.formatter",
 			"tigase.util.LogFormatter");
-		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.limit", "1000000");
+		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.limit", "10000000");
 		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.pattern",
 			"logs/tigase.log");
 		defaults.put(LOGGING_KEY + "tigase.useParentHandlers", "true");
