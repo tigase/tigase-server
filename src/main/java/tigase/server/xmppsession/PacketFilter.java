@@ -56,6 +56,55 @@ public class PacketFilter {
 	 */
 	public PacketFilter() {	}
 
+	public boolean forward(final Packet packet, final XMPPResourceConnection session,
+		final NonAuthUserRepository repo, final Queue<Packet> results) {
+		if (session == null) {
+			return false;
+		} // end of if (session == null)
+
+		try {
+			// For all messages coming from the owner of this account set
+			// proper 'from' attribute. This is actually needed for the case
+			// when the user sends a message to himself.
+			if (packet.getFrom() != null
+				&& packet.getFrom().equals(session.getConnectionId())) {
+				packet.getElement().setAttribute("from", session.getJID());
+				log.finest("Setting correct from attribute: " + session.getJID());
+			} else {
+				return false;
+			}
+
+			// This could be earlier at the beginnig of the method, but I want to have
+			// from address set properly whenever possible
+			if (packet.getElemTo() == null) {
+				return false;
+			}
+
+			String id = JIDUtils.getNodeID(packet.getElemTo());
+
+			if (id.equals(session.getUserId())) {
+				// Yes this is message to 'this' client
+				log.finest("Yes, this is packet to 'this' client: " + id);
+				Element elem = packet.getElement().clone();
+				Packet result = new Packet(elem);
+				result.setTo(session.getParentSession().
+					getResourceConnection(packet.getElemTo()).getConnectionId());
+				log.finest("Setting to: " + result.getTo());
+				result.setFrom(packet.getTo());
+				results.offer(result);
+			} else {
+// 				// This is message to some other client
+// 				Element result = packet.getElement().clone();
+// 				results.offer(new Packet(result));
+				return false;
+			} // end of else
+		} catch (NotAuthorizedException e) {
+			return false;
+		} // end of try-catch
+
+		return true;
+	}
+
 	public boolean process(final Packet packet, final XMPPResourceConnection session,
 		final NonAuthUserRepository repo, final Queue<Packet> results) {
 
@@ -81,14 +130,16 @@ public class PacketFilter {
 				return false;
 			}
 
-			// For all messages coming from the owner of this account set
-			// proper 'from' attribute. This is actually needed for the case
-			// when the user sends a message to himself.
-			if (packet.getFrom() != null
-				&& packet.getFrom().equals(session.getConnectionId())) {
-				packet.getElement().setAttribute("from", session.getJID());
-				log.finest("Setting correct from attribute: " + session.getJID());
-			} // end of if (packet.getFrom().equals(session.getConnectionId()))
+			// Already done in forward method....
+			// No need to repeat this (performance - everything counts...)
+// 			// For all messages coming from the owner of this account set
+// 			// proper 'from' attribute. This is actually needed for the case
+// 			// when the user sends a message to himself.
+// 			if (packet.getFrom() != null
+// 				&& packet.getFrom().equals(session.getConnectionId())) {
+// 				packet.getElement().setAttribute("from", session.getJID());
+// 				log.finest("Setting correct from attribute: " + session.getJID());
+// 			} // end of if (packet.getFrom().equals(session.getConnectionId()))
 
 			String id = JIDUtils.getNodeID(packet.getElemTo());
 

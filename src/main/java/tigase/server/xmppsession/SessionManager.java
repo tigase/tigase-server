@@ -177,6 +177,14 @@ public class SessionManager extends AbstractMessageReceiver
 			stop |= preproc.preProcess(packet, conn, naUserRepository, results);
 		} // end of for (XMPPPreprocessorIfc preproc: preProcessors)
 
+		if (!stop) {
+			if (filter.forward(packet, conn, naUserRepository, results)) {
+				packet.processedBy("filter-foward");
+				log.finest("Packet forwarded: " + packet.toString());
+				addOutPackets(results);
+				return;
+			}
+		}
 
 		if (!stop) {
 			walk(packet, conn, packet.getElement(), results);
@@ -191,7 +199,7 @@ public class SessionManager extends AbstractMessageReceiver
 
 		if (!stop && !packet.wasProcessed() && !isInRoutings(packet.getTo())
 			&& filter.process(packet, conn, naUserRepository, results)) {
-			packet.processedBy("packet-filter");
+			packet.processedBy("filter-process");
 		}
 
 		addOutPackets(results);
