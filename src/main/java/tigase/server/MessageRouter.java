@@ -153,15 +153,15 @@ public class MessageRouter extends AbstractMessageReceiver {
 		}
 	}
 
-	private boolean isToLocalComponent(String jid) {
+	private String isToLocalComponent(String jid) {
 		for (String name: components.keySet()) {
 			for (String hostname: localAddresses) {
 				if (jid.equals(name + "." + hostname)) {
-					return true;
+					return name;
 				}
 			}
 		} // end of for ()
-		return false;
+		return null;
 	}
 
 	private boolean isLocalDomain(String domain) {
@@ -182,8 +182,9 @@ public class MessageRouter extends AbstractMessageReceiver {
 			+ ", to: " + packet.getTo()
 			+ ", from: " + packet.getFrom());
 
+		String local_comp_name = isToLocalComponent(packet.getTo());
 		if (localAddresses.contains(packet.getTo())
-			|| isToLocalComponent(packet.getTo())) {
+			|| local_comp_name != null) {
 			// Detect inifinite loop if from == to
 			if (packet.getFrom() != null &&
 				packet.getFrom().equals(packet.getTo())) {
@@ -202,6 +203,14 @@ public class MessageRouter extends AbstractMessageReceiver {
 				} // end of for ()
 				return;
 			}
+// 			// None of components wanted to process the packet, let's try
+// 			// to insert it directly to component queue....
+// 			MessageReceiver mr = receivers.get(local_comp_name);
+// 			if (mr != null) {
+// 				log.finest("Adding packet to local component: " + packet.toString());
+// 				mr.addPacket(packet);
+// 				return;
+// 			}
 		}
 
 		String host = JIDUtils.getNodeHost(packet.getTo());
@@ -261,10 +270,18 @@ public class MessageRouter extends AbstractMessageReceiver {
 		} // end of for (MessageReceiver mr: receivers.values())
 		// It is not for any local host, so maybe it is for some
 		// remote server, let's try sending it through s2s service:
-		if (localAddresses.contains(JIDUtils.getNodeHost(packet.getTo()))) {
-			// This packet is to local domain, we don't want to send it out
-			addOutPacketNB(Authorization.ITEM_NOT_FOUND.getResponseMessage(packet,
-					"Destination receiving entity has not been found, can't deliver.", true));
+		if (localAddresses.contains(JIDUtils.getNodeHost(packet.getTo()))
+			|| local_comp_name != null) {
+			if (packet.getType() == null || packet.getType() != StanzaType.error) {
+				// This packet is to local domain, we don't want to send it out
+				addOutPacketNB(
+					Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
+						"Your request can not be processed.", true));
+			} else {
+				// drop packet :-(
+				log.warning("Can't process packet to local domain, dropping..."
+					+ packet.toString());
+			}
 			return;
 		}
 		if (s2s != null) {
