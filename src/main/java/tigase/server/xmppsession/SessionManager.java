@@ -595,7 +595,9 @@ public class SessionManager extends AbstractMessageReceiver
 		clearRoutings();
 		for (String host: hostnames) {
 			addRouting(host);
- 			createUserSession(host + "-" + System.currentTimeMillis(), host, host);
+			XMPPResourceConnection conn =
+				createUserSession(host + "-" + System.currentTimeMillis(), host, host);
+			conn.setDummy(true);
 		} // end of for ()
 
 		admins = (String[])props.get(ADMINS_PROP_KEY);

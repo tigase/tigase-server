@@ -77,6 +77,8 @@ public class XMPPResourceConnection extends RepositoryAccess {
 
 	private int priority = 0;
 
+	private boolean dummy = false;
+
 	/**
 	 * Session temporary data. All data stored in this <code>Map</code> disapear
 	 * when session finishes.
@@ -341,6 +343,14 @@ public class XMPPResourceConnection extends RepositoryAccess {
 			loginHandler.handleLogin(nick, this);
 		} // end of if (result == Authorization.AUTHORIZED)
 		return result;
+	}
+
+	public boolean isDummy() {
+		return dummy;
+	}
+
+	public void setDummy(boolean dummy) {
+		this.dummy = dummy;
 	}
 
 } // XMPPResourceConnection
