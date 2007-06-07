@@ -125,8 +125,8 @@ public abstract class AbstractMessageReceiver
 
 	private boolean prAddPacket(Packet packet) {
 		try {
-			log.finest(">" + getName() + "<  " +
-				"Adding packet to inQueue: " + packet.getStringData());
+// 			log.finest(">" + getName() + "<  " +
+// 				"Adding packet to inQueue: " + packet.getStringData());
 			in_queue.put(new QueueElement(QueueElementType.IN_QUEUE, packet));
 			++statAddedMessagesOk;
 		} catch (InterruptedException e) {
@@ -138,8 +138,8 @@ public abstract class AbstractMessageReceiver
 
 	protected boolean addOutPacket(Packet packet) {
 		try {
-			log.finest(">" + getName() + "<  " +
-				"Adding packet to outQueue: " + packet.getStringData());
+// 			log.finest(">" + getName() + "<  " +
+// 				"Adding packet to outQueue: " + packet.getStringData());
 			out_queue.put(new QueueElement(QueueElementType.OUT_QUEUE, packet));
 			++statAddedMessagesOk;
 		} catch (InterruptedException e) {
@@ -345,13 +345,13 @@ public abstract class AbstractMessageReceiver
 	}
 
 	public boolean isInRegexRoutings(String address) {
-		log.finest(getName() + " looking for regex routings: " + address);
+// 		log.finest(getName() + " looking for regex routings: " + address);
 		for (Pattern pat: regexRoutings) {
 			if (pat.matcher(address).matches()) {
 				log.finest(getName() + " matched against pattern: " + pat.toString());
 				return true;
 			}
-			log.finest(getName() + " matching failed against pattern: " + pat.toString());
+// 			log.finest(getName() + " matching failed against pattern: " + pat.toString());
 		}
 		return false;
 	}
@@ -392,8 +392,8 @@ public abstract class AbstractMessageReceiver
 						break;
 					case OUT_QUEUE:
 						if (parent != null) {
-							log.finest(">" + getName() + "<  " +
-								"Sending outQueue to parent: " + parent.getName());
+// 							log.finest(">" + getName() + "<  " +
+// 								"Sending outQueue to parent: " + parent.getName());
 							parent.addPacket(qel.packet);
 						} else {
 							// It may happen for MessageRouter and this is intentional
