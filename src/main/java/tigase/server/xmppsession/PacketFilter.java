@@ -70,8 +70,6 @@ public class PacketFilter {
 				&& packet.getFrom().equals(session.getConnectionId())) {
 				packet.getElement().setAttribute("from", session.getJID());
 				log.finest("Setting correct from attribute: " + session.getJID());
-			} else {
-				return false;
 			}
 
 			// This could be earlier at the beginnig of the method, but I want to have
@@ -82,7 +80,9 @@ public class PacketFilter {
 
 			String id = JIDUtils.getNodeID(packet.getElemTo());
 
-			if (id.equals(session.getUserId())) {
+			if (id.equals(session.getUserId())
+				&& packet.getFrom() != null
+				&& packet.getFrom().equals(packet.getElemFrom())) {
 				// Yes this is message to 'this' client
 				log.finest("Yes, this is packet to 'this' client: " + id);
 				Element elem = packet.getElement().clone();
