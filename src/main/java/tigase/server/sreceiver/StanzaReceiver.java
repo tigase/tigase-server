@@ -134,7 +134,6 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	private static final Logger log =
 		Logger.getLogger("tigase.server.sreceiver.StanzaReceiver");
 
-	private static final String DEF_HOSTNAME_PROP_KEY = "def-hostname";
 	private static String DEF_HOSTNAME_PROP_VAL = "localhost";
 	private static final String TASKS_LIST_PROP_KEY = "tasks-list";
 	private static final String[] TASKS_LIST_PROP_VAL = {"development-news"};

@@ -135,6 +135,7 @@ public interface Configurable extends ServerComponent {
 
 	public static final String HOSTNAMES_PROP_KEY = "hostnames";
 	public static final String ADMINS_PROP_KEY = "admins";
+	public static final String DEF_HOSTNAME_PROP_KEY = "def-hostname";
 
 	/**
 	 * Get object name. This name corresponds to section in configuration.

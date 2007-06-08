@@ -337,7 +337,8 @@ public abstract class AbstractMessageReceiver
 	}
 
 	public boolean removeRegexRouting(String address) {
-		return regexRoutings.remove(Pattern.compile(address));
+		return regexRoutings.remove(Pattern.compile(address,
+				Pattern.CASE_INSENSITIVE));
 	}
 
 	public void clearRegexRoutings() {

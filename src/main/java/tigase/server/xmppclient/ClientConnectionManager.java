@@ -83,7 +83,7 @@ public class ClientConnectionManager extends ConnectionManager {
 	public String[] HOSTNAMES_PROP_VAL =	{"localhost", "hostname"};
 
 	private RoutingsContainer routings = null;
-	private String defHostName = null;
+	private String defHostname = HOSTNAMES_PROP_VAL[0];
 	private Set<String> hostnames = new TreeSet<String>();
 
 	private Map<String, XMPPProcessorIfc> processors =
@@ -188,6 +188,7 @@ public class ClientConnectionManager extends ConnectionManager {
 			HOSTNAMES_PROP_VAL = DNSResolver.getDefHostNames();
 		}
 		props.put(HOSTNAMES_PROP_KEY, HOSTNAMES_PROP_VAL);
+		props.put(DEF_HOSTNAME_PROP_KEY, HOSTNAMES_PROP_VAL[0]);
 		props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_MODE_PROP_KEY,
 			ROUTING_MODE_PROP_VAL);
 		if (params.get("config-type").equals(GEN_CONFIG_CS)
@@ -216,16 +217,13 @@ public class ClientConnectionManager extends ConnectionManager {
 					(String)entry.getValue());
 			} // end of if (entry.getKey().startsWith(ROUTINGS_PROP_KEY + "/"))
 		} // end of for ()
+		defHostname = (String)props.get(DEF_HOSTNAME_PROP_KEY);
 		String[] hnames = (String[])props.get(HOSTNAMES_PROP_KEY);
 		clearRoutings();
 		hostnames.clear();
-		defHostName = null;
 		for (String host: hnames) {
 			addRouting(getName() + "@" + host);
 			hostnames.add(host);
-			if (defHostName == null) {
-				defHostName = host;
-			} // end of if (defHostName == null)
 		} // end of for ()
 	}
 
@@ -265,7 +263,7 @@ public class ClientConnectionManager extends ConnectionManager {
 		final String id = UUID.randomUUID().toString();
 		if (hostname == null) {
 			return "<stream:stream version='1.0' xml:lang='en'"
-				+ " from='" + defHostName + "'"
+				+ " from='" + defHostname + "'"
 				+ " id='" + id + "'"
 				+ " xmlns='jabber:client'"
 				+ " xmlns:stream='http://etherx.jabber.org/streams'>"
@@ -278,7 +276,7 @@ public class ClientConnectionManager extends ConnectionManager {
 
 		if (!hostnames.contains(hostname)) {
 			return "<stream:stream version='1.0' xml:lang='en'"
-				+ " from='" + defHostName + "'"
+				+ " from='" + defHostname + "'"
 				+ " id='" + id + "'"
 				+ " xmlns='jabber:client'"
 				+ " xmlns:stream='http://etherx.jabber.org/streams'>"
@@ -330,7 +328,7 @@ public class ClientConnectionManager extends ConnectionManager {
 	}
 
 	public String getDefHostName() {
-		return defHostName == null ? super.getDefHostName() : defHostName;
+		return defHostname == null ? super.getDefHostName() : defHostname;
 	}
 
 	/**
