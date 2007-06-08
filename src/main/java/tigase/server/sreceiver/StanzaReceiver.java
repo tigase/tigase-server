@@ -43,6 +43,7 @@ import tigase.server.AbstractMessageReceiver;
 import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.server.ServerComponent;
+import tigase.util.DNSResolver;
 import tigase.util.ClassUtil;
 import tigase.util.JIDUtils;
 import tigase.xml.Element;
@@ -133,6 +134,8 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	private static final Logger log =
 		Logger.getLogger("tigase.server.sreceiver.StanzaReceiver");
 
+	private static final String DEF_HOSTNAME_PROP_KEY = "def-hostname";
+	private static String DEF_HOSTNAME_PROP_VAL = "localhost";
 	private static final String TASKS_LIST_PROP_KEY = "tasks-list";
 	private static final String[] TASKS_LIST_PROP_VAL = {"development-news"};
 	private static final String TASK_ACTIVE_PROP_KEY = "active";
@@ -141,7 +144,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	private static final String TASK_TYPE_PROP_VAL = "News Distribution";
 	private static final String SREC_REPO_CLASS_PROP_KEY = "srec-repo-class";
 	private static final String SREC_REPO_URL_PROP_KEY = "srec-repo-url";
-	private String[] ADMINS_PROP_VAL =	{"admin@localhost", "admin@hostname"};
+	private static String[] ADMINS_PROP_VAL =	{"admin@localhost", "admin@hostname"};
 
 	private static final String TASK_TYPES_PROP_NODE = "task-types/";
 	private static final String TASK_TYPES_PROP_KEY =
@@ -174,6 +177,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	private Map<String, TaskCommandIfc> commands =
 		new ConcurrentSkipListMap<String, TaskCommandIfc>();
 
+	private String defHostname = DEF_HOSTNAME_PROP_VAL;
 	private ServiceEntity serviceEntity = null;
 	private String[] admins = {"admin@localhost"};
 	private UserRepository repository = null;
@@ -213,7 +217,8 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	 * @return a <code>String</code> value
 	 */
 	private String myDomain() {
-		return getName() + "." + getDefHostName();
+		//		return getName() + "." + getDefHostName();
+		return getName() + "." + defHostname;
 	}
 
 	protected boolean isAllowedCreate(String jid, String task_type) {
@@ -356,6 +361,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	public void setProperties(final Map<String, Object> props) {
 		super.setProperties(props);
 
+		defHostname = (String)props.get(DEF_HOSTNAME_PROP_KEY);
 		addRouting(myDomain());
 
 		serviceEntity = new ServiceEntity(getName(), null, "Stanza Receiver");
@@ -434,6 +440,13 @@ public class StanzaReceiver extends AbstractMessageReceiver
 
 	public Map<String, Object> getDefaults(final Map<String, Object> params) {
 		Map<String, Object> defs = super.getDefaults(params);
+
+		if (params.get(GEN_VIRT_HOSTS) != null) {
+			DEF_HOSTNAME_PROP_VAL = ((String)params.get(GEN_VIRT_HOSTS)).split(",")[0];
+		} else {
+			DEF_HOSTNAME_PROP_VAL = DNSResolver.getDefHostNames()[0];
+		}
+		defs.put(DEF_HOSTNAME_PROP_KEY, DEF_HOSTNAME_PROP_VAL);
 
 		List<String> conf_tasks = new LinkedList<String>();
 		conf_tasks.addAll(Arrays.asList(TASKS_LIST_PROP_VAL));
@@ -529,9 +542,9 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		defs.put(CREATION_POLICY_PROP_KEY, CREATION_POLICY_PROP_VAL.toString());
 		defs.put(CREATION_MAX_NO_PROP_KEY, CREATION_MAX_NO_PROP_VAL);
 
-		defs.put(CREATION_POLICY_PROP_KEY + "/" + TASK_TYPE_PROP_VAL,
+		defs.put(TASK_TYPE_PROP_VAL + "/" + CREATION_POLICY_PROP_KEY,
 			TaskCreationPolicy.ALL.toString());
-		defs.put(CREATION_MAX_NO_PROP_KEY + "/" + TASK_TYPE_PROP_VAL, 100);
+		defs.put(TASK_TYPE_PROP_VAL + "/" + CREATION_MAX_NO_PROP_KEY, 100);
 
 		return defs;
 	}
