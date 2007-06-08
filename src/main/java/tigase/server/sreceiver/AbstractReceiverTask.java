@@ -416,6 +416,10 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 	public void processPacket(final Packet packet, final Queue<Packet> results) {
 		++packets_received;
 		log.finest(getJID() + ": " + "Processing packet: " + packet.toString());
+		if (packet.getType() != null && packet.getType() == StanzaType.error) {
+			log.info("Ignoring error stanza: " + packet.toString());
+			return;
+		}
 		if (packet.getElemName().equals("presence")) {
 			processPresence(packet, results);
 		} // end of if (packet.getElemName().equals("presence))
