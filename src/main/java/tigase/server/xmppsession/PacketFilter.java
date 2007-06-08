@@ -74,7 +74,8 @@ public class PacketFilter {
 
 			// This could be earlier at the beginnig of the method, but I want to have
 			// from address set properly whenever possible
-			if (packet.getElemTo() == null || session.isDummy()) {
+			if (packet.getElemTo() == null || session.isDummy()
+				|| (packet.getType() != null && packet.getType() == StanzaType.probe)) {
 				return false;
 			}
 
