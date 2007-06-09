@@ -111,10 +111,6 @@ public class StanzaSender extends AbstractMessageReceiver
 		super.release();
 	}
 
-	private String myDomain() {
-		return getName() + "." + getDefHostName();
-	}
-
 	/**
 	 * Describe <code>processPacket</code> method here.
 	 *

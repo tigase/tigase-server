@@ -83,7 +83,6 @@ public class ClientConnectionManager extends ConnectionManager {
 	public String[] HOSTNAMES_PROP_VAL =	{"localhost", "hostname"};
 
 	private RoutingsContainer routings = null;
-	private String defHostname = HOSTNAMES_PROP_VAL[0];
 	private Set<String> hostnames = new TreeSet<String>();
 
 	private Map<String, XMPPProcessorIfc> processors =
@@ -188,7 +187,6 @@ public class ClientConnectionManager extends ConnectionManager {
 			HOSTNAMES_PROP_VAL = DNSResolver.getDefHostNames();
 		}
 		props.put(HOSTNAMES_PROP_KEY, HOSTNAMES_PROP_VAL);
-		props.put(DEF_HOSTNAME_PROP_KEY, HOSTNAMES_PROP_VAL[0]);
 		props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_MODE_PROP_KEY,
 			ROUTING_MODE_PROP_VAL);
 		if (params.get("config-type").equals(GEN_CONFIG_CS)
@@ -217,7 +215,6 @@ public class ClientConnectionManager extends ConnectionManager {
 					(String)entry.getValue());
 			} // end of if (entry.getKey().startsWith(ROUTINGS_PROP_KEY + "/"))
 		} // end of for ()
-		defHostname = (String)props.get(DEF_HOSTNAME_PROP_KEY);
 		String[] hnames = (String[])props.get(HOSTNAMES_PROP_KEY);
 		clearRoutings();
 		hostnames.clear();

@@ -43,6 +43,7 @@ import tigase.stats.StatRecord;
 import tigase.stats.StatisticType;
 import tigase.stats.StatisticsContainer;
 import tigase.util.JIDUtils;
+import tigase.util.DNSResolver;
 
 /**
  * Describe class AbstractMessageReceiver here.
@@ -60,6 +61,7 @@ public abstract class AbstractMessageReceiver
 	protected static final long MINUTE = 60*SECOND;
 	protected static final long HOUR = 60*MINUTE;
 
+	private String DEF_HOSTNAME_PROP_VAL = "localhost";
 	public static final String MAX_QUEUE_SIZE_PROP_KEY = "max-queue-size";
 	//  public static final Integer MAX_QUEUE_SIZE_PROP_VAL = Integer.MAX_VALUE;
   public static final Integer MAX_QUEUE_SIZE_PROP_VAL = 1000;
@@ -71,6 +73,7 @@ public abstract class AbstractMessageReceiver
     Logger.getLogger("tigase.server.AbstractMessageReceiver");
 
   private int maxQueueSize = MAX_QUEUE_SIZE_PROP_VAL;
+	protected String defHostname = DEF_HOSTNAME_PROP_VAL;
 
   private MessageReceiver parent = null;
 	//	private Timer delayedTask = new Timer("MessageReceiverTask", true);
@@ -99,6 +102,15 @@ public abstract class AbstractMessageReceiver
    * added messages due to queue overflow.
    */
   private long statAddedMessagesEr = 0;
+
+	/**
+	 * Describe <code>myDomain</code> method here.
+	 *
+	 * @return a <code>String</code> value
+	 */
+	public String myDomain() {
+		return getName() + "." + defHostname;
+	}
 
   /**
    * Describe <code>addMessage</code> method here.
@@ -201,6 +213,8 @@ public abstract class AbstractMessageReceiver
   public void setProperties(Map<String, Object> properties) {
     int queueSize = (Integer)properties.get(MAX_QUEUE_SIZE_PROP_KEY);
     setMaxQueueSize(queueSize);
+		defHostname = (String)properties.get(DEF_HOSTNAME_PROP_KEY);
+		addRouting(myDomain());
   }
 
   public void setMaxQueueSize(int maxQueueSize) {
@@ -233,6 +247,13 @@ public abstract class AbstractMessageReceiver
   public Map<String, Object> getDefaults(Map<String, Object> params) {
     Map<String, Object> defs = new LinkedHashMap<String, Object>();
 		defs.put(MAX_QUEUE_SIZE_PROP_KEY, MAX_QUEUE_SIZE_PROP_VAL);
+		if (params.get(GEN_VIRT_HOSTS) != null) {
+			DEF_HOSTNAME_PROP_VAL = ((String)params.get(GEN_VIRT_HOSTS)).split(",")[0];
+		} else {
+			DEF_HOSTNAME_PROP_VAL = DNSResolver.getDefHostNames()[0];
+		}
+		defs.put(DEF_HOSTNAME_PROP_KEY, DEF_HOSTNAME_PROP_VAL);
+
     return defs;
   }
 
@@ -299,12 +320,7 @@ public abstract class AbstractMessageReceiver
   }
 
 	public String getDefHostName() {
-		if (parent != null) {
-			return parent.getDefHostName();
-		} // end of if (parent != null)
-		else {
-			return null;
-		} // end of if (parent != null) else
+		return defHostname;
 	}
 
 	public Set<String> getRoutings() {

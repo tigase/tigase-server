@@ -61,7 +61,6 @@ public class BoshConnectionManager extends ConnectionManager {
 	private static final String HOSTNAMES_PROP_KEY = "hostnames";
 	private String[] HOSTNAMES_PROP_VAL =	{"localhost", "hostname"};
 
-	private String defHostName = null;
 	private Set<String> hostnames = new TreeSet<String>();
 	private long max_wait = MAX_WAIT_DEF_PROP_VAL;
 	private long min_polling = MIN_POLLING_PROP_VAL;
@@ -123,13 +122,9 @@ public class BoshConnectionManager extends ConnectionManager {
 		String[] hnames = (String[])props.get(HOSTNAMES_PROP_KEY);
 		clearRoutings();
 		hostnames.clear();
-		defHostName = null;
 		for (String host: hnames) {
 			addRouting(getName() + "@" + host);
 			hostnames.add(host);
-			if (defHostName == null) {
-				defHostName = host;
-			} // end of if (defHostName == null)
 		} // end of for ()
 		max_wait = (Long)props.get(MAX_WAIT_DEF_PROP_KEY);
 		min_polling  = (Long)props.get(MIN_POLLING_PROP_KEY);

@@ -43,7 +43,6 @@ import tigase.server.AbstractMessageReceiver;
 import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.server.ServerComponent;
-import tigase.util.DNSResolver;
 import tigase.util.ClassUtil;
 import tigase.util.JIDUtils;
 import tigase.xml.Element;
@@ -134,7 +133,6 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	private static final Logger log =
 		Logger.getLogger("tigase.server.sreceiver.StanzaReceiver");
 
-	private static String DEF_HOSTNAME_PROP_VAL = "localhost";
 	private static final String TASKS_LIST_PROP_KEY = "tasks-list";
 	private static final String[] TASKS_LIST_PROP_VAL = {"development-news"};
 	private static final String TASK_ACTIVE_PROP_KEY = "active";
@@ -176,7 +174,6 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	private Map<String, TaskCommandIfc> commands =
 		new ConcurrentSkipListMap<String, TaskCommandIfc>();
 
-	private String defHostname = DEF_HOSTNAME_PROP_VAL;
 	private ServiceEntity serviceEntity = null;
 	private String[] admins = {"admin@localhost"};
 	private UserRepository repository = null;
@@ -208,16 +205,6 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		commands.put(new_task.getNodeName(), new_task);
 		new_task = new TaskInstanceCommand();
 		commands.put(new_task.getNodeName(), new_task);
-	}
-
-	/**
-	 * Describe <code>myDomain</code> method here.
-	 *
-	 * @return a <code>String</code> value
-	 */
-	private String myDomain() {
-		//		return getName() + "." + getDefHostName();
-		return getName() + "." + defHostname;
 	}
 
 	protected boolean isAllowedCreate(String jid, String task_type) {
@@ -360,9 +347,6 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	public void setProperties(final Map<String, Object> props) {
 		super.setProperties(props);
 
-		defHostname = (String)props.get(DEF_HOSTNAME_PROP_KEY);
-		addRouting(myDomain());
-
 		serviceEntity = new ServiceEntity(getName(), null, "Stanza Receiver");
 		serviceEntity.addIdentities(
 			new ServiceIdentity("component", "generic", "Stanza Receiver"));
@@ -440,13 +424,6 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	public Map<String, Object> getDefaults(final Map<String, Object> params) {
 		Map<String, Object> defs = super.getDefaults(params);
 
-		if (params.get(GEN_VIRT_HOSTS) != null) {
-			DEF_HOSTNAME_PROP_VAL = ((String)params.get(GEN_VIRT_HOSTS)).split(",")[0];
-		} else {
-			DEF_HOSTNAME_PROP_VAL = DNSResolver.getDefHostNames()[0];
-		}
-		defs.put(DEF_HOSTNAME_PROP_KEY, DEF_HOSTNAME_PROP_VAL);
-
 		List<String> conf_tasks = new LinkedList<String>();
 		conf_tasks.addAll(Arrays.asList(TASKS_LIST_PROP_VAL));
 
@@ -477,7 +454,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 					}
 					if (entry.getKey().equals(TASK_OWNER_PROP_KEY)) {
 						defs.put(task_name + "/props/" + entry.getKey(),
-							"drupal-forum-" + id + "@ssend." + getDefHostName());
+							"drupal-forum-" + id + "@" + myDomain());
 					}
 				} // end of for ()
 			}
@@ -532,7 +509,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 				ADMINS_PROP_VAL = ((String)params.get(GEN_ADMINS)).split(",");
 			} else {
 				ADMINS_PROP_VAL = new String[1];
-				ADMINS_PROP_VAL[0] = "admin@"+getDefHostName();
+				ADMINS_PROP_VAL[0] = "admin@" + defHostname;
 			}
 		} // end of if (params.get(GEN_SREC_ADMINS) != null) else
 		defs.put(ADMINS_PROP_KEY, ADMINS_PROP_VAL);

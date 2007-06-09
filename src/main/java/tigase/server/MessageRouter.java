@@ -77,8 +77,7 @@ public class MessageRouter extends AbstractMessageReceiver {
 
 	private static final long startupTime = System.currentTimeMillis();
 
-	private String defHostName = null;
-	private static Set<String> localAddresses =	new CopyOnWriteArraySet<String>();
+	private Set<String> localAddresses =	new CopyOnWriteArraySet<String>();
 
   private ComponentRegistrator config = null;
 	private ServiceEntity serviceEntity = null;
@@ -353,11 +352,8 @@ public class MessageRouter extends AbstractMessageReceiver {
 			String[] localAddresses = (String[])props.get(LOCAL_ADDRESSES_PROP_KEY);
 			this.localAddresses.clear();
 			if (localAddresses != null && localAddresses.length > 0) {
-				defHostName = localAddresses[0];
 				Collections.addAll(this.localAddresses, localAddresses);
-			} else {
-				defHostName = "localhost";
-			} // end of else
+			}
       Map<String, ComponentRegistrator> tmp_reg = registrators;
       Map<String, MessageReceiver> tmp_rec = receivers;
       components = new TreeMap<String, ServerComponent>();
@@ -420,10 +416,6 @@ public class MessageRouter extends AbstractMessageReceiver {
       inProperties = false;
     } // end of try-finally
   }
-
-	public String getDefHostName() {
-		return defHostName;
-	}
 
 	private void processDiscoQuery(final Packet packet,
 		final Queue<Packet> results) {
