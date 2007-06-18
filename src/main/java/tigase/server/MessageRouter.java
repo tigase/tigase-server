@@ -175,16 +175,28 @@ public class MessageRouter extends AbstractMessageReceiver {
 			return;
 		} // end of if (packet.getTo() == null)
 
+		// Intentionally comparing to static, final String
+		if (packet.getTo() == NULL_ROUTING) {
+			log.info("NULL routing, it is normal if server doesn't know how to"
+				+ " process packet: " + packet.toString());
+			Packet error =
+				Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
+				"Feature not supported yet.", true);
+			addOutPacketNB(error);
+			return;
+		}
+
 		log.finer("Processing packet: " + packet.getElemName()
 			+ ", type: " + packet.getType());
 		log.finest("Processing packet: " + packet.getStringData()
 			+ ", to: " + packet.getTo()
 			+ ", from: " + packet.getFrom());
 
-		String local_comp_name = isToLocalComponent(packet.getTo());
-		if (localAddresses.contains(packet.getTo())
-			|| local_comp_name != null) {
+		String id =  JIDUtils.getNodeID(packet.getTo());
+		String local_comp_name = isToLocalComponent(id);
+		if (localAddresses.contains(id) || local_comp_name != null) {
 			// Detect inifinite loop if from == to
+			// Maybe it is not needed anymore...
 			if (packet.getFrom() != null &&
 				packet.getFrom().equals(packet.getTo())) {
 				log.warning("Possible infinite loop, dropping packet: "
@@ -213,7 +225,6 @@ public class MessageRouter extends AbstractMessageReceiver {
 		}
 
 		String host = JIDUtils.getNodeHost(packet.getTo());
-		String id =  JIDUtils.getNodeID(packet.getTo());
 		String nick = JIDUtils.getNodeNick(packet.getTo());
 		// Let's try to find message receiver quick way
 		// In case if packet is handled internally:
@@ -434,13 +445,13 @@ public class MessageRouter extends AbstractMessageReceiver {
 					} // end of for ()
 				} else {
 					for (XMPPService comp: xmppServices.values()) {
-						if (jid.startsWith(comp.getName() + ".")) {
+						//						if (jid.startsWith(comp.getName() + ".")) {
 							Element resp = comp.getDiscoInfo(node, jid);
 							if (resp != null) {
 								query = resp;
 								break;
 							}
-						}
+							//						}
 					} // end of for ()
 				}
 			}
