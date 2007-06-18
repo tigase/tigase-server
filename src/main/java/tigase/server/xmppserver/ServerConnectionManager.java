@@ -47,7 +47,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.db.UserRepository;
 import tigase.net.ConnectionType;
-import tigase.net.IOService;
+//import tigase.net.IOService;
 import tigase.net.SocketReadThread;
 import tigase.net.SocketType;
 import tigase.server.ConnectionManager;
@@ -72,7 +72,7 @@ import tigase.stats.StatRecord;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class ServerConnectionManager extends ConnectionManager {
+public class ServerConnectionManager extends ConnectionManager<XMPPIOService> {
 
 	/**
    * Variable <code>log</code> is a class logger.
@@ -528,15 +528,15 @@ public class ServerConnectionManager extends ConnectionManager {
 		maxPacketWaitingTime = (Long)props.get(MAX_PACKET_WAITING_TIME_PROP_KEY);
 	}
 
-	public void serviceStarted(final IOService service) {
-		super.serviceStarted(service);
-		log.finest("s2s connection opened: " + service.getRemoteAddress()
-			+ ", type: " + service.connectionType().toString()
-			+ ", id=" + service.getUniqueId());
-		switch (service.connectionType()) {
+	public void serviceStarted(XMPPIOService serv) {
+		super.serviceStarted(serv);
+		log.finest("s2s connection opened: " + serv.getRemoteAddress()
+			+ ", type: " + serv.connectionType().toString()
+			+ ", id=" + serv.getUniqueId());
+		switch (serv.connectionType()) {
 		case connect:
 			// Send init xmpp stream here
-			XMPPIOService serv = (XMPPIOService)service;
+			//			XMPPIOService serv = (XMPPIOService)service;
 			String data = "<stream:stream"
 				+ " xmlns:stream='http://etherx.jabber.org/streams'"
 				+ " xmlns='jabber:server'"
@@ -591,7 +591,7 @@ public class ServerConnectionManager extends ConnectionManager {
 		return stats;
 	}
 
-	public void serviceStopped(final IOService service) {
+	public void serviceStopped(final XMPPIOService service) {
 		super.serviceStopped(service);
 		String local_hostname =
 			(String)service.getSessionData().get("local-hostname");
@@ -611,7 +611,7 @@ public class ServerConnectionManager extends ConnectionManager {
 		String cid = getConnectionId(local_hostname, remote_hostname,
 			service.connectionType());
 		boolean stopped = false;
-		IOService serv = servicesByHost_Type.get(cid);
+		XMPPIOService serv = servicesByHost_Type.get(cid);
 		// This checking is necessary due to specific s2s behaviour which
 		// I don't fully understand yet, possible bug in my s2s implementation
 		if (serv == service) {
@@ -927,6 +927,10 @@ public class ServerConnectionManager extends ConnectionManager {
 	 */
 	protected long getMaxInactiveTime() {
 		return 15*MINUTE;
+	}
+
+	protected XMPPIOService getXMPPIOServiceInstance() {
+		return new XMPPIOService();
 	}
 
 }

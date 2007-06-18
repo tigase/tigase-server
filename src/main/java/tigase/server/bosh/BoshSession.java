@@ -41,8 +41,6 @@ import static tigase.server.bosh.Constants.*;
  */
 public class BoshSession {
 
-	protected static final String CONTENT_ATTR = "content";
-
 	private UUID sid = null;
 	private Map<UUID, BoshIOService> connections =
 		new LinkedHashMap<UUID, BoshIOService>();
@@ -96,17 +94,35 @@ public class BoshSession {
 		if (packet.getAttribute(CONTENT_ATTR) != null) {
 			service.setContentType(packet.getAttribute(CONTENT_ATTR));
 		}
+// 		ack='1573741820'
+// 		accept='deflate,gzip'
+// 		charsets='ISO_8859-1 ISO-2022-JP'
+// 		secure='true'
 		Element body = new Element(BODY_EL_NAME,
 			new String[] {WAIT_ATTR,
 										INACTIVITY_ATTR,
 										POLLING_ATTR,
-										REQUESTS_ATTR},
+										REQUESTS_ATTR,
+										HOLD_ATTR,
+										MAXPAUSE_ATTR,
+										SID_ATTR,
+										VER_ATTR,
+										FROM_ATTR,
+										SECURE_ATTR},
 			new String[] {Long.valueOf(this.max_wait).toString(),
 										Long.valueOf(this.max_inactivity).toString(),
 										Long.valueOf(this.min_polling).toString(),
-										Integer.valueOf(this.hold_requests).toString()});
+										Integer.valueOf(this.hold_requests).toString(),
+										Integer.valueOf(this.hold_requests).toString(),
+										Long.valueOf(this.max_pause).toString(),
+										this.sid.toString(),
+										BOSH_VERSION,
+										this.domain,
+										"true"});
+		body.setXMLNS(BOSH_XMLNS);
 		return new Packet(body);
 	}
 
+// 		xmlns='http://jabber.org/protocol/httpbind'
 
 }

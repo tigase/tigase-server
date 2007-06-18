@@ -220,7 +220,9 @@ public abstract class IOService implements Callable<IOService> {
 		} catch (Exception e) {
 			// Well, do nothing, we are closing the connection anyway....
 		} finally {
-			serviceListener.serviceStopped(this);
+			if (serviceListener != null) {
+				serviceListener.serviceStopped(this);
+			}
 		}
   }
 
@@ -228,14 +230,13 @@ public abstract class IOService implements Callable<IOService> {
    * Method <code>run</code> is used to perform
    *
    */
-  @TODO(note="Maybe we can do more intelligent locking.")
   public IOService call() throws IOException {
 		// It is not safe to call below function here....
 		// It might be already executing in different thread...
 		// and we don't want to put any locking or synchronization
 		//		processWaitingPackets();
 		processSocketData();
-		if (receivedPackets() > 0) {
+		if (receivedPackets() > 0 && serviceListener != null) {
 			serviceListener.packetsReady(this);
 		} // end of if (receivedPackets.size() > 0)
     return this;

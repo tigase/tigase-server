@@ -48,7 +48,7 @@ import static tigase.server.bosh.Constants.*;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class BoshConnectionManager extends ConnectionManager {
+public class BoshConnectionManager extends ConnectionManager<BoshIOService> {
 
   /**
    * Variable <code>log</code> is a class logger.
@@ -78,24 +78,12 @@ public class BoshConnectionManager extends ConnectionManager {
 		writePacketToSocket(packet);
 	}
 
-	public Queue<Packet> processSocketData(XMPPIOService serv) {
+	public Queue<Packet> processSocketData(BoshIOService serv) {
 		Packet p = null;
 		while ((p = serv.getReceivedPackets().poll()) != null) {
 			log.finer("Processing packet: " + p.getElemName()
 				+ ", type: " + p.getType());
 			log.finest("Processing socket data: " + p.getStringData());
-			try {
-				serv.writeRawData("HTTP/1.1 200 OK\r\n"
-					+ "Content-Type: text/xml; charset=utf-8\r\n"
-					+ "Content-Length: 128\r\n"
-					+ "\r\n"
-					+ "<body wait='60' inactivity='30' polling='5' requests='2' hold='1'"
-					+ " ack='1573741820' accept='deflate,gzip' maxpause='120' sid='SomeSID'"
-					+ " ver='1.6' from='localhost' secure='true'"
-					+ " xmlns='http://jabber.org/protocol/httpbind'/>");
-			} catch (IOException e) {
-				log.log(Level.INFO, "Exception", e);
-			}
 		} // end of while ()
 		return null;
 	}
@@ -138,11 +126,11 @@ public class BoshConnectionManager extends ConnectionManager {
 		return PORTS;
 	}
 
-	public void serviceStopped(final IOService service) {
+	public void serviceStopped(BoshIOService service) {
 		super.serviceStopped(service);
 	}
 
-	public void serviceStarted(final IOService service) {
+	public void serviceStarted(BoshIOService service) {
 		super.serviceStarted(service);
 	}
 
@@ -157,13 +145,17 @@ public class BoshConnectionManager extends ConnectionManager {
 		return 1000*10*MINUTE;
 	}
 
-	public void xmppStreamClosed(XMPPIOService serv) {
+	public void xmppStreamClosed(BoshIOService serv) {
 		log.finer("Stream closed.");
 	}
 
-	public String xmppStreamOpened(XMPPIOService serv,
+	public String xmppStreamOpened(BoshIOService serv,
 		Map<String, String> attribs) {
 		return null;
+	}
+
+	protected BoshIOService getXMPPIOServiceInstance() {
+		return new BoshIOService();
 	}
 
 }

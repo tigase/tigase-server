@@ -49,6 +49,7 @@ public abstract class Constants {
 	protected static final String MAX_PAUSE_PROP_KEY = "max-inactivity";
 	protected static final long MAX_PAUSE_PROP_VAL = 120;
 
+	protected static final String BOSH_XMLNS = "http://jabber.org/protocol/httpbind";
 	protected static final String BODY_EL_NAME = "body";
 
 	protected static final String CONTENT_ATTR = "content";
@@ -68,5 +69,6 @@ public abstract class Constants {
 	protected static final String CHARSETS_ATTR = "charsets";
 	protected static final String VER_ATTR = "ver";
 	protected static final String FROM_ATTR = "from";
+
 
 }

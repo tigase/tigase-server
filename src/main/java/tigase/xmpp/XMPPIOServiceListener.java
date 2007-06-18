@@ -36,8 +36,8 @@ import tigase.net.IOServiceListener;
  */
 public interface XMPPIOServiceListener extends IOServiceListener {
 
-	String xmppStreamOpened(XMPPIOService serv, Map<String, String> attribs);
+	String streamOpened(XMPPIOService serv, Map<String, String> attribs);
 
-	void xmppStreamClosed(XMPPIOService serv);
+	void streamClosed(XMPPIOService serv);
 
 } // XMPPIOServiceListener

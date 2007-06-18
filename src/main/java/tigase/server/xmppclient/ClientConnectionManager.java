@@ -51,7 +51,7 @@ import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPIOService;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
-import tigase.net.IOService;
+//import tigase.net.IOService;
 import tigase.net.SocketReadThread;
 
 import static tigase.server.MessageRouterConfig.DEF_SM_NAME;
@@ -64,7 +64,7 @@ import static tigase.server.MessageRouterConfig.DEF_SM_NAME;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class ClientConnectionManager extends ConnectionManager {
+public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 	//	implements XMPPService {
 
   /**
@@ -310,7 +310,7 @@ public class ClientConnectionManager extends ConnectionManager {
 		return null;
 	}
 
-	public void serviceStopped(IOService service) {
+	public void serviceStopped(XMPPIOService service) {
 		super.serviceStopped(service);
 		//		XMPPIOService serv = (XMPPIOService)service;
 		Packet command = Command.STREAM_CLOSED.getPacket(
@@ -337,6 +337,10 @@ public class ClientConnectionManager extends ConnectionManager {
 	 */
 	protected long getMaxInactiveTime() {
 		return 24*HOUR;
+	}
+
+	protected XMPPIOService getXMPPIOServiceInstance() {
+		return new XMPPIOService();
 	}
 
 }

@@ -35,7 +35,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.net.ConnectionType;
-import tigase.net.IOService;
+//import tigase.net.IOService;
 import tigase.net.SocketType;
 import tigase.server.ConnectionManager;
 import tigase.server.MessageReceiver;
@@ -57,7 +57,7 @@ import tigase.xmpp.XMPPIOService;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class ComponentConnectionManager extends ConnectionManager
+public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 	implements XMPPService {
 
 	public int[] PORTS = {5555};
@@ -291,12 +291,12 @@ public class ComponentConnectionManager extends ConnectionManager
 		return defs;
 	}
 
-	protected String getUniqueId(IOService serv) {
+	protected String getUniqueId(XMPPIOService serv) {
 		//		return (String)serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
 		return service_id;
 	}
 
-	public void serviceStopped(final IOService service) {
+	public void serviceStopped(XMPPIOService service) {
 		super.serviceStopped(service);
 		Map<String, Object> sessionData = service.getSessionData();
 		String[] routings = (String[])sessionData.get(PORT_ROUTING_TABLE_PROP_KEY);
@@ -315,21 +315,21 @@ public class ComponentConnectionManager extends ConnectionManager
 		return service_id;
 	}
 
-	public void serviceStarted(final IOService service) {
-		super.serviceStarted(service);
-		log.finest("c2c connection opened: " + service.getRemoteAddress()
-			+ ", type: " + service.connectionType().toString()
-			+ ", id=" + service.getUniqueId());
+	public void serviceStarted(XMPPIOService serv) {
+		super.serviceStarted(serv);
+		log.finest("c2c connection opened: " + serv.getRemoteAddress()
+			+ ", type: " + serv.connectionType().toString()
+			+ ", id=" + serv.getUniqueId());
 // 		String addr =
 // 			(String)service.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
 // 		addRouting(addr);
 		//		addRouting(serv.getRemoteHost());
-		switch (service.connectionType()) {
+		switch (serv.connectionType()) {
 		case connect:
 			// Send init xmpp stream here
-			XMPPIOService serv = (XMPPIOService)service;
+			//XMPPIOService serv = (XMPPIOService)service;
 			String compName =
-				(String)service.getSessionData().get(PORT_LOCAL_HOST_PROP_KEY);
+				(String)serv.getSessionData().get(PORT_LOCAL_HOST_PROP_KEY);
 			String data =
 				"<stream:stream"
 				+ " xmlns='jabber:component:accept'"
@@ -443,6 +443,10 @@ public class ComponentConnectionManager extends ConnectionManager
 		} else {
  			return Arrays.asList(serviceEntity.getDiscoItem(null, getName() + "." + jid));
 		}
+	}
+
+	protected XMPPIOService getXMPPIOServiceInstance() {
+		return new XMPPIOService();
 	}
 
 }

@@ -63,8 +63,8 @@ import java.io.File;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public abstract class ConnectionManager extends AbstractMessageReceiver
-	implements XMPPIOServiceListener {
+public abstract class ConnectionManager<IO extends XMPPIOService>
+	extends AbstractMessageReceiver implements XMPPIOServiceListener {
 
 	private static final Logger log =
     Logger.getLogger("tigase.server.ConnectionManager");
@@ -108,8 +108,8 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 	private static SocketReadThread readThread = SocketReadThread.getInstance();
 	private Timer delayedTasks = null;
 	private Thread watchdog = null;
-	private Map<String, IOService> services =
-		new ConcurrentSkipListMap<String, IOService>();
+	private Map<String, IO> services =
+		new ConcurrentSkipListMap<String, IO>();
 	private Set<ConnectionListenerImpl> pending_open =
 		Collections.synchronizedSet(new HashSet<ConnectionListenerImpl>());;
 	protected long connectionDelay = 2000;
@@ -275,29 +275,31 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 	 *
 	 * @param s an <code>IOService</code> value
 	 */
+	@SuppressWarnings({"unchecked"})
 	public void packetsReady(IOService s) throws IOException {
 		log.finest("packetsReady called");
-		XMPPIOService serv = (XMPPIOService)s;
-		writePacketsToSocket(serv, processSocketData(serv));
-// 		writePacketsToSocket(s,
-// 			processSocketData(getUniqueId(s), s.getSessionData(),
-// 				((XMPPIOService)s).getReceivedPackets()));
+		IO serv = (IO)s;
+		packetsReady(serv);
 	}
 
-	protected void writePacketsToSocket(IOService s, Queue<Packet> packets)
+	public void packetsReady(IO serv) throws IOException {
+		writePacketsToSocket(serv, processSocketData(serv));
+	}
+
+	protected void writePacketsToSocket(IO serv, Queue<Packet> packets)
 		throws IOException {
 		if (packets != null && packets.size() > 0) {
 			Packet p = null;
 			while ((p = packets.poll()) != null) {
-				((XMPPIOService)s).addPacketToSend(p);
+				serv.addPacketToSend(p);
 			} // end of for ()
-			s.processWaitingPackets();
+			serv.processWaitingPackets();
 		}
 	}
 
-	protected boolean writePacketToSocket(IOService ios, Packet p) {
+	protected boolean writePacketToSocket(IO ios, Packet p) {
 		if (ios != null) {
-			((XMPPIOService)ios).addPacketToSend(p);
+			ios.addPacketToSend(p);
 			try {
 				ios.processWaitingPackets();
 				return true;
@@ -321,7 +323,7 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 		log.finer("Processing packet: " + p.getElemName()
 			+ ", type: " + p.getType());
 		log.finest("Writing packet to: " + p.getTo());
-		IOService ios = getXMPPIOService(p);
+		IO ios = getXMPPIOService(p);
 		writePacketToSocket(ios, p);
 	}
 
@@ -329,31 +331,37 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 		log.finer("Processing packet: " + p.getElemName()
 			+ ", type: " + p.getType());
 		log.finest("Writing packet to: " + p.getTo());
-		IOService ios = getXMPPIOService(serviceId);
+		IO ios = getXMPPIOService(serviceId);
 		writePacketToSocket(ios, p);
 	}
 
-	protected XMPPIOService getXMPPIOService(String serviceId) {
-		return (XMPPIOService)services.get(serviceId);
+	protected IO getXMPPIOService(String serviceId) {
+		return services.get(serviceId);
 	}
 
-	protected XMPPIOService getXMPPIOService(Packet p) {
-		return (XMPPIOService)services.get(getServiceId(p));
+	protected IO getXMPPIOService(Packet p) {
+		return services.get(getServiceId(p));
 	}
 
 	public void processPacket(Packet packet) {
 		writePacketToSocket(packet);
 	}
 
-	public abstract Queue<Packet> processSocketData(XMPPIOService serv);
+	public abstract Queue<Packet> processSocketData(IO serv);
 
-	public void serviceStopped(final IOService service) {
+	@SuppressWarnings({"unchecked"})
+	public void serviceStopped(IOService s) {
+		IO ios = (IO)s;
+		serviceStopped(ios);
+	}
+
+	public void serviceStopped(IO service) {
 		synchronized(service) {
 			String id = getUniqueId(service);
 			log.finer(">>" + getName() + "<< Connection stopped: " + id);
 			// id might be null if service is stopped in accept method due to
 			// an exception during establishing TCP/IP connection
-			XMPPIOService serv = (id != null ? (XMPPIOService)services.get(id) : null);
+			IO serv = (id != null ? services.get(id) : null);
 			if (serv == service) {
 				services.remove(id);
 			} else {
@@ -365,11 +373,11 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 	}
 
 	@TODO(note="Do something if service with the same unique ID is already started, possibly kill the old one...")
-	public void serviceStarted(final IOService service) {
+	public void serviceStarted(final IO service) {
 		synchronized(services) {
 			String id = getUniqueId(service);
 			log.finer(">>" + getName() + "<< Connection started: " + id);
-			XMPPIOService serv = (XMPPIOService)services.get(id);
+			IO serv = services.get(id);
 			if (serv != null) {
 				if (serv == service) {
 					log.warning(getName()
@@ -388,13 +396,29 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 		}
 	}
 
-	protected String getUniqueId(IOService serv) {
+	protected String getUniqueId(IO serv) {
 		return serv.getUniqueId();
 	}
 
 	protected String getServiceId(Packet packet) {
 		return JIDUtils.getNodeResource(packet.getTo());
 	}
+
+	@SuppressWarnings({"unchecked"})
+	public void streamClosed(XMPPIOService s) {
+		IO serv = (IO)s;
+		xmppStreamClosed(serv);
+	}
+
+	public abstract void xmppStreamClosed(IO serv);
+
+	@SuppressWarnings({"unchecked"})
+	public String streamOpened(XMPPIOService s, Map<String, String> attribs) {
+		IO serv = (IO)s;
+		return xmppStreamOpened(serv, attribs);
+	}
+
+	public abstract String xmppStreamOpened(IO s, Map<String, String> attribs);
 
 	public List<StatRecord> getStatistics() {
 		List<StatRecord> stats = super.getStatistics();
@@ -412,9 +436,7 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 		return stats;
 	}
 
-	protected XMPPIOService getXMPPIOServiceInstance() {
-		return new XMPPIOService();
-	}
+	protected abstract IO getXMPPIOServiceInstance();
 
 	private class ConnectionListenerImpl implements ConnectionOpenListener {
 
@@ -449,7 +471,7 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 
 		public void accept(SocketChannel sc) {
 
-			XMPPIOService serv = getXMPPIOServiceInstance();
+			IO serv = getXMPPIOServiceInstance();
 			serv.setSSLId(getName());
 			serv.setIOServiceListener(ConnectionManager.this);
 			serv.setSessionData(port_props);
@@ -490,7 +512,7 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 	 */
 	private class Watchdog implements Runnable {
 
-		private String getCID(XMPPIOService service) {
+		private String getCID(IO service) {
 			String local_hostname =
 				(String)service.getSessionData().get("local-hostname");
 			String remote_hostname =
@@ -503,7 +525,6 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 
 		public void run() {
 			while (true) {
-				XMPPIOService service = null;
 				try {
 					// Sleep for 1 minute
 					Thread.sleep(MINUTE);
@@ -512,39 +533,41 @@ public abstract class ConnectionManager extends AbstractMessageReceiver
 					// is inactive for hour or more and close the service
 					// on Exception
 					long curr_time = System.currentTimeMillis();
-					for (IOService serv: services.values()) {
-						service = (XMPPIOService)serv;
-						long lastTransfer = serv.getLastTransferTime();
-						if (curr_time - lastTransfer >= getMaxInactiveTime()) {
-							// Stop the service is max keep-alive time is acceeded
-							// for non-active connections.
-							log.info(getName()
-								+ ": Max inactive time exceeded, stopping: "
-								+ getUniqueId(service)
-								+ ", CID: " + getCID(service));
-							service.stop();
-						} else {
-							if (curr_time - lastTransfer >= HOUR) {
-								// At least once an hour check if the connection is
-								// still alive.
-								service.writeRawData(" ");
+					for (IO service: services.values()) {
+						//						service = (XMPPIOService)serv;
+						long lastTransfer = service.getLastTransferTime();
+						try {
+							if (curr_time - lastTransfer >= getMaxInactiveTime()) {
+								// Stop the service is max keep-alive time is acceeded
+								// for non-active connections.
+								log.info(getName()
+									+ ": Max inactive time exceeded, stopping: "
+									+ getUniqueId(service)
+									+ ", CID: " + getCID(service));
+								service.stop();
+							} else {
+								if (curr_time - lastTransfer >= HOUR) {
+									// At least once an hour check if the connection is
+									// still alive.
+									service.writeRawData(" ");
+								}
+							}
+						} catch (Exception e) {
+							// Close the service....
+							try {
+								if (service != null) {
+									log.info(getName()
+										+ "Found dead connection, stopping: "
+										+ getUniqueId(service)
+										+ ", CID: " + getCID(service));
+									service.stop();
+								}
+							} catch (Exception ignore) {
+								// Do nothing here as we expect Exception to be thrown here...
 							}
 						}
 					}
-				} catch (Exception e) {
-					// Close the service....
-					try {
-						if (service != null) {
-							log.info(getName()
-								+ "Found dead connection, stopping: "
-								+ getUniqueId(service)
-								+ ", CID: " + getCID(service));
-							service.stop();
-						}
-					} catch (Exception ignore) {
-						// Do nothing here as we expect Exception to be thrown here...
-					}
-				}
+				} catch (InterruptedException e) { /* Do nothing here */ }
 			}
 		}
 	}

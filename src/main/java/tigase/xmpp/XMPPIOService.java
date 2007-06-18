@@ -53,7 +53,7 @@ public class XMPPIOService extends IOService {
 		Logger.getLogger("tigase.xmpp.XMPPIOService");
 
   private XMPPDomBuilderHandler domHandler = null;
-	private static SimpleParser parser = SingletonFactory.getParserInstance();
+	private SimpleParser parser = SingletonFactory.getParserInstance();
 	private XMPPIOServiceListener serviceListener = null;
 
   /**
@@ -95,18 +95,20 @@ public class XMPPIOService extends IOService {
 	}
 
 	protected void xmppStreamOpened(Map<String, String> attribs) {
-		final String response = serviceListener.xmppStreamOpened(this, attribs);
-    try {
-			log.finest("Sending data: " + response);
-			writeRawData(response);
-			assert debug(response, "--SENT:");
-			if (response != null && response.endsWith("</stream:stream>")) {
+		if (serviceListener != null) {
+			String response = serviceListener.streamOpened(this, attribs);
+			try {
+				log.finest("Sending data: " + response);
+				writeRawData(response);
+				assert debug(response, "--SENT:");
+				if (response != null && response.endsWith("</stream:stream>")) {
+					stop();
+				} // end of if (response.endsWith())
+			} catch (IOException e) {
+				log.warning("Error sending stream open data: " + e);
 				stop();
-			} // end of if (response.endsWith())
-		} catch (IOException e) {
-			log.warning("Error sending stream open data: " + e);
-			stop();
-    }
+			}
+		}
 	}
 
 	public void xmppStreamOpen(final String data) {
@@ -135,7 +137,9 @@ public class XMPPIOService extends IOService {
 
 	protected void xmppStreamClosed() {
 		//streamClosed = true;
-		serviceListener.xmppStreamClosed(this);
+		if (serviceListener != null) {
+			serviceListener.streamClosed(this);
+		}
     try {
 			log.finest("Sending data: </stream:stream>");
 			writeRawData("</stream:stream>");
