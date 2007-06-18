@@ -142,9 +142,13 @@ public class PacketFilter {
 // 				log.finest("Setting correct from attribute: " + session.getJID());
 // 			} // end of if (packet.getFrom().equals(session.getConnectionId()))
 
-			String id = JIDUtils.getNodeID(packet.getElemTo());
+			//String id = JIDUtils.getNodeID(packet.getElemTo());
+			String id = JIDUtils.getNodeID(packet.getElemFrom());
 
 			if (id.equals(session.getUserId())) {
+				Element result = packet.getElement().clone();
+				results.offer(new Packet(result));
+			} else {
 				// Yes this is message to 'this' client
 				log.finest("Yes, this is packet to 'this' client: " + id);
 				Element elem = packet.getElement().clone();
@@ -154,10 +158,6 @@ public class PacketFilter {
 				log.finest("Setting to: " + result.getTo());
 				result.setFrom(packet.getTo());
 				results.offer(result);
-			} else {
-				// This is message to some other client
-				Element result = packet.getElement().clone();
-				results.offer(new Packet(result));
 			} // end of else
 		} catch (NotAuthorizedException e) {
 			log.warning("NotAuthorizedException for packet: "	+ packet.getStringData());

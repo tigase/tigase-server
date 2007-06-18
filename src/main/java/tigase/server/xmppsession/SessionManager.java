@@ -143,6 +143,23 @@ public class SessionManager extends AbstractMessageReceiver
 		} // end of if (pc.isCommand())
 		XMPPResourceConnection conn = getXMPPResourceConnection(packet);
 		if (conn == null) {
+
+			if (packet.getFrom() != packet.getElemFrom()) {
+				// It doesn't look good, there should reaaly be a connection for
+				// this packet....
+				// returning error back...
+				if (packet.getType() == StanzaType.error) {
+					// Drop packet.
+				} else {
+					Packet error =
+						Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet,
+						"Service not available.", true);
+					error.setTo(packet.getFrom());
+					addOutPacket(error);
+					return;
+				}
+			}
+
 			// It might be a message _to_ some user on this server
 			// so let's look for established session for this user...
 			final String to = packet.getElemTo();
@@ -223,7 +240,7 @@ public class SessionManager extends AbstractMessageReceiver
 			} else {
 				if ((packet.getElemFrom() != null || conn != null)
 					&& packet.getType() != StanzaType.error) {
-					error =	Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
+					error = Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
 						"Feature not supported yet.", true);
 				} else {
 					log.warning("Lost packet: " + packet.getStringData());
@@ -595,8 +612,7 @@ public class SessionManager extends AbstractMessageReceiver
 		clearRoutings();
 		for (String host: hostnames) {
 			addRouting(host);
-			XMPPResourceConnection conn =
-				createUserSession(host + "-" + System.currentTimeMillis(), host, host);
+			XMPPResourceConnection conn = createUserSession(NULL_ROUTING, host, host);
 			conn.setDummy(true);
 		} // end of for ()
 
@@ -655,8 +671,9 @@ public class SessionManager extends AbstractMessageReceiver
 		if (jid != null && jid.startsWith(getName()+".")) {
 			return serviceEntity.getDiscoItems(node, jid);
 		} else {
-			return
-				Arrays.asList(serviceEntity.getDiscoItem(null, getName() + "." + jid));
+// 			return
+// 				Arrays.asList(serviceEntity.getDiscoItem(null, getName() + "." + jid));
+			return null;
 		}
 	}
 
