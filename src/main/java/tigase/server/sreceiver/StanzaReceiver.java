@@ -509,7 +509,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 				ADMINS_PROP_VAL = ((String)params.get(GEN_ADMINS)).split(",");
 			} else {
 				ADMINS_PROP_VAL = new String[1];
-				ADMINS_PROP_VAL[0] = "admin@" + defHostname;
+				ADMINS_PROP_VAL[0] = "admin@" + getDefHostName();
 			}
 		} // end of if (params.get(GEN_SREC_ADMINS) != null) else
 		defs.put(ADMINS_PROP_KEY, ADMINS_PROP_VAL);
