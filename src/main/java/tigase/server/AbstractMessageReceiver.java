@@ -73,7 +73,7 @@ public abstract class AbstractMessageReceiver
     Logger.getLogger("tigase.server.AbstractMessageReceiver");
 
   private int maxQueueSize = MAX_QUEUE_SIZE_PROP_VAL;
-	protected String defHostname = DEF_HOSTNAME_PROP_VAL;
+	private String defHostname = DEF_HOSTNAME_PROP_VAL;
 
   private MessageReceiver parent = null;
 	//	private Timer delayedTask = new Timer("MessageReceiverTask", true);
