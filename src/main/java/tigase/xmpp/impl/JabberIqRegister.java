@@ -89,10 +89,11 @@ public class JabberIqRegister extends XMPPProcessor
 		}
 
 		try {
-			if (session.isAuthorized()
-				&& packet.getFrom().equals(session.getConnectionId())) {
-				packet.getElement().setAttribute("from", session.getJID());
-			}
+			// Not needed anymore. Packet filter does it for all stanzas.
+// 			if (session.isAuthorized()
+// 				&& packet.getFrom().equals(session.getConnectionId())) {
+// 				packet.getElement().setAttribute("from", session.getJID());
+// 			}
 
 			if ((id.equals(session.getDomain())
 					|| id.equals(session.getUserId()))

@@ -234,8 +234,9 @@ public class Presence extends XMPPProcessor
 	protected void forwardPresence(final Queue<Packet> results,
 		final Packet packet, final String from) {
 		Element result = packet.getElement().clone();
-		// According to spec we must set proper FROM attribute
-		result.setAttribute("from", from);
+		// Not needed anymore. Packet filter does it for all stanzas.
+// 		// According to spec we must set proper FROM attribute
+// 		result.setAttribute("from", from);
 		log.finest("\n\nFORWARD presence: " + result.toString());
 		results.offer(new Packet(result));
 	}
@@ -297,11 +298,12 @@ public class Presence extends XMPPProcessor
 				type = StanzaType.available;
 			} // end of if (type == null)
 
-			// For all messages coming from the owner of this account set
-			// proper 'from' attribute
-			if (packet.getFrom().equals(session.getConnectionId())) {
-				packet.getElement().setAttribute("from", session.getJID());
-			} // end of if (packet.getFrom().equals(session.getConnectionId()))
+			// Not needed anymore. Packet filter does it for all stanzas.
+// 			// For all messages coming from the owner of this account set
+// 			// proper 'from' attribute
+// 			if (packet.getFrom().equals(session.getConnectionId())) {
+// 				packet.getElement().setAttribute("from", session.getJID());
+// 			} // end of if (packet.getFrom().equals(session.getConnectionId()))
 
 			log.finest(pres_type + " presence found: " + packet.toString());
 			boolean subscr_changed = false;

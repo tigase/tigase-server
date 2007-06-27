@@ -84,12 +84,13 @@ public class JabberIqCommand extends XMPPProcessor implements XMPPProcessorIfc {
 		try {
 			log.finest("Received packet: " + packet.getStringData());
 
-			// For all messages coming from the owner of this account set
-			// proper 'from' attribute. This is actually needed for the case
-			// when the user sends a message to himself.
-			if (packet.getFrom().equals(session.getConnectionId())) {
-				packet.getElement().setAttribute("from", session.getJID());
-			} // end of if (packet.getFrom().equals(session.getConnectionId()))
+			// Not needed anymore. Packet filter does it for all stanzas.
+// 			// For all messages coming from the owner of this account set
+// 			// proper 'from' attribute. This is actually needed for the case
+// 			// when the user sends a message to himself.
+// 			if (packet.getFrom().equals(session.getConnectionId())) {
+// 				packet.getElement().setAttribute("from", session.getJID());
+// 			} // end of if (packet.getFrom().equals(session.getConnectionId()))
 
 			String id = JIDUtils.getNodeID(packet.getElemTo());
 

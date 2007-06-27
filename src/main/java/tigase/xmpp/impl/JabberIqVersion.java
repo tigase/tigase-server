@@ -123,12 +123,13 @@ public class JabberIqVersion extends XMPPProcessor
 		}
 
 		try {
-			// For all messages coming from the owner of this account set
-			// proper 'from' attribute. This is actually needed for the case
-			// when the user sends a message to himself.
-			if (packet.getFrom().equals(session.getConnectionId())) {
-				packet.getElement().setAttribute("from", session.getJID());
-			} // end of if (packet.getFrom().equals(session.getConnectionId()))
+			// Not needed anymore. Packet filter does it for all stanzas.
+// 			// For all messages coming from the owner of this account set
+// 			// proper 'from' attribute. This is actually needed for the case
+// 			// when the user sends a message to himself.
+// 			if (packet.getFrom().equals(session.getConnectionId())) {
+// 				packet.getElement().setAttribute("from", session.getJID());
+// 			} // end of if (packet.getFrom().equals(session.getConnectionId()))
 
 			// According to JEP-0092 user doesn't need to be logged in to
 			// retrieve server version information, so this part is executed

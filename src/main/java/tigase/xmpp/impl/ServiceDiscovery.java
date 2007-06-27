@@ -148,8 +148,9 @@ public abstract class ServiceDiscovery extends XMPPProcessor
 				// case it is absolutely safe and recommended to set 'from'
 				// attribute
 				Element result = packet.getElement().clone();
-				// According to spec we must set proper FROM attribute
-				result.setAttribute("from", session.getJID());
+				// Not needed anymore. Packet filter does it for all stanzas.
+// 				// According to spec we must set proper FROM attribute
+// 				result.setAttribute("from", session.getJID());
 				results.offer(new Packet(result));
 			} // end of else
 		} catch (NotAuthorizedException e) {

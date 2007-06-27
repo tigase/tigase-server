@@ -133,8 +133,9 @@ public class JabberIqStats extends XMPPProcessor
 				// case it is absolutely safe and recommended to set 'from'
 				// attribute
 				Element el_res = packet.getElement().clone();
-				// According to spec we must set proper FROM attribute
-				el_res.setAttribute("from", session.getJID());
+				// Not needed anymore. Packet filter does it for all stanzas.
+// 				// According to spec we must set proper FROM attribute
+// 				el_res.setAttribute("from", session.getJID());
 				Packet result = new Packet(el_res);
 				results.offer(result);
 				log.finest("Sending result: " + result.getStringData());

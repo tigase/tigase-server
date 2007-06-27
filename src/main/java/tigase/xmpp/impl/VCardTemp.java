@@ -121,9 +121,10 @@ public class VCardTemp extends XMPPProcessor implements XMPPProcessorIfc {
 		} // end of if (session == null)
 
 		try {
-			if (packet.getFrom().equals(session.getConnectionId())) {
-				packet.getElement().setAttribute("from", session.getJID());
-			} // end of if (packet.getFrom().equals(session.getConnectionId()))
+			// Not needed anymore. Packet filter does it for all stanzas.
+// 			if (packet.getFrom().equals(session.getConnectionId())) {
+// 				packet.getElement().setAttribute("from", session.getJID());
+// 			} // end of if (packet.getFrom().equals(session.getConnectionId()))
 
 			String id = null;
 			if (packet.getElemTo() != null) {

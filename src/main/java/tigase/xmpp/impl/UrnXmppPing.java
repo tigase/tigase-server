@@ -78,9 +78,10 @@ public class UrnXmppPing extends XMPPProcessor implements XMPPProcessorIfc {
 		}
 
 		try {
-			if (packet.getFrom().equals(session.getConnectionId())) {
-				packet.getElement().setAttribute("from", session.getJID());
-			}
+			// Not needed anymore. Packet filter does it for all stanzas.
+// 			if (packet.getFrom().equals(session.getConnectionId())) {
+// 				packet.getElement().setAttribute("from", session.getJID());
+// 			}
 
 			if (id.equals(session.getUserId())) {
 				Element elem = packet.getElement().clone();
