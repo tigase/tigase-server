@@ -72,38 +72,47 @@ public class PacketFilter {
 				log.finest("Setting correct from attribute: " + session.getJID());
 			}
 
-			// This could be earlier at the beginnig of the method, but I want to have
-			// from address set properly whenever possible
-			if (packet.getElemTo() == null || session.isDummy()
-				|| (packet.getType() != null && packet.getType() == StanzaType.probe)) {
-				return false;
-			}
+			// Apparently all code below breaks all cases when packet addressed to
+			// the user should be processed in server on user behalf so it is commented
+			// for now. The correct solution is to handle all unprocessed packets in
+			// "process" method.
+			// So here we just set proper from address and that's it.
+			// I think we should modify all plugins code and remove setting proper
+			// from address as this has been already done here so no need for
+			// duplicated code to maintaind and process.
 
-			String id = JIDUtils.getNodeID(packet.getElemTo());
+// 			// This could be earlier at the beginnig of the method, but I want to have
+// 			// from address set properly whenever possible
+// 			if (packet.getElemTo() == null || session.isDummy()
+// 				|| packet.getElemName().equals("presence")) {
+// 				return false;
+// 			}
 
-			if (id.equals(session.getUserId())
-				&& packet.getFrom() != null
-				&& packet.getFrom().equals(packet.getElemFrom())) {
-				// Yes this is message to 'this' client
-				log.finest("Yes, this is packet to 'this' client: " + id);
-				Element elem = packet.getElement().clone();
-				Packet result = new Packet(elem);
-				result.setTo(session.getParentSession().
-					getResourceConnection(packet.getElemTo()).getConnectionId());
-				log.finest("Setting to: " + result.getTo());
-				result.setFrom(packet.getTo());
-				results.offer(result);
-			} else {
-// 				// This is message to some other client
-// 				Element result = packet.getElement().clone();
-// 				results.offer(new Packet(result));
-				return false;
-			} // end of else
+// 			String id = JIDUtils.getNodeID(packet.getElemTo());
+
+// 			if (id.equals(session.getUserId())
+// 				&& packet.getFrom() != null
+// 				&& packet.getFrom().equals(packet.getElemFrom())) {
+// 				// Yes this is message to 'this' client
+// 				log.finest("Yes, this is packet to 'this' client: " + id);
+// 				Element elem = packet.getElement().clone();
+// 				Packet result = new Packet(elem);
+// 				result.setTo(session.getParentSession().
+// 					getResourceConnection(packet.getElemTo()).getConnectionId());
+// 				log.finest("Setting to: " + result.getTo());
+// 				result.setFrom(packet.getTo());
+// 				results.offer(result);
+// 			} else {
+// // 				// This is message to some other client
+// // 				Element result = packet.getElement().clone();
+// // 				results.offer(new Packet(result));
+// 				return false;
+// 			} // end of else
 		} catch (NotAuthorizedException e) {
 			return false;
 		} // end of try-catch
 
-		return true;
+		return false;
 	}
 
 	public boolean process(final Packet packet, final XMPPResourceConnection session,
@@ -142,13 +151,10 @@ public class PacketFilter {
 // 				log.finest("Setting correct from attribute: " + session.getJID());
 // 			} // end of if (packet.getFrom().equals(session.getConnectionId()))
 
-			//String id = JIDUtils.getNodeID(packet.getElemTo());
-			String id = JIDUtils.getNodeID(packet.getElemFrom());
+			String id = null;
 
+			id = JIDUtils.getNodeID(packet.getElemTo());
 			if (id.equals(session.getUserId())) {
-				Element result = packet.getElement().clone();
-				results.offer(new Packet(result));
-			} else {
 				// Yes this is message to 'this' client
 				log.finest("Yes, this is packet to 'this' client: " + id);
 				Element elem = packet.getElement().clone();
@@ -158,14 +164,22 @@ public class PacketFilter {
 				log.finest("Setting to: " + result.getTo());
 				result.setFrom(packet.getTo());
 				results.offer(result);
+				return true;
 			} // end of else
+
+			id = JIDUtils.getNodeID(packet.getElemFrom());
+			if (id.equals(session.getUserId())) {
+				Element result = packet.getElement().clone();
+				results.offer(new Packet(result));
+				return true;
+			}
 		} catch (NotAuthorizedException e) {
 			log.warning("NotAuthorizedException for packet: "	+ packet.getStringData());
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 					"You must authorize session first.", true));
 		} // end of try-catch
 
-		return true;
+		return false;
 	}
 
 }
