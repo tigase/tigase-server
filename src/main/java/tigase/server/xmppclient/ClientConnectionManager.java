@@ -260,7 +260,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 		final String id = UUID.randomUUID().toString();
 		if (hostname == null) {
 			return "<stream:stream version='1.0' xml:lang='en'"
-				+ " from='" + defHostname + "'"
+				+ " from='" + getDefHostName() + "'"
 				+ " id='" + id + "'"
 				+ " xmlns='jabber:client'"
 				+ " xmlns:stream='http://etherx.jabber.org/streams'>"
@@ -273,7 +273,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 
 		if (!hostnames.contains(hostname)) {
 			return "<stream:stream version='1.0' xml:lang='en'"
-				+ " from='" + defHostname + "'"
+				+ " from='" + getDefHostName() + "'"
 				+ " id='" + id + "'"
 				+ " xmlns='jabber:client'"
 				+ " xmlns:stream='http://etherx.jabber.org/streams'>"
@@ -322,10 +322,6 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 
 	public void xmppStreamClosed(XMPPIOService serv) {
 		log.finer("Stream closed.");
-	}
-
-	public String getDefHostName() {
-		return defHostname == null ? super.getDefHostName() : defHostname;
 	}
 
 	/**
