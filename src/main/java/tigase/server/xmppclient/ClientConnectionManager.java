@@ -74,10 +74,10 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
     Logger.getLogger("tigase.server.xmppclient.ClientConnectionManager");
 
 	private static final String ROUTINGS_PROP_KEY = "routings";
-	public static final String ROUTING_MODE_PROP_KEY = "multi-mode";
-	public static final boolean ROUTING_MODE_PROP_VAL = true;
-	public static final String ROUTING_ENTRY_PROP_KEY = ".+";
-	public static final String ROUTING_ENTRY_PROP_VAL = DEF_SM_NAME + "@localhost";
+	private static final String ROUTING_MODE_PROP_KEY = "multi-mode";
+	private static final boolean ROUTING_MODE_PROP_VAL = true;
+	private static final String ROUTING_ENTRY_PROP_KEY = ".+";
+	private static final String ROUTING_ENTRY_PROP_VAL = DEF_SM_NAME + "@localhost";
 
 	public static final String HOSTNAMES_PROP_KEY = "hostnames";
 	public String[] HOSTNAMES_PROP_VAL =	{"localhost", "hostname"};
@@ -189,6 +189,10 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 		props.put(HOSTNAMES_PROP_KEY, HOSTNAMES_PROP_VAL);
 		props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_MODE_PROP_KEY,
 			ROUTING_MODE_PROP_VAL);
+		// If the server is configured as connection manager only node then
+		// route packets to SM on remote host where is default routing
+		// for external component.
+		// Otherwise default routing is to SM on localhost
 		if (params.get("config-type").equals(GEN_CONFIG_CS)
 			&& params.get(GEN_EXT_COMP) != null) {
 			String[] comp_params = ((String)params.get(GEN_EXT_COMP)).split(",");
