@@ -26,18 +26,24 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.LinkedHashMap;
 import java.util.Queue;
+import java.util.LinkedList;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.net.IOService;
+import tigase.server.Command;
 import tigase.server.ConnectionManager;
 import tigase.server.Packet;
+import tigase.util.JIDUtils;
 import tigase.util.DNSResolver;
+import tigase.util.RoutingsContainer;
+import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPIOService;
 
 import static tigase.server.bosh.Constants.*;
+import static tigase.server.MessageRouterConfig.DEF_SM_NAME;
 
 /**
  * Describe class BoshConnectionManager here.
@@ -56,11 +62,18 @@ public class BoshConnectionManager extends ConnectionManager<BoshIOService> {
   private static final Logger log =
     Logger.getLogger("tigase.server.bosh.BoshConnectionManager");
 
+	private static final String ROUTINGS_PROP_KEY = "routings";
+	private static final String ROUTING_MODE_PROP_KEY = "multi-mode";
+	private static final boolean ROUTING_MODE_PROP_VAL = true;
+	private static final String ROUTING_ENTRY_PROP_KEY = ".+";
+	private static final String ROUTING_ENTRY_PROP_VAL = DEF_SM_NAME + "@localhost";
+
 	private static final int DEF_PORT_NO = 5280;
 	private int[] PORTS = {DEF_PORT_NO};
 	private static final String HOSTNAMES_PROP_KEY = "hostnames";
 	private String[] HOSTNAMES_PROP_VAL =	{"localhost", "hostname"};
 
+	private RoutingsContainer routings = null;
 	private Set<String> hostnames = new TreeSet<String>();
 	private long max_wait = MAX_WAIT_DEF_PROP_VAL;
 	private long min_polling = MIN_POLLING_PROP_VAL;
@@ -84,8 +97,53 @@ public class BoshConnectionManager extends ConnectionManager<BoshIOService> {
 			log.finer("Processing packet: " + p.getElemName()
 				+ ", type: " + p.getType());
 			log.finest("Processing socket data: " + p.getStringData());
+			String sid_str = p.getAttribute(SID_ATTR);
+			UUID sid = null;
+			Queue<Packet> out_results = new LinkedList<Packet>();
+			try {
+				if (sid_str == null) {
+					BoshSession bs = new BoshSession(getDefHostName());
+					sid = bs.getSid();
+					sessions.put(sid, bs);
+					Packet result = bs.init(p, serv, max_wait, min_polling, max_inactivity,
+						concurrent_requests, hold_requests, max_pause);
+					Packet streamOpen = Command.STREAM_OPENED.getPacket(
+						getFromAddress(sid.toString()),
+						routings.computeRouting(bs.getDomain()),
+						StanzaType.set, "sess1", "submit");
+					Command.addFieldValue(streamOpen, "session-id", sid.toString());
+					Command.addFieldValue(streamOpen, "hostname", bs.getDomain());
+					addOutPacket(streamOpen);
+					if (result != null) {
+						result.setFrom(getFromAddress(sid.toString()));
+						result.setTo(routings.computeRouting(bs.getDomain()));
+						out_results.offer(result);
+					}
+				} else {
+					sid = UUID.fromString(sid_str);
+					BoshSession bs = sessions.get(sid);
+					if (bs != null) {
+						bs.processPacket(p, serv, out_results);
+						for (Packet res: out_results) {
+							res.setFrom(getFromAddress(bs.getSid().toString()));
+							res.setTo(routings.computeRouting(bs.getDomain()));
+						}
+					} else {
+						log.warning("There is no session with given SID. Ignoring for now...");
+					}
+				}
+			} catch (Exception e) {
+				log.log(Level.WARNING,
+					"Problem processing socket data for sid =  " + sid,
+					e);
+			}
+			addOutPackets(out_results);
 		} // end of while ()
 		return null;
+	}
+
+	private String getFromAddress(String id) {
+		return JIDUtils.getJID(getName(), getDefHostName(), id);
 	}
 
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -96,6 +154,21 @@ public class BoshConnectionManager extends ConnectionManager<BoshIOService> {
 			HOSTNAMES_PROP_VAL = DNSResolver.getDefHostNames();
 		}
 		props.put(HOSTNAMES_PROP_KEY, HOSTNAMES_PROP_VAL);
+		props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_MODE_PROP_KEY,
+			ROUTING_MODE_PROP_VAL);
+		// If the server is configured as connection manager only node then
+		// route packets to SM on remote host where is default routing
+		// for external component.
+		// Otherwise default routing is to SM on localhost
+		if (params.get("config-type").equals(GEN_CONFIG_CS)
+			&& params.get(GEN_EXT_COMP) != null) {
+			String[] comp_params = ((String)params.get(GEN_EXT_COMP)).split(",");
+			props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_ENTRY_PROP_KEY,
+				DEF_SM_NAME + "@" + comp_params[1]);
+		} else {
+			props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_ENTRY_PROP_KEY,
+				DEF_SM_NAME + "@" + HOSTNAMES_PROP_VAL[0]);
+		}
 		props.put(MAX_WAIT_DEF_PROP_KEY, MAX_WAIT_DEF_PROP_VAL);
 		props.put(MIN_POLLING_PROP_KEY, MIN_POLLING_PROP_VAL);
 		props.put(MAX_INACTIVITY_PROP_KEY, MAX_INACTIVITY_PROP_VAL);
@@ -107,6 +180,18 @@ public class BoshConnectionManager extends ConnectionManager<BoshIOService> {
 
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
+		boolean routing_mode =
+			(Boolean)props.get(ROUTINGS_PROP_KEY + "/" + ROUTING_MODE_PROP_KEY);
+		routings = new RoutingsContainer(routing_mode);
+		int idx = (ROUTINGS_PROP_KEY + "/").length();
+		for (Map.Entry<String, Object> entry: props.entrySet()) {
+			if (entry.getKey().startsWith(ROUTINGS_PROP_KEY + "/")
+				&& !entry.getKey().equals(ROUTINGS_PROP_KEY + "/" +
+					ROUTING_MODE_PROP_KEY)) {
+				routings.addRouting(entry.getKey().substring(idx),
+					(String)entry.getValue());
+			} // end of if (entry.getKey().startsWith(ROUTINGS_PROP_KEY + "/"))
+		} // end of for ()
 		String[] hnames = (String[])props.get(HOSTNAMES_PROP_KEY);
 		clearRoutings();
 		hostnames.clear();
@@ -142,7 +227,7 @@ public class BoshConnectionManager extends ConnectionManager<BoshIOService> {
 	 * @return a <code>long</code> value
 	 */
 	protected long getMaxInactiveTime() {
-		return 1000*10*MINUTE;
+		return 10*MINUTE;
 	}
 
 	public void xmppStreamClosed(BoshIOService serv) {

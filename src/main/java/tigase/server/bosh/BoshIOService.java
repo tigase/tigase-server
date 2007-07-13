@@ -22,6 +22,7 @@
  */
 package tigase.server.bosh;
 
+import java.util.logging.Logger;
 import java.io.IOException;
 import tigase.xmpp.XMPPIOService;
 
@@ -35,6 +36,12 @@ import tigase.xmpp.XMPPIOService;
  * @version $Rev$
  */
 public class BoshIOService extends XMPPIOService {
+
+  /**
+   * Variable <code>log</code> is a class logger.
+   */
+  private static final Logger log =
+    Logger.getLogger("tigase.server.bosh.BoshIOService");
 
 	private static final String EOL = "\r\n";
 
@@ -51,6 +58,7 @@ public class BoshIOService extends XMPPIOService {
 		sb.append("Content-Length: " + data.length() + EOL);
 		sb.append(EOL);
 		sb.append(data);
+		log.finest("Writing to socket:\n" + sb.toString());
 		super.writeRawData(sb.toString());
 	}
 

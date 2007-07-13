@@ -24,7 +24,9 @@ package tigase.server.bosh;
 
 import java.util.UUID;
 import java.util.Map;
+import java.util.Queue;
 import java.util.LinkedHashMap;
+import java.io.IOException;
 import tigase.server.Packet;
 import tigase.xml.Element;
 
@@ -63,7 +65,8 @@ public class BoshSession {
 
 	public Packet init(Packet packet, BoshIOService service,
 		long max_wait, long min_polling, long max_inactivity,
-		int concurrent_requests, int hold_requests, long max_pause) {
+		int concurrent_requests, int hold_requests, long max_pause)
+		throws IOException {
 		long wait_l = max_wait;
 		String wait_s = packet.getAttribute(WAIT_ATTR);
 		if (wait_s != null) {
@@ -120,9 +123,21 @@ public class BoshSession {
 										this.domain,
 										"true"});
 		body.setXMLNS(BOSH_XMLNS);
-		return new Packet(body);
+		service.writeRawData(body.toString());
+		return null;
 	}
 
-// 		xmlns='http://jabber.org/protocol/httpbind'
+	public UUID getSid() {
+		return sid;
+	}
+
+	public String getDomain() {
+		return domain;
+	}
+
+	public void processPacket(Packet packet, BoshIOService service,
+		Queue<Packet> out_results) {
+		
+	}
 
 }
