@@ -1,26 +1,23 @@
---  Tigase database schema for MySQL
 --
---  Package Tigase XMPP/Jabber Server
---  Copyright (C) 2004 - 2007
---  "Artur Hefczyc" <artur.hefczyc@tigase.org>
+--  Tigase Jabber/XMPP Server
+--  Copyright (C) 2004-2007 "Artur Hefczyc" <artur.hefczyc@tigase.org>
 --
---  This program is free software; you can redistribute it and/or modify
+--  This program is free software: you can redistribute it and/or modify
 --  it under the terms of the GNU General Public License as published by
---  the Free Software Foundation; either version 2 of the License, or
---  (at your option) any later version.
+--  the Free Software Foundation, either version 3 of the License.
 --
 --  This program is distributed in the hope that it will be useful,
 --  but WITHOUT ANY WARRANTY; without even the implied warranty of
---  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+--  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 --  GNU General Public License for more details.
 --
 --  You should have received a copy of the GNU General Public License
---  along with this program; if not, write to the Free Software Foundation,
---  Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+--  along with this program. Look for COPYING file in the top folder.
+--  If not, see http://www.gnu.org/licenses/.
 --
--- $Rev: 367 $
--- Last modified by $Author: kobit $
--- $Date: 2007-04-03 19:40:48 +0100 (Tue, 03 Apr 2007) $
+--  $Rev: $
+--  Last modified by $Author: $
+--  $Date: $
 --
 
 --  To load schema to MySQL database execute following commands:
