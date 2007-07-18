@@ -83,13 +83,13 @@
     <dependency>
       <groupId>tigase-utils</groupId>
       <artifactId>tigase-utils</artifactId>
-      <version>2.4.2</version>
+      <version>3.0.0</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>tigase-xmltools</groupId>
       <artifactId>tigase-xmltools</artifactId>
-      <version>2.7.1</version>
+      <version>3.0.0</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
