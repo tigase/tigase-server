@@ -84,9 +84,11 @@ public class DrupalAuth implements UserAuthRepository {
 	private PreparedStatement max_uid_st = null;
 	private PreparedStatement conn_valid_st = null;
 	private PreparedStatement update_last_login_st = null;
+	private PreparedStatement update_online_status = null;
 
 	private long lastConnectionValidated = 0;
 	private long connectionValidateInterval = 1000*60;
+	private boolean online_status = false;
 
 	private void initPreparedStatements() throws SQLException {
 		String query = "select pass from " + users_tbl
@@ -110,6 +112,10 @@ public class DrupalAuth implements UserAuthRepository {
 
 		query = "update " + users_tbl + " set access=?, login=? where name=?;";
 		update_last_login_st = conn.prepareStatement(query);
+
+		query = "update " + users_tbl
+			+ " set online_status=online_status+? where name=?;";
+		update_online_status = conn.prepareStatement(query);
 	}
 
 	private boolean checkConnection() throws SQLException {
@@ -153,6 +159,19 @@ public class DrupalAuth implements UserAuthRepository {
 		} // end of try-catch
 	}
 
+	private void updateOnlineStatus(String user, int status)
+		throws TigaseDBException {
+		if (online_status) {
+			try {
+				update_online_status.setInt(1, status);
+				update_online_status.setString(2, JIDUtils.getNodeNick(user));
+				update_online_status.executeUpdate();
+			} catch (SQLException e) {
+				throw new TigaseDBException("Error accessin repository.", e);
+			} // end of try-catch
+		}
+	}
+
 	private boolean isActive(final String user)
 		throws SQLException, UserNotFoundException {
 		ResultSet rs = null;
@@ -175,10 +194,10 @@ public class DrupalAuth implements UserAuthRepository {
 			rs = max_uid_st.executeQuery();
 			if (rs.next()) {
 				BigDecimal max_uid = rs.getBigDecimal(1);
-				System.out.println("MAX UID = " + max_uid.longValue());
+				//System.out.println("MAX UID = " + max_uid.longValue());
 				return max_uid.longValue();
 			} else {
-				System.out.println("MAX UID = -1!!!!");
+				//System.out.println("MAX UID = -1!!!!");
 				return -1;
 			} // end of else
 		} finally {
@@ -223,6 +242,12 @@ public class DrupalAuth implements UserAuthRepository {
 	private void initRepo() throws SQLException {
 		conn = DriverManager.getConnection(db_conn);
 		initPreparedStatements();
+		if (online_status) {
+			Statement stmt = conn.createStatement();
+			stmt.executeUpdate("update users set online_status = 0;");
+			stmt.close();
+			stmt = null;
+		}
 	}
 
 	/**
@@ -234,6 +259,9 @@ public class DrupalAuth implements UserAuthRepository {
 	public void initRepository(final String connection_str)
 		throws DBInitException {
 		db_conn = connection_str;
+		if (db_conn.contains("online_status=true")) {
+			online_status = true;
+		}
 		try {
 			initRepo();
 		} catch (SQLException e) {
@@ -266,6 +294,7 @@ public class DrupalAuth implements UserAuthRepository {
 			boolean login_ok = db_password.equals(enc_passwd);
 			if (login_ok) {
 				updateLastLogin(user);
+				updateOnlineStatus(user, 1);
 			} // end of if (login_ok)
 			return login_ok;
 		} catch (NoSuchAlgorithmException e) {
@@ -314,6 +343,7 @@ public class DrupalAuth implements UserAuthRepository {
 				if (login_ok) {
 					String user = (String)props.get(USER_ID_KEY);
 					updateLastLogin(user);
+					updateOnlineStatus(user, 1);
 				} // end of if (login_ok)
 				return login_ok;
 			} // end of if (mech.equals("PLAIN"))
@@ -322,7 +352,15 @@ public class DrupalAuth implements UserAuthRepository {
 		throw new AuthorizationException("Protocol is not supported: " + proto);
 	}
 
-	public void logout(final String user) {}
+	public void logout(final String user)
+		throws UserNotFoundException, TigaseDBException {
+		try {
+			checkConnection();
+			updateOnlineStatus(user, -1);
+		} catch (SQLException e) {
+			throw new TigaseDBException("Problem accessing repository.", e);
+		} // end of catch
+	}
 
 	/**
 	 * Describe <code>addUser</code> method here.
