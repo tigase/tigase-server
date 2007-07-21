@@ -92,8 +92,7 @@ function tigase_monitor_block($op='list', $delta=0) {
 		$link_zip = "<a href=\"{$base_path}{$zip_file}\">zip</a>, ";
 		$link_exe = "<a href=\"{$base_path}{$exe_file}\">exe</a>, ";
 		$link_targz = "<a href=\"{$base_path}{$targz_file}\">tar.gz</a>";
-		$link_all = l("$server_downloads",
-			"/filebrowser/tigase-server", array(), NULL, NULL, FALSE, TRUE);
+		$link_all = "<a href=\"{$base_path}/filebrowser/tigase-server\">$server_downloads</a>";
 		$users_cnt = db_fetch_object(db_query("SELECT COUNT(*) as count from {users};"));
 		$online_cnt = db_fetch_object(db_query("SELECT COUNT(*) as count from {users} where online_status > 0;"));
 		// Count users with activity in the past defined period.
@@ -104,7 +103,7 @@ function tigase_monitor_block($op='list', $delta=0) {
 		$block_content .= '<table border="0">';
 		$block_content .= '<tr><td>Registered:</td><td>' . $users_cnt->count . '</td></tr>';
 		$block_content .= '<tr><td>Jabber Online:</td><td>' . $online_cnt->count . '</td></tr>';
-		$block_content .= '<tr><td>Web Online:</td><td>' . ($users->count + $guests->count) . '</td></tr>';
+		$block_content .= '<tr><td>Website Online:</td><td>' . ($users->count + $guests->count) . '</td></tr>';
 		$block_content .= '<tr><td>Ver ' . $server_version . ':</td><td>'
 			. $link_zip . $link_exe . $link_targz . '</td></tr>';
 		$block_content .= '<tr><td>All downloads:</td><td>' . $link_all . '</td></tr>';
