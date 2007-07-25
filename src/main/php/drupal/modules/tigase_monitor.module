@@ -62,6 +62,8 @@ function tigase_monitor_block($op='list', $delta=0) {
 		$folder = 'files/downloads/tigase-server/';
 		$descript = $folder . 'descript.ion';
 		$info = tigase_monitor_decript($descript);
+		$jabber_stats_file = 'files/jabber_stats.txt';
+		$jabber_stats = tigase_monitor_stats($jabber_stats_file);
  		$server_downloads = '';
 		$server_version = ' ';
 		$file = '';
@@ -102,8 +104,13 @@ function tigase_monitor_block($op='list', $delta=0) {
 		$users = db_fetch_object(db_query('SELECT COUNT(*) AS count FROM {users} WHERE access >= %d AND uid != 0 ORDER BY access DESC', time() - $time_period));
 		$block_content .= '<table border="0">';
 		$block_content .= '<tr><td>Registered:</td><td>' . $users_cnt->count . '</td></tr>';
-		$block_content .= '<tr><td>Jabber Online:</td><td>' . $online_cnt->count . '</td></tr>';
-		$block_content .= '<tr><td>Website Online:</td><td>' . ($users->count + $guests->count) . '</td></tr>';
+		//		$block_content .= '<tr><td>Jabber Online:</td><td>' . $online_cnt->count . '</td></tr>';
+// 		print_r( $jabber_stats );
+// 		print_r( '<br/>' );
+		foreach ($jabber_stats as $name => $description) {
+			$block_content .= "<tr><td>{$name}</td><td>{$description}</td></tr>";
+		}
+		$block_content .= '<tr><td>Website online:</td><td>' . ($users->count + $guests->count) . '</td></tr>';
 		$block_content .= '<tr><td>Ver ' . $server_version . ':</td><td>'
 			. $link_zip . $link_exe . $link_targz . '</td></tr>';
 		$block_content .= '<tr><td>All downloads:</td><td>' . $link_all . '</td></tr>';
@@ -146,7 +153,50 @@ function tigase_monitor_decript($decript = NULL) {
     foreach ($decriptinfo as $name => $description) {
       $decriptinfo[$name] = array(trim($description));
     }
-    $decriptcols = ($callback ? $callback() : array(t('Downloads')));
   }
   return $decriptinfo;
+}
+
+/**
+ * Loads file metainformation from the specified file.
+ */
+function tigase_monitor_stats($stats = NULL) {
+  static $statscols = array();
+
+  // Return (previously generated) stats column list
+  if (!isset($stats)) { return $statscols; }
+
+	// Build stats information list
+  $statsinfo = array();
+  if (is_readable($stats) && ($file = file($stats))) {
+    foreach ($file as $line) {
+      // Skip empty and commented lines
+      if (trim($line) == '' || strpos(trim($line), '#') === 0) {
+        continue;
+      }
+			if (stripos($line, 'Packets received')) {
+				$split_line = explode(' ', trim($line));
+				$statsinfo['Packets:'] = $split_line[2];
+			}
+			if (stripos($line, 'Uptime')) {
+				$split_line = explode(' ', trim($line));
+				$statsinfo['Uptime:'] = $split_line[1] . 'd, ' . $split_line[3] . 'h';
+			}
+			if (stripos($line, 's2s')) {
+				$split_line = explode(' ', trim($line));
+				$statsinfo['Servers online:'] = $split_line[4];
+			}
+			if (stripos($line, 'c2s')) {
+				$split_line = explode(' ', trim($line));
+				$statsinfo['Clients online:'] = $split_line[3];
+			}
+    }
+
+//     foreach ($statsinfo as $name => $description) {
+//       $statsinfo[$name] = array(trim($description));
+//     }
+  }
+// 	print_r( $descriptinfo );
+// 	print_r( '<br/>' );
+  return $statsinfo;
 }
