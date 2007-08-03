@@ -303,7 +303,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 			if (attribs.get("version") != null) {
 				addOutPacket(Command.GETFEATURES.getPacket(
 					getFromAddress(getUniqueId(serv)),
-					routings.computeRouting(null), StanzaType.get, "sess1", null));
+					routings.computeRouting(null), StanzaType.get, "sess2", null));
 			} // end of if (attribs.get("version") != null)
 		} catch (IOException e) {
 			serv.stop();
