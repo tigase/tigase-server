@@ -79,9 +79,6 @@ public class JabberIqStats extends XMPPProcessor
 		if (session == null) { return; }
 
 		try {
-			// Maybe it is message to admininstrator:
-			String id = JIDUtils.getNodeID(packet.getElemTo());
-
 			log.finest("Received packet: " + packet.getStringData());
 
 			if (packet.isCommand()) {
@@ -104,6 +101,10 @@ public class JabberIqStats extends XMPPProcessor
 				}
 			} // end of if (packet.isCommand()
 
+
+			// Maybe it is message to admininstrator:
+			String id = packet.getElemTo() != null ?
+				JIDUtils.getNodeID(packet.getElemTo()) : null;
 
 			// If ID part of user account contains only host name
 			// and this is local domain it is message to admin
