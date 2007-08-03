@@ -68,6 +68,7 @@ public abstract class Constants {
 	protected static final String CHARSETS_ATTR = "charsets";
 	protected static final String VER_ATTR = "ver";
 	protected static final String FROM_ATTR = "from";
+	protected static final String AUTHID_ATTR = "authid";
 
 
 }

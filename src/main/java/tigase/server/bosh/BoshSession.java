@@ -24,10 +24,15 @@ package tigase.server.bosh;
 import java.util.UUID;
 import java.util.Map;
 import java.util.Queue;
-import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.LinkedList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.io.IOException;
 import tigase.server.Packet;
 import tigase.xml.Element;
+import tigase.server.Command;
+import tigase.xmpp.StanzaType;
 
 import static tigase.server.bosh.Constants.*;
 
@@ -42,9 +47,16 @@ import static tigase.server.bosh.Constants.*;
  */
 public class BoshSession {
 
+  /**
+   * Variable <code>log</code> is a class logger.
+   */
+  private static final Logger log =
+    Logger.getLogger("tigase.server.bosh.BoshSession");
+
 	private UUID sid = null;
-	private Map<UUID, BoshIOService> connections =
-		new LinkedHashMap<UUID, BoshIOService>();
+	private Queue<BoshIOService> connections =
+		new LinkedList<BoshIOService>();
+	private Queue<Packet> waiting_packets = new LinkedList<Packet>();
 	private long max_wait = MAX_WAIT_DEF_PROP_VAL;
 	private long min_polling = MIN_POLLING_PROP_VAL;
 	private long max_inactivity = MAX_INACTIVITY_PROP_VAL;
@@ -52,6 +64,7 @@ public class BoshSession {
 	private int hold_requests = HOLD_REQUESTS_PROP_VAL;
 	private long max_pause = MAX_PAUSE_PROP_VAL;
 	private String domain = null;
+	private String sessionId = null;
 
 	/**
 	 * Creates a new <code>BoshSession</code> instance.
@@ -62,9 +75,10 @@ public class BoshSession {
 		this.domain = def_domain;
 	}
 
-	public Packet init(Packet packet, BoshIOService service,
+	public void init(Packet packet, BoshIOService service,
 		long max_wait, long min_polling, long max_inactivity,
-		int concurrent_requests, int hold_requests, long max_pause)
+		int concurrent_requests, int hold_requests, long max_pause,
+		Queue<Packet> out_results)
 		throws IOException {
 		long wait_l = max_wait;
 		String wait_s = packet.getAttribute(WAIT_ATTR);
@@ -121,9 +135,19 @@ public class BoshSession {
 										BOSH_VERSION,
 										this.domain,
 										"true"});
+		sessionId = UUID.randomUUID().toString();
+		if (packet.getAttribute(VER_ATTR) == null) {
+			body.setAttribute(AUTHID_ATTR, sessionId);
+		}
 		body.setXMLNS(BOSH_XMLNS);
 		service.writeRawData(body.toString());
-		return null;
+		Packet streamOpen = Command.STREAM_OPENED.getPacket(null, null,
+			StanzaType.set, "sess1", "submit");
+		Command.addFieldValue(streamOpen, "session-id", sessionId);
+		Command.addFieldValue(streamOpen, "hostname", domain);
+		out_results.offer(streamOpen);
+		out_results.offer(Command.GETFEATURES.getPacket(null, null,
+				StanzaType.get, "sess1", null));
 	}
 
 	public UUID getSid() {
@@ -134,9 +158,52 @@ public class BoshSession {
 		return domain;
 	}
 
-	public void processPacket(Packet packet, BoshIOService service,
-		Queue<Packet> out_results) {
-		
+	public void processPacket(Packet packet, Queue<Packet> out_results)
+		throws IOException {
+
+		log.finest("Processing packet: " + packet.toString());
+
+		BoshIOService serv = connections.poll();
+		if (serv != null) {
+			Element body = new Element(BODY_EL_NAME,
+				new String[] {FROM_ATTR, SECURE_ATTR},
+				new String[] {this.domain, "true"});
+			body.setXMLNS(BOSH_XMLNS);
+			body.addChild(packet.getElement());
+			serv.writeRawData(body.toString());
+		} else {
+			waiting_packets.offer(packet);
+		}
+	}
+
+	public void processSocketPacket(Packet packet, BoshIOService service,
+		Queue<Packet> out_results) throws IOException {
+
+		log.finest("Processing socket packet: " + packet.toString());
+
+		if (packet.getElemName().equals(BODY_EL_NAME)) {
+			List<Element> children = packet.getElemChildren(BODY_EL_NAME);
+			if (children != null) {
+				for (Element el: children) {
+					out_results.offer(new Packet(el));
+				}
+			}
+			if (waiting_packets.size() > 0) {
+				Element body = new Element(BODY_EL_NAME,
+					new String[] {FROM_ATTR, SECURE_ATTR},
+					new String[] {this.domain, "true"});
+				body.setXMLNS(BOSH_XMLNS);
+				Packet pack = null;
+				while ((pack = waiting_packets.poll()) != null) {
+					body.addChild(pack.getElement());
+				}
+				service.writeRawData(body.toString());
+			} else {
+				connections.offer(service);
+			}
+		} else {
+			log.warning("Unexpected packet from the network: " + packet.toString());
+		}
 	}
 
 }

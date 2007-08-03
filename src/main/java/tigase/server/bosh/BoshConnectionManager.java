@@ -31,6 +31,7 @@ import java.util.TreeSet;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import tigase.xml.Element;
 import tigase.net.IOService;
 import tigase.server.Command;
 import tigase.server.ConnectionManager;
@@ -87,7 +88,44 @@ public class BoshConnectionManager extends ConnectionManager<BoshIOService> {
 		log.finer("Processing packet: " + packet.getElemName()
 			+ ", type: " + packet.getType());
 		log.finest("Processing packet: " + packet.getStringData());
-		writePacketToSocket(packet);
+		UUID sid = UUID.fromString(JIDUtils.getNodeResource(packet.getTo()));
+		BoshSession session = sessions.get(sid);
+		if (session != null) {
+			if (packet.isCommand() && packet.getCommand() != Command.OTHER) {
+				processCommand(packet, session);
+			} else {
+				Queue<Packet> out_results = new LinkedList<Packet>();
+				try {
+					session.processPacket(packet, out_results);
+				} catch (IOException e) {
+					log.warning("I/O Exception during processing packet: "
+						+ packet.toString()	+ ",    " + e);
+				}
+				addOutPackets(out_results, session);
+			}
+		} else {
+			log.warning("Session does not exist for packet: " + packet.toString());
+		}
+	}
+
+	private void processCommand(Packet packet, BoshSession session) {
+		XMPPIOService serv = getXMPPIOService(packet);
+		switch (packet.getCommand()) {
+		case GETFEATURES:
+			if (packet.getType() == StanzaType.result) {
+				Element elem_features = new Element("stream:features");
+				elem_features.addChildren(Command.getData(packet));
+				try {
+					session.processPacket(new Packet(elem_features), null);
+				} catch (IOException e) {
+					log.warning("I/O Exception during processing packet: "
+						+ elem_features.toString()	+ ",    " + e);
+				}
+			} // end of if (packet.getType() == StanzaType.get)
+			break;
+		default:
+			break;
+		} // end of switch (pc.getCommand())
 	}
 
 	public Queue<Packet> processSocketData(BoshIOService serv) {
@@ -98,47 +136,41 @@ public class BoshConnectionManager extends ConnectionManager<BoshIOService> {
 			log.finest("Processing socket data: " + p.getStringData());
 			String sid_str = p.getAttribute(SID_ATTR);
 			UUID sid = null;
-			Queue<Packet> out_results = new LinkedList<Packet>();
 			try {
+				Queue<Packet> out_results = new LinkedList<Packet>();
+				BoshSession bs = null;
 				if (sid_str == null) {
-					BoshSession bs = new BoshSession(getDefHostName());
+					bs = new BoshSession(getDefHostName());
 					sid = bs.getSid();
 					sessions.put(sid, bs);
-					Packet result = bs.init(p, serv, max_wait, min_polling, max_inactivity,
-						concurrent_requests, hold_requests, max_pause);
-					Packet streamOpen = Command.STREAM_OPENED.getPacket(
-						getFromAddress(sid.toString()),
-						routings.computeRouting(bs.getDomain()),
-						StanzaType.set, "sess1", "submit");
-					Command.addFieldValue(streamOpen, "session-id", sid.toString());
-					Command.addFieldValue(streamOpen, "hostname", bs.getDomain());
-					addOutPacket(streamOpen);
-					if (result != null) {
-						result.setFrom(getFromAddress(sid.toString()));
-						result.setTo(routings.computeRouting(bs.getDomain()));
-						out_results.offer(result);
-					}
+					bs.init(p, serv, max_wait, min_polling, max_inactivity,
+						concurrent_requests, hold_requests, max_pause, out_results);
 				} else {
 					sid = UUID.fromString(sid_str);
-					BoshSession bs = sessions.get(sid);
+					bs = sessions.get(sid);
 					if (bs != null) {
-						bs.processPacket(p, serv, out_results);
-						for (Packet res: out_results) {
-							res.setFrom(getFromAddress(bs.getSid().toString()));
-							res.setTo(routings.computeRouting(bs.getDomain()));
-						}
+						bs.processSocketPacket(p, serv, out_results);
 					} else {
 						log.warning("There is no session with given SID. Ignoring for now...");
 					}
 				}
+				addOutPackets(out_results, bs);
 			} catch (Exception e) {
 				log.log(Level.WARNING,
-					"Problem processing socket data for sid =  " + sid,
-					e);
+					"Problem processing socket data for sid =  " + sid,	e);
 			}
-			addOutPackets(out_results);
+			//addOutPackets(out_results);
 		} // end of while ()
 		return null;
+	}
+
+	private void addOutPackets(Queue<Packet> out_results, BoshSession bs) {
+		for (Packet res: out_results) {
+			res.setFrom(getFromAddress(bs.getSid().toString()));
+			res.setTo(routings.computeRouting(bs.getDomain()));
+			addOutPacket(res);
+		}
+		out_results.clear();
 	}
 
 	private String getFromAddress(String id) {
