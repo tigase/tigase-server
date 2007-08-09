@@ -26,6 +26,9 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.List;
 import java.util.LinkedList;
+import java.util.EnumMap;
+import java.util.LinkedHashMap;
+import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.io.IOException;
@@ -33,6 +36,7 @@ import tigase.server.Packet;
 import tigase.xml.Element;
 import tigase.server.Command;
 import tigase.xmpp.StanzaType;
+import tigase.xmpp.Authorization;
 
 import static tigase.server.bosh.Constants.*;
 
@@ -57,6 +61,7 @@ public class BoshSession {
 	private Queue<BoshIOService> connections =
 		new LinkedList<BoshIOService>();
 	private Queue<Packet> waiting_packets = new LinkedList<Packet>();
+	private BoshSessionTaskHandler handler = null;
 	private long max_wait = MAX_WAIT_DEF_PROP_VAL;
 	private long min_polling = MIN_POLLING_PROP_VAL;
 	private long max_inactivity = MAX_INACTIVITY_PROP_VAL;
@@ -65,14 +70,16 @@ public class BoshSession {
 	private long max_pause = MAX_PAUSE_PROP_VAL;
 	private String domain = null;
 	private String sessionId = null;
+	private boolean scheduledForDeletion = false;
 
 	/**
 	 * Creates a new <code>BoshSession</code> instance.
 	 *
 	 */
-	public BoshSession(String def_domain) {
+	public BoshSession(String def_domain, BoshSessionTaskHandler handler) {
 		this.sid = UUID.randomUUID();
 		this.domain = def_domain;
+		this.handler = handler;
 	}
 
 	public void init(Packet packet, BoshIOService service,
@@ -158,13 +165,14 @@ public class BoshSession {
 		return domain;
 	}
 
-	public void processPacket(Packet packet, Queue<Packet> out_results)
+	public synchronized void processPacket(Packet packet, Queue<Packet> out_results)
 		throws IOException {
 
 		log.finest("Processing packet: " + packet.toString());
 
 		BoshIOService serv = connections.poll();
 		if (serv != null) {
+			serv.setSid(null);
 			Element body = new Element(BODY_EL_NAME,
 				new String[] {FROM_ATTR, SECURE_ATTR},
 				new String[] {this.domain, "true"});
@@ -176,8 +184,8 @@ public class BoshSession {
 		}
 	}
 
-	public void processSocketPacket(Packet packet, BoshIOService service,
-		Queue<Packet> out_results) throws IOException {
+	public synchronized void processSocketPacket(Packet packet,
+		BoshIOService service, Queue<Packet> out_results) throws IOException {
 
 		log.finest("Processing socket packet: " + packet.toString());
 
@@ -199,11 +207,57 @@ public class BoshSession {
 				}
 				service.writeRawData(body.toString());
 			} else {
+				service.setSid(sid);
 				connections.offer(service);
 			}
 		} else {
 			log.warning("Unexpected packet from the network: " + packet.toString());
 		}
+	}
+
+	private enum TimedTask { EMPTY_RESP, STOP };
+	private Map<TimerTask, TimedTask> task_enum =
+		new LinkedHashMap<TimerTask, TimedTask>();
+	private EnumMap<TimedTask, TimerTask> enum_task =
+		new EnumMap<TimedTask, TimerTask>(TimedTask.class);
+
+	public void disconnected(BoshIOService bios) {
+		connections.remove(bios);
+		if (connections.size() == 0) {
+			TimerTask tt = handler.scheduleTask(this, max_pause);
+			task_enum.put(tt, TimedTask.STOP);
+			enum_task.put(TimedTask.STOP, tt);
+		}
+	}
+
+	public synchronized boolean task(Queue<Packet> out_results, TimerTask tt) {
+		TimedTask ttask = task_enum.remove(tt);
+		if (ttask != null) {
+			enum_task.remove(ttask);
+			switch (ttask) {
+			case STOP:
+				for (TimerTask ttemp: task_enum.keySet()) {
+					handler.cancelTask(ttemp);
+				}
+				for (Packet packet: waiting_packets) {
+					if (packet.getType() == null || packet.getType() != StanzaType.error) {
+						out_results.offer(
+							Authorization.RECIPIENT_UNAVAILABLE.getResponseMessage(packet,
+								"Bosh = disconnected", true));
+					}
+				}
+				return true;
+			case EMPTY_RESP:
+
+				break;
+			default:
+				log.warning("Uknown TimedTask value: " + ttask.toString());
+				break;
+			}
+		} else {
+			log.warning("TimedTask enum is null for scheduled task....");
+		}
+		return false;
 	}
 
 }

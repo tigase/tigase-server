@@ -23,6 +23,7 @@ package tigase.server.bosh;
 
 import java.util.logging.Logger;
 import java.io.IOException;
+import java.util.UUID;
 import tigase.xmpp.XMPPIOService;
 
 /**
@@ -42,6 +43,8 @@ public class BoshIOService extends XMPPIOService {
   private static final Logger log =
     Logger.getLogger("tigase.server.bosh.BoshIOService");
 
+	private UUID sid = null;
+
 	private static final String EOL = "\r\n";
 
 	private String content_type = "text/xml; charset=utf-8";
@@ -59,6 +62,14 @@ public class BoshIOService extends XMPPIOService {
 		sb.append(data);
 		log.finest("Writing to socket:\n" + sb.toString());
 		super.writeRawData(sb.toString());
+	}
+
+	public void setSid(UUID sid) {
+		this.sid = sid;
+	}
+
+	public UUID getSid() {
+		return this.sid;
 	}
 
 }

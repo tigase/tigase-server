@@ -29,6 +29,8 @@ import java.util.LinkedList;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.xml.Element;
@@ -54,7 +56,8 @@ import static tigase.server.MessageRouterConfig.DEF_SM_NAME;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class BoshConnectionManager extends ConnectionManager<BoshIOService> {
+public class BoshConnectionManager extends ConnectionManager<BoshIOService>
+	implements BoshSessionTaskHandler {
 
   /**
    * Variable <code>log</code> is a class logger.
@@ -140,7 +143,7 @@ public class BoshConnectionManager extends ConnectionManager<BoshIOService> {
 				Queue<Packet> out_results = new LinkedList<Packet>();
 				BoshSession bs = null;
 				if (sid_str == null) {
-					bs = new BoshSession(getDefHostName());
+					bs = new BoshSession(getDefHostName(), this);
 					sid = bs.getSid();
 					sessions.put(sid, bs);
 					bs.init(p, serv, max_wait, min_polling, max_inactivity,
@@ -244,6 +247,13 @@ public class BoshConnectionManager extends ConnectionManager<BoshIOService> {
 
 	public void serviceStopped(BoshIOService service) {
 		super.serviceStopped(service);
+		UUID sid = service.getSid();
+		if (sid != null) {
+			BoshSession bs = sessions.get(sid);
+			if (bs != null) {
+				bs.disconnected(service);
+			}
+		}
 	}
 
 	public void serviceStarted(BoshIOService service) {
@@ -272,6 +282,36 @@ public class BoshConnectionManager extends ConnectionManager<BoshIOService> {
 
 	protected BoshIOService getXMPPIOServiceInstance() {
 		return new BoshIOService();
+	}
+
+	private Timer boshTasks = new Timer("BoshTasks");
+
+	public TimerTask scheduleTask(BoshSession bs, long delay) {
+		BoshTask bt = new BoshTask(bs);
+		boshTasks.schedule(bt, delay);
+		return bt;
+	}
+
+	public void cancelTask(TimerTask tt) {
+		tt.cancel();
+	}
+
+	private class BoshTask extends TimerTask {
+
+		private BoshSession bs = null;
+
+		public BoshTask(BoshSession bs) {
+			this.bs = bs;
+		}
+
+		public void run() {
+			Queue<Packet> out_results = new LinkedList<Packet>();
+			if (bs.task(out_results, this)) {
+				sessions.remove(bs.getSid());
+			}
+			addOutPackets(out_results, bs);
+		}
+
 	}
 
 }
