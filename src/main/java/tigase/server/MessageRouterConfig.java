@@ -114,13 +114,15 @@ public class MessageRouterConfig {
 			if (config_type.equals(GEN_CONFIG_CS)) {
 				rcv_names = CS_MSG_RECEIVERS_NAMES_PROP_VAL;
 			}
-			if (config_type.equals(GEN_CONFIG_COMP)) {
-				String c_name = (String)params.get(GEN_COMP_NAME);
-				String c_class = (String)params.get(GEN_COMP_CLASS);
-				rcv_names = new String[] {c_name};
-				defs.put(MSG_RECEIVERS_PROP_KEY + c_name + ".class", c_class);
-				defs.put(MSG_RECEIVERS_PROP_KEY + c_name + ".active", true);
-			}
+			// You can now add a component for any server instance type
+			// and you can also add many different components this way...
+// 			if (config_type.equals(GEN_CONFIG_COMP)) {
+// 				String c_name = (String)params.get(GEN_COMP_NAME);
+// 				String c_class = (String)params.get(GEN_COMP_CLASS);
+// 				rcv_names = new String[] {c_name};
+// 				defs.put(MSG_RECEIVERS_PROP_KEY + c_name + ".class", c_class);
+// 				defs.put(MSG_RECEIVERS_PROP_KEY + c_name + ".active", true);
+// 			}
 		}
 
 		Arrays.sort(rcv_names);
@@ -132,8 +134,22 @@ public class MessageRouterConfig {
 				if (Arrays.binarySearch(rcv_names, new_comp_name) < 0) {
 					rcv_names = Arrays.copyOf(rcv_names, rcv_names.length+1);
 					rcv_names[rcv_names.length-1] = new_comp_name;
+					Arrays.sort(rcv_names);
 				}
 			} // end of if (key.startsWith(GEN_EXT_COMP))
+			if (key.startsWith(GEN_COMP_NAME)) {
+				String comp_name_suffix = key.substring(GEN_COMP_NAME.length());
+				String c_name = (String)params.get(GEN_COMP_NAME + comp_name_suffix);
+				String c_class = (String)params.get(GEN_COMP_CLASS + comp_name_suffix);
+				if (Arrays.binarySearch(rcv_names, c_name) < 0) {
+					defs.put(MSG_RECEIVERS_PROP_KEY + c_name + ".class", c_class);
+					defs.put(MSG_RECEIVERS_PROP_KEY + c_name + ".active", true);
+					rcv_names = Arrays.copyOf(rcv_names, rcv_names.length+1);
+					rcv_names[rcv_names.length-1] = c_name;
+					Arrays.sort(rcv_names);
+					//System.out.println(Arrays.toString(rcv_names));
+				}
+			}
 		} // end of for ()
 
 		defs.put(MSG_RECEIVERS_NAMES_PROP_KEY, rcv_names);
