@@ -57,6 +57,8 @@ public class BoshSession {
   private static final Logger log =
     Logger.getLogger("tigase.server.bosh.BoshSession");
 
+	private static final long SECOND = 1000;
+
 	private UUID sid = null;
 	private Queue<BoshIOService> connections =
 		new LinkedList<BoshIOService>();
@@ -68,9 +70,16 @@ public class BoshSession {
 	private int concurrent_requests = CONCURRENT_REQUESTS_PROP_VAL;
 	private int hold_requests = HOLD_REQUESTS_PROP_VAL;
 	private long max_pause = MAX_PAUSE_PROP_VAL;
+	private String content_type = CONTENT_TYPE_DEF;
 	private String domain = null;
 	private String sessionId = null;
 	private boolean scheduledForDeletion = false;
+
+	private enum TimedTask { EMPTY_RESP, STOP };
+	private Map<TimerTask, TimedTask> task_enum =
+		new LinkedHashMap<TimerTask, TimedTask>();
+	private EnumMap<TimedTask, TimerTask> enum_task =
+		new EnumMap<TimedTask, TimerTask>(TimedTask.class);
 
 	/**
 	 * Creates a new <code>BoshSession</code> instance.
@@ -85,8 +94,7 @@ public class BoshSession {
 	public void init(Packet packet, BoshIOService service,
 		long max_wait, long min_polling, long max_inactivity,
 		int concurrent_requests, int hold_requests, long max_pause,
-		Queue<Packet> out_results)
-		throws IOException {
+		Queue<Packet> out_results) {
 		long wait_l = max_wait;
 		String wait_s = packet.getAttribute(WAIT_ATTR);
 		if (wait_s != null) {
@@ -115,8 +123,9 @@ public class BoshSession {
 		this.concurrent_requests = concurrent_requests;
 		this.max_pause = max_pause;
 		if (packet.getAttribute(CONTENT_ATTR) != null) {
-			service.setContentType(packet.getAttribute(CONTENT_ATTR));
+			content_type = packet.getAttribute(CONTENT_ATTR);
 		}
+		service.setContentType(content_type);
 // 		ack='1573741820'
 // 		accept='deflate,gzip'
 // 		charsets='ISO_8859-1 ISO-2022-JP'
@@ -147,7 +156,8 @@ public class BoshSession {
 			body.setAttribute(AUTHID_ATTR, sessionId);
 		}
 		body.setXMLNS(BOSH_XMLNS);
-		service.writeRawData(body.toString());
+		sendBody(service, body);
+		//service.writeRawData(body.toString());
 		Packet streamOpen = Command.STREAM_OPENED.getPacket(null, null,
 			StanzaType.set, "sess1", "submit");
 		Command.addFieldValue(streamOpen, "session-id", sessionId);
@@ -165,29 +175,59 @@ public class BoshSession {
 		return domain;
 	}
 
-	public synchronized void processPacket(Packet packet, Queue<Packet> out_results)
-		throws IOException {
+	public synchronized void processPacket(Packet packet,
+		Queue<Packet> out_results) {
 
-		log.finest("Processing packet: " + packet.toString());
-
-		BoshIOService serv = connections.poll();
-		if (serv != null) {
-			serv.setSid(null);
-			Element body = new Element(BODY_EL_NAME,
-				new String[] {FROM_ATTR, SECURE_ATTR},
-				new String[] {this.domain, "true"});
-			body.setXMLNS(BOSH_XMLNS);
-			body.addChild(packet.getElement());
-			serv.writeRawData(body.toString());
-		} else {
+		if (packet != null) {
+			log.finest("[" + connections.size() +
+				"] Processing packet: " + packet.toString());
 			waiting_packets.offer(packet);
+		}
+		if (connections.size() > 0 && waiting_packets.size() > 0) {
+			BoshIOService serv = connections.poll();
+			sendBody(serv, null);
 		}
 	}
 
-	public synchronized void processSocketPacket(Packet packet,
-		BoshIOService service, Queue<Packet> out_results) throws IOException {
+	private void sendBody(BoshIOService serv, Element body_par) {
+		Element body = body_par;
+		if (body == null) {
+			body = new Element(BODY_EL_NAME,
+				new String[] {FROM_ATTR, SECURE_ATTR},
+				new String[] {this.domain, "true"});
+			body.setXMLNS(BOSH_XMLNS);
+			for (Packet pack: waiting_packets) {
+				body.addChild(pack.getElement());
+			}
+		}
+		try {
+			serv.writeRawData(body.toString());
+			waiting_packets.clear();
+		} catch (IOException e) {
+			// I call it anyway at the end of method call
+			//disconnected(null);
+			log.log(Level.WARNING, "[" + connections.size() +
+				"] Exception during writing to socket", e);
+		}
+		serv.setSid(null);
+		disconnected(serv);
+	}
 
-		log.finest("Processing socket packet: " + packet.toString());
+	public synchronized void processSocketPacket(Packet packet,
+		BoshIOService service, Queue<Packet> out_results) {
+
+		log.finest("[" + connections.size() +
+			"] Processing socket packet: " + packet.toString());
+
+		TimerTask tt = enum_task.remove(TimedTask.STOP);
+		if (tt != null) {
+			task_enum.remove(tt);
+			handler.cancelTask(tt);
+		}
+
+		service.setContentType(content_type);
+		service.setSid(sid);
+		connections.offer(service);
 
 		if (packet.getElemName().equals(BODY_EL_NAME)) {
 			List<Element> children = packet.getElemChildren(BODY_EL_NAME);
@@ -196,35 +236,29 @@ public class BoshSession {
 					out_results.offer(new Packet(el));
 				}
 			}
-			if (waiting_packets.size() > 0) {
-				Element body = new Element(BODY_EL_NAME,
-					new String[] {FROM_ATTR, SECURE_ATTR},
-					new String[] {this.domain, "true"});
-				body.setXMLNS(BOSH_XMLNS);
-				Packet pack = null;
-				while ((pack = waiting_packets.poll()) != null) {
-					body.addChild(pack.getElement());
-				}
-				service.writeRawData(body.toString());
-			} else {
-				service.setSid(sid);
-				connections.offer(service);
-			}
 		} else {
-			log.warning("Unexpected packet from the network: " + packet.toString());
+			log.warning("[" + connections.size() +
+				"] Unexpected packet from the network: " + packet.toString());
+		}
+		// Send packets waiting in queue...
+		processPacket(null, out_results);
+
+		tt = enum_task.get(TimedTask.EMPTY_RESP);
+		// Checking (waiting_packets.size() == 0) is probably redundant here
+		if (connections.size() > 0 && waiting_packets.size() == 0 && tt == null) {
+			task_enum.put(tt, TimedTask.EMPTY_RESP);
+			enum_task.put(TimedTask.EMPTY_RESP, tt);
+			tt = handler.scheduleTask(this, max_wait*SECOND);
 		}
 	}
 
-	private enum TimedTask { EMPTY_RESP, STOP };
-	private Map<TimerTask, TimedTask> task_enum =
-		new LinkedHashMap<TimerTask, TimedTask>();
-	private EnumMap<TimedTask, TimerTask> enum_task =
-		new EnumMap<TimedTask, TimerTask>(TimedTask.class);
-
-	public void disconnected(BoshIOService bios) {
-		connections.remove(bios);
-		if (connections.size() == 0) {
-			TimerTask tt = handler.scheduleTask(this, max_pause);
+	public synchronized void disconnected(BoshIOService bios) {
+		if (bios != null) {
+			connections.remove(bios);
+		}
+		TimerTask tt = enum_task.get(TimedTask.STOP);
+		if (connections.size() == 0 && tt == null) {
+			tt = handler.scheduleTask(this, max_pause*SECOND);
 			task_enum.put(tt, TimedTask.STOP);
 			enum_task.put(TimedTask.STOP, tt);
 		}
@@ -248,14 +282,19 @@ public class BoshSession {
 				}
 				return true;
 			case EMPTY_RESP:
-
+				BoshIOService serv = connections.poll();
+				if (serv != null) {
+					sendBody(serv, null);
+				}
 				break;
 			default:
-				log.warning("Uknown TimedTask value: " + ttask.toString());
+				log.warning("[" + connections.size() +
+					"] Uknown TimedTask value: " + ttask.toString());
 				break;
 			}
 		} else {
-			log.warning("TimedTask enum is null for scheduled task....");
+			log.warning("[" + connections.size() +
+				"] TimedTask enum is null for scheduled task....");
 		}
 		return false;
 	}

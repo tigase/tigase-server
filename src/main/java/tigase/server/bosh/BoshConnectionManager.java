@@ -98,12 +98,7 @@ public class BoshConnectionManager extends ConnectionManager<BoshIOService>
 				processCommand(packet, session);
 			} else {
 				Queue<Packet> out_results = new LinkedList<Packet>();
-				try {
-					session.processPacket(packet, out_results);
-				} catch (IOException e) {
-					log.warning("I/O Exception during processing packet: "
-						+ packet.toString()	+ ",    " + e);
-				}
+				session.processPacket(packet, out_results);
 				addOutPackets(out_results, session);
 			}
 		} else {
@@ -118,12 +113,7 @@ public class BoshConnectionManager extends ConnectionManager<BoshIOService>
 			if (packet.getType() == StanzaType.result) {
 				Element elem_features = new Element("stream:features");
 				elem_features.addChildren(Command.getData(packet));
-				try {
-					session.processPacket(new Packet(elem_features), null);
-				} catch (IOException e) {
-					log.warning("I/O Exception during processing packet: "
-						+ elem_features.toString()	+ ",    " + e);
-				}
+				session.processPacket(new Packet(elem_features), null);
 			} // end of if (packet.getType() == StanzaType.get)
 			break;
 		default:

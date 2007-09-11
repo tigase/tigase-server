@@ -70,5 +70,7 @@ public abstract class Constants {
 	protected static final String FROM_ATTR = "from";
 	protected static final String AUTHID_ATTR = "authid";
 
+	protected static final String CONTENT_TYPE_DEF = "text/xml; charset=utf-8";
+
 
 }
