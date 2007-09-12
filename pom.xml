@@ -81,15 +81,15 @@
   </repositories>
   <dependencies>
     <dependency>
-      <groupId>tigase-utils</groupId>
+      <groupId>tigase</groupId>
       <artifactId>tigase-utils</artifactId>
-      <version>3.0.0</version>
+      <version>3.0.1-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>tigase-xmltools</groupId>
+      <groupId>tigase</groupId>
       <artifactId>tigase-xmltools</artifactId>
-      <version>3.0.0</version>
+      <version>3.0.1-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
