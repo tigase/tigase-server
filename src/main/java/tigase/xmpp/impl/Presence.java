@@ -276,6 +276,17 @@ public class Presence extends XMPPProcessor
 		log.finest("Added direct presence jid: " + jid);
 	}
 
+	@SuppressWarnings({"unchecked"})
+	protected void removeDirectPresenceJID(String jid,
+		XMPPResourceConnection session ) {
+		Set<String> direct_presences =
+			(Set<String>)session.getSessionData(DIRECT_PRESENCE);
+		if (direct_presences != null) {
+			direct_presences.remove(jid);
+		} // end of if (direct_presences == null)
+		log.finest("Added direct presence jid: " + jid);
+	}
+
 	@SuppressWarnings("fallthrough")
   public void process(final Packet packet, final XMPPResourceConnection session,
 		final NonAuthUserRepository repo, final Queue<Packet> results) {
@@ -313,7 +324,14 @@ public class Presence extends XMPPProcessor
 					// Yes this is it, send direct presence
 					Element result = packet.getElement().clone();
 					results.offer(new Packet(result));
-					addDirectPresenceJID(packet.getElemTo(), session);
+					// If this is unavailable presence, remove jid from Set
+					// otherwise add it to the Set
+					if (packet.getType() != null &&
+						packet.getType() == StanzaType.unavailable) {
+						removeDirectPresenceJID(packet.getElemTo(), session);
+					} else {
+						addDirectPresenceJID(packet.getElemTo(), session);
+					}
 				} else {
 					boolean first = false;
 					if (session.getSessionData(PRESENCE_KEY) == null) {
