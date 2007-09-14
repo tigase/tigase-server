@@ -211,6 +211,12 @@ public class BoshSession {
 		}
 		serv.setSid(null);
 		disconnected(serv);
+		TimerTask tt = enum_task.remove(TimedTask.EMPTY_RESP);
+		if (tt != null) {
+			task_enum.remove(tt);
+			handler.cancelTask(tt);
+		}
+
 	}
 
 	public synchronized void processSocketPacket(Packet packet,
@@ -233,6 +239,9 @@ public class BoshSession {
 			List<Element> children = packet.getElemChildren(BODY_EL_NAME);
 			if (children != null) {
 				for (Element el: children) {
+					if (el.getXMLNS().equals(BOSH_XMLNS)) {
+						el.setXMLNS("jabber:client");
+					}
 					out_results.offer(new Packet(el));
 				}
 			}
@@ -243,12 +252,17 @@ public class BoshSession {
 		// Send packets waiting in queue...
 		processPacket(null, out_results);
 
+		if (connections.size() > 1) {
+			BoshIOService serv = connections.poll();
+			sendBody(serv, null);
+		}
+
 		tt = enum_task.get(TimedTask.EMPTY_RESP);
 		// Checking (waiting_packets.size() == 0) is probably redundant here
 		if (connections.size() > 0 && waiting_packets.size() == 0 && tt == null) {
+			tt = handler.scheduleTask(this, max_wait*SECOND);
 			task_enum.put(tt, TimedTask.EMPTY_RESP);
 			enum_task.put(TimedTask.EMPTY_RESP, tt);
-			tt = handler.scheduleTask(this, max_wait*SECOND);
 		}
 	}
 
