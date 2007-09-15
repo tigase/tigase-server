@@ -171,7 +171,7 @@ function tigase_monitor_stats($stats = NULL) {
   if (is_readable($stats) && ($file = file($stats))) {
     foreach ($file as $line) {
       // Skip empty and commented lines
-      if (trim($line) == '' || strpos(trim($line), '#') === 0) {
+      if (trim($line) == '' || strpos(trim($line), '#') == 0) {
         continue;
       }
 			if (stripos($line, 'Packets received')) {
@@ -180,7 +180,15 @@ function tigase_monitor_stats($stats = NULL) {
 			}
 			if (stripos($line, 'Uptime')) {
 				$split_line = explode(' ', trim($line));
-				$statsinfo['Uptime:'] = $split_line[1] . 'd, ' . $split_line[3] . 'h';
+				if (sizeof($split_line) < 6) {
+					$statsinfo['Uptime:'] = $split_line[1] . 'm, ' . $split_line[3] . 's';
+				} else {
+					if (sizeof($split_line) < 8) {
+						$statsinfo['Uptime:'] = $split_line[1] . 'h, ' . $split_line[3] . 'm';
+					} else {
+						$statsinfo['Uptime:'] = $split_line[1] . 'd, ' . $split_line[3] . 'h';
+					}
+				}
 			}
 			if (stripos($line, 's2s')) {
 				$split_line = explode(' ', trim($line));
