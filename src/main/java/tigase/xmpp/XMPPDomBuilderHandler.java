@@ -69,7 +69,6 @@ public class XMPPDomBuilderHandler implements SimpleHandler {
 
   private Object parserState = null;
   private String top_xmlns = null;
-  private String def_xmlns = null;
 	private XMPPIOService service = null;
 
   private LinkedList<Element> all_roots = new LinkedList<Element>();
@@ -147,10 +146,12 @@ public class XMPPDomBuilderHandler implements SimpleHandler {
     Element elem = newElement(tmp_name, null, attr_names, attr_values);
     String ns = elem.getXMLNS();
     if (ns == null) {
-      elem.setDefXMLNS(def_xmlns);
-    } else {
-      def_xmlns = ns;
-    } // end of if (ns == null) else
+			if (el_stack.isEmpty() || el_stack.peek().getXMLNS() == null) {
+				elem.setDefXMLNS(top_xmlns);
+			} else {
+				elem.setDefXMLNS(el_stack.peek().getXMLNS());
+			}
+    }
 		if (new_xmlns != null) {
 			elem.setXMLNS(new_xmlns);
 			elem.removeAttribute("xmlns:" + prefix);
@@ -184,10 +185,8 @@ public class XMPPDomBuilderHandler implements SimpleHandler {
     Element elem = el_stack.pop();
     if (el_stack.isEmpty()) {
       all_roots.offer(elem);
-      def_xmlns = top_xmlns;
       log.finest("Adding new request: "+elem.toString());
-    } // end of if (el_stack.isEmpty())
-    else {
+    } else {
       el_stack.peek().addChild(elem);
     } // end of if (el_stack.isEmpty()) else
   }
