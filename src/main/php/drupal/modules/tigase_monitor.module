@@ -144,8 +144,7 @@ function tigase_monitor_decript($decript = NULL) {
       list($name, $description) = explode(" ", $line, 2);
       if (isset($decriptinfo[$name])) {
         $decriptinfo[$name] .= trim($description) . " ";
-      }
-      else {
+      } else {
         $decriptinfo[$name] = trim($description) . " ";
       }
     }
@@ -171,7 +170,7 @@ function tigase_monitor_stats($stats = NULL) {
   if (is_readable($stats) && ($file = file($stats))) {
     foreach ($file as $line) {
       // Skip empty and commented lines
-      if (trim($line) == '' || strpos(trim($line), '#') == 0) {
+      if ((trim($line) == '') || strpos(trim($line), '#')) {
         continue;
       }
 			if (stripos($line, 'Packets received')) {
@@ -204,7 +203,7 @@ function tigase_monitor_stats($stats = NULL) {
 //       $statsinfo[$name] = array(trim($description));
 //     }
   }
-// 	print_r( $descriptinfo );
-// 	print_r( '<br/>' );
+//  	print_r( $statsinfo );
+//  	print_r( '<br/>' );
   return $statsinfo;
 }
