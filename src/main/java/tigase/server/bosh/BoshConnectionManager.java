@@ -90,7 +90,7 @@ public class BoshConnectionManager extends ConnectionManager<BoshIOService>
 	public void processPacket(Packet packet) {
 		log.finer("Processing packet: " + packet.getElemName()
 			+ ", type: " + packet.getType());
-		log.finest("Processing packet: " + packet.getStringData());
+		log.finest("Processing packet: " + packet.toString());
 		UUID sid = UUID.fromString(JIDUtils.getNodeResource(packet.getTo()));
 		BoshSession session = sessions.get(sid);
 		if (session != null) {
@@ -126,7 +126,7 @@ public class BoshConnectionManager extends ConnectionManager<BoshIOService>
 		while ((p = serv.getReceivedPackets().poll()) != null) {
 			log.finer("Processing packet: " + p.getElemName()
 				+ ", type: " + p.getType());
-			log.finest("Processing socket data: " + p.getStringData());
+			log.finest("Processing socket data: " + p.toString());
 			String sid_str = p.getAttribute(SID_ATTR);
 			UUID sid = null;
 			try {

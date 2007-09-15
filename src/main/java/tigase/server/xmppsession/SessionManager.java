@@ -132,7 +132,7 @@ public class SessionManager extends AbstractMessageReceiver
 	}
 
 	public void processPacket(Packet packet) {
-		log.finest("Processing packet: " + packet.getStringData());
+		log.finest("Processing packet: " + packet.toString());
 		if (packet.isCommand()) {
 			processCommand(packet);
 			packet.processedBy("SessionManager");

@@ -121,7 +121,7 @@ public class PacketFilter {
 			return false;
 		} // end of if (session == null)
 
-		log.finest("Processing packet: " + packet.getStringData());
+		log.finest("Processing packet: " + packet.toString());
 
 		try {
 			// Can not forward packet if there is no destination address

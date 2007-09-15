@@ -222,7 +222,8 @@ public class Packet {
   }
 
 	public String toString() {
-		return "to="+to+", from="+from+", data="+elem.toString();
+		return "to="+to+", from="+from+", data="+elem.toString()
+			+", XMLNS="+elem.getXMLNS();
 	}
 
 	public boolean isRouted() {

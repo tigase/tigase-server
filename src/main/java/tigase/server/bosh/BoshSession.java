@@ -242,7 +242,9 @@ public class BoshSession {
 					if (el.getXMLNS().equals(BOSH_XMLNS)) {
 						el.setXMLNS("jabber:client");
 					}
-					out_results.offer(new Packet(el));
+					Packet result = new Packet(el);
+					log.finest("Sending out packet: " + result.toString());
+					out_results.offer(result);
 				}
 			}
 		} else {
