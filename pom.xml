@@ -3,7 +3,7 @@
   <groupId>tigase</groupId>
   <artifactId>tigase-server</artifactId>
   <name>TigaseXMPPServer</name>
-  <version>3.0.1-beta</version>
+  <version>3.0.1-SNAPSHOT</version>
   <description>Tigase XMPP Server</description>
   <url>http://www.tigase.org/</url>
   <issueManagement>
@@ -26,9 +26,9 @@
     </license>
   </licenses>
   <scm>
-    <connection>scm:svn:https://svn.tigase.org/reps/tigase-server/tags/tigase-server-3.0.1-beta</connection>
-    <developerConnection>scm:svn:https://svn.tigase.org/reps/tigase-server/tags/tigase-server-3.0.1-beta</developerConnection>
-    <url>scm:svn:https://svn.tigase.org/reps/tigase-server/tags/tigase-server-3.0.1-beta</url>
+    <connection>scm:svn:https://svn.tigase.org/reps/tigase-server/trunk</connection>
+    <developerConnection>scm:svn:https://svn.tigase.org/reps/tigase-server/trunk</developerConnection>
+    <url>https://svn.tigase.org/reps/tigase-server</url>
   </scm>
   <organization>
     <name>Tigase</name>
