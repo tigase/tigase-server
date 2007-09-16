@@ -197,6 +197,10 @@ function tigase_monitor_stats($stats = NULL) {
 				$split_line = explode(' ', trim($line));
 				$statsinfo['Clients online:'] = $split_line[3];
 			}
+			if (stripos($line, 'bosh')) {
+				$split_line = explode(' ', trim($line));
+				$statsinfo['Bosh online:'] = $split_line[3];
+			}
     }
 
 //     foreach ($statsinfo as $name => $description) {
