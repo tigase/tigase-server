@@ -34,6 +34,7 @@ import java.util.logging.Logger;
 import tigase.conf.Configurable;
 import tigase.db.RepositoryFactory;
 import tigase.db.TigaseDBException;
+import tigase.db.UserExistsException;
 import tigase.db.UserRepository;
 import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
@@ -372,11 +373,14 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		try {
 			String cls_name = (String)props.get(SREC_REPO_CLASS_PROP_KEY);
 			String res_uri = (String)props.get(SREC_REPO_URL_PROP_KEY);
-			if (!res_uri.contains("autoCreateUser=true")) {
-				res_uri += "&autoCreateUser=true";
-			} // end of if (!res_uri.contains("autoCreateUser=true"))
+// 			if (!res_uri.contains("autoCreateUser=true")) {
+// 				res_uri += "&autoCreateUser=true";
+// 			} // end of if (!res_uri.contains("autoCreateUser=true"))
 			repository = RepositoryFactory.getUserRepository(getName(),
 				cls_name, res_uri);
+			try {
+				repository.addUser(myDomain());
+			} catch (UserExistsException e) { /*Ignore, this is correct and expected*/	}
 
 			loadTasksFromRepository();
 
@@ -411,10 +415,10 @@ public class StanzaReceiver extends AbstractMessageReceiver
 			TaskType tt = task_types.get(task_t);
 			if (tt != null) {
 				String policy_str =
-					(String)props.get(CREATION_POLICY_PROP_KEY + "/" + task_t);
+					(String)props.get(task_t + "/" + CREATION_POLICY_PROP_KEY);
 				TaskCreationPolicy policy = TaskCreationPolicy.valueOf(policy_str);
 				tt.setCreationPolicy(policy);
-				int max_inst = (Integer)props.get(CREATION_MAX_NO_PROP_KEY + "/" + task_t);
+				int max_inst = (Integer)props.get(task_t + "/" + CREATION_MAX_NO_PROP_KEY);
 				tt.setMaxInstancesNo(max_inst);
 			}
 		}
@@ -602,7 +606,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 
 	/**
 	 * <code>processPacket</code> method is here to process packets addressed
-	 * directly to the hostname mainly commands, ad-hoc commands in particular.
+	 * directly to the hostname, mainly commands, ad-hoc commands in particular.
 	 *
 	 * @param packet a <code>Packet</code> value is command for processing.
 	 */

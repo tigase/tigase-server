@@ -725,6 +725,8 @@ public class SessionManager extends AbstractMessageReceiver
 			String[] list) throws UserNotFoundException {
 			try {
 				rep.addDataList(user, calcNode(OFFLINE_DATA_NODE, subnode), key, list);
+			} catch (UserNotFoundException e) {
+				log.warning("User not found in repository: " + user);
 			}	catch (TigaseDBException e) {
 				log.log(Level.SEVERE, "Problem accessing repository data.", e);
 			} // end of try-catch

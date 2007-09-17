@@ -26,6 +26,7 @@ import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.db.TigaseDBException;
+import tigase.db.UserExistsException;
 import tigase.db.UserRepository;
 import tigase.server.Packet;
 
@@ -143,18 +144,14 @@ public abstract class RepoRosterTask extends AbstractReceiverTask {
 		saveToRepository(ri);
 	}
 
-	public void loadRoster() {
-		try {
-			String[] roster = repository.getSubnodes(getJID(), roster_node);
-			if (roster != null) {
-				for (String jid: roster) {
-					log.fine(getJID() + ": " + " loadin from repository: " + jid);
-					addToRoster(loadFromRepository(jid));
-				} // end of for (String jid: roster)
-			} // end of if (roster != null)
-		} catch (TigaseDBException e) {
-			log.log(Level.SEVERE, "Problem loading roster from repository", e);
-		} // end of try-catch
+	public void loadRoster() throws TigaseDBException {
+		String[] roster = repository.getSubnodes(getJID(), roster_node);
+		if (roster != null) {
+			for (String jid: roster) {
+				log.fine(getJID() + ": " + " loadin from repository: " + jid);
+				addToRoster(loadFromRepository(jid));
+			} // end of for (String jid: roster)
+		} // end of if (roster != null)
 	}
 
 	public void setParams(final Map<String, Object> map) {
@@ -162,8 +159,15 @@ public abstract class RepoRosterTask extends AbstractReceiverTask {
 			repository = (UserRepository)map.get(USER_REPOSITORY_PROP_KEY);
 		}
 		if (repository != null && !loaded) {
-			loaded = true;
-			loadRoster();
+			try {
+				try {
+					repository.addUser(getJID());
+				} catch (UserExistsException e) { /*Ignore, this is correct and expected*/	}
+				loaded = true;
+				loadRoster();
+			} catch (TigaseDBException e) {
+				log.log(Level.SEVERE, "Problem loading roster from repository", e);
+			} // end of try-catch
 		} // end of if (repository != null && !loaded)
 		super.setParams(map);
 	}
