@@ -801,7 +801,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 					setup(routerCompName);
 				} // end of if (admin)
 			}
-			Command.addNote(result, "New component vreated: " + new_comp_name);
+			Command.addNote(result, "New component created: " + new_comp_name);
 			Command.addFieldValue(result, "Note",
 				"New component created: " + new_comp_name, "fixed");
 		} catch (Exception e) {
