@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.LinkedHashMap;
-import java.util.HashSet;
+import java.util.concurrent.CopyOnWriteArraySet;
 // import java.util.Timer;
 // import java.util.TimerTask;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -88,8 +88,8 @@ public abstract class AbstractMessageReceiver
 	private Thread out_thread = null;
   private boolean stopped = false;
   private String name = null;
-	private Set<String> routings = new HashSet<String>();
-	private Set<Pattern> regexRoutings = new HashSet<Pattern>();
+	private Set<String> routings = new CopyOnWriteArraySet<String>();
+	private Set<Pattern> regexRoutings = new CopyOnWriteArraySet<Pattern>();
 
   /**
    * Variable <code>statAddedMessagesOk</code> keeps counter of successfuly
