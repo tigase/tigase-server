@@ -130,6 +130,10 @@ public class BoshSession {
 // 		accept='deflate,gzip'
 // 		charsets='ISO_8859-1 ISO-2022-JP'
 // 		secure='true'
+// 		   xmpp:version='1.0'
+//       xmlns='http://jabber.org/protocol/httpbind'
+//       xmlns:xmpp='urn:xmpp:xbosh'
+//       xmlns:stream='http://etherx.jabber.org/streams'>
 		Element body = new Element(BODY_EL_NAME,
 			new String[] {WAIT_ATTR,
 										INACTIVITY_ATTR,
@@ -140,21 +144,27 @@ public class BoshSession {
 										SID_ATTR,
 										VER_ATTR,
 										FROM_ATTR,
-										SECURE_ATTR},
+										SECURE_ATTR,
+										"xmpp:version",
+										"xmlns:xmpp",
+										"xmlns:stream"},
 			new String[] {Long.valueOf(this.max_wait).toString(),
 										Long.valueOf(this.max_inactivity).toString(),
 										Long.valueOf(this.min_polling).toString(),
-										Integer.valueOf(this.hold_requests).toString(),
+										Integer.valueOf(this.concurrent_requests).toString(),
 										Integer.valueOf(this.hold_requests).toString(),
 										Long.valueOf(this.max_pause).toString(),
 										this.sid.toString(),
 										BOSH_VERSION,
 										this.domain,
-										"true"});
+										"true",
+										"1.0",
+										"urn:xmpp:xbosh",
+										"http://etherx.jabber.org/streams"});
 		sessionId = UUID.randomUUID().toString();
-		if (packet.getAttribute(VER_ATTR) == null) {
+// 		if (packet.getAttribute(VER_ATTR) == null) {
 			body.setAttribute(AUTHID_ATTR, sessionId);
-		}
+// 		}
 		body.setXMLNS(BOSH_XMLNS);
 		sendBody(service, body);
 		//service.writeRawData(body.toString());
@@ -193,8 +203,14 @@ public class BoshSession {
 		Element body = body_par;
 		if (body == null) {
 			body = new Element(BODY_EL_NAME,
-				new String[] {FROM_ATTR, SECURE_ATTR},
-				new String[] {this.domain, "true"});
+				new String[] {FROM_ATTR, SECURE_ATTR,
+										"xmpp:version",
+										"xmlns:xmpp",
+										"xmlns:stream"},
+				new String[] {this.domain, "true",
+										"1.0",
+										"urn:xmpp:xbosh",
+										"http://etherx.jabber.org/streams"});
 			body.setXMLNS(BOSH_XMLNS);
 			for (Packet pack: waiting_packets) {
 				body.addChild(pack.getElement());
