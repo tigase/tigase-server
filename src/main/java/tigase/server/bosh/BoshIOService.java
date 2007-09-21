@@ -57,7 +57,7 @@ public class BoshIOService extends XMPPIOService {
 		StringBuilder sb = new StringBuilder();
 		sb.append("HTTP/1.1 200 OK" + EOL);
 		sb.append("Content-Type: " + content_type + EOL);
-		sb.append("Content-Length: " + data.length() + EOL);
+		sb.append("Content-Length: " + data.getBytes().length + EOL);
 		sb.append(EOL);
 		sb.append(data);
 		log.finest("Writing to socket:\n" + sb.toString());
