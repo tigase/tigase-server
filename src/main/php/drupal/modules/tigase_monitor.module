@@ -179,15 +179,8 @@ function tigase_monitor_stats($stats = NULL) {
 			}
 			if (stripos($line, 'Uptime')) {
 				$split_line = explode(' ', trim($line));
-				if (sizeof($split_line) < 6) {
-					$statsinfo['Uptime:'] = $split_line[1] . 'm, ' . $split_line[3] . 's';
-				} else {
-					if (sizeof($split_line) < 8) {
-						$statsinfo['Uptime:'] = $split_line[1] . 'h, ' . $split_line[3] . 'm';
-					} else {
-						$statsinfo['Uptime:'] = $split_line[1] . 'd, ' . $split_line[3] . 'h';
-					}
-				}
+				$statsinfo['Uptime:'] = $split_line[1] . substr($split_line[2], 0, 1)
+					. ', ' . $split_line[3] . substr($split_line[4], 0, 1);
 			}
 			if (stripos($line, 's2s')) {
 				$split_line = explode(' ', trim($line));
