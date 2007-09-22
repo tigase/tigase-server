@@ -38,6 +38,7 @@ public enum StanzaType {
 		subscribed, unsubscribe, unsubscribed,    // presence types
 		chat, groupchat, headline, normal,        // message types
 		valid, invalid,                           // Dialback verification packets
+		terminate,                                // Bosh - session termination stanza
     invisible;                                // Other unknown types...
 
 	public static StanzaType valueof(String cmd) {

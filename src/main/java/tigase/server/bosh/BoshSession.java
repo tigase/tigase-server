@@ -73,8 +73,8 @@ public class BoshSession {
 	private String content_type = CONTENT_TYPE_DEF;
 	private String domain = null;
 	private String sessionId = null;
-	private boolean scheduledForDeletion = false;
 
+	private boolean terminate = false;
 	private enum TimedTask { EMPTY_RESP, STOP };
 	private Map<TimerTask, TimedTask> task_enum =
 		new LinkedHashMap<TimerTask, TimedTask>();
@@ -217,11 +217,18 @@ public class BoshSession {
 			}
 		}
 		try {
+			if (terminate) {
+				body.setAttribute("type", StanzaType.terminate.toString());
+			}
 			serv.writeRawData(body.toString());
 			waiting_packets.clear();
+			serv.stop();
 		} catch (IOException e) {
 			// I call it anyway at the end of method call
 			//disconnected(null);
+			log.log(Level.WARNING, "[" + connections.size() +
+				"] Exception during writing to socket", e);
+		} catch (Exception e) {
 			log.log(Level.WARNING, "[" + connections.size() +
 				"] Exception during writing to socket", e);
 		}
@@ -252,6 +259,14 @@ public class BoshSession {
 		connections.offer(service);
 
 		if (packet.getElemName().equals(BODY_EL_NAME)) {
+			if (packet.getType() != null && packet.getType() == StanzaType.terminate) {
+				// We are preparing for session termination.
+				// Some client send IQ stanzas with private data to store some
+				// settings so some confirmation stanzas might be sent back
+				// let's give the client a few secs for session termination
+				max_pause = 2;   // Max pause changed to 2 secs
+				terminate = true;
+			}
 			List<Element> children = packet.getElemChildren(BODY_EL_NAME);
 			if (children != null) {
 				for (Element el: children) {
@@ -312,6 +327,9 @@ public class BoshSession {
 								"Bosh = disconnected", true));
 					}
 				}
+				Packet command = Command.STREAM_CLOSED.getPacket(null, null,
+					StanzaType.set, "sess1");
+				out_results.offer(command);
 				return true;
 			case EMPTY_RESP:
 				BoshIOService serv = connections.poll();
