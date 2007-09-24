@@ -45,6 +45,7 @@ import tigase.disco.ServiceIdentity;
 import tigase.util.Algorithms;
 import tigase.util.JIDUtils;
 import tigase.xml.Element;
+import tigase.xmpp.Authorization;
 import tigase.xmpp.XMPPIOService;
 
 /**
@@ -94,6 +95,11 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 		log.finer("Processing packet: " + packet.getElemName()
 			+ ", type: " + packet.getType());
 		log.finest("Processing packet: " + packet.getStringData());
+		if (packet.getElemTo() != null && packet.getElemTo().equals(myDomain())) {
+			addOutPacket(
+				Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet, "Not implemented", true));
+			return;
+		}
 		if (pack_routed) {
 			writePacketToSocket(packet.packRouted());
 		} else {
