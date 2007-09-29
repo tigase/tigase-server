@@ -221,7 +221,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	}
 
 	private void addTaskToInstances(ReceiverTaskIfc task) {
-		task_instances.put(task.getJID(),	task);
+		task_instances.put(task.getJID().toLowerCase(), task);
 		ServiceEntity item = new ServiceEntity(task.getJID(),
 			JIDUtils.getNodeNick(task.getJID()), task.getDescription());
 		item.addIdentities(
@@ -246,7 +246,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	 * @param task a <code>ReceiverTaskIfc</code> value
 	 */
 	protected void addTaskInstance(ReceiverTaskIfc task) {
-		if (task_instances.get(task.getJID()) == null) {
+		if (task_instances.get(task.getJID().toLowerCase()) == null) {
 			addTaskToInstances(task);
 			try {
 				saveTaskToRepository(task);
@@ -263,7 +263,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		ServiceEntity item = new ServiceEntity(task.getJID(),
 			JIDUtils.getNodeNick(task.getJID()), task.getDescription());
 		serviceEntity.removeItems(item);
-		task_instances.remove(task.getJID());
+		task_instances.remove(task.getJID().toLowerCase());
 		Queue<Packet> results = new LinkedList<Packet>();
 		task.destroy(results);
 		addOutPackets(results);
@@ -595,7 +595,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 			return;
 		} // end of if (packet.getElemName().equals("iq"))
 
-		ReceiverTaskIfc task = task_instances.get(packet.getElemTo());
+		ReceiverTaskIfc task = task_instances.get(packet.getElemTo().toLowerCase());
 		if (task != null) {
 			log.finest("Found a task for packet: " + task.getJID());
 			Queue<Packet> results = new LinkedList<Packet>();
