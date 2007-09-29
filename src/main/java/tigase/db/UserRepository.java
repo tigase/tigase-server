@@ -46,6 +46,8 @@ public interface UserRepository {
 
 	List<String> getUsers() throws TigaseDBException;
 
+	long getUsersCount();
+
 	/**
    * This <code>addUser</code> method allows to add new user to reposiotry.
    * It <b>must</b> throw en exception <code>UserExistsException</code> if such

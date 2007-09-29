@@ -377,6 +377,27 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		}
 	}
 
+	public long getUsersCount() {
+		Statement stmt = null;
+		ResultSet rs = null;
+		try {
+			stmt = conn.createStatement();
+			// Load all user ids from database
+			rs = stmt.executeQuery("SELECT count(*) FROM " + users_tbl);
+			long users = -1;
+			if (rs.next()) {
+				users = rs.getLong(1);
+			} // end of while (rs.next())
+			return users;
+		} catch (SQLException e) {
+			return -1;
+			//throw new TigaseDBException("Problem loading user list from repository", e);
+		} finally {
+			release(stmt, rs);
+			stmt = null; rs = null;
+		}
+	}
+
 	/**
 	 * Describe <code>getUsers</code> method here.
 	 *
@@ -393,7 +414,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 			while (rs.next()) {
 				users.add(rs.getString(1));
 			} // end of while (rs.next())
-		return users;
+			return users;
 		} catch (SQLException e) {
 			throw new TigaseDBException("Problem loading user list from repository", e);
 		} finally {

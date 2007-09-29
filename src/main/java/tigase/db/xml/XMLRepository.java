@@ -124,6 +124,10 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
 		return xmldb.getAllNode1s();
 	}
 
+	public long getUsersCount() {
+		return xmldb.getAllNode1sCount();
+	}
+
   /**
    * <code>setData</code> method sets data value for
    * given user ID in repository under given node path and associates it with
