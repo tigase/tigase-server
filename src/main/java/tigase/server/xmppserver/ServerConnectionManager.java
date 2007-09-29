@@ -4,7 +4,7 @@
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation version 3 of the License.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -144,6 +144,13 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService> {
 // 			+ ", type: " + packet.getType());
 		log.finest("Processing packet: " + packet.getStringData());
 		if (!packet.isCommand() || !processCommand(packet)) {
+
+			if (packet.getElemTo() == null) {
+				log.warning("Missing 'to' attribute, ignoring packet..."
+					+ packet.toString()
+					+ "\n This most likely happens due to missconfiguration of components domain names.");
+				return;
+			}
 
 			// Check whether addressing is correct:
 			String to_hostname = JIDUtils.getNodeHost(packet.getElemTo());
