@@ -95,7 +95,7 @@ function tigase_monitor_block($op='list', $delta=0) {
 		$link_exe = "<a href=\"{$base_path}{$exe_file}\">exe</a>, ";
 		$link_targz = "<a href=\"{$base_path}{$targz_file}\">tar.gz</a>";
 		$link_all = "<a href=\"{$base_path}/filebrowser/tigase-server\">$server_downloads</a>";
-		$users_cnt = db_fetch_object(db_query("SELECT COUNT(*) as count from {users};"));
+		//$users_cnt = db_fetch_object(db_query("SELECT COUNT(*) as count from {users};"));
 		$online_cnt = db_fetch_object(db_query("SELECT COUNT(*) as count from {users} where online_status > 0;"));
 		// Count users with activity in the past defined period.
 		$time_period = variable_get('user_block_seconds_online', 900);
@@ -103,7 +103,7 @@ function tigase_monitor_block($op='list', $delta=0) {
 		$guests = db_fetch_object(db_query('SELECT COUNT(sid) AS count FROM {sessions} WHERE timestamp >= %d AND uid = 0', time() - $time_period));
 		$users = db_fetch_object(db_query('SELECT COUNT(*) AS count FROM {users} WHERE access >= %d AND uid != 0 ORDER BY access DESC', time() - $time_period));
 		$block_content .= '<table border="0">';
-		$block_content .= '<tr><td>Registered:</td><td>' . $users_cnt->count . '</td></tr>';
+		//		$block_content .= '<tr><td>Registered:</td><td>' . $users_cnt->count . '</td></tr>';
 		//		$block_content .= '<tr><td>Jabber Online:</td><td>' . $online_cnt->count . '</td></tr>';
 // 		print_r( $jabber_stats );
 // 		print_r( '<br/>' );
@@ -173,9 +173,17 @@ function tigase_monitor_stats($stats = NULL) {
       if ((trim($line) == '') || strpos(trim($line), '#')) {
         continue;
       }
+			if (stripos($line, 'Registered')) {
+				$split_line = explode(' ', trim($line));
+				$statsinfo['Registered:'] = $split_line[3];
+			}
 			if (stripos($line, 'Packets received')) {
 				$split_line = explode(' ', trim($line));
 				$statsinfo['Packets:'] = $split_line[2];
+			}
+			if (stripos($line, 'Open authorized sessions')) {
+				$split_line = explode(' ', trim($line));
+				$statsinfo['Sessions online:'] = $split_line[4];
 			}
 			if (stripos($line, 'Uptime')) {
 				$split_line = explode(' ', trim($line));
@@ -196,9 +204,6 @@ function tigase_monitor_stats($stats = NULL) {
 			}
     }
 
-//     foreach ($statsinfo as $name => $description) {
-//       $statsinfo[$name] = array(trim($description));
-//     }
   }
 //  	print_r( $statsinfo );
 //  	print_r( '<br/>' );
