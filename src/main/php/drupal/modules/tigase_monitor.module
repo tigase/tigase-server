@@ -44,7 +44,8 @@ function tigase_monitor_help($section='') {
 }
 
 function tigase_monitor_perm() {
-  return array('access tigase_monitor');
+  return array('access tigase_monitor', 'access tigase_monitor content',
+		'access tigase_monitor config');
 }
 
 /**
@@ -117,11 +118,99 @@ function tigase_monitor_block($op='list', $delta=0) {
 		$block_content .= '<tr><td><a href="http://www.ohloh.net/">Ohloh</a> stats:</td>' .
 			'<td><a href="http://www.ohloh.net/projects/4171"><img src="/files/ohloh_badge.gif"/></a></td></tr>';
 		$block_content .= '</table>';
+		$block_content .=
+			"<div class=\"more-link\">"
+			.'Click for '
+			.l(t("details..."), "jabber-stats", array("title" => t("Statistics details.")))
+			.' or '
+			.l(t("configuration..."), "jabber-config", array("title" => t("Server configuration.")))
+			."</div>";
     // set up the block
     $block['subject'] = 'Monitor';
     $block['content'] = $block_content;
     return $block;
 	}
+}
+
+/**
+ * Output full jabber statistics from files/jabber_stats.html file
+ */
+function tigase_monitor_full_stats() {
+	$page_content = '';
+	$src_file = 'files/jabber_stats.html';
+
+  if (is_readable($src_file) && ($file = file($src_file))) {
+		$started = 0;
+    foreach ($file as $line) {
+			if (!$started) {
+				$started = stripos($line, 'Server version info:')
+					|| stripos($line, 'Tests results:');
+			} else {
+				$started = !stripos($line, 'Server basic configuration parameters:');
+			}
+			if ($started) {
+				$page_content .= $line;
+			}
+    }
+	}
+
+	// check to see if there was any content before
+  // setting up the block
+  if ($page_content == '') {
+    // No statistics file...
+    $page_content = "Server statistics are not available yet...";
+  }
+
+  return $page_content;
+}
+
+/**
+ * Output full jabber statistics from files/jabber_stats.html file
+ */
+function tigase_monitor_tigase_config() {
+	$page_content = '';
+	$src_file = 'files/jabber_stats.html';
+
+  if (is_readable($src_file) && ($file = file($src_file))) {
+		$started = 0;
+    foreach ($file as $line) {
+			if (!$started) {
+				$started = stripos($line, 'Server basic configuration parameters:');
+			} else {
+				$started = !stripos($line, 'Tests results:');
+			}
+			if ($started) {
+				$page_content .= $line;
+			}
+    }
+	}
+
+	// check to see if there was any content before
+  // setting up the block
+  if ($page_content == '') {
+    // No statistics file...
+    $page_content = "Server configuration are not available yet...";
+  }
+
+  return $page_content;
+}
+
+function tigase_monitor_menu() {
+
+  $items = array();
+
+  $items[] = array('path' => 'jabber-stats',
+		'title' => t('Tigase server statistics'),
+		'callback' => 'tigase_monitor_full_stats',
+		'access' => user_access('access tigase_monitor content'),
+		'type' => MENU_CALLBACK);
+  $items[] = array('path' => 'jabber-config',
+		'title' => t('Tigase server configuration'),
+		'callback' => 'tigase_monitor_tigase_config',
+		'access' => user_access('access tigase_monitor config'),
+		'type' => MENU_CALLBACK);
+
+  return $items;
 }
 
 /**
