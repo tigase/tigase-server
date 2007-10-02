@@ -526,7 +526,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 			while (true) {
 				try {
 					// Sleep for 1 minute
-					Thread.sleep(MINUTE);
+					Thread.sleep(30*MINUTE);
 					// Walk through all connections and check whether they are
 					// really alive...., try to send space for each service which
 					// is inactive for hour or more and close the service
