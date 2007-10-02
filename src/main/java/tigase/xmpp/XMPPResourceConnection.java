@@ -78,6 +78,9 @@ public class XMPPResourceConnection extends RepositoryAccess {
 
 	private boolean dummy = false;
 
+	private String userJid = null;
+	private String userId = null;
+
 	/**
 	 * Session temporary data. All data stored in this <code>Map</code> disapear
 	 * when session finishes.
@@ -151,6 +154,9 @@ public class XMPPResourceConnection extends RepositoryAccess {
 
 	public void setParentSession(final XMPPSession parent) {
 		this.parentSession = parent;
+		if (parentSession != null) {
+			userId = JIDUtils.getNodeID(parentSession.getUserName(), domain);
+		}
 	}
 
 	public XMPPSession getParentSession() {
@@ -168,7 +174,10 @@ public class XMPPResourceConnection extends RepositoryAccess {
    * been authorized yet and some parts of user JID are not known yet.
    */
   public final String getJID() throws NotAuthorizedException {
-    return getUserId() + (resource != null ? ("/" + resource) : "");
+    if (parentSession == null) {
+      throw new NotAuthorizedException(NOT_AUTHORIZED_MSG);
+    } // end of if (username == null)
+    return userJid;
   }
 
   /**
@@ -190,7 +199,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
     if (parentSession == null) {
       throw new NotAuthorizedException(NOT_AUTHORIZED_MSG);
     } // end of if (username == null)
-    return JIDUtils.getNodeID(parentSession.getUserName(), domain);
+    return userId;
   }
 
 	public final String getUserName() throws NotAuthorizedException {
@@ -255,9 +264,10 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	 *
 	 * @param argResource Value to assign to this.resource
 	 */
-	public void setResource(final String argResource) {
+	public void setResource(final String argResource) throws NotAuthorizedException {
 		this.resource = argResource;
 		parentSession.resourceSet(this);
+		userJid = getUserId() + (resource != null ? ("/" + resource) : "");
 	}
 
 	/**
