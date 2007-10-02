@@ -57,7 +57,7 @@ public class PacketFilter {
 
 	public boolean forward(final Packet packet, final XMPPResourceConnection session,
 		final NonAuthUserRepository repo, final Queue<Packet> results) {
-		if (session == null) {
+		if (session == null || !session.isAuthorized()) {
 			return false;
 		} // end of if (session == null)
 
