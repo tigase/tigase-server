@@ -28,8 +28,8 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.LinkedHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
-// import java.util.Timer;
-// import java.util.TimerTask;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Logger;
@@ -84,12 +84,18 @@ public abstract class AbstractMessageReceiver
 
 // 	private String sync = "SyncObject";
 
+	private Timer receiverTasks = null;
 	private Thread in_thread = null;
 	private Thread out_thread = null;
   private boolean stopped = false;
   private String name = null;
 	private Set<String> routings = new CopyOnWriteArraySet<String>();
 	private Set<Pattern> regexRoutings = new CopyOnWriteArraySet<Pattern>();
+	private int curr_second = 0;
+	private int[] seconds = new int[60];
+	private int sec_idx = 0;
+	private int[] minutes = new int[60];
+	private int min_idx = 0;
 
   /**
    * Variable <code>statAddedMessagesOk</code> keeps counter of successfuly
@@ -203,6 +209,14 @@ public abstract class AbstractMessageReceiver
 				statAddedMessagesOk, Level.FINE));
     stats.add(new StatRecord(getName(), StatisticType.QUEUE_OVERFLOW,
 				statAddedMessagesEr, Level.FINEST));
+		stats.add(new StatRecord(getName(), "Last second packets", "int",
+				seconds[(sec_idx == 0 ? 59 : sec_idx - 1)], Level.FINE));
+		stats.add(new StatRecord(getName(), "Last minute packets", "int",
+				minutes[(min_idx == 0 ? 59 : min_idx - 1)], Level.FINE));
+		int curr_hour = 0;
+		for (int min: minutes) { curr_hour += min; }
+		stats.add(new StatRecord(getName(), "Last hour packets", "int",
+				curr_hour, Level.FINE));
     return stats;
   }
 
@@ -240,12 +254,16 @@ public abstract class AbstractMessageReceiver
 //     localAddresses = addresses;
 //   }
 
+	protected Integer getDefMaxQueueSize() {
+		return MAX_QUEUE_SIZE_PROP_VAL;
+	}
+
   /**
    * Returns defualt configuration settings for this object.
    */
   public Map<String, Object> getDefaults(Map<String, Object> params) {
     Map<String, Object> defs = new LinkedHashMap<String, Object>();
-		defs.put(MAX_QUEUE_SIZE_PROP_KEY, MAX_QUEUE_SIZE_PROP_VAL);
+		defs.put(MAX_QUEUE_SIZE_PROP_KEY, getDefMaxQueueSize());
 		if (params.get(GEN_VIRT_HOSTS) != null) {
 			DEF_HOSTNAME_PROP_VAL = ((String)params.get(GEN_VIRT_HOSTS)).split(",")[0];
 		} else {
@@ -291,6 +309,8 @@ public abstract class AbstractMessageReceiver
 		} catch (InterruptedException e) {}
 		in_thread = null;
 		out_thread = null;
+		receiverTasks.cancel();
+		receiverTasks = null;
 	}
 
 	private void startThreads() {
@@ -306,6 +326,29 @@ public abstract class AbstractMessageReceiver
 			out_thread.setName("out_" + name);
 			out_thread.start();
 		} // end of if (thread == null || ! thread.isAlive())
+		receiverTasks = new Timer(getName() + " tasks", true);
+		receiverTasks.schedule(new TimerTask() {
+				public void run() {
+					seconds[sec_idx++] = curr_second;
+					curr_second = 0;
+					if (sec_idx >= 60) {
+						sec_idx = 0;
+					}
+				}
+			}, 10*SECOND, SECOND);
+		receiverTasks.schedule(new TimerTask() {
+				public void run() {
+					int curr_minute = 0;
+					for (int sec: seconds) {
+						curr_minute += sec;
+					}
+					minutes[min_idx++] = curr_minute;
+					if (min_idx >= 60) {
+						min_idx = 0;
+					}
+				}
+			}, 10*SECOND+MINUTE, MINUTE);
+
 	}
 
 	public void start() {
@@ -404,6 +447,7 @@ public abstract class AbstractMessageReceiver
 					QueueElement qel = queue.take();
 					switch (qel.type) {
 					case IN_QUEUE:
+						++curr_second;
 						processPacket(qel.packet);
 						break;
 					case OUT_QUEUE:
