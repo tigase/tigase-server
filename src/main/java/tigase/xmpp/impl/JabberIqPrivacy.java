@@ -103,7 +103,7 @@ public class JabberIqPrivacy extends XMPPProcessor
 	public boolean preProcess(Packet packet, XMPPResourceConnection session,
 		NonAuthUserRepository repo,	Queue<Packet> results) {
 
-		if (session == null) {
+		if (session == null || !session.isAuthorized()) {
 			return false;
 		} // end of if (session == null)
 
