@@ -120,7 +120,7 @@ function tigase_monitor_block($op='list', $delta=0) {
 		$block_content .= '</table>';
 		$block_content .=
 			"<div class=\"more-link\">"
-			.'Click for '
+			.'More '
 			.l(t("details..."), "jabber-stats", array("title" => t("Statistics details.")))
 			.' or '
 			.l(t("configuration..."), "jabber-config", array("title" => t("Server configuration.")))
