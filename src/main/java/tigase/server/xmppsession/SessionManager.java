@@ -409,10 +409,18 @@ public class SessionManager extends AbstractMessageReceiver
 		connection.setSessionId("session-id");
 		connectionsByFrom.put(conn_id, connection);
 		handleLogin(JIDUtils.getNodeNick(user_jid), connection);
-		connection.setResource(JIDUtils.getNodeResource(user_jid));
+		try {
+			connection.setResource(JIDUtils.getNodeResource(user_jid));
+		} catch (NotAuthorizedException e) {
+			log.warning("Something wrong with authorization: " + e
+				+ ", for user: " + user_jid);
+		}
 		return connection;
 	}
 
+	protected Integer getDefMaxQueueSize() {
+		return new Integer(10000);
+	}
 
 	private void processCommand(Packet pc) {
 		log.finer(pc.getCommand().toString() + " command from: " + pc.getFrom());
