@@ -1,0 +1,300 @@
+<?php
+	/*
+	 * Tigase Drupal Monitor Module
+	 * Copyright (C) 2004-2007 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+	 *
+	 * This program is free software: you can redistribute it and/or modify
+	 * it under the terms of the GNU General Public License as published by
+	 * the Free Software Foundation, either version 3 of the License.
+	 *
+	 * This program is distributed in the hope that it will be useful,
+	 * but WITHOUT ANY WARRANTY; without even the implied warranty of
+	 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	 * GNU General Public License for more details.
+	 *
+	 * You should have received a copy of the GNU General Public License
+	 * along with this program. Look for COPYING file in the top folder.
+	 * If not, see http://www.gnu.org/licenses/.
+	 *
+	 * $Rev:  $
+	 * Last modified by $Author: $
+	 * $Date:  $
+	 */
+
+	/**
+	 * Display help and module information
+	 * @param section which section of the site we're displaying help
+	 * @return help text for section
+	 */
+function tigase_monitor_help($section='') {
+
+	$output = '';
+
+	switch ($section) {
+	case "admin/modules#description":
+		$output = t("Monitor displaying various server statistics.");
+		break;
+	case "admin/help#tigase_monitor":
+		$output = t("Monitor displaying various server statistics.") . "\n"
+			. t(" This module displays information about number of downloads, last software version, number of registered user accounts, number of users online, number of s2s connections and so on...");
+		break;
+	}
+
+	return $output;
+}
+
+function tigase_monitor_perm() {
+  return array('access tigase_monitor', 'access tigase_monitor content',
+		'access tigase_monitor config');
+}
+
+/**
+* Output all monitor information
+* @param op the operation from the URL
+* @param delta offset
+* @returns block HTML
+*/
+function tigase_monitor_block($op='list', $delta=0) {
+	// listing of blocks, such as on the admin/block page
+	if ($op == "list") {
+		$block[0]["info"] = t('Monitor');
+		return $block;
+	} else if ($op == 'view') {
+		$folder = 'files/downloads/tigase-server/';
+		$descript = $folder . 'descript.ion';
+		$info = tigase_monitor_decript($descript);
+		$jabber_stats_file = 'files/jabber_stats.txt';
+		$jabber_stats = tigase_monitor_stats($jabber_stats_file);
+ 		$server_downloads = '';
+		$server_version = ' ';
+		$file = '';
+		foreach ($info as $name => $description) {
+			if ($name != 'TOTAL:') {
+				$name_ver = str_ireplace("tigase-server-", "", $name);
+				$name_ver = str_ireplace(".zip", "", $name_ver);
+				$name_ver = str_ireplace(".gz", "", $name_ver);
+				$name_ver = str_ireplace(".tar", "", $name_ver);
+				$name_ver = str_ireplace(".exe", "", $name_ver);
+				if ($name_ver >= $server_version) {
+					$server_version = $name_ver;
+					$file = $name;
+					if (strpos($name, ".zip")) {
+						$zip_file = "$folder/$file";
+					}
+					if (strpos($name, ".exe")) {
+						$exe_file = "$folder/$file";
+					}
+					if (strpos($name, ".tar.gz")) {
+						$targz_file = "$folder/$file";
+					}
+				}
+			} else {
+				$server_downloads = $description[0];
+			}
+		}
+		$link_zip = "<a href=\"{$base_path}{$zip_file}\">zip</a>, ";
+		$link_exe = "<a href=\"{$base_path}{$exe_file}\">exe</a>, ";
+		$link_targz = "<a href=\"{$base_path}{$targz_file}\">tar.gz</a>";
+		$link_all = "<a href=\"{$base_path}/filebrowser/tigase-server\">$server_downloads</a>";
+		//$users_cnt = db_fetch_object(db_query("SELECT COUNT(*) as count from {users};"));
+		$online_cnt = db_fetch_object(db_query("SELECT COUNT(*) as count from {users} where online_status > 0;"));
+		// Count users with activity in the past defined period.
+		$time_period = variable_get('user_block_seconds_online', 900);
+		// Perform database queries to gather online user lists.
+		$guests = db_fetch_object(db_query('SELECT COUNT(sid) AS count FROM {sessions} WHERE timestamp >= %d AND uid = 0', time() - $time_period));
+		$users = db_fetch_object(db_query('SELECT COUNT(*) AS count FROM {users} WHERE access >= %d AND uid != 0 ORDER BY access DESC', time() - $time_period));
+		$block_content .= '<table border="0">';
+		//		$block_content .= '<tr><td>Registered:</td><td>' . $users_cnt->count . '</td></tr>';
+		//		$block_content .= '<tr><td>Jabber Online:</td><td>' . $online_cnt->count . '</td></tr>';
+// 		print_r( $jabber_stats );
+// 		print_r( '<br/>' );
+		foreach ($jabber_stats as $name => $description) {
+			$block_content .= "<tr><td>{$name}</td><td>{$description}</td></tr>";
+		}
+		$block_content .= '<tr><td>Website online:</td><td>' . ($users->count + $guests->count) . '</td></tr>';
+		$block_content .= '<tr><td>Ver ' . $server_version . ':</td><td>'
+			. $link_zip . $link_exe . $link_targz . '</td></tr>';
+		$block_content .= '<tr><td>All downloads:</td><td>' . $link_all . '</td></tr>';
+		$block_content .= '<tr><td><a href="http://www.ohloh.net/">Ohloh</a> stats:</td>' .
+			'<td><a href="http://www.ohloh.net/projects/4171"><img src="/files/ohloh_badge.gif"/></a></td></tr>';
+		$block_content .= '</table>';
+		$block_content .=
+			"<div class=\"more-link\">"
+			.'More '
+			.l(t("details..."), "jabber-stats", array("title" => t("Statistics details.")))
+			.' or '
+			.l(t("configuration..."), "jabber-config", array("title" => t("Server configuration.")))
+			."</div>";
+    // set up the block
+    $block['subject'] = 'Monitor';
+    $block['content'] = $block_content;
+    return $block;
+	}
+}
+
+/**
+ * Output full jabber statistics from files/jabber_stats.html file
+ */
+function tigase_monitor_full_stats() {
+	$page_content = '';
+	$src_file = 'files/jabber_stats.html';
+
+  if (is_readable($src_file) && ($file = file($src_file))) {
+		$started = 0;
+    foreach ($file as $line) {
+			if (!$started) {
+				$started = stripos($line, 'Server version info:')
+					|| stripos($line, 'Tests results:');
+			} else {
+				$started = !stripos($line, 'Server basic configuration parameters:');
+			}
+			if ($started) {
+				$page_content .= $line;
+			}
+    }
+	}
+
+	// check to see if there was any content before
+  // setting up the block
+  if ($page_content == '') {
+    // No statistics file...
+    $page_content = "Server statistics are not available yet...";
+  }
+
+  return $page_content;
+}
+
+/**
+ * Output full jabber statistics from files/jabber_stats.html file
+ */
+function tigase_monitor_tigase_config() {
+	$page_content = '';
+	$src_file = 'files/jabber_stats.html';
+
+  if (is_readable($src_file) && ($file = file($src_file))) {
+		$started = 0;
+    foreach ($file as $line) {
+			if (!$started) {
+				$started = stripos($line, 'Server basic configuration parameters:');
+			} else {
+				$started = !stripos($line, 'Tests results:');
+			}
+			if ($started) {
+				$page_content .= $line;
+			}
+    }
+	}
+
+	// check to see if there was any content before
+  // setting up the block
+  if ($page_content == '') {
+    // No statistics file...
+    $page_content = "Server configuration are not available yet...";
+  }
+
+  return $page_content;
+}
+
+function tigase_monitor_menu() {
+
+  $items = array();
+
+  $items[] = array('path' => 'jabber-stats',
+		'title' => t('Tigase server statistics'),
+		'callback' => 'tigase_monitor_full_stats',
+		'access' => user_access('access tigase_monitor content'),
+		'type' => MENU_CALLBACK);
+  $items[] = array('path' => 'jabber-config',
+		'title' => t('Tigase server configuration'),
+		'callback' => 'tigase_monitor_tigase_config',
+		'access' => user_access('access tigase_monitor config'),
+		'type' => MENU_CALLBACK);
+
+  return $items;
+}
+
+/**
+ * Loads file metainformation from the specified file.
+ */
+function tigase_monitor_decript($decript = NULL) {
+  static $decriptcols = array();
+
+  // Return (previously generated) decript column list
+  if (!isset($decript)) { return $decriptcols; }
+
+  // Build decript information list
+  $decriptinfo = array();
+  if (is_readable($decript) && ($file = file($decript))) {
+    foreach ($file as $line) {
+      // Skip empty and commented lines
+      if (trim($line) == '' || strpos(trim($line), '#') === 0) {
+        continue;
+      }
+      list($name, $description) = explode(" ", $line, 2);
+      if (isset($decriptinfo[$name])) {
+        $decriptinfo[$name] .= trim($description) . " ";
+      } else {
+        $decriptinfo[$name] = trim($description) . " ";
+      }
+    }
+
+    foreach ($decriptinfo as $name => $description) {
+      $decriptinfo[$name] = array(trim($description));
+    }
+  }
+  return $decriptinfo;
+}
+
+/**
+ * Loads file metainformation from the specified file.
+ */
+function tigase_monitor_stats($stats = NULL) {
+  static $statscols = array();
+
+  // Return (previously generated) stats column list
+  if (!isset($stats)) { return $statscols; }
+
+	// Build stats information list
+  $statsinfo = array();
+  if (is_readable($stats) && ($file = file($stats))) {
+    foreach ($file as $line) {
+      // Skip empty and commented lines
+      if ((trim($line) == '') || strpos(trim($line), '#')) {
+        continue;
+      }
+			if (stripos($line, 'Registered')) {
+				$split_line = explode(' ', trim($line));
+				$statsinfo['Registered:'] = $split_line[3];
+			}
+			if (stripos($line, 'Packets received')) {
+				$split_line = explode(' ', trim($line));
+				$statsinfo['Packets:'] = $split_line[2];
+			}
+			if (stripos($line, 'Open authorized sessions')) {
+				$split_line = explode(' ', trim($line));
+				$statsinfo['Sessions online:'] = $split_line[4];
+			}
+			if (stripos($line, 'Uptime')) {
+				$split_line = explode(' ', trim($line));
+				$statsinfo['Uptime:'] = $split_line[1] . substr($split_line[2], 0, 1)
+					. ', ' . $split_line[3] . substr($split_line[4], 0, 1);
+			}
+			if (stripos($line, 's2s')) {
+				$split_line = explode(' ', trim($line));
+				$statsinfo['Servers online:'] = $split_line[4];
+			}
+			if (stripos($line, 'c2s')) {
+				$split_line = explode(' ', trim($line));
+				$statsinfo['Clients online:'] = $split_line[3];
+			}
+			if (stripos($line, 'bosh')) {
+				$split_line = explode(' ', trim($line));
+				$statsinfo['Bosh online:'] = $split_line[3];
+			}
+    }
+
+  }
+//  	print_r( $statsinfo );
+//  	print_r( '<br/>' );
+  return $statsinfo;
+}
