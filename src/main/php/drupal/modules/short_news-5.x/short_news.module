@@ -31,9 +31,6 @@ function short_news_help($section='') {
 	$output = '';
 
 	switch ($section) {
-	case "admin/modules#description":
-		$output = t("Short news displaying from short_news table.");
-		break;
 	case "admin/help#short_news":
 		$output = t("Short news displaying fro short_news table.") . "\n"
 			. t(" This module displays N last short news found in 'short_news' table.");
@@ -97,11 +94,18 @@ function short_news_block($op='list', $delta=0) {
 * Module configuration settings
 * @return settings HTML or deny access
 */
-function short_news_settings() {
-  // only administrators can access this module
-  if (!user_access("access administration pages")) {
-    return t('you do not have rights to this resource.');
-  }
+function short_news_menu($may_cache) {
+	$items[] = array(
+    'path' => 'admin/settings/short_news',
+    'title' => t('Short news'),
+    'description' => t('Set short news displaying parameters.'),
+    'callback' => 'drupal_get_form',
+    'callback arguments' => array('short_news_admin_settings'),
+    'access' => user_access('administer site configuration'),
+									 );
+}
+
+function short_news_admin_settings() {
 	$form['short_news_blockdisp'] =
 		array('#type' => 'textfield',
 			'#title' => t('Number of posts to display in block'),
@@ -114,6 +118,5 @@ function short_news_settings() {
 			'#default_value' => variable_get('short_news_blocktype', 'minis'),
 			'#description' => t("The type of posts to display in block: 'minis', 'shorts', 'techs', 'funs', ..."),
 			'#maxlength' => '10', '#size' => '10');
-  return $form;
+	return system_settings_form($form);
 }
-
