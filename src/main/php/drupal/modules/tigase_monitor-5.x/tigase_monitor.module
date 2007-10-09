@@ -31,9 +31,6 @@ function tigase_monitor_help($section='') {
 	$output = '';
 
 	switch ($section) {
-	case "admin/modules#description":
-		$output = t("Monitor displaying various server statistics.");
-		break;
 	case "admin/help#tigase_monitor":
 		$output = t("Monitor displaying various server statistics.") . "\n"
 			. t(" This module displays information about number of downloads, last software version, number of registered user accounts, number of users online, number of s2s connections and so on...");
@@ -57,7 +54,7 @@ function tigase_monitor_perm() {
 function tigase_monitor_block($op='list', $delta=0) {
 	// listing of blocks, such as on the admin/block page
 	if ($op == "list") {
-		$block[0]["info"] = t('Monitor');
+		$block[0]["info"] = t('Monitor - Tigase Server');
 		return $block;
 	} else if ($op == 'view') {
 		$folder = 'files/downloads/tigase-server/';
@@ -199,12 +196,14 @@ function tigase_monitor_menu() {
 
   $items = array();
 
-  $items[] = array('path' => 'jabber-stats',
+  $items[] = array(
+		'path' => 'jabber-stats',
 		'title' => t('Tigase server statistics'),
 		'callback' => 'tigase_monitor_full_stats',
 		'access' => user_access('access tigase_monitor content'),
 		'type' => MENU_CALLBACK);
-  $items[] = array('path' => 'jabber-config',
+  $items[] = array(
+		'path' => 'jabber-config',
 		'title' => t('Tigase server configuration'),
 		'callback' => 'tigase_monitor_tigase_config',
 		'access' => user_access('access tigase_monitor config'),
