@@ -1,6 +1,5 @@
-/*
- * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2007 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+/*  Tigase Jabber/XMPP Server
+ *  Copyright (C) 2004-2007 "Artur Hefczyc" <artur.hefczyc@tigase.org>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,22 +20,27 @@
  */
 package tigase.xmpp;
 
-import java.util.Queue;
-import tigase.server.Packet;
-import tigase.db.NonAuthUserRepository;
-
 /**
- * Describe interface XMPPProcessorIfc here.
+ * Describe class PacketErrorTypeException here.
  *
  *
- * Created: Wed Feb  8 13:47:56 2006
+ * Created: Tue Oct  9 13:41:43 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public interface XMPPProcessorIfc extends XMPPImplIfc {
+public class PacketErrorTypeException extends XMPPException {
 
-	void process(Packet packet, XMPPResourceConnection session,
-		NonAuthUserRepository repo,	Queue<Packet> results) throws XMPPException;
+  private static final long serialVersionUID = 1L;
 
-} // XMPPProcessorIfc
+  /**
+   * Creates a new <code>PacketErrorTypeException</code> instance.
+   *
+   */
+  public PacketErrorTypeException(String message) { super(message); }
+
+  public PacketErrorTypeException(String message, Throwable cause) {
+    super(message, cause);
+  }
+
+}

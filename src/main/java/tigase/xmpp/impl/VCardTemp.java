@@ -36,6 +36,7 @@ import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.NotAuthorizedException;
+import tigase.xmpp.XMPPException;
 import tigase.util.JIDUtils;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.UserNotFoundException;
@@ -98,7 +99,8 @@ public class VCardTemp extends XMPPProcessor implements XMPPProcessorIfc {
 	 * @param results a <code>Queue</code> value
 	 */
 	public void process(Packet packet, XMPPResourceConnection session,
-		NonAuthUserRepository repo, Queue<Packet> results) {
+		NonAuthUserRepository repo, Queue<Packet> results)
+		throws XMPPException {
 
 		if (session == null && packet.getType() != null
 			&& packet.getType() == StanzaType.get) {

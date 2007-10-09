@@ -72,6 +72,8 @@ import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.XMPPSession;
 import tigase.xmpp.XMPPStopListenerIfc;
+import tigase.xmpp.PacketErrorTypeException;
+import tigase.xmpp.XMPPException;
 
 import static tigase.server.xmppsession.SessionManagerConfig.*;
 
@@ -146,16 +148,16 @@ public class SessionManager extends AbstractMessageReceiver
 				// It doesn't look good, there should reaaly be a connection for
 				// this packet....
 				// returning error back...
-				if (packet.getType() == StanzaType.error) {
-					// Drop packet.
-				} else {
+				try {
 					Packet error =
 						Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet,
-						"Service not available.", true);
+							"Service not available.", true);
 					error.setTo(packet.getFrom());
 					addOutPacket(error);
-					return;
+				} catch (PacketErrorTypeException e) {
+					log.warning("Packet processing exception: " + e);
 				}
+				return;
 			}
 
 			// It might be a message _to_ some user on this server
@@ -227,23 +229,22 @@ public class SessionManager extends AbstractMessageReceiver
 					&& packet.getElemFrom() != null && packet.getElemTo() != null
 					&& (packet.getElemName().equals("iq")
 						|| packet.getElemName().equals("message")))) {
-				// Infinite loop detection code:
-				if (packet.getType() == StanzaType.error) {
-					// Let's just ignore all error stanzas if there is no plugin to process
-					// them and no alive connection to receive them.
-				} else {
+				try {
 					error =	Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet,
 						"Service not available.", true);
+				} catch (PacketErrorTypeException e) {
+					log.warning("Packet processing exception: " + e);
 				}
 			} else {
-				if ((packet.getElemFrom() != null || conn != null)
-					&& packet.getType() != StanzaType.error) {
-					error = Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
-						"Feature not supported yet.", true);
-				} else {
-					log.warning("Lost packet: " + packet.getStringData());
-				} // end of else
-			} // end of if (stop) else
+				if (packet.getElemFrom() != null || conn != null) {
+					try {
+						error = Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
+							"Feature not supported yet.", true);
+					} catch (PacketErrorTypeException e) {
+						log.warning("Packet processing exception: " + e);
+					}
+				}
+			}
 			if (error != null) {
 				if (error.getElemTo() != null) {
 					conn = getResourceConnection(error.getElemTo());
@@ -336,8 +337,12 @@ public class SessionManager extends AbstractMessageReceiver
 				log.finest("XMPPProcessorIfc: "+proc.getClass().getSimpleName()+
 					" ("+proc.id()+")"+"\n Request: "+elem.toString()
 					+ (connection != null ? ", " + connection.getConnectionId() : " null"));
-				proc.process(packet, connection, naUserRepository, results);
-				packet.processedBy(proc.id());
+				try {
+					proc.process(packet, connection, naUserRepository, results);
+					packet.processedBy(proc.id());
+				} catch (XMPPException e) {
+					log.warning("Problem processing packet: " + e);
+				}
 			} // end of if (proc.isSupporting(elem.getName(), elem.getXMLNS()))
 		} // end of for ()
 		Collection<Element> children = elem.getChildren();

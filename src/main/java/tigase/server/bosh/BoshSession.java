@@ -37,6 +37,7 @@ import tigase.xml.Element;
 import tigase.server.Command;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.Authorization;
+import tigase.xmpp.PacketErrorTypeException;
 
 import static tigase.server.bosh.Constants.*;
 
@@ -321,10 +322,12 @@ public class BoshSession {
 					handler.cancelTask(ttemp);
 				}
 				for (Packet packet: waiting_packets) {
-					if (packet.getType() == null || packet.getType() != StanzaType.error) {
+					try {
 						out_results.offer(
 							Authorization.RECIPIENT_UNAVAILABLE.getResponseMessage(packet,
 								"Bosh = disconnected", true));
+					} catch (PacketErrorTypeException e) {
+						log.warning("Packet processing exception: " + e);
 					}
 				}
 				Packet command = Command.STREAM_CLOSED.getPacket(null, null,

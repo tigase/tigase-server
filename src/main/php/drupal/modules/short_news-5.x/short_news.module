@@ -53,7 +53,7 @@ function short_news_perm() {
 function short_news_block($op='list', $delta=0) {
 	// listing of blocks, such as on the admin/block page
 	if ($op == "list") {
-		$block[0]["info"] = t('Minis');
+		$block[0]["info"] = t('Minis - short news');
 		return $block;
 	} else if ($op == 'view') {
 		$posts_type = variable_get('short_news_blocktype', 'minis');
@@ -94,29 +94,37 @@ function short_news_block($op='list', $delta=0) {
 * Module configuration settings
 * @return settings HTML or deny access
 */
-function short_news_menu($may_cache) {
-	$items[] = array(
+function short_news_menu() {
+
+  $items = array();
+
+  $items[] = array(
     'path' => 'admin/settings/short_news',
     'title' => t('Short news'),
     'description' => t('Set short news displaying parameters.'),
     'callback' => 'drupal_get_form',
-    'callback arguments' => array('short_news_admin_settings'),
-    'access' => user_access('administer site configuration'),
-									 );
+    'callback arguments' => 'short_news_admin_settings',
+    'access' => user_access('access administration pages'),
+    'type' => MENU_NORMAL_ITEM,
+   );
+
+  return $items;
 }
 
 function short_news_admin_settings() {
-	$form['short_news_blockdisp'] =
-		array('#type' => 'textfield',
-			'#title' => t('Number of posts to display in block'),
-			'#default_value' => variable_get('short_news_blockdisp', 3),
-			'#description' => t("The maximum number of posts to display in the block."),
-			'#maxlength' => '2', '#size' => '2');
-	$form['short_news_blocktype'] =
-		array('#type' => 'textfield',
-			'#title' => t('Posts type to display in block'),
-			'#default_value' => variable_get('short_news_blocktype', 'minis'),
-			'#description' => t("The type of posts to display in block: 'minis', 'shorts', 'techs', 'funs', ..."),
-			'#maxlength' => '10', '#size' => '10');
+	$form['short_news_blockdisp'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Number of posts to display in block'),
+		'#default_value' => variable_get('short_news_blockdisp', 3),
+		'#description' => t("The maximum number of posts to display in the block."),
+		'#maxlength' => '2',
+		'#size' => '2');
+	$form['short_news_blocktype'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Posts type to display in block'),
+		'#default_value' => variable_get('short_news_blocktype', 'minis'),
+		'#description' => t("The type of posts to display in block: 'minis', 'shorts', 'techs', 'funs', ..."),
+		'#maxlength' => '10',
+		'#size' => '10');
 	return system_settings_form($form);
 }

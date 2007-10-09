@@ -171,9 +171,14 @@ public enum Authorization {
   public abstract String getErrorType();
 
   public Packet getResponseMessage(Packet p, String text,
-    boolean includeOriginalXML) {
-		return p.errorResult(getErrorType(), getCondition(), text,
-			includeOriginalXML);
+    boolean includeOriginalXML) throws PacketErrorTypeException {
+		if (p.getType() == null || p.getType() != StanzaType.error) {
+			return p.errorResult(getErrorType(), getCondition(), text,
+				includeOriginalXML);
+		} else {
+			throw new PacketErrorTypeException("The packet has already 'error' type: "
+				+ p.toString());
+		}
   }
 
 }

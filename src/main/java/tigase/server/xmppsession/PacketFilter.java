@@ -30,6 +30,7 @@ import tigase.xmpp.Authorization;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.StanzaType;
+import tigase.xmpp.PacketErrorTypeException;
 import tigase.util.JIDUtils;
 
 /**
@@ -173,9 +174,13 @@ public class PacketFilter {
 				return true;
 			}
 		} catch (NotAuthorizedException e) {
-			log.warning("NotAuthorizedException for packet: "	+ packet.getStringData());
-			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-					"You must authorize session first.", true));
+			try {
+				results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
+						"You must authorize session first.", true));
+				log.warning("NotAuthorizedException for packet: "	+ packet.getStringData());
+			} catch (PacketErrorTypeException e2) {
+				log.warning("Packet processing exception: " + e2);
+			}
 		} // end of try-catch
 
 		return false;

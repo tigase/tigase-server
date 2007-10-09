@@ -35,6 +35,7 @@ import tigase.xmpp.XMPPPreprocessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.Authorization;
+import tigase.xmpp.XMPPException;
 import tigase.util.JIDUtils;
 import tigase.util.Base64;
 import tigase.db.UserNotFoundException;
@@ -96,7 +97,8 @@ public class JabberIqIq extends XMPPProcessor
 	}
 
 	public void process(Packet packet, XMPPResourceConnection session,
-		NonAuthUserRepository repo, Queue<Packet> results) {
+		NonAuthUserRepository repo, Queue<Packet> results)
+		throws XMPPException {
 
 		if (session == null && packet.getType() != null
 			&& packet.getType() == StanzaType.get) {

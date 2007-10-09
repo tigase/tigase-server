@@ -34,6 +34,7 @@ import tigase.xmpp.XMPPImplIfc;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.XMPPException;
 import tigase.util.JIDUtils;
 
 /**
@@ -77,7 +78,8 @@ public class Jingle extends XMPPProcessor implements XMPPProcessorIfc {
 	 * @param results a <code>Queue</code> value
 	 */
 	public void process(final Packet packet, final XMPPResourceConnection conn,
-		final NonAuthUserRepository nonAuthUserRepo, final Queue<Packet> results) {
+		final NonAuthUserRepository nonAuthUserRepo, final Queue<Packet> results)
+		throws XMPPException {
 
 		if (conn == null) { return; }
 

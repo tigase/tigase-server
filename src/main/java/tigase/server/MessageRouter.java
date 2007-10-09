@@ -44,6 +44,7 @@ import tigase.xml.Element;
 import tigase.util.JIDUtils;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.StanzaType;
+import tigase.xmpp.PacketErrorTypeException;
 import tigase.disco.XMPPService;
 import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
@@ -118,10 +119,14 @@ public class MessageRouter extends AbstractMessageReceiver {
 		}
 
 		if (packet.getPermissions() != Permissions.ADMIN) {
-			Packet res = Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-				"You are not authorized for this action.", true);
-			results.offer(res);
-			//processPacket(res);
+			try {
+				Packet res = Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
+					"You are not authorized for this action.", true);
+				results.offer(res);
+				//processPacket(res);
+			} catch (PacketErrorTypeException e) {
+				log.warning("Packet processing exception: " + e);
+			}
 			return;
 		}
 
@@ -177,10 +182,14 @@ public class MessageRouter extends AbstractMessageReceiver {
 		if (packet.getTo() == NULL_ROUTING) {
 			log.info("NULL routing, it is normal if server doesn't know how to"
 				+ " process packet: " + packet.toString());
-			Packet error =
-				Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
-				"Feature not supported yet.", true);
-			addOutPacketNB(error);
+			try {
+				Packet error =
+					Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
+						"Feature not supported yet.", true);
+				addOutPacketNB(error);
+			} catch (PacketErrorTypeException e) {
+				log.warning("Packet processing exception: " + e);
+			}
 			return;
 		}
 
@@ -195,8 +204,11 @@ public class MessageRouter extends AbstractMessageReceiver {
 		if (localAddresses.contains(id) || local_comp_name != null) {
 			// Detect inifinite loop if from == to
 			// Maybe it is not needed anymore...
-			if (packet.getFrom() != null &&
-				packet.getFrom().equals(packet.getTo())) {
+			if ((packet.getFrom() != null
+					&& packet.getFrom().equals(packet.getTo()))
+				|| (packet.getFrom() == NULL_ROUTING
+					&& packet.getElemFrom() != null
+					&& packet.getElemFrom().equals(packet.getTo()))) {
 				log.warning("Possible infinite loop, dropping packet: "
 					+ packet.toString());
 				return;
@@ -280,12 +292,12 @@ public class MessageRouter extends AbstractMessageReceiver {
 		// remote server, let's try sending it through s2s service:
 		if (localAddresses.contains(JIDUtils.getNodeHost(packet.getTo()))
 			|| local_comp_name != null) {
-			if (packet.getType() == null || packet.getType() != StanzaType.error) {
-				// This packet is to local domain, we don't want to send it out
+			try {
 				addOutPacketNB(
 					Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
 						"Your request can not be processed.", true));
-			} else {
+			} catch (PacketErrorTypeException e) {
+				// This packet is to local domain, we don't want to send it out
 				// drop packet :-(
 				log.warning("Can't process packet to local domain, dropping..."
 					+ packet.toString());

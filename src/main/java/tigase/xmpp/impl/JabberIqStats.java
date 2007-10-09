@@ -34,6 +34,7 @@ import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.Authorization;
+import tigase.xmpp.XMPPException;
 import tigase.util.JIDUtils;
 import tigase.util.ElementUtils;
 import tigase.db.NonAuthUserRepository;
@@ -74,7 +75,8 @@ public class JabberIqStats extends XMPPProcessor
 	{ return Arrays.copyOf(DISCO_FEATURES, DISCO_FEATURES.length); }
 
 	public void process(final Packet packet, final XMPPResourceConnection session,
-		final NonAuthUserRepository repo, final Queue<Packet> results) {
+		final NonAuthUserRepository repo, final Queue<Packet> results)
+		throws XMPPException {
 
 		if (session == null) { return; }
 

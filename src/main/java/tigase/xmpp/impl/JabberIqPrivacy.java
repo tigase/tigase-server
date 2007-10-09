@@ -35,6 +35,7 @@ import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPPreprocessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.XMPPException;
 import tigase.xml.Element;
 import tigase.db.NonAuthUserRepository;
 
@@ -220,7 +221,8 @@ public class JabberIqPrivacy extends XMPPProcessor
 	}
 
   public void process(final Packet packet, final XMPPResourceConnection session,
-		final NonAuthUserRepository repo, final Queue<Packet> results) {
+		final NonAuthUserRepository repo, final Queue<Packet> results)
+		throws XMPPException {
 
 		if (session == null) {
 			return;
@@ -255,7 +257,7 @@ public class JabberIqPrivacy extends XMPPProcessor
 
 	private void processSetRequest(final Packet packet,
 		final XMPPResourceConnection session,	final Queue<Packet> results)
-    throws NotAuthorizedException {
+    throws NotAuthorizedException, XMPPException {
 		List<Element> children = packet.getElemChildren("/iq/query");
 		if (children != null && children.size() == 1) {
 			Element child = children.get(0);
@@ -286,7 +288,7 @@ public class JabberIqPrivacy extends XMPPProcessor
 
 	private void processGetRequest(final Packet packet,
 		final XMPPResourceConnection session,	final Queue<Packet> results)
-    throws NotAuthorizedException {
+    throws NotAuthorizedException, XMPPException {
 		List<Element> children = packet.getElemChildren("/iq/query");
 		if (children == null || children.size() == 0) {
 			String[] lists = Privacy.getLists(session);

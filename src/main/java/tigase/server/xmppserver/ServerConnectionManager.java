@@ -59,6 +59,7 @@ import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPIOService;
 import tigase.xmpp.Authorization;
+import tigase.xmpp.PacketErrorTypeException;
 import tigase.stats.StatRecord;
 
 /**
@@ -162,9 +163,13 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService> {
 				// Let's send the packet back....
 				log.finest("Packet addresses to localhost, I am not processing it: "
 					+ packet.getStringData());
-				addOutPacket(
-					Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet,
-						"S2S - not delivered", true));
+				try {
+					addOutPacket(
+						Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet,
+							"S2S - not delivered", true));
+				} catch (PacketErrorTypeException e) {
+					log.warning("Packet processing exception: " + e);
+				}
 				return;
 			}
 
@@ -206,14 +211,14 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService> {
 					// remote server tries to connect from domain which doesn't exist
 					// in DNS so no further action should be performed.
 					if ((packet.getElement().getXMLNS() == null
-							|| !packet.getElement().getXMLNS().equals(DIALBACK_XMLNS))
-						&& (packet.getType() != StanzaType.error
-							|| packet.getErrorCondition() == null
-							|| !packet.getErrorCondition().equals(
-								Authorization.REMOTE_SERVER_NOT_FOUND.getCondition()))) {
-						addOutPacket(
-							Authorization.REMOTE_SERVER_NOT_FOUND.getResponseMessage(packet,
-								"S2S - destination host not found", true));
+							|| !packet.getElement().getXMLNS().equals(DIALBACK_XMLNS))) {
+						try {
+							addOutPacket(
+								Authorization.REMOTE_SERVER_NOT_FOUND.getResponseMessage(packet,
+									"S2S - destination host not found", true));
+						} catch (PacketErrorTypeException e) {
+							log.warning("Packet processing exception: " + e);
+						}
 					}
 				}
 			} // end of if (serv == null)
@@ -353,7 +358,11 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService> {
 			Packet p = null;
 			while ((p = waiting.poll()) != null) {
 				log.finest("Sending packet back: " + p.getStringData());
-				addOutPacket(author.getResponseMessage(p, "S2S - not delivered", true));
+				try {
+					addOutPacket(author.getResponseMessage(p, "S2S - not delivered", true));
+				} catch (PacketErrorTypeException e) {
+					log.warning("Packet processing exception: " + e);
+				}
 			} // end of while (p = waitingPackets.remove(ipAddress) != null)
 		} // end of if (waiting != null)
 	}

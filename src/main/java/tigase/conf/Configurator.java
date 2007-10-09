@@ -57,6 +57,7 @@ import tigase.xml.XMLUtils;
 import tigase.xml.db.Types.DataType;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.StanzaType;
+import tigase.xmpp.PacketErrorTypeException;
 
 import static tigase.server.MessageRouterConfig.DEF_SM_NAME;
 
@@ -640,8 +641,12 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 					return;
 				}
 			} else {
-				results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-						"You are not authorized for this action.", true));
+				try {
+					results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
+							"You are not authorized for this action.", true));
+				} catch (PacketErrorTypeException e) {
+					log.warning("Packet processing exception: " + e);
+				}
 				return;
 			}
 		}

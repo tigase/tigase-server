@@ -40,6 +40,7 @@ import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.XMPPException;
 
 /**
  * JEP-0078: Non-SASL Authentication
@@ -91,7 +92,8 @@ public class JabberIqAuth extends XMPPProcessor
 	}
 
 	public void process(final Packet packet, final XMPPResourceConnection session,
-		final NonAuthUserRepository repo, final Queue<Packet> results) {
+		final NonAuthUserRepository repo, final Queue<Packet> results)
+		throws XMPPException {
 
 		if (session == null) {
 			return;

@@ -40,6 +40,7 @@ import tigase.stats.StatRecord;
 import tigase.util.JIDUtils;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.Authorization;
+import tigase.xmpp.PacketErrorTypeException;
 import java.util.LinkedList;
 
 import static tigase.server.sreceiver.PropertyConstants.*;
@@ -426,8 +427,12 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 			if (isAllowedToPost(JIDUtils.getNodeID(packet.getElemFrom()))) {
 				processMessage(packet, results);
 			} else {
-				results.offer(Authorization.NOT_ALLOWED.getResponseMessage(packet,
-						"You are not allowed to post a message.", true));
+				try {
+					results.offer(Authorization.NOT_ALLOWED.getResponseMessage(packet,
+							"You are not allowed to post a message.", true));
+				} catch (PacketErrorTypeException e) {
+					log.warning("Packet processing exception: " + e);
+				}
 			}
 		} // end of if (packet.getElemName().equals("message"))
 		packets_sent += results.size();

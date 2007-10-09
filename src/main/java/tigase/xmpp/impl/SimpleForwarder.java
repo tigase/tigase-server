@@ -33,6 +33,7 @@ import tigase.xmpp.XMPPImplIfc;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.XMPPException;
 import tigase.util.JIDUtils;
 
 /**
@@ -74,7 +75,8 @@ public abstract class SimpleForwarder
 	 * @param results a <code>Queue</code> value
 	 */
 	public void process(final Packet packet, final XMPPResourceConnection session,
-		final NonAuthUserRepository repo, final Queue<Packet> results) {
+		final NonAuthUserRepository repo, final Queue<Packet> results)
+		throws XMPPException {
 
 		if (session == null) {
 			return;
