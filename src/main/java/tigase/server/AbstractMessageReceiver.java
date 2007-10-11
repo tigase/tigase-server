@@ -218,6 +218,8 @@ public abstract class AbstractMessageReceiver
 				minutes[(min_idx == 0 ? 59 : min_idx - 1)], Level.FINE));
 		int curr_hour = 0;
 		for (int min: minutes) { curr_hour += min; }
+		for (int sec: seconds) { curr_hour += sec; }
+		curr_hour += curr_second;
 		stats.add(new StatRecord(getName(), "Last hour packets", "int",
 				curr_hour, Level.FINE));
     return stats;
