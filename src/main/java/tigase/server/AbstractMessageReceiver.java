@@ -141,6 +141,7 @@ public abstract class AbstractMessageReceiver
   }
 
 	private boolean prAddPacket(Packet packet) {
+		++curr_second;
 		try {
 // 			log.finest(">" + getName() + "<  " +
 // 				"Adding packet to inQueue: " + packet.getStringData());
@@ -154,6 +155,7 @@ public abstract class AbstractMessageReceiver
   }
 
 	protected boolean addOutPacket(Packet packet) {
+		++curr_second;
 		try {
 // 			log.finest(">" + getName() + "<  " +
 // 				"Adding packet to outQueue: " + packet.getStringData());
@@ -173,6 +175,7 @@ public abstract class AbstractMessageReceiver
 	 * @return a <code>boolean</code> value
 	 */
 	protected boolean addOutPacketNB(Packet packet) {
+		++curr_second;
 		log.finest(">" + getName() + "<  " +
 			"Adding packet to outQueue: " + packet.getStringData());
 		boolean result =
@@ -447,7 +450,6 @@ public abstract class AbstractMessageReceiver
 					QueueElement qel = queue.take();
 					switch (qel.type) {
 					case IN_QUEUE:
-						++curr_second;
 						processPacket(qel.packet);
 						break;
 					case OUT_QUEUE:
