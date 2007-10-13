@@ -82,7 +82,7 @@ public class JabberIqPrivacy extends XMPPProcessor
 			String or2 = el2.getAttribute(ORDER);
 			return or1.compareTo(or2);
 		}
-		};
+	};
 
 	public String id() { return ID; }
 
@@ -110,12 +110,13 @@ public class JabberIqPrivacy extends XMPPProcessor
 
 		try {
 			Element list = Privacy.getActiveList(session);
-			if (list == null) {
+			if (list == null && session.getSessionData("privacy-init") == null) {
 				String lName = Privacy.getDefaultList(session);
 				if (lName != null) {
 					Privacy.setActiveList(session, lName);
 					list = Privacy.getActiveList(session);
 				} // end of if (lName != null)
+				session.putSessionData("privacy-init", "");
 			} // end of if (lName == null)
 			if (list != null) {
 				List<Element> items = list.getChildren();
