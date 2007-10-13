@@ -49,6 +49,12 @@ public class ConnectionOpenThread implements Runnable {
 
   private static final Logger log =
 		Logger.getLogger("tigase.net.ConnectionOpenThread");
+	/**
+	 * <code>RECEIVE_BUFFER_SIZE</code> defines a size for TCP/IP packets.
+	 * XMPP data packets are quite small usually, below 1kB so we don't need
+	 * big TCP/IP data buffers.
+	 */
+	private static final int RECEIVE_BUFFER_SIZE = 2*1024;
 
   protected long accept_counter = 0;
 
@@ -125,6 +131,7 @@ public class ConnectionOpenThread implements Runnable {
 		case accept:
 			log.finest("Setting up 'accept' channel...");
 			ServerSocketChannel ssc = ServerSocketChannel.open();
+			ssc.socket().setReceiveBufferSize(RECEIVE_BUFFER_SIZE);
 			ssc.configureBlocking(false);
 			ssc.socket().bind(isa);
 			ssc.register(selector, SelectionKey.OP_ACCEPT, al);
@@ -133,6 +140,7 @@ public class ConnectionOpenThread implements Runnable {
 			log.finest("Setting up 'connect' channel for: "
 				+ isa.getAddress() + "/" + isa.getPort());
 			SocketChannel sc = SocketChannel.open();
+			sc.socket().setReceiveBufferSize(RECEIVE_BUFFER_SIZE);
 			sc.configureBlocking(false);
 			sc.connect(isa);
 			sc.register(selector, SelectionKey.OP_CONNECT, al);
