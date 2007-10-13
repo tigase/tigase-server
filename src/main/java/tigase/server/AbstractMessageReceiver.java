@@ -206,22 +206,30 @@ public abstract class AbstractMessageReceiver
 
   public List<StatRecord> getStatistics() {
     List<StatRecord> stats = new LinkedList<StatRecord>();
-    stats.add(new StatRecord(getName(), StatisticType.QUEUE_SIZE,
-				(in_queue.size() + out_queue.size()), Level.FINEST));
-    stats.add(new StatRecord(getName(), StatisticType.MSG_RECEIVED_OK,
-				statAddedMessagesOk, Level.FINE));
-    stats.add(new StatRecord(getName(), StatisticType.QUEUE_OVERFLOW,
-				statAddedMessagesEr, Level.FINEST));
 		stats.add(new StatRecord(getName(), "Last second packets", "int",
 				seconds[(sec_idx == 0 ? 59 : sec_idx - 1)], Level.FINE));
 		stats.add(new StatRecord(getName(), "Last minute packets", "int",
 				minutes[(min_idx == 0 ? 59 : min_idx - 1)], Level.FINE));
-		int curr_hour = 0;
+		long curr_hour = 0;
 		for (int min: minutes) { curr_hour += min; }
-		for (int sec: seconds) { curr_hour += sec; }
+		//for (int sec: seconds) { curr_hour += sec; }
 		curr_hour += curr_second;
+		if (curr_hour > statAddedMessagesOk) {
+			// This is not a dirty hack!! It looks weird but this is correct.
+			// Last second, minute and hour are calculated in different threads
+			// from the main packets processing thread and sometimes might
+			// be out of sync. It does look odd on stats page so this statements
+			// saves from long explanations to non-techies.
+			curr_hour = statAddedMessagesOk;
+		}
 		stats.add(new StatRecord(getName(), "Last hour packets", "int",
 				curr_hour, Level.FINE));
+    stats.add(new StatRecord(getName(), StatisticType.MSG_RECEIVED_OK,
+				statAddedMessagesOk, Level.FINE));
+    stats.add(new StatRecord(getName(), StatisticType.QUEUE_SIZE,
+				(in_queue.size() + out_queue.size()), Level.FINEST));
+    stats.add(new StatRecord(getName(), StatisticType.QUEUE_OVERFLOW,
+				statAddedMessagesEr, Level.FINEST));
     return stats;
   }
 
