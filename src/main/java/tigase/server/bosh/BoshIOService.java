@@ -46,6 +46,9 @@ public class BoshIOService extends XMPPIOService {
 	private UUID sid = null;
 
 	private static final String EOL = "\r\n";
+	private static final String HTTP_RESPONSE = "HTTP/1.1 200 OK" + EOL;
+	private static final String CONTENT_TYPE_HEADER = "Content-Type: ";
+	private static final String CONTENT_TYPE_LENGTH = "Content-Length: ";
 
 	private String content_type = "text/xml; charset=utf-8";
 
@@ -55,9 +58,9 @@ public class BoshIOService extends XMPPIOService {
 
 	public void writeRawData(String data) throws IOException {
 		StringBuilder sb = new StringBuilder();
-		sb.append("HTTP/1.1 200 OK" + EOL);
-		sb.append("Content-Type: " + content_type + EOL);
-		sb.append("Content-Length: " + data.getBytes().length + EOL);
+		sb.append(HTTP_RESPONSE);
+		sb.append(CONTENT_TYPE_HEADER + content_type + EOL);
+		sb.append(CONTENT_TYPE_LENGTH + data.getBytes().length + EOL);
 		sb.append(EOL);
 		sb.append(data);
 		log.finest("Writing to socket:\n" + sb.toString());
