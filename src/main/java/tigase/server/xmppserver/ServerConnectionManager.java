@@ -153,6 +153,12 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService> {
 				return;
 			}
 
+			if (packet.getElemFrom() == null) {
+				log.warning("Missing 'from' attribute, ignoring packet..."
+					+ packet.toString());
+				return;
+			}
+
 			// Check whether addressing is correct:
 			String to_hostname = JIDUtils.getNodeHost(packet.getElemTo());
 			// We don't send packets to local domains trough s2s, there
@@ -283,8 +289,8 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService> {
 	}
 
 	private String getConnectionId(Packet packet) {
-		return JIDUtils.getJID(JIDUtils.getNodeHost(packet.getFrom()),
-			JIDUtils.getNodeHost(packet.getTo()),
+		return JIDUtils.getJID(JIDUtils.getNodeHost(packet.getElemFrom()),
+			JIDUtils.getNodeHost(packet.getElemTo()),
 			ConnectionType.connect.toString());
 	}
 
@@ -738,7 +744,11 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService> {
 			serv.getSessionData().put("local-hostname", local_hostname);
 			serv.getSessionData().put("remote-hostname", remote_hostname);
 			handshakingByHost_Type.put(cid, serv);
-			if (old_serv != null) {
+			// Apparently some servers open more than 1 connection and apparently
+			// this is correct. So, let's try to not stop the old connection if it
+			// it accept type....
+			if (old_serv != null
+				&& old_serv.connectionType() == ConnectionType.accept) {
 				log.finest("Stopping old connection for: " + cid);
 				old_serv.stop();
 			}
