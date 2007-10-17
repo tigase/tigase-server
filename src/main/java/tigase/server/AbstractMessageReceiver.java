@@ -82,7 +82,7 @@ public abstract class AbstractMessageReceiver
   private LinkedBlockingQueue<QueueElement> out_queue =
 		new LinkedBlockingQueue<QueueElement>(maxQueueSize);
 
-// 	private String sync = "SyncObject";
+	// 	private String sync = "SyncObject";
 
 	private Timer receiverTasks = null;
 	private Thread in_thread = null;
@@ -91,10 +91,12 @@ public abstract class AbstractMessageReceiver
   private String name = null;
 	private Set<String> routings = new CopyOnWriteArraySet<String>();
 	private Set<Pattern> regexRoutings = new CopyOnWriteArraySet<Pattern>();
-	private int curr_second = 0;
-	private int[] seconds = new int[60];
+	private long curr_second = 0;
+	private long curr_minute = 0;
+	private long curr_hour = 0;
+	private long[] seconds = new long[60];
 	private int sec_idx = 0;
-	private int[] minutes = new int[60];
+	private long[] minutes = new long[60];
 	private int min_idx = 0;
 
   /**
@@ -141,12 +143,12 @@ public abstract class AbstractMessageReceiver
   }
 
 	private boolean prAddPacket(Packet packet) {
-		++curr_second;
 		try {
-// 			log.finest(">" + getName() + "<  " +
-// 				"Adding packet to inQueue: " + packet.getStringData());
+			// 			log.finest(">" + getName() + "<  " +
+			// 				"Adding packet to inQueue: " + packet.getStringData());
 			in_queue.put(new QueueElement(QueueElementType.IN_QUEUE, packet));
 			++statAddedMessagesOk;
+			++curr_second;
 		} catch (InterruptedException e) {
 			++statAddedMessagesEr;
 			return false;
@@ -155,12 +157,12 @@ public abstract class AbstractMessageReceiver
   }
 
 	protected boolean addOutPacket(Packet packet) {
-		++curr_second;
 		try {
-// 			log.finest(">" + getName() + "<  " +
-// 				"Adding packet to outQueue: " + packet.getStringData());
+			// 			log.finest(">" + getName() + "<  " +
+			// 				"Adding packet to outQueue: " + packet.getStringData());
 			out_queue.put(new QueueElement(QueueElementType.OUT_QUEUE, packet));
 			++statAddedMessagesOk;
+			++curr_second;
 		} catch (InterruptedException e) {
 			++statAddedMessagesEr;
 			return false;
@@ -175,13 +177,13 @@ public abstract class AbstractMessageReceiver
 	 * @return a <code>boolean</code> value
 	 */
 	protected boolean addOutPacketNB(Packet packet) {
-		++curr_second;
 		log.finest(">" + getName() + "<  " +
 			"Adding packet to outQueue: " + packet.getStringData());
 		boolean result =
 			out_queue.offer(new QueueElement(QueueElementType.OUT_QUEUE, packet));
 		if (result) {
 			++statAddedMessagesOk;
+			++curr_second;
 		} else {
 			++statAddedMessagesEr;
 		}
@@ -210,18 +212,18 @@ public abstract class AbstractMessageReceiver
 				seconds[(sec_idx == 0 ? 59 : sec_idx - 1)], Level.FINE));
 		stats.add(new StatRecord(getName(), "Last minute packets", "int",
 				minutes[(min_idx == 0 ? 59 : min_idx - 1)], Level.FINE));
-		long curr_hour = 0;
-		for (int min: minutes) { curr_hour += min; }
+		// 		long curr_hour = 0;
+		// 		for (long min: minutes) { curr_hour += min; }
 		//for (int sec: seconds) { curr_hour += sec; }
-		curr_hour += curr_second;
-		if (curr_hour > statAddedMessagesOk) {
-			// This is not a dirty hack!! It looks weird but this is correct.
-			// Last second, minute and hour are calculated in different threads
-			// from the main packets processing thread and sometimes might
-			// be out of sync. It does look odd on stats page so this statements
-			// saves from long explanations to non-techies.
-			curr_hour = statAddedMessagesOk;
-		}
+		//curr_hour += curr_second;
+		// 		if (curr_hour > statAddedMessagesOk) {
+		// 			// This is not a dirty hack!! It looks weird but this is correct.
+		// 			// Last second, minute and hour are calculated in different threads
+		// 			// from the main packets processing thread and sometimes might
+		// 			// be out of sync. It does look odd on stats page so this statements
+		// 			// saves from long explanations to non-techies.
+		// 			curr_hour = statAddedMessagesOk;
+		// 		}
 		stats.add(new StatRecord(getName(), "Last hour packets", "int",
 				curr_hour, Level.FINE));
     stats.add(new StatRecord(getName(), StatisticType.MSG_RECEIVED_OK,
@@ -263,9 +265,9 @@ public abstract class AbstractMessageReceiver
     } // end of if (this.maxQueueSize != maxQueueSize)
   }
 
-//   public void setLocalAddresses(String[] addresses) {
-//     localAddresses = addresses;
-//   }
+	//   public void setLocalAddresses(String[] addresses) {
+	//     localAddresses = addresses;
+	//   }
 
 	protected Integer getDefMaxQueueSize() {
 		return MAX_QUEUE_SIZE_PROP_VAL;
@@ -342,25 +344,25 @@ public abstract class AbstractMessageReceiver
 		receiverTasks = new Timer(getName() + " tasks", true);
 		receiverTasks.schedule(new TimerTask() {
 				public void run() {
-					seconds[sec_idx++] = curr_second;
+					curr_minute -= seconds[sec_idx];
+					seconds[sec_idx] = curr_second;
 					curr_second = 0;
+					curr_minute += seconds[sec_idx++];
 					if (sec_idx >= 60) {
 						sec_idx = 0;
 					}
 				}
-			}, 10*SECOND, SECOND);
+			}, SECOND, SECOND);
 		receiverTasks.schedule(new TimerTask() {
 				public void run() {
-					int curr_minute = 0;
-					for (int sec: seconds) {
-						curr_minute += sec;
-					}
-					minutes[min_idx++] = curr_minute;
+					curr_hour -= minutes[min_idx];
+					minutes[min_idx] = curr_minute;
+					curr_hour += minutes[min_idx++];
 					if (min_idx >= 60) {
 						min_idx = 0;
 					}
 				}
-			}, 10*SECOND+MINUTE, MINUTE);
+			}, MINUTE, MINUTE);
 
 	}
 
@@ -417,13 +419,13 @@ public abstract class AbstractMessageReceiver
 	}
 
 	public boolean isInRegexRoutings(String address) {
-// 		log.finest(getName() + " looking for regex routings: " + address);
+		// 		log.finest(getName() + " looking for regex routings: " + address);
 		for (Pattern pat: regexRoutings) {
 			if (pat.matcher(address).matches()) {
 				log.finest(getName() + " matched against pattern: " + pat.toString());
 				return true;
 			}
-// 			log.finest(getName() + " matching failed against pattern: " + pat.toString());
+			// 			log.finest(getName() + " matching failed against pattern: " + pat.toString());
 		}
 		return false;
 	}
@@ -464,8 +466,8 @@ public abstract class AbstractMessageReceiver
 						break;
 					case OUT_QUEUE:
 						if (parent != null) {
-// 							log.finest(">" + getName() + "<  " +
-// 								"Sending outQueue to parent: " + parent.getName());
+							// 							log.finest(">" + getName() + "<  " +
+							// 								"Sending outQueue to parent: " + parent.getName());
 							parent.addPacket(qel.packet);
 						} else {
 							// It may happen for MessageRouter and this is intentional
