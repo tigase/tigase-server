@@ -748,7 +748,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService> {
 			// this is correct. So, let's try to not stop the old connection if it
 			// it accept type....
 			if (old_serv != null
-				&& old_serv.connectionType() == ConnectionType.accept) {
+				&& old_serv.connectionType() != ConnectionType.accept) {
 				log.finest("Stopping old connection for: " + cid);
 				old_serv.stop();
 			}
