@@ -37,22 +37,36 @@
   <build>
     <plugins>
       <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
-          <encoding>UTF-8</encoding>
-        </configuration>
+      	<artifactId>maven-compiler-plugin</artifactId>
+      	<configuration>
+      		<source>1.6</source>
+      		<target>1.6</target>
+      		<encoding>UTF-8</encoding>
+      	</configuration>
       </plugin>
       <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.0.1</version>
-        <configuration>
-          <descriptors>
-            <descriptor>src/main/assembly/prodenv.xml</descriptor>
-          </descriptors>
-          <finalName>${artifactId}-${version}</finalName>
-        </configuration>
+      	<artifactId>maven-jar-plugin</artifactId>
+      	<version>2.1</version>
+      	<configuration>
+      		<archive>
+      			<manifest>
+      				<packageName>tigase/</packageName>
+      				<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+      				<mainClass>tigase.server.XMPPServer</mainClass>
+      			</manifest>
+      			<manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
+      		</archive>
+      	</configuration>
+      </plugin>
+      <plugin>
+      	<artifactId>maven-assembly-plugin</artifactId>
+      	<version>2.0.1</version>
+      	<configuration>
+      		<descriptors>
+      			<descriptor>src/main/assembly/prodenv.xml</descriptor>
+      		</descriptors>
+      		<finalName>${artifactId}-${version}</finalName>
+      	</configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
