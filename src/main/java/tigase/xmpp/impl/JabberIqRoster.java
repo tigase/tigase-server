@@ -156,12 +156,13 @@ public class JabberIqRoster extends XMPPProcessor
       for (String buddy : buddies) {
 				query.addChild(Roster.getBuddyItem(session, buddy));
       }
+			DynamicRosterIfc[] dynr = null;
 			if (settings != null) {
 				synchronized (settings) {
 					init_settings(settings);
 				}
+				dynr = (DynamicRosterIfc[])settings.get(DYNAMIC_ROSTERS);
 			}
-			DynamicRosterIfc[] dynr = (DynamicRosterIfc[])settings.get(DYNAMIC_ROSTERS);
 			if (dynr != null) {
 				for (DynamicRosterIfc dri: dynr) {
 					List<Element> items = dri.getRosterItems(session);
