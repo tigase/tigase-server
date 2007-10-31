@@ -246,10 +246,9 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 							// the external component (it acts as like s2s component)
 							PORT_ROUTING_TABLE_PROP_VAL =	new String[] { "*" };
 						} else {
+							String regex_host = PORT_REMOTE_HOST_PROP_VAL.replace(".", "\\.");
 							PORT_ROUTING_TABLE_PROP_VAL =
-								new String[] { PORT_REMOTE_HOST_PROP_VAL,
-															 ".*@" + PORT_REMOTE_HOST_PROP_VAL,
-															 ".*\\." + PORT_REMOTE_HOST_PROP_VAL	};
+								new String[] { regex_host, ".*@" + regex_host, ".*\\." + regex_host	};
 						}
 					}
 					break;
@@ -261,9 +260,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 			PORT_REMOTE_HOST_PROP_VAL = getName() + ".localhost";
 			String regex_host = PORT_REMOTE_HOST_PROP_VAL.replace(".", "\\.");
 			PORT_ROUTING_TABLE_PROP_VAL =
-				new String[] { PORT_REMOTE_HOST_PROP_VAL,
-											 ".*@" + regex_host,
-											 ".*\\." + regex_host	};
+				new String[] { regex_host, ".*@" + regex_host, ".*\\." + regex_host	};
 		} // end of if (!def_found)
 		Map<String, Object> props = super.getDefaults(params);
 		props.put(PACK_ROUTED_KEY, PACK_ROUTED_VAL);
