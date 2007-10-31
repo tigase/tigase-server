@@ -115,6 +115,8 @@ public class SessionManager extends AbstractMessageReceiver
 		new ConcurrentSkipListMap<String, XMPPPostprocessorIfc>();
 	private Map<String, XMPPStopListenerIfc> stopListeners =
 		new ConcurrentSkipListMap<String, XMPPStopListenerIfc>();
+	private Map<String, Map<String, Object>> plugin_config =
+		new ConcurrentSkipListMap<String, Map<String, Object>>();
 
 	private ServiceEntity serviceEntity = null;
 
@@ -338,7 +340,8 @@ public class SessionManager extends AbstractMessageReceiver
 					" ("+proc.id()+")"+"\n Request: "+elem.toString()
 					+ (connection != null ? ", " + connection.getConnectionId() : " null"));
 				try {
-					proc.process(packet, connection, naUserRepository, results);
+					proc.process(packet, connection, naUserRepository, results,
+						plugin_config.get(proc.id()));
 					packet.processedBy(proc.id());
 				} catch (XMPPException e) {
 					log.warning("Problem processing packet: " + e);
@@ -618,6 +621,18 @@ public class SessionManager extends AbstractMessageReceiver
 		processors.clear();
 		for (String comp_id: plugins) {
 			addPlugin(comp_id);
+			Map<String, Object> plugin_settings =
+				new ConcurrentSkipListMap<String, Object>();
+			for (Map.Entry<String, Object> entry: props.entrySet()) {
+				if (entry.getKey().startsWith(PLUGINS_CONF_PROP_KEY + "/" + comp_id)) {
+					plugin_settings.put(
+						entry.getKey().substring((PLUGINS_CONF_PROP_KEY + "/" + comp_id + "/").length()), entry.getValue());
+				}
+			}
+			if (plugin_settings.size() > 0) {
+				log.finest(plugin_settings.toString());
+				plugin_config.put(comp_id, plugin_settings);
+			}
 		} // end of for (String comp_id: plugins)
 		String[] hostnames = (String[])props.get(HOSTNAMES_PROP_KEY);
 		clearRoutings();

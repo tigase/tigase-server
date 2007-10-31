@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 import java.util.Arrays;
 import java.util.Queue;
 import java.util.List;
+import java.util.Map;
 import tigase.db.NonAuthUserRepository;
 import tigase.server.Packet;
 import tigase.xml.Element;
@@ -99,7 +100,8 @@ public class JabberIqPrivate extends XMPPProcessor implements XMPPProcessorIfc {
 	 * @param results a <code>Queue</code> value
 	 */
 	public void process(Packet packet, XMPPResourceConnection session,
-		NonAuthUserRepository repo, Queue<Packet> results)
+		NonAuthUserRepository repo, Queue<Packet> results,
+		final Map<String, Object> settings)
 		throws XMPPException {
 
 		// Don't do anything if session is null

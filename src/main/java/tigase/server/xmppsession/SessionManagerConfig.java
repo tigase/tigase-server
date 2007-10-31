@@ -44,6 +44,7 @@ public class SessionManagerConfig {
 	public static final String AUTH_REPO_URL_PROP_KEY = "auth-repo-url";
 
 	public static final String PLUGINS_PROP_KEY = "plugins";
+	public static final String PLUGINS_CONF_PROP_KEY = "plugins-conf";
 	/**
 	 * List of default plugins loaded by the server. It can be changed later
 	 * in config file or at runtime.

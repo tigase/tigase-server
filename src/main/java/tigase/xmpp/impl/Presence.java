@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.Queue;
 import java.util.EnumSet;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.logging.Logger;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
@@ -290,7 +291,8 @@ public class Presence extends XMPPProcessor
 
 	@SuppressWarnings("fallthrough")
   public void process(final Packet packet, final XMPPResourceConnection session,
-		final NonAuthUserRepository repo, final Queue<Packet> results)
+		final NonAuthUserRepository repo, final Queue<Packet> results,
+		final Map<String, Object> settings)
 		throws XMPPException {
 
 		if (session == null) {

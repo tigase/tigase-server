@@ -24,6 +24,7 @@ package tigase.xmpp.impl;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Queue;
+import java.util.Map;
 import tigase.server.Packet;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
@@ -77,7 +78,8 @@ public class JabberIqRegister extends XMPPProcessor
 	{ return Arrays.copyOf(DISCO_FEATURES, DISCO_FEATURES.length); }
 
 	public void process(final Packet packet, final XMPPResourceConnection session,
-		final NonAuthUserRepository repo, final Queue<Packet> results)
+		final NonAuthUserRepository repo, final Queue<Packet> results,
+		final Map<String, Object> settings)
 		throws XMPPException {
 
 		if (session == null) {

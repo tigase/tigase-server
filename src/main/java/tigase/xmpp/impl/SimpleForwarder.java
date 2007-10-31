@@ -23,6 +23,7 @@ package tigase.xmpp.impl;
 
 import java.util.List;
 import java.util.Queue;
+import java.util.Map;
 import java.util.logging.Logger;
 import tigase.db.NonAuthUserRepository;
 import tigase.server.Packet;
@@ -75,7 +76,8 @@ public abstract class SimpleForwarder
 	 * @param results a <code>Queue</code> value
 	 */
 	public void process(final Packet packet, final XMPPResourceConnection session,
-		final NonAuthUserRepository repo, final Queue<Packet> results)
+		final NonAuthUserRepository repo, final Queue<Packet> results,
+		final Map<String, Object> settings)
 		throws XMPPException {
 
 		if (session == null) {

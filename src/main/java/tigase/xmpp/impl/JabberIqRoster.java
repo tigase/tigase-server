@@ -23,7 +23,9 @@ package tigase.xmpp.impl;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Queue;
+import java.util.Map;
 import java.util.logging.Logger;
 import tigase.server.Packet;
 import tigase.util.JIDUtils;
@@ -66,6 +68,9 @@ public class JabberIqRoster extends XMPPProcessor
   private static final Element[] DISCO_FEATURES =	{
 		new Element("feature", new String[] {"var"}, new String[] {XMLNS})
 	};
+
+	private static final String DYNAMIC_ROSTERS = "dynamic-rosters";
+	private static final String DYNAMIC_ROSTERS_CLASSES = "dynamic-roster-classes";
 
   public Element[] supDiscoFeatures(final XMPPResourceConnection session)
 	{ return Arrays.copyOf(DISCO_FEATURES, DISCO_FEATURES.length); }
@@ -141,24 +146,69 @@ public class JabberIqRoster extends XMPPProcessor
   }
 
 	private void processGetRequest(final Packet packet,
-		final XMPPResourceConnection session,	final Queue<Packet> results)
+		final XMPPResourceConnection session,	final Queue<Packet> results,
+		final Map<String, Object> settings)
     throws NotAuthorizedException {
     String[] buddies = Roster.getBuddies(session);
     if (buddies != null) {
-      StringBuilder items = new StringBuilder();
+			Element query = new Element("query");
+			query.setXMLNS("jabber:iq:roster");
       for (String buddy : buddies) {
-        items.append(Roster.getBuddyItem(session, buddy));
+				query.addChild(Roster.getBuddyItem(session, buddy));
       }
-      results.offer(packet.okResult(items.toString(), 1));
-    } // end of if (buddies != null)
-    else {
+			if (settings != null) {
+				synchronized (settings) {
+					init_settings(settings);
+				}
+			}
+			DynamicRosterIfc[] dynr = (DynamicRosterIfc[])settings.get(DYNAMIC_ROSTERS);
+			if (dynr != null) {
+				for (DynamicRosterIfc dri: dynr) {
+					List<Element> items = dri.getRosterItems(session);
+					if (items != null) {
+						query.addChildren(items);
+					}
+				}
+			}
+      results.offer(packet.okResult(query, 0));
+    } else {
       results.offer(packet.okResult((String)null, 1));
     } // end of if (buddies != null) else
   }
 
-  public void process(final Packet packet, final XMPPResourceConnection session,
-		final NonAuthUserRepository repo, final Queue<Packet> results)
-		throws XMPPException {
+	private void init_settings(final Map<String, Object> settings) {
+		DynamicRosterIfc[] dynr = (DynamicRosterIfc[])settings.get(DYNAMIC_ROSTERS);
+		if (dynr == null) {
+			String[] dyncls = (String[])settings.get(DYNAMIC_ROSTERS_CLASSES);
+			if (dyncls != null) {
+				ArrayList<DynamicRosterIfc> al = new ArrayList<DynamicRosterIfc>();
+				for (String cls: dyncls) {
+					try {
+						DynamicRosterIfc dri =
+							(DynamicRosterIfc)Class.forName(cls).newInstance();
+						if (settings.get(cls + ".init") != null) {
+							dri.init((String)settings.get(cls + ".init"));
+						} else {
+							dri.init(settings);
+						}
+						al.add(dri);
+						log.info("Initialized dynamic roster: " + cls);
+					} catch (Exception e) {
+						log.warning("Problem initializing dynmic roster class: "
+							+ cls + ", " + e);
+					}
+				}
+				if (al.size() > 0) {
+					settings.put(DYNAMIC_ROSTERS,
+						al.toArray(new DynamicRosterIfc[al.size()]));
+				}
+			}
+		}
+	}
+
+	public void process(final Packet packet, final XMPPResourceConnection session,
+		final NonAuthUserRepository repo, final Queue<Packet> results,
+		final Map<String, Object> settings) throws XMPPException {
 
 		if (session == null) {
 			return;
@@ -179,7 +229,7 @@ public class JabberIqRoster extends XMPPProcessor
 			StanzaType type = packet.getType();
 			switch (type) {
 			case get:
-				processGetRequest(packet, session, results);
+				processGetRequest(packet, session, results, settings);
 				break;
 			case set:
         processSetRequest(packet, session, results);

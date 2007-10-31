@@ -259,10 +259,11 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 		if (!def_found) {
 			PORT_LOCAL_HOST_PROP_VAL = "localhost";
 			PORT_REMOTE_HOST_PROP_VAL = getName() + ".localhost";
+			String regex_host = PORT_REMOTE_HOST_PROP_VAL.replace(".", "\\.");
 			PORT_ROUTING_TABLE_PROP_VAL =
 				new String[] { PORT_REMOTE_HOST_PROP_VAL,
-											 ".*@" + PORT_REMOTE_HOST_PROP_VAL,
-											 ".*\\." + PORT_REMOTE_HOST_PROP_VAL	};
+											 ".*@" + regex_host,
+											 ".*\\." + regex_host	};
 		} // end of if (!def_found)
 		Map<String, Object> props = super.getDefaults(params);
 		props.put(PACK_ROUTED_KEY, PACK_ROUTED_VAL);

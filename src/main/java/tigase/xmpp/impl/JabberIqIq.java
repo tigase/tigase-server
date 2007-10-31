@@ -24,6 +24,7 @@ package tigase.xmpp.impl;
 import java.util.logging.Logger;
 import java.util.Arrays;
 import java.util.Queue;
+import java.util.Map;
 import tigase.db.NonAuthUserRepository;
 import tigase.server.Packet;
 import tigase.xml.Element;
@@ -97,7 +98,8 @@ public class JabberIqIq extends XMPPProcessor
 	}
 
 	public void process(Packet packet, XMPPResourceConnection session,
-		NonAuthUserRepository repo, Queue<Packet> results)
+		NonAuthUserRepository repo, Queue<Packet> results,
+		final Map<String, Object> settings)
 		throws XMPPException {
 
 		if (session == null && packet.getType() != null

@@ -26,6 +26,7 @@ import java.util.Queue;
 import java.util.Date;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.Map;
 import java.text.SimpleDateFormat;
 import tigase.util.JIDUtils;
 import tigase.db.NonAuthUserRepository;
@@ -117,7 +118,8 @@ public class OfflineMessages extends XMPPProcessor
 	 * @param results a <code>Queue</code> value
 	 */
 	public void process(final Packet packet, final XMPPResourceConnection conn,
-		final NonAuthUserRepository repo, final Queue<Packet> results) {
+		final NonAuthUserRepository repo, final Queue<Packet> results,
+		final Map<String, Object> settings) {
 
 		if (conn == null) {
 			return;

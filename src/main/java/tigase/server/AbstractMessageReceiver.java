@@ -406,7 +406,9 @@ public abstract class AbstractMessageReceiver
 	}
 
 	public void addRegexRouting(String address) {
+		log.fine(getName() + " - attempt to add regex routing: " + address);
 		regexRoutings.add(Pattern.compile(address, Pattern.CASE_INSENSITIVE));
+		log.fine(getName() + " - success adding regex routing: " + address);
 	}
 
 	public boolean removeRegexRouting(String address) {

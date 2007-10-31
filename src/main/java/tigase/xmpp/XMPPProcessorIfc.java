@@ -22,6 +22,7 @@
 package tigase.xmpp;
 
 import java.util.Queue;
+import java.util.Map;
 import tigase.server.Packet;
 import tigase.db.NonAuthUserRepository;
 
@@ -37,6 +38,7 @@ import tigase.db.NonAuthUserRepository;
 public interface XMPPProcessorIfc extends XMPPImplIfc {
 
 	void process(Packet packet, XMPPResourceConnection session,
-		NonAuthUserRepository repo,	Queue<Packet> results) throws XMPPException;
+		NonAuthUserRepository repo,	Queue<Packet> results,
+		Map<String, Object> settings) throws XMPPException;
 
 } // XMPPProcessorIfc

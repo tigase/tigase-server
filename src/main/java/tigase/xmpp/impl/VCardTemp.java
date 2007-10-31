@@ -23,6 +23,7 @@ package tigase.xmpp.impl;
 
 import java.util.Arrays;
 import java.util.Queue;
+import java.util.Map;
 import java.util.logging.Logger;
 import tigase.server.Packet;
 import tigase.xml.Element;
@@ -99,7 +100,8 @@ public class VCardTemp extends XMPPProcessor implements XMPPProcessorIfc {
 	 * @param results a <code>Queue</code> value
 	 */
 	public void process(Packet packet, XMPPResourceConnection session,
-		NonAuthUserRepository repo, Queue<Packet> results)
+		NonAuthUserRepository repo, Queue<Packet> results,
+		final Map<String, Object> settings)
 		throws XMPPException {
 
 		if (session == null && packet.getType() != null

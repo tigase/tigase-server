@@ -23,6 +23,7 @@ package tigase.xmpp.impl;
 
 import java.util.Arrays;
 import java.util.Queue;
+import java.util.Map;
 import java.util.logging.Logger;
 import tigase.server.Packet;
 import tigase.xml.Element;
@@ -84,7 +85,8 @@ public class SessionBind extends XMPPProcessor
 	}
 
   public void process(final Packet packet, final XMPPResourceConnection session,
-		final NonAuthUserRepository repo, final Queue<Packet> results)
+		final NonAuthUserRepository repo, final Queue<Packet> results,
+		final Map<String, Object> settings)
 		throws XMPPException {
 
 		if (session == null) {

@@ -116,7 +116,8 @@ public class SaslAuth extends XMPPProcessor
 
   @SuppressWarnings({"unchecked"})
   public void process(final Packet packet, final XMPPResourceConnection session,
-		final NonAuthUserRepository repo, final Queue<Packet> results) {
+		final NonAuthUserRepository repo, final Queue<Packet> results,
+		final Map<String, Object> settings) {
 
 		if (session == null) {
 			return;

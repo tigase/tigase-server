@@ -242,12 +242,6 @@ public class DrupalAuth implements UserAuthRepository {
 	private void initRepo() throws SQLException {
 		conn = DriverManager.getConnection(db_conn);
 		initPreparedStatements();
-		if (online_status) {
-			Statement stmt = conn.createStatement();
-			stmt.executeUpdate("update users set online_status = 0;");
-			stmt.close();
-			stmt = null;
-		}
 	}
 
 	/**
@@ -264,6 +258,12 @@ public class DrupalAuth implements UserAuthRepository {
 		}
 		try {
 			initRepo();
+			if (online_status) {
+				Statement stmt = conn.createStatement();
+				stmt.executeUpdate("update users set online_status = 0;");
+				stmt.close();
+				stmt = null;
+			}
 		} catch (SQLException e) {
 			conn = null;
 			throw	new DBInitException("Problem initializing jdbc connection: "

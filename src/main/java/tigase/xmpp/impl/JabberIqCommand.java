@@ -23,6 +23,7 @@ package tigase.xmpp.impl;
 
 import java.util.Arrays;
 import java.util.Queue;
+import java.util.Map;
 import java.util.logging.Logger;
 import tigase.db.NonAuthUserRepository;
 import tigase.server.Command;
@@ -71,7 +72,8 @@ public class JabberIqCommand extends XMPPProcessor implements XMPPProcessorIfc {
 	{ return Arrays.copyOf(DISCO_FEATURES, DISCO_FEATURES.length); }
 
 	public void process(final Packet packet, final XMPPResourceConnection session,
-		final NonAuthUserRepository repo, final Queue<Packet> results)
+		final NonAuthUserRepository repo, final Queue<Packet> results,
+		final Map<String, Object> settings)
 		throws XMPPException {
 
 		if (session == null) { return; }

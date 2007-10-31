@@ -456,8 +456,10 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 		case unavailable:
 			if (ri != null) {
 				setRosterItemOnline(ri, false);
-				results.offer(getPresence(packet.getElemFrom(), jid,
-						StanzaType.unavailable));
+			// This is really not necessary as the task is always on-line
+			// It should only mark remote contact as off-line and that's it.
+// 				results.offer(getPresence(packet.getElemFrom(), jid,
+// 						StanzaType.unavailable));
 			} // end of if (ri != null)
 			break;
 		case subscribe:

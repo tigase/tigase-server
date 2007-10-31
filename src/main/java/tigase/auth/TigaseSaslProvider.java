@@ -53,7 +53,7 @@ public class TigaseSaslProvider extends Provider {
 	private static final String MY_NAME = "tigase.sasl";
 	private static final double VERSION = 1.0;
 	private static final String INFO =
-		"This is tigase provider (implements server PLAIN mechanism)";
+		"This is tigase provider (provides Tigase server specific mechanisms)";
 
 	/**
 	 * Creates a new <code>TigaseSaslProvider</code> instance.

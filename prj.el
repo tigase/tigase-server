@@ -15,7 +15,8 @@
      "$PROJECTS_HOME/tigase/server/libs/tigase-utils.jar")))
  '(jde-sourcepath
    (quote
-    ("$PROJECTS_HOME/tigase/server/src/main/java"
+    (
+		 "$PROJECTS_HOME/tigase/server/src/main/java"
      "$PROJECTS_HOME/tigase/xmltools/src/main/java"
      "$PROJECTS_HOME/tigase/utils/src/main/java"
      "$PROJECTS_HOME/tigase/server/tests/unittests/src"
@@ -23,11 +24,11 @@
  '(jde-gen-buffer-boilerplate
    (quote
     ("/*  Tigase Jabber/XMPP Server"
-     " *  Copyright (C) 2004-2007 \"Artur Hefczyc\" <artur.hefczyc@tigase.org>"
+     " *  Copyright (C) 2004-2008 \"Artur Hefczyc\" <artur.hefczyc@tigase.org>"
      " *"
 		 " * This program is free software: you can redistribute it and/or modify"
 		 " * it under the terms of the GNU General Public License as published by"
-		 " * the Free Software Foundation, either version 3 of the License."
+		 " * the Free Software Foundation, version 3 of the License."
 		 " *"
 		 " * This program is distributed in the hope that it will be useful,"
 		 " * but WITHOUT ANY WARRANTY; without even the implied warranty of"

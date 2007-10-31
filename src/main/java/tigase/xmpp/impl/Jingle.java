@@ -24,6 +24,7 @@ package tigase.xmpp.impl;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Queue;
+import java.util.Map;
 import java.util.logging.Logger;
 import tigase.db.NonAuthUserRepository;
 import tigase.server.Packet;
@@ -78,7 +79,8 @@ public class Jingle extends XMPPProcessor implements XMPPProcessorIfc {
 	 * @param results a <code>Queue</code> value
 	 */
 	public void process(final Packet packet, final XMPPResourceConnection conn,
-		final NonAuthUserRepository nonAuthUserRepo, final Queue<Packet> results)
+		final NonAuthUserRepository nonAuthUserRepo, final Queue<Packet> results,
+		final Map<String, Object> settings)
 		throws XMPPException {
 
 		if (conn == null) { return; }
