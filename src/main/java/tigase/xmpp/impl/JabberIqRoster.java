@@ -149,37 +149,43 @@ public class JabberIqRoster extends XMPPProcessor
 		final XMPPResourceConnection session,	final Queue<Packet> results,
 		final Map<String, Object> settings)
     throws NotAuthorizedException {
+		Element query = new Element("query");
     String[] buddies = Roster.getBuddies(session);
     if (buddies != null) {
-			Element query = new Element("query");
 			query.setXMLNS("jabber:iq:roster");
       for (String buddy : buddies) {
 				query.addChild(Roster.getBuddyItem(session, buddy));
       }
-			DynamicRosterIfc[] dynr = null;
-			if (settings != null) {
-				synchronized (settings) {
-					init_settings(settings);
-				}
-				dynr = (DynamicRosterIfc[])settings.get(DYNAMIC_ROSTERS);
+		}
+		DynamicRosterIfc[] dynr = null;
+		if (settings != null) {
+			synchronized (settings) {
+				log.finest("Initializing settings.");
+				init_settings(settings);
 			}
-			if (dynr != null) {
-				for (DynamicRosterIfc dri: dynr) {
-					List<Element> items = dri.getRosterItems(session);
-					if (items != null) {
-						query.addChildren(items);
-					}
+			dynr = (DynamicRosterIfc[])settings.get(DYNAMIC_ROSTERS);
+		} else {
+			log.finest("Settings parameter is NULL");
+		}
+		if (dynr != null) {
+			for (DynamicRosterIfc dri: dynr) {
+				List<Element> items = dri.getRosterItems(session);
+				if (items != null) {
+					query.addChildren(items);
 				}
 			}
-      results.offer(packet.okResult(query, 0));
-    } else {
-      results.offer(packet.okResult((String)null, 1));
-    } // end of if (buddies != null) else
+		}
+		if (query.getChildren() != null && query.getChildren().size() > 0) {
+			results.offer(packet.okResult(query, 0));
+		} else {
+			results.offer(packet.okResult((String)null, 1));
+		} // end of if (buddies != null) else
   }
 
 	private void init_settings(final Map<String, Object> settings) {
 		DynamicRosterIfc[] dynr = (DynamicRosterIfc[])settings.get(DYNAMIC_ROSTERS);
 		if (dynr == null) {
+			log.info("Initializing dynamic rosters...");
 			String[] dyncls = (String[])settings.get(DYNAMIC_ROSTERS_CLASSES);
 			if (dyncls != null) {
 				ArrayList<DynamicRosterIfc> al = new ArrayList<DynamicRosterIfc>();
