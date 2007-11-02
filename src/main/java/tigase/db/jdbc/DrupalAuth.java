@@ -68,6 +68,9 @@ import static tigase.db.UserAuthRepository.*;
  */
 public class DrupalAuth implements UserAuthRepository {
 
+  /**
+   * Private logger for class instancess.
+   */
   private static final Logger log =
     Logger.getLogger("tigase.db.jdbc.DrupalAuth");
 	private static final String[] non_sasl_mechs = {"password"};
@@ -76,20 +79,42 @@ public class DrupalAuth implements UserAuthRepository {
 	public static final String DEF_USERS_TBL = "users";
 
 	private String users_tbl = DEF_USERS_TBL;
+	/**
+	 * Database connection string.
+	 */
 	private String db_conn = null;
+	/**
+	 * Database active connection.
+	 */
 	private Connection conn = null;
 	private PreparedStatement pass_st = null;
 	private PreparedStatement status_st = null;
 	private PreparedStatement user_add_st = null;
 	private PreparedStatement max_uid_st = null;
+	/**
+	 * Prepared statement for testing whether database connection is still
+	 * working. If not connection to database is recreated.
+	 */
 	private PreparedStatement conn_valid_st = null;
 	private PreparedStatement update_last_login_st = null;
 	private PreparedStatement update_online_status = null;
 
+	/**
+	 * Connection validation helper.
+	 */
 	private long lastConnectionValidated = 0;
+	/**
+	 * Connection validation helper.
+	 */
 	private long connectionValidateInterval = 1000*60;
 	private boolean online_status = false;
 
+	/**
+	 * <code>initPreparedStatements</code> method initializes internal
+	 * database connection variables such as prepared statements.
+	 *
+	 * @exception SQLException if an error occurs on database query.
+	 */
 	private void initPreparedStatements() throws SQLException {
 		String query = "select pass from " + users_tbl
 			+ " where name = ?;";
@@ -118,6 +143,16 @@ public class DrupalAuth implements UserAuthRepository {
 		update_online_status = conn.prepareStatement(query);
 	}
 
+	/**
+	 * <code>checkConnection</code> method checks database connection before any
+	 * query. For some database servers (or JDBC drivers) it happens the connection
+	 * is dropped if not in use for a long time or after certain timeout passes.
+	 * This method allows us to detect the problem and reinitialize database
+	 * connection.
+	 *
+	 * @return a <code>boolean</code> value if the database connection is working.
+	 * @exception SQLException if an error occurs on database query.
+	 */
 	private boolean checkConnection() throws SQLException {
 		try {
 // 			if (!conn.isValid(5)) {
@@ -239,6 +274,12 @@ public class DrupalAuth implements UserAuthRepository {
 		} // end of if (protocol.equals(PROTOCOL_VAL_NONSASL))
 	}
 
+	/**
+	 * <code>initRepo</code> method initializes database connection
+	 * and data repository.
+	 *
+	 * @exception SQLException if an error occurs on database query.
+	 */
 	private void initRepo() throws SQLException {
 		conn = DriverManager.getConnection(db_conn);
 		initPreparedStatements();
