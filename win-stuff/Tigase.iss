@@ -1,4 +1,4 @@
-#define ver "3.0.2-b700";
+#define ver "3.1.0-b711";
 
 [Setup]
 AppName=Tigase Server
@@ -44,7 +44,6 @@ Name: spanish; MessagesFile: compiler:Languages\Spanish.isl
 Source: wrapper\wrapper.exe; DestDir: {app}; Flags: ignoreversion; Languages: 
 Source: ..\certs\*; DestDir: {app}\certs; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: ..\docs-tigase-server\*; DestDir: {app}\docs; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: ..\etc\*; DestDir: {app}\etc; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: ..\jars\*; DestDir: {app}\jars; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: ..\libs\*; DestDir: {app}\libs; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: ..\database\mysql-schema.sql; DestDir: {app}\database\mysql-schema.sql; Flags: ignoreversion
@@ -61,6 +60,7 @@ Source: scripts\Uninst.bat; DestDir: {app}; Flags: ignoreversion
 Source: Licence.txt; DestDir: {app}; Flags: ignoreversion
 Source: wrapper\wrapper.dll; DestDir: {app}\libs; Flags: ignoreversion
 Source: wrapper\wrapper.jar; DestDir: {app}\libs; Flags: ignoreversion
+Source: ..\etc\tigase.conf; DestDir: {app}\etc\tigase.conf
 
 [Dirs]
 Name: {app}\logs
