@@ -95,13 +95,13 @@ public class Presence extends XMPPProcessor
 	 * @param session a <code>XMPPResourceConnection</code> value
 	 */
 	public void stopped(final XMPPResourceConnection session,
-		final Queue<Packet> results) {
+		final Queue<Packet> results, final Map<String, Object> settings) {
 		Element pres = (Element)session.getSessionData(PRESENCE_KEY);
 		if (pres == null || pres.getAttribute("type") == null
 			|| !pres.getAttribute("type").equals("unavailable")) {
 			try {
 				sendPresenceBroadcast(StanzaType.unavailable, session,
-					FROM_SUBSCRIBED, results, null);
+					FROM_SUBSCRIBED, results, null, settings);
 				updateOfflineChange(session, results);
 			} catch (NotAuthorizedException e) { } // end of try-catch
 		}
@@ -121,9 +121,11 @@ public class Presence extends XMPPProcessor
 	protected void sendPresenceBroadcast(final StanzaType t,
     final XMPPResourceConnection session,
 		final EnumSet<SubscriptionType> subscrs,
-		final Queue<Packet> results, final Element pres)
+		final Queue<Packet> results, final Element pres,
+		final Map<String, Object> settings)
 		throws NotAuthorizedException {
     String[] buddies = Roster.getBuddies(session, subscrs);
+		buddies = DynamicRoster.addBuddies(session, settings, buddies);
     if (buddies != null) {
 			for (String buddy: buddies) {
 				sendPresence(t, buddy, session.getJID(), results, pres);
@@ -364,12 +366,12 @@ public class Presence extends XMPPProcessor
 					// availability presence
 					if (first && type == StanzaType.available) {
 						sendPresenceBroadcast(StanzaType.probe, session, TO_SUBSCRIBED,
-							results, null);
+							results, null, settings);
 					} // end of if (type == StanzaType.available)
 
 					// Broadcast initial presence to 'from' or 'both' contacts
 					sendPresenceBroadcast(type, session, FROM_SUBSCRIBED,
-						results, packet.getElement());
+						results, packet.getElement(), settings);
 
 					// Broadcast initial presence to other available user resources
 					//				Element presence = packet.getElement().clone();
@@ -488,7 +490,12 @@ public class Presence extends XMPPProcessor
 				SubscriptionType buddy_subscr =
 					Roster.getBuddySubscription(session, packet.getElemFrom());
 				if (buddy_subscr == null) {
-					buddy_subscr = SubscriptionType.none;
+					if (DynamicRoster.getBuddyItem(session, settings,
+							packet.getElemFrom()) != null) {
+						buddy_subscr = SubscriptionType.both;
+					} else {
+						buddy_subscr = SubscriptionType.none;
+					}
 				} // end of if (buddy_subscr == null)
 				switch (buddy_subscr) {
 				case none:
@@ -506,7 +513,9 @@ public class Presence extends XMPPProcessor
 				default:
 					break;
 				} // end of switch (buddy_subscr)
-				if (Roster.isSubscribedFrom(session, packet.getElemFrom())) {
+				if (Roster.isSubscribedFrom(session, packet.getElemFrom())
+						|| DynamicRoster.getBuddyItem(session, settings,
+							packet.getElemFrom()) != null) {
 					for (XMPPResourceConnection conn: session.getActiveSessions()) {
 						Element pres = (Element)conn.getSessionData(PRESENCE_KEY);
 						sendPresence(null, packet.getElemFrom(), conn.getJID(),
