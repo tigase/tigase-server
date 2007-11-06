@@ -22,6 +22,7 @@
 package tigase.xmpp;
 
 import java.util.Queue;
+import java.util.Map;
 import tigase.server.Packet;
 import tigase.db.NonAuthUserRepository;
 
@@ -36,6 +37,7 @@ import tigase.db.NonAuthUserRepository;
  */
 public interface XMPPStopListenerIfc extends XMPPImplIfc {
 
-	void stopped(XMPPResourceConnection session, Queue<Packet> results);
+	void stopped(XMPPResourceConnection session, Queue<Packet> results,
+		Map<String, Object> settings);
 
 } // XMPPStopListener
