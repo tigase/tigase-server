@@ -516,7 +516,7 @@ public class SessionManager extends AbstractMessageReceiver
 		}
 		Queue<Packet> results = new LinkedList<Packet>();
 		for (XMPPStopListenerIfc stopProc: stopListeners.values()) {
-			stopProc.stopped(conn, results);
+			stopProc.stopped(conn, results, plugin_config.get(stopProc.id()));
 		} // end of for ()
 		addOutPackets(results);
 		conn.streamClosed();
@@ -624,10 +624,23 @@ public class SessionManager extends AbstractMessageReceiver
 			Map<String, Object> plugin_settings =
 				new ConcurrentSkipListMap<String, Object>();
 			for (Map.Entry<String, Object> entry: props.entrySet()) {
-				if (entry.getKey().startsWith(PLUGINS_CONF_PROP_KEY + "/" + comp_id)) {
-					plugin_settings.put(
-						entry.getKey().substring((PLUGINS_CONF_PROP_KEY + "/" + comp_id + "/").length()), entry.getValue());
+				if (entry.getKey().startsWith(PLUGINS_CONF_PROP_KEY)) {
+					// Split the key to configuration nodes separated with '/'
+					String[] nodes = entry.getKey().split("/");
+					// The plugin ID part may contain many IDs separated with comma ','
+					if (nodes.length > 2) {
+						String[] ids = nodes[1].split(",");
+						Arrays.sort(ids);
+						if (Arrays.binarySearch(ids, comp_id) >= 0) {
+							plugin_settings.put(nodes[2], entry.getValue());
+						}
+					}
 				}
+// 				if (entry.getKey().startsWith(PLUGINS_CONF_PROP_KEY + "/" + comp_id)) {
+// 					plugin_settings.put(
+// 						entry.getKey().substring((PLUGINS_CONF_PROP_KEY +
+// 								"/" + comp_id + "/").length()), entry.getValue());
+// 				}
 			}
 			if (plugin_settings.size() > 0) {
 				log.finest(plugin_settings.toString());
