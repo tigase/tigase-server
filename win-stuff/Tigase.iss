@@ -1,4 +1,4 @@
-#define ver "3.1.1-b720";
+#define ver "3.1.1-b728";
 
 [Setup]
 AppName=Tigase Server
@@ -60,7 +60,8 @@ Source: scripts\Uninst.bat; DestDir: {app}; Flags: ignoreversion
 Source: Licence.txt; DestDir: {app}; Flags: ignoreversion
 Source: wrapper\wrapper.dll; DestDir: {app}\libs; Flags: ignoreversion
 Source: wrapper\wrapper.jar; DestDir: {app}\libs; Flags: ignoreversion
-Source: ..\etc\tigase.conf; DestDir: {app}\etc\tigase.conf
+Source: ..\etc\tigase.conf; DestDir: {app}\etc; Flags: ignoreversion
+Source: ..\etc\initial.properties; DestDir: {app}\etc; Flags: ignoreversion
 
 [Dirs]
 Name: {app}\logs
