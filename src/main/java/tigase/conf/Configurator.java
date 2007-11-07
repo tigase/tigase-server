@@ -24,7 +24,9 @@ package tigase.conf;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -34,6 +36,7 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeMap;
+import java.util.Properties;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
@@ -72,6 +75,7 @@ import static tigase.server.MessageRouterConfig.DEF_SM_NAME;
 public class Configurator extends AbstractComponentRegistrator<Configurable>
 	implements Configurable, XMPPService {
 
+	public static final String PROPERTY_FILENAME_PROP_KEY = "--property-file";
 	private static final String LOGGING_KEY = "logging/";
 
   private static final Logger log =
@@ -81,6 +85,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 	//	private Timer delayedTask = new Timer("ConfiguratorTask", true);
 	private Map<String, Object> defConfigParams =
 		new LinkedHashMap<String, Object>();
+	private Properties defProperties = new Properties();
 	private ServiceEntity serviceEntity = null;
 	private ServiceEntity config_list = null;
 	private ServiceEntity config_set = null;
@@ -135,7 +140,8 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 					|| args[i].equals(GEN_COMP_NAME) || args[i].equals(GEN_COMP_CLASS)
 					|| args[i].startsWith(GEN_EXT_COMP) || args[i].equals(GEN_VIRT_HOSTS)
 					|| args[i].equals(GEN_ADMINS) || args[i].equals(GEN_DEBUG)
-					|| (args[i].startsWith(GEN_CONF) && !args[i].startsWith(GEN_CONFIG))) {
+					|| (args[i].startsWith(GEN_CONF) && !args[i].startsWith(GEN_CONFIG))
+					|| args[i].equals(PROPERTY_FILENAME_PROP_KEY)) {
 					key = args[i];  val = args[++i];
 				}
 				if (key != null) {
@@ -145,12 +151,59 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 				} // end of if (key != null)
       } // end of for (int i = 0; i < args.length; i++)
     }
+		String property_filename =
+			(String)defConfigParams.get(PROPERTY_FILENAME_PROP_KEY);
+		if (property_filename != null) {
+			log.config("Loading initial properties from property file: "
+				+ property_filename);
+			try {
+				defProperties.load(new FileReader(property_filename));
+				Set<String> prop_keys = defProperties.stringPropertyNames();
+				for (String key: prop_keys) {
+					if (key.startsWith("--") || key.equals("config-type")) {
+						String value = defProperties.getProperty(key);
+						defConfigParams.put(key, value);
+						defProperties.remove(key);
+						log.config("Added default config parameter: ("
+							+ key + "=" + value + ")");
+					}
+				}
+			} catch (FileNotFoundException e) {
+				log.warning("Given property file was not found: " + property_filename);
+			} catch (IOException e) {
+				log.log(Level.WARNING, "Can not read property file: "
+					+ property_filename, e);
+			}
+		}
   }
 
 	public Configurator(String fileName, String[] args) {
 		parseArgs(args);
 		repository = ConfigRepository.getConfigRepository(fileName);
 		defConfigParams.putAll(getAllProperties(null));
+		Set<String> prop_keys = defProperties.stringPropertyNames();
+		for (String key: prop_keys) {
+			int idx1 = key.indexOf("/");
+			if (idx1 > 0) {
+				String root = key.substring(0, idx1);
+				String node = key.substring(idx1+1);
+				String prop_key = null;
+				int idx2 = node.lastIndexOf("/");
+				if (idx2 > 0) {
+					prop_key = node.substring(idx2+1);
+					node = node.substring(0, idx2);
+				} else {
+					prop_key = node;
+					node = null;
+				}
+				repository.set(root, node, prop_key, defProperties.getProperty(key));
+				log.config("Added default config property: ("
+					+ key + "=" + defProperties.getProperty(key) + ")");
+
+			} else {
+				log.warning("Ignoring default property, component part is missing: " + key);
+			}
+		}
 	}
 
 	public boolean isCorrectType(ServerComponent component) {
