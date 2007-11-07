@@ -53,8 +53,9 @@ public abstract class DynamicRoster {
 		DynamicRosterIfc[] dynr = (DynamicRosterIfc[])settings.get(DYNAMIC_ROSTERS);
 		if (dynr == null) {
 			log.info("Initializing dynamic rosters...");
-			String[] dyncls = (String[])settings.get(DYNAMIC_ROSTERS_CLASSES);
-			if (dyncls != null) {
+			String dynclss = (String)settings.get(DYNAMIC_ROSTERS_CLASSES);
+			if (dynclss != null) {
+				String[] dyncls = dynclss.split(",");
 				ArrayList<DynamicRosterIfc> al = new ArrayList<DynamicRosterIfc>();
 				for (String cls: dyncls) {
 					try {
