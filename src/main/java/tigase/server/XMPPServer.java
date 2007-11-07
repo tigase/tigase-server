@@ -141,6 +141,7 @@ public class XMPPServer {
 		String initial_config =
 			".level=ALL\n"
 			+ "handlers=java.util.logging.ConsoleHandler\n"
+			+ "java.util.logging.ConsoleHandler.level=ALL\n"
 			+ "java.util.logging.ConsoleHandler.formatter=tigase.util.LogFormatter\n"
 			;
 		Configurator.loadLogManagerConfig(initial_config);
