@@ -139,7 +139,8 @@ public class XMPPServer {
     parseParams(args);
 
 		String initial_config =
-			".level=ALL\n"
+			"tigase.level=ALL\n"
+			+ "tigase.xml.level=INFO\n"
 			+ "handlers=java.util.logging.ConsoleHandler\n"
 			+ "java.util.logging.ConsoleHandler.level=ALL\n"
 			+ "java.util.logging.ConsoleHandler.formatter=tigase.util.LogFormatter\n"
