@@ -522,7 +522,11 @@ public class Roster {
 
 	public static void addBuddy(final XMPPResourceConnection session,
 		final String jid) throws NotAuthorizedException {
-    session.setData(groupNode(jid), NAME, JIDUtils.getNodeNick(jid));
+		String nick = JIDUtils.getNodeNick(jid);
+		if (nick == null) {
+			nick = jid;
+		}
+		session.setData(groupNode(jid), NAME, nick);
     session.setData(groupNode(jid), SUBSCRIPTION,
 			SubscriptionType.none.toString());
 	}
@@ -537,14 +541,16 @@ public class Roster {
 // 			current_subscription = SubscriptionType.none;
 // 			addBuddy(session, jid);
 // 		} // end of if (current_subscription == null)
-		final SubscriptionType new_subscription =
-			getStateTransition(current_subscription, presence);
-		log.finest("new_subscription="+new_subscription
-			+" for presence="+presence);
-		if (current_subscription != new_subscription) {
-			setBuddySubscription(session, new_subscription, jid);
-			return true;
-		} // end of if (current_subscription != new_subscription)
+		if (current_subscription != null) {
+			final SubscriptionType new_subscription =
+				getStateTransition(current_subscription, presence);
+			log.finest("new_subscription="+new_subscription
+				+" for presence="+presence);
+			if (current_subscription != new_subscription) {
+				setBuddySubscription(session, new_subscription, jid);
+				return true;
+			} // end of if (current_subscription != new_subscription)
+		}
 		return false;
 	}
 
