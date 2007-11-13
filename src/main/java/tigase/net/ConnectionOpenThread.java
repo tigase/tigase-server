@@ -208,7 +208,6 @@ public class ConnectionOpenThread implements Runnable {
         stopping = true;
       } // end of catch
     }
-		System.exit(1);
   }
 
 	public void start() {
