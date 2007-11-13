@@ -385,9 +385,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 			loadTasksFromRepository();
 
 		} catch (Exception e) {
-			log.severe("Can't initialize repository: " + e);
-			e.printStackTrace();
-			System.exit(1);
+			log.log(Level.SEVERE, "Can't initialize repository: ", e);
 		} // end of try-catch
 
 		String[] tasks_list = (String[])props.get(TASKS_LIST_PROP_KEY);
