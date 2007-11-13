@@ -89,6 +89,8 @@ public class ProcessorFactory {
       log.finest("Loaded XMPPProcessors:\n" + sb.toString());
 
     } catch (Exception e) {
+			System.out.println("Can not load XMPPProcessor implementations");
+			e.printStackTrace();
       log.log(Level.SEVERE, "Can not load XMPPProcessor implementations", e);
       System.exit(1);
     } // end of try-catch
