@@ -177,9 +177,6 @@ public class SocketReadThread implements Runnable {
         stopping = true;
       }
     }
-
-    System.err.println("ClientThread stopped!");
-    System.exit(2);
 	}
 
   @TODO(note="ExecutionException is poorly implemented.")
