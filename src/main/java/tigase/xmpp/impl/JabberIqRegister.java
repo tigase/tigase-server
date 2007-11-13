@@ -23,19 +23,20 @@ package tigase.xmpp.impl;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Queue;
 import java.util.Map;
+import java.util.Queue;
+import java.util.logging.Logger;
+import tigase.db.NonAuthUserRepository;
 import tigase.server.Packet;
+import tigase.util.JIDUtils;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
+import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.StanzaType;
+import tigase.xmpp.XMPPException;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
-import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.XMPPException;
-import tigase.db.NonAuthUserRepository;
-import tigase.util.JIDUtils;
 
 /**
  * JEP-0077: In-Band Registration
@@ -48,6 +49,12 @@ import tigase.util.JIDUtils;
  */
 public class JabberIqRegister extends XMPPProcessor
 	implements XMPPProcessorIfc {
+
+  /**
+   * Private logger for class instancess.
+   */
+  private static Logger log =
+		Logger.getLogger("tigase.xmpp.impl.JabberIqRegister");
 
 	private static final String ID = "jabber:iq:register";
 	private static final String[] ELEMENTS = {"query"};
@@ -82,7 +89,10 @@ public class JabberIqRegister extends XMPPProcessor
 		final Map<String, Object> settings)
 		throws XMPPException {
 
+		log.finest("Processing packet: " + packet.toString());
+
 		if (session == null) {
+			log.finest("Session is null, ignoring");
 			return;
 		} // end of if (session == null)
 
@@ -161,8 +171,16 @@ public class JabberIqRegister extends XMPPProcessor
 					break;
 				} // end of switch (type)
 			} else {
-				Element result = packet.getElement().clone();
-				results.offer(new Packet(result));
+				if (id.equals(session.getUserId())) {
+					// It might be a registration request from transport for example...
+					Element elem_res = packet.getElement().clone();
+					Packet pack_res = new Packet(elem_res);
+					pack_res.setTo(session.getConnectionId());
+					results.offer(pack_res);
+				} else {
+					Element result = packet.getElement().clone();
+					results.offer(new Packet(result));
+				}
 			}
 		} catch (NotAuthorizedException e) {
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
