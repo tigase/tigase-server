@@ -142,9 +142,7 @@ public class SSLContextContainer {
 			secureRandom.nextInt();
 		} // end of try
 		catch (Exception e) {
-			System.out.println("Can not initialize SSL library: " + e); // NOPMD
 			log.log(Level.SEVERE, "Can not initialize SSL library", e);
-			System.exit(1);
 		} // end of try-catch
 	}
 
