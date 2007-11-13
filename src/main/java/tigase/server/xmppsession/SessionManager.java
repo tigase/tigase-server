@@ -600,9 +600,7 @@ public class SessionManager extends AbstractMessageReceiver
 				cls_name, res_uri);
 			log.config("Initialized " + cls_name + " as user repository: " + res_uri);
 		} catch (Exception e) {
-			log.severe("Can't initialize user repository: " + e);
-			e.printStackTrace();
-			System.exit(1);
+			log.log(Level.SEVERE, "Can't initialize user repository: ", e);
 		} // end of try-catch
 		try {
 			String cls_name = (String)props.get(AUTH_REPO_CLASS_PROP_KEY);
@@ -611,9 +609,7 @@ public class SessionManager extends AbstractMessageReceiver
 				cls_name, res_uri);
 			log.config("Initialized " + cls_name + " as auth repository: " + res_uri);
 		} catch (Exception e) {
-			log.severe("Can't initialize auth repository: " + e);
-			e.printStackTrace();
-			System.exit(1);
+			log.log(Level.SEVERE, "Can't initialize auth repository: ", e);
 		} // end of try-catch
 
 		naUserRepository = new NARepository(user_repository);
