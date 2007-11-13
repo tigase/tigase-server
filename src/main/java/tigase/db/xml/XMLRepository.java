@@ -56,18 +56,28 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
 
 	private static final String USER_STR = "User: ";
   private static final String NOT_FOUND_STR =
-    " has not been found in repository.";
+		" has not been found in repository.";
 
   private static final Logger log =
-    Logger.getLogger("tigase.db.xml.XMLRepository");
+		Logger.getLogger("tigase.db.xml.XMLRepository");
 
 	private XMLDB xmldb = null;
 	private UserAuthRepository auth = null;
+	private boolean autoCreateUser = false;
+
 
   // Implementation of tigase.xmpp.rep.UserRepository
 
-	public void initRepository(String file_name) {
+	public void initRepository(String file) {
+		String file_name = file;
     try {
+			int idx = file.indexOf("?");
+			if (idx > 0) {
+				file_name = file.substring(0, idx);
+			}
+			if (file.contains("autoCreateUser=true")) {
+				autoCreateUser=true;
+			} // end of if (db_conn.contains())
 			auth = new UserAuthRepositoryImpl(this);
       xmldb = new XMLDB(file_name);
     } catch (Exception e) {
@@ -149,11 +159,20 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
    */
   public final void setData(final String user, final String subnode,
     final String key, final String value)
-    throws UserNotFoundException {
+		throws UserNotFoundException, TigaseDBException {
     try {
       xmldb.setData(user, subnode, key, value);
     } catch (NodeNotFoundException e) {
-      throw new UserNotFoundException(USER_STR+user+NOT_FOUND_STR, e);
+			if (autoCreateUser) {
+				try {
+					addUser(user);
+					xmldb.setData(user, subnode, key, value);
+				} catch (Exception ex) {
+					throw new TigaseDBException("Unknown repository problem: ", ex);
+				}
+			} else {
+				throw new UserNotFoundException(USER_STR+user+NOT_FOUND_STR, e);
+			}
     } // end of try-catch
   }
 
@@ -175,7 +194,7 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
    */
   public final void setData(final String user, final String key,
     final String value)
-    throws UserNotFoundException {
+    throws UserNotFoundException, TigaseDBException {
     setData(user, null, key, value);
   }
 
@@ -199,12 +218,20 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
    */
   public final void setDataList(final String user, final String subnode,
     final String key, final String[] list)
-    throws UserNotFoundException {
+    throws UserNotFoundException, TigaseDBException {
     try {
       xmldb.setData(user, subnode, key, list);
     } catch (NodeNotFoundException e) {
-      throw new UserNotFoundException(USER_STR+user+
-        NOT_FOUND_STR, e);
+			if (autoCreateUser) {
+				try {
+					addUser(user);
+					xmldb.setData(user, subnode, key, list);
+				} catch (Exception ex) {
+					throw new TigaseDBException("Unknown repository problem: ", ex);
+				}
+			} else {
+				throw new UserNotFoundException(USER_STR+user+NOT_FOUND_STR, e);
+			}
     } // end of try-catch
   }
 
@@ -227,7 +254,7 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
 	 */
   public final void addDataList(final String user, final String subnode,
     final String key, final String[] list)
-    throws UserNotFoundException {
+    throws UserNotFoundException, TigaseDBException {
     try {
 			String[] old_data = getDataList(user, subnode, key);
 			String[] all = null;
@@ -262,12 +289,20 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
    */
   public final String[] getDataList(final String user, final String subnode,
     final String key)
-    throws UserNotFoundException {
+    throws UserNotFoundException, TigaseDBException {
     try {
       return xmldb.getDataList(user, subnode, key);
     } catch (NodeNotFoundException e) {
-      throw new UserNotFoundException(USER_STR+user+
-        NOT_FOUND_STR, e);
+			if (autoCreateUser) {
+				try {
+					addUser(user);
+					return xmldb.getDataList(user, subnode, key);
+				} catch (Exception ex) {
+					throw new TigaseDBException("Unknown repository problem: ", ex);
+				}
+			} else {
+				throw new UserNotFoundException(USER_STR+user+NOT_FOUND_STR, e);
+			}
     } // end of try-catch
   }
 
@@ -290,11 +325,20 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
    */
   public final String getData(final String user, final String subnode,
     final String key, final String def)
-    throws UserNotFoundException {
+    throws UserNotFoundException, TigaseDBException {
     try {
       return (String)xmldb.getData(user, subnode, key, def);
     } catch (NodeNotFoundException e) {
-      throw new UserNotFoundException(USER_STR+user+NOT_FOUND_STR, e);
+			if (autoCreateUser) {
+				try {
+					addUser(user);
+					return (String)xmldb.getData(user, subnode, key, def);
+				} catch (Exception ex) {
+					throw new TigaseDBException("Unknown repository problem: ", ex);
+				}
+			} else {
+				throw new UserNotFoundException(USER_STR+user+NOT_FOUND_STR, e);
+			}
     } // end of try-catch
   }
 
@@ -315,7 +359,7 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
    */
   public final String getData(final String user, final String subnode,
     final String key)
-    throws UserNotFoundException {
+    throws UserNotFoundException, TigaseDBException {
     return getData(user, subnode, key, null);
   }
 
@@ -332,7 +376,7 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
    * @exception UserNotFoundException if user id hasn't been found in reository.
    */
   public final String getData(final String user, final String key)
-    throws UserNotFoundException {
+    throws UserNotFoundException, TigaseDBException {
     return getData(user, null, key, null);
   }
 
@@ -349,11 +393,20 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
    * @exception UserNotFoundException if user id hasn't been found in reository.
    */
   public final String[] getSubnodes(final String user, final String subnode)
-    throws UserNotFoundException {
+    throws UserNotFoundException, TigaseDBException {
     try {
       return xmldb.getSubnodes(user, subnode);
     } catch (NodeNotFoundException e) {
-      throw new UserNotFoundException(USER_STR+user+NOT_FOUND_STR, e);
+			if (autoCreateUser) {
+				try {
+					addUser(user);
+					return xmldb.getSubnodes(user, subnode);
+				} catch (Exception ex) {
+					throw new TigaseDBException("Unknown repository problem: ", ex);
+				}
+			} else {
+				throw new UserNotFoundException(USER_STR+user+NOT_FOUND_STR, e);
+			}
     } // end of try-catch
   }
 
@@ -368,7 +421,7 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
    * @exception UserNotFoundException if user id hasn't been found in reository.
    */
   public final String[] getSubnodes(final String user)
-    throws UserNotFoundException {
+    throws UserNotFoundException, TigaseDBException {
     return getSubnodes(user, null);
   }
 
@@ -388,11 +441,20 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
    * @exception UserNotFoundException if user id hasn't been found in reository.
    */
   public final String[] getKeys(final String user, final String subnode)
-    throws UserNotFoundException {
+    throws UserNotFoundException, TigaseDBException {
     try {
       return xmldb.getKeys(user, subnode);
     } catch (NodeNotFoundException e) {
-      throw new UserNotFoundException(USER_STR+user+NOT_FOUND_STR, e);
+			if (autoCreateUser) {
+				try {
+					addUser(user);
+					return xmldb.getKeys(user, subnode);
+				} catch (Exception ex) {
+					throw new TigaseDBException("Unknown repository problem: ", ex);
+				}
+			} else {
+				throw new UserNotFoundException(USER_STR+user+NOT_FOUND_STR, e);
+			}
     } // end of try-catch
   }
 
@@ -409,7 +471,7 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
    * @exception UserNotFoundException if user id hasn't been found in reository.
    */
   public final String[] getKeys(final String user)
-    throws UserNotFoundException {
+    throws UserNotFoundException, TigaseDBException {
     return getKeys(user, null);
   }
 
@@ -435,7 +497,9 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
     try {
       xmldb.removeData(user, subnode, key);
     } catch (NodeNotFoundException e) {
-      throw new UserNotFoundException(USER_STR+user+NOT_FOUND_STR, e);
+			if (!autoCreateUser) {
+				throw new UserNotFoundException(USER_STR+user+NOT_FOUND_STR, e);
+			}
     } // end of try-catch
   }
 
@@ -474,7 +538,9 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
     try {
       xmldb.removeSubnode(user, subnode);
     } catch (NodeNotFoundException e) {
-      throw new UserNotFoundException(USER_STR+user+NOT_FOUND_STR, e);
+			if (!autoCreateUser) {
+				throw new UserNotFoundException(USER_STR+user+NOT_FOUND_STR, e);
+			}
     } // end of try-catch
   }
 
