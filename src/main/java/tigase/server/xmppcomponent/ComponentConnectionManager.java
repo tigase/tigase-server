@@ -202,13 +202,19 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 				} // end of if (getName().endsWith(end))
 				if (params.get(gen_ext_comp) != null) {
 					def_found = true;
+					log.config("Found default configuration: " +
+						(String)params.get(gen_ext_comp));
 					String[] comp_params = ((String)params.get(gen_ext_comp)).split(",");
 					int idx = 0;
 					if (comp_params.length >= idx + 1) {
 						PORT_LOCAL_HOST_PROP_VAL = comp_params[idx++];
+						log.config("Setting PORT_LOCAL_HOST_PROP_VAL to "
+							+ PORT_LOCAL_HOST_PROP_VAL);
 					}
 					if (comp_params.length >= idx + 1) {
 						PORT_REMOTE_HOST_PROP_VAL = comp_params[idx++];
+						log.config("Setting PORT_REMOTE_HOST_PROP_VAL to "
+							+ PORT_REMOTE_HOST_PROP_VAL);
 						PORT_ROUTING_TABLE_PROP_VAL = new String[] { PORT_REMOTE_HOST_PROP_VAL };
 						if (config_type.equals(GEN_CONFIG_CS)) {
 							PORT_IFC_PROP_VAL = new String[] {PORT_REMOTE_HOST_PROP_VAL};
@@ -221,14 +227,17 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 							log.warning("Incorrect component port number: " + comp_params[idx-1]);
 							PORTS[0] = 5555;
 						}
+						log.config("Setting PORTS[0] to " + PORTS[0]);
 					}
 					if (comp_params.length >= idx + 1) {
 						SECRET_PROP_VAL = comp_params[idx++];
+						log.config("Setting SECRET_PROP_VAL to " + SECRET_PROP_VAL);
 					}
 					if (comp_params.length >= idx + 1) {
 						if (comp_params[idx++].equals("ssl")) {
 							PORT_SOCKET_PROP_VAL = SocketType.plain;
 						}
+						log.config("Setting PORT_SOCKET_PROP_VAL to " + PORT_SOCKET_PROP_VAL);
 					}
 					if (comp_params.length >= idx + 1) {
 						if (comp_params[idx++].equals("accept")) {
@@ -236,6 +245,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 						} else {
 							PORT_TYPE_PROP_VAL = ConnectionType.connect;
 						}
+						log.config("Setting PORT_TYPE_PROP_VAL to " + PORT_TYPE_PROP_VAL);
 					}
 					if (comp_params.length >= idx + 1) {
 						PORT_ROUTING_TABLE_PROP_VAL = new String[] { comp_params[idx++] };
