@@ -541,16 +541,18 @@ public class Roster {
 // 			current_subscription = SubscriptionType.none;
 // 			addBuddy(session, jid);
 // 		} // end of if (current_subscription == null)
-		if (current_subscription != null) {
-			final SubscriptionType new_subscription =
-				getStateTransition(current_subscription, presence);
-			log.finest("new_subscription="+new_subscription
-				+" for presence="+presence);
-			if (current_subscription != new_subscription) {
-				setBuddySubscription(session, new_subscription, jid);
-				return true;
-			} // end of if (current_subscription != new_subscription)
+		if (current_subscription == null) {
+			addBuddy(session, jid);
+			current_subscription = SubscriptionType.none;
 		}
+		final SubscriptionType new_subscription =
+			getStateTransition(current_subscription, presence);
+		log.finest("new_subscription="+new_subscription
+			+" for presence="+presence);
+		if (current_subscription != new_subscription) {
+			setBuddySubscription(session, new_subscription, jid);
+			return true;
+		} // end of if (current_subscription != new_subscription)
 		return false;
 	}
 
