@@ -72,6 +72,10 @@ public class Gateway extends AbstractMessageReceiver
 
 	private static final String username_key = "user-name-key";
 	private static final String password_key = "password-key";
+	private static final String AUTHORIZED_KEY = "authorized-key";
+	private static final String NAME_KEY = "authorized-key";
+	private static final String PRESENCE_TYPE = "presence-type";
+	private static final String PRESENCE_SHOW = "presence-show";
 
 	private String[] ADMINS_PROP_VAL =	{"admin@localhost", "admin@hostname"};
 
@@ -233,14 +237,27 @@ public class Gateway extends AbstractMessageReceiver
 					XMLUtils.unescape(packet.getElemTo().split("@")[0].replace("%", "@"));
 				String roster_node = id + "/roster/" + buddy;
 				String authorized = "true";
+				String pres_type = "null";
+				String pres_show = "null";
 				try {
 					repository.setData(myDomain(), roster_node, AUTHORIZED_KEY, authorized);
+					pres_type = repository.getData(myDomain(), roster_node, PRESENCE_TYPE);
+					pres_show = repository.getData(myDomain(), roster_node, PRESENCE_SHOW);
 				} catch (TigaseDBException e) {
 					log.log(Level.WARNING, "Problem updating repository data", e);
 				}
-				Packet presence = new Packet(new Element("presence",
+
+				Element pres_el = new Element("presence",
 						new String[] {"to", "from"},
-						new String[] {packet.getElemFrom(), packet.getElemTo()}));
+						new String[] {packet.getElemFrom(), packet.getElemTo()});
+				if (!pres_type.equals("null")) {
+					pres_el.setAttribute("type", pres_type);
+				}
+				if (!pres_show.equals("null")) {
+					Element show = new Element("show", pres_show);
+					pres_el.addChild(show);
+				}
+				Packet presence = new Packet(pres_el);
 				log.finest("Sending out presence: " + presence.toString());
 				addOutPacket(presence);
 			}
@@ -339,9 +356,6 @@ public class Gateway extends AbstractMessageReceiver
 		log.log(Level.WARNING, "Gateway exception", exc);
 	}
 
-	private static final String AUTHORIZED_KEY = "authorized-key";
-	private static final String NAME_KEY = "authorized-key";
-
 	public void userRoster(String username, List<RosterItem> roster) {
 		String id = JIDUtils.getNodeID(username);
 		for (RosterItem item: roster) {
@@ -357,17 +371,31 @@ public class Gateway extends AbstractMessageReceiver
 					repository.setData(myDomain(), roster_node, AUTHORIZED_KEY, authorized);
 					repository.setData(myDomain(), roster_node, NAME_KEY, item.getName());
 				}
+				if (item.getStatus().getType() != null) {
+					repository.setData(myDomain(), roster_node, PRESENCE_TYPE,
+						item.getStatus().getType());
+				} else {
+					repository.setData(myDomain(), roster_node, PRESENCE_TYPE, "null");
+				}
+				if (item.getStatus().getShow() != null) {
+					repository.setData(myDomain(), roster_node, PRESENCE_SHOW,
+						item.getStatus().getShow());
+				} else {
+					repository.setData(myDomain(), roster_node, PRESENCE_SHOW, "null");
+				}
 			} catch (TigaseDBException e) {
 				log.log(Level.WARNING, "Problem updating repository data", e);
 			}
-			if (authorized.equals("false")) {
+
+			//			if (authorized.equals("false")) {
 				// Send authorization request...
 				Packet presence = new Packet(new Element("presence",
 						new String[] {"to", "from", "type"},
 						new String[] {username, from, "subscribe"}));
 				log.finest("Sending out presence: " + presence.toString());
 				addOutPacket(presence);
-			}
+				//			}
+
 			Element pres_el = new Element("presence",
 				new String[] {"to", "from"},
 				new String[] {username, from});
@@ -378,10 +406,46 @@ public class Gateway extends AbstractMessageReceiver
 				Element show = new Element("show", item.getStatus().getShow());
 				pres_el.addChild(show);
 			}
-			Packet presence = new Packet(pres_el);
+			presence = new Packet(pres_el);
 			log.finest("Sending out presence: " + presence.toString());
 			addOutPacket(presence);
 		}
+	}
+
+	public void updateStatus(String username, RosterItem item) {
+		String id = JIDUtils.getNodeID(username);
+		String from = XMLUtils.escape(item.getBuddyId().replace("@", "%")
+			+ "@" + myDomain());
+		String roster_node = id + "/roster/" + item.getBuddyId();
+		try {
+			if (item.getStatus().getType() != null) {
+				repository.setData(myDomain(), roster_node, PRESENCE_TYPE,
+					item.getStatus().getType());
+			} else {
+				repository.setData(myDomain(), roster_node, PRESENCE_TYPE, "null");
+			}
+			if (item.getStatus().getShow() != null) {
+				repository.setData(myDomain(), roster_node, PRESENCE_SHOW,
+					item.getStatus().getShow());
+			} else {
+				repository.setData(myDomain(), roster_node, PRESENCE_SHOW, "null");
+			}
+		} catch (TigaseDBException e) {
+			log.log(Level.WARNING, "Problem updating repository data", e);
+		}
+		Element pres_el = new Element("presence",
+			new String[] {"to", "from"},
+			new String[] {username, from});
+		if (item.getStatus().getType() != null) {
+			pres_el.setAttribute("type", item.getStatus().getType());
+		}
+		if (item.getStatus().getShow() != null) {
+			Element show = new Element("show", item.getStatus().getShow());
+			pres_el.addChild(show);
+		}
+		Packet presence = new Packet(pres_el);
+		log.finest("Sending out presence: " + presence.toString());
+		addOutPacket(presence);
 	}
 
 }

@@ -45,4 +45,6 @@ public interface GatewayListener {
 
 	void userRoster(String username, List<RosterItem> roster);
 
+	void updateStatus(String username, RosterItem item);
+
 }

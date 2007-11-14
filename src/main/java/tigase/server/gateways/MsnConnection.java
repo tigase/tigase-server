@@ -404,21 +404,40 @@ public class MsnConnection
 	public void contactStatusChanged(final MsnMessenger msnMessenger,
 		final MsnContact msnContact) {
 		log.finest(active_jid + " contactStatusChanged completed.");
-		String to = active_jid;
-		String jid =
-			XMLUtils.escape(msnContact.getEmail().getEmailAddress().replace("@", "%")
-				+ "@" + gatewayDomain);
-		Element presence = new Element("presence",
-			new String[] {"from", "to"}, new String[] {jid, to});
+// 		String to = active_jid;
+// 		String jid =
+// 			XMLUtils.escape(msnContact.getEmail().getEmailAddress().replace("@", "%")
+// 				+ "@" + gatewayDomain);
+// 		Element presence = new Element("presence",
+// 			new String[] {"from", "to"}, new String[] {jid, to});
+// 		if (msnContact.getStatus() == MsnUserStatus.OFFLINE ) {
+// 			presence.setAttribute("type", "unavailable");
+// 		} else {
+// 			presence.addChild(new Element("show",
+// 					msnContact.getStatus().getDisplayStatus().toLowerCase()));
+// 		}
+// 		Packet packet = new Packet(presence);
+// 		log.finest("Sending out buddy presence: " + packet.toString());
+
+		RosterItem item = new RosterItem(msnContact.getEmail().getEmailAddress());
+		item.setName(msnContact.getFriendlyName());
+		item.setSubscription("both");
 		if (msnContact.getStatus() == MsnUserStatus.OFFLINE ) {
-			presence.setAttribute("type", "unavailable");
+			item.setStatus(new UserStatus("unavailable", null));
 		} else {
-			presence.addChild(new Element("show",
+			item.setStatus(new UserStatus(null,
 					msnContact.getStatus().getDisplayStatus().toLowerCase()));
 		}
-		Packet packet = new Packet(presence);
-		log.finest("Sending out buddy presence: " + packet.toString());
-		listener.packetReceived(packet);
+		MsnGroup[] groups = msnContact.getBelongGroups();
+		if (groups != null && groups.length > 0) {
+			List<String> grps = new ArrayList<String>();
+			for (MsnGroup group: groups) {
+				grps.add(group.getGroupName());
+			}
+			item.setGroups(grps);
+		}
+
+		listener.updateStatus(active_jid, item);
 	}
 
 	/**
