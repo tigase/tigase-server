@@ -68,7 +68,7 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
 
   // Implementation of tigase.xmpp.rep.UserRepository
 
-	public void initRepository(String file) {
+	public synchronized void initRepository(String file) {
 		String file_name = file;
     try {
 			int idx = file.indexOf("?");
@@ -102,7 +102,7 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
    * and domain address.
    * @exception UserExistsException if user with the same id already exists.
    */
-  public final void addUser(final String user) throws UserExistsException {
+  public synchronized void addUser(final String user) throws UserExistsException {
     try {
       xmldb.addNode1(user);
     } catch (NodeExistsException e) {
@@ -122,7 +122,8 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
    * and domain address.
    * @exception UserNotFoundException if user id hasn't been found in reository.
    */
-  public final void removeUser(final String user) throws UserNotFoundException {
+  public synchronized void removeUser(final String user)
+		throws UserNotFoundException {
     try {
       xmldb.removeNode1(user);
     } catch (NodeNotFoundException e) {
@@ -130,11 +131,11 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
     } // end of try-catch
   }
 
-	public List<String> getUsers() {
+	public synchronized List<String> getUsers() {
 		return xmldb.getAllNode1s();
 	}
 
-	public long getUsersCount() {
+	public synchronized long getUsersCount() {
 		return xmldb.getAllNode1sCount();
 	}
 
@@ -157,7 +158,7 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
    * specified key.
    * @exception UserNotFoundException if user id hasn't been found in reository.
    */
-  public final void setData(final String user, final String subnode,
+  public synchronized void setData(final String user, final String subnode,
     final String key, final String value)
 		throws UserNotFoundException, TigaseDBException {
     try {
@@ -192,7 +193,7 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
    * specified key.
    * @exception UserNotFoundException if user id hasn't been found in reository.
    */
-  public final void setData(final String user, final String key,
+  public void setData(final String user, final String key,
     final String value)
     throws UserNotFoundException, TigaseDBException {
     setData(user, null, key, value);
@@ -216,7 +217,7 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
    * with the specified key.
    * @exception UserNotFoundException if user id hasn't been found in reository.
    */
-  public final void setDataList(final String user, final String subnode,
+  public synchronized void setDataList(final String user, final String subnode,
     final String key, final String[] list)
     throws UserNotFoundException, TigaseDBException {
     try {
@@ -252,7 +253,7 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
    * with the specified key.
    * @exception UserNotFoundException if user id hasn't been found in reository.
 	 */
-  public final void addDataList(final String user, final String subnode,
+  public synchronized void addDataList(final String user, final String subnode,
     final String key, final String[] list)
     throws UserNotFoundException, TigaseDBException {
     try {
@@ -287,7 +288,7 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
    * @return a <code>String[]</code> value
    * @exception UserNotFoundException if user id hasn't been found in reository.
    */
-  public final String[] getDataList(final String user, final String subnode,
+  public synchronized String[] getDataList(final String user, final String subnode,
     final String key)
     throws UserNotFoundException, TigaseDBException {
     try {
@@ -323,7 +324,7 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
    * @return a <code>String</code> value
    * @exception UserNotFoundException if user id hasn't been found in reository.
    */
-  public final String getData(final String user, final String subnode,
+  public synchronized String getData(final String user, final String subnode,
     final String key, final String def)
     throws UserNotFoundException, TigaseDBException {
     try {
@@ -357,7 +358,7 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
    * @return a <code>String</code> value
    * @exception UserNotFoundException if user id hasn't been found in reository.
    */
-  public final String getData(final String user, final String subnode,
+  public String getData(final String user, final String subnode,
     final String key)
     throws UserNotFoundException, TigaseDBException {
     return getData(user, subnode, key, null);
@@ -375,7 +376,7 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
    * @return a <code>String</code> value
    * @exception UserNotFoundException if user id hasn't been found in reository.
    */
-  public final String getData(final String user, final String key)
+  public String getData(final String user, final String key)
     throws UserNotFoundException, TigaseDBException {
     return getData(user, null, key, null);
   }
@@ -392,7 +393,7 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
    * @return a <code>String[]</code> value is an array of all direct subnodes.
    * @exception UserNotFoundException if user id hasn't been found in reository.
    */
-  public final String[] getSubnodes(final String user, final String subnode)
+  public synchronized String[] getSubnodes(final String user, final String subnode)
     throws UserNotFoundException, TigaseDBException {
     try {
       return xmldb.getSubnodes(user, subnode);
@@ -420,7 +421,7 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
    * nodes for given user.
    * @exception UserNotFoundException if user id hasn't been found in reository.
    */
-  public final String[] getSubnodes(final String user)
+  public String[] getSubnodes(final String user)
     throws UserNotFoundException, TigaseDBException {
     return getSubnodes(user, null);
   }
@@ -440,7 +441,7 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
    * @return a <code>String[]</code> value
    * @exception UserNotFoundException if user id hasn't been found in reository.
    */
-  public final String[] getKeys(final String user, final String subnode)
+  public synchronized String[] getKeys(final String user, final String subnode)
     throws UserNotFoundException, TigaseDBException {
     try {
       return xmldb.getKeys(user, subnode);
@@ -470,7 +471,7 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
    * @return a <code>String[]</code> value
    * @exception UserNotFoundException if user id hasn't been found in reository.
    */
-  public final String[] getKeys(final String user)
+  public String[] getKeys(final String user)
     throws UserNotFoundException, TigaseDBException {
     return getKeys(user, null);
   }
@@ -491,7 +492,7 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
    * @param key a <code>String</code> for which the value is to be removed.
    * @exception UserNotFoundException if user id hasn't been found in reository.
    */
-  public final void removeData(final String user, final String subnode,
+  public synchronized void removeData(final String user, final String subnode,
     final String key)
     throws UserNotFoundException {
     try {
@@ -516,7 +517,7 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
    * @param key a <code>String</code> for which the value is to be removed.
    * @exception UserNotFoundException if user id hasn't been found in reository.
    */
-  public final void removeData(final String user, final String key)
+  public void removeData(final String user, final String key)
     throws UserNotFoundException {
     removeData(user, null, key);
   }
@@ -533,7 +534,7 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
    * system: <pre>/root/subnode1/subnode2</pre>.
    * @exception UserNotFoundException if user id hasn't been found in reository.
    */
-  public final void removeSubnode(final String user, final String subnode)
+  public synchronized void removeSubnode(final String user, final String subnode)
     throws UserNotFoundException {
     try {
       xmldb.removeSubnode(user, subnode);
@@ -555,7 +556,7 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
 	 * @exception UserNotFoundException if an error occurs
 	 * @exception TigaseDBException if an error occurs
 	 */
-	public boolean plainAuth(final String user, final String password)
+	public synchronized boolean plainAuth(final String user, final String password)
 		throws UserNotFoundException, TigaseDBException, AuthorizationException {
 		return auth.plainAuth(user, password);
 	}
@@ -571,7 +572,7 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
 	 * @exception UserNotFoundException if an error occurs
 	 * @exception TigaseDBException if an error occurs
 	 */
-	public boolean digestAuth(final String user, final String digest,
+	public synchronized boolean digestAuth(final String user, final String digest,
 		final String id, final String alg)
 		throws UserNotFoundException, TigaseDBException, AuthorizationException {
 		return auth.digestAuth(user, digest, id, alg);
@@ -586,17 +587,17 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
 	 * @exception TigaseDBException if an error occurs
 	 * @exception AuthorizationException if an error occurs
 	 */
-	public boolean otherAuth(final Map<String, Object> props)
+	public synchronized boolean otherAuth(final Map<String, Object> props)
 		throws UserNotFoundException, TigaseDBException, AuthorizationException {
 		return auth.otherAuth(props);
 	}
 
-	public void logout(final String user)
+	public synchronized void logout(final String user)
 		throws UserNotFoundException, TigaseDBException {
 		auth.logout(user);
 	}
 
-	public void updatePassword(final String user, final String password)
+	public synchronized void updatePassword(final String user, final String password)
 		throws UserExistsException, TigaseDBException {
 		auth.updatePassword(user, password);
 	}
@@ -609,12 +610,12 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
 	 * @exception UserExistsException if an error occurs
 	 * @exception TigaseDBException if an error occurs
 	 */
-	public void addUser(final String user, final String password)
+	public synchronized void addUser(final String user, final String password)
 		throws UserExistsException, TigaseDBException {
 		auth.addUser(user, password);
 	}
 
-	public void queryAuth(Map<String, Object> authProps) {
+	public synchronized void queryAuth(Map<String, Object> authProps) {
 		auth.queryAuth(authProps);
 	}
 
