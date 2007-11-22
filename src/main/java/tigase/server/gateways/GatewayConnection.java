@@ -51,8 +51,14 @@ public interface GatewayConnection {
 
 	void sendMessage(Packet message) throws GatewayException;
 
+	void addBuddy(String id, String nick) throws GatewayException;
+
+	void removeBuddy(String id) throws GatewayException;
+
 	String getType();
 
 	String getName();
+
+	String getPromptMessage();
 
 }
