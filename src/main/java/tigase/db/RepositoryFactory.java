@@ -46,6 +46,12 @@ public class RepositoryFactory {
 		String class_name, String resource)
 		throws ClassNotFoundException, InstantiationException,
 					 IllegalAccessException, DBInitException {
+		// XMLRepository is different as you can not have many instances accessing
+		// the same file, thus we have to detect it and return always a hadle
+		// to the same repository instance if it is accessing the same file
+		if (class_name.equals("tigase.db.xml.XMLRepository")) {
+			comp_name = resource;
+		}
 		ConcurrentMap<String, UserRepository> repo_map = user_repos.get(comp_name);
 		if (repo_map == null) {
 			repo_map = new ConcurrentHashMap<String, UserRepository>();
