@@ -41,7 +41,9 @@ import tigase.util.DBUtils;
 import tigase.util.JIDUtils;
 import tigase.xml.XMLUtils;
 import tigase.xml.Element;
+import tigase.xmpp.Authorization;
 import tigase.xmpp.StanzaType;
+import tigase.xmpp.PacketErrorTypeException;
 
 /**
  * Describe class Gateway here.
@@ -84,6 +86,7 @@ public class Gateway extends AbstractMessageReceiver
 	private String gw_class_name = GW_CLASS_NAME_PROP_VAL;
 	private String gw_name = "Undefined";
 	private String gw_type = "unknown";
+	private String gw_desc = "empty";
 	private UserRepository repository = null;
 	private Map<String, GatewayConnection> gw_connections =
 		new LinkedHashMap<String, GatewayConnection>();
@@ -96,6 +99,7 @@ public class Gateway extends AbstractMessageReceiver
 		if (gc != null) {
 			gw_type = gc.getType();
 			gw_name = gc.getName();
+			gw_desc = gc.getPromptMessage();
 		}
 
 		serviceEntity = new ServiceEntity(getName(), null, "Transport");
@@ -103,6 +107,7 @@ public class Gateway extends AbstractMessageReceiver
 			new ServiceIdentity("gateway", gw_type, gw_name));
 		serviceEntity.addFeatures(DEF_FEATURES);
 		serviceEntity.addFeatures("jabber:iq:register", "jabber:iq:gateway");
+		//serviceEntity.addFeatures("jabber:iq:register");
 
 		admins = (String[])props.get(ADMINS_PROP_KEY);
 		Arrays.sort(admins);
@@ -215,26 +220,27 @@ public class Gateway extends AbstractMessageReceiver
 
 	private void processPresence(Packet packet) {
 		if (packet.getElemTo().equals(myDomain())) {
-			if (packet.getType() == null) {
+			if (packet.getType() == null || packet.getType() == StanzaType.available) {
 				// Open new connection if ti does not exist
-				findConnection(packet);
+				findConnection(packet, true);
 				return;
 			}
 			if (packet.getType() == StanzaType.subscribe) {
 				addOutPacket(packet.swapElemFromTo(StanzaType.subscribed));
 			}
+			if (packet.getType() == StanzaType.unavailable) {
+				closeConnection(packet);
+			}
 		} else {
-			if (packet.getType() == null) {
+			if (packet.getType() == null || packet.getType() == StanzaType.available) {
 				// Ignore
 				return;
 			}
 			String id = JIDUtils.getNodeID(packet.getElemFrom());
-			if (packet.getType() == StanzaType.subscribe) {
-				addOutPacket(packet.swapElemFromTo(StanzaType.subscribed));
-			}
 			if (packet.getType() == StanzaType.subscribed) {
-				String buddy =
-					XMLUtils.unescape(packet.getElemTo().split("@")[0].replace("%", "@"));
+				addOutPacket(packet.swapElemFromTo(StanzaType.subscribed));
+				String buddy = decodeLegacyName(packet.getElemTo());
+				log.fine("Received subscribed presence for: " + buddy);
 				String roster_node = id + "/roster/" + buddy;
 				String authorized = "true";
 				String pres_type = "null";
@@ -243,6 +249,7 @@ public class Gateway extends AbstractMessageReceiver
 					repository.setData(myDomain(), roster_node, AUTHORIZED_KEY, authorized);
 					pres_type = repository.getData(myDomain(), roster_node, PRESENCE_TYPE);
 					pres_show = repository.getData(myDomain(), roster_node, PRESENCE_SHOW);
+					log.fine("Added buddy do repository for: " + buddy);
 				} catch (TigaseDBException e) {
 					log.log(Level.WARNING, "Problem updating repository data", e);
 				}
@@ -261,6 +268,79 @@ public class Gateway extends AbstractMessageReceiver
 				log.finest("Sending out presence: " + presence.toString());
 				addOutPacket(presence);
 			}
+			if (packet.getType() == StanzaType.subscribe) {
+				addOutPacket(packet.swapElemFromTo(StanzaType.subscribe));
+				String buddy = decodeLegacyName(packet.getElemTo());
+				log.fine("Received subscribe presence for: " + buddy);
+				String nick = JIDUtils.getNodeNick(buddy);
+				if (nick == null || nick.isEmpty()) {
+					nick = buddy;
+				}
+				GatewayConnection conn = findConnection(packet, true);
+				if (conn != null) {
+					try {
+						conn.addBuddy(buddy, nick);
+						log.fine("Added to roster buddy: " + buddy);
+					} catch (GatewayException e) {
+						log.log(Level.WARNING, "Problem with gateway when adding buddy: "
+							+ buddy, e);
+					}
+				}
+			}
+			if (packet.getType() == StanzaType.unsubscribe) {
+				Packet presence = packet.swapElemFromTo(StanzaType.unsubscribe);
+				log.finest("Sending out presence: " + presence.toString());
+				addOutPacket(presence);
+			}
+			if (packet.getType() == StanzaType.unsubscribed) {
+				addOutPacket(packet.swapElemFromTo(StanzaType.unsubscribe));
+				addOutPacket(packet.swapElemFromTo(StanzaType.unsubscribed));
+				String buddy = decodeLegacyName(packet.getElemTo());
+				String roster_node = id + "/roster/" + buddy;
+				log.fine("Received unsubscribed presence for buddy: " + buddy);
+				try {
+					repository.removeSubnode(myDomain(), roster_node);
+					log.fine("Removed from repository buddy: " + buddy);
+				} catch (TigaseDBException e) {
+					log.log(Level.WARNING, "Problem updating repository data", e);
+				}
+				GatewayConnection conn = findConnection(packet, true);
+				if (conn != null) {
+					try {
+						conn.removeBuddy(buddy);
+						log.fine("Removed from roster buddy: " + buddy);
+					} catch (GatewayException e) {
+						log.log(Level.WARNING, "Problem with gateway when removing buddy: "
+							+ buddy, e);
+					}
+				}
+			}
+		}
+	}
+
+	private void processGateway(Packet packet) {
+		if (packet.getType() == null) {
+			try {
+				log.info("Bad gateway request: " + packet.toString());
+				addOutPacket(Authorization.BAD_REQUEST.getResponseMessage(packet,
+						"IQ request must have either 'set' or 'get' type.", true));
+			} catch (PacketErrorTypeException e) {
+				log.info("This must have been an error already, dropping: "
+					+ packet.toString() + ", exception: " + e);
+			}
+			return;
+		}
+		if (packet.getType() == StanzaType.get) {
+			Element query = new Element("query");
+			query.setXMLNS("jabber:iq:gateway");
+			query.addChild(new Element("desc", gw_desc));
+			query.addChild(new Element("prompt"));
+			addOutPacket(packet.okResult(query, 0));
+		}
+		if (packet.getType() == StanzaType.set) {
+			String legacyName = packet.getElemCData("/iq/query/prompt");
+			String jid = formatJID(legacyName);
+			addOutPacket(packet.okResult(new Element("prompt", jid), 1));
 		}
 	}
 
@@ -268,12 +348,32 @@ public class Gateway extends AbstractMessageReceiver
 		if (packet.isXMLNS("/iq/query", "jabber:iq:register")) {
 			processRegister(packet);
 		}
+		if (packet.isXMLNS("/iq/query", "jabber:iq:gateway")) {
+			processGateway(packet);
+		}
 	}
 
-	private GatewayConnection findConnection(Packet packet) {
+	private void closeConnection(Packet packet) {
 		String id = JIDUtils.getNodeID(packet.getElemFrom());
 		GatewayConnection conn = gw_connections.get(id);
-		if (conn != null) { return conn; }
+		if (conn != null) {
+			gw_connections.remove(id);
+			conn.logout();
+		}
+	}
+
+	public String formatJID(String legacyName) {
+		return XMLUtils.escape(legacyName.replace("@", "%") + "@" + myDomain());
+	}
+
+	public String decodeLegacyName(String jid) {
+		return XMLUtils.unescape(jid).split("@")[0].replace("%", "@");
+	}
+
+	private GatewayConnection findConnection(Packet packet, boolean create) {
+		String id = JIDUtils.getNodeID(packet.getElemFrom());
+		GatewayConnection conn = gw_connections.get(id);
+		if (conn != null || !create) { return conn; }
 		try {
 			String username = repository.getData(myDomain(), id, username_key);
 			String password = repository.getData(myDomain(), id, password_key);
@@ -301,6 +401,7 @@ public class Gateway extends AbstractMessageReceiver
 		}
 		if (packet.getElemName().equals("presence")) {
 			processPresence(packet);
+			return;
 		}
 		if (packet.getElemTo().equals(myDomain())) {
 			// Local processing.
@@ -308,7 +409,7 @@ public class Gateway extends AbstractMessageReceiver
 			processLocalPacket(packet);
 			return;
 		}
-		GatewayConnection conn = findConnection(packet);
+		GatewayConnection conn = findConnection(packet, false);
 		if (conn != null) {
 			try {
 				conn.sendMessage(packet);
@@ -359,8 +460,8 @@ public class Gateway extends AbstractMessageReceiver
 	public void userRoster(String username, List<RosterItem> roster) {
 		String id = JIDUtils.getNodeID(username);
 		for (RosterItem item: roster) {
-			String from = XMLUtils.escape(item.getBuddyId().replace("@", "%")
-				+ "@" + myDomain());
+			log.fine("Received roster entry: " + item.getBuddyId());
+			String from = formatJID(item.getBuddyId());
 			String roster_node = id + "/roster/" + item.getBuddyId();
 			String authorized = "false";
 			try {
@@ -414,8 +515,7 @@ public class Gateway extends AbstractMessageReceiver
 
 	public void updateStatus(String username, RosterItem item) {
 		String id = JIDUtils.getNodeID(username);
-		String from = XMLUtils.escape(item.getBuddyId().replace("@", "%")
-			+ "@" + myDomain());
+		String from = formatJID(item.getBuddyId());
 		String roster_node = id + "/roster/" + item.getBuddyId();
 		try {
 			if (item.getStatus().getType() != null) {

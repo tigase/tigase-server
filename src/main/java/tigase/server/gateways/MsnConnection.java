@@ -129,13 +129,15 @@ public class MsnConnection
 	}
 
 	public void sendMessage(Packet packet) {
-		log.finest("Sending message: " + packet.toString());
 		String address =
 			JIDUtils.getNodeNick(packet.getElemTo()).replace("%", "@");
 		active_jid = packet.getElemFrom();
 		if (packet.getElemName().equals("message")) {
+			log.finest("Sending message: " + packet.toString());
 			String body = XMLUtils.unescape(packet.getElemCData("/message/body"));
 			messenger.sendText(Email.parseStr(address), body);
+		} else {
+			log.finest("Ignoring unknown packet: " + packet.toString());
 		}
 	}
 
@@ -151,9 +153,7 @@ public class MsnConnection
 	public void instantMessageReceived(final MsnSwitchboard msnSwitchboard,
 		final MsnInstantMessage msnInstantMessage, final MsnContact msnContact) {
 		String to = active_jid;
-		String from =
-			XMLUtils.escape(msnContact.getEmail().getEmailAddress().replace("@", "%")
-				+ "@" + gatewayDomain);
+		String from = listener.formatJID(msnContact.getEmail().getEmailAddress());
 		String content = XMLUtils.escape(msnInstantMessage.getContent());
 		Element message = new Element("message",
 			new String[] {"from", "to", "type"},
@@ -175,9 +175,7 @@ public class MsnConnection
 	public void controlMessageReceived(final MsnSwitchboard msnSwitchboard,
 		final MsnControlMessage msnControlMessage, final MsnContact msnContact) {
 		String to = active_jid;
-		String from =
-			XMLUtils.escape(msnContact.getEmail().getEmailAddress().replace("@", "%")
-				+ "@" + gatewayDomain);
+		String from = listener.formatJID(msnContact.getEmail().getEmailAddress());
 		Element message = new Element("message",
 			new String[] {"from", "to", "type"},
 			new String[] {from, to, "chat"});
@@ -348,6 +346,17 @@ public class MsnConnection
 // 			iq.addChild(query);
 			List<RosterItem> roster = new ArrayList<RosterItem>();
 			for (MsnContact contact: list) {
+				MsnGroup[] c_groups = contact.getBelongGroups();
+				if (c_groups != null && c_groups.length > 0) {
+					for (MsnGroup c_grp: c_groups) {
+						log.fine("Contact " + contact.getEmail().getEmailAddress()
+							+ " group: " + c_grp.getGroupName());
+					}
+				} else {
+					log.fine("Contact " + contact.getEmail().getEmailAddress()
+						+ " is not in any group");
+				}
+				MsnContactList c_list = contact.getContactList();
 				RosterItem item = new RosterItem(contact.getEmail().getEmailAddress());
 				item.setName(contact.getFriendlyName());
 				item.setSubscription("both");
@@ -457,6 +466,20 @@ public class MsnConnection
 	 */
 	public void contactAddedMe(final MsnMessenger msnMessenger,
 		final MsnContact msnContact) {
+		String to = active_jid;
+		String from = listener.formatJID(msnContact.getEmail().getEmailAddress());
+		Element presence = new Element("presence",
+			new String[] {"from", "to", "type"},
+			new String[] {from, to, "subscribe"});
+		Packet packet = new Packet(presence);
+		log.finest("Received subscription presence: " + packet.toString());
+		listener.packetReceived(packet);
+		presence = new Element("presence",
+			new String[] {"from", "to", "type"},
+			new String[] {from, to, "subscribed"});
+		packet = new Packet(presence);
+		log.finest("Received subscription presence: " + packet.toString());
+		listener.packetReceived(packet);
 		log.finest(active_jid + " contactAddedMe completed.");
 	}
 
@@ -468,6 +491,20 @@ public class MsnConnection
 	 */
 	public void contactRemovedMe(final MsnMessenger msnMessenger,
 		final MsnContact msnContact) {
+		String to = active_jid;
+		String from = listener.formatJID(msnContact.getEmail().getEmailAddress());
+		Element presence = new Element("presence",
+			new String[] {"from", "to", "type"},
+			new String[] {from, to, "unsubscribe"});
+		Packet packet = new Packet(presence);
+		log.finest("Received subscription presence: " + packet.toString());
+		listener.packetReceived(packet);
+		presence = new Element("presence",
+			new String[] {"from", "to", "type"},
+			new String[] {from, to, "unsubscribed"});
+		packet = new Packet(presence);
+		log.finest("Received subscription presence: " + packet.toString());
+		listener.packetReceived(packet);
 		log.finest(active_jid + " contactRemovedMe completed.");
 	}
 
@@ -479,6 +516,24 @@ public class MsnConnection
 	 */
 	public void contactAddCompleted(final MsnMessenger msnMessenger,
 		final MsnContact msnContact) {
+		RosterItem item = new RosterItem(msnContact.getEmail().getEmailAddress());
+		item.setName(msnContact.getFriendlyName());
+		item.setSubscription("both");
+		if (msnContact.getStatus() == MsnUserStatus.OFFLINE ) {
+			item.setStatus(new UserStatus("unavailable", null));
+		} else {
+			item.setStatus(new UserStatus(null,
+					msnContact.getStatus().getDisplayStatus().toLowerCase()));
+		}
+		MsnGroup[] groups = msnContact.getBelongGroups();
+		if (groups != null && groups.length > 0) {
+			List<String> grps = new ArrayList<String>();
+			for (MsnGroup group: groups) {
+				grps.add(group.getGroupName());
+			}
+			item.setGroups(grps);
+		}
+		listener.updateStatus(active_jid, item);
 		log.finest(active_jid + " contactAddCompleted completed.");
 	}
 
@@ -490,7 +545,8 @@ public class MsnConnection
 	 */
 	public void contactRemoveCompleted(final MsnMessenger msnMessenger,
 		final MsnContact msnContact) {
-		log.finest(active_jid + " contactRemoveCompleted completed.");
+		log.finest(active_jid + " contactRemoveCompleted completed: "
+			+ msnContact.getEmail().getEmailAddress());
 	}
 
 	/**
@@ -515,8 +571,23 @@ public class MsnConnection
 		log.finest(active_jid + " groupRemoveCompleted completed.");
 	}
 
+	public void addBuddy(String id, String nick) throws GatewayException {
+		messenger.addFriend(Email.parseStr(id), nick);
+		log.finest(active_jid + " addBuddy completed: " + id);
+	}
+
+	public void removeBuddy(String id) throws GatewayException {
+		messenger.removeFriend(Email.parseStr(id), true);
+		log.finest(active_jid + " removeBuddy completed: " + id);
+	}
+
 	public String getType() { return "msn"; }
 
 	public String getName() { return "MSN Gateway"; }
+
+	public String getPromptMessage() {
+		return "Please enter the Windows Live Messenger address of the person "
+			+ "you would like to contact.";
+	}
 
 }
