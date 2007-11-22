@@ -4,7 +4,7 @@
 AppName=Tigase Server
 AppVersion={#ver}
 AppVerName=Tigase XMPP Server {#ver}
-AppPublisher=tigase.org
+AppPublisher=Tigase.org
 AppPublisherURL=http://www.tigase.org/
 AppSupportURL=http://www.tigase.org/
 AppUpdatesURL=http://www.tigase.org/
