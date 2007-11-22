@@ -47,4 +47,8 @@ public interface GatewayListener {
 
 	void updateStatus(String username, RosterItem item);
 
+	String formatJID(String legacyName);
+
+	String decodeLegacyName(String jid);
+
 }
