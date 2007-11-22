@@ -408,8 +408,10 @@ public class Presence extends XMPPProcessor
 					Roster.updateBuddyChange(session, results,
 						Roster.getBuddyItem(session, packet.getElemTo()));
 					forwardPresence(results, packet, session.getUserId());
-					sendPresence(StanzaType.available, packet.getElemTo(),
-						session.getJID(), results, null);
+					if (pres_type == PresenceType.out_subscribed) {
+						sendPresence(StanzaType.available, packet.getElemTo(),
+							session.getJID(), results, null);
+					}
 				} // end of if (subscr_changed)
 				break;
 			case in_initial:
