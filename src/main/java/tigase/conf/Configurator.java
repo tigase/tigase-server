@@ -178,11 +178,17 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
   }
 
 	public Configurator(String fileName, String[] args) {
+		//		System.out.println("configurator init...");
 		parseArgs(args);
+		//		System.out.println("configurator after parse args, reading config from file: " + fileName);
 		repository = ConfigRepository.getConfigRepository(fileName);
+		//		System.out.println("configurator after config repository load");
 		defConfigParams.putAll(getAllProperties(null));
+		//System.out.println("configurator after defparams.putall all properties");
 		Set<String> prop_keys = defProperties.stringPropertyNames();
+		//System.out.println("configurator starting loop....");
 		for (String key: prop_keys) {
+			//System.out.println("Analyzing key: " + key);
 			int idx1 = key.indexOf("/");
 			if (idx1 > 0) {
 				String root = key.substring(0, idx1);
@@ -199,6 +205,8 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 				repository.set(root, node, prop_key, defProperties.getProperty(key));
 				log.config("Added default config property: ("
 					+ key + "=" + defProperties.getProperty(key) + ")");
+				// System.out.println("Added default config property: ("
+				// 	+ key + "=" + defProperties.getProperty(key) + ")");
 
 			} else {
 				log.warning("Ignoring default property, component part is missing: " + key);
