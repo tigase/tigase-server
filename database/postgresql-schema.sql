@@ -69,7 +69,7 @@ create table tig_nodes (
 
        primary key (nid)
 );
-create unique index tnode on tig_nodes ( parent_nid, node );
+create unique index tnode on tig_nodes ( parent_nid, uid, node );
 create index node on tig_nodes ( node );
 
 create table tig_pairs (

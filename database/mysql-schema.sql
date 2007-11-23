@@ -81,7 +81,7 @@ create table tig_nodes (
        node varchar(64) NOT NULL,
 
        primary key (nid),
-       unique key tnode (parent_nid, node),
+       unique key tnode (parent_nid, uid, node),
        key node (node),
 			 constraint tig_nodes_constr foreign key (uid) references tig_users (uid)
 )
