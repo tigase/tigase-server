@@ -38,6 +38,7 @@ import net.sf.jml.MsnMessenger;
 import net.sf.jml.MsnOwner;
 import net.sf.jml.MsnSwitchboard;
 import net.sf.jml.MsnUserStatus;
+import net.sf.jml.MsnProtocol;
 import net.sf.jml.event.MsnContactListListener;
 import net.sf.jml.event.MsnMessageListener;
 import net.sf.jml.event.MsnMessengerListener;
