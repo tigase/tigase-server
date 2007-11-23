@@ -31,13 +31,11 @@ import java.util.Set;
 import java.util.logging.Logger;
 import net.sf.jml.Email;
 import net.sf.jml.MsnContact;
-import net.sf.jml.MsnContact;
+import net.sf.jml.MsnList;
 import net.sf.jml.MsnContactList;
 import net.sf.jml.MsnGroup;
 import net.sf.jml.MsnMessenger;
-import net.sf.jml.MsnMessenger;
-import net.sf.jml.MsnMessenger;
-import net.sf.jml.MsnMessenger;
+import net.sf.jml.MsnOwner;
 import net.sf.jml.MsnSwitchboard;
 import net.sf.jml.MsnUserStatus;
 import net.sf.jml.event.MsnContactListListener;
@@ -114,6 +112,11 @@ public class MsnConnection
 		messenger.addMessageListener(this);
 		messenger.addMessengerListener(this);
 		messenger.addContactListListener(this);
+		messenger.setSupportedProtocol(new MsnProtocol[] {MsnProtocol.MSNP11});
+		MsnOwner owner = messenger.getOwner();
+		owner.setNotifyMeWhenSomeoneAddedMe(true);
+		owner.setOnlyNotifyAllowList(true);
+		owner.setInitStatus(MsnUserStatus.ONLINE);
 	}
 
 	public void login() {
@@ -121,11 +124,7 @@ public class MsnConnection
 	}
 
 	public void logout() {
-		MsnSwitchboard[] msbs = messenger.getActiveSwitchboards();
 		messenger.logout();
-		for (MsnSwitchboard msb: msbs) {
-			msb.close();
-		}
 	}
 
 	public void sendMessage(Packet packet) {
@@ -255,6 +254,15 @@ public class MsnConnection
 	public void loginCompleted(final MsnMessenger msnMessenger) {
 		listener.loginCompleted(active_jid);
 		log.finest(active_jid + " logout completed.");
+		MsnOwner owner = msnMessenger.getOwner();
+		log.fine("Owner initstatus: " + owner.getInitStatus().getDisplayStatus());
+		log.fine("Owner isNotifyMeWhenSomeoneAddedMe: "
+			+ owner.isNotifyMeWhenSomeoneAddedMe());
+		log.fine("Owner isOnlyNotifyAllowList: " + owner.isOnlyNotifyAllowList());
+		owner.setNotifyMeWhenSomeoneAddedMe(true);
+		owner.setOnlyNotifyAllowList(true);
+		owner.setInitStatus(MsnUserStatus.ONLINE);
+		owner.setStatus(MsnUserStatus.ONLINE);
 	}
 
 	/**
@@ -333,7 +341,7 @@ public class MsnConnection
 	 */
 	public void contactListInitCompleted(final MsnMessenger msnMessenger) {
 		log.finest(active_jid + " contactListInitCompleted completed.");
-		MsnContact[] list = msnMessenger.getContactList().getContacts();
+		MsnContact[] list =	msnMessenger.getContactList().getContacts();
 		if (list != null) {
 // 			Queue<Packet> buddy_presences = new LinkedList<Packet>();
 // 			String to = active_jid;
@@ -346,6 +354,7 @@ public class MsnConnection
 // 			iq.addChild(query);
 			List<RosterItem> roster = new ArrayList<RosterItem>();
 			for (MsnContact contact: list) {
+				if (contact.isInList(MsnList.AL)) {
 				MsnGroup[] c_groups = contact.getBelongGroups();
 				if (c_groups != null && c_groups.length > 0) {
 					for (MsnGroup c_grp: c_groups) {
@@ -399,7 +408,25 @@ public class MsnConnection
 // 			while ((pack = buddy_presences.poll()) != null) {
 // 				log.finest("Sending out the buddy presence: " + pack.toString());
 // 				listener.packetReceived(pack);
- 			}
+				} else {
+					if (contact.isInList(MsnList.BL)) {
+						log.fine("Contact " + contact.getEmail().getEmailAddress()
+							+ " is on BL list.");
+					}
+					if (contact.isInList(MsnList.FL)) {
+						log.fine("Contact " + contact.getEmail().getEmailAddress()
+							+ " is on FL list.");
+					}
+					if (contact.isInList(MsnList.PL)) {
+						log.fine("Contact " + contact.getEmail().getEmailAddress()
+							+ " is on PL list.");
+					}
+					if (contact.isInList(MsnList.RL)) {
+						log.fine("Contact " + contact.getEmail().getEmailAddress()
+							+ " is on RL list.");
+					}
+				}
+			}
 			listener.userRoster(active_jid, roster);
 		}
 	}
@@ -428,25 +455,44 @@ public class MsnConnection
 // 		Packet packet = new Packet(presence);
 // 		log.finest("Sending out buddy presence: " + packet.toString());
 
-		RosterItem item = new RosterItem(msnContact.getEmail().getEmailAddress());
-		item.setName(msnContact.getFriendlyName());
-		item.setSubscription("both");
-		if (msnContact.getStatus() == MsnUserStatus.OFFLINE ) {
-			item.setStatus(new UserStatus("unavailable", null));
-		} else {
-			item.setStatus(new UserStatus(null,
-					msnContact.getStatus().getDisplayStatus().toLowerCase()));
-		}
-		MsnGroup[] groups = msnContact.getBelongGroups();
-		if (groups != null && groups.length > 0) {
-			List<String> grps = new ArrayList<String>();
-			for (MsnGroup group: groups) {
-				grps.add(group.getGroupName());
+		if (msnContact.isInList(MsnList.AL)) {
+			RosterItem item = new RosterItem(msnContact.getEmail().getEmailAddress());
+			item.setName(msnContact.getFriendlyName());
+			item.setSubscription("both");
+			if (msnContact.getStatus() == MsnUserStatus.OFFLINE ) {
+				item.setStatus(new UserStatus("unavailable", null));
+			} else {
+				item.setStatus(new UserStatus(null,
+						msnContact.getStatus().getDisplayStatus().toLowerCase()));
 			}
-			item.setGroups(grps);
-		}
+			MsnGroup[] groups = msnContact.getBelongGroups();
+			if (groups != null && groups.length > 0) {
+				List<String> grps = new ArrayList<String>();
+				for (MsnGroup group: groups) {
+					grps.add(group.getGroupName());
+				}
+				item.setGroups(grps);
+			}
 
-		listener.updateStatus(active_jid, item);
+			listener.updateStatus(active_jid, item);
+		} else {
+			if (msnContact.isInList(MsnList.BL)) {
+				log.fine("Contact " + msnContact.getEmail().getEmailAddress()
+					+ " is on BL list.");
+			}
+			if (msnContact.isInList(MsnList.FL)) {
+				log.fine("Contact " + msnContact.getEmail().getEmailAddress()
+					+ " is on FL list.");
+			}
+			if (msnContact.isInList(MsnList.PL)) {
+				log.fine("Contact " + msnContact.getEmail().getEmailAddress()
+					+ " is on PL list.");
+			}
+			if (msnContact.isInList(MsnList.RL)) {
+				log.fine("Contact " + msnContact.getEmail().getEmailAddress()
+					+ " is on RL list.");
+			}
+		}
 	}
 
 	/**

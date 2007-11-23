@@ -18,6 +18,7 @@ Compression=lzma
 SolidCompression=true
 UninstallDisplayIcon={app}\Tigase.ico
 VersionInfoCopyright=Artur Hefczyc
+AppCopyright=Artur Hefczyc
 
 [Languages]
 Name: english; MessagesFile: compiler:Default.isl
