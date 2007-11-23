@@ -433,6 +433,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 			// Add user into database.
 			query = "insert into " + users_tbl + " (uid, user_id) values ("
 				+ uid + ", '" + user_id + "');";
+			log.finest("User add: " + query);
 			stmt.executeUpdate(query);
 			//			incrementMaxUID();
 			addNode(uid, -1, root_node);
