@@ -243,7 +243,9 @@ public class MsnConnection
 	 * @param msnMessenger a <code>MsnMessenger</code> value
 	 */
 	public void logout(final MsnMessenger msnMessenger) {
+		List<RosterItem> roster = getRoster(msnMessenger, MsnUserStatus.OFFLINE);
 		listener.logout(active_jid);
+		listener.userRoster(active_jid, roster);
 		log.finest(active_jid + " logout called.");
 	}
 
@@ -335,6 +337,72 @@ public class MsnConnection
 // 		}
 	}
 
+	private List<RosterItem> getRoster(final MsnMessenger msnMessenger,
+		final MsnUserStatus presetStatus) {
+		MsnContact[] list =	msnMessenger.getContactList().getContacts();
+		List<RosterItem> roster = new ArrayList<RosterItem>();
+		if (list != null) {
+			for (MsnContact contact: list) {
+				if (contact.isInList(MsnList.AL)) {
+					MsnGroup[] c_groups = contact.getBelongGroups();
+					if (c_groups != null && c_groups.length > 0) {
+						for (MsnGroup c_grp: c_groups) {
+							log.fine("Contact " + contact.getEmail().getEmailAddress()
+								+ " group: " + c_grp.getGroupName());
+						}
+					} else {
+						log.fine("Contact " + contact.getEmail().getEmailAddress()
+							+ " is not in any group");
+					}
+					MsnContactList c_list = contact.getContactList();
+					RosterItem item = new RosterItem(contact.getEmail().getEmailAddress());
+					item.setName(contact.getFriendlyName());
+					item.setSubscription("both");
+					MsnUserStatus status = presetStatus != null ? presetStatus :
+						contact.getStatus();
+					if (status == MsnUserStatus.OFFLINE ) {
+						item.setStatus(new UserStatus("unavailable", null));
+					} else {
+						item.setStatus(new UserStatus(null,
+								status.getDisplayStatus().toLowerCase()));
+					}
+					MsnGroup[] groups = contact.getBelongGroups();
+					if (groups != null && groups.length > 0) {
+						List<String> grps = new ArrayList<String>();
+						for (MsnGroup group: groups) {
+							grps.add(group.getGroupName());
+						}
+						item.setGroups(grps);
+					}
+					log.finest("Contact AL received: " + contact.getEmail().getEmailAddress()
+						+ ", status: " + status.getDisplayStatus());
+					roster.add(item);
+				}
+				if (contact.isInList(MsnList.AL)) {
+					log.fine("Contact " + contact.getEmail().getEmailAddress()
+						+ " is on AL list.");
+				}
+				if (contact.isInList(MsnList.BL)) {
+					log.fine("Contact " + contact.getEmail().getEmailAddress()
+						+ " is on BL list.");
+				}
+				if (contact.isInList(MsnList.FL)) {
+					log.fine("Contact " + contact.getEmail().getEmailAddress()
+						+ " is on FL list.");
+				}
+				if (contact.isInList(MsnList.PL)) {
+					log.fine("Contact " + contact.getEmail().getEmailAddress()
+						+ " is on PL list.");
+				}
+				if (contact.isInList(MsnList.RL)) {
+					log.fine("Contact " + contact.getEmail().getEmailAddress()
+						+ " is on RL list.");
+				}
+			}
+		}
+		return roster;
+	}
+
 	/**
 	 * Describe <code>contactListInitCompleted</code> method here.
 	 *
@@ -342,99 +410,8 @@ public class MsnConnection
 	 */
 	public void contactListInitCompleted(final MsnMessenger msnMessenger) {
 		log.finest(active_jid + " contactListInitCompleted completed.");
-		MsnContact[] list =	msnMessenger.getContactList().getContacts();
-		if (list != null) {
-// 			Queue<Packet> buddy_presences = new LinkedList<Packet>();
-// 			String to = active_jid;
-// 			String from = gatewayDomain;
-// 			Element iq = new Element("iq",
-// 				new String[] {"from", "to", "type", "id"},
-// 				new String[] {from, to, "set", "1r"});
-// 			Element query = new Element("query");
-// 			query.setXMLNS("jabber:iq:roster");
-// 			iq.addChild(query);
-			List<RosterItem> roster = new ArrayList<RosterItem>();
-			for (MsnContact contact: list) {
-				if (contact.isInList(MsnList.AL)) {
-				MsnGroup[] c_groups = contact.getBelongGroups();
-				if (c_groups != null && c_groups.length > 0) {
-					for (MsnGroup c_grp: c_groups) {
-						log.fine("Contact " + contact.getEmail().getEmailAddress()
-							+ " group: " + c_grp.getGroupName());
-					}
-				} else {
-					log.fine("Contact " + contact.getEmail().getEmailAddress()
-						+ " is not in any group");
-				}
-				MsnContactList c_list = contact.getContactList();
-				RosterItem item = new RosterItem(contact.getEmail().getEmailAddress());
-				item.setName(contact.getFriendlyName());
-				item.setSubscription("both");
-				if (contact.getStatus() == MsnUserStatus.OFFLINE ) {
-					item.setStatus(new UserStatus("unavailable", null));
-				} else {
-					item.setStatus(new UserStatus(null,
-							contact.getStatus().getDisplayStatus().toLowerCase()));
-				}
-				MsnGroup[] groups = contact.getBelongGroups();
-				if (groups != null && groups.length > 0) {
-					List<String> grps = new ArrayList<String>();
-					for (MsnGroup group: groups) {
-						grps.add(group.getGroupName());
-					}
-					item.setGroups(grps);
-				}
-				log.finest("Contact AL received: " + contact.getEmail().getEmailAddress()
-					+ ", status: " + contact.getStatus().getDisplayStatus());
-				roster.add(item);
-// 				Element item = new Element("item");
-// 				String jid = XMLUtils.escape(contact.getId().replace("@", "%")
-// 					+ "@" + gatewayDomain);
-// 				item.setAttribute("jid", jid);
-// 				item.setAttribute("subscription", "both");
-// 				item.setAttribute("name", XMLUtils.escape(contact.getFriendlyName()));
-// 				query.addChild(item);
-// 				Element presence = new Element("presence",
-// 					new String[] {"from", "to"}, new String[] {jid, to});
-// 				if (contact.getStatus() == MsnUserStatus.OFFLINE ) {
-// 					presence.setAttribute("type", "unavailable");
-// 				} else {
-// 					presence.addChild(new Element("show",
-// 							contact.getStatus().getDisplayStatus()));
-// 				}
-// 				buddy_presences.offer(new Packet(presence));
-// 			}
-// 			Packet roster = new Packet(iq);
-// 			log.finest("Sending out the roster: " + roster.toString());
-// 			listener.packetReceived(roster);
-// 			Packet pack = null;
-// 			while ((pack = buddy_presences.poll()) != null) {
-// 				log.finest("Sending out the buddy presence: " + pack.toString());
-// 				listener.packetReceived(pack);
-				}
-					if (contact.isInList(MsnList.AL)) {
-						log.fine("Contact " + contact.getEmail().getEmailAddress()
-							+ " is on AL list.");
-					}
-					if (contact.isInList(MsnList.BL)) {
-						log.fine("Contact " + contact.getEmail().getEmailAddress()
-							+ " is on BL list.");
-					}
-					if (contact.isInList(MsnList.FL)) {
-						log.fine("Contact " + contact.getEmail().getEmailAddress()
-							+ " is on FL list.");
-					}
-					if (contact.isInList(MsnList.PL)) {
-						log.fine("Contact " + contact.getEmail().getEmailAddress()
-							+ " is on PL list.");
-					}
-					if (contact.isInList(MsnList.RL)) {
-						log.fine("Contact " + contact.getEmail().getEmailAddress()
-							+ " is on RL list.");
-					}
-			}
-			listener.userRoster(active_jid, roster);
-		}
+
+		listener.userRoster(active_jid, getRoster(msnMessenger, null));
 	}
 
 	/**
