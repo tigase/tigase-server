@@ -416,6 +416,16 @@ public class Gateway extends AbstractMessageReceiver
 			} catch (GatewayException e) {
 				log.log(Level.WARNING, "Error initializing gateway connection", e);
 			}
+		} else {
+			try {
+				log.finer("Gateway not connected, sending packet back: "
+					+ packet.toString());
+				addOutPacket(Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet,
+						"Gateway is not connected.", true));
+			} catch (PacketErrorTypeException e) {
+				log.info("This must have been an error already, dropping: "
+					+ packet.toString() + ", exception: " + e);
+			}
 		}
 	}
 
