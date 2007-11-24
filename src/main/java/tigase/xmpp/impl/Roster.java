@@ -568,7 +568,7 @@ public class Roster {
 		SubscriptionType subscr = getBuddySubscription(session, buddy);
     if (subscr != null) {
 			Element item = new Element("item");
-			item.setAttribute("jid", buddy);
+			item.setAttribute("jid", JIDUtils.getNodeID(buddy));
 			item.addAttributes(subscr.getSubscriptionAttr());
 			item.setAttribute("name", getBuddyName(session, buddy));
       String[] groups = getBuddyGroups(session, buddy);
