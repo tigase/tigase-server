@@ -130,7 +130,7 @@ public class JabberIqRoster extends XMPPProcessor
         String[] gr = new String[groups.size()];
         int cnt = 0;
         for (Element group : groups) {
-          gr[cnt++] = group.getCData();
+					gr[cnt++] = (group.getCData() == null ? "" : group.getCData());
         } // end of for (ElementData group : groups)
         session.setDataList(Roster.groupNode(buddy), Roster.GROUPS, gr);
       } else {
