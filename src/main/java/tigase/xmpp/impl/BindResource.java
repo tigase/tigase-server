@@ -107,8 +107,7 @@ public class BindResource extends XMPPProcessor
         final String resource = request.getChildCData("/iq/bind/resource");
         if (resource == null || resource.equals("")) {
           session.setResource("tigase-"+(++resGenerator));
-        } // end of if (resource == null)
-        else {
+        } else {
           session.setResource(resource);
         } // end of if (resource == null) else
         session.putSessionData(RESOURCE_KEY, "true");

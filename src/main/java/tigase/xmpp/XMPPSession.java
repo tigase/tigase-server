@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 import tigase.util.JIDUtils;
 
 /**
@@ -86,18 +87,26 @@ public class XMPPSession {
 		String cur_res = conn.getResource();
 		XMPPResourceConnection old_conn = getResourceForResource(cur_res);
 		if (old_conn != null) {
-			log.finest("Found old resource connection, id: "+old_conn.getConnectionId());
-			activeResources.remove(old_conn);
+			log.finest("Found old resource connection for username : " + username
+				+ ", id: "+old_conn.getConnectionId());
+			removeResourceConnection(old_conn);
+			try { old_conn.logout(); } catch (Exception e) {
+				log.log(Level.INFO, "Exception during closing old connection, ignoring.", e);
+			}
 		} // end of if (old_res != null)
 		activeResources.add(conn);
 	}
 
 	public void addResourceConnection(XMPPResourceConnection conn) {
-		log.finest("Adding resource connection for id: " + conn.getConnectionId());
+		log.finest("Adding resource connection for username : " + username
+			+ ", id: " + conn.getConnectionId());
 		XMPPResourceConnection old_res = getResourceForResource(conn.getResource());
 		if (old_res != null) {
 			log.finest("Found old resource connection, id: "+old_res.getConnectionId());
-			activeResources.remove(old_res);
+			removeResourceConnection(old_res);
+			try { old_res.logout(); } catch (Exception e) {
+				log.log(Level.INFO, "Exception during closing old connection, ignoring.", e);
+			}
 		} // end of if (old_res != null)
 		activeResources.add(conn);
 		conn.setParentSession(this);
