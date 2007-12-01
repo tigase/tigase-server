@@ -366,7 +366,9 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 			} else {
 				// Is it at all possible to happen???
 				// let's log it for now....
-				log.warning("Attempt to stop incorrect service: " + id);
+				log.warning(">>" + getName()
+										+	"<< Attempt to stop incorrect service: " + id);
+				Thread.dumpStack();
 			}
 		}
 	}
