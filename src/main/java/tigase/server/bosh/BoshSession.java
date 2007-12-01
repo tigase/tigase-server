@@ -268,6 +268,11 @@ public class BoshSession {
 				max_pause = 2;   // Max pause changed to 2 secs
 				terminate = true;
 			}
+			if (packet.getAttribute(RESTART_ATTR) != null
+				&& packet.getAttribute(RESTART_ATTR).equals("true")) {
+				out_results.offer(Command.GETFEATURES.getPacket(null, null,
+						StanzaType.get, "restart1", null));
+			}
 			List<Element> children = packet.getElemChildren(BODY_EL_NAME);
 			if (children != null) {
 				for (Element el: children) {
