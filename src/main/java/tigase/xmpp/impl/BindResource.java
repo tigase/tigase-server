@@ -74,7 +74,11 @@ public class BindResource extends XMPPProcessor
 	{ return Arrays.copyOf(XMLNSS, XMLNSS.length); }
 
   public Element[] supStreamFeatures(final XMPPResourceConnection session)	{
-    if (session.getSessionData(RESOURCE_KEY) != null) {
+		if (session == null) {
+			return null;
+		}
+    if (session.getSessionData(RESOURCE_KEY) != null
+				|| !session.isAuthorized()) {
       return null;
     } else {
       return Arrays.copyOf(FEATURES, FEATURES.length);
