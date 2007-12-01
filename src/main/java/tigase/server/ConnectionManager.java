@@ -494,7 +494,9 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 						reconnectService(port_props, connectionDelay);
 					} // end of if (recon != 0)
 				} else {
-					serv.stop();
+					//System.out.println(port_props.toString());
+					//e.printStackTrace();
+					//serv.stop();
 				}
 			} catch (Exception e) {
 				log.log(Level.WARNING, "Can not accept connection.", e);
