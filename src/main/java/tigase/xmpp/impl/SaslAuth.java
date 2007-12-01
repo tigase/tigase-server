@@ -96,7 +96,7 @@ public class SaslAuth extends XMPPProcessor
 	{ return Arrays.copyOf(XMLNSS, XMLNSS.length); }
 
   public Element[] supStreamFeatures(final XMPPResourceConnection session)	{
-    if (session.isAuthorized()) {
+    if (session == null || session.isAuthorized()) {
       return null;
     } else {
 			Map<String, Object> query = new HashMap<String, Object>();
