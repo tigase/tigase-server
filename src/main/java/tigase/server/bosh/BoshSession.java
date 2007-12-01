@@ -270,6 +270,7 @@ public class BoshSession {
 			}
 			if (packet.getAttribute(RESTART_ATTR) != null
 				&& packet.getAttribute(RESTART_ATTR).equals("true")) {
+				log.fine("Found stream restart instruction: " + packet.toString());
 				out_results.offer(Command.GETFEATURES.getPacket(null, null,
 						StanzaType.get, "restart1", null));
 			}
