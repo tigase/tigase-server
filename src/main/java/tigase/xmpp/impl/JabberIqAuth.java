@@ -84,7 +84,7 @@ public class JabberIqAuth extends XMPPProcessor
 	{ return Arrays.copyOf(XMLNSS, XMLNSS.length); }
 
 	public Element[] supStreamFeatures(final XMPPResourceConnection session)	{
-		if (session != null && session.isAuthorized()) {
+		if (session == null || session.isAuthorized()) {
 			return null;
 		} else {
 			return Arrays.copyOf(FEATURES, FEATURES.length);
