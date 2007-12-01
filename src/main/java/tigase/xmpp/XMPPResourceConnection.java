@@ -156,6 +156,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 		this.parentSession = parent;
 		if (parentSession != null) {
 			userId = JIDUtils.getNodeID(parentSession.getUserName(), domain);
+			userJid = userId + (resource != null ? ("/" + resource) : "temp");
 		}
 	}
 
@@ -267,7 +268,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	public void setResource(final String argResource) throws NotAuthorizedException {
 		this.resource = argResource;
 		parentSession.resourceSet(this);
-		userJid = getUserId() + (resource != null ? ("/" + resource) : "");
+		userJid = getUserId() + (resource != null ? ("/" + resource) : "temp");
 	}
 
 	/**
