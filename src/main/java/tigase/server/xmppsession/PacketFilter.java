@@ -68,8 +68,14 @@ public class PacketFilter {
 			// when the user sends a message to himself.
 			if (packet.getFrom() != null
 				&& packet.getFrom().equals(session.getConnectionId())) {
-				packet.getElement().setAttribute("from", session.getJID());
-				log.finest("Setting correct from attribute: " + session.getJID());
+				String from_jid = session.getJID();
+				if (from_jid != null && !from_jid.isEmpty()) {
+					log.finest("Setting correct from attribute: " + from_jid);
+					packet.getElement().setAttribute("from", from_jid);
+				} else {
+					log.warning("Session is authenticated but session.getJid() is empty: "
+						+ packet.toString());
+				}
 			}
 
 			// Apparently all code below breaks all cases when packet addressed to
