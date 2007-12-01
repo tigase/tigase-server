@@ -305,7 +305,7 @@ public class Presence extends XMPPProcessor
 			final String jid = session.getJID();
 			PresenceType pres_type = Roster.getPresenceType(session, packet);
 			if (pres_type == null) {
-				log.warning("Invalid presence found: " + packet.getStringData());
+				log.warning("Invalid presence found: " + packet.toString());
 				return;
 			} // end of if (type == null)
 
@@ -415,16 +415,26 @@ public class Presence extends XMPPProcessor
 				} // end of if (subscr_changed)
 				break;
 			case in_initial:
+				if (packet.getElemFrom() == null) {
+					// That really happened already. It looks like a bug in tigase
+					// let's try to catch it here....
+					log.warning("Initial presence without from attribute set: "
+						+ packet.toString());
+					return;
+				}
 				// If other users are in 'to' or 'both' contacts, broadcast
 				// their preseces to all active resources
 				if (Roster.isSubscribedTo(session, packet.getElemFrom())) {
 					updatePresenceChange(packet.getElement(), session, results);
 				} else {
-					Element elem = packet.getElement().clone();
-					Packet result = new Packet(elem);
-					result.setTo(session.getConnectionId());
-					result.setFrom(packet.getTo());
-					results.offer(result);
+					// The code below looks like a bug to me.
+					// If the buddy is nt subscribed I should ignore all presences
+					// states from him. Commenting this out for now....
+// 					Element elem = packet.getElement().clone();
+// 					Packet result = new Packet(elem);
+// 					result.setTo(session.getConnectionId());
+// 					result.setFrom(packet.getTo());
+// 					results.offer(result);
 				}
 				break;
 			case in_subscribe:
