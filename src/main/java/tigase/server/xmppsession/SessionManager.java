@@ -101,6 +101,7 @@ public class SessionManager extends AbstractMessageReceiver
 	private PacketFilter filter = null;
 
 	private String[] admins = {"admin@localhost"};
+	private String[] trusted = {"admin@localhost"};
 
 	private Map<String, XMPPSession> sessionsByNodeId =
 		new ConcurrentSkipListMap<String, XMPPSession>();
@@ -235,7 +236,8 @@ public class SessionManager extends AbstractMessageReceiver
 					error =	Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet,
 						"Service not available.", true);
 				} catch (PacketErrorTypeException e) {
-					log.warning("Packet processing exception: " + e);
+					log.warning("Packet processing exception: " + e
+						+ ", packet: " + packet.toString());
 				}
 			} else {
 				if (packet.getElemFrom() != null || conn != null) {
@@ -243,7 +245,8 @@ public class SessionManager extends AbstractMessageReceiver
 						error = Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
 							"Feature not supported yet.", true);
 					} catch (PacketErrorTypeException e) {
-						log.warning("Packet processing exception: " + e);
+						log.warning("Packet processing exception: " + e
+							+ ", packet: " + packet.toString());
 					}
 				}
 			}
@@ -270,6 +273,9 @@ public class SessionManager extends AbstractMessageReceiver
 				perms = Permissions.AUTH;
 				try {
 					String id = conn.getUserId();
+					if (isTrusted(id)) {
+						perms = Permissions.TRUSTED;
+					}
 					if (isAdmin(id)) {
 						perms = Permissions.ADMIN;
 					}
@@ -290,6 +296,15 @@ public class SessionManager extends AbstractMessageReceiver
 			}
 		}
 		return false;
+	}
+
+	private boolean isTrusted(String jid) {
+		for (String trust: trusted) {
+			if (trust.equals(JIDUtils.getNodeID(jid))) {
+				return true;
+			}
+		}
+		return isAdmin(jid);
 	}
 
 	private boolean processAdmins(Packet packet) {
@@ -433,11 +448,11 @@ public class SessionManager extends AbstractMessageReceiver
 	private void processCommand(Packet pc) {
 		log.finer(pc.getCommand().toString() + " command from: " + pc.getFrom());
 		//Element command = pc.getElement();
+		XMPPResourceConnection connection =	connectionsByFrom.get(pc.getFrom());
 		switch (pc.getCommand()) {
 		case STREAM_OPENED:
 			// It might be existing opened stream after TLS/SASL authorization
 			// If not, it means this is new stream
-			XMPPResourceConnection connection =	connectionsByFrom.get(pc.getFrom());
 			if (connection == null) {
 				log.finer("Adding resource connection for: " + pc.getFrom());
 				final String hostname = Command.getFieldValue(pc, "hostname");
@@ -479,6 +494,48 @@ public class SessionManager extends AbstractMessageReceiver
 				log.info("Can not find resource connection for packet: " +
 					pc.toString());
 			} // end of if (conn != null) else
+			break;
+		case BROADCAST_TO_ONLINE:
+			String from = pc.getFrom();
+			boolean trusted = false;
+			try {
+				trusted = (from != null && isTrusted(from))
+					|| (connection != null && isTrusted(connection.getUserId()));
+			} catch (NotAuthorizedException e) {
+				trusted = false;
+			}
+			try {
+				if (trusted) {
+					List<Element> packets = Command.getData(pc);
+					if (packets != null) {
+						for (XMPPResourceConnection conn: connectionsByFrom.values()) {
+							if (conn.isAuthorized()) {
+								try {
+									for (Element el_pack: packets) {
+										Element el_copy = el_pack.clone();
+										el_copy.setAttribute("to", conn.getJID());
+										Packet out_packet = new Packet(el_copy);
+										out_packet.setTo(conn.getConnectionId());
+										addOutPacket(out_packet);
+									}
+								} catch (NotAuthorizedException e) {
+									log.warning("Something wrong, connection is authenticated but "
+										+ "NoAuthorizedException is thrown.");
+								}
+							}
+						}
+					} else {
+						addOutPacket(Authorization.BAD_REQUEST.getResponseMessage(pc,
+								"Missing packets for broadcast.", true));
+					}
+				} else {
+					addOutPacket(Authorization.FORBIDDEN.getResponseMessage(pc,
+							"You don't have enough permission to brodcast packet.", true));
+				}
+			} catch (PacketErrorTypeException e) {
+				log.warning("Packet processing exception: " + e
+					+ ", packet: " + pc.toString());
+			}
 			break;
 		case OTHER:
 			log.info("Other command found: " + pc.getStrCommand());
@@ -652,6 +709,7 @@ public class SessionManager extends AbstractMessageReceiver
 		} // end of for ()
 
 		admins = (String[])props.get(ADMINS_PROP_KEY);
+		trusted = (String[])props.get(TRUSTED_PROP_KEY);
 
 	}
 
