@@ -23,6 +23,7 @@ package tigase.xmpp.impl;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.LinkedList;
 import java.util.ArrayList;
 import java.util.Queue;
 import java.util.Map;
@@ -146,23 +147,41 @@ public class JabberIqRoster extends XMPPProcessor
 		final XMPPResourceConnection session,	final Queue<Packet> results,
 		final Map<String, Object> settings)
     throws NotAuthorizedException {
-		Element query = new Element("query");
     String[] buddies = Roster.getBuddies(session);
     if (buddies != null) {
+			Element query = new Element("query");
 			query.setXMLNS("jabber:iq:roster");
       for (String buddy : buddies) {
 				query.addChild(Roster.getBuddyItem(session, buddy));
       }
-		}
-		List<Element> items = DynamicRoster.getRosterItems(session, settings);
-		if (items != null) {
-			query.addChildren(items);
-		}
-		if (query.getChildren() != null && query.getChildren().size() > 0) {
-			results.offer(packet.okResult(query, 0));
+			if (query.getChildren() != null && query.getChildren().size() > 0) {
+				results.offer(packet.okResult(query, 0));
+			} else {
+				results.offer(packet.okResult((String)null, 1));
+			} // end of if (buddies != null) else
 		} else {
 			results.offer(packet.okResult((String)null, 1));
-		} // end of if (buddies != null) else
+		}
+		List<Element> its = DynamicRoster.getRosterItems(session, settings);
+		if (its != null) {
+			LinkedList<Element> items = new LinkedList<Element>(its);
+			while (items.size() > 0) {
+				Element iq = new Element("iq",
+					new String[] {"type", "id", "to"},
+					new String[] {"set", "dr-"+items.size(), session.getJID()});
+				Element query = new Element("query");
+				query.setXMLNS("jabber:iq:roster");
+				iq.addChild(query);
+				query.addChild(items.poll());
+				while (query.getChildren().size() < 20 && items.size() > 0) {
+					query.addChild(items.poll());
+				}
+				Packet rost_res = new Packet(iq);
+				rost_res.setTo(session.getConnectionId());
+				rost_res.setFrom(packet.getTo());
+				results.offer(rost_res);
+			}
+		}
   }
 
 	public void process(final Packet packet, final XMPPResourceConnection session,
