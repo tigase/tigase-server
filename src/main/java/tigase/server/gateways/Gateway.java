@@ -187,8 +187,8 @@ public class Gateway extends AbstractMessageReceiver
 			case get:
 				addOutPacket(packet.okResult(
 						"<instructions>"
-						+ "Please type your " + gw_name + " account details"
-						+ " into the username field and your password."
+						+ "Please enter your " + gw_type.toUpperCase() + " account details"
+						+ " into the fields below."
 						+ "</instructions>"
 						+ "<username/>"
 						+ "<password/>", 1));
