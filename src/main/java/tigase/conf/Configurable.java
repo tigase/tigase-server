@@ -86,6 +86,7 @@ public interface Configurable extends ServerComponent {
 	public static final String GEN_USER_DB_URI = "--user-db-uri";
 	public static final String GEN_AUTH_DB_URI = "--auth-db-uri";
 	public static final String GEN_ADMINS = "--admins";
+	public static final String GEN_TRUSTED = "--trusted";
 	public static final String GEN_VIRT_HOSTS = "--virt-hosts";
 	public static final String GEN_DEBUG = "--debug";
 
@@ -133,6 +134,7 @@ public interface Configurable extends ServerComponent {
 
 	public static final String HOSTNAMES_PROP_KEY = "hostnames";
 	public static final String ADMINS_PROP_KEY = "admins";
+	public static final String TRUSTED_PROP_KEY = "trusted";
 	public static final String DEF_HOSTNAME_PROP_KEY = "def-hostname";
 
 	public static final String NULL_ROUTING = "NULL";
