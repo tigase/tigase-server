@@ -46,6 +46,8 @@ public enum Command {
 		CLOSE,
 		GETSTATS,
 		USER_STATUS,
+		BROADCAST_TO_ONLINE,
+		BROADCAST_TO_ALL,
 		OTHER;
 
   /**
