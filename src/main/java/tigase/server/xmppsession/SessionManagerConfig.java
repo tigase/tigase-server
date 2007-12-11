@@ -71,6 +71,7 @@ public class SessionManagerConfig {
 	private static String[] HOSTNAMES_PROP_VAL =	{"localhost", "hostname"};
 
 	private static String[] ADMINS_PROP_VAL =	{"admin@localhost", "admin@hostname"};
+	private static String[] TRUSTED_PROP_VAL = {"admin@localhost", "admin@hostname"};
 
 	public static void getDefaults(Map<String, Object> props,
 		Map<String, Object> params) {
@@ -169,6 +170,15 @@ public class SessionManagerConfig {
 			} // end of for (int i = 0; i < ADMINS_PROP_VAL.length; i++)
 		}
 		props.put(ADMINS_PROP_KEY, ADMINS_PROP_VAL);
+		if (params.get(GEN_TRUSTED) != null) {
+			TRUSTED_PROP_VAL = ((String)params.get(GEN_TRUSTED)).split(",");
+		} else {
+			TRUSTED_PROP_VAL = new String[HOSTNAMES_PROP_VAL.length];
+			for (int i = 0; i < TRUSTED_PROP_VAL.length; i++) {
+				TRUSTED_PROP_VAL[i] = "admin@"+HOSTNAMES_PROP_VAL[i];
+			} // end of for (int i = 0; i < TRUSTED_PROP_VAL.length; i++)
+		}
+		props.put(TRUSTED_PROP_KEY, TRUSTED_PROP_VAL);
 	}
 
 } // SessionManagerConfig
