@@ -21,23 +21,24 @@
  */
 package tigase.server.bosh;
 
-import java.util.UUID;
-import java.util.Map;
-import java.util.Queue;
-import java.util.List;
-import java.util.LinkedList;
+import java.io.IOException;
 import java.util.EnumMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
 import java.util.TimerTask;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.io.IOException;
+import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.xml.Element;
-import tigase.server.Command;
-import tigase.xmpp.StanzaType;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.PacketErrorTypeException;
+import tigase.xmpp.StanzaType;
 
 import static tigase.server.bosh.Constants.*;
 
@@ -63,7 +64,7 @@ public class BoshSession {
 	private UUID sid = null;
 	private Queue<BoshIOService> connections =
 		new LinkedList<BoshIOService>();
-	private Queue<Packet> waiting_packets = new LinkedList<Packet>();
+	private Queue<Packet> waiting_packets = new ConcurrentLinkedQueue<Packet>();
 	private BoshSessionTaskHandler handler = null;
 	private long max_wait = MAX_WAIT_DEF_PROP_VAL;
 	private long min_polling = MIN_POLLING_PROP_VAL;
@@ -213,8 +214,12 @@ public class BoshSession {
 										"urn:xmpp:xbosh",
 										"http://etherx.jabber.org/streams"});
 			body.setXMLNS(BOSH_XMLNS);
-			for (Packet pack: waiting_packets) {
-				body.addChild(pack.getElement());
+			if (waiting_packets.size() > 0) {
+				body.addChild(waiting_packets.poll().getElement());
+				while (waiting_packets.size() > 0
+					&& body.getChildren().size() < MAX_PACKETS) {
+					body.addChild(waiting_packets.poll().getElement());
+				}
 			}
 		}
 		try {
@@ -222,7 +227,7 @@ public class BoshSession {
 				body.setAttribute("type", StanzaType.terminate.toString());
 			}
 			serv.writeRawData(body.toString());
-			waiting_packets.clear();
+			//waiting_packets.clear();
 			serv.stop();
 		} catch (IOException e) {
 			// I call it anyway at the end of method call
