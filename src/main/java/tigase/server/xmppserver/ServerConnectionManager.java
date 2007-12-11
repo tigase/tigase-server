@@ -46,7 +46,6 @@ import java.util.logging.Logger;
 import tigase.db.UserRepository;
 import tigase.net.ConnectionType;
 //import tigase.net.IOService;
-import tigase.net.SocketReadThread;
 import tigase.net.SocketType;
 import tigase.server.ConnectionManager;
 import tigase.server.MessageReceiver;
