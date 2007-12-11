@@ -34,6 +34,8 @@ public abstract class Constants {
 
 	public static final String BOSH_VERSION = "1.6";
 
+	protected static final int MAX_PACKETS = 2;
+
 	protected static final String MAX_WAIT_DEF_PROP_KEY = "max-wait";
 	protected static final long MAX_WAIT_DEF_PROP_VAL = 60;
 	protected static final String MIN_POLLING_PROP_KEY = "min-polling";
