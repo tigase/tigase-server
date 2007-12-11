@@ -289,6 +289,7 @@ public class MsnConnection
 	 */
 	public void contactListSyncCompleted(final MsnMessenger msnMessenger) {
 		log.finest(active_jid + " contactListSyncCompleted completed.");
+		listener.userRoster(active_jid, getRoster(msnMessenger, null));
 // 		MsnContact[] list = msnMessenger.getContactList().getContacts();
 // 		if (list != null) {
 // 			Queue<Packet> buddy_presences = new LinkedList<Packet>();
@@ -352,7 +353,8 @@ public class MsnConnection
 						}
 					} else {
 						log.fine("Contact " + contact.getEmail().getEmailAddress()
-							+ " is not in any group");
+							+ " is not in any group, status: "
+							+ contact.getStatus().getDisplayStatus());
 					}
 					MsnContactList c_list = contact.getContactList();
 					RosterItem item = new RosterItem(contact.getEmail().getEmailAddress());
