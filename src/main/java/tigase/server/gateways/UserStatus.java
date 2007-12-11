@@ -20,6 +20,11 @@
  */
 package tigase.server.gateways;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+
+
 /**
  * Describe class UserStatus here.
  *
@@ -34,12 +39,25 @@ public class UserStatus {
 	private String type = null;
 	private String show = null;
 
+	private static final Map<String, String> show_vals =
+		new LinkedHashMap<String, String>();
+
+	static {
+		show_vals.put("away", "away");
+		show_vals.put("be_right_back", "away");
+		show_vals.put("busy", "dnd");
+		show_vals.put("hide", "xa");
+		show_vals.put("idle", "xa");
+		show_vals.put("on_the_phone", "dnd");
+		show_vals.put("out_to_lunch", "xa");
+	}
+
 	/**
 	 * Creates a new <code>UserStatus</code> instance.
 	 *
 	 */
 	public UserStatus(String type, String show) {
-		this.show = show;
+		this.show = show_vals.get(show);
 		this.type = type;
 	}
 
