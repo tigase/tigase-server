@@ -146,13 +146,18 @@ public class SessionManagerConfig {
 	  props.put(AUTH_REPO_CLASS_PROP_KEY, auth_repo_class);
 	  props.put(AUTH_REPO_URL_PROP_KEY, auth_repo_url);
 
-		if (full_comps) {
-			// Some plugins are not loaded during tests at least until proper
-			// test cases are created for them. Sample case is off-line message
-			// storage which may impact some test cases.
-			props.put(PLUGINS_PROP_KEY, PLUGINS_FULL_PROP_VAL);
+		String str_plugins = (String)params.get(GEN_SM_PLUGINS);
+		if (str_plugins != null) {
+			props.put(PLUGINS_PROP_KEY, str_plugins.split(","));
 		} else {
-			props.put(PLUGINS_PROP_KEY, PLUGINS_NO_REG_PROP_VAL);
+			if (full_comps) {
+				// Some plugins are not loaded during tests at least until proper
+				// test cases are created for them. Sample case is off-line message
+				// storage which may impact some test cases.
+				props.put(PLUGINS_PROP_KEY, PLUGINS_FULL_PROP_VAL);
+			} else {
+				props.put(PLUGINS_PROP_KEY, PLUGINS_NO_REG_PROP_VAL);
+			}
 		}
 
 		if (params.get(GEN_VIRT_HOSTS) != null) {
