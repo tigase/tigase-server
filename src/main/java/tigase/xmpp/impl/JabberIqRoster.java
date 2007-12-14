@@ -150,7 +150,7 @@ public class JabberIqRoster extends XMPPProcessor
     String[] buddies = Roster.getBuddies(session);
     if (buddies != null) {
 			Element query = new Element("query");
-			query.setXMLNS("jabber:iq:roster");
+			query.setXMLNS(XMLNS);
       for (String buddy : buddies) {
 				query.addChild(Roster.getBuddyItem(session, buddy));
       }
@@ -170,7 +170,7 @@ public class JabberIqRoster extends XMPPProcessor
 					new String[] {"type", "id", "to"},
 					new String[] {"set", "dr-"+items.size(), session.getJID()});
 				Element query = new Element("query");
-				query.setXMLNS("jabber:iq:roster");
+				query.setXMLNS(XMLNS);
 				iq.addChild(query);
 				query.addChild(items.poll());
 				while (query.getChildren().size() < 20 && items.size() > 0) {
