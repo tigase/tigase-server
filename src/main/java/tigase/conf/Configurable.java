@@ -88,6 +88,7 @@ public interface Configurable extends ServerComponent {
 	public static final String GEN_ADMINS = "--admins";
 	public static final String GEN_TRUSTED = "--trusted";
 	public static final String GEN_VIRT_HOSTS = "--virt-hosts";
+	public static final String GEN_SM_PLUGINS = "--sm-plugins";
 	public static final String GEN_DEBUG = "--debug";
 
 	public static final String GEN_SREC_DB = "--gen-srec-db";
