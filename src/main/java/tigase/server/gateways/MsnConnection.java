@@ -48,6 +48,7 @@ import net.sf.jml.message.MsnDatacastMessage;
 import net.sf.jml.message.MsnInstantMessage;
 import net.sf.jml.message.MsnSystemMessage;
 import net.sf.jml.message.MsnUnknownMessage;
+import net.sf.jml.message.p2p.MsnP2PMessage;
 import tigase.server.Packet;
 import tigase.util.JIDUtils;
 import tigase.xml.Element;
@@ -235,7 +236,12 @@ public class MsnConnection
 	}
 
 
-	// Implementation of net.sf.jml.event.MsnMessengerListener
+	public void p2pMessageReceived(MsnSwitchboard switchboard, MsnP2PMessage message,
+		MsnContact contact) {
+		// Ignore for now.
+	}
+
+// Implementation of net.sf.jml.event.MsnMessengerListener
 
 	/**
 	 * Describe <code>logout</code> method here.
