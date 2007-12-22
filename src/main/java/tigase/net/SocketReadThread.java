@@ -133,7 +133,11 @@ public class SocketReadThread implements Runnable {
       final SocketChannel sc = s.getSocketChannel();
       try {
         sc.register(clientsSel, SelectionKey.OP_READ, s);
-				log.finest("ADDED: " + s.getUniqueId());
+				log.finest("ADDED OP_READ: " + s.getUniqueId());
+				if (s.waitingToSend()) {
+					sc.register(clientsSel, SelectionKey.OP_WRITE, s);
+					log.finest("ADDED OP_WRITE: " + s.getUniqueId());
+				}
 			} catch (Exception e) {
         // Ignore such channel
 				log.finest("ERROR adding channel for: " + s.getUniqueId()

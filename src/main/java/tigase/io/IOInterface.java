@@ -50,4 +50,6 @@ public interface IOInterface {
 
 	int getInputPacketSize() throws IOException;
 
+	boolean waitingToSend();
+
 } // IOInterface

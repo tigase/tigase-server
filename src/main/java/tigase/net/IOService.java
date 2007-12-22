@@ -234,6 +234,7 @@ public abstract class IOService implements Callable<IOService> {
 		// It might be already executing in different thread...
 		// and we don't want to put any locking or synchronization
 		//		processWaitingPackets();
+		writeData(null);
 		processSocketData();
 		if (receivedPackets() > 0 && serviceListener != null) {
 			serviceListener.packetsReady(this);
@@ -293,7 +294,11 @@ public abstract class IOService implements Callable<IOService> {
     return cb != null ? cb.array() : null;
   }
 
-  /**
+	public boolean waitingToSend() {
+		return socketIO.waitingToSend();
+	}
+
+	/**
    * Describe <code>writeData</code> method here.
    *
    * @param data a <code>String</code> value
@@ -306,7 +311,7 @@ public abstract class IOService implements Callable<IOService> {
       dataBuffer = encoder.encode(CharBuffer.wrap(data));
 			encoder.flush(dataBuffer);
       socketIO.write(dataBuffer);
-    } // end of if (data == null || data.equals("")) else
+    }
 		setLastTransferTime();
   }
 

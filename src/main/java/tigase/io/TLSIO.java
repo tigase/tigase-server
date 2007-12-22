@@ -53,11 +53,6 @@ public class TLSIO implements IOInterface {
    * <code>tlsInput</code> buffer keeps data decoded from tlsWrapper.
    */
   private ByteBuffer tlsInput = null;
-  /**
-   * <code>tlsOutput</code> buffer keeps data encoded by tlsWrapper.
-   *
-   */
-  private ByteBuffer tlsOutput = null;
 
 //   /**
 //    * Creates a new <code>TLSIO</code> instance.
@@ -67,7 +62,6 @@ public class TLSIO implements IOInterface {
 //     io = new SocketIO(sock);
 //     tlsWrapper = new TLSWrapper("TLS");
 //     tlsInput = ByteBuffer.allocate(tlsWrapper.getAppBuffSize());
-//     tlsOutput = ByteBuffer.allocate(tlsWrapper.getNetBuffSize());
 //   }
 
   public TLSIO(final IOInterface ioi, final TLSWrapper wrapper)
@@ -75,7 +69,6 @@ public class TLSIO implements IOInterface {
 		io = ioi;
     tlsWrapper = wrapper;
     tlsInput = ByteBuffer.allocate(tlsWrapper.getAppBuffSize());
-    tlsOutput = ByteBuffer.allocate(tlsWrapper.getNetBuffSize());
 		log.finer("TLS Socket created.");
 		if (tlsWrapper.isClientMode()) {
 			log.finer("TLS - client mode, starting handshaking now...");
@@ -142,6 +135,7 @@ public class TLSIO implements IOInterface {
     int result = buff.remaining();
     log.finer("TLS - Writing data, remaining: " + buff.remaining());
     do {
+			ByteBuffer tlsOutput = ByteBuffer.allocate(tlsWrapper.getNetBuffSize());
       tlsOutput.clear();
       tlsWrapper.wrap(buff, tlsOutput);
       if (tlsWrapper.getStatus() == TLSStatus.CLOSED) {
@@ -175,6 +169,10 @@ public class TLSIO implements IOInterface {
 
 	public int getInputPacketSize() throws IOException {
 		return tlsWrapper.getPacketBuffSize();
+	}
+
+	public boolean waitingToSend() {
+		return io.waitingToSend();
 	}
 
 } // TLSIO

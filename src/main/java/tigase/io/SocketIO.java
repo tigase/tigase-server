@@ -26,6 +26,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.logging.Logger;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Describe class SocketIO here.
@@ -39,6 +41,9 @@ import java.util.logging.Logger;
 public class SocketIO implements IOInterface {
 
   private static Logger log = Logger.getLogger("tigase.io.SocketIO");
+
+	private Queue<ByteBuffer> dataToSend =
+		new ConcurrentLinkedQueue<ByteBuffer>();
 
   private SocketChannel channel = null;
   private int bytesRead = 0;
@@ -67,14 +72,25 @@ public class SocketIO implements IOInterface {
   }
 
   public int write(final ByteBuffer buff) throws IOException {
-    int result = 0;
-    while (buff.hasRemaining()) {
-      final int res = channel.write(buff);
-      if (res == -1) {
-        throw new EOFException("Channel has been closed.");
-      } // end of if (res == -1)
-      result += res;
-    } // end of while (out.hasRemaining())
+//     int result = 0;
+//     while (buff.hasRemaining()) {
+//       final int res = channel.write(buff);
+//       if (res == -1) {
+//         throw new EOFException("Channel has been closed.");
+//       } // end of if (res == -1)
+//       result += res;
+//     } // end of while (out.hasRemaining())
+//     log.finer("Wrote to channel " + result + " bytes.");
+//     return result;
+		dataToSend.offer(buff);
+		ByteBuffer dataBuffer = dataToSend.peek();
+    int result = channel.write(dataBuffer);
+		if (result == -1) {
+			throw new EOFException("Channel has been closed.");
+		} // end of if (res == -1)
+		if (!dataBuffer.hasRemaining()) {
+			dataToSend.poll();
+		}
     log.finer("Wrote to channel " + result + " bytes.");
     return result;
   }
@@ -95,5 +111,10 @@ public class SocketIO implements IOInterface {
 	public int getInputPacketSize() throws IOException {
 		return channel.socket().getReceiveBufferSize();
 	}
+
+	public boolean waitingToSend() {
+		return dataToSend.size() > 0;
+	}
+
 
 } // SocketIO
