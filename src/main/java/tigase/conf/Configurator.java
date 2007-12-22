@@ -85,7 +85,8 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 	//	private Timer delayedTask = new Timer("ConfiguratorTask", true);
 	private Map<String, Object> defConfigParams =
 		new LinkedHashMap<String, Object>();
-	private Properties defProperties = new Properties();
+	private Map<String, Object> defProperties =
+		new LinkedHashMap<String, Object>();
 	private ServiceEntity serviceEntity = null;
 	private ServiceEntity config_list = null;
 	private ServiceEntity config_set = null;
@@ -137,7 +138,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 				}
 				if (args[i].equals(GEN_USER_DB) || args[i].equals(GEN_USER_DB_URI)
 					|| args[i].equals(GEN_AUTH_DB) || args[i].equals(GEN_AUTH_DB_URI)
-					|| args[i].equals(GEN_COMP_NAME) || args[i].equals(GEN_COMP_CLASS)
+					|| args[i].startsWith(GEN_COMP_NAME) || args[i].startsWith(GEN_COMP_CLASS)
 					|| args[i].startsWith(GEN_EXT_COMP) || args[i].equals(GEN_VIRT_HOSTS)
 					|| args[i].equals(GEN_ADMINS) || args[i].equals(GEN_DEBUG)
 					|| (args[i].startsWith(GEN_CONF) && !args[i].startsWith(GEN_CONFIG))
@@ -157,15 +158,48 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 			log.config("Loading initial properties from property file: "
 				+ property_filename);
 			try {
-				defProperties.load(new FileReader(property_filename));
-				Set<String> prop_keys = defProperties.stringPropertyNames();
+				Properties defProps = new Properties();
+				defProps.load(new FileReader(property_filename));
+				Set<String> prop_keys = defProps.stringPropertyNames();
 				for (String key: prop_keys) {
+					String value = defProps.getProperty(key);
 					if (key.startsWith("--") || key.equals("config-type")) {
-						String value = defProperties.getProperty(key);
 						defConfigParams.put(key, value);
-						defProperties.remove(key);
+						//defProperties.remove(key);
 						log.config("Added default config parameter: ("
 							+ key + "=" + value + ")");
+					} else {
+						Object val = value;
+						if (key.matches(".*\\[[LISBlisb]\\]$")) {
+							char c = key.charAt(key.length()-2);
+							key = key.substring(0, key.length()-3);
+							try {
+								switch (c) {
+								case 'L':
+									// Long value
+									val = Long.decode(value);
+									break;
+								case 'I':
+									// Integer value
+									val = Integer.decode(value);
+									break;
+								case 'B':
+									// Boolean value
+									val = Boolean.valueOf(Boolean.parseBoolean(value));
+									break;
+								case 's':
+									// Comma separated, Strings array
+									val = value.split(",");
+									break;
+								default:
+									// Do nothing, default to String
+									break;
+								}
+							} catch (Exception e) {
+								log.log(Level.CONFIG, "Incorrect parameter modifier", e);
+							}
+						}
+						defProperties.put(key, val);
 					}
 				}
 			} catch (FileNotFoundException e) {
@@ -185,7 +219,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 		//		System.out.println("configurator after config repository load");
 		defConfigParams.putAll(getAllProperties(null));
 		//System.out.println("configurator after defparams.putall all properties");
-		Set<String> prop_keys = defProperties.stringPropertyNames();
+		Set<String> prop_keys = defProperties.keySet();
 		//System.out.println("configurator starting loop....");
 		for (String key: prop_keys) {
 			//System.out.println("Analyzing key: " + key);
@@ -202,9 +236,9 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 					prop_key = node;
 					node = null;
 				}
-				repository.set(root, node, prop_key, defProperties.getProperty(key));
+				repository.set(root, node, prop_key, defProperties.get(key));
 				log.config("Added default config property: ("
-					+ key + "=" + defProperties.getProperty(key) + ")");
+					+ key + "=" + defProperties.get(key) + ")");
 				// System.out.println("Added default config property: ("
 				// 	+ key + "=" + defProperties.getProperty(key) + ")");
 
