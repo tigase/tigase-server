@@ -20,6 +20,7 @@
  */
 package tigase.io;
 
+import java.io.File;
 import java.util.Map;
 import javax.net.ssl.SSLContext;
 
@@ -58,7 +59,7 @@ public interface SSLContextContainerIfc {
 	 * Constant <code>DEFAULT_DOMAIN_CERT_VAL</code> keeps default value for a
 	 * domain with default certificate.
 	 */
-	public static final String DEFAULT_DOMAIN_CERT_VAL = "localhost";
+	public static final String DEFAULT_DOMAIN_CERT_VAL = "default";
 	/**
 	 * Constant <code>JKS_KEYSTORE_FILE_KEY</code> is a key pointing to a JKS
 	 * keystore file.
@@ -68,7 +69,8 @@ public interface SSLContextContainerIfc {
 	 * Constant <code>JKS_KEYSTORE_FILE_VAL</code> keeps default value for a
 	 * JKS keystore file.
 	 */
-	public static final String JKS_KEYSTORE_FILE_VAL = "certs/rsa-keystore";
+	public static final String JKS_KEYSTORE_FILE_VAL =
+		"certs" + File.separator + "rsa-keystore";
 	/**
 	 * Constant <code>JKS_KEYSTORE_PWD_KEY</code> is a key pointing to a private
 	 * key password,
@@ -87,7 +89,8 @@ public interface SSLContextContainerIfc {
 	/**
 	 * Constant <code>TRUSTSTORE_FILE_VAL</code> is a default truststore file.
 	 */
-	public static final String TRUSTSTORE_FILE_VAL = "certs/truststore";
+	public static final String TRUSTSTORE_FILE_VAL =
+		"certs" + File.separator + "truststore";
 	/**
 	 * Constant <code>TRUSTSTORE_PWD_KEY</code> is a key pointing to a trustore
 	 * file password.
@@ -161,11 +164,12 @@ public interface SSLContextContainerIfc {
 	 * specific certificate for a given domain then default certificate should
 	 * be used.
 	 *
+	 * @param protocol a <code>String</code> is either 'SSL' or 'TLS' value.
 	 * @param hostname a <code>String</code> value keeps a hostname or domain
 	 * for SSLContext.
 	 * @return a <code>SSLContext</code> value
 	 */
-	SSLContext getSSLContext(String hostname);
+	SSLContext getSSLContext(String protocol, String hostname);
 
 	/**
 	 * Method <code>init</code> method initializes the container. If the container

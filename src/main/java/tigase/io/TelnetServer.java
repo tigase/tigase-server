@@ -33,6 +33,7 @@ import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -40,6 +41,8 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import java.util.logging.SocketHandler;
+
+import static tigase.io.SSLContextContainerIfc.*;
 
 /**
  * This is sample class demonstrating how to use <code>tigase.io</code> library
@@ -140,8 +143,12 @@ public class TelnetServer implements SampleSocketThread.SocketHandler {
 			turnDebugOn();
 		} // end of if (debug)
 		if (ssl) {
-			TLSUtil.configureSSLContext(sslId, "certs/keystore", "keystore",
-				"certs/truststore", "truststore", null);
+			Map<String, String> tls_params = new LinkedHashMap<String, String>();
+			tls_params.put(JKS_KEYSTORE_FILE_KEY, "certs/keystore");
+			tls_params.put(JKS_KEYSTORE_PWD_KEY, "keystore");
+			tls_params.put(TRUSTSTORE_FILE_KEY, "certs/truststore");
+			tls_params.put(TRUSTSTORE_PWD_KEY, "truststore");
+			TLSUtil.configureSSLContext(sslId, tls_params);
 		} // end of if (ssl)
 		TelnetServer server = new TelnetServer(port);
 		server.run();

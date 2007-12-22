@@ -48,7 +48,7 @@ import javax.net.ssl.X509TrustManager;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class SSLContextContainer {
+public class SSLContextContainer implements SSLContextContainerIfc {
 
   private static final Logger log =
 		Logger.getLogger("tigase.io.SSLContextContainer");
@@ -63,24 +63,37 @@ public class SSLContextContainer {
 	private String def_cert_alias = null;
 
 	public SSLContextContainer() {
-		log.config("Initializing SSL library (trust all certs mode)...");
-		init(null, null, null, null);
+// 		log.config("Initializing SSL library (trust all certs mode)...");
+// 		init(null, null, null, null);
 	}
 
-	public SSLContextContainer(String k_store, String k_passwd,
-		String def_cert_alias) {
-		log.config("Initializing SSL library (trust all certs mode)...");
-		this.def_cert_alias = def_cert_alias;
-		init(k_store, k_passwd, null, null);
-	}
+// 	public SSLContextContainer(String k_store, String k_passwd,
+// // 		String def_cert_alias) {
+// // 		log.config("Initializing SSL library (trust all certs mode)...");
+// // 		this.def_cert_alias = def_cert_alias;
+// // 		init(k_store, k_passwd, null, null);
+// 	}
 
-	public SSLContextContainer(String k_store, String k_passwd,
-		String t_store, String t_passwd, String def_cert_alias) {
+// 	public SSLContextContainer(String k_store, String k_passwd,
+// 		String t_store, String t_passwd, String def_cert_alias) {
 
-		log.config("Initializing SSL library...");
-		this.def_cert_alias = def_cert_alias;
+// 		log.config("Initializing SSL library...");
+// 		this.def_cert_alias = def_cert_alias;
+// 		init(k_store, k_passwd, t_store, t_passwd);
+// 	}
+
+	public void init(Map<String, String> params) {
+		String k_store = params.get(JKS_KEYSTORE_FILE_KEY);
+		String k_passwd = params.get(JKS_KEYSTORE_PWD_KEY);
+		String t_store = params.get(TRUSTSTORE_FILE_KEY);
+		String t_passwd = params.get(TRUSTSTORE_PWD_KEY);
 		init(k_store, k_passwd, t_store, t_passwd);
 	}
+
+	public void addCertificates(Map<String, String> params) {
+		init(params);
+	}
+
 
 	private void init(String k_store, String k_passwd,
 		String t_store, String t_passwd) {

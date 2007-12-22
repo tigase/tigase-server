@@ -25,6 +25,9 @@ import java.util.Map;
 import java.util.HashMap;
 import javax.net.ssl.SSLContext;
 import java.util.logging.Logger;
+import java.util.logging.Level;
+
+import static tigase.io.SSLContextContainerIfc.*;
 
 /**
  * Describe class TLSUtil here.
@@ -39,29 +42,35 @@ public abstract class TLSUtil {
 
   private static final Logger log = Logger.getLogger("tigase.io.TLSUtil");
 
-	private static Map<String, SSLContextContainer> sslContexts =
-		new HashMap<String, SSLContextContainer>();
+	private static Map<String, SSLContextContainerIfc> sslContexts =
+		new HashMap<String, SSLContextContainerIfc>();
 
-  public static void configureSSLContext(String id,
-		String k_store, String k_passwd, String t_store, String t_passwd,
-		String def_cert_alias) {
-		SSLContextContainer sslCC =
-			new SSLContextContainer(k_store, k_passwd, t_store, t_passwd,
-				def_cert_alias);
-		sslContexts.put(id, sslCC);
+  public static void configureSSLContext(String id, Map<String, String> params) {
+		String sslCC_class = params.get(SSL_CONTAINER_CLASS_KEY);
+		if (sslCC_class == null) {
+			sslCC_class = SSL_CONTAINER_CLASS_VAL;
+		}
+		try {
+			SSLContextContainerIfc sslCC =
+				(SSLContextContainerIfc)Class.forName(sslCC_class).newInstance();
+			sslCC.init(params);
+			sslContexts.put(id, sslCC);
+		} catch (Exception e) {
+			log.log(Level.SEVERE, "Can not initialize SSL Container: " + sslCC_class, e);
+		}
   }
 
-  public static void configureSSLContext(String id,
-		String k_store, String k_passwd, String def_cert_alias) {
-		SSLContextContainer sslCC =
-			new SSLContextContainer(k_store, k_passwd, def_cert_alias);
-		sslContexts.put(id, sslCC);
-	}
+//   public static void configureSSLContext(String id,
+// 		String k_store, String k_passwd, String def_cert_alias) {
+// 		SSLContextContainer sslCC =
+// 			new SSLContextContainer(k_store, k_passwd, def_cert_alias);
+// 		sslContexts.put(id, sslCC);
+// 	}
 
-  public static void configureSSLContext(String id) {
-		SSLContextContainer sslCC =	new SSLContextContainer();
-		sslContexts.put(id, sslCC);
-	}
+//   public static void configureSSLContext(String id) {
+// 		SSLContextContainer sslCC =	new SSLContextContainer();
+// 		sslContexts.put(id, sslCC);
+// 	}
 
 	public static SSLContext getSSLContext(String id, String protocol,
 		String hostname) {
