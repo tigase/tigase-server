@@ -21,28 +21,30 @@
  */
 package tigase.xmpp.impl;
 
-import java.util.logging.Logger;
-import java.util.Queue;
-import java.util.Date;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.Map;
-import java.text.SimpleDateFormat;
-import tigase.util.JIDUtils;
+import java.util.Queue;
+import java.util.logging.Logger;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.UserNotFoundException;
 import tigase.server.Packet;
+import tigase.util.JIDUtils;
+import tigase.xml.DomBuilderHandler;
 import tigase.xml.Element;
 import tigase.xml.SimpleParser;
 import tigase.xml.SingletonFactory;
-import tigase.xml.DomBuilderHandler;
+import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPImplIfc;
 import tigase.xmpp.XMPPPostprocessorIfc;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
-import tigase.xmpp.NotAuthorizedException;
 
 /**
  * Describe class OfflineMessages here.
@@ -210,21 +212,32 @@ public class OfflineMessages extends XMPPProcessor
 		String[] msgs = conn.getOfflineDataList(ID, "messages");
 		if (msgs != null && msgs.length > 0) {
 			conn.removeOfflineDataGroup(ID);
-			Queue<Packet> pacs = new LinkedList<Packet>();
+			LinkedList<Packet> pacs = new LinkedList<Packet>();
+			StringBuilder sb = new StringBuilder();
 			for (String msg: msgs) {
-				char[] data = msg.toCharArray();
-				parser.parse(domHandler, data, 0, data.length);
-				Queue<Element> elems = domHandler.getParsedElements();
-				Element elem = null;
-				while ((elem = elems.poll()) != null) {
-					pacs.offer(new Packet(elem));
-				} // end of while (elem = elems.poll() != null)
-			} // end of for (int i = 0; i < msgs.length; i++)
+				sb.append(msg);
+			}
+			char[] data = sb.toString().toCharArray();
+			parser.parse(domHandler, data, 0, data.length);
+			Queue<Element> elems = domHandler.getParsedElements();
+			Element elem = null;
+			while ((elem = elems.poll()) != null) {
+				pacs.offer(new Packet(elem));
+			} // end of while (elem = elems.poll() != null)
+			Collections.sort(pacs, new StampComparator());
 			return pacs;
 		} // end of if (msgs != null)
 		else {
 			return null;
 		} // end of if (msgs != null) else
+	}
+
+	private class StampComparator implements Comparator<Packet> {
+		public int compare(Packet p1, Packet p2) {
+			String stamp1 = p1.getElement().getAttribute("/message/x", "stamp");
+			String stamp2 = p2.getElement().getAttribute("/message/x", "stamp");
+			return stamp1.compareTo(stamp2);
+		}
 	}
 
 } // OfflineMessages
