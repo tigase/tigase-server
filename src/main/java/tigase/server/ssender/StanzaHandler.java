@@ -37,6 +37,8 @@ public interface StanzaHandler {
 
 	void handleStanza(String stanza);
 
+	void handleStanza(Packet stanza);
+
 	void handleStanzas(Queue<Packet> results);
 
 }

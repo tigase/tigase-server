@@ -231,6 +231,10 @@ public class StanzaSender extends AbstractMessageReceiver
 		parseXMLData(stanza);
 	}
 
+	public void handleStanza(Packet stanza) {
+		addOutPacket(stanza);
+	}
+
 	public void handleStanzas(Queue<Packet> results) {
 		addOutPackets(results);
 	}
