@@ -3,7 +3,7 @@
   <groupId>tigase</groupId>
   <artifactId>tigase-server</artifactId>
   <name>TigaseXMPPServer</name>
-  <version>3.1.0-SNAPSHOT</version>
+  <version>3.2.0-SNAPSHOT</version>
   <description>Tigase XMPP Server</description>
   <url>http://www.tigase.org/</url>
   <issueManagement>
@@ -12,11 +12,14 @@
   </issueManagement>
   <developers>
     <developer>
-      <name>Artur Hefczyc</name>
-      <roles>
-        <role>architect</role>
-        <role>developer</role>
-      </roles>
+      <id>kobit</id>
+       <name>Artur Hefczyc</name>
+       <email>kobit@tigase.org</email>
+       <url>http://artur.hefczyc.net/</url>
+       <roles>
+         <role>architect</role>
+         <role>developer</role>
+       </roles>
     </developer>
   </developers>
   <licenses>
