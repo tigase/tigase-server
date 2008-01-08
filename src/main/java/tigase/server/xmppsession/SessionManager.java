@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.security.auth.login.AppConfigurationEntry.LoginModuleControlFlag;
@@ -48,32 +49,32 @@ import tigase.db.TigaseDBException;
 import tigase.db.UserAuthRepository;
 import tigase.db.UserNotFoundException;
 import tigase.db.UserRepository;
-import tigase.server.XMPPServer;
-import tigase.server.AbstractMessageReceiver;
-import tigase.server.MessageReceiver;
-import tigase.server.Packet;
-import tigase.server.Command;
-import tigase.server.Permissions;
-import tigase.server.MessageRouter;
-import tigase.disco.XMPPService;
 import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
+import tigase.disco.XMPPService;
+import tigase.server.AbstractMessageReceiver;
+import tigase.server.Command;
+import tigase.server.MessageReceiver;
+import tigase.server.MessageRouter;
+import tigase.server.Packet;
+import tigase.server.Permissions;
+import tigase.server.XMPPServer;
 import tigase.stats.StatRecord;
 import tigase.util.ElementUtils;
 import tigase.util.JIDUtils;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.NotAuthorizedException;
+import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.ProcessorFactory;
 import tigase.xmpp.StanzaType;
+import tigase.xmpp.XMPPException;
 import tigase.xmpp.XMPPPostprocessorIfc;
 import tigase.xmpp.XMPPPreprocessorIfc;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.XMPPSession;
 import tigase.xmpp.XMPPStopListenerIfc;
-import tigase.xmpp.PacketErrorTypeException;
-import tigase.xmpp.XMPPException;
 
 import static tigase.server.xmppsession.SessionManagerConfig.*;
 
@@ -110,8 +111,8 @@ public class SessionManager extends AbstractMessageReceiver
 
 	private Map<String, XMPPPreprocessorIfc> preProcessors =
 		new ConcurrentSkipListMap<String, XMPPPreprocessorIfc>();
-	private Map<String, XMPPProcessorIfc> processors =
-		new ConcurrentSkipListMap<String, XMPPProcessorIfc>();
+	private Map<String, ProcessorThread> processors =
+		new ConcurrentSkipListMap<String, ProcessorThread>();
 	private Map<String, XMPPPostprocessorIfc> postProcessors =
 		new ConcurrentSkipListMap<String, XMPPPostprocessorIfc>();
 	private Map<String, XMPPStopListenerIfc> stopListeners =
@@ -347,19 +348,18 @@ public class SessionManager extends AbstractMessageReceiver
 	private void walk(final Packet packet,
 		final XMPPResourceConnection connection, final Element elem,
 		final Queue<Packet> results) {
-		for (XMPPProcessorIfc proc: processors.values()) {
+		for (ProcessorThread proc_t: processors.values()) {
 			String xmlns = elem.getXMLNS();
 			if (xmlns == null) { xmlns = "jabber:client";	}
-			if (proc.isSupporting(elem.getName(), xmlns)) {
-				log.finest("XMPPProcessorIfc: "+proc.getClass().getSimpleName()+
-					" ("+proc.id()+")"+"\n Request: "+elem.toString()
+			if (proc_t.processor.isSupporting(elem.getName(), xmlns)) {
+				log.finest("XMPPProcessorIfc: "+proc_t.processor.getClass().getSimpleName()+
+					" ("+proc_t.processor.id()+")"+"\n Request: "+elem.toString()
 					+ (connection != null ? ", " + connection.getConnectionId() : " null"));
-				try {
-					proc.process(packet, connection, naUserRepository, results,
-						plugin_config.get(proc.id()));
-					packet.processedBy(proc.id());
-				} catch (XMPPException e) {
-					log.warning("Problem processing packet: " + e);
+				if (proc_t.addItem(packet, connection)) {
+					packet.processedBy(proc_t.processor.id());
+				} else {
+					log.warning("Can not add packet: " + packet.toString()
+						+ " to processor: " + proc_t.getName() + " internal queue");
 				}
 			} // end of if (proc.isSupporting(elem.getName(), elem.getXMLNS()))
 		} // end of for ()
@@ -592,8 +592,8 @@ public class SessionManager extends AbstractMessageReceiver
 
 	private List<Element> getFeatures(XMPPResourceConnection session) {
 		List<Element> results = new LinkedList<Element>();
-		for (XMPPProcessorIfc proc: processors.values()) {
-			Element[] features = proc.supStreamFeatures(session);
+		for (ProcessorThread proc_t: processors.values()) {
+			Element[] features = proc_t.processor.supStreamFeatures(session);
 			if (features != null) {
 				results.addAll(Arrays.asList(features));
 			} // end of if (features != null)
@@ -612,7 +612,11 @@ public class SessionManager extends AbstractMessageReceiver
 		XMPPProcessorIfc proc = ProcessorFactory.getProcessor(comp_id);
 		boolean loaded = false;
 		if (proc != null) {
-			processors.put(comp_id, proc);
+			ProcessorThread pt = new ProcessorThread(proc);
+			pt.setDaemon(true);
+			pt.setName(proc.id());
+			pt.start();
+			processors.put(comp_id, pt);
 			log.config("Added processor: " + proc.getClass().getSimpleName()
 				+ " for plugin id: " + comp_id);
 			loaded = true;
@@ -738,8 +742,8 @@ public class SessionManager extends AbstractMessageReceiver
 	public Element getDiscoInfo(String node, String jid) {
 		if (jid != null && jid.startsWith(getName()+".")) {
 			Element query = serviceEntity.getDiscoInfo(node);
-			for (XMPPProcessorIfc proc: processors.values()) {
-				Element[] discoFeatures = proc.supDiscoFeatures(null);
+			for (ProcessorThread proc_t: processors.values()) {
+				Element[] discoFeatures = proc_t.processor.supDiscoFeatures(null);
 				if (discoFeatures != null) {
 					query.addChildren(Arrays.asList(discoFeatures));
 				} // end of if (discoFeatures != null)
@@ -751,8 +755,8 @@ public class SessionManager extends AbstractMessageReceiver
 
 	public List<Element> getDiscoFeatures() {
 		List<Element> features = new LinkedList<Element>();
-		for (XMPPProcessorIfc proc: processors.values()) {
-			Element[] discoFeatures = proc.supDiscoFeatures(null);
+		for (ProcessorThread proc_t: processors.values()) {
+			Element[] discoFeatures = proc_t.processor.supDiscoFeatures(null);
 			if (discoFeatures != null) {
 				features.addAll(Arrays.asList(discoFeatures));
 			} // end of if (discoFeatures != null)
@@ -781,6 +785,47 @@ public class SessionManager extends AbstractMessageReceiver
 		stats.add(new StatRecord(getName(), "Closed connections", "long",
 				closedConnections, Level.FINER));
 		return stats;
+	}
+
+	private class QueueItem {
+		Packet packet;
+		XMPPResourceConnection conn;
+	}
+
+	private class ProcessorThread extends Thread {
+
+		private boolean stopped = false;
+		private XMPPProcessorIfc processor = null;
+		private LinkedList<Packet> local_results = new LinkedList<Packet>();
+		private LinkedBlockingQueue<QueueItem> in_queue =
+			new LinkedBlockingQueue<QueueItem>(maxQueueSize);
+
+		public ProcessorThread(XMPPProcessorIfc processor) {
+			this.processor = processor;
+		}
+
+		public boolean addItem(Packet packet, XMPPResourceConnection conn) {
+			QueueItem item = new QueueItem();
+			item.packet = packet;
+			item.conn = conn;
+			return in_queue.offer(item);
+		}
+
+		public void run() {
+			QueueItem item = null;
+			while (! stopped) {
+				try {
+					item = in_queue.take();
+					processor.process(item.packet, item.conn, naUserRepository, local_results,
+						plugin_config.get(processor.id()));
+					addOutPackets(local_results);
+				} catch (Exception e) {
+					log.log(Level.SEVERE, "Exception during packet processing: "
+						+ item.packet.toString(), e);
+				}
+			}
+		}
+
 	}
 
 	private static class NARepository implements NonAuthUserRepository {

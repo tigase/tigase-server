@@ -71,7 +71,7 @@ public abstract class AbstractMessageReceiver
   private static final Logger log =
     Logger.getLogger("tigase.server.AbstractMessageReceiver");
 
-  private int maxQueueSize = MAX_QUEUE_SIZE_PROP_VAL;
+  protected  int maxQueueSize = MAX_QUEUE_SIZE_PROP_VAL;
 	private String defHostname = DEF_HOSTNAME_PROP_VAL;
 
   private MessageReceiver parent = null;
