@@ -155,14 +155,13 @@ public class DrupalAuth implements UserAuthRepository {
 	 */
 	private boolean checkConnection() throws SQLException {
 		try {
-// 			if (!conn.isValid(5)) {
-// 				initRepo();
-// 			} // end of if (!conn.isValid())
-			long tmp = System.currentTimeMillis();
-			if ((tmp - lastConnectionValidated) >= connectionValidateInterval) {
-				conn_valid_st.executeQuery();
-				lastConnectionValidated = tmp;
-			} // end of if ()
+			synchronized (conn_valid_st) {
+				long tmp = System.currentTimeMillis();
+				if ((tmp - lastConnectionValidated) >= connectionValidateInterval) {
+					conn_valid_st.executeQuery();
+					lastConnectionValidated = tmp;
+				} // end of if ()
+			}
 		} catch (Exception e) {
 			initRepo();
 		} // end of try-catch
@@ -184,11 +183,13 @@ public class DrupalAuth implements UserAuthRepository {
 
 	private void updateLastLogin(String user) throws TigaseDBException {
 		try {
-			BigDecimal bd = new BigDecimal((System.currentTimeMillis()/1000));
-			update_last_login_st.setBigDecimal(1, bd);
-			update_last_login_st.setBigDecimal(2, bd);
-			update_last_login_st.setString(3, JIDUtils.getNodeNick(user));
-			update_last_login_st.executeUpdate();
+			synchronized (update_last_login_st) {
+				BigDecimal bd = new BigDecimal((System.currentTimeMillis()/1000));
+				update_last_login_st.setBigDecimal(1, bd);
+				update_last_login_st.setBigDecimal(2, bd);
+				update_last_login_st.setString(3, JIDUtils.getNodeNick(user));
+				update_last_login_st.executeUpdate();
+			}
 		} catch (SQLException e) {
 			throw new TigaseDBException("Error accessin repository.", e);
 		} // end of try-catch
@@ -198,9 +199,11 @@ public class DrupalAuth implements UserAuthRepository {
 		throws TigaseDBException {
 		if (online_status) {
 			try {
-				update_online_status.setInt(1, status);
-				update_online_status.setString(2, JIDUtils.getNodeNick(user));
-				update_online_status.executeUpdate();
+				synchronized (update_online_status) {
+					update_online_status.setInt(1, status);
+					update_online_status.setString(2, JIDUtils.getNodeNick(user));
+					update_online_status.executeUpdate();
+				}
 			} catch (SQLException e) {
 				throw new TigaseDBException("Error accessin repository.", e);
 			} // end of try-catch
@@ -211,13 +214,15 @@ public class DrupalAuth implements UserAuthRepository {
 		throws SQLException, UserNotFoundException {
 		ResultSet rs = null;
 		try {
-			status_st.setString(1, JIDUtils.getNodeNick(user));
-			rs = status_st.executeQuery();
-			if (rs.next()) {
-				return (rs.getInt(1) == 1);
-			} else {
-				throw new UserNotFoundException("User does not exist: " + user);
-			} // end of if (isnext) else
+			synchronized (status_st) {
+				status_st.setString(1, JIDUtils.getNodeNick(user));
+				rs = status_st.executeQuery();
+				if (rs.next()) {
+					return (rs.getInt(1) == 1);
+				} else {
+					throw new UserNotFoundException("User does not exist: " + user);
+				} // end of if (isnext) else
+			}
 		} finally {
 			release(null, rs);
 		}
@@ -226,15 +231,17 @@ public class DrupalAuth implements UserAuthRepository {
 	private long getMaxUID() throws SQLException {
 		ResultSet rs = null;
 		try {
-			rs = max_uid_st.executeQuery();
-			if (rs.next()) {
-				BigDecimal max_uid = rs.getBigDecimal(1);
-				//System.out.println("MAX UID = " + max_uid.longValue());
+			synchronized (max_uid_st) {
+				rs = max_uid_st.executeQuery();
+				if (rs.next()) {
+					BigDecimal max_uid = rs.getBigDecimal(1);
+					//System.out.println("MAX UID = " + max_uid.longValue());
 				return max_uid.longValue();
-			} else {
-				//System.out.println("MAX UID = -1!!!!");
-				return -1;
-			} // end of else
+				} else {
+					//System.out.println("MAX UID = -1!!!!");
+					return -1;
+				} // end of else
+			}
 		} finally {
 			release(null, rs);
 		}
@@ -245,13 +252,15 @@ public class DrupalAuth implements UserAuthRepository {
 		ResultSet rs = null;
 		try {
 			checkConnection();
-			pass_st.setString(1, JIDUtils.getNodeNick(user));
-			rs = pass_st.executeQuery();
-			if (rs.next()) {
-				return rs.getString(1);
-			} else {
-				throw new UserNotFoundException("User does not exist: " + user);
-			} // end of if (isnext) else
+			synchronized (pass_st) {
+				pass_st.setString(1, JIDUtils.getNodeNick(user));
+				rs = pass_st.executeQuery();
+				if (rs.next()) {
+					return rs.getString(1);
+				} else {
+					throw new UserNotFoundException("User does not exist: " + user);
+				} // end of if (isnext) else
+			}
 		} finally {
 			release(null, rs);
 		}
@@ -281,8 +290,10 @@ public class DrupalAuth implements UserAuthRepository {
 	 * @exception SQLException if an error occurs on database query.
 	 */
 	private void initRepo() throws SQLException {
-		conn = DriverManager.getConnection(db_conn);
-		initPreparedStatements();
+		synchronized (db_conn) {
+			conn = DriverManager.getConnection(db_conn);
+			initPreparedStatements();
+		}
 	}
 
 	/**
@@ -415,11 +426,13 @@ public class DrupalAuth implements UserAuthRepository {
 		throws UserExistsException, TigaseDBException {
 		try {
 			checkConnection();
-			long uid = getMaxUID()+1;
-			user_add_st.setLong(1, uid);
-			user_add_st.setString(2, JIDUtils.getNodeNick(user));
-			user_add_st.setString(3, Algorithms.hexDigest("", password, "MD5"));
-			user_add_st.executeUpdate();
+			synchronized (user_add_st) {
+				long uid = getMaxUID()+1;
+				user_add_st.setLong(1, uid);
+				user_add_st.setString(2, JIDUtils.getNodeNick(user));
+				user_add_st.setString(3, Algorithms.hexDigest("", password, "MD5"));
+				user_add_st.executeUpdate();
+			}
 		} catch (NoSuchAlgorithmException e) {
 			throw
 				new TigaseDBException("Password encoding algorithm is not supported.",

@@ -129,11 +129,13 @@ public class LibreSourceAuth implements UserAuthRepository {
 
 	private boolean checkConnection() throws SQLException {
 		try {
-			long tmp = System.currentTimeMillis();
-			if ((tmp - lastConnectionValidated) >= connectionValidateInterval) {
-				conn_valid_st.executeQuery();
-				lastConnectionValidated = tmp;
-			} // end of if ()
+			synchronized (conn_valid_st) {
+				long tmp = System.currentTimeMillis();
+				if ((tmp - lastConnectionValidated) >= connectionValidateInterval) {
+					conn_valid_st.executeQuery();
+					lastConnectionValidated = tmp;
+				} // end of if ()
+			}
 		} catch (Exception e) {
 			initRepo();
 		} // end of try-catch
@@ -155,9 +157,11 @@ public class LibreSourceAuth implements UserAuthRepository {
 
 	private void updateLastLogin(String user) throws TigaseDBException {
 		try {
-			update_last_login_st.setDate(1, new Date(System.currentTimeMillis()));
-			update_last_login_st.setString(2, JIDUtils.getNodeNick(user));
-			update_last_login_st.executeUpdate();
+			synchronized (update_last_login_st) {
+				update_last_login_st.setDate(1, new Date(System.currentTimeMillis()));
+				update_last_login_st.setString(2, JIDUtils.getNodeNick(user));
+				update_last_login_st.executeUpdate();
+			}
 		} catch (SQLException e) {
 			throw new TigaseDBException("Error accessin repository.", e);
 		} // end of try-catch
@@ -166,9 +170,11 @@ public class LibreSourceAuth implements UserAuthRepository {
 	private void updateOnlineStatus(String user, int status)
 		throws TigaseDBException {
 		try {
-			update_online_status.setInt(1, status);
-			update_online_status.setString(2, JIDUtils.getNodeNick(user));
-			update_online_status.executeUpdate();
+			synchronized (update_online_status) {
+				update_online_status.setInt(1, status);
+				update_online_status.setString(2, JIDUtils.getNodeNick(user));
+				update_online_status.executeUpdate();
+			}
 		} catch (SQLException e) {
 			throw new TigaseDBException("Error accessin repository.", e);
 		} // end of try-catch
@@ -178,14 +184,16 @@ public class LibreSourceAuth implements UserAuthRepository {
 		throws SQLException, UserNotFoundException {
 		ResultSet rs = null;
 		try {
-			status_st.setString(1, JIDUtils.getNodeNick(user));
-			rs = status_st.executeQuery();
-			if (rs.next()) {
-				int res = rs.getInt(1);
-				return (rs.wasNull() || res == 0);
-			} else {
-				throw new UserNotFoundException("User does not exist: " + user);
-			} // end of if (isnext) else
+			synchronized (status_st) {
+				status_st.setString(1, JIDUtils.getNodeNick(user));
+				rs = status_st.executeQuery();
+				if (rs.next()) {
+					int res = rs.getInt(1);
+					return (rs.wasNull() || res == 0);
+				} else {
+					throw new UserNotFoundException("User does not exist: " + user);
+				} // end of if (isnext) else
+			}
 		} finally {
 			release(null, rs);
 		}
@@ -195,13 +203,15 @@ public class LibreSourceAuth implements UserAuthRepository {
 		throws SQLException, UserNotFoundException {
 		ResultSet rs = null;
 		try {
-			pass_st.setString(1, JIDUtils.getNodeNick(user));
-			rs = pass_st.executeQuery();
-			if (rs.next()) {
-				return rs.getString(1);
-			} else {
-				throw new UserNotFoundException("User does not exist: " + user);
-			} // end of if (isnext) else
+			synchronized (pass_st) {
+				pass_st.setString(1, JIDUtils.getNodeNick(user));
+				rs = pass_st.executeQuery();
+				if (rs.next()) {
+					return rs.getString(1);
+				} else {
+					throw new UserNotFoundException("User does not exist: " + user);
+				} // end of if (isnext) else
+			}
 		} finally {
 			release(null, rs);
 		}
@@ -225,8 +235,10 @@ public class LibreSourceAuth implements UserAuthRepository {
 	}
 
 	private void initRepo() throws SQLException {
-		conn = DriverManager.getConnection(db_conn);
-		initPreparedStatements();
+		synchronized (db_conn) {
+			conn = DriverManager.getConnection(db_conn);
+			initPreparedStatements();
+		}
 	}
 
 	/**
@@ -411,9 +423,11 @@ public class LibreSourceAuth implements UserAuthRepository {
 		throws UserExistsException, TigaseDBException {
 		try {
 			checkConnection();
-			update_password.setString(1, password);
-			update_password.setString(2, JIDUtils.getNodeNick(user));
-			update_password.executeUpdate();
+			synchronized (update_password) {
+				update_password.setString(1, password);
+				update_password.setString(2, JIDUtils.getNodeNick(user));
+				update_password.executeUpdate();
+			}
 		} catch (SQLException e) {
 			throw new TigaseDBException("Error accessin repository.", e);
 		} // end of try-catch
