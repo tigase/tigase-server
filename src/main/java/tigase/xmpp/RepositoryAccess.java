@@ -109,7 +109,7 @@ public abstract class RepositoryAccess {
     }
 	}
 
-	public final Authorization register(final String name_param,
+	public Authorization register(final String name_param,
 		final String pass_param, final String email_param)
 		throws NotAuthorizedException {
     // Some clients send plain user name and others send
@@ -293,7 +293,7 @@ public abstract class RepositoryAccess {
    * has not been authorized yet and there is no access to permanent storage.
    * @see #setData(String, String, String)
    */
-  public final String[] getDataList(final String subnode, final String key)
+  public String[] getDataList(final String subnode, final String key)
     throws NotAuthorizedException {
     try { return repo.getDataList(getUserId(), subnode, key);
     } catch (UserNotFoundException e) {
@@ -328,7 +328,7 @@ public abstract class RepositoryAccess {
    * has not been authorized yet and there is no access to permanent storage.
    * @see #setData(String, String, String)
    */
-  public final String getData(final String subnode,
+  public String getData(final String subnode,
     final String key, final String def) throws NotAuthorizedException {
     try { return repo.getData(getUserId(), subnode, key, def);
     } catch (UserNotFoundException e) {
@@ -385,7 +385,7 @@ public abstract class RepositoryAccess {
    * @see #removeDataGroup(String)
    * @see UserRepository
    */
-  public final void setData(final String subnode,
+  public void setData(final String subnode,
     final String key, final String value) throws NotAuthorizedException {
     try { repo.setData(getUserId(), subnode, key, value);
     } catch (UserNotFoundException e) {
@@ -396,7 +396,7 @@ public abstract class RepositoryAccess {
 		} // end of try-catch
   }
 
-  public final void removeData(final String subnode, final String key)
+  public void removeData(final String subnode, final String key)
 		throws NotAuthorizedException {
     try { repo.removeData(getUserId(), subnode, key);
     } catch (UserNotFoundException e) {
@@ -420,7 +420,7 @@ public abstract class RepositoryAccess {
    * has not been authorized yet and there is no access to permanent storage.
    * @see #setData(String, String, String)
    */
-  public final String[] getDataGroups(final String subnode)
+  public String[] getDataGroups(final String subnode)
     throws NotAuthorizedException {
     try { return repo.getSubnodes(getUserId(), subnode);
     } catch (UserNotFoundException e) {
@@ -447,7 +447,7 @@ public abstract class RepositoryAccess {
    * has not been authorized yet and there is no access to permanent storage.
    * @see #setData(String, String, String)
    */
-  public final String[] getDataKeys(final String subnode)
+  public String[] getDataKeys(final String subnode)
     throws NotAuthorizedException {
     try { return repo.getKeys(getUserId(), subnode);
     } catch (UserNotFoundException e) {
@@ -473,7 +473,7 @@ public abstract class RepositoryAccess {
    * has not been authorized yet and there is no access to permanent storage.
    * @see #setData(String, String, String)
    */
-  public final void removeDataGroup(final String subnode)
+  public void removeDataGroup(final String subnode)
     throws NotAuthorizedException {
     try { repo.removeSubnode(getUserId(), subnode);
     } catch (UserNotFoundException e) {
@@ -500,7 +500,7 @@ public abstract class RepositoryAccess {
    * has not been authorized yet and there is no access to permanent storage.
    * @see #setData(String, String, String)
    */
-  public final void setDataList(final String subnode, final String key,
+  public void setDataList(final String subnode, final String key,
     final String[] list) throws NotAuthorizedException {
     try { repo.setDataList(getUserId(), subnode, key, list);
     } catch (UserNotFoundException e) {
@@ -511,7 +511,7 @@ public abstract class RepositoryAccess {
 		} // end of try-catch
   }
 
-  public final void addDataList(final String subnode, final String key,
+  public void addDataList(final String subnode, final String key,
     final String[] list) throws NotAuthorizedException {
     try { repo.addDataList(getUserId(), subnode, key, list);
     } catch (UserNotFoundException e) {
