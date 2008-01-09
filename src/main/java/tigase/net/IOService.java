@@ -213,14 +213,16 @@ public abstract class IOService implements Callable<IOService> {
    *
    * @exception IOException if an error occurs
    */
-  public synchronized void stop() {
+  public void stop() {
 		try {
 			socketIO.stop();
 		} catch (Exception e) {
 			// Well, do nothing, we are closing the connection anyway....
 		} finally {
 			if (serviceListener != null) {
-				serviceListener.serviceStopped(this);
+				IOServiceListener tmp = serviceListener;
+				serviceListener = null;
+				tmp.serviceStopped(this);
 			}
 		}
   }
@@ -271,26 +273,28 @@ public abstract class IOService implements Callable<IOService> {
    * @return a <code>char[]</code> value
    * @exception IOException if an error occurs
    */
-  protected synchronized char[] readData() throws IOException {
+  protected char[] readData() throws IOException {
 		setLastTransferTime();
     CharBuffer cb = null;
-    try {
-			//			resizeInputBuffer();
-      ByteBuffer tmpBuffer = socketIO.read(socketInput);
-      if (socketIO.bytesRead() > 0) {
-        tmpBuffer.flip();
-        cb = decoder.decode(tmpBuffer);
-        tmpBuffer.clear();
-      } // end of if (socketIO.bytesRead() > 0)
-    } catch (BufferUnderflowException underfl) {
-			// Obtain more inbound network data for src,
-			// then retry the operation.
-			resizeInputBuffer();
-			return null;
-    } catch (Exception eof) {
-			//			eof.printStackTrace();
-			stop();
-    } // end of try-catch
+		synchronized (decoder) {
+			try {
+				//			resizeInputBuffer();
+				ByteBuffer tmpBuffer = socketIO.read(socketInput);
+				if (socketIO.bytesRead() > 0) {
+					tmpBuffer.flip();
+					cb = decoder.decode(tmpBuffer);
+					tmpBuffer.clear();
+				} // end of if (socketIO.bytesRead() > 0)
+			} catch (BufferUnderflowException underfl) {
+				// Obtain more inbound network data for src,
+				// then retry the operation.
+				resizeInputBuffer();
+				return null;
+			} catch (Exception eof) {
+				//			eof.printStackTrace();
+				stop();
+			} // end of try-catch
+		}
     return cb != null ? cb.array() : null;
   }
 
@@ -304,14 +308,16 @@ public abstract class IOService implements Callable<IOService> {
    * @param data a <code>String</code> value
    * @exception IOException if an error occurs
    */
-  protected synchronized void writeData(final String data) throws IOException {
-    if (data != null && data.length() > 0) {
-			ByteBuffer dataBuffer = null;
-			encoder.reset();
-      dataBuffer = encoder.encode(CharBuffer.wrap(data));
-			encoder.flush(dataBuffer);
-      socketIO.write(dataBuffer);
-    }
+  protected void writeData(final String data) throws IOException {
+		synchronized (encoder) {
+			if (data != null && data.length() > 0) {
+				ByteBuffer dataBuffer = null;
+				encoder.reset();
+				dataBuffer = encoder.encode(CharBuffer.wrap(data));
+				encoder.flush(dataBuffer);
+				socketIO.write(dataBuffer);
+			}
+		}
 		setLastTransferTime();
   }
 

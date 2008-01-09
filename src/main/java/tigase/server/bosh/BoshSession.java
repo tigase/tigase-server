@@ -63,7 +63,7 @@ public class BoshSession {
 
 	private UUID sid = null;
 	private Queue<BoshIOService> connections =
-		new LinkedList<BoshIOService>();
+		new ConcurrentLinkedQueue<BoshIOService>();
 	private Queue<Packet> waiting_packets = new ConcurrentLinkedQueue<Packet>();
 	private BoshSessionTaskHandler handler = null;
 	private long max_wait = MAX_WAIT_DEF_PROP_VAL;
@@ -187,7 +187,7 @@ public class BoshSession {
 		return domain;
 	}
 
-	public synchronized void processPacket(Packet packet,
+	public void processPacket(Packet packet,
 		Queue<Packet> out_results) {
 
 		if (packet != null) {
@@ -248,16 +248,18 @@ public class BoshSession {
 
 	}
 
-	public synchronized void processSocketPacket(Packet packet,
+	public void processSocketPacket(Packet packet,
 		BoshIOService service, Queue<Packet> out_results) {
 
 		log.finest("[" + connections.size() +
 			"] Processing socket packet: " + packet.toString());
 
-		TimerTask tt = enum_task.remove(TimedTask.STOP);
-		if (tt != null) {
-			task_enum.remove(tt);
-			handler.cancelTask(tt);
+		synchronized (task_enum) {
+			TimerTask tt = enum_task.remove(TimedTask.STOP);
+			if (tt != null) {
+				task_enum.remove(tt);
+				handler.cancelTask(tt);
+			}
 		}
 
 		service.setContentType(content_type);
@@ -302,63 +304,69 @@ public class BoshSession {
 			sendBody(serv, null);
 		}
 
-		tt = enum_task.get(TimedTask.EMPTY_RESP);
-		// Checking (waiting_packets.size() == 0) is probably redundant here
-		if (connections.size() > 0 && waiting_packets.size() == 0 && tt == null) {
-			tt = handler.scheduleTask(this, max_wait*SECOND);
-			task_enum.put(tt, TimedTask.EMPTY_RESP);
-			enum_task.put(TimedTask.EMPTY_RESP, tt);
-		}
-	}
-
-	public synchronized void disconnected(BoshIOService bios) {
-		if (bios != null) {
-			connections.remove(bios);
-		}
-		TimerTask tt = enum_task.get(TimedTask.STOP);
-		if (connections.size() == 0 && tt == null) {
-			tt = handler.scheduleTask(this, max_pause*SECOND);
-			task_enum.put(tt, TimedTask.STOP);
-			enum_task.put(TimedTask.STOP, tt);
-		}
-	}
-
-	public synchronized boolean task(Queue<Packet> out_results, TimerTask tt) {
-		TimedTask ttask = task_enum.remove(tt);
-		if (ttask != null) {
-			enum_task.remove(ttask);
-			switch (ttask) {
-			case STOP:
-				for (TimerTask ttemp: task_enum.keySet()) {
-					handler.cancelTask(ttemp);
-				}
-				for (Packet packet: waiting_packets) {
-					try {
-						out_results.offer(
-							Authorization.RECIPIENT_UNAVAILABLE.getResponseMessage(packet,
-								"Bosh = disconnected", true));
-					} catch (PacketErrorTypeException e) {
-						log.warning("Packet processing exception: " + e);
-					}
-				}
-				Packet command = Command.STREAM_CLOSED.getPacket(null, null,
-					StanzaType.set, "sess1");
-				out_results.offer(command);
-				return true;
-			case EMPTY_RESP:
-				BoshIOService serv = connections.poll();
-				if (serv != null) {
-					sendBody(serv, null);
-				}
-				break;
-			default:
-				log.warning("[" + connections.size() +
-					"] Uknown TimedTask value: " + ttask.toString());
-				break;
+		synchronized (task_enum) {
+			TimerTask tt = enum_task.get(TimedTask.EMPTY_RESP);
+			// Checking (waiting_packets.size() == 0) is probably redundant here
+			if (connections.size() > 0 && waiting_packets.size() == 0 && tt == null) {
+				tt = handler.scheduleTask(this, max_wait*SECOND);
+				task_enum.put(tt, TimedTask.EMPTY_RESP);
+				enum_task.put(TimedTask.EMPTY_RESP, tt);
 			}
-		} else {
-			log.warning("[" + connections.size() +
-				"] TimedTask enum is null for scheduled task....");
+		}
+	}
+
+	public void disconnected(BoshIOService bios) {
+		synchronized (task_enum) {
+			if (bios != null) {
+				connections.remove(bios);
+			}
+			TimerTask tt = enum_task.get(TimedTask.STOP);
+			if (connections.size() == 0 && tt == null) {
+				tt = handler.scheduleTask(this, max_pause*SECOND);
+				task_enum.put(tt, TimedTask.STOP);
+				enum_task.put(TimedTask.STOP, tt);
+			}
+		}
+	}
+
+	public boolean task(Queue<Packet> out_results, TimerTask tt) {
+		synchronized (task_enum) {
+			TimedTask ttask = task_enum.remove(tt);
+			if (ttask != null) {
+				enum_task.remove(ttask);
+				switch (ttask) {
+				case STOP:
+					for (TimerTask ttemp: task_enum.keySet()) {
+						handler.cancelTask(ttemp);
+					}
+					for (Packet packet: waiting_packets) {
+						try {
+							out_results.offer(
+								Authorization.RECIPIENT_UNAVAILABLE.getResponseMessage(packet,
+									"Bosh = disconnected", true));
+						} catch (PacketErrorTypeException e) {
+							log.warning("Packet processing exception: " + e);
+						}
+					}
+					Packet command = Command.STREAM_CLOSED.getPacket(null, null,
+						StanzaType.set, "sess1");
+					out_results.offer(command);
+					return true;
+				case EMPTY_RESP:
+					BoshIOService serv = connections.poll();
+					if (serv != null) {
+						sendBody(serv, null);
+					}
+					break;
+				default:
+					log.warning("[" + connections.size() +
+						"] Uknown TimedTask value: " + ttask.toString());
+					break;
+				}
+			} else {
+				log.warning("[" + connections.size() +
+					"] TimedTask enum is null for scheduled task....");
+			}
 		}
 		return false;
 	}
