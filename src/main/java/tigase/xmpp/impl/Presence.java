@@ -430,11 +430,14 @@ public class Presence extends XMPPProcessor
 					// The code below looks like a bug to me.
 					// If the buddy is nt subscribed I should ignore all presences
 					// states from him. Commenting this out for now....
-// 					Element elem = packet.getElement().clone();
-// 					Packet result = new Packet(elem);
-// 					result.setTo(session.getConnectionId());
-// 					result.setFrom(packet.getTo());
-// 					results.offer(result);
+					// Well, it is not a bug and it is intentional.
+					// All presences received from MUC come from not subscribed buddies
+					// therefore it seems presences from unknown buddy should be passed out
+					Element elem = packet.getElement().clone();
+					Packet result = new Packet(elem);
+					result.setTo(session.getConnectionId());
+					result.setFrom(packet.getTo());
+					results.offer(result);
 				}
 				break;
 			case in_subscribe:
