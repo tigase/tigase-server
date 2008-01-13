@@ -489,7 +489,9 @@ public class SessionManager extends AbstractMessageReceiver
 			++closedConnections;
 			connection = connectionsByFrom.remove(pc.getFrom());
 			if (connection != null) {
-				closeSession(connection);
+				synchronized (connection) {
+					closeSession(connection);
+				}
 			} else {
 				log.info("Can not find resource connection for packet: " +
 					pc.toString());
@@ -546,6 +548,11 @@ public class SessionManager extends AbstractMessageReceiver
 	}
 
 	private void closeSession(XMPPResourceConnection conn) {
+		Queue<Packet> results = new LinkedList<Packet>();
+		for (XMPPStopListenerIfc stopProc: stopListeners.values()) {
+			stopProc.stopped(conn, results, plugin_config.get(stopProc.id()));
+		} // end of for ()
+		addOutPackets(results);
 		try {
 			String userId = conn.getUserId();
 			log.info("Closing connection for: " + userId);
@@ -571,11 +578,6 @@ public class SessionManager extends AbstractMessageReceiver
 		} catch (Exception e) {
 			log.info("Exception closing session... " + e);
 		}
-		Queue<Packet> results = new LinkedList<Packet>();
-		for (XMPPStopListenerIfc stopProc: stopListeners.values()) {
-			stopProc.stopped(conn, results, plugin_config.get(stopProc.id()));
-		} // end of for ()
-		addOutPackets(results);
 		conn.streamClosed();
 	}
 
@@ -816,8 +818,10 @@ public class SessionManager extends AbstractMessageReceiver
 			while (! stopped) {
 				try {
 					item = in_queue.take();
-					processor.process(item.packet, item.conn, naUserRepository, local_results,
-						plugin_config.get(processor.id()));
+					synchronized (item.conn) {
+						processor.process(item.packet, item.conn, naUserRepository,
+							local_results, plugin_config.get(processor.id()));
+					}
 					addOutPackets(local_results);
 				} catch (Exception e) {
 					log.log(Level.SEVERE, "Exception during packet processing: "
