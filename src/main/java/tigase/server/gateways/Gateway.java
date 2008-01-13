@@ -531,6 +531,7 @@ public class Gateway extends AbstractMessageReceiver
 				addOutPacket(presence);
 			}
 		}
+		gw_connections.remove(JIDUtils.getNodeID(jids[0]));
 	}
 
 	public void loginCompleted(GatewayConnection gc) {
