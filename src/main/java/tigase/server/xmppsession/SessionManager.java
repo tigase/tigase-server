@@ -818,9 +818,14 @@ public class SessionManager extends AbstractMessageReceiver
 			while (! stopped) {
 				try {
 					item = in_queue.take();
-					synchronized (item.conn) {
-						processor.process(item.packet, item.conn, naUserRepository,
-							local_results, plugin_config.get(processor.id()));
+					if (item.conn != null) {
+						synchronized (item.conn) {
+							processor.process(item.packet, item.conn, naUserRepository,
+								local_results, plugin_config.get(processor.id()));
+						}
+					} else {
+							processor.process(item.packet, null, naUserRepository,
+								local_results, plugin_config.get(processor.id()));
 					}
 					addOutPackets(local_results);
 				} catch (Exception e) {
