@@ -20,7 +20,6 @@
  */
 package tigase.server.gateways;
 
-import java.util.List;
 import tigase.server.Packet;
 
 /**
@@ -37,15 +36,15 @@ public interface GatewayListener {
 
 	void packetReceived(Packet packet);
 
-	void logout(String username);
+	void logout(GatewayConnection gc);
 
-	void loginCompleted(String username);
+	void loginCompleted(GatewayConnection gc);
 
-	void gatewayException(String username, Throwable exc);
+	void gatewayException(GatewayConnection gc, Throwable exc);
 
-	void userRoster(String username, List<RosterItem> roster);
+	void userRoster(GatewayConnection gc);
 
-	void updateStatus(String username, RosterItem item);
+	void updateStatus(GatewayConnection gc, RosterItem item);
 
 	String formatJID(String legacyName);
 

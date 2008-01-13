@@ -20,6 +20,7 @@
  */
 package tigase.server.gateways;
 
+import java.util.List;
 import tigase.server.Packet;
 
 /**
@@ -41,6 +42,8 @@ public interface GatewayConnection {
 
 	void removeJid(String jid);
 
+	String[] getAllJids();
+
 	void setGatewayListener(GatewayListener listener);
 
 	void init() throws GatewayException;
@@ -60,5 +63,7 @@ public interface GatewayConnection {
 	String getName();
 
 	String getPromptMessage();
+
+	List<RosterItem> getRoster();
 
 }
