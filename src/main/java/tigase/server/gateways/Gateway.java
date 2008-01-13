@@ -427,6 +427,7 @@ public class Gateway extends AbstractMessageReceiver
 				addOutPacket(new Packet(new Element("presence",
 							new String[] {"from", "to"},
 							new String[] {myDomain(), packet.getElemFrom()})));
+				updateRosterPresence(conn.getRoster(), packet.getElemFrom());
 			}
 			return conn;
 		}
@@ -545,6 +546,32 @@ public class Gateway extends AbstractMessageReceiver
 		log.log(Level.WARNING, "Gateway exception", exc);
 	}
 
+	private void updateRosterPresence(List<RosterItem> roster, String ... to) {
+		if (roster == null) {
+			// It may happen when the transport's roster is not synchronized yet
+			return;
+		}
+		for (RosterItem item: roster) {
+			log.fine("Received roster entry: " + item.getBuddyId());
+			String from = formatJID(item.getBuddyId());
+			for (String username: to) {
+				Element pres_el = new Element("presence",
+					new String[] {"to", "from"},
+					new String[] {username, from});
+				if (item.getStatus().getType() != null) {
+					pres_el.setAttribute("type", item.getStatus().getType());
+				}
+				if (item.getStatus().getShow() != null) {
+					Element show = new Element("show", item.getStatus().getShow());
+					pres_el.addChild(show);
+				}
+				Packet presence = new Packet(pres_el);
+				log.finest("Sending out presence: " + presence.toString());
+				addOutPacket(presence);
+			}
+		}
+	}
+
 	public void userRoster(GatewayConnection gc) {
 		String[] jids = gc.getAllJids();
 		String id = JIDUtils.getNodeID(jids[0]);
@@ -578,31 +605,15 @@ public class Gateway extends AbstractMessageReceiver
 				log.log(Level.WARNING, "Problem updating repository data", e);
 			}
 
-			//			if (authorized.equals("false")) {
-				// Send authorization request...
 			for (String username: jids) {
 				Packet presence = new Packet(new Element("presence",
 						new String[] {"to", "from", "type"},
 						new String[] {username, from, "subscribe"}));
 				log.finest("Sending out presence: " + presence.toString());
 				addOutPacket(presence);
-				//			}
-
-				Element pres_el = new Element("presence",
-					new String[] {"to", "from"},
-					new String[] {username, from});
-				if (item.getStatus().getType() != null) {
-					pres_el.setAttribute("type", item.getStatus().getType());
-				}
-				if (item.getStatus().getShow() != null) {
-					Element show = new Element("show", item.getStatus().getShow());
-					pres_el.addChild(show);
-				}
-				presence = new Packet(pres_el);
-				log.finest("Sending out presence: " + presence.toString());
-				addOutPacket(presence);
 			}
 		}
+		updateRosterPresence(roster, jids);
 	}
 
 	public void updateStatus(GatewayConnection gc, RosterItem item) {
