@@ -555,7 +555,7 @@ public class Presence extends XMPPProcessor
 		} // end of try
 		catch (NotAuthorizedException e) {
       log.warning(
-				"Received roster request but user session is not authorized yet: " +
+				"Can not access user Roster, user session is not authorized yet: " +
         packet.getStringData());
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 					"You must authorize session first.", true));
