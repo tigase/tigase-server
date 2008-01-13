@@ -519,6 +519,16 @@ public class Gateway extends AbstractMessageReceiver
 			addOutPacket(new Packet(new Element("presence",
 						new String[] {"from", "to", "type"},
 						new String[] {myDomain(), username, "unavailable"})));
+			List<RosterItem> roster = gc.getRoster();
+			for (RosterItem item: roster) {
+				String from = formatJID(item.getBuddyId());
+				Element pres_el = new Element("presence",
+					new String[] {"to", "from", "type"},
+					new String[] {username, from, "unavailable"});
+				Packet presence = new Packet(pres_el);
+				log.finest("Sending out presence: " + presence.toString());
+				addOutPacket(presence);
+			}
 		}
 	}
 
