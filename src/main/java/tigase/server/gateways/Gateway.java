@@ -70,10 +70,15 @@ public class Gateway extends AbstractMessageReceiver
 	public static final String GW_REPO_URL_PROP_KEY = "gw-repo-url";
 	public static final String GW_CLASS_NAME_PROP_KEY = "gw-class-name";
 	public static final String GW_CLASS_NAME_PROP_VAL =
-		"tigase.server.gateways.MsnConnection";
+		"tigase.extras.gateway.MsnConnection";
+	public static final String GW_MODERATED_PROP_KEY = "is-moderated";
+	public static final boolean GW_MODERATED_PROP_VAL = false;
 
 	private static final String username_key = "user-name-key";
 	private static final String password_key = "password-key";
+	private static final String moderated_key = "moderated-key";
+	private static final String moderated_true = "true";
+	private static final String moderated_false = "false";
 	private static final String AUTHORIZED_KEY = "authorized-key";
 	private static final String NAME_KEY = "authorized-key";
 	private static final String PRESENCE_TYPE = "presence-type";
@@ -84,6 +89,7 @@ public class Gateway extends AbstractMessageReceiver
 	private ServiceEntity serviceEntity = null;
 	private String[] admins = ADMINS_PROP_VAL;
 	private String gw_class_name = GW_CLASS_NAME_PROP_VAL;
+	private boolean is_moderated = GW_MODERATED_PROP_VAL;
 	private String gw_name = "Undefined";
 	private String gw_type = "unknown";
 	private String gw_desc = "empty";
@@ -112,6 +118,8 @@ public class Gateway extends AbstractMessageReceiver
 		admins = (String[])props.get(ADMINS_PROP_KEY);
 		Arrays.sort(admins);
 
+		is_moderated = (Boolean)props.get(GW_MODERATED_PROP_KEY);
+
 		try {
 			String cls_name = (String)props.get(GW_REPO_CLASS_PROP_KEY);
 			String res_uri = (String)props.get(GW_REPO_URL_PROP_KEY);
@@ -126,8 +134,6 @@ public class Gateway extends AbstractMessageReceiver
 		} catch (Exception e) {
 			log.log(Level.SEVERE, "Can't initialize repository", e);
 		} // end of try-catch
-
-
 	}
 
 	public Map<String, Object> getDefaults(final Map<String, Object> params) {
@@ -164,6 +170,7 @@ public class Gateway extends AbstractMessageReceiver
 		defs.put(ADMINS_PROP_KEY, ADMINS_PROP_VAL);
 
 		defs.put(GW_CLASS_NAME_PROP_KEY, GW_CLASS_NAME_PROP_VAL);
+		defs.put(GW_MODERATED_PROP_KEY, GW_MODERATED_PROP_VAL);
 
 		return defs;
 	}
@@ -181,7 +188,24 @@ public class Gateway extends AbstractMessageReceiver
 		return null;
 	}
 
-	private void processRegister(Packet packet) {
+	private boolean isAdmin(String jid) {
+		for (String adm: admins) {
+			if (adm.equals(JIDUtils.getNodeID(jid))) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private void sendToAdmins(Element elem) {
+		for (String adm: admins) {
+			Element msg = elem.clone();
+			msg.setAttribute("to", adm);
+			addOutPacket(new Packet(msg));
+		}
+	}
+
+	private void processRegister(Packet packet) throws PacketErrorTypeException {
 		if (packet.getType() != null) {
 			switch (packet.getType()) {
 			case get:
@@ -200,17 +224,46 @@ public class Gateway extends AbstractMessageReceiver
 				try {
 					repository.setData(myDomain(), id, username_key, new_username);
 					repository.setData(myDomain(), id, password_key, new_password);
+					addOutPacket(packet.okResult((String)null, 0));
+					addOutPacket(new Packet(new Element("presence",
+								new String[] {"to", "from", "type"},
+								new String[] {id, myDomain(), "subscribe"})));
+					if (is_moderated && !isAdmin(id)) {
+						repository.setData(myDomain(), id, moderated_key, moderated_true);
+						addOutPacket(new Packet(new Element("message",
+									new Element[] {
+										new Element("body",
+											"Your subscription to the gateway needs administrator approval."
+											+ " You will be notified when your request has been processed"
+											+ " and you will be able to use the gateway since then." )
+									},
+									new String[] {"to", "from", "type", "id"},
+									new String[] {id, myDomain(), "chat", "gw-ap-1"})));
+						sendToAdmins(new Element("message",
+								new Element[] {
+									new Element("body",
+										"Gateway subscription request is awaiting for: " + id)
+								},
+								new String[] {"from", "type", "id"},
+								new String[] {myDomain(), "chat", "gw-ap-1"}));
+					} else {
+						repository.setData(myDomain(), id, moderated_key, moderated_false);
+					}
 				} catch (tigase.db.UserNotFoundException e) {
 					log.warning("This is most likely configuration error, please make"
 						+ " sure you have set '&autoCreateUser=true' property in your"
 						+ " database connection string.");
+					addOutPacket(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet,
+							"Please notify administrator with the message below:\n"
+							+ "This is most likely configuration error, please make"
+							+ " sure you have set '&autoCreateUser=true' property in your"
+							+ " database connection string.", true));
 				} catch (TigaseDBException e) {
 					log.log(Level.WARNING, "Database access error: ", e);
+					addOutPacket(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet,
+							"Please notify administrator with the message below:\n"
+							+ "Database access error: " + e, true));
 				}
-				addOutPacket(packet.okResult((String)null, 0));
-				addOutPacket(new Packet(new Element("presence",
-							new String[] {"to", "from", "type"},
-							new String[] {id, myDomain(), "subscribe"})));
 				break;
 			default:
 				break;
@@ -221,7 +274,7 @@ public class Gateway extends AbstractMessageReceiver
 	private void processPresence(Packet packet) {
 		if (packet.getElemTo().equals(myDomain())) {
 			if (packet.getType() == null || packet.getType() == StanzaType.available) {
-				// Open new connection if ti does not exist
+				// Open new connection if it does not exist
 				findConnection(packet, true);
 				return;
 			}
@@ -318,16 +371,11 @@ public class Gateway extends AbstractMessageReceiver
 		}
 	}
 
-	private void processGateway(Packet packet) {
+	private void processGateway(Packet packet) throws PacketErrorTypeException {
 		if (packet.getType() == null) {
-			try {
-				log.info("Bad gateway request: " + packet.toString());
-				addOutPacket(Authorization.BAD_REQUEST.getResponseMessage(packet,
-						"IQ request must have either 'set' or 'get' type.", true));
-			} catch (PacketErrorTypeException e) {
-				log.info("This must have been an error already, dropping: "
-					+ packet.toString() + ", exception: " + e);
-			}
+			log.info("Bad gateway request: " + packet.toString());
+			addOutPacket(Authorization.BAD_REQUEST.getResponseMessage(packet,
+					"IQ request must have either 'set' or 'get' type.", true));
 			return;
 		}
 		if (packet.getType() == StanzaType.get) {
@@ -344,7 +392,7 @@ public class Gateway extends AbstractMessageReceiver
 		}
 	}
 
-	private void processLocalPacket(Packet packet) {
+	private void processLocalPacket(Packet packet) throws PacketErrorTypeException {
 		if (packet.isXMLNS("/iq/query", "jabber:iq:register")) {
 			processRegister(packet);
 		}
@@ -375,6 +423,12 @@ public class Gateway extends AbstractMessageReceiver
 		GatewayConnection conn = gw_connections.get(id);
 		if (conn != null || !create) { return conn; }
 		try {
+			String moderated = repository.getData(myDomain(), id, moderated_key);
+			if (moderated == null || moderated.equals(moderated_true)) {
+				addOutPacket(Authorization.NOT_ALLOWED.getResponseMessage(packet,
+						"Administrator approval awaiting.", true));
+				return null;
+			}
 			String username = repository.getData(myDomain(), id, username_key);
 			String password = repository.getData(myDomain(), id, password_key);
 			if (username != null && password != null) {
@@ -395,37 +449,37 @@ public class Gateway extends AbstractMessageReceiver
 	}
 
 	public void processPacket(final Packet packet) {
-		if (packet.getElemTo() == null) {
-			log.warning("Bad packet, 'to' is null: " + packet.toString());
-			return;
-		}
-		if (packet.getElemName().equals("presence")) {
-			processPresence(packet);
-			return;
-		}
-		if (packet.getElemTo().equals(myDomain())) {
-			// Local processing.
-			log.fine("Local packet: " + packet.toString());
-			processLocalPacket(packet);
-			return;
-		}
-		GatewayConnection conn = findConnection(packet, false);
-		if (conn != null) {
-			try {
-				conn.sendMessage(packet);
-			} catch (GatewayException e) {
-				log.log(Level.WARNING, "Error initializing gateway connection", e);
+		try {
+			if (packet.getElemTo() == null) {
+				log.warning("Bad packet, 'to' is null: " + packet.toString());
+				return;
 			}
-		} else {
-			try {
+			if (packet.getElemName().equals("presence")) {
+				processPresence(packet);
+				return;
+			}
+			if (packet.getElemTo().equals(myDomain())) {
+				// Local processing.
+				log.fine("Local packet: " + packet.toString());
+				processLocalPacket(packet);
+				return;
+			}
+			GatewayConnection conn = findConnection(packet, false);
+			if (conn != null) {
+				try {
+					conn.sendMessage(packet);
+				} catch (GatewayException e) {
+					log.log(Level.WARNING, "Error initializing gateway connection", e);
+				}
+			} else {
 				log.finer("Gateway not connected, sending packet back: "
 					+ packet.toString());
 				addOutPacket(Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet,
 						"Gateway is not connected.", true));
-			} catch (PacketErrorTypeException e) {
-				log.info("This must have been an error already, dropping: "
-					+ packet.toString() + ", exception: " + e);
 			}
+		} catch (PacketErrorTypeException e) {
+			log.info("This must have been an error already, dropping: "
+				+ packet.toString() + ", exception: " + e);
 		}
 	}
 
