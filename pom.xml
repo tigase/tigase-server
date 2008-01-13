@@ -3,7 +3,7 @@
   <groupId>tigase</groupId>
   <artifactId>tigase-server</artifactId>
   <name>TigaseXMPPServer</name>
-  <version>3.2.0-SNAPSHOT</version>
+  <version>3.2.1-SNAPSHOT</version>
   <description>Tigase XMPP Server</description>
   <url>http://www.tigase.org/</url>
   <issueManagement>
