@@ -356,6 +356,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 			ios.addPacketToSend(p);
 			try {
 				ios.processWaitingPackets();
+				readThread.addSocketService(ios);
 				return true;
 			} catch (Exception e) {
 				log.log(Level.WARNING, "Exception during writing packets: ", e);

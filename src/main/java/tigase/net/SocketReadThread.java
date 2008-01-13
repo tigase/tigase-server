@@ -126,18 +126,23 @@ public class SocketReadThread implements Runnable {
 		} // end of if (key != null)
 	}
 
-  private void addAllWaiting() throws IOException {
+	private static final int READ_ONLY = SelectionKey.OP_READ;
+	private static final int READ_WRITE =
+		SelectionKey.OP_READ | SelectionKey.OP_WRITE;
+
+	private void addAllWaiting() throws IOException {
 
     IOService s = null;
     while ((s = waiting.poll()) != null) {
       final SocketChannel sc = s.getSocketChannel();
       try {
-        sc.register(clientsSel, SelectionKey.OP_READ, s);
+				int sel_key = READ_ONLY;
 				log.finest("ADDED OP_READ: " + s.getUniqueId());
 				if (s.waitingToSend()) {
-					sc.register(clientsSel, SelectionKey.OP_WRITE, s);
+					sel_key = READ_WRITE;
 					log.finest("ADDED OP_WRITE: " + s.getUniqueId());
 				}
+        sc.register(clientsSel, sel_key, s);
 			} catch (Exception e) {
         // Ignore such channel
 				log.finest("ERROR adding channel for: " + s.getUniqueId()
