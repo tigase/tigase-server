@@ -209,7 +209,6 @@ public class SessionManager extends AbstractMessageReceiver
 
 		if (!stop) {
 			walk(packet, conn, packet.getElement(), results);
-			setPermissions(conn, results);
 		}
 
 		if (!stop) {
@@ -822,6 +821,7 @@ public class SessionManager extends AbstractMessageReceiver
 						synchronized (item.conn) {
 							processor.process(item.packet, item.conn, naUserRepository,
 								local_results, plugin_config.get(processor.id()));
+							setPermissions(item.conn, local_results);
 						}
 					} else {
 							processor.process(item.packet, null, naUserRepository,
