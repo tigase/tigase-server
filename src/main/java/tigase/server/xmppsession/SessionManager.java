@@ -488,9 +488,7 @@ public class SessionManager extends AbstractMessageReceiver
 			++closedConnections;
 			connection = connectionsByFrom.remove(pc.getFrom());
 			if (connection != null) {
-				synchronized (connection) {
-					closeSession(connection);
-				}
+				closeSession(connection);
 			} else {
 				log.info("Can not find resource connection for packet: " +
 					pc.toString());
@@ -818,11 +816,9 @@ public class SessionManager extends AbstractMessageReceiver
 				try {
 					item = in_queue.take();
 					if (item.conn != null) {
-						synchronized (item.conn) {
-							processor.process(item.packet, item.conn, naUserRepository,
-								local_results, plugin_config.get(processor.id()));
-							setPermissions(item.conn, local_results);
-						}
+						processor.process(item.packet, item.conn, naUserRepository,
+							local_results, plugin_config.get(processor.id()));
+						setPermissions(item.conn, local_results);
 					} else {
 							processor.process(item.packet, null, naUserRepository,
 								local_results, plugin_config.get(processor.id()));
