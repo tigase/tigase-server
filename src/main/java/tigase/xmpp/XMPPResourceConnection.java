@@ -81,6 +81,8 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	private String userJid = null;
 	private String userId = null;
 
+	private long id_counter = 0;
+
 	/**
 	 * Session temporary data. All data stored in this <code>Map</code> disapear
 	 * when session finishes.
@@ -346,6 +348,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 		Authorization result = super.loginOther(props);
 		if (result == Authorization.AUTHORIZED) {
 			String user = (String)props.get(UserAuthRepository.USER_ID_KEY);
+			log.finest("UserAuthRepository.USER_ID_KEY: " + user);
 			String nick = JIDUtils.getNodeNick(user);
 			if (nick == null) {
 				nick = user;
@@ -361,6 +364,10 @@ public class XMPPResourceConnection extends RepositoryAccess {
 
 	public void setDummy(boolean dummy) {
 		this.dummy = dummy;
+	}
+
+	public String nextStanzaId() {
+		return "tig" + (++id_counter);
 	}
 
 } // XMPPResourceConnection
