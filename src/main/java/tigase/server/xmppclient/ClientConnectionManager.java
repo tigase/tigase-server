@@ -162,6 +162,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 	public Queue<Packet> processSocketData(XMPPIOService serv) {
 
 		String id = getUniqueId(serv);
+		String hostname = (String)serv.getSessionData().get(serv.HOSTNAME_KEY);
 
 		Packet p = null;
 		while ((p = serv.getReceivedPackets().poll()) != null) {
@@ -169,7 +170,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 				+ ", type: " + p.getType());
 			log.finest("Processing socket data: " + p.getStringData());
 			p.setFrom(getFromAddress(id));
-			p.setTo(routings.computeRouting(p.getElemTo()));
+			p.setTo(routings.computeRouting(hostname));
 			addOutPacket(p);
 			// 			results.offer(new Packet(new Element("OK")));
 		} // end of while ()
