@@ -186,20 +186,24 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 			HOSTNAMES_PROP_VAL = DNSResolver.getDefHostNames();
 		}
 		props.put(HOSTNAMES_PROP_KEY, HOSTNAMES_PROP_VAL);
-		props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_MODE_PROP_KEY,
-			ROUTING_MODE_PROP_VAL);
-		// If the server is configured as connection manager only node then
-		// route packets to SM on remote host where is default routing
-		// for external component.
-		// Otherwise default routing is to SM on localhost
-		if (params.get("config-type").equals(GEN_CONFIG_CS)
-			&& params.get(GEN_EXT_COMP) != null) {
-			String[] comp_params = ((String)params.get(GEN_EXT_COMP)).split(",");
-			props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_ENTRY_PROP_KEY,
-				DEF_SM_NAME + "@" + comp_params[1]);
-		} else {
-			props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_ENTRY_PROP_KEY,
-				DEF_SM_NAME + "@" + HOSTNAMES_PROP_VAL[0]);
+		Boolean r_mode = (Boolean)params.get(getName() + "/" + ROUTINGS_PROP_KEY
+			+ "/" + ROUTING_MODE_PROP_KEY);
+		if (r_mode == null) {
+			props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_MODE_PROP_KEY,
+				ROUTING_MODE_PROP_VAL);
+			// If the server is configured as connection manager only node then
+			// route packets to SM on remote host where is default routing
+			// for external component.
+			// Otherwise default routing is to SM on localhost
+			if (params.get("config-type").equals(GEN_CONFIG_CS)
+				&& params.get(GEN_EXT_COMP) != null) {
+				String[] comp_params = ((String)params.get(GEN_EXT_COMP)).split(",");
+				props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_ENTRY_PROP_KEY,
+					DEF_SM_NAME + "@" + comp_params[1]);
+			} else {
+				props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_ENTRY_PROP_KEY,
+					DEF_SM_NAME + "@" + HOSTNAMES_PROP_VAL[0]);
+			}
 		}
 		return props;
 	}
