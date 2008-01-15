@@ -308,7 +308,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 			if (attribs.get("version") != null) {
 				addOutPacket(Command.GETFEATURES.getPacket(
 					getFromAddress(getUniqueId(serv)),
-					routings.computeRouting(null), StanzaType.get, "sess2", null));
+					routings.computeRouting(hostname), StanzaType.get, "sess2", null));
 			} // end of if (attribs.get("version") != null)
 		} catch (IOException e) {
 			serv.stop();
@@ -320,9 +320,11 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 	public void serviceStopped(XMPPIOService service) {
 		super.serviceStopped(service);
 		//		XMPPIOService serv = (XMPPIOService)service;
+		String hostname =
+			(String)service.getSessionData().get(service.HOSTNAME_KEY);
 		Packet command = Command.STREAM_CLOSED.getPacket(
 			getFromAddress(getUniqueId(service)),
-			routings.computeRouting(null), StanzaType.set, "sess1");
+			routings.computeRouting(hostname), StanzaType.set, "sess1");
 		addOutPacket(command);
 		log.fine("Service stopped, sending packet: " + command.getStringData());
 	}
