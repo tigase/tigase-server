@@ -33,6 +33,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.xml.Element;
@@ -201,6 +202,30 @@ public class BoshSession {
 		}
 	}
 
+	private Pattern[] links_regexs =	{
+			Pattern.compile("([^>/\";]|^)(www\\.[^ ]+)", Pattern.CASE_INSENSITIVE),
+			Pattern.compile("([^\">;]|^)(http://[^ ]+)", Pattern.CASE_INSENSITIVE),
+	};
+	private String[] replace_with = {
+		"$1&lt;a href=\"http://$2\" target=\"_blank\"&gt;$2&lt;/a&gt;",
+		"$1&lt;a href=\"$2\" target=\"_blank\"&gt;$2&lt;/a&gt;",
+	};
+
+	private Element applyFilters(Element packet) {
+		Element result = packet.clone();
+		if (result.getName().equals("message")) {
+			String body =	result.getCData("/message/body");
+			if (body != null) {
+				int count = 0;
+				for (Pattern reg: links_regexs) {
+					body = reg.matcher(body).replaceAll(replace_with[count++]);
+				}
+				result.getChild("body").setCData(body);
+			}
+		}
+		return result;
+	}
+
 	private void sendBody(BoshIOService serv, Element body_par) {
 		Element body = body_par;
 		if (body == null) {
@@ -215,10 +240,10 @@ public class BoshSession {
 										"http://etherx.jabber.org/streams"});
 			body.setXMLNS(BOSH_XMLNS);
 			if (waiting_packets.size() > 0) {
-				body.addChild(waiting_packets.poll().getElement());
+				body.addChild(applyFilters(waiting_packets.poll().getElement()));
 				while (waiting_packets.size() > 0
 					&& body.getChildren().size() < MAX_PACKETS) {
-					body.addChild(waiting_packets.poll().getElement());
+					body.addChild(applyFilters(waiting_packets.poll().getElement()));
 				}
 			}
 		}
