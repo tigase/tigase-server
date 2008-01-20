@@ -207,8 +207,8 @@ public class BoshSession {
 			Pattern.compile("([^\">;]|^)(http://[^ ]+)", Pattern.CASE_INSENSITIVE),
 	};
 	private String[] replace_with = {
-		"$1&lt;a href=\"http://$2\" target=\"_blank\"&gt;$2&lt;/a&gt;",
-		"$1&lt;a href=\"$2\" target=\"_blank\"&gt;$2&lt;/a&gt;",
+		"$1&lt;a href=\"http://$2\" target=\"_top\"&gt;$2&lt;/a&gt;",
+		"$1&lt;a href=\"$2\" target=\"_top\"&gt;$2&lt;/a&gt;",
 	};
 
 	private Element applyFilters(Element packet) {
