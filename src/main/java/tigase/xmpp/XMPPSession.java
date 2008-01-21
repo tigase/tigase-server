@@ -89,10 +89,10 @@ public class XMPPSession {
 		if (old_conn != null) {
 			log.finest("Found old resource connection for username : " + username
 				+ ", id: "+old_conn.getConnectionId());
-			removeResourceConnection(old_conn);
 			try { old_conn.logout(); } catch (Exception e) {
 				log.log(Level.INFO, "Exception during closing old connection, ignoring.", e);
 			}
+			removeResourceConnection(old_conn);
 		} // end of if (old_res != null)
 		activeResources.add(conn);
 	}
