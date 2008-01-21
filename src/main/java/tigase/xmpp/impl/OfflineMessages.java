@@ -224,7 +224,11 @@ public class OfflineMessages extends XMPPProcessor
 			while ((elem = elems.poll()) != null) {
 				pacs.offer(new Packet(elem));
 			} // end of while (elem = elems.poll() != null)
-			Collections.sort(pacs, new StampComparator());
+			try {
+				Collections.sort(pacs, new StampComparator());
+			} catch (NullPointerException e) {
+				log.warning("Can not sort off line messages, " + e);
+			}
 			return pacs;
 		} // end of if (msgs != null)
 		else {
