@@ -732,7 +732,10 @@ public class SessionManager extends AbstractMessageReceiver
 
 	public void handleLogout(final String userName,
 		final XMPPResourceConnection conn) {
-		String userId = JIDUtils.getNodeID(userName, conn.getDomain());
+		String domain = conn.getDomain();
+		addOutPacket(Command.CLOSE.getPacket(JIDUtils.getNodeID(getName(), domain),
+				conn.getConnectionId(), StanzaType.set, conn.nextStanzaId()));
+		String userId = JIDUtils.getNodeID(userName, domain);
 		XMPPSession session = sessionsByNodeId.get(userId);
 		if (session != null && session.getActiveResourcesSize() <= 1) {
 			sessionsByNodeId.remove(userId);

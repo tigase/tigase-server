@@ -188,6 +188,11 @@ public class BoshSession {
 		return domain;
 	}
 
+	public void close() {
+		terminate = true;
+		processPacket(null, null);
+	}
+
 	public void processPacket(Packet packet,
 		Queue<Packet> out_results) {
 

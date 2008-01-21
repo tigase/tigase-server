@@ -116,6 +116,9 @@ public class BoshConnectionManager extends ConnectionManager<BoshIOService>
 				session.processPacket(new Packet(elem_features), null);
 			} // end of if (packet.getType() == StanzaType.get)
 			break;
+		case CLOSE:
+			session.close();
+			break;
 		default:
 			break;
 		} // end of switch (pc.getCommand())
