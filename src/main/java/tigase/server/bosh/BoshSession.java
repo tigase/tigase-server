@@ -201,7 +201,8 @@ public class BoshSession {
 				"] Processing packet: " + packet.toString());
 			waiting_packets.offer(packet);
 		}
-		if (connections.size() > 0 && waiting_packets.size() > 0) {
+		if (connections.size() > 0 &&
+			(waiting_packets.size() > 0 || terminate)) {
 			BoshIOService serv = connections.poll();
 			sendBody(serv, null);
 		}

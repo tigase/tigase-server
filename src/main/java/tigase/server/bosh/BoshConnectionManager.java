@@ -117,6 +117,7 @@ public class BoshConnectionManager extends ConnectionManager<BoshIOService>
 			} // end of if (packet.getType() == StanzaType.get)
 			break;
 		case CLOSE:
+			log.fine("Closing session: " + session.getSid());
 			session.close();
 			break;
 		default:
