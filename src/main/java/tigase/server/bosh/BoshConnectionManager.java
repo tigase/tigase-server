@@ -119,6 +119,7 @@ public class BoshConnectionManager extends ConnectionManager<BoshIOService>
 		case CLOSE:
 			log.fine("Closing session: " + session.getSid());
 			session.close();
+			sessions.remove(session.getSid());
 			break;
 		default:
 			break;
@@ -148,7 +149,8 @@ public class BoshConnectionManager extends ConnectionManager<BoshIOService>
 					if (bs != null) {
 						bs.processSocketPacket(p, serv, out_results);
 					} else {
-						log.warning("There is no session with given SID. Ignoring for now...");
+						log.warning("There is no session with given SID. Closing invalid connection");
+						serv.stop();
 					}
 				}
 				addOutPackets(out_results, bs);
