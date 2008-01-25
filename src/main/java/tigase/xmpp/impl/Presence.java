@@ -143,6 +143,20 @@ public class Presence extends XMPPProcessor
 		} // end of if (direct_presence != null)
   }
 
+	protected void resendPendingInRequests(final XMPPResourceConnection session,
+    final Queue<Packet> results)
+    throws NotAuthorizedException {
+		String[] buddies = Roster.getBuddies(session, Roster.PENDING_IN);
+		if (buddies != null) {
+			for (String buddy: buddies) {
+				Element presence = new Element("presence");
+				presence.setAttribute("type", StanzaType.subscribe.toString());
+				presence.setAttribute("from", buddy);
+				updatePresenceChange(presence, session, results);
+			}
+		}
+	}
+
 	/**
 	 * <code>updateOfflineChange</code> method broadcast off-line presence
 	 * to all other user active resources.
@@ -364,11 +378,13 @@ public class Presence extends XMPPProcessor
 							session.setPriority(pr);
 						}
 
-						// Send presence probes to 'to' or 'both' contacts if this is
-						// availability presence
+						// Special actions on the first availability presence
 						if (first && type == StanzaType.available) {
+							// Send presence probes to 'to' or 'both' contacts
 							sendPresenceBroadcast(StanzaType.probe, session, TO_SUBSCRIBED,
 								results, null, settings);
+							// Resend pending in subscription requests
+							resendPendingInRequests(session, results);
 						} // end of if (type == StanzaType.available)
 
 						// Broadcast initial presence to 'from' or 'both' contacts
@@ -455,11 +471,9 @@ public class Presence extends XMPPProcessor
 							curr_sub = SubscriptionType.none;
 							Roster.addBuddy(session, packet.getElemFrom());
 						} // end of if (curr_sub == null)
-						subscr_changed = Roster.updateBuddySubscription(session, pres_type,
+						Roster.updateBuddySubscription(session, pres_type,
 							packet.getElemFrom());
-						if (subscr_changed) {
-							updatePresenceChange(packet.getElement(), session, results);
-						}
+						updatePresenceChange(packet.getElement(), session, results);
 					} // end of else
 					break;
 				case in_unsubscribe:
