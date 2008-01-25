@@ -113,6 +113,12 @@ public class Roster {
 	protected static final EnumSet<StanzaType> INITIAL_PRESENCES =
 		EnumSet.of(StanzaType.available, StanzaType.unavailable);
 
+	protected static final EnumSet<SubscriptionType> PENDING_IN =
+    EnumSet.of(
+			SubscriptionType.none_pending_in,
+			SubscriptionType.none_pending_out_in,
+			SubscriptionType.to_pending_in);
+
 	// Below StateTransition enum is implementation of all below tables
 	// coming from RFC-3921
 
@@ -387,8 +393,6 @@ public class Roster {
 		return subsToStateMap.get(subscription).getStateTransition(presence);
 	}
 
-	private static long iq_id = 0;
-
 	public static PresenceType getPresenceType(
 		final XMPPResourceConnection session, final Packet packet)
 		throws NotAuthorizedException {
@@ -449,6 +453,12 @@ public class Roster {
 		return null;
 	}
 
+	public static boolean isPendingIn(final XMPPResourceConnection session,
+		final String jid) throws NotAuthorizedException {
+		SubscriptionType subscr = getBuddySubscription(session, jid);
+		return PENDING_IN.contains(subscr);
+	}
+
 	public static boolean isSubscribedTo(final XMPPResourceConnection session,
 		final String jid) throws NotAuthorizedException {
 		SubscriptionType subscr = getBuddySubscription(session, jid);
@@ -507,6 +517,7 @@ public class Roster {
   public static SubscriptionType getBuddySubscription(
 		final XMPPResourceConnection session,
     final String buddy) throws NotAuthorizedException {
+		//		return SubscriptionType.both;
 		String subscr = session.getData(groupNode(buddy),	SUBSCRIPTION, null);
 		if (subscr != null) {
 			return SubscriptionType.valueOf(subscr);
@@ -596,7 +607,7 @@ public class Roster {
 		for (XMPPResourceConnection conn: session.getActiveSessions()) {
 			Element conn_update = update.clone();
 			conn_update.setAttribute("to", conn.getJID());
-			conn_update.setAttribute("id", ""+(++iq_id));
+			conn_update.setAttribute("id", "rst"+session.nextStanzaId());
 			Packet pack_update = new Packet(conn_update);
 			pack_update.setTo(conn.getConnectionId());
 			pack_update.setFrom(session.getJID());
