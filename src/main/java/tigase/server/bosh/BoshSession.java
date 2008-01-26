@@ -303,8 +303,11 @@ public class BoshSession {
 				// Some client send IQ stanzas with private data to store some
 				// settings so some confirmation stanzas might be sent back
 				// let's give the client a few secs for session termination
-				max_pause = 2;   // Max pause changed to 2 secs
+				max_inactivity = 2;   // Max pause changed to 2 secs
 				terminate = true;
+				Packet command = Command.STREAM_CLOSED.getPacket(null, null,
+					StanzaType.set, "sess1");
+				out_results.offer(command);
 			}
 			if (packet.getAttribute(RESTART_ATTR) != null
 				&& packet.getAttribute(RESTART_ATTR).equals("true")) {
