@@ -333,7 +333,7 @@ public class BoshSession {
 		// Send packets waiting in queue...
 		processPacket(null, out_results);
 
-		if (connections.size() > 1) {
+		if (connections.size() > concurrent_requests) {
 			BoshIOService serv = connections.poll();
 			sendBody(serv, null);
 		}
