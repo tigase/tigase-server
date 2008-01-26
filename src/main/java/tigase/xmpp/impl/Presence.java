@@ -427,7 +427,16 @@ public class Presence extends XMPPProcessor
 							Roster.getBuddyItem(session, packet.getElemTo()));
 						forwardPresence(results, packet, session.getUserId());
 						if (pres_type == PresenceType.out_subscribed) {
-							sendPresence(StanzaType.available, packet.getElemTo(),
+							Element presence = (Element)session.getSessionData(PRESENCE_KEY);
+							if (presence != null) {
+								sendPresence(null, packet.getElemTo(), session.getJID(),
+									results, presence);
+							} else {
+								sendPresence(StanzaType.available, packet.getElemTo(),
+									session.getJID(), results, null);
+							}
+						} else {
+							sendPresence(StanzaType.unavailable, packet.getElemTo(),
 								session.getJID(), results, null);
 						}
 					} // end of if (subscr_changed)
