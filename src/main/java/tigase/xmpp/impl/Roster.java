@@ -577,22 +577,23 @@ public class Roster {
 		final String buddy)
     throws NotAuthorizedException {
 		SubscriptionType subscr = getBuddySubscription(session, buddy);
-    if (subscr != null) {
-			Element item = new Element("item");
-			item.setAttribute("jid", JIDUtils.getNodeID(buddy));
-			item.addAttributes(subscr.getSubscriptionAttr());
-			item.setAttribute("name", getBuddyName(session, buddy));
-      String[] groups = getBuddyGroups(session, buddy);
-      if (groups != null) {
-        for (String gr : groups) {
-					Element group = new Element("group");
-					group.setCData(gr);
-					item.addChild(group);
-        } // end of for ()
-      } // end of if-else
-			return item;
+    if (subscr == null) {
+			subscr = SubscriptionType.none;
+			setBuddySubscription(session, subscr, buddy);
     } // end of if
-		return null;
+		Element item = new Element("item");
+		item.setAttribute("jid", JIDUtils.getNodeID(buddy));
+		item.addAttributes(subscr.getSubscriptionAttr());
+		item.setAttribute("name", getBuddyName(session, buddy));
+		String[] groups = getBuddyGroups(session, buddy);
+		if (groups != null) {
+			for (String gr : groups) {
+				Element group = new Element("group");
+				group.setCData(gr);
+				item.addChild(group);
+			} // end of for ()
+		} // end of if-else
+		return item;
   }
 
 	public static void updateBuddyChange(final XMPPResourceConnection session,

@@ -41,7 +41,7 @@ public abstract class Constants {
 	protected static final String MIN_POLLING_PROP_KEY = "min-polling";
 	protected static final long MIN_POLLING_PROP_VAL = 10;
 	protected static final String MAX_INACTIVITY_PROP_KEY = "max-inactivity";
-	protected static final long MAX_INACTIVITY_PROP_VAL = 20;
+	protected static final long MAX_INACTIVITY_PROP_VAL = 10;
 	protected static final String CONCURRENT_REQUESTS_PROP_KEY =
 		"concurrent-requests";
 	protected static final int CONCURRENT_REQUESTS_PROP_VAL = 2;
