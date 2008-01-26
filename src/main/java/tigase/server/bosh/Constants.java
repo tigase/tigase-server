@@ -37,18 +37,18 @@ public abstract class Constants {
 	protected static final int MAX_PACKETS = 2;
 
 	protected static final String MAX_WAIT_DEF_PROP_KEY = "max-wait";
-	protected static final long MAX_WAIT_DEF_PROP_VAL = 60;
+	protected static final long MAX_WAIT_DEF_PROP_VAL = 30;
 	protected static final String MIN_POLLING_PROP_KEY = "min-polling";
 	protected static final long MIN_POLLING_PROP_VAL = 10;
 	protected static final String MAX_INACTIVITY_PROP_KEY = "max-inactivity";
-	protected static final long MAX_INACTIVITY_PROP_VAL = 60;
+	protected static final long MAX_INACTIVITY_PROP_VAL = 20;
 	protected static final String CONCURRENT_REQUESTS_PROP_KEY =
 		"concurrent-requests";
 	protected static final int CONCURRENT_REQUESTS_PROP_VAL = 2;
 	protected static final String HOLD_REQUESTS_PROP_KEY = "hold-requests";
 	protected static final int HOLD_REQUESTS_PROP_VAL = 1;
 	protected static final String MAX_PAUSE_PROP_KEY = "max-inactivity";
-	protected static final long MAX_PAUSE_PROP_VAL = 120;
+	protected static final long MAX_PAUSE_PROP_VAL = 10;
 
 	protected static final String BOSH_XMLNS = "http://jabber.org/protocol/httpbind";
 	protected static final String BODY_EL_NAME = "body";

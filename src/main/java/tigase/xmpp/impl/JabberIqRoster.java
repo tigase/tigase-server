@@ -95,10 +95,6 @@ public class JabberIqRoster extends XMPPProcessor
     if (subscription != null && subscription.equals("remove")) {
 			SubscriptionType sub = Roster.getBuddySubscription(session, buddy);
 			if (sub != null && sub != SubscriptionType.none) {
-				Element it = new Element("item");
-				it.setAttribute("jid", buddy);
-				it.setAttribute("subscription", "remove");
-				Roster.updateBuddyChange(session, results, it);
 				Element pres = new Element("presence");
 				pres.setAttribute("to", buddy);
 				pres.setAttribute("from", session.getUserId());
@@ -114,7 +110,14 @@ public class JabberIqRoster extends XMPPProcessor
 				pres.setAttribute("from", session.getJID());
 				pres.setAttribute("type", "unavailable");
 				results.offer(new Packet(pres));
-			} // end of if (sub != null && sub != SubscriptionType.none)
+			}
+			// It happens sometimes that the client still think the buddy
+			// is in the roster while he isn't. In such a case just ensure the
+			// client that the buddy has been removed for sure
+			Element it = new Element("item");
+			it.setAttribute("jid", buddy);
+			it.setAttribute("subscription", "remove");
+			Roster.updateBuddyChange(session, results, it);
 			Roster.removeBuddy(session, buddy);
       results.offer(packet.okResult((String)null, 0));
     } else {

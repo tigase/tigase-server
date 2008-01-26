@@ -106,7 +106,7 @@
     <dependency>
       <groupId>tigase</groupId>
       <artifactId>tigase-xmltools</artifactId>
-      <version>3.0.2</version>
+      <version>3.0.4</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
