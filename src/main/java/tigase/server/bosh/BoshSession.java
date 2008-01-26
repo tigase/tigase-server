@@ -353,7 +353,7 @@ public class BoshSession {
 			}
 			TimerTask tt = enum_task.get(TimedTask.STOP);
 			if (connections.size() == 0 && tt == null) {
-				tt = handler.scheduleTask(this, max_pause*SECOND);
+				tt = handler.scheduleTask(this, max_inactivity*SECOND);
 				task_enum.put(tt, TimedTask.STOP);
 				enum_task.put(TimedTask.STOP, tt);
 			}
