@@ -254,8 +254,10 @@ public class Presence extends XMPPProcessor
 		final Packet packet, final String from) {
 		Element result = packet.getElement().clone();
 		// Not needed anymore. Packet filter does it for all stanzas.
-// 		// According to spec we must set proper FROM attribute
-// 		result.setAttribute("from", from);
+ 		// According to spec we must set proper FROM attribute
+		// Yes, but packet filter put full JID and we need a subscription
+		// presence without resource here.
+		result.setAttribute("from", from);
 		log.finest("\n\nFORWARD presence: " + result.toString());
 		results.offer(new Packet(result));
 	}
