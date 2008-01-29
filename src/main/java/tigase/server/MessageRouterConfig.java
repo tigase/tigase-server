@@ -95,6 +95,11 @@ public class MessageRouterConfig {
 		REGISTRATOR_PROP_KEY + "stat-1.active";
 	public static final boolean STAT_1_ACTIVE_PROP_VAL = true;
 
+	public static final String DISCO_NAME_PROP_KEY = "disco-name";
+	public static final String DISCO_NAME_PROP_VAL = tigase.server.XMPPServer.NAME;
+	public static final String DISCO_SHOW_VERSION_PROP_KEY = "disco-show-version";
+	public static final boolean DISCO_SHOW_VERSION_PROP_VAL = true;
+
 	public static void getDefaults(Map<String, Object> defs,
 		Map<String, Object> params, String comp_name) {
 
@@ -173,6 +178,8 @@ public class MessageRouterConfig {
 			LOCAL_ADDRESSES_PROP_VALUE = DNSResolver.getDefHostNames();
 		}
     defs.put(LOCAL_ADDRESSES_PROP_KEY, LOCAL_ADDRESSES_PROP_VALUE);
+		defs.put(DISCO_NAME_PROP_KEY, DISCO_NAME_PROP_VAL);
+		defs.put(DISCO_SHOW_VERSION_PROP_KEY, DISCO_SHOW_VERSION_PROP_VAL);
 	}
 
 	private Map<String, Object> props = null;

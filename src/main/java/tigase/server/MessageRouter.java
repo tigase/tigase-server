@@ -77,6 +77,8 @@ public class MessageRouter extends AbstractMessageReceiver {
 	private static final long startupTime = System.currentTimeMillis();
 
 	private Set<String> localAddresses =	new CopyOnWriteArraySet<String>();
+	private String disco_name = DISCO_NAME_PROP_VAL;
+	private boolean disco_show_version = DISCO_SHOW_VERSION_PROP_VAL;
 
   private ComponentRegistrator config = null;
 	private ServiceEntity serviceEntity = null;
@@ -362,10 +364,15 @@ public class MessageRouter extends AbstractMessageReceiver {
       inProperties = true;
     } // end of if (inProperties) else
 
+		disco_name = (String)props.get(DISCO_NAME_PROP_KEY);
+		disco_show_version = (Boolean)props.get(DISCO_SHOW_VERSION_PROP_KEY);
+
 		serviceEntity = new ServiceEntity("Tigase", "server", "Session manager");
 		serviceEntity.addIdentities(new ServiceIdentity[] {
-				new ServiceIdentity("server", "im", tigase.server.XMPPServer.NAME +
-					" ver. " + tigase.server.XMPPServer.getImplementationVersion())});
+				new ServiceIdentity("server", "im", disco_name +
+					(disco_show_version ?
+						(" ver. " + tigase.server.XMPPServer.getImplementationVersion())
+						: ""))});
 		serviceEntity.addFeatures(XMPPService.DEF_FEATURES);
 
     try {
