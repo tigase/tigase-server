@@ -70,17 +70,17 @@ public class JabberIqIq extends XMPPProcessor
 	};
 
   public Element[] supDiscoFeatures(final XMPPResourceConnection session)
-	{ return Arrays.copyOf(DISCO_FEATURES, DISCO_FEATURES.length); }
+	{ return DISCO_FEATURES; }
 
 	// Implementation of tigase.xmpp.XMPPImplIfc
 
 	public String id() { return ID; }
 
 	public String[] supElements()
-	{ return Arrays.copyOf(ELEMENTS, ELEMENTS.length); }
+	{ return ELEMENTS; }
 
   public String[] supNamespaces()
-	{ return Arrays.copyOf(XMLNSS, XMLNSS.length); }
+	{ return XMLNSS; }
 
 	public boolean preProcess(Packet packet, XMPPResourceConnection session,
 		NonAuthUserRepository repo,	Queue<Packet> results) {

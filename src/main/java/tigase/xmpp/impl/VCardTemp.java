@@ -72,7 +72,7 @@ public class VCardTemp extends XMPPProcessor implements XMPPProcessorIfc {
 	};
 
   public Element[] supDiscoFeatures(final XMPPResourceConnection session)
-	{ return Arrays.copyOf(DISCO_FEATURES, DISCO_FEATURES.length); }
+	{ return DISCO_FEATURES; }
 
 
 	private static final SimpleParser parser =
@@ -82,11 +82,9 @@ public class VCardTemp extends XMPPProcessor implements XMPPProcessorIfc {
 
 	public String id() { return ID; }
 
-	public String[] supElements()
-	{ return Arrays.copyOf(ELEMENTS, ELEMENTS.length); }
+	public String[] supElements()	{ return ELEMENTS; }
 
-  public String[] supNamespaces()
-	{ return Arrays.copyOf(XMLNSS, XMLNSS.length); }
+  public String[] supNamespaces()	{ return XMLNSS; }
 
 
 	// Implementation of tigase.xmpp.XMPPProcessorIfc

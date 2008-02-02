@@ -21,7 +21,6 @@
  */
 package tigase.xmpp.impl;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.ArrayList;
@@ -53,8 +52,7 @@ import static tigase.xmpp.impl.Roster.SubscriptionType;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class JabberIqRoster extends XMPPProcessor
-	implements XMPPProcessorIfc {
+public abstract class JabberIqRoster {
 
   /**
    * Private logger for class instancess.
@@ -62,27 +60,14 @@ public class JabberIqRoster extends XMPPProcessor
   private static Logger log =
 		Logger.getLogger("tigase.xmpp.impl.JabberIqRoster");
 
-  private static final String XMLNS = "jabber:iq:roster";
-	private static final String ID = XMLNS;
+  protected static final String XMLNS = "jabber:iq:roster";
 	private static final String[] ELEMENTS = {"query"};
   private static final String[] XMLNSS = {XMLNS};
-  private static final Element[] DISCO_FEATURES =	{
+  protected static final Element[] DISCO_FEATURES =	{
 		new Element("feature", new String[] {"var"}, new String[] {XMLNS})
 	};
 
-  public Element[] supDiscoFeatures(final XMPPResourceConnection session)
-	{ return Arrays.copyOf(DISCO_FEATURES, DISCO_FEATURES.length); }
-
-
-	public String id() { return ID; }
-
-	public String[] supElements()
-	{ return Arrays.copyOf(ELEMENTS, ELEMENTS.length); }
-
-  public String[] supNamespaces()
-	{ return Arrays.copyOf(XMLNSS, XMLNSS.length); }
-
-	private void processSetRequest(final Packet packet,
+	private static void processSetRequest(final Packet packet,
 		final XMPPResourceConnection session,	final Queue<Packet> results)
     throws NotAuthorizedException {
 
@@ -146,7 +131,7 @@ public class JabberIqRoster extends XMPPProcessor
     } // end of else
   }
 
-	private void processGetRequest(final Packet packet,
+	private static void processGetRequest(final Packet packet,
 		final XMPPResourceConnection session,	final Queue<Packet> results,
 		final Map<String, Object> settings)
     throws NotAuthorizedException {
@@ -187,13 +172,10 @@ public class JabberIqRoster extends XMPPProcessor
 		}
   }
 
-	public void process(final Packet packet, final XMPPResourceConnection session,
+	public static void process(final Packet packet,
+		final XMPPResourceConnection session,
 		final NonAuthUserRepository repo, final Queue<Packet> results,
 		final Map<String, Object> settings) throws XMPPException {
-
-		if (session == null) {
-			return;
-		} // end of if (session == null)
 
 		try {
 			if (packet.getElemFrom() != null

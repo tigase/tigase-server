@@ -31,6 +31,7 @@ import java.util.LinkedHashMap;
 import java.util.logging.Logger;
 import tigase.server.Packet;
 import tigase.xml.Element;
+import tigase.xml.XMLUtils;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPResourceConnection;
@@ -584,12 +585,12 @@ public class Roster {
 		Element item = new Element("item");
 		item.setAttribute("jid", JIDUtils.getNodeID(buddy));
 		item.addAttributes(subscr.getSubscriptionAttr());
-		item.setAttribute("name", getBuddyName(session, buddy));
+		item.setAttribute("name", XMLUtils.escape(getBuddyName(session, buddy)));
 		String[] groups = getBuddyGroups(session, buddy);
 		if (groups != null) {
 			for (String gr : groups) {
 				Element group = new Element("group");
-				group.setCData(gr);
+				group.setCData(XMLUtils.escape(gr));
 				item.addChild(group);
 			} // end of for ()
 		} // end of if-else

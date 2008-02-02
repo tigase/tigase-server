@@ -69,7 +69,7 @@ public class JabberIqPrivacy extends XMPPProcessor
 	};
 
   public Element[] supDiscoFeatures(final XMPPResourceConnection session)
-	{ return Arrays.copyOf(DISCO_FEATURES, DISCO_FEATURES.length); }
+	{ return DISCO_FEATURES; }
 
 
 	private enum ITEM_TYPE { jid, group, subscription, all };
@@ -88,10 +88,10 @@ public class JabberIqPrivacy extends XMPPProcessor
 	public String id() { return ID; }
 
 	public String[] supElements()
-	{ return Arrays.copyOf(ELEMENTS, ELEMENTS.length); }
+	{ return ELEMENTS; }
 
   public String[] supNamespaces()
-	{ return Arrays.copyOf(XMLNSS, XMLNSS.length); }
+	{ return XMLNSS; }
 
 	/**
 	 * <code>preProcess</code> method checks only incoming stanzas

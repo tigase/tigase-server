@@ -75,7 +75,7 @@ public class SaslAuth extends XMPPProcessor
 	};
 
   public Element[] supDiscoFeatures(final XMPPResourceConnection session)
-	{ return Arrays.copyOf(DISCO_FEATURES, DISCO_FEATURES.length); }
+	{ return DISCO_FEATURES; }
 
 
   public enum ElementType {
@@ -90,10 +90,10 @@ public class SaslAuth extends XMPPProcessor
 	public String id() { return ID; }
 
 	public String[] supElements()
-	{ return Arrays.copyOf(ELEMENTS, ELEMENTS.length); }
+	{ return ELEMENTS; }
 
   public String[] supNamespaces()
-	{ return Arrays.copyOf(XMLNSS, XMLNSS.length); }
+	{ return XMLNSS; }
 
   public Element[] supStreamFeatures(final XMPPResourceConnection session)	{
     if (session == null || session.isAuthorized()) {

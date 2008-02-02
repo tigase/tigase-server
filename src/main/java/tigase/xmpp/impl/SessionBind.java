@@ -63,24 +63,22 @@ public class SessionBind extends XMPPProcessor
 	};
 
   public Element[] supDiscoFeatures(final XMPPResourceConnection session)
-	{ return Arrays.copyOf(DISCO_FEATURES, DISCO_FEATURES.length); }
+	{ return DISCO_FEATURES; }
 
 
   private static int resGenerator = 0;
 
 	public String id() { return ID; }
 
-	public String[] supElements()
-	{ return Arrays.copyOf(ELEMENTS, ELEMENTS.length); }
+	public String[] supElements()	{ return ELEMENTS; }
 
-	public String[] supNamespaces()
-	{ return Arrays.copyOf(XMLNSS, XMLNSS.length); }
+	public String[] supNamespaces()	{ return XMLNSS; }
 
   public Element[] supStreamFeatures(final XMPPResourceConnection session)	{
     if (session.getSessionData(SESSION_KEY) != null) {
       return null;
     } else {
-      return Arrays.copyOf(FEATURES, FEATURES.length);
+      return FEATURES;
     } // end of if (session.isAuthorized()) else
 	}
 

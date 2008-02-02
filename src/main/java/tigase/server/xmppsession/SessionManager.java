@@ -676,6 +676,12 @@ public class SessionManager extends AbstractMessageReceiver
 		String[] plugins = (String[])props.get(PLUGINS_PROP_KEY);
 		processors.clear();
 		for (String comp_id: plugins) {
+			if (comp_id.equals("presence")) {
+				log.warning("Your configuration is outdated!"
+					+ " Note 'presence' and 'jaber:iq:roster' plugins are no longer exist."
+					+ " Use 'roster-presence' plugin instead, loading automaticly...");
+				comp_id = "roster-presence";
+			}
 			addPlugin(comp_id);
 			Map<String, Object> plugin_settings =
 				new ConcurrentSkipListMap<String, Object>();

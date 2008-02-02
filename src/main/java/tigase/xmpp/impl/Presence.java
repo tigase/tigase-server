@@ -55,8 +55,7 @@ import static tigase.xmpp.impl.Roster.FROM_SUBSCRIBED;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class Presence extends XMPPProcessor
-	implements XMPPProcessorIfc, XMPPStopListenerIfc {
+public abstract class Presence {
 
 	/**
 	 * Constant <code>PRESENCE_KEY</code> is a key in temporary session data
@@ -77,25 +76,19 @@ public class Presence extends XMPPProcessor
    */
   private static Logger log =	Logger.getLogger("tigase.xmpp.impl.Presence");
 
-	private static final String ID = "presence";
+  protected static final String XMLNS = "jabber:client";
   private static final String[] ELEMENTS = {"presence"};
-  private static final String[] XMLNSS = {"jabber:client"};
-
-	public String id() { return ID; }
-
-	public String[] supElements()
-	{ return Arrays.copyOf(ELEMENTS, ELEMENTS.length); }
-
-  public String[] supNamespaces()
-	{ return Arrays.copyOf(XMLNSS, XMLNSS.length); }
+  private static final String[] XMLNSS = {XMLNS};
 
 	/**
 	 * <code>stopped</code> method is called when user disconnects or logs-out.
 	 *
 	 * @param session a <code>XMPPResourceConnection</code> value
 	 */
-	public void stopped(final XMPPResourceConnection session,
+	public static void stopped(final XMPPResourceConnection session,
 		final Queue<Packet> results, final Map<String, Object> settings) {
+		// Synchronization to avoid conflict with login/logout events
+		// processed in the SessionManager asynchronously
 		synchronized (session) {
 			Element pres = (Element)session.getSessionData(PRESENCE_KEY);
 			if (pres == null || pres.getAttribute("type") == null
@@ -120,7 +113,7 @@ public class Presence extends XMPPProcessor
 	 * @exception NotAuthorizedException if an error occurs
 	 */
 	@SuppressWarnings({"unchecked"})
-	protected void sendPresenceBroadcast(final StanzaType t,
+	protected static void sendPresenceBroadcast(final StanzaType t,
     final XMPPResourceConnection session,
 		final EnumSet<SubscriptionType> subscrs,
 		final Queue<Packet> results, final Element pres,
@@ -143,7 +136,7 @@ public class Presence extends XMPPProcessor
 		} // end of if (direct_presence != null)
   }
 
-	protected void resendPendingInRequests(final XMPPResourceConnection session,
+	protected static void resendPendingInRequests(final XMPPResourceConnection session,
     final Queue<Packet> results)
     throws NotAuthorizedException {
 		String[] buddies = Roster.getBuddies(session, Roster.PENDING_IN);
@@ -164,7 +157,7 @@ public class Presence extends XMPPProcessor
 	 * @param session a <code>XMPPResourceConnection</code> value
 	 * @exception NotAuthorizedException if an error occurs
 	 */
-	protected void updateOfflineChange(final XMPPResourceConnection session,
+	protected static void updateOfflineChange(final XMPPResourceConnection session,
 		final Queue<Packet> results)
 		throws NotAuthorizedException {
 		for (XMPPResourceConnection conn: session.getActiveSessions()) {
@@ -197,7 +190,7 @@ public class Presence extends XMPPProcessor
 	 * connection session object.
 	 * @exception NotAuthorizedException if an error occurs
 	 */
-	protected void updateUserResources(final Element presence,
+	protected static void updateUserResources(final Element presence,
     final XMPPResourceConnection session, final Queue<Packet> results)
 		throws NotAuthorizedException {
 		for (XMPPResourceConnection conn: session.getActiveSessions()) {
@@ -236,7 +229,7 @@ public class Presence extends XMPPProcessor
 	 * connection session object.
 	 * @exception NotAuthorizedException if an error occurs
 	 */
-	protected void updatePresenceChange(final Element presence,
+	protected static void updatePresenceChange(final Element presence,
     final XMPPResourceConnection session, final Queue<Packet> results)
 		throws NotAuthorizedException {
 		for (XMPPResourceConnection conn: session.getActiveSessions()) {
@@ -250,7 +243,7 @@ public class Presence extends XMPPProcessor
 		} // end of for (XMPPResourceConnection conn: sessions)
 	}
 
-	protected void forwardPresence(final Queue<Packet> results,
+	protected static void forwardPresence(final Queue<Packet> results,
 		final Packet packet, final String from) {
 		Element result = packet.getElement().clone();
 		// Not needed anymore. Packet filter does it for all stanzas.
@@ -262,7 +255,7 @@ public class Presence extends XMPPProcessor
 		results.offer(new Packet(result));
 	}
 
-  protected final void sendPresence(final StanzaType t, final String to,
+  protected static void sendPresence(final StanzaType t, final String to,
 		final String from, final Queue<Packet> results, final Element pres) {
 
 		Element presence = null;
@@ -286,7 +279,7 @@ public class Presence extends XMPPProcessor
   }
 
 	@SuppressWarnings({"unchecked"})
-	protected void addDirectPresenceJID(String jid,
+	protected static void addDirectPresenceJID(String jid,
 		XMPPResourceConnection session ) {
 		Set<String> direct_presences =
 			(Set<String>)session.getSessionData(DIRECT_PRESENCE);
@@ -299,7 +292,7 @@ public class Presence extends XMPPProcessor
 	}
 
 	@SuppressWarnings({"unchecked"})
-	protected void removeDirectPresenceJID(String jid,
+	protected static void removeDirectPresenceJID(String jid,
 		XMPPResourceConnection session ) {
 		Set<String> direct_presences =
 			(Set<String>)session.getSessionData(DIRECT_PRESENCE);
@@ -310,14 +303,14 @@ public class Presence extends XMPPProcessor
 	}
 
 	@SuppressWarnings("fallthrough")
-  public void process(final Packet packet, final XMPPResourceConnection session,
+  public static void process(final Packet packet,
+		final XMPPResourceConnection session,
 		final NonAuthUserRepository repo, final Queue<Packet> results,
 		final Map<String, Object> settings)
 		throws XMPPException {
 
-		if (session == null) {
-			return;
-		} // end of if (session == null)
+		// Synchronization to avoid conflict with login/logout events
+		// processed in the SessionManager asynchronously
 		synchronized (session) {
 			try {
 				final String jid = session.getJID();

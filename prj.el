@@ -9,20 +9,20 @@
 	 (quote
 		(
 		 "$JAVA_HOME/jre/lib/rt.jar"
-		 "$PROJECTS_HOME/tigase/server/classes/"
-		 "$PROJECTS_HOME/tigase/server/libs/junit.jar"
-		 "$PROJECTS_HOME/tigase/server/libs/jdbc-mysql.jar"
-		 "$PROJECTS_HOME/tigase/server/libs/tigase-xmltools.jar"
-		 "$PROJECTS_HOME/tigase/server/libs/tigase-utils.jar"
-		 "$PROJECTS_HOME/tigase/server/libs/jml-1.0b2.jar"
+		 "$HOME/projects/tigase/server/classes/"
+		 "$HOME/projects/tigase/server/libs/junit.jar"
+		 "$HOME/projects/tigase/server/libs/jdbc-mysql.jar"
+		 "$HOME/projects/tigase/server/libs/tigase-xmltools.jar"
+		 "$HOME/projects/tigase/server/libs/tigase-utils.jar"
+		 "$HOME/projects/tigase/server/libs/jml-1.0b2.jar"
 		 )))
  '(jde-sourcepath
 	 (quote
 		(
-		 "$PROJECTS_HOME/tigase/server/src/main/java"
-		 "$PROJECTS_HOME/tigase/xmltools/src/main/java"
-		 "$PROJECTS_HOME/tigase/utils/src/main/java"
-		 "$PROJECTS_HOME/tigase/server/tests/unittests/src"
+		 "$HOME/projects/tigase/server/src/main/java"
+		 "$HOME/projects/tigase/xmltools/src/main/java"
+		 "$HOME/projects/tigase/utils/src/main/java"
+		 "$HOME/projects/tigase/server/tests/unittests/src"
 		 "$JAVA_HOME/share/src"
 		 "$JAVA_HOME/share/tests/src"
 		 )))

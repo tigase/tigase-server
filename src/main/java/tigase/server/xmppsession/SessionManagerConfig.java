@@ -52,7 +52,7 @@ public class SessionManagerConfig {
 	private static final String[] PLUGINS_NO_REG_PROP_VAL =
 	{"jabber:iq:auth", "urn:ietf:params:xml:ns:xmpp-sasl",
 	 "urn:ietf:params:xml:ns:xmpp-bind", "urn:ietf:params:xml:ns:xmpp-session",
-	 "jabber:iq:roster", "jabber:iq:privacy", "presence", "msgoffline",
+	 "roster-presence", "jabber:iq:privacy", "msgoffline",
 	 "jabber:iq:version", "http://jabber.org/protocol/stats", "starttls",
 	 "vcard-temp", "http://jabber.org/protocol/commands", "jabber:iq:private",
 	 "urn:xmpp:ping"};
@@ -63,7 +63,7 @@ public class SessionManagerConfig {
 	private static final String[] PLUGINS_FULL_PROP_VAL =
 	{"jabber:iq:register", "jabber:iq:auth", "urn:ietf:params:xml:ns:xmpp-sasl",
 	 "urn:ietf:params:xml:ns:xmpp-bind", "urn:ietf:params:xml:ns:xmpp-session",
-	 "jabber:iq:roster", "jabber:iq:privacy", "presence", "jabber:iq:version",
+	 "roster-presence", "jabber:iq:privacy", "jabber:iq:version",
 	 "http://jabber.org/protocol/stats", "starttls", "msgoffline",
 	 "vcard-temp", "http://jabber.org/protocol/commands", "jabber:iq:private",
 	 "urn:xmpp:ping"};

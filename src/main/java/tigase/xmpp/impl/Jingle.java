@@ -63,10 +63,10 @@ public class Jingle extends XMPPProcessor implements XMPPProcessorIfc {
 	public String id() { return ID; }
 
 	public String[] supElements()
-	{ return Arrays.copyOf(ELEMENTS, ELEMENTS.length); }
+	{ return ELEMENTS; }
 
   public String[] supNamespaces()
-	{ return Arrays.copyOf(XMLNSS, XMLNSS.length); }
+	{ return XMLNSS; }
 
 	// Implementation of tigase.xmpp.XMPPProcessorIfc
 

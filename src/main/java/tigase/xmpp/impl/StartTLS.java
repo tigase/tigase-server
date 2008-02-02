@@ -74,19 +74,17 @@ public class StartTLS extends XMPPProcessor
 
 	public String id() { return ID; }
 
-	public String[] supElements()
-	{ return Arrays.copyOf(ELEMENTS, ELEMENTS.length); }
+	public String[] supElements()	{ return ELEMENTS; }
 
-  public String[] supNamespaces()
-	{ return Arrays.copyOf(XMLNSS, XMLNSS.length); }
+  public String[] supNamespaces()	{ return XMLNSS; }
 
   public Element[] supStreamFeatures(final XMPPResourceConnection session)	{
     if (session.getSessionData(TLS_STARTED_KEY) == null) {
       if (session.getSessionData(TLS_REQUIRED_KEY) != null
 				&& session.getSessionData(TLS_REQUIRED_KEY).equals("true")) {
-        return Arrays.copyOf(F_REQUIRED, F_REQUIRED.length);
+        return F_REQUIRED;
       } else {
-        return Arrays.copyOf(F_NOT_REQUIRED, F_NOT_REQUIRED.length);
+        return F_NOT_REQUIRED;
       }
     } // end of if (session.isAuthorized())
     else {
