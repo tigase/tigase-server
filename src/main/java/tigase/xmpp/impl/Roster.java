@@ -472,6 +472,10 @@ public class Roster {
 		return FROM_SUBSCRIBED.contains(subscr);
 	}
 
+	public static boolean isSubscribedFrom(SubscriptionType subscr) {
+		return FROM_SUBSCRIBED.contains(subscr);
+	}
+
 	public static String groupNode(final String buddy) {
     return ROSTER + "/" + JIDUtils.getNodeID(buddy);
   }
