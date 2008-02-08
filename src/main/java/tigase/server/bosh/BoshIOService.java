@@ -44,6 +44,7 @@ public class BoshIOService extends XMPPIOService {
     Logger.getLogger("tigase.server.bosh.BoshIOService");
 
 	private UUID sid = null;
+	private long rid = -1;
 
 	private static final String EOL = "\r\n";
 	private static final String HTTP_RESPONSE = "HTTP/1.1 200 OK" + EOL;
@@ -73,6 +74,14 @@ public class BoshIOService extends XMPPIOService {
 
 	public UUID getSid() {
 		return this.sid;
+	}
+
+	public void setRid(long rid) {
+		this.rid = rid;
+	}
+
+	public long getRid() {
+		return this.rid;
 	}
 
 }

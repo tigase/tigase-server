@@ -76,6 +76,18 @@ public class BoshSession {
 	private String content_type = CONTENT_TYPE_DEF;
 	private String domain = null;
 	private String sessionId = null;
+	/**
+	 * <code>last_rid</code> is the last body rid for which the reply has
+	 * been sent.
+	 */
+	private long last_rid = 0;
+	/**
+	 * <code>current_rid</code> is the table with body rids which are waiting
+	 * for replies.
+	 */
+	private long[] current_rids = null;
+	private int rids_head = 0;
+	private int rids_tail = 0;
 
 	private boolean terminate = false;
 	private enum TimedTask { EMPTY_RESP, STOP };
@@ -98,6 +110,10 @@ public class BoshSession {
 		long max_wait, long min_polling, long max_inactivity,
 		int concurrent_requests, int hold_requests, long max_pause,
 		Queue<Packet> out_results) {
+		current_rids = new long[this.concurrent_requests+1];
+		for (int i = 0; i < current_rids.length; i++) {
+			current_rids[i] = -1;
+		}
 		long wait_l = max_wait;
 		String wait_s = packet.getAttribute(WAIT_ATTR);
 		if (wait_s != null) {
@@ -109,12 +125,20 @@ public class BoshSession {
 		}
 		this.max_wait = Math.min(wait_l, max_wait);
 		int hold_i = hold_requests;
-		String hold_s = packet.getAttribute(HOLD_ATTR);
-		if (hold_s != null) {
+		String tmp_str = packet.getAttribute(HOLD_ATTR);
+		if (tmp_str != null) {
 			try {
-				hold_i = Integer.parseInt(hold_s);
+				hold_i = Integer.parseInt(tmp_str);
 			} catch (NumberFormatException e) {
 				hold_i = hold_requests;
+			}
+		}
+		tmp_str = packet.getAttribute(RID_ATTR);
+		if (tmp_str != null) {
+			try {
+				last_rid = Long.parseLong(tmp_str);
+			} catch (NumberFormatException e) {
+				last_rid = -1;
 			}
 		}
 		this.hold_requests = Math.max(hold_i, hold_requests);
@@ -165,9 +189,10 @@ public class BoshSession {
 										"urn:xmpp:xbosh",
 										"http://etherx.jabber.org/streams"});
 		sessionId = UUID.randomUUID().toString();
-// 		if (packet.getAttribute(VER_ATTR) == null) {
-			body.setAttribute(AUTHID_ATTR, sessionId);
-// 		}
+		body.setAttribute(AUTHID_ATTR, sessionId);
+		if (last_rid > 0) {
+			body.setAttribute(ACK_ATTR, ""+last_rid);
+		}
 		body.setXMLNS(BOSH_XMLNS);
 		sendBody(service, body);
 		//service.writeRawData(body.toString());
@@ -232,6 +257,46 @@ public class BoshSession {
 		return result;
 	}
 
+	private long getCurrentRidTail() {
+		synchronized (current_rids) {
+			return current_rids[rids_tail];
+		}
+	}
+
+	private long takeCurrentRidTail() {
+		synchronized (current_rids) {
+			int idx = rids_tail++;
+			if (rids_tail >= current_rids.length) {
+				rids_tail = 0;
+			}
+			return current_rids[idx];
+		}
+	}
+
+	private void processRid(long rid) {
+		synchronized (current_rids) {
+			if ((current_rids[rids_head] + 1) != rid) {
+				log.info("Incorrect packet order, last_rid=" + current_rids[rids_head]
+          + ", current_rid=" + rid);
+			}
+			current_rids[rids_head++] = rid;
+			if (rids_head >= current_rids.length) {
+				rids_head = 0;
+			}
+		}
+	}
+
+	private boolean isDuplicate(long rid) {
+		synchronized (current_rids) {
+			for (long c_rid: current_rids) {
+				if (rid == c_rid) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	private void sendBody(BoshIOService serv, Element body_par) {
 		Element body = body_par;
 		if (body == null) {
@@ -245,6 +310,11 @@ public class BoshSession {
 										"urn:xmpp:xbosh",
 										"http://etherx.jabber.org/streams"});
 			body.setXMLNS(BOSH_XMLNS);
+			long rid = takeCurrentRidTail();
+			if (rid > 0) {
+				body.setAttribute(ACK_ATTR, ""+rid);
+				last_rid = rid;
+			}
 			if (waiting_packets.size() > 0) {
 				body.addChild(applyFilters(waiting_packets.poll().getElement()));
 				while (waiting_packets.size() > 0
@@ -298,33 +368,48 @@ public class BoshSession {
 		connections.offer(service);
 
 		if (packet.getElemName().equals(BODY_EL_NAME)) {
-			if (packet.getType() != null && packet.getType() == StanzaType.terminate) {
-				// We are preparing for session termination.
-				// Some client send IQ stanzas with private data to store some
-				// settings so some confirmation stanzas might be sent back
-				// let's give the client a few secs for session termination
-				max_inactivity = 2;   // Max pause changed to 2 secs
-				terminate = true;
-				Packet command = Command.STREAM_CLOSED.getPacket(null, null,
-					StanzaType.set, "sess1");
-				out_results.offer(command);
-			}
-			if (packet.getAttribute(RESTART_ATTR) != null
-				&& packet.getAttribute(RESTART_ATTR).equals("true")) {
-				log.fine("Found stream restart instruction: " + packet.toString());
-				out_results.offer(Command.GETFEATURES.getPacket(null, null,
-						StanzaType.get, "restart1", null));
-			}
-			List<Element> children = packet.getElemChildren(BODY_EL_NAME);
-			if (children != null) {
-				for (Element el: children) {
-					if (el.getXMLNS().equals(BOSH_XMLNS)) {
-						el.setXMLNS("jabber:client");
-					}
-					Packet result = new Packet(el);
-					log.finest("Sending out packet: " + result.toString());
-					out_results.offer(result);
+			boolean duplicate = false;
+			if (packet.getAttribute(RID_ATTR) != null) {
+				try {
+					long rid = Long.parseLong(packet.getAttribute(RID_ATTR));
+					service.setRid(rid);
+					processRid(rid);
+					duplicate = isDuplicate(rid);
+				} catch (NumberFormatException e) {
+					log.warning("Incorrect RID value: " + packet.getAttribute(RID_ATTR));
 				}
+			}
+			if (!duplicate) {
+				if (packet.getType() != null && packet.getType() == StanzaType.terminate) {
+					// We are preparing for session termination.
+					// Some client send IQ stanzas with private data to store some
+					// settings so some confirmation stanzas might be sent back
+					// let's give the client a few secs for session termination
+					max_inactivity = 2;   // Max pause changed to 2 secs
+					terminate = true;
+					Packet command = Command.STREAM_CLOSED.getPacket(null, null,
+						StanzaType.set, "sess1");
+					out_results.offer(command);
+				}
+				if (packet.getAttribute(RESTART_ATTR) != null
+					&& packet.getAttribute(RESTART_ATTR).equals("true")) {
+					log.fine("Found stream restart instruction: " + packet.toString());
+					out_results.offer(Command.GETFEATURES.getPacket(null, null,
+							StanzaType.get, "restart1", null));
+				}
+				List<Element> children = packet.getElemChildren(BODY_EL_NAME);
+				if (children != null) {
+					for (Element el: children) {
+						if (el.getXMLNS().equals(BOSH_XMLNS)) {
+							el.setXMLNS("jabber:client");
+						}
+						Packet result = new Packet(el);
+						log.finest("Sending out packet: " + result.toString());
+						out_results.offer(result);
+					}
+				}
+			} else {
+				log.info("Duplicated packet: " + packet.toString());
 			}
 		} else {
 			log.warning("[" + connections.size() +
