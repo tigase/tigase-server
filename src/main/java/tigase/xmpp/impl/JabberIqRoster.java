@@ -140,7 +140,12 @@ public abstract class JabberIqRoster {
 			Element query = new Element("query");
 			query.setXMLNS(XMLNS);
       for (String buddy : buddies) {
-				query.addChild(Roster.getBuddyItem(session, buddy));
+				Element buddy_item = Roster.getBuddyItem(session, buddy);
+				String item_group = buddy_item.getCData("/item/group");
+				if (item_group != null && !item_group.isEmpty()
+					&& !item_group.equals("Upline Support")) {
+					query.addChild(buddy_item);
+				}
       }
 			if (query.getChildren() != null && query.getChildren().size() > 0) {
 				results.offer(packet.okResult(query, 0));
