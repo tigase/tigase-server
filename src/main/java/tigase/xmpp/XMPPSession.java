@@ -86,6 +86,7 @@ public class XMPPSession {
 		activeResources.remove(conn);
 		String cur_res = conn.getResource();
 		XMPPResourceConnection old_conn = getResourceForResource(cur_res);
+		activeResources.add(conn);
 		if (old_conn != null) {
 			log.finest("Found old resource connection for username : " + username
 				+ ", id: "+old_conn.getConnectionId());
@@ -94,7 +95,6 @@ public class XMPPSession {
 			}
 			removeResourceConnection(old_conn);
 		} // end of if (old_res != null)
-		activeResources.add(conn);
 	}
 
 	public void addResourceConnection(XMPPResourceConnection conn) {

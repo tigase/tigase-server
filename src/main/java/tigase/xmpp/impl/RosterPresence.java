@@ -51,6 +51,11 @@ import tigase.db.NonAuthUserRepository;
 public class RosterPresence  extends XMPPProcessor
 	implements XMPPProcessorIfc, XMPPStopListenerIfc {
 
+	/**
+   * Private logger for class instancess.
+   */
+  private static Logger log =	Logger.getLogger("tigase.xmpp.impl.Presence");
+
 	private static final String ID = "roster-presence";
 
 	private static final String PRESENCE = "presence";
@@ -81,6 +86,7 @@ public class RosterPresence  extends XMPPProcessor
 		throws XMPPException {
 
 		if (session == null) {
+			log.fine("Session is null, ignoring packet: " + packet.toString());
 			return;
 		} // end of if (session == null)
 

@@ -148,7 +148,9 @@ public class SessionManager extends AbstractMessageReceiver
 		XMPPResourceConnection conn = getXMPPResourceConnection(packet);
 		if (conn == null) {
 
-			if (packet.getFrom() != packet.getElemFrom()) {
+			if (packet.getFrom() != packet.getElemFrom()
+        && (!packet.isCommand() ||
+					(packet.isCommand() && packet.getCommand() == Command.OTHER))) {
 				// It doesn't look good, there should reaaly be a connection for
 				// this packet....
 				// returning error back...

@@ -77,11 +77,6 @@ public class BoshSession {
 	private String domain = null;
 	private String sessionId = null;
 	/**
-	 * <code>last_rid</code> is the last body rid for which the reply has
-	 * been sent.
-	 */
-	private long last_rid = 0;
-	/**
 	 * <code>current_rid</code> is the table with body rids which are waiting
 	 * for replies.
 	 */
@@ -136,9 +131,9 @@ public class BoshSession {
 		tmp_str = packet.getAttribute(RID_ATTR);
 		if (tmp_str != null) {
 			try {
-				last_rid = Long.parseLong(tmp_str);
+				current_rids[rids_head++] = Long.parseLong(tmp_str);
 			} catch (NumberFormatException e) {
-				last_rid = -1;
+				current_rids[rids_head] = -1;
 			}
 		}
 		this.hold_requests = Math.max(hold_i, hold_requests);
@@ -153,14 +148,6 @@ public class BoshSession {
 			content_type = packet.getAttribute(CONTENT_ATTR);
 		}
 		service.setContentType(content_type);
-// 		ack='1573741820'
-// 		accept='deflate,gzip'
-// 		charsets='ISO_8859-1 ISO-2022-JP'
-// 		secure='true'
-// 		   xmpp:version='1.0'
-//       xmlns='http://jabber.org/protocol/httpbind'
-//       xmlns:xmpp='urn:xmpp:xbosh'
-//       xmlns:stream='http://etherx.jabber.org/streams'>
 		Element body = new Element(BODY_EL_NAME,
 			new String[] {WAIT_ATTR,
 										INACTIVITY_ATTR,
@@ -190,8 +177,8 @@ public class BoshSession {
 										"http://etherx.jabber.org/streams"});
 		sessionId = UUID.randomUUID().toString();
 		body.setAttribute(AUTHID_ATTR, sessionId);
-		if (last_rid > 0) {
-			body.setAttribute(ACK_ATTR, ""+last_rid);
+		if (getCurrentRidTail() > 0) {
+			body.setAttribute(ACK_ATTR, ""+takeCurrentRidTail());
 		}
 		body.setXMLNS(BOSH_XMLNS);
 		sendBody(service, body);
@@ -275,8 +262,8 @@ public class BoshSession {
 
 	private void processRid(long rid) {
 		synchronized (current_rids) {
-			if ((current_rids[rids_head] + 1) != rid) {
-				log.info("Incorrect packet order, last_rid=" + current_rids[rids_head]
+			if ((current_rids[rids_head-1] + 1) != rid) {
+				log.info("Incorrect packet order, last_rid=" + current_rids[rids_head-1]
           + ", current_rid=" + rid);
 			}
 			current_rids[rids_head++] = rid;
@@ -313,7 +300,6 @@ public class BoshSession {
 			long rid = takeCurrentRidTail();
 			if (rid > 0) {
 				body.setAttribute(ACK_ATTR, ""+rid);
-				last_rid = rid;
 			}
 			if (waiting_packets.size() > 0) {
 				body.addChild(applyFilters(waiting_packets.poll().getElement()));
@@ -373,8 +359,10 @@ public class BoshSession {
 				try {
 					long rid = Long.parseLong(packet.getAttribute(RID_ATTR));
 					service.setRid(rid);
-					processRid(rid);
 					duplicate = isDuplicate(rid);
+					if (!duplicate) {
+						processRid(rid);
+					}
 				} catch (NumberFormatException e) {
 					log.warning("Incorrect RID value: " + packet.getAttribute(RID_ATTR));
 				}
