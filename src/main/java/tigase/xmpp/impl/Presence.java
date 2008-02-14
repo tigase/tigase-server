@@ -40,6 +40,7 @@ import tigase.xmpp.XMPPException;
 import tigase.server.Packet;
 import tigase.db.UserNotFoundException;
 import tigase.db.NonAuthUserRepository;
+import tigase.util.JIDUtils;
 
 import static tigase.xmpp.impl.Roster.SubscriptionType;
 import static tigase.xmpp.impl.Roster.PresenceType;
@@ -333,6 +334,30 @@ public abstract class Presence {
 				// 			} // end of if (packet.getFrom().equals(session.getConnectionId()))
 
 				log.finest(pres_type + " presence found: " + packet.toString());
+
+				// All 'in' subscription presences must have a valid from address
+				switch (pres_type) {
+				case in_unsubscribe:
+				case in_subscribe:
+				case in_unsubscribed:
+				case in_subscribed:
+					if (packet.getElemFrom() == null) {
+						log.fine("'in' subscription presence without valid 'from' address, dropping packet: "
+							+ packet.toString());
+						return;
+					}
+					if (JIDUtils.getNodeID(packet.getElemFrom()).equals(session.getUserId())) {
+						log.fine("'in' subscription to myself, not allowed, returning error for packet: " + packet.toString());
+						results.offer(Authorization.NOT_ALLOWED.getResponseMessage(packet,
+								"You can not subscribe to yourself.", false));
+						return;
+					}
+					break;
+				default:
+					break;
+				}
+
+
 				boolean subscr_changed = false;
 				switch (pres_type) {
 				case out_initial:
