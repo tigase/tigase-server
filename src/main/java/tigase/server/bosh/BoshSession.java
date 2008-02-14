@@ -83,6 +83,7 @@ public class BoshSession {
 	private long[] current_rids = null;
 	private int rids_head = 0;
 	private int rids_tail = 0;
+	private long previous_received_rid = -1;
 
 	private boolean terminate = false;
 	private enum TimedTask { EMPTY_RESP, STOP };
@@ -131,10 +132,9 @@ public class BoshSession {
 		tmp_str = packet.getAttribute(RID_ATTR);
 		if (tmp_str != null) {
 			try {
-				current_rids[rids_head++] = Long.parseLong(tmp_str);
-			} catch (NumberFormatException e) {
-				current_rids[rids_head] = -1;
-			}
+				previous_received_rid = Long.parseLong(tmp_str);
+				current_rids[rids_head++] = previous_received_rid;
+			} catch (NumberFormatException e) {	}
 		}
 		this.hold_requests = Math.max(hold_i, hold_requests);
 		if (packet.getAttribute(TO_ATTR) != null) {
@@ -262,10 +262,11 @@ public class BoshSession {
 
 	private void processRid(long rid) {
 		synchronized (current_rids) {
-			if ((current_rids[rids_head-1] + 1) != rid) {
-				log.info("Incorrect packet order, last_rid=" + current_rids[rids_head-1]
+			if ((previous_received_rid + 1) != rid) {
+				log.info("Incorrect packet order, last_rid=" + previous_received_rid
           + ", current_rid=" + rid);
 			}
+			previous_received_rid = rid;
 			current_rids[rids_head++] = rid;
 			if (rids_head >= current_rids.length) {
 				rids_head = 0;
