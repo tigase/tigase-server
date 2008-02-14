@@ -340,7 +340,8 @@ public class RepositoryUtils {
 		UserAuthRepository src_auth = null;
 
 		try {
-			src_repo = RepositoryFactory.getUserRepository("util", src_class, src_uri);
+			src_repo = RepositoryFactory.getUserRepository("util", src_class, src_uri,
+				null);
 			System.out.println(
 				"Loaded src_repo " + src_repo.getClass().getName()
 				+ " for parameters:"
@@ -355,7 +356,8 @@ public class RepositoryUtils {
 		// Let's try with AuthRepository....
 		if (src_repo == null) {
 			try {
-				src_auth = RepositoryFactory.getAuthRepository("util", src_class, src_uri);
+				src_auth = RepositoryFactory.getAuthRepository("util", src_class, src_uri,
+					null);
 				System.out.println(
 					"Loaded src_auth " + src_auth.getClass().getName()
 					+ " for parameters:"
@@ -436,7 +438,8 @@ public class RepositoryUtils {
 			Exception dst_exc = null;
 			UserAuthRepository dst_auth = null;
 			try {
-				dst_repo = RepositoryFactory.getUserRepository("util", dst_class, dst_uri);
+				dst_repo = RepositoryFactory.getUserRepository("util", dst_class, dst_uri,
+					null);
 				System.out.println(
 					"Loaded dst_repo " + dst_repo.getClass().getName()
 					+ " for parameters:"
@@ -449,7 +452,8 @@ public class RepositoryUtils {
 			} // end of try-catch
 			if (dst_repo == null) {
 				try {
-					dst_auth = RepositoryFactory.getAuthRepository("util", dst_class, dst_uri);
+					dst_auth = RepositoryFactory.getAuthRepository("util", dst_class, dst_uri,
+						null);
 					System.out.println(
 						"Loaded dst_auth " + dst_auth.getClass().getName()
 						+ " for parameters:"

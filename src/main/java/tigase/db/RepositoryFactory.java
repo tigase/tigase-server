@@ -21,6 +21,7 @@
  */
 package tigase.db;
 
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -43,7 +44,7 @@ public class RepositoryFactory {
 		new ConcurrentHashMap<String, ConcurrentMap<String, UserAuthRepository>>();
 
 	public static UserRepository getUserRepository(String comp_name,
-		String class_name, String resource)
+		String class_name, String resource, Map<String, String> params)
 		throws ClassNotFoundException, InstantiationException,
 					 IllegalAccessException, DBInitException {
 		// XMLRepository is different as you can not have many instances accessing
@@ -60,14 +61,14 @@ public class RepositoryFactory {
 		UserRepository rep = repo_map.get(resource);
 		if (rep == null) {
 			rep = (UserRepository)Class.forName(class_name).newInstance();
-			rep.initRepository(resource);
+			rep.initRepository(resource, params);
 			repo_map.put(resource, rep);
 		} // end of if (rep == null)
 		return rep;
 	}
 
 	public static UserAuthRepository getAuthRepository(String comp_name,
-		String class_name, String resource)
+		String class_name, String resource, Map<String, String> params)
 		throws ClassNotFoundException, InstantiationException,
 					 IllegalAccessException, DBInitException {
 		ConcurrentMap<String, UserAuthRepository> repo_map = auth_repos.get(comp_name);
@@ -83,7 +84,7 @@ public class RepositoryFactory {
 			} // end of if (!rep.getClass().getName().equals(class_name))
 			if (rep == null) {
 				rep = (UserAuthRepository)Class.forName(class_name).newInstance();
-				rep.initRepository(resource);
+				rep.initRepository(resource, params);
 				repo_map.put(resource, rep);
 			} // end of if (rep == null)
 		} // end of if (rep == null)

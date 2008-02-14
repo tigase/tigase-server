@@ -39,9 +39,11 @@ public class SessionManagerConfig {
 
 	public static final String USER_REPO_CLASS_PROP_KEY = "user-repo-class";
 	public static final String USER_REPO_URL_PROP_KEY = "user-repo-url";
+	public static final String USER_REPO_PARAMS_NODE = "user-repo-params";
 
 	public static final String AUTH_REPO_CLASS_PROP_KEY = "auth-repo-class";
 	public static final String AUTH_REPO_URL_PROP_KEY = "auth-repo-url";
+	public static final String AUTH_REPO_PARAMS_NODE = "auth-repo-params";
 
 	public static final String PLUGINS_PROP_KEY = "plugins";
 	public static final String PLUGINS_CONF_PROP_KEY = "plugins-conf";
@@ -142,9 +144,11 @@ public class SessionManagerConfig {
 
 		props.put(USER_REPO_CLASS_PROP_KEY, user_repo_class);
 	  props.put(USER_REPO_URL_PROP_KEY, user_repo_url);
+		props.put(USER_REPO_PARAMS_NODE + "param-1", "value-1");
 
 	  props.put(AUTH_REPO_CLASS_PROP_KEY, auth_repo_class);
 	  props.put(AUTH_REPO_URL_PROP_KEY, auth_repo_url);
+		props.put(AUTH_REPO_PARAMS_NODE + "param-1", "value-1");
 
 		String str_plugins = (String)params.get(GEN_SM_PLUGINS);
 		if (str_plugins != null) {

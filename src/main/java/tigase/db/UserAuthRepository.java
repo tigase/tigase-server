@@ -67,7 +67,8 @@ public interface UserAuthRepository {
 	 * @exception DBInitException if an error occurs during access database. It won't
 	 * happen however as in this method we do simple variable assigment.
 	 */
-	void initRepository(String resource_uri) throws DBInitException;
+	void initRepository(String resource_uri, Map<String, String> params)
+    throws DBInitException;
 
 	/**
 	 * <code>getResourceUri</code> method returns database connection string.

@@ -354,7 +354,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 				// 			rs.next();
 				// 			max_uid = rs.getLong("max_uid");
 				// 			max_nid = rs.getLong("max_nid");
-				cache = new SimpleCache<String, Object>(10000);
+				cache = Collections.synchronizedMap(new SimpleCache<String, Object>(10000));
 			}
 		} finally {
 			release(stmt, rs);
@@ -369,8 +369,8 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	 *
 	 * @param connection_str a <code>String</code> value
 	 */
-	public void initRepository(final String connection_str)
-		throws DBInitException {
+	public void initRepository(final String connection_str,
+		Map<String, String> params) throws DBInitException {
 		db_conn = connection_str;
 		if (db_conn.contains("autoCreateUser=true")) {
 			autoCreateUser=true;

@@ -110,7 +110,8 @@ public class UserAuthRepositoryImpl implements UserAuthRepository {
 	 * @param string a <code>String</code> value
 	 * @exception DBInitException if an error occurs
 	 */
-	public void initRepository(final String string) throws DBInitException { }
+	public void initRepository(final String string, Map<String, String> params)
+    throws DBInitException { }
 
 	/**
 	 * Describe <code>plainAuth</code> method here.

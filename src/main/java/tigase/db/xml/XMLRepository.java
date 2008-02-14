@@ -68,7 +68,8 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
 
   // Implementation of tigase.xmpp.rep.UserRepository
 
-	public synchronized void initRepository(String file) {
+	public synchronized void initRepository(String file,
+		Map<String, String> params) {
 		String file_name = file;
     try {
 			int idx = file.indexOf("?");

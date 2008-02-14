@@ -247,8 +247,8 @@ public class LibreSourceAuth implements UserAuthRepository {
 	 * @param connection_str a <code>String</code> value
 	 * @exception DBInitException if an error occurs
 	 */
-	public void initRepository(final String connection_str)
-		throws DBInitException {
+	public void initRepository(final String connection_str,
+		Map<String, String> params) throws DBInitException {
 		db_conn = connection_str;
 		try {
 			initRepo();

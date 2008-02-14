@@ -377,7 +377,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 // 				res_uri += "&autoCreateUser=true";
 // 			} // end of if (!res_uri.contains("autoCreateUser=true"))
 			repository = RepositoryFactory.getUserRepository(getName(),
-				cls_name, res_uri);
+				cls_name, res_uri, null);
 			try {
 				repository.addUser(myDomain());
 			} catch (UserExistsException e) { /*Ignore, this is correct and expected*/	}

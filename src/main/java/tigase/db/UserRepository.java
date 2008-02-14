@@ -21,6 +21,7 @@
  */
 package tigase.db;
 
+import java.util.Map;
 import java.util.List;
 
 /**
@@ -40,7 +41,8 @@ import java.util.List;
  */
 public interface UserRepository {
 
-	void initRepository(String resource_uri) throws DBInitException;
+	void initRepository(String resource_uri, Map<String, String> params)
+    throws DBInitException;
 
 	String getResourceUri();
 

@@ -21,6 +21,7 @@
 package tigase.db;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * DummyRepository is a class with all methods empty. They don't return
@@ -87,7 +88,7 @@ public class DummyRepository implements UserRepository {
 	 * @param string a <code>String</code> value
 	 * @exception DBInitException if an error occurs
 	 */
-	public void initRepository(final String string) {	}
+	public void initRepository(final String string, Map<String, String> params) {	}
 
 	/**
 	 * Describe <code>getResourceUri</code> method here.

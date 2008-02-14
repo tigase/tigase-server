@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.LinkedHashMap;
 import java.util.Queue;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -655,11 +656,31 @@ public class SessionManager extends AbstractMessageReceiver
 
 		filter = new PacketFilter();
 
+		Map<String, String> user_repo_params = new LinkedHashMap<String, String>();
+		Map<String, String> auth_repo_params = new LinkedHashMap<String, String>();
+		for (Map.Entry<String, Object> entry: props.entrySet()) {
+			if (entry.getKey().startsWith(USER_REPO_PARAMS_NODE)) {
+				// Split the key to configuration nodes separated with '/'
+				String[] nodes = entry.getKey().split("/");
+				// The plugin ID part may contain many IDs separated with comma ','
+				if (nodes.length > 2) {
+					user_repo_params.put(nodes[2], entry.getValue().toString());
+				}
+			}
+			if (entry.getKey().startsWith(AUTH_REPO_PARAMS_NODE)) {
+				// Split the key to configuration nodes separated with '/'
+				String[] nodes = entry.getKey().split("/");
+				// The plugin ID part may contain many IDs separated with comma ','
+				if (nodes.length > 2) {
+					auth_repo_params.put(nodes[2], entry.getValue().toString());
+				}
+			}
+		}
 		try {
 			String cls_name = (String)props.get(USER_REPO_CLASS_PROP_KEY);
 			String res_uri = (String)props.get(USER_REPO_URL_PROP_KEY);
 			user_repository = RepositoryFactory.getUserRepository(getName(),
-				cls_name, res_uri);
+				cls_name, res_uri, user_repo_params);
 			log.config("Initialized " + cls_name + " as user repository: " + res_uri);
 		} catch (Exception e) {
 			log.log(Level.SEVERE, "Can't initialize user repository: ", e);
@@ -668,7 +689,7 @@ public class SessionManager extends AbstractMessageReceiver
 			String cls_name = (String)props.get(AUTH_REPO_CLASS_PROP_KEY);
 			String res_uri = (String)props.get(AUTH_REPO_URL_PROP_KEY);
 			auth_repository =	RepositoryFactory.getAuthRepository(getName(),
-				cls_name, res_uri);
+				cls_name, res_uri, auth_repo_params);
 			log.config("Initialized " + cls_name + " as auth repository: " + res_uri);
 		} catch (Exception e) {
 			log.log(Level.SEVERE, "Can't initialize auth repository: ", e);
