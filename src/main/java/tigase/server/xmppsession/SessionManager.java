@@ -663,16 +663,16 @@ public class SessionManager extends AbstractMessageReceiver
 				// Split the key to configuration nodes separated with '/'
 				String[] nodes = entry.getKey().split("/");
 				// The plugin ID part may contain many IDs separated with comma ','
-				if (nodes.length > 2) {
-					user_repo_params.put(nodes[2], entry.getValue().toString());
+				if (nodes.length > 1) {
+					user_repo_params.put(nodes[1], entry.getValue().toString());
 				}
 			}
 			if (entry.getKey().startsWith(AUTH_REPO_PARAMS_NODE)) {
 				// Split the key to configuration nodes separated with '/'
 				String[] nodes = entry.getKey().split("/");
 				// The plugin ID part may contain many IDs separated with comma ','
-				if (nodes.length > 2) {
-					auth_repo_params.put(nodes[2], entry.getValue().toString());
+				if (nodes.length > 1) {
+					auth_repo_params.put(nodes[1], entry.getValue().toString());
 				}
 			}
 		}
