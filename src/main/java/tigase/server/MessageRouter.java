@@ -100,8 +100,8 @@ public class MessageRouter extends AbstractMessageReceiver {
 			} // end of if (comp != this)
 		} // end of for ()
 		// There is no better way to do it outside MessageRouter for now.
-		if (packet.isXMLNS("/iq/query", INFO_XMLNS)
-			|| packet.isXMLNS("/iq/query", ITEMS_XMLNS)
+		if ((packet.isXMLNS("/iq/query", INFO_XMLNS)
+				|| packet.isXMLNS("/iq/query", ITEMS_XMLNS))
 			&& (packet.getType() != null && packet.getType() == StanzaType.get)) {
 			processDiscoQuery(packet, results);
 		}
