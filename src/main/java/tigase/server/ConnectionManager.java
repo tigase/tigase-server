@@ -139,6 +139,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 	private Set<ConnectionListenerImpl> pending_open =
 		Collections.synchronizedSet(new HashSet<ConnectionListenerImpl>());;
 	protected long connectionDelay = 2000;
+	protected long startDelay = 10000;
 
 	public void setName(String name) {
 		super.setName(name);
@@ -261,7 +262,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 					} // end of if (entry.getKey().startsWith())
 				} // end of for ()
 				port_props.put(PORT_KEY, ports[i]);
-				reconnectService(port_props, connectionDelay);
+				reconnectService(port_props, startDelay);
 			} // end of for (int i = 0; i < ports.length; i++)
 		} // end of if (ports != null)
     if ((Boolean)props.get(TLS_USE_PROP_KEY)) {
