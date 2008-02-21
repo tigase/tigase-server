@@ -549,14 +549,13 @@ public abstract class Presence {
 				case in_probe:
 					SubscriptionType buddy_subscr =
 						Roster.getBuddySubscription(session, packet.getElemFrom());
-					//					if (buddy_subscr == null) {
-						if (DynamicRoster.getBuddyItem(session, settings,
-								packet.getElemFrom()) != null) {
-							buddy_subscr = SubscriptionType.both;
-						} else {
-							buddy_subscr = SubscriptionType.none;
-						}
-						//} // end of if (buddy_subscr == null)
+					if (DynamicRoster.getBuddyItem(session, settings,
+							packet.getElemFrom()) != null) {
+						buddy_subscr = SubscriptionType.both;
+					}
+					if (buddy_subscr == null) {
+						buddy_subscr = SubscriptionType.none;
+					} // end of if (buddy_subscr == null)
 					switch (buddy_subscr) {
 					case none:
 					case none_pending_out:
