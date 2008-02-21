@@ -138,11 +138,13 @@ public class JabberIqPrivacy extends XMPPProcessor
 							break;
 						case group:
 							String[] groups = Roster.getBuddyGroups(session, from);
-							for (String group: groups) {
-								if (type_matched = group.equals(value)) {
-									break;
-								} // end of if (group.equals(value))
-							} // end of for (String group: groups)
+							if (groups != null) {
+								for (String group: groups) {
+									if (type_matched = group.equals(value)) {
+										break;
+									} // end of if (group.equals(value))
+								} // end of for (String group: groups)
+							}
 							break;
 						case subscription:
 							ITEM_SUBSCRIPTIONS subscr = ITEM_SUBSCRIPTIONS.valueOf(value);
