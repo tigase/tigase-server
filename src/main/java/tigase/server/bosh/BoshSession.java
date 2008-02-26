@@ -64,8 +64,10 @@ public class BoshSession {
 
 	private UUID sid = null;
 	private Queue<BoshIOService> connections =
-		new ConcurrentLinkedQueue<BoshIOService>();
-	private Queue<Packet> waiting_packets = new ConcurrentLinkedQueue<Packet>();
+    new ConcurrentLinkedQueue<BoshIOService>();
+	private Queue<Element> waiting_packets = new ConcurrentLinkedQueue<Element>();
+	private BoshSessionCache cache = null;
+	private boolean cache_on = false;
 	private BoshSessionTaskHandler handler = null;
 	private long max_wait = MAX_WAIT_DEF_PROP_VAL;
 	private long min_polling = MIN_POLLING_PROP_VAL;
@@ -106,6 +108,12 @@ public class BoshSession {
 		long max_wait, long min_polling, long max_inactivity,
 		int concurrent_requests, int hold_requests, long max_pause,
 		Queue<Packet> out_results) {
+		String cache_action = packet.getAttribute(CACHE_ATTR);
+		if (cache_action != null && cache_action.equals(CacheAction.on.toString())) {
+			cache = new BoshSessionCache();
+			cache_on = true;
+			log.fine("BoshSessionCache set to ON");
+		}
 		current_rids = new long[this.concurrent_requests+1];
 		for (int i = 0; i < current_rids.length; i++) {
 			current_rids[i] = -1;
@@ -211,7 +219,10 @@ public class BoshSession {
 		if (packet != null) {
 			log.finest("[" + connections.size() +
 				"] Processing packet: " + packet.toString());
-			waiting_packets.offer(packet);
+			waiting_packets.offer(packet.getElement());
+			if (cache_on) {
+				processAutomaticCache(packet);
+			}
 		}
 		if (connections.size() > 0 &&
 			(waiting_packets.size() > 0 || terminate)) {
@@ -303,10 +314,10 @@ public class BoshSession {
 				body.setAttribute(ACK_ATTR, ""+rid);
 			}
 			if (waiting_packets.size() > 0) {
-				body.addChild(applyFilters(waiting_packets.poll().getElement()));
+				body.addChild(applyFilters(waiting_packets.poll()));
 				while (waiting_packets.size() > 0
 					&& body.getChildren().size() < MAX_PACKETS) {
-					body.addChild(applyFilters(waiting_packets.poll().getElement()));
+					body.addChild(applyFilters(waiting_packets.poll()));
 				}
 			}
 		}
@@ -334,6 +345,55 @@ public class BoshSession {
 			handler.cancelTask(tt);
 		}
 
+	}
+
+	private void processAutomaticCache(Packet packet) {
+		if (packet.getElemName().equals("presence")) {
+			cache.addPresence(packet.getElement());
+		}
+		if (packet.isXMLNS("/iq/query", "jabber:iq:roster")) {
+			cache.addRoster(packet.getElement());
+		}
+	}
+
+	private void processCache(CacheAction action, Packet packet) {
+		List<Element> children = packet.getElemChildren(BODY_EL_NAME);
+		String cache_id = packet.getAttribute(CACHE_ID_ATTR);
+		List<Element> cache_res = null;
+		switch (action) {
+		case on:
+			if (cache == null) {
+				cache = new BoshSessionCache();
+			}
+			cache_on = true;
+			log.fine("BoshSessionCache set to ON");
+			break;
+		case off:
+			cache_on = false;
+			log.fine("BoshSessionCache set to OFF");
+			break;
+		case set:
+			cache.set(cache_id, children);
+			break;
+		case add:
+			cache.add(cache_id, children);
+			break;
+		case get:
+			cache_res = cache.get(cache_id);
+			break;
+		case remove:
+			cache.remove(cache_id);
+			break;
+		case get_all:
+			cache_res = cache.getAll();
+			break;
+		default:
+			log.warning("Unknown cache action: " + action.toString());
+			break;
+		}
+		if (cache_res != null) {
+			waiting_packets.addAll(cache_res);
+		}
 	}
 
 	public void processSocketPacket(Packet packet,
@@ -386,15 +446,28 @@ public class BoshSession {
 					out_results.offer(Command.GETFEATURES.getPacket(null, null,
 							StanzaType.get, "restart1", null));
 				}
-				List<Element> children = packet.getElemChildren(BODY_EL_NAME);
-				if (children != null) {
-					for (Element el: children) {
-						if (el.getXMLNS().equals(BOSH_XMLNS)) {
-							el.setXMLNS("jabber:client");
+				if (packet.getAttribute(CACHE_ATTR) != null) {
+					try {
+						CacheAction action =
+              CacheAction.valueOf(packet.getAttribute(CACHE_ATTR));
+						if (cache_on || (action == CacheAction.on)) {
+							processCache(action, packet);
 						}
-						Packet result = new Packet(el);
-						log.finest("Sending out packet: " + result.toString());
-						out_results.offer(result);
+					} catch (IllegalArgumentException e) {
+						log.warning("Incorrect cache action: "
+							+ packet.getAttribute(CACHE_ATTR));
+					}
+				} else {
+					List<Element> children = packet.getElemChildren(BODY_EL_NAME);
+					if (children != null) {
+						for (Element el: children) {
+							if (el.getXMLNS().equals(BOSH_XMLNS)) {
+								el.setXMLNS("jabber:client");
+							}
+							Packet result = new Packet(el);
+							log.finest("Sending out packet: " + result.toString());
+							out_results.offer(result);
+						}
 					}
 				}
 			} else {
@@ -447,10 +520,11 @@ public class BoshSession {
 					for (TimerTask ttemp: task_enum.keySet()) {
 						handler.cancelTask(ttemp);
 					}
-					for (Packet packet: waiting_packets) {
+					for (Element packet: waiting_packets) {
 						try {
 							out_results.offer(
-								Authorization.RECIPIENT_UNAVAILABLE.getResponseMessage(packet,
+								Authorization.RECIPIENT_UNAVAILABLE.getResponseMessage(
+									new Packet(packet),
 									"Bosh = disconnected", true));
 						} catch (PacketErrorTypeException e) {
 							log.warning("Packet processing exception: " + e);

@@ -73,6 +73,20 @@ public abstract class Constants {
 	protected static final String AUTHID_ATTR = "authid";
 	protected static final String RESTART_ATTR = "xmpp:restart";
 
+	protected static final String CACHE_ATTR = "cache";
+	protected static final String CACHE_ID_ATTR = "cache-id";
+
+	protected enum CacheAction {
+		on, off, set, add, get, get_all, remove;
+	}
+// 	protected static final String CACHE_ON = "on";
+// 	protected static final String CACHE_OFF = "off";
+// 	protected static final String CACHE_SET = "set";
+// 	protected static final String CACHE_ADD = "add";
+// 	protected static final String CACHE_GET = "get";
+// 	protected static final String CACHE_GET_ALL = "get-all";
+// 	protected static final String CACHE_REMOVE = "remove";
+
 	protected static final String CONTENT_TYPE_DEF = "text/xml; charset=utf-8";
 
 
