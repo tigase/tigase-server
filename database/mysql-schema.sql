@@ -100,13 +100,13 @@ create table tig_pairs (
 )
 ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
 
-create table tig_max_ids (
-       max_uid bigint unsigned,
-       max_nid bigint unsigned
-)
-ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
+-- create table tig_max_ids (
+--        max_uid bigint unsigned,
+--        max_nid bigint unsigned
+-- )
+-- ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
 
-insert into tig_max_ids (max_uid, max_nid) values (1, 1);
+-- insert into tig_max_ids (max_uid, max_nid) values (1, 1);
 
 -- Get top nodes for the user: user1@hostname
 --
