@@ -28,6 +28,7 @@ import java.util.Queue;
 import java.util.logging.Logger;
 import tigase.db.NonAuthUserRepository;
 import tigase.server.Packet;
+import tigase.server.Command;
 import tigase.util.JIDUtils;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
@@ -128,6 +129,11 @@ public class JabberIqRegister extends XMPPProcessor
 						} else {
 							try {
 								result = session.unregister(packet.getElemFrom());
+								results.offer(packet.okResult((String)null, 0));
+								results.offer(Command.CLOSE.getPacket(session.getDomain(),
+										session.getConnectionId(), StanzaType.set,
+										session.nextStanzaId()));
+
 							} catch (NotAuthorizedException e) {
 								results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 										"You must authorize session first.", true));
@@ -140,12 +146,12 @@ public class JabberIqRegister extends XMPPProcessor
 						String password = request.getChildCData("/iq/query/password");
 						String email = request.getChildCData("/iq/query/email");
 						result = session.register(user_name, password, email);
-					}
-					if (result == Authorization.AUTHORIZED) {
-						results.offer(result.getResponseMessage(packet, null, false));
-					} else {
-						results.offer(result.getResponseMessage(packet,
-								"Unsuccessful registration attempt", true));
+						if (result == Authorization.AUTHORIZED) {
+							results.offer(result.getResponseMessage(packet, null, false));
+						} else {
+							results.offer(result.getResponseMessage(packet,
+									"Unsuccessful registration attempt", true));
+						}
 					}
 					break;
 				case get:

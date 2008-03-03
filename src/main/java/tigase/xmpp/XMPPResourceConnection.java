@@ -311,16 +311,16 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	public Authorization unregister(final String name_param)
 		throws NotAuthorizedException {
 		Authorization auth_res = super.unregister(name_param);
-		if (auth_res == Authorization.AUTHORIZED) {
-			List<XMPPResourceConnection> res_conn =
-				parentSession.getActiveResources();
-			for (XMPPResourceConnection res: res_conn) {
-				if (res != this) {
-					res.logout();
-				} // end of if (res != this)
-			} // end of for (XMPPResourceConnection res: res_conn)
-			logout();
-		} // end of if (res == Authorization.AUTHORIZED)
+// 		if (auth_res == Authorization.AUTHORIZED) {
+// 			List<XMPPResourceConnection> res_conn =
+// 				parentSession.getActiveResources();
+// 			for (XMPPResourceConnection res: res_conn) {
+// 				if (res != this) {
+// 					res.logout();
+// 				} // end of if (res != this)
+// 			} // end of for (XMPPResourceConnection res: res_conn)
+// 			logout();
+// 		} // end of if (res == Authorization.AUTHORIZED)
 		return auth_res;
 	}
 
