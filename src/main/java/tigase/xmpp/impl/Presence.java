@@ -471,7 +471,9 @@ public abstract class Presence {
 					}
 					// If other users are in 'to' or 'both' contacts, broadcast
 					// their preseces to all active resources
-					if (Roster.isSubscribedTo(session, packet.getElemFrom())) {
+					if (Roster.isSubscribedTo(session, packet.getElemFrom())
+						|| (DynamicRoster.getBuddyItem(session, settings,
+								packet.getElemFrom()) != null)) {
 						updatePresenceChange(packet.getElement(), session, results);
 					} else {
 						// The code below looks like a bug to me.
