@@ -33,6 +33,7 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
@@ -354,7 +355,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 				// 			rs.next();
 				// 			max_uid = rs.getLong("max_uid");
 				// 			max_nid = rs.getLong("max_nid");
-				cache = Collections.synchronizedMap(new SimpleCache<String, Object>(10000));
+				cache = Collections.synchronizedMap(new RepoCache(10000, 60*1000));
 			}
 		} finally {
 			release(stmt, rs);
@@ -967,6 +968,27 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 
 	public void queryAuth(Map<String, Object> authProps) {
 		auth.queryAuth(authProps);
+	}
+
+	private class RepoCache extends SimpleCache<String, Object> {
+
+		public RepoCache(int maxsize, long cache_time) {
+			super(maxsize, cache_time);
+		}
+
+		public Object remove(Object key) {
+			Object val = super.remove(key);
+			String strk = key.toString();
+			Iterator<String> ks = keySet().iterator();
+			while (ks.hasNext()) {
+				String k = ks.next().toString();
+				if (k.startsWith(strk)) {
+					ks.remove();
+				} // end of if (k.startsWith(strk))
+			} // end of while (ks.hasNext())
+			return val;
+		}
+
 	}
 
 } // JDBCRepository
