@@ -32,7 +32,7 @@ create table tig_ma_jid (
 ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
 
 -- Table keeping chat threads and subjects if set
-create table ma_thread_subject (
+create table tig_ma_thread_subject (
   -- Automatic record ID
   ma_ts_id    bigint unsigned NOT NULL auto_increment,
   -- Chat thread, if set
@@ -46,20 +46,30 @@ create table ma_thread_subject (
 ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
 
 -- Table keeping actual message body
-create table ma_message (
+create table tig_ma_message (
   -- Automatic record ID
   ma_m_id    bigint unsigned NOT NULL auto_increment,
   -- Automaticly generated timestamp and automaticly updated on change
-  utc     timestamp,
+  utc        timestamp,
+	-- From address of the message, the vaulue refers to the tig_ma_jid table
+	from_jid 	bigint unsigned NOT NULL,
+	-- To address of the message, the vaulue refers to the tig_ma_jid table
+	to_jid		bigint unsigned NOT NULL,
+	-- Thread and Subject ID reference to the table tig_ma_thread_subject
+	ts_id 		bigint unsigned,
+	-- This field is supposed to lower database storage consumption. The idea is
+	-- to not store the same message 2 times which may happen if 2 users
+	-- on the same server chat with each other. With all the informations in this
+	-- table it should be enough to store such message only once.
+	body_hash  char(32) NOT NULL,
 	-- The body of the message
-	body    varchar(4096),
-  -- from - 1, to - 2
-  direction smallint,
-	-- jid - reference to table: ma_jid
-	bjid bigint unsigned NOT NULL,
+	body       varchar(4096) NOT NULL,
   primary key(ma_m_id),
   key utc (utc),
-	key bjid (bjid),
+	key from_jid (from_jid),
+	key to_jid (to_jid),
+	key ts_id (ts_id),
+	key body_hash (body_hash),
   key body (body)
 )
 ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
