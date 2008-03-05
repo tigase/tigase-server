@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.TimerTask;
 import java.util.UUID;
+import java.util.Collections;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -155,6 +156,10 @@ public class BoshSession {
 		if (packet.getAttribute(CONTENT_ATTR) != null) {
 			content_type = packet.getAttribute(CONTENT_ATTR);
 		}
+		String lang = packet.getAttribute(LANG_ATTR);
+		if (lang == null) {
+			lang = "en";
+		}
 		service.setContentType(content_type);
 		Element body = new Element(BODY_EL_NAME,
 			new String[] {WAIT_ATTR,
@@ -195,6 +200,7 @@ public class BoshSession {
 			StanzaType.set, "sess1", "submit");
 		Command.addFieldValue(streamOpen, "session-id", sessionId);
 		Command.addFieldValue(streamOpen, "hostname", domain);
+		Command.addFieldValue(streamOpen, LANG_ATTR, lang);
 		out_results.offer(streamOpen);
 		out_results.offer(Command.GETFEATURES.getPacket(null, null,
 				StanzaType.get, "sess1", null));
@@ -353,6 +359,10 @@ public class BoshSession {
 		}
 		if (packet.isXMLNS("/iq/query", "jabber:iq:roster")) {
 			cache.addRoster(packet.getElement());
+		}
+		if (packet.isXMLNS("/iq/bind", "urn:ietf:params:xml:ns:xmpp-bind")) {
+			cache.set(BoshSessionCache.RESOURCE_BIND_ID,
+				Collections.singletonList(packet.getElement()));
 		}
 	}
 

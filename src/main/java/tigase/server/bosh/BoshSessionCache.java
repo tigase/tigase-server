@@ -44,6 +44,7 @@ public class BoshSessionCache {
 
 	public static final String DEF_ID = "";
 	public static final String ROSTER_ID = "bosh-roster";
+	public static final String RESOURCE_BIND_ID = "bosh-resource-bind";
 
 	/**
 	 * Cache elements stored by the Bosh client. The cache elements are grouped

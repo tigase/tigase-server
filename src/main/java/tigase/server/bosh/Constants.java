@@ -72,6 +72,7 @@ public abstract class Constants {
 	protected static final String FROM_ATTR = "from";
 	protected static final String AUTHID_ATTR = "authid";
 	protected static final String RESTART_ATTR = "xmpp:restart";
+	protected static final String LANG_ATTR = "xml:lang";
 
 	protected static final String CACHE_ATTR = "cache";
 	protected static final String CACHE_ID_ATTR = "cache-id";
