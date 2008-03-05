@@ -474,6 +474,7 @@ public class SessionManager extends AbstractMessageReceiver
 					+ connection.isAuthorized());
 			} // end of else
 			connection.setSessionId(Command.getFieldValue(pc, "session-id"));
+			connection.setDefLang(Command.getFieldValue(pc, "xml:lang"));
 			log.finest("Setting session-id " + connection.getSessionId()
 				+ " for connection: " + connection.getConnectionId());
 			break;

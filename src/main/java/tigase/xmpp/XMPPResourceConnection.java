@@ -57,6 +57,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	//private LoginContext loginContext = null;
 
 	private String sessionId = null;
+	private String defLang = "en";
   /**
    * Session resource - part of user's JID for this session
    */
@@ -251,6 +252,14 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	 */
 	public void setSessionId(final String argSessionId) {
 		this.sessionId = argSessionId;
+	}
+
+	public String getDefLang() {
+		return this.defLang;
+	}
+
+	public void setDefLang(String lang) {
+		this.defLang = lang;
 	}
 
 	/**

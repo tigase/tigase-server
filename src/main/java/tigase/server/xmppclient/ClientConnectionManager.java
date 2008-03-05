@@ -264,6 +264,10 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 		Map<String, String> attribs) {
 		log.finer("Stream opened: " + attribs.toString());
 		final String hostname = attribs.get("to");
+		String lang = attribs.get("xml:lang");
+		if (lang == null) {
+			lang = "en";
+		}
 		final String id = UUID.randomUUID().toString();
 		if (hostname == null) {
 			return "<stream:stream version='1.0' xml:lang='en'"
@@ -304,6 +308,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 				routings.computeRouting(hostname), StanzaType.set, "sess1", "submit");
 			Command.addFieldValue(streamOpen, "session-id", id);
 			Command.addFieldValue(streamOpen, "hostname", hostname);
+			Command.addFieldValue(streamOpen, "xml:lang", lang);
 			addOutPacket(streamOpen);
 			if (attribs.get("version") != null) {
 				addOutPacket(Command.GETFEATURES.getPacket(
