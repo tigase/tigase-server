@@ -116,13 +116,106 @@ public class RepositoryUtils {
 	public static void printRepoContent(UserRepository repo)
 		throws Exception {
 		if (user != null) {
-			printNode(user, repo, "  ", null);
+			printNode(user, repo, "  ", subnode);
 		} else {
 			List<String> users = repo.getUsers();
 			if (users != null) {
 				for (String usr: users) {
 					System.out.println(usr);
-					printNode(usr, repo, "  ", null);
+					printNode(usr, repo, "  ", subnode);
+				} // end of for (String user: users)
+			} else {
+				System.out.println("There are no user accounts in repository.");
+			} // end of else
+		}
+	}
+
+	public static boolean checkJID(String jid) {
+		String nick_check = JIDUtils.checkNickName(JIDUtils.getNodeNick(jid));
+		if (nick_check != null) {
+			System.out.println("      Invalid nickname - " + JIDUtils.getNodeNick(jid)
+				+ ": " + nick_check);
+			return false;
+		}
+		String host_check = JIDUtils.checkNickName(JIDUtils.getNodeHost(jid));
+		if (host_check != null) {
+			System.out.println("      Invalid hostname - " + JIDUtils.getNodeHost(jid)
+				+ ": " + host_check);
+			return false;
+		}
+		return true;
+	}
+
+	public static boolean checkContact(String user, UserRepository repo,
+		String contact) throws Exception {
+		if (!checkJID(contact)) {
+			return false;
+		}
+		//String[] keys = repo.getKeys(user, "roster/"+contact);
+		String[] vals = repo.getDataList(user, "roster/"+contact, "groups");
+		if (vals == null || vals.length == 0) {
+			System.out.println("      Empty groups list");
+			if (!allowed_empty_groups) {
+				return false;
+			}
+		} else {
+			for (String val: vals) {
+				if (val.equals("Upline Support")
+					|| val.startsWith("Level ")) {
+					System.out.println("      Invalid group: " + val);
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	private static long counter = 0;
+
+	public static void repairUserRoster(String user, UserRepository repo)
+		throws Exception {
+		System.out.println("  " + (++counter) + ". " + user + " roster: ");
+		if (!checkJID(user)) {
+			System.out.println("    Invalid user ID, should be removed...");
+			String[] contacts = repo.getSubnodes(user, "roster");
+			if (contacts == null || contacts.length == 0) {
+				System.out.println("    empty contact list, save to remove...");
+				repo.removeUser(user);
+			} else {
+				System.out.println("    non-empty contact list, leaving for now...");
+			}
+		} else {
+			String[] contacts = repo.getSubnodes(user, "roster");
+			if (contacts != null) {
+				for (String contact: contacts) {
+					System.out.println("    contact: " + contact);
+					boolean valid = checkContact(user, repo, contact);
+					if (valid) {
+						System.out.println("      looks OK");
+					} else {
+						System.out.println("      should be REMOVED");
+						String contact_node = "roster/" + contact;
+						System.out.println("      removing node: " + contact_node);
+						repo.removeSubnode(user, contact_node);
+						System.out.println("      DONE.");
+					}
+				} // end of for (String node: nodes)
+			} else {
+				System.out.println("    empty roster...");
+			}
+		}
+	}
+
+	public static void repairRoster(UserRepository repo)
+		throws Exception {
+		if (user != null) {
+			repairUserRoster(user, repo);
+		} else {
+			List<String> users = repo.getUsers();
+			if (users != null) {
+				for (String usr: users) {
+					//System.out.println(usr);
+					repairUserRoster(usr, repo);
 				} // end of for (String user: users)
 			} else {
 				System.out.println("There are no user accounts in repository.");
@@ -199,6 +292,11 @@ public class RepositoryUtils {
 			+ " -kv         data content string is node/key=value string\n"
 			+ " -add        add data content to repository\n"
 			+ " -del        delete data content from repository\n"
+      + " ------------\n"
+      + " -roster     check the user roster\n"
+      + " -aeg [true|false]  Allow empty group list for the contact\n"
+      + "\n"
+      + "\n"
 			+ "\n"
 			+ "Note! If you put UserAuthRepository implementation as a class name\n"
 			+ "      some operation are not allowed and will be silently skipped.\n"
@@ -222,6 +320,8 @@ public class RepositoryUtils {
 	private static boolean del = false;
 	private static boolean node = false;
 	private static boolean key_val = false;
+	private static boolean check_roster = false;
+	private static boolean allowed_empty_groups = true;
 
 	private static String subnode = null;
 	private static String key = null;
@@ -321,6 +421,12 @@ public class RepositoryUtils {
         } // end of if (args[i].equals("-h"))
         if (args[i].equals("-del")) {
 					del = true;
+        } // end of if (args[i].equals("-h"))
+        if (args[i].equals("-roster")) {
+					check_roster = true;
+        } // end of if (args[i].equals("-h"))
+        if (args[i].equals("-aeg")) {
+					allowed_empty_groups = args[++i].equals("true");
         } // end of if (args[i].equals("-h"))
       } // end of for (int i = 0; i < args.length; i++)
     }
@@ -470,10 +576,23 @@ public class RepositoryUtils {
 			} // end of if (dst_repo == null)
 		} // end of if (copy_repos)
 
+		if (check_roster && src_repo != null) {
+			System.out.println("Checking roster:");
+			if (user != null) {
+				repairUserRoster(user, src_repo);
+			} else {
+				repairRoster(src_repo);
+			} // end of else
+		}
+
 		if (print_repo && src_repo != null) {
 			System.out.println("Printing repository:");
 			if (content != null) {
-				parseNodeKeyValue(content);
+				if (node) {
+					subnode = content;
+				} else {
+					parseNodeKeyValue(content);
+				}
 			} // end of if (content != null)
 			if (user != null) {
 				if (key_val) {
