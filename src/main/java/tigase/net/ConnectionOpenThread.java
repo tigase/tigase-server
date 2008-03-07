@@ -186,12 +186,20 @@ public class ConnectionOpenThread implements Runnable {
 						log.finest("OP_CONNECT");
 					} // end of if (sk.readyOps() & SelectionKey.OP_ACCEPT)
 					if (sc != null) {
-						sc.configureBlocking(false);
-						sc.socket().setSoLinger(false, 0);
-						sc.socket().setReuseAddress(true);
-						log.finer("Registered new client socket: "+sc);
-						ConnectionOpenListener al = (ConnectionOpenListener)sk.attachment();
-						al.accept(sc);
+						// We have to catch exception here as sometimes socket is closed
+						// or connection is broken before we start configuring it here
+						// then whatever we do on the socket it throws an exception
+						try {
+							sc.configureBlocking(false);
+							sc.socket().setSoLinger(false, 0);
+							sc.socket().setReuseAddress(true);
+							log.finer("Registered new client socket: "+sc);
+							ConnectionOpenListener al = (ConnectionOpenListener)sk.attachment();
+							al.accept(sc);
+						} catch (java.net.SocketException e) {
+							log.log(Level.INFO,
+								"Soket closed instantly after it had been opened?", e);
+						}
 					} else {
 						log.warning("Can't obtain socket channel from selection key.");
 					} // end of if (sc != null) else
