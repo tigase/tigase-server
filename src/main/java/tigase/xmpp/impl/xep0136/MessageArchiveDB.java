@@ -24,14 +24,17 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.Map;
 import java.util.Date;
+import java.util.Collections;
 import java.util.logging.Logger;
 
 import tigase.util.JDBCAbstract;
 import tigase.util.JIDUtils;
 import tigase.xml.Element;
 
+import tigase.util.SimpleCache;
 
 /**
  * Describe class MessageArchiveDB here.
@@ -50,11 +53,21 @@ public class MessageArchiveDB extends JDBCAbstract {
   private static final Logger log =
     Logger.getLogger("tigase.xmpp.impl.xep0136.MessageArchiveDB");
 
+	private static final long LONG_NULL = 0;
+
 	private PreparedStatement save_message_st = null;
 	private PreparedStatement get_msg_for_jid_st = null;
 	private PreparedStatement get_jid_id_st = null;
 	private PreparedStatement get_jids_id_st = null;
-	private PreparedStatement add_jid_id_st = null;
+	private PreparedStatement add_jid_st = null;
+	private PreparedStatement add_thread_st = null;
+	private PreparedStatement get_thread_id_st = null;
+	private PreparedStatement add_subject_st = null;
+	private PreparedStatement get_subject_id_st = null;
+
+	private int cacheSize = 10000;
+	private long cacheTime = 60*60*1000;
+	private Map<String, Object> cache = null;
 
 	/**
 	 * <code>initPreparedStatements</code> method initializes internal
@@ -65,13 +78,25 @@ public class MessageArchiveDB extends JDBCAbstract {
 	protected void initPreparedStatements() throws SQLException {
 		super.initPreparedStatements();
 		String query = "insert into tig_ma_jid (jid) values (?);";
-		add_jid_id_st = prepareStatement(query);
+		add_jid_st = prepareStatement(query);
 
 		query = "select ma_j_id from tig_ma_jid where jid = ?;";
 		get_jid_id_st = prepareStatement(query);
 
 		query = "select * from tig_ma_jid where (jid = ?) or (jid = ?);";
 		get_jids_id_st = prepareStatement(query);
+
+		query = "insert into tig_ma_thread (thread) values (?);";
+		add_thread_st = prepareStatement(query);
+
+		query = "select ma_t_id from tig_ma_thread where (thread = ?);";
+		get_thread_id_st = prepareStatement(query);
+
+		query = "insert into tig_ma_subject (subject) values (?);";
+		add_subject_st = prepareStatement(query);
+
+		query = "select ma_s_id from tig_ma_subject where (subject = ?);";
+		get_subject_id_st = prepareStatement(query);
 	}
 
 	/**
@@ -88,26 +113,64 @@ public class MessageArchiveDB extends JDBCAbstract {
 	public void initRepository(String conn_str, Map<String, String> params)
     throws SQLException {
 		setResourceUri(conn_str);
+		cache =
+      Collections.synchronizedMap(new SimpleCache<String, Object>(10000, 60*1000));
 	}
 
 	private long[] getJidsIds(String ... jids) throws SQLException {
-		checkConnection();
-		long[] results = null;
-		if (jids.length == 1) {
-
-		} else {
-
+		ResultSet rs = null;
+		try {
+			checkConnection();
+			long[] results = new long[jids.length];
+			for (int i = 0; i < results.length; i++) {
+				results[i] = LONG_NULL;
+			}
+			if (jids.length == 1) {
+				synchronized (get_jid_id_st) {
+					get_jid_id_st.setString(1, jids[0]);
+					rs = get_jid_id_st.executeQuery();
+					if (rs.next()) {
+						results[0] = rs.getLong("ma_j_id");
+						return results;
+					}
+				}
+				return null;
+			} else {
+				synchronized (get_jids_id_st) {
+					for (int i = 0; i < jids.length; i++) {
+						get_jids_id_st.setString(i+1, jids[i]);
+					}
+					rs = get_jids_id_st.executeQuery();
+					int cnt = 0;
+					while (rs.next()) {
+						String db_jid = rs.getString("jid");
+						for (int i = 0; i < jids.length; i++) {
+							if (db_jid.equals(jids[i])) {
+								results[i] = rs.getLong("ma_j_id");
+								++cnt;
+							}
+						}
+					}
+					if (cnt > 0) {
+						return results;
+					} else {
+						return null;
+					}
+				}
+			}
+		} finally {
+			release(null, rs);
 		}
-		return results;
+		//return results;
 	}
 
 	private long addJidID(String jid) throws SQLException {
 		checkConnection();
-		synchronized (add_jid_id_st) {
-			add_jid_id_st.setString(1, JIDUtils.getNodeID(jid));
-			add_jid_id_st.executeUpdate();
+		synchronized (add_jid_st) {
+			add_jid_st.setString(1, jid);
+			add_jid_st.executeUpdate();
 		}
-		// This is not the most effective solution but this methd shouldn't be
+		// This is not the most effective solution but this method shouldn't be
 		// called very often so the perfrmance impact should be insignificant.
 		long[] jid_ids = getJidsIds(jid);
 		if (jid_ids != null) {
@@ -115,14 +178,96 @@ public class MessageArchiveDB extends JDBCAbstract {
 		} else {
 			// That should never happen here, but just in case....
 			log.warning("I have just added new jid but it was not found.... " + jid);
-			return -1;
+			return LONG_NULL;
 		}
 	}
 
-	public void saveMessage(Element message, boolean full_content)
+	private long getThreadID(String thread)
+    throws SQLException {
+		ResultSet rs = null;
+		try {
+			checkConnection();
+			synchronized (get_thread_id_st) {
+				get_thread_id_st.setString(1, thread);
+				rs = get_thread_id_st.executeQuery();
+				if (rs.next()) {
+					return rs.getLong("ma_t_id");
+				}
+			}
+		} finally {
+			release(null, rs);
+		}
+		return LONG_NULL;
+	}
+
+	private long getSubjectID(String subject)
+    throws SQLException {
+		ResultSet rs = null;
+		try {
+			checkConnection();
+			synchronized (get_subject_id_st) {
+				get_subject_id_st.setString(1, subject);
+				rs = get_subject_id_st.executeQuery();
+				if (rs.next()) {
+					return rs.getLong("ma_s_id");
+				}
+			}
+		} finally {
+			release(null, rs);
+		}
+		return LONG_NULL;
+	}
+
+	private long addThreadID(String thread)
+    throws SQLException {
+		long result = getThreadID(thread);
+		if (result != LONG_NULL) {
+			return result;
+		}
+		synchronized (add_thread_st) {
+			add_thread_st.setString(1, thread);
+			add_thread_st.executeUpdate();
+		}
+		// This is not the most effective solution but this method shouldn't be
+		// called very often so the perfrmance impact should be insignificant.
+		result = getThreadID(thread);
+		return result;
+	}
+
+	private long addSubjectID(String subject)
+    throws SQLException {
+		long result = getSubjectID(subject);
+		if (result != LONG_NULL) {
+			return result;
+		}
+		synchronized (add_subject_st) {
+			add_subject_st.setString(1, subject);
+			add_subject_st.executeUpdate();
+		}
+		// This is not the most effective solution but this method shouldn't be
+		// called very often so the perfrmance impact should be insignificant.
+		result = getSubjectID(subject);
+		return result;
+	}
+
+	public void saveMessage(Element message, boolean full_content, String defLang)
     throws SQLException {
 		String from_str = JIDUtils.getNodeID(message.getAttribute("from"));
 		String to_str = JIDUtils.getNodeID(message.getAttribute("to"));
+		long[] ids = getJidsIds(from_str, to_str);
+		long from_id = (ids[0] != LONG_NULL ? ids[0] : addJidID(from_str));
+		long to_id = (ids[1] != LONG_NULL ? ids[1] : addJidID(to_str));
+
+		String thread = message.getCData("/message/thread");
+		long thread_id = LONG_NULL;
+		String subject = message.getCData("/message/subject");
+		long subject_id = LONG_NULL;
+		if (thread != null && !thread.trim().isEmpty()) {
+			thread_id = addThreadID(thread);
+		}
+		if (subject != null && !subject.trim().isEmpty()) {
+			subject_id = addSubjectID(subject);
+		}
 	}
 
 	public void getMessages(String jid, String with_jid, Date timestamp, int limit) {

@@ -31,16 +31,24 @@ create table tig_ma_jid (
 )
 ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
 
--- Table keeping chat threads and subjects if set
-create table tig_ma_thread_subject (
+-- Table keeping chat threads if set
+create table tig_ma_thread (
   -- Automatic record ID
-  ma_ts_id    bigint unsigned NOT NULL auto_increment,
+  ma_t_id    bigint unsigned NOT NULL auto_increment,
   -- Chat thread, if set
   thread     varchar(128),
+  primary key(ma_ts_id),
+  unique key thread (thread),
+)
+ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
+
+-- Table keeping chat subjects if set
+create table tig_ma_subject (
+  -- Automatic record ID
+  ma_s_id    bigint unsigned NOT NULL auto_increment,
 	-- Chat subject if set
 	subject    varchar(255),
   primary key(ma_ts_id),
-  unique key thread (thread),
   unique key subject (subject)
 )
 ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
@@ -62,6 +70,7 @@ create table tig_ma_message (
 	-- on the same server chat with each other. With all the informations in this
 	-- table it should be enough to store such message only once.
 	body_hash  char(32) NOT NULL,
+	body_lang  char(2) NOT NULL,
 	-- The body of the message
 	body       varchar(4096) NOT NULL,
   primary key(ma_m_id),
