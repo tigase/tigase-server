@@ -165,6 +165,8 @@ public class SaslAuth extends XMPPProcessor
 			//e.printStackTrace();
 			results.offer(packet.swapFromTo(createReply(ElementType.failure,
  						"<not-authorized/>")));
+			results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
+					StanzaType.set, packet.getElemId()));
 		} // end of try-catch
   }
 
