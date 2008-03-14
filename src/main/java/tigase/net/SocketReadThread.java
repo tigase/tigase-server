@@ -161,7 +161,14 @@ public class SocketReadThread implements Runnable {
 	public void run() {
     while (!stopping) {
       try {
-        clientsSel.select();
+				try {
+					clientsSel.select();
+				} catch (CancelledKeyException brokene) {
+					// According to Java API that should not happen.
+					// I think it happens only on the broken Java implementation
+					// from Apple.
+					log.log(Level.INFO, "Ups, broken JDK, Apple?", brokene);
+				}
 //         Set<SelectionKey> selected_keys = clientsSel.selectedKeys();
 //         for (SelectionKey sk : selected_keys) {
         for (Iterator i = clientsSel.selectedKeys().iterator(); i.hasNext();) {
