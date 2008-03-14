@@ -142,6 +142,8 @@ public class JabberIqAuth extends XMPPProcessor
 				} else {
 					results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 							"Authentication failed", false));
+					results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
+							StanzaType.set, packet.getElemId()));
 				} // end of else
 			} catch (NotAuthorizedException e) {
 				log.info("Authentication failed: " + user_name);
