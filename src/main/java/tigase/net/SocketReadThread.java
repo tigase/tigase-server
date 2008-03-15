@@ -168,6 +168,10 @@ public class SocketReadThread implements Runnable {
 					// I think it happens only on the broken Java implementation
 					// from Apple.
 					log.log(Level.INFO, "Ups, broken JDK, Apple?", brokene);
+				} catch (Exception broken2) {
+					// Lot's or exception happen here on 64bit arch
+					// let's catch them all
+					log.log(Level.INFO, "Unexpected exception in selector.selecyt()", broken2);
 				}
 //         Set<SelectionKey> selected_keys = clientsSel.selectedKeys();
 //         for (SelectionKey sk : selected_keys) {
