@@ -193,8 +193,8 @@ public class SocketReadThread implements Runnable {
         clientsSel.selectNow();
         addAllWaiting();
       } catch (Exception e) {
-        log.log(Level.SEVERE, "Server I/O error, can't continue my work.", e);
-        stopping = true;
+        log.log(Level.SEVERE, "Server I/O error.", e);
+        //stopping = true;
       }
     }
 	}

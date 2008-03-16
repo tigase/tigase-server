@@ -207,13 +207,13 @@ public class ConnectionOpenThread implements Runnable {
         }
 				addAllWaiting();
       } catch (IOException e) {
-        log.log(Level.SEVERE, "Server I/O error, can't continue my work.", e);
-        stopping = true;
+        log.log(Level.SEVERE, "Server I/O error.", e);
+        //stopping = true;
       } // end of catch
       catch (Exception e) {
         log.log(Level.SEVERE,
-          "Other service exception, can't continue my work.", e);
-        stopping = true;
+          "Other service exception.", e);
+        //stopping = true;
       } // end of catch
     }
   }
