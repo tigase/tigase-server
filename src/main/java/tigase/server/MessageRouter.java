@@ -513,6 +513,16 @@ public class MessageRouter extends AbstractMessageReceiver {
 				+ (minutes > 0 ? minutes + " min, " : "")
 				+ (seconds > 0 ? seconds + " sec" : "")
 				, Level.INFO));
+		Runtime runtime = Runtime.getRuntime();
+		long maxMem = runtime.maxMemory();
+		long totalMem = runtime.totalMemory();
+		long freeMem = runtime.freeMemory();
+		stats.add(new StatRecord(getName(), "Max JVM mem", "long", maxMem,
+				Level.INFO));
+		stats.add(new StatRecord(getName(), "Total JVM mem", "long", totalMem,
+				Level.INFO));
+		stats.add(new StatRecord(getName(), "Free JVM mem", "long", freeMem,
+				Level.INFO));
 		return stats;
 	}
 
