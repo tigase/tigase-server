@@ -70,17 +70,17 @@ if [ -z "${TIGASE_HOME}" ] ; then
   TIGASE_HOME=`dirname ${0}`
   TIGASE_HOME=`dirname ${TIGASE_HOME}`
   TIGASE_JAR=""
-  for j in ${TIGASE_HOME}/jars/tigase-server*.jar ; do
-		if [ -f ${j} ] ; then
-	    TIGASE_JAR=${j}
-	    break
-		fi
-  done
-  if [ -z ${TIGASE_JAR} ] ; then
-		echo "TIGASE_HOME is not set."
-		echo "Please set it to correct value before starting the sever."
-		exit 1
-  fi
+fi
+for j in ${TIGASE_HOME}/jars/tigase-server*.jar ; do
+	if [ -f ${j} ] ; then
+	  TIGASE_JAR=${j}
+	  break
+	fi
+done
+if [ -z ${TIGASE_JAR} ] ; then
+	echo "TIGASE_HOME is not set."
+	echo "Please set it to correct value before starting the sever."
+	exit 1
 fi
 if [ -z "${TIGASE_CONSOLE_LOG}" ] ; then
   if [ -w "${TIGASE_HOME}/logs/" ] ; then
@@ -185,6 +185,7 @@ case "${1}" in
   check)
     echo "Checking arguments to Tigase: "
     echo "TIGASE_HOME     =  $TIGASE_HOME"
+    echo "TIGASE_JAR      =  $TIGASE_JAR"
     echo "TIGASE_PARAMS   =  $TIGASE_PARAMS"
     echo "TIGASE_CONFIG   =  $TIGASE_CONFIG"
     echo "TIGASE_RUN      =  $TIGASE_RUN"
