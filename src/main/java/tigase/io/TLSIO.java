@@ -132,7 +132,10 @@ public class TLSIO implements IOInterface {
   }
 
   public int write(final ByteBuffer buff) throws IOException {
-    int result = buff.remaining();
+		if (buff == null) {
+			return io.write(null);
+		}
+    int result = 0;
     log.finer("TLS - Writing data, remaining: " + buff.remaining());
     do {
 			ByteBuffer tlsOutput = ByteBuffer.allocate(tlsWrapper.getNetBuffSize());
@@ -142,7 +145,7 @@ public class TLSIO implements IOInterface {
         throw new EOFException("Socket has been closed.");
       } // end of if (tlsWrapper.getStatus() == TLSStatus.CLOSED)
       tlsOutput.flip();
-			io.write(tlsOutput);
+			result += io.write(tlsOutput);
     } while (buff.hasRemaining());
     if (tlsWrapper.getStatus() == TLSStatus.NEED_WRITE) {
       write(ByteBuffer.allocate(0));

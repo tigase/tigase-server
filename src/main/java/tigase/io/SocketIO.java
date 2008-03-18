@@ -82,7 +82,9 @@ public class SocketIO implements IOInterface {
 //     } // end of while (out.hasRemaining())
 //     log.finer("Wrote to channel " + result + " bytes.");
 //     return result;
-		dataToSend.offer(buff);
+		if (buff != null) {
+			dataToSend.offer(buff);
+		}
 		ByteBuffer dataBuffer = dataToSend.peek();
     int result = channel.write(dataBuffer);
 		if (result == -1) {

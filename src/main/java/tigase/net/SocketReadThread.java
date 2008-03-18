@@ -161,18 +161,7 @@ public class SocketReadThread implements Runnable {
 	public void run() {
     while (!stopping) {
       try {
-				try {
-					clientsSel.select();
-				} catch (CancelledKeyException brokene) {
-					// According to Java API that should not happen.
-					// I think it happens only on the broken Java implementation
-					// from Apple.
-					log.log(Level.INFO, "Ups, broken JDK, Apple?", brokene);
-				} catch (Exception broken2) {
-					// Lot's or exception happen here on 64bit arch
-					// let's catch them all
-					log.log(Level.INFO, "Unexpected exception in selector.selecyt()", broken2);
-				}
+				clientsSel.select();
 //         Set<SelectionKey> selected_keys = clientsSel.selectedKeys();
 //         for (SelectionKey sk : selected_keys) {
         for (Iterator i = clientsSel.selectedKeys().iterator(); i.hasNext();) {
@@ -192,6 +181,11 @@ public class SocketReadThread implements Runnable {
 				// Clean-up cancelled keys...
         clientsSel.selectNow();
         addAllWaiting();
+			} catch (CancelledKeyException brokene) {
+				// According to Java API that should not happen.
+				// I think it happens only on the broken Java implementation
+				// from Apple.
+				log.log(Level.WARNING, "Ups, broken JDK, Apple?", brokene);
       } catch (Exception e) {
         log.log(Level.SEVERE, "Server I/O error.", e);
         //stopping = true;

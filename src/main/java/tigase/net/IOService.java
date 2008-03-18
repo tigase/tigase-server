@@ -316,9 +316,16 @@ public abstract class IOService implements Callable<IOService> {
 				dataBuffer = encoder.encode(CharBuffer.wrap(data));
 				encoder.flush(dataBuffer);
 				socketIO.write(dataBuffer);
+
+				setLastTransferTime();
+			} else {
+				if (socketIO.waitingToSend()) {
+					socketIO.write(null);
+
+					setLastTransferTime();
+				}
 			}
 		}
-		setLastTransferTime();
   }
 
   /**
