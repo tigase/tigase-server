@@ -51,6 +51,8 @@ public class BoshIOService extends XMPPIOService {
 	private static final String CONTENT_TYPE_HEADER = "Content-Type: ";
 	private static final String CONTENT_TYPE_LENGTH = "Content-Length: ";
 	private static final String CONNECTION = "Connection: ";
+	private static final String SERVER = "Server: Tigase Bosh/"
+    + tigase.server.XMPPServer.getImplementationVersion();
 
 	private String content_type = "text/xml; charset=utf-8";
 
@@ -64,6 +66,7 @@ public class BoshIOService extends XMPPIOService {
 		sb.append(CONTENT_TYPE_HEADER + content_type + EOL);
 		sb.append(CONTENT_TYPE_LENGTH + data.getBytes().length + EOL);
 		sb.append(CONNECTION + "close" + EOL);
+		sb.append(SERVER + EOL);
 		sb.append(EOL);
 		sb.append(data);
 		log.finest("Writing to socket:\n" + sb.toString());
