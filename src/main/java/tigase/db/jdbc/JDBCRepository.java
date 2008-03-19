@@ -977,6 +977,8 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		}
 
 		public Object remove(Object key) {
+			if (cache_off) { return null; }
+
 			Object val = super.remove(key);
 			String strk = key.toString();
 			Iterator<String> ks = keySet().iterator();
