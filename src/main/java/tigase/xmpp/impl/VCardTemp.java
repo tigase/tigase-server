@@ -184,7 +184,7 @@ public class VCardTemp extends XMPPProcessor implements XMPPProcessorIfc {
 			} // end of else
 		} catch (NotAuthorizedException e) {
       log.warning(
-				"Received privacy request but user session is not authorized yet: " +
+				"Received vCard request but user session is not authorized yet: " +
         packet.getStringData());
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 					"You must authorize session first.", true));
