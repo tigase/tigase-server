@@ -31,6 +31,7 @@ import java.util.Queue;
 import java.util.Stack;
 import java.util.TreeMap;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 import tigase.xml.DefaultElementFactory;
 import tigase.xml.Element;
 import tigase.xml.ElementFactory;
@@ -101,9 +102,11 @@ public class XMPPDomBuilderHandler implements SimpleHandler {
 
   public void startElement(StringBuilder name,
     StringBuilder[] attr_names, StringBuilder[] attr_values) {
-    log.finest("Start element name: "+name);
-    log.finest("Element attributes names: "+Arrays.toString(attr_names));
-    log.finest("Element attributes values: "+Arrays.toString(attr_values));
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Start element name: "+name);
+			log.finest("Element attributes names: "+Arrays.toString(attr_names));
+			log.finest("Element attributes values: "+Arrays.toString(attr_values));
+		}
 
 		// Look for 'xmlns:' declarations:
 		if (attr_names != null) {
@@ -147,7 +150,7 @@ public class XMPPDomBuilderHandler implements SimpleHandler {
     String ns = elem.getXMLNS();
     if (ns == null) {
 			if (el_stack.isEmpty() || el_stack.peek().getXMLNS() == null) {
-				elem.setDefXMLNS(top_xmlns);
+				//elem.setDefXMLNS(top_xmlns);
 			} else {
 				elem.setDefXMLNS(el_stack.peek().getXMLNS());
 			}
@@ -185,7 +188,9 @@ public class XMPPDomBuilderHandler implements SimpleHandler {
     Element elem = el_stack.pop();
     if (el_stack.isEmpty()) {
       all_roots.offer(elem);
-      log.finest("Adding new request: "+elem.toString());
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Adding new request: "+elem.toString());
+			}
     } else {
       el_stack.peek().addChild(elem);
     } // end of if (el_stack.isEmpty()) else

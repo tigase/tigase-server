@@ -354,9 +354,11 @@ public class SessionManager extends AbstractMessageReceiver
 			String xmlns = elem.getXMLNS();
 			if (xmlns == null) { xmlns = "jabber:client";	}
 			if (proc_t.processor.isSupporting(elem.getName(), xmlns)) {
-				log.finest("XMPPProcessorIfc: "+proc_t.processor.getClass().getSimpleName()+
-					" ("+proc_t.processor.id()+")"+"\n Request: "+elem.toString()
-					+ (connection != null ? ", " + connection.getConnectionId() : " null"));
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("XMPPProcessorIfc: "+proc_t.processor.getClass().getSimpleName()+
+						" ("+proc_t.processor.id()+")"+"\n Request: "+elem.toString()
+						+ (connection != null ? ", " + connection.getConnectionId() : " null"));
+				}
 				if (proc_t.addItem(packet, connection)) {
 					packet.processedBy(proc_t.processor.id());
 				} else {

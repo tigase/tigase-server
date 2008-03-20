@@ -76,7 +76,12 @@ public abstract class XMPPProcessor
     String[] impl_xmlns = supNamespaces();
     if (impl_elements != null && impl_xmlns != null) {
       for (int i = 0; i < impl_elements.length && i < impl_xmlns.length; i++) {
-        if (impl_elements[i].equals(element) && impl_xmlns[i].equals(ns)) {
+				// ******   WARNING!!!! WARNING!!!!    *****
+				// This is intentional reference comparison!
+				// This method is called very, very often and it is also very expensive
+				// therefore all XML element names and xmlns are created using
+				// String.intern()
+        if (impl_elements[i] == element && impl_xmlns[i] == ns) {
           return true;
         } // end of if (ELEMENTS[i].equals(element) && XMLNSS[i].equals(ns))
       } // end of for (int i = 0; i < ELEMENTS.length; i++)

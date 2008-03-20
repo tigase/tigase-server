@@ -53,6 +53,7 @@ public class Packet {
 	private String to = null;
 	private String from = null;
 	private Permissions permissions = Permissions.NONE;
+	private String packetToString = null;
 
   public Packet(final Element elem) {
 		if (elem == null) {
@@ -100,6 +101,7 @@ public class Packet {
 	}
 
 	public void setPermissions(Permissions perm) {
+		packetToString = null;
 		permissions = perm;
 	}
 
@@ -160,6 +162,7 @@ public class Packet {
 	}
 
 	public void setTo(final String to) {
+		packetToString = null;
 		this.to = to;
 	}
 
@@ -168,10 +171,11 @@ public class Packet {
 	}
 
 	public void setFrom(final String from) {
+		packetToString = null;
 		this.from = from;
 	}
 
-	public String getAttribute(final String key) {
+	public String getAttribute(String key) {
 		return elem.getAttribute(key);
 	}
 
@@ -222,8 +226,11 @@ public class Packet {
   }
 
 	public String toString() {
-		return "to="+to+", from="+from+", data="+elem.toString()
-			+", XMLNS="+elem.getXMLNS();
+		if (packetToString == null) {
+			packetToString = "to=" + to + ", from=" + from + ", data=" + elem.toString()
+			  + ", XMLNS="+elem.getXMLNS();
+		}
+		return packetToString;
 	}
 
 	public boolean isRouted() {
