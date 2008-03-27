@@ -92,6 +92,7 @@ public abstract class IOService implements Callable<IOService> {
 	 * it is used to help detect dead connections.
    */
 	private long lastTransferTime = 0;
+	private boolean stopping = false;
 
 	private IOServiceListener serviceListener = null;
 
@@ -214,6 +215,14 @@ public abstract class IOService implements Callable<IOService> {
    * @exception IOException if an error occurs
    */
   public void stop() {
+		if (socketIO.waitingToSend()) {
+			stopping = true;
+		} else {
+			forceStop();
+		}
+  }
+
+	public void forceStop() {
 		try {
 			socketIO.stop();
 		} catch (Exception e) {
@@ -225,7 +234,7 @@ public abstract class IOService implements Callable<IOService> {
 				tmp.serviceStopped(this);
 			}
 		}
-  }
+	}
 
   /**
    * Method <code>run</code> is used to perform
@@ -237,10 +246,14 @@ public abstract class IOService implements Callable<IOService> {
 		// and we don't want to put any locking or synchronization
 		//		processWaitingPackets();
 		writeData(null);
-		processSocketData();
-		if (receivedPackets() > 0 && serviceListener != null) {
-			serviceListener.packetsReady(this);
-		} // end of if (receivedPackets.size() > 0)
+		if (stopping) {
+			stop();
+		} else {
+			processSocketData();
+			if (receivedPackets() > 0 && serviceListener != null) {
+				serviceListener.packetsReady(this);
+			} // end of if (receivedPackets.size() > 0)
+		}
     return this;
   }
 
