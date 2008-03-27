@@ -120,23 +120,44 @@
         tofile="${dist}/@{packagename}-${version}/ChangeLog"/>
       <mkdir dir="${dist}/@{packagename}-${version}/certs"/>
       <copy todir="${dist}/@{packagename}-${version}/certs">
-        <fileset dir="certs" includes="*"/>
+        <filelist dir="certs">
+          <file name="dummy.cer"/>
+          <file name="rsa-keystore"/>
+          <file name="truststore"/>
+          <file name="localhost.pem"/>
+        </filelist>
       </copy>
       <mkdir dir="${dist}/@{packagename}-${version}/etc"/>
-      <copy
-        file="etc/tigase.conf"
-        tofile="${dist}/@{packagename}-${version}/etc/tigase.conf"/>
+      <copy todir="${dist}/@{packagename}-${version}/etc">
+        <filelist dir="etc">
+          <file name="tigase.conf"/>
+          <file name="init.properties"/>
+        </filelist>
+      </copy>
       <mkdir dir="${dist}/@{packagename}-${version}/libs"/>
       <copy todir="${dist}/@{packagename}-${version}/libs">
-        <fileset dir="libs" includes="*"/>
+        <filelist dir="libs">
+          <file name="bcprov-jdk16-136.jar"/>
+          <file name="cindy.jar"/>
+          <file name="commons-logging.jar"/>
+          <file name="jdbc-mysql.jar"/>
+          <file name="jdbc-postgresql.jar"/>
+          <file name="jml-1.0b2.jar"/>
+          <file name="jtds-1.2.2.jar"/>
+          <file name="tigase-extras-0.2.0-SNAPSHOT.jar"/>
+          <file name="tigase-muc-0.1.6-SNAPSHOT.jar"/>
+          <file name="tigase-utils.jar"/>
+          <file name="tigase-xmltools.jar"/>
+        </filelist>
       </copy>
       <mkdir dir="${dist}/@{packagename}-${version}/database"/>
-      <copy
-        file="database/mysql-schema.sql"
-        tofile="${dist}/@{packagename}-${version}/database/mysql-schema.sql"/>
-      <copy
-        file="database/postgresql-schema.sql"
-        tofile="${dist}/@{packagename}-${version}/database/postgresql-schema.sql"/>
+      <copy todir="${dist}/@{packagename}-${version}/database">
+        <filelist dir="database">
+          <file name="mysql-schema.sql"/>
+          <file name="postgresql-schema.sql"/>
+          <file name="sqlserver-schema.sql"/>
+        </filelist>
+      </copy>
       <copy
         file="scripts/tigase.sh"
         tofile="${dist}/@{packagename}-${version}/bin/tigase.sh"/>
@@ -155,9 +176,6 @@
       <move todir="${dist}/@{packagename}-${version}/docs">
         <fileset dir="@{docsdir}"/>
       </move>
-      <copy todir="${dist}/@{packagename}-${version}">
-        <fileset dir="." includes="CHANGES*"/>
-      </copy>
       <zip zipfile="@{packagename}-${version}.zip" basedir="${dist}"/>
       <tar tarfile="@{packagename}-${version}.tar" basedir="${dist}"/>
       <gzip

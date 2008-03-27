@@ -1,4 +1,4 @@
-#define ver "3.1.1-b745";
+#define ver "3.3.2-b889";
 
 [Setup]
 AppName=Tigase Server
@@ -43,12 +43,26 @@ Name: spanish; MessagesFile: compiler:Languages\Spanish.isl
 
 [Files]
 Source: wrapper\wrapper.exe; DestDir: {app}; Flags: ignoreversion; Languages: 
-Source: ..\certs\*; DestDir: {app}\certs; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: ..\certs\dummy.cer; DestDir: {app}\certs; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: ..\certs\rsa-keystore; DestDir: {app}\certs; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: ..\certs\truststore; DestDir: {app}\certs; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: ..\certs\localhost.pem; DestDir: {app}\certs; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: ..\docs-tigase-server\*; DestDir: {app}\docs; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: ..\jars\*; DestDir: {app}\jars; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: ..\libs\*; DestDir: {app}\libs; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: ..\database\mysql-schema.sql; DestDir: {app}\database\mysql-schema.sql; Flags: ignoreversion
-Source: ..\database\postgresql-schema.sql; DestDir: {app}\database\postgresql-schema.sql; Flags: ignoreversion
+Source: ..\libs\tigase-utils.jar; DestDir: {app}\libs; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: ..\libs\tigase-xmltools.jar; DestDir: {app}\libs; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: ..\libs\bcprov-jdk16-136.jar; DestDir: {app}\libs; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: ..\libs\cindy.jar; DestDir: {app}\libs; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: ..\libs\commons-logging.jar; DestDir: {app}\libs; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: ..\libs\jdbc-mysql.jar; DestDir: {app}\libs; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: ..\libs\jdbc-postgresql.jar; DestDir: {app}\libs; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: ..\libs\jml-1.0b2.jar; DestDir: {app}\libs; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: ..\libs\jtds-1.2.2.jar; DestDir: {app}\libs; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: ..\libs\tigase-extras-0.2.0-SNAPSHOT.jar; DestDir: {app}\libs; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: ..\libs\tigase-muc-0.1.6-SNAPSHOT.jar; DestDir: {app}\libs; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: ..\database\mysql-schema.sql; DestDir: {app}\database; Flags: ignoreversion
+Source: ..\database\postgresql-schema.sql; DestDir: {app}\database; Flags: ignoreversion
+Source: ..\database\sqlserver-schema.sql; DestDir: {app}\database; Flags: ignoreversion
 Source: wrapper\wrapper.conf; DestDir: {app}; Flags: ignoreversion
 Source: scripts\InstallTigaseService.bat; DestDir: {app}; Flags: ignoreversion
 Source: ..\README.html; DestDir: {app}; Flags: ignoreversion
@@ -62,7 +76,7 @@ Source: Licence.txt; DestDir: {app}; Flags: ignoreversion
 Source: wrapper\wrapper.dll; DestDir: {app}\libs; Flags: ignoreversion
 Source: wrapper\wrapper.jar; DestDir: {app}\libs; Flags: ignoreversion
 Source: ..\etc\tigase.conf; DestDir: {app}\etc; Flags: ignoreversion
-Source: ..\etc\initial.properties; DestDir: {app}\etc; Flags: ignoreversion
+Source: ..\etc\init.properties; DestDir: {app}\etc; Flags: ignoreversion
 
 [Dirs]
 Name: {app}\logs
