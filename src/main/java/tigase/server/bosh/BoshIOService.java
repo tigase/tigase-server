@@ -47,7 +47,7 @@ public class BoshIOService extends XMPPIOService {
 	private long rid = -1;
 
 	private static final String EOL = "\r\n";
-	private static final String HTTP_RESPONSE = "HTTP/1.1 200 OK" + EOL;
+	private static final String HTTP_OK_RESPONSE = "HTTP/1.1 200 OK" + EOL;
 	private static final String CONTENT_TYPE_HEADER = "Content-Type: ";
 	private static final String CONTENT_TYPE_LENGTH = "Content-Length: ";
 	private static final String CONNECTION = "Connection: ";
@@ -62,7 +62,7 @@ public class BoshIOService extends XMPPIOService {
 
 	public void writeRawData(String data) throws IOException {
 		StringBuilder sb = new StringBuilder();
-		sb.append(HTTP_RESPONSE);
+		sb.append(HTTP_OK_RESPONSE);
 		sb.append(CONTENT_TYPE_HEADER + content_type + EOL);
 		sb.append(CONTENT_TYPE_LENGTH + data.getBytes().length + EOL);
 		sb.append(CONNECTION + "close" + EOL);
@@ -71,6 +71,23 @@ public class BoshIOService extends XMPPIOService {
 		sb.append(data);
 		log.finest("Writing to socket:\n" + sb.toString());
 		super.writeRawData(sb.toString());
+	}
+
+	public void sendErrorAndStop(int errorCode, String errorMsg) throws IOException {
+		String code404 = "<body type='terminate'"
+      + " condition='item-not-found'"
+      + " xmlns='http://jabber.org/protocol/httpbind'/>";
+		StringBuilder sb = new StringBuilder();
+		sb.append("HTTP/1.1 " + errorCode + " " + errorMsg + EOL);
+		sb.append(CONTENT_TYPE_HEADER + content_type + EOL);
+		sb.append(CONTENT_TYPE_LENGTH + code404.getBytes().length + EOL);
+		sb.append(CONNECTION + "close" + EOL);
+		sb.append(SERVER + EOL);
+		sb.append(EOL);
+		sb.append(code404);
+		log.finest("Writing to socket:\n" + sb.toString());
+		super.writeRawData(sb.toString());
+		stop();
 	}
 
 	public void setSid(UUID sid) {

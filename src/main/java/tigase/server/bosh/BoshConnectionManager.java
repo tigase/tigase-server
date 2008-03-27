@@ -150,7 +150,7 @@ public class BoshConnectionManager extends ConnectionManager<BoshIOService>
 						bs.processSocketPacket(p, serv, out_results);
 					} else {
 						log.warning("There is no session with given SID. Closing invalid connection");
-						serv.stop();
+						serv.sendErrorAndStop(404, "Not Found");
 					}
 				}
 				addOutPackets(out_results, bs);
