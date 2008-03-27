@@ -26,6 +26,8 @@ import tigase.db.RepositoryFactory;
 import tigase.db.UserAuthRepository;
 import tigase.db.UserExistsException;
 import tigase.db.UserRepository;
+import java.io.BufferedReader;
+import java.io.FileReader;
 
 /**
  * Describe class RepositoryUtils here.
@@ -295,6 +297,8 @@ public class RepositoryUtils {
       + " ------------\n"
       + " -roster     check the user roster\n"
       + " -aeg [true|false]  Allow empty group list for the contact\n"
+      + " -import file  import user data from the file of following format:\n"
+      + "         user_jid, password, roser_jid, roster_nick, subscription, group\n"
       + "\n"
       + "\n"
 			+ "\n"
@@ -322,10 +326,12 @@ public class RepositoryUtils {
 	private static boolean key_val = false;
 	private static boolean check_roster = false;
 	private static boolean allowed_empty_groups = true;
+	private static boolean import_data = false;
 
 	private static String subnode = null;
 	private static String key = null;
 	private static String value = null;
+	private static String import_file = null;
 
 	public static void copyRepositories(UserRepository src, UserRepository dst)
 		throws Exception {
@@ -424,6 +430,10 @@ public class RepositoryUtils {
         } // end of if (args[i].equals("-h"))
         if (args[i].equals("-roster")) {
 					check_roster = true;
+        } // end of if (args[i].equals("-h"))
+        if (args[i].equals("-import")) {
+					import_data = true;
+					import_file = args[++i];
         } // end of if (args[i].equals("-h"))
         if (args[i].equals("-aeg")) {
 					allowed_empty_groups = args[++i].equals("true");
@@ -583,6 +593,33 @@ public class RepositoryUtils {
 			} else {
 				repairRoster(src_repo);
 			} // end of else
+		}
+
+		if (import_data && src_repo != null) {
+			BufferedReader br = new BufferedReader(new FileReader(import_file));
+			String line = null;
+			while ((line = br.readLine()) != null) {
+				String[] vals = line.split(",");
+				try {
+					src_repo.addUser(vals[0]);
+				} catch (UserExistsException e) {	}
+				if (vals.length >= 2) {
+					src_repo.setData(vals[0], null, "password", vals[1]);
+				}
+				if (vals.length >= 3) {
+					src_repo.setData(vals[0], "roster/"+vals[2], "name", vals[2]);
+				}
+				if (vals.length >= 4) {
+					src_repo.setData(vals[0], "roster/"+vals[2], "name", vals[3]);
+				}
+				if (vals.length >= 5) {
+					src_repo.setData(vals[0], "roster/"+vals[2], "subscription", vals[4]);
+				}
+				if (vals.length >= 6) {
+					src_repo.setData(vals[0], "roster/"+vals[2], "groups", vals[5]);
+				}
+			}
+			br.close();
 		}
 
 		if (print_repo && src_repo != null) {
