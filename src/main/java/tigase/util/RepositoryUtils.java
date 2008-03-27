@@ -601,22 +601,26 @@ public class RepositoryUtils {
 			while ((line = br.readLine()) != null) {
 				String[] vals = line.split(",");
 				try {
-					src_repo.addUser(vals[0]);
+					src_repo.addUser(vals[0].trim());
 				} catch (UserExistsException e) {	}
 				if (vals.length >= 2) {
-					src_repo.setData(vals[0], null, "password", vals[1]);
+					src_repo.setData(vals[0].trim(), null, "password", vals[1].trim());
 				}
 				if (vals.length >= 3) {
-					src_repo.setData(vals[0], "roster/"+vals[2], "name", vals[2]);
+					src_repo.setData(vals[0].trim(), "roster/"+vals[2].trim(),
+						"name", vals[2].trim());
 				}
 				if (vals.length >= 4) {
-					src_repo.setData(vals[0], "roster/"+vals[2], "name", vals[3]);
+					src_repo.setData(vals[0].trim(), "roster/"+vals[2].trim(),
+						"name", vals[3].trim());
 				}
 				if (vals.length >= 5) {
-					src_repo.setData(vals[0], "roster/"+vals[2], "subscription", vals[4]);
+					src_repo.setData(vals[0].trim(), "roster/"+vals[2].trim(),
+						"subscription", vals[4].trim());
 				}
 				if (vals.length >= 6) {
-					src_repo.setData(vals[0], "roster/"+vals[2], "groups", vals[5]);
+					src_repo.setData(vals[0].trim(), "roster/"+vals[2].trim(),
+						"groups", vals[5].trim());
 				}
 			}
 			br.close();
