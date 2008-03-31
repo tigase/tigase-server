@@ -589,7 +589,10 @@ public class Roster {
 		Element item = new Element("item");
 		item.setAttribute("jid", JIDUtils.getNodeID(buddy));
 		item.addAttributes(subscr.getSubscriptionAttr());
-		item.setAttribute("name", XMLUtils.escape(getBuddyName(session, buddy)));
+		String name = getBuddyName(session, buddy);
+		if (name != null) {
+			item.setAttribute("name", XMLUtils.escape(name));
+		}
 		String[] groups = getBuddyGroups(session, buddy);
 		if (groups != null) {
 			for (String gr : groups) {
