@@ -270,11 +270,12 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 		}
 		final String id = UUID.randomUUID().toString();
 		if (hostname == null) {
-			return "<stream:stream version='1.0' xml:lang='en'"
-				+ " from='" + getDefHostName() + "'"
-				+ " id='" + id + "'"
+			return "<?xml version='1.0'?><stream:stream"
 				+ " xmlns='jabber:client'"
-				+ " xmlns:stream='http://etherx.jabber.org/streams'>"
+				+ " xmlns:stream='http://etherx.jabber.org/streams'"
+				+ " id='" + id + "'"
+				+ " from='" + getDefHostName() + "'"
+        + " version='1.0' xml:lang='en'>"
 				+ "<stream:error>"
 				+ "<improper-addressing xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>"
 				+ "</stream:error>"
@@ -283,11 +284,12 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 		} // end of if (hostname == null)
 
 		if (!hostnames.contains(hostname)) {
-			return "<stream:stream version='1.0' xml:lang='en'"
-				+ " from='" + getDefHostName() + "'"
-				+ " id='" + id + "'"
+			return "<?xml version='1.0'?><stream:stream"
 				+ " xmlns='jabber:client'"
-				+ " xmlns:stream='http://etherx.jabber.org/streams'>"
+				+ " xmlns:stream='http://etherx.jabber.org/streams'"
+				+ " id='" + id + "'"
+				+ " from='" + getDefHostName() + "'"
+        + " version='1.0' xml:lang='en'>"
 				+ "<stream:error>"
 				+ "<host-unknown xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>"
 				+ "</stream:error>"
@@ -296,11 +298,12 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 		} // end of if (!hostnames.contains(hostname))
 
 		try {
-			serv.writeRawData("<stream:stream version='1.0' xml:lang='en'"
+			serv.writeRawData("<?xml version='1.0'?><stream:stream"
+				+ " xmlns='jabber:client'"
+				+ " xmlns:stream='http://etherx.jabber.org/streams'"
 				+ " from='" + hostname + "'"
 				+ " id='" + id + "'"
-				+ " xmlns='jabber:client'"
-				+ " xmlns:stream='http://etherx.jabber.org/streams'>");
+				+ " version='1.0' xml:lang='en'>");
 			serv.getSessionData().put(serv.SESSION_ID_KEY, id);
 			serv.getSessionData().put(serv.HOSTNAME_KEY, hostname);
 			Packet streamOpen = Command.STREAM_OPENED.getPacket(
