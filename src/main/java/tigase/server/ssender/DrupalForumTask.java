@@ -97,7 +97,7 @@ public class DrupalForumTask extends SenderTask {
 	/**
 	 * <code>conn_valid_st</code> is a prepared statement keeping query used
 	 * to validate connection to database:
-	 * <pre>select localtime</pre>
+	 * <pre>select 1</pre>
 	 */
 	private PreparedStatement conn_valid_st = null;
 
@@ -208,7 +208,7 @@ public class DrupalForumTask extends SenderTask {
 		conn = DriverManager.getConnection(db_conn);
 		conn.setAutoCommit(true);
 
-		String query = "select localtime";
+		String query = "select 1;";
 		conn_valid_st = conn.prepareStatement(query);
 
 		query = "select users.name as name, node_revisions.title as title,"

@@ -333,7 +333,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 			+ " where (nid = ?) AND (pkey = ?)";
 		remove_key_data_st = conn.prepareStatement(query);
 
-		query = "select localtime;";
+		query = "select 1;";
 		conn_valid_st = conn.prepareStatement(query);
 	}
 

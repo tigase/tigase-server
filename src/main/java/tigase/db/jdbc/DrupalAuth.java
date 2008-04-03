@@ -132,7 +132,7 @@ public class DrupalAuth implements UserAuthRepository {
 		query = "select max(uid) from " + users_tbl;
 		max_uid_st = conn.prepareStatement(query);
 
-		query = "select localtime;";
+		query = "select 1;";
 		conn_valid_st = conn.prepareStatement(query);
 
 		query = "update " + users_tbl + " set access=?, login=? where name=?;";

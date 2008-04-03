@@ -116,7 +116,7 @@ public class LibreSourceAuth implements UserAuthRepository {
 			+ " where id_ = ?;";
 		status_st = conn.prepareStatement(query);
 
-		query = "select localtime;";
+		query = "select 1;";
 		conn_valid_st = conn.prepareStatement(query);
 
 		query = "update " + users_tbl + " set passworddigest_ = ? where username_ = ?;";

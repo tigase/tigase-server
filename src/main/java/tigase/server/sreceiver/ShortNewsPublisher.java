@@ -130,7 +130,7 @@ public class ShortNewsPublisher extends RepoRosterTask {
 	/**
 	 * <code>conn_valid_st</code> is a prepared statement keeping query used
 	 * to validate connection to database:
-	 * <pre>select localtime</pre>
+	 * <pre>select 1</pre>
 	 */
 	private PreparedStatement conn_valid_st = null;
 	/**
@@ -186,7 +186,7 @@ public class ShortNewsPublisher extends RepoRosterTask {
 		conn = DriverManager.getConnection(db_conn);
 		conn.setAutoCommit(true);
 
-		String query = "select localtime";
+		String query = "select 1;";
 		conn_valid_st = conn.prepareStatement(query);
 
 		if (newsType == null || newsType.length() == 0) {
