@@ -282,7 +282,7 @@ public class Gateway extends AbstractMessageReceiver
 				addOutPacket(packet.swapElemFromTo(StanzaType.subscribed));
 			}
 			if (packet.getType() == StanzaType.unavailable) {
-				closeConnection(packet);
+				removeJid(packet);
 			}
 		} else {
 			if (packet.getType() == null || packet.getType() == StanzaType.available) {
@@ -401,11 +401,19 @@ public class Gateway extends AbstractMessageReceiver
 		}
 	}
 
-	private void closeConnection(Packet packet) {
+	private void removeJid(Packet packet) {
 		String id = JIDUtils.getNodeID(packet.getElemFrom());
 		GatewayConnection conn = gw_connections.get(id);
 		if (conn != null) {
 			gw_connections.remove(id);
+			if (conn.getAllJids() == null || conn.getAllJids().length == 0) {
+				closeConnection(conn);
+			}
+		}
+	}
+
+	private void closeConnection(GatewayConnection conn) {
+		if (conn != null) {
 			conn.logout();
 		}
 	}
@@ -444,7 +452,7 @@ public class Gateway extends AbstractMessageReceiver
 				conn = gwInstance();
 				conn.setGatewayListener(this);
 				conn.setLogin(username, password);
-				conn.setGatewayDomain(myDomain());
+				//conn.setGatewayDomain(myDomain());
 				conn.addJid(packet.getElemFrom());
 				conn.init();
 				conn.login();
