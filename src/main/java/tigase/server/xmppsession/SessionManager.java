@@ -33,6 +33,8 @@ import java.util.Map;
 import java.util.LinkedHashMap;
 import java.util.Queue;
 import java.util.TreeMap;
+import java.util.Set;
+import java.util.HashSet;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
@@ -121,6 +123,8 @@ public class SessionManager extends AbstractMessageReceiver
 	private Map<String, Map<String, Object>> plugin_config =
 		new ConcurrentSkipListMap<String, Map<String, Object>>();
 
+	private Set<String> anonymous_domains = new HashSet<String>();
+
 	private ServiceEntity serviceEntity = null;
 
 	private long closedConnections = 0;
@@ -197,9 +201,20 @@ public class SessionManager extends AbstractMessageReceiver
 		Queue<Packet> results = new LinkedList<Packet>();
 
 		boolean stop = false;
-		for (XMPPPreprocessorIfc preproc: preProcessors.values()) {
-			stop |= preproc.preProcess(packet, conn, naUserRepository, results);
-		} // end of for (XMPPPreprocessorIfc preproc: preProcessors)
+		if (!stop) {
+			if (filter.preprocess(packet, conn, naUserRepository, results)) {
+				packet.processedBy("filter-foward");
+				log.finest("Packet forwarded: " + packet.toString());
+				addOutPackets(results);
+				return;
+			}
+		}
+
+		if (!stop) {
+			for (XMPPPreprocessorIfc preproc: preProcessors.values()) {
+				stop |= preproc.preProcess(packet, conn, naUserRepository, results);
+			} // end of for (XMPPPreprocessorIfc preproc: preProcessors)
+		}
 
 		if (!stop) {
 			if (filter.forward(packet, conn, naUserRepository, results)) {
@@ -274,16 +289,20 @@ public class SessionManager extends AbstractMessageReceiver
 			perms = Permissions.LOCAL;
 			if (conn.isAuthorized()) {
 				perms = Permissions.AUTH;
-				try {
-					String id = conn.getUserId();
-					if (isTrusted(id)) {
-						perms = Permissions.TRUSTED;
+				if (conn.isAnonymous()) {
+					perms = Permissions.ANONYM;
+				} else {
+					try {
+						String id = conn.getUserId();
+						if (isTrusted(id)) {
+							perms = Permissions.TRUSTED;
+						}
+						if (isAdmin(id)) {
+							perms = Permissions.ADMIN;
+						}
+					} catch (NotAuthorizedException e) {
+						perms = Permissions.NONE;
 					}
-					if (isAdmin(id)) {
-						perms = Permissions.ADMIN;
-					}
-				} catch (NotAuthorizedException e) {
-					perms = Permissions.NONE;
 				}
 			}
 		}
@@ -430,7 +449,7 @@ public class SessionManager extends AbstractMessageReceiver
 	private XMPPResourceConnection createUserSession(String conn_id,
 		String domain, String user_jid) {
 		XMPPResourceConnection connection = new XMPPResourceConnection(conn_id,
-			user_repository, auth_repository, this);
+			user_repository, auth_repository, this, false);
 		connection.setDomain(domain);
 		// Dummy session ID, we might decide later to set real thing here
 		connection.setSessionId("session-id");
@@ -461,7 +480,8 @@ public class SessionManager extends AbstractMessageReceiver
 				log.finer("Adding resource connection for: " + pc.getFrom());
 				final String hostname = Command.getFieldValue(pc, "hostname");
 				connection = new XMPPResourceConnection(pc.getFrom(),
-					user_repository, auth_repository, this);
+					user_repository, auth_repository, this,
+					anonymous_domains.contains(hostname));
 				if (hostname != null) {
 					log.finest("Setting hostname " + hostname
 						+ " for connection: " + connection.getConnectionId());
@@ -742,7 +762,9 @@ public class SessionManager extends AbstractMessageReceiver
 			XMPPResourceConnection conn = createUserSession(NULL_ROUTING, host, host);
 			conn.setDummy(true);
 		} // end of for ()
-
+		anonymous_domains.clear();
+		anonymous_domains.addAll(
+			Arrays.asList((String[])props.get(ANONYMOUS_DOMAINS_PROP_KEY)));
 		admins = (String[])props.get(ADMINS_PROP_KEY);
 		trusted = (String[])props.get(TRUSTED_PROP_KEY);
 

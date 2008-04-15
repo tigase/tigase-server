@@ -32,10 +32,11 @@ package tigase.server;
  */
 public enum Permissions {
 
-	NONE,       // Unknown user JID
-		LOCAL,    // This is local user JID but not authenticated yet
-		AUTH,     // Local authenticated and authorized user
-		TRUSTED,  // Trusted accound, can broadcats packets
-		ADMIN;    // Admin account already authenticated
+	NONE,     // Unknown user JID
+  ANONYM,   // Anonymous user
+	LOCAL,    // This is local user JID but not authenticated yet
+	AUTH,     // Local authenticated and authorized user
+	TRUSTED,  // Trusted accound, can broadcats packets
+	ADMIN;    // Admin account already authenticated
 
 }

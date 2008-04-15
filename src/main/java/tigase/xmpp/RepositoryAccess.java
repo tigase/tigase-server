@@ -24,6 +24,8 @@ package tigase.xmpp;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Map;
+import java.util.UUID;
+import java.util.Arrays;
 import tigase.util.JIDUtils;
 import tigase.db.UserRepository;
 import tigase.db.UserAuthRepository;
@@ -56,6 +58,8 @@ public abstract class RepositoryAccess {
   protected static final String NO_ACCESS_TO_REP_MSG =
     "Can not access user repository.";
 
+	private static final String ANONYMOUS_MECH = "ANONYMOUS";
+
 	/**
    * Handle to user repository - permanent data base for storing user data.
    */
@@ -67,14 +71,18 @@ public abstract class RepositoryAccess {
    * It becomes <code>AUTHORIZED</code>
    */
 	private Authorization authState = Authorization.NOT_AUTHORIZED;
+	private boolean anon_allowed = false;
+	private boolean is_anonymous = false;
 
 	/**
 	 * Creates a new <code>RepositoryAccess</code> instance.
 	 *
 	 */
-	public RepositoryAccess(UserRepository rep, UserAuthRepository auth) {
+	public RepositoryAccess(UserRepository rep, UserAuthRepository auth,
+		boolean anon_allowed) {
 		repo = rep;
 		authRepo = auth;
+		this.anon_allowed = anon_allowed;
 	}
 
 	public abstract String getUserId() throws NotAuthorizedException;
@@ -235,12 +243,23 @@ public abstract class RepositoryAccess {
 		} // end of try-catch
   }
 
+	public boolean isAnonymous() {
+		return is_anonymous;
+	}
+
   public Authorization loginOther(Map<String, Object> props)
 		throws NotAuthorizedException, AuthorizationException {
 		try {
-			if (authRepo.otherAuth(props)) {
+			String mech = (String)props.get(UserAuthRepository.MACHANISM_KEY);
+			if (anon_allowed && mech != null && mech.equals(ANONYMOUS_MECH)) {
+				is_anonymous = true;
+				props.put(UserAuthRepository.USER_ID_KEY, UUID.randomUUID().toString());
 				authState = Authorization.AUTHORIZED;
-			} // end of if (authRepo.loginPlain())auth.login();
+			} else {
+				if (authRepo.otherAuth(props)) {
+					authState = Authorization.AUTHORIZED;
+				} // end of if (authRepo.loginPlain())auth.login();
+			}
 			return authState;
     } catch (UserNotFoundException e) {
       log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
@@ -271,6 +290,14 @@ public abstract class RepositoryAccess {
 
 	public void queryAuth(Map<String, Object> authProps) {
 		authRepo.queryAuth(authProps);
+		if (anon_allowed
+			&& (authProps.get(UserAuthRepository.PROTOCOL_KEY)
+				== UserAuthRepository.PROTOCOL_VAL_SASL)) {
+			String[] auth_mechs =
+         (String[])authProps.get(UserAuthRepository.RESULT_KEY);
+			auth_mechs = Arrays.copyOf(auth_mechs, auth_mechs.length+1);
+			auth_mechs[auth_mechs.length-1] = ANONYMOUS_MECH;
+		}
 	}
 
 	public void logout()
@@ -295,6 +322,12 @@ public abstract class RepositoryAccess {
    */
   public String[] getDataList(final String subnode, final String key)
     throws NotAuthorizedException {
+		if (is_anonymous) {
+			return null;
+		}
+		if (!isAuthorized()) {
+      throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG);
+		}
     try { return repo.getDataList(getUserId(), subnode, key);
     } catch (UserNotFoundException e) {
       log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
@@ -330,6 +363,12 @@ public abstract class RepositoryAccess {
    */
   public String getData(final String subnode,
     final String key, final String def) throws NotAuthorizedException {
+		if (is_anonymous) {
+			return null;
+		}
+		if (!isAuthorized()) {
+      throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG);
+		}
     try { return repo.getData(getUserId(), subnode, key, def);
     } catch (UserNotFoundException e) {
       log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
@@ -422,6 +461,12 @@ public abstract class RepositoryAccess {
    */
   public String[] getDataGroups(final String subnode)
     throws NotAuthorizedException {
+		if (is_anonymous) {
+			return null;
+		}
+		if (!isAuthorized()) {
+      throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG);
+		}
     try { return repo.getSubnodes(getUserId(), subnode);
     } catch (UserNotFoundException e) {
       log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
@@ -449,6 +494,12 @@ public abstract class RepositoryAccess {
    */
   public String[] getDataKeys(final String subnode)
     throws NotAuthorizedException {
+		if (is_anonymous) {
+			return null;
+		}
+		if (!isAuthorized()) {
+      throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG);
+		}
     try { return repo.getKeys(getUserId(), subnode);
     } catch (UserNotFoundException e) {
       log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
@@ -475,6 +526,12 @@ public abstract class RepositoryAccess {
    */
   public void removeDataGroup(final String subnode)
     throws NotAuthorizedException {
+		if (is_anonymous) {
+			return;
+		}
+		if (!isAuthorized()) {
+      throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG);
+		}
     try { repo.removeSubnode(getUserId(), subnode);
     } catch (UserNotFoundException e) {
       log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
@@ -502,6 +559,12 @@ public abstract class RepositoryAccess {
    */
   public void setDataList(final String subnode, final String key,
     final String[] list) throws NotAuthorizedException {
+		if (is_anonymous) {
+			return;
+		}
+		if (!isAuthorized()) {
+      throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG);
+		}
     try { repo.setDataList(getUserId(), subnode, key, list);
     } catch (UserNotFoundException e) {
       log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
@@ -513,6 +576,12 @@ public abstract class RepositoryAccess {
 
   public void addDataList(final String subnode, final String key,
     final String[] list) throws NotAuthorizedException {
+		if (is_anonymous) {
+			return;
+		}
+		if (!isAuthorized()) {
+      throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG);
+		}
     try { repo.addDataList(getUserId(), subnode, key, list);
     } catch (UserNotFoundException e) {
       log.log(Level.FINEST, "Problem accessing reposiotry: ", e);

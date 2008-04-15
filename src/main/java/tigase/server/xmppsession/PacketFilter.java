@@ -56,7 +56,7 @@ public class PacketFilter {
 	 */
 	public PacketFilter() {	}
 
-	public boolean forward(final Packet packet, final XMPPResourceConnection session,
+	public boolean preprocess(final Packet packet, final XMPPResourceConnection session,
 		final NonAuthUserRepository repo, final Queue<Packet> results) {
 		if (session == null || !session.isAuthorized()) {
 			return false;
@@ -78,46 +78,15 @@ public class PacketFilter {
 				}
 			}
 
-			// Apparently all code below breaks all cases when packet addressed to
-			// the user should be processed in server on user behalf so it is commented
-			// for now. The correct solution is to handle all unprocessed packets in
-			// "process" method.
-			// So here we just set proper from address and that's it.
-			// I think we should modify all plugins code and remove setting proper
-			// from address as this has been already done here so no need for
-			// duplicated code to maintaind and process.
-
-// 			// This could be earlier at the beginnig of the method, but I want to have
-// 			// from address set properly whenever possible
-// 			if (packet.getElemTo() == null || session.isDummy()
-// 				|| packet.getElemName().equals("presence")) {
-// 				return false;
-// 			}
-
-// 			String id = JIDUtils.getNodeID(packet.getElemTo());
-
-// 			if (id.equals(session.getUserId())
-// 				&& packet.getFrom() != null
-// 				&& packet.getFrom().equals(packet.getElemFrom())) {
-// 				// Yes this is message to 'this' client
-// 				log.finest("Yes, this is packet to 'this' client: " + id);
-// 				Element elem = packet.getElement().clone();
-// 				Packet result = new Packet(elem);
-// 				result.setTo(session.getParentSession().
-// 					getResourceConnection(packet.getElemTo()).getConnectionId());
-// 				log.finest("Setting to: " + result.getTo());
-// 				result.setFrom(packet.getTo());
-// 				results.offer(result);
-// 			} else {
-// // 				// This is message to some other client
-// // 				Element result = packet.getElement().clone();
-// // 				results.offer(new Packet(result));
-// 				return false;
-// 			} // end of else
 		} catch (NotAuthorizedException e) {
 			return false;
 		} // end of try-catch
 
+		return false;
+	}
+
+	public boolean forward(final Packet packet, final XMPPResourceConnection session,
+		final NonAuthUserRepository repo, final Queue<Packet> results) {
 		return false;
 	}
 

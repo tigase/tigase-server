@@ -63,6 +63,8 @@ public class TigaseSaslProvider extends Provider {
 		super(MY_NAME, VERSION, INFO);
 		putService(new Provider.Service(this, "SaslServerFactory", "PLAIN",
 				"tigase.auth.TigaseSaslServerFactory", null, null));
+		putService(new Provider.Service(this, "SaslServerFactory", "ANONYMOUS",
+				"tigase.auth.TigaseSaslServerFactory", null, null));
 // 		putService(new Provider.Service(this, "SaslServerFactory", "DIGEST-MD5",
 // 				"tigase.auth.TigaseSaslServerFactory", null, null));
 	}

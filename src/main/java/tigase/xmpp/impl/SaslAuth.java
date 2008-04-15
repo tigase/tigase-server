@@ -157,6 +157,7 @@ public class SaslAuth extends XMPPProcessor
 				results.offer(packet.swapFromTo(createReply(ElementType.success,
 							challenge_data)));
 				authProps.clear();
+				session.removeSessionData(XMLNS+"-authProps");
 			} else {
 				results.offer(packet.swapFromTo(createReply(ElementType.challenge,
 							challenge_data)));

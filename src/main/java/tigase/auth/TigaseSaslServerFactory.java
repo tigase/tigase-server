@@ -64,6 +64,9 @@ public class TigaseSaslServerFactory implements SaslServerFactory {
 		if (mechanism.equals("PLAIN")) {
 			return new SaslPLAIN(props, callbackHandler);
 		} // end of if (mechanism.equals("PLAIN"))
+		if (mechanism.equals("ANONYMOUS")) {
+			return new SaslPLAIN(props, callbackHandler);
+		} // end of if (mechanism.equals("PLAIN"))
 // 		if (mechanism.equals("DIGEST-MD5")) {
 // 			return new SaslDigestMD5(props, callbackHandler);
 // 		} // end of if (mechanism.equals("PLAIN"))

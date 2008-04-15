@@ -95,8 +95,8 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	 *
 	 */
 	public XMPPResourceConnection(String connectionId, UserRepository rep,
-		UserAuthRepository authRepo, LoginHandler loginHandler) {
-		super(rep, authRepo);
+		UserAuthRepository authRepo, LoginHandler loginHandler, boolean anon_allowed) {
+		super(rep, authRepo, anon_allowed);
 		this.connectionId = connectionId;
 		this.loginHandler = loginHandler;
     sessionData = new HashMap<String, Object>();
@@ -137,6 +137,11 @@ public class XMPPResourceConnection extends RepositoryAccess {
     lastAccessed = System.currentTimeMillis();
     return sessionData.get(key);
   }
+
+	public final void removeSessionData(final String key) {
+    lastAccessed = System.currentTimeMillis();
+		sessionData.remove(key);
+	}
 
 	public void setPriority(final int priority) {
 		this.priority = priority;
@@ -377,6 +382,10 @@ public class XMPPResourceConnection extends RepositoryAccess {
 
 	public String nextStanzaId() {
 		return "tig" + (++id_counter);
+	}
+
+	public void queryAuth(Map<String, Object> authProps) {
+		super.queryAuth(authProps);
 	}
 
 } // XMPPResourceConnection

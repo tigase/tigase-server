@@ -47,6 +47,9 @@ public class SessionManagerConfig {
 
 	public static final String PLUGINS_PROP_KEY = "plugins";
 	public static final String PLUGINS_CONF_PROP_KEY = "plugins-conf";
+
+	public static final String ANONYMOUS_DOMAINS_PROP_KEY = "anonymous-domains";
+
 	/**
 	 * List of default plugins loaded by the server. It can be changed later
 	 * in config file or at runtime.
@@ -71,6 +74,7 @@ public class SessionManagerConfig {
 	 "urn:xmpp:ping"};
 
 	private static String[] HOSTNAMES_PROP_VAL =	{"localhost", "hostname"};
+	private static String[] ANONYMOUS_DOMAINS_PROP_VAL = {"localhost", "hostname"};
 
 	private static String[] ADMINS_PROP_VAL =	{"admin@localhost", "admin@hostname"};
 	private static String[] TRUSTED_PROP_VAL = {"admin@localhost", "admin@hostname"};
@@ -166,10 +170,13 @@ public class SessionManagerConfig {
 
 		if (params.get(GEN_VIRT_HOSTS) != null) {
 			HOSTNAMES_PROP_VAL = ((String)params.get(GEN_VIRT_HOSTS)).split(",");
+			ANONYMOUS_DOMAINS_PROP_VAL = ((String)params.get(GEN_VIRT_HOSTS)).split(",");
 		} else {
 			HOSTNAMES_PROP_VAL = DNSResolver.getDefHostNames();
+			ANONYMOUS_DOMAINS_PROP_VAL = DNSResolver.getDefHostNames();
 		}
 		props.put(HOSTNAMES_PROP_KEY, HOSTNAMES_PROP_VAL);
+		props.put(ANONYMOUS_DOMAINS_PROP_KEY, ANONYMOUS_DOMAINS_PROP_VAL);
 		if (params.get(GEN_ADMINS) != null) {
 			ADMINS_PROP_VAL = ((String)params.get(GEN_ADMINS)).split(",");
 		} else {
