@@ -604,6 +604,36 @@ public class SessionManager extends AbstractMessageReceiver
 		conn.streamClosed();
 	}
 
+	protected boolean checkOutPacket(Packet packet) {
+		if (packet.getPermissions() == Permissions.ANONYM) {
+			if (packet.getElemTo() != null
+				&& !anonymous_domains.contains(JIDUtils.getNodeHost(packet.getElemTo()))) {
+				try {
+					addPacket(Authorization.FORBIDDEN.getResponseMessage(packet,
+							"Anonymous user can only send local messages.", true));
+				} catch (PacketErrorTypeException e) {
+					log.log(Level.INFO, "Error for error packet: " + packet.toString(), e);
+				}
+				return false;
+			}
+		}
+		return true;
+	}
+
+	protected boolean addOutPacket(Packet packet) {
+		if (checkOutPacket(packet)) {
+			return super.addOutPacket(packet);
+		}
+		return false;
+	}
+
+	protected boolean addOutPackets(Queue<Packet> packets) {
+		for (Packet packet: packets) {
+			addOutPacket(packet);
+		}
+		return true;
+	}
+
 	private XMPPResourceConnection getXMPPResourceConnection(Packet p) {
 		if (p.getFrom() != null) {
 			return connectionsByFrom.get(p.getFrom());

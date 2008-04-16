@@ -191,7 +191,7 @@ public class DrupalAuth implements UserAuthRepository {
 				update_last_login_st.executeUpdate();
 			}
 		} catch (SQLException e) {
-			throw new TigaseDBException("Error accessin repository.", e);
+			throw new TigaseDBException("Error accessing repository.", e);
 		} // end of try-catch
 	}
 
@@ -205,7 +205,7 @@ public class DrupalAuth implements UserAuthRepository {
 					update_online_status.executeUpdate();
 				}
 			} catch (SQLException e) {
-				throw new TigaseDBException("Error accessin repository.", e);
+				throw new TigaseDBException("Error accessing repository.", e);
 			} // end of try-catch
 		}
 	}
