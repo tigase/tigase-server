@@ -195,11 +195,15 @@ public class MessageRouter extends AbstractMessageReceiver {
 			return;
 		}
 
-		log.finer("Processing packet: " + packet.getElemName()
-			+ ", type: " + packet.getType());
-		log.finest("Processing packet: " + packet.getStringData()
-			+ ", to: " + packet.getTo()
-			+ ", from: " + packet.getFrom());
+		if (log.isLoggable(Level.FINER)) {
+			log.finer("Processing packet: " + packet.getElemName()
+				+ ", type: " + packet.getType());
+		}
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Processing packet: " + packet.getStringData()
+				+ ", to: " + packet.getTo()
+				+ ", from: " + packet.getFrom());
+		}
 
 		String id =  JIDUtils.getNodeID(packet.getTo());
 		String local_comp_name = isToLocalComponent(id);
