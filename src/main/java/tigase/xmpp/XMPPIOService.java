@@ -99,7 +99,6 @@ public class XMPPIOService extends IOService {
 			try {
 				log.finest("Sending data: " + response);
 				writeRawData(response);
-				assert debug(response, "--SENT:");
 				if (response != null && response.endsWith("</stream:stream>")) {
 					stop();
 				} // end of if (response.endsWith())
@@ -174,11 +173,13 @@ public class XMPPIOService extends IOService {
   public void processWaitingPackets() throws IOException {
 		Packet packet = null;
 		while ((packet = waitingPackets.poll()) != null) {
-			log.finer("Processing packet: " + packet.getElemName()
-				+ ", type: " + packet.getType());
-			log.finest("Sending packet: " + packet.getStringData());
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Sending packet: " + packet.getStringData());
+			}
 			writeRawData(packet.getStringData());
-			assert debug(packet.getStringData(), "--SENT:");
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("SENT: " + packet.getStringData());
+			}
 		} // end of while (packet = waitingPackets.poll() != null)
   }
 
@@ -226,7 +227,9 @@ public class XMPPIOService extends IOService {
 						while ((elem = elems.poll()) != null) {
 							//	assert debug(elem.toString() + "\n");
 							log.finer("Read element: " + elem.getName());
-							log.finest("Read packet: " + elem.toString());
+							if (log.isLoggable(Level.FINEST)) {
+								log.finest("Read packet: " + elem.toString());
+							}
 							//							System.out.print(elem.toString());
 							addReceivedPacket(new Packet(elem));
 						} // end of while ((elem = elems.poll()) != null)
