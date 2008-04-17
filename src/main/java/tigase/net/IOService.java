@@ -324,6 +324,7 @@ public abstract class IOService implements Callable<IOService> {
   protected void writeData(final String data) throws IOException {
 		synchronized (encoder) {
 			if (data != null && data.length() > 0) {
+				log.finest("Writing data: " + data);
 				ByteBuffer dataBuffer = null;
 				encoder.reset();
 				dataBuffer = encoder.encode(CharBuffer.wrap(data));
