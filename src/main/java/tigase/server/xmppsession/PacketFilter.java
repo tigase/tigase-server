@@ -23,6 +23,7 @@ package tigase.server.xmppsession;
 
 import java.util.Queue;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 import tigase.db.NonAuthUserRepository;
 import tigase.server.Packet;
 import tigase.xml.Element;
@@ -97,7 +98,9 @@ public class PacketFilter {
 			return false;
 		} // end of if (session == null)
 
-		log.finest("Processing packet: " + packet.toString());
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Processing packet: " + packet.toString());
+		}
 
 		try {
 			// Can not forward packet if there is no destination address
