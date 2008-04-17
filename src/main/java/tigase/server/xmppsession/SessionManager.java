@@ -143,7 +143,9 @@ public class SessionManager extends AbstractMessageReceiver
 	}
 
 	public void processPacket(Packet packet) {
-		log.finest("Processing packet: " + packet.toString());
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Processing packet: " + packet.toString());
+		}
 		if (packet.isCommand()) {
 			processCommand(packet);
 			packet.processedBy("SessionManager");
@@ -204,7 +206,9 @@ public class SessionManager extends AbstractMessageReceiver
 		if (!stop) {
 			if (filter.preprocess(packet, conn, naUserRepository, results)) {
 				packet.processedBy("filter-foward");
-				log.finest("Packet forwarded: " + packet.toString());
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("Packet forwarded: " + packet.toString());
+				}
 				addOutPackets(results);
 				return;
 			}
@@ -219,7 +223,9 @@ public class SessionManager extends AbstractMessageReceiver
 		if (!stop) {
 			if (filter.forward(packet, conn, naUserRepository, results)) {
 				packet.processedBy("filter-foward");
-				log.finest("Packet forwarded: " + packet.toString());
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("Packet forwarded: " + packet.toString());
+				}
 				addOutPackets(results);
 				return;
 			}
@@ -243,7 +249,9 @@ public class SessionManager extends AbstractMessageReceiver
 		addOutPackets(results);
 
 		if (!packet.wasProcessed()) {
-			log.finest("Packet not processed: " + packet.toString());
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Packet not processed: " + packet.toString());
+			}
 			Packet error = null;
 			if (stop
 				|| (conn == null
@@ -628,7 +636,8 @@ public class SessionManager extends AbstractMessageReceiver
 	}
 
 	protected boolean addOutPackets(Queue<Packet> packets) {
-		for (Packet packet: packets) {
+		Packet packet = null;
+		while ((packet = packets.poll()) != null) {
 			addOutPacket(packet);
 		}
 		return true;
