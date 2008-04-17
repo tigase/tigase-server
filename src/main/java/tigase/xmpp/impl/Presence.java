@@ -28,6 +28,7 @@ import java.util.EnumSet;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.XMPPProcessor;
@@ -333,7 +334,9 @@ public abstract class Presence {
 				// 				packet.getElement().setAttribute("from", session.getJID());
 				// 			} // end of if (packet.getFrom().equals(session.getConnectionId()))
 
-				log.finest(pres_type + " presence found: " + packet.toString());
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest(pres_type + " presence found: " + packet.toString());
+				}
 
 				// All 'in' subscription presences must have a valid from address
 				switch (pres_type) {
