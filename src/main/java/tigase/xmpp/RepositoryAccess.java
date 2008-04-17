@@ -297,6 +297,7 @@ public abstract class RepositoryAccess {
          (String[])authProps.get(UserAuthRepository.RESULT_KEY);
 			auth_mechs = Arrays.copyOf(auth_mechs, auth_mechs.length+1);
 			auth_mechs[auth_mechs.length-1] = ANONYMOUS_MECH;
+			authProps.put(UserAuthRepository.RESULT_KEY, auth_mechs);
 		}
 	}
 
