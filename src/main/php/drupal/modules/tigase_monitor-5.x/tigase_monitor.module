@@ -76,13 +76,13 @@ function tigase_monitor_block($op='list', $delta=0) {
 					$server_version = $name_ver;
 					$file = $name;
 					if (strpos($name, ".zip")) {
-						$zip_file = "$folder/$file";
+						$zip_file = "$folder$file";
 					}
 					if (strpos($name, ".exe")) {
-						$exe_file = "$folder/$file";
+						$exe_file = "$folder$file";
 					}
 					if (strpos($name, ".tar.gz")) {
-						$targz_file = "$folder/$file";
+						$targz_file = "$folder$file";
 					}
 				}
 			} else {
