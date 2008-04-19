@@ -100,6 +100,12 @@ public class MessageRouterConfig {
 	public static final String DISCO_SHOW_VERSION_PROP_KEY = "disco-show-version";
 	public static final boolean DISCO_SHOW_VERSION_PROP_VAL = true;
 
+	public static final String UPDATES_CHECKING_PROP_KEY = "updates-checking";
+	public static final Boolean UPDATES_CHECKING_PROP_VAL = true;
+	public static final String UPDATES_CHECKING_INTERVAL_PROP_KEY =
+    "updates-checking-interval";
+	public static final long UPDATES_CHECKING_INTERVAL_PROP_VAL = 7;
+
 	public static void getDefaults(Map<String, Object> defs,
 		Map<String, Object> params, String comp_name) {
 
@@ -180,6 +186,8 @@ public class MessageRouterConfig {
     defs.put(LOCAL_ADDRESSES_PROP_KEY, LOCAL_ADDRESSES_PROP_VALUE);
 		defs.put(DISCO_NAME_PROP_KEY, DISCO_NAME_PROP_VAL);
 		defs.put(DISCO_SHOW_VERSION_PROP_KEY, DISCO_SHOW_VERSION_PROP_VAL);
+		defs.put(UPDATES_CHECKING_PROP_KEY, UPDATES_CHECKING_PROP_VAL);
+		defs.put(UPDATES_CHECKING_INTERVAL_PROP_KEY, UPDATES_CHECKING_INTERVAL_PROP_VAL);
 	}
 
 	private Map<String, Object> props = null;
