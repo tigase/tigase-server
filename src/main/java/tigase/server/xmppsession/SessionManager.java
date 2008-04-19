@@ -177,12 +177,15 @@ public class SessionManager extends AbstractMessageReceiver
 			// so let's look for established session for this user...
 			final String to = packet.getElemTo();
 			if (to != null) {
+				if (processAdmins(packet)) {
+					// No more processing is needed....
+					return;
+				}
 				conn = getResourceConnection(to);
 				if (conn == null) {
 					// It might be message to admin
-					if (processAdmins(packet)) {
-						// No more processing is needed....
-						return;
+					if (log.isLoggable(Level.FINEST)) {
+						log.info("Is it a message to admins? " + packet.toString());
 					}
 				}
 			} else {
