@@ -588,25 +588,27 @@ public class SessionManager extends AbstractMessageReceiver
 		} // end of for ()
 		addOutPackets(results);
 		try {
-			String userId = conn.getUserId();
-			log.info("Closing connection for: " + userId);
-			XMPPSession session = conn.getParentSession();
-			if (session != null) {
-				log.info("Found parent session for: " + userId);
-				if (session.getActiveResourcesSize() <= 1) {
-					session = sessionsByNodeId.remove(userId);
-					if (session == null) {
-						log.info("UPS can't remove session, not found in map: " + userId);
+			if (conn.isAuthorized()) {
+				String userId = conn.getUserId();
+				log.info("Closing connection for: " + userId);
+				XMPPSession session = conn.getParentSession();
+				if (session != null) {
+					log.info("Found parent session for: " + userId);
+					if (session.getActiveResourcesSize() <= 1) {
+						session = sessionsByNodeId.remove(userId);
+						if (session == null) {
+							log.info("UPS can't remove session, not found in map: " + userId);
+						} else {
+							log.finer("Number of authorized connections: "
+								+ sessionsByNodeId.size());
+						} // end of else
+						auth_repository.logout(userId);
 					} else {
-						log.finer("Number of authorized connections: "
-							+ sessionsByNodeId.size());
+						log.finer("Number of connections is "
+							+ session.getActiveResourcesSize() + " for the user: " + userId);
 					} // end of else
-					auth_repository.logout(userId);
-				} else {
-					log.finer("Number of connections is "
-						+ session.getActiveResourcesSize() + " for the user: " + userId);
-				} // end of else
-			} // end of if (session.getActiveResourcesSize() == 0)
+				} // end of if (session.getActiveResourcesSize() == 0)
+			}
 		} catch (NotAuthorizedException e) {
 			log.info("Closed not authorized session: " + e);
 		} catch (Exception e) {

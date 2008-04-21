@@ -51,6 +51,9 @@ public class PacketFilter {
   private static final Logger log =
 		Logger.getLogger("tigase.server.xmppsession.PacketFilter");
 
+	private String[] IGNORE_PACKETS = {"stream:features"};
+	private StanzaType[] IGNORE_TYPES = {StanzaType.error};
+
 	/**
 	 * Creates a new <code>PacketFilter</code> instance.
 	 *
@@ -59,6 +62,14 @@ public class PacketFilter {
 
 	public boolean preprocess(final Packet packet, final XMPPResourceConnection session,
 		final NonAuthUserRepository repo, final Queue<Packet> results) {
+
+		for (int i = 0; i < IGNORE_PACKETS.length; i++) {
+			if (packet.getElemName() == IGNORE_PACKETS[i]
+				&& packet.getType() == IGNORE_TYPES[i]) {
+				return true;
+			}
+		}
+
 		if (session == null || !session.isAuthorized()) {
 			return false;
 		} // end of if (session == null)
