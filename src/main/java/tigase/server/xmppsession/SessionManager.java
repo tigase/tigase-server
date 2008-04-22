@@ -815,6 +815,7 @@ public class SessionManager extends AbstractMessageReceiver
 		admins = (String[])props.get(ADMINS_PROP_KEY);
 		trusted = (String[])props.get(TRUSTED_PROP_KEY);
 		anon_peers = (String[])props.get(ANONYMOUS_PEERS_PROP_KEY);
+		Arrays.sort(anon_peers);
 	}
 
 	public void handleLogin(final String userName,

@@ -66,6 +66,7 @@ public abstract class JabberIqRoster {
   protected static final Element[] DISCO_FEATURES =	{
 		new Element("feature", new String[] {"var"}, new String[] {XMLNS})
 	};
+	private static final String ANON = "anon";
 
 	private static void processSetRequest(final Packet packet,
 		final XMPPResourceConnection session,	final Queue<Packet> results)
@@ -79,7 +80,11 @@ public abstract class JabberIqRoster {
     String subscription = item.getAttribute("subscription");
     if (subscription != null && subscription.equals("remove")) {
 			SubscriptionType sub = Roster.getBuddySubscription(session, buddy);
-			if (sub != null && sub != SubscriptionType.none) {
+			if (sub == null) {
+				sub = SubscriptionType.none;
+			}
+			String type = request.getAttribute("/iq/query/item", "type");
+			if (sub != SubscriptionType.none && (type == null || !type.equals(ANON))) {
 				Element pres = new Element("presence");
 				pres.setAttribute("to", buddy);
 				pres.setAttribute("from", session.getUserId());
@@ -111,6 +116,10 @@ public abstract class JabberIqRoster {
         name = buddy;
       } // end of if (name == null)
       Roster.setBuddyName(session, buddy, name);
+			String type = request.getAttribute("/iq/query/item", "type");
+			if (type != null && type.equals(ANON)) {
+        Roster.setBuddySubscription(session, SubscriptionType.both, buddy);
+			}
       if (Roster.getBuddySubscription(session, buddy) == null) {
         Roster.setBuddySubscription(session, SubscriptionType.none, buddy);
       } // end of if (getBuddySubscription(session, buddy) == null)
@@ -179,35 +188,17 @@ public abstract class JabberIqRoster {
 			log.finest("Anonymous session: " + session.getUserId());
 			String[] anon_peers = session.getAnonymousPeers();
 			if (anon_peers != null) {
-				Element iq = new Element("iq",
-					new String[] {"type", "id", "to"},
-					new String[] {"set", session.nextStanzaId(), session.getJID()});
-				Element query = new Element("query");
-				query.setXMLNS(XMLNS);
-				iq.addChild(query);
 				for (String peer: anon_peers) {
-					Element item = new Element("item", new Element[] {
-							new Element("group", "Anonymous peers")},
-						new String[] {"jid", "subscription", "name"},
-						new String[] {peer, "both", JIDUtils.getNodeNick(peer)});
-					query.addChild(item);
-				}
-				Packet rost_res = new Packet(iq);
-				rost_res.setTo(session.getConnectionId());
-				rost_res.setFrom(packet.getTo());
-				results.offer(rost_res);
-				log.finest("Sending anonymous user roster: " + rost_res.toString());
-				for (String peer: anon_peers) {
-					iq = new Element("iq",
+					Element iq = new Element("iq",
 						new String[] {"type", "id", "to", "from"},
 						new String[] {"set", session.getUserName(), peer, peer});
-					query = new Element("query");
+					Element query = new Element("query");
 					query.setXMLNS(XMLNS);
 					iq.addChild(query);
 					Element item = new Element("item", new Element[] {
 							new Element("group", "Anonymous peers")},
-						new String[] {"jid", "subscription", "name"},
-						new String[] {session.getUserId(), "both", session.getUserName()});
+						new String[] {"jid", "type", "name"},
+						new String[] {session.getUserId(), ANON, session.getUserName()});
 					query.addChild(item);
 					Packet rost_update = new Packet(iq);
 					results.offer(rost_update);
@@ -283,8 +274,8 @@ public abstract class JabberIqRoster {
 						query.setXMLNS(XMLNS);
 						iq.addChild(query);
 						Element item = new Element("item",
-						new String[] {"jid", "subscription"},
-							new String[] {session.getUserId(), "remove"});
+							new String[] {"jid", "subscription", "type"},
+							new String[] {session.getUserId(), "remove", ANON});
 						query.addChild(item);
 						Packet rost_update = new Packet(iq);
 						results.offer(rost_update);

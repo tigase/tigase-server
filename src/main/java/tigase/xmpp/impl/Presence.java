@@ -104,7 +104,7 @@ public abstract class Presence {
 		}
 	}
 
-  /**
+	/**
 	 * <code>sendPresenceBroadcast</code> method broadcasts given presence
 	 * to all budies from roster and to all users to which direct presence
 	 * was sent.
