@@ -174,8 +174,17 @@ public class SocketReadThread implements Runnable {
           // at the same time.
           //selected_keys.remove(sk);
           IOService s = (IOService)sk.attachment();
+					if (log.isLoggable(Level.FINEST)) {
+						StringBuilder sb = new StringBuilder("AWAKEN: " + s.getUniqueId());
+						if (sk.isWritable()) {
+							sb.append(", read for WRITING");
+						}
+						if (sk.isReadable()) {
+							sb.append(", read for READING");
+						}
+						log.finest(sb.toString());
+					}
 					sk.cancel();
-					log.finest("AWAKEN: " + s.getUniqueId());
           completionService.submit(s);
         }
 				// Clean-up cancelled keys...
