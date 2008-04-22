@@ -49,6 +49,7 @@ public class SessionManagerConfig {
 	public static final String PLUGINS_CONF_PROP_KEY = "plugins-conf";
 
 	public static final String ANONYMOUS_DOMAINS_PROP_KEY = "anonymous-domains";
+	public static final String ANONYMOUS_PEERS_PROP_KEY = "anonymous-peers";
 
 	/**
 	 * List of default plugins loaded by the server. It can be changed later
@@ -186,6 +187,7 @@ public class SessionManagerConfig {
 			} // end of for (int i = 0; i < ADMINS_PROP_VAL.length; i++)
 		}
 		props.put(ADMINS_PROP_KEY, ADMINS_PROP_VAL);
+		props.put(ANONYMOUS_PEERS_PROP_KEY, ADMINS_PROP_VAL);
 		if (params.get(GEN_TRUSTED) != null) {
 			TRUSTED_PROP_VAL = ((String)params.get(GEN_TRUSTED)).split(",");
 		} else {

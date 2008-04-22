@@ -77,6 +77,7 @@ public class RosterPresence  extends XMPPProcessor
 	public void stopped(final XMPPResourceConnection session,
 		final Queue<Packet> results, final Map<String, Object> settings) {
 		Presence.stopped(session, results, settings);
+		JabberIqRoster.stopped(session, results, settings);
 	}
 
   public void process(final Packet packet,

@@ -175,6 +175,46 @@ public abstract class JabberIqRoster {
 				results.offer(rost_res);
 			}
 		}
+		if (session.isAnonymous()) {
+			log.finest("Anonymous session: " + session.getUserId());
+			String[] anon_peers = session.getAnonymousPeers();
+			if (anon_peers != null) {
+				Element iq = new Element("iq",
+					new String[] {"type", "id", "to"},
+					new String[] {"set", session.nextStanzaId(), session.getJID()});
+				Element query = new Element("query");
+				query.setXMLNS(XMLNS);
+				iq.addChild(query);
+				for (String peer: anon_peers) {
+					Element item = new Element("item", new Element[] {
+							new Element("group", "Anonymous peers")},
+						new String[] {"jid", "subscription", "name"},
+						new String[] {peer, "both", JIDUtils.getNodeNick(peer)});
+					query.addChild(item);
+				}
+				Packet rost_res = new Packet(iq);
+				rost_res.setTo(session.getConnectionId());
+				rost_res.setFrom(packet.getTo());
+				results.offer(rost_res);
+				log.finest("Sending anonymous user roster: " + rost_res.toString());
+				for (String peer: anon_peers) {
+					iq = new Element("iq",
+						new String[] {"type", "id", "to", "from"},
+						new String[] {"set", session.getUserName(), peer, peer});
+					query = new Element("query");
+					query.setXMLNS(XMLNS);
+					iq.addChild(query);
+					Element item = new Element("item", new Element[] {
+							new Element("group", "Anonymous peers")},
+						new String[] {"jid", "subscription", "name"},
+						new String[] {session.getUserId(), "both", session.getUserName()});
+					query.addChild(item);
+					Packet rost_update = new Packet(iq);
+					results.offer(rost_update);
+					log.finest("Sending roster update: " + rost_update.toString());
+				}
+			}
+		}
   }
 
 	public static void process(final Packet packet,
@@ -220,5 +260,42 @@ public abstract class JabberIqRoster {
 		} // end of try-catch
 	}
 
+
+	/**
+	 * <code>stopped</code> method is called when user disconnects or logs-out.
+	 *
+	 * @param session a <code>XMPPResourceConnection</code> value
+	 */
+	public static void stopped(final XMPPResourceConnection session,
+		final Queue<Packet> results, final Map<String, Object> settings) {
+		// Synchronization to avoid conflict with login/logout events
+		// processed in the SessionManager asynchronously
+		synchronized (session) {
+			try {
+				if (session.isAnonymous() && session.getAnonymousPeers() != null) {
+					log.finest("Anonymous session: " + session.getUserId());
+					String[] anon_peers = session.getAnonymousPeers();
+					for (String peer: anon_peers) {
+						Element iq = new Element("iq",
+							new String[] {"type", "id", "to", "from"},
+							new String[] {"set", session.getUserName(), peer, peer});
+						Element query = new Element("query");
+						query.setXMLNS(XMLNS);
+						iq.addChild(query);
+						Element item = new Element("item",
+						new String[] {"jid", "subscription"},
+							new String[] {session.getUserId(), "remove"});
+						query.addChild(item);
+						Packet rost_update = new Packet(iq);
+						results.offer(rost_update);
+						log.finest("Sending roster update: " + rost_update.toString());
+					}
+				}
+			} catch (NotAuthorizedException e) {
+				log.warning("Can not proceed with anonymous logout, session not authorized yet..."
+					+ session.getConnectionId());
+			}
+		}
+	}
 
 } // JabberIqRoster

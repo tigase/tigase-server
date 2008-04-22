@@ -81,6 +81,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 
 	private String userJid = null;
 	private String userId = null;
+	private String[] anon_peers = null;
 
 	private long id_counter = 0;
 
@@ -172,7 +173,15 @@ public class XMPPResourceConnection extends RepositoryAccess {
 		return parentSession;
 	}
 
-  /**
+	public void setAnonymousPeers(String[] peers) {
+		this.anon_peers = peers;
+	}
+
+	public String[] getAnonymousPeers() {
+		return anon_peers;
+	}
+
+	/**
    * Returns full user JID for this session or throws
    * <code>NotAuthorizedException</code> if session is not authorized yet and
    * therefore user name and resource is not known yet.

@@ -106,6 +106,7 @@ public class SessionManager extends AbstractMessageReceiver
 
 	private String[] admins = {"admin@localhost"};
 	private String[] trusted = {"admin@localhost"};
+	private String[] anon_peers = {"admin@localhost"};
 
 	private Map<String, XMPPSession> sessionsByNodeId =
 		new ConcurrentSkipListMap<String, XMPPSession>();
@@ -464,6 +465,7 @@ public class SessionManager extends AbstractMessageReceiver
 		connection.setDomain(domain);
 		// Dummy session ID, we might decide later to set real thing here
 		connection.setSessionId("session-id");
+		connection.setAnonymousPeers(anon_peers);
 		connectionsByFrom.put(conn_id, connection);
 		handleLogin(JIDUtils.getNodeNick(user_jid), connection);
 		try {
@@ -501,6 +503,7 @@ public class SessionManager extends AbstractMessageReceiver
 				else {
 					connection.setDomain(getDefHostName());
 				} // end of if (hostname != null) else
+				connection.setAnonymousPeers(anon_peers);
 				connectionsByFrom.put(pc.getFrom(), connection);
 			} else {
 				log.finest("Stream opened for existing session, authorized: "
@@ -811,7 +814,7 @@ public class SessionManager extends AbstractMessageReceiver
 			Arrays.asList((String[])props.get(ANONYMOUS_DOMAINS_PROP_KEY)));
 		admins = (String[])props.get(ADMINS_PROP_KEY);
 		trusted = (String[])props.get(TRUSTED_PROP_KEY);
-
+		anon_peers = (String[])props.get(ANONYMOUS_PEERS_PROP_KEY);
 	}
 
 	public void handleLogin(final String userName,
