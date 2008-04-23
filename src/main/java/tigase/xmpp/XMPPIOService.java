@@ -238,7 +238,12 @@ public class XMPPIOService extends IOService {
 						ex.printStackTrace();
 						forceStop();
 					} // end of try-catch
-				} // end of if (isConnected() && data != null)
+				} else {
+					log.finest("Nothing read!!");
+				}
+			} else {
+				log.info("function called when the service is not connected! forceStop()");
+				forceStop();
 			}
     } finally {
 //       readLock.unlock();
