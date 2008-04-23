@@ -177,10 +177,10 @@ public class SocketReadThread implements Runnable {
 					if (log.isLoggable(Level.FINEST)) {
 						StringBuilder sb = new StringBuilder("AWAKEN: " + s.getUniqueId());
 						if (sk.isWritable()) {
-							sb.append(", read for WRITING");
+							sb.append(", ready for WRITING");
 						}
 						if (sk.isReadable()) {
-							sb.append(", read for READING");
+							sb.append(", ready for READING");
 						}
 						log.finest(sb.toString());
 					}

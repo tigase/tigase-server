@@ -305,7 +305,7 @@ public abstract class IOService implements Callable<IOService> {
 				return null;
 			} catch (Exception eof) {
 				//			eof.printStackTrace();
-				stop();
+				forceStop();
 			} // end of try-catch
 		}
     return cb != null ? cb.array() : null;
