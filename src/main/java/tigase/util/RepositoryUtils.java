@@ -28,6 +28,9 @@ import tigase.db.UserExistsException;
 import tigase.db.UserRepository;
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.Writer;
+import tigase.xmpp.impl.Roster;
 
 /**
  * Describe class RepositoryUtils here.
@@ -154,7 +157,7 @@ public class RepositoryUtils {
 			return false;
 		}
 		//String[] keys = repo.getKeys(user, "roster/"+contact);
-		String[] vals = repo.getDataList(user, "roster/"+contact, "groups");
+		String[] vals = repo.getDataList(user, "roster/"+contact, Roster.GROUPS);
 		if (vals == null || vals.length == 0) {
 			System.out.println("      Empty groups list");
 			if (!allowed_empty_groups) {
@@ -162,7 +165,7 @@ public class RepositoryUtils {
 			}
 		} else {
 			for (String val: vals) {
-				if (val.equals("Upline Support")
+				if (val.equals("Upline Support") || val.equals("Support")
 					|| val.startsWith("Level ")) {
 					System.out.println("      Invalid group: " + val);
 					return false;
@@ -218,6 +221,85 @@ public class RepositoryUtils {
 				for (String usr: users) {
 					//System.out.println(usr);
 					repairUserRoster(usr, repo);
+				} // end of for (String user: users)
+			} else {
+				System.out.println("There are no user accounts in repository.");
+			} // end of else
+		}
+	}
+
+	public static void exportUserRoster(String user, UserRepository repo, Writer w)
+		throws Exception {
+		System.out.println("  " + (++counter) + ". " + user + " roster: ");
+		if (!checkJID(user)) {
+			System.out.println("    Invalid user ID, should be removed...");
+			String[] contacts = repo.getSubnodes(user, "roster");
+			if (contacts == null || contacts.length == 0) {
+				System.out.println("    empty contact list, save to remove...");
+				repo.removeUser(user);
+			} else {
+				System.out.println("    non-empty contact list, leaving for now...");
+			}
+		} else {
+			String[] contacts = repo.getSubnodes(user, "roster");
+			if (contacts != null) {
+				for (String contact: contacts) {
+					System.out.println("    contact: " + contact);
+					boolean valid = checkContact(user, repo, contact);
+					if (valid) {
+						System.out.println("      looks OK");
+						String password = repo.getData(user, "password");
+						String[] groups =
+              repo.getDataList(user, "roster/"+contact, Roster.GROUPS);
+						String contact_nick =
+              repo.getData(user, "roster/"+contact, Roster.NAME);
+						String subscription =
+              repo.getData(user, "roster/"+contact, Roster.SUBSCRIPTION);
+						StringBuilder sb = new StringBuilder(user);
+						sb.append(",");
+						if (password != null) {
+							sb.append(password);
+						}
+						sb.append("," + contact);
+						sb.append(",");
+						if (contact_nick != null) {
+							sb.append(contact_nick);
+						}
+						sb.append(",");
+						if (subscription != null) {
+							sb.append(subscription);
+						}
+						if (groups != null && groups.length > 0) {
+							for (String group: groups) {
+								sb.append("," + group);
+							}
+						}
+						sb.append("\n");
+						w.write(sb.toString());
+					} else {
+						System.out.println("      should be REMOVED");
+						String contact_node = "roster/" + contact;
+						System.out.println("      removing node: " + contact_node);
+						//repo.removeSubnode(user, contact_node);
+						System.out.println("      DONE.");
+					}
+				} // end of for (String node: nodes)
+			} else {
+				System.out.println("    empty roster...");
+			}
+		}
+	}
+
+	public static void exportRoster(UserRepository repo, Writer w)
+	  throws Exception {
+		if (user != null) {
+			exportUserRoster(user, repo, w);
+		} else {
+			List<String> users = repo.getUsers();
+			if (users != null) {
+				for (String usr: users) {
+					//System.out.println(usr);
+					exportUserRoster(usr, repo, w);
 				} // end of for (String user: users)
 			} else {
 				System.out.println("There are no user accounts in repository.");
@@ -299,6 +381,8 @@ public class RepositoryUtils {
       + " -aeg [true|false]  Allow empty group list for the contact\n"
       + " -import file  import user data from the file of following format:\n"
       + "         user_jid, password, roser_jid, roster_nick, subscription, group\n"
+      + " export file   export user roster data to the specified file in the following format:\n"
+      + "        user_jid, password, roser_jid, roster_nick, subscription, group\n"
       + "\n"
       + "\n"
 			+ "\n"
@@ -327,11 +411,13 @@ public class RepositoryUtils {
 	private static boolean check_roster = false;
 	private static boolean allowed_empty_groups = true;
 	private static boolean import_data = false;
+	private static boolean export_data = false;
 
 	private static String subnode = null;
 	private static String key = null;
 	private static String value = null;
 	private static String import_file = null;
+	private static String export_file = null;
 
 	public static void copyRepositories(UserRepository src, UserRepository dst)
 		throws Exception {
@@ -434,6 +520,10 @@ public class RepositoryUtils {
         if (args[i].equals("-import")) {
 					import_data = true;
 					import_file = args[++i];
+        } // end of if (args[i].equals("-h"))
+        if (args[i].equals("-export")) {
+					export_data = true;
+					export_file = args[++i];
         } // end of if (args[i].equals("-h"))
         if (args[i].equals("-aeg")) {
 					allowed_empty_groups = args[++i].equals("true");
@@ -603,27 +693,37 @@ public class RepositoryUtils {
 				try {
 					src_repo.addUser(vals[0].trim());
 				} catch (UserExistsException e) {	}
-				if (vals.length >= 2) {
+				if (vals.length >= 2 && vals[1].trim().length() > 0) {
 					src_repo.setData(vals[0].trim(), null, "password", vals[1].trim());
 				}
-				if (vals.length >= 3) {
+				if (vals.length >= 3 && vals[2].trim().length() > 0) {
 					src_repo.setData(vals[0].trim(), "roster/"+vals[2].trim(),
 						"name", vals[2].trim());
 				}
-				if (vals.length >= 4) {
+				if (vals.length >= 4 && vals[3].trim().length() > 0) {
 					src_repo.setData(vals[0].trim(), "roster/"+vals[2].trim(),
 						"name", vals[3].trim());
 				}
-				if (vals.length >= 5) {
+				if (vals.length >= 5 && vals[4].trim().length() > 0) {
 					src_repo.setData(vals[0].trim(), "roster/"+vals[2].trim(),
 						"subscription", vals[4].trim());
 				}
-				if (vals.length >= 6) {
+				if (vals.length >= 6 && vals[5].trim().length() > 0) {
 					src_repo.setData(vals[0].trim(), "roster/"+vals[2].trim(),
 						"groups", vals[5].trim());
 				}
 			}
 			br.close();
+		}
+
+		if (export_data && src_repo != null) {
+			FileWriter fr = new FileWriter(export_file);
+			if (user != null) {
+				exportUserRoster(user, src_repo, fr);
+			} else {
+				exportRoster(src_repo, fr);
+			} // end of else
+			fr.close();
 		}
 
 		if (print_repo && src_repo != null) {

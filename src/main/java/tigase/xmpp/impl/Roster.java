@@ -54,10 +54,10 @@ public class Roster {
   private static Logger log =	Logger.getLogger("tigase.xmpp.impl.Roster");
 
   protected static final String ROSTER_XMLNS = "jabber:iq:roster";
-  protected static final String ROSTER = "roster";
-  protected static final String GROUPS = "groups";
-  protected static final String NAME = "name";
-  protected static final String SUBSCRIPTION = "subscription";
+  public static final String ROSTER = "roster";
+  public static final String GROUPS = "groups";
+  public static final String NAME = "name";
+  public static final String SUBSCRIPTION = "subscription";
 
 	public enum PresenceType {
 		out_initial,
