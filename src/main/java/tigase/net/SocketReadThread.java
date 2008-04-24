@@ -161,31 +161,49 @@ public class SocketReadThread implements Runnable {
 	public void run() {
     while (!stopping) {
       try {
-				clientsSel.select();
+				int selectedKeys = clientsSel.select();
+				if(selectedKeys == 0 ){
+					// Handling a bug or not a bug described in the
+					// last comment to this issue:
+					// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4850373
+					Set s = clientsSel.keys();
+					for(Iterator it = s.iterator();it.hasNext();){
+						SelectionKey k = (SelectionKey)it.next();
+						if(k.interestOps() == 0) {
+							IOService serv = (IOService)k.attachment();
+							try {
+								log.info("Forcing stopping the service: " + serv.getUniqueId());
+								serv.forceStop();
+							} catch (Exception e) {	}
+							k.cancel();
+						}
+					}
+				} else {
+					for (Iterator i = clientsSel.selectedKeys().iterator(); i.hasNext();) {
+						SelectionKey sk = (SelectionKey)i.next();
+						i.remove();
+						// According to most guides we should use below code
+						// removing SelectionKey from iterator, however a little later
+						// we do cancel() on this key so removing is somehow redundant
+						// and causes concurrency exception if a few calls are performed
+						// at the same time.
+						//selected_keys.remove(sk);
+						IOService s = (IOService)sk.attachment();
+						if (log.isLoggable(Level.FINEST)) {
+							StringBuilder sb = new StringBuilder("AWAKEN: " + s.getUniqueId());
+							if (sk.isWritable()) {
+								sb.append(", ready for WRITING");
+							}
+							if (sk.isReadable()) {
+								sb.append(", ready for READING");
+							}
+							log.finest(sb.toString());
+						}
 //         Set<SelectionKey> selected_keys = clientsSel.selectedKeys();
 //         for (SelectionKey sk : selected_keys) {
-        for (Iterator i = clientsSel.selectedKeys().iterator(); i.hasNext();) {
-					SelectionKey sk = (SelectionKey)i.next();
-					i.remove();
-          // According to most guides we should use below code
-          // removing SelectionKey from iterator, however a little later
-          // we do cancel() on this key so removing is somehow redundant
-          // and causes concurrency exception if a few calls are performed
-          // at the same time.
-          //selected_keys.remove(sk);
-          IOService s = (IOService)sk.attachment();
-					if (log.isLoggable(Level.FINEST)) {
-						StringBuilder sb = new StringBuilder("AWAKEN: " + s.getUniqueId());
-						if (sk.isWritable()) {
-							sb.append(", ready for WRITING");
-						}
-						if (sk.isReadable()) {
-							sb.append(", ready for READING");
-						}
-						log.finest(sb.toString());
+						sk.cancel();
+						completionService.submit(s);
 					}
-					sk.cancel();
-          completionService.submit(s);
         }
 				// Clean-up cancelled keys...
         clientsSel.selectNow();
