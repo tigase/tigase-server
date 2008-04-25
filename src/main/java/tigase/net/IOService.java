@@ -280,6 +280,9 @@ public abstract class IOService implements Callable<IOService> {
 		decoder.reset();
 	}
 
+	private long empty_read_call_count = 0;
+	private static final long MAX_ALLOWED_EMPTY_CALLS = 10;
+
 	/**
    * Describe <code>readData</code> method here.
    *
@@ -294,10 +297,19 @@ public abstract class IOService implements Callable<IOService> {
 				//			resizeInputBuffer();
 				ByteBuffer tmpBuffer = socketIO.read(socketInput);
 				if (socketIO.bytesRead() > 0) {
+					empty_read_call_count = 0;
 					tmpBuffer.flip();
 					cb = decoder.decode(tmpBuffer);
 					tmpBuffer.clear();
-				} // end of if (socketIO.bytesRead() > 0)
+				} else {
+					// Detecting infinite read 0 bytes
+					// sometimes it happens that the connection has been lost
+					// and the select thinks there are some bytes waiting for reading
+					// and 0 bytes are read
+					if ((++empty_read_call_count) > MAX_ALLOWED_EMPTY_CALLS) {
+						forceStop();
+					}
+				}
 			} catch (BufferUnderflowException underfl) {
 				// Obtain more inbound network data for src,
 				// then retry the operation.
