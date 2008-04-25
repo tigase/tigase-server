@@ -71,7 +71,7 @@ public abstract class Presence {
 	 * To all these addresses unavailable presence must be sent when user
 	 * disconnects.
 	 */
-	private static final String DIRECT_PRESENCE = "direct-presences";
+	public static final String DIRECT_PRESENCE = "direct-presences";
 
 	/**
    * Private logger for class instancess.
@@ -100,6 +100,25 @@ public abstract class Presence {
 						FROM_SUBSCRIBED, results, null, settings);
 					updateOfflineChange(session, results);
 				} catch (NotAuthorizedException e) { } // end of try-catch
+			}
+			if (session.isAnonymous()) {
+				Set<String> direct_presences =
+			    (Set<String>)session.getSessionData(DIRECT_PRESENCE);
+				if (direct_presences != null) {
+					try {
+						for (String buddy: direct_presences) {
+							String peer = JIDUtils.getNodeID(buddy);
+							Packet roster_update =
+                new Packet(JabberIqRoster.createRosterPacket("set",
+									session.nextStanzaId(), peer, peer, session.getUserId(), null,
+									null, "remove", JabberIqRoster.ANON));
+							results.offer(roster_update);
+						} // end of for (String buddy: buddies)
+					} catch (NotAuthorizedException e) {
+						log.finest("Anonymous user has logged out already: "
+							+ session.getConnectionId());
+					}
+				} // end of if (direct_presence != null)
 			}
 		}
 	}
@@ -367,6 +386,17 @@ public abstract class Presence {
 					// Is it direct presence to some entity on the network?
 					if (packet.getElemTo() != null) {
 						// Yes this is it, send direct presence
+						if (session.isAnonymous()) {
+							log.finest("Anonymous session: " + session.getUserId());
+							String peer = JIDUtils.getNodeID(packet.getElemTo());
+							Packet rost_update =
+                new Packet(JabberIqRoster.createRosterPacket("set",
+										session.nextStanzaId(), peer, peer, session.getUserId(),
+										session.getUserName(), "Anonymous peers", null,
+										JabberIqRoster.ANON));
+							results.offer(rost_update);
+							log.finest("Sending roster update: " + rost_update.toString());
+						}
 						Element result = packet.getElement().clone();
 						results.offer(new Packet(result));
 						// If this is unavailable presence, remove jid from Set

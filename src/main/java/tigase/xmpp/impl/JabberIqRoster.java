@@ -66,7 +66,42 @@ public abstract class JabberIqRoster {
   protected static final Element[] DISCO_FEATURES =	{
 		new Element("feature", new String[] {"var"}, new String[] {XMLNS})
 	};
-	private static final String ANON = "anon";
+	public static final String ANON = "anon";
+
+	public static Element createRosterPacket(String iq_type, String iq_id,
+		String to, String from, String item_jid, String item_name, String item_group,
+		String subscription, String item_type) {
+		Element iq = new Element("iq",
+			new String[] {"type", "id"},
+			new String[] {iq_type, iq_id});
+		if (from != null) {
+			iq.addAttribute("from", from);
+		}
+		if (to != null) {
+			iq.addAttribute("to", to);
+		}
+		Element query = new Element("query");
+		query.setXMLNS(XMLNS);
+		iq.addChild(query);
+		Element item = new Element("item",
+			new String[] {"jid"},
+			new String[] {item_jid});
+		if (item_type != null) {
+			item.addAttribute("type", item_type);
+		}
+		if (item_name != null) {
+			item.addAttribute(Roster.NAME, item_name);
+		}
+		if (subscription != null) {
+			item.addAttribute(Roster.SUBSCRIPTION, subscription);
+		}
+		if (item_group != null) {
+			Element group = new Element(Roster.GROUP, item_group);
+			item.addChild(group);
+		}
+		query.addChild(item);
+		return iq;
+	}
 
 	private static void processSetRequest(final Packet packet,
 		final XMPPResourceConnection session,	final Queue<Packet> results)
@@ -184,28 +219,28 @@ public abstract class JabberIqRoster {
 				results.offer(rost_res);
 			}
 		}
-		if (session.isAnonymous()) {
-			log.finest("Anonymous session: " + session.getUserId());
-			String[] anon_peers = session.getAnonymousPeers();
-			if (anon_peers != null) {
-				for (String peer: anon_peers) {
-					Element iq = new Element("iq",
-						new String[] {"type", "id", "to", "from"},
-						new String[] {"set", session.getUserName(), peer, peer});
-					Element query = new Element("query");
-					query.setXMLNS(XMLNS);
-					iq.addChild(query);
-					Element item = new Element("item", new Element[] {
-							new Element("group", "Anonymous peers")},
-						new String[] {"jid", "type", "name"},
-						new String[] {session.getUserId(), ANON, session.getUserName()});
-					query.addChild(item);
-					Packet rost_update = new Packet(iq);
-					results.offer(rost_update);
-					log.finest("Sending roster update: " + rost_update.toString());
-				}
-			}
-		}
+// 		if (session.isAnonymous()) {
+// 			log.finest("Anonymous session: " + session.getUserId());
+// 			String[] anon_peers = session.getAnonymousPeers();
+// 			if (anon_peers != null) {
+// 				for (String peer: anon_peers) {
+// 					Element iq = new Element("iq",
+// 						new String[] {"type", "id", "to", "from"},
+// 						new String[] {"set", session.getUserName(), peer, peer});
+// 					Element query = new Element("query");
+// 					query.setXMLNS(XMLNS);
+// 					iq.addChild(query);
+// 					Element item = new Element("item", new Element[] {
+// 							new Element("group", "Anonymous peers")},
+// 						new String[] {"jid", "type", "name"},
+// 						new String[] {session.getUserId(), ANON, session.getUserName()});
+// 					query.addChild(item);
+// 					Packet rost_update = new Packet(iq);
+// 					results.offer(rost_update);
+// 					log.finest("Sending roster update: " + rost_update.toString());
+// 				}
+// 			}
+// 		}
   }
 
 	public static void process(final Packet packet,
@@ -259,34 +294,34 @@ public abstract class JabberIqRoster {
 	 */
 	public static void stopped(final XMPPResourceConnection session,
 		final Queue<Packet> results, final Map<String, Object> settings) {
-		// Synchronization to avoid conflict with login/logout events
-		// processed in the SessionManager asynchronously
-		synchronized (session) {
-			try {
-				if (session.isAnonymous() && session.getAnonymousPeers() != null) {
-					log.finest("Anonymous session: " + session.getUserId());
-					String[] anon_peers = session.getAnonymousPeers();
-					for (String peer: anon_peers) {
-						Element iq = new Element("iq",
-							new String[] {"type", "id", "to", "from"},
-							new String[] {"set", session.getUserName(), peer, peer});
-						Element query = new Element("query");
-						query.setXMLNS(XMLNS);
-						iq.addChild(query);
-						Element item = new Element("item",
-							new String[] {"jid", "subscription", "type"},
-							new String[] {session.getUserId(), "remove", ANON});
-						query.addChild(item);
-						Packet rost_update = new Packet(iq);
-						results.offer(rost_update);
-						log.finest("Sending roster update: " + rost_update.toString());
-					}
-				}
-			} catch (NotAuthorizedException e) {
-				log.warning("Can not proceed with anonymous logout, session not authorized yet..."
-					+ session.getConnectionId());
-			}
-		}
+// 		// Synchronization to avoid conflict with login/logout events
+// 		// processed in the SessionManager asynchronously
+// 		synchronized (session) {
+// 			try {
+// 				if (session.isAnonymous() && session.getAnonymousPeers() != null) {
+// 					log.finest("Anonymous session: " + session.getUserId());
+// 					String[] anon_peers = session.getAnonymousPeers();
+// 					for (String peer: anon_peers) {
+// 						Element iq = new Element("iq",
+// 							new String[] {"type", "id", "to", "from"},
+// 							new String[] {"set", session.getUserName(), peer, peer});
+// 						Element query = new Element("query");
+// 						query.setXMLNS(XMLNS);
+// 						iq.addChild(query);
+// 						Element item = new Element("item",
+// 							new String[] {"jid", "subscription", "type"},
+// 							new String[] {session.getUserId(), "remove", ANON});
+// 						query.addChild(item);
+// 						Packet rost_update = new Packet(iq);
+// 						results.offer(rost_update);
+// 						log.finest("Sending roster update: " + rost_update.toString());
+// 					}
+// 				}
+// 			} catch (NotAuthorizedException e) {
+// 				log.warning("Can not proceed with anonymous logout, session not authorized yet..."
+// 					+ session.getConnectionId());
+// 			}
+// 		}
 	}
 
 } // JabberIqRoster

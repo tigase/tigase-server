@@ -24,11 +24,15 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import tigase.util.JIDUtils;
 import tigase.xml.Element;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.impl.Roster;
+import tigase.xmpp.impl.Presence;
+
 
 /**
  * Describe class AnonymousRoster here.
@@ -48,7 +52,16 @@ public class AnonymousRoster implements DynamicRosterIfc {
 	public String[] getBuddies(XMPPResourceConnection session)
 		throws NotAuthorizedException {
 		if (session.isAnonymous()) {
-			return session.getAnonymousPeers();
+			Set<String> direct_presences =
+			    (Set<String>)session.getSessionData(Presence.DIRECT_PRESENCE);
+			if (direct_presences != null) {
+				String[] result = new String[direct_presences.size()];
+				int i = 0;
+				for (String peer: direct_presences) {
+					result[i++] = JIDUtils.getNodeID(peer);
+				}
+				return result;
+			}
 		}
 		return null;
 	}
@@ -56,15 +69,16 @@ public class AnonymousRoster implements DynamicRosterIfc {
 	public Element getBuddyItem(XMPPResourceConnection session, String buddy)
 		throws NotAuthorizedException {
 		if (session.isAnonymous()) {
-			String[] anon_peers = session.getAnonymousPeers();
+			String[] anon_peers = getBuddies(session);
 			if (anon_peers != null) {
-				String peer = JIDUtils.getNodeID(buddy);
-				if (Arrays.binarySearch(anon_peers, peer) >= 0) {
-					Element item = new Element("item", new Element[] {
-							new Element("group", "Anonymous peers")},
-						new String[] {"jid", "subscription", "name"},
-						new String[] {peer, "both", JIDUtils.getNodeNick(peer)});
-					return item;
+				for (String peer: anon_peers) {
+					if (peer.equals(JIDUtils.getNodeID(buddy))) {
+						Element item = new Element("item", new Element[] {
+								new Element("group", "Anonymous peers")},
+							new String[] {"jid", "subscription", "name"},
+							new String[] {peer, "both", JIDUtils.getNodeNick(peer)});
+						return item;
+					}
 				}
 			}
 		}
@@ -74,7 +88,7 @@ public class AnonymousRoster implements DynamicRosterIfc {
 	public List<Element> getRosterItems(XMPPResourceConnection session)
 		throws NotAuthorizedException {
 		if (session.isAnonymous()) {
-			String[] anon_peers = session.getAnonymousPeers();
+			String[] anon_peers = getBuddies(session);
 			if (anon_peers != null) {
 				ArrayList<Element> al = new ArrayList<Element>();
 				for (String peer: anon_peers) {

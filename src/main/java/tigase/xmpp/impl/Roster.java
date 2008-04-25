@@ -56,6 +56,7 @@ public class Roster {
   protected static final String ROSTER_XMLNS = "jabber:iq:roster";
   public static final String ROSTER = "roster";
   public static final String GROUPS = "groups";
+  public static final String GROUP = "group";
   public static final String NAME = "name";
   public static final String SUBSCRIPTION = "subscription";
 
