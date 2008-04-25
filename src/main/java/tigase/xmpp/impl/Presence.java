@@ -64,7 +64,7 @@ public abstract class Presence {
 	 * where the last presence sent by the userto server is stored,
 	 * either initial presence or off-line presence before disconnecting.
 	 */
-	private static final String PRESENCE_KEY = "user-presence";
+	public static final String PRESENCE_KEY = "user-presence";
 	/**
 	 * <code>DIRECT_PRESENCE</code> is a key in temporary session data for
 	 * the collection of JIDs where direct presence was sent.
