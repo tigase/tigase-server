@@ -154,6 +154,10 @@ public abstract class JabberIqRoster {
 			String type = request.getAttribute("/iq/query/item", "type");
 			if (type != null && type.equals(ANON)) {
         Roster.setBuddySubscription(session, SubscriptionType.both, buddy);
+				Element pres = new Element("presence");
+				pres.setAttribute("to", buddy);
+				pres.setAttribute("from", session.getJID());
+				results.offer(new Packet(pres));
 			}
       if (Roster.getBuddySubscription(session, buddy) == null) {
         Roster.setBuddySubscription(session, SubscriptionType.none, buddy);

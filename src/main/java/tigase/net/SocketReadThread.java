@@ -197,6 +197,7 @@ public class SocketReadThread implements Runnable {
 							if (sk.isReadable()) {
 								sb.append(", ready for READING");
 							}
+							sb.append(", readyOps() = " + sk.readyOps());
 							log.finest(sb.toString());
 						}
 //         Set<SelectionKey> selected_keys = clientsSel.selectedKeys();
