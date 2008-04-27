@@ -333,23 +333,27 @@ public abstract class IOService implements Callable<IOService> {
    * @param data a <code>String</code> value
    * @exception IOException if an error occurs
    */
-  protected void writeData(final String data) throws IOException {
+  protected void writeData(final String data) {
 		synchronized (encoder) {
-			if (data != null && data.length() > 0) {
-				log.finest("Writing data: " + data);
-				ByteBuffer dataBuffer = null;
-				encoder.reset();
-				dataBuffer = encoder.encode(CharBuffer.wrap(data));
-				encoder.flush(dataBuffer);
-				socketIO.write(dataBuffer);
-
-				setLastTransferTime();
-			} else {
-				if (socketIO.waitingToSend()) {
-					socketIO.write(null);
+			try {
+				if (data != null && data.length() > 0) {
+					log.finest("Writing data: " + data);
+					ByteBuffer dataBuffer = null;
+					encoder.reset();
+					dataBuffer = encoder.encode(CharBuffer.wrap(data));
+					encoder.flush(dataBuffer);
+					socketIO.write(dataBuffer);
 
 					setLastTransferTime();
+				} else {
+					if (socketIO.waitingToSend()) {
+						socketIO.write(null);
+
+						setLastTransferTime();
+					}
 				}
+			} catch (Exception e) {
+				forceStop();
 			}
 		}
   }
