@@ -290,6 +290,10 @@ function tigase_monitor_stats($stats = NULL) {
 				$split_line = explode(' ', trim($line));
 				$statsinfo['Bosh online:'] = $split_line[3];
 			}
+			if (stripos($line, 'Version')) {
+        $split_line = explode(' ', trim($line));
+        $statsinfo['Running version:'] = $split_line[1];
+      }
     }
 
   }
