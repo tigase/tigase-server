@@ -163,6 +163,7 @@ public class SocketReadThread implements Runnable {
       try {
 				int selectedKeys = clientsSel.select();
 				if(selectedKeys == 0 ){
+					log.finest("Selected keys = 0!!! a bug again?");
 					// Handling a bug or not a bug described in the
 					// last comment to this issue:
 					// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4850373
@@ -189,21 +190,27 @@ public class SocketReadThread implements Runnable {
 						// at the same time.
 						//selected_keys.remove(sk);
 						IOService s = (IOService)sk.attachment();
-						if (log.isLoggable(Level.FINEST)) {
-							StringBuilder sb = new StringBuilder("AWAKEN: " + s.getUniqueId());
-							if (sk.isWritable()) {
-								sb.append(", ready for WRITING");
+						try {
+							if (log.isLoggable(Level.FINEST)) {
+								StringBuilder sb = new StringBuilder("AWAKEN: " + s.getUniqueId());
+								if (sk.isWritable()) {
+									sb.append(", ready for WRITING");
+								}
+								if (sk.isReadable()) {
+									sb.append(", ready for READING");
+								}
+								sb.append(", readyOps() = " + sk.readyOps());
+								log.finest(sb.toString());
 							}
-							if (sk.isReadable()) {
-								sb.append(", ready for READING");
-							}
-							sb.append(", readyOps() = " + sk.readyOps());
-							log.finest(sb.toString());
+							//         Set<SelectionKey> selected_keys = clientsSel.selectedKeys();
+							//         for (SelectionKey sk : selected_keys) {
+							sk.cancel();
+							completionService.submit(s);
+						} catch (CancelledKeyException e) {
+							log.finest("CancelledKeyException, stopping the connection: "
+								+ s.getUniqueId());
+							try {	s.forceStop(); } catch (Exception ex2) {	}
 						}
-//         Set<SelectionKey> selected_keys = clientsSel.selectedKeys();
-//         for (SelectionKey sk : selected_keys) {
-						sk.cancel();
-						completionService.submit(s);
 					}
         }
 				// Clean-up cancelled keys...
