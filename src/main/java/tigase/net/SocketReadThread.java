@@ -59,10 +59,9 @@ public class SocketReadThread implements Runnable {
 	private static SocketReadThread socketReadThread = null;
 
   private boolean stopping = false;
+	private boolean wakeup_called = false;
 
   private final ConcurrentLinkedQueue<IOService> waiting =
-    new ConcurrentLinkedQueue<IOService>();
-  private final ConcurrentLinkedQueue<IOService> for_removal =
     new ConcurrentLinkedQueue<IOService>();
   private Selector clientsSel = null;
 	private ThreadPoolExecutor executor = null;
@@ -116,6 +115,7 @@ public class SocketReadThread implements Runnable {
 
 	public void addSocketService(IOService s) {
     waiting.offer(s);
+		wakeup_called = true;
     clientsSel.wakeup();
 	}
 
@@ -160,29 +160,41 @@ public class SocketReadThread implements Runnable {
 	 */
 	public void run() {
     while (!stopping) {
+			synchronized (this) {};
       try {
+				wakeup_called = false;
 				int selectedKeys = clientsSel.select();
-				if(selectedKeys == 0 ){
+				if(selectedKeys == 0 && !wakeup_called) {
 					log.finest("Selected keys = 0!!! a bug again?");
 					// Handling a bug or not a bug described in the
 					// last comment to this issue:
 					// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4850373
+					// and
+					// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6403933
 					Set s = clientsSel.keys();
 					for(Iterator it = s.iterator();it.hasNext();){
 						SelectionKey k = (SelectionKey)it.next();
 						IOService serv = (IOService)k.attachment();
 						try {
-							if(k.interestOps() == 0) {
+							if(!serv.isConnected()) {
 								try {
 									log.info("Forcing stopping the service: " + serv.getUniqueId());
 									serv.forceStop();
 								} catch (Exception e) {	}
-								k.cancel();
+								// Handling a bug or not a bug described in the
+								// last comment to this issue:
+								// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4850373
+								// and
+								// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6403933
+								synchronized (this) {
+									k.cancel();
+									// NIO bug workarund:
+									clientsSel.selectNow();
+								}
 							}
 						} catch (CancelledKeyException e) {
 							log.finest("CancelledKeyException, stopping the connection: "
 								+ serv.getUniqueId());
-							try {	serv.forceStop(); } catch (Exception ex2) {	}
 						}
 					}
 				} else {
@@ -210,7 +222,16 @@ public class SocketReadThread implements Runnable {
 							}
 							//         Set<SelectionKey> selected_keys = clientsSel.selectedKeys();
 							//         for (SelectionKey sk : selected_keys) {
-							sk.cancel();
+							// Handling a bug or not a bug described in the
+							// last comment to this issue:
+							// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4850373
+							// and
+							// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6403933
+							synchronized (this) {
+								sk.cancel();
+								// NIO bug workarund:
+								clientsSel.selectNow();
+							}
 							completionService.submit(s);
 						} catch (CancelledKeyException e) {
 							log.finest("CancelledKeyException, stopping the connection: "
@@ -220,8 +241,10 @@ public class SocketReadThread implements Runnable {
 					}
         }
 				// Clean-up cancelled keys...
-        clientsSel.selectNow();
-        addAllWaiting();
+				synchronized (this) {
+					clientsSel.selectNow();
+					addAllWaiting();
+				}
 			} catch (CancelledKeyException brokene) {
 				// According to Java API that should not happen.
 				// I think it happens only on the broken Java implementation
