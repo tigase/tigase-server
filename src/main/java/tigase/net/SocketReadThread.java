@@ -170,13 +170,19 @@ public class SocketReadThread implements Runnable {
 					Set s = clientsSel.keys();
 					for(Iterator it = s.iterator();it.hasNext();){
 						SelectionKey k = (SelectionKey)it.next();
-						if(k.interestOps() == 0) {
-							IOService serv = (IOService)k.attachment();
-							try {
-								log.info("Forcing stopping the service: " + serv.getUniqueId());
-								serv.forceStop();
-							} catch (Exception e) {	}
-							k.cancel();
+						IOService serv = (IOService)k.attachment();
+						try {
+							if(k.interestOps() == 0) {
+								try {
+									log.info("Forcing stopping the service: " + serv.getUniqueId());
+									serv.forceStop();
+								} catch (Exception e) {	}
+								k.cancel();
+							}
+						} catch (CancelledKeyException e) {
+							log.finest("CancelledKeyException, stopping the connection: "
+								+ serv.getUniqueId());
+							try {	serv.forceStop(); } catch (Exception ex2) {	}
 						}
 					}
 				} else {
