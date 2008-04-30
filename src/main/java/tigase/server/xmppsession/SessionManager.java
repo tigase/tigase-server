@@ -250,6 +250,7 @@ public class SessionManager extends AbstractMessageReceiver
 			packet.processedBy("filter-process");
 		}
 
+		setPermissions(conn, results);
 		addOutPackets(results);
 
 		if (!packet.wasProcessed()) {
