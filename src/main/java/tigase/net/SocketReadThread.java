@@ -198,9 +198,8 @@ public class SocketReadThread implements Runnable {
 						}
 					}
 				} else {
-					for (Iterator i = clientsSel.selectedKeys().iterator(); i.hasNext();) {
-						SelectionKey sk = (SelectionKey)i.next();
-						i.remove();
+					Set<SelectionKey> keys = clientsSel.selectedKeys();
+					for (SelectionKey sk: keys) {
 						// According to most guides we should use below code
 						// removing SelectionKey from iterator, however a little later
 						// we do cancel() on this key so removing is somehow redundant
@@ -239,6 +238,7 @@ public class SocketReadThread implements Runnable {
 							try {	s.forceStop(); } catch (Exception ex2) {	}
 						}
 					}
+					keys.clear();
         }
 				// Clean-up cancelled keys...
 				synchronized (this) {
