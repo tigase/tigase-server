@@ -56,11 +56,13 @@ public class SocketReadThread implements Runnable {
 		Logger.getLogger("tigase.net.SocketReadThread");
 
 	public static final int DEF_MAX_THREADS_PER_CPU = 5;
+	private static final int MAX_EMPTY_SELECTIONS = 10;
 
 	private static SocketReadThread socketReadThread = null;
 
   private boolean stopping = false;
 	private boolean wakeup_called = false;
+	private int empty_selections = 0;
 
   private final ConcurrentLinkedQueue<IOService> waiting =
     new ConcurrentLinkedQueue<IOService>();
@@ -114,7 +116,7 @@ public class SocketReadThread implements Runnable {
 		executor.setMaximumPoolSize(threads);
 	}
 
-	public void addSocketService(IOService s) {
+	public synchronized void addSocketService(IOService s) {
     waiting.offer(s);
 		wakeup_called = true;
     clientsSel.wakeup();
@@ -161,48 +163,55 @@ public class SocketReadThread implements Runnable {
 	 */
 	public void run() {
     while (!stopping) {
-			synchronized (this) {};
       try {
 				wakeup_called = false;
 				int selectedKeys = clientsSel.select();
-				if(selectedKeys == 0 && !wakeup_called) {
+				if(selectedKeys == 0 && !wakeup_called
+					&& (++empty_selections) > MAX_EMPTY_SELECTIONS) {
+					empty_selections = 0;
 					log.finest("Selected keys = 0!!! a bug again?");
 					// Handling a bug or not a bug described in the
 					// last comment to this issue:
 					// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4850373
 					// and
 					// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6403933
-					Set s = clientsSel.keys();
-					for(Iterator it = s.iterator();it.hasNext();){
-						SelectionKey k = (SelectionKey)it.next();
-						IOService serv = (IOService)k.attachment();
-						try {
-							if(!serv.isConnected()) {
+					// Recreating the selector and registering all channles with
+					// the new selector
+					synchronized (this) {
+						Selector tempSel = clientsSel;
+						clientsSel = Selector.open();
+						for (SelectionKey sk: tempSel.selectedKeys()) {
+							IOService serv = (IOService)sk.attachment();
+							sk.cancel();
+							if (serv.isConnected()) {
+								SocketChannel sc = serv.getSocketChannel();
+								try {
+									int sel_key = READ_ONLY;
+									log.finest("ADDED OP_READ: " + serv.getUniqueId());
+									if (serv.waitingToSend()) {
+										sel_key = READ_WRITE;
+										log.finest("ADDED OP_WRITE: " + serv.getUniqueId());
+									}
+									sc.register(clientsSel, sel_key, serv);
+								} catch (Exception e) {
+									// Ignore such channel
+									log.finest("ERROR re-adding channel for: " + serv.getUniqueId()
+										+ ", exception: " + e);
+								} // end of try-catch
+							} else {
 								try {
 									log.info("Forcing stopping the service: " + serv.getUniqueId());
 									serv.forceStop();
 								} catch (Exception e) {	}
-								// Handling a bug or not a bug described in the
-								// last comment to this issue:
-								// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4850373
-								// and
-								// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6403933
-								synchronized (this) {
-									k.cancel();
-									// NIO bug workarund:
-									clientsSel.selectNow();
-								}
 							}
-						} catch (CancelledKeyException e) {
-							log.finest("CancelledKeyException, stopping the connection: "
-								+ serv.getUniqueId());
 						}
+						tempSel.close();
 					}
 				} else {
-					Set<SelectionKey> keys = clientsSel.selectedKeys();
+					empty_selections = 0;
 					// This is dirty but selectNow() causes concurrent modification exception
 					// and the selectNow() is needed because of a bug in JVM mentioned below
-					for (SelectionKey sk: new HashSet<SelectionKey>(keys)) {
+					for (SelectionKey sk: clientsSel.selectedKeys()) {
 						// According to most guides we should use below code
 						// removing SelectionKey from iterator, however a little later
 						// we do cancel() on this key so removing is somehow redundant
@@ -229,11 +238,7 @@ public class SocketReadThread implements Runnable {
 							// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4850373
 							// and
 							// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6403933
-							synchronized (this) {
-								sk.cancel();
-								// NIO bug workarund:
-								clientsSel.selectNow();
-							}
+							sk.cancel();
 							completionService.submit(s);
 						} catch (CancelledKeyException e) {
 							log.finest("CancelledKeyException, stopping the connection: "
@@ -241,13 +246,10 @@ public class SocketReadThread implements Runnable {
 							try {	s.forceStop(); } catch (Exception ex2) {	}
 						}
 					}
-					keys.clear();
         }
 				// Clean-up cancelled keys...
-				synchronized (this) {
-					clientsSel.selectNow();
-					addAllWaiting();
-				}
+				clientsSel.selectNow();
+				addAllWaiting();
 			} catch (CancelledKeyException brokene) {
 				// According to Java API that should not happen.
 				// I think it happens only on the broken Java implementation
