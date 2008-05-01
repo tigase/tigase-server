@@ -29,6 +29,7 @@ import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.HashSet;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
@@ -199,7 +200,9 @@ public class SocketReadThread implements Runnable {
 					}
 				} else {
 					Set<SelectionKey> keys = clientsSel.selectedKeys();
-					for (SelectionKey sk: keys) {
+					// This is dirty but selectNow() causes concurrent modification exception
+					// and the selectNow() is needed because of a bug in JVM mentioned below
+					for (SelectionKey sk: new HashSet<SelectionKey>(keys)) {
 						// According to most guides we should use below code
 						// removing SelectionKey from iterator, however a little later
 						// we do cancel() on this key so removing is somehow redundant
