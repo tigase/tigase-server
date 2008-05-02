@@ -24,9 +24,10 @@ package tigase.server;
 
 import java.util.List;
 import java.util.Set;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
+import tigase.cluster.ClusterElement;
 
 /**
  * Class Packet
@@ -42,7 +43,7 @@ public class Packet {
 
   private static final String ERROR_NS = "urn:ietf:params:xml:ns:xmpp-stanzas";
 
-	private Set<String> processorsIds = new HashSet<String>();
+	private Set<String> processorsIds = new LinkedHashSet<String>();
 
 	private final Element elem;
 	private final Command command;
@@ -54,6 +55,7 @@ public class Packet {
 	private String from = null;
 	private Permissions permissions = Permissions.NONE;
 	private String packetToString = null;
+	private Set<String> visited_cluster_nodes = null;
 
   public Packet(final Element elem) {
 		if (elem == null) {
@@ -87,6 +89,9 @@ public class Packet {
 		else {
 			routed = false;
 		} // end of if (elem.getName().equals("route")) else
+		visited_cluster_nodes =
+      ClusterElement.getVisitedNodes(elem.findChild(elem.getName()
+					+ "/" + ClusterElement.CLUSTER_EL_NAME));
 	}
 
 	public Packet(String el_name, String from, String to, StanzaType type) {
@@ -98,6 +103,27 @@ public class Packet {
 		this.command = null;
 		this.cmd = false;
 		this.routed = false;
+	}
+
+	public void addVisitedClusterNode(String node_id) {
+		if (visited_cluster_nodes == null) {
+			visited_cluster_nodes = new LinkedHashSet<String>();
+		}
+		visited_cluster_nodes.add(node_id);
+		Element cluster =
+      elem.findChild(elem.getName() + "/" + ClusterElement.CLUSTER_EL_NAME);
+		if (cluster == null) {
+			elem.addChild(ClusterElement.createClusterElement(visited_cluster_nodes));
+		} else {
+			ClusterElement.addVisitedNode(cluster, node_id);
+		}
+	}
+
+	public boolean isVisitedClusterNode(String node_id) {
+		if (visited_cluster_nodes == null) {
+			return false;
+		}
+		return visited_cluster_nodes.contains(node_id);
 	}
 
 	public void setPermissions(Permissions perm) {

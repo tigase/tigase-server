@@ -49,7 +49,9 @@ public class SessionManagerConfig {
 	public static final String PLUGINS_CONF_PROP_KEY = "plugins-conf";
 
 	public static final String ANONYMOUS_DOMAINS_PROP_KEY = "anonymous-domains";
-	public static final String ANONYMOUS_PEERS_PROP_KEY = "anonymous-peers";
+	//	public static final String ANONYMOUS_PEERS_PROP_KEY = "anonymous-peers";
+
+	public static final String CLUSTER_NODES_PROP_KEY = "cluster-nodes";
 
 	/**
 	 * List of default plugins loaded by the server. It can be changed later
@@ -79,6 +81,7 @@ public class SessionManagerConfig {
 
 	private static String[] ADMINS_PROP_VAL =	{"admin@localhost", "admin@hostname"};
 	private static String[] TRUSTED_PROP_VAL = {"admin@localhost", "admin@hostname"};
+	private static String[] CLUSTER_NODES_PROP_VAL = {"sess-man@localhost"};
 
 	public static void getDefaults(Map<String, Object> props,
 		Map<String, Object> params) {
@@ -187,7 +190,7 @@ public class SessionManagerConfig {
 			} // end of for (int i = 0; i < ADMINS_PROP_VAL.length; i++)
 		}
 		props.put(ADMINS_PROP_KEY, ADMINS_PROP_VAL);
-		props.put(ANONYMOUS_PEERS_PROP_KEY, ADMINS_PROP_VAL);
+		//		props.put(ANONYMOUS_PEERS_PROP_KEY, ADMINS_PROP_VAL);
 		if (params.get(GEN_TRUSTED) != null) {
 			TRUSTED_PROP_VAL = ((String)params.get(GEN_TRUSTED)).split(",");
 		} else {
