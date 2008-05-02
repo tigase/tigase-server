@@ -49,6 +49,7 @@ public class AnonymousRoster implements DynamicRosterIfc {
 
 	public void init(String par) {}
 
+	@SuppressWarnings({"unchecked"})
 	public String[] getBuddies(XMPPResourceConnection session)
 		throws NotAuthorizedException {
 		if (session.isAnonymous()) {

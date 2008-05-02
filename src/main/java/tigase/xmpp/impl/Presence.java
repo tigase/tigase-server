@@ -87,6 +87,7 @@ public abstract class Presence {
 	 *
 	 * @param session a <code>XMPPResourceConnection</code> value
 	 */
+	@SuppressWarnings({"unchecked"})
 	public static void stopped(final XMPPResourceConnection session,
 		final Queue<Packet> results, final Map<String, Object> settings) {
 		// Synchronization to avoid conflict with login/logout events

@@ -165,6 +165,7 @@ public class VCardTemp extends XMPPProcessor implements XMPPProcessorIfc {
 					} // end of else
 					break;
 				case result:
+				case error:
 					Element elem = packet.getElement().clone();
 					Packet result = new Packet(elem);
 					result.setTo(session.getConnectionId());
