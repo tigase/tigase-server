@@ -157,6 +157,48 @@ public class SocketReadThread implements Runnable {
 
 	// Implementation of java.lang.Runnable
 
+	private synchronized void recreateSelector() throws IOException {
+		log.finest("Recreating selector, opened channels: " + clientsSel.keys().size());
+		empty_selections = 0;
+		// Handling a bug or not a bug described in the
+		// last comment to this issue:
+		// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4850373
+		// and
+		// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6403933
+		// Recreating the selector and registering all channles with
+		// the new selector
+		synchronized (this) {
+			Selector tempSel = clientsSel;
+			clientsSel = Selector.open();
+			for (SelectionKey sk: tempSel.keys()) {
+				IOService serv = (IOService)sk.attachment();
+				sk.cancel();
+				if (serv.isConnected()) {
+					SocketChannel sc = serv.getSocketChannel();
+					try {
+						int sel_key = READ_ONLY;
+						log.finest("ADDED OP_READ: " + serv.getUniqueId());
+						if (serv.waitingToSend()) {
+							sel_key = READ_WRITE;
+							log.finest("ADDED OP_WRITE: " + serv.getUniqueId());
+						}
+						sc.register(clientsSel, sel_key, serv);
+					} catch (Exception e) {
+						// Ignore such channel
+						log.finest("ERROR re-adding channel for: " + serv.getUniqueId()
+							+ ", exception: " + e);
+					} // end of try-catch
+				} else {
+					try {
+						log.info("Forcing stopping the service: " + serv.getUniqueId());
+						serv.forceStop();
+					} catch (Exception e) {	}
+				}
+			}
+			tempSel.close();
+		}
+	}
+
 	/**
 	 * Describe <code>run</code> method here.
 	 *
@@ -168,45 +210,8 @@ public class SocketReadThread implements Runnable {
 				int selectedKeys = clientsSel.select();
 				if(selectedKeys == 0 && !wakeup_called
 					&& (++empty_selections) > MAX_EMPTY_SELECTIONS) {
-					empty_selections = 0;
 					log.finest("Selected keys = 0!!! a bug again?");
-					// Handling a bug or not a bug described in the
-					// last comment to this issue:
-					// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4850373
-					// and
-					// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6403933
-					// Recreating the selector and registering all channles with
-					// the new selector
-					synchronized (this) {
-						Selector tempSel = clientsSel;
-						clientsSel = Selector.open();
-						for (SelectionKey sk: tempSel.selectedKeys()) {
-							IOService serv = (IOService)sk.attachment();
-							sk.cancel();
-							if (serv.isConnected()) {
-								SocketChannel sc = serv.getSocketChannel();
-								try {
-									int sel_key = READ_ONLY;
-									log.finest("ADDED OP_READ: " + serv.getUniqueId());
-									if (serv.waitingToSend()) {
-										sel_key = READ_WRITE;
-										log.finest("ADDED OP_WRITE: " + serv.getUniqueId());
-									}
-									sc.register(clientsSel, sel_key, serv);
-								} catch (Exception e) {
-									// Ignore such channel
-									log.finest("ERROR re-adding channel for: " + serv.getUniqueId()
-										+ ", exception: " + e);
-								} // end of try-catch
-							} else {
-								try {
-									log.info("Forcing stopping the service: " + serv.getUniqueId());
-									serv.forceStop();
-								} catch (Exception e) {	}
-							}
-						}
-						tempSel.close();
-					}
+					recreateSelector();
 				} else {
 					empty_selections = 0;
 					// This is dirty but selectNow() causes concurrent modification exception
@@ -255,8 +260,31 @@ public class SocketReadThread implements Runnable {
 				// I think it happens only on the broken Java implementation
 				// from Apple.
 				log.log(Level.WARNING, "Ups, broken JDK, Apple?", brokene);
-      } catch (Exception e) {
-        log.log(Level.SEVERE, "Server I/O error.", e);
+				try {
+					recreateSelector();
+				} catch (Exception e) {
+					log.log(Level.SEVERE, "Serious problem, can't recreate selector", e);
+					//stopping = true;
+				}
+			} catch (IOException ioe) {
+				// According to Java API that should not happen.
+				// I think it happens only on the broken Java implementation
+				// from Apple.
+				log.log(Level.WARNING, "Problem with the network connection", ioe);
+				try {
+					recreateSelector();
+				} catch (Exception e) {
+					log.log(Level.SEVERE, "Serious problem, can't recreate selector", e);
+					//stopping = true;
+				}
+      } catch (Exception exe) {
+        log.log(Level.SEVERE, "Server I/O error.", exe);
+				try {
+					recreateSelector();
+				} catch (Exception e) {
+					log.log(Level.SEVERE, "Serious problem, can't recreate selector", e);
+					//stopping = true;
+				}
         //stopping = true;
       }
     }
