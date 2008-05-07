@@ -208,8 +208,8 @@ public class SocketReadThread implements Runnable {
       try {
 				wakeup_called = false;
 				int selectedKeys = clientsSel.select();
-				if(selectedKeys == 0 && !wakeup_called
-					&& (++empty_selections) > MAX_EMPTY_SELECTIONS) {
+				if((selectedKeys == 0) && !wakeup_called
+					&& ((++empty_selections) > MAX_EMPTY_SELECTIONS)) {
 					log.finest("Selected keys = 0!!! a bug again?");
 					recreateSelector();
 				} else {
@@ -259,30 +259,30 @@ public class SocketReadThread implements Runnable {
 				// According to Java API that should not happen.
 				// I think it happens only on the broken Java implementation
 				// from Apple.
-				log.log(Level.WARNING, "Ups, broken JDK, Apple?", brokene);
+				log.log(Level.WARNING, "Ups, broken JDK, Apple? ", brokene);
 				try {
 					recreateSelector();
 				} catch (Exception e) {
-					log.log(Level.SEVERE, "Serious problem, can't recreate selector", e);
+					log.log(Level.SEVERE, "Serious problem, can't recreate selector: ", e);
 					//stopping = true;
 				}
 			} catch (IOException ioe) {
 				// According to Java API that should not happen.
 				// I think it happens only on the broken Java implementation
 				// from Apple.
-				log.log(Level.WARNING, "Problem with the network connection", ioe);
+				log.log(Level.WARNING, "Problem with the network connection: ", ioe);
 				try {
 					recreateSelector();
 				} catch (Exception e) {
-					log.log(Level.SEVERE, "Serious problem, can't recreate selector", e);
+					log.log(Level.SEVERE, "Serious problem, can't recreate selector: ", e);
 					//stopping = true;
 				}
       } catch (Exception exe) {
-        log.log(Level.SEVERE, "Server I/O error.", exe);
+        log.log(Level.SEVERE, "Server I/O error: ", exe);
 				try {
 					recreateSelector();
 				} catch (Exception e) {
-					log.log(Level.SEVERE, "Serious problem, can't recreate selector", e);
+					log.log(Level.SEVERE, "Serious problem, can't recreate selector: ", e);
 					//stopping = true;
 				}
         //stopping = true;
