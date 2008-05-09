@@ -184,6 +184,7 @@ public class OfflineMessages extends XMPPProcessor
 		StanzaType type = pac.getType();
 
 		if ((pac.getElemName().equals("message") &&
+				(pac.getElement().findChild("/message/body") != null)
 				(type == null || type == StanzaType.normal || type == StanzaType.chat))
 			|| (pac.getElemName().equals("presence") &&
 					(type == StanzaType.subscribe || type == StanzaType.subscribed
