@@ -62,6 +62,9 @@ public class BoshSession {
     Logger.getLogger("tigase.server.bosh.BoshSession");
 
 	private static final long SECOND = 1000;
+	private static final String PRESENCE_ELEMENT_NAME = "presence";
+	private static final String MESSAGE_ELEMENT_NAME = "message";
+	private static final String IQ_ELEMENT_NAME = "iq";
 
 	private UUID sid = null;
 	private Queue<BoshIOService> connections =
@@ -225,9 +228,11 @@ public class BoshSession {
 		if (packet != null) {
 			log.finest("[" + connections.size() +
 				"] Processing packet: " + packet.toString());
-			waiting_packets.offer(packet.getElement());
-			if (cache_on) {
-				processAutomaticCache(packet);
+			if (filterInPacket(packet)) {
+				waiting_packets.offer(packet.getElement());
+			} else {
+				log.finest("[" + connections.size() +
+					"] In packet filtered: " + packet.toString());
 			}
 		}
 		if (connections.size() > 0 &&
@@ -248,7 +253,7 @@ public class BoshSession {
 
 	private Element applyFilters(Element packet) {
 		Element result = packet.clone();
-		if (result.getName().equals("message")) {
+		if (result.getName() == MESSAGE_ELEMENT_NAME) {
 			String body =	result.getCData("/message/body");
 			if (body != null) {
 				int count = 0;
@@ -354,8 +359,11 @@ public class BoshSession {
 	}
 
 	private void processAutomaticCache(Packet packet) {
-		if (packet.getElemName().equals("presence")) {
+		if (packet.getElemName() == PRESENCE_ELEMENT_NAME) {
 			cache.addPresence(packet.getElement());
+		}
+		if (packet.getElemName() == MESSAGE_ELEMENT_NAME) {
+			cache.addFromMessage(packet.getElement());
 		}
 		if (packet.isXMLNS("/iq/query", "jabber:iq:roster")) {
 			cache.addRoster(packet.getElement());
@@ -404,6 +412,20 @@ public class BoshSession {
 		if (cache_res != null) {
 			waiting_packets.addAll(cache_res);
 		}
+	}
+
+	private boolean filterOutPacket(Packet packet) {
+		if (cache_on && packet.getElemName() == MESSAGE_ELEMENT_NAME) {
+			cache.addToMessage(packet.getElement());
+		}
+		return true;
+	}
+
+	private boolean filterInPacket(Packet packet) {
+		if (cache_on) {
+			processAutomaticCache(packet);
+		}
+		return true;
 	}
 
 	public void processSocketPacket(Packet packet,
@@ -475,8 +497,12 @@ public class BoshSession {
 								el.setXMLNS("jabber:client");
 							}
 							Packet result = new Packet(el);
-							log.finest("Sending out packet: " + result.toString());
-							out_results.offer(result);
+							if (filterOutPacket(result)) {
+								log.finest("Sending out packet: " + result.toString());
+								out_results.offer(result);
+							} else {
+								log.finest("Out packet filtered: " + result.toString());
+							}
 						}
 					}
 				}

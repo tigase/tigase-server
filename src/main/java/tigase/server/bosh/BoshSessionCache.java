@@ -20,6 +20,8 @@
  */
 package tigase.server.bosh;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 import java.util.List;
 import java.util.Arrays;
@@ -45,6 +47,10 @@ public class BoshSessionCache {
 	public static final String DEF_ID = "";
 	public static final String ROSTER_ID = "bosh-roster";
 	public static final String RESOURCE_BIND_ID = "bosh-resource-bind";
+	public static final String MESSAGE_ID = "bosh-message";
+
+	private static final SimpleDateFormat sdf =
+    new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 
 	/**
 	 * Cache elements stored by the Bosh client. The cache elements are grouped
@@ -57,6 +63,11 @@ public class BoshSessionCache {
 	 * cache stores the last presence element for each JID.
 	 */
 	private Map<String, Element> jid_presence = null;
+	/**
+	 * Cached time of the first message to/from some jid
+	 * to speedup message caching processing
+	 */
+	protected Map<String, Long> jid_msg_start = null;
 
 	/**
 	 * Creates a new <code>BoshSessionCache</code> instance.
@@ -65,6 +76,7 @@ public class BoshSessionCache {
 	public BoshSessionCache() {
 		id_cache = new LinkedHashMap<String, List<Element>>();
 		jid_presence = new LinkedHashMap<String, Element>();
+		jid_msg_start = new LinkedHashMap<String, Long>();
 	}
 
 	public void set(String id, List<Element> data) {
@@ -143,6 +155,59 @@ public class BoshSessionCache {
 	public void addRoster(Element roster) {
 		add(ROSTER_ID, Arrays.asList(roster));
 		log.finest("ADD_ROSTER, ROSTER: " + roster.toString());
+	}
+
+	private long getMsgStartTime(String jid) {
+		Long start_time = jid_msg_start.get(jid);
+		if (start_time == null) {
+			start_time = (System.currentTimeMillis()/1000);
+			jid_msg_start.put(jid, start_time);
+		}
+		return start_time;
+	}
+
+	private Element createMessageHistory(String jid) {
+		return new Element("iq", new Element[] {
+				new Element("chat",
+					new String[] {"xmlns", "with", "start"},
+					new String[] {"urn:xmpp:tmp:archive", jid, sdf.format(new Date())})},
+			new String[] {"type", "id"},
+			new String[] {"result", ""+System.currentTimeMillis()});
+	}
+
+	private void addMsgBody(String jid, String direction, Element body) {
+		long start_time = getMsgStartTime(jid);
+		List<Element> msg_history_l = id_cache.get(MESSAGE_ID+jid);
+		Element msg_history = null;
+		if (msg_history == null) {
+			msg_history = createMessageHistory(jid);
+			add(MESSAGE_ID+jid, Arrays.asList(msg_history));
+		} else {
+			msg_history = msg_history_l.get(0);
+		}
+		long current_secs = (System.currentTimeMillis()/1000) - start_time;
+		msg_history.findChild("/iq/chat").addChild(new Element(direction,
+				new Element[] {body},
+				new String[] {"secs"},
+				new String[] {""+current_secs}));
+	}
+
+	public void addFromMessage(Element message) {
+		Element body = message.findChild("/message/body");
+		if (body == null) {
+			return;
+		}
+		String jid = message.getAttribute("from");
+		addMsgBody(jid, "from", body);
+	}
+
+	public void addToMessage(Element message) {
+		Element body = message.findChild("/message/body");
+		if (body == null) {
+			return;
+		}
+		String jid = message.getAttribute("to");
+		addMsgBody(jid, "to", body);
 	}
 
 }
