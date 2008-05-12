@@ -204,6 +204,10 @@ public class SessionManager extends AbstractMessageReceiver
 		// That is needed for preprocessors like privacy lists which should
 		// block certain packets.
 
+		if (conn == null && checkNonSessionPacket(packet)) {
+			return;
+		}
+
 		Queue<Packet> results = new LinkedList<Packet>();
 
 		boolean stop = false;
@@ -293,6 +297,10 @@ public class SessionManager extends AbstractMessageReceiver
 		} else {
 			log.finest("Packet processed by: " + packet.getProcessorsIds().toString());
 		} // end of else
+	}
+
+	public boolean checkNonSessionPacket(Packet packet) {
+		return false;
 	}
 
 	private void setPermissions(XMPPResourceConnection conn,
@@ -642,6 +650,10 @@ public class SessionManager extends AbstractMessageReceiver
 			return super.addOutPacket(packet);
 		}
 		return false;
+	}
+
+	protected boolean fastAddOutPacket(Packet packet) {
+		return super.addOutPacket(packet);
 	}
 
 	protected boolean addOutPackets(Queue<Packet> packets) {
