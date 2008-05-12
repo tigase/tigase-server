@@ -72,6 +72,7 @@ public abstract class Presence {
 	 * disconnects.
 	 */
 	public static final String DIRECT_PRESENCE = "direct-presences";
+	public static final String PRESENCE_ELEMENT_NAME = "presence";
 
 	/**
    * Private logger for class instancess.
@@ -79,7 +80,7 @@ public abstract class Presence {
   private static Logger log =	Logger.getLogger("tigase.xmpp.impl.Presence");
 
   protected static final String XMLNS = "jabber:client";
-  private static final String[] ELEMENTS = {"presence"};
+  private static final String[] ELEMENTS = {PRESENCE_ELEMENT_NAME};
   private static final String[] XMLNSS = {XMLNS};
 
 	/**
@@ -164,7 +165,7 @@ public abstract class Presence {
 		String[] buddies = Roster.getBuddies(session, Roster.PENDING_IN);
 		if (buddies != null) {
 			for (String buddy: buddies) {
-				Element presence = new Element("presence");
+				Element presence = new Element(PRESENCE_ELEMENT_NAME);
 				presence.setAttribute("type", StanzaType.subscribe.toString());
 				presence.setAttribute("from", buddy);
 				updatePresenceChange(presence, session, results);
@@ -187,7 +188,7 @@ public abstract class Presence {
 			if (conn != session && conn.getResource() != null
 				&& !conn.getResource().equals(session.getResource())) {
 				// Send to old resource presence about new resource
-				Element pres_update = new Element("presence");
+				Element pres_update = new Element(PRESENCE_ELEMENT_NAME);
 				pres_update.setAttribute("from", session.getJID());
 				pres_update.setAttribute("to", conn.getJID());
 				pres_update.setAttribute("type", StanzaType.unavailable.toString());
@@ -282,7 +283,7 @@ public abstract class Presence {
 
 		Element presence = null;
 		if (pres == null) {
-			presence = new Element("presence");
+			presence = new Element(PRESENCE_ELEMENT_NAME);
 			if (t != null) {
 				presence.setAttribute("type", t.toString());
 			} // end of if (t != null)
