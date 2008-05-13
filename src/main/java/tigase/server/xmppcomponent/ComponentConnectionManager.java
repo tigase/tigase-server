@@ -446,7 +446,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 	}
 
 	public Element getDiscoInfo(String node, String jid) {
-		if (jid != null && jid.startsWith(getName()+".")) {
+		if (jid != null && getName().equals(JIDUtils.getNodeNick(jid))) {
 			return serviceEntity.getDiscoInfo(node);
 		}
 		return null;
@@ -455,10 +455,11 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 	public 	List<Element> getDiscoFeatures() { return null; }
 
 	public List<Element> getDiscoItems(String node, String jid) {
-		if (jid.startsWith(getName()+".")) {
+		if (getName().equals(JIDUtils.getNodeNick(jid))) {
 			return serviceEntity.getDiscoItems(node, null);
 		} else {
- 			return Arrays.asList(serviceEntity.getDiscoItem(null, getName() + "." + jid));
+ 			return Arrays.asList(serviceEntity.getDiscoItem(null,
+					JIDUtils.getNodeID(getName(), jid)));
 		}
 	}
 

@@ -202,7 +202,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 					DEF_SM_NAME + "@" + comp_params[1]);
 			} else {
 				props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_ENTRY_PROP_KEY,
-					DEF_SM_NAME + "@" + HOSTNAMES_PROP_VAL[0]);
+					DEF_SM_NAME + "@" + DNSResolver.getDefaultHostname());
 			}
 		}
 		return props;

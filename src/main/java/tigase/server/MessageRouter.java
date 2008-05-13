@@ -95,7 +95,7 @@ public class MessageRouter extends AbstractMessageReceiver {
     new ConcurrentSkipListMap<String, MessageReceiver>();
 
 	public void processPacket(final Packet packet, final Queue<Packet> results) {
-		String to = packet.getTo();
+		String nick = JIDUtils.getNodeNick(packet.getTo());
 		for (ServerComponent comp: components.values()) {
 			if (comp != this) {
 				comp.processPacket(packet, results);
@@ -112,7 +112,7 @@ public class MessageRouter extends AbstractMessageReceiver {
 // 			processPacket(res);
 // 		} // end of for ()
 
-		if (!to.startsWith(getName())) {
+		if (nick == null || !getName().equals(nick)) {
 // 			if (results.size() == 0) {
 // 				Packet res =
 // 					Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
@@ -160,13 +160,14 @@ public class MessageRouter extends AbstractMessageReceiver {
 	}
 
 	private String isToLocalComponent(String jid) {
-		for (String name: components.keySet()) {
-			for (String hostname: localAddresses) {
-				if (jid.equals(name + "." + hostname)) {
-					return name;
-				}
-			}
-		} // end of for ()
+		String nick = JIDUtils.getNodeNick(jid);
+		if (nick == null) {
+			return null;
+		}
+		String host = JIDUtils.getNodeHost(jid);
+		if (isLocalDomain(host) && components.get(nick) != null) {
+			return nick;
+		}
 		return null;
 	}
 
@@ -202,25 +203,35 @@ public class MessageRouter extends AbstractMessageReceiver {
 				+ ", type: " + packet.getType());
 		}
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Processing packet: " + packet.getStringData()
-				+ ", to: " + packet.getTo()
-				+ ", from: " + packet.getFrom());
+			log.finest("Processing packet: " + packet.toString());
 		}
+
+		// Detect inifinite loop if from == to
+		// Maybe it is not needed anymore...
+		if ((packet.getFrom() != null
+				&& packet.getFrom().equals(packet.getTo()))
+			|| (packet.getFrom() == NULL_ROUTING
+				&& packet.getElemFrom() != null
+				&& packet.getElemFrom().equals(packet.getTo()))) {
+			log.warning("Possible infinite loop, dropping packet: "
+				+ packet.toString());
+			return;
+		}
+
+
+		// There are 2 methods for processing packets:
+		// Blocking processing method implemented by all components
+		// which processes packet and returns results instantly, usually
+		// used by Components which don't have own thread for data processing
+		// and it is always used only in cases the results can be returned
+		// instantly without waiting for any resource.
+		// Most AbstractMessageReceivers have an empty implementation of this
+		// method. It is used mainly to process server commands and to
+		// handle service discovery packets.
 
 		String id =  JIDUtils.getNodeID(packet.getTo());
 		String local_comp_name = isToLocalComponent(id);
 		if (localAddresses.contains(id) || local_comp_name != null) {
-			// Detect inifinite loop if from == to
-			// Maybe it is not needed anymore...
-			if ((packet.getFrom() != null
-					&& packet.getFrom().equals(packet.getTo()))
-				|| (packet.getFrom() == NULL_ROUTING
-					&& packet.getElemFrom() != null
-					&& packet.getElemFrom().equals(packet.getTo()))) {
-				log.warning("Possible infinite loop, dropping packet: "
-					+ packet.toString());
-				return;
-			}
 			log.finest("This packet is addressed to server itself.");
 			Queue<Packet> results = new LinkedList<Packet>();
 			processPacket(packet, results);
@@ -232,14 +243,6 @@ public class MessageRouter extends AbstractMessageReceiver {
 				} // end of for ()
 				return;
 			}
-// 			// None of components wanted to process the packet, let's try
-// 			// to insert it directly to component queue....
-// 			MessageReceiver mr = receivers.get(local_comp_name);
-// 			if (mr != null) {
-// 				log.finest("Adding packet to local component: " + packet.toString());
-// 				mr.addPacket(packet);
-// 				return;
-// 			}
 		}
 
 		String host = JIDUtils.getNodeHost(packet.getTo());
@@ -250,23 +253,10 @@ public class MessageRouter extends AbstractMessageReceiver {
 		if (nick != null) {
 			first = receivers.get(nick);
 		} // end of if (nick != null)
-		if (first != null) {
-			// Well, I found something. Now we need to make sure it is
-			// indeed to this receiver and it is not just accidental
-			// nick name match, so we are checking routing hosts.
-			Set<String> routings = first.getRoutings();
-			if (routings != null) {
-				log.finest(first.getName() + ": Looking for host: " + host
-					+ " in " + routings.toString());
-				if (routings.contains(host)) {
-					log.finest("Found receiver: " + first.getName());
-					first.addPacket(packet);
-					return;
-				} // end of if (routings.contains())
-			} // end of if (routings != null)
-			else {
-				log.severe("Routings are null for: " + first.getName());
-			} // end of if (routings != null) else
+		if (first != null && host.equals(getDefHostName())) {
+			log.finest("Found receiver: " + first.getName());
+			first.addPacket(packet);
+			return;
 		} // end of if (mr != null)
 		// This packet is not processed localy, so let's find receiver
 		// which will send it to correct destination:
@@ -478,6 +468,7 @@ public class MessageRouter extends AbstractMessageReceiver {
 	private void processDiscoQuery(final Packet packet,
 		final Queue<Packet> results) {
 			String jid = packet.getElemTo();
+			String nick = JIDUtils.getNodeNick(jid);
 			String node = packet.getAttribute("/iq/query", "node");
 			Element query = packet.getElement().getChild("query").clone();
 
@@ -506,7 +497,7 @@ public class MessageRouter extends AbstractMessageReceiver {
 			if (packet.isXMLNS("/iq/query", ITEMS_XMLNS)) {
 				boolean localDomain = isLocalDomain(jid);
 				for (XMPPService comp: xmppServices.values()) {
-					if (localDomain || jid.startsWith(comp.getName() + ".")) {
+					if (localDomain || (nick != null && comp.getName().equals(nick))) {
 						List<Element> items =	comp.getDiscoItems(node, jid);
 						if (items != null && items.size() > 0) {
 							query.addChildren(items);

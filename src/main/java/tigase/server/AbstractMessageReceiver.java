@@ -279,11 +279,14 @@ public abstract class AbstractMessageReceiver
   public Map<String, Object> getDefaults(Map<String, Object> params) {
     Map<String, Object> defs = new LinkedHashMap<String, Object>();
 		defs.put(MAX_QUEUE_SIZE_PROP_KEY, getDefMaxQueueSize());
-		if (params.get(GEN_VIRT_HOSTS) != null) {
-			DEF_HOSTNAME_PROP_VAL = ((String)params.get(GEN_VIRT_HOSTS)).split(",")[0];
-		} else {
-			DEF_HOSTNAME_PROP_VAL = DNSResolver.getDefHostNames()[0];
-		}
+// 		if (params.get(GEN_VIRT_HOSTS) != null) {
+// 			DEF_HOSTNAME_PROP_VAL = ((String)params.get(GEN_VIRT_HOSTS)).split(",")[0];
+// 		} else {
+		// The default hostname must be a real name of the machine and is a separate
+		// thing from virtual hostnames. This is a critical parameter for proper
+		// MessageRouter working.
+		DEF_HOSTNAME_PROP_VAL = DNSResolver.getDefaultHostname();
+// 		}
 		defs.put(DEF_HOSTNAME_PROP_KEY, DEF_HOSTNAME_PROP_VAL);
 
     return defs;

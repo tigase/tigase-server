@@ -716,7 +716,8 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 			return;
 		}
 
-		if (!packet.getTo().startsWith(getName()+".")) return;
+		String nick = JIDUtils.getNodeNick(packet.getTo());
+		if (nick == null || !getName().equals(nick)) return;
 
 		String msg = "Please be careful, you are service admin and all changes"
 			+ " you make are instantly applied to live system!";
@@ -1088,7 +1089,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 	}
 
 	public Element getDiscoInfo(String node, String jid) {
-		if (jid != null && jid.startsWith(getName()+".")) {
+		if (jid != null && getName().equals(JIDUtils.getNodeNick(jid))) {
 			return serviceEntity.getDiscoInfo(node);
 		}
 		return null;
@@ -1097,10 +1098,11 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 	public 	List<Element> getDiscoFeatures() { return null; }
 
 	public List<Element> getDiscoItems(String node, String jid) {
-		if (jid.startsWith(getName()+".")) {
+		if (getName().equals(JIDUtils.getNodeNick(jid))) {
 			return serviceEntity.getDiscoItems(node, jid);
 		} else {
-			return Arrays.asList(serviceEntity.getDiscoItem(null, getName() + "." + jid));
+			return Arrays.asList(serviceEntity.getDiscoItem(null,
+					JIDUtils.getNodeID(getName(), jid)));
 		}
 	}
 

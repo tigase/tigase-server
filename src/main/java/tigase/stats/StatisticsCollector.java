@@ -41,6 +41,7 @@ import tigase.xml.Element;
 import tigase.xml.XMLUtils;
 import tigase.xmpp.StanzaType;
 import tigase.util.ElementUtils;
+import tigase.util.JIDUtils;
 
 /**
  * Class StatisticsCollector
@@ -135,7 +136,8 @@ public class StatisticsCollector
 		}
 		case OTHER: {
 			if (packet.getStrCommand() == null) return;
-			if (!packet.getTo().startsWith(getName()+".")) return;
+			String nick = JIDUtils.getNodeNick(packet.getTo());
+			if (nick == null || !getName().equals(nick)) return;
 			String action = Command.getAction(packet);
 			if (action != null && action.equals("cancel")) {
 				Packet result = packet.commandResult(null);
@@ -187,7 +189,7 @@ public class StatisticsCollector
 	}
 
 	public Element getDiscoInfo(String node, String jid) {
-		if (jid != null && jid.startsWith(getName()+".")) {
+		if (jid != null && getName().equals(JIDUtils.getNodeNick(jid))) {
 			return serviceEntity.getDiscoInfo(node);
 		}
 		return null;
@@ -196,10 +198,11 @@ public class StatisticsCollector
 	public 	List<Element> getDiscoFeatures() { return null; }
 
 	public List<Element> getDiscoItems(String node, String jid) {
-		if (jid.startsWith(getName()+".")) {
+		if (getName().equals(JIDUtils.getNodeNick(jid))) {
 			return serviceEntity.getDiscoItems(node, jid);
 		} else {
-			return Arrays.asList(serviceEntity.getDiscoItem(null, getName() + "." + jid));
+			return Arrays.asList(serviceEntity.getDiscoItem(null,
+					JIDUtils.getNodeID(getName(), jid)));
 		}
 	}
 

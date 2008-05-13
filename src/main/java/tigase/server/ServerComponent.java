@@ -44,6 +44,13 @@ public interface ServerComponent {
 
   void release();
 
-  void processPacket(Packet packet, Queue<Packet> results);
+  /**
+	 * <code>processPacket</code> is a blocking processing method implemented
+	 * by all components. This method processes packet and returns results
+	 * instantly without waiting for any resources.
+	 *
+	 * @param packet a <code>Packet</code> value
+	 */
+	void processPacket(Packet packet, Queue<Packet> results);
 
 }

@@ -50,6 +50,10 @@ public class SessionManagerClustered extends SessionManager {
 
 	private String[] cluster_nodes = {};
 
+	public Packet initalPacketProcessin(Packet packet) {
+		return packet;
+	}
+
 	public boolean checkNonSessionPacket(Packet packet) {
 		// It might be a packet to another cluster node...
 		String sess_man_id = JIDUtils.getNodeID(getName(), getDefHostName());

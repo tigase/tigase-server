@@ -143,10 +143,15 @@ public class SessionManager extends AbstractMessageReceiver
 		}
 	}
 
-	public void processPacket(Packet packet) {
+	public Packet initalPacketProcessin(Packet packet) {
+		return packet;
+	}
+
+	public void processPacket(final Packet pack_par) {
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Processing packet: " + packet.toString());
+			log.finest("Processing packet: " + pack_par.toString());
 		}
+		Packet packet = initalPacketProcessin(pack_par);
 		if (packet.isCommand()) {
 			processCommand(packet);
 			packet.processedBy("SessionManager");
@@ -154,48 +159,10 @@ public class SessionManager extends AbstractMessageReceiver
 			// 			return;
 		} // end of if (pc.isCommand())
 		XMPPResourceConnection conn = getXMPPResourceConnection(packet);
-		if (conn == null) {
 
-			if (packet.getFrom() != packet.getElemFrom()
-        && (!packet.isCommand() ||
-					(packet.isCommand() && packet.getCommand() == Command.OTHER))) {
-				// It doesn't look good, there should reaaly be a connection for
-				// this packet....
-				// returning error back...
-				try {
-					Packet error =
-						Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet,
-							"Service not available.", true);
-					error.setTo(packet.getFrom());
-					addOutPacket(error);
-				} catch (PacketErrorTypeException e) {
-					log.warning("Packet processing exception: " + e);
-				}
-				return;
-			}
-
-			// It might be a message _to_ some user on this server
-			// so let's look for established session for this user...
-			final String to = packet.getElemTo();
-			if (to != null) {
-				if (processAdmins(packet)) {
-					// No more processing is needed....
-					return;
-				}
-				conn = getResourceConnection(to);
-				if (conn == null) {
-					// It might be message to admin
-					if (log.isLoggable(Level.FINEST)) {
-						log.info("Is it a message to admins? " + packet.toString());
-					}
-				}
-			} else {
-				// Hm, not sure what should I do now....
-				// Maybe I should treat it as message to admin....
-				log.info("Message without TO attribute set, don't know what to do wih this: "
-					+ packet.getStringData());
-			} // end of else
-		} // end of if (conn == null)
+		if (conn == null && checkNonSessionPacket(packet)) {
+			return;
+		}
 
 		// Preprocess..., all preprocessors get all messages to look at.
 		// I am not sure if this is correct for now, let's try to do it this
@@ -203,10 +170,6 @@ public class SessionManager extends AbstractMessageReceiver
 		// If any of them returns true - it means processing should stop now.
 		// That is needed for preprocessors like privacy lists which should
 		// block certain packets.
-
-		if (conn == null && checkNonSessionPacket(packet)) {
-			return;
-		}
 
 		Queue<Packet> results = new LinkedList<Packet>();
 
@@ -665,10 +628,47 @@ public class SessionManager extends AbstractMessageReceiver
 	}
 
 	private XMPPResourceConnection getXMPPResourceConnection(Packet p) {
+		XMPPResourceConnection conn = null;
 		if (p.getFrom() != null) {
-			return connectionsByFrom.get(p.getFrom());
+			conn = connectionsByFrom.get(p.getFrom());
+			if (conn != null) {
+				return conn;
+			}
 		}
-		return null;
+		if (p.getFrom() != p.getElemFrom() && (!p.isCommand()
+				|| (p.isCommand() && p.getCommand() == Command.OTHER))) {
+			// It doesn't look good, there should reaaly be a connection for
+			// this packet....
+			// returning error back...
+			try {
+				Packet error =
+						Authorization.SERVICE_UNAVAILABLE.getResponseMessage(p,
+							"Service not available.", true);
+				error.setTo(p.getFrom());
+				fastAddOutPacket(error);
+			} catch (PacketErrorTypeException e) {
+				log.warning("Packet processing exception: " + e);
+			}
+			return null;
+		}
+
+		// It might be a message _to_ some user on this server
+		// so let's look for established session for this user...
+		final String to = p.getElemTo();
+		if (to != null) {
+			if (processAdmins(p)) {
+				// No more processing is needed....
+				return null;
+			}
+			conn = getResourceConnection(to);
+		} else {
+			// Hm, not sure what should I do now....
+			// Maybe I should treat it as message to admin....
+			log.info("Message without TO attribute set, don't know what to do wih this: "
+				+ p.getStringData());
+		} // end of else
+
+		return conn;
 	}
 
 	private XMPPSession getXMPPSession(Packet p) {
@@ -858,7 +858,7 @@ public class SessionManager extends AbstractMessageReceiver
 	}
 
 	public Element getDiscoInfo(String node, String jid) {
-		if (jid != null && jid.startsWith(getName()+".")) {
+		if (jid != null && getName().equals(JIDUtils.getNodeNick(jid))) {
 			Element query = serviceEntity.getDiscoInfo(node);
 			for (ProcessorThread proc_t: processors.values()) {
 				Element[] discoFeatures = proc_t.processor.supDiscoFeatures(null);
@@ -883,7 +883,7 @@ public class SessionManager extends AbstractMessageReceiver
 	}
 
 	public List<Element> getDiscoItems(String node, String jid) {
-		if (jid != null && jid.startsWith(getName()+".")) {
+		if (jid != null && getName().equals(JIDUtils.getNodeNick(jid))) {
 			return serviceEntity.getDiscoItems(node, jid);
 		} else {
 // 			return
