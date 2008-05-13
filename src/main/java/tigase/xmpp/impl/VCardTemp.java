@@ -109,9 +109,13 @@ public class VCardTemp extends XMPPProcessor implements XMPPProcessorIfc {
 					repo.getPublicData(JIDUtils.getNodeID(packet.getElemTo()), ID, VCARD_KEY, null);
 				if (strvCard != null) {
 					results.offer(parseXMLData(strvCard, packet));
+				} else {
+					Packet result = packet.errorResult("cancel", "item-not-found", "User not found", true);
+					results.offer(result);
 				} // end of if (vcard != null)
 			} catch (UserNotFoundException e) {
-				// Just ignore....
+				Packet result = packet.errorResult("cancel", "item-not-found", "User not found", true);
+				results.offer(result);
 			} // end of try-catch
 			return;
 		} // end of if (session == null)
