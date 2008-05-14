@@ -29,6 +29,7 @@ import java.util.Map;
 //import tigase.cluster.ClusterElement;
 import tigase.server.Packet;
 import tigase.util.JIDUtils;
+import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.server.xmppsession.SessionManager;
 
@@ -79,26 +80,22 @@ public class SessionManagerClustered extends SessionManager {
 	}
 
 	protected void processClusterPacket(Packet packet) {
-		
+		ClusterElement clel = new ClusterElement(packet.getElement());
 	}
 
 	protected boolean sentToNextNode(Packet packet) {
-		return false;
-	}
-
-	public boolean checkNonSessionPacket(Packet packet) {
-		// It might be a packet to another cluster node...
-// 		String sess_man_id = JIDUtils.getNodeID(getName(), getDefHostName());
-// 		if (cluster_nodes.length > 0 && !packet.isVisitedClusterNode(sess_man_id)) {
-// 			packet.addVisitedClusterNode(sess_man_id);
-// 			for (String cluster_node: cluster_nodes) {
-// 				if (!packet.isVisitedClusterNode(cluster_node)) {
-// 					packet.setTo(cluster_node);
-// 					super.fastAddOutPacket(packet);
-// 					return true;
-// 				}
-// 			}
-// 		}
+		if (cluster_nodes.length > 0) {
+			String sess_man_id = getComponentId();
+			for (String cluster_node: cluster_nodes) {
+				if (!cluster_node.equals(sess_man_id)) {
+					ClusterElement clel = new ClusterElement(sess_man_id, cluster_node,
+						StanzaType.set, packet.getElement());
+					clel.addVisitedNode(sess_man_id);
+					super.fastAddOutPacket(new Packet(clel.getClusterElement()));
+					return true;
+				}
+			}
+		}
 		return false;
 	}
 

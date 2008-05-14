@@ -98,6 +98,7 @@ public abstract class AbstractMessageReceiver
 	private int sec_idx = 0;
 	private long[] minutes = new long[60];
 	private int min_idx = 0;
+	private String compId = null;
 
   /**
    * Variable <code>statAddedMessagesOk</code> keeps counter of successfuly
@@ -111,12 +112,12 @@ public abstract class AbstractMessageReceiver
   private long statAddedMessagesEr = 0;
 
 	/**
-	 * Describe <code>myDomain</code> method here.
+	 * Describe <code>getComponentId</code> method here.
 	 *
 	 * @return a <code>String</code> value
 	 */
-	public String myDomain() {
-		return getName() + "." + defHostname;
+	public String getComponentId() {
+		return compId;
 	}
 
   /**
@@ -242,7 +243,8 @@ public abstract class AbstractMessageReceiver
     int queueSize = (Integer)properties.get(MAX_QUEUE_SIZE_PROP_KEY);
     setMaxQueueSize(queueSize);
 		defHostname = (String)properties.get(DEF_HOSTNAME_PROP_KEY);
-		addRouting(myDomain());
+		compId = JIDUtils.getNodeID(name, defHostname);
+		addRouting(getComponentId());
   }
 
   public void setMaxQueueSize(int maxQueueSize) {
@@ -303,6 +305,7 @@ public abstract class AbstractMessageReceiver
 
   public void setName(String name) {
     this.name = name;
+		compId = JIDUtils.getNodeID(name, defHostname);
   }
 
   public String getName() {

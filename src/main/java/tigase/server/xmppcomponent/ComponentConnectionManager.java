@@ -96,10 +96,12 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 		log.finer("Processing packet: " + packet.getElemName()
 			+ ", type: " + packet.getType());
 		log.finest("Processing packet: " + packet.getStringData());
-		if (packet.getElemTo() != null && packet.getElemTo().equals(myDomain())) {
+		if (packet.getElemTo() != null
+			&& packet.getElemTo().equals(getComponentId())) {
 			try {
 				addOutPacket(
-					Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet, "Not implemented", true));
+					Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
+						"Not implemented", true));
 			} catch (PacketErrorTypeException e) {
 				log.warning("Packet processing exception: " + e);
 			}

@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.LinkedHashSet;
 import java.util.ArrayList;
 
+import tigase.xmpp.StanzaType;
 import tigase.xml.Element;
 
 /**
@@ -88,10 +89,10 @@ public class ClusterElement {
 		}
 	}
 
-	public ClusterElement(String from, String to, String type, Element packet) {
+	public ClusterElement(String from, String to, StanzaType type, Element packet) {
 		packets = new ArrayList<Element>();
 		visited_nodes = new LinkedHashSet<String>();
-		elem = createClusterElement(from, to, type);
+		elem = createClusterElement(from, to, type.toString());
 		if (packet != null) {
 			addDataPacket(packet);
 		}

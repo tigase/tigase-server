@@ -71,6 +71,8 @@ public class Gateway extends AbstractMessageReceiver
 	public static final String GW_CLASS_NAME_PROP_KEY = "gw-class-name";
 	public static final String GW_CLASS_NAME_PROP_VAL =
 		"tigase.extras.gateway.MsnConnection";
+	public static final String GW_DOMAIN_NAME_PROP_KEY = "gw-domain-name";
+	public static final String GW_DOMAIN_NAME_PROP_VAL =	"msn.localhost";
 	public static final String GW_MODERATED_PROP_KEY = "is-moderated";
 	public static final boolean GW_MODERATED_PROP_VAL = false;
 
@@ -92,6 +94,7 @@ public class Gateway extends AbstractMessageReceiver
 	private boolean is_moderated = GW_MODERATED_PROP_VAL;
 	private String gw_name = "Undefined";
 	private String gw_type = "unknown";
+	private String gw_hostname = GW_DOMAIN_NAME_PROP_VAL;
 	private String gw_desc = "empty";
 	private UserRepository repository = null;
 	private Map<String, GatewayConnection> gw_connections =
@@ -117,6 +120,8 @@ public class Gateway extends AbstractMessageReceiver
 
 		admins = (String[])props.get(ADMINS_PROP_KEY);
 		Arrays.sort(admins);
+		gw_hostname = (String)props.get(GW_DOMAIN_NAME_PROP_KEY);
+		addRouting(gw_hostname);
 
 		is_moderated = (Boolean)props.get(GW_MODERATED_PROP_KEY);
 
@@ -129,7 +134,7 @@ public class Gateway extends AbstractMessageReceiver
 			repository = RepositoryFactory.getUserRepository(getName(),
 				cls_name, res_uri, null);
 			try {
-				repository.addUser(myDomain());
+				repository.addUser(getComponentId());
 			} catch (UserExistsException e) { /*Ignore, this is correct and expected*/	}
 		} catch (Exception e) {
 			log.log(Level.SEVERE, "Can't initialize repository", e);
@@ -171,6 +176,7 @@ public class Gateway extends AbstractMessageReceiver
 
 		defs.put(GW_CLASS_NAME_PROP_KEY, GW_CLASS_NAME_PROP_VAL);
 		defs.put(GW_MODERATED_PROP_KEY, GW_MODERATED_PROP_VAL);
+		defs.put(GW_DOMAIN_NAME_PROP_KEY, GW_DOMAIN_NAME_PROP_VAL);
 
 		return defs;
 	}
@@ -222,14 +228,14 @@ public class Gateway extends AbstractMessageReceiver
 				String new_username = packet.getElemCData("/iq/query/username");
 				String new_password = packet.getElemCData("/iq/query/password");
 				try {
-					repository.setData(myDomain(), id, username_key, new_username);
-					repository.setData(myDomain(), id, password_key, new_password);
+					repository.setData(getComponentId(), id, username_key, new_username);
+					repository.setData(getComponentId(), id, password_key, new_password);
 					addOutPacket(packet.okResult((String)null, 0));
 					addOutPacket(new Packet(new Element("presence",
 								new String[] {"to", "from", "type"},
-								new String[] {id, myDomain(), "subscribe"})));
+								new String[] {id, gw_hostname, "subscribe"})));
 					if (is_moderated && !isAdmin(id)) {
-						repository.setData(myDomain(), id, moderated_key, moderated_true);
+						repository.setData(getComponentId(), id, moderated_key, moderated_true);
 						addOutPacket(new Packet(new Element("message",
 									new Element[] {
 										new Element("body",
@@ -238,16 +244,16 @@ public class Gateway extends AbstractMessageReceiver
 											+ " and you will be able to use the gateway since then." )
 									},
 									new String[] {"to", "from", "type", "id"},
-									new String[] {id, myDomain(), "chat", "gw-ap-1"})));
+									new String[] {id, gw_hostname, "chat", "gw-ap-1"})));
 						sendToAdmins(new Element("message",
 								new Element[] {
 									new Element("body",
 										"Gateway subscription request is awaiting for: " + id)
 								},
 								new String[] {"from", "type", "id"},
-								new String[] {myDomain(), "chat", "gw-ap-1"}));
+								new String[] {getComponentId(), "chat", "gw-ap-1"}));
 					} else {
-						repository.setData(myDomain(), id, moderated_key, moderated_false);
+						repository.setData(gw_hostname, id, moderated_key, moderated_false);
 					}
 				} catch (tigase.db.UserNotFoundException e) {
 					log.warning("This is most likely configuration error, please make"
@@ -272,7 +278,7 @@ public class Gateway extends AbstractMessageReceiver
 	}
 
 	private void processPresence(Packet packet) {
-		if (packet.getElemTo().equals(myDomain())) {
+		if (packet.getElemTo().equals(gw_hostname)) {
 			if (packet.getType() == null || packet.getType() == StanzaType.available) {
 				// Open new connection if it does not exist
 				findConnection(packet, true);
@@ -299,9 +305,9 @@ public class Gateway extends AbstractMessageReceiver
 				String pres_type = "null";
 				String pres_show = "null";
 				try {
-					repository.setData(myDomain(), roster_node, AUTHORIZED_KEY, authorized);
-					pres_type = repository.getData(myDomain(), roster_node, PRESENCE_TYPE);
-					pres_show = repository.getData(myDomain(), roster_node, PRESENCE_SHOW);
+					repository.setData(getComponentId(), roster_node, AUTHORIZED_KEY, authorized);
+					pres_type = repository.getData(getComponentId(), roster_node, PRESENCE_TYPE);
+					pres_show = repository.getData(getComponentId(), roster_node, PRESENCE_SHOW);
 					log.fine("Added buddy do repository for: " + buddy);
 				} catch (TigaseDBException e) {
 					log.log(Level.WARNING, "Problem updating repository data", e);
@@ -352,7 +358,7 @@ public class Gateway extends AbstractMessageReceiver
 				String roster_node = id + "/roster/" + buddy;
 				log.fine("Received unsubscribed presence for buddy: " + buddy);
 				try {
-					repository.removeSubnode(myDomain(), roster_node);
+					repository.removeSubnode(getComponentId(), roster_node);
 					log.fine("Removed from repository buddy: " + buddy);
 				} catch (TigaseDBException e) {
 					log.log(Level.WARNING, "Problem updating repository data", e);
@@ -419,7 +425,7 @@ public class Gateway extends AbstractMessageReceiver
 	}
 
 	public String formatJID(String legacyName) {
-		return XMLUtils.escape(legacyName.replace("@", "%") + "@" + myDomain());
+		return XMLUtils.escape(legacyName.replace("@", "%") + "@" + gw_hostname);
 	}
 
 	public String decodeLegacyName(String jid) {
@@ -434,25 +440,25 @@ public class Gateway extends AbstractMessageReceiver
 				conn.addJid(packet.getElemFrom());
 				addOutPacket(new Packet(new Element("presence",
 							new String[] {"from", "to"},
-							new String[] {myDomain(), packet.getElemFrom()})));
+							new String[] {gw_hostname, packet.getElemFrom()})));
 				updateRosterPresence(conn.getRoster(), packet.getElemFrom());
 			}
 			return conn;
 		}
 		try {
-			String moderated = repository.getData(myDomain(), id, moderated_key);
+			String moderated = repository.getData(getComponentId(), id, moderated_key);
 			if (moderated == null || moderated.equals(moderated_true)) {
 				addOutPacket(Authorization.NOT_ALLOWED.getResponseMessage(packet,
 						"Administrator approval awaiting.", true));
 				return null;
 			}
-			String username = repository.getData(myDomain(), id, username_key);
-			String password = repository.getData(myDomain(), id, password_key);
+			String username = repository.getData(getComponentId(), id, username_key);
+			String password = repository.getData(getComponentId(), id, password_key);
 			if (username != null && password != null) {
 				conn = gwInstance();
 				conn.setGatewayListener(this);
 				conn.setLogin(username, password);
-				//conn.setGatewayDomain(myDomain());
+				//conn.setGatewayDomain(getComponentId());
 				conn.addJid(packet.getElemFrom());
 				conn.init();
 				conn.login();
@@ -475,7 +481,7 @@ public class Gateway extends AbstractMessageReceiver
 				processPresence(packet);
 				return;
 			}
-			if (packet.getElemTo().equals(myDomain())) {
+			if (packet.getElemTo().equals(gw_hostname)) {
 				// Local processing.
 				log.fine("Local packet: " + packet.toString());
 				processLocalPacket(packet);
@@ -527,7 +533,7 @@ public class Gateway extends AbstractMessageReceiver
 		for (String username: jids) {
 			addOutPacket(new Packet(new Element("presence",
 						new String[] {"from", "to", "type"},
-						new String[] {myDomain(), username, "unavailable"})));
+						new String[] {gw_hostname, username, "unavailable"})));
 			List<RosterItem> roster = gc.getRoster();
 			for (RosterItem item: roster) {
 				String from = formatJID(item.getBuddyId());
@@ -547,7 +553,7 @@ public class Gateway extends AbstractMessageReceiver
 		for (String username: jids) {
 			addOutPacket(new Packet(new Element("presence",
 						new String[] {"from", "to"},
-						new String[] {myDomain(), username})));
+						new String[] {gw_hostname, username})));
 		}
 	}
 
@@ -591,24 +597,24 @@ public class Gateway extends AbstractMessageReceiver
 			String roster_node = id + "/roster/" + item.getBuddyId();
 			String authorized = "false";
 			try {
-				authorized = repository.getData(myDomain(), roster_node, AUTHORIZED_KEY);
+				authorized = repository.getData(getComponentId(), roster_node, AUTHORIZED_KEY);
 				if (authorized == null) {
 					// Add item to the roster and send subscription request to user...
 					authorized = "false";
-					repository.setData(myDomain(), roster_node, AUTHORIZED_KEY, authorized);
-					repository.setData(myDomain(), roster_node, NAME_KEY, item.getName());
+					repository.setData(getComponentId(), roster_node, AUTHORIZED_KEY, authorized);
+					repository.setData(getComponentId(), roster_node, NAME_KEY, item.getName());
 				}
 				if (item.getStatus().getType() != null) {
-					repository.setData(myDomain(), roster_node, PRESENCE_TYPE,
+					repository.setData(getComponentId(), roster_node, PRESENCE_TYPE,
 						item.getStatus().getType());
 				} else {
-					repository.setData(myDomain(), roster_node, PRESENCE_TYPE, "null");
+					repository.setData(getComponentId(), roster_node, PRESENCE_TYPE, "null");
 				}
 				if (item.getStatus().getShow() != null) {
-					repository.setData(myDomain(), roster_node, PRESENCE_SHOW,
+					repository.setData(getComponentId(), roster_node, PRESENCE_SHOW,
 						item.getStatus().getShow());
 				} else {
-					repository.setData(myDomain(), roster_node, PRESENCE_SHOW, "null");
+					repository.setData(getComponentId(), roster_node, PRESENCE_SHOW, "null");
 				}
 			} catch (TigaseDBException e) {
 				log.log(Level.WARNING, "Problem updating repository data", e);
@@ -632,16 +638,16 @@ public class Gateway extends AbstractMessageReceiver
 		String roster_node = id + "/roster/" + item.getBuddyId();
 		try {
 			if (item.getStatus().getType() != null) {
-				repository.setData(myDomain(), roster_node, PRESENCE_TYPE,
+				repository.setData(getComponentId(), roster_node, PRESENCE_TYPE,
 					item.getStatus().getType());
 			} else {
-				repository.setData(myDomain(), roster_node, PRESENCE_TYPE, "null");
+				repository.setData(getComponentId(), roster_node, PRESENCE_TYPE, "null");
 			}
 			if (item.getStatus().getShow() != null) {
-				repository.setData(myDomain(), roster_node, PRESENCE_SHOW,
+				repository.setData(getComponentId(), roster_node, PRESENCE_SHOW,
 					item.getStatus().getShow());
 			} else {
-				repository.setData(myDomain(), roster_node, PRESENCE_SHOW, "null");
+				repository.setData(getComponentId(), roster_node, PRESENCE_SHOW, "null");
 			}
 		} catch (TigaseDBException e) {
 			log.log(Level.WARNING, "Problem updating repository data", e);

@@ -40,6 +40,7 @@ import tigase.xml.DomBuilderHandler;
 import tigase.xml.Element;
 import tigase.xml.SimpleParser;
 import tigase.xml.SingletonFactory;
+import tigase.util.DNSResolver;
 
 /**
  * <code>StanzaSender</code> class implements simple cyclic tasks management
@@ -86,6 +87,8 @@ public class StanzaSender extends AbstractMessageReceiver
 	{JDBC_TASK_NAME, FILE_TASK_NAME};
 	private static final String TASK_ACTIVE_PROP_KEY = "active";
 	private static final boolean TASK_ACTIVE_PROP_VAL = false;
+	public static final String MY_DOMAIN_NAME_PROP_KEY = "domain-name";
+	public static String MY_DOMAIN_NAME_PROP_VAL =	"srecv.localhost";
 
 	/**
    * Variable <code>log</code> is a class logger.
@@ -99,6 +102,7 @@ public class StanzaSender extends AbstractMessageReceiver
 	private Map<String, SenderTask> tasks_list =
 		new LinkedHashMap<String, SenderTask>();
 	private Timer tasks = new Timer("StanzaSender", true);
+	private String my_hostname = MY_DOMAIN_NAME_PROP_VAL;
 
 	// Implementation of tigase.server.ServerComponent
 
@@ -130,7 +134,8 @@ public class StanzaSender extends AbstractMessageReceiver
 	public void setProperties(final Map<String, Object> props) {
 		super.setProperties(props);
 
-		addRouting(myDomain());
+		my_hostname = (String)props.get(MY_DOMAIN_NAME_PROP_KEY);
+		addRouting(my_hostname);
 
 		//interval = (Long)props.get(INTERVAL_PROP_KEY);
 		String[] config_tasks = (String[])props.get(STANZA_LISTENERS_PROP_KEY);
@@ -151,7 +156,7 @@ public class StanzaSender extends AbstractMessageReceiver
 					(Long)props.get(task_name + "/" + TASK_INTERVAL_PROP_KEY);
 				try {
 					SenderTask task = (SenderTask)Class.forName(task_class).newInstance();
-					task.setName(task_name + "@" + myDomain());
+					task.setName(task_name + "@" + my_hostname);
 					task.init(this, task_init);
 
 					// Install new task
@@ -224,6 +229,12 @@ public class StanzaSender extends AbstractMessageReceiver
 		}
 
 		defs.put(STANZA_LISTENERS_PROP_KEY, listeners.toArray(new String[0]));
+		if (params.get(GEN_VIRT_HOSTS) != null) {
+			MY_DOMAIN_NAME_PROP_VAL =
+        "ssend." + ((String)params.get(GEN_VIRT_HOSTS)).split(",")[0];
+		} else {
+			MY_DOMAIN_NAME_PROP_VAL = "ssend." + DNSResolver.getDefHostNames()[0];
+		}
 		return defs;
 	}
 

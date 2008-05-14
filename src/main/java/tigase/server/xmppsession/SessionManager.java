@@ -372,8 +372,7 @@ public class SessionManager extends AbstractMessageReceiver
 				log.finer("Packet for hostname: " + packet.getStringData());
 				Packet host_pac =
           new Packet(packet.getElement().clone());
-				host_pac.getElement().setAttribute("to",
-					JIDUtils.getNodeID(getName(), getDefHostName()));
+				host_pac.getElement().setAttribute("to", getComponentId());
 				host_pac.getElement().setAttribute(Packet.OLDTO, packet.getElemTo());
 				processPacket(host_pac);
 			}
@@ -836,7 +835,7 @@ public class SessionManager extends AbstractMessageReceiver
 // 			conn.setDummy(true);
 		} // end of for ()
 		serverSession = createUserSession(NULL_ROUTING, getDefHostName(),
-			JIDUtils.getNodeID(getName(), getDefHostName()));
+			getComponentId());
 		anonymous_domains.clear();
 		anonymous_domains.addAll(
 			Arrays.asList((String[])props.get(ANONYMOUS_DOMAINS_PROP_KEY)));
@@ -863,7 +862,7 @@ public class SessionManager extends AbstractMessageReceiver
 	public void handleLogout(final String userName,
 		final XMPPResourceConnection conn) {
 		String domain = conn.getDomain();
-		addOutPacket(Command.CLOSE.getPacket(JIDUtils.getNodeID(getName(), domain),
+		addOutPacket(Command.CLOSE.getPacket(getComponentId(),
 				conn.getConnectionId(), StanzaType.set, conn.nextStanzaId()));
 		String userId = JIDUtils.getNodeID(userName, domain);
 		XMPPSession session = sessionsByNodeId.get(userId);
