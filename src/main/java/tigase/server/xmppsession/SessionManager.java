@@ -174,6 +174,7 @@ public class SessionManager extends AbstractMessageReceiver
 			// It doesn't look good, there should reaaly be a connection for
 			// this packet....
 			// returning error back...
+			log.info("Broken packet: " + p.toString());
 			try {
 				Packet error =
 						Authorization.SERVICE_UNAVAILABLE.getResponseMessage(p,
@@ -354,7 +355,7 @@ public class SessionManager extends AbstractMessageReceiver
 		return isAdmin(jid);
 	}
 
-	private boolean processAdminsOrDomains(Packet packet) {
+	protected boolean processAdminsOrDomains(Packet packet) {
 		final String to = packet.getElemTo();
 		if (isInRoutings(to)) {
 			if (packet.getElemName().equals("message")) {
@@ -504,7 +505,7 @@ public class SessionManager extends AbstractMessageReceiver
 		return new Integer(10000);
 	}
 
-	private void processCommand(Packet pc) {
+	protected void processCommand(Packet pc) {
 		log.finer(pc.getCommand().toString() + " command from: " + pc.getFrom());
 		//Element command = pc.getElement();
 		XMPPResourceConnection connection =	connectionsByFrom.get(pc.getFrom());

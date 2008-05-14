@@ -20,14 +20,17 @@
  * $Date$
  */
 
-package tigase.server.xmppsession;
+package tigase.cluster;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Map;
 
+//import tigase.cluster.ClusterElement;
 import tigase.server.Packet;
 import tigase.util.JIDUtils;
+import tigase.xmpp.XMPPResourceConnection;
+import tigase.server.xmppsession.SessionManager;
 
 import static tigase.server.xmppsession.SessionManagerConfig.*;
 
@@ -51,12 +54,36 @@ public class SessionManagerClustered extends SessionManager {
 	private String[] cluster_nodes = {};
 
 	public void processPacket(final Packet packet) {
-		super.processPacket(packet);
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Received packet: " + packet.toString());
+		}
+		if (packet.getElemName() == ClusterElement.CLUSTER_EL_NAME
+			&& packet.getElement().getXMLNS() == ClusterElement.XMLNS) {
+			processClusterPacket(packet);
+			return;
+		}
+
+		if (packet.isCommand()) {
+			processCommand(packet);
+			packet.processedBy("SessionManager");
+			// No more processing is needed for command packet
+			// 			return;
+		} // end of if (pc.isCommand())
+		XMPPResourceConnection conn = getXMPPResourceConnection(packet);
+		if (conn == null
+			&& (isBrokenPacket(packet) || processAdminsOrDomains(packet)
+				|| sentToNextNode(packet))) {
+			return;
+		}
+		processPacket(packet, conn);
 	}
 
+	protected void processClusterPacket(Packet packet) {
+		
+	}
 
-	public Packet initalPacketProcessin(Packet packet) {
-		return packet;
+	protected boolean sentToNextNode(Packet packet) {
+		return false;
 	}
 
 	public boolean checkNonSessionPacket(Packet packet) {
