@@ -126,6 +126,8 @@ public class SessionManager extends AbstractMessageReceiver
 
 	private Set<String> anonymous_domains = new HashSet<String>();
 
+	private XMPPResourceConnection serverSession = null;
+
 	private ServiceEntity serviceEntity = null;
 
 	private long closedConnections = 0;
@@ -143,15 +145,53 @@ public class SessionManager extends AbstractMessageReceiver
 		}
 	}
 
-	public Packet initalPacketProcessin(Packet packet) {
-		return packet;
+	public XMPPResourceConnection getXMPPResourceConnection(Packet p) {
+		XMPPResourceConnection conn = null;
+		if (p.getFrom() != null) {
+			conn = connectionsByFrom.get(p.getFrom());
+			if (conn != null) {
+				return conn;
+			}
+		}
+		// It might be a message _to_ some user on this server
+		// so let's look for established session for this user...
+		final String to = p.getElemTo();
+		if (to != null) {
+			conn = getResourceConnection(to);
+		} else {
+			// Hm, not sure what should I do now....
+			// Maybe I should treat it as message to admin....
+			log.info("Message without TO attribute set, don't know what to do wih this: "
+				+ p.getStringData());
+		} // end of else
+
+		return conn;
 	}
 
-	public void processPacket(final Packet pack_par) {
-		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Processing packet: " + pack_par.toString());
+	protected boolean isBrokenPacket(Packet p) {
+		if (p.getFrom() != p.getElemFrom() && (!p.isCommand()
+				|| (p.isCommand() && p.getCommand() == Command.OTHER))) {
+			// It doesn't look good, there should reaaly be a connection for
+			// this packet....
+			// returning error back...
+			try {
+				Packet error =
+						Authorization.SERVICE_UNAVAILABLE.getResponseMessage(p,
+							"Service not available.", true);
+				error.setTo(p.getFrom());
+				fastAddOutPacket(error);
+			} catch (PacketErrorTypeException e) {
+				log.warning("Packet processing exception: " + e);
+			}
+			return true;
 		}
-		Packet packet = initalPacketProcessin(pack_par);
+		return false;
+	}
+
+	public void processPacket(final Packet packet) {
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Received packet: " + packet.toString());
+		}
 		if (packet.isCommand()) {
 			processCommand(packet);
 			packet.processedBy("SessionManager");
@@ -159,18 +199,16 @@ public class SessionManager extends AbstractMessageReceiver
 			// 			return;
 		} // end of if (pc.isCommand())
 		XMPPResourceConnection conn = getXMPPResourceConnection(packet);
-
-		if (conn == null && checkNonSessionPacket(packet)) {
+		if (conn == null && (isBrokenPacket(packet) || processAdminsOrDomains(packet))) {
 			return;
 		}
+		processPacket(packet, conn);
+	}
 
-		// Preprocess..., all preprocessors get all messages to look at.
-		// I am not sure if this is correct for now, let's try to do it this
-		// way and maybe change it later.
-		// If any of them returns true - it means processing should stop now.
-		// That is needed for preprocessors like privacy lists which should
-		// block certain packets.
-
+	protected void processPacket(Packet packet, XMPPResourceConnection conn) {
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("processing packet: " + packet.toString());
+		}
 		Queue<Packet> results = new LinkedList<Packet>();
 
 		boolean stop = false;
@@ -184,6 +222,13 @@ public class SessionManager extends AbstractMessageReceiver
 				return;
 			}
 		}
+
+		// Preprocess..., all preprocessors get all messages to look at.
+		// I am not sure if this is correct for now, let's try to do it this
+		// way and maybe change it later.
+		// If any of them returns true - it means processing should stop now.
+		// That is needed for preprocessors like privacy lists which should
+		// block certain packets.
 
 		if (!stop) {
 			for (XMPPPreprocessorIfc preproc: preProcessors.values()) {
@@ -262,10 +307,6 @@ public class SessionManager extends AbstractMessageReceiver
 		} // end of else
 	}
 
-	public boolean checkNonSessionPacket(Packet packet) {
-		return false;
-	}
-
 	private void setPermissions(XMPPResourceConnection conn,
 		Queue<Packet> results) {
 		Permissions perms = Permissions.NONE;
@@ -313,18 +354,28 @@ public class SessionManager extends AbstractMessageReceiver
 		return isAdmin(jid);
 	}
 
-	private boolean processAdmins(Packet packet) {
+	private boolean processAdminsOrDomains(Packet packet) {
 		final String to = packet.getElemTo();
-		if (isInRoutings(to) && packet.getElemName().equals("message")) {
-			// Yes this packet is for admin....
-			log.finer("Packet for admin: " + packet.getStringData());
-			for (String admin: admins) {
-				log.finer("Sending packet to admin: " + admin);
-				Packet admin_pac =
+		if (isInRoutings(to)) {
+			if (packet.getElemName().equals("message")) {
+				// Yes this packet is for admin....
+				log.finer("Packet for admin: " + packet.getStringData());
+				for (String admin: admins) {
+					log.finer("Sending packet to admin: " + admin);
+					Packet admin_pac =
+            new Packet(packet.getElement().clone());
+					admin_pac.getElement().setAttribute("to", admin);
+					processPacket(admin_pac);
+				}
+			} else {
+				log.finer("Packet for hostname: " + packet.getStringData());
+				Packet host_pac =
           new Packet(packet.getElement().clone());
-				admin_pac.getElement().setAttribute("to", admin);
-				processPacket(admin_pac);
-			} // end of for (String admin: admins)
+				host_pac.getElement().setAttribute("to",
+					JIDUtils.getNodeID(getName(), getDefHostName()));
+				host_pac.getElement().setAttribute(Packet.OLDTO, packet.getElemTo());
+				processPacket(host_pac);
+			}
 			return true;
 		} // end of if (isInRoutings(to))
 		return false;
@@ -605,6 +656,11 @@ public class SessionManager extends AbstractMessageReceiver
 				return false;
 			}
 		}
+		String oldto = packet.getAttribute(Packet.OLDTO);
+		if (oldto != null) {
+			packet.getElement().setAttribute("from", oldto);
+			packet.getElement().removeAttribute(Packet.OLDTO);
+		}
 		return true;
 	}
 
@@ -625,50 +681,6 @@ public class SessionManager extends AbstractMessageReceiver
 			addOutPacket(packet);
 		}
 		return true;
-	}
-
-	private XMPPResourceConnection getXMPPResourceConnection(Packet p) {
-		XMPPResourceConnection conn = null;
-		if (p.getFrom() != null) {
-			conn = connectionsByFrom.get(p.getFrom());
-			if (conn != null) {
-				return conn;
-			}
-		}
-		if (p.getFrom() != p.getElemFrom() && (!p.isCommand()
-				|| (p.isCommand() && p.getCommand() == Command.OTHER))) {
-			// It doesn't look good, there should reaaly be a connection for
-			// this packet....
-			// returning error back...
-			try {
-				Packet error =
-						Authorization.SERVICE_UNAVAILABLE.getResponseMessage(p,
-							"Service not available.", true);
-				error.setTo(p.getFrom());
-				fastAddOutPacket(error);
-			} catch (PacketErrorTypeException e) {
-				log.warning("Packet processing exception: " + e);
-			}
-			return null;
-		}
-
-		// It might be a message _to_ some user on this server
-		// so let's look for established session for this user...
-		final String to = p.getElemTo();
-		if (to != null) {
-			if (processAdmins(p)) {
-				// No more processing is needed....
-				return null;
-			}
-			conn = getResourceConnection(to);
-		} else {
-			// Hm, not sure what should I do now....
-			// Maybe I should treat it as message to admin....
-			log.info("Message without TO attribute set, don't know what to do wih this: "
-				+ p.getStringData());
-		} // end of else
-
-		return conn;
 	}
 
 	private XMPPSession getXMPPSession(Packet p) {
@@ -819,9 +831,11 @@ public class SessionManager extends AbstractMessageReceiver
 		clearRoutings();
 		for (String host: hostnames) {
 			addRouting(host);
-			XMPPResourceConnection conn = createUserSession(NULL_ROUTING, host, host);
-			conn.setDummy(true);
+// 			XMPPResourceConnection conn = createUserSession(NULL_ROUTING, host, host);
+// 			conn.setDummy(true);
 		} // end of for ()
+		serverSession = createUserSession(NULL_ROUTING, getDefHostName(),
+			JIDUtils.getNodeID(getName(), getDefHostName()));
 		anonymous_domains.clear();
 		anonymous_domains.addAll(
 			Arrays.asList((String[])props.get(ANONYMOUS_DOMAINS_PROP_KEY)));

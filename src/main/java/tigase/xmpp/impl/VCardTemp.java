@@ -111,9 +111,7 @@ public class VCardTemp extends XMPPProcessor implements XMPPProcessorIfc {
 				if (strvCard != null) {
 					results.offer(parseXMLData(strvCard, packet));
 				} else {
-					Packet result = packet.errorResult("cancel", "item-not-found",
-						"User not found", true);
-					results.offer(result);
+					results.offer(packet.okResult((String)null, 1));
 				} // end of if (vcard != null)
 			} catch (UserNotFoundException e) {
 				Packet result = packet.errorResult("cancel", "item-not-found",
@@ -142,12 +140,19 @@ public class VCardTemp extends XMPPProcessor implements XMPPProcessorIfc {
 				StanzaType type = packet.getType();
 				switch (type) {
 				case get:
-					String strvCard = session.getPublicData(ID, VCARD_KEY, null);
-					if (strvCard != null) {
-						results.offer(parseXMLData(strvCard, packet));
-					} else {
-						results.offer(packet.okResult((String)null, 1));
-					} // end of if (vcard != null) else
+					try {
+						String strvCard = repo.getPublicData(session.getUserId(),
+							ID, VCARD_KEY, null);
+						if (strvCard != null) {
+							results.offer(parseXMLData(strvCard, packet));
+						} else {
+							results.offer(packet.okResult((String)null, 1));
+						} // end of if (vcard != null) else
+					} catch (UserNotFoundException e) {
+						Packet result = packet.errorResult("cancel", "item-not-found",
+							"User not found", true);
+						results.offer(result);
+					} // end of try-catch
 					break;
 				case set:
 					if (packet.getFrom().equals(session.getConnectionId())) {
@@ -191,6 +196,7 @@ public class VCardTemp extends XMPPProcessor implements XMPPProcessorIfc {
 				results.offer(new Packet(result));
 			} // end of else
 		} catch (NotAuthorizedException e) {
+			e.printStackTrace();
       log.warning(
 				"Received vCard request but user session is not authorized yet: " +
         packet.getStringData());

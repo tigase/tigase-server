@@ -27,7 +27,23 @@ import java.util.LinkedHashSet;
 import tigase.xml.Element;
 
 /**
- * Describe class ClusterElement here.
+ * Class ClusterElement is a utility class for handling tigase cluster
+ * specific packets. The cluster packet has the following form:
+ * <pre>
+ * <cluster xmlns="tigase:cluster" from="source" to="dest" type="set">
+ *   <packets>
+ *     <message xmlns="jabber:client" from="source-u" to="dest-x" type="chat">
+ *       <body>Hello world!</body>
+ *     </message>
+ *   </packets>
+ *   <data>
+ *     <visited-nodes>
+ *       <node-id>node1 JID address</node-id>
+ *       <node-id>node2 JID address</node-id>
+ *     </visited-nodes>
+ *   </data>
+ * </cluster>
+ * </pre>
  *
  *
  * Created: Fri May  2 09:40:40 2008
@@ -40,6 +56,8 @@ public class ClusterElement {
 	public static final String XMLNS = "tigase:cluster";
 
 	public static final String CLUSTER_EL_NAME = "cluster";
+	public static final String CLUSTER_DATA_EL_NAME = "data";
+	public static final String CLUSTER_PACKETS_EL_NAME = "packets";
 	public static final String VISITED_NODES_EL_NAME = "visited-nodes";
 	public static final String VISITED_NODES_EL_PATH =
     CLUSTER_EL_NAME + "/" + VISITED_NODES_EL_NAME;

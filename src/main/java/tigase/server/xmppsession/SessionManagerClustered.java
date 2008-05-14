@@ -50,6 +50,11 @@ public class SessionManagerClustered extends SessionManager {
 
 	private String[] cluster_nodes = {};
 
+	public void processPacket(final Packet packet) {
+		super.processPacket(packet);
+	}
+
+
 	public Packet initalPacketProcessin(Packet packet) {
 		return packet;
 	}

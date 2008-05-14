@@ -29,6 +29,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.UserNotFoundException;
@@ -228,7 +229,14 @@ public class OfflineMessages extends XMPPProcessor
 			try {
 				Collections.sort(pacs, new StampComparator());
 			} catch (NullPointerException e) {
-				log.warning("Can not sort off line messages, " + e);
+				try {
+					log.warning("Can not sort off line messages, user="
+						+ conn.getJID() + ",\n"
+						+ Arrays.toString(msgs) + ",\n"
+						+ e);
+				} catch (Exception exc) {
+					log.log(Level.WARNING, "Can not print log message.", exc);
+				}
 			}
 			return pacs;
 		} // end of if (msgs != null)

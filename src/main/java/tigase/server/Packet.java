@@ -45,6 +45,21 @@ public class Packet {
 
 	private Set<String> processorsIds = new LinkedHashSet<String>();
 
+
+	/**
+	 * Constant <code>OLDTO</code> is kind of hack to store old request address
+	 * when the packet is processed by the session mamaner. The problem is that
+	 * SessionManager may work for many virtual domains but has just one real
+	 * address. So to forward the request to the SessionManager the 'to' address
+	 * is replaced with the real SessionManager address. The response however
+	 * needs to be sent with the 'from' address as the original request was 'to'.
+	 * Therefore 'oldto' attribute temporarly stores the old 'to' address
+	 * and after the packet processing is completed the 'from' attribute
+	 * is replaced with original 'to' value.
+	 *
+	 */
+	public static final String OLDTO = "oldto";
+
 	private final Element elem;
 	private final Command command;
 	private final String strCommand;
@@ -325,6 +340,9 @@ public class Packet {
 		if (includeOriginalXML) {
 			reply.addChildren(elem.getChildren());
 		} // end of if (includeOriginalXML)
+		if (getAttribute(OLDTO) != null) {
+			reply.setAttribute(OLDTO, getAttribute(OLDTO));
+		}
 		Element error = new Element("error");
 		error.setAttribute("type", errorType);
 		Element cond = new Element(errorCondition);
@@ -352,6 +370,9 @@ public class Packet {
 		if (getElemId() != null) {
 			reply.setAttribute("id", getElemId());
 		} // end of if (getElemId() != null)
+		if (getAttribute(OLDTO) != null) {
+			reply.setAttribute(OLDTO, getAttribute(OLDTO));
+		}
 		Element old_child = elem;
 		Element new_child = reply;
 		for (int i = 0; i < originalXML; i++) {
@@ -379,6 +400,9 @@ public class Packet {
 		if (getElemId() != null) {
 			reply.setAttribute("id", getElemId());
 		} // end of if (getElemId() != null)
+		if (getAttribute(OLDTO) != null) {
+			reply.setAttribute(OLDTO, getAttribute(OLDTO));
+		}
 		Element old_child = elem;
 		Element new_child = reply;
 		for (int i = 0; i < originalXML; i++) {

@@ -208,10 +208,11 @@ public class SocketReadThread implements Runnable {
       try {
 				wakeup_called = false;
 				int selectedKeys = clientsSel.select();
-				if((selectedKeys == 0) && !wakeup_called
-					&& ((++empty_selections) > MAX_EMPTY_SELECTIONS)) {
+				if((selectedKeys == 0) && !wakeup_called) {
 					log.finest("Selected keys = 0!!! a bug again?");
-					recreateSelector();
+					if ((++empty_selections) > MAX_EMPTY_SELECTIONS) {
+						recreateSelector();
+					}
 				} else {
 					empty_selections = 0;
 					// This is dirty but selectNow() causes concurrent modification exception
