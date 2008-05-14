@@ -61,17 +61,17 @@ public class SessionManagerClustered extends SessionManager {
 
 	public boolean checkNonSessionPacket(Packet packet) {
 		// It might be a packet to another cluster node...
-		String sess_man_id = JIDUtils.getNodeID(getName(), getDefHostName());
-		if (cluster_nodes.length > 0 && !packet.isVisitedClusterNode(sess_man_id)) {
-			packet.addVisitedClusterNode(sess_man_id);
-			for (String cluster_node: cluster_nodes) {
-				if (!packet.isVisitedClusterNode(cluster_node)) {
-					packet.setTo(cluster_node);
-					super.fastAddOutPacket(packet);
-					return true;
-				}
-			}
-		}
+// 		String sess_man_id = JIDUtils.getNodeID(getName(), getDefHostName());
+// 		if (cluster_nodes.length > 0 && !packet.isVisitedClusterNode(sess_man_id)) {
+// 			packet.addVisitedClusterNode(sess_man_id);
+// 			for (String cluster_node: cluster_nodes) {
+// 				if (!packet.isVisitedClusterNode(cluster_node)) {
+// 					packet.setTo(cluster_node);
+// 					super.fastAddOutPacket(packet);
+// 					return true;
+// 				}
+// 			}
+// 		}
 		return false;
 	}
 
