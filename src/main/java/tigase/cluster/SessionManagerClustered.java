@@ -25,6 +25,10 @@ package tigase.cluster;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Map;
+import java.util.Set;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Arrays;
 
 //import tigase.cluster.ClusterElement;
 import tigase.server.Packet;
@@ -32,6 +36,7 @@ import tigase.util.JIDUtils;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.server.xmppsession.SessionManager;
+import tigase.xml.Element;
 
 import static tigase.server.xmppsession.SessionManagerConfig.*;
 
@@ -52,7 +57,8 @@ public class SessionManagerClustered extends SessionManager {
   private static final Logger log =
     Logger.getLogger("tigase.server.xmppsession.SessionManagerClustered");
 
-	private String[] cluster_nodes = {};
+	private Set<String> cluster_nodes = new LinkedHashSet<String>();
+	private Set<String> broken_nodes = new LinkedHashSet<String>();
 
 	public void processPacket(final Packet packet) {
 		if (log.isLoggable(Level.FINEST)) {
@@ -64,11 +70,10 @@ public class SessionManagerClustered extends SessionManager {
 			return;
 		}
 
-		if (packet.isCommand()) {
-			processCommand(packet);
+		if (packet.isCommand() && processCommand(packet)) {
 			packet.processedBy("SessionManager");
 			// No more processing is needed for command packet
-			// 			return;
+			return;
 		} // end of if (pc.isCommand())
 		XMPPResourceConnection conn = getXMPPResourceConnection(packet);
 		if (conn == null
@@ -81,10 +86,75 @@ public class SessionManagerClustered extends SessionManager {
 
 	protected void processClusterPacket(Packet packet) {
 		ClusterElement clel = new ClusterElement(packet.getElement());
+		switch (packet.getType()) {
+		case set:
+			List<Element> elems = clel.getDataPackets();
+			if (elems != null && elems.size() > 0) {
+				for (Element elem: elems) {
+					XMPPResourceConnection conn = getXMPPResourceConnection(packet);
+					if (conn != null || !sentToNextNode(clel)) {
+						processPacket(new Packet(elem), conn);
+					}
+				}
+			} else {
+				log.finest("Empty packets list in the cluster packet: "
+					+ packet.toString());
+			}
+			break;
+		case get:
+
+			break;
+		case result:
+
+			break;
+		case error:
+			// There might be many different errors...
+			// But they all mean the cluster node is unreachable.
+			// Let's leave custom handling each error type for later...
+			String from = packet.getElemFrom();
+			clel.addVisitedNode(from);
+			if (cluster_nodes.remove(from)) {
+				broken_nodes.add(from);
+			}
+			if (!sentToNextNode(clel)) {
+				
+			}
+			break;
+		default:
+			break;
+		}
+	}
+
+	protected boolean sentToNextNode(ClusterElement clel) {
+		if (cluster_nodes.size() > 0) {
+			String next_node = null;
+			for (String cluster_node: cluster_nodes) {
+				if (!clel.isVisitedNode(cluster_node)) {
+					next_node = cluster_node;
+					break;
+				}
+			}
+			if (next_node == null) {
+				String first_node = clel.getFirstNode();
+				if (first_node == null) {
+					log.warning("Something wrong - the first node should NOT be null here.");
+				} else {
+					if (!first_node.equals(getComponentId())) {
+						next_node = first_node;
+					}
+				}
+			}
+			if (next_node != null) {
+				ClusterElement next_clel = clel.nextClusterNode(next_node);
+				super.fastAddOutPacket(new Packet(next_clel.getClusterElement()));
+				return true;
+			}
+		}
+		return false;
 	}
 
 	protected boolean sentToNextNode(Packet packet) {
-		if (cluster_nodes.length > 0) {
+		if (cluster_nodes.size() > 0) {
 			String sess_man_id = getComponentId();
 			for (String cluster_node: cluster_nodes) {
 				if (!cluster_node.equals(sess_man_id)) {
@@ -101,7 +171,9 @@ public class SessionManagerClustered extends SessionManager {
 
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
-		cluster_nodes = (String[])props.get(CLUSTER_NODES_PROP_KEY);
+		cluster_nodes =
+      new LinkedHashSet<String>(Arrays.asList((String[])props.get(CLUSTER_NODES_PROP_KEY)));
+		broken_nodes = new LinkedHashSet<String>();
 	}
 
 }

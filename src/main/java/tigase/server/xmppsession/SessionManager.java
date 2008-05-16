@@ -193,11 +193,10 @@ public class SessionManager extends AbstractMessageReceiver
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Received packet: " + packet.toString());
 		}
-		if (packet.isCommand()) {
-			processCommand(packet);
+		if (packet.isCommand() && processCommand(packet)) {
 			packet.processedBy("SessionManager");
 			// No more processing is needed for command packet
-			// 			return;
+			return;
 		} // end of if (pc.isCommand())
 		XMPPResourceConnection conn = getXMPPResourceConnection(packet);
 		if (conn == null && (isBrokenPacket(packet) || processAdminsOrDomains(packet))) {
@@ -504,7 +503,8 @@ public class SessionManager extends AbstractMessageReceiver
 		return new Integer(10000);
 	}
 
-	protected void processCommand(Packet pc) {
+	protected boolean processCommand(Packet pc) {
+		boolean processing_result = false;
 		log.finer(pc.getCommand().toString() + " command from: " + pc.getFrom());
 		//Element command = pc.getElement();
 		XMPPResourceConnection connection =	connectionsByFrom.get(pc.getFrom());
@@ -536,6 +536,7 @@ public class SessionManager extends AbstractMessageReceiver
 			connection.setDefLang(Command.getFieldValue(pc, "xml:lang"));
 			log.finest("Setting session-id " + connection.getSessionId()
 				+ " for connection: " + connection.getConnectionId());
+			processing_result = true;
 			break;
 		case GETFEATURES:
 			if (pc.getType() == StanzaType.get) {
@@ -545,6 +546,7 @@ public class SessionManager extends AbstractMessageReceiver
 				Command.setData(result, features);
 				addOutPacket(result);
 			} // end of if (pc.getType() == StanzaType.get)
+			processing_result = true;
 			break;
 		case STREAM_CLOSED:
 			log.fine("Stream closed from: " + pc.getFrom());
@@ -556,6 +558,7 @@ public class SessionManager extends AbstractMessageReceiver
 				log.info("Can not find resource connection for packet: " +
 					pc.toString());
 			} // end of if (conn != null) else
+			processing_result = true;
 			break;
 		case BROADCAST_TO_ONLINE:
 			String from = pc.getFrom();
@@ -605,6 +608,7 @@ public class SessionManager extends AbstractMessageReceiver
 		default:
 			break;
 		} // end of switch (pc.getCommand())
+		return processing_result;
 	}
 
 	private void closeSession(XMPPResourceConnection conn) {

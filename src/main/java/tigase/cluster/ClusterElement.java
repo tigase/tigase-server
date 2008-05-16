@@ -39,6 +39,7 @@ import tigase.xml.Element;
  *     </message>
  *   </packets>
  *   <data>
+ *     <first-node>node1 JID address</first-node>
  *     <visited-nodes>
  *       <node-id>node1 JID address</node-id>
  *       <node-id>node2 JID address</node-id>
@@ -46,6 +47,8 @@ import tigase.xml.Element;
  *   </data>
  * </cluster>
  * </pre>
+ * If none of nodes could process the packet it goes back to the first node
+ * as this node is the most likely to process the packet correctly.
  *
  *
  * Created: Fri May  2 09:40:40 2008
@@ -65,6 +68,9 @@ public class ClusterElement {
 	public static final String CLUSTER_PACKETS_PATH =
     "/" + CLUSTER_EL_NAME + "/" + CLUSTER_PACKETS_EL_NAME;
 	public static final String VISITED_NODES_EL_NAME = "visited-nodes";
+	public static final String FIRST_NODE_EL_NAME = "first-node";
+	public static final String FIRST_NODE_PATH =
+    CLUSTER_DATA_PATH + "/" + FIRST_NODE_EL_NAME;
 	public static final String VISITED_NODES_PATH =
     CLUSTER_DATA_PATH + "/" + VISITED_NODES_EL_NAME;
 	public static final String NODE_ID_EL_NAME = "node-id";
@@ -72,6 +78,7 @@ public class ClusterElement {
 	private Element elem = null;
 	private List<Element> packets = null;
 	private Set<String> visited_nodes = null;
+	private String first_node = null;
 
 	/**
 	 * Creates a new <code>ClusterElement</code> instance.
@@ -80,9 +87,10 @@ public class ClusterElement {
 	public ClusterElement(Element elem) {
 		this.elem = elem;
 		packets = elem.getChildren(CLUSTER_PACKETS_PATH);
+		first_node = elem.getCData(FIRST_NODE_PATH);
+		visited_nodes = new LinkedHashSet<String>();
 		List<Element> nodes = elem.getChildren(VISITED_NODES_PATH);
 		if (nodes != null) {
-			visited_nodes = new LinkedHashSet<String>();
 			for (Element node: nodes) {
 				visited_nodes.add(node.getCData());
 			}
@@ -110,6 +118,21 @@ public class ClusterElement {
 		return cluster_el;
 	}
 
+	public String getFirstNode() {
+		return first_node;
+	}
+
+	public ClusterElement nextClusterNode(String node_id) {
+		Element next_el = elem.clone();
+		String from = elem.getAttribute("to");
+		next_el.setAttribute("from", from);
+		next_el.setAttribute("to", node_id);
+		next_el.setAttribute("type", StanzaType.set.toString());
+		ClusterElement next_cl = new ClusterElement(next_el);
+		next_cl.addVisitedNode(from);
+		return next_cl;
+	}
+
 	public void addDataPacket(Element packet) {
 		packets.add(packet);
 		elem.findChild(CLUSTER_PACKETS_PATH).addChild(packet);
@@ -124,9 +147,18 @@ public class ClusterElement {
 	}
 
 	public void addVisitedNode(String node_id) {
+		if (visited_nodes.size() == 0) {
+			first_node = node_id;
+			elem.findChild(CLUSTER_DATA_PATH)
+        .addChild(new Element(FIRST_NODE_EL_NAME, node_id));
+		}
 		visited_nodes.add(node_id);
 		elem.findChild(VISITED_NODES_PATH)
       .addChild(new Element(NODE_ID_EL_NAME, node_id));
+	}
+
+	public boolean isVisitedNode(String node_id) {
+		return visited_nodes.contains(node_id);
 	}
 
 	public Set<String> getVisitedNodes() {
