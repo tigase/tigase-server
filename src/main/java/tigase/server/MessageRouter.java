@@ -205,6 +205,8 @@ public class MessageRouter extends AbstractMessageReceiver {
 		}
 
 		String id =  JIDUtils.getNodeID(packet.getTo());
+		String host = JIDUtils.getNodeHost(packet.getTo());
+		String nick = JIDUtils.getNodeNick(packet.getTo());
 		ServerComponent comp = getLocalComponent(id);
 		if (comp != null) {
 			log.finest("Packet is processing by: " + comp.getComponentId());
@@ -240,8 +242,6 @@ public class MessageRouter extends AbstractMessageReceiver {
 			return;
 		}
 
-		String host = JIDUtils.getNodeHost(packet.getTo());
-		String nick = JIDUtils.getNodeNick(packet.getTo());
 		// Let's try to find message receiver quick way
 		// In case if packet is handled internally:
 		MessageReceiver first = null;
@@ -468,7 +468,7 @@ public class MessageRouter extends AbstractMessageReceiver {
 			Element query = packet.getElement().getChild("query").clone();
 
 			if (packet.isXMLNS("/iq/query", INFO_XMLNS)) {
-				if (isLocalDomain(jid)) {
+				//				if (isLocalDomain(jid)) {
 					query = getDiscoInfo(node, jid);
 					for (XMPPService comp: xmppServices.values()) {
 						List<Element> features = comp.getDiscoFeatures();
@@ -476,17 +476,17 @@ public class MessageRouter extends AbstractMessageReceiver {
 							query.addChildren(features);
 						}
 					} // end of for ()
-				} else {
-					for (XMPPService comp: xmppServices.values()) {
-						//						if (jid.startsWith(comp.getName() + ".")) {
-							Element resp = comp.getDiscoInfo(node, jid);
-							if (resp != null) {
-								query = resp;
-								break;
-							}
-							//						}
-					} // end of for ()
-				}
+// 				} else {
+// 					for (XMPPService comp: xmppServices.values()) {
+// 						//						if (jid.startsWith(comp.getName() + ".")) {
+// 							Element resp = comp.getDiscoInfo(node, jid);
+// 							if (resp != null) {
+// 								query = resp;
+// 								break;
+// 							}
+// 							//						}
+// 					} // end of for ()
+// 				}
 			}
 
 			if (packet.isXMLNS("/iq/query", ITEMS_XMLNS)) {

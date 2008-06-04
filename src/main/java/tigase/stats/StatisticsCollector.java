@@ -105,6 +105,29 @@ public class StatisticsCollector
 
 	public void processPacket(final Packet packet, final Queue<Packet> results) {
 
+		if (packet.isXMLNS("/iq/query", INFO_XMLNS)
+			|| packet.isXMLNS("/iq/query", ITEMS_XMLNS)) {
+			String jid = packet.getElemTo();
+			String node = packet.getAttribute("/iq/query", "node");
+			Element query = packet.getElement().getChild("query").clone();
+
+			if (packet.isXMLNS("/iq/query", INFO_XMLNS)) {
+				Element resp = getDiscoInfo(node, jid);
+				if (resp != null) {
+					query = resp;
+				}
+			}
+
+			if (packet.isXMLNS("/iq/query", ITEMS_XMLNS)) {
+				List<Element> items =	getDiscoItems(node, jid);
+				if (items != null && items.size() > 0) {
+					query.addChildren(items);
+				}
+			}
+			results.offer(packet.okResult(query, 0));
+			return;
+		}
+
 		if (!packet.isCommand()
 			|| (packet.getType() != null && packet.getType() == StanzaType.result)) {
 			return;
