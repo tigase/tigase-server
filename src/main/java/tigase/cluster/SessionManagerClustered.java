@@ -171,9 +171,16 @@ public class SessionManagerClustered extends SessionManager {
 
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
-		cluster_nodes =
-      new LinkedHashSet<String>(Arrays.asList((String[])props.get(CLUSTER_NODES_PROP_KEY)));
+		String[] cl_nodes = (String[])props.get(CLUSTER_NODES_PROP_KEY);
+		log.config("Cluster nodes loaded: " + Arrays.toString(cl_nodes));
+		cluster_nodes = new LinkedHashSet<String>(Arrays.asList(cl_nodes));
 		broken_nodes = new LinkedHashSet<String>();
+	}
+
+	public Map<String, Object> getDefaults(Map<String, Object> params) {
+		Map<String, Object> props = super.getDefaults(params);
+		props.put(CLUSTER_NODES_PROP_KEY, new String[] {getComponentId()});
+		return props;
 	}
 
 }
