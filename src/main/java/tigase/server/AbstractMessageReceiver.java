@@ -60,7 +60,7 @@ public abstract class AbstractMessageReceiver
 	protected static final long MINUTE = 60*SECOND;
 	protected static final long HOUR = 60*MINUTE;
 
-	private String DEF_HOSTNAME_PROP_VAL = "localhost";
+	private String DEF_HOSTNAME_PROP_VAL = DNSResolver.getDefaultHostname();
 	public static final String MAX_QUEUE_SIZE_PROP_KEY = "max-queue-size";
 	//  public static final Integer MAX_QUEUE_SIZE_PROP_VAL = Integer.MAX_VALUE;
   public static final Integer MAX_QUEUE_SIZE_PROP_VAL = 1000;
@@ -239,11 +239,11 @@ public abstract class AbstractMessageReceiver
   /**
    * Sets all configuration properties for object.
    */
-  public void setProperties(Map<String, Object> properties) {
-    int queueSize = (Integer)properties.get(MAX_QUEUE_SIZE_PROP_KEY);
+  public void setProperties(Map<String, Object> props) {
+    int queueSize = (Integer)props.get(MAX_QUEUE_SIZE_PROP_KEY);
     setMaxQueueSize(queueSize);
-		defHostname = (String)properties.get(DEF_HOSTNAME_PROP_KEY);
-		compId = JIDUtils.getNodeID(name, defHostname);
+		defHostname = (String)props.get(DEF_HOSTNAME_PROP_KEY);
+		compId = (String)props.get(COMPONENT_ID_PROP_KEY);
 		addRouting(getComponentId());
   }
 
@@ -290,6 +290,7 @@ public abstract class AbstractMessageReceiver
 		DEF_HOSTNAME_PROP_VAL = DNSResolver.getDefaultHostname();
 // 		}
 		defs.put(DEF_HOSTNAME_PROP_KEY, DEF_HOSTNAME_PROP_VAL);
+		defs.put(COMPONENT_ID_PROP_KEY, compId);
 
     return defs;
   }
@@ -438,9 +439,8 @@ public abstract class AbstractMessageReceiver
 		return false;
 	}
 
-	public void processPacket(final Packet packet, final Queue<Packet> results)	{
-		// do nothing, this method is called directly by MessageRouter
-		// and should not be used normally by the component.
+	public final void processPacket(final Packet packet, final Queue<Packet> results)	{
+		addPacket(packet);
 	}
 
 	private enum QueueElementType { IN_QUEUE, OUT_QUEUE }
