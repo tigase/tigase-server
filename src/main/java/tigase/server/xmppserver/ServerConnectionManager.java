@@ -724,8 +724,9 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService> {
 					new String[] {"urn:ietf:params:xml:ns:xmpp-streams"})
 			}, null, null);
 		try {
-			serv.writeRawData(error.toString());
-			serv.writeRawData("</stream:stream>");
+			writeRawData(serv, error.toString());
+// 			serv.writeRawData(error.toString());
+// 			serv.writeRawData("</stream:stream>");
 			serv.stop();
 		} catch (Exception e) {
 			serv.stop();
@@ -900,7 +901,8 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService> {
 					return;
 				}
 				try {
-					accept_serv.writeRawData(elem.toString());
+					writeRawData(accept_serv, elem.toString());
+					//accept_serv.writeRawData(elem.toString());
 					switch (packet.getType()) {
 					case valid:
 						log.finer("Received " + packet.getType().toString()
@@ -911,7 +913,8 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService> {
 						// Ups, verification failed, let's stop the service now.
 						log.finer("Received " + packet.getType().toString()
 							+ " validation result, stopping service, closing connection.");
-						accept_serv.writeRawData("</stream:stream>");
+						writeRawData(accept_serv, "</stream:stream>");
+						//accept_serv.writeRawData("</stream:stream>");
 						accept_serv.stop();
 						break;
 					}
