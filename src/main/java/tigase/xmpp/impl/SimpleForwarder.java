@@ -84,30 +84,7 @@ public abstract class SimpleForwarder
 			return;
 		} // end of if (session == null)
 
-		// If there are any children for this packet with incompatible xmlns
-		// then, skip processing of this packet as it will be processed by
-		// different - native processor.
-		// Examle is: <message> packet with IBB data children or AMP children
-		// such message packet should be processed by IBB or AMP processor
-		// instead of Message processor.
-// 		List<Element> elems = packet.getElement().getChildren();
-// 		if (elems != null && elems.size() > 0) {
-// 			for (Element elem: elems) {
-// 				if (!containsXMLNS(elem.getXMLNS())) {
-// 					log.finest("Element XMLNS is not recognized: " + elem.getXMLNS());
-// 					return;
-// 				}
-// 			}
-// 		}
-
 		try {
-			// Not needed anymore. Packet filter does it for all stanzas.
-// 			// For all messages coming from the owner of this account set
-// 			// proper 'from' attribute. This is actually needed for the case
-// 			// when the user sends a message to himself.
-// 			if (packet.getFrom().equals(session.getConnectionId())) {
-// 				packet.getElement().setAttribute("from", session.getJID());
-// 			} // end of if (packet.getFrom().equals(session.getConnectionId()))
 
 			String id = JIDUtils.getNodeID(packet.getElemTo());
 
