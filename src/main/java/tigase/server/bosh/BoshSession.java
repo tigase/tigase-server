@@ -336,14 +336,15 @@ public class BoshSession {
 			if (terminate) {
 				body.setAttribute("type", StanzaType.terminate.toString());
 			}
-			serv.writeRawData(body.toString());
+			handler.writeRawData(serv, body.toString());
+			//serv.writeRawData(body.toString());
 			//waiting_packets.clear();
 			serv.stop();
-		} catch (IOException e) {
-			// I call it anyway at the end of method call
-			//disconnected(null);
-			log.log(Level.WARNING, "[" + connections.size() +
-				"] Exception during writing to socket", e);
+// 		} catch (IOException e) {
+// 			// I call it anyway at the end of method call
+// 			//disconnected(null);
+// 			log.log(Level.WARNING, "[" + connections.size() +
+// 				"] Exception during writing to socket", e);
 		} catch (Exception e) {
 			log.log(Level.WARNING, "[" + connections.size() +
 				"] Exception during writing to socket", e);
