@@ -37,4 +37,6 @@ public interface BoshSessionTaskHandler {
 
 	void cancelTask(TimerTask bs);
 
+	void writeRawData(BoshIOService ios, String data);
+
 }
