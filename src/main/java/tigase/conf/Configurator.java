@@ -142,13 +142,14 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 					|| args[i].startsWith(GEN_EXT_COMP) || args[i].equals(GEN_VIRT_HOSTS)
 					|| args[i].equals(GEN_ADMINS) || args[i].equals(GEN_DEBUG)
 					|| (args[i].startsWith(GEN_CONF) && !args[i].startsWith(GEN_CONFIG))
-					|| args[i].equals(PROPERTY_FILENAME_PROP_KEY)) {
+					|| args[i].equals(PROPERTY_FILENAME_PROP_KEY)
+					|| args[i].equals(CLUSTER_MODE)) {
 					key = args[i];  val = args[++i];
 				}
 				if (key != null) {
 					defConfigParams.put(key, val);
 					//System.out.println("Setting defaults: " + key + "=" + val.toString());
-					log.config("Setting defaults: " + key + "=" + val.toString());
+					log.warning("Setting defaults: " + key + "=" + val.toString());
 				} // end of if (key != null)
       } // end of for (int i = 0; i < args.length; i++)
     }
@@ -162,11 +163,11 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 				defProps.load(new FileReader(property_filename));
 				Set<String> prop_keys = defProps.stringPropertyNames();
 				for (String key: prop_keys) {
-					String value = defProps.getProperty(key);
+					String value = defProps.getProperty(key).trim();
 					if (key.startsWith("--") || key.equals("config-type")) {
-						defConfigParams.put(key, value);
+						defConfigParams.put(key.trim(), value);
 						//defProperties.remove(key);
-						log.config("Added default config parameter: ("
+						log.warning("Added default config parameter: ("
 							+ key + "=" + value + ")");
 					} else {
 						Object val = value;
@@ -199,7 +200,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 								log.log(Level.CONFIG, "Incorrect parameter modifier", e);
 							}
 						}
-						defProperties.put(key, val);
+						defProperties.put(key.trim(), val);
 					}
 				}
 			} catch (FileNotFoundException e) {
