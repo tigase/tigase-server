@@ -598,13 +598,26 @@ public class StanzaReceiver extends AbstractMessageReceiver
 				return;
 			}
 
+// 			Packet result = packet.commandResult("result");
+// 			TaskCommandIfc command = commands.get("*");
+// 			if (command != null) {
+// 				command.processCommand(packet, result, this);
+// 			} // end of if (command != null)
+// 			addOutPacket(result);
+// 			return;
+
 			Packet result = packet.commandResult("result");
-			TaskCommandIfc command = commands.get("*");
-			if (command != null) {
-				command.processCommand(packet, result, this);
-			} // end of if (command != null)
-			addOutPacket(result);
-			return;
+			String str_command = packet.getStrCommand();
+			if (str_command != null) {
+				String[] arr_command = str_command.split("/");
+				if (arr_command.length > 1) {
+					TaskCommandIfc command = commands.get(arr_command[1]);
+				if (command != null) {
+					command.processCommand(packet, result, this);
+				} // end of if (command != null)
+				} // end of if (arr_command.length > 1)
+			} // end of if (str_command != null)
+
 		}
 
 		log.finest("Processing packet: " + packet.toString());
@@ -620,42 +633,6 @@ public class StanzaReceiver extends AbstractMessageReceiver
 			task.processPacket(packet, results);
 			addOutPackets(results);
 		} // end of if (task != null)
-	}
-
-	/**
-	 * <code>processPacket</code> method is here to process packets addressed
-	 * directly to the hostname, mainly commands, ad-hoc commands in particular.
-	 *
-	 * @param packet a <code>Packet</code> value is command for processing.
-	 */
-	public void processPacket(final Packet packet, final Queue<Packet> results) {
-
-		if (!packet.isCommand()) {
-			return;
-		}
-
-		if (!packet.getTo().startsWith(getName()+".")) return;
-
-		String action = Command.getAction(packet);
-		if (action != null && action.equals("cancel")) {
-			Packet result = packet.commandResult(null);
-			results.offer(result);
-			return;
-		}
-
-		Packet result = packet.commandResult("result");
-		String str_command = packet.getStrCommand();
-		if (str_command != null) {
-			String[] arr_command = str_command.split("/");
-			if (arr_command.length > 1) {
-				TaskCommandIfc command = commands.get(arr_command[1]);
-				if (command != null) {
-					command.processCommand(packet, result, this);
-				} // end of if (command != null)
-			} // end of if (arr_command.length > 1)
-		} // end of if (str_command != null)
-
-		results.offer(result);
 	}
 
 	/**
