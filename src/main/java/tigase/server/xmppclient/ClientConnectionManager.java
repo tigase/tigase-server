@@ -125,12 +125,13 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 					// threads pool and then sends <proceed> packet and starts TLS.
 					Element proceed = Command.getData(packet, "proceed", null);
 					Packet p_proceed = new Packet(proceed);
-					SocketReadThread readThread = SocketReadThread.getInstance();
-					readThread.removeSocketService(serv);
-					serv.addPacketToSend(p_proceed);
-					serv.processWaitingPackets();
+// 					SocketReadThread readThread = SocketReadThread.getInstance();
+// 					readThread.removeSocketService(serv);
+					writePacketToSocket(serv, p_proceed);
+// 					serv.addPacketToSend(p_proceed);
+// 					serv.processWaitingPackets();
 					serv.startTLS(false);
-					readThread.addSocketService(serv);
+// 					readThread.addSocketService(serv);
 				} catch (IOException e) {
 					log.warning("Error starting TLS: " + e);
 				} // end of try-catch
@@ -297,8 +298,8 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 				;
 		} // end of if (!hostnames.contains(hostname))
 
-		try {
-			serv.writeRawData("<?xml version='1.0'?><stream:stream"
+// 		try {
+			writeRawData(serv, "<?xml version='1.0'?><stream:stream"
 				+ " xmlns='jabber:client'"
 				+ " xmlns:stream='http://etherx.jabber.org/streams'"
 				+ " from='" + hostname + "'"
@@ -318,9 +319,9 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 					getFromAddress(getUniqueId(serv)),
 					routings.computeRouting(hostname), StanzaType.get, "sess2", null));
 			} // end of if (attribs.get("version") != null)
-		} catch (IOException e) {
-			serv.stop();
-		}
+// 		} catch (IOException e) {
+// 			serv.stop();
+// 		}
 
 		return null;
 	}
