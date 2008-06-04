@@ -72,6 +72,9 @@ public class MessageRouterConfig {
 	private static final Map<String, String> MSG_RCV_CLASSES =
 		new LinkedHashMap<String, String>();
 
+	private static final Map<String, String> COMP_CLUS_MAP =
+		new LinkedHashMap<String, String>();
+
 	static {
 		MSG_RCV_CLASSES.put(DEF_C2S_NAME, C2S_COMP_CLASS_NAME);
 		MSG_RCV_CLASSES.put(DEF_S2S_NAME, S2S_COMP_CLASS_NAME);
@@ -80,6 +83,8 @@ public class MessageRouterConfig {
 		MSG_RCV_CLASSES.put(DEF_SSEND_NAME, SSEND_COMP_CLASS_NAME);
 		MSG_RCV_CLASSES.put(DEF_SRECV_NAME, SRECV_COMP_CLASS_NAME);
 		MSG_RCV_CLASSES.put(DEF_BOSH_NAME, BOSH_COMP_CLASS_NAME);
+
+		COMP_CLUS_MAP.put(SM_COMP_CLASS_NAME, SM_CLUS_COMP_CLASS_NAME);
 	}
 
 	public static final String REGISTRATOR_PROP_KEY = "components/registrators/";
@@ -108,6 +113,21 @@ public class MessageRouterConfig {
 
 	public static void getDefaults(Map<String, Object> defs,
 		Map<String, Object> params, String comp_name) {
+
+		log.config("Cluster mode: " + params.get(CLUSTER_MODE));
+		if (isTrue((String)params.get(CLUSTER_MODE))) {
+			log.config("Cluster mode is on, replacing known components with cluster"
+				+ " versions:");
+			for (Map.Entry<String, String> entry: MSG_RCV_CLASSES.entrySet()) {
+				String cls = COMP_CLUS_MAP.get(entry.getValue());
+				if (cls != null) {
+					log.config("Replacing " + entry.getValue() + " with " + cls);
+					entry.setValue(cls);
+				}
+			}
+		} else {
+			log.config("Cluster mode is off.");
+		}
 
 		String config_type = (String)params.get("config-type");
 		String[] rcv_names = DEF_MSG_RECEIVERS_NAMES_PROP_VAL;
@@ -162,6 +182,10 @@ public class MessageRouterConfig {
 				}
 			}
 		} // end of for ()
+
+		if (isTrue((String)params.get(CLUSTER_MODE))) {
+			log.config("In cluster mode I am setting up 1 listening xep-0114 component:");
+		}
 
 		defs.put(MSG_RECEIVERS_NAMES_PROP_KEY, rcv_names);
 		for (String name: rcv_names) {
@@ -241,6 +265,15 @@ public class MessageRouterConfig {
 
 		String cls_name = (String)props.get(MSG_RECEIVERS_PROP_KEY + name + ".class");
 		return (MessageReceiver)Class.forName(cls_name).newInstance();
+	}
+
+	private static boolean isTrue(String val) {
+		if (val == null) {
+			return false;
+		}
+		String value = val.toLowerCase();
+		return (value.equals("true") || value.equals("yes") || value.equals("on")
+			|| value.equals("1"));
 	}
 
 } // MessageRouterConfig
