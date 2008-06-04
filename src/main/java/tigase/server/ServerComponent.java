@@ -42,6 +42,10 @@ public interface ServerComponent {
 
   String getName();
 
+	//	void setComponentId(String id);
+
+	String getComponentId();
+
   void release();
 
   /**
