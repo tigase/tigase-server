@@ -280,6 +280,11 @@ public class BoshConnectionManager extends ConnectionManager<BoshIOService>
 		return new BoshIOService();
 	}
 
+	public void writeRawData(BoshIOService ios, String data) {
+		super.writeRawData(ios, data);
+	}
+
+
 	private Timer boshTasks = new Timer("BoshTasks");
 
 	public TimerTask scheduleTask(BoshSession bs, long delay) {
