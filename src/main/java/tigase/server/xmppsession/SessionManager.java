@@ -428,58 +428,6 @@ public class SessionManager extends AbstractMessageReceiver
 		} // end of if (children != null)
 	}
 
-	public void processPacket(final Packet pc, final Queue<Packet> results) {
-
-		if (!pc.isCommand()) {
-			return;
-		}
-
-		log.finest("Command received: " + pc.getStringData());
-		XMPPResourceConnection connection = null;
-		switch (pc.getCommand()) {
-		case USER_STATUS:
-			String user_jid = Command.getFieldValue(pc, "jid");
-			String hostname = JIDUtils.getNodeHost(user_jid);
-			String av = Command.getFieldValue(pc, "available");
-			boolean available = !(av != null && av.equalsIgnoreCase("false"));
-			if (available) {
-				connection = connectionsByFrom.get(pc.getElemFrom());
-				if (connection == null) {
-					connection = createUserSession(pc.getElemFrom(), hostname, user_jid);
-					connection.putSessionData("jingle", "active");
-					Packet presence =
-						new Packet(new Element("presence",
-								new Element[] {
-									new Element("priority", "-1"),
-									new Element("c",
-										new String[] {"node", "ver", "ext", "xmlns"},
-										new String[] {"http://www.google.com/xmpp/client/caps",
-																	XMPPServer.getImplementationVersion(),
-																	"voice-v1",
-																	"http://jabber.org/protocol/caps"})},
-								null, null));
-					presence.setFrom(pc.getElemFrom());
-					presence.setTo(getName() + "@" + pc.getTo());
-					addOutPacket(presence);
-				} else {
-					log.finest("USER_STATUS set to true for user who is already available: "
-						+ pc.toString());
-				}
-			} else {
-				connection = connectionsByFrom.remove(pc.getElemFrom());
-				if (connection != null) {
-					closeSession(connection);
-				} else {
-					log.info("Can not find resource connection for packet: " +
-						pc.toString());
-				}
-			}
-			break;
-		default:
-			break;
-		} // end of switch (pc.getCommand())
-	}
-
 	private XMPPResourceConnection createUserSession(String conn_id,
 		String domain, String user_jid) {
 		XMPPResourceConnection connection = new XMPPResourceConnection(conn_id,
@@ -602,6 +550,44 @@ public class SessionManager extends AbstractMessageReceiver
 					+ ", packet: " + pc.toString());
 			}
 			break;
+		case USER_STATUS:
+			String user_jid = Command.getFieldValue(pc, "jid");
+			String hostname = JIDUtils.getNodeHost(user_jid);
+			String av = Command.getFieldValue(pc, "available");
+			boolean available = !(av != null && av.equalsIgnoreCase("false"));
+			if (available) {
+				connection = connectionsByFrom.get(pc.getElemFrom());
+				if (connection == null) {
+					connection = createUserSession(pc.getElemFrom(), hostname, user_jid);
+					connection.putSessionData("jingle", "active");
+					Packet presence =
+						new Packet(new Element("presence",
+								new Element[] {
+									new Element("priority", "-1"),
+									new Element("c",
+										new String[] {"node", "ver", "ext", "xmlns"},
+										new String[] {"http://www.google.com/xmpp/client/caps",
+																	XMPPServer.getImplementationVersion(),
+																	"voice-v1",
+																	"http://jabber.org/protocol/caps"})},
+								null, null));
+					presence.setFrom(pc.getElemFrom());
+					presence.setTo(getName() + "@" + pc.getTo());
+					addOutPacket(presence);
+				} else {
+					log.finest("USER_STATUS set to true for user who is already available: "
+						+ pc.toString());
+				}
+			} else {
+				connection = connectionsByFrom.remove(pc.getElemFrom());
+				if (connection != null) {
+					closeSession(connection);
+				} else {
+					log.info("Can not find resource connection for packet: " +
+						pc.toString());
+				}
+			}
+			break;
 		case OTHER:
 			log.info("Other command found: " + pc.getStrCommand());
 			break;
@@ -629,7 +615,7 @@ public class SessionManager extends AbstractMessageReceiver
 						if (session == null) {
 							log.info("UPS can't remove session, not found in map: " + userId);
 						} else {
-							log.finer("Number of authorized connections: "
+							log.finer("Number of user sessions: "
 								+ sessionsByNodeId.size());
 						} // end of else
 						auth_repository.logout(userId);
