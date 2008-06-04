@@ -89,9 +89,9 @@ function tigase_monitor_block($op='list', $delta=0) {
 				$server_downloads = $description[0];
 			}
 		}
-		$link_zip = "<a href=\"{$base_path}{$zip_file}\">zip</a>, ";
-		$link_exe = "<a href=\"{$base_path}{$exe_file}\">exe</a>, ";
-		$link_targz = "<a href=\"{$base_path}{$targz_file}\">tar.gz</a>";
+		$link_zip = "<a href=\"{$base_path}/{$zip_file}\">zip</a>, ";
+		$link_exe = "<a href=\"{$base_path}/{$exe_file}\">exe</a>, ";
+		$link_targz = "<a href=\"{$base_path}/{$targz_file}\">tar.gz</a>";
 		$link_all = "<a href=\"{$base_path}/filebrowser/tigase-server\">$server_downloads</a>";
 		//$users_cnt = db_fetch_object(db_query("SELECT COUNT(*) as count from {users};"));
 		$online_cnt = db_fetch_object(db_query("SELECT COUNT(*) as count from {users} where online_status > 0;"));
