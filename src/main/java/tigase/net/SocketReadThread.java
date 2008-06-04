@@ -215,46 +215,48 @@ public class SocketReadThread implements Runnable {
 					}
 				} else {
 					empty_selections = 0;
-					// This is dirty but selectNow() causes concurrent modification exception
-					// and the selectNow() is needed because of a bug in JVM mentioned below
-					for (SelectionKey sk: clientsSel.selectedKeys()) {
-						// According to most guides we should use below code
-						// removing SelectionKey from iterator, however a little later
-						// we do cancel() on this key so removing is somehow redundant
-						// and causes concurrency exception if a few calls are performed
-						// at the same time.
-						//selected_keys.remove(sk);
-						IOService s = (IOService)sk.attachment();
-						try {
-							if (log.isLoggable(Level.FINEST)) {
-								StringBuilder sb = new StringBuilder("AWAKEN: " + s.getUniqueId());
-								if (sk.isWritable()) {
-									sb.append(", ready for WRITING");
+					if (selectedKeys > 0) {
+						// This is dirty but selectNow() causes concurrent modification exception
+						// and the selectNow() is needed because of a bug in JVM mentioned below
+						for (SelectionKey sk: clientsSel.selectedKeys()) {
+							// According to most guides we should use below code
+							// removing SelectionKey from iterator, however a little later
+							// we do cancel() on this key so removing is somehow redundant
+							// and causes concurrency exception if a few calls are performed
+							// at the same time.
+							//selected_keys.remove(sk);
+							IOService s = (IOService)sk.attachment();
+							try {
+								if (log.isLoggable(Level.FINEST)) {
+									StringBuilder sb = new StringBuilder("AWAKEN: " + s.getUniqueId());
+									if (sk.isWritable()) {
+										sb.append(", ready for WRITING");
+									}
+									if (sk.isReadable()) {
+										sb.append(", ready for READING");
+									}
+									sb.append(", readyOps() = " + sk.readyOps());
+									log.finest(sb.toString());
 								}
-								if (sk.isReadable()) {
-									sb.append(", ready for READING");
-								}
-								sb.append(", readyOps() = " + sk.readyOps());
-								log.finest(sb.toString());
+								//         Set<SelectionKey> selected_keys = clientsSel.selectedKeys();
+								//         for (SelectionKey sk : selected_keys) {
+								// Handling a bug or not a bug described in the
+								// last comment to this issue:
+								// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4850373
+								// and
+								// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6403933
+								sk.cancel();
+								completionService.submit(s);
+							} catch (CancelledKeyException e) {
+								log.finest("CancelledKeyException, stopping the connection: "
+									+ s.getUniqueId());
+								try {	s.forceStop(); } catch (Exception ex2) {	}
 							}
-							//         Set<SelectionKey> selected_keys = clientsSel.selectedKeys();
-							//         for (SelectionKey sk : selected_keys) {
-							// Handling a bug or not a bug described in the
-							// last comment to this issue:
-							// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4850373
-							// and
-							// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6403933
-							sk.cancel();
-							completionService.submit(s);
-						} catch (CancelledKeyException e) {
-							log.finest("CancelledKeyException, stopping the connection: "
-								+ s.getUniqueId());
-							try {	s.forceStop(); } catch (Exception ex2) {	}
 						}
 					}
-        }
-				// Clean-up cancelled keys...
-				clientsSel.selectNow();
+					// Clean-up cancelled keys...
+					clientsSel.selectNow();
+				}
 				addAllWaiting();
 			} catch (CancelledKeyException brokene) {
 				// According to Java API that should not happen.
