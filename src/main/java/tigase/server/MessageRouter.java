@@ -94,34 +94,7 @@ public class MessageRouter extends AbstractMessageReceiver {
   private Map<String, MessageReceiver> receivers =
     new ConcurrentSkipListMap<String, MessageReceiver>();
 
-	public void processPacket(final Packet packet, final Queue<Packet> results) {
-		String nick = JIDUtils.getNodeNick(packet.getTo());
-		for (ServerComponent comp: components.values()) {
-			if (comp != this) {
-				comp.processPacket(packet, results);
-			} // end of if (comp != this)
-		} // end of for ()
-		// There is no better way to do it outside MessageRouter for now.
-		if ((packet.isXMLNS("/iq/query", INFO_XMLNS)
-				|| packet.isXMLNS("/iq/query", ITEMS_XMLNS))
-			&& (packet.getType() != null && packet.getType() == StanzaType.get)) {
-			processDiscoQuery(packet, results);
-		}
-
-// 		for (Packet res: results) {
-// 			processPacket(res);
-// 		} // end of for ()
-
-		if (nick == null || !getName().equals(nick)) {
-// 			if (results.size() == 0) {
-// 				Packet res =
-// 					Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
-// 						"Feature not supported yet.", true);
-// 				processPacket(res);
-// 			} // end of if (results.size() == null)
-			return;
-		}
-
+	public void processPacketMR(final Packet packet, final Queue<Packet> results) {
 		if (packet.getPermissions() != Permissions.ADMIN) {
 			try {
 				Packet res = Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
@@ -159,17 +132,30 @@ public class MessageRouter extends AbstractMessageReceiver {
 		}
 	}
 
-	private String isToLocalComponent(String jid) {
+	private ServerComponent getLocalComponent(String jid) {
 		String nick = JIDUtils.getNodeNick(jid);
 		if (nick == null) {
 			return null;
 		}
 		String host = JIDUtils.getNodeHost(jid);
-		if (isLocalDomain(host) && components.get(nick) != null) {
-			return nick;
+		ServerComponent comp = components.get(nick);
+		if (isLocalDomain(host)) {
+			return comp;
 		}
 		return null;
 	}
+
+// 	private String isToLocalComponent(String jid) {
+// 		String nick = JIDUtils.getNodeNick(jid);
+// 		if (nick == null) {
+// 			return null;
+// 		}
+// 		String host = JIDUtils.getNodeHost(jid);
+// 		if (isLocalDomain(host) && components.get(nick) != null) {
+// 			return nick;
+// 		}
+// 		return null;
+// 	}
 
 	private boolean isLocalDomain(String domain) {
 		return localAddresses.contains(domain);
@@ -218,31 +204,40 @@ public class MessageRouter extends AbstractMessageReceiver {
 			return;
 		}
 
-
-		// There are 2 methods for processing packets:
-		// Blocking processing method implemented by all components
-		// which processes packet and returns results instantly, usually
-		// used by Components which don't have own thread for data processing
-		// and it is always used only in cases the results can be returned
-		// instantly without waiting for any resource.
-		// Most AbstractMessageReceivers have an empty implementation of this
-		// method. It is used mainly to process server commands and to
-		// handle service discovery packets.
-
 		String id =  JIDUtils.getNodeID(packet.getTo());
-		String local_comp_name = isToLocalComponent(id);
-		if (localAddresses.contains(id) || local_comp_name != null) {
-			log.finest("This packet is addressed to server itself.");
+		ServerComponent comp = getLocalComponent(id);
+		if (comp != null) {
+			log.finest("Packet is processing by: " + comp.getComponentId());
 			Queue<Packet> results = new LinkedList<Packet>();
-			processPacket(packet, results);
+			if (comp == this) {
+				processPacketMR(packet, results);
+			} else {
+				comp.processPacket(packet, results);
+			}
 			if (results.size() > 0) {
 				for (Packet res: results) {
 					// No more recurrential calls!!
 					addOutPacketNB(res);
 					//					processPacket(res);
 				} // end of for ()
-				return;
 			}
+			return;
+		}
+		if (localAddresses.contains(id)
+			&& (packet.isXMLNS("/iq/query", INFO_XMLNS)
+				|| packet.isXMLNS("/iq/query", ITEMS_XMLNS))
+			&& packet.getType() != null && packet.getType() == StanzaType.get) {
+			log.finest("Processing disco query by: " + getComponentId());
+			Queue<Packet> results = new LinkedList<Packet>();
+			processDiscoQuery(packet, results);
+			if (results.size() > 0) {
+				for (Packet res: results) {
+					// No more recurrential calls!!
+					addOutPacketNB(res);
+					//					processPacket(res);
+				} // end of for ()
+			}
+			return;
 		}
 
 		String host = JIDUtils.getNodeHost(packet.getTo());
@@ -288,8 +283,7 @@ public class MessageRouter extends AbstractMessageReceiver {
 		} // end of for (MessageReceiver mr: receivers.values())
 		// It is not for any local host, so maybe it is for some
 		// remote server, let's try sending it through s2s service:
-		if (localAddresses.contains(JIDUtils.getNodeHost(packet.getTo()))
-			|| local_comp_name != null) {
+		if (localAddresses.contains(host) || comp != null) {
 			try {
 				addOutPacketNB(
 					Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
@@ -377,6 +371,7 @@ public class MessageRouter extends AbstractMessageReceiver {
 			this.localAddresses.clear();
 			if (localAddresses != null && localAddresses.length > 0) {
 				Collections.addAll(this.localAddresses, localAddresses);
+				this.localAddresses.add(getDefHostName());
 			}
       Map<String, ComponentRegistrator> tmp_reg = registrators;
       Map<String, MessageReceiver> tmp_rec = receivers;
