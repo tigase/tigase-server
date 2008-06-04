@@ -76,6 +76,20 @@ public interface Configurable extends ServerComponent {
 	 */
 	public static final String GEN_CONFIG_COMP = GEN_CONFIG + "-comp";
 
+	/**
+	 * Constant <code>CLUSTER_MODE</code> sets the cluster mode to either
+	 * <code>true</code> or <code>false</code>. By default cluster mode is
+	 * set to <code>false</code>.
+	 */
+	public static final String CLUSTER_MODE = "--cluster-mode";
+	/**
+	 * Constant <code>CLUSTER_NODES</code> is for setting list of cluster nodes
+	 * the instance should try to connect to.
+	 */
+	public static final String CLUSTER_NODES = "--cluster-nodes";
+	public static final String CLUSTER_LISTEN = "cluster-listen";
+	public static final String CLUSTER_CONECT = "cluster-connect";
+
 	public static final String GEN_CONF = "--gen-";
 	public static final String GEN_TEST = "--test";
 	public static final String GEN_COMP_NAME = "--comp-name";
@@ -124,6 +138,8 @@ public interface Configurable extends ServerComponent {
 		"tigase.server.xmppserver.ServerConnectionManager";
 	public static final String SM_COMP_CLASS_NAME =
 		"tigase.server.xmppsession.SessionManager";
+	public static final String SM_CLUS_COMP_CLASS_NAME =
+		"tigase.cluster.SessionManagerClustered";
 	public static final String EXT_COMP_CLASS_NAME =
 		"tigase.server.xmppcomponent.ComponentConnectionManager";
 	public static final String SSEND_COMP_CLASS_NAME =
@@ -137,6 +153,7 @@ public interface Configurable extends ServerComponent {
 	public static final String ADMINS_PROP_KEY = "admins";
 	public static final String TRUSTED_PROP_KEY = "trusted";
 	public static final String DEF_HOSTNAME_PROP_KEY = "def-hostname";
+	public static final String COMPONENT_ID_PROP_KEY = "component-id";
 
 	public static final String NULL_ROUTING = "NULL";
 
