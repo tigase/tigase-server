@@ -341,14 +341,23 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 		writePacketsToSocket(serv, processSocketData(serv));
 	}
 
-	protected void writePacketsToSocket(IO serv, Queue<Packet> packets)
-		throws IOException {
+	protected void writePacketsToSocket(IO serv, Queue<Packet> packets) {
 		if (packets != null && packets.size() > 0) {
 			Packet p = null;
 			while ((p = packets.poll()) != null) {
 				serv.addPacketToSend(p);
 			} // end of for ()
-			serv.processWaitingPackets();
+			try {
+				serv.processWaitingPackets();
+				readThread.addSocketService(serv);
+			} catch (Exception e) {
+				log.log(Level.WARNING, "Exception during writing packets: ", e);
+				try {
+					serv.stop();
+				} catch (Exception e1) {
+					log.log(Level.WARNING, "Exception stopping XMPPIOService: ", e1);
+				} // end of try-catch
+			} // end of try-catch
 		}
 	}
 
@@ -373,6 +382,20 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 				+ ", service id: " + getServiceId(p));
 		} // end of if (ios != null) else
 		return false;
+	}
+
+	protected void writeRawData(IO ios, String data) {
+		try {
+			ios.writeRawData(data);
+			readThread.addSocketService(ios);
+		} catch (Exception e) {
+			log.log(Level.WARNING, "Exception during writing data: " + data, e);
+			try {
+				ios.stop();
+			} catch (Exception e1) {
+				log.log(Level.WARNING, "Exception stopping XMPPIOService: ", e1);
+			} // end of try-catch
+		}
 	}
 
 	protected void writePacketToSocket(Packet p) {
