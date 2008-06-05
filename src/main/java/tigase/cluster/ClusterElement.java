@@ -27,6 +27,7 @@ import java.util.ArrayList;
 
 import tigase.xmpp.StanzaType;
 import tigase.xml.Element;
+import tigase.server.Packet;
 
 /**
  * Class ClusterElement is a utility class for handling tigase cluster
@@ -69,6 +70,7 @@ public class ClusterElement {
     "/" + CLUSTER_EL_NAME + "/" + CLUSTER_PACKETS_EL_NAME;
 	public static final String VISITED_NODES_EL_NAME = "visited-nodes";
 	public static final String FIRST_NODE_EL_NAME = "first-node";
+	public static final String PACKET_FROM_ATTR_NAME = "packet-from";
 	public static final String FIRST_NODE_PATH =
     CLUSTER_DATA_PATH + "/" + FIRST_NODE_EL_NAME;
 	public static final String VISITED_NODES_PATH =
@@ -97,22 +99,26 @@ public class ClusterElement {
 		}
 	}
 
-	public ClusterElement(String from, String to, StanzaType type, Element packet) {
+	public ClusterElement(String from, String to, StanzaType type, Packet packet) {
 		packets = new ArrayList<Element>();
 		visited_nodes = new LinkedHashSet<String>();
-		elem = createClusterElement(from, to, type.toString());
+		elem = createClusterElement(from, to, type.toString(), packet.getFrom());
 		if (packet != null) {
+			if (packet.getElement().getXMLNS() == null) {
+				packet.getElement().setXMLNS("jabber:client");
+			}
 			addDataPacket(packet);
 		}
 	}
 
 	public static Element createClusterElement(String from, String to,
-		String type) {
+		String type, String packet_from) {
 		Element cluster_el = new Element(CLUSTER_EL_NAME,
 			new String[] {"from", "to", "type"},
 			new String[] {from, to, type});
 		cluster_el.setXMLNS(XMLNS);
-		cluster_el.addChild(new Element(CLUSTER_PACKETS_EL_NAME));
+		cluster_el.addChild(new Element(CLUSTER_PACKETS_EL_NAME,
+				new String[] {PACKET_FROM_ATTR_NAME}, new String[] {packet_from}));
 		cluster_el.addChild(new Element(CLUSTER_DATA_EL_NAME,
 				new Element[] {new Element(VISITED_NODES_EL_NAME)}, null, null));
 		return cluster_el;
@@ -129,17 +135,21 @@ public class ClusterElement {
 		next_el.setAttribute("to", node_id);
 		next_el.setAttribute("type", StanzaType.set.toString());
 		ClusterElement next_cl = new ClusterElement(next_el);
-		next_cl.addVisitedNode(from);
+		//next_cl.addVisitedNode(from);
 		return next_cl;
 	}
 
-	public void addDataPacket(Element packet) {
-		packets.add(packet);
-		elem.findChild(CLUSTER_PACKETS_PATH).addChild(packet);
+	public void addDataPacket(Packet packet) {
+		packets.add(packet.getElement());
+		elem.findChild(CLUSTER_PACKETS_PATH).addChild(packet.getElement());
 	}
 
 	public List<Element> getDataPackets() {
 		return packets;
+	}
+
+	public String getDataPacketFrom() {
+		return elem.getAttribute(CLUSTER_PACKETS_PATH, PACKET_FROM_ATTR_NAME);
 	}
 
 	public Element getClusterElement() {

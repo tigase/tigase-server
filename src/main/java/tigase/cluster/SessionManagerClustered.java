@@ -86,14 +86,18 @@ public class SessionManagerClustered extends SessionManager {
 
 	protected void processClusterPacket(Packet packet) {
 		ClusterElement clel = new ClusterElement(packet.getElement());
+		clel.addVisitedNode(getComponentId());
 		switch (packet.getType()) {
 		case set:
 			List<Element> elems = clel.getDataPackets();
+			String packet_from = clel.getDataPacketFrom();
 			if (elems != null && elems.size() > 0) {
 				for (Element elem: elems) {
-					XMPPResourceConnection conn = getXMPPResourceConnection(packet);
+					Packet el_packet = new Packet(elem);
+					el_packet.setFrom(packet_from);
+					XMPPResourceConnection conn = getXMPPResourceConnection(el_packet);
 					if (conn != null || !sentToNextNode(clel)) {
-						processPacket(new Packet(elem), conn);
+						processPacket(el_packet, conn);
 					}
 				}
 			} else {
@@ -159,7 +163,7 @@ public class SessionManagerClustered extends SessionManager {
 			for (String cluster_node: cluster_nodes) {
 				if (!cluster_node.equals(sess_man_id)) {
 					ClusterElement clel = new ClusterElement(sess_man_id, cluster_node,
-						StanzaType.set, packet.getElement());
+						StanzaType.set, packet);
 					clel.addVisitedNode(sess_man_id);
 					super.fastAddOutPacket(new Packet(clel.getClusterElement()));
 					return true;
