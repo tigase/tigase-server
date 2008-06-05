@@ -130,6 +130,15 @@ public interface Configurable extends ServerComponent {
 	public static final String LIBRESOURCE_REPO_URL_PROP_VAL =
 		"jdbc:postgresql://localhost/libresource?user=demo";
 
+	public static final String DEF_SM_NAME = "sess-man";
+	public static final String DEF_C2S_NAME = "c2s";
+	public static final String DEF_S2S_NAME = "s2s";
+	public static final String DEF_EXT_COMP_NAME = "ext-comp";
+	public static final String DEF_CL_COMP_NAME = "cl-comp";
+	public static final String DEF_SSEND_NAME = "ssend";
+	public static final String DEF_SRECV_NAME = "srecv";
+	public static final String DEF_BOSH_NAME = "bosh";
+
 	public static final String ROUTER_COMP_CLASS_NAME =
 		"tigase.server.MessageRouter";
 	public static final String C2S_COMP_CLASS_NAME =
@@ -142,6 +151,8 @@ public interface Configurable extends ServerComponent {
 		"tigase.cluster.SessionManagerClustered";
 	public static final String EXT_COMP_CLASS_NAME =
 		"tigase.server.xmppcomponent.ComponentConnectionManager";
+	public static final String CL_COMP_CLASS_NAME =
+		"tigase.cluster.ClusterConnectionManager";
 	public static final String SSEND_COMP_CLASS_NAME =
 		"tigase.server.ssender.StanzaSender";
 	public static final String SRECV_COMP_CLASS_NAME =
@@ -154,6 +165,7 @@ public interface Configurable extends ServerComponent {
 	public static final String TRUSTED_PROP_KEY = "trusted";
 	public static final String DEF_HOSTNAME_PROP_KEY = "def-hostname";
 	public static final String COMPONENT_ID_PROP_KEY = "component-id";
+	public static final String CLUSTER_NODES_PROP_KEY = "cluster-nodes";
 
 	public static final String NULL_ROUTING = "NULL";
 
