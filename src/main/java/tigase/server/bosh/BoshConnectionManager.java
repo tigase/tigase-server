@@ -45,7 +45,6 @@ import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPIOService;
 
 import static tigase.server.bosh.Constants.*;
-import static tigase.server.MessageRouterConfig.DEF_SM_NAME;
 
 /**
  * Describe class BoshConnectionManager here.

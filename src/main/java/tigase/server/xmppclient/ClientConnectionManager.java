@@ -52,8 +52,6 @@ import tigase.xmpp.XMPPResourceConnection;
 //import tigase.net.IOService;
 import tigase.net.SocketReadThread;
 
-import static tigase.server.MessageRouterConfig.DEF_SM_NAME;
-
 /**
  * Class ClientConnectionManager
  *
