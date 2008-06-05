@@ -51,13 +51,6 @@ public class MessageRouterConfig {
 		"components/msg-receivers/";
 	public static final String MSG_RECEIVERS_NAMES_PROP_KEY =
 		MSG_RECEIVERS_PROP_KEY + "id-names";
-	public static final String DEF_SM_NAME = "sess-man";
-	public static final String DEF_C2S_NAME = "c2s";
-	public static final String DEF_S2S_NAME = "s2s";
-	public static final String DEF_EXT_COMP_NAME = "ext-comp";
-	public static final String DEF_SSEND_NAME = "ssend";
-	public static final String DEF_SRECV_NAME = "srecv";
-	public static final String DEF_BOSH_NAME = "bosh";
 
 	private static final String[] ALL_MSG_RECEIVERS_NAMES_PROP_VAL =
 	{	DEF_C2S_NAME, DEF_S2S_NAME, DEF_SM_NAME,
@@ -79,6 +72,7 @@ public class MessageRouterConfig {
 		MSG_RCV_CLASSES.put(DEF_C2S_NAME, C2S_COMP_CLASS_NAME);
 		MSG_RCV_CLASSES.put(DEF_S2S_NAME, S2S_COMP_CLASS_NAME);
 		MSG_RCV_CLASSES.put(DEF_EXT_COMP_NAME, EXT_COMP_CLASS_NAME);
+		MSG_RCV_CLASSES.put(DEF_CL_COMP_NAME, CL_COMP_CLASS_NAME);
 		MSG_RCV_CLASSES.put(DEF_SM_NAME, SM_COMP_CLASS_NAME);
 		MSG_RCV_CLASSES.put(DEF_SSEND_NAME, SSEND_COMP_CLASS_NAME);
 		MSG_RCV_CLASSES.put(DEF_SRECV_NAME, SRECV_COMP_CLASS_NAME);
@@ -157,8 +151,9 @@ public class MessageRouterConfig {
 		}
 
 		Arrays.sort(rcv_names);
-		// Now init defaults for all external components:
+		// Now init defaults for all extra components:
 		for (String key: params.keySet()) {
+			// XEP-0114 components
 			if (key.startsWith(GEN_EXT_COMP)) {
 				String new_comp_name =
 					DEF_EXT_COMP_NAME + key.substring(GEN_EXT_COMP.length());
@@ -168,6 +163,7 @@ public class MessageRouterConfig {
 					Arrays.sort(rcv_names);
 				}
 			} // end of if (key.startsWith(GEN_EXT_COMP))
+			// All other extra components, assuming class has been given
 			if (key.startsWith(GEN_COMP_NAME)) {
 				String comp_name_suffix = key.substring(GEN_COMP_NAME.length());
 				String c_name = (String)params.get(GEN_COMP_NAME + comp_name_suffix);
@@ -183,8 +179,17 @@ public class MessageRouterConfig {
 			}
 		} // end of for ()
 
+		// Add XEP-0114 for cluster communication
 		if (isTrue((String)params.get(CLUSTER_MODE))) {
 			log.config("In cluster mode I am setting up 1 listening xep-0114 component:");
+			if (Arrays.binarySearch(rcv_names, DEF_CL_COMP_NAME) < 0) {
+				defs.put(MSG_RECEIVERS_PROP_KEY + DEF_CL_COMP_NAME + ".class",
+					CL_COMP_CLASS_NAME);
+				defs.put(MSG_RECEIVERS_PROP_KEY + DEF_CL_COMP_NAME + ".active", true);
+				rcv_names = Arrays.copyOf(rcv_names, rcv_names.length+1);
+				rcv_names[rcv_names.length-1] = DEF_CL_COMP_NAME;
+				Arrays.sort(rcv_names);
+			}
 		}
 
 		defs.put(MSG_RECEIVERS_NAMES_PROP_KEY, rcv_names);
