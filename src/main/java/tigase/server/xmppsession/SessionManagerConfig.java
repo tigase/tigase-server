@@ -51,8 +51,6 @@ public class SessionManagerConfig {
 	public static final String ANONYMOUS_DOMAINS_PROP_KEY = "anonymous-domains";
 	//	public static final String ANONYMOUS_PEERS_PROP_KEY = "anonymous-peers";
 
-	public static final String CLUSTER_NODES_PROP_KEY = "cluster-nodes";
-
 	/**
 	 * List of default plugins loaded by the server. It can be changed later
 	 * in config file or at runtime.
