@@ -168,6 +168,7 @@ public abstract class Presence {
 				Element presence = new Element(PRESENCE_ELEMENT_NAME);
 				presence.setAttribute("type", StanzaType.subscribe.toString());
 				presence.setAttribute("from", buddy);
+				presence.setXMLNS(XMLNS);
 				updatePresenceChange(presence, session, results);
 			}
 		}
@@ -192,6 +193,7 @@ public abstract class Presence {
 				pres_update.setAttribute("from", session.getJID());
 				pres_update.setAttribute("to", conn.getJID());
 				pres_update.setAttribute("type", StanzaType.unavailable.toString());
+				pres_update.setXMLNS(XMLNS);
 				Packet pack_update = new Packet(pres_update);
 				pack_update.setTo(conn.getConnectionId());
 				results.offer(pack_update);
@@ -296,6 +298,7 @@ public abstract class Presence {
 		} // end of if (pres == null) else
 		presence.setAttribute("to", to);
 		presence.setAttribute("from", from);
+		presence.setXMLNS(XMLNS);
 		Packet packet = new Packet(presence);
 		log.finest("Sending presence info: " + packet.getStringData());
 		results.offer(packet);
