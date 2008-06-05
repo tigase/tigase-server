@@ -569,7 +569,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 			} catch (ConnectException e) {
 				// Accept side for component service is not ready yet?
 				// Let's wait for a few secs and try again.
-				log.log(Level.FINEST, "Problem reconnecting the service", e);
+				log.log(Level.FINEST, "Problem reconnecting the service: ", e);
 				Integer reconnects = (Integer)port_props.get(MAX_RECONNECTS_PROP_KEY);
 				if (reconnects != null) {
 					int recon = reconnects.intValue();
