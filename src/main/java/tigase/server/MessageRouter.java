@@ -208,6 +208,20 @@ public class MessageRouter extends AbstractMessageReceiver {
 		String host = JIDUtils.getNodeHost(packet.getTo());
 		String nick = JIDUtils.getNodeNick(packet.getTo());
 		ServerComponent comp = getLocalComponent(id);
+		if (packet.isServiceDisco()
+			&& packet.getType() != null && packet.getType() == StanzaType.get
+			&& (comp != null || localAddresses.contains(id))) {
+			log.finest("Processing disco query by: " + getComponentId());
+			Queue<Packet> results = new LinkedList<Packet>();
+			processDiscoQuery(packet, results);
+			if (results.size() > 0) {
+				for (Packet res: results) {
+					// No more recurrential calls!!
+					addOutPacketNB(res);
+				} // end of for ()
+			}
+			return;
+		}
 		if (comp != null) {
 			log.finest("Packet is processing by: " + comp.getComponentId());
 			Queue<Packet> results = new LinkedList<Packet>();
@@ -216,22 +230,6 @@ public class MessageRouter extends AbstractMessageReceiver {
 			} else {
 				comp.processPacket(packet, results);
 			}
-			if (results.size() > 0) {
-				for (Packet res: results) {
-					// No more recurrential calls!!
-					addOutPacketNB(res);
-					//					processPacket(res);
-				} // end of for ()
-			}
-			return;
-		}
-		if (localAddresses.contains(id)
-			&& (packet.isXMLNS("/iq/query", INFO_XMLNS)
-				|| packet.isXMLNS("/iq/query", ITEMS_XMLNS))
-			&& packet.getType() != null && packet.getType() == StanzaType.get) {
-			log.finest("Processing disco query by: " + getComponentId());
-			Queue<Packet> results = new LinkedList<Packet>();
-			processDiscoQuery(packet, results);
 			if (results.size() > 0) {
 				for (Packet res: results) {
 					// No more recurrential calls!!
@@ -468,7 +466,7 @@ public class MessageRouter extends AbstractMessageReceiver {
 			Element query = packet.getElement().getChild("query").clone();
 
 			if (packet.isXMLNS("/iq/query", INFO_XMLNS)) {
-				//				if (isLocalDomain(jid)) {
+				if (isLocalDomain(jid)) {
 					query = getDiscoInfo(node, jid);
 					for (XMPPService comp: xmppServices.values()) {
 						List<Element> features = comp.getDiscoFeatures();
@@ -476,17 +474,17 @@ public class MessageRouter extends AbstractMessageReceiver {
 							query.addChildren(features);
 						}
 					} // end of for ()
-// 				} else {
-// 					for (XMPPService comp: xmppServices.values()) {
-// 						//						if (jid.startsWith(comp.getName() + ".")) {
-// 							Element resp = comp.getDiscoInfo(node, jid);
-// 							if (resp != null) {
-// 								query = resp;
-// 								break;
-// 							}
-// 							//						}
-// 					} // end of for ()
-// 				}
+				} else {
+					for (XMPPService comp: xmppServices.values()) {
+						//						if (jid.startsWith(comp.getName() + ".")) {
+							Element resp = comp.getDiscoInfo(node, jid);
+							if (resp != null) {
+								query = resp;
+								break;
+							}
+							//						}
+					} // end of for ()
+				}
 			}
 
 			if (packet.isXMLNS("/iq/query", ITEMS_XMLNS)) {
