@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.LinkedHashSet;
 import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
+import tigase.disco.XMPPService;
 
 /**
  * Class Packet
@@ -63,6 +64,7 @@ public class Packet {
 	private final Command command;
 	private final String strCommand;
 	private final boolean cmd;
+	private final boolean serviceDisco;
 	private final StanzaType type;
 	private final boolean routed;
 	private String to = null;
@@ -75,7 +77,7 @@ public class Packet {
 			throw new NullPointerException();
 		} // end of if (elem == null)
 		this.elem = elem;
-		if (elem.getName().equals("iq")) {
+		if (elem.getName() == "iq") {
 			Element child = elem.getChild("command", Command.XMLNS);
 			if (child != null) {
 				cmd = true;
@@ -86,10 +88,13 @@ public class Packet {
 				command = null;
 				cmd = false;
 			}
+			serviceDisco = (isXMLNS("/iq/query", XMPPService.INFO_XMLNS)
+				|| isXMLNS("/iq/query", XMPPService.ITEMS_XMLNS));
 		} else {
 			strCommand = null;
 			command = null;
 			cmd = false;
+			serviceDisco = false;
 		}
 		if (elem.getAttribute("type") != null) {
 			type = StanzaType.valueof(elem.getAttribute("type"));
@@ -113,6 +118,7 @@ public class Packet {
 		this.command = null;
 		this.cmd = false;
 		this.routed = false;
+		this.serviceDisco = false;
 	}
 
 	public void setPermissions(Permissions perm) {
@@ -162,6 +168,10 @@ public class Packet {
 
 	public boolean isCommand() {
 		return cmd;
+	}
+
+	public boolean isServiceDisco() {
+		return serviceDisco;
 	}
 
 	public boolean isXMLNS(String elementPath, String xmlns) {
