@@ -75,6 +75,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 	public static final boolean RETURN_SERVICE_DISCO_VAL = true;
 	public static final String IDENTITY_TYPE_KEY = "identity-type";
 	public static final String IDENTITY_TYPE_VAL = "generic";
+	public static final String XMLNS = "tigase:cluster";
 
 	private ServiceEntity serviceEntity = null;
 	//private boolean service_disco = RETURN_SERVICE_DISCO_VAL;
@@ -192,8 +193,6 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 					Map<String, Object> port_props = new LinkedHashMap<String, Object>();
 					port_props.put(SECRET_PROP_KEY, SECRET_PROP_VAL);
 					port_props.put(PORT_LOCAL_HOST_PROP_KEY, getDefHostName());
-					port_props.put(PORT_ROUTING_TABLE_PROP_KEY,
-						new String[] {host, ".*@" + host, ".*\\." + host});
 					port_props.put(PORT_TYPE_PROP_KEY, ConnectionType.connect);
 					port_props.put(PORT_SOCKET_PROP_KEY, SocketType.plain);
 					port_props.put(PORT_REMOTE_HOST_PROP_KEY, host);
@@ -274,13 +273,17 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 		case connect:
 			// Send init xmpp stream here
 			//XMPPIOService serv = (XMPPIOService)service;
-			String compName =
-				(String)serv.getSessionData().get(PORT_LOCAL_HOST_PROP_KEY);
+			String remote_host =
+        (String)serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
+			serv.getSessionData().put(serv.HOSTNAME_KEY, remote_host);
+			serv.getSessionData().put(PORT_ROUTING_TABLE_PROP_KEY,
+				new String[] {remote_host, ".*@" + remote_host, ".*\\." + remote_host});
 			String data =
 				"<stream:stream"
-				+ " xmlns='jabber:component:accept'"
+				+ " xmlns='" + XMLNS + "'"
 				+ " xmlns:stream='http://etherx.jabber.org/streams'"
-				+ " to='" + compName + "'"
+				+ " from='" + getDefHostName() + "'"
+				+ " to='" + remote_host + "'"
 				+ ">";
 			log.finest("cid: " + (String)serv.getSessionData().get("cid")
 				+ ", sending: " + data);
@@ -314,14 +317,17 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 			}
 		}
 		case accept: {
-			String hostname = attribs.get("to");
-			service.getSessionData().put(service.HOSTNAME_KEY, hostname);
+			String remote_host = attribs.get("to");
+			service.getSessionData().put(service.HOSTNAME_KEY, remote_host);
+			service.getSessionData().put(PORT_ROUTING_TABLE_PROP_KEY,
+				new String[] {remote_host, ".*@" + remote_host, ".*\\." + remote_host});
 			String id = UUID.randomUUID().toString();
 			service.getSessionData().put(service.SESSION_ID_KEY, id);
 			return "<stream:stream"
-				+ " xmlns='jabber:component:accept'"
+				+ " xmlns='" + XMLNS + "'"
 				+ " xmlns:stream='http://etherx.jabber.org/streams'"
-				+ " from='" + hostname + "'"
+				+ " from='" + getDefHostName() + "'"
+				+ " to='" + remote_host + "'"
 				+ " id='" + id + "'"
 				+ ">";
 		}
