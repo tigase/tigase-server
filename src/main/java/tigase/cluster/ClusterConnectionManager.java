@@ -244,7 +244,9 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 		super.serviceStopped(service);
 		Map<String, Object> sessionData = service.getSessionData();
 		String[] routings = (String[])sessionData.get(PORT_ROUTING_TABLE_PROP_KEY);
-		updateRoutings(routings, false);
+		if (routings != null) {
+			updateRoutings(routings, false);
+		}
 		ConnectionType type = service.connectionType();
 		if (type == ConnectionType.connect) {
 			reconnectService(sessionData, connectionDelay);
