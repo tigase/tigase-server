@@ -138,8 +138,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 		new ConcurrentSkipListMap<String, IO>();
 	private Set<ConnectionListenerImpl> pending_open =
 		Collections.synchronizedSet(new HashSet<ConnectionListenerImpl>());;
-	protected long connectionDelay = 2000;
-	protected long startDelay = 10000;
+	protected long connectionDelay = 2 * SECOND;
+	protected long startDelay = 10 * SECOND;
 
 	public void setName(String name) {
 		super.setName(name);
@@ -251,7 +251,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 		int[] ports = (int[])props.get(PORTS_PROP_KEY);
 		if (ports != null) {
 			for (int i = 0; i < ports.length; i++) {
-				Map<String, Object> port_props = new TreeMap<String, Object>();
+				Map<String, Object> port_props = new LinkedHashMap<String, Object>();
 				for (Map.Entry<String, Object> entry : props.entrySet()) {
 					if (entry.getKey().startsWith(PROP_KEY + ports[i])) {
 						int idx = entry.getKey().lastIndexOf('/');
