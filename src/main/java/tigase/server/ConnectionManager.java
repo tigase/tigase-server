@@ -305,7 +305,10 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 			+ ", scheduling next try in " + (delay / 1000) + "secs");
 		delayedTasks.schedule(new TimerTask() {
 				public void run() {
-					log.fine("Reconnecting service " + getName());
+					String host = (String)port_props.get(PORT_REMOTE_HOST_PROP_KEY);
+					int port = (Integer)port_props.get(PORT_KEY);
+					log.fine("Reconnecting service for component: " + getName()
+						+ ", to remote host: " + host + " on port: " + port);
 					startService(port_props);
 				}
 			}, delay);
