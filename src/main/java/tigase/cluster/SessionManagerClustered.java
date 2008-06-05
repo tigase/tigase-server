@@ -179,7 +179,17 @@ public class SessionManagerClustered extends SessionManager {
 
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> props = super.getDefaults(params);
-		props.put(CLUSTER_NODES_PROP_KEY, new String[] {getComponentId()});
+		if (params.get(CLUSTER_NODES) != null) {
+			String[] cl_nodes = ((String)params.get(CLUSTER_NODES)).split(",");
+			for (int i = 0; i < cl_nodes.length; i++) {
+				if (cl_nodes[i].equals(JIDUtils.getNodeHost(cl_nodes[i]))) {
+					cl_nodes[i] = DEF_SM_NAME + "@" + cl_nodes[i];
+				}
+			}
+			props.put(CLUSTER_NODES_PROP_KEY, cl_nodes);
+		} else {
+			props.put(CLUSTER_NODES_PROP_KEY, new String[] {getComponentId()});
+		}
 		return props;
 	}
 
