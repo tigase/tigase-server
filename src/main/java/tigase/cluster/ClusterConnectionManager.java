@@ -317,7 +317,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 			}
 		}
 		case accept: {
-			String remote_host = attribs.get("to");
+			String remote_host = attribs.get("from");
 			service.getSessionData().put(service.HOSTNAME_KEY, remote_host);
 			service.getSessionData().put(PORT_ROUTING_TABLE_PROP_KEY,
 				new String[] {remote_host, ".*@" + remote_host, ".*\\." + remote_host});
