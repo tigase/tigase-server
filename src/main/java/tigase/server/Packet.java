@@ -308,7 +308,18 @@ public class Packet {
 		return null;
 	}
 
+	public Packet errorResult(final ErrorCondition errorCondition, final String errorText,
+			final boolean includeOriginalXML) {
+		return errorResult(errorCondition.getXmppErrorType().toString(), errorCondition.getLegacyErrorCode(),
+				errorCondition.getXmppErrorCondition(), errorText, includeOriginalXML);
+	}
+	
 	public Packet errorResult(final String errorType, final String errorCondition,
+			final String errorText, final boolean includeOriginalXML) {
+		return errorResult(errorType, null, errorCondition, errorText, includeOriginalXML);
+	}
+	
+	public Packet errorResult(final String errorType, final Integer errorCode, final String errorCondition,
 		final String errorText, final boolean includeOriginalXML) {
 		Element reply = new Element(elem.getName());
 		reply.setAttribute("type", StanzaType.error.toString());
@@ -328,6 +339,9 @@ public class Packet {
 			reply.setAttribute(OLDTO, getAttribute(OLDTO));
 		}
 		Element error = new Element("error");
+		if(errorCode != null) {
+			error.setAttribute("code", errorCode.toString());
+		}
 		error.setAttribute("type", errorType);
 		Element cond = new Element(errorCondition);
 		cond.setXMLNS(ERROR_NS);
