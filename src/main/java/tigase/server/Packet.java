@@ -308,6 +308,7 @@ public class Packet {
 		return null;
 	}
 	
+	@Deprecated
 	public Packet errorResult(final String errorType, final String errorCondition,
 			final String errorText, final boolean includeOriginalXML) {
 		return errorResult(errorType, null, errorCondition, errorText, includeOriginalXML);
