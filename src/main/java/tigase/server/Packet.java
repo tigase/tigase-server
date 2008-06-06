@@ -307,12 +307,6 @@ public class Packet {
 		} // end of if (children == null) else
 		return null;
 	}
-
-	public Packet errorResult(final ErrorCondition errorCondition, final String errorText,
-			final boolean includeOriginalXML) {
-		return errorResult(errorCondition.getXmppErrorType().toString(), errorCondition.getLegacyErrorCode(),
-				errorCondition.getXmppErrorCondition(), errorText, includeOriginalXML);
-	}
 	
 	public Packet errorResult(final String errorType, final String errorCondition,
 			final String errorText, final boolean includeOriginalXML) {

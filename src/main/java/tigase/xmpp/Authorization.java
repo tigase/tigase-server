@@ -173,7 +173,7 @@ public enum Authorization {
   public Packet getResponseMessage(Packet p, String text,
     boolean includeOriginalXML) throws PacketErrorTypeException {
 		if (p.getType() == null || p.getType() != StanzaType.error) {
-			return p.errorResult(getErrorType(), getCondition(), text,
+			return p.errorResult(getErrorType(), getErrorCode(), getCondition(), text,
 				includeOriginalXML);
 		} else {
 			throw new PacketErrorTypeException("The packet has already 'error' type: "
