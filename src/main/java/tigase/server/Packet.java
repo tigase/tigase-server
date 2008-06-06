@@ -307,15 +307,15 @@ public class Packet {
 		} // end of if (children == null) else
 		return null;
 	}
-	
-	@Deprecated
-	public Packet errorResult(final String errorType, final String errorCondition,
-			final String errorText, final boolean includeOriginalXML) {
-		return errorResult(errorType, null, errorCondition, errorText, includeOriginalXML);
-	}
-	
-	public Packet errorResult(final String errorType, final Integer errorCode, final String errorCondition,
-		final String errorText, final boolean includeOriginalXML) {
+
+// 	public Packet errorResult(final String errorType, final String errorCondition,
+// 			final String errorText, final boolean includeOriginalXML) {
+// 		return errorResult(errorType, null, errorCondition, errorText, includeOriginalXML);
+// 	}
+
+	public Packet errorResult(final String errorType, final Integer errorCode,
+		final String errorCondition, final String errorText,
+		final boolean includeOriginalXML) {
 		Element reply = new Element(elem.getName());
 		reply.setAttribute("type", StanzaType.error.toString());
 		if (getElemFrom() != null) {

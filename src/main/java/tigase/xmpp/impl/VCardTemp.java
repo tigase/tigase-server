@@ -114,7 +114,8 @@ public class VCardTemp extends XMPPProcessor implements XMPPProcessorIfc {
 					results.offer(packet.okResult((String)null, 1));
 				} // end of if (vcard != null)
 			} catch (UserNotFoundException e) {
-				results.offer(Authorization.ITEM_NOT_FOUND.getResponseMessage(packet, "User not found", true));
+				results.offer(Authorization.ITEM_NOT_FOUND.getResponseMessage(packet,
+						"User not found", true));
 			} // end of try-catch
 			return;
 		} // end of if (session == null)
@@ -147,7 +148,8 @@ public class VCardTemp extends XMPPProcessor implements XMPPProcessorIfc {
 							results.offer(packet.okResult((String)null, 1));
 						} // end of if (vcard != null) else
 					} catch (UserNotFoundException e) {
-						results.offer(Authorization.ITEM_NOT_FOUND.getResponseMessage(packet, "User not found", true));
+						results.offer(Authorization.ITEM_NOT_FOUND.getResponseMessage(packet,
+								"User not found", true));
 					} // end of try-catch
 					break;
 				case set:
