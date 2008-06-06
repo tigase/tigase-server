@@ -114,9 +114,7 @@ public class VCardTemp extends XMPPProcessor implements XMPPProcessorIfc {
 					results.offer(packet.okResult((String)null, 1));
 				} // end of if (vcard != null)
 			} catch (UserNotFoundException e) {
-				Packet result = packet.errorResult("cancel", "item-not-found",
-					"User not found", true);
-				results.offer(result);
+				results.offer(Authorization.ITEM_NOT_FOUND.getResponseMessage(packet, "User not found", true));
 			} // end of try-catch
 			return;
 		} // end of if (session == null)
