@@ -84,26 +84,30 @@ public class SessionManagerClustered extends SessionManager {
 		processPacket(packet, conn);
 	}
 
+	protected void processPacket(ClusterElement packet) {
+		List<Element> elems = packet.getDataPackets();
+		String packet_from = packet.getDataPacketFrom();
+		if (elems != null && elems.size() > 0) {
+			for (Element elem: elems) {
+					Packet el_packet = new Packet(elem);
+					el_packet.setFrom(packet_from);
+					XMPPResourceConnection conn = getXMPPResourceConnection(el_packet);
+					if (conn != null || !sentToNextNode(packet)) {
+						processPacket(el_packet, conn);
+					}
+			}
+		} else {
+			log.finest("Empty packets list in the cluster packet: "
+				+ packet.toString());
+		}
+	}
+
 	protected void processClusterPacket(Packet packet) {
 		ClusterElement clel = new ClusterElement(packet.getElement());
 		clel.addVisitedNode(getComponentId());
 		switch (packet.getType()) {
 		case set:
-			List<Element> elems = clel.getDataPackets();
-			String packet_from = clel.getDataPacketFrom();
-			if (elems != null && elems.size() > 0) {
-				for (Element elem: elems) {
-					Packet el_packet = new Packet(elem);
-					el_packet.setFrom(packet_from);
-					XMPPResourceConnection conn = getXMPPResourceConnection(el_packet);
-					if (conn != null || !sentToNextNode(clel)) {
-						processPacket(el_packet, conn);
-					}
-				}
-			} else {
-				log.finest("Empty packets list in the cluster packet: "
-					+ packet.toString());
-			}
+			processPacket(clel);
 			break;
 		case get:
 
@@ -120,9 +124,7 @@ public class SessionManagerClustered extends SessionManager {
 			if (cluster_nodes.remove(from)) {
 				broken_nodes.add(from);
 			}
-			if (!sentToNextNode(clel)) {
-				
-			}
+			processPacket(clel);
 			break;
 		default:
 			break;
