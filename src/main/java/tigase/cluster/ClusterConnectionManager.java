@@ -78,12 +78,15 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 	public static final boolean RETURN_SERVICE_DISCO_VAL = true;
 	public static final String IDENTITY_TYPE_KEY = "identity-type";
 	public static final String IDENTITY_TYPE_VAL = "generic";
+	public static final String CONNECT_ALL_PAR = "--connect-all";
+	public static final String CONNECT_ALL_PROP_KEY = "connect-all";
+	public static final boolean CONNECT_ALL_PROP_VAL = false;
 	public static final String XMLNS = "tigase:cluster";
 
 	private ServiceEntity serviceEntity = null;
 	//private boolean service_disco = RETURN_SERVICE_DISCO_VAL;
 	private String identity_type = IDENTITY_TYPE_VAL;
-	private String service_id = "it doesn't matter";
+	private boolean connect_all = CONNECT_ALL_PROP_VAL;
 
   /**
    * Variable <code>log</code> is a class logger.
@@ -184,6 +187,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 		serviceEntity = new ServiceEntity("XEP-0114 " + getName(), null, "XEP-0114");
 		serviceEntity.addIdentities(
 			new ServiceIdentity("component", identity_type, "XEP-0114 " + getName()));
+		connect_all = (Boolean)props.get(CONNECT_ALL_PROP_KEY);
 		connectionDelay = 30*SECOND;
 		String[] cl_nodes = (String[])props.get(CLUSTER_NODES_PROP_KEY);
 		if (cl_nodes != null) {
@@ -191,7 +195,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 				String host = JIDUtils.getNodeHost(node);
 				log.config("Found cluster node host: " + host);
 				if (!host.equals(getDefHostName())
-					&& (host.hashCode() > getDefHostName().hashCode())) {
+					&& (host.hashCode() > getDefHostName().hashCode() || connect_all)) {
 					log.config("Trying to connect to cluster node: " + host);
 					Map<String, Object> port_props = new LinkedHashMap<String, Object>();
 					port_props.put(SECRET_PROP_KEY, SECRET_PROP_VAL);
@@ -212,6 +216,12 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 		Map<String, Object> props = super.getDefaults(params);
 		props.put(RETURN_SERVICE_DISCO_KEY, RETURN_SERVICE_DISCO_VAL);
 		props.put(IDENTITY_TYPE_KEY, IDENTITY_TYPE_VAL);
+		if (params.get(CONNECT_ALL_PAR) == null
+			|| !((String)params.get(CONNECT_ALL_PAR)).equals("true")) {
+			props.put(CONNECT_ALL_PROP_KEY, false);
+		} else {
+			props.put(CONNECT_ALL_PROP_KEY, true);
+		}
 		if (params.get(CLUSTER_NODES) != null) {
 			String[] cl_nodes = ((String)params.get(CLUSTER_NODES)).split(",");
 			for (int i = 0; i < cl_nodes.length; i++) {
