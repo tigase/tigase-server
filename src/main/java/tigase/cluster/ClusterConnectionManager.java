@@ -158,7 +158,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 					log.fine("Connected to: " + addr);
 					updateServiceDiscovery(addr, "XEP-0114 connected");
 				} else {
-					log.info("Handshaking passwords don't match, disconnecting...");
+					log.info("Handshaking password doesn't match, disconnecting...");
 					serv.stop();
 				}
 			} catch (Exception e) {
@@ -236,7 +236,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 
 	protected String getUniqueId(XMPPIOService serv) {
 		//		return (String)serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
-		return service_id;
+		return (String)serv.getSessionData().get(serv.HOSTNAME_KEY);
 	}
 
 	public void serviceStopped(XMPPIOService service) {
@@ -257,7 +257,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 	}
 
 	protected String getServiceId(Packet packet) {
-		return service_id;
+		return JIDUtils.getNodeHost(packet.getTo());
 	}
 
 	public void serviceStarted(XMPPIOService serv) {
