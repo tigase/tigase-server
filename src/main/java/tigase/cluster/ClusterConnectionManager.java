@@ -32,6 +32,8 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.net.UnknownHostException;
+
 import tigase.net.ConnectionType;
 //import tigase.net.IOService;
 import tigase.net.SocketType;
@@ -44,6 +46,7 @@ import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
 import tigase.util.Algorithms;
 import tigase.util.JIDUtils;
+import tigase.util.DNSResolver;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.XMPPIOService;
@@ -236,7 +239,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 
 	protected String getUniqueId(XMPPIOService serv) {
 		//		return (String)serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
-		return (String)serv.getSessionData().get(serv.HOSTNAME_KEY);
+		return serv.getRemoteAddress();
 	}
 
 	public void serviceStopped(XMPPIOService service) {
@@ -257,7 +260,13 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 	}
 
 	protected String getServiceId(Packet packet) {
-		return JIDUtils.getNodeHost(packet.getTo());
+		try {
+			return DNSResolver.getHostIP(JIDUtils.getNodeHost(packet.getTo()));
+		} catch (UnknownHostException e) {
+			log.warning("Uknown host exception for address: "
+				+ JIDUtils.getNodeHost(packet.getTo()));
+			return JIDUtils.getNodeHost(packet.getTo());
+		}
 	}
 
 	public void serviceStarted(XMPPIOService serv) {
