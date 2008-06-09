@@ -78,7 +78,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 	public static final boolean RETURN_SERVICE_DISCO_VAL = true;
 	public static final String IDENTITY_TYPE_KEY = "identity-type";
 	public static final String IDENTITY_TYPE_VAL = "generic";
-	public static final String CONNECT_ALL_PAR = "--connect-all";
+	public static final String CONNECT_ALL_PAR = "--cluster-connect-all";
 	public static final String CONNECT_ALL_PROP_KEY = "connect-all";
 	public static final boolean CONNECT_ALL_PROP_VAL = false;
 	public static final String XMLNS = "tigase:cluster";
