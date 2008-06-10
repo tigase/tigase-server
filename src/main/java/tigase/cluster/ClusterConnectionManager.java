@@ -48,6 +48,7 @@ import tigase.util.Algorithms;
 import tigase.util.JIDUtils;
 import tigase.util.DNSResolver;
 import tigase.xml.Element;
+import tigase.xmpp.StanzaType;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.XMPPIOService;
 import tigase.xmpp.PacketErrorTypeException;
@@ -70,9 +71,6 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 	public String PORT_LOCAL_HOST_PROP_VAL = "localhost";
 	public String PORT_REMOTE_HOST_PROP_VAL = "comp-1.localhost";
 	public static final String PORT_ROUTING_TABLE_PROP_KEY = "routing-table";
-	public String[] PORT_ROUTING_TABLE_PROP_VAL =
-	{ PORT_REMOTE_HOST_PROP_VAL, ".*@" + PORT_REMOTE_HOST_PROP_VAL,
-		".*\\." + PORT_REMOTE_HOST_PROP_VAL };
 	public String[] PORT_IFC_PROP_VAL = {"*"};
 	public static final String RETURN_SERVICE_DISCO_KEY = "service-disco";
 	public static final boolean RETURN_SERVICE_DISCO_VAL = true;
@@ -80,6 +78,9 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 	public static final String IDENTITY_TYPE_VAL = "generic";
 	public static final String CONNECT_ALL_PAR = "--cluster-connect-all";
 	public static final String CONNECT_ALL_PROP_KEY = "connect-all";
+	public static final String CLUSTER_CONTR_ID_PROP_KEY = "cluster-controller-id";
+	//	public static final String NOTIFY_ADMINS_PROP_KEY = "notify-admins";
+	//	public static final boolean NOTIFY_ADMINS_PROP_VAL = true;
 	public static final boolean CONNECT_ALL_PROP_VAL = false;
 	public static final String XMLNS = "tigase:cluster";
 
@@ -87,6 +88,9 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 	//private boolean service_disco = RETURN_SERVICE_DISCO_VAL;
 	private String identity_type = IDENTITY_TYPE_VAL;
 	private boolean connect_all = CONNECT_ALL_PROP_VAL;
+	//	private boolean notify_admins = NOTIFY_ADMINS_PROP_VAL;
+	//	private String[] admins = new String[] {};
+	private String cluster_controller_id = null;
 
   /**
    * Variable <code>log</code> is a class logger.
@@ -132,13 +136,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 		case connect: {
 			String data = p.getElemCData();
 			if (data == null) {
-				String[] routings =
-					(String[])serv.getSessionData().get(PORT_ROUTING_TABLE_PROP_KEY);
-				updateRoutings(routings, true);
-				String addr =
-					(String)serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
-				log.fine("Connected to: " + addr);
-				updateServiceDiscovery(addr, "XEP-0114 connected");
+				serviceConnected(serv);
 			} else {
 				log.warning("Incorrect packet received: " + p.getStringData());
 			}
@@ -157,12 +155,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 				if (digest != null && digest.equals(loc_digest)) {
 					Packet resp = new Packet(new Element("handshake"));
 					writePacketToSocket(serv, resp);
-					String[] routings =
-						(String[])serv.getSessionData().get(PORT_ROUTING_TABLE_PROP_KEY);
-					updateRoutings(routings, true);
-					String addr = (String)serv.getSessionData().get(serv.HOSTNAME_KEY);
-					log.fine("Connected to: " + addr);
-					updateServiceDiscovery(addr, "XEP-0114 connected");
+					serviceConnected(serv);
 				} else {
 					log.info("Handshaking password doesn't match, disconnecting...");
 					serv.stop();
@@ -178,6 +171,19 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 		} // end of switch (service.connectionType())
 	}
 
+	protected void serviceConnected(XMPPIOService serv) {
+		String[] routings =
+			(String[])serv.getSessionData().get(PORT_ROUTING_TABLE_PROP_KEY);
+		updateRoutings(routings, true);
+		String addr =
+			(String)serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
+		log.fine("Connected to: " + addr);
+		updateServiceDiscovery(addr, "XEP-0114 connected");
+		addOutPacket(new Packet(ClusterElement.createClusterConnectedNodes(
+					getComponentId(), cluster_controller_id,
+					StanzaType.set.toString(), addr)));
+	}
+
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
 		//service_disco = (Boolean)props.get(RETURN_SERVICE_DISCO_KEY);
@@ -188,6 +194,9 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 		serviceEntity.addIdentities(
 			new ServiceIdentity("component", identity_type, "XEP-0114 " + getName()));
 		connect_all = (Boolean)props.get(CONNECT_ALL_PROP_KEY);
+		cluster_controller_id = (String)props.get(CLUSTER_CONTR_ID_PROP_KEY);
+// 		notify_admins = (Boolean)props.get(NOTIFY_ADMINS_PROP_KEY);
+// 		admins = (String[])props.get(ADMINS_PROP_KEY);
 		connectionDelay = 30*SECOND;
 		String[] cl_nodes = (String[])props.get(CLUSTER_NODES_PROP_KEY);
 		if (cl_nodes != null) {
@@ -231,6 +240,15 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 		} else {
 			props.put(CLUSTER_NODES_PROP_KEY, new String[] {getDefHostName()});
 		}
+		props.put(CLUSTER_CONTR_ID_PROP_KEY,
+			DEF_CLUST_CONTR_NAME + "@" + getDefHostName());
+// 		props.put(NOTIFY_ADMINS_PROP_KEY, NOTIFY_ADMINS_PROP_VAL);
+// 		if (params.get(GEN_ADMINS) != null) {
+// 			admins = ((String)params.get(GEN_ADMINS)).split(",");
+// 		} else {
+// 			admins = new String[] { "admin@localhost" };
+// 		}
+// 		props.put(ADMINS_PROP_KEY, admins);
 		return props;
 	}
 
@@ -267,6 +285,9 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 		String addr = (String)sessionData.get(PORT_REMOTE_HOST_PROP_KEY);
 		log.fine("Disonnected from: " + addr);
 		updateServiceDiscovery(addr, "XEP-0114 disconnected");
+		addOutPacket(new Packet(ClusterElement.createClusterDisconnectedNodes(
+					getComponentId(), cluster_controller_id,
+					StanzaType.set.toString(), addr)));
 	}
 
 	protected String getServiceId(Packet packet) {

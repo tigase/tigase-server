@@ -34,18 +34,21 @@ import tigase.server.Packet;
  * specific packets. The cluster packet has the following form:
  * <pre>
  * <cluster xmlns="tigase:cluster" from="source" to="dest" type="set">
- *   <packets>
+ *   <data>
  *     <message xmlns="jabber:client" from="source-u" to="dest-x" type="chat">
  *       <body>Hello world!</body>
  *     </message>
- *   </packets>
- *   <data>
+ *   </data>
+ *   <control>
  *     <first-node>node1 JID address</first-node>
  *     <visited-nodes>
  *       <node-id>node1 JID address</node-id>
  *       <node-id>node2 JID address</node-id>
  *     </visited-nodes>
- *   </data>
+ *     <connected-node>devel.tigase.org</connected-node>
+ *     <connected-node>test-i.tigase.org</connected-node>
+ *     <disconnected-node>shell2.tigase.org</disconnected-node>
+ *   </control>
  * </cluster>
  * </pre>
  * If none of nodes could process the packet it goes back to the first node
@@ -62,19 +65,25 @@ public class ClusterElement {
 	public static final String XMLNS = "tigase:cluster";
 
 	public static final String CLUSTER_EL_NAME = "cluster";
+	public static final String CLUSTER_CONTROL_EL_NAME = "control";
+	public static final String CLUSTER_CONTROL_PATH =
+    "/" + CLUSTER_EL_NAME + "/" + CLUSTER_CONTROL_EL_NAME;
 	public static final String CLUSTER_DATA_EL_NAME = "data";
 	public static final String CLUSTER_DATA_PATH =
     "/" + CLUSTER_EL_NAME + "/" + CLUSTER_DATA_EL_NAME;
-	public static final String CLUSTER_PACKETS_EL_NAME = "packets";
-	public static final String CLUSTER_PACKETS_PATH =
-    "/" + CLUSTER_EL_NAME + "/" + CLUSTER_PACKETS_EL_NAME;
+	public static final String CLUSTER_CONNECTED_NODE_EL_NAME = "connected-node";
+	public static final String CLUSTER_CONNECTED_NODE_PATH =
+    "/" + CLUSTER_CONTROL_PATH + "/" + CLUSTER_CONNECTED_NODE_EL_NAME;
+	public static final String CLUSTER_DISCONNECTED_NODE_EL_NAME = "disconnected-node";
+	public static final String CLUSTER_DISCONNECTED_NODE_PATH =
+    "/" + CLUSTER_CONTROL_PATH + "/" + CLUSTER_DISCONNECTED_NODE_EL_NAME;
 	public static final String VISITED_NODES_EL_NAME = "visited-nodes";
 	public static final String FIRST_NODE_EL_NAME = "first-node";
 	public static final String PACKET_FROM_ATTR_NAME = "packet-from";
 	public static final String FIRST_NODE_PATH =
-    CLUSTER_DATA_PATH + "/" + FIRST_NODE_EL_NAME;
+    CLUSTER_CONTROL_PATH + "/" + FIRST_NODE_EL_NAME;
 	public static final String VISITED_NODES_PATH =
-    CLUSTER_DATA_PATH + "/" + VISITED_NODES_EL_NAME;
+    CLUSTER_CONTROL_PATH + "/" + VISITED_NODES_EL_NAME;
 	public static final String NODE_ID_EL_NAME = "node-id";
 
 	private Element elem = null;
@@ -88,7 +97,7 @@ public class ClusterElement {
 	 */
 	public ClusterElement(Element elem) {
 		this.elem = elem;
-		packets = elem.getChildren(CLUSTER_PACKETS_PATH);
+		packets = elem.getChildren(CLUSTER_DATA_PATH);
 		first_node = elem.getCData(FIRST_NODE_PATH);
 		visited_nodes = new LinkedHashSet<String>();
 		List<Element> nodes = elem.getChildren(VISITED_NODES_PATH);
@@ -117,10 +126,42 @@ public class ClusterElement {
 			new String[] {"from", "to", "type"},
 			new String[] {from, to, type});
 		cluster_el.setXMLNS(XMLNS);
-		cluster_el.addChild(new Element(CLUSTER_PACKETS_EL_NAME,
-				new String[] {PACKET_FROM_ATTR_NAME}, new String[] {packet_from}));
 		cluster_el.addChild(new Element(CLUSTER_DATA_EL_NAME,
+				new String[] {PACKET_FROM_ATTR_NAME}, new String[] {packet_from}));
+		cluster_el.addChild(new Element(CLUSTER_CONTROL_EL_NAME,
 				new Element[] {new Element(VISITED_NODES_EL_NAME)}, null, null));
+		return cluster_el;
+	}
+
+	public static Element createClusterConnectedNodes(String from, String to,
+		String type, String ... nodes) {
+		Element cluster_el = new Element(CLUSTER_EL_NAME,
+			new String[] {"from", "to", "type"},
+			new String[] {from, to, type});
+		cluster_el.setXMLNS(XMLNS);
+		cluster_el.addChild(new Element(CLUSTER_DATA_EL_NAME));
+		cluster_el.addChild(new Element(CLUSTER_CONTROL_EL_NAME,
+				new Element[] {new Element(VISITED_NODES_EL_NAME)}, null, null));
+		for (String node: nodes) {
+			cluster_el.findChild(CLUSTER_CONTROL_PATH)
+        .addChild(new Element(CLUSTER_CONNECTED_NODE_EL_NAME, node));
+		}
+		return cluster_el;
+	}
+
+	public static Element createClusterDisconnectedNodes(String from, String to,
+		String type, String ... nodes) {
+		Element cluster_el = new Element(CLUSTER_EL_NAME,
+			new String[] {"from", "to", "type"},
+			new String[] {from, to, type});
+		cluster_el.setXMLNS(XMLNS);
+		cluster_el.addChild(new Element(CLUSTER_DATA_EL_NAME));
+		cluster_el.addChild(new Element(CLUSTER_CONTROL_EL_NAME,
+				new Element[] {new Element(VISITED_NODES_EL_NAME)}, null, null));
+		for (String node: nodes) {
+			cluster_el.findChild(CLUSTER_CONTROL_PATH)
+        .addChild(new Element(CLUSTER_DISCONNECTED_NODE_EL_NAME, node));
+		}
 		return cluster_el;
 	}
 
@@ -141,7 +182,7 @@ public class ClusterElement {
 
 	public void addDataPacket(Packet packet) {
 		packets.add(packet.getElement());
-		elem.findChild(CLUSTER_PACKETS_PATH).addChild(packet.getElement());
+		elem.findChild(CLUSTER_DATA_PATH).addChild(packet.getElement());
 	}
 
 	public List<Element> getDataPackets() {
@@ -149,7 +190,7 @@ public class ClusterElement {
 	}
 
 	public String getDataPacketFrom() {
-		return elem.getAttribute(CLUSTER_PACKETS_PATH, PACKET_FROM_ATTR_NAME);
+		return elem.getAttribute(CLUSTER_DATA_PATH, PACKET_FROM_ATTR_NAME);
 	}
 
 	public Element getClusterElement() {
@@ -159,7 +200,7 @@ public class ClusterElement {
 	public void addVisitedNode(String node_id) {
 		if (visited_nodes.size() == 0) {
 			first_node = node_id;
-			elem.findChild(CLUSTER_DATA_PATH)
+			elem.findChild(CLUSTER_CONTROL_PATH)
         .addChild(new Element(FIRST_NODE_EL_NAME, node_id));
 		}
 		visited_nodes.add(node_id);
@@ -173,6 +214,42 @@ public class ClusterElement {
 
 	public Set<String> getVisitedNodes() {
 		return visited_nodes;
+	}
+
+	public Set<String> getConnectedNodes() {
+		Set<String> nodes = new LinkedHashSet<String>();
+		List<Element> children = elem.getChildren(CLUSTER_CONTROL_PATH);
+		for (Element child: children) {
+			if (child.getName() == CLUSTER_CONNECTED_NODE_EL_NAME) {
+				nodes.add(child.getCData());
+			}
+		}
+		return nodes.size() > 0 ? nodes : null;
+	}
+
+	public void addConnectedNodes(String ... nodes) {
+		for (String node: nodes) {
+			elem.findChild(CLUSTER_CONTROL_PATH)
+        .addChild(new Element(CLUSTER_CONNECTED_NODE_EL_NAME, node));
+		}
+	}
+
+	public Set<String> getDisconnectedNodes() {
+		Set<String> nodes = new LinkedHashSet<String>();
+		List<Element> children = elem.getChildren(CLUSTER_CONTROL_PATH);
+		for (Element child: children) {
+			if (child.getName() == CLUSTER_DISCONNECTED_NODE_EL_NAME) {
+				nodes.add(child.getCData());
+			}
+		}
+		return nodes.size() > 0 ? nodes : null;
+	}
+
+	public void addDisconnectedNodes(String ... nodes) {
+		for (String node: nodes) {
+			elem.findChild(CLUSTER_CONTROL_PATH)
+        .addChild(new Element(CLUSTER_DISCONNECTED_NODE_EL_NAME, node));
+		}
 	}
 
 }

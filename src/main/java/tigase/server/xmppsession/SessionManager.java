@@ -360,13 +360,7 @@ public class SessionManager extends AbstractMessageReceiver
 			if (packet.getElemName().equals("message")) {
 				// Yes this packet is for admin....
 				log.finer("Packet for admin: " + packet.getStringData());
-				for (String admin: admins) {
-					log.finer("Sending packet to admin: " + admin);
-					Packet admin_pac =
-            new Packet(packet.getElement().clone());
-					admin_pac.getElement().setAttribute("to", admin);
-					processPacket(admin_pac);
-				}
+				sendToAdmins(packet);
 			} else {
 				log.finer("Packet for hostname: " + packet.getStringData());
 				Packet host_pac =
@@ -378,6 +372,16 @@ public class SessionManager extends AbstractMessageReceiver
 			return true;
 		} // end of if (isInRoutings(to))
 		return false;
+	}
+
+	protected void sendToAdmins(Packet packet) {
+		for (String admin: admins) {
+			log.finer("Sending packet to admin: " + admin);
+			Packet admin_pac =
+        new Packet(packet.getElement().clone());
+			admin_pac.getElement().setAttribute("to", admin);
+			processPacket(admin_pac);
+		}
 	}
 
 	private XMPPSession getSession(String jid) {

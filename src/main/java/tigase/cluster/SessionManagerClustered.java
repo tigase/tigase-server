@@ -49,7 +49,8 @@ import static tigase.server.xmppsession.SessionManagerConfig.*;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class SessionManagerClustered extends SessionManager {
+public class SessionManagerClustered extends SessionManager
+	implements ClusteredComponent {
 
   /**
    * Variable <code>log</code> is a class logger.
@@ -177,26 +178,55 @@ public class SessionManagerClustered extends SessionManager {
 
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
-		String[] cl_nodes = (String[])props.get(CLUSTER_NODES_PROP_KEY);
-		log.config("Cluster nodes loaded: " + Arrays.toString(cl_nodes));
-		cluster_nodes = new LinkedHashSet<String>(Arrays.asList(cl_nodes));
-		broken_nodes = new LinkedHashSet<String>();
+// 		String[] cl_nodes = (String[])props.get(CLUSTER_NODES_PROP_KEY);
+// 		log.config("Cluster nodes loaded: " + Arrays.toString(cl_nodes));
+// 		cluster_nodes = new LinkedHashSet<String>(Arrays.asList(cl_nodes));
+// 		broken_nodes = new LinkedHashSet<String>();
 	}
 
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> props = super.getDefaults(params);
-		if (params.get(CLUSTER_NODES) != null) {
-			String[] cl_nodes = ((String)params.get(CLUSTER_NODES)).split(",");
-			for (int i = 0; i < cl_nodes.length; i++) {
-				if (cl_nodes[i].equals(JIDUtils.getNodeHost(cl_nodes[i]))) {
-					cl_nodes[i] = DEF_SM_NAME + "@" + cl_nodes[i];
-				}
-			}
-			props.put(CLUSTER_NODES_PROP_KEY, cl_nodes);
-		} else {
-			props.put(CLUSTER_NODES_PROP_KEY, new String[] {getComponentId()});
-		}
+// 		if (params.get(CLUSTER_NODES) != null) {
+// 			String[] cl_nodes = ((String)params.get(CLUSTER_NODES)).split(",");
+// 			for (int i = 0; i < cl_nodes.length; i++) {
+// 				if (cl_nodes[i].equals(JIDUtils.getNodeHost(cl_nodes[i]))) {
+// 					cl_nodes[i] = DEF_SM_NAME + "@" + cl_nodes[i];
+// 				}
+// 			}
+// 			props.put(CLUSTER_NODES_PROP_KEY, cl_nodes);
+// 		} else {
+// 			props.put(CLUSTER_NODES_PROP_KEY, new String[] {getComponentId()});
+// 		}
 		return props;
+	}
+
+	public void nodesConnected(Set<String> node_hostnames) {
+		cluster_nodes.addAll(node_hostnames);
+		broken_nodes.removeAll(node_hostnames);
+		sendClusterNotification("Cluster nodes have been connected:",
+			"New cluster nodes connected", node_hostnames);
+	}
+
+	public void nodesDisconnected(Set<String> node_hostnames) {
+		cluster_nodes.removeAll(node_hostnames);
+		broken_nodes.addAll(node_hostnames);
+		sendClusterNotification("Cluster nodes have been disconnected:",
+			"Disconnected cluster nodes", node_hostnames);
+	}
+
+	private void sendClusterNotification(String msg, String subject,
+		Set<String> nodes) {
+		String message = msg;
+		if (nodes != null) {
+			message = msg + "\n";
+		}
+		int cnt = 0;
+		for (String node: nodes) {
+			message += "" + (++cnt) + ". " + node;
+		}
+		Packet p_msg = Packet.getMessage("", getComponentId(), StanzaType.headline,
+			message, subject, "xyz");
+		sendToAdmins(p_msg);
 	}
 
 }
