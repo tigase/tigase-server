@@ -202,8 +202,8 @@ public class SessionManagerClustered extends SessionManager
 
 	public void nodesConnected(Set<String> node_hostnames) {
 		for (String node: node_hostnames) {
-			cluster_nodes.add(DEF_SM_NAME + "@" + node_hostnames);
-			broken_nodes.remove(DEF_SM_NAME + "@" + node_hostnames);
+			cluster_nodes.add(DEF_SM_NAME + "@" + node);
+			broken_nodes.remove(DEF_SM_NAME + "@" + node);
 		}
 		sendClusterNotification("Cluster nodes have been connected:",
 			"New cluster nodes connected", node_hostnames);
@@ -211,8 +211,8 @@ public class SessionManagerClustered extends SessionManager
 
 	public void nodesDisconnected(Set<String> node_hostnames) {
 		for (String node: node_hostnames) {
-			cluster_nodes.remove(DEF_SM_NAME + "@" + node_hostnames);
-			broken_nodes.add(DEF_SM_NAME + "@" + node_hostnames);
+			cluster_nodes.remove(DEF_SM_NAME + "@" + node);
+			broken_nodes.add(DEF_SM_NAME + "@" + node);
 		}
 		sendClusterNotification("Cluster nodes have been disconnected:",
 			"Disconnected cluster nodes", node_hostnames);
