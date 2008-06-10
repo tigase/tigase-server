@@ -178,7 +178,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 		String addr =
 			(String)serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
 		log.fine("Connected to: " + addr);
-		updateServiceDiscovery(addr, "XEP-0114 connected");
+		updateServiceDiscovery(addr, XMLNS + " connected");
 		addOutPacket(new Packet(ClusterElement.createClusterConnectedNodes(
 					getComponentId(), cluster_controller_id,
 					StanzaType.set.toString(), addr)));
@@ -190,9 +190,9 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 		identity_type = (String)props.get(IDENTITY_TYPE_KEY);
 
 		//serviceEntity = new ServiceEntity(getName(), "external", "XEP-0114");
-		serviceEntity = new ServiceEntity("XEP-0114 " + getName(), null, "XEP-0114");
+		serviceEntity = new ServiceEntity(XMLNS + " " + getName(), null, XMLNS);
 		serviceEntity.addIdentities(
-			new ServiceIdentity("component", identity_type, "XEP-0114 " + getName()));
+			new ServiceIdentity("component", identity_type, XMLNS + " " + getName()));
 		connect_all = (Boolean)props.get(CONNECT_ALL_PROP_KEY);
 		cluster_controller_id = (String)props.get(CLUSTER_CONTR_ID_PROP_KEY);
 // 		notify_admins = (Boolean)props.get(NOTIFY_ADMINS_PROP_KEY);
@@ -284,7 +284,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 		//		removeRouting(serv.getRemoteHost());
 		String addr = (String)sessionData.get(PORT_REMOTE_HOST_PROP_KEY);
 		log.fine("Disonnected from: " + addr);
-		updateServiceDiscovery(addr, "XEP-0114 disconnected");
+		updateServiceDiscovery(addr, XMLNS + " disconnected");
 		addOutPacket(new Packet(ClusterElement.createClusterDisconnectedNodes(
 					getComponentId(), cluster_controller_id,
 					StanzaType.set.toString(), addr)));
@@ -359,6 +359,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 		case accept: {
 			String remote_host = attribs.get("from");
 			service.getSessionData().put(service.HOSTNAME_KEY, remote_host);
+			service.getSessionData().put(PORT_REMOTE_HOST_PROP_KEY, remote_host);
 			service.getSessionData().put(PORT_ROUTING_TABLE_PROP_KEY,
 				new String[] {remote_host, ".*@" + remote_host, ".*\\." + remote_host});
 			String id = UUID.randomUUID().toString();

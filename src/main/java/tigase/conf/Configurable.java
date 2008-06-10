@@ -139,8 +139,8 @@ public interface Configurable extends ServerComponent {
 	public static final String DEF_SRECV_NAME = "srecv";
 	public static final String DEF_BOSH_NAME = "bosh";
 
-	public static final String DEF_CLUST_CONTR_NAME = "cluster-contr";
 	public static final String DEF_STATS_NAME = "stats";
+	public static final String DEF_CLUST_CONTR_NAME = "cluster-contr";
 
 	public static final String ROUTER_COMP_CLASS_NAME =
 		"tigase.server.MessageRouter";
