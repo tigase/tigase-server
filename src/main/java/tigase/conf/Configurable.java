@@ -138,7 +138,9 @@ public interface Configurable extends ServerComponent {
 	public static final String DEF_SSEND_NAME = "ssend";
 	public static final String DEF_SRECV_NAME = "srecv";
 	public static final String DEF_BOSH_NAME = "bosh";
+
 	public static final String DEF_CLUST_CONTR_NAME = "cluster-contr";
+	public static final String DEF_STATS_NAME = "stats";
 
 	public static final String ROUTER_COMP_CLASS_NAME =
 		"tigase.server.MessageRouter";
@@ -160,6 +162,12 @@ public interface Configurable extends ServerComponent {
 		"tigase.server.sreceiver.StanzaReceiver";
 	public static final String BOSH_COMP_CLASS_NAME =
 		"tigase.server.bosh.BoshConnectionManager";
+
+	public static final String STATS_CLASS_NAME =
+		"tigase.stats.StatisticsCollector";
+	public static final String CLUSTER_CONTR_CLASS_NAME =
+    "tigase.cluster.ClusterController";
+
 
 	public static final String HOSTNAMES_PROP_KEY = "hostnames";
 	public static final String ADMINS_PROP_KEY = "admins";

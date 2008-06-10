@@ -62,21 +62,23 @@ public class MessageRouterConfig {
 	private static final String[] CS_MSG_RECEIVERS_NAMES_PROP_VAL =
 	{	DEF_C2S_NAME, DEF_S2S_NAME, DEF_EXT_COMP_NAME, DEF_BOSH_NAME };
 
-	private static final Map<String, String> MSG_RCV_CLASSES =
+	private static final Map<String, String> COMPONENT_CLASSES =
 		new LinkedHashMap<String, String>();
 
 	private static final Map<String, String> COMP_CLUS_MAP =
 		new LinkedHashMap<String, String>();
 
 	static {
-		MSG_RCV_CLASSES.put(DEF_C2S_NAME, C2S_COMP_CLASS_NAME);
-		MSG_RCV_CLASSES.put(DEF_S2S_NAME, S2S_COMP_CLASS_NAME);
-		MSG_RCV_CLASSES.put(DEF_EXT_COMP_NAME, EXT_COMP_CLASS_NAME);
-		MSG_RCV_CLASSES.put(DEF_CL_COMP_NAME, CL_COMP_CLASS_NAME);
-		MSG_RCV_CLASSES.put(DEF_SM_NAME, SM_COMP_CLASS_NAME);
-		MSG_RCV_CLASSES.put(DEF_SSEND_NAME, SSEND_COMP_CLASS_NAME);
-		MSG_RCV_CLASSES.put(DEF_SRECV_NAME, SRECV_COMP_CLASS_NAME);
-		MSG_RCV_CLASSES.put(DEF_BOSH_NAME, BOSH_COMP_CLASS_NAME);
+		COMPONENT_CLASSES.put(DEF_C2S_NAME, C2S_COMP_CLASS_NAME);
+		COMPONENT_CLASSES.put(DEF_S2S_NAME, S2S_COMP_CLASS_NAME);
+		COMPONENT_CLASSES.put(DEF_EXT_COMP_NAME, EXT_COMP_CLASS_NAME);
+		COMPONENT_CLASSES.put(DEF_CL_COMP_NAME, CL_COMP_CLASS_NAME);
+		COMPONENT_CLASSES.put(DEF_SM_NAME, SM_COMP_CLASS_NAME);
+		COMPONENT_CLASSES.put(DEF_SSEND_NAME, SSEND_COMP_CLASS_NAME);
+		COMPONENT_CLASSES.put(DEF_SRECV_NAME, SRECV_COMP_CLASS_NAME);
+		COMPONENT_CLASSES.put(DEF_BOSH_NAME, BOSH_COMP_CLASS_NAME);
+		COMPONENT_CLASSES.put(DEF_STATS_NAME, STATS_CLASS_NAME);
+		COMPONENT_CLASSES.put(DEF_CLUST_CONTR_NAME, CLUSTER_CONTR_CLASS_NAME);
 
 		COMP_CLUS_MAP.put(SM_COMP_CLASS_NAME, SM_CLUS_COMP_CLASS_NAME);
 	}
@@ -84,15 +86,10 @@ public class MessageRouterConfig {
 	public static final String REGISTRATOR_PROP_KEY = "components/registrators/";
 	public static final String REGISTRATOR_NAMES_PROP_KEY =
 		REGISTRATOR_PROP_KEY + "id-names";
-	private static final String[] REGISTRATOR_NAMES_PROP_VAL =	{	"stat-1" };
-
-	public static final String STAT_1_CLASS_PROP_KEY =
-		REGISTRATOR_PROP_KEY + "stat-1.class";
-	public static final String STAT_1_CLASS_PROP_VAL =
-		"tigase.stats.StatisticsCollector";
-	public static final String STAT_1_ACTIVE_PROP_KEY =
-		REGISTRATOR_PROP_KEY + "stat-1.active";
-	public static final boolean STAT_1_ACTIVE_PROP_VAL = true;
+	private static final String[] DEF_REGISTRATOR_NAMES_PROP_VAL =
+	{	DEF_STATS_NAME };
+	private static final String[] CLUSTER_REGISTRATOR_NAMES_PROP_VAL =
+	{	DEF_STATS_NAME, DEF_CLUST_CONTR_NAME };
 
 	public static final String DISCO_NAME_PROP_KEY = "disco-name";
 	public static final String DISCO_NAME_PROP_VAL = tigase.server.XMPPServer.NAME;
@@ -108,11 +105,13 @@ public class MessageRouterConfig {
 	public static void getDefaults(Map<String, Object> defs,
 		Map<String, Object> params, String comp_name) {
 
+		boolean cluster_mode = isTrue((String)params.get(CLUSTER_MODE));
+
 		log.config("Cluster mode: " + params.get(CLUSTER_MODE));
-		if (isTrue((String)params.get(CLUSTER_MODE))) {
+		if (cluster_mode) {
 			log.config("Cluster mode is on, replacing known components with cluster"
 				+ " versions:");
-			for (Map.Entry<String, String> entry: MSG_RCV_CLASSES.entrySet()) {
+			for (Map.Entry<String, String> entry: COMPONENT_CLASSES.entrySet()) {
 				String cls = COMP_CLUS_MAP.get(entry.getValue());
 				if (cls != null) {
 					log.config("Replacing " + entry.getValue() + " with " + cls);
@@ -180,7 +179,7 @@ public class MessageRouterConfig {
 		} // end of for ()
 
 		// Add XEP-0114 for cluster communication
-		if (isTrue((String)params.get(CLUSTER_MODE))) {
+		if (cluster_mode) {
 			log.config("In cluster mode I am setting up 1 listening xep-0114 component:");
 			if (Arrays.binarySearch(rcv_names, DEF_CL_COMP_NAME) < 0) {
 				defs.put(MSG_RECEIVERS_PROP_KEY + DEF_CL_COMP_NAME + ".class",
@@ -195,7 +194,7 @@ public class MessageRouterConfig {
 		defs.put(MSG_RECEIVERS_NAMES_PROP_KEY, rcv_names);
 		for (String name: rcv_names) {
 			if (defs.get(MSG_RECEIVERS_PROP_KEY + name + ".class") == null) {
-				String def_class = MSG_RCV_CLASSES.get(name);
+				String def_class = COMPONENT_CLASSES.get(name);
 				if (def_class == null) {
 					def_class = EXT_COMP_CLASS_NAME;
 				}
@@ -203,9 +202,15 @@ public class MessageRouterConfig {
 				defs.put(MSG_RECEIVERS_PROP_KEY + name + ".active", true);
 			}
 		}
-		defs.put(REGISTRATOR_NAMES_PROP_KEY, REGISTRATOR_NAMES_PROP_VAL);
-		defs.put(STAT_1_CLASS_PROP_KEY, STAT_1_CLASS_PROP_VAL);
-		defs.put(STAT_1_ACTIVE_PROP_KEY, STAT_1_ACTIVE_PROP_VAL);
+		String[] registr = DEF_REGISTRATOR_NAMES_PROP_VAL;
+		if (cluster_mode) {
+			registr = CLUSTER_REGISTRATOR_NAMES_PROP_VAL;
+		}
+		defs.put(REGISTRATOR_NAMES_PROP_KEY, registr);
+		for (String reg: registr) {
+			defs.put(REGISTRATOR_PROP_KEY + reg + ".class", COMPONENT_CLASSES.get(reg));
+			defs.put(REGISTRATOR_PROP_KEY + reg + ".active", true);
+		}
 		if (params.get(GEN_VIRT_HOSTS) != null) {
 			LOCAL_ADDRESSES_PROP_VALUE =
 				 ((String)params.get(GEN_VIRT_HOSTS)).split(",");
