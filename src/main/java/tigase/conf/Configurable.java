@@ -148,6 +148,8 @@ public interface Configurable extends ServerComponent {
 		"tigase.server.xmppclient.ClientConnectionManager";
 	public static final String S2S_COMP_CLASS_NAME =
 		"tigase.server.xmppserver.ServerConnectionManager";
+	public static final String S2S_CLUST_COMP_CLASS_NAME =
+		"tigase.cluster.ServerConnectionClustered";
 	public static final String SM_COMP_CLASS_NAME =
 		"tigase.server.xmppsession.SessionManager";
 	public static final String SM_CLUS_COMP_CLASS_NAME =

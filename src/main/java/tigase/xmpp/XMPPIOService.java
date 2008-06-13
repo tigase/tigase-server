@@ -175,7 +175,7 @@ public class XMPPIOService extends IOService {
 		Packet packet = null;
 		while ((packet = waitingPackets.poll()) != null) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Sending packet: " + packet.getStringData());
+				log.finest("Sending packet: " + packet.toString());
 			}
 			writeRawData(packet.getStringData());
 			if (log.isLoggable(Level.FINEST)) {

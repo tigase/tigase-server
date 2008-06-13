@@ -81,6 +81,7 @@ public class MessageRouterConfig {
 		COMPONENT_CLASSES.put(DEF_CLUST_CONTR_NAME, CLUSTER_CONTR_CLASS_NAME);
 
 		COMP_CLUS_MAP.put(SM_COMP_CLASS_NAME, SM_CLUS_COMP_CLASS_NAME);
+		COMP_CLUS_MAP.put(S2S_COMP_CLASS_NAME, S2S_CLUST_COMP_CLASS_NAME);
 	}
 
 	public static final String REGISTRATOR_PROP_KEY = "components/registrators/";

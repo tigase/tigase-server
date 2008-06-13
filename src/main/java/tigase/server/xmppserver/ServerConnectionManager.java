@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.LinkedList;
+import java.util.LinkedHashSet;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
@@ -70,7 +71,8 @@ import tigase.stats.StatRecord;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class ServerConnectionManager extends ConnectionManager<XMPPIOService> {
+public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
+	implements ConnectionHandlerIfc {
 
 	/**
    * Variable <code>log</code> is a class logger.
@@ -78,7 +80,12 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService> {
   private static final Logger log =
     Logger.getLogger("tigase.server.xmppserver.ServerConnectionManager");
 
-	private static final String DIALBACK_XMLNS = "jabber:server:dialback";
+	private static final String XMLNS_DB_ATT = "xmlns:db";
+	private static final String XMLNS_DB_VAL = "jabber:server:dialback";
+	private static final String RESULT_EL_NAME = "result";
+	private static final String DB_RESULT_EL_NAME = "db:result";
+	private static final String VERIFY_EL_NAME = "verify";
+	private static final String DB_VERIFY_EL_NAME = "db:verify";
 	public static final String HOSTNAMES_PROP_KEY = "hostnames";
 	public String[] HOSTNAMES_PROP_VAL =	{"localhost", "hostname"};
 	public static final String MAX_PACKET_WAITING_TIME_PROP_KEY =
@@ -103,46 +110,13 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService> {
 	/**
 	 * Services connected and autorized/autenticated
 	 */
-	private Map<String, XMPPIOService> servicesByHost_Type =
-		new HashMap<String, XMPPIOService>();
-
-	/**
-	 * Services which are in process of establishing s2s connection
-	 */
-	private Map<String, XMPPIOService> handshakingByHost_Type =
-		new HashMap<String, XMPPIOService>();
-
-	/**
-	 * Connections IDs (cids) of services which are in process of connecting
-	 */
-	private Set<String> connectingByHost_Type = new HashSet<String>();
-
-	/**
-	 * Normal packets between users on different servers
-	 */
-	private Map<String, ServerPacketQueue> waitingPackets =
-		new ConcurrentSkipListMap<String, ServerPacketQueue>();
-
-	/**
-	 * Controll packets for s2s connection establishing
-	 */
-	private Map<String, ServerPacketQueue> waitingControlPackets =
-		new ConcurrentSkipListMap<String, ServerPacketQueue>();
-
-	/**
-	 * Data shared between sessions. Some servers (like google for example)
-	 * use different IP address for outgoing and incoming data and as sessions
-	 * are identified by IP address we have to create 2 separate sessions
-	 * objects for such server. These sessions have to share session ID and
-	 * dialback key.
-	 */
-	private Map<String, Object> sharedSessionData =
-		new ConcurrentSkipListMap<String, Object>();
+	private Map<String, ServerConnections> connectionsByLocalRemote =
+		new ConcurrentSkipListMap<String, ServerConnections>();
 
 	public void processPacket(Packet packet) {
-// 		log.finer("Processing packet: " + packet.getElemName()
-// 			+ ", type: " + packet.getType());
-		log.finest("Processing packet: " + packet.getStringData());
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Processing packet: " + packet.toString());
+		}
 		if (!packet.isCommand() || !processCommand(packet)) {
 
 			if (packet.getElemTo() == null) {
@@ -171,74 +145,95 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService> {
 				try {
 					addOutPacket(
 						Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet,
-							"S2S - not delivered", true));
+							"S2S - not delivered. Server missconfiguration.", true));
 				} catch (PacketErrorTypeException e) {
 					log.warning("Packet processing exception: " + e);
 				}
 				return;
 			}
 
+			// I think from_hostname needs to be different from to_hostname at
+			// this point... or s2s doesn't make sense
+			String from_hostname = JIDUtils.getNodeHost(packet.getElemFrom());
+			if (to_hostname.equals(from_hostname)) {
+				log.warning("Dropping incorrect packet - from_hostname == to_hostname: "
+					+ packet.toString());
+				return;
+			}
+
 			String cid = getConnectionId(packet);
 			log.finest("Connection ID is: " + cid);
-			synchronized(servicesByHost_Type) {
-				XMPPIOService serv = servicesByHost_Type.get(cid);
-				if (serv == null || !writePacketToSocket(serv, packet)) {
-					addWaitingPacket(cid, packet, waitingPackets);
-				} // end of if (serv != null) else
+			ServerConnections serv_conn = connectionsByLocalRemote.get(cid);
+			if (serv_conn == null
+				|| (!serv_conn.sendPacket(packet) && serv_conn.needsConnection())) {
+				createServerConnection(cid, packet, serv_conn);
 			}
 		} // end of else
 	}
 
-	private void addWaitingPacket(String cid, Packet packet,
-		Map<String, ServerPacketQueue> waitingPacketsMap) {
+	private ServerConnections createNewServerConnections(String cid, Packet packet) {
+		ServerConnections conns = new ServerConnections(this);
+		if (packet != null) {
+			if (packet.getElement().getXMLNS() == XMLNS_DB_VAL) {
+				conns.addControlPacket(packet);
+			} else {
+				conns.addDataPacket(packet);
+			}
+		}
+		connectionsByLocalRemote.put(cid, conns);
+		return conns;
+	}
 
-		synchronized (connectingByHost_Type) {
-			boolean connecting = connectingByHost_Type.contains(cid);
-			if (!connecting) {
-				String localhost = JIDUtils.getNodeNick(cid);
-				String remotehost = JIDUtils.getNodeHost(cid);
-				boolean reconnect = (packet == null);
-				if (connecting =
-					openNewServerConnection(localhost, remotehost, reconnect)) {
-					connectingByHost_Type.add(cid);
-				} else {
-					// Can't establish connection...., unknown host??
-					waitingPacketsMap.remove(cid);
-					// Well, is somebody injects a packet with the same sender and
-					// receiver domain and this domain is not valid then we have
-					// infinite loop here....
-					// Let's try to handle this by dropping such packet.
-					// It may happen as well that the source domain is different from
-					// target domain and both are invalid, what then?
-					// The best option would be to drop the packet if it is already an
-					// error - remote-server-not-found....
-					// For dialback packet just ignore the error completely as it means
-					// remote server tries to connect from domain which doesn't exist
-					// in DNS so no further action should be performed.
-					if ((packet.getElement().getXMLNS() == null
-							|| !packet.getElement().getXMLNS().equals(DIALBACK_XMLNS))) {
-						try {
-							addOutPacket(
-								Authorization.REMOTE_SERVER_NOT_FOUND.getResponseMessage(packet,
-									"S2S - destination host not found", true));
-						} catch (PacketErrorTypeException e) {
-							log.warning("Packet processing exception: " + e);
-						}
+	/**
+	 * Mehtod <code>createServerConnection</code> is called only when a new
+	 * connection is needed for any reason for given hostnames combination.
+	 *
+	 * @param cid a <code>String</code> s2s connection ID (localhost@remotehost)
+	 * @param packet a <code>Packet</code> packet to send, should be passed to the
+	 * ServerConnections only when it was null.
+	 * @param serv_conn a <code>ServerConnections</code> which was called for
+	 * the packet.
+	 */
+	private void createServerConnection(String cid, Packet packet,
+		ServerConnections serv_conn) {
+
+		ServerConnections conns = serv_conn;
+		if (conns == null) {
+			conns = createNewServerConnections(cid, packet);
+		}
+
+		String localhost = JIDUtils.getNodeNick(cid);
+		String remotehost = JIDUtils.getNodeHost(cid);
+		if (openNewServerConnection(localhost, remotehost)) {
+			conns.setConnecting();
+		} else {
+			// Can't establish connection...., unknown host??
+			Queue<Packet> waitingPackets = conns.getWaitingPackets();
+			// Well, is somebody injects a packet with the same sender and
+			// receiver domain and this domain is not valid then we have
+			// infinite loop here....
+			// Let's try to handle this by dropping such packet.
+			// It may happen as well that the source domain is different from
+			// target domain and both are invalid, what then?
+			// The best option would be to drop the packet if it is already an
+			// error - remote-server-not-found....
+			// For dialback packet just ignore the error completely as it means
+			// remote server tries to connect from domain which doesn't exist
+			// in DNS so no further action should be performed.
+			Packet p = null;
+			while ((p = waitingPackets.poll()) != null) {
+				if (p.getElement().getXMLNS() != XMLNS_DB_VAL) {
+					try {
+						addOutPacket(
+							Authorization.REMOTE_SERVER_NOT_FOUND.getResponseMessage(p,
+							"S2S - destination host not found", true));
+					} catch (PacketErrorTypeException e) {
+						log.warning("Packet: " + p.toString() + " processing exception: " + e);
 					}
 				}
-			} // end of if (serv == null)
-			if (connecting) {
-				// The packet may be null if first try to connect to remote
-				// server failed and now Tigase is retrying to connect
-				if (packet != null) {
-					ServerPacketQueue queue = waitingPacketsMap.get(cid);
-					if (queue == null) {
-						queue = new ServerPacketQueue();
-						waitingPacketsMap.put(cid, queue);
-					} // end of if (queue == null)
-					queue.offer(packet);
-				}
-			} // end of if (connecting) else
+			}
+			conns.stopAll();
+			//connectionsByLocalRemote.remove(cid);
 		}
 	}
 
@@ -250,8 +245,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService> {
 // 		log.finest(sb.toString());
 // 	}
 
-	private boolean openNewServerConnection(String localhost,
-		String remotehost, boolean reconnect) {
+	private boolean openNewServerConnection(String localhost, String remotehost) {
 
 		//		dumpCurrentStack(Thread.currentThread().getStackTrace());
 
@@ -266,14 +260,10 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService> {
 			port_props.put("type", ConnectionType.connect);
 			port_props.put("port-no", 5269);
 			String cid =
-				getConnectionId(localhost, remotehost, ConnectionType.connect);
+				getConnectionId(localhost, remotehost);
 			port_props.put("cid", cid);
 			log.finest("STARTING new connection: " + cid);
-			if (reconnect) {
-				reconnectService(port_props, 15*SECOND);
-			} else {
-				startService(port_props);
-			}
+			reconnectService(port_props, 5*SECOND);
 			return true;
 		} catch (UnknownHostException e) {
 			log.warning("UnknownHostException for host: " + remotehost);
@@ -282,15 +272,13 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService> {
 
 	}
 
-	private String getConnectionId(String localhost, String remotehost,
-		ConnectionType connection) {
-		return JIDUtils.getJID(localhost, remotehost, connection.toString());
+	private String getConnectionId(String localhost, String remotehost) {
+		return JIDUtils.getJID(localhost, remotehost, null);
 	}
 
 	private String getConnectionId(Packet packet) {
 		return JIDUtils.getJID(JIDUtils.getNodeHost(packet.getElemFrom()),
-			JIDUtils.getNodeHost(packet.getElemTo()),
-			ConnectionType.connect.toString());
+			JIDUtils.getNodeHost(packet.getElemTo()), null);
 	}
 
 	private String getConnectionId(XMPPIOService service) {
@@ -299,18 +287,9 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService> {
 		String remote_hostname =
 			(String)service.getSessionData().get("remote-hostname");
 		String cid = getConnectionId(local_hostname,
-			(remote_hostname != null ? remote_hostname : "NULL"),
-			service.connectionType());
+			(remote_hostname != null ? remote_hostname : "NULL"));
 		return cid;
 	}
-
-// 	private String getHandshakingId(String localhost, String remotehost) {
-// 		return JIDUtils.getJID(localhost, remotehost, null);
-// 	}
-
-// 	private String getHandshakingId(Packet packet) {
-// 		return JIDUtils.getJID(packet.getFrom(), packet.getTo(), null);
-// 	}
 
 	public Queue<Packet> processSocketData(XMPPIOService serv) {
 		Queue<Packet> packets = serv.getReceivedPackets();
@@ -318,30 +297,15 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService> {
 		while ((p = packets.poll()) != null) {
 // 			log.finer("Processing packet: " + p.getElemName()
 // 				+ ", type: " + p.getType());
-			log.finest("Processing socket data: " + p.getStringData());
+			if (p.getElement().getXMLNS() == null) {
+				p.getElement().setXMLNS("jabber:client");
+			}
+			log.finest("Processing socket data: " + p.toString());
 
-			if (p.getElement().getXMLNS() != null &&
-				p.getElement().getXMLNS().equals(DIALBACK_XMLNS)) {
-				Queue<Packet> results = new LinkedList<Packet>();
-				processDialback(p, serv, results);
-				for (Packet res: results) {
-					String cid = res.getTo();
-					log.finest("Sending dialback result: " + res.getStringData()
-						+ " to " + cid);
-					XMPPIOService sender = handshakingByHost_Type.get(cid);
-					if (sender == null) {
-						sender = servicesByHost_Type.get(cid);
-					}
-					log.finest("cid: " + cid
-						+ ", writing packet to socket: " + res.getStringData());
-					if (sender == null || !writePacketToSocket(sender, res)) {
-						// I am assuming here that it can't happen that the packet is
-						// to accept channel and it doesn't exist
-						addWaitingPacket(cid, res, waitingControlPackets);
-					} // end of else
-				} // end of for (Packet p: results)
+			if (p.getElement().getXMLNS() == XMLNS_DB_VAL) {
+				processDialback(p, serv);
 			} else {
-				if (p.getElemName().equals("error")) {
+				if (p.getElemName() == "error") {
 					processStreamError(p, serv);
 					return null;
 				} else {
@@ -358,8 +322,9 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService> {
 	}
 
 	private void bouncePacketsBack(Authorization author, String cid) {
-		Queue<Packet> waiting =	waitingPackets.remove(cid);
-		if (waiting != null) {
+		ServerConnections serv_conns = connectionsByLocalRemote.get(cid);
+		if (serv_conns != null) {
+			Queue<Packet> waiting =	serv_conns.getWaitingPackets();
 			Packet p = null;
 			while ((p = waiting.poll()) != null) {
 				log.finest("Sending packet back: " + p.getStringData());
@@ -369,7 +334,9 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService> {
 					log.warning("Packet processing exception: " + e);
 				}
 			} // end of while (p = waitingPackets.remove(ipAddress) != null)
-		} // end of if (waiting != null)
+		} else {
+			log.warning("No ServerConnections for cid: " + cid);
+		}
 	}
 
 
@@ -393,12 +360,23 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService> {
 		String remote_hostname =
 			(String)serv.getSessionData().get("remote-hostname");
 		if (!JIDUtils.getNodeHost(packet_from).equals(remote_hostname)) {
+			log.finer("Invalid hostname from the remote server, expected: "
+				+ remote_hostname);
 			generateStreamError("invalid-from", serv);
 			return false;
 		}
 		String local_hostname =	(String)serv.getSessionData().get("local-hostname");
 		if (!JIDUtils.getNodeHost(packet_to).equals(local_hostname)) {
+			log.finer("Invalid hostname of the local server, expected: "
+				+ local_hostname);
 			generateStreamError("host-unknown", serv);
+			return false;
+		}
+		String cid = getConnectionId(serv);
+		String session_id = (String)serv.getSessionData().get(serv.SESSION_ID_KEY);
+		ServerConnections serv_conns = connectionsByLocalRemote.get(cid);
+		if (serv_conns == null || !serv_conns.isIncomingValid(session_id)) {
+			log.info("Incoming connection hasn't been validated");
 			return false;
 		}
 		return true;
@@ -433,12 +411,15 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService> {
 				(String)serv.getSessionData().get("remote-hostname");
 			String local_hostname =
 				(String)serv.getSessionData().get("local-hostname");
-			String cid = getConnectionId(local_hostname, remote_hostname,
-				ConnectionType.connect);
+			String cid = getConnectionId(local_hostname, remote_hostname);
 			log.finest("Stream opened for: " + cid);
-			handshakingByHost_Type.put(cid, serv);
+			ServerConnections serv_conns = connectionsByLocalRemote.get(cid);
+			if (serv_conns == null) {
+				serv_conns = createNewServerConnections(cid, null);
+			}
+			serv_conns.addOutgoing(serv);
 			String remote_id = attribs.get("id");
-			sharedSessionData.put(cid+"-session-id", remote_id);
+			serv.getSessionData().put(serv.SESSION_ID_KEY, remote_id);
 			String uuid = UUID.randomUUID().toString();
 			String key = null;
 			try {
@@ -446,26 +427,13 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService> {
 			} catch (NoSuchAlgorithmException e) {
 				key = uuid;
 			} // end of try-catch
-			sharedSessionData.put(cid+"-dialback-key", key);
-			Element elem = new Element("db:result", key);
-			elem.addAttribute("to", remote_hostname);
-			elem.addAttribute("from", local_hostname);
-			elem.addAttribute("xmlns:db", DIALBACK_XMLNS);
-
-			StringBuilder sb = new StringBuilder();
-			// Attach also all controll packets which are wating to send
-			Packet p = null;
-			Queue<Packet> waiting =	waitingControlPackets.get(cid);
-			if (waiting != null) {
-				while ((p = waiting.poll()) != null) {
-					log.finest("Sending packet: " + p.getStringData());
-					sb.append(p.getStringData());
-				} // end of while (p = waitingPackets.remove(ipAddress) != null)
-			} // end of if (waiting != null)
-			sb.append(elem.toString());
-			log.finest("cid: " + (String)serv.getSessionData().get("cid")
-				+ ", sending: " + sb.toString());
-			return sb.toString();
+			serv_conns.putDBKey(remote_id, key);
+			Element elem = new Element(DB_RESULT_EL_NAME, key,
+				new String[] {"from", "to", XMLNS_DB_ATT},
+				new String[] {local_hostname, remote_hostname, XMLNS_DB_VAL});
+			serv_conns.addControlPacket(new Packet(elem));
+			serv_conns.sendAllControlPackets();
+			return null;
 		}
 		case accept: {
 			String remote_hostname =
@@ -474,8 +442,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService> {
 				(String)serv.getSessionData().get("local-hostname");
 			String cid = getConnectionId(
 				(local_hostname != null ? local_hostname : "NULL"),
-				(remote_hostname != null ? remote_hostname : "NULL"),
-				ConnectionType.accept);
+				(remote_hostname != null ? remote_hostname : "NULL"));
 			log.finest("Stream opened for: " + cid);
 			if (remote_hostname != null) {
 				log.fine("Opening stream for already established connection...., trying to turn on TLS????");
@@ -573,18 +540,18 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService> {
 
 	public List<StatRecord> getStatistics() {
 		List<StatRecord> stats = super.getStatistics();
-		stats.add(new StatRecord(getName(), "Open s2s connections", "int",
-				servicesByHost_Type.size(), Level.INFO));
-		int waiting = 0;
-		for (Queue<Packet> q: waitingPackets.values()) {
-			waiting += q.size();
-		}
-		stats.add(new StatRecord(getName(), "Packets queued", "int",
-				waiting, Level.INFO));
-		stats.add(new StatRecord(getName(), "Connecting s2s connections", "int",
-				connectingByHost_Type.size(), Level.FINE));
-		stats.add(new StatRecord(getName(), "Handshaking s2s connections", "int",
-				handshakingByHost_Type.size(), Level.FINER));
+// 		stats.add(new StatRecord(getName(), "Open s2s connections", "int",
+// 				servicesByHost_Type.size(), Level.INFO));
+// 		int waiting = 0;
+// 		for (Queue<Packet> q: waitingPackets.values()) {
+// 			waiting += q.size();
+// 		}
+// 		stats.add(new StatRecord(getName(), "Packets queued", "int",
+// 				waiting, Level.INFO));
+// 		stats.add(new StatRecord(getName(), "Connecting s2s connections", "int",
+// 				connectingByHost_Type.size(), Level.FINE));
+// 		stats.add(new StatRecord(getName(), "Handshaking s2s connections", "int",
+// 				handshakingByHost_Type.size(), Level.FINER));
 // 		StringBuilder sb = new StringBuilder("Handshaking: ");
 // 		for (IOService serv: handshakingByHost_Type.values()) {
 // 			sb.append("\nService ID: " + getUniqueId(serv)
@@ -594,19 +561,19 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService> {
 // 				+ ", connection-type: " + serv.connectionType());
 // 		}
 // 		log.finest(sb.toString());
-		LinkedList<String> waiting_qs = new LinkedList<String>();
-		for (Map.Entry<String, ServerPacketQueue> entry: waitingPackets.entrySet()) {
-			if (entry.getValue().size() > 0) {
-				waiting_qs.add(entry.getKey() + ":  " + entry.getValue().size());
-			}
-		}
-		if (waiting_qs.size() > 0) {
-			stats.add(new StatRecord(getName(), "Packets queued for each connection",
-					waiting_qs,	Level.FINER));
-		}
-		ArrayList<String> all_s2s = new ArrayList<String>(servicesByHost_Type.keySet());
-		Collections.sort(all_s2s);
-		stats.add(new StatRecord(getName(), "s2s connections", all_s2s,	Level.FINEST));
+// 		LinkedList<String> waiting_qs = new LinkedList<String>();
+// 		for (Map.Entry<String, ServerPacketQueue> entry: waitingPackets.entrySet()) {
+// 			if (entry.getValue().size() > 0) {
+// 				waiting_qs.add(entry.getKey() + ":  " + entry.getValue().size());
+// 			}
+// 		}
+// 		if (waiting_qs.size() > 0) {
+// 			stats.add(new StatRecord(getName(), "Packets queued for each connection",
+// 					waiting_qs,	Level.FINER));
+// 		}
+// 		ArrayList<String> all_s2s = new ArrayList<String>(servicesByHost_Type.keySet());
+// 		Collections.sort(all_s2s);
+// 		stats.add(new StatRecord(getName(), "s2s connections", all_s2s,	Level.FINEST));
 		return stats;
 	}
 
@@ -627,93 +594,27 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService> {
 				+ ", remote address: " + service.getRemoteAddress());
 			return;
 		}
-		String cid = getConnectionId(local_hostname, remote_hostname,
-			service.connectionType());
-		boolean stopped = false;
-		XMPPIOService serv = servicesByHost_Type.get(cid);
-		// This checking is necessary due to specific s2s behaviour which
-		// I don't fully understand yet, possible bug in my s2s implementation
-		if (serv == service) {
-			stopped = true;
-			servicesByHost_Type.remove(cid);
-		} else {
-			log.info("Stopped non-active service for CID: " + cid);
-		}
-		serv = handshakingByHost_Type.get(cid);
-		// This checking is necessary due to specific s2s behaviour which
-		// I don't fully understand yet, possible bug in my s2s implementation
-		if (!stopped && serv == service) {
-			stopped = true;
-			handshakingByHost_Type.remove(cid);
-			connectingByHost_Type.remove(cid);
-			waitingControlPackets.remove(cid);
-		} else {
-			if (!stopped) {
-				log.info("Stopped non-handshaking service for CID: " + cid);
-			}
-		}
-		if (serv == null && connectingByHost_Type.contains(cid)) {
-			connectingByHost_Type.remove(cid);
-			waitingControlPackets.remove(cid);
-			stopped = true;
-		}
-		if (!stopped) {
+		String cid = getConnectionId(local_hostname, remote_hostname);
+		ServerConnections serv_conns = connectionsByLocalRemote.get(cid);
+		if (serv_conns == null) {
+			log.warning("There is no ServerConnections for stopped service: "
+				+ service.getUniqueId() + ", cid: " + cid);
 			return;
 		}
-		log.fine("s2s stopped: " + cid);
-		// Some servers close just 1 of dialback connections and even though
-		// other connection is still open they don't accept any data on that
-		// connections. So the solution is: if one of pair connection is closed
-		// close the other connection as well.
-		// Find other connection:
 
-		// Hm it doesn't work very well, let's comment it out for now.
+		boolean outgoing = serv_conns.isOutgoing(service);
+		serv_conns.serviceStopped(service);
 
-// 		String other_id = null;
-// 		switch (service.connectionType()) {
-// 		case accept:
-// 			other_id = getConnectionId(local_hostname, remote_hostname,
-// 				ConnectionType.connect);
-// 			break;
-// 		case connect:
-// 		default:
-// 			other_id = getConnectionId(local_hostname, remote_hostname,
-// 				ConnectionType.accept);
-// 			break;
-// 		} // end of switch (service.connectionType())
-// 		XMPPIOService other_service = servicesByHost_Type.get(other_id);
-// 		if (other_service == null) {
-// 			other_service = handshakingByHost_Type.get(other_id);
-// 		} // end of if (other_service == null)
-// 		if (other_service != null) {
-// 			log.fine("Stopping other service: " + other_id);
-// // 			servicesByHost_Type.remove(other_id);
-// // 			handshakingByHost_Type.remove(other_id);
-// // 			connectingByHost_Type.remove(other_id);
-// 			other_service.stop();
-// 		} // end of if (other_service != null)
-		ServerPacketQueue waiting =	waitingPackets.get(cid);
-		if (waiting != null && waiting.size() > 0) {
-			if (System.currentTimeMillis() - waiting.creationTime
-				> maxPacketWaitingTime) {
-				bouncePacketsBack(Authorization.REMOTE_SERVER_TIMEOUT, cid);
-			} else {
-				addWaitingPacket(cid, null, waitingPackets);
+		if (outgoing) {
+			Queue<Packet> waiting = serv_conns.getWaitingPackets();
+			if (waiting.size() > 0) {
+				if (serv_conns.waitingTime() > maxPacketWaitingTime) {
+					bouncePacketsBack(Authorization.REMOTE_SERVER_TIMEOUT, cid);
+				} else {
+					createServerConnection(cid, null, serv_conns);
+				}
 			}
 		}
-	}
-
-	public void handleDialbackSuccess(final String connect_jid) {
-		log.finest("handleDialbackSuccess: connect_jid="+connect_jid);
-		Packet p = null;
-		XMPPIOService serv = servicesByHost_Type.get(connect_jid);
-		ServerPacketQueue waiting = waitingPackets.remove(connect_jid);
-		if (waiting != null) {
-			while ((p = waiting.poll()) != null) {
-				log.finest("Sending packet: " + p.getStringData());
-				writePacketToSocket(serv, p);
-			} // end of while (p = waitingPackets.remove(ipAddress) != null)
-		} // end of if (waiting != null)
 	}
 
 	private void generateStreamError(String error_el, XMPPIOService serv) {
@@ -729,34 +630,11 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService> {
 // 			serv.writeRawData("</stream:stream>");
 			serv.stop();
 		} catch (Exception e) {
-			serv.stop();
+			serv.forceStop();
 		}
 	}
 
-	private void initServiceMapping(String local_hostname, String remote_hostname,
-		String cid, XMPPIOService serv) {
-		// Assuming this is the first packet from that connection which
-		// tells us for what domain this connection is we have to map
-		// somehow this IP address to hostname
-		XMPPIOService old_serv = (handshakingByHost_Type.get(cid) != null ?
-			handshakingByHost_Type.get(cid) : servicesByHost_Type.get(cid));
-		if (old_serv != serv) {
-			serv.getSessionData().put("local-hostname", local_hostname);
-			serv.getSessionData().put("remote-hostname", remote_hostname);
-			handshakingByHost_Type.put(cid, serv);
-			// Apparently some servers open more than 1 connection and apparently
-			// this is correct. So, let's try to not stop the old connection if it
-			// it accept type....
-			if (old_serv != null
-				&& old_serv.connectionType() != ConnectionType.accept) {
-				log.finest("Stopping old connection for: " + cid);
-				old_serv.stop();
-			}
-		}
-	}
-
-	public synchronized void processDialback(Packet packet, XMPPIOService serv,
-		Queue<Packet> results) {
+	public synchronized void processDialback(Packet packet, XMPPIOService serv) {
 
 		log.finest("DIALBACK - " + packet.getStringData());
 
@@ -778,169 +656,134 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService> {
 			generateStreamError("host-unknown", serv);
 			return;
 		}
-		String connect_jid = getConnectionId(local_hostname, remote_hostname,
-			ConnectionType.connect);
-		String accept_jid = getConnectionId(local_hostname, remote_hostname,
-			ConnectionType.accept);
+		String cid = getConnectionId(local_hostname, remote_hostname);
+		ServerConnections serv_conns = connectionsByLocalRemote.get(cid);
 
 		// <db:result>
-		if (packet.getElemName().equals("result")) {
+		if ((packet.getElemName() == RESULT_EL_NAME) ||
+			(packet.getElemName() == DB_RESULT_EL_NAME)) {
 			if (packet.getType() == null) {
+				// This is incoming connection with dialback key for verification
 				if (packet.getElemCData() != null) {
 					// db:result with key to validate from accept connection
-					sharedSessionData.put(accept_jid + "-session-id",
-						serv.getSessionData().get(serv.SESSION_ID_KEY));
-					sharedSessionData.put(accept_jid + "-dialback-key",
-						packet.getElemCData());
-					initServiceMapping(local_hostname, remote_hostname, accept_jid, serv);
+					String session_id = (String)serv.getSessionData().get(serv.SESSION_ID_KEY);
+					String db_key = packet.getElemCData();
+					//initServiceMapping(local_hostname, remote_hostname, accept_jid, serv);
 
 					// <db:result> with CDATA containing KEY
-					Element elem = new Element("db:verify", packet.getElemCData(),
-						new String[] {"id", "to", "from", "xmlns:db"},
-						new String[] {(String)serv.getSessionData().get(serv.SESSION_ID_KEY),
-													packet.getElemFrom(),
-													packet.getElemTo(),
-													DIALBACK_XMLNS});
+					Element elem = new Element(DB_VERIFY_EL_NAME, db_key,
+						new String[] {"id", "to", "from", XMLNS_DB_ATT},
+						new String[] {session_id, remote_hostname, local_hostname,
+													XMLNS_DB_VAL});
 					Packet result = new Packet(elem);
-					result.setTo(connect_jid);
-					results.offer(result);
+					if (serv_conns == null) {
+						serv_conns = createNewServerConnections(cid, null);
+					}
+					serv_conns.putDBKey(session_id, db_key);
+					serv.getSessionData().put("remote-hostname", remote_hostname);
+					serv.getSessionData().put("local-hostname", local_hostname);
+					serv_conns.addIncoming(session_id, serv);
+					if (!serv_conns.sendControlPacket(result)
+						&& serv_conns.needsConnection()) {
+						createServerConnection(cid, result, serv_conns);
+					}
 				} else {
 					// Incorrect dialback packet, it happens for some servers....
 					// I don't know yet what software they use.
 					// Let's just disconnect and signal unrecoverable conection error
 					log.finer("Incorrect diablack packet: " + packet.getStringData());
-					bouncePacketsBack(Authorization.SERVICE_UNAVAILABLE, connect_jid);
+					bouncePacketsBack(Authorization.SERVICE_UNAVAILABLE, cid);
 					generateStreamError("bad-format", serv);
 				}
 			} else {
 				// <db:result> with type 'valid' or 'invalid'
 				// It means that session has been validated now....
-				XMPPIOService connect_serv = handshakingByHost_Type.get(connect_jid);
+				//XMPPIOService connect_serv = handshakingByHost_Type.get(connect_jid);
 				switch (packet.getType()) {
 				case valid:
-					log.finer("Connection: " + connect_jid
+					log.finer("Connection: " + cid
 						+ " is valid, adding to available services.");
-					servicesByHost_Type.put(connect_jid, connect_serv);
-					handshakingByHost_Type.remove(connect_jid);
-					connectingByHost_Type.remove(connect_jid);
-					waitingControlPackets.remove(connect_jid);
-					handleDialbackSuccess(connect_jid);
+					serv_conns.handleDialbackSuccess();
 					break;
 				default:
-					log.finer("Connection: " + connect_jid + " is invalid!! Stopping...");
-					connect_serv.stop();
+					log.finer("Connection: " + cid + " is invalid!! Stopping...");
+					serv_conns.handleDialbackFailure();
 					break;
 				} // end of switch (packet.getType())
 			} // end of if (packet.getType() != null) else
 		} // end of if (packet != null && packet.getElemName().equals("db:result"))
 
 		// <db:verify> with type 'valid' or 'invalid'
-		if (packet.getElemName().equals("verify")) {
-			if (packet.getType() == null) {
-				// When type is NULL then it means this packet contains
-				// data for verification
-				if (packet.getElemId() != null && packet.getElemCData() != null) {
-					// This might be the first dialback packet from remote server
-					initServiceMapping(local_hostname, remote_hostname, accept_jid, serv);
+		if ((packet.getElemName() == VERIFY_EL_NAME)
+			|| (packet.getElemName() == DB_VERIFY_EL_NAME)) {
+			if (packet.getElemId() != null) {
 
-					// Yes data for verification are available in packet
-					final String id = packet.getElemId();
-					final String key = packet.getElemCData();
+				String session_id = packet.getElemId();
+				if (packet.getType() == null) {
+					// When type is NULL then it means this packet contains
+					// data for verification
+					if (packet.getElemId() != null && packet.getElemCData() != null) {
+						String db_key = packet.getElemCData();
+						// This might be the first dialback packet from remote server
+						serv.getSessionData().put("remote-hostname", remote_hostname);
+						serv.getSessionData().put("local-hostname", local_hostname);
+						serv_conns.addIncoming(session_id, serv);
+						//initServiceMapping(local_hostname, remote_hostname, accept_jid, serv);
 
-					final String local_key =
-						(String)sharedSessionData.get(connect_jid+"-dialback-key");
+						String local_key = getLocalDBKey(serv_conns, session_id);
 
-					log.fine("Local key for cid=" + connect_jid + " is " + local_key);
+						if (local_key == null) {
+							log.fine("db key is not availablefor session ID: " + session_id
+								+ ", key for validation: " + db_key);
+// 							queryClusterNodesForKey(local_hostname, remote_hostname, session_id,
+// 								db_key);
+						} else {
+							log.fine("Local key for cid=" + cid + " is " + local_key);
+							sendVerifyResult(local_hostname, remote_hostname, session_id,
+								db_key.equals(local_key), serv_conns);
+						}
+					} // end of if (packet.getElemName().equals("db:verify"))
+				}	else {
+					// Type is not null so this is packet with verification result.
+					// If the type is valid it means accept connection has been
+					// validated and we can now receive data from this channel.
 
-					Element result_el = new Element("db:verify",
-						new String[] {"to", "from", "id", "xmlns:db"},
-						new String[] {packet.getElemFrom(), packet.getElemTo(),
-													packet.getElemId(), DIALBACK_XMLNS});
-					Packet result = new Packet(result_el);
+					Element elem = new Element(DB_RESULT_EL_NAME,
+						new String[] {"type", "to", "from", XMLNS_DB_ATT},
+						new String[] {packet.getType().toString(),
+													remote_hostname, local_hostname,
+													XMLNS_DB_VAL});
 
-					if (key.equals(local_key)) {
-						log.finer("Verification for " + accept_jid
-							+ " succeeded, sending valid.");
-						result_el.setAttribute("type", "valid");
-						//result = packet.swapElemFromTo(StanzaType.valid);
-					} else {
-						log.finer("Verification for " + accept_jid
-							+ " failed, sending invalid.");
-						result_el.setAttribute("type", "invalid");
-						//result = packet.swapElemFromTo(StanzaType.invalid);
-					} // end of if (key.equals(local_key)) else
-					result.setTo(accept_jid);
-					log.finest("Adding result packet: " + result.getStringData()
-						+ " to " + result.getTo());
-					results.offer(result);
-				} // end of if (packet.getElemName().equals("db:verify"))
-			}	else {
-				// Type is not null so this is packet with verification result.
-				// If the type is valid it means accept connection has been
-				// validated and we can now receive data from this channel.
+					serv_conns.sendToIncoming(session_id, new Packet(elem));
+					serv_conns.validateIncoming(session_id,
+						(packet.getType() == StanzaType.valid));
 
-				Element elem = new Element("db:result",
-					new String[] {"type", "to", "from", "xmlns:db"},
-					new String[] {packet.getType().toString(),
-												packet.getElemFrom(), packet.getElemTo(),
-												DIALBACK_XMLNS});
-
-				XMPPIOService accept_serv = handshakingByHost_Type.remove(accept_jid);
-				if (accept_serv == null) {
-					accept_serv = servicesByHost_Type.get(accept_jid);
-				} else {
-					connectingByHost_Type.remove(accept_jid);
-					waitingControlPackets.remove(accept_jid);
-				}
-
-				if (accept_serv == null) {
-					// UPS, no such connection do send a packet, I give up
-					log.fine("Connection closed before handshaking completed: "
-						+ accept_jid
-						+ ", can't send packet: " + elem.toString());
-					return;
-				}
-				try {
-					writeRawData(accept_serv, elem.toString());
-					//accept_serv.writeRawData(elem.toString());
-					switch (packet.getType()) {
-					case valid:
-						log.finer("Received " + packet.getType().toString()
-							+ " validation result, adding connection to active services.");
-						servicesByHost_Type.put(accept_jid, accept_serv);
-						break;
-					default:
-						// Ups, verification failed, let's stop the service now.
-						log.finer("Received " + packet.getType().toString()
-							+ " validation result, stopping service, closing connection.");
-						writeRawData(accept_serv, "</stream:stream>");
-						//accept_serv.writeRawData("</stream:stream>");
-						accept_serv.stop();
-						break;
-					}
-				} catch (Exception e) {
-					accept_serv.stop();
-				}
-
-			} // end of if (packet.getType() == null) else
+				} // end of if (packet.getType() == null) else
+			} else {
+				// Incorrect dialback packet, it happens for some servers....
+				// I don't know yet what software they use.
+				// Let's just disconnect and signal unrecoverable conection error
+				log.finer("Incorrect diablack packet: " + packet.getStringData());
+				bouncePacketsBack(Authorization.SERVICE_UNAVAILABLE, cid);
+				generateStreamError("bad-format", serv);
+			}
 		} // end of if (packet != null && packet.getType() != null)
 
 	}
 
-	private static class ServerPacketQueue extends ConcurrentLinkedQueue<Packet> {
-		private static final long serialVersionUID = 1L;
+	protected String getLocalDBKey(ServerConnections serv_conns, String sessionId) {
+		return serv_conns.getDBKey(sessionId);
+	}
 
-		/**
-		 * Keeps the creation time. After some time the queue and all
-		 * packets waiting to send should become outdated and they
-		 * should be returned to sender and no more attempts to connect
-		 * to the remote server should be performed.
-		 */
-		private long creationTime = 0;
-
-		private ServerPacketQueue() {
-			super();
-			creationTime = System.currentTimeMillis();
+	protected void sendVerifyResult(String from, String to, String id, boolean valid,
+		ServerConnections serv_conns) {
+		String type = (valid ? "valid" : "invalid");
+		Element result_el = new Element(DB_VERIFY_EL_NAME,
+			new String[] {"from", "to", "id", "type", XMLNS_DB_ATT},
+			new String[] {from, to, id, type, XMLNS_DB_VAL});
+		Packet result = new Packet(result_el);
+		if (!serv_conns.sendToIncoming(id, result)) {
+			log.warning("Can not send verification packet back: " + result.toString());
 		}
 	}
 

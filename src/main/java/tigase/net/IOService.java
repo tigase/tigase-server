@@ -215,7 +215,7 @@ public abstract class IOService implements Callable<IOService> {
    * @exception IOException if an error occurs
    */
   public void stop() {
-		if (socketIO.waitingToSend()) {
+		if (socketIO != null && socketIO.waitingToSend()) {
 			stopping = true;
 		} else {
 			forceStop();
@@ -224,7 +224,9 @@ public abstract class IOService implements Callable<IOService> {
 
 	public void forceStop() {
 		try {
-			socketIO.stop();
+			if (socketIO != null) {
+				socketIO.stop();
+			}
 		} catch (Exception e) {
 			// Well, do nothing, we are closing the connection anyway....
 		} finally {

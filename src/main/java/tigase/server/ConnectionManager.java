@@ -22,7 +22,7 @@
 package tigase.server;
 
 import java.io.IOException;
-import java.net.ConnectException;
+import java.net.SocketException;
 import java.nio.channels.SocketChannel;
 import java.security.SecureRandom;
 import java.util.Arrays;
@@ -344,7 +344,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 		writePacketsToSocket(serv, processSocketData(serv));
 	}
 
-	protected void writePacketsToSocket(IO serv, Queue<Packet> packets) {
+	public void writePacketsToSocket(IO serv, Queue<Packet> packets) {
 		if (packets != null && packets.size() > 0) {
 			Packet p = null;
 			while ((p = packets.poll()) != null) {
@@ -364,7 +364,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 		}
 	}
 
-	protected boolean writePacketToSocket(IO ios, Packet p) {
+	public boolean writePacketToSocket(IO ios, Packet p) {
 		if (ios != null) {
 			ios.addPacketToSend(p);
 			try {
@@ -566,7 +566,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 				} // end of if (socket == SocketType.ssl)
 				serviceStarted(serv);
 				readThread.addSocketService(serv);
-			} catch (ConnectException e) {
+			} catch (SocketException e) {
 				// Accept side for component service is not ready yet?
 				// Let's wait for a few secs and try again.
 				log.log(Level.FINEST, "Problem reconnecting the service: ", e);
