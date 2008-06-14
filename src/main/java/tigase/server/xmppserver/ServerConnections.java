@@ -66,14 +66,6 @@ public class ServerConnections {
 	private ConcurrentSkipListMap<String, XMPPIOService> incoming =
     new ConcurrentSkipListMap<String, XMPPIOService>();
 
-// 	/**
-// 	 * Incoming (accept) handshaking services by session:id. Some servers
-// 	 * (EJabberd) opens many connections for each domain, especially when
-// 	 * in cluster mode.
-// 	 */
-// 	private ConcurrentSkipListMap<String, XMPPIOService> in_handshaking =
-//     new ConcurrentSkipListMap<String, XMPPIOService>();
-
 	/**
 	 * Normal packets between users on different servers
 	 */
@@ -298,6 +290,10 @@ public class ServerConnections {
 			return;
 		}
 		incoming.remove(session_id);
+	}
+
+	public int incomingSize() {
+		return incoming.size();
 	}
 
 }
