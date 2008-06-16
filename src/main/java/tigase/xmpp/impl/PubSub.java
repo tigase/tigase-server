@@ -109,6 +109,10 @@ public class PubSub extends XMPPProcessor implements XMPPProcessorIfc {
 				Element notification = createNotification(publish, fromJid, buddy);
 				results.add(new Packet(notification));
 			}
+			for (String buddy : session.getAllResourcesJIDs()) {
+				Element notification = createNotification(publish, fromJid, buddy);
+				results.add(new Packet(notification));
+			}
 		} else {
 			results.add(Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet, null, true));
 		}
