@@ -278,9 +278,13 @@ function tigase_monitor_stats($stats = NULL) {
 				$statsinfo['Uptime:'] = $split_line[1] . substr($split_line[2], 0, 1)
 					. ', ' . $split_line[3] . substr($split_line[4], 0, 1);
 			}
-			if (stripos($line, 's2s')) {
+			if (stripos($line, 'Connected servers')) {
 				$split_line = explode(' ', trim($line));
-				$statsinfo['Servers online:'] = $split_line[4];
+				$statsinfo['Connected servers:'] = $split_line[3];
+			}
+			if (stripos($line, 'Open s2s connections')) {
+				$split_line = explode(' ', trim($line));
+				$statsinfo['Server connections:'] = $split_line[4];
 			}
 			if (stripos($line, 'c2s')) {
 				$split_line = explode(' ', trim($line));
