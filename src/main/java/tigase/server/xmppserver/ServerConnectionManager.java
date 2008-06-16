@@ -644,6 +644,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 		}
 		String cid = getConnectionId(local_hostname, remote_hostname);
 		ServerConnections serv_conns = connectionsByLocalRemote.get(cid);
+		String session_id = (String)serv.getSessionData().get(serv.SESSION_ID_KEY);
 
 		// <db:result>
 		if ((packet.getElemName() == RESULT_EL_NAME) ||
@@ -652,7 +653,6 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 				// This is incoming connection with dialback key for verification
 				if (packet.getElemCData() != null) {
 					// db:result with key to validate from accept connection
-					String session_id = (String)serv.getSessionData().get(serv.SESSION_ID_KEY);
 					String db_key = packet.getElemCData();
 					//initServiceMapping(local_hostname, remote_hostname, accept_jid, serv);
 
@@ -704,7 +704,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 			|| (packet.getElemName() == DB_VERIFY_EL_NAME)) {
 			if (packet.getElemId() != null) {
 
-				String session_id = packet.getElemId();
+				String forkey_session_id = packet.getElemId();
 				if (packet.getType() == null) {
 					// When type is NULL then it means this packet contains
 					// data for verification
@@ -716,17 +716,15 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 						serv_conns.addIncoming(session_id, serv);
 						//initServiceMapping(local_hostname, remote_hostname, accept_jid, serv);
 
-						String local_key = getLocalDBKey(serv_conns, session_id);
+						String local_key = getLocalDBKey(serv_conns, forkey_session_id);
 
 						if (local_key == null) {
-							log.fine("db key is not availablefor session ID: " + session_id
+							log.fine("db key is not availablefor session ID: " + forkey_session_id
 								+ ", key for validation: " + db_key);
-// 							queryClusterNodesForKey(local_hostname, remote_hostname, session_id,
-// 								db_key);
 						} else {
 							log.fine("Local key for cid=" + cid + " is " + local_key);
-							sendVerifyResult(local_hostname, remote_hostname, session_id,
-								db_key.equals(local_key), serv_conns);
+							sendVerifyResult(local_hostname, remote_hostname, forkey_session_id,
+								db_key.equals(local_key), serv_conns, session_id);
 						}
 					} // end of if (packet.getElemName().equals("db:verify"))
 				}	else {
@@ -740,8 +738,8 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 													remote_hostname, local_hostname,
 													XMLNS_DB_VAL});
 
-					serv_conns.sendToIncoming(session_id, new Packet(elem));
-					serv_conns.validateIncoming(session_id,
+					serv_conns.sendToIncoming(forkey_session_id, new Packet(elem));
+					serv_conns.validateIncoming(forkey_session_id,
 						(packet.getType() == StanzaType.valid));
 
 				} // end of if (packet.getType() == null) else
@@ -762,13 +760,13 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 	}
 
 	protected void sendVerifyResult(String from, String to, String id, boolean valid,
-		ServerConnections serv_conns) {
+		ServerConnections serv_conns, String session_id) {
 		String type = (valid ? "valid" : "invalid");
 		Element result_el = new Element(DB_VERIFY_EL_NAME,
 			new String[] {"from", "to", "id", "type", XMLNS_DB_ATT},
 			new String[] {from, to, id, type, XMLNS_DB_VAL});
 		Packet result = new Packet(result_el);
-		if (!serv_conns.sendToIncoming(id, result)) {
+		if (!serv_conns.sendToIncoming(session_id, result)) {
 			log.warning("Can not send verification packet back: " + result.toString());
 		}
 	}
