@@ -633,7 +633,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 									+ ", CID: " + getCID(service));
 								service.stop();
 							} else {
-								if (curr_time - lastTransfer >= HOUR) {
+								if (curr_time - lastTransfer >= (29*MINUTE)) {
 									// At least once an hour check if the connection is
 									// still alive.
 									service.writeRawData(" ");
