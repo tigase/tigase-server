@@ -194,8 +194,12 @@ public class MessageRouter extends AbstractMessageReceiver {
 
 		// Detect inifinite loop if from == to
 		// Maybe it is not needed anymore...
+		// There is a need to process packets with the same from and to address
+		// let't try to relax restriction and block all packets with error type
+		// 2008-06-16
 		if ((packet.getFrom() != null
-				&& packet.getFrom().equals(packet.getTo()))
+				&& packet.getFrom().equals(packet.getTo())
+				&& packet.getType() == StanzaType.error)
 			|| (packet.getFrom() == NULL_ROUTING
 				&& packet.getElemFrom() != null
 				&& packet.getElemFrom().equals(packet.getTo()))) {
