@@ -716,7 +716,8 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 						serv_conns.addIncoming(session_id, serv);
 						//initServiceMapping(local_hostname, remote_hostname, accept_jid, serv);
 
-						String local_key = getLocalDBKey(serv_conns, forkey_session_id);
+						String local_key = getLocalDBKey(cid, db_key, forkey_session_id,
+							session_id);
 
 						if (local_key == null) {
 							log.fine("db key is not availablefor session ID: " + forkey_session_id
@@ -755,8 +756,10 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 
 	}
 
-	protected String getLocalDBKey(ServerConnections serv_conns, String sessionId) {
-		return serv_conns.getDBKey(sessionId);
+	protected String getLocalDBKey(String cid, String key, String forkey_sessionId,
+		String asking_sessionId) {
+		ServerConnections serv_conns = connectionsByLocalRemote.get(cid);
+		return serv_conns == null ? null : serv_conns.getDBKey(forkey_sessionId);
 	}
 
 	protected void sendVerifyResult(String from, String to, String id, boolean valid,

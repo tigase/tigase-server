@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Map;
 import java.util.Queue;
+import java.util.LinkedHashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.disco.ServiceEntity;
@@ -110,14 +111,19 @@ public class ClusterController
 	public void processPacket(final Packet packet, final Queue<Packet> results) {
 		if (packet.getElement().getName() == ClusterElement.CLUSTER_EL_NAME) {
 			ClusterElement clem = new ClusterElement(packet.getElement());
-			Set<String> connected_nodes = clem.getConnectedNodes();
-			Set<String> disconnected_nodes = clem.getDisconnectedNodes();
-			for (ClusteredComponent comp: components.values()) {
-				if (connected_nodes != null && connected_nodes.size() > 0) {
-					comp.nodesConnected(connected_nodes);
-				}
-				if (disconnected_nodes != null && disconnected_nodes.size() > 0) {
-					comp.nodesDisconnected(disconnected_nodes);
+			if (clem.getMethodName() != null
+				&& clem.getMethodName().equals(ClusterMethods.UPDATE_NODES.toString())) {
+				String connected_nodes = clem.getMethodParam("connected");
+				String disconnected_nodes = clem.getMethodParam("disconnected");
+				for (ClusteredComponent comp: components.values()) {
+					if (connected_nodes != null) {
+						comp.nodesConnected(new
+							LinkedHashSet<String>(Arrays.asList(connected_nodes.split(","))));
+					}
+					if (disconnected_nodes != null) {
+						comp.nodesDisconnected(new
+							LinkedHashSet<String>(Arrays.asList(disconnected_nodes.split(","))));
+					}
 				}
 			}
 		}

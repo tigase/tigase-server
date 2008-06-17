@@ -61,7 +61,7 @@ public class SessionManagerClustered extends SessionManager
 	private Set<String> cluster_nodes = new LinkedHashSet<String>();
 	private Set<String> broken_nodes = new LinkedHashSet<String>();
 
-	public void processPacket(final Packet packet) {
+	public void processPacket(Packet packet) {
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Received packet: " + packet.toString());
 		}
@@ -133,31 +133,14 @@ public class SessionManagerClustered extends SessionManager
 	}
 
 	protected boolean sentToNextNode(ClusterElement clel) {
-		if (cluster_nodes.size() > 0) {
-			String next_node = null;
-			for (String cluster_node: cluster_nodes) {
-				if (!clel.isVisitedNode(cluster_node)) {
-					next_node = cluster_node;
-					break;
-				}
-			}
-			if (next_node == null) {
-				String first_node = clel.getFirstNode();
-				if (first_node == null) {
-					log.warning("Something wrong - the first node should NOT be null here.");
-				} else {
-					if (!first_node.equals(getComponentId())) {
-						next_node = first_node;
-					}
-				}
-			}
-			if (next_node != null) {
-				ClusterElement next_clel = clel.nextClusterNode(next_node);
-				super.fastAddOutPacket(new Packet(next_clel.getClusterElement()));
-				return true;
-			}
+		ClusterElement next_clel = ClusterElement.createForNextNode(clel,
+			cluster_nodes, getComponentId());
+		if (next_clel != null) {
+			super.fastAddOutPacket(new Packet(next_clel.getClusterElement()));
+			return true;
+		} else {
+			return false;
 		}
-		return false;
 	}
 
 	protected boolean sentToNextNode(Packet packet) {

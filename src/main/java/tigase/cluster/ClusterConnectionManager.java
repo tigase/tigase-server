@@ -79,8 +79,6 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 	public static final String CONNECT_ALL_PAR = "--cluster-connect-all";
 	public static final String CONNECT_ALL_PROP_KEY = "connect-all";
 	public static final String CLUSTER_CONTR_ID_PROP_KEY = "cluster-controller-id";
-	//	public static final String NOTIFY_ADMINS_PROP_KEY = "notify-admins";
-	//	public static final boolean NOTIFY_ADMINS_PROP_VAL = true;
 	public static final boolean CONNECT_ALL_PROP_VAL = false;
 	public static final String XMLNS = "tigase:cluster";
 
@@ -179,9 +177,12 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 			(String)serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
 		log.fine("Connected to: " + addr);
 		updateServiceDiscovery(addr, XMLNS + " connected");
-		addOutPacket(new Packet(ClusterElement.createClusterConnectedNodes(
+		Map<String, String> method_params = new LinkedHashMap<String, String>();
+		method_params.put("connected", addr);
+		addOutPacket(new Packet(ClusterElement.createClusterMethodCall(
 					getComponentId(), cluster_controller_id,
-					StanzaType.set.toString(), addr)));
+					StanzaType.set.toString(), ClusterMethods.UPDATE_NODES.toString(),
+					method_params)));
 	}
 
 	public void setProperties(Map<String, Object> props) {
@@ -285,9 +286,12 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 		String addr = (String)sessionData.get(PORT_REMOTE_HOST_PROP_KEY);
 		log.fine("Disonnected from: " + addr);
 		updateServiceDiscovery(addr, XMLNS + " disconnected");
-		addOutPacket(new Packet(ClusterElement.createClusterDisconnectedNodes(
+		Map<String, String> method_params = new LinkedHashMap<String, String>();
+		method_params.put("disconnected", addr);
+		addOutPacket(new Packet(ClusterElement.createClusterMethodCall(
 					getComponentId(), cluster_controller_id,
-					StanzaType.set.toString(), addr)));
+					StanzaType.set.toString(), ClusterMethods.UPDATE_NODES.toString(),
+					method_params)));
 	}
 
 	protected String getServiceId(Packet packet) {

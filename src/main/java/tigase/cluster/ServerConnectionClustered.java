@@ -21,9 +21,19 @@
 package tigase.cluster;
 
 import java.util.Set;
+import java.util.Map;
+import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Arrays;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
+
+import tigase.xmpp.StanzaType;
+import tigase.server.Packet;
 import tigase.server.xmppserver.ServerConnectionManager;
+import tigase.xml.Element;
 
 /**
  * Describe class ServerConnectionClustered here.
@@ -37,19 +47,108 @@ import tigase.server.xmppserver.ServerConnectionManager;
 public class ServerConnectionClustered extends ServerConnectionManager
 	implements ClusteredComponent {
 
+  /**
+   * Variable <code>log</code> is a class logger.
+   */
+  private static final Logger log =
+    Logger.getLogger("tigase.cluster.ServerConnectionClustered");
+
+	private static final String CID = "cid";
+	private static final String KEY = "key";
+	private static final String FORKEY_SESSION_ID = "forkey_sessionId";
+	private static final String ASKING_SESSION_ID = "asking_sessionId";
+
 	private Set<String> cluster_nodes = new LinkedHashSet<String>();
 
-	/**
-	 * Creates a new <code>ServerConnectionClustered</code> instance.
-	 *
-	 */
-	public ServerConnectionClustered() {
-
+	public void processPacket(Packet packet) {
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Received packet: " + packet.toString());
+		}
+		if (packet.getElemName() == ClusterElement.CLUSTER_EL_NAME
+			&& packet.getElement().getXMLNS() == ClusterElement.XMLNS) {
+			processClusterPacket(packet);
+			return;
+		}
+		super.processPacket(packet);
 	}
 
-	private void queryClusterNodesForKey(String local_hostname,
-		String remote_hostname, String session_id, String db_key) {
-		
+	protected void processClusterPacket(Packet packet) {
+		ClusterElement clel = new ClusterElement(packet.getElement());
+		clel.addVisitedNode(getComponentId());
+		switch (packet.getType()) {
+		case set:
+			if (clel.getMethodName().equals(ClusterMethods.CHECK_DB_KEY.toString())) {
+				String cid = clel.getMethodParam(CID);
+				String key = clel.getMethodParam(KEY);
+				String forkey_sessionId = clel.getMethodParam(FORKEY_SESSION_ID);
+				String asking_sessionId = clel.getMethodParam(ASKING_SESSION_ID);
+				String local_key =
+          super.getLocalDBKey(cid, key, forkey_sessionId, asking_sessionId);
+				ClusterElement result = null;
+				boolean valid = false;
+				if (local_key != null) {
+					valid = local_key.equals(key);
+				} else {
+					result = ClusterElement.createForNextNode(clel, cluster_nodes,
+						getComponentId());
+				}
+				if (result == null) {
+					Map<String, String> res_vals = new LinkedHashMap<String, String>();
+					res_vals.put("valid", "" + valid);
+					result = clel.createMethodResponse(getComponentId(),
+						"result", res_vals);
+				}
+				addOutPacket(new Packet(result.getClusterElement()));
+			}
+			break;
+		case get:
+
+			break;
+		case result:
+
+			break;
+		case error:
+			// There might be many different errors...
+			// But they all mean the cluster node is unreachable.
+			// Let's leave custom handling each error type for later...
+			String from = packet.getElemFrom();
+			clel.addVisitedNode(from);
+			addOutPacket(new Packet(ClusterElement.createForNextNode(clel,
+						cluster_nodes, getComponentId()).getClusterElement()));
+			break;
+		default:
+			break;
+		}
+	}
+
+	protected String getLocalDBKey(String cid, String key, String forkey_sessionId,
+		String asking_sessionId) {
+		String local_key = super.getLocalDBKey(cid, key, forkey_sessionId,
+			asking_sessionId);
+		if (local_key != null) {
+			return local_key;
+		} else {
+			String cluster_node = null;
+			for (String node: cluster_nodes) {
+				if (!node.equals(getComponentId())) {
+					cluster_node = node;
+					break;
+				}
+			}
+			if (cluster_node != null) {
+				Map<String, String> params = new LinkedHashMap<String, String>();
+				params.put(CID, cid);
+				params.put(KEY, key);
+				params.put(FORKEY_SESSION_ID, forkey_sessionId);
+				params.put(ASKING_SESSION_ID, asking_sessionId);
+				Element check_db_key =
+          ClusterElement.createClusterMethodCall(getComponentId(), cluster_node,
+						StanzaType.set.toString(), ClusterMethods.CHECK_DB_KEY.toString(),
+						params);
+				addOutPacket(new Packet(check_db_key));
+			}
+			return null;
+		}
 	}
 
 	public void nodesConnected(Set<String> node_hostnames) {
