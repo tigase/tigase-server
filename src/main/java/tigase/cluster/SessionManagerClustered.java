@@ -125,11 +125,10 @@ public class SessionManagerClustered extends SessionManager
 			if (clel.getMethodName() == null) {
 				processPacket(clel);
 			}
-			break;
 			if (ClusterMethods.SESSION_TRANSFER.toString().equals(clel.getMethodName())) {
 				String userId = null;
 				try {
-					String userId = clel.getMethodParam(USER_ID);
+					userId = clel.getMethodParam(USER_ID);
 					String xmpp_sessionId = clel.getMethodParam(XMPP_SESSION_ID);
 					//String defLand = conn.getLang();
 					String resource = clel.getMethodParam(RESOURCE);
@@ -152,6 +151,7 @@ public class SessionManagerClustered extends SessionManager
 						"Exception during user session transfer: " + userId, e);
 				}
 			}
+			break;
 		case get:
 			if (ClusterMethods.CHECK_USER_SESSION.toString().equals(clel.getMethodName())) {
 				ClusterElement result = null;
@@ -234,23 +234,28 @@ public class SessionManagerClustered extends SessionManager
 		if (session != null) {
 			List<XMPPResourceConnection> conns = session.getActiveResources();
 			for (XMPPResourceConnection conn: conns) {
-				String xmpp_sessionId = conn.getSessionId();
-				//String defLand = conn.getLang();
-				String resource = conn.getResource();
-				String connectionId = conn.getConnectionId();
-				int priority = conn.getPriority();
-				String token = conn.getAuthenticationToken(xmpp_sessionId);
-				Map<String, String> params = new LinkedHashMap<String, String>();
-				params.put(USER_ID, userId);
-				params.put(XMPP_SESSION_ID, xmpp_sessionId);
-				params.put(RESOURCE, resource);
-				params.put(CONNECTION_ID, connectionId);
-				params.put(PRIORITY, "" + priority);
-				params.put(TOKEN, token);
-				Element sess_trans = ClusterElement.createClusterMethodCall(
-					getComponentId(), remote_sessionId, "set",
-					ClusterMethods.SESSION_TRANSFER.toString(), params);
-				fastAddOutPacket(new Packet(sess_trans));
+				try {
+					String xmpp_sessionId = conn.getSessionId();
+					//String defLand = conn.getLang();
+					String resource = conn.getResource();
+					String connectionId = conn.getConnectionId();
+					int priority = conn.getPriority();
+					String token = conn.getAuthenticationToken(xmpp_sessionId);
+					Map<String, String> params = new LinkedHashMap<String, String>();
+					params.put(USER_ID, userId);
+					params.put(XMPP_SESSION_ID, xmpp_sessionId);
+					params.put(RESOURCE, resource);
+					params.put(CONNECTION_ID, connectionId);
+					params.put(PRIORITY, "" + priority);
+					params.put(TOKEN, token);
+					Element sess_trans = ClusterElement.createClusterMethodCall(
+						getComponentId(), remote_sessionId, "set",
+						ClusterMethods.SESSION_TRANSFER.toString(), params);
+					fastAddOutPacket(new Packet(sess_trans));
+				} catch (Exception e) {
+					log.log(Level.WARNING,
+						"Exception during user session transfer preparation", e);
+				}
 			}
 		} else {
 			Map<String, String> res_vals = new LinkedHashMap<String, String>();
