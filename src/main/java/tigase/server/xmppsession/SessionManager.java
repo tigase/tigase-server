@@ -384,7 +384,7 @@ public class SessionManager extends AbstractMessageReceiver
 		}
 	}
 
-	private XMPPSession getSession(String jid) {
+	protected XMPPSession getSession(String jid) {
 		return sessionsByNodeId.get(JIDUtils.getNodeID(jid));
 	}
 
@@ -432,7 +432,7 @@ public class SessionManager extends AbstractMessageReceiver
 		} // end of if (children != null)
 	}
 
-	private XMPPResourceConnection createUserSession(String conn_id,
+	protected XMPPResourceConnection createUserSession(String conn_id,
 		String domain, String user_jid) {
 		XMPPResourceConnection connection = new XMPPResourceConnection(conn_id,
 			user_repository, auth_repository, this, false);
@@ -839,8 +839,7 @@ public class SessionManager extends AbstractMessageReceiver
 		//Arrays.sort(anon_peers);
 	}
 
-	public void handleLogin(final String userName,
-		final XMPPResourceConnection conn) {
+	public void handleLogin(String userName, XMPPResourceConnection conn) {
 		log.finest("handleLogin called for: " + userName);
 		String userId = JIDUtils.getNodeID(userName, conn.getDomain());
 		XMPPSession session = sessionsByNodeId.get(userId);
@@ -853,8 +852,7 @@ public class SessionManager extends AbstractMessageReceiver
 	}
 
 
-	public void handleLogout(final String userName,
-		final XMPPResourceConnection conn) {
+	public void handleLogout(String userName, XMPPResourceConnection conn) {
 		String domain = conn.getDomain();
 		addOutPacket(Command.CLOSE.getPacket(getComponentId(),
 				conn.getConnectionId(), StanzaType.set, conn.nextStanzaId()));

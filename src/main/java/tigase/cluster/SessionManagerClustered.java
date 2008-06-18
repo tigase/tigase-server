@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Set;
 import java.util.LinkedHashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Arrays;
 
@@ -34,7 +35,9 @@ import java.util.Arrays;
 import tigase.server.Packet;
 import tigase.util.JIDUtils;
 import tigase.xmpp.StanzaType;
+import tigase.xmpp.Authorization;
 import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.XMPPSession;
 import tigase.server.xmppsession.SessionManager;
 import tigase.xml.Element;
 
@@ -57,6 +60,17 @@ public class SessionManagerClustered extends SessionManager
    */
   private static final Logger log =
     Logger.getLogger("tigase.server.xmppsession.SessionManagerClustered");
+
+	private static final String USER_ID = "userId";
+	private static final String SESSION_ID = "sessionId";
+	private static final String CREATION_TIME = "creationTime";
+	private static final String ERROR_CODE = "errorCode";
+
+	private static final String XMPP_SESSION_ID = "xmppSessionId";
+	private static final String RESOURCE = "resource";
+	private static final String CONNECTION_ID = "connectionId";
+	private static final String PRIORITY = "priority";
+	private static final String TOKEN = "token";
 
 	private Set<String> cluster_nodes = new LinkedHashSet<String>();
 	private Set<String> broken_nodes = new LinkedHashSet<String>();
@@ -108,13 +122,95 @@ public class SessionManagerClustered extends SessionManager
 		clel.addVisitedNode(getComponentId());
 		switch (packet.getType()) {
 		case set:
-			processPacket(clel);
+			if (clel.getMethodName() == null) {
+				processPacket(clel);
+			}
 			break;
+			if (ClusterMethods.SESSION_TRANSFER.toString().equals(clel.getMethodName())) {
+				String userId = null;
+				try {
+					String userId = clel.getMethodParam(USER_ID);
+					String xmpp_sessionId = clel.getMethodParam(XMPP_SESSION_ID);
+					//String defLand = conn.getLang();
+					String resource = clel.getMethodParam(RESOURCE);
+					String connectionId = clel.getMethodParam(CONNECTION_ID);
+					int priority = 5;
+					try {
+						priority = Integer.parseInt(clel.getMethodParam(PRIORITY));
+					} catch (Exception e) {
+						priority = 5;
+					}
+					String token = clel.getMethodParam(TOKEN);
+					String domain = JIDUtils.getNodeHost(userId);
+					String nick = JIDUtils.getNodeNick(userId);
+					XMPPResourceConnection res_con = createUserSession(connectionId, domain,
+						JIDUtils.getJID(nick, domain, resource));
+					res_con.setSessionId(xmpp_sessionId);
+					res_con.loginToken(xmpp_sessionId, token);
+				} catch (Exception e) {
+					log.log(Level.WARNING,
+						"Exception during user session transfer: " + userId, e);
+				}
+			}
 		case get:
-
+			if (ClusterMethods.CHECK_USER_SESSION.toString().equals(clel.getMethodName())) {
+				ClusterElement result = null;
+				String userId = clel.getMethodParam(USER_ID);
+				XMPPSession session = getSession(userId);
+				if (session == null) {
+					result = ClusterElement.createForNextNode(clel, cluster_nodes,
+						getComponentId());
+				} else {
+					Map<String, String> res_vals = new LinkedHashMap<String, String>();
+					res_vals.put(SESSION_ID, getComponentId());
+					res_vals.put(CREATION_TIME, ""+session.getCreationTime());
+					result = clel.createMethodResponse(getComponentId(),
+						"result", res_vals);
+				}
+				if (result != null) {
+					fastAddOutPacket(new Packet(result.getClusterElement()));
+				}
+			}
+			if (ClusterMethods.SESSION_TRANSFER.toString().equals(clel.getMethodName())) {
+				transferUserSession(clel.getMethodParam(USER_ID),
+					clel.getMethodParam(SESSION_ID), clel);
+			}
 			break;
 		case result:
-
+			if (ClusterMethods.CHECK_USER_SESSION.toString().equals(clel.getMethodName())) {
+				String userId = clel.getMethodParam(USER_ID);
+				String remote_sessionId = clel.getMethodResultVal(SESSION_ID);
+				long remote_creationTime = 0;
+				try {
+					remote_creationTime =
+            Long.parseLong(clel.getMethodResultVal(CREATION_TIME));
+				} catch (Exception e) {
+					remote_creationTime = 0;
+				}
+				int remote_hashcode = (userId+remote_sessionId).hashCode();
+				int local_hashcode = (userId+getComponentId()).hashCode();
+				XMPPSession session = getSession(userId);
+				boolean transfer_out = false;
+				if (remote_creationTime > session.getCreationTime()) {
+					transfer_out = true;
+				}
+				if (remote_creationTime == session.getCreationTime()) {
+					if (remote_hashcode > local_hashcode) {
+						transfer_out = true;
+					}
+				}
+				if (transfer_out) {
+					transferUserSession(userId, remote_sessionId, clel);
+				} else {
+					Map<String, String> params = new LinkedHashMap<String, String>();
+					params.put(USER_ID, userId);
+					params.put(SESSION_ID, getComponentId());
+					Element sess_trans = ClusterElement.createClusterMethodCall(
+						getComponentId(), remote_sessionId, "get",
+						ClusterMethods.SESSION_TRANSFER.toString(), params);
+					fastAddOutPacket(new Packet(sess_trans));
+				}
+			}
 			break;
 		case error:
 			// There might be many different errors...
@@ -132,11 +228,44 @@ public class SessionManagerClustered extends SessionManager
 		}
 	}
 
+	protected void transferUserSession(String userId, String remote_sessionId,
+		ClusterElement clel) {
+		XMPPSession session = getSession(userId);
+		if (session != null) {
+			List<XMPPResourceConnection> conns = session.getActiveResources();
+			for (XMPPResourceConnection conn: conns) {
+				String xmpp_sessionId = conn.getSessionId();
+				//String defLand = conn.getLang();
+				String resource = conn.getResource();
+				String connectionId = conn.getConnectionId();
+				int priority = conn.getPriority();
+				String token = conn.getAuthenticationToken(xmpp_sessionId);
+				Map<String, String> params = new LinkedHashMap<String, String>();
+				params.put(USER_ID, userId);
+				params.put(XMPP_SESSION_ID, xmpp_sessionId);
+				params.put(RESOURCE, resource);
+				params.put(CONNECTION_ID, connectionId);
+				params.put(PRIORITY, "" + priority);
+				params.put(TOKEN, token);
+				Element sess_trans = ClusterElement.createClusterMethodCall(
+					getComponentId(), remote_sessionId, "set",
+					ClusterMethods.SESSION_TRANSFER.toString(), params);
+				fastAddOutPacket(new Packet(sess_trans));
+			}
+		} else {
+			Map<String, String> res_vals = new LinkedHashMap<String, String>();
+			res_vals.put(ERROR_CODE, Authorization.ITEM_NOT_FOUND.toString());
+			ClusterElement error_clel = clel.createMethodResponse(getComponentId(),
+						"error", res_vals);
+			fastAddOutPacket(new Packet(error_clel.getClusterElement()));
+		}
+	}
+
 	protected boolean sentToNextNode(ClusterElement clel) {
 		ClusterElement next_clel = ClusterElement.createForNextNode(clel,
 			cluster_nodes, getComponentId());
 		if (next_clel != null) {
-			super.fastAddOutPacket(new Packet(next_clel.getClusterElement()));
+			fastAddOutPacket(new Packet(next_clel.getClusterElement()));
 			return true;
 		} else {
 			return false;
@@ -146,14 +275,13 @@ public class SessionManagerClustered extends SessionManager
 	protected boolean sentToNextNode(Packet packet) {
 		if (cluster_nodes.size() > 0) {
 			String sess_man_id = getComponentId();
-			for (String cluster_node: cluster_nodes) {
-				if (!cluster_node.equals(sess_man_id)) {
-					ClusterElement clel = new ClusterElement(sess_man_id, cluster_node,
-						StanzaType.set, packet);
-					clel.addVisitedNode(sess_man_id);
-					super.fastAddOutPacket(new Packet(clel.getClusterElement()));
-					return true;
-				}
+			String cluster_node = getFirstClusterNode();
+			if (cluster_node != null) {
+				ClusterElement clel = new ClusterElement(sess_man_id, cluster_node,
+					StanzaType.set, packet);
+				clel.addVisitedNode(sess_man_id);
+				fastAddOutPacket(new Packet(clel.getClusterElement()));
+				return true;
 			}
 		}
 		return false;
@@ -199,6 +327,32 @@ public class SessionManagerClustered extends SessionManager
 		}
 		sendClusterNotification("Cluster nodes have been disconnected:",
 			"Disconnected cluster nodes", node_hostnames);
+	}
+
+	protected String getFirstClusterNode() {
+		String cluster_node = null;
+		for (String node: cluster_nodes) {
+			if (!node.equals(getComponentId())) {
+				cluster_node = node;
+				break;
+			}
+		}
+		return cluster_node;
+	}
+
+	public void handleLogin(String userName, XMPPResourceConnection conn) {
+		super.handleLogin(userName, conn);
+		if (!conn.isAnonymous()) {
+			String cluster_node = getFirstClusterNode();
+			if (cluster_node != null) {
+				Map<String, String> params = new LinkedHashMap<String, String>();
+				params.put(USER_ID, JIDUtils.getNodeID(userName, conn.getDomain()));
+				Element check_session_el = ClusterElement.createClusterMethodCall(
+					getComponentId(), cluster_node, "get",
+					ClusterMethods.CHECK_USER_SESSION.toString(), params);
+				fastAddOutPacket(new Packet(check_session_el));
+			}
+		}
 	}
 
 	private void sendClusterNotification(String msg, String subject,

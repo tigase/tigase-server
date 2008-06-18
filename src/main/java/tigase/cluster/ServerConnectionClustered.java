@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 import java.util.logging.Level;
 
 
+import tigase.util.JIDUtils;
 import tigase.xmpp.StanzaType;
 import tigase.server.Packet;
 import tigase.server.xmppserver.ServerConnectionManager;
@@ -57,6 +58,7 @@ public class ServerConnectionClustered extends ServerConnectionManager
 	private static final String KEY = "key";
 	private static final String FORKEY_SESSION_ID = "forkey_sessionId";
 	private static final String ASKING_SESSION_ID = "asking_sessionId";
+	private static final String VALID = "valid";
 
 	private Set<String> cluster_nodes = new LinkedHashSet<String>();
 
@@ -77,7 +79,7 @@ public class ServerConnectionClustered extends ServerConnectionManager
 		clel.addVisitedNode(getComponentId());
 		switch (packet.getType()) {
 		case set:
-			if (clel.getMethodName().equals(ClusterMethods.CHECK_DB_KEY.toString())) {
+			if (ClusterMethods.CHECK_DB_KEY.toString().equals(clel.getMethodName())) {
 				String cid = clel.getMethodParam(CID);
 				String key = clel.getMethodParam(KEY);
 				String forkey_sessionId = clel.getMethodParam(FORKEY_SESSION_ID);
@@ -94,7 +96,7 @@ public class ServerConnectionClustered extends ServerConnectionManager
 				}
 				if (result == null) {
 					Map<String, String> res_vals = new LinkedHashMap<String, String>();
-					res_vals.put("valid", "" + valid);
+					res_vals.put(VALID, "" + valid);
 					result = clel.createMethodResponse(getComponentId(),
 						"result", res_vals);
 				}
@@ -105,7 +107,17 @@ public class ServerConnectionClustered extends ServerConnectionManager
 
 			break;
 		case result:
-
+			if (ClusterMethods.CHECK_DB_KEY.toString().equals(clel.getMethodName())) {
+				String cid = clel.getMethodParam(CID);
+				String key = clel.getMethodParam(KEY);
+				String forkey_sessionId = clel.getMethodParam(FORKEY_SESSION_ID);
+				String asking_sessionId = clel.getMethodParam(ASKING_SESSION_ID);
+				boolean valid = "true".equals(clel.getMethodResultVal(VALID));
+				String from = JIDUtils.getNodeNick(cid);
+				String to = JIDUtils.getNodeHost(cid);
+				sendVerifyResult(from, to, forkey_sessionId, valid,
+					getServerConnections(cid), asking_sessionId);
+			}
 			break;
 		case error:
 			// There might be many different errors...
@@ -121,6 +133,17 @@ public class ServerConnectionClustered extends ServerConnectionManager
 		}
 	}
 
+	protected String getFirstClusterNode() {
+		String cluster_node = null;
+		for (String node: cluster_nodes) {
+			if (!node.equals(getComponentId())) {
+				cluster_node = node;
+				break;
+			}
+		}
+		return cluster_node;
+	}
+
 	protected String getLocalDBKey(String cid, String key, String forkey_sessionId,
 		String asking_sessionId) {
 		String local_key = super.getLocalDBKey(cid, key, forkey_sessionId,
@@ -128,13 +151,7 @@ public class ServerConnectionClustered extends ServerConnectionManager
 		if (local_key != null) {
 			return local_key;
 		} else {
-			String cluster_node = null;
-			for (String node: cluster_nodes) {
-				if (!node.equals(getComponentId())) {
-					cluster_node = node;
-					break;
-				}
-			}
+			String cluster_node = getFirstClusterNode();
 			if (cluster_node != null) {
 				Map<String, String> params = new LinkedHashMap<String, String>();
 				params.put(CID, cid);

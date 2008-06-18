@@ -52,6 +52,7 @@ public class XMPPSession {
   private String username = null;
 
 	private ArrayList<XMPPResourceConnection> activeResources = null;
+	private long creationTime = 0;
 
 	/**
 	 * Creates a new <code>XMPPSession</code> instance.
@@ -60,6 +61,11 @@ public class XMPPSession {
 	public XMPPSession(final String username) {
 		activeResources = new ArrayList<XMPPResourceConnection>();
 		this.username = username;
+		this.creationTime = System.currentTimeMillis();
+	}
+
+	public long getCreationTime() {
+		return creationTime;
 	}
 
 	public void streamClosed(XMPPResourceConnection conn) {

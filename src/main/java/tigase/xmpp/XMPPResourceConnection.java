@@ -56,6 +56,10 @@ public class XMPPResourceConnection extends RepositoryAccess {
 
 	//private LoginContext loginContext = null;
 
+	/**
+	 * <code>sessionId</code> keeps XMPP stream session ID given at connection
+	 * initialization time.
+	 */
 	private String sessionId = null;
 	private String defLang = "en";
   /**
@@ -77,7 +81,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 
 	private int priority = 0;
 
-	private boolean dummy = false;
+	//private boolean dummy = false;
 
 	private String userJid = null;
 	private String userId = null;
@@ -381,13 +385,13 @@ public class XMPPResourceConnection extends RepositoryAccess {
 		return result;
 	}
 
-	public boolean isDummy() {
-		return dummy;
-	}
+// 	public boolean isDummy() {
+// 		return dummy;
+// 	}
 
-	public void setDummy(boolean dummy) {
-		this.dummy = dummy;
-	}
+// 	public void setDummy(boolean dummy) {
+// 		this.dummy = dummy;
+// 	}
 
 	public String nextStanzaId() {
 		return "tig" + (++id_counter);

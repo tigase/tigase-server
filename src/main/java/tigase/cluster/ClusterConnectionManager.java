@@ -111,7 +111,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 			}
 			return;
 		}
-		writePacketToSocket(packet);
+		writePacketToSocket(packet.packRouted());
 	}
 
 	public Queue<Packet> processSocketData(XMPPIOService serv) {
@@ -123,6 +123,9 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 			if (p.getElemName().equals("handshake")) {
 				processHandshake(p, serv);
 			} else {
+				if (p.isRouted()) {
+					p = p.unpackRouted();
+				} // end of if (p.isRouted())
 				addOutPacket(p);
 			}
 		} // end of while ()

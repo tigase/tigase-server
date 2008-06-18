@@ -31,6 +31,6 @@ package tigase.cluster;
  */
 public enum ClusterMethods {
 
-	UPDATE_NODES, CHECK_DB_KEY;
+	UPDATE_NODES, CHECK_DB_KEY, CHECK_USER_SESSION, SESSION_TRANSFER;
 
 }

@@ -270,7 +270,31 @@ public abstract class RepositoryAccess {
 		} // end of try-catch
   }
 
-  public Authorization loginDigest(String user, String digest,
+	public String getAuthenticationToken(String xmpp_sessionId)
+	  throws NotAuthorizedException {
+		UUID token = UUID.randomUUID();
+		setData("tokens", xmpp_sessionId, token.toString());
+		return token.toString();
+	}
+
+	public Authorization loginToken(String xmpp_sessionId, String token)
+	  throws NotAuthorizedException {
+    try {
+			String db_token = repo.getData(getUserId(), "tokens", xmpp_sessionId);
+			if (token.equals(db_token)) {
+				authState = Authorization.AUTHORIZED;
+				repo.removeData(getUserId(), "tokens", xmpp_sessionId);
+			}
+    } catch (UserNotFoundException e) {
+      log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
+      throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
+    } catch (TigaseDBException e) {
+			log.log(Level.SEVERE, "Repository access exception.", e);
+		} // end of try-catch
+		return authState;
+	}
+
+	public Authorization loginDigest(String user, String digest,
 		String id, String alg)
 		throws NotAuthorizedException, AuthorizationException {
 		try {

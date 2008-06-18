@@ -113,6 +113,10 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 	private Map<String, ServerConnections> connectionsByLocalRemote =
 		new ConcurrentSkipListMap<String, ServerConnections>();
 
+	protected ServerConnections getServerConnections(String cid) {
+		return connectionsByLocalRemote.get(cid);
+	}
+
 	public void processPacket(Packet packet) {
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Processing packet: " + packet.toString());
@@ -163,7 +167,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 
 			String cid = getConnectionId(packet);
 			log.finest("Connection ID is: " + cid);
-			ServerConnections serv_conn = connectionsByLocalRemote.get(cid);
+			ServerConnections serv_conn = getServerConnections(cid);
 			if (serv_conn == null
 				|| (!serv_conn.sendPacket(packet) && serv_conn.needsConnection())) {
 				createServerConnection(cid, packet, serv_conn);
@@ -322,7 +326,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 	}
 
 	private void bouncePacketsBack(Authorization author, String cid) {
-		ServerConnections serv_conns = connectionsByLocalRemote.get(cid);
+		ServerConnections serv_conns = getServerConnections(cid);
 		if (serv_conns != null) {
 			Queue<Packet> waiting =	serv_conns.getWaitingPackets();
 			Packet p = null;
@@ -374,7 +378,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 		}
 		String cid = getConnectionId(serv);
 		String session_id = (String)serv.getSessionData().get(serv.SESSION_ID_KEY);
-		ServerConnections serv_conns = connectionsByLocalRemote.get(cid);
+		ServerConnections serv_conns = getServerConnections(cid);
 		if (serv_conns == null || !serv_conns.isIncomingValid(session_id)) {
 			log.info("Incoming connection hasn't been validated");
 			return false;
@@ -413,7 +417,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 				(String)serv.getSessionData().get("local-hostname");
 			String cid = getConnectionId(local_hostname, remote_hostname);
 			log.finest("Stream opened for: " + cid);
-			ServerConnections serv_conns = connectionsByLocalRemote.get(cid);
+			ServerConnections serv_conns = getServerConnections(cid);
 			if (serv_conns == null) {
 				serv_conns = createNewServerConnections(cid, null);
 			}
@@ -581,7 +585,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 			return;
 		}
 		String cid = getConnectionId(local_hostname, remote_hostname);
-		ServerConnections serv_conns = connectionsByLocalRemote.get(cid);
+		ServerConnections serv_conns = getServerConnections(cid);
 		if (serv_conns == null) {
 			log.warning("There is no ServerConnections for stopped service: "
 				+ service.getUniqueId() + ", cid: " + cid);
@@ -643,7 +647,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 			return;
 		}
 		String cid = getConnectionId(local_hostname, remote_hostname);
-		ServerConnections serv_conns = connectionsByLocalRemote.get(cid);
+		ServerConnections serv_conns = getServerConnections(cid);
 		String session_id = (String)serv.getSessionData().get(serv.SESSION_ID_KEY);
 
 		// <db:result>
@@ -758,18 +762,18 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 
 	protected String getLocalDBKey(String cid, String key, String forkey_sessionId,
 		String asking_sessionId) {
-		ServerConnections serv_conns = connectionsByLocalRemote.get(cid);
+		ServerConnections serv_conns = getServerConnections(cid);
 		return serv_conns == null ? null : serv_conns.getDBKey(forkey_sessionId);
 	}
 
-	protected void sendVerifyResult(String from, String to, String id, boolean valid,
-		ServerConnections serv_conns, String session_id) {
+	protected void sendVerifyResult(String from, String to, String forkey_sessionId,
+		boolean valid, ServerConnections serv_conns, String asking_sessionId) {
 		String type = (valid ? "valid" : "invalid");
 		Element result_el = new Element(DB_VERIFY_EL_NAME,
 			new String[] {"from", "to", "id", "type", XMLNS_DB_ATT},
-			new String[] {from, to, id, type, XMLNS_DB_VAL});
+			new String[] {from, to, forkey_sessionId, type, XMLNS_DB_VAL});
 		Packet result = new Packet(result_el);
-		if (!serv_conns.sendToIncoming(session_id, result)) {
+		if (!serv_conns.sendToIncoming(asking_sessionId, result)) {
 			log.warning("Can not send verification packet back: " + result.toString());
 		}
 	}

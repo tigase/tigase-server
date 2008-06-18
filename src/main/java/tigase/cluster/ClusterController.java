@@ -111,8 +111,7 @@ public class ClusterController
 	public void processPacket(final Packet packet, final Queue<Packet> results) {
 		if (packet.getElement().getName() == ClusterElement.CLUSTER_EL_NAME) {
 			ClusterElement clem = new ClusterElement(packet.getElement());
-			if (clem.getMethodName() != null
-				&& clem.getMethodName().equals(ClusterMethods.UPDATE_NODES.toString())) {
+			if (ClusterMethods.UPDATE_NODES.toString().equals(clem.getMethodName())) {
 				String connected_nodes = clem.getMethodParam("connected");
 				String disconnected_nodes = clem.getMethodParam("disconnected");
 				for (ClusteredComponent comp: components.values()) {
