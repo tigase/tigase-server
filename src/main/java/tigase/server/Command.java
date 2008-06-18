@@ -48,6 +48,7 @@ public enum Command {
 		USER_STATUS,
 		BROADCAST_TO_ONLINE,
 		BROADCAST_TO_ALL,
+    REDIRECT,
 		OTHER;
 
   /**

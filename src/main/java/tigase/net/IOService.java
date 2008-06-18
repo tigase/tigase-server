@@ -107,7 +107,17 @@ public abstract class IOService implements Callable<IOService> {
   private CharsetEncoder encoder = Charset.forName("UTF-8").newEncoder();
   private CharsetDecoder decoder = Charset.forName("UTF-8").newDecoder();
 
-  public synchronized void setSSLId(final String id) {
+	private String dataReceiver = null;
+
+	public void setDataReceiver(String address) {
+		this.dataReceiver = address;
+	}
+
+	public String getDataReceiver() {
+		return this.dataReceiver;
+	}
+
+  public void setSSLId(final String id) {
     sslId = id;
   }
 
@@ -123,7 +133,7 @@ public abstract class IOService implements Callable<IOService> {
 		lastTransferTime = System.currentTimeMillis();
 	}
 
-  public synchronized void startSSL(final boolean clientMode)
+  public void startSSL(final boolean clientMode)
     throws IOException {
 
 		socketIO = new TLSIO(socketIO,
@@ -132,7 +142,7 @@ public abstract class IOService implements Callable<IOService> {
 		setLastTransferTime();
   }
 
-  public synchronized void startTLS(final boolean clientMode)
+  public void startTLS(final boolean clientMode)
     throws IOException {
 
 		socketIO = new TLSIO(socketIO,
@@ -185,7 +195,7 @@ public abstract class IOService implements Callable<IOService> {
    *
    * @param socketChannel a <code>SocketChannel</code> value
    */
-  public synchronized void accept(final SocketChannel socketChannel)
+  public void accept(final SocketChannel socketChannel)
     throws IOException {
 		if (socketChannel.isConnectionPending()) {
 			socketChannel.finishConnect();

@@ -501,15 +501,7 @@ public class SessionManager extends AbstractMessageReceiver
 			processing_result = true;
 			break;
 		case STREAM_CLOSED:
-			log.fine("Stream closed from: " + pc.getFrom());
-			++closedConnections;
-			connection = connectionsByFrom.remove(pc.getFrom());
-			if (connection != null) {
-				closeSession(connection);
-			} else {
-				log.info("Can not find resource connection for packet: " +
-					pc.toString());
-			} // end of if (conn != null) else
+			closeConnection(pc.getFrom());
 			processing_result = true;
 			break;
 		case BROADCAST_TO_ONLINE:
@@ -599,6 +591,17 @@ public class SessionManager extends AbstractMessageReceiver
 			break;
 		} // end of switch (pc.getCommand())
 		return processing_result;
+	}
+
+	protected void closeConnection(String connectionId) {
+		log.fine("Stream closed from: " + connectionId);
+		++closedConnections;
+		XMPPResourceConnection connection = connectionsByFrom.remove(connectionId);
+		if (connection != null) {
+			closeSession(connection);
+		} else {
+			log.info("Can not find resource connection for packet: " + connectionId);
+		} // end of if (conn != null) else
 	}
 
 	private void closeSession(XMPPResourceConnection conn) {

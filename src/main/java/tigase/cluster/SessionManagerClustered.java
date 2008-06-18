@@ -33,6 +33,7 @@ import java.util.Arrays;
 
 //import tigase.cluster.ClusterElement;
 import tigase.server.Packet;
+import tigase.server.Command;
 import tigase.util.JIDUtils;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.Authorization;
@@ -71,6 +72,7 @@ public class SessionManagerClustered extends SessionManager
 	private static final String CONNECTION_ID = "connectionId";
 	private static final String PRIORITY = "priority";
 	private static final String TOKEN = "token";
+	private static final String TRANSFER = "transfer";
 
 	private Set<String> cluster_nodes = new LinkedHashSet<String>();
 	private Set<String> broken_nodes = new LinkedHashSet<String>();
@@ -146,6 +148,17 @@ public class SessionManagerClustered extends SessionManager
 						JIDUtils.getJID(nick, domain, resource));
 					res_con.setSessionId(xmpp_sessionId);
 					res_con.loginToken(xmpp_sessionId, token);
+
+					Packet redirect = Command.REDIRECT.getPacket(getComponentId(),
+						connectionId, StanzaType.set, "1", "submit");
+					Command.addFieldValue(redirect, "session-id", xmpp_sessionId);
+					fastAddOutPacket(redirect);
+
+					Map<String, String> res_vals = new LinkedHashMap<String, String>();
+					res_vals.put(TRANSFER, "success");
+					ClusterElement result = clel.createMethodResponse(getComponentId(),
+						"result", res_vals);
+					fastAddOutPacket(new Packet(result.getClusterElement()));
 				} catch (Exception e) {
 					log.log(Level.WARNING,
 						"Exception during user session transfer: " + userId, e);
@@ -210,6 +223,10 @@ public class SessionManagerClustered extends SessionManager
 						ClusterMethods.SESSION_TRANSFER.toString(), params);
 					fastAddOutPacket(new Packet(sess_trans));
 				}
+			}
+			if (ClusterMethods.SESSION_TRANSFER.toString().equals(clel.getMethodName())) {
+				String connectionId = clel.getMethodParam(CONNECTION_ID);
+				closeConnection(connectionId);
 			}
 			break;
 		case error:
