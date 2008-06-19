@@ -81,6 +81,9 @@ public class ServerConnections {
 	private ConcurrentSkipListMap<String, String> db_keys =
     new ConcurrentSkipListMap<String, String>();
 
+	private long sentPackets = 0;
+	private long receivedPackets = 0;
+
 	private ConnectionHandlerIfc handler = null;
 
 	/**
@@ -113,6 +116,8 @@ public class ServerConnections {
 			if (!result) {
 				outgoing.forceStop();
 				outgoing = null;
+			} else {
+				++sentPackets;
 			}
 		}
 		if (!result) {
@@ -178,6 +183,7 @@ public class ServerConnections {
 		while ((packet = waitingControlPackets.poll()) != null) {
 			all.offer(packet);
 		}
+		sentPackets += waitingPackets.size();
 		while ((packet = waitingPackets.poll()) != null) {
 			all.offer(packet);
 		}

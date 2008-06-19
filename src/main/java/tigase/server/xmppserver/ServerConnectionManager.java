@@ -548,13 +548,19 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 		int open_s2s_connections = 0;
 		int connected_servers = 0;
 		int server_connections_instances = connectionsByLocalRemote.size();
-		for (ServerConnections conn: connectionsByLocalRemote.values()) {
+		for (Map.Entry<String, ServerConnections> entry:
+      connectionsByLocalRemote.entrySet()) {
+			ServerConnections conn = entry.getValue();
 			waiting_packets += conn.getWaitingPackets().size();
 			open_s2s_connections += conn.incomingSize();
 			if (!conn.needsConnection()) {
 				++open_s2s_connections;
 				++connected_servers;
 			}
+			log.info("s2s instance: " + entry.getKey()
+				+ ", waitingQueue: " + conn.getWaitingPackets().size()
+				+ ", incomingConnections: " + conn.incomingSize()
+				+ ", outgoingActive: " + !conn.needsConnection());
 		}
  		stats.add(new StatRecord(getName(), "Open s2s connections", "int",
  				open_s2s_connections, Level.INFO));
