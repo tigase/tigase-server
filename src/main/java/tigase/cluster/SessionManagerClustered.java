@@ -220,7 +220,7 @@ public class SessionManagerClustered extends SessionManager
 					params.put(SESSION_ID, getComponentId());
 					Element sess_trans = ClusterElement.createClusterMethodCall(
 						getComponentId(), remote_sessionId, "get",
-						ClusterMethods.SESSION_TRANSFER.toString(), params);
+						ClusterMethods.SESSION_TRANSFER.toString(), params).getClusterElement();
 					fastAddOutPacket(new Packet(sess_trans));
 				}
 			}
@@ -267,7 +267,7 @@ public class SessionManagerClustered extends SessionManager
 					params.put(TOKEN, token);
 					Element sess_trans = ClusterElement.createClusterMethodCall(
 						getComponentId(), remote_sessionId, "set",
-						ClusterMethods.SESSION_TRANSFER.toString(), params);
+						ClusterMethods.SESSION_TRANSFER.toString(), params).getClusterElement();
 					fastAddOutPacket(new Packet(sess_trans));
 				} catch (Exception e) {
 					log.log(Level.WARNING,
@@ -371,7 +371,7 @@ public class SessionManagerClustered extends SessionManager
 				params.put(USER_ID, JIDUtils.getNodeID(userName, conn.getDomain()));
 				Element check_session_el = ClusterElement.createClusterMethodCall(
 					getComponentId(), cluster_node, "get",
-					ClusterMethods.CHECK_USER_SESSION.toString(), params);
+					ClusterMethods.CHECK_USER_SESSION.toString(), params).getClusterElement();
 				fastAddOutPacket(new Packet(check_session_el));
 			}
 		}

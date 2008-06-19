@@ -185,7 +185,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 		addOutPacket(new Packet(ClusterElement.createClusterMethodCall(
 					getComponentId(), cluster_controller_id,
 					StanzaType.set.toString(), ClusterMethods.UPDATE_NODES.toString(),
-					method_params)));
+					method_params).getClusterElement()));
 	}
 
 	public void setProperties(Map<String, Object> props) {
@@ -294,7 +294,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 		addOutPacket(new Packet(ClusterElement.createClusterMethodCall(
 					getComponentId(), cluster_controller_id,
 					StanzaType.set.toString(), ClusterMethods.UPDATE_NODES.toString(),
-					method_params)));
+					method_params).getClusterElement()));
 	}
 
 	protected String getServiceId(Packet packet) {

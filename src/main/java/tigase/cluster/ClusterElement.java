@@ -162,8 +162,8 @@ public class ClusterElement {
 		return cluster_el;
 	}
 
-	public static Element createClusterMethodCall(String from, String to, String type,
-		String method_name, Map<String, String> params) {
+	public static ClusterElement createClusterMethodCall(String from, String to,
+		String type, String method_name, Map<String, String> params) {
 		Element cluster_el = clusterElement(from, to, type);
 		Element method_call = new Element(CLUSTER_METHOD_EL_NAME,
 			new String [] {CLUSTER_NAME_ATTR}, new String[] {method_name});
@@ -175,7 +175,9 @@ public class ClusterElement {
 			}
 		}
 		cluster_el.findChild(CLUSTER_CONTROL_PATH).addChild(method_call);
-		return cluster_el;
+		ClusterElement result_cl = new ClusterElement(cluster_el);
+		result_cl.addVisitedNode(from);
+		return result_cl;
 	}
 
 	public ClusterElement createMethodResponse(String from, String type,
