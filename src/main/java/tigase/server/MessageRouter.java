@@ -503,7 +503,8 @@ public class MessageRouter extends AbstractMessageReceiver {
 			if (packet.isXMLNS("/iq/query", ITEMS_XMLNS)) {
 				boolean localDomain = isLocalDomain(jid);
 				for (XMPPService comp: xmppServices.values()) {
-					if (localDomain || (nick != null && comp.getName().equals(nick))) {
+					//					if (localDomain || (nick != null && comp.getName().equals(nick))) {
+					if (localDomain || comp.getComponentId().equals(jid)) {
 						List<Element> items =	comp.getDiscoItems(node, jid);
 						if (items != null && items.size() > 0) {
 							query.addChildren(items);

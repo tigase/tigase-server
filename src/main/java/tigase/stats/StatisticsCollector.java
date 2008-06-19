@@ -198,7 +198,7 @@ public class StatisticsCollector
 	public 	List<Element> getDiscoFeatures() { return null; }
 
 	public List<Element> getDiscoItems(String node, String jid) {
-		if (getName().equals(JIDUtils.getNodeNick(jid))) {
+		if (getName().equals(JIDUtils.getNodeNick(jid)) || getComponentId().equals(jid)) {
 			return serviceEntity.getDiscoItems(node, jid);
 		} else {
 			return Arrays.asList(serviceEntity.getDiscoItem(null,
