@@ -139,16 +139,20 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 			} // end of else
 			break;
 		case REDIRECT:
-			String serv_sessionId =
-        (String)serv.getSessionData().get(serv.SESSION_ID_KEY);
-			String command_sessionId = Command.getFieldValue(packet, "session-id");
-			if (serv_sessionId.equals(command_sessionId)) {
-				serv.setDataReceiver(packet.getFrom());
-				log.fine("Redirecting data for sessionId: " + serv_sessionId
-					+ ", to: " + packet.getFrom());
+			if (serv != null) {
+				String serv_sessionId =
+          (String)serv.getSessionData().get(serv.SESSION_ID_KEY);
+				String command_sessionId = Command.getFieldValue(packet, "session-id");
+				if (serv_sessionId.equals(command_sessionId)) {
+					serv.setDataReceiver(packet.getFrom());
+					log.fine("Redirecting data for sessionId: " + serv_sessionId
+						+ ", to: " + packet.getFrom());
+				} else {
+					log.warning("Incorrect session ID, ignoring data redirect for: "
+						+ packet.toString());
+				}
 			} else {
-				log.warning("Incorrect session ID, ignoring data redirect for: "
-					+ packet.toString());
+				log.finest("Connection for REDIRECT command does not exist, ignoring.");
 			}
 			break;
 		case STREAM_CLOSED:
