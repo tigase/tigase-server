@@ -89,6 +89,8 @@ public class MessageRouter extends AbstractMessageReceiver {
 		new ConcurrentSkipListMap<String, XMPPService>();
   private Map<String, ServerComponent> components =
     new ConcurrentSkipListMap<String, ServerComponent>();
+  private Map<String, ServerComponent> components_byId =
+    new ConcurrentSkipListMap<String, ServerComponent>();
   private Map<String, ComponentRegistrator> registrators =
     new ConcurrentSkipListMap<String, ComponentRegistrator>();
   private Map<String, MessageReceiver> receivers =
@@ -133,12 +135,16 @@ public class MessageRouter extends AbstractMessageReceiver {
 	}
 
 	private ServerComponent getLocalComponent(String jid) {
+		ServerComponent comp = components_byId.get(jid);
+		if (comp != null) {
+			return comp;
+		}
 		String nick = JIDUtils.getNodeNick(jid);
 		if (nick == null) {
 			return null;
 		}
 		String host = JIDUtils.getNodeHost(jid);
-		ServerComponent comp = components.get(nick);
+		comp = components.get(nick);
 		if (isLocalDomain(host)) {
 			return comp;
 		}
@@ -338,6 +344,7 @@ public class MessageRouter extends AbstractMessageReceiver {
       } // end of if (reg != component)
     } // end of for ()
     components.put(component.getName(), component);
+    components_byId.put(component.getComponentId(), component);
 		if (component instanceof XMPPService) {
 			xmppServices.put(component.getName(), (XMPPService)component);
 		}
