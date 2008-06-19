@@ -139,7 +139,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 	private Set<ConnectionListenerImpl> pending_open =
 		Collections.synchronizedSet(new HashSet<ConnectionListenerImpl>());;
 	protected long connectionDelay = 2 * SECOND;
-	protected long startDelay = 10 * SECOND;
+	protected long startDelay = 2 * SECOND;
 
 	public void setName(String name) {
 		super.setName(name);

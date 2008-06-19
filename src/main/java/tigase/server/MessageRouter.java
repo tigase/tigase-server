@@ -502,15 +502,27 @@ public class MessageRouter extends AbstractMessageReceiver {
 
 			if (packet.isXMLNS("/iq/query", ITEMS_XMLNS)) {
 				boolean localDomain = isLocalDomain(jid);
-				for (XMPPService comp: xmppServices.values()) {
-					//					if (localDomain || (nick != null && comp.getName().equals(nick))) {
-					if (localDomain || comp.getComponentId().equals(jid)) {
+				if (localDomain) {
+					for (XMPPService comp: xmppServices.values()) {
+						//	if (localDomain || (nick != null && comp.getName().equals(nick))) {
 						List<Element> items =	comp.getDiscoItems(node, jid);
+						log.finest("DiscoItems processed by: " + comp.getComponentId()
+							+ ", items: " + (items == null ? null : items.toString()));
+						if (items != null && items.size() > 0) {
+							query.addChildren(items);
+						}
+					} // end of for ()
+				} else {
+					ServerComponent comp = getLocalComponent(packet.getElemTo());
+					if (comp != null && comp instanceof XMPPService) {
+						List<Element> items = ((XMPPService)comp).getDiscoItems(node, jid);
+						log.finest("DiscoItems processed by: " + comp.getComponentId()
+							+ ", items: " + (items == null ? null : items.toString()));
 						if (items != null && items.size() > 0) {
 							query.addChildren(items);
 						}
 					}
-				} // end of for ()
+				}
 			}
 			results.offer(packet.okResult(query, 0));
 	}

@@ -199,10 +199,16 @@ public class StatisticsCollector
 
 	public List<Element> getDiscoItems(String node, String jid) {
 		if (getName().equals(JIDUtils.getNodeNick(jid)) || getComponentId().equals(jid)) {
-			return serviceEntity.getDiscoItems(node, jid);
+			List<Element> items = serviceEntity.getDiscoItems(node, jid);
+			log.finest("Processing discoItems for node: " + node + ", result: "
+				+ (items == null ? null : items.toString()));
+			return items;
 		} else {
-			return Arrays.asList(serviceEntity.getDiscoItem(null,
-					JIDUtils.getNodeID(getName(), jid)));
+			Element item = serviceEntity.getDiscoItem(null,
+				JIDUtils.getNodeID(getName(),	jid));
+			log.finest("Processing discoItems, result: "
+				+ (item == null ? null : item.toString()));
+			return Arrays.asList(item);
 		}
 	}
 
