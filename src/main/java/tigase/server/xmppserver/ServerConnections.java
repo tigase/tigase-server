@@ -293,9 +293,15 @@ public class ServerConnections {
 		if (serv == outgoing) {
 			outgoing = null;
 			conn_state = OutgoingState.NULL;
+			log.finer("Connection removed: " + session_id);
 			return;
 		}
-		incoming.remove(session_id);
+		XMPPIOService rem = incoming.remove(session_id);
+		if (rem == null) {
+			log.fine("No service with given SESSION_ID: " + session_id);
+		} else {
+			log.finer("Connection removed: " + session_id);
+		}
 	}
 
 	public int incomingSize() {
