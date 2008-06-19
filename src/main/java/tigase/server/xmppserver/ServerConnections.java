@@ -283,6 +283,10 @@ public class ServerConnections {
 		}
 	}
 
+	public boolean isOutgoingConnected() {
+		return outgoing != null && outgoing.isConnected();
+	}
+
 	public boolean isOutgoing(XMPPIOService serv) {
 		return serv == outgoing;
 	}

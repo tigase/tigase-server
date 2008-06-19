@@ -553,7 +553,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 			ServerConnections conn = entry.getValue();
 			waiting_packets += conn.getWaitingPackets().size();
 			open_s2s_connections += conn.incomingSize();
-			if (!conn.needsConnection()) {
+			if (conn.isOutgoingConnected()) {
 				++open_s2s_connections;
 				++connected_servers;
 			}
