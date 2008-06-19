@@ -208,13 +208,11 @@ public class MessageRouter extends AbstractMessageReceiver {
 			return;
 		}
 
-		String id =  JIDUtils.getNodeID(packet.getTo());
-		String host = JIDUtils.getNodeHost(packet.getTo());
-		String nick = JIDUtils.getNodeNick(packet.getTo());
-		ServerComponent comp = getLocalComponent(id);
+		ServerComponent comp = packet.getElemTo() == null ? null
+      : getLocalComponent(packet.getElemTo());
 		if (packet.isServiceDisco()
 			&& packet.getType() != null && packet.getType() == StanzaType.get
-			&& (comp != null || localAddresses.contains(id))) {
+			&& (comp != null || isLocalDomain(packet.getElemTo()))) {
 			log.finest("Processing disco query by: " + getComponentId());
 			Queue<Packet> results = new LinkedList<Packet>();
 			processDiscoQuery(packet, results);
@@ -226,6 +224,10 @@ public class MessageRouter extends AbstractMessageReceiver {
 			}
 			return;
 		}
+		String id =  JIDUtils.getNodeID(packet.getTo());
+		String host = JIDUtils.getNodeHost(packet.getTo());
+		String nick = JIDUtils.getNodeNick(packet.getTo());
+		comp = getLocalComponent(id);
 		if (comp != null) {
 			log.finest("Packet is processing by: " + comp.getComponentId());
 			Queue<Packet> results = new LinkedList<Packet>();
