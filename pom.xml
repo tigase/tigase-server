@@ -100,7 +100,7 @@
     <dependency>
       <groupId>tigase</groupId>
       <artifactId>tigase-utils</artifactId>
-      <version>3.0.11</version>
+      <version>3.0.12</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
