@@ -422,6 +422,8 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 				serv_conns = createNewServerConnections(cid, null);
 			}
 			serv_conns.addOutgoing(serv);
+			log.finest("Counters: ioservices: " + countIOServices()
+				+ ", s2s connections: " + countOpenConnections());
 			String remote_id = attribs.get("id");
 			serv.getSessionData().put(serv.SESSION_ID_KEY, remote_id);
 			String uuid = UUID.randomUUID().toString();
@@ -542,6 +544,20 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 		} // end of switch (service.connectionType())
 	}
 
+	private int countOpenConnections() {
+		int open_s2s_connections = 0;
+		for (Map.Entry<String, ServerConnections> entry:
+      connectionsByLocalRemote.entrySet()) {
+			ServerConnections conn = entry.getValue();
+			open_s2s_connections += conn.incomingSize();
+			if (conn.isOutgoingConnected()) {
+				++open_s2s_connections;
+			}
+		}
+		return open_s2s_connections;
+	}
+
+
 	public List<StatRecord> getStatistics() {
 		List<StatRecord> stats = super.getStatistics();
 		int waiting_packets = 0;
@@ -560,7 +576,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 			log.info("s2s instance: " + entry.getKey()
 				+ ", waitingQueue: " + conn.getWaitingPackets().size()
 				+ ", incomingConnections: " + conn.incomingSize()
-				+ ", outgoingActive: " + !conn.needsConnection());
+				+ ", outgoingActive: " + conn.isOutgoingConnected());
 		}
  		stats.add(new StatRecord(getName(), "Open s2s connections", "int",
  				open_s2s_connections, Level.INFO));
@@ -588,6 +604,8 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 			log.info("remote-hostname is NULL, local-hostname: " + local_hostname
 				+ ", local address: " + service.getLocalAddress()
 				+ ", remote address: " + service.getRemoteAddress());
+			log.finest("Counters: ioservices: " + countIOServices()
+				+ ", s2s connections: " + countOpenConnections());
 			return;
 		}
 		String cid = getConnectionId(local_hostname, remote_hostname);
@@ -595,11 +613,15 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 		if (serv_conns == null) {
 			log.warning("There is no ServerConnections for stopped service: "
 				+ service.getUniqueId() + ", cid: " + cid);
+			log.finest("Counters: ioservices: " + countIOServices()
+				+ ", s2s connections: " + countOpenConnections());
 			return;
 		}
 
 		boolean outgoing = serv_conns.isOutgoing(service);
 		serv_conns.serviceStopped(service);
+		log.finest("Counters: ioservices: " + countIOServices()
+			+ ", s2s connections: " + countOpenConnections());
 
 		if (outgoing) {
 			Queue<Packet> waiting = serv_conns.getWaitingPackets();
@@ -679,6 +701,8 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 					serv.getSessionData().put("remote-hostname", remote_hostname);
 					serv.getSessionData().put("local-hostname", local_hostname);
 					serv_conns.addIncoming(session_id, serv);
+					log.finest("Counters: ioservices: " + countIOServices()
+						+ ", s2s connections: " + countOpenConnections());
 					if (!serv_conns.sendControlPacket(result)
 						&& serv_conns.needsConnection()) {
 						createServerConnection(cid, result, serv_conns);
@@ -724,6 +748,8 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 						serv.getSessionData().put("remote-hostname", remote_hostname);
 						serv.getSessionData().put("local-hostname", local_hostname);
 						serv_conns.addIncoming(session_id, serv);
+						log.finest("Counters: ioservices: " + countIOServices()
+							+ ", s2s connections: " + countOpenConnections());
 						//initServiceMapping(local_hostname, remote_hostname, accept_jid, serv);
 
 						String local_key = getLocalDBKey(cid, db_key, forkey_session_id,

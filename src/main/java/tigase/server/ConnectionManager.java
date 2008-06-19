@@ -504,6 +504,10 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 
 	public abstract String xmppStreamOpened(IO s, Map<String, String> attribs);
 
+	protected int countIOServices() {
+		return services.size();
+	}
+
 	public List<StatRecord> getStatistics() {
 		List<StatRecord> stats = super.getStatistics();
 		stats.add(new StatRecord(getName(), "Open connections", "int",
