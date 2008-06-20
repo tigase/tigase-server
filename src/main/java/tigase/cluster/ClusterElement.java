@@ -96,7 +96,7 @@ public class ClusterElement {
 
 	public static final String VISITED_NODES_EL_NAME = "visited-nodes";
 	public static final String FIRST_NODE_EL_NAME = "first-node";
-	public static final String PACKET_FROM_ATTR_NAME = "packet-from";
+	//	public static final String PACKET_FROM_ATTR_NAME = "packet-from";
 	public static final String FIRST_NODE_PATH =
     CLUSTER_CONTROL_PATH + "/" + FIRST_NODE_EL_NAME;
 	public static final String VISITED_NODES_PATH =
@@ -157,8 +157,8 @@ public class ClusterElement {
 	public static Element createClusterElement(String from, String to,
 		String type, String packet_from) {
 		Element cluster_el = clusterElement(from, to, type);
-		cluster_el.addChild(new Element(CLUSTER_DATA_EL_NAME,
-				new String[] {PACKET_FROM_ATTR_NAME}, new String[] {packet_from}));
+		cluster_el.addChild(new Element(CLUSTER_DATA_EL_NAME));
+// 				new String[] {PACKET_FROM_ATTR_NAME}, new String[] {packet_from}));
 		return cluster_el;
 	}
 
@@ -293,9 +293,9 @@ public class ClusterElement {
 		return packets;
 	}
 
-	public String getDataPacketFrom() {
-		return elem.getAttribute(CLUSTER_DATA_PATH, PACKET_FROM_ATTR_NAME);
-	}
+// 	public String getDataPacketFrom() {
+// 		return elem.getAttribute(CLUSTER_DATA_PATH, PACKET_FROM_ATTR_NAME);
+// 	}
 
 	public Element getClusterElement() {
 		return elem;

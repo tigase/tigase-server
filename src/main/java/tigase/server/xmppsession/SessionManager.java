@@ -831,8 +831,8 @@ public class SessionManager extends AbstractMessageReceiver
 // 			XMPPResourceConnection conn = createUserSession(NULL_ROUTING, host, host);
 // 			conn.setDummy(true);
 		} // end of for ()
-		serverSession = createUserSession(NULL_ROUTING, getDefHostName(),
-			getComponentId());
+// 		serverSession = createUserSession(NULL_ROUTING, getDefHostName(),
+// 			getComponentId());
 		anonymous_domains.clear();
 		anonymous_domains.addAll(
 			Arrays.asList((String[])props.get(ANONYMOUS_DOMAINS_PROP_KEY)));
