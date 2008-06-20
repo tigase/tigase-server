@@ -701,7 +701,8 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 					serv.getSessionData().put("remote-hostname", remote_hostname);
 					serv.getSessionData().put("local-hostname", local_hostname);
 					serv_conns.addIncoming(session_id, serv);
-					log.finest("Counters: ioservices: " + countIOServices()
+					log.finest("cid: " + cid + ", sessionId: " + session_id
+						+ ", Counters: ioservices: " + countIOServices()
 						+ ", s2s connections: " + countOpenConnections());
 					if (!serv_conns.sendControlPacket(result)
 						&& serv_conns.needsConnection()) {
@@ -748,7 +749,8 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 						serv.getSessionData().put("remote-hostname", remote_hostname);
 						serv.getSessionData().put("local-hostname", local_hostname);
 						serv_conns.addIncoming(session_id, serv);
-						log.finest("Counters: ioservices: " + countIOServices()
+						log.finest("cid: " + cid + ", sessionId: " + session_id
+							+ ", Counters: ioservices: " + countIOServices()
 							+ ", s2s connections: " + countOpenConnections());
 						//initServiceMapping(local_hostname, remote_hostname, accept_jid, serv);
 

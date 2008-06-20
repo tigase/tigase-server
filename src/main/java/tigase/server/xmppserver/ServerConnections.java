@@ -235,6 +235,10 @@ public class ServerConnections {
 	}
 
 	public void addIncoming(String session_id, XMPPIOService serv) {
+		if (serv == outgoing) {
+			log.info("Adding outgoing connection as incoming, packet received on wrong connection? session_id: " + session_id);
+			return;
+		}
 		XMPPIOService old_serv = incoming.get(session_id);
 		if (old_serv != null) {
 			if (old_serv == serv) {
