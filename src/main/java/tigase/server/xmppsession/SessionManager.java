@@ -441,7 +441,7 @@ public class SessionManager extends AbstractMessageReceiver
 		connection.setSessionId("session-id");
 		//connection.setAnonymousPeers(anon_peers);
 		connectionsByFrom.put(conn_id, connection);
-		handleLogin(JIDUtils.getNodeNick(user_jid), connection);
+		registerNewSession(JIDUtils.getNodeID(user_jid), connection);
 		try {
 			connection.setResource(JIDUtils.getNodeResource(user_jid));
 		} catch (NotAuthorizedException e) {
@@ -842,16 +842,20 @@ public class SessionManager extends AbstractMessageReceiver
 		//Arrays.sort(anon_peers);
 	}
 
-	public void handleLogin(String userName, XMPPResourceConnection conn) {
-		log.finest("handleLogin called for: " + userName);
-		String userId = JIDUtils.getNodeID(userName, conn.getDomain());
+	protected void registerNewSession(String userId, XMPPResourceConnection conn) {
 		XMPPSession session = sessionsByNodeId.get(userId);
 		if (session == null) {
-			session = new XMPPSession(userName);
+			session = new XMPPSession(JIDUtils.getNodeNick(userId));
 			sessionsByNodeId.put(userId, session);
 			log.finest("Created new XMPPSession for: " + userId);
 		} // end of if (session == null)
 		session.addResourceConnection(conn);
+	}
+
+	public void handleLogin(String userName, XMPPResourceConnection conn) {
+		log.finest("handleLogin called for: " + userName);
+		String userId = JIDUtils.getNodeID(userName, conn.getDomain());
+		registerNewSession(userId, conn);
 	}
 
 
