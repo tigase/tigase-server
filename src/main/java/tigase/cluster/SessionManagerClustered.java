@@ -187,7 +187,7 @@ public class SessionManagerClustered extends SessionManager
 					res_vals.put(SM_ID, getComponentId());
 					res_vals.put(CREATION_TIME, ""+session.getCreationTime());
 					result = clel.createMethodResponse(getComponentId(),
-						"result", res_vals);
+						StanzaType.result.toString(), res_vals);
 				}
 				if (result != null) {
 					fastAddOutPacket(new Packet(result.getClusterElement()));
@@ -392,7 +392,7 @@ public class SessionManagerClustered extends SessionManager
 				Map<String, String> params = new LinkedHashMap<String, String>();
 				params.put(USER_ID, JIDUtils.getNodeID(userName, conn.getDomain()));
 				Element check_session_el = ClusterElement.createClusterMethodCall(
-					getComponentId(), cluster_node, "get",
+					getComponentId(), cluster_node, StanzaType.get.toString(),
 					ClusterMethods.CHECK_USER_SESSION.toString(), params).getClusterElement();
 				fastAddOutPacket(new Packet(check_session_el));
 			}

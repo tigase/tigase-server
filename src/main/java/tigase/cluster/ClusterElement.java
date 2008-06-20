@@ -279,7 +279,7 @@ public class ClusterElement {
 		String from = elem.getAttribute("to");
 		next_el.setAttribute("from", from);
 		next_el.setAttribute("to", node_id);
-		next_el.setAttribute("type", StanzaType.set.toString());
+		//next_el.setAttribute("type", StanzaType.set.toString());
 		ClusterElement next_cl = new ClusterElement(next_el);
 		return next_cl;
 	}
