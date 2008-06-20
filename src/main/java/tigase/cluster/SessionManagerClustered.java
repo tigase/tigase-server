@@ -63,7 +63,7 @@ public class SessionManagerClustered extends SessionManager
     Logger.getLogger("tigase.server.xmppsession.SessionManagerClustered");
 
 	private static final String USER_ID = "userId";
-	private static final String SESSION_ID = "sessionId";
+	private static final String SM_ID = "smId";
 	private static final String CREATION_TIME = "creationTime";
 	private static final String ERROR_CODE = "errorCode";
 
@@ -147,7 +147,11 @@ public class SessionManagerClustered extends SessionManager
 					XMPPResourceConnection res_con = createUserSession(connectionId, domain,
 						JIDUtils.getJID(nick, domain, resource));
 					res_con.setSessionId(xmpp_sessionId);
-					res_con.loginToken(xmpp_sessionId, token);
+					Authorization auth_res = res_con.loginToken(xmpp_sessionId, token);
+					log.finest("SESSION_TRANSFER received SET request, userId: " + userId
+						+ ", resource: " + resource
+						+ ", xmpp_sessionId: " + xmpp_sessionId
+						+ ", connectionId: " + connectionId + ", auth_res: " + auth_res);
 
 					Packet redirect = Command.REDIRECT.getPacket(getComponentId(),
 						connectionId, StanzaType.set, "1", "submit");
@@ -170,12 +174,17 @@ public class SessionManagerClustered extends SessionManager
 				ClusterElement result = null;
 				String userId = clel.getMethodParam(USER_ID);
 				XMPPSession session = getSession(userId);
+				log.finest("CHECK_USER_SESSION received GET request for user: " + userId
+					+ " from " + clel.getFirstNode());
 				if (session == null) {
+					log.finest("Session not local, forwarding CHECK_USER_SESSION "
+						+ "to next node.");
 					result = ClusterElement.createForNextNode(clel, cluster_nodes,
 						getComponentId());
 				} else {
+					log.finest("Session found, sending back user session data...");
 					Map<String, String> res_vals = new LinkedHashMap<String, String>();
-					res_vals.put(SESSION_ID, getComponentId());
+					res_vals.put(SM_ID, getComponentId());
 					res_vals.put(CREATION_TIME, ""+session.getCreationTime());
 					result = clel.createMethodResponse(getComponentId(),
 						"result", res_vals);
@@ -186,13 +195,13 @@ public class SessionManagerClustered extends SessionManager
 			}
 			if (ClusterMethods.SESSION_TRANSFER.toString().equals(clel.getMethodName())) {
 				transferUserSession(clel.getMethodParam(USER_ID),
-					clel.getMethodParam(SESSION_ID), clel);
+					clel.getMethodParam(SM_ID), clel);
 			}
 			break;
 		case result:
 			if (ClusterMethods.CHECK_USER_SESSION.toString().equals(clel.getMethodName())) {
 				String userId = clel.getMethodParam(USER_ID);
-				String remote_sessionId = clel.getMethodResultVal(SESSION_ID);
+				String remote_smId = clel.getMethodResultVal(SM_ID);
 				long remote_creationTime = 0;
 				try {
 					remote_creationTime =
@@ -200,7 +209,7 @@ public class SessionManagerClustered extends SessionManager
 				} catch (Exception e) {
 					remote_creationTime = 0;
 				}
-				int remote_hashcode = (userId+remote_sessionId).hashCode();
+				int remote_hashcode = (userId+remote_smId).hashCode();
 				int local_hashcode = (userId+getComponentId()).hashCode();
 				XMPPSession session = getSession(userId);
 				boolean transfer_out = false;
@@ -212,14 +221,21 @@ public class SessionManagerClustered extends SessionManager
 						transfer_out = true;
 					}
 				}
+				log.finest("CHECK_USER_SESSION received RESULT response for user: "
+					+ userId + " from " + remote_smId
+					+ ", remote_creationTime: " + remote_creationTime
+					+ ", local_creationTime: " + session.getCreationTime()
+					+ ", transfer_out: " + transfer_out);
 				if (transfer_out) {
-					transferUserSession(userId, remote_sessionId, clel);
+					transferUserSession(userId, remote_smId, clel);
 				} else {
+					log.finest("Requesting user: " + userId
+						+ " session transfer from " + remote_smId);
 					Map<String, String> params = new LinkedHashMap<String, String>();
 					params.put(USER_ID, userId);
-					params.put(SESSION_ID, getComponentId());
+					params.put(SM_ID, getComponentId());
 					Element sess_trans = ClusterElement.createClusterMethodCall(
-						getComponentId(), remote_sessionId, "get",
+						getComponentId(), remote_smId, "get",
 						ClusterMethods.SESSION_TRANSFER.toString(), params).getClusterElement();
 					fastAddOutPacket(new Packet(sess_trans));
 				}
@@ -245,10 +261,11 @@ public class SessionManagerClustered extends SessionManager
 		}
 	}
 
-	protected void transferUserSession(String userId, String remote_sessionId,
+	protected void transferUserSession(String userId, String remote_smId,
 		ClusterElement clel) {
 		XMPPSession session = getSession(userId);
 		if (session != null) {
+			log.finest("TRANSFERIN user: " + userId + " sessions to " + remote_smId);
 			List<XMPPResourceConnection> conns = session.getActiveResources();
 			for (XMPPResourceConnection conn: conns) {
 				try {
@@ -258,6 +275,9 @@ public class SessionManagerClustered extends SessionManager
 					String connectionId = conn.getConnectionId();
 					int priority = conn.getPriority();
 					String token = conn.getAuthenticationToken(xmpp_sessionId);
+					log.finest("Sending user: " + userId + " session, resource: " + resource
+						+ ", xmpp_sessionId: " + xmpp_sessionId
+						+ ", connectionId: " + connectionId);
 					Map<String, String> params = new LinkedHashMap<String, String>();
 					params.put(USER_ID, userId);
 					params.put(XMPP_SESSION_ID, xmpp_sessionId);
@@ -266,7 +286,7 @@ public class SessionManagerClustered extends SessionManager
 					params.put(PRIORITY, "" + priority);
 					params.put(TOKEN, token);
 					Element sess_trans = ClusterElement.createClusterMethodCall(
-						getComponentId(), remote_sessionId, "set",
+						getComponentId(), remote_smId, "set",
 						ClusterMethods.SESSION_TRANSFER.toString(), params).getClusterElement();
 					fastAddOutPacket(new Packet(sess_trans));
 				} catch (Exception e) {
@@ -367,6 +387,8 @@ public class SessionManagerClustered extends SessionManager
 		if (!conn.isAnonymous()) {
 			String cluster_node = getFirstClusterNode();
 			if (cluster_node != null) {
+				log.finest("CHECK_USER_SESSION on other cluster nodes for: "
+					+ JIDUtils.getNodeID(userName, conn.getDomain()));
 				Map<String, String> params = new LinkedHashMap<String, String>();
 				params.put(USER_ID, JIDUtils.getNodeID(userName, conn.getDomain()));
 				Element check_session_el = ClusterElement.createClusterMethodCall(
