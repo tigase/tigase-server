@@ -677,6 +677,19 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 		String cid = getConnectionId(local_hostname, remote_hostname);
 		ServerConnections serv_conns = getServerConnections(cid);
 		String session_id = (String)serv.getSessionData().get(serv.SESSION_ID_KEY);
+		String serv_local_hostname =
+      (String)serv.getSessionData().get("local-hostname");
+		String serv_remote_hostname =
+      (String)serv.getSessionData().get("remote-hostname");
+		if ((serv_local_hostname != null && !local_hostname.equals(serv_local_hostname))
+			|| (serv_remote_hostname != null
+				&& !remote_hostname.equals(serv_remote_hostname))) {
+		log.info("Somebody tries to reusing connection?"
+			+ "serv_local_hostname: " + serv_local_hostname
+			+ ", serv_remote_hostname: " + serv_remote_hostname
+			+ ", local_hostname: " + local_hostname
+			+ ", remote_hostname: " + remote_hostname);
+	}
 
 		// <db:result>
 		if ((packet.getElemName() == RESULT_EL_NAME) ||
