@@ -181,6 +181,11 @@ public class SessionManagerClustered extends SessionManager
 						+ "to next node.");
 					result = ClusterElement.createForNextNode(clel, cluster_nodes,
 						getComponentId());
+					if (result != null
+						&& result.getClusterElement().getAttribute("to").equals(result.getFirstNode())) {
+						log.finest("No more nodes for checking user sessiom, we don't want to send this packet back...");
+						result = null;
+					}
 				} else {
 					log.finest("Session found, sending back user session data...");
 					Map<String, String> res_vals = new LinkedHashMap<String, String>();
