@@ -716,7 +716,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
       (String)serv.getSessionData().get("remote-hostname");
 		String serv_cid = serv_remote_hostname == null ? null
       : getConnectionId(serv_local_hostname, serv_remote_hostname);
-		if (!cid.equals(serv_cid)) {
+		if (serv_cid != null && !cid.equals(serv_cid)) {
 			log.info("Somebody tries to reuse connection?"
 				+ " old_cid: " + serv_cid + ", new_cid: " + cid);
 	}
