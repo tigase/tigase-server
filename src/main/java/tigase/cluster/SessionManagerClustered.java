@@ -103,11 +103,11 @@ public class SessionManagerClustered extends SessionManager
 
 	protected void processPacket(ClusterElement packet) {
 		List<Element> elems = packet.getDataPackets();
-		String packet_from = packet.getDataPacketFrom();
+		//String packet_from = packet.getDataPacketFrom();
 		if (elems != null && elems.size() > 0) {
 			for (Element elem: elems) {
 					Packet el_packet = new Packet(elem);
-					el_packet.setFrom(packet_from);
+					//el_packet.setFrom(packet_from);
 					XMPPResourceConnection conn = getXMPPResourceConnection(el_packet);
 					if (conn != null || !sentToNextNode(packet)) {
 						processPacket(el_packet, conn);
