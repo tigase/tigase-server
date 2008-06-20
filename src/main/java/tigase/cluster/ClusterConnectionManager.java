@@ -111,7 +111,11 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 			}
 			return;
 		}
-		writePacketToSocket(packet.packRouted());
+		if (packet.getElemName() == ClusterElement.CLUSTER_EL_NAME) {
+			writePacketToSocket(packet);
+		} else {
+			writePacketToSocket(packet.packRouted());
+		}
 	}
 
 	public Queue<Packet> processSocketData(XMPPIOService serv) {
