@@ -201,25 +201,22 @@ public class ClusterElement {
 
 	public static ClusterElement createForNextNode(ClusterElement clel,
 		Set<String> cluster_nodes, String comp_id) {
+		log.finest("Calculating a next node from nodes: " + cluster_nodes.toString());
 		if (cluster_nodes.size() > 0) {
 			String next_node = null;
 			for (String cluster_node: cluster_nodes) {
 				if (!clel.isVisitedNode(cluster_node)) {
 					next_node = cluster_node;
+					log.finest("Found next cluster node: " + next_node);
 					break;
 				}
 			}
 			if (next_node == null) {
-				String first_node = clel.getFirstNode();
-				if (first_node == null) {
-					log.warning("Something wrong - the first node should NOT be null here.");
-				} else {
-					if (!first_node.equals(comp_id)) {
-						next_node = first_node;
-					}
-				}
+				next_node = clel.getFirstNode();
+				log.finest("No more cluster nodes found, sending back to the first node: "
+					+ next_node);
 			}
-			if (next_node != null) {
+			if (next_node != null && !first_node.equals(comp_id)) {
 				return clel.nextClusterNode(next_node);
 			}
 		}
