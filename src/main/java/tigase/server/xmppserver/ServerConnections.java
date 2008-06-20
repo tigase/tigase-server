@@ -59,12 +59,12 @@ public class ServerConnections {
 	private XMPPIOService outgoing = null;
 	private OutgoingState conn_state = OutgoingState.NULL;
 
-	/**
-	 * Incoming (accept) services session:id. Some servers (EJabberd) opens
-	 * many connections for each domain, especially when in cluster mode.
-	 */
-	private ConcurrentSkipListMap<String, XMPPIOService> incoming =
-    new ConcurrentSkipListMap<String, XMPPIOService>();
+// 	/**
+// 	 * Incoming (accept) services session:id. Some servers (EJabberd) opens
+// 	 * many connections for each domain, especially when in cluster mode.
+// 	 */
+// 	private ConcurrentSkipListMap<String, XMPPIOService> incoming =
+//     new ConcurrentSkipListMap<String, XMPPIOService>();
 
 	/**
 	 * Normal packets between users on different servers
@@ -207,11 +207,11 @@ public class ServerConnections {
 			outgoing = null;
 			conn_state = OutgoingState.NULL;
 		}
-		Set<Map.Entry<String, XMPPIOService>> set = incoming.entrySet();
-		for (Map.Entry<String, XMPPIOService> entry: set) {
-			entry.getValue().forceStop();
-			set.remove(entry);
-		}
+// 		Set<Map.Entry<String, XMPPIOService>> set = incoming.entrySet();
+// 		for (Map.Entry<String, XMPPIOService> entry: set) {
+// 			entry.getValue().forceStop();
+// 			set.remove(entry);
+// 		}
 	}
 
 	public void putDBKey(String sessionId, String dbKey) {
@@ -234,58 +234,58 @@ public class ServerConnections {
 		}
 	}
 
-	public void addIncoming(String session_id, XMPPIOService serv) {
-		if (serv == outgoing) {
-			log.info("Adding outgoing connection as incoming, packet received on wrong connection? session_id: " + session_id);
-			return;
-		}
-		XMPPIOService old_serv = incoming.get(session_id);
-		if (old_serv != null) {
-			if (old_serv == serv) {
-				log.info("Adding again the same handshaking service session_id: "
-					+ session_id + ", unique_id: " + serv.getUniqueId());
-				return;
-			} else {
-				log.info("Adding new handshaking service when the old one for the"
-					+ " same session_id exists: "
-					+ session_id + ", new_unique_id: " + serv.getUniqueId()
-					+ ", old_unique_id: " + old_serv.getUniqueId());
-				old_serv.forceStop();
-			}
-		}
-		incoming.put(session_id, serv);
-	}
+// 	public void addIncoming(String session_id, XMPPIOService serv) {
+// 		if (serv == outgoing) {
+// 			log.info("Adding outgoing connection as incoming, packet received on wrong connection? session_id: " + session_id);
+// 			return;
+// 		}
+// 		XMPPIOService old_serv = incoming.get(session_id);
+// 		if (old_serv != null) {
+// 			if (old_serv == serv) {
+// 				log.info("Adding again the same handshaking service session_id: "
+// 					+ session_id + ", unique_id: " + serv.getUniqueId());
+// 				return;
+// 			} else {
+// 				log.info("Adding new handshaking service when the old one for the"
+// 					+ " same session_id exists: "
+// 					+ session_id + ", new_unique_id: " + serv.getUniqueId()
+// 					+ ", old_unique_id: " + old_serv.getUniqueId());
+// 				old_serv.forceStop();
+// 			}
+// 		}
+// 		incoming.put(session_id, serv);
+// 	}
 
-	public boolean sendToIncoming(String session_id, Packet packet) {
-		XMPPIOService serv = incoming.get(session_id);
-		if (serv != null) {
-			return handler.writePacketToSocket(serv, packet);
-		} else {
-			return false;
-		}
-	}
+// 	public boolean sendToIncoming(String session_id, Packet packet) {
+// 		XMPPIOService serv = incoming.get(session_id);
+// 		if (serv != null) {
+// 			return handler.writePacketToSocket(serv, packet);
+// 		} else {
+// 			return false;
+// 		}
+// 	}
 
-	public void validateIncoming(String session_id, boolean valid) {
-		XMPPIOService serv = incoming.get(session_id);
-		if (serv != null) {
-			serv.getSessionData().put("valid", valid);
-			if (!valid) {
-				serv.stop();
-			}
-		}
-	}
+// 	public void validateIncoming(String session_id, boolean valid) {
+// 		XMPPIOService serv = incoming.get(session_id);
+// 		if (serv != null) {
+// 			serv.getSessionData().put("valid", valid);
+// 			if (!valid) {
+// 				serv.stop();
+// 			}
+// 		}
+// 	}
 
-	public boolean isIncomingValid(String session_id) {
-		if (session_id == null) {
-			return false;
-		}
-		XMPPIOService serv = incoming.get(session_id);
-		if (serv == null || serv.getSessionData().get("valid") == null) {
-			return false;
-		} else {
-			return (Boolean)serv.getSessionData().get("valid");
-		}
-	}
+// 	public boolean isIncomingValid(String session_id) {
+// 		if (session_id == null) {
+// 			return false;
+// 		}
+// 		XMPPIOService serv = incoming.get(session_id);
+// 		if (serv == null || serv.getSessionData().get("valid") == null) {
+// 			return false;
+// 		} else {
+// 			return (Boolean)serv.getSessionData().get("valid");
+// 		}
+// 	}
 
 	public boolean isOutgoingConnected() {
 		return outgoing != null && outgoing.isConnected();
@@ -302,18 +302,18 @@ public class ServerConnections {
 			outgoing = null;
 			conn_state = OutgoingState.NULL;
 			log.finer("Connection removed: " + session_id);
-			return;
+// 			return;
 		}
-		XMPPIOService rem = incoming.remove(session_id);
-		if (rem == null) {
-			log.fine("No service with given SESSION_ID: " + session_id);
-		} else {
-			log.finer("Connection removed: " + session_id);
-		}
+// 		XMPPIOService rem = incoming.remove(session_id);
+// 		if (rem == null) {
+// 			log.fine("No service with given SESSION_ID: " + session_id);
+// 		} else {
+// 			log.finer("Connection removed: " + session_id);
+// 		}
 	}
 
-	public int incomingSize() {
-		return incoming.size();
-	}
+// 	public int incomingSize() {
+// 		return incoming.size();
+// 	}
 
 }
