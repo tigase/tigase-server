@@ -216,7 +216,7 @@ public class ClusterElement {
 				log.finest("No more cluster nodes found, sending back to the first node: "
 					+ next_node);
 			}
-			if (next_node != null && !first_node.equals(comp_id)) {
+			if (next_node != null && !next_node.equals(comp_id)) {
 				return clel.nextClusterNode(next_node);
 			}
 		}
