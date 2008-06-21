@@ -439,7 +439,8 @@ public class SessionManagerClustered extends SessionManager
 		for (String node: nodes) {
 			message += "" + (++cnt) + ". " + node;
 		}
-		Packet p_msg = Packet.getMessage("", getComponentId(), StanzaType.normal,
+		Packet p_msg = Packet.getMessage("",
+			JIDUtils.getJID(getName(), getVHosts()[0], null), StanzaType.normal,
 			message, subject, "xyz");
 		sendToAdmins(p_msg);
 	}

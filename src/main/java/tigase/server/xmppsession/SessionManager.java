@@ -104,6 +104,7 @@ public class SessionManager extends AbstractMessageReceiver
 	private NonAuthUserRepository naUserRepository = null;
 	private PacketFilter filter = null;
 
+	private String[] hostnames = {"localhost"};
 	private String[] admins = {"admin@localhost"};
 	private String[] trusted = {"admin@localhost"};
 	//private String[] anon_peers = {"admin@localhost"};
@@ -338,6 +339,10 @@ public class SessionManager extends AbstractMessageReceiver
 		for (Packet res: results) {
 			res.setPermissions(perms);
 		}
+	}
+
+	protected String[] getVHosts() {
+		return hostnames;
 	}
 
 	private boolean isAdmin(String jid) {
@@ -830,7 +835,7 @@ public class SessionManager extends AbstractMessageReceiver
 				plugin_config.put(comp_id, plugin_settings);
 			}
 		} // end of for (String comp_id: plugins)
-		String[] hostnames = (String[])props.get(HOSTNAMES_PROP_KEY);
+		hostnames = (String[])props.get(HOSTNAMES_PROP_KEY);
 		clearRoutings();
 		for (String host: hostnames) {
 			addRouting(host);
