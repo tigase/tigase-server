@@ -839,6 +839,8 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 	public boolean sendToIncoming(String session_id, Packet packet) {
 		XMPPIOService serv = incoming.get(session_id);
 		if (serv != null) {
+			log.finest("Sending to incoming connectin: " + session_id
+				+ " packet: " + packet.toString());
 			return writePacketToSocket(serv, packet);
 		} else {
 			log.finer("Trying to send packet: " + packet.toString()
