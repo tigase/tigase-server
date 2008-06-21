@@ -501,7 +501,7 @@ public class SessionManager extends AbstractMessageReceiver
 			processing_result = true;
 			break;
 		case STREAM_CLOSED:
-			closeConnection(pc.getFrom());
+			closeConnection(pc.getFrom(), false);
 			processing_result = true;
 			break;
 		case BROADCAST_TO_ONLINE:
@@ -577,7 +577,7 @@ public class SessionManager extends AbstractMessageReceiver
 			} else {
 				connection = connectionsByFrom.remove(pc.getElemFrom());
 				if (connection != null) {
-					closeSession(connection);
+					closeSession(connection, false);
 				} else {
 					log.info("Can not find resource connection for packet: " +
 						pc.toString());
@@ -593,23 +593,25 @@ public class SessionManager extends AbstractMessageReceiver
 		return processing_result;
 	}
 
-	protected void closeConnection(String connectionId) {
+	protected void closeConnection(String connectionId, boolean closeOnly) {
 		log.fine("Stream closed from: " + connectionId);
 		++closedConnections;
 		XMPPResourceConnection connection = connectionsByFrom.remove(connectionId);
 		if (connection != null) {
-			closeSession(connection);
+			closeSession(connection, closeOnly);
 		} else {
 			log.info("Can not find resource connection for packet: " + connectionId);
 		} // end of if (conn != null) else
 	}
 
-	private void closeSession(XMPPResourceConnection conn) {
-		Queue<Packet> results = new LinkedList<Packet>();
-		for (XMPPStopListenerIfc stopProc: stopListeners.values()) {
-			stopProc.stopped(conn, results, plugin_config.get(stopProc.id()));
-		} // end of for ()
-		addOutPackets(results);
+	private void closeSession(XMPPResourceConnection conn, boolean closeOnly) {
+		if (!closeOnly) {
+			Queue<Packet> results = new LinkedList<Packet>();
+			for (XMPPStopListenerIfc stopProc: stopListeners.values()) {
+				stopProc.stopped(conn, results, plugin_config.get(stopProc.id()));
+			} // end of for ()
+			addOutPackets(results);
+		}
 		try {
 			if (conn.isAuthorized()) {
 				String userId = conn.getUserId();

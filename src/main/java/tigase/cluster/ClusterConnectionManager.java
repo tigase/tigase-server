@@ -205,7 +205,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 		cluster_controller_id = (String)props.get(CLUSTER_CONTR_ID_PROP_KEY);
 // 		notify_admins = (Boolean)props.get(NOTIFY_ADMINS_PROP_KEY);
 // 		admins = (String[])props.get(ADMINS_PROP_KEY);
-		connectionDelay = 30*SECOND;
+		connectionDelay = 5*SECOND;
 		String[] cl_nodes = (String[])props.get(CLUSTER_NODES_PROP_KEY);
 		if (cl_nodes != null) {
 			for (String node: cl_nodes) {

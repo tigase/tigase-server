@@ -247,7 +247,7 @@ public class SessionManagerClustered extends SessionManager
 			}
 			if (ClusterMethods.SESSION_TRANSFER.toString().equals(clel.getMethodName())) {
 				String connectionId = clel.getMethodParam(CONNECTION_ID);
-				closeConnection(connectionId);
+				closeConnection(connectionId, true);
 			}
 			break;
 		case error:
