@@ -71,6 +71,7 @@ public class XMPPDomBuilderHandler implements SimpleHandler {
   private Object parserState = null;
   private String top_xmlns = null;
 	private XMPPIOService service = null;
+	private boolean error = false;
 
   private LinkedList<Element> all_roots = new LinkedList<Element>();
   private Stack<Element> el_stack = new Stack<Element>();
@@ -93,7 +94,12 @@ public class XMPPDomBuilderHandler implements SimpleHandler {
   public void error(String errorMessage) {
     log.warning("XML content parse error.");
 		log.warning(errorMessage);
+		error = true;
   }
+
+	public boolean parseError() {
+		return error;
+	}
 
   private Element newElement(String name, String cdata,
     StringBuilder[] attnames, StringBuilder[] attvals) {
