@@ -21,6 +21,8 @@
 package tigase.cluster;
 
 import java.util.Set;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import tigase.server.ServiceChecker;
 import tigase.xmpp.XMPPIOService;
@@ -39,17 +41,25 @@ import tigase.server.xmppclient.ClientConnectionManager;
 public class ClientConnectionClustered extends ClientConnectionManager
 	implements ClusteredComponent {
 
-	public void nodesConnected(Set<String> node_hostnames) {
-	}
+  /**
+   * Variable <code>log</code> is a class logger.
+   */
+  private static final Logger log =
+    Logger.getLogger("tigase.cluster.ClientConnectionClustered");
+
+	public void nodesConnected(Set<String> node_hostnames) {}
 
 	public void nodesDisconnected(Set<String> node_hostnames) {
+		log.finest("Disconnected nodes: " + node_hostnames.toString());
 		for (String node: node_hostnames) {
 			final String hostname = node;
 			doForAllServices(new ServiceChecker() {
 					public void check(final XMPPIOService service, final String serviceId) {
 						String dataReceiver = service.getDataReceiver();
+						log.finest("Checking service for dataReceiver: " + dataReceiver);
 						if (dataReceiver != null
 							&& JIDUtils.getNodeHost(dataReceiver).equals(hostname)) {
+							log.finest("Stopping service because corresponding cluster node stopped.");
 							service.stop();
 						}
 					}
