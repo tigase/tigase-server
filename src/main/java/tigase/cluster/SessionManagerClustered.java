@@ -31,6 +31,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 //import tigase.cluster.ClusterElement;
 import tigase.server.Packet;
@@ -76,6 +78,7 @@ public class SessionManagerClustered extends SessionManager
 	private static final String TRANSFER = "transfer";
 	private static final String SESSION_PACKETS = "session-packets";
 
+	private Timer delayedTasks = null;
 	private Set<String> cluster_nodes = new LinkedHashSet<String>();
 	private Set<String> broken_nodes = new LinkedHashSet<String>();
 
@@ -290,39 +293,49 @@ public class SessionManagerClustered extends SessionManager
 		}
 	}
 
-	protected void transferUserSession(String userId, String remote_smId,
+	protected void transferUserSession(final String userId, final String remote_smId,
 		ClusterElement clel) {
 		XMPPSession session = getSession(userId);
 		if (session != null) {
 			log.finest("TRANSFERIN user: " + userId + " sessions to " + remote_smId);
 			List<XMPPResourceConnection> conns = session.getActiveResources();
-			for (XMPPResourceConnection conn: conns) {
-				try {
-					conn.setOnHold();
-					String xmpp_sessionId = conn.getSessionId();
-					//String defLand = conn.getLang();
-					String resource = conn.getResource();
-					String connectionId = conn.getConnectionId();
-					int priority = conn.getPriority();
-					String token = conn.getAuthenticationToken(xmpp_sessionId);
-					log.finest("Sending user: " + userId + " session, resource: " + resource
-						+ ", xmpp_sessionId: " + xmpp_sessionId
-						+ ", connectionId: " + connectionId);
-					Map<String, String> params = new LinkedHashMap<String, String>();
-					params.put(USER_ID, userId);
-					params.put(XMPP_SESSION_ID, xmpp_sessionId);
-					params.put(RESOURCE, resource);
-					params.put(CONNECTION_ID, connectionId);
-					params.put(PRIORITY, "" + priority);
-					params.put(TOKEN, token);
-					Element sess_trans = ClusterElement.createClusterMethodCall(
-						getComponentId(), remote_smId, "set",
-						ClusterMethods.SESSION_TRANSFER.toString(), params).getClusterElement();
-					fastAddOutPacket(new Packet(sess_trans));
-				} catch (Exception e) {
-					log.log(Level.WARNING,
-						"Exception during user session transfer preparation", e);
-				}
+			for (XMPPResourceConnection conn_res: conns) {
+				conn_res.setOnHold();
+				final XMPPResourceConnection conn = conn_res;
+				// Delay is needed here as there might be packets which are being processing
+				// while we are preparing session for transfer.
+				// Putting it on hold makes all new incoming packets to be queued but
+				// packets received just before session transfer are still in plugin
+				// queues
+				delayedTasks.schedule(new TimerTask() {
+						public void run() {
+							try {
+								String xmpp_sessionId = conn.getSessionId();
+								//String defLand = conn.getLang();
+								String resource = conn.getResource();
+								String connectionId = conn.getConnectionId();
+								int priority = conn.getPriority();
+								String token = conn.getAuthenticationToken(xmpp_sessionId);
+								log.finest("Sending user: " + userId + " session, resource: " + resource
+									+ ", xmpp_sessionId: " + xmpp_sessionId
+									+ ", connectionId: " + connectionId);
+								Map<String, String> params = new LinkedHashMap<String, String>();
+								params.put(USER_ID, userId);
+								params.put(XMPP_SESSION_ID, xmpp_sessionId);
+								params.put(RESOURCE, resource);
+								params.put(CONNECTION_ID, connectionId);
+								params.put(PRIORITY, "" + priority);
+								params.put(TOKEN, token);
+								Element sess_trans = ClusterElement.createClusterMethodCall(
+									getComponentId(), remote_smId, "set",
+									ClusterMethods.SESSION_TRANSFER.toString(), params).getClusterElement();
+								fastAddOutPacket(new Packet(sess_trans));
+							} catch (Exception e) {
+								log.log(Level.WARNING,
+									"Exception during user session transfer preparation", e);
+							}
+						}
+					}, 500);
 			}
 		} else {
 			Map<String, String> res_vals = new LinkedHashMap<String, String>();
@@ -443,6 +456,16 @@ public class SessionManagerClustered extends SessionManager
 			JIDUtils.getJID(getName(), getVHosts()[0], null), StanzaType.normal,
 			message, subject, "xyz");
 		sendToAdmins(p_msg);
+	}
+
+	public void release() {
+		delayedTasks.cancel();
+		super.release();
+	}
+
+	public void start() {
+		super.start();
+		delayedTasks = new Timer("SM Cluster Delayed Tasks", true);
 	}
 
 }
