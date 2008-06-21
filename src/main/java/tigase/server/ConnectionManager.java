@@ -594,6 +594,12 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 
 	}
 
+	protected void doForAllServices(ServiceChecker checker) {
+		for (IO service: services.values()) {
+			checker.check(service, getUniqueId(service));
+		}
+	}
+
 	protected abstract long getMaxInactiveTime();
 
 	/**
@@ -602,17 +608,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 	 *
 	 */
 	private class Watchdog implements Runnable {
-
-		private String getCID(IO service) {
-			String local_hostname =
-				(String)service.getSessionData().get("local-hostname");
-			String remote_hostname =
-				(String)service.getSessionData().get("remote-hostname");
-			return JIDUtils.getJID(
-				(local_hostname != null ? local_hostname : "NULL"),
-				(remote_hostname != null ? remote_hostname : "NULL"),
-				service.connectionType().toString());
-		}
 
 		public void run() {
 			while (true) {
@@ -623,41 +618,44 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 					// really alive...., try to send space for each service which
 					// is inactive for hour or more and close the service
 					// on Exception
-					long curr_time = System.currentTimeMillis();
-					for (IO service: services.values()) {
-						//						service = (XMPPIOService)serv;
-						long lastTransfer = service.getLastTransferTime();
-						try {
-							if (curr_time - lastTransfer >= getMaxInactiveTime()) {
-								// Stop the service is max keep-alive time is acceeded
-								// for non-active connections.
-								log.info(getName()
-									+ ": Max inactive time exceeded, stopping: "
-									+ getUniqueId(service)
-									+ ", CID: " + getCID(service));
-								service.stop();
-							} else {
-								if (curr_time - lastTransfer >= (29*MINUTE)) {
-									// At least once an hour check if the connection is
-									// still alive.
-									service.writeRawData(" ");
+					doForAllServices(new ServiceChecker() {
+							public void check(final XMPPIOService service,
+								final String serviceId) {
+								// 								for (IO service: services.values()) {
+								//						service = (XMPPIOService)serv;
+								long curr_time = System.currentTimeMillis();
+								long lastTransfer = service.getLastTransferTime();
+								try {
+									if (curr_time - lastTransfer >= getMaxInactiveTime()) {
+										// Stop the service is max keep-alive time is acceeded
+										// for non-active connections.
+										log.info(getName()
+											+ ": Max inactive time exceeded, stopping: "
+											+ serviceId);
+										service.stop();
+									} else {
+										if (curr_time - lastTransfer >= (29*MINUTE)) {
+											// At least once an hour check if the connection is
+											// still alive.
+											service.writeRawData(" ");
+										}
+									}
+								} catch (Exception e) {
+									// Close the service....
+									try {
+										if (service != null) {
+											log.info(getName()
+												+ "Found dead connection, stopping: "
+												+ serviceId);
+											service.stop();
+										}
+									} catch (Exception ignore) {
+										// Do nothing here as we expect Exception to be thrown here...
+									}
 								}
+								// 								}
 							}
-						} catch (Exception e) {
-							// Close the service....
-							try {
-								if (service != null) {
-									log.info(getName()
-										+ "Found dead connection, stopping: "
-										+ getUniqueId(service)
-										+ ", CID: " + getCID(service));
-									service.stop();
-								}
-							} catch (Exception ignore) {
-								// Do nothing here as we expect Exception to be thrown here...
-							}
-						}
-					}
+						});
 				} catch (InterruptedException e) { /* Do nothing here */ }
 			}
 		}
