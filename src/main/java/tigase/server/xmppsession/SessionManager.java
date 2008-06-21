@@ -145,7 +145,11 @@ public class SessionManager extends AbstractMessageReceiver
 		}
 	}
 
-	public XMPPResourceConnection getXMPPResourceConnection(Packet p) {
+	protected XMPPResourceConnection getXMPPResourceConnection(String connId) {
+		return connectionsByFrom.get(connId);
+	}
+
+	protected XMPPResourceConnection getXMPPResourceConnection(Packet p) {
 		XMPPResourceConnection conn = null;
 		if (p.getFrom() != null) {
 			conn = connectionsByFrom.get(p.getFrom());

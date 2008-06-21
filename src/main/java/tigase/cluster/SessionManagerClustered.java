@@ -30,6 +30,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Arrays;
+import java.util.LinkedList;
 
 //import tigase.cluster.ClusterElement;
 import tigase.server.Packet;
@@ -73,10 +74,12 @@ public class SessionManagerClustered extends SessionManager
 	private static final String PRIORITY = "priority";
 	private static final String TOKEN = "token";
 	private static final String TRANSFER = "transfer";
+	private static final String SESSION_PACKETS = "session-packets";
 
 	private Set<String> cluster_nodes = new LinkedHashSet<String>();
 	private Set<String> broken_nodes = new LinkedHashSet<String>();
 
+	@SuppressWarnings("unchecked")
 	public void processPacket(Packet packet) {
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Received packet: " + packet.toString());
@@ -96,6 +99,16 @@ public class SessionManagerClustered extends SessionManager
 		if (conn == null
 			&& (isBrokenPacket(packet) || processAdminsOrDomains(packet)
 				|| sentToNextNode(packet))) {
+			return;
+		}
+		if (conn.isOnHold()) {
+			LinkedList<Packet> packets =
+        (LinkedList<Packet>)conn.getSessionData(SESSION_PACKETS);
+			if (packets == null) {
+				packets = new LinkedList<Packet>();
+				conn.putSessionData(SESSION_PACKETS, packets);
+			}
+			packets.offer(packet);
 			return;
 		}
 		processPacket(packet, conn);
@@ -119,6 +132,7 @@ public class SessionManagerClustered extends SessionManager
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	protected void processClusterPacket(Packet packet) {
 		ClusterElement clel = new ClusterElement(packet.getElement());
 		clel.addVisitedNode(getComponentId());
@@ -190,7 +204,7 @@ public class SessionManagerClustered extends SessionManager
 					log.finest("Session found, sending back user session data...");
 					Map<String, String> res_vals = new LinkedHashMap<String, String>();
 					res_vals.put(SM_ID, getComponentId());
-					res_vals.put(CREATION_TIME, ""+session.getCreationTime());
+					res_vals.put(CREATION_TIME, ""+session.getLiveTime());
 					result = clel.createMethodResponse(getComponentId(),
 						StanzaType.result.toString(), res_vals);
 				}
@@ -218,10 +232,10 @@ public class SessionManagerClustered extends SessionManager
 				int local_hashcode = (userId+getComponentId()).hashCode();
 				XMPPSession session = getSession(userId);
 				boolean transfer_out = false;
-				if (remote_creationTime > session.getCreationTime()) {
+				if (remote_creationTime > session.getLiveTime()) {
 					transfer_out = true;
 				}
-				if (remote_creationTime == session.getCreationTime()) {
+				if (remote_creationTime == session.getLiveTime()) {
 					if (remote_hashcode > local_hashcode) {
 						transfer_out = true;
 					}
@@ -229,7 +243,7 @@ public class SessionManagerClustered extends SessionManager
 				log.finest("CHECK_USER_SESSION received RESULT response for user: "
 					+ userId + " from " + remote_smId
 					+ ", remote_creationTime: " + remote_creationTime
-					+ ", local_creationTime: " + session.getCreationTime()
+					+ ", local_creationTime: " + session.getLiveTime()
 					+ ", transfer_out: " + transfer_out);
 				if (transfer_out) {
 					transferUserSession(userId, remote_smId, clel);
@@ -247,6 +261,16 @@ public class SessionManagerClustered extends SessionManager
 			}
 			if (ClusterMethods.SESSION_TRANSFER.toString().equals(clel.getMethodName())) {
 				String connectionId = clel.getMethodParam(CONNECTION_ID);
+				XMPPResourceConnection conn = getXMPPResourceConnection(connectionId);
+				if (conn != null) {
+					List<Packet> packets = (List<Packet>)conn.getSessionData(SESSION_PACKETS);
+					if (packets != null) {
+						for (Packet sess_pack: packets) {
+							sess_pack.setTo(clel.getClusterElement().getAttribute("from"));
+							fastAddOutPacket(sess_pack);
+						}
+					}
+				}
 				closeConnection(connectionId, true);
 			}
 			break;
@@ -274,6 +298,7 @@ public class SessionManagerClustered extends SessionManager
 			List<XMPPResourceConnection> conns = session.getActiveResources();
 			for (XMPPResourceConnection conn: conns) {
 				try {
+					conn.setOnHold();
 					String xmpp_sessionId = conn.getSessionId();
 					//String defLand = conn.getLang();
 					String resource = conn.getResource();

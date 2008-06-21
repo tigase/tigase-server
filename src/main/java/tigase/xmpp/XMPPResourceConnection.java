@@ -88,6 +88,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	//	private String[] anon_peers = null;
 
 	private long id_counter = 0;
+	private boolean onHold = false;
 
 	/**
 	 * Session temporary data. All data stored in this <code>Map</code> disapear
@@ -107,7 +108,15 @@ public class XMPPResourceConnection extends RepositoryAccess {
     sessionData = new HashMap<String, Object>();
 	}
 
-  /**
+	public void setOnHold() {
+		onHold = true;
+	}
+
+	public boolean isOnHold() {
+		return onHold;
+	}
+
+	/**
    * Saves given session data. Data are saved to temporary storage only and are
    * accessible during this session life only and only from this session
    * instance.<br/>

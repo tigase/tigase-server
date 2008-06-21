@@ -64,8 +64,8 @@ public class XMPPSession {
 		this.creationTime = System.currentTimeMillis();
 	}
 
-	public long getCreationTime() {
-		return creationTime;
+	public long getLiveTime() {
+		return (System.currentTimeMillis() - creationTime);
 	}
 
 	public void streamClosed(XMPPResourceConnection conn) {
