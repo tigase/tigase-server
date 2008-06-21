@@ -220,7 +220,7 @@ public class XMPPIOService extends IOService {
 					assert debug(new String(data), "--RECEIVED:");
 					try {
 						parser.parse(domHandler, data, 0, data.length);
-						if (domHandler.error()) {
+						if (domHandler.parseError()) {
 							log.warning("Data parsing error: " + new String(data));
 							domHandler = new XMPPDomBuilderHandler(this);
 						}
