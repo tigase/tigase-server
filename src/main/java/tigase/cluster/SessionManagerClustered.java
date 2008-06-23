@@ -137,7 +137,7 @@ public class SessionManagerClustered extends SessionManager
 
 	@SuppressWarnings("unchecked")
 	protected void processClusterPacket(Packet packet) {
-		ClusterElement clel = new ClusterElement(packet.getElement());
+		final ClusterElement clel = new ClusterElement(packet.getElement());
 		clel.addVisitedNode(getComponentId());
 		switch (packet.getType()) {
 		case set:
@@ -145,44 +145,64 @@ public class SessionManagerClustered extends SessionManager
 				processPacket(clel);
 			}
 			if (ClusterMethods.SESSION_TRANSFER.toString().equals(clel.getMethodName())) {
-				String userId = null;
+				String user_id = null;
 				try {
-					userId = clel.getMethodParam(USER_ID);
-					String xmpp_sessionId = clel.getMethodParam(XMPP_SESSION_ID);
+					final String userId = clel.getMethodParam(USER_ID);
+					// Only to make it available for the exception if thrown...
+					user_id = userId;
+					final String xmpp_sessionId = clel.getMethodParam(XMPP_SESSION_ID);
 					//String defLand = conn.getLang();
 					String resource = clel.getMethodParam(RESOURCE);
-					String connectionId = clel.getMethodParam(CONNECTION_ID);
+					final String connectionId = clel.getMethodParam(CONNECTION_ID);
 					int priority = 5;
 					try {
 						priority = Integer.parseInt(clel.getMethodParam(PRIORITY));
 					} catch (Exception e) {
 						priority = 5;
 					}
-					String token = clel.getMethodParam(TOKEN);
+					final String token = clel.getMethodParam(TOKEN);
 					String domain = JIDUtils.getNodeHost(userId);
 					String nick = JIDUtils.getNodeNick(userId);
-					XMPPResourceConnection res_con = createUserSession(connectionId, domain,
-						JIDUtils.getJID(nick, domain, resource));
+					final XMPPResourceConnection res_con =
+            createUserSession(connectionId, domain,
+							JIDUtils.getJID(nick, domain, resource));
 					res_con.setSessionId(xmpp_sessionId);
 					Authorization auth_res = res_con.loginToken(xmpp_sessionId, token);
-					log.finest("SESSION_TRANSFER received SET request, userId: " + userId
-						+ ", resource: " + resource
-						+ ", xmpp_sessionId: " + xmpp_sessionId
-						+ ", connectionId: " + connectionId + ", auth_res: " + auth_res);
-
-					Packet redirect = Command.REDIRECT.getPacket(getComponentId(),
-						connectionId, StanzaType.set, "1", "submit");
-					Command.addFieldValue(redirect, "session-id", xmpp_sessionId);
-					fastAddOutPacket(redirect);
-
-					Map<String, String> res_vals = new LinkedHashMap<String, String>();
-					res_vals.put(TRANSFER, "success");
-					ClusterElement result = clel.createMethodResponse(getComponentId(),
-						"result", res_vals);
-					fastAddOutPacket(new Packet(result.getClusterElement()));
+					if (auth_res == Authorization.AUTHORIZED) {
+						log.finest("SESSION_TRANSFER received SET request, userId: " + userId
+							+ ", resource: " + resource
+							+ ", xmpp_sessionId: " + xmpp_sessionId
+							+ ", connectionId: " + connectionId + ", auth_res: " + auth_res);
+						finishSessionTransfer(connectionId, xmpp_sessionId, clel);
+					} else {
+						log.finest("SESSION_TRANSFER authorization failed: " + auth_res
+							+ ", userId: " + userId + ", MySQL cluster delay? Waiting 2 secs");
+						delayedTasks.schedule(new TimerTask() {
+								public void run() {
+									try {
+										Authorization auth =
+                      res_con.loginToken(xmpp_sessionId, token);
+										if (auth == Authorization.AUTHORIZED) {
+											finishSessionTransfer(connectionId, xmpp_sessionId, clel);
+										} else {
+											log.finest("Authorization failed after delay: "
+												+ auth + ", userId: " + userId
+												+ ", closing the session and connection.");
+											closeConnection(connectionId, true);
+											Packet close = Command.CLOSE.getPacket(getComponentId(),
+												connectionId, StanzaType.set, "1");
+											fastAddOutPacket(close);
+										}
+									} catch (Exception e) {
+										log.log(Level.WARNING,
+											"Exception during user session transfer preparation", e);
+									}
+								}
+							}, 2000);
+					}
 				} catch (Exception e) {
 					log.log(Level.WARNING,
-						"Exception during user session transfer: " + userId, e);
+						"Exception during user session transfer: " + user_id, e);
 				}
 			}
 			break;
@@ -293,6 +313,20 @@ public class SessionManagerClustered extends SessionManager
 		}
 	}
 
+	protected void finishSessionTransfer(String connectionId, String xmpp_sessionId,
+		ClusterElement clel) {
+		Packet redirect = Command.REDIRECT.getPacket(getComponentId(),
+			connectionId, StanzaType.set, "1", "submit");
+		Command.addFieldValue(redirect, "session-id", xmpp_sessionId);
+		fastAddOutPacket(redirect);
+
+		Map<String, String> res_vals = new LinkedHashMap<String, String>();
+		res_vals.put(TRANSFER, "success");
+		ClusterElement result = clel.createMethodResponse(getComponentId(),
+			"result", res_vals);
+		fastAddOutPacket(new Packet(result.getClusterElement()));
+	}
+
 	protected void transferUserSession(final String userId, final String remote_smId,
 		ClusterElement clel) {
 		XMPPSession session = getSession(userId);
@@ -316,7 +350,8 @@ public class SessionManagerClustered extends SessionManager
 								String connectionId = conn.getConnectionId();
 								int priority = conn.getPriority();
 								String token = conn.getAuthenticationToken(xmpp_sessionId);
-								log.finest("Sending user: " + userId + " session, resource: " + resource
+								log.finest("Sending user: " + userId
+									+ " session, resource: " + resource
 									+ ", xmpp_sessionId: " + xmpp_sessionId
 									+ ", connectionId: " + connectionId);
 								Map<String, String> params = new LinkedHashMap<String, String>();
