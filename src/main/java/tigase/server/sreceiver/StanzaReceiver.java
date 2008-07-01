@@ -612,12 +612,14 @@ public class StanzaReceiver extends AbstractMessageReceiver
 				String[] arr_command = str_command.split("/");
 				if (arr_command.length > 1) {
 					TaskCommandIfc command = commands.get(arr_command[1]);
-				if (command != null) {
-					command.processCommand(packet, result, this);
-				} // end of if (command != null)
+					if (command != null) {
+						log.fine("Processing task command: " + arr_command[1]);
+						command.processCommand(packet, result, this);
+					} // end of if (command != null)
 				} // end of if (arr_command.length > 1)
 			} // end of if (str_command != null)
-
+			addOutPacket(result);
+			return;
 		}
 
 		log.finest("Processing packet: " + packet.toString());
