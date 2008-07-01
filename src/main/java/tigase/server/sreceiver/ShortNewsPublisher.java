@@ -279,7 +279,10 @@ public class ShortNewsPublisher extends RepoRosterTask {
 			String author = JIDUtils.getNodeID(packet.getElemFrom());
 			String subject = packet.getElemCData("/message/subject");
 			String body =  packet.getElemCData("/message/body");
-			if (body != null && subject != null) {
+			if (body != null) {
+				if (subject == null || subject.length() == 0) {
+					subject = "No subject...";
+				}
 				insert_post.setString(1, author);
 				insert_post.setString(2, XMLUtils.unescape(subject));
 				insert_post.setString(3, XMLUtils.unescape(body));
