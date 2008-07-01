@@ -87,7 +87,7 @@ public class UrnXmppPing extends XMPPProcessor implements XMPPProcessorIfc {
 			if (id.equals(session.getUserId())) {
 				Element elem = packet.getElement().clone();
 				Packet result = new Packet(elem);
-				result.setTo(session.getConnectionId());
+				result.setTo(session.getConnectionId(packet.getElemTo()));
 				result.setFrom(packet.getTo());
 				results.offer(result);
 			} else {

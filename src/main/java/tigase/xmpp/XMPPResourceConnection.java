@@ -337,6 +337,11 @@ public class XMPPResourceConnection extends RepositoryAccess {
 		return this.connectionId;
 	}
 
+	public String getConnectionId(String jid) {
+		return ((parentSession == null || jid == null) ? this.connectionId
+			: parentSession.getResourceConnection(jid).getConnectionId());
+	}
+
 	public final void logout()
 		throws NotAuthorizedException {
 		loginHandler.handleLogout(getUserName(), this);

@@ -139,7 +139,7 @@ public class JabberIqVersion extends XMPPProcessor
 				// Yes this is message to 'this' client
 				Element elem = packet.getElement().clone();
 				Packet result = new Packet(elem);
-				result.setTo(session.getConnectionId());
+				result.setTo(session.getConnectionId(packet.getElemTo()));
 				result.setFrom(packet.getTo());
 				results.offer(result);
 			} else {

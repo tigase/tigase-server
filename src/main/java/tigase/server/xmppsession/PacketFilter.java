@@ -148,8 +148,7 @@ public class PacketFilter {
 				log.finest("Yes, this is packet to 'this' client: " + id);
 				Element elem = packet.getElement().clone();
 				Packet result = new Packet(elem);
-				result.setTo(session.getParentSession().
-					getResourceConnection(packet.getElemTo()).getConnectionId());
+				result.setTo(session.getConnectionId(packet.getElemTo()));
 				log.finest("Setting to: " + result.getTo());
 				result.setFrom(packet.getTo());
 				results.offer(result);
