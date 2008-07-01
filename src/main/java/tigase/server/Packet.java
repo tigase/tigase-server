@@ -174,9 +174,13 @@ public class Packet {
 		return serviceDisco;
 	}
 
+	public String getXMLNS() {
+		return elem.getXMLNS();
+	}
+
 	public boolean isXMLNS(String elementPath, String xmlns) {
 		String this_xmlns = elem.getXMLNS(elementPath);
-		if (this_xmlns != null && this_xmlns.equals(xmlns)) {
+		if (this_xmlns == xmlns) {
 			return true;
 		}
 		return false;
