@@ -42,6 +42,8 @@ import tigase.util.JIDUtils;
 import tigase.util.DNSResolver;
 import tigase.util.RoutingsContainer;
 import tigase.xmpp.StanzaType;
+import tigase.xmpp.Authorization;
+import tigase.xmpp.Authorization;
 import tigase.xmpp.XMPPIOService;
 
 import static tigase.server.bosh.Constants.*;
@@ -137,11 +139,17 @@ public class BoshConnectionManager extends ConnectionManager<BoshIOService>
 				Queue<Packet> out_results = new LinkedList<Packet>();
 				BoshSession bs = null;
 				if (sid_str == null) {
-					bs = new BoshSession(getDefHostName(), this);
-					sid = bs.getSid();
-					sessions.put(sid, bs);
-					bs.init(p, serv, max_wait, min_polling, max_inactivity,
-						concurrent_requests, hold_requests, max_pause, out_results);
+					String hostname = p.getAttribute("to");
+					if (hostname != null && hostnames.contains(hostname)) {
+						bs = new BoshSession(getDefHostName(), this);
+						sid = bs.getSid();
+						sessions.put(sid, bs);
+						bs.init(p, serv, max_wait, min_polling, max_inactivity,
+							concurrent_requests, hold_requests, max_pause, out_results);
+					} else {
+						log.warning("Invalid hostname. Closing invalid connection");
+						serv.sendErrorAndStop(Authorization.NOT_ALLOWED, p, "Invalid hostname.");
+					}
 				} else {
 					sid = UUID.fromString(sid_str);
 					bs = sessions.get(sid);
@@ -149,7 +157,7 @@ public class BoshConnectionManager extends ConnectionManager<BoshIOService>
 						bs.processSocketPacket(p, serv, out_results);
 					} else {
 						log.warning("There is no session with given SID. Closing invalid connection");
-						serv.sendErrorAndStop(404, "Not Found");
+						serv.sendErrorAndStop(Authorization.ITEM_NOT_FOUND, p, "Invalid SID");
 					}
 				}
 				addOutPackets(out_results, bs);

@@ -36,8 +36,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import tigase.server.Command;
-import tigase.server.Packet;
 import tigase.xml.Element;
+import tigase.server.Packet;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
@@ -447,7 +447,7 @@ public class BoshSession {
 		service.setSid(sid);
 		connections.offer(service);
 
-		if (packet.getElemName().equals(BODY_EL_NAME)) {
+		if (packet.getElemName() == BODY_EL_NAME && packet.getXMLNS() == BOSH_XMLNS) {
 			boolean duplicate = false;
 			if (packet.getAttribute(RID_ATTR) != null) {
 				try {
@@ -513,6 +513,24 @@ public class BoshSession {
 		} else {
 			log.warning("[" + connections.size() +
 				"] Unexpected packet from the network: " + packet.toString());
+			String er_msg = "Invalid body element";
+			if (packet.getElemName() != BODY_EL_NAME) {
+				er_msg += ", incorrect root element name, use " + BODY_EL_NAME;
+			}
+			if (packet.getXMLNS() != BOSH_XMLNS) {
+				er_msg += ", incorrect xmlns, use " + BOSH_XMLNS;
+			}
+			try {
+				Packet error = Authorization.BAD_REQUEST.getResponseMessage(
+					packet, er_msg, true);
+				waiting_packets.add(error.getElement());
+				terminate = true;
+				Packet command = Command.STREAM_CLOSED.getPacket(null, null,
+					StanzaType.set, "sess1");
+				out_results.offer(command);
+			} catch (PacketErrorTypeException e) {
+				log.info("Error type and incorrect from bosh client? Ignoring...");
+			}
 		}
 		// Send packets waiting in queue...
 		processPacket(null, out_results);

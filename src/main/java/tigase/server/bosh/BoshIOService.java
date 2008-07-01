@@ -25,6 +25,9 @@ import java.util.logging.Logger;
 import java.io.IOException;
 import java.util.UUID;
 import tigase.xmpp.XMPPIOService;
+import tigase.server.Packet;
+import tigase.xmpp.Authorization;
+import tigase.xmpp.PacketErrorTypeException;
 
 /**
  * Describe class BoshIOService here.
@@ -73,18 +76,25 @@ public class BoshIOService extends XMPPIOService {
 		super.writeRawData(sb.toString());
 	}
 
-	public void sendErrorAndStop(int errorCode, String errorMsg) throws IOException {
-		String code404 = "<body type='terminate'"
+	public void sendErrorAndStop(Authorization errorCode,
+		Packet packet, String errorMsg) throws IOException {
+		String code = "<body type='terminate'"
       + " condition='item-not-found'"
       + " xmlns='http://jabber.org/protocol/httpbind'/>";
+		try {
+			Packet error = errorCode.getResponseMessage(packet, errorMsg, false);
+			code = error.getElement().toString();
+		} catch (PacketErrorTypeException e) {
+			// ignore
+		}
 		StringBuilder sb = new StringBuilder();
-		sb.append("HTTP/1.1 " + errorCode + " " + errorMsg + EOL);
+		sb.append("HTTP/1.1 " + errorCode.getErrorCode() + " " + errorMsg + EOL);
 		sb.append(CONTENT_TYPE_HEADER + content_type + EOL);
-		sb.append(CONTENT_TYPE_LENGTH + code404.getBytes().length + EOL);
+		sb.append(CONTENT_TYPE_LENGTH + code.getBytes().length + EOL);
 		sb.append(CONNECTION + "close" + EOL);
 		sb.append(SERVER + EOL);
 		sb.append(EOL);
-		sb.append(code404);
+		sb.append(code);
 		log.finest("Writing to socket:\n" + sb.toString());
 		super.writeRawData(sb.toString());
 		stop();
