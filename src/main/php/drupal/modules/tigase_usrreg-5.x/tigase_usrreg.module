@@ -26,7 +26,7 @@ function tigase_usrreg_user($op, &$edit, &$user) {
   if ($op == 'insert') {
 	  $folder = 'users-list/';
 		$user_name = $user->name;
-		$handle = fopen($folder . $user_name, "w+")
+		$handle = fopen($folder . $user_name, "w+");
 		fwrite($handle, $user_name);
 		fclose($handle);
   }
