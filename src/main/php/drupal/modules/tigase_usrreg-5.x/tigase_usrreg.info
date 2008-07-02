@@ -1,0 +1,8 @@
+; $Rev: $
+; Last modified by $Author: $
+; $Date: $
+
+name = User register hook
+description = Catches user creation event and for each new user creates a file in the filesystem with the new user name. This file is later used by system scripts which create system directory for the user so he can receive emails.
+package = Tigase
+version = 1.0

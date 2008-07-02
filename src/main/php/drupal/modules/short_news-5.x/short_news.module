@@ -32,7 +32,7 @@ function short_news_help($section='') {
 
 	switch ($section) {
 	case "admin/help#short_news":
-		$output = t("Short news displaying fro short_news table.") . "\n"
+		$output = t("Short news displaying from short_news table.") . "\n"
 			. t(" This module displays N last short news found in 'short_news' table.");
 		break;
 	}
