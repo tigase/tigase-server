@@ -15,7 +15,8 @@ for i in $mydir/* ; do
   /usr/bin/mail -s "Welcome to Tigase LiveCD" -t ${newuser}@livecd.tigase.org <<EOFMAIL
 Hi,
 
-This is automated messages sent to every new user registered on the LiveCD.
+This is an automated message sent to every new user registered on the LiveCD.
+
 Please enjoy the system and send me your comments.
 
 Artur Hefczyc
