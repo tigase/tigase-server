@@ -71,12 +71,21 @@ public class StanzaSender extends AbstractMessageReceiver
 	private static final String JDBC_TASK_INIT =
 		"jdbc:mysql://localhost/tigase?user=root&password=mypass&table=xmpp_stanza";
 	private static final long JDBC_INTERVAL = 10;
+
 	private static final String DRUPAL_FORUM_TASK_NAME = "drupal-forum";
 	private static final String DRUPAL_FORUM_TASK_CLASS =
 		"tigase.server.ssender.DrupalForumTask";
 	private static final String DRUPAL_FORUM_TASK_INIT =
 		"drupal_forum:mysql://localhost/tigase?user=root&password=mypass";
 	private static final long DRUPAL_FORUM_INTERVAL = 30;
+
+	private static final String DRUPAL_COMMENTS_TASK_NAME = "drupal-comments";
+	private static final String DRUPAL_COMMENTS_TASK_CLASS =
+		"tigase.server.ssender.DrupalCommentsTask";
+	private static final String DRUPAL_COMMENTS_TASK_INIT =
+		"drupal_comments:mysql://localhost/tigase?user=root&password=mypass";
+	private static final long DRUPAL_COMMENTS_INTERVAL = 10;
+
 	private static final String FILE_TASK_NAME = "file";
 	private static final String FILE_TASK_CLASS = "tigase.server.ssender.FileTask";
 	private static final String FILE_TASK_INIT =
@@ -84,7 +93,7 @@ public class StanzaSender extends AbstractMessageReceiver
 		"jabber" + File.separator + "*.stanza";
 	private static final long FILE_INTERVAL = 10;
 	private static final String[] STANZA_LISTENERS_PROP_VAL =
-	{JDBC_TASK_NAME, FILE_TASK_NAME};
+	{JDBC_TASK_NAME, FILE_TASK_NAME, DRUPAL_COMMENTS_TASK_NAME};
 	private static final String TASK_ACTIVE_PROP_KEY = "active";
 	private static final boolean TASK_ACTIVE_PROP_VAL = false;
 	public static final String MY_DOMAIN_NAME_PROP_KEY = "domain-name";
@@ -102,7 +111,6 @@ public class StanzaSender extends AbstractMessageReceiver
 	private Map<String, SenderTask> tasks_list =
 		new LinkedHashMap<String, SenderTask>();
 	private Timer tasks = new Timer("StanzaSender", true);
-	private String my_hostname = MY_DOMAIN_NAME_PROP_VAL;
 
 	// Implementation of tigase.server.ServerComponent
 
@@ -134,9 +142,6 @@ public class StanzaSender extends AbstractMessageReceiver
 	public void setProperties(final Map<String, Object> props) {
 		super.setProperties(props);
 
-		my_hostname = (String)props.get(MY_DOMAIN_NAME_PROP_KEY);
-		addRouting(my_hostname);
-
 		//interval = (Long)props.get(INTERVAL_PROP_KEY);
 		String[] config_tasks = (String[])props.get(STANZA_LISTENERS_PROP_KEY);
 		for (String task_name: config_tasks) {
@@ -156,7 +161,7 @@ public class StanzaSender extends AbstractMessageReceiver
 					(Long)props.get(task_name + "/" + TASK_INTERVAL_PROP_KEY);
 				try {
 					SenderTask task = (SenderTask)Class.forName(task_class).newInstance();
-					task.setName(task_name + "@" + my_hostname);
+					task.setName(task_name + "@" + getComponentId());
 					task.init(this, task_init);
 
 					// Install new task
@@ -201,7 +206,7 @@ public class StanzaSender extends AbstractMessageReceiver
 		defs.put(JDBC_TASK_NAME + "/" + TASK_INIT_PROP_KEY, JDBC_TASK_INIT);
 		defs.put(JDBC_TASK_NAME + "/" + TASK_INTERVAL_PROP_KEY, JDBC_INTERVAL);
 
-		String repo_uri = DRUPAL_FORUM_TASK_INIT;
+		String repo_uri = DRUPAL_COMMENTS_TASK_INIT;
 		if (params.get(GEN_CONF + "drupal-db-uri") != null) {
 				repo_uri = (String)params.get(GEN_CONF + "drupal-db-uri");
 		} else {
@@ -213,20 +218,13 @@ public class StanzaSender extends AbstractMessageReceiver
 		List<String> listeners = new ArrayList<String>();
 		listeners.addAll(Arrays.asList(STANZA_LISTENERS_PROP_VAL));
 
-		if (params.get(GEN_CONF + "ssend-forum-task") != null) {
-			String[] forum_ids =
-				((String)params.get(GEN_CONF + "ssend-forum-task")).split(",");
-			for (String id: forum_ids) {
-				String task_name = DRUPAL_FORUM_TASK_NAME + "-" + id;
-				listeners.add(task_name);
-				defs.put(task_name + "/" + TASK_ACTIVE_PROP_KEY, true);
-				defs.put(task_name + "/" + TASK_CLASS_PROP_KEY, DRUPAL_FORUM_TASK_CLASS);
-				defs.put(task_name + "/" + TASK_INTERVAL_PROP_KEY, DRUPAL_FORUM_INTERVAL);
-				defs.put(task_name + "/" + TASK_INIT_PROP_KEY,
-					repo_uri + "&forum=" + id + "&jid=forum-" + id
-					+ "@srecv." + getDefHostName());
-			}
-		}
+		String task_name = DRUPAL_COMMENTS_TASK_NAME;
+		listeners.add(task_name);
+		defs.put(task_name + "/" + TASK_ACTIVE_PROP_KEY, false);
+		defs.put(task_name + "/" + TASK_CLASS_PROP_KEY, DRUPAL_COMMENTS_TASK_CLASS);
+		defs.put(task_name + "/" + TASK_INTERVAL_PROP_KEY, DRUPAL_COMMENTS_INTERVAL);
+		defs.put(task_name + "/" + TASK_INIT_PROP_KEY,
+			repo_uri + "&jid=drupal-comments@srecv." + getDefHostName());
 
 		defs.put(STANZA_LISTENERS_PROP_KEY, listeners.toArray(new String[0]));
 		if (params.get(GEN_VIRT_HOSTS) != null) {
