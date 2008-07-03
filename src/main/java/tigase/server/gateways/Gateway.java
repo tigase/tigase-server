@@ -85,6 +85,7 @@ public class Gateway extends AbstractMessageReceiver
 	private static final String NAME_KEY = "authorized-key";
 	private static final String PRESENCE_TYPE = "presence-type";
 	private static final String PRESENCE_SHOW = "presence-show";
+	private static final String PRESENCE_ELNAME = "presence";
 
 	private String[] ADMINS_PROP_VAL =	{"admin@localhost", "admin@hostname"};
 
@@ -94,7 +95,7 @@ public class Gateway extends AbstractMessageReceiver
 	private boolean is_moderated = GW_MODERATED_PROP_VAL;
 	private String gw_name = "Undefined";
 	private String gw_type = "unknown";
-	private String gw_hostname = GW_DOMAIN_NAME_PROP_VAL;
+	//private String gw_hostname = GW_DOMAIN_NAME_PROP_VAL;
 	private String gw_desc = "empty";
 	private UserRepository repository = null;
 	private Map<String, GatewayConnection> gw_connections =
@@ -120,8 +121,8 @@ public class Gateway extends AbstractMessageReceiver
 
 		admins = (String[])props.get(ADMINS_PROP_KEY);
 		Arrays.sort(admins);
-		gw_hostname = (String)props.get(GW_DOMAIN_NAME_PROP_KEY);
-		addRouting(gw_hostname);
+		//gw_hostname = (String)props.get(GW_DOMAIN_NAME_PROP_KEY);
+		//addRouting(gw_hostname);
 
 		is_moderated = (Boolean)props.get(GW_MODERATED_PROP_KEY);
 
@@ -231,9 +232,9 @@ public class Gateway extends AbstractMessageReceiver
 					repository.setData(getComponentId(), id, username_key, new_username);
 					repository.setData(getComponentId(), id, password_key, new_password);
 					addOutPacket(packet.okResult((String)null, 0));
-					addOutPacket(new Packet(new Element("presence",
+					addOutPacket(new Packet(new Element(PRESENCE_ELNAME,
 								new String[] {"to", "from", "type"},
-								new String[] {id, gw_hostname, "subscribe"})));
+								new String[] {id, getComponentId(), "subscribe"})));
 					if (is_moderated && !isAdmin(id)) {
 						repository.setData(getComponentId(), id, moderated_key, moderated_true);
 						addOutPacket(new Packet(new Element("message",
@@ -244,7 +245,7 @@ public class Gateway extends AbstractMessageReceiver
 											+ " and you will be able to use the gateway since then." )
 									},
 									new String[] {"to", "from", "type", "id"},
-									new String[] {id, gw_hostname, "chat", "gw-ap-1"})));
+									new String[] {id, getComponentId(), "chat", "gw-ap-1"})));
 						sendToAdmins(new Element("message",
 								new Element[] {
 									new Element("body",
@@ -253,7 +254,7 @@ public class Gateway extends AbstractMessageReceiver
 								new String[] {"from", "type", "id"},
 								new String[] {getComponentId(), "chat", "gw-ap-1"}));
 					} else {
-						repository.setData(gw_hostname, id, moderated_key, moderated_false);
+						repository.setData(getComponentId(), id, moderated_key, moderated_false);
 					}
 				} catch (tigase.db.UserNotFoundException e) {
 					log.warning("This is most likely configuration error, please make"
@@ -278,7 +279,7 @@ public class Gateway extends AbstractMessageReceiver
 	}
 
 	private void processPresence(Packet packet) {
-		if (packet.getElemTo().equals(gw_hostname)) {
+		if (packet.getElemTo().equals(getComponentId())) {
 			if (packet.getType() == null || packet.getType() == StanzaType.available) {
 				// Open new connection if it does not exist
 				findConnection(packet, true);
@@ -313,7 +314,7 @@ public class Gateway extends AbstractMessageReceiver
 					log.log(Level.WARNING, "Problem updating repository data", e);
 				}
 
-				Element pres_el = new Element("presence",
+				Element pres_el = new Element(PRESENCE_ELNAME,
 						new String[] {"to", "from"},
 						new String[] {packet.getElemFrom(), packet.getElemTo()});
 				if (!pres_type.equals("null")) {
@@ -411,10 +412,19 @@ public class Gateway extends AbstractMessageReceiver
 		String id = JIDUtils.getNodeID(packet.getElemFrom());
 		GatewayConnection conn = gw_connections.get(id);
 		if (conn != null) {
+			log.info("Stopping connection for: " + packet.getElemFrom());
 			gw_connections.remove(id);
 			if (conn.getAllJids() == null || conn.getAllJids().length == 0) {
 				closeConnection(conn);
 			}
+			Element pres_el = new Element(PRESENCE_ELNAME,
+				new String[] {"to", "from", "type"},
+				new String[] {packet.getElemFrom(), getComponentId(), "unavailable"});
+			Packet presence = new Packet(pres_el);
+			log.finest("Sending out presence: " + presence.toString());
+			addOutPacket(presence);
+		} else {
+			log.info("No connection for: " + packet.getElemFrom());
 		}
 	}
 
@@ -425,7 +435,7 @@ public class Gateway extends AbstractMessageReceiver
 	}
 
 	public String formatJID(String legacyName) {
-		return XMLUtils.escape(legacyName.replace("@", "%") + "@" + gw_hostname);
+		return XMLUtils.escape(legacyName.replace("@", "%") + "@" + getComponentId());
 	}
 
 	public String decodeLegacyName(String jid) {
@@ -438,9 +448,9 @@ public class Gateway extends AbstractMessageReceiver
 		if (conn != null || !create) {
 			if (conn != null) {
 				conn.addJid(packet.getElemFrom());
-				addOutPacket(new Packet(new Element("presence",
+				addOutPacket(new Packet(new Element(PRESENCE_ELNAME,
 							new String[] {"from", "to"},
-							new String[] {gw_hostname, packet.getElemFrom()})));
+							new String[] {getComponentId(), packet.getElemFrom()})));
 				updateRosterPresence(conn.getRoster(), packet.getElemFrom());
 			}
 			return conn;
@@ -477,11 +487,11 @@ public class Gateway extends AbstractMessageReceiver
 				log.warning("Bad packet, 'to' is null: " + packet.toString());
 				return;
 			}
-			if (packet.getElemName().equals("presence")) {
+			if (packet.getElemName() == PRESENCE_ELNAME) {
 				processPresence(packet);
 				return;
 			}
-			if (packet.getElemTo().equals(gw_hostname)) {
+			if (packet.getElemTo().equals(getComponentId())) {
 				// Local processing.
 				log.fine("Local packet: " + packet.toString());
 				processLocalPacket(packet);
@@ -531,13 +541,13 @@ public class Gateway extends AbstractMessageReceiver
 	public void logout(GatewayConnection gc) {
 		String[] jids = gc.getAllJids();
 		for (String username: jids) {
-			addOutPacket(new Packet(new Element("presence",
+			addOutPacket(new Packet(new Element(PRESENCE_ELNAME,
 						new String[] {"from", "to", "type"},
-						new String[] {gw_hostname, username, "unavailable"})));
+						new String[] {getComponentId(), username, "unavailable"})));
 			List<RosterItem> roster = gc.getRoster();
 			for (RosterItem item: roster) {
 				String from = formatJID(item.getBuddyId());
-				Element pres_el = new Element("presence",
+				Element pres_el = new Element(PRESENCE_ELNAME,
 					new String[] {"to", "from", "type"},
 					new String[] {username, from, "unavailable"});
 				Packet presence = new Packet(pres_el);
@@ -551,9 +561,9 @@ public class Gateway extends AbstractMessageReceiver
 	public void loginCompleted(GatewayConnection gc) {
 		String[] jids = gc.getAllJids();
 		for (String username: jids) {
-			addOutPacket(new Packet(new Element("presence",
+			addOutPacket(new Packet(new Element(PRESENCE_ELNAME,
 						new String[] {"from", "to"},
-						new String[] {gw_hostname, username})));
+						new String[] {getComponentId(), username})));
 		}
 	}
 
@@ -570,7 +580,7 @@ public class Gateway extends AbstractMessageReceiver
 			log.fine("Received roster entry: " + item.getBuddyId());
 			String from = formatJID(item.getBuddyId());
 			for (String username: to) {
-				Element pres_el = new Element("presence",
+				Element pres_el = new Element(PRESENCE_ELNAME,
 					new String[] {"to", "from"},
 					new String[] {username, from});
 				if (item.getStatus().getType() != null) {
@@ -621,7 +631,7 @@ public class Gateway extends AbstractMessageReceiver
 			}
 
 			for (String username: jids) {
-				Packet presence = new Packet(new Element("presence",
+				Packet presence = new Packet(new Element(PRESENCE_ELNAME,
 						new String[] {"to", "from", "type"},
 						new String[] {username, from, "subscribe"}));
 				log.finest("Sending out presence: " + presence.toString());
@@ -653,7 +663,7 @@ public class Gateway extends AbstractMessageReceiver
 			log.log(Level.WARNING, "Problem updating repository data", e);
 		}
 		for (String username: jids) {
-			Element pres_el = new Element("presence",
+			Element pres_el = new Element(PRESENCE_ELNAME,
 				new String[] {"to", "from"},
 				new String[] {username, from});
 			if (item.getStatus().getType() != null) {
