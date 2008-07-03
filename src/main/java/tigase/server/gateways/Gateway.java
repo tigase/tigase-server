@@ -417,12 +417,6 @@ public class Gateway extends AbstractMessageReceiver
 			if (conn.getAllJids() == null || conn.getAllJids().length == 0) {
 				closeConnection(conn);
 			}
-			Element pres_el = new Element(PRESENCE_ELNAME,
-				new String[] {"to", "from", "type"},
-				new String[] {packet.getElemFrom(), getComponentId(), "unavailable"});
-			Packet presence = new Packet(pres_el);
-			log.finest("Sending out presence: " + presence.toString());
-			addOutPacket(presence);
 		} else {
 			log.info("No connection for: " + packet.getElemFrom());
 		}
@@ -456,11 +450,13 @@ public class Gateway extends AbstractMessageReceiver
 			return conn;
 		}
 		try {
-			String moderated = repository.getData(getComponentId(), id, moderated_key);
-			if (moderated == null || moderated.equals(moderated_true)) {
-				addOutPacket(Authorization.NOT_ALLOWED.getResponseMessage(packet,
+			if (is_moderated) {
+				String moderated = repository.getData(getComponentId(), id, moderated_key);
+				if (moderated == null || moderated.equals(moderated_true)) {
+					addOutPacket(Authorization.NOT_ALLOWED.getResponseMessage(packet,
 						"Administrator approval awaiting.", true));
-				return null;
+					return null;
+				}
 			}
 			String username = repository.getData(getComponentId(), id, username_key);
 			String password = repository.getData(getComponentId(), id, password_key);
