@@ -216,7 +216,7 @@ public class MessageRouter extends AbstractMessageReceiver {
 
 		ServerComponent comp = packet.getElemTo() == null ? null
       : getLocalComponent(packet.getElemTo());
-		if (packet.isServiceDisco()
+		if (!(comp instanceof DisableDisco) && packet.isServiceDisco()
 			&& packet.getType() != null && packet.getType() == StanzaType.get
 			&& (comp != null || isLocalDomain(packet.getElemTo()))) {
 			log.finest("Processing disco query by: " + getComponentId());
