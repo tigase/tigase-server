@@ -337,6 +337,9 @@ public class Packet {
 		if (getAttribute(OLDTO) != null) {
 			reply.setAttribute(OLDTO, getAttribute(OLDTO));
 		}
+		if(getAttribute("xmlns") != null){
+			reply.setAttribute("xmlns", getAttribute("xmlns"));
+		}
 		Element error = new Element("error");
 		if(errorCode != null) {
 			error.setAttribute("code", errorCode.toString());
