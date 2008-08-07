@@ -39,6 +39,7 @@ import tigase.server.AbstractMessageReceiver;
 import tigase.server.Packet;
 import tigase.util.DBUtils;
 import tigase.util.JIDUtils;
+import tigase.util.DNSResolver;
 import tigase.xml.XMLUtils;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
@@ -86,8 +87,11 @@ public class Gateway extends AbstractMessageReceiver
 	private static final String PRESENCE_TYPE = "presence-type";
 	private static final String PRESENCE_SHOW = "presence-show";
 	private static final String PRESENCE_ELNAME = "presence";
+	public static final String HOSTNAMES_PROP_KEY = "hostnames";
+	public String[] HOSTNAMES_PROP_VAL =	{"localhost", "hostname"};
 
 	private String[] ADMINS_PROP_VAL =	{"admin@localhost", "admin@hostname"};
+	private String[] hostnames = HOSTNAMES_PROP_VAL;
 
 	private ServiceEntity serviceEntity = null;
 	private String[] admins = ADMINS_PROP_VAL;
@@ -100,9 +104,21 @@ public class Gateway extends AbstractMessageReceiver
 	private UserRepository repository = null;
 	private Map<String, GatewayConnection> gw_connections =
 		new LinkedHashMap<String, GatewayConnection>();
+	
 
 	public void setProperties(final Map<String, Object> props) {
 		super.setProperties(props);
+
+		hostnames = (String[])props.get(HOSTNAMES_PROP_KEY);
+		if (hostnames == null || hostnames.length == 0) {
+			log.warning("Hostnames definition is empty, setting 'localhost'");
+			hostnames = new String[] {getName() + ".localhost"};
+		} // end of if (hostnames == null || hostnames.length == 0)
+		Arrays.sort(hostnames);
+		clearRoutings();
+		for (String host: hostnames) {
+			addRouting(host);
+		} // end of for ()
 
 		gw_class_name = (String)props.get(GW_CLASS_NAME_PROP_KEY);
 		GatewayConnection gc = gwInstance();
@@ -179,6 +195,18 @@ public class Gateway extends AbstractMessageReceiver
 		defs.put(GW_MODERATED_PROP_KEY, GW_MODERATED_PROP_VAL);
 		defs.put(GW_DOMAIN_NAME_PROP_KEY, GW_DOMAIN_NAME_PROP_VAL);
 
+		if (params.get(GEN_VIRT_HOSTS) != null) {
+			HOSTNAMES_PROP_VAL = ((String)params.get(GEN_VIRT_HOSTS)).split(",");
+		} else {
+			HOSTNAMES_PROP_VAL = DNSResolver.getDefHostNames();
+		}
+		hostnames = new String[] {};
+		int i = 0;
+		for (String host: HOSTNAMES_PROP_VAL) {
+			hostnames[i++] = getName() + "." + host;
+		}
+		defs.put(HOSTNAMES_PROP_KEY, hostnames);
+
 		return defs;
 	}
 
@@ -234,7 +262,7 @@ public class Gateway extends AbstractMessageReceiver
 					addOutPacket(packet.okResult((String)null, 0));
 					addOutPacket(new Packet(new Element(PRESENCE_ELNAME,
 								new String[] {"to", "from", "type"},
-								new String[] {id, getComponentId(), "subscribe"})));
+								new String[] {id, packet.getElemTo(), "subscribe"})));
 					if (is_moderated && !isAdmin(id)) {
 						repository.setData(getComponentId(), id, moderated_key, moderated_true);
 						addOutPacket(new Packet(new Element("message",
@@ -245,14 +273,14 @@ public class Gateway extends AbstractMessageReceiver
 											+ " and you will be able to use the gateway since then." )
 									},
 									new String[] {"to", "from", "type", "id"},
-									new String[] {id, getComponentId(), "chat", "gw-ap-1"})));
+									new String[] {id, packet.getElemTo(), "chat", "gw-ap-1"})));
 						sendToAdmins(new Element("message",
 								new Element[] {
 									new Element("body",
 										"Gateway subscription request is awaiting for: " + id)
 								},
 								new String[] {"from", "type", "id"},
-								new String[] {getComponentId(), "chat", "gw-ap-1"}));
+								new String[] {packet.getElemTo(), "chat", "gw-ap-1"}));
 					} else {
 						repository.setData(getComponentId(), id, moderated_key, moderated_false);
 					}
@@ -279,7 +307,7 @@ public class Gateway extends AbstractMessageReceiver
 	}
 
 	private void processPresence(Packet packet) {
-		if (packet.getElemTo().equals(getComponentId())) {
+		if (Arrays.binarySearch(hostnames, packet.getElemTo()) >= 0) {
 			if (packet.getType() == null || packet.getType() == StanzaType.available) {
 				// Open new connection if it does not exist
 				findConnection(packet, true);
