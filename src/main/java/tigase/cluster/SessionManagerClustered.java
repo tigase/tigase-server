@@ -104,7 +104,7 @@ public class SessionManagerClustered extends SessionManager
 				|| sentToNextNode(packet))) {
 			return;
 		}
-		if (conn.isOnHold()) {
+		if (conn != null && conn.isOnHold()) {
 			LinkedList<Packet> packets =
         (LinkedList<Packet>)conn.getSessionData(SESSION_PACKETS);
 			if (packets == null) {
@@ -433,8 +433,8 @@ public class SessionManagerClustered extends SessionManager
 
 	public void nodesConnected(Set<String> node_hostnames) {
 		for (String node: node_hostnames) {
-			cluster_nodes.add(DEF_SM_NAME + "@" + node);
-			broken_nodes.remove(DEF_SM_NAME + "@" + node);
+			cluster_nodes.add(getName() + "@" + node);
+			broken_nodes.remove(getName() + "@" + node);
 		}
 		sendClusterNotification("Cluster nodes have been connected:",
 			"New cluster nodes connected", node_hostnames);
@@ -442,8 +442,8 @@ public class SessionManagerClustered extends SessionManager
 
 	public void nodesDisconnected(Set<String> node_hostnames) {
 		for (String node: node_hostnames) {
-			cluster_nodes.remove(DEF_SM_NAME + "@" + node);
-			broken_nodes.add(DEF_SM_NAME + "@" + node);
+			cluster_nodes.remove(getName() + "@" + node);
+			broken_nodes.add(getName() + "@" + node);
 		}
 		sendClusterNotification("Cluster nodes have been disconnected:",
 			"Disconnected cluster nodes", node_hostnames);
