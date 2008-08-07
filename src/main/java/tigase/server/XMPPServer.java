@@ -63,7 +63,8 @@ public class XMPPServer {
   }
 
 	public static String getImplementationVersion() {
-		return XMPPServer.class.getPackage().getImplementationVersion();
+		String version = XMPPServer.class.getPackage().getImplementationVersion();
+		return version == null ? "0.0.0-0" : version;
 	}
 
 	public static String version() {
