@@ -96,6 +96,7 @@ public class ServerConnectionClustered extends ServerConnectionManager
 				}
 				if (result == null) {
 					Map<String, String> res_vals = new LinkedHashMap<String, String>();
+
 					res_vals.put(VALID, "" + valid);
 					result = clel.createMethodResponse(getComponentId(),
 						"result", res_vals);
@@ -170,13 +171,13 @@ public class ServerConnectionClustered extends ServerConnectionManager
 
 	public void nodesConnected(Set<String> node_hostnames) {
 		for (String node: node_hostnames) {
-			cluster_nodes.add(DEF_S2S_NAME + "@" + node);
+			cluster_nodes.add(getName() + "@" + node);
 		}
 	}
 
 	public void nodesDisconnected(Set<String> node_hostnames) {
 		for (String node: node_hostnames) {
-			cluster_nodes.remove(DEF_S2S_NAME + "@" + node);
+			cluster_nodes.remove(getName() + "@" + node);
 		}
 	}
 
