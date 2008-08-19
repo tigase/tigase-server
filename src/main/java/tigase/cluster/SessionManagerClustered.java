@@ -31,16 +31,18 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
-//import tigase.cluster.ClusterElement;
+import tigase.cluster.methodcalls.SessionTransferMC;
 import tigase.server.Packet;
 import tigase.server.Command;
 import tigase.util.JIDUtils;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.ConnectionStatus;
 import tigase.xmpp.XMPPSession;
 import tigase.server.xmppsession.SessionManager;
 import tigase.xml.Element;
@@ -78,9 +80,13 @@ public class SessionManagerClustered extends SessionManager
 	private static final String TRANSFER = "transfer";
 	private static final String SESSION_PACKETS = "session-packets";
 
+	private SessionTransferMC sessionTransferMC = null;
+
 	private Timer delayedTasks = null;
 	private Set<String> cluster_nodes = new LinkedHashSet<String>();
 	private Set<String> broken_nodes = new LinkedHashSet<String>();
+	private ArrayList<MethodCall> methods = new ArrayList<MethodCall>();
+
 
 	@SuppressWarnings("unchecked")
 	public void processPacket(Packet packet) {
@@ -104,15 +110,22 @@ public class SessionManagerClustered extends SessionManager
 				|| sentToNextNode(packet))) {
 			return;
 		}
-		if (conn != null && conn.isOnHold()) {
-			LinkedList<Packet> packets =
+		if (conn != null) {
+			switch (conn.getConnectionStatus()) {
+			case ON_HOLD:
+				LinkedList<Packet> packets =
         (LinkedList<Packet>)conn.getSessionData(SESSION_PACKETS);
-			if (packets == null) {
-				packets = new LinkedList<Packet>();
-				conn.putSessionData(SESSION_PACKETS, packets);
+				if (packets == null) {
+					packets = new LinkedList<Packet>();
+					conn.putSessionData(SESSION_PACKETS, packets);
+				}
+				packets.offer(packet);
+				return;
+			case REDIRECT:
+				packet.setTo((String)conn.getSessionData("redirect-to"));
+				fastAddOutPacket(packet);
+				return;
 			}
-			packets.offer(packet);
-			return;
 		}
 		processPacket(packet, conn);
 	}
@@ -286,6 +299,9 @@ public class SessionManagerClustered extends SessionManager
 				String connectionId = clel.getMethodParam(CONNECTION_ID);
 				XMPPResourceConnection conn = getXMPPResourceConnection(connectionId);
 				if (conn != null) {
+					conn.putSessionData("redirect-to",
+						clel.getClusterElement().getAttribute("from"));
+					conn.setConnectionStatus(ConnectionStatus.REDIRECT);
 					List<Packet> packets = (List<Packet>)conn.getSessionData(SESSION_PACKETS);
 					if (packets != null) {
 						for (Packet sess_pack: packets) {
@@ -294,7 +310,7 @@ public class SessionManagerClustered extends SessionManager
 						}
 					}
 				}
-				closeConnection(connectionId, true);
+				//closeConnection(connectionId, true);
 			}
 			break;
 		case error:
@@ -334,7 +350,7 @@ public class SessionManagerClustered extends SessionManager
 			log.finest("TRANSFERIN user: " + userId + " sessions to " + remote_smId);
 			List<XMPPResourceConnection> conns = session.getActiveResources();
 			for (XMPPResourceConnection conn_res: conns) {
-				conn_res.setOnHold();
+				conn_res.setConnectionStatus(ConnectionStatus.ON_HOLD);
 				final XMPPResourceConnection conn = conn_res;
 				// Delay is needed here as there might be packets which are being processing
 				// while we are preparing session for transfer.
@@ -413,6 +429,18 @@ public class SessionManagerClustered extends SessionManager
 // 		log.config("Cluster nodes loaded: " + Arrays.toString(cl_nodes));
 // 		cluster_nodes = new LinkedHashSet<String>(Arrays.asList(cl_nodes));
 // 		broken_nodes = new LinkedHashSet<String>();
+		init();
+	}
+
+	private void init() {
+		this.sessionTransferMC = new SessionTransferMC();
+	}
+
+	private <T extends MethodCall> T registerMethodCall(final T methodCall) {
+		log.config("Registering method call: "
+			+ methodCall.getClass().getCanonicalName());
+		this.methods.add(methodCall);
+		return methodCall;
 	}
 
 	public Map<String, Object> getDefaults(Map<String, Object> params) {

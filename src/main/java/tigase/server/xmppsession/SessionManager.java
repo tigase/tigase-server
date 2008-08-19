@@ -593,6 +593,19 @@ public class SessionManager extends AbstractMessageReceiver
 				}
 			}
 			break;
+		case REDIRECT:
+			if (connection != null) {
+				String action = Command.getFieldValue(pc, "action");
+				if (action.equals("close")) {
+					log.fine("Closing redirected connections: " + pc.getFrom());
+					closeConnection(pc.getFrom(), true);
+				} else {
+					log.fine("Activating redirected connections: " + pc.getFrom());
+				}
+			} else {
+				log.fine("Redirect for non-existen connection: " + pc.toString());
+			}
+			break;
 		case OTHER:
 			log.info("Other command found: " + pc.getStrCommand());
 			break;

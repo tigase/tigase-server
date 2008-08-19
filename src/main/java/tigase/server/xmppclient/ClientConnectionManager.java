@@ -144,9 +144,20 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
           (String)serv.getSessionData().get(serv.SESSION_ID_KEY);
 				String command_sessionId = Command.getFieldValue(packet, "session-id");
 				if (serv_sessionId.equals(command_sessionId)) {
+					String old_receiver = serv.getDataReceiver();
 					serv.setDataReceiver(packet.getFrom());
 					log.fine("Redirecting data for sessionId: " + serv_sessionId
 						+ ", to: " + packet.getFrom());
+					Packet response = packet.commandResult(null);
+					Command.addFieldValue(response, "session-id", command_sessionId);
+					Command.addFieldValue(response, "action", "close");
+					response.getElement().setAttribute("to", old_receiver);
+					addOutPacket(response);
+					response = packet.commandResult(null);
+					Command.addFieldValue(response, "session-id", command_sessionId);
+					Command.addFieldValue(response, "action", "activate");
+					response.getElement().setAttribute("to", serv.getDataReceiver());
+					addOutPacket(response);
 				} else {
 					log.warning("Incorrect session ID, ignoring data redirect for: "
 						+ packet.toString());
@@ -178,7 +189,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 	public Queue<Packet> processSocketData(XMPPIOService serv) {
 
 		String id = getUniqueId(serv);
-		String hostname = (String)serv.getSessionData().get(serv.HOSTNAME_KEY);
+		//String hostname = (String)serv.getSessionData().get(serv.HOSTNAME_KEY);
 
 		Packet p = null;
 		while ((p = serv.getReceivedPackets().poll()) != null) {
@@ -186,8 +197,9 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 				+ ", type: " + p.getType());
 			log.finest("Processing socket data: " + p.getStringData());
 			p.setFrom(getFromAddress(id));
-			p.setTo(serv.getDataReceiver() != null ? serv.getDataReceiver()
-				: routings.computeRouting(hostname));
+			p.setTo(serv.getDataReceiver());
+// 			p.setTo(serv.getDataReceiver() != null ? serv.getDataReceiver()
+// 				: routings.computeRouting(hostname));
 			addOutPacket(p);
 			// 			results.offer(new Packet(new Element("OK")));
 		} // end of while ()
@@ -323,9 +335,10 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 				+ " version='1.0' xml:lang='en'>");
 			serv.getSessionData().put(serv.SESSION_ID_KEY, id);
 			serv.getSessionData().put(serv.HOSTNAME_KEY, hostname);
+			serv.setDataReceiver(routings.computeRouting(hostname));
 			Packet streamOpen = Command.STREAM_OPENED.getPacket(
 				getFromAddress(getUniqueId(serv)),
-				routings.computeRouting(hostname), StanzaType.set, "sess1", "submit");
+				serv.getDataReceiver(), StanzaType.set, "sess1", "submit");
 			Command.addFieldValue(streamOpen, "session-id", id);
 			Command.addFieldValue(streamOpen, "hostname", hostname);
 			Command.addFieldValue(streamOpen, "xml:lang", lang);
@@ -333,7 +346,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 			if (attribs.get("version") != null) {
 				addOutPacket(Command.GETFEATURES.getPacket(
 					getFromAddress(getUniqueId(serv)),
-					routings.computeRouting(hostname), StanzaType.get, "sess2", null));
+					serv.getDataReceiver(), StanzaType.get, "sess2", null));
 			} // end of if (attribs.get("version") != null)
 // 		} catch (IOException e) {
 // 			serv.stop();
@@ -345,13 +358,15 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 	public void serviceStopped(XMPPIOService service) {
 		super.serviceStopped(service);
 		//		XMPPIOService serv = (XMPPIOService)service;
-		String hostname =
-			(String)service.getSessionData().get(service.HOSTNAME_KEY);
-		Packet command = Command.STREAM_CLOSED.getPacket(
-			getFromAddress(getUniqueId(service)),
-			routings.computeRouting(hostname), StanzaType.set, "sess1");
-		addOutPacket(command);
-		log.fine("Service stopped, sending packet: " + command.getStringData());
+		if (service.getDataReceiver() != null) {
+			Packet command = Command.STREAM_CLOSED.getPacket(
+				getFromAddress(getUniqueId(service)),
+				service.getDataReceiver(), StanzaType.set, "sess1");
+			addOutPacket(command);
+			log.fine("Service stopped, sending packet: " + command.getStringData());
+		} else {
+			log.fine("Service stopped, before stream:stream received");
+		}
 	}
 
 	public void xmppStreamClosed(XMPPIOService serv) {

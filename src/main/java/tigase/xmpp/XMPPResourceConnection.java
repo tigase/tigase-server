@@ -45,7 +45,7 @@ import tigase.db.AuthorizationException;
  */
 public class XMPPResourceConnection extends RepositoryAccess {
 
-  /**
+	/**
    * Private logger for class instancess.
    */
   private static final Logger log =
@@ -88,7 +88,8 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	//	private String[] anon_peers = null;
 
 	private long id_counter = 0;
-	private boolean onHold = false;
+	private ConnectionStatus connectionStatus = ConnectionStatus.NORMAL;
+// 	private boolean onHold = false;
 
 	/**
 	 * Session temporary data. All data stored in this <code>Map</code> disapear
@@ -108,13 +109,21 @@ public class XMPPResourceConnection extends RepositoryAccess {
     sessionData = new HashMap<String, Object>();
 	}
 
-	public void setOnHold() {
-		onHold = true;
+	public void setConnectionStatus(ConnectionStatus status) {
+		connectionStatus = status;
 	}
 
-	public boolean isOnHold() {
-		return onHold;
+	public ConnectionStatus getConnectionStatus() {
+		return connectionStatus;
 	}
+
+// 	public void setOnHold() {
+// 		onHold = true;
+// 	}
+
+// 	public boolean isOnHold() {
+// 		return onHold;
+// 	}
 
 	/**
    * Saves given session data. Data are saved to temporary storage only and are
