@@ -66,7 +66,7 @@ ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
 create table tig_users (
        uid bigint unsigned NOT NULL,
 
-       user_id varchar(256) NOT NULL,
+       user_id varchar(255) NOT NULL,
 
        primary key (uid),
        unique key user_id (user_id)
