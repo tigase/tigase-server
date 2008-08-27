@@ -114,6 +114,7 @@ public class BindResource extends XMPPProcessor
         } else {
           session.setResource(resource);
         } // end of if (resource == null) else
+				packet.getElement().setAttribute("from", session.getJID());
         session.putSessionData(RESOURCE_KEY, "true");
 				results.offer(packet.okResult("<jid>" + session.getJID() + "</jid>", 1));
 				break;
