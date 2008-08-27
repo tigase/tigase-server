@@ -200,7 +200,7 @@ public class Gateway extends AbstractMessageReceiver
 		} else {
 			HOSTNAMES_PROP_VAL = DNSResolver.getDefHostNames();
 		}
-		hostnames = new String[] {};
+		hostnames = new String[HOSTNAMES_PROP_VAL.length];
 		int i = 0;
 		for (String host: HOSTNAMES_PROP_VAL) {
 			hostnames[i++] = getName() + "." + host;
