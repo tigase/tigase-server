@@ -310,6 +310,12 @@ public class DrupalAuth implements UserAuthRepository {
 		}
 		try {
 			initRepo();
+		} catch (SQLException e) {
+			conn = null;
+			throw	new DBInitException("Problem initializing jdbc connection: "
+				+ db_conn, e);
+		}
+		try {
 			if (online_status) {
 				Statement stmt = conn.createStatement();
 				stmt.executeUpdate("update users set online_status = 0;");
@@ -317,9 +323,22 @@ public class DrupalAuth implements UserAuthRepository {
 				stmt = null;
 			}
 		} catch (SQLException e) {
-			conn = null;
-			throw	new DBInitException("Problem initializing jdbc connection: "
-				+ db_conn, e);
+			if (e.getMessage().contains("'online_status'")) {
+				try {
+					Statement stmt = conn.createStatement();
+					stmt.executeUpdate("alter table users add online_status int default 0;");
+					stmt.close();
+					stmt = null;
+				} catch (SQLException ex) {
+					conn = null;
+					throw	new DBInitException("Problem initializing jdbc connection: "
+						+ db_conn, ex);
+				}
+			} else {
+				conn = null;
+				throw	new DBInitException("Problem initializing jdbc connection: "
+					+ db_conn, e);
+			}
 		}
 	}
 
