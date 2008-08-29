@@ -141,7 +141,8 @@ public abstract class RepositoryAccess {
 			log.info("User added: " + JIDUtils.getNodeID(user_name, getDomain())
 				+ ", pass: " + pass_param);
       setRegistration(user_name, pass_param, email_param);
-			log.info("Registration data set for: " + JIDUtils.getNodeID(user_name, getDomain())
+			log.info("Registration data set for: " +
+				JIDUtils.getNodeID(user_name, getDomain())
 				+ ", pass: " + pass_param + ", email: " + email_param);
       return Authorization.AUTHORIZED;
     } catch (UserExistsException e) {
