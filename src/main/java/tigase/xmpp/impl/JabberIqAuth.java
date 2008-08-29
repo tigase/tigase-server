@@ -149,8 +149,17 @@ public class JabberIqAuth extends XMPPProcessor
 				log.info("Authentication failed: " + user_name);
 				results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 						e.getMessage(), false));
-				results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
-						StanzaType.set, packet.getElemId()));
+				Integer retries = (Integer)session.getSessionData("auth-retries");
+				if (retries == null) {
+					retries = new Integer(0);
+				}
+				if (retries.intValue() < 3) {
+					session.putSessionData("auth-retries",
+						new Integer(retries.intValue() + 1));
+				} else {
+					results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
+							StanzaType.set, packet.getElemId()));
+				}
 			} catch (Exception e) {
 				log.info("Authentication failed: " + user_name);
 				log.log(Level.WARNING, "Authentication failed: ", e);

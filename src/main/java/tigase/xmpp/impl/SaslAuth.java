@@ -164,10 +164,19 @@ public class SaslAuth extends XMPPProcessor
 			}
 		} catch (Exception e) {
 			//e.printStackTrace();
+			session.removeSessionData(XMLNS+"-authProps");
 			results.offer(packet.swapFromTo(createReply(ElementType.failure,
- 						"<not-authorized/>")));
-			results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
-					StanzaType.set, packet.getElemId()));
+						"<not-authorized/>")));
+			Integer retries = (Integer)session.getSessionData("auth-retries");
+			if (retries == null) {
+				retries = new Integer(0);
+			}
+			if (retries.intValue() < 3) {
+				session.putSessionData("auth-retries", new Integer(retries.intValue() + 1));
+			} else {
+				results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
+						StanzaType.set, packet.getElemId()));
+			}
 		} // end of try-catch
   }
 
