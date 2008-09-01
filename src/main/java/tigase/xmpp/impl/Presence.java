@@ -394,10 +394,14 @@ public abstract class Presence {
 						if (session.isAnonymous()) {
 							log.finest("Anonymous session: " + session.getUserId());
 							String peer = JIDUtils.getNodeID(packet.getElemTo());
+							String nick = packet.getElemCData("/presence/nick");
+							if (nick == null) {
+								nick = session.getUserName();
+							}
 							Packet rost_update =
                 new Packet(JabberIqRoster.createRosterPacket("set",
 										session.nextStanzaId(), peer, peer, session.getUserId(),
-										session.getUserName(), "Anonymous peers", null,
+										nick, "Anonymous peers", null,
 										JabberIqRoster.ANON));
 							results.offer(rost_update);
 							log.finest("Sending roster update: " + rost_update.toString());
