@@ -78,7 +78,6 @@ public class SessionManagerClustered extends SessionManager
 	private static final String PRIORITY = "priority";
 	private static final String TOKEN = "token";
 	private static final String TRANSFER = "transfer";
-	private static final String SESSION_PACKETS = "session-packets";
 
 	private SessionTransferMC sessionTransferMC = null;
 
@@ -114,16 +113,18 @@ public class SessionManagerClustered extends SessionManager
 			switch (conn.getConnectionStatus()) {
 			case ON_HOLD:
 				LinkedList<Packet> packets =
-        (LinkedList<Packet>)conn.getSessionData(SESSION_PACKETS);
+          (LinkedList<Packet>)conn.getSessionData(SESSION_PACKETS);
 				if (packets == null) {
 					packets = new LinkedList<Packet>();
 					conn.putSessionData(SESSION_PACKETS, packets);
 				}
 				packets.offer(packet);
+				log.finest("Packet put on hold: " + packet.toString());
 				return;
 			case REDIRECT:
 				packet.setTo((String)conn.getSessionData("redirect-to"));
 				fastAddOutPacket(packet);
+				log.finest("Packet redirected: " + packet.toString());
 				return;
 			}
 		}
@@ -148,7 +149,6 @@ public class SessionManagerClustered extends SessionManager
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	protected void processClusterPacket(Packet packet) {
 		final ClusterElement clel = new ClusterElement(packet.getElement());
 		clel.addVisitedNode(getComponentId());
@@ -299,16 +299,7 @@ public class SessionManagerClustered extends SessionManager
 				String connectionId = clel.getMethodParam(CONNECTION_ID);
 				XMPPResourceConnection conn = getXMPPResourceConnection(connectionId);
 				if (conn != null) {
-					conn.putSessionData("redirect-to",
-						clel.getClusterElement().getAttribute("from"));
-					conn.setConnectionStatus(ConnectionStatus.REDIRECT);
-					List<Packet> packets = (List<Packet>)conn.getSessionData(SESSION_PACKETS);
-					if (packets != null) {
-						for (Packet sess_pack: packets) {
-							sess_pack.setTo(clel.getClusterElement().getAttribute("from"));
-							fastAddOutPacket(sess_pack);
-						}
-					}
+					sendAllOnHold(conn);
 				}
 				//closeConnection(connectionId, true);
 			}
@@ -351,6 +342,7 @@ public class SessionManagerClustered extends SessionManager
 			List<XMPPResourceConnection> conns = session.getActiveResources();
 			for (XMPPResourceConnection conn_res: conns) {
 				conn_res.setConnectionStatus(ConnectionStatus.ON_HOLD);
+				conn_res.putSessionData("redirect-to", remote_smId);
 				final XMPPResourceConnection conn = conn_res;
 				// Delay is needed here as there might be packets which are being processing
 				// while we are preparing session for transfer.
