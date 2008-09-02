@@ -78,6 +78,7 @@ import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.XMPPSession;
 import tigase.xmpp.XMPPStopListenerIfc;
+import tigase.xmpp.ConnectionStatus;
 
 import static tigase.server.xmppsession.SessionManagerConfig.*;
 
@@ -98,6 +99,8 @@ public class SessionManager extends AbstractMessageReceiver
    */
   private static final Logger log =
     Logger.getLogger("tigase.server.xmppsession.SessionManager");
+
+	protected static final String SESSION_PACKETS = "session-packets";
 
 	private UserRepository user_repository = null;
 	private UserAuthRepository auth_repository = null;
@@ -554,6 +557,7 @@ public class SessionManager extends AbstractMessageReceiver
 				log.warning("Packet processing exception: " + e
 					+ ", packet: " + pc.toString());
 			}
+			processing_result = true;
 			break;
 		case USER_STATUS:
 			String user_jid = Command.getFieldValue(pc, "jid");
@@ -592,12 +596,14 @@ public class SessionManager extends AbstractMessageReceiver
 						pc.toString());
 				}
 			}
+			processing_result = true;
 			break;
 		case REDIRECT:
 			if (connection != null) {
 				String action = Command.getFieldValue(pc, "action");
 				if (action.equals("close")) {
 					log.fine("Closing redirected connections: " + pc.getFrom());
+					sendAllOnHold(connection);
 					closeConnection(pc.getFrom(), true);
 				} else {
 					log.fine("Activating redirected connections: " + pc.getFrom());
@@ -605,6 +611,7 @@ public class SessionManager extends AbstractMessageReceiver
 			} else {
 				log.fine("Redirect for non-existen connection: " + pc.toString());
 			}
+			processing_result = true;
 			break;
 		case OTHER:
 			log.info("Other command found: " + pc.getStrCommand());
@@ -613,6 +620,25 @@ public class SessionManager extends AbstractMessageReceiver
 			break;
 		} // end of switch (pc.getCommand())
 		return processing_result;
+	}
+
+	@SuppressWarnings("unchecked")
+	protected void sendAllOnHold(XMPPResourceConnection conn) {
+		String remote_smId = (String)conn.getSessionData("redirect-to");
+		if (remote_smId == null) {
+			log.warning("No address for remote SM to redirect packets.");
+			return;
+		}
+		conn.setConnectionStatus(ConnectionStatus.REDIRECT);
+		LinkedList<Packet> packets =
+      (LinkedList<Packet>)conn.getSessionData(SESSION_PACKETS);
+		if (packets != null) {
+			Packet sess_pack = null;
+			while ((sess_pack = packets.poll()) != null) {
+				sess_pack.setTo(remote_smId);
+				fastAddOutPacket(sess_pack);
+			}
+		}
 	}
 
 	protected void closeConnection(String connectionId, boolean closeOnly) {
