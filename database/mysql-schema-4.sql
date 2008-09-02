@@ -63,13 +63,21 @@ create table xmpp_stanza (
 )
 ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
 
+create table tig_properties (
+       tkey varchar(255) NOT NULL,
+       tval text NOT NULL,
+
+       primary key (tkey)
+)
+ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
+
 create table tig_users (
        uid bigint unsigned NOT NULL,
 
-       user_id varchar(255) NOT NULL,
+       user_id varchar(2048) NOT NULL,
 
-       primary key (uid),
-       unique key user_id (user_id)
+       primary key (uid)
+       key user_id (user_id(765))
 )
 ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
 
