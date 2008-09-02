@@ -152,7 +152,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		return true;
 	}
 
-	private long getUserUID(String user_id)
+	private long getUserUID(String user_id, boolean autoCreate)
 		throws SQLException, UserNotFoundException {
 		Long cache_res = (Long)cache.get(user_id);
 		if (cache_res != null) {
@@ -167,11 +167,11 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 				if (rs.next()) {
 					result = rs.getLong(1);
 				} else {
-					if (autoCreateUser) {
+					if (autoCreate) {
 						result = addUserRepo(user_id);
 					} else {
 						throw new UserNotFoundException("User does not exist: " + user_id);
-					} // end of if (autoCreateUser) else
+					} // end of if (autoCreate) else
 				} // end of if (isnext) else
 			}
 		} finally {
@@ -179,6 +179,15 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		}
 		cache.put(user_id, Long.valueOf(result));
 		return result;
+	}
+
+	public boolean userExists(String user) {
+		try {
+			getUserUID(user, false);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
 	}
 
 // 	private void incrementMaxUID() throws SQLException {
@@ -254,7 +263,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		if (cache_res != null) {
 			return cache_res.longValue();
 		} // end of if (result != null)
-		long uid = getUserUID(user_id);
+		long uid = getUserUID(user_id, autoCreateUser);
 		long result = getNodeNID(uid, node_path);
 		if (result > 0) {
 			cache.put(user_id+"/"+node_path, Long.valueOf(result));
@@ -286,7 +295,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 			// Or should I throw NullPointerException?
 			return getNodeNID(user_id, null);
 		} // end of if (node_path == null)
-		long uid = getUserUID(user_id);
+		long uid = getUserUID(user_id, autoCreateUser);
 		long nid = getNodeNID(uid, null);
 		StringTokenizer strtok = new StringTokenizer(node_path, "/", false);
 		StringBuilder built_path = new StringBuilder();
@@ -502,7 +511,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 			checkConnection();
 			stmt = conn.createStatement();
 			// Get user account uid
-			long uid = getUserUID(user_id);
+			long uid = getUserUID(user_id, autoCreateUser);
 			// Remove all user enrties from pairs table
 			query = "delete from " + pairs_tbl + " where uid = " + uid;
 			stmt.executeUpdate(query);
@@ -691,7 +700,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		throws UserNotFoundException, TigaseDBException {
 		try {
 			checkConnection();
-			long uid = getUserUID(user_id);
+			long uid = getUserUID(user_id, autoCreateUser);
 			long nid = getNodeNID(uid, subnode);
 			if (nid < 0) {
 				nid = createNodePath(user_id, subnode);

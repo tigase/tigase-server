@@ -51,6 +51,27 @@ public interface UserRepository {
 	long getUsersCount();
 
 	/**
+	 * Method <code>userExists</code> checks whether the user (or repository top node)
+	 * exists in the database. The method doesn't throw any exception nor it creates
+	 * the user in case it is missing. It just checjs wether the user is already
+	 * in the database.
+	 *
+	 * Please don't overuser this method. All other methods
+	 * throw <code>UserNotFoundException</code> exception in case the user is missing
+	 * for which you executed the method. The exception is thrown unless
+	 * <code>userAutoCreate</code> property is set to true. In such case the exception
+	 * is never thrown and the methods are executed for given parameters prior to
+	 * creating user entry if it is missing.
+	 *
+	 * Therefore this method should be used only to check whether the account exists
+	 * without creating it.
+	 *
+	 * @param user a <code>String</code> value
+	 * @return a <code>boolean</code> value
+	 */
+	boolean userExists(String user);
+
+	/**
    * This <code>addUser</code> method allows to add new user to reposiotry.
    * It <b>must</b> throw en exception <code>UserExistsException</code> if such
    * user already exists because user <b>must</b> be unique within user

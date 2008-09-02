@@ -111,6 +111,10 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
     } // end of try-catch
   }
 
+	public synchronized boolean userExists(final String user) {
+		return xmldb.findNode1(user) != null;
+	}
+
   /**
    * This <code>removeUser</code> method allows to remove user and all his data
    * from user repository.

@@ -1033,7 +1033,9 @@ public class SessionManager extends AbstractMessageReceiver
 		public String getPublicData(String user, String subnode, String key,
 			String def)	throws UserNotFoundException {
 			try {
-				return rep.getData(user, calcNode(PUBLIC_DATA_NODE, subnode), key, def);
+				return (rep.userExists(user) ?
+          rep.getData(user, calcNode(PUBLIC_DATA_NODE, subnode), key, def) :
+					null);
 			}	catch (TigaseDBException e) {
 				log.log(Level.SEVERE, "Problem accessing repository data.", e);
 				return null;
@@ -1043,7 +1045,9 @@ public class SessionManager extends AbstractMessageReceiver
 		public String[] getPublicDataList(String user, String subnode, String key)
 			throws UserNotFoundException {
 			try {
-				return rep.getDataList(user, calcNode(PUBLIC_DATA_NODE, subnode), key);
+				return (rep.userExists(user) ?
+					rep.getDataList(user, calcNode(PUBLIC_DATA_NODE, subnode), key) :
+					null);
 			}	catch (TigaseDBException e) {
 				log.log(Level.SEVERE, "Problem accessing repository data.", e);
 				return null;
@@ -1053,7 +1057,12 @@ public class SessionManager extends AbstractMessageReceiver
 		public void addOfflineDataList(String user, String subnode, String key,
 			String[] list) throws UserNotFoundException {
 			try {
-				rep.addDataList(user, calcNode(OFFLINE_DATA_NODE, subnode), key, list);
+				if (rep.userExists(user)) {
+					rep.addDataList(user, calcNode(OFFLINE_DATA_NODE, subnode), key, list);
+				} else {
+					throw new UserNotFoundException("User: " + user
+						+ " has not been found inthe repository.");
+				}
 			} catch (UserNotFoundException e) {
 				log.warning("User not found in repository: " + user);
 			}	catch (TigaseDBException e) {

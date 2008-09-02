@@ -120,6 +120,10 @@ public class DummyRepository implements UserRepository {
 	 */
 	public void addUser(final String user) { }
 
+	public boolean userExists(final String user) {
+		return false;
+	}
+
 	/**
 	 * Describe <code>removeUser</code> method here.
 	 *
