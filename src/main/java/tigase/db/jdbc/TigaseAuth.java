@@ -27,8 +27,10 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Statement;
 import java.util.Map;
 import java.util.TreeMap;
@@ -58,7 +60,7 @@ import tigase.util.JIDUtils;
 import static tigase.db.UserAuthRepository.*;
 
 /**
- * Describe class DrupalAuth here.
+ * Describe class TigaseAuth here.
  *
  *
  * Created: Sat Nov 11 22:22:04 2006
@@ -66,13 +68,13 @@ import static tigase.db.UserAuthRepository.*;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class DrupalAuth implements UserAuthRepository {
+public class TigaseAuth implements UserAuthRepository {
 
   /**
    * Private logger for class instancess.
    */
   private static final Logger log =
-    Logger.getLogger("tigase.db.jdbc.DrupalAuth");
+    Logger.getLogger("tigase.db.jdbc.TigaseAuth");
 	private static final String[] non_sasl_mechs = {"password"};
 	private static final String[] sasl_mechs = {"PLAIN"};
 
@@ -87,17 +89,18 @@ public class DrupalAuth implements UserAuthRepository {
 	 * Database active connection.
 	 */
 	private Connection conn = null;
-	private PreparedStatement pass_st = null;
-	private PreparedStatement status_st = null;
-	private PreparedStatement user_add_st = null;
-	private PreparedStatement max_uid_st = null;
+	private CallableStatement init_db_sp = null;
+	private CallableStatement add_user_plain_pw_sp = null;
+	private CallableStatement remove_user_sp = null;
+	private CallableStatement get_pass_sp = null;
+	private CallableStatement update_pass_plain_pw_sp = null;
+	private CallableStatement user_login_plain_pw_sp = null;
+	private CallableStatement user_logout_sp = null;
 	/**
 	 * Prepared statement for testing whether database connection is still
 	 * working. If not connection to database is recreated.
 	 */
 	private PreparedStatement conn_valid_st = null;
-	private PreparedStatement update_last_login_st = null;
-	private PreparedStatement update_online_status = null;
 
 	/**
 	 * Connection validation helper.
@@ -116,31 +119,29 @@ public class DrupalAuth implements UserAuthRepository {
 	 * @exception SQLException if an error occurs on database query.
 	 */
 	private void initPreparedStatements() throws SQLException {
-		String query = "select pass from " + users_tbl
-			+ " where name = ?;";
-		pass_st = conn.prepareStatement(query);
-
-		query = "select status from " + users_tbl
-			+ " where name = ?;";
-		status_st = conn.prepareStatement(query);
-
-		query = "insert into " + users_tbl
-			+ " (uid, name, pass, status)"
-			+ " values (?, ?, ?, 1);";
-		user_add_st = conn.prepareStatement(query);
-
-		query = "select max(uid) from " + users_tbl;
-		max_uid_st = conn.prepareStatement(query);
-
-		query = "select 1;";
+		String query = query = "select 1;";
 		conn_valid_st = conn.prepareStatement(query);
 
-		query = "update " + users_tbl + " set access=?, login=? where name=?;";
-		update_last_login_st = conn.prepareStatement(query);
+		query = "{ call TigInitdb() }";
+		init_db_sp = conn.prepareCall(query);
 
-		query = "update " + users_tbl
-			+ " set online_status=online_status+? where name=?;";
-		update_online_status = conn.prepareStatement(query);
+		query = "{ call TigAddUserPlainPw(?, ?) }";
+		add_user_plain_pw_sp = conn.prepareCall(query);
+
+		query = "{ call TigRemoveUser(?) }";
+		remove_user_sp = conn.prepareCall(query);
+
+		query = "{ call TigGetPassword(?) }";
+		get_pass_sp = conn.prepareCall(query);
+
+		query = "{ call TigUpdatePasswordPlainPw(?, ?) }";
+		update_pass_plain_pw_sp = conn.prepareCall(query);
+
+		query = "{ call TigUserLoginPlainPw(?, ?, ?) }";
+		user_login_plain_pw_sp = conn.prepareCall(query);
+
+		query = "{ call TigUserLogout(?) }";
+		user_logout_sp = conn.prepareCall(query);
 	}
 
 	/**
@@ -181,80 +182,14 @@ public class DrupalAuth implements UserAuthRepository {
 		}
 	}
 
-	private void updateLastLogin(String user) throws TigaseDBException {
-		try {
-			synchronized (update_last_login_st) {
-				BigDecimal bd = new BigDecimal((System.currentTimeMillis()/1000));
-				update_last_login_st.setBigDecimal(1, bd);
-				update_last_login_st.setBigDecimal(2, bd);
-				update_last_login_st.setString(3, JIDUtils.getNodeNick(user));
-				update_last_login_st.executeUpdate();
-			}
-		} catch (SQLException e) {
-			throw new TigaseDBException("Error accessing repository.", e);
-		} // end of try-catch
-	}
-
-	private void updateOnlineStatus(String user, int status)
-		throws TigaseDBException {
-		if (online_status) {
-			try {
-				synchronized (update_online_status) {
-					update_online_status.setInt(1, status);
-					update_online_status.setString(2, JIDUtils.getNodeNick(user));
-					update_online_status.executeUpdate();
-				}
-			} catch (SQLException e) {
-				throw new TigaseDBException("Error accessing repository.", e);
-			} // end of try-catch
-		}
-	}
-
-	private boolean isActive(final String user)
-		throws SQLException, UserNotFoundException {
-		ResultSet rs = null;
-		try {
-			synchronized (status_st) {
-				status_st.setString(1, JIDUtils.getNodeNick(user));
-				rs = status_st.executeQuery();
-				if (rs.next()) {
-					return (rs.getInt(1) == 1);
-				} else {
-					throw new UserNotFoundException("User does not exist: " + user);
-				} // end of if (isnext) else
-			}
-		} finally {
-			release(null, rs);
-		}
-	}
-
-	private long getMaxUID() throws SQLException {
-		ResultSet rs = null;
-		try {
-			synchronized (max_uid_st) {
-				rs = max_uid_st.executeQuery();
-				if (rs.next()) {
-					BigDecimal max_uid = rs.getBigDecimal(1);
-					//System.out.println("MAX UID = " + max_uid.longValue());
-				return max_uid.longValue();
-				} else {
-					//System.out.println("MAX UID = -1!!!!");
-					return -1;
-				} // end of else
-			}
-		} finally {
-			release(null, rs);
-		}
-	}
-
 	private String getPassword(final String user)
 		throws SQLException, UserNotFoundException {
 		ResultSet rs = null;
 		try {
 			checkConnection();
-			synchronized (pass_st) {
-				pass_st.setString(1, JIDUtils.getNodeNick(user));
-				rs = pass_st.executeQuery();
+			synchronized (get_pass_sp) {
+				get_pass_sp.setString(1, JIDUtils.getNodeID(user));
+				rs = get_pass_sp.executeQuery();
 				if (rs.next()) {
 					return rs.getString(1);
 				} else {
@@ -305,40 +240,15 @@ public class DrupalAuth implements UserAuthRepository {
 	public void initRepository(final String connection_str,
 		Map<String, String> params) throws DBInitException {
 		db_conn = connection_str;
-		if (db_conn.contains("online_status=true")) {
-			online_status = true;
-		}
 		try {
 			initRepo();
+			if (params != null && params.get("init-db") != null) {
+				init_db_sp.executeQuery();
+			}
 		} catch (SQLException e) {
 			conn = null;
 			throw	new DBInitException("Problem initializing jdbc connection: "
 				+ db_conn, e);
-		}
-		try {
-			if (online_status) {
-				Statement stmt = conn.createStatement();
-				stmt.executeUpdate("update users set online_status = 0;");
-				stmt.close();
-				stmt = null;
-			}
-		} catch (SQLException e) {
-			if (e.getMessage().contains("'online_status'")) {
-				try {
-					Statement stmt = conn.createStatement();
-					stmt.executeUpdate("alter table users add online_status int default 0;");
-					stmt.close();
-					stmt = null;
-				} catch (SQLException ex) {
-					conn = null;
-					throw	new DBInitException("Problem initializing jdbc connection: "
-						+ db_conn, ex);
-				}
-			} else {
-				conn = null;
-				throw	new DBInitException("Problem initializing jdbc connection: "
-					+ db_conn, e);
-			}
 		}
 	}
 
@@ -355,23 +265,27 @@ public class DrupalAuth implements UserAuthRepository {
 	 */
 	public boolean plainAuth(final String user, final String password)
 		throws UserNotFoundException, TigaseDBException, AuthorizationException {
+		ResultSet rs = null;
 		try {
 			checkConnection();
-			if (!isActive(user)) {
-				throw new AuthorizationException("User account has been blocked.");
-			} // end of if (!isActive(user))
-			String enc_passwd = Algorithms.hexDigest("", password, "MD5");
-			String db_password = getPassword(user);
-			boolean login_ok = db_password.equals(enc_passwd);
-			if (login_ok) {
-				updateLastLogin(user);
-				updateOnlineStatus(user, 1);
-			} // end of if (login_ok)
-			return login_ok;
-		} catch (NoSuchAlgorithmException e) {
-			throw
-				new AuthorizationException("Password encoding algorithm is not supported.",
-					e);
+			synchronized (user_login_plain_pw_sp) {
+				String user_id = JIDUtils.getNodeID(user);
+				user_login_plain_pw_sp.setString(1, user_id);
+				user_login_plain_pw_sp.setString(2, password);
+				String temp_var = null;
+				user_login_plain_pw_sp.setString(3, temp_var);
+				rs = user_login_plain_pw_sp.executeQuery();
+				if (rs.next()) {
+					boolean auth_result_ok = user_id.equals(rs.getString(1));
+					if (auth_result_ok) {
+						return true;
+					} else {
+						log.info("Login failed, for user: " + user_id
+							+ ", from DB got: " + rs.getString(1));
+					}
+				}
+				throw new UserNotFoundException("User does not exist: " + user);
+			}
 		} catch (SQLException e) {
 			throw new TigaseDBException("Problem accessing repository.", e);
 		} // end of catch
@@ -410,13 +324,7 @@ public class DrupalAuth implements UserAuthRepository {
 		if (proto.equals(PROTOCOL_VAL_SASL)) {
 			String mech = (String)props.get(MACHANISM_KEY);
 			if (mech.equals("PLAIN")) {
-				boolean login_ok = saslAuth(props);
-				if (login_ok) {
-					String user = (String)props.get(USER_ID_KEY);
-					updateLastLogin(user);
-					updateOnlineStatus(user, 1);
-				} // end of if (login_ok)
-				return login_ok;
+				return saslAuth(props);
 			} // end of if (mech.equals("PLAIN"))
 			throw new AuthorizationException("Mechanism is not supported: " + mech);
 		} // end of if (proto.equals(PROTOCOL_VAL_SASL))
@@ -427,10 +335,13 @@ public class DrupalAuth implements UserAuthRepository {
 		throws UserNotFoundException, TigaseDBException {
 		try {
 			checkConnection();
-			updateOnlineStatus(user, -1);
+			synchronized (user_logout_sp) {
+				user_logout_sp.setString(1, JIDUtils.getNodeID(user));
+				user_logout_sp.execute();
+			}
 		} catch (SQLException e) {
 			throw new TigaseDBException("Problem accessing repository.", e);
-		} // end of catch
+		}
 	}
 
 	/**
@@ -445,19 +356,15 @@ public class DrupalAuth implements UserAuthRepository {
 		throws UserExistsException, TigaseDBException {
 		try {
 			checkConnection();
-			synchronized (user_add_st) {
-				long uid = getMaxUID()+1;
-				user_add_st.setLong(1, uid);
-				user_add_st.setString(2, JIDUtils.getNodeNick(user));
-				user_add_st.setString(3, Algorithms.hexDigest("", password, "MD5"));
-				user_add_st.executeUpdate();
+			synchronized (add_user_plain_pw_sp) {
+				add_user_plain_pw_sp.setString(1, JIDUtils.getNodeID(user));
+				add_user_plain_pw_sp.setString(2, password);
+				add_user_plain_pw_sp.execute();
 			}
-		} catch (NoSuchAlgorithmException e) {
-			throw
-				new TigaseDBException("Password encoding algorithm is not supported.",
-					e);
-		} catch (SQLException e) {
+		} catch (SQLIntegrityConstraintViolationException e) {
 			throw new UserExistsException("Error while adding user to repository, user exists?", e);
+		} catch (SQLException e) {
+			throw new TigaseDBException("Problem accessing repository.", e);
 		}
 	}
 
@@ -471,7 +378,16 @@ public class DrupalAuth implements UserAuthRepository {
 	 */
 	public void updatePassword(final String user, final String password)
 		throws UserNotFoundException, TigaseDBException {
-		throw new TigaseDBException("Updatin user password is not supported.");
+		try {
+			checkConnection();
+			synchronized (update_pass_plain_pw_sp) {
+				update_pass_plain_pw_sp.setString(1, JIDUtils.getNodeID(user));
+				update_pass_plain_pw_sp.setString(2, password);
+				update_pass_plain_pw_sp.execute();
+			}
+		} catch (SQLException e) {
+			throw new TigaseDBException("Problem accessing repository.", e);
+		}
 	}
 
 	/**
@@ -483,104 +399,43 @@ public class DrupalAuth implements UserAuthRepository {
 	 */
 	public void removeUser(final String user)
 		throws UserNotFoundException, TigaseDBException {
-		throw new TigaseDBException("Removing user is not supported.");
+		try {
+			checkConnection();
+			synchronized (remove_user_sp) {
+				remove_user_sp.setString(1, JIDUtils.getNodeID(user));
+				remove_user_sp.execute();
+			}
+		} catch (SQLException e) {
+			throw new TigaseDBException("Problem accessing repository.", e);
+		}
+	}
+
+	private String decodeString(byte[] source, int start_from) {
+		int idx = start_from;
+		while (source[idx] != 0 && idx < source.length)	{ ++idx;	}
+		return new String(source, start_from, idx - start_from);
 	}
 
 	private boolean saslAuth(final Map<String, Object> props)
-		throws AuthorizationException {
-		try {
-			SaslServer ss = (SaslServer)props.get("SaslServer");
-			if (ss == null) {
-				Map<String, String> sasl_props = new TreeMap<String, String>();
-				sasl_props.put(Sasl.QOP, "auth");
-				sasl_props.put(SaslPLAIN.ENCRYPTION_KEY, SaslPLAIN.ENCRYPTION_MD5);
-				ss = Sasl.createSaslServer((String)props.get(MACHANISM_KEY),
-					"xmpp",	(String)props.get(SERVER_NAME_KEY),
-					sasl_props, new SaslCallbackHandler(props));
-				props.put("SaslServer", ss);
-			} // end of if (ss == null)
-			String data_str = (String)props.get(DATA_KEY);
-			byte[] in_data =
-				(data_str != null ? Base64.decode(data_str) : new byte[0]);
-			byte[] challenge = ss.evaluateResponse(in_data);
-			log.finest("challenge: " +
-				(challenge != null ? new String(challenge) : "null"));
-			String challenge_str = (challenge != null && challenge.length > 0
-				? Base64.encode(challenge) : null);
-			props.put(RESULT_KEY, challenge_str);
-			if (ss.isComplete()) {
-				return true;
-			} else {
-				return false;
-			} // end of if (ss.isComplete()) else
-		} catch (SaslException e) {
-			throw new AuthorizationException("Sasl exception.", e);
-		} // end of try-catch
+		throws UserNotFoundException, TigaseDBException, AuthorizationException {
+		String data_str = (String)props.get(DATA_KEY);
+		String domain = (String)props.get(REALM_KEY);
+		props.put(RESULT_KEY, null);
+		byte[] in_data = (data_str != null ? Base64.decode(data_str) : new byte[0]);
+
+		int auth_idx = 0;
+		while (in_data[auth_idx] != 0 && auth_idx < in_data.length)
+		{ ++auth_idx;	}
+		String authoriz = new String(in_data, 0, auth_idx);
+		int user_idx = ++auth_idx;
+		while (in_data[user_idx] != 0 && user_idx < in_data.length)
+		{ ++user_idx;	}
+		String user_name = new String(in_data, auth_idx, user_idx - auth_idx);
+		++user_idx;
+		String jid = JIDUtils.getNodeID(user_name, domain);
+		props.put(USER_ID_KEY, jid);
+		String passwd =	new String(in_data, user_idx, in_data.length - user_idx);
+		return plainAuth(jid, passwd);
 	}
 
-	private class SaslCallbackHandler implements CallbackHandler {
-
-		private Map<String, Object> options = null;
-
-		private SaslCallbackHandler(final Map<String, Object> options) {
-			this.options = options;
-		}
-
-		// Implementation of javax.security.auth.callback.CallbackHandler
-		/**
-		 * Describe <code>handle</code> method here.
-		 *
-		 * @param callbacks a <code>Callback[]</code> value
-		 * @exception IOException if an error occurs
-		 * @exception UnsupportedCallbackException if an error occurs
-		 */
-		public void handle(final Callback[] callbacks)
-			throws IOException, UnsupportedCallbackException {
-
-			String jid = null;
-
-			for (int i = 0; i < callbacks.length; i++) {
-				log.finest("Callback: " + callbacks[i].getClass().getSimpleName());
-				if (callbacks[i] instanceof RealmCallback) {
-					RealmCallback rc = (RealmCallback)callbacks[i];
-					String realm = (String)options.get(REALM_KEY);
-					if (realm != null) {
-						rc.setText(realm);
-					} // end of if (realm == null)
-					log.finest("RealmCallback: " + realm);
-				} else if (callbacks[i] instanceof NameCallback) {
-					NameCallback nc = (NameCallback)callbacks[i];
-					String user_name = nc.getName();
-					if (user_name == null) {
-						user_name = nc.getDefaultName();
-					} // end of if (name == null)
-					jid = JIDUtils.getNodeID(user_name, (String)options.get(REALM_KEY));
-					options.put(USER_ID_KEY, jid);
-					log.finest("NameCallback: " + user_name);
-				} else if (callbacks[i] instanceof PasswordCallback) {
-					PasswordCallback pc = (PasswordCallback)callbacks[i];
-					try {
-						String passwd = getPassword(jid);
-						pc.setPassword(passwd.toCharArray());
-						log.finest("PasswordCallback: " +	passwd);
-					} catch (Exception e) {
-						throw new IOException("Password retrieving problem.", e);
-					} // end of try-catch
-				} else if (callbacks[i] instanceof AuthorizeCallback) {
-					AuthorizeCallback authCallback = ((AuthorizeCallback)callbacks[i]);
-					String authenId = authCallback.getAuthenticationID();
-					log.finest("AuthorizeCallback: authenId: " + authenId);
-					String authorId = authCallback.getAuthorizationID();
-					log.finest("AuthorizeCallback: authorId: " + authorId);
-					if (authenId.equals(authorId)) {
-						authCallback.setAuthorized(true);
-					} // end of if (authenId.equals(authorId))
-				} else {
-					throw new UnsupportedCallbackException
-						(callbacks[i], "Unrecognized Callback");
-				}
-			}
-		}
-	}
-
-} // DrupalAuth
+} // TigaseAuth

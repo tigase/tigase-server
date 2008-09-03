@@ -115,6 +115,8 @@ public interface Configurable extends ServerComponent {
 		"tigase.db.jdbc.JDBCRepository";
 	public static final String PGSQL_REPO_CLASS_PROP_VAL =
 		"tigase.db.jdbc.JDBCRepository";
+	public static final String TIGASE_AUTH_REPO_CLASS_PROP_VAL =
+		"tigase.db.jdbc.TigaseAuth";
 	public static final String DRUPAL_REPO_CLASS_PROP_VAL =
 		"tigase.db.jdbc.DrupalAuth";
 	public static final String LIBRESOURCE_REPO_CLASS_PROP_VAL =
@@ -125,6 +127,8 @@ public interface Configurable extends ServerComponent {
 		"jdbc:mysql://localhost/tigase?user=root&password=mypass";
 	public static final String PGSQL_REPO_URL_PROP_VAL =
 		"jdbc:postgresql://localhost/tigase?user=tigase";
+	public static final String TIGASE_AUTH_REPO_URL_PROP_VAL =
+		"jdbc:mysql://localhost/tigasedb?user=tigase_user&password=mypass";
 	public static final String DRUPAL_REPO_URL_PROP_VAL =
 		"jdbc:mysql://localhost/drupal?user=root&password=mypass";
 	public static final String LIBRESOURCE_REPO_URL_PROP_VAL =

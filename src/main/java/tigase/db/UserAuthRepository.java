@@ -152,7 +152,7 @@ public interface UserAuthRepository {
 	 * @exception TigaseDBException if an error occurs
 	 */
   void updatePassword(String user, String password)
-		throws TigaseDBException;
+		throws UserNotFoundException, TigaseDBException;
 
 	/**
 	 * Describe <code>removeUser</code> method here.
