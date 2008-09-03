@@ -30,6 +30,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -715,7 +716,9 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 				} // end of for (String val: list)
 			}
 		} catch (SQLException e) {
-			throw new TigaseDBException("Error getting subnodes list.", e);
+			throw new TigaseDBException("Error adding data list, user_id: " + user_id
+				+ ", subnode: " + subnode + ", key: " + key
+				+ ", list: " + Arrays.toString(list), e);
 		}
 		//		cache.put(user_id+"/"+subnode+"/"+key, list);
 	}
