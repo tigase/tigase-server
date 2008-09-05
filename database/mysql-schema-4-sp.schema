@@ -25,6 +25,7 @@ delimiter //
 
 -- Database properties get - function
 create function TigGetDBProperty(_tkey varchar(255)) returns mediumtext
+READS SQL DATA
 begin
 	declare _result mediumtext;
 
