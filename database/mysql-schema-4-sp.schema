@@ -1,0 +1,247 @@
+-- Database stored procedures and fucntions for Tigase schema version 4.0.0
+
+drop procedure if exists TigInitdb;
+drop procedure if exists TigAddUser;
+drop procedure if exists TigAddUserPlainPw;
+drop procedure if exists TigRemoveUser;
+drop procedure if exists TigUpdatePassword;
+drop procedure if exists TigUpdatePasswordPlainPw;
+drop procedure if exists TigGetPassword;
+drop procedure if exists TigUserLogin;
+drop procedure if exists TigUserLoginPlainPw;
+drop procedure if exists TigUserLogout;
+drop procedure if exists TigOnlineUsers;
+drop procedure if exists TigOfflineUsers;
+drop procedure if exists TigDisableAccount;
+drop procedure if exists TigEnableAccount;
+drop procedure if exists TigActiveAccounts;
+drop procedure if exists TigDisabledAccounts;
+drop procedure if exists TigTestAddUser;
+drop procedure if exists TigUsers2Ver4Convert;
+drop procedure if exists TigPutDBProperty;
+drop function if exists TigGetDBProperty;
+
+delimiter //
+
+-- Database properties get - function
+create function TigGetDBProperty(_tkey varchar(255)) returns mediumtext
+begin
+	declare _result mediumtext;
+
+	select pval into _result from tig_pairs, tig_users
+		where (pkey = _tkey) AND (user_id = 'db-properties')
+					AND (tig_pairs.uid = tig_users.uid);
+
+	return (_result);
+end //
+
+-- Database properties set - procedure
+create procedure TigPutDBProperty(_tkey varchar(255), _tval mediumtext)
+begin
+	insert into tig_pairs (pkey, pval)
+		select _tkey, _tval from tig_pairs, tig_users
+			where (user_id = 'db-properties') AND (tig_pairs.uid = tig_users.uid)
+	  ON DUPLICATE KEY UPDATE pval = _tval;
+end //
+
+-- The initialization of the database.
+-- The procedure should be called manually somehow before starting the
+-- server. In theory the server could call the procedure automatically
+-- at the startup time but I don't know yet how to solve the problem
+-- with multiple cluster nodes starting at later time when the server
+-- is already running.
+create procedure TigInitdb()
+begin
+	update tig_users set online_status = 0;
+end //
+
+-- Add a new user to the database assuming the user password is already
+-- encoded properly according to the database settings.
+-- If password is not encoded TigAddUserPlainPw should be used instead.
+create procedure TigAddUser(_user_id varchar(2048), _user_pw varchar(255))
+begin
+	insert into tig_users (user_id, sha1_user_id, user_pw)
+		values (_user_id, sha1(_user_id), _user_pw);
+end //
+
+-- Takes plain text user password and converts it to internal representation
+-- and creates a new user account.
+create procedure TigAddUserPlainPw(_user_id varchar(2048), _user_pw varchar(255))
+begin
+	case TigGetDBProperty('password-encoding')
+		when 'MD5-PASSWORD' then
+			call TigAddUser(_user_id, MD5(_user_pw));
+		when 'MD5-USERID-PASSWORD' then
+			call TigAddUser(_user_id, MD5(CONCAT(_user_id, _user_pw)));
+		else
+			call TigAddUser(_user_id, _user_pw);
+		end case;
+end //
+
+-- Removes a user from the database
+create procedure TigRemoveUser(_user_id varchar(2048))
+begin
+	delete from tig_users where user_id = _user_id;
+end //
+
+-- Returns user's password from the database
+create procedure TigGetPassword(_user_id varchar(2048))
+begin
+	select user_pw from tig_users where user_id = _user_id;
+end //
+
+-- Takes plain text user password and converts it to internal representation
+create procedure TigUpdatePasswordPlainPw(_user_id varchar(2048), _user_pw varchar(255))
+begin
+	case TigGetDBProperty('password-encoding')
+		when 'MD5-PASSWORD' then
+			call TigUpdatePassword(_user_id, MD5(_user_pw));
+		when 'MD5-USERID-PASSWORD' then
+			call TigUpdatePassword(_user_id, MD5(CONCAT(_user_id, _user_pw)));
+		else
+			call TigUpdatePassword(_user_id, _user_pw);
+		end case;
+end //
+
+-- Update user password
+create procedure TigUpdatePassword(_user_id varchar(2048), _user_pw varchar(255))
+begin
+	update tig_users set user_pw = _user_pw where user_id = _user_id;
+end //
+
+-- List all online users
+create procedure TigOnlineUsers()
+begin
+	select user_id, last_login, last_logout, online_status, failed_logins, account_status
+		from tig_users where online_status > 0;
+end //
+
+-- List all offline users
+create procedure TigOfflineUsers()
+begin
+	select user_id, last_login, last_logout, online_status, failed_logins, account_status
+		from tig_users where online_status = 0;
+end //
+
+-- Performs user login for a plain text password, converting it to an internal
+-- representation if necessary
+create procedure TigUserLoginPlainPw(_user_id varchar(2048), _user_pw varchar(255),
+			 					 out res_user_id varchar(2048))
+begin
+	case TigGetDBProperty('password-encoding')
+		when 'MD5-PASSWORD' then
+			call TigUserLogin(_user_id, MD5(_user_pw), res_user_id);
+		when 'MD5-USERID-PASSWORD' then
+			call TigUserLogin(_user_id, MD5(CONCAT(_user_id, _user_pw)), res_user_id);
+		else
+			call TigUserLogin(_user_id, _user_pw, res_user_id);
+		end case;
+end //
+
+-- Perforrm user login. It returns user_id uppon success and NULL
+-- on failure.
+-- If the login is successful it also increases online_status and sets
+-- last_login time to the current timestamp
+create procedure TigUserLogin(_user_id varchar(2048), _user_pw varchar(255),
+			 					 out res_user_id varchar(2048))
+begin
+	if exists(select user_id from tig_users
+		where (account_status > 0) AND (user_id = _user_id) AND (user_pw = _user_pw))
+	then
+		update tig_users
+			set online_status = online_status + 1, last_login = CURRENT_TIMESTAMP
+			where user_id = _user_id;
+		set res_user_id = _user_id;
+		select _user_id as user_id;
+	else
+		update tig_users set failed_logins = failed_logins + 1 where user_id = _user_id;
+		set res_user_id = NULL;
+		select NULL as user_id;
+	end if;
+end //
+
+-- It decreases online_status and sets last_logout time to the current timestamp
+create procedure TigUserLogout(_user_id varchar(2048))
+begin
+	update tig_users
+		set online_status = greatest(online_status - 1, 0),
+			last_logout = CURRENT_TIMESTAMP
+		where user_id = _user_id;
+end //
+
+-- Disable user account
+create procedure TigDisableAccount(_user_id varchar(2048))
+begin
+	update tig_users set account_status = 0 where user_id = _user_id;
+end //
+
+-- Enable user account
+create procedure TigEnableAccount(_user_id varchar(2048))
+begin
+	update tig_users set account_status = 1 where user_id = _user_id;
+end //
+
+-- Get list of all active user accounts
+create procedure TigActiveAccounts()
+begin
+	select user_id, last_login, last_logout, online_status, failed_logins, account_status
+		from tig_users where account_status > 0;
+end //
+
+-- Get list of all disabled user accounts
+create procedure TigDisabledAccounts()
+begin
+	select user_id, last_login, last_logout, online_status, failed_logins, account_status
+		from tig_users where account_status = 0;
+end //
+
+-- For testing only:
+create procedure TigTestAddUser(_user_id varchar(2048), _user_passwd varchar(255),
+			 success_text text, failure_text text)
+begin
+	declare insert_status int default 0;
+	DECLARE CONTINUE HANDLER FOR 1062 SET insert_status=1;
+	call TigAddUserPLainPw(_user_id, _user_passwd);
+	if insert_status = 0 then
+		 select success_text;
+ 	else
+		 select failure_text;
+	end if;
+end //
+
+create procedure TigUsers2Ver4Convert()
+begin
+
+	declare _user_id varchar(2049);
+	declare _password varchar(255);
+	declare l_last_row_fetched int default 0;
+	DECLARE cursor1 CURSOR FOR
+		select user_id, pval as password
+			from tig_users, tig_pairs
+			where tig_users.uid = tig_pairs.uid and pkey = 'password';
+	DECLARE CONTINUE HANDLER FOR NOT FOUND SET l_last_row_fetched=1;
+
+	START TRANSACTION;
+
+		update tig_users set sha1_user_id = sha1(user_id);
+
+		SET l_last_row_fetched=0;
+
+		OPEN cursor1;
+			cursor_loop:LOOP
+				FETCH cursor1 INTO _user_id, _password;
+    		IF l_last_row_fetched=1 THEN
+      		LEAVE cursor_loop;
+    		END IF;
+				call TigUpdatePasswordPlainPw(_user_id, _password);
+			END LOOP cursor_loop;
+		CLOSE cursor1;
+
+		SET l_last_row_fetched=0;
+
+	COMMIT;
+
+end //
+
+delimiter ;
+

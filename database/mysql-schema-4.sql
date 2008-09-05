@@ -63,21 +63,37 @@ create table xmpp_stanza (
 )
 ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
 
-create table tig_properties (
-       tkey varchar(255) NOT NULL,
-       tval text NOT NULL,
-
-       primary key (tkey)
-)
-ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
-
 create table tig_users (
-       uid bigint unsigned NOT NULL,
+       uid bigint unsigned NOT NULL auto_increment,
 
-       user_id varchar(2048) NOT NULL,
+			 -- Jabber User ID
+       user_id varchar(2049) NOT NULL,
+			 -- UserID SHA1 hash to prevent duplicate user_ids
+			 sha1_user_id char(128) NOT NULL,
+			 -- User password encrypted or not
+			 user_pw varchar(255) NOT NULL,
+			 -- Time of the last user login
+			 last_login timestamp DEFAULT 0,
+			 -- Time of the last user logout
+			 last_logout timestamp DEFAULT 0,
+			 -- User online status, if > 0 then user is online, the value
+			 -- indicates the number of user connections.
+			 -- It is incremented on each user login and decremented on each
+			 -- user logout.
+			 online_status int default 0,
+			 -- Number of failed login attempts
+			 failed_logins int default 0,
+			 -- User status, whether the account is active or disabled
+			 -- >0 - account active, 0 - account disabled
+			 account_status int default 1,
 
-       primary key (uid)
-       key user_id (user_id(765))
+			 primary key (uid),
+			 unique key sha1_user_id (sha1_user_id),
+       key user_id (user_id(765)),
+			 key last_login (last_login),
+			 key last_logout (last_logout),
+			 key account_status (account_status),
+			 key online_status (online_status)
 )
 ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
 
@@ -86,7 +102,7 @@ create table tig_nodes (
        parent_nid bigint unsigned,
        uid bigint unsigned NOT NULL,
 
-       node varchar(128) NOT NULL,
+       node varchar(255) NOT NULL,
 
        primary key (nid),
        unique key tnode (parent_nid, uid, node),
@@ -99,7 +115,7 @@ create table tig_pairs (
        nid bigint unsigned,
        uid bigint unsigned NOT NULL,
 
-       pkey varchar(128) NOT NULL,
+       pkey varchar(255) NOT NULL,
        pval mediumtext,
 
        key pkey (pkey),
@@ -108,13 +124,92 @@ create table tig_pairs (
 )
 ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
 
--- create table tig_max_ids (
---        max_uid bigint unsigned,
---        max_nid bigint unsigned
--- )
--- ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
+-- This is a dummy user who keeps all the database-properties
+insert ignore into tig_users (user_id) values ('db-properties');
 
--- insert into tig_max_ids (max_uid, max_nid) values (1, 1);
+source database/mysql-schema-4-sp.schema;
+
+select 'Initializing database..';
+call TigInitdb();
+
+-- Possible encodings are:
+-- - 'MD5-USERID-PASSWORD'
+-- - 'MD5-PASSWORD'
+-- - 'PLAIN'
+-- More can be added if needed.
+call TigPutDBProperty('password-encoding', 'PLAIN');
+call TigPutDBProperty('schema-version', '4.0');
+
+select 'Adding new user with PlainPw: ', 'test_user', 'test_password';
+call TigTestAddUser('test_user', 'test_passwd', 'SUCCESS - adding new user',
+		 'ERROR - adding new user');
+
+call TigUserLogin('test_user', 'wrong_passwd', @res_user_id);
+select @res_user_id as user_id\g
+select if(@res_user_id is NULL,
+         'SUCCESS - User login failed as expected, used UserLogin',
+			 	 'ERROR - User login succeeded as NOT expected');
+
+call TigUserLoginPlainPw('test_user', 'wrong_passwd', @res_user_id);
+select if(@res_user_id is NULL,
+			   'SUCCESS - User login failed as expected, used wrong password',
+			 	 'ERROR - User login succeeded as NOT expected');
+
+call TigUserLoginPlainPw('test_user', 'test_passwd', @res_user_id);
+select if(@res_user_id is not NULL,
+			   'SUCCESS - User login OK as expected, used UserLoginPlainPw',
+			 	 'ERROR - User login failed as NOT expected');
+
+call TigUserLogout('test_user');
+call TigUserLogout('test_user');
+select online_status into @res_online_status from tig_users
+  where user_id = 'test_user';
+select if(@res_online_status = 0,
+			   'SUCCESS - online status OK after 2 logouts',
+			 	 'ERROR - online status incorrect after 2 logouts');
+
+select 'Changing password using UpdatePassword';
+call TigUpdatePassword('test_user', 'new_password');
+call TigUserLoginPlainPw('test_user', 'new_password', @res_user_id);
+select if(@res_user_id is NULL,
+			   'SUCCESS - User login failed as expected, password incorrectly changed',
+			 	 'ERROR - User login succeeded as NOT expected');
+
+select 'Changing password using UpdatePasswordPlainPw';
+call TigUpdatePasswordPlainPw('test_user', 'new_password');
+call TigUserLoginPlainPw('test_user', 'new_password', @res_user_id);
+select if(@res_user_id is not NULL,
+			   'SUCCESS - User login OK as expected, password updated with PlainPw',
+			 	 'ERROR - User login failed as NOT expected');
+
+call TigUserLogout('test_user');
+select 'Disabling user account';
+call TigDisableAccount('test_user');
+call TigUserLoginPlainPw('test_user', 'new_password', @res_user_id);
+select if(@res_user_id is NULL,
+			   'SUCCESS - User login failed as expected, account disabled',
+			 	 'ERROR - User login succeeded as NOT expected');
+
+select 'Enabling user account';
+call TigEnableAccount('test_user');
+call TigUserLoginPlainPw('test_user', 'new_password', @res_user_id);
+select if(@res_user_id is not NULL,
+			   'SUCCESS - User login OK as expected, account enabled',
+			 	 'ERROR - User login failed as NOT expected');
+
+call TigUserLogout('test_user');
+
+select 'Adding new user with PlainPw: ', 'test_user_2', 'test_password_2';
+call TigTestAddUser('test_user_2', 'test_passwd_2', 'SUCCESS - adding new user',
+		 'ERROR - adding new user');
+
+select 'Adding a user with the same user_id: ', 'test_user', 'test_password_2';
+call TigTestAddUser('test_user', 'test_password_2', 'ERROR, that was duplicate entry insertion and it should fail.', 'SUCCESS - user adding failure as expected as that was duplicate entry insertion attempt');
+
+call TigRemoveUser('test_user');
+call TigRemoveUser('test_user_2');
+call TigOnlineUsers();
+call TigOfflineUsers();
 
 -- Get top nodes for the user: user1@hostname
 --
