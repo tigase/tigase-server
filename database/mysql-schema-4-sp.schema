@@ -3,6 +3,7 @@
 drop procedure if exists TigInitdb;
 drop procedure if exists TigAddUser;
 drop procedure if exists TigAddUserPlainPw;
+drop procedure if exists TigGetUserDBUid;
 drop procedure if exists TigRemoveUser;
 drop procedure if exists TigUpdatePassword;
 drop procedure if exists TigUpdatePasswordPlainPw;
@@ -12,6 +13,8 @@ drop procedure if exists TigUserLoginPlainPw;
 drop procedure if exists TigUserLogout;
 drop procedure if exists TigOnlineUsers;
 drop procedure if exists TigOfflineUsers;
+drop procedure if exists TigAllUsers;
+drop procedure if exists TigAllUsersCount;
 drop procedure if exists TigDisableAccount;
 drop procedure if exists TigEnableAccount;
 drop procedure if exists TigActiveAccounts;
@@ -59,15 +62,16 @@ end //
 -- Add a new user to the database assuming the user password is already
 -- encoded properly according to the database settings.
 -- If password is not encoded TigAddUserPlainPw should be used instead.
-create procedure TigAddUser(_user_id varchar(2048), _user_pw varchar(255))
+create procedure TigAddUser(_user_id varchar(2049), _user_pw varchar(255))
 begin
 	insert into tig_users (user_id, sha1_user_id, user_pw)
 		values (_user_id, sha1(_user_id), _user_pw);
+	select LAST_INSERT_ID() as uid;
 end //
 
 -- Takes plain text user password and converts it to internal representation
 -- and creates a new user account.
-create procedure TigAddUserPlainPw(_user_id varchar(2048), _user_pw varchar(255))
+create procedure TigAddUserPlainPw(_user_id varchar(2049), _user_pw varchar(255))
 begin
 	case TigGetDBProperty('password-encoding')
 		when 'MD5-PASSWORD' then
@@ -79,20 +83,27 @@ begin
 		end case;
 end //
 
+-- Low level database user id as big number. Used only for performance reasons
+-- and save database space. Besides JID is too large to server as UID
+create procedure TigGetUserDBUid(_user_id varchar(2049))
+begin
+	select uid from tig_users where user_id = _user_id;
+end //
+
 -- Removes a user from the database
-create procedure TigRemoveUser(_user_id varchar(2048))
+create procedure TigRemoveUser(_user_id varchar(2049))
 begin
 	delete from tig_users where user_id = _user_id;
 end //
 
 -- Returns user's password from the database
-create procedure TigGetPassword(_user_id varchar(2048))
+create procedure TigGetPassword(_user_id varchar(2049))
 begin
 	select user_pw from tig_users where user_id = _user_id;
 end //
 
 -- Takes plain text user password and converts it to internal representation
-create procedure TigUpdatePasswordPlainPw(_user_id varchar(2048), _user_pw varchar(255))
+create procedure TigUpdatePasswordPlainPw(_user_id varchar(2049), _user_pw varchar(255))
 begin
 	case TigGetDBProperty('password-encoding')
 		when 'MD5-PASSWORD' then
@@ -105,7 +116,7 @@ begin
 end //
 
 -- Update user password
-create procedure TigUpdatePassword(_user_id varchar(2048), _user_pw varchar(255))
+create procedure TigUpdatePassword(_user_id varchar(2049), _user_pw varchar(255))
 begin
 	update tig_users set user_pw = _user_pw where user_id = _user_id;
 end //
@@ -124,10 +135,23 @@ begin
 		from tig_users where online_status = 0;
 end //
 
+-- List of all users in database
+create procedure TigAllUsers()
+begin
+	select user_id, last_login, last_logout, online_status, failed_logins, account_status
+		from tig_users;
+end //
+
+-- All users count
+create procedure TigAllUsersCount()
+begin
+	select count(*) from tig_users;
+end //
+
 -- Performs user login for a plain text password, converting it to an internal
 -- representation if necessary
-create procedure TigUserLoginPlainPw(_user_id varchar(2048), _user_pw varchar(255),
-			 					 out res_user_id varchar(2048))
+create procedure TigUserLoginPlainPw(_user_id varchar(2049), _user_pw varchar(255),
+			 					 out res_user_id varchar(2049))
 begin
 	case TigGetDBProperty('password-encoding')
 		when 'MD5-PASSWORD' then
@@ -143,8 +167,8 @@ end //
 -- on failure.
 -- If the login is successful it also increases online_status and sets
 -- last_login time to the current timestamp
-create procedure TigUserLogin(_user_id varchar(2048), _user_pw varchar(255),
-			 					 out res_user_id varchar(2048))
+create procedure TigUserLogin(_user_id varchar(2049), _user_pw varchar(255),
+			 					 out res_user_id varchar(2049))
 begin
 	if exists(select user_id from tig_users
 		where (account_status > 0) AND (user_id = _user_id) AND (user_pw = _user_pw))
@@ -162,7 +186,7 @@ begin
 end //
 
 -- It decreases online_status and sets last_logout time to the current timestamp
-create procedure TigUserLogout(_user_id varchar(2048))
+create procedure TigUserLogout(_user_id varchar(2049))
 begin
 	update tig_users
 		set online_status = greatest(online_status - 1, 0),
@@ -171,13 +195,13 @@ begin
 end //
 
 -- Disable user account
-create procedure TigDisableAccount(_user_id varchar(2048))
+create procedure TigDisableAccount(_user_id varchar(2049))
 begin
 	update tig_users set account_status = 0 where user_id = _user_id;
 end //
 
 -- Enable user account
-create procedure TigEnableAccount(_user_id varchar(2048))
+create procedure TigEnableAccount(_user_id varchar(2049))
 begin
 	update tig_users set account_status = 1 where user_id = _user_id;
 end //
@@ -196,8 +220,16 @@ begin
 		from tig_users where account_status = 0;
 end //
 
+-- Helper procedure for adding a new node
+create procedure TigAddNode(_parent_nid bigint, _uid bigint, _node varchar(255))
+begin
+	insert into tig_nodes (parent_nid, uid, node)
+		values (_parent_nid, _uid, _node);
+	select LAST_INSERT_ID() as nid;
+end //
+
 -- For testing only:
-create procedure TigTestAddUser(_user_id varchar(2048), _user_passwd varchar(255),
+create procedure TigTestAddUser(_user_id varchar(2049), _user_passwd varchar(255),
 			 success_text text, failure_text text)
 begin
 	declare insert_status int default 0;
@@ -215,8 +247,12 @@ begin
 
 	declare _user_id varchar(2049);
 	declare _password varchar(255);
+	declare _parent_nid bigint;
+	declare _uid bigint;
+	declare _node varchar(255);
 	declare l_last_row_fetched int default 0;
-	DECLARE cursor1 CURSOR FOR
+
+	DECLARE cursor_users CURSOR FOR
 		select user_id, pval as password
 			from tig_users, tig_pairs
 			where tig_users.uid = tig_pairs.uid and pkey = 'password';
@@ -224,19 +260,45 @@ begin
 
 	START TRANSACTION;
 
-		update tig_users set sha1_user_id = sha1(user_id);
+		-- Add temporarly old_uid field for convertion process
+		alter table tig_users add column old_uid bigint;
+		-- Add temporarly old_nid field for convertion process
+		alter table tig_nodes add column old_nid bigint;
+
+		-- Load all tig_users data to a new table
+		insert into tig_users (user_id, sha1_user_id, old_uid)
+			select user_id, sha1(user_id), uid from tig_users_old;
+
+		-- First load of the tig_nodes table with new UIDs
+		insert into tig_nodes (uid, old_nid, node)
+			select tig_users.uid, nid, node from tig_users, tig_nodes_old
+				where (tig_nodes_old.uid = tig_users.old_uid);
+		-- Update parent_nid column based on the new NIDs
+		update tig_nodes, tig_nodes_old set tig_nodes.parent_nid = tig_nodes.nid
+			where (tig_nodes_old.parent_nid = tig_nodes.old_nid);
+
+		-- Load tig_pairs data with new uids and nids
+		insert into tig_pairs (nid, uid, pkey, pval)
+			select tig_nodes.nid, tig_users.uid, pkey, pval
+				from tig_pairs_old, tig_users, tig_nodes
+				where (tig_pairs_old.uid = tig_users.old_uid)
+					AND (tig_pairs_old.nid = tig_nodes.old_nid);
+
+		-- Remove temporarly fields which are not needed anymore
+		alter table tig_users drop column old_uid;
+		alter table tig_nodes drop column old_nid;
 
 		SET l_last_row_fetched=0;
 
-		OPEN cursor1;
+		OPEN cursor_users;
 			cursor_loop:LOOP
-				FETCH cursor1 INTO _user_id, _password;
+				FETCH cursor_users INTO _user_id, _password;
     		IF l_last_row_fetched=1 THEN
       		LEAVE cursor_loop;
     		END IF;
 				call TigUpdatePasswordPlainPw(_user_id, _password);
 			END LOOP cursor_loop;
-		CLOSE cursor1;
+		CLOSE cursor_users;
 
 		SET l_last_row_fetched=0;
 
