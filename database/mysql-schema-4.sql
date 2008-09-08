@@ -108,6 +108,8 @@ create table if not exists tig_nodes (
        primary key (nid),
        unique key tnode (parent_nid, uid, node),
        key node (node),
+			 key uid (uid),
+			 key parent_nid (parent_nid),
 			 constraint tig_nodes_constr foreign key (uid) references tig_users (uid)
 )
 ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
@@ -120,6 +122,8 @@ create table if not exists tig_pairs (
        pval mediumtext,
 
        key pkey (pkey),
+			 key uid (uid),
+			 key nid (nid),
 			 constraint tig_pairs_constr_1 foreign key (uid) references tig_users (uid),
 			 constraint tig_pairs_constr_2 foreign key (nid) references tig_nodes (nid)
 )
