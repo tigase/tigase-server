@@ -19,6 +19,7 @@ drop procedure if exists TigDisableAccount;
 drop procedure if exists TigEnableAccount;
 drop procedure if exists TigActiveAccounts;
 drop procedure if exists TigDisabledAccounts;
+drop procedure if exists TigAddNode;
 drop procedure if exists TigTestAddUser;
 drop procedure if exists TigUsers2Ver4Convert;
 drop procedure if exists TigPutDBProperty;

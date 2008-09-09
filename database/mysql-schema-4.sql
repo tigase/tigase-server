@@ -35,39 +35,11 @@
 --                  FLUSH PRIVILEGES;" | mysql -u root -pdbpass mysql
 
 
-create table if not exists short_news (
-  -- Automatic record ID
-  snid            bigint unsigned NOT NULL auto_increment,
-  -- Automaticly generated timestamp and automaticly updated on change
-  publishing_time timestamp,
-	-- Optional news type: 'shorts', 'minis', 'techs', 'funs'....
-	news_type       varchar(10),
-  -- Author JID
-  author          varchar(128) NOT NULL,
-  -- Short subject - this is short news, right?
-  subject         varchar(128) NOT NULL,
-  -- Short news message - this is short news, right?
-  body            varchar(1024) NOT NULL,
-  primary key(snid),
-  key publishing_time (publishing_time),
-  key author (author),
-  key news_type (news_type)
-)
-ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
-
-create table if not exists xmpp_stanza (
-			 id bigint unsigned NOT NULL auto_increment,
-			 stanza text NOT NULL,
-
-			 primary key (id)
-)
-ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
-
 create table if not exists tig_users (
-       uid bigint unsigned NOT NULL auto_increment,
+			 uid bigint unsigned NOT NULL auto_increment,
 
 			 -- Jabber User ID
-       user_id varchar(2049) NOT NULL,
+			 user_id varchar(2049) NOT NULL,
 			 -- UserID SHA1 hash to prevent duplicate user_ids
 			 sha1_user_id char(128) NOT NULL,
 			 -- User password encrypted or not
@@ -90,7 +62,7 @@ create table if not exists tig_users (
 			 primary key (uid),
 			 unique key sha1_user_id (sha1_user_id),
 			 key user_pw (user_pw),
-       key user_id (user_id(765)),
+			 key user_id (user_id(765)),
 			 key last_login (last_login),
 			 key last_logout (last_logout),
 			 key account_status (account_status),
@@ -126,6 +98,34 @@ create table if not exists tig_pairs (
 			 key nid (nid),
 			 constraint tig_pairs_constr_1 foreign key (uid) references tig_users (uid),
 			 constraint tig_pairs_constr_2 foreign key (nid) references tig_nodes (nid)
+)
+ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
+
+create table if not exists short_news (
+  -- Automatic record ID
+  snid            bigint unsigned NOT NULL auto_increment,
+  -- Automaticly generated timestamp and automaticly updated on change
+  publishing_time timestamp,
+	-- Optional news type: 'shorts', 'minis', 'techs', 'funs'....
+	news_type       varchar(10),
+  -- Author JID
+  author          varchar(128) NOT NULL,
+  -- Short subject - this is short news, right?
+  subject         varchar(128) NOT NULL,
+  -- Short news message - this is short news, right?
+  body            varchar(1024) NOT NULL,
+  primary key(snid),
+  key publishing_time (publishing_time),
+  key author (author),
+  key news_type (news_type)
+)
+ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
+
+create table if not exists xmpp_stanza (
+			 id bigint unsigned NOT NULL auto_increment,
+			 stanza text NOT NULL,
+
+			 primary key (id)
 )
 ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
 
