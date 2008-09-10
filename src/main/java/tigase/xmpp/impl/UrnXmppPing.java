@@ -26,10 +26,13 @@ import java.util.Queue;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import tigase.conf.Configurable;
 import tigase.db.NonAuthUserRepository;
 import tigase.server.Packet;
 import tigase.util.JIDUtils;
 import tigase.xml.Element;
+import tigase.xmpp.Authorization;
+import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
@@ -67,23 +70,26 @@ public class UrnXmppPing extends XMPPProcessor implements XMPPProcessorIfc {
 		final Map<String, Object> settings) {
 
 		if (session == null) {
+			try {
+				results.offer(Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet,
+						"Service not available.", true));
+			} catch (PacketErrorTypeException e) {
+				log.fine("This is already ping error packet, ignoring... "
+					+ packet.toString());
+			}
 			return;
 		}
 		String id = session.getDomain();
 		if (packet.getElemTo() != null) {
 			id = JIDUtils.getNodeID(packet.getElemTo());
 		}
-		if (id == null || id.equals("") || id.equalsIgnoreCase(session.getDomain())) {
+		if (id == null || id.equals("") || id.equalsIgnoreCase(session.getDomain())
+			|| session.getConnectionId() == Configurable.NULL_ROUTING) {
 			results.offer(packet.okResult((Element) null, 0));
 			return;
 		}
 
 		try {
-			// Not needed anymore. Packet filter does it for all stanzas.
-// 			if (packet.getFrom().equals(session.getConnectionId())) {
-// 				packet.getElement().setAttribute("from", session.getJID());
-// 			}
-
 			if (id.equals(session.getUserId())) {
 				Element elem = packet.getElement().clone();
 				Packet result = new Packet(elem);
