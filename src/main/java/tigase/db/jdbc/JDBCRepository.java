@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -75,7 +76,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 
 	private static final String USER_STR = "User: ";
 
-	private String users_tbl = DEF_USERS_TBL;
+	//	private String users_tbl = DEF_USERS_TBL;
 	private String nodes_tbl = DEF_NODES_TBL;
 	private String pairs_tbl = DEF_PAIRS_TBL;
 	//	private String maxids_tbl = DEF_MAXIDS_TBL;
@@ -84,8 +85,13 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	private UserAuthRepository auth = null;
 	private String db_conn = null;
 	private Connection conn = null;
-	private PreparedStatement uid_st = null;
-	private PreparedStatement node_add_st = null;
+	private CallableStatement uid_sp = null;
+	private CallableStatement users_count_sp = null;
+	private CallableStatement all_users_sp = null;
+	private CallableStatement user_add_sp = null;
+	private CallableStatement user_del_sp = null;
+
+	private PreparedStatement node_add_sp = null;
 	private PreparedStatement data_for_node_st = null;
 	private PreparedStatement keys_for_node_st = null;
 	private PreparedStatement nodes_for_node_st = null;
@@ -100,30 +106,30 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 
 	private boolean autoCreateUser = false;
 
-	private static long var_max_uid = 0;
-	private static long var_max_nid = 0;
+// 	private static long var_max_uid = 0;
+// 	private static long var_max_nid = 0;
 
-	/**
-	 * Describe <code>getMaxUid</code> method handles unique IDs much better for
-	 * distributed environment than the old code.
-	 * Thank's to Daniele for the help and the code.
-	 *
-	 * @return a <code>long</code> value
-	 */
-	private long getMaxUid() {
-		return (System.currentTimeMillis() * 100) + ((var_max_uid++) % 100);
-	}
+// 	/**
+// 	 * Describe <code>getMaxUid</code> method handles unique IDs much better for
+// 	 * distributed environment than the old code.
+// 	 * Thank's to Daniele for the help and the code.
+// 	 *
+// 	 * @return a <code>long</code> value
+// 	 */
+// 	private long getMaxUid() {
+// 		return (System.currentTimeMillis() * 100) + ((var_max_uid++) % 100);
+// 	}
 
-	/**
-	 * <code>getMaxNid</code> method handles unique IDs much better for
-	 * distributed environment than the old code.
-	 * Thank's to Daniele for the help and the code.
-	 *
-	 * @return a <code>long</code> value
-	 */
-	private long getMaxNid() {
-		return (System.currentTimeMillis() * 100) + ((var_max_nid++) % 100);
-	}
+// 	/**
+// 	 * <code>getMaxNid</code> method handles unique IDs much better for
+// 	 * distributed environment than the old code.
+// 	 * Thank's to Daniele for the help and the code.
+// 	 *
+// 	 * @return a <code>long</code> value
+// 	 */
+// 	private long getMaxNid() {
+// 		return (System.currentTimeMillis() * 100) + ((var_max_nid++) % 100);
+// 	}
 
 	private void release(Statement stmt, ResultSet rs) {
 		if (rs != null) {
@@ -154,7 +160,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	}
 
 	private long getUserUID(String user_id, boolean autoCreate)
-		throws SQLException, UserNotFoundException {
+		throws SQLException, UserNotFoundException, TigaseDBException {
 		Long cache_res = (Long)cache.get(user_id);
 		if (cache_res != null) {
 			return cache_res.longValue();
@@ -162,9 +168,9 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		ResultSet rs = null;
 		long result = -1;
 		try {
-			synchronized (uid_st) {
-				uid_st.setString(1, user_id);
-				rs = uid_st.executeQuery();
+			synchronized (uid_sp) {
+				uid_sp.setString(1, user_id);
+				rs = uid_sp.executeQuery();
 				if (rs.next()) {
 					result = rs.getLong(1);
 				} else {
@@ -242,6 +248,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	private long getNodeNID(long uid, String node_path)
 		throws SQLException, UserNotFoundException {
 		String query = buildNodeQuery(uid, node_path);
+		log.finest(query);
 		Statement stmt = null;
 		ResultSet rs = null;
 		try {
@@ -259,7 +266,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	}
 
 	private long getNodeNID(String user_id, String node_path)
-		throws SQLException, UserNotFoundException {
+		throws SQLException, UserNotFoundException, TigaseDBException {
 		Long cache_res = (Long)cache.get(user_id+"/"+node_path);
 		if (cache_res != null) {
 			return cache_res.longValue();
@@ -273,25 +280,34 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	}
 
 	private long addNode(long uid, long parent_nid, String node_name)
-		throws SQLException {
-		long new_nid = getMaxNid();
-		synchronized (node_add_st) {
-			node_add_st.setLong(1, new_nid);
-			if (parent_nid < 0) {
-				node_add_st.setNull(2, Types.BIGINT);
-			} else {
-				node_add_st.setLong(2, parent_nid);
-			} // end of else
-			node_add_st.setLong(3, uid);
-			node_add_st.setString(4, node_name);
-			node_add_st.executeUpdate();
+		throws SQLException, TigaseDBException {
+		ResultSet rs = null;
+		long new_nid = -1;
+		synchronized (node_add_sp) {
+			try {
+				if (parent_nid < 0) {
+					node_add_sp.setNull(1, Types.BIGINT);
+				} else {
+					node_add_sp.setLong(1, parent_nid);
+				} // end of else
+				node_add_sp.setLong(2, uid);
+				node_add_sp.setString(3, node_name);
+				rs = node_add_sp.executeQuery();
+				if (rs.next()) {
+					return rs.getLong(1);
+				} else {
+					throw new TigaseDBException("Propeblem adding new user to repository. "
+						+ "The SP should return nid or fail");
+				} // end of if (isnext) else
+			} finally {
+				release(null, rs);
+			}
 		}
-		//incrementMaxNID();
-		return new_nid;
+		//return new_nid;
 	}
 
 	private long createNodePath(String user_id, String node_path)
-		throws SQLException, UserNotFoundException {
+		throws SQLException, UserNotFoundException, TigaseDBException {
 		if (node_path == null) {
 			// Or should I throw NullPointerException?
 			return getNodeNID(user_id, null);
@@ -314,14 +330,24 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	}
 
 	private void initPreparedStatements() throws SQLException {
-		String query = "select uid from " + users_tbl
-			+ " where user_id = ?;";
-		uid_st = conn.prepareStatement(query);
+		String query = "{ call TigGetUserDBUid(?) }";
+		uid_sp = conn.prepareCall(query);
 
-		query = "insert into " + nodes_tbl
-			+ " (nid, parent_nid, uid, node)"
-			+ " values (?, ?, ?, ?);";
-		node_add_st = conn.prepareStatement(query);
+		query = "{ call TigAllUsersCount() }";
+		users_count_sp = conn.prepareCall(query);
+
+		query = "{ call TigAllUsers() }";
+		all_users_sp = conn.prepareCall(query);
+
+		query = "{ call TigAddUserPlainPw(?, ?) }";
+		user_add_sp = conn.prepareCall(query);
+
+		query = "{ call TigRemoveUser(?) }";
+		user_del_sp = conn.prepareCall(query);
+
+
+		query = "{ call TigAddNode(?, ?, ?) }";
+		node_add_sp = conn.prepareStatement(query);
 
 		query = "select pval from " + pairs_tbl
 			+ " where (nid = ?) AND (pkey = ?);";
@@ -349,6 +375,34 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 
 	// Implementation of tigase.db.UserRepository
 
+	private void checkDBSchema() {
+		String schema_version = "1.0";
+		try {
+			String query = "select TigGetDBProperty('schema-version') as prop_val;";
+			Statement stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery(query);
+			if (rs.next()) {
+				schema_version = rs.getString(1);
+				if ("4.0".equals(schema_version)) {
+					return;
+				}
+			}
+			throw new TigaseDBException("Incorect DB schema version.");
+		} catch (Exception e) {
+			System.err.println("\n\nPlease upgrade database schema now.");
+			System.err.println("Current scheme version is: " + schema_version
+				+ ", expected: 4.0");
+			System.err.println("Check the schema upgrade guide at the address:");
+			System.err.println("http://www.tigase.org/en/mysql-db-schema-upgrade-4-0");
+			System.err.println("----");
+			System.err.println("If you have upgraded your schema and you are still");
+			System.err.println("experiencing this problem please contact support at");
+			System.err.println("e-mail address: support@tigase.org");
+			e.printStackTrace();
+			System.exit(100);
+		}
+	}
+
 	private void initRepo() throws SQLException {
 		Statement stmt = null;
 		ResultSet rs = null;
@@ -356,6 +410,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 			synchronized (db_conn) {
 				conn = DriverManager.getConnection(db_conn);
 				conn.setAutoCommit(true);
+				checkDBSchema();
 				initPreparedStatements();
 				auth = new UserAuthRepositoryImpl(this);
 				stmt = conn.createStatement();
@@ -403,13 +458,11 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	 * @return a <code>long</code> number of user accounts in database.
 	 */
 	public long getUsersCount() {
-		Statement stmt = null;
 		ResultSet rs = null;
 		try {
 			checkConnection();
-			stmt = conn.createStatement();
-			// Load all user ids from database
-			rs = stmt.executeQuery("SELECT count(*) FROM " + users_tbl);
+			// Load all user count from database
+			rs = users_count_sp.executeQuery();
 			long users = -1;
 			if (rs.next()) {
 				users = rs.getLong(1);
@@ -419,8 +472,8 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 			return -1;
 			//throw new TigaseDBException("Problem loading user list from repository", e);
 		} finally {
-			release(stmt, rs);
-			stmt = null; rs = null;
+			release(null, rs);
+			rs = null;
 		}
 	}
 
@@ -431,13 +484,11 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	 * @return a <code>List</code> of user IDs from database.
 	 */
 	public List<String> getUsers() throws TigaseDBException {
-		Statement stmt = null;
 		ResultSet rs = null;
 		try {
 			checkConnection();
-			stmt = conn.createStatement();
 			// Load all user ids from database
-			rs = stmt.executeQuery("SELECT user_id FROM " + users_tbl);
+			rs = all_users_sp.executeQuery();
 			List<String> users = new ArrayList<String>();
 			while (rs.next()) {
 				users.add(rs.getString(1));
@@ -446,8 +497,8 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		} catch (SQLException e) {
 			throw new TigaseDBException("Problem loading user list from repository", e);
 		} finally {
-			release(stmt, rs);
-			stmt = null; rs = null;
+			release(null, rs);
+			rs = null;
 		}
 	}
 
@@ -459,23 +510,26 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	 * @return a <code>long</code> value of <code>uid</code> database user ID.
 	 * @exception SQLException if an error occurs
 	 */
-	private long addUserRepo(final String user_id) throws SQLException {
+	private long addUserRepo(final String user_id)
+    throws SQLException, TigaseDBException {
 		checkConnection();
-		Statement stmt = null;
-		String query = null;
-		long uid = getMaxUid();
-		try {
-			stmt = conn.createStatement();
-			// Add user into database.
-			query = "insert into " + users_tbl + " (uid, user_id) values ("
-				+ uid + ", '" + user_id + "');";
-			log.finest("User add: " + query);
-			stmt.executeUpdate(query);
-			//			incrementMaxUID();
-			addNode(uid, -1, root_node);
-		} finally {
-			release(stmt, null);
-			stmt = null;
+		ResultSet rs = null;
+		long uid = -1;
+		synchronized (user_add_sp) {
+			try {
+				user_add_sp.setString(1, user_id);
+				user_add_sp.setNull(2, Types.VARCHAR);
+				rs = user_add_sp.executeQuery();
+				if (rs.next()) {
+					uid = rs.getLong(1);
+					//addNode(uid, -1, root_node);
+				} else {
+					throw new TigaseDBException("Propeblem adding new user to repository. "
+						+ "The SP should return uid or fail");
+				} // end of if (isnext) else
+			} finally {
+				release(null, rs);
+			}
 		}
 		cache.put(user_id, Long.valueOf(uid));
 		return uid;
@@ -520,8 +574,8 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 			query = "delete from " + nodes_tbl + " where uid = " + uid;
 			stmt.executeUpdate(query);
 			// Remove user account from users table
-			query = "delete from " + users_tbl + " where uid = " + uid;
-			stmt.executeUpdate(query);
+			user_del_sp.setString(1, user_id);
+			user_del_sp.executeUpdate();
 		} catch (SQLException e) {
 			throw new TigaseDBException("Error removing user from repository: "
 				+ query, e);
@@ -699,10 +753,12 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	public void addDataList(final String user_id, final String subnode,
 		final String key, final String[] list)
 		throws UserNotFoundException, TigaseDBException {
+		long uid = -2;
+		long nid = -2;
 		try {
 			checkConnection();
-			long uid = getUserUID(user_id, autoCreateUser);
-			long nid = getNodeNID(uid, subnode);
+			uid = getUserUID(user_id, autoCreateUser);
+			nid = getNodeNID(uid, subnode);
 			if (nid < 0) {
 				nid = createNodePath(user_id, subnode);
 			}
@@ -718,6 +774,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		} catch (SQLException e) {
 			throw new TigaseDBException("Error adding data list, user_id: " + user_id
 				+ ", subnode: " + subnode + ", key: " + key
+				+ ", uid: " + uid + ", nid: " + nid
 				+ ", list: " + Arrays.toString(list), e);
 		}
 		//		cache.put(user_id+"/"+subnode+"/"+key, list);
