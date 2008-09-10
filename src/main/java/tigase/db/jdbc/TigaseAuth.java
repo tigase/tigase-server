@@ -280,7 +280,8 @@ public class TigaseAuth implements UserAuthRepository {
 					if (auth_result_ok) {
 						return true;
 					} else {
-						log.info("Login failed, for user: " + user_id
+						log.fine("Login failed, for user: '" + user_id + "'"
+							+ ", password: '" + password + "'"
 							+ ", from DB got: " + rs.getString(1));
 					}
 				}
@@ -432,7 +433,10 @@ public class TigaseAuth implements UserAuthRepository {
 		{ ++user_idx;	}
 		String user_name = new String(in_data, auth_idx, user_idx - auth_idx);
 		++user_idx;
-		String jid = JIDUtils.getNodeID(user_name, domain);
+		String jid = user_name;
+		if (JIDUtils.getNodeNick(user_name) == null) {
+			jid = JIDUtils.getNodeID(user_name, domain);
+		}
 		props.put(USER_ID_KEY, jid);
 		String passwd =	new String(in_data, user_idx, in_data.length - user_idx);
 		return plainAuth(jid, passwd);
