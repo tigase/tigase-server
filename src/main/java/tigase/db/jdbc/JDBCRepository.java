@@ -398,7 +398,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 			System.err.println("If you have upgraded your schema and you are still");
 			System.err.println("experiencing this problem please contact support at");
 			System.err.println("e-mail address: support@tigase.org");
-			e.printStackTrace();
+			//e.printStackTrace();
 			System.exit(100);
 		}
 	}
