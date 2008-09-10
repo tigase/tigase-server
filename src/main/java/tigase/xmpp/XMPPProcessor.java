@@ -27,6 +27,8 @@ import java.util.Map;
 import java.util.Queue;
 import tigase.server.Packet;
 import tigase.xml.Element;
+import tigase.db.UserRepository;
+import tigase.db.TigaseDBException;
 
 /**
  * <code>XMPPProcessor</code> abstract class contains basic definition for
@@ -103,5 +105,7 @@ public abstract class XMPPProcessor
     return
       getClass().getName().compareTo(proc.getClass().getName());
   }
+
+	public void init(UserRepository rep) throws TigaseDBException {}
 
 }// XMPPProcessor
