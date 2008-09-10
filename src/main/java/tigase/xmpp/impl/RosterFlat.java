@@ -38,7 +38,7 @@ import tigase.xmpp.XMPPResourceConnection;
 import tigase.util.JIDUtils;
 
 /**
- * Describe class Roster here.
+ * Describe class RosterFlat here.
  *
  *
  * Created: Tue Feb 21 18:05:53 2006
@@ -46,14 +46,16 @@ import tigase.util.JIDUtils;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class Roster extends RosterAbstract {
+public class RosterFlat extends RosterAbstract {
 
 	/**
    * Private logger for class instancess.
    */
-  private static Logger log =	Logger.getLogger("tigase.xmpp.impl.Roster");
+  private static Logger log =	Logger.getLogger("tigase.xmpp.impl.RosterFlat");
 
-  public String[] getBuddies(final XMPPResourceConnection session)
+	
+
+	public String[] getBuddies(final XMPPResourceConnection session)
     throws NotAuthorizedException {
     return session.getDataGroups(ROSTER);
   }
@@ -109,4 +111,4 @@ public class Roster extends RosterAbstract {
     return session.getDataList(groupNode(buddy), GROUPS);
   }
 
-} // Roster
+} // RosterFlat
