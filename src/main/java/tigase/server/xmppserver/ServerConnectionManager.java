@@ -593,7 +593,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 				++open_s2s_connections;
 				++connected_servers;
 			}
-			log.info("s2s instance: " + entry.getKey()
+			log.finest("s2s instance: " + entry.getKey()
 				+ ", waitingQueue: " + conn.getWaitingPackets().size()
 				+ ", outgoingActive: " + conn.isOutgoingConnected());
 		}
