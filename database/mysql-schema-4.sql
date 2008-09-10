@@ -133,3 +133,5 @@ source database/mysql-schema-4-sp.schema;
 
 -- This is a dummy user who keeps all the database-properties
 call TigAddUserPlainPw('db-properties', NULL);
+select NOW(), ' - Setting schema version to 4.0';
+call TigPutDBProperty('schema-version', '4.0');

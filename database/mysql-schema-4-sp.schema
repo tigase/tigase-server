@@ -43,9 +43,9 @@ end //
 -- Database properties set - procedure
 create procedure TigPutDBProperty(_tkey varchar(255), _tval mediumtext)
 begin
-	insert into tig_pairs (pkey, pval)
-		select _tkey, _tval from tig_pairs, tig_users
-			where (user_id = 'db-properties') AND (tig_pairs.uid = tig_users.uid)
+	insert into tig_pairs (pkey, pval, uid)
+		select _tkey, _tval, uid from tig_users
+			where (user_id = 'db-properties')
 	  ON DUPLICATE KEY UPDATE pval = _tval;
 end //
 
@@ -65,9 +65,17 @@ end //
 -- If password is not encoded TigAddUserPlainPw should be used instead.
 create procedure TigAddUser(_user_id varchar(2049), _user_pw varchar(255))
 begin
+	declare res_uid bigint unsigned;
+
 	insert into tig_users (user_id, sha1_user_id, user_pw)
 		values (_user_id, sha1(_user_id), _user_pw);
-	select LAST_INSERT_ID() as uid;
+
+	select LAST_INSERT_ID() into res_uid;
+
+	insert into tig_nodes (parent_nid, uid, node)
+		values (NULL, res_uid, 'root');
+
+	select res_uid as uid;
 end //
 
 -- Takes plain text user password and converts it to internal representation

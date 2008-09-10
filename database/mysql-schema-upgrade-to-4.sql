@@ -1,10 +1,15 @@
 -- Database schema upgrade for Tigase version 4.0.0
 
-select NOW(), ' - Copying old tig_pairs table for later convertion';
+select NOW(), ' - Dropping foreign indexes';
+alter table tig_nodes DROP FOREIGN KEY tig_nodes_constr;
+alter table tig_pairs DROP FOREIGN KEY tig_pairs_constr_1;
+alter table tig_pairs DROP FOREIGN KEY tig_pairs_constr_2;
+
+select NOW(), ' - Renaming old tig_pairs table for later convertion';
 alter table tig_pairs rename to tig_pairs_old;
-select NOW(), ' - Copying old tig_nodes table for later convertion';
+select NOW(), ' - Renaming old tig_nodes table for later convertion';
 alter table tig_nodes rename to tig_nodes_old;
-select NOW(), ' - Copying old tig_users table for later convertion';
+select NOW(), ' - Renaming old tig_users table for later convertion';
 alter table tig_users rename to tig_users_old;
 
 select NOW(), ' - Loading new database schema 4.0';
@@ -53,6 +58,4 @@ alter table tig_nodes drop column old_nid;
 select NOW(), ' - Converting user passwords to a new format';
 call TigUsers2Ver4Convert();
 
-select NOW(), ' - Setting schema version to 4.0';
-call TigPutDBProperty('schema-version', '4.0');
 select NOW(), ' - All done, database ready to use!';
