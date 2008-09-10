@@ -82,6 +82,8 @@ public abstract class Presence {
   protected static final String XMLNS = "jabber:client";
   private static final String[] ELEMENTS = {PRESENCE_ELEMENT_NAME};
   private static final String[] XMLNSS = {XMLNS};
+	private static RosterAbstract roster_util =
+    RosterFactory.getRosterImplementation(true);
 
 	/**
 	 * <code>stopped</code> method is called when user disconnects or logs-out.
@@ -142,7 +144,7 @@ public abstract class Presence {
 		final Queue<Packet> results, final Element pres,
 		final Map<String, Object> settings)
 		throws NotAuthorizedException {
-    String[] buddies = Roster.getBuddies(session, subscrs);
+    String[] buddies = roster_util.getBuddies(session, subscrs);
 		buddies = DynamicRoster.addBuddies(session, settings, buddies);
     if (buddies != null) {
 			for (String buddy: buddies) {
@@ -162,7 +164,7 @@ public abstract class Presence {
 	protected static void resendPendingInRequests(final XMPPResourceConnection session,
     final Queue<Packet> results)
     throws NotAuthorizedException {
-		String[] buddies = Roster.getBuddies(session, Roster.PENDING_IN);
+		String[] buddies = roster_util.getBuddies(session, roster_util.PENDING_IN);
 		if (buddies != null) {
 			for (String buddy: buddies) {
 				Element presence = new Element(PRESENCE_ELEMENT_NAME);
@@ -340,7 +342,7 @@ public abstract class Presence {
 		synchronized (session) {
 			try {
 				final String jid = session.getJID();
-				PresenceType pres_type = Roster.getPresenceType(session, packet);
+				PresenceType pres_type = roster_util.getPresenceType(session, packet);
 				if (pres_type == null) {
 					log.warning("Invalid presence found: " + packet.toString());
 					return;
@@ -464,16 +466,16 @@ public abstract class Presence {
 				case out_unsubscribe:
 					if (pres_type == PresenceType.out_subscribe) {
 						SubscriptionType current_subscription =
-							Roster.getBuddySubscription(session, packet.getElemTo());
+							roster_util.getBuddySubscription(session, packet.getElemTo());
 						if (current_subscription == null) {
-							Roster.addBuddy(session, packet.getElemTo());
+							roster_util.addBuddy(session, packet.getElemTo());
 						} // end of if (current_subscription == null)
 					}
-					subscr_changed = Roster.updateBuddySubscription(session, pres_type,
+					subscr_changed = roster_util.updateBuddySubscription(session, pres_type,
 						packet.getElemTo());
 					if (subscr_changed) {
-						Roster.updateBuddyChange(session, results,
-							Roster.getBuddyItem(session, packet.getElemTo()));
+						roster_util.updateBuddyChange(session, results,
+							roster_util.getBuddyItem(session, packet.getElemTo()));
 					} // end of if (subscr_changed)
 					// According to RFC-3921 I must forward all these kind presence
 					// requests, it allows to resynchronize
@@ -482,11 +484,11 @@ public abstract class Presence {
 					break;
 				case out_subscribed:
 				case out_unsubscribed:
-					subscr_changed = Roster.updateBuddySubscription(session, pres_type,
+					subscr_changed = roster_util.updateBuddySubscription(session, pres_type,
 						packet.getElemTo());
 					if (subscr_changed) {
-						Roster.updateBuddyChange(session, results,
-							Roster.getBuddyItem(session, packet.getElemTo()));
+						roster_util.updateBuddyChange(session, results,
+							roster_util.getBuddyItem(session, packet.getElemTo()));
 						forwardPresence(results, packet, session.getUserId());
 						if (pres_type == PresenceType.out_subscribed) {
 							Element presence = (Element)session.getSessionData(PRESENCE_KEY);
@@ -513,7 +515,7 @@ public abstract class Presence {
 					}
 					// If other users are in 'to' or 'both' contacts, broadcast
 					// their preseces to all active resources
-					if (Roster.isSubscribedTo(session, packet.getElemFrom())
+					if (roster_util.isSubscribedTo(session, packet.getElemFrom())
 						|| (DynamicRoster.getBuddyItem(session, settings,
 								packet.getElemFrom()) != null)) {
 						updatePresenceChange(packet.getElement(), session, results);
@@ -534,58 +536,58 @@ public abstract class Presence {
 				case in_subscribe:
 					// If the buddy is already subscribed then auto-reply with sybscribed
 					// presence stanza.
-					if (Roster.isSubscribedFrom(session, packet.getElemFrom())) {
+					if (roster_util.isSubscribedFrom(session, packet.getElemFrom())) {
 						sendPresence(StanzaType.subscribed, packet.getElemFrom(),
 							session.getJID(), results, null);
 					} else {
 						SubscriptionType curr_sub =
-							Roster.getBuddySubscription(session, packet.getElemFrom());
+							roster_util.getBuddySubscription(session, packet.getElemFrom());
 						if (curr_sub == null) {
 							curr_sub = SubscriptionType.none;
-							Roster.addBuddy(session, packet.getElemFrom());
+							roster_util.addBuddy(session, packet.getElemFrom());
 						} // end of if (curr_sub == null)
-						Roster.updateBuddySubscription(session, pres_type,
+						roster_util.updateBuddySubscription(session, pres_type,
 							packet.getElemFrom());
 						updatePresenceChange(packet.getElement(), session, results);
 					} // end of else
 					break;
 				case in_unsubscribe:
-					subscr_changed = Roster.updateBuddySubscription(session, pres_type,
+					subscr_changed = roster_util.updateBuddySubscription(session, pres_type,
 						packet.getElemFrom());
 					if (subscr_changed) {
 						sendPresence(StanzaType.unsubscribed, packet.getElemFrom(),
 							session.getJID(), results, null);
 						updatePresenceChange(packet.getElement(), session, results);
-						Roster.updateBuddyChange(session, results,
-							Roster.getBuddyItem(session, packet.getElemFrom()));
+						roster_util.updateBuddyChange(session, results,
+							roster_util.getBuddyItem(session, packet.getElemFrom()));
 					}
 					break;
 				case in_subscribed: {
 					SubscriptionType curr_sub =
-						Roster.getBuddySubscription(session, packet.getElemFrom());
+						roster_util.getBuddySubscription(session, packet.getElemFrom());
 					if (curr_sub == null) {
 						curr_sub = SubscriptionType.none;
-						Roster.addBuddy(session, packet.getElemFrom());
+						roster_util.addBuddy(session, packet.getElemFrom());
 					} // end of if (curr_sub == null)
-					subscr_changed = Roster.updateBuddySubscription(session, pres_type,
+					subscr_changed = roster_util.updateBuddySubscription(session, pres_type,
 						packet.getElemFrom());
 					if (subscr_changed) {
 						updatePresenceChange(packet.getElement(), session, results);
-						Roster.updateBuddyChange(session, results,
-							Roster.getBuddyItem(session, packet.getElemFrom()));
+						roster_util.updateBuddyChange(session, results,
+							roster_util.getBuddyItem(session, packet.getElemFrom()));
 					}
 				}
 					break;
 				case in_unsubscribed: {
 					SubscriptionType curr_sub =
-						Roster.getBuddySubscription(session, packet.getElemFrom());
+						roster_util.getBuddySubscription(session, packet.getElemFrom());
 					if (curr_sub != null) {
-						subscr_changed = Roster.updateBuddySubscription(session, pres_type,
+						subscr_changed = roster_util.updateBuddySubscription(session, pres_type,
 							packet.getElemFrom());
 						if (subscr_changed) {
 							updatePresenceChange(packet.getElement(), session, results);
-							Roster.updateBuddyChange(session, results,
-								Roster.getBuddyItem(session, packet.getElemFrom()));
+							roster_util.updateBuddyChange(session, results,
+								roster_util.getBuddyItem(session, packet.getElemFrom()));
 						}
 					}
 				}
@@ -597,7 +599,7 @@ public abstract class Presence {
 						buddy_subscr = SubscriptionType.both;
 					} else {
 						buddy_subscr =
-              Roster.getBuddySubscription(session, packet.getElemFrom());
+              roster_util.getBuddySubscription(session, packet.getElemFrom());
 					}
 					if (buddy_subscr == null) {
 						buddy_subscr = SubscriptionType.none;
@@ -618,13 +620,13 @@ public abstract class Presence {
 					default:
 						break;
 					} // end of switch (buddy_subscr)
-					if (Roster.isSubscribedFrom(buddy_subscr)) {
+					if (roster_util.isSubscribedFrom(buddy_subscr)) {
 						for (XMPPResourceConnection conn: session.getActiveSessions()) {
 							Element pres = (Element)conn.getSessionData(PRESENCE_KEY);
 							sendPresence(null, packet.getElemFrom(), conn.getJID(),
 								results, pres);
 						}
-					} // end of if (Roster.isSubscribedFrom(session, packet.getElemFrom()))
+					} // end of if (roster_util.isSubscribedFrom(session, packet.getElemFrom()))
 					break;
 				case error: {
 					// This is message to 'this' client probably
