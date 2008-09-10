@@ -67,6 +67,8 @@ public abstract class JabberIqRoster {
 		new Element("feature", new String[] {"var"}, new String[] {XMLNS})
 	};
 	public static final String ANON = "anon";
+	private static RosterAbstract roster_util =
+    RosterFactory.getRosterImplementation(true);
 
 	public static Element createRosterPacket(String iq_type, String iq_id,
 		String to, String from, String item_jid, String item_name, String item_group,
@@ -90,13 +92,13 @@ public abstract class JabberIqRoster {
 			item.addAttribute("type", item_type);
 		}
 		if (item_name != null) {
-			item.addAttribute(Roster.NAME, item_name);
+			item.addAttribute(roster_util.NAME, item_name);
 		}
 		if (subscription != null) {
-			item.addAttribute(Roster.SUBSCRIPTION, subscription);
+			item.addAttribute(roster_util.SUBSCRIPTION, subscription);
 		}
 		if (item_group != null) {
-			Element group = new Element(Roster.GROUP, item_group);
+			Element group = new Element(roster_util.GROUP, item_group);
 			item.addChild(group);
 		}
 		query.addChild(item);
@@ -114,7 +116,7 @@ public abstract class JabberIqRoster {
     Element item =  request.findChild("/iq/query/item");
     String subscription = item.getAttribute("subscription");
     if (subscription != null && subscription.equals("remove")) {
-			SubscriptionType sub = Roster.getBuddySubscription(session, buddy);
+			SubscriptionType sub = roster_util.getBuddySubscription(session, buddy);
 			if (sub == null) {
 				sub = SubscriptionType.none;
 			}
@@ -142,18 +144,18 @@ public abstract class JabberIqRoster {
 			Element it = new Element("item");
 			it.setAttribute("jid", buddy);
 			it.setAttribute("subscription", "remove");
-			Roster.updateBuddyChange(session, results, it);
-			Roster.removeBuddy(session, buddy);
+			roster_util.updateBuddyChange(session, results, it);
+			roster_util.removeBuddy(session, buddy);
       results.offer(packet.okResult((String)null, 0));
     } else {
       String name = request.getAttribute("/iq/query/item", "name");
       if (name == null) {
         name = buddy;
       } // end of if (name == null)
-      Roster.setBuddyName(session, buddy, name);
+      roster_util.setBuddyName(session, buddy, name);
 			String type = request.getAttribute("/iq/query/item", "type");
 			if (type != null && type.equals(ANON)) {
-        Roster.setBuddySubscription(session, SubscriptionType.both, buddy);
+        roster_util.setBuddySubscription(session, SubscriptionType.both, buddy);
 				Element pres = (Element)session.getSessionData(Presence.PRESENCE_KEY);
 				if (pres == null) {
 					pres = new Element("presence");
@@ -164,8 +166,8 @@ public abstract class JabberIqRoster {
 				pres.setAttribute("from", session.getJID());
 				results.offer(new Packet(pres));
 			}
-      if (Roster.getBuddySubscription(session, buddy) == null) {
-        Roster.setBuddySubscription(session, SubscriptionType.none, buddy);
+      if (roster_util.getBuddySubscription(session, buddy) == null) {
+        roster_util.setBuddySubscription(session, SubscriptionType.none, buddy);
       } // end of if (getBuddySubscription(session, buddy) == null)
       List<Element> groups = item.getChildren();
       if (groups != null && groups.size() > 0) {
@@ -174,13 +176,13 @@ public abstract class JabberIqRoster {
         for (Element group : groups) {
 					gr[cnt++] = (group.getCData() == null ? "" : group.getCData());
         } // end of for (ElementData group : groups)
-        session.setDataList(Roster.groupNode(buddy), Roster.GROUPS, gr);
+        session.setDataList(roster_util.groupNode(buddy), roster_util.GROUPS, gr);
       } else {
-				session.removeData(Roster.groupNode(buddy), Roster.GROUPS);
+				session.removeData(roster_util.groupNode(buddy), roster_util.GROUPS);
 			} // end of else
       results.offer(packet.okResult((String)null, 0));
-      Roster.updateBuddyChange(session, results,
-				Roster.getBuddyItem(session, buddy));
+      roster_util.updateBuddyChange(session, results,
+				roster_util.getBuddyItem(session, buddy));
     } // end of else
   }
 
@@ -188,12 +190,12 @@ public abstract class JabberIqRoster {
 		final XMPPResourceConnection session,	final Queue<Packet> results,
 		final Map<String, Object> settings)
     throws NotAuthorizedException {
-    String[] buddies = Roster.getBuddies(session);
+    String[] buddies = roster_util.getBuddies(session);
     if (buddies != null) {
 			Element query = new Element("query");
 			query.setXMLNS(XMLNS);
       for (String buddy : buddies) {
-				Element buddy_item = Roster.getBuddyItem(session, buddy);
+				Element buddy_item = roster_util.getBuddyItem(session, buddy);
 				String item_group = buddy_item.getCData("/item/group");
 // 				if (item_group != null && !item_group.isEmpty()
 // 					&& !item_group.equals("Upline Support")) {
