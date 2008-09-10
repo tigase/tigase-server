@@ -68,6 +68,9 @@ public class JabberIqPrivacy extends XMPPProcessor
 		new Element("feature", new String[] {"var"}, new String[] {XMLNS})
 	};
 
+	private static RosterAbstract roster_util =
+    RosterFactory.getRosterImplementation(true);
+
   public Element[] supDiscoFeatures(final XMPPResourceConnection session)
 	{ return DISCO_FEATURES; }
 
@@ -137,7 +140,7 @@ public class JabberIqPrivacy extends XMPPProcessor
 							type_matched = from.contains(value);
 							break;
 						case group:
-							String[] groups = Roster.getBuddyGroups(session, from);
+							String[] groups = roster_util.getBuddyGroups(session, from);
 							if (groups != null) {
 								for (String group: groups) {
 									if (type_matched = group.equals(value)) {
@@ -150,18 +153,18 @@ public class JabberIqPrivacy extends XMPPProcessor
 							ITEM_SUBSCRIPTIONS subscr = ITEM_SUBSCRIPTIONS.valueOf(value);
 							switch (subscr) {
 							case to:
-								type_matched = Roster.isSubscribedTo(session, from);
+								type_matched = roster_util.isSubscribedTo(session, from);
 								break;
 							case from:
-								type_matched = Roster.isSubscribedFrom(session, from);
+								type_matched = roster_util.isSubscribedFrom(session, from);
 								break;
 							case none:
-								type_matched = (!Roster.isSubscribedFrom(session, from)
-									&& !Roster.isSubscribedTo(session, from));
+								type_matched = (!roster_util.isSubscribedFrom(session, from)
+									&& !roster_util.isSubscribedTo(session, from));
 								break;
 							case both:
-								type_matched = (Roster.isSubscribedFrom(session, from)
-									&& Roster.isSubscribedTo(session, from));
+								type_matched = (roster_util.isSubscribedFrom(session, from)
+									&& roster_util.isSubscribedTo(session, from));
 								break;
 							default:
 								break;
