@@ -758,12 +758,18 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		try {
 			checkConnection();
 			uid = getUserUID(user_id, autoCreateUser);
-			nid = getNodeNID(uid, subnode);
-			if (nid < 0) {
-				nid = createNodePath(user_id, subnode);
+			if (subnode != null) {
+				nid = getNodeNID(uid, subnode);
+				if (nid < 0) {
+					nid = createNodePath(user_id, subnode);
+				}
 			}
 			synchronized (insert_key_val_st) {
-				insert_key_val_st.setLong(1, nid);
+				if (nid > 0) {
+					insert_key_val_st.setLong(1, nid);
+				} else {
+					insert_key_val_st.setNull(1, Types.BIGINT);
+				}
 				insert_key_val_st.setLong(2, uid);
 				insert_key_val_st.setString(3, key);
 				for (String val: list) {
