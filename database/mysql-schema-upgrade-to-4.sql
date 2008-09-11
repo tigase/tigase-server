@@ -9,6 +9,8 @@ select NOW(), ' - Renaming old tig_pairs table for later convertion';
 alter table tig_pairs rename to tig_pairs_old;
 select NOW(), ' - Renaming old tig_nodes table for later convertion';
 alter table tig_nodes rename to tig_nodes_old;
+alter table tig_nodes_old add index parent_nid (parent_nid);
+alter table tig_nodes_old add index uid (uid);
 select NOW(), ' - Renaming old tig_users table for later convertion';
 alter table tig_users rename to tig_users_old;
 
@@ -39,8 +41,19 @@ insert into tig_nodes (uid, old_nid, node)
 	select tig_users.uid, nid, node from tig_users, tig_nodes_old
 		where (tig_nodes_old.uid = tig_users.old_uid);
 select NOW(), ' - Updating parent_nids in the new tig_nodes table';
-update tig_nodes, tig_nodes_old set tig_nodes.parent_nid = tig_nodes.nid
-	where (tig_nodes_old.parent_nid = tig_nodes.old_nid);
+
+create temporary table temp_nodes
+	select tig_nodes.uid as new_uid, tig_nodes.nid as new_nid,
+			tig_nodes_old.nid as old_nid, tig_nodes_old.parent_nid as old_parent_nid
+		from tig_nodes, tig_nodes_old where tig_nodes.old_nid = tig_nodes_old.nid;
+
+alter table temp_nodes add index new_nid (new_nid);
+alter table temp_nodes add index old_nid (old_nid);
+
+update tig_nodes, tig_nodes_old, temp_nodes
+	set tig_nodes.parent_nid = temp_nodes.new_nid
+	where (tig_nodes.old_nid = tig_nodes_old.nid)
+		AND (tig_nodes_old.parent_nid = temp_nodes.old_nid);
 
 select NOW(), ' - Loading tig_pairs table from old one with new uids and nids';
 insert into tig_pairs (nid, uid, pkey, pval)
