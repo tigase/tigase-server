@@ -420,7 +420,12 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 				// 			rs.next();
 				// 			max_uid = rs.getLong("max_uid");
 				// 			max_nid = rs.getLong("max_nid");
-				cache = Collections.synchronizedMap(new RepoCache(10000, 60*1000));
+				if (db_conn.contains("cacheRepo=off")) {
+					log.fine("Disabling cache.");
+					cache = Collections.synchronizedMap(new RepoCache(0, -1000));
+				} else {
+					cache = Collections.synchronizedMap(new RepoCache(10000, 60*1000));
+				}
 			}
 		} finally {
 			release(stmt, rs);
@@ -758,18 +763,12 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		try {
 			checkConnection();
 			uid = getUserUID(user_id, autoCreateUser);
-			if (subnode != null) {
-				nid = getNodeNID(uid, subnode);
-				if (nid < 0) {
-					nid = createNodePath(user_id, subnode);
-				}
+			nid = getNodeNID(uid, subnode);
+			if (nid < 0) {
+				nid = createNodePath(user_id, subnode);
 			}
 			synchronized (insert_key_val_st) {
-				if (nid > 0) {
-					insert_key_val_st.setLong(1, nid);
-				} else {
-					insert_key_val_st.setNull(1, Types.BIGINT);
-				}
+				insert_key_val_st.setLong(1, nid);
 				insert_key_val_st.setLong(2, uid);
 				insert_key_val_st.setString(3, key);
 				for (String val: list) {
