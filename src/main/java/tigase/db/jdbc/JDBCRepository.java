@@ -246,19 +246,30 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	}
 
 	private long getNodeNID(long uid, String node_path)
-		throws SQLException, UserNotFoundException {
+		throws SQLException, TigaseDBException, UserNotFoundException {
 		String query = buildNodeQuery(uid, node_path);
 		log.finest(query);
 		Statement stmt = null;
 		ResultSet rs = null;
+		long nid = -1;
 		try {
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(query);
 			if (rs.next()) {
-				return rs.getLong(1);
+				nid = rs.getLong(1);
 			} else {
-				return -1;
+				nid = -1;
 			} // end of if (isnext) else
+			if (nid <= 0) {
+				if (node_path == null) {
+					log.warning("Missing root node, database upgrade or bug in the code? Adding missing root node now.");
+					nid = addNode(uid, -1, "root");
+				} else {
+					log.warning("Something wrong with the database, missing nid for node path: "
+						+ node_path + " and uid: " + uid);
+				}
+			}
+			return nid;
 		} finally {
 			release(stmt, rs);
 			stmt = null; rs = null;
