@@ -40,8 +40,8 @@ select NOW(), ' - Copying tig_nodes data to a new table';
 insert into tig_nodes (uid, old_nid, node)
 	select tig_users.uid, nid, node from tig_users, tig_nodes_old
 		where (tig_nodes_old.uid = tig_users.old_uid);
-select NOW(), ' - Updating parent_nids in the new tig_nodes table';
 
+select NOW(), ' - Updating parent_nids in the new tig_nodes table';
 create temporary table temp_nodes
 	select tig_nodes.uid as new_uid, tig_nodes.nid as new_nid,
 			tig_nodes_old.nid as old_nid, tig_nodes_old.parent_nid as old_parent_nid
