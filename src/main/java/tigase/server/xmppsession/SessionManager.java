@@ -265,7 +265,7 @@ public class SessionManager extends AbstractMessageReceiver
 			} // end of for (XMPPPostprocessorIfc postproc: postProcessors)
 		} // end of if (!stop)
 
-		if (!stop && !packet.wasProcessed() && !isInRoutings(packet.getTo())
+		if (!stop && !packet.wasProcessed() && !isInRoutings(packet.getElemTo())
 			&& filter.process(packet, conn, naUserRepository, results)) {
 			packet.processedBy("filter-process");
 		}
