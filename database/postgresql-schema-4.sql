@@ -27,6 +27,62 @@
 --  psql -q -U tigase -d tigase -f postgresql-schema.sql
 
 
+create table tig_users (
+       uid serial,
+
+			 -- Jabber User ID
+       user_id varchar(2049) NOT NULL,
+			 -- User password encrypted or not
+			 user_pw varchar(255) default NULL,
+			 -- Time of the last user login
+			 last_login timestamp,
+			 -- Time of the last user logout
+			 last_logout timestamp,
+			 -- User online status, if > 0 then user is online, the value
+			 -- indicates the number of user connections.
+			 -- It is incremented on each user login and decremented on each
+			 -- user logout.
+			 online_status int default 0,
+			 -- Number of failed login attempts
+			 failed_logins int default 0,
+			 -- User status, whether the account is active or disabled
+			 -- >0 - account active, 0 - account disabled
+			 account_status int default 1,
+
+       primary key (uid)
+);
+create unique index user_id on tig_users ( user_id );
+create index user_pw on tig_users (user_pw);
+create index last_login on tig_users (last_login);
+create index last_logout on tig_users (last_logout);
+create index account_status on tig_users (account_status);
+create index online_status on tig_users (online_status);
+
+create table tig_nodes (
+       nid serial,
+       parent_nid bigint,
+       uid bigint NOT NULL references tig_users(uid),
+
+       node varchar(255) NOT NULL,
+
+       primary key (nid)
+);
+create unique index tnode on tig_nodes ( parent_nid, uid, node );
+create index node on tig_nodes ( node );
+create index nuid on tig_nodes (uid);
+create index parent_nid on tig_nodes (parent_nid);
+
+create table tig_pairs (
+       nid bigint references tig_nodes(nid),
+       uid bigint NOT NULL references tig_users(uid),
+
+       pkey varchar(255) NOT NULL,
+       pval text
+);
+create index pkey on tig_pairs ( pkey );
+create index puid on tig_pairs (uid);
+create index pnid on tig_pairs (nid);
+
 create table short_news (
   -- Automatic record ID
   snid            serial,
@@ -51,43 +107,6 @@ create table xmpp_stanza (
 			 stanza text NOT NULL
 );
 
-create table tig_users (
-       uid bigint NOT NULL,
-
-       user_id varchar(256) NOT NULL,
-
-       primary key (uid)
-);
-create unique index user_id on tig_users ( user_id );
-
-create table tig_nodes (
-       nid bigint NOT NULL,
-       parent_nid bigint,
-       uid bigint NOT NULL references tig_users(uid),
-
-       node varchar(128) NOT NULL,
-
-       primary key (nid)
-);
-create unique index tnode on tig_nodes ( parent_nid, uid, node );
-create index node on tig_nodes ( node );
-
-create table tig_pairs (
-       nid bigint references tig_nodes(nid),
-       uid bigint NOT NULL references tig_users(uid),
-
-       pkey varchar(128) NOT NULL,
-       pval text
-);
-create index pkey on tig_pairs ( pkey );
-
-create table tig_max_ids (
-       max_uid bigint,
-       max_nid bigint
-);
-
-
-insert into tig_max_ids (max_uid, max_nid) values (1, 1);
 
 -- Get top nodes for the user: user1@hostname
 --
