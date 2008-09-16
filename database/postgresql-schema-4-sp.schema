@@ -100,8 +100,10 @@ end;
 create or replace function TigGetUserDBUid(varchar(2049)) returns bigint as '
 declare
   _user_id alias for $1;
+  res_uid bigint;
 begin
-	select uid from tig_users where user_id = _user_id;
+	select uid into res_uid from tig_users where user_id = _user_id;
+  return res_uid;
 end;
 ' LANGUAGE 'plpgsql';
 
@@ -119,8 +121,10 @@ end;
 create or replace function TigGetPassword(varchar(2049)) returns varchar(255) as '
 declare
   _user_id alias for $1;
+  res_pw varchar(255);
 begin
-	select user_pw from tig_users where user_id = _user_id;
+	select user_pw into res_pw from tig_users where user_id = _user_id;
+  return res_pw;
 end;
 ' LANGUAGE 'plpgsql';
 
@@ -185,8 +189,11 @@ end;
 
 -- All users count
 create or replace function TigAllUsersCount() returns bigint as '
+declare
+  res_cnt bigint;
 begin
-	select count(*) from tig_users;
+	select count(*) into res_cnt from tig_users;
+  return res_cnt;
 end;
 ' LANGUAGE 'plpgsql';
 
