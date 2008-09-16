@@ -1,0 +1,320 @@
+-- Database stored procedures and fucntions for Tigase schema version 4.0.0
+
+create language plpgsql;
+
+-- Database properties get - function
+create or replace function TigGetDBProperty(varchar(255)) returns text as '
+declare
+  _result text;
+  _tkey alias for $1;
+begin
+
+	select pval into _result from tig_pairs, tig_users
+		where (pkey = _tkey) AND (user_id = ''db-properties'')
+					AND (tig_pairs.uid = tig_users.uid);
+
+	return _result;
+end;
+' LANGUAGE 'plpgsql';
+
+-- Database properties set - procedure
+create or replace function TigPutDBProperty(varchar(255), text) returns void as '
+declare
+  _tkey alias for $1;
+  _tval alias for $2;
+begin
+  if exists( select pval from tig_pairs, tig_users where
+		(user_id = ''db-properties'') AND (tig_users.uid = tig_pairs.uid)
+		AND (pkey = _tkey))
+  then
+	  update tig_pairs set pval = _tval
+      where (tig_users.user_id = ''db-properties'')
+        AND (tig_users.uid = tig_pairs.uid)
+        AND (pkey = _tkey);
+  else
+    insert into tig_pairs (pkey, pval, uid)
+		  select _tkey, _tval, uid from tig_users
+			  where (user_id = ''db-properties'');
+  end if;
+  return;
+end;
+' LANGUAGE 'plpgsql';
+
+-- The initialization of the database.
+-- The procedure should be called manually somehow before starting the
+-- server. In theory the server could call the procedure automatically
+-- at the startup time but I don't know yet how to solve the problem
+-- with multiple cluster nodes starting at later time when the server
+-- is already running.
+create or replace function TigInitdb() returns void as '
+begin
+	update tig_users set online_status = 0;
+  return;
+end;
+' LANGUAGE 'plpgsql';
+
+-- Add a new user to the database assuming the user password is already
+-- encoded properly according to the database settings.
+-- If password is not encoded TigAddUserPlainPw should be used instead.
+create or replace function TigAddUser(varchar(2049), varchar(255))
+  returns bigint as '
+declare
+  _user_id alias for $1;
+  _user_pw alias for $2;
+  _res_uid bigint;
+begin
+	insert into tig_users (user_id, sha1_user_id, user_pw)
+		values (_user_id, sha1(_user_id), _user_pw)
+    returning uid into _res_uid;
+
+	insert into tig_nodes (parent_nid, uid, node)
+		values (NULL, _res_uid, ''root'');
+
+	return _res_uid as uid;
+end;
+' LANGUAGE 'plpgsql';
+
+-- Takes plain text user password and converts it to internal representation
+-- and creates a new user account.
+create or replace function TigAddUserPlainPw(varchar(2049), varchar(255))
+  returns bigint as '
+declare
+  _user_id alias for $1;
+  _user_pw alias for $2;
+  _enc text;
+  _res_uid bigint;
+begin
+	select TigGetDBProperty(''password-encoding'') into _enc;
+  select
+    case _enc
+ 		when ''MD5-PASSWORD'' then TigAddUser(_user_id, MD5(_user_pw))
+	  when ''MD5-USERID-PASSWORD'' then TigAddUser(_user_id, MD5(_user_id || _user_pw))
+	  else TigAddUser(_user_id, _user_pw)
+	  end into _res_uid;
+	return _res_uid as uid;
+end;
+' LANGUAGE 'plpgsql';
+
+-- Low level database user id as big number. Used only for performance reasons
+-- and save database space. Besides JID is too large to server as UID
+create or replace function TigGetUserDBUid(varchar(2049)) returns bigint as '
+declare
+  _user_id alias for $1;
+begin
+	select uid from tig_users where user_id = _user_id;
+end;
+' LANGUAGE 'plpgsql';
+
+-- Removes a user from the database
+create or replace function TigRemoveUser(varchar(2049)) returns void as '
+declare
+  _user_id alias for $1;
+begin
+	delete from tig_users where user_id = _user_id;
+  return;
+end;
+' LANGUAGE 'plpgsql';
+
+-- Returns user's password from the database
+create or replace function TigGetPassword(varchar(2049)) returns varchar(255) as '
+declare
+  _user_id alias for $1;
+begin
+	select user_pw from tig_users where user_id = _user_id;
+end;
+' LANGUAGE 'plpgsql';
+
+-- Takes plain text user password and converts it to internal representation
+create or replace function TigUpdatePasswordPlainPw(varchar(2049), varchar(255))
+  returns void as '
+declare
+  _user_id alias for $1;
+  _user_pw alias for $2;
+  _enc text;
+begin
+	select TigGetDBProperty(''password-encoding'') into _enc;
+  select
+    case _enc
+		when ''MD5-PASSWORD'' then TigUpdatePassword(_user_id, MD5(_user_pw))
+		when ''MD5-USERID-PASSWORD'' then
+      TigUpdatePassword(_user_id, MD5(_user_id || _user_pw))
+		else TigUpdatePassword(_user_id, _user_pw)
+		end;
+  return;
+end;
+' LANGUAGE 'plpgsql';
+
+-- Update user password
+create or replace function TigUpdatePassword(varchar(2049), varchar(255))
+  returns void as '
+declare
+  _user_id alias for $1;
+  _user_pw alias for $2;
+begin
+	update tig_users set user_pw = _user_pw where user_id = _user_id;
+  return;
+end;
+' LANGUAGE 'plpgsql';
+
+-- List all online users
+create or replace function TigOnlineUsers() returns void as '
+begin
+  return;
+	select user_id, last_login, last_logout, online_status, failed_logins, account_status
+		from tig_users where online_status > 0;
+end;
+' LANGUAGE 'plpgsql';
+
+-- List all offline users
+create or replace function TigOfflineUsers() returns void as '
+begin
+  return;
+	select user_id, last_login, last_logout, online_status, failed_logins, account_status
+		from tig_users where online_status = 0;
+end;
+' LANGUAGE 'plpgsql';
+
+-- List of all users in database
+create or replace function TigAllUsers() returns void as '
+begin
+  return;
+	select user_id, last_login, last_logout, online_status, failed_logins, account_status
+		from tig_users;
+end;
+' LANGUAGE 'plpgsql';
+
+-- All users count
+create or replace function TigAllUsersCount() returns bigint as '
+begin
+	select count(*) from tig_users;
+end;
+' LANGUAGE 'plpgsql';
+
+-- Performs user login for a plain text password, converting it to an internal
+-- representation if necessary
+create or replace function TigUserLoginPlainPw(varchar(2049), varchar(255),
+			 					 out varchar(2049)) returns varchar(2049) as '
+declare
+  _user_id alias for $1;
+  _user_pw alias for $2;
+  res_user_id alias for $3;
+  _enc text;
+begin
+	select TigGetDBProperty(''password-encoding'') into _enc;
+  select
+    case _enc
+		when ''MD5-PASSWORD'' then TigUserLogin(_user_id, MD5(_user_pw), res_user_id)
+		when ''MD5-USERID-PASSWORD'' then
+      TigUserLogin(_user_id, MD5(CONCAT(_user_id, _user_pw)), res_user_id)
+		else TigUserLogin(_user_id, _user_pw, res_user_id)
+		end;
+  return;
+end;
+' LANGUAGE 'plpgsql';
+
+-- Perforrm user login. It returns user_id uppon success and NULL
+-- on failure.
+-- If the login is successful it also increases online_status and sets
+-- last_login time to the current timestamp
+create or replace function TigUserLogin(varchar(2049), varchar(255),
+			 					 out varchar(2049)) returns varchar(2049) as '
+declare
+  _user_id alias for $1;
+  _user_pw alias for $2;
+  res_user_id alias for $3;
+begin
+	if exists(select user_id from tig_users
+		where (account_status > 0) AND (user_id = _user_id) AND (user_pw = _user_pw))
+	then
+		update tig_users
+			set online_status = online_status + 1, last_login = now()
+			where user_id = _user_id returning user_id into res_user_id;
+	else
+		update tig_users set failed_logins = failed_logins + 1 where user_id = _user_id
+      returning NULL into res_user_id;
+	end if;
+  return;
+end;
+' LANGUAGE 'plpgsql';
+
+-- It decreases online_status and sets last_logout time to the current timestamp
+create or replace function TigUserLogout(varchar(2049)) returns void as '
+declare
+  _user_id alias for $1;
+begin
+	update tig_users
+		set online_status = greatest(online_status - 1, 0),
+			last_logout = now()
+		where user_id = _user_id;
+  return;
+end;
+' LANGUAGE 'plpgsql';
+
+-- Disable user account
+create or replace function TigDisableAccount(varchar(2049)) returns void as '
+declare
+  _user_id alias for $1;
+begin
+	update tig_users set account_status = 0 where user_id = _user_id;
+  return;
+end;
+' LANGUAGE 'plpgsql';
+
+-- Enable user account
+create or replace function TigEnableAccount(varchar(2049)) returns void as '
+declare
+  _user_id alias for $1;
+begin
+	update tig_users set account_status = 1 where user_id = _user_id;
+  return;
+end;
+' LANGUAGE 'plpgsql';
+
+-- Get list of all active user accounts
+create or replace function TigActiveAccounts() returns void as '
+begin
+  return;
+	select user_id, last_login, last_logout, online_status, failed_logins, account_status
+		from tig_users where account_status > 0;
+end;
+' LANGUAGE 'plpgsql';
+
+-- Get list of all disabled user accounts
+create or replace function TigDisabledAccounts() returns void as '
+begin
+  return;
+	select user_id, last_login, last_logout, online_status, failed_logins, account_status
+		from tig_users where account_status = 0;
+end;
+' LANGUAGE 'plpgsql';
+
+-- Helper procedure for adding a new node
+create or replace function TigAddNode(bigint, bigint, varchar(255))
+  returns bigint as '
+declare
+  _parent_nid alias for $1;
+  _uid alias for $2;
+  _node alias for $3;
+  res_nid bigint;
+begin
+	insert into tig_nodes (parent_nid, uid, node)
+		values (_parent_nid, _uid, _node) returning nid into res_nid;
+  return res_nid;
+end;
+' LANGUAGE 'plpgsql';
+
+create or replace function TigUsers2Ver4Convert() returns void as '
+declare
+  user_row RECORD;
+begin
+
+  for user_row in
+		select user_id, pval as password
+			from tig_users, tig_pairs
+			where tig_users.uid = tig_pairs.uid and pkey = ''password'' loop
+		perform TigUpdatePasswordPlainPw(user_row.user_id, user_row.password);
+	END LOOP;
+
+end;
+' LANGUAGE 'plpgsql';
+

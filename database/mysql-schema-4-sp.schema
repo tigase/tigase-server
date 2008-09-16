@@ -43,10 +43,18 @@ end //
 -- Database properties set - procedure
 create procedure TigPutDBProperty(_tkey varchar(255), _tval mediumtext)
 begin
-	insert into tig_pairs (pkey, pval, uid)
-		select _tkey, _tval, uid from tig_users
-			where (user_id = 'db-properties')
-	  ON DUPLICATE KEY UPDATE pval = _tval;
+  if exists( select pval from tig_pairs, tig_users where
+		(user_id = 'db-properties') AND (tig_users.uid = tig_pairs.uid)
+		AND (pkey = _tkey))
+  then
+	  update tig_pairs, tig_users set pval = _tval
+      where (user_id = 'db-properties') AND (tig_users.uid = tig_pairs.uid)
+        AND (pkey = _tkey);
+  else
+    insert into tig_pairs (pkey, pval, uid)
+		  select _tkey, _tval, uid from tig_users
+			  where (user_id = 'db-properties');
+  end if;
 end //
 
 -- The initialization of the database.

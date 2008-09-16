@@ -28,7 +28,7 @@
 
 
 create table tig_users (
-       uid serial,
+       uid bigserial,
 
 			 -- Jabber User ID
        user_id varchar(2049) NOT NULL,
@@ -59,7 +59,7 @@ create index account_status on tig_users (account_status);
 create index online_status on tig_users (online_status);
 
 create table tig_nodes (
-       nid serial,
+       nid bigserial,
        parent_nid bigint,
        uid bigint NOT NULL references tig_users(uid),
 
@@ -85,7 +85,7 @@ create index pnid on tig_pairs (nid);
 
 create table short_news (
   -- Automatic record ID
-  snid            serial,
+  snid            bigserial,
   -- Automaticly generated timestamp and automaticly updated on change
   publishing_time timestamp default now(),
 	-- Optional news type: 'shorts', 'minis', 'techs', 'funs'....
@@ -103,47 +103,10 @@ create index author on short_news (author);
 create index news_type on short_news (news_type);
 
 create table xmpp_stanza (
-			 id serial,
+			 id bigserial,
 			 stanza text NOT NULL
 );
 
+\i database/postgresql-schema-4-sp.schema
 
--- Get top nodes for the user: user1@hostname
---
--- select nid, node from nodes, users
---   where ('user1@hostname' = user_id)
---     AND (nodes.uid = users.uid)
---     AND (parent_nid is null);
 
--- Get all subnodes of the node: /privacy/default for user: user1@hostname
---
--- select nid, node from nodes,
--- (
---   select nid as dnid from nodes,
---   (
---     select nid as pnid from nodes, users
---       where ('user1@hostname' = user_id)
---         AND (nodes.uid = users.uid)
---         AND (parent_nid is null)
---         AND (node = 'privacy')
---   ) ptab where (parent_nid = pnid)
---       AND (node = 'default')
--- ) dtab where (parent_nid = dnid);
-
--- Get all keys (pairs) for the node: /privacy/default/24 for user: user1@hostname
---
--- select  pkey, pval from pairs,
--- (
---   select nid, node from nodes,
---   (
---     select nid as dnid from nodes,
---     (
---       select nid as pnid from nodes, users
---         where ('user1@hostname' = user_id)
---           AND (nodes.uid = users.uid)
---     	  AND (parent_nid is null)
---     	  AND (node = 'privacy')
---     ) ptab where (parent_nid = pnid)
---         AND (node = 'default')
---   ) dtab where (parent_nid = dnid)
--- ) ntab where (pairs.nid = ntab.nid) AND (node = '24');
