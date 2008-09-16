@@ -27,7 +27,7 @@ begin
 		(user_id = ''db-properties'') AND (tig_users.uid = tig_pairs.uid)
 		AND (pkey = _tkey))
   then
-	  update tig_pairs set pval = _tval
+	  update tig_pairs set pval = _tval from tig_users
       where (tig_users.user_id = ''db-properties'')
         AND (tig_users.uid = tig_pairs.uid)
         AND (pkey = _tkey);
@@ -63,8 +63,8 @@ declare
   _user_pw alias for $2;
   _res_uid bigint;
 begin
-	insert into tig_users (user_id, sha1_user_id, user_pw)
-		values (_user_id, sha1(_user_id), _user_pw)
+	insert into tig_users (user_id, user_pw)
+		values (_user_id, _user_pw)
     returning uid into _res_uid;
 
 	insert into tig_nodes (parent_nid, uid, node)

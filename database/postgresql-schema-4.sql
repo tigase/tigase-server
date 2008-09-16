@@ -108,5 +108,7 @@ create table xmpp_stanza (
 );
 
 \i database/postgresql-schema-4-sp.schema
-
-
+-- This is a dummy user who keeps all the database-properties
+select TigAddUserPlainPw('db-properties', NULL);
+select now(), ' - Setting schema version to 4.0';
+select TigPutDBProperty('schema-version', '4.0');
