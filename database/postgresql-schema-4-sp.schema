@@ -137,7 +137,7 @@ declare
   _enc text;
 begin
 	select TigGetDBProperty(''password-encoding'') into _enc;
-  select
+  perform
     case _enc
 		when ''MD5-PASSWORD'' then TigUpdatePassword(_user_id, MD5(_user_pw))
 		when ''MD5-USERID-PASSWORD'' then
@@ -321,7 +321,7 @@ begin
 			where tig_users.uid = tig_pairs.uid and pkey = ''password'' loop
 		perform TigUpdatePasswordPlainPw(user_row.user_id, user_row.password);
 	END LOOP;
-
+  return;
 end;
 ' LANGUAGE 'plpgsql';
 
