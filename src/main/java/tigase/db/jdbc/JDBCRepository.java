@@ -90,8 +90,8 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	private CallableStatement all_users_sp = null;
 	private CallableStatement user_add_sp = null;
 	private CallableStatement user_del_sp = null;
+	private CallableStatement node_add_sp = null;
 
-	private PreparedStatement node_add_sp = null;
 	private PreparedStatement data_for_node_st = null;
 	private PreparedStatement keys_for_node_st = null;
 	private PreparedStatement nodes_for_node_st = null;
@@ -265,7 +265,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 					log.warning("Missing root node, database upgrade or bug in the code? Adding missing root node now.");
 					nid = addNode(uid, -1, "root");
 				} else {
-					log.warning("Something wrong with the database, missing nid for node path: "
+					log.finest("Missing nid for node path: "
 						+ node_path + " and uid: " + uid);
 				}
 			}
@@ -303,11 +303,13 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 				} // end of else
 				node_add_sp.setLong(2, uid);
 				node_add_sp.setString(3, node_name);
+				//node_add_sp.registerOutParameter(4, Types.BIGINT);
 				rs = node_add_sp.executeQuery();
 				if (rs.next()) {
 					return rs.getLong(1);
 				} else {
-					throw new TigaseDBException("Propeblem adding new user to repository. "
+					log.warning("Missing NID after adding new node...");
+					throw new TigaseDBException("Propeblem adding new node. "
 						+ "The SP should return nid or fail");
 				} // end of if (isnext) else
 			} finally {
@@ -358,7 +360,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 
 
 		query = "{ call TigAddNode(?, ?, ?) }";
-		node_add_sp = conn.prepareStatement(query);
+		node_add_sp = conn.prepareCall(query);
 
 		query = "select pval from " + pairs_tbl
 			+ " where (nid = ?) AND (pkey = ?);";
@@ -540,6 +542,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 					uid = rs.getLong(1);
 					//addNode(uid, -1, root_node);
 				} else {
+					log.warning("Missing UID after adding new user...");
 					throw new TigaseDBException("Propeblem adding new user to repository. "
 						+ "The SP should return uid or fail");
 				} // end of if (isnext) else
