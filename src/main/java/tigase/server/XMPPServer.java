@@ -153,7 +153,11 @@ public class XMPPServer {
 		try {
 			config = new Configurator(config_file, args);
 		} catch (XMLDBException e) {
-			System.err.println("Invalid XML configuration file: " + config_file);
+			System.err.println("");
+			System.err.println("  --------------------------------------");
+			System.err.println("  ERROR! Terminating the server process.");
+			System.err.println("  Invalid XML configuration file: " + config_file);
+			System.err.println("  Please fix the problem and start the server again.");
 			System.exit(1);
 		}
 		config.setName("basic-conf");

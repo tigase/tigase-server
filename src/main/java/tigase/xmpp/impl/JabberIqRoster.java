@@ -195,12 +195,17 @@ public abstract class JabberIqRoster {
 			Element query = new Element("query");
 			query.setXMLNS(XMLNS);
       for (String buddy : buddies) {
-				Element buddy_item = roster_util.getBuddyItem(session, buddy);
-				String item_group = buddy_item.getCData("/item/group");
-// 				if (item_group != null && !item_group.isEmpty()
-// 					&& !item_group.equals("Upline Support")) {
+				try {
+					Element buddy_item = roster_util.getBuddyItem(session, buddy);
+					String item_group = buddy_item.getCData("/item/group");
 					query.addChild(buddy_item);
-// 				}
+				} catch (Exception e) {
+					// It happens that some weird JIDs drive database crazy and
+					// it throws exceptions. Let's for now just ignore those
+					// contacts....
+					log.info("Can not retrieve data for contact: " + buddy
+						+ ", an exception occurs: " + e);
+				}
       }
 			if (query.getChildren() != null && query.getChildren().size() > 0) {
 				results.offer(packet.okResult(query, 0));
