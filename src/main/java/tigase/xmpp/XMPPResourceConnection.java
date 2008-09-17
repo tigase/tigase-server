@@ -359,7 +359,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	}
 
 	public Authorization unregister(final String name_param)
-		throws NotAuthorizedException {
+		throws NotAuthorizedException, TigaseDBException {
 		Authorization auth_res = super.unregister(name_param);
 // 		if (auth_res == Authorization.AUTHORIZED) {
 // 			List<XMPPResourceConnection> res_conn =
@@ -375,7 +375,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	}
 
   public final Authorization loginPlain(String user, String password)
-		throws NotAuthorizedException, AuthorizationException {
+		throws NotAuthorizedException, AuthorizationException, TigaseDBException {
 		Authorization result = super.loginPlain(user, password);
 		if (result == Authorization.AUTHORIZED) {
 			loginHandler.handleLogin(user, this);
@@ -385,7 +385,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 
   public final Authorization loginDigest(String user, String digest,
 		String id, String alg)
-		throws NotAuthorizedException, AuthorizationException {
+		throws NotAuthorizedException, AuthorizationException, TigaseDBException {
 		Authorization result = super.loginDigest(user, digest, id, alg);
 		if (result == Authorization.AUTHORIZED) {
 			loginHandler.handleLogin(user, this);
@@ -394,7 +394,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	}
 
   public final Authorization loginOther(Map<String, Object> props)
-		throws NotAuthorizedException, AuthorizationException {
+		throws NotAuthorizedException, AuthorizationException, TigaseDBException {
 		Authorization result = super.loginOther(props);
 		if (result == Authorization.AUTHORIZED) {
 			String user = (String)props.get(UserAuthRepository.USER_ID_KEY);

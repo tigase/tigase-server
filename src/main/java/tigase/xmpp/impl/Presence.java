@@ -41,6 +41,7 @@ import tigase.xmpp.XMPPException;
 import tigase.server.Packet;
 import tigase.db.UserNotFoundException;
 import tigase.db.NonAuthUserRepository;
+import tigase.db.TigaseDBException;
 import tigase.util.JIDUtils;
 
 import static tigase.xmpp.impl.Roster.SubscriptionType;
@@ -103,7 +104,12 @@ public abstract class Presence {
 					sendPresenceBroadcast(StanzaType.unavailable, session,
 						FROM_SUBSCRIBED, results, null, settings);
 					updateOfflineChange(session, results);
-				} catch (NotAuthorizedException e) { } // end of try-catch
+				} catch (NotAuthorizedException e) {
+					// Do nothing, it may happen quite often when the user disconnects before
+					// it authenticates
+				} catch (TigaseDBException e) {
+					log.warning("Error accessing database for offline message: " + e);
+				} // end of try-catch
 			}
 			if (session.isAnonymous()) {
 				Set<String> direct_presences =
@@ -143,7 +149,7 @@ public abstract class Presence {
 		final EnumSet<SubscriptionType> subscrs,
 		final Queue<Packet> results, final Element pres,
 		final Map<String, Object> settings)
-		throws NotAuthorizedException {
+		throws NotAuthorizedException, TigaseDBException {
     String[] buddies = roster_util.getBuddies(session, subscrs);
 		buddies = DynamicRoster.addBuddies(session, settings, buddies);
     if (buddies != null) {
@@ -163,7 +169,7 @@ public abstract class Presence {
 
 	protected static void resendPendingInRequests(final XMPPResourceConnection session,
     final Queue<Packet> results)
-    throws NotAuthorizedException {
+    throws NotAuthorizedException, TigaseDBException {
 		String[] buddies = roster_util.getBuddies(session, roster_util.PENDING_IN);
 		if (buddies != null) {
 			for (String buddy: buddies) {
@@ -649,6 +655,8 @@ public abstract class Presence {
 					packet.getStringData());
 				results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 						"You must authorize session first.", true));
+			} catch (TigaseDBException e) {
+				log.warning("Error accessing database for presence data: " + e);
 			} // end of try-catch
 		}
 	}

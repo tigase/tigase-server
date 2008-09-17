@@ -36,6 +36,7 @@ import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.util.JIDUtils;
+import tigase.db.TigaseDBException;
 
 /**
  * Describe class RosterFlat here.
@@ -53,33 +54,32 @@ public class RosterFlat extends RosterAbstract {
    */
   private static Logger log =	Logger.getLogger("tigase.xmpp.impl.RosterFlat");
 
-	
-
 	public String[] getBuddies(final XMPPResourceConnection session)
-    throws NotAuthorizedException {
+    throws NotAuthorizedException, TigaseDBException {
     return session.getDataGroups(ROSTER);
   }
 
   public String getBuddyName(final XMPPResourceConnection session,
 		final String buddy)
-    throws NotAuthorizedException {
+    throws NotAuthorizedException, TigaseDBException {
     return session.getData(groupNode(buddy), NAME, null);
   }
 
   public void setBuddyName(final XMPPResourceConnection session,
-		final String buddy, final String name) throws NotAuthorizedException {
+		final String buddy, final String name)
+    throws NotAuthorizedException, TigaseDBException {
     session.setData(groupNode(buddy), NAME, name);
   }
 
   public void setBuddySubscription(final XMPPResourceConnection session,
     final SubscriptionType subscription, final String buddy)
-		throws NotAuthorizedException {
+		throws NotAuthorizedException, TigaseDBException {
     session.setData(groupNode(buddy), SUBSCRIPTION, subscription.toString());
   }
 
   public SubscriptionType getBuddySubscription(
 		final XMPPResourceConnection session,
-    final String buddy) throws NotAuthorizedException {
+    final String buddy) throws NotAuthorizedException, TigaseDBException {
 		//		return SubscriptionType.both;
 		String subscr = session.getData(groupNode(buddy),	SUBSCRIPTION, null);
 		if (subscr != null) {
@@ -89,13 +89,13 @@ public class RosterFlat extends RosterAbstract {
   }
 
 	public boolean removeBuddy(final XMPPResourceConnection session,
-		final String jid) throws NotAuthorizedException {
+		final String jid) throws NotAuthorizedException, TigaseDBException {
 		session.removeDataGroup(groupNode(jid));
 		return true;
 	}
 
 	public void addBuddy(final XMPPResourceConnection session,
-		final String jid) throws NotAuthorizedException {
+		final String jid) throws NotAuthorizedException, TigaseDBException {
 		String nick = JIDUtils.getNodeNick(jid);
 		if (nick == null) {
 			nick = jid;
@@ -107,7 +107,7 @@ public class RosterFlat extends RosterAbstract {
 
   public String[] getBuddyGroups(final XMPPResourceConnection session,
 		final String buddy)
-    throws NotAuthorizedException {
+    throws NotAuthorizedException, TigaseDBException {
     return session.getDataList(groupNode(buddy), GROUPS);
   }
 

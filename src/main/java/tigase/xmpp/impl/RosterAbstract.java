@@ -457,19 +457,19 @@ public abstract class RosterAbstract {
 	}
 
 	public boolean isPendingIn(final XMPPResourceConnection session,
-		final String jid) throws NotAuthorizedException {
+		final String jid) throws NotAuthorizedException, TigaseDBException {
 		SubscriptionType subscr = getBuddySubscription(session, jid);
 		return PENDING_IN.contains(subscr);
 	}
 
 	public boolean isSubscribedTo(final XMPPResourceConnection session,
-		final String jid) throws NotAuthorizedException {
+		final String jid) throws NotAuthorizedException, TigaseDBException {
 		SubscriptionType subscr = getBuddySubscription(session, jid);
 		return TO_SUBSCRIBED.contains(subscr);
 	}
 
 	public boolean isSubscribedFrom(final XMPPResourceConnection session,
-		final String jid) throws NotAuthorizedException {
+		final String jid) throws NotAuthorizedException, TigaseDBException {
 		SubscriptionType subscr = getBuddySubscription(session, jid);
 		return FROM_SUBSCRIBED.contains(subscr);
 	}
@@ -484,7 +484,7 @@ public abstract class RosterAbstract {
 
   public String[] getBuddies(final XMPPResourceConnection session,
 		final EnumSet<SubscriptionType> subscrs)
-    throws NotAuthorizedException {
+    throws NotAuthorizedException, TigaseDBException {
     final String[] allBuddies = getBuddies(session);
     if (allBuddies == null) {
       return null;
@@ -501,7 +501,7 @@ public abstract class RosterAbstract {
 
 	public boolean updateBuddySubscription(
 		final XMPPResourceConnection session,	final PresenceType presence,
-		final String jid) throws NotAuthorizedException {
+		final String jid) throws NotAuthorizedException, TigaseDBException {
 		SubscriptionType current_subscription =	getBuddySubscription(session, jid);
 		log.finest("current_subscription="+current_subscription
 			+" for jid="+jid);
@@ -526,7 +526,7 @@ public abstract class RosterAbstract {
 
   public Element getBuddyItem(final XMPPResourceConnection session,
 		final String buddy)
-    throws NotAuthorizedException {
+    throws NotAuthorizedException, TigaseDBException {
 		SubscriptionType subscr = getBuddySubscription(session, buddy);
     if (subscr == null) {
 			subscr = SubscriptionType.none;
@@ -552,7 +552,7 @@ public abstract class RosterAbstract {
 
 	public void updateBuddyChange(final XMPPResourceConnection session,
 		final Queue<Packet> results, final Element item)
-		throws NotAuthorizedException {
+		throws NotAuthorizedException, TigaseDBException {
 		Element update = new Element("iq");
 		update.setAttribute("type", StanzaType.set.toString());
 		Element query = new Element("query");
@@ -571,33 +571,35 @@ public abstract class RosterAbstract {
 	}
 
   public abstract String[] getBuddies(final XMPPResourceConnection session)
-    throws NotAuthorizedException;
+    throws NotAuthorizedException, TigaseDBException;
 
   public abstract String getBuddyName(final XMPPResourceConnection session,
 		final String buddy)
-    throws NotAuthorizedException;
+    throws NotAuthorizedException, TigaseDBException;
 
   public abstract void setBuddyName(final XMPPResourceConnection session,
-		final String buddy, final String name) throws NotAuthorizedException;
+		final String buddy, final String name)
+    throws NotAuthorizedException, TigaseDBException;
 
   public abstract void setBuddySubscription(final XMPPResourceConnection session,
     final SubscriptionType subscription, final String buddy)
-		throws NotAuthorizedException;
+		throws NotAuthorizedException, TigaseDBException;
 
   public abstract SubscriptionType getBuddySubscription(
 		final XMPPResourceConnection session,
-    final String buddy) throws NotAuthorizedException;
+    final String buddy) throws NotAuthorizedException, TigaseDBException;
 
 	public abstract boolean removeBuddy(final XMPPResourceConnection session,
-		final String jid) throws NotAuthorizedException;
+		final String jid) throws NotAuthorizedException, TigaseDBException;
 
 	public abstract void addBuddy(final XMPPResourceConnection session,
-		final String jid) throws NotAuthorizedException;
+		final String jid) throws NotAuthorizedException, TigaseDBException;
 
   public abstract String[] getBuddyGroups(final XMPPResourceConnection session,
 		final String buddy)
-    throws NotAuthorizedException;
+    throws NotAuthorizedException, TigaseDBException;
 
-	public void init(UserRepository repo) throws TigaseDBException {}
+	public void init(UserRepository repo)
+    throws TigaseDBException, TigaseDBException {}
 
 }

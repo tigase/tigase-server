@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 import tigase.xml.Element;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
+import tigase.db.TigaseDBException;
 
 /**
  * Class defining data structure for privacy lists.
@@ -78,7 +79,7 @@ public class Privacy {
 
 
 	public static String[] getLists(XMPPResourceConnection session)
-    throws NotAuthorizedException {
+    throws NotAuthorizedException, TigaseDBException {
     return session.getDataGroups(PRIVACY);
 	}
 
@@ -87,7 +88,7 @@ public class Privacy {
 	}
 
 	public static void setDefaultList(XMPPResourceConnection session,
-		Element list) throws NotAuthorizedException {
+		Element list) throws NotAuthorizedException, TigaseDBException {
 		if (list.getAttribute(NAME) != null) {
 			session.setData(PRIVACY, DEFAULT, list.getAttribute(NAME));
 		} else {
@@ -96,12 +97,12 @@ public class Privacy {
 	}
 
 	public static String getDefaultList(XMPPResourceConnection session)
-    throws NotAuthorizedException {
+    throws NotAuthorizedException, TigaseDBException {
 		return session.getData(PRIVACY, DEFAULT, null);
 	}
 
 	public static void setActiveList(XMPPResourceConnection session, String lName)
-    throws NotAuthorizedException {
+    throws NotAuthorizedException, TigaseDBException {
 		if (lName != null) {
 			Element list = getList(session, lName);
 			session.putSessionData(ACTIVE, list);
@@ -126,7 +127,7 @@ public class Privacy {
 	}
 
 	public static void addList(XMPPResourceConnection session,
-		Element list) throws NotAuthorizedException {
+		Element list) throws NotAuthorizedException, TigaseDBException {
 
 		String lNode = listNode(list.getAttribute(NAME));
 
@@ -159,7 +160,7 @@ public class Privacy {
 	}
 
 	public static Element getList(XMPPResourceConnection session,
-		String list) throws NotAuthorizedException {
+		String list) throws NotAuthorizedException, TigaseDBException {
 		String lNode = listNode(list);
 		String[] items = session.getDataGroups(lNode);
 		if (items != null) {

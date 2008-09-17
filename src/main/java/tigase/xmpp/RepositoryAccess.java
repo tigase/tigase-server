@@ -92,7 +92,7 @@ public abstract class RepositoryAccess {
 	public abstract String getDomain();
 
 	public Authorization unregister(final String name_param)
-		throws NotAuthorizedException {
+		throws NotAuthorizedException, TigaseDBException {
     if (!isAuthorized()) {
       return Authorization.FORBIDDEN;
     }
@@ -119,7 +119,7 @@ public abstract class RepositoryAccess {
 
 	public Authorization register(final String name_param,
 		final String pass_param, final String email_param)
-		throws NotAuthorizedException {
+		throws NotAuthorizedException, TigaseDBException {
     // Some clients send plain user name and others send
     // jid as user name. Let's resolve this here.
     String user_name = JIDUtils.getNodeNick(name_param);
@@ -155,7 +155,7 @@ public abstract class RepositoryAccess {
 
   private Authorization changeRegistration(final String name_param,
     final String pass_param, final String email_param)
-		throws NotAuthorizedException {
+		throws NotAuthorizedException, TigaseDBException {
 
     if (name_param == null || name_param.equals("")
       || pass_param == null || pass_param.equals("")) {
@@ -171,7 +171,7 @@ public abstract class RepositoryAccess {
   }
 
   private void setRegistration(final String name_param,
-    final String pass_param, final String email_param) {
+    final String pass_param, final String email_param) throws TigaseDBException {
     try {
       authRepo.updatePassword(JIDUtils.getNodeID(name_param, getDomain()),
 				pass_param);
@@ -181,8 +181,8 @@ public abstract class RepositoryAccess {
       }
     } catch (UserNotFoundException e) {
       log.log(Level.WARNING, "Problem accessing reposiotry: ", e);
-    } catch (TigaseDBException e) {
-			log.log(Level.SEVERE, "Repository access exception.", e);
+//     } catch (TigaseDBException e) {
+// 			log.log(Level.SEVERE, "Repository access exception.", e);
 		} // end of try-catch
   }
 
@@ -229,7 +229,7 @@ public abstract class RepositoryAccess {
    * @return a <code>Authorization</code> value of result code.
    */
   public Authorization loginPlain(String user, String password)
-		throws NotAuthorizedException, AuthorizationException {
+		throws NotAuthorizedException, AuthorizationException, TigaseDBException {
 		try {
 			if (authRepo.plainAuth(JIDUtils.getNodeID(user, getDomain()), password)) {
 				authState = Authorization.AUTHORIZED;
@@ -238,9 +238,9 @@ public abstract class RepositoryAccess {
     } catch (UserNotFoundException e) {
       log.info("User not found, authorization failed: " + user);
       throw new NotAuthorizedException("Authorization failed", e);
-    } catch (TigaseDBException e) {
-			log.log(Level.SEVERE, "Repository access exception.", e);
-      throw new NotAuthorizedException("Authorization failed", e);
+//     } catch (TigaseDBException e) {
+// 			log.log(Level.SEVERE, "Repository access exception.", e);
+//       throw new NotAuthorizedException("Authorization failed", e);
 		} // end of try-catch
   }
 
@@ -249,7 +249,7 @@ public abstract class RepositoryAccess {
 	}
 
   public Authorization loginOther(Map<String, Object> props)
-		throws NotAuthorizedException, AuthorizationException {
+		throws NotAuthorizedException, AuthorizationException, TigaseDBException {
 		try {
 			String mech = (String)props.get(UserAuthRepository.MACHANISM_KEY);
 			if (anon_allowed && mech != null && mech.equals(ANONYMOUS_MECH)) {
@@ -265,21 +265,21 @@ public abstract class RepositoryAccess {
     } catch (UserNotFoundException e) {
       log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
       throw new NotAuthorizedException("Authorization failed", e);
-    } catch (TigaseDBException e) {
-			log.log(Level.SEVERE, "Repository access exception.", e);
-      throw new NotAuthorizedException("Authorization failed", e);
+//     } catch (TigaseDBException e) {
+// 			log.log(Level.SEVERE, "Repository access exception.", e);
+//       throw new NotAuthorizedException("Authorization failed", e);
 		} // end of try-catch
   }
 
 	public String getAuthenticationToken(String xmpp_sessionId)
-	  throws NotAuthorizedException {
+	  throws NotAuthorizedException, TigaseDBException {
 		UUID token = UUID.randomUUID();
 		setData("tokens", xmpp_sessionId, token.toString());
 		return token.toString();
 	}
 
 	public Authorization loginToken(String xmpp_sessionId, String token)
-	  throws NotAuthorizedException {
+	  throws NotAuthorizedException, TigaseDBException {
     try {
 			String db_token = repo.getData(getUserId(), "tokens", xmpp_sessionId);
 			if (token.equals(db_token)) {
@@ -289,15 +289,15 @@ public abstract class RepositoryAccess {
     } catch (UserNotFoundException e) {
       log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
       throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
-    } catch (TigaseDBException e) {
-			log.log(Level.SEVERE, "Repository access exception.", e);
+//     } catch (TigaseDBException e) {
+// 			log.log(Level.SEVERE, "Repository access exception.", e);
 		} // end of try-catch
 		return authState;
 	}
 
 	public Authorization loginDigest(String user, String digest,
 		String id, String alg)
-		throws NotAuthorizedException, AuthorizationException {
+		throws NotAuthorizedException, AuthorizationException, TigaseDBException {
 		try {
 			if (authRepo.digestAuth(JIDUtils.getNodeID(user, getDomain()), digest,
 					id, alg)) {
@@ -307,9 +307,9 @@ public abstract class RepositoryAccess {
     } catch (UserNotFoundException e) {
       log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
       throw new NotAuthorizedException("Authorization failed", e);
-    } catch (TigaseDBException e) {
-			log.log(Level.SEVERE, "Repository access exception.", e);
-      throw new NotAuthorizedException("Authorization failed", e);
+//     } catch (TigaseDBException e) {
+// 			log.log(Level.SEVERE, "Repository access exception.", e);
+//       throw new NotAuthorizedException("Authorization failed", e);
 		} // end of try-catch
   }
 
@@ -347,7 +347,7 @@ public abstract class RepositoryAccess {
    * @see #setData(String, String, String)
    */
   public String[] getDataList(final String subnode, final String key)
-    throws NotAuthorizedException {
+    throws NotAuthorizedException, TigaseDBException {
 		if (is_anonymous) {
 			return null;
 		}
@@ -358,10 +358,10 @@ public abstract class RepositoryAccess {
     } catch (UserNotFoundException e) {
       log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
       throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
-    } catch (TigaseDBException e) {
-			log.log(Level.SEVERE, "Repository access exception.", e);
+//     } catch (TigaseDBException e) {
+// 			log.log(Level.SEVERE, "Repository access exception.", e);
 		} // end of try-catch
-		return null;
+// 		return null;
   }
 
   /**
@@ -388,7 +388,8 @@ public abstract class RepositoryAccess {
    * @see #setData(String, String, String)
    */
   public String getData(final String subnode,
-    final String key, final String def) throws NotAuthorizedException {
+    final String key, final String def) throws NotAuthorizedException,
+    TigaseDBException {
 		if (is_anonymous) {
 			return null;
 		}
@@ -399,10 +400,10 @@ public abstract class RepositoryAccess {
     } catch (UserNotFoundException e) {
       log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
       throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
-    } catch (TigaseDBException e) {
-			log.log(Level.SEVERE, "Repository access exception.", e);
+//     } catch (TigaseDBException e) {
+// 			log.log(Level.SEVERE, "Repository access exception.", e);
 		} // end of try-catch
-		return null;
+// 		return null;
   }
 
   /**
@@ -451,24 +452,25 @@ public abstract class RepositoryAccess {
    * @see UserRepository
    */
   public void setData(final String subnode,
-    final String key, final String value) throws NotAuthorizedException {
+    final String key, final String value)
+    throws NotAuthorizedException, TigaseDBException {
     try { repo.setData(getUserId(), subnode, key, value);
     } catch (UserNotFoundException e) {
       log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
       throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
-    } catch (TigaseDBException e) {
-			log.log(Level.SEVERE, "Repository access exception.", e);
-		} // end of try-catch
+//     } catch (TigaseDBException e) {
+// 			log.log(Level.SEVERE, "Repository access exception.", e);
+ 		} // end of try-catch
   }
 
   public void removeData(final String subnode, final String key)
-		throws NotAuthorizedException {
+		throws NotAuthorizedException, TigaseDBException {
     try { repo.removeData(getUserId(), subnode, key);
     } catch (UserNotFoundException e) {
       log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
       throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
-    } catch (TigaseDBException e) {
-			log.log(Level.SEVERE, "Repository access exception.", e);
+//     } catch (TigaseDBException e) {
+// 			log.log(Level.SEVERE, "Repository access exception.", e);
 		} // end of try-catch
   }
 
@@ -486,7 +488,7 @@ public abstract class RepositoryAccess {
    * @see #setData(String, String, String)
    */
   public String[] getDataGroups(final String subnode)
-    throws NotAuthorizedException {
+    throws NotAuthorizedException, TigaseDBException {
 		if (is_anonymous) {
 			return null;
 		}
@@ -497,10 +499,10 @@ public abstract class RepositoryAccess {
     } catch (UserNotFoundException e) {
       log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
       throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
-    } catch (TigaseDBException e) {
-			log.log(Level.SEVERE, "Repository access exception.", e);
+//     } catch (TigaseDBException e) {
+// 			log.log(Level.SEVERE, "Repository access exception.", e);
 		} // end of try-catch
-		return null;
+// 		return null;
   }
 
   /**
@@ -519,7 +521,7 @@ public abstract class RepositoryAccess {
    * @see #setData(String, String, String)
    */
   public String[] getDataKeys(final String subnode)
-    throws NotAuthorizedException {
+    throws NotAuthorizedException, TigaseDBException {
 		if (is_anonymous) {
 			return null;
 		}
@@ -530,10 +532,10 @@ public abstract class RepositoryAccess {
     } catch (UserNotFoundException e) {
       log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
       throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
-    } catch (TigaseDBException e) {
-			log.log(Level.SEVERE, "Repository access exception.", e);
+//     } catch (TigaseDBException e) {
+// 			log.log(Level.SEVERE, "Repository access exception.", e);
 		} // end of try-catch
-		return null;
+// 		return null;
   }
 
   /**
@@ -551,7 +553,7 @@ public abstract class RepositoryAccess {
    * @see #setData(String, String, String)
    */
   public void removeDataGroup(final String subnode)
-    throws NotAuthorizedException {
+    throws NotAuthorizedException, TigaseDBException {
 		if (is_anonymous) {
 			return;
 		}
@@ -562,8 +564,8 @@ public abstract class RepositoryAccess {
     } catch (UserNotFoundException e) {
       log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
       throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
-    } catch (TigaseDBException e) {
-			log.log(Level.SEVERE, "Repository access exception.", e);
+//     } catch (TigaseDBException e) {
+// 			log.log(Level.SEVERE, "Repository access exception.", e);
 		} // end of try-catch
   }
 
@@ -584,7 +586,7 @@ public abstract class RepositoryAccess {
    * @see #setData(String, String, String)
    */
   public void setDataList(final String subnode, final String key,
-    final String[] list) throws NotAuthorizedException {
+    final String[] list) throws NotAuthorizedException, TigaseDBException {
 		if (is_anonymous) {
 			return;
 		}
@@ -595,13 +597,13 @@ public abstract class RepositoryAccess {
     } catch (UserNotFoundException e) {
       log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
       throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
-    } catch (TigaseDBException e) {
-			log.log(Level.SEVERE, "Repository access exception.", e);
+//     } catch (TigaseDBException e) {
+// 			log.log(Level.SEVERE, "Repository access exception.", e);
 		} // end of try-catch
   }
 
   public void addDataList(final String subnode, final String key,
-    final String[] list) throws NotAuthorizedException {
+    final String[] list) throws NotAuthorizedException, TigaseDBException {
 		if (is_anonymous) {
 			return;
 		}
@@ -612,8 +614,8 @@ public abstract class RepositoryAccess {
     } catch (UserNotFoundException e) {
       log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
       throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
-    } catch (TigaseDBException e) {
-			log.log(Level.SEVERE, "Repository access exception.", e);
+//     } catch (TigaseDBException e) {
+// 			log.log(Level.SEVERE, "Repository access exception.", e);
 		} // end of try-catch
   }
 
@@ -625,72 +627,72 @@ public abstract class RepositoryAccess {
 	}
 
   public void setPublicDataList(String subnode, String key,	String[] list)
-		throws NotAuthorizedException {
+		throws NotAuthorizedException, TigaseDBException {
 		setDataList(calcNode(PUBLIC_DATA_NODE, subnode), key, list);
 	}
 
 	public void addPublicDataList(String subnode, String key,	String[] list)
-		throws NotAuthorizedException {
+		throws NotAuthorizedException, TigaseDBException {
 		addDataList(calcNode(PUBLIC_DATA_NODE, subnode), key, list);
 	}
 
   public String[] getPublicDataList(String subnode, String key)
-    throws NotAuthorizedException {
+    throws NotAuthorizedException, TigaseDBException {
 		return getDataList(calcNode(PUBLIC_DATA_NODE, subnode), key);
 	}
 
   public void setPublicData(String subnode, String key,	String value)
-		throws NotAuthorizedException {
+		throws NotAuthorizedException, TigaseDBException {
 		setData(calcNode(PUBLIC_DATA_NODE, subnode), key, value);
 	}
 
   public String getPublicData(String subnode, String key,	String def)
-		throws NotAuthorizedException {
+		throws NotAuthorizedException, TigaseDBException {
 		return getData(calcNode(PUBLIC_DATA_NODE, subnode), key, def);
 	}
 
   public void removePublicData(String subnode, String key)
-    throws NotAuthorizedException {
+    throws NotAuthorizedException, TigaseDBException {
 		removeData(calcNode(PUBLIC_DATA_NODE, subnode), key);
 	}
 
   public void removePublicDataGroup(String subnode)
-    throws NotAuthorizedException {
+    throws NotAuthorizedException, TigaseDBException {
 		removeDataGroup(calcNode(PUBLIC_DATA_NODE, subnode));
 	}
 
   public void setOfflineDataList(String subnode, String key,	String[] list)
-		throws NotAuthorizedException {
+		throws NotAuthorizedException, TigaseDBException {
 		setDataList(calcNode(OFFLINE_DATA_NODE, subnode), key, list);
 	}
 
 	public void addOfflineDataList(String subnode, String key,	String[] list)
-		throws NotAuthorizedException {
+		throws NotAuthorizedException, TigaseDBException {
 		addDataList(calcNode(OFFLINE_DATA_NODE, subnode), key, list);
 	}
 
   public String[] getOfflineDataList(String subnode, String key)
-    throws NotAuthorizedException {
+    throws NotAuthorizedException, TigaseDBException {
 		return getDataList(calcNode(OFFLINE_DATA_NODE, subnode), key);
 	}
 
   public void setOfflineData(String subnode, String key,	String value)
-		throws NotAuthorizedException {
+		throws NotAuthorizedException, TigaseDBException {
 		setData(calcNode(OFFLINE_DATA_NODE, subnode), key, value);
 	}
 
   public String getOfflineData(String subnode, String key,	String def)
-		throws NotAuthorizedException {
+		throws NotAuthorizedException, TigaseDBException {
 		return getData(calcNode(OFFLINE_DATA_NODE, subnode), key, def);
 	}
 
   public void removeOfflineData(String subnode, String key)
-    throws NotAuthorizedException {
+    throws NotAuthorizedException, TigaseDBException {
 		removeData(calcNode(OFFLINE_DATA_NODE, subnode), key);
 	}
 
   public void removeOfflineDataGroup(String subnode)
-    throws NotAuthorizedException {
+    throws NotAuthorizedException, TigaseDBException {
 		removeDataGroup(calcNode(OFFLINE_DATA_NODE, subnode));
 	}
 

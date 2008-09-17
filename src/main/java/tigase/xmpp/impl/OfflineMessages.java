@@ -33,6 +33,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.UserNotFoundException;
+import tigase.db.TigaseDBException;
 import tigase.server.Packet;
 import tigase.util.JIDUtils;
 import tigase.xml.DomBuilderHandler;
@@ -148,7 +149,11 @@ public class OfflineMessages extends XMPPProcessor
 						log.finer("Sending off-line messages: " + packets.size());
 						results.addAll(packets);
 					} // end of if (packets != null)
-				} catch (NotAuthorizedException e) {	} // end of try-catch
+				} catch (NotAuthorizedException e) {
+					log.warning("User not authrized to retrieve offline messages, something must be wrong. " + e);
+				} catch (TigaseDBException e) {
+					log.warning("Error accessing database for offline message: " + e);
+				} // end of try-catch
 			} // end of if (priority >= 0)
 		} // end of if (type == null || type == StanzaType.available)
 
@@ -209,7 +214,7 @@ public class OfflineMessages extends XMPPProcessor
 	}
 
 	public Queue<Packet> restorePacketForOffLineUser(XMPPResourceConnection conn)
-		throws NotAuthorizedException {
+		throws NotAuthorizedException, TigaseDBException {
 		DomBuilderHandler domHandler = new DomBuilderHandler();
 		String[] msgs = conn.getOfflineDataList(ID, "messages");
 		if (msgs != null && msgs.length > 0) {

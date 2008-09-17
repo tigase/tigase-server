@@ -39,6 +39,7 @@ import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.XMPPException;
 import tigase.xml.Element;
 import tigase.db.NonAuthUserRepository;
+import tigase.db.TigaseDBException;
 
 import static tigase.xmpp.impl.Privacy.*;
 
@@ -222,7 +223,9 @@ public class JabberIqPrivacy extends XMPPProcessor
 		} catch (NotAuthorizedException e) {
 // 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 // 					"You must authorize session first.", true));
-		} // end of try-catch
+		} catch (TigaseDBException e) {
+			log.warning("Database problem, please notify the admin. " + e);
+		}
 
 		return false;
 	}
@@ -260,12 +263,16 @@ public class JabberIqPrivacy extends XMPPProcessor
         packet.getStringData());
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 					"You must authorize session first.", true));
-		} // end of try-catch
+		} catch (TigaseDBException e) {
+			log.warning("Database proble, please contact admin: " +e);
+			results.offer(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet,
+					"Database access problem, please contact administrator.", true));
+		}
 	}
 
 	private void processSetRequest(final Packet packet,
 		final XMPPResourceConnection session,	final Queue<Packet> results)
-    throws NotAuthorizedException, XMPPException {
+    throws NotAuthorizedException, XMPPException, TigaseDBException {
 		List<Element> children = packet.getElemChildren("/iq/query");
 		if (children != null && children.size() == 1) {
 			Element child = children.get(0);
@@ -296,7 +303,7 @@ public class JabberIqPrivacy extends XMPPProcessor
 
 	private void processGetRequest(final Packet packet,
 		final XMPPResourceConnection session,	final Queue<Packet> results)
-    throws NotAuthorizedException, XMPPException {
+    throws NotAuthorizedException, XMPPException, TigaseDBException {
 		List<Element> children = packet.getElemChildren("/iq/query");
 		if (children == null || children.size() == 0) {
 			String[] lists = Privacy.getLists(session);

@@ -41,6 +41,7 @@ import tigase.xmpp.XMPPException;
 import tigase.util.JIDUtils;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.UserNotFoundException;
+import tigase.db.TigaseDBException;
 
 /**
  * Describe class VCardTemp here.
@@ -200,6 +201,10 @@ public class VCardTemp extends XMPPProcessor implements XMPPProcessorIfc {
         packet.getStringData());
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 					"You must authorize session first.", true));
+		} catch (TigaseDBException e) {
+			log.warning("Database problem, please contact admin: " +e);
+			results.offer(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet,
+					"Database access problem, please contact administrator.", true));
 		} // end of try-catch
 
 	}

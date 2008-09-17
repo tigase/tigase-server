@@ -40,6 +40,7 @@ import tigase.xmpp.XMPPException;
 import tigase.util.JIDUtils;
 import tigase.util.Base64;
 import tigase.db.UserNotFoundException;
+import tigase.db.TigaseDBException;
 
 /**
  * Describe class JabberIqIq here.
@@ -91,9 +92,9 @@ public class JabberIqIq extends XMPPProcessor
 				&& packet.getElemName().equals("message")) {
 				evaluateMessage(session, packet.getElemCData("/message/body"));
 			}
-		} catch (NotAuthorizedException e) {
+		} catch (Exception e) {
 			// Ignore....
-		} // end of try-catch
+		}
 		return false;
 	}
 
@@ -169,12 +170,16 @@ public class JabberIqIq extends XMPPProcessor
         packet.getStringData());
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 					"You must authorize session first.", true));
-		} // end of try-catch
+		} catch (TigaseDBException e) {
+			log.warning("Database proble, please contact admin: " +e);
+			results.offer(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet,
+					"Database access problem, please contact administrator.", true));
+		}
 
 	}
 
 	private double getIq(XMPPResourceConnection session)
-		throws NotAuthorizedException {
+		throws NotAuthorizedException, TigaseDBException {
 		String iq_level = session.getPublicData(ID, LEVEL, "100");
 		double iq = 100;
 		try {
@@ -186,7 +191,7 @@ public class JabberIqIq extends XMPPProcessor
 	}
 
 	private String changeIq(XMPPResourceConnection session, double val)
-		throws NotAuthorizedException {
+		throws NotAuthorizedException, TigaseDBException {
 		double value = getIq(session);
 		value += val;
 		String curr = new Double(value).toString();
@@ -267,7 +272,7 @@ public class JabberIqIq extends XMPPProcessor
 	 "YXJzZQ==", "dmFnaW5h", "cG9ybg==", "cGVuaXM=", "cGlzcw==", "c3V4"};
 
 	private void evaluateMessage(XMPPResourceConnection session, String msg)
-		throws NotAuthorizedException {
+		throws NotAuthorizedException, TigaseDBException {
 		if (msg == null) { return; }
 		// User wrote a message, good + 0.01
 		double val = 0.01;

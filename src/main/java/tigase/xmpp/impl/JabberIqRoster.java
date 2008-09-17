@@ -38,6 +38,8 @@ import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.XMPPException;
 import tigase.db.NonAuthUserRepository;
+import tigase.db.TigaseDBException;
+
 
 import static tigase.xmpp.impl.Roster.SubscriptionType;
 
@@ -107,7 +109,7 @@ public abstract class JabberIqRoster {
 
 	private static void processSetRequest(final Packet packet,
 		final XMPPResourceConnection session,	final Queue<Packet> results)
-    throws NotAuthorizedException {
+    throws NotAuthorizedException, TigaseDBException {
 
 		Element request = packet.getElement();
 
@@ -189,17 +191,17 @@ public abstract class JabberIqRoster {
 	private static void processGetRequest(final Packet packet,
 		final XMPPResourceConnection session,	final Queue<Packet> results,
 		final Map<String, Object> settings)
-    throws NotAuthorizedException {
+    throws NotAuthorizedException, TigaseDBException {
     String[] buddies = roster_util.getBuddies(session);
     if (buddies != null) {
 			Element query = new Element("query");
 			query.setXMLNS(XMLNS);
       for (String buddy : buddies) {
-				try {
+ 				try {
 					Element buddy_item = roster_util.getBuddyItem(session, buddy);
 					String item_group = buddy_item.getCData("/item/group");
 					query.addChild(buddy_item);
-				} catch (Exception e) {
+				} catch (TigaseDBException e) {
 					// It happens that some weird JIDs drive database crazy and
 					// it throws exceptions. Let's for now just ignore those
 					// contacts....
@@ -299,6 +301,10 @@ public abstract class JabberIqRoster {
         packet.getStringData());
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 					"You must authorize session first.", true));
+		} catch (TigaseDBException e) {
+			log.warning("Database problem, please contact admin: " +e);
+			results.offer(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet,
+					"Database access problem, please contact administrator.", true));
 		} // end of try-catch
 	}
 
