@@ -23,6 +23,7 @@ package tigase.server;
 
 import java.util.Locale;
 import tigase.conf.Configurator;
+import tigase.xml.db.XMLDBException;
 
 /**
  * Describe class XMPPServer here.
@@ -148,7 +149,13 @@ public class XMPPServer {
 			;
 		Configurator.loadLogManagerConfig(initial_config);
 
-		Configurator config = new Configurator(config_file, args);
+		Configurator config = null;
+		try {
+			config = new Configurator(config_file, args);
+		} catch (XMLDBException e) {
+			System.err.println("Invalid XML configuration file: " + config_file);
+			System.exit(1);
+		}
 		config.setName("basic-conf");
 		MessageRouter router = new MessageRouter();
 		router.setName(server_name);

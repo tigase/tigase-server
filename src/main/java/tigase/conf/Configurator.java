@@ -57,6 +57,7 @@ import tigase.util.ClassUtil;
 import tigase.util.JIDUtils;
 import tigase.xml.Element;
 import tigase.xml.XMLUtils;
+import tigase.xml.db.XMLDBException;
 import tigase.xml.db.Types.DataType;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.StanzaType;
@@ -210,7 +211,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 		}
   }
 
-	public Configurator(String fileName, String[] args) {
+	public Configurator(String fileName, String[] args) throws XMLDBException {
 		//		System.out.println("configurator init...");
 		parseArgs(args);
 		//		System.out.println("configurator after parse args, reading config from file: " + fileName);

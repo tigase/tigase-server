@@ -33,6 +33,7 @@ import tigase.annotations.TODO;
 import tigase.xml.db.NodeNotFoundException;
 import tigase.xml.db.NodeExistsException;
 import tigase.xml.db.XMLDB;
+import tigase.xml.db.XMLDBException;
 
 /**
  * Class <code>ConfigRepository</code> provides access to configuration
@@ -63,16 +64,17 @@ public class ConfigRepository {
     new LinkedHashMap<String, ConfigRepository>();
   private static ConfigRepository def_config = null;
 
-  public static ConfigRepository getConfigRepository() {
+  public static ConfigRepository getConfigRepository() throws XMLDBException {
     return getConfigRepository(null);
   }
 
-  public static ConfigRepository getConfigRepository(final String file_name) {
+  public static ConfigRepository getConfigRepository(final String file_name)
+	  throws XMLDBException {
     return getConfigRepository(false, file_name);
   }
 
   public static ConfigRepository getConfigRepository(final boolean debug,
-    final String file_name) {
+    final String file_name) throws XMLDBException {
 
     ConfigRepository config = null;
     if (file_name == null) {
@@ -92,19 +94,20 @@ public class ConfigRepository {
     return config;
   }
 
-  private ConfigRepository(final boolean debug, final String file) {
+  private ConfigRepository(final boolean debug, final String file)
+    throws XMLDBException {
     config_file = file;
     init();
   }
 
-  private ConfigRepository(final boolean debug) {
+  private ConfigRepository(final boolean debug) throws XMLDBException {
     config_file = System.getProperty(XMPP_CONFIG_FILE_PROPERTY_KEY,
       XMPP_CONFIG_FILE_PROPERTY_VAL);
     init();
     def_config = this;
   }
 
-  private void init() {
+  private void init() throws XMLDBException {
     try {
       xmldb = new XMLDB(config_file);
     } catch (IOException e) {
