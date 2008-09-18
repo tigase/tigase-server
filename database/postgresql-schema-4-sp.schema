@@ -199,23 +199,23 @@ end;
 
 -- Performs user login for a plain text password, converting it to an internal
 -- representation if necessary
-create or replace function TigUserLoginPlainPw(varchar(2049), varchar(255),
-			 					 out varchar(2049)) returns varchar(2049) as '
+create or replace function TigUserLoginPlainPw(varchar(2049), varchar(255))
+			 					  returns varchar(2049) as '
 declare
   _user_id alias for $1;
   _user_pw alias for $2;
-  res_user_id alias for $3;
+  res_user_id varchar(2049);
   _enc text;
 begin
 	select TigGetDBProperty(''password-encoding'') into _enc;
   select
     case _enc
-		when ''MD5-PASSWORD'' then TigUserLogin(_user_id, MD5(_user_pw), res_user_id)
+		when ''MD5-PASSWORD'' then TigUserLogin(_user_id, MD5(_user_pw))
 		when ''MD5-USERID-PASSWORD'' then
-      TigUserLogin(_user_id, MD5(CONCAT(_user_id, _user_pw)), res_user_id)
-		else TigUserLogin(_user_id, _user_pw, res_user_id)
-		end;
-  return;
+      TigUserLogin(_user_id, MD5(_user_id || _user_pw))
+		else TigUserLogin(_user_id, _user_pw)
+		end into res_user_id;
+  return res_user_id;
 end;
 ' LANGUAGE 'plpgsql';
 
@@ -223,12 +223,12 @@ end;
 -- on failure.
 -- If the login is successful it also increases online_status and sets
 -- last_login time to the current timestamp
-create or replace function TigUserLogin(varchar(2049), varchar(255),
-			 					 out varchar(2049)) returns varchar(2049) as '
+create or replace function TigUserLogin(varchar(2049), varchar(255))
+			 					  returns varchar(2049) as '
 declare
   _user_id alias for $1;
   _user_pw alias for $2;
-  res_user_id alias for $3;
+  res_user_id varchar(2049);
 begin
 	if exists(select user_id from tig_users
 		where (account_status > 0) AND (user_id = _user_id) AND (user_pw = _user_pw))
@@ -240,7 +240,7 @@ begin
 		update tig_users set failed_logins = failed_logins + 1 where user_id = _user_id
       returning NULL into res_user_id;
 	end if;
-  return;
+  return res_user_id;
 end;
 ' LANGUAGE 'plpgsql';
 

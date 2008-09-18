@@ -167,16 +167,15 @@ end //
 
 -- Performs user login for a plain text password, converting it to an internal
 -- representation if necessary
-create procedure TigUserLoginPlainPw(_user_id varchar(2049), _user_pw varchar(255),
-			 					 out res_user_id varchar(2049))
+create procedure TigUserLoginPlainPw(_user_id varchar(2049), _user_pw varchar(255))
 begin
 	case TigGetDBProperty('password-encoding')
 		when 'MD5-PASSWORD' then
-			call TigUserLogin(_user_id, MD5(_user_pw), res_user_id);
+			call TigUserLogin(_user_id, MD5(_user_pw));
 		when 'MD5-USERID-PASSWORD' then
-			call TigUserLogin(_user_id, MD5(CONCAT(_user_id, _user_pw)), res_user_id);
+			call TigUserLogin(_user_id, MD5(CONCAT(_user_id, _user_pw)));
 		else
-			call TigUserLogin(_user_id, _user_pw, res_user_id);
+			call TigUserLogin(_user_id, _user_pw);
 		end case;
 end //
 
@@ -184,8 +183,7 @@ end //
 -- on failure.
 -- If the login is successful it also increases online_status and sets
 -- last_login time to the current timestamp
-create procedure TigUserLogin(_user_id varchar(2049), _user_pw varchar(255),
-			 					 out res_user_id varchar(2049))
+create procedure TigUserLogin(_user_id varchar(2049), _user_pw varchar(255))
 begin
 	if exists(select user_id from tig_users
 		where (account_status > 0) AND (user_id = _user_id) AND (user_pw = _user_pw))
@@ -193,11 +191,9 @@ begin
 		update tig_users
 			set online_status = online_status + 1, last_login = CURRENT_TIMESTAMP
 			where user_id = _user_id;
-		set res_user_id = _user_id;
 		select _user_id as user_id;
 	else
 		update tig_users set failed_logins = failed_logins + 1 where user_id = _user_id;
-		set res_user_id = NULL;
 		select NULL as user_id;
 	end if;
 end //

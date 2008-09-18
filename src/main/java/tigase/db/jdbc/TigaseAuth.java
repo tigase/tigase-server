@@ -137,7 +137,7 @@ public class TigaseAuth implements UserAuthRepository {
 		query = "{ call TigUpdatePasswordPlainPw(?, ?) }";
 		update_pass_plain_pw_sp = conn.prepareCall(query);
 
-		query = "{ call TigUserLoginPlainPw(?, ?, ?) }";
+		query = "{ call TigUserLoginPlainPw(?, ?) }";
 		user_login_plain_pw_sp = conn.prepareCall(query);
 
 		query = "{ call TigUserLogout(?) }";
@@ -272,8 +272,6 @@ public class TigaseAuth implements UserAuthRepository {
 				String user_id = JIDUtils.getNodeID(user);
 				user_login_plain_pw_sp.setString(1, user_id);
 				user_login_plain_pw_sp.setString(2, password);
-				String temp_var = null;
-				user_login_plain_pw_sp.setString(3, temp_var);
 				rs = user_login_plain_pw_sp.executeQuery();
 				if (rs.next()) {
 					boolean auth_result_ok = user_id.equals(rs.getString(1));
