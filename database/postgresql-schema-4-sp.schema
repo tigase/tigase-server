@@ -64,8 +64,8 @@ declare
   _res_uid bigint;
 begin
 	insert into tig_users (user_id, user_pw)
-		values (_user_id, _user_pw)
-    returning uid into _res_uid;
+		values (_user_id, _user_pw);
+  select currval(''tig_users_uid_seq'') into _res_uid;
 
 	insert into tig_nodes (parent_nid, uid, node)
 		values (NULL, _res_uid, ''root'');
@@ -235,10 +235,11 @@ begin
 	then
 		update tig_users
 			set online_status = online_status + 1, last_login = now()
-			where user_id = _user_id returning user_id into res_user_id;
+			where user_id = _user_id;
+    select _user_id into res_user_id;
 	else
-		update tig_users set failed_logins = failed_logins + 1 where user_id = _user_id
-      returning NULL into res_user_id;
+		update tig_users set failed_logins = failed_logins + 1 where user_id = _user_id;
+    select NULL into res_user_id;
 	end if;
   return res_user_id;
 end;
@@ -305,7 +306,8 @@ declare
   res_nid bigint;
 begin
 	insert into tig_nodes (parent_nid, uid, node)
-		values (_parent_nid, _uid, _node) returning nid into res_nid;
+		values (_parent_nid, _uid, _node);
+  select currval(''tig_nodes_nid_seq'') into res_nid;
   return res_nid;
 end;
 ' LANGUAGE 'plpgsql';
