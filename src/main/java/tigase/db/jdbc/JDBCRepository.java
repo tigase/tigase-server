@@ -174,6 +174,9 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 				if (rs.next()) {
 					result = rs.getLong(1);
 				} else {
+					result = -1;
+				}
+				if (result <= 0) {
 					if (autoCreate) {
 						result = addUserRepo(user_id);
 					} else {
