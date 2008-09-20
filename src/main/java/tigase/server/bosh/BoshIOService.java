@@ -64,16 +64,20 @@ public class BoshIOService extends XMPPIOService {
 	}
 
 	public void writeRawData(String data) throws IOException {
-		StringBuilder sb = new StringBuilder();
-		sb.append(HTTP_OK_RESPONSE);
-		sb.append(CONTENT_TYPE_HEADER + content_type + EOL);
-		sb.append(CONTENT_TYPE_LENGTH + data.getBytes().length + EOL);
-		sb.append(CONNECTION + "close" + EOL);
-		sb.append(SERVER + EOL);
-		sb.append(EOL);
-		sb.append(data);
-		log.finest("Writing to socket:\n" + sb.toString());
-		super.writeRawData(sb.toString());
+		if (data != null && data.startsWith("<body")) {
+			StringBuilder sb = new StringBuilder();
+			sb.append(HTTP_OK_RESPONSE);
+			sb.append(CONTENT_TYPE_HEADER + content_type + EOL);
+			sb.append(CONTENT_TYPE_LENGTH + data.getBytes().length + EOL);
+			sb.append(CONNECTION + "close" + EOL);
+			sb.append(SERVER + EOL);
+			sb.append(EOL);
+			sb.append(data);
+			log.finest("Writing to socket:\n" + sb.toString());
+			super.writeRawData(sb.toString());
+		} else {
+			super.writeRawData(data);
+		}
 	}
 
 	public void sendErrorAndStop(Authorization errorCode,

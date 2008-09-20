@@ -78,8 +78,8 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 	public static final String HOSTNAMES_PROP_KEY = "hostnames";
 	public String[] HOSTNAMES_PROP_VAL =	{"localhost", "hostname"};
 
-	private RoutingsContainer routings = null;
-	private Set<String> hostnames = new TreeSet<String>();
+	protected RoutingsContainer routings = null;
+	protected Set<String> hostnames = new TreeSet<String>();
 
 	private Map<String, XMPPProcessorIfc> processors =
 		new ConcurrentSkipListMap<String, XMPPProcessorIfc>();
@@ -95,7 +95,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 		} // end of else
 	}
 
-	private void processCommand(final Packet packet) {
+	protected void processCommand(final Packet packet) {
 		XMPPIOService serv = getXMPPIOService(packet);
 		switch (packet.getCommand()) {
 		case GETFEATURES:
@@ -139,15 +139,13 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 			} // end of else
 			break;
 		case REDIRECT:
-			if (serv != null) {
-				String serv_sessionId =
-          (String)serv.getSessionData().get(serv.SESSION_ID_KEY);
-				String command_sessionId = Command.getFieldValue(packet, "session-id");
-				if (serv_sessionId.equals(command_sessionId)) {
-					String old_receiver = serv.getDataReceiver();
-					serv.setDataReceiver(packet.getFrom());
-					log.fine("Redirecting data for sessionId: " + serv_sessionId
-						+ ", to: " + packet.getFrom());
+			String command_sessionId = Command.getFieldValue(packet, "session-id");
+			String newAddress = packet.getFrom();
+			String old_receiver = changeDataReceiver(packet, newAddress,
+				command_sessionId, serv);
+			if (old_receiver != null) {
+					log.fine("Redirecting data for sessionId: " + command_sessionId
+						+ ", to: " + newAddress);
 					Packet response = packet.commandResult(null);
 					Command.addFieldValue(response, "session-id", command_sessionId);
 					Command.addFieldValue(response, "action", "close");
@@ -156,14 +154,11 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 					response = packet.commandResult(null);
 					Command.addFieldValue(response, "session-id", command_sessionId);
 					Command.addFieldValue(response, "action", "activate");
-					response.getElement().setAttribute("to", serv.getDataReceiver());
+					response.getElement().setAttribute("to", newAddress);
 					addOutPacket(response);
-				} else {
-					log.warning("Incorrect session ID, ignoring data redirect for: "
-						+ packet.toString());
-				}
 			} else {
-				log.finest("Connection for REDIRECT command does not exist, ignoring.");
+				log.finest("Connection for REDIRECT command does not exist, ignoring "
+					+ "packet: " + packet.toString());
 			}
 			break;
 		case STREAM_CLOSED:
@@ -184,6 +179,23 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 		default:
 			break;
 		} // end of switch (pc.getCommand())
+	}
+
+	protected String changeDataReceiver(Packet packet, String newAddress,
+		String command_sessionId, XMPPIOService serv) {
+		if (serv != null) {
+			String serv_sessionId =
+          (String)serv.getSessionData().get(serv.SESSION_ID_KEY);
+			if (serv_sessionId.equals(command_sessionId)) {
+				String old_receiver = serv.getDataReceiver();
+				serv.setDataReceiver(newAddress);
+				return old_receiver;
+			} else {
+				log.warning("Incorrect session ID, ignoring data redirect for: "
+					+ newAddress);
+			}
+		}
+		return null;
 	}
 
 	public Queue<Packet> processSocketData(XMPPIOService serv) {

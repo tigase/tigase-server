@@ -34,6 +34,8 @@ import tigase.xmpp.StanzaType;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.util.JIDUtils;
 
+import static tigase.xmpp.impl.Roster.PresenceType;
+
 /**
  * Describe class PacketFilter here.
  *
@@ -53,6 +55,7 @@ public class PacketFilter {
 
 	private String[] IGNORE_PACKETS = {"stream:features"};
 	private StanzaType[] IGNORE_TYPES = {StanzaType.error};
+// 	private RosterAbstract roster_util = RosterFactory.getRosterImplementation(true);
 
 	/**
 	 * Creates a new <code>PacketFilter</code> instance.
@@ -99,6 +102,20 @@ public class PacketFilter {
 
 	public boolean forward(final Packet packet, final XMPPResourceConnection session,
 		final NonAuthUserRepository repo, final Queue<Packet> results) {
+		// Processing of the packets which needs to be processed as quickly
+		// as possible, direct presences from unsubscribed entities apparently
+		// have high priority as they may come from MUC and must be delivered
+		// before room history
+// 		if (packet.getElemName() == "presence") {
+// 			PresenceType pres_type = roster_util.getPresenceType(session, packet);
+// 			if ((prese_type == PresenceType.in_initial)
+// 				&& (packet.getElemFrom() != null)
+// 				&& (roster_util.isSubscribedTo(session, packet.getElemFrom())
+// 					|| (DynamicRoster.getBuddyItem(session, settings,
+// 							packet.getElemFrom()) != null))) {
+
+// 			}
+// 		}
 		return false;
 	}
 

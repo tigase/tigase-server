@@ -45,6 +45,7 @@ import tigase.xmpp.StanzaType;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.XMPPIOService;
+import tigase.server.xmppclient.ClientConnectionManager;
 
 import static tigase.server.bosh.Constants.*;
 
@@ -57,7 +58,7 @@ import static tigase.server.bosh.Constants.*;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class BoshConnectionManager extends ConnectionManager<BoshIOService>
+public class BoshConnectionManager extends ClientConnectionManager
 	implements BoshSessionTaskHandler {
 
   /**
@@ -74,11 +75,11 @@ public class BoshConnectionManager extends ConnectionManager<BoshIOService>
 
 	private static final int DEF_PORT_NO = 5280;
 	private int[] PORTS = {DEF_PORT_NO};
-	private static final String HOSTNAMES_PROP_KEY = "hostnames";
-	private String[] HOSTNAMES_PROP_VAL =	{"localhost", "hostname"};
+// 	private static final String HOSTNAMES_PROP_KEY = "hostnames";
+// 	private String[] HOSTNAMES_PROP_VAL =	{"localhost", "hostname"};
 
-	private RoutingsContainer routings = null;
-	private Set<String> hostnames = new TreeSet<String>();
+//	private RoutingsContainer routings = null;
+// 	private Set<String> hostnames = new TreeSet<String>();
 	private long max_wait = MAX_WAIT_DEF_PROP_VAL;
 	private long min_polling = MIN_POLLING_PROP_VAL;
 	private long max_inactivity = MAX_INACTIVITY_PROP_VAL;
@@ -88,46 +89,70 @@ public class BoshConnectionManager extends ConnectionManager<BoshIOService>
 	private Map<UUID, BoshSession> sessions =
 		new LinkedHashMap<UUID, BoshSession>();
 
-	public void processPacket(Packet packet) {
-		log.finer("Processing packet: " + packet.getElemName()
-			+ ", type: " + packet.getType());
-		log.finest("Processing packet: " + packet.toString());
+// 	public void processPacket(Packet packet) {
+// 		log.finer("Processing packet: " + packet.getElemName()
+// 			+ ", type: " + packet.getType());
+// 		log.finest("Processing packet: " + packet.toString());
+// 		if (packet.isCommand() && packet.getCommand() != Command.OTHER) {
+// 			processCommand(packet);
+// 		} else {
+// 			writePacketToSocket(packet);
+// 		}
+// 	}
+
+	protected BoshSession getBoshSessionTo(Packet packet) {
 		UUID sid = UUID.fromString(JIDUtils.getNodeResource(packet.getTo()));
-		BoshSession session = sessions.get(sid);
+		return sessions.get(sid);
+	}
+
+	protected void writePacketToSocket(Packet packet) {
+		BoshSession session = getBoshSessionTo(packet);
 		if (session != null) {
-			if (packet.isCommand() && packet.getCommand() != Command.OTHER) {
-				processCommand(packet, session);
-			} else {
-				Queue<Packet> out_results = new LinkedList<Packet>();
-				session.processPacket(packet, out_results);
-				addOutPackets(out_results, session);
-			}
+			Queue<Packet> out_results = new LinkedList<Packet>();
+			session.processPacket(packet, out_results);
+			addOutPackets(out_results, session);
 		} else {
 			log.warning("Session does not exist for packet: " + packet.toString());
 		}
 	}
 
-	private void processCommand(Packet packet, BoshSession session) {
-		XMPPIOService serv = getXMPPIOService(packet);
+	protected void processCommand(Packet packet) {
 		switch (packet.getCommand()) {
-		case GETFEATURES:
-			if (packet.getType() == StanzaType.result) {
-				Element elem_features = new Element("stream:features");
-				elem_features.addChildren(Command.getData(packet));
-				session.processPacket(new Packet(elem_features), null);
-			} // end of if (packet.getType() == StanzaType.get)
-			break;
 		case CLOSE:
-			log.fine("Closing session: " + session.getSid());
-			session.close();
-			sessions.remove(session.getSid());
+			BoshSession session = getBoshSessionTo(packet);
+			if (session != null) {
+				log.fine("Closing session: " + session.getSid());
+				session.close();
+				sessions.remove(session.getSid());
+			} else {
+				log.warning("Session does not exist for packet: " + packet.toString());
+			}
 			break;
 		default:
+			super.processCommand(packet);
 			break;
 		} // end of switch (pc.getCommand())
 	}
 
-	public Queue<Packet> processSocketData(BoshIOService serv) {
+	protected String changeDataReceiver(Packet packet, String newAddress,
+		String command_sessionId, XMPPIOService serv) {
+		BoshSession session = getBoshSessionTo(packet);
+		if (session != null) {
+			String sessionId = session.getSessionId();
+			if (sessionId.equals(command_sessionId)) {
+				String old_receiver = session.getDataReceiver();
+				session.setDataReceiver(newAddress);
+				return old_receiver;
+			} else {
+				log.warning("Incorrect session ID, ignoring data redirect for: "
+					+ newAddress);
+			}
+		}
+		return null;
+	}
+
+	public Queue<Packet> processSocketData(XMPPIOService srv) {
+		BoshIOService serv = (BoshIOService)srv;
 		Packet p = null;
 		while ((p = serv.getReceivedPackets().poll()) != null) {
 			log.finer("Processing packet: " + p.getElemName()
@@ -141,7 +166,8 @@ public class BoshConnectionManager extends ConnectionManager<BoshIOService>
 				if (sid_str == null) {
 					String hostname = p.getAttribute("to");
 					if (hostname != null && hostnames.contains(hostname)) {
-						bs = new BoshSession(getDefHostName(), this);
+						bs = new BoshSession(getDefHostName(),
+							routings.computeRouting(hostname), this);
 						sid = bs.getSid();
 						sessions.put(sid, bs);
 						bs.init(p, serv, max_wait, min_polling, max_inactivity,
@@ -173,7 +199,7 @@ public class BoshConnectionManager extends ConnectionManager<BoshIOService>
 	private void addOutPackets(Queue<Packet> out_results, BoshSession bs) {
 		for (Packet res: out_results) {
 			res.setFrom(getFromAddress(bs.getSid().toString()));
-			res.setTo(routings.computeRouting(bs.getDomain()));
+			res.setTo(bs.getDataReceiver());
 			addOutPacket(res);
 		}
 		out_results.clear();
@@ -185,27 +211,6 @@ public class BoshConnectionManager extends ConnectionManager<BoshIOService>
 
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> props = super.getDefaults(params);
-		if (params.get(GEN_VIRT_HOSTS) != null) {
-			HOSTNAMES_PROP_VAL = ((String)params.get(GEN_VIRT_HOSTS)).split(",");
-		} else {
-			HOSTNAMES_PROP_VAL = DNSResolver.getDefHostNames();
-		}
-		props.put(HOSTNAMES_PROP_KEY, HOSTNAMES_PROP_VAL);
-		props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_MODE_PROP_KEY,
-			ROUTING_MODE_PROP_VAL);
-		// If the server is configured as connection manager only node then
-		// route packets to SM on remote host where is default routing
-		// for external component.
-		// Otherwise default routing is to SM on localhost
-		if (params.get("config-type").equals(GEN_CONFIG_CS)
-			&& params.get(GEN_EXT_COMP) != null) {
-			String[] comp_params = ((String)params.get(GEN_EXT_COMP)).split(",");
-			props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_ENTRY_PROP_KEY,
-				DEF_SM_NAME + "@" + comp_params[1]);
-		} else {
-			props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_ENTRY_PROP_KEY,
-				DEF_SM_NAME + "@" + DNSResolver.getDefaultHostname());
-		}
 		props.put(MAX_WAIT_DEF_PROP_KEY, MAX_WAIT_DEF_PROP_VAL);
 		props.put(MIN_POLLING_PROP_KEY, MIN_POLLING_PROP_VAL);
 		props.put(MAX_INACTIVITY_PROP_KEY, MAX_INACTIVITY_PROP_VAL);
@@ -217,25 +222,6 @@ public class BoshConnectionManager extends ConnectionManager<BoshIOService>
 
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
-		boolean routing_mode =
-			(Boolean)props.get(ROUTINGS_PROP_KEY + "/" + ROUTING_MODE_PROP_KEY);
-		routings = new RoutingsContainer(routing_mode);
-		int idx = (ROUTINGS_PROP_KEY + "/").length();
-		for (Map.Entry<String, Object> entry: props.entrySet()) {
-			if (entry.getKey().startsWith(ROUTINGS_PROP_KEY + "/")
-				&& !entry.getKey().equals(ROUTINGS_PROP_KEY + "/" +
-					ROUTING_MODE_PROP_KEY)) {
-				routings.addRouting(entry.getKey().substring(idx),
-					(String)entry.getValue());
-			} // end of if (entry.getKey().startsWith(ROUTINGS_PROP_KEY + "/"))
-		} // end of for ()
-		String[] hnames = (String[])props.get(HOSTNAMES_PROP_KEY);
-		clearRoutings();
-		hostnames.clear();
-		for (String host: hnames) {
-			addRouting(getName() + "@" + host);
-			hostnames.add(host);
-		} // end of for ()
 		max_wait = (Long)props.get(MAX_WAIT_DEF_PROP_KEY);
 		min_polling  = (Long)props.get(MIN_POLLING_PROP_KEY);
 		max_inactivity = (Long)props.get(MAX_INACTIVITY_PROP_KEY);
@@ -246,6 +232,10 @@ public class BoshConnectionManager extends ConnectionManager<BoshIOService>
 
 	protected int[] getDefPlainPorts() {
 		return PORTS;
+	}
+
+	protected int[] getDefSSLPorts() {
+		return null;
 	}
 
 	public void serviceStopped(BoshIOService service) {
@@ -280,7 +270,21 @@ public class BoshConnectionManager extends ConnectionManager<BoshIOService>
 
 	public String xmppStreamOpened(BoshIOService serv,
 		Map<String, String> attribs) {
-		return null;
+		log.fine("Ups, what just happened? Stream open. Hey, this is a Bosh connection manager. c2s and s2s are not supported on the same port as Bosh yet.");
+		return "<?xml version='1.0'?><stream:stream"
+				+ " xmlns='jabber:client'"
+				+ " xmlns:stream='http://etherx.jabber.org/streams'"
+				+ " id='1'"
+				+ " from='" + getDefHostName() + "'"
+        + " version='1.0' xml:lang='en'>"
+				+ "<stream:error>"
+				+ "<invalid-namespace xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>"
+        + "<text xmlns='urn:ietf:params:xml:ns:xmpp-streams' xml:lang='langcode'>"
+        + "Ups, what just happened? Stream open. Hey, this is a Bosh connection manager. c2s and s2s are not supported on the same port... yet."
+        + "</text>"
+				+ "</stream:error>"
+				+ "</stream:stream>"
+				;
 	}
 
 	protected BoshIOService getXMPPIOServiceInstance() {

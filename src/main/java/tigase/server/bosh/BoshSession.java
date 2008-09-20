@@ -82,6 +82,7 @@ public class BoshSession {
 	private String content_type = CONTENT_TYPE_DEF;
 	private String domain = null;
 	private String sessionId = null;
+	private String dataReceiver = null;
 	/**
 	 * <code>current_rid</code> is the table with body rids which are waiting
 	 * for replies.
@@ -102,9 +103,11 @@ public class BoshSession {
 	 * Creates a new <code>BoshSession</code> instance.
 	 *
 	 */
-	public BoshSession(String def_domain, BoshSessionTaskHandler handler) {
+	public BoshSession(String def_domain, String dataReceiver,
+		BoshSessionTaskHandler handler) {
 		this.sid = UUID.randomUUID();
 		this.domain = def_domain;
+		this.dataReceiver = dataReceiver;
 		this.handler = handler;
 	}
 
@@ -207,6 +210,18 @@ public class BoshSession {
 		out_results.offer(streamOpen);
 		out_results.offer(Command.GETFEATURES.getPacket(null, null,
 				StanzaType.get, "sess1", null));
+	}
+
+	public String getSessionId() {
+		return sessionId;
+	}
+
+	public String getDataReceiver() {
+		return dataReceiver;
+	}
+
+	public void setDataReceiver(String dataReceiver) {
+		this.dataReceiver = dataReceiver;
 	}
 
 	public UUID getSid() {

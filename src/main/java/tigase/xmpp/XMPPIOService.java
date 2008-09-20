@@ -209,7 +209,7 @@ public class XMPPIOService extends IOService {
 // 		readLock.lock();
     try {
 			if (isConnected()) {
-				final char[] data = readData();
+				char[] data = readData();
 
 				// Yes check again if we are still connected as
 				// servce might be disconnected during data read
@@ -239,7 +239,9 @@ public class XMPPIOService extends IOService {
 							addReceivedPacket(new Packet(elem));
 						} // end of while ((elem = elems.poll()) != null)
 					}	catch (Exception ex) {
-						ex.printStackTrace();
+						log.info("Incorrect XML data: " + new String(data)
+							+ ", stopping connection: " + getUniqueId()
+							+ ", exception: " + ex);
 						forceStop();
 					} // end of try-catch
 				} else {
