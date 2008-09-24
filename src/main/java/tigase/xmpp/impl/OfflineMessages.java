@@ -75,7 +75,7 @@ public class OfflineMessages extends XMPPProcessor
 
 	private SimpleParser parser = SingletonFactory.getParserInstance();
 	private SimpleDateFormat formater =
-		new SimpleDateFormat("yyyyMMdd'T'HH:mm:ss");
+		new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
 	// Implementation of tigase.xmpp.XMPPImplIfc
 
@@ -201,9 +201,9 @@ public class OfflineMessages extends XMPPProcessor
 				stamp = formater.format(new Date());
 			}
 			String from = JIDUtils.getNodeHost(pac.getElemTo());
-			Element x = new Element("x", "Offline Storage",
+			Element x = new Element("delay", "Offline Storage",
 				new String[] {"from", "stamp", "xmlns"},
-				new String[] {from, stamp, "jabber:x:delay"});
+				new String[] {from, stamp, "urn:xmpp:delay"});
 			packet.addChild(x);
 			String user_id = JIDUtils.getNodeID(pac.getElemTo());
 			repo.addOfflineDataList(user_id, ID,
@@ -218,7 +218,7 @@ public class OfflineMessages extends XMPPProcessor
 		DomBuilderHandler domHandler = new DomBuilderHandler();
 		String[] msgs = conn.getOfflineDataList(ID, "messages");
 		if (msgs != null && msgs.length > 0) {
-			conn.removeOfflineDataGroup(ID);
+			conn.removeOfflineData(ID, "messages");
 			LinkedList<Packet> pacs = new LinkedList<Packet>();
 			StringBuilder sb = new StringBuilder();
 			for (String msg: msgs) {
@@ -252,8 +252,22 @@ public class OfflineMessages extends XMPPProcessor
 
 	private class StampComparator implements Comparator<Packet> {
 		public int compare(Packet p1, Packet p2) {
-			String stamp1 = p1.getElement().getAttribute("/message/x", "stamp");
-			String stamp2 = p2.getElement().getAttribute("/message/x", "stamp");
+			String stamp1 = "";
+			String stamp2 = "";
+			// Try XEP-0203 - the new XEP...
+			Element stamp_el1 = p1.getElement().getChild("delay", "urn:xmpp:delay");
+			if (stamp_el1 == null) {
+				// XEP-0091 support - the old one...
+				stamp_el1 = p1.getElement().getChild("x", "jabber:x:delay");
+			}
+			stamp1 = stamp_el1.getAttribute("stamp");
+			// Try XEP-0203 - the new XEP...
+			Element stamp_el2 = p2.getElement().getChild("delay", "urn:xmpp:delay");
+			if (stamp_el2 == null) {
+				// XEP-0091 support - the old one...
+				stamp_el2 = p2.getElement().getChild("x", "jabber:x:delay");
+			}
+			stamp2 = stamp_el2.getAttribute("stamp");
 			return stamp1.compareTo(stamp2);
 		}
 	}
