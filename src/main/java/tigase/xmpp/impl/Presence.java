@@ -561,9 +561,10 @@ public abstract class Presence {
 					subscr_changed = roster_util.updateBuddySubscription(session, pres_type,
 						packet.getElemFrom());
 					if (subscr_changed) {
-						sendPresence(StanzaType.unsubscribed, packet.getElemFrom(),
-							session.getJID(), results, null);
-						updatePresenceChange(packet.getElement(), session, results);
+						// No longer needed according to RFC-3921-bis5
+						//sendPresence(StanzaType.unsubscribed, packet.getElemFrom(),
+						//	session.getJID(), results, null);
+						//updatePresenceChange(packet.getElement(), session, results);
 						roster_util.updateBuddyChange(session, results,
 							roster_util.getBuddyItem(session, packet.getElemFrom()));
 					}
@@ -591,7 +592,8 @@ public abstract class Presence {
 						subscr_changed = roster_util.updateBuddySubscription(session, pres_type,
 							packet.getElemFrom());
 						if (subscr_changed) {
-							updatePresenceChange(packet.getElement(), session, results);
+							// No longer needed according to RFC-3921-bis5
+							//updatePresenceChange(packet.getElement(), session, results);
 							roster_util.updateBuddyChange(session, results,
 								roster_util.getBuddyItem(session, packet.getElemFrom()));
 						}
