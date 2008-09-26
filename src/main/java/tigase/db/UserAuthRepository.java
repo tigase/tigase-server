@@ -97,7 +97,7 @@ public interface UserAuthRepository {
 		throws UserNotFoundException, TigaseDBException, AuthorizationException;
 
 	/**
-	 * <code>plainAuth</code> method performs non-sasl, digest authentication
+	 * <code>digestAuth</code> method performs non-sasl, digest authentication
 	 * as described in non-sasl authentication
 	 * <a href="http://www.xmpp.org/extensions/xep-0078.html">XEP-0078</a>
 	 * For now it is empty and always returns <code>false</code> as I don't
