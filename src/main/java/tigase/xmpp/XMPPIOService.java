@@ -239,9 +239,9 @@ public class XMPPIOService extends IOService {
 							addReceivedPacket(new Packet(elem));
 						} // end of while ((elem = elems.poll()) != null)
 					}	catch (Exception ex) {
-						log.info("Incorrect XML data: " + new String(data)
+						log.log(Level.INFO, "Incorrect XML data: " + new String(data)
 							+ ", stopping connection: " + getUniqueId()
-							+ ", exception: " + ex);
+							+ ", exception: ", ex);
 						forceStop();
 					} // end of try-catch
 				} else {
