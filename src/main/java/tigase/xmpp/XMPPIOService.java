@@ -77,7 +77,7 @@ public class XMPPIOService extends IOService {
 //    * socket and the data should be processed in proper order.
 //    */
 //   private Lock writeLock = new ReentrantLock();
-	//private Lock readLock = new ReentrantLock();
+	private Lock readLock = new ReentrantLock();
 
 	//private boolean streamClosed = false;
 
@@ -206,7 +206,7 @@ public class XMPPIOService extends IOService {
     // It can be called by many threads simultanously
     // so we need to make it thread-safe
 		//log.finer("About to read socket data.");
-// 		readLock.lock();
+ 		readLock.lock();
     try {
 			if (isConnected()) {
 				char[] data = readData();
@@ -231,7 +231,7 @@ public class XMPPIOService extends IOService {
 						Element elem = null;
 						while ((elem = elems.poll()) != null) {
 							//	assert debug(elem.toString() + "\n");
-							log.finer("Read element: " + elem.getName());
+							//log.finer("Read element: " + elem.getName());
 							if (log.isLoggable(Level.FINEST)) {
 								log.finest("Read packet: " + elem.toString());
 							}
@@ -252,7 +252,7 @@ public class XMPPIOService extends IOService {
 				forceStop();
 			}
     } finally {
-//       readLock.unlock();
+			readLock.unlock();
     }
   }
 

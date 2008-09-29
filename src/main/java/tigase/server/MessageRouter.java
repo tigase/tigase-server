@@ -190,10 +190,10 @@ public class MessageRouter extends AbstractMessageReceiver {
 			return;
 		}
 
-		if (log.isLoggable(Level.FINER)) {
-			log.finer("Processing packet: " + packet.getElemName()
-				+ ", type: " + packet.getType());
-		}
+// 		if (log.isLoggable(Level.FINER)) {
+// 			log.finer("Processing packet: " + packet.getElemName()
+// 				+ ", type: " + packet.getType());
+// 		}
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Processing packet: " + packet.toString());
 		}
