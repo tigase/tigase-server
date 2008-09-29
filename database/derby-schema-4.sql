@@ -202,6 +202,6 @@ CREATE procedure TigDisabledAccounts()
 CREATE procedure TigAddNode(parentNid bigint, uid bigint, node varchar(255)) 
 	PARAMETER STYLE JAVA
 	LANGUAGE JAVA
-	READS SQL DATA
-	MODIFIES RESULT SETS 1
+	MODIFIES SQL DATA
+	DYNAMIC RESULT SETS 1
 	EXTERNAL NAME 'tigase.db.derby.StoredProcedures.TigAddNode';
