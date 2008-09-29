@@ -103,6 +103,26 @@ public abstract class RosterAbstract {
 
 	}
 
+	protected static final EnumSet<SubscriptionType> SUB_NONE =
+		EnumSet.of(
+			SubscriptionType.none,
+			SubscriptionType.none_pending_out,
+			SubscriptionType.none_pending_in,
+			SubscriptionType.none_pending_out_in);
+
+	protected static final EnumSet<SubscriptionType> SUB_TO =
+		EnumSet.of(
+			SubscriptionType.to,
+			SubscriptionType.to_pending_in);
+
+	protected static final EnumSet<SubscriptionType> SUB_FROM =
+		EnumSet.of(
+			SubscriptionType.from,
+			SubscriptionType.from_pending_out);
+
+	protected static final EnumSet<SubscriptionType> SUB_BOTH =
+		EnumSet.of(SubscriptionType.both);
+
 	protected static final EnumSet<SubscriptionType> TO_SUBSCRIBED =
 		EnumSet.of(
 			SubscriptionType.to,
@@ -505,10 +525,6 @@ public abstract class RosterAbstract {
 		SubscriptionType current_subscription =	getBuddySubscription(session, jid);
 		log.finest("current_subscription="+current_subscription
 			+" for jid="+jid);
-// 		if (current_subscription == null) {
-// 			current_subscription = SubscriptionType.none;
-// 			addBuddy(session, jid);
-// 		} // end of if (current_subscription == null)
 		if (current_subscription == null) {
 			addBuddy(session, jid);
 			current_subscription = SubscriptionType.none;
@@ -517,11 +533,30 @@ public abstract class RosterAbstract {
 			getStateTransition(current_subscription, presence);
 		log.finest("new_subscription="+new_subscription
 			+" for presence="+presence);
+		if (current_subscription == SubscriptionType.none_pending_in
+			&& presence == PresenceType.out_unsubscribed) {
+			removeBuddy(session, jid);
+			return false;
+		}
 		if (current_subscription != new_subscription) {
 			setBuddySubscription(session, new_subscription, jid);
 			return true;
-		} // end of if (current_subscription != new_subscription)
-		return false;
+		} else {
+			return false;
+		}
+// 		if ((SUB_NONE.contains(current_subscription)
+// 				&& SUB_NONE.contains(new_subscription))
+// 			|| (SUB_TO.contains(current_subscription)
+// 				&& SUB_TO.contains(new_subscription))
+// 			|| (SUB_FROM.contains(current_subscription)
+// 				&& SUB_FROM.contains(new_subscription))
+// 			|| (SUB_BOTH.contains(current_subscription)
+// 				&& SUB_BOTH.contains(new_subscription))) {
+// 			return false;
+// 		} else {
+// 			setBuddySubscription(session, new_subscription, jid);
+// 			return true;
+// 		}
 	}
 
   public Element getBuddyItem(final XMPPResourceConnection session,

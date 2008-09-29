@@ -490,12 +490,12 @@ public abstract class Presence {
 					break;
 				case out_subscribed:
 				case out_unsubscribed:
+					forwardPresence(results, packet, session.getUserId());
 					subscr_changed = roster_util.updateBuddySubscription(session, pres_type,
 						packet.getElemTo());
 					if (subscr_changed) {
 						roster_util.updateBuddyChange(session, results,
 							roster_util.getBuddyItem(session, packet.getElemTo()));
-						forwardPresence(results, packet, session.getUserId());
 						if (pres_type == PresenceType.out_subscribed) {
 							Element presence = (Element)session.getSessionData(PRESENCE_KEY);
 							if (presence != null) {
