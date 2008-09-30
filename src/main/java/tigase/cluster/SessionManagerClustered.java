@@ -256,6 +256,11 @@ public class SessionManagerClustered extends SessionManager
 		case result:
 			if (ClusterMethods.CHECK_USER_SESSION.toString().equals(clel.getMethodName())) {
 				String userId = clel.getMethodParam(USER_ID);
+				XMPPSession session = getSession(userId);
+				if (session == null) {
+					// Ups the session is gone by now, no need for further processing then
+					return;
+				}
 				String remote_smId = clel.getMethodResultVal(SM_ID);
 				long remote_creationTime = 0;
 				try {
@@ -266,7 +271,6 @@ public class SessionManagerClustered extends SessionManager
 				}
 				int remote_hashcode = (userId+remote_smId).hashCode();
 				int local_hashcode = (userId+getComponentId()).hashCode();
-				XMPPSession session = getSession(userId);
 				boolean transfer_out = false;
 				if (remote_creationTime > session.getLiveTime()) {
 					transfer_out = true;
