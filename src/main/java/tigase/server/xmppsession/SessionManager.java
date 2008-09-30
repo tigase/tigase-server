@@ -177,7 +177,7 @@ public class SessionManager extends AbstractMessageReceiver
 	}
 
 	protected boolean isBrokenPacket(Packet p) {
-		if (p.getFrom() != p.getElemFrom() && (!p.isCommand()
+		if (!p.getFrom().equals(p.getElemFrom()) && (!p.isCommand()
 				|| (p.isCommand() && p.getCommand() == Command.OTHER))) {
 			// It doesn't look good, there should reaaly be a connection for
 			// this packet....
