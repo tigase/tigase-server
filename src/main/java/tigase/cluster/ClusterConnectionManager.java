@@ -64,6 +64,12 @@ import tigase.xmpp.PacketErrorTypeException;
 public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 	implements XMPPService {
 
+  /**
+   * Variable <code>log</code> is a class logger.
+   */
+  private static final Logger log =
+    Logger.getLogger("tigase.cluster.ClusterConnectionManager");
+
 	public int[] PORTS = {5277};
   public static final String SECRET_PROP_KEY = "secret";
   public String SECRET_PROP_VAL =	"someSecret";
@@ -89,17 +95,18 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 	//	private boolean notify_admins = NOTIFY_ADMINS_PROP_VAL;
 	//	private String[] admins = new String[] {};
 	private String cluster_controller_id = null;
-
-  /**
-   * Variable <code>log</code> is a class logger.
-   */
-  private static final Logger log =
-    Logger.getLogger("tigase.cluster.ClusterConnectionManager");
+// 	private LinkedHashMap<String, LinkedHashMap<Long, Packet>> waiting_packs =
+//     new LinkedHashMap<String, LinkedHashMap<Long, Packet>>();
+// 	private LinkedHashMap<String, Long> sent_rids = new LinkedHashMap<String, Long>();
+// 	private LinkedHashMap<String, Long> recieved_rids =
+//     new LinkedHashMap<String, Long>();
+// 	private LinkedHashMap<String, Long> recieved_acks =
+//     new LinkedHashMap<String, Long>();
 
 	public void processPacket(Packet packet) {
-		log.finer("Processing packet: " + packet.getElemName()
-			+ ", type: " + packet.getType());
-		log.finest("Processing packet: " + packet.getStringData());
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Processing packet: " + packet.getStringData());
+		}
 		if (packet.getElemTo() != null
 			&& packet.getElemTo().equals(getComponentId())) {
 			try {
@@ -111,23 +118,41 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 			}
 			return;
 		}
-		if (packet.getElemName() == ClusterElement.CLUSTER_EL_NAME) {
-			writePacketToSocket(packet);
-		} else {
-			writePacketToSocket(packet.packRouted());
-		}
+		writePacketToSocket(packet.packRouted());
+// 		if (packet.getElemName() == ClusterElement.CLUSTER_EL_NAME) {
+// 			writePacketToSocket(packet);
+// 		} else {
+// 			writePacketToSocket(packet.packRouted());
+// 		}
+	}
+
+	protected void writePacketToSocket(Packet p) {
+// 		long rid = ++send_rid;
+// 		p.getElement().setAttribute("rid", ""+rid);
+// 		synchronized (waiting_packs) {
+// 			LinkedHashMap<Long, Packet> waiting_packets =
+//         waiting_packs.get(getServiceId(p));
+// 			if (waiting_packets == null) {
+// 				waiting_packets = new LinkedHashMap<Long, Packet>();
+// 				waiting_ack.put(getServiceId(p), waiting_packets);
+// 			}
+// 			waiting_packets.put(rid, p);
+// 		}
+		super.writePacketToSocket(p);
 	}
 
 	public Queue<Packet> processSocketData(XMPPIOService serv) {
 		Packet p = null;
 		while ((p = serv.getReceivedPackets().poll()) != null) {
-			log.finer("Processing packet: " + p.getElemName()
-				+ ", type: " + p.getType());
-			log.finest("Processing socket data: " + p.getStringData());
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Processing socket data: " + p.getStringData());
+			}
 			if (p.getElemName().equals("handshake")) {
 				processHandshake(p, serv);
 			} else {
 				if (p.isRouted()) {
+// 					processReceivedRid(p, serv);
+// 					processReceivedAck(p, serv);
 					p = p.unpackRouted();
 				} // end of if (p.isRouted())
 				addOutPacket(p);
@@ -135,6 +160,53 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 		} // end of while ()
 		return null;
 	}
+
+// 	private void processReceivedAck(Packet packet, XMPPIOService serv) {
+// 		String ack_str = packet.getAttribute("ack");
+// 		if (ack_str == null) {
+// 			log.warning("ack attribute is null for packet: " + packet.toString()
+// 				+ ", please update all cluster nodes.");
+// 		} else {
+// 			try {
+// 				long r_ack = Long.parseLong(ack_str);
+// 				synchronized (waiting_packs) {
+// 					LinkedHashMap<Long, Packet> waiting_packets =
+//             waiting_packs.get(serv.getRemoteAddress());
+// 					if (waiting_packets == null) {
+// 						log.warning("Checking ACK and waiting_packets is null for packet: " +
+// 							packet);
+// 						return;
+// 					}
+// 					long last_ack = received_acks.get(serv.getRemoteAddress());
+// 					if (r_ack == (++last_ack)) {
+// 						received_acks.put(serv.getRemoteAddress(), r_ack);
+// 						Packet p = waiting_packets.remove(r_ack);
+// 						if (p == null) {
+// 							log.warning("Packet for r_ack = " + r_ack + " not found...");
+// 						}
+// 					} else {
+						
+// 					}
+// 				}
+// 			} catch (NumberFormatException e) {
+// 				log.warning("Incorrect ack value in packet: " + packet.toString());
+// 			}
+// 		}
+// 	}
+
+// 	private void processReceivedRid(Packet packet, XMPPIOService serv) {
+// 		String rid_str = packet.getAttribute("rid");
+// 		if (rid_str == null) {
+// 			log.warning("rid attribute is null for packet: " + packet.toString()
+// 				+ ", please update all cluster nodes.");
+// 		} else {
+// 			try {
+// 				long r_rid = Long.parseLong(rid_str);
+// 			} catch (NumberFormatException e) {
+// 				log.warning("Incorrect rid value in packet: " + packet.toString());
+// 			}
+// 		}
+// 	}
 
 	private void processHandshake(Packet p, XMPPIOService serv) {
 		switch (serv.connectionType()) {
@@ -162,7 +234,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 					writePacketToSocket(serv, resp);
 					serviceConnected(serv);
 				} else {
-					log.info("Handshaking password doesn't match, disconnecting...");
+					log.warning("Handshaking password doesn't match, disconnecting...");
 					serv.stop();
 				}
 			} catch (Exception e) {
@@ -182,7 +254,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 		updateRoutings(routings, true);
 		String addr =
 			(String)serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
-		log.fine("Connected to: " + addr);
+		log.info("Connected to: " + addr);
 		updateServiceDiscovery(addr, XMLNS + " connected");
 		Map<String, String> method_params = new LinkedHashMap<String, String>();
 		method_params.put("connected", addr);
@@ -190,6 +262,14 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 					getComponentId(), cluster_controller_id,
 					StanzaType.set.toString(), ClusterMethods.UPDATE_NODES.toString(),
 					method_params).getClusterElement()));
+// 		synchronized (waiting_packs) {
+// 			LinkedHashMap<Long, Packet> waiting_packets =
+//         waiting_packs.get(serv.getRemoteAddress());
+// 			if (waiting_packets == null) {
+// 				waiting_packets = new LinkedHashMap<Long, Packet>();
+// 				waiting_ack.put(serv.getRemoteAddress(), waiting_packets);
+// 			}
+// 		}
 	}
 
 	public void setProperties(Map<String, Object> props) {
@@ -291,7 +371,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 		} // end of if (type == ConnectionType.connect)
 		//		removeRouting(serv.getRemoteHost());
 		String addr = (String)sessionData.get(PORT_REMOTE_HOST_PROP_KEY);
-		log.fine("Disonnected from: " + addr);
+		log.info("Disonnected from: " + addr);
 		updateServiceDiscovery(addr, XMLNS + " disconnected");
 		Map<String, String> method_params = new LinkedHashMap<String, String>();
 		method_params.put("disconnected", addr);
@@ -313,7 +393,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 
 	public void serviceStarted(XMPPIOService serv) {
 		super.serviceStarted(serv);
-		log.finest("c2c connection opened: " + serv.getRemoteAddress()
+		log.info("cluster connection opened: " + serv.getRemoteAddress()
 			+ ", type: " + serv.connectionType().toString()
 			+ ", id=" + serv.getUniqueId());
 // 		String addr =
@@ -336,7 +416,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 				+ " from='" + getDefHostName() + "'"
 				+ " to='" + remote_host + "'"
 				+ ">";
-			log.finest("cid: " + (String)serv.getSessionData().get("cid")
+			log.info("cid: " + (String)serv.getSessionData().get("cid")
 				+ ", sending: " + data);
 			serv.xmppStreamOpen(data);
 			break;
@@ -349,7 +429,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 	public String xmppStreamOpened(XMPPIOService service,
 		Map<String, String> attribs) {
 
-		log.finer("Stream opened: " + attribs.toString());
+		log.info("Stream opened: " + attribs.toString());
 
 		switch (service.connectionType()) {
 		case connect: {
@@ -391,7 +471,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 	}
 
 	public void xmppStreamClosed(XMPPIOService serv) {
-		log.finer("Stream closed.");
+		log.info("Stream closed.");
 	}
 
 	/**
@@ -428,7 +508,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 	private void updateServiceDiscovery(String jid, String name) {
 		ServiceEntity item = new ServiceEntity(jid, null, name);
 		//item.addIdentities(new ServiceIdentity("component", identity_type, name));
-		log.finest("Modifing service-discovery info: " + item.toString());
+		log.info("Modifing service-discovery info: " + item.toString());
 		serviceEntity.addItems(item);
 	}
 
