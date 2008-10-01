@@ -561,60 +561,70 @@ public class SessionManager extends AbstractMessageReceiver
 			processing_result = true;
 			break;
 		case USER_STATUS:
-			if (isTrusted(pc.getElemFrom())
-				|| isTrusted(JIDUtils.getNodeHost(pc.getElemFrom()))) {
-				String user_jid = Command.getFieldValue(pc, "jid");
-				String hostname = JIDUtils.getNodeHost(user_jid);
-				String av = Command.getFieldValue(pc, "available");
-				boolean available = !(av != null && av.equalsIgnoreCase("false"));
-				if (available) {
-					connection = connectionsByFrom.get(pc.getElemFrom());
-					if (connection == null) {
-						connection = createUserSession(pc.getElemFrom(), hostname, user_jid);
-						connection.setSessionId("USER_STATUS");
-						try {
+			try {
+				if (isTrusted(pc.getElemFrom())
+					|| isTrusted(JIDUtils.getNodeHost(pc.getElemFrom()))) {
+					String user_jid = Command.getFieldValue(pc, "jid");
+					String hostname = JIDUtils.getNodeHost(user_jid);
+					String av = Command.getFieldValue(pc, "available");
+					boolean available = !(av != null && av.equalsIgnoreCase("false"));
+					if (available) {
+						connection = connectionsByFrom.get(pc.getElemFrom());
+						if (connection == null) {
+							connection = createUserSession(pc.getElemFrom(), hostname, user_jid);
+							connection.setSessionId("USER_STATUS");
 							user_repository.setData(JIDUtils.getNodeID(user_jid), "tokens",
 								"USER_STATUS", "USER_STATUS");
 							connection.loginToken("USER_STATUS", "USER_STATUS");
 							handleLogin(user_jid, connection);
 							connection.putSessionData("jingle", "active");
+							addOutPacket(pc.okResult((String)null, 0));
 							Packet presence =
-						new Packet(new Element("presence",
-								new Element[] {
-									new Element("priority", "-1"),
-									new Element("c",
-										new String[] {"node", "ver", "ext", "xmlns"},
-										new String[] {"http://www.google.com/xmpp/client/caps",
-																	XMPPServer.getImplementationVersion(),
-																	"voice-v1",
-																	"http://jabber.org/protocol/caps"})},
-								null, null));
+						    new Packet(new Element("presence",
+										new Element[] {
+											new Element("priority", "-1"),
+											new Element("c",
+												new String[] {"node", "ver", "ext", "xmlns"},
+												new String[] {"http://www.google.com/xmpp/client/caps",
+																			XMPPServer.getImplementationVersion(),
+																			"voice-v1",
+																			"http://jabber.org/protocol/caps"})},
+										null, null));
 							presence.setFrom(pc.getElemFrom());
 							presence.setTo(getComponentId());
 							addOutPacket(presence);
-						} catch (Exception e) {
-							log.log(Level.WARNING, "USER_STATUS session creation error: ", e);
+						} else {
+							addOutPacket(Authorization.CONFLICT.getResponseMessage(pc,
+									"The user resource already exists.", true));
+							log.finest("USER_STATUS set to true for user who is already available: "
+								+ pc.toString());
 						}
 					} else {
-						log.finest("USER_STATUS set to true for user who is already available: "
-							+ pc.toString());
+						connection = connectionsByFrom.remove(pc.getElemFrom());
+						if (connection != null) {
+							closeSession(connection, false);
+							addOutPacket(pc.okResult((String)null, 0));
+						} else {
+							addOutPacket(Authorization.ITEM_NOT_FOUND.getResponseMessage(pc,
+									"The user resource you want to remove does not exist.", true));
+							log.info("Can not find resource connection for packet: " +
+								pc.toString());
+						}
 					}
 				} else {
-					connection = connectionsByFrom.remove(pc.getElemFrom());
-					if (connection != null) {
-						closeSession(connection, false);
-					} else {
-						log.info("Can not find resource connection for packet: " +
-							pc.toString());
+					try {
+						addOutPacket(Authorization.FORBIDDEN.getResponseMessage(pc,
+								"Only trusted entity can do it.", true));
+					} catch (PacketErrorTypeException e) {
+						log.warning("Packet error type when not expected: " + pc.toString());
 					}
 				}
-			} else {
+			} catch (Exception e) {
 				try {
-					addOutPacket(Authorization.FORBIDDEN.getResponseMessage(pc,
-							"Only trusted entity can do it.", true));
-				} catch (PacketErrorTypeException e) {
-					log.warning("Packet error type when not expected: " + pc.toString());
-				}
+					addOutPacket(Authorization.UNDEFINED_CONDITION.getResponseMessage(pc,
+							"Unexpected error occured during the request: " + e, true));
+				} catch (Exception ex) { ex.printStackTrace(); }
+				log.log(Level.WARNING, "USER_STATUS session creation error: ", e);
 			}
 			processing_result = true;
 			break;
