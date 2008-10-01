@@ -561,16 +561,24 @@ public class SessionManager extends AbstractMessageReceiver
 			processing_result = true;
 			break;
 		case USER_STATUS:
-			String user_jid = Command.getFieldValue(pc, "jid");
-			String hostname = JIDUtils.getNodeHost(user_jid);
-			String av = Command.getFieldValue(pc, "available");
-			boolean available = !(av != null && av.equalsIgnoreCase("false"));
-			if (available) {
-				connection = connectionsByFrom.get(pc.getElemFrom());
-				if (connection == null) {
-					connection = createUserSession(pc.getElemFrom(), hostname, user_jid);
-					connection.putSessionData("jingle", "active");
-					Packet presence =
+			if (isTrusted(pc.getElemFrom())
+				|| isTrusted(JIDUtils.getNodeHost(pc.getElemFrom()))) {
+				String user_jid = Command.getFieldValue(pc, "jid");
+				String hostname = JIDUtils.getNodeHost(user_jid);
+				String av = Command.getFieldValue(pc, "available");
+				boolean available = !(av != null && av.equalsIgnoreCase("false"));
+				if (available) {
+					connection = connectionsByFrom.get(pc.getElemFrom());
+					if (connection == null) {
+						connection = createUserSession(pc.getElemFrom(), hostname, user_jid);
+						connection.setSessionId("USER_STATUS");
+						try {
+							user_repository.setData(JIDUtils.getNodeID(user_jid), "tokens",
+								"USER_STATUS", "USER_STATUS");
+							connection.loginToken("USER_STATUS", "USER_STATUS");
+							handleLogin(user_jid, connection);
+							connection.putSessionData("jingle", "active");
+							Packet presence =
 						new Packet(new Element("presence",
 								new Element[] {
 									new Element("priority", "-1"),
@@ -581,20 +589,31 @@ public class SessionManager extends AbstractMessageReceiver
 																	"voice-v1",
 																	"http://jabber.org/protocol/caps"})},
 								null, null));
-					presence.setFrom(pc.getElemFrom());
-					presence.setTo(getName() + "@" + pc.getTo());
-					addOutPacket(presence);
+							presence.setFrom(pc.getElemFrom());
+							presence.setTo(getComponentId());
+							addOutPacket(presence);
+						} catch (Exception e) {
+							log.log(Level.WARNING, "USER_STATUS session creation error: ", e);
+						}
+					} else {
+						log.finest("USER_STATUS set to true for user who is already available: "
+							+ pc.toString());
+					}
 				} else {
-					log.finest("USER_STATUS set to true for user who is already available: "
-						+ pc.toString());
+					connection = connectionsByFrom.remove(pc.getElemFrom());
+					if (connection != null) {
+						closeSession(connection, false);
+					} else {
+						log.info("Can not find resource connection for packet: " +
+							pc.toString());
+					}
 				}
 			} else {
-				connection = connectionsByFrom.remove(pc.getElemFrom());
-				if (connection != null) {
-					closeSession(connection, false);
-				} else {
-					log.info("Can not find resource connection for packet: " +
-						pc.toString());
+				try {
+					addOutPacket(Authorization.FORBIDDEN.getResponseMessage(pc,
+							"Only trusted entity can do it.", true));
+				} catch (PacketErrorTypeException e) {
+					log.warning("Packet error type when not expected: " + pc.toString());
 				}
 			}
 			processing_result = true;

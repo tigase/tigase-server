@@ -107,23 +107,28 @@ public class XMPPSession {
 		log.finest("Adding resource connection for username : " + username
 			+ ", id: " + conn.getConnectionId());
 		XMPPResourceConnection old_res = getResourceForResource(conn.getResource());
-		if (old_res != null) {
-			log.finest("Found old resource connection, id: "+old_res.getConnectionId());
-			removeResourceConnection(old_res);
-			try { old_res.logout(); } catch (Exception e) {
-				log.log(Level.INFO, "Exception during closing old connection, ignoring.", e);
-			}
-		} // end of if (old_res != null)
-		activeResources.add(conn);
-		conn.setParentSession(this);
-		log.finest("Number of active resources is: " + activeResources.size());
-		if (activeResources.size() > 1) {
-			int i = 0;
-			for (XMPPResourceConnection res: activeResources) {
-				log.finest("RES " + (++i) + ": " + res.getResource() + ", "
-					+ res.getConnectionId());
-			} // end of for (XMPPResourceConnection res: activeResources)
-		} // end of if (activeResources.size() > 1)
+		// If they are equal, just ignore this. It may happen only for USER_STATUS
+		// command where the user session is artificialy created....
+		if (old_res != conn) {
+			if (old_res != null) {
+				log.finest("Found old resource connection, id: "+old_res.getConnectionId());
+				removeResourceConnection(old_res);
+				try { old_res.logout(); } catch (Exception e) {
+					log.log(Level.INFO,
+						"Exception during closing old connection, ignoring.", e);
+				}
+			} // end of if (old_res != null)
+			activeResources.add(conn);
+			conn.setParentSession(this);
+			log.finest("Number of active resources is: " + activeResources.size());
+			if (activeResources.size() > 1) {
+				int i = 0;
+				for (XMPPResourceConnection res: activeResources) {
+					log.finest("RES " + (++i) + ": " + res.getResource() + ", "
+						+ res.getConnectionId());
+				} // end of for (XMPPResourceConnection res: activeResources)
+			} // end of if (activeResources.size() > 1)
+		}
 	}
 
 	public void removeResourceConnection(XMPPResourceConnection conn) {
