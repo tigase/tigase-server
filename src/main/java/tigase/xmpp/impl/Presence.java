@@ -228,7 +228,7 @@ public abstract class Presence {
 		throws NotAuthorizedException {
 		for (XMPPResourceConnection conn: session.getActiveSessions()) {
 			log.finer("Update presence change to: " + conn.getJID());
-			if (conn != session) {
+			if (conn != session && conn.isResourceSet()) {
 				// Send to new resource presence about old resource
 				Element pres_update = presence.clone();
 				pres_update.setAttribute("from", session.getJID());

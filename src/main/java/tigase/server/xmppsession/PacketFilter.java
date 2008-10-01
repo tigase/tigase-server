@@ -78,6 +78,17 @@ public class PacketFilter {
 		} // end of if (session == null)
 
 		try {
+			// After authentication we require resource binding packet and
+			// nothing else:
+			if (!session.isResourceSet()
+				&& packet.getElement().getChild("bind", "urn:ietf:params:xml:ns:xmpp-bind") == null) {
+				// We do not accept anything without resource binding....
+				results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
+						"You must bind the resource first: http://www.xmpp.org/rfcs/rfc3920.html#bind",
+						true));
+				return true;
+			}
+
 			// For all messages coming from the owner of this account set
 			// proper 'from' attribute. This is actually needed for the case
 			// when the user sends a message to himself.
@@ -93,7 +104,7 @@ public class PacketFilter {
 				}
 			}
 
-		} catch (NotAuthorizedException e) {
+		} catch (Exception e) {
 			return false;
 		} // end of try-catch
 

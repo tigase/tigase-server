@@ -298,6 +298,10 @@ public class XMPPResourceConnection extends RepositoryAccess {
 		this.defLang = lang;
 	}
 
+	public boolean isResourceSet() {
+		return this.resource != null;
+	}
+
 	/**
 	 * Gets the value of resource
 	 *
