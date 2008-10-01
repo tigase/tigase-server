@@ -123,6 +123,7 @@ public class XMPPDomBuilderHandler implements SimpleHandler {
 					namespaces.put(attr_names[i].substring("xmlns:".length(),
 							attr_names[i].length()),
 						attr_values[i].toString());
+					log.finest("Namespace found: " + attr_values[i].toString());
 				} // end of if (att_name.startsWith("xmlns:"))
 			} // end of for (String att_name : attnames)
 		} // end of if (attr_names != null)
@@ -150,6 +151,7 @@ public class XMPPDomBuilderHandler implements SimpleHandler {
 				new_xmlns = namespaces.get(pref);
 				tmp_name = tmp_name.substring(pref.length()+1, tmp_name.length());
 				prefix = pref;
+				log.finest("new_xmlns = " + new_xmlns);
 			} // end of if (tmp_name.startsWith(xmlns))
 		} // end of for (String xmlns: namespaces.keys())
     Element elem = newElement(tmp_name, null, attr_names, attr_values);
@@ -159,11 +161,13 @@ public class XMPPDomBuilderHandler implements SimpleHandler {
 				//elem.setDefXMLNS(top_xmlns);
 			} else {
 				elem.setDefXMLNS(el_stack.peek().getXMLNS());
+				log.finest("DefXMLNS assigned: " + elem.toString());
 			}
     }
 		if (new_xmlns != null) {
 			elem.setXMLNS(new_xmlns);
 			elem.removeAttribute("xmlns:" + prefix);
+			log.finest("new_xmlns assigned: " + elem.toString());
 		}
     el_stack.push(elem);
   }
