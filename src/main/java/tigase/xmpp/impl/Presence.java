@@ -579,7 +579,7 @@ public abstract class Presence {
 					subscr_changed = roster_util.updateBuddySubscription(session, pres_type,
 						packet.getElemFrom());
 					if (subscr_changed) {
-						updatePresenceChange(packet.getElement(), session, results);
+						//updatePresenceChange(packet.getElement(), session, results);
 						roster_util.updateBuddyChange(session, results,
 							roster_util.getBuddyItem(session, packet.getElemFrom()));
 					}
