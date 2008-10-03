@@ -272,9 +272,9 @@ public class BoshSession {
 			String body =	result.getCData("/message/body");
 			if (body != null) {
 				int count = 0;
-				for (Pattern reg: links_regexs) {
-					body = reg.matcher(body).replaceAll(replace_with[count++]);
-				}
+// 				for (Pattern reg: links_regexs) {
+// 					body = reg.matcher(body).replaceAll(replace_with[count++]);
+// 				}
 				result.getChild("body").setCData(body);
 			}
 		}
