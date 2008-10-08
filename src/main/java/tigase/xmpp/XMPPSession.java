@@ -156,6 +156,15 @@ public class XMPPSession {
 		return null;
 	}
 
+	public XMPPResourceConnection getResourceForConnectionId(String connectionId) {
+		for (XMPPResourceConnection conn: activeResources) {
+			if (connectionId.equals(conn.getConnectionId())) {
+				return conn;
+			} // end of if (resource.equals(conn.getResource()))
+		} // end of for (XMPPResourceConnection conn: activeResources)
+		return null;
+	}
+
 	public XMPPResourceConnection getResourceForJID(final String jid) {
 		final String resource = JIDUtils.getNodeResource(jid);
 		return getResourceForResource(resource);

@@ -221,31 +221,53 @@ public class SessionManagerClustered extends SessionManager
 			break;
 		case get:
 			if (ClusterMethods.CHECK_USER_SESSION.toString().equals(clel.getMethodName())) {
-				ClusterElement result = null;
 				String userId = clel.getMethodParam(USER_ID);
 				XMPPSession session = getSession(userId);
-				log.finest("CHECK_USER_SESSION received GET request for user: " + userId
-					+ " from " + clel.getFirstNode());
-				if (session == null) {
-					log.finest("Session not local, forwarding CHECK_USER_SESSION "
-						+ "to next node.");
-					result = ClusterElement.createForNextNode(clel, cluster_nodes,
-						getComponentId());
-					if (result != null
-						&& result.getClusterElement().getAttribute("to").equals(result.getFirstNode())) {
-						log.finest("No more nodes for checking user sessiom, we don't want to send this packet back...");
-						result = null;
+				if (getComponentId().equals(clel.getFirstNode())) {
+					// The request has bounced back which means there is no session for
+					// this user on any other node.
+					// Release ON_HOLD for the session and process all waiting packets:
+					if (session != null) {
+						String connectionId = clel.getMethodParam(CONNECTION_ID);
+						XMPPResourceConnection conn =
+              session.getResourceForConnectionId(connectionId);
+						if (conn != null) {
+							conn.setConnectionStatus(ConnectionStatus.NORMAL);
+							sendAllOnHold(conn);
+						} else {
+							// Hm, session found but no connection, maybe the user
+							// has disconnected in meantime
+							log.info("CHECK_USER_SESSION command came back with no results, the user session exists but connection doesn't, packet: " + packet.toString());
+						}
+					} else {
+						// Hm, session not found, maybe the user has disconnected in meantime
+						log.info("CHECK_USER_SESSION command came back with no results, the user session doesn't exists locally either, packet: " + packet.toString());
 					}
 				} else {
-					log.finest("Session found, sending back user session data...");
-					Map<String, String> res_vals = new LinkedHashMap<String, String>();
-					res_vals.put(SM_ID, getComponentId());
-					res_vals.put(CREATION_TIME, ""+session.getLiveTime());
-					result = clel.createMethodResponse(getComponentId(),
-						StanzaType.result.toString(), res_vals);
-				}
-				if (result != null) {
-					fastAddOutPacket(new Packet(result.getClusterElement()));
+					ClusterElement result = null;
+					log.finest("CHECK_USER_SESSION received GET request for user: " + userId
+						+ " from " + clel.getFirstNode());
+					if (session == null) {
+						log.finest("Session not local, forwarding CHECK_USER_SESSION "
+							+ "to next node.");
+						result = ClusterElement.createForNextNode(clel, cluster_nodes,
+							getComponentId());
+// 						if (result != null
+// 							&& result.getClusterElement().getAttribute("to").equals(result.getFirstNode())) {
+// 							log.finest("No more nodes for checking user sessiom, we don't want to send this packet back...");
+// 							result = null;
+// 						}
+					} else {
+						log.finest("Session found, sending back user session data...");
+						Map<String, String> res_vals = new LinkedHashMap<String, String>();
+						res_vals.put(SM_ID, getComponentId());
+						res_vals.put(CREATION_TIME, ""+session.getLiveTime());
+						result = clel.createMethodResponse(getComponentId(),
+							StanzaType.result.toString(), res_vals);
+					}
+					if (result != null) {
+						fastAddOutPacket(new Packet(result.getClusterElement()));
+					}
 				}
 			}
 			if (ClusterMethods.SESSION_TRANSFER.toString().equals(clel.getMethodName())) {
@@ -345,7 +367,7 @@ public class SessionManagerClustered extends SessionManager
 			log.finest("TRANSFERIN user: " + userId + " sessions to " + remote_smId);
 			List<XMPPResourceConnection> conns = session.getActiveResources();
 			for (XMPPResourceConnection conn_res: conns) {
-				conn_res.setConnectionStatus(ConnectionStatus.ON_HOLD);
+				//				conn_res.setConnectionStatus(ConnectionStatus.ON_HOLD);
 				conn_res.putSessionData("redirect-to", remote_smId);
 				final XMPPResourceConnection conn = conn_res;
 				// Delay is needed here as there might be packets which are being processing
@@ -491,8 +513,10 @@ public class SessionManagerClustered extends SessionManager
 			if (cluster_node != null) {
 				log.finest("CHECK_USER_SESSION on other cluster nodes for: "
 					+ JIDUtils.getNodeID(userName, conn.getDomain()));
+				conn.setConnectionStatus(ConnectionStatus.ON_HOLD);
 				Map<String, String> params = new LinkedHashMap<String, String>();
 				params.put(USER_ID, JIDUtils.getNodeID(userName, conn.getDomain()));
+				params.put(CONNECTION_ID, conn.getConnectionId());
 				Element check_session_el = ClusterElement.createClusterMethodCall(
 					getComponentId(), cluster_node, StanzaType.get.toString(),
 					ClusterMethods.CHECK_USER_SESSION.toString(), params).getClusterElement();
