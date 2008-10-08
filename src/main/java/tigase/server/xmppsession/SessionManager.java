@@ -655,13 +655,19 @@ public class SessionManager extends AbstractMessageReceiver
 	@SuppressWarnings("unchecked")
 	protected void sendAllOnHold(XMPPResourceConnection conn) {
 		String remote_smId = (String)conn.getSessionData("redirect-to");
+		LinkedList<Packet> packets =
+      (LinkedList<Packet>)conn.getSessionData(SESSION_PACKETS);
 		if (remote_smId == null) {
-			log.warning("No address for remote SM to redirect packets.");
+			log.finest("No address for remote SM to redirect packets, processing locally.");
+			if (packets != null) {
+				Packet sess_pack = null;
+				while ((sess_pack = packets.poll()) != null) {
+					processPacket(sess_pack);
+				}
+			}
 			return;
 		}
 		conn.setConnectionStatus(ConnectionStatus.REDIRECT);
-		LinkedList<Packet> packets =
-      (LinkedList<Packet>)conn.getSessionData(SESSION_PACKETS);
 		if (packets != null) {
 			Packet sess_pack = null;
 			while ((sess_pack = packets.poll()) != null) {
