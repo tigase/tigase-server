@@ -232,6 +232,7 @@ public class SessionManagerClustered extends SessionManager
 						XMPPResourceConnection conn =
               session.getResourceForConnectionId(connectionId);
 						if (conn != null) {
+							log.finest("Releasing ON_HOLD for a user session.");
 							conn.setConnectionStatus(ConnectionStatus.NORMAL);
 							sendAllOnHold(conn);
 						} else {
@@ -310,6 +311,19 @@ public class SessionManagerClustered extends SessionManager
 				if (transfer_out) {
 					transferUserSession(userId, remote_smId, clel);
 				} else {
+					String connectionId = clel.getMethodParam(CONNECTION_ID);
+					XMPPResourceConnection conn =
+              session.getResourceForConnectionId(connectionId);
+					if (conn != null) {
+						log.finest("Releasing ON_HOLD for a user session.");
+						conn.setConnectionStatus(ConnectionStatus.NORMAL);
+						sendAllOnHold(conn);
+					} else {
+						// Hm, session found but no connection, maybe the user
+						// has disconnected in meantime
+						log.info("CHECK_USER_SESSION command came back with no results, the user session exists but connection doesn't, packet: " + packet.toString());
+					}
+
 					log.finest("Requesting user: " + userId
 						+ " session transfer from " + remote_smId);
 					Map<String, String> params = new LinkedHashMap<String, String>();
