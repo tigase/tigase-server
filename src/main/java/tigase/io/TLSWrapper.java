@@ -154,7 +154,7 @@ public class TLSWrapper {
 	}
 
 	/**
-	 * Method <code>resizeApplicationBuffer</code> is used to perform 
+	 * Method <code>resizeApplicationBuffer</code> is used to perform
 	 */
 	private ByteBuffer resizeApplicationBuffer(ByteBuffer app) {
 		if (app.remaining() < appBuffSize) {

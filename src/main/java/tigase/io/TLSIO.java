@@ -104,6 +104,7 @@ public class TLSIO implements IOInterface {
 				throw new BufferUnderflowException();
       case CLOSED:
         if (tlsWrapper.getStatus() == TLSStatus.CLOSED) {
+					log.finer("TLS Socket closed...");
           throw new EOFException("Socket has been closed.");
         } // end of if (tlsWrapper.getStatus() == TLSStatus.CLOSED)
         break do_loop;

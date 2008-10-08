@@ -129,6 +129,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 // 					serv.addPacketToSend(p_proceed);
 // 					serv.processWaitingPackets();
 					serv.startTLS(false);
+					serv.call();
 // 					readThread.addSocketService(serv);
 				} catch (IOException e) {
 					log.warning("Error starting TLS: " + e);
