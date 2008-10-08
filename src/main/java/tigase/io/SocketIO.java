@@ -68,6 +68,7 @@ public class SocketIO implements IOInterface {
   }
 
   public boolean isConnected() {
+		log.finest("Is connected: " + channel.isConnected());
     return channel.isConnected();
   }
 
