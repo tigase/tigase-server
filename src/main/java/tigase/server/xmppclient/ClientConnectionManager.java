@@ -123,8 +123,8 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 					// threads pool and then sends <proceed> packet and starts TLS.
 					Element proceed = Command.getData(packet, "proceed", null);
 					Packet p_proceed = new Packet(proceed);
-// 					SocketReadThread readThread = SocketReadThread.getInstance();
-// 					readThread.removeSocketService(serv);
+ 					SocketReadThread readThread = SocketReadThread.getInstance();
+ 					readThread.removeSocketService(serv);
 					writePacketToSocket(serv, p_proceed);
 // 					serv.addPacketToSend(p_proceed);
 // 					serv.processWaitingPackets();
