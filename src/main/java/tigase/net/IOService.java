@@ -136,9 +136,9 @@ public abstract class IOService implements Callable<IOService> {
   public void startSSL(final boolean clientMode)
     throws IOException {
 
-		socketIO = new TLSIO(socketIO,
-			new TLSWrapper(TLSUtil.getSSLContext(sslId, "SSL",
-					(String)sessionData.get(HOSTNAME_KEY)), null, clientMode));
+		TLSWrapper wrapper = new TLSWrapper(TLSUtil.getSSLContext(sslId, "SSL",
+				(String)sessionData.get(HOSTNAME_KEY)), null, clientMode);
+		socketIO = new TLSIO(socketIO, wrapper);
 		setLastTransferTime();
   }
 

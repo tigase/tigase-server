@@ -159,6 +159,7 @@ public class TLSIO implements IOInterface {
   }
 
   public void stop() throws IOException {
+		log.finest("Stop called...");
     io.stop();
     tlsWrapper.close();
   }
