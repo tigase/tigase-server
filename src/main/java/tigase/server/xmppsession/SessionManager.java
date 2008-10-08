@@ -919,7 +919,7 @@ public class SessionManager extends AbstractMessageReceiver
 		} // end of for ()
 		addRouting(getComponentId());
  		serverSession = createUserSession(NULL_ROUTING, getDefHostName(),
- 			getComponentId());
+ 			getComponentId() + "/server");
 		anonymous_domains.clear();
 		anonymous_domains.addAll(
 			Arrays.asList((String[])props.get(ANONYMOUS_DOMAINS_PROP_KEY)));
