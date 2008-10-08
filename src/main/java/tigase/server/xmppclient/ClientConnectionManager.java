@@ -125,12 +125,12 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 					Packet p_proceed = new Packet(proceed);
  					SocketReadThread readThread = SocketReadThread.getInstance();
  					readThread.removeSocketService(serv);
-					writePacketToSocket(serv, p_proceed);
-// 					serv.addPacketToSend(p_proceed);
-// 					serv.processWaitingPackets();
+					//					writePacketToSocket(serv, p_proceed);
+ 					serv.addPacketToSend(p_proceed);
+ 					serv.processWaitingPackets();
 					serv.startTLS(false);
-					serv.call();
-// 					readThread.addSocketService(serv);
+					//					serv.call();
+ 					readThread.addSocketService(serv);
 				} catch (IOException e) {
 					log.warning("Error starting TLS: " + e);
 				} // end of try-catch
