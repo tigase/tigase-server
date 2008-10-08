@@ -159,7 +159,7 @@ public abstract class Presence {
     } // end of if (buddies == null)
 		Set<String> direct_presences =
 			(Set<String>)session.getSessionData(DIRECT_PRESENCE);
-		if (direct_presences != null) {
+		if (direct_presences != null && t != null && t == StanzaType.unavailable) {
 			for (String buddy: direct_presences) {
 				log.finest("Updating direct presence for: " + buddy);
 				sendPresence(t, buddy, session.getJID(), results, pres);
