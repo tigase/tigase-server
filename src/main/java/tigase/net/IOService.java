@@ -145,9 +145,9 @@ public abstract class IOService implements Callable<IOService> {
   public void startTLS(final boolean clientMode)
     throws IOException {
 
-		socketIO = new TLSIO(socketIO,
-			new TLSWrapper(TLSUtil.getSSLContext(sslId, "TLS",
-					(String)sessionData.get(HOSTNAME_KEY)), null, clientMode));
+		TLSWrapper wrapper = new TLSWrapper(TLSUtil.getSSLContext(sslId, "TLS",
+				(String)sessionData.get(HOSTNAME_KEY)), null, clientMode);
+		socketIO = new TLSIO(socketIO, wrapper);
 		setLastTransferTime();
   }
 
@@ -179,8 +179,9 @@ public abstract class IOService implements Callable<IOService> {
    * @return a <code>boolean</code> value
    */
   public synchronized boolean isConnected() {
-    return socketIO == null ? false : socketIO.isConnected();
-  }
+		log.finest("socketIO = " + socketIO);
+		return socketIO == null ? false : socketIO.isConnected();
+	}
 
 	public String getRemoteAddress() {
 		return remote_address;

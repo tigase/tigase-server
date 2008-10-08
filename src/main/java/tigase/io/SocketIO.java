@@ -64,6 +64,7 @@ public class SocketIO implements IOInterface {
   }
 
   public void stop() throws IOException {
+		log.finest("Stop called.");
     channel.close();
   }
 
