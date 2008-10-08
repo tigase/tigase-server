@@ -233,6 +233,7 @@ public abstract class IOService implements Callable<IOService> {
   }
 
 	public void forceStop() {
+		log.finer("Force stop called...");
 		try {
 			if (socketIO != null) {
 				socketIO.stop();
