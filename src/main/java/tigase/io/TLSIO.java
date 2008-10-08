@@ -69,7 +69,7 @@ public class TLSIO implements IOInterface {
 		io = ioi;
     tlsWrapper = wrapper;
     tlsInput = ByteBuffer.allocate(tlsWrapper.getAppBuffSize());
-		log.finer("TLS Socket created.");
+		log.finer("TLS Socket created, connected: " + io.isConnected());
 		if (tlsWrapper.isClientMode()) {
 			log.finer("TLS - client mode, starting handshaking now...");
 			write(ByteBuffer.allocate(0));
