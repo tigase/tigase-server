@@ -98,8 +98,10 @@ public abstract class Presence {
 		// processed in the SessionManager asynchronously
 		synchronized (session) {
 			Element pres = (Element)session.getSessionData(PRESENCE_KEY);
-			if (pres == null || pres.getAttribute("type") == null
-				|| !pres.getAttribute("type").equals("unavailable")) {
+			// According to the spec and logic actually offline status should
+			// not be broadcasted if initial presence was not sent by the client.
+			if (pres != null && (pres.getAttribute("type") == null
+					|| !pres.getAttribute("type").equals("unavailable"))) {
 				try {
 					sendPresenceBroadcast(StanzaType.unavailable, session,
 						FROM_SUBSCRIBED, results, null, settings);
