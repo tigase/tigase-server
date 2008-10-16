@@ -95,6 +95,8 @@ begin
 			call TigAddUser(_user_id, MD5(_user_pw));
 		when 'MD5-USERID-PASSWORD' then
 			call TigAddUser(_user_id, MD5(CONCAT(_user_id, _user_pw)));
+		when 'MD5-USERNAME-PASSWORD' then
+			call TigAddUser(_user_id, MD5(CONCAT(substring_index(_user_id, '@', 1), _user_pw)));
 		else
 			call TigAddUser(_user_id, _user_pw);
 		end case;
@@ -127,6 +129,8 @@ begin
 			call TigUpdatePassword(_user_id, MD5(_user_pw));
 		when 'MD5-USERID-PASSWORD' then
 			call TigUpdatePassword(_user_id, MD5(CONCAT(_user_id, _user_pw)));
+		when 'MD5-USERNAME-PASSWORD' then
+			call TigUpdatePassword(_user_id, MD5(CONCAT(substring_index(_user_id, '@', 1), _user_pw)));
 		else
 			call TigUpdatePassword(_user_id, _user_pw);
 		end case;
@@ -174,6 +178,8 @@ begin
 			call TigUserLogin(_user_id, MD5(_user_pw));
 		when 'MD5-USERID-PASSWORD' then
 			call TigUserLogin(_user_id, MD5(CONCAT(_user_id, _user_pw)));
+		when 'MD5-USERNAME-PASSWORD' then
+			call TigUserLogin(_user_id, MD5(CONCAT(substring_index(_user_id, '@', 1), _user_pw)));
 		else
 			call TigUserLogin(_user_id, _user_pw);
 		end case;
