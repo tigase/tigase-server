@@ -69,6 +69,8 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
   private static final Logger log =
     Logger.getLogger("tigase.server.xmppclient.ClientConnectionManager");
 
+	private static final String XMLNS = "jabber:client";
+
 	private static final String ROUTINGS_PROP_KEY = "routings";
 	private static final String ROUTING_MODE_PROP_KEY = "multi-mode";
 	private static final boolean ROUTING_MODE_PROP_VAL = true;
@@ -145,18 +147,18 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 			String old_receiver = changeDataReceiver(packet, newAddress,
 				command_sessionId, serv);
 			if (old_receiver != null) {
-					log.fine("Redirecting data for sessionId: " + command_sessionId
-						+ ", to: " + newAddress);
-					Packet response = packet.commandResult(null);
-					Command.addFieldValue(response, "session-id", command_sessionId);
-					Command.addFieldValue(response, "action", "close");
-					response.getElement().setAttribute("to", old_receiver);
-					addOutPacket(response);
-					response = packet.commandResult(null);
-					Command.addFieldValue(response, "session-id", command_sessionId);
-					Command.addFieldValue(response, "action", "activate");
-					response.getElement().setAttribute("to", newAddress);
-					addOutPacket(response);
+				log.fine("Redirecting data for sessionId: " + command_sessionId
+					+ ", to: " + newAddress);
+				Packet response = packet.commandResult(null);
+				Command.addFieldValue(response, "session-id", command_sessionId);
+				Command.addFieldValue(response, "action", "close");
+				response.getElement().setAttribute("to", old_receiver);
+				addOutPacket(response);
+				response = packet.commandResult(null);
+				Command.addFieldValue(response, "session-id", command_sessionId);
+				Command.addFieldValue(response, "action", "activate");
+				response.getElement().setAttribute("to", newAddress);
+				addOutPacket(response);
 			} else {
 				log.finest("Connection for REDIRECT command does not exist, ignoring "
 					+ "packet: " + packet.toString());
@@ -193,7 +195,8 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 				return old_receiver;
 			} else {
 				log.warning("Incorrect session ID, ignoring data redirect for: "
-					+ newAddress);
+					+ newAddress + ", expected: " + serv_sessionId
+					+ ", received: " + command_sessionId);
 			}
 		}
 		return null;
@@ -310,10 +313,15 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 		if (lang == null) {
 			lang = "en";
 		}
-		final String id = UUID.randomUUID().toString();
+		String id = (String)serv.getSessionData().get(serv.SESSION_ID_KEY);
+		if (id == null) {
+			id = UUID.randomUUID().toString();
+			serv.getSessionData().put(serv.SESSION_ID_KEY, id);
+			serv.setXMLNS(XMLNS);
+		}
 		if (hostname == null) {
 			return "<?xml version='1.0'?><stream:stream"
-				+ " xmlns='jabber:client'"
+				+ " xmlns='" + XMLNS + "'"
 				+ " xmlns:stream='http://etherx.jabber.org/streams'"
 				+ " id='" + id + "'"
 				+ " from='" + getDefHostName() + "'"
@@ -327,7 +335,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 
 		if (!hostnames.contains(hostname)) {
 			return "<?xml version='1.0'?><stream:stream"
-				+ " xmlns='jabber:client'"
+				+ " xmlns='" + XMLNS + "'"
 				+ " xmlns:stream='http://etherx.jabber.org/streams'"
 				+ " id='" + id + "'"
 				+ " from='" + getDefHostName() + "'"
@@ -341,12 +349,11 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 
 // 		try {
 			writeRawData(serv, "<?xml version='1.0'?><stream:stream"
-				+ " xmlns='jabber:client'"
+				+ " xmlns='" + XMLNS + "'"
 				+ " xmlns:stream='http://etherx.jabber.org/streams'"
 				+ " from='" + hostname + "'"
 				+ " id='" + id + "'"
 				+ " version='1.0' xml:lang='en'>");
-			serv.getSessionData().put(serv.SESSION_ID_KEY, id);
 			serv.getSessionData().put(serv.HOSTNAME_KEY, hostname);
 			serv.setDataReceiver(routings.computeRouting(hostname));
 			Packet streamOpen = Command.STREAM_OPENED.getPacket(
@@ -370,15 +377,17 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 
 	public void serviceStopped(XMPPIOService service) {
 		super.serviceStopped(service);
-		//		XMPPIOService serv = (XMPPIOService)service;
-		if (service.getDataReceiver() != null) {
-			Packet command = Command.STREAM_CLOSED.getPacket(
-				getFromAddress(getUniqueId(service)),
-				service.getDataReceiver(), StanzaType.set, "sess1");
-			addOutPacket(command);
-			log.fine("Service stopped, sending packet: " + command.getStringData());
-		} else {
-			log.fine("Service stopped, before stream:stream received");
+		if (service.getXMLNS() == XMLNS) {
+			//		XMPPIOService serv = (XMPPIOService)service;
+			if (service.getDataReceiver() != null) {
+				Packet command = Command.STREAM_CLOSED.getPacket(
+					getFromAddress(getUniqueId(service)),
+					service.getDataReceiver(), StanzaType.set, "sess1");
+				addOutPacket(command);
+				log.fine("Service stopped, sending packet: " + command.getStringData());
+			} else {
+				log.fine("Service stopped, before stream:stream received");
+			}
 		}
 	}
 

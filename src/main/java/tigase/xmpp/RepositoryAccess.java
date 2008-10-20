@@ -233,6 +233,7 @@ public abstract class RepositoryAccess {
 		try {
 			if (authRepo.plainAuth(JIDUtils.getNodeID(user, getDomain()), password)) {
 				authState = Authorization.AUTHORIZED;
+				login();
 			} // end of if (authRepo.loginPlain())auth.login();
 			return authState;
     } catch (UserNotFoundException e) {
@@ -256,9 +257,11 @@ public abstract class RepositoryAccess {
 				is_anonymous = true;
 				props.put(UserAuthRepository.USER_ID_KEY, UUID.randomUUID().toString());
 				authState = Authorization.AUTHORIZED;
+				login();
 			} else {
 				if (authRepo.otherAuth(props)) {
 					authState = Authorization.AUTHORIZED;
+					login();
 				} // end of if (authRepo.loginPlain())auth.login();
 			}
 			return authState;
@@ -284,6 +287,7 @@ public abstract class RepositoryAccess {
 			String db_token = repo.getData(getUserId(), "tokens", xmpp_sessionId);
 			if (token.equals(db_token)) {
 				authState = Authorization.AUTHORIZED;
+				login();
 				repo.removeData(getUserId(), "tokens", xmpp_sessionId);
 			}
     } catch (UserNotFoundException e) {
@@ -302,6 +306,7 @@ public abstract class RepositoryAccess {
 			if (authRepo.digestAuth(JIDUtils.getNodeID(user, getDomain()), digest,
 					id, alg)) {
 				authState = Authorization.AUTHORIZED;
+				login();
 			} // end of if (authRepo.loginPlain())auth.login();
 			return authState;
     } catch (UserNotFoundException e) {
@@ -330,6 +335,8 @@ public abstract class RepositoryAccess {
 		throws NotAuthorizedException {
 		authState = Authorization.NOT_AUTHORIZED;
 	}
+
+	protected abstract void login();
 
 	/**
    * This method allows to retrieve list of values associated with one key.

@@ -92,6 +92,8 @@ public class ClusterElement {
 	public static final String CLUSTER_NAME_ATTR = "name";
 	public static final String CLUSTER_METHOD_PAR_EL_NAME = "par";
 	public static final String CLUSTER_METHOD_RESULTS_EL_NAME = "results";
+	public static final String CLUSTER_METHOD_RESULTS_PATH =
+    CLUSTER_METHOD_PATH + "/" + CLUSTER_METHOD_RESULTS_EL_NAME;
 	public static final String CLUSTER_METHOD_RESULTS_VAL_EL_NAME = "val";
 
 	public static final String VISITED_NODES_EL_NAME = "visited-nodes";
@@ -135,7 +137,7 @@ public class ClusterElement {
 	public ClusterElement(String from, String to, StanzaType type, Packet packet) {
 		packets = new ArrayList<Element>();
 		visited_nodes = new LinkedHashSet<String>();
-		elem = createClusterElement(from, to, type.toString(), packet.getFrom());
+		elem = createClusterElement(from, to, type, packet.getFrom());
 		if (packet != null) {
 			if (packet.getElement().getXMLNS() == null) {
 				packet.getElement().setXMLNS("jabber:client");
@@ -144,10 +146,10 @@ public class ClusterElement {
 		}
 	}
 
-	public static Element clusterElement(String from, String to, String type) {
+	public static Element clusterElement(String from, String to, StanzaType type) {
 		Element cluster_el = new Element(CLUSTER_EL_NAME,
 			new String[] {"from", "to", "type"},
-			new String[] {from, to, type});
+			new String[] {from, to, type.toString()});
 		cluster_el.setXMLNS(XMLNS);
 		cluster_el.addChild(new Element(CLUSTER_CONTROL_EL_NAME,
 				new Element[] {new Element(VISITED_NODES_EL_NAME)}, null, null));
@@ -155,7 +157,7 @@ public class ClusterElement {
 	}
 
 	public static Element createClusterElement(String from, String to,
-		String type, String packet_from) {
+		StanzaType type, String packet_from) {
 		Element cluster_el = clusterElement(from, to, type);
 		cluster_el.addChild(new Element(CLUSTER_DATA_EL_NAME));
 // 				new String[] {PACKET_FROM_ATTR_NAME}, new String[] {packet_from}));
@@ -163,7 +165,7 @@ public class ClusterElement {
 	}
 
 	public static ClusterElement createClusterMethodCall(String from, String to,
-		String type, String method_name, Map<String, String> params) {
+		StanzaType type, String method_name, Map<String, String> params) {
 		Element cluster_el = clusterElement(from, to, type);
 		Element method_call = new Element(CLUSTER_METHOD_EL_NAME,
 			new String [] {CLUSTER_NAME_ATTR}, new String[] {method_name});
@@ -182,21 +184,38 @@ public class ClusterElement {
 
 	public ClusterElement createMethodResponse(String from, String type,
 		Map<String, String> results) {
+		return createMethodResponse(from, null, type, results);
+	}
+
+	public ClusterElement createMethodResponse(String from, String to,
+		String type, Map<String, String> results) {
 		Element result_el = elem.clone();
 		result_el.setAttribute("from", from);
-		result_el.setAttribute("to", first_node);
+		result_el.setAttribute("to", (to != null ? to : first_node));
 		result_el.setAttribute("type", type);
-		if (results != null) {
-			Element results_el = new Element(CLUSTER_METHOD_RESULTS_EL_NAME);
-			for (Map.Entry<String, String> entry: results.entrySet()) {
-				results_el.addChild(new Element(CLUSTER_METHOD_RESULTS_VAL_EL_NAME,
-						entry.getValue(),
-						new String[] {CLUSTER_NAME_ATTR}, new String[] {entry.getKey()}));
-			}
-			result_el.findChild(CLUSTER_METHOD_PATH).addChild(results_el);
-		}
+		Element res = new Element(CLUSTER_METHOD_RESULTS_EL_NAME);
+		result_el.findChild(CLUSTER_METHOD_PATH).addChild(res);
 		ClusterElement result_cl = new ClusterElement(result_el);
+		if (results != null) {
+			for (Map.Entry<String, String> entry: results.entrySet()) {
+				result_cl.addMethodResult(entry.getKey(), entry.getValue());
+			}
+		}
 		return result_cl;
+	}
+
+	public void addMethodResult(String key, String val) {
+		Element res = elem.findChild(CLUSTER_METHOD_RESULTS_PATH);
+		if (res == null) {
+			res = new Element(CLUSTER_METHOD_RESULTS_EL_NAME);
+			elem.findChild(CLUSTER_METHOD_PATH).addChild(res);
+		}
+		res.addChild(new Element(CLUSTER_METHOD_RESULTS_VAL_EL_NAME, val,
+				new String[] {CLUSTER_NAME_ATTR}, new String[] {key}));
+		if (method_results == null) {
+			method_results = new LinkedHashMap<String, String>();
+		}
+		method_results.put(key, val);
 	}
 
 	public static ClusterElement createForNextNode(ClusterElement clel,
@@ -237,10 +256,12 @@ public class ClusterElement {
 					method_results = new LinkedHashMap<String, String>();
 				}
 				List<Element> res_children = child.getChildren();
-				for (Element res_child: res_children) {
-					if (res_child.getName() == CLUSTER_METHOD_RESULTS_VAL_EL_NAME) {
-						String val_name = res_child.getAttribute(CLUSTER_NAME_ATTR);
-						method_results.put(val_name, res_child.getCData());
+				if (res_children != null) {
+					for (Element res_child: res_children) {
+						if (res_child.getName() == CLUSTER_METHOD_RESULTS_VAL_EL_NAME) {
+							String val_name = res_child.getAttribute(CLUSTER_NAME_ATTR);
+							method_results.put(val_name, res_child.getCData());
+						}
 					}
 				}
 			}
@@ -255,12 +276,38 @@ public class ClusterElement {
 		return method_params == null ? null : method_params.get(par_name);
 	}
 
+	public long getMethodParam(String par_name, long def) {
+		String val_str = getMethodParam(par_name);
+		if (val_str == null) {
+			return def;
+		} else {
+			try {
+				return Long.parseLong(val_str);
+			} catch (NumberFormatException e) {
+				return def;
+			}
+		}
+	}
+
 	public Map<String, String> getAllMethodParams() {
 		return method_params;
 	}
 
 	public String getMethodResultVal(String val_name) {
 		return method_results == null ? null : method_results.get(val_name);
+	}
+
+	public long getMethodResultVal(String val_name, long def) {
+		String val_str = getMethodResultVal(val_name);
+		if (val_str == null) {
+			return def;
+		} else {
+			try {
+				return Long.parseLong(val_str);
+			} catch (NumberFormatException e) {
+				return def;
+			}
+		}
 	}
 
 	public Map<String, String> getAllMethodResults() {

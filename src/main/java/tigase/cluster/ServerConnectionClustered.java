@@ -161,7 +161,7 @@ public class ServerConnectionClustered extends ServerConnectionManager
 				params.put(ASKING_SESSION_ID, asking_sessionId);
 				Element check_db_key =
           ClusterElement.createClusterMethodCall(getComponentId(), cluster_node,
-						StanzaType.set.toString(), ClusterMethods.CHECK_DB_KEY.toString(),
+						StanzaType.set, ClusterMethods.CHECK_DB_KEY.toString(),
 						params).getClusterElement();
 				addOutPacket(new Packet(check_db_key));
 			}

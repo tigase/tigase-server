@@ -485,7 +485,7 @@ public class BoshSession {
 					max_inactivity = 2;   // Max pause changed to 2 secs
 					terminate = true;
 					Packet command = Command.STREAM_CLOSED.getPacket(null, null,
-						StanzaType.set, "sess1");
+						StanzaType.set, "bosh1");
 					out_results.offer(command);
 				}
 				if (packet.getAttribute(RESTART_ATTR) != null

@@ -24,11 +24,13 @@ package tigase.xmpp;
  * The XMPPResourceConnection Object can be put in special states
  * when all packets received to by this connection are threated in
  * different way:
- * <code>NORMAL</code> - packets are processed in normal way.
+ * <code>INIT</code> - Behaviour is like in <code>NORMAL</code> state. It is
+ * just an indication that the session is in an initial phase before authentication.
  * <code>ON_HOLD</code> - packets are not processed at all, they are
  * collected by instead for later time.
  * <code>REDIRECT</code> - packets received by this connection are
  * being redirected to a different SM for processing.
+ * <code>NORMAL</code> - packets are processed in normal way.
  *
  *
  * Created: Wed Aug 13 20:58:33 2008
@@ -38,6 +40,8 @@ package tigase.xmpp;
  */
 public enum ConnectionStatus {
 
-	NORMAL, ON_HOLD, REDIRECT;
+	INIT, ON_HOLD, REDIRECT, NORMAL,
+  // The temp state is a special state used in the session transfer
+  TEMP;
 
 }

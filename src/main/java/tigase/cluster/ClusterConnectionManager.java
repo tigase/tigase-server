@@ -260,7 +260,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 		method_params.put("connected", addr);
 		addOutPacket(new Packet(ClusterElement.createClusterMethodCall(
 					getComponentId(), cluster_controller_id,
-					StanzaType.set.toString(), ClusterMethods.UPDATE_NODES.toString(),
+					StanzaType.set, ClusterMethods.UPDATE_NODES.toString(),
 					method_params).getClusterElement()));
 // 		synchronized (waiting_packs) {
 // 			LinkedHashMap<Long, Packet> waiting_packets =
@@ -377,7 +377,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 		method_params.put("disconnected", addr);
 		addOutPacket(new Packet(ClusterElement.createClusterMethodCall(
 					getComponentId(), cluster_controller_id,
-					StanzaType.set.toString(), ClusterMethods.UPDATE_NODES.toString(),
+					StanzaType.set, ClusterMethods.UPDATE_NODES.toString(),
 					method_params).getClusterElement()));
 	}
 

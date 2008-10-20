@@ -71,6 +71,8 @@ public class XMPPResourceConnection extends RepositoryAccess {
    * session last active from user side.
    */
   private long lastAccessed = 0;
+	private long creationTime = 0;
+	private long authenticationTime = 0;
 
 	private String domain = null;
 
@@ -88,7 +90,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	//	private String[] anon_peers = null;
 
 	private long id_counter = 0;
-	private ConnectionStatus connectionStatus = ConnectionStatus.NORMAL;
+	private ConnectionStatus connectionStatus = ConnectionStatus.INIT;
 // 	private boolean onHold = false;
 
 	/**
@@ -106,6 +108,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 		super(rep, authRepo, anon_allowed);
 		this.connectionId = connectionId;
 		this.loginHandler = loginHandler;
+		this.creationTime = System.currentTimeMillis();
     sessionData = new HashMap<String, Object>();
 	}
 
@@ -187,7 +190,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 		this.parentSession = parent;
 		if (parentSession != null) {
 			userId = JIDUtils.getNodeID(parentSession.getUserName(), domain);
-			userJid = userId + (resource != null ? ("/" + resource) : "/temp");
+			userJid = userId + (resource != null ? ("/" + resource) : "/" + sessionId);
 		}
 	}
 
@@ -319,7 +322,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	public void setResource(final String argResource) throws NotAuthorizedException {
 		this.resource = argResource;
 		parentSession.resourceSet(this);
-		userJid = getUserId() + (resource != null ? ("/" + resource) : "/temp");
+		userJid = getUserId() + (resource != null ? ("/" + resource) : "/" + sessionId);
 	}
 
 	/**
@@ -360,6 +363,18 @@ public class XMPPResourceConnection extends RepositoryAccess {
 		loginHandler.handleLogout(getUserName(), this);
 		streamClosed();
 		super.logout();
+	}
+
+	protected void login() {
+		authenticationTime = System.currentTimeMillis();
+	}
+
+	public long getAuthTime() {
+		return authenticationTime - creationTime;
+	}
+
+	public long getCreationTime() {
+		return creationTime;
 	}
 
 	public Authorization unregister(final String name_param)

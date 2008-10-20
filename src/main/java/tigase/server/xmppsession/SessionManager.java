@@ -158,7 +158,7 @@ public class SessionManager extends AbstractMessageReceiver
 		if (p.getFrom() != null) {
 			conn = connectionsByFrom.get(p.getFrom());
 			if (conn != null) {
-				return conn;
+				return conn.getConnectionStatus() == ConnectionStatus.TEMP ? null : conn;
 			}
 		}
 		// It might be a message _to_ some user on this server
@@ -166,6 +166,9 @@ public class SessionManager extends AbstractMessageReceiver
 		final String to = p.getElemTo();
 		if (to != null) {
 			conn = getResourceConnection(to);
+			if (conn != null && conn.getConnectionStatus() == ConnectionStatus.TEMP) {
+				conn = null;
+			}
 		} else {
 			// Hm, not sure what should I do now....
 			// Maybe I should treat it as message to admin....
@@ -214,6 +217,7 @@ public class SessionManager extends AbstractMessageReceiver
 	}
 
 	protected void processPacket(Packet packet, XMPPResourceConnection conn) {
+		packet.setTo(getComponentId());
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("processing packet: " + packet.toString());
 		}
@@ -224,7 +228,12 @@ public class SessionManager extends AbstractMessageReceiver
 			if (filter.preprocess(packet, conn, naUserRepository, results)) {
 				packet.processedBy("filter-foward");
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Packet forwarded: " + packet.toString());
+					log.finest("Packet preprocessed: " + packet.toString());
+					if (results.size() > 0) {
+						for (Packet p: results) {
+							log.finest("Preprocess result: " + p.toString());
+						}
+					}
 				}
 				addOutPackets(results);
 				return;
@@ -697,7 +706,8 @@ public class SessionManager extends AbstractMessageReceiver
 			addOutPackets(results);
 		}
 		try {
-			if (conn.isAuthorized()) {
+			if (conn.isAuthorized()
+				|| (conn.getConnectionStatus() == ConnectionStatus.TEMP)) {
 				String userId = conn.getUserId();
 				log.info("Closing connection for: " + userId);
 				XMPPSession session = conn.getParentSession();
@@ -708,8 +718,7 @@ public class SessionManager extends AbstractMessageReceiver
 						if (session == null) {
 							log.info("UPS can't remove session, not found in map: " + userId);
 						} else {
-							log.finer("Number of user sessions: "
-								+ sessionsByNodeId.size());
+							log.finer("Number of user sessions: " + sessionsByNodeId.size());
 						} // end of else
 						auth_repository.logout(userId);
 					} else {

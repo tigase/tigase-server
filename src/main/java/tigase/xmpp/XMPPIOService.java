@@ -69,6 +69,8 @@ public class XMPPIOService extends IOService {
   private ConcurrentLinkedQueue<Packet> receivedPackets =
     new ConcurrentLinkedQueue<Packet>();
 
+	private String xmlns = null;
+
 //   /**
 //    * Variable <code>lock</code> keeps reference to object lock.
 //    * It supports multi-threaded processing and can be called simultanously from
@@ -87,6 +89,14 @@ public class XMPPIOService extends IOService {
 	 */
 	public XMPPIOService() {
 		domHandler = new XMPPDomBuilderHandler(this);
+	}
+
+	public void setXMLNS(String xmlns) {
+		this.xmlns = xmlns;
+	}
+
+	public String getXMLNS() {
+		return this.xmlns;
 	}
 
 	public void setIOServiceListener(XMPPIOServiceListener sl) {

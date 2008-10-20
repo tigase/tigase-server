@@ -45,6 +45,7 @@ import tigase.xmpp.StanzaType;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.XMPPIOService;
+import tigase.xmpp.PacketErrorTypeException;
 import tigase.server.xmppclient.ClientConnectionManager;
 
 import static tigase.server.bosh.Constants.*;
@@ -113,6 +114,22 @@ public class BoshConnectionManager extends ClientConnectionManager
 			addOutPackets(out_results, session);
 		} else {
 			log.warning("Session does not exist for packet: " + packet.toString());
+			try {
+				Packet error =
+						Authorization.ITEM_NOT_FOUND.getResponseMessage(packet,
+							"The user connection is no longer active.", true);
+				addOutPacket(error);
+			} catch (PacketErrorTypeException e) {
+				log.finest("Ups, already error packet. Dropping it to prevent infinite loop.");
+			}
+			// In case the SessionManager lost synchronization for any reason, let's
+			// notify it that the user connection no longer exists.
+			Packet command = Command.STREAM_CLOSED.getPacket(null, null,
+				StanzaType.set, "bosh-missing-1");
+			command.setFrom(packet.getTo());
+			command.setTo(packet.getFrom());
+			log.fine("Sending a command to close the remote session for non-existen Bosh connection: " + command.toString());
+			addOutPacket(command);
 		}
 	}
 

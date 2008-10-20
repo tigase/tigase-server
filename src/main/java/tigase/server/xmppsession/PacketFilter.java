@@ -86,6 +86,10 @@ public class PacketFilter {
 				results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 						"You must bind the resource first: http://www.xmpp.org/rfcs/rfc3920.html#bind",
 						true));
+				log.finest("Session details: connectionId=" + session.getConnectionId()
+					+ ", sessionId=" + session.getSessionId()
+					+ ", ConnectionStatus=" + session.getConnectionStatus());
+				log.finest("Session more detais: JID=" + session.getJID());
 				return true;
 			}
 
@@ -105,6 +109,7 @@ public class PacketFilter {
 			}
 
 		} catch (Exception e) {
+			log.log(Level.FINEST, "Packet preprocessing exception: ", e);
 			return false;
 		} // end of try-catch
 
