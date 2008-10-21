@@ -107,36 +107,66 @@ public class TigaseCustomAuth implements UserAuthRepository {
 	 * Query executing periodically to ensure active connection with the database.
 	 *
 	 * Takes no arguments.
+	 *
+	 * Example query:
+	 * <pre>
+	 * select 1
+	 * </pre>
 	 */
 	public static final String DEF_CONNVALID_KEY = "conn-valid-query";
 	/**
 	 * Database initialization query which is run after the server is started.
 	 *
 	 * Takes no arguments.
+	 *
+	 * Example query:
+	 * <pre>
+	 * update tig_users set online_status = 0
+	 * </pre>
 	 */
 	public static final String DEF_INITDB_KEY = "init-db-query";
 	/**
 	 * Query adding a new user to the database.
 	 *
 	 * Takes 2 arguments: <code>(user_id (JID), password)</code>
+	 *
+	 * Example query:
+	 * <pre>
+	 * insert into tig_users (user_id, user_pw) values (?, ?)
+	 * </pre>
 	 */
 	public static final String DEF_ADDUSER_KEY = "add-user-query";
 	/**
 	 * Removes a user from the database.
 	 *
 	 * Takes 1 argument: <code>(user_id (JID))</code>
+	 *
+	 * Example query:
+	 * <pre>
+	 * delete from tig_users where user_id = ?
+	 * </pre>
 	 */
 	public static final String DEF_DELUSER_KEY = "del-user-query";
 	/**
 	 * Rertieves user password from the database for given user_id (JID).
 	 *
 	 * Takes 1 argument: <code>(user_id (JID))</code>
+	 *
+	 * Example query:
+	 * <pre>
+	 * select user_pw as password from tig_users where user_id = ?
+	 * </pre>
 	 */
 	public static final String DEF_GETPASSWORD_KEY = "get-password-query";
 	/**
 	 * Updates (changes) password for a given user_id (JID).
 	 *
-	 * Takes 2 arguments: <code>(user_id (JID), password)</code>
+	 * Takes 2 arguments: <code>(password, user_id (JID))</code>
+	 *
+	 * Example query:
+	 * <pre>
+	 * update tig_users set user_pw = ? where user_id = ?
+	 * </pre>
 	 */
 	public static final String DEF_UPDATEPASSWORD_KEY = "update-password-query";
 	/**
@@ -145,11 +175,20 @@ public class TigaseCustomAuth implements UserAuthRepository {
 	 * user password. Therefore at least one of those queries must be defined:
 	 * <code>user-login-query</code> or <code>get-password-query</code>.
 	 *
-	 * If both quries are defined then <code>user-login-query</code> is used.
+	 * If both queries are defined then <code>user-login-query</code> is used.
 	 * Normally this method should be only used with plain text password
 	 * authentication or sasl-plain.
 	 *
+	 * The Tigase server expects a result set with user_id to be returned from the
+	 * query if login is successful and empty results set if the login is
+	 * unsuccessful.
+	 *
 	 * Takes 2 arguments: <code>(user_id (JID), password)</code>
+	 *
+	 * Example query:
+	 * <pre>
+	 * select user_id from tig_users where (user_id = ?) AND (user_pw = ?)
+	 * </pre>
 	 */
 	public static final String DEF_USERLOGIN_KEY = "user-login-query";
 	/**
@@ -157,6 +196,11 @@ public class TigaseCustomAuth implements UserAuthRepository {
 	 * event in the database.
 	 *
 	 * Takes 1 argument: <code>(user_id (JID))</code>
+	 *
+	 * Example query:
+	 * <pre>
+	 * update tig_users, set online_status = online_status - 1 where user_id = ?
+	 * </pre>
 	 */
 	public static final String DEF_USERLOGOUT_KEY = "user-logout-query";
 	/**
@@ -182,13 +226,15 @@ public class TigaseCustomAuth implements UserAuthRepository {
 	public static final String DEF_DELUSER_QUERY = "{ call TigRemoveUser(?) }";
 	public static final String DEF_GETPASSWORD_QUERY = "{ call TigGetPassword(?) }";
 	public static final String DEF_UPDATEPASSWORD_QUERY
-    = "{ call TigUpdatePasswordPlainPw(?, ?) }";
+    = "{ call TigUpdatePasswordPlainPwRev(?, ?) }";
 	public static final String DEF_USERLOGIN_QUERY
     = "{ call TigUserLoginPlainPw(?, ?) }";
 	public static final String DEF_USERLOGOUT_QUERY = "{ call TigUserLogout(?) }";
 
 	public static final String DEF_NONSASL_MECHS = "password";
 	public static final String DEF_SASL_MECHS = "PLAIN";
+
+	public static final String SP_STARTS_WITH = "{ call";
 
 	private String convalid_query = DEF_CONNVALID_QUERY;
 	private String initdb_query = DEF_INITDB_QUERY;
@@ -233,6 +279,14 @@ public class TigaseCustomAuth implements UserAuthRepository {
 	private long connectionValidateInterval = 1000*60;
 	private boolean online_status = false;
 
+	private PreparedStatement prepareQuery(String query) throws SQLException {
+		if (query.startsWith(SP_STARTS_WITH)) {
+			return conn.prepareCall(query);
+		} else {
+			return conn.prepareStatement(query);
+		}
+	}
+
 	/**
 	 * <code>initPreparedStatements</code> method initializes internal
 	 * database connection variables such as prepared statements.
@@ -240,29 +294,14 @@ public class TigaseCustomAuth implements UserAuthRepository {
 	 * @exception SQLException if an error occurs on database query.
 	 */
 	private void initPreparedStatements() throws SQLException {
-		String query = query = convalid_query;
-		conn_valid_st = conn.prepareStatement(query);
-
-		query = initdb_query;
-		init_db = conn.prepareCall(query);
-
-		query = adduser_query;
-		add_user = conn.prepareCall(query);
-
-		query = deluser_query;
-		remove_user = conn.prepareCall(query);
-
-		query = getpassword_query;
-		get_pass = conn.prepareCall(query);
-
-		query = updatepassword_query;
-		update_pass = conn.prepareCall(query);
-
-		query = userlogin_query;
-		user_login = conn.prepareCall(query);
-
-		query = userlogout_query;
-		user_logout = conn.prepareCall(query);
+		conn_valid_st = prepareQuery(convalid_query);
+		init_db = prepareQuery(initdb_query);
+		add_user = prepareQuery(adduser_query);
+		remove_user = prepareQuery(deluser_query);
+		get_pass = prepareQuery(getpassword_query);
+		update_pass = prepareQuery(updatepassword_query);
+		user_login = prepareQuery(userlogin_query);
+		user_logout = prepareQuery(userlogout_query);
 	}
 
 	/**
