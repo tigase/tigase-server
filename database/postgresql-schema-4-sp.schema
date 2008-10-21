@@ -113,8 +113,13 @@ end;
 create or replace function TigRemoveUser(varchar(2049)) returns void as '
 declare
   _user_id alias for $1;
+  res_uid bigint;
 begin
-	delete from tig_users where user_id = _user_id;
+	select uid into res_uid from tig_users where user_id = _user_id;
+
+	delete from tig_pairs where uid = res_uid;
+	delete from tig_nodes where uid = res_uid;
+	delete from tig_users where uid = res_uid;
   return;
 end;
 ' LANGUAGE 'plpgsql';

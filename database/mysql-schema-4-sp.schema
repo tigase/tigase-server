@@ -112,7 +112,13 @@ end //
 -- Removes a user from the database
 create procedure TigRemoveUser(_user_id varchar(2049))
 begin
-	delete from tig_users where user_id = _user_id;
+	declare res_uid bigint unsigned;
+
+	select uid into res_uid from tig_users where user_id = _user_id;
+
+	delete from tig_pairs where uid = res_uid;
+	delete from tig_nodes where uid = res_uid;
+	delete from tig_users where uid = res_uid;
 end //
 
 -- Returns user's password from the database
