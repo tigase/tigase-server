@@ -89,6 +89,8 @@ begin
     case _enc
  		when ''MD5-PASSWORD'' then TigAddUser(_user_id, MD5(_user_pw))
 	  when ''MD5-USERID-PASSWORD'' then TigAddUser(_user_id, MD5(_user_id || _user_pw))
+	  when ''MD5-USERNAME-PASSWORD'' then
+      TigAddUser(_user_id, MD5(split_part(_user_id, ''@'', 1) || _user_pw))
 	  else TigAddUser(_user_id, _user_pw)
 	  end into _res_uid;
 	return _res_uid as uid;
@@ -142,6 +144,8 @@ begin
 		when ''MD5-PASSWORD'' then TigUpdatePassword(_user_id, MD5(_user_pw))
 		when ''MD5-USERID-PASSWORD'' then
       TigUpdatePassword(_user_id, MD5(_user_id || _user_pw))
+	  when ''MD5-USERNAME-PASSWORD'' then
+      TigUpdatePassword(_user_id, MD5(split_part(_user_id, ''@'', 1) || _user_pw))
 		else TigUpdatePassword(_user_id, _user_pw)
 		end;
   return;
@@ -213,6 +217,8 @@ begin
 		when ''MD5-PASSWORD'' then TigUserLogin(_user_id, MD5(_user_pw))
 		when ''MD5-USERID-PASSWORD'' then
       TigUserLogin(_user_id, MD5(_user_id || _user_pw))
+	  when ''MD5-USERNAME-PASSWORD'' then
+      TigUserLogin(_user_id, MD5(split_part(_user_id, ''@'', 1) || _user_pw))
 		else TigUserLogin(_user_id, _user_pw)
 		end into res_user_id;
   return res_user_id;
