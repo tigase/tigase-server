@@ -117,6 +117,8 @@ public interface Configurable extends ServerComponent {
 		"tigase.db.jdbc.JDBCRepository";
 	public static final String TIGASE_AUTH_REPO_CLASS_PROP_VAL =
 		"tigase.db.jdbc.TigaseAuth";
+	public static final String TIGASE_CUSTOM_AUTH_REPO_CLASS_PROP_VAL =
+		"tigase.db.jdbc.TigaseCustomAuth";
 	public static final String DRUPAL_REPO_CLASS_PROP_VAL =
 		"tigase.db.jdbc.DrupalAuth";
 	public static final String LIBRESOURCE_REPO_CLASS_PROP_VAL =

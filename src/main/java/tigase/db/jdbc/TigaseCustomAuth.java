@@ -154,7 +154,7 @@ public class TigaseCustomAuth implements UserAuthRepository {
 	 *
 	 * Example query:
 	 * <pre>
-	 * select user_pw as password from tig_users where user_id = ?
+	 * select user_pw from tig_users where user_id = ?
 	 * </pre>
 	 */
 	public static final String DEF_GETPASSWORD_KEY = "get-password-query";
@@ -399,6 +399,11 @@ public class TigaseCustomAuth implements UserAuthRepository {
 			return def;
 		}
 		String result = params.get(key);
+		if (result != null) {
+			log.config("Custom query loaded for '" + key + "': '" + result + "'");
+		} else {
+			log.config("Default query loaded for '" + key + "': '" + def + "'");
+		}
 		return result != null ? result.trim() : def;
 	}
 

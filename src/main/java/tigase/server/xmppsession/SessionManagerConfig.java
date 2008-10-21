@@ -120,8 +120,10 @@ public class SessionManagerConfig {
 					auth_repo_class = PGSQL_REPO_CLASS_PROP_VAL;
 					auth_repo_url = PGSQL_REPO_URL_PROP_VAL;
 				} else {
-					if (params.get(GEN_AUTH_DB).equals("tigase-auth")) {
-						auth_repo_class = TIGASE_AUTH_REPO_CLASS_PROP_VAL;
+					if (params.get(GEN_AUTH_DB).equals("tigase-custom-auth")
+						|| params.get(GEN_AUTH_DB).equals("custom-auth")
+						|| params.get(GEN_AUTH_DB).equals("tigase-custom")) {
+						auth_repo_class = TIGASE_CUSTOM_AUTH_REPO_CLASS_PROP_VAL;
 						//auth_repo_url = TIGASE_AUTH_REPO_URL_PROP_VAL;
 						// For any external authentication connector like TigaseAuth,
 						// Drupal or LibreSource authentication all account
@@ -129,25 +131,35 @@ public class SessionManagerConfig {
 						// for Jabber data have to be created automatically
 						//user_repo_url += "&autoCreateUser=true";
 					} else {
-						if (params.get(GEN_AUTH_DB).equals("drupal")) {
-							auth_repo_class = DRUPAL_REPO_CLASS_PROP_VAL;
-							auth_repo_url = DRUPAL_REPO_URL_PROP_VAL;
-							// For Drupal or LibreSource authentication all account
+						if (params.get(GEN_AUTH_DB).equals("tigase-auth")) {
+							auth_repo_class = TIGASE_AUTH_REPO_CLASS_PROP_VAL;
+							//auth_repo_url = TIGASE_AUTH_REPO_URL_PROP_VAL;
+							// For any external authentication connector like TigaseAuth,
+							// Drupal or LibreSource authentication all account
 							// management is done via Web interface so accounts containers
 							// for Jabber data have to be created automatically
-							user_repo_url += "&autoCreateUser=true";
-							full_comps = false;
+							//user_repo_url += "&autoCreateUser=true";
 						} else {
-							if (params.get(GEN_AUTH_DB).equals("libresource")) {
-								auth_repo_class = LIBRESOURCE_REPO_CLASS_PROP_VAL;
-								auth_repo_url = LIBRESOURCE_REPO_URL_PROP_VAL;
+							if (params.get(GEN_AUTH_DB).equals("drupal")) {
+								auth_repo_class = DRUPAL_REPO_CLASS_PROP_VAL;
+								auth_repo_url = DRUPAL_REPO_URL_PROP_VAL;
 								// For Drupal or LibreSource authentication all account
 								// management is done via Web interface so accounts containers
 								// for Jabber data have to be created automatically
 								user_repo_url += "&autoCreateUser=true";
 								full_comps = false;
 							} else {
-								auth_repo_class = (String)params.get(GEN_AUTH_DB);
+								if (params.get(GEN_AUTH_DB).equals("libresource")) {
+									auth_repo_class = LIBRESOURCE_REPO_CLASS_PROP_VAL;
+									auth_repo_url = LIBRESOURCE_REPO_URL_PROP_VAL;
+									// For Drupal or LibreSource authentication all account
+									// management is done via Web interface so accounts containers
+									// for Jabber data have to be created automatically
+									user_repo_url += "&autoCreateUser=true";
+									full_comps = false;
+								} else {
+									auth_repo_class = (String)params.get(GEN_AUTH_DB);
+								}
 							}
 						}
 					}
