@@ -152,6 +152,20 @@ begin
 end;
 ' LANGUAGE 'plpgsql';
 
+-- Variant of TigUpdatePasswordPlainPw SP with parameters in reverse order.
+-- Some implementations require the parameters to be in the same order as
+-- the update query.
+create or replace function TigUpdatePasswordPlainPwRev(varchar(255), varchar(2049))
+  returns void as '
+declare
+  _user_pw alias for $1;
+  _user_id alias for $2;
+begin
+  perform TigUpdatePasswordPlainPw(_user_id, _user_pw);
+  return;
+end;
+' LANGUAGE 'plpgsql';
+
 -- Update user password
 create or replace function TigUpdatePassword(varchar(2049), varchar(255))
   returns void as '

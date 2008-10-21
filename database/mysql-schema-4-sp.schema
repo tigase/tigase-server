@@ -136,6 +136,14 @@ begin
 		end case;
 end //
 
+-- Variant of TigUpdatePasswordPlainPw SP with parameters in reverse order.
+-- Some implementations require the parameters to be in the same order as
+-- the update query.
+create procedure TigUpdatePasswordPlainPwRev(_user_pw varchar(255), _user_id varchar(2049))
+begin
+	call TigUpdatePasswordPlainPw(_user_id, _user_pw);
+end //
+
 -- Update user password
 create procedure TigUpdatePassword(_user_id varchar(2049), _user_pw varchar(255))
 begin
