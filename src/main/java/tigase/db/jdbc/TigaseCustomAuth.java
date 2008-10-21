@@ -278,6 +278,7 @@ public class TigaseCustomAuth implements UserAuthRepository {
 	 */
 	private long connectionValidateInterval = 1000*60;
 	private boolean online_status = false;
+	private boolean userlogin_active = false;
 
 	private PreparedStatement prepareQuery(String query) throws SQLException {
 		if (query.startsWith(SP_STARTS_WITH)) {
@@ -343,7 +344,7 @@ public class TigaseCustomAuth implements UserAuthRepository {
 	}
 
 	private String getPassword(final String user)
-		throws SQLException, UserNotFoundException {
+		throws TigaseDBException, UserNotFoundException {
 		ResultSet rs = null;
 		try {
 			checkConnection();
@@ -356,6 +357,8 @@ public class TigaseCustomAuth implements UserAuthRepository {
 					throw new UserNotFoundException("User does not exist: " + user);
 				} // end of if (isnext) else
 			}
+		} catch (SQLException e) {
+			throw new TigaseDBException("Problem with retrieving user password.", e);
 		} finally {
 			release(null, rs);
 		}
@@ -416,8 +419,11 @@ public class TigaseCustomAuth implements UserAuthRepository {
 			DEF_GETPASSWORD_QUERY);
 		updatepassword_query = getParamWithDef(params, DEF_UPDATEPASSWORD_KEY,
 			DEF_UPDATEPASSWORD_QUERY);
-		userlogin_query = getParamWithDef(params, DEF_USERLOGIN_KEY,
-			DEF_USERLOGIN_QUERY);
+		if (params != null && params.get(DEF_USERLOGIN_KEY) != null) {
+			userlogin_query = getParamWithDef(params, DEF_USERLOGIN_KEY,
+				DEF_USERLOGIN_QUERY);
+			userlogin_active = true;
+		}
 		userlogout_query = getParamWithDef(params, DEF_USERLOGOUT_KEY,
 			DEF_USERLOGOUT_QUERY);
 
@@ -439,16 +445,7 @@ public class TigaseCustomAuth implements UserAuthRepository {
 
 	public String getResourceUri() { return db_conn; }
 
-	/**
-	 * Describe <code>plainAuth</code> method here.
-	 *
-	 * @param user a <code>String</code> value
-	 * @param password a <code>String</code> value
-	 * @return a <code>boolean</code> value
-	 * @exception UserNotFoundException if an error occurs
-	 * @exception TigaseDBException if an error occurs
-	 */
-	public boolean plainAuth(final String user, final String password)
+	private boolean userLoginAuth(final String user, final String password)
 		throws UserNotFoundException, TigaseDBException, AuthorizationException {
 		ResultSet rs = null;
 		try {
@@ -476,6 +473,26 @@ public class TigaseCustomAuth implements UserAuthRepository {
 	}
 
 	/**
+	 * Describe <code>plainAuth</code> method here.
+	 *
+	 * @param user a <code>String</code> value
+	 * @param password a <code>String</code> value
+	 * @return a <code>boolean</code> value
+	 * @exception UserNotFoundException if an error occurs
+	 * @exception TigaseDBException if an error occurs
+	 */
+	public boolean plainAuth(final String user, final String password)
+		throws UserNotFoundException, TigaseDBException, AuthorizationException {
+		if (userlogin_active) {
+			return userLoginAuth(user, password);
+		} else {
+			String db_password = getPassword(user);
+			return password != null && db_password != null &&
+			  db_password.equals(password);
+		}
+	}
+
+	/**
 	 * Describe <code>digestAuth</code> method here.
 	 *
 	 * @param user a <code>String</code> value
@@ -490,7 +507,19 @@ public class TigaseCustomAuth implements UserAuthRepository {
 	public boolean digestAuth(final String user, final String digest,
 		final String id, final String alg)
 		throws UserNotFoundException, TigaseDBException, AuthorizationException {
-		throw new AuthorizationException("Not supported.");
+		if (userlogin_active) {
+			throw new AuthorizationException("Not supported.");
+		} else {
+			final String db_password = getPassword(user);
+			try {
+				final String digest_db_pass =	Algorithms.hexDigest(id, db_password, alg);
+				log.finest("Comparing passwords, given: " + digest
+					+ ", db: " + digest_db_pass);
+				return digest.equals(digest_db_pass);
+			} catch (NoSuchAlgorithmException e) {
+				throw new AuthorizationException("No such algorithm.", e);
+			} // end of try-catch
+		}
 	}
 
 	/**
@@ -508,11 +537,12 @@ public class TigaseCustomAuth implements UserAuthRepository {
 		if (proto.equals(PROTOCOL_VAL_SASL)) {
 			String mech = (String)props.get(MACHANISM_KEY);
 			if (mech.equals("PLAIN")) {
+				return saslPlainAuth(props);
+			} else {
 				return saslAuth(props);
-			} // end of if (mech.equals("PLAIN"))
-			throw new AuthorizationException("Mechanism is not supported: " + mech);
+			}
 		} // end of if (proto.equals(PROTOCOL_VAL_SASL))
-		throw new AuthorizationException("Protocol is not supported: " + proto);
+		throw new AuthorizationException("Protocol is not supported.");
 	}
 
 	public void logout(final String user)
@@ -565,8 +595,8 @@ public class TigaseCustomAuth implements UserAuthRepository {
 		try {
 			checkConnection();
 			synchronized (update_pass) {
-				update_pass.setString(1, JIDUtils.getNodeID(user));
-				update_pass.setString(2, password);
+				update_pass.setString(1, password);
+				update_pass.setString(2, JIDUtils.getNodeID(user));
 				update_pass.execute();
 			}
 		} catch (SQLException e) {
@@ -600,7 +630,7 @@ public class TigaseCustomAuth implements UserAuthRepository {
 		return new String(source, start_from, idx - start_from);
 	}
 
-	private boolean saslAuth(final Map<String, Object> props)
+	private boolean saslPlainAuth(final Map<String, Object> props)
 		throws UserNotFoundException, TigaseDBException, AuthorizationException {
 		String data_str = (String)props.get(DATA_KEY);
 		String domain = (String)props.get(REALM_KEY);
@@ -623,6 +653,103 @@ public class TigaseCustomAuth implements UserAuthRepository {
 		props.put(USER_ID_KEY, jid);
 		String passwd =	new String(in_data, user_idx, in_data.length - user_idx);
 		return plainAuth(jid, passwd);
+	}
+
+	private boolean saslAuth(final Map<String, Object> props)
+		throws AuthorizationException {
+		try {
+			SaslServer ss = (SaslServer)props.get("SaslServer");
+			if (ss == null) {
+				Map<String, String> sasl_props = new TreeMap<String, String>();
+				sasl_props.put(Sasl.QOP, "auth");
+				ss = Sasl.createSaslServer((String)props.get(MACHANISM_KEY),
+					"xmpp",	(String)props.get(SERVER_NAME_KEY),
+					sasl_props, new SaslCallbackHandler(props));
+				props.put("SaslServer", ss);
+			} // end of if (ss == null)
+			String data_str = (String)props.get(DATA_KEY);
+			byte[] in_data =
+				(data_str != null ? Base64.decode(data_str) : new byte[0]);
+			log.finest("response: " + new String(in_data));
+			byte[] challenge = ss.evaluateResponse(in_data);
+			log.finest("challenge: " +
+				(challenge != null ? new String(challenge) : "null"));
+			String challenge_str = (challenge != null && challenge.length > 0
+				? Base64.encode(challenge) : null);
+			props.put(RESULT_KEY, challenge_str);
+			if (ss.isComplete()) {
+				return true;
+			} else {
+				return false;
+			} // end of if (ss.isComplete()) else
+		} catch (SaslException e) {
+			throw new AuthorizationException("Sasl exception.", e);
+		} // end of try-catch
+	}
+
+	private class SaslCallbackHandler implements CallbackHandler {
+
+		private Map<String, Object> options = null;
+
+		private SaslCallbackHandler(final Map<String, Object> options) {
+			this.options = options;
+		}
+
+		// Implementation of javax.security.auth.callback.CallbackHandler
+		/**
+		 * Describe <code>handle</code> method here.
+		 *
+		 * @param callbacks a <code>Callback[]</code> value
+		 * @exception IOException if an error occurs
+		 * @exception UnsupportedCallbackException if an error occurs
+		 */
+		public void handle(final Callback[] callbacks)
+			throws IOException, UnsupportedCallbackException {
+
+			String jid = null;
+
+			for (int i = 0; i < callbacks.length; i++) {
+				log.finest("Callback: " + callbacks[i].getClass().getSimpleName());
+				if (callbacks[i] instanceof RealmCallback) {
+					RealmCallback rc = (RealmCallback)callbacks[i];
+					String realm = (String)options.get(REALM_KEY);
+					if (realm != null) {
+						rc.setText(realm);
+					} // end of if (realm == null)
+					log.finest("RealmCallback: " + realm);
+				} else if (callbacks[i] instanceof NameCallback) {
+					NameCallback nc = (NameCallback)callbacks[i];
+					String user_name = nc.getName();
+					if (user_name == null) {
+						user_name = nc.getDefaultName();
+					} // end of if (name == null)
+					jid = JIDUtils.getNodeID(user_name, (String)options.get(REALM_KEY));
+					options.put(USER_ID_KEY, jid);
+					log.finest("NameCallback: " + user_name);
+				} else if (callbacks[i] instanceof PasswordCallback) {
+					PasswordCallback pc = (PasswordCallback)callbacks[i];
+					try {
+						String passwd = getPassword(jid);
+						pc.setPassword(passwd.toCharArray());
+						log.finest("PasswordCallback: " +	passwd);
+					} catch (Exception e) {
+						throw new IOException("Password retrieving problem.", e);
+					} // end of try-catch
+				} else if (callbacks[i] instanceof AuthorizeCallback) {
+					AuthorizeCallback authCallback = ((AuthorizeCallback)callbacks[i]);
+					String authenId = authCallback.getAuthenticationID();
+					log.finest("AuthorizeCallback: authenId: " + authenId);
+					String authorId = authCallback.getAuthorizationID();
+					log.finest("AuthorizeCallback: authorId: " + authorId);
+					if (authenId.equals(authorId)) {
+						authCallback.setAuthorized(true);
+					} // end of if (authenId.equals(authorId))
+				} else {
+					throw new UnsupportedCallbackException
+						(callbacks[i], "Unrecognized Callback");
+				}
+			}
+		}
 	}
 
 } // TigaseCustomAuth
