@@ -205,3 +205,7 @@ CREATE procedure TigAddNode(parentNid bigint, uid bigint, node varchar(255))
 	MODIFIES SQL DATA
 	DYNAMIC RESULT SETS 1
 	EXTERNAL NAME 'tigase.db.derby.StoredProcedures.TigAddNode';
+
+-- This is a dummy user who keeps all the database-properties
+call TigAddUserPlainPw('db-properties', NULL);
+call TigPutDBProperty('schema-version', '4.0');

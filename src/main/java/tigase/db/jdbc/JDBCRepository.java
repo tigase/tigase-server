@@ -76,6 +76,14 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 
 	private static final String USER_STR = "User: ";
 
+	public static final String DERBY_CONNVALID_QUERY = "values 1";
+	public static final String JDBC_CONNVALID_QUERY = "select 1";
+
+	public static final String DERBY_GETSCHEMAVER_QUERY
+    = "values TigGetDBProperty('schema-version')";
+	public static final String JDBC_GETSCHEMAVER_QUERY
+    = "select TigGetDBProperty('schema-version')";
+
 	//	private String users_tbl = DEF_USERS_TBL;
 	private String nodes_tbl = DEF_NODES_TBL;
 	private String pairs_tbl = DEF_PAIRS_TBL;
@@ -105,6 +113,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	private long connectionValidateInterval = 1000*60;
 
 	private boolean autoCreateUser = false;
+	private boolean derby_mode = false;
 
 // 	private static long var_max_uid = 0;
 // 	private static long var_max_nid = 0;
@@ -366,15 +375,15 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		node_add_sp = conn.prepareCall(query);
 
 		query = "select pval from " + pairs_tbl
-			+ " where (nid = ?) AND (pkey = ?);";
+			+ " where (nid = ?) AND (pkey = ?)";
 		data_for_node_st = conn.prepareStatement(query);
 
 		query = "select pkey from " + pairs_tbl
-			+ " where (nid = ?);";
+			+ " where (nid = ?)";
 		keys_for_node_st = conn.prepareStatement(query);
 
 		query = "select nid, node from " + nodes_tbl
-			+ " where parent_nid = ?;";
+			+ " where parent_nid = ?";
 		nodes_for_node_st = conn.prepareStatement(query);
 
 		query =  "insert into " + pairs_tbl	+ " (nid, uid, pkey, pval) "
@@ -385,7 +394,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 			+ " where (nid = ?) AND (pkey = ?)";
 		remove_key_data_st = conn.prepareStatement(query);
 
-		query = "select 1;";
+		query = (derby_mode ? DERBY_CONNVALID_QUERY : JDBC_CONNVALID_QUERY);
 		conn_valid_st = conn.prepareStatement(query);
 	}
 
@@ -394,7 +403,8 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	private void checkDBSchema() {
 		String schema_version = "1.0";
 		try {
-			String query = "select TigGetDBProperty('schema-version') as prop_val;";
+			String query =
+        (derby_mode ? DERBY_GETSCHEMAVER_QUERY : JDBC_GETSCHEMAVER_QUERY);
 			Statement stmt = conn.createStatement();
 			ResultSet rs = stmt.executeQuery(query);
 			if (rs.next()) {
@@ -426,6 +436,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 			synchronized (db_conn) {
 				conn = DriverManager.getConnection(db_conn);
 				conn.setAutoCommit(true);
+				derby_mode = db_conn.startsWith("jdbc:derby");
 				checkDBSchema();
 				initPreparedStatements();
 				auth = new UserAuthRepositoryImpl(this);

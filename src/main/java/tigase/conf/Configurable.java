@@ -113,6 +113,8 @@ public interface Configurable extends ServerComponent {
 		"tigase.db.xml.XMLRepository";
 	public static final String MYSQL_REPO_CLASS_PROP_VAL =
 		"tigase.db.jdbc.JDBCRepository";
+	public static final String DERBY_REPO_CLASS_PROP_VAL =
+		"tigase.db.jdbc.JDBCRepository";
 	public static final String PGSQL_REPO_CLASS_PROP_VAL =
 		"tigase.db.jdbc.JDBCRepository";
 	public static final String TIGASE_AUTH_REPO_CLASS_PROP_VAL =
@@ -127,6 +129,8 @@ public interface Configurable extends ServerComponent {
 	public static final String XML_REPO_URL_PROP_VAL = "user-repository.xml";
 	public static final String MYSQL_REPO_URL_PROP_VAL =
 		"jdbc:mysql://localhost/tigase?user=root&password=mypass";
+	public static final String DERBY_REPO_URL_PROP_VAL =
+		"jdbc:derby:tigase-derbydb;create=true";
 	public static final String PGSQL_REPO_URL_PROP_VAL =
 		"jdbc:postgresql://localhost/tigase?user=tigase";
 	public static final String TIGASE_AUTH_REPO_URL_PROP_VAL =

@@ -20,7 +20,7 @@ public class StoredProcedures {
 		if (encMethod != null && "MD5-PASSWORD".equals(encMethod)) {
 			return md5(userPw);
 		} else if (encMethod != null && "MD5-USERID-PASSWORD".equals(encMethod)) {
-			return md5(userId + '\0' + userPw);
+			return md5(userId + userPw);
 		} else {
 			return userPw;
 		}
@@ -44,7 +44,7 @@ public class StoredProcedures {
 			PreparedStatement ps = conn.prepareStatement("select user_id, last_login, last_logout, online_status, failed_logins, account_status from tig_users where account_status > 0");
 			data[0] = ps.executeQuery();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			log.log(Level.SEVERE, "SP error", e);
 			throw e;
 		}
@@ -62,7 +62,7 @@ public class StoredProcedures {
 			ps.executeUpdate();
 			data[0] = ps.getGeneratedKeys();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			log.log(Level.SEVERE, "SP error", e);
 			throw e;
 		}
@@ -89,7 +89,7 @@ public class StoredProcedures {
 			ps2.setLong(1, generatedKey);
 			ps2.executeUpdate();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			log.log(Level.SEVERE, "SP error", e);
 			throw e;
 		}
@@ -101,7 +101,7 @@ public class StoredProcedures {
 			String encp = encodePassword(encMethod, userId, userPw);
 			tigAddUser(userId, encp, data);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			log.log(Level.SEVERE, "SP error", e);
 			throw e;
 		}
@@ -113,7 +113,7 @@ public class StoredProcedures {
 			PreparedStatement ps = conn.prepareStatement("select user_id, last_login, last_logout, online_status, failed_logins, account_status from tig_users");
 			data[0] = ps.executeQuery();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			log.log(Level.SEVERE, "SP error", e);
 			throw e;
 		}
@@ -122,10 +122,10 @@ public class StoredProcedures {
 	public static void tigAllUsersCount(ResultSet[] data) throws SQLException {
 		try {
 			Connection conn = DriverManager.getConnection("jdbc:default:connection");
-			PreparedStatement ps = conn.prepareStatement("select count(*) into res_cnt from tig_users");
+			PreparedStatement ps = conn.prepareStatement("select count(*) as res_cnt from tig_users");
 			data[0] = ps.executeQuery();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			log.log(Level.SEVERE, "SP error", e);
 			throw e;
 		}
@@ -138,7 +138,7 @@ public class StoredProcedures {
 			ps.setString(1, userId);
 			ps.executeUpdate();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			log.log(Level.SEVERE, "SP error", e);
 			throw e;
 		}
@@ -150,7 +150,7 @@ public class StoredProcedures {
 			PreparedStatement ps = conn.prepareStatement("select user_id, last_login, last_logout, online_status, failed_logins, account_status from tig_users where account_status = 0");
 			data[0] = ps.executeQuery();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			log.log(Level.SEVERE, "SP error", e);
 			throw e;
 		}
@@ -163,7 +163,7 @@ public class StoredProcedures {
 			ps.setString(1, userId);
 			ps.executeUpdate();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			log.log(Level.SEVERE, "SP error", e);
 			throw e;
 		}
@@ -186,7 +186,7 @@ public class StoredProcedures {
 
 			return result;
 		} catch (SQLException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			log.log(Level.SEVERE, "SP error", e);
 			throw e;
 		}
@@ -199,7 +199,7 @@ public class StoredProcedures {
 			ps.setString(1, userId);
 			data[0] = ps.executeQuery();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			log.log(Level.SEVERE, "SP error", e);
 			throw e;
 		}
@@ -212,7 +212,7 @@ public class StoredProcedures {
 			ps.setString(1, userId);
 			data[0] = ps.executeQuery();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			log.log(Level.SEVERE, "SP error", e);
 			throw e;
 		}
@@ -224,7 +224,7 @@ public class StoredProcedures {
 			PreparedStatement ps = conn.prepareStatement("update tig_users set online_status = 0");
 			ps.executeUpdate();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			log.log(Level.SEVERE, "SP error", e);
 			throw e;
 		}
@@ -236,7 +236,7 @@ public class StoredProcedures {
 			PreparedStatement ps = conn.prepareStatement("select user_id, last_login, last_logout, online_status, failed_logins, account_status from tig_users where online_status = 0");
 			data[0] = ps.executeQuery();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			log.log(Level.SEVERE, "SP error", e);
 			throw e;
 		}
@@ -248,7 +248,7 @@ public class StoredProcedures {
 			PreparedStatement ps = conn.prepareStatement("select user_id, last_login, last_logout, online_status, failed_logins, account_status from tig_users where online_status > 0");
 			data[0] = ps.executeQuery();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			log.log(Level.SEVERE, "SP error", e);
 			throw e;
 		}
@@ -274,7 +274,7 @@ public class StoredProcedures {
 				log.severe("Error on put properties");
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			log.log(Level.SEVERE, "SP error", e);
 			throw e;
 		}
@@ -283,11 +283,39 @@ public class StoredProcedures {
 	public static void tigRemoveUser(final String userId) throws SQLException {
 		try {
 			Connection conn = DriverManager.getConnection("jdbc:default:connection");
-			PreparedStatement ps = conn.prepareStatement("delete from tig_users where user_id = ?");
+
+			PreparedStatement ps3 = conn.prepareStatement("select uid from tig_users where user_id = ?");
+			ps3.setString(1, userId);
+			ResultSet rs = ps3.executeQuery();
+			rs.next();
+			long uid = rs.getLong(1);
+
+			PreparedStatement ps1 = conn.prepareStatement("delete from tig_pairs where uid = ?");
+			ps1.setLong(1, uid);
+			ps1.executeUpdate();
+
+			PreparedStatement ps2 = conn.prepareStatement("delete from tig_nodes where uid = ?");
+			ps2.setLong(1, uid);
+			ps2.executeUpdate();
+
+			PreparedStatement ps = conn.prepareStatement("delete from tig_users where uid = ?");
+			ps.setLong(1, uid);
+			ps.executeUpdate();
+		} catch (SQLException e) {
+			//e.printStackTrace();
+			log.log(Level.SEVERE, "SP error", e);
+			throw e;
+		}
+	}
+
+	public static void tigUserLogout(final String userId) throws SQLException {
+		try {
+			Connection conn = DriverManager.getConnection("jdbc:default:connection");
+			PreparedStatement ps = conn.prepareStatement("update tig_users set online_status = online_status - 1, last_logout = current timestamp where user_id =  ?");
 			ps.setString(1, userId);
 			ps.executeUpdate();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			log.log(Level.SEVERE, "SP error", e);
 			throw e;
 		}
@@ -301,7 +329,7 @@ public class StoredProcedures {
 			ps.setString(2, userId);
 			ps.executeUpdate();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			log.log(Level.SEVERE, "SP error", e);
 			throw e;
 		}
@@ -313,16 +341,20 @@ public class StoredProcedures {
 			String encp = encodePassword(encMethod, userId, userPw);
 			tigUpdatePassword(userId, encp);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			log.log(Level.SEVERE, "SP error", e);
 			throw e;
 		}
 	}
 
+	public static void tigUpdatePasswordPlainPwRev(String userPw, String userId) throws SQLException {
+		tigUpdatePasswordPlainPw(userId, userPw);
+	}
+
 	public static void tigUserLogin(String userId, String userPw, ResultSet[] data) throws SQLException {
 		try {
 			Connection conn = DriverManager.getConnection("jdbc:default:connection");
-			PreparedStatement ps = conn.prepareStatement("select user_id from tig_users where (account_status > 0) AND (user_id = ?) AND (user_pw = ?))");
+			PreparedStatement ps = conn.prepareStatement("select user_id from tig_users where (account_status > 0) AND (user_id = ?) AND (user_pw = ?)");
 			ps.setString(1, userId);
 			ps.setString(2, userPw);
 			ResultSet rs = ps.executeQuery();
@@ -337,7 +369,7 @@ public class StoredProcedures {
 				flps.executeUpdate();
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			log.log(Level.SEVERE, "SP error", e);
 			throw e;
 		}
@@ -349,7 +381,7 @@ public class StoredProcedures {
 			String encp = encodePassword(encMethod, userId, userPw);
 			tigUserLogin(userId, encp, data);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			log.log(Level.SEVERE, "SP error", e);
 			throw e;
 		}

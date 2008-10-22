@@ -78,9 +78,9 @@ public class TigaseAuth implements UserAuthRepository {
 	private static final String[] non_sasl_mechs = {"password"};
 	private static final String[] sasl_mechs = {"PLAIN"};
 
-	public static final String DEF_USERS_TBL = "users";
+	public static final String DERBY_CONNVALID_QUERY = "values 1";
+	public static final String JDBC_CONNVALID_QUERY = "select 1";
 
-	private String users_tbl = DEF_USERS_TBL;
 	/**
 	 * Database connection string.
 	 */
@@ -111,6 +111,7 @@ public class TigaseAuth implements UserAuthRepository {
 	 */
 	private long connectionValidateInterval = 1000*60;
 	private boolean online_status = false;
+	private boolean derby_mode = false;
 
 	/**
 	 * <code>initPreparedStatements</code> method initializes internal
@@ -119,7 +120,7 @@ public class TigaseAuth implements UserAuthRepository {
 	 * @exception SQLException if an error occurs on database query.
 	 */
 	private void initPreparedStatements() throws SQLException {
-		String query = query = "select 1;";
+		String query = (derby_mode ? DERBY_CONNVALID_QUERY : JDBC_CONNVALID_QUERY);
 		conn_valid_st = conn.prepareStatement(query);
 
 		query = "{ call TigInitdb() }";
@@ -227,6 +228,7 @@ public class TigaseAuth implements UserAuthRepository {
 	private void initRepo() throws SQLException {
 		synchronized (db_conn) {
 			conn = DriverManager.getConnection(db_conn);
+			derby_mode = db_conn.startsWith("jdbc:derby");
 			initPreparedStatements();
 		}
 	}
