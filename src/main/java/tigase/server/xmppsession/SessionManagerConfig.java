@@ -87,19 +87,19 @@ public class SessionManagerConfig {
 		boolean full_comps = true;
 		String user_repo_class = DERBY_REPO_CLASS_PROP_VAL;
 		String user_repo_url = DERBY_REPO_URL_PROP_VAL;
-		String auth_repo_class = TIGASE_AUTH_REPO_CLASS_PROP_VAL;
+		String auth_repo_class = DERBY_REPO_CLASS_PROP_VAL;
 		String auth_repo_url = DERBY_REPO_URL_PROP_VAL;
 		if (params.get(GEN_USER_DB) != null) {
 			if (params.get(GEN_USER_DB).equals("mysql")) {
 				user_repo_class = MYSQL_REPO_CLASS_PROP_VAL;
 				user_repo_url = MYSQL_REPO_URL_PROP_VAL;
-				auth_repo_class = TIGASE_AUTH_REPO_CLASS_PROP_VAL;
+				auth_repo_class = MYSQL_REPO_CLASS_PROP_VAL;
 				auth_repo_url = MYSQL_REPO_URL_PROP_VAL;
 			} else {
 				if (params.get(GEN_USER_DB).equals("pgsql")) {
 					user_repo_class = PGSQL_REPO_CLASS_PROP_VAL;
 					user_repo_url = PGSQL_REPO_URL_PROP_VAL;
-					auth_repo_class = TIGASE_AUTH_REPO_CLASS_PROP_VAL;
+					auth_repo_class = PGSQL_REPO_CLASS_PROP_VAL;
 					auth_repo_url = PGSQL_REPO_URL_PROP_VAL;
 				} else {
 					if (params.get(GEN_USER_DB).equals("derby")) {

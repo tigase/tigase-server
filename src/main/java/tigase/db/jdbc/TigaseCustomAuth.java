@@ -316,16 +316,19 @@ public class TigaseCustomAuth implements UserAuthRepository {
 	 * @exception SQLException if an error occurs on database query.
 	 */
 	private boolean checkConnection() throws SQLException {
+		ResultSet rs = null;
 		try {
 			synchronized (conn_valid_st) {
 				long tmp = System.currentTimeMillis();
 				if ((tmp - lastConnectionValidated) >= connectionValidateInterval) {
-					conn_valid_st.executeQuery();
+					rs = conn_valid_st.executeQuery();
 					lastConnectionValidated = tmp;
 				} // end of if ()
 			}
 		} catch (Exception e) {
 			initRepo();
+		} finally {
+			release(null, rs);
 		} // end of try-catch
 		return true;
 	}
@@ -474,6 +477,8 @@ public class TigaseCustomAuth implements UserAuthRepository {
 			}
 		} catch (SQLException e) {
 			throw new TigaseDBException("Problem accessing repository.", e);
+		} finally {
+			release(null, rs);
 		} // end of catch
 	}
 
@@ -573,17 +578,23 @@ public class TigaseCustomAuth implements UserAuthRepository {
 	 */
 	public void addUser(final String user, final String password)
 		throws UserExistsException, TigaseDBException {
+		ResultSet rs = null;
 		try {
 			checkConnection();
 			synchronized (add_user) {
 				add_user.setString(1, JIDUtils.getNodeID(user));
 				add_user.setString(2, password);
-				add_user.execute();
+				boolean is_result = add_user.execute();
+				if (is_result) {
+					rs = add_user.getResultSet();
+				}
 			}
 		} catch (SQLIntegrityConstraintViolationException e) {
 			throw new UserExistsException("Error while adding user to repository, user exists?", e);
 		} catch (SQLException e) {
 			throw new TigaseDBException("Problem accessing repository.", e);
+		} finally {
+			release(null, rs);
 		}
 	}
 
