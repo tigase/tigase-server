@@ -241,6 +241,12 @@ public class SessionManagerClustered extends SessionManager
 								fastAddOutPacket(new Packet(result.getClusterElement()));
 								conn.putSessionData("redirect-to", node_found);
 								sendAllOnHold(conn);
+
+								String xmpp_sessionId = clel.getMethodParam(XMPP_SESSION_ID);
+								Packet redirect = Command.REDIRECT.getPacket(node_found,
+									connectionId, StanzaType.set, "1", "submit");
+								Command.addFieldValue(redirect, "session-id", xmpp_sessionId);
+								fastAddOutPacket(redirect);
 							} else {
 								// Ups, the user has disconnected, send session transfer to all
 								log.finest("Addeding node to cancel_nodes: " + node_found);
@@ -370,10 +376,10 @@ public class SessionManagerClustered extends SessionManager
 						fastAddOutPacket(close);
 					}
 					conn.setConnectionStatus(ConnectionStatus.NORMAL);
-					Packet redirect = Command.REDIRECT.getPacket(getComponentId(),
-						connectionId, StanzaType.set, "1", "submit");
-					Command.addFieldValue(redirect, "session-id", xmpp_sessionId);
-					fastAddOutPacket(redirect);
+// 					Packet redirect = Command.REDIRECT.getPacket(getComponentId(),
+// 						connectionId, StanzaType.set, "1", "submit");
+// 					Command.addFieldValue(redirect, "session-id", xmpp_sessionId);
+// 					fastAddOutPacket(redirect);
 
 // 					Map<String, String> res_vals = new LinkedHashMap<String, String>();
 // 					res_vals.put(TRANSFER, "cancel");
