@@ -34,6 +34,7 @@ import java.util.LinkedList;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.Date;
 
 //import tigase.cluster.methodcalls.SessionTransferMC;
 import tigase.server.Packet;
@@ -87,7 +88,6 @@ public class SessionManagerClustered extends SessionManager
 	private Set<String> cluster_nodes = new LinkedHashSet<String>();
 	private Set<String> broken_nodes = new LinkedHashSet<String>();
 	//	private ArrayList<MethodCall> methods = new ArrayList<MethodCall>();
-
 
 	@SuppressWarnings("unchecked")
 	public void processPacket(Packet packet) {
@@ -486,8 +486,8 @@ public class SessionManagerClustered extends SessionManager
 			cluster_nodes.add(getName() + "@" + node);
 			broken_nodes.remove(getName() + "@" + node);
 		}
-		sendClusterNotification("Cluster nodes have been connected:",
-			"New cluster nodes connected", node_hostnames);
+		sendClusterNotification("Cluster nodes have been connected ("
+			+ (new Date()) + ")", "\nNew cluster nodes connected", node_hostnames);
 	}
 
 	public void nodesDisconnected(Set<String> node_hostnames) {
@@ -495,8 +495,8 @@ public class SessionManagerClustered extends SessionManager
 			cluster_nodes.remove(getName() + "@" + node);
 			broken_nodes.add(getName() + "@" + node);
 		}
-		sendClusterNotification("Cluster nodes have been disconnected:",
-			"Disconnected cluster nodes", node_hostnames);
+		sendClusterNotification("Cluster nodes have been disconnected ("
+			+ (new Date()) + ")", "\nDisconnected cluster nodes", node_hostnames);
 	}
 
 	protected String getFirstClusterNode() {

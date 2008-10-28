@@ -43,6 +43,7 @@ import tigase.io.TLSIO;
 import tigase.io.TLSUtil;
 import tigase.io.TLSWrapper;
 import tigase.io.BufferUnderflowException;
+import tigase.util.TimeUtils;
 
 /**
  * <code>IOService</code> offers thread thread safe
@@ -94,6 +95,11 @@ public abstract class IOService implements Callable<IOService> {
 	private long lastTransferTime = 0;
 	private boolean stopping = false;
 
+	private long[] rdData = new long[60];
+	private long[] wrData = new long[60];
+	private int lastMinuteRd = 0;
+	private int lastMinuteWr = 0;
+
 	private IOServiceListener serviceListener = null;
 
 	private ConcurrentMap<String, Object> sessionData =
@@ -108,6 +114,32 @@ public abstract class IOService implements Callable<IOService> {
   private CharsetDecoder decoder = Charset.forName("UTF-8").newDecoder();
 
 	private String dataReceiver = null;
+
+	private void addRead(long read) {
+		int minute = TimeUtils.getMinuteNow();
+		if (lastMinuteRd != minute) {
+			lastMinuteRd = minute;
+			rdData[minute] = 0;
+		}
+		rdData[minute] += read;
+	}
+
+	public long[] getReadCounters() {
+		return rdData;
+	}
+
+	private void addWritten(long wrote) {
+		int minute = TimeUtils.getMinuteNow();
+		if (lastMinuteWr != minute) {
+			lastMinuteWr = minute;
+			wrData[minute] = 0;
+		}
+		wrData[minute] += wrote;
+	}
+
+	public long[] getWriteCounters() {
+		return wrData;
+	}
 
 	public void setDataReceiver(String address) {
 		this.dataReceiver = address;
@@ -315,12 +347,14 @@ public abstract class IOService implements Callable<IOService> {
 					tmpBuffer.flip();
 					cb = decoder.decode(tmpBuffer);
 					tmpBuffer.clear();
+					addRead(cb.array().length);
 				} else {
 					// Detecting infinite read 0 bytes
 					// sometimes it happens that the connection has been lost
 					// and the select thinks there are some bytes waiting for reading
 					// and 0 bytes are read
 					if ((++empty_read_call_count) > MAX_ALLOWED_EMPTY_CALLS) {
+						log.warning("Max allowed empty calls excceeded, closing connection.");
 						forceStop();
 					}
 				}
@@ -359,6 +393,7 @@ public abstract class IOService implements Callable<IOService> {
 					socketIO.write(dataBuffer);
 
 					setLastTransferTime();
+					addWritten(data.length());
 				} else {
 					if (socketIO.waitingToSend()) {
 						socketIO.write(null);

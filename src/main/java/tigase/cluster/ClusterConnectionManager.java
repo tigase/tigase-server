@@ -52,6 +52,10 @@ import tigase.xmpp.StanzaType;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.XMPPIOService;
 import tigase.xmpp.PacketErrorTypeException;
+import tigase.stats.StatRecord;
+import tigase.stats.StatisticType;
+import tigase.stats.StatisticsContainer;
+import tigase.util.TimeUtils;
 
 /**
  * Class ClusterConnectionManager
@@ -102,6 +106,12 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 //     new LinkedHashMap<String, Long>();
 // 	private LinkedHashMap<String, Long> recieved_acks =
 //     new LinkedHashMap<String, Long>();
+
+	private long totalNodeDisconnects = 0;
+	private long[] lastDay = new long[24];
+	private long[] lastHour = new long[60];
+	private int lastDayIdx = 0;
+	private int lastHourIdx = 0;
 
 	public void processPacket(Packet packet) {
 		if (log.isLoggable(Level.FINEST)) {
@@ -379,6 +389,19 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 					getComponentId(), cluster_controller_id,
 					StanzaType.set, ClusterMethods.UPDATE_NODES.toString(),
 					method_params).getClusterElement()));
+		++totalNodeDisconnects;
+		int hour = TimeUtils.getHourNow();
+		if (lastDayIdx != hour) {
+			lastDayIdx = hour;
+			lastDay[hour] = 0;
+		}
+		++lastDay[hour];
+		int minute = TimeUtils.getMinuteNow();
+		if (lastHourIdx != minute) {
+			lastHourIdx = minute;
+			lastHour[minute] = 0;
+		}
+		++lastHour[minute];
 	}
 
 	protected String getServiceId(Packet packet) {
@@ -532,6 +555,18 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 
 	protected XMPPIOService getXMPPIOServiceInstance() {
 		return new XMPPIOService();
+	}
+
+	public List<StatRecord> getStatistics() {
+		List<StatRecord> stats = super.getStatistics();
+		stats.add(new StatRecord(getName(), "Total disconnects", "long",
+				totalNodeDisconnects, Level.INFO));
+
+		stats.add(new StatRecord(getName(), "Last day disconnects", "array",
+				Arrays.toString(lastDay), Level.FINE));
+		stats.add(new StatRecord(getName(), "Last hour disconnects", "array",
+				Arrays.toString(lastHour), Level.INFO));
+		return stats;
 	}
 
 }

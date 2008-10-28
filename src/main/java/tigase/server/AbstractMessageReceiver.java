@@ -335,6 +335,25 @@ public abstract class AbstractMessageReceiver
 		receiverTasks = null;
 	}
 
+	public void everySecond() {
+		curr_minute -= seconds[sec_idx];
+		seconds[sec_idx] = curr_second;
+		curr_second = 0;
+		curr_minute += seconds[sec_idx++];
+		if (sec_idx >= 60) {
+			sec_idx = 0;
+		}
+	}
+
+	public void everyMinute() {
+		curr_hour -= minutes[min_idx];
+		minutes[min_idx] = curr_minute;
+		curr_hour += minutes[min_idx++];
+		if (min_idx >= 60) {
+			min_idx = 0;
+		}
+	}
+
 	private void startThreads() {
 		if (in_thread == null || ! in_thread.isAlive()) {
 			stopped = false;
@@ -351,26 +370,14 @@ public abstract class AbstractMessageReceiver
 		receiverTasks = new Timer(getName() + " tasks", true);
 		receiverTasks.schedule(new TimerTask() {
 				public void run() {
-					curr_minute -= seconds[sec_idx];
-					seconds[sec_idx] = curr_second;
-					curr_second = 0;
-					curr_minute += seconds[sec_idx++];
-					if (sec_idx >= 60) {
-						sec_idx = 0;
-					}
+					everySecond();
 				}
 			}, SECOND, SECOND);
 		receiverTasks.schedule(new TimerTask() {
 				public void run() {
-					curr_hour -= minutes[min_idx];
-					minutes[min_idx] = curr_minute;
-					curr_hour += minutes[min_idx++];
-					if (min_idx >= 60) {
-						min_idx = 0;
-					}
+					everyMinute();
 				}
 			}, MINUTE, MINUTE);
-
 	}
 
 	public void start() {

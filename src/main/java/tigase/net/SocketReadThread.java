@@ -190,7 +190,7 @@ public class SocketReadThread implements Runnable {
 					} // end of try-catch
 				} else {
 					try {
-						log.info("Forcing stopping the service: " + serv.getUniqueId());
+						log.warning("Forcing stopping the service: " + serv.getUniqueId());
 						serv.forceStop();
 					} catch (Exception e) {	}
 				}
