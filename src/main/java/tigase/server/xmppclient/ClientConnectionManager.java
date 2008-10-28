@@ -149,11 +149,12 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 			if (old_receiver != null) {
 				log.fine("Redirecting data for sessionId: " + command_sessionId
 					+ ", to: " + newAddress);
-				Packet response = packet.commandResult(null);
-				Command.addFieldValue(response, "session-id", command_sessionId);
-				Command.addFieldValue(response, "action", "close");
-				response.getElement().setAttribute("to", old_receiver);
-				addOutPacket(response);
+				Packet response = null;
+// 				response = packet.commandResult(null);
+// 				Command.addFieldValue(response, "session-id", command_sessionId);
+// 				Command.addFieldValue(response, "action", "close");
+// 				response.getElement().setAttribute("to", old_receiver);
+// 				addOutPacket(response);
 				response = packet.commandResult(null);
 				Command.addFieldValue(response, "session-id", command_sessionId);
 				Command.addFieldValue(response, "action", "activate");
