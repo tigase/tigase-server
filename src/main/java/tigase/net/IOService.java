@@ -353,10 +353,10 @@ public abstract class IOService implements Callable<IOService> {
 					// sometimes it happens that the connection has been lost
 					// and the select thinks there are some bytes waiting for reading
 					// and 0 bytes are read
-					if ((++empty_read_call_count) > MAX_ALLOWED_EMPTY_CALLS) {
-						log.warning("Max allowed empty calls excceeded, closing connection.");
-						forceStop();
-					}
+// 					if ((++empty_read_call_count) > MAX_ALLOWED_EMPTY_CALLS) {
+// 						log.warning("Max allowed empty calls excceeded, closing connection.");
+// 						forceStop();
+// 					}
 				}
 			} catch (BufferUnderflowException underfl) {
 				// Obtain more inbound network data for src,
