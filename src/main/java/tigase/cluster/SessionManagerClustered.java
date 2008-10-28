@@ -144,22 +144,24 @@ public class SessionManagerClustered extends SessionManager
 				//el_packet.setFrom(packet_from);
 				XMPPResourceConnection conn = getXMPPResourceConnection(el_packet);
 				if (conn != null || !sentToNextNode(packet)) {
-					switch (conn.getConnectionStatus()) {
-					case ON_HOLD:
-						LinkedList<Packet> packets =
+					if (conn != null) {
+						switch (conn.getConnectionStatus()) {
+						case ON_HOLD:
+							LinkedList<Packet> packets =
               (LinkedList<Packet>)conn.getSessionData(SESSION_PACKETS);
-						if (packets == null) {
-							packets = new LinkedList<Packet>();
-							conn.putSessionData(SESSION_PACKETS, packets);
+							if (packets == null) {
+								packets = new LinkedList<Packet>();
+								conn.putSessionData(SESSION_PACKETS, packets);
+							}
+							packets.offer(el_packet);
+							log.finest("Packet put on hold: " + el_packet.toString());
+							return;
+						case REDIRECT:
+							el_packet.setTo((String)conn.getSessionData("redirect-to"));
+							fastAddOutPacket(el_packet);
+							log.finest("Packet redirected: " + el_packet.toString());
+							return;
 						}
-						packets.offer(el_packet);
-						log.finest("Packet put on hold: " + el_packet.toString());
-						return;
-					case REDIRECT:
-						el_packet.setTo((String)conn.getSessionData("redirect-to"));
-						fastAddOutPacket(el_packet);
-						log.finest("Packet redirected: " + el_packet.toString());
-						return;
 					}
 					processPacket(el_packet, conn);
 				}
