@@ -121,7 +121,7 @@ public class RosterFlat extends RosterAbstract {
 		String buddy)
     throws NotAuthorizedException, TigaseDBException {
 		Map<String, RosterElement> roster = getUserRoster(session);
-		return roster.get(buddy);
+		return roster.get(JIDUtils.getNodeID(buddy));
 	}
 
 	public String[] getBuddies(final XMPPResourceConnection session)
@@ -186,8 +186,9 @@ public class RosterFlat extends RosterAbstract {
 		String jid, String name, String[] groups)
     throws NotAuthorizedException, TigaseDBException {
 		Map<String, RosterElement> roster = getUserRoster(session);
-		RosterElement relem = new RosterElement(jid, name, groups);
-		roster.put(jid, relem);
+		String buddy = JIDUtils.getNodeID(jid);
+		RosterElement relem = new RosterElement(buddy, name, groups);
+		roster.put(buddy, relem);
 		saveUserRoster(session);
 		log.finest("Added buddy to roster: " + jid);
 	}
