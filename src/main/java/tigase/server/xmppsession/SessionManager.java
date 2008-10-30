@@ -573,13 +573,23 @@ public class SessionManager extends AbstractMessageReceiver
 			try {
 				if (isTrusted(pc.getElemFrom())
 					|| isTrusted(JIDUtils.getNodeHost(pc.getElemFrom()))) {
-					String user_jid = Command.getFieldValue(pc, "jid");
-					String hostname = JIDUtils.getNodeHost(user_jid);
 					String av = Command.getFieldValue(pc, "available");
 					boolean available = !(av != null && av.equalsIgnoreCase("false"));
 					if (available) {
+						Packet presence = null;
+						Element p = pc.getElement().getChild("command").getChild("presence");
+						if (p != null) {
+// +							// use this hack to break XMLNS
+// +							Element el = new Element("presence");
+// +							el.setChildren(p.getChildren());
+							Element elem = p.clone();
+							elem.setXMLNS("jabber:client");
+							presence = new Packet(elem);
+						}
 						connection = connectionsByFrom.get(pc.getElemFrom());
 						if (connection == null) {
+							String user_jid = Command.getFieldValue(pc, "jid");
+							String hostname = JIDUtils.getNodeHost(user_jid);
 							connection = createUserSession(pc.getElemFrom(), hostname, user_jid);
 							connection.setSessionId("USER_STATUS");
 							user_repository.setData(JIDUtils.getNodeID(user_jid), "tokens",
@@ -588,25 +598,29 @@ public class SessionManager extends AbstractMessageReceiver
 							handleLogin(user_jid, connection);
 							connection.putSessionData("jingle", "active");
 							addOutPacket(pc.okResult((String)null, 0));
-							Packet presence =
-						    new Packet(new Element("presence",
-										new Element[] {
-											new Element("priority", "-1"),
-											new Element("c",
-												new String[] {"node", "ver", "ext", "xmlns"},
-												new String[] {"http://www.google.com/xmpp/client/caps",
-																			XMPPServer.getImplementationVersion(),
-																			"voice-v1",
-																			"http://jabber.org/protocol/caps"})},
-										null, null));
+							if (presence == null) {
+								presence =
+						      new Packet(new Element("presence",
+											new Element[] {
+												new Element("priority", "-1"),
+												new Element("c",
+													new String[] {"node", "ver", "ext", "xmlns"},
+													new String[] {"http://www.google.com/xmpp/client/caps",
+																				XMPPServer.getImplementationVersion(),
+																				"voice-v1",
+																				"http://jabber.org/protocol/caps"})},
+											null, null));
+							}
+						} else {
+// 							addOutPacket(Authorization.CONFLICT.getResponseMessage(pc,
+// 									"The user resource already exists.", true));
+							log.finest("USER_STATUS set to true for user who is already available: "
+								+ pc.toString());
+						}
+						if (presence != null) {
 							presence.setFrom(pc.getElemFrom());
 							presence.setTo(getComponentId());
 							addOutPacket(presence);
-						} else {
-							addOutPacket(Authorization.CONFLICT.getResponseMessage(pc,
-									"The user resource already exists.", true));
-							log.finest("USER_STATUS set to true for user who is already available: "
-								+ pc.toString());
 						}
 					} else {
 						connection = connectionsByFrom.remove(pc.getElemFrom());
