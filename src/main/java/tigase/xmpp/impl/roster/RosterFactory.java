@@ -18,7 +18,7 @@
  * Last modified by $Author$
  * $Date$
  */
-package tigase.xmpp.impl;
+package tigase.xmpp.impl.roster;
 
 /**
  * Describe class RosterFactory here.
@@ -36,11 +36,11 @@ public abstract class RosterFactory {
 	public static RosterAbstract getRosterImplementation(boolean shared_impl) {
 		if (shared_impl) {
 			if (shared == null) {
-				shared = new Roster();
+				shared = new RosterFlat();
 			}
 			return shared;
 		}
-		return new Roster();
+		return new RosterFlat();
 	}
 
 }

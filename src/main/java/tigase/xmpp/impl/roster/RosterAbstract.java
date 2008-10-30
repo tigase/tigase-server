@@ -18,7 +18,7 @@
  * Last modified by $Author$
  * $Date$
  */
-package tigase.xmpp.impl;
+package tigase.xmpp.impl.roster;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -54,7 +54,7 @@ public abstract class RosterAbstract {
    */
   private static Logger log =	Logger.getLogger("tigase.xmpp.impl.RosterAbstract");
 
-  protected static final String ROSTER_XMLNS = "jabber:iq:roster";
+  public static final String ROSTER_XMLNS = "jabber:iq:roster";
   public static final String ROSTER = "roster";
   public static final String GROUPS = "groups";
   public static final String GROUP = "group";
@@ -103,40 +103,40 @@ public abstract class RosterAbstract {
 
 	}
 
-	protected static final EnumSet<SubscriptionType> SUB_NONE =
+	public static final EnumSet<SubscriptionType> SUB_NONE =
 		EnumSet.of(
 			SubscriptionType.none,
 			SubscriptionType.none_pending_out,
 			SubscriptionType.none_pending_in,
 			SubscriptionType.none_pending_out_in);
 
-	protected static final EnumSet<SubscriptionType> SUB_TO =
+	public static final EnumSet<SubscriptionType> SUB_TO =
 		EnumSet.of(
 			SubscriptionType.to,
 			SubscriptionType.to_pending_in);
 
-	protected static final EnumSet<SubscriptionType> SUB_FROM =
+	public static final EnumSet<SubscriptionType> SUB_FROM =
 		EnumSet.of(
 			SubscriptionType.from,
 			SubscriptionType.from_pending_out);
 
-	protected static final EnumSet<SubscriptionType> SUB_BOTH =
+	public static final EnumSet<SubscriptionType> SUB_BOTH =
 		EnumSet.of(SubscriptionType.both);
 
-	protected static final EnumSet<SubscriptionType> TO_SUBSCRIBED =
+	public static final EnumSet<SubscriptionType> TO_SUBSCRIBED =
 		EnumSet.of(
 			SubscriptionType.to,
 			SubscriptionType.to_pending_in,
 			SubscriptionType.both);
-	protected static final EnumSet<SubscriptionType> FROM_SUBSCRIBED =
+	public static final EnumSet<SubscriptionType> FROM_SUBSCRIBED =
 		EnumSet.of(
 			SubscriptionType.from,
 			SubscriptionType.from_pending_out,
 			SubscriptionType.both);
-	protected static final EnumSet<StanzaType> INITIAL_PRESENCES =
+	public static final EnumSet<StanzaType> INITIAL_PRESENCES =
 		EnumSet.of(StanzaType.available, StanzaType.unavailable);
 
-	protected static final EnumSet<SubscriptionType> PENDING_IN =
+	public static final EnumSet<SubscriptionType> PENDING_IN =
     EnumSet.of(
 			SubscriptionType.none_pending_in,
 			SubscriptionType.none_pending_out_in,
@@ -526,7 +526,7 @@ public abstract class RosterAbstract {
 		log.finest("current_subscription="+current_subscription
 			+" for jid="+jid);
 		if (current_subscription == null) {
-			addBuddy(session, jid);
+			addBuddy(session, jid, null, null);
 			current_subscription = SubscriptionType.none;
 		}
 		final SubscriptionType new_subscription =
@@ -627,12 +627,17 @@ public abstract class RosterAbstract {
 	public abstract boolean removeBuddy(final XMPPResourceConnection session,
 		final String jid) throws NotAuthorizedException, TigaseDBException;
 
-	public abstract void addBuddy(final XMPPResourceConnection session,
-		final String jid) throws NotAuthorizedException, TigaseDBException;
+	public abstract void addBuddy(XMPPResourceConnection session,
+		String jid, String name, String[] groups)
+    throws NotAuthorizedException, TigaseDBException;
 
   public abstract String[] getBuddyGroups(final XMPPResourceConnection session,
 		final String buddy)
     throws NotAuthorizedException, TigaseDBException;
+
+//   public abstract void setBuddyGroups(XMPPResourceConnection session,
+// 		String buddy, String[] groups)
+//     throws NotAuthorizedException, TigaseDBException;
 
 	public void init(UserRepository repo)
     throws TigaseDBException, TigaseDBException {}

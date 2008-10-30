@@ -19,7 +19,7 @@
  * Last modified by $Author$
  * $Date$
  */
-package tigase.xmpp.impl;
+package tigase.xmpp.impl.roster;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -39,7 +39,7 @@ import tigase.util.JIDUtils;
 import tigase.db.TigaseDBException;
 
 /**
- * Describe class RosterFlat here.
+ * Describe class Roster here.
  *
  *
  * Created: Tue Feb 21 18:05:53 2006
@@ -47,14 +47,14 @@ import tigase.db.TigaseDBException;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class RosterFlat extends RosterAbstract {
+public class Roster extends RosterAbstract {
 
 	/**
    * Private logger for class instancess.
    */
-  private static Logger log =	Logger.getLogger("tigase.xmpp.impl.RosterFlat");
+  private static Logger log =	Logger.getLogger("tigase.xmpp.impl.Roster");
 
-	public String[] getBuddies(final XMPPResourceConnection session)
+  public String[] getBuddies(final XMPPResourceConnection session)
     throws NotAuthorizedException, TigaseDBException {
     return session.getDataGroups(ROSTER);
   }
@@ -94,15 +94,16 @@ public class RosterFlat extends RosterAbstract {
 		return true;
 	}
 
-	public void addBuddy(final XMPPResourceConnection session,
-		final String jid) throws NotAuthorizedException, TigaseDBException {
+	public void addBuddy(XMPPResourceConnection session,
+		String jid, String name, String[] groups)
+    throws NotAuthorizedException, TigaseDBException {
 		String nick = JIDUtils.getNodeNick(jid);
 		if (nick == null) {
 			nick = jid;
 		}
 		session.setData(groupNode(jid), NAME, nick);
-    session.setData(groupNode(jid), SUBSCRIPTION,
-			SubscriptionType.none.toString());
+    session.setData(groupNode(jid), SUBSCRIPTION, SubscriptionType.none.toString());
+    session.setDataList(groupNode(jid), GROUPS, groups);
 	}
 
   public String[] getBuddyGroups(final XMPPResourceConnection session,
@@ -111,4 +112,4 @@ public class RosterFlat extends RosterAbstract {
     return session.getDataList(groupNode(buddy), GROUPS);
   }
 
-} // RosterFlat
+} // Roster

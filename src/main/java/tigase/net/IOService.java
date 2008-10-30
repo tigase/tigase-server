@@ -224,7 +224,7 @@ public abstract class IOService implements Callable<IOService> {
 	}
 
 	/**
-   * Method <code>accept</code> is used to perform 
+   * Method <code>accept</code> is used to perform
    *
    * @param socketChannel a <code>SocketChannel</code> value
    */
@@ -327,7 +327,7 @@ public abstract class IOService implements Callable<IOService> {
 	}
 
 	private long empty_read_call_count = 0;
-	private static final long MAX_ALLOWED_EMPTY_CALLS = 10;
+	private static final long MAX_ALLOWED_EMPTY_CALLS = 100;
 
 	/**
    * Describe <code>readData</code> method here.
@@ -353,10 +353,10 @@ public abstract class IOService implements Callable<IOService> {
 					// sometimes it happens that the connection has been lost
 					// and the select thinks there are some bytes waiting for reading
 					// and 0 bytes are read
-// 					if ((++empty_read_call_count) > MAX_ALLOWED_EMPTY_CALLS) {
-// 						log.warning("Max allowed empty calls excceeded, closing connection.");
-// 						forceStop();
-// 					}
+					if ((++empty_read_call_count) > MAX_ALLOWED_EMPTY_CALLS) {
+						log.warning("Max allowed empty calls excceeded, closing connection.");
+						forceStop();
+					}
 				}
 			} catch (BufferUnderflowException underfl) {
 				// Obtain more inbound network data for src,
@@ -401,6 +401,7 @@ public abstract class IOService implements Callable<IOService> {
 						setLastTransferTime();
 					}
 				}
+				empty_read_call_count = 0;
 			} catch (Exception e) {
 				forceStop();
 			}

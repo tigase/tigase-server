@@ -30,7 +30,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.Writer;
-import tigase.xmpp.impl.Roster;
+import tigase.xmpp.impl.roster.RosterAbstract;
 
 /**
  * Describe class RepositoryUtils here.
@@ -157,7 +157,7 @@ public class RepositoryUtils {
 			return false;
 		}
 		//String[] keys = repo.getKeys(user, "roster/"+contact);
-		String[] vals = repo.getDataList(user, "roster/"+contact, Roster.GROUPS);
+		String[] vals = repo.getDataList(user, "roster/"+contact, RosterAbstract.GROUPS);
 		if (vals == null || vals.length == 0) {
 			System.out.println("      Empty groups list");
 			if (!allowed_empty_groups) {
@@ -250,11 +250,11 @@ public class RepositoryUtils {
 						System.out.println("      looks OK");
 						String password = repo.getData(user, "password");
 						String[] groups =
-              repo.getDataList(user, "roster/"+contact, Roster.GROUPS);
+              repo.getDataList(user, "roster/"+contact, RosterAbstract.GROUPS);
 						String contact_nick =
-              repo.getData(user, "roster/"+contact, Roster.NAME);
+              repo.getData(user, "roster/"+contact, RosterAbstract.NAME);
 						String subscription =
-              repo.getData(user, "roster/"+contact, Roster.SUBSCRIPTION);
+              repo.getData(user, "roster/"+contact, RosterAbstract.SUBSCRIPTION);
 						StringBuilder sb = new StringBuilder(user);
 						sb.append(",");
 						if (password != null) {

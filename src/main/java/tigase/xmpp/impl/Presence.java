@@ -43,11 +43,13 @@ import tigase.db.UserNotFoundException;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 import tigase.util.JIDUtils;
+import tigase.xmpp.impl.roster.RosterAbstract;
+import tigase.xmpp.impl.roster.RosterFactory;
 
-import static tigase.xmpp.impl.Roster.SubscriptionType;
-import static tigase.xmpp.impl.Roster.PresenceType;
-import static tigase.xmpp.impl.Roster.TO_SUBSCRIBED;
-import static tigase.xmpp.impl.Roster.FROM_SUBSCRIBED;
+import static tigase.xmpp.impl.roster.RosterAbstract.SubscriptionType;
+import static tigase.xmpp.impl.roster.RosterAbstract.PresenceType;
+import static tigase.xmpp.impl.roster.RosterAbstract.TO_SUBSCRIBED;
+import static tigase.xmpp.impl.roster.RosterAbstract.FROM_SUBSCRIBED;
 
 /**
  * Describe class Presence here.
@@ -476,7 +478,7 @@ public abstract class Presence {
 						SubscriptionType current_subscription =
 							roster_util.getBuddySubscription(session, packet.getElemTo());
 						if (current_subscription == null) {
-							roster_util.addBuddy(session, packet.getElemTo());
+							roster_util.addBuddy(session, packet.getElemTo(), null, null);
 						} // end of if (current_subscription == null)
 					}
 					subscr_changed = roster_util.updateBuddySubscription(session, pres_type,
@@ -552,7 +554,7 @@ public abstract class Presence {
 							roster_util.getBuddySubscription(session, packet.getElemFrom());
 						if (curr_sub == null) {
 							curr_sub = SubscriptionType.none;
-							roster_util.addBuddy(session, packet.getElemFrom());
+							roster_util.addBuddy(session, packet.getElemFrom(), null, null);
 						} // end of if (curr_sub == null)
 						roster_util.updateBuddySubscription(session, pres_type,
 							packet.getElemFrom());
@@ -576,7 +578,7 @@ public abstract class Presence {
 						roster_util.getBuddySubscription(session, packet.getElemFrom());
 					if (curr_sub == null) {
 						curr_sub = SubscriptionType.none;
-						roster_util.addBuddy(session, packet.getElemFrom());
+						roster_util.addBuddy(session, packet.getElemFrom(), null, null);
 					} // end of if (curr_sub == null)
 					subscr_changed = roster_util.updateBuddySubscription(session, pres_type,
 						packet.getElemFrom());

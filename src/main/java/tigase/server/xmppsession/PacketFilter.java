@@ -34,7 +34,7 @@ import tigase.xmpp.StanzaType;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.util.JIDUtils;
 
-import static tigase.xmpp.impl.Roster.PresenceType;
+//import static tigase.xmpp.impl.Roster.PresenceType;
 
 /**
  * Describe class PacketFilter here.

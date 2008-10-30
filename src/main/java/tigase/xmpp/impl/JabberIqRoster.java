@@ -39,9 +39,10 @@ import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.XMPPException;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
+import tigase.xmpp.impl.roster.RosterAbstract;
+import tigase.xmpp.impl.roster.RosterFactory;
 
-
-import static tigase.xmpp.impl.Roster.SubscriptionType;
+import static tigase.xmpp.impl.roster.Roster.SubscriptionType;
 
 /**
  * Class <code>JabberIqRoster</code> implements part of <em>RFC-3921</em> -
@@ -151,10 +152,20 @@ public abstract class JabberIqRoster {
       results.offer(packet.okResult((String)null, 0));
     } else {
       String name = request.getAttribute("/iq/query/item", "name");
-      if (name == null) {
-        name = buddy;
-      } // end of if (name == null)
-      roster_util.setBuddyName(session, buddy, name);
+//       if (name == null) {
+//         name = buddy;
+//       } // end of if (name == null)
+      List<Element> groups = item.getChildren();
+			String[] gr = null;
+      if (groups != null && groups.size() > 0) {
+        gr = new String[groups.size()];
+        int cnt = 0;
+        for (Element group : groups) {
+					gr[cnt++] = (group.getCData() == null ? "" : group.getCData());
+        } // end of for (ElementData group : groups)
+      }
+			//roster_util.setBuddyGroups(session, buddy, gr);
+      roster_util.addBuddy(session, buddy, name, gr);
 			String type = request.getAttribute("/iq/query/item", "type");
 			if (type != null && type.equals(ANON)) {
         roster_util.setBuddySubscription(session, SubscriptionType.both, buddy);
@@ -171,17 +182,6 @@ public abstract class JabberIqRoster {
       if (roster_util.getBuddySubscription(session, buddy) == null) {
         roster_util.setBuddySubscription(session, SubscriptionType.none, buddy);
       } // end of if (getBuddySubscription(session, buddy) == null)
-      List<Element> groups = item.getChildren();
-      if (groups != null && groups.size() > 0) {
-        String[] gr = new String[groups.size()];
-        int cnt = 0;
-        for (Element group : groups) {
-					gr[cnt++] = (group.getCData() == null ? "" : group.getCData());
-        } // end of for (ElementData group : groups)
-        session.setDataList(roster_util.groupNode(buddy), roster_util.GROUPS, gr);
-      } else {
-				session.removeData(roster_util.groupNode(buddy), roster_util.GROUPS);
-			} // end of else
       results.offer(packet.okResult((String)null, 0));
       roster_util.updateBuddyChange(session, results,
 				roster_util.getBuddyItem(session, buddy));

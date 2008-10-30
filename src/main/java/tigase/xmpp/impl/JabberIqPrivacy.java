@@ -40,6 +40,8 @@ import tigase.xmpp.XMPPException;
 import tigase.xml.Element;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
+import tigase.xmpp.impl.roster.RosterAbstract;
+import tigase.xmpp.impl.roster.RosterFactory;
 
 import static tigase.xmpp.impl.Privacy.*;
 

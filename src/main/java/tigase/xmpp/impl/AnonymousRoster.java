@@ -30,8 +30,8 @@ import tigase.util.JIDUtils;
 import tigase.xml.Element;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
-import tigase.xmpp.impl.Roster;
-import tigase.xmpp.impl.Presence;
+//import tigase.xmpp.impl.Roster;
+//import tigase.xmpp.impl.Presence;
 
 
 /**
