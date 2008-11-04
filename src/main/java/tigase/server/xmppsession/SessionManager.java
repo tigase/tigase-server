@@ -736,8 +736,14 @@ public class SessionManager extends AbstractMessageReceiver
 						} // end of else
 						auth_repository.logout(userId);
 					} else {
+						StringBuilder sb = new StringBuilder();
+						for (XMPPResourceConnection res_con: session.getActiveResources()) {
+							sb.append(", res=" + res_con.getResource() + " ("
+								+ res_con.getConnectionStatus() + ")");
+						}
 						log.finer("Number of connections is "
-							+ session.getActiveResourcesSize() + " for the user: " + userId);
+							+ session.getActiveResourcesSize() + " for the user: " + userId
+							+ sb.toString());
 					} // end of else
 				} // end of if (session.getActiveResourcesSize() == 0)
 			}
