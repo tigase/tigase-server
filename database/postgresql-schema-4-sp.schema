@@ -1,7 +1,10 @@
 -- Database stored procedures and fucntions for Tigase schema version 4.0.0
 
+-- QUERY START:
 create language plpgsql;
+-- QUERY END:
 
+-- QUERY START:
 -- Database properties get - function
 create or replace function TigGetDBProperty(varchar(255)) returns text as '
 declare
@@ -16,7 +19,9 @@ begin
 	return _result;
 end;
 ' LANGUAGE 'plpgsql';
+-- QUERY END:
 
+-- QUERY START:
 -- Database properties set - procedure
 create or replace function TigPutDBProperty(varchar(255), text) returns void as '
 declare
@@ -39,7 +44,9 @@ begin
   return;
 end;
 ' LANGUAGE 'plpgsql';
+-- QUERY END:
 
+-- QUERY START:
 -- The initialization of the database.
 -- The procedure should be called manually somehow before starting the
 -- server. In theory the server could call the procedure automatically
@@ -52,7 +59,9 @@ begin
   return;
 end;
 ' LANGUAGE 'plpgsql';
+-- QUERY END:
 
+-- QUERY START:
 -- Add a new user to the database assuming the user password is already
 -- encoded properly according to the database settings.
 -- If password is not encoded TigAddUserPlainPw should be used instead.
@@ -73,7 +82,9 @@ begin
 	return _res_uid as uid;
 end;
 ' LANGUAGE 'plpgsql';
+-- QUERY END:
 
+-- QUERY START:
 -- Takes plain text user password and converts it to internal representation
 -- and creates a new user account.
 create or replace function TigAddUserPlainPw(varchar(2049), varchar(255))
@@ -96,7 +107,9 @@ begin
 	return _res_uid as uid;
 end;
 ' LANGUAGE 'plpgsql';
+-- QUERY END:
 
+-- QUERY START:
 -- Low level database user id as big number. Used only for performance reasons
 -- and save database space. Besides JID is too large to server as UID
 create or replace function TigGetUserDBUid(varchar(2049)) returns bigint as '
@@ -108,7 +121,9 @@ begin
   return res_uid;
 end;
 ' LANGUAGE 'plpgsql';
+-- QUERY END:
 
+-- QUERY START:
 -- Removes a user from the database
 create or replace function TigRemoveUser(varchar(2049)) returns void as '
 declare
@@ -123,7 +138,9 @@ begin
   return;
 end;
 ' LANGUAGE 'plpgsql';
+-- QUERY END:
 
+-- QUERY START:
 -- Returns user's password from the database
 create or replace function TigGetPassword(varchar(2049)) returns varchar(255) as '
 declare
@@ -134,7 +151,9 @@ begin
   return res_pw;
 end;
 ' LANGUAGE 'plpgsql';
+-- QUERY END:
 
+-- QUERY START:
 -- Takes plain text user password and converts it to internal representation
 create or replace function TigUpdatePasswordPlainPw(varchar(2049), varchar(255))
   returns void as '
@@ -156,7 +175,9 @@ begin
   return;
 end;
 ' LANGUAGE 'plpgsql';
+-- QUERY END:
 
+-- QUERY START:
 -- Variant of TigUpdatePasswordPlainPw SP with parameters in reverse order.
 -- Some implementations require the parameters to be in the same order as
 -- the update query.
@@ -170,7 +191,9 @@ begin
   return;
 end;
 ' LANGUAGE 'plpgsql';
+-- QUERY END:
 
+-- QUERY START:
 -- Update user password
 create or replace function TigUpdatePassword(varchar(2049), varchar(255))
   returns void as '
@@ -182,7 +205,9 @@ begin
   return;
 end;
 ' LANGUAGE 'plpgsql';
+-- QUERY END:
 
+-- QUERY START:
 -- List all online users
 create or replace function TigOnlineUsers() returns void as '
 begin
@@ -191,7 +216,9 @@ begin
 		from tig_users where online_status > 0;
 end;
 ' LANGUAGE 'plpgsql';
+-- QUERY END:
 
+-- QUERY START:
 -- List all offline users
 create or replace function TigOfflineUsers() returns void as '
 begin
@@ -200,7 +227,9 @@ begin
 		from tig_users where online_status = 0;
 end;
 ' LANGUAGE 'plpgsql';
+-- QUERY END:
 
+-- QUERY START:
 -- List of all users in database
 create or replace function TigAllUsers() returns void as '
 begin
@@ -209,7 +238,9 @@ begin
 		from tig_users;
 end;
 ' LANGUAGE 'plpgsql';
+-- QUERY END:
 
+-- QUERY START:
 -- All users count
 create or replace function TigAllUsersCount() returns bigint as '
 declare
@@ -219,7 +250,9 @@ begin
   return res_cnt;
 end;
 ' LANGUAGE 'plpgsql';
+-- QUERY END:
 
+-- QUERY START:
 -- Performs user login for a plain text password, converting it to an internal
 -- representation if necessary
 create or replace function TigUserLoginPlainPw(varchar(2049), varchar(255))
@@ -243,7 +276,9 @@ begin
   return res_user_id;
 end;
 ' LANGUAGE 'plpgsql';
+-- QUERY END:
 
+-- QUERY START:
 -- Perforrm user login. It returns user_id uppon success and NULL
 -- on failure.
 -- If the login is successful it also increases online_status and sets
@@ -269,7 +304,9 @@ begin
   return res_user_id;
 end;
 ' LANGUAGE 'plpgsql';
+-- QUERY END:
 
+-- QUERY START:
 -- It decreases online_status and sets last_logout time to the current timestamp
 create or replace function TigUserLogout(varchar(2049)) returns void as '
 declare
@@ -282,7 +319,9 @@ begin
   return;
 end;
 ' LANGUAGE 'plpgsql';
+-- QUERY END:
 
+-- QUERY START:
 -- Disable user account
 create or replace function TigDisableAccount(varchar(2049)) returns void as '
 declare
@@ -292,7 +331,9 @@ begin
   return;
 end;
 ' LANGUAGE 'plpgsql';
+-- QUERY END:
 
+-- QUERY START:
 -- Enable user account
 create or replace function TigEnableAccount(varchar(2049)) returns void as '
 declare
@@ -302,7 +343,9 @@ begin
   return;
 end;
 ' LANGUAGE 'plpgsql';
+-- QUERY END:
 
+-- QUERY START:
 -- Get list of all active user accounts
 create or replace function TigActiveAccounts() returns void as '
 begin
@@ -311,7 +354,9 @@ begin
 		from tig_users where account_status > 0;
 end;
 ' LANGUAGE 'plpgsql';
+-- QUERY END:
 
+-- QUERY START:
 -- Get list of all disabled user accounts
 create or replace function TigDisabledAccounts() returns void as '
 begin
@@ -320,7 +365,9 @@ begin
 		from tig_users where account_status = 0;
 end;
 ' LANGUAGE 'plpgsql';
+-- QUERY END:
 
+-- QUERY START:
 -- Helper procedure for adding a new node
 create or replace function TigAddNode(bigint, bigint, varchar(255))
   returns bigint as '
@@ -336,7 +383,9 @@ begin
   return res_nid;
 end;
 ' LANGUAGE 'plpgsql';
+-- QUERY END:
 
+-- QUERY START:
 create or replace function TigUsers2Ver4Convert() returns void as '
 declare
   user_row RECORD;
@@ -351,4 +400,4 @@ begin
   return;
 end;
 ' LANGUAGE 'plpgsql';
-
+-- QUERY END:

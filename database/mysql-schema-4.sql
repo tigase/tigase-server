@@ -34,6 +34,7 @@
 --                  IDENTIFIED BY 'tigase_passwd'; \
 --                  FLUSH PRIVILEGES;" | mysql -u root -pdbpass mysql
 
+-- QUERY START:
 
 create table if not exists tig_users (
 			 uid bigint unsigned NOT NULL auto_increment,
@@ -70,6 +71,10 @@ create table if not exists tig_users (
 )
 ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
 
+-- QUERY END:
+
+-- QUERY START:
+
 create table if not exists tig_nodes (
        nid bigint unsigned NOT NULL auto_increment,
        parent_nid bigint unsigned,
@@ -86,6 +91,10 @@ create table if not exists tig_nodes (
 )
 ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
 
+-- QUERY END:
+
+-- QUERY START:
+
 create table if not exists tig_pairs (
        nid bigint unsigned,
        uid bigint unsigned NOT NULL,
@@ -100,6 +109,10 @@ create table if not exists tig_pairs (
 			 constraint tig_pairs_constr_2 foreign key (nid) references tig_nodes (nid)
 )
 ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
+
+-- QUERY END:
+
+-- QUERY START:
 
 create table if not exists short_news (
   -- Automatic record ID
@@ -121,6 +134,10 @@ create table if not exists short_news (
 )
 ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
 
+-- QUERY END:
+
+-- QUERY START:
+
 create table if not exists xmpp_stanza (
 			 id bigint unsigned NOT NULL auto_increment,
 			 stanza text NOT NULL,
@@ -128,6 +145,9 @@ create table if not exists xmpp_stanza (
 			 primary key (id)
 )
 ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
+
+-- QUERY END:
+
 
 source database/mysql-schema-4-sp.schema;
 

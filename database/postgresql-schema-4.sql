@@ -27,6 +27,7 @@
 --  psql -q -U tigase -d tigase -f postgresql-schema.sql
 
 
+-- QUERY START:
 create table tig_users (
        uid bigserial,
 
@@ -51,13 +52,27 @@ create table tig_users (
 
        primary key (uid)
 );
+-- QUERY END:
+-- QUERY START:
 create unique index user_id on tig_users ( user_id );
+-- QUERY END:
+-- QUERY START:
 create index user_pw on tig_users (user_pw);
+-- QUERY END:
+-- QUERY START:
 create index last_login on tig_users (last_login);
+-- QUERY END:
+-- QUERY START:
 create index last_logout on tig_users (last_logout);
+-- QUERY END:
+-- QUERY START:
 create index account_status on tig_users (account_status);
+-- QUERY END:
+-- QUERY START:
 create index online_status on tig_users (online_status);
+-- QUERY END:
 
+-- QUERY START:
 create table tig_nodes (
        nid bigserial,
        parent_nid bigint,
@@ -67,11 +82,21 @@ create table tig_nodes (
 
        primary key (nid)
 );
+-- QUERY END:
+-- QUERY START:
 create unique index tnode on tig_nodes ( parent_nid, uid, node );
+-- QUERY END:
+-- QUERY START:
 create index node on tig_nodes ( node );
+-- QUERY END:
+-- QUERY START:
 create index nuid on tig_nodes (uid);
+-- QUERY END:
+-- QUERY START:
 create index parent_nid on tig_nodes (parent_nid);
+-- QUERY END:
 
+-- QUERY START:
 create table tig_pairs (
        nid bigint references tig_nodes(nid),
        uid bigint NOT NULL references tig_users(uid),
@@ -79,10 +104,18 @@ create table tig_pairs (
        pkey varchar(255) NOT NULL,
        pval text
 );
+-- QUERY END:
+-- QUERY START:
 create index pkey on tig_pairs ( pkey );
+-- QUERY END:
+-- QUERY START:
 create index puid on tig_pairs (uid);
+-- QUERY END:
+-- QUERY START:
 create index pnid on tig_pairs (nid);
+-- QUERY END:
 
+-- QUERY START:
 create table short_news (
   -- Automatic record ID
   snid            bigserial,
@@ -98,14 +131,23 @@ create table short_news (
   body            varchar(1024) NOT NULL,
   primary key(snid)
 );
+-- QUERY END:
+-- QUERY START:
 create index publishing_time on short_news (publishing_time);
+-- QUERY END:
+-- QUERY START:
 create index author on short_news (author);
+-- QUERY END:
+-- QUERY START:
 create index news_type on short_news (news_type);
+-- QUERY END:
 
+-- QUERY START:
 create table xmpp_stanza (
 			 id bigserial,
 			 stanza text NOT NULL
 );
+-- QUERY END:
 
 \i database/postgresql-schema-4-sp.schema
 -- This is a dummy user who keeps all the database-properties

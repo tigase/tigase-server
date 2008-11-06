@@ -1,32 +1,81 @@
 -- Database stored procedures and fucntions for Tigase schema version 4.0.0
 
+-- QUERY START:
 drop procedure if exists TigInitdb;
+-- QUERY END:
+-- QUERY START:
 drop procedure if exists TigAddUser;
+-- QUERY END:
+-- QUERY START:
 drop procedure if exists TigAddUserPlainPw;
+-- QUERY END:
+-- QUERY START:
 drop procedure if exists TigGetUserDBUid;
+-- QUERY END:
+-- QUERY START:
 drop procedure if exists TigRemoveUser;
+-- QUERY END:
+-- QUERY START:
 drop procedure if exists TigUpdatePassword;
+-- QUERY END:
+-- QUERY START:
 drop procedure if exists TigUpdatePasswordPlainPw;
+-- QUERY END:
+-- QUERY START:
 drop procedure if exists TigGetPassword;
+-- QUERY END:
+-- QUERY START:
 drop procedure if exists TigUserLogin;
+-- QUERY END:
+-- QUERY START:
 drop procedure if exists TigUserLoginPlainPw;
+-- QUERY END:
+-- QUERY START:
 drop procedure if exists TigUserLogout;
+-- QUERY END:
+-- QUERY START:
 drop procedure if exists TigOnlineUsers;
+-- QUERY END:
+-- QUERY START:
 drop procedure if exists TigOfflineUsers;
+-- QUERY END:
+-- QUERY START:
 drop procedure if exists TigAllUsers;
+-- QUERY END:
+-- QUERY START:
 drop procedure if exists TigAllUsersCount;
+-- QUERY END:
+-- QUERY START:
 drop procedure if exists TigDisableAccount;
+-- QUERY END:
+-- QUERY START:
 drop procedure if exists TigEnableAccount;
+-- QUERY END:
+-- QUERY START:
 drop procedure if exists TigActiveAccounts;
+-- QUERY END:
+-- QUERY START:
 drop procedure if exists TigDisabledAccounts;
+-- QUERY END:
+-- QUERY START:
 drop procedure if exists TigAddNode;
+-- QUERY END:
+-- QUERY START:
 drop procedure if exists TigTestAddUser;
+-- QUERY END:
+-- QUERY START:
 drop procedure if exists TigUsers2Ver4Convert;
+-- QUERY END:
+-- QUERY START:
 drop procedure if exists TigPutDBProperty;
+-- QUERY END:
+-- QUERY START:
 drop function if exists TigGetDBProperty;
+-- QUERY END:
 
 delimiter //
 
+-- QUERY START:
 -- Database properties get - function
 create function TigGetDBProperty(_tkey varchar(255)) returns mediumtext
 READS SQL DATA
@@ -39,7 +88,9 @@ begin
 
 	return (_result);
 end //
+-- QUERY END:
 
+-- QUERY START:
 -- Database properties set - procedure
 create procedure TigPutDBProperty(_tkey varchar(255), _tval mediumtext)
 begin
@@ -56,7 +107,9 @@ begin
 			  where (user_id = 'db-properties');
   end if;
 end //
+-- QUERY END:
 
+-- QUERY START:
 -- The initialization of the database.
 -- The procedure should be called manually somehow before starting the
 -- server. In theory the server could call the procedure automatically
@@ -67,7 +120,9 @@ create procedure TigInitdb()
 begin
 	update tig_users set online_status = 0;
 end //
+-- QUERY END:
 
+-- QUERY START:
 -- Add a new user to the database assuming the user password is already
 -- encoded properly according to the database settings.
 -- If password is not encoded TigAddUserPlainPw should be used instead.
@@ -85,7 +140,9 @@ begin
 
 	select res_uid as uid;
 end //
+-- QUERY END:
 
+-- QUERY START:
 -- Takes plain text user password and converts it to internal representation
 -- and creates a new user account.
 create procedure TigAddUserPlainPw(_user_id varchar(2049), _user_pw varchar(255))
@@ -101,14 +158,18 @@ begin
 			call TigAddUser(_user_id, _user_pw);
 		end case;
 end //
+-- QUERY END:
 
+-- QUERY START:
 -- Low level database user id as big number. Used only for performance reasons
 -- and save database space. Besides JID is too large to server as UID
 create procedure TigGetUserDBUid(_user_id varchar(2049))
 begin
 	select uid from tig_users where user_id = _user_id;
 end //
+-- QUERY END:
 
+-- QUERY START:
 -- Removes a user from the database
 create procedure TigRemoveUser(_user_id varchar(2049))
 begin
@@ -120,13 +181,17 @@ begin
 	delete from tig_nodes where uid = res_uid;
 	delete from tig_users where uid = res_uid;
 end //
+-- QUERY END:
 
+-- QUERY START:
 -- Returns user's password from the database
 create procedure TigGetPassword(_user_id varchar(2049))
 begin
 	select user_pw from tig_users where user_id = _user_id;
 end //
+-- QUERY END:
 
+-- QUERY START:
 -- Takes plain text user password and converts it to internal representation
 create procedure TigUpdatePasswordPlainPw(_user_id varchar(2049), _user_pw varchar(255))
 begin
@@ -141,7 +206,9 @@ begin
 			call TigUpdatePassword(_user_id, _user_pw);
 		end case;
 end //
+-- QUERY END:
 
+-- QUERY START:
 -- Variant of TigUpdatePasswordPlainPw SP with parameters in reverse order.
 -- Some implementations require the parameters to be in the same order as
 -- the update query.
@@ -149,40 +216,52 @@ create procedure TigUpdatePasswordPlainPwRev(_user_pw varchar(255), _user_id var
 begin
 	call TigUpdatePasswordPlainPw(_user_id, _user_pw);
 end //
+-- QUERY END:
 
+-- QUERY START:
 -- Update user password
 create procedure TigUpdatePassword(_user_id varchar(2049), _user_pw varchar(255))
 begin
 	update tig_users set user_pw = _user_pw where user_id = _user_id;
 end //
+-- QUERY END:
 
+-- QUERY START:
 -- List all online users
 create procedure TigOnlineUsers()
 begin
 	select user_id, last_login, last_logout, online_status, failed_logins, account_status
 		from tig_users where online_status > 0;
 end //
+-- QUERY END:
 
+-- QUERY START:
 -- List all offline users
 create procedure TigOfflineUsers()
 begin
 	select user_id, last_login, last_logout, online_status, failed_logins, account_status
 		from tig_users where online_status = 0;
 end //
+-- QUERY END:
 
+-- QUERY START:
 -- List of all users in database
 create procedure TigAllUsers()
 begin
 	select user_id, last_login, last_logout, online_status, failed_logins, account_status
 		from tig_users;
 end //
+-- QUERY END:
 
+-- QUERY START:
 -- All users count
 create procedure TigAllUsersCount()
 begin
 	select count(*) from tig_users;
 end //
+-- QUERY END:
 
+-- QUERY START:
 -- Performs user login for a plain text password, converting it to an internal
 -- representation if necessary
 create procedure TigUserLoginPlainPw(_user_id varchar(2049), _user_pw varchar(255))
@@ -198,7 +277,9 @@ begin
 			call TigUserLogin(_user_id, _user_pw);
 		end case;
 end //
+-- QUERY END:
 
+-- QUERY START:
 -- Perforrm user login. It returns user_id uppon success and NULL
 -- on failure.
 -- If the login is successful it also increases online_status and sets
@@ -217,7 +298,9 @@ begin
 		select NULL as user_id;
 	end if;
 end //
+-- QUERY END:
 
+-- QUERY START:
 -- It decreases online_status and sets last_logout time to the current timestamp
 create procedure TigUserLogout(_user_id varchar(2049))
 begin
@@ -226,33 +309,43 @@ begin
 			last_logout = CURRENT_TIMESTAMP
 		where user_id = _user_id;
 end //
+-- QUERY END:
 
+-- QUERY START:
 -- Disable user account
 create procedure TigDisableAccount(_user_id varchar(2049))
 begin
 	update tig_users set account_status = 0 where user_id = _user_id;
 end //
+-- QUERY END:
 
+-- QUERY START:
 -- Enable user account
 create procedure TigEnableAccount(_user_id varchar(2049))
 begin
 	update tig_users set account_status = 1 where user_id = _user_id;
 end //
+-- QUERY END:
 
+-- QUERY START:
 -- Get list of all active user accounts
 create procedure TigActiveAccounts()
 begin
 	select user_id, last_login, last_logout, online_status, failed_logins, account_status
 		from tig_users where account_status > 0;
 end //
+-- QUERY END:
 
+-- QUERY START:
 -- Get list of all disabled user accounts
 create procedure TigDisabledAccounts()
 begin
 	select user_id, last_login, last_logout, online_status, failed_logins, account_status
 		from tig_users where account_status = 0;
 end //
+-- QUERY END:
 
+-- QUERY START:
 -- Helper procedure for adding a new node
 create procedure TigAddNode(_parent_nid bigint, _uid bigint, _node varchar(255))
 begin
@@ -260,7 +353,9 @@ begin
 		values (_parent_nid, _uid, _node);
 	select LAST_INSERT_ID() as nid;
 end //
+-- QUERY END:
 
+-- QUERY START:
 -- For testing only:
 create procedure TigTestAddUser(_user_id varchar(2049), _user_passwd varchar(255),
 			 success_text text, failure_text text)
@@ -274,7 +369,9 @@ begin
 		 select failure_text;
 	end if;
 end //
+-- QUERY END:
 
+-- QUERY START:
 create procedure TigUsers2Ver4Convert()
 begin
 
@@ -310,6 +407,7 @@ begin
 	COMMIT;
 
 end //
+-- QUERY END:
 
 delimiter ;
 
