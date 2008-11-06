@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+
+<!--
+Tigase Jabber/XMPP Server
+Copyright (C) 2004-2007 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. Look for COPYING file in the top folder.
+If not, see http://www.gnu.org/licenses/.
+
+
+IzPack insallation file for the Tigase server.
+Based on the IzPack sample installation file.
+
+To compile it :
+- go in the bin directory where you installed IzPack
+- call "compile ../sample/install.xml -b ../sample"
+
+$Rev: 1190 $
+Last modified by $Author: kobit $
+$Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
+-->
+
+<installation version="1.0">
+
+	<!--
+			 The info section.
+			 The meaning of the tags should be natural ...
+	-->
+	<info>
+		<appname>Tigase XMPP (Jabber) Server</appname>
+		<appversion>4.0.0b1193</appversion>
+		<authors>
+			<author name="Artur Hefczyc" email="artur.hefczyc@tigase.org"/>
+			<author name="Bartosz Małkowski" email="bartosz.malkowski@tigase.org"/>
+		</authors>
+		<url>http://www.tigase.org/</url>
+		<appsubpath>Tigase-$APP_VER</appsubpath>
+		<javaversion>1.6</javaversion>
+		<requiresjdk>yes</requiresjdk>
+<!-- 		<pack200/> -->
+	</info>
+
+	<jar src="libs/jdbc-postgresql.jar"/>
+	<jar src="libs/jdbc-mysql.jar"/>
+	<jar src="libs/derby.jar"/>
+	<jar src="jars/tigase-server.jar"/>
+
+	<variables>
+		<variable name="InstallerFrame.logfilePath" value="$INSTALL_PATH/install.log"/>
+		<variable name="JDKPathPanel.minVersion" value="1.6" />
+		<variable name="JDKPathPanel.skipIfValid" value="yes"/>
+		<variable name="DerbyDBPath.windows" value="c:\Tigase\tigasedb"/>
+		<variable name="DerbyDBPath.mac" value="/var/tigasedb"/>
+		<variable name="DerbyDBPath.unix" value="/var/lib/tigasedb"/>
+	</variables>
+
+	<dynamicvariables>
+		<variable name="JDKPath" value="$JAVA_HOME"/>
+	</dynamicvariables>
+
+	<conditions>
+		<condition type="variable" id="installSelected">
+			<name>serverInstall</name>
+			<value>on</value>
+		</condition>
+		<condition type="variable" id="configSelected">
+			<name>serverConfig</name>
+			<value>on</value>
+		</condition>
+		<condition type="variable" id="advancedSelected">
+			<name>advancedConfig</name>
+			<value>on</value>
+		</condition>
+		<condition type="variable" id="mysqlSelected">
+			<name>dbType</name>
+			<value>MySQL</value>
+		</condition>
+		<condition type="variable" id="pgsqlSelected">
+			<name>dbType</name>
+			<value>PostgreSQL</value>
+		</condition>
+		<condition type="variable" id="derbySelected">
+			<name>dbType</name>
+			<value>Derby</value>
+		</condition>
+		<condition type="variable" id="authDBSelected">
+			<name>authDB</name>
+			<value>on</value>
+		</condition>
+	</conditions>
+
+	<!--
+			The gui preferences indication.
+			Sets the installer window to 800x600. It will not be able to change the size.
+	-->
+	<guiprefs width="800" height="600" resizable="yes">
+		<modifier key="useButtonIcons" value="yes"/>
+		<modifier key="useLabelIcons" value="yes"/>
+		<modifier key="labelGap" value="2"/>
+		<modifier key="layoutAnchor" value="NORTH"/>
+		<modifier key="useHeadingPanel" value="no"/>
+		<modifier key="headingImageOnLeft" value="no"/>
+		<modifier key="headingLineCount" value="1"/>
+		<modifier key="headingFontSize" value="1.5"/>
+		<modifier key="headingBackgroundColor" value="0x00ffffff"/>
+		<modifier key="headingPanelCounter" value="progressbar"/>
+		<modifier key="headingPanelCounterPos" value="inNavigationPanel"/>
+	</guiprefs>
+	<!--
+			The locale section.
+			Asks here to include the English and Polish langpacks.
+	-->
+	<locale>
+		<langpack iso3="eng"/>
+<!-- 		<langpack iso3="pol"/> -->
+	</locale>
+
+	<!--
+			The resources section.
+			The ids must be these ones if you want to use the LicencePanel and/or the InfoPanel.
+	-->
+	<resources>
+		<res id="HTMLInfoPanel.info" src="package.html"/>
+		<res id="HTMLLicencePanel.licence" src="License.html"/>
+		<res id="TigaseLogo" src="src/main/izpack/resources/pics/tiger.png"/>
+		<res id="Installer.image"
+				 src="src/main/izpack/resources/pics/tigase-install-logo.png"/>
+		<res id="Heading.image" src="src/main/izpack/resources/pics/tiger.png"/>
+		<res id="userInputSpec.xml" src="src/main/izpack/userInputSpec.xml" />
+		<res id="packsLang.xml" src="src/main/izpack/resources/packsLang.xml"/>
+		<res id="mysql.create" src="database/mysql-create-db.sql"/>
+		<res id="mysql.schema" src="database/mysql-schema-4.sql"/>
+		<res id="mysql.sp" src="database/mysql-schema-4-sp.schema"/>
+		<res id="mysql.props" src="database/mysql-schema-4-props.sql"/>
+		<res id="mysql.upgrade" src="database/mysql-schema-upgrade-to-4.sql"/>
+		<res id="pgsql.create" src="database/postgresql-create-db.sql"/>
+		<res id="pgsql.schema" src="database/postgresql-schema-4.sql"/>
+		<res id="pgsql.sp" src="database/postgresql-schema-4-sp.schema"/>
+		<res id="pgsql.props" src="database/postgresql-schema-4-props.sql"/>
+		<res id="pgsql.upgrade" src="database/postgresql-schema-upgrade-to-4.sql"/>
+		<res id="derby.create" src="database/derby-create-db.sql"/>
+		<res id="derby.schema" src="database/derby-schema-4.sql"/>
+		<res id="derby.sp" src="database/derby-schema-4-sp.schema"/>
+		<res id="derby.props" src="database/derby-schema-4-props.sql"/>
+	</resources>
+
+	<!--
+			The panels section.
+			We indicate here which panels we want to use. The order will be respected.
+	-->
+		<panels>
+			<panel classname="HelloPanel" id="HelloPanel.id"/>
+			<panel classname="UserInputPanel" id="InstallConfigPanel.id"/>
+			<panel classname="HTMLInfoPanel" condition="installSelected"
+						 id="HTMLReadmePanel.id"/>
+			<panel classname="HTMLLicencePanel" condition="installSelected"
+						 id="HTMLLicensePanel.id"/>
+			<panel classname="TargetPanel" condition="installSelected"
+						 id="TargetPanel.id"/>
+			<panel classname="InstallationGroupPanel" condition="installSelected"
+						 id="InstallationGroupPanel.id"/>>
+			<panel classname="PacksPanel" condition="installSelected"
+						 id="PacksPanel.id"/>
+			<panel classname="SummaryPanel" condition="installSelected"
+						 id="SummaryPanel.id"/>
+			<panel classname="InstallPanel" condition="installSelected"
+						 id="InstallPanel.id"/>
+
+			<panel classname="JDKPathPanel" condition="configSelected"
+						 id="JDKPathPanel.id"/>
+			<panel classname="UserInputPanel" condition="!installSelected"
+						 id="InstallationPathForConfigPanel.id"/>
+			<panel classname="TigaseConfigLoadPanel" condition="configSelected"
+						 id="TigaseConfigLoadPanel.id"/>
+			<panel classname="UserInputPanel" condition="configSelected"
+						 id="BasicConfigurationPanel.id"/>
+			<panel classname="UserInputPanel" condition="advancedSelected"
+						 id="AdvancedConfigurationPanel.id"/>
+			<panel classname="UserInputPanel" condition="advancedSelected"
+						 id="PluginsListPanel.id"/>
+			<panel classname="UserInputPanel" condition="mysqlSelected|pgsqlSelected"
+						 id="DatabaseConfigurationPanel.id"/>
+			<panel classname="DerbyPathPanel" condition="derbySelected"
+						 id="DerbyPathPanel.id"/>
+			<panel classname="UserInputPanel" condition="authDBSelected"
+						 id="AuthenticationDatabasePanel.id"/>
+			<panel classname="TigaseConfigSavePanel" condition="configSelected"
+						 id="TigaseConfigSavePanel.id"/>
+			<panel classname="TigaseDBCheckPanel" condition="configSelected"
+						 id="TigaseDBCheckPanel.id"/>
+			<panel classname="FinishPanel"
+						 id="FinishPanel.id"/>
+		</panels>
+
+		<!--
+				The packs section.
+				We specify here our packs.
+		-->
+    <packs>
+			<pack name="Base" required="yes">
+				<description>The base files</description>
+				<file src="etc/init.properties" targetdir="$INSTALL_PATH/etc"
+							override="askfalse"/>
+				<fileset dir="." targetdir="$INSTALL_PATH">
+					<include name="package.html"/>
+					<include name="License.html"/>
+					<include name="jars/tigase-server.jar"/>
+					<include name="libs/tigase-utils.jar"/>
+					<include name="libs/tigase-xmltools.jar"/>
+					<include name="etc/tigase.conf"/>
+				</fileset>
+				<parsable targetfile="$INSTALL_PATH/etc/init.properties"/>
+				<parsable targetfile="$INSTALL_PATH/etc/tigase.conf"/>
+			</pack>
+			<pack name="Docs" required="no">
+				<description>The documentation</description>
+				<file src="docs-tigase-server" targetdir="$INSTALL_PATH"/>
+			</pack>
+			<pack name="Extras" required="no" preselected="yes">
+				<description>The base files</description>
+				<fileset dir="." targetdir="$INSTALL_PATH">
+					<include name="libs/tigase-muc.jar"/>
+					<include name="libs/tigase-pubsub.jar"/>
+					<include name="libs/tigase-extras.jar"/>
+				</fileset>
+			</pack>
+			<pack name="Derby Database" required="yes" preselected="yes"
+						installGroups="Derby Database">
+				<description>Derby database files</description>
+				<fileset dir="." targetdir="$INSTALL_PATH">
+					<include name="libs/derby.jar"/>
+					<include name="libs/derbytools.jar"/>
+				</fileset>
+			</pack>
+			<pack name="MySQL Database" required="yes" preselected="yes"
+						installGroups="MySQL Database">
+				<description>MySQL database files</description>
+				<fileset dir="." targetdir="$INSTALL_PATH">
+					<include name="libs/jdbc-mysql.jar"/>
+				</fileset>
+			</pack>
+			<pack name="PostgreSQL Database" required="yes" preselected="yes"
+						installGroups="PostgreSQL Database">
+				<description>PostgreSQL database files</description>
+				<fileset dir="." targetdir="$INSTALL_PATH">
+					<include name="libs/jdbc-postgresql.jar"/>
+				</fileset>
+			</pack>
+			<pack name="SQL Server Database" required="yes" preselected="yes"
+						installGroups="SQL Server Database">
+				<description>SQL Server database files</description>
+				<fileset dir="." targetdir="$INSTALL_PATH">
+					<include name="libs/jtds-1.2.2.jar"/>
+				</fileset>
+			</pack>
+			<pack name="Windows files" required="yes">
+				<os family="windows"/>
+				<description>Files needed to run the server in MS Windows platform</description>
+			</pack>
+			<pack name="Sources" required="no" preselected="no">
+				<description>The server source files, tools and libraries sources are not included.</description>
+				<file src="src" targetdir="$INSTALL_PATH"/>
+			</pack>
+		</packs>
+
+</installation>
