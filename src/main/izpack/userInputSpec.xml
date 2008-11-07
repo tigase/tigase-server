@@ -35,7 +35,9 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 					 bold="true" size="2"/>
 		<field type="staticText" align="left" id="staticText.text"
 					 txt="On this panel you can specify whether you want to install only or configure already installed server or to do both. If you are just installing a server on your machine it is a good idea to do both steps."/>
+		<field type="space"/>
 		<field type="divider"/>
+		<field type="space"/>
 
 		<field type="check" variable="serverInstall">
 			<description align="left" txt="The wizards you want to execute"
@@ -47,6 +49,16 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 			<spec txt="Configuration of the Tigase Server" id="serverConfig.label"
 						true="on" false="off"	set="true"/>
 		</field>
+		<field type="space"/>
+		<field type="divider"/>
+		<field type="space"/>
+		<field type="staticText" align="left" id="staticText.text"
+					 txt="Please note!"/>
+		<field type="staticText" align="left" id="staticText.text"
+					 txt="While the Tigase server is quite stable and well tested application the installer itself is a new addition. Take precautions especially if you upgrade the server from earlier version. Backup old server files and the database."/>
+		<field type="space"/>
+		<field type="staticText" align="left" id="staticText.text"
+					 txt="If you notice any problems please report them to address: artur.hefczyc@tigase.org"/>
 	</panel>
 
 	<!-- Select installation directory in config-only mode -->
@@ -60,7 +72,7 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 						type="directory" result="directory">
 				<choice value="$INSTALL_PATH" set="true"/>
 				<choice value="$APPLICATIONS_DEFAULT_ROOT/Tigase-$APP_VER"/>
-				<choice value="C:\Program Files\Tigase-$APP_VER" os="windows" />
+				<choice value="C:\Tigase\Tigase-$APP_VER" os="windows" />
 				<choice value="/opt/Tigase-$APP_VER" os="unix" />
 				<choice value="/Applications/Tigase-$APP_VER" os="Mac OS X" />
 				<choice value="/home/tigase/server" os="unix" />

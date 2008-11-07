@@ -193,12 +193,18 @@ public class TigaseConfigLoadPanel extends IzPanel {
 						}
 
 						if (varName.equals(TigaseConfigConst.AUTH_DB_URI)) {
-							parseAuthDbUri(props.getProperty(name));
-							Debug.trace("Load: " + varName + " = " + props.getProperty(name));
+							if (props.getProperty(name) != null) {
+								parseAuthDbUri(props.getProperty(name));
+								Debug.trace("Loaded: " + varName + " = " + props.getProperty(name));
+							} else {
+								Debug.trace("Missing configuration for " + varName);
+							}
 							continue;
 						}
 
-						idata.setVariable(varName, props.getProperty(name));
+						if (props.getProperty(name) != null) {
+							idata.setVariable(varName, props.getProperty(name));
+						}
 					}
 				}
 				Debug.trace("Done.");

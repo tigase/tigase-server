@@ -38,7 +38,7 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 	-->
 	<info>
 		<appname>Tigase XMPP (Jabber) Server</appname>
-		<appversion>4.0.0b1193</appversion>
+		<appversion>4.0.0-b1193</appversion>
 		<authors>
 			<author name="Artur Hefczyc" email="artur.hefczyc@tigase.org"/>
 			<author name="Bartosz Małkowski" email="bartosz.malkowski@tigase.org"/>
@@ -103,9 +103,9 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 			The gui preferences indication.
 			Sets the installer window to 800x600. It will not be able to change the size.
 	-->
-	<guiprefs width="800" height="600" resizable="yes">
+	<guiprefs width="800" height="600" resizable="no">
 		<modifier key="useButtonIcons" value="yes"/>
-		<modifier key="useLabelIcons" value="yes"/>
+		<modifier key="useLabelIcons" value="no"/>
 		<modifier key="labelGap" value="2"/>
 		<modifier key="layoutAnchor" value="NORTH"/>
 		<modifier key="useHeadingPanel" value="no"/>
@@ -167,8 +167,8 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 						 id="HTMLLicensePanel.id"/>
 			<panel classname="TargetPanel" condition="installSelected"
 						 id="TargetPanel.id"/>
-			<panel classname="InstallationGroupPanel" condition="installSelected"
-						 id="InstallationGroupPanel.id"/>>
+<!-- 			<panel classname="InstallationGroupPanel" condition="installSelected" -->
+<!-- 						 id="InstallationGroupPanel.id"/>> -->
 			<panel classname="PacksPanel" condition="installSelected"
 						 id="PacksPanel.id"/>
 			<panel classname="SummaryPanel" condition="installSelected"
@@ -218,58 +218,100 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 					<include name="libs/tigase-utils.jar"/>
 					<include name="libs/tigase-xmltools.jar"/>
 					<include name="etc/tigase.conf"/>
+					<include name="certs/dummy.cer"/>
+					<include name="certs/rsa-keystore"/>
+					<include name="certs/truststore"/>
+					<include name="certs/localhost.pem"/>
+					<include name="logs"/>
+<!-- 					<exclude name="logs/*.log*"/> -->
 				</fileset>
 				<parsable targetfile="$INSTALL_PATH/etc/init.properties"/>
 				<parsable targetfile="$INSTALL_PATH/etc/tigase.conf"/>
 			</pack>
+			<pack name="Unix files" required="yes">
+				<os family="unix"/>
+				<description>Files needed to run the server on Unix like systems</description>
+				<fileset dir="." targetdir="$INSTALL_PATH">
+					<include name="scripts/config.sh"/>
+					<include name="scripts/repo.sh"/>
+					<include name="scripts/tigase.sh"/>
+					<include name="scripts/mandriva"/>
+					<include name="scripts/gentoo"/>
+				</fileset>
+				<executable targetfile="${INSTALL_PATH}/scripts/tigase.sh"/>
+				<executable targetfile="${INSTALL_PATH}/scripts/repo.sh"/>
+				<executable targetfile="${INSTALL_PATH}/scripts/config.sh"/>
+			</pack>
+			<pack name="Windows files" required="yes">
+				<os family="windows"/>
+				<description>Files needed to run the server in MS Windows platform</description>
+				<singlefile src="win-stuff/wrapper/wrapper.exe"
+										target="${INSTALL_PATH}/wrapper.exe"/>
+				<singlefile src="win-stuff/wrapper/wrapper.conf"
+										target="${INSTALL_PATH}/wrapper.conf"/>
+
+				<singlefile src="win-stuff/wrapper/wrapper.dll"
+										target="$INSTALL_PATH/libs/wrapper.dll"/>
+				<singlefile src="win-stuff/wrapper/wrapper.jar"
+										target="$INSTALL_PATH/libs/wrapper.jar"/>
+
+				<singlefile src="win-stuff/scripts/InstallTigaseService.bat"
+										target="$INSTALL_PATH/InstallTigaseService.bat"/>
+				<singlefile src="win-stuff/scripts/Run.bat"
+										target="$INSTALL_PATH/Run.bat"/>
+				<singlefile src="win-stuff/scripts/Tigase.bat"
+										target="$INSTALL_PATH/Tigase.bat"/>
+				<singlefile src="win-stuff/scripts/UninstallTigaseService.bat"
+										target="$INSTALL_PATH/UninstallTigaseService.bat"/>
+			</pack>
 			<pack name="Docs" required="no">
 				<description>The documentation</description>
-				<file src="docs-tigase-server" targetdir="$INSTALL_PATH"/>
+				<fileset dir="." targetdir="${INSTALL_PATH}">
+					<include name="docs/**/*"/>
+				</fileset>
 			</pack>
 			<pack name="Extras" required="no" preselected="yes">
-				<description>The base files</description>
+				<description>Extras libraries, MUC, PubSub...</description>
 				<fileset dir="." targetdir="$INSTALL_PATH">
 					<include name="libs/tigase-muc.jar"/>
 					<include name="libs/tigase-pubsub.jar"/>
 					<include name="libs/tigase-extras.jar"/>
 				</fileset>
 			</pack>
-			<pack name="Derby Database" required="yes" preselected="yes"
-						installGroups="Derby Database">
+			<pack name="Derby Database" required="no" preselected="yes">
+<!-- 						installGroups="Derby Database"> -->
 				<description>Derby database files</description>
 				<fileset dir="." targetdir="$INSTALL_PATH">
 					<include name="libs/derby.jar"/>
 					<include name="libs/derbytools.jar"/>
 				</fileset>
 			</pack>
-			<pack name="MySQL Database" required="yes" preselected="yes"
-						installGroups="MySQL Database">
+			<pack name="MySQL Database" required="no" preselected="yes">
+<!-- 						installGroups="MySQL Database"> -->
 				<description>MySQL database files</description>
 				<fileset dir="." targetdir="$INSTALL_PATH">
 					<include name="libs/jdbc-mysql.jar"/>
 				</fileset>
 			</pack>
-			<pack name="PostgreSQL Database" required="yes" preselected="yes"
-						installGroups="PostgreSQL Database">
+			<pack name="PostgreSQL Database" required="no" preselected="yes">
+<!-- 						installGroups="PostgreSQL Database"> -->
 				<description>PostgreSQL database files</description>
 				<fileset dir="." targetdir="$INSTALL_PATH">
 					<include name="libs/jdbc-postgresql.jar"/>
 				</fileset>
 			</pack>
-			<pack name="SQL Server Database" required="yes" preselected="yes"
-						installGroups="SQL Server Database">
+			<pack name="SQL Server Database" required="no" preselected="yes">
+<!-- 						installGroups="SQL Server Database"> -->
 				<description>SQL Server database files</description>
 				<fileset dir="." targetdir="$INSTALL_PATH">
 					<include name="libs/jtds-1.2.2.jar"/>
 				</fileset>
 			</pack>
-			<pack name="Windows files" required="yes">
-				<os family="windows"/>
-				<description>Files needed to run the server in MS Windows platform</description>
-			</pack>
 			<pack name="Sources" required="no" preselected="no">
-				<description>The server source files, tools and libraries sources are not included.</description>
-				<file src="src" targetdir="$INSTALL_PATH"/>
+				<description>The server source files, tools and libraries sources are not included</description>
+				<fileset dir="." targetdir="${INSTALL_PATH}" defaultexcludes="yes">
+					<include name="src/**/*"/>
+				</fileset>
 			</pack>
 		</packs>
 

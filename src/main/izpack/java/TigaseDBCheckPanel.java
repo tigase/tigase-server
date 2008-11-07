@@ -142,7 +142,7 @@ public class TigaseDBCheckPanel extends IzPanel {
 					table.setValueAt(validateDBSchema(), DB_SCHEMA_POS, 1);
 					table.setValueAt(validateDBConversion(), DB_CONVER_POS, 1);
 				}
-			}, 1000);
+			}, 500);
 
 	}
 

@@ -79,7 +79,7 @@
  <target name="docs" depends="prepare"
   description="Make Server javadoc">
   <docs packages="${javadoc-package}"
-   destdir="docs-${projectname}-${jarfile}"/>
+   destdir="docs"/>
  </target>
 
  <target name="dist"

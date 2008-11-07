@@ -2,15 +2,16 @@
 
 <html>
 	<head>
-		<title>Tigase XMPP (Jabber) server</title>
+		<title>Tigase XMPP (Jabber) server ver ${$APP_VER}</title>
 	</head>
 	<body bgcolor="white">
 		<h2>About</h2>
 
 		<p>Copyright &copy; 2004 Tigase.org. &lt;http://www.tigase.org/&gt;</p>
 
-		<p><strong>Tigase Jabber/XMPP Server</strong> is <strong>Open Source and Free
-		(GPLv3)</strong> <a href="http://java.sun.com">Java</a> based server. The
+		<p><strong>Tigase Jabber/XMPP Server</strong> is
+		<strong>Open Source and Free  (GPLv3)</strong>
+		<a href="http://java.sun.com">Java</a> based server. The
 		goals behind the design and implementation of the server are: </p>
 
 		<ol>
@@ -22,116 +23,6 @@
 			<li>Make the server easy to setup and maintain.</li>
 		</ol>
 
-		<dl>
-			<dt><strong>Robust and reliable.</strong></dt>
-			<dd><p>By robust and reliable server I mean the server which can handle many
-			concurrent requests/connections and can run for a log time. By many
-			concurrent requests/connections I mean as many as it is needed. The server
-			is designed and implemented to handle milions of simultanous
-			connections.</p>
-			<p>It is not enough however to design and implement high
-			load server and hope it will run well. The main focus in the project is put
-			in tests. Tests are taken so seriously that dedicated <a
-			href="http://testsuite.tigase.org/">testing framework</a> has been
-			implemented. All server functions are considered as implemented only when
-			they pass testing cycle. The testing cycle consists of 3 fundamental
-			tests:</p>
-			<ol>
-				<li><strong>Functional tests - </strong> checking whether the function
-				works at all.</li>
-				<li><strong>Performance tests - </strong> checking whether the function
-				performs well enough.</li>
-				<li><strong>Stability tests - </strong> checking whether the function
-				behaves well in long term run. It must handle hundreds of requests a
-				second in several hours server run.</li>
-			</ol>
-			</dd>
-			<dt><strong>Secure</strong></dt>
-			<dd><p>There are a few elements of the security related to Jabber/XMPP
-			server: secure data transmissions which is met by the implementation of
-			<strong>SSL</strong> or <strong>TLS</strong> protocol, secure user
-			authorization which is met by the implementation of <strong>DIGEST</strong>
-			or <strong>SASL</strong> user authorization and secure deplyoment which is
-			met by component architecture.</p> <p><strong>Secure deployment</strong> is
-			a software installation which doesn't impact network security. Companies
-			usually have their networks divided into 2 parts: <strong>DMZ</strong>
-			which is partially open to outside world and <strong>Private
-			network</strong> which is closed to outside world.</p> <p>If the
-			Jabber/XMPP server have to provide effective way of communication between
-			company eployees regardles they are in company office or outside (perhaps
-			at customer site) it needs to accept connections from outside world. So the
-			natural place for server deployment is a <strong>DMZ</strong> part. There
-			is an issue however with such installation. Each company has normally
-			established network users base and integrated authorization mechanizms. So
-			it would be very good if Jabber server could use this mechanizms for users
-			authorizations as well. Usually, however, authorization information is not
-			available in <strong>DMZ</strong> and it shouldn't be.</p>
-			<p><strong>Tigase server</strong> offers solution for such case. With it's
-			component structure it can be easily deployed on any number machines and
-			from the user point of view it is seen as a one logical Jabber server. So
-			in our case we can install <em>Session Manager</em> module in
-			<strong>private</strong> network part and <em>Client Connection
-			Manager</em> with <em>Server Connection Manager</em> in
-			<strong>DMZ</strong>.<br/> <em>Session Manager</em> connects to
-			<strong>DMZ</strong> and receives all packets from users. Thus is can
-			sacurely realize users authorization based on company authorization
-			mechanizms. </p></dd>
-			<dt><strong>Flexibile</strong></dt>
-			<dd>There are many different Jabber/XMPP server use cases. The most obvious
-			are:
-			<ul>
-				<li>Used as bussiness communication platform in small and medium companies
-				server is not under heavy load. Instead for such deployments security is a
-				key feature.</li>
-				<li>Fo huge community websites or internet portals server is on the other
-				side usually under very heavy load and have to support tousands or
-				millions of simultanous connections and for such deployment we talk about
-				different kind of security as the service is open to public anyway.</li>
-				<li>For very small community deployments or for small home networks the key
-				factor is ease to deploy and maintain.</li>
-				</ul> <p>Architecture based on components allows you to run selected modules
-				on separate machines so the server can be easily applied to all
-				scenarious.<br/> For simple installation server generates config file which
-				can be used almost stright away with very few modifications or sometimes
-				even no config editing is required. For complex deployments though you can
-				tweak configuration to your needs and setup Jabber server on as many
-				physical machines as you need.</p>
-			</dd>
-			<dt><strong>Extensibile</strong></dt>
-			<dd><p>The world changes all the time so people needs change as well.
-			Jabber/XMPP protocol has been designed to be extensible to make it easy
-			adding new features and apply it to different needs. As a result Jabber is
-			a very effective platform not only for sending messages to mates. It can
-			also be extended for sending instant notifications about events, it can be
-			useful platform for on-line customer service, voice communication and all
-			other cases where sending information instantly to other people is
-			needed.</p> <p><strong>Tigase server</strong> has been designed to be
-			extensible as well. Of course modular architecture makes it extensible as
-			you can easily replace component which doesn't fullfill your requirements
-			with another one better fiiting your needs. But this is not all. Another
-			factor of extensibility is how easy is to replace component or add new
-			extensions. The great focus has been put in server design API to make it
-			easy for other software developers to create extensions and implement new
-			features.</p></dd>
-			<dt><strong>Easy</strong></dt>
-			<dd><p>Complex computer networks consisting of many servers with different
-			services are hard to maintain. There is no other way than employing
-			professional staff and looking after the network.</p> <p>Not all networks
-			are so complex however. Most small companies have just a few servers for
-			their needs with services like e-mail, <code>HTTP</code> server with
-			company website and that's it. They might want to add Jabber server to the
-			collection of their services and don't want to dedicate much resources on
-			setting it up and later maintanance. For such users default configuration
-			is pretty much what they need. If operating system on the server is well
-			configured then Tigase should pickup correct hostname.</p> <p>Tigase server
-			is designed and implemnted to allow dynamic reconfiguration at runtime so
-			there is no need for restarting server each time you want to change a
-			configuration settings.</p> <p>There are also interfaces and handlers
-			available to make it easy to implement web user interface for server
-			monitoring and configuring. Such user interface will included in one of
-			future releases.</p></dd>
-		</dl>
-
 		<h2>Installtion, configuration and compilation</h2>
 
 		<p>The most recent documentation on all these topics is always available in the
@@ -139,7 +30,11 @@
 		refer to the website for all the details and always up to date guides.</p>
 
 		<p>The website also contains lots of other useful information like load tests
-		results, user discussions and online support and help always available to you.</p>
+		results, user discussions and online support and help always available to
+		you.</p>
+
+		<p>This is ${APP_VER} release of the server. Please include the exact version
+		number in all correspondence regarding the server.</p>
 
  </body>
 </html>

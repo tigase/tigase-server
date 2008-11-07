@@ -283,12 +283,13 @@ public class TigaseConfigSavePanel extends IzPanel {
 			return "server";
 		}
 		for (String deb: TigaseConfigConst.ALL_DEBUGS) {
-			if (!idata.getVariable(deb).equals("off")) {
-				if (!debugs.isEmpty()) {
-					debugs += ",";
-				}
-				debugs += idata.getVariable(deb);
+			if (idata.getVariable(deb) == null || idata.getVariable(deb).equals("off")) {
+				continue;
 			}
+			if (!debugs.isEmpty()) {
+				debugs += ",";
+			}
+			debugs += idata.getVariable(deb);
 		}
 		return debugs;
 	}
