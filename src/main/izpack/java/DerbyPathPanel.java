@@ -7,6 +7,7 @@ import com.izforge.izpack.util.FileExecutor;
 import com.izforge.izpack.util.OsVersion;
 import com.izforge.izpack.util.os.RegistryDefaultHandler;
 import com.izforge.izpack.util.os.RegistryHandler;
+import com.izforge.izpack.util.VariableSubstitutor;
 
 import java.io.File;
 import java.util.Arrays;
@@ -77,6 +78,8 @@ public class DerbyPathPanel extends PathInputPanel {
 				}
 			}
 		}
+		VariableSubstitutor vs = new VariableSubstitutor(idata.getVariables());
+		chosenPath = vs.substitute(chosenPath, null);
 		// Set the path for method pathIsValid ...
 		pathSelectionPanel.setPath(chosenPath);
 

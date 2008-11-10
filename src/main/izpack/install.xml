@@ -38,7 +38,7 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 	-->
 	<info>
 		<appname>Tigase XMPP (Jabber) Server</appname>
-		<appversion>4.0.0-b1193</appversion>
+		<appversion>4.0.0-b1207</appversion>
 		<authors>
 			<author name="Artur Hefczyc" email="artur.hefczyc@tigase.org"/>
 			<author name="Bartosz Małkowski" email="bartosz.malkowski@tigase.org"/>
@@ -55,13 +55,15 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 	<jar src="libs/derby.jar"/>
 	<jar src="jars/tigase-server.jar"/>
 
+	<native type="izpack" name="ShellLink.dll"/>
+
 	<variables>
 		<variable name="InstallerFrame.logfilePath" value="$INSTALL_PATH/install.log"/>
 		<variable name="JDKPathPanel.minVersion" value="1.6" />
 		<variable name="JDKPathPanel.skipIfValid" value="yes"/>
-		<variable name="DerbyDBPath.windows" value="c:\Tigase\tigasedb"/>
-		<variable name="DerbyDBPath.mac" value="/var/tigasedb"/>
-		<variable name="DerbyDBPath.unix" value="/var/lib/tigasedb"/>
+		<variable name="DerbyDBPath.windows" value="${INSTALL_PATH}\tigasedb"/>
+		<variable name="DerbyDBPath.mac" value="${INSTALL_PATH}/tigasedb"/>
+		<variable name="DerbyDBPath.unix" value="${INSTALL_PATH}/tigasedb"/>
 	</variables>
 
 	<dynamicvariables>
@@ -103,7 +105,7 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 			The gui preferences indication.
 			Sets the installer window to 800x600. It will not be able to change the size.
 	-->
-	<guiprefs width="800" height="600" resizable="no">
+	<guiprefs width="800" height="600" resizable="yes">
 		<modifier key="useButtonIcons" value="yes"/>
 		<modifier key="useLabelIcons" value="no"/>
 		<modifier key="labelGap" value="2"/>
@@ -138,6 +140,11 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 		<res id="Heading.image" src="src/main/izpack/resources/pics/tiger.png"/>
 		<res id="userInputSpec.xml" src="src/main/izpack/userInputSpec.xml" />
 		<res id="packsLang.xml" src="src/main/izpack/resources/packsLang.xml"/>
+		<res id="shortcutSpec.xml" src="src/main/izpack/shortcutSpec.xml"/>
+		<res id="Unix_shortcutSpec.xml" src="src/main/izpack/Unix_shortcutSpec.xml"/>
+		<res id="RegistrySpec.xml" src="src/main/izpack/RegistrySpec.xml"/>
+		<res id="TargetPanel.dir.windows"
+				 src="src/main/izpack/resources/target_windows.dir"/>
 		<res id="mysql.create" src="database/mysql-create-db.sql"/>
 		<res id="mysql.schema" src="database/mysql-schema-4.sql"/>
 		<res id="mysql.sp" src="database/mysql-schema-4-sp.schema"/>
@@ -159,7 +166,8 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 			We indicate here which panels we want to use. The order will be respected.
 	-->
 		<panels>
-			<panel classname="HelloPanel" id="HelloPanel.id"/>
+			<panel classname="CheckedHelloPanel" id="CheckedHelloPanel.id"/>
+			<panel classname="JDKPathPanel" id="JDKPathPanel.id"/>
 			<panel classname="UserInputPanel" id="InstallConfigPanel.id"/>
 			<panel classname="HTMLInfoPanel" condition="installSelected"
 						 id="HTMLReadmePanel.id"/>
@@ -175,9 +183,9 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 						 id="SummaryPanel.id"/>
 			<panel classname="InstallPanel" condition="installSelected"
 						 id="InstallPanel.id"/>
+			<panel classname="ShortcutPanel" condition="installSelected"
+						 id="ShortcutPanel.id"/>
 
-			<panel classname="JDKPathPanel" condition="configSelected"
-						 id="JDKPathPanel.id"/>
 			<panel classname="UserInputPanel" condition="!installSelected"
 						 id="InstallationPathForConfigPanel.id"/>
 			<panel classname="TigaseConfigLoadPanel" condition="configSelected"
@@ -198,8 +206,7 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 						 id="TigaseConfigSavePanel.id"/>
 			<panel classname="TigaseDBCheckPanel" condition="configSelected"
 						 id="TigaseDBCheckPanel.id"/>
-			<panel classname="FinishPanel"
-						 id="FinishPanel.id"/>
+			<panel classname="FinishPanel" id="FinishPanel.id"/>
 		</panels>
 
 		<!--
@@ -223,12 +230,14 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 					<include name="certs/truststore"/>
 					<include name="certs/localhost.pem"/>
 					<include name="logs"/>
+					<include name="database/*.sql"/>
+					<include name="database/*.schema"/>
 <!-- 					<exclude name="logs/*.log*"/> -->
 				</fileset>
 				<parsable targetfile="$INSTALL_PATH/etc/init.properties"/>
 				<parsable targetfile="$INSTALL_PATH/etc/tigase.conf"/>
 			</pack>
-			<pack name="Unix files" required="yes">
+			<pack name="Unix Files" required="yes">
 				<os family="unix"/>
 				<description>Files needed to run the server on Unix like systems</description>
 				<fileset dir="." targetdir="$INSTALL_PATH">
@@ -241,8 +250,14 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 				<executable targetfile="${INSTALL_PATH}/scripts/tigase.sh"/>
 				<executable targetfile="${INSTALL_PATH}/scripts/repo.sh"/>
 				<executable targetfile="${INSTALL_PATH}/scripts/config.sh"/>
+				<singlefile src="src/main/resources/pictures/Tigase16x16.png"
+										target="$INSTALL_PATH/icons/Tigase16x16.png"/>
+				<singlefile src="src/main/resources/pictures/Tigase32x32.png"
+										target="$INSTALL_PATH/icons/Tigase32x32.png"/>
+				<singlefile src="src/main/resources/pictures/Tigase48x48.png"
+										target="$INSTALL_PATH/icons/Tigase48x48.png"/>
 			</pack>
-			<pack name="Windows files" required="yes">
+			<pack name="Windows Files" required="yes">
 				<os family="windows"/>
 				<description>Files needed to run the server in MS Windows platform</description>
 				<singlefile src="win-stuff/wrapper/wrapper.exe"
@@ -263,6 +278,8 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 										target="$INSTALL_PATH/Tigase.bat"/>
 				<singlefile src="win-stuff/scripts/UninstallTigaseService.bat"
 										target="$INSTALL_PATH/UninstallTigaseService.bat"/>
+				<singlefile src="win-stuff/Tigase.ico"
+										target="$INSTALL_PATH/Tigase.ico"/>
 			</pack>
 			<pack name="Docs" required="no">
 				<description>The documentation</description>
@@ -280,7 +297,7 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 			</pack>
 			<pack name="Derby Database" required="no" preselected="yes">
 <!-- 						installGroups="Derby Database"> -->
-				<description>Derby database files</description>
+				<description>Derby database and JDBC driver</description>
 				<fileset dir="." targetdir="$INSTALL_PATH">
 					<include name="libs/derby.jar"/>
 					<include name="libs/derbytools.jar"/>
@@ -288,21 +305,21 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 			</pack>
 			<pack name="MySQL Database" required="no" preselected="yes">
 <!-- 						installGroups="MySQL Database"> -->
-				<description>MySQL database files</description>
+				<description>MySQL JDBC driver (MySQL has to be installed separately)</description>
 				<fileset dir="." targetdir="$INSTALL_PATH">
 					<include name="libs/jdbc-mysql.jar"/>
 				</fileset>
 			</pack>
 			<pack name="PostgreSQL Database" required="no" preselected="yes">
 <!-- 						installGroups="PostgreSQL Database"> -->
-				<description>PostgreSQL database files</description>
+				<description>PostgreSQL JDBC driver (PostgreSQL has to be installed separately)</description>
 				<fileset dir="." targetdir="$INSTALL_PATH">
 					<include name="libs/jdbc-postgresql.jar"/>
 				</fileset>
 			</pack>
 			<pack name="SQL Server Database" required="no" preselected="yes">
 <!-- 						installGroups="SQL Server Database"> -->
-				<description>SQL Server database files</description>
+				<description>SQL Server JDBC driver (SQL Server has to be installed separately)</description>
 				<fileset dir="." targetdir="$INSTALL_PATH">
 					<include name="libs/jtds-1.2.2.jar"/>
 				</fileset>

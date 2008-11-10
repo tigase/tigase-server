@@ -9,5 +9,4 @@
 	 <str id="TigaseConfigLoadPanel.info" txt="Existing Tigase server configuration"/>
 	 <str id="TigaseConfigSavePanel.info" txt="New Tigase server configuration generated. Press 'Next' to save the configuration, 'Prev' to make changes. You can also edit settings here and press 'Next' to save them."/>
 	 <str id="TigaseDBCheckPanel.info" txt="Checking database connection and the database schema."/>
-
  </langpack>

@@ -135,12 +135,14 @@ public class TigaseDBCheckPanel extends IzPanel {
 
 	public void panelActivate() {
 		super.panelActivate();
+		parent.lockNextButton();
 		delayedTasks.schedule(new TimerTask() {
 				public void run() {
 					table.setValueAt(validateDBConnection(), DB_CONNEC_POS, 1);
 					table.setValueAt(validateDBExists(), DB_EXISTS_POS, 1);
 					table.setValueAt(validateDBSchema(), DB_SCHEMA_POS, 1);
 					table.setValueAt(validateDBConversion(), DB_CONVER_POS, 1);
+					parent.unlockNextButton();
 				}
 			}, 500);
 

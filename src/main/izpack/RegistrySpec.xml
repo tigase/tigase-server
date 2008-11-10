@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+
+<registry>
+	<pack name="UninstallStuff">
+		<!-- Special "pack", if not defined an uninstall key will be generated automatically -->
+		<!-- The variable $UNINSTALL_NAME can be only used if CheckedHelloPanel will be used
+				 because there the variable will be declared. With that variable it is possible
+				 to install more as one instances of the product on one machine each with an
+				 unique uninstall key. -->
+		<value
+				name="DisplayName"
+				keypath="SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$UNINSTALL_NAME"
+				root="HKLM"
+				string="$UNINSTALL_NAME"/>
+		<value
+				name="UninstallString"
+				keypath="SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$UNINSTALL_NAME"
+				root="HKLM"
+				string="&quot;$JAVA_HOME\bin\javaw.exe&quot; -jar &quot;$INSTALL_PATH\uninstaller\uninstaller.jar&quot;"/>
+		<value
+				name="DisplayIcon"
+				keypath="SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$UNINSTALL_NAME"
+				root="HKLM"
+				string="$INSTALL_PATH\Tigase.ico"/>
+		<value
+				name="HelpLink"
+				keypath="SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$UNINSTALL_NAME"
+				root="HKLM"
+				string="$APP_URL"/>
+	</pack>
+	<pack name="Base">
+		<key keypath="SOFTWARE\Tigase\Server\$UNINSTALL_NAME\Base" root="HKLM"/>
+	</pack>
+	<pack name="Unix Files">
+		<key keypath="SOFTWARE\Tigase\Server\$UNINSTALL_NAME\UnixFiles" root="HKLM"/>
+	</pack>
+	<pack name="Windows Files">
+		<key keypath="SOFTWARE\Tigase\Server\$UNINSTALL_NAME\WindowsFiles" root="HKLM"/>
+	</pack>
+	<pack name="Docs">
+		<key keypath="SOFTWARE\Tigase\Server\$UNINSTALL_NAME\Docs" root="HKLM"/>
+	</pack>
+	<pack name="Extras">
+		<key keypath="SOFTWARE\Tigase\Server\$UNINSTALL_NAME\Extras" root="HKLM"/>
+	</pack>
+	<pack name="Derby Database">
+		<key keypath="SOFTWARE\Tigase\Server\$UNINSTALL_NAME\DerbyDatabase" root="HKLM"/>
+	</pack>
+	<pack name="MySQL Database">
+		<key keypath="SOFTWARE\Tigase\Server\$UNINSTALL_NAME\MySQLDatabase" root="HKLM"/>
+	</pack>
+	<pack name="PostgreSQL Database">
+		<key keypath="SOFTWARE\Tigase\Server\$UNINSTALL_NAME\PostgreSQLDatabase" root="HKLM"/>
+	</pack>
+	<pack name="SQL Server Database">
+		<key keypath="SOFTWARE\Tigase\Server\$UNINSTALL_NAME\SQLServerDatabase" root="HKLM"/>
+	</pack>
+	<pack name="Sources">
+		<key keypath="SOFTWARE\Tigase\Server\$UNINSTALL_NAME\Sources" root="HKLM"/>
+	</pack>
+</registry>

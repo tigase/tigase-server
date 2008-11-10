@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+
+<shortcuts>
+
+ <skipIfNotSupported/>
+
+ <programGroup defaultName="Tigase-$APP_VER" location="applications"/>
+
+ <shortcut
+		 name="Manually Start Tigase-$APP_VER Server"
+		 programGroup="yes"
+		 desktop="yes"
+		 applications="no"
+		 startMenu="no"
+		 startup="no"
+		 target="$INSTALL_PATH\Run.bat"
+		 commandLine=""
+		 description="Manually run the Tigase server if it is not running as a system service."
+		 iconFile="$INSTALL_PATH\Tigase.ico"
+		 iconIndex="0"
+		 initialState="noShow">
+ </shortcut>
+
+ <shortcut
+		 name="Install Tigase-$APP_VER Windows Service"
+		 programGroup="yes"
+		 desktop="yes"
+		 applications="no"
+		 startMenu="no"
+		 startup="no"
+		 target="$INSTALL_PATH\InstallTigaseService.bat"
+		 commandLine=""
+		 description="Install Windows system service to start the Tigase server automatically."
+		 iconFile="$INSTALL_PATH\Tigase.ico"
+		 iconIndex="0"
+		 initialState="noShow">
+ </shortcut>
+
+ <shortcut
+		 name="Uninstall Tigase-$APP_VER Windows Service"
+		 programGroup="yes"
+		 desktop="no"
+		 applications="no"
+		 startMenu="no"
+		 startup="no"
+		 target="$INSTALL_PATH\UninstallTigaseService.bat"
+		 commandLine=""
+		 description="Uninstall Windows system service to stop the Tigase server from starting automatically."
+		 iconFile=""
+		 iconIndex="0"
+		 initialState="noShow">
+ </shortcut>
+
+ <shortcut
+		 name="Tigase-$APP_VER Online Documentation"
+		 programGroup="yes"
+		 desktop="no"
+		 applications="no"
+		 startMenu="no"
+		 startup="no"
+		 target="http://www.tigase.org/en/content/configuration-4-0"
+		 commandLine=""
+		 description="This opens a WebBrowser to look into the Tigase-$APP_VER (HTML) administrator documentation">
+ </shortcut>
+
+ <shortcut
+		 name="Tigase-$APP_VER README"
+		 programGroup="yes"
+		 desktop="no"
+		 applications="no"
+		 startMenu="no"
+		 startup="no"
+		 target="$INSTALL_PATH\package.html"
+		 commandLine=""
+		 description="Tigase README file opens in a web browser.">
+ </shortcut>
+
+ <shortcut
+		 name="Tigase-$APP_VER Uninstaller"
+		 programGroup="yes"
+		 desktop="no"
+		 applications="no"
+		 startMenu="no"
+		 startup="no"
+		 target="$INSTALL_PATH\Uninstaller\uninstaller.jar"
+		 commandLine=""
+		 iconFile="%SystemRoot%\system32\SHELL32.dll"
+		 iconIndex="31"
+		 description="This uninstalls Tigase-$APP_VER">
+ </shortcut>
+
+</shortcuts>

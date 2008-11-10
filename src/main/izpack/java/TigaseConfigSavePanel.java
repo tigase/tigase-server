@@ -28,6 +28,7 @@ import com.izforge.izpack.gui.LayoutConstants;
 import com.izforge.izpack.installer.InstallData;
 import com.izforge.izpack.installer.InstallerFrame;
 import com.izforge.izpack.util.Debug;
+import com.izforge.izpack.util.OsVersion;
 import com.izforge.izpack.installer.IzPanel;
 
 import javax.swing.*;
@@ -162,7 +163,9 @@ public class TigaseConfigSavePanel extends IzPanel {
 			Debug.trace("Set: " + entry.getKey() + " = " + varValue);
 		}
 		for (String name: TigaseConfigConst.props.stringPropertyNames()) {
-			config += name + " = " + TigaseConfigConst.props.getProperty(name) + "\n";
+			if (!name.startsWith("root")) {
+				config += name + " = " + TigaseConfigConst.props.getProperty(name) + "\n";
+			}
 		}
 		textArea.setText(config);
 	}
@@ -176,7 +179,11 @@ public class TigaseConfigSavePanel extends IzPanel {
 			db_uri += database + ":";
 		}
 		if (database.equals("derby")) {
-			db_uri += idata.getVariable("DerbyDBPath");
+			String derby_path = idata.getVariable("DerbyDBPath");
+			if (OsVersion.IS_WINDOWS) {
+				derby_path = derby_path.replace("\\", "\\\\");
+			}
+			db_uri += derby_path;
 		} else {
 			db_uri += "//" + idata.getVariable("dbHost");
 			db_uri += "/" + idata.getVariable("dbName");

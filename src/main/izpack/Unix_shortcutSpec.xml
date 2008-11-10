@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<shortcuts>
+
+ <programGroup defaultName="Tigase-$APP_VER" location="applications"/>
+
+
+ <shortcut
+		 name="Start Tigase-$APP_VER"
+		 programGroup="yes"
+		 desktop="yes"
+		 applications="no"
+		 startMenu="yes"
+     startup="no"
+		 target="$INSTALL_PATH/scripts/tigase.sh"
+		 commandLine="start etc/tigase.conf"
+		 workingDirectory="$INSTALL_PATH"
+		 description="Start the Tigase server manually"
+		 iconFile="$INSTALL_PATH/icons/Tigase48x48.png"
+		 iconIndex="0"
+		 type="Application"
+		 encoding="UTF-8"
+		 terminal="true"
+		 KdeSubstUID="false"
+		 Categories="Application;System;"
+		 initialState="normal">
+ </shortcut>
+
+ <shortcut
+		 name="Tigase-$APP_VER Online Documentation"
+		 programGroup="yes"
+		 desktop="no"
+		 applications="no"
+		 startMenu="yes"
+		 startup="no"
+		 target="firefox"
+		 workingDirectory="http://www.tigase.org/en/content/configuration-4-0"
+		 commandLine=""
+		 initialState="noShow"
+		 iconFile="help"
+		 iconIndex="0"
+		 url="http://www.tigase.org/en/content/configuration-4-0"
+		 type="Application"
+		 encoding="UTF-8"
+		 createForAll="false"
+		 Categories="Application;System;"
+		 description="This opens a WebBrowser to look into the Tigase-$APP_VER (HTML) online documentation">
+ </shortcut>
+
+ <shortcut
+		 name="Tigase-$APP_VER README"
+		 programGroup="yes"
+		 desktop="no"
+		 applications="no"
+		 startMenu="yes"
+		 startup="no"
+		 target="firefox"
+		 workingDirectory=""
+		 commandLine="$INSTALL_PATH/package.html"
+		 initialState="noShow"
+		 iconFile="help"
+		 iconIndex="0"
+		 url="$INSTALL_PATH/package.html"
+		 type="Application"
+		 encoding="UTF-8"
+		 createForAll="false"
+		 Categories="Application;System;"
+		 description="This opens a WebBrowser to look into the Tigase-$APP_VER (HTML) README">
+ </shortcut>
+
+ <shortcut
+		 name="Tigase-$APP_VER Uninstaller"
+		 programGroup="yes"
+		 desktop="yes"
+		 applications="no"
+		 startMenu="no"
+		 startup="no"
+		 target="java"
+		 commandLine="-jar $INSTALL_PATH/Uninstaller/uninstaller.jar"
+		 initialState="noShow"
+		 iconFile="trashcan_full"
+		 iconIndex="0"
+		 workingDirectory=""
+		 type="Application"
+		 encoding="UTF-8"
+		 KdeSubstUID="false"
+		 createForAll="false"
+		 Categories="Application;System;"
+		 TryExec="java -jar $INSTALL_PATH/Uninstaller/uninstaller.jar"
+		 description="This uninstalls Tigase-$APP_VER">
+ </shortcut>
+
+</shortcuts>
