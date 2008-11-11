@@ -86,7 +86,7 @@
   depends="clean-all,prepare-dist,jar-dist,docs"
   description="Create ${projectname} ${jarfile} binary distribution file">
   <distbin packagename="${projectname}-${jarfile}"
-   docsdir="docs-${projectname}-${jarfile}"/>
+   docsdir="docs"/>
  </target>
 
  <target name="dist-src" depends="prepare,prepare-dist"

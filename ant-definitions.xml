@@ -99,9 +99,9 @@
       <delete file="@{packagename}-${version}.tar.gz"/>
       <delete dir="dist"/>
       <mkdir dir="${dist}/@{packagename}-${version}/${jars}"/>
-      <mkdir dir="${dist}/@{packagename}-${version}/bin"/>
-      <mkdir dir="${dist}/@{packagename}-${version}/bin/gentoo"/>
-      <mkdir dir="${dist}/@{packagename}-${version}/bin/mandriva"/>
+      <mkdir dir="${dist}/@{packagename}-${version}/scripts"/>
+      <mkdir dir="${dist}/@{packagename}-${version}/scripts/gentoo"/>
+      <mkdir dir="${dist}/@{packagename}-${version}/scripts/mandriva"/>
       <copy
         file="${jars}/@{packagename}.jar"
         tofile="${dist}/@{packagename}-${version}/${jars}/@{packagename}.jar"/>
@@ -114,10 +114,28 @@
       </exec>
       <copy
         file="package.html"
-        tofile="${dist}/@{packagename}-${version}/README.html"/>
+        tofile="${dist}/@{packagename}-${version}/package.html"/>
+      <copy
+        file="License.html"
+        tofile="${dist}/@{packagename}-${version}/License.html"/>
       <copy
         file="ChangeLog"
         tofile="${dist}/@{packagename}-${version}/ChangeLog"/>
+      <mkdir dir="${dist}/@{packagename}-${version}/libs"/>
+      <copy todir="${dist}/@{packagename}-${version}/libs">
+        <filelist dir="libs">
+          <file name="tigase-utils.jar"/>
+          <file name="tigase-xmltools.jar"/>
+          <file name="jdbc-mysql.jar"/>
+          <file name="jdbc-postgresql.jar"/>
+          <file name="derby.jar"/>
+          <file name="derbytools.jar"/>
+          <file name="jtds-1.2.2.jar"/>
+          <file name="tigase-extras.jar"/>
+          <file name="tigase-muc.jar"/>
+          <file name="tigase-pubsub.jar"/>
+        </filelist>
+      </copy>
       <mkdir dir="${dist}/@{packagename}-${version}/certs"/>
       <copy todir="${dist}/@{packagename}-${version}/certs">
         <filelist dir="certs">
@@ -134,43 +152,27 @@
           <file name="init.properties"/>
         </filelist>
       </copy>
-      <mkdir dir="${dist}/@{packagename}-${version}/libs"/>
-      <copy todir="${dist}/@{packagename}-${version}/libs">
-        <filelist dir="libs">
-          <file name="bcprov-jdk16-136.jar"/>
-          <file name="cindy.jar"/>
-          <file name="commons-logging.jar"/>
-          <file name="jdbc-mysql.jar"/>
-          <file name="jdbc-postgresql.jar"/>
-          <file name="jml-1.0b2.jar"/>
-          <file name="jtds-1.2.2.jar"/>
-          <file name="tigase-extras-0.2.0-SNAPSHOT.jar"/>
-          <file name="tigase-muc-0.1.6-SNAPSHOT.jar"/>
-          <file name="tigase-utils.jar"/>
-          <file name="tigase-xmltools.jar"/>
-        </filelist>
-      </copy>
       <mkdir dir="${dist}/@{packagename}-${version}/database"/>
       <copy todir="${dist}/@{packagename}-${version}/database">
-        <filelist dir="database">
-          <file name="mysql-schema.sql"/>
-          <file name="postgresql-schema.sql"/>
-          <file name="sqlserver-schema.sql"/>
-        </filelist>
+        <fileset dir="database">
+					<include name="*.sql"/>
+					<include name="*.schema"/>
+        </fileset>
       </copy>
+      <mkdir dir="${dist}/@{packagename}-${version}/logs"/>
       <copy
         file="scripts/tigase.sh"
-        tofile="${dist}/@{packagename}-${version}/bin/tigase.sh"/>
+        tofile="${dist}/@{packagename}-${version}/scripts/tigase.sh"/>
       <copy
         file="scripts/config.sh"
-        tofile="${dist}/@{packagename}-${version}/bin/config.sh"/>
+        tofile="${dist}/@{packagename}-${version}/scripts/config.sh"/>
       <copy
         file="scripts/repo.sh"
-        tofile="${dist}/@{packagename}-${version}/bin/repo.sh"/>
-      <copy todir="${dist}/@{packagename}-${version}/bin/gentoo">
+        tofile="${dist}/@{packagename}-${version}/scripts/repo.sh"/>
+      <copy todir="${dist}/@{packagename}-${version}/scripts/gentoo">
         <fileset dir="scripts/gentoo"/>
       </copy>
-      <copy todir="${dist}/@{packagename}-${version}/bin/mandriva">
+      <copy todir="${dist}/@{packagename}-${version}/scripts/mandriva">
         <fileset dir="scripts/mandriva"/>
       </copy>
       <move todir="${dist}/@{packagename}-${version}/docs">

@@ -38,7 +38,7 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 	-->
 	<info>
 		<appname>Tigase XMPP (Jabber) Server</appname>
-		<appversion>4.0.0-b1207</appversion>
+		<appversion>4.0.0-b1209</appversion>
 		<authors>
 			<author name="Artur Hefczyc" email="artur.hefczyc@tigase.org"/>
 			<author name="Bartosz Małkowski" email="bartosz.malkowski@tigase.org"/>
@@ -221,6 +221,7 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 				<fileset dir="." targetdir="$INSTALL_PATH">
 					<include name="package.html"/>
 					<include name="License.html"/>
+					<include name="Changelog"/>
 					<include name="jars/tigase-server.jar"/>
 					<include name="libs/tigase-utils.jar"/>
 					<include name="libs/tigase-xmltools.jar"/>
@@ -244,8 +245,8 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 					<include name="scripts/config.sh"/>
 					<include name="scripts/repo.sh"/>
 					<include name="scripts/tigase.sh"/>
-					<include name="scripts/mandriva"/>
-					<include name="scripts/gentoo"/>
+					<include name="scripts/mandriva/**/*"/>
+					<include name="scripts/gentoo/**/*"/>
 				</fileset>
 				<executable targetfile="${INSTALL_PATH}/scripts/tigase.sh"/>
 				<executable targetfile="${INSTALL_PATH}/scripts/repo.sh"/>
