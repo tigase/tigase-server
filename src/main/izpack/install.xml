@@ -38,7 +38,7 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 	-->
 	<info>
 		<appname>Tigase XMPP (Jabber) Server</appname>
-		<appversion>4.0.0-b1209</appversion>
+		<appversion>4.0.0-b1212</appversion>
 		<authors>
 			<author name="Artur Hefczyc" email="artur.hefczyc@tigase.org"/>
 			<author name="Bartosz Małkowski" email="bartosz.malkowski@tigase.org"/>
@@ -47,7 +47,7 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 		<appsubpath>Tigase-$APP_VER</appsubpath>
 		<javaversion>1.6</javaversion>
 		<requiresjdk>yes</requiresjdk>
-<!-- 		<pack200/> -->
+		<pack200/>
 	</info>
 
 	<jar src="libs/jdbc-postgresql.jar"/>
