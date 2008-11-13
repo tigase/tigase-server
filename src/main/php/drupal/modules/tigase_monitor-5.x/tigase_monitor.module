@@ -72,26 +72,37 @@ function tigase_monitor_block($op='list', $delta=0) {
 				$name_ver = str_ireplace(".gz", "", $name_ver);
 				$name_ver = str_ireplace(".tar", "", $name_ver);
 				$name_ver = str_ireplace(".exe", "", $name_ver);
+				$name_ver = str_ireplace(".jar", "", $name_ver);
 				if ($name_ver >= $server_version) {
 					$server_version = $name_ver;
-					$file = $name;
-					if (strpos($name, ".zip")) {
-						$zip_file = "$folder$file";
-					}
-					if (strpos($name, ".exe")) {
-						$exe_file = "$folder$file";
-					}
-					if (strpos($name, ".tar.gz")) {
-						$targz_file = "$folder$file";
-					}
+
+					$zip_file = "$folder"."tigase-server-$server_version".".zip";
+					$exe_file = "$folder"."tigase-server-$server_version".".exe";
+					$targz_file = "$folder"."tigase-server-$server_version".".tar.gz";
+					$jar_file = "$folder"."tigase-server-$server_version".".jar";
+
+// 						$file = $name;
+// 					if (strpos($name, ".zip")) {
+// 						$zip_file = "$folder$file";
+// 					}
+// 					if (strpos($name, ".exe")) {
+// 						$exe_file = "$folder$file";
+// 					}
+// 					if (strpos($name, ".tar.gz")) {
+// 						$targz_file = "$folder$file";
+// 					}
+// 					if (strpos($name, ".jar")) {
+// 						$jar_file = "$folder$file";
+// 					}
 				}
 			} else {
 				$server_downloads = $description[0];
 			}
 		}
-		$link_zip = "<a href=\"{$base_path}/{$zip_file}\">zip</a>, ";
+		$link_jar = "<a href=\"{$base_path}/{$jar_file}\">jar</a>, ";
 		$link_exe = "<a href=\"{$base_path}/{$exe_file}\">exe</a>, ";
-		$link_targz = "<a href=\"{$base_path}/{$targz_file}\">tar.gz</a>";
+		$link_targz = "<a href=\"{$base_path}/{$targz_file}\">tar.gz</a>, ";
+		$link_zip = "<a href=\"{$base_path}/{$zip_file}\">zip</a>";
 		$link_all = "<a href=\"{$base_path}/filebrowser/tigase-server\">$server_downloads</a>";
 		//$users_cnt = db_fetch_object(db_query("SELECT COUNT(*) as count from {users};"));
 		$online_cnt = db_fetch_object(db_query("SELECT COUNT(*) as count from {users} where online_status > 0;"));
@@ -110,7 +121,7 @@ function tigase_monitor_block($op='list', $delta=0) {
 		}
 		$block_content .= '<tr><td>Website online:</td><td>' . ($users->count + $guests->count) . '</td></tr>';
 		$block_content .= '<tr><td>Ver ' . $server_version . ':</td><td>'
-			. $link_zip . $link_exe . $link_targz . '</td></tr>';
+			. $link_jar . $link_exe . $link_targz . $link_zip . '</td></tr>';
 		$block_content .= '<tr><td>All downloads:</td><td>' . $link_all . '</td></tr>';
 		$block_content .= '<tr><td><a href="http://www.ohloh.net/">Ohloh</a> stats:</td>' .
 			'<td><a href="http://www.ohloh.net/projects/4171"><img src="/files/ohloh_badge.gif"/></a></td></tr>';
