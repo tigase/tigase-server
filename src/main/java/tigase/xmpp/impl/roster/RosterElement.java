@@ -53,7 +53,7 @@ public class RosterElement {
 	private String jid = null;
 
 	public RosterElement(String jid, String name, String[] groups) {
-		this.jid = jid;
+		this.jid = jid.toLowerCase();
 		if (name == null) {
 			this.name = JIDUtils.getNodeNick(jid);
 			if (this.name == null || this.name.isEmpty()) {
@@ -72,7 +72,7 @@ public class RosterElement {
 	 */
 	public RosterElement(Element roster_el) {
 		if (roster_el.getName() == ELEM_NAME) {
-			jid = roster_el.getAttribute(JID_ATT);
+			jid = roster_el.getAttribute(JID_ATT).toLowerCase();
 			name = roster_el.getAttribute(NAME_ATT);
 			if (name == null || name.isEmpty()) {
 				name = JIDUtils.getNodeNick(jid);

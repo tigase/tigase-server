@@ -158,8 +158,12 @@ public class RosterFlat extends RosterAbstract {
     final SubscriptionType subscription, final String buddy)
 		throws NotAuthorizedException, TigaseDBException {
 		RosterElement relem = getRosterElement(session, buddy);
-		relem.setSubscription(subscription);
-		saveUserRoster(session);
+		if (relem != null) {
+			relem.setSubscription(subscription);
+			saveUserRoster(session);
+		} else {
+			log.warning("Missing roster contact for subscription set: " + buddy);
+		}
   }
 
   public SubscriptionType getBuddySubscription(
