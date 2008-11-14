@@ -116,6 +116,21 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>tigase</groupId>
+      <artifactId>tigase-muc</artifactId>
+      <version>0.2.2</version>
+      <scope>runtime</scope>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>tigase</groupId>
+      <artifactId>tigase-pubsub</artifactId>
+      <version>0.5.0</version>
+      <scope>runtime</scope>
+      <optional>true</optional>
+    </dependency>
+                                      
+    <dependency>
       <groupId>postgresql</groupId>
       <artifactId>postgresql</artifactId>
       <version>7.4.1-jdbc3</version>
