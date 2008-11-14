@@ -233,6 +233,10 @@ uvme:vcard-temp,http://jabber.org/protocol/commands,jabber:iq:private,urn:xmpp:p
 			<spec txt="Session bind" id="sessionBindPlugin.label"
 						true="urn:ietf:params:xml:ns:xmpp-session" false="off"	set="false"/>
 		</field>
+		<field type="check" variable="registerPlugin">
+			<spec txt="Session bind" id="registerPlugin.label"
+						true="jabber:iq:register" false="off"	set="true"/>
+		</field>
 		<field type="check" variable="rosterPlugin">
 			<spec txt="Presence/Roster management" id="rosterPlugin.label"
 						true="roster-presence" false="off"	set="true"/>

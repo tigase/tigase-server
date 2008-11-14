@@ -59,7 +59,7 @@ public abstract class TigaseConfigConst {
 
 	public static String[] ALL_PLUGINS =
 	{"nonSaslAuthPlugin", "saslAuthPlugin", "resBindPlugin",
-	 "sessionBindPlugin", "rosterPlugin", "privacyPlugin",
+	 "sessionBindPlugin", "registerPlugin", "rosterPlugin", "privacyPlugin",
 	 "versionPlugin", "statsPlugin", "tlsPlugin", "msgOfflinePlugin",
 	 "vcardPlugin", "commandsPlugin", "privatePlugin", "pingPlugin"};
 	public static LinkedHashMap<String, String> pluginsMap =
@@ -114,6 +114,7 @@ public abstract class TigaseConfigConst {
 		pluginsMap.put("urn:ietf:params:xml:ns:xmpp-sasl", "saslAuthPlugin");
 		pluginsMap.put("urn:ietf:params:xml:ns:xmpp-bind", "resBindPlugin");
 		pluginsMap.put("urn:ietf:params:xml:ns:xmpp-session", "sessionBindPlugin");
+		pluginsMap.put("jabber:iq:register", "registerPlugin");
 		pluginsMap.put("roster-presence", "rosterPlugin");
 		pluginsMap.put("jabber:iq:privacy", "privacyPlugin");
 		pluginsMap.put("jabber:iq:version", "versionPlugin");
