@@ -61,7 +61,7 @@ public class SessionManagerConfig {
 	 "roster-presence", "jabber:iq:privacy", "msgoffline",
 	 "jabber:iq:version", "http://jabber.org/protocol/stats", "starttls",
 	 "vcard-temp", "http://jabber.org/protocol/commands", "jabber:iq:private",
-	 "urn:xmpp:ping", "http://jabber.org/protocol/pubsub"};
+	 "urn:xmpp:ping"};
 	/**
 	 * List of plugins loaded when the server is loaded in test mode.
 	 * Some plugins like off-line message storage is disabled during tests.
@@ -72,7 +72,7 @@ public class SessionManagerConfig {
 	 "roster-presence", "jabber:iq:privacy", "jabber:iq:version",
 	 "http://jabber.org/protocol/stats", "starttls", "msgoffline",
 	 "vcard-temp", "http://jabber.org/protocol/commands", "jabber:iq:private",
-	 "urn:xmpp:ping", "http://jabber.org/protocol/pubsub"};
+	 "urn:xmpp:ping"};
 
 	private static String[] HOSTNAMES_PROP_VAL =	{"localhost", "hostname"};
 	private static String[] ANONYMOUS_DOMAINS_PROP_VAL = {"localhost", "hostname"};
