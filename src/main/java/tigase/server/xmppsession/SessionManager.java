@@ -750,7 +750,7 @@ public class SessionManager extends AbstractMessageReceiver
 		} catch (NotAuthorizedException e) {
 			log.info("Closed not authorized session: " + e);
 		} catch (Exception e) {
-			log.info("Exception closing session... " + e);
+			log.log(Level.WARNING, "Exception closing session... ", e);
 		}
 		conn.streamClosed();
 	}
