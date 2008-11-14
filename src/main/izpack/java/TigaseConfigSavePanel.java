@@ -137,7 +137,7 @@ public class TigaseConfigSavePanel extends IzPanel {
 					++comp_idx;
 					TigaseConfigConst.props.setProperty("--comp-name-"+comp_idx, "muc");
 					TigaseConfigConst.props.setProperty("--comp-class-"+comp_idx,
-						"tigase.muc.MUCService");
+						"tigase.muc.MUCComponent");
 				}
 				Debug.trace("Set: " + "--comp-name-"+comp_idx + " = " + "muc");
 				continue;
@@ -153,8 +153,13 @@ public class TigaseConfigSavePanel extends IzPanel {
 				continue;
 			}
 			if (varName.equals(TigaseConfigConst.AUTH_DB_URI)) {
-				TigaseConfigConst.props.setProperty(entry.getKey(), getAuthUri());
-				Debug.trace("Set: " + entry.getKey() + " = " + getAuthUri());
+				String auth_db_uri = getAuthUri();
+				if (auth_db_uri != null) {
+					TigaseConfigConst.props.setProperty(entry.getKey(), auth_db_uri);
+					Debug.trace("Set: " + entry.getKey() + " = " + auth_db_uri);
+				} else {
+					Debug.trace("Not set: " + entry.getKey());
+				}
 				continue;
 			}
 			if (!varValue.trim().isEmpty()) {
@@ -250,7 +255,12 @@ public class TigaseConfigSavePanel extends IzPanel {
 		String database = idata.getVariable(TigaseConfigConst.AUTH_DB_URI);
 		db_uri += database + ":";
 		if (database.equals("derby")) {
-			db_uri += idata.getVariable("DerbyDBPath");
+			String derby_path = idata.getVariable("DerbyDBPath");
+			if (derby_path != null) {
+				db_uri += derby_path;
+			} else {
+				return null;
+			}
 		} else {
 			db_uri += "//" + idata.getVariable("dbAuthHost");
 			db_uri += "/" + idata.getVariable("dbAuthName");
