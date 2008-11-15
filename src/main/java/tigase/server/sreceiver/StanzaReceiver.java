@@ -486,8 +486,8 @@ public class StanzaReceiver extends AbstractMessageReceiver
 
 		defs.put(TASKS_LIST_PROP_KEY, conf_tasks.toArray(new String[0]));
 
-		String srec_repo_class = XML_REPO_CLASS_PROP_VAL;
-		String srec_repo_uri = XML_REPO_URL_PROP_VAL;
+		String srec_repo_class = DERBY_REPO_CLASS_PROP_VAL;
+		String srec_repo_uri = DERBY_REPO_URL_PROP_VAL;
 		String conf_srec_db = null;
 		if (params.get(GEN_SREC_DB) != null) {
 			conf_srec_db = (String)params.get(GEN_SREC_DB);
