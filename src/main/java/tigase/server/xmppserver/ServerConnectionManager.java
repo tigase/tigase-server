@@ -508,17 +508,25 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 		} else {
 			HOSTNAMES_PROP_VAL = DNSResolver.getDefHostNames();
 		}
+		ArrayList<String> vhosts =
+      new ArrayList<String>(Arrays.asList(HOSTNAMES_PROP_VAL));
 		for (Map.Entry<String, Object> entry: params.entrySet()) {
 			if (entry.getKey().startsWith(GEN_EXT_COMP)) {
 				String ext_comp = (String)entry.getValue();
 				if (ext_comp != null) {
 					String[] comp_params = ext_comp.split(",");
-					HOSTNAMES_PROP_VAL = Arrays.copyOf(HOSTNAMES_PROP_VAL,
-						HOSTNAMES_PROP_VAL.length + 1);
-					HOSTNAMES_PROP_VAL[HOSTNAMES_PROP_VAL.length - 1] = comp_params[1];
+					vhosts.add(comp_params[1]);
+				}
+			}
+			if (entry.getKey().startsWith(GEN_COMP_NAME)) {
+				String comp_name_suffix = entry.getKey().substring(GEN_COMP_NAME.length());
+				String c_name = (String)params.get(GEN_COMP_NAME + comp_name_suffix);
+				for (String vhost: HOSTNAMES_PROP_VAL) {
+					vhosts.add(c_name + "." + vhost);
 				}
 			}
 		}
+		HOSTNAMES_PROP_VAL = vhosts.toArray(new String[0]);
 		hostnames = HOSTNAMES_PROP_VAL;
 		props.put(HOSTNAMES_PROP_KEY, HOSTNAMES_PROP_VAL);
 		props.put(MAX_PACKET_WAITING_TIME_PROP_KEY,
