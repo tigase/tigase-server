@@ -134,6 +134,10 @@ public class MessageRouter extends AbstractMessageReceiver {
 		}
 	}
 
+	protected Integer getDefMaxQueueSize() {
+		return MAX_QUEUE_SIZE_PROP_VAL*10;
+	}
+
 	private ServerComponent getLocalComponent(String jid) {
 		ServerComponent comp = components_byId.get(jid);
 		if (comp != null) {
