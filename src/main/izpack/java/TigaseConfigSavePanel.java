@@ -281,6 +281,10 @@ public class TigaseConfigSavePanel extends IzPanel {
 			return "";
 		}
 		for (String plugin: TigaseConfigConst.ALL_PLUGINS) {
+			if (idata.getVariable(plugin) == null) {
+				Debug.trace("Missing idata for: " + plugin);
+				continue;
+			}
 			if (!idata.getVariable(plugin).equals("off")) {
 				if (!plugins.isEmpty()) {
 					plugins += ",";
