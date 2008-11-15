@@ -63,7 +63,7 @@ public abstract class AbstractMessageReceiver
 	private String DEF_HOSTNAME_PROP_VAL = DNSResolver.getDefaultHostname();
 	public static final String MAX_QUEUE_SIZE_PROP_KEY = "max-queue-size";
 	//  public static final Integer MAX_QUEUE_SIZE_PROP_VAL = Integer.MAX_VALUE;
-  public static final Integer MAX_QUEUE_SIZE_PROP_VAL = 1000;
+  public static final Integer MAX_QUEUE_SIZE_PROP_VAL = 100000;
 
   /**
    * Variable <code>log</code> is a class logger.
@@ -331,8 +331,10 @@ public abstract class AbstractMessageReceiver
 		} catch (InterruptedException e) {}
 		in_thread = null;
 		out_thread = null;
-		receiverTasks.cancel();
-		receiverTasks = null;
+		if (receiverTasks != null) {
+			receiverTasks.cancel();
+			receiverTasks = null;
+		}
 	}
 
 	public void everySecond() {
