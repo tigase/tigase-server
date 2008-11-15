@@ -243,7 +243,7 @@ public class TigaseConfigLoadPanel extends IzPanel {
 
 	private Pattern dbUriPattern =
     Pattern.compile(
-			"jdbc:([^:]+(:[^:]+)?):(//([^/]+))?/?([a-zA-Z_/]+)[;\\?]?(user=([^;&]+))?[;&]?(password=([^;&]+))?[;&]?(.*)");
+			"jdbc:([^:]+(:[^:]+)?):(//([^/]+))?/?([0-9.a-zA-Z_/-]+)[;\\?]?(user=([^;&]+))?[;&]?(password=([^;&]+))?[;&]?(.*)");
 
 	private void parseUserDbUri(String dbUri) {
 		Matcher m = dbUriPattern.matcher(dbUri);
@@ -267,9 +267,11 @@ public class TigaseConfigLoadPanel extends IzPanel {
 			}
 			if (dbName != null) {
 				if (jdbcDriver.equals("derby")) {
-					idata.setVariable("DerbyDBPath", "/"+dbName);
+					idata.setVariable("DerbyDBPath", "/" + dbName);
+					Debug.trace("DerbyDBPath set to /" + dbName);
 				} else {
 					idata.setVariable("dbName", dbName);
+					Debug.trace("dbName read: " + dbName);
 				}
 			}
 			if (userName != null) {
