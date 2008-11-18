@@ -174,7 +174,7 @@ public class SessionManagerClustered extends SessionManager
 
 	protected void processClusterPacket(Packet packet) {
 		final ClusterElement clel = new ClusterElement(packet.getElement());
-		clel.addVisitedNode(getComponentId());
+		//clel.addVisitedNode(getComponentId());
 		switch (packet.getType()) {
 		case set:
 			if (clel.getMethodName() == null) {

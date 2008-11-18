@@ -224,7 +224,7 @@ public class ClusterElement {
 		if (cluster_nodes.size() > 0) {
 			String next_node = null;
 			for (String cluster_node: cluster_nodes) {
-				if (!clel.isVisitedNode(cluster_node)) {
+				if (!clel.isVisitedNode(cluster_node) && !cluster_node.equals(comp_id)) {
 					next_node = cluster_node;
 					log.finest("Found next cluster node: " + next_node);
 					break;
@@ -235,8 +235,10 @@ public class ClusterElement {
 				log.finest("No more cluster nodes found, sending back to the first node: "
 					+ next_node);
 			}
-			if (next_node != null && !next_node.equals(comp_id)) {
-				return clel.nextClusterNode(next_node);
+			if (next_node != null) {
+				ClusterElement result = clel.nextClusterNode(next_node);
+				result.addVisitedNode(comp_id);
+				return result;
 			}
 		}
 		return null;
