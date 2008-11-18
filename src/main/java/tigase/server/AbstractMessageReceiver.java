@@ -63,7 +63,7 @@ public abstract class AbstractMessageReceiver
 	private String DEF_HOSTNAME_PROP_VAL = DNSResolver.getDefaultHostname();
 	public static final String MAX_QUEUE_SIZE_PROP_KEY = "max-queue-size";
 	//  public static final Integer MAX_QUEUE_SIZE_PROP_VAL = Integer.MAX_VALUE;
-  public static final Integer MAX_QUEUE_SIZE_PROP_VAL = 100000;
+  public static final Integer MAX_QUEUE_SIZE_PROP_VAL = 10000;
 
   /**
    * Variable <code>log</code> is a class logger.
