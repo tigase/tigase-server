@@ -473,8 +473,8 @@ public class SessionManager extends AbstractMessageReceiver
 		return connection;
 	}
 
-	protected Integer getDefMaxQueueSize() {
-		return new Integer(10000);
+	protected Integer getMaxQueueSize(int def) {
+		return def*10;
 	}
 
 	protected boolean processCommand(Packet pc) {

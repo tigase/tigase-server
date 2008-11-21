@@ -149,6 +149,9 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	public static final String MY_DOMAIN_NAME_PROP_KEY = "domain-name";
 	public static final String MY_DOMAIN_NAME_PROP_VAL =	"srecv.localhost";
 
+	private static final String TESTER_TASK_NAME = "tester_1";
+	private static final String TESTER_TASK_TYPE = "Tester Task";
+
 	private static final String TASK_TYPES_PROP_NODE = "task-types/";
 	private static final String TASK_TYPES_PROP_KEY =
 		TASK_TYPES_PROP_NODE + "list";
@@ -483,6 +486,15 @@ public class StanzaReceiver extends AbstractMessageReceiver
 					entry.getValue().toString());
 			} // end of for ()
 		} // end of for (String task_name: TASKS_LIST_PROP_VAL)
+		if ((Boolean)params.get(GEN_TEST)) {
+			conf_tasks.add(TESTER_TASK_NAME);
+			defs.put(TESTER_TASK_NAME + "/" + TASK_ACTIVE_PROP_KEY, true);
+			defs.put(TESTER_TASK_NAME + "/" + TASK_TYPE_PROP_KEY, TESTER_TASK_TYPE);
+			defs.put(TESTER_TASK_NAME + "/props/" + ALLOWED_SENDERS_PROP_KEY,
+				SenderRestrictions.ALL.toString());
+			defs.put(TESTER_TASK_NAME + "/props/" + MESSAGE_TYPE_PROP_KEY,
+				MessageType.NORMAL.toString());
+		}
 
 		defs.put(TASKS_LIST_PROP_KEY, conf_tasks.toArray(new String[0]));
 

@@ -32,9 +32,12 @@ package tigase.stats;
  */
 public enum StatisticType {
 
-	QUEUE_SIZE("Queue size", "int"),
+	QUEUE_WAITING("Total waiting packets", "int"),
+	MAX_QUEUE_SIZE("Max queue size", "int"),
 	MSG_RECEIVED_OK("Packets received", "long"),
-	QUEUE_OVERFLOW("Queue overflow", "long"),
+	MSG_SENT_OK("Packets sent", "long"),
+	IN_QUEUE_OVERFLOW("IN Queue overflow", "long"),
+	OUT_QUEUE_OVERFLOW("OUT Queue overflow", "long"),
 	LIST(null, "list"),
 	OTHER(null, null);
 

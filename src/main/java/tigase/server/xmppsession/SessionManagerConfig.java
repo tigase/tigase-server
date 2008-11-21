@@ -66,6 +66,14 @@ public class SessionManagerConfig {
 	 * List of plugins loaded when the server is loaded in test mode.
 	 * Some plugins like off-line message storage is disabled during tests.
 	 */
+	private static final String[] PLUGINS_TEST_PROP_VAL =
+	{"jabber:iq:register", "jabber:iq:auth", "urn:ietf:params:xml:ns:xmpp-sasl",
+	 "urn:ietf:params:xml:ns:xmpp-bind", "urn:ietf:params:xml:ns:xmpp-session",
+	 "roster-presence", "jabber:iq:privacy", "jabber:iq:version",
+	 "http://jabber.org/protocol/stats", "starttls",
+	 "vcard-temp", "http://jabber.org/protocol/commands", "jabber:iq:private",
+	 "urn:xmpp:ping"};
+
 	private static final String[] PLUGINS_FULL_PROP_VAL =
 	{"jabber:iq:register", "jabber:iq:auth", "urn:ietf:params:xml:ns:xmpp-sasl",
 	 "urn:ietf:params:xml:ns:xmpp-bind", "urn:ietf:params:xml:ns:xmpp-session",
@@ -189,13 +197,17 @@ public class SessionManagerConfig {
 		if (str_plugins != null) {
 			props.put(PLUGINS_PROP_KEY, str_plugins.split(","));
 		} else {
-			if (full_comps) {
-				// Some plugins are not loaded during tests at least until proper
-				// test cases are created for them. Sample case is off-line message
-				// storage which may impact some test cases.
-				props.put(PLUGINS_PROP_KEY, PLUGINS_FULL_PROP_VAL);
+			if ((Boolean)params.get(GEN_TEST)) {
+				props.put(PLUGINS_PROP_KEY, PLUGINS_TEST_PROP_VAL);
 			} else {
-				props.put(PLUGINS_PROP_KEY, PLUGINS_NO_REG_PROP_VAL);
+				if (full_comps) {
+					// Some plugins are not loaded during tests at least until proper
+					// test cases are created for them. Sample case is off-line message
+					// storage which may impact some test cases.
+					props.put(PLUGINS_PROP_KEY, PLUGINS_FULL_PROP_VAL);
+				} else {
+					props.put(PLUGINS_PROP_KEY, PLUGINS_NO_REG_PROP_VAL);
+				}
 			}
 		}
 

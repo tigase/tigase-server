@@ -134,8 +134,8 @@ public class MessageRouter extends AbstractMessageReceiver {
 		}
 	}
 
-	protected Integer getDefMaxQueueSize() {
-		return MAX_QUEUE_SIZE_PROP_VAL*10;
+	protected Integer getMaxQueueSize(int def) {
+		return def*10;
 	}
 
 	private ServerComponent getLocalComponent(String jid) {
@@ -264,7 +264,7 @@ public class MessageRouter extends AbstractMessageReceiver {
 		} // end of if (nick != null)
 		if (first != null && host.equals(getDefHostName())) {
 			log.finest("Found receiver: " + first.getName());
-			first.addPacket(packet);
+			first.addPacketNB(packet);
 			return;
 		} // end of if (mr != null)
 		// This packet is not processed localy, so let's find receiver
@@ -277,13 +277,13 @@ public class MessageRouter extends AbstractMessageReceiver {
 					" in " + routings.toString());
 				if (routings.contains(host) || routings.contains(id)) {
 					log.finest("Found receiver: " + mr.getName());
-					mr.addPacket(packet);
+					mr.addPacketNB(packet);
 					return;
 				} // end of if (routings.contains())
 				// Resolve wildchars routings....
 				if (mr.isInRegexRoutings(id)) {
 					log.finest("Found receiver: " + mr.getName());
-					mr.addPacket(packet);
+					mr.addPacketNB(packet);
 					return;
 				}
 				if (routings.contains("*")) {
@@ -311,7 +311,7 @@ public class MessageRouter extends AbstractMessageReceiver {
 			return;
 		}
 		if (s2s != null) {
-			s2s.addPacket(packet);
+			s2s.addPacketNB(packet);
 		} // end of if (s2s != null)
   }
 

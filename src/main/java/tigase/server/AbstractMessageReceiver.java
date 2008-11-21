@@ -63,24 +63,25 @@ public abstract class AbstractMessageReceiver
 	private String DEF_HOSTNAME_PROP_VAL = DNSResolver.getDefaultHostname();
 	public static final String MAX_QUEUE_SIZE_PROP_KEY = "max-queue-size";
 	//  public static final Integer MAX_QUEUE_SIZE_PROP_VAL = Integer.MAX_VALUE;
-  public static final Integer MAX_QUEUE_SIZE_PROP_VAL = 10000;
+  public static final Integer MAX_QUEUE_SIZE_PROP_VAL =
+    new Long(Runtime.getRuntime().maxMemory()/100000L).intValue();
 
   /**
    * Variable <code>log</code> is a class logger.
    */
   private static final Logger log =
-    Logger.getLogger("tigase.server.AbstractMessageReceiver");
+    Logger.getLogger("tigase.abstract.AbstractMessageReceiver");
 
-  protected  int maxQueueSize = MAX_QUEUE_SIZE_PROP_VAL;
+  protected int maxQueueSize = MAX_QUEUE_SIZE_PROP_VAL;
 	private String defHostname = DEF_HOSTNAME_PROP_VAL;
 
   private MessageReceiver parent = null;
 	//	private Timer delayedTask = new Timer("MessageReceiverTask", true);
 
-  private LinkedBlockingQueue<QueueElement> in_queue =
-		new LinkedBlockingQueue<QueueElement>(maxQueueSize);
-  private LinkedBlockingQueue<QueueElement> out_queue =
-		new LinkedBlockingQueue<QueueElement>(maxQueueSize);
+  private LinkedBlockingQueue<Packet> in_queue =
+		new LinkedBlockingQueue<Packet>(maxQueueSize);
+  private LinkedBlockingQueue<Packet> out_queue =
+		new LinkedBlockingQueue<Packet>(maxQueueSize);
 
 	// 	private String sync = "SyncObject";
 
@@ -104,12 +105,14 @@ public abstract class AbstractMessageReceiver
    * Variable <code>statAddedMessagesOk</code> keeps counter of successfuly
    * added messages to queue.
    */
-  private long statAddedMessagesOk = 0;
+  private long statReceivedMessagesOk = 0;
+  private long statSentMessagesOk = 0;
   /**
    * Variable <code>statAddedMessagesEr</code> keeps counter of unsuccessfuly
    * added messages due to queue overflow.
    */
-  private long statAddedMessagesEr = 0;
+  private long statReceivedMessagesEr = 0;
+  private long statSentMessagesEr = 0;
 
 	/**
 	 * Describe <code>getComponentId</code> method here.
@@ -120,20 +123,25 @@ public abstract class AbstractMessageReceiver
 		return compId;
 	}
 
-  /**
-   * Describe <code>addMessage</code> method here.
-   *
-   * @param packet a <code>Packet</code> value
-   */
-  public boolean addPacket(Packet packet) {
-    return prAddPacket(packet);
+  public boolean addPacketNB(Packet packet) {
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest(">" + getName() + "<  " + packet.toString());
+		}
+		boolean result = in_queue.offer(packet);
+		if (result) {
+			++statReceivedMessagesOk;
+			++curr_second;
+		} else {
+			++statReceivedMessagesEr;
+		}
+		return result;
   }
 
   public boolean addPackets(Queue<Packet> packets) {
 		Packet p = null;
 		boolean result = true;
 		while ((p = packets.peek()) != null) {
-			result = prAddPacket(p);
+			result = addPacket(p);
 			if (result) {
 				packets.poll();
 			} else {
@@ -143,33 +151,20 @@ public abstract class AbstractMessageReceiver
     return true;
   }
 
-	private boolean prAddPacket(Packet packet) {
+	public boolean addPacket(Packet packet) {
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest(">" + getName() + "<  " + packet.toString());
+		}
 		try {
-			// 			log.finest(">" + getName() + "<  " +
-			// 				"Adding packet to inQueue: " + packet.getStringData());
-			in_queue.put(new QueueElement(QueueElementType.IN_QUEUE, packet));
-			++statAddedMessagesOk;
+			in_queue.put(packet);
+			++statReceivedMessagesOk;
 			++curr_second;
 		} catch (InterruptedException e) {
-			++statAddedMessagesEr;
+			++statReceivedMessagesEr;
 			return false;
 		} // end of try-catch
 		return true;
   }
-
-	protected boolean addOutPacket(Packet packet) {
-		try {
-			// 			log.finest(">" + getName() + "<  " +
-			// 				"Adding packet to outQueue: " + packet.getStringData());
-			out_queue.put(new QueueElement(QueueElementType.OUT_QUEUE, packet));
-			++statAddedMessagesOk;
-			++curr_second;
-		} catch (InterruptedException e) {
-			++statAddedMessagesEr;
-			return false;
-		} // end of try-catch
-		return true;
-	}
 
 	/**
 	 * Non blocking version of <code>addOutPacket</code>.
@@ -178,17 +173,32 @@ public abstract class AbstractMessageReceiver
 	 * @return a <code>boolean</code> value
 	 */
 	protected boolean addOutPacketNB(Packet packet) {
-		log.finest(">" + getName() + "<  " +
-			"Adding packet to outQueue: " + packet.getStringData());
-		boolean result =
-			out_queue.offer(new QueueElement(QueueElementType.OUT_QUEUE, packet));
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest(">" + getName() + "<  " + packet.toString());
+		}
+		boolean result = out_queue.offer(packet);
 		if (result) {
-			++statAddedMessagesOk;
-			++curr_second;
+			++statSentMessagesOk;
+			//++curr_second;
 		} else {
-			++statAddedMessagesEr;
+			++statSentMessagesEr;
 		}
 		return result;
+	}
+
+	protected boolean addOutPacket(Packet packet) {
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest(">" + getName() + "<  " + packet.toString());
+		}
+		try {
+			out_queue.put(packet);
+			++statSentMessagesOk;
+			//++curr_second;
+		} catch (InterruptedException e) {
+			++statSentMessagesEr;
+			return false;
+		} // end of try-catch
+		return true;
 	}
 
 	protected boolean addOutPackets(Queue<Packet> packets) {
@@ -228,11 +238,17 @@ public abstract class AbstractMessageReceiver
 		stats.add(new StatRecord(getName(), "Last hour packets", "int",
 				curr_hour, Level.FINE));
     stats.add(new StatRecord(getName(), StatisticType.MSG_RECEIVED_OK,
-				statAddedMessagesOk, Level.FINE));
-    stats.add(new StatRecord(getName(), StatisticType.QUEUE_SIZE,
+				statReceivedMessagesOk, Level.FINE));
+    stats.add(new StatRecord(getName(), StatisticType.MSG_SENT_OK,
+				statSentMessagesOk, Level.FINE));
+    stats.add(new StatRecord(getName(), StatisticType.QUEUE_WAITING,
 				(in_queue.size() + out_queue.size()), Level.FINEST));
-    stats.add(new StatRecord(getName(), StatisticType.QUEUE_OVERFLOW,
-				statAddedMessagesEr, Level.FINEST));
+    stats.add(new StatRecord(getName(), StatisticType.MAX_QUEUE_SIZE,
+				maxQueueSize, Level.FINEST));
+    stats.add(new StatRecord(getName(), StatisticType.IN_QUEUE_OVERFLOW,
+				statReceivedMessagesEr, Level.FINEST));
+    stats.add(new StatRecord(getName(), StatisticType.OUT_QUEUE_OVERFLOW,
+				statSentMessagesEr, Level.FINEST));
     return stats;
   }
 
@@ -252,14 +268,14 @@ public abstract class AbstractMessageReceiver
 			stopThreads();
       this.maxQueueSize = maxQueueSize;
       if (in_queue != null) {
-				LinkedBlockingQueue<QueueElement> newQueue =
-					new LinkedBlockingQueue<QueueElement>(maxQueueSize);
+				LinkedBlockingQueue<Packet> newQueue =
+					new LinkedBlockingQueue<Packet>(maxQueueSize);
 				newQueue.addAll(in_queue);
 				in_queue = newQueue;
       } // end of if (queue != null)
       if (out_queue != null) {
-				LinkedBlockingQueue<QueueElement> newQueue =
-					new LinkedBlockingQueue<QueueElement>(maxQueueSize);
+				LinkedBlockingQueue<Packet> newQueue =
+					new LinkedBlockingQueue<Packet>(maxQueueSize);
 				newQueue.addAll(out_queue);
 				out_queue = newQueue;
       } // end of if (queue != null)
@@ -271,8 +287,8 @@ public abstract class AbstractMessageReceiver
 	//     localAddresses = addresses;
 	//   }
 
-	protected Integer getDefMaxQueueSize() {
-		return MAX_QUEUE_SIZE_PROP_VAL;
+	protected Integer getMaxQueueSize(int def) {
+		return def;
 	}
 
   /**
@@ -280,7 +296,16 @@ public abstract class AbstractMessageReceiver
    */
   public Map<String, Object> getDefaults(Map<String, Object> params) {
     Map<String, Object> defs = new LinkedHashMap<String, Object>();
-		defs.put(MAX_QUEUE_SIZE_PROP_KEY, getDefMaxQueueSize());
+		//maxQueueSize = MAX_QUEUE_SIZE_PROP_VAL;
+		String queueSize = (String)params.get(GEN_MAX_QUEUE_SIZE);
+		if (queueSize != null) {
+			try {
+				maxQueueSize = Integer.parseInt(queueSize);
+			} catch (NumberFormatException e) {
+				maxQueueSize = MAX_QUEUE_SIZE_PROP_VAL;
+			}
+		}
+		defs.put(MAX_QUEUE_SIZE_PROP_KEY, getMaxQueueSize(maxQueueSize));
 // 		if (params.get(GEN_VIRT_HOSTS) != null) {
 // 			DEF_HOSTNAME_PROP_VAL = ((String)params.get(GEN_VIRT_HOSTS)).split(",")[0];
 // 		} else {
@@ -359,13 +384,13 @@ public abstract class AbstractMessageReceiver
 	private void startThreads() {
 		if (in_thread == null || ! in_thread.isAlive()) {
 			stopped = false;
-			in_thread = new Thread(new QueueListener(in_queue));
+			in_thread = new Thread(new QueueListener(in_queue, QueueType.IN_QUEUE));
 			in_thread.setName("in_" + name);
 			in_thread.start();
 		} // end of if (thread == null || ! thread.isAlive())
 		if (out_thread == null || ! out_thread.isAlive()) {
 			stopped = false;
-			out_thread = new Thread(new QueueListener(out_queue));
+			out_thread = new Thread(new QueueListener(out_queue, QueueType.OUT_QUEUE));
 			out_thread.setName("out_" + name);
 			out_thread.start();
 		} // end of if (thread == null || ! thread.isAlive())
@@ -448,52 +473,44 @@ public abstract class AbstractMessageReceiver
 		return false;
 	}
 
-	public final void processPacket(final Packet packet, final Queue<Packet> results)	{
-		addPacket(packet);
+	public final void processPacket(final Packet packet,
+		final Queue<Packet> results)	{
+		addPacketNB(packet);
 	}
 
-	private enum QueueElementType { IN_QUEUE, OUT_QUEUE }
-
-	private static class QueueElement {
-		private QueueElementType type = null;
-		private Packet packet = null;
-
-		private QueueElement(QueueElementType type, Packet packet) {
-			this.type = type;
-			this.packet = packet;
-		}
-
-	}
+	private enum QueueType { IN_QUEUE, OUT_QUEUE }
 
 	private class QueueListener implements Runnable {
 
-		private LinkedBlockingQueue<QueueElement> queue = null;
+		private LinkedBlockingQueue<Packet> queue = null;
+		private QueueType type = null;
 
-		private QueueListener(LinkedBlockingQueue<QueueElement> q) {
+		private QueueListener(LinkedBlockingQueue<Packet> q, QueueType type) {
 			this.queue = q;
+			this.type = type;
 		}
 
 		public void run() {
 			while (! stopped) {
 				try {
-					QueueElement qel = queue.take();
-					switch (qel.type) {
+					Packet packet = queue.take();
+					switch (type) {
 					case IN_QUEUE:
-						processPacket(qel.packet);
+						processPacket(packet);
 						break;
 					case OUT_QUEUE:
 						if (parent != null) {
 							// 							log.finest(">" + getName() + "<  " +
 							// 								"Sending outQueue to parent: " + parent.getName());
-							parent.addPacket(qel.packet);
+							parent.addPacket(packet);
 						} else {
 							// It may happen for MessageRouter and this is intentional
-							prAddPacket(qel.packet);
+							addPacketNB(packet);
 							//log.warning(">" + getName() + "<  " + "No parent!");
 						} // end of else
 						break;
 					default:
-						log.severe("Unknown queue element type: " + qel.type);
+						log.severe("Unknown queue element type: " + type);
 						break;
 					} // end of switch (qel.type)
 				} catch (InterruptedException e) {

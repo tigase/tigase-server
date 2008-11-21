@@ -22,6 +22,7 @@ package tigase.server.sreceiver;
 
 import tigase.server.Packet;
 import tigase.xmpp.StanzaType;
+import tigase.util.JIDUtils;
 import java.util.Queue;
 
 /**
@@ -46,7 +47,7 @@ public class TesterTask extends AbstractReceiverTask {
 		+ " The purpose of this task is testing of the Tigase server and"
 		+ " the task should not be normally loaded on to live system.";
 
-	private enum command { help; };
+	private enum command { help, genn; };
 
 	public String getType() {
 		return TASK_TYPE;
@@ -59,6 +60,8 @@ public class TesterTask extends AbstractReceiverTask {
 	private String commandsHelp() {
 		return "Available commands are:\n"
 			+ "//help - display this help info\n"
+			+ "//genn N - generates N messages to random, non-existen users on "
+      + "the server and responds with a simple reply masse: 'Completed N.'\n"
 			+ " For now you can only subsribe to and unsubscribe from task roster"
 			+ " and send a message to task as it was a user. The task will always"
 			+ " respond to your messages with following text:\n"
@@ -87,7 +90,29 @@ public class TesterTask extends AbstractReceiverTask {
 					packet.getElemTo(), StanzaType.chat, commandsHelp(),
 					"Commands description", null));
 			break;
+		case genn:
+			try {
+				int number = Integer.parseInt(body_split[1]);
+				String domain = JIDUtils.getNodeHost(packet.getElemFrom());
+				for (int i = 0; i < number; i++) {
+					results.offer(Packet.getMessage("nonename_" + i + "@" + domain,
+							packet.getElemTo(), StanzaType.normal,
+							"Traffic generattion: " + number,
+							"Internal load test", null));
+				}
+				results.offer(Packet.getMessage(packet.getElemFrom(),
+						packet.getElemTo(), StanzaType.normal,
+						"Completed " + number,
+						"Response", null));
+			} catch (Exception e) {
+				results.offer(Packet.getMessage(packet.getElemFrom(),
+						packet.getElemTo(), StanzaType.normal,
+						"Incorrect command parameter: "
+						+ (body_split.length > 1 ? body_split[1] : null)
+						+ ", expecting Integer.", "Response", null));
 			}
+			break;
+		}
 	}
 
 	protected void processMessage(Packet packet, Queue<Packet> results) {

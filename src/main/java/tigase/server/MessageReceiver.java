@@ -60,6 +60,7 @@ public interface MessageReceiver extends ServerComponent {
 	 * successfully added, <code>false</code> otherwise.
 	 */
 	boolean addPacket(Packet packet);
+	boolean addPacketNB(Packet packet);
 
 	/**
 	 * Describe <code>addPackets</code> method here.
