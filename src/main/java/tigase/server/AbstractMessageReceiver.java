@@ -133,6 +133,9 @@ public abstract class AbstractMessageReceiver
 			++curr_second;
 		} else {
 			++statReceivedMessagesEr;
+// 			log.warning("Can't add more packets to the queue: "
+// 				+ "size=" + in_queue.size()
+// 				+ ", remaining=" + in_queue.remainingCapacity());
 		}
 		return result;
   }
@@ -298,14 +301,15 @@ public abstract class AbstractMessageReceiver
     Map<String, Object> defs = new LinkedHashMap<String, Object>();
 		//maxQueueSize = MAX_QUEUE_SIZE_PROP_VAL;
 		String queueSize = (String)params.get(GEN_MAX_QUEUE_SIZE);
+		int queueSizeInt = MAX_QUEUE_SIZE_PROP_VAL;
 		if (queueSize != null) {
 			try {
-				maxQueueSize = Integer.parseInt(queueSize);
+				queueSizeInt = Integer.parseInt(queueSize);
 			} catch (NumberFormatException e) {
-				maxQueueSize = MAX_QUEUE_SIZE_PROP_VAL;
+				queueSizeInt = MAX_QUEUE_SIZE_PROP_VAL;
 			}
 		}
-		defs.put(MAX_QUEUE_SIZE_PROP_KEY, getMaxQueueSize(maxQueueSize));
+		defs.put(MAX_QUEUE_SIZE_PROP_KEY, getMaxQueueSize(queueSizeInt));
 // 		if (params.get(GEN_VIRT_HOSTS) != null) {
 // 			DEF_HOSTNAME_PROP_VAL = ((String)params.get(GEN_VIRT_HOSTS)).split(",")[0];
 // 		} else {
