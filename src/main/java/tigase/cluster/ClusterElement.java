@@ -27,7 +27,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.ArrayList;
 import java.util.logging.Logger;
-import java.util.logging.Level;
 
 import tigase.xmpp.StanzaType;
 import tigase.xml.Element;
@@ -230,7 +229,9 @@ public class ClusterElement {
 					break;
 				}
 			}
-			if (next_node == null) {
+			// The next node can not be the node which is processing the
+			// packet now. adding now: getFirstNode() != comp_id
+			if (next_node == null && !comp_id.equals(clel.getFirstNode())) {
 				next_node = clel.getFirstNode();
 				log.finest("No more cluster nodes found, sending back to the first node: "
 					+ next_node);
