@@ -490,8 +490,10 @@ public class SessionManagerClustered extends SessionManager
 	}
 
 	public void nodesConnected(Set<String> node_hostnames) {
+               log.fine("Nodes connected: " + node_hostnames.toString());
 		for (String node: node_hostnames) {
 			cluster_nodes.add(getName() + "@" + node);
+                        log.fine("Cluster nodes: " + cluster_nodes.toString());
 			broken_nodes.remove(getName() + "@" + node);
 		}
 		sendClusterNotification("Cluster nodes have been connected ("
@@ -499,8 +501,10 @@ public class SessionManagerClustered extends SessionManager
 	}
 
 	public void nodesDisconnected(Set<String> node_hostnames) {
+               log.fine("Nodes disconnected: " + node_hostnames.toString());
 		for (String node: node_hostnames) {
 			cluster_nodes.remove(getName() + "@" + node);
+                        log.fine("Cluster nodes: " + cluster_nodes.toString());
 			broken_nodes.add(getName() + "@" + node);
 		}
 		sendClusterNotification("Cluster nodes have been disconnected ("
