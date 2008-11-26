@@ -405,9 +405,9 @@ public class SessionManagerClustered extends SessionManager
 			// Let's leave custom handling each error type for later...
 			String from = packet.getElemFrom();
 			clel.addVisitedNode(from);
-			if (cluster_nodes.remove(from)) {
-				broken_nodes.add(from);
-			}
+			//if (cluster_nodes.remove(from)) {
+			//	broken_nodes.add(from);
+			//}
 			processPacket(clel);
 			break;
 		default:
