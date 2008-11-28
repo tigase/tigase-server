@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Queue;
 import java.util.LinkedHashMap;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.net.UnknownHostException;
@@ -38,9 +37,7 @@ import tigase.net.ConnectionType;
 //import tigase.net.IOService;
 import tigase.net.SocketType;
 import tigase.server.ConnectionManager;
-import tigase.server.MessageReceiver;
 import tigase.server.Packet;
-import tigase.server.MessageRouter;
 import tigase.disco.XMPPService;
 import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
@@ -53,8 +50,6 @@ import tigase.xmpp.Authorization;
 import tigase.xmpp.XMPPIOService;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.stats.StatRecord;
-import tigase.stats.StatisticType;
-import tigase.stats.StatisticsContainer;
 import tigase.util.TimeUtils;
 
 /**
@@ -113,6 +108,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 	private int lastDayIdx = 0;
 	private int lastHourIdx = 0;
 
+	@Override
 	public void processPacket(Packet packet) {
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Processing packet: " + packet.getStringData());
@@ -232,7 +228,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 		case accept: {
 			String digest = p.getElemCData();
 			String id =
-				(String)serv.getSessionData().get(serv.SESSION_ID_KEY);
+				(String)serv.getSessionData().get(XMPPIOService.SESSION_ID_KEY);
 			String secret =
 				(String)serv.getSessionData().get(SECRET_PROP_KEY);
 			try {
@@ -282,6 +278,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 // 		}
 	}
 
+	@Override
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
 		//service_disco = (Boolean)props.get(RETURN_SERVICE_DISCO_KEY);
@@ -319,6 +316,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 		}
 	}
 
+	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> props = super.getDefaults(params);
 		props.put(RETURN_SERVICE_DISCO_KEY, RETURN_SERVICE_DISCO_VAL);
@@ -404,6 +402,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 		++lastHour[minute];
 	}
 
+	@Override
 	protected String getServiceId(Packet packet) {
 		try {
 			return DNSResolver.getHostIP(JIDUtils.getNodeHost(packet.getTo()));
@@ -414,6 +413,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 		}
 	}
 
+	@Override
 	public void serviceStarted(XMPPIOService serv) {
 		super.serviceStarted(serv);
 		log.info("cluster connection opened: " + serv.getRemoteAddress()
@@ -429,7 +429,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 			//XMPPIOService serv = (XMPPIOService)service;
 			String remote_host =
         (String)serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
-			serv.getSessionData().put(serv.HOSTNAME_KEY, remote_host);
+			serv.getSessionData().put(XMPPIOService.HOSTNAME_KEY, remote_host);
 			serv.getSessionData().put(PORT_ROUTING_TABLE_PROP_KEY,
 				new String[] {remote_host, ".*@" + remote_host, ".*\\." + remote_host});
 			String data =
@@ -457,7 +457,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 		switch (service.connectionType()) {
 		case connect: {
 			String id = attribs.get("id");
-			service.getSessionData().put(service.SESSION_ID_KEY, id);
+			service.getSessionData().put(XMPPIOService.SESSION_ID_KEY, id);
 			String secret =
 				(String)service.getSessionData().get(SECRET_PROP_KEY);
 			try {
@@ -472,12 +472,12 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 		}
 		case accept: {
 			String remote_host = attribs.get("from");
-			service.getSessionData().put(service.HOSTNAME_KEY, remote_host);
+			service.getSessionData().put(XMPPIOService.HOSTNAME_KEY, remote_host);
 			service.getSessionData().put(PORT_REMOTE_HOST_PROP_KEY, remote_host);
 			service.getSessionData().put(PORT_ROUTING_TABLE_PROP_KEY,
 				new String[] {remote_host, ".*@" + remote_host, ".*\\." + remote_host});
 			String id = UUID.randomUUID().toString();
-			service.getSessionData().put(service.SESSION_ID_KEY, id);
+			service.getSessionData().put(XMPPIOService.SESSION_ID_KEY, id);
 			return "<stream:stream"
 				+ " xmlns='" + XMLNS + "'"
 				+ " xmlns:stream='http://etherx.jabber.org/streams'"
@@ -514,7 +514,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 				try {
 					addRegexRouting(route);
 				} catch (Exception e) {
-					addRouting(route);
+					log.warning("Can not add regex routing '" + route + "' : " + e);
 				}
 			}
 		} else {
@@ -522,7 +522,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 				try {
 					removeRegexRouting(route);
 				} catch (Exception e) {
-					removeRouting(route);
+					log.warning("Can not remove regex routing '" + route + "' : " + e);
 				}
 			}
 		}

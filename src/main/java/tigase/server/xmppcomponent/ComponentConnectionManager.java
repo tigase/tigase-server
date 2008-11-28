@@ -29,16 +29,12 @@ import java.util.List;
 import java.util.Queue;
 import java.util.TreeMap;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.net.ConnectionType;
-//import tigase.net.IOService;
 import tigase.net.SocketType;
 import tigase.server.ConnectionManager;
-import tigase.server.MessageReceiver;
 import tigase.server.Packet;
-import tigase.server.MessageRouter;
 import tigase.disco.XMPPService;
 import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
@@ -92,6 +88,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
   private static final Logger log =
     Logger.getLogger("tigase.server.xmppcomponent.ComponentConnectionManager");
 
+	@Override
 	public void processPacket(Packet packet) {
 		log.finer("Processing packet: " + packet.getElemName()
 			+ ", type: " + packet.getType());
@@ -152,7 +149,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 		case accept: {
 			String digest = p.getElemCData();
 			String id =
-				(String)serv.getSessionData().get(serv.SESSION_ID_KEY);
+				(String)serv.getSessionData().get(XMPPIOService.SESSION_ID_KEY);
 			String secret =
 				(String)serv.getSessionData().get(SECRET_PROP_KEY);
 			try {
@@ -165,7 +162,8 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 					String[] routings =
 						(String[])serv.getSessionData().get(PORT_ROUTING_TABLE_PROP_KEY);
 					updateRoutings(routings, true);
-					String addr = (String)serv.getSessionData().get(serv.HOSTNAME_KEY);
+					String addr = 
+									(String)serv.getSessionData().get(XMPPIOService.HOSTNAME_KEY);
 					log.fine("Connected to: " + addr);
 					updateServiceDiscovery(addr, "XEP-0114 connected");
 				} else {
@@ -183,6 +181,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 		} // end of switch (service.connectionType())
 	}
 
+	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		String config_type = (String)params.get("config-type");
 		if (config_type.equals(GEN_CONFIG_SM)) {
@@ -281,6 +280,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 		return props;
 	}
 
+	@Override
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
 		pack_routed = (Boolean)props.get(PACK_ROUTED_KEY);
@@ -293,10 +293,12 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 			new ServiceIdentity("component", identity_type, "XEP-0114 " + getName()));
 	}
 
+	@Override
 	protected int[] getDefPlainPorts() {
 		return PORTS;
 	}
 
+	@Override
 	protected Map<String, Object> getParamsForPort(int port) {
     Map<String, Object> defs = new TreeMap<String, Object>();
 		defs.put(SECRET_PROP_KEY, SECRET_PROP_VAL);
@@ -310,11 +312,13 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 		return defs;
 	}
 
+	@Override
 	protected String getUniqueId(XMPPIOService serv) {
 		//		return (String)serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
 		return service_id;
 	}
 
+	@Override
 	public void serviceStopped(XMPPIOService service) {
 		super.serviceStopped(service);
 		Map<String, Object> sessionData = service.getSessionData();
@@ -330,10 +334,12 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 		updateServiceDiscovery(addr, "XEP-0114 disconnected");
 	}
 
+	@Override
 	protected String getServiceId(Packet packet) {
 		return service_id;
 	}
 
+	@Override
 	public void serviceStarted(XMPPIOService serv) {
 		super.serviceStarted(serv);
 		log.finest("c2c connection opened: " + serv.getRemoteAddress()
@@ -373,7 +379,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 		switch (service.connectionType()) {
 		case connect: {
 			String id = attribs.get("id");
-			service.getSessionData().put(service.SESSION_ID_KEY, id);
+			service.getSessionData().put(XMPPIOService.SESSION_ID_KEY, id);
 			String secret =
 				(String)service.getSessionData().get(SECRET_PROP_KEY);
 			try {
@@ -388,9 +394,9 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 		}
 		case accept: {
 			String hostname = attribs.get("to");
-			service.getSessionData().put(service.HOSTNAME_KEY, hostname);
+			service.getSessionData().put(XMPPIOService.HOSTNAME_KEY, hostname);
 			String id = UUID.randomUUID().toString();
-			service.getSessionData().put(service.SESSION_ID_KEY, id);
+			service.getSessionData().put(XMPPIOService.SESSION_ID_KEY, id);
 			return "<stream:stream"
 				+ " xmlns='jabber:component:accept'"
 				+ " xmlns:stream='http://etherx.jabber.org/streams'"
@@ -426,7 +432,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 				try {
 					addRegexRouting(route);
 				} catch (Exception e) {
-					addRouting(route);
+					log.warning("Can not add regex routing '" + route + "' : " + e);
 				}
 			}
 		} else {
@@ -434,7 +440,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 				try {
 					removeRegexRouting(route);
 				} catch (Exception e) {
-					removeRouting(route);
+					log.warning("Can not remove regex routing '" + route + "' : " + e);
 				}
 			}
 		}

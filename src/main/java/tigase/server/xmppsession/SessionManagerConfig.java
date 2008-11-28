@@ -48,7 +48,6 @@ public class SessionManagerConfig {
 	public static final String PLUGINS_PROP_KEY = "plugins";
 	public static final String PLUGINS_CONF_PROP_KEY = "plugins-conf";
 
-	public static final String ANONYMOUS_DOMAINS_PROP_KEY = "anonymous-domains";
 	//	public static final String ANONYMOUS_PEERS_PROP_KEY = "anonymous-peers";
 
 	/**
@@ -218,8 +217,8 @@ public class SessionManagerConfig {
 			HOSTNAMES_PROP_VAL = DNSResolver.getDefHostNames();
 			ANONYMOUS_DOMAINS_PROP_VAL = DNSResolver.getDefHostNames();
 		}
-		props.put(HOSTNAMES_PROP_KEY, HOSTNAMES_PROP_VAL);
-		props.put(ANONYMOUS_DOMAINS_PROP_KEY, ANONYMOUS_DOMAINS_PROP_VAL);
+//		props.put(HOSTNAMES_PROP_KEY, HOSTNAMES_PROP_VAL);
+//		props.put(ANONYMOUS_DOMAINS_PROP_KEY, ANONYMOUS_DOMAINS_PROP_VAL);
 		if (params.get(GEN_ADMINS) != null) {
 			ADMINS_PROP_VAL = ((String)params.get(GEN_ADMINS)).split(",");
 		} else {

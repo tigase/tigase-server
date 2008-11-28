@@ -20,11 +20,8 @@
  */
 package tigase.cluster;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
-import java.util.Map;
 import java.util.Queue;
 import java.util.LinkedHashSet;
 import java.util.logging.Level;
@@ -33,14 +30,9 @@ import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
 import tigase.disco.XMPPService;
 import tigase.server.AbstractComponentRegistrator;
-import tigase.server.Command;
-import tigase.server.MessageRouter;
 import tigase.server.Packet;
 import tigase.server.ServerComponent;
 import tigase.xml.Element;
-import tigase.xml.XMLUtils;
-import tigase.xmpp.StanzaType;
-import tigase.util.ElementUtils;
 import tigase.util.JIDUtils;
 
 /**
@@ -63,6 +55,7 @@ public class ClusterController
 	//private ServiceEntity stats_modules = null;
 	private Level statsLevel = Level.INFO;
 
+	@Override
 	public void setName(String name) {
 		super.setName(name);
 		serviceEntity = new ServiceEntity(name, "load", "Server clustering");

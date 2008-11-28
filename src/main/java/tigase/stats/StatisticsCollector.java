@@ -25,7 +25,6 @@ package tigase.stats;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,7 +33,6 @@ import tigase.disco.ServiceIdentity;
 import tigase.disco.XMPPService;
 import tigase.server.AbstractComponentRegistrator;
 import tigase.server.Command;
-import tigase.server.MessageRouter;
 import tigase.server.Packet;
 import tigase.server.ServerComponent;
 import tigase.xml.Element;
@@ -65,6 +63,7 @@ public class StatisticsCollector
 	//private ServiceEntity stats_modules = null;
 	private Level statsLevel = Level.INFO;
 
+	@Override
 	public void setName(String name) {
 		super.setName(name);
 		serviceEntity = new ServiceEntity(name, "stats", "Server statistics");
@@ -198,7 +197,8 @@ public class StatisticsCollector
 	public 	List<Element> getDiscoFeatures() { return null; }
 
 	public List<Element> getDiscoItems(String node, String jid) {
-		if (getName().equals(JIDUtils.getNodeNick(jid)) || getComponentId().equals(jid)) {
+		if (getName().equals(JIDUtils.getNodeNick(jid)) ||
+						getComponentId().equals(jid)) {
 			List<Element> items = serviceEntity.getDiscoItems(node, jid);
 			log.finest("Processing discoItems for node: " + node + ", result: "
 				+ (items == null ? null : items.toString()));

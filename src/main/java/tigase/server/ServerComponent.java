@@ -54,7 +54,10 @@ public interface ServerComponent {
 	 * instantly without waiting for any resources.
 	 *
 	 * @param packet a <code>Packet</code> value
+	 * @param results
 	 */
 	void processPacket(Packet packet, Queue<Packet> results);
+
+	void initializationCompleted();
 
 }

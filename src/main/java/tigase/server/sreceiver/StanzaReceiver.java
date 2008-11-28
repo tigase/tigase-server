@@ -355,6 +355,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	 *
 	 * @param props a <code>Map</code> value
 	 */
+	@Override
 	public void setProperties(final Map<String, Object> props) {
 		super.setProperties(props);
 
@@ -381,7 +382,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		admins = (String[])props.get(ADMINS_PROP_KEY);
 		Arrays.sort(admins);
 		my_hostname = (String)props.get(MY_DOMAIN_NAME_PROP_KEY);
-		addRouting(my_hostname);
+//		addRouting(my_hostname);
 
 		try {
 			String cls_name = (String)props.get(SREC_REPO_CLASS_PROP_KEY);
@@ -437,6 +438,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
       new HashSet<String>(Arrays.asList((String[])props.get(LOCAL_DOMAINS_PROP_KEY)));
 	}
 
+	@Override
 	public Map<String, Object> getDefaults(final Map<String, Object> params) {
 		Map<String, Object> defs = super.getDefaults(params);
 

@@ -48,7 +48,6 @@ public abstract class AbstractComponentRegistrator<E extends ServerComponent>
 	 */
 	public AbstractComponentRegistrator() {}
 
-
 	public abstract boolean isCorrectType(ServerComponent component);
 
 	@SuppressWarnings("unchecked")
@@ -93,6 +92,9 @@ public abstract class AbstractComponentRegistrator<E extends ServerComponent>
 	public String getComponentId() {
 		return componentId;
 	}
+
+	@Override
+	public void initializationCompleted() {}
 
 	public abstract void componentRemoved(E component);
 

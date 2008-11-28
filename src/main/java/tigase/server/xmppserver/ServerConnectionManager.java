@@ -534,10 +534,17 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 		return props;
 	}
 
+	@Override
 	protected int[] getDefPlainPorts() {
 		return new int[] {5269};
 	}
 
+	@Override
+	public boolean handlesNonLocalDomains() {
+		return true;
+	}
+
+	@Override
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
 		hostnames = (String[])props.get(HOSTNAMES_PROP_KEY);
@@ -547,7 +554,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 		} // end of if (hostnames == null || hostnames.length == 0)
 		Arrays.sort(hostnames);
 
-		addRouting("*");
+//		addRouting("*");
 		maxPacketWaitingTime = (Long)props.get(MAX_PACKET_WAITING_TIME_PROP_KEY);
 	}
 

@@ -22,21 +22,14 @@
 
 package tigase.server;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.Collections;
-import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.LinkedHashSet;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Logger;
 import java.util.logging.Level;
@@ -50,8 +43,6 @@ import tigase.disco.XMPPService;
 import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
 import tigase.stats.StatRecord;
-import tigase.stats.StatisticType;
-import tigase.stats.StatisticsContainer;
 
 import static tigase.server.MessageRouterConfig.*;
 
@@ -77,7 +68,7 @@ public class MessageRouter extends AbstractMessageReceiver {
 
 	private static final long startupTime = System.currentTimeMillis();
 
-	private Set<String> localAddresses =	new CopyOnWriteArraySet<String>();
+//	private Set<String> localAddresses =	new CopyOnWriteArraySet<String>();
 	private String disco_name = DISCO_NAME_PROP_VAL;
 	private boolean disco_show_version = DISCO_SHOW_VERSION_PROP_VAL;
 
@@ -134,8 +125,24 @@ public class MessageRouter extends AbstractMessageReceiver {
 		}
 	}
 
+	@Override
 	protected Integer getMaxQueueSize(int def) {
 		return def*10;
+	}
+
+	private ServerComponent[] getServerComponentsForRegex(String id) {
+		LinkedHashSet<ServerComponent> comps = new LinkedHashSet<ServerComponent>();
+		for (MessageReceiver mr: receivers.values()) {
+			if (mr.isInRegexRoutings(id)) {
+				log.finest("Found receiver: " + mr.getName());
+				comps.add(mr);
+			}
+		}
+		if (comps.size() > 0) {
+			return comps.toArray(new ServerComponent[comps.size()]);
+		} else {
+			return null;
+		}
 	}
 
 	private ServerComponent getLocalComponent(String jid) {
@@ -167,9 +174,9 @@ public class MessageRouter extends AbstractMessageReceiver {
 // 		return null;
 // 	}
 
-	private boolean isLocalDomain(String domain) {
-		return localAddresses.contains(domain);
-	}
+//	private boolean isLocalDomain(String domain) {
+//		return localAddresses.contains(domain);
+//	}
 
 	public void processPacket(Packet packet) {
 
@@ -207,12 +214,12 @@ public class MessageRouter extends AbstractMessageReceiver {
 		// There is a need to process packets with the same from and to address
 		// let't try to relax restriction and block all packets with error type
 		// 2008-06-16
-		if ((packet.getFrom() != null
-				&& packet.getFrom().equals(packet.getTo())
-				&& packet.getType() == StanzaType.error)
-			|| (packet.getFrom() == NULL_ROUTING
-				&& packet.getElemFrom() != null
-				&& packet.getElemFrom().equals(packet.getTo()))) {
+		if ((packet.getFrom() != null &&
+						packet.getFrom().equals(packet.getTo()) &&
+						packet.getType() == StanzaType.error) ||
+						(packet.getFrom() == NULL_ROUTING &&
+						packet.getElemFrom() != null &&
+						packet.getElemFrom().equals(packet.getTo()))) {
 			log.warning("Possible infinite loop, dropping packet: "
 				+ packet.toString());
 			return;
@@ -220,9 +227,10 @@ public class MessageRouter extends AbstractMessageReceiver {
 
 		ServerComponent comp = packet.getElemTo() == null ? null
       : getLocalComponent(packet.getElemTo());
-		if (!(comp instanceof DisableDisco) && packet.isServiceDisco()
-			&& packet.getType() != null && packet.getType() == StanzaType.get
-			&& (comp != null || isLocalDomain(packet.getElemTo()))) {
+		if (packet.isServiceDisco() && packet.getType() != null &&
+						packet.getType() == StanzaType.get &&
+						((comp != null && !(comp instanceof DisableDisco)) ||
+						isLocalDomain(packet.getElemTo()))) {
 			log.finest("Processing disco query by: " + getComponentId());
 			Queue<Packet> results = new LinkedList<Packet>();
 			processDiscoQuery(packet, results);
@@ -235,8 +243,6 @@ public class MessageRouter extends AbstractMessageReceiver {
 			return;
 		}
 		String id =  JIDUtils.getNodeID(packet.getTo());
-		String host = JIDUtils.getNodeHost(packet.getTo());
-		String nick = JIDUtils.getNodeNick(packet.getTo());
 		comp = getLocalComponent(id);
 		if (comp != null) {
 			log.finest("Packet is processing by: " + comp.getComponentId());
@@ -258,62 +264,108 @@ public class MessageRouter extends AbstractMessageReceiver {
 
 		// Let's try to find message receiver quick way
 		// In case if packet is handled internally:
-		MessageReceiver first = null;
-		if (nick != null) {
-			first = receivers.get(nick);
-		} // end of if (nick != null)
-		if (first != null && host.equals(getDefHostName())) {
-			log.finest("Found receiver: " + first.getName());
-			first.addPacketNB(packet);
-			return;
-		} // end of if (mr != null)
+//		String nick = JIDUtils.getNodeNick(packet.getTo());
+		String host = JIDUtils.getNodeHost(packet.getTo());
+//		MessageReceiver first = null;
+		// Below code probably never get's executed anyway.
+		// All components included in commented code below should
+		// be picked up by code above.
+//		if (nick != null) {
+//			first = receivers.get(nick);
+//		} // end of if (nick != null)
+//		if (first != null && host.equals(getDefHostName())) {
+//			log.finest("Found receiver: " + first.getName());
+//			first.addPacketNB(packet);
+//			return;
+//		} // end of if (mr != null)
 		// This packet is not processed localy, so let's find receiver
 		// which will send it to correct destination:
-		MessageReceiver s2s = null;
-		for (MessageReceiver mr: receivers.values()) {
-			Set<String> routings = mr.getRoutings();
-			if (routings != null) {
-				log.finest(mr.getName() + ": Looking for host: " + host +
-					" in " + routings.toString());
-				if (routings.contains(host) || routings.contains(id)) {
-					log.finest("Found receiver: " + mr.getName());
-					mr.addPacketNB(packet);
-					return;
-				} // end of if (routings.contains())
-				// Resolve wildchars routings....
-				if (mr.isInRegexRoutings(id)) {
-					log.finest("Found receiver: " + mr.getName());
-					mr.addPacketNB(packet);
-					return;
+
+		ServerComponent[] comps = getComponentsForLocalDomain(host);
+		if (comps == null) {
+			comps = getServerComponentsForRegex(id);
+		}
+		if (comps == null && !isLocalDomain(host)) {
+			comps = getComponentsForNonLocalDomain(host);
+		}
+		if (comps != null) {
+			Queue<Packet> results = new LinkedList<Packet>();
+			for (ServerComponent serverComponent : comps) {
+				serverComponent.processPacket(packet, results);
+				if (results.size() > 0) {
+					for (Packet res : results) {
+						// No more recurrential calls!!
+						addOutPacketNB(res);
+					//					processPacket(res);
+					} // end of for ()
 				}
-				if (routings.contains("*")) {
-					// I found s2s receiver, remember it for later....
-					s2s = mr;
-				} // end of if (routings.contains())
-			} // end of if (routings != null)
-			else {
-				log.severe("Routings are null for: " + mr.getName());
-			} // end of if (routings != null) else
-		} // end of for (MessageReceiver mr: receivers.values())
-		// It is not for any local host, so maybe it is for some
-		// remote server, let's try sending it through s2s service:
-		if (localAddresses.contains(host) || comp != null) {
+			}
+		} else {
 			try {
 				addOutPacketNB(
-					Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
-						"Your request can not be processed.", true));
+					Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet,
+						"There is no service found to process your request.", true));
 			} catch (PacketErrorTypeException e) {
 				// This packet is to local domain, we don't want to send it out
 				// drop packet :-(
 				log.warning("Can't process packet to local domain, dropping..."
 					+ packet.toString());
 			}
-			return;
 		}
-		if (s2s != null) {
-			s2s.addPacketNB(packet);
-		} // end of if (s2s != null)
+
+//		MessageReceiver s2s = null;
+//		for (MessageReceiver mr: receivers.values()) {
+//			Set<String> routings = mr.getRoutings();
+//			if (routings != null) {
+//				log.finest(mr.getName() + ": Looking for host: " + host +
+//					" in " + routings.toString());
+//				if (routings.contains(host) || routings.contains(id)) {
+//					log.finest("Found receiver: " + mr.getName());
+//					mr.addPacketNB(packet);
+//					return;
+//				} // end of if (routings.contains())
+//				// Resolve wildchars routings....
+//				if (mr.isInRegexRoutings(id)) {
+//					log.finest("Found receiver: " + mr.getName());
+//					mr.addPacketNB(packet);
+//					return;
+//				}
+//				if (routings.contains("*")) {
+//					// I found s2s receiver, remember it for later....
+//					s2s = mr;
+//				} // end of if (routings.contains())
+//			} // end of if (routings != null)
+//			else {
+//				log.severe("Routings are null for: " + mr.getName());
+//			} // end of if (routings != null) else
+//		} // end of for (MessageReceiver mr: receivers.values())
+//		// It is not for any local host, so maybe it is for some
+//		// remote server, let's try sending it through s2s service:
+//		if (localAddresses.contains(host) || comp != null) {
+//			try {
+//				addOutPacketNB(
+//					Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
+//						"Your request can not be processed.", true));
+//			} catch (PacketErrorTypeException e) {
+//				// This packet is to local domain, we don't want to send it out
+//				// drop packet :-(
+//				log.warning("Can't process packet to local domain, dropping..."
+//					+ packet.toString());
+//			}
+//			return;
+//		}
+//		if (s2s != null) {
+//			s2s.addPacketNB(packet);
+//		} // end of if (s2s != null)
   }
+
+	private ServerComponent[] getComponentsForLocalDomain(String domain) {
+		return vHostManager.getComponentsForLocalDomain(domain);
+	}
+
+	private ServerComponent[] getComponentsForNonLocalDomain(String domain) {
+		return vHostManager.getComponentsForNonLocalDomain(domain);
+	}
 
   public void setConfig(ComponentRegistrator config) {
     components.put(getName(), this);
@@ -354,6 +406,7 @@ public class MessageRouter extends AbstractMessageReceiver {
 		}
   }
 
+	@Override
   public Map<String, Object> getDefaults(Map<String, Object> params) {
     Map<String, Object> defs = super.getDefaults(params);
     MessageRouterConfig.getDefaults(defs, params, getName());
@@ -361,6 +414,7 @@ public class MessageRouter extends AbstractMessageReceiver {
   }
 
   private boolean inProperties = false;
+	@Override
   public void setProperties(Map<String, Object> props) {
 
     if (inProperties) {
@@ -382,12 +436,12 @@ public class MessageRouter extends AbstractMessageReceiver {
 
     try {
       super.setProperties(props);
-			String[] localAddresses = (String[])props.get(LOCAL_ADDRESSES_PROP_KEY);
-			this.localAddresses.clear();
-			if (localAddresses != null && localAddresses.length > 0) {
-				Collections.addAll(this.localAddresses, localAddresses);
-				this.localAddresses.add(getDefHostName());
-			}
+//			String[] localAddresses = (String[])props.get(LOCAL_ADDRESSES_PROP_KEY);
+//			this.localAddresses.clear();
+//			if (localAddresses != null && localAddresses.length > 0) {
+//				Collections.addAll(this.localAddresses, localAddresses);
+//				this.localAddresses.add(getDefHostName());
+//			}
       Map<String, ComponentRegistrator> tmp_reg = registrators;
       Map<String, MessageReceiver> tmp_rec = receivers;
       components = new TreeMap<String, ServerComponent>();
@@ -454,6 +508,9 @@ public class MessageRouter extends AbstractMessageReceiver {
     } finally {
       inProperties = false;
     } // end of try-finally
+		for (ServerComponent comp : components.values()) {
+			comp.initializationCompleted();
+		}
   }
 
 	private void stopUpdatesChecker() {
@@ -542,6 +599,7 @@ public class MessageRouter extends AbstractMessageReceiver {
 		return null;
 	}
 
+	@Override
 	public List<StatRecord> getStatistics() {
 		List<StatRecord> stats = super.getStatistics();
     long uptime = (System.currentTimeMillis() - startupTime);

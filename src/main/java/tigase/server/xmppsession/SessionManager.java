@@ -23,7 +23,6 @@
 package tigase.server.xmppsession;
 
 //import tigase.auth.TigaseConfiguration;
-import java.net.UnknownHostException;
 import java.security.Security;
 import java.util.Arrays;
 import java.util.Collection;
@@ -32,16 +31,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.LinkedHashMap;
 import java.util.Queue;
-import java.util.TreeMap;
-import java.util.Set;
-import java.util.HashSet;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.security.auth.login.AppConfigurationEntry.LoginModuleControlFlag;
-import javax.security.auth.login.AppConfigurationEntry;
-import javax.security.auth.login.Configuration;
 import tigase.auth.LoginHandler;
 import tigase.auth.TigaseSaslProvider;
 import tigase.conf.Configurable;
@@ -57,13 +50,10 @@ import tigase.disco.ServiceIdentity;
 import tigase.disco.XMPPService;
 import tigase.server.AbstractMessageReceiver;
 import tigase.server.Command;
-import tigase.server.MessageReceiver;
-import tigase.server.MessageRouter;
 import tigase.server.Packet;
 import tigase.server.Permissions;
 import tigase.server.XMPPServer;
 import tigase.stats.StatRecord;
-import tigase.util.ElementUtils;
 import tigase.util.JIDUtils;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
@@ -71,7 +61,6 @@ import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.ProcessorFactory;
 import tigase.xmpp.StanzaType;
-import tigase.xmpp.XMPPException;
 import tigase.xmpp.XMPPPostprocessorIfc;
 import tigase.xmpp.XMPPPreprocessorIfc;
 import tigase.xmpp.XMPPProcessorIfc;
@@ -107,7 +96,7 @@ public class SessionManager extends AbstractMessageReceiver
 	private NonAuthUserRepository naUserRepository = null;
 	private PacketFilter filter = null;
 
-	private String[] hostnames = {"localhost"};
+	//private String[] hostnames = {"localhost"};
 	private String[] admins = {"admin@localhost"};
 	private String[] trusted = {"admin@localhost"};
 	//private String[] anon_peers = {"admin@localhost"};
@@ -128,14 +117,15 @@ public class SessionManager extends AbstractMessageReceiver
 	private Map<String, Map<String, Object>> plugin_config =
 		new ConcurrentSkipListMap<String, Map<String, Object>>();
 
-	private Set<String> anonymous_domains = new HashSet<String>();
+	//private Set<String> anonymous_domains = new HashSet<String>();
 
-	private XMPPResourceConnection serverSession = null;
+	//private XMPPResourceConnection serverSession = null;
 
 	private ServiceEntity serviceEntity = null;
 
 	private long closedConnections = 0;
 
+	@Override
 	public void setName(String name) {
 		super.setName(name);
 		serviceEntity = new ServiceEntity(name, "sm", "Session manager");
@@ -143,11 +133,11 @@ public class SessionManager extends AbstractMessageReceiver
 			new ServiceIdentity("component", "sm", "Session manager"));
 	}
 
-	private void debug_packet(String msg, Packet packet, String to) {
-		if (packet.getElemTo().equals(to)) {
-			log.finest(msg + ", packet: " + packet.getStringData());
-		}
-	}
+//	private void debug_packet(String msg, Packet packet, String to) {
+//		if (packet.getElemTo().equals(to)) {
+//			log.finest(msg + ", packet: " + packet.getStringData());
+//		}
+//	}
 
 	protected XMPPResourceConnection getXMPPResourceConnection(String connId) {
 		return connectionsByFrom.get(connId);
@@ -210,7 +200,8 @@ public class SessionManager extends AbstractMessageReceiver
 			return;
 		} // end of if (pc.isCommand())
 		XMPPResourceConnection conn = getXMPPResourceConnection(packet);
-		if (conn == null && (isBrokenPacket(packet) || processAdminsOrDomains(packet))) {
+		if (conn == null && (isBrokenPacket(packet) ||
+						processAdminsOrDomains(packet))) {
 			return;
 		}
 		processPacket(packet, conn);
@@ -274,7 +265,7 @@ public class SessionManager extends AbstractMessageReceiver
 			} // end of for (XMPPPostprocessorIfc postproc: postProcessors)
 		} // end of if (!stop)
 
-		if (!stop && !packet.wasProcessed() && !isInRoutings(packet.getElemTo())
+		if (!stop && !packet.wasProcessed() && !isLocalDomain(packet.getElemTo())
 			&& filter.process(packet, conn, naUserRepository, results)) {
 			packet.processedBy("filter-process");
 		}
@@ -354,9 +345,9 @@ public class SessionManager extends AbstractMessageReceiver
 		}
 	}
 
-	protected String[] getVHosts() {
-		return hostnames;
-	}
+//	protected String[] getVHosts() {
+//		return hostnames;
+//	}
 
 	private boolean isAdmin(String jid) {
 		for (String adm: admins) {
@@ -378,7 +369,7 @@ public class SessionManager extends AbstractMessageReceiver
 
 	protected boolean processAdminsOrDomains(Packet packet) {
 		final String to = packet.getElemTo();
-		if (isInRoutings(to)) {
+		if (isLocalDomain(to)) {
 			if (packet.getElemName().equals("message")) {
 				// Yes this packet is for admin....
 				log.finer("Packet for admin: " + packet.getStringData());
@@ -473,8 +464,14 @@ public class SessionManager extends AbstractMessageReceiver
 		return connection;
 	}
 
+	@Override
 	protected Integer getMaxQueueSize(int def) {
 		return def*10;
+	}
+
+	private boolean isAnonymousEnabled(String domain) {
+		return vHostManager != null ? vHostManager.isAnonymousEnabled(domain) : 
+			false;
 	}
 
 	protected boolean processCommand(Packet pc) {
@@ -491,7 +488,7 @@ public class SessionManager extends AbstractMessageReceiver
 				final String hostname = Command.getFieldValue(pc, "hostname");
 				connection = new XMPPResourceConnection(pc.getFrom(),
 					user_repository, auth_repository, this,
-					anonymous_domains.contains(hostname));
+					isAnonymousEnabled(hostname));
 				if (hostname != null) {
 					log.finest("Setting hostname " + hostname
 						+ " for connection: " + connection.getConnectionId());
@@ -758,7 +755,7 @@ public class SessionManager extends AbstractMessageReceiver
 	protected boolean checkOutPacket(Packet packet) {
 		if (packet.getPermissions() == Permissions.ANONYM) {
 			if (packet.getElemTo() != null
-				&& !anonymous_domains.contains(JIDUtils.getNodeHost(packet.getElemTo()))) {
+				&& !isLocalDomain(JIDUtils.getNodeHost(packet.getElemTo()))) {
 				try {
 					addPacket(Authorization.FORBIDDEN.getResponseMessage(packet,
 							"Anonymous user can only send local messages.", true));
@@ -776,6 +773,7 @@ public class SessionManager extends AbstractMessageReceiver
 		return true;
 	}
 
+	@Override
 	protected boolean addOutPacket(Packet packet) {
 		if (checkOutPacket(packet)) {
 			return super.addOutPacket(packet);
@@ -787,6 +785,7 @@ public class SessionManager extends AbstractMessageReceiver
 		return super.addOutPacket(packet);
 	}
 
+	@Override
 	protected boolean addOutPackets(Queue<Packet> packets) {
 		Packet packet = null;
 		while ((packet = packets.poll()) != null) {
@@ -795,9 +794,9 @@ public class SessionManager extends AbstractMessageReceiver
 		return true;
 	}
 
-	private XMPPSession getXMPPSession(Packet p) {
-		return connectionsByFrom.get(p.getFrom()).getParentSession();
-	}
+//	private XMPPSession getXMPPSession(Packet p) {
+//		return connectionsByFrom.get(p.getFrom()).getParentSession();
+//	}
 
 	private List<Element> getFeatures(XMPPResourceConnection session) {
 		List<Element> results = new LinkedList<Element>();
@@ -810,6 +809,7 @@ public class SessionManager extends AbstractMessageReceiver
 		return results;
 	}
 
+	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> props = super.getDefaults(params);
 		SessionManagerConfig.getDefaults(props, params);
@@ -939,23 +939,28 @@ public class SessionManager extends AbstractMessageReceiver
 				plugin_config.put(comp_id, plugin_settings);
 			}
 		} // end of for (String comp_id: plugins)
-		hostnames = (String[])props.get(HOSTNAMES_PROP_KEY);
-		clearRoutings();
-		for (String host: hostnames) {
-			addRouting(host);
-// 			XMPPResourceConnection conn = createUserSession(NULL_ROUTING, host, host);
-// 			conn.setDummy(true);
-		} // end of for ()
-		addRouting(getComponentId());
- 		serverSession = createUserSession(NULL_ROUTING, getDefHostName(),
- 			getComponentId() + "/server");
-		anonymous_domains.clear();
-		anonymous_domains.addAll(
-			Arrays.asList((String[])props.get(ANONYMOUS_DOMAINS_PROP_KEY)));
+//		hostnames = (String[])props.get(HOSTNAMES_PROP_KEY);
+//		clearRoutings();
+//		for (String host: hostnames) {
+//			addRouting(host);
+//// 			XMPPResourceConnection conn = createUserSession(NULL_ROUTING, host, host);
+//// 			conn.setDummy(true);
+//		} // end of for ()
+//		addRouting(getComponentId());
+//		anonymous_domains.clear();
+//		anonymous_domains.addAll(
+//			Arrays.asList((String[])props.get(ANONYMOUS_DOMAINS_PROP_KEY)));
+// 		serverSession =
+		createUserSession(NULL_ROUTING, getDefHostName(),
+						getComponentId() + "/server");
 		admins = (String[])props.get(ADMINS_PROP_KEY);
 		trusted = (String[])props.get(TRUSTED_PROP_KEY);
 		//anon_peers = (String[])props.get(ANONYMOUS_PEERS_PROP_KEY);
 		//Arrays.sort(anon_peers);
+	}
+
+	public boolean handlesLocalDomains() {
+		return true;
 	}
 
 	protected void registerNewSession(String userId, XMPPResourceConnection conn) {

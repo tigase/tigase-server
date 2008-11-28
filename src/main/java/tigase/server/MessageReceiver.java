@@ -48,7 +48,7 @@ public interface MessageReceiver extends ServerComponent {
 //    */
 //   String[] getLocalAddresses();
 
-	Set<String> getRoutings();
+	//Set<String> getRoutings();
 
 	boolean isInRegexRoutings(String address);
 

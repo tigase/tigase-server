@@ -23,24 +23,17 @@
 package tigase.server.xmppclient;
 
 import java.io.IOException;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.Arrays;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
-import java.util.TreeMap;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.server.Command;
 import tigase.server.ConnectionManager;
-import tigase.server.MessageReceiver;
 import tigase.server.Packet;
-import tigase.disco.XMPPService;
 import tigase.util.DNSResolver;
 import tigase.util.JIDUtils;
 import tigase.util.RoutingsContainer;
@@ -75,17 +68,18 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 	private static final String ROUTING_MODE_PROP_KEY = "multi-mode";
 	private static final boolean ROUTING_MODE_PROP_VAL = true;
 	private static final String ROUTING_ENTRY_PROP_KEY = ".+";
-	private static final String ROUTING_ENTRY_PROP_VAL = DEF_SM_NAME + "@localhost";
+	//private static final String ROUTING_ENTRY_PROP_VAL = DEF_SM_NAME + "@localhost";
 
-	public static final String HOSTNAMES_PROP_KEY = "hostnames";
-	public String[] HOSTNAMES_PROP_VAL =	{"localhost", "hostname"};
+	//public static final String HOSTNAMES_PROP_KEY = "hostnames";
+	//public String[] HOSTNAMES_PROP_VAL =	{"localhost", "hostname"};
 
 	protected RoutingsContainer routings = null;
-	protected Set<String> hostnames = new TreeSet<String>();
+	//protected Set<String> hostnames = new TreeSet<String>();
 
 	private Map<String, XMPPProcessorIfc> processors =
 		new ConcurrentSkipListMap<String, XMPPProcessorIfc>();
 
+	@Override
 	public void processPacket(final Packet packet) {
 		log.finer("Processing packet: " + packet.getElemName()
 			+ ", type: " + packet.getType());
@@ -189,7 +183,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 		String command_sessionId, XMPPIOService serv) {
 		if (serv != null) {
 			String serv_sessionId =
-          (String)serv.getSessionData().get(serv.SESSION_ID_KEY);
+          (String)serv.getSessionData().get(XMPPIOService.SESSION_ID_KEY);
 			if (serv_sessionId.equals(command_sessionId)) {
 				String old_receiver = serv.getDataReceiver();
 				serv.setDataReceiver(newAddress);
@@ -226,12 +220,12 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> props = super.getDefaults(params);
-		if (params.get(GEN_VIRT_HOSTS) != null) {
-			HOSTNAMES_PROP_VAL = ((String)params.get(GEN_VIRT_HOSTS)).split(",");
-		} else {
-			HOSTNAMES_PROP_VAL = DNSResolver.getDefHostNames();
-		}
-		props.put(HOSTNAMES_PROP_KEY, HOSTNAMES_PROP_VAL);
+//		if (params.get(GEN_VIRT_HOSTS) != null) {
+//			HOSTNAMES_PROP_VAL = ((String)params.get(GEN_VIRT_HOSTS)).split(",");
+//		} else {
+//			HOSTNAMES_PROP_VAL = DNSResolver.getDefHostNames();
+//		}
+//		props.put(HOSTNAMES_PROP_KEY, HOSTNAMES_PROP_VAL);
 		Boolean r_mode = (Boolean)params.get(getName() + "/" + ROUTINGS_PROP_KEY
 			+ "/" + ROUTING_MODE_PROP_KEY);
 		if (r_mode == null) {
@@ -268,13 +262,13 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 					(String)entry.getValue());
 			} // end of if (entry.getKey().startsWith(ROUTINGS_PROP_KEY + "/"))
 		} // end of for ()
-		String[] hnames = (String[])props.get(HOSTNAMES_PROP_KEY);
-		clearRoutings();
-		hostnames.clear();
-		for (String host: hnames) {
-			addRouting(getName() + "@" + host);
-			hostnames.add(host);
-		} // end of for ()
+//		String[] hnames = (String[])props.get(HOSTNAMES_PROP_KEY);
+//		clearRoutings();
+//		hostnames.clear();
+//		for (String host: hnames) {
+//			addRouting(getName() + "@" + host);
+//			hostnames.add(host);
+//		} // end of for ()
 	}
 
 	private XMPPResourceConnection getXMPPSession(Packet p) {
@@ -314,10 +308,10 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 		if (lang == null) {
 			lang = "en";
 		}
-		String id = (String)serv.getSessionData().get(serv.SESSION_ID_KEY);
+		String id = (String)serv.getSessionData().get(XMPPIOService.SESSION_ID_KEY);
 		if (id == null) {
 			id = UUID.randomUUID().toString();
-			serv.getSessionData().put(serv.SESSION_ID_KEY, id);
+			serv.getSessionData().put(XMPPIOService.SESSION_ID_KEY, id);
 			serv.setXMLNS(XMLNS);
 		}
 		if (hostname == null) {
@@ -334,7 +328,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 				;
 		} // end of if (hostname == null)
 
-		if (!hostnames.contains(hostname)) {
+		if (!isLocalDomain(hostname)) {
 			return "<?xml version='1.0'?><stream:stream"
 				+ " xmlns='" + XMLNS + "'"
 				+ " xmlns:stream='http://etherx.jabber.org/streams'"
@@ -355,7 +349,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 				+ " from='" + hostname + "'"
 				+ " id='" + id + "'"
 				+ " version='1.0' xml:lang='en'>");
-			serv.getSessionData().put(serv.HOSTNAME_KEY, hostname);
+			serv.getSessionData().put(XMPPIOService.HOSTNAME_KEY, hostname);
 			serv.setDataReceiver(routings.computeRouting(hostname));
 			Packet streamOpen = Command.STREAM_OPENED.getPacket(
 				getFromAddress(getUniqueId(serv)),
@@ -376,6 +370,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 		return null;
 	}
 
+	@Override
 	public void serviceStopped(XMPPIOService service) {
 		super.serviceStopped(service);
 		if (service.getXMLNS() == XMLNS) {

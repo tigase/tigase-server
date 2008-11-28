@@ -87,11 +87,11 @@ public class Gateway extends AbstractMessageReceiver
 	private static final String PRESENCE_TYPE = "presence-type";
 	private static final String PRESENCE_SHOW = "presence-show";
 	private static final String PRESENCE_ELNAME = "presence";
-	public static final String HOSTNAMES_PROP_KEY = "hostnames";
-	public String[] HOSTNAMES_PROP_VAL =	{"localhost", "hostname"};
+//	public static final String HOSTNAMES_PROP_KEY = "hostnames";
+//	public String[] HOSTNAMES_PROP_VAL =	{"localhost", "hostname"};
 
 	private String[] ADMINS_PROP_VAL =	{"admin@localhost", "admin@hostname"};
-	private String[] hostnames = HOSTNAMES_PROP_VAL;
+//	private String[] hostnames = HOSTNAMES_PROP_VAL;
 
 	private ServiceEntity serviceEntity = null;
 	private String[] admins = ADMINS_PROP_VAL;
@@ -106,19 +106,20 @@ public class Gateway extends AbstractMessageReceiver
 		new LinkedHashMap<String, GatewayConnection>();
 	
 
+	@Override
 	public void setProperties(final Map<String, Object> props) {
 		super.setProperties(props);
 
-		hostnames = (String[])props.get(HOSTNAMES_PROP_KEY);
-		if (hostnames == null || hostnames.length == 0) {
-			log.warning("Hostnames definition is empty, setting 'localhost'");
-			hostnames = new String[] {getName() + ".localhost"};
-		} // end of if (hostnames == null || hostnames.length == 0)
-		Arrays.sort(hostnames);
-		clearRoutings();
-		for (String host: hostnames) {
-			addRouting(host);
-		} // end of for ()
+//		hostnames = (String[])props.get(HOSTNAMES_PROP_KEY);
+//		if (hostnames == null || hostnames.length == 0) {
+//			log.warning("Hostnames definition is empty, setting 'localhost'");
+//			hostnames = new String[] {getName() + ".localhost"};
+//		} // end of if (hostnames == null || hostnames.length == 0)
+//		Arrays.sort(hostnames);
+//		clearRoutings();
+//		for (String host: hostnames) {
+//			addRouting(host);
+//		} // end of for ()
 
 		gw_class_name = (String)props.get(GW_CLASS_NAME_PROP_KEY);
 		GatewayConnection gc = gwInstance();
@@ -158,6 +159,7 @@ public class Gateway extends AbstractMessageReceiver
 		} // end of try-catch
 	}
 
+	@Override
 	public Map<String, Object> getDefaults(final Map<String, Object> params) {
 		Map<String, Object> defs = super.getDefaults(params);
 
@@ -195,17 +197,17 @@ public class Gateway extends AbstractMessageReceiver
 		defs.put(GW_MODERATED_PROP_KEY, GW_MODERATED_PROP_VAL);
 		defs.put(GW_DOMAIN_NAME_PROP_KEY, GW_DOMAIN_NAME_PROP_VAL);
 
-		if (params.get(GEN_VIRT_HOSTS) != null) {
-			HOSTNAMES_PROP_VAL = ((String)params.get(GEN_VIRT_HOSTS)).split(",");
-		} else {
-			HOSTNAMES_PROP_VAL = DNSResolver.getDefHostNames();
-		}
-		hostnames = new String[HOSTNAMES_PROP_VAL.length];
-		int i = 0;
-		for (String host: HOSTNAMES_PROP_VAL) {
-			hostnames[i++] = getName() + "." + host;
-		}
-		defs.put(HOSTNAMES_PROP_KEY, hostnames);
+//		if (params.get(GEN_VIRT_HOSTS) != null) {
+//			HOSTNAMES_PROP_VAL = ((String)params.get(GEN_VIRT_HOSTS)).split(",");
+//		} else {
+//			HOSTNAMES_PROP_VAL = DNSResolver.getDefHostNames();
+//		}
+//		hostnames = new String[HOSTNAMES_PROP_VAL.length];
+//		int i = 0;
+//		for (String host: HOSTNAMES_PROP_VAL) {
+//			hostnames[i++] = getName() + "." + host;
+//		}
+//		defs.put(HOSTNAMES_PROP_KEY, hostnames);
 
 		return defs;
 	}
@@ -307,7 +309,9 @@ public class Gateway extends AbstractMessageReceiver
 	}
 
 	private void processPresence(Packet packet) {
-		if (Arrays.binarySearch(hostnames, packet.getElemTo()) >= 0) {
+		if (packet.getElemTo().startsWith(getName() + ".") &&
+						!packet.getElemTo().contains("@")) {
+//		if (Arrays.binarySearch(hostnames, packet.getElemTo()) >= 0) {
 			if (packet.getType() == null || packet.getType() == StanzaType.available) {
 				// Open new connection if it does not exist
 				findConnection(packet, true);

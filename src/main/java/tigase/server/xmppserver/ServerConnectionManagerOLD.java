@@ -543,7 +543,7 @@ public class ServerConnectionManagerOLD extends ConnectionManager<XMPPIOService>
 		} // end of if (hostnames == null || hostnames.length == 0)
 		Arrays.sort(hostnames);
 
-		addRouting("*");
+		//addRouting("*");
 		maxPacketWaitingTime = (Long)props.get(MAX_PACKET_WAITING_TIME_PROP_KEY);
 	}
 

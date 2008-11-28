@@ -29,11 +29,8 @@ import java.util.Set;
 import java.util.LinkedHashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Arrays;
 import java.util.LinkedList;
-import java.util.ArrayList;
 import java.util.Timer;
-import java.util.TimerTask;
 import java.util.Date;
 
 //import tigase.cluster.methodcalls.SessionTransferMC;
@@ -42,7 +39,6 @@ import tigase.server.Command;
 import tigase.util.JIDUtils;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.Authorization;
-import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.ConnectionStatus;
 import tigase.xmpp.XMPPSession;
@@ -90,6 +86,7 @@ public class SessionManagerClustered extends SessionManager
 	//	private ArrayList<MethodCall> methods = new ArrayList<MethodCall>();
 
 	@SuppressWarnings("unchecked")
+	@Override
 	public void processPacket(Packet packet) {
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Received packet: " + packet.toString());
@@ -405,9 +402,9 @@ public class SessionManagerClustered extends SessionManager
 			// Let's leave custom handling each error type for later...
 			String from = packet.getElemFrom();
 			clel.addVisitedNode(from);
-			//if (cluster_nodes.remove(from)) {
-			//	broken_nodes.add(from);
-			//}
+//			if (cluster_nodes.remove(from)) {
+//				broken_nodes.add(from);
+//			}
 			processPacket(clel);
 			break;
 		default:
@@ -570,16 +567,18 @@ public class SessionManagerClustered extends SessionManager
 			message += "" + (++cnt) + ". " + node;
 		}
 		Packet p_msg = Packet.getMessage("",
-			JIDUtils.getJID(getName(), getVHosts()[0], null), StanzaType.normal,
+			JIDUtils.getJID(getName(), getDefHostName(), null), StanzaType.normal,
 			message, subject, "xyz");
 		sendToAdmins(p_msg);
 	}
 
+	@Override
 	public void release() {
 		delayedTasks.cancel();
 		super.release();
 	}
 
+	@Override
 	public void start() {
 		super.start();
 		delayedTasks = new Timer("SM Cluster Delayed Tasks", true);

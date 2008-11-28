@@ -30,19 +30,18 @@ import java.util.LinkedHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
-import java.util.regex.Matcher;
-import tigase.annotations.TODO;
 import tigase.conf.Configurable;
 import tigase.stats.StatRecord;
 import tigase.stats.StatisticType;
 import tigase.stats.StatisticsContainer;
 import tigase.util.JIDUtils;
 import tigase.util.DNSResolver;
+import tigase.vhosts.VHostListener;
+import tigase.vhosts.VHostManagerIfc;
 
 /**
  * Describe class AbstractMessageReceiver here.
@@ -54,7 +53,7 @@ import tigase.util.DNSResolver;
  * @version $Rev$
  */
 public abstract class AbstractMessageReceiver
-  implements StatisticsContainer, MessageReceiver, Configurable {
+  implements StatisticsContainer, MessageReceiver, Configurable, VHostListener {
 
 	protected static final long SECOND = 1000;
 	protected static final long MINUTE = 60*SECOND;
@@ -90,7 +89,8 @@ public abstract class AbstractMessageReceiver
 	private Thread out_thread = null;
   private boolean stopped = false;
   private String name = null;
-	private Set<String> routings = new CopyOnWriteArraySet<String>();
+	protected VHostManagerIfc vHostManager = null;
+	//private Set<String> routings = new CopyOnWriteArraySet<String>();
 	private Set<Pattern> regexRoutings = new CopyOnWriteArraySet<Pattern>();
 	private long curr_second = 0;
 	private long curr_minute = 0;
@@ -122,6 +122,9 @@ public abstract class AbstractMessageReceiver
 	public String getComponentId() {
 		return compId;
 	}
+	
+	@Override
+	public void initializationCompleted() {}
 
   public boolean addPacketNB(Packet packet) {
 		if (log.isLoggable(Level.FINEST)) {
@@ -263,7 +266,7 @@ public abstract class AbstractMessageReceiver
     setMaxQueueSize(queueSize);
 		defHostname = (String)props.get(DEF_HOSTNAME_PROP_KEY);
 		compId = (String)props.get(COMPONENT_ID_PROP_KEY);
-		addRouting(getComponentId());
+		//addRouting(getComponentId());
   }
 
   public void setMaxQueueSize(int maxQueueSize) {
@@ -366,22 +369,26 @@ public abstract class AbstractMessageReceiver
 		}
 	}
 
-	public void everySecond() {
+	public synchronized void everySecond() {
 		curr_minute -= seconds[sec_idx];
 		seconds[sec_idx] = curr_second;
 		curr_second = 0;
-		curr_minute += seconds[sec_idx++];
-		if (sec_idx >= 60) {
+		curr_minute += seconds[sec_idx];
+		if (sec_idx >= 59) {
 			sec_idx = 0;
+		} else {
+			++sec_idx;
 		}
 	}
 
-	public void everyMinute() {
+	public synchronized void everyMinute() {
 		curr_hour -= minutes[min_idx];
 		minutes[min_idx] = curr_minute;
-		curr_hour += minutes[min_idx++];
-		if (min_idx >= 60) {
+		curr_hour += minutes[min_idx];
+		if (min_idx >= 59) {
 			min_idx = 0;
+		} else {
+			++min_idx;
 		}
 	}
 
@@ -425,29 +432,49 @@ public abstract class AbstractMessageReceiver
 		return defHostname;
 	}
 
-	public Set<String> getRoutings() {
-		return routings;
+	public boolean handlesLocalDomains() {
+		return false;
 	}
+
+	public boolean handlesNameSubdomains() {
+		return true;
+	}
+
+	public boolean handlesNonLocalDomains() {
+		return false;
+	}
+
+	public void setVHostManager(VHostManagerIfc manager) {
+		this.vHostManager = manager;
+	}
+
+	public boolean isLocalDomain(String domain) {
+		return vHostManager != null ? vHostManager.isLocalDomain(domain) : false;
+	}
+
+//	public Set<String> getRoutings() {
+//		return routings;
+//	}
+
+//	public void addRouting(String address) {
+//		routings.add(address);
+//		log.fine(getName() + " - added routing: " + address);
+//	}
+
+//	public boolean removeRouting(String address) {
+//		return routings.remove(address);
+//	}
+
+//	public void clearRoutings() {
+//		routings.clear();
+//	}
+
+//	public boolean isInRoutings(String host) {
+//		return routings.contains(host);
+//	}
 
 	public Set<Pattern> getRegexRoutings() {
 		return regexRoutings;
-	}
-
-	public void addRouting(String address) {
-		routings.add(address);
-		log.fine(getName() + " - added routing: " + address);
-	}
-
-	public boolean removeRouting(String address) {
-		return routings.remove(address);
-	}
-
-	public void clearRoutings() {
-		routings.clear();
-	}
-
-	public boolean isInRoutings(String host) {
-		return routings.contains(host);
 	}
 
 	public void addRegexRouting(String address) {
@@ -495,9 +522,10 @@ public abstract class AbstractMessageReceiver
 		}
 
 		public void run() {
+			Packet packet = null;
 			while (! stopped) {
 				try {
-					Packet packet = queue.take();
+					packet = queue.take();
 					switch (type) {
 					case IN_QUEUE:
 						processPacket(packet);
@@ -521,7 +549,9 @@ public abstract class AbstractMessageReceiver
 					//log.log(Level.SEVERE, "Exception during packet processing: ", e);
 					//				stopped = true;
 				} catch (Exception e) {
-					log.log(Level.SEVERE, "Exception during packet processing: ", e);
+					log.log(Level.SEVERE, "[" + getName() +
+									"] Exception during packet processing: " +
+									packet.toString(), e);
 				} // end of try-catch
 			} // end of while (! stopped)
 		}

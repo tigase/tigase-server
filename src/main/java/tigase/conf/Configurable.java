@@ -152,6 +152,7 @@ public interface Configurable extends ServerComponent {
 
 	public static final String DEF_STATS_NAME = "stats";
 	public static final String DEF_CLUST_CONTR_NAME = "cluster-contr";
+	public static final String DEF_VHOST_MAN_NAME = "vhost-man";
 
 	public static final String ROUTER_COMP_CLASS_NAME =
 		"tigase.server.MessageRouter";
@@ -182,6 +183,8 @@ public interface Configurable extends ServerComponent {
 		"tigase.stats.StatisticsCollector";
 	public static final String CLUSTER_CONTR_CLASS_NAME =
     "tigase.cluster.ClusterController";
+	public static final String VHOST_MAN_CLASS_NAME =
+					"tigase.vhosts.VHostManager";
 
 
 	public static final String HOSTNAMES_PROP_KEY = "hostnames";

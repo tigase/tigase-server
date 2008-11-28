@@ -186,6 +186,8 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 								case 'B':
 									// Boolean value
 									val = Boolean.valueOf(Boolean.parseBoolean(value));
+									log.config("Found Boolean property: " +
+													val.toString());
 									break;
 								case 's':
 									// Comma separated, Strings array
@@ -238,7 +240,8 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 				}
 				repository.set(root, node, prop_key, defProperties.get(key));
 				log.config("Added default config property: ("
-					+ key + "=" + defProperties.get(key) + ")");
+					+ key + "=" + defProperties.get(key) + "), classname: " +
+					defProperties.get(key).getClass().getName());
 				// System.out.println("Added default config property: ("
 				// 	+ key + "=" + defProperties.getProperty(key) + ")");
 

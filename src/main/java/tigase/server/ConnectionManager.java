@@ -24,19 +24,16 @@ package tigase.server;
 import java.io.IOException;
 import java.net.SocketException;
 import java.nio.channels.SocketChannel;
-import java.security.SecureRandom;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.TreeMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -52,7 +49,6 @@ import tigase.stats.StatRecord;
 import tigase.util.JIDUtils;
 import tigase.xmpp.XMPPIOService;
 import tigase.xmpp.XMPPIOServiceListener;
-import java.io.File;
 
 import static tigase.io.SSLContextContainerIfc.*;
 
@@ -134,13 +130,16 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 	private static SocketReadThread readThread = SocketReadThread.getInstance();
 	private Timer delayedTasks = null;
 	private Thread watchdog = null;
+	private LinkedList<Map<String, Object>> waitingTasks =
+					new LinkedList<Map<String, Object>>();
 	private Map<String, IO> services =
 		new ConcurrentSkipListMap<String, IO>();
 	private Set<ConnectionListenerImpl> pending_open =
 		Collections.synchronizedSet(new HashSet<ConnectionListenerImpl>());;
 	protected long connectionDelay = 2 * SECOND;
-	protected long startDelay = 20 * SECOND;
+//	protected long startDelay = 5 * SECOND;
 
+	@Override
 	public void setName(String name) {
 		super.setName(name);
 		watchdog = new Thread(new Watchdog(), "Watchdog - " + name);
@@ -148,6 +147,15 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 		watchdog.start();
 	}
 
+	@Override
+	public void initializationCompleted() {
+		for (Map<String, Object> params : waitingTasks) {
+			reconnectService(params, connectionDelay);
+		}
+		waitingTasks.clear();
+	}
+
+	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> props = super.getDefaults(params);
 		props.put(TLS_USE_PROP_KEY, TLS_USE_PROP_VAL);
@@ -245,6 +253,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 		delayedTasks = new Timer("DelayedTasks", true);
 	}
 
+	@Override
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
 		releaseListeners();
@@ -262,7 +271,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 					} // end of if (entry.getKey().startsWith())
 				} // end of for ()
 				port_props.put(PORT_KEY, ports[i]);
-				reconnectService(port_props, startDelay);
+				waitingTasks.add(port_props);
+				//reconnectService(port_props, startDelay);
 			} // end of for (int i = 0; i < ports.length; i++)
 		} // end of if (ports != null)
     if ((Boolean)props.get(TLS_USE_PROP_KEY)) {
@@ -332,6 +342,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 	 * Describe <code>packetsReady</code> method here.
 	 *
 	 * @param s an <code>IOService</code> value
+	 * @throws IOException
 	 */
 	@SuppressWarnings({"unchecked"})
 	public void packetsReady(IOService s) throws IOException {
@@ -447,11 +458,13 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 			if (serv == service) {
 				services.remove(id);
 			} else {
-				// Is it at all possible to happen???
-				// let's log it for now....
-				log.warning(">>" + getName()
-										+	"<< Attempt to stop incorrect service: " + id);
-				Thread.dumpStack();
+				if (id != null) {
+					// Is it at all possible to happen???
+					// let's log it for now....
+					log.warning(">>" + getName() +
+									"<< Attempt to stop incorrect service: " + id);
+					Thread.dumpStack();
+				}
 			}
 		}
 	}

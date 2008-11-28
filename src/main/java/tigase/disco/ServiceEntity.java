@@ -49,6 +49,10 @@ public class ServiceEntity {
 	/**
 	 * Creates a new <code>ServiceEntity</code> instance.
 	 *
+	 *
+	 * @param jid
+	 * @param node
+	 * @param name
 	 */
 	public ServiceEntity(String jid, String node, String name) {
 		this.jid = jid;
@@ -62,6 +66,7 @@ public class ServiceEntity {
 	 * @param obj an <code>Object</code> value
 	 * @return a <code>boolean</code> value
 	 */
+	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof ServiceEntity) {
 			ServiceEntity se = (ServiceEntity)obj;
@@ -88,6 +93,8 @@ public class ServiceEntity {
 	/**
 	 * Describe <code>addFeatures</code> method here.
 	 *
+	 *
+	 * @param features
 	 */
 	public void addFeatures(String... features) {
 		if (this.features == null) {
@@ -99,6 +106,8 @@ public class ServiceEntity {
 	/**
 	 * Describe <code>addIdentities</code> method here.
 	 *
+	 *
+	 * @param identities
 	 */
 	public void addIdentities(ServiceIdentity... identities) {
 		if (this.identities == null) {
@@ -110,6 +119,8 @@ public class ServiceEntity {
 	/**
 	 * Describe <code>addItems</code> method here.
 	 *
+	 *
+	 * @param items
 	 */
 	public void addItems(ServiceEntity... items) {
 		if (this.items == null) {

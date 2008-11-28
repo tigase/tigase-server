@@ -21,28 +21,19 @@
  */
 package tigase.server.bosh;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.LinkedHashMap;
 import java.util.Queue;
 import java.util.LinkedList;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.UUID;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import tigase.xml.Element;
-import tigase.net.IOService;
 import tigase.server.Command;
-import tigase.server.ConnectionManager;
 import tigase.server.Packet;
 import tigase.util.JIDUtils;
-import tigase.util.DNSResolver;
-import tigase.util.RoutingsContainer;
 import tigase.xmpp.StanzaType;
-import tigase.xmpp.Authorization;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.XMPPIOService;
 import tigase.xmpp.PacketErrorTypeException;
@@ -182,7 +173,7 @@ public class BoshConnectionManager extends ClientConnectionManager
 				BoshSession bs = null;
 				if (sid_str == null) {
 					String hostname = p.getAttribute("to");
-					if (hostname != null && hostnames.contains(hostname)) {
+					if (hostname != null && isLocalDomain(hostname)) {
 						bs = new BoshSession(getDefHostName(),
 							routings.computeRouting(hostname), this);
 						sid = bs.getSid();

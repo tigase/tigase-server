@@ -20,13 +20,10 @@
  */
 package tigase.server.xmppserver;
 
-import java.util.Set;
-import java.util.Map;
 import java.util.Queue;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import tigase.xmpp.XMPPIOService;
@@ -97,6 +94,8 @@ public class ServerConnections {
 	/**
 	 * Creates a new <code>ServerConnections</code> instance.
 	 *
+	 *
+	 * @param handler 
 	 */
 	public ServerConnections(ConnectionHandlerIfc handler) {
 		this.handler = handler;
@@ -177,18 +176,25 @@ public class ServerConnections {
 
 
 	public synchronized boolean handleDialbackSuccess() {
-		setValid();
-		LinkedList<Packet> all = new LinkedList<Packet>();
-		Packet packet = null;
-		while ((packet = waitingControlPackets.poll()) != null) {
-			all.offer(packet);
+		if (outgoing != null && conn_state == OutgoingState.HANDSHAKING) {
+			setValid();
+			LinkedList<Packet> all = new LinkedList<Packet>();
+			Packet packet = null;
+			while ((packet = waitingControlPackets.poll()) != null) {
+				all.offer(packet);
+			}
+			sentPackets += waitingPackets.size();
+			while ((packet = waitingPackets.poll()) != null) {
+				all.offer(packet);
+			}
+			handler.writePacketsToSocket(outgoing, all);
+			return true;
+		} else {
+			log.warning("Something wrong, the method was called when the outgoing connection is null.");
+			outgoing = null;
+			conn_state = OutgoingState.NULL;
+			return false;
 		}
-		sentPackets += waitingPackets.size();
-		while ((packet = waitingPackets.poll()) != null) {
-			all.offer(packet);
-		}
-		handler.writePacketsToSocket(outgoing, all);
-		return true;
 	}
 
 	public synchronized void handleDialbackFailure() {
@@ -296,8 +302,13 @@ public class ServerConnections {
 	}
 
 	public void serviceStopped(XMPPIOService serv) {
-		String session_id = (String)serv.getSessionData().get(serv.SESSION_ID_KEY);
-		db_keys.remove(session_id);
+		String session_id = 
+						(String) serv.getSessionData().get(XMPPIOService.SESSION_ID_KEY);
+		if (session_id != null) {
+			db_keys.remove(session_id);
+		} else {
+			log.info("Session_ID is null for: " + serv.getUniqueId());
+		}
 		if (serv == outgoing) {
 			outgoing = null;
 			conn_state = OutgoingState.NULL;
