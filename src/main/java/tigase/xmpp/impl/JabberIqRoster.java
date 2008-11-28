@@ -23,18 +23,17 @@ package tigase.xmpp.impl;
 
 import java.util.List;
 import java.util.LinkedList;
-import java.util.ArrayList;
 import java.util.Queue;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.server.Packet;
 import tigase.util.JIDUtils;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.NotAuthorizedException;
+import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
-import tigase.xmpp.XMPPProcessor;
-import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.XMPPException;
 import tigase.db.NonAuthUserRepository;
@@ -64,10 +63,12 @@ public abstract class JabberIqRoster {
 		Logger.getLogger("tigase.xmpp.impl.JabberIqRoster");
 
   protected static final String XMLNS = "jabber:iq:roster";
-	private static final String[] ELEMENTS = {"query"};
-  private static final String[] XMLNSS = {XMLNS};
+  protected static final String XMLNS_DYNAMIC = "jabber:iq:roster-dynamic";
+	private static final String[] ELEMENTS = {"query", "query"};
+  private static final String[] XMLNSS = {XMLNS, XMLNS_DYNAMIC};
   protected static final Element[] DISCO_FEATURES =	{
-		new Element("feature", new String[] {"var"}, new String[] {XMLNS})
+		new Element("feature", new String[] {"var"}, new String[] {XMLNS}),
+		new Element("feature", new String[] {"var"}, new String[] {XMLNS_DYNAMIC})
 	};
 	public static final String ANON = "anon";
 	private static RosterAbstract roster_util =
@@ -95,17 +96,60 @@ public abstract class JabberIqRoster {
 			item.addAttribute("type", item_type);
 		}
 		if (item_name != null) {
-			item.addAttribute(roster_util.NAME, item_name);
+			item.addAttribute(RosterAbstract.NAME, item_name);
 		}
 		if (subscription != null) {
-			item.addAttribute(roster_util.SUBSCRIPTION, subscription);
+			item.addAttribute(RosterAbstract.SUBSCRIPTION, subscription);
 		}
 		if (item_group != null) {
-			Element group = new Element(roster_util.GROUP, item_group);
+			Element group = new Element(RosterAbstract.GROUP, item_group);
 			item.addChild(group);
 		}
 		query.addChild(item);
 		return iq;
+	}
+
+	private static void dynamicGetRequest(Packet packet,
+					XMPPResourceConnection session,
+					Queue<Packet> results,
+					Map<String, Object> settings) throws NotAuthorizedException {
+		Element request = packet.getElement();
+		Element item = request.findChild("/iq/query/item");
+		if (item != null) {
+			Element new_item = DynamicRoster.getItemExtraData(session, settings, item);
+			if (new_item == null) {
+				new_item = item;
+			}
+			results.offer(packet.okResult(new_item, 1));
+		} else {
+			try {
+				results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
+								"Missing 'item' element, request can not be processed.", true));
+			} catch (PacketErrorTypeException ex) {
+				log.log(Level.SEVERE, "Received error packet? not possible.", ex);
+			}
+		}
+	}
+
+	private static void dynamicSetRequest(Packet packet,
+					XMPPResourceConnection session,
+					Queue<Packet> results,
+					Map<String, Object> settings) {
+		Element request = packet.getElement();
+		List<Element> items = request.getChildren("/iq/query");
+		if (items != null && items.size() > 0) {
+			for (Element item : items) {
+				DynamicRoster.setItemExtraData(session, settings, item);
+			}
+			results.offer(packet.okResult((String) null, 0));
+		} else {
+			try {
+				results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
+								"Missing 'item' element, request can not be processed.", true));
+			} catch (PacketErrorTypeException ex) {
+				log.log(Level.SEVERE, "Received error packet? not possible.", ex);
+			}
+		}
 	}
 
 	private static void processSetRequest(final Packet packet,
@@ -279,21 +323,46 @@ public abstract class JabberIqRoster {
 				// && !session.getUserId().equals(JIDUtils.getNodeID(packet.getElemFrom())))
 
 			StanzaType type = packet.getType();
-			switch (type) {
-			case get:
-				processGetRequest(packet, session, results, settings);
-				break;
-			case set:
-        processSetRequest(packet, session, results);
-				break;
-			case result:
-				// Ignore
-				break;
-			default:
-				results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
-						"Request type is incorrect", false));
-				break;
-			} // end of switch (type)
+			String xmlns = packet.getElement().getXMLNS("/iq/query");
+			if (xmlns == XMLNS) {
+				switch (type) {
+					case get:
+						processGetRequest(packet, session, results, settings);
+						break;
+					case set:
+						processSetRequest(packet, session, results);
+						break;
+					case result:
+						// Ignore
+						break;
+					default:
+						results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
+										"Request type is incorrect", false));
+						break;
+				} // end of switch (type)
+			} else {
+				if (xmlns == XMLNS_DYNAMIC) {
+				switch (type) {
+					case get:
+						dynamicGetRequest(packet, session, results, settings);
+						break;
+					case set:
+						dynamicSetRequest(packet, session, results, settings);
+						break;
+					case result:
+						// Ignore
+						break;
+					default:
+						results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
+										"Request type is incorrect", false));
+						break;
+				} // end of switch (type)
+				} else {
+					// Hm, don't know what to do, unexpected name space, let's record it
+					log.warning("Unknown XMLNS for the roster plugin: " +
+									packet.toString());
+				}
+			}
 
 		} catch (NotAuthorizedException e) {
       log.warning(
@@ -313,6 +382,7 @@ public abstract class JabberIqRoster {
 	 * <code>stopped</code> method is called when user disconnects or logs-out.
 	 *
 	 * @param session a <code>XMPPResourceConnection</code> value
+	 * @param results
 	 */
 	public static void stopped(final XMPPResourceConnection session,
 		final Queue<Packet> results, final Map<String, Object> settings) {

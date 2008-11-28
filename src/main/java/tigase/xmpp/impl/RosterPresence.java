@@ -20,18 +20,11 @@
  */
 package tigase.xmpp.impl;
 
-import java.util.List;
-import java.util.LinkedList;
-import java.util.ArrayList;
 import java.util.Queue;
 import java.util.Map;
 import java.util.logging.Logger;
 import tigase.server.Packet;
-import tigase.util.JIDUtils;
 import tigase.xml.Element;
-import tigase.xmpp.Authorization;
-import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPStopListenerIfc;
@@ -59,8 +52,9 @@ public class RosterPresence  extends XMPPProcessor
 	private static final String ID = "roster-presence";
 
 	private static final String PRESENCE = "presence";
-	private static final String[] ELEMENTS = {PRESENCE, "query"};
-  private static final String[] XMLNSS = {Presence.XMLNS, JabberIqRoster.XMLNS};
+	private static final String[] ELEMENTS = {PRESENCE, "query", "query"};
+  private static final String[] XMLNSS = {
+		Presence.XMLNS, JabberIqRoster.XMLNS, JabberIqRoster.XMLNS_DYNAMIC};
   private static final Element[] DISCO_FEATURES =	JabberIqRoster.DISCO_FEATURES;
 
 	public String id() { return ID; }

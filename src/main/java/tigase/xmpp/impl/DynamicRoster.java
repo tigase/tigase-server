@@ -81,8 +81,7 @@ public abstract class DynamicRoster {
 		}
 	}
 
-	public static List<Element> getRosterItems(final XMPPResourceConnection session,
-		final Map<String, Object> settings) throws NotAuthorizedException {
+	public static DynamicRosterIfc[] getDynamicRosters(final Map<String, Object> settings) {
 		DynamicRosterIfc[] dynr = null;
 		if (settings != null) {
 			synchronized (settings) {
@@ -93,6 +92,12 @@ public abstract class DynamicRoster {
 		} else {
 			log.finest("Settings parameter is NULL");
 		}
+		return dynr;
+	}
+
+	public static List<Element> getRosterItems(final XMPPResourceConnection session,
+		final Map<String, Object> settings) throws NotAuthorizedException {
+		DynamicRosterIfc[] dynr = getDynamicRosters(settings);
 		if (dynr != null) {
 			ArrayList<Element> result = new ArrayList<Element>();
 			for (DynamicRosterIfc dri: dynr) {
@@ -111,16 +116,7 @@ public abstract class DynamicRoster {
 	public static Element getBuddyItem(final XMPPResourceConnection session,
 		final Map<String, Object> settings, String buddy)
 		throws NotAuthorizedException {
-		DynamicRosterIfc[] dynr = null;
-		if (settings != null) {
-			synchronized (settings) {
-				log.finest("Initializing settings.");
-				init_settings(settings);
-			}
-			dynr = (DynamicRosterIfc[])settings.get(DYNAMIC_ROSTERS);
-		} else {
-			log.finest("Settings parameter is NULL");
-		}
+		DynamicRosterIfc[] dynr = getDynamicRosters(settings);
 		if (dynr != null) {
 			for (DynamicRosterIfc dri: dynr) {
 				Element item = dri.getBuddyItem(session, buddy);
@@ -134,16 +130,7 @@ public abstract class DynamicRoster {
 
 	public static List<String> getBuddiesList(final XMPPResourceConnection session,
 		final Map<String, Object> settings) throws NotAuthorizedException {
-		DynamicRosterIfc[] dynr = null;
-		if (settings != null) {
-			synchronized (settings) {
-				log.finest("Initializing settings.");
-				init_settings(settings);
-			}
-			dynr = (DynamicRosterIfc[])settings.get(DYNAMIC_ROSTERS);
-		} else {
-			log.finest("Settings parameter is NULL");
-		}
+		DynamicRosterIfc[] dynr = getDynamicRosters(settings);
 		if (dynr != null) {
 			ArrayList<String> result = new ArrayList<String>();
 			for (DynamicRosterIfc dri: dynr) {
@@ -182,6 +169,32 @@ public abstract class DynamicRoster {
 			return result.toArray(new String[result.size()]);
 		}
 		return null;
+	}
+
+	static Element getItemExtraData(XMPPResourceConnection session,
+					Map<String, Object> settings, Element item) {
+		DynamicRosterIfc[] dynr = getDynamicRosters(settings);
+		if (dynr != null) {
+			Element result = null;
+			for (DynamicRosterIfc dri : dynr) {
+				if ((result = dri.getItemExtraData(item)) != null) {
+					break;
+				}
+			}
+			return result;
+		} else {
+			return null;
+		}
+	}
+
+	static void setItemExtraData(XMPPResourceConnection session,
+					Map<String, Object> settings, Element item) {
+		DynamicRosterIfc[] dynr = getDynamicRosters(settings);
+		if (dynr != null) {
+			for (DynamicRosterIfc dri : dynr) {
+				dri.setItemExtraData(item);
+			}
+		}
 	}
 
 }

@@ -67,6 +67,10 @@ import tigase.xmpp.NotAuthorizedException;
  */
 public interface DynamicRosterIfc {
 
+	void setItemExtraData(Element item);
+
+	Element getItemExtraData(Element item);
+
 	/**
 	 * <code>init</code> method is used to provide configuration parameters
 	 * and initialize the object. Please have a look at the interface descriotion
@@ -74,7 +78,7 @@ public interface DynamicRosterIfc {
 	 * before it's <code>init(...)</code> method is called but it might be
 	 * used stright away after the method has finished.
 	 *
-	 * @param par a <code>Map<String, Object> props</code> is a configuration
+	 * @param props a <code>Map<String, Object> props</code> is a configuration
 	 * parameters map in the form: key:value exactly as they were specified
 	 * in the configuration file.
 	 */

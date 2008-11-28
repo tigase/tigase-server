@@ -20,7 +20,6 @@
  */
 package tigase.xmpp.impl;
 
-import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -104,5 +103,9 @@ public class AnonymousRoster implements DynamicRosterIfc {
 		}
 		return null;
 	}
+
+	public void setItemExtraData(Element item) { }
+
+	public Element getItemExtraData(Element item) { return null; }
 
 }
