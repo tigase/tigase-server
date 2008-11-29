@@ -24,6 +24,7 @@ package tigase.db;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import static tigase.conf.Configurable.*;
 
 /**
  * Describe class RepositoryFactory here.
@@ -43,6 +44,35 @@ public class RepositoryFactory {
 		auth_repos =
 		new ConcurrentHashMap<String, ConcurrentMap<String, UserAuthRepository>>();
 
+	public static String getRepoClass(String repo_name) {
+		String result = repo_name;
+		if (repo_name.equals("mysql")) {
+			result = MYSQL_REPO_CLASS_PROP_VAL;
+		}
+		if (repo_name.equals("pgsql")) {
+			result = PGSQL_REPO_CLASS_PROP_VAL;
+		}
+		if (repo_name.equals("derby")) {
+			result = DERBY_REPO_CLASS_PROP_VAL;
+		}
+		if (repo_name.equals("tigase-custom-auth") ||
+						repo_name.equals("tigase-custom") ||
+						repo_name.equals("custom-auth")) {
+			result = TIGASE_CUSTOM_AUTH_REPO_CLASS_PROP_VAL;
+		}
+		if (repo_name.equals("tigase-auth")) {
+			result = TIGASE_AUTH_REPO_CLASS_PROP_VAL;
+		}
+		if (repo_name.equals("drupal")) {
+			result = DRUPAL_REPO_CLASS_PROP_VAL;
+		}
+		if (repo_name.equals("libresource")) {
+			result = LIBRESOURCE_REPO_CLASS_PROP_VAL;
+		}
+		return result;
+	}
+
+
 	public static UserRepository getUserRepository(String comp_name,
 		String class_name, String resource, Map<String, String> params)
 		throws ClassNotFoundException, InstantiationException,
@@ -60,7 +90,7 @@ public class RepositoryFactory {
 		} // end of if (repo_map == null)
 		UserRepository rep = repo_map.get(resource);
 		if (rep == null) {
-			rep = (UserRepository)Class.forName(class_name).newInstance();
+			rep = (UserRepository)Class.forName(getRepoClass(class_name)).newInstance();
 			rep.initRepository(resource, params);
 			repo_map.put(resource, rep);
 		} // end of if (rep == null)
@@ -89,7 +119,7 @@ public class RepositoryFactory {
 				rep = null;
 			} // end of if (!rep.getClass().getName().equals(class_name))
 			if (rep == null) {
-				rep = (UserAuthRepository)Class.forName(class_name).newInstance();
+				rep = (UserAuthRepository)Class.forName(getRepoClass(class_name)).newInstance();
 				rep.initRepository(resource, params);
 				repo_map.put(resource, rep);
 			} // end of if (rep == null)

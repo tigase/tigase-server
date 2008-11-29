@@ -76,4 +76,6 @@ public class VhostConfigRepository implements VHostRepository {
 		return vhosts.keySet().contains(domain);
 	}
 
+	public void reload() { }
+
 }

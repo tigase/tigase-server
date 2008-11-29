@@ -20,6 +20,9 @@
  */
 package tigase.vhosts;
 
+import java.util.logging.Logger;
+import tigase.xml.Element;
+
 /**
  * Created: 22 Nov 2008
  *
@@ -27,6 +30,18 @@ package tigase.vhosts;
  * @version $Rev$
  */
 public class VHostItem {
+
+	private static final Logger log =
+					Logger.getLogger("tigase.vhosts.VHostItem");
+
+	public static final String VHOST_ELEM = "vhost";
+	public static final String COMPONENTS_ELEM = "comps";
+	public static final String OTHER_PARAMS_ELEM = "other";
+	public static final String HOSTNAME_ATT = "hostname";
+	public static final String ENABLED_ATT = "enabled";
+	public static final String ANONYMOUS_ENABLED_ATT = "anon";
+	public static final String REGISTER_ENABLED_ATT = "register";
+	public static final String MAX_USERS_NUMBER_ATT = "max-users";
 
 	private String vhost = null;
 	private String[] comps = null;
@@ -38,6 +53,49 @@ public class VHostItem {
 
 	public VHostItem(String vhost) {
 		this.vhost = vhost;
+	}
+
+	public VHostItem(Element elem) {
+		vhost = elem.getAttribute(HOSTNAME_ATT);
+		enabled = Boolean.parseBoolean(elem.getAttribute(ENABLED_ATT));
+		anonymousEnabled =
+						Boolean.parseBoolean(elem.getAttribute(ANONYMOUS_ENABLED_ATT));
+		registerEnabled =
+						Boolean.parseBoolean(elem.getAttribute(REGISTER_ENABLED_ATT));
+		try {
+			maxUsersNumber = Long.parseLong(elem.getAttribute(MAX_USERS_NUMBER_ATT));
+		} catch (Exception e) {
+			log.warning("Can not parse max users number: " +
+							elem.getAttribute(MAX_USERS_NUMBER_ATT));
+		}
+		String comps_str = elem.getCData("/" + VHOST_ELEM + "/" + COMPONENTS_ELEM);
+		if (comps_str != null && !comps_str.isEmpty()) {
+			comps = comps_str.split(",");
+		}
+		otherDomainParams =
+						elem.getCData("/" + VHOST_ELEM + "/" + OTHER_PARAMS_ELEM);
+	}
+
+	public Element toXML() {
+		String comps_str = "";
+		if (comps != null && comps.length > 0) {
+			for (String comp : comps) {
+				if (!comps_str.isEmpty()) {
+					comps_str += ",";
+				}
+				comps_str += comp;
+			}
+		}
+		String other_params = otherDomainParams != null ? otherDomainParams : "";
+		Element elem = new Element(VHOST_ELEM, new Element[] {
+							new Element(COMPONENTS_ELEM, comps_str),
+							new Element(OTHER_PARAMS_ELEM, other_params)
+						},
+						new String[]{HOSTNAME_ATT, ENABLED_ATT, ANONYMOUS_ENABLED_ATT,
+							REGISTER_ENABLED_ATT, MAX_USERS_NUMBER_ATT},
+						new String[]{vhost, "" + enabled, "" + anonymousEnabled,
+							"" + registerEnabled, "" + maxUsersNumber});
+		return elem;
 	}
 
 	public String[] getComps() {

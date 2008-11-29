@@ -45,4 +45,8 @@ public interface VHostRepository {
 	 */
 	void getDefaults(Map<String, Object> defs, Map<String, Object> params);
 
+	void reload();
+
+
+
 }

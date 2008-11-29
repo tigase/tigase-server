@@ -58,6 +58,7 @@ import static tigase.io.SSLContextContainerIfc.*;
  *
  * Created: Sun Jan 22 22:52:58 2006
  *
+ * @param <IO> 
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */

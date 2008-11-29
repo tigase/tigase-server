@@ -21,22 +21,15 @@
  */
 package tigase.xmpp.impl.roster;
 
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.EnumSet;
-import java.util.List;
 import java.util.Queue;
 import java.util.Map;
 import java.util.LinkedHashMap;
 import java.util.logging.Logger;
-import tigase.server.Packet;
 import tigase.xml.Element;
-import tigase.xml.XMLUtils;
 import tigase.xml.DomBuilderHandler;
 import tigase.xml.SimpleParser;
 import tigase.xml.SingletonFactory;
 import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.util.JIDUtils;
 import tigase.db.TigaseDBException;

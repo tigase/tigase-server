@@ -53,7 +53,7 @@ public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
 	public static final String VHOSTS_REPO_CLASS_PROPERTY = "--vhost-repo-class";
 	public static final String VHOSTS_REPO_CLASS_PROP_KEY = "repository-class";
 	public static final String VHOSTS_REPO_CLASS_PROP_VAL =
-					"tigase.vhosts.VhostConfigRepository";
+					"tigase.vhosts.VHostJDBCRepository";
 
 	private static final Logger log =
 					Logger.getLogger("tigase.vhosts.VHostManager");
