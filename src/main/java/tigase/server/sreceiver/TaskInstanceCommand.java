@@ -114,8 +114,8 @@ public class TaskInstanceCommand implements TaskCommandIfc {
 	}
 
 	private void taskMainScreen(Packet result, ReceiverTaskIfc task) {
-		Command.setStatus(result, "executing");
-		Command.addAction(result, "next");
+		Command.setStatus(result, Command.Status.executing);
+		Command.addAction(result, Command.Action.next);
 
 		List<StatRecord> stats = task.getStats();
 		if (stats != null) {
@@ -138,8 +138,8 @@ public class TaskInstanceCommand implements TaskCommandIfc {
 		String task_name = Command.getFieldValue(packet, TASK_NAME_FIELD);
 		if (confirm == null) {
 			Command.addFieldValue(result, CONFIRM, "true", "hidden");
-			Command.setStatus(result, "executing");
-			Command.addAction(result, "complete");
+		Command.setStatus(result, Command.Status.executing);
+			Command.addAction(result, Command.Action.complete);
 			Command.addFieldValue(result, "Info",
 				"Are you sure you want to remove task: "
 				+ task_name
@@ -160,8 +160,8 @@ public class TaskInstanceCommand implements TaskCommandIfc {
 		ReceiverTaskIfc task = receiv.getTaskInstances().get(task_name);
 		if (confirm == null) {
 			Command.addFieldValue(result, CONFIRM, "true", "hidden");
-			Command.setStatus(result, "executing");
-			Command.addAction(result, "complete");
+			Command.setStatus(result, Command.Status.executing);
+			Command.addAction(result, Command.Action.complete);
 			propertyItems2Command(task.getParams(), result);
 		} else {
 			Command.addFieldValue(result, "Info",
@@ -200,9 +200,9 @@ public class TaskInstanceCommand implements TaskCommandIfc {
 		ReceiverTaskIfc task = receiv.getTaskInstances().get(task_name);
 		String user_action = Command.getFieldValue(packet, USER_ACTION_FIELD);
 		if (user_action == null) {
-			Command.setStatus(result, "executing");
-			Command.addAction(result, "complete");
-			Command.addAction(result, "next");
+			Command.setStatus(result, Command.Status.executing);
+			Command.addAction(result, Command.Action.complete);
+			Command.addAction(result, Command.Action.next);
 			Command.addFieldValue(result, "Info", "Select action and user:", "fixed");
 			String[] actions = USER_ACTION.strValues();
 			List<String> moderated = new LinkedList<String>();
@@ -276,8 +276,8 @@ public class TaskInstanceCommand implements TaskCommandIfc {
 					String roster_action =
 						Command.getFieldValue(packet, ROSTER_ACTION_FIELD);
 					if (roster_action == null) {
-						Command.setStatus(result, "executing");
-						Command.addAction(result, "complete");
+						Command.setStatus(result, Command.Status.executing);
+						Command.addAction(result, Command.Action.complete);
 						Command.addFieldValue(result, "Info",
 							"Update subscription data for: " + jid, "fixed");
 						Command.addFieldValue(result, SUBSCRIBERS_FIELD, jid, "hidden");
@@ -384,8 +384,8 @@ public class TaskInstanceCommand implements TaskCommandIfc {
 				break;
 			} // end of switch (action)
 		} else {
-			Command.setStatus(result, "executing");
-			Command.addAction(result, "next");
+			Command.setStatus(result, Command.Status.executing);
+			Command.addAction(result, Command.Action.next);
 			Command.addFieldValue(result, TASK_NAME_FIELD,
 				"", "text-single", "Enter task JID");
 		} // end of if (task != null) else

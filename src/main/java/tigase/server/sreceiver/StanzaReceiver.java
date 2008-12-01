@@ -43,7 +43,6 @@ import tigase.disco.XMPPService;
 import tigase.server.AbstractMessageReceiver;
 import tigase.server.Command;
 import tigase.server.Packet;
-import tigase.server.ServerComponent;
 import tigase.util.ClassUtil;
 import tigase.util.JIDUtils;
 import tigase.util.DNSResolver;
@@ -605,8 +604,8 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	public void processPacket(final Packet packet) {
 
 		if (packet.isCommand()) {
-			String action = Command.getAction(packet);
-			if (action != null && action.equals("cancel")) {
+			Command.Action action = Command.getAction(packet);
+			if (action == Command.Action.cancel) {
 				Packet result = packet.commandResult(null);
 				addOutPacket(result);
 				return;

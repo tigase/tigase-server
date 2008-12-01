@@ -87,8 +87,8 @@ public class NewTaskCommand implements TaskCommandIfc {
 		Command.addFieldValue(result, "Info",	"Press:", "fixed");
 		Command.addFieldValue(result, "Info",
 			"'Next' to set all parameters for the new task.", "fixed");
-		Command.setStatus(result, "executing");
-		Command.addAction(result, "next");
+		Command.setStatus(result, Command.Status.executing);
+		Command.addAction(result, Command.Action.next);
 		Command.addFieldValue(result, TASK_NAME_FIELD,
 			"", "text-single", TASK_NAME_FIELD);
 		String[] task_types =
@@ -120,9 +120,9 @@ public class NewTaskCommand implements TaskCommandIfc {
 			"1. 'Finish' to create component with this parameters.", "fixed");
 		Command.addFieldValue(result, "Info3",
 			"2. 'Previous' to go back and select different component.", "fixed");
-		Command.setStatus(result, "executing");
-		Command.addAction(result, "complete");
-		Command.addAction(result, "prev");
+		Command.setStatus(result, Command.Status.executing);
+		Command.addAction(result, Command.Action.complete);
+		Command.addAction(result, Command.Action.prev);
 		Map<String, PropertyItem> default_props = task_t.getDefaultParams();
 		PropertyItem pi = default_props.get(TASK_OWNER_PROP_KEY);
 		if (pi != null) {

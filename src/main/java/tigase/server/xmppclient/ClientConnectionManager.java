@@ -175,6 +175,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 			} // end of if (serv != null) else
 			break;
 		default:
+			writePacketToSocket(packet);
 			break;
 		} // end of switch (pc.getCommand())
 	}

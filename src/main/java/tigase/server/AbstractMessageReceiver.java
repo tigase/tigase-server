@@ -100,6 +100,8 @@ public abstract class AbstractMessageReceiver
 	private long[] minutes = new long[60];
 	private int min_idx = 0;
 	private String compId = null;
+	private long[] processPacketTimings = new long[100];
+	private int pptIdx = 0;
 
   /**
    * Variable <code>statAddedMessagesOk</code> keeps counter of successfuly
@@ -255,6 +257,14 @@ public abstract class AbstractMessageReceiver
 				statReceivedMessagesEr, Level.FINEST));
     stats.add(new StatRecord(getName(), StatisticType.OUT_QUEUE_OVERFLOW,
 				statSentMessagesEr, Level.FINEST));
+		long res = 0;
+		for (long ppt : processPacketTimings) {
+			res += ppt;
+		}
+		stats.add(new StatRecord(getName(),
+						"Average processing time on last " +
+						processPacketTimings.length + " runs [ms]", "long",
+				(res/processPacketTimings.length), Level.FINEST));
     return stats;
   }
 
@@ -528,7 +538,15 @@ public abstract class AbstractMessageReceiver
 					packet = queue.take();
 					switch (type) {
 					case IN_QUEUE:
+						long startPPT = System.currentTimeMillis();
 						processPacket(packet);
+						processPacketTimings[pptIdx] =
+										System.currentTimeMillis() - startPPT;
+						if (pptIdx >= (processPacketTimings.length-1)) {
+							pptIdx = 0;
+						} else {
+							++pptIdx;
+						}
 						break;
 					case OUT_QUEUE:
 						if (parent != null) {

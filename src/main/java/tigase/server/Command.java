@@ -39,17 +39,36 @@ import tigase.xmpp.StanzaType;
 public enum Command {
 
 	STREAM_OPENED,
-		STREAM_CLOSED,
-		STARTTLS,
-		GETFEATURES,
-		GETDISCO,
-		CLOSE,
-		GETSTATS,
-		USER_STATUS,
-		BROADCAST_TO_ONLINE,
-		BROADCAST_TO_ALL,
-    REDIRECT,
-		OTHER;
+	STREAM_CLOSED,
+	STARTTLS,
+	GETFEATURES,
+	GETDISCO,
+	CLOSE,
+	GETSTATS,
+	USER_STATUS,
+	BROADCAST_TO_ONLINE,
+	BROADCAST_TO_ALL,
+	REDIRECT,
+	VHOSTS_RELOAD,
+	VHOSTS_UPDATE,
+	VHOSTS_REMOVE,
+	OTHER;
+
+	public enum Status {
+		executing,
+		completed,
+		canceled,
+		other;
+	}
+
+	public enum Action {
+		execute,
+		cancel,
+		prev,
+		next,
+		complete,
+		other;
+	}
 
   /**
    * Variable <code>log</code> is a class logger.
@@ -95,34 +114,39 @@ public enum Command {
 				new String[] {"jabber:x:data", data_type});
 			command.addChild(x);
 			if (data_type.equals("result")) {
-				command.setAttribute("status", "completed");
+				command.setAttribute("status", Status.completed.toString());
 			}
 		}
 		iq.addChild(command);
 		return iq;
 	}
 
-	public static void setStatus(final Packet packet, final String status) {
+	public static void setStatus(final Packet packet, final Status status) {
 		Element iq = packet.getElement();
 		Element command = iq.getChild("command");
-		command.setAttribute("status", status);
+		command.setAttribute("status", status.toString());
 	}
 
-	public static void addAction(final Packet packet, final String action) {
+	public static void addAction(final Packet packet, final Action action) {
 		Element iq = packet.getElement();
 		Element command = iq.getChild("command");
 		Element actions = command.getChild("actions");
 		if (actions == null) {
 			actions = new Element("actions",
-				new String[] {"execute"},
-				new String[] {action});
+				new String[] {Action.execute.toString()},
+				new String[] {action.toString()});
 			command.addChild(actions);
 		}
-		actions.addChild(new Element(action));
+		actions.addChild(new Element(action.toString()));
 	}
 
-	public static String getAction(final Packet packet) {
-		return packet.getElement().getAttribute("/iq/command", "action");
+	public static Action getAction(final Packet packet) {
+		String action = packet.getElement().getAttribute("/iq/command", "action");
+		try {
+			return Action.valueOf(action);
+		} catch (Exception e) {
+			return Action.other;
+		}
 	}
 
 	public static void addNote(final Packet packet, final String note) {

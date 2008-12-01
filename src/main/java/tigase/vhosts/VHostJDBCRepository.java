@@ -22,7 +22,6 @@
 
 package tigase.vhosts;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
@@ -30,7 +29,6 @@ import java.util.logging.Logger;
 import tigase.db.RepositoryFactory;
 import tigase.db.UserExistsException;
 import tigase.db.UserRepository;
-import tigase.util.DNSResolver;
 import tigase.xml.DomBuilderHandler;
 import tigase.xml.Element;
 import tigase.xml.SimpleParser;
@@ -43,7 +41,7 @@ import static tigase.conf.Configurable.*;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class VHostJDBCRepository implements VHostRepository {
+public class VHostJDBCRepository extends VhostConfigRepository {
 
 	private static final Logger log =
 					Logger.getLogger("tigase.vhosts.VHostJDBCRepository");
@@ -55,18 +53,13 @@ public class VHostJDBCRepository implements VHostRepository {
 	private String vhost_list_pkey = "vhosts-lists";
 
 	private UserRepository repo = null;
-	private LinkedHashMap<String, VHostItem> vhosts =
-					new LinkedHashMap<String, VHostItem>();
 
+	@Override
 	public void getDefaults(Map<String, Object> defs,
 					Map<String, Object> params) {
 		// Something to initialize database with, in case it is empty
 		// Otherwise the server would not work at all with empty VHost database
-		String[] hostnames = DNSResolver.getDefHostNames();
-		if (params.get(GEN_VIRT_HOSTS) != null) {
-			hostnames = ((String) params.get(GEN_VIRT_HOSTS)).split(",");
-		}
-		defs.put(HOSTNAMES_PROP_KEY, hostnames);
+		super.getDefaults(defs, params);
 
 		// Now the real VHost data storage:
 		String repo_class = DERBY_REPO_CLASS_PROP_VAL;
@@ -81,19 +74,11 @@ public class VHostJDBCRepository implements VHostRepository {
 		defs.put(VHOST_REPO_URI_PROP_KEY, repo_uri);
 	}
 
+	@Override
 	public void setProperties(Map<String, Object> properties) {
 		// Let's load VHosts from configuration first. Later we can overwrite
 		// them with vhosts settings in the database.
-		String[] hostnames = (String[]) properties.get(HOSTNAMES_PROP_KEY);
-		if (hostnames != null && hostnames.length > 0) {
-			vhosts.clear();
-			for (String hostname : hostnames) {
-				VHostItem item = new VHostItem(hostname);
-				vhosts.put(hostname, item);
-			}
-		} else {
-			log.warning("Virtual hosts list is not set in the configuration file!!");
-		}
+		super.setProperties(properties);
 
 		String repo_class = (String)properties.get(VHOST_REPO_CLASS_PROP_KEY);
 		String repo_uri = (String)properties.get(VHOST_REPO_URI_PROP_KEY);
@@ -121,7 +106,9 @@ public class VHostJDBCRepository implements VHostRepository {
 		}
 	}
 
+	@Override
 	public void reload() {
+		super.reload();
 		try {
 			// It is now time to load all VHost settings from the database:
 			String vhosts_list = repo.getData(vhost_user, vhost_list_pkey);
@@ -144,7 +131,8 @@ public class VHostJDBCRepository implements VHostRepository {
 		}
 	}
 
-	private void store() {
+	public void store() {
+		super.store();
 		StringBuilder sb = new StringBuilder();
 		for (VHostItem vhost : vhosts.values()) {
 			sb.append(vhost.toXML().toString());
@@ -154,14 +142,6 @@ public class VHostJDBCRepository implements VHostRepository {
 		} catch (Exception e) {
 			log.log(Level.SEVERE, "Error storing VHosts list in the repository", e);
 		}
-	}
-
-	public VHostItem getVHost(String domain) {
-		return vhosts.get(domain);
-	}
-
-	public boolean contains(String domain) {
-		return vhosts.keySet().contains(domain);
 	}
 
 }

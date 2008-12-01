@@ -752,8 +752,8 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 
 		log.finest("Command received: " + packet.getStringData());
 
-		String action = Command.getAction(packet);
-		if (action != null && action.equals("cancel")) {
+		Command.Action action = Command.getAction(packet);
+		if (action == Command.Action.cancel) {
 			Packet result = packet.commandResult(null);
 			results.offer(result);
 			return;
@@ -796,8 +796,8 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 		Command.addFieldValue(result, "Info",	"Press:", "fixed");
 		Command.addFieldValue(result, "Info",
 			"'Next' to set all parameters for the new component.", "fixed");
-		Command.setStatus(result, "executing");
-		Command.addAction(result, "next");
+		Command.setStatus(result, Command.Status.executing);
+		Command.addAction(result, Command.Action.next);
 		Command.addFieldValue(result, "Component name",
 			"", "text-single", "Component name");
 		try {
@@ -933,7 +933,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 		if (!checkComponentName(result, new_comp_name)) {
 			return;
 		} // end of if (!checkComponentName(new_comp_name))
-		Command.setStatus(result, "executing");
+		Command.setStatus(result, Command.Status.executing);
 		Command.addFieldValue(result, "Component name",	new_comp_name,	"hidden");
 		Command.addFieldValue(result, "Component class", new_comp_class, "hidden");
 		Command.addFieldValue(result, "Info1",	"Press:", "fixed");
@@ -950,8 +950,8 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 						"1. 'Next' to set more component parameters.", "fixed");
 					Command.addFieldValue(result, "Info3",
 						"2. 'Previous' to go back and select different component.", "fixed");
-					Command.addAction(result, "next");
-					Command.addAction(result, "prev");
+					Command.addAction(result, Command.Action.next);
+					Command.addAction(result, Command.Action.prev);
 					Command.addFieldValue(result, "Info4",
 						"This component uses TCP/IP ports, please provide port numbers:",
 						"fixed");
@@ -970,8 +970,8 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 							"1. 'Next' to set more component parameters.", "fixed");
 						Command.addFieldValue(result, "Info3",
 							"2. 'Previous' to go back and select different component.", "fixed");
-						Command.addAction(result, "next");
-						Command.addAction(result, "prev");
+					Command.addAction(result, Command.Action.next);
+					Command.addAction(result, Command.Action.prev);
 						Command.addFieldValue(result, "Info4",
 							"Incorrect TCP/IP ports provided, please provide port numbers:",
 							"fixed");
@@ -984,8 +984,8 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 				"1. 'Finish' to create component with this parameters.", "fixed");
 			Command.addFieldValue(result, "Info3",
 				"2. 'Previous' to go back and select different component.", "fixed");
-			Command.addAction(result, "complete");
-			Command.addAction(result, "prev");
+			Command.addAction(result, Command.Action.complete);
+			Command.addAction(result, Command.Action.prev);
 			mr.setName(new_comp_name);
 			if (mr instanceof Configurable) {
 				// Load defaults into sorted Map:
@@ -1015,8 +1015,8 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 			newComponentCommand(result);
 			return;
 		} // end of if (comp_name.equals("--none--"))
-		Command.setStatus(result, "executing");
-		Command.addAction(result, "complete");
+		Command.setStatus(result, Command.Status.executing);
+		Command.addAction(result, Command.Action.complete);
 		// Let's try to sort them to make it easier to find options on
 		// configuration page.
 		Map<String, Object> allprop =

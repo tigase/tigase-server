@@ -80,9 +80,9 @@ public class JabberIqCommand extends XMPPProcessor implements XMPPProcessorIfc {
 
 		// Processing only commands (that should be quaranteed by name space)
 		// and only unknown commands. All known commands are processed elsewhere
-		if (!packet.isCommand() || packet.getCommand() != Command.OTHER) {
-			return;
-		}
+//		if (!packet.isCommand() || packet.getCommand() != Command.OTHER) {
+//			return;
+//		}
 
 		try {
 			log.finest("Received packet: " + packet.getStringData());

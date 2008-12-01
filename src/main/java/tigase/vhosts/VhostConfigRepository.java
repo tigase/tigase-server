@@ -42,7 +42,7 @@ public class VhostConfigRepository implements VHostRepository {
 
 	public static final String ANONYMOUS_DOMAINS_PROP_KEY = "anonymous-domains";
 
-	private LinkedHashMap<String, VHostItem> vhosts =
+	protected LinkedHashMap<String, VHostItem> vhosts =
 					new LinkedHashMap<String, VHostItem>();
 
 	public void getDefaults(Map<String, Object> defs,
@@ -77,5 +77,21 @@ public class VhostConfigRepository implements VHostRepository {
 	}
 
 	public void reload() { }
+
+	public void store() { }
+
+	public int size() {
+		return vhosts.size();
+	}
+
+	public void addVHost(VHostItem vhost) {
+		vhosts.put(vhost.getVhost(), vhost);
+		store();
+	}
+
+	public void removeVHost(String vh) {
+		vhosts.remove(vh);
+		store();
+	}
 
 }

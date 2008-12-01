@@ -137,8 +137,8 @@ public class StatisticsCollector
 			if (packet.getStrCommand() == null) return;
 			String nick = JIDUtils.getNodeNick(packet.getTo());
 			if (nick == null || !getName().equals(nick)) return;
-			String action = Command.getAction(packet);
-			if (action != null && action.equals("cancel")) {
+			Command.Action action = Command.getAction(packet);
+			if (action == Command.Action.cancel) {
 				Packet result = packet.commandResult(null);
 				results.offer(result);
 				return;
@@ -157,8 +157,8 @@ public class StatisticsCollector
 			}
 			if (stats != null && stats.size() > 0) {
 				Packet result = packet.commandResult("result");
-				Command.setStatus(result, "executing");
-				Command.addAction(result, "next");
+				Command.setStatus(result, Command.Status.executing);
+				Command.addAction(result, Command.Action.next);
 				for (StatRecord rec: stats) {
 					if (rec.getLevel().intValue() >= statsLevel.intValue()) {
 						if (rec.getType() == StatisticType.LIST) {

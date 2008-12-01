@@ -32,6 +32,10 @@ import java.util.Map;
  */
 public interface VHostRepository {
 
+	void removeVHost(String vh);
+
+	void addVHost(VHostItem vhost);
+
 	VHostItem getVHost(String domain);
 
 	boolean contains(String domain);
@@ -47,6 +51,6 @@ public interface VHostRepository {
 
 	void reload();
 
-
+	int size();
 
 }
