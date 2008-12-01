@@ -21,7 +21,6 @@
  */
 package tigase.xmpp.impl;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Queue;
 import java.util.Map;
@@ -106,6 +105,7 @@ public class JabberIqPrivacy extends XMPPProcessor
 	 * @param packet a <code>Packet</code> value
 	 * @param session a <code>XMPPResourceConnection</code> value
 	 * @param repo a <code>NonAuthUserRepository</code> value
+	 * @param results 
 	 * @return a <code>boolean</code> value
 	 */
 	public boolean preProcess(Packet packet, XMPPResourceConnection session,

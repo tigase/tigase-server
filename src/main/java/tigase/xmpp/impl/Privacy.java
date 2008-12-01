@@ -22,11 +22,15 @@
 package tigase.xmpp.impl;
 
 import java.util.List;
+import java.util.Queue;
 import java.util.logging.Logger;
 import tigase.xml.Element;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.db.TigaseDBException;
+import tigase.xml.DomBuilderHandler;
+import tigase.xml.SimpleParser;
+import tigase.xml.SingletonFactory;
 
 /**
  * Class defining data structure for privacy lists.
@@ -63,7 +67,7 @@ public class Privacy {
 	/**
    * Private logger for class instancess.
    */
-  private static Logger log =	Logger.getLogger("tigase.xmpp.impl.Roster");
+  private static Logger log =	Logger.getLogger("tigase.xmpp.impl.Privacy");
 
 	protected static final String PRIVACY = "privacy";
 	protected static final String LIST = "list";
@@ -76,6 +80,7 @@ public class Privacy {
 	protected static final String STANZAS = "stanzas";
 	protected static final String DEFAULT = "default-list";
 	protected static final String ACTIVE = "active-list";
+	protected static final String PRIVACY_LIST = "privacy-list";
 
 
 	public static String[] getLists(XMPPResourceConnection session)
@@ -127,40 +132,35 @@ public class Privacy {
 	}
 
 	public static void addList(XMPPResourceConnection session,
-		Element list) throws NotAuthorizedException, TigaseDBException {
-
+					Element list)
+					throws NotAuthorizedException, TigaseDBException {
+		log.finest("Saving privacy list: " + list.toString());
 		String lNode = listNode(list.getAttribute(NAME));
-
-		// Always remove this list as it is either removed or replaced
-		// by new one. To make sure there are no old data left, let's
-		// remove it here.
-		session.removeDataGroup(lNode);
-
-		if (list.getChildren() != null && list.getChildren().size() > 0) {
-			for (Element item: list.getChildren()) {
-				String iNode = lNode + "/" + item.getAttribute(ORDER);
-				if (item.getAttribute(TYPE) != null) {
-					session.setData(iNode, TYPE, item.getAttribute(TYPE));
-				} // end of if (item.getAttribute(TYPE) != null)
-				if (item.getAttribute(VALUE) != null) {
-					session.setData(iNode, VALUE, item.getAttribute(VALUE));
-				} // end of if (item.getAttribute(VALUE) != null)
-				session.setData(iNode, ACTION, item.getAttribute(ACTION));
-				List<Element> stanzas_list = item.getChildren();
-				if (stanzas_list != null && stanzas_list.size() > 0) {
-					String[] stanzas = new String[stanzas_list.size()];
-					int cnt = -1;
-					for (Element stanza: stanzas_list) {
-						stanzas[++cnt] = stanza.getName();
-					} // end of for (Element stanza: stanzas_list)
-					session.setDataList(iNode, STANZAS, stanzas);
-				} // end of if (stanzas_list != null && stanzas_list.size() > 0)
-			} // end of for (Element item: list.getChildren())
-		}
+		session.setData(lNode, PRIVACY_LIST, list.toString());
 	}
 
 	public static Element getList(XMPPResourceConnection session,
-		String list) throws NotAuthorizedException, TigaseDBException {
+					String list)
+					throws NotAuthorizedException, TigaseDBException {
+		log.finest("Loading privacy list: " + list);
+		String lNode = listNode(list);
+		String list_str = session.getData(lNode, PRIVACY_LIST, null);
+		if (list_str != null && !list_str.isEmpty()) {
+			SimpleParser parser = SingletonFactory.getParserInstance();
+			DomBuilderHandler domHandler = new DomBuilderHandler();
+			parser.parse(domHandler, list_str.toCharArray(), 0, list_str.length());
+			Queue<Element> elems = domHandler.getParsedElements();
+			Element result = elems.poll();
+			log.finest("Loaded privacy list: " + result.toString());
+			return result;
+		} else {
+			return getListOld(session, list);
+		}
+	}
+
+	public static Element getListOld(XMPPResourceConnection session,
+					String list)
+					throws NotAuthorizedException, TigaseDBException {
 		String lNode = listNode(list);
 		String[] items = session.getDataGroups(lNode);
 		if (items != null) {
@@ -192,5 +192,39 @@ public class Privacy {
 		} // end of if (items != null)
 		return null;
 	}
+
+//	public static void addListOld(XMPPResourceConnection session,
+//					Element list)
+//					throws NotAuthorizedException, TigaseDBException {
+//
+//		String lNode = listNode(list.getAttribute(NAME));
+//
+//		// Always remove this list as it is either removed or replaced
+//		// by new one. To make sure there are no old data left, let's
+//		// remove it here.
+//		session.removeDataGroup(lNode);
+//
+//		if (list.getChildren() != null && list.getChildren().size() > 0) {
+//			for (Element item: list.getChildren()) {
+//				String iNode = lNode + "/" + item.getAttribute(ORDER);
+//				if (item.getAttribute(TYPE) != null) {
+//					session.setData(iNode, TYPE, item.getAttribute(TYPE));
+//				} // end of if (item.getAttribute(TYPE) != null)
+//				if (item.getAttribute(VALUE) != null) {
+//					session.setData(iNode, VALUE, item.getAttribute(VALUE));
+//				} // end of if (item.getAttribute(VALUE) != null)
+//				session.setData(iNode, ACTION, item.getAttribute(ACTION));
+//				List<Element> stanzas_list = item.getChildren();
+//				if (stanzas_list != null && stanzas_list.size() > 0) {
+//					String[] stanzas = new String[stanzas_list.size()];
+//					int cnt = -1;
+//					for (Element stanza: stanzas_list) {
+//						stanzas[++cnt] = stanza.getName();
+//					} // end of for (Element stanza: stanzas_list)
+//					session.setDataList(iNode, STANZAS, stanzas);
+//				} // end of if (stanzas_list != null && stanzas_list.size() > 0)
+//			} // end of for (Element item: list.getChildren())
+//		}
+//	}
 
 } // Privacy
