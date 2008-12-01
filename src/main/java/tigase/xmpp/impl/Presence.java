@@ -25,21 +25,16 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.Queue;
 import java.util.EnumSet;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
-import tigase.xmpp.XMPPProcessor;
-import tigase.xmpp.XMPPProcessorIfc;
-import tigase.xmpp.XMPPStopListenerIfc;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPException;
 import tigase.server.Packet;
-import tigase.db.UserNotFoundException;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 import tigase.util.JIDUtils;
@@ -144,8 +139,12 @@ public abstract class Presence {
 	 *
 	 * @param t a <code>StanzaType</code> value
 	 * @param session a <code>XMPPResourceConnection</code> value
+	 * @param subscrs
+	 * @param results
 	 * @param pres an <code>Element</code> value
+	 * @param settings 
 	 * @exception NotAuthorizedException if an error occurs
+	 * @throws TigaseDBException
 	 */
 	@SuppressWarnings({"unchecked"})
 	protected static void sendPresenceBroadcast(final StanzaType t,
@@ -174,7 +173,7 @@ public abstract class Presence {
 	protected static void resendPendingInRequests(final XMPPResourceConnection session,
     final Queue<Packet> results)
     throws NotAuthorizedException, TigaseDBException {
-		String[] buddies = roster_util.getBuddies(session, roster_util.PENDING_IN);
+		String[] buddies = roster_util.getBuddies(session, RosterAbstract.PENDING_IN);
 		if (buddies != null) {
 			for (String buddy: buddies) {
 				Element presence = new Element(PRESENCE_ELEMENT_NAME);
@@ -191,6 +190,7 @@ public abstract class Presence {
 	 * to all other user active resources.
 	 *
 	 * @param session a <code>XMPPResourceConnection</code> value
+	 * @param results 
 	 * @exception NotAuthorizedException if an error occurs
 	 */
 	protected static void updateOfflineChange(final XMPPResourceConnection session,
@@ -340,7 +340,7 @@ public abstract class Presence {
 		log.finest("Added direct presence jid: " + jid);
 	}
 
-	@SuppressWarnings("fallthrough")
+	@SuppressWarnings({"unchecked", "fallthrough"})
   public static void process(final Packet packet,
 		final XMPPResourceConnection session,
 		final NonAuthUserRepository repo, final Queue<Packet> results,
@@ -642,11 +642,22 @@ public abstract class Presence {
 					break;
 				case error: {
 					// This is message to 'this' client probably
-					Element elem = packet.getElement().clone();
-					Packet result = new Packet(elem);
-					result.setTo(session.getConnectionId());
-					result.setFrom(packet.getTo());
-					results.offer(result);
+					// Only error responses to DIRECT presence should be sent back
+					// to the client, all other should be ignored for now.
+					// Later on the Tigase should remember who responded with
+					// an error and don't send presence updates to this entity
+					Set<String> direct_presences =
+									(Set<String>) session.getSessionData(DIRECT_PRESENCE);
+					if (direct_presences != null &&
+									direct_presences.contains(packet.getElemFrom())) {
+						Element elem = packet.getElement().clone();
+						Packet result = new Packet(elem);
+						result.setTo(session.getConnectionId());
+						result.setFrom(packet.getTo());
+						results.offer(result);
+					} else {
+						// Ignore for now....
+					}
 				}
 					break;
 				default:
