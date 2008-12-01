@@ -108,6 +108,12 @@ public class PacketFilter {
 				}
 			}
 
+		} catch (PacketErrorTypeException e) {
+			// Ignore this packet
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Ignoring packet with an error to non-existen user session: " +
+								packet.toString());
+			}
 		} catch (Exception e) {
 			log.log(Level.FINEST, "Packet preprocessing exception: ", e);
 			return false;
