@@ -684,8 +684,8 @@ public abstract class Presence {
 					"Can not access user Roster, user session is not authorized yet: " +
 					packet.getStringData());
 				log.log(Level.FINEST, "presence problem...", e);
-				results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-						"You must authorize session first.", true));
+//				results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
+//						"You must authorize session first.", true));
 			} catch (TigaseDBException e) {
 				log.warning("Error accessing database for presence data: " + e);
 			} // end of try-catch
