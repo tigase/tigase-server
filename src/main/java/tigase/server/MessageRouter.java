@@ -214,9 +214,9 @@ public class MessageRouter extends AbstractMessageReceiver {
 		// There is a need to process packets with the same from and to address
 		// let't try to relax restriction and block all packets with error type
 		// 2008-06-16
-		if ((packet.getFrom() != null &&
-						packet.getFrom().equals(packet.getTo()) &&
-						packet.getType() == StanzaType.error) ||
+		if ((packet.getType() == StanzaType.error &&
+						packet.getFrom() != null &&
+						packet.getFrom().equals(packet.getTo())) ||
 						(packet.getFrom() == NULL_ROUTING &&
 						packet.getElemFrom() != null &&
 						packet.getElemFrom().equals(packet.getTo()))) {
@@ -291,6 +291,8 @@ public class MessageRouter extends AbstractMessageReceiver {
 		if (comps != null) {
 			Queue<Packet> results = new LinkedList<Packet>();
 			for (ServerComponent serverComponent : comps) {
+				log.finest("Packet processed by: " + 
+								serverComponent.getComponentId());
 				serverComponent.processPacket(packet, results);
 				if (results.size() > 0) {
 					for (Packet res : results) {
@@ -301,6 +303,7 @@ public class MessageRouter extends AbstractMessageReceiver {
 				}
 			}
 		} else {
+			log.finest("There is no component for the packet, sending it back");
 			try {
 				addOutPacketNB(
 					Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet,
