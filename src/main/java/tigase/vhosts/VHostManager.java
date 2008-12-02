@@ -252,8 +252,12 @@ public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
 	public ServerComponent[] getComponentsForNonLocalDomain(String domain) {
 		++getComponentsForNonLocalDomainCalls;
 		// Return components for non-local domains
-		return nonLocalDomainsHandlers.toArray(new ServerComponent[nonLocalDomainsHandlers.
-						size()]);
+		if (nonLocalDomainsHandlers.size() > 0) {
+			return nonLocalDomainsHandlers.toArray(
+							new ServerComponent[nonLocalDomainsHandlers.size()]);
+		} else {
+			return null;
+		}
 	}
 	
 	public ServerComponent[] getComponentsForLocalDomain(String domain) {
@@ -363,9 +367,8 @@ public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
 		if (vh != null && !vh.isEmpty()) {
 			VHostItem vhost = new VHostItem(vh);
 			String enabled = Command.getFieldValue(packet, "Enabled");
-			if (!"true".equals(enabled)) {
-				vhost.setEnabled(false);
-			}
+			vhost.setEnabled(enabled == null || enabled.isEmpty() ||
+							"true".equals(enabled));
 			repo.addVHost(vhost);
 			addCompletedVHostsField(result);
 		} else {
