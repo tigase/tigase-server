@@ -259,19 +259,24 @@ public abstract class Presence {
 	 * <code>updatePresenceChange</code> method is used to broadcast
 	 * to all active resources presence stanza received from other users, like
 	 * incoming avaiability presence, subscription presence and so on...
-	 * But only to those resources who
+	 * Initial presences are however sent only to those resources which
+	 * already have sent initial presence.
 	 *
 	 * @param presence an <code>Element</code> presence received from other users,
 	 * we have to change 'to' attribute to full resource JID.
 	 * @param session a <code>XMPPResourceConnection</code> value keeping
 	 * connection session object.
+	 * @param results
 	 * @exception NotAuthorizedException if an error occurs
 	 */
 	protected static void updatePresenceChange(final Element presence,
     final XMPPResourceConnection session, final Queue<Packet> results)
 		throws NotAuthorizedException {
+		boolean initial_p = (presence.getAttribute("type") == null ||
+						"available".equals(presence.getAttribute("type")) ||
+						"unavailable".equals(presence.getAttribute("type")));
 		for (XMPPResourceConnection conn: session.getActiveSessions()) {
-			if (conn.getSessionData(PRESENCE_KEY) != null) {
+			if (conn.getSessionData(PRESENCE_KEY) != null || !initial_p) {
 				// Update presence change only for online resources that is
 				// resources which already sent initial presence.
 				log.finer("Update presence change to: " + conn.getJID());
