@@ -163,7 +163,7 @@ public class PacketFilter {
 					// Nothing to do....
 					return true;
 				}
-				log.warning("No 'to' address, can't deliver packet: "
+				log.info("No 'to' address, can't deliver packet: "
 					+ packet.getStringData());
 				return false;
 			}
