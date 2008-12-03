@@ -24,6 +24,25 @@ import java.util.logging.Logger;
 import tigase.xml.Element;
 
 /**
+ * Objects of this class represent virtual host with all hosts configuration
+ * settings. In most cases simple domain name string is not enough to deal with
+ * the virtual host. VHost can be enabled/disabled. Can be available to selected
+ * server components only and so on. Therefore every time there is a detailed
+ * information needed for a vhost this classed must be used.
+ *
+ * This class has it's own XML representation which can be used for creating
+ * an instance of the class or can be exported to the XML form for permanent
+ * storage:
+ * <pre>
+ * <vhost hostname="vhost.something.com"
+ *        enabled="true"
+ *        anon="true"
+ *        register="true"
+ *        max-users="99999999999L">
+ *   <comps/>
+ *   <other/>
+ * </pre>
+ *
  * Created: 22 Nov 2008
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -34,13 +53,45 @@ public class VHostItem {
 	private static final Logger log =
 					Logger.getLogger("tigase.vhosts.VHostItem");
 
+	/**
+	 * Element name to for the VHostItem XML storage.
+	 */
 	public static final String VHOST_ELEM = "vhost";
+	/**
+	 * Element name for the VHostItem XML child keeping list of the server component
+	 * which can handle packets for this domain. In most cases this element should
+	 * be empty.
+	 */
 	public static final String COMPONENTS_ELEM = "comps";
+	/**
+	 * Element name for the VHostItem XML child keeping all the extra parameters
+	 * for the domain. This is a container for future extensions and parameters
+	 * which are not defined yet.
+	 */
 	public static final String OTHER_PARAMS_ELEM = "other";
+	/**
+	 * This is an attribute name for storing the VHost name.
+	 */
 	public static final String HOSTNAME_ATT = "hostname";
+	/**
+	 * This is an attribute name for storing information whether the VHost is
+	 * enabled or disabled.
+	 */
 	public static final String ENABLED_ATT = "enabled";
+	/**
+	 * This is an attribute name for storing information whether anonymous
+	 * user can login for this domain.
+	 */
 	public static final String ANONYMOUS_ENABLED_ATT = "anon";
+	/**
+	 * This is an attribute name for storing information whether user registration
+	 * is allowed for this domain.
+	 */
 	public static final String REGISTER_ENABLED_ATT = "register";
+	/**
+	 * This is an attribute name for storing the maximum number of users for
+	 * this virtual domain.
+	 */
 	public static final String MAX_USERS_NUMBER_ATT = "max-users";
 
 	private String vhost = null;
@@ -51,10 +102,22 @@ public class VHostItem {
 	private long maxUsersNumber = 99999999999L;
 	private String otherDomainParams = null;
 
+	/**
+	 * The constructor creates the <code>VHostItem</code> instance for a given
+	 * domain name with default values for all other parameters. By the default
+	 * all domain parameters are set to true.
+	 * @param vhost is a <code>String</code> value with a domain name.
+	 */
 	public VHostItem(String vhost) {
 		this.vhost = vhost;
 	}
 
+	/**
+	 * The constructor creates the <code>VHostItem</code> instance from a given
+	 * XML element. Please refer to the class documentation for more details of
+	 * the XML element.
+	 * @param elem is an <code>Element</code> object with virtual domain settings.
+	 */
 	public VHostItem(Element elem) {
 		vhost = elem.getAttribute(HOSTNAME_ATT);
 		enabled = Boolean.parseBoolean(elem.getAttribute(ENABLED_ATT));
@@ -76,6 +139,10 @@ public class VHostItem {
 						elem.getCData("/" + VHOST_ELEM + "/" + OTHER_PARAMS_ELEM);
 	}
 
+	/**
+	 * The method exports the <code>VHostItem</code> object to XML representation.
+	 * @return an <code>Element</code> object with vhost information.
+	 */
 	public Element toXML() {
 		String comps_str = "";
 		if (comps != null && comps.length > 0) {
@@ -98,54 +165,143 @@ public class VHostItem {
 		return elem;
 	}
 
+	/**
+	 * Returns an array with the server components names which should process
+	 * packets sent to this domain or <code>null</code> (default) if there is
+	 * no specific component assigned to this domain.
+	 * @return a <code>String[]</code> object with server component names.
+	 */
 	public String[] getComps() {
 		return comps;
 	}
 
+	/**
+	 * Sets an array with the server component names by which packets to this
+	 * domain can be processed. Every local domain will be handled by
+	 * <code>VHostListener</code> which returns <code>true</code> for
+	 * <code>handlesLocalDomains()</code> method call and by all components
+	 * set via this method.
+	 * @param comps is an <code>String[]</code> array with server component names.
+	 */
 	public void setComps(String[] comps) {
 		this.comps = comps;
 	}
 
+	/**
+	 * Checks whether this domain is set as enabled or not. This is domain own
+	 * configuration parameter which allows to temporarly disable domain so packets
+	 * for this domain are not processed normally. Instead the server returns
+	 * an error.
+	 * @return a <code>boolean</code> value <code>true</code> if the domain is
+	 * enabled and <code>false</code> if the domain is disabled.
+	 */
 	public boolean isEnabled() {
 		return enabled;
 	}
 
+	/**
+	 * This method allows to enable or disable local domain. If the domain is
+	 * disabled packets sent for this domain are not processed normally, instead
+	 * the server returns an error to the sender.
+	 * Domain is enabled by default.
+	 * @param enabled is a <code>boolean</code> value indicating whether the
+	 * domain is enabled or not.
+	 */
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
 
+	/**
+	 * The method checks whether user registration is enabled for this domain
+	 * or not. This is the domain own configuration parameter which allows to
+	 * disable user accounts registration via XMPP per domain basis.
+	 * @return a <code>boolean</code> value indicating whether user account
+	 * registration is allowed for this domain.
+	 */
 	public boolean isRegisterEnabled() {
 		return registerEnabled;
 	}
 
+	/**
+	 * This method allows to enable or disable user account registration for this
+	 * domain. By default user account registration is enabled.
+	 * @param enabled is a <code>boolean</code> value indicating whether user
+	 * account registration is allowed for this domain or not.
+	 */
 	public void setRegisterEnabled(boolean enabled) {
 		this.registerEnabled = enabled;
 	}
 
+	/**
+	 * This method checks whether anonymous login is enabled for this domain.
+	 * This is the domain own configuration parameter which allows to disable
+	 * anonymous logins on per domain basis.
+	 * @return a <code>boolean</code> value indicating whether anonymous logins
+	 * are allowed for this domain.
+	 */
 	public boolean isAnonymousEnabled() {
 		return anonymousEnabled;
 	}
 
+	/**
+	 * This method allows to enable or disable anonymous logins for this domain.
+	 * By default anonymous logins are enabled.
+	 * @param enabled is a <code>boolean</code> value indicating whether anonymous
+	 * logins are allowed for this domain.
+	 */
 	public void setAnonymousEnabled(boolean enabled) {
 		this.anonymousEnabled = enabled;
 	}
 
+	/**
+	 * This method returns the maximum number of user accounts allowed for
+	 * this domain. This parameter is to allow for limiting number of users
+	 * on per domain basis.
+	 * @return a <code>long</code> value indicating the maximum number of
+	 * user accounts allowed for this domain.
+	 */
 	public long getMaxUsersNumber() {
 		return maxUsersNumber;
 	}
 
+	/**
+	 * This method allows to set the maximum number of user accounts allowed for
+	 * this domain. The default value of this parameter is:
+	 * <code>99999999999L</code>.
+	 * @param maxUsersNumber is a <code>long</code> value specifying the maximum
+	 * number of user accounts allowed for this domain.
+	 */
 	public void setMaxUsersNumber(long maxUsersNumber) {
 		this.maxUsersNumber = maxUsersNumber;
 	}
 
+	/**
+	 * This method allows to access the virtual domain other configuration
+	 * parameters. This is future feature API and it is not used right now.
+	 * It allows to access configuration parameters which are not specified
+	 * at the time of API definition.
+	 * @return a <code>String</code> value with domain extra parameters.
+	 */
 	public String  getOtherDomainParams() {
 		return otherDomainParams;
 	}
 
+	/**
+	 * This method allows to set extra configuration parameters for the virtual
+	 * domain.  This is future feature API and it is not used right now.
+	 * It allows to access configuration parameters which are not specified
+	 * at the time of API definition.
+	 * @param otherParams is a <code>String</code> value with domain extra
+	 * parameters.
+	 */
 	public void setOtherDomainParams(String otherParams) {
 		this.otherDomainParams = otherParams;
 	}
 
+	/**
+	 * This method return a virtual host name as a <code>String</code> value.
+	 * @return a <code>String</code> value with the virtual domain name.
+	 */
 	public String getVhost() {
 		return vhost;
 	}

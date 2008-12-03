@@ -36,6 +36,19 @@ import tigase.xml.SingletonFactory;
 import static tigase.conf.Configurable.*;
 
 /**
+ * This implementation stores virtual domains in the UserRepository database.
+ * It loads initial settings and virtual hosts from the configuration file
+ * and then loads more vhosts from the database. Virtual domains from the
+ * database can overwrite (disable) vhosts loaded from the configuration file.
+ *
+ * This implementation keeps all virtual hosts and their parameters in a single
+ * database field. This might not be very efficient if you want to manager big
+ * number of virtual domains. It is sufficient for hundreds of vhosts. If you
+ * need thousands of VHosts support I advice to implement this storage in
+ * more efficient way using separate database tables instead of UserRepository.
+ * Please note there is a limit of about 300 vhosts if you use Derby database.
+ *
+ *
  * Created: Nov 29, 2008 2:32:48 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -131,6 +144,7 @@ public class VHostJDBCRepository extends VhostConfigRepository {
 		}
 	}
 
+	@Override
 	public void store() {
 		super.store();
 		StringBuilder sb = new StringBuilder();

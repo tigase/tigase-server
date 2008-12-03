@@ -23,7 +23,10 @@ package tigase.vhosts;
 import tigase.server.ServerComponent;
 
 /**
- * Describe interface VHostListener here.
+ * Interface VHostListener needs to be implemented by every class wanting
+ * to accept and process XMPP packets sent to virtual domains. It allows
+ * for basic component settings and retrieve information and configuration
+ * about virtual domains server by the installation.
  *
  *
  * Created: Fri Nov 21 14:29:49 2008
@@ -34,6 +37,12 @@ import tigase.server.ServerComponent;
 public interface VHostListener
 				extends ServerComponent {
 
+	/**
+	 * Sets the VHostManager which works on this server installation.
+	 * The VHostManager allows for accessing vritual domain data.
+	 * @param manager is a reference to VHostManager available on the server
+	 * installation.
+	 */
 	void setVHostManager(VHostManagerIfc manager);
 
 	/**
