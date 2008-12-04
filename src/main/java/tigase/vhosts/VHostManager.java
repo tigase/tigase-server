@@ -39,7 +39,6 @@ import tigase.server.Packet;
 import tigase.server.Permissions;
 import tigase.server.ServerComponent;
 import tigase.stats.StatRecord;
-import tigase.stats.StatisticType;
 import tigase.stats.StatisticsContainer;
 import tigase.util.JIDUtils;
 import tigase.xml.Element;
@@ -358,8 +357,9 @@ public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
 		Command.setStatus(result, Command.Status.executing);
 		Command.addAction(result, Command.Action.complete);
 		Command.addFieldValue(result, "VHost", "");
-		Command.addFieldValue(result, "Enabled", "true", "true", new String[]{"true",
-							"false"}, new String[]{"true", "false"});
+		Command.addFieldValue(result, "Enabled", "true", "Enabled",
+						new String[]{"true", "false"},
+						new String[]{"true", "false"});
 	}
 
 	private void updateVHostChanges(Packet packet, Packet result) {
