@@ -114,7 +114,7 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 		<field type="text" align="left" variable="virtualDomains">
 <!-- 			<description align="left" id="description.virtualDomains" -->
 <!-- 									 txt="You can enter multiple virtual domains separating them with a comma: im.$HOST_NAME,jabber.$HOST_NAME"/> -->
-			<spec txt="Your XMPP (Jabber) domain" size="30" set="$HOST_NAME"/>
+			<spec txt="Your XMPP (Jabber) domains" size="30" set="$HOST_NAME"/>
 		</field>
 
 		<field type="text" align="right" variable="admins">
