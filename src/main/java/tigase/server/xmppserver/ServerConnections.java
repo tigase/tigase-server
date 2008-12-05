@@ -125,6 +125,14 @@ public class ServerConnections {
 		return result;
 	}
 
+	public OutgoingState getOutgoingState() {
+		return conn_state;
+	}
+
+	public int getDBKeysSize() {
+		return db_keys.size();
+	}
+
 	public synchronized boolean sendControlPacket(Packet packet) {
 		boolean result = false;
 		if (outgoing != null && outgoing.isConnected()
@@ -138,8 +146,13 @@ public class ServerConnections {
 		}
 		if (!result) {
 			addControlPacket(packet);
+			log.finest("Inserted to waiting queue packet: " + packet.toString());
 		}
 		return result;
+	}
+
+	public boolean outgoingIsNull() {
+		return outgoing == null;
 	}
 
 	public void addDataPacket(Packet packet) {

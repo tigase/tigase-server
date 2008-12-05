@@ -22,36 +22,21 @@
 
 package tigase.server.xmppserver;
 
-import java.io.IOException;
 import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.LinkedList;
-import java.util.LinkedHashSet;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Queue;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import tigase.db.UserRepository;
 import tigase.net.ConnectionType;
 //import tigase.net.IOService;
 import tigase.net.SocketType;
 import tigase.server.ConnectionManager;
-import tigase.server.MessageReceiver;
 import tigase.server.Packet;
-import tigase.disco.XMPPService;
 import tigase.util.Algorithms;
 import tigase.util.DNSResolver;
 import tigase.util.JIDUtils;
@@ -86,13 +71,13 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 	private static final String DB_RESULT_EL_NAME = "db:result";
 	private static final String VERIFY_EL_NAME = "verify";
 	private static final String DB_VERIFY_EL_NAME = "db:verify";
-	public static final String HOSTNAMES_PROP_KEY = "hostnames";
-	public String[] HOSTNAMES_PROP_VAL =	{"localhost", "hostname"};
+//	public static final String HOSTNAMES_PROP_KEY = "hostnames";
+//	public String[] HOSTNAMES_PROP_VAL =	{"localhost", "hostname"};
 	public static final String MAX_PACKET_WAITING_TIME_PROP_KEY =
 		"max-packet-waiting-time";
 	public static final long MAX_PACKET_WAITING_TIME_PROP_VAL = 5*MINUTE;
 
-	private String[] hostnames = HOSTNAMES_PROP_VAL;
+//	private String[] hostnames = HOSTNAMES_PROP_VAL;
 
 	/**
 	 * <code>maxPacketWaitingTime</code> keeps the maximum time packets
@@ -151,7 +136,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 			String to_hostname = JIDUtils.getNodeHost(packet.getElemTo());
 			// We don't send packets to local domains trough s2s, there
 			// must be something wrong with configuration
-			if (Arrays.binarySearch(hostnames, to_hostname) >= 0) {
+			if (isLocalDomain(to_hostname)) {
 				// Ups, remote hostname is the same as one of local hostname??
 				// Internal loop possible, we don't want that....
 				// Let's send the packet back....
@@ -181,7 +166,10 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 			ServerConnections serv_conn = getServerConnections(cid);
 			if (serv_conn == null
 				|| (!serv_conn.sendPacket(packet) && serv_conn.needsConnection())) {
+				log.finest("Couldn't send packet, creating a new connection.");
 				createServerConnection(cid, packet, serv_conn);
+			} else {
+				log.finest("Packet seems to be sent correctly: " + packet.toString());
 			}
 		} // end of else
 	}
@@ -221,7 +209,9 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 		String remotehost = JIDUtils.getNodeHost(cid);
 		if (openNewServerConnection(localhost, remotehost)) {
 			conns.setConnecting();
+			log.finest("Connecting a new s2s service: " + cid);
 		} else {
+			log.finest("Couldn't open a new s2s service: (UknownHost??) " + cid);
 			// Can't establish connection...., unknown host??
 			Queue<Packet> waitingPackets = conns.getWaitingPackets();
 			// Well, is somebody injects a packet with the same sender and
@@ -502,33 +492,33 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> props = super.getDefaults(params);
-		// Usually we want the server to do s2s for the external component too:
-		if (params.get(GEN_VIRT_HOSTS) != null) {
-			HOSTNAMES_PROP_VAL = ((String)params.get(GEN_VIRT_HOSTS)).split(",");
-		} else {
-			HOSTNAMES_PROP_VAL = DNSResolver.getDefHostNames();
-		}
-		ArrayList<String> vhosts =
-      new ArrayList<String>(Arrays.asList(HOSTNAMES_PROP_VAL));
-		for (Map.Entry<String, Object> entry: params.entrySet()) {
-			if (entry.getKey().startsWith(GEN_EXT_COMP)) {
-				String ext_comp = (String)entry.getValue();
-				if (ext_comp != null) {
-					String[] comp_params = ext_comp.split(",");
-					vhosts.add(comp_params[1]);
-				}
-			}
-			if (entry.getKey().startsWith(GEN_COMP_NAME)) {
-				String comp_name_suffix = entry.getKey().substring(GEN_COMP_NAME.length());
-				String c_name = (String)params.get(GEN_COMP_NAME + comp_name_suffix);
-				for (String vhost: HOSTNAMES_PROP_VAL) {
-					vhosts.add(c_name + "." + vhost);
-				}
-			}
-		}
-		HOSTNAMES_PROP_VAL = vhosts.toArray(new String[0]);
-		hostnames = HOSTNAMES_PROP_VAL;
-		props.put(HOSTNAMES_PROP_KEY, HOSTNAMES_PROP_VAL);
+// Usually we want the server to do s2s for the external component too:
+//		if (params.get(GEN_VIRT_HOSTS) != null) {
+//			HOSTNAMES_PROP_VAL = ((String)params.get(GEN_VIRT_HOSTS)).split(",");
+//		} else {
+//			HOSTNAMES_PROP_VAL = DNSResolver.getDefHostNames();
+//		}
+//		ArrayList<String> vhosts =
+//      new ArrayList<String>(Arrays.asList(HOSTNAMES_PROP_VAL));
+//		for (Map.Entry<String, Object> entry: params.entrySet()) {
+//			if (entry.getKey().startsWith(GEN_EXT_COMP)) {
+//				String ext_comp = (String)entry.getValue();
+//				if (ext_comp != null) {
+//					String[] comp_params = ext_comp.split(",");
+//					vhosts.add(comp_params[1]);
+//				}
+//			}
+//			if (entry.getKey().startsWith(GEN_COMP_NAME)) {
+//				String comp_name_suffix = entry.getKey().substring(GEN_COMP_NAME.length());
+//				String c_name = (String)params.get(GEN_COMP_NAME + comp_name_suffix);
+//				for (String vhost: HOSTNAMES_PROP_VAL) {
+//					vhosts.add(c_name + "." + vhost);
+//				}
+//			}
+//		}
+//		HOSTNAMES_PROP_VAL = vhosts.toArray(new String[0]);
+//		hostnames = HOSTNAMES_PROP_VAL;
+//		props.put(HOSTNAMES_PROP_KEY, HOSTNAMES_PROP_VAL);
 		props.put(MAX_PACKET_WAITING_TIME_PROP_KEY,
 			MAX_PACKET_WAITING_TIME_PROP_VAL);
 		return props;
@@ -547,12 +537,12 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 	@Override
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
-		hostnames = (String[])props.get(HOSTNAMES_PROP_KEY);
-		if (hostnames == null || hostnames.length == 0) {
-			log.warning("Hostnames definition is empty, setting 'localhost'");
-			hostnames = new String[] {"localhost"};
-		} // end of if (hostnames == null || hostnames.length == 0)
-		Arrays.sort(hostnames);
+//		hostnames = (String[])props.get(HOSTNAMES_PROP_KEY);
+//		if (hostnames == null || hostnames.length == 0) {
+//			log.warning("Hostnames definition is empty, setting 'localhost'");
+//			hostnames = new String[] {"localhost"};
+//		} // end of if (hostnames == null || hostnames.length == 0)
+//		Arrays.sort(hostnames);
 
 //		addRouting("*");
 		maxPacketWaitingTime = (Long)props.get(MAX_PACKET_WAITING_TIME_PROP_KEY);
@@ -608,9 +598,12 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 				++open_s2s_connections;
 				++connected_servers;
 			}
-			log.finest("s2s instance: " + entry.getKey()
-				+ ", waitingQueue: " + conn.getWaitingPackets().size()
-				+ ", outgoingActive: " + conn.isOutgoingConnected());
+			log.finest("s2s instance: " + entry.getKey() +
+							", waitingQueue: " + conn.getWaitingPackets().size() +
+						  ", outgoingIsNull(): " + conn.outgoingIsNull() + 
+							", outgoingActive: " + conn.isOutgoingConnected() +
+							", OutgoingState: " + conn.getOutgoingState().toString() +
+							", db_keys.size(): " + conn.getDBKeysSize());
 		}
  		stats.add(new StatRecord(getName(), "Open s2s connections", "int",
  				open_s2s_connections, Level.INFO));
@@ -706,7 +699,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 
 		String local_hostname = JIDUtils.getNodeHost(packet.getElemTo());
 		// Check whether this is correct local host name...
-		if (Arrays.binarySearch(hostnames, local_hostname) < 0) {
+		if (!isLocalDomain(local_hostname)) {
 			// Ups, this hostname is not served by this server, return stream
 			// error and close the connection....
 			generateStreamError("host-unknown", serv);
@@ -715,7 +708,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 		String remote_hostname = JIDUtils.getNodeHost(packet.getElemFrom());
 		// And we don't want to accept any connection which is from remote
 		// host name the same as one my localnames.......
-		if (Arrays.binarySearch(hostnames, remote_hostname) >= 0) {
+		if (isLocalDomain(remote_hostname)) {
 			// Ups, remote hostname is the same as one of local hostname??
 			// fake server or what? internal loop, we don't want that....
 			// error and close the connection....
