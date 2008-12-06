@@ -22,7 +22,6 @@
 
 package tigase.server;
 
-import java.lang.Number;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryUsage;
 import java.lang.management.OperatingSystemMXBean;
