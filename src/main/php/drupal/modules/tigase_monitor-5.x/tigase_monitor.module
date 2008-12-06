@@ -309,6 +309,10 @@ function tigase_monitor_stats($stats = NULL) {
         $split_line = explode(' ', trim($line));
         $statsinfo['Running version:'] = $split_line[1];
       }
+			if (stripos($line, 'CPU')) {
+        $split_line = explode(' ', trim($line));
+        $statsinfo['CPU usage:'] = $split_line[2];
+      }
     }
 
   }
