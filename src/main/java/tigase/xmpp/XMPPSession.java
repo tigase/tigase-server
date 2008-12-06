@@ -22,10 +22,7 @@
 package tigase.xmpp;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import tigase.util.JIDUtils;
@@ -148,7 +145,8 @@ public class XMPPSession {
 	public XMPPResourceConnection getResourceForResource(final String resource) {
 		if (resource != null && resource.length() > 0) {
 			for (XMPPResourceConnection conn: activeResources) {
-				if (resource.equals(conn.getResource())) {
+				log.finest("Resource checking: " + conn.getResource());
+				if (resource.equalsIgnoreCase(conn.getResource())) {
 					return conn;
 				} // end of if (resource.equals(conn.getResource()))
 			} // end of for (XMPPResourceConnection conn: activeResources)
@@ -186,6 +184,7 @@ public class XMPPSession {
 
 	public XMPPResourceConnection getResourceConnection(final String jid) {
 
+		log.finest("Called for: " + jid);
 		if (activeResources.size() == 0) {
 			return null;
 		} // end of if (activeResources.size() == 0)
