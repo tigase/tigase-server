@@ -129,7 +129,7 @@ import static tigase.server.sreceiver.PropertyConstants.*;
  * @version $Rev$
  */
 public class StanzaReceiver extends AbstractMessageReceiver
-	implements Configurable, XMPPService {
+	implements Configurable, XMPPService, StanzaReceiverIfc {
 
 	private static final Logger log =
 		Logger.getLogger("tigase.server.sreceiver.StanzaReceiver");
@@ -343,6 +343,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		Map<String, Object> task_params ) {
 		//		ReceiverTaskIfc ttask = task_types.get(task_type);
 		ReceiverTaskIfc ntask = task_types.get(task_type).getTaskInstance();
+		ntask.setStanzaReceiver(this);
 		ntask.setJID(task_jid);
 		task_params.put(USER_REPOSITORY_PROP_KEY, repository);
 		ntask.setParams(task_params);
@@ -675,7 +676,8 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		}
 	}
 
-	protected boolean addOutPacket(Packet packet) {
+	@Override
+	public boolean addOutPacket(Packet packet) {
 		return super.addOutPacket(packet);
 	}
 

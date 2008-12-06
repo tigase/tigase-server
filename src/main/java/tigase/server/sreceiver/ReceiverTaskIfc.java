@@ -21,7 +21,6 @@
  */
 package tigase.server.sreceiver;
 
-import java.awt.TrayIcon.MessageType;
 import java.util.Map;
 import java.util.Queue;
 import java.util.List;
@@ -39,6 +38,8 @@ import tigase.stats.StatRecord;
  * @version $Rev$
  */
 public interface ReceiverTaskIfc {
+
+	void setStanzaReceiver(StanzaReceiverIfc srecv);
 
 	/**
 	 * <code>getType</code> method returns the task type name. This

@@ -139,6 +139,7 @@ public abstract class RepoRosterTask extends AbstractReceiverTask {
 		saveToRepository(ri);
 	}
 
+	@Override
 	public void setRosterItemModerationAccepted(RosterItem ri, boolean accepted) {
 		super.setRosterItemModerationAccepted(ri, accepted);
 		saveToRepository(ri);

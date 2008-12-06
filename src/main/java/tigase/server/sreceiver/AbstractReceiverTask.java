@@ -23,19 +23,15 @@ package tigase.server.sreceiver;
 
 
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import tigase.xml.Element;
 import tigase.server.Packet;
-import tigase.server.sreceiver.PropertyConstants.SenderRestrictions;
 import tigase.stats.StatRecord;
 import tigase.util.JIDUtils;
 import tigase.xmpp.StanzaType;
@@ -74,6 +70,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 		Pattern.compile(SUBSCR_RESTR_REGEX_PROP_VAL);
 	private String owner = TASK_OWNER_PROP_VAL;
 	private String[] admins = {};
+	private StanzaReceiverIfc srecv = null;
 
 	private long packets_received = 0;
 	private long packets_sent = 0;
@@ -81,6 +78,14 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 	private Map<String, RosterItem> roster = new HashMap<String, RosterItem>();
 
 	// Implementation of tigase.server.sreceiver.ReceiverTaskIfc
+
+	public void setStanzaReceiver(StanzaReceiverIfc srecv) {
+		this.srecv = srecv;
+	}
+
+	protected boolean addOutPacket(Packet packet) {
+		return srecv.addOutPacket(packet);
+	}
 
 	/**
 	 * Describe <code>getInstance</code> method here.
