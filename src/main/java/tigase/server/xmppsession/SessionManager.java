@@ -155,6 +155,7 @@ public class SessionManager extends AbstractMessageReceiver
 		// so let's look for established session for this user...
 		final String to = p.getElemTo();
 		if (to != null) {
+			log.finest("Searching for resource connection for: " + to);
 			conn = getResourceConnection(to);
 			if (conn != null && conn.getConnectionStatus() == ConnectionStatus.TEMP) {
 				conn = null;
@@ -210,7 +211,8 @@ public class SessionManager extends AbstractMessageReceiver
 	protected void processPacket(Packet packet, XMPPResourceConnection conn) {
 		packet.setTo(getComponentId());
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("processing packet: " + packet.toString());
+			log.finest("processing packet: " + packet.toString() +
+							"connectionID: " + (conn != null ? conn.getConnectionId() : "null"));
 		}
 		Queue<Packet> results = new LinkedList<Packet>();
 
@@ -404,6 +406,7 @@ public class SessionManager extends AbstractMessageReceiver
 	private XMPPResourceConnection getResourceConnection(String jid) {
 		XMPPSession session = getSession(jid);
 		if (session != null) {
+			log.finest("Session not null, getting resource for jid: " + jid);
 			return session.getResourceConnection(jid);
 		} // end of if (session != null)
 		return null;
