@@ -21,10 +21,8 @@
  */
 package tigase.server.bosh;
 
-import java.io.IOException;
 import java.util.EnumMap;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -134,7 +132,8 @@ public class BoshSession {
 				wait_l = max_wait;
 			}
 		}
-		this.max_wait = Math.min(wait_l, max_wait);
+		//this.max_wait = Math.min(wait_l, max_wait);
+		this.max_wait = wait_l;
 		int hold_i = hold_requests;
 		String tmp_str = packet.getAttribute(HOLD_ATTR);
 		if (tmp_str != null) {
