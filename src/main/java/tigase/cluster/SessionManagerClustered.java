@@ -45,7 +45,6 @@ import tigase.xmpp.XMPPSession;
 import tigase.server.xmppsession.SessionManager;
 import tigase.xml.Element;
 
-import static tigase.server.xmppsession.SessionManagerConfig.*;
 
 /**
  * Class SessionManagerClustered
