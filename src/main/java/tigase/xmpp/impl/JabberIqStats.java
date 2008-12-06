@@ -96,7 +96,7 @@ public class JabberIqStats extends XMPPProcessor
 					Element stats = Command.getData(packet, "statistics", null);
 					query.addChildren(stats.getChildren());
 					Packet result = new Packet(iq);
-					result.setTo(session.getConnectionId());
+					result.setTo(session.getConnectionId(packet.getElemTo()));
 					results.offer(result);
 					log.finest("Sending result: " + result.getStringData());
 					return;
