@@ -22,6 +22,13 @@
 
 package tigase.server;
 
+import java.lang.Number;
+import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryUsage;
+import java.lang.management.OperatingSystemMXBean;
+import java.lang.management.ThreadMXBean;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +73,7 @@ public class MessageRouter extends AbstractMessageReceiver {
   private static final Logger log =
     Logger.getLogger("tigase.server.MessageRouter");
 
-	private static final long startupTime = System.currentTimeMillis();
+	//private static final long startupTime = System.currentTimeMillis();
 
 //	private Set<String> localAddresses =	new CopyOnWriteArraySet<String>();
 	private String disco_name = DISCO_NAME_PROP_VAL;
@@ -605,7 +612,7 @@ public class MessageRouter extends AbstractMessageReceiver {
 	@Override
 	public List<StatRecord> getStatistics() {
 		List<StatRecord> stats = super.getStatistics();
-    long uptime = (System.currentTimeMillis() - startupTime);
+    long uptime = ManagementFactory.getRuntimeMXBean().getUptime();
 		long days = uptime / (24 * HOUR);
 		long hours = (uptime - (days * 24 * HOUR)) / HOUR;
 		long minutes = (uptime - (days * 24 * HOUR + hours * HOUR)) / MINUTE;
@@ -618,16 +625,64 @@ public class MessageRouter extends AbstractMessageReceiver {
 				+ (minutes > 0 ? minutes + " min, " : "")
 				+ (seconds > 0 ? seconds + " sec" : "")
 				, Level.INFO));
-		Runtime runtime = Runtime.getRuntime();
-		long maxMem = runtime.maxMemory();
-		long totalMem = runtime.totalMemory();
-		long freeMem = runtime.freeMemory();
-		stats.add(new StatRecord(getName(), "Max JVM mem", "long", maxMem,
-				Level.INFO));
-		stats.add(new StatRecord(getName(), "Total JVM mem", "long", totalMem,
-				Level.INFO));
-		stats.add(new StatRecord(getName(), "Free JVM mem", "long", freeMem,
-				Level.INFO));
+//		Runtime runtime = Runtime.getRuntime();
+		// Run GC for more accurate memory readings
+		//runtime.gc();
+//		long maxMem = runtime.maxMemory();
+//		long totalMem = runtime.totalMemory();
+//		long freeMem = runtime.freeMemory();
+//		stats.add(new StatRecord(getName(), "Max JVM mem", "long", maxMem,
+//				Level.FINEST));
+//		stats.add(new StatRecord(getName(), "Total JVM mem", "long", totalMem,
+//				Level.FINEST));
+//		stats.add(new StatRecord(getName(), "Free JVM mem", "long", freeMem,
+//				Level.FINEST));
+
+		OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
+		NumberFormat format = NumberFormat.getNumberInstance();
+		format.setMaximumFractionDigits(4);
+		stats.add(new StatRecord(getName(), "Load average", "double",
+						format.format(osBean.getSystemLoadAverage()), Level.INFO));
+		stats.add(new StatRecord(getName(), "CPUs no", "int",
+						osBean.getAvailableProcessors(), Level.FINEST));
+
+		ThreadMXBean thBean = ManagementFactory.getThreadMXBean();
+		stats.add(new StatRecord(getName(), "Threads count", "int",
+						thBean.getThreadCount(), Level.FINEST));
+		long cpuTime = 0;
+		for (long thid : thBean.getAllThreadIds()) {
+			cpuTime += thBean.getThreadCpuTime(thid);
+		}
+//		stats.add(new StatRecord(getName(), "Threads CPU time", "long", cpuTime,
+//				Level.FINEST));
+		double cpuUsage = (new Long(cpuTime).doubleValue() / 1000000) / new Long(
+						uptime).doubleValue();
+		format = NumberFormat.getPercentInstance();
+		format.setMaximumFractionDigits(2);
+		stats.add(new StatRecord(getName(), "CPU usage", "double",
+						format.format(cpuUsage), Level.INFO));
+		MemoryUsage heap = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();
+		MemoryUsage nonHeap =
+						ManagementFactory.getMemoryMXBean().getNonHeapMemoryUsage();
+
+		format = NumberFormat.getIntegerInstance();
+		if (format instanceof DecimalFormat) {
+			DecimalFormat decf = (DecimalFormat)format;
+			decf.applyPattern(decf.toPattern()+" KB");
+		}
+		stats.add(new StatRecord(getName(), "Max Heap mem", "long", 
+						format.format(heap.getMax()/1024), Level.INFO));
+		stats.add(new StatRecord(getName(), "Used Heap", "long", 
+						format.format(heap.getUsed()/1024), Level.INFO));
+		stats.add(new StatRecord(getName(), "Free Heap", "long",
+						format.format((heap.getMax() - heap.getUsed())/1024), Level.INFO));
+		stats.add(new StatRecord(getName(), "Max NonHeap mem", "long", 
+						format.format(nonHeap.getMax()/1024), Level.INFO));
+		stats.add(new StatRecord(getName(), "Used NonHeap", "long",
+						format.format(nonHeap.getUsed()/1024), Level.INFO));
+		stats.add(new StatRecord(getName(), "Free NonHeap", "long",
+						format.format((nonHeap.getMax() - nonHeap.getUsed())/1024), Level.INFO));
+
 		return stats;
 	}
 
