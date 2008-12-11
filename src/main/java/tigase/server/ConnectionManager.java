@@ -317,6 +317,9 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 		delayedTasks.schedule(new TimerTask() {
 				public void run() {
 					String host = (String)port_props.get(PORT_REMOTE_HOST_PROP_KEY);
+					if (host == null) {
+						host = (String)port_props.get("remote-hostname");
+					}
 					int port = (Integer)port_props.get(PORT_KEY);
 					log.fine("Reconnecting service for component: " + getName()
 						+ ", to remote host: " + host + " on port: " + port);
