@@ -88,29 +88,27 @@ public class DiskMonitor extends AbstractMonitor {
 	@Override
 	public void check1Min(Queue<Packet> results) {
 		for (File file : roots) {
-			if (file.canWrite()) {
-				NumberFormat format = NumberFormat.getIntegerInstance();
-				if (format instanceof DecimalFormat) {
-					DecimalFormat decf = (DecimalFormat) format;
-					decf.applyPattern(decf.toPattern() + " KB");
-				}
-				NumberFormat formp = NumberFormat.getPercentInstance();
-				formp.setMaximumFractionDigits(2);
-				double percent = new Long(file.getUsableSpace()).doubleValue() /
-								new Long(file.getTotalSpace()).doubleValue();
-				if (file.getUsableSpace() < file.getTotalSpace() * treshold) {
-					prepareWarning("Available space on volume: " + file.toString() +
-									" is low: " + format.format(file.getUsableSpace()/1024) +
-									" of " + format.format(file.getTotalSpace()/1024) +
-									" - " + formp.format(percent),
-									results, file);
-				} else {
-					prepareCalmDown("Available space on volume: " + file.toString() +
-									" is OK now: " + format.format(file.getUsableSpace()/1024) +
-									" of " + format.format(file.getTotalSpace()/1024) +
-									" - " + formp.format(percent),
-									results, file);
-				}
+			NumberFormat format = NumberFormat.getIntegerInstance();
+			if (format instanceof DecimalFormat) {
+				DecimalFormat decf = (DecimalFormat) format;
+				decf.applyPattern(decf.toPattern() + " KB");
+			}
+			NumberFormat formp = NumberFormat.getPercentInstance();
+			formp.setMaximumFractionDigits(2);
+			double percent = new Long(file.getUsableSpace()).doubleValue() /
+							new Long(file.getTotalSpace()).doubleValue();
+			if (file.getUsableSpace() < file.getTotalSpace() * (1 - treshold)) {
+				prepareWarning("Available space on volume: " + file.toString() +
+								" is low: " + format.format(file.getUsableSpace() / 1024) +
+								" of " + format.format(file.getTotalSpace() / 1024) +
+								" - " + formp.format(percent),
+								results, file.toString());
+			} else {
+				prepareCalmDown("Available space on volume: " + file.toString() +
+								" is OK now: " + format.format(file.getUsableSpace() / 1024) +
+								" of " + format.format(file.getTotalSpace() / 1024) +
+								" - " + formp.format(percent),
+								results, file.toString());
 			}
 		}
 	}
@@ -128,29 +126,34 @@ public class DiskMonitor extends AbstractMonitor {
 		String format_n = "%1$15s%2$,12dM%3$,12dM%4$,12dM%5$12.2f%%\n";
 		long MEGA = 1024*1024;
 		for (File file : roots) {
-			if (file.canWrite()) {
-				double percent = new Long(file.getUsableSpace()).doubleValue() /
-								new Long(file.getTotalSpace()).doubleValue();
-				formatter.format(format_n, file.toString(),
-								(file.getTotalSpace() / MEGA), 
-								(file.getTotalSpace() - file.getUsableSpace())/MEGA,
-								(file.getUsableSpace()/MEGA), percent*100);
-			}
+			double percent = new Long(file.getUsableSpace()).doubleValue() /
+							new Long(file.getTotalSpace()).doubleValue();
+			formatter.format(format_n, file.toString(),
+							(file.getTotalSpace() / MEGA),
+							(file.getTotalSpace() - file.getUsableSpace()) / MEGA,
+							(file.getUsableSpace() / MEGA), percent * 100);
 		}
 		return formatter.toString();
 	}
 
 	private File[] getLinuxRoots() {
 		try {
-			BufferedReader buffr = new BufferedReader(new FileReader("/etc/mtab"));
+			String mtab = "/etc/mtab";
+			log.finest("Reading mtab: " + mtab);
+			BufferedReader buffr = new BufferedReader(new FileReader(mtab));
 			String line = null;
 			ArrayList<File> results = new ArrayList<File>();
 			while ((line = buffr.readLine()) != null) {
-				if (line.contains("proc") || line.contains("dev") || 
-								line.contains("tmpfs") || line.contains("sysfs")) {
+				log.finest("Analyzing line: " + line);
+				if (line.contains("proc") || line.contains("devfs") ||
+								line.contains("tmpfs") || line.contains("sysfs") ||
+								line.contains("devpts") || line.contains("securityfs")) {
+					log.finest("Found virtual fs line, omitting...");
 					continue;
 				}
+				log.finest("Splitting line...");
 				String[] parts = line.split("\\s");
+				log.finest("Found file system: " + parts[1]);
 				results.add(new File(parts[1]));
 			}
 			return results.toArray(new File[results.size()]);
@@ -170,8 +173,6 @@ public class DiskMonitor extends AbstractMonitor {
 		});
 	}
 
-	private File[] getSolarisRoots() {
-		throw new UnsupportedOperationException("Not yet implemented");
-	}
+	private File[] getSolarisRoots() { return File.listRoots();	}
 
 }
