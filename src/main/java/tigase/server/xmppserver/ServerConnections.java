@@ -80,6 +80,7 @@ public class ServerConnections {
 
 	private long sentPackets = 0;
 	private long receivedPackets = 0;
+	private String cid = null;
 
 	private ConnectionHandlerIfc handler = null;
 
@@ -97,8 +98,13 @@ public class ServerConnections {
 	 *
 	 * @param handler 
 	 */
-	public ServerConnections(ConnectionHandlerIfc handler) {
+	public ServerConnections(ConnectionHandlerIfc handler, String cid) {
 		this.handler = handler;
+		this.cid = cid;
+	}
+
+	public String getCID() {
+		return cid;
 	}
 
 	/**

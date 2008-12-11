@@ -77,7 +77,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 //	public String[] HOSTNAMES_PROP_VAL =	{"localhost", "hostname"};
 	public static final String MAX_PACKET_WAITING_TIME_PROP_KEY =
 		"max-packet-waiting-time";
-	public static final long MAX_PACKET_WAITING_TIME_PROP_VAL = 5*MINUTE;
+	public static final long MAX_PACKET_WAITING_TIME_PROP_VAL = 7*MINUTE;
 
 //	private String[] hostnames = HOSTNAMES_PROP_VAL;
 
@@ -179,7 +179,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 	}
 
 	private ServerConnections createNewServerConnections(String cid, Packet packet) {
-		ServerConnections conns = new ServerConnections(this);
+		ServerConnections conns = new ServerConnections(this, cid);
 		if (packet != null) {
 			if (packet.getElement().getXMLNS() == XMLNS_DB_VAL) {
 				conns.addControlPacket(packet);
@@ -214,7 +214,8 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 		if (openNewServerConnection(localhost, remotehost)) {
 			conns.setConnecting();
 			connectionWatchdog.schedule(
-							new ConnectionWatchdogTask(conns, localhost, remotehost), MINUTE);
+							new ConnectionWatchdogTask(conns, localhost, remotehost), 
+							2*MINUTE);
 			log.finest("Connecting a new s2s service: " + cid);
 		} else {
 			log.finest("Couldn't open a new s2s service: (UknownHost??) " + cid);
@@ -922,18 +923,28 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 		public void run() {
 			if (conns.getOutgoingState() ==
 							ServerConnections.OutgoingState.CONNECTING) {
+				log.finest("Connecting timeout expired, still connecting: " +
+								conns.getCID());
 				Queue<Packet> waiting = conns.getWaitingPackets();
 				if (waiting.size() > 0) {
-					String cid = getConnectionId(localhost, remotehost);
 					if (conns.waitingTime() > maxPacketWaitingTime) {
+						log.finest("Max packets waiting time expired, sending all back: " +
+										conns.getCID());
 						conns.stopAll();
-						bouncePacketsBack(Authorization.REMOTE_SERVER_TIMEOUT, cid);
+						bouncePacketsBack(Authorization.REMOTE_SERVER_TIMEOUT, 
+										conns.getCID());
 					} else {
-						createServerConnection(cid, null, conns);
+						log.finest("Reconnecting: " +	conns.getCID());
+						createServerConnection(conns.getCID(), null, conns);
 					}
 				} else {
 					conns.stopAll();
+					log.finest("No packets waiting in queue, giving up: " +
+									conns.getCID());
 				}
+			} else {
+				log.finest("Connecting timeout expired: " + conns.getCID() +
+								", connection state is: " +	conns.getOutgoingState());
 			}
 		}
 
