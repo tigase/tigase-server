@@ -169,16 +169,22 @@ public class TaskInstanceCommand implements TaskCommandIfc {
 			Map<String, PropertyItem> old_params = task.getParams();
 			Map<String, Object> new_params = new LinkedHashMap<String, Object>();
 			for (Map.Entry<String, PropertyItem> entry: old_params.entrySet()) {
-				String value =
-					Command.getFieldValue(packet, XMLUtils.escape(entry.getKey()));
-				if (value == null) {
-					value = "";
-				} // end of if (value == null)
-				value = XMLUtils.unescape(value);
-				if (!value.equals(entry.getValue().toString())) {
-					new_params.put(entry.getKey(), value);
-					Command.addFieldValue(result, "Info",
-						entry.getValue().getDisplay_name() + ": " + value, "fixed");
+				if (entry.getValue().isMultiValue()) {
+					String[] values =
+									Command.getFieldValues(packet, XMLUtils.escape(entry.getKey()));
+					new_params.put(entry.getKey(), values);
+				} else {
+					String value =
+									Command.getFieldValue(packet, XMLUtils.escape(entry.getKey()));
+					if (value == null) {
+						value = "";
+					} // end of if (value == null)
+					value = XMLUtils.unescape(value);
+					if (!value.equals(entry.getValue().toString())) {
+						new_params.put(entry.getKey(), value);
+						Command.addFieldValue(result, "Info",
+										entry.getValue().getDisplay_name() + ": " + value, "fixed");
+					}
 				}
 			} // end of for (String key: default_props.keySet())
 			try {
@@ -350,10 +356,11 @@ public class TaskInstanceCommand implements TaskCommandIfc {
 		if (task == null) {
 			task_name = Command.getFieldValue(packet, TASK_NAME_FIELD);
 			if (task_name != null) {
-				task = receiv.getTaskInstances().get(task_name);
+				task = receiv.getTask(task_name);
 			} // end of if (task_name != null)
 		} // end of if (task == null)
 		if (task != null) {
+			task_name = task.getJID();
 			if (!(receiv.isAdmin(packet.getElemFrom())
 					|| task.isAdmin(packet.getElemFrom()))) {
 				Command.addFieldValue(result, "Info",
@@ -387,7 +394,7 @@ public class TaskInstanceCommand implements TaskCommandIfc {
 			Command.setStatus(result, Command.Status.executing);
 			Command.addAction(result, Command.Action.next);
 			Command.addFieldValue(result, TASK_NAME_FIELD,
-				"", "text-single", "Enter task JID");
+				"", "text-single", "Enter task JID or Name");
 		} // end of if (task != null) else
 	}
 

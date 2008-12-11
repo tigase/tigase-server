@@ -139,12 +139,17 @@ public class NewTaskCommand implements TaskCommandIfc {
 			receiv.getTaskTypes().get(task_type).getTaskType().getDefaultParams();
 		Map<String, Object> new_params = new LinkedHashMap<String, Object>();
 		for (String key: default_props.keySet()) {
-			String value = Command.getFieldValue(packet, XMLUtils.escape(key));
-			if (value == null) {
-				value = "";
-			} // end of if (value == null)
-			value = XMLUtils.unescape(value);
-			new_params.put(key, value);
+			if (default_props.get(key).isMultiValue()) {
+				String[] values = Command.getFieldValues(packet, XMLUtils.escape(key));
+				new_params.put(key, values);
+			} else {
+				String value = Command.getFieldValue(packet, XMLUtils.escape(key));
+				if (value == null) {
+					value = "";
+				} // end of if (value == null)
+				value = XMLUtils.unescape(value);
+				new_params.put(key, value);
+			}
 		} // end of for (String key: default_props.keySet())
 		receiv.addTaskInstance(task_type, task_name, new_params);
 		Command.addFieldValue(result, "Info",
@@ -156,14 +161,14 @@ public class NewTaskCommand implements TaskCommandIfc {
 	 *
 	 * @param packet a <code>Packet</code> value
 	 * @param result a <code>Packet</code> value
+	 * @param receiv
 	 * @param reciv a <code>StanzaReceiver</code> value
 	 */
 	public void processCommand(Packet packet, Packet result,
 		StanzaReceiver receiv) {
 		String task_name = Command.getFieldValue(packet, TASK_NAME_FIELD);
 		if (task_name == null || !checkTaskName(task_name, result, receiv)
-			|| (Command.getAction(packet) != null &&
-				Command.getAction(packet).equals("prev"))) {
+			|| (Command.getAction(packet) == Command.Action.prev)) {
 			Command.addFieldValue(result, STEP, "step1", "hidden");
 			newTask_Step1(result, receiv);
 			return;

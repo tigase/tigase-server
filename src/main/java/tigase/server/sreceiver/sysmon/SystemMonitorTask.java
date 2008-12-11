@@ -22,17 +22,23 @@
 
 package tigase.server.sreceiver.sysmon;
 
-import java.lang.management.ManagementFactory;
-import java.lang.management.MemoryUsage;
-import java.lang.management.ThreadMXBean;
-import java.text.NumberFormat;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import tigase.server.Packet;
 import tigase.server.sreceiver.AbstractReceiverTask;
+import tigase.server.sreceiver.PropertyItem;
+import tigase.util.ClassUtil;
 import tigase.xmpp.StanzaType;
+
+import static tigase.server.sreceiver.PropertyConstants.*;
+import static tigase.server.sreceiver.sysmon.ResourceMonitorIfc.*;
 
 /**
  * Created: Dec 6, 2008 8:12:41 PM
@@ -42,41 +48,107 @@ import tigase.xmpp.StanzaType;
  */
 public class SystemMonitorTask extends AbstractReceiverTask {
 
+  private static Logger log =
+					Logger.getLogger("tigase.server.sreceiver.sysmon.SystemMonitorTask");
+
 	private static final String TASK_TYPE = "System Monitor";
 	private static final String TASK_HELP =
 		"This is a system monitor task." +
-		" It monitor system resources usage and sends notifications" +
+		" It monitors system resources usage and sends notifications" +
 		" to subscribed users. It allos responds to your messages with" +
 		" a simple reply message. This is to ensure the monitor works.";
-	private static final long SECOND = 1000;
-	private long interval = 10*SECOND;
-	private int historySize = 100;
+	private static final String MONITORS_CLASSES_PROP_KEY =
+					"Monitor implementations";
+	private static final String WARNING_TRESHOLD_PROP_KEY =
+					"Warning treshold";
+	//private long interval = 10*SECOND;
 
-	private long lastCPUUsage = 0;
-	private double[] cpuUsage = new double[historySize];
-	private int cpuUsageIdx = 0;
-	private double[] loadAverage = new double[historySize];
-	private int loadAverageIdx = 0;
-	private boolean cpuWarningSent = false;
-	private boolean heapWarningSent = false;
-	private boolean nonHeapWarningSent = false;
+	private String[] all_monitors = null;
+	private String[] selected_monitors = null;
+	private Map<String, ResourceMonitorIfc> monitors =
+					new LinkedHashMap<String, ResourceMonitorIfc>();
+	private double warning_treshold = 0.9;
 
-	private double recentCpu(int histCheck) {
-		double recentCpu = 0;
-		int idx = cpuUsageIdx;
-		for (int i = 0; i < histCheck; i++) {
-			idx -= i;
-			if (idx < 0) {
-				idx = cpuUsage.length;
-			}
-			recentCpu += cpuUsage[idx];
-		}
-		return recentCpu / histCheck;
-	}
-
-	private enum command { help; };
+	private enum command { help, state; };
 
 	private Timer tasks = null;
+
+	public SystemMonitorTask() {
+		try {
+			Set<ResourceMonitorIfc> mons =
+							ClassUtil.getImplementations(ResourceMonitorIfc.class);
+			all_monitors = new String[mons.size()];
+			int idx = 0;
+			for (ResourceMonitorIfc monitor : mons) {
+				all_monitors[idx++] = monitor.getClass().getName();
+			}
+		} catch (Exception ex) {
+			log.log(Level.SEVERE, "Can't load resource monitors implementations", ex);
+			all_monitors = new String[2];
+			all_monitors[0] = "tigase.server.sreceiver.sysmon.CPUMonitor";
+			all_monitors[1] = "tigase.server.sreceiver.sysmon.MemMonitor";
+		}
+	}
+
+	protected void sendPacketsOut(Queue<Packet> input) {
+		Queue<Packet> results = new LinkedList<Packet>();
+		for (Packet packet : input) {
+			if (packet.getElemName() == "message" || packet.getElemTo() == null ||
+							packet.getElemTo().isEmpty()) {
+				super.processMessage(packet, results);
+			} else {
+				results.add(packet);
+			}
+		}
+		for (Packet packet : results) {
+			addOutPacket(packet);
+		}
+	}
+
+	protected void sendPacketOut(Packet input) {
+		Queue<Packet> results = new LinkedList<Packet>();
+		if (input.getElemName() == "message" || input.getElemTo() == null ||
+						input.getElemTo().isEmpty()) {
+			super.processMessage(input, results);
+			} else {
+			results.add(input);
+		}
+		for (Packet packet : results) {
+			addOutPacket(packet);
+		}
+	}
+
+	private void monitor10Secs() {
+		Queue<Packet> results = new LinkedList<Packet>();
+		for (ResourceMonitorIfc monitor : monitors.values()) {
+			monitor.check10Secs(results);
+		}
+		sendPacketsOut(results);
+	}
+	
+	private void monitor1Min() {
+		Queue<Packet> results = new LinkedList<Packet>();
+		for (ResourceMonitorIfc monitor : monitors.values()) {
+			monitor.check1Min(results);
+		}
+		sendPacketsOut(results);
+	}
+	
+	private void monitor1Hour() {
+		Queue<Packet> results = new LinkedList<Packet>();
+		for (ResourceMonitorIfc monitor : monitors.values()) {
+			monitor.check1Hour(results);
+		}
+		sendPacketsOut(results);
+	}
+	
+	private void monitor1Day() {
+		Queue<Packet> results = new LinkedList<Packet>();
+		for (ResourceMonitorIfc monitor : monitors.values()) {
+			monitor.check1Day(results);
+		}
+		sendPacketsOut(results);
+	}
 
 	@Override
 	public void init(Queue<Packet> results) {
@@ -84,16 +156,31 @@ public class SystemMonitorTask extends AbstractReceiverTask {
 		tasks = new Timer("SystemMonitorTask", true);
 		tasks.scheduleAtFixedRate(new TimerTask() {
 			public void run() {
-				monitor();
+				monitor10Secs();
 			}
-		}, interval, interval);
+		}, INTERVAL_10SECS, INTERVAL_10SECS);
+		tasks.scheduleAtFixedRate(new TimerTask() {
+			public void run() {
+				monitor1Min();
+			}
+		}, INTERVAL_1MIN, INTERVAL_1MIN);
+		tasks.scheduleAtFixedRate(new TimerTask() {
+			public void run() {
+				monitor1Hour();
+			}
+		}, INTERVAL_1HOUR, INTERVAL_1HOUR);
+		tasks.scheduleAtFixedRate(new TimerTask() {
+			public void run() {
+				monitor1Day();
+			}
+		}, INTERVAL_1DAY, INTERVAL_1DAY);
 	}
 
 	@Override
 	public void destroy(Queue<Packet> results) {
-		super.destroy(results);
 		tasks.cancel();
 		tasks = null;
+		super.destroy(results);
 	}
 
 	public String getType() {
@@ -105,8 +192,9 @@ public class SystemMonitorTask extends AbstractReceiverTask {
 	}
 
 	private String commandsHelp() {
-		return "Available commands are:\n"
-			+ "//help - display this help info\n";
+		return "Available commands are:\n" +
+						"//help - display this help info\n" +
+						"//state - displays current state from all monitors\n";
 	}
 
 	private boolean isPostCommand(Packet packet) {
@@ -121,6 +209,84 @@ public class SystemMonitorTask extends AbstractReceiverTask {
 		return false;
 	}
 
+	@Override
+	public void setParams(Map<String, Object> map)	{
+		super.setParams(map);
+		String treshold = (String) map.get(WARNING_TRESHOLD_PROP_KEY);
+		try {
+			double tresh = Double.parseDouble(treshold);
+			warning_treshold = tresh;
+		} catch (Exception e) {
+			log.warning("Incorrect warning treshold, using default" + treshold);
+		}
+		String[] mons = null;
+		try {
+			mons = (String[]) map.get(MONITORS_CLASSES_PROP_KEY);
+		} catch (Exception e) {
+			log.warning("Incorrect monitors list: " + 
+							map.get(MONITORS_CLASSES_PROP_KEY));
+			mons = all_monitors;
+		}
+		if (mons != null) {
+			selected_monitors = mons;
+			monitors.clear();
+			for (String string : mons) {
+				try {
+					ResourceMonitorIfc resMon =
+									(ResourceMonitorIfc) Class.forName(string).newInstance();
+					String monJid = getJID() + "/" + resMon.getClass().getSimpleName();
+					resMon.init(monJid, warning_treshold, this);
+					monitors.put(monJid, resMon);
+					log.config("Loaded resource monitor: " + monJid);
+				} catch (Exception ex) {
+					log.log(Level.SEVERE,
+									"Can't instantiate resource monitor: " + string, ex);
+				}
+			}
+		}
+	}
+
+	public Map<String, PropertyItem> getParams() {
+		Map<String, PropertyItem> props = super.getParams();
+		props.put(MONITORS_CLASSES_PROP_KEY,
+						new PropertyItem(MONITORS_CLASSES_PROP_KEY,
+						MONITORS_CLASSES_PROP_KEY, selected_monitors, all_monitors,
+						"List of system monitors available for use"));
+		props.put(WARNING_TRESHOLD_PROP_KEY,
+						new PropertyItem(WARNING_TRESHOLD_PROP_KEY,
+						WARNING_TRESHOLD_PROP_KEY, warning_treshold));
+//	log.fine("selected_monitors: " + Arrays.toString(selected_monitors) +
+//						", all_monitors: " + Arrays.toString(all_monitors));
+		return props;
+	}
+
+	@Override
+	public Map<String, PropertyItem> getDefaultParams() {
+		Map<String, PropertyItem> defs = super.getDefaultParams();
+		defs.put(DESCRIPTION_PROP_KEY, new PropertyItem(DESCRIPTION_PROP_KEY,
+						DESCRIPTION_DISPL_NAME, "System Monitor Task"));
+		defs.put(MESSAGE_TYPE_PROP_KEY,
+						new PropertyItem(MESSAGE_TYPE_PROP_KEY,
+						MESSAGE_TYPE_DISPL_NAME, MessageType.NORMAL));
+		defs.put(ONLINE_ONLY_PROP_KEY,
+						new PropertyItem(ONLINE_ONLY_PROP_KEY,
+						ONLINE_ONLY_DISPL_NAME, false));
+		defs.put(REPLACE_SENDER_PROP_KEY,
+						new PropertyItem(REPLACE_SENDER_PROP_KEY,
+						REPLACE_SENDER_DISPL_NAME, SenderAddress.LEAVE));
+		defs.put(SUBSCR_RESTRICTIONS_PROP_KEY,
+						new PropertyItem(SUBSCR_RESTRICTIONS_PROP_KEY,
+						SUBSCR_RESTRICTIONS_DISPL_NAME, SubscrRestrictions.MODERATED));
+		defs.put(MONITORS_CLASSES_PROP_KEY,
+						new PropertyItem(MONITORS_CLASSES_PROP_KEY,
+						MONITORS_CLASSES_PROP_KEY, all_monitors, all_monitors,
+						"List of system monitors available for use"));
+		defs.put(WARNING_TRESHOLD_PROP_KEY,
+						new PropertyItem(WARNING_TRESHOLD_PROP_KEY,
+						WARNING_TRESHOLD_PROP_KEY, warning_treshold));
+		return defs;
+	}
+
 	private void runCommand(Packet packet, Queue<Packet> results) {
 		String body = packet.getElemCData("/message/body");
 		String[] body_split = body.split(" |\n|\r");
@@ -130,6 +296,16 @@ public class SystemMonitorTask extends AbstractReceiverTask {
 			results.offer(Packet.getMessage(packet.getElemFrom(),
 					packet.getElemTo(), StanzaType.chat, commandsHelp(),
 					"Commands description", null));
+			break;
+			case state:
+				StringBuilder sb = new StringBuilder("\n");
+				for (ResourceMonitorIfc resmon : monitors.values()) {
+					sb.append(resmon.getClass().getSimpleName() + ":\n");
+					sb.append(resmon.getState() + "\n");
+				}
+				results.offer(Packet.getMessage(packet.getElemFrom(),
+								packet.getElemTo(), StanzaType.chat, sb.toString(),
+								"Monitors State", null));
 			break;
 		}
 	}
@@ -144,89 +320,6 @@ public class SystemMonitorTask extends AbstractReceiverTask {
 					packet.getElemTo(), StanzaType.normal,
 					"This is response to your message: [" + body + "]",
 					"Response", null));
-		}
-	}
-
-	private int setValueInArr(double[] arr, int idx, double val) {
-		arr[idx] = val;
-		if (idx >= (arr.length-1)) {
-			idx = 0;
-		} else {
-			++idx;
-		}
-		return idx;
-	}
-
-	private void monitor() {
-		ThreadMXBean thBean = ManagementFactory.getThreadMXBean();
-		long cpuTime = 0;
-		for (long thid : thBean.getAllThreadIds()) {
-			cpuTime += thBean.getThreadCpuTime(thid);
-		}
-		long tmpCPU = lastCPUUsage;
-		lastCPUUsage = cpuTime;
-		cpuTime -= tmpCPU;
-		double totalUsage = (new Long(cpuTime).doubleValue() / 1000000) /
-						new Long(interval).doubleValue();
-		cpuUsageIdx = setValueInArr(cpuUsage, cpuUsageIdx, totalUsage);
-		loadAverageIdx = setValueInArr(loadAverage, loadAverageIdx,
-						ManagementFactory.getOperatingSystemMXBean().getSystemLoadAverage());
-		MemoryUsage heap =
-						ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();
-		MemoryUsage nonHeap =
-						ManagementFactory.getMemoryMXBean().getNonHeapMemoryUsage();
-		double used = new Long(heap.getUsed()).doubleValue();
-		double max = new Long(heap.getMax()).doubleValue();
-		double percentUsedHeap = used/max;
-		long percentUsedNonHeap = (nonHeap.getUsed()*100)/nonHeap.getMax();
-		Queue<Packet> results = new LinkedList<Packet>();
-		if (percentUsedHeap > 0.9) {
-			if (!heapWarningSent) {
-				heapWarningSent = true;
-				NumberFormat format = NumberFormat.getPercentInstance();
-				format.setMaximumFractionDigits(2);
-				Packet packet = Packet.getMessage("", getJID(), StanzaType.normal,
-								"WARNING!\n" +
-								"High usage of heap memory: " +
-								format.format(percentUsedHeap) + " KB",
-								"System Monitor Alert", null);
-				processMessage(packet, results);
-			}
-		} else {
-			heapWarningSent = false;
-		}
-		if (percentUsedNonHeap > 0.9) {
-			if (!nonHeapWarningSent) {
-				nonHeapWarningSent = true;
-				NumberFormat format = NumberFormat.getPercentInstance();
-				format.setMaximumFractionDigits(2);
-				Packet packet = Packet.getMessage("", getJID(), StanzaType.normal,
-								"WARNING!\n" +
-								"High usage of non-heap memory: " +
-								format.format(percentUsedNonHeap) + " KB",
-								"System Monitor Alert", null);
-				processMessage(packet, results);
-			}
-		} else {
-			nonHeapWarningSent = false;
-		}
-		if ((totalUsage > 0.9) && (recentCpu(6) > 0.9)) {
-			if (!cpuWarningSent) {
-				cpuWarningSent = true;
-				NumberFormat format = NumberFormat.getPercentInstance();
-				format.setMaximumFractionDigits(2);
-				Packet packet = Packet.getMessage("", getJID(), StanzaType.normal,
-								"WARNING!\n" +
-								"High CPU usage in last minute: " +
-								format.format(recentCpu(6)) + " KB",
-								"System Monitor Alert", null);
-				processMessage(packet, results);
-			}
-		} else {
-			cpuWarningSent = false;
-		}
-		for (Packet packet : results) {
-			addOutPacket(packet);
 		}
 	}
 

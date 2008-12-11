@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import java.util.HashSet;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -44,8 +43,8 @@ import tigase.server.AbstractMessageReceiver;
 import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.util.ClassUtil;
-import tigase.util.JIDUtils;
 import tigase.util.DNSResolver;
+import tigase.util.JIDUtils;
 import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
 
@@ -143,8 +142,8 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	private static final String SREC_REPO_CLASS_PROP_KEY = "srec-repo-class";
 	private static final String SREC_REPO_URL_PROP_KEY = "srec-repo-url";
 	private static String[] ADMINS_PROP_VAL =	{"admin@localhost", "admin@hostname"};
-	private static final String LOCAL_DOMAINS_PROP_KEY = "local-domains";
-	private static String[] LOCAL_DOMAINS_PROP_VAL = {"localhost"};
+//	private static final String LOCAL_DOMAINS_PROP_KEY = "local-domains";
+//	private static String[] LOCAL_DOMAINS_PROP_VAL = {"localhost"};
 	public static final String MY_DOMAIN_NAME_PROP_KEY = "domain-name";
 	public static final String MY_DOMAIN_NAME_PROP_VAL =	"srecv.localhost";
 
@@ -184,7 +183,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 
 	private ServiceEntity serviceEntity = null;
 	private String[] admins = {"admin@localhost"};
-	private Set<String> local_domains = new HashSet<String>();
+//	private Set<String> local_domains = new HashSet<String>();
 	private String my_hostname = MY_DOMAIN_NAME_PROP_VAL;
 	private UserRepository repository = null;
 // 	/**
@@ -223,7 +222,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		case ADMIN:
 			return isAdmin(jid);
 		case LOCAL:
-			return local_domains.contains(JIDUtils.getNodeHost(jid));
+			return isLocalDomain(JIDUtils.getNodeHost(jid));
 		default:
 			break;
 		}
@@ -256,7 +255,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	 * @param task a <code>ReceiverTaskIfc</code> value
 	 */
 	protected void addTaskInstance(ReceiverTaskIfc task) {
-		if (task_instances.get(task.getJID().toLowerCase()) == null) {
+		if (getTask(task.getJID()) == null) {
 			addTaskToInstances(task);
 			try {
 				saveTaskToRepository(task);
@@ -315,11 +314,23 @@ public class StanzaReceiver extends AbstractMessageReceiver
 				Map<String, Object> task_params = new LinkedHashMap<String, Object>();
 				if (keys != null) {
 					for (String key: keys) {
-						task_params.put(key, repository.getData(getComponentId(),
-								repo_node.toString(), key));
+						String[] vals = repository.getDataList(getComponentId(),
+								repo_node.toString(), key);
+						if (vals.length == 1) {
+							task_params.put(key, vals[0]);
+							log.info("Loaded data: " + key + ", value: " + vals[0]);
+						} else {
+							task_params.put(key, vals);
+							log.info("Loaded data list: " + key + ", value: " +
+											Arrays.toString(vals));
+						}
 					} // end of for (String key: keys)
 				} // end of if (keys != null)
-				addTaskToInstances(createTask(task_type, task_jid, task_params));
+				try {
+					addTaskToInstances(createTask(task_type, task_jid, task_params));
+				} catch (Exception e) {
+					log.log(Level.WARNING, "Can't create task: " + task_jid, e);
+				}
 			} // end of for (String task_jid: tasks_jids)
 		} // end of if (tasks_jids != null)
 	}
@@ -333,8 +344,17 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		repo_node += params_node;
 		for (Map.Entry<String, PropertyItem> entry: task_params.entrySet()) {
 			if (!entry.getKey().equals(USER_REPOSITORY_PROP_KEY)) {
-				repository.setData(getComponentId(), repo_node, entry.getKey(),
-					entry.getValue().toString());
+				if (entry.getValue().getValue().getClass().isArray()) {
+					repository.setDataList(getComponentId(), repo_node, entry.getKey(),
+									(String[])entry.getValue().getValue());
+					log.info("Saving task data list: " + entry.getKey() + ", value: " +
+									Arrays.toString((String[])entry.getValue().getValue()));
+				} else {
+					repository.setData(getComponentId(), repo_node, entry.getKey(),
+									entry.getValue().toString());
+					log.info("Saving task data: " + entry.getKey() + ", value: " +
+									entry.getValue().toString());
+				}
 			} // end of if (!entry.getKey().equals(USER_REPOSITORY_PROP_KEY))
 		}
 	}
@@ -359,11 +379,12 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	public void setProperties(final Map<String, Object> props) {
 		super.setProperties(props);
 
+		my_hostname = (String)props.get(MY_DOMAIN_NAME_PROP_KEY);
 		serviceEntity = new ServiceEntity(getName(), null, "Stanza Receiver");
 		serviceEntity.addIdentities(
 			new ServiceIdentity("component", "generic", "Stanza Receiver"));
 		serviceEntity.addFeatures(DEF_FEATURES);
-		ServiceEntity com = new ServiceEntity(getComponentId(), "commands",
+		ServiceEntity com = new ServiceEntity(my_hostname, "commands",
 			"Tasks management commands");
 		com.addFeatures(DEF_FEATURES);
 		com.addIdentities(
@@ -371,8 +392,9 @@ public class StanzaReceiver extends AbstractMessageReceiver
 				"Tasks management commands"));
 		serviceEntity.addItems(com);
 		for (TaskCommandIfc comm: commands.values()) {
-			ServiceEntity item = new ServiceEntity(getComponentId(),
-				comm.getNodeName(), comm.getDescription());
+			ServiceEntity item = 
+							new ServiceEntity(my_hostname,
+							comm.getNodeName(), comm.getDescription());
 			item.addFeatures(CMD_FEATURES);
 			item.addIdentities(new ServiceIdentity("automation", "command-node",
 					comm.getDescription()));
@@ -381,7 +403,6 @@ public class StanzaReceiver extends AbstractMessageReceiver
 
 		admins = (String[])props.get(ADMINS_PROP_KEY);
 		Arrays.sort(admins);
-		my_hostname = (String)props.get(MY_DOMAIN_NAME_PROP_KEY);
 //		addRouting(my_hostname);
 
 		try {
@@ -434,8 +455,8 @@ public class StanzaReceiver extends AbstractMessageReceiver
 				tt.setMaxInstancesNo(max_inst);
 			}
 		}
-		local_domains =
-      new HashSet<String>(Arrays.asList((String[])props.get(LOCAL_DOMAINS_PROP_KEY)));
+//		local_domains =
+//      new HashSet<String>(Arrays.asList((String[])props.get(LOCAL_DOMAINS_PROP_KEY)));
 	}
 
 	@Override
@@ -541,13 +562,12 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		} // end of if (params.get(GEN_SREC_ADMINS) != null) else
 		defs.put(ADMINS_PROP_KEY, ADMINS_PROP_VAL);
 
+		String[] local_domains = DNSResolver.getDefHostNames();
 		if (params.get(GEN_VIRT_HOSTS) != null) {
-			LOCAL_DOMAINS_PROP_VAL = ((String)params.get(GEN_VIRT_HOSTS)).split(",");
-		} else {
-			LOCAL_DOMAINS_PROP_VAL = DNSResolver.getDefHostNames();
+			local_domains = ((String)params.get(GEN_VIRT_HOSTS)).split(",");
 		}
-		defs.put(LOCAL_DOMAINS_PROP_KEY, LOCAL_DOMAINS_PROP_VAL);
-		defs.put(MY_DOMAIN_NAME_PROP_KEY, "srecv." + LOCAL_DOMAINS_PROP_VAL[0]);
+//		defs.put(LOCAL_DOMAINS_PROP_KEY, LOCAL_DOMAINS_PROP_VAL);
+		defs.put(MY_DOMAIN_NAME_PROP_KEY, "srecv." + local_domains[0]);
 
 		defs.put(TASK_TYPES_PROP_KEY, TASK_TYPES_PROP_VAL);
 		defs.put(CREATION_POLICY_PROP_KEY, CREATION_POLICY_PROP_VAL.toString());
@@ -642,13 +662,21 @@ public class StanzaReceiver extends AbstractMessageReceiver
 			return;
 		} // end of if (packet.getElemName().equals("iq"))
 
-		ReceiverTaskIfc task = task_instances.get(packet.getElemTo().toLowerCase());
+		ReceiverTaskIfc task = getTask(packet.getElemTo());
 		if (task != null) {
 			log.finest("Found a task for packet: " + task.getJID());
 			Queue<Packet> results = new LinkedList<Packet>();
 			task.processPacket(packet, results);
 			addOutPackets(results);
 		} // end of if (task != null)
+	}
+
+	public ReceiverTaskIfc getTask(String jidOrName) {
+		ReceiverTaskIfc task = task_instances.get(jidOrName.toLowerCase());
+		if (task == null) {
+			task = task_instances.get(jidOrName + "@" + my_hostname);
+		}
+		return task;
 	}
 
 	/**

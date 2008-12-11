@@ -41,6 +41,7 @@ public class PropertyItem {
 	private Object value = null;
 	private String[] possible_values = null;
 	private String description = null;
+	private boolean multiValue = false;
 
 	/**
 	 * Creates a new <code>PropertyItem</code> instance.
@@ -51,6 +52,23 @@ public class PropertyItem {
 		this.name = name;
 		this.display_name = display_name;
 		this.value = def_value;
+		this.description = description;
+		if (possible_values != null) {
+			this.possible_values =
+				Arrays.copyOf(possible_values, possible_values.length);
+		} else {
+			if (value != null) {
+				guessPossibleValues();
+			} // end of if (possible_values == null && value != null)
+		}
+	}
+
+	public PropertyItem(String name, String display_name, String[] def_values,
+		String[] possible_values, String description) {
+		this.multiValue = true;
+		this.name = name;
+		this.display_name = display_name;
+		this.value = def_values;
 		this.description = description;
 		if (possible_values != null) {
 			this.possible_values =
@@ -85,6 +103,10 @@ public class PropertyItem {
 		if (value != null) {
 			guessPossibleValues();
 		} // end of if (possible_values == null && value != null)
+	}
+
+	public boolean isMultiValue() {
+		return multiValue;
 	}
 
 	private void guessPossibleValues() {

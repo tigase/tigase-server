@@ -46,18 +46,33 @@ public abstract class TaskCommons {
 		for (Map.Entry<String, PropertyItem> entry: props.entrySet()) {
 			if (!entry.getKey().equals(USER_REPOSITORY_PROP_KEY)) {
 				PropertyItem item = entry.getValue();
-				if (item.getPossible_values() != null) {
-					Command.addFieldValue(result,
-						XMLUtils.escape(item.getName()),
-						XMLUtils.escape(item.toString()),
-						XMLUtils.escape(item.getDisplay_name()),
-						item.getPossible_values(), item.getPossible_values());
+				if (item.isMultiValue()) {
+					if (item.getPossible_values() != null) {
+						Command.addFieldValue(result,
+										XMLUtils.escape(item.getName()),
+										(String[])item.getValue(),
+										XMLUtils.escape(item.getDisplay_name()),
+										item.getPossible_values(), item.getPossible_values());
+					} else {
+						Command.addFieldValue(result,
+										XMLUtils.escape(item.getName()),
+										XMLUtils.escape(item.toString()),
+										"text-single", XMLUtils.escape(item.getDisplay_name()));
+					} // end of if (item.getPossible_values() != null) else
 				} else {
-					Command.addFieldValue(result,
-						XMLUtils.escape(item.getName()),
-						XMLUtils.escape(item.toString()),
-						"text-single", XMLUtils.escape(item.getDisplay_name()));
-				} // end of if (item.getPossible_values() != null) else
+					if (item.getPossible_values() != null) {
+						Command.addFieldValue(result,
+										XMLUtils.escape(item.getName()),
+										XMLUtils.escape(item.toString()),
+										XMLUtils.escape(item.getDisplay_name()),
+										item.getPossible_values(), item.getPossible_values());
+					} else {
+						Command.addFieldValue(result,
+										XMLUtils.escape(item.getName()),
+										XMLUtils.escape(item.toString()),
+										"text-single", XMLUtils.escape(item.getDisplay_name()));
+					} // end of if (item.getPossible_values() != null) else
+				}
 			} // end of if (!entry.getKey().equals(USER_REPOSITORY_PROP_KEY))
 		} // end of for (Map.Entry entry: prop.entrySet())
 	}
