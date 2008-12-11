@@ -136,7 +136,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 			String to_hostname = JIDUtils.getNodeHost(packet.getElemTo());
 			// We don't send packets to local domains trough s2s, there
 			// must be something wrong with configuration
-			if (isLocalDomain(to_hostname)) {
+			if (isLocalDomainOrComponent(to_hostname)) {
 				// Ups, remote hostname is the same as one of local hostname??
 				// Internal loop possible, we don't want that....
 				// Let's send the packet back....
@@ -699,7 +699,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 
 		String local_hostname = JIDUtils.getNodeHost(packet.getElemTo());
 		// Check whether this is correct local host name...
-		if (!isLocalDomain(local_hostname)) {
+		if (!isLocalDomainOrComponent(local_hostname)) {
 			// Ups, this hostname is not served by this server, return stream
 			// error and close the connection....
 			generateStreamError("host-unknown", serv);
@@ -708,7 +708,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 		String remote_hostname = JIDUtils.getNodeHost(packet.getElemFrom());
 		// And we don't want to accept any connection which is from remote
 		// host name the same as one my localnames.......
-		if (isLocalDomain(remote_hostname)) {
+		if (isLocalDomainOrComponent(remote_hostname)) {
 			// Ups, remote hostname is the same as one of local hostname??
 			// fake server or what? internal loop, we don't want that....
 			// error and close the connection....

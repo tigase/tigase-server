@@ -462,6 +462,11 @@ public abstract class AbstractMessageReceiver
 		return vHostManager != null ? vHostManager.isLocalDomain(domain) : false;
 	}
 
+	public boolean isLocalDomainOrComponent(String domain) {
+		return vHostManager != null ? vHostManager.isLocalDomainOrComponent(domain)
+						: false;
+	}
+
 //	public Set<String> getRoutings() {
 //		return routings;
 //	}
