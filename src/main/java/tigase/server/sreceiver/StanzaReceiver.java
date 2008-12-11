@@ -663,6 +663,9 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		} // end of if (packet.getElemName().equals("iq"))
 
 		ReceiverTaskIfc task = getTask(packet.getElemTo());
+		if (task == null) {
+			task = getTask(JIDUtils.getNodeNick(packet.getElemTo()));
+		}
 		if (task != null) {
 			log.finest("Found a task for packet: " + task.getJID());
 			Queue<Packet> results = new LinkedList<Packet>();
