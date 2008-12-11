@@ -22,13 +22,18 @@
 
 package tigase.server.sreceiver.sysmon;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileFilter;
+import java.io.FileReader;
 import java.text.DecimalFormat;
-import java.text.MessageFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.Queue;
+import java.util.logging.Logger;
 import tigase.server.Packet;
+import tigase.util.OSUtils;
 
 /**
  * Created: Dec 10, 2008 8:14:53 PM
@@ -38,12 +43,46 @@ import tigase.server.Packet;
  */
 public class DiskMonitor extends AbstractMonitor {
 
+  private static final Logger log =
+    Logger.getLogger("tigase.server.sreceiver.sysmon.DiskMonitor");
+
 	private File[] roots = null;
 
 	@Override
 	public void init(String jid, double treshold, SystemMonitorTask smTask) {
 		super.init(jid, treshold, smTask);
 		roots = File.listRoots();
+		findAllRoots();
+	}
+
+	private void findAllRoots() {
+		switch (OSUtils.getOSType()) {
+			case windows:
+				File[] winRoots = File.listRoots();
+				roots = winRoots;
+				break;
+			case linux:
+				File[] linRoots = getLinuxRoots();
+				roots = linRoots;
+				break;
+			case solaris:
+				File[] solRoots = getSolarisRoots();
+				roots = solRoots;
+				break;
+			case mac:
+				File[] macRoots = getMacRoots();
+				roots = macRoots;
+				break;
+			default:
+				File[] otherRoots = File.listRoots();
+				if (otherRoots.length == 1) {
+					File[] mtabRoots = getLinuxRoots();
+					if (mtabRoots != null && mtabRoots.length > 1) {
+						otherRoots = mtabRoots;
+					}
+					roots = otherRoots;
+				}
+		}
 	}
 
 	@Override
@@ -76,6 +115,11 @@ public class DiskMonitor extends AbstractMonitor {
 		}
 	}
 
+	@Override
+	public void check1Hour(Queue<Packet> results) {
+		findAllRoots();
+	}
+
 	public String getState() {
 		StringBuilder sb = new StringBuilder();
 		Formatter formatter = new Formatter(sb);
@@ -94,6 +138,40 @@ public class DiskMonitor extends AbstractMonitor {
 			}
 		}
 		return formatter.toString();
+	}
+
+	private File[] getLinuxRoots() {
+		try {
+			BufferedReader buffr = new BufferedReader(new FileReader("/etc/mtab"));
+			String line = null;
+			ArrayList<File> results = new ArrayList<File>();
+			while ((line = buffr.readLine()) != null) {
+				if (line.contains("proc") || line.contains("dev") || 
+								line.contains("tmpfs") || line.contains("sysfs")) {
+					continue;
+				}
+				String[] parts = line.split("\\s");
+				results.add(new File(parts[1]));
+			}
+			return results.toArray(new File[results.size()]);
+		} catch (Exception e) {
+			log.warning("Can not read filesystems from /etc/mtab file" + e);
+			return File.listRoots();
+		}
+
+	}
+
+	private File[] getMacRoots() {
+		File volumes = new File("/Volumes");
+		return volumes.listFiles(new FileFilter() {
+			public boolean accept(File path) {
+				return path.isDirectory();
+			}
+		});
+	}
+
+	private File[] getSolarisRoots() {
+		throw new UnsupportedOperationException("Not yet implemented");
 	}
 
 }
