@@ -211,8 +211,10 @@ public class ServerConnections {
 	}
 
 	public synchronized void handleDialbackFailure() {
-		outgoing.forceStop();
-		outgoing = null;
+		if (outgoing != null) {
+			outgoing.forceStop();
+			outgoing = null;
+		}
 		conn_state = OutgoingState.NULL;
 	}
 
@@ -224,8 +226,8 @@ public class ServerConnections {
 		if (outgoing != null) {
 			outgoing.forceStop();
 			outgoing = null;
-			conn_state = OutgoingState.NULL;
 		}
+		conn_state = OutgoingState.NULL;
 // 		Set<Map.Entry<String, XMPPIOService>> set = incoming.entrySet();
 // 		for (Map.Entry<String, XMPPIOService> entry: set) {
 // 			entry.getValue().forceStop();

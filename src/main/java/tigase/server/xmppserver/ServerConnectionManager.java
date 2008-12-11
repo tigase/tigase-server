@@ -27,6 +27,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -104,6 +106,8 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 	 */
 	private ConcurrentSkipListMap<String, XMPPIOService> incoming =
     new ConcurrentSkipListMap<String, XMPPIOService>();
+
+	private Timer connectionWatchdog = new Timer();
 
 	protected ServerConnections getServerConnections(String cid) {
 		return connectionsByLocalRemote.get(cid);
@@ -209,6 +213,8 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 		String remotehost = JIDUtils.getNodeHost(cid);
 		if (openNewServerConnection(localhost, remotehost)) {
 			conns.setConnecting();
+			connectionWatchdog.schedule(
+							new ConnectionWatchdogTask(conns, localhost, remotehost), MINUTE);
 			log.finest("Connecting a new s2s service: " + cid);
 		} else {
 			log.finest("Couldn't open a new s2s service: (UknownHost??) " + cid);
@@ -898,6 +904,39 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 
 	protected XMPPIOService getXMPPIOServiceInstance() {
 		return new XMPPIOService();
+	}
+
+	private class ConnectionWatchdogTask extends TimerTask {
+
+		private ServerConnections conns = null;
+		private String localhost = null;
+		private String remotehost = null;
+
+		private ConnectionWatchdogTask(ServerConnections conns, String localhost,
+						String remotehost) {
+			this.conns = conns;
+			this.localhost = localhost;
+			this.remotehost = remotehost;
+		}
+
+		public void run() {
+			if (conns.getOutgoingState() ==
+							ServerConnections.OutgoingState.CONNECTING) {
+				Queue<Packet> waiting = conns.getWaitingPackets();
+				if (waiting.size() > 0) {
+					String cid = getConnectionId(localhost, remotehost);
+					if (conns.waitingTime() > maxPacketWaitingTime) {
+						conns.stopAll();
+						bouncePacketsBack(Authorization.REMOTE_SERVER_TIMEOUT, cid);
+					} else {
+						createServerConnection(cid, null, conns);
+					}
+				} else {
+					conns.stopAll();
+				}
+			}
+		}
+
 	}
 
 }
