@@ -49,6 +49,8 @@ public interface VHostManagerIfc {
 	 */
 	boolean isLocalDomain(String domain);
 
+	boolean isLocalDomainOrComponent(String domain);
+
 	/**
 	 * This method checks whether anonymous login is enabled for a given domain.
 	 * That is it checks whether this domains is local and anonymousEnabled

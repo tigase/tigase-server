@@ -238,6 +238,21 @@ public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
 		return repo.contains(domain);
 	}
 
+	public boolean isLocalDomainOrComponent(String domain) {
+		boolean result = isLocalDomain(domain);
+		if (!result) {
+			int idx = domain.indexOf('.');
+			if (idx > 0) {
+				String name = domain.substring(0, idx);
+				String basedomain = domain.substring(idx + 1);
+				VHostListener listener = components.get(name);
+				result = (listener != null && listener.handlesNameSubdomains() &&
+								isLocalDomain(basedomain));
+			}
+		}
+		return result;
+	}
+
 	public boolean isAnonymousEnabled(String domain) {
 		++isAnonymousEnabledCalls;
 		VHostItem vhost = repo.getVHost(domain);
