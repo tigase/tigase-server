@@ -75,7 +75,7 @@ public class MemMonitor extends AbstractMonitor
 					if (memoryPoolMXBean.isUsageThresholdExceeded()) {
 						Notification not = new Notification(
 										MemoryNotificationInfo.MEMORY_THRESHOLD_EXCEEDED,
-										null, 1);
+										this, 1);
 						handleNotification(not, memoryPoolMXBean);
 					}
 				} else {
