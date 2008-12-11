@@ -148,7 +148,7 @@ public class TaskInstanceCommand implements TaskCommandIfc {
 				"Note! There is no undo for task deletion function", "fixed");
 			return;
 		} // end of if (confirm == null)
-		receiv.removeTaskInstance(receiv.getTaskInstances().get(task_name));
+		receiv.removeTaskInstance(receiv.getTask(task_name));
 		Command.addFieldValue(result, "Info",
 			"Task " + task_name + " has been removed.", "fixed");
 	}

@@ -230,7 +230,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	}
 
 	private void addTaskToInstances(ReceiverTaskIfc task) {
-		task_instances.put(task.getJID().toLowerCase(), task);
+		task_instances.put(task.getJID(), task);
 		ServiceEntity item = new ServiceEntity(task.getJID(),
 			JIDUtils.getNodeNick(task.getJID()), task.getDescription());
 		item.addIdentities(
@@ -272,7 +272,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		ServiceEntity item = new ServiceEntity(task.getJID(),
 			JIDUtils.getNodeNick(task.getJID()), task.getDescription());
 		serviceEntity.removeItems(item);
-		task_instances.remove(task.getJID().toLowerCase());
+		task_instances.remove(task.getJID());
 		Queue<Packet> results = new LinkedList<Packet>();
 		task.destroy(results);
 		addOutPackets(results);
@@ -364,7 +364,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		//		ReceiverTaskIfc ttask = task_types.get(task_type);
 		ReceiverTaskIfc ntask = task_types.get(task_type).getTaskInstance();
 		ntask.setStanzaReceiver(this);
-		ntask.setJID(task_jid);
+		ntask.setJID(task_jid.toLowerCase());
 		task_params.put(USER_REPOSITORY_PROP_KEY, repository);
 		ntask.setParams(task_params);
 		return ntask;
