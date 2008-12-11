@@ -34,9 +34,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-import tigase.annotations.TODO;
 import tigase.io.IOInterface;
 import tigase.io.SocketIO;
 import tigase.io.TLSIO;
@@ -230,10 +228,20 @@ public abstract class IOService implements Callable<IOService> {
    */
   public void accept(final SocketChannel socketChannel)
     throws IOException {
-		if (socketChannel.isConnectionPending()) {
-			socketChannel.finishConnect();
-		} // end of if (socketChannel.isConnecyionPending())
-    socketIO = new SocketIO(socketChannel);
+    try {
+			if (socketChannel.isConnectionPending()) {
+				socketChannel.finishConnect();
+			} // end of if (socketChannel.isConnecyionPending())
+			socketIO = new SocketIO(socketChannel);
+		} catch (IOException e) {
+			String host = (String)sessionData.get("remote-hostname");
+			if (host == null) {
+				host = (String)sessionData.get("remote-host");
+			}
+			log.info("Problem connecting to remote host: " + host +
+							", address: " + remote_address + " - exception: " + e);
+			throw e;
+		}
     socketInput = ByteBuffer.allocate(socketIO.getInputPacketSize());
 		Socket sock = socketIO.getSocketChannel().socket();
 		local_address = sock.getLocalAddress().getHostAddress();
