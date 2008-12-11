@@ -158,18 +158,25 @@ public class MessageRouter extends AbstractMessageReceiver {
 		}
 		String host = JIDUtils.getNodeHost(jid);
 		String nick = JIDUtils.getNodeNick(jid);
-		if (nick == null) {
-			int idx = jid.indexOf('.');
-			if (idx > 0) {
-				nick = jid.substring(0, idx);
-				host = jid.substring(idx + 1);
-			} else {
-				return null;
+
+		if (nick != null) {
+			comp = components.get(nick);
+			if (comp != null && 
+							(isLocalDomain(host) || host.equals(getDefHostName()))) {
+				return comp;
 			}
 		}
-		comp = components.get(nick);
-		if (isLocalDomain(host)) {
-			return comp;
+		int idx = host.indexOf('.');
+		if (idx > 0) {
+			String cmpName = host.substring(0, idx);
+			String basename = host.substring(idx + 1);
+			if (comp == null) {
+				comp = components.get(cmpName);
+			}
+			if (comp != null &&
+							(isLocalDomain(basename) || basename.equals(getDefHostName()))) {
+				return comp;
+			}
 		}
 		return null;
 	}
