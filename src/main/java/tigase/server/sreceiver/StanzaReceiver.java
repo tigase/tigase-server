@@ -146,6 +146,8 @@ public class StanzaReceiver extends AbstractMessageReceiver
 //	private static String[] LOCAL_DOMAINS_PROP_VAL = {"localhost"};
 	public static final String MY_DOMAIN_NAME_PROP_KEY = "domain-name";
 	public static final String MY_DOMAIN_NAME_PROP_VAL =	"srecv.localhost";
+//	public static final String SIMPLE_JID_PROP_KEY = "simple-jid";
+//	public static final String SIMPLE_JID_PROP_VAL =	"srecv@localhost";
 
 	private static final String TESTER_TASK_NAME = "tester_1";
 	private static final String TESTER_TASK_TYPE = "Tester Task";
@@ -185,6 +187,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	private String[] admins = {"admin@localhost"};
 //	private Set<String> local_domains = new HashSet<String>();
 	private String my_hostname = MY_DOMAIN_NAME_PROP_VAL;
+//	private String simpleJid = null;
 	private UserRepository repository = null;
 // 	/**
 // 	 * Variable <code>defaultPolicy</code> specifies default task creation policy.
@@ -215,6 +218,10 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		new_task = new TaskInstanceCommand();
 		commands.put(new_task.getNodeName(), new_task);
 	}
+
+//	public String getSimpleJid() {
+//		return simpleJid;
+//	}
 
 	protected boolean isAllowedCreate(String jid, String task_type) {
 		TaskType tt = task_types.get(task_type);
@@ -380,6 +387,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		super.setProperties(props);
 
 		my_hostname = (String)props.get(MY_DOMAIN_NAME_PROP_KEY);
+//		simpleJid = (String)props.get(SIMPLE_JID_PROP_KEY);
 		serviceEntity = new ServiceEntity(getName(), null, "Stanza Receiver");
 		serviceEntity.addIdentities(
 			new ServiceIdentity("component", "generic", "Stanza Receiver"));
@@ -568,6 +576,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		}
 //		defs.put(LOCAL_DOMAINS_PROP_KEY, LOCAL_DOMAINS_PROP_VAL);
 		defs.put(MY_DOMAIN_NAME_PROP_KEY, "srecv." + local_domains[0]);
+//		defs.put(SIMPLE_JID_PROP_KEY, "srecv@" + local_domains[0]);
 
 		defs.put(TASK_TYPES_PROP_KEY, TASK_TYPES_PROP_VAL);
 		defs.put(CREATION_POLICY_PROP_KEY, CREATION_POLICY_PROP_VAL.toString());
@@ -665,6 +674,12 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		ReceiverTaskIfc task = getTask(packet.getElemTo());
 		if (task == null) {
 			task = getTask(JIDUtils.getNodeNick(packet.getElemTo()));
+		}
+		if (task == null) {
+			String resource = JIDUtils.getNodeResource(packet.getElemTo());
+			if (resource != null) {
+				task = getTask(resource);
+			}
 		}
 		if (task != null) {
 			log.finest("Found a task for packet: " + task.getJID());
