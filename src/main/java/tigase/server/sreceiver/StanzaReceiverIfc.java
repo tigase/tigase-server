@@ -32,6 +32,10 @@ import tigase.server.Packet;
  */
 public interface StanzaReceiverIfc {
 
+	String getDefHostName();
+
 	boolean addOutPacket(Packet packet);
+
+	String getName();
 
 }
