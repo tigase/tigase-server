@@ -32,8 +32,8 @@ import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.server.Packet;
-import tigase.server.sreceiver.AbstractReceiverTask;
 import tigase.server.sreceiver.PropertyItem;
+import tigase.server.sreceiver.RepoRosterTask;
 import tigase.util.ClassUtil;
 import tigase.xmpp.StanzaType;
 
@@ -46,7 +46,7 @@ import static tigase.server.sreceiver.sysmon.ResourceMonitorIfc.*;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class SystemMonitorTask extends AbstractReceiverTask {
+public class SystemMonitorTask extends RepoRosterTask {
 
   private static Logger log =
 					Logger.getLogger("tigase.server.sreceiver.sysmon.SystemMonitorTask");
@@ -110,7 +110,7 @@ public class SystemMonitorTask extends AbstractReceiverTask {
 		if (input.getElemName() == "message" || input.getElemTo() == null ||
 						input.getElemTo().isEmpty()) {
 			super.processMessage(input, results);
-			} else {
+		} else {
 			results.add(input);
 		}
 		for (Packet packet : results) {
