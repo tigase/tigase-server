@@ -57,6 +57,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 		Logger.getLogger("tigase.server.sreceiver.AbstractReceiverTask");
 
 	private String jid = null;
+	private String name = null;
 	private String local_domain = null;
 	private String description = null;
 	private Map<String, PropertyItem> props = null;
@@ -113,6 +114,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 		int idx = jid.indexOf(".");
 		this.local_domain = jid.substring(idx+1);
 		log.fine("Local domain set to: " + this.local_domain);
+		this.name = JIDUtils.getNodeNick(jid);
 	}
 
 	/**
@@ -421,7 +423,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 	public void processPacket(final Packet packet, final Queue<Packet> results) {
 		++packets_received;
 		log.finest(getJID() + ": " + "Processing packet: " + packet.toString());
-		if (packet.getType() != null && packet.getType() == StanzaType.error) {
+		if (packet.getType() == StanzaType.error) {
 			log.fine("Ignoring error stanza: " + packet.toString());
 			return;
 		}
@@ -497,10 +499,10 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 	}
 
 	protected void processMessage(Packet packet, Queue<Packet> results) {
-		for (RosterItem ri: roster.values()) {
-			if (ri.isSubscribed() && ri.isModerationAccepted()
-				&& (!send_to_online_only || ri.isOnline())
-				&& (!JIDUtils.getNodeID(packet.getElemFrom()).equals(ri.getJid()))) {
+		for (RosterItem ri : roster.values()) {
+			if (ri.isSubscribed() && ri.isModerationAccepted() &&
+							(!send_to_online_only || ri.isOnline()) &&
+							(!JIDUtils.getNodeID(packet.getElemFrom()).equals(ri.getJid()))) {
 				Element message = packet.getElement().clone();
 				Element body = message.getChild("body");
 				if (body == null) {
@@ -509,17 +511,27 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 				message.setAttribute("to", ri.getJid());
 				message.setAttribute("type", message_type.toString().toLowerCase());
 				switch (replace_sender_address) {
-				case REPLACE:
-					String old_from = message.getAttribute("from");
-					message.setAttribute("from", jid);
-					String cdata = body.getCData();
-					body.setCData(old_from + " sends:\n\n" + cdata);
-					break;
-				case REMOVE:
-					message.setAttribute("from", jid);
-					break;
-				default:
-					break;
+					case REPLACE: {
+						String old_from = message.getAttribute("from");
+						message.setAttribute("from", jid);
+						String cdata = body.getCData();
+						body.setCData(old_from + " sends:\n\n" + cdata);
+						break;
+					}
+					case REMOVE:
+						message.setAttribute("from", jid);
+						break;
+					case REPLACE_SRECV: {
+						String old_from = message.getAttribute("from");
+						message.setAttribute("from", JIDUtils.getJID(srecv.getName(), 
+										local_domain, name));
+						String cdata = body.getCData();
+						body.setCData(old_from + " sends for installation at " +
+										srecv.getDefHostName() + ":\n\n" + cdata);
+						break;
+					}
+					default:
+						break;
 				}
 				results.offer(new Packet(message));
 			} // end of if (ri.isSubscribed() && ri.isModerationAccepted())

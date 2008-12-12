@@ -69,7 +69,7 @@ public abstract class PropertyConstants {
 	};
 
 	public enum SenderAddress implements DefaultValues {
-		REPLACE, LEAVE, REMOVE;
+		REPLACE, LEAVE, REMOVE, REPLACE_SRECV;
 		public String[] strValues() {
 			String[] possible_values = new String[values().length];
 			int i = 0;
