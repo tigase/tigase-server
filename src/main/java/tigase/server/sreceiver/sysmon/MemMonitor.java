@@ -48,8 +48,6 @@ public class MemMonitor extends AbstractMonitor
 					Logger.getLogger("tigase.server.sreceiver.sysmon.MemMonitor");
 
 	private MemoryMXBean memoryMXBean = null;
-	private MemoryUsage nonHeap = null;
-	private String jid = null;
 
 	@Override
 	public void init(String jid, double treshold, SystemMonitorTask smTask) {
@@ -65,13 +63,16 @@ public class MemMonitor extends AbstractMonitor
 			if (memUsage != null) {
 				if (memoryPoolMXBean.isUsageThresholdSupported()) {
 					emitter.addNotificationListener(this, null, memoryPoolMXBean);
-					long memUsageTreshold = memUsage.getMax() - 
+					long memUsageTreshold =
 									new Double(new Long(memUsage.getMax()).doubleValue() *
 									treshold).longValue();
 					memoryPoolMXBean.setUsageThreshold(memUsageTreshold);
 					log.config("Setting treshold: " + memUsageTreshold +
 									" for memory pool: " + memoryPoolMXBean.getName() +
-									", type: " + memoryPoolMXBean.getType().toString());
+									", type: " + memoryPoolMXBean.getType().toString() +
+									", memMax: " + memUsage.getMax() +
+									", memUsed: " + memUsage.getUsed() +
+									", config treeshold: " + treshold);
 					if (memoryPoolMXBean.isUsageThresholdExceeded()) {
 						Notification not = new Notification(
 										MemoryNotificationInfo.MEMORY_THRESHOLD_EXCEEDED,
@@ -121,7 +122,7 @@ public class MemMonitor extends AbstractMonitor
 		List<MemoryPoolMXBean> memPools = ManagementFactory.getMemoryPoolMXBeans();
 		for (MemoryPoolMXBean memoryPoolMXBean : memPools) {
 			MemoryUsage memUsage = memoryPoolMXBean.getUsage();
-			if (memUsage != null) {
+			if (memUsage != null && memoryPoolMXBean.isUsageThresholdSupported()) {
 				sb.append("Memory pool: " + memoryPoolMXBean.getName() +
 								", type: " + memoryPoolMXBean.getType().toString() +
 								", usage: " + format.format(memUsage.getUsed()/1024) +
@@ -129,6 +130,8 @@ public class MemMonitor extends AbstractMonitor
 								" - " +
 								formp.format(new Long(memUsage.getUsed()).doubleValue()/
 								new Long(memUsage.getMax()).doubleValue()) +
+								", treshold: " +
+								format.format(memoryPoolMXBean.getUsageThreshold() / 1024) +
 								"\n");
 			}
 		}
