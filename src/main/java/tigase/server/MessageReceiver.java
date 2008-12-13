@@ -23,7 +23,6 @@
 package tigase.server;
 
 import java.util.Queue;
-import java.util.Set;
 
 /**
  * Interface MessageReceiver
@@ -65,6 +64,7 @@ public interface MessageReceiver extends ServerComponent {
 	/**
 	 * Describe <code>addPackets</code> method here.
 	 *
+	 * @param packets
 	 * @return a <code>boolean</code> value
 	 */
 	boolean addPackets(Queue<Packet> packets);
