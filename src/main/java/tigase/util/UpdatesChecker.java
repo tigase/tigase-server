@@ -21,7 +21,6 @@
 package tigase.util;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import java.net.URL;
@@ -78,11 +77,12 @@ public class UpdatesChecker extends Thread {
 		setName("UpdatesChecker");
 	}
 
+	@Override
 	public void run() {
 		String version = XMPPServer.getImplementationVersion();
 		int idx = version.indexOf('-');
 		version = version.substring(0, idx);
-		log.warning("Server version: " + version);
+		log.info("Server version: " + version);
 		String[] nums = version.split("\\.");
 		try {
 			major_ver = Integer.parseInt(nums[0]);
