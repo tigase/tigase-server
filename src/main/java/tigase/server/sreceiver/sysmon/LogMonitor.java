@@ -49,6 +49,7 @@ public class LogMonitor extends AbstractMonitor {
 					new LinkedHashMap<String, String>();
 	private int loggerSize = 20;
 	private Level levelTreshold = Level.WARNING;
+	private int maxLogBuffer = 1000*1000;
 
 	private enum command {
 		setlevel(" [package level] - Sets logging level for specified package."),
@@ -189,21 +190,24 @@ public class LogMonitor extends AbstractMonitor {
 
 	private class MonitorHandler extends Handler {
 
-		private Queue<String> logs = new LinkedList<String>();
+		private LinkedList<String> logs = new LinkedList<String>();
 		private LogFormatter formatter = new LogFormatter();
 
 		@Override
-		public void publish(LogRecord record) {
+		public synchronized void publish(LogRecord record) {
 			logs.add(formatter.format(record));
 		}
 
 		public synchronized String logsToString() {
 			StringBuilder sb = new StringBuilder();
-			for (String string : logs) {
-				sb.append(XMLUtils.escape(string) + "\n");
+			String logEntry = null;
+			while (((logEntry = logs.removeLast()) != null) &&
+							(sb.length() < maxLogBuffer)) {
+				sb.insert(0, logEntry);
 			}
 			logs.clear();
-			return sb.toString();
+			return sb.length() <= maxLogBuffer ? sb.toString()
+							: sb.substring(sb.length() - maxLogBuffer);
 		}
 
 		@Override
