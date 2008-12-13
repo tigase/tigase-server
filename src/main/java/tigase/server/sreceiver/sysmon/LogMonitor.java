@@ -53,7 +53,8 @@ public class LogMonitor extends AbstractMonitor {
 	private enum command {
 		setlevel(" [package level] - Sets logging level for specified package."),
 		loggersize(" [N] - Sets memory logger size to specified value."),
-		leveltreshold(" [level] - Sets level treshold to specified level.");
+		leveltreshold(" [level] - Sets level treshold to specified level."),
+		logdump(" - retrieves all logs collected in the memory buffer and clears that buffer.");
 
 		private String helpText = null;
 
@@ -103,7 +104,14 @@ public class LogMonitor extends AbstractMonitor {
 				}
 			case loggersize:
 				if (com.length > 1) {
-					return "Setting memory logger size is not supported yet.";
+					try {
+						int newLoggerSize = Integer.parseInt(com[1]);
+						loggerSize = newLoggerSize;
+						registerHandler();
+						return "New logger size successfuly set to: " + loggerSize;
+					} catch (Exception e) {
+						return "Incorrect logger size: " + com[1];
+					}
 				} else {
 					return "Current memory logger size is: " + loggerSize;
 				}
@@ -113,6 +121,9 @@ public class LogMonitor extends AbstractMonitor {
 				} else {
 					return "Current logging treshold level is: " + levelTreshold;
 				}
+			case logdump:
+				return "Memory logging buffer content:\n" +
+								memoryHandler.pushToString();
 		}
 		return null;
 	}
@@ -129,17 +140,24 @@ public class LogMonitor extends AbstractMonitor {
 		return false;
 	}
 
-	@Override
-	public void init(String jid, double treshold, SystemMonitorTask smTask) {
-		super.init(jid, treshold, smTask);
+	private void registerHandler() {
+		if (memoryHandler != null) {
+			Logger.getLogger("").removeHandler(memoryHandler);
+		}
 		if (monitorHandler == null) {
 			monitorHandler = new MonitorHandler();
 			monitorHandler.setLevel(Level.ALL);
-			memoryHandler =
-							new MemoryHandlerFlush(monitorHandler, loggerSize, levelTreshold);
-			memoryHandler.setLevel(Level.ALL);
-			Logger.getLogger("").addHandler(memoryHandler);
 		}
+		memoryHandler =
+						new MemoryHandlerFlush(monitorHandler, loggerSize, levelTreshold);
+		memoryHandler.setLevel(Level.ALL);
+		Logger.getLogger("").addHandler(memoryHandler);
+	}
+
+	@Override
+	public void init(String jid, double treshold, SystemMonitorTask smTask) {
+		super.init(jid, treshold, smTask);
+		registerHandler();
 	}
 
 	private String getCurrentLevels() {
@@ -179,14 +197,18 @@ public class LogMonitor extends AbstractMonitor {
 			logs.add(formatter.format(record));
 		}
 
-		@Override
-		public synchronized void flush() {
+		public synchronized String logsToString() {
 			StringBuilder sb = new StringBuilder();
 			for (String string : logs) {
 				sb.append(XMLUtils.escape(string) + "\n");
 			}
 			logs.clear();
-			sendWarningOut(sb.toString(), null);
+			return sb.toString();
+		}
+
+		@Override
+		public synchronized void flush() {
+			sendWarningOut(logsToString(), null);
 		}
 
 		@Override
@@ -196,8 +218,16 @@ public class LogMonitor extends AbstractMonitor {
 
 	private class MemoryHandlerFlush extends MemoryHandler {
 
-		public MemoryHandlerFlush(Handler target, int size, Level pushLevel) {
+		MonitorHandler monHandle = null;
+
+		public MemoryHandlerFlush(MonitorHandler target, int size, Level pushLevel) {
 			super(target, size, pushLevel);
+			monHandle = target;
+		}
+
+		public String pushToString() {
+			super.push();
+			return monHandle.logsToString();
 		}
 
 		@Override
