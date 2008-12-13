@@ -21,10 +21,10 @@
  */
 package tigase.xmpp.impl;
 
-import java.util.Arrays;
 import java.util.Queue;
 import java.util.Map;
 import java.util.logging.Logger;
+import tigase.conf.Configurable;
 import tigase.server.Packet;
 import tigase.server.XMPPServer;
 import tigase.xml.Element;
@@ -97,8 +97,9 @@ public class JabberIqVersion extends XMPPProcessor
 
 		// If ID part of user account contains only host name
 		// and this is local domain it is message to admin
-		if (id == null || id.equals("")
-			|| id.equalsIgnoreCase(session.getDomain())
+		if (id == null || id.equals("") ||
+						session.getConnectionId() == Configurable.NULL_ROUTING ||
+						id.equalsIgnoreCase(session.getDomain())
 // 			|| (packet.getElemTo() != null && packet.getElemFrom() != null
 // 				&& packet.getElemTo().equals(packet.getElemFrom()))
 				) {
