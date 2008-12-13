@@ -271,7 +271,11 @@ public class StanzaReceiver extends AbstractMessageReceiver
 					+ task.getJID(), e);
 			} // end of try-catch
 		} else {
-			log.warning("Attempt to add another task with jid: " + task.getJID());
+//			Exception exep = new Exception("Attempt to add another task with jid: " +
+//							task.getJID() + ", ignoring.");
+//			exep.fillInStackTrace();
+			log.log(Level.INFO, "Attempt to add another task with jid: " +
+							task.getJID() + ", ignoring.");
 		} // end of else
 	}
 
