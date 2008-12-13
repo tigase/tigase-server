@@ -59,12 +59,15 @@ public class JabberIqVersion extends XMPPProcessor
 
 	public String id() { return ID; }
 
+	@Override
 	public String[] supElements()
 	{ return ELEMENTS; }
 
+	@Override
   public String[] supNamespaces()
 	{ return XMLNSS; }
 
+	@Override
   public Element[] supDiscoFeatures(final XMPPResourceConnection session)
 	{ return DISCO_FEATURES; }
 
