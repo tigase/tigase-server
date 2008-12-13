@@ -121,9 +121,9 @@ public class DiskMonitor extends AbstractMonitor {
 	public String getState() {
 		StringBuilder sb = new StringBuilder();
 		Formatter formatter = new Formatter(sb);
-		String format_s = "%1$15s%2$12s%3$12s%4$12s%5$12s\n";
+		String format_s = "%1$20s%2$12s%3$12s%4$12s%5$12s\n";
 		formatter.format(format_s, "Filesystem", "Size", "Used", "Avail", "Free%");
-		String format_n = "%1$15s%2$,12dM%3$,12dM%4$,12dM%5$12.2f%%\n";
+		String format_n = "%1$20s%2$,12dM%3$,12dM%4$,12dM%5$12.2f%%\n";
 		long MEGA = 1024*1024;
 		for (File file : roots) {
 			double percent = new Long(file.getUsableSpace()).doubleValue() /

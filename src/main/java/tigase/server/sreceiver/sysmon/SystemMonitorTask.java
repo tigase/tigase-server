@@ -69,7 +69,22 @@ public class SystemMonitorTask extends RepoRosterTask {
 					new LinkedHashMap<String, ResourceMonitorIfc>();
 	private double warning_treshold = 0.9;
 
-	private enum command { help, state; };
+	private enum command {
+		help(" - Displays help info."),
+		state(" - Displays current state from all monitors."),
+		treshold(" [0.NN] - sets/displays current treshold value.");
+
+		private String helpText = null;
+
+		private command(String helpText) {
+			this.helpText = helpText;
+		}
+
+		public String getHelp() {
+			return helpText;
+		}
+
+	};
 
 	private Timer tasks = null;
 
@@ -192,9 +207,14 @@ public class SystemMonitorTask extends RepoRosterTask {
 	}
 
 	private String commandsHelp() {
-		return "Available commands are:\n" +
-						"//help - display this help info\n" +
-						"//state - displays current state from all monitors\n";
+		StringBuilder sb = new StringBuilder();
+		for (command comm : command.values()) {
+			sb.append("//" + comm.name() + comm.getHelp() + "\n");
+		}
+		for (ResourceMonitorIfc monitor : monitors.values()) {
+			sb.append(monitor.commandsHelp());
+		}
+		return "Available commands are:\n" + sb.toString();
 	}
 
 	private boolean isPostCommand(Packet packet) {
@@ -207,6 +227,18 @@ public class SystemMonitorTask extends RepoRosterTask {
 			}
 		}
 		return false;
+	}
+
+	private ResourceMonitorIfc monitorForCommand(Packet packet) {
+		String body = packet.getElemCData("/message/body");
+		if (body != null) {
+			for (ResourceMonitorIfc monitor : monitors.values()) {
+				if (monitor.isMonitorCommand(body)) {
+					return monitor;
+				}
+			}
+		}
+		return null;
 	}
 
 	@Override
@@ -273,7 +305,7 @@ public class SystemMonitorTask extends RepoRosterTask {
 						ONLINE_ONLY_DISPL_NAME, false));
 		defs.put(REPLACE_SENDER_PROP_KEY,
 						new PropertyItem(REPLACE_SENDER_PROP_KEY,
-						REPLACE_SENDER_DISPL_NAME, SenderAddress.LEAVE));
+						REPLACE_SENDER_DISPL_NAME, SenderAddress.REPLACE_SRECV));
 		defs.put(SUBSCR_RESTRICTIONS_PROP_KEY,
 						new PropertyItem(SUBSCR_RESTRICTIONS_PROP_KEY,
 						SUBSCR_RESTRICTIONS_DISPL_NAME, SubscrRestrictions.MODERATED));
@@ -289,14 +321,14 @@ public class SystemMonitorTask extends RepoRosterTask {
 
 	private void runCommand(Packet packet, Queue<Packet> results) {
 		String body = packet.getElemCData("/message/body");
-		String[] body_split = body.split(" |\n|\r");
+		String[] body_split = body.split("\\s");
 		command comm = command.valueOf(body_split[0].substring(2));
 		switch (comm) {
-		case help:
-			results.offer(Packet.getMessage(packet.getElemFrom(),
-					packet.getElemTo(), StanzaType.chat, commandsHelp(),
-					"Commands description", null));
-			break;
+			case help:
+				results.offer(Packet.getMessage(packet.getElemFrom(),
+								packet.getElemTo(), StanzaType.chat, commandsHelp(),
+								"Commands description", null));
+				break;
 			case state:
 				StringBuilder sb = new StringBuilder("\n");
 				for (ResourceMonitorIfc resmon : monitors.values()) {
@@ -306,8 +338,55 @@ public class SystemMonitorTask extends RepoRosterTask {
 				results.offer(Packet.getMessage(packet.getElemFrom(),
 								packet.getElemTo(), StanzaType.chat, sb.toString(),
 								"Monitors State", null));
-			break;
+				break;
+			case treshold:
+				if (body_split.length > 1) {
+					boolean correct = false;
+					try {
+						double newtreshold = Double.parseDouble(body_split[1]);
+						if (newtreshold > 0 && newtreshold < 1) {
+							warning_treshold = newtreshold;
+							for (Map.Entry<String, ResourceMonitorIfc> resmon : monitors.entrySet()) {
+								resmon.getValue().init(resmon.getKey(), warning_treshold, this);
+							}
+							correct = true;
+						}
+					} catch (Exception e) { }
+					if (correct) {
+						results.offer(Packet.getMessage(packet.getElemFrom(),
+										packet.getElemTo(), StanzaType.chat,
+										"New treshold set to: " + warning_treshold + "\n",
+										"Threshold command.", null));
+					} else {
+						results.offer(Packet.getMessage(packet.getElemFrom(),
+										packet.getElemTo(), StanzaType.chat,
+										"Incorrect treshold givenm using the old treshold: " + 
+										warning_treshold + "\n" +
+										"Correct treshold is a float point number 0 < N < 1.",
+										"Threshold command.", null));
+					}
+				} else {
+					results.offer(Packet.getMessage(packet.getElemFrom(),
+									packet.getElemTo(), StanzaType.chat,
+									"Current treshold value is: " + warning_treshold,
+									"Threshold command.", null));
+				}
+				break;
 		}
+	}
+
+	private void runMonitorCommand(ResourceMonitorIfc monitor, 
+					Packet packet, Queue<Packet> results) {
+		String body = packet.getElemCData("/message/body");
+		String[] body_split = body.split("\\s");
+		String result = monitor.runCommand(body_split);
+		if (result == null) {
+			result = "Monitor " + monitor.getClass().getSimpleName() +
+							" command was run but returned no results.";
+		}
+		results.offer(Packet.getMessage(packet.getElemFrom(),
+						packet.getElemTo(), StanzaType.chat, result,
+						monitor.getClass().getSimpleName() + " command.", null));
 	}
 
 	@Override
@@ -315,11 +394,16 @@ public class SystemMonitorTask extends RepoRosterTask {
 		if (isPostCommand(packet)) {
 			runCommand(packet, results);
 		} else {
-			String body = packet.getElemCData("/message/body");
-			results.offer(Packet.getMessage(packet.getElemFrom(),
-					packet.getElemTo(), StanzaType.normal,
-					"This is response to your message: [" + body + "]",
-					"Response", null));
+			ResourceMonitorIfc monitor = monitorForCommand(packet);
+			if (monitor != null) {
+				runMonitorCommand(monitor, packet, results);
+			} else {
+				String body = packet.getElemCData("/message/body");
+				results.offer(Packet.getMessage(packet.getElemFrom(),
+								packet.getElemTo(), StanzaType.normal,
+								"This is response to your message: [" + body + "]",
+								"Response", null));
+			}
 		}
 	}
 

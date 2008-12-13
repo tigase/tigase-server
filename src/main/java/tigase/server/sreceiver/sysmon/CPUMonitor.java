@@ -102,7 +102,7 @@ public class CPUMonitor extends AbstractMonitor {
 		formd.setMaximumFractionDigits(4);
 		return "Current CPU usage is: " + format.format(cpuUsage[idx]) +
 						", Last minute CPU usage is: " + format.format(recentCpu(6)) +
-						", Load average is: " + formd.format(loadAverage[idx]);
+						", Load average is: " + formd.format(loadAverage[idx]) + "\n";
 	}
 
 }

@@ -81,13 +81,13 @@ public abstract class AbstractMonitor implements ResourceMonitorIfc {
 
 	public void sendWarningOut(String text, Object warning) {
 		if (warning == null || !warningsSent.contains(warning)) {
+			Packet result = Packet.getMessage("", jid, StanzaType.normal,
+							"Warning! High resource usage alert from: " +
+							getClass().getSimpleName() + "\n" +
+							new Date() + " - " + text,
+							"System Monitor Alert", null);
+			smTask.sendPacketOut(result);
 			if (warning != null) {
-				Packet result = Packet.getMessage("", jid, StanzaType.normal,
-								"Warning! High resource usage alert from: " +
-								getClass().getSimpleName() + "\n" +
-								new Date() + " - " + text,
-								"System Monitor Alert", null);
-				smTask.sendPacketOut(result);
 				warningsSent.add(warning);
 			}
 		}
@@ -95,11 +95,7 @@ public abstract class AbstractMonitor implements ResourceMonitorIfc {
 
 	public int setValueInArr(double[] arr, int idx, double val) {
 		arr[idx] = val;
-		if (idx >= (arr.length-1)) {
-			idx = 0;
-		} else {
-			++idx;
-		}
+		++idx; idx %= arr.length;
 		return idx;
 	}
 
@@ -115,6 +111,16 @@ public abstract class AbstractMonitor implements ResourceMonitorIfc {
 	public void check1Min(Queue<Packet> results) {
 	}
 
+	public String commandsHelp() {
+		return "";
+	}
 
+	public String runCommand(String[] command) {
+		return null;
+	}
+
+	public boolean isMonitorCommand(String command) {
+		return false;
+	}
 
 }

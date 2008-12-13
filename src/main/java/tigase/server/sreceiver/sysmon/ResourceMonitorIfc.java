@@ -51,4 +51,10 @@ public interface ResourceMonitorIfc {
 
 	public String getState();
 
+	public String commandsHelp();
+
+	public String runCommand(String[] command);
+
+	public boolean isMonitorCommand(String command);
+
 }
