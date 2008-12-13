@@ -273,11 +273,11 @@ public class MessageRouterConfig {
 		return (ComponentRegistrator)Class.forName(cls_name).newInstance();
 	}
 
-	public MessageReceiver getMsgRcvInstance(String name) throws
+	public ServerComponent getMsgRcvInstance(String name) throws
 		ClassNotFoundException, InstantiationException, IllegalAccessException {
 
 		String cls_name = (String)props.get(MSG_RECEIVERS_PROP_KEY + name + ".class");
-		return (MessageReceiver)Class.forName(cls_name).newInstance();
+		return (ServerComponent)Class.forName(cls_name).newInstance();
 	}
 
 	private static boolean isTrue(String val) {

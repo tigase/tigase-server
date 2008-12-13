@@ -499,7 +499,7 @@ public class MessageRouter extends AbstractMessageReceiver {
       String[] msgrcv_names = conf.getMsgRcvNames();
       for (String name: msgrcv_names) {
 				log.finer("Loading and registering message receiver: " + name);
-				MessageReceiver mr = tmp_rec.remove(name);
+				ServerComponent mr = tmp_rec.remove(name);
 				String cls_name =
 					(String)props.get(MSG_RECEIVERS_PROP_KEY + name + ".class");
 				try {
@@ -508,11 +508,17 @@ public class MessageRouter extends AbstractMessageReceiver {
 							mr.release();
 						}
 						mr = conf.getMsgRcvInstance(name);
-						mr.setParent(this);
 						mr.setName(name);
-						mr.start();
+						if (mr instanceof MessageReceiver) {
+							((MessageReceiver)mr).setParent(this);
+							((MessageReceiver)mr).start();
+						}
 					} // end of if (cr == null)
-					addRouter(mr);
+					if (mr instanceof MessageReceiver) {
+						addRouter((MessageReceiver)mr);
+					} else {
+						addComponent(mr);
+					}
 				} // end of try
 				catch (Exception e) {
 					e.printStackTrace();
