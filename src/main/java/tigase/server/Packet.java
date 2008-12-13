@@ -256,10 +256,9 @@ public class Packet {
 
 	public String toString() {
 		if (packetToString == null) {
-			packetToString = "to=" + to + ", from=" + from + ", data=" + elem.toString()
-			  + ", XMLNS="+elem.getXMLNS();
+			packetToString = ", data=" + elem.toString() + ", XMLNS="+elem.getXMLNS();
 		}
-		return packetToString;
+		return "to=" + to + ", from=" + from + packetToString;
 	}
 
 	public boolean isRouted() {
