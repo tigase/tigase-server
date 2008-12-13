@@ -145,7 +145,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 				if (key != null) {
 					defConfigParams.put(key, val);
 					//System.out.println("Setting defaults: " + key + "=" + val.toString());
-					log.warning("Setting defaults: " + key + "=" + val.toString());
+					log.config("Setting defaults: " + key + "=" + val.toString());
 				} // end of if (key != null)
       } // end of for (int i = 0; i < args.length; i++)
     }
@@ -163,7 +163,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 					if (key.startsWith("--") || key.equals("config-type")) {
 						defConfigParams.put(key.trim(), value);
 						//defProperties.remove(key);
-						log.warning("Added default config parameter: ("
+						log.config("Added default config parameter: ("
 							+ key + "=" + value + ")");
 					} else {
 						Object val = value;
@@ -369,7 +369,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 			} // end of if (entry.getKey().startsWith(LOGGING_KEY))
 		}
 		loadLogManagerConfig(buff.toString());
-		log.warning("DONE");
+		log.config("DONE");
 	}
 
 	public static void loadLogManagerConfig(String config) {
@@ -716,7 +716,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 		}
 
 		if (packet.getType() != null && packet.getType() == StanzaType.error) {
-			log.warning("Ignoring error packet: " + packet.toString());
+			log.info("Ignoring error packet: " + packet.toString());
 			return;
 		}
 
