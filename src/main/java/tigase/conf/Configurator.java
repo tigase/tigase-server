@@ -33,11 +33,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.TreeMap;
 import java.util.Properties;
-import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -47,9 +44,7 @@ import tigase.disco.XMPPService;
 import tigase.server.AbstractComponentRegistrator;
 import tigase.server.Command;
 import tigase.server.MessageReceiver;
-import tigase.server.MessageRouter;
 import tigase.server.ConnectionManager;
-import tigase.server.MessageRouterConfig;
 import tigase.server.Packet;
 import tigase.server.Permissions;
 import tigase.server.ServerComponent;
@@ -79,6 +74,8 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 
   private static final Logger log =
 		Logger.getLogger("tigase.conf.Configurator");
+
+	public static String logManagerConfiguration = null;
 
 	private ConfigRepository repository = null;
 	//	private Timer delayedTask = new Timer("ConfiguratorTask", true);
@@ -309,7 +306,9 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 	/**
    * Returns defualt configuration settings in case if there is no
    * config file.
-   */
+	 * @param params
+	 * @return
+	 */
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> defaults = new TreeMap<String, Object>();
 		defaults.put(LOGGING_KEY + "java.util.logging.ConsoleHandler.level", "WARNING");
@@ -349,7 +348,8 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 
   /**
    * Sets all configuration properties for object.
-   */
+	 * @param properties
+	 */
 	public void setProperties(final Map<String, Object> properties) {
 		setupLogManager(properties);
 		demoMode = (Boolean)properties.get("demo-mode");
@@ -373,7 +373,8 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 	}
 
 	public static void loadLogManagerConfig(String config) {
-    try {
+    logManagerConfiguration = config;
+		try {
       final ByteArrayInputStream bis =
         new ByteArrayInputStream(config.getBytes());
       LogManager.getLogManager().readConfiguration(bis);
