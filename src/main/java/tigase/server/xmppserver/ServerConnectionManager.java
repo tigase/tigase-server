@@ -278,7 +278,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 			reconnectService(port_props, 5*SECOND);
 			return true;
 		} catch (UnknownHostException e) {
-			log.warning("UnknownHostException for host: " + remotehost);
+			log.info("UnknownHostException for host: " + remotehost);
 			return false;
 		} // end of try-catch
 
