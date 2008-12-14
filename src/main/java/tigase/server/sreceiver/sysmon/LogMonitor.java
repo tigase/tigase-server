@@ -201,7 +201,7 @@ public class LogMonitor extends AbstractMonitor {
 		public synchronized String logsToString() {
 			StringBuilder sb = new StringBuilder();
 			String logEntry = null;
-			while (((logEntry = logs.removeLast()) != null) &&
+			while (((logEntry = logs.pollLast()) != null) &&
 							(sb.length() < maxLogBuffer)) {
 				sb.insert(0, logEntry);
 			}
