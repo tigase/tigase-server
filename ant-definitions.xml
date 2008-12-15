@@ -204,7 +204,7 @@
 <!--         date="today"/> -->
       <mkdir dir="@{packagename}-${version}.src/@{packagename}-${version}.src"/>
       <move todir="@{packagename}-${version}.src/@{packagename}-${version}.src">
-        <fileset dir="@{cvspackage}"/>
+        <fileset dir="@{packagename}"/>
       </move>
       <zip
         zipfile="@{packagename}-${version}.src.zip"
