@@ -91,7 +91,7 @@
 
  <target name="dist-src" depends="prepare,prepare-dist"
   description="Create distribution package with all source files">
-  <distsrc packagename="${projectname}" cvsroot="${svnroot}"
+  <distsrc packagename="${projectname}-${jarfile}" cvsroot="${svnroot}"
    cvspackage="${cvspackage}"/>
  </target>
 
