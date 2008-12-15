@@ -254,6 +254,10 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 		delayedTasks = new Timer("DelayedTasks", true);
 	}
 
+	protected void addWaitingTask(Map<String, Object> conn) {
+		waitingTasks.add(conn);
+	}
+
 	@Override
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
@@ -272,7 +276,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 					} // end of if (entry.getKey().startsWith())
 				} // end of for ()
 				port_props.put(PORT_KEY, ports[i]);
-				waitingTasks.add(port_props);
+				addWaitingTask(port_props);
 				//reconnectService(port_props, startDelay);
 			} // end of for (int i = 0; i < ports.length; i++)
 		} // end of if (ports != null)

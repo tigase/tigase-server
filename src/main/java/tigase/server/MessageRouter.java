@@ -537,6 +537,7 @@ public class MessageRouter extends AbstractMessageReceiver {
       inProperties = false;
     } // end of try-finally
 		for (ServerComponent comp : components.values()) {
+			log.info("Initialization completed.");
 			comp.initializationCompleted();
 		}
   }

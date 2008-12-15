@@ -310,7 +310,8 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 					port_props.put(PORT_IFC_PROP_KEY, new String[] {host});
 					port_props.put(MAX_RECONNECTS_PROP_KEY, 99999999);
 					port_props.put(PORT_KEY, PORTS[0]);
-					reconnectService(port_props, connectionDelay);
+					addWaitingTask(port_props);
+					//reconnectService(port_props, connectionDelay);
 				}
 			}
 		}
