@@ -326,7 +326,8 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 		updateRoutings(routings, false);
 		ConnectionType type = service.connectionType();
 		if (type == ConnectionType.connect) {
-			reconnectService(sessionData, connectionDelay);
+			addWaitingTask(sessionData);
+			//reconnectService(sessionData, connectionDelay);
 		} // end of if (type == ConnectionType.connect)
 		//		removeRouting(serv.getRemoteHost());
 		String addr = (String)sessionData.get(PORT_REMOTE_HOST_PROP_KEY);

@@ -269,11 +269,12 @@ public class ServerConnectionManagerOLD extends ConnectionManager<XMPPIOService>
 				getConnectionId(localhost, remotehost, ConnectionType.connect);
 			port_props.put("cid", cid);
 			log.finest("STARTING new connection: " + cid);
-			if (reconnect) {
-				reconnectService(port_props, 15*SECOND);
-			} else {
-				startService(port_props);
-			}
+			addWaitingTask(port_props);
+//			if (reconnect) {
+//				reconnectService(port_props, 15*SECOND);
+//			} else {
+//				startService(port_props);
+//			}
 			return true;
 		} catch (UnknownHostException e) {
 			log.warning("UnknownHostException for host: " + remotehost);

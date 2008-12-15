@@ -138,6 +138,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 	private Set<ConnectionListenerImpl> pending_open =
 		Collections.synchronizedSet(new HashSet<ConnectionListenerImpl>());;
 	protected long connectionDelay = 2 * SECOND;
+	private boolean initializationCompleted = false;
 //	protected long startDelay = 5 * SECOND;
 
 	@Override
@@ -150,10 +151,19 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 
 	@Override
 	public void initializationCompleted() {
+		initializationCompleted = true;
 		for (Map<String, Object> params : waitingTasks) {
 			reconnectService(params, connectionDelay);
 		}
 		waitingTasks.clear();
+	}
+
+	protected void addWaitingTask(Map<String, Object> conn) {
+		if (initializationCompleted) {
+			reconnectService(conn, connectionDelay);
+		} else {
+			waitingTasks.add(conn);
+		}
 	}
 
 	@Override
@@ -254,10 +264,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 		delayedTasks = new Timer("DelayedTasks", true);
 	}
 
-	protected void addWaitingTask(Map<String, Object> conn) {
-		waitingTasks.add(conn);
-	}
-
 	@Override
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
@@ -306,7 +312,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
     } // end of if (use.equalsIgnoreCase())
 	}
 
-	protected void startService(Map<String, Object> port_props) {
+	private void startService(Map<String, Object> port_props) {
 		ConnectionListenerImpl cli = new ConnectionListenerImpl(port_props);
 		if (cli.getConnectionType() == ConnectionType.accept) {
 			pending_open.add(cli);
@@ -314,7 +320,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 		connectThread.addConnectionOpenListener(cli);
 	}
 
-	protected void reconnectService(final Map<String, Object> port_props,
+	private void reconnectService(final Map<String, Object> port_props,
 		long delay) {
 		log.finer("Reconnecting service for: " + getName()
 			+ ", scheduling next try in " + (delay / 1000) + "secs");

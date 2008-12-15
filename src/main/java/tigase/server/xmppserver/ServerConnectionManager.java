@@ -275,7 +275,8 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 				getConnectionId(localhost, remotehost);
 			port_props.put("cid", cid);
 			log.finest("STARTING new connection: " + cid);
-			reconnectService(port_props, 5*SECOND);
+			addWaitingTask(port_props);
+			//reconnectService(port_props, 5*SECOND);
 			return true;
 		} catch (UnknownHostException e) {
 			log.info("UnknownHostException for host: " + remotehost);
