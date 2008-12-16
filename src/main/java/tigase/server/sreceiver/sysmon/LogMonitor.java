@@ -195,7 +195,8 @@ public class LogMonitor extends AbstractMonitor {
 
 		@Override
 		public synchronized void publish(LogRecord record) {
-			logs.add(formatter.format(record));
+			logs.add(formatter.format(record).replace('<', '[').replace('>',
+							']'));
 		}
 
 		public synchronized String logsToString() {
