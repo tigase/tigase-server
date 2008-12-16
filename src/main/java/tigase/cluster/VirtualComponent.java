@@ -40,6 +40,43 @@ import tigase.util.JIDUtils;
 import tigase.xml.Element;
 
 /**
+ * The purpose of this component implementation is to forward packets to a target
+ * real component implementation in the cluster installation. Let's say you have
+ * a cluster installation with full Tigase server installed on each node and you
+ * also want to use a component which doesn't have clustered implementation yet.
+ * In such case you deploy the component on one of the cluster nodes and put the
+ * virtual component on all other nodes. With proper configuration they pretend
+ * to be the component returning a correct service disco information and forward
+ * all packets for this component to a cluster node with real component running.
+ *
+ * This is a very lightweight implementation which doesn't use much resources
+ * either memory or CPU.
+ *
+ * It can work well for any kind of a component: MUC, PubSub, transport either
+ * native Tigase components or third-party components connected via XEP-0114 -
+ * external protocol component.
+ *
+ * Basic configuration parameters are actually the same as for a real component.
+ * You set a real component name as a name for the virtual component and a vritual
+ * component class name to load. Let's say we want to deploy MUC component this
+ * way. The MUC component is visible as <code>muc.domain.our</code> in our
+ * installation. Thus the name of the component is: <code>muc</code>:
+ * <pre>
+ * --comp-name-1=muc
+ * --comp-class-1=tigase.cluster.VirtualComponent
+ * </pre>
+ * This is pretty much all you need to load a virtual component. A few other
+ * options are needed to point to correct destination addresses for forwarded
+ * packets and to set correct service discovery parameters:
+ * <pre>
+ * muc/redirect-to=muc@cluster-node-with-real-muc.domain.our
+ * muc/disco-name=Multi User Chat
+ * muc/disco-node=
+ * muc/disco-type=text
+ * muc/disco-category=conference
+ * muc/disco-features=http://jabber.org/protocol/muc
+ * </pre>
+ * Above options set all possible parameters to setup virtual MUC component.
  * Created: Dec 13, 2008 7:44:35 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -54,15 +91,43 @@ public class VirtualComponent
   private static final Logger log =
     Logger.getLogger("tigase.cluster.VirtualComponent");
 
+	/**
+	 * Virtual component parameter setting packet redirect destination address.
+	 */
 	public static final String REDIRECT_TO_PROP_KEY = "redirect-to";
+	/**
+	 * Parameter to set service discovery item name for the virtual component
+	 * instance. You should refer to service discovery documentation for a proper
+	 * name for your component.
+	 */
 	public static final String DISCO_NAME_PROP_KEY = "disco-name";
 	public static final String DISCO_NAME_PROP_VAL = "Multi User Chat";
+	/**
+	 * Parameter to set service discovery node name. In most cases you should leave
+	 * it empty unless you really know what you are doing.
+	 */
 	public static final String DISCO_NODE_PROP_KEY = "disco-node";
 	public static final String DISCO_NODE_PROP_VAL = "";
+	/**
+	 * Parameter to set service discovery item type for the virtual component.
+	 * You should refer to a service discovery documentation for a correct type
+	 * for your component. Or, alternatively you can have a look what returns
+	 * your real component.
+	 */
 	public static final String DISCO_TYPE_PROP_KEY = "disco-type";
 	public static final String DISCO_TYPE_PROP_VAL = "text";
+	/**
+	 * Parameter to set service discovery item category name for the virtual
+	 * component. Please refer to service discovery documentation for a correct
+	 * category or check what is returned by your real component instance.
+	 */
 	public static final String DISCO_CATEGORY_PROP_KEY = "disco-category";
 	public static final String DISCO_CATEGORY_PROP_VAL = "conference";
+	/**
+	 * Comma separated list of features for the service discovery item
+	 * reprezented by this virtual component. Please check with the real component
+	 * to obtain a correct list of features.
+	 */
 	public static final String DISCO_FEATURES_PROP_KEY = "disco-features";
 	public static final String DISCO_FEATURES_PROP_VAL = "http://jabber.org/protocol/muc";
 
