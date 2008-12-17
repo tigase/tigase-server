@@ -66,13 +66,14 @@ function tigase_monitor_block($op='list', $delta=0) {
 		$server_version = ' ';
 		$file = '';
 		foreach ($info as $name => $description) {
-			if ($name != 'TOTAL:') {
+			if (($name != 'TOTAL:') && !stripos($name, 'xmltools') && !stripos($name, 'utils')) {
 				$name_ver = str_ireplace("tigase-server-", "", $name);
 				$name_ver = str_ireplace(".zip", "", $name_ver);
 				$name_ver = str_ireplace(".gz", "", $name_ver);
 				$name_ver = str_ireplace(".tar", "", $name_ver);
 				$name_ver = str_ireplace(".exe", "", $name_ver);
 				$name_ver = str_ireplace(".jar", "", $name_ver);
+				$name_ver = str_ireplace(".src", "", $name_ver);
 				if ($name_ver >= $server_version) {
 					$server_version = $name_ver;
 
