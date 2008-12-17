@@ -492,8 +492,6 @@ public class SessionManagerClustered extends SessionManager
                         log.fine("Cluster nodes: " + cluster_nodes.toString());
 			broken_nodes.remove(getName() + "@" + node);
 		}
-		sendClusterNotification("Cluster nodes have been connected ("
-			+ (new Date()) + ")", "\nNew cluster nodes connected", node_hostnames);
 	}
 
 	public void nodesDisconnected(Set<String> node_hostnames) {
@@ -503,8 +501,6 @@ public class SessionManagerClustered extends SessionManager
                         log.fine("Cluster nodes: " + cluster_nodes.toString());
 			broken_nodes.add(getName() + "@" + node);
 		}
-		sendClusterNotification("Cluster nodes have been disconnected ("
-			+ (new Date()) + ")", "\nDisconnected cluster nodes", node_hostnames);
 	}
 
 	protected String getFirstClusterNode() {
@@ -553,22 +549,6 @@ public class SessionManagerClustered extends SessionManager
 				}
 			}
 		}
-	}
-
-	private void sendClusterNotification(String msg, String subject,
-		Set<String> nodes) {
-		String message = msg;
-		if (nodes != null) {
-			message = msg + "\n";
-		}
-		int cnt = 0;
-		for (String node: nodes) {
-			message += "" + (++cnt) + ". " + node;
-		}
-		Packet p_msg = Packet.getMessage("",
-			JIDUtils.getJID(getName(), getDefHostName(), null), StanzaType.normal,
-			message, subject, "xyz");
-		sendToAdmins(p_msg);
 	}
 
 	@Override

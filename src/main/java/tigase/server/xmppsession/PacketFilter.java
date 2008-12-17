@@ -78,36 +78,36 @@ public class PacketFilter {
 		} // end of if (session == null)
 
 		try {
-			// After authentication we require resource binding packet and
-			// nothing else:
-			if (!session.isResourceSet()
-				&& packet.getElement().getChild("bind", "urn:ietf:params:xml:ns:xmpp-bind") == null) {
-				// We do not accept anything without resource binding....
-				results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-						"You must bind the resource first: http://www.xmpp.org/rfcs/rfc3920.html#bind",
-						true));
-				log.finest("Session details: connectionId=" + session.getConnectionId()
-					+ ", sessionId=" + session.getSessionId()
-					+ ", ConnectionStatus=" + session.getConnectionStatus());
-				log.finest("Session more detais: JID=" + session.getJID());
-				return true;
-			}
-
 			// For all messages coming from the owner of this account set
 			// proper 'from' attribute. This is actually needed for the case
 			// when the user sends a message to himself.
 			if (packet.getFrom() != null
 				&& packet.getFrom().equals(session.getConnectionId())) {
-				String from_jid = session.getJID();
-				if (from_jid != null && !from_jid.isEmpty()) {
-					log.finest("Setting correct from attribute: " + from_jid);
-					packet.getElement().setAttribute("from", from_jid);
+				// After authentication we require resource binding packet and
+				// nothing else:
+				if (!session.isResourceSet() && packet.getElement().getChild("bind",
+								"urn:ietf:params:xml:ns:xmpp-bind") == null) {
+					// We do not accept anything without resource binding....
+					results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
+									"You must bind the resource first: http://www.xmpp.org/rfcs/rfc3920.html#bind",
+									true));
+					log.finest("Session details: connectionId=" +
+									session.getConnectionId() + ", sessionId=" + session.
+									getSessionId() + ", ConnectionStatus=" + session.
+									getConnectionStatus());
+					log.finest("Session more detais: JID=" + session.getJID());
+					return true;
 				} else {
-					log.warning("Session is authenticated but session.getJid() is empty: "
-						+ packet.toString());
+					String from_jid = session.getJID();
+					if (from_jid != null && !from_jid.isEmpty()) {
+						log.finest("Setting correct from attribute: " + from_jid);
+						packet.getElement().setAttribute("from", from_jid);
+					} else {
+						log.warning("Session is authenticated but session.getJid() is empty: " +
+										packet.toString());
+					}
 				}
 			}
-
 		} catch (PacketErrorTypeException e) {
 			// Ignore this packet
 			if (log.isLoggable(Level.FINEST)) {

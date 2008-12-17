@@ -21,19 +21,26 @@
 package tigase.cluster;
 
 import java.util.Arrays;
+import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import tigase.conf.Configurable;
 import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
 import tigase.disco.XMPPService;
 import tigase.server.AbstractComponentRegistrator;
 import tigase.server.Packet;
 import tigase.server.ServerComponent;
+import tigase.util.DNSResolver;
 import tigase.xml.Element;
 import tigase.util.JIDUtils;
+import tigase.xmpp.StanzaType;
 
 /**
  * Describe class ClusterController here.
@@ -46,14 +53,18 @@ import tigase.util.JIDUtils;
  */
 public class ClusterController
 	extends AbstractComponentRegistrator<ClusteredComponent>
-	implements XMPPService {
+	implements XMPPService, Configurable {
 
   private static final Logger log =
 		Logger.getLogger("tigase.cluster.ClusterController");
 
+	public static final String MY_DOMAIN_NAME_PROP_KEY = "domain-name";
+	public static final String MY_DOMAIN_NAME_PROP_VAL =	"localhost";
+
 	private ServiceEntity serviceEntity = null;
 	//private ServiceEntity stats_modules = null;
 	private Level statsLevel = Level.INFO;
+	private String my_hostname = null;
 
 	@Override
 	public void setName(String name) {
@@ -117,8 +128,49 @@ public class ClusterController
 							LinkedHashSet<String>(Arrays.asList(disconnected_nodes.split(","))));
 					}
 				}
+				if (connected_nodes != null) {
+					results.add(sendClusterNotification("Cluster nodes have been connected (" +
+									(new Date()) + ")", "\nNew cluster nodes connected",
+									connected_nodes));
+				}
+				if (disconnected_nodes != null) {
+					results.add(sendClusterNotification("Cluster nodes have been disconnected (" +
+									(new Date()) + ")", "\nDisconnected cluster nodes",
+									disconnected_nodes));
+				}
 			}
 		}
+	}
+
+	private Packet sendClusterNotification(String msg, String subject,
+					String nodes) {
+		String message = msg;
+		if (nodes != null) {
+			message = msg + "\n";
+		}
+		int cnt = 0;
+		for (String node: nodes.split(",")) {
+			message += "" + (++cnt) + ". " + node;
+		}
+		Packet p_msg = Packet.getMessage(my_hostname,
+			JIDUtils.getJID(getName(), my_hostname, null), StanzaType.normal,
+			message, subject, "xyz");
+		return p_msg;
+	}
+
+	public void setProperties(Map<String, Object> properties) {
+		my_hostname = (String) properties.get(MY_DOMAIN_NAME_PROP_KEY);
+	}
+
+	public Map<String, Object> getDefaults(Map<String, Object> params) {
+		Map<String, Object> defs = new LinkedHashMap<String, Object>();
+		String[] local_domains = DNSResolver.getDefHostNames();
+		if (params.get(GEN_VIRT_HOSTS) != null) {
+			local_domains = ((String) params.get(GEN_VIRT_HOSTS)).split(",");
+		}
+//		defs.put(LOCAL_DOMAINS_PROP_KEY, LOCAL_DOMAINS_PROP_VAL);
+		defs.put(MY_DOMAIN_NAME_PROP_KEY, local_domains[0]);
+		return defs;
 	}
 
 }
