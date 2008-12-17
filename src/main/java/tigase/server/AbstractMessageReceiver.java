@@ -130,7 +130,7 @@ public abstract class AbstractMessageReceiver
 
   public boolean addPacketNB(Packet packet) {
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest(">" + getName() + "<  " + packet.toString());
+			log.finest("[" + getName() + "]  " + packet.toString());
 		}
 		boolean result = in_queue.offer(packet);
 		if (result) {
@@ -161,7 +161,7 @@ public abstract class AbstractMessageReceiver
 
 	public boolean addPacket(Packet packet) {
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest(">" + getName() + "<  " + packet.toString());
+			log.finest("[" + getName() + "]  " + packet.toString());
 		}
 		try {
 			in_queue.put(packet);
@@ -182,7 +182,7 @@ public abstract class AbstractMessageReceiver
 	 */
 	protected boolean addOutPacketNB(Packet packet) {
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest(">" + getName() + "<  " + packet.toString());
+			log.finest("[" + getName() + "]  " + packet.toString());
 		}
 		boolean result = out_queue.offer(packet);
 		if (result) {
@@ -196,7 +196,7 @@ public abstract class AbstractMessageReceiver
 
 	protected boolean addOutPacket(Packet packet) {
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest(">" + getName() + "<  " + packet.toString());
+			log.finest("[" + getName() + "]  " + packet.toString());
 		}
 		try {
 			out_queue.put(packet);
@@ -555,13 +555,13 @@ public abstract class AbstractMessageReceiver
 						break;
 					case OUT_QUEUE:
 						if (parent != null) {
-							// 							log.finest(">" + getName() + "<  " +
+							// 							log.finest("[" + getName() + "]  " +
 							// 								"Sending outQueue to parent: " + parent.getName());
 							parent.addPacket(packet);
 						} else {
 							// It may happen for MessageRouter and this is intentional
 							addPacketNB(packet);
-							//log.warning(">" + getName() + "<  " + "No parent!");
+							//log.warning("[" + getName() + "]  " + "No parent!");
 						} // end of else
 						break;
 					default:

@@ -25,7 +25,6 @@ package tigase.server.sreceiver.sysmon;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Queue;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -33,7 +32,6 @@ import java.util.logging.Logger;
 import java.util.logging.MemoryHandler;
 import tigase.conf.Configurator;
 import tigase.util.LogFormatter;
-import tigase.xml.XMLUtils;
 
 /**
  * Created: Dec 12, 2008 8:31:38 PM
@@ -195,8 +193,7 @@ public class LogMonitor extends AbstractMonitor {
 
 		@Override
 		public synchronized void publish(LogRecord record) {
-			logs.add(formatter.format(record).replace('<', '[').replace('>',
-							']'));
+			logs.add(formatter.format(record).replace('<', '[').replace('>', ']'));
 		}
 
 		public synchronized String logsToString() {

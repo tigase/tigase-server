@@ -405,8 +405,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 				} // end of try-catch
 			} // end of try-catch
 		} else {
-			log.info("Can't find service for packet: <"
-				+ p.getElemName() + "> " + p.getTo()
+			log.info("Can't find service for packet: ["
+				+ p.getElemName() + "] " + p.getTo()
 				+ ", service id: " + getServiceId(p));
 		} // end of if (ios != null) else
 		return false;
@@ -465,7 +465,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 	public void serviceStopped(IO service) {
 		synchronized(service) {
 			String id = getUniqueId(service);
-			log.finer(">>" + getName() + "<< Connection stopped: " + id);
+			log.finer("[[" + getName() + "]] Connection stopped: " + id);
 			// id might be null if service is stopped in accept method due to
 			// an exception during establishing TCP/IP connection
 			IO serv = (id != null ? services.get(id) : null);
@@ -475,8 +475,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 				if (id != null) {
 					// Is it at all possible to happen???
 					// let's log it for now....
-					log.warning(">>" + getName() +
-									"<< Attempt to stop incorrect service: " + id);
+					log.warning("[[" + getName() +
+									"]] Attempt to stop incorrect service: " + id);
 					Thread.dumpStack();
 				}
 			}
@@ -487,7 +487,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 	public void serviceStarted(final IO service) {
 		synchronized(services) {
 			String id = getUniqueId(service);
-			log.finer(">>" + getName() + "<< Connection started: " + id);
+			log.finer("[[" + getName() + "]] Connection started: " + id);
 			IO serv = services.get(id);
 			if (serv != null) {
 				if (serv == service) {
