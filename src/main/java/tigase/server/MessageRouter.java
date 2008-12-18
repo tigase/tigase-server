@@ -170,9 +170,7 @@ public class MessageRouter extends AbstractMessageReceiver {
 		if (idx > 0) {
 			String cmpName = host.substring(0, idx);
 			String basename = host.substring(idx + 1);
-			if (comp == null) {
-				comp = components.get(cmpName);
-			}
+			comp = components.get(cmpName);
 			if (comp != null &&
 							(isLocalDomain(basename) || basename.equals(getDefHostName()))) {
 				return comp;
