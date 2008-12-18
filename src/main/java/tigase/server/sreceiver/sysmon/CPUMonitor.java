@@ -71,22 +71,24 @@ public class CPUMonitor extends AbstractMonitor {
 		loadAverageIdx = setValueInArr(loadAverage, loadAverageIdx,
 						osBean.getSystemLoadAverage());
 		if ((totalUsage > treshold) && (recentCpu(6) > treshold)) {
-			prepareWarning("High CPU usage in last minute: " +
+			prepareWarning("High CPU usage, current: " + format.format(totalUsage) +
+							", last minute: " +
 							format.format(recentCpu(6)), results, this);
 		} else {
-			prepareCalmDown("CPU usage is now low again: " + 
-							format.format(totalUsage), results, this);
+			prepareCalmDown("CPU usage is now low again, current: " +
+							format.format(totalUsage) + ", last minute: " +
+							format.format(recentCpu(6)), results, this);
 		}
 	}
 
 	private double recentCpu(int histCheck) {
 		double recentCpu = 0;
-		int idx = cpuUsageIdx;
+		int start = cpuUsageIdx - histCheck;
+		if (start < 0) {
+			start = cpuUsage.length - start;
+		}
 		for (int i = 0; i < histCheck; i++) {
-			idx -= i;
-			if (idx < 0) {
-				idx = cpuUsage.length-1;
-			}
+			int idx = (start + i) % cpuUsage.length;
 			recentCpu += cpuUsage[idx];
 		}
 		return recentCpu / histCheck;
