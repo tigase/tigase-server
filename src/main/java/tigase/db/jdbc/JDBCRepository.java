@@ -22,14 +22,12 @@
 package tigase.db.jdbc;
 
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.Arrays;
@@ -39,12 +37,9 @@ import java.util.List;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.StringTokenizer;
-import java.util.TreeMap;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.db.AuthorizationException;
 import tigase.db.DBInitException;
-import tigase.db.RepositoryFactory;
 import tigase.db.TigaseDBException;
 import tigase.db.UserAuthRepository;
 import tigase.db.UserAuthRepositoryImpl;
@@ -278,7 +273,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 			} // end of if (isnext) else
 			if (nid <= 0) {
 				if (node_path == null) {
-					log.warning("Missing root node, database upgrade or bug in the code? Adding missing root node now.");
+					log.info("Missing root node, database upgrade or bug in the code? Adding missing root node now.");
 					nid = addNode(uid, -1, "root");
 				} else {
 					log.finest("Missing nid for node path: "
