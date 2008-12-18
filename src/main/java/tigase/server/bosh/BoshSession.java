@@ -596,7 +596,7 @@ public class BoshSession {
 									new Packet(packet),
 									"Bosh = disconnected", true));
 						} catch (PacketErrorTypeException e) {
-							log.warning("Packet processing exception: " + e);
+							log.info("Packet processing exception: " + e);
 						}
 					}
 					Packet command = Command.STREAM_CLOSED.getPacket(null, null,
