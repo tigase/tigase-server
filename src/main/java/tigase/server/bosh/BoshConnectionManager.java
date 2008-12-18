@@ -104,7 +104,7 @@ public class BoshConnectionManager extends ClientConnectionManager
 			session.processPacket(packet, out_results);
 			addOutPackets(out_results, session);
 		} else {
-			log.warning("Session does not exist for packet: " + packet.toString());
+			log.info("Session does not exist for packet: " + packet.toString());
 			try {
 				Packet error =
 						Authorization.ITEM_NOT_FOUND.getResponseMessage(packet,
@@ -133,7 +133,7 @@ public class BoshConnectionManager extends ClientConnectionManager
 				session.close();
 				sessions.remove(session.getSid());
 			} else {
-				log.warning("Session does not exist for packet: " + packet.toString());
+				log.info("Session does not exist for packet: " + packet.toString());
 			}
 			break;
 		default:
@@ -152,7 +152,7 @@ public class BoshConnectionManager extends ClientConnectionManager
 				session.setDataReceiver(newAddress);
 				return old_receiver;
 			} else {
-				log.warning("Incorrect session ID, ignoring data redirect for: "
+				log.info("Incorrect session ID, ignoring data redirect for: "
 					+ newAddress);
 			}
 		}
@@ -181,7 +181,7 @@ public class BoshConnectionManager extends ClientConnectionManager
 						bs.init(p, serv, max_wait, min_polling, max_inactivity,
 							concurrent_requests, hold_requests, max_pause, out_results);
 					} else {
-						log.warning("Invalid hostname. Closing invalid connection");
+						log.info("Invalid hostname. Closing invalid connection");
 						serv.sendErrorAndStop(Authorization.NOT_ALLOWED, p, "Invalid hostname.");
 					}
 				} else {
@@ -190,7 +190,7 @@ public class BoshConnectionManager extends ClientConnectionManager
 					if (bs != null) {
 						bs.processSocketPacket(p, serv, out_results);
 					} else {
-						log.warning("There is no session with given SID. Closing invalid connection");
+						log.info("There is no session with given SID. Closing invalid connection");
 						serv.sendErrorAndStop(Authorization.ITEM_NOT_FOUND, p, "Invalid SID");
 					}
 				}
