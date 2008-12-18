@@ -45,7 +45,7 @@ public class LogMonitor extends AbstractMonitor {
 	private MemoryHandlerFlush memoryHandler = null;
 	private Map<String, String> monitorLevels =
 					new LinkedHashMap<String, String>();
-	private int loggerSize = 20;
+	private int loggerSize = 50;
 	private Level levelTreshold = Level.WARNING;
 	private int maxLogBuffer = 1000*1000;
 

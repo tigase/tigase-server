@@ -24,13 +24,11 @@ package tigase.xmpp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.util.JIDUtils;
 import tigase.db.UserRepository;
 import tigase.db.UserAuthRepository;
 import tigase.db.TigaseDBException;
-import tigase.db.UserNotFoundException;
 import tigase.auth.LoginHandler;
 import tigase.db.AuthorizationException;
 
@@ -318,6 +316,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	 * Sets the value of resource
 	 *
 	 * @param argResource Value to assign to this.resource
+	 * @throws NotAuthorizedException
 	 */
 	public void setResource(final String argResource) throws NotAuthorizedException {
 		this.resource = argResource;
