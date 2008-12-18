@@ -55,6 +55,7 @@ public class PacketFilter {
 
 	private String[] IGNORE_PACKETS = {"stream:features"};
 	private StanzaType[] IGNORE_TYPES = {StanzaType.error};
+	private String[] AUTH_ONLY_ELEMS = {"message", "presence"};
 // 	private RosterAbstract roster_util = RosterFactory.getRosterImplementation(true);
 
 	/**
@@ -73,7 +74,7 @@ public class PacketFilter {
 			}
 		}
 
-		if (session == null || !session.isAuthorized()) {
+		if (session == null) {
 			return false;
 		} // end of if (session == null)
 
@@ -83,6 +84,26 @@ public class PacketFilter {
 			// when the user sends a message to himself.
 			if (packet.getFrom() != null
 				&& packet.getFrom().equals(session.getConnectionId())) {
+				if (!session.isAuthorized()) {
+					// We allow only certain packets here...
+					// For now it is simpler to disallow all messages and presences
+					// packets, the rest should be bounced back anyway
+					for (String elem : AUTH_ONLY_ELEMS) {
+						if (packet.getElemName() == elem) {
+							results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(
+											packet,
+											"You must authenticate session first, before you" +
+											" can send any message or presence packet.",
+											true));
+							log.info("Session details: connectionId=" +
+											session.getConnectionId() + ", sessionId=" + 
+											session.getSessionId() + ", ConnectionStatus=" + 
+											session.getConnectionStatus());
+							return true;
+						}
+					}
+					return false;
+				}
 				// After authentication we require resource binding packet and
 				// nothing else:
 				if (!session.isResourceSet() && packet.getElement().getChild("bind",
@@ -91,10 +112,10 @@ public class PacketFilter {
 					results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 									"You must bind the resource first: http://www.xmpp.org/rfcs/rfc3920.html#bind",
 									true));
-					log.finest("Session details: connectionId=" +
-									session.getConnectionId() + ", sessionId=" + session.
-									getSessionId() + ", ConnectionStatus=" + session.
-									getConnectionStatus());
+					log.info("Session details: connectionId=" +
+									session.getConnectionId() + ", sessionId=" +
+									session.getSessionId() + ", ConnectionStatus=" +
+									session.getConnectionStatus());
 					log.finest("Session more detais: JID=" + session.getJID());
 					return true;
 				} else {

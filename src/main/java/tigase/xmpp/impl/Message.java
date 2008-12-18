@@ -21,16 +21,7 @@
  */
 package tigase.xmpp.impl;
 
-import java.util.Arrays;
-import java.util.Queue;
 import java.util.logging.Logger;
-import tigase.server.Packet;
-import tigase.util.JIDUtils;
-import tigase.xml.Element;
-import tigase.xmpp.Authorization;
-import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.XMPPResourceConnection;
-import tigase.db.NonAuthUserRepository;
 
 /**
  * Message forwarder class. The class is not abstract in fact. Is has been
@@ -57,11 +48,14 @@ public abstract class Message extends SimpleForwarder {
   private static final String[] ELEMENTS = {"message"};
   private static final String[] XMLNSS = {XMLNS};
 
+	@Override
 	public String id() { return ID; }
 
+	@Override
 	public String[] supElements()
 	{ return ELEMENTS; }
 
+	@Override
   public String[] supNamespaces()
 	{ return XMLNSS; }
 

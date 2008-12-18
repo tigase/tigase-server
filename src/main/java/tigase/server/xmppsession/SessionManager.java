@@ -173,6 +173,17 @@ public class SessionManager extends AbstractMessageReceiver
 	protected boolean isBrokenPacket(Packet p) {
 		if (!p.getFrom().equals(p.getElemFrom()) && (!p.isCommand()
 				|| (p.isCommand() && p.getCommand() == Command.OTHER))) {
+			// Sometimes (Bosh) connection is gone and this is an error packet
+			// sent back to the original sender. This original sender might
+			// not local....
+			if (p.getElemFrom() != null && 
+							!isLocalDomain(JIDUtils.getNodeHost(p.getElemFrom()))) {
+				// ok just forward it there....
+				p.setFrom(null);
+				p.setTo(null);
+				fastAddOutPacket(p);
+				return true;
+			}
 			// It doesn't look good, there should reaaly be a connection for
 			// this packet....
 			// returning error back...
@@ -184,7 +195,7 @@ public class SessionManager extends AbstractMessageReceiver
 				error.setTo(p.getFrom());
 				fastAddOutPacket(error);
 			} catch (PacketErrorTypeException e) {
-				log.warning("Packet processing exception: " + e);
+				log.info("Packet processing exception: " + e);
 			}
 			return true;
 		}
@@ -212,7 +223,8 @@ public class SessionManager extends AbstractMessageReceiver
 		packet.setTo(getComponentId());
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("processing packet: " + packet.toString() +
-							"connectionID: " + (conn != null ? conn.getConnectionId() : "null"));
+							", connectionID: " +
+							(conn != null ? conn.getConnectionId() : "null"));
 		}
 		Queue<Packet> results = new LinkedList<Packet>();
 
