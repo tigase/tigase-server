@@ -28,7 +28,6 @@ import java.lang.management.ThreadMXBean;
 import java.text.NumberFormat;
 import java.util.Queue;
 import tigase.server.Packet;
-import tigase.xmpp.StanzaType;
 
 /**
  * Created: Dec 10, 2008 12:27:15 PM
@@ -93,6 +92,7 @@ public class CPUMonitor extends AbstractMonitor {
 		return recentCpu / histCheck;
 	}
 
+	@Override
 	public String getState() {
 		int idx = cpuUsageIdx-1;
 		if (idx < 0) {
