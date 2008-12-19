@@ -249,21 +249,23 @@ public class ClusterElement {
 		method_name = method_call.getAttribute(CLUSTER_NAME_ATTR);
 		method_params = new LinkedHashMap<String, String>();
 		List<Element> children = method_call.getChildren();
-		for (Element child: children) {
-			if (child.getName() == CLUSTER_METHOD_PAR_EL_NAME) {
-				String par_name = child.getAttribute(CLUSTER_NAME_ATTR);
-				method_params.put(par_name, child.getCData());
-			}
-			if (child.getName() == CLUSTER_METHOD_RESULTS_EL_NAME) {
-				if (method_results == null) {
-					method_results = new LinkedHashMap<String, String>();
+		if (children != null) {
+			for (Element child : children) {
+				if (child.getName() == CLUSTER_METHOD_PAR_EL_NAME) {
+					String par_name = child.getAttribute(CLUSTER_NAME_ATTR);
+					method_params.put(par_name, child.getCData());
 				}
-				List<Element> res_children = child.getChildren();
-				if (res_children != null) {
-					for (Element res_child: res_children) {
-						if (res_child.getName() == CLUSTER_METHOD_RESULTS_VAL_EL_NAME) {
+				if (child.getName() == CLUSTER_METHOD_RESULTS_EL_NAME) {
+					if (method_results == null) {
+						method_results = new LinkedHashMap<String, String>();
+					}
+					List<Element> res_children = child.getChildren();
+					if (res_children != null) {
+						for (Element res_child : res_children) {
+							if (res_child.getName() == CLUSTER_METHOD_RESULTS_VAL_EL_NAME) {
 							String val_name = res_child.getAttribute(CLUSTER_NAME_ATTR);
-							method_results.put(val_name, res_child.getCData());
+								method_results.put(val_name, res_child.getCData());
+							}
 						}
 					}
 				}
