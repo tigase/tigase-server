@@ -75,9 +75,11 @@ public class CPUMonitor extends AbstractMonitor {
 							", last minute: " +
 							format.format(recentCpu(6)), results, this);
 		} else {
-			prepareCalmDown("CPU usage is now low again, current: " +
-							format.format(totalUsage) + ", last minute: " +
-							format.format(recentCpu(6)), results, this);
+			if (totalUsage < (treshold * 0.75)) {
+				prepareCalmDown("CPU usage is now low again, current: " +
+								format.format(totalUsage) + ", last minute: " +
+								format.format(recentCpu(6)), results, this);
+			}
 		}
 	}
 
