@@ -1150,7 +1150,8 @@ public class SessionManager extends AbstractMessageReceiver
 						+ " has not been found inthe repository.");
 				}
 			} catch (UserNotFoundException e) {
-				log.warning("User not found in repository: " + user);
+				// This is quite normal for anonymous users.
+				log.info("User not found in repository: " + user);
 			}	catch (TigaseDBException e) {
 				log.log(Level.SEVERE, "Problem accessing repository data.", e);
 			} // end of try-catch
