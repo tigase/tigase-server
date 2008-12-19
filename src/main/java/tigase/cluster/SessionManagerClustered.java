@@ -201,7 +201,7 @@ public class SessionManagerClustered extends SessionManager
 										packet.getFrom(),	StanzaType.error.toString(), null);
 						Packet resp_pack = new Packet(response.getClusterElement());
 						fastAddOutPacket(resp_pack);
-						log.warning("No local session for redirected packet, sending error back: " +
+						log.info("No local session for redirected packet, sending error back: " +
 										resp_pack.toString());
 					} else {
 						processPacket(pack, conn);
@@ -437,12 +437,12 @@ public class SessionManagerClustered extends SessionManager
 					XMPPResourceConnection conn = getXMPPResourceConnection(pack);
 					if (conn == null) {
 						// Just ignore.
-						log.warning("No local session for redirect error packet, ignoring: " +
+						log.info("No local session for redirect error packet, ignoring: " +
 										packet.toString());
 					} else {
             // Remove the local session with redirect, the session on the other
 						// node doesn't exist anymore anyway
-						log.warning("Packet redirect error, removing local session: " +
+						log.info("Packet redirect error, removing local session: " +
 										packet.toString());
 						closeConnection(conn.getConnectionId(), true);
 					}
