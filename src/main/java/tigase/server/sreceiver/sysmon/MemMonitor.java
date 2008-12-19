@@ -122,17 +122,19 @@ public class MemMonitor extends AbstractMonitor
 		List<MemoryPoolMXBean> memPools = ManagementFactory.getMemoryPoolMXBeans();
 		for (MemoryPoolMXBean memoryPoolMXBean : memPools) {
 			MemoryUsage memUsage = memoryPoolMXBean.getUsage();
-			if (memUsage != null && memoryPoolMXBean.isUsageThresholdSupported()) {
+			if (memUsage != null) {
 				sb.append("Memory pool: " + memoryPoolMXBean.getName() +
 								", type: " + memoryPoolMXBean.getType().toString() +
 								", usage: " + format.format(memUsage.getUsed()/1024) +
 								" of " + format.format(memUsage.getMax()/1024) +
 								" - " +
 								formp.format(new Long(memUsage.getUsed()).doubleValue()/
-								new Long(memUsage.getMax()).doubleValue()) +
-								", treshold: " +
-								format.format(memoryPoolMXBean.getUsageThreshold() / 1024) +
-								"\n");
+								new Long(memUsage.getMax()).doubleValue()));
+				if (memoryPoolMXBean.isUsageThresholdSupported()) {
+					sb.append(", treshold: " +
+									format.format(memoryPoolMXBean.getUsageThreshold() / 1024));
+				}
+				sb.append("\n");
 			}
 		}
 		return sb.toString();
