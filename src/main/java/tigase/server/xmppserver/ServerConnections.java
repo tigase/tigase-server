@@ -256,7 +256,7 @@ public class ServerConnections {
 			conn_state = OutgoingState.HANDSHAKING;
 		}
 		if (old != null) {
-			log.warning("Old outgoing connection replaced with new one!");
+			log.info("Old outgoing connection replaced with new one!");
 			old.forceStop();
 		}
 	}
