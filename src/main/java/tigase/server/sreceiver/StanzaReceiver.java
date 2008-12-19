@@ -134,7 +134,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		Logger.getLogger("tigase.server.sreceiver.StanzaReceiver");
 
 	private static final String TASKS_LIST_PROP_KEY = "tasks-list";
-	private static final String[] TASKS_LIST_PROP_VAL = {"development-news"};
+	private static final String[] TASKS_LIST_PROP_VAL = {};
 	private static final String TASK_ACTIVE_PROP_KEY = "active";
 	private static final boolean TASK_ACTIVE_PROP_VAL = true;
 	private static final String TASK_TYPE_PROP_KEY = "task-type";
