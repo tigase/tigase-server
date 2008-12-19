@@ -415,7 +415,7 @@ public class SessionManager extends AbstractMessageReceiver
 		return sessionsByNodeId.get(JIDUtils.getNodeID(jid));
 	}
 
-	private XMPPResourceConnection getResourceConnection(String jid) {
+	protected XMPPResourceConnection getResourceConnection(String jid) {
 		XMPPSession session = getSession(jid);
 		if (session != null) {
 			log.finest("Session not null, getting resource for jid: " + jid);

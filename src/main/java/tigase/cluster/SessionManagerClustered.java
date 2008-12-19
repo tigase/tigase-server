@@ -31,7 +31,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Timer;
-import java.util.Date;
 
 //import tigase.cluster.methodcalls.SessionTransferMC;
 import tigase.server.Packet;
@@ -120,9 +119,9 @@ public class SessionManagerClustered extends SessionManager
 				log.finest("Packet put on hold: " + packet.toString());
 				return;
 			case REDIRECT:
-				packet.setTo((String)conn.getSessionData("redirect-to"));
-				fastAddOutPacket(packet);
-				log.finest("Packet redirected: " + packet.toString());
+				sendPacketRedirect(packet, (String)conn.getSessionData("redirect-to"));
+//				packet.setTo((String)conn.getSessionData("redirect-to"));
+//				fastAddOutPacket(packet);
 				return;
 			}
 		}
@@ -153,9 +152,10 @@ public class SessionManagerClustered extends SessionManager
 							log.finest("Packet put on hold: " + el_packet.toString());
 							return;
 						case REDIRECT:
-							el_packet.setTo((String)conn.getSessionData("redirect-to"));
-							fastAddOutPacket(el_packet);
-							log.finest("Packet redirected: " + el_packet.toString());
+							sendPacketRedirect(el_packet, 
+											(String) conn.getSessionData("redirect-to"));
+//							el_packet.setTo((String)conn.getSessionData("redirect-to"));
+//							fastAddOutPacket(el_packet);							
 							return;
 						}
 					}
@@ -168,6 +168,17 @@ public class SessionManagerClustered extends SessionManager
 		}
 	}
 
+	private void sendPacketRedirect(Packet packet, String destination) {
+		ClusterElement redirect =
+						ClusterElement.createClusterMethodCall(getComponentId(),
+						destination, StanzaType.set,
+						ClusterMethods.PACKET_REDIRECT.toString(), null);
+		redirect.addDataPacket(packet);
+		Packet pack_red = new Packet(redirect.getClusterElement());
+		fastAddOutPacket(pack_red);
+		log.finest("Packet redirected: " + pack_red.toString());
+	}
+
 	protected void processClusterPacket(Packet packet) {
 		final ClusterElement clel = new ClusterElement(packet.getElement());
 		//clel.addVisitedNode(getComponentId());
@@ -175,6 +186,24 @@ public class SessionManagerClustered extends SessionManager
 		case set:
 			if (clel.getMethodName() == null) {
 				processPacket(clel);
+			}
+			if (ClusterMethods.PACKET_REDIRECT.toString().equals(clel.getMethodName())) {
+				for (Element elem : clel.getDataPackets()) {
+					Packet pack = new Packet(elem);
+					XMPPResourceConnection conn = 
+									getResourceConnection(JIDUtils.getNodeID(pack.getElemTo()));
+					if (conn == null) {
+						ClusterElement response = clel.createMethodResponse(packet.getTo(),
+										packet.getFrom(),	StanzaType.error.toString(), null);
+						Packet resp_pack = new Packet(response.getClusterElement());
+						fastAddOutPacket(resp_pack);
+						log.finest("No local session for redirected packet, sending error back: " +
+										resp_pack.toString());
+					} else {
+						processPacket(pack, conn);
+					}
+				}
+				return;
 			}
 			if (ClusterMethods.SESSION_TRANSFER.toString().equals(clel.getMethodName())) {
 				Set<String> cancel_nodes = new LinkedHashSet<String>();
@@ -186,7 +215,7 @@ public class SessionManagerClustered extends SessionManager
 				if (session != null) {
 					conn = session.getResourceForConnectionId(connectionId);
 				}
-							//ClusterElement result = null;
+				//ClusterElement result = null;
 				if (getComponentId().equals(clel.getFirstNode())) {
 					log.finest("Session transfer request came back to me....");
 					// Ok, the request has came back to me, let's look what to do now....
@@ -396,9 +425,25 @@ public class SessionManagerClustered extends SessionManager
 			}
 			break;
 		case error:
-			// There might be many different errors...
-			// But they all mean the cluster node is unreachable.
-			// Let's leave custom handling each error type for later...
+			if (ClusterMethods.PACKET_REDIRECT.toString().equals(clel.getMethodName())) {
+				for (Element elem : clel.getDataPackets()) {
+					Packet pack = new Packet(elem);
+					XMPPResourceConnection conn =
+									getResourceConnection(JIDUtils.getNodeID(pack.getElemTo()));
+					if (conn == null) {
+						// Just ignore.
+						log.finest("No local session for redirect error packet, ignoring: " +
+										packet.toString());
+					} else {
+            // Remove the local session with redirect, the session on the other
+						// node doesn't exist anymore anyway
+						log.finest("Packet redirect error, removing local session: " +
+										packet.toString());
+						closeConnection(conn.getConnectionId(), true);
+					}
+				}
+				return;
+			}
 			String from = packet.getElemFrom();
 			clel.addVisitedNode(from);
 //			if (cluster_nodes.remove(from)) {
