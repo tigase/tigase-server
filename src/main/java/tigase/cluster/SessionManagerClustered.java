@@ -169,10 +169,13 @@ public class SessionManagerClustered extends SessionManager
 	}
 
 	private void sendPacketRedirect(Packet packet, String destination) {
+		Map<String, String> params = new LinkedHashMap<String, String>();
+		params.put("to", destination);
+		params.put("from", packet.getFrom());
 		ClusterElement redirect =
 						ClusterElement.createClusterMethodCall(getComponentId(),
 						destination, StanzaType.set,
-						ClusterMethods.PACKET_REDIRECT.toString(), null);
+						ClusterMethods.PACKET_REDIRECT.toString(), params);
 		redirect.addDataPacket(packet);
 		Packet pack_red = new Packet(redirect.getClusterElement());
 		fastAddOutPacket(pack_red);
@@ -190,14 +193,15 @@ public class SessionManagerClustered extends SessionManager
 			if (ClusterMethods.PACKET_REDIRECT.toString().equals(clel.getMethodName())) {
 				for (Element elem : clel.getDataPackets()) {
 					Packet pack = new Packet(elem);
-					XMPPResourceConnection conn = 
-									getResourceConnection(JIDUtils.getNodeID(pack.getElemTo()));
+					pack.setTo(clel.getMethodParam("to"));
+					pack.setFrom(clel.getMethodParam("from"));
+					XMPPResourceConnection conn = getXMPPResourceConnection(pack);
 					if (conn == null) {
 						ClusterElement response = clel.createMethodResponse(packet.getTo(),
 										packet.getFrom(),	StanzaType.error.toString(), null);
 						Packet resp_pack = new Packet(response.getClusterElement());
 						fastAddOutPacket(resp_pack);
-						log.finest("No local session for redirected packet, sending error back: " +
+						log.warning("No local session for redirected packet, sending error back: " +
 										resp_pack.toString());
 					} else {
 						processPacket(pack, conn);
@@ -428,16 +432,17 @@ public class SessionManagerClustered extends SessionManager
 			if (ClusterMethods.PACKET_REDIRECT.toString().equals(clel.getMethodName())) {
 				for (Element elem : clel.getDataPackets()) {
 					Packet pack = new Packet(elem);
-					XMPPResourceConnection conn =
-									getResourceConnection(JIDUtils.getNodeID(pack.getElemTo()));
+					pack.setTo(clel.getMethodParam("to"));
+					pack.setFrom(clel.getMethodParam("from"));
+					XMPPResourceConnection conn = getXMPPResourceConnection(pack);
 					if (conn == null) {
 						// Just ignore.
-						log.finest("No local session for redirect error packet, ignoring: " +
+						log.warning("No local session for redirect error packet, ignoring: " +
 										packet.toString());
 					} else {
             // Remove the local session with redirect, the session on the other
 						// node doesn't exist anymore anyway
-						log.finest("Packet redirect error, removing local session: " +
+						log.warning("Packet redirect error, removing local session: " +
 										packet.toString());
 						closeConnection(conn.getConnectionId(), true);
 					}
