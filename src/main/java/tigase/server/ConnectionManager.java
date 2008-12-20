@@ -131,6 +131,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 	private static SocketReadThread readThread = SocketReadThread.getInstance();
 	private Timer delayedTasks = null;
 	private Thread watchdog = null;
+	private long watchdogRuns = 0;
+	private long watchdogTests = 0;
 	private LinkedList<Map<String, Object>> waitingTasks =
 					new LinkedList<Map<String, Object>>();
 	private Map<String, IO> services =
@@ -539,6 +541,10 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 		List<StatRecord> stats = super.getStatistics();
 		stats.add(new StatRecord(getName(), "Open connections", "int",
 				services.size(), Level.FINE));
+		stats.add(new StatRecord(getName(), "Watchdog runs", "long",
+				watchdogRuns, Level.FINE));
+		stats.add(new StatRecord(getName(), "Watchdog tests", "long",
+				watchdogTests, Level.FINE));
 // 		StringBuilder sb = new StringBuilder("All connected: ");
 // 		for (IOService serv: services.values()) {
 // 			sb.append("\nService ID: " + getUniqueId(serv)
@@ -636,16 +642,19 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 	 */
 	private class Watchdog implements Runnable {
 
+		@Override
 		public void run() {
 			while (true) {
 				try {
 					// Sleep for 1 minute
 					Thread.sleep(30*MINUTE);
+					++watchdogRuns;
 					// Walk through all connections and check whether they are
 					// really alive...., try to send space for each service which
 					// is inactive for hour or more and close the service
 					// on Exception
 					doForAllServices(new ServiceChecker() {
+						@Override
 							public void check(final XMPPIOService service,
 								final String serviceId) {
 								// 								for (IO service: services.values()) {
@@ -665,6 +674,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 											// At least once an hour check if the connection is
 											// still alive.
 											service.writeRawData(" ");
+											++watchdogTests;
 										}
 									}
 								} catch (Exception e) {
