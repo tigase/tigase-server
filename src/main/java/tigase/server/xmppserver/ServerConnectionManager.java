@@ -344,11 +344,11 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 				try {
 					addOutPacket(author.getResponseMessage(p, "S2S - not delivered", true));
 				} catch (PacketErrorTypeException e) {
-					log.warning("Packet processing exception: " + e);
+					log.info("Packet processing exception: " + e);
 				}
 			} // end of while (p = waitingPackets.remove(ipAddress) != null)
 		} else {
-			log.warning("No ServerConnections for cid: " + cid);
+			log.info("No ServerConnections for cid: " + cid);
 		}
 	}
 
