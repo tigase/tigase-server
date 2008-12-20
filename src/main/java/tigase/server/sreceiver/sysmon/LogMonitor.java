@@ -48,6 +48,7 @@ public class LogMonitor extends AbstractMonitor {
 	private int loggerSize = 50;
 	private Level levelTreshold = Level.WARNING;
 	private int maxLogBuffer = 1000*1000;
+	private long lastWarningSent = 0;
 
 	private enum command {
 		setlevel(" [package level] - Sets logging level for specified package."),
@@ -210,7 +211,13 @@ public class LogMonitor extends AbstractMonitor {
 
 		@Override
 		public synchronized void flush() {
-			sendWarningOut(logsToString(), null);
+			String logBuff = logsToString();
+			// We don't want to flood the system with this in case of
+			// some frequent error....
+			if (System.currentTimeMillis() - lastWarningSent > 5*MINUTE) {
+				sendWarningOut(logBuff, null);
+				lastWarningSent = System.currentTimeMillis();
+			}
 		}
 
 		@Override

@@ -34,9 +34,10 @@ import tigase.server.Packet;
 public interface ResourceMonitorIfc {
 
 	public static final long SECOND = 1000;
+	public static final long MINUTE = 60*SECOND;
 	public static final long INTERVAL_10SECS = 10 * SECOND;
-	public static final long INTERVAL_1MIN = 60 * SECOND;
-	public static final long INTERVAL_1HOUR = 60 * INTERVAL_1MIN;
+	public static final long INTERVAL_1MIN = MINUTE;
+	public static final long INTERVAL_1HOUR = 60 * MINUTE;
 	public static final long INTERVAL_1DAY = 24 * INTERVAL_1HOUR;
 
 	public void init(String jid, double treshold, SystemMonitorTask smTask);
