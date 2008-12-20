@@ -650,7 +650,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 			while (true) {
 				try {
 					// Sleep for 1 minute
-					Thread.sleep(30*MINUTE);
+					Thread.sleep(10*MINUTE);
 					++watchdogRuns;
 					// Walk through all connections and check whether they are
 					// really alive...., try to send space for each service which
