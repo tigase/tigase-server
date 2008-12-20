@@ -186,7 +186,7 @@ public class SocketReadThread implements Runnable {
 					} // end of try-catch
 				} else {
 					try {
-						log.warning("Forcing stopping the service: " + serv.getUniqueId());
+						log.info("Forcing stopping the service: " + serv.getUniqueId());
 						serv.forceStop();
 					} catch (Exception e) {	}
 				}
@@ -199,6 +199,7 @@ public class SocketReadThread implements Runnable {
 	 * Describe <code>run</code> method here.
 	 *
 	 */
+	@Override
 	public void run() {
     while (!stopping) {
       try {
@@ -297,6 +298,7 @@ public class SocketReadThread implements Runnable {
 			setName("SocketReadThread$ResultsListener");
 		}
 
+		@Override
     public void run() {
 
       for (;;) {

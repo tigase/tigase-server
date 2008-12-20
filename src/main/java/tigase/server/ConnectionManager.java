@@ -133,6 +133,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 	private Thread watchdog = null;
 	private long watchdogRuns = 0;
 	private long watchdogTests = 0;
+	private long watchdogStopped = 0;
 	private LinkedList<Map<String, Object>> waitingTasks =
 					new LinkedList<Map<String, Object>>();
 	private Map<String, IO> services =
@@ -548,6 +549,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 				watchdogRuns, Level.FINE));
 		stats.add(new StatRecord(getName(), "Watchdog tests", "long",
 				watchdogTests, Level.FINE));
+		stats.add(new StatRecord(getName(), "Watchdog stopped", "long",
+				watchdogStopped, Level.FINE));
 // 		StringBuilder sb = new StringBuilder("All connected: ");
 // 		for (IOService serv: services.values()) {
 // 			sb.append("\nService ID: " + getUniqueId(serv)
@@ -671,6 +674,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 										log.info(getName()
 											+ ": Max inactive time exceeded, stopping: "
 											+ serviceId);
+										++watchdogStopped;
 										service.stop();
 									} else {
 										if (curr_time - lastTransfer >= (29*MINUTE)) {
@@ -687,6 +691,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 											log.info(getName()
 												+ "Found dead connection, stopping: "
 												+ serviceId);
+											++watchdogStopped;
 											service.stop();
 										}
 									} catch (Exception ignore) {
