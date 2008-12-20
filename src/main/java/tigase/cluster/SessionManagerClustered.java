@@ -499,6 +499,7 @@ public class SessionManagerClustered extends SessionManager
 		return false;
 	}
 
+	@Override
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
 // 		String[] cl_nodes = (String[])props.get(CLUSTER_NODES_PROP_KEY);
@@ -519,6 +520,7 @@ public class SessionManagerClustered extends SessionManager
 // 		return methodCall;
 // 	}
 
+	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> props = super.getDefaults(params);
 // 		if (params.get(CLUSTER_NODES) != null) {
@@ -535,6 +537,7 @@ public class SessionManagerClustered extends SessionManager
 		return props;
 	}
 
+	@Override
 	public void nodesConnected(Set<String> node_hostnames) {
                log.fine("Nodes connected: " + node_hostnames.toString());
 		for (String node: node_hostnames) {
