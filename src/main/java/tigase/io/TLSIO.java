@@ -122,6 +122,7 @@ public class TLSIO implements IOInterface {
     return tlsInput;
   }
 
+	@Override
   public ByteBuffer read(ByteBuffer buff) throws IOException {
     buff = io.read(buff);
 		if (io.bytesRead() > 0) {
@@ -132,13 +133,15 @@ public class TLSIO implements IOInterface {
     } // end of else
   }
 
+	@Override
   public int write(final ByteBuffer buff) throws IOException {
 		if (buff == null) {
 			return io.write(null);
 		}
     int result = 0;
     log.finer("TLS - Writing data, remaining: " + buff.remaining());
-    do {
+    int wr = 0;
+		do {
 			ByteBuffer tlsOutput = ByteBuffer.allocate(tlsWrapper.getNetBuffSize());
       tlsOutput.clear();
       tlsWrapper.wrap(buff, tlsOutput);
@@ -146,36 +149,43 @@ public class TLSIO implements IOInterface {
         throw new EOFException("Socket has been closed.");
       } // end of if (tlsWrapper.getStatus() == TLSStatus.CLOSED)
       tlsOutput.flip();
-			result += io.write(tlsOutput);
-    } while (buff.hasRemaining());
+			wr = io.write(tlsOutput);
+			result += wr;
+    } while (buff.hasRemaining() && wr > 0);
     if (tlsWrapper.getStatus() == TLSStatus.NEED_WRITE) {
       write(ByteBuffer.allocate(0));
     } // end of if ()
     return result;
   }
 
+	@Override
   public boolean isConnected() {
     return io.isConnected();
   }
 
+	@Override
   public void stop() throws IOException {
 		log.finest("Stop called...");
     io.stop();
     tlsWrapper.close();
   }
 
+	@Override
   public SocketChannel getSocketChannel() {
     return io.getSocketChannel();
   }
 
+	@Override
   public int bytesRead() {
     return io.bytesRead();
   }
 
+	@Override
 	public int getInputPacketSize() throws IOException {
 		return tlsWrapper.getPacketBuffSize();
 	}
 
+	@Override
 	public boolean waitingToSend() {
 		return io.waitingToSend();
 	}
