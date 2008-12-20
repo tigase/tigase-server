@@ -317,7 +317,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 			defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.level", "INFO");
 		} else {
 			defaults.put(LOGGING_KEY + ".level", "INFO");
-			defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.level", "ALL");
+			defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.level", "INFO");
 		}
 		defaults.put(LOGGING_KEY + "handlers",
 			"java.util.logging.ConsoleHandler java.util.logging.FileHandler");
@@ -335,8 +335,8 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 		defaults.put(LOGGING_KEY + "tigase.useParentHandlers", "true");
 		if (params.get(GEN_DEBUG) != null) {
 			defaults.put(LOGGING_KEY + ".level", "INFO");
-			defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.level", "ALL");
-			defaults.put(LOGGING_KEY + "java.util.logging.ConsoleHandler.level", "FINER");
+			defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.level", "INFO");
+			defaults.put(LOGGING_KEY + "java.util.logging.ConsoleHandler.level", "WARNING");
 			String[] packs = ((String)params.get(GEN_DEBUG)).split(",");
 			for (String pack: packs) {
 				defaults.put(LOGGING_KEY + "tigase."+pack+".level", "ALL");
