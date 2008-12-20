@@ -24,8 +24,10 @@ package tigase.server.sreceiver.sysmon;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
+import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
 import java.text.NumberFormat;
+import java.util.Map;
 import java.util.Queue;
 import tigase.server.Packet;
 
@@ -46,6 +48,99 @@ public class CPUMonitor extends AbstractMonitor {
 	private ThreadMXBean thBean = null;
 	private OperatingSystemMXBean osBean = null;
 	private NumberFormat format = NumberFormat.getPercentInstance();
+
+	private enum command {
+		maxthread(" - Returns information about the most active thread.");
+
+		private String helpText = null;
+
+		private command(String helpText) {
+			this.helpText = helpText;
+		}
+
+		public String getHelp() {
+			return helpText;
+		}
+
+	};
+
+	private String getStackTrace(Map<Thread,StackTraceElement[]> map, long id) {
+		for (Map.Entry<Thread, StackTraceElement[]> entry : map.entrySet()) {
+			if (entry.getKey().getId() == id) {
+				StringBuilder sb = new StringBuilder();
+				for (StackTraceElement stelem : entry.getValue()) {
+					sb.append(stelem.toString() + "\n");
+				}
+				return sb.toString();
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public String runCommand(String[] com) {
+		command comm = command.valueOf(com[0].substring(2));
+		switch (comm) {
+			case maxthread:
+				Map<Thread, StackTraceElement[]> map = Thread.getAllStackTraces();
+				if (com.length > 1) {
+					try {
+						long thid = Long.parseLong(com[1]);
+						ThreadInfo ti = thBean.getThreadInfo(thid);
+						if (ti != null) {
+							StringBuilder sb =
+											new StringBuilder("Thread: " + ti.getThreadName() + "\n");
+							sb.append(ti.toString());
+							return sb.toString() + getStackTrace(map, thid);
+						} else {
+							return "ThreadInfo is null...";
+						}
+					} catch (Exception e) {
+						return "Incorrect Thread ID";
+					}
+				}
+				long maxCpu = 0;
+				long id = 0;
+				ThreadInfo ti = null;
+				for (long thid : thBean.getAllThreadIds()) {
+					if (thBean.getThreadCpuTime(thid) >= maxCpu) {
+						maxCpu = thBean.getThreadCpuTime(thid);
+						ti = thBean.getThreadInfo(thid);
+						id = thid;
+					}
+				}
+				if (ti != null) {
+					StringBuilder sb =
+									new StringBuilder("Thread: " + ti.getThreadName() + "\n");
+					sb.append(ti.toString());
+					return sb.toString() + getStackTrace(map, id);
+				} else {
+					return "ThreadInfo is null...";
+				}
+		}
+		return null;
+	}
+
+	@Override
+	public String commandsHelp() {
+		StringBuilder sb = new StringBuilder();
+		for (command comm : command.values()) {
+			sb.append("//" + comm.name() + comm.getHelp() + "\n");
+		}
+		return sb.toString();
+	}
+
+	@Override
+	public boolean isMonitorCommand(String com) {
+		if (com != null) {
+			for (command comm: command.values()) {
+				if (com.startsWith("//" + comm.toString())) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 
 	@Override
 	public void init(String jid, double treshold, SystemMonitorTask smTask) {

@@ -1020,6 +1020,7 @@ public class SessionManager extends AbstractMessageReceiver
 		return null;
 	}
 
+	@Override
 	public List<Element> getDiscoFeatures() {
 		List<Element> features = new LinkedList<Element>();
 		for (ProcessorThread proc_t: processors.values()) {
@@ -1031,6 +1032,7 @@ public class SessionManager extends AbstractMessageReceiver
 		return features;
 	}
 
+	@Override
 	public List<Element> getDiscoItems(String node, String jid) {
 		if (jid != null && getName().equals(JIDUtils.getNodeNick(jid))) {
 			return serviceEntity.getDiscoItems(node, jid);
@@ -1041,6 +1043,7 @@ public class SessionManager extends AbstractMessageReceiver
 		}
 	}
 
+	@Override
 	public List<StatRecord> getStatistics() {
 		List<StatRecord> stats = super.getStatistics();
 		stats.add(new StatRecord(getName(), "Open connections", "int",
