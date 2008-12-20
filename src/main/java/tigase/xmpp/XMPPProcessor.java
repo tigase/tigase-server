@@ -22,10 +22,6 @@
 
 package tigase.xmpp;
 
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Queue;
-import tigase.server.Packet;
 import tigase.xml.Element;
 import tigase.db.UserRepository;
 import tigase.db.TigaseDBException;
@@ -63,16 +59,21 @@ public abstract class XMPPProcessor
 
 	protected XMPPProcessor() {	inst = this; }
 
+	@Override
 	public String[] supElements() { return null; }
 
+	@Override
   public String[] supNamespaces() { return null; }
 
+	@Override
   public Element[] supStreamFeatures(final XMPPResourceConnection session)
 	{ return null; }
 
+	@Override
   public Element[] supDiscoFeatures(final XMPPResourceConnection session)
 	{ return null; }
 
+	@Override
   public boolean isSupporting(final String element, final String ns) {
     String[] impl_elements = supElements();
     String[] impl_xmlns = supNamespaces();
@@ -101,11 +102,13 @@ public abstract class XMPPProcessor
    * @param proc an <code>XMPPProcessor</code> value
    * @return an <code>int</code> value
    */
+	@Override
   public final int compareTo(final XMPPProcessor proc) {
     return
       getClass().getName().compareTo(proc.getClass().getName());
   }
 
+	@Override
 	public void init(UserRepository rep) throws TigaseDBException {}
 
 }// XMPPProcessor

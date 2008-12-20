@@ -179,7 +179,6 @@ public class PacketFilter {
 				// If this is simple <iq type="result"/> then ignore it
 				// and consider it OK
 				if (packet.getElemName().equals("iq")
-					&& packet.getType() != null
 					&& packet.getType() == StanzaType.result) {
 					// Nothing to do....
 					return true;

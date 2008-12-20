@@ -21,10 +21,8 @@
  */
 package tigase.xmpp.impl;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Arrays;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,7 +31,6 @@ import tigase.db.UserAuthRepository;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.server.Command;
 import tigase.server.Packet;
-import tigase.util.JIDUtils;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.StanzaType;
@@ -72,17 +69,22 @@ public class JabberIqAuth extends XMPPProcessor
 		new Element("feature", new String[] {"var"}, new String[] {XMLNS})
 	};
 
+	@Override
   public Element[] supDiscoFeatures(final XMPPResourceConnection session)
 	{ return DISCO_FEATURES; }
 
+	@Override
 	public String id() { return ID; }
 
+	@Override
 	public String[] supElements()
 	{ return ELEMENTS; }
 
+	@Override
 	public String[] supNamespaces()
 	{ return XMLNSS; }
 
+	@Override
 	public Element[] supStreamFeatures(final XMPPResourceConnection session)	{
 		if (session == null || session.isAuthorized()) {
 			return null;
@@ -91,6 +93,7 @@ public class JabberIqAuth extends XMPPProcessor
 		} // end of if (session.isAuthorized()) else
 	}
 
+	@Override
 	public void process(final Packet packet, final XMPPResourceConnection session,
 		final NonAuthUserRepository repo, final Queue<Packet> results,
 		final Map<String, Object> settings)

@@ -518,6 +518,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 	}
 
 	@SuppressWarnings({"unchecked"})
+	@Override
 	public void streamClosed(XMPPIOService s) {
 		IO serv = (IO)s;
 		xmppStreamClosed(serv);
@@ -526,6 +527,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 	public abstract void xmppStreamClosed(IO serv);
 
 	@SuppressWarnings({"unchecked"})
+	@Override
 	public String streamOpened(XMPPIOService s, Map<String, String> attribs) {
 		IO serv = (IO)s;
 		return xmppStreamOpened(serv, attribs);
@@ -537,6 +539,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 		return services.size();
 	}
 
+	@Override
 	public List<StatRecord> getStatistics() {
 		List<StatRecord> stats = super.getStatistics();
 		stats.add(new StatRecord(getName(), "Open connections", "int",
