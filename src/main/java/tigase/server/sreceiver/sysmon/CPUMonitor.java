@@ -40,7 +40,8 @@ import tigase.server.Packet;
 public class CPUMonitor extends AbstractMonitor {
 
 	private int historySize = 100;
-	private long lastCPUUsage = 0;
+	private long lastCpuUsage = 0;
+	private long lastCpuChecked = 0;
 	private double[] cpuUsage = new double[historySize];
 	private int cpuUsageIdx = 0;
 	private double[] loadAverage = new double[historySize];
@@ -50,7 +51,9 @@ public class CPUMonitor extends AbstractMonitor {
 	private NumberFormat format = NumberFormat.getPercentInstance();
 
 	private enum command {
-		maxthread(" - Returns information about the most active thread.");
+		maxthread(" - Returns information about the most active thread."),
+		mth(" - Short version of the command above."),
+		allthreads(" [ex] - display all threads information, with 'ex' parameters it prints extended information.");
 
 		private String helpText = null;
 
@@ -77,46 +80,60 @@ public class CPUMonitor extends AbstractMonitor {
 		return null;
 	}
 
+	private String getThreadInfo(long thid, boolean stack) {
+		ThreadInfo ti = thBean.getThreadInfo(thid);
+		if (ti != null) {
+			Map<Thread, StackTraceElement[]> map = Thread.getAllStackTraces();
+			long maxCpu = thBean.getThreadCpuTime(thid);
+			double totalUsage = (new Long(maxCpu).doubleValue() / 1000000) /
+							new Long(System.currentTimeMillis()).doubleValue();
+			StringBuilder sb =
+							new StringBuilder("Thread: " + ti.getThreadName() +
+							", ID: " + ti.getThreadId());
+			sb.append(", CPU usage: " + format.format(totalUsage) + "\n");
+			if (stack) {
+				sb.append(ti.toString());
+				sb.append(getStackTrace(map, thid));
+			}
+			return sb.toString();
+		} else {
+			return "ThreadInfo is null...";
+		}
+	}
+
 	@Override
 	public String runCommand(String[] com) {
 		command comm = command.valueOf(com[0].substring(2));
 		switch (comm) {
+			case mth:
 			case maxthread:
-				Map<Thread, StackTraceElement[]> map = Thread.getAllStackTraces();
 				if (com.length > 1) {
 					try {
 						long thid = Long.parseLong(com[1]);
-						ThreadInfo ti = thBean.getThreadInfo(thid);
-						if (ti != null) {
-							StringBuilder sb =
-											new StringBuilder("Thread: " + ti.getThreadName() + "\n");
-							sb.append(ti.toString());
-							return sb.toString() + getStackTrace(map, thid);
-						} else {
-							return "ThreadInfo is null...";
-						}
+						return getThreadInfo(thid, true);
 					} catch (Exception e) {
 						return "Incorrect Thread ID";
 					}
 				}
 				long maxCpu = 0;
 				long id = 0;
-				ThreadInfo ti = null;
 				for (long thid : thBean.getAllThreadIds()) {
 					if (thBean.getThreadCpuTime(thid) >= maxCpu) {
 						maxCpu = thBean.getThreadCpuTime(thid);
-						ti = thBean.getThreadInfo(thid);
 						id = thid;
 					}
 				}
-				if (ti != null) {
-					StringBuilder sb =
-									new StringBuilder("Thread: " + ti.getThreadName() + "\n");
-					sb.append(ti.toString());
-					return sb.toString() + getStackTrace(map, id);
-				} else {
-					return "ThreadInfo is null...";
+				return getThreadInfo(id, true);
+			case allthreads:
+				boolean extend = false;
+				if (com.length > 1 && com[1].equals("ex")) {
+					extend = true;
 				}
+				StringBuilder sb = new StringBuilder("All threads information:\n");
+				for (long thid : thBean.getAllThreadIds()) {
+					sb.append(getThreadInfo(thid, extend));
+				}
+				return sb.toString();
 		}
 		return null;
 	}
@@ -157,11 +174,12 @@ public class CPUMonitor extends AbstractMonitor {
 		for (long thid : thBean.getAllThreadIds()) {
 			cpuTime += thBean.getThreadCpuTime(thid);
 		}
-		long tmpCPU = lastCPUUsage;
-		lastCPUUsage = cpuTime;
+		long tmpCPU = lastCpuUsage;
+		lastCpuUsage = cpuTime;
 		cpuTime -= tmpCPU;
 		double totalUsage = (new Long(cpuTime).doubleValue() / 1000000) /
-						new Long(INTERVAL_10SECS).doubleValue();
+						new Long(System.currentTimeMillis() - lastCpuChecked).doubleValue();
+		lastCpuChecked = System.currentTimeMillis();
 		cpuUsageIdx = setValueInArr(cpuUsage, cpuUsageIdx, totalUsage);
 		loadAverageIdx = setValueInArr(loadAverage, loadAverageIdx,
 						osBean.getSystemLoadAverage());
