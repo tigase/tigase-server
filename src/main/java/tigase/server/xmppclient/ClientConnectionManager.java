@@ -289,10 +289,12 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 		return results;
 	}
 
+	@Override
 	protected int[] getDefPlainPorts() {
 		return new int[] {5222};
 	}
 
+	@Override
 	protected int[] getDefSSLPorts() {
 		return new int[] {5223};
 	}
@@ -301,6 +303,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 		return JIDUtils.getJID(getName(), getDefHostName(), id);
 	}
 
+	@Override
 	public String xmppStreamOpened(XMPPIOService serv,
 		Map<String, String> attribs) {
 		log.finer("Stream opened: " + attribs.toString());
