@@ -436,20 +436,22 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		} // end of try-catch
 
 		String[] tasks_list = (String[])props.get(TASKS_LIST_PROP_KEY);
-		for (String task_name: tasks_list) {
-			String task_type =
-				(String)props.get(task_name + "/" + TASK_TYPE_PROP_KEY);
-			Map<String, Object> task_params = new LinkedHashMap<String, Object>();
-			String prep = task_name + "/props/";
-			for (Map.Entry<String, Object> entry: props.entrySet()) {
-				if (entry.getKey().startsWith(prep)) {
-					task_params.put(entry.getKey().substring(prep.length()),
-						entry.getValue());
-				} // end of if (entry.getKey().startsWith())
-			} // end of for (Map.Entry entry: props.entrySet())
-			addTaskInstance(createTask(task_type, task_name + "@" + my_hostname,
-					task_params));
-		} // end of for (String task_name: tasks_list)
+		if (tasks_list != null && tasks_list.length > 0) {
+			for (String task_name : tasks_list) {
+				String task_type =
+								(String) props.get(task_name + "/" + TASK_TYPE_PROP_KEY);
+				Map<String, Object> task_params = new LinkedHashMap<String, Object>();
+				String prep = task_name + "/props/";
+				for (Map.Entry<String, Object> entry : props.entrySet()) {
+					if (entry.getKey().startsWith(prep)) {
+						task_params.put(entry.getKey().substring(prep.length()),
+										entry.getValue());
+					} // end of if (entry.getKey().startsWith())
+				} // end of for (Map.Entry entry: props.entrySet())
+				addTaskInstance(createTask(task_type, task_name + "@" + my_hostname,
+								task_params));
+			} // end of for (String task_name: tasks_list)
+		}
 
 // 	  defaultPolicy =
 // 			TaskCreationPolicy.valueOf((String)props.get(CREATION_POLICY_PROP_KEY));
