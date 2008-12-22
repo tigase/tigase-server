@@ -21,29 +21,16 @@
  */
 package tigase.xmpp.impl;
 
-import java.lang.annotation.ElementType;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Arrays;
 import java.util.Queue;
-import java.util.TreeMap;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
-import javax.security.sasl.RealmCallback;
-import javax.security.sasl.Sasl;
-import javax.security.sasl.SaslException;
-import javax.security.sasl.SaslServer;
-import tigase.auth.ResourceConnectionCallback;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.UserAuthRepository;
 import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
-import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
