@@ -1054,6 +1054,14 @@ public class SessionManager extends AbstractMessageReceiver
 				sessionsByNodeId.size(), Level.INFO));
 		stats.add(new StatRecord(getName(), "Closed connections", "long",
 				closedConnections, Level.FINER));
+		for (Map.Entry<String, ProcessorThread> procent : processors.entrySet()) {
+			ProcessorThread proc = procent.getValue();
+			stats.add(new StatRecord(getName(), "Processor: " + procent.getKey(),
+							"String", "Queue: " + proc.in_queue.size() +
+							", AvTime: " + proc.cntAverageTime +
+							", Runs: " + proc.cntRuns,
+							Level.FINEST));
+		}
 		return stats;
 	}
 
@@ -1069,6 +1077,8 @@ public class SessionManager extends AbstractMessageReceiver
 		private LinkedList<Packet> local_results = new LinkedList<Packet>();
 		private LinkedBlockingQueue<QueueItem> in_queue =
 			new LinkedBlockingQueue<QueueItem>(maxQueueSize);
+		private long cntRuns = 0;
+		private long cntAverageTime = 0;
 
 		public ProcessorThread(XMPPProcessorIfc processor) {
 			this.processor = processor;
@@ -1081,11 +1091,13 @@ public class SessionManager extends AbstractMessageReceiver
 			return in_queue.offer(item);
 		}
 
+		@Override
 		public void run() {
 			QueueItem item = null;
 			while (! stopped) {
 				try {
 					item = in_queue.take();
+					long start = System.currentTimeMillis();
 					if (item.conn != null) {
 						processor.process(item.packet, item.conn, naUserRepository,
 							local_results, plugin_config.get(processor.id()));
@@ -1095,6 +1107,9 @@ public class SessionManager extends AbstractMessageReceiver
 								local_results, plugin_config.get(processor.id()));
 					}
 					addOutPackets(local_results);
+					++cntRuns;
+					cntAverageTime =
+									(cntAverageTime + (System.currentTimeMillis()-start))/2;
 				} catch (Exception e) {
 					log.log(Level.SEVERE, "Exception during packet processing: "
 						+ item.packet.toString(), e);
