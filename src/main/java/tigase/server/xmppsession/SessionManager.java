@@ -31,6 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.LinkedHashMap;
 import java.util.Queue;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
@@ -116,6 +118,7 @@ public class SessionManager extends AbstractMessageReceiver
 		new ConcurrentSkipListMap<String, XMPPStopListenerIfc>();
 	private Map<String, Map<String, Object>> plugin_config =
 		new ConcurrentSkipListMap<String, Map<String, Object>>();
+	private Timer authenticationWatchdog = new Timer();
 
 	//private Set<String> anonymous_domains = new HashSet<String>();
 
@@ -514,6 +517,8 @@ public class SessionManager extends AbstractMessageReceiver
 				} // end of if (hostname != null) else
 				//connection.setAnonymousPeers(anon_peers);
 				connectionsByFrom.put(pc.getFrom(), connection);
+				authenticationWatchdog.schedule(new AuthenticationTimer(pc.getFrom()),
+								MINUTE);
 			} else {
 				log.finest("Stream opened for existing session, authorized: "
 					+ connection.isAuthorized());
@@ -1114,6 +1119,25 @@ public class SessionManager extends AbstractMessageReceiver
 					log.log(Level.SEVERE, "Exception during packet processing: "
 						+ item.packet.toString(), e);
 				}
+			}
+		}
+
+	}
+
+	private class AuthenticationTimer extends TimerTask {
+
+		private String connId = null;
+
+		private AuthenticationTimer(String connId) {
+			this.connId = connId;
+		}
+
+		@Override
+		public void run() {
+			XMPPResourceConnection connection = connectionsByFrom.get(connId);
+			if (connection != null && !connection.isAuthorized()) {
+				fastAddOutPacket(Command.CLOSE.getPacket(getComponentId(), connId, StanzaType.set, "1"));
+				log.info("Authentication timeout expired, closing connection: " + connId);
 			}
 		}
 
