@@ -128,6 +128,7 @@ public class SessionManager extends AbstractMessageReceiver
 
 	private long closedConnections = 0;
 	private long authTimeouts = 0;
+	private int maxPluginsNo = 0;
 
 	@Override
 	public void setName(String name) {
@@ -921,6 +922,7 @@ public class SessionManager extends AbstractMessageReceiver
 
 		naUserRepository = new NARepository(user_repository);
 		String[] plugins = (String[])props.get(PLUGINS_PROP_KEY);
+		maxPluginsNo = plugins.length;
 		processors.clear();
 		for (String comp_id: plugins) {
 			if (comp_id.equals("presence")) {
@@ -1080,7 +1082,7 @@ public class SessionManager extends AbstractMessageReceiver
 		private XMPPProcessorIfc processor = null;
 		private LinkedList<Packet> local_results = new LinkedList<Packet>();
 		private LinkedBlockingQueue<QueueItem> in_queue =
-			new LinkedBlockingQueue<QueueItem>(maxQueueSize);
+			new LinkedBlockingQueue<QueueItem>(maxQueueSize/maxPluginsNo);
 		private long cntRuns = 0;
 		private long cntAverageTime = 0;
 
