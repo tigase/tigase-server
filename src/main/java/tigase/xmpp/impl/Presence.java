@@ -680,7 +680,7 @@ public abstract class Presence {
 				} // end of switch (type)
 			} // end of try
 			catch (NotAuthorizedException e) {
-				log.warning(
+				log.info(
 					"Can not access user Roster, user session is not authorized yet: " +
 					packet.getStringData());
 				log.log(Level.FINEST, "presence problem...", e);
