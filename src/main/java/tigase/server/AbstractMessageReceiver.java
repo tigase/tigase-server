@@ -225,6 +225,7 @@ public abstract class AbstractMessageReceiver
 
   public abstract void processPacket(Packet packet);
 
+	@Override
   public List<StatRecord> getStatistics() {
     List<StatRecord> stats = new LinkedList<StatRecord>();
 		stats.add(new StatRecord(getName(), "Last second packets", "int",
