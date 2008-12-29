@@ -59,20 +59,24 @@ public class SocketIO implements IOInterface {
 		channel.socket().setReuseAddress(true);
   }
 
+	@Override
   public SocketChannel getSocketChannel() {
     return channel;
   }
 
+	@Override
   public void stop() throws IOException {
 		log.finest("Stop called.");
     channel.close();
   }
 
+	@Override
   public boolean isConnected() {
 		log.finest("Is connected: " + channel.isConnected());
     return channel.isConnected();
   }
 
+	@Override
   public int write(final ByteBuffer buff) throws IOException {
 //     int result = 0;
 //     while (buff.hasRemaining()) {
@@ -99,6 +103,7 @@ public class SocketIO implements IOInterface {
     return result;
   }
 
+	@Override
   public ByteBuffer read(final ByteBuffer buff) throws IOException {
     bytesRead = channel.read(buff);
     log.finer("Read from channel " + bytesRead + " bytes.");
@@ -108,14 +113,17 @@ public class SocketIO implements IOInterface {
     return buff;
   }
 
+	@Override
   public int bytesRead() {
     return bytesRead;
   }
 
+	@Override
 	public int getInputPacketSize() throws IOException {
 		return channel.socket().getReceiveBufferSize();
 	}
 
+	@Override
 	public boolean waitingToSend() {
 		return dataToSend.size() > 0;
 	}
