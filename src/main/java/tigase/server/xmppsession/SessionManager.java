@@ -127,6 +127,7 @@ public class SessionManager extends AbstractMessageReceiver
 	private ServiceEntity serviceEntity = null;
 
 	private long closedConnections = 0;
+	private long authTimeouts = 0;
 
 	@Override
 	public void setName(String name) {
@@ -805,13 +806,9 @@ public class SessionManager extends AbstractMessageReceiver
 		return super.addOutPacket(packet);
 	}
 
-	@Override
-	protected boolean addOutPackets(Queue<Packet> packets) {
-		Packet packet = null;
-		while ((packet = packets.poll()) != null) {
-			addOutPacket(packet);
-		}
-		return true;
+	protected boolean addOutPackets(Packet packet, XMPPResourceConnection conn,
+					Queue<Packet> results) {
+		return false;
 	}
 
 //	private XMPPSession getXMPPSession(Packet p) {
@@ -1059,6 +1056,8 @@ public class SessionManager extends AbstractMessageReceiver
 				sessionsByNodeId.size(), Level.INFO));
 		stats.add(new StatRecord(getName(), "Closed connections", "long",
 				closedConnections, Level.FINER));
+		stats.add(new StatRecord(getName(), "Authentication timouts", "long",
+						authTimeouts, Level.FINEST));
 		for (Map.Entry<String, ProcessorThread> procent : processors.entrySet()) {
 			ProcessorThread proc = procent.getValue();
 			stats.add(new StatRecord(getName(), "Processor: " + procent.getKey(),
@@ -1136,6 +1135,7 @@ public class SessionManager extends AbstractMessageReceiver
 		public void run() {
 			XMPPResourceConnection connection = connectionsByFrom.get(connId);
 			if (connection != null && !connection.isAuthorized()) {
+				++authTimeouts;
 				fastAddOutPacket(Command.CLOSE.getPacket(getComponentId(), connId, StanzaType.set, "1"));
 				log.info("Authentication timeout expired, closing connection: " + connId);
 			}
@@ -1158,6 +1158,7 @@ public class SessionManager extends AbstractMessageReceiver
 			return base + "/" + subnode;
 		}
 
+		@Override
 		public String getPublicData(String user, String subnode, String key,
 			String def)	throws UserNotFoundException {
 			try {
@@ -1170,6 +1171,7 @@ public class SessionManager extends AbstractMessageReceiver
 			} // end of try-catch
 		}
 
+		@Override
 		public String[] getPublicDataList(String user, String subnode, String key)
 			throws UserNotFoundException {
 			try {
@@ -1182,6 +1184,7 @@ public class SessionManager extends AbstractMessageReceiver
 			} // end of try-catch
 		}
 
+		@Override
 		public void addOfflineDataList(String user, String subnode, String key,
 			String[] list) throws UserNotFoundException {
 			try {
@@ -1199,6 +1202,7 @@ public class SessionManager extends AbstractMessageReceiver
 			} // end of try-catch
 		}
 
+		@Override
 		public void addOfflineData(String user, String subnode, String key,
 			String value) throws UserNotFoundException, DataOverwriteException {
 			String node = calcNode(OFFLINE_DATA_NODE, subnode);
