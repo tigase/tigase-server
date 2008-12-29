@@ -320,7 +320,15 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	 */
 	public void setResource(final String argResource) throws NotAuthorizedException {
 		this.resource = argResource;
-		parentSession.resourceSet(this);
+		// There is really unlikely a parent session would be null here but it may
+		// happen when the user disconnects just after sending resource bind.
+		// Due to asynchronous nature of packets processing in the Tigase the
+		// the authorization might be cancelled while resource bind packet still
+		// waits in the queue.....
+		// This has already happened....
+		if (parentSession != null) {
+			parentSession.resourceSet(this);
+		}
 		userJid = getUserId() + (resource != null ? ("/" + resource) : "/" + sessionId);
 	}
 
