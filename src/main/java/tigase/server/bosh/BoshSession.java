@@ -443,7 +443,7 @@ public class BoshSession {
 		return true;
 	}
 
-	public void processSocketPacket(Packet packet,
+	public synchronized void processSocketPacket(Packet packet,
 		BoshIOService service, Queue<Packet> out_results) {
 
 		log.finest("[" + connections.size() +
