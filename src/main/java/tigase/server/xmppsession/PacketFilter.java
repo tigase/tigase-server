@@ -82,8 +82,7 @@ public class PacketFilter {
 			// For all messages coming from the owner of this account set
 			// proper 'from' attribute. This is actually needed for the case
 			// when the user sends a message to himself.
-			if (packet.getFrom() != null
-				&& packet.getFrom().equals(session.getConnectionId())) {
+			if (session.getConnectionId().equals(packet.getFrom())) {
 				if (!session.isAuthorized()) {
 					// We allow only certain packets here...
 					// For now it is simpler to disallow all messages and presences
