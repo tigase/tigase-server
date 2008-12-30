@@ -236,7 +236,7 @@ public class BoshSession {
 		processPacket(null, null);
 	}
 
-	public void processPacket(Packet packet,
+	public synchronized void processPacket(Packet packet,
 		Queue<Packet> out_results) {
 
 		if (packet != null) {
@@ -321,7 +321,7 @@ public class BoshSession {
 		return false;
 	}
 
-	private void sendBody(BoshIOService serv, Element body_par) {
+	private synchronized void sendBody(BoshIOService serv, Element body_par) {
 		Element body = body_par;
 		if (body == null) {
 			body = new Element(BODY_EL_NAME,
