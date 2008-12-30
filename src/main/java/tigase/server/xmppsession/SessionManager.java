@@ -452,7 +452,7 @@ public class SessionManager extends AbstractMessageReceiver
 				if (proc_t.addItem(packet, connection)) {
 					packet.processedBy(proc_t.processor.id());
 				} else {
-					log.info("Can not add packet: " + packet.toString()
+					log.warning("Can not add packet: " + packet.toString()
 						+ " to processor: " + proc_t.getName() + " internal queue");
 				}
 			} // end of if (proc.isSupporting(elem.getName(), elem.getXMLNS()))
