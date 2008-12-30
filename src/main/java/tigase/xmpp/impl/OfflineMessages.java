@@ -42,7 +42,6 @@ import tigase.xml.SimpleParser;
 import tigase.xml.SingletonFactory;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.StanzaType;
-import tigase.xmpp.XMPPImplIfc;
 import tigase.xmpp.XMPPPostprocessorIfc;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
@@ -74,7 +73,7 @@ public class OfflineMessages extends XMPPProcessor
 	{new Element("feature",	new String[] {"var"},	new String[] {"msgoffline"})};
 
 	private SimpleParser parser = SingletonFactory.getParserInstance();
-	private SimpleDateFormat formater =
+	private final SimpleDateFormat formater =
 		new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
 	// Implementation of tigase.xmpp.XMPPImplIfc
@@ -84,6 +83,7 @@ public class OfflineMessages extends XMPPProcessor
 	 *
 	 * @return a <code>String[]</code> value
 	 */
+	@Override
 	public String[] supElements()
 	{ return ELEMENTS; }
 
@@ -92,6 +92,7 @@ public class OfflineMessages extends XMPPProcessor
 	 *
 	 * @return a <code>String[]</code> value
 	 */
+	@Override
   public String[] supNamespaces()
 	{ return XMLNSS; }
 
@@ -101,6 +102,7 @@ public class OfflineMessages extends XMPPProcessor
 	 * @param session a <code>XMPPResourceConnection</code> value
 	 * @return a <code>String[]</code> value
 	 */
+	@Override
   public Element[] supDiscoFeatures(final XMPPResourceConnection session)
 	{ return DISCO_FEATURES; }
 
@@ -109,6 +111,7 @@ public class OfflineMessages extends XMPPProcessor
 	 *
 	 * @return a <code>String</code> value
 	 */
+	@Override
 	public String id() { return ID; }
 
 	// Implementation of tigase.xmpp.XMPPProcessorIfc
@@ -120,7 +123,9 @@ public class OfflineMessages extends XMPPProcessor
 	 * @param conn a <code>XMPPResourceConnection</code> value
 	 * @param repo a <code>NonAuthUserRepository</code> value
 	 * @param results a <code>Queue</code> value
+	 * @param settings
 	 */
+	@Override
 	public void process(final Packet packet, final XMPPResourceConnection conn,
 		final NonAuthUserRepository repo, final Queue<Packet> results,
 		final Map<String, Object> settings) {
@@ -150,7 +155,10 @@ public class OfflineMessages extends XMPPProcessor
 						results.addAll(packets);
 					} // end of if (packets != null)
 				} catch (NotAuthorizedException e) {
-					log.warning("User not authrized to retrieve offline messages, something must be wrong. " + e);
+					log.info("User not authrized to retrieve offline messages, " +
+									"this happens quite often on some installations where there" +
+									" are a very short living client connections. They can " +
+									"disconnect at any time. " + e);
 				} catch (TigaseDBException e) {
 					log.warning("Error accessing database for offline message: " + e);
 				} // end of try-catch
@@ -169,6 +177,7 @@ public class OfflineMessages extends XMPPProcessor
 	 * @param repo a <code>NonAuthUserRepository</code> value
 	 * @param queue a <code>Queue</code> value
 	 */
+	@Override
 	public void postProcess(final Packet packet,
 		final XMPPResourceConnection conn,	final NonAuthUserRepository repo,
 		final Queue<Packet> queue) {
@@ -251,6 +260,7 @@ public class OfflineMessages extends XMPPProcessor
 	}
 
 	private class StampComparator implements Comparator<Packet> {
+		@Override
 		public int compare(Packet p1, Packet p2) {
 			String stamp1 = "";
 			String stamp2 = "";
