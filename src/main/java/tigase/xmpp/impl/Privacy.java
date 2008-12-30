@@ -21,7 +21,6 @@
  */
 package tigase.xmpp.impl;
 
-import java.util.List;
 import java.util.Queue;
 import java.util.logging.Logger;
 import tigase.xml.Element;
@@ -110,15 +109,15 @@ public class Privacy {
     throws NotAuthorizedException, TigaseDBException {
 		if (lName != null) {
 			Element list = getList(session, lName);
-			session.putSessionData(ACTIVE, list);
+			session.putCommonSessionData(ACTIVE, list);
 		} else {
-			session.putSessionData(ACTIVE, null);
+			session.putCommonSessionData(ACTIVE, null);
 		}
 	}
 
 	public static Element getActiveList(XMPPResourceConnection session)
     throws NotAuthorizedException {
-		return (Element)session.getSessionData(ACTIVE);
+		return (Element)session.getCommonSessionData(ACTIVE);
 	}
 
 	public static String getActiveListName(XMPPResourceConnection session)
