@@ -55,6 +55,8 @@ import tigase.db.TigaseDBException;
 public abstract class XMPPProcessor
 	implements XMPPImplIfc, Comparable<XMPPProcessor> {
 
+	protected static final String ALL = "*";
+
 	private XMPPProcessor inst = null;
 
 	protected XMPPProcessor() {	inst = this; }
@@ -84,7 +86,8 @@ public abstract class XMPPProcessor
 				// This method is called very, very often and it is also very expensive
 				// therefore all XML element names and xmlns are created using
 				// String.intern()
-        if (impl_elements[i] == element && impl_xmlns[i] == ns) {
+        if ((impl_elements[i] == element || impl_elements[i] == ALL) &&
+								(impl_xmlns[i] == ns || impl_xmlns[i] == ALL)) {
           return true;
         } // end of if (ELEMENTS[i].equals(element) && XMLNSS[i].equals(ns))
       } // end of for (int i = 0; i < ELEMENTS.length; i++)

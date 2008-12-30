@@ -22,6 +22,7 @@
 package tigase.xmpp;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -29,7 +30,7 @@ import tigase.util.JIDUtils;
 import tigase.db.UserRepository;
 import tigase.db.UserAuthRepository;
 import tigase.db.TigaseDBException;
-import tigase.auth.LoginHandler;
+import tigase.server.xmppsession.SessionManagerHandler;
 import tigase.db.AuthorizationException;
 
 /**
@@ -49,7 +50,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
   private static final Logger log =
 		Logger.getLogger("tigase.xmpp.XMPPResourceConnection");
 
-	private LoginHandler loginHandler = null;
+	private SessionManagerHandler loginHandler = null;
 	private XMPPSession parentSession = null;
 
 	//private LoginContext loginContext = null;
@@ -100,14 +101,40 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	/**
 	 * Creates a new <code>XMPPResourceConnection</code> instance.
 	 *
+	 *
+	 * @param connectionId
+	 * @param rep
+	 * @param authRepo
+	 * @param loginHandler
+	 * @param anon_allowed
 	 */
 	public XMPPResourceConnection(String connectionId, UserRepository rep,
-		UserAuthRepository authRepo, LoginHandler loginHandler, boolean anon_allowed) {
+		UserAuthRepository authRepo, SessionManagerHandler loginHandler, boolean anon_allowed) {
 		super(rep, authRepo, anon_allowed);
 		this.connectionId = connectionId;
 		this.loginHandler = loginHandler;
 		this.creationTime = System.currentTimeMillis();
-    sessionData = new HashMap<String, Object>();
+    sessionData = new LinkedHashMap<String, Object>();
+	}
+
+	public boolean isLocalDomain(String outDomain) {
+		return loginHandler.isLocalDomain(outDomain);
+	}
+
+	public void putCommonSessionData(String key, Object value) {
+		if (parentSession != null) {
+			parentSession.putCommonSessionData(key, value);
+		}
+	}
+
+	/**
+	 *
+	 * @param key
+	 * @return
+	 */
+	public Object getCommonSessionData(String key) {
+		return parentSession == null ? null : 
+			parentSession.getCommonSessionData(key);
 	}
 
 	public void setConnectionStatus(ConnectionStatus status) {

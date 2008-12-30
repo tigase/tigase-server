@@ -77,6 +77,10 @@ public abstract class RepositoryAccess {
 	/**
 	 * Creates a new <code>RepositoryAccess</code> instance.
 	 *
+	 *
+	 * @param rep
+	 * @param auth
+	 * @param anon_allowed
 	 */
 	public RepositoryAccess(UserRepository rep, UserAuthRepository auth,
 		boolean anon_allowed) {

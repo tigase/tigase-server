@@ -37,7 +37,6 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import tigase.auth.LoginHandler;
 import tigase.auth.TigaseSaslProvider;
 import tigase.conf.Configurable;
 import tigase.db.DataOverwriteException;
@@ -71,6 +70,7 @@ import tigase.xmpp.XMPPSession;
 import tigase.xmpp.XMPPStopListenerIfc;
 import tigase.xmpp.ConnectionStatus;
 
+import tigase.xmpp.XMPPPacketFilterIfc;
 import static tigase.server.xmppsession.SessionManagerConfig.*;
 
 /**
@@ -83,7 +83,7 @@ import static tigase.server.xmppsession.SessionManagerConfig.*;
  * @version $Rev$
  */
 public class SessionManager extends AbstractMessageReceiver
-	implements Configurable, XMPPService, LoginHandler {
+	implements Configurable, XMPPService, SessionManagerHandler {
 
   /**
    * Variable <code>log</code> is a class logger.
@@ -118,6 +118,8 @@ public class SessionManager extends AbstractMessageReceiver
 		new ConcurrentSkipListMap<String, XMPPStopListenerIfc>();
 	private Map<String, Map<String, Object>> plugin_config =
 		new ConcurrentSkipListMap<String, Map<String, Object>>();
+	private Map<String, XMPPPacketFilterIfc> outFilters =
+		new ConcurrentSkipListMap<String, XMPPPacketFilterIfc>();
 	private Timer authenticationWatchdog = new Timer();
 
 	//private Set<String> anonymous_domains = new HashSet<String>();
@@ -245,7 +247,7 @@ public class SessionManager extends AbstractMessageReceiver
 						}
 					}
 				}
-				addOutPackets(results);
+				addOutPackets(packet, conn, results);
 				return;
 			}
 		}
@@ -269,7 +271,7 @@ public class SessionManager extends AbstractMessageReceiver
 				if (log.isLoggable(Level.FINEST)) {
 					log.finest("Packet forwarded: " + packet.toString());
 				}
-				addOutPackets(results);
+				addOutPackets(packet, conn, results);
 				return;
 			}
 		}
@@ -290,7 +292,7 @@ public class SessionManager extends AbstractMessageReceiver
 		}
 
 		setPermissions(conn, results);
-		addOutPackets(results);
+		addOutPackets(packet, conn, results);
 
 		if (!packet.wasProcessed()) {
 			if (log.isLoggable(Level.FINEST)) {
@@ -426,14 +428,6 @@ public class SessionManager extends AbstractMessageReceiver
 			log.finest("Session not null, getting resource for jid: " + jid);
 			return session.getResourceConnection(jid);
 		} // end of if (session != null)
-		return null;
-	}
-
-	private String getConnectionId(String jid) {
-		XMPPResourceConnection res = getResourceConnection(jid);
-		if (res != null) {
-			return res.getConnectionId();
-		} // end of if (res != null)
 		return null;
 	}
 
@@ -736,7 +730,7 @@ public class SessionManager extends AbstractMessageReceiver
 			for (XMPPStopListenerIfc stopProc: stopListeners.values()) {
 				stopProc.stopped(conn, results, plugin_config.get(stopProc.id()));
 			} // end of for ()
-			addOutPackets(results);
+			addOutPackets(null, conn, results);
 		}
 		try {
 			if (conn.isAuthorized()
@@ -774,42 +768,26 @@ public class SessionManager extends AbstractMessageReceiver
 		conn.streamClosed();
 	}
 
-	protected boolean checkOutPacket(Packet packet) {
-		if (packet.getPermissions() == Permissions.ANONYM) {
-			if (packet.getElemTo() != null
-				&& !isLocalDomain(JIDUtils.getNodeHost(packet.getElemTo()))) {
-				try {
-					addPacket(Authorization.FORBIDDEN.getResponseMessage(packet,
-							"Anonymous user can only send local messages.", true));
-				} catch (PacketErrorTypeException e) {
-					log.log(Level.INFO, "Error for error packet: " + packet.toString(), e);
-				}
-				return false;
-			}
-		}
+	@Override
+	protected boolean addOutPacket(Packet packet) {
 		String oldto = packet.getAttribute(Packet.OLDTO);
 		if (oldto != null) {
 			packet.getElement().setAttribute("from", oldto);
 			packet.getElement().removeAttribute(Packet.OLDTO);
 		}
-		return true;
-	}
-
-	@Override
-	protected boolean addOutPacket(Packet packet) {
-		if (checkOutPacket(packet)) {
-			return super.addOutPacket(packet);
-		}
-		return false;
+		return super.addOutPacket(packet);
 	}
 
 	protected boolean fastAddOutPacket(Packet packet) {
 		return super.addOutPacket(packet);
 	}
 
-	protected boolean addOutPackets(Packet packet, XMPPResourceConnection conn,
+	protected void addOutPackets(Packet packet, XMPPResourceConnection conn,
 					Queue<Packet> results) {
-		return false;
+		for (XMPPPacketFilterIfc outfilter : outFilters.values()) {
+			outfilter.filter(packet, conn, naUserRepository, results);
+		} // end of for (XMPPPostprocessorIfc postproc: postProcessors)
+		addOutPackets(results);
 	}
 
 //	private XMPPSession getXMPPSession(Packet p) {
@@ -869,11 +847,19 @@ public class SessionManager extends AbstractMessageReceiver
 				+ " for plugin id: " + comp_id);
 			loaded = true;
 		}
+		XMPPPacketFilterIfc filterproc = ProcessorFactory.getPacketFilter(comp_id);
+		if (filterproc != null) {
+			outFilters.put(comp_id, filterproc);
+			log.config("Added packet filter: " + filterproc.getClass().getSimpleName()
+				+ " for plugin id: " + comp_id);
+			loaded = true;
+		}
 		if (!loaded) {
 			log.warning("No implementation found for plugin id: " + comp_id);
 		} // end of if (!loaded)
 	}
 
+	@Override
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
 
@@ -978,6 +964,7 @@ public class SessionManager extends AbstractMessageReceiver
 		//Arrays.sort(anon_peers);
 	}
 
+	@Override
 	public boolean handlesLocalDomains() {
 		return true;
 	}
@@ -992,6 +979,7 @@ public class SessionManager extends AbstractMessageReceiver
 		session.addResourceConnection(conn);
 	}
 
+	@Override
 	public void handleLogin(String userName, XMPPResourceConnection conn) {
 		log.finest("handleLogin called for: " + userName);
 		String userId = JIDUtils.getNodeID(userName, conn.getDomain());
@@ -999,6 +987,7 @@ public class SessionManager extends AbstractMessageReceiver
 	}
 
 
+	@Override
 	public void handleLogout(String userName, XMPPResourceConnection conn) {
 		String domain = conn.getDomain();
 		addOutPacket(Command.CLOSE.getPacket(getComponentId(),
@@ -1010,6 +999,7 @@ public class SessionManager extends AbstractMessageReceiver
 		} // end of if (session.getActiveResourcesSize() == 0)
 	}
 
+	@Override
 	public Element getDiscoInfo(String node, String jid) {
 		if (jid != null && getName().equals(JIDUtils.getNodeNick(jid))) {
 			Element query = serviceEntity.getDiscoInfo(node);
@@ -1104,15 +1094,12 @@ public class SessionManager extends AbstractMessageReceiver
 				try {
 					item = in_queue.take();
 					long start = System.currentTimeMillis();
+					processor.process(item.packet, item.conn, naUserRepository,
+									local_results, plugin_config.get(processor.id()));
 					if (item.conn != null) {
-						processor.process(item.packet, item.conn, naUserRepository,
-							local_results, plugin_config.get(processor.id()));
 						setPermissions(item.conn, local_results);
-					} else {
-							processor.process(item.packet, null, naUserRepository,
-								local_results, plugin_config.get(processor.id()));
 					}
-					addOutPackets(local_results);
+					addOutPackets(item.packet, item.conn, local_results);
 					++cntRuns;
 					cntAverageTime =
 									(cntAverageTime + (System.currentTimeMillis()-start))/2;

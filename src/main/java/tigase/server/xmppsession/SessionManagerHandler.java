@@ -19,12 +19,12 @@
  * Last modified by $Author$
  * $Date$
  */
-package tigase.auth;
+package tigase.server.xmppsession;
 
 import tigase.xmpp.XMPPResourceConnection;
 
 /**
- * Describe interface LoginHandler here.
+ * Describe interface SessionManagerHandler here.
  *
  *
  * Created: Sat Feb 18 13:27:58 2006
@@ -32,7 +32,7 @@ import tigase.xmpp.XMPPResourceConnection;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public interface LoginHandler {
+public interface SessionManagerHandler {
 
 	public static final String COMMIT_HANDLER_KEY = "LoginHandlerKey";
 
@@ -40,4 +40,6 @@ public interface LoginHandler {
 
 	void handleLogout(String userName, XMPPResourceConnection conn);
 
-} // LoginHandler
+	boolean isLocalDomain(String domain);
+
+}

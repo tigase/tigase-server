@@ -22,7 +22,9 @@
 package tigase.xmpp;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import tigase.util.JIDUtils;
@@ -50,12 +52,16 @@ public class XMPPSession {
 
 	private ArrayList<XMPPResourceConnection> activeResources = null;
 	private long creationTime = 0;
+	private Map<String, Object> sessionData = null;
 
 	/**
 	 * Creates a new <code>XMPPSession</code> instance.
 	 *
+	 *
+	 * @param username
 	 */
 	public XMPPSession(final String username) {
+		sessionData = new LinkedHashMap<String, Object>();
 		activeResources = new ArrayList<XMPPResourceConnection>();
 		this.username = username;
 		this.creationTime = System.currentTimeMillis();
@@ -84,6 +90,8 @@ public class XMPPSession {
 
 	/**
 	 * This method is called each time the resource is set for connection.
+	 *
+	 * @param conn
 	 */
 	public void resourceSet(XMPPResourceConnection conn) {
 		activeResources.remove(conn);
@@ -237,6 +245,19 @@ public class XMPPSession {
 			} // end of if (al.get(i).getLastAccessed() > time)
 		}
 		return conn_last;
+	}
+
+	/**
+	 *
+	 * @param key
+	 * @return
+	 */
+	public Object getCommonSessionData(String key) {
+		return sessionData.get(key);
+	}
+
+	void putCommonSessionData(String key, Object value) {
+		sessionData.put(key, value);
 	}
 
 } // XMPPSession

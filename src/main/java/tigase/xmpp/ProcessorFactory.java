@@ -92,6 +92,14 @@ public class ProcessorFactory {
     } // end of try-catch
   }
 
+	public static XMPPPacketFilterIfc getPacketFilter(String id) {
+		XMPPImplIfc imp = processors.get(id);
+		if (imp instanceof XMPPPacketFilterIfc) {
+			return (XMPPPacketFilterIfc)imp;
+		}
+		return null;
+	}
+
   private ProcessorFactory() {}
 
   public static XMPPProcessorIfc getProcessor(String id) {

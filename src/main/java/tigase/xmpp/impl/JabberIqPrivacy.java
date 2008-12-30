@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 import java.util.Comparator;
 import java.util.Collections;
+import java.util.Iterator;
 import tigase.server.Packet;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.NotAuthorizedException;
@@ -39,6 +40,8 @@ import tigase.xmpp.XMPPException;
 import tigase.xml.Element;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
+import tigase.util.JIDUtils;
+import tigase.xmpp.XMPPPacketFilterIfc;
 import tigase.xmpp.impl.roster.RosterAbstract;
 import tigase.xmpp.impl.roster.RosterFactory;
 
@@ -54,7 +57,7 @@ import static tigase.xmpp.impl.Privacy.*;
  * @version $Rev$
  */
 public class JabberIqPrivacy extends XMPPProcessor
-	implements XMPPProcessorIfc, XMPPPreprocessorIfc {
+	implements XMPPProcessorIfc, XMPPPreprocessorIfc, XMPPPacketFilterIfc {
 
   /**
    * Private logger for class instancess.
@@ -70,11 +73,36 @@ public class JabberIqPrivacy extends XMPPProcessor
 		new Element("feature", new String[] {"var"}, new String[] {XMLNS})
 	};
 
+	private static final String PRIVACY_INIT_KEY = "privacy-init";
+	private static final String LIST_EL_NAME = "list";
+	private static final String DEFAULT_EL_NAME = "default";
+	private static final String ACTIVE_EL_NAME = "active";
+	private static final String PRESENCE_IN_EL_NAME = "presence-in";
+	private static final String PRESEBCE_OUT_EL_NAME = "presence-out";
+	private static final String PRESENCE_EL_NAME = "presence";
+
+
+
 	private static RosterAbstract roster_util =
     RosterFactory.getRosterImplementation(true);
 
+	@Override
   public Element[] supDiscoFeatures(final XMPPResourceConnection session)
 	{ return DISCO_FEATURES; }
+
+	@Override
+	public void filter(Packet packet, XMPPResourceConnection session,
+					NonAuthUserRepository repo, Queue<Packet> results) {
+		if (session == null || results == null || results.size() == 0) {
+			return;
+		}
+		for (Iterator<Packet> it = results.iterator(); it.hasNext();) {
+			Packet res = it.next();
+			if (!res.isXMLNS("/iq/query", XMLNS) && !allowed(res, session)) {
+				it.remove();
+			}
+		}
+	}
 
 
 	private enum ITEM_TYPE { jid, group, subscription, all };
@@ -83,6 +111,7 @@ public class JabberIqPrivacy extends XMPPProcessor
 
 	private static final Comparator<Element> compar =
 		new Comparator<Element>() {
+		@Override
 		public int compare(Element el1, Element el2) {
 			String or1 = el1.getAttribute(ORDER);
 			String or2 = el2.getAttribute(ORDER);
@@ -90,40 +119,27 @@ public class JabberIqPrivacy extends XMPPProcessor
 		}
 	};
 
+	@Override
 	public String id() { return ID; }
 
+	@Override
 	public String[] supElements()
 	{ return ELEMENTS; }
 
+	@Override
   public String[] supNamespaces()
 	{ return XMLNSS; }
 
-	/**
-	 * <code>preProcess</code> method checks only incoming stanzas
-	 * so it doesn't check for presence-out at all.
-	 *
-	 * @param packet a <code>Packet</code> value
-	 * @param session a <code>XMPPResourceConnection</code> value
-	 * @param repo a <code>NonAuthUserRepository</code> value
-	 * @param results 
-	 * @return a <code>boolean</code> value
-	 */
-	public boolean preProcess(Packet packet, XMPPResourceConnection session,
-		NonAuthUserRepository repo,	Queue<Packet> results) {
-
-		if (session == null || !session.isAuthorized()) {
-			return false;
-		} // end of if (session == null)
-
+	private boolean allowed(Packet packet, XMPPResourceConnection session) {
 		try {
 			Element list = Privacy.getActiveList(session);
-			if (list == null && session.getSessionData("privacy-init") == null) {
+			if (list == null && session.getSessionData(PRIVACY_INIT_KEY) == null) {
 				String lName = Privacy.getDefaultList(session);
 				if (lName != null) {
 					Privacy.setActiveList(session, lName);
 					list = Privacy.getActiveList(session);
 				} // end of if (lName != null)
-				session.putSessionData("privacy-init", "");
+				session.putSessionData(PRIVACY_INIT_KEY, "");
 			} // end of if (lName == null)
 			if (list != null) {
 				List<Element> items = list.getChildren();
@@ -136,14 +152,20 @@ public class JabberIqPrivacy extends XMPPProcessor
 						type = ITEM_TYPE.valueOf(item.getAttribute(TYPE));
 					} // end of if (item.getAttribute(TYPE) != null)
 					String value = item.getAttribute(VALUE);
-					String from = packet.getElemFrom();
-					if (from != null) {
+					String sessionUserId = session.getUserId();
+					String jid = packet.getElemFrom();
+					boolean packetIn = true;
+					if (jid == null || sessionUserId.equals(JIDUtils.getNodeID(jid))) {
+						jid = packet.getElemTo();
+						packetIn = false;
+					}
+					if (jid != null) {
 						switch (type) {
 						case jid:
-							type_matched = from.contains(value);
+							type_matched = jid.contains(value);
 							break;
 						case group:
-							String[] groups = roster_util.getBuddyGroups(session, from);
+							String[] groups = roster_util.getBuddyGroups(session, jid);
 							if (groups != null) {
 								for (String group: groups) {
 									if (type_matched = group.equals(value)) {
@@ -156,18 +178,18 @@ public class JabberIqPrivacy extends XMPPProcessor
 							ITEM_SUBSCRIPTIONS subscr = ITEM_SUBSCRIPTIONS.valueOf(value);
 							switch (subscr) {
 							case to:
-								type_matched = roster_util.isSubscribedTo(session, from);
+								type_matched = roster_util.isSubscribedTo(session, jid);
 								break;
 							case from:
-								type_matched = roster_util.isSubscribedFrom(session, from);
+								type_matched = roster_util.isSubscribedFrom(session, jid);
 								break;
 							case none:
-								type_matched = (!roster_util.isSubscribedFrom(session, from)
-									&& !roster_util.isSubscribedTo(session, from));
+								type_matched = (!roster_util.isSubscribedFrom(session, jid)
+									&& !roster_util.isSubscribedTo(session, jid));
 								break;
 							case both:
-								type_matched = (roster_util.isSubscribedFrom(session, from)
-									&& roster_util.isSubscribedTo(session, from));
+								type_matched = (roster_util.isSubscribedFrom(session, jid)
+									&& roster_util.isSubscribedTo(session, jid));
 								break;
 							default:
 								break;
@@ -192,19 +214,18 @@ public class JabberIqPrivacy extends XMPPProcessor
 						elem_matched = true;
 					} else {
 						for (Element elem: elems) {
-							if (elem.getName().equals("presence-in")) {
-								if (packet.getElemName().equals("presence")
-									&& (packet.getType() == null
-										|| packet.getType() == StanzaType.unavailable)) {
-									elem_matched = true;
-									break;
-								}
-							} else {
-								if (elem.getName().equals(packet.getElemName())) {
-									elem_matched = true;
-									break;
-								} // end of if (elem.getName().equals(packet.getElemName()))
-							} // end of if (elem.getName().equals("presence-in")) else
+							if (packet.getElemName() == PRESENCE_EL_NAME &&
+											((packetIn && elem.getName() == PRESENCE_IN_EL_NAME) ||
+											(!packetIn && elem.getName() == PRESEBCE_OUT_EL_NAME)) &&
+											(packet.getType() == null ||
+											packet.getType() == StanzaType.unavailable)) {
+								elem_matched = true;
+								break;
+							}
+							if (packetIn && elem.getName() == packet.getElemName()) {
+								elem_matched = true;
+								break;
+							} // end of if (elem.getName().equals(packet.getElemName()))
 						} // end of for (Element elem: elems)
 					} // end of else
 					if (!elem_matched) {
@@ -214,9 +235,9 @@ public class JabberIqPrivacy extends XMPPProcessor
 					ITEM_ACTION action = ITEM_ACTION.valueOf(item.getAttribute(ACTION));
 					switch (action) {
 					case allow:
-						return false;
-					case deny:
 						return true;
+					case deny:
+						return false;
 					default:
 						break;
 					} // end of switch (action)
@@ -229,9 +250,32 @@ public class JabberIqPrivacy extends XMPPProcessor
 			log.warning("Database problem, please notify the admin. " + e);
 		}
 
-		return false;
+		return true;
+	
 	}
 
+	/**
+	 * <code>preProcess</code> method checks only incoming stanzas
+	 * so it doesn't check for presence-out at all.
+	 *
+	 * @param packet a <code>Packet</code> value
+	 * @param session a <code>XMPPResourceConnection</code> value
+	 * @param repo a <code>NonAuthUserRepository</code> value
+	 * @param results 
+	 * @return a <code>boolean</code> value
+	 */
+	@Override
+	public boolean preProcess(Packet packet, XMPPResourceConnection session,
+		NonAuthUserRepository repo,	Queue<Packet> results) {
+
+		if (session == null || !session.isAuthorized() ||
+						packet.isXMLNS("/iq/query", XMLNS)) {
+			return false;
+		} // end of if (session == null)
+		return !allowed(packet, session);
+	}
+
+	@Override
   public void process(final Packet packet, final XMPPResourceConnection session,
 		final NonAuthUserRepository repo, final Queue<Packet> results,
 		final Map<String, Object> settings)
@@ -251,6 +295,7 @@ public class JabberIqPrivacy extends XMPPProcessor
 				processSetRequest(packet, session, results);
 				break;
 			case result:
+			case error:
 				// Ignore
 				break;
 			default:
@@ -278,7 +323,7 @@ public class JabberIqPrivacy extends XMPPProcessor
 		List<Element> children = packet.getElemChildren("/iq/query");
 		if (children != null && children.size() == 1) {
 			Element child = children.get(0);
-			if (child.getName().equals("list")) {
+			if (child.getName() == LIST_EL_NAME) {
 				// Broken privacy implementation sends list without name set
 				// instead of sending BAD_REQUEST error I can just assign
 				// 'default' name here.
@@ -289,11 +334,11 @@ public class JabberIqPrivacy extends XMPPProcessor
 				Privacy.addList(session, child);
 				results.offer(packet.okResult((String)null, 0));
 			} // end of if (child.getName().equals("list))
-			if (child.getName().equals("default")) {
+			if (child.getName() == DEFAULT_EL_NAME) {
 				Privacy.setDefaultList(session, child);
 				results.offer(packet.okResult((String)null, 0));
 			} // end of if (child.getName().equals("list))
-			if (child.getName().equals("active")) {
+			if (child.getName() == ACTIVE_EL_NAME) {
 				Privacy.setActiveList(session, child.getAttribute(NAME));
 				results.offer(packet.okResult((String)null, 0));
 			} // end of if (child.getName().equals("list))
