@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.logging.Logger;
 import tigase.xml.Element;
 
 /**
@@ -39,6 +40,8 @@ import tigase.xml.Element;
  */
 public class ServiceEntity {
 
+	private static Logger log = Logger.getLogger("tigase.disco.ServiceEntity");
+	
 	private String jid = null;
 	private String node = null;
 	private String name = null;
@@ -183,8 +186,11 @@ public class ServiceEntity {
 	 * @return an <code>Element</code> value
 	 */
 	public Element getDiscoInfo(String node) {
+		//System.out.println("Node: " + node);
+		log.finest("Node: " + node);
 		Element query = null;
 		if (node == null) {
+			log.finest("It's me: " + toString());
 			query = new Element("query",
 				new String[] {"xmlns"},
 				new String[] {"http://jabber.org/protocol/disco#info"});
@@ -203,11 +209,25 @@ public class ServiceEntity {
 		} else {
 			ServiceEntity entity = findNode(node);
 			if (entity != null) {
+				log.finest("Found child node: " + entity.toString());
 				query = entity.getDiscoInfo(null);
 				query.setAttribute("node", node);
 			}
 		}
 		return query;
+	}
+
+	public Element[] getDiscoFeatures(String node) {
+		ArrayList<Element> elFeatures = new ArrayList<Element>();
+		if (features != null) {
+			for (String feature : features) {
+				elFeatures.add(new Element("feature",
+								new String[]{"var"},
+								new String[]{feature}));
+			}
+		}
+		return elFeatures.size() > 0 ?
+			elFeatures.toArray(new Element[elFeatures.size()]) : null;
 	}
 
 	/**
@@ -251,11 +271,15 @@ public class ServiceEntity {
 	}
 
 	public List<Element> getDiscoItems(String node, String jid) {
+		//System.out.println("node: " + node + ", jid: " + jid);
+		log.finest("node: " + node + ", jid: " + jid);
 		List<Element> result = null;
 		if (node == null) {
 			result = getItems(null, jid);
 		} else {
 			ServiceEntity entity = findNode(node);
+			//System.out.println("Found disco entity: " + entity.toString());
+			log.finest("Found disco entity: " + entity.toString());
 			if (entity != null) {
 				result = entity.getItems(node, jid);
 			}
@@ -270,7 +294,11 @@ public class ServiceEntity {
 	 * @return a <code>ServiceEntity</code> value
 	 */
 	public ServiceEntity findNode(String node) {
+		//System.out.println("Looking for a node: " + node);
+		log.finest("Looking for a node: " + node);
 		if (this.node != null && this.node.equals(node)) {
+			//System.out.println("Looking for a node: " + node);
+			log.finest("Found myself: " + toString());
 			return this;
 		}
 		if (items == null) {
@@ -279,6 +307,7 @@ public class ServiceEntity {
 		for (ServiceEntity item: items) {
 			String n = item.getNode();
 			if (n != null && node.equals(n)) {
+				log.finest("Found child item: " + item.toString());
 				return item;
 			}
 		}
@@ -299,6 +328,7 @@ public class ServiceEntity {
 	 *
 	 * @return a <code>String</code> value
 	 */
+	@Override
 	public String toString() {
 		return getDiscoItem(null, null).toString();
 	}
