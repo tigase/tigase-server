@@ -87,6 +87,8 @@ public abstract class Presence {
 	 * <code>stopped</code> method is called when user disconnects or logs-out.
 	 *
 	 * @param session a <code>XMPPResourceConnection</code> value
+	 * @param results
+	 * @param settings
 	 */
 	@SuppressWarnings({"unchecked"})
 	public static void stopped(final XMPPResourceConnection session,
@@ -97,19 +99,22 @@ public abstract class Presence {
 			Element pres = (Element)session.getSessionData(PRESENCE_KEY);
 			// According to the spec and logic actually offline status should
 			// not be broadcasted if initial presence was not sent by the client.
-			if (pres != null && (pres.getAttribute("type") == null
-					|| !pres.getAttribute("type").equals("unavailable"))) {
-				try {
+			try {
+				if (pres != null && (pres.getAttribute("type") == null ||
+								!pres.getAttribute("type").equals("unavailable"))) {
 					sendPresenceBroadcast(StanzaType.unavailable, session,
-						FROM_SUBSCRIBED, results, null, settings);
+									FROM_SUBSCRIBED, results, null, settings);
 					updateOfflineChange(session, results);
-				} catch (NotAuthorizedException e) {
-					// Do nothing, it may happen quite often when the user disconnects before
-					// it authenticates
+				} else {
+					broadcastDirectPresences(StanzaType.unavailable, session, results,
+									null);
+				}
+			} catch (NotAuthorizedException e) {
+				// Do nothing, it may happen quite often when the user disconnects before
+				// it authenticates
 				} catch (TigaseDBException e) {
-					log.warning("Error accessing database for offline message: " + e);
-				} // end of try-catch
-			}
+				log.warning("Error accessing database for offline message: " + e);
+			} // end of try-catch
 			if (session.isAnonymous()) {
 				Set<String> direct_presences =
 			    (Set<String>)session.getSessionData(DIRECT_PRESENCE);
@@ -145,8 +150,7 @@ public abstract class Presence {
 	 * @param settings 
 	 * @exception NotAuthorizedException if an error occurs
 	 * @throws TigaseDBException
-	 */
-	@SuppressWarnings({"unchecked"})
+	 */	
 	protected static void sendPresenceBroadcast(final StanzaType t,
     final XMPPResourceConnection session,
 		final EnumSet<SubscriptionType> subscrs,
@@ -160,6 +164,13 @@ public abstract class Presence {
 				sendPresence(t, buddy, session.getJID(), results, pres);
 			} // end of for (String buddy: buddies)
     } // end of if (buddies == null)
+		broadcastDirectPresences(t, session, results, pres);
+	}
+
+	@SuppressWarnings({"unchecked"})
+	protected static void broadcastDirectPresences(StanzaType t,
+					XMPPResourceConnection session, Queue<Packet> results, Element pres)
+					throws NotAuthorizedException, TigaseDBException {
 		Set<String> direct_presences =
 			(Set<String>)session.getSessionData(DIRECT_PRESENCE);
 		if (direct_presences != null && t != null && t == StanzaType.unavailable) {
@@ -168,7 +179,7 @@ public abstract class Presence {
 				sendPresence(t, buddy, session.getJID(), results, pres);
 			} // end of for (String buddy: buddies)
 		} // end of if (direct_presence != null)
-  }
+	}
 
 	protected static void resendPendingInRequests(final XMPPResourceConnection session,
     final Queue<Packet> results)
