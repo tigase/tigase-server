@@ -61,7 +61,8 @@ public abstract class TigaseConfigConst {
 	{"nonSaslAuthPlugin", "saslAuthPlugin", "resBindPlugin",
 	 "sessionBindPlugin", "registerPlugin", "rosterPlugin", "privacyPlugin",
 	 "versionPlugin", "statsPlugin", "tlsPlugin", "msgOfflinePlugin",
-	 "vcardPlugin", "commandsPlugin", "privatePlugin", "pingPlugin"};
+	 "vcardPlugin", "commandsPlugin", "privatePlugin", "pingPlugin",
+	 "basicFilterPlugin", "domainFilterPlugin"};
 	public static LinkedHashMap<String, String> pluginsMap =
     new LinkedHashMap<String, String>();
 
@@ -125,6 +126,8 @@ public abstract class TigaseConfigConst {
 		pluginsMap.put("http://jabber.org/protocol/commands", "commandsPlugin");
 		pluginsMap.put("jabber:iq:private", "privatePlugin");
 		pluginsMap.put("urn:xmpp:ping", "pingPlugin");
+		pluginsMap.put("basic-filter", "basicFilterPlugin");
+		pluginsMap.put("domain-filter", "domainFilterPlugin");
 	}
 
 	public static final String PGSQL_DRIVER = "org.postgresql.Driver";

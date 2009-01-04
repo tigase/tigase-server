@@ -241,10 +241,14 @@ uvme:vcard-temp,http://jabber.org/protocol/commands,jabber:iq:private,urn:xmpp:p
 			<spec txt="Presence/Roster management" id="rosterPlugin.label"
 						true="roster-presence" false="off"	set="true"/>
 		</field>
-<!-- 		<field type="check" variable="presencePlugin"> -->
-<!-- 			<spec txt="Presence" id="presencePlugin.label" -->
-<!-- 						true="roster-presence" false="off"	set="true"/> -->
-<!-- 		</field> -->
+		<field type="check" variable="basicFilterPlugin">
+			<spec txt="Basic filter" id="basicFilterPlugin.label"
+ 						true="basic-filter" false="off"	set="true"/>
+		</field>
+		<field type="check" variable="domainFilterPlugin">
+			<spec txt="Domain filter" id="domainFilterPlugin.label"
+ 						true="domain-filter" false="off"	set="true"/>
+		</field>
 		<field type="check" variable="privacyPlugin">
 			<spec txt="Privacy lists" id="privacyPlugin.label"
 						true="jabber:iq:privacy" false="off"	set="true"/>
