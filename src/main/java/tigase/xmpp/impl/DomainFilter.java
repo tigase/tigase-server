@@ -54,6 +54,8 @@ public class DomainFilter extends XMPPProcessor
   private static Logger log =
 		Logger.getLogger("tigase.xmpp.impl.DomainFilter");
 
+	protected static final String ALLOWED_DOMAINS_LIST_KEY =
+					"allowed-domains-list";
 	protected static final String ALLOWED_DOMAINS_KEY = "allowed-domains";
 
 	private static final String ID = "domain-filter";
@@ -102,6 +104,40 @@ public class DomainFilter extends XMPPProcessor
 	@Override
 	public String id() { return ID; }
 
+	private DOMAINS getDomains(XMPPResourceConnection session) 
+					throws NotAuthorizedException, TigaseDBException {
+		DOMAINS domains =
+						(DOMAINS)session.getCommonSessionData(ALLOWED_DOMAINS_KEY);
+		if (domains == null) {
+			String dbDomains = session.getData(null, ALLOWED_DOMAINS_KEY, null);
+			domains = DOMAINS.valueof(dbDomains);
+			if (domains == null) {
+				if (session.isAnonymous()) {
+					domains = DOMAINS.LOCAL;
+				} else {
+					domains = DOMAINS.ALL;
+				}
+			}
+			session.putCommonSessionData(ALLOWED_DOMAINS_KEY, domains);
+		}
+		return domains;
+	}
+	
+	private String[] getDomainsList(XMPPResourceConnection session)
+					throws NotAuthorizedException, TigaseDBException {
+		String[] allowedDomains =
+						(String[]) session.getCommonSessionData(ALLOWED_DOMAINS_LIST_KEY);
+		if (allowedDomains == null) {
+			String dbDomains = session.getData(null, ALLOWED_DOMAINS_KEY, null);
+			allowedDomains = dbDomains.split(",");
+			for (int i = 0; i < allowedDomains.length; ++i) {
+				allowedDomains[i] = allowedDomains[i].intern();
+			}
+			session.putCommonSessionData(ALLOWED_DOMAINS_LIST_KEY, allowedDomains);
+		}
+		return allowedDomains;
+	}
+
 	@Override
 	public void filter(Packet packet, XMPPResourceConnection session,
 					NonAuthUserRepository repo, Queue<Packet> results) {
@@ -109,14 +145,10 @@ public class DomainFilter extends XMPPProcessor
 			return;
 		}
 		try {
-			String dbDomains = session.getData(null, ALLOWED_DOMAINS_KEY, null);
-			DOMAINS domains = DOMAINS.valueof(dbDomains);
-			if (domains == null) {
-				if (session.isAnonymous()) {
-					domains = DOMAINS.LOCAL;
-				} else {
-					domains = DOMAINS.ALL;
-				}
+			DOMAINS domains = getDomains(session);
+			// Fast return when user is authorized to send packets to any domain
+			if (domains == DOMAINS.ALL) {
+				return;
 			}
 			Queue<Packet> errors = new LinkedList<Packet>();
 			for (Iterator<Packet> it = results.iterator(); it.hasNext();) {
@@ -126,9 +158,6 @@ public class DomainFilter extends XMPPProcessor
 					outDomain = JIDUtils.getNodeHost(outDomain).intern();
 				}
 				switch (domains) {
-					case ALL:
-						// Do nothing, allow all packets.
-						break;
 					case LOCAL:
 						if (outDomain != null && !session.isLocalDomain(outDomain)) {
 							removePacket(it, res, errors,
@@ -142,15 +171,7 @@ public class DomainFilter extends XMPPProcessor
 						}
 						break;
 					case LIST:
-						String[] allowedDomains =
-										(String[])session.getCommonSessionData(ALLOWED_DOMAINS_KEY);
-						if (allowedDomains == null) {
-							allowedDomains = dbDomains.split(",");
-							for (int i = 0; i < allowedDomains.length; ++i) {
-								allowedDomains[i] = allowedDomains[i].intern();
-							}
-							session.putCommonSessionData(ALLOWED_DOMAINS_KEY, allowedDomains);
-						}
+						String[] allowedDomains = getDomainsList(session);
 						boolean found = false;
 						for (String domain : allowedDomains) {
 							if (domain == outDomain) {
@@ -193,18 +214,14 @@ public class DomainFilter extends XMPPProcessor
 	public boolean preProcess(Packet packet, XMPPResourceConnection session,
 					NonAuthUserRepository repo,	Queue<Packet> results) {
  		boolean stop = false;
-		if (session == null ) {
+		if (session == null) {
 			return stop;
 		}
 		try {
-			String dbDomains = session.getData(null, ALLOWED_DOMAINS_KEY, null);
-			DOMAINS domains = DOMAINS.valueof(dbDomains);
-			if (domains == null) {
-				if (session.isAnonymous()) {
-					domains = DOMAINS.LOCAL;
-				} else {
-					domains = DOMAINS.ALL;
-				}
+			DOMAINS domains = getDomains(session);
+			// Fast return when user is authorized to send packets to any domain
+			if (domains == DOMAINS.ALL) {
+				return stop;
 			}
 			String outDomain = packet.getElemFrom();
 			if (session.getConnectionId().equals(packet.getFrom())) {
@@ -214,9 +231,6 @@ public class DomainFilter extends XMPPProcessor
 				outDomain = JIDUtils.getNodeHost(outDomain).intern();
 			}
 			switch (domains) {
-				case ALL:
-					// Do nothing, allow all packets.
-					break;
 				case LOCAL:
 					if (outDomain != null && !session.isLocalDomain(outDomain)) {
 						removePacket(null, packet, results,
@@ -232,15 +246,7 @@ public class DomainFilter extends XMPPProcessor
 					}
 					break;
 				case LIST:
-					String[] allowedDomains =
-									(String[]) session.getCommonSessionData(ALLOWED_DOMAINS_KEY);
-					if (allowedDomains == null) {
-						allowedDomains = dbDomains.split(",");
-						for (int i = 0; i < allowedDomains.length; ++i) {
-							allowedDomains[i] = allowedDomains[i].intern();
-						}
-						session.putCommonSessionData(ALLOWED_DOMAINS_KEY, allowedDomains);
-					}
+					String[] allowedDomains = getDomainsList(session);
 					boolean found = false;
 					for (String domain : allowedDomains) {
 						if (domain == outDomain) {
