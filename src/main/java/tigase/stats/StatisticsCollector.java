@@ -156,7 +156,7 @@ public class StatisticsCollector
 				statsLevel = Level.parse(tmp_val);
 			}
 			if (stats != null && stats.size() > 0) {
-				Packet result = packet.commandResult("result");
+				Packet result = packet.commandResult(Command.DataType.result);
 				Command.setStatus(result, Command.Status.executing);
 				Command.addAction(result, Command.Action.next);
 				for (StatRecord rec: stats) {
@@ -204,11 +204,16 @@ public class StatisticsCollector
 				+ (items == null ? null : items.toString()));
 			return items;
 		} else {
-			Element item = serviceEntity.getDiscoItem(null,
-				JIDUtils.getNodeID(getName(),	jid));
-			log.finest("Processing discoItems, result: "
-				+ (item == null ? null : item.toString()));
-			return Arrays.asList(item);
+			if (node == null) {
+				Element item = serviceEntity.getDiscoItem(null,
+								JIDUtils.getNodeID(getName(), jid));
+				log.finest("Processing discoItems, result: "
+ +
+								(item == null ? null : item.toString()));
+				return Arrays.asList(item);
+			} else {
+				return null;
+			}
 		}
 	}
 

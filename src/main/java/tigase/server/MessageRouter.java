@@ -114,7 +114,7 @@ public class MessageRouter extends AbstractMessageReceiver {
 					String[] spl = packet.getStrCommand().split("/");
 					String cmd = spl[1];
 					if (cmd.equals("stop")) {
-						Packet result = packet.commandResult("result");
+						Packet result = packet.commandResult(Command.DataType.result);
 						results.offer(result);
 						//processPacket(result);
 						new Timer("Stopping...", true).schedule(new TimerTask() {
@@ -535,7 +535,7 @@ public class MessageRouter extends AbstractMessageReceiver {
       inProperties = false;
     } // end of try-finally
 		for (ServerComponent comp : components.values()) {
-			log.info("Initialization completed.");
+			log.info("Initialization completed notification to: " + comp.getName());
 			comp.initializationCompleted();
 		}
   }
@@ -567,7 +567,7 @@ public class MessageRouter extends AbstractMessageReceiver {
 			Element query = packet.getElement().getChild("query").clone();
 
 			if (packet.isXMLNS("/iq/query", INFO_XMLNS)) {
-				if (isLocalDomain(jid)) {
+				if (isLocalDomain(jid) && node == null) {
 					query = getDiscoInfo(node, jid);
 					for (XMPPService comp: xmppServices.values()) {
 						List<Element> features = comp.getDiscoFeatures();

@@ -280,10 +280,10 @@ public class Packet {
 // 	}
 
 	public Packet packRouted() {
-		Element routed = new Element("route", new String[] {"to", "from"},
+		Element routedp = new Element("route", new String[] {"to", "from"},
 			new String[] {getTo(), getFrom()});
-		routed.addChild(elem);
-		return new Packet(routed);
+		routedp.addChild(elem);
+		return new Packet(routedp);
 	}
 
 	public Packet swapFromTo(final Element el) {
@@ -293,9 +293,23 @@ public class Packet {
 		return packet;
 	}
 
-	public Packet commandResult(String cmd_type) {
-		Packet result = new Packet(command.createIqCommand(getTo(), getFrom(),
-				StanzaType.result, elem.getAttribute("id"), strCommand, cmd_type));
+	public Packet commandResult(Command.DataType cmd_type) {
+		Packet result = new Packet(command.createIqCommand(
+						getElemTo(),
+						getElemFrom(),
+						StanzaType.result, elem.getAttribute("id"), strCommand, cmd_type));
+		result.setFrom(getTo());
+		result.setTo(getFrom());
+		return result;
+	}
+
+	public static Packet commandResultForm(Packet packet) {
+		Packet result = packet.commandResult(Command.DataType.form);
+		return result;
+	}
+
+	public static Packet commandResultResult(Packet packet) {
+		Packet result = packet.commandResult(Command.DataType.result);
 		return result;
 	}
 

@@ -202,7 +202,7 @@ public class BoshSession {
 		sendBody(service, body);
 		//service.writeRawData(body.toString());
 		Packet streamOpen = Command.STREAM_OPENED.getPacket(null, null,
-			StanzaType.set, "sess1", "submit");
+			StanzaType.set, "sess1", Command.DataType.submit);
 		Command.addFieldValue(streamOpen, "session-id", sessionId);
 		Command.addFieldValue(streamOpen, "hostname", domain);
 		Command.addFieldValue(streamOpen, LANG_ATTR, lang);

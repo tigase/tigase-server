@@ -655,7 +655,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 // 			addOutPacket(result);
 // 			return;
 
-			Packet result = packet.commandResult("result");
+			Packet result = packet.commandResult(Command.DataType.result);
 			String str_command = packet.getStrCommand();
 			if (str_command != null) {
 				String[] arr_command = str_command.split("/");
@@ -723,8 +723,12 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		if (jid.startsWith(getName()+".")) {
 			return serviceEntity.getDiscoItems(node, null);
 		} else {
- 			return
-				Arrays.asList(serviceEntity.getDiscoItem(null, getName() + "." + jid));
+			if (node == null) {
+				return Arrays.asList(serviceEntity.getDiscoItem(null, getName() + "." +
+								jid));
+			} else {
+				return null;
+			}
 		}
 	}
 

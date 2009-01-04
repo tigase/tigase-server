@@ -357,7 +357,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 			serv.setDataReceiver(routings.computeRouting(hostname));
 			Packet streamOpen = Command.STREAM_OPENED.getPacket(
 				getFromAddress(getUniqueId(serv)),
-				serv.getDataReceiver(), StanzaType.set, "sess1", "submit");
+				serv.getDataReceiver(), StanzaType.set, "sess1", Command.DataType.submit);
 			Command.addFieldValue(streamOpen, "session-id", id);
 			Command.addFieldValue(streamOpen, "hostname", hostname);
 			Command.addFieldValue(streamOpen, "xml:lang", lang);

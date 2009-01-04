@@ -125,7 +125,8 @@ public abstract class ServiceDiscovery extends XMPPProcessor
 				|| (nodeNick == null && nodeId.endsWith(session.getDomain()))) {
 				Element query = packet.getElement().getChild("query");
 				Packet discoCommand = Command.GETDISCO.getPacket(session.getJID(),
-					session.getDomain(), StanzaType.get, packet.getElemId(), "submit");
+					session.getDomain(), StanzaType.get, packet.getElemId(), 
+					Command.DataType.submit);
 				Command.addFieldValue(discoCommand, "xmlns", query.getXMLNS());
 				Command.addFieldValue(discoCommand, "jid", packet.getElemTo());
 				if (query.getAttribute("node") != null) {

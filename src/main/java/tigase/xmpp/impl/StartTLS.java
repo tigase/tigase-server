@@ -21,7 +21,6 @@
  */
 package tigase.xmpp.impl;
 
-import java.util.Arrays;
 import java.util.Queue;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -104,7 +103,7 @@ public class StartTLS extends XMPPProcessor
 			session.putSessionData(TLS_STARTED_KEY, "true");
 			//results.offer(packet.swapFromTo(proceed));
 			Packet result = Command.STARTTLS.getPacket(packet.getTo(),
-				packet.getFrom(), StanzaType.set, "1", "submit");
+				packet.getFrom(), StanzaType.set, "1", Command.DataType.submit);
 			Command.setData(result, new Element("proceed",
 					new String[] {"xmlns"},
 					new String[] {"urn:ietf:params:xml:ns:xmpp-tls"}));

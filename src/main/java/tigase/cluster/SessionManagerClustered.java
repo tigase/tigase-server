@@ -275,7 +275,7 @@ public class SessionManagerClustered extends SessionManager
 
 								String xmpp_sessionId = clel.getMethodParam(XMPP_SESSION_ID);
 								Packet redirect = Command.REDIRECT.getPacket(node_found,
-									connectionId, StanzaType.set, "1", "submit");
+									connectionId, StanzaType.set, "1", Command.DataType.submit);
 								Command.addFieldValue(redirect, "session-id", xmpp_sessionId);
 								fastAddOutPacket(redirect);
 							} else {

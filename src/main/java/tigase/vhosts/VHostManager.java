@@ -177,7 +177,15 @@ public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
 			return;
 		}
 
-		Packet result = packet.commandResult("result");
+		log.info("Processing command: " + packet.toString());
+		Packet result = null;
+		if (packet.getCommand() == Command.VHOSTS_RELOAD ||
+						Command.getData(packet) != null) {
+			result = packet.commandResult(Command.DataType.result);
+		} else {
+			result = packet.commandResult(Command.DataType.form);
+		}
+		log.finest("Preparing result: " + result.toString());
 		switch (packet.getCommand()) {
 			case VHOSTS_RELOAD:
 				repo.reload();
@@ -185,31 +193,34 @@ public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
 				results.offer(result);
 				break;
 			case VHOSTS_UPDATE:
-					if (Command.getData(packet) == null) {
-						prepareVHostData(result);
-						results.offer(result);
-					} else {
-						updateVHostChanges(packet, result);
-						results.offer(result);
-					}
+				if (Command.getData(packet) == null) {
+					prepareVHostData(result);
+					log.finest("Sending result back: " + result.toString());
+					results.offer(result);
+				} else {
+					updateVHostChanges(packet, result);
+					results.offer(result);
+				}
 
 				break;
 			case VHOSTS_REMOVE:
-					if (Command.getData(packet) == null) {
-						prepareVHostRemove(result);
-						results.offer(result);
-					} else {
-						updateVHostRemove(packet, result);
-						results.offer(result);
-					}
+				if (Command.getData(packet) == null) {
+					prepareVHostRemove(result);
+					results.offer(result);
+				} else {
+					updateVHostRemove(packet, result);
+					results.offer(result);
+				}
 				break;
 			default:
 				break;
 		}
 	}
 
+	@Override
 	public List<Element> getDiscoFeatures() { return null; }
 
+	@Override
 	public Element getDiscoInfo(String node, String jid) {
 		if (jid != null && getName().equals(JIDUtils.getNodeNick(jid))) {
 			return serviceEntity.getDiscoInfo(node);
@@ -217,6 +228,7 @@ public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
 		return null;
 	}
 
+	@Override
 	public List<Element> getDiscoItems(String node, String jid) {
 		if (getName().equals(JIDUtils.getNodeNick(jid)) ||
 						getComponentId().equals(jid)) {
@@ -225,19 +237,26 @@ public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
 				+ (items == null ? null : items.toString()));
 			return items;
 		} else {
-			Element item = serviceEntity.getDiscoItem(null,
-				JIDUtils.getNodeID(getName(),	jid));
-			log.finest("Processing discoItems, result: "
-				+ (item == null ? null : item.toString()));
-			return Arrays.asList(item);
+			if (node == null) {
+				Element item = serviceEntity.getDiscoItem(null,
+								JIDUtils.getNodeID(getName(), jid));
+				log.finest("Processing discoItems, result: "
+ +
+								(item == null ? null : item.toString()));
+				return Arrays.asList(item);
+			} else {
+				return null;
+			}
 		}
 	}
 
+	@Override
 	public boolean isLocalDomain(String domain) {
 		++isLocalDomainCalls;
 		return repo.contains(domain);
 	}
 
+	@Override
 	public boolean isLocalDomainOrComponent(String domain) {
 		boolean result = isLocalDomain(domain);
 		if (!result) {
@@ -253,6 +272,7 @@ public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
 		return result;
 	}
 
+	@Override
 	public boolean isAnonymousEnabled(String domain) {
 		++isAnonymousEnabledCalls;
 		VHostItem vhost = repo.getVHost(domain);
@@ -263,6 +283,7 @@ public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
 		}
 	}
 
+	@Override
 	public ServerComponent[] getComponentsForNonLocalDomain(String domain) {
 		++getComponentsForNonLocalDomainCalls;
 		// Return components for non-local domains
@@ -274,6 +295,7 @@ public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
 		}
 	}
 	
+	@Override
 	public ServerComponent[] getComponentsForLocalDomain(String domain) {
 		++getComponentsForLocalDomainCalls;
 		VHostItem vhost = repo.getVHost(domain);
@@ -314,6 +336,7 @@ public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
 		}
 	}
 
+	@Override
 	public void setProperties(Map<String, Object> properties) {
 		String repo_class = (String)properties.get(VHOSTS_REPO_CLASS_PROP_KEY);
 		try {
@@ -328,6 +351,7 @@ public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
 		}
 	}
 
+	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> defs = new LinkedHashMap<String, Object>();
 		String repo_class = (String)params.get(VHOSTS_REPO_CLASS_PROPERTY);
@@ -347,6 +371,7 @@ public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
 		return defs;
 	}
 
+	@Override
 	public List<StatRecord> getStatistics() {
 		List<StatRecord> stats = new LinkedList<StatRecord>();
 		stats.add(new StatRecord(getName(), "Number of VHosts", "int",
@@ -363,14 +388,11 @@ public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
 	}
 
 	private void addCompletedVHostsField(Packet result) {
-		Command.setStatus(result, Command.Status.completed);
 		Command.addFieldValue(result, "Note",
 						"Current number of VHosts: " + repo.size(), "fixed");
 	}
 
 	private void prepareVHostData(Packet result) {
-		Command.setStatus(result, Command.Status.executing);
-		Command.addAction(result, Command.Action.complete);
 		Command.addFieldValue(result, "VHost", "");
 		Command.addFieldValue(result, "Enabled", "true", "Enabled",
 						new String[]{"true", "false"},
@@ -387,7 +409,6 @@ public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
 			repo.addVHost(vhost);
 			addCompletedVHostsField(result);
 		} else {
-			Command.setStatus(result, Command.Status.completed);
 			Command.addFieldValue(result, "Note",
 							"Incorrect VHost name given", "fixed");
 		}
@@ -399,15 +420,12 @@ public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
 			repo.removeVHost(vh);
 			addCompletedVHostsField(result);
 		} else {
-			Command.setStatus(result, Command.Status.completed);
 			Command.addFieldValue(result, "Note",
 							"Incorrect VHost name given", "fixed");
 		}
 	}
 
 	private void prepareVHostRemove(Packet result) {
-		Command.setStatus(result, Command.Status.executing);
-		Command.addAction(result, Command.Action.complete);
 		Command.addFieldValue(result, "VHost", "");
 	}
 

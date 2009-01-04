@@ -21,7 +21,6 @@
  */
 package tigase.xmpp.impl;
 
-import java.util.Arrays;
 import java.util.Queue;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -60,17 +59,22 @@ public class JabberIqCommand extends XMPPProcessor implements XMPPProcessorIfc {
   private static final Element[] DISCO_FEATURES =
 	{new Element("feature",	new String[] {"var"},	new String[] {XMLNS})};
 
+	@Override
 	public String id() { return ID; }
 
+	@Override
 	public String[] supElements()
 	{ return ELEMENTS; }
 
+	@Override
   public String[] supNamespaces()
 	{ return XMLNSS; }
 
+	@Override
   public Element[] supDiscoFeatures(final XMPPResourceConnection session)
 	{ return DISCO_FEATURES; }
 
+	@Override
 	public void process(final Packet packet, final XMPPResourceConnection session,
 		final NonAuthUserRepository repo, final Queue<Packet> results,
 		final Map<String, Object> settings)

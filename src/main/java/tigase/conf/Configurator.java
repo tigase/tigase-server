@@ -335,7 +335,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 		defaults.put(LOGGING_KEY + "tigase.useParentHandlers", "true");
 		if (params.get(GEN_DEBUG) != null) {
 			defaults.put(LOGGING_KEY + ".level", "INFO");
-			defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.level", "INFO");
+			defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.level", "ALL");
 			defaults.put(LOGGING_KEY + "java.util.logging.ConsoleHandler.level", "WARNING");
 			String[] packs = ((String)params.get(GEN_DEBUG)).split(",");
 			for (String pack: packs) {
@@ -733,7 +733,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 					+ " you can not change anything.";
 				if (packet.getStrCommand() != null
 					&& packet.getStrCommand().endsWith(DEF_SM_NAME)) {
-					Packet result = packet.commandResult("result");
+					Packet result = packet.commandResult(Command.DataType.result);
 					Command.addFieldValue(result, "Note",	msg, "fixed");
 					Command.addFieldValue(result, "Note",
 						"Restricted area, only admin can see these settings.", "fixed");
@@ -765,7 +765,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 			if (packet.getStrCommand() != null) {
 				if (packet.getStrCommand().startsWith("config/list/")) {
 					String[] spl = packet.getStrCommand().split("/");
-					Packet result = packet.commandResult("result");
+					Packet result = packet.commandResult(Command.DataType.result);
 					Command.addFieldValue(result, "Note",	msg, "fixed");
 					Map<String, Object> allprop = getAllProperties(spl[2]);
 					for (Map.Entry<String, Object> entry: allprop.entrySet()) {
@@ -776,7 +776,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 				}
 				if (packet.getStrCommand().startsWith("config/set/")) {
 					String[] spl = packet.getStrCommand().split("/");
-					Packet result = packet.commandResult("result");
+					Packet result = packet.commandResult(Command.DataType.result);
 					Command.addFieldValue(result, "Note",	msg, "fixed");
 					if (Command.getData(packet) == null) {
 						prepareConfigData(result, spl[2]);
@@ -1105,8 +1105,12 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 		if (getName().equals(JIDUtils.getNodeNick(jid))) {
 			return serviceEntity.getDiscoItems(node, jid);
 		} else {
-			return Arrays.asList(serviceEntity.getDiscoItem(null,
-					JIDUtils.getNodeID(getName(), jid)));
+			if (node == null) {
+				return Arrays.asList(serviceEntity.getDiscoItem(null,
+								JIDUtils.getNodeID(getName(), jid)));
+			} else {
+				return null;
+			}
 		}
 	}
 
