@@ -32,6 +32,7 @@ import java.util.logging.Logger;
 import java.util.logging.MemoryHandler;
 import tigase.conf.Configurator;
 import tigase.util.LogFormatter;
+import tigase.xml.XMLUtils;
 
 /**
  * Created: Dec 12, 2008 8:31:38 PM
@@ -178,6 +179,7 @@ public class LogMonitor extends AbstractMonitor {
 		return sb.toString();
 	}
 
+	@Override
 	public String getState() {
 		StringBuilder sb = new StringBuilder("Logging levels:\n");
 		sb.append(getCurrentLevels());
@@ -205,8 +207,9 @@ public class LogMonitor extends AbstractMonitor {
 				sb.insert(0, logEntry);
 			}
 			logs.clear();
-			return sb.length() <= maxLogBuffer ? sb.toString()
+			String result = sb.length() <= maxLogBuffer ? sb.toString()
 							: sb.substring(sb.length() - maxLogBuffer);
+			return XMLUtils.escape(result);
 		}
 
 		@Override
