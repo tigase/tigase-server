@@ -20,20 +20,59 @@
  * $Date: $
  */
 
+/*
+Description: Command to change user inter-domain communication permission.
+CommandId: user-domain-perm
+*/
+
 package tigase.admin
 
-import tigase.server.Command
-import tigase.server.Packet
+import tigase.server.*
+import tigase.util.*
+import tigase.xmpp.impl.DomainFilter
+import tigase.db.UserRepository
+import tigase.db.UserNotFoundException
 
-Packet p = (Packet)packet
-num1 = Command.getFieldValue(p, "num1")
-num2 = Command.getFieldValue(p, "num2")
+def JID = "jid"
+def DOMAIN = "domain"
+def DOMAIN_LIST = "domainList"
 
-if (num1 == null || num2 == null) {
-	Packet res = p.commandResult(Command.DataType.form);
-	Command.addFieldValue(res, "num1", "")
-	Command.addFieldValue(res, "num2", "")
+def p = (Packet)packet
+def jid = Command.getFieldValue(p, JID)
+def domain = Command.getFieldValue(p, DOMAIN)
+def domainList = Command.getFieldValue(p, DOMAIN_LIST)
+
+if (jid == null || domain == null || 
+	(domain == DomainFilter.DOMAINS.LIST.name() && domainList == null)) {
+	def res = (Packet)p.commandResult(Command.DataType.form);
+	Command.addFieldValue(res, JID, jid ?: "", "jid-single", "User JID")
+	domainStr = []
+  DomainFilter.DOMAINS.values().each { domainStr += it.name() }
+	Command.addFieldValue(res, DOMAIN, domain ?: domainStr[0], "List of domains",
+		(String[])domainStr, (String[])domainStr)
+	Command.addFieldValue(res, DOMAIN_LIST, domainList ?: "", "text-single", "Domains List")
 	return res
 }
 
-return num1 + num2
+jid = JIDUtils.getNodeID(jid)
+
+def repo = (UserRepository)userRepository
+
+try {
+	def old_value = repo.getData(jid, null,
+		DomainFilter.ALLOWED_DOMAINS_LIST_KEY, null)
+
+	def new_value = domain
+	if (domain == DomainFilter.DOMAINS.LIST.name()) {
+		new_value = domainList
+	}
+	repo.setData(jid, null, DomainFilter.ALLOWED_DOMAINS_LIST_KEY, new_value)
+
+	return "Changed an old value: $old_value to a new value: $new_value for user: $jid"
+} catch (e) {
+  if (e in UserNotFoundException)	{
+		return "The user $jid was not found in the user repository"
+	} else {
+		return "Unexpected error: " + e
+	}
+}
