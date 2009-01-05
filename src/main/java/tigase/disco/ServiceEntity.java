@@ -279,7 +279,8 @@ public class ServiceEntity {
 		} else {
 			ServiceEntity entity = findNode(node);
 			//System.out.println("Found disco entity: " + entity.toString());
-			log.finest("Found disco entity: " + entity.toString());
+			log.finest("Found disco entity: " + 
+							(entity != null ? entity.toString() : null));
 			if (entity != null) {
 				result = entity.getItems(node, jid);
 			}
