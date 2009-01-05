@@ -27,6 +27,7 @@ import java.util.LinkedHashSet;
 import java.util.Queue;
 import java.util.Set;
 import tigase.server.Packet;
+import tigase.xml.XMLUtils;
 import tigase.xmpp.StanzaType;
 
 /**
@@ -42,6 +43,7 @@ public abstract class AbstractMonitor implements ResourceMonitorIfc {
 	private SystemMonitorTask smTask = null;
 	protected double treshold = 0.9;
 
+	@Override
 	public void init(String jid, double treshold, SystemMonitorTask smTask) {
 		this.jid = jid;
 		this.treshold = treshold;
@@ -57,9 +59,9 @@ public abstract class AbstractMonitor implements ResourceMonitorIfc {
 					Object warning) {
 		if (!warningsSent.contains(warning)) {
 			Packet result = Packet.getMessage("", jid, StanzaType.normal,
-							"Warning! High resource usage alert from: " +
+							XMLUtils.escape("Warning! High resource usage alert from: " +
 							getClass().getSimpleName() + "\n" +
-							new Date() + " - " + text,
+							new Date() + " - " + text),
 							"System Monitor Alert", null);
 			results.add(result);
 			warningsSent.add(warning);
@@ -70,9 +72,9 @@ public abstract class AbstractMonitor implements ResourceMonitorIfc {
 					Object warning) {
 		if (warningsSent.contains(warning)) {
 			Packet result = Packet.getMessage("", jid, StanzaType.normal,
-							"Calm down! Resource usage notification from: " +
+							XMLUtils.escape("Calm down! Resource usage notification from: " +
 							getClass().getSimpleName() + "\n" +
-							new Date() + " - " + text,
+							new Date() + " - " + text),
 							"System Monitor Alert", null);
 			results.add(result);
 			warningsSent.remove(warning);
@@ -82,9 +84,9 @@ public abstract class AbstractMonitor implements ResourceMonitorIfc {
 	public void sendWarningOut(String text, Object warning) {
 		if (warning == null || !warningsSent.contains(warning)) {
 			Packet result = Packet.getMessage("", jid, StanzaType.normal,
-							"Warning! High resource usage alert from: " +
+							XMLUtils.escape("Warning! High resource usage alert from: " +
 							getClass().getSimpleName() + "\n" +
-							new Date() + " - " + text,
+							new Date() + " - " + text),
 							"System Monitor Alert", null);
 			smTask.sendPacketOut(result);
 			if (warning != null) {
@@ -99,26 +101,33 @@ public abstract class AbstractMonitor implements ResourceMonitorIfc {
 		return idx;
 	}
 
+	@Override
 	public void check10Secs(Queue<Packet> results) {
 	}
 	
+	@Override
 	public void check1Day(Queue<Packet> results) {
 	}
 
+	@Override
 	public void check1Hour(Queue<Packet> results) {
 	}
 
+	@Override
 	public void check1Min(Queue<Packet> results) {
 	}
 
+	@Override
 	public String commandsHelp() {
 		return "";
 	}
 
+	@Override
 	public String runCommand(String[] command) {
 		return null;
 	}
 
+	@Override
 	public boolean isMonitorCommand(String command) {
 		return false;
 	}

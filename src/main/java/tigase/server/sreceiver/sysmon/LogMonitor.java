@@ -32,7 +32,6 @@ import java.util.logging.Logger;
 import java.util.logging.MemoryHandler;
 import tigase.conf.Configurator;
 import tigase.util.LogFormatter;
-import tigase.xml.XMLUtils;
 
 /**
  * Created: Dec 12, 2008 8:31:38 PM
@@ -196,7 +195,9 @@ public class LogMonitor extends AbstractMonitor {
 
 		@Override
 		public synchronized void publish(LogRecord record) {
-			logs.add(formatter.format(record).replace('<', '[').replace('>', ']'));
+			String logEntry =
+							formatter.format(record).replace('<', '[').replace('>', ']');
+			logs.add(logEntry);
 		}
 
 		public synchronized String logsToString() {
@@ -209,7 +210,7 @@ public class LogMonitor extends AbstractMonitor {
 			logs.clear();
 			String result = sb.length() <= maxLogBuffer ? sb.toString()
 							: sb.substring(sb.length() - maxLogBuffer);
-			return XMLUtils.escape(result);
+			return result;
 		}
 
 		@Override
