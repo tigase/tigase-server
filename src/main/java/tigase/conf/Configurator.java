@@ -309,6 +309,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 	 * @param params
 	 * @return
 	 */
+	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> defaults = new TreeMap<String, Object>();
 		defaults.put(LOGGING_KEY + "java.util.logging.ConsoleHandler.level", "WARNING");
@@ -350,6 +351,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
    * Sets all configuration properties for object.
 	 * @param properties
 	 */
+	@Override
 	public void setProperties(final Map<String, Object> properties) {
 		setupLogManager(properties);
 		demoMode = (Boolean)properties.get("demo-mode");
