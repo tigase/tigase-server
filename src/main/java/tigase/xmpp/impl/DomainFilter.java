@@ -54,7 +54,7 @@ public class DomainFilter extends XMPPProcessor
   private static Logger log =
 		Logger.getLogger("tigase.xmpp.impl.DomainFilter");
 
-	protected static final String ALLOWED_DOMAINS_LIST_KEY =
+	public static final String ALLOWED_DOMAINS_LIST_KEY =
 					"allowed-domains-list";
 	protected static final String ALLOWED_DOMAINS_KEY = "allowed-domains";
 
@@ -62,7 +62,7 @@ public class DomainFilter extends XMPPProcessor
 	private static final String[] ELEMENTS = {ALL};
   private static final String[] XMLNSS = {ALL};
 
-	private enum DOMAINS {
+	public enum DOMAINS {
 		ALL, LOCAL, OWN, LIST;
 
 		public static DOMAINS valueof(String domains) {
