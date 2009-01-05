@@ -432,7 +432,10 @@ public class RepositoryUtils {
 		} else {
 			List<String> users = src.getUsers();
 			if (users != null) {
+				System.out.println("Found " + users.size() +
+								" in the source repository.");
 				for (String usr: users) {
+					System.out.println("Found " + usr + " in the source repository.");
 					copyUser(usr, src, dst);
 				} // end of for (String user: users)
 			} else {
