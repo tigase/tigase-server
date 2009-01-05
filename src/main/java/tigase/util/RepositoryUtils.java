@@ -79,6 +79,9 @@ public class RepositoryUtils {
 	public static void copyUser(String user, UserRepository src,
 		UserAuthRepository dst)
 		throws Exception {
+		if (user == null || user.isEmpty()) {
+			return;
+		}
 		System.out.print("Copying user: " + user + "...");
 		String password = src.getData(user, "password");
 		try {
