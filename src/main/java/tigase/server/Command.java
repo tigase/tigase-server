@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.LinkedList;
 import java.util.logging.Logger;
 import tigase.xml.Element;
+import tigase.xml.XMLUtils;
 import tigase.xmpp.StanzaType;
 
 /**
@@ -307,7 +308,7 @@ public enum Command {
 				new String[] {"info"});
 			command.addChild(notes);
 		}
-		notes.setCData(note);
+		notes.setCData(XMLUtils.escape(note));
 	}
 
 	/**
@@ -331,9 +332,9 @@ public enum Command {
 			x = addDataForm(command, DataType.submit);
 		}
 		Element field = new Element("field",
-			new Element[] {new Element("value", f_value)},
+			new Element[] {new Element("value", XMLUtils.escape(f_value))},
 			new String[] {"var"},
-			new String[] {f_name});
+			new String[] {XMLUtils.escape(f_name)});
 		x.addChild(field);
 	}
 
@@ -361,9 +362,9 @@ public enum Command {
 		if (f_value != null && f_value.size() > 0) {
 			Element field = new Element("field",
 				new String[] {"var", "type"},
-				new String[] {f_name, "text-multi"});
+				new String[] {XMLUtils.escape(f_name), "text-multi"});
 			for (String val: f_value) {
-				Element value = new Element("value", val);
+				Element value = new Element("value", XMLUtils.escape(val));
 				field.addChild(value);
 			}
 			x.addChild(field);
@@ -403,14 +404,14 @@ public enum Command {
 			x = addDataForm(command, DataType.submit);
 		}
 		Element field = new Element("field",
-			new Element[] {new Element("value", f_value)},
+			new Element[] {new Element("value", XMLUtils.escape(f_value))},
 			new String[] {"var", "type", "label"},
-			new String[] {f_name, "list-single", label});
+			new String[] {XMLUtils.escape(f_name), "list-single", XMLUtils.escape(label)});
 		for (int i = 0; i < labels.length; i++) {
 			field.addChild(new Element("option",
-					new Element[] {new Element("value", options[i])},
+					new Element[] {new Element("value", XMLUtils.escape(options[i]))},
 					new String[] {"label"},
-					new String[] {labels[i]}));
+					new String[] {XMLUtils.escape(labels[i])}));
 		}
 		x.addChild(field);
 	}
@@ -449,15 +450,15 @@ public enum Command {
 		}
 		Element field = new Element("field",
 			new String[] {"var", "type", "label"},
-			new String[] {f_name, "list-multi", label});
+			new String[] {XMLUtils.escape(f_name), "list-multi", XMLUtils.escape(label)});
 		for (int i = 0; i < labels.length; i++) {
 			field.addChild(new Element("option",
-					new Element[] {new Element("value", options[i])},
+					new Element[] {new Element("value", XMLUtils.escape(options[i]))},
 					new String[] {"label"},
-					new String[] {labels[i]}));
+					new String[] {XMLUtils.escape(labels[i])}));
 		}
 		for (int i = 0; i < f_values.length; i++) {
-			field.addChild(new Element("value", f_values[i]));
+			field.addChild(new Element("value", XMLUtils.escape(f_values[i])));
 		}
 
 		x.addChild(field);
@@ -473,14 +474,14 @@ public enum Command {
 			x = addDataForm(command, DataType.submit);
 		}
 		Element field = new Element("field",
-			new Element[] {new Element("value", f_value)},
+			new Element[] {new Element("value", XMLUtils.escape(f_value))},
 			new String[] {"var", "type", "label"},
-			new String[] {f_name, type, label});
+			new String[] {XMLUtils.escape(f_name), type, XMLUtils.escape(label)});
 		for (int i = 0; i < labels.length; i++) {
 			field.addChild(new Element("option",
-					new Element[] {new Element("value", options[i])},
+					new Element[] {new Element("value", XMLUtils.escape(options[i]))},
 					new String[] {"label"},
-					new String[] {labels[i]}));
+					new String[] {XMLUtils.escape(labels[i])}));
 		}
 		x.addChild(field);
 	}
@@ -499,9 +500,9 @@ public enum Command {
 			x = addDataForm(command, DataType.submit);
 		}
 		Element field = new Element("field",
-			new Element[] {new Element("value", f_value)},
+			new Element[] {new Element("value", XMLUtils.escape(f_value))},
 			new String[] {"var", "type"},
-			new String[] {f_name, type});
+			new String[] {XMLUtils.escape(f_name), type});
 		x.addChild(field);
 	}
 
@@ -515,9 +516,9 @@ public enum Command {
 			x = addDataForm(command, DataType.submit);
 		}
 		Element field = new Element("field",
-			new Element[] {new Element("value", f_value)},
+			new Element[] {new Element("value", XMLUtils.escape(f_value))},
 			new String[] {"var", "type", "label"},
-			new String[] {f_name, type, label});
+			new String[] {XMLUtils.escape(f_name), type, XMLUtils.escape(label)});
 		x.addChild(field);
 	}
 
@@ -542,10 +543,13 @@ public enum Command {
 		if (x != null) {
 			List<Element> children = x.getChildren();
 			if (children != null) {
-				for (Element child: children) {
-					if (child.getName().equals("field")
-						&& child.getAttribute("var").equals(f_name)) {
-						return child.getChildCData("/field/value");
+				for (Element child : children) {
+					if (child.getName().equals("field") &&
+									child.getAttribute("var").equals(f_name)) {
+						String value = child.getChildCData("/field/value");
+						if (value != null) {
+							return XMLUtils.unescape(value);
+						}
 					}
 				}
 			}
@@ -562,13 +566,16 @@ public enum Command {
 			List<Element> children = x.getChildren();
 			if (children != null) {
 				for (Element child: children) {
-					if (child.getName().equals("field")
-						&& child.getAttribute("var").equals(f_name)) {
+					if (child.getName().equals("field") &&
+									child.getAttribute("var").equals(f_name)) {
 						List<String> values = new LinkedList<String>();
 						List<Element> val_children = child.getChildren();
 						for (Element val_child: val_children) {
 							if (val_child.getName().equals("value")) {
-								values.add(val_child.getCData());
+								String value = val_child.getCData();
+								if (value != null) {
+									values.add(XMLUtils.unescape(value));
+								}
 							}
 						}
 						return values.toArray(new String[0]);
@@ -588,8 +595,8 @@ public enum Command {
 			List<Element> children = x.getChildren();
 			if (children != null) {
 				for (Element child: children) {
-					if (child.getName().equals("field")
-						&& child.getAttribute("var").equals(f_name)) {
+					if (child.getName().equals("field") &&
+									child.getAttribute("var").equals(f_name)) {
 						return x.removeChild(child);
 					}
 				}
@@ -613,11 +620,13 @@ public enum Command {
 		List<Element> children = x.getChildren();
 		for (Element child: children) {
 			log.info("Command form child: " + child.toString());
-			if (child.getName().equals("field")
-				&& child.getAttribute("var").equals(f_name)) {
-				log.info("Command found: field=" + f_name
-					+ ", value=" + child.getChildCData("/field/value"));
-				return child.getChildCData("value");
+			if (child.getName().equals("field") &&
+							child.getAttribute("var").equals(f_name)) {
+				String value = child.getChildCData("/field/value");
+				log.info("Command found: field=" + f_name + ", value=" + value);
+				if (value != null) {
+					return XMLUtils.unescape(value);
+				}
 			} else {
 				log.info("Command not found: field=" + f_name
 					+ ", value=" + child.getChildCData("/field/value"));
