@@ -729,41 +729,44 @@ public class SessionManager extends AbstractMessageReceiver
 		case OTHER:
 			String strCommand = pc.getStrCommand();
 			if (strCommand != null && strCommand.contains(ADMIN_COMMAND_NODE)) {
-				boolean admin = false;
-				try {
-					admin = isAdmin(connection.getUserId());
-					if (admin) {
-						log.info("Processing admin command: " + pc.toString());
-						int hashIdx = strCommand.indexOf('#');
-						String scriptId = strCommand.substring(hashIdx + 1);
-						AdminCommandIfc com = adminCommands.get(scriptId);
-						if (com == null) {
-							Packet result = pc.commandResult(null);
-							Command.addTextField(result, "Error", "The command: " + scriptId +
-											" is not available yet.");
-							fastAddOutPacket(result);
-						} else {
-							Bindings binds = scriptEngineManager.getBindings();
-							initBindings(binds);
-							Queue<Packet> results = new LinkedList<Packet>();
-							com.runCommand(pc, binds, results);
-							addOutPackets(results);
-						}
-					}
-				} catch (NotAuthorizedException e) {
-					admin = false;
-				} catch (Exception e) {
-					log.log(Level.WARNING,
-									"Unknown admin command processing exception: " +
-									pc.toString(), e);
-				}
-				if (!admin) {
+				Command.Action action = Command.getAction(pc);
+				if (action != Command.Action.cancel) {
+					boolean admin = false;
 					try {
-						addOutPacket(Authorization.FORBIDDEN.getResponseMessage(pc,
-								"Only Administrator can call the command.", true));
+						admin = isAdmin(connection.getUserId());
+						if (admin) {
+							log.info("Processing admin command: " + pc.toString());
+							int hashIdx = strCommand.indexOf('#');
+							String scriptId = strCommand.substring(hashIdx + 1);
+							AdminCommandIfc com = adminCommands.get(scriptId);
+							if (com == null) {
+								Packet result = pc.commandResult(null);
+								Command.addTextField(result, "Error", "The command: " + scriptId +
+												" is not available yet.");
+								fastAddOutPacket(result);
+							} else {
+								Bindings binds = scriptEngineManager.getBindings();
+								initBindings(binds);
+								Queue<Packet> results = new LinkedList<Packet>();
+								com.runCommand(pc, binds, results);
+								addOutPackets(results);
+							}
+						}
+					} catch (NotAuthorizedException e) {
+						admin = false;
 					} catch (Exception e) {
-						log.info("Problem sending FORBIDDEN error: " + e +
-										", packet: " + pc.toString());
+						log.log(Level.WARNING,
+										"Unknown admin command processing exception: " +
+										pc.toString(), e);
+					}
+					if (!admin) {
+						try {
+							addOutPacket(Authorization.FORBIDDEN.getResponseMessage(pc,
+											"Only Administrator can call the command.", true));
+						} catch (Exception e) {
+							log.info("Problem sending FORBIDDEN error: " + e +
+											", packet: " + pc.toString());
+						}
 					}
 				}
 				processing_result = true;
@@ -1111,7 +1114,8 @@ public class SessionManager extends AbstractMessageReceiver
 					} // end of if (discoFeatures != null)
 				}
 			}
-			log.finest("Found disco info: " + query.toString());
+			log.finest("Found disco info: " + 
+							(query != null ? query.toString() : null));
 			return query;
 		}
 		log.finest("Not found disco info for node: " + node + ", jid: " + jid);
@@ -1209,6 +1213,8 @@ public class SessionManager extends AbstractMessageReceiver
 					++cntRuns;
 					cntAverageTime =
 									(cntAverageTime + (System.currentTimeMillis()-start))/2;
+				} catch (PacketErrorTypeException e) {
+					log.info("Already error packet, ignoring: " + item.packet.toString());
 				} catch (Exception e) {
 					log.log(Level.SEVERE, "Exception during packet processing: "
 						+ item.packet.toString(), e);
