@@ -91,6 +91,7 @@ public class XMPPDomBuilderHandler implements SimpleHandler {
     return all_roots;
   }
 
+	@Override
   public void error(String errorMessage) {
     log.warning("XML content parse error.");
 		log.warning(errorMessage);
@@ -106,6 +107,7 @@ public class XMPPDomBuilderHandler implements SimpleHandler {
     return customFactory.elementInstance(name, cdata, attnames, attvals);
   }
 
+	@Override
   public void startElement(StringBuilder name,
     StringBuilder[] attr_names, StringBuilder[] attr_values) {
 		if (log.isLoggable(Level.FINEST)) {
@@ -146,14 +148,22 @@ public class XMPPDomBuilderHandler implements SimpleHandler {
 
 		String new_xmlns = null;
 		String prefix = null;
-		for (String pref: namespaces.keySet()) {
-			if (tmp_name.startsWith(pref)) {
-				new_xmlns = namespaces.get(pref);
-				tmp_name = tmp_name.substring(pref.length()+1, tmp_name.length());
-				prefix = pref;
-				log.finest("new_xmlns = " + new_xmlns);
-			} // end of if (tmp_name.startsWith(xmlns))
-		} // end of for (String xmlns: namespaces.keys())
+		String tmp_name_prefix = null;
+		int idx = tmp_name.indexOf(':');
+		if (idx > 0) {
+			tmp_name_prefix = tmp_name.substring(0, idx);
+			log.finest("Found prefixed element name, prefix: " + tmp_name_prefix);
+		}
+		if (tmp_name_prefix != null) {
+			for (String pref : namespaces.keySet()) {
+				if (tmp_name_prefix.equals(pref)) {
+					new_xmlns = namespaces.get(pref);
+					tmp_name = tmp_name.substring(pref.length() + 1, tmp_name.length());
+					prefix = pref;
+					log.finest("new_xmlns = " + new_xmlns);
+				} // end of if (tmp_name.startsWith(xmlns))
+			} // end of for (String xmlns: namespaces.keys())
+		}
     Element elem = newElement(tmp_name, null, attr_names, attr_values);
     String ns = elem.getXMLNS();
     if (ns == null) {
@@ -172,6 +182,7 @@ public class XMPPDomBuilderHandler implements SimpleHandler {
     el_stack.push(elem);
   }
 
+	@Override
   public void elementCData(StringBuilder cdata) {
     log.finest("Element CDATA: "+cdata);
 		try {
@@ -182,6 +193,7 @@ public class XMPPDomBuilderHandler implements SimpleHandler {
 		}
   }
 
+	@Override
   public void endElement(StringBuilder name) {
     log.finest("End element name: "+name);
 
@@ -206,16 +218,19 @@ public class XMPPDomBuilderHandler implements SimpleHandler {
     } // end of if (el_stack.isEmpty()) else
   }
 
+	@Override
   public void otherXML(StringBuilder other) {
     log.finest("Other XML content: "+other);
 
     // Just ignore
   }
 
+	@Override
   public void saveParserState(Object state) {
     parserState = state;
   }
 
+	@Override
   public Object restoreParserState() {
     return parserState;
   }
