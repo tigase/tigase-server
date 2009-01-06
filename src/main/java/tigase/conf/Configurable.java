@@ -201,16 +201,20 @@ public interface Configurable extends ServerComponent {
 	 *
 	 * @return a <code>String</code> value of object name.
 	 */
+	@Override
 	String getName();
 
   /**
    * Sets all configuration properties for the object.
-   */
+	 * @param properties
+	 */
 	void setProperties(Map<String, Object> properties);
 
   /**
    * Returns defualt configuration settings for this object.
-   */
+	 * @param params
+	 * @return
+	 */
 	Map<String, Object> getDefaults(Map<String, Object> params);
 
 }
