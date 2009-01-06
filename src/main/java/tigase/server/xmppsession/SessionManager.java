@@ -351,7 +351,7 @@ public class SessionManager extends AbstractMessageReceiver
 					error =	Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet,
 						"Service not available.", true);
 				} catch (PacketErrorTypeException e) {
-					log.warning("Packet processing exception: " + e
+					log.info("Packet processing exception: " + e
 						+ ", packet: " + packet.toString());
 				}
 			} else {
@@ -360,7 +360,7 @@ public class SessionManager extends AbstractMessageReceiver
 						error = Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
 							"Feature not supported yet.", true);
 					} catch (PacketErrorTypeException e) {
-						log.warning("Packet processing exception: " + e
+						log.info("Packet processing exception: " + e
 							+ ", packet: " + packet.toString());
 					}
 				}
