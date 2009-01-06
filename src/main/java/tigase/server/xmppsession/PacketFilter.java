@@ -24,6 +24,7 @@ package tigase.server.xmppsession;
 import java.util.Queue;
 import java.util.logging.Logger;
 import java.util.logging.Level;
+import tigase.conf.Configurable;
 import tigase.db.NonAuthUserRepository;
 import tigase.server.Packet;
 import tigase.xml.Element;
@@ -203,13 +204,19 @@ public class PacketFilter {
 			id = JIDUtils.getNodeID(packet.getElemTo());
 			if (id.equals(session.getUserId())) {
 				// Yes this is message to 'this' client
-				log.finest("Yes, this is packet to 'this' client: " + id);
-				Element elem = packet.getElement().clone();
-				Packet result = new Packet(elem);
-				result.setTo(session.getConnectionId(packet.getElemTo()));
-				log.finest("Setting to: " + result.getTo());
-				result.setFrom(packet.getTo());
-				results.offer(result);
+				if (session.getConnectionId(packet.getElemTo()) ==
+								Configurable.NULL_ROUTING) {
+					results.offer(Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(
+									packet, "Features not implemented yet.", true));
+				} else {
+					log.finest("Yes, this is packet to 'this' client: " + id);
+					Element elem = packet.getElement().clone();
+					Packet result = new Packet(elem);
+					result.setTo(session.getConnectionId(packet.getElemTo()));
+					log.finest("Setting to: " + result.getTo());
+					result.setFrom(packet.getTo());
+					results.offer(result);
+				}
 				return true;
 			} // end of else
 
@@ -219,6 +226,8 @@ public class PacketFilter {
 				results.offer(new Packet(result));
 				return true;
 			}
+		} catch (PacketErrorTypeException e) {
+			log.info("Error packet, ignoring... " + packet.toString());
 		} catch (NotAuthorizedException e) {
 			try {
 				results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
