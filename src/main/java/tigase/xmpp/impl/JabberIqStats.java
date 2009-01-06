@@ -21,11 +21,10 @@
  */
 package tigase.xmpp.impl;
 
-import java.util.Arrays;
 import java.util.Queue;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import tigase.conf.Configurable;
 import tigase.server.Packet;
 import tigase.server.Command;
 import tigase.xml.Element;
@@ -112,11 +111,16 @@ public class JabberIqStats extends XMPPProcessor
 
 			// If ID part of user account contains only host name
 			// and this is local domain it is message to admin
-			if (id == null || id.equals("")
-				|| id.equalsIgnoreCase(session.getDomain())) {
+			if (id == null || id.isEmpty() ||
+							session.getConnectionId() == Configurable.NULL_ROUTING ||
+							id.equalsIgnoreCase(session.getDomain())) {
+				String oldto = packet.getAttribute("oldto");
 				Packet result =
 					Command.GETSTATS.getPacket(packet.getElemFrom(),
 					session.getDomain(), StanzaType.get, packet.getElemId());
+				if (oldto != null) {
+					result.getElement().setAttribute("oldto", oldto);
+				}
 				results.offer(result);
 				log.finest("Sending result: " + result.getStringData());
 				return;
