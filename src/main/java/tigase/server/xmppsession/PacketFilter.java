@@ -204,8 +204,7 @@ public class PacketFilter {
 			id = JIDUtils.getNodeID(packet.getElemTo());
 			if (id.equals(session.getUserId())) {
 				// Yes this is message to 'this' client
-				if (session.getConnectionId(packet.getElemTo()) ==
-								Configurable.NULL_ROUTING) {
+				if (session.getConnectionId() == Configurable.NULL_ROUTING) {
 					results.offer(Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(
 									packet, "Features not implemented yet.", true));
 				} else {
