@@ -740,7 +740,7 @@ public class SessionManager extends AbstractMessageReceiver
 							String scriptId = strCommand.substring(hashIdx + 1);
 							AdminCommandIfc com = adminCommands.get(scriptId);
 							if (com == null) {
-								Packet result = pc.commandResult(null);
+								Packet result = pc.commandResult(Command.DataType.result);
 								Command.addTextField(result, "Error", "The command: " + scriptId +
 												" is not available yet.");
 								fastAddOutPacket(result);
@@ -768,6 +768,11 @@ public class SessionManager extends AbstractMessageReceiver
 											", packet: " + pc.toString());
 						}
 					}
+				} else {
+					Packet result = pc.commandResult(Command.DataType.result);
+					Command.addTextField(result, "Note", "Command canceled.");
+					fastAddOutPacket(result);
+
 				}
 				processing_result = true;
 			} else {
