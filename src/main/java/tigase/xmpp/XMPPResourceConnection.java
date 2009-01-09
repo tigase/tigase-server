@@ -354,7 +354,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 		// waits in the queue.....
 		// This has already happened....
 		if (parentSession != null) {
-			parentSession.resourceSet(this);
+			parentSession.addResourceConnection(this);
 		}
 		userJid = getUserId() + (resource != null ? ("/" + resource) : "/" + sessionId);
 	}
@@ -392,6 +392,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 			: parentSession.getResourceConnection(jid).getConnectionId());
 	}
 
+	@Override
 	public final void logout()
 		throws NotAuthorizedException {
 		loginHandler.handleLogout(getUserName(), this);
