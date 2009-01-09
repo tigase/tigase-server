@@ -32,6 +32,7 @@ import tigase.util.DNSResolver;
  *
  * Created: Tue Nov 22 22:57:44 2005
  *
+ * @param <E> 
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
@@ -51,6 +52,7 @@ public abstract class AbstractComponentRegistrator<E extends ServerComponent>
 	public abstract boolean isCorrectType(ServerComponent component);
 
 	@SuppressWarnings("unchecked")
+	@Override
 	public boolean addComponent(ServerComponent component) {
 		if (isCorrectType(component)) {
 			components.put(component.getName(), (E)component);
@@ -69,26 +71,32 @@ public abstract class AbstractComponentRegistrator<E extends ServerComponent>
 
   /**
    *
-   * @return tigase.server.ServerComponent
+	 * @param component
+	 * @return tigase.server.ServerComponent
    */
   @SuppressWarnings("unchecked")
+	@Override
 	public boolean deleteComponent(ServerComponent component) {
 		components.remove(component.getName());
 		componentRemoved((E)component);
 		return true;
 	}
 
+	@Override
 	public void release() {}
 
+	@Override
 	public void setName(String name) {
 		this.name = name;
 		this.componentId = JIDUtils.getNodeID(name, DNSResolver.getDefaultHostname());
 	}
 
+	@Override
 	public String getName() {
 		return name;
 	}
 
+	@Override
 	public String getComponentId() {
 		return componentId;
 	}
