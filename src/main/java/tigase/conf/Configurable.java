@@ -109,6 +109,7 @@ public interface Configurable extends ServerComponent {
 	public static final String GEN_SREC_DB = "--gen-srec-db";
 	public static final String GEN_SREC_DB_URI = "--gen-srec-db-uri";
 	public static final String GEN_SREC_ADMINS = "--gen-srec-admins";
+	public static final String MONITORING = "--monitoring";
 
 	public static final String XML_REPO_CLASS_PROP_VAL =
 		"tigase.db.xml.XMLRepository";

@@ -44,7 +44,8 @@ public interface ComponentRegistrator extends ServerComponent {
 
   /**
    *
-   * @return a <code>boolean</code> value indicating whehether component has
+	 * @param component 
+	 * @return a <code>boolean</code> value indicating whehether component has
    * been successfuly removed or not.
    */
 	boolean deleteComponent(ServerComponent component);

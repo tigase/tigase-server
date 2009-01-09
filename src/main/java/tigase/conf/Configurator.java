@@ -93,6 +93,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 	 */
 	private String routerCompName = null;
 
+	@Override
 	public void setName(String name) {
 		super.setName(name);
 		serviceEntity = new ServiceEntity(name, "config", "Server configuration");
@@ -246,12 +247,42 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 				log.warning("Ignoring default property, component part is missing: " + key);
 			}
 		}
+		// Not sure if this is the correct pleace to initialize monitoring
+		// maybe it should be initialized init initializationCompleted but
+		// Then some stuff might be missing. Let's try to do it here for now
+		// and maybe change it later.
+		initMonitoring((String) defConfigParams.get(MONITORING));
 	}
 
+	public enum MONITOR { jmx, http, snmp; }
+
+	private void initMonitoring(String monitoring) {
+		if (monitoring == null) {
+			return;
+		}
+		String[] monitors = monitoring.split(",");
+		for (String string : monitors) {
+			try {
+				MONITOR monitor = MONITOR.valueOf(string);
+				switch (monitor) {
+					case jmx:
+						break;
+					case http:
+						break;
+					case snmp:
+						break;
+				}
+			} catch (Exception e) {
+			}
+		}
+	}
+
+	@Override
 	public boolean isCorrectType(ServerComponent component) {
 		return component instanceof Configurable;
 	}
 
+	@Override
 	public void componentAdded(Configurable component) {
 		log.finer(" component: " + component.getName());
 		ServiceEntity item = config_list.findNode(component.getName());
@@ -273,6 +304,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 		} // end of if (component.getClass().getName().equals())
 	}
 
+	@Override
 	public void componentRemoved(Configurable component) {}
 
 	public void setup(String name) {
@@ -662,6 +694,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 	 * Describe <code>main</code> method here.
 	 *
 	 * @param args a <code>String[]</code> value
+	 * @throws Exception
 	 */
 	public static void main(final String[] args) throws Exception {
 
@@ -711,6 +744,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 		} // end of if (print)
 	}
 
+	@Override
 	public void processPacket(final Packet packet, final Queue<Packet> results) {
 
 		if (!packet.isCommand()) {
@@ -1094,6 +1128,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 		return result;
 	}
 
+	@Override
 	public Element getDiscoInfo(String node, String jid) {
 		if (jid != null && getName().equals(JIDUtils.getNodeNick(jid))) {
 			return serviceEntity.getDiscoInfo(node);
@@ -1101,8 +1136,10 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 		return null;
 	}
 
+	@Override
 	public 	List<Element> getDiscoFeatures() { return null; }
 
+	@Override
 	public List<Element> getDiscoItems(String node, String jid) {
 		if (getName().equals(JIDUtils.getNodeNick(jid))) {
 			return serviceEntity.getDiscoItems(node, jid);
