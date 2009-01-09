@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import tigase.util.JIDUtils;
@@ -50,7 +51,7 @@ public class XMPPSession {
    */
   private String username = null;
 
-	private ArrayList<XMPPResourceConnection> activeResources = null;
+	private CopyOnWriteArrayList<XMPPResourceConnection> activeResources = null;
 	private long creationTime = 0;
 	private Map<String, Object> sessionData = null;
 
@@ -62,7 +63,7 @@ public class XMPPSession {
 	 */
 	public XMPPSession(final String username) {
 		sessionData = new LinkedHashMap<String, Object>();
-		activeResources = new ArrayList<XMPPResourceConnection>();
+		activeResources = new CopyOnWriteArrayList<XMPPResourceConnection>();
 		this.username = username;
 		this.creationTime = System.currentTimeMillis();
 	}
@@ -88,26 +89,31 @@ public class XMPPSession {
 		return activeResources.size();
 	}
 
+//	public void resourceSet(XMPPResourceConnection conn) {
+//		//activeResources.remove(conn);
+//		String cur_res = conn.getResource();
+//		XMPPResourceConnection old_conn = getResourceForResource(cur_res);
+//		if (old_conn != conn) {
+//			if (old_conn != null) {
+//				log.finest("Found old resource connection for username : " + username +
+//								", id: " + old_conn.getConnectionId());
+//				try {
+//					old_conn.logout();
+//				} catch (Exception e) {
+//					log.log(Level.INFO,
+//									"Exception during closing old connection, ignoring.", e);
+//				}
+//				removeResourceConnection(old_conn);
+//			} // end of if (old_res != null)
+//			activeResources.add(conn);
+//		}
+//	}
+
 	/**
 	 * This method is called each time the resource is set for connection.
 	 *
 	 * @param conn
 	 */
-	public void resourceSet(XMPPResourceConnection conn) {
-		activeResources.remove(conn);
-		String cur_res = conn.getResource();
-		XMPPResourceConnection old_conn = getResourceForResource(cur_res);
-		activeResources.add(conn);
-		if (old_conn != null) {
-			log.finest("Found old resource connection for username : " + username
-				+ ", id: "+old_conn.getConnectionId());
-			try { old_conn.logout(); } catch (Exception e) {
-				log.log(Level.INFO, "Exception during closing old connection, ignoring.", e);
-			}
-			removeResourceConnection(old_conn);
-		} // end of if (old_res != null)
-	}
-
 	public void addResourceConnection(XMPPResourceConnection conn) {
 		log.finest("Adding resource connection for username : " + username
 			+ ", id: " + conn.getConnectionId());
