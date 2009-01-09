@@ -22,12 +22,15 @@
 
 package tigase.stats;
 
+import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.management.ObjectName;
 import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
 import tigase.disco.XMPPService;
@@ -74,8 +77,21 @@ public class StatisticsCollector
 				"Statistics retrieving commands"));
 		serviceEntity.addFeatures(DEF_FEATURES);
 		serviceEntity.addFeatures(CMD_FEATURES);
+		try {
+			StatisticsProvider sp = new StatisticsProvider(this);
+			ObjectName on = new ObjectName("tigase.stats:type=StatisticsProvider");
+			ManagementFactory.getPlatformMBeanServer().registerMBean(sp, on);
+		} catch (Exception ex) {
+			log.log(Level.SEVERE, "Can not install Statistics MXBean: ", ex);
+		}
 	}
 
+	@Override
+	public String getName() {
+		return super.getName();
+	}
+
+	@Override
 	public void componentAdded(StatisticsContainer component) {
 		ServiceEntity item = serviceEntity.findNode(component.getName());
 		if (item == null) {
@@ -88,20 +104,42 @@ public class StatisticsCollector
 		}
 	}
 
+	@Override
 	public boolean isCorrectType(ServerComponent component) {
 		return component instanceof StatisticsContainer;
 	}
 
+	@Override
 	public void componentRemoved(StatisticsContainer component) {}
 
-	private List<StatRecord> getAllStats() {
+	public List<StatRecord> getAllStats() {
+		return getAllStats(Level.ALL.intValue());
+	}
+
+	public List<StatRecord> getAllStats(int level) {
 		List<StatRecord> result = new ArrayList<StatRecord>();
 		for (StatisticsContainer comp: components.values()) {
-			result.addAll(comp.getStatistics());
+			result.addAll(getComponentStats(comp.getName(), level));
 		}
 		return result;
 	}
 
+	public List<StatRecord> getComponentStats(String name, int level) {
+		List<StatRecord> result = components.get(name).getStatistics();
+		for (Iterator<StatRecord> it = result.iterator(); it.hasNext();) {
+			StatRecord statRecord = it.next();
+			if (statRecord.getLevel().intValue() < level) {
+				it.remove();
+			}
+		}
+		return result;
+	}
+
+	public List<String> getComponentsNames() {
+		return new ArrayList<String>(components.keySet());
+	}
+
+	@Override
 	public void processPacket(final Packet packet, final Queue<Packet> results) {
 
 		if (!packet.isCommand()
@@ -144,32 +182,30 @@ public class StatisticsCollector
 				return;
 			}
 			log.finest("Command received: " + packet.getStringData());
-			List<StatRecord> stats = null;
-			if (packet.getStrCommand().equals("stats")) {
-				stats = getAllStats();
-			} else {
-				String[] spl = packet.getStrCommand().split("/");
-				stats = getComponent(spl[1]).getStatistics();
-			}
 			String tmp_val = Command.getFieldValue(packet, "Stats level");
 			if (tmp_val != null) {
 				statsLevel = Level.parse(tmp_val);
 			}
+			List<StatRecord> stats = null;
+			if (packet.getStrCommand().equals("stats")) {
+				stats = getAllStats(statsLevel.intValue());
+			} else {
+				String[] spl = packet.getStrCommand().split("/");
+				stats = getComponentStats(spl[1], statsLevel.intValue());
+			}
 			if (stats != null && stats.size() > 0) {
 				Packet result = packet.commandResult(Command.DataType.result);
-				Command.setStatus(result, Command.Status.executing);
-				Command.addAction(result, Command.Action.next);
 				for (StatRecord rec: stats) {
-					if (rec.getLevel().intValue() >= statsLevel.intValue()) {
-						if (rec.getType() == StatisticType.LIST) {
-							Command.addFieldMultiValue(result,
-								XMLUtils.escape(rec.getComponent() + "/" + rec.getDescription()),
-								rec.getListValue());
-						} else {
-							Command.addFieldValue(result,
-								XMLUtils.escape(rec.getComponent() + "/" + rec.getDescription()),
-								XMLUtils.escape(rec.getValue()));
-						}
+					if (rec.getType() == StatisticType.LIST) {
+						Command.addFieldMultiValue(result,
+										XMLUtils.escape(rec.getComponent() + "/" + rec.
+										getDescription()),
+										rec.getListValue());
+					} else {
+						Command.addFieldValue(result,
+										XMLUtils.escape(rec.getComponent() + "/" + rec.
+										getDescription()),
+										XMLUtils.escape(rec.getValue()));
 					}
 				}
 				Command.addFieldValue(result, "Stats level", statsLevel.getName(),
@@ -187,6 +223,7 @@ public class StatisticsCollector
 		} // end of switch (packet.getCommand())
 	}
 
+	@Override
 	public Element getDiscoInfo(String node, String jid) {
 		if (jid != null && getName().equals(JIDUtils.getNodeNick(jid))) {
 			return serviceEntity.getDiscoInfo(node);
@@ -194,8 +231,10 @@ public class StatisticsCollector
 		return null;
 	}
 
+	@Override
 	public 	List<Element> getDiscoFeatures() { return null; }
 
+	@Override
 	public List<Element> getDiscoItems(String node, String jid) {
 		if (getName().equals(JIDUtils.getNodeNick(jid)) ||
 						getComponentId().equals(jid)) {
@@ -207,8 +246,7 @@ public class StatisticsCollector
 			if (node == null) {
 				Element item = serviceEntity.getDiscoItem(null,
 								JIDUtils.getNodeID(getName(), jid));
-				log.finest("Processing discoItems, result: "
- +
+				log.finest("Processing discoItems, result: " +
 								(item == null ? null : item.toString()));
 				return Arrays.asList(item);
 			} else {

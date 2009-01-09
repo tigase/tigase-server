@@ -49,8 +49,10 @@ public class StatRecord {
 	/**
 	 * Creates a new <code>StatRecord</code> instance.
 	 *
+	 * @param comp
 	 * @param type a <code>StatisticType</code> value
 	 * @param value a <code>long</code> value
+	 * @param level
 	 */
 	public StatRecord(String comp, StatisticType type, long value, Level level) {
 		this.type = type;
