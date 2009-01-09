@@ -1,0 +1,5 @@
+/etc/tigase
+/usr/share/tigase/libs
+/usr/share/tigase/jars
+/var/log/tigase
+/var/lib/tigase/embedded-db

@@ -94,6 +94,11 @@
   <distsrc packagename="${projectname}-${jarfile}" cvsroot="${svnroot}"
    cvspackage="${cvspackage}"/>
  </target>
+	
+ <target name="dist-deb" depends="prepare,prepare-dist"
+  description="Create Debian package">
+  <distdeb version="${ver}" build="${build-no}" cvsroot="${svnroot}" />
+ </target>
 
  <target name="pmd">
   <taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask"/>

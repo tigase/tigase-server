@@ -1,0 +1,28 @@
+#!/usr/bin/make -f
+
+#export DH_VERBOSE=1
+
+include /usr/share/cdbs/1/rules/simple-patchsys.mk
+include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/class/ant.mk
+
+DEST := $(CURDIR)/debian/tigase
+TARGET := $(CURDIR)
+TIGJARS := $(CURDIR)/jars
+TIGASE := $(DEST)/usr/share/tigase
+ETCDIR := $(DEST)/etc/tigase
+LOGDIR := $(DEST)/var/log/tigase
+VARDIR := $(DEST)/var/lib/tigase
+
+JAVA_HOME := /usr/lib/jvm/java-6-openjdk
+ANT_HOME := /usr/share/ant
+DEB_ANT_BUILDFILE := build.xml
+DEB_ANT_CLEAN_TARGET := clean
+DEB_JARS := ant-nodeps
+	
+install/tigase::
+	cp $(TIGJARS)/*.jar $(TIGASE)/jars
+	cp $(TARGET)/libs/*.jar $(TIGASE)/libs
+	cp -r $(TARGET)/certs $(TIGASE)/certs
+	cp $(TARGET)/etc/init-debian.properties $(ETCDIR)/init.properties
+

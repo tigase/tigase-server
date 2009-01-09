@@ -1,0 +1,20 @@
+Source: tigase
+Section: net
+Priority: optional
+Maintainer: Sergey Nazarov <phearnot@renee.ru>
+Build-Depends: debhelper (>= 5), cdbs, patchutils, sun-java6-jdk, ant
+Standards-Version: 3.7.2
+
+Package: tigase
+Section: net
+Priority: optional
+Pre-Depends: sun-java6-jre
+Architecture: all
+Description: A high performance XMPP (Jabber) server.
+ Tigase is an instant messaging server that implements the XMPP
+ (Jabber) protocol. It features high performance, a robust
+ administration console, and a full plugin system. The server
+ is 100% Java.
+ .
+ See http://www.tigase.org/
+Homepage: http://www.tigase.org/

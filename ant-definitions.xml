@@ -219,5 +219,73 @@
       <delete dir="@{packagename}-${version}.src"/>
     </sequential>
   </macrodef>
+  
+  <macrodef name="distdeb">
+  	<attribute name="version"/>
+    <attribute name="build" />
+  	<attribute name="cvsroot"/>
+  	<sequential>  
+  	  <property name="deb.work" value="debian/build"/>
+  	  <property name="deb.src" value="${deb.work}/tigase-@{version}"/>
+  	  <property name="deb.conf" value="${deb.src}/debian"/>
+  	  <property name="deb.conf.src" value="scripts/debian"/>
+  	  <property name="deb.version" value="@{version}-b@{build}"/>
+  	  
+  	  <tstamp>
+  	    <format property="deb.builddate" pattern="EEE, dd MMM yyyy HH:mm:ss Z" locale="en"/>
+  	  </tstamp>
 
+      <delete dir="${deb.work}"/>
+  	  <delete dir="${dist}">
+  	    <include name="*.deb" />
+  	    <include name="*.changes" />
+  	    <include name="*.dsc" />
+  	    <include name="*.gz" />
+  	  </delete>
+  	  <exec executable="svn">
+        <arg line="export --non-interactive @{cvsroot} ${deb.src}"/>
+  	  </exec>
+  	  <mkdir dir="${deb.src}/libs"/>
+  	  <copy todir="${deb.src}/libs">
+  	    <fileset dir="${libs}"/>
+  	  </copy>
+  	  <!-- FIXME: Remove after adding etc/init-debian.properties to SVN -->
+  	  <copy todir="${deb.src}/etc">
+  	    <fileset dir="etc">
+  	  	  <include name="init-debian.properties" />      
+  	  	</fileset>  
+  	  </copy>
+  	  <!-- END FIXME -->
+  	  <mkdir dir="${deb.conf}" />
+  	  <copy todir="${deb.conf}">
+  	    <fileset dir="${deb.conf.src}" />
+  	    <filterset>
+  	      <filter token="builddate" value="${deb.builddate}"/>
+  	      <filter token="version" value="${deb.version}"/>
+  	    </filterset>
+  	  </copy>
+  	  <!-- Make the copied 'rules' executable -->
+  	  <chmod file="${deb.conf}/rules" perm="755" />
+  	  <chmod file="${deb.src}/etc/init.properties" perm="700" />
+      <!-- Create the package -->
+  	  <exec executable="dpkg-buildpackage" dir="${deb.src}" failonerror="true">
+  	    <!-- Allow building without root-privs -->
+  	    <arg line="-rfakeroot"/>
+  	    <!-- Don't sign source -->
+  	    <arg line="-us"/>
+  	    <!-- Don't sign changelog -->
+  	    <arg line="-uc"/>
+  	  </exec>
+      <!-- Copy the resulting files into target -->
+  	  <copy todir="${dist}">
+  	    <fileset dir="${deb.work}" followsymlinks="false">
+  		  <include name="*.deb" />
+  		  <include name="*.changes" />
+  		  <include name="*.dsc" />
+  		  <include name="*.gz" />
+        </fileset>
+  	  </copy>
+  	  <delete dir="debian"/>
+  	</sequential>
+  </macrodef>
 </project>
