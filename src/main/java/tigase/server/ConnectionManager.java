@@ -573,14 +573,17 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 			this.port_props = port_props;
 		}
 
+		@Override
 		public int getPort() {
 			return (Integer)port_props.get(PORT_KEY);
 		}
 
+		@Override
 		public String[] getIfcs() {
 			return (String[])port_props.get(PORT_IFC_PROP_KEY);
 		}
 
+		@Override
 		public ConnectionType getConnectionType() {
 			String type = null;
 			if (port_props.get(PORT_TYPE_PROP_KEY) == null) {
@@ -596,6 +599,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 			return SocketType.valueOf(port_props.get(PORT_SOCKET_PROP_KEY).toString());
 		}
 
+		@Override
 		public void accept(SocketChannel sc) {
 
 			IO serv = getXMPPIOServiceInstance();
