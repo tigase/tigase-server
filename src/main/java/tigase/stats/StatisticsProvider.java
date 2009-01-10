@@ -213,7 +213,7 @@ public class StatisticsProvider extends StandardMBean
 		return theRef.getName();
 	}
 
-	private Map getMapFromList(List<StatRecord> stats) {
+	private Map<String, String> getMapFromList(List<StatRecord> stats) {
 		Map<String, String> result = new LinkedHashMap<String, String>();
 		for (StatRecord rec : stats) {
 			String key = rec.getComponent() + "/" + rec.getDescription();
@@ -232,7 +232,7 @@ public class StatisticsProvider extends StandardMBean
 	 * @return java.util.Map<String, String>
 	 */
 	@Override
-	public Map getAllStats(int param0) {
+	public Map<String, String> getAllStats(int param0) {
 		return getMapFromList(theRef.getAllStats(param0));
 	}
 
@@ -243,7 +243,7 @@ public class StatisticsProvider extends StandardMBean
 	 * @return java.util.Map<String, String>
 	 */
 	@Override
-	public Map getComponentStats(String param0, int param1) {
+	public Map<String, String> getComponentStats(String param0, int param1) {
 		return getMapFromList(theRef.getComponentStats(param0, param1));
 	}
 }
