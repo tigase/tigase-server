@@ -59,7 +59,7 @@ public interface StatisticsProviderMBean
 	 * @param param0 Statistics level, 0 - All, 500 - Medium, 800 - Minimal
 	 * @return java.util.Map<String, String>
 	 */
-	public Map getAllStats(int param0);
+	public Map<String, String> getAllStats(int param0);
 
 	/**
 	 * Operation exposed for management
@@ -67,7 +67,7 @@ public interface StatisticsProviderMBean
 	 * @param param1 Statistics level, 0 - All, 500 - Medium, 800 - Minimal
 	 * @return java.util.Map<String, String>
 	 */
-	public Map getComponentStats(String param0, int param1);
+	public Map<String, String> getComponentStats(String param0, int param1);
 	
 }
 
