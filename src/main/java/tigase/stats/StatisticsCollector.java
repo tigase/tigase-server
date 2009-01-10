@@ -31,6 +31,7 @@ import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.management.ObjectName;
+import tigase.conf.Configurator;
 import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
 import tigase.disco.XMPPService;
@@ -79,8 +80,10 @@ public class StatisticsCollector
 		serviceEntity.addFeatures(CMD_FEATURES);
 		try {
 			StatisticsProvider sp = new StatisticsProvider(this);
-			ObjectName on = new ObjectName("tigase.stats:type=StatisticsProvider");
+			String objName = "tigase.stats:type=StatisticsProvider";
+			ObjectName on = new ObjectName(objName);
 			ManagementFactory.getPlatformMBeanServer().registerMBean(sp, on);
+			Configurator.putMXBean(objName, sp);
 		} catch (Exception ex) {
 			log.log(Level.SEVERE, "Can not install Statistics MXBean: ", ex);
 		}
