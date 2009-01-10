@@ -22,6 +22,7 @@
 
 package tigase.conf;
 
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileReader;
@@ -76,6 +77,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 		Logger.getLogger("tigase.conf.Configurator");
 
 	public static String logManagerConfiguration = null;
+	private static MonitoringSetupIfc monitoring = null;
 
 	private ConfigRepository repository = null;
 	//	private Timer delayedTask = new Timer("ConfiguratorTask", true);
@@ -251,29 +253,41 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 		// maybe it should be initialized init initializationCompleted but
 		// Then some stuff might be missing. Let's try to do it here for now
 		// and maybe change it later.
-		initMonitoring((String) defConfigParams.get(MONITORING));
+		initMonitoring((String) defConfigParams.get(MONITORING),
+						new File(fileName).getParent());
 	}
 
-	public enum MONITOR { jmx, http, snmp; }
-
-	private void initMonitoring(String monitoring) {
-		if (monitoring == null) {
-			return;
+	public static void putMXBean(String objName, Object bean) {
+		if (monitoring != null) {
+			monitoring.putMXBean(objName, bean);
 		}
-		String[] monitors = monitoring.split(",");
-		for (String string : monitors) {
+	}
+	
+	public static Object getMXBean(String objName) {
+		if (monitoring != null) {
+			return monitoring.getMXBean(objName);
+		} else {
+			return null;
+		}
+	}
+
+	private void initMonitoring(String settings, String configDir) {
+		if (monitoring == null && settings != null) {
 			try {
-				MONITOR monitor = MONITOR.valueOf(string);
-				switch (monitor) {
-					case jmx:
-						break;
-					case http:
-						break;
-					case snmp:
-						break;
-				}
+				monitoring =
+								(MonitoringSetupIfc) Class.forName("tigase.management.MonitoringSetup").newInstance();
+				monitoring.initMonitoring(settings, configDir);
 			} catch (Exception e) {
+				log.log(Level.WARNING, "Can not initialize monitoring: ", e);
 			}
+		}
+	}
+
+	@Override
+	public void initializationCompleted() {
+		super.initializationCompleted();
+		if (monitoring != null) {
+			monitoring.initializationCompleted();
 		}
 	}
 
