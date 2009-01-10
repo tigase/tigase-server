@@ -538,6 +538,8 @@ public class MessageRouter extends AbstractMessageReceiver {
 			log.info("Initialization completed notification to: " + comp.getName());
 			comp.initializationCompleted();
 		}
+//		log.info("Initialization completed notification to: " + config.getName());
+//		config.initializationCompleted();
   }
 
 	private void stopUpdatesChecker() {
