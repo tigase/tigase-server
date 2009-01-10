@@ -92,7 +92,7 @@ public class SessionManager extends AbstractMessageReceiver
    * Variable <code>log</code> is a class logger.
    */
   private static final Logger log =
-    Logger.getLogger("tigase.server.xmppsession.SessionManager");
+					Logger.getLogger(SessionManager.class.getName());
 
 	protected static final String SESSION_PACKETS = "session-packets";
 	protected static final String ADMIN_COMMAND_NODE =
