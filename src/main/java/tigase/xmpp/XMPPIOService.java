@@ -211,6 +211,7 @@ public class XMPPIOService extends IOService {
    *
    * @exception IOException if an error occurs
    */
+	@Override
   protected void processSocketData() throws IOException {
     // We change state of this object in this method
     // It can be called by many threads simultanously
@@ -266,6 +267,7 @@ public class XMPPIOService extends IOService {
     }
   }
 
+	@Override
 	protected int receivedPackets() {
 		return receivedPackets.size();
 	}
