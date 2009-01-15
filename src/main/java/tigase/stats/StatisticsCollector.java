@@ -197,7 +197,7 @@ public class StatisticsCollector
 				stats = getComponentStats(spl[1], statsLevel.intValue());
 			}
 			if (stats != null && stats.size() > 0) {
-				Packet result = packet.commandResult(Command.DataType.result);
+				Packet result = packet.commandResult(Command.DataType.form);
 				for (StatRecord rec: stats) {
 					if (rec.getType() == StatisticType.LIST) {
 						Command.addFieldMultiValue(result,
