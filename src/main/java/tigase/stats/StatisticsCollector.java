@@ -121,10 +121,8 @@ public class StatisticsCollector
 
 	public List<StatRecord> getAllStats(int level) {
 		List<StatRecord> result = new ArrayList<StatRecord>();
-		if (result != null) {
-			for (StatisticsContainer comp : components.values()) {
-				result.addAll(getComponentStats(comp.getName(), level));
-			}
+		for (StatisticsContainer comp : components.values()) {
+			result.addAll(getComponentStats(comp.getName(), level));
 		}
 		return result;
 	}

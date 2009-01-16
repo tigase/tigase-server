@@ -21,6 +21,7 @@
  */
 
 package tigase.stats;
+
 import java.util.List;
 import javax.management.*;
 import java.util.Arrays;
@@ -214,16 +215,20 @@ public class StatisticsProvider extends StandardMBean
 	}
 
 	private Map<String, String> getMapFromList(List<StatRecord> stats) {
-		Map<String, String> result = new LinkedHashMap<String, String>();
-		for (StatRecord rec : stats) {
-			String key = rec.getComponent() + "/" + rec.getDescription();
-			String value = rec.getValue();
-			if (rec.getType() == StatisticType.LIST) {
+		if (stats != null) {
+			Map<String, String> result = new LinkedHashMap<String, String>();
+			for (StatRecord rec : stats) {
+				String key = rec.getComponent() + "/" + rec.getDescription();
+				String value = rec.getValue();
+				if (rec.getType() == StatisticType.LIST) {
 				value = rec.getListValue().toString();
+				}
+				result.put(key, value);
 			}
-			result.put(key, value);
+			return result;
+		} else {
+			return null;
 		}
-		return result;
 	}
 
 	/**
