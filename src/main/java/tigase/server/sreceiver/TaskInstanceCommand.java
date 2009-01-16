@@ -34,7 +34,6 @@ import tigase.xml.XMLUtils;
 import tigase.db.TigaseDBException;
 import tigase.xmpp.StanzaType;
 
-import static tigase.server.sreceiver.PropertyConstants.*;
 import static tigase.server.sreceiver.TaskCommons.*;
 
 /**
@@ -100,6 +99,7 @@ public class TaskInstanceCommand implements TaskCommandIfc {
 	 *
 	 * @return a <code>String</code> value
 	 */
+	@Override
 	public String getNodeName() {
 		return "*";
 	}
@@ -109,6 +109,7 @@ public class TaskInstanceCommand implements TaskCommandIfc {
 	 *
 	 * @return a <code>String</code> value
 	 */
+	@Override
 	public String getDescription() {
 		return "Manage task exiting instance";
 	}
@@ -347,8 +348,9 @@ public class TaskInstanceCommand implements TaskCommandIfc {
 	 *
 	 * @param packet a <code>Packet</code> value
 	 * @param result a <code>Packet</code> value
-	 * @param reciv a <code>StanzaReceiver</code> value
+	 * @param receiv
 	 */
+	@Override
 	public void processCommand(Packet packet, Packet result,
 		StanzaReceiver receiv) {
 		String task_name = packet.getElemTo();
