@@ -140,10 +140,14 @@ public class LogMonitor extends AbstractMonitor {
 		return false;
 	}
 
-	private void registerHandler() {
+	private void removeHandler() {
 		if (memoryHandler != null) {
 			Logger.getLogger("").removeHandler(memoryHandler);
 		}
+	}
+
+	private void registerHandler() {
+		removeHandler();
 		if (monitorHandler == null) {
 			monitorHandler = new MonitorHandler();
 			monitorHandler.setLevel(Level.ALL);
@@ -158,6 +162,11 @@ public class LogMonitor extends AbstractMonitor {
 	public void init(String jid, double treshold, SystemMonitorTask smTask) {
 		super.init(jid, treshold, smTask);
 		registerHandler();
+	}
+
+	@Override
+	public void destroy() {
+		removeHandler();
 	}
 
 	private String getCurrentLevels() {

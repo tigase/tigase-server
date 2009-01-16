@@ -42,6 +42,8 @@ public interface ResourceMonitorIfc {
 
 	public void init(String jid, double treshold, SystemMonitorTask smTask);
 
+	public void destroy();
+
 	public void check10Secs(Queue<Packet> results);
 
 	public void check1Day(Queue<Packet> results);

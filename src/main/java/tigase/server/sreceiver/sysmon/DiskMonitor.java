@@ -118,6 +118,7 @@ public class DiskMonitor extends AbstractMonitor {
 		findAllRoots();
 	}
 
+	@Override
 	public String getState() {
 		StringBuilder sb = new StringBuilder();
 		Formatter formatter = new Formatter(sb);
@@ -174,5 +175,10 @@ public class DiskMonitor extends AbstractMonitor {
 	}
 
 	private File[] getSolarisRoots() { return File.listRoots();	}
+
+	@Override
+	public void destroy() {
+		// Nothing to destroy....
+	}
 
 }

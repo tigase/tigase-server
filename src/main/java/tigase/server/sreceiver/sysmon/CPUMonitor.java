@@ -167,7 +167,6 @@ public class CPUMonitor extends AbstractMonitor {
 		format.setMaximumFractionDigits(2);
 	}
 
-
 	@Override
 	public void check10Secs(Queue<Packet> results) {
 		long cpuTime = 0;
@@ -220,6 +219,11 @@ public class CPUMonitor extends AbstractMonitor {
 		return "Current CPU usage is: " + format.format(cpuUsage[idx]) +
 						", Last minute CPU usage is: " + format.format(recentCpu(6)) +
 						", Load average is: " + formd.format(loadAverage[idx]) + "\n";
+	}
+
+	@Override
+	public void destroy() {
+		// Nothing to destroy
 	}
 
 }

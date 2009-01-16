@@ -59,20 +59,20 @@ public class SystemMonitorTask extends RepoRosterTask {
 		" a simple reply message. This is to ensure the monitor works.";
 	private static final String MONITORS_CLASSES_PROP_KEY =
 					"Monitor implementations";
-	private static final String WARNING_TRESHOLD_PROP_KEY =
-					"Warning treshold";
+	private static final String WARNING_THRESHOLD_PROP_KEY =
+					"Warning threshold";
 	//private long interval = 10*SECOND;
 
 	private String[] all_monitors = null;
 	private String[] selected_monitors = null;
 	private Map<String, ResourceMonitorIfc> monitors =
 					new LinkedHashMap<String, ResourceMonitorIfc>();
-	private double warning_treshold = 0.9;
+	private double warning_threshold = 0.9;
 
 	private enum command {
 		help(" - Displays help info."),
 		state(" - Displays current state from all monitors."),
-		treshold(" [0.NN] - sets/displays current treshold value.");
+		threshold(" [0.NN] - sets/displays current threshold value.");
 
 		private String helpText = null;
 
@@ -170,21 +170,25 @@ public class SystemMonitorTask extends RepoRosterTask {
 		super.init(results);
 		tasks = new Timer("SystemMonitorTask", true);
 		tasks.scheduleAtFixedRate(new TimerTask() {
+			@Override
 			public void run() {
 				monitor10Secs();
 			}
 		}, INTERVAL_10SECS, INTERVAL_10SECS);
 		tasks.scheduleAtFixedRate(new TimerTask() {
+			@Override
 			public void run() {
 				monitor1Min();
 			}
 		}, INTERVAL_1MIN, INTERVAL_1MIN);
 		tasks.scheduleAtFixedRate(new TimerTask() {
+			@Override
 			public void run() {
 				monitor1Hour();
 			}
 		}, INTERVAL_1HOUR, INTERVAL_1HOUR);
 		tasks.scheduleAtFixedRate(new TimerTask() {
+			@Override
 			public void run() {
 				monitor1Day();
 			}
@@ -198,10 +202,12 @@ public class SystemMonitorTask extends RepoRosterTask {
 		super.destroy(results);
 	}
 
+	@Override
 	public String getType() {
 		return TASK_TYPE;
 	}
 
+	@Override
 	public String getHelp() {
 		return TASK_HELP;
 	}
@@ -244,12 +250,16 @@ public class SystemMonitorTask extends RepoRosterTask {
 	@Override
 	public void setParams(Map<String, Object> map)	{
 		super.setParams(map);
-		String treshold = (String) map.get(WARNING_TRESHOLD_PROP_KEY);
-		try {
-			double tresh = Double.parseDouble(treshold);
-			warning_treshold = tresh;
-		} catch (Exception e) {
-			log.warning("Incorrect warning treshold, using default" + treshold);
+		String threshold = (String) map.get(WARNING_THRESHOLD_PROP_KEY);
+		if (threshold != null) {
+			// In fact it can be null if this is just a configuration change
+			// in this case only changed properties are passed to the task
+			try {
+				double tresh = Double.parseDouble(threshold);
+				warning_threshold = tresh;
+			} catch (Exception e) {
+				log.warning("Incorrect warning threshold, using default" + threshold);
+			}
 		}
 		String[] mons = null;
 		try {
@@ -261,13 +271,16 @@ public class SystemMonitorTask extends RepoRosterTask {
 		}
 		if (mons != null) {
 			selected_monitors = mons;
+			for (ResourceMonitorIfc monitor : monitors.values()) {
+				monitor.destroy();
+			}
 			monitors.clear();
 			for (String string : mons) {
 				try {
 					ResourceMonitorIfc resMon =
 									(ResourceMonitorIfc) Class.forName(string).newInstance();
 					String monJid = getJID() + "/" + resMon.getClass().getSimpleName();
-					resMon.init(monJid, warning_treshold, this);
+					resMon.init(monJid, warning_threshold, this);
 					monitors.put(monJid, resMon);
 					log.config("Loaded resource monitor: " + monJid);
 				} catch (Exception ex) {
@@ -278,15 +291,16 @@ public class SystemMonitorTask extends RepoRosterTask {
 		}
 	}
 
+	@Override
 	public Map<String, PropertyItem> getParams() {
 		Map<String, PropertyItem> props = super.getParams();
 		props.put(MONITORS_CLASSES_PROP_KEY,
 						new PropertyItem(MONITORS_CLASSES_PROP_KEY,
 						MONITORS_CLASSES_PROP_KEY, selected_monitors, all_monitors,
 						"List of system monitors available for use"));
-		props.put(WARNING_TRESHOLD_PROP_KEY,
-						new PropertyItem(WARNING_TRESHOLD_PROP_KEY,
-						WARNING_TRESHOLD_PROP_KEY, warning_treshold));
+		props.put(WARNING_THRESHOLD_PROP_KEY,
+						new PropertyItem(WARNING_THRESHOLD_PROP_KEY,
+						WARNING_THRESHOLD_PROP_KEY, warning_threshold));
 //	log.fine("selected_monitors: " + Arrays.toString(selected_monitors) +
 //						", all_monitors: " + Arrays.toString(all_monitors));
 		return props;
@@ -313,9 +327,9 @@ public class SystemMonitorTask extends RepoRosterTask {
 						new PropertyItem(MONITORS_CLASSES_PROP_KEY,
 						MONITORS_CLASSES_PROP_KEY, all_monitors, all_monitors,
 						"List of system monitors available for use"));
-		defs.put(WARNING_TRESHOLD_PROP_KEY,
-						new PropertyItem(WARNING_TRESHOLD_PROP_KEY,
-						WARNING_TRESHOLD_PROP_KEY, warning_treshold));
+		defs.put(WARNING_THRESHOLD_PROP_KEY,
+						new PropertyItem(WARNING_THRESHOLD_PROP_KEY,
+						WARNING_THRESHOLD_PROP_KEY, warning_threshold));
 		return defs;
 	}
 
@@ -339,15 +353,15 @@ public class SystemMonitorTask extends RepoRosterTask {
 								packet.getElemTo(), StanzaType.chat, sb.toString(),
 								"Monitors State", null));
 				break;
-			case treshold:
+			case threshold:
 				if (body_split.length > 1) {
 					boolean correct = false;
 					try {
-						double newtreshold = Double.parseDouble(body_split[1]);
-						if (newtreshold > 0 && newtreshold < 1) {
-							warning_treshold = newtreshold;
+						double newthreshold = Double.parseDouble(body_split[1]);
+						if (newthreshold > 0 && newthreshold < 1) {
+							warning_threshold = newthreshold;
 							for (Map.Entry<String, ResourceMonitorIfc> resmon : monitors.entrySet()) {
-								resmon.getValue().init(resmon.getKey(), warning_treshold, this);
+								resmon.getValue().init(resmon.getKey(), warning_threshold, this);
 							}
 							correct = true;
 						}
@@ -355,20 +369,20 @@ public class SystemMonitorTask extends RepoRosterTask {
 					if (correct) {
 						results.offer(Packet.getMessage(packet.getElemFrom(),
 										packet.getElemTo(), StanzaType.chat,
-										"New treshold set to: " + warning_treshold + "\n",
+										"New threshold set to: " + warning_threshold + "\n",
 										"Threshold command.", null));
 					} else {
 						results.offer(Packet.getMessage(packet.getElemFrom(),
 										packet.getElemTo(), StanzaType.chat,
-										"Incorrect treshold givenm using the old treshold: " + 
-										warning_treshold + "\n" +
-										"Correct treshold is a float point number 0 < N < 1.",
+										"Incorrect threshold givenm using the old threshold: " +
+										warning_threshold + "\n" +
+										"Correct threshold is a float point number 0 < N < 1.",
 										"Threshold command.", null));
 					}
 				} else {
 					results.offer(Packet.getMessage(packet.getElemFrom(),
 									packet.getElemTo(), StanzaType.chat,
-									"Current treshold value is: " + warning_treshold,
+									"Current threshold value is: " + warning_threshold,
 									"Threshold command.", null));
 				}
 				break;

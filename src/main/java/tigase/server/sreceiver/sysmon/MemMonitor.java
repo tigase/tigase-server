@@ -50,6 +50,18 @@ public class MemMonitor extends AbstractMonitor
 	private MemoryMXBean memoryMXBean = null;
 
 	@Override
+	public void destroy() {
+		memoryMXBean = ManagementFactory.getMemoryMXBean();
+		NotificationEmitter emitter = (NotificationEmitter)memoryMXBean;
+		List<MemoryPoolMXBean> memPools = ManagementFactory.getMemoryPoolMXBeans();
+		for (MemoryPoolMXBean memoryPoolMXBean : memPools) {
+			try {
+				emitter.removeNotificationListener(this, null, memoryPoolMXBean);
+			} catch (Exception e) {	}
+		}
+	}
+
+	@Override
 	public void init(String jid, double treshold, SystemMonitorTask smTask) {
 		super.init(jid, treshold, smTask);
 		memoryMXBean = ManagementFactory.getMemoryMXBean();
@@ -92,6 +104,7 @@ public class MemMonitor extends AbstractMonitor
 		}
 	}
 
+	@Override
 	public void handleNotification(Notification note, Object handback) {
 		if (note.getType().equals(MemoryNotificationInfo.MEMORY_THRESHOLD_EXCEEDED)) {
 			log.info("Usage threshold exceeded, sending notification.");
@@ -110,6 +123,7 @@ public class MemMonitor extends AbstractMonitor
 		}
 	}
 
+	@Override
 	public String getState() {
 		NumberFormat format = NumberFormat.getIntegerInstance();
 		if (format instanceof DecimalFormat) {
