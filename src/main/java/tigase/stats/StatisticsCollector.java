@@ -130,12 +130,16 @@ public class StatisticsCollector
 	}
 
 	public List<StatRecord> getComponentStats(String name, int level) {
-		List<StatRecord> result = components.get(name).getStatistics();
-		if (result != null) {
-			for (Iterator<StatRecord> it = result.iterator(); it.hasNext();) {
-				StatRecord statRecord = it.next();
-				if (statRecord.getLevel().intValue() < level) {
-					it.remove();
+		List<StatRecord> result = null;
+		StatisticsContainer stats = components.get(name);
+		if (stats != null) {
+			result = stats.getStatistics();
+			if (result != null) {
+				for (Iterator<StatRecord> it = result.iterator(); it.hasNext();) {
+					StatRecord statRecord = it.next();
+					if (statRecord.getLevel().intValue() < level) {
+						it.remove();
+					}
 				}
 			}
 		}
