@@ -121,18 +121,22 @@ public class StatisticsCollector
 
 	public List<StatRecord> getAllStats(int level) {
 		List<StatRecord> result = new ArrayList<StatRecord>();
-		for (StatisticsContainer comp: components.values()) {
-			result.addAll(getComponentStats(comp.getName(), level));
+		if (result != null) {
+			for (StatisticsContainer comp : components.values()) {
+				result.addAll(getComponentStats(comp.getName(), level));
+			}
 		}
 		return result;
 	}
 
 	public List<StatRecord> getComponentStats(String name, int level) {
 		List<StatRecord> result = components.get(name).getStatistics();
-		for (Iterator<StatRecord> it = result.iterator(); it.hasNext();) {
-			StatRecord statRecord = it.next();
-			if (statRecord.getLevel().intValue() < level) {
-				it.remove();
+		if (result != null) {
+			for (Iterator<StatRecord> it = result.iterator(); it.hasNext();) {
+				StatRecord statRecord = it.next();
+				if (statRecord.getLevel().intValue() < level) {
+					it.remove();
+				}
 			}
 		}
 		return result;
