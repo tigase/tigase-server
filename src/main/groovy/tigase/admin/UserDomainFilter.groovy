@@ -60,13 +60,13 @@ def repo = (UserRepository)userRepository
 
 try {
 	def old_value = repo.getData(jid, null,
-		DomainFilter.ALLOWED_DOMAINS_LIST_KEY, null)
+		DomainFilter.ALLOWED_DOMAINS_KEY, null)
 
 	def new_value = domain
 	if (domain == DomainFilter.DOMAINS.LIST.name()) {
 		new_value = domainList
 	}
-	repo.setData(jid, null, DomainFilter.ALLOWED_DOMAINS_LIST_KEY, new_value)
+	repo.setData(jid, null, DomainFilter.ALLOWED_DOMAINS_KEY, new_value)
 
 	return "Changed an old value: $old_value to a new value: $new_value for user: $jid"
 } catch (e) {
