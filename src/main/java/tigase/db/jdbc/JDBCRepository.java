@@ -572,7 +572,9 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	 *
 	 * @param user_id a <code>String</code> value
 	 * @exception UserExistsException if an error occurs
+	 * @throws TigaseDBException
 	 */
+	@Override
 	public void addUser(final String user_id)
 		throws UserExistsException, TigaseDBException {
 		try {
@@ -589,6 +591,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	 * @param user_id a <code>String</code> value the user Jabber ID.
 	 * @exception UserNotFoundException if an error occurs
 	 */
+	@Override
 	public void removeUser(final String user_id)
 		throws UserNotFoundException, TigaseDBException {
 		Statement stmt = null;
@@ -627,7 +630,9 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	 * @param key a <code>String</code> value
 	 * @return a <code>String[]</code> value
 	 * @exception UserNotFoundException if an error occurs
+	 * @throws TigaseDBException
 	 */
+	@Override
 	public String[] getDataList(final String user_id, final String subnode,
 		final String key) throws UserNotFoundException, TigaseDBException {
 		// 		String[] cache_res = (String[])cache.get(user_id+"/"+subnode+"/"+key);
@@ -669,7 +674,9 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	 * @param subnode a <code>String</code> value
 	 * @return a <code>String[]</code> value
 	 * @exception UserNotFoundException if an error occurs
+	 * @throws TigaseDBException 
 	 */
+	@Override
 	public String[] getSubnodes(final String user_id,	final String subnode)
 		throws UserNotFoundException, TigaseDBException {
 		ResultSet rs = null;
@@ -703,7 +710,9 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	 * @param user_id a <code>String</code> value
 	 * @return a <code>String[]</code> value
 	 * @exception UserNotFoundException if an error occurs
+	 * @throws TigaseDBException
 	 */
+	@Override
 	public String[] getSubnodes(final String user_id)
 		throws UserNotFoundException, TigaseDBException {
 		return getSubnodes(user_id, null);
@@ -739,7 +748,9 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	 * @param user_id a <code>String</code> value
 	 * @param subnode a <code>String</code> value
 	 * @exception UserNotFoundException if an error occurs
+	 * @throws TigaseDBException
 	 */
+	@Override
 	public void removeSubnode(final String user_id,	final String subnode)
 		throws UserNotFoundException, TigaseDBException {
 		if (subnode == null) {
@@ -765,7 +776,9 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	 * @param key a <code>String</code> value
 	 * @param list a <code>String[]</code> value
 	 * @exception UserNotFoundException if an error occurs
+	 * @throws TigaseDBException
 	 */
+	@Override
 	public void setDataList(final String user_id, final String subnode,
 		final String key, final String[] list)
 		throws UserNotFoundException, TigaseDBException {
@@ -781,7 +794,9 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	 * @param key a <code>String</code> value
 	 * @param list a <code>String[]</code> value
 	 * @exception UserNotFoundException if an error occurs
+	 * @throws TigaseDBException
 	 */
+	@Override
 	public void addDataList(final String user_id, final String subnode,
 		final String key, final String[] list)
 		throws UserNotFoundException, TigaseDBException {
@@ -819,7 +834,9 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	 * @param subnode a <code>String</code> value
 	 * @return a <code>String[]</code> value
 	 * @exception UserNotFoundException if an error occurs
+	 * @throws TigaseDBException
 	 */
+	@Override
 	public String[] getKeys(final String user_id, final String subnode)
 		throws UserNotFoundException, TigaseDBException {
 		ResultSet rs = null;
@@ -853,7 +870,9 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	 * @param user_id a <code>String</code> value
 	 * @return a <code>String[]</code> value
 	 * @exception UserNotFoundException if an error occurs
+	 * @throws TigaseDBException
 	 */
+	@Override
 	public String[] getKeys(final String user_id)
 		throws UserNotFoundException, TigaseDBException {
 		return getKeys(user_id, null);
@@ -868,7 +887,9 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	 * @param def a <code>String</code> value
 	 * @return a <code>String</code> value
 	 * @exception UserNotFoundException if an error occurs
+	 * @throws TigaseDBException
 	 */
+	@Override
 	public String getData(final String user_id, final String subnode,
 		final String key, final String def)
 		throws UserNotFoundException, TigaseDBException {
@@ -880,6 +901,8 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		try {
 			checkConnection();
 			long nid = getNodeNID(user_id, subnode);
+			log.finest("Loading data for key: " + key + ", user: " + user_id +
+							", node: " + subnode + ", def: " + def + ", found nid: " + nid);
 			synchronized (data_for_node_st) {
 				if (nid > 0) {
 					String result = def;
@@ -888,6 +911,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 					rs = data_for_node_st.executeQuery();
 					if (rs.next()) {
 						result = rs.getString(1);
+						log.finest("Found data: " + result);
 					}
 					//cache.put(user_id+"/"+subnode+"/"+key, new String[] {result});
 					return result;
@@ -910,7 +934,9 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	 * @param key a <code>String</code> value
 	 * @return a <code>String</code> value
 	 * @exception UserNotFoundException if an error occurs
+	 * @throws TigaseDBException
 	 */
+	@Override
 	public String getData(final String user_id, final String subnode,
 		final String key) throws UserNotFoundException, TigaseDBException {
 		return getData(user_id, subnode, key, null);
@@ -923,7 +949,9 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	 * @param key a <code>String</code> value
 	 * @return a <code>String</code> value
 	 * @exception UserNotFoundException if an error occurs
+	 * @throws TigaseDBException
 	 */
+	@Override
 	public String getData(final String user_id,	final String key)
 		throws UserNotFoundException, TigaseDBException {
 		return getData(user_id, null, key, null);
@@ -937,7 +965,9 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	 * @param key a <code>String</code> value
 	 * @param value a <code>String</code> value
 	 * @exception UserNotFoundException if an error occurs
+	 * @throws TigaseDBException
 	 */
+	@Override
 	public void setData(final String user_id, final String subnode,
 		final String key, final String value)
 		throws UserNotFoundException, TigaseDBException {
@@ -951,7 +981,9 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	 * @param key a <code>String</code> value
 	 * @param value a <code>String</code> value
 	 * @exception UserNotFoundException if an error occurs
+	 * @throws TigaseDBException
 	 */
+	@Override
 	public void setData(final String user_id, final String key,
 		final String value)
 		throws UserNotFoundException, TigaseDBException {
@@ -965,7 +997,9 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	 * @param subnode a <code>String</code> value
 	 * @param key a <code>String</code> value
 	 * @exception UserNotFoundException if an error occurs
+	 * @throws TigaseDBException
 	 */
+	@Override
 	public void removeData(final String user_id, final String subnode,
 		final String key)
 		throws UserNotFoundException, TigaseDBException {
@@ -991,7 +1025,9 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	 * @param user_id a <code>String</code> value
 	 * @param key a <code>String</code> value
 	 * @exception UserNotFoundException if an error occurs
+	 * @throws TigaseDBException
 	 */
+	@Override
 	public void removeData(final String user_id, final String key)
 		throws UserNotFoundException, TigaseDBException {
 		removeData(user_id, null, key);
@@ -1008,6 +1044,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	 * @exception UserNotFoundException if an error occurs
 	 * @exception TigaseDBException if an error occurs
 	 */
+	@Override
 	public boolean plainAuth(final String user, final String password)
 		throws UserNotFoundException, TigaseDBException, AuthorizationException {
 		return auth.plainAuth(user, password);
@@ -1024,6 +1061,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	 * @exception UserNotFoundException if an error occurs
 	 * @exception TigaseDBException if an error occurs
 	 */
+	@Override
 	public boolean digestAuth(final String user, final String digest,
 		final String id, final String alg)
 		throws UserNotFoundException, TigaseDBException, AuthorizationException {
@@ -1039,16 +1077,19 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	 * @exception TigaseDBException if an error occurs
 	 * @exception AuthorizationException if an error occurs
 	 */
+	@Override
 	public boolean otherAuth(final Map<String, Object> props)
 		throws UserNotFoundException, TigaseDBException, AuthorizationException {
 		return auth.otherAuth(props);
 	}
 
+	@Override
 	public void updatePassword(final String user, final String password)
 		throws TigaseDBException {
 		auth.updatePassword(user, password);
 	}
 
+	@Override
 	public void logout(final String user)
 		throws UserNotFoundException, TigaseDBException {
 		auth.logout(user);
@@ -1062,11 +1103,13 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	 * @exception UserExistsException if an error occurs
 	 * @exception TigaseDBException if an error occurs
 	 */
+	@Override
 	public void addUser(final String user, final String password)
 		throws UserExistsException, TigaseDBException {
 		auth.addUser(user, password);
 	}
 
+	@Override
 	public void queryAuth(Map<String, Object> authProps) {
 		auth.queryAuth(authProps);
 	}
@@ -1077,6 +1120,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 			super(maxsize, cache_time);
 		}
 
+		@Override
 		public Object remove(Object key) {
 			if (cache_off) { return null; }
 
