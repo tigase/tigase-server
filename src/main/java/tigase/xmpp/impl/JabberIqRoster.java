@@ -21,6 +21,8 @@
  */
 package tigase.xmpp.impl;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -75,7 +77,7 @@ public abstract class JabberIqRoster {
     RosterFactory.getRosterImplementation(true);
 
 	public static Element createRosterPacket(String iq_type, String iq_id,
-		String to, String from, String item_jid, String item_name, String item_group,
+		String to, String from, String item_jid, String item_name, String[] item_groups,
 		String subscription, String item_type) {
 		Element iq = new Element("iq",
 			new String[] {"type", "id"},
@@ -101,9 +103,11 @@ public abstract class JabberIqRoster {
 		if (subscription != null) {
 			item.addAttribute(RosterAbstract.SUBSCRIPTION, subscription);
 		}
-		if (item_group != null) {
-			Element group = new Element(RosterAbstract.GROUP, item_group);
-			item.addChild(group);
+		if (item_groups != null) {
+			for (String gr : item_groups) {
+				Element group = new Element(RosterAbstract.GROUP, gr);
+				item.addChild(group);
+			}
 		}
 		query.addChild(item);
 		return iq;
@@ -236,6 +240,28 @@ public abstract class JabberIqRoster {
 		final XMPPResourceConnection session,	final Queue<Packet> results,
 		final Map<String, Object> settings)
     throws NotAuthorizedException, TigaseDBException {
+		List<Element> its = DynamicRoster.getRosterItems(session, settings);
+		for (Iterator<Element> it = its.iterator(); it.hasNext();) {
+			Element element = it.next();
+			String jid = element.getAttribute("jid");
+			if (roster_util.containsBuddy(session, jid)) {
+				roster_util.setBuddySubscription(session, SubscriptionType.both, jid);
+				List<Element> elgr = element.getChildren();
+				if (elgr != null && elgr.size() > 0) {
+					ArrayList<String> groups = new ArrayList<String>();
+					for (Element grp : elgr) {
+						if (grp.getName() == RosterAbstract.GROUP) {
+							groups.add(grp.getCData());
+						}
+					}
+					if (groups.size() > 0) {
+						roster_util.addBuddyGroup(session, jid, 
+										groups.toArray(new String[groups.size()]));
+					}
+				}
+				it.remove();
+			}
+		}
     String[] buddies = roster_util.getBuddies(session);
     if (buddies != null) {
 			Element query = new Element("query");
@@ -261,7 +287,6 @@ public abstract class JabberIqRoster {
 		} else {
 			results.offer(packet.okResult((String)null, 1));
 		}
-		List<Element> its = DynamicRoster.getRosterItems(session, settings);
 		if (its != null) {
 			LinkedList<Element> items = new LinkedList<Element>(its);
 			while (items.size() > 0) {

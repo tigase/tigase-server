@@ -23,7 +23,6 @@ package tigase.xmpp.impl.roster;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.EnumSet;
-import java.util.List;
 import java.util.Queue;
 import java.util.Map;
 import java.util.LinkedHashMap;
@@ -634,6 +633,14 @@ public abstract class RosterAbstract {
   public abstract String[] getBuddyGroups(final XMPPResourceConnection session,
 		final String buddy)
     throws NotAuthorizedException, TigaseDBException;
+
+	public abstract boolean containsBuddy(final XMPPResourceConnection session,
+					final String buddy)
+					throws NotAuthorizedException, TigaseDBException;
+
+	public abstract boolean addBuddyGroup(final XMPPResourceConnection session,
+		final String buddy, final String[] groups)
+		throws NotAuthorizedException, TigaseDBException;
 
 //   public abstract void setBuddyGroups(XMPPResourceConnection session,
 // 		String buddy, String[] groups)

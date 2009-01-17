@@ -21,19 +21,8 @@
  */
 package tigase.xmpp.impl.roster;
 
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Queue;
-import java.util.Map;
-import java.util.LinkedHashMap;
 import java.util.logging.Logger;
-import tigase.server.Packet;
-import tigase.xml.Element;
-import tigase.xml.XMLUtils;
 import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.util.JIDUtils;
 import tigase.db.TigaseDBException;
@@ -111,5 +100,18 @@ public class Roster extends RosterAbstract {
     throws NotAuthorizedException, TigaseDBException {
     return session.getDataList(groupNode(buddy), GROUPS);
   }
+
+	@Override
+	public boolean containsBuddy(XMPPResourceConnection session, String buddy)
+					throws NotAuthorizedException, TigaseDBException {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	@Override
+	public boolean addBuddyGroup(XMPPResourceConnection session, String buddy,
+					String[] groups)
+					throws NotAuthorizedException, TigaseDBException {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
 
 } // Roster

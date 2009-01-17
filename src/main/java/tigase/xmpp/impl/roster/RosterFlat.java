@@ -236,4 +236,27 @@ public class RosterFlat extends RosterAbstract {
 		}
   }
 
+	@Override
+	public boolean containsBuddy(XMPPResourceConnection session, String buddy)
+					throws NotAuthorizedException, TigaseDBException {
+		return getRosterElement(session, buddy) != null;
+	}
+
+	@Override
+	public boolean addBuddyGroup(XMPPResourceConnection session, String buddy,
+					String[] groups)
+					throws NotAuthorizedException, TigaseDBException {
+		RosterElement relem = getRosterElement(session, buddy);
+		if (relem != null) {
+			relem.addGroups(groups);
+			// Intentionally not saving the roster here.
+			// At the moment it is only used to combine dynamic roster with the
+			// static roster in case a contact exist in both but in a different
+			// group.
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 } // RosterFlat

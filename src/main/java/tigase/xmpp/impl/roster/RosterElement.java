@@ -20,6 +20,7 @@
  */
 package tigase.xmpp.impl.roster;
 
+import java.util.Arrays;
 import tigase.xml.Element;
 import java.util.logging.Logger;
 import tigase.util.JIDUtils;
@@ -139,6 +140,19 @@ public class RosterElement {
 			elem.setAttribute(GRP_ATT, grps);
 		}
 		return elem;
+	}
+
+	void addGroups(String[] groups) {
+		if (groups != null) {
+			if (this.groups == null) {
+				this.groups = groups;
+			} else {
+				this.groups = Arrays.copyOf(this.groups,
+								this.groups.length + groups.length);
+				System.arraycopy(groups, 0, this.groups,
+								this.groups.length - groups.length, groups.length);
+			}
+		}
 	}
 
 }

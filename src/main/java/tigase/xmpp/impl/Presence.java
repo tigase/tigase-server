@@ -437,7 +437,7 @@ public abstract class Presence {
 							Packet rost_update =
                 new Packet(JabberIqRoster.createRosterPacket("set",
 										session.nextStanzaId(), peer, peer, session.getUserId(),
-										nick, "Anonymous peers", null,
+										nick, new String[] {"Anonymous peers"}, null,
 										JabberIqRoster.ANON));
 							results.offer(rost_update);
 							log.finest("Sending roster update: " + rost_update.toString());
