@@ -396,11 +396,12 @@ public abstract class RepositoryAccess {
    * <code>def</code> if there was no data associated with given key.
    * @exception NotAuthorizedException is thrown when session
    * has not been authorized yet and there is no access to permanent storage.
-   * @see #setData(String, String, String)
+	 * @throws TigaseDBException
+	 * @see #setData(String, String, String)
    */
   public String getData(final String subnode,
-    final String key, final String def) throws NotAuthorizedException,
-    TigaseDBException {
+					final String key, final String def)
+					throws NotAuthorizedException, TigaseDBException {
 		if (is_anonymous) {
 			return null;
 		}
@@ -459,12 +460,13 @@ public abstract class RepositoryAccess {
    * @param value a <code>String</code> actual data stored in user repository.
    * @exception NotAuthorizedException is thrown when session
    * has not been authorized yet and there is no access to permanent storage.
-   * @see #removeDataGroup(String)
+	 * @throws TigaseDBException
+	 * @see #removeDataGroup(String)
    * @see UserRepository
    */
   public void setData(final String subnode,
-    final String key, final String value)
-    throws NotAuthorizedException, TigaseDBException {
+					final String key, final String value)
+					throws NotAuthorizedException, TigaseDBException {
     try { repo.setData(getUserId(), subnode, key, value);
     } catch (UserNotFoundException e) {
       log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
