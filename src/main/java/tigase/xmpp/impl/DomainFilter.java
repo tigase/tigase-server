@@ -108,8 +108,10 @@ public class DomainFilter extends XMPPProcessor
 					throws NotAuthorizedException, TigaseDBException {
 		DOMAINS domains =
 						(DOMAINS)session.getCommonSessionData(ALLOWED_DOMAINS_KEY);
+		log.finest("domains read from user session: " + domains);
 		if (domains == null) {
 			String dbDomains = session.getData(null, ALLOWED_DOMAINS_KEY, null);
+			log.finest("Domains read from database: " + dbDomains);
 			domains = DOMAINS.valueof(dbDomains);
 			if (domains == null) {
 				if (session.isAnonymous()) {
@@ -213,12 +215,18 @@ public class DomainFilter extends XMPPProcessor
 	@Override
 	public boolean preProcess(Packet packet, XMPPResourceConnection session,
 					NonAuthUserRepository repo,	Queue<Packet> results) {
- 		boolean stop = false;
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Processing: " + packet.toString());
+		}
+		boolean stop = false;
 		if (session == null) {
 			return stop;
 		}
 		try {
 			DOMAINS domains = getDomains(session);
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("DOMAINS setting is: " + domains.name());
+			}
 			// Fast return when user is authorized to send packets to any domain
 			if (domains == DOMAINS.ALL) {
 				return stop;
@@ -236,6 +244,15 @@ public class DomainFilter extends XMPPProcessor
 						removePacket(null, packet, results,
 										"You can only communicate within the server local domains.");
 						stop = true;
+						if (log.isLoggable(Level.FINEST)) {
+							log.finest("LOCAL Domains only, blocking packet: " +
+											packet.toString());
+						}
+					} else {
+						if (log.isLoggable(Level.FINEST)) {
+							log.finest("LOCAL Domains only, packet not blocked: " +
+											packet.toString());
+						}
 					}
 					break;
 				case OWN:
@@ -243,6 +260,15 @@ public class DomainFilter extends XMPPProcessor
 						removePacket(null, packet, results,
 										"You can only communicate within your own domain.");
 						stop = true;
+						if (log.isLoggable(Level.FINEST)) {
+							log.finest("OWN Domain only, blocking packet: " +
+											packet.toString());
+						}
+					} else {
+						if (log.isLoggable(Level.FINEST)) {
+							log.finest("OWN Domain only, packet not blocked: " +
+											packet.toString());
+						}
 					}
 					break;
 				case LIST:
@@ -258,6 +284,15 @@ public class DomainFilter extends XMPPProcessor
 						removePacket(null, packet, results,
 										"You can only communicate within selected list of domains.");
 						stop = true;
+						if (log.isLoggable(Level.FINEST)) {
+							log.finest("LISTED Domains only, blocking packet: " +
+											packet.toString());
+						}
+					} else {
+						if (log.isLoggable(Level.FINEST)) {
+							log.finest("LISTED Domain only, packet not blocked: " +
+											packet.toString());
+						}
 					}
 					break;
 			}
