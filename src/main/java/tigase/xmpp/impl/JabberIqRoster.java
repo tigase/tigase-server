@@ -241,27 +241,27 @@ public abstract class JabberIqRoster {
 		final Map<String, Object> settings)
     throws NotAuthorizedException, TigaseDBException {
 		List<Element> its = DynamicRoster.getRosterItems(session, settings);
-		for (Iterator<Element> it = its.iterator(); it.hasNext();) {
-			Element element = it.next();
-			String jid = element.getAttribute("jid");
-			if (roster_util.containsBuddy(session, jid)) {
-				roster_util.setBuddySubscription(session, SubscriptionType.both, jid);
-				List<Element> elgr = element.getChildren();
-				if (elgr != null && elgr.size() > 0) {
-					ArrayList<String> groups = new ArrayList<String>();
-					for (Element grp : elgr) {
-						if (grp.getName() == RosterAbstract.GROUP) {
-							groups.add(grp.getCData());
+		if (its != null)
+			for (Iterator<Element> it = its.iterator(); it.hasNext();) {
+				Element element = it.next();
+				String jid = element.getAttribute("jid");
+				if (roster_util.containsBuddy(session, jid)) {
+					roster_util.setBuddySubscription(session, SubscriptionType.both, jid);
+					List<Element> elgr = element.getChildren();
+					if (elgr != null && elgr.size() > 0) {
+						ArrayList<String> groups = new ArrayList<String>();
+						for (Element grp : elgr) {
+							if (grp.getName() == RosterAbstract.GROUP) {
+								groups.add(grp.getCData());
+							}
+						}
+						if (groups.size() > 0) {
+							roster_util.addBuddyGroup(session, jid, groups.toArray(new String[groups.size()]));
 						}
 					}
-					if (groups.size() > 0) {
-						roster_util.addBuddyGroup(session, jid, 
-										groups.toArray(new String[groups.size()]));
-					}
+					it.remove();
 				}
-				it.remove();
 			}
-		}
     String[] buddies = roster_util.getBuddies(session);
     if (buddies != null) {
 			Element query = new Element("query");
