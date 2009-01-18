@@ -21,7 +21,6 @@
  */
 package tigase.xmpp.impl;
 
-import java.util.Arrays;
 import java.util.Queue;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -30,7 +29,6 @@ import tigase.xml.Element;
 import tigase.xml.SimpleParser;
 import tigase.xml.SingletonFactory;
 import tigase.xml.DomBuilderHandler;
-import tigase.xmpp.XMPPImplIfc;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
@@ -72,6 +70,7 @@ public class VCardTemp extends XMPPProcessor implements XMPPProcessorIfc {
 		new Element("feature", new String[] {"var"}, new String[] {XMLNS})
 	};
 
+	@Override
   public Element[] supDiscoFeatures(final XMPPResourceConnection session)
 	{ return DISCO_FEATURES; }
 
@@ -81,10 +80,13 @@ public class VCardTemp extends XMPPProcessor implements XMPPProcessorIfc {
 
 	// Implementation of tigase.xmpp.XMPPImplIfc
 
+	@Override
 	public String id() { return ID; }
 
+	@Override
 	public String[] supElements()	{ return ELEMENTS; }
 
+	@Override
   public String[] supNamespaces()	{ return XMLNSS; }
 
 
@@ -97,7 +99,10 @@ public class VCardTemp extends XMPPProcessor implements XMPPProcessorIfc {
 	 * @param session a <code>XMPPResourceConnection</code> value
 	 * @param repo a <code>NonAuthUserRepository</code> value
 	 * @param results a <code>Queue</code> value
+	 * @param settings
+	 * @throws XMPPException 
 	 */
+	@Override
 	public void process(Packet packet, XMPPResourceConnection session,
 		NonAuthUserRepository repo, Queue<Packet> results,
 		final Map<String, Object> settings)

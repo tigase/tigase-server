@@ -22,10 +22,13 @@
 
 package tigase.xmpp.impl;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import tigase.util.JIDUtils;
 import tigase.xml.Element;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
@@ -43,12 +46,14 @@ public class DynamicRosterTest implements DynamicRosterIfc {
 
 	private Map<String, Element> memStorage = new LinkedHashMap<String, Element>();
 
+	@Override
 	public void setItemExtraData(Element item) {
 		String jid = item.getAttribute("jid");
 		log.finest("Storing item: " + item + ", for jid=" + jid);
 		memStorage.put(jid, item);
 	}
 
+	@Override
 	public Element getItemExtraData(Element item) {
 		String jid = item.getAttribute("jid");
 		Element result = memStorage.get(jid);
@@ -56,17 +61,41 @@ public class DynamicRosterTest implements DynamicRosterIfc {
 		return result;
 	}
 
+	@Override
 	public void init(Map<String, Object> props) {	}
 
+	@Override
 	public void init(String par) {}
 
+	@Override
 	public String[] getBuddies(XMPPResourceConnection session)
-					throws NotAuthorizedException { return null; }
+					throws NotAuthorizedException {
+		return new String[] {"dynrost@test-d"};
+	}
 
+	private Element getBuddy() {
+		return new Element("item",
+						new Element[]{
+							new Element("group", "test group")
+						},
+						new String[]{"jid", "name", "subscription"},
+						new String[]{"dynrost@test-d", "dynrost", "both"});
+	}
+
+	@Override
 	public Element getBuddyItem(XMPPResourceConnection session, String buddy)
-					throws NotAuthorizedException { return null; }
+					throws NotAuthorizedException {
+		if ("dynrost@test-d".equals(JIDUtils.getNodeID(buddy))) {
+			return getBuddy();
+		} else {
+			return null;
+		}
+	}
 
+	@Override
 	public List<Element> getRosterItems(XMPPResourceConnection session)
-					throws NotAuthorizedException { return null; }
+					throws NotAuthorizedException { 
+		return new ArrayList<Element>(Arrays.asList(getBuddy()));
+	}
 
 }
