@@ -241,7 +241,7 @@ public abstract class JabberIqRoster {
 		final Map<String, Object> settings)
     throws NotAuthorizedException, TigaseDBException {
 		List<Element> its = DynamicRoster.getRosterItems(session, settings);
-		if (its != null)
+		if (its != null && its.size() > 0) {
 			for (Iterator<Element> it = its.iterator(); it.hasNext();) {
 				Element element = it.next();
 				String jid = element.getAttribute("jid");
@@ -256,12 +256,14 @@ public abstract class JabberIqRoster {
 							}
 						}
 						if (groups.size() > 0) {
-							roster_util.addBuddyGroup(session, jid, groups.toArray(new String[groups.size()]));
+							roster_util.addBuddyGroup(session, jid,
+											groups.toArray(new String[groups.size()]));
 						}
 					}
 					it.remove();
 				}
 			}
+		}
     String[] buddies = roster_util.getBuddies(session);
     if (buddies != null) {
 			Element query = new Element("query");
