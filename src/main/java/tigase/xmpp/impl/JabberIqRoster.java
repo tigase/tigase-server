@@ -271,7 +271,7 @@ public abstract class JabberIqRoster {
       for (String buddy : buddies) {
  				try {
 					Element buddy_item = roster_util.getBuddyItem(session, buddy);
-					String item_group = buddy_item.getCData("/item/group");
+					//String item_group = buddy_item.getCData("/item/group");
 					query.addChild(buddy_item);
 				} catch (TigaseDBException e) {
 					// It happens that some weird JIDs drive database crazy and
