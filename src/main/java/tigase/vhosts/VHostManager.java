@@ -155,6 +155,7 @@ public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
 		return component instanceof VHostListener;
 	}
 
+	@Override
 	public void processPacket(Packet packet, Queue<Packet> results) {
 		if (!packet.isCommand() ||
 						(packet.getType() != null &&

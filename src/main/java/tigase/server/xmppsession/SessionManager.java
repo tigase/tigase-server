@@ -973,45 +973,51 @@ public class SessionManager extends AbstractMessageReceiver
 		Security.insertProviderAt(new TigaseSaslProvider(), 6);
 
 		filter = new PacketFilter();
-
-		Map<String, String> user_repo_params = new LinkedHashMap<String, String>();
-		Map<String, String> auth_repo_params = new LinkedHashMap<String, String>();
-		for (Map.Entry<String, Object> entry: props.entrySet()) {
-			if (entry.getKey().startsWith(USER_REPO_PARAMS_NODE)) {
-				// Split the key to configuration nodes separated with '/'
-				String[] nodes = entry.getKey().split("/");
-				// The plugin ID part may contain many IDs separated with comma ','
-				if (nodes.length > 1) {
-					user_repo_params.put(nodes[1], entry.getValue().toString());
+		// Is there shared user repository instance? If so I want to use it:
+		user_repository = (UserRepository) props.get(SHARED_USER_REPO_PROP_KEY);
+		auth_repository = (UserAuthRepository) props.get(SHARED_AUTH_REPO_PROP_KEY);
+		if (user_repository != null) {
+			log.config("Using shared repository instance.");
+		} else {
+			Map<String, String> user_repo_params = new LinkedHashMap<String, String>();
+			Map<String, String> auth_repo_params = new LinkedHashMap<String, String>();
+			for (Map.Entry<String, Object> entry : props.entrySet()) {
+				if (entry.getKey().startsWith(USER_REPO_PARAMS_NODE)) {
+					// Split the key to configuration nodes separated with '/'
+					String[] nodes = entry.getKey().split("/");
+					// The plugin ID part may contain many IDs separated with comma ','
+					if (nodes.length > 1) {
+						user_repo_params.put(nodes[1], entry.getValue().toString());
+					}
+				}
+				if (entry.getKey().startsWith(AUTH_REPO_PARAMS_NODE)) {
+					// Split the key to configuration nodes separated with '/'
+					String[] nodes = entry.getKey().split("/");
+					// The plugin ID part may contain many IDs separated with comma ','
+					if (nodes.length > 1) {
+						auth_repo_params.put(nodes[1], entry.getValue().toString());
+					}
 				}
 			}
-			if (entry.getKey().startsWith(AUTH_REPO_PARAMS_NODE)) {
-				// Split the key to configuration nodes separated with '/'
-				String[] nodes = entry.getKey().split("/");
-				// The plugin ID part may contain many IDs separated with comma ','
-				if (nodes.length > 1) {
-					auth_repo_params.put(nodes[1], entry.getValue().toString());
-				}
-			}
+			try {
+				String cls_name = (String) props.get(USER_REPO_CLASS_PROP_KEY);
+				String res_uri = (String) props.get(USER_REPO_URL_PROP_KEY);
+				user_repository = RepositoryFactory.getUserRepository(getName(),
+								cls_name, res_uri, user_repo_params);
+				log.config("Initialized " + cls_name + " as user repository: " + res_uri);
+			} catch (Exception e) {
+				log.log(Level.SEVERE, "Can't initialize user repository: ", e);
+			} // end of try-catch
+			try {
+				String cls_name = (String) props.get(AUTH_REPO_CLASS_PROP_KEY);
+				String res_uri = (String) props.get(AUTH_REPO_URL_PROP_KEY);
+				auth_repository = RepositoryFactory.getAuthRepository(getName(),
+								cls_name, res_uri, auth_repo_params);
+				log.config("Initialized " + cls_name + " as auth repository: " + res_uri);
+			} catch (Exception e) {
+				log.log(Level.SEVERE, "Can't initialize auth repository: ", e);
+			} // end of try-catch
 		}
-		try {
-			String cls_name = (String)props.get(USER_REPO_CLASS_PROP_KEY);
-			String res_uri = (String)props.get(USER_REPO_URL_PROP_KEY);
-			user_repository = RepositoryFactory.getUserRepository(getName(),
-				cls_name, res_uri, user_repo_params);
-			log.config("Initialized " + cls_name + " as user repository: " + res_uri);
-		} catch (Exception e) {
-			log.log(Level.SEVERE, "Can't initialize user repository: ", e);
-		} // end of try-catch
-		try {
-			String cls_name = (String)props.get(AUTH_REPO_CLASS_PROP_KEY);
-			String res_uri = (String)props.get(AUTH_REPO_URL_PROP_KEY);
-			auth_repository =	RepositoryFactory.getAuthRepository(getName(),
-				cls_name, res_uri, auth_repo_params);
-			log.config("Initialized " + cls_name + " as auth repository: " + res_uri);
-		} catch (Exception e) {
-			log.log(Level.SEVERE, "Can't initialize auth repository: ", e);
-		} // end of try-catch
 
 		naUserRepository = new NARepository(user_repository);
 		String[] plugins = (String[])props.get(PLUGINS_PROP_KEY);

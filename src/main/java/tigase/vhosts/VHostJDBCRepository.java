@@ -93,14 +93,19 @@ public class VHostJDBCRepository extends VhostConfigRepository {
 		// them with vhosts settings in the database.
 		super.setProperties(properties);
 
-		String repo_class = (String)properties.get(VHOST_REPO_CLASS_PROP_KEY);
-		String repo_uri = (String)properties.get(VHOST_REPO_URI_PROP_KEY);
-		try {
-			repo = RepositoryFactory.getUserRepository(vhost_user, repo_class,
-							repo_uri, null);
-		} catch (Exception e) {
-			log.log(Level.SEVERE, "Can't initialize VHost repository", e);
-			repo = null;
+		repo = (UserRepository) properties.get(SHARED_USER_REPO_PROP_KEY);
+		if (repo != null) {
+			log.config("Using shared repository instance.");
+		} else {
+			String repo_class = (String) properties.get(VHOST_REPO_CLASS_PROP_KEY);
+			String repo_uri = (String) properties.get(VHOST_REPO_URI_PROP_KEY);
+			try {
+				repo = RepositoryFactory.getUserRepository(vhost_user, repo_class,
+								repo_uri, null);
+			} catch (Exception e) {
+				log.log(Level.SEVERE, "Can't initialize VHost repository", e);
+				repo = null;
+			}
 		}
 		if (repo != null) {
 			// If this is the first run of the VHost manager the database might not

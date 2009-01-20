@@ -127,6 +127,12 @@ public interface Configurable extends ServerComponent {
 		"tigase.db.jdbc.DrupalAuth";
 	public static final String LIBRESOURCE_REPO_CLASS_PROP_VAL =
 		"tigase.db.jdbc.LibreSourceAuth";
+	public static final String SHARED_USER_REPO_PROP_KEY = "shared-user-repo";
+	public static final String SHARED_USER_REPO_PARAMS_PROP_KEY =
+					"shared-user-repo-params";
+	public static final String SHARED_AUTH_REPO_PROP_KEY = "shared-auth-repo";
+	public static final String SHARED_AUTH_REPO_PARAMS_PROP_KEY =
+					"shared-auth-repo-params";
 
 	public static final String XML_REPO_URL_PROP_VAL = "user-repository.xml";
 	public static final String MYSQL_REPO_URL_PROP_VAL =

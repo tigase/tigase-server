@@ -39,6 +39,9 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
+import tigase.db.RepositoryFactory;
+import tigase.db.UserAuthRepository;
+import tigase.db.UserRepository;
 import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
 import tigase.disco.XMPPService;
@@ -94,6 +97,12 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 	 * components....
 	 */
 	private String routerCompName = null;
+	// Default user repsitory instance which can be shared among components
+	private UserRepository user_repository = null;
+	private Map<String, String> user_repo_params = null;
+	// Default user auth repository instance which can be shared among components
+	private UserAuthRepository auth_repository = null;
+	private Map<String, String> auth_repo_params = null;
 
 	@Override
 	public void setName(String name) {
@@ -346,6 +355,10 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 				e.printStackTrace();
 			} // end of try-catch
 		} // end of if (modified)
+		prop.put(SHARED_USER_REPO_PROP_KEY, user_repository);
+		prop.put(SHARED_USER_REPO_PARAMS_PROP_KEY, user_repo_params);
+		prop.put(SHARED_AUTH_REPO_PROP_KEY, auth_repository);
+		prop.put(SHARED_AUTH_REPO_PARAMS_PROP_KEY, auth_repo_params);
 		component.setProperties(prop);
 	}
 
@@ -390,91 +403,20 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 			} // end of for (String pack: packs)
 		}
 		defaults.put("demo-mode", demoMode);
-				String user_repo_class = DERBY_REPO_CLASS_PROP_VAL;
+		String user_repo_class = DERBY_REPO_CLASS_PROP_VAL;
 		String user_repo_url = DERBY_REPO_URL_PROP_VAL;
 		String auth_repo_class = DERBY_REPO_CLASS_PROP_VAL;
 		String auth_repo_url = DERBY_REPO_URL_PROP_VAL;
 		if (params.get(GEN_USER_DB) != null) {
-			if (params.get(GEN_USER_DB).equals("mysql")) {
-				user_repo_class = MYSQL_REPO_CLASS_PROP_VAL;
-				user_repo_url = MYSQL_REPO_URL_PROP_VAL;
-				auth_repo_class = MYSQL_REPO_CLASS_PROP_VAL;
-				auth_repo_url = MYSQL_REPO_URL_PROP_VAL;
-			} else {
-				if (params.get(GEN_USER_DB).equals("pgsql")) {
-					user_repo_class = PGSQL_REPO_CLASS_PROP_VAL;
-					user_repo_url = PGSQL_REPO_URL_PROP_VAL;
-					auth_repo_class = PGSQL_REPO_CLASS_PROP_VAL;
-					auth_repo_url = PGSQL_REPO_URL_PROP_VAL;
-				} else {
-					if (params.get(GEN_USER_DB).equals("derby")) {
-						user_repo_class = DERBY_REPO_CLASS_PROP_VAL;
-						user_repo_url = DERBY_REPO_URL_PROP_VAL;
-						auth_repo_class = DERBY_REPO_CLASS_PROP_VAL;
-						auth_repo_url = DERBY_REPO_URL_PROP_VAL;
-					} else {
-						user_repo_class = (String)params.get(GEN_USER_DB);
-						auth_repo_class = (String)params.get(GEN_USER_DB);
-					}
-				}
-			}
+			user_repo_class = (String) params.get(GEN_USER_DB);
+			auth_repo_class = (String) params.get(GEN_USER_DB);
 		}
 		if (params.get(GEN_USER_DB_URI) != null) {
 			user_repo_url = (String)params.get(GEN_USER_DB_URI);
 			auth_repo_url = user_repo_url;
 		}
 		if (params.get(GEN_AUTH_DB) != null) {
-			if (params.get(GEN_AUTH_DB).equals("mysql")) {
-				auth_repo_class = MYSQL_REPO_CLASS_PROP_VAL;
-				auth_repo_url = MYSQL_REPO_URL_PROP_VAL;
-			} else {
-				if (params.get(GEN_AUTH_DB).equals("pgsql")) {
-					auth_repo_class = PGSQL_REPO_CLASS_PROP_VAL;
-					auth_repo_url = PGSQL_REPO_URL_PROP_VAL;
-				} else {
-					if (params.get(GEN_AUTH_DB).equals("tigase-custom-auth")
-						|| params.get(GEN_AUTH_DB).equals("custom-auth")
-						|| params.get(GEN_AUTH_DB).equals("tigase-custom")) {
-						auth_repo_class = TIGASE_CUSTOM_AUTH_REPO_CLASS_PROP_VAL;
-						//auth_repo_url = TIGASE_AUTH_REPO_URL_PROP_VAL;
-						// For any external authentication connector like TigaseAuth,
-						// Drupal or LibreSource authentication all account
-						// management is done via Web interface so accounts containers
-						// for Jabber data have to be created automatically
-						//user_repo_url += "&autoCreateUser=true";
-					} else {
-						if (params.get(GEN_AUTH_DB).equals("tigase-auth")) {
-							auth_repo_class = TIGASE_AUTH_REPO_CLASS_PROP_VAL;
-							//auth_repo_url = TIGASE_AUTH_REPO_URL_PROP_VAL;
-							// For any external authentication connector like TigaseAuth,
-							// Drupal or LibreSource authentication all account
-							// management is done via Web interface so accounts containers
-							// for Jabber data have to be created automatically
-							//user_repo_url += "&autoCreateUser=true";
-						} else {
-							if (params.get(GEN_AUTH_DB).equals("drupal")) {
-								auth_repo_class = DRUPAL_REPO_CLASS_PROP_VAL;
-								auth_repo_url = DRUPAL_REPO_URL_PROP_VAL;
-								// For Drupal or LibreSource authentication all account
-								// management is done via Web interface so accounts containers
-								// for Jabber data have to be created automatically
-								user_repo_url += "&autoCreateUser=true";
-							} else {
-								if (params.get(GEN_AUTH_DB).equals("libresource")) {
-									auth_repo_class = LIBRESOURCE_REPO_CLASS_PROP_VAL;
-									auth_repo_url = LIBRESOURCE_REPO_URL_PROP_VAL;
-									// For Drupal or LibreSource authentication all account
-									// management is done via Web interface so accounts containers
-									// for Jabber data have to be created automatically
-									user_repo_url += "&autoCreateUser=true";
-								} else {
-									auth_repo_class = (String)params.get(GEN_AUTH_DB);
-								}
-							}
-						}
-					}
-				}
-			}
+			auth_repo_class = (String) params.get(GEN_AUTH_DB);
 		}
 		if (params.get(GEN_AUTH_DB_URI) != null) {
 			auth_repo_url = (String)params.get(GEN_AUTH_DB_URI);
@@ -496,9 +438,48 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 	 * @param properties
 	 */
 	@Override
-	public void setProperties(final Map<String, Object> properties) {
-		setupLogManager(properties);
-		demoMode = (Boolean)properties.get("demo-mode");
+	public void setProperties(final Map<String, Object> props) {
+		setupLogManager(props);
+		demoMode = (Boolean)props.get("demo-mode");
+		user_repo_params = new LinkedHashMap<String, String>();
+		auth_repo_params = new LinkedHashMap<String, String>();
+		for (Map.Entry<String, Object> entry: props.entrySet()) {
+			if (entry.getKey().startsWith(USER_REPO_PARAMS_NODE)) {
+				// Split the key to configuration nodes separated with '/'
+				String[] nodes = entry.getKey().split("/");
+				// The plugin ID part may contain many IDs separated with comma ','
+				if (nodes.length > 1) {
+					user_repo_params.put(nodes[1], entry.getValue().toString());
+				}
+			}
+			if (entry.getKey().startsWith(AUTH_REPO_PARAMS_NODE)) {
+				// Split the key to configuration nodes separated with '/'
+				String[] nodes = entry.getKey().split("/");
+				// The plugin ID part may contain many IDs separated with comma ','
+				if (nodes.length > 1) {
+					auth_repo_params.put(nodes[1], entry.getValue().toString());
+				}
+			}
+		}
+		try {
+			String cls_name = (String)props.get(USER_REPO_CLASS_PROP_KEY);
+			String res_uri = (String)props.get(USER_REPO_URL_PROP_KEY);
+			user_repository = RepositoryFactory.getUserRepository(getName(),
+							cls_name, res_uri, user_repo_params);
+			log.config("Initialized " + cls_name + " as user repository: " + res_uri);
+		} catch (Exception e) {
+			log.log(Level.SEVERE, "Can't initialize user repository: ", e);
+		} // end of try-catch
+		try {
+			String cls_name = (String)props.get(AUTH_REPO_CLASS_PROP_KEY);
+			String res_uri = (String)props.get(AUTH_REPO_URL_PROP_KEY);
+			auth_repository = RepositoryFactory.getAuthRepository(getName(),
+							cls_name, res_uri, auth_repo_params);
+			log.config("Initialized " + cls_name + " as auth repository: " + res_uri);
+		} catch (Exception e) {
+			log.log(Level.SEVERE, "Can't initialize auth repository: ", e);
+		} // end of try-catch
+
 	}
 
 	private void setupLogManager(Map<String, Object> properties) {
