@@ -123,7 +123,8 @@ public class XMPPSession {
 		// command where the user session is artificialy created....
 		if (old_res != conn) {
 			if (old_res != null) {
-				log.finest("Found old resource connection, id: "+old_res.getConnectionId());
+				log.finest("Found old resource connection, id: " +
+								old_res.getConnectionId());
 				removeResourceConnection(old_res);
 				try { old_res.logout(); } catch (Exception e) {
 					log.log(Level.INFO,
@@ -160,7 +161,8 @@ public class XMPPSession {
 	public XMPPResourceConnection getResourceForResource(final String resource) {
 		if (resource != null && resource.length() > 0) {
 			for (XMPPResourceConnection conn: activeResources) {
-				log.finest("Resource checking: " + conn.getResource());
+				log.finest("Resource checking: " + conn.getResource() +
+								", connectionID: " + conn.getConnectionId());
 				if (resource.equalsIgnoreCase(conn.getResource())) {
 					return conn;
 				} // end of if (resource.equals(conn.getResource()))
