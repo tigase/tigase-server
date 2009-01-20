@@ -104,6 +104,7 @@ public interface Configurable extends ServerComponent {
 	public static final String GEN_VIRT_HOSTS = "--virt-hosts";
 	public static final String GEN_SM_PLUGINS = "--sm-plugins";
 	public static final String GEN_DEBUG = "--debug";
+	public static final String GEN_DEBUG_PACKAGES = "--debug-packages";
 	public static final String GEN_MAX_QUEUE_SIZE = "--max-queue-size";
 
 	public static final String GEN_SREC_DB = "--gen-srec-db";

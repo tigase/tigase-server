@@ -402,6 +402,15 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 				defaults.put(LOGGING_KEY + "tigase."+pack+".level", "ALL");
 			} // end of for (String pack: packs)
 		}
+		if (params.get(GEN_DEBUG_PACKAGES) != null) {
+			defaults.put(LOGGING_KEY + ".level", "INFO");
+			defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.level", "ALL");
+			defaults.put(LOGGING_KEY + "java.util.logging.ConsoleHandler.level", "WARNING");
+			String[] packs = ((String)params.get(GEN_DEBUG_PACKAGES)).split(",");
+			for (String pack: packs) {
+				defaults.put(LOGGING_KEY + pack+".level", "ALL");
+			} // end of for (String pack: packs)
+		}
 		defaults.put("demo-mode", demoMode);
 		String user_repo_class = DERBY_REPO_CLASS_PROP_VAL;
 		String user_repo_url = DERBY_REPO_URL_PROP_VAL;
@@ -495,6 +504,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 				} // end of if (key.equals())
 			} // end of if (entry.getKey().startsWith(LOGGING_KEY))
 		}
+		System.out.println("Setting logging: \n" + buff.toString());
 		loadLogManagerConfig(buff.toString());
 		log.config("DONE");
 	}
