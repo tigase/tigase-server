@@ -338,6 +338,9 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 	public void setup(Configurable component) {
 		String compId = component.getName();
 		Map<String, Object> prop = repository.getProperties(compId);
+//		if (component == this) {
+//			System.out.println("Properties: " + prop.toString());
+//		}
 		Map<String, Object> defs = component.getDefaults(defConfigParams);
 		Set<Map.Entry<String, Object>> defs_entries = defs.entrySet();
 		boolean modified = false;
@@ -411,6 +414,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 				defaults.put(LOGGING_KEY + pack+".level", "ALL");
 			} // end of for (String pack: packs)
 		}
+		//System.out.println("Setting logging properties:\n" + defaults.toString());
 		defaults.put("demo-mode", demoMode);
 		String user_repo_class = DERBY_REPO_CLASS_PROP_VAL;
 		String user_repo_url = DERBY_REPO_URL_PROP_VAL;
@@ -504,7 +508,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 				} // end of if (key.equals())
 			} // end of if (entry.getKey().startsWith(LOGGING_KEY))
 		}
-		System.out.println("Setting logging: \n" + buff.toString());
+		//System.out.println("Setting logging: \n" + buff.toString());
 		loadLogManagerConfig(buff.toString());
 		log.config("DONE");
 	}
