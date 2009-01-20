@@ -125,14 +125,19 @@ public class XMPPSession {
 			if (old_res != null) {
 				log.finest("Found old resource connection, id: " +
 								old_res.getConnectionId());
-				removeResourceConnection(old_res);
 				try { old_res.logout(); } catch (Exception e) {
 					log.log(Level.INFO,
 						"Exception during closing old connection, ignoring.", e);
 				}
+				removeResourceConnection(old_res);
 			} // end of if (old_res != null)
-			activeResources.add(conn);
-			conn.setParentSession(this);
+			// The connection could have been already added with null resource
+			// to avoid adding it twice let's check if it is already there
+			old_res = getResourceForConnectionId(conn.getConnectionId());
+			if (old_res == null) {
+				activeResources.add(conn);
+				conn.setParentSession(this);
+			}
 			log.finest("Number of active resources is: " + activeResources.size());
 			if (activeResources.size() > 1) {
 				int i = 0;
