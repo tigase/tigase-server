@@ -37,14 +37,6 @@ import static tigase.conf.Configurable.*;
  */
 public class SessionManagerConfig {
 
-	public static final String USER_REPO_CLASS_PROP_KEY = "user-repo-class";
-	public static final String USER_REPO_URL_PROP_KEY = "user-repo-url";
-	public static final String USER_REPO_PARAMS_NODE = "user-repo-params";
-
-	public static final String AUTH_REPO_CLASS_PROP_KEY = "auth-repo-class";
-	public static final String AUTH_REPO_URL_PROP_KEY = "auth-repo-url";
-	public static final String AUTH_REPO_PARAMS_NODE = "auth-repo-params";
-
 	public static final String PLUGINS_PROP_KEY = "plugins";
 	public static final String PLUGINS_CONF_PROP_KEY = "plugins-conf";
 
@@ -92,106 +84,6 @@ public class SessionManagerConfig {
 		Map<String, Object> params) {
 
 		boolean full_comps = true;
-		String user_repo_class = DERBY_REPO_CLASS_PROP_VAL;
-		String user_repo_url = DERBY_REPO_URL_PROP_VAL;
-		String auth_repo_class = DERBY_REPO_CLASS_PROP_VAL;
-		String auth_repo_url = DERBY_REPO_URL_PROP_VAL;
-		if (params.get(GEN_USER_DB) != null) {
-			if (params.get(GEN_USER_DB).equals("mysql")) {
-				user_repo_class = MYSQL_REPO_CLASS_PROP_VAL;
-				user_repo_url = MYSQL_REPO_URL_PROP_VAL;
-				auth_repo_class = MYSQL_REPO_CLASS_PROP_VAL;
-				auth_repo_url = MYSQL_REPO_URL_PROP_VAL;
-			} else {
-				if (params.get(GEN_USER_DB).equals("pgsql")) {
-					user_repo_class = PGSQL_REPO_CLASS_PROP_VAL;
-					user_repo_url = PGSQL_REPO_URL_PROP_VAL;
-					auth_repo_class = PGSQL_REPO_CLASS_PROP_VAL;
-					auth_repo_url = PGSQL_REPO_URL_PROP_VAL;
-				} else {
-					if (params.get(GEN_USER_DB).equals("derby")) {
-						user_repo_class = DERBY_REPO_CLASS_PROP_VAL;
-						user_repo_url = DERBY_REPO_URL_PROP_VAL;
-						auth_repo_class = DERBY_REPO_CLASS_PROP_VAL;
-						auth_repo_url = DERBY_REPO_URL_PROP_VAL;
-					} else {
-						user_repo_class = (String)params.get(GEN_USER_DB);
-						auth_repo_class = (String)params.get(GEN_USER_DB);
-					}
-				}
-			}
-		}
-		if (params.get(GEN_USER_DB_URI) != null) {
-			user_repo_url = (String)params.get(GEN_USER_DB_URI);
-			auth_repo_url = user_repo_url;
-		}
-		if (params.get(GEN_AUTH_DB) != null) {
-			if (params.get(GEN_AUTH_DB).equals("mysql")) {
-				auth_repo_class = MYSQL_REPO_CLASS_PROP_VAL;
-				auth_repo_url = MYSQL_REPO_URL_PROP_VAL;
-			} else {
-				if (params.get(GEN_AUTH_DB).equals("pgsql")) {
-					auth_repo_class = PGSQL_REPO_CLASS_PROP_VAL;
-					auth_repo_url = PGSQL_REPO_URL_PROP_VAL;
-				} else {
-					if (params.get(GEN_AUTH_DB).equals("tigase-custom-auth")
-						|| params.get(GEN_AUTH_DB).equals("custom-auth")
-						|| params.get(GEN_AUTH_DB).equals("tigase-custom")) {
-						auth_repo_class = TIGASE_CUSTOM_AUTH_REPO_CLASS_PROP_VAL;
-						//auth_repo_url = TIGASE_AUTH_REPO_URL_PROP_VAL;
-						// For any external authentication connector like TigaseAuth,
-						// Drupal or LibreSource authentication all account
-						// management is done via Web interface so accounts containers
-						// for Jabber data have to be created automatically
-						//user_repo_url += "&autoCreateUser=true";
-					} else {
-						if (params.get(GEN_AUTH_DB).equals("tigase-auth")) {
-							auth_repo_class = TIGASE_AUTH_REPO_CLASS_PROP_VAL;
-							//auth_repo_url = TIGASE_AUTH_REPO_URL_PROP_VAL;
-							// For any external authentication connector like TigaseAuth,
-							// Drupal or LibreSource authentication all account
-							// management is done via Web interface so accounts containers
-							// for Jabber data have to be created automatically
-							//user_repo_url += "&autoCreateUser=true";
-						} else {
-							if (params.get(GEN_AUTH_DB).equals("drupal")) {
-								auth_repo_class = DRUPAL_REPO_CLASS_PROP_VAL;
-								auth_repo_url = DRUPAL_REPO_URL_PROP_VAL;
-								// For Drupal or LibreSource authentication all account
-								// management is done via Web interface so accounts containers
-								// for Jabber data have to be created automatically
-								user_repo_url += "&autoCreateUser=true";
-								full_comps = false;
-							} else {
-								if (params.get(GEN_AUTH_DB).equals("libresource")) {
-									auth_repo_class = LIBRESOURCE_REPO_CLASS_PROP_VAL;
-									auth_repo_url = LIBRESOURCE_REPO_URL_PROP_VAL;
-									// For Drupal or LibreSource authentication all account
-									// management is done via Web interface so accounts containers
-									// for Jabber data have to be created automatically
-									user_repo_url += "&autoCreateUser=true";
-									full_comps = false;
-								} else {
-									auth_repo_class = (String)params.get(GEN_AUTH_DB);
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		if (params.get(GEN_AUTH_DB_URI) != null) {
-			auth_repo_url = (String)params.get(GEN_AUTH_DB_URI);
-		}
-
-		props.put(USER_REPO_CLASS_PROP_KEY, user_repo_class);
-	  props.put(USER_REPO_URL_PROP_KEY, user_repo_url);
-		props.put(USER_REPO_PARAMS_NODE + "/param-1", "value-1");
-
-	  props.put(AUTH_REPO_CLASS_PROP_KEY, auth_repo_class);
-	  props.put(AUTH_REPO_URL_PROP_KEY, auth_repo_url);
-		props.put(AUTH_REPO_PARAMS_NODE + "/param-1", "value-1");
-
 		String str_plugins = (String)params.get(GEN_SM_PLUGINS);
 		if (str_plugins != null) {
 			props.put(PLUGINS_PROP_KEY, str_plugins.split(","));

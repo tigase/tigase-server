@@ -22,6 +22,7 @@
 package tigase.xmpp;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -114,7 +115,7 @@ public class XMPPSession {
 	 *
 	 * @param conn
 	 */
-	public void addResourceConnection(XMPPResourceConnection conn) {
+	public synchronized void addResourceConnection(XMPPResourceConnection conn) {
 		log.finest("Adding resource connection for username : " + username
 			+ ", id: " + conn.getConnectionId());
 		XMPPResourceConnection old_res = getResourceForResource(conn.getResource());
@@ -142,7 +143,7 @@ public class XMPPSession {
 		}
 	}
 
-	public void removeResourceConnection(XMPPResourceConnection conn) {
+	public synchronized void removeResourceConnection(XMPPResourceConnection conn) {
 		activeResources.remove(conn);
 		conn.setParentSession(null);
 	}
@@ -196,7 +197,7 @@ public class XMPPSession {
 		return getResourceForResource(resource);
 	}
 
-	public XMPPResourceConnection getResourceConnection(final String jid) {
+	public synchronized XMPPResourceConnection getResourceConnection(final String jid) {
 
 		log.finest("Called for: " + jid);
 		if (activeResources.size() == 0) {
@@ -220,10 +221,17 @@ public class XMPPSession {
 		// connection with the highest priority:
 		ArrayList<XMPPResourceConnection> al =
 			new ArrayList<XMPPResourceConnection>();
-		al.add(activeResources.get(0));
-		int highest_priority = al.get(0).getPriority();
-		for (int i = 1; i < activeResources.size(); ++i) {
-			XMPPResourceConnection conn_tmp = activeResources.get(i);
+//		al.add(activeResources.get(0));
+//		int highest_priority = al.get(0).getPriority();
+		int highest_priority = 0;
+		for (Iterator<XMPPResourceConnection> it = activeResources.iterator();
+						it.hasNext();) {
+			XMPPResourceConnection conn_tmp = it.next();
+			if (!conn_tmp.isAuthorized()) {
+				log.info("Old XMPP connection which is not authorized anymore, removing..." +
+								conn_tmp.getConnectionId());
+				it.remove();
+			}
 			if (conn_tmp.getPriority() == highest_priority) {
 				al.add(conn_tmp);
 				continue;
@@ -233,8 +241,7 @@ public class XMPPSession {
 				al.add(conn_tmp);
 				highest_priority = conn_tmp.getPriority();
 			}
-		} // end of for (XMPPResourceConnection conn: activeResources)
-
+		}
 		if (al.size() == 1) {
 			// We found 1 connection with highest priority
 			return al.get(0);

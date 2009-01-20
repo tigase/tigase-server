@@ -188,6 +188,14 @@ public interface Configurable extends ServerComponent {
 					"tigase.vhosts.VHostManager";
 
 
+	public static final String USER_REPO_CLASS_PROP_KEY = "user-repo-class";
+	public static final String USER_REPO_URL_PROP_KEY = "user-repo-url";
+	public static final String USER_REPO_PARAMS_NODE = "user-repo-params";
+
+	public static final String AUTH_REPO_CLASS_PROP_KEY = "auth-repo-class";
+	public static final String AUTH_REPO_URL_PROP_KEY = "auth-repo-url";
+	public static final String AUTH_REPO_PARAMS_NODE = "auth-repo-params";
+
 	public static final String HOSTNAMES_PROP_KEY = "hostnames";
 	public static final String ADMINS_PROP_KEY = "admins";
 	public static final String TRUSTED_PROP_KEY = "trusted";
