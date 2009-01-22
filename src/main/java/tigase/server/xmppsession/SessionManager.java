@@ -443,6 +443,7 @@ public class SessionManager extends AbstractMessageReceiver
           new Packet(packet.getElement().clone());
 				host_pac.getElement().setAttribute("to", getComponentId());
 				host_pac.getElement().setAttribute(Packet.OLDTO, packet.getElemTo());
+				host_pac.getElement().setAttribute(Packet.OLDFROM, packet.getElemFrom());
 				processPacket(host_pac);
 			}
 			return true;
@@ -733,7 +734,8 @@ public class SessionManager extends AbstractMessageReceiver
 				if (action != Command.Action.cancel) {
 					boolean admin = false;
 					try {
-						admin = isAdmin(connection.getUserId());
+						admin = connection != null && connection.isAuthorized() &&
+										isAdmin(connection.getUserId());
 						if (admin) {
 							log.info("Processing admin command: " + pc.toString());
 							int hashIdx = strCommand.indexOf('#');
@@ -881,6 +883,11 @@ public class SessionManager extends AbstractMessageReceiver
 		if (oldto != null) {
 			packet.getElement().setAttribute("from", oldto);
 			packet.getElement().removeAttribute(Packet.OLDTO);
+		}
+		String oldfrom = packet.getAttribute(Packet.OLDFROM);
+		if (oldfrom != null) {
+			packet.getElement().setAttribute("to", oldfrom);
+			packet.getElement().removeAttribute(Packet.OLDFROM);
 		}
 		return super.addOutPacket(packet);
 	}
