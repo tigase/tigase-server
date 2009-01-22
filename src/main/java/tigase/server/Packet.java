@@ -59,6 +59,7 @@ public class Packet {
 	 *
 	 */
 	public static final String OLDTO = "oldto";
+	public static final String OLDFROM = "oldfrom";
 
 	private final Element elem;
 	private final Command command;
