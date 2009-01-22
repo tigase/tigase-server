@@ -63,6 +63,7 @@ public class BoshIOService extends XMPPIOService {
 		this.content_type = ct;
 	}
 
+	@Override
 	public void writeRawData(String data) throws IOException {
 		if (data != null && data.startsWith("<body")) {
 			StringBuilder sb = new StringBuilder();
