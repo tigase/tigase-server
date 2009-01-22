@@ -57,7 +57,7 @@ import static tigase.conf.Configurable.*;
 public class VHostJDBCRepository extends VhostConfigRepository {
 
 	private static final Logger log =
-					Logger.getLogger("tigase.vhosts.VHostJDBCRepository");
+					Logger.getLogger(VHostJDBCRepository.class.getName());
 
 	public static final String VHOST_REPO_CLASS_PROP_KEY = "vhost-repo-class";
 	public static final String VHOST_REPO_URI_PROP_KEY = "vhost-repo-uri";
