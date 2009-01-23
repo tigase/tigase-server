@@ -637,6 +637,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	 *
 	 * @param packet a <code>Packet</code> value
 	 */
+	@Override
 	public void processPacket(final Packet packet) {
 
 		if (packet.isCommand()) {
@@ -710,6 +711,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	 * @param jid a <code>String</code> value
 	 * @return an <code>Element</code> value
 	 */
+	@Override
 	public Element getDiscoInfo(String node, String jid) {
 		if (jid != null && jid.startsWith(getName()+".")) {
 			return serviceEntity.getDiscoInfo(node);
@@ -717,8 +719,10 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		return null;
 	}
 
+	@Override
 	public 	List<Element> getDiscoFeatures() { return null; }
 
+	@Override
 	public List<Element> getDiscoItems(String node, String jid) {
 		if (jid.startsWith(getName()+".")) {
 			return serviceEntity.getDiscoItems(node, null);
