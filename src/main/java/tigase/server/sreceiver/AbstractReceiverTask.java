@@ -58,7 +58,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 
 	private String jid = null;
 	private String name = null;
-	private String local_domain = null;
+	protected String local_domain = null;
 	private String description = null;
 	private Map<String, PropertyItem> props = null;
 
@@ -80,6 +80,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 
 	// Implementation of tigase.server.sreceiver.ReceiverTaskIfc
 
+	@Override
 	public void setStanzaReceiver(StanzaReceiverIfc srecv) {
 		this.srecv = srecv;
 	}
@@ -93,6 +94,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 	 *
 	 * @return a <code>ReceiverTaskIfc</code> value
 	 */
+	@Override
 	public ReceiverTaskIfc getInstance() {
 		try {
 			return getClass().newInstance();
@@ -108,6 +110,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 	 *
 	 * @param jid a <code>String</code> value
 	 */
+	@Override
 	public void setJID(final String jid) {
 		this.jid = jid;
 		log.fine("JID set to: " + this.jid);
@@ -122,6 +125,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 	 *
 	 * @return a <code>String</code> value
 	 */
+	@Override
 	public String getJID() {
 		return jid;
 	}
@@ -131,6 +135,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 	 *
 	 * @return a <code>String</code> value
 	 */
+	@Override
 	public String getDescription() {
 		return description;
 	}
@@ -214,6 +219,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 		ri.setSubscribed(subscribed);
 	}
 
+	@Override
 	public void setRosterItemModerationAccepted(RosterItem ri, boolean accepted) {
 		ri.setModerationAccepted(accepted);
 	}
@@ -221,6 +227,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 	/**
 	 * Describe <code>addNewSubscribers</code> method here.
 	 *
+	 * @param results
 	 * @param new_subscr a <code>String[]</code> value
 	 */
 	public void addNewSubscribers(Queue<Packet> results, String... new_subscr) {
@@ -244,6 +251,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 		} // end of for (String buddy: new_subscr)
 	}
 
+	@Override
 	public void removeSubscribers(Queue<Packet> results, String... subscr) {
 		for (String buddy: subscr) {
 			RosterItem ri = removeFromRoster(buddy);
@@ -260,6 +268,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 	 *
 	 * @param map a <code>Map</code> value
 	 */
+	@Override
 	public void setParams(final Map<String, Object> map) {
 		if (props == null) {
 			props = new TreeMap<String, PropertyItem>();
@@ -352,10 +361,12 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 	 *
 	 * @return a <code>Map</code> value
 	 */
+	@Override
 	public Map<String, PropertyItem> getParams() {
 		return props;
 	}
 
+	@Override
 	public Map<String, PropertyItem> getDefaultParams() {
 		Map<String, PropertyItem> defs = new TreeMap<String, PropertyItem>();
 		defs.put(SUBSCR_RESTRICTIONS_PROP_KEY,
@@ -391,6 +402,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 		return defs;
 	}
 
+	@Override
 	public void init(final Queue<Packet> results) {
 		for (RosterItem ri: roster.values()) {
 			Packet presence = null;
@@ -405,6 +417,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 		}
 	}
 
+	@Override
 	public void destroy(Queue<Packet> results) {
 		for (RosterItem ri: roster.values()) {
 			Packet presence = getPresence(ri.getJid(), jid, StanzaType.unsubscribe);
@@ -420,6 +433,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 	 * @param packet a <code>Packet</code> value
 	 * @param results a <code>Queue</code> value
 	 */
+	@Override
 	public void processPacket(final Packet packet, final Queue<Packet> results) {
 		++packets_received;
 		log.finest(getJID() + ": " + "Processing packet: " + packet.toString());
@@ -538,6 +552,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 		} // end of for (RosterItem ri: roster.values())
 	}
 
+	@Override
 	public List<StatRecord> getStats() {
     List<StatRecord> stats = new LinkedList<StatRecord>();
     stats.add(new StatRecord(getJID(), "Roster size", "int",
@@ -555,11 +570,13 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 		return stats;
 	}
 
+	@Override
 	public boolean isAdmin(String jid) {
 		RosterItem ri = getRosterItem(jid);
 		return ri != null && (ri.isAdmin() || ri.isOwner());
 	}
 
+	@Override
 	public Map<String, RosterItem> getRoster() {
 		return roster;
 	}
