@@ -40,6 +40,8 @@ public class TaskType {
 	/**
 	 * Creates a new <code>TaskType</code> instance.
 	 *
+	 *
+	 * @param task
 	 */
 	public TaskType(ReceiverTaskIfc task) {
 		this.task = task;
