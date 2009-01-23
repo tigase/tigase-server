@@ -56,7 +56,7 @@ public class DomainFilter extends XMPPProcessor
 
 	public static final String ALLOWED_DOMAINS_LIST_KEY =
 					"allowed-domains-list";
-	protected static final String ALLOWED_DOMAINS_KEY = "allowed-domains";
+	public static final String ALLOWED_DOMAINS_KEY = "allowed-domains";
 
 	private static final String ID = "domain-filter";
 	private static final String[] ELEMENTS = {ALL};
