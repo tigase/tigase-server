@@ -83,7 +83,11 @@ public class SessionManagerConfig {
 	public static void getDefaults(Map<String, Object> props,
 		Map<String, Object> params) {
 
-		boolean full_comps = true;
+		boolean full_comps = (params.get(GEN_AUTH_DB) == null) ||
+			params.get(GEN_AUTH_DB).toString().equals("mysql") ||
+			params.get(GEN_AUTH_DB).toString().equals("pgsql") ||
+			params.get(GEN_AUTH_DB).toString().equals("derby") ||
+			params.get(GEN_AUTH_DB).toString().equals("tigase-auth");
 		String str_plugins = (String)params.get(GEN_SM_PLUGINS);
 		if (str_plugins != null) {
 			props.put(PLUGINS_PROP_KEY, str_plugins.split(","));
