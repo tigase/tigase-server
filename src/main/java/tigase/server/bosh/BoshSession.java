@@ -81,11 +81,12 @@ public class BoshSession {
 	private String domain = null;
 	private String sessionId = null;
 	private String dataReceiver = null;
+	private int[] hashCodes = null;
 	/**
 	 * <code>current_rid</code> is the table with body rids which are waiting
 	 * for replies.
 	 */
-	private long[] current_rids = null;
+	private long[] currentRids = null;
 	private int rids_head = 0;
 	private int rids_tail = 0;
 	private long previous_received_rid = -1;
@@ -100,6 +101,10 @@ public class BoshSession {
 	/**
 	 * Creates a new <code>BoshSession</code> instance.
 	 *
+	 *
+	 * @param def_domain
+	 * @param dataReceiver
+	 * @param handler
 	 */
 	public BoshSession(String def_domain, String dataReceiver,
 		BoshSessionTaskHandler handler) {
@@ -119,9 +124,11 @@ public class BoshSession {
 			cache_on = true;
 			log.fine("BoshSessionCache set to ON");
 		}
-		current_rids = new long[this.concurrent_requests+1];
-		for (int i = 0; i < current_rids.length; i++) {
-			current_rids[i] = -1;
+		hashCodes = new int[(this.concurrent_requests+1)*5];
+		currentRids = new long[(this.concurrent_requests+1)*5];
+		for (int i = 0; i < currentRids.length; i++) {
+			currentRids[i] = -1;
+			hashCodes[i] = -1;
 		}
 		long wait_l = max_wait;
 		String wait_s = packet.getAttribute(WAIT_ATTR);
@@ -147,7 +154,7 @@ public class BoshSession {
 		if (tmp_str != null) {
 			try {
 				previous_received_rid = Long.parseLong(tmp_str);
-				current_rids[rids_head++] = previous_received_rid;
+				currentRids[rids_head++] = previous_received_rid;
 			} catch (NumberFormatException e) {	}
 		}
 		this.hold_requests = Math.max(hold_i, hold_requests);
@@ -281,59 +288,103 @@ public class BoshSession {
 	}
 
 	private long getCurrentRidTail() {
-		synchronized (current_rids) {
-			return current_rids[rids_tail];
+		synchronized (currentRids) {
+			return currentRids[rids_tail];
 		}
 	}
 
 	private long takeCurrentRidTail() {
-		synchronized (current_rids) {
+		synchronized (currentRids) {
 			int idx = rids_tail++;
-			if (rids_tail >= current_rids.length) {
+			if (rids_tail >= currentRids.length) {
 				rids_tail = 0;
 			}
-			return current_rids[idx];
+			return currentRids[idx];
 		}
 	}
 
-	private void processRid(long rid) {
-		synchronized (current_rids) {
+	private void processRid(long rid, List<Element> packets) {
+		synchronized (currentRids) {
 			if ((previous_received_rid + 1) != rid) {
 				log.info("Incorrect packet order, last_rid=" + previous_received_rid
           + ", current_rid=" + rid);
 			}
+			if (packets != null && packets.size() > 0) {
+				StringBuilder sb = new StringBuilder();
+				for (Element elem : packets) {
+					sb.append(elem.toString());
+				}
+				hashCodes[rids_head] = sb.toString().hashCode();
+			} else {
+				hashCodes[rids_head] = -1;
+			}
 			previous_received_rid = rid;
-			current_rids[rids_head++] = rid;
-			if (rids_head >= current_rids.length) {
+			currentRids[rids_head++] = rid;
+			if (rids_head >= currentRids.length) {
 				rids_head = 0;
 			}
 		}
 	}
 
-	private boolean isDuplicate(long rid) {
-		synchronized (current_rids) {
-			for (long c_rid: current_rids) {
-				if (rid == c_rid) {
-					return true;
+	private boolean isDuplicateRid(long rid, List<Element> packets) {
+		synchronized (currentRids) {
+			int hashCode = -1;
+			if (packets != null && packets.size() > 0) {
+				StringBuilder sb = new StringBuilder();
+				for (Element elem : packets) {
+					sb.append(elem.toString());
+				}
+				hashCode = sb.toString().hashCode();
+			}
+			for (int i = 0; i < currentRids.length; ++i) {
+				if (rid == currentRids[i]) {
+					return hashCode != hashCodes[i];
 				}
 			}
 		}
 		return false;
 	}
 
+	private boolean isDuplicateMessage(long rid, List<Element> packets) {
+		synchronized (currentRids) {
+			int hashCode = -1;
+			if (packets != null && packets.size() > 0) {
+				StringBuilder sb = new StringBuilder();
+				for (Element elem : packets) {
+					sb.append(elem.toString());
+				}
+				hashCode = sb.toString().hashCode();
+			}
+			if (hashCode == -1) {
+				return false;
+			}
+			for (int i = 0; i < currentRids.length; ++i) {
+				if (rid == currentRids[i]) {
+					return hashCode == hashCodes[i];
+				}
+			}
+		}
+		return false;
+	}
+
+	private Element getBodyElem() {
+		Element body = new Element(BODY_EL_NAME,
+						new String[]{FROM_ATTR, SECURE_ATTR,
+							"xmpp:version",
+							"xmlns:xmpp",
+							"xmlns:stream"},
+						new String[]{this.domain, "true",
+							"1.0",
+							"urn:xmpp:xbosh",
+							"http://etherx.jabber.org/streams"});
+		body.setXMLNS(BOSH_XMLNS);
+		return body;
+	}
+
 	private synchronized void sendBody(BoshIOService serv, Element body_par) {
 		Element body = body_par;
 		if (body == null) {
-			body = new Element(BODY_EL_NAME,
-				new String[] {FROM_ATTR, SECURE_ATTR,
-										"xmpp:version",
-										"xmlns:xmpp",
-										"xmlns:stream"},
-				new String[] {this.domain, "true",
-										"1.0",
-										"urn:xmpp:xbosh",
-										"http://etherx.jabber.org/streams"});
-			body.setXMLNS(BOSH_XMLNS);
+			body = getBodyElem();
 			long rid = takeCurrentRidTail();
 			if (rid > 0) {
 				body.setAttribute(ACK_ATTR, ""+rid);
@@ -457,24 +508,31 @@ public class BoshSession {
 			}
 		}
 
-		service.setContentType(content_type);
-		service.setSid(sid);
-		connections.offer(service);
-
 		if (packet.getElemName() == BODY_EL_NAME && packet.getXMLNS() == BOSH_XMLNS) {
+			List<Element> children = packet.getElemChildren(BODY_EL_NAME);
 			boolean duplicate = false;
 			if (packet.getAttribute(RID_ATTR) != null) {
 				try {
 					long rid = Long.parseLong(packet.getAttribute(RID_ATTR));
+					if (isDuplicateRid(rid, children)) {
+						log.info("Discovered duplicate client connection, trying to close the old one with RID: " + rid);
+						Element body = getBodyElem();
+						body.setAttribute("type", StanzaType.terminate.toString());
+						sendBody(service, body);
+						return;
+					}
 					service.setRid(rid);
-					duplicate = isDuplicate(rid);
+					duplicate = isDuplicateMessage(rid, children);
 					if (!duplicate) {
-						processRid(rid);
+						processRid(rid, children);
 					}
 				} catch (NumberFormatException e) {
 					log.warning("Incorrect RID value: " + packet.getAttribute(RID_ATTR));
 				}
 			}
+			service.setContentType(content_type);
+			service.setSid(sid);
+			connections.offer(service);
 			if (!duplicate) {
 				if (packet.getType() != null && packet.getType() == StanzaType.terminate) {
 					// We are preparing for session termination.
@@ -505,8 +563,7 @@ public class BoshSession {
 							+ packet.getAttribute(CACHE_ATTR));
 					}
 				} else {
-					List<Element> children = packet.getElemChildren(BODY_EL_NAME);
-					if (children != null) {
+										if (children != null) {
 						for (Element el: children) {
 							if (el.getXMLNS().equals(BOSH_XMLNS)) {
 								el.setXMLNS("jabber:client");
