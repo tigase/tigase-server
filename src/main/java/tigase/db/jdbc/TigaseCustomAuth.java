@@ -21,13 +21,11 @@
  */
 package tigase.db.jdbc;
 
-import java.math.BigDecimal;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
@@ -47,7 +45,6 @@ import javax.security.sasl.SaslException;
 import javax.security.sasl.SaslServer;
 
 import tigase.util.Base64;
-import tigase.auth.SaslPLAIN;
 import tigase.db.AuthorizationException;
 import tigase.db.DBInitException;
 import tigase.db.TigaseDBException;
@@ -243,7 +240,10 @@ public class TigaseCustomAuth implements UserAuthRepository {
 	private String getpassword_query = DEF_GETPASSWORD_QUERY;
 	private String updatepassword_query = DEF_UPDATEPASSWORD_QUERY;
 	private String userlogin_query = DEF_USERLOGIN_QUERY;
-	private String userlogout_query = DEF_USERLOGOUT_QUERY;
+	// It is better just to not call the query if it is not defined by the user
+	// By default it is null then and not called.
+	private String userlogout_query = null;
+//	private String userlogout_query = DEF_USERLOGOUT_QUERY;
 
 	private String[] nonsasl_mechs = DEF_NONSASL_MECHS.split(",");
 	private String[] sasl_mechs = DEF_SASL_MECHS.split(",");
@@ -302,7 +302,9 @@ public class TigaseCustomAuth implements UserAuthRepository {
 		get_pass = prepareQuery(getpassword_query);
 		update_pass = prepareQuery(updatepassword_query);
 		user_login = prepareQuery(userlogin_query);
-		user_logout = prepareQuery(userlogout_query);
+		if (userlogout_query != null) {
+			user_logout = prepareQuery(userlogout_query);
+		}
 	}
 
 	/**
@@ -432,8 +434,7 @@ public class TigaseCustomAuth implements UserAuthRepository {
 				DEF_USERLOGIN_QUERY);
 			userlogin_active = true;
 		}
-		userlogout_query = getParamWithDef(params, DEF_USERLOGOUT_KEY,
-			DEF_USERLOGOUT_QUERY);
+		userlogout_query = getParamWithDef(params, DEF_USERLOGOUT_KEY, null);
 
 		nonsasl_mechs = getParamWithDef(params, DEF_NONSASL_MECHS_KEY,
 			DEF_NONSASL_MECHS).split(",");
@@ -557,14 +558,16 @@ public class TigaseCustomAuth implements UserAuthRepository {
 
 	public void logout(final String user)
 		throws UserNotFoundException, TigaseDBException {
-		try {
-			checkConnection();
-			synchronized (user_logout) {
-				user_logout.setString(1, JIDUtils.getNodeID(user));
-				user_logout.execute();
+		if (user_logout != null) {
+			try {
+				checkConnection();
+				synchronized (user_logout) {
+					user_logout.setString(1, JIDUtils.getNodeID(user));
+					user_logout.execute();
+				}
+			} catch (SQLException e) {
+				throw new TigaseDBException("Problem accessing repository.", e);
 			}
-		} catch (SQLException e) {
-			throw new TigaseDBException("Problem accessing repository.", e);
 		}
 	}
 
