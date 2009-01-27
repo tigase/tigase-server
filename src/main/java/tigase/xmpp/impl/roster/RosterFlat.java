@@ -55,24 +55,30 @@ public class RosterFlat extends RosterAbstract {
 	private static final int maxRosterSize =
 					new Long(Runtime.getRuntime().maxMemory() / 250000L).intValue();
 
+	public static void parseRoster(String roster_str,
+					Map<String, RosterElement> roster) {
+		DomBuilderHandler domHandler = new DomBuilderHandler();
+		parser.parse(domHandler, roster_str.toCharArray(), 0, roster_str.length());
+		Queue<Element> elems = domHandler.getParsedElements();
+		if (elems != null && elems.size() > 0) {
+			for (Element elem : elems) {
+				RosterElement relem = new RosterElement(elem);
+				if (!addBuddy(relem, roster)) {
+						break;
+				}
+			}
+		}
+	}
+
 	private Map<String, RosterElement> loadUserRoster(XMPPResourceConnection session)
     throws NotAuthorizedException, TigaseDBException {
-		Map<String, RosterElement> roster = new LinkedHashMap<String, RosterElement>();
+		Map<String, RosterElement> roster =
+						new LinkedHashMap<String, RosterElement>();
 		session.putCommonSessionData(ROSTER, roster);
 		String roster_str = session.getData(null, ROSTER, null);
 		log.finest("Loaded user roster: " + roster_str);
 		if (roster_str != null && !roster_str.isEmpty()) {
-			DomBuilderHandler domHandler = new DomBuilderHandler();
-			parser.parse(domHandler, roster_str.toCharArray(), 0, roster_str.length());
-			Queue<Element> elems = domHandler.getParsedElements();
-			if (elems != null && elems.size() > 0) {
-				for (Element elem: elems) {
-					RosterElement relem = new RosterElement(elem);
-					if (!addBuddy(relem, roster)) {
-						break;
-					}
-				}
-			}
+			parseRoster(roster_str, roster);
 		} else {
 			// Try to load a roster from the 'old' style roster storage and
 			// convert it the the flat roster storage
@@ -95,7 +101,7 @@ public class RosterFlat extends RosterAbstract {
 		return roster;
 	}
 
-	private boolean addBuddy(RosterElement relem,
+	private static boolean addBuddy(RosterElement relem,
 					Map<String, RosterElement> roster) {
 		if (roster.size() <  maxRosterSize) {
 			roster.put(relem.getJid(), relem);
