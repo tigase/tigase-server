@@ -24,6 +24,7 @@ package tigase.server.xmppserver;
 
 import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -117,6 +118,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 		return connectionsByLocalRemote.remove(cid);
 	}
 
+	@Override
 	public void processPacket(Packet packet) {
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Processing packet: " + packet.toString());
@@ -213,9 +215,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 		String remotehost = JIDUtils.getNodeHost(cid);
 		if (openNewServerConnection(localhost, remotehost)) {
 			conns.setConnecting();
-			connectionWatchdog.schedule(
-							new ConnectionWatchdogTask(conns, localhost, remotehost), 
-							2*MINUTE);
+			new ConnectionWatchdogTask(conns, localhost, remotehost);
 			log.finest("Connecting a new s2s service: " + cid);
 		} else {
 			log.finest("Couldn't open a new s2s service: (UknownHost??) " + cid);
@@ -304,6 +304,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 		return cid;
 	}
 
+	@Override
 	public Queue<Packet> processSocketData(XMPPIOService serv) {
 		Queue<Packet> packets = serv.getReceivedPackets();
 		Packet p = null;
@@ -423,6 +424,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 		return false;
 	}
 
+	@Override
 	public String xmppStreamOpened(XMPPIOService serv,
 		Map<String, String> attribs) {
 
@@ -494,10 +496,12 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 		return null;
 	}
 
+	@Override
 	public void xmppStreamClosed(XMPPIOService serv) {
 		log.finer("Stream closed: " + getConnectionId(serv));
 	}
 
+	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> props = super.getDefaults(params);
 // Usually we want the server to do s2s for the external component too:
@@ -556,6 +560,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 		maxPacketWaitingTime = (Long)props.get(MAX_PACKET_WAITING_TIME_PROP_KEY);
 	}
 
+	@Override
 	public void serviceStarted(XMPPIOService serv) {
 		super.serviceStarted(serv);
 		log.finest("s2s connection opened: " + serv.getRemoteAddress()
@@ -592,6 +597,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 		return open_s2s_connections;
 	}
 
+	@Override
 	public List<StatRecord> getStatistics() {
 		List<StatRecord> stats = super.getStatistics();
 		int waiting_packets = 0;
@@ -624,6 +630,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 		return stats;
 	}
 
+	@Override
 	public void serviceStopped(final XMPPIOService serv) {
 		super.serviceStopped(serv);
 		switch (serv.connectionType()) {
@@ -900,13 +907,18 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 	 *
 	 * @return a <code>long</code> value
 	 */
+	@Override
 	protected long getMaxInactiveTime() {
 		return 15*MINUTE;
 	}
 
+	@Override
 	protected XMPPIOService getXMPPIOServiceInstance() {
 		return new XMPPIOService();
 	}
+
+	private static Map<String, ConnectionWatchdogTask> waitingTasks =
+					new LinkedHashMap<String, ConnectionWatchdogTask>();
 
 	private class ConnectionWatchdogTask extends TimerTask {
 
@@ -919,9 +931,19 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 			this.conns = conns;
 			this.localhost = localhost;
 			this.remotehost = remotehost;
+			String key = localhost+remotehost;
+			ConnectionWatchdogTask task = waitingTasks.get(key);
+			if (task != null) {
+				task.cancel();
+			}
+			connectionWatchdog.schedule(this, 2 * MINUTE);
+			waitingTasks.put(key, this);
 		}
 
+		@Override
 		public void run() {
+			String key = localhost+remotehost;
+			waitingTasks.remove(key);
 			if (conns.getOutgoingState() ==
 							ServerConnections.OutgoingState.CONNECTING) {
 				log.finest("Connecting timeout expired, still connecting: " +
