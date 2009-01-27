@@ -63,7 +63,7 @@ public class DomainFilter extends XMPPProcessor
   private static final String[] XMLNSS = {ALL};
 
 	public enum DOMAINS {
-		ALL, LOCAL, OWN, LIST;
+		ALL, LOCAL, OWN, BLOCK, LIST;
 
 		public static DOMAINS valueof(String domains) {
 			if (domains == null) {
@@ -155,6 +155,10 @@ public class DomainFilter extends XMPPProcessor
 			Queue<Packet> errors = new LinkedList<Packet>();
 			for (Iterator<Packet> it = results.iterator(); it.hasNext();) {
 				Packet res = it.next();
+				if (domains == DOMAINS.BLOCK) {
+					removePacket(it, res, errors, "Communication blocked.");
+					continue;
+				}
 				String outDomain = res.getElemTo();
 				if (outDomain != null) {
 					outDomain = JIDUtils.getNodeHost(outDomain).intern();
@@ -239,6 +243,13 @@ public class DomainFilter extends XMPPProcessor
 				outDomain = JIDUtils.getNodeHost(outDomain).intern();
 			}
 			switch (domains) {
+				case BLOCK:
+					removePacket(null, packet, results, "Communication blocked.");
+					stop = true;
+					if (log.isLoggable(Level.FINEST)) {
+						log.finest("BLOCK, blocking packet: " +	packet.toString());
+					}
+					break;
 				case LOCAL:
 					if (outDomain != null && !session.isLocalDomain(outDomain)) {
 						removePacket(null, packet, results,
