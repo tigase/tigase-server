@@ -264,7 +264,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 
 	public void start() {
 		super.start();
-		delayedTasks = new Timer("DelayedTasks", true);
+		delayedTasks = new Timer(getName() + " - delayed connections", true);
 	}
 
 	@Override
