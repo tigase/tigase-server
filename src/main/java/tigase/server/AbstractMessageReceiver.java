@@ -121,6 +121,7 @@ public abstract class AbstractMessageReceiver
 	 *
 	 * @return a <code>String</code> value
 	 */
+	@Override
 	public String getComponentId() {
 		return compId;
 	}
@@ -128,6 +129,7 @@ public abstract class AbstractMessageReceiver
 	@Override
 	public void initializationCompleted() {}
 
+	@Override
   public boolean addPacketNB(Packet packet) {
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("[" + getName() + "]  " + packet.toString());
@@ -145,6 +147,7 @@ public abstract class AbstractMessageReceiver
 		return result;
   }
 
+	@Override
   public boolean addPackets(Queue<Packet> packets) {
 		Packet p = null;
 		boolean result = true;
@@ -159,6 +162,7 @@ public abstract class AbstractMessageReceiver
     return true;
   }
 
+	@Override
 	public boolean addPacket(Packet packet) {
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("[" + getName() + "]  " + packet.toString());
@@ -271,7 +275,9 @@ public abstract class AbstractMessageReceiver
 
   /**
    * Sets all configuration properties for object.
-   */
+	 * @param props
+	 */
+	@Override
   public void setProperties(Map<String, Object> props) {
     int queueSize = (Integer)props.get(MAX_QUEUE_SIZE_PROP_KEY);
     setMaxQueueSize(queueSize);
@@ -311,6 +317,7 @@ public abstract class AbstractMessageReceiver
   /**
    * Returns defualt configuration settings for this object.
    */
+	@Override
   public Map<String, Object> getDefaults(Map<String, Object> params) {
     Map<String, Object> defs = new LinkedHashMap<String, Object>();
 		//maxQueueSize = MAX_QUEUE_SIZE_PROP_VAL;
@@ -338,20 +345,24 @@ public abstract class AbstractMessageReceiver
     return defs;
   }
 
+	@Override
   public void release() {
     stop();
   }
 
+	@Override
   public void setParent(MessageReceiver parent) {
     this.parent = parent;
 		//addRouting(getDefHostName());
   }
 
+	@Override
   public void setName(String name) {
     this.name = name;
 		compId = JIDUtils.getNodeID(name, defHostname);
   }
 
+	@Override
   public String getName() {
     return name;
   }
@@ -429,6 +440,7 @@ public abstract class AbstractMessageReceiver
 			}, MINUTE, MINUTE);
 	}
 
+	@Override
 	public void start() {
 		log.finer(getName() + ": starting queue management threads ...");
 		startThreads();
@@ -439,10 +451,12 @@ public abstract class AbstractMessageReceiver
 		stopThreads();
   }
 
+	@Override
 	public String getDefHostName() {
 		return defHostname;
 	}
 
+	@Override
 	public boolean handlesLocalDomains() {
 		return false;
 	}
