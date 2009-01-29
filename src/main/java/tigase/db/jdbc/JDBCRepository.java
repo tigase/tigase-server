@@ -62,7 +62,7 @@ import tigase.util.SimpleCache;
 public class JDBCRepository implements UserAuthRepository, UserRepository {
 
   private static final Logger log =
-    Logger.getLogger("tigase.db.jdbc.JDBCRepository");
+    Logger.getLogger(JDBCRepository.class.getName());
 
 	public static final String DEF_USERS_TBL = "tig_users";
 	public static final String DEF_NODES_TBL = "tig_nodes";
