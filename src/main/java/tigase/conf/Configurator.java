@@ -42,6 +42,7 @@ import java.util.logging.Logger;
 import tigase.db.RepositoryFactory;
 import tigase.db.UserAuthRepository;
 import tigase.db.UserRepository;
+import tigase.db.UserRepositoryPool;
 import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
 import tigase.disco.XMPPService;
@@ -99,6 +100,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 	private String routerCompName = null;
 	// Default user repsitory instance which can be shared among components
 	private UserRepository user_repository = null;
+	private UserRepositoryPool repo_pool = null;
 	private Map<String, String> user_repo_params = null;
 	// Default user auth repository instance which can be shared among components
 	private UserAuthRepository auth_repository = null;
@@ -362,6 +364,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 		prop.put(SHARED_USER_REPO_PARAMS_PROP_KEY, user_repo_params);
 		prop.put(SHARED_AUTH_REPO_PROP_KEY, auth_repository);
 		prop.put(SHARED_AUTH_REPO_PARAMS_PROP_KEY, auth_repo_params);
+		prop.put(SHARED_USER_REPO_POOL_PROP_KEY, repo_pool);
 		component.setProperties(prop);
 	}
 
@@ -434,6 +437,11 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 		if (params.get(GEN_AUTH_DB_URI) != null) {
 			auth_repo_url = (String)params.get(GEN_AUTH_DB_URI);
 		}
+		if (params.get(USER_REPO_POOL_SIZE) != null) {
+			defaults.put(USER_REPO_POOL_SIZE_PROP_KEY, params.get(USER_REPO_POOL_SIZE));
+		} else {
+			defaults.put(USER_REPO_POOL_SIZE_PROP_KEY, "" + 1);
+		}
 
 		defaults.put(USER_REPO_CLASS_PROP_KEY, user_repo_class);
 	  defaults.put(USER_REPO_URL_PROP_KEY, user_repo_url);
@@ -454,6 +462,16 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 	public void setProperties(final Map<String, Object> props) {
 		setupLogManager(props);
 		demoMode = (Boolean)props.get("demo-mode");
+		int repo_pool_size = 1;
+		try {
+			repo_pool_size =
+							Integer.parseInt((String) props.get(USER_REPO_POOL_SIZE_PROP_KEY));
+		} catch (Exception e) {
+			repo_pool_size = 1;
+		}
+
+		repo_pool = new UserRepositoryPool();
+
 		user_repo_params = new LinkedHashMap<String, String>();
 		auth_repo_params = new LinkedHashMap<String, String>();
 		for (Map.Entry<String, Object> entry: props.entrySet()) {
@@ -477,9 +495,14 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 		try {
 			String cls_name = (String)props.get(USER_REPO_CLASS_PROP_KEY);
 			String res_uri = (String)props.get(USER_REPO_URL_PROP_KEY);
-			user_repository = RepositoryFactory.getUserRepository(getName(),
-							cls_name, res_uri, user_repo_params);
+			for (int i = 0; i < repo_pool_size; i++) {
+				user_repository =
+								RepositoryFactory.getUserRepository(getName() + "-" + (i+1),
+								cls_name, res_uri, user_repo_params);
+				repo_pool.addRepo(user_repository);
+			}
 			log.config("Initialized " + cls_name + " as user repository: " + res_uri);
+			log.config("Initialized user repository pool: " + repo_pool_size);
 		} catch (Exception e) {
 			log.log(Level.SEVERE, "Can't initialize user repository: ", e);
 		} // end of try-catch
