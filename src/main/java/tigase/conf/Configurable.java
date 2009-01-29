@@ -111,6 +111,7 @@ public interface Configurable extends ServerComponent {
 	public static final String GEN_SREC_DB_URI = "--gen-srec-db-uri";
 	public static final String GEN_SREC_ADMINS = "--gen-srec-admins";
 	public static final String MONITORING = "--monitoring";
+	public static final String USER_REPO_POOL_SIZE = "--user-repo-pool-size";
 
 	public static final String XML_REPO_CLASS_PROP_VAL =
 		"tigase.db.xml.XMLRepository";
@@ -134,6 +135,8 @@ public interface Configurable extends ServerComponent {
 	public static final String SHARED_AUTH_REPO_PROP_KEY = "shared-auth-repo";
 	public static final String SHARED_AUTH_REPO_PARAMS_PROP_KEY =
 					"shared-auth-repo-params";
+	public static final String SHARED_USER_REPO_POOL_PROP_KEY =
+					"shared-user-repo-pool";
 
 	public static final String XML_REPO_URL_PROP_VAL = "user-repository.xml";
 	public static final String MYSQL_REPO_URL_PROP_VAL =
@@ -198,6 +201,7 @@ public interface Configurable extends ServerComponent {
 	public static final String USER_REPO_CLASS_PROP_KEY = "user-repo-class";
 	public static final String USER_REPO_URL_PROP_KEY = "user-repo-url";
 	public static final String USER_REPO_PARAMS_NODE = "user-repo-params";
+	public static final String USER_REPO_POOL_SIZE_PROP_KEY = "user-repo-pool-size";
 
 	public static final String AUTH_REPO_CLASS_PROP_KEY = "auth-repo-class";
 	public static final String AUTH_REPO_URL_PROP_KEY = "auth-repo-url";
