@@ -63,7 +63,7 @@ public class PubSubTestsTask extends RepoRosterTask {
 
 	private boolean memoryLow() {
 		MemoryUsage heap = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();
-		return new Long(heap.getUsed()).doubleValue()/new Long(heap.getMax()).doubleValue() > 0.8;
+		return new Long(heap.getUsed()).doubleValue()/new Long(heap.getMax()).doubleValue() > 0.6;
 	}
 
 	private enum command {
