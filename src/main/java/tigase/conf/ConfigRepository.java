@@ -21,6 +21,7 @@
  */
 package tigase.conf;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.TreeMap;
 import java.util.LinkedHashMap;
@@ -109,7 +110,11 @@ public class ConfigRepository {
 
   private void init() throws XMLDBException {
     try {
-      xmldb = new XMLDB(config_file);
+      if (new File(config_file).exists()) {
+				xmldb = new XMLDB(config_file);
+			} else {
+				xmldb = XMLDB.createDB(config_file, ROOT_NODE, COMPONENT_NODE);
+			}
     } catch (IOException e) {
       log.warning("Can not open existing configuration file, creating new one, "
         + e);
