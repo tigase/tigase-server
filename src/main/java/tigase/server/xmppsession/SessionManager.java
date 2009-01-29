@@ -127,7 +127,7 @@ public class SessionManager extends AbstractMessageReceiver
 					new ConcurrentSkipListMap<String, XMPPPacketFilterIfc>();
 	private Map<String, AdminCommandIfc> adminCommands =
 					new ConcurrentSkipListMap<String, AdminCommandIfc>();
-	private Timer authenticationWatchdog = new Timer();
+	private Timer authenticationWatchdog = new Timer("SM authentocation watchdog");
 
 	private ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
 
@@ -980,8 +980,14 @@ public class SessionManager extends AbstractMessageReceiver
 		Security.insertProviderAt(new TigaseSaslProvider(), 6);
 
 		filter = new PacketFilter();
-		// Is there shared user repository instance? If so I want to use it:
-		user_repository = (UserRepository) props.get(SHARED_USER_REPO_PROP_KEY);
+		// Is there a shared user repository pool? If so I want to use it:
+		user_repository = (UserRepository) props.get(SHARED_USER_REPO_POOL_PROP_KEY);
+		if (user_repository == null) {
+			// Is there shared user repository instance? If so I want to use it:
+			user_repository = (UserRepository) props.get(SHARED_USER_REPO_PROP_KEY);
+		} else {
+			log.config("Using shared repository pool.");
+		}
 		auth_repository = (UserAuthRepository) props.get(SHARED_AUTH_REPO_PROP_KEY);
 		if (user_repository != null) {
 			log.config("Using shared repository instance.");
