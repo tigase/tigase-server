@@ -42,7 +42,20 @@ public class PubSubTestsTask extends RepoRosterTask {
 					"This is a PubSub component testing task." +
 					" Only for testing and only to be run by an admnistrator.";
 
-	private long delay = 100;
+	private long delay = 25;
+	private Element conf = new Element("x",
+					new Element[]{
+						new Element("field",
+						new Element[]{new Element("value",
+							"http://jabber.org/protocol/pubsub#node_config")},
+						new String[]{"var", "type"},
+						new String[]{"FORM_TYPE", "hidden"}),
+						new Element("field",
+						new Element[]{new Element("value", "0")},
+						new String[]{"var"},
+						new String[]{"pubsub#notify_sub_aff_state"})},
+					new String[]{"xmlns", "type"},
+					new String[]{"jabber:x:data", "submit"});
 
 	private enum command {
 		help(" - Displays help info."),
@@ -173,6 +186,7 @@ public class PubSubTestsTask extends RepoRosterTask {
 			Element el = createPubSubEl(from, "id-" + i, node, "create",
 							"http://jabber.org/protocol/pubsub");
 			el.findChild("/iq/pubsub").addChild(new Element("configure"));
+			el.findChild("/iq/pubsub/configure").addChild(conf);
 			addOutPacket(new Packet(el));
 			if (nums.length > 1 && nums[1] > 0) {
 				addSubscriptionsForNode(from, node, nums[1]);
@@ -182,6 +196,9 @@ public class PubSubTestsTask extends RepoRosterTask {
 			} catch (Exception e) {
 			}
 		}
+//		if (nums.length > 1 && nums[1] > 0) {
+//			addSubscriptionsForNodes(from, nodes, nums[1]);
+//		}
 		return nodes;
 	}
 
