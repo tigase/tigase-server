@@ -108,7 +108,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 	private ConcurrentSkipListMap<String, XMPPIOService> incoming =
     new ConcurrentSkipListMap<String, XMPPIOService>();
 
-	private Timer connectionWatchdog = new Timer();
+	private Timer connectionWatchdog = new Timer("s2s connections watchdog");
 
 	protected ServerConnections getServerConnections(String cid) {
 		return connectionsByLocalRemote.get(cid);
