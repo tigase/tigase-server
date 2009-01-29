@@ -22,6 +22,8 @@
 
 package tigase.server.sreceiver;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryUsage;
 import java.util.Map;
 import java.util.Queue;
 import tigase.server.Packet;
@@ -42,7 +44,7 @@ public class PubSubTestsTask extends RepoRosterTask {
 					"This is a PubSub component testing task." +
 					" Only for testing and only to be run by an admnistrator.";
 
-	private long delay = 25;
+	private long delay = 2000;
 	private Element conf = new Element("x",
 					new Element[]{
 						new Element("field",
@@ -56,13 +58,21 @@ public class PubSubTestsTask extends RepoRosterTask {
 						new String[]{"pubsub#notify_sub_aff_state"})},
 					new String[]{"xmlns", "type"},
 					new String[]{"jabber:x:data", "submit"});
+	private boolean stop = false;
+
+
+	private boolean memoryLow() {
+		MemoryUsage heap = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();
+		return new Long(heap.getUsed()).doubleValue()/new Long(heap.getMax()).doubleValue() > 0.8;
+	}
 
 	private enum command {
 		help(" - Displays help info."),
 		newnodes(" N - Create N nodes in the pubsub."),
 		newsubscr(" node-name N - create N subscriptions for a given node name."),
 		newnodessubscr(" N M -  create N nodes with M subscriptions each."),
-		setdelay(" N - set the delay between sending node creation packet.");
+		setdelay(" N - set the delay between sending node creation packet."),
+		stop(" - Stops the current packets generation.");
 
 		private String helpText = null;
 
@@ -181,6 +191,9 @@ public class PubSubTestsTask extends RepoRosterTask {
 	private String[] createNodes(String from,	int ... nums) {
 		String[] nodes = new String[nums[0]];
 		for (int i = 0; i < nums[0]; i++) {
+			if (stop) {
+				break;
+			}
 			String node = "node-" + i;
 			nodes[i] = node;
 			Element el = createPubSubEl(from, "id-" + i, node, "create",
@@ -191,24 +204,41 @@ public class PubSubTestsTask extends RepoRosterTask {
 			if (nums.length > 1 && nums[1] > 0) {
 				addSubscriptionsForNode(from, node, nums[1]);
 			}
-			try {
-				Thread.sleep(delay);
-			} catch (Exception e) {
+			while (memoryLow()) {
+				try {
+					Thread.sleep(delay);
+				} catch (Exception e) { }
 			}
 		}
+		stop = false;
 //		if (nums.length > 1 && nums[1] > 0) {
 //			addSubscriptionsForNodes(from, nodes, nums[1]);
 //		}
 		return nodes;
 	}
 
+	private void runInThread(final Runnable job, final Packet packet) {
+		Thread thr = new Thread() {
+			public void run() {
+				job.run();
+				addOutPacket(Packet.getMessage(packet.getElemFrom(),
+								packet.getElemTo(), StanzaType.chat,
+								"Generation of the test data completed.",
+								"PubSub testing task", null));
+
+			}
+		};
+		thr.setName("pubsub-test-job");
+		thr.start();
+	}
+
 	private String[] last_nodes = null;
 
-	private void runCommand(Packet packet, Queue<Packet> results) {
+	private void runCommand(final Packet packet, Queue<Packet> results) {
 		String body = packet.getElemCData("/message/body");
-		String[] body_split = body.split("\\s");
+		final String[] body_split = body.split("\\s");
 		command comm = command.valueOf(body_split[0].substring(2));
-		int[] pars = null;
+		final int[] pars;
 		switch (comm) {
 			case help:
 				results.offer(Packet.getMessage(packet.getElemFrom(),
@@ -227,7 +257,12 @@ public class PubSubTestsTask extends RepoRosterTask {
 					addOutPacket(Packet.getMessage(packet.getElemFrom(),
 									packet.getElemTo(), StanzaType.chat,
 									"Task accepted, processing...", "PubSub testing task", null));
-					last_nodes = createNodes(packet.getElemFrom(), pars);
+					runInThread(new Runnable() {
+						@Override
+						public void run() {
+							last_nodes = createNodes(packet.getElemFrom(), pars);
+						}
+					}, packet);
 				} else {
 					results.offer(Packet.getMessage(packet.getElemFrom(),
 									packet.getElemTo(), StanzaType.chat,
@@ -242,8 +277,13 @@ public class PubSubTestsTask extends RepoRosterTask {
 						addOutPacket(Packet.getMessage(packet.getElemFrom(),
 										packet.getElemTo(), StanzaType.chat,
 										"Task accepted, processing...", "PubSub testing task", null));
-						addSubscriptionsForNode(packet.getElemFrom(), 
-										body_split[1], pars[0]);
+						runInThread(new Runnable() {
+							@Override
+							public void run() {
+								addSubscriptionsForNode(packet.getElemFrom(),
+												body_split[1], pars[0]);
+							}
+						}, packet);
 					} else {
 						results.offer(
 										Packet.getMessage(packet.getElemFrom(),
@@ -267,7 +307,12 @@ public class PubSubTestsTask extends RepoRosterTask {
 					addOutPacket(Packet.getMessage(packet.getElemFrom(),
 									packet.getElemTo(), StanzaType.chat,
 									"Task accepted, processing...", "PubSub testing task", null));
-					last_nodes = createNodes(packet.getElemFrom(), pars);
+					runInThread(new Runnable() {
+						@Override
+						public void run() {
+							last_nodes = createNodes(packet.getElemFrom(), pars);
+						}
+					}, packet);
 				} else {
 					results.offer(Packet.getMessage(packet.getElemFrom(),
 									packet.getElemTo(), StanzaType.chat,
@@ -275,11 +320,10 @@ public class PubSubTestsTask extends RepoRosterTask {
 					return;
 				}
 				break;
+			case stop:
+				stop = true;
+				break;
 		}
-		addOutPacket(Packet.getMessage(packet.getElemFrom(),
-						packet.getElemTo(), StanzaType.chat,
-						"Generation of the test data completed, sending to pubsub....",
-						"PubSub testing task", null));
 	}
 
 	@Override
