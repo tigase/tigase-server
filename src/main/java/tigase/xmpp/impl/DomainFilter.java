@@ -218,8 +218,8 @@ public class DomainFilter extends XMPPProcessor
 		try {
 			errors.add(Authorization.FORBIDDEN.getResponseMessage(res, msg,	true));
 		} catch (PacketErrorTypeException ex) {
-			log.fine("Already error packet, dropping it..: " +
-							res.toString());
+			log.log(Level.FINE, "Already error packet, dropping it..: " +
+							res.toString(), ex);
 		}
 	}
 
