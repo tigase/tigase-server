@@ -157,10 +157,10 @@ public class DomainFilter extends XMPPProcessor
 			for (Iterator<Packet> it = results.iterator(); it.hasNext();) {
 				Packet res = it.next();
 				if (domains == DOMAINS.BLOCK) {
+					log.finest("packet.getType() = " + packet.getType());
 					if ((packet.getType() != StanzaType.error) &&
 									((packet.getElemFrom() != null &&
-									!JIDUtils.getNodeID(packet.getElemFrom()).equals(session.
-									getUserId())) ||
+									!JIDUtils.getNodeID(packet.getElemFrom()).equals(session.getUserId())) ||
 									(packet.getElemTo() != null &&
 									!JIDUtils.getNodeID(packet.getElemTo()).equals(session.getUserId())))) {
 						removePacket(it, res, errors, "Communication blocked.");
