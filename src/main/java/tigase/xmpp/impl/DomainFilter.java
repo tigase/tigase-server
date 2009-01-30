@@ -251,7 +251,8 @@ public class DomainFilter extends XMPPProcessor
 			}
 			switch (domains) {
 				case BLOCK:
-					if ((packet.getElemFrom() == null ||
+					if ((packet.getType() != null && packet.getType() == StanzaType.error) ||
+									(packet.getElemFrom() == null ||
 									JIDUtils.getNodeID(packet.getElemFrom()).equals(session.getUserId())) &&
 									(packet.getElemTo() == null ||
 									JIDUtils.getNodeID(packet.getElemTo()).equals(session.getUserId()))) {
