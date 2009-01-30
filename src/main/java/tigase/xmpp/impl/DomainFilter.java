@@ -244,8 +244,15 @@ public class DomainFilter extends XMPPProcessor
 			}
 			switch (domains) {
 				case BLOCK:
-					removePacket(null, packet, results, "Communication blocked.");
-					stop = true;
+					if ((packet.getElemFrom() == null ||
+									JIDUtils.getNodeID(packet.getElemFrom()).equals(session.getUserId())) &&
+									(packet.getElemTo() == null ||
+									JIDUtils.getNodeID(packet.getElemTo()).equals(session.getUserId()))) {
+						return stop;
+					} else {
+						removePacket(null, packet, results, "Communication blocked.");
+						stop = true;
+					}
 					if (log.isLoggable(Level.FINEST)) {
 						log.finest("BLOCK, blocking packet: " +	packet.toString());
 					}
