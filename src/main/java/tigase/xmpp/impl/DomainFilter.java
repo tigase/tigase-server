@@ -34,6 +34,7 @@ import tigase.util.JIDUtils;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.PacketErrorTypeException;
+import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPPacketFilterIfc;
 import tigase.xmpp.XMPPPreprocessorIfc;
 import tigase.xmpp.XMPPProcessor;
@@ -156,7 +157,8 @@ public class DomainFilter extends XMPPProcessor
 			for (Iterator<Packet> it = results.iterator(); it.hasNext();) {
 				Packet res = it.next();
 				if (domains == DOMAINS.BLOCK) {
-					if ((packet.getElemFrom() != null &&
+					if ((packet.getType() == null || packet.getType() != StanzaType.error) &&
+									(packet.getElemFrom() != null &&
 									!JIDUtils.getNodeID(packet.getElemFrom()).equals(session.getUserId())) ||
 									(packet.getElemTo() != null &&
 									!JIDUtils.getNodeID(packet.getElemTo()).equals(session.getUserId()))) {
