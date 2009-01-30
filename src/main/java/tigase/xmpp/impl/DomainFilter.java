@@ -157,7 +157,6 @@ public class DomainFilter extends XMPPProcessor
 			for (Iterator<Packet> it = results.iterator(); it.hasNext();) {
 				Packet res = it.next();
 				if (domains == DOMAINS.BLOCK) {
-					log.finest("res.getType() = " + res.getType());
 					if ((res.getType() != StanzaType.error) &&
 									((res.getElemFrom() != null &&
 									!JIDUtils.getNodeID(res.getElemFrom()).equals(session.getUserId())) ||
@@ -220,7 +219,7 @@ public class DomainFilter extends XMPPProcessor
 			errors.add(Authorization.FORBIDDEN.getResponseMessage(res, msg,	true));
 		} catch (PacketErrorTypeException ex) {
 			log.log(Level.FINE, "Already error packet, dropping it..: " +
-							res.toString(), ex);
+							res.toString());
 		}
 	}
 
