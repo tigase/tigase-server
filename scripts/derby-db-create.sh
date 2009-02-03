@@ -5,15 +5,15 @@
   exit 1
 
 
-java -Dij.protocol=jdbc:derby: -Dij.database="$1/tigasedb;create=true" \
+java -Dij.protocol=jdbc:derby: -Dij.database="$1;create=true" \
 		-Dderby.system.home=`pwd` \
 		-cp libs/derby.jar:libs/derbytools.jar:jars/tigase-server.jar \
 		org.apache.derby.tools.ij database/derby-schema-4.sql
-java -Dij.protocol=jdbc:derby: -Dij.database="$1/tigasedb" \
+java -Dij.protocol=jdbc:derby: -Dij.database="$1" \
 		-Dderby.system.home=`pwd` \
 		-cp libs/derby.jar:libs/derbytools.jar:jars/tigase-server.jar \
 		org.apache.derby.tools.ij database/derby-schema-4-sp.schema
-java -Dij.protocol=jdbc:derby: -Dij.database="$1/tigasedb" \
+java -Dij.protocol=jdbc:derby: -Dij.database="$1" \
 		-Dderby.system.home=`pwd` \
 		-cp libs/derby.jar:libs/derbytools.jar:jars/tigase-server.jar \
 		org.apache.derby.tools.ij database/derby-schema-4-props.sql
