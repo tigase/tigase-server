@@ -100,42 +100,14 @@
     <dependency>
       <groupId>tigase</groupId>
       <artifactId>tigase-utils</artifactId>
-      <version>3.1.1</version>
+      <version>3.1.2</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>tigase</groupId>
       <artifactId>tigase-xmltools</artifactId>
-      <version>3.0.11</version>
+      <version>3.1.1</version>
       <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>tigase</groupId>
-      <artifactId>tigase-muc</artifactId>
-      <version>0.2.2</version>
-      <scope>runtime</scope>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>tigase</groupId>
-      <artifactId>tigase-pubsub</artifactId>
-      <version>0.5.0</version>
-      <scope>runtime</scope>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-      <version>7.4.1-jdbc3</version>
-      <scope>runtime</scope>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
-      <version>5.0.2</version>
-      <scope>runtime</scope>
-      <optional>true</optional>
     </dependency>
   </dependencies>
   <distributionManagement>
