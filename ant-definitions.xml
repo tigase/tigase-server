@@ -110,6 +110,10 @@
         <arg value="s/&lt;[^>]*>//g"/>
         <arg value="-e"/>
         <arg value="s/&#60;[^>]*>//g"/>
+        <arg value="-e"/>
+        <arg value="s/&amp;[^; ]*;//g"/>
+        <arg value="-e"/>
+        <arg value="s/${APP_VER}/${version}/g"/>
         <arg value="package.html"/>
       </exec>
       <copy

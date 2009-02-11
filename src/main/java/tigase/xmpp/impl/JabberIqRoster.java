@@ -113,6 +113,22 @@ public abstract class JabberIqRoster {
 		return iq;
 	}
 
+	public static String[] getItemGroups(Element item) {
+		List<Element> elgr = item.getChildren();
+		if (elgr != null && elgr.size() > 0) {
+			ArrayList<String> groups = new ArrayList<String>();
+			for (Element grp : elgr) {
+				if (grp.getName() == RosterAbstract.GROUP) {
+					groups.add(grp.getCData());
+				}
+			}
+			if (groups.size() > 0) {
+				return groups.toArray(new String[groups.size()]);
+			}
+		}
+		return null;
+	}
+
 	private static void dynamicGetRequest(Packet packet,
 					XMPPResourceConnection session,
 					Queue<Packet> results,
@@ -157,14 +173,14 @@ public abstract class JabberIqRoster {
 	}
 
 	private static void processSetRequest(final Packet packet,
-		final XMPPResourceConnection session,	final Queue<Packet> results)
+		final XMPPResourceConnection session,	final Queue<Packet> results,
+		final Map<String, Object> settings)
     throws NotAuthorizedException, TigaseDBException {
 
 		Element request = packet.getElement();
-
-    String buddy =
-			JIDUtils.getNodeID(request.getAttribute("/iq/query/item", "jid"));
     Element item =  request.findChild("/iq/query/item");
+
+    String buddy = JIDUtils.getNodeID(item.getAttribute("jid"));
     String subscription = item.getAttribute("subscription");
     if (subscription != null && subscription.equals("remove")) {
 			SubscriptionType sub = roster_util.getBuddySubscription(session, buddy);
@@ -199,7 +215,8 @@ public abstract class JabberIqRoster {
 			roster_util.removeBuddy(session, buddy);
       results.offer(packet.okResult((String)null, 0));
     } else {
-      String name = request.getAttribute("/iq/query/item", "name");
+      Element dynamicItem = DynamicRoster.getBuddyItem(session, settings, buddy);
+			String name = request.getAttribute("/iq/query/item", "name");
 //       if (name == null) {
 //         name = buddy;
 //       } // end of if (name == null)
@@ -227,9 +244,20 @@ public abstract class JabberIqRoster {
 				pres.setAttribute("from", session.getJID());
 				results.offer(new Packet(pres));
 			}
+			Element new_buddy = roster_util.getBuddyItem(session, buddy);
+			log.finest("1. New Buddy: " + new_buddy.toString());
       if (roster_util.getBuddySubscription(session, buddy) == null) {
-        roster_util.setBuddySubscription(session, SubscriptionType.none, buddy);
+				roster_util.setBuddySubscription(session, SubscriptionType.none, buddy);
       } // end of if (getBuddySubscription(session, buddy) == null)
+			if (dynamicItem != null) {
+				roster_util.setBuddySubscription(session, SubscriptionType.both, buddy);
+				String[] itemGroups = getItemGroups(dynamicItem);
+				if (itemGroups != null) {
+					roster_util.addBuddyGroup(session, buddy, itemGroups);
+				}
+			}
+			new_buddy = roster_util.getBuddyItem(session, buddy);
+			log.finest("2. New Buddy: " + new_buddy.toString());
       results.offer(packet.okResult((String)null, 0));
       roster_util.updateBuddyChange(session, results,
 				roster_util.getBuddyItem(session, buddy));
@@ -247,18 +275,9 @@ public abstract class JabberIqRoster {
 				String jid = element.getAttribute("jid");
 				if (roster_util.containsBuddy(session, jid)) {
 					roster_util.setBuddySubscription(session, SubscriptionType.both, jid);
-					List<Element> elgr = element.getChildren();
-					if (elgr != null && elgr.size() > 0) {
-						ArrayList<String> groups = new ArrayList<String>();
-						for (Element grp : elgr) {
-							if (grp.getName() == RosterAbstract.GROUP) {
-								groups.add(grp.getCData());
-							}
-						}
-						if (groups.size() > 0) {
-							roster_util.addBuddyGroup(session, jid,
-											groups.toArray(new String[groups.size()]));
-						}
+					String[] itemGroups = getItemGroups(element);
+					if (itemGroups != null) {
+						roster_util.addBuddyGroup(session, jid, itemGroups);
 					}
 					it.remove();
 				}
@@ -357,7 +376,7 @@ public abstract class JabberIqRoster {
 						processGetRequest(packet, session, results, settings);
 						break;
 					case set:
-						processSetRequest(packet, session, results);
+						processSetRequest(packet, session, results, settings);
 						break;
 					case result:
 						// Ignore

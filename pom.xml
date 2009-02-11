@@ -3,7 +3,7 @@
   <groupId>tigase</groupId>
   <artifactId>tigase-server</artifactId>
   <name>TigaseXMPPServer</name>
-  <version>4.1.1-SNAPSHOT</version>
+  <version>4.1.1</version>
   <description>Tigase XMPP Server</description>
   <url>http://www.tigase.org/</url>
   <issueManagement>
@@ -29,9 +29,9 @@
     </license>
   </licenses>
   <scm>
-    <connection>scm:svn:https://svn.tigase.org/reps/tigase-server/trunk</connection>
-    <developerConnection>scm:svn:https://svn.tigase.org/reps/tigase-server/trunk</developerConnection>
-    <url>https://svn.tigase.org/reps/tigase-server</url>
+    <connection>scm:svn:https://svn.tigase.org/reps/tigase-server/tags/tigase-server-4.1.1</connection>
+    <developerConnection>scm:svn:https://svn.tigase.org/reps/tigase-server/tags/tigase-server-4.1.1</developerConnection>
+    <url>scm:svn:https://svn.tigase.org/reps/tigase-server/tags/tigase-server-4.1.1</url>
   </scm>
   <organization>
     <name>Tigase</name>
@@ -100,42 +100,14 @@
     <dependency>
       <groupId>tigase</groupId>
       <artifactId>tigase-utils</artifactId>
-      <version>3.1.1</version>
+      <version>3.1.2</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>tigase</groupId>
       <artifactId>tigase-xmltools</artifactId>
-      <version>3.0.11</version>
+      <version>3.1.1</version>
       <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>tigase</groupId>
-      <artifactId>tigase-muc</artifactId>
-      <version>0.2.2</version>
-      <scope>runtime</scope>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>tigase</groupId>
-      <artifactId>tigase-pubsub</artifactId>
-      <version>0.5.0</version>
-      <scope>runtime</scope>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-      <version>7.4.1-jdbc3</version>
-      <scope>runtime</scope>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
-      <version>5.0.2</version>
-      <scope>runtime</scope>
-      <optional>true</optional>
     </dependency>
   </dependencies>
   <distributionManagement>

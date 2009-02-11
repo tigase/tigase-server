@@ -20,7 +20,8 @@
  */
 package tigase.xmpp.impl.roster;
 
-import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import tigase.xml.Element;
 import java.util.logging.Logger;
 import tigase.util.JIDUtils;
@@ -70,6 +71,8 @@ public class RosterElement {
 	/**
 	 * Creates a new <code>RosterElement</code> instance.
 	 *
+	 *
+	 * @param roster_el
 	 */
 	public RosterElement(Element roster_el) {
 		if (roster_el.getName() == ELEM_NAME) {
@@ -147,10 +150,15 @@ public class RosterElement {
 			if (this.groups == null) {
 				this.groups = groups;
 			} else {
-				this.groups = Arrays.copyOf(this.groups,
-								this.groups.length + groups.length);
-				System.arraycopy(groups, 0, this.groups,
-								this.groups.length - groups.length, groups.length);
+				// Groups names must be unique
+				Set<String> groupsSet = new HashSet<String>();
+				for (String group : this.groups) {
+					groupsSet.add(group);
+				}
+				for (String group : groups) {
+					groupsSet.add(group);
+				}
+				this.groups = groupsSet.toArray(new String[groupsSet.size()]);
 			}
 		}
 	}

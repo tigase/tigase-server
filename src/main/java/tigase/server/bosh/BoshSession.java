@@ -390,10 +390,12 @@ public class BoshSession {
 				body.setAttribute(ACK_ATTR, ""+rid);
 			}
 			if (waiting_packets.size() > 0) {
-				body.addChild(applyFilters(waiting_packets.poll()));
+				//body.addChild(applyFilters(waiting_packets.poll()));
+				body.addChild(waiting_packets.poll());
 				while (waiting_packets.size() > 0
 					&& body.getChildren().size() < MAX_PACKETS) {
-					body.addChild(applyFilters(waiting_packets.poll()));
+					//body.addChild(applyFilters(waiting_packets.poll()));
+					body.addChild(waiting_packets.poll());
 				}
 			}
 		}
