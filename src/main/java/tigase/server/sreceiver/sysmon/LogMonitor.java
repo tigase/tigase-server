@@ -51,7 +51,7 @@ public class LogMonitor extends AbstractMonitor {
 	private long lastWarningSent = 0;
 
 	private enum command {
-		setlevel(" [package level] - Sets logging level for specified package."),
+		setlevel(" [package=level] - Sets logging level for specified package."),
 		loggersize(" [N] - Sets memory logger size to specified value."),
 		leveltreshold(" [level] - Sets level treshold to specified level."),
 		logdump(" - retrieves all logs collected in the memory buffer and clears that buffer.");
