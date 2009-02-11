@@ -57,7 +57,7 @@
       				<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
       				<mainClass>tigase.server.XMPPServer</mainClass>
       			</manifest>
-      			<manifestFile>MANIFEST.MF</manifestFile>
+      			<manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
       		</archive>
       	</configuration>
       </plugin>

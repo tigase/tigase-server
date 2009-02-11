@@ -81,7 +81,9 @@ public class UpdatesChecker extends Thread {
 	public void run() {
 		String version = XMPPServer.getImplementationVersion();
 		int idx = version.indexOf('-');
-		version = version.substring(0, idx);
+		if (idx > 0) {
+			version = version.substring(0, idx);
+		}
 		log.info("Server version: " + version);
 		String[] nums = version.split("\\.");
 		try {
