@@ -806,7 +806,13 @@ public class SessionManager extends AbstractMessageReceiver
 			log.finest("No address for remote SM to redirect packets, processing locally.");
 			if (packets != null) {
 				Packet sess_pack = null;
-				while ((sess_pack = packets.poll()) != null) {
+				while (((sess_pack = packets.poll()) != null) &&
+								// Temporarily fix, need a better solution. For some reason
+								// the mode has been sent back from normal to on_hold during
+								// loop execution leading to infinite loop.
+								// Possibly buggy client sent a second authentication packet
+								// executing a second handleLogin call....
+								(conn.getConnectionStatus() != ConnectionStatus.ON_HOLD)) {
 					processPacket(sess_pack);
 				}
 			}

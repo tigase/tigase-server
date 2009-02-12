@@ -143,7 +143,7 @@ public class SessionManagerClustered extends SessionManager
 						switch (conn.getConnectionStatus()) {
 						case ON_HOLD:
 							LinkedList<Packet> packets =
-              (LinkedList<Packet>)conn.getSessionData(SESSION_PACKETS);
+											(LinkedList<Packet>) conn.getSessionData(SESSION_PACKETS);
 							if (packets == null) {
 								packets = new LinkedList<Packet>();
 								conn.putSessionData(SESSION_PACKETS, packets);
@@ -567,6 +567,7 @@ public class SessionManagerClustered extends SessionManager
 		return cluster_node;
 	}
 
+	@Override
 	public void handleLogin(String userName, XMPPResourceConnection conn) {
 		super.handleLogin(userName, conn);
 		if (!conn.isAnonymous()) {
