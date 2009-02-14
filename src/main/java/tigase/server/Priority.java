@@ -31,6 +31,7 @@ package tigase.server;
 public enum Priority {
 
 	SYSTEM,
+	CLUSTER,
 	HIGH,
 	NORMAL,
 	LOW;

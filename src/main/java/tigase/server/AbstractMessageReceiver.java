@@ -285,18 +285,26 @@ public abstract class AbstractMessageReceiver
 				statReceivedMessagesOk, Level.FINE));
     stats.add(new StatRecord(getName(), StatisticType.MSG_SENT_OK,
 				statSentMessagesOk, Level.FINE));
+		int in_queues_size = 0;
+		int out_queues_size = 0;
 		for (Priority queue : Priority.values()) {
 			stats.add(new StatRecord(getName(), "In queue: " + queue.name(), "int",
 							in_queues.get(queue).size(), Level.FINEST));
 			stats.add(new StatRecord(getName(), "Out queue: " + queue.name(), "int",
 							out_queues.get(queue).size(), Level.FINEST));
+			in_queues_size += in_queues.get(queue).size();
+			out_queues_size += out_queues.get(queue).size();
 		}
+		stats.add(new StatRecord(getName(), "Total In queues wait", "int",
+						in_queues_size, Level.FINE));
+		stats.add(new StatRecord(getName(), "Total Out queues wait", "int",
+						out_queues_size, Level.FINE));
     stats.add(new StatRecord(getName(), StatisticType.MAX_QUEUE_SIZE,
-				maxQueueSize, Level.FINEST));
+				maxQueueSize, Level.FINE));
     stats.add(new StatRecord(getName(), StatisticType.IN_QUEUE_OVERFLOW,
-				statReceivedMessagesEr, Level.FINEST));
+				statReceivedMessagesEr, Level.FINE));
     stats.add(new StatRecord(getName(), StatisticType.OUT_QUEUE_OVERFLOW,
-				statSentMessagesEr, Level.FINEST));
+				statSentMessagesEr, Level.FINE));
 		long res = 0;
 		for (long ppt : processPacketTimings) {
 			res += ppt;
@@ -606,10 +614,11 @@ public abstract class AbstractMessageReceiver
 					// According to the spec, queues.values() must return values
 					// in the same order the enum has been declared, the highest
 					// order for the earliest declared enums/queues
+					//log.finest("checking queues:");
 					for (Map.Entry<Priority, LinkedBlockingQueue<Packet>> queueEntry : queues.entrySet()) {
 						// The log call must be commented out after initial tests
 						// made to ensure queues are polled in a correct order
-						log.finest("Queue: " + queueEntry.getKey().name());
+						//log.finest("Queue: " + queueEntry.getKey().name());
 						while ((packet = queueEntry.getValue().poll()) != null) {
 							switch (type) {
 								case IN_QUEUE:

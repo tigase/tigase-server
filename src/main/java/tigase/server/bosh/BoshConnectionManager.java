@@ -97,6 +97,7 @@ public class BoshConnectionManager extends ClientConnectionManager
 		return sessions.get(sid);
 	}
 
+	@Override
 	protected void writePacketToSocket(Packet packet) {
 		BoshSession session = getBoshSessionTo(packet);
 		if (session != null) {
@@ -124,6 +125,7 @@ public class BoshConnectionManager extends ClientConnectionManager
 		}
 	}
 
+	@Override
 	protected void processCommand(Packet packet) {
 		switch (packet.getCommand()) {
 		case CLOSE:
@@ -142,6 +144,7 @@ public class BoshConnectionManager extends ClientConnectionManager
 		} // end of switch (pc.getCommand())
 	}
 
+	@Override
 	protected String changeDataReceiver(Packet packet, String newAddress,
 		String command_sessionId, XMPPIOService serv) {
 		BoshSession session = getBoshSessionTo(packet);
@@ -159,6 +162,7 @@ public class BoshConnectionManager extends ClientConnectionManager
 		return null;
 	}
 
+	@Override
 	public Queue<Packet> processSocketData(XMPPIOService srv) {
 		BoshIOService serv = (BoshIOService)srv;
 		Packet p = null;
@@ -217,6 +221,7 @@ public class BoshConnectionManager extends ClientConnectionManager
 		return JIDUtils.getJID(getName(), getDefHostName(), id);
 	}
 
+	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> props = super.getDefaults(params);
 		props.put(MAX_WAIT_DEF_PROP_KEY, MAX_WAIT_DEF_PROP_VAL);
@@ -228,6 +233,7 @@ public class BoshConnectionManager extends ClientConnectionManager
 		return props;
 	}
 
+	@Override
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
 		max_wait = (Long)props.get(MAX_WAIT_DEF_PROP_KEY);
@@ -238,10 +244,12 @@ public class BoshConnectionManager extends ClientConnectionManager
 		max_pause = (Long)props.get(MAX_PAUSE_PROP_KEY);
 	}
 
+	@Override
 	protected int[] getDefPlainPorts() {
 		return PORTS;
 	}
 
+	@Override
 	protected int[] getDefSSLPorts() {
 		return null;
 	}
@@ -268,6 +276,7 @@ public class BoshConnectionManager extends ClientConnectionManager
 	 *
 	 * @return a <code>long</code> value
 	 */
+	@Override
 	protected long getMaxInactiveTime() {
 		return 10*MINUTE;
 	}
@@ -295,10 +304,12 @@ public class BoshConnectionManager extends ClientConnectionManager
 				;
 	}
 
+	@Override
 	protected BoshIOService getXMPPIOServiceInstance() {
 		return new BoshIOService();
 	}
 
+	@Override
 	public void writeRawData(BoshIOService ios, String data) {
 		super.writeRawData(ios, data);
 	}
@@ -306,12 +317,14 @@ public class BoshConnectionManager extends ClientConnectionManager
 
 	private Timer boshTasks = new Timer("BoshTasks");
 
+	@Override
 	public TimerTask scheduleTask(BoshSession bs, long delay) {
 		BoshTask bt = new BoshTask(bs);
 		boshTasks.schedule(bt, delay);
 		return bt;
 	}
 
+	@Override
 	public void cancelTask(TimerTask tt) {
 		tt.cancel();
 	}
@@ -324,6 +337,7 @@ public class BoshConnectionManager extends ClientConnectionManager
 			this.bs = bs;
 		}
 
+		@Override
 		public void run() {
 			Queue<Packet> out_results = new LinkedList<Packet>();
 			if (bs.task(out_results, this)) {

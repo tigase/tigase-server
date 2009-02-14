@@ -51,71 +51,71 @@ public enum Command {
 	 * Command sent from a connection manager to the session manager when a
 	 * new stream from the client has been opened.
 	 */
-	STREAM_OPENED,
+	STREAM_OPENED(Priority.SYSTEM),
 	/**
 	 * Command sent from a connection manager to the session manager when a
 	 * connection or stream has been closed.
 	 */
-	STREAM_CLOSED,
+	STREAM_CLOSED(Priority.SYSTEM),
 	/**
 	 * Command sent from the session manager to a connection manager to start
 	 * TLS handshaking over the client connection.
 	 */
-	STARTTLS,
+	STARTTLS(Priority.NORMAL),
 	/**
 	 * Command sent between a connection manager and the session manager to
 	 * retrieve stream features.
 	 */
-	GETFEATURES,
+	GETFEATURES(Priority.HIGH),
 	/**
 	 * This is deprecated command sent between components in the Tigase server
 	 * for service discovery handling.
 	 */
-	GETDISCO,
+	GETDISCO(Priority.HIGH),
 	/**
 	 * Command sent from the session manager to a client manager to close the
 	 * client connection.
 	 */
-	CLOSE,
+	CLOSE(Priority.SYSTEM),
 	/**
 	 * Command used by the StatisticsCollector to provide server statistics
 	 * through ad-hoc command.
 	 */
-	GETSTATS,
+	GETSTATS(Priority.HIGH),
 	/**
 	 * Command sent to the session manager from an external entity to activate
 	 * a user session with the connection end-point at the given address.
 	 */
-	USER_STATUS,
+	USER_STATUS(Priority.NORMAL),
 	/**
 	 * Command used to set a broadcast message to all online users.
 	 */
-	BROADCAST_TO_ONLINE,
+	BROADCAST_TO_ONLINE(Priority.NORMAL),
 	/**
 	 * Command used to set a broadcast message to all registered local users.
 	 */
-	BROADCAST_TO_ALL,
+	BROADCAST_TO_ALL(Priority.NORMAL),
 	/**
 	 * Command used to redirect packets from a connection manager to other
 	 * than default session manager. (Mostly used in the clustering.)
 	 */
-	REDIRECT,
+	REDIRECT(Priority.SYSTEM),
 	/**
 	 * Command sent to the VHostManager to reload virtual hosts from the database.
 	 */
-	VHOSTS_RELOAD,
+	VHOSTS_RELOAD(Priority.NORMAL),
 	/**
 	 * Command sent to the VHostManager to add or update existing virtual host.
 	 */
-	VHOSTS_UPDATE,
+	VHOSTS_UPDATE(Priority.NORMAL),
 	/**
 	 * Command sent to the VHostManager to remove existing virtual host.
 	 */
-	VHOSTS_REMOVE,
+	VHOSTS_REMOVE(Priority.NORMAL),
 	/**
 	 * Identifies all other, not predefined commands.
 	 */
-	OTHER;
+	OTHER(Priority.NORMAL);
 
 	/**
 	 * Ad-hoc command statuses as defined in the XEP-0050.
@@ -196,6 +196,12 @@ public enum Command {
 	public static final String XMLNS = "http://jabber.org/protocol/commands";
 	public static final String COMMAND_EL = "command";
 
+	private Priority priority = Priority.NORMAL;
+
+	private Command(Priority priority) {
+		this.priority = priority;
+	}
+
 	public static Command valueof(String cmd) {
 		try {
 			return Command.valueOf(cmd);
@@ -208,14 +214,18 @@ public enum Command {
 		final StanzaType type, final String id) {
 		Element elem =
 			createIqCommand(from, to, type, id, this.toString(), null);
-		return new Packet(elem);
+		Packet result = new Packet(elem);
+		result.setPriority(priority);
+		return result;
 	}
 
 	public Packet getPacket(final String from, final String to,
 		final StanzaType type, final String id, final DataType data_type) {
 		Element elem =
 			createIqCommand(from, to, type, id, this.toString(), data_type);
-		return new Packet(elem);
+		Packet result = new Packet(elem);
+		result.setPriority(priority);
+		return result;
 	}
 
 	private static Element addDataForm(Element command, DataType data_type) {
