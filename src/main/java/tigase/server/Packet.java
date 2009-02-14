@@ -96,6 +96,9 @@ public class Packet {
 			command = null;
 			cmd = false;
 			serviceDisco = false;
+			if (elem.getName() == "cluster") {
+				setPriority(Priority.CLUSTER);
+			}
 		}
 		if (elem.getAttribute("type") != null) {
 			type = StanzaType.valueof(elem.getAttribute("type"));

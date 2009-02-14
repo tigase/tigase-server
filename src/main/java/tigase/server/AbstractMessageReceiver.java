@@ -64,7 +64,7 @@ public abstract class AbstractMessageReceiver
 	public static final String MAX_QUEUE_SIZE_PROP_KEY = "max-queue-size";
 	//  public static final Integer MAX_QUEUE_SIZE_PROP_VAL = Integer.MAX_VALUE;
   public static final Integer MAX_QUEUE_SIZE_PROP_VAL =
-    new Long(Runtime.getRuntime().maxMemory()/200000L).intValue();
+    new Long(Runtime.getRuntime().maxMemory()/400000L).intValue();
 
   /**
    * Variable <code>log</code> is a class logger.
