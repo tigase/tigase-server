@@ -21,6 +21,7 @@
  */
 package tigase.server;
 
+import java.util.EnumMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -63,7 +64,7 @@ public abstract class AbstractMessageReceiver
 	public static final String MAX_QUEUE_SIZE_PROP_KEY = "max-queue-size";
 	//  public static final Integer MAX_QUEUE_SIZE_PROP_VAL = Integer.MAX_VALUE;
   public static final Integer MAX_QUEUE_SIZE_PROP_VAL =
-    new Long(Runtime.getRuntime().maxMemory()/100000L).intValue();
+    new Long(Runtime.getRuntime().maxMemory()/200000L).intValue();
 
   /**
    * Variable <code>log</code> is a class logger.
@@ -77,12 +78,20 @@ public abstract class AbstractMessageReceiver
   private MessageReceiver parent = null;
 	//	private Timer delayedTask = new Timer("MessageReceiverTask", true);
 
-  private LinkedBlockingQueue<Packet> in_queue =
-		new LinkedBlockingQueue<Packet>(maxQueueSize);
-  private LinkedBlockingQueue<Packet> out_queue =
-		new LinkedBlockingQueue<Packet>(maxQueueSize);
+	private final EnumMap<Priority, LinkedBlockingQueue<Packet>> in_queues =
+					new EnumMap<Priority, LinkedBlockingQueue<Packet>>(Priority.class);
+	private final EnumMap<Priority, LinkedBlockingQueue<Packet>> out_queues =
+					new EnumMap<Priority, LinkedBlockingQueue<Packet>>(Priority.class);
+
+//  private LinkedBlockingQueue<Packet> in_queue =
+//		new LinkedBlockingQueue<Packet>(maxQueueSize);
+//  private LinkedBlockingQueue<Packet> out_queue =
+//		new LinkedBlockingQueue<Packet>(maxQueueSize);
 
 	// 	private String sync = "SyncObject";
+
+	// Array cache to speed processing up....
+	private Priority[] pr_cache = Priority.values();
 
 	private Timer receiverTasks = null;
 	private Thread in_thread = null;
@@ -129,20 +138,39 @@ public abstract class AbstractMessageReceiver
 	@Override
 	public void initializationCompleted() {}
 
+	private boolean tryLowerPriority(Packet packet, EnumMap<Priority,
+					LinkedBlockingQueue<Packet>> queues) {
+		boolean result = false;
+		int q_num = packet.getPriority().ordinal();
+		if (q_num < (pr_cache.length - 1)) {
+			synchronized (queues) {
+				result = queues.get(pr_cache[q_num + 1]).offer(packet);
+				queues.notifyAll();
+			}
+		}
+		return result;
+	}
+
 	@Override
   public boolean addPacketNB(Packet packet) {
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("[" + getName() + "]  " + packet.toString());
 		}
-		boolean result = in_queue.offer(packet);
+		boolean result = false;
+		synchronized (in_queues) {
+			result = in_queues.get(packet.getPriority()).offer(packet);
+			in_queues.notifyAll();
+		}
 		if (result) {
 			++statReceivedMessagesOk;
 			++curr_second;
 		} else {
+			// Queue overflow!
 			++statReceivedMessagesEr;
-// 			log.warning("Can't add more packets to the queue: "
-// 				+ "size=" + in_queue.size()
-// 				+ ", remaining=" + in_queue.remainingCapacity());
+			// System monitor should be notified here now
+			// In the meantime let's try to fit the packet in another, lower
+			// priority queue
+			tryLowerPriority(packet, in_queues);
 		}
 		return result;
   }
@@ -168,7 +196,10 @@ public abstract class AbstractMessageReceiver
 			log.finest("[" + getName() + "]  " + packet.toString());
 		}
 		try {
-			in_queue.put(packet);
+			synchronized (in_queues) {
+				in_queues.get(packet.getPriority()).put(packet);
+				in_queues.notifyAll();
+			}
 			++statReceivedMessagesOk;
 			++curr_second;
 		} catch (InterruptedException e) {
@@ -188,12 +219,21 @@ public abstract class AbstractMessageReceiver
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("[" + getName() + "]  " + packet.toString());
 		}
-		boolean result = out_queue.offer(packet);
+		boolean result = false;
+		synchronized (out_queues) {
+			result = out_queues.get(packet.getPriority()).offer(packet);
+			out_queues.notifyAll();
+		}
 		if (result) {
 			++statSentMessagesOk;
 			//++curr_second;
 		} else {
+			// Queue overflow!
 			++statSentMessagesEr;
+			// System monitor should be notified here now
+			// In the meantime let's try to fit the packet in another, lower
+			// priority queue
+			tryLowerPriority(packet, out_queues);
 		}
 		return result;
 	}
@@ -203,7 +243,10 @@ public abstract class AbstractMessageReceiver
 			log.finest("[" + getName() + "]  " + packet.toString());
 		}
 		try {
-			out_queue.put(packet);
+			synchronized (out_queues) {
+				out_queues.get(packet.getPriority()).put(packet);
+				out_queues.notifyAll();
+			}
 			++statSentMessagesOk;
 			//++curr_second;
 		} catch (InterruptedException e) {
@@ -236,26 +279,18 @@ public abstract class AbstractMessageReceiver
 				seconds[(sec_idx == 0 ? 59 : sec_idx - 1)], Level.FINE));
 		stats.add(new StatRecord(getName(), "Last minute packets", "int",
 				minutes[(min_idx == 0 ? 59 : min_idx - 1)], Level.FINE));
-		// 		long curr_hour = 0;
-		// 		for (long min: minutes) { curr_hour += min; }
-		//for (int sec: seconds) { curr_hour += sec; }
-		//curr_hour += curr_second;
-		// 		if (curr_hour > statAddedMessagesOk) {
-		// 			// This is not a dirty hack!! It looks weird but this is correct.
-		// 			// Last second, minute and hour are calculated in different threads
-		// 			// from the main packets processing thread and sometimes might
-		// 			// be out of sync. It does look odd on stats page so this statements
-		// 			// saves from long explanations to non-techies.
-		// 			curr_hour = statAddedMessagesOk;
-		// 		}
 		stats.add(new StatRecord(getName(), "Last hour packets", "int",
 				curr_hour, Level.FINE));
     stats.add(new StatRecord(getName(), StatisticType.MSG_RECEIVED_OK,
 				statReceivedMessagesOk, Level.FINE));
     stats.add(new StatRecord(getName(), StatisticType.MSG_SENT_OK,
 				statSentMessagesOk, Level.FINE));
-    stats.add(new StatRecord(getName(), StatisticType.QUEUE_WAITING,
-				(in_queue.size() + out_queue.size()), Level.FINEST));
+		for (Priority queue : Priority.values()) {
+			stats.add(new StatRecord(getName(), "In queue: " + queue.name(), "int",
+							in_queues.get(queue).size(), Level.FINEST));
+			stats.add(new StatRecord(getName(), "Out queue: " + queue.name(), "int",
+							out_queues.get(queue).size(), Level.FINEST));
+		}
     stats.add(new StatRecord(getName(), StatisticType.MAX_QUEUE_SIZE,
 				maxQueueSize, Level.FINEST));
     stats.add(new StatRecord(getName(), StatisticType.IN_QUEUE_OVERFLOW,
@@ -280,29 +315,34 @@ public abstract class AbstractMessageReceiver
 	@Override
   public void setProperties(Map<String, Object> props) {
     int queueSize = (Integer)props.get(MAX_QUEUE_SIZE_PROP_KEY);
-    setMaxQueueSize(queueSize);
+		stopThreads();
+		setMaxQueueSize(queueSize);
+		startThreads();
 		defHostname = (String)props.get(DEF_HOSTNAME_PROP_KEY);
 		compId = (String)props.get(COMPONENT_ID_PROP_KEY);
 		//addRouting(getComponentId());
   }
 
   public void setMaxQueueSize(int maxQueueSize) {
-    if (this.maxQueueSize != maxQueueSize) {
-			stopThreads();
+    boolean initialized = in_queues.get(Priority.SYSTEM) != null;
+		if (this.maxQueueSize != maxQueueSize || !initialized) {
       this.maxQueueSize = maxQueueSize;
-      if (in_queue != null) {
-				LinkedBlockingQueue<Packet> newQueue =
-					new LinkedBlockingQueue<Packet>(maxQueueSize);
-				newQueue.addAll(in_queue);
-				in_queue = newQueue;
-      } // end of if (queue != null)
-      if (out_queue != null) {
-				LinkedBlockingQueue<Packet> newQueue =
-					new LinkedBlockingQueue<Packet>(maxQueueSize);
-				newQueue.addAll(out_queue);
-				out_queue = newQueue;
-      } // end of if (queue != null)
-			startThreads();
+			LinkedBlockingQueue<Packet> queue = null;
+			LinkedBlockingQueue<Packet> newQueue = null;
+			for (Priority pr : Priority.values()) {
+				queue = in_queues.get(pr);
+				newQueue = new LinkedBlockingQueue<Packet>(maxQueueSize);
+				if (queue != null) {
+					newQueue.addAll(queue);
+				} // end of if (queue != null)
+				in_queues.put(pr, newQueue);
+				queue = out_queues.get(pr);
+				newQueue = new LinkedBlockingQueue<Packet>(maxQueueSize);
+				if (queue != null) {
+					newQueue.addAll(queue);
+				} // end of if (queue != null)
+				out_queues.put(pr, newQueue);
+			}
     } // end of if (this.maxQueueSize != maxQueueSize)
   }
 
@@ -360,6 +400,7 @@ public abstract class AbstractMessageReceiver
   public void setName(String name) {
     this.name = name;
 		compId = JIDUtils.getNodeID(name, defHostname);
+		setMaxQueueSize(maxQueueSize);
   }
 
 	@Override
@@ -417,13 +458,13 @@ public abstract class AbstractMessageReceiver
 	private void startThreads() {
 		if (in_thread == null || ! in_thread.isAlive()) {
 			stopped = false;
-			in_thread = new Thread(new QueueListener(in_queue, QueueType.IN_QUEUE));
+			in_thread = new Thread(new QueueListener(in_queues, QueueType.IN_QUEUE));
 			in_thread.setName("in_" + name);
 			in_thread.start();
 		} // end of if (thread == null || ! thread.isAlive())
 		if (out_thread == null || ! out_thread.isAlive()) {
 			stopped = false;
-			out_thread = new Thread(new QueueListener(out_queue, QueueType.OUT_QUEUE));
+			out_thread = new Thread(new QueueListener(out_queues, QueueType.OUT_QUEUE));
 			out_thread.setName("out_" + name);
 			out_thread.start();
 		} // end of if (thread == null || ! thread.isAlive())
@@ -461,14 +502,17 @@ public abstract class AbstractMessageReceiver
 		return false;
 	}
 
+	@Override
 	public boolean handlesNameSubdomains() {
 		return true;
 	}
 
+	@Override
 	public boolean handlesNonLocalDomains() {
 		return false;
 	}
 
+	@Override
 	public void setVHostManager(VHostManagerIfc manager) {
 		this.vHostManager = manager;
 	}
@@ -522,6 +566,7 @@ public abstract class AbstractMessageReceiver
 		regexRoutings.clear();
 	}
 
+	@Override
 	public boolean isInRegexRoutings(String address) {
 		// 		log.finest(getName() + " looking for regex routings: " + address);
 		for (Pattern pat: regexRoutings) {
@@ -534,6 +579,7 @@ public abstract class AbstractMessageReceiver
 		return false;
 	}
 
+	@Override
 	public final void processPacket(final Packet packet,
 		final Queue<Packet> results)	{
 		addPacketNB(packet);
@@ -543,46 +589,67 @@ public abstract class AbstractMessageReceiver
 
 	private class QueueListener implements Runnable {
 
-		private LinkedBlockingQueue<Packet> queue = null;
+		private final EnumMap<Priority, LinkedBlockingQueue<Packet>> queues;
 		private QueueType type = null;
 
-		private QueueListener(LinkedBlockingQueue<Packet> q, QueueType type) {
-			this.queue = q;
+		private QueueListener(EnumMap<Priority, LinkedBlockingQueue<Packet>> q,
+						QueueType type) {
+			this.queues = q;
 			this.type = type;
 		}
 
+		@Override
 		public void run() {
 			Packet packet = null;
 			while (! stopped) {
 				try {
-					packet = queue.take();
-					switch (type) {
-					case IN_QUEUE:
-						long startPPT = System.currentTimeMillis();
-						processPacket(packet);
-						processPacketTimings[pptIdx] =
-										System.currentTimeMillis() - startPPT;
-						if (pptIdx >= (processPacketTimings.length-1)) {
-							pptIdx = 0;
-						} else {
-							++pptIdx;
+					// According to the spec, queues.values() must return values
+					// in the same order the enum has been declared, the highest
+					// order for the earliest declared enums/queues
+					for (Map.Entry<Priority, LinkedBlockingQueue<Packet>> queueEntry : queues.entrySet()) {
+						// The log call must be commented out after initial tests
+						// made to ensure queues are polled in a correct order
+						log.finest("Queue: " + queueEntry.getKey().name());
+						while ((packet = queueEntry.getValue().poll()) != null) {
+							switch (type) {
+								case IN_QUEUE:
+									long startPPT = System.currentTimeMillis();
+									processPacket(packet);
+									processPacketTimings[pptIdx] =
+													System.currentTimeMillis() - startPPT;
+									if (pptIdx >= (processPacketTimings.length - 1)) {
+										pptIdx = 0;
+									} else {
+										++pptIdx;
+									}
+									break;
+								case OUT_QUEUE:
+									if (parent != null) {
+										parent.addPacket(packet);
+									} else {
+										// It may happen for MessageRouter and this is intentional
+										addPacketNB(packet);
+									//log.warning("[" + getName() + "]  " + "No parent!");
+									} // end of else
+									break;
+								default:
+									log.severe("Unknown queue element type: " + type);
+									break;
+							} // end of switch (qel.type)
 						}
-						break;
-					case OUT_QUEUE:
-						if (parent != null) {
-							// 							log.finest("[" + getName() + "]  " +
-							// 								"Sending outQueue to parent: " + parent.getName());
-							parent.addPacket(packet);
-						} else {
-							// It may happen for MessageRouter and this is intentional
-							addPacketNB(packet);
-							//log.warning("[" + getName() + "]  " + "No parent!");
-						} // end of else
-						break;
-					default:
-						log.severe("Unknown queue element type: " + type);
-						break;
-					} // end of switch (qel.type)
+					}
+				  // Let's make sure there was nothing added to any queue in the meantime
+					synchronized (queues) {
+						boolean added = false;
+						for (LinkedBlockingQueue<Packet> queue : queues.values()) {
+							if (added = (queue.size() > 0)) {
+								break;
+							}
+						}
+						if (!added) {
+							queues.wait();
+						}
+					}
 				} catch (InterruptedException e) {
 					//log.log(Level.SEVERE, "Exception during packet processing: ", e);
 					//				stopped = true;

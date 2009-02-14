@@ -45,7 +45,6 @@ public class Packet {
 
 	private Set<String> processorsIds = new LinkedHashSet<String>();
 
-
 	/**
 	 * Constant <code>OLDTO</code> is kind of hack to store old request address
 	 * when the packet is processed by the session mamaner. The problem is that
@@ -72,6 +71,7 @@ public class Packet {
 	private String from = null;
 	private Permissions permissions = Permissions.NONE;
 	private String packetToString = null;
+	private Priority priority = Priority.NORMAL;
 
   public Packet(final Element elem) {
 		if (elem == null) {
@@ -120,6 +120,14 @@ public class Packet {
 		this.cmd = false;
 		this.routed = false;
 		this.serviceDisco = false;
+	}
+
+	public void setPriority(Priority priority) {
+		this.priority = priority;
+	}
+
+	public Priority getPriority() {
+		return priority;
 	}
 
 	public void setPermissions(Permissions perm) {

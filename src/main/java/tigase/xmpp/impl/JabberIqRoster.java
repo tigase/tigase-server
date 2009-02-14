@@ -259,8 +259,7 @@ public abstract class JabberIqRoster {
 			new_buddy = roster_util.getBuddyItem(session, buddy);
 			log.finest("2. New Buddy: " + new_buddy.toString());
       results.offer(packet.okResult((String)null, 0));
-      roster_util.updateBuddyChange(session, results,
-				roster_util.getBuddyItem(session, buddy));
+      roster_util.updateBuddyChange(session, results, new_buddy);
     } // end of else
   }
 
