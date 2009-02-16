@@ -66,7 +66,7 @@ public enum Command {
 	 * Command sent between a connection manager and the session manager to
 	 * retrieve stream features.
 	 */
-	GETFEATURES(Priority.HIGH),
+	GETFEATURES(Priority.SYSTEM),
 	/**
 	 * This is deprecated command sent between components in the Tigase server
 	 * for service discovery handling.

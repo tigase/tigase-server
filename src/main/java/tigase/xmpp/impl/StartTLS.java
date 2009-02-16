@@ -78,7 +78,9 @@ public class StartTLS extends XMPPProcessor
   public String[] supNamespaces()	{ return XMLNSS; }
 
   public Element[] supStreamFeatures(final XMPPResourceConnection session)	{
-    if (session.getSessionData(TLS_STARTED_KEY) == null) {
+    // If session does not exist, just return null, we don't provide features
+		// for non-existen stream
+		if (session != null && session.getSessionData(TLS_STARTED_KEY) == null) {
       if (session.getSessionData(TLS_REQUIRED_KEY) != null
 				&& session.getSessionData(TLS_REQUIRED_KEY).equals("true")) {
         return F_REQUIRED;

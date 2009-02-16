@@ -611,15 +611,20 @@ public abstract class AbstractMessageReceiver
 			Packet packet = null;
 			while (! stopped) {
 				try {
-					// According to the spec, queues.values() must return values
-					// in the same order the enum has been declared, the highest
-					// order for the earliest declared enums/queues
-					//log.finest("checking queues:");
-					for (Map.Entry<Priority, LinkedBlockingQueue<Packet>> queueEntry : queues.entrySet()) {
-						// The log call must be commented out after initial tests
-						// made to ensure queues are polled in a correct order
-						//log.finest("Queue: " + queueEntry.getKey().name());
-						while ((packet = queueEntry.getValue().poll()) != null) {
+					// First take the first - highest priority queue...
+					int queue_idx = 0;
+					do {
+						LinkedBlockingQueue<Packet> queue = queues.get(pr_cache[queue_idx]);
+						// Check higher priority queues first:
+						for (int i = 0; i < queue_idx; i++) {
+							if (queues.get(pr_cache[i]).size() > 0) {
+								queue_idx = i;
+								queue = queues.get(pr_cache[queue_idx]);
+								break;
+							}
+						}
+						// Now process next waiting packet
+						if ((packet = queue.poll()) != null) {
 							switch (type) {
 								case IN_QUEUE:
 									long startPPT = System.currentTimeMillis();
@@ -645,8 +650,10 @@ public abstract class AbstractMessageReceiver
 									log.severe("Unknown queue element type: " + type);
 									break;
 							} // end of switch (qel.type)
+						} else {
+							++queue_idx;
 						}
-					}
+					} while (packet != null || queue_idx < pr_cache.length);
 				  // Let's make sure there was nothing added to any queue in the meantime
 					synchronized (queues) {
 						boolean added = false;

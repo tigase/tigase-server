@@ -30,6 +30,7 @@ import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 import tigase.server.Packet;
 import tigase.server.Command;
+import tigase.server.Priority;
 import tigase.util.JIDUtils;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
@@ -72,20 +73,26 @@ public class JabberIqRegister extends XMPPProcessor
 			new String[] {"jabber:iq:register"})
 	};
 
+	@Override
 	public String id() { return ID; }
 
+	@Override
 	public String[] supElements()
 	{ return ELEMENTS; }
 
+	@Override
 	public String[] supNamespaces()
 	{ return XMLNSS; }
 
+	@Override
   public Element[] supStreamFeatures(final XMPPResourceConnection session)
 	{ return FEATURES; }
 
+	@Override
   public Element[] supDiscoFeatures(final XMPPResourceConnection session)
 	{ return DISCO_FEATURES; }
 
+	@Override
 	public void process(final Packet packet, final XMPPResourceConnection session,
 		final NonAuthUserRepository repo, final Queue<Packet> results,
 		final Map<String, Object> settings)
@@ -130,7 +137,12 @@ public class JabberIqRegister extends XMPPProcessor
 						} else {
 							try {
 								result = session.unregister(packet.getElemFrom());
-								results.offer(packet.okResult((String)null, 0));
+								Packet ok_result = packet.okResult((String)null, 0);
+								// We have to set SYSTEM priority for the packet here,
+								// otherwise the network connection is closed before the
+								// client received a response
+								ok_result.setPriority(Priority.SYSTEM);
+								results.offer(ok_result);
 								results.offer(Command.CLOSE.getPacket(session.getDomain(),
 										session.getConnectionId(), StanzaType.set,
 										session.nextStanzaId()));

@@ -302,7 +302,7 @@ public class TigaseCustomAuth implements UserAuthRepository {
 		get_pass = prepareQuery(getpassword_query);
 		update_pass = prepareQuery(updatepassword_query);
 		user_login = prepareQuery(userlogin_query);
-		if (userlogout_query != null) {
+		if (userlogout_query != null && !userlogout_query.isEmpty()) {
 			user_logout = prepareQuery(userlogout_query);
 		}
 	}
@@ -416,10 +416,13 @@ public class TigaseCustomAuth implements UserAuthRepository {
 	 * Describe <code>initRepository</code> method here.
 	 *
 	 * @param connection_str a <code>String</code> value
+	 * @param params
 	 * @exception DBInitException if an error occurs
 	 */
+	@Override
 	public void initRepository(final String connection_str,
-		Map<String, String> params) throws DBInitException {
+					Map<String, String> params)
+					throws DBInitException {
 		db_conn = connection_str;
 		convalid_query = getParamWithDef(params, DEF_CONNVALID_KEY, DEF_CONNVALID_QUERY);
 		initdb_query = getParamWithDef(params, DEF_INITDB_KEY, DEF_INITDB_QUERY);
