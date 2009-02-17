@@ -28,10 +28,12 @@ import java.util.LinkedList;
 import java.util.UUID;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.server.Command;
 import tigase.server.Packet;
+import tigase.server.ReceiverEventHandler;
 import tigase.util.JIDUtils;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.Authorization;
@@ -78,6 +80,9 @@ public class BoshConnectionManager extends ClientConnectionManager
 	private int concurrent_requests = CONCURRENT_REQUESTS_PROP_VAL;
 	private int hold_requests = HOLD_REQUESTS_PROP_VAL;
 	private long max_pause = MAX_PAUSE_PROP_VAL;
+	private ReceiverEventHandler stoppedHandler = newStoppedHandler();
+	private ReceiverEventHandler startedHandler = newStartedHandler();
+
 	private Map<UUID, BoshSession> sessions =
 		new LinkedHashMap<UUID, BoshSession>();
 
@@ -92,36 +97,22 @@ public class BoshConnectionManager extends ClientConnectionManager
 // 		}
 // 	}
 
-	protected BoshSession getBoshSessionTo(Packet packet) {
-		UUID sid = UUID.fromString(JIDUtils.getNodeResource(packet.getTo()));
+	protected BoshSession getBoshSession(String jid) {
+		UUID sid = UUID.fromString(JIDUtils.getNodeResource(jid));
 		return sessions.get(sid);
 	}
 
 	@Override
-	protected void writePacketToSocket(Packet packet) {
-		BoshSession session = getBoshSessionTo(packet);
+	protected boolean writePacketToSocket(Packet packet) {
+		BoshSession session = getBoshSession(packet.getTo());
 		if (session != null) {
 			Queue<Packet> out_results = new LinkedList<Packet>();
 			session.processPacket(packet, out_results);
 			addOutPackets(out_results, session);
+			return true;
 		} else {
 			log.info("Session does not exist for packet: " + packet.toString());
-			try {
-				Packet error =
-						Authorization.ITEM_NOT_FOUND.getResponseMessage(packet,
-							"The user connection is no longer active.", true);
-				addOutPacket(error);
-			} catch (PacketErrorTypeException e) {
-				log.finest("Ups, already error packet. Dropping it to prevent infinite loop.");
-			}
-			// In case the SessionManager lost synchronization for any reason, let's
-			// notify it that the user connection no longer exists.
-			Packet command = Command.STREAM_CLOSED.getPacket(null, null,
-				StanzaType.set, "bosh-missing-1");
-			command.setFrom(packet.getTo());
-			command.setTo(packet.getFrom());
-			log.fine("Sending a command to close the remote session for non-existen Bosh connection: " + command.toString());
-			addOutPacket(command);
+			return false;
 		}
 	}
 
@@ -129,7 +120,7 @@ public class BoshConnectionManager extends ClientConnectionManager
 	protected void processCommand(Packet packet) {
 		switch (packet.getCommand()) {
 		case CLOSE:
-			BoshSession session = getBoshSessionTo(packet);
+			BoshSession session = getBoshSession(packet.getTo());
 			if (session != null) {
 				log.fine("Closing session: " + session.getSid());
 				session.close();
@@ -147,7 +138,7 @@ public class BoshConnectionManager extends ClientConnectionManager
 	@Override
 	protected String changeDataReceiver(Packet packet, String newAddress,
 		String command_sessionId, XMPPIOService serv) {
-		BoshSession session = getBoshSessionTo(packet);
+		BoshSession session = getBoshSession(packet.getTo());
 		if (session != null) {
 			String sessionId = session.getSessionId();
 			if (sessionId.equals(command_sessionId)) {
@@ -347,5 +338,60 @@ public class BoshConnectionManager extends ClientConnectionManager
 		}
 
 	}
+
+	/**
+	 *
+	 * @param packet
+	 * @return
+	 */
+	@Override
+	public boolean addOutStreamOpen(Packet packet, BoshSession bs) {
+		packet.setFrom(getFromAddress(bs.getSid().toString()));
+		packet.setTo(bs.getDataReceiver());
+		return addOutPacketWithTimeout(packet, startedHandler, 5l, TimeUnit.SECONDS);
+	}
+
+	@Override
+	public boolean addOutStreamClosed(Packet packet, BoshSession bs) {
+		packet.setFrom(getFromAddress(bs.getSid().toString()));
+		packet.setTo(bs.getDataReceiver());
+		return addOutPacketWithTimeout(packet, stoppedHandler, 5l, TimeUnit.SECONDS);
+	}
+
+	@Override
+	protected ReceiverEventHandler newStartedHandler() {
+		return new StartedHandler();
+	}
+
+	private class StartedHandler implements ReceiverEventHandler {
+
+		@Override
+		public void timeOutExpired(Packet packet) {
+			// If we still haven't received confirmation from the SM then
+			// the packet either has been lost or the server is overloaded
+			// In either case we disconnect the connection.
+			log.warning("No response within time limit received for a packet: " +
+							packet.toString());
+			BoshSession session = getBoshSession(packet.getFrom());
+			if (session != null) {
+				log.fine("Closing session: " + session.getSid());
+				session.close();
+				sessions.remove(session.getSid());
+			} else {
+				log.info("Session does not exist for packet: " + packet.toString());
+			}
+		}
+
+		@Override
+		public void responseReceived(Packet packet, Packet response) {
+			// We are now ready to ask for features....
+			addOutPacket(Command.GETFEATURES.getPacket(packet.getFrom(),
+							packet.getTo(), StanzaType.get, UUID.randomUUID().toString(),
+							null));
+		}
+
+	}
+
+
 
 }

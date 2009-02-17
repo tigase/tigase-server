@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import tigase.server.Command;
 import tigase.server.ConnectionManager;
@@ -44,6 +45,9 @@ import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 //import tigase.net.IOService;
 import tigase.net.SocketReadThread;
+import tigase.server.ReceiverEventHandler;
+import tigase.xmpp.Authorization;
+import tigase.xmpp.PacketErrorTypeException;
 
 /**
  * Class ClientConnectionManager
@@ -78,6 +82,8 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 
 	private Map<String, XMPPProcessorIfc> processors =
 		new ConcurrentSkipListMap<String, XMPPProcessorIfc>();
+	private ReceiverEventHandler stoppedHandler = newStoppedHandler();
+	private ReceiverEventHandler startedHandler = newStartedHandler();
 
 	@Override
 	public void processPacket(final Packet packet) {
@@ -87,7 +93,27 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 		if (packet.isCommand() && packet.getCommand() != Command.OTHER) {
 			processCommand(packet);
 		} else {
-			writePacketToSocket(packet);
+			if (!writePacketToSocket(packet)) {
+				// Connection closed or broken, send message back to the SM
+				try {
+					Packet error =
+									Authorization.ITEM_NOT_FOUND.getResponseMessage(packet,
+									"The user connection is no longer active.", true);
+					addOutPacket(error);
+				} catch (PacketErrorTypeException e) {
+					log.finest(
+									"Ups, already error packet. Dropping it to prevent infinite loop.");
+				}
+				// In case the SessionManager lost synchronization for any reason, let's
+				// notify it that the user connection no longer exists.
+				Packet command = Command.STREAM_CLOSED.getPacket(null, null,
+								StanzaType.set, UUID.randomUUID().toString());
+				command.setFrom(packet.getTo());
+				command.setTo(packet.getFrom());
+				addOutPacketWithTimeout(command, stoppedHandler, 5l, TimeUnit.SECONDS);
+				log.fine("Sending a command to close the remote session for non-existen Bosh connection: " +
+								command.toString());
+			}
 		} // end of else
 	}
 
@@ -170,8 +196,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 				serv.stop();
 			} else {
 				log.fine("Attempt to stop non-existen service for packet: "
-					+ packet.getStringData()
-					+ ", Service already stopped?");
+					+ packet.getStringData() + ", Service already stopped?");
 			} // end of if (serv != null) else
 			break;
 		default:
@@ -198,6 +223,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 		return null;
 	}
 
+	@Override
 	public Queue<Packet> processSocketData(XMPPIOService serv) {
 
 		String id = getUniqueId(serv);
@@ -219,6 +245,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 		return null;
 	}
 
+	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> props = super.getDefaults(params);
 //		if (params.get(GEN_VIRT_HOSTS) != null) {
@@ -249,6 +276,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 		return props;
 	}
 
+	@Override
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
 		boolean routing_mode =
@@ -361,12 +389,12 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 			Command.addFieldValue(streamOpen, "session-id", id);
 			Command.addFieldValue(streamOpen, "hostname", hostname);
 			Command.addFieldValue(streamOpen, "xml:lang", lang);
-			addOutPacket(streamOpen);
-			if (attribs.get("version") != null) {
-				addOutPacket(Command.GETFEATURES.getPacket(
-					getFromAddress(getUniqueId(serv)),
-					serv.getDataReceiver(), StanzaType.get, "sess2", null));
-			} // end of if (attribs.get("version") != null)
+			addOutPacketWithTimeout(streamOpen, startedHandler, 5l, TimeUnit.SECONDS);
+//			if (attribs.get("version") != null) {
+//				addOutPacket(Command.GETFEATURES.getPacket(
+//					getFromAddress(getUniqueId(serv)),
+//					serv.getDataReceiver(), StanzaType.get, "sess2", null));
+//			} // end of if (attribs.get("version") != null)
 // 		} catch (IOException e) {
 // 			serv.stop();
 // 		}
@@ -382,8 +410,9 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 			if (service.getDataReceiver() != null) {
 				Packet command = Command.STREAM_CLOSED.getPacket(
 					getFromAddress(getUniqueId(service)),
-					service.getDataReceiver(), StanzaType.set, "sess1");
-				addOutPacket(command);
+					service.getDataReceiver(), StanzaType.set, 
+					UUID.randomUUID().toString());
+				addOutPacketWithTimeout(command, stoppedHandler, 5l, TimeUnit.SECONDS);
 				log.fine("Service stopped, sending packet: " + command.getStringData());
 			} else {
 				log.fine("Service stopped, before stream:stream received");
@@ -391,6 +420,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 		}
 	}
 
+	@Override
 	public void xmppStreamClosed(XMPPIOService serv) {
 		log.finer("Stream closed.");
 	}
@@ -402,12 +432,69 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 	 *
 	 * @return a <code>long</code> value
 	 */
+	@Override
 	protected long getMaxInactiveTime() {
 		return 24*HOUR;
 	}
 
+	@Override
 	protected XMPPIOService getXMPPIOServiceInstance() {
 		return new XMPPIOService();
+	}
+
+	protected ReceiverEventHandler newStoppedHandler() {
+		return new StoppedHandler();
+	}
+
+	protected ReceiverEventHandler newStartedHandler() {
+		return new StartedHandler();
+	}
+
+	private class StoppedHandler implements ReceiverEventHandler {
+
+		@Override
+		public void timeOutExpired(Packet packet) {
+			// Ups, doesn't look good, the server is either oveloaded or lost
+			// a packet.
+			log.warning("No response within time limit received for a packet: " +
+							packet.toString());
+			addOutPacketWithTimeout(packet, stoppedHandler, 5l, TimeUnit.SECONDS);
+		}
+
+		@Override
+		public void responseReceived(Packet packet, Packet response) {
+			// Great, nothing to worry about.
+			log.finest("Response for stop received...");
+		}
+
+	}
+
+	private class StartedHandler implements ReceiverEventHandler {
+
+		@Override
+		public void timeOutExpired(Packet packet) {
+			// If we still haven't received confirmation from the SM then
+			// the packet either has been lost or the server is overloaded
+			// In either case we disconnect the connection.
+			log.warning("No response within time limit received for a packet: " +
+							packet.toString());
+			XMPPIOService serv = getXMPPIOService(packet.getFrom());
+			if (serv != null) {
+				serv.stop();
+			} else {
+				log.fine("Attempt to stop non-existen service for packet: "
+					+ packet.getStringData() + ", Service already stopped?");
+			} // end of if (serv != null) else
+		}
+
+		@Override
+		public void responseReceived(Packet packet, Packet response) {
+			// We are now ready to ask for features....
+			addOutPacket(Command.GETFEATURES.getPacket(packet.getFrom(),
+							packet.getTo(), StanzaType.get, UUID.randomUUID().toString(),
+							null));
+		}
+
 	}
 
 }

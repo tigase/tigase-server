@@ -571,6 +571,7 @@ public class SessionManager extends AbstractMessageReceiver
 			connection.setDefLang(Command.getFieldValue(pc, "xml:lang"));
 			log.finest("Setting session-id " + connection.getSessionId()
 				+ " for connection: " + connection.getConnectionId());
+			fastAddOutPacket(pc.okResult((String) null, 0));
 			processing_result = true;
 			break;
 		case GETFEATURES:
@@ -584,6 +585,7 @@ public class SessionManager extends AbstractMessageReceiver
 			processing_result = true;
 			break;
 		case STREAM_CLOSED:
+			fastAddOutPacket(pc.okResult((String)null, 0));
 			closeConnection(pc.getFrom(), false);
 			processing_result = true;
 			break;
@@ -656,9 +658,9 @@ public class SessionManager extends AbstractMessageReceiver
 							user_repository.setData(JIDUtils.getNodeID(user_jid), "tokens",
 								"USER_STATUS", "USER_STATUS");
 							connection.loginToken("USER_STATUS", "USER_STATUS");
-							handleLogin(user_jid, connection);
+							handleLogin(JIDUtils.getNodeNick(user_jid), connection);
 							connection.putSessionData("jingle", "active");
-							addOutPacket(pc.okResult((String)null, 0));
+							fastAddOutPacket(pc.okResult((String)null, 0));
 							if (presence == null) {
 								presence =
 						      new Packet(new Element("presence",

@@ -209,13 +209,12 @@ public class BoshSession {
 		sendBody(service, body);
 		//service.writeRawData(body.toString());
 		Packet streamOpen = Command.STREAM_OPENED.getPacket(null, null,
-			StanzaType.set, "sess1", Command.DataType.submit);
+			StanzaType.set, UUID.randomUUID().toString(), Command.DataType.submit);
 		Command.addFieldValue(streamOpen, "session-id", sessionId);
 		Command.addFieldValue(streamOpen, "hostname", domain);
 		Command.addFieldValue(streamOpen, LANG_ATTR, lang);
-		out_results.offer(streamOpen);
-		out_results.offer(Command.GETFEATURES.getPacket(null, null,
-				StanzaType.get, "sess1", null));
+		handler.addOutStreamOpen(streamOpen, this);
+		//out_results.offer(streamOpen);
 	}
 
 	public String getSessionId() {
@@ -544,8 +543,9 @@ public class BoshSession {
 					max_inactivity = 2;   // Max pause changed to 2 secs
 					terminate = true;
 					Packet command = Command.STREAM_CLOSED.getPacket(null, null,
-						StanzaType.set, "bosh1");
-					out_results.offer(command);
+						StanzaType.set, UUID.randomUUID().toString());
+					handler.addOutStreamClosed(command, this);
+					//out_results.offer(command);
 				}
 				if (packet.getAttribute(RESTART_ATTR) != null
 					&& packet.getAttribute(RESTART_ATTR).equals("true")) {
@@ -599,8 +599,9 @@ public class BoshSession {
 				waiting_packets.add(error.getElement());
 				terminate = true;
 				Packet command = Command.STREAM_CLOSED.getPacket(null, null,
-					StanzaType.set, "sess1");
-				out_results.offer(command);
+					StanzaType.set, UUID.randomUUID().toString());
+				handler.addOutStreamClosed(command, this);
+				//out_results.offer(command);
 			} catch (PacketErrorTypeException e) {
 				log.info("Error type and incorrect from bosh client? Ignoring...");
 			}
@@ -659,8 +660,9 @@ public class BoshSession {
 						}
 					}
 					Packet command = Command.STREAM_CLOSED.getPacket(null, null,
-						StanzaType.set, "sess1");
-					out_results.offer(command);
+						StanzaType.set, UUID.randomUUID().toString());
+					handler.addOutStreamClosed(command, this);
+					//out_results.offer(command);
 					return true;
 				case EMPTY_RESP:
 					BoshIOService serv = connections.poll();

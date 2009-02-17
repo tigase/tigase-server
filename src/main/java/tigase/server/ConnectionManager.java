@@ -429,20 +429,33 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 		}
 	}
 
-	protected void writePacketToSocket(Packet p) {
+	/**
+	 * 
+	 * @param p
+	 * @return
+	 */
+	protected boolean writePacketToSocket(Packet p) {
 		log.finer("Processing packet: " + p.getElemName()
 			+ ", type: " + p.getType());
 		log.finest("Writing packet to: " + p.getTo());
 		IO ios = getXMPPIOService(p);
-		writePacketToSocket(ios, p);
+		if (ios != null) {
+			return writePacketToSocket(ios, p);
+		} else {
+			return false;
+		}
 	}
 
-	protected void writePacketToSocket(Packet p, String serviceId) {
+	protected boolean writePacketToSocket(Packet p, String serviceId) {
 		log.finer("Processing packet: " + p.getElemName()
 			+ ", type: " + p.getType());
 		log.finest("Writing packet to: " + p.getTo());
 		IO ios = getXMPPIOService(serviceId);
-		writePacketToSocket(ios, p);
+		if (ios != null) {
+			return writePacketToSocket(ios, p);
+		} else {
+			return false;
+		}
 	}
 
 	protected IO getXMPPIOService(String serviceId) {
@@ -515,7 +528,11 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 	}
 
 	protected String getServiceId(Packet packet) {
-		return JIDUtils.getNodeResource(packet.getTo());
+		return getServiceId(packet.getTo());
+	}
+
+	protected String getServiceId(String jid) {
+		return JIDUtils.getNodeResource(jid);
 	}
 
 	@SuppressWarnings({"unchecked"})

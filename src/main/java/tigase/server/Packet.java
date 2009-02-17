@@ -69,6 +69,7 @@ public class Packet {
 	private final boolean routed;
 	private String to = null;
 	private String from = null;
+	private String id = null;
 	private Permissions permissions = Permissions.NONE;
 	private String packetToString = null;
 	private Priority priority = Priority.NORMAL;
@@ -78,6 +79,7 @@ public class Packet {
 			throw new NullPointerException();
 		} // end of if (elem == null)
 		this.elem = elem;
+		this.id = elem.getAttribute("id");
 		if (elem.getName() == "iq") {
 			Element child = elem.getChild("command", Command.XMLNS);
 			if (child != null) {
@@ -131,6 +133,10 @@ public class Packet {
 
 	public Priority getPriority() {
 		return priority;
+	}
+
+	public String getId() {
+		return id;
 	}
 
 	public void setPermissions(Permissions perm) {

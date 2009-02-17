@@ -31,7 +31,9 @@ import java.util.LinkedHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
@@ -94,6 +96,8 @@ public abstract class AbstractMessageReceiver
 	private Priority[] pr_cache = Priority.values();
 
 	private Timer receiverTasks = null;
+	private ConcurrentHashMap<String, ReceiverTask> waitingTasks =
+					new ConcurrentHashMap<String, ReceiverTask>(16, 0.75f, 4);
 	private Thread in_thread = null;
 	private Thread out_thread = null;
   private boolean stopped = false;
@@ -236,6 +240,13 @@ public abstract class AbstractMessageReceiver
 			tryLowerPriority(packet, out_queues);
 		}
 		return result;
+	}
+
+	protected boolean addOutPacketWithTimeout(Packet packet,
+					ReceiverEventHandler handler, long delay,	TimeUnit unit) {
+		// It is automatically added to collections and the Timer
+		new ReceiverTask(handler, delay, unit, packet);
+		return addOutPacket(packet);
 	}
 
 	protected boolean addOutPacket(Packet packet) {
@@ -628,7 +639,13 @@ public abstract class AbstractMessageReceiver
 							switch (type) {
 								case IN_QUEUE:
 									long startPPT = System.currentTimeMillis();
-									processPacket(packet);
+									ReceiverTask task =
+													waitingTasks.remove(packet.getTo() + packet.getId());
+									if (task != null) {
+										task.handleResponse(packet);
+									} else {
+										processPacket(packet);
+									}
 									processPacketTimings[pptIdx] =
 													System.currentTimeMillis() - startPPT;
 									if (pptIdx >= (processPacketTimings.length - 1)) {
@@ -675,6 +692,38 @@ public abstract class AbstractMessageReceiver
 									packet.toString(), e);
 				} // end of try-catch
 			} // end of while (! stopped)
+		}
+
+	}
+
+	private class ReceiverTask extends TimerTask {
+
+		private ReceiverEventHandler handler = null;
+		private Packet packet = null;
+
+		private ReceiverTask(ReceiverEventHandler handler, long delay,
+						TimeUnit unit, Packet packet) {
+			super();
+			this.handler = handler;
+			this.packet = packet;
+			waitingTasks.put(packet.getFrom() + packet.getId(), this);
+			receiverTasks.schedule(this, unit.toMillis(delay));
+		}
+
+		@Override
+		public void run() {
+			handleTimeout();
+		}
+		
+		public void handleTimeout() {
+			waitingTasks.remove(packet.getFrom() + packet.getId());
+			handler.timeOutExpired(packet);
+		}
+
+		public void handleResponse(Packet response) {
+			//waitingTasks.remove(packet.getFrom() + packet.getId());
+			this.cancel();
+			handler.responseReceived(packet, response);
 		}
 
 	}

@@ -132,7 +132,8 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 // 		}
 	}
 
-	protected void writePacketToSocket(Packet p) {
+	@Override
+	protected boolean writePacketToSocket(Packet p) {
 // 		long rid = ++send_rid;
 // 		p.getElement().setAttribute("rid", ""+rid);
 // 		synchronized (waiting_packs) {
@@ -144,9 +145,10 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 // 			}
 // 			waiting_packets.put(rid, p);
 // 		}
-		super.writePacketToSocket(p);
+		return super.writePacketToSocket(p);
 	}
 
+	@Override
 	public Queue<Packet> processSocketData(XMPPIOService serv) {
 		Packet p = null;
 		while ((p = serv.getReceivedPackets().poll()) != null) {
