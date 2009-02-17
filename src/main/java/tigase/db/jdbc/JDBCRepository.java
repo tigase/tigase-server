@@ -111,31 +111,6 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	private boolean autoCreateUser = false;
 	private boolean derby_mode = false;
 
-// 	private static long var_max_uid = 0;
-// 	private static long var_max_nid = 0;
-
-// 	/**
-// 	 * Describe <code>getMaxUid</code> method handles unique IDs much better for
-// 	 * distributed environment than the old code.
-// 	 * Thank's to Daniele for the help and the code.
-// 	 *
-// 	 * @return a <code>long</code> value
-// 	 */
-// 	private long getMaxUid() {
-// 		return (System.currentTimeMillis() * 100) + ((var_max_uid++) % 100);
-// 	}
-
-// 	/**
-// 	 * <code>getMaxNid</code> method handles unique IDs much better for
-// 	 * distributed environment than the old code.
-// 	 * Thank's to Daniele for the help and the code.
-// 	 *
-// 	 * @return a <code>long</code> value
-// 	 */
-// 	private long getMaxNid() {
-// 		return (System.currentTimeMillis() * 100) + ((var_max_nid++) % 100);
-// 	}
-
 	private void release(Statement stmt, ResultSet rs) {
 		if (rs != null) {
 			try {
@@ -207,30 +182,6 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 			return false;
 		}
 	}
-
-// 	private void incrementMaxUID() throws SQLException {
-// 		Statement stmt = null;
-// 		try {
-// 			stmt = conn.createStatement();
-// 			// Update max_uid to current value
-// 			stmt.executeUpdate("update " + maxids_tbl + " set max_uid=(max_uid+1);");
-// 		} finally {
-// 			release(stmt, null);
-// 			stmt = null;
-// 		}
-// 	}
-
-// 	private void incrementMaxNID() throws SQLException {
-// 		Statement stmt = null;
-// 		try {
-// 			stmt = conn.createStatement();
-// 			// Update max_uid to current value
-// 			stmt.executeUpdate("update " + maxids_tbl + " set max_nid=(max_nid+1);");
-// 		} finally {
-// 			release(stmt, null);
-// 			stmt = null;
-// 		}
-// 	}
 
 	private String buildNodeQuery(long uid, String node_path) {
 		String query =
@@ -314,7 +265,6 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 				} // end of else
 				node_add_sp.setLong(2, uid);
 				node_add_sp.setString(3, node_name);
-				//node_add_sp.registerOutParameter(4, Types.BIGINT);
 				rs = node_add_sp.executeQuery();
 				if (rs.next()) {
 					return rs.getLong(1);
@@ -440,12 +390,6 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 				initPreparedStatements();
 				auth = new UserAuthRepositoryImpl(this);
 				stmt = conn.createStatement();
-				// 			// load maximum ids
-				// 			String query = "SELECT max_uid, max_nid FROM " + maxids_tbl;
-				// 			rs = stmt.executeQuery(query);
-				// 			rs.next();
-				// 			max_uid = rs.getLong("max_uid");
-				// 			max_nid = rs.getLong("max_nid");
 				if (db_conn.contains("cacheRepo=off")) {
 					log.fine("Disabling cache.");
 					cache = Collections.synchronizedMap(new RepoCache(0, -1000));
@@ -728,15 +672,6 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 			stmt.executeUpdate(query);
 			query = "delete from " + nodes_tbl + " where nid = " + nid;
 			stmt.executeUpdate(query);
-			// I am not really sure if this is correct. Besides, it is not save for
-			// many JDBC drivers to call a query while reading results from another
-			// query.
-// 			query = "select nid from " + nodes_tbl + " where parent_nid = " + nid;
-// 			rs = stmt.executeQuery(query);
-// 			while (rs.next()) {
-// 				long subnode_nid = rs.getLong(1);
-// 				deleteSubnode(subnode_nid);
-// 			} // end of while (rs.next())
 		} finally {
 			release(stmt, rs);
 		}
