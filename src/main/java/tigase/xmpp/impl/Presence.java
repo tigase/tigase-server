@@ -547,6 +547,22 @@ public abstract class Presence {
 							+ packet.toString());
 						return;
 					}
+					// If this is a direct presence to a resource which is already gone
+					// Ignore it.
+					String resource = JIDUtils.getNodeResource(packet.getElemTo());
+					if (resource != null) {
+						XMPPResourceConnection direct =
+										session.getParentSession().getResourceForResource(resource);
+						if (direct != null) {
+							// Send a direct presence to correct resource, otherwise ignore
+							Element elem = packet.getElement().clone();
+							Packet result = new Packet(elem);
+							result.setTo(direct.getConnectionId());
+							result.setFrom(packet.getTo());
+							results.offer(result);
+						}
+						break;
+					}
 					// If other users are in 'to' or 'both' contacts, broadcast
 					// their preseces to all active resources
 					if (roster_util.isSubscribedTo(session, packet.getElemFrom())
@@ -555,7 +571,7 @@ public abstract class Presence {
 						updatePresenceChange(packet.getElement(), session, results);
 					} else {
 						// The code below looks like a bug to me.
-						// If the buddy is nt subscribed I should ignore all presences
+						// If the buddy is not subscribed I should ignore all presences
 						// states from him. Commenting this out for now....
 						// Well, it is not a bug and it is intentional.
 						// All presences received from MUC come from not subscribed buddies
