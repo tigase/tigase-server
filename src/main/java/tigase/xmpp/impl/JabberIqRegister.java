@@ -21,8 +21,6 @@
  */
 package tigase.xmpp.impl;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Logger;
@@ -111,12 +109,6 @@ public class JabberIqRegister extends XMPPProcessor
 		}
 
 		try {
-			// Not needed anymore. Packet filter does it for all stanzas.
-// 			if (session.isAuthorized()
-// 				&& packet.getFrom().equals(session.getConnectionId())) {
-// 				packet.getElement().setAttribute("from", session.getJID());
-// 			}
-
 			if ((id.equals(session.getDomain())
 					|| id.equals(session.getUserId()))
 				&& packet.getFrom().equals(session.getConnectionId())) {
