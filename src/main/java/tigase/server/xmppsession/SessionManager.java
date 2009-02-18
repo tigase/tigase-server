@@ -33,8 +33,10 @@ import java.util.LinkedHashMap;
 import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.script.Bindings;
@@ -56,6 +58,7 @@ import tigase.server.AbstractMessageReceiver;
 import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.server.Permissions;
+import tigase.server.ReceiverEventHandler;
 import tigase.server.XMPPServer;
 import tigase.stats.StatRecord;
 import tigase.util.JIDUtils;
@@ -130,6 +133,9 @@ public class SessionManager extends AbstractMessageReceiver
 	private Timer authenticationWatchdog = new Timer("SM authentocation watchdog");
 
 	private ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
+
+	private ConnectionCheckCommandHandler connectionCheckCommandHandler =
+					new ConnectionCheckCommandHandler();
 
 	//private Set<String> anonymous_domains = new HashSet<String>();
 
@@ -831,13 +837,13 @@ public class SessionManager extends AbstractMessageReceiver
 	}
 
 	protected void closeConnection(String connectionId, boolean closeOnly) {
-		log.fine("Stream closed from: " + connectionId);
+		log.finer("Stream closed from: " + connectionId);
 		++closedConnections;
 		XMPPResourceConnection connection = connectionsByFrom.remove(connectionId);
 		if (connection != null) {
 			closeSession(connection, closeOnly);
 		} else {
-			log.info("Can not find resource connection for packet: " + connectionId);
+			log.fine("Can not find resource connection for packet: " + connectionId);
 		} // end of if (conn != null) else
 	}
 
@@ -1109,7 +1115,18 @@ public class SessionManager extends AbstractMessageReceiver
 			session = new XMPPSession(JIDUtils.getNodeNick(userId));
 			sessionsByNodeId.put(userId, session);
 			log.finest("Created new XMPPSession for: " + userId);
-		} // end of if (session == null)
+		} else {
+			// Check all other connections whether they are still alive....
+			List<XMPPResourceConnection> connections = session.getActiveResources();
+			if (connections != null) {
+				for (XMPPResourceConnection connection : connections) {
+					addOutPacketWithTimeout(Command.CHECK_USER_CONNECTION.getPacket(
+									getComponentId(), connection.getConnectionId(),
+									StanzaType.get, UUID.randomUUID().toString()),
+									connectionCheckCommandHandler, 7l, TimeUnit.SECONDS);
+				}
+			}
+		}
 		session.addResourceConnection(conn);
 	}
 
@@ -1124,13 +1141,14 @@ public class SessionManager extends AbstractMessageReceiver
 	@Override
 	public void handleLogout(String userName, XMPPResourceConnection conn) {
 		String domain = conn.getDomain();
-		addOutPacket(Command.CLOSE.getPacket(getComponentId(),
-				conn.getConnectionId(), StanzaType.set, conn.nextStanzaId()));
 		String userId = JIDUtils.getNodeID(userName, domain);
 		XMPPSession session = sessionsByNodeId.get(userId);
 		if (session != null && session.getActiveResourcesSize() <= 1) {
 			sessionsByNodeId.remove(userId);
 		} // end of if (session.getActiveResourcesSize() == 0)
+		connectionsByFrom.remove(conn.getConnectionId());
+		fastAddOutPacket(Command.CLOSE.getPacket(getComponentId(),
+				conn.getConnectionId(), StanzaType.set, conn.nextStanzaId()));
 	}
 
 	@Override
@@ -1266,11 +1284,29 @@ public class SessionManager extends AbstractMessageReceiver
 
 		@Override
 		public void run() {
-			XMPPResourceConnection connection = connectionsByFrom.get(connId);
-			if (connection != null && !connection.isAuthorized()) {
+			XMPPResourceConnection conn = connectionsByFrom.remove(connId);
+			if (conn != null && !conn.isAuthorized()) {
 				++authTimeouts;
-				fastAddOutPacket(Command.CLOSE.getPacket(getComponentId(), connId, StanzaType.set, "1"));
 				log.info("Authentication timeout expired, closing connection: " + connId);
+				fastAddOutPacket(Command.CLOSE.getPacket(getComponentId(),
+								connId, StanzaType.set, conn.nextStanzaId()));
+			}
+		}
+
+	}
+
+	private class ConnectionCheckCommandHandler implements ReceiverEventHandler {
+
+		@Override
+		public void timeOutExpired(Packet packet) {
+			closeConnection(packet.getTo(), false);
+		}
+
+		@Override
+		public void responseReceived(Packet packet, Packet response) {
+			if (response.getType() == StanzaType.error) {
+				// The connection is not longer active, closing the user session here.
+				closeConnection(packet.getTo(), false);
 			}
 		}
 

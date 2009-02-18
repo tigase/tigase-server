@@ -58,6 +58,12 @@ public enum Command {
 	 */
 	STREAM_CLOSED(Priority.SYSTEM),
 	/**
+	 * Sends a command from SM to the connection holder to confirm whether the
+	 * connection is still active. Expects result for ok, error or timeout
+	 * if the connection is no longer active.
+	 */
+	CHECK_USER_CONNECTION(Priority.SYSTEM),
+	/**
 	 * Command sent from the session manager to a connection manager to start
 	 * TLS handshaking over the client connection.
 	 */
@@ -66,7 +72,7 @@ public enum Command {
 	 * Command sent between a connection manager and the session manager to
 	 * retrieve stream features.
 	 */
-	GETFEATURES(Priority.SYSTEM),
+	GETFEATURES(Priority.HIGH),
 	/**
 	 * This is deprecated command sent between components in the Tigase server
 	 * for service discovery handling.

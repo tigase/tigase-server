@@ -21,9 +21,6 @@
  */
 package tigase.db.jdbc;
 
-import java.math.BigDecimal;
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -33,28 +30,15 @@ import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Statement;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.logging.Logger;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
-import javax.security.auth.callback.UnsupportedCallbackException;
-import javax.security.sasl.AuthorizeCallback;
-import javax.security.sasl.RealmCallback;
-import javax.security.sasl.Sasl;
-import javax.security.sasl.SaslException;
-import javax.security.sasl.SaslServer;
 
 import tigase.util.Base64;
-import tigase.auth.SaslPLAIN;
 import tigase.db.AuthorizationException;
 import tigase.db.DBInitException;
 import tigase.db.TigaseDBException;
 import tigase.db.UserAuthRepository;
 import tigase.db.UserExistsException;
 import tigase.db.UserNotFoundException;
-import tigase.util.Algorithms;
 import tigase.util.JIDUtils;
 
 import static tigase.db.UserAuthRepository.*;

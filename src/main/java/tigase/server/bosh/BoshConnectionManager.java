@@ -38,9 +38,9 @@ import tigase.util.JIDUtils;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.XMPPIOService;
-import tigase.xmpp.PacketErrorTypeException;
 import tigase.server.xmppclient.ClientConnectionManager;
 
+import tigase.xmpp.PacketErrorTypeException;
 import static tigase.server.bosh.Constants.*;
 
 /**
@@ -118,17 +118,33 @@ public class BoshConnectionManager extends ClientConnectionManager
 
 	@Override
 	protected void processCommand(Packet packet) {
+		BoshSession session = getBoshSession(packet.getTo());
 		switch (packet.getCommand()) {
-		case CLOSE:
-			BoshSession session = getBoshSession(packet.getTo());
-			if (session != null) {
-				log.fine("Closing session: " + session.getSid());
-				session.close();
-				sessions.remove(session.getSid());
-			} else {
-				log.info("Session does not exist for packet: " + packet.toString());
-			}
-			break;
+			case CLOSE:
+				if (session != null) {
+					log.fine("Closing session: " + session.getSid());
+					session.close();
+					sessions.remove(session.getSid());
+				} else {
+					log.info("Session does not exist for packet: " + packet.toString());
+				}
+				break;
+			case CHECK_USER_CONNECTION:
+				if (session != null) {
+					// It's ok, the session has been found, respond with OK.
+					addOutPacket(packet.okResult((String)null, 0));
+				} else {
+					// Session is no longer active, respond with an error.
+					try {
+						addOutPacket(Authorization.ITEM_NOT_FOUND.getResponseMessage(packet,
+										"Connection gone.", false));
+					} catch (PacketErrorTypeException e) {
+						// Hm, error already, ignoring...
+						log.info("Error packet is not really expected here: " +
+										packet.toString());
+					}
+				}
+				break;
 		default:
 			super.processCommand(packet);
 			break;

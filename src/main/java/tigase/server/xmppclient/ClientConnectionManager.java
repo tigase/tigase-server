@@ -120,88 +120,105 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 	protected void processCommand(final Packet packet) {
 		XMPPIOService serv = getXMPPIOService(packet);
 		switch (packet.getCommand()) {
-		case GETFEATURES:
-			if (packet.getType() == StanzaType.result) {
-				List<Element> features = getFeatures(getXMPPSession(packet));
-				Element elem_features = new Element("stream:features");
-				elem_features.addChildren(features);
-				elem_features.addChildren(Command.getData(packet));
-				Packet result = new Packet(elem_features);
-				result.setTo(packet.getTo());
-				writePacketToSocket(result);
-			} // end of if (packet.getType() == StanzaType.get)
-			break;
-		case STARTTLS:
-			if (serv != null) {
-				log.finer("Starting TLS for connection: " + serv.getUniqueId());
-				try {
-					// Note:
-					// If you send <proceed> packet to client you must expect
-					// instant response from the client with TLS handshaking data
-					// before you will call startTLS() on server side.
-					// So the initial handshaking data might be lost as they will
-					// be processed in another thread reading data from the socket.
-					// That's why below code first removes service from reading
-					// threads pool and then sends <proceed> packet and starts TLS.
-					Element proceed = Command.getData(packet, "proceed", null);
-					Packet p_proceed = new Packet(proceed);
- 					SocketReadThread readThread = SocketReadThread.getInstance();
- 					readThread.removeSocketService(serv);
-					//					writePacketToSocket(serv, p_proceed);
- 					serv.addPacketToSend(p_proceed);
- 					serv.processWaitingPackets();
-					serv.startTLS(false);
-					//					serv.call();
- 					readThread.addSocketService(serv);
-				} catch (IOException e) {
-					log.warning("Error starting TLS: " + e);
-				} // end of try-catch
-			} else {
-				log.warning("Can't find sevice for STARTTLS command: " +
-					packet.getStringData());
-			} // end of else
-			break;
-		case REDIRECT:
-			String command_sessionId = Command.getFieldValue(packet, "session-id");
-			String newAddress = packet.getFrom();
-			String old_receiver = changeDataReceiver(packet, newAddress,
-				command_sessionId, serv);
-			if (old_receiver != null) {
-				log.fine("Redirecting data for sessionId: " + command_sessionId
-					+ ", to: " + newAddress);
-				Packet response = null;
+			case GETFEATURES:
+				if (packet.getType() == StanzaType.result) {
+					List<Element> features = getFeatures(getXMPPSession(packet));
+					Element elem_features = new Element("stream:features");
+					elem_features.addChildren(features);
+					elem_features.addChildren(Command.getData(packet));
+					Packet result = new Packet(elem_features);
+					result.setTo(packet.getTo());
+					writePacketToSocket(result);
+				} // end of if (packet.getType() == StanzaType.get)
+				break;
+			case STARTTLS:
+				if (serv != null) {
+					log.finer("Starting TLS for connection: " + serv.getUniqueId());
+					try {
+						// Note:
+						// If you send <proceed> packet to client you must expect
+						// instant response from the client with TLS handshaking data
+						// before you will call startTLS() on server side.
+						// So the initial handshaking data might be lost as they will
+						// be processed in another thread reading data from the socket.
+						// That's why below code first removes service from reading
+						// threads pool and then sends <proceed> packet and starts TLS.
+						Element proceed = Command.getData(packet, "proceed", null);
+						Packet p_proceed = new Packet(proceed);
+						SocketReadThread readThread = SocketReadThread.getInstance();
+						readThread.removeSocketService(serv);
+						//					writePacketToSocket(serv, p_proceed);
+						serv.addPacketToSend(p_proceed);
+						serv.processWaitingPackets();
+						serv.startTLS(false);
+						//					serv.call();
+						readThread.addSocketService(serv);
+					} catch (IOException e) {
+						log.warning("Error starting TLS: " + e);
+					} // end of try-catch
+				} else {
+					log.warning("Can't find sevice for STARTTLS command: " +
+									packet.getStringData());
+				} // end of else
+				break;
+			case REDIRECT:
+				String command_sessionId = Command.getFieldValue(packet, "session-id");
+				String newAddress = packet.getFrom();
+				String old_receiver = changeDataReceiver(packet, newAddress,
+								command_sessionId, serv);
+				if (old_receiver != null) {
+					log.fine("Redirecting data for sessionId: " + command_sessionId +
+									", to: " + newAddress);
+					Packet response = null;
 // 				response = packet.commandResult(null);
 // 				Command.addFieldValue(response, "session-id", command_sessionId);
 // 				Command.addFieldValue(response, "action", "close");
 // 				response.getElement().setAttribute("to", old_receiver);
 // 				addOutPacket(response);
-				response = packet.commandResult(null);
-				Command.addFieldValue(response, "session-id", command_sessionId);
-				Command.addFieldValue(response, "action", "activate");
-				response.getElement().setAttribute("to", newAddress);
-				addOutPacket(response);
-			} else {
-				log.finest("Connection for REDIRECT command does not exist, ignoring "
-					+ "packet: " + packet.toString());
-			}
-			break;
-		case STREAM_CLOSED:
+					response = packet.commandResult(null);
+					Command.addFieldValue(response, "session-id", command_sessionId);
+					Command.addFieldValue(response, "action", "activate");
+					response.getElement().setAttribute("to", newAddress);
+					addOutPacket(response);
+				} else {
+					log.finest("Connection for REDIRECT command does not exist, ignoring " +
+									"packet: " + packet.toString());
+				}
+				break;
+			case STREAM_CLOSED:
 
-			break;
-		case GETDISCO:
+				break;
+			case GETDISCO:
 
-			break;
-		case CLOSE:
-			if (serv != null) {
-				serv.stop();
-			} else {
-				log.fine("Attempt to stop non-existen service for packet: "
-					+ packet.getStringData() + ", Service already stopped?");
-			} // end of if (serv != null) else
-			break;
-		default:
-			writePacketToSocket(packet);
-			break;
+				break;
+			case CLOSE:
+				if (serv != null) {
+					serv.stop();
+				} else {
+					log.fine("Attempt to stop non-existen service for packet: " +
+									packet.getStringData() + ", Service already stopped?");
+				} // end of if (serv != null) else
+				break;
+			case CHECK_USER_CONNECTION:
+				if (serv != null) {
+					// It's ok, the session has been found, respond with OK.
+					addOutPacket(packet.okResult((String) null, 0));
+				} else {
+					// Session is no longer active, respond with an error.
+					try {
+						addOutPacket(Authorization.ITEM_NOT_FOUND.getResponseMessage(packet,
+										"Connection gone.", false));
+					} catch (PacketErrorTypeException e) {
+						// Hm, error already, ignoring...
+						log.info("Error packet is not really expected here: " +
+										packet.toString());
+					}
+				}
+				break;
+
+			default:
+				writePacketToSocket(packet);
+				break;
 		} // end of switch (pc.getCommand())
 	}
 
