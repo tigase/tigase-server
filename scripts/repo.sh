@@ -25,8 +25,7 @@ CP="jars/tigase-server.jar:libs/jdbc-mysql.jar:libs/jdbc-postgresql.jar:libs/tig
 
 D="-server -Xms100M -Xmx1500M -Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8 -Djdbc.drivers=com.mysql.jdbc.Driver:org.postgresql.Driver"
 
-XML_REP="-sc tigase.db.xml.XMLRepository -su ../testsuite/user-repository.xml_200k_backup"
-MYSQL_REP="-sc tigase.db.jdbc.JDBCRepository -su jdbc:mysql://localhost/tigase?user=root&password=mypass"
+MYSQL_REP="-sc tigase.db.jdbc.JDBCRepository -su jdbc:mysql://localhost/nk_200k?user=root&password=mypass"
 PGSQL_REP="-sc tigase.db.jdbc.JDBCRepository -su jdbc:postgresql://localhost/tigase?user=tigase"
 
 java $D -cp $CP tigase.util.RepositoryUtils $MYSQL_REP $*
