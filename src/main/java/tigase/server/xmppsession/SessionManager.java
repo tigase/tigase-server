@@ -547,6 +547,15 @@ public class SessionManager extends AbstractMessageReceiver
 		log.finer(pc.getCommand().toString() + " command from: " + pc.getFrom());
 		//Element command = pc.getElement();
 		XMPPResourceConnection connection =	connectionsByFrom.get(pc.getFrom());
+		try {
+			log.finer("Command rejected non-admin detected: " +
+							(connection != null ? (connection.isAuthorized() + ": " +
+							connection.getUserId())
+							: "null"));
+		} catch (Exception e) {
+			log.info("Problem sending FORBIDDEN error: " + e +
+							", packet: " + pc.toString());
+		}
 		switch (pc.getCommand()) {
 		case STREAM_OPENED:
 			// It might be existing opened stream after TLS/SASL authorization
@@ -771,6 +780,10 @@ public class SessionManager extends AbstractMessageReceiver
 					}
 					if (!admin) {
 						try {
+							log.finer("Command rejected non-admin detected: " +
+											(connection != null ? (connection.isAuthorized() + ": " +
+											connection.getUserId())
+											: "null"));
 							addOutPacket(Authorization.FORBIDDEN.getResponseMessage(pc,
 											"Only Administrator can call the command.", true));
 						} catch (Exception e) {
@@ -1284,8 +1297,9 @@ public class SessionManager extends AbstractMessageReceiver
 
 		@Override
 		public void run() {
-			XMPPResourceConnection conn = connectionsByFrom.remove(connId);
+			XMPPResourceConnection conn = connectionsByFrom.get(connId);
 			if (conn != null && !conn.isAuthorized()) {
+				connectionsByFrom.remove(connId);
 				++authTimeouts;
 				log.info("Authentication timeout expired, closing connection: " + connId);
 				fastAddOutPacket(Command.CLOSE.getPacket(getComponentId(),
@@ -1299,12 +1313,16 @@ public class SessionManager extends AbstractMessageReceiver
 
 		@Override
 		public void timeOutExpired(Packet packet) {
+			log.finer("Connection checker timeout expired, closing connection: " + 
+							packet.getTo());
 			closeConnection(packet.getTo(), false);
 		}
 
 		@Override
 		public void responseReceived(Packet packet, Packet response) {
 			if (response.getType() == StanzaType.error) {
+				log.finer("Connection checker error received, closing connection: " +
+							packet.getTo());
 				// The connection is not longer active, closing the user session here.
 				closeConnection(packet.getTo(), false);
 			}
