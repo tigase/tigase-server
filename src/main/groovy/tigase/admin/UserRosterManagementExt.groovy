@@ -147,6 +147,17 @@ if (rosterAction == UPDATE_EXT || rosterAction == REMOVE_EXT) {
 		rosterItemGroups, subscr)
 }
 
+if (!remove_item) {
+	Element pres = new Element("presence", 
+		(String[])["from", "to", "type"], (String[])[rosterOwnerJid, rosterItemJid,
+      "probe"])
+  results.offer(new Packet(pres))
+	pres = new Element("presence", 
+		(String[])["from", "to", "type"], (String[])[rosterItemJid, rosterOwnerJid, 
+			"probe"])
+  results.offer(new Packet(pres))
+}
+
 Packet result = p.commandResult(Command.DataType.result)
 Command.addTextField(result, "Note", "Operation successful");
 results.add(result)
