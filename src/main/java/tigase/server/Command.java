@@ -380,8 +380,10 @@ public enum Command {
 				new String[] {"var", "type"},
 				new String[] {XMLUtils.escape(f_name), "text-multi"});
 			for (String val: f_value) {
-				Element value = new Element("value", XMLUtils.escape(val));
-				field.addChild(value);
+				if (val != null) {
+					Element value = new Element("value", XMLUtils.escape(val));
+					field.addChild(value);
+				}
 			}
 			x.addChild(field);
 		}
