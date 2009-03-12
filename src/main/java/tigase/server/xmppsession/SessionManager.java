@@ -23,6 +23,9 @@
 package tigase.server.xmppsession;
 
 //import tigase.auth.TigaseConfiguration;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.security.Security;
 import java.util.Arrays;
 import java.util.Collection;
@@ -547,15 +550,6 @@ public class SessionManager extends AbstractMessageReceiver
 		log.finer(pc.getCommand().toString() + " command from: " + pc.getFrom());
 		//Element command = pc.getElement();
 		XMPPResourceConnection connection =	connectionsByFrom.get(pc.getFrom());
-		try {
-			log.finer("Command rejected non-admin detected: " +
-							(connection != null ? (connection.isAuthorized() + ": " +
-							connection.getUserId())
-							: "null"));
-		} catch (Exception e) {
-			log.info("Problem sending FORBIDDEN error: " + e +
-							", packet: " + pc.toString());
-		}
 		switch (pc.getCommand()) {
 		case STREAM_OPENED:
 			// It might be existing opened stream after TLS/SASL authorization
@@ -754,7 +748,7 @@ public class SessionManager extends AbstractMessageReceiver
 						admin = connection != null && connection.isAuthorized() &&
 										isAdmin(connection.getUserId());
 						if (admin) {
-							log.info("Processing admin command: " + pc.toString());
+							log.finer("Processing admin command: " + pc.toString());
 							int hashIdx = strCommand.indexOf('#');
 							String scriptId = strCommand.substring(hashIdx + 1);
 							AdminCommandIfc com = adminCommands.get(scriptId);
@@ -1115,6 +1109,49 @@ public class SessionManager extends AbstractMessageReceiver
 		trusted = (String[])props.get(TRUSTED_PROP_KEY);
 		//anon_peers = (String[])props.get(ANONYMOUS_PEERS_PROP_KEY);
 		//Arrays.sort(anon_peers);
+		// Loading admin scripts....
+		String descrStr = "AS:Description: ";
+		String cmdIdStr = "AS:CommandId: ";
+		String scriptsPath = (String) props.get(ADMIN_SCRIPTS_PROP_KEY);
+		File file = null;
+		AddScriptCommand addCommand = new AddScriptCommand();
+		Bindings binds = scriptEngineManager.getBindings();
+		initBindings(binds);
+		try {
+			File adminDir = new File(scriptsPath);
+			for (File f : adminDir.listFiles()) {
+				String cmdId = null;
+				String cmdDescr = null;
+				file = f;
+				StringBuilder sb = new StringBuilder();
+				BufferedReader buffr = new BufferedReader(new FileReader(file));
+				String line = null;
+				while ((line = buffr.readLine()) != null) {
+					sb.append(line + "\n");
+					int idx = line.indexOf(descrStr);
+					if (idx >= 0) {
+						cmdDescr = line.substring(idx + descrStr.length());
+					}
+					idx = line.indexOf(cmdIdStr);
+					if (idx >= 0) {
+						cmdId = line.substring(idx + cmdIdStr.length());
+					}
+				}
+				buffr.close();
+				if (cmdId == null || cmdDescr == null) {
+					log.warning("Admin script found but it has no command ID or command description: " + file);
+					continue;
+				}
+				int idx = file.toString().lastIndexOf(".");
+				String ext = file.toString().substring(idx + 1);
+				addCommand.addAdminScript(cmdId, cmdDescr, sb.toString(), null,
+								ext, binds);
+				log.config("Loaded admin command from file: " + file +
+								", id: " + cmdId + ", ext: " + ext + ", descr: " + cmdDescr);
+			}
+		} catch (Exception e) {
+			log.log(Level.WARNING, "Can't load the admin script file: " + file, e);
+		}
 	}
 
 	@Override
