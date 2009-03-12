@@ -22,15 +22,17 @@
 
 package tigase.server.xmppsession;
 
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Queue;
 import java.util.logging.Logger;
 import javax.script.Bindings;
+import javax.script.Compilable;
+import javax.script.CompiledScript;
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 import tigase.server.Command;
 import tigase.server.Packet;
 
@@ -43,16 +45,34 @@ import tigase.server.Packet;
 public class AdminScript extends AbstractAdminCommand {
 
   private static final Logger log =
-    Logger.getLogger("tigase.server.xmppsession.AdminScript");
+    Logger.getLogger(AdminScript.class.getName());
 
+	private CompiledScript compiledScript = null;
+	private ScriptEngine scriptEngine = null;
 	private String script = null;
 	private String language = null;
+	private String ext = null;
 
-	public void init(String id, String description, String script, String lang) {
+	public void init(String id, String description, String script, String lang,
+					String ext, Bindings binds) throws ScriptException {
 		super.init(id, description);
 		this.script = script;
 		this.language = lang;
+		this.ext = ext;
+
+		ScriptEngineManager scriptEngineManager =
+						(ScriptEngineManager) binds.get(SCRI_MANA);
+		if (language != null) {
+			scriptEngine = scriptEngineManager.getEngineByName(language);
+		}
+		if (ext != null) {
+			scriptEngine = scriptEngineManager.getEngineByExtension(ext);
+		}
+		if (scriptEngine instanceof Compilable) {
+			compiledScript = ((Compilable)scriptEngine).compile(script);
+		}
 		log.info("Initialized script command, lang: " + this.language +
+						", ext: " + ext +
 						", script text: \n" + this.script);
 	}
 
@@ -62,9 +82,6 @@ public class AdminScript extends AbstractAdminCommand {
 		ScriptContext context = null;
 		StringWriter writer = null;
 		try {
-			ScriptEngineManager scriptEngineManager =
-							(ScriptEngineManager) binds.get(SCRI_MANA);
-			ScriptEngine scriptEngine = scriptEngineManager.getEngineByName(language);
 			Bindings localBinds = scriptEngine.createBindings();
 			localBinds.put(PACKET, packet);
 			// Workaround for Python which doesn't return values and can overwrite
@@ -75,8 +92,11 @@ public class AdminScript extends AbstractAdminCommand {
 			context.setBindings(localBinds, ScriptContext.ENGINE_SCOPE);
 			writer = new StringWriter();
 			context.setErrorWriter(writer);
-			StringReader sr = new StringReader(script);
-			res = scriptEngine.eval(sr, context);
+			if (compiledScript != null) {
+				res = compiledScript.eval(context);
+			} else {
+				res = scriptEngine.eval(script, context);
+			}
 			if (res == null) {
 				// Yes, Python doesn't return results normally
 				// (or I don't know how to do it)
@@ -121,7 +141,8 @@ public class AdminScript extends AbstractAdminCommand {
 					error[i + 2 + ste.length] = errorMsgs[i];
 				}
 			}
-			Command.addFieldMultiValue(result, SCRIPT_TEXT, Arrays.asList(error));
+			Command.addTextField(result, "Error message", e.getMessage());
+			Command.addFieldMultiValue(result, "Debug info", Arrays.asList(error));
 			results.offer(result);
 		}
 	}

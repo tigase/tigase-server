@@ -22,13 +22,17 @@
 
 package tigase.server.xmppsession;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.script.Bindings;
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
 import tigase.disco.XMPPService;
@@ -42,6 +46,9 @@ import tigase.server.Packet;
  * @version $Rev$
  */
 public class AddScriptCommand extends AbstractAdminCommand {
+
+  private static final Logger log =
+    Logger.getLogger(AddScriptCommand.class.getName());
 
 	@Override
 	@SuppressWarnings({"unchecked"})
@@ -60,24 +67,47 @@ public class AddScriptCommand extends AbstractAdminCommand {
 					sb.append(string + "\n");
 				}
 			}
-			AdminScript as = new AdminScript();
-			as.init(commandId, description, sb.toString(), language);
-			Map<String, AdminCommandIfc> adminCommands =
-							(Map<String, AdminCommandIfc>) binds.get(ADMN_CMDS);
-			adminCommands.put(as.getCommandId(), as);
-			ServiceEntity serviceEntity = (ServiceEntity) binds.get(ADMN_DISC);
-			ServiceEntity item = new ServiceEntity(as.getCommandId(),
-							"http://jabber.org/protocol/admin#" + as.getCommandId(),
-							description);
-			item.addIdentities(
-							new ServiceIdentity("component", "generic", description),
-							new ServiceIdentity("automation", "command-node", description));
-			item.addFeatures(XMPPService.CMD_FEATURES);
-			serviceEntity.addItems(item);
-			Packet result = packet.commandResult(Command.DataType.result);
-			Command.addTextField(result, "Note", "Script loaded successfuly.");
-			results.offer(result);
+			try {
+				addAdminScript(commandId, description, sb.toString(), language,
+								null, binds);
+				Packet result = packet.commandResult(Command.DataType.result);
+				Command.addTextField(result, "Note", "Script loaded successfuly.");
+				results.offer(result);
+			} catch (Exception e) {
+				log.log(Level.WARNING, "Can't initialize script: ", e);
+				Packet result = packet.commandResult(Command.DataType.result);
+				Command.addTextField(result, "Note", "Script initialization error.");
+				StackTraceElement[] ste = e.getStackTrace();
+				String[] error = new String[ste.length + 2];
+				error[0] = e.getMessage();
+				error[1] = e.toString();
+				for (int i = 0; i < ste.length; i++) {
+					error[i + 2] = ste[i].toString();
+				}
+				Command.addTextField(result, "Error message", e.getMessage());
+				Command.addFieldMultiValue(result, "Debug info", Arrays.asList(error));
+				results.offer(result);
+			}
 		}
+	}
+
+	public boolean addAdminScript(String cmdId, String cmdDescr, String script,
+					String lang, String ext, Bindings binds) throws ScriptException {
+		AdminScript as = new AdminScript();
+		as.init(cmdId, cmdDescr, script, lang, ext, binds);
+		Map<String, AdminCommandIfc> adminCommands =
+						(Map<String, AdminCommandIfc>) binds.get(ADMN_CMDS);
+		adminCommands.put(as.getCommandId(), as);
+		ServiceEntity serviceEntity = (ServiceEntity) binds.get(ADMN_DISC);
+		ServiceEntity item = new ServiceEntity(as.getCommandId(),
+						"http://jabber.org/protocol/admin#" + as.getCommandId(),
+						cmdDescr);
+		item.addIdentities(
+						new ServiceIdentity("component", "generic", cmdDescr),
+						new ServiceIdentity("automation", "command-node", cmdDescr));
+		item.addFeatures(XMPPService.CMD_FEATURES);
+		serviceEntity.addItems(item);
+		return true;
 	}
 
 	private Packet prepareScriptCommand(Packet packet, Bindings binds) {
