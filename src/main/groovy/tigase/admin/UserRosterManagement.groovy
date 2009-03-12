@@ -21,8 +21,8 @@
  */
 
 /*
-Description: Update user roster entry
-CommandId: user-roster-management
+AS:Description: Update user roster entry
+AS:CommandId: user-roster-management
 */
 
 package tigase.admin
