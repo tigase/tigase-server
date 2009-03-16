@@ -21,10 +21,7 @@
  */
 package tigase.server.bosh;
 
-import java.util.EnumMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 import java.util.TimerTask;
 import java.util.UUID;
@@ -92,11 +89,13 @@ public class BoshSession {
 	private long previous_received_rid = -1;
 
 	private boolean terminate = false;
-	private enum TimedTask { EMPTY_RESP, STOP };
-	private Map<TimerTask, TimedTask> task_enum =
-		new LinkedHashMap<TimerTask, TimedTask>();
-	private EnumMap<TimedTask, TimerTask> enum_task =
-		new EnumMap<TimedTask, TimerTask>(TimedTask.class);
+	//private enum TimedTask { EMPTY_RESP, STOP };
+	//private Map<TimerTask, TimedTask> task_enum =
+	//	new LinkedHashMap<TimerTask, TimedTask>();
+	//private EnumMap<TimedTask, TimerTask> enum_task =
+	//	new EnumMap<TimedTask, TimerTask>(TimedTask.class);
+	private TimerTask waitTimer = null;
+	private TimerTask inactivityTimer = null;
 
 	/**
 	 * Creates a new <code>BoshSession</code> instance.
@@ -417,12 +416,10 @@ public class BoshSession {
 		}
 		serv.setSid(null);
 		disconnected(serv);
-		TimerTask tt = enum_task.remove(TimedTask.EMPTY_RESP);
-		if (tt != null) {
-			task_enum.remove(tt);
-			handler.cancelTask(tt);
+		if (waitTimer != null) {
+			log.finest("Canceling waitTimer: " + getSid());
+			handler.cancelTask(waitTimer);
 		}
-
 	}
 
 	private void processAutomaticCache(Packet packet) {
@@ -501,12 +498,13 @@ public class BoshSession {
 		log.finest("[" + connections.size() +
 			"] Processing socket packet: " + packet.toString());
 
-		synchronized (task_enum) {
-			TimerTask tt = enum_task.remove(TimedTask.STOP);
-			if (tt != null) {
-				task_enum.remove(tt);
-				handler.cancelTask(tt);
-			}
+		if (waitTimer != null) {
+			log.finest("Canceling waitTimer: " + getSid());
+			handler.cancelTask(waitTimer);
+		}
+		if (inactivityTimer != null) {
+			log.finest("Canceling inactivityTimer: " + getSid());
+			handler.cancelTask(inactivityTimer);
 		}
 
 		if (packet.getElemName() == BODY_EL_NAME && packet.getXMLNS() == BOSH_XMLNS) {
@@ -614,70 +612,54 @@ public class BoshSession {
 			sendBody(serv, null);
 		}
 
-		synchronized (task_enum) {
-			TimerTask tt = enum_task.get(TimedTask.EMPTY_RESP);
-			// Checking (waiting_packets.size() == 0) is probably redundant here
-			if (connections.size() > 0 && waiting_packets.size() == 0 && tt == null) {
-				tt = handler.scheduleTask(this, max_wait*SECOND);
-				task_enum.put(tt, TimedTask.EMPTY_RESP);
-				enum_task.put(TimedTask.EMPTY_RESP, tt);
-			}
+		if (connections.size() > 0 && waiting_packets.size() == 0) {
+			log.finest("Setting waitTimer for " + max_wait + ": " + getSid());
+			waitTimer = handler.scheduleTask(this, max_wait * SECOND);
 		}
 	}
 
 	public void disconnected(BoshIOService bios) {
-		synchronized (task_enum) {
-			if (bios != null) {
-				connections.remove(bios);
-			}
-			TimerTask tt = enum_task.get(TimedTask.STOP);
-			if (connections.size() == 0 && tt == null) {
-				tt = handler.scheduleTask(this, max_inactivity*SECOND);
-				task_enum.put(tt, TimedTask.STOP);
-				enum_task.put(TimedTask.STOP, tt);
-			}
+		if (bios != null) {
+			connections.remove(bios);
+		}
+		if (inactivityTimer != null) {
+			log.finest("Canceling inactivityTimer: " + getSid());
+			handler.cancelTask(inactivityTimer);
+		}
+		if (connections.size() == 0) {
+			log.finest("Setting inactivityTimer for " + max_inactivity + ": " + getSid());
+			inactivityTimer = handler.scheduleTask(this, max_inactivity * SECOND);
 		}
 	}
 
 	public boolean task(Queue<Packet> out_results, TimerTask tt) {
-		synchronized (task_enum) {
-			TimedTask ttask = task_enum.remove(tt);
-			if (ttask != null) {
-				enum_task.remove(ttask);
-				switch (ttask) {
-				case STOP:
-					for (TimerTask ttemp: task_enum.keySet()) {
-						handler.cancelTask(ttemp);
-					}
-					for (Element packet: waiting_packets) {
-						try {
-							out_results.offer(
-								Authorization.RECIPIENT_UNAVAILABLE.getResponseMessage(
-									new Packet(packet),
+		if (tt == inactivityTimer) {
+			log.finest("inactivityTimer fired: " + getSid());
+			if (waitTimer != null) {
+				log.finest("Canceling waitTimer: " + getSid());
+				handler.cancelTask(waitTimer);
+			}
+			for (Element packet : waiting_packets) {
+				try {
+					out_results.offer(Authorization.RECIPIENT_UNAVAILABLE.
+									getResponseMessage(new Packet(packet),
 									"Bosh = disconnected", true));
-						} catch (PacketErrorTypeException e) {
-							log.info("Packet processing exception: " + e);
-						}
-					}
-					Packet command = Command.STREAM_CLOSED.getPacket(null, null,
-						StanzaType.set, UUID.randomUUID().toString());
-					handler.addOutStreamClosed(command, this);
-					//out_results.offer(command);
-					return true;
-				case EMPTY_RESP:
-					BoshIOService serv = connections.poll();
-					if (serv != null) {
-						sendBody(serv, null);
-					}
-					break;
-				default:
-					log.warning("[" + connections.size() +
-						"] Uknown TimedTask value: " + ttask.toString());
-					break;
+				} catch (PacketErrorTypeException e) {
+					log.info("Packet processing exception: " + e);
 				}
-			} else {
-				log.warning("[" + connections.size() +
-					"] TimedTask enum is null for scheduled task....");
+			}
+			log.finest("Closing session, inactivity timeout expired: " + getSid());
+			Packet command = Command.STREAM_CLOSED.getPacket(null, null,
+							StanzaType.set, UUID.randomUUID().toString());
+			handler.addOutStreamClosed(command, this);
+		//out_results.offer(command);
+			return true;
+		}
+		if (tt == waitTimer) {
+			log.finest("waitTimer fired: " + getSid());
+			BoshIOService serv = connections.poll();
+			if (serv != null) {
+				sendBody(serv, null);
 			}
 		}
 		return false;

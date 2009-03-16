@@ -196,7 +196,7 @@ public class ConnectionOpenThread implements Runnable {
 							al.accept(sc);
 						} catch (java.net.SocketException e) {
 							log.log(Level.INFO,
-								"Soket closed instantly after it had been opened?", e);
+								"Socket closed instantly after it had been opened?", e);
 						}
 					} else {
 						log.warning("Can't obtain socket channel from selection key.");

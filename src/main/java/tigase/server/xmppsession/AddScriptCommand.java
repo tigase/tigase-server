@@ -91,6 +91,7 @@ public class AddScriptCommand extends AbstractAdminCommand {
 		}
 	}
 
+	@SuppressWarnings({"unchecked"})
 	public boolean addAdminScript(String cmdId, String cmdDescr, String script,
 					String lang, String ext, Bindings binds) throws ScriptException {
 		AdminScript as = new AdminScript();

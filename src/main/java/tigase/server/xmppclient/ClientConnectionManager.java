@@ -248,9 +248,9 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 
 		Packet p = null;
 		while ((p = serv.getReceivedPackets().poll()) != null) {
-			log.finer("Processing packet: " + p.getElemName()
+			log.finer(id + ": Processing packet: " + p.getElemName()
 				+ ", type: " + p.getType());
-			log.finest("Processing socket data: " + p.getStringData());
+			log.finest(id + ": Processing socket data: " + p.getStringData());
 			p.setFrom(getFromAddress(id));
 			p.setTo(serv.getDataReceiver());
 // 			p.setTo(serv.getDataReceiver() != null ? serv.getDataReceiver()
@@ -402,7 +402,8 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 			serv.setDataReceiver(routings.computeRouting(hostname));
 			Packet streamOpen = Command.STREAM_OPENED.getPacket(
 				getFromAddress(getUniqueId(serv)),
-				serv.getDataReceiver(), StanzaType.set, "sess1", Command.DataType.submit);
+				serv.getDataReceiver(), StanzaType.set, UUID.randomUUID().toString(),
+				Command.DataType.submit);
 			Command.addFieldValue(streamOpen, "session-id", id);
 			Command.addFieldValue(streamOpen, "hostname", hostname);
 			Command.addFieldValue(streamOpen, "xml:lang", lang);
@@ -422,6 +423,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 	@Override
 	public void serviceStopped(XMPPIOService service) {
 		super.serviceStopped(service);
+		// It might be a Bosh service in which case it is ignored here.
 		if (service.getXMLNS() == XMLNS) {
 			//		XMPPIOService serv = (XMPPIOService)service;
 			if (service.getDataReceiver() != null) {
@@ -439,7 +441,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 
 	@Override
 	public void xmppStreamClosed(XMPPIOService serv) {
-		log.finer("Stream closed.");
+		log.finer("Stream closed: " + serv.getUniqueId());
 	}
 
 	/**

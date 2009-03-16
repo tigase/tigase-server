@@ -57,7 +57,7 @@ public class SocketReadThread implements Runnable {
 	private static SocketReadThread socketReadThread = null;
 
   private boolean stopping = false;
-	private boolean wakeup_called = false;
+	private boolean selecting = false;
 	private int empty_selections = 0;
 
   private final ConcurrentLinkedQueue<IOService> waiting =
@@ -114,8 +114,10 @@ public class SocketReadThread implements Runnable {
 
 	public synchronized void addSocketService(IOService s) {
     waiting.offer(s);
-		wakeup_called = true;
-    clientsSel.wakeup();
+		// Calling lazy wakeup to avoid multiple wakeup calls
+		// when lots of new services are added....
+		clientsSel.wakeup();
+		//wakeupHelper.wakeup();
 	}
 
 	public void removeSocketService(IOService s) {
@@ -135,17 +137,25 @@ public class SocketReadThread implements Runnable {
     while ((s = waiting.poll()) != null) {
       final SocketChannel sc = s.getSocketChannel();
       try {
-				int sel_key = READ_ONLY;
-				log.finest("ADDED OP_READ: " + s.getUniqueId());
-				if (s.waitingToSend()) {
-					sel_key = READ_WRITE;
-					log.finest("ADDED OP_WRITE: " + s.getUniqueId());
+				if (sc.isConnected()) {
+					int sel_key = READ_ONLY;
+					log.finest("ADDED OP_READ: " + s.getUniqueId());
+					if (s.waitingToSend()) {
+						sel_key = READ_WRITE;
+						log.finest("ADDED OP_WRITE: " + s.getUniqueId());
+					}
+					sc.register(clientsSel, sel_key, s);
+				} else {
+					log.finest("Socket not connected: " + s.getUniqueId());
+					try {
+						log.finer("Forcing stopping the service: " + s.getUniqueId());
+						s.forceStop();
+					} catch (Exception e) {	}
 				}
-        sc.register(clientsSel, sel_key, s);
 			} catch (Exception e) {
         // Ignore such channel
-				log.finest("ERROR adding channel for: " + s.getUniqueId()
-					+ ", exception: " + e);
+				log.log(Level.FINEST, "ERROR adding channel for: " + s.getUniqueId()
+					+ ", exception: " + e, e);
       } // end of try-catch
     } // end of for ()
 
@@ -163,33 +173,36 @@ public class SocketReadThread implements Runnable {
 		// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6403933
 		// Recreating the selector and registering all channles with
 		// the new selector
-		synchronized (this) {
+			//Selector tempSel = clientsSel;
+			//clientsSel = Selector.open();
+		boolean cancelled = false;
+		// Sometimes this is just a broken connection which causes
+		// selector spin... this is the cheaper solution....
+		for (SelectionKey sk: clientsSel.keys()) {
+			IOService serv = (IOService) sk.attachment();
+			SocketChannel sc = serv.getSocketChannel();
+			if (sc == null || !sc.isConnected()) {
+				cancelled = false;
+				sk.cancel();
+				try {
+					log.info("Forcing stopping the service: " + serv.getUniqueId());
+					serv.forceStop();
+				} catch (Exception e) {
+				}
+			}
+		  //waiting.offer(serv);
+		}
+		if (cancelled) {
+			clientsSel.selectNow();
+		} else {
+			// Unfortunately must be something wrong with the selector
+			// itself, now more expensive calculations...
 			Selector tempSel = clientsSel;
 			clientsSel = Selector.open();
 			for (SelectionKey sk: tempSel.keys()) {
 				IOService serv = (IOService)sk.attachment();
 				sk.cancel();
-				if (serv.isConnected()) {
-					SocketChannel sc = serv.getSocketChannel();
-					try {
-						int sel_key = READ_ONLY;
-						log.finest("ADDED OP_READ: " + serv.getUniqueId());
-						if (serv.waitingToSend()) {
-							sel_key = READ_WRITE;
-							log.finest("ADDED OP_WRITE: " + serv.getUniqueId());
-						}
-						sc.register(clientsSel, sel_key, serv);
-					} catch (Exception e) {
-						// Ignore such channel
-						log.finest("ERROR re-adding channel for: " + serv.getUniqueId()
-							+ ", exception: " + e);
-					} // end of try-catch
-				} else {
-					try {
-						log.info("Forcing stopping the service: " + serv.getUniqueId());
-						serv.forceStop();
-					} catch (Exception e) {	}
-				}
+				waiting.offer(serv);
 			}
 			tempSel.close();
 		}
@@ -203,9 +216,8 @@ public class SocketReadThread implements Runnable {
 	public void run() {
     while (!stopping) {
       try {
-				wakeup_called = false;
 				int selectedKeys = clientsSel.select();
-				if((selectedKeys == 0) && !wakeup_called) {
+				if(selectedKeys == 0 && waiting.size() == 0) {
 					log.finest("Selected keys = 0!!! a bug again?");
 					if ((++empty_selections) > MAX_EMPTY_SELECTIONS) {
 						recreateSelector();
@@ -255,6 +267,7 @@ public class SocketReadThread implements Runnable {
 					clientsSel.selectNow();
 				}
 				addAllWaiting();
+				//clientsSel.selectNow();
 			} catch (CancelledKeyException brokene) {
 				// According to Java API that should not happen.
 				// I think it happens only on the broken Java implementation
@@ -268,8 +281,8 @@ public class SocketReadThread implements Runnable {
 				}
 			} catch (IOException ioe) {
 				// According to Java API that should not happen.
-				// I think it happens only on the broken Java implementation
-				// from Apple.
+				// I think it happens only on the broken Java implementation from Apple
+				// and due to a bug: http://bugs.sun.com/view_bug.do?bug_id=6693490
 				log.log(Level.WARNING, "Problem with the network connection: ", ioe);
 				try {
 					recreateSelector();

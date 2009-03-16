@@ -1182,7 +1182,8 @@ public class SessionManager extends AbstractMessageReceiver
 
 	@Override
 	public void handleLogin(String userName, XMPPResourceConnection conn) {
-		log.finest("handleLogin called for: " + userName);
+		log.finest("handleLogin called for: " + userName + ", conn_id: " +
+						conn.getConnectionId());
 		String userId = JIDUtils.getNodeID(userName, conn.getDomain());
 		registerNewSession(userId, conn);
 	}

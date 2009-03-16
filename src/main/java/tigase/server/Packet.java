@@ -416,7 +416,9 @@ public class Packet {
 		if (includeXML != null) {
 			new_child.setCData(includeXML);
 		} // end of if (includeOriginalXML)
-		return swapFromTo(reply);
+		Packet result = swapFromTo(reply);
+		result.setPriority(priority);
+		return result;
 	}
 
 	public Packet okResult(final Element includeXML, final int originalXML) {
@@ -446,14 +448,18 @@ public class Packet {
 		if (includeXML != null) {
 			new_child.addChild(includeXML);
 		} // end of if (includeOriginalXML)
-		return swapFromTo(reply);
+		Packet result = swapFromTo(reply);
+		result.setPriority(priority);
+		return result;
 	}
 
 	public Packet swapElemFromTo() {
 		Element copy = elem.clone();
 		copy.setAttribute("to", getElemFrom());
 		copy.setAttribute("from", getElemTo());
-		return new Packet(copy);
+		Packet result = new Packet(copy);
+		result.setPriority(priority);
+		return result;
 	}
 
 	public Packet swapElemFromTo(final StanzaType type) {
@@ -461,7 +467,9 @@ public class Packet {
 		copy.setAttribute("to", getElemFrom());
 		copy.setAttribute("from", getElemTo());
 		copy.setAttribute("type", type.toString());
-		return new Packet(copy);
+		Packet result = new Packet(copy);
+		result.setPriority(priority);
+		return result;
 	}
 
 	public static Packet getMessage(String to, String from, StanzaType type,

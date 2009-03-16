@@ -122,7 +122,7 @@ public class BoshConnectionManager extends ClientConnectionManager
 		switch (packet.getCommand()) {
 			case CLOSE:
 				if (session != null) {
-					log.fine("Closing session: " + session.getSid());
+					log.fine("Closing session for command CLOSE: " + session.getSid());
 					session.close();
 					sessions.remove(session.getSid());
 				} else {
@@ -348,6 +348,7 @@ public class BoshConnectionManager extends ClientConnectionManager
 		public void run() {
 			Queue<Packet> out_results = new LinkedList<Packet>();
 			if (bs.task(out_results, this)) {
+				log.fine("Closing session for BS task: " + bs.getSid());
 				sessions.remove(bs.getSid());
 			}
 			addOutPackets(out_results, bs);
@@ -390,7 +391,7 @@ public class BoshConnectionManager extends ClientConnectionManager
 							packet.toString());
 			BoshSession session = getBoshSession(packet.getFrom());
 			if (session != null) {
-				log.fine("Closing session: " + session.getSid());
+				log.fine("Closing session for timeout: " + session.getSid());
 				session.close();
 				sessions.remove(session.getSid());
 			} else {

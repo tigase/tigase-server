@@ -141,7 +141,9 @@ public class AdminScript extends AbstractAdminCommand {
 					error[i + 2 + ste.length] = errorMsgs[i];
 				}
 			}
-			Command.addTextField(result, "Error message", e.getMessage());
+			if (e.getMessage() != null) {
+				Command.addTextField(result, "Error message", e.getMessage());
+			}
 			Command.addFieldMultiValue(result, "Debug info", Arrays.asList(error));
 			results.offer(result);
 		}

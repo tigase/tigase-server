@@ -195,6 +195,7 @@ public class MessageRouter extends AbstractMessageReceiver {
 //		return localAddresses.contains(domain);
 //	}
 
+	@Override
 	public void processPacket(Packet packet) {
 
 		if (packet.getTo() == null) {
