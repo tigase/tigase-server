@@ -21,7 +21,6 @@
  */
 package tigase.xmpp.impl;
 
-import java.util.List;
 import java.util.Queue;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -30,7 +29,6 @@ import tigase.server.Packet;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.XMPPImplIfc;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
@@ -75,6 +73,7 @@ public abstract class SimpleForwarder
 	 * @param repo a <code>NonAuthUserRepository</code> value
 	 * @param results a <code>Queue</code> value
 	 */
+	@Override
 	public void process(final Packet packet, final XMPPResourceConnection session,
 		final NonAuthUserRepository repo, final Queue<Packet> results,
 		final Map<String, Object> settings)
