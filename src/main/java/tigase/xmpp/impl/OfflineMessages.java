@@ -130,9 +130,18 @@ public class OfflineMessages extends XMPPProcessor
 		final NonAuthUserRepository repo, final Queue<Packet> results,
 		final Map<String, Object> settings) {
 
-		if (conn == null) {
+		// If the user session is null or the user is anonymous just
+		// ignore it.
+		if (conn == null || conn.isAnonymous()) {
 			return;
 		} // end of if (session == null)
+
+		// Try to restore the offline messages only if this is the first
+		// initial presence
+		if (conn.getSessionData(ID) != null) {
+			return;
+		}
+
 
 		StanzaType type = packet.getType();
 		if (type == null || type == StanzaType.available) {
@@ -148,6 +157,7 @@ public class OfflineMessages extends XMPPProcessor
 				} // end of try-catch
 			} // end of if (priority != null)
 			if (priority >= 0) {
+				conn.putSessionData(ID, ID);
 				try {
 					Queue<Packet> packets =	restorePacketForOffLineUser(conn);
 					if (packets != null) {
