@@ -282,7 +282,7 @@ public abstract class JabberIqRoster {
 				}
 			}
 		}
-    String[] buddies = roster_util.getBuddies(session);
+    String[] buddies = roster_util.getBuddies(session, false);
     if (buddies != null) {
 			Element query = new Element("query");
 			query.setXMLNS(XMLNS);

@@ -88,6 +88,7 @@ public class Message extends XMPPProcessor implements XMPPProcessorIfc {
 
 		try {
 
+			// Remember to cut the resource part off before comparing JIDs
 			String id = JIDUtils.getNodeID(packet.getElemTo());
 			// Checking if this is a packet TO the owner of the session
 			if (session.getUserId().equals(id)) {

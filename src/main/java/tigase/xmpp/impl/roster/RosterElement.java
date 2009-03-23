@@ -53,6 +53,24 @@ public class RosterElement {
 	private String[] groups = null;
 	private String name = null;
 	private String jid = null;
+	private boolean online = false;
+
+	public boolean isOnline() {
+		return online;
+	}
+
+	public void setOnline(boolean online) {
+		this.online = online;
+	}
+
+	public boolean isPresence_sent() {
+		return presence_sent;
+	}
+
+	public void setPresence_sent(boolean presence_sent) {
+		this.presence_sent = presence_sent;
+	}
+	private boolean presence_sent = false;
 
 	public RosterElement(String jid, String name, String[] groups) {
 		this.jid = jid.toLowerCase();

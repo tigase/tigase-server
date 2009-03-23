@@ -157,7 +157,7 @@ public abstract class Presence {
 		final Queue<Packet> results, final Element pres,
 		final Map<String, Object> settings)
 		throws NotAuthorizedException, TigaseDBException {
-    String[] buddies = roster_util.getBuddies(session, subscrs);
+    String[] buddies = roster_util.getBuddies(session, subscrs, true);
 		buddies = DynamicRoster.addBuddies(session, settings, buddies);
     if (buddies != null) {
 			for (String buddy: buddies) {
@@ -184,7 +184,8 @@ public abstract class Presence {
 	protected static void resendPendingInRequests(final XMPPResourceConnection session,
     final Queue<Packet> results)
     throws NotAuthorizedException, TigaseDBException {
-		String[] buddies = roster_util.getBuddies(session, RosterAbstract.PENDING_IN);
+		String[] buddies = roster_util.getBuddies(session, RosterAbstract.PENDING_IN,
+						false);
 		if (buddies != null) {
 			for (String buddy: buddies) {
 				Element presence = new Element(PRESENCE_ELEMENT_NAME);
@@ -675,8 +676,11 @@ public abstract class Presence {
 					if (roster_util.isSubscribedFrom(buddy_subscr)) {
 						for (XMPPResourceConnection conn: session.getActiveSessions()) {
 							Element pres = (Element)conn.getSessionData(PRESENCE_KEY);
-							sendPresence(null, packet.getElemFrom(), conn.getJID(),
-								results, pres);
+							if (pres != null) {
+								sendPresence(null, packet.getElemFrom(), conn.getJID(),
+												results, pres);
+							}
+							roster_util.setBuddyOnline(session, packet.getElemFrom(), true);
 						}
 					} // end of if (roster_util.isSubscribedFrom(session, packet.getElemFrom()))
 					break;

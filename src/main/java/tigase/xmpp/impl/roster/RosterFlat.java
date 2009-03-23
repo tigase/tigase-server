@@ -21,6 +21,7 @@
  */
 package tigase.xmpp.impl.roster;
 
+import java.util.ArrayList;
 import java.util.Queue;
 import java.util.Map;
 import java.util.LinkedHashMap;
@@ -140,10 +141,21 @@ public class RosterFlat extends RosterAbstract {
 	}
 
 	@Override
-	public String[] getBuddies(final XMPPResourceConnection session)
+	public String[] getBuddies(final XMPPResourceConnection session,
+					boolean onlineOnly)
     throws NotAuthorizedException, TigaseDBException {
 		Map<String, RosterElement> roster = getUserRoster(session);
-    return roster.keySet().toArray(new String[0]);
+		if (onlineOnly) {
+			ArrayList<String> online = new ArrayList<String>();
+			for (Map.Entry<String, RosterElement> rosterEl : roster.entrySet()) {
+				if (rosterEl.getValue().isOnline()) {
+					online.add(rosterEl.getKey());
+				}
+			}
+			return online.toArray(new String[online.size()]);
+		} else {
+			return roster.keySet().toArray(new String[0]);
+		}
   }
 
 	@Override
@@ -263,6 +275,26 @@ public class RosterFlat extends RosterAbstract {
 		} else {
 			return false;
 		}
+	}
+
+	@Override
+	public void setBuddyOnline(XMPPResourceConnection session, String buddy,
+					boolean online)
+					throws NotAuthorizedException, TigaseDBException {
+		RosterElement relem = getRosterElement(session, buddy);
+		if (relem != null) {
+			relem.setOnline(online);
+		}
+	}
+
+	@Override
+	public boolean isBuddyOnline(XMPPResourceConnection session, String buddy)
+					throws NotAuthorizedException, TigaseDBException {
+		RosterElement relem = getRosterElement(session, buddy);
+		if (relem != null) {
+			return relem.isOnline();
+		}
+		return false;
 	}
 
 } // RosterFlat

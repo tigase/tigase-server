@@ -502,9 +502,9 @@ public abstract class RosterAbstract {
   }
 
   public String[] getBuddies(final XMPPResourceConnection session,
-		final EnumSet<SubscriptionType> subscrs)
+		final EnumSet<SubscriptionType> subscrs, boolean onlineOnly)
     throws NotAuthorizedException, TigaseDBException {
-    final String[] allBuddies = getBuddies(session);
+    final String[] allBuddies = getBuddies(session, onlineOnly);
     if (allBuddies == null) {
       return null;
     } // end of if (allBuddies == null)
@@ -604,8 +604,9 @@ public abstract class RosterAbstract {
 		} // end of for (XMPPResourceConnection conn: sessions)
 	}
 
-  public abstract String[] getBuddies(final XMPPResourceConnection session)
-    throws NotAuthorizedException, TigaseDBException;
+  public abstract String[] getBuddies(final XMPPResourceConnection session,
+					boolean onlineOnly)
+					throws NotAuthorizedException, TigaseDBException;
 
   public abstract String getBuddyName(final XMPPResourceConnection session,
 		final String buddy)
@@ -641,6 +642,14 @@ public abstract class RosterAbstract {
 	public abstract boolean addBuddyGroup(final XMPPResourceConnection session,
 		final String buddy, final String[] groups)
 		throws NotAuthorizedException, TigaseDBException;
+
+	public abstract void setBuddyOnline(final XMPPResourceConnection session,
+					final String buddy, final boolean online)
+					throws NotAuthorizedException, TigaseDBException;
+
+	public abstract boolean isBuddyOnline(final XMPPResourceConnection session,
+					final String buddy)
+					throws NotAuthorizedException, TigaseDBException;
 
 //   public abstract void setBuddyGroups(XMPPResourceConnection session,
 // 		String buddy, String[] groups)
