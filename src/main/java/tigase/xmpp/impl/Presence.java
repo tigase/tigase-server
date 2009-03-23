@@ -157,11 +157,14 @@ public abstract class Presence {
 		final Queue<Packet> results, final Element pres,
 		final Map<String, Object> settings)
 		throws NotAuthorizedException, TigaseDBException {
-    String[] buddies = roster_util.getBuddies(session, subscrs, true);
+		boolean onlineOnly = (t != StanzaType.probe);
+		String from = (t == StanzaType.probe) ? session.getUserId()
+						: session.getJID();
+    String[] buddies = roster_util.getBuddies(session, subscrs, onlineOnly);
 		buddies = DynamicRoster.addBuddies(session, settings, buddies);
     if (buddies != null) {
 			for (String buddy: buddies) {
-				sendPresence(t, buddy, session.getJID(), results, pres);
+				sendPresence(t, buddy, from, results, pres);
 			} // end of for (String buddy: buddies)
     } // end of if (buddies == null)
 		broadcastDirectPresences(t, session, results, pres);
@@ -569,6 +572,22 @@ public abstract class Presence {
 					if (roster_util.isSubscribedTo(session, packet.getElemFrom())
 						|| (DynamicRoster.getBuddyItem(session, settings,
 								packet.getElemFrom()) != null)) {
+						boolean online = StanzaType.unavailable != packet.getType();
+						log.finest("Received initial presence, setting buddy: " +
+										packet.getElemFrom() + " online status to: " + online);
+						if (!roster_util.isBuddyOnline(session, packet.getElemFrom())) {
+							// The buddy wasn't online before so it needs our presence too
+							for (XMPPResourceConnection conn : session.getActiveSessions()) {
+								Element pres = (Element) conn.getSessionData(PRESENCE_KEY);
+								if (pres != null) {
+									sendPresence(null, packet.getElemFrom(), conn.getJID(),
+													results, pres);
+									log.finest("Received presence from a new buddy, sending presence to: " +
+													packet.getElemFrom());
+								}
+							}
+						}
+						roster_util.setBuddyOnline(session, packet.getElemFrom(), online);
 						updatePresenceChange(packet.getElement(), session, results);
 					} else {
 						// The code below looks like a bug to me.
@@ -674,13 +693,17 @@ public abstract class Presence {
 						break;
 					} // end of switch (buddy_subscr)
 					if (roster_util.isSubscribedFrom(buddy_subscr)) {
+						log.finest("Received probe, setting buddy: " +
+										packet.getElemFrom() + " as online.");
+						roster_util.setBuddyOnline(session, packet.getElemFrom(), true);
 						for (XMPPResourceConnection conn: session.getActiveSessions()) {
 							Element pres = (Element)conn.getSessionData(PRESENCE_KEY);
 							if (pres != null) {
 								sendPresence(null, packet.getElemFrom(), conn.getJID(),
 												results, pres);
+								log.finest("Received probe, sending presence response to: " +
+												packet.getElemFrom());
 							}
-							roster_util.setBuddyOnline(session, packet.getElemFrom(), true);
 						}
 					} // end of if (roster_util.isSubscribedFrom(session, packet.getElemFrom()))
 					break;
