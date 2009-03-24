@@ -469,6 +469,11 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 		return new StartedHandler();
 	}
 
+	@Override
+	protected Integer getMaxQueueSize(int def) {
+		return def * 10;
+	}
+
 	private class StoppedHandler implements ReceiverEventHandler {
 
 		@Override
