@@ -99,9 +99,11 @@ public class PriorityQueue<E> {
 		LinkedBlockingQueue<E> q = qs[priority];
 		if (blocking) {
 			q.put(element);
-			//log.finest("[" + owner + "] " + priority + " B element added: " + element.toString());
+//			log.finest("[" + owner + "] " + priority + " B element added: " + element.toString());
+			//log.finest("" + priority + " B element added: " + element.toString());
 		} else {
 			result = q.offer(element);
+			//log.finest("" + priority + " B element added: " + element.toString());
 //			log.finest("[" + owner + "] " + priority + " NB element added: " +
 //							element.toString() + ", result: " + result +
 //							", lowestNonEmpty: " + lowestNonEmpty + ", size: " + q.size());

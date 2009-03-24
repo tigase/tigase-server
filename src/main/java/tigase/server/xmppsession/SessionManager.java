@@ -38,7 +38,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -61,10 +60,12 @@ import tigase.server.AbstractMessageReceiver;
 import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.server.Permissions;
+import tigase.server.Priority;
 import tigase.server.ReceiverEventHandler;
 import tigase.server.XMPPServer;
 import tigase.stats.StatRecord;
 import tigase.util.JIDUtils;
+import tigase.util.PriorityQueue;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.NotAuthorizedException;
@@ -498,8 +499,11 @@ public class SessionManager extends AbstractMessageReceiver
 				if (proc_t.addItem(packet, connection)) {
 					packet.processedBy(proc_t.processor.id());
 				} else {
-					log.warning("Can not add packet: " + packet.toString()
-						+ " to processor: " + proc_t.getName() + " internal queue");
+					if (log.isLoggable(Level.FINE)) {
+						log.fine("Can not add packet: " + packet.toString() +
+										" to processor: " + proc_t.getName() +
+										" internal queue full.");
+					}
 				}
 			} // end of if (proc.isSupporting(elem.getName(), elem.getXMLNS()))
 		} // end of for ()
@@ -1263,11 +1267,19 @@ public class SessionManager extends AbstractMessageReceiver
 						authTimeouts, Level.FINEST));
 		for (Map.Entry<String, ProcessorThread> procent : processors.entrySet()) {
 			ProcessorThread proc = procent.getValue();
-			stats.add(new StatRecord(getName(), "Processor: " + procent.getKey(),
-							"String", "Queue: " + proc.in_queue.size() +
-							", AvTime: " + proc.cntAverageTime +
-							", Runs: " + proc.cntRuns,
-							Level.FINEST));
+			if (proc.getName().equals("roster-presence")) {
+				stats.add(new StatRecord(getName(), "Processor: " + procent.getKey(),
+								"String", "Queue: " + proc.in_queue.size() +
+								", AvTime: " + proc.cntAverageTime +
+								", Runs: " + proc.cntRuns,
+								Level.INFO));
+			} else {
+				stats.add(new StatRecord(getName(), "Processor: " + procent.getKey(),
+								"String", "Queue: " + proc.in_queue.size() +
+								", AvTime: " + proc.cntAverageTime +
+								", Runs: " + proc.cntRuns,
+								Level.FINEST));
+			}
 		}
 		return stats;
 	}
@@ -1282,12 +1294,16 @@ public class SessionManager extends AbstractMessageReceiver
 		private boolean stopped = false;
 		private XMPPProcessorIfc processor = null;
 		private LinkedList<Packet> local_results = new LinkedList<Packet>();
-		private LinkedBlockingQueue<QueueItem> in_queue =
-			new LinkedBlockingQueue<QueueItem>(maxQueueSize/maxPluginsNo);
+		private PriorityQueue<QueueItem> in_queue =
+						new PriorityQueue<QueueItem>(Priority.values().length,
+						maxQueueSize/maxPluginsNo);
+//		private LinkedBlockingQueue<QueueItem> in_queue =
+//			new LinkedBlockingQueue<QueueItem>(maxQueueSize/maxPluginsNo);
 		private long cntRuns = 0;
 		private long cntAverageTime = 0;
 
 		public ProcessorThread(XMPPProcessorIfc processor) {
+			super();
 			this.processor = processor;
 		}
 
@@ -1295,7 +1311,7 @@ public class SessionManager extends AbstractMessageReceiver
 			QueueItem item = new QueueItem();
 			item.packet = packet;
 			item.conn = conn;
-			return in_queue.offer(item);
+			return in_queue.offer(item, packet.getPriority().ordinal());
 		}
 
 		@Override

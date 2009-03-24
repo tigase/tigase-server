@@ -34,6 +34,7 @@ public enum Priority {
 	CLUSTER,
 	HIGH,
 	NORMAL,
-	LOW;
+	LOW,
+	PRESENCE;
 
 }

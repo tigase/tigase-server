@@ -80,6 +80,11 @@ public class Packet {
 		} // end of if (elem == null)
 		this.elem = elem;
 		this.id = elem.getAttribute("id");
+		if (elem.getAttribute("type") != null) {
+			type = StanzaType.valueof(elem.getAttribute("type"));
+		} else {
+			type = null;
+		} // end of if (elem.getAttribute("type") != null) else
 		if (elem.getName() == "iq") {
 			Element child = elem.getChild("command", Command.XMLNS);
 			if (child != null) {
@@ -101,12 +106,13 @@ public class Packet {
 			if (elem.getName() == "cluster") {
 				setPriority(Priority.CLUSTER);
 			}
+			if ((elem.getName() == "presence") && (type == null ||
+							type == StanzaType.available || 
+							type == StanzaType.unavailable ||
+							type == StanzaType.probe)) {
+				setPriority(Priority.PRESENCE);
+			}
 		}
-		if (elem.getAttribute("type") != null) {
-			type = StanzaType.valueof(elem.getAttribute("type"));
-		} else {
-			type = null;
-		} // end of if (elem.getAttribute("type") != null) else
 		if (elem.getName().equals("route")) {
 			routed = true;
 		} // end of if (elem.getName().equals("route"))
