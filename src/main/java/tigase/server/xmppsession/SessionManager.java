@@ -1307,6 +1307,11 @@ public class SessionManager extends AbstractMessageReceiver
 		public ProcessorThread(XMPPProcessorIfc processor) {
 			super();
 			this.processor = processor;
+			if (processor.id().equals("roster-presence")) {
+				in_queue = new PriorityQueue<QueueItem>(Priority.values().length,
+								10*maxQueueSize);
+				log.finest("Setting roster presence queue to: " + (10*maxQueueSize));
+			}
 		}
 
 		public boolean addItem(Packet packet, XMPPResourceConnection conn) {

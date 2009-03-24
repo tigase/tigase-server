@@ -54,22 +54,23 @@ public class SocketReadThread implements Runnable {
 	public static final int DEF_MAX_THREADS_PER_CPU = 5;
 	private static final int MAX_EMPTY_SELECTIONS = 10;
 
-	private static SocketReadThread socketReadThread = null;
-
+	private static SocketReadThread[] socketReadThread = null;
+	private static int cpus = Runtime.getRuntime().availableProcessors();
   private boolean stopping = false;
-	private boolean selecting = false;
+	//private boolean selecting = false;
 	private int empty_selections = 0;
 
   private final ConcurrentLinkedQueue<IOService> waiting =
     new ConcurrentLinkedQueue<IOService>();
   private Selector clientsSel = null;
-	private ThreadPoolExecutor executor = null;
+	private static ThreadPoolExecutor executor = null;
   /**
    * Variable <code>completionService</code> keeps reference to server thread pool.
    * There is only one thread pool used by all server modules. Each module requiring
    * separate threads for tasks processing must have access to server thread pool.
    */
-  private CompletionService<IOService> completionService = null;
+  private static CompletionService<IOService> completionService = null;
+	private static int threadNo = 0;
 
 	/**
 	 * Creates a new <code>SocketReadThread</code> instance.
@@ -78,12 +79,6 @@ public class SocketReadThread implements Runnable {
 	private SocketReadThread() {
 		try {
 			clientsSel = Selector.open();
-			int cpus = Runtime.getRuntime().availableProcessors();
-			int nThreads = cpus * DEF_MAX_THREADS_PER_CPU;
-			executor = new ThreadPoolExecutor(nThreads, nThreads,
-				0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
-			completionService =
-				new ExecutorCompletionService<IOService>(executor);
 		} catch (Exception e) {
 			log.log(Level.SEVERE, "Server I/O error, can't continue my work.", e);
 			stopping = true;
@@ -93,13 +88,21 @@ public class SocketReadThread implements Runnable {
 
 	public static SocketReadThread getInstance() {
 		if (socketReadThread == null) {
-			socketReadThread = new SocketReadThread();
-			Thread thrd = new Thread(socketReadThread);
-			thrd.setName("SocketReadThread");
-			thrd.start();
-			log.fine("SocketReadThread started.");
+			int nThreads = cpus * DEF_MAX_THREADS_PER_CPU;
+			executor = new ThreadPoolExecutor(nThreads, nThreads,
+				0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
+			completionService =
+				new ExecutorCompletionService<IOService>(executor);
+			socketReadThread = new SocketReadThread[cpus];
+			for (int i = 0; i < socketReadThread.length; i++) {
+				socketReadThread[i] = new SocketReadThread();
+				Thread thrd = new Thread(socketReadThread[i]);
+				thrd.setName("SocketReadThread_CPU-"+i);
+				thrd.start();
+			}
+			log.warning("" + socketReadThread.length + " SocketReadThreads started.");
 		} // end of if (acceptThread == null)
-		return socketReadThread;
+		return socketReadThread[0];
 	}
 
 	public void setMaxThreadPerCPU(int threads) {
@@ -112,7 +115,21 @@ public class SocketReadThread implements Runnable {
 		executor.setMaximumPoolSize(threads);
 	}
 
-	public synchronized void addSocketService(IOService s) {
+	private static final Object threadNoSync = new Object();
+	private static int incrementAndGet() {
+		int result = 0;
+		synchronized (threadNoSync) {
+			threadNo = (threadNo + 1) % socketReadThread.length;
+			result = threadNo;
+		}
+		return result;
+	}
+
+	public static void addSocketService(IOService s) {
+		socketReadThread[incrementAndGet()].addSocketServicePriv(s);
+	}
+
+	public void addSocketServicePriv(IOService s) {
     waiting.offer(s);
 		// Calling lazy wakeup to avoid multiple wakeup calls
 		// when lots of new services are added....
