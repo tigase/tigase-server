@@ -499,6 +499,7 @@ public class SessionManager extends AbstractMessageReceiver
 				if (proc_t.addItem(packet, connection)) {
 					packet.processedBy(proc_t.processor.id());
 				} else {
+					proc_t.packetDroped();
 					if (log.isLoggable(Level.FINE)) {
 						log.fine("Can not add packet: " + packet.toString() +
 										" to processor: " + proc_t.getName() +
@@ -1269,15 +1270,15 @@ public class SessionManager extends AbstractMessageReceiver
 			ProcessorThread proc = procent.getValue();
 			if (proc.getName().equals("roster-presence")) {
 				stats.add(new StatRecord(getName(), "Processor: " + procent.getKey(),
-								"String", "Queue: " + proc.in_queue.size() +
+								"String", "Queue: " + proc.in_queue.totalSize() +
 								", AvTime: " + proc.cntAverageTime +
-								", Runs: " + proc.cntRuns,
+								", Runs: " + proc.cntRuns + ", Lost: " + proc.dropedPackets,
 								Level.INFO));
 			} else {
 				stats.add(new StatRecord(getName(), "Processor: " + procent.getKey(),
-								"String", "Queue: " + proc.in_queue.size() +
+								"String", "Queue: " + proc.in_queue.totalSize() +
 								", AvTime: " + proc.cntAverageTime +
-								", Runs: " + proc.cntRuns,
+								", Runs: " + proc.cntRuns + ", Lost: " + proc.dropedPackets,
 								Level.FINEST));
 			}
 		}
@@ -1301,6 +1302,7 @@ public class SessionManager extends AbstractMessageReceiver
 //			new LinkedBlockingQueue<QueueItem>(maxQueueSize/maxPluginsNo);
 		private long cntRuns = 0;
 		private long cntAverageTime = 0;
+		private long dropedPackets = 0;
 
 		public ProcessorThread(XMPPProcessorIfc processor) {
 			super();
@@ -1337,6 +1339,10 @@ public class SessionManager extends AbstractMessageReceiver
 						+ item.packet.toString(), e);
 				}
 			}
+		}
+
+		private void packetDroped() {
+			++dropedPackets;
 		}
 
 	}

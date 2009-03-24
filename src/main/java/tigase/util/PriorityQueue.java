@@ -174,4 +174,12 @@ public class PriorityQueue<E> {
 		return result;
 	}
 
+	public int totalSize() {
+		int result = 0;
+		for (int i = 0; i < qs.length; i++) {
+			result += qs[i].size();
+		}
+		return result;
+	}
+
 }
