@@ -118,8 +118,8 @@ public class XMPPResourceConnection extends RepositoryAccess {
     sessionData = new LinkedHashMap<String, Object>(4, 0.9f);
 	}
 
-	public boolean isLocalDomain(String outDomain) {
-		return loginHandler.isLocalDomain(outDomain);
+	public boolean isLocalDomain(String outDomain, boolean includeComponents) {
+		return loginHandler.isLocalDomain(outDomain, includeComponents);
 	}
 
 	public void putCommonSessionData(String key, Object value) {

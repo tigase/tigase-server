@@ -176,7 +176,7 @@ public class DomainFilter extends XMPPProcessor
 				}
 				switch (domains) {
 					case LOCAL:
-						if (outDomain != null && !session.isLocalDomain(outDomain)) {
+						if (outDomain != null && !session.isLocalDomain(outDomain, true)) {
 							removePacket(it, res, errors,
 											"You can only communicate within the server local domains.");
 						}
@@ -270,7 +270,7 @@ public class DomainFilter extends XMPPProcessor
 					}
 					break;
 				case LOCAL:
-					if (outDomain != null && !session.isLocalDomain(outDomain)) {
+					if (outDomain != null && !session.isLocalDomain(outDomain, true)) {
 						removePacket(null, packet, results,
 										"You can only communicate within the server local domains.");
 						stop = true;

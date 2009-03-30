@@ -165,6 +165,7 @@ public class SessionManager extends AbstractMessageReceiver
 
 		reaperTask = new Timer("Session reaper task", true);
 		reaperTask.schedule(new TimerTask() {
+			@Override
 			public void run() {
 				long currentTime = System.currentTimeMillis();
 				for (Enumeration<XMPPResourceConnection> e = connectionsByFrom.elements(); e.hasMoreElements(); ) {
@@ -1387,6 +1388,15 @@ public class SessionManager extends AbstractMessageReceiver
 			}
 		}
 		return stats;
+	}
+
+	@Override
+	public boolean isLocalDomain(String domain, boolean includeComponents) {
+		if (includeComponents) {
+			return isLocalDomainOrComponent(domain);
+		} else {
+			return isLocalDomain(domain);
+		}
 	}
 
 	private class QueueItem {
