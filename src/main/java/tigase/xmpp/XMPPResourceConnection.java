@@ -26,6 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 import tigase.util.JIDUtils;
 import tigase.db.UserRepository;
 import tigase.db.UserAuthRepository;
@@ -114,7 +115,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 		this.connectionId = connectionId;
 		this.loginHandler = loginHandler;
 		this.creationTime = System.currentTimeMillis();
-    sessionData = new LinkedHashMap<String, Object>();
+    sessionData = new LinkedHashMap<String, Object>(4, 0.9f);
 	}
 
 	public boolean isLocalDomain(String outDomain) {
@@ -452,7 +453,9 @@ public class XMPPResourceConnection extends RepositoryAccess {
 		Authorization result = super.loginOther(props);
 		if (result == Authorization.AUTHORIZED) {
 			String user = (String)props.get(UserAuthRepository.USER_ID_KEY);
-			log.finest("UserAuthRepository.USER_ID_KEY: " + user);
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("UserAuthRepository.USER_ID_KEY: " + user);
+			}
 			String nick = JIDUtils.getNodeNick(user);
 			if (nick == null) {
 				nick = user;

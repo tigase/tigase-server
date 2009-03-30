@@ -27,6 +27,7 @@ import java.util.Queue;
 import java.util.Map;
 import java.util.LinkedHashMap;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 import tigase.server.Packet;
 import tigase.xml.Element;
 import tigase.xml.XMLUtils;
@@ -87,7 +88,7 @@ public abstract class RosterAbstract {
 			both("both", null),
 			remove("remove", null);
 
-		private Map<String, String> attrs = new LinkedHashMap<String, String>();
+		private Map<String, String> attrs = new LinkedHashMap<String, String>(2, 1.0f);
 
 		private SubscriptionType(String subscr, String ask) {
 			attrs.put("subscription", subscr);
@@ -381,9 +382,11 @@ public abstract class RosterAbstract {
 
 		public SubscriptionType getStateTransition(PresenceType pres_type) {
 			SubscriptionType res = stateTransition.get(pres_type);
-			log.finest("this="+this.toString()
-				+", pres_type="+pres_type
-				+", res="+res);
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("this="+this.toString()
+					+", pres_type="+pres_type
+					+", res="+res);
+			}
 				return res;
 		}
 
@@ -522,16 +525,20 @@ public abstract class RosterAbstract {
 		final XMPPResourceConnection session,	final PresenceType presence,
 		final String jid) throws NotAuthorizedException, TigaseDBException {
 		SubscriptionType current_subscription =	getBuddySubscription(session, jid);
-		log.finest("current_subscription="+current_subscription
-			+" for jid="+jid);
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("current_subscription="+current_subscription
+				+" for jid="+jid);
+		}
 		if (current_subscription == null) {
 			addBuddy(session, jid, null, null);
 			current_subscription = SubscriptionType.none;
 		}
 		final SubscriptionType new_subscription =
 			getStateTransition(current_subscription, presence);
-		log.finest("new_subscription="+new_subscription
-			+" for presence="+presence);
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("new_subscription="+new_subscription
+				+" for presence="+presence);
+		}
 		if (current_subscription == SubscriptionType.none_pending_in
 			&& presence == PresenceType.out_unsubscribed) {
 			removeBuddy(session, jid);

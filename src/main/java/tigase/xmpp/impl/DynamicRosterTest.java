@@ -28,6 +28,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 import tigase.util.JIDUtils;
 import tigase.xml.Element;
 import tigase.xmpp.NotAuthorizedException;
@@ -49,7 +50,9 @@ public class DynamicRosterTest implements DynamicRosterIfc {
 	@Override
 	public void setItemExtraData(Element item) {
 		String jid = item.getAttribute("jid");
-		log.finest("Storing item: " + item + ", for jid=" + jid);
+		if (log.isLoggable(Level.FINEST)) {
+    		log.finest("Storing item: " + item + ", for jid=" + jid);
+        }
 		memStorage.put(jid, item);
 	}
 
@@ -57,7 +60,9 @@ public class DynamicRosterTest implements DynamicRosterIfc {
 	public Element getItemExtraData(Element item) {
 		String jid = item.getAttribute("jid");
 		Element result = memStorage.get(jid);
-		log.finest("Retrieving item: " + result + ", for jid=" + jid);
+		if (log.isLoggable(Level.FINEST)) {
+    		log.finest("Retrieving item: " + result + ", for jid=" + jid);
+        }
 		return result;
 	}
 

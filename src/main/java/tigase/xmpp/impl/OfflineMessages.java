@@ -161,7 +161,9 @@ public class OfflineMessages extends XMPPProcessor
 				try {
 					Queue<Packet> packets =	restorePacketForOffLineUser(conn);
 					if (packets != null) {
-						log.finer("Sending off-line messages: " + packets.size());
+                        if (log.isLoggable(Level.FINER)) {
+                        	log.finer("Sending off-line messages: " + packets.size());
+                        }
 						results.addAll(packets);
 					} // end of if (packets != null)
 				} catch (NotAuthorizedException e) {
@@ -197,8 +199,10 @@ public class OfflineMessages extends XMPPProcessor
 					packet.processedBy(ID);
 				}
 			} catch (UserNotFoundException e) {
-				log.finest("UserNotFoundException at trying to save packet for off-line user."
-					+ packet.getStringData());
+   				if (log.isLoggable(Level.FINEST)) {
+    				log.finest("UserNotFoundException at trying to save packet for off-line user."
+        				+ packet.getStringData());
+                }
 			} // end of try-catch
 		} // end of if (conn == null)
 	}

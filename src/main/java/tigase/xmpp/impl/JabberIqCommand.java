@@ -24,6 +24,7 @@ package tigase.xmpp.impl;
 import java.util.Queue;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 import tigase.db.NonAuthUserRepository;
 import tigase.server.Command;
 import tigase.server.Packet;
@@ -89,7 +90,9 @@ public class JabberIqCommand extends XMPPProcessor implements XMPPProcessorIfc {
 //		}
 
 		try {
-			log.finest("Received packet: " + packet.getStringData());
+			if (log.isLoggable(Level.FINEST)) {
+    			log.finest("Received packet: " + packet.getStringData());
+            }
 
 			// Not needed anymore. Packet filter does it for all stanzas.
 // 			// For all messages coming from the owner of this account set

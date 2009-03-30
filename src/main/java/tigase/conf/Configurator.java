@@ -309,7 +309,9 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 
 	@Override
 	public void componentAdded(Configurable component) {
-		log.finer(" component: " + component.getName());
+		if (log.isLoggable(Level.FINER)) {
+    		log.finer(" component: " + component.getName());
+        }
 		ServiceEntity item = config_list.findNode(component.getName());
 		if (item == null) {
 			item = new ServiceEntity(getName(), component.getName(),
@@ -334,7 +336,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 
 	public void setup(String name) {
 		Configurable component = getComponent(name);
-		setup(component);
+			setup(component);
 	}
 
 	public void setup(Configurable component) {
@@ -917,7 +919,9 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 			}
 		}
 
-		log.finest("Command received: " + packet.getStringData());
+		if (log.isLoggable(Level.FINEST)) {
+    		log.finest("Command received: " + packet.getStringData());
+        }
 
 		Command.Action action = Command.getAction(packet);
 		if (action == Command.Action.cancel) {

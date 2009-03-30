@@ -325,8 +325,10 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 
 	private void reconnectService(final Map<String, Object> port_props,
 		long delay) {
-		log.finer("Reconnecting service for: " + getName()
-			+ ", scheduling next try in " + (delay / 1000) + "secs");
+		if (log.isLoggable(Level.FINER)) {
+			log.finer("Reconnecting service for: " + getName()
+				+ ", scheduling next try in " + (delay / 1000) + "secs");
+		}
 		delayedTasks.schedule(new TimerTask() {
 				public void run() {
 					String host = (String)port_props.get(PORT_REMOTE_HOST_PROP_KEY);
@@ -334,8 +336,10 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 						host = (String)port_props.get("remote-hostname");
 					}
 					int port = (Integer)port_props.get(PORT_KEY);
-					log.fine("Reconnecting service for component: " + getName()
-						+ ", to remote host: " + host + " on port: " + port);
+					if (log.isLoggable(Level.FINE)) {
+						log.fine("Reconnecting service for component: " + getName()
+							+ ", to remote host: " + host + " on port: " + port);
+					}
 					startService(port_props);
 				}
 			}, delay);
@@ -363,7 +367,9 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 	 */
 	@SuppressWarnings({"unchecked"})
 	public void packetsReady(IOService s) throws IOException {
-		log.finest("packetsReady called");
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("packetsReady called");
+		}
 		IO serv = (IO)s;
 		packetsReady(serv);
 	}
@@ -408,9 +414,11 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 				} // end of try-catch
 			} // end of try-catch
 		} else {
-			log.info("Can't find service for packet: ["
-				+ p.getElemName() + "] " + p.getTo()
-				+ ", service id: " + getServiceId(p));
+			if (log.isLoggable(Level.FINE)) {
+				log.fine("Can't find service for packet: <"
+					+ p.getElemName() + "> " + p.getTo()
+					+ ", service id: " + getServiceId(p));
+			}
 		} // end of if (ios != null) else
 		return false;
 	}
@@ -435,9 +443,13 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 	 * @return
 	 */
 	protected boolean writePacketToSocket(Packet p) {
-		log.finer("Processing packet: " + p.getElemName()
-			+ ", type: " + p.getType());
-		log.finest("Writing packet to: " + p.getTo());
+		if (log.isLoggable(Level.FINER)) {
+			log.finer("Processing packet: " + p.getElemName()
+				+ ", type: " + p.getType());
+		}
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Writing packet to: " + p.getTo());
+		}
 		IO ios = getXMPPIOService(p);
 		if (ios != null) {
 			return writePacketToSocket(ios, p);
@@ -447,9 +459,13 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 	}
 
 	protected boolean writePacketToSocket(Packet p, String serviceId) {
-		log.finer("Processing packet: " + p.getElemName()
-			+ ", type: " + p.getType());
-		log.finest("Writing packet to: " + p.getTo());
+		if (log.isLoggable(Level.FINER)) {
+			log.finer("Processing packet: " + p.getElemName()
+				+ ", type: " + p.getType());
+		}
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Writing packet to: " + p.getTo());
+		}
 		IO ios = getXMPPIOService(serviceId);
 		if (ios != null) {
 			return writePacketToSocket(ios, p);
@@ -481,7 +497,9 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 	public void serviceStopped(IO service) {
 		synchronized(service) {
 			String id = getUniqueId(service);
-			log.finer("[[" + getName() + "]] Connection stopped: " + id);
+			if (log.isLoggable(Level.FINER)) {
+    			log.finer("[[" + getName() + "]] Connection stopped: " + id);
+            }
 			// id might be null if service is stopped in accept method due to
 			// an exception during establishing TCP/IP connection
 			IO serv = (id != null ? services.get(id) : null);
@@ -503,7 +521,9 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 	public void serviceStarted(final IO service) {
 		synchronized(services) {
 			String id = getUniqueId(service);
-			log.finer("[[" + getName() + "]] Connection started: " + id);
+			if (log.isLoggable(Level.FINER)) {
+    			log.finer("[[" + getName() + "]] Connection started: " + id);
+            }
 			IO serv = services.get(id);
 			if (serv != null) {
 				if (serv == service) {
@@ -686,22 +706,24 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 								final String serviceId) {
 								// 								for (IO service: services.values()) {
 								//						service = (XMPPIOService)serv;
-								long curr_time = System.currentTimeMillis();
-								long lastTransfer = service.getLastTransferTime();
 								try {
-									if (curr_time - lastTransfer >= getMaxInactiveTime()) {
-										// Stop the service is max keep-alive time is acceeded
-										// for non-active connections.
-										log.info(getName()
-											+ ": Max inactive time exceeded, stopping: "
-											+ serviceId);
-										++watchdogStopped;
-										service.stop();
-									} else {
-										if (curr_time - lastTransfer >= (29*MINUTE)) {
-											// At least once an hour check if the connection is
-											// still alive.
-											service.writeRawData(" ");
+									if (null != service) {
+										long curr_time = System.currentTimeMillis();
+										long lastTransfer = service.getLastTransferTime();
+										if (curr_time - lastTransfer >= getMaxInactiveTime()) {
+											// Stop the service is max keep-alive time is acceeded
+											// for non-active connections.
+                                			if (log.isLoggable(Level.INFO)) {
+                                                log.info(getName()
+                                                    + ": Max inactive time exceeded, stopping: "
+                                                    + serviceId);
+                                            }
+    										++watchdogStopped;
+											service.stop();
+										} else if (curr_time - lastTransfer >= (29*MINUTE)) {
+                                            // At least once an hour check if the connection is
+                                            // still alive.
+                                            service.writeRawData(" ");
 											++watchdogTests;
 										}
 									}

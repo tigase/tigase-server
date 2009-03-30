@@ -116,12 +116,16 @@ public class PacketFilter {
 									session.getConnectionId() + ", sessionId=" +
 									session.getSessionId() + ", ConnectionStatus=" +
 									session.getConnectionStatus());
-					log.finest("Session more detais: JID=" + session.getJID());
+    				if (log.isLoggable(Level.FINEST)) {
+        				log.finest("Session more detais: JID=" + session.getJID());
+                    }
 					return true;
 				} else {
 					String from_jid = session.getJID();
 					if (from_jid != null && !from_jid.isEmpty()) {
-						log.finest("Setting correct from attribute: " + from_jid);
+        				if (log.isLoggable(Level.FINEST)) {
+                            log.finest("Setting correct from attribute: " + from_jid);
+                        }
 						packet.getElement().setAttribute("from", from_jid);
 					} else {
 						log.warning("Session is authenticated but session.getJid() is empty: " +
@@ -208,11 +212,15 @@ public class PacketFilter {
 					results.offer(Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(
 									packet, "Features not implemented yet.", true));
 				} else {
-					log.finest("Yes, this is packet to 'this' client: " + id);
+    				if (log.isLoggable(Level.FINEST)) {
+        				log.finest("Yes, this is packet to 'this' client: " + id);
+                    }
 					Element elem = packet.getElement().clone();
 					Packet result = new Packet(elem);
 					result.setTo(session.getConnectionId(packet.getElemTo()));
-					log.finest("Setting to: " + result.getTo());
+    				if (log.isLoggable(Level.FINEST)) {
+        				log.finest("Setting to: " + result.getTo());
+                    }
 					result.setFrom(packet.getTo());
 					results.offer(result);
 				}

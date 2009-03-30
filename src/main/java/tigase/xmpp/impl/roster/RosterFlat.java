@@ -26,6 +26,7 @@ import java.util.Queue;
 import java.util.Map;
 import java.util.LinkedHashMap;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 import tigase.xml.Element;
 import tigase.xml.DomBuilderHandler;
 import tigase.xml.SimpleParser;
@@ -77,7 +78,9 @@ public class RosterFlat extends RosterAbstract {
 						new LinkedHashMap<String, RosterElement>();
 		session.putCommonSessionData(ROSTER, roster);
 		String roster_str = session.getData(null, ROSTER, null);
-		log.finest("Loaded user roster: " + roster_str);
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Loaded user roster: " + roster_str);
+		}
 		if (roster_str != null && !roster_str.isEmpty()) {
 			parseRoster(roster_str, roster);
 		} else {
@@ -118,7 +121,9 @@ public class RosterFlat extends RosterAbstract {
 		for (RosterElement relem: roster.values()) {
 			sb.append(relem.getRosterElement().toString());
 		}
-		log.finest("Saving user roster: " + sb.toString());
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Saving user roster: " + sb.toString());
+		}
 		session.setData(null, ROSTER, sb.toString());
 	}
 
@@ -176,7 +181,9 @@ public class RosterFlat extends RosterAbstract {
     throws NotAuthorizedException, TigaseDBException {
 		RosterElement relem = getRosterElement(session, buddy);
 		if (relem != null) {
-			log.finest("Setting name: '"+name+"' for buddy: " + buddy);
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Setting name: '"+name+"' for buddy: " + buddy);
+			}
 			relem.setName(name);
 			saveUserRoster(session);
 		} else {
@@ -233,12 +240,16 @@ public class RosterFlat extends RosterAbstract {
 			} else {
 				throw new TigaseDBException("Too many elements in the user roster.");
 			}
-			log.finest("Added buddy to roster: " + jid);
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Added buddy to roster: " + jid);
+			}
 		} else {
 			relem.setName(name);
 			relem.setGroups(groups);
 			saveUserRoster(session);
-			log.finest("Updated buddy in roster: " + jid);
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Updated buddy in roster: " + jid);
+			}
 		}
 	}
 

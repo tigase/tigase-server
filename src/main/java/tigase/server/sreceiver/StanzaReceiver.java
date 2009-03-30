@@ -672,7 +672,9 @@ public class StanzaReceiver extends AbstractMessageReceiver
 			return;
 		}
 
-		log.finest("Processing packet: " + packet.toString());
+		if (log.isLoggable(Level.FINEST)) {
+    		log.finest("Processing packet: " + packet.toString());
+        }
 		if (packet.getElemName().equals("iq")) {
 			processIQPacket(packet);
 			return;
@@ -689,7 +691,9 @@ public class StanzaReceiver extends AbstractMessageReceiver
 			}
 		}
 		if (task != null) {
-			log.finest("Found a task for packet: " + task.getJID());
+			if (log.isLoggable(Level.FINEST)) {
+    			log.finest("Found a task for packet: " + task.getJID());
+            }
 			Queue<Packet> results = new LinkedList<Packet>();
 			task.processPacket(packet, results);
 			addOutPackets(results);

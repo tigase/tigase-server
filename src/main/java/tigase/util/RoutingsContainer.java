@@ -25,6 +25,7 @@ import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 import java.util.regex.Pattern;
 
 /**
@@ -95,7 +96,9 @@ public class RoutingsContainer {
 		private String def = null;
 
 		public void addRouting(final String pattern, final String address) {
-			log.fine("Adding routing: " + pattern + " --> " + address);
+			if (log.isLoggable(Level.FINE)) {
+				log.fine("Adding routing: " + pattern + " --> " + address);
+			}
 			routings.put(Pattern.compile(pattern), address);
 			if (def == null) {
 				def = address;
@@ -104,13 +107,17 @@ public class RoutingsContainer {
 
 		public String computeRouting(final String address) {
 			if (address == null) {
-				log.finer("For null address returning default routing: " + def);
+				if (log.isLoggable(Level.FINER)) {
+					log.finer("For null address returning default routing: " + def);
+				}
 				return def;
 			} // end of if (address == null)
 			for (Map.Entry<Pattern, String> entry: routings.entrySet()) {
 				if (entry.getKey().matcher(address).find()) {
-					log.finest("For address: " + address + " pattern: "
-						+ entry.getKey().pattern() + " matched.");
+    				if (log.isLoggable(Level.FINEST)) {
+        				log.finest("For address: " + address + " pattern: "
+            				+ entry.getKey().pattern() + " matched.");
+                    }
 					return entry.getValue();
 				} // end of if (pattern.matcher(address).find())
 			} // end of for ()

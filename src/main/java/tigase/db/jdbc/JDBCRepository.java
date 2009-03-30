@@ -38,6 +38,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 import tigase.db.AuthorizationException;
 import tigase.db.DBInitException;
 import tigase.db.TigaseDBException;
@@ -210,7 +211,9 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	private long getNodeNID(long uid, String node_path)
 		throws SQLException, TigaseDBException, UserNotFoundException {
 		String query = buildNodeQuery(uid, node_path);
-		log.finest(query);
+		if (log.isLoggable(Level.FINEST)) {
+    		log.finest(query);
+        }
 		Statement stmt = null;
 		ResultSet rs = null;
 		long nid = -1;
@@ -227,8 +230,10 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 					log.info("Missing root node, database upgrade or bug in the code? Adding missing root node now.");
 					nid = addNode(uid, -1, "root");
 				} else {
-					log.finest("Missing nid for node path: "
-						+ node_path + " and uid: " + uid);
+    				if (log.isLoggable(Level.FINEST)) {
+    					log.finest("Missing nid for node path: "
+        					+ node_path + " and uid: " + uid);
+                    }
 				}
 			}
 			return nid;
@@ -836,8 +841,10 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		try {
 			checkConnection();
 			long nid = getNodeNID(user_id, subnode);
-			log.finest("Loading data for key: " + key + ", user: " + user_id +
+    		if (log.isLoggable(Level.FINEST)) {
+        		log.finest("Loading data for key: " + key + ", user: " + user_id +
 							", node: " + subnode + ", def: " + def + ", found nid: " + nid);
+            }
 			synchronized (data_for_node_st) {
 				if (nid > 0) {
 					String result = def;
@@ -846,7 +853,9 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 					rs = data_for_node_st.executeQuery();
 					if (rs.next()) {
 						result = rs.getString(1);
-						log.finest("Found data: " + result);
+        				if (log.isLoggable(Level.FINEST)) {
+        					log.finest("Found data: " + result);
+                        }
 					}
 					//cache.put(user_id+"/"+subnode+"/"+key, new String[] {result});
 					return result;

@@ -35,6 +35,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 import tigase.io.IOInterface;
 import tigase.io.SocketIO;
 import tigase.io.TLSIO;
@@ -101,7 +102,7 @@ public abstract class IOService implements Callable<IOService> {
 	private IOServiceListener serviceListener = null;
 
 	private ConcurrentMap<String, Object> sessionData =
-		new ConcurrentHashMap<String, Object>();
+		new ConcurrentHashMap<String, Object>(4, 0.75f, 4);
 
 	/**
    * <code>socketInput</code> buffer keeps data read from socket.
@@ -209,7 +210,9 @@ public abstract class IOService implements Callable<IOService> {
    * @return a <code>boolean</code> value
    */
   public synchronized boolean isConnected() {
-		log.finest("socketIO = " + socketIO);
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("socketIO = " + socketIO);
+		}
 		return socketIO == null ? false : socketIO.isConnected();
 	}
 
@@ -274,7 +277,9 @@ public abstract class IOService implements Callable<IOService> {
   }
 
 	public synchronized void forceStop() {
-		log.finer("Force stop called...");
+		if (log.isLoggable(Level.FINER)) {
+			log.finer("Force stop called...");
+		}
 		try {
 			if (socketIO != null) {
 				socketIO.stop();
@@ -321,9 +326,11 @@ public abstract class IOService implements Callable<IOService> {
 		int netSize = socketIO.getInputPacketSize();
 		// Resize buffer if needed.
 		if (netSize > socketInput.remaining()) {
-			log.fine("Resizing buffer to "
-				+ (netSize + socketInput.capacity())
-				+ " bytes.");
+			if (log.isLoggable(Level.FINE)) {
+				log.fine("Resizing buffer to "
+					+ (netSize + socketInput.capacity())
+					+ " bytes.");
+			}
 			ByteBuffer b = ByteBuffer.allocate(netSize+socketInput.capacity());
 			b.put(socketInput);
 			socketInput = b;
@@ -393,7 +400,9 @@ public abstract class IOService implements Callable<IOService> {
 		synchronized (encoder) {
 			try {
 				if (data != null && data.length() > 0) {
-					log.finest("Writing data: " + data);
+					if (log.isLoggable(Level.FINEST)) {
+						log.finest("Writing data: " + data);
+					}
 					ByteBuffer dataBuffer = null;
 					encoder.reset();
 					dataBuffer = encoder.encode(CharBuffer.wrap(data));
@@ -437,12 +446,14 @@ public abstract class IOService implements Callable<IOService> {
    * @return a <code>boolean</code> value
    */
   protected boolean debug(final String msg, final String prefix) {
-    if (msg != null && msg.trim().length() > 0) {
-			String log_msg = "\n"
-				+ (connectionType() != null ?	connectionType().toString() : "null-type")
-				+ " " + prefix + "\n" + msg + "\n";
-				//			System.out.print(log_msg);
-				log.finest(log_msg);
+	if (log.isLoggable(Level.FINEST)) {
+	    if (msg != null && msg.trim().length() > 0) {
+				String log_msg = "\n"
+					+ (connectionType() != null ?	connectionType().toString() : "null-type")
+					+ " " + prefix + "\n" + msg + "\n";
+					//			System.out.print(log_msg);
+					log.finest(log_msg);
+		}
     }
     return true;
   }

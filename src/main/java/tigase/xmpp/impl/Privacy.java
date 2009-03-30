@@ -23,6 +23,7 @@ package tigase.xmpp.impl;
 
 import java.util.Queue;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 import tigase.xml.Element;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
@@ -133,7 +134,9 @@ public class Privacy {
 	public static void addList(XMPPResourceConnection session,
 					Element list)
 					throws NotAuthorizedException, TigaseDBException {
-		log.finest("Saving privacy list: " + list.toString());
+		if (log.isLoggable(Level.FINEST)) {
+    		log.finest("Saving privacy list: " + list.toString());
+        }
 		String lNode = listNode(list.getAttribute(NAME));
 		session.setData(lNode, PRIVACY_LIST, list.toString());
 	}
@@ -141,7 +144,9 @@ public class Privacy {
 	public static Element getList(XMPPResourceConnection session,
 					String list)
 					throws NotAuthorizedException, TigaseDBException {
-		log.finest("Loading privacy list: " + list);
+		if (log.isLoggable(Level.FINEST)) {
+    		log.finest("Loading privacy list: " + list);
+        }
 		String lNode = listNode(list);
 		String list_str = session.getData(lNode, PRIVACY_LIST, null);
 		if (list_str != null && !list_str.isEmpty()) {
@@ -150,7 +155,9 @@ public class Privacy {
 			parser.parse(domHandler, list_str.toCharArray(), 0, list_str.length());
 			Queue<Element> elems = domHandler.getParsedElements();
 			Element result = elems.poll();
-			log.finest("Loaded privacy list: " + result.toString());
+			if (log.isLoggable(Level.FINEST)) {
+    			log.finest("Loaded privacy list: " + result.toString());
+            }
 			return result;
 		} else {
 			return getListOld(session, list);

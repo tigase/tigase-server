@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 import tigase.db.NonAuthUserRepository;
 import tigase.server.Packet;
 import tigase.xml.Element;
@@ -86,7 +87,9 @@ public class Jingle extends XMPPProcessor implements XMPPProcessorIfc {
 		if (conn == null) { return; }
 
 		try {
-			log.finest("Received packet: " + packet.getStringData());
+			if (log.isLoggable(Level.FINEST)) {
+    			log.finest("Received packet: " + packet.getStringData());
+            }
 
 			// Not needed anymore. Packet filter does it for all stanzas.
 // 			// For all messages coming from the owner of this account set

@@ -29,6 +29,7 @@ import java.io.FileReader;
 import java.security.Security;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -38,9 +39,11 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.Enumeration;
 import javax.script.Bindings;
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
@@ -115,10 +118,10 @@ public class SessionManager extends AbstractMessageReceiver
 	private String[] trusted = {"admin@localhost"};
 	//private String[] anon_peers = {"admin@localhost"};
 
-	private Map<String, XMPPSession> sessionsByNodeId =
-		new ConcurrentSkipListMap<String, XMPPSession>();
-	private Map<String, XMPPResourceConnection> connectionsByFrom =
-		new ConcurrentSkipListMap<String, XMPPResourceConnection>();
+	private ConcurrentHashMap<String, XMPPSession> sessionsByNodeId =
+		new ConcurrentHashMap<String, XMPPSession>();
+	private ConcurrentHashMap<String, XMPPResourceConnection> connectionsByFrom =
+		new ConcurrentHashMap<String, XMPPResourceConnection>();
 
 	private Map<String, XMPPPreprocessorIfc> preProcessors =
 					new ConcurrentSkipListMap<String, XMPPPreprocessorIfc>();
@@ -151,6 +154,47 @@ public class SessionManager extends AbstractMessageReceiver
 	private long closedConnections = 0;
 	private long authTimeouts = 0;
 	private int maxPluginsNo = 0;
+
+	private Timer reaperTask = null;
+	private long reaperInterval = 60 * 1000;
+	private long maxIdleTime = 86400 * 1000;
+
+	@Override
+	public void start() {
+		super.start();
+
+		reaperTask = new Timer("Session reaper task", true);
+		reaperTask.schedule(new TimerTask() {
+			public void run() {
+				long currentTime = System.currentTimeMillis();
+				for (Enumeration<XMPPResourceConnection> e = connectionsByFrom.elements(); e.hasMoreElements(); ) {
+					XMPPResourceConnection xrc = e.nextElement();
+					if (!"session-id-sess-man".equals(xrc.getSessionId())) {
+						if (currentTime - xrc.getLastAccessed() > maxIdleTime && currentTime - xrc.getCreationTime() > reaperInterval) {
+							if (log.isLoggable(Level.WARNING)) {
+								log.warning("Logging out " + xrc.getSessionId() + " after >" + (maxIdleTime/1000) + " seconds of inactivity");
+							}
+							try {
+								xrc.logout();
+							} catch (NotAuthorizedException ex) {
+								if (log.isLoggable(Level.WARNING)) {
+									log.warning("Could not logout " + xrc.getSessionId() + ": " + ex.getMessage());
+								}
+							}
+						}
+					}
+				}
+			}
+		}, reaperInterval, reaperInterval);
+	}
+
+	@Override
+	public void stop() {
+		super.stop();
+
+		reaperTask.cancel();
+		reaperTask = null;
+	}
 
 	@Override
 	public void setName(String name) {
@@ -203,8 +247,9 @@ public class SessionManager extends AbstractMessageReceiver
 
 	protected XMPPResourceConnection getXMPPResourceConnection(Packet p) {
 		XMPPResourceConnection conn = null;
-		if (p.getFrom() != null) {
-			conn = connectionsByFrom.get(p.getFrom());
+		final String from = p.getFrom();
+		if (from != null) {
+			conn = connectionsByFrom.get(from);
 			if (conn != null) {
 				return conn.getConnectionStatus() == ConnectionStatus.TEMP ? null : conn;
 			}
@@ -213,7 +258,9 @@ public class SessionManager extends AbstractMessageReceiver
 		// so let's look for established session for this user...
 		final String to = p.getElemTo();
 		if (to != null) {
-			log.finest("Searching for resource connection for: " + to);
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Searching for resource connection for: " + to);
+			}
 			conn = getResourceConnection(to);
 			if (conn != null && conn.getConnectionStatus() == ConnectionStatus.TEMP) {
 				conn = null;
@@ -385,7 +432,9 @@ public class SessionManager extends AbstractMessageReceiver
 				addOutPacket(error);
 			}
 		} else {
-			log.finest("Packet processed by: " + packet.getProcessorsIds().toString());
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Packet processed by: " + packet.getProcessorsIds().toString());
+			}
 		} // end of else
 	}
 
@@ -445,10 +494,14 @@ public class SessionManager extends AbstractMessageReceiver
 		if (isLocalDomain(to)) {
 			if (packet.getElemName().equals("message")) {
 				// Yes this packet is for admin....
-				log.finer("Packet for admin: " + packet.getStringData());
+    			if (log.isLoggable(Level.FINER)) {
+    				log.finer("Packet for admin: " + packet.getStringData());
+                }
 				sendToAdmins(packet);
 			} else {
-				log.finer("Packet for hostname: " + packet.getStringData());
+    			if (log.isLoggable(Level.FINER)) {
+    				log.finer("Packet for hostname: " + packet.getStringData());
+                }
 				Packet host_pac =
           new Packet(packet.getElement().clone());
 				host_pac.getElement().setAttribute("to", getComponentId());
@@ -463,7 +516,9 @@ public class SessionManager extends AbstractMessageReceiver
 
 	protected void sendToAdmins(Packet packet) {
 		for (String admin: admins) {
-			log.finer("Sending packet to admin: " + admin);
+   			if (log.isLoggable(Level.FINER)) {
+    			log.finer("Sending packet to admin: " + admin);
+            }
 			Packet admin_pac =
         new Packet(packet.getElement().clone());
 			admin_pac.getElement().setAttribute("to", admin);
@@ -478,7 +533,9 @@ public class SessionManager extends AbstractMessageReceiver
 	protected XMPPResourceConnection getResourceConnection(String jid) {
 		XMPPSession session = getSession(jid);
 		if (session != null) {
-			log.finest("Session not null, getting resource for jid: " + jid);
+			if (log.isLoggable(Level.FINEST)) {
+    			log.finest("Session not null, getting resource for jid: " + jid);
+            }
 			return session.getResourceConnection(jid);
 		} // end of if (session != null)
 		return null;
@@ -499,6 +556,7 @@ public class SessionManager extends AbstractMessageReceiver
 				if (proc_t.addItem(packet, connection)) {
 					packet.processedBy(proc_t.processor.id());
 				} else {
+//					proc_t.debugQueue();
 					proc_t.packetDroped();
 					if (log.isLoggable(Level.FINE)) {
 						log.fine("Can not add packet: " + packet.toString() +
@@ -522,7 +580,7 @@ public class SessionManager extends AbstractMessageReceiver
 			user_repository, auth_repository, this, false);
 		connection.setDomain(domain);
 		// Dummy session ID, we might decide later to set real thing here
-		connection.setSessionId("session-id");
+		connection.setSessionId("session-id-"+JIDUtils.getNodeNick(user_jid));
 		//connection.setAnonymousPeers(anon_peers);
 		connectionsByFrom.put(conn_id, connection);
 		registerNewSession(JIDUtils.getNodeID(user_jid), connection);
@@ -552,7 +610,9 @@ public class SessionManager extends AbstractMessageReceiver
 			return false;
 		}
 		boolean processing_result = false;
-		log.finer(pc.getCommand().toString() + " command from: " + pc.getFrom());
+		if (log.isLoggable(Level.FINER)) {
+			log.finer(pc.getCommand().toString() + " command from: " + pc.getFrom());
+		}
 		//Element command = pc.getElement();
 		XMPPResourceConnection connection =	connectionsByFrom.get(pc.getFrom());
 		switch (pc.getCommand()) {
@@ -560,14 +620,18 @@ public class SessionManager extends AbstractMessageReceiver
 			// It might be existing opened stream after TLS/SASL authorization
 			// If not, it means this is new stream
 			if (connection == null) {
-				log.finer("Adding resource connection for: " + pc.getFrom());
+				if (log.isLoggable(Level.FINER)) {
+					log.finer("Adding resource connection for: " + pc.getFrom());
+				}
 				final String hostname = Command.getFieldValue(pc, "hostname");
 				connection = new XMPPResourceConnection(pc.getFrom(),
 					user_repository, auth_repository, this,
 					isAnonymousEnabled(hostname));
 				if (hostname != null) {
-					log.finest("Setting hostname " + hostname
-						+ " for connection: " + connection.getConnectionId());
+					if (log.isLoggable(Level.FINEST)) {
+						log.finest("Setting hostname " + hostname
+							+ " for connection: " + connection.getConnectionId());
+					}
 					connection.setDomain(hostname);
 				} // end of if (hostname != null)
 				else {
@@ -578,13 +642,17 @@ public class SessionManager extends AbstractMessageReceiver
 				authenticationWatchdog.schedule(new AuthenticationTimer(pc.getFrom()),
 								MINUTE);
 			} else {
-				log.finest("Stream opened for existing session, authorized: "
-					+ connection.isAuthorized());
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("Stream opened for existing session, authorized: "
+						+ connection.isAuthorized());
+				}
 			} // end of else
 			connection.setSessionId(Command.getFieldValue(pc, "session-id"));
 			connection.setDefLang(Command.getFieldValue(pc, "xml:lang"));
-			log.finest("Setting session-id " + connection.getSessionId()
-				+ " for connection: " + connection.getConnectionId());
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Setting session-id " + connection.getSessionId()
+					+ " for connection: " + connection.getConnectionId());
+			}
 			fastAddOutPacket(pc.okResult((String) null, 0));
 			processing_result = true;
 			break;
@@ -691,8 +759,10 @@ public class SessionManager extends AbstractMessageReceiver
 						} else {
 // 							addOutPacket(Authorization.CONFLICT.getResponseMessage(pc,
 // 									"The user resource already exists.", true));
-							log.finest("USER_STATUS set to true for user who is already available: "
-								+ pc.toString());
+							if (log.isLoggable(Level.FINEST)) {
+								log.finest("USER_STATUS set to true for user who is already available: "
+									+ pc.toString());
+							}
 						}
 						if (presence != null) {
 							presence.setFrom(pc.getElemFrom());
@@ -732,14 +802,20 @@ public class SessionManager extends AbstractMessageReceiver
 			if (connection != null) {
 				String action = Command.getFieldValue(pc, "action");
 				if (action.equals("close")) {
-					log.fine("Closing redirected connections: " + pc.getFrom());
+					if (log.isLoggable(Level.FINE)) {
+						log.fine("Closing redirected connections: " + pc.getFrom());
+					}
 					sendAllOnHold(connection);
 					closeConnection(pc.getFrom(), true);
 				} else {
-					log.fine("Activating redirected connections: " + pc.getFrom());
+					if (log.isLoggable(Level.FINE)) {
+						log.fine("Activating redirected connections: " + pc.getFrom());
+					}
 				}
 			} else {
-				log.fine("Redirect for non-existen connection: " + pc.toString());
+				if (log.isLoggable(Level.FINE)) {
+					log.fine("Redirect for non-existen connection: " + pc.toString());
+				}
 			}
 			processing_result = true;
 			break;
@@ -753,7 +829,9 @@ public class SessionManager extends AbstractMessageReceiver
 						admin = connection != null && connection.isAuthorized() &&
 										isAdmin(connection.getUserId());
 						if (admin) {
-							log.finer("Processing admin command: " + pc.toString());
+                			if (log.isLoggable(Level.FINER)) {
+                				log.finer("Processing admin command: " + pc.toString());
+                            }
 							int hashIdx = strCommand.indexOf('#');
 							String scriptId = strCommand.substring(hashIdx + 1);
 							AdminCommandIfc com = adminCommands.get(scriptId);
@@ -779,10 +857,12 @@ public class SessionManager extends AbstractMessageReceiver
 					}
 					if (!admin) {
 						try {
-							log.finer("Command rejected non-admin detected: " +
+                			if (log.isLoggable(Level.FINER)) {
+                				log.finer("Command rejected non-admin detected: " +
 											(connection != null ? (connection.isAuthorized() + ": " +
 											connection.getUserId())
 											: "null"));
+                            }
 							addOutPacket(Authorization.FORBIDDEN.getResponseMessage(pc,
 											"Only Administrator can call the command.", true));
 						} catch (Exception e) {
@@ -823,7 +903,9 @@ public class SessionManager extends AbstractMessageReceiver
 		LinkedList<Packet> packets =
       (LinkedList<Packet>)conn.getSessionData(SESSION_PACKETS);
 		if (remote_smId == null) {
-			log.finest("No address for remote SM to redirect packets, processing locally.");
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("No address for remote SM to redirect packets, processing locally.");
+			}
 			if (packets != null) {
 				Packet sess_pack = null;
 				while (((sess_pack = packets.poll()) != null) &&
@@ -849,7 +931,9 @@ public class SessionManager extends AbstractMessageReceiver
 	}
 
 	protected void closeConnection(String connectionId, boolean closeOnly) {
-		log.finer("Stream closed from: " + connectionId);
+		if (log.isLoggable(Level.FINER)) {
+			log.finer("Stream closed from: " + connectionId);
+		}
 		++closedConnections;
 		XMPPResourceConnection connection = connectionsByFrom.remove(connectionId);
 		if (connection != null) {
@@ -871,27 +955,35 @@ public class SessionManager extends AbstractMessageReceiver
 			if (conn.isAuthorized()
 				|| (conn.getConnectionStatus() == ConnectionStatus.TEMP)) {
 				String userId = conn.getUserId();
-				log.info("Closing connection for: " + userId);
+				if (log.isLoggable(Level.FINE)) {
+					log.fine("Closing connection for: " + userId);
+				}
 				XMPPSession session = conn.getParentSession();
 				if (session != null) {
-					log.info("Found parent session for: " + userId);
+					if (log.isLoggable(Level.FINE)) {
+						log.fine("Found parent session for: " + userId);
+					}
 					if (session.getActiveResourcesSize() <= 1) {
 						session = sessionsByNodeId.remove(userId);
 						if (session == null) {
 							log.info("UPS can't remove session, not found in map: " + userId);
 						} else {
-							log.finer("Number of user sessions: " + sessionsByNodeId.size());
+							if (log.isLoggable(Level.FINER)) {
+								log.finer("Number of user sessions: " + sessionsByNodeId.size());
+							}
 						} // end of else
 						auth_repository.logout(userId);
 					} else {
-						StringBuilder sb = new StringBuilder();
-						for (XMPPResourceConnection res_con: session.getActiveResources()) {
-							sb.append(", res=" + res_con.getResource() + " ("
-								+ res_con.getConnectionStatus() + ")");
+						if (log.isLoggable(Level.FINER)) {
+							StringBuilder sb = new StringBuilder();
+							for (XMPPResourceConnection res_con: session.getActiveResources()) {
+								sb.append(", res=" + res_con.getResource() + " ("
+									+ res_con.getConnectionStatus() + ")");
+							}
+							log.finer("Number of connections is "
+								+ session.getActiveResourcesSize() + " for the user: " + userId
+								+ sb.toString());
 						}
-						log.finer("Number of connections is "
-							+ session.getActiveResourcesSize() + " for the user: " + userId
-							+ sb.toString());
 					} // end of else
 				} // end of if (session.getActiveResourcesSize() == 0)
 			}
@@ -1092,7 +1184,9 @@ public class SessionManager extends AbstractMessageReceiver
 // 				}
 			}
 			if (plugin_settings.size() > 0) {
-				log.finest(plugin_settings.toString());
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest(plugin_settings.toString());
+				}
 				plugin_config.put(comp_id, plugin_settings);
 			}
 		} // end of for (String comp_id: plugins)
@@ -1169,7 +1263,9 @@ public class SessionManager extends AbstractMessageReceiver
 		if (session == null) {
 			session = new XMPPSession(JIDUtils.getNodeNick(userId));
 			sessionsByNodeId.put(userId, session);
-			log.finest("Created new XMPPSession for: " + userId);
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Created new XMPPSession for: " + userId);
+			}
 		} else {
 			// Check all other connections whether they are still alive....
 			List<XMPPResourceConnection> connections = session.getActiveResources();
@@ -1187,8 +1283,10 @@ public class SessionManager extends AbstractMessageReceiver
 
 	@Override
 	public void handleLogin(String userName, XMPPResourceConnection conn) {
-		log.finest("handleLogin called for: " + userName + ", conn_id: " +
-						conn.getConnectionId());
+		if (log.isLoggable(Level.FINEST)) {
+    		log.finest("handleLogin called for: " + userName + ", conn_id: " +
+        					conn.getConnectionId());
+        }
 		String userId = JIDUtils.getNodeID(userName, conn.getDomain());
 		registerNewSession(userId, conn);
 	}
@@ -1220,11 +1318,15 @@ public class SessionManager extends AbstractMessageReceiver
 					} // end of if (discoFeatures != null)
 				}
 			}
-			log.finest("Found disco info: " + 
+			if (log.isLoggable(Level.FINEST)) {
+    			log.finest("Found disco info: " +
 							(query != null ? query.toString() : null));
+            }
 			return query;
 		}
-		log.finest("Not found disco info for node: " + node + ", jid: " + jid);
+		if (log.isLoggable(Level.FINEST)) {
+    		log.finest("Not found disco info for node: " + node + ", jid: " + jid);
+        }
 		return null;
 	}
 
@@ -1243,8 +1345,10 @@ public class SessionManager extends AbstractMessageReceiver
 	@Override
 	public List<Element> getDiscoItems(String node, String jid) {
 		List<Element> result = serviceEntity.getDiscoItems(node, jid);
-		log.finest("Found disco items: " + 
+		if (log.isLoggable(Level.FINEST)) {
+    		log.finest("Found disco items: " +
 						(result != null ? result.toString() : null));
+        }
 		return result;
 //		if (jid != null && getName().equals(JIDUtils.getNodeNick(jid))) {
 //			return serviceEntity.getDiscoItems(node, jid);
@@ -1270,13 +1374,13 @@ public class SessionManager extends AbstractMessageReceiver
 			ProcessorThread proc = procent.getValue();
 			if (proc.getName().equals("roster-presence")) {
 				stats.add(new StatRecord(getName(), "Processor: " + procent.getKey(),
-								"String", "Queue: " + proc.in_queue.totalSize() +
+								"String", "Queue: " + proc.getTotalQueueSize() +
 								", AvTime: " + proc.cntAverageTime +
 								", Runs: " + proc.cntRuns + ", Lost: " + proc.dropedPackets,
 								Level.INFO));
 			} else {
 				stats.add(new StatRecord(getName(), "Processor: " + procent.getKey(),
-								"String", "Queue: " + proc.in_queue.totalSize() +
+								"String", "Queue: " + proc.getTotalQueueSize() +
 								", AvTime: " + proc.cntAverageTime +
 								", Runs: " + proc.cntRuns + ", Lost: " + proc.dropedPackets,
 								Level.FINEST));
@@ -1294,58 +1398,115 @@ public class SessionManager extends AbstractMessageReceiver
 
 		private boolean stopped = false;
 		private XMPPProcessorIfc processor = null;
-		private LinkedList<Packet> local_results = new LinkedList<Packet>();
-		private PriorityQueue<QueueItem> in_queue =
-						new PriorityQueue<QueueItem>(Priority.values().length,
-						maxQueueSize/maxPluginsNo);
-//		private LinkedBlockingQueue<QueueItem> in_queue =
-//			new LinkedBlockingQueue<QueueItem>(maxQueueSize/maxPluginsNo);
-		private long cntRuns = 0;
-		private long cntAverageTime = 0;
-		private long dropedPackets = 0;
+		private LinkedList<ProcessorWorkerThread> workerThreads = new LinkedList<ProcessorWorkerThread>();
+		private PriorityQueue<QueueItem> nullQueue = new PriorityQueue<QueueItem>(Priority.values().length, maxQueueSize/maxPluginsNo);
+		private ArrayList<PriorityQueue<QueueItem>> queues = new ArrayList<PriorityQueue<QueueItem>>();
+
+		private int numQueues = 1;
+		private int numWorkerThreads = 2;
+
+        private long cntRuns = 0;
+        private long cntAverageTime = 0;
+        private long dropedPackets = 0;
 
 		public ProcessorThread(XMPPProcessorIfc processor) {
 			super();
 			this.processor = processor;
-			if (processor.id().equals("roster-presence")) {
-				in_queue = new PriorityQueue<QueueItem>(Priority.values().length,
-								10*maxQueueSize);
-				log.finest("Setting roster presence queue to: " + (10*maxQueueSize));
-			}
 		}
 
+        private int getTotalQueueSize() {
+            int ret = 0;
+            for (PriorityQueue<QueueItem> pq : queues) {
+                ret += pq.totalSize();
+            }
+            ret += nullQueue.totalSize();
+            return ret;
+        }
+
 		public boolean addItem(Packet packet, XMPPResourceConnection conn) {
+			boolean ret = false;
 			QueueItem item = new QueueItem();
-			item.packet = packet;
 			item.conn = conn;
-			return in_queue.offer(item, packet.getPriority().ordinal());
+			item.packet = packet;
+			if (null != conn) {
+				ret = queues.get(Math.abs(conn.hashCode() % numQueues)).offer(item, packet.getPriority().ordinal());
+			} else {
+				ret = nullQueue.offer(item, packet.getPriority().ordinal());
+			}
+			return ret;
 		}
 
 		@Override
 		public void run() {
-			QueueItem item = null;
+			if ("roster-presence".equals(processor.id())) {
+				numQueues = 16;
+				numWorkerThreads = 2;
+			} else if ("jabber:iq:auth".equals(processor.id())) {
+				numQueues = 4;
+				numWorkerThreads = 2;
+			}
+
+			for (int i = 0; i < numQueues; i++) {
+				queues.add(new PriorityQueue<QueueItem>(Priority.values().length, maxQueueSize/maxPluginsNo));
+				for (int j = 0; j < numWorkerThreads; j++) {
+					ProcessorWorkerThread t = new ProcessorWorkerThread(queues.get(i));
+					t.setDaemon(true);
+					t.setName(processor.id() + " Queue " + i + " Worker " + j);
+					t.start();
+					workerThreads.add(t);
+				}
+			}
+			ProcessorWorkerThread t = new ProcessorWorkerThread(nullQueue);
+			t.setDaemon(true);
+			t.setName(processor.id() + " Null Queue Worker");
+			t.start();
+			workerThreads.add(t);
 			while (! stopped) {
 				try {
-					item = in_queue.take();
-					long start = System.currentTimeMillis();
-					processor.process(item.packet, item.conn, naUserRepository,
-									local_results, plugin_config.get(processor.id()));
-					if (item.conn != null) {
-						setPermissions(item.conn, local_results);
-					}
-					addOutPackets(item.packet, item.conn, local_results);
-					++cntRuns;
-					cntAverageTime =
-									(cntAverageTime + (System.currentTimeMillis()-start))/2;
-				} catch (PacketErrorTypeException e) {
-					log.info("Already error packet, ignoring: " + item.packet.toString());
-				} catch (Exception e) {
-					log.log(Level.SEVERE, "Exception during packet processing: "
-						+ item.packet.toString(), e);
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
 				}
 			}
 		}
 
+		private class ProcessorWorkerThread extends Thread {
+			private LinkedList<Packet> local_results = new LinkedList<Packet>();
+			private PriorityQueue<QueueItem> queue = null;
+
+			private ProcessorWorkerThread(PriorityQueue<QueueItem> queue) {
+				this.queue = queue;
+			}
+
+			public void run() {
+				while (! stopped) {
+					QueueItem item = null;
+					try {
+                        //XXX - not very nice, getting the current time can be slooooooow
+                    	long start = System.currentTimeMillis();
+						item = queue.take();
+						if (item.conn != null) {
+							synchronized (item.conn) {
+								processor.process(item.packet, item.conn, naUserRepository,
+										local_results, plugin_config.get(processor.id()));
+								setPermissions(item.conn, local_results);
+							}
+						} else {
+							processor.process(item.packet, null, naUserRepository,
+									local_results, plugin_config.get(processor.id()));
+						}
+    					addOutPackets(local_results);
+    					++cntRuns;
+        				cntAverageTime =
+                    					(cntAverageTime + (System.currentTimeMillis()-start))/2;
+					} catch (PacketErrorTypeException e) {
+                        log.info("Already error packet, ignoring: " + item.packet.toString());
+                    } catch (Exception e) {
+						log.log(Level.SEVERE, "Exception during packet processing: "
+							+ item.packet.toString(), e);
+					}
+				}
+			}
+		}
 		private void packetDroped() {
 			++dropedPackets;
 		}
@@ -1378,16 +1539,20 @@ public class SessionManager extends AbstractMessageReceiver
 
 		@Override
 		public void timeOutExpired(Packet packet) {
-			log.finer("Connection checker timeout expired, closing connection: " + 
+   			if (log.isLoggable(Level.FINER)) {
+    			log.finer("Connection checker timeout expired, closing connection: " +
 							packet.getTo());
+            }
 			closeConnection(packet.getTo(), false);
 		}
 
 		@Override
 		public void responseReceived(Packet packet, Packet response) {
 			if (response.getType() == StanzaType.error) {
-				log.finer("Connection checker error received, closing connection: " +
+    			if (log.isLoggable(Level.FINER)) {
+    				log.finer("Connection checker error received, closing connection: " +
 							packet.getTo());
+                }
 				// The connection is not longer active, closing the user session here.
 				closeConnection(packet.getTo(), false);
 			}

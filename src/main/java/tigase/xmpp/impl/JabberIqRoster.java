@@ -245,7 +245,9 @@ public abstract class JabberIqRoster {
 				results.offer(new Packet(pres));
 			}
 			Element new_buddy = roster_util.getBuddyItem(session, buddy);
-			log.finest("1. New Buddy: " + new_buddy.toString());
+			if (log.isLoggable(Level.FINEST)) {
+    			log.finest("1. New Buddy: " + new_buddy.toString());
+            }
       if (roster_util.getBuddySubscription(session, buddy) == null) {
 				roster_util.setBuddySubscription(session, SubscriptionType.none, buddy);
       } // end of if (getBuddySubscription(session, buddy) == null)
@@ -257,7 +259,9 @@ public abstract class JabberIqRoster {
 				}
 			}
 			new_buddy = roster_util.getBuddyItem(session, buddy);
-			log.finest("2. New Buddy: " + new_buddy.toString());
+			if (log.isLoggable(Level.FINEST)) {
+    			log.finest("2. New Buddy: " + new_buddy.toString());
+            }
       results.offer(packet.okResult((String)null, 0));
       roster_util.updateBuddyChange(session, results, new_buddy);
     } // end of else

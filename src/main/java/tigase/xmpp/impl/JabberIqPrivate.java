@@ -22,6 +22,7 @@
 package tigase.xmpp.impl;
 
 import java.util.logging.Logger;
+import java.util.logging.Level;
 import java.util.Arrays;
 import java.util.Queue;
 import java.util.List;
@@ -127,8 +128,10 @@ public class JabberIqPrivate extends XMPPProcessor implements XMPPProcessorIfc {
 					case get:
 						String priv = session.getData(PRIVATE_KEY,
 							elem.getName()+elem.getXMLNS(), null);
-						log.finest("Loaded private data for key: "
-							+ elem.getName() + ": " + priv);
+        				if (log.isLoggable(Level.FINEST)) {
+        					log.finest("Loaded private data for key: "
+                                + elem.getName() + ": " + priv);
+                        }
 						if (priv != null) {
 							results.offer(parseXMLData(priv, packet));
 							break;
@@ -136,9 +139,11 @@ public class JabberIqPrivate extends XMPPProcessor implements XMPPProcessorIfc {
 						results.offer(packet.okResult((String)null, 2));
 						break;
 					case set:
-						log.finest("Saving private data: " + elem.toString());
-						session.setData(PRIVATE_KEY,
-							elem.getName()+elem.getXMLNS(), elem.toString());
+        				if (log.isLoggable(Level.FINEST)) {
+        					log.finest("Saving private data: " + elem.toString());
+                        }
+                        session.setData(PRIVATE_KEY,
+    					elem.getName()+elem.getXMLNS(), elem.toString());
 						results.offer(packet.okResult((String)null, 0));
 						break;
 					case result:

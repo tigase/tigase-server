@@ -183,7 +183,9 @@ public class StoredProcedures {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
 		try {
 			String result = null;
-			log.finest("function tigGetDBProperty('" + key + "') called");
+			if (log.isLoggable(Level.FINEST)) {
+    			log.finest("function tigGetDBProperty('" + key + "') called");
+            }
 
 			PreparedStatement ps = conn.prepareStatement("select pval from tig_pairs, tig_users where (pkey = ?) AND (user_id = 'db-properties') AND (tig_pairs.uid = tig_users.uid)");
 			ResultSet rs;
@@ -279,7 +281,9 @@ public class StoredProcedures {
 	public static void tigPutDBProperty(final String key, final String value) throws SQLException {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
 		try {
-			log.finest("procedure tigPutDBProperty('" + key + "', '" + value + "') called");
+			if (log.isLoggable(Level.FINEST)) {
+    			log.finest("procedure tigPutDBProperty('" + key + "', '" + value + "') called");
+            }
 			int result;
 			if (tigGetDBProperty(key) != null) {
 				PreparedStatement ps = conn.prepareStatement("update tig_pairs set tig_pairs.pval = ? where (pkey = ?) and uid = (select uid from tig_users where tig_users.user_id = 'db-properties')");

@@ -174,9 +174,13 @@ public class BoshConnectionManager extends ClientConnectionManager
 		BoshIOService serv = (BoshIOService)srv;
 		Packet p = null;
 		while ((p = serv.getReceivedPackets().poll()) != null) {
-			log.finer("Processing packet: " + p.getElemName()
-				+ ", type: " + p.getType());
-			log.finest("Processing socket data: " + p.toString());
+			if (log.isLoggable(Level.FINER)) {
+				log.finer("Processing packet: " + p.getElemName()
+					+ ", type: " + p.getType());
+			}
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Processing socket data: " + p.toString());
+			}
 			String sid_str = p.getAttribute(SID_ATTR);
 			UUID sid = null;
 			try {
@@ -289,12 +293,16 @@ public class BoshConnectionManager extends ClientConnectionManager
 	}
 
 	public void xmppStreamClosed(BoshIOService serv) {
-		log.finer("Stream closed.");
+		if (log.isLoggable(Level.FINER)) {
+			log.finer("Stream closed.");
+		}
 	}
 
 	public String xmppStreamOpened(BoshIOService serv,
 		Map<String, String> attribs) {
-		log.fine("Ups, what just happened? Stream open. Hey, this is a Bosh connection manager. c2s and s2s are not supported on the same port as Bosh yet.");
+		if (log.isLoggable(Level.FINE)) {
+			log.fine("Ups, what just happened? Stream open. Hey, this is a Bosh connection manager. c2s and s2s are not supported on the same port as Bosh yet.");
+		}
 		return "<?xml version='1.0'?><stream:stream"
 				+ " xmlns='jabber:client'"
 				+ " xmlns:stream='http://etherx.jabber.org/streams'"

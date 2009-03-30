@@ -24,6 +24,7 @@ package tigase.xmpp.impl;
 import java.util.Queue;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 import tigase.conf.Configurable;
 import tigase.server.Packet;
 import tigase.server.Command;
@@ -82,7 +83,9 @@ public class JabberIqStats extends XMPPProcessor
 		if (session == null) { return; }
 
 		try {
-			log.finest("Received packet: " + packet.getStringData());
+			if (log.isLoggable(Level.FINEST)) {
+    			log.finest("Received packet: " + packet.getStringData());
+            }
 
 			if (packet.isCommand()) {
 				if (packet.getCommand() == Command.GETSTATS
@@ -97,7 +100,9 @@ public class JabberIqStats extends XMPPProcessor
 					Packet result = new Packet(iq);
 					result.setTo(session.getConnectionId(packet.getElemTo()));
 					results.offer(result);
-					log.finest("Sending result: " + result.getStringData());
+    				if (log.isLoggable(Level.FINEST)) {
+    					log.finest("Sending result: " + result.getStringData());
+                    }
 					return;
 				} else {
 					return;
@@ -122,7 +127,9 @@ public class JabberIqStats extends XMPPProcessor
 					result.getElement().setAttribute("oldto", oldto);
 				}
 				results.offer(result);
-				log.finest("Sending result: " + result.getStringData());
+   				if (log.isLoggable(Level.FINEST)) {
+    				log.finest("Sending result: " + result.getStringData());
+                }
 				return;
 			}
 
@@ -133,7 +140,9 @@ public class JabberIqStats extends XMPPProcessor
 				result.setTo(session.getConnectionId(packet.getElemTo()));
 				result.setFrom(packet.getTo());
 				results.offer(result);
-				log.finest("Sending result: " + result.getStringData());
+   				if (log.isLoggable(Level.FINEST)) {
+    				log.finest("Sending result: " + result.getStringData());
+                }
 			} else {
 				// This is message to some other client so I need to
 				// set proper 'from' attribute whatever it is set to now.
@@ -146,7 +155,9 @@ public class JabberIqStats extends XMPPProcessor
 // 				el_res.setAttribute("from", session.getJID());
 				Packet result = new Packet(el_res);
 				results.offer(result);
-				log.finest("Sending result: " + result.getStringData());
+   				if (log.isLoggable(Level.FINEST)) {
+    				log.finest("Sending result: " + result.getStringData());
+                }
 			} // end of else
 		} catch (NotAuthorizedException e) {
       log.warning(

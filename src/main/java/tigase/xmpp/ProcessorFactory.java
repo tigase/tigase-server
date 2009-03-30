@@ -82,7 +82,9 @@ public class ProcessorFactory {
       for (String elm : elems) {
         sb.append(elm);
       } // end of for ()
-      log.finest("Loaded XMPPProcessors:\n" + sb.toString());
+		if (log.isLoggable(Level.FINEST)) {
+	      log.finest("Loaded XMPPProcessors:\n" + sb.toString());
+		 }
 
     } catch (Exception e) {
 			System.out.println("Can not load XMPPProcessor implementations");

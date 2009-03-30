@@ -22,6 +22,7 @@
 package tigase.server.bosh;
 
 import java.util.logging.Logger;
+import java.util.logging.Level;
 import java.io.IOException;
 import java.util.UUID;
 import tigase.xmpp.XMPPIOService;
@@ -74,7 +75,9 @@ public class BoshIOService extends XMPPIOService {
 			sb.append(SERVER + EOL);
 			sb.append(EOL);
 			sb.append(data);
-			log.finest("Writing to socket:\n" + sb.toString());
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Writing to socket:\n" + sb.toString());
+			}
 			super.writeRawData(sb.toString());
 		} else {
 			super.writeRawData(data);
@@ -100,7 +103,9 @@ public class BoshIOService extends XMPPIOService {
 		sb.append(SERVER + EOL);
 		sb.append(EOL);
 		sb.append(code);
-		log.finest("Writing to socket:\n" + sb.toString());
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Writing to socket:\n" + sb.toString());
+		}
 		super.writeRawData(sb.toString());
 		stop();
 	}

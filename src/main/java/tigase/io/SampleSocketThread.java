@@ -120,7 +120,9 @@ public class SampleSocketThread extends Thread {
 					if ((sk.readyOps() & SelectionKey.OP_ACCEPT) != 0) {
 						ServerSocketChannel nextReady = (ServerSocketChannel)sk.channel();
 						SocketChannel sc = nextReady.accept();
-						log.finer("Registered new client socket: "+sc);
+            			if (log.isLoggable(Level.FINER)) {
+            				log.finer("Registered new client socket: "+sc);
+                        }
 						handler.handleSocketAccept(sc);
 					}
 					if ((sk.readyOps() & SelectionKey.OP_CONNECT) != 0) {

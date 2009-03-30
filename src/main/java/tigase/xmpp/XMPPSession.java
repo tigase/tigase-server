@@ -116,15 +116,19 @@ public class XMPPSession {
 	 * @param conn
 	 */
 	public synchronized void addResourceConnection(XMPPResourceConnection conn) {
-		log.finest("Adding resource connection for username : " + username
-			+ ", id: " + conn.getConnectionId());
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Adding resource connection for username : " + username
+				+ ", id: " + conn.getConnectionId());
+			}
 		XMPPResourceConnection old_res = getResourceForResource(conn.getResource());
 		// If they are equal, just ignore this. It may happen only for USER_STATUS
 		// command where the user session is artificialy created....
 		if (old_res != conn) {
 			if (old_res != null) {
-				log.finest("Found old resource connection, id: " +
-								old_res.getConnectionId());
+				if (log.isLoggable(Level.FINEST)) {
+    				log.finest("Found old resource connection, id: " +
+        							old_res.getConnectionId());
+                }
 				try { old_res.logout(); } catch (Exception e) {
 					log.log(Level.INFO,
 						"Exception during closing old connection, ignoring.", e);
@@ -138,14 +142,17 @@ public class XMPPSession {
 				activeResources.add(conn);
 				conn.setParentSession(this);
 			}
-			log.finest("Number of active resources is: " + activeResources.size());
-			if (activeResources.size() > 1) {
-				int i = 0;
-				for (XMPPResourceConnection res: activeResources) {
-					log.finest("RES " + (++i) + ": " + res.getResource() + ", "
-						+ res.getConnectionId());
-				} // end of for (XMPPResourceConnection res: activeResources)
-			} // end of if (activeResources.size() > 1)
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Number of active resources is: " + activeResources.size());
+			
+				if (activeResources.size() > 1) {
+					int i = 0;
+					for (XMPPResourceConnection res: activeResources) {
+						log.finest("RES " + (++i) + ": " + res.getResource() + ", "
+							+ res.getConnectionId());
+					} // end of for (XMPPResourceConnection res: activeResources)
+				} // end of if (activeResources.size() > 1)
+			}
 		}
 	}
 
@@ -166,8 +173,10 @@ public class XMPPSession {
 	public XMPPResourceConnection getResourceForResource(final String resource) {
 		if (resource != null && resource.length() > 0) {
 			for (XMPPResourceConnection conn: activeResources) {
-				log.finest("Resource checking: " + conn.getResource() +
+    			if (log.isLoggable(Level.FINEST)) {
+        			log.finest("Resource checking: " + conn.getResource() +
 								", connectionID: " + conn.getConnectionId());
+                }
 				if (resource.equalsIgnoreCase(conn.getResource())) {
 					return conn;
 				} // end of if (resource.equals(conn.getResource()))
@@ -205,22 +214,27 @@ public class XMPPSession {
 	}
 
 	public synchronized XMPPResourceConnection getResourceConnection(final String jid) {
-
-		log.finest("Called for: " + jid);
+		if (log.isLoggable(Level.FINEST)) {
+    		log.finest("Called for: " + jid);
+        }
 		if (activeResources.size() == 0) {
 			return null;
 		} // end of if (activeResources.size() == 0)
 
 		if (activeResources.size() == 1) {
 			XMPPResourceConnection result = activeResources.get(0);
-			log.finest("Only 1 active resource: " + result.getResource());
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Only 1 active resource: " + result.getResource());
+			}
 			return result;
 		} // end of if (activeResources.size() == 1)
 
 		XMPPResourceConnection conn = getResourceForJID(jid);
 		if (conn != null) {
-			log.finest("Number of resources: " + activeResources.size()
-				+ ", got resource for jid: " + jid);
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Number of resources: " + activeResources.size()
+					+ ", got resource for jid: " + jid);
+				}
 			return conn;
 		} // end of if (conn != null)
 

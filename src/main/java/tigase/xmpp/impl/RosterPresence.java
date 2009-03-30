@@ -23,6 +23,7 @@ package tigase.xmpp.impl;
 import java.util.Queue;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 import tigase.server.Packet;
 import tigase.xml.Element;
 import tigase.xmpp.XMPPProcessor;
@@ -81,7 +82,9 @@ public class RosterPresence  extends XMPPProcessor
 		throws XMPPException {
 
 		if (session == null) {
-			log.fine("Session is null, ignoring packet: " + packet.toString());
+			if (log.isLoggable(Level.FINE)) {
+				log.fine("Session is null, ignoring packet: " + packet.toString());
+			}
 			return;
 		} // end of if (session == null)
 

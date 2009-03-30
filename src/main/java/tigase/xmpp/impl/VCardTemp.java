@@ -24,6 +24,7 @@ package tigase.xmpp.impl;
 import java.util.Queue;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 import tigase.server.Packet;
 import tigase.xml.Element;
 import tigase.xml.SimpleParser;
@@ -168,10 +169,14 @@ public class VCardTemp extends XMPPProcessor implements XMPPProcessorIfc {
 							elvCard = packet.getElement().getChild(ELEMENTS[1]);
 						}
 						if (elvCard != null) {
-							log.finer("Adding vCard: " + elvCard.toString());
+                            if (log.isLoggable(Level.FINER)) {
+                            	log.finer("Adding vCard: " + elvCard.toString());
+                            }
 							session.setPublicData(ID, VCARD_KEY, elvCard.toString());
 						} else {
-							log.finer("Removing vCard");
+                            if (log.isLoggable(Level.FINER)) {
+                            	log.finer("Removing vCard");
+                            }
 							session.removePublicData(ID, VCARD_KEY);
 						} // end of else
 						results.offer(packet.okResult((String)null, 0));

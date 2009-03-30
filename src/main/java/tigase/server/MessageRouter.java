@@ -106,7 +106,9 @@ public class MessageRouter extends AbstractMessageReceiver {
 			return;
 		}
 
-		log.finest("Command received: " + packet.getStringData());
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Command received: " + packet.getStringData());
+		}
 		switch (packet.getCommand()) {
 		case OTHER:
 			if (packet.getStrCommand() != null) {
@@ -140,7 +142,9 @@ public class MessageRouter extends AbstractMessageReceiver {
 		LinkedHashSet<ServerComponent> comps = new LinkedHashSet<ServerComponent>();
 		for (MessageReceiver mr: receivers.values()) {
 			if (mr.isInRegexRoutings(id)) {
-				log.finest("Found receiver: " + mr.getName());
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("Found receiver: " + mr.getName());
+				}
 				comps.add(mr);
 			}
 		}
@@ -249,7 +253,9 @@ public class MessageRouter extends AbstractMessageReceiver {
 						packet.getType() == StanzaType.get &&
 						((comp != null && !(comp instanceof DisableDisco)) ||
 						isLocalDomain(packet.getElemTo()))) {
-			log.finest("Processing disco query by: " + getComponentId());
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Processing disco query by: " + getComponentId());
+			}
 			Queue<Packet> results = new LinkedList<Packet>();
 			processDiscoQuery(packet, results);
 			if (results.size() > 0) {
@@ -263,7 +269,9 @@ public class MessageRouter extends AbstractMessageReceiver {
 		String id =  JIDUtils.getNodeID(packet.getTo());
 		comp = getLocalComponent(id);
 		if (comp != null) {
-			log.finest("Packet is processing by: " + comp.getComponentId());
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Packet is processing by: " + comp.getComponentId());
+			}
 			Queue<Packet> results = new LinkedList<Packet>();
 			if (comp == this) {
 				processPacketMR(packet, results);
@@ -309,8 +317,10 @@ public class MessageRouter extends AbstractMessageReceiver {
 		if (comps != null) {
 			Queue<Packet> results = new LinkedList<Packet>();
 			for (ServerComponent serverComponent : comps) {
-				log.finest("Packet processed by: " + 
+				if (log.isLoggable(Level.FINEST)) {
+    				log.finest("Packet processed by: " +
 								serverComponent.getComponentId());
+                }
 				serverComponent.processPacket(packet, results);
 				if (results.size() > 0) {
 					for (Packet res : results) {
@@ -321,7 +331,9 @@ public class MessageRouter extends AbstractMessageReceiver {
 				}
 			}
 		} else {
-			log.finest("There is no component for the packet, sending it back");
+			if (log.isLoggable(Level.FINEST)) {
+    			log.finest("There is no component for the packet, sending it back");
+            }
 			try {
 				addOutPacketNB(
 					Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet,
@@ -415,8 +427,10 @@ public class MessageRouter extends AbstractMessageReceiver {
     log.info("Adding component: " + component.getClass().getSimpleName());
     for (ComponentRegistrator registr : registrators.values()) {
       if (registr != component) {
+			if (log.isLoggable(Level.FINER)) {
 				log.finer("Adding: " + component.getName() + " component to "
 					+ registr.getName() + " registrator.");
+			}
 				registr.addComponent(component);
       } // end of if (reg != component)
     } // end of for ()
@@ -497,7 +511,9 @@ public class MessageRouter extends AbstractMessageReceiver {
 
       String[] msgrcv_names = conf.getMsgRcvNames();
       for (String name: msgrcv_names) {
-				log.finer("Loading and registering message receiver: " + name);
+				if (log.isLoggable(Level.FINER)) {
+					log.finer("Loading and registering message receiver: " + name);
+				}
 				ServerComponent mr = tmp_rec.remove(name);
 				String cls_name =
 					(String)props.get(MSG_RECEIVERS_PROP_KEY + name + ".class");
@@ -597,8 +613,10 @@ public class MessageRouter extends AbstractMessageReceiver {
 					for (XMPPService comp: xmppServices.values()) {
 						//	if (localDomain || (nick != null && comp.getName().equals(nick))) {
 						List<Element> items =	comp.getDiscoItems(node, jid);
-						log.finest("DiscoItems processed by: " + comp.getComponentId()
-							+ ", items: " + (items == null ? null : items.toString()));
+						if (log.isLoggable(Level.FINEST)) {
+							log.finest("DiscoItems processed by: " + comp.getComponentId()
+								+ ", items: " + (items == null ? null : items.toString()));
+						}
 						if (items != null && items.size() > 0) {
 							query.addChildren(items);
 						}
@@ -607,8 +625,10 @@ public class MessageRouter extends AbstractMessageReceiver {
 					ServerComponent comp = getLocalComponent(packet.getElemTo());
 					if (comp != null && comp instanceof XMPPService) {
 						List<Element> items = ((XMPPService)comp).getDiscoItems(node, jid);
-						log.finest("DiscoItems processed by: " + comp.getComponentId()
-							+ ", items: " + (items == null ? null : items.toString()));
+						if (log.isLoggable(Level.FINEST)) {
+							log.finest("DiscoItems processed by: " + comp.getComponentId()
+								+ ", items: " + (items == null ? null : items.toString()));
+						}
 						if (items != null && items.size() > 0) {
 							query.addChildren(items);
 						}
@@ -621,7 +641,9 @@ public class MessageRouter extends AbstractMessageReceiver {
 
 	public Element getDiscoInfo(String node, String jid) {
 		Element query = serviceEntity.getDiscoInfo(null);
-		log.finest("Returing disco-info: " + query.toString());
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Returing disco-info: " + query.toString());
+		}
 		return query;
 	}
 

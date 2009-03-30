@@ -357,7 +357,9 @@ public class Gateway extends AbstractMessageReceiver
 					pres_el.addChild(show);
 				}
 				Packet presence = new Packet(pres_el);
-				log.finest("Sending out presence: " + presence.toString());
+				if (log.isLoggable(Level.FINEST)) {
+    				log.finest("Sending out presence: " + presence.toString());
+                }
 				addOutPacket(presence);
 			}
 			if (packet.getType() == StanzaType.subscribe) {
@@ -381,7 +383,9 @@ public class Gateway extends AbstractMessageReceiver
 			}
 			if (packet.getType() == StanzaType.unsubscribe) {
 				Packet presence = packet.swapElemFromTo(StanzaType.unsubscribe);
-				log.finest("Sending out presence: " + presence.toString());
+				if (log.isLoggable(Level.FINEST)) {
+    				log.finest("Sending out presence: " + presence.toString());
+                }
 				addOutPacket(presence);
 			}
 			if (packet.getType() == StanzaType.unsubscribed) {
@@ -533,8 +537,10 @@ public class Gateway extends AbstractMessageReceiver
 					log.log(Level.WARNING, "Error initializing gateway connection", e);
 				}
 			} else {
-				log.finer("Gateway not connected, sending packet back: "
-					+ packet.toString());
+    			if (log.isLoggable(Level.FINER)) {
+    				log.finer("Gateway not connected, sending packet back: "
+        				+ packet.toString());
+                }
 				addOutPacket(Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet,
 						"Gateway is not connected.", true));
 			}
@@ -579,7 +585,9 @@ public class Gateway extends AbstractMessageReceiver
 					new String[] {"to", "from", "type"},
 					new String[] {username, from, "unavailable"});
 				Packet presence = new Packet(pres_el);
-				log.finest("Sending out presence: " + presence.toString());
+				if (log.isLoggable(Level.FINEST)) {
+    				log.finest("Sending out presence: " + presence.toString());
+                }
 				addOutPacket(presence);
 			}
 		}
@@ -619,7 +627,9 @@ public class Gateway extends AbstractMessageReceiver
 					pres_el.addChild(show);
 				}
 				Packet presence = new Packet(pres_el);
-				log.finest("Sending out presence: " + presence.toString());
+				if (log.isLoggable(Level.FINEST)) {
+    				log.finest("Sending out presence: " + presence.toString());
+                }
 				addOutPacket(presence);
 			}
 		}
@@ -662,7 +672,9 @@ public class Gateway extends AbstractMessageReceiver
 				Packet presence = new Packet(new Element(PRESENCE_ELNAME,
 						new String[] {"to", "from", "type"},
 						new String[] {username, from, "subscribe"}));
-				log.finest("Sending out presence: " + presence.toString());
+   				if (log.isLoggable(Level.FINEST)) {
+    				log.finest("Sending out presence: " + presence.toString());
+                }
 				addOutPacket(presence);
 			}
 		}
@@ -702,7 +714,9 @@ public class Gateway extends AbstractMessageReceiver
 				pres_el.addChild(show);
 			}
 			Packet presence = new Packet(pres_el);
-			log.finest("Sending out presence: " + presence.toString());
+			if (log.isLoggable(Level.FINEST)) {
+    			log.finest("Sending out presence: " + presence.toString());
+            }
 			addOutPacket(presence);
 		}
 	}

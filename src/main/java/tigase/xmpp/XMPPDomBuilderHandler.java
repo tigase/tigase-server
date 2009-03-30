@@ -122,10 +122,13 @@ public class XMPPDomBuilderHandler implements SimpleHandler {
 				// Exit the loop as soon as we reach end of attributes set
 				if (attr_names[i] == null) { break;	}
 				if (attr_names[i].toString().startsWith("xmlns:")) {
+					//TODO should use a StringCache instead of intern() to avoid potential DoS by exhausting permgen
 					namespaces.put(attr_names[i].substring("xmlns:".length(),
-							attr_names[i].length()),
+							attr_names[i].length()).intern(),
 						attr_values[i].toString());
-					log.finest("Namespace found: " + attr_values[i].toString());
+					if (log.isLoggable(Level.FINEST)) {
+						log.finest("Namespace found: " + attr_values[i].toString());
+					}
 				} // end of if (att_name.startsWith("xmlns:"))
 			} // end of for (String att_name : attnames)
 		} // end of if (attr_names != null)
@@ -152,7 +155,9 @@ public class XMPPDomBuilderHandler implements SimpleHandler {
 		int idx = tmp_name.indexOf(':');
 		if (idx > 0) {
 			tmp_name_prefix = tmp_name.substring(0, idx);
-			log.finest("Found prefixed element name, prefix: " + tmp_name_prefix);
+			if (log.isLoggable(Level.FINEST)) {
+    			log.finest("Found prefixed element name, prefix: " + tmp_name_prefix);
+            }
 		}
 		if (tmp_name_prefix != null) {
 			for (String pref : namespaces.keySet()) {
@@ -160,7 +165,9 @@ public class XMPPDomBuilderHandler implements SimpleHandler {
 					new_xmlns = namespaces.get(pref);
 					tmp_name = tmp_name.substring(pref.length() + 1, tmp_name.length());
 					prefix = pref;
-					log.finest("new_xmlns = " + new_xmlns);
+					if (log.isLoggable(Level.FINEST)) {
+                		log.finest("new_xmlns = " + new_xmlns);
+                    }
 				} // end of if (tmp_name.startsWith(xmlns))
 			} // end of for (String xmlns: namespaces.keys())
 		}
@@ -171,20 +178,26 @@ public class XMPPDomBuilderHandler implements SimpleHandler {
 				//elem.setDefXMLNS(top_xmlns);
 			} else {
 				elem.setDefXMLNS(el_stack.peek().getXMLNS());
-				log.finest("DefXMLNS assigned: " + elem.toString());
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("DefXMLNS assigned: " + elem.toString());
+				}
 			}
     }
 		if (new_xmlns != null) {
 			elem.setXMLNS(new_xmlns);
 			elem.removeAttribute("xmlns:" + prefix);
-			log.finest("new_xmlns assigned: " + elem.toString());
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("new_xmlns assigned: " + elem.toString());
+			}
 		}
     el_stack.push(elem);
   }
 
 	@Override
   public void elementCData(StringBuilder cdata) {
-    log.finest("Element CDATA: "+cdata);
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Element CDATA: "+cdata);
+		}
 		try {
 			el_stack.peek().setCData(cdata.toString());
 		} catch (EmptyStackException e) {
@@ -195,7 +208,9 @@ public class XMPPDomBuilderHandler implements SimpleHandler {
 
 	@Override
   public void endElement(StringBuilder name) {
-    log.finest("End element name: "+name);
+	if (log.isLoggable(Level.FINEST)) {
+    	log.finest("End element name: "+name);
+	}
 
     String tmp_name = name.toString();
 		if (tmp_name.equals(ELEM_STREAM_STREAM)) {
@@ -220,7 +235,9 @@ public class XMPPDomBuilderHandler implements SimpleHandler {
 
 	@Override
   public void otherXML(StringBuilder other) {
-    log.finest("Other XML content: "+other);
+	if (log.isLoggable(Level.FINEST)) {
+   	 log.finest("Other XML content: "+other);
+	 }
 
     // Just ignore
   }

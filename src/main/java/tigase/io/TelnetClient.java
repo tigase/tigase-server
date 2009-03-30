@@ -89,7 +89,9 @@ public class TelnetClient implements SampleSocketThread.SocketHandler {
 				new TLSWrapper(TLSUtil.getSSLContext(sslId, "SSL", null), null, true));
 		} // end of if (ssl)
 		reader.addIOInterface(iosock);
-		log.finer("Registered new client socket: " + sc);
+        if (log.isLoggable(Level.FINER)) {
+    		log.finer("Registered new client socket: " + sc);
+        }
 	}
 
 	public void writeData(String data) throws IOException {

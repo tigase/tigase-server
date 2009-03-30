@@ -28,6 +28,7 @@ import javax.net.ssl.SSLEngineResult.HandshakeStatus;
 import javax.net.ssl.SSLEngineResult.Status;
 import javax.net.ssl.SSLEngineResult;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 import java.nio.ByteBuffer;
 import tigase.conf.Configurator;
 
@@ -125,27 +126,35 @@ public class TLSWrapper {
 		ByteBuffer out = app;
  		out = resizeApplicationBuffer(out);
  		tlsEngineResult = tlsEngine.unwrap(net, out);
- 		log.finest("unwrap() \ntlsEngineRsult.getStatus() = "
- 			+ tlsEngineResult.getStatus()
-			+ "\ntlsEngineRsult.getHandshakeStatus() = "
-			+ tlsEngineResult.getHandshakeStatus());
+		if (log.isLoggable(Level.FINEST)) {
+ 			log.finest("unwrap() \ntlsEngineRsult.getStatus() = "
+ 				+ tlsEngineResult.getStatus()
+				+ "\ntlsEngineRsult.getHandshakeStatus() = "
+				+ tlsEngineResult.getHandshakeStatus());
+		}
 		if (tlsEngineResult.getHandshakeStatus() == HandshakeStatus.NEED_TASK) {
 			doTasks();
-			log.finest("unwrap() doTasks(), handshake: " +
-				tlsEngine.getHandshakeStatus());
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("unwrap() doTasks(), handshake: " +
+					tlsEngine.getHandshakeStatus());
+			}
 		}
 		return out;
 	}
 
 	public void wrap(ByteBuffer app, ByteBuffer net) throws SSLException {
 		tlsEngineResult = tlsEngine.wrap(app, net);
-		log.finest("wrap() \ntlsEngineRsult.getStatus() = "
-			+ tlsEngineResult.getStatus()
-			+ "\ntlsEngineRsult.getHandshakeStatus() = "
-			+ tlsEngineResult.getHandshakeStatus());
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("wrap() \ntlsEngineRsult.getStatus() = "
+				+ tlsEngineResult.getStatus()
+				+ "\ntlsEngineRsult.getHandshakeStatus() = "
+				+ tlsEngineResult.getHandshakeStatus());
+		}
 		if (tlsEngineResult.getHandshakeStatus() == HandshakeStatus.NEED_TASK) {
 			doTasks();
-			log.finest("wrap() doTasks(): " + tlsEngine.getHandshakeStatus());
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("wrap() doTasks(): " + tlsEngine.getHandshakeStatus());
+			}
 		}
 	}
 

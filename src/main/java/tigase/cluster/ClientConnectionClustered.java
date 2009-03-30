@@ -50,16 +50,22 @@ public class ClientConnectionClustered extends ClientConnectionManager
 	public void nodesConnected(Set<String> node_hostnames) {}
 
 	public void nodesDisconnected(Set<String> node_hostnames) {
-		log.finest("Disconnected nodes: " + node_hostnames.toString());
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Disconnected nodes: " + node_hostnames.toString());
+		}
 		for (String node: node_hostnames) {
 			final String hostname = node;
 			doForAllServices(new ServiceChecker() {
 					public void check(final XMPPIOService service, final String serviceId) {
 						String dataReceiver = service.getDataReceiver();
-						log.finest("Checking service for dataReceiver: " + dataReceiver);
+						if (log.isLoggable(Level.FINEST)) {
+							log.finest("Checking service for dataReceiver: " + dataReceiver);
+						}
 						if (dataReceiver != null
 							&& JIDUtils.getNodeHost(dataReceiver).equals(hostname)) {
-							log.finest("Stopping service because corresponding cluster node stopped.");
+							if (log.isLoggable(Level.FINEST)) {
+								log.finest("Stopping service because corresponding cluster node stopped.");
+							}
 							service.stop();
 						}
 					}

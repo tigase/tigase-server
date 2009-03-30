@@ -245,8 +245,10 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 					"Not allowed to subscribe, rejecting: " + buddy);
 				presence = getPresence(buddy, jid, StanzaType.unsubscribed);
 			} // end of else
-			log.finest(getJID() + ": " +
-				"Sending back: " + presence.toString());
+			if (log.isLoggable(Level.FINEST)) {
+    			log.finest(getJID() + ": " +
+        			"Sending back: " + presence.toString());
+            }
 			results.offer(presence);
 		} // end of for (String buddy: new_subscr)
 	}
@@ -436,7 +438,9 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 	@Override
 	public void processPacket(final Packet packet, final Queue<Packet> results) {
 		++packets_received;
-		log.finest(getJID() + ": " + "Processing packet: " + packet.toString());
+		if (log.isLoggable(Level.FINEST)) {
+    		log.finest(getJID() + ": " + "Processing packet: " + packet.toString());
+        }
 		if (packet.getType() == StanzaType.error) {
 			log.fine("Ignoring error stanza: " + packet.toString());
 			return;

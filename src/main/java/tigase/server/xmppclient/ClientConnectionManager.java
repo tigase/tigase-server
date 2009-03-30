@@ -32,6 +32,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 import tigase.server.Command;
 import tigase.server.ConnectionManager;
 import tigase.server.Packet;
@@ -87,9 +88,13 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 
 	@Override
 	public void processPacket(final Packet packet) {
-		log.finer("Processing packet: " + packet.getElemName()
-			+ ", type: " + packet.getType());
-		log.finest("Processing packet: " + packet.getStringData());
+		if (log.isLoggable(Level.FINER)) {
+			log.finer("Processing packet: " + packet.getElemName()
+				+ ", type: " + packet.getType());
+		}
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Processing packet: " + packet.getStringData());
+		}
 		if (packet.isCommand() && packet.getCommand() != Command.OTHER) {
 			processCommand(packet);
 		} else {
@@ -101,8 +106,10 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 									"The user connection is no longer active.", true);
 					addOutPacket(error);
 				} catch (PacketErrorTypeException e) {
-					log.finest(
+    				if (log.isLoggable(Level.FINEST)) {
+    					log.finest(
 									"Ups, already error packet. Dropping it to prevent infinite loop.");
+                        }
 				}
 				// In case the SessionManager lost synchronization for any reason, let's
 				// notify it that the user connection no longer exists.
@@ -133,7 +140,9 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 				break;
 			case STARTTLS:
 				if (serv != null) {
-					log.finer("Starting TLS for connection: " + serv.getUniqueId());
+            		if (log.isLoggable(Level.FINER)) {
+                		log.finer("Starting TLS for connection: " + serv.getUniqueId());
+                    }
 					try {
 						// Note:
 						// If you send <proceed> packet to client you must expect
@@ -167,8 +176,10 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 				String old_receiver = changeDataReceiver(packet, newAddress,
 								command_sessionId, serv);
 				if (old_receiver != null) {
-					log.fine("Redirecting data for sessionId: " + command_sessionId +
+            		if (log.isLoggable(Level.FINE)) {
+    					log.fine("Redirecting data for sessionId: " + command_sessionId +
 									", to: " + newAddress);
+                    }
 					Packet response = null;
 // 				response = packet.commandResult(null);
 // 				Command.addFieldValue(response, "session-id", command_sessionId);
@@ -181,8 +192,10 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 					response.getElement().setAttribute("to", newAddress);
 					addOutPacket(response);
 				} else {
-					log.finest("Connection for REDIRECT command does not exist, ignoring " +
-									"packet: " + packet.toString());
+            		if (log.isLoggable(Level.FINEST)) {
+    					log.finest("Connection for REDIRECT command does not exist, ignoring " +
+        								"packet: " + packet.toString());
+                    }
 				}
 				break;
 			case STREAM_CLOSED:
@@ -195,8 +208,10 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 				if (serv != null) {
 					serv.stop();
 				} else {
-					log.fine("Attempt to stop non-existen service for packet: " +
+            		if (log.isLoggable(Level.FINE)) {
+    					log.fine("Attempt to stop non-existen service for packet: " +
 									packet.getStringData() + ", Service already stopped?");
+                    }
 				} // end of if (serv != null) else
 				break;
 			case CHECK_USER_CONNECTION:
@@ -248,9 +263,13 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 
 		Packet p = null;
 		while ((p = serv.getReceivedPackets().poll()) != null) {
-			log.finer(id + ": Processing packet: " + p.getElemName()
-				+ ", type: " + p.getType());
-			log.finest(id + ": Processing socket data: " + p.getStringData());
+			if (log.isLoggable(Level.FINER)) {
+				log.finer("Processing packet: " + p.getElemName()
+					+ ", type: " + p.getType());
+			}
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Processing socket data: " + p.getStringData());
+			}
 			p.setFrom(getFromAddress(id));
 			p.setTo(serv.getDataReceiver());
 // 			p.setTo(serv.getDataReceiver() != null ? serv.getDataReceiver()
@@ -351,7 +370,9 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 	@Override
 	public String xmppStreamOpened(XMPPIOService serv,
 		Map<String, String> attribs) {
-		log.finer("Stream opened: " + attribs.toString());
+		if (log.isLoggable(Level.FINER)) {
+			log.finer("Stream opened: " + attribs.toString());
+		}
 		final String hostname = attribs.get("to");
 		String lang = attribs.get("xml:lang");
 		if (lang == null) {
@@ -432,16 +453,22 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 					service.getDataReceiver(), StanzaType.set, 
 					UUID.randomUUID().toString());
 				addOutPacketWithTimeout(command, stoppedHandler, 5l, TimeUnit.SECONDS);
-				log.fine("Service stopped, sending packet: " + command.getStringData());
+				if (log.isLoggable(Level.FINE)) {
+					log.fine("Service stopped, sending packet: " + command.getStringData());
+				}
 			} else {
-				log.fine("Service stopped, before stream:stream received");
+				if (log.isLoggable(Level.FINE)) {
+					log.fine("Service stopped, before stream:stream received");
+				}
 			}
 		}
 	}
 
 	@Override
 	public void xmppStreamClosed(XMPPIOService serv) {
-		log.finer("Stream closed: " + serv.getUniqueId());
+		if (log.isLoggable(Level.FINER)) {
+			log.finer("Stream closed: " + serv.getUniqueId());
+		}
 	}
 
 	/**
@@ -488,7 +515,9 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 		@Override
 		public void responseReceived(Packet packet, Packet response) {
 			// Great, nothing to worry about.
-			log.finest("Response for stop received...");
+			if (log.isLoggable(Level.FINEST)) {
+    			log.finest("Response for stop received...");
+            }
 		}
 
 	}

@@ -547,6 +547,7 @@ public class SessionManagerClustered extends SessionManager
 		}
 	}
 
+	@Override
 	public void nodesDisconnected(Set<String> node_hostnames) {
                log.fine("Nodes disconnected: " + node_hostnames.toString());
 		for (String node: node_hostnames) {

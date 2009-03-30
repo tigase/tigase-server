@@ -43,7 +43,7 @@ public class Packet {
 
   private static final String ERROR_NS = "urn:ietf:params:xml:ns:xmpp-stanzas";
 
-	private Set<String> processorsIds = new LinkedHashSet<String>();
+	private Set<String> processorsIds = new LinkedHashSet<String>(4, 0.9f);
 
 	/**
 	 * Constant <code>OLDTO</code> is kind of hack to store old request address

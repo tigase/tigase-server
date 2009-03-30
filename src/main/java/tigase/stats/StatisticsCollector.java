@@ -158,7 +158,9 @@ public class StatisticsCollector
 
 		switch (packet.getCommand()) {
 		case GETSTATS: {
-			log.finest("Command received: " + packet.getStringData());
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Command received: " + packet.getStringData());
+			}
 			//			Element statistics = new Element("statistics");
 			Element iq =
 				ElementUtils.createIqQuery(packet.getElemTo(), packet.getElemFrom(),
@@ -190,7 +192,9 @@ public class StatisticsCollector
 				results.offer(result);
 				return;
 			}
-			log.finest("Command received: " + packet.getStringData());
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Command received: " + packet.getStringData());
+			}
 			String tmp_val = Command.getFieldValue(packet, "Stats level");
 			if (tmp_val != null) {
 				statsLevel = Level.parse(tmp_val);
@@ -248,15 +252,19 @@ public class StatisticsCollector
 		if (getName().equals(JIDUtils.getNodeNick(jid)) ||
 						getComponentId().equals(jid)) {
 			List<Element> items = serviceEntity.getDiscoItems(node, jid);
-			log.finest("Processing discoItems for node: " + node + ", result: "
-				+ (items == null ? null : items.toString()));
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Processing discoItems for node: " + node + ", result: "
+					+ (items == null ? null : items.toString()));
+			}
 			return items;
 		} else {
 			if (node == null) {
 				Element item = serviceEntity.getDiscoItem(null,
 								JIDUtils.getNodeID(getName(), jid));
-				log.finest("Processing discoItems, result: " +
-								(item == null ? null : item.toString()));
+    			if (log.isLoggable(Level.FINEST)) {
+        			log.finest("Processing discoItems, result: " +
+            					(item == null ? null : item.toString()));
+                }
 				return Arrays.asList(item);
 			} else {
 				return null;

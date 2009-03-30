@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 import tigase.xml.Element;
 
 /**
@@ -86,7 +87,9 @@ public class BoshSessionCache {
 		List<Element> cached_data = new ArrayList<Element>();
 		id_cache.put(id, cached_data);
 		cached_data.addAll(data);
-		log.finest("SET, id = " + id + ", DATA: " + data.toString());
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("SET, id = " + id + ", DATA: " + data.toString());
+		}
 	}
 
 	public void add(String id, List<Element> data) {
@@ -99,7 +102,9 @@ public class BoshSessionCache {
 			id_cache.put(id, cached_data);
 		}
 		cached_data.addAll(data);
-		log.finest("ADD, id = " + id + ", DATA: " + data.toString());
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("ADD, id = " + id + ", DATA: " + data.toString());
+		}
 	}
 
 	public List<Element> remove(String id) {
@@ -107,7 +112,9 @@ public class BoshSessionCache {
 			id = DEF_ID;
 		}
 		List<Element> data = id_cache.remove(id);
-		log.finest("REMOVED, id = " + id + ", DATA: " + data.toString());
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("REMOVED, id = " + id + ", DATA: " + data.toString());
+		}
 		return data;
 	}
 
@@ -116,7 +123,9 @@ public class BoshSessionCache {
 			id = DEF_ID;
 		}
 		List<Element> data = id_cache.get(id);
-		log.finest("GET, id = " + id + ", DATA: " + data.toString());
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("GET, id = " + id + ", DATA: " + data.toString());
+		}
 		return data;
 	}
 
@@ -126,15 +135,19 @@ public class BoshSessionCache {
 			result.addAll(cache_data);
 		}
 		result.addAll(jid_presence.values());
-		log.finest("GET_ALL, DATA: " + result.toString());
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("GET_ALL, DATA: " + result.toString());
+		}
 		return result;
 	}
 
 	public void addPresence(Element presence) {
 		String from = presence.getAttribute("from");
 		jid_presence.put(from, presence);
-		log.finest("ADD_PRESENCE, from = " + from
-			+ ", PRESENCE: " + presence.toString());
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("ADD_PRESENCE, from = " + from
+				+ ", PRESENCE: " + presence.toString());
+		}
 	}
 
 	public List<Element> getAllPresences() {
@@ -154,7 +167,9 @@ public class BoshSessionCache {
 
 	public void addRoster(Element roster) {
 		add(ROSTER_ID, Arrays.asList(roster));
-		log.finest("ADD_ROSTER, ROSTER: " + roster.toString());
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("ADD_ROSTER, ROSTER: " + roster.toString());
+		}
 	}
 
 	private long getMsgStartTime(String jid) {
@@ -179,7 +194,7 @@ public class BoshSessionCache {
 		long start_time = getMsgStartTime(jid);
 		List<Element> msg_history_l = id_cache.get(MESSAGE_ID+jid);
 		Element msg_history = null;
-		if (msg_history == null) {
+		if (msg_history_l == null) {
 			msg_history = createMessageHistory(jid);
 			add(MESSAGE_ID+jid, Arrays.asList(msg_history));
 		} else {

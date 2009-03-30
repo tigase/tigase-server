@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.Queue;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import tigase.conf.Configurable;
 import tigase.db.NonAuthUserRepository;
@@ -74,8 +75,10 @@ public class UrnXmppPing extends XMPPProcessor implements XMPPProcessorIfc {
 				results.offer(Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet,
 						"Service not available.", true));
 			} catch (PacketErrorTypeException e) {
-				log.fine("This is already ping error packet, ignoring... "
-					+ packet.toString());
+				if (log.isLoggable(Level.FINE)) {
+					log.fine("This is already ping error packet, ignoring... "
+						+ packet.toString());
+				}
 			}
 			return;
 		}

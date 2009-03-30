@@ -235,8 +235,10 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 				(String)serv.getSessionData().get(SECRET_PROP_KEY);
 			try {
 				String loc_digest = Algorithms.hexDigest(id, secret, "SHA");
-				log.finest("Calculating digest: id="+id+", secret="+secret
-					+", digest="+loc_digest);
+   				if (log.isLoggable(Level.FINEST)) {
+    				log.finest("Calculating digest: id="+id+", secret="+secret
+        				+", digest="+loc_digest);
+                }
 				if (digest != null && digest.equals(loc_digest)) {
 					Packet resp = new Packet(new Element("handshake"));
 					writePacketToSocket(serv, resp);
@@ -466,8 +468,10 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 				(String)service.getSessionData().get(SECRET_PROP_KEY);
 			try {
 				String digest = Algorithms.hexDigest(id, secret, "SHA");
-				log.finest("Calculating digest: id="+id+", secret="+secret
-					+", digest="+digest);
+   				if (log.isLoggable(Level.FINEST)) {
+    				log.finest("Calculating digest: id="+id+", secret="+secret
+        				+", digest="+digest);
+                }
 				return "<handshake>" + digest + "</handshake>";
 			} catch (NoSuchAlgorithmException e) {
 				log.log(Level.SEVERE, "Can not generate digest for pass phrase.", e);

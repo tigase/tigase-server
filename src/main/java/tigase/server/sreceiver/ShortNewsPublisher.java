@@ -295,12 +295,10 @@ public class ShortNewsPublisher extends RepoRosterTask {
 				// if body is null it might be an empty message used for
 				// announcing other side that the user has just started typing
 				// message, such messages we just ignore
-				if (body != null) {
-					results.offer(Packet.getMessage(packet.getElemFrom(),
-							packet.getElemTo(), StanzaType.normal,
-							"Missing subject, post has NOT been submitted.",
-							"Short news submitions result.", null));
-				}
+				results.offer(Packet.getMessage(packet.getElemFrom(),
+								packet.getElemTo(), StanzaType.normal,
+								"Missing body, post has NOT been submitted.",
+								"Short news submitions result.", null));
 			}
 		} catch (SQLException e) {
 			log.log(Level.SEVERE, "Problem inserting new post: "

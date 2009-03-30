@@ -462,12 +462,16 @@ public abstract class AbstractMessageReceiver
 
 	@Override
 	public void start() {
-		log.finer(getName() + ": starting queue management threads ...");
+		if (log.isLoggable(Level.FINER)) {
+			log.finer(getName() + ": starting queue management threads ...");
+		}
 		startThreads();
   }
 
   public void stop() {
-		log.finer(getName() + ": stopping queue management threads ...");
+		if (log.isLoggable(Level.FINER)) {
+			log.finer(getName() + ": stopping queue management threads ...");
+		}
 		stopThreads();
   }
 
@@ -531,9 +535,13 @@ public abstract class AbstractMessageReceiver
 	}
 
 	public void addRegexRouting(String address) {
-		log.fine(getName() + " - attempt to add regex routing: " + address);
+		if (log.isLoggable(Level.FINE)) {
+			log.fine(getName() + " - attempt to add regex routing: " + address);
+		}
 		regexRoutings.add(Pattern.compile(address, Pattern.CASE_INSENSITIVE));
-		log.fine(getName() + " - success adding regex routing: " + address);
+		if (log.isLoggable(Level.FINE)) {
+			log.fine(getName() + " - success adding regex routing: " + address);
+		}
 	}
 
 	public boolean removeRegexRouting(String address) {
@@ -550,7 +558,9 @@ public abstract class AbstractMessageReceiver
 		// 		log.finest(getName() + " looking for regex routings: " + address);
 		for (Pattern pat: regexRoutings) {
 			if (pat.matcher(address).matches()) {
-				log.finest(getName() + " matched against pattern: " + pat.toString());
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest(getName() + " matched against pattern: " + pat.toString());
+				}
 				return true;
 			}
 			// 			log.finest(getName() + " matching failed against pattern: " + pat.toString());
@@ -578,7 +588,9 @@ public abstract class AbstractMessageReceiver
 
 		@Override
 		public void run() {
-			log.finest(getName() + " starting queue processing.");
+			if (log.isLoggable(Level.FINEST)) {
+    			log.finest(getName() + " starting queue processing.");
+            }
 			Packet packet = null;
 			while (! stopped) {
 				try {

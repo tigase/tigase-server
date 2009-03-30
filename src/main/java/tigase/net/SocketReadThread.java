@@ -35,6 +35,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.Set;
 import tigase.annotations.TODO;
 
 /**
@@ -156,23 +157,33 @@ public class SocketReadThread implements Runnable {
       try {
 				if (sc.isConnected()) {
 					int sel_key = READ_ONLY;
-					log.finest("ADDED OP_READ: " + s.getUniqueId());
+    				if (log.isLoggable(Level.FINEST)) {
+        				log.finest("ADDED OP_READ: " + s.getUniqueId());
+                    }
 					if (s.waitingToSend()) {
 						sel_key = READ_WRITE;
-						log.finest("ADDED OP_WRITE: " + s.getUniqueId());
+        				if (log.isLoggable(Level.FINEST)) {
+            				log.finest("ADDED OP_WRITE: " + s.getUniqueId());
+                        }
 					}
 					sc.register(clientsSel, sel_key, s);
 				} else {
-					log.finest("Socket not connected: " + s.getUniqueId());
+    				if (log.isLoggable(Level.FINEST)) {
+        				log.finest("Socket not connected: " + s.getUniqueId());
+                    }
 					try {
-						log.finer("Forcing stopping the service: " + s.getUniqueId());
+        				if (log.isLoggable(Level.FINER)) {
+            				log.finer("Forcing stopping the service: " + s.getUniqueId());
+                        }
 						s.forceStop();
 					} catch (Exception e) {	}
 				}
 			} catch (Exception e) {
         // Ignore such channel
-				log.log(Level.FINEST, "ERROR adding channel for: " + s.getUniqueId()
-					+ ", exception: " + e, e);
+				if (log.isLoggable(Level.FINEST)) {
+    				log.log(Level.FINEST, "ERROR adding channel for: " + s.getUniqueId()
+        				+ ", exception: " + e, e);
+                }
       } // end of try-catch
     } // end of for ()
 
@@ -181,7 +192,9 @@ public class SocketReadThread implements Runnable {
 	// Implementation of java.lang.Runnable
 
 	private synchronized void recreateSelector() throws IOException {
-		log.finest("Recreating selector, opened channels: " + clientsSel.keys().size());
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Recreating selector, opened channels: " + clientsSel.keys().size());
+		}
 		empty_selections = 0;
 		// Handling a bug or not a bug described in the
 		// last comment to this issue:
@@ -233,9 +246,13 @@ public class SocketReadThread implements Runnable {
 	public void run() {
     while (!stopping) {
       try {
-				int selectedKeys = clientsSel.select();
+				clientsSel.select();
+				Set<SelectionKey> selected = clientsSel.selectedKeys();
+				int selectedKeys = selected.size();
 				if(selectedKeys == 0 && waiting.size() == 0) {
-					log.finest("Selected keys = 0!!! a bug again?");
+					if (log.isLoggable(Level.FINEST)) {
+						log.finest("Selected keys = 0!!! a bug again?");
+					}
 					if ((++empty_selections) > MAX_EMPTY_SELECTIONS) {
 						recreateSelector();
 					}
@@ -244,7 +261,7 @@ public class SocketReadThread implements Runnable {
 					if (selectedKeys > 0) {
 						// This is dirty but selectNow() causes concurrent modification exception
 						// and the selectNow() is needed because of a bug in JVM mentioned below
-						for (SelectionKey sk: clientsSel.selectedKeys()) {
+						for (SelectionKey sk : selected) {
 							// According to most guides we should use below code
 							// removing SelectionKey from iterator, however a little later
 							// we do cancel() on this key so removing is somehow redundant
@@ -262,7 +279,9 @@ public class SocketReadThread implements Runnable {
 										sb.append(", ready for READING");
 									}
 									sb.append(", readyOps() = " + sk.readyOps());
-									log.finest(sb.toString());
+									if (log.isLoggable(Level.FINEST)) {
+										log.finest(sb.toString());
+									}
 								}
 								//         Set<SelectionKey> selected_keys = clientsSel.selectedKeys();
 								//         for (SelectionKey sk : selected_keys) {
@@ -274,9 +293,17 @@ public class SocketReadThread implements Runnable {
 								sk.cancel();
 								completionService.submit(s);
 							} catch (CancelledKeyException e) {
-								log.finest("CancelledKeyException, stopping the connection: "
+								if (log.isLoggable(Level.FINEST)) {
+									log.finest("CancelledKeyException, stopping the connection: "
 									+ s.getUniqueId());
-								try {	s.forceStop(); } catch (Exception ex2) {	}
+								}
+								try {	
+									s.forceStop();
+								} catch (Exception ex2) {
+									if (log.isLoggable(Level.WARNING)) {
+										log.warning("got exception during forceStop: " + e);
+									}
+								}
 							}
 						}
 					}
@@ -337,11 +364,15 @@ public class SocketReadThread implements Runnable {
           if (service.isConnected()
 						//&& !service.getSocketChannel().isRegistered()
 							) {
-						log.finest("COMPLETED: " + service.getUniqueId());
+						if (log.isLoggable(Level.FINEST)) {
+							log.finest("COMPLETED: " + service.getUniqueId());
+						}
             addSocketService(service);
           } else {
-						log.finest("REMOVED: " + service.getUniqueId());
-					} // end of else
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("REMOVED: " + service.getUniqueId());
+				}
+			} // end of else
         }
         catch (ExecutionException e) {
           log.log(Level.WARNING, "Protocol execution exception.", e);

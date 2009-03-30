@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 import tigase.xml.Element;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
@@ -85,12 +86,16 @@ public abstract class DynamicRoster {
 		DynamicRosterIfc[] dynr = null;
 		if (settings != null) {
 			synchronized (settings) {
-				log.finest("Initializing settings.");
+   				if (log.isLoggable(Level.FINEST)) {
+    				log.finest("Initializing settings.");
+                }
 				init_settings(settings);
 			}
 			dynr = (DynamicRosterIfc[])settings.get(DYNAMIC_ROSTERS);
 		} else {
-			log.finest("Settings parameter is NULL");
+ 			if (log.isLoggable(Level.FINEST)) {
+    			log.finest("Settings parameter is NULL");
+            }
 		}
 		return dynr;
 	}

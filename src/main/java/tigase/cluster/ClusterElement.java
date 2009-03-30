@@ -27,6 +27,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.ArrayList;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import tigase.xmpp.StanzaType;
 import tigase.xml.Element;
@@ -134,10 +135,10 @@ public class ClusterElement {
 	}
 
 	public ClusterElement(String from, String to, StanzaType type, Packet packet) {
-		packets = new ArrayList<Element>();
-		visited_nodes = new LinkedHashSet<String>();
-		elem = createClusterElement(from, to, type, packet.getFrom());
 		if (packet != null) {
+			packets = new ArrayList<Element>();
+			visited_nodes = new LinkedHashSet<String>();
+			elem = createClusterElement(from, to, type, packet.getFrom());
 			if (packet.getElement().getXMLNS() == null) {
 				packet.getElement().setXMLNS("jabber:client");
 			}
@@ -219,13 +220,17 @@ public class ClusterElement {
 
 	public static ClusterElement createForNextNode(ClusterElement clel,
 		Set<String> cluster_nodes, String comp_id) {
-		log.finest("Calculating a next node from nodes: " + cluster_nodes.toString());
+		if (log.isLoggable(Level.FINEST)) {
+    		log.finest("Calculating a next node from nodes: " + cluster_nodes.toString());
+        }
 		if (cluster_nodes.size() > 0) {
 			String next_node = null;
 			for (String cluster_node: cluster_nodes) {
 				if (!clel.isVisitedNode(cluster_node) && !cluster_node.equals(comp_id)) {
 					next_node = cluster_node;
-					log.finest("Found next cluster node: " + next_node);
+    				if (log.isLoggable(Level.FINEST)) {
+        				log.finest("Found next cluster node: " + next_node);
+                    }
 					break;
 				}
 			}
@@ -233,8 +238,10 @@ public class ClusterElement {
 			// packet now. adding now: getFirstNode() != comp_id
 			if (next_node == null && !comp_id.equals(clel.getFirstNode())) {
 				next_node = clel.getFirstNode();
-				log.finest("No more cluster nodes found, sending back to the first node: "
-					+ next_node);
+				if (log.isLoggable(Level.FINEST)) {
+    				log.finest("No more cluster nodes found, sending back to the first node: "
+        				+ next_node);
+                }
 			}
 			if (next_node != null) {
 				ClusterElement result = clel.nextClusterNode(next_node);

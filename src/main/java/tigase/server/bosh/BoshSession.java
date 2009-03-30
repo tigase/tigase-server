@@ -245,13 +245,17 @@ public class BoshSession {
 		Queue<Packet> out_results) {
 
 		if (packet != null) {
-			log.finest("[" + connections.size() +
-				"] Processing packet: " + packet.toString());
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("[" + connections.size() +
+					"] Processing packet: " + packet.toString());
+			}
 			if (filterInPacket(packet)) {
 				waiting_packets.offer(packet.getElement());
 			} else {
-				log.finest("[" + connections.size() +
-					"] In packet filtered: " + packet.toString());
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("[" + connections.size() +
+						"] In packet filtered: " + packet.toString());
+				}
 			}
 		}
 		if (connections.size() > 0 &&
@@ -417,7 +421,9 @@ public class BoshSession {
 		serv.setSid(null);
 		disconnected(serv);
 		if (waitTimer != null) {
-			log.finest("Canceling waitTimer: " + getSid());
+			if (log.isLoggable(Level.FINEST)) {
+    			log.finest("Canceling waitTimer: " + getSid());
+            }
 			handler.cancelTask(waitTimer);
 		}
 	}
@@ -495,15 +501,21 @@ public class BoshSession {
 	public synchronized void processSocketPacket(Packet packet,
 		BoshIOService service, Queue<Packet> out_results) {
 
-		log.finest("[" + connections.size() +
-			"] Processing socket packet: " + packet.toString());
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("[" + connections.size() +
+				"] Processing socket packet: " + packet.toString());
+		}
 
 		if (waitTimer != null) {
-			log.finest("Canceling waitTimer: " + getSid());
+			if (log.isLoggable(Level.FINEST)) {
+    			log.finest("Canceling waitTimer: " + getSid());
+            }
 			handler.cancelTask(waitTimer);
 		}
 		if (inactivityTimer != null) {
-			log.finest("Canceling inactivityTimer: " + getSid());
+			if (log.isLoggable(Level.FINEST)) {
+    			log.finest("Canceling inactivityTimer: " + getSid());
+            }
 			handler.cancelTask(inactivityTimer);
 		}
 
@@ -570,10 +582,14 @@ public class BoshSession {
 							}
 							Packet result = new Packet(el);
 							if (filterOutPacket(result)) {
-								log.finest("Sending out packet: " + result.toString());
+								if (log.isLoggable(Level.FINEST)) {
+									log.finest("Sending out packet: " + result.toString());
+								}
 								out_results.offer(result);
 							} else {
-								log.finest("Out packet filtered: " + result.toString());
+								if (log.isLoggable(Level.FINEST)) {
+									log.finest("Out packet filtered: " + result.toString());
+								}
 							}
 						}
 					}
@@ -613,7 +629,9 @@ public class BoshSession {
 		}
 
 		if (connections.size() > 0 && waiting_packets.size() == 0) {
-			log.finest("Setting waitTimer for " + max_wait + ": " + getSid());
+			if (log.isLoggable(Level.FINEST)) {
+    			log.finest("Setting waitTimer for " + max_wait + ": " + getSid());
+            }
 			waitTimer = handler.scheduleTask(this, max_wait * SECOND);
 		}
 	}
@@ -623,20 +641,28 @@ public class BoshSession {
 			connections.remove(bios);
 		}
 		if (inactivityTimer != null) {
-			log.finest("Canceling inactivityTimer: " + getSid());
+			if (log.isLoggable(Level.FINEST)) {
+    			log.finest("Canceling inactivityTimer: " + getSid());
+            }
 			handler.cancelTask(inactivityTimer);
 		}
 		if (connections.size() == 0) {
-			log.finest("Setting inactivityTimer for " + max_inactivity + ": " + getSid());
+			if (log.isLoggable(Level.FINEST)) {
+    			log.finest("Setting inactivityTimer for " + max_inactivity + ": " + getSid());
+            }
 			inactivityTimer = handler.scheduleTask(this, max_inactivity * SECOND);
 		}
 	}
 
 	public boolean task(Queue<Packet> out_results, TimerTask tt) {
 		if (tt == inactivityTimer) {
-			log.finest("inactivityTimer fired: " + getSid());
+			if (log.isLoggable(Level.FINEST)) {
+    			log.finest("inactivityTimer fired: " + getSid());
+            }
 			if (waitTimer != null) {
-				log.finest("Canceling waitTimer: " + getSid());
+                if (log.isLoggable(Level.FINEST)) {
+    				log.finest("Canceling waitTimer: " + getSid());
+                }
 				handler.cancelTask(waitTimer);
 			}
 			for (Element packet : waiting_packets) {
@@ -648,7 +674,9 @@ public class BoshSession {
 					log.info("Packet processing exception: " + e);
 				}
 			}
-			log.finest("Closing session, inactivity timeout expired: " + getSid());
+			if (log.isLoggable(Level.FINEST)) {
+    			log.finest("Closing session, inactivity timeout expired: " + getSid());
+            }
 			Packet command = Command.STREAM_CLOSED.getPacket(null, null,
 							StanzaType.set, UUID.randomUUID().toString());
 			handler.addOutStreamClosed(command, this);
@@ -656,7 +684,9 @@ public class BoshSession {
 			return true;
 		}
 		if (tt == waitTimer) {
-			log.finest("waitTimer fired: " + getSid());
+			if (log.isLoggable(Level.FINEST)) {
+    			log.finest("waitTimer fired: " + getSid());
+            }
 			BoshIOService serv = connections.poll();
 			if (serv != null) {
 				sendBody(serv, null);

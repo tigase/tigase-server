@@ -109,10 +109,14 @@ public class DomainFilter extends XMPPProcessor
 					throws NotAuthorizedException, TigaseDBException {
 		DOMAINS domains =
 						(DOMAINS)session.getCommonSessionData(ALLOWED_DOMAINS_KEY);
-		log.finest("domains read from user session: " + domains);
+		if (log.isLoggable(Level.FINEST)) {
+    		log.finest("domains read from user session: " + domains);
+        }
 		if (domains == null) {
 			String dbDomains = session.getData(null, ALLOWED_DOMAINS_KEY, null);
-			log.finest("Domains read from database: " + dbDomains);
+			if (log.isLoggable(Level.FINEST)) {
+    			log.finest("Domains read from database: " + dbDomains);
+            }
 			domains = DOMAINS.valueof(dbDomains);
 			if (domains == null) {
 				if (session.isAnonymous()) {

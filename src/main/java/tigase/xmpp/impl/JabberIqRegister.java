@@ -24,6 +24,7 @@ package tigase.xmpp.impl;
 import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 import tigase.server.Packet;
@@ -96,10 +97,14 @@ public class JabberIqRegister extends XMPPProcessor
 		final Map<String, Object> settings)
 		throws XMPPException {
 
-		log.finest("Processing packet: " + packet.toString());
+		if (log.isLoggable(Level.FINEST)) {
+    		log.finest("Processing packet: " + packet.toString());
+        }
 
 		if (session == null) {
-			log.finest("Session is null, ignoring");
+			if (log.isLoggable(Level.FINEST)) {
+    			log.finest("Session is null, ignoring");
+            }
 			return;
 		} // end of if (session == null)
 
