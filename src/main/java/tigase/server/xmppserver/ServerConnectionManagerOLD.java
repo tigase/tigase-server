@@ -142,7 +142,9 @@ public class ServerConnectionManagerOLD extends ConnectionManager<XMPPIOService>
 	public void processPacket(Packet packet) {
 // 		log.finer("Processing packet: " + packet.getElemName()
 // 			+ ", type: " + packet.getType());
-		log.finest("Processing packet: " + packet.getStringData());
+		if (log.isLoggable(Level.FINEST)) {
+    		log.finest("Processing packet: " + packet.getStringData());
+        }
 		if (!packet.isCommand() || !processCommand(packet)) {
 
 			if (packet.getElemTo() == null) {
@@ -166,8 +168,10 @@ public class ServerConnectionManagerOLD extends ConnectionManager<XMPPIOService>
 				// Ups, remote hostname is the same as one of local hostname??
 				// Internal loop possible, we don't want that....
 				// Let's send the packet back....
-				log.finest("Packet addresses to localhost, I am not processing it: "
-					+ packet.getStringData());
+   				if (log.isLoggable(Level.FINEST)) {
+    				log.finest("Packet addresses to localhost, I am not processing it: "
+        				+ packet.getStringData());
+                }
 				try {
 					addOutPacket(
 						Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet,
@@ -179,7 +183,9 @@ public class ServerConnectionManagerOLD extends ConnectionManager<XMPPIOService>
 			}
 
 			String cid = getConnectionId(packet);
-			log.finest("Connection ID is: " + cid);
+			if (log.isLoggable(Level.FINEST)) {
+    			log.finest("Connection ID is: " + cid);
+            }
 			synchronized(servicesByHost_Type) {
 				XMPPIOService serv = servicesByHost_Type.get(cid);
 				if (serv == null || !writePacketToSocket(serv, packet)) {
@@ -268,7 +274,9 @@ public class ServerConnectionManagerOLD extends ConnectionManager<XMPPIOService>
 			String cid =
 				getConnectionId(localhost, remotehost, ConnectionType.connect);
 			port_props.put("cid", cid);
-			log.finest("STARTING new connection: " + cid);
+			if (log.isLoggable(Level.FINEST)) {
+    			log.finest("STARTING new connection: " + cid);
+            }
 			addWaitingTask(port_props);
 //			if (reconnect) {
 //				reconnectService(port_props, 15*SECOND);
@@ -319,7 +327,9 @@ public class ServerConnectionManagerOLD extends ConnectionManager<XMPPIOService>
 		while ((p = packets.poll()) != null) {
 // 			log.finer("Processing packet: " + p.getElemName()
 // 				+ ", type: " + p.getType());
-			log.finest("Processing socket data: " + p.getStringData());
+			if (log.isLoggable(Level.FINEST)) {
+    			log.finest("Processing socket data: " + p.getStringData());
+            }
 
 			if (p.getElement().getXMLNS() != null &&
 				p.getElement().getXMLNS().equals(DIALBACK_XMLNS)) {
@@ -327,14 +337,18 @@ public class ServerConnectionManagerOLD extends ConnectionManager<XMPPIOService>
 				processDialback(p, serv, results);
 				for (Packet res: results) {
 					String cid = res.getTo();
-					log.finest("Sending dialback result: " + res.getStringData()
-						+ " to " + cid);
+    				if (log.isLoggable(Level.FINEST)) {
+    					log.finest("Sending dialback result: " + res.getStringData()
+        					+ " to " + cid);
+                    }
 					XMPPIOService sender = handshakingByHost_Type.get(cid);
 					if (sender == null) {
 						sender = servicesByHost_Type.get(cid);
 					}
-					log.finest("cid: " + cid
-						+ ", writing packet to socket: " + res.getStringData());
+    				if (log.isLoggable(Level.FINEST)) {
+    					log.finest("cid: " + cid
+        					+ ", writing packet to socket: " + res.getStringData());
+                    }
 					if (sender == null || !writePacketToSocket(sender, res)) {
 						// I am assuming here that it can't happen that the packet is
 						// to accept channel and it doesn't exist
@@ -347,7 +361,9 @@ public class ServerConnectionManagerOLD extends ConnectionManager<XMPPIOService>
 					return null;
 				} else {
 					if (checkPacket(p, serv)) {
-						log.finest("Adding packet out: " + p.getStringData());
+        				if (log.isLoggable(Level.FINEST)) {
+        					log.finest("Adding packet out: " + p.getStringData());
+                        }
 						addOutPacket(p);
 					} else {
 						return null;
@@ -363,7 +379,9 @@ public class ServerConnectionManagerOLD extends ConnectionManager<XMPPIOService>
 		if (waiting != null) {
 			Packet p = null;
 			while ((p = waiting.poll()) != null) {
-				log.finest("Sending packet back: " + p.getStringData());
+   				if (log.isLoggable(Level.FINEST)) {
+    				log.finest("Sending packet back: " + p.getStringData());
+                }
 				try {
 					addOutPacket(author.getResponseMessage(p, "S2S - not delivered", true));
 				} catch (PacketErrorTypeException e) {
@@ -425,7 +443,9 @@ public class ServerConnectionManagerOLD extends ConnectionManager<XMPPIOService>
 	public String xmppStreamOpened(XMPPIOService serv,
 		Map<String, String> attribs) {
 
-		log.finer("Stream opened: " + attribs.toString());
+        if (log.isLoggable(Level.FINER)) {
+        	log.finer("Stream opened: " + attribs.toString());
+        }
 
 		switch (serv.connectionType()) {
 		case connect: {
@@ -436,7 +456,9 @@ public class ServerConnectionManagerOLD extends ConnectionManager<XMPPIOService>
 				(String)serv.getSessionData().get("local-hostname");
 			String cid = getConnectionId(local_hostname, remote_hostname,
 				ConnectionType.connect);
-			log.finest("Stream opened for: " + cid);
+			if (log.isLoggable(Level.FINEST)) {
+    			log.finest("Stream opened for: " + cid);
+            }
 			handshakingByHost_Type.put(cid, serv);
 			String remote_id = attribs.get("id");
 			sharedSessionData.put(cid+"-session-id", remote_id);
@@ -459,13 +481,17 @@ public class ServerConnectionManagerOLD extends ConnectionManager<XMPPIOService>
 			Queue<Packet> waiting =	waitingControlPackets.get(cid);
 			if (waiting != null) {
 				while ((p = waiting.poll()) != null) {
-					log.finest("Sending packet: " + p.getStringData());
+    				if (log.isLoggable(Level.FINEST)) {
+    					log.finest("Sending packet: " + p.getStringData());
+                    }
 					sb.append(p.getStringData());
 				} // end of while (p = waitingPackets.remove(ipAddress) != null)
 			} // end of if (waiting != null)
 			sb.append(elem.toString());
-			log.finest("cid: " + (String)serv.getSessionData().get("cid")
+			if (log.isLoggable(Level.FINEST)) {
+    			log.finest("cid: " + (String)serv.getSessionData().get("cid")
 				+ ", sending: " + sb.toString());
+            }
 			return sb.toString();
 		}
 		case accept: {
@@ -477,7 +503,9 @@ public class ServerConnectionManagerOLD extends ConnectionManager<XMPPIOService>
 				(local_hostname != null ? local_hostname : "NULL"),
 				(remote_hostname != null ? remote_hostname : "NULL"),
 				ConnectionType.accept);
-			log.finest("Stream opened for: " + cid);
+			if (log.isLoggable(Level.FINEST)) {
+    			log.finest("Stream opened for: " + cid);
+            }
 			if (remote_hostname != null) {
 				log.fine("Opening stream for already established connection...., trying to turn on TLS????");
 			}
@@ -502,7 +530,9 @@ public class ServerConnectionManagerOLD extends ConnectionManager<XMPPIOService>
 	}
 
 	public void xmppStreamClosed(XMPPIOService serv) {
-		log.finer("Stream closed: " + getConnectionId(serv));
+        if (log.isLoggable(Level.FINER)) {
+        	log.finer("Stream closed: " + getConnectionId(serv));
+        }
 	}
 
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -550,9 +580,11 @@ public class ServerConnectionManagerOLD extends ConnectionManager<XMPPIOService>
 
 	public void serviceStarted(XMPPIOService serv) {
 		super.serviceStarted(serv);
-		log.finest("s2s connection opened: " + serv.getRemoteAddress()
-			+ ", type: " + serv.connectionType().toString()
-			+ ", id=" + serv.getUniqueId());
+		if (log.isLoggable(Level.FINEST)) {
+    		log.finest("s2s connection opened: " + serv.getRemoteAddress()
+        		+ ", type: " + serv.connectionType().toString()
+            	+ ", id=" + serv.getUniqueId());
+        }
 		switch (serv.connectionType()) {
 		case connect:
 			// Send init xmpp stream here
@@ -562,8 +594,10 @@ public class ServerConnectionManagerOLD extends ConnectionManager<XMPPIOService>
 				+ " xmlns='jabber:server'"
 				+ " xmlns:db='jabber:server:dialback'"
 				+ ">";
-			log.finest("cid: " + (String)serv.getSessionData().get("cid")
-				+ ", sending: " + data);
+			if (log.isLoggable(Level.FINEST)) {
+    			log.finest("cid: " + (String)serv.getSessionData().get("cid")
+        			+ ", sending: " + data);
+            }
 			serv.xmppStreamOpen(data);
 			break;
 		default:
@@ -705,13 +739,17 @@ public class ServerConnectionManagerOLD extends ConnectionManager<XMPPIOService>
 	}
 
 	public void handleDialbackSuccess(final String connect_jid) {
-		log.finest("handleDialbackSuccess: connect_jid="+connect_jid);
+		if (log.isLoggable(Level.FINEST)) {
+    		log.finest("handleDialbackSuccess: connect_jid="+connect_jid);
+        }
 		Packet p = null;
 		XMPPIOService serv = servicesByHost_Type.get(connect_jid);
 		ServerPacketQueue waiting = waitingPackets.remove(connect_jid);
 		if (waiting != null) {
 			while ((p = waiting.poll()) != null) {
-				log.finest("Sending packet: " + p.getStringData());
+   				if (log.isLoggable(Level.FINEST)) {
+    				log.finest("Sending packet: " + p.getStringData());
+                }
 				writePacketToSocket(serv, p);
 			} // end of while (p = waitingPackets.remove(ipAddress) != null)
 		} // end of if (waiting != null)
@@ -750,7 +788,9 @@ public class ServerConnectionManagerOLD extends ConnectionManager<XMPPIOService>
 			// it accept type....
 			if (old_serv != null
 				&& old_serv.connectionType() != ConnectionType.accept) {
-				log.finest("Stopping old connection for: " + cid);
+   				if (log.isLoggable(Level.FINEST)) {
+    				log.finest("Stopping old connection for: " + cid);
+                }
 				old_serv.stop();
 			}
 		}
@@ -759,7 +799,9 @@ public class ServerConnectionManagerOLD extends ConnectionManager<XMPPIOService>
 	public synchronized void processDialback(Packet packet, XMPPIOService serv,
 		Queue<Packet> results) {
 
-		log.finest("DIALBACK - " + packet.getStringData());
+		if (log.isLoggable(Level.FINEST)) {
+    		log.finest("DIALBACK - " + packet.getStringData());
+        }
 
 		String local_hostname = JIDUtils.getNodeHost(packet.getElemTo());
 		// Check whether this is correct local host name...
@@ -809,7 +851,9 @@ public class ServerConnectionManagerOLD extends ConnectionManager<XMPPIOService>
 					// Incorrect dialback packet, it happens for some servers....
 					// I don't know yet what software they use.
 					// Let's just disconnect and signal unrecoverable conection error
-					log.finer("Incorrect diablack packet: " + packet.getStringData());
+                    if (log.isLoggable(Level.FINER)) {
+                    	log.finer("Incorrect diablack packet: " + packet.getStringData());
+                    }
 					bouncePacketsBack(Authorization.SERVICE_UNAVAILABLE, connect_jid);
 					generateStreamError("bad-format", serv);
 				}
@@ -819,8 +863,10 @@ public class ServerConnectionManagerOLD extends ConnectionManager<XMPPIOService>
 				XMPPIOService connect_serv = handshakingByHost_Type.get(connect_jid);
 				switch (packet.getType()) {
 				case valid:
-					log.finer("Connection: " + connect_jid
-						+ " is valid, adding to available services.");
+                    if (log.isLoggable(Level.FINER)) {
+                    	log.finer("Connection: " + connect_jid
+                        	+ " is valid, adding to available services.");
+                    }
 					servicesByHost_Type.put(connect_jid, connect_serv);
 					handshakingByHost_Type.remove(connect_jid);
 					connectingByHost_Type.remove(connect_jid);
@@ -828,7 +874,9 @@ public class ServerConnectionManagerOLD extends ConnectionManager<XMPPIOService>
 					handleDialbackSuccess(connect_jid);
 					break;
 				default:
-					log.finer("Connection: " + connect_jid + " is invalid!! Stopping...");
+                    if (log.isLoggable(Level.FINER)) {
+                    	log.finer("Connection: " + connect_jid + " is invalid!! Stopping...");
+                    }
 					connect_serv.stop();
 					break;
 				} // end of switch (packet.getType())
@@ -860,19 +908,25 @@ public class ServerConnectionManagerOLD extends ConnectionManager<XMPPIOService>
 					Packet result = new Packet(result_el);
 
 					if (key.equals(local_key)) {
-						log.finer("Verification for " + accept_jid
-							+ " succeeded, sending valid.");
+                        if (log.isLoggable(Level.FINER)) {
+                        	log.finer("Verification for " + accept_jid
+                            	+ " succeeded, sending valid.");
+                        }
 						result_el.setAttribute("type", "valid");
 						//result = packet.swapElemFromTo(StanzaType.valid);
 					} else {
-						log.finer("Verification for " + accept_jid
-							+ " failed, sending invalid.");
+                        if (log.isLoggable(Level.FINER)) {
+                        	log.finer("Verification for " + accept_jid
+                            	+ " failed, sending invalid.");
+                        }
 						result_el.setAttribute("type", "invalid");
 						//result = packet.swapElemFromTo(StanzaType.invalid);
 					} // end of if (key.equals(local_key)) else
 					result.setTo(accept_jid);
-					log.finest("Adding result packet: " + result.getStringData()
-						+ " to " + result.getTo());
+    				if (log.isLoggable(Level.FINEST)) {
+    					log.finest("Adding result packet: " + result.getStringData()
+        					+ " to " + result.getTo());
+                    }
 					results.offer(result);
 				} // end of if (packet.getElemName().equals("db:verify"))
 			}	else {
@@ -906,14 +960,18 @@ public class ServerConnectionManagerOLD extends ConnectionManager<XMPPIOService>
 					//accept_serv.writeRawData(elem.toString());
 					switch (packet.getType()) {
 					case valid:
-						log.finer("Received " + packet.getType().toString()
-							+ " validation result, adding connection to active services.");
+                        if (log.isLoggable(Level.FINER)) {
+                        	log.finer("Received " + packet.getType().toString()
+                            	+ " validation result, adding connection to active services.");
+                        }
 						servicesByHost_Type.put(accept_jid, accept_serv);
 						break;
 					default:
 						// Ups, verification failed, let's stop the service now.
-						log.finer("Received " + packet.getType().toString()
-							+ " validation result, stopping service, closing connection.");
+                        if (log.isLoggable(Level.FINER)) {
+                        	log.finer("Received " + packet.getType().toString()
+                            	+ " validation result, stopping service, closing connection.");
+                        }
 						writeRawData(accept_serv, "</stream:stream>");
 						//accept_serv.writeRawData("</stream:stream>");
 						accept_serv.stop();

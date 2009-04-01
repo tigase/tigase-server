@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 import tigase.xml.Element;
 
 /**
@@ -187,10 +188,14 @@ public class ServiceEntity {
 	 */
 	public Element getDiscoInfo(String node) {
 		//System.out.println("Node: " + node);
-		log.finest("Node: " + node);
+		if (log.isLoggable(Level.FINEST)) {
+    		log.finest("Node: " + node);
+        }
 		Element query = null;
 		if (node == null) {
-			log.finest("It's me: " + toString());
+			if (log.isLoggable(Level.FINEST)) {
+    			log.finest("It's me: " + toString());
+            }
 			query = new Element("query",
 				new String[] {"xmlns"},
 				new String[] {"http://jabber.org/protocol/disco#info"});
@@ -209,7 +214,9 @@ public class ServiceEntity {
 		} else {
 			ServiceEntity entity = findNode(node);
 			if (entity != null) {
-				log.finest("Found child node: " + entity.toString());
+				if (log.isLoggable(Level.FINEST)) {
+    				log.finest("Found child node: " + entity.toString());
+                }
 				query = entity.getDiscoInfo(null);
 				query.setAttribute("node", node);
 			}
@@ -272,15 +279,19 @@ public class ServiceEntity {
 
 	public List<Element> getDiscoItems(String node, String jid) {
 		//System.out.println("node: " + node + ", jid: " + jid);
-		log.finest("node: " + node + ", jid: " + jid);
+		if (log.isLoggable(Level.FINEST)) {
+    		log.finest("node: " + node + ", jid: " + jid);
+        }
 		List<Element> result = null;
 		if (node == null) {
 			result = getItems(null, jid);
 		} else {
 			ServiceEntity entity = findNode(node);
 			//System.out.println("Found disco entity: " + entity.toString());
-			log.finest("Found disco entity: " + 
+			if (log.isLoggable(Level.FINEST)) {
+    			log.finest("Found disco entity: " +
 							(entity != null ? entity.toString() : null));
+            }
 			if (entity != null) {
 				result = entity.getItems(node, jid);
 			}
@@ -296,10 +307,14 @@ public class ServiceEntity {
 	 */
 	public ServiceEntity findNode(String node) {
 		//System.out.println("Looking for a node: " + node);
-		log.finest("Looking for a node: " + node);
+		if (log.isLoggable(Level.FINEST)) {
+    		log.finest("Looking for a node: " + node);
+        }
 		if (this.node != null && this.node.equals(node)) {
 			//System.out.println("Looking for a node: " + node);
-			log.finest("Found myself: " + toString());
+			if (log.isLoggable(Level.FINEST)) {
+    			log.finest("Found myself: " + toString());
+            }
 			return this;
 		}
 		if (items == null) {
@@ -308,7 +323,9 @@ public class ServiceEntity {
 		for (ServiceEntity item: items) {
 			String n = item.getNode();
 			if (n != null && node.equals(n)) {
-				log.finest("Found child item: " + item.toString());
+				if (log.isLoggable(Level.FINEST)) {
+    				log.finest("Found child item: " + item.toString());
+                }
 				return item;
 			}
 		}

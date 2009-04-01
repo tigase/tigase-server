@@ -83,7 +83,9 @@ public class ConnectionOpenThread implements Runnable {
 			Thread thrd = new Thread(acceptThread);
 			thrd.setName("ConnectionOpenThread");
 			thrd.start();
-			log.finer("ConnectionOpenThread started.");
+            if (log.isLoggable(Level.FINER)) {
+            	log.finer("ConnectionOpenThread started.");
+            }
 		} // end of if (acceptThread == null)
 		return acceptThread;
 	}
@@ -127,7 +129,9 @@ public class ConnectionOpenThread implements Runnable {
 		throws IOException {
 		switch (al.getConnectionType()) {
 		case accept:
-			log.finest("Setting up 'accept' channel...");
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Setting up 'accept' channel...");
+			}
 			ServerSocketChannel ssc = ServerSocketChannel.open();
 			ssc.socket().setReceiveBufferSize(RECEIVE_BUFFER_SIZE);
 			ssc.configureBlocking(false);
@@ -135,8 +139,10 @@ public class ConnectionOpenThread implements Runnable {
 			ssc.register(selector, SelectionKey.OP_ACCEPT, al);
 			break;
 		case connect:
-			log.finest("Setting up 'connect' channel for: "
-				+ isa.getAddress() + "/" + isa.getPort());
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Setting up 'connect' channel for: "
+					+ isa.getAddress() + "/" + isa.getPort());
+			}
 			SocketChannel sc = SocketChannel.open();
 			sc.socket().setReceiveBufferSize(RECEIVE_BUFFER_SIZE);
 			sc.configureBlocking(false);
@@ -176,12 +182,16 @@ public class ConnectionOpenThread implements Runnable {
 					if ((sk.readyOps() & SelectionKey.OP_ACCEPT) != 0) {
 						ServerSocketChannel nextReady = (ServerSocketChannel)sk.channel();
 						sc = nextReady.accept();
-						log.finest("OP_ACCEPT");
+						if (log.isLoggable(Level.FINEST)) {
+							log.finest("OP_ACCEPT");
+						}
 					} // end of if (sk.readyOps() & SelectionKey.OP_ACCEPT)
 					if ((sk.readyOps() & SelectionKey.OP_CONNECT) != 0) {
 						sk.cancel();
 						sc = (SocketChannel)sk.channel();
-						log.finest("OP_CONNECT");
+						if (log.isLoggable(Level.FINEST)) {
+							log.finest("OP_CONNECT");
+						}
 					} // end of if (sk.readyOps() & SelectionKey.OP_ACCEPT)
 					if (sc != null) {
 						// We have to catch exception here as sometimes socket is closed
@@ -191,7 +201,9 @@ public class ConnectionOpenThread implements Runnable {
 							sc.configureBlocking(false);
 							sc.socket().setSoLinger(false, 0);
 							sc.socket().setReuseAddress(true);
-							log.finer("Registered new client socket: "+sc);
+                            if (log.isLoggable(Level.FINER)) {
+                            	log.finer("Registered new client socket: "+sc);
+                            }
 							ConnectionOpenListener al = (ConnectionOpenListener)sk.attachment();
 							al.accept(sc);
 						} catch (java.net.SocketException e) {

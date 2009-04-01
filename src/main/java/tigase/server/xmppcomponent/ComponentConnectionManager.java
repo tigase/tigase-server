@@ -90,9 +90,13 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 
 	@Override
 	public void processPacket(Packet packet) {
-		log.finer("Processing packet: " + packet.getElemName()
-			+ ", type: " + packet.getType());
-		log.finest("Processing packet: " + packet.getStringData());
+		if (log.isLoggable(Level.FINER)) {
+			log.finer("Processing packet: " + packet.getElemName()
+				+ ", type: " + packet.getType());
+		}
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Processing packet: " + packet.getStringData());
+		}
 		if (packet.getElemTo() != null
 			&& packet.getElemTo().equals(getComponentId())) {
 			try {
@@ -114,9 +118,13 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 	public Queue<Packet> processSocketData(XMPPIOService serv) {
 		Packet p = null;
 		while ((p = serv.getReceivedPackets().poll()) != null) {
-			log.finer("Processing packet: " + p.getElemName()
-				+ ", type: " + p.getType());
-			log.finest("Processing socket data: " + p.getStringData());
+			if (log.isLoggable(Level.FINER)) {
+				log.finer("Processing packet: " + p.getElemName()
+					+ ", type: " + p.getType());
+			}
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Processing socket data: " + p.getStringData());
+			}
 			if (p.getElemName().equals("handshake")) {
 				processHandshake(p, serv);
 			} else {
@@ -139,7 +147,9 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 				updateRoutings(routings, true);
 				String addr =
 					(String)serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
-				log.fine("Connected to: " + addr);
+				if (log.isLoggable(Level.FINE)) {
+					log.fine("Connected to: " + addr);
+				}
 				updateServiceDiscovery(addr, "XEP-0114 connected");
 			} else {
 				log.warning("Incorrect packet received: " + p.getStringData());
@@ -154,8 +164,10 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 				(String)serv.getSessionData().get(SECRET_PROP_KEY);
 			try {
 				String loc_digest = Algorithms.hexDigest(id, secret, "SHA");
-				log.finest("Calculating digest: id="+id+", secret="+secret
-					+", digest="+loc_digest);
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("Calculating digest: id="+id+", secret="+secret
+						+", digest="+loc_digest);
+				}
 				if (digest != null && digest.equals(loc_digest)) {
 					Packet resp = new Packet(new Element("handshake"));
 					writePacketToSocket(serv, resp);
@@ -164,7 +176,9 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 					updateRoutings(routings, true);
 					String addr = 
 									(String)serv.getSessionData().get(XMPPIOService.HOSTNAME_KEY);
-					log.fine("Connected to: " + addr);
+					if (log.isLoggable(Level.FINE)) {
+						log.fine("Connected to: " + addr);
+					}
 					updateServiceDiscovery(addr, "XEP-0114 connected");
 				} else {
 					log.info("Handshaking passwords don't match, disconnecting...");
@@ -331,7 +345,9 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 		} // end of if (type == ConnectionType.connect)
 		//		removeRouting(serv.getRemoteHost());
 		String addr = (String)sessionData.get(PORT_REMOTE_HOST_PROP_KEY);
-		log.fine("Disonnected from: " + addr);
+		if (log.isLoggable(Level.FINE)) {
+			log.fine("Disonnected from: " + addr);
+		}
 		updateServiceDiscovery(addr, "XEP-0114 disconnected");
 	}
 
@@ -343,9 +359,11 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 	@Override
 	public void serviceStarted(XMPPIOService serv) {
 		super.serviceStarted(serv);
-		log.finest("c2c connection opened: " + serv.getRemoteAddress()
-			+ ", type: " + serv.connectionType().toString()
-			+ ", id=" + serv.getUniqueId());
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("c2c connection opened: " + serv.getRemoteAddress()
+				+ ", type: " + serv.connectionType().toString()
+				+ ", id=" + serv.getUniqueId());
+		}
 // 		String addr =
 // 			(String)service.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
 // 		addRouting(addr);
@@ -362,8 +380,10 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 				+ " xmlns:stream='http://etherx.jabber.org/streams'"
 				+ " to='" + compName + "'"
 				+ ">";
-			log.finest("cid: " + (String)serv.getSessionData().get("cid")
-				+ ", sending: " + data);
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("cid: " + (String)serv.getSessionData().get("cid")
+					+ ", sending: " + data);
+			}
 			serv.xmppStreamOpen(data);
 			break;
 		default:
@@ -375,7 +395,9 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 	public String xmppStreamOpened(XMPPIOService service,
 		Map<String, String> attribs) {
 
-		log.finer("Stream opened: " + attribs.toString());
+        if (log.isLoggable(Level.FINER)) {
+        	log.finer("Stream opened: " + attribs.toString());
+        }
 
 		switch (service.connectionType()) {
 		case connect: {
@@ -385,8 +407,10 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 				(String)service.getSessionData().get(SECRET_PROP_KEY);
 			try {
 				String digest = Algorithms.hexDigest(id, secret, "SHA");
-				log.finest("Calculating digest: id="+id+", secret="+secret
-					+", digest="+digest);
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("Calculating digest: id="+id+", secret="+secret
+						+", digest="+digest);
+				}
 				return "<handshake>" + digest + "</handshake>";
 			} catch (NoSuchAlgorithmException e) {
 				log.log(Level.SEVERE, "Can not generate digest for pass phrase.", e);
@@ -413,7 +437,9 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 	}
 
 	public void xmppStreamClosed(XMPPIOService serv) {
-		log.finer("Stream closed.");
+        if (log.isLoggable(Level.FINER)) {
+        	log.finer("Stream closed.");
+        }
 	}
 
 	/**
@@ -450,7 +476,9 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 	private void updateServiceDiscovery(String jid, String name) {
 		ServiceEntity item = new ServiceEntity(jid, null, name);
 		//item.addIdentities(new ServiceIdentity("component", identity_type, name));
-		log.finest("Modifing service-discovery info: " + item.toString());
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Modifing service-discovery info: " + item.toString());
+		}
 		serviceEntity.addItems(item);
 	}
 

@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.Queue;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 import tigase.server.Packet;
 import tigase.util.OSUtils;
 
@@ -140,21 +141,31 @@ public class DiskMonitor extends AbstractMonitor {
 	private File[] getLinuxRoots() {
 		try {
 			String mtab = "/etc/mtab";
-			log.finest("Reading mtab: " + mtab);
+			if (log.isLoggable(Level.FINEST)) {
+    			log.finest("Reading mtab: " + mtab);
+            }
 			BufferedReader buffr = new BufferedReader(new FileReader(mtab));
 			String line = null;
 			ArrayList<File> results = new ArrayList<File>();
 			while ((line = buffr.readLine()) != null) {
-				log.finest("Analyzing line: " + line);
+				if (log.isLoggable(Level.FINEST)) {
+    				log.finest("Analyzing line: " + line);
+                }
 				if (line.contains("proc") || line.contains("devfs") ||
 								line.contains("tmpfs") || line.contains("sysfs") ||
 								line.contains("devpts") || line.contains("securityfs")) {
-					log.finest("Found virtual fs line, omitting...");
+    				if (log.isLoggable(Level.FINEST)) {
+        				log.finest("Found virtual fs line, omitting...");
+                    }
 					continue;
 				}
-				log.finest("Splitting line...");
+				if (log.isLoggable(Level.FINEST)) {
+    				log.finest("Splitting line...");
+                }
 				String[] parts = line.split("\\s");
-				log.finest("Found file system: " + parts[1]);
+				if (log.isLoggable(Level.FINEST)) {
+    				log.finest("Found file system: " + parts[1]);
+                }
 				results.add(new File(parts[1]));
 			}
 			return results.toArray(new File[results.size()]);

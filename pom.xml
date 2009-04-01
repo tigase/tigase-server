@@ -100,13 +100,13 @@
     <dependency>
       <groupId>tigase</groupId>
       <artifactId>tigase-utils</artifactId>
-      <version>3.1.2</version>
+      <version>3.2.0</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>tigase</groupId>
       <artifactId>tigase-xmltools</artifactId>
-      <version>3.1.1</version>
+      <version>3.2.0</version>
       <scope>compile</scope>
     </dependency>
   </dependencies>

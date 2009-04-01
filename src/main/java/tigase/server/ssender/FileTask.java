@@ -154,7 +154,9 @@ public class FileTask extends SenderTask {
 			String[] files = fdir.list(new MaskFilter(file_mask));
 			if (files != null) {
 				for (String file: files) {
-					log.finest("Processing file: " + file);
+    				if (log.isLoggable(Level.FINEST)) {
+        				log.finest("Processing file: " + file);
+                    }
 					File ffile = new File(fdir, file);
 					String stanza = readFile(ffile);
 					handler.handleStanza(stanza);

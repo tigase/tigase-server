@@ -178,7 +178,9 @@ public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
 			return;
 		}
 
-		log.info("Processing command: " + packet.toString());
+		if (log.isLoggable(Level.INFO)) {
+			log.info("Processing command: " + packet.toString());
+		}
 		Packet result = null;
 		if (packet.getCommand() == Command.VHOSTS_RELOAD ||
 						Command.getData(packet) != null) {
@@ -186,7 +188,9 @@ public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
 		} else {
 			result = packet.commandResult(Command.DataType.form);
 		}
-		log.finest("Preparing result: " + result.toString());
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Preparing result: " + result.toString());
+		}
 		switch (packet.getCommand()) {
 			case VHOSTS_RELOAD:
 				repo.reload();
@@ -196,7 +200,9 @@ public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
 			case VHOSTS_UPDATE:
 				if (Command.getData(packet) == null) {
 					prepareVHostData(result);
-					log.finest("Sending result back: " + result.toString());
+					if (log.isLoggable(Level.FINEST)) {
+						log.finest("Sending result back: " + result.toString());
+					}
 					results.offer(result);
 				} else {
 					updateVHostChanges(packet, result);
@@ -234,16 +240,19 @@ public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
 		if (getName().equals(JIDUtils.getNodeNick(jid)) ||
 						getComponentId().equals(jid)) {
 			List<Element> items = serviceEntity.getDiscoItems(node, jid);
-			log.finest("Processing discoItems for node: " + node + ", result: "
-				+ (items == null ? null : items.toString()));
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Processing discoItems for node: " + node + ", result: "	+
+								(items == null ? null : items.toString()));
+			}
 			return items;
 		} else {
 			if (node == null) {
 				Element item = serviceEntity.getDiscoItem(null,
 								JIDUtils.getNodeID(getName(), jid));
-				log.finest("Processing discoItems, result: "
- +
-								(item == null ? null : item.toString()));
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("Processing discoItems, result: " +
+									(item == null ? null : item.toString()));
+				}
 				return Arrays.asList(item);
 			} else {
 				return null;
@@ -346,7 +355,7 @@ public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
 			repo_tmp.setProperties(properties);
 			repo = repo_tmp;
 		} catch (Exception e) {
-			log.log(Level.SEVERE, 
+			log.log(Level.SEVERE,
 							"Can not create VHost repository instance for class: " +
 							repo_class, e);
 		}

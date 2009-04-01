@@ -252,7 +252,9 @@ public class JDBCTask extends SenderTask {
 				// Handle stanza to the StanzaSender....
 				String stanza = rs.getString("stanza");
 				handler.handleStanza(stanza);
-				log.finest("Sent stanza found in database: " + stanza);
+   				if (log.isLoggable(Level.FINEST)) {
+    				log.finest("Sent stanza found in database: " + stanza);
+                }
 			}
 			// Remove all processed stanzas
 			for (long id: ids_to_delete) {

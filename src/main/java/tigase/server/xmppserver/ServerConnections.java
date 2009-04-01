@@ -25,6 +25,7 @@ import java.util.LinkedList;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import tigase.xmpp.XMPPIOService;
 import tigase.server.Packet;
@@ -152,7 +153,9 @@ public class ServerConnections {
 		}
 		if (!result) {
 			addControlPacket(packet);
-			log.finest("Inserted to waiting queue packet: " + packet.toString());
+			if (log.isLoggable(Level.FINEST)) {
+    			log.finest("Inserted to waiting queue packet: " + packet.toString());
+            }
 		}
 		return result;
 	}
@@ -333,7 +336,9 @@ public class ServerConnections {
 		if (serv == outgoing) {
 			outgoing = null;
 			conn_state = OutgoingState.NULL;
-			log.finer("Connection removed: " + session_id);
+            if (log.isLoggable(Level.FINER)) {
+                log.finer("Connection removed: " + session_id);
+            }
 // 			return;
 		}
 // 		XMPPIOService rem = incoming.remove(session_id);
