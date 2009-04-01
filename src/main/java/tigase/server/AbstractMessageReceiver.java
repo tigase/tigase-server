@@ -21,6 +21,7 @@
  */
 package tigase.server;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -88,8 +89,9 @@ public abstract class AbstractMessageReceiver
 	// Array cache to speed processing up....
 	private Priority[] pr_cache = Priority.values();
 
-	private PriorityQueue<Packet> in_queue =
-		new PriorityQueue<Packet>(pr_cache.length, maxQueueSize);
+	private int in_queues_size = 1;
+	private ArrayList<PriorityQueue<Packet>> in_queues =
+		new ArrayList<PriorityQueue<Packet>>();
   private PriorityQueue<Packet> out_queue =
 		new PriorityQueue<Packet>(pr_cache.length, maxQueueSize);
 
@@ -97,9 +99,9 @@ public abstract class AbstractMessageReceiver
 	private Timer receiverTasks = null;
 	private ConcurrentHashMap<String, ReceiverTask> waitingTasks =
 					new ConcurrentHashMap<String, ReceiverTask>(16, 0.75f, 4);
-	private Thread in_thread = null;
-	private Thread out_thread = null;
-  private boolean stopped = false;
+	private LinkedList<QueueListener> processingThreads = null;
+	private QueueListener out_thread = null;
+  //private boolean stopped = false;
   private String name = null;
 	protected VHostManagerIfc vHostManager = null;
 	//private Set<String> routings = new CopyOnWriteArraySet<String>();
@@ -143,12 +145,16 @@ public abstract class AbstractMessageReceiver
 
 	@Override
   public boolean addPacketNB(Packet packet) {
+		int queueIdx = Math.abs(packet.getTo().hashCode() %	in_queues_size);
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("[" + getName() + "]  " + packet.toString());
+			log.finest("[" + getName() + "] queueIdx=" + queueIdx +
+							", " + packet.toString());
 		}
 //		boolean result = in_queue.offer(packet, packet.getPriority().ordinal(),
 //						getName() + ":" + QueueType.IN_QUEUE);
-		boolean result = in_queue.offer(packet, packet.getPriority().ordinal());
+		//boolean result = in_queue.offer(packet, packet.getPriority().ordinal());
+		boolean result = in_queues.get(queueIdx).offer(packet,
+						packet.getPriority().ordinal());
 		if (result) {
 			++statReceivedMessagesOk;
 			++curr_second;
@@ -176,13 +182,16 @@ public abstract class AbstractMessageReceiver
 
 	@Override
 	public boolean addPacket(Packet packet) {
+		int queueIdx = Math.abs(packet.getTo().hashCode() %	in_queues_size);
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("[" + getName() + "]  " + packet.toString());
+			log.finest("[" + getName() + "] queueIdx=" + queueIdx +
+							", " + packet.toString());
 		}
 		try {
 //			in_queue.put(packet, packet.getPriority().ordinal(),
 //							getName() + ":" + QueueType.IN_QUEUE);
-			in_queue.put(packet, packet.getPriority().ordinal());
+			//in_queue.put(packet, packet.getPriority().ordinal());
+			in_queues.get(queueIdx).put(packet, packet.getPriority().ordinal());
 			++statReceivedMessagesOk;
 			++curr_second;
 		} catch (InterruptedException e) {
@@ -269,7 +278,13 @@ public abstract class AbstractMessageReceiver
 				statReceivedMessagesOk, Level.FINE));
     stats.add(new StatRecord(getName(), StatisticType.MSG_SENT_OK,
 				statSentMessagesOk, Level.FINE));
-		int[] in_priority_sizes = in_queue.size();
+		int[] in_priority_sizes = in_queues.get(0).size();
+		for (int i = 1; i < in_queues.size(); i++) {
+			int[] tmp_pr_sizes = in_queues.get(i).size();
+			for (int j = 0; j < tmp_pr_sizes.length; j++) {
+				in_priority_sizes[j] += tmp_pr_sizes[j];
+			}
+		}
 		int in_queue_size = 0;
 		int[] out_priority_sizes = out_queue.size();
 		int out_queue_size = 0;
@@ -308,7 +323,7 @@ public abstract class AbstractMessageReceiver
 	 */
 	@Override
   public void setProperties(Map<String, Object> props) {
-    int queueSize = (Integer)props.get(MAX_QUEUE_SIZE_PROP_KEY);
+		int queueSize = (Integer)props.get(MAX_QUEUE_SIZE_PROP_KEY);
 		//stopThreads();
 		setMaxQueueSize(queueSize);
 		//startThreads();
@@ -318,9 +333,17 @@ public abstract class AbstractMessageReceiver
   }
 
   public void setMaxQueueSize(int maxQueueSize) {
-		if (this.maxQueueSize != maxQueueSize) {
+		if (this.maxQueueSize != maxQueueSize || in_queues.size() == 0) {
       this.maxQueueSize = maxQueueSize;
-			in_queue.setMaxSize(maxQueueSize);
+			if (in_queues.size() == 0) {
+				for (int i = 0; i < in_queues_size; i++) {
+					in_queues.add(new PriorityQueue<Packet>(pr_cache.length, maxQueueSize));
+				}
+			} else {
+				for (int i = 0; i < in_queues.size(); i++) {
+					in_queues.get(i).setMaxSize(maxQueueSize);
+				}
+			}
 			out_queue.setMaxSize(maxQueueSize);
     } // end of if (this.maxQueueSize != maxQueueSize)
   }
@@ -379,6 +402,7 @@ public abstract class AbstractMessageReceiver
   public void setName(String name) {
     this.name = name;
 		compId = JIDUtils.getNodeID(name, defHostname);
+		//in_queues_size = processingThreads();
 		setMaxQueueSize(maxQueueSize);
   }
 
@@ -388,22 +412,26 @@ public abstract class AbstractMessageReceiver
   }
 
 	private void stopThreads() {
-    stopped = true;
+    //stopped = true;
 		try {
-			if (in_thread != null) {
-				in_thread.interrupt();
-				while (in_thread.isAlive()) {
-					Thread.sleep(100);
+			if (processingThreads != null) {
+				for (QueueListener in_thread : processingThreads) {
+					in_thread.threadStopped = true;
+					in_thread.interrupt();
+					while (in_thread.isAlive()) {
+						Thread.sleep(100);
+					}
 				}
 			}
 			if (out_thread != null) {
+				out_thread.threadStopped = true;
 				out_thread.interrupt();
 				while (out_thread.isAlive()) {
 					Thread.sleep(100);
 				}
 			}
 		} catch (InterruptedException e) {}
-		in_thread = null;
+		processingThreads = null;
 		out_thread = null;
 		if (receiverTasks != null) {
 			receiverTasks.cancel();
@@ -435,25 +463,32 @@ public abstract class AbstractMessageReceiver
 	}
 
 	private void startThreads() {
-		if (in_thread == null || ! in_thread.isAlive()) {
-			stopped = false;
-			in_thread = new Thread(new QueueListener(in_queue, QueueType.IN_QUEUE));
-			in_thread.setName("in_" + name);
-			in_thread.start();
+		if (processingThreads == null) {
+			//stopped = false;
+			processingThreads = new LinkedList<QueueListener>();
+			for (int i = 0; i < in_queues_size; i++) {
+				QueueListener in_thread =
+								new QueueListener(in_queues.get(i), QueueType.IN_QUEUE);
+				in_thread.setName("in_" + i + "-" + name);
+				in_thread.start();
+				processingThreads.add(in_thread);
+			}
 		} // end of if (thread == null || ! thread.isAlive())
 		if (out_thread == null || ! out_thread.isAlive()) {
-			stopped = false;
-			out_thread = new Thread(new QueueListener(out_queue, QueueType.OUT_QUEUE));
+			//stopped = false;
+			out_thread = new QueueListener(out_queue, QueueType.OUT_QUEUE);
 			out_thread.setName("out_" + name);
 			out_thread.start();
 		} // end of if (thread == null || ! thread.isAlive())
 		receiverTasks = new Timer(getName() + " tasks", true);
 		receiverTasks.schedule(new TimerTask() {
+			@Override
 				public void run() {
 					everySecond();
 				}
 			}, SECOND, SECOND);
 		receiverTasks.schedule(new TimerTask() {
+			@Override
 				public void run() {
 					everyMinute();
 				}
@@ -574,12 +609,17 @@ public abstract class AbstractMessageReceiver
 		addPacketNB(packet);
 	}
 
+	public int processingThreads() {
+		return 1;
+	}
+
 	private enum QueueType { IN_QUEUE, OUT_QUEUE }
 
-	private class QueueListener implements Runnable {
+	private class QueueListener extends Thread {
 
 		private PriorityQueue<Packet> queue;
 		private QueueType type = null;
+		private boolean threadStopped = false;
 
 		private QueueListener(PriorityQueue<Packet> q, QueueType type) {
 			this.queue = q;
@@ -589,10 +629,10 @@ public abstract class AbstractMessageReceiver
 		@Override
 		public void run() {
 			if (log.isLoggable(Level.FINEST)) {
-    			log.finest(getName() + " starting queue processing.");
-            }
+				log.finest(getName() + " starting queue processing.");
+			}
 			Packet packet = null;
-			while (! stopped) {
+			while (! threadStopped) {
 				try {
 					// Now process next waiting packet
 //					log.finest("[" + getName() + "] before take... " + type);
@@ -639,7 +679,7 @@ public abstract class AbstractMessageReceiver
 									"] Exception during packet processing: " +
 									packet.toString(), e);
 				} // end of try-catch
-			} // end of while (! stopped)
+			} // end of while (! threadStopped)
 		}
 
 	}

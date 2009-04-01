@@ -95,6 +95,16 @@ public abstract class XMPPProcessor
     return false;
   }
 
+	@Override
+	public int concurrentQueuesNo() {
+		return 2;
+	}
+
+	@Override
+	public int concurrentThreadsPerQueue() {
+		return 1;
+	}
+
 	public XMPPProcessor getInstance() { return inst; }
 
 	// Implementation of java.lang.Comparable

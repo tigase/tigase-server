@@ -105,7 +105,12 @@ public interface XMPPImplIfc {
 	 * or need schema upgrade.
 	 *
 	 * @param rep an <code>UserRepository</code> value
+	 * @throws TigaseDBException 
 	 */
 	void init(UserRepository rep) throws TigaseDBException;
+
+	int concurrentQueuesNo();
+
+	int concurrentThreadsPerQueue();
 
 } // XMPPImplIfc

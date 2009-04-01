@@ -106,9 +106,11 @@ public class BoshConnectionManager extends ClientConnectionManager
 	protected boolean writePacketToSocket(Packet packet) {
 		BoshSession session = getBoshSession(packet.getTo());
 		if (session != null) {
-			Queue<Packet> out_results = new LinkedList<Packet>();
-			session.processPacket(packet, out_results);
-			addOutPackets(out_results, session);
+			synchronized (session) {
+				Queue<Packet> out_results = new LinkedList<Packet>();
+				session.processPacket(packet, out_results);
+				addOutPackets(out_results, session);
+			}
 			return true;
 		} else {
 			log.info("Session does not exist for packet: " + packet.toString());
@@ -203,7 +205,9 @@ public class BoshConnectionManager extends ClientConnectionManager
 					sid = UUID.fromString(sid_str);
 					bs = sessions.get(sid);
 					if (bs != null) {
-						bs.processSocketPacket(p, serv, out_results);
+						synchronized (bs) {
+							bs.processSocketPacket(p, serv, out_results);
+						}
 					} else {
 						log.info("There is no session with given SID. Closing invalid connection");
 						serv.sendErrorAndStop(Authorization.ITEM_NOT_FOUND, p, "Invalid SID");

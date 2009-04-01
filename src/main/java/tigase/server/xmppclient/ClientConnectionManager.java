@@ -106,10 +106,10 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 									"The user connection is no longer active.", true);
 					addOutPacket(error);
 				} catch (PacketErrorTypeException e) {
-    				if (log.isLoggable(Level.FINEST)) {
-    					log.finest(
-									"Ups, already error packet. Dropping it to prevent infinite loop.");
-                        }
+					if (log.isLoggable(Level.FINEST)) {
+						log.finest(
+										"Ups, already error packet. Dropping it to prevent infinite loop.");
+					}
 				}
 				// In case the SessionManager lost synchronization for any reason, let's
 				// notify it that the user connection no longer exists.
@@ -140,9 +140,9 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 				break;
 			case STARTTLS:
 				if (serv != null) {
-            		if (log.isLoggable(Level.FINER)) {
-                		log.finer("Starting TLS for connection: " + serv.getUniqueId());
-                    }
+					if (log.isLoggable(Level.FINER)) {
+						log.finer("Starting TLS for connection: " + serv.getUniqueId());
+					}
 					try {
 						// Note:
 						// If you send <proceed> packet to client you must expect
@@ -176,10 +176,10 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 				String old_receiver = changeDataReceiver(packet, newAddress,
 								command_sessionId, serv);
 				if (old_receiver != null) {
-            		if (log.isLoggable(Level.FINE)) {
-    					log.fine("Redirecting data for sessionId: " + command_sessionId +
-									", to: " + newAddress);
-                    }
+					if (log.isLoggable(Level.FINE)) {
+						log.fine("Redirecting data for sessionId: " + command_sessionId +
+										", to: " + newAddress);
+					}
 					Packet response = null;
 // 				response = packet.commandResult(null);
 // 				Command.addFieldValue(response, "session-id", command_sessionId);
@@ -192,10 +192,10 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 					response.getElement().setAttribute("to", newAddress);
 					addOutPacket(response);
 				} else {
-            		if (log.isLoggable(Level.FINEST)) {
-    					log.finest("Connection for REDIRECT command does not exist, ignoring " +
-        								"packet: " + packet.toString());
-                    }
+					if (log.isLoggable(Level.FINEST)) {
+						log.finest("Connection for REDIRECT command does not exist, ignoring " +
+										"packet: " + packet.toString());
+					}
 				}
 				break;
 			case STREAM_CLOSED:
@@ -208,10 +208,10 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 				if (serv != null) {
 					serv.stop();
 				} else {
-            		if (log.isLoggable(Level.FINE)) {
-    					log.fine("Attempt to stop non-existen service for packet: " +
-									packet.getStringData() + ", Service already stopped?");
-                    }
+					if (log.isLoggable(Level.FINE)) {
+						log.fine("Attempt to stop non-existen service for packet: " +
+										packet.getStringData() + ", Service already stopped?");
+					}
 				} // end of if (serv != null) else
 				break;
 			case CHECK_USER_CONNECTION:
@@ -499,6 +499,11 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 	@Override
 	protected Integer getMaxQueueSize(int def) {
 		return def * 10;
+	}
+
+	@Override
+	public int processingThreads() {
+		return Runtime.getRuntime().availableProcessors();
 	}
 
 	private class StoppedHandler implements ReceiverEventHandler {

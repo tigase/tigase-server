@@ -117,7 +117,7 @@ public class SocketReadThread implements Runnable {
 	}
 
 	private static final Object threadNoSync = new Object();
-	private static int incrementAndGet() {
+	private int incrementAndGet() {
 		int result = 0;
 		synchronized (threadNoSync) {
 			threadNo = (threadNo + 1) % socketReadThread.length;
@@ -126,7 +126,7 @@ public class SocketReadThread implements Runnable {
 		return result;
 	}
 
-	public static void addSocketService(IOService s) {
+	public void addSocketService(IOService s) {
 		socketReadThread[incrementAndGet()].addSocketServicePriv(s);
 	}
 

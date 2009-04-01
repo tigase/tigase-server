@@ -58,23 +58,41 @@ public class RosterPresence  extends XMPPProcessor
 		Presence.XMLNS, JabberIqRoster.XMLNS, JabberIqRoster.XMLNS_DYNAMIC};
   private static final Element[] DISCO_FEATURES =	JabberIqRoster.DISCO_FEATURES;
 
+	@Override
 	public String id() { return ID; }
 
+	@Override
 	public String[] supElements()
 	{ return ELEMENTS; }
 
+	@Override
   public String[] supNamespaces()
 	{ return XMLNSS; }
 
+	@Override
   public Element[] supDiscoFeatures(final XMPPResourceConnection session)
 	{ return DISCO_FEATURES; }
 
+	@Override
 	public void stopped(final XMPPResourceConnection session,
 		final Queue<Packet> results, final Map<String, Object> settings) {
 		Presence.stopped(session, results, settings);
 		JabberIqRoster.stopped(session, results, settings);
 	}
 
+	@Override
+	public int concurrentQueuesNo() {
+		return Runtime.getRuntime().availableProcessors() * 2;
+	}
+
+	@Override
+	public int concurrentThreadsPerQueue() {
+		// Packet processing does matter for roster/presence therefore
+		// we need a single thread for each queue.
+		return 1;
+	}
+
+	@Override
   public void process(final Packet packet,
 		final XMPPResourceConnection session,
 		final NonAuthUserRepository repo, final Queue<Packet> results,

@@ -94,6 +94,16 @@ public class JabberIqAuth extends XMPPProcessor
 	}
 
 	@Override
+	public int concurrentQueuesNo() {
+		return Runtime.getRuntime().availableProcessors();
+	}
+
+	@Override
+	public int concurrentThreadsPerQueue() {
+		return 2;
+	}
+
+	@Override
 	public void process(final Packet packet, final XMPPResourceConnection session,
 		final NonAuthUserRepository repo, final Queue<Packet> results,
 		final Map<String, Object> settings)

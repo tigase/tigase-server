@@ -379,61 +379,72 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 	}
 
 	public void writePacketsToSocket(IO serv, Queue<Packet> packets) {
-		if (packets != null && packets.size() > 0) {
-			Packet p = null;
-			while ((p = packets.poll()) != null) {
-				serv.addPacketToSend(p);
-			} // end of for ()
-			try {
-				serv.processWaitingPackets();
-				readThread.addSocketService(serv);
-			} catch (Exception e) {
-				log.log(Level.WARNING, "Exception during writing packets: ", e);
-				try {
-					serv.stop();
-				} catch (Exception e1) {
-					log.log(Level.WARNING, "Exception stopping XMPPIOService: ", e1);
-				} // end of try-catch
-			} // end of try-catch
-		}
+		if (serv != null) {
+			synchronized (serv) {
+				if (packets != null && packets.size() > 0) {
+					Packet p = null;
+					while ((p = packets.poll()) != null) {
+						serv.addPacketToSend(p);
+					} // end of for ()
+					try {
+						serv.processWaitingPackets();
+						readThread.addSocketService(serv);
+					} catch (Exception e) {
+						log.log(Level.WARNING, "Exception during writing packets: ", e);
+						try {
+							serv.stop();
+						} catch (Exception e1) {
+							log.log(Level.WARNING, "Exception stopping XMPPIOService: ", e1);
+						} // end of try-catch
+					} // end of try-catch
+				}
+			}
+		} else {
+			if (log.isLoggable(Level.FINE)) {
+				log.fine("Can't find service for packets: <" + packets.toString() + "> ");
+			}
+		} // end of if (ios != null) else
 	}
 
 	public boolean writePacketToSocket(IO ios, Packet p) {
 		if (ios != null) {
-			ios.addPacketToSend(p);
-			try {
-				ios.processWaitingPackets();
-				readThread.addSocketService(ios);
-				return true;
-			} catch (Exception e) {
-				log.log(Level.WARNING, "Exception during writing packets: ", e);
+			synchronized (ios) {
+				ios.addPacketToSend(p);
 				try {
-					ios.stop();
-				} catch (Exception e1) {
-					log.log(Level.WARNING, "Exception stopping XMPPIOService: ", e1);
+					ios.processWaitingPackets();
+					readThread.addSocketService(ios);
+					return true;
+				} catch (Exception e) {
+					log.log(Level.WARNING, "Exception during writing packets: ", e);
+					try {
+						ios.stop();
+					} catch (Exception e1) {
+						log.log(Level.WARNING, "Exception stopping XMPPIOService: ", e1);
+					} // end of try-catch
 				} // end of try-catch
-			} // end of try-catch
+			}
 		} else {
 			if (log.isLoggable(Level.FINE)) {
-				log.fine("Can't find service for packet: <"
-					+ p.getElemName() + "> " + p.getTo()
-					+ ", service id: " + getServiceId(p));
+				log.fine("Can't find service for packet: <" + p.getElemName() + "> " +
+								p.getTo() + ", service id: " + getServiceId(p));
 			}
 		} // end of if (ios != null) else
 		return false;
 	}
 
 	protected void writeRawData(IO ios, String data) {
-		try {
-			ios.writeRawData(data);
-			readThread.addSocketService(ios);
-		} catch (Exception e) {
-			log.log(Level.WARNING, "Exception during writing data: " + data, e);
+		synchronized (ios) {
 			try {
-				ios.stop();
-			} catch (Exception e1) {
-				log.log(Level.WARNING, "Exception stopping XMPPIOService: ", e1);
-			} // end of try-catch
+				ios.writeRawData(data);
+				readThread.addSocketService(ios);
+			} catch (Exception e) {
+				log.log(Level.WARNING, "Exception during writing data: " + data, e);
+				try {
+					ios.stop();
+				} catch (Exception e1) {
+					log.log(Level.WARNING, "Exception stopping XMPPIOService: ", e1);
+				} // end of try-catch
+			}
 		}
 	}
 
@@ -482,6 +493,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 		return services.get(getServiceId(p));
 	}
 
+	@Override
 	public void processPacket(Packet packet) {
 		writePacketToSocket(packet);
 	}
@@ -489,6 +501,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 	public abstract Queue<Packet> processSocketData(IO serv);
 
 	@SuppressWarnings({"unchecked"})
+	@Override
 	public void serviceStopped(IOService s) {
 		IO ios = (IO)s;
 		serviceStopped(ios);

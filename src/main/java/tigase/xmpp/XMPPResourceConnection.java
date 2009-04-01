@@ -21,7 +21,6 @@
  */
 package tigase.xmpp;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -264,6 +263,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
    * been authorized yet and some parts of user JID are not known yet.
    * @see #getJID()
    */
+	@Override
   public final String getUserId() throws NotAuthorizedException {
     if (parentSession == null) {
       throw new NotAuthorizedException(NOT_AUTHORIZED_MSG);
@@ -271,6 +271,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
     return userId;
   }
 
+	@Override
 	public final String getUserName() throws NotAuthorizedException {
     if (parentSession == null) {
       throw new NotAuthorizedException(NOT_AUTHORIZED_MSG);

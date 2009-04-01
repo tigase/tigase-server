@@ -199,10 +199,10 @@ public class OfflineMessages extends XMPPProcessor
 					packet.processedBy(ID);
 				}
 			} catch (UserNotFoundException e) {
-   				if (log.isLoggable(Level.FINEST)) {
-    				log.finest("UserNotFoundException at trying to save packet for off-line user."
-        				+ packet.getStringData());
-                }
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("UserNotFoundException at trying to save packet for off-line user." +
+									packet.getStringData());
+				}
 			} // end of try-catch
 		} // end of if (conn == null)
 	}

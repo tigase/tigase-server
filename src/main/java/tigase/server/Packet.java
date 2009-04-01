@@ -234,7 +234,8 @@ public class Packet {
 
 	/**
    * Returns packet destination address.
-   */
+	 * @return
+	 */
   public String getElemTo() {
     return elem.getAttribute("to");
   }
@@ -245,7 +246,8 @@ public class Packet {
 
   /**
    * Returns packet source address.
-   */
+	 * @return
+	 */
   public String getElemFrom() {
     return elem.getAttribute("from");
   }
@@ -278,9 +280,12 @@ public class Packet {
     return elem.toString().toCharArray();
   }
 
+	@Override
 	public String toString() {
 		if (packetToString == null) {
-			packetToString = ", data=" + elem.toString() + ", XMLNS="+elem.getXMLNS();
+			packetToString = ", data=" + elem.toString() + 
+							", XMLNS="+elem.getXMLNS() +
+							", priority="+priority;
 		}
 		return "to=" + to + ", from=" + from + packetToString;
 	}
