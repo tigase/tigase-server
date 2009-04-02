@@ -402,7 +402,7 @@ public abstract class AbstractMessageReceiver
   public void setName(String name) {
     this.name = name;
 		compId = JIDUtils.getNodeID(name, defHostname);
-		//in_queues_size = processingThreads();
+		in_queues_size = processingThreads();
 		setMaxQueueSize(maxQueueSize);
   }
 
