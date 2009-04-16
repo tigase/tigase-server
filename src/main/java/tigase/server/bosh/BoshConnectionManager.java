@@ -83,7 +83,7 @@ public class BoshConnectionManager extends ClientConnectionManager
 	private ReceiverEventHandler stoppedHandler = newStoppedHandler();
 	private ReceiverEventHandler startedHandler = newStartedHandler();
 
-	private Map<UUID, BoshSession> sessions =
+	private final Map<UUID, BoshSession> sessions =
 		new LinkedHashMap<UUID, BoshSession>();
 
 // 	public void processPacket(Packet packet) {
@@ -176,47 +176,61 @@ public class BoshConnectionManager extends ClientConnectionManager
 		BoshIOService serv = (BoshIOService)srv;
 		Packet p = null;
 		while ((p = serv.getReceivedPackets().poll()) != null) {
-			if (log.isLoggable(Level.FINER)) {
-				log.finer("Processing packet: " + p.getElemName()
-					+ ", type: " + p.getType());
-			}
-			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Processing socket data: " + p.toString());
-			}
-			String sid_str = p.getAttribute(SID_ATTR);
-			UUID sid = null;
-			try {
-				Queue<Packet> out_results = new LinkedList<Packet>();
-				BoshSession bs = null;
+			Queue<Packet> out_results = new LinkedList<Packet>();
+			BoshSession bs = null;
+			String sid_str = null;
+			synchronized (sessions) {
+				if (log.isLoggable(Level.FINER)) {
+					log.finer("Processing packet: " + p.getElemName() +
+									", type: " + p.getType());
+				}
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("Processing socket data: " + p.toString());
+				}
+				sid_str = p.getAttribute(SID_ATTR);
+				UUID sid = null;
 				if (sid_str == null) {
 					String hostname = p.getAttribute("to");
 					if (hostname != null && isLocalDomain(hostname)) {
 						bs = new BoshSession(getDefHostName(),
-							routings.computeRouting(hostname), this);
+										routings.computeRouting(hostname), this);
 						sid = bs.getSid();
 						sessions.put(sid, bs);
-						bs.init(p, serv, max_wait, min_polling, max_inactivity,
-							concurrent_requests, hold_requests, max_pause, out_results);
 					} else {
 						log.info("Invalid hostname. Closing invalid connection");
-						serv.sendErrorAndStop(Authorization.NOT_ALLOWED, p, "Invalid hostname.");
+						try {
+							serv.sendErrorAndStop(Authorization.NOT_ALLOWED, p,
+											"Invalid hostname.");
+						} catch (Exception e) {
+							log.log(Level.WARNING,
+											"Problem sending invalid hostname error for sid =  " +
+											sid, e);
+						}
 					}
 				} else {
 					sid = UUID.fromString(sid_str);
 					bs = sessions.get(sid);
-					if (bs != null) {
-						synchronized (bs) {
+				}
+			}
+			try {
+				if (bs != null) {
+					synchronized (bs) {
+						if (sid_str == null) {
+							bs.init(p, serv, max_wait, min_polling, max_inactivity,
+											concurrent_requests, hold_requests, max_pause, out_results);
+						} else {
 							bs.processSocketPacket(p, serv, out_results);
 						}
-					} else {
-						log.info("There is no session with given SID. Closing invalid connection");
-						serv.sendErrorAndStop(Authorization.ITEM_NOT_FOUND, p, "Invalid SID");
 					}
+				} else {
+					log.info(
+									"There is no session with given SID. Closing invalid connection");
+					serv.sendErrorAndStop(Authorization.ITEM_NOT_FOUND, p, "Invalid SID");
 				}
 				addOutPackets(out_results, bs);
 			} catch (Exception e) {
 				log.log(Level.WARNING,
-					"Problem processing socket data for sid =  " + sid,	e);
+					"Problem processing socket data for sid =  " + sid_str,	e);
 			}
 			//addOutPackets(out_results);
 		} // end of while ()

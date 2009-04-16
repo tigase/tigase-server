@@ -27,6 +27,7 @@ import java.util.TimerTask;
 import java.util.UUID;
 import java.util.Collections;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -62,8 +63,15 @@ public class BoshSession {
 	private static final String IQ_ELEMENT_NAME = "iq";
 
 	private UUID sid = null;
+	// Active connections with pending requests received
 	private Queue<BoshIOService> connections =
-    new ConcurrentLinkedQueue<BoshIOService>();
+					new ConcurrentLinkedQueue<BoshIOService>();
+	// Old connections which might be reused in keep-alive mode.
+	// Requests have been responded to so in most cases the connection should
+	// be closed unless it is reused in keep-alive mode.
+	// Normally there should be no more than max 2 elements in the queue.
+	private Queue<BoshIOService> old_connections =
+					new LinkedBlockingQueue<BoshIOService>(4);
 	private Queue<Element> waiting_packets = new ConcurrentLinkedQueue<Element>();
 	private BoshSessionCache cache = null;
 	private boolean cache_on = false;
@@ -408,8 +416,24 @@ public class BoshSession {
 			handler.writeRawData(serv, body.toString());
 			//serv.writeRawData(body.toString());
 			//waiting_packets.clear();
-			serv.stop();
-// 		} catch (IOException e) {
+			//serv.stop();
+
+			if (!old_connections.contains(serv)) {
+				while (!old_connections.offer(serv)) {
+					BoshIOService old_serv = old_connections.poll();
+					if (old_serv != null) {
+						old_serv.stop();
+					} else {
+						if (log.isLoggable(Level.WARNING)) {
+							log.warning("old_connections queue is empty but can not add new element!: " +
+											getSid());
+						}
+						break;
+					}
+				}
+			}
+
+			// 		} catch (IOException e) {
 // 			// I call it anyway at the end of method call
 // 			//disconnected(null);
 // 			log.log(Level.WARNING, "[" + connections.size() +
@@ -422,8 +446,8 @@ public class BoshSession {
 		disconnected(serv);
 		if (waitTimer != null) {
 			if (log.isLoggable(Level.FINEST)) {
-    			log.finest("Canceling waitTimer: " + getSid());
-            }
+				log.finest("Canceling waitTimer: " + getSid());
+			}
 			handler.cancelTask(waitTimer);
 		}
 	}
@@ -630,8 +654,8 @@ public class BoshSession {
 
 		if (connections.size() > 0 && waiting_packets.size() == 0) {
 			if (log.isLoggable(Level.FINEST)) {
-    			log.finest("Setting waitTimer for " + max_wait + ": " + getSid());
-            }
+				log.finest("Setting waitTimer for " + max_wait + ": " + getSid());
+			}
 			waitTimer = handler.scheduleTask(this, max_wait * SECOND);
 		}
 	}
@@ -642,14 +666,15 @@ public class BoshSession {
 		}
 		if (inactivityTimer != null) {
 			if (log.isLoggable(Level.FINEST)) {
-    			log.finest("Canceling inactivityTimer: " + getSid());
-            }
+				log.finest("Canceling inactivityTimer: " + getSid());
+			}
 			handler.cancelTask(inactivityTimer);
 		}
 		if (connections.size() == 0) {
 			if (log.isLoggable(Level.FINEST)) {
-    			log.finest("Setting inactivityTimer for " + max_inactivity + ": " + getSid());
-            }
+				log.finest("Setting inactivityTimer for " + max_inactivity + ": " +
+								getSid());
+			}
 			inactivityTimer = handler.scheduleTask(this, max_inactivity * SECOND);
 		}
 	}
@@ -657,12 +682,12 @@ public class BoshSession {
 	public boolean task(Queue<Packet> out_results, TimerTask tt) {
 		if (tt == inactivityTimer) {
 			if (log.isLoggable(Level.FINEST)) {
-    			log.finest("inactivityTimer fired: " + getSid());
-            }
+				log.finest("inactivityTimer fired: " + getSid());
+			}
 			if (waitTimer != null) {
-                if (log.isLoggable(Level.FINEST)) {
-    				log.finest("Canceling waitTimer: " + getSid());
-                }
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("Canceling waitTimer: " + getSid());
+				}
 				handler.cancelTask(waitTimer);
 			}
 			for (Element packet : waiting_packets) {
