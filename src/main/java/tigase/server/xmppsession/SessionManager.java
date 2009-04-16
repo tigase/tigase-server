@@ -1375,13 +1375,13 @@ public class SessionManager extends AbstractMessageReceiver
 			if (proc.getName().equals("roster-presence")) {
 				stats.add(new StatRecord(getName(), "Processor: " + procent.getKey(),
 								"String", "Queue: " + proc.getTotalQueueSize() +
-								", AvTime: " + proc.cntAverageTime +
+								", AvTime: " + proc.averageTime() +
 								", Runs: " + proc.cntRuns + ", Lost: " + proc.dropedPackets,
 								Level.INFO));
 			} else {
 				stats.add(new StatRecord(getName(), "Processor: " + procent.getKey(),
 								"String", "Queue: " + proc.getTotalQueueSize() +
-								", AvTime: " + proc.cntAverageTime +
+								", AvTime: " + proc.averageTime() +
 								", Runs: " + proc.cntRuns + ", Lost: " + proc.dropedPackets,
 								Level.FINEST));
 			}
@@ -1425,7 +1425,6 @@ public class SessionManager extends AbstractMessageReceiver
 		private int maxQueueSizeDef = maxQueueSize/maxPluginsNo;
 
 		private long cntRuns = 0;
-		private long cntAverageTime = 0;
 		private long dropedPackets = 0;
 
 		public ProcessorThreads(XMPPProcessorIfc processor) {
@@ -1491,10 +1490,19 @@ public class SessionManager extends AbstractMessageReceiver
 			++dropedPackets;
 		}
 
+		private long averageTime() {
+			long average = 0;
+			for (ProcessorWorkerThread processorWorkerThread : workerThreads) {
+				average += processorWorkerThread.cntAverageTime;
+			}
+			return average / workerThreads.size();
+		}
+
 		private class ProcessorWorkerThread
 						extends Thread {
 			private LinkedList<Packet> local_results = new LinkedList<Packet>();
 			private PriorityQueue<QueueItem> queue = null;
+			private long cntAverageTime = 0;
 
 			private ProcessorWorkerThread(PriorityQueue<QueueItem> queue) {
 				this.queue = queue;
@@ -1506,8 +1514,8 @@ public class SessionManager extends AbstractMessageReceiver
 					QueueItem item = null;
 					try {
 						//XXX - not very nice, getting the current time can be slooooooow
-						long start = System.currentTimeMillis();
 						item = queue.take();
+						long start = System.currentTimeMillis();
 						if (item.conn != null) {
 							// Not sure if this synchronization is needed at all
 							synchronized (item.conn) {
