@@ -22,6 +22,7 @@
 
 package tigase.vhosts;
 
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -45,6 +46,7 @@ public class VhostConfigRepository implements VHostRepository {
 	protected LinkedHashMap<String, VHostItem> vhosts =
 					new LinkedHashMap<String, VHostItem>();
 
+	@Override
 	public void getDefaults(Map<String, Object> defs,
 					Map<String, Object> params) {
 		String[] hostnames = DNSResolver.getDefHostNames();
@@ -55,6 +57,7 @@ public class VhostConfigRepository implements VHostRepository {
 		defs.put(ANONYMOUS_DOMAINS_PROP_KEY, hostnames);
 	}
 
+	@Override
 	public void setProperties(Map<String, Object> properties) {
 		String[] hostnames = (String[]) properties.get(HOSTNAMES_PROP_KEY);
 		if (hostnames != null && hostnames.length > 0) {
@@ -68,30 +71,41 @@ public class VhostConfigRepository implements VHostRepository {
 		}
 	}
 
+	@Override
 	public VHostItem getVHost(String domain) {
 		return vhosts.get(domain);
 	}
 
+	@Override
 	public boolean contains(String domain) {
 		return vhosts.keySet().contains(domain);
 	}
 
+	@Override
 	public void reload() { }
 
 	public void store() { }
 
+	@Override
 	public int size() {
 		return vhosts.size();
 	}
 
+	@Override
 	public void addVHost(VHostItem vhost) {
 		vhosts.put(vhost.getVhost(), vhost);
 		store();
 	}
 
+	@Override
 	public void removeVHost(String vh) {
 		vhosts.remove(vh);
 		store();
+	}
+
+	@Override
+	public Collection<VHostItem> localDomains() {
+		return vhosts.values();
 	}
 
 }

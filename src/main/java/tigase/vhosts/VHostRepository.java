@@ -22,6 +22,7 @@
 
 package tigase.vhosts;
 
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -114,5 +115,7 @@ public interface VHostRepository {
 	 * repository.
 	 */
 	int size();
+
+	Collection<VHostItem> localDomains();
 
 }
