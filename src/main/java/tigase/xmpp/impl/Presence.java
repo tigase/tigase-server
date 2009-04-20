@@ -37,6 +37,7 @@ import tigase.xmpp.XMPPException;
 import tigase.server.Packet;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
+import tigase.sys.TigaseRuntime;
 import tigase.util.JIDUtils;
 import tigase.xmpp.impl.roster.RosterAbstract;
 import tigase.xmpp.impl.roster.RosterFactory;
@@ -94,14 +95,11 @@ public abstract class Presence {
 		// Synchronization to avoid conflict with login/logout events
 		// processed in the SessionManager asynchronously
 		synchronized (session) {
-			Element pres = (Element) session.getSessionData(PRESENCE_KEY);
 			// According to the spec and logic actually offline status should
 			// not be broadcasted if initial presence was not sent by the client.
 			try {
-				if (pres != null && (pres.getAttribute("type") == null ||
-								!pres.getAttribute("type").equals("unavailable"))) {
-					sendPresenceBroadcast(StanzaType.unavailable, session,
-									FROM_SUBSCRIBED, results, null, settings);
+				if (session.getSessionData(PRESENCE_KEY) != null) {
+					broadcastOffline(session, results, settings);
 					updateOfflineChange(session, results);
 				} else {
 					broadcastDirectPresences(StanzaType.unavailable, session, results,
@@ -148,6 +146,86 @@ public abstract class Presence {
 	 * @param subscrs
 	 * @param results
 	 * @param pres an <code>Element</code> value
+	 * @param settings
+	 * @exception NotAuthorizedException if an error occurs
+	 * @throws TigaseDBException
+	 */
+	protected static void broadcastOffline(final XMPPResourceConnection session,
+					final Queue<Packet> results, final Map<String, Object> settings)
+					throws NotAuthorizedException, TigaseDBException {
+		Element pres = (Element) session.getSessionData(PRESENCE_KEY);
+		if (pres == null) {
+			pres = new Element(PRESENCE_ELEMENT_NAME);
+			pres.setAttribute("type", StanzaType.unavailable.toString());
+			pres.setXMLNS(XMLNS);
+		}
+		String[] buddies = roster_util.getBuddies(session, FROM_SUBSCRIBED, true);
+		buddies = DynamicRoster.addBuddies(session, settings, buddies);
+		if (buddies != null) {
+			Set<String> onlineJids = TigaseRuntime.getTigaseRuntime().getOnlineJids();
+			for (String buddy : buddies) {
+				// If buddy is a local buddy and he is offline, don't send him packet...
+				String buddy_domain = JIDUtils.getNodeHost(buddy);
+				if (!session.isLocalDomain(buddy_domain, false) ||
+								onlineJids.contains(buddy)) {
+					sendPresence(null, buddy, session.getUserId(), results, pres);
+				}
+			} // end of for (String buddy: buddies)
+		} // end of if (buddies == null)
+		broadcastDirectPresences(null, session, results, pres);
+	}
+
+	/**
+	 * <code>sendPresenceBroadcast</code> method broadcasts given presence
+	 * to all budies from roster and to all users to which direct presence
+	 * was sent.
+	 *
+	 * @param t a <code>StanzaType</code> value
+	 * @param session a <code>XMPPResourceConnection</code> value
+	 * @param subscrs
+	 * @param results
+	 * @param pres an <code>Element</code> value
+	 * @param settings
+	 * @exception NotAuthorizedException if an error occurs
+	 * @throws TigaseDBException
+	 */
+	protected static void broadcastProbe(final XMPPResourceConnection session,
+					final Queue<Packet> results, final Map<String, Object> settings)
+					throws NotAuthorizedException, TigaseDBException {
+		Element presOnline = (Element) session.getSessionData(PRESENCE_KEY);
+		if (presOnline == null) {
+			presOnline = new Element(PRESENCE_ELEMENT_NAME);
+			presOnline.setAttribute("type", StanzaType.unavailable.toString());
+			presOnline.setXMLNS(XMLNS);
+		}
+		Element presProbe = presOnline.clone();
+		presOnline.setAttribute("type", StanzaType.probe.toString());
+		String[] buddies = roster_util.getBuddies(session, TO_SUBSCRIBED, false);
+		buddies = DynamicRoster.addBuddies(session, settings, buddies);
+		if (buddies != null) {
+			Set<String> onlineJids = TigaseRuntime.getTigaseRuntime().getOnlineJids();
+			for (String buddy : buddies) {
+				// If the buddy is already online send just initial presence
+				// otherwise send probe.
+				if (onlineJids.contains(buddy)) {
+					sendPresence(null, buddy, session.getUserId(), results, presOnline);
+				} else {
+					sendPresence(null, buddy, session.getUserId(), results, presProbe);
+				}
+			} // end of for (String buddy: buddies)
+		} // end of if (buddies == null)
+	}
+
+	/**
+	 * <code>sendPresenceBroadcast</code> method broadcasts given presence
+	 * to all budies from roster and to all users to which direct presence
+	 * was sent.
+	 *
+	 * @param t a <code>StanzaType</code> value
+	 * @param session a <code>XMPPResourceConnection</code> value
+	 * @param subscrs
+	 * @param results
+	 * @param pres an <code>Element</code> value
 	 * @param settings 
 	 * @exception NotAuthorizedException if an error occurs
 	 * @throws TigaseDBException
@@ -158,9 +236,8 @@ public abstract class Presence {
 					final Queue<Packet> results, final Element pres,
 					final Map<String, Object> settings)
 					throws NotAuthorizedException, TigaseDBException {
-		boolean onlineOnly = (t != StanzaType.probe);
-		String from = (t == StanzaType.probe) ? session.getUserId()
-						: session.getJID();
+		boolean onlineOnly = true;
+		String from = session.getJID();
 		String[] buddies = roster_util.getBuddies(session, subscrs, onlineOnly);
 		buddies = DynamicRoster.addBuddies(session, settings, buddies);
 		if (buddies != null) {
@@ -520,8 +597,9 @@ public abstract class Presence {
 							// Special actions on the first availability presence
 							if (first && type == StanzaType.available) {
 								// Send presence probes to 'to' or 'both' contacts
-								sendPresenceBroadcast(StanzaType.probe, session, TO_SUBSCRIBED,
-												results, null, settings);
+								broadcastProbe(session, results, settings);
+//								sendPresenceBroadcast(StanzaType.probe, session, TO_SUBSCRIBED,
+//												results, null, settings);
 								// Resend pending in subscription requests
 								resendPendingInRequests(session, results);
 							} // end of if (type == StanzaType.available)
