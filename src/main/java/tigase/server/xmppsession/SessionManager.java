@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.LinkedHashMap;
 import java.util.Queue;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
@@ -67,6 +68,8 @@ import tigase.server.Priority;
 import tigase.server.ReceiverEventHandler;
 import tigase.server.XMPPServer;
 import tigase.stats.StatRecord;
+import tigase.sys.OnlineJidsReporter;
+import tigase.sys.TigaseRuntime;
 import tigase.util.JIDUtils;
 import tigase.util.PriorityQueue;
 import tigase.xml.Element;
@@ -98,7 +101,8 @@ import static tigase.server.xmppsession.SessionManagerConfig.*;
  * @version $Rev$
  */
 public class SessionManager extends AbstractMessageReceiver
-	implements Configurable, XMPPService, SessionManagerHandler {
+	implements Configurable, XMPPService, SessionManagerHandler,
+				OnlineJidsReporter {
 
   /**
    * Variable <code>log</code> is a class logger.
@@ -236,6 +240,7 @@ public class SessionManager extends AbstractMessageReceiver
 								scriptEngineFactory.getLanguageVersion());
 			}
 		}
+		TigaseRuntime.getTigaseRuntime().addOnlineJidsReporter(this);
 	}
 
 //	private void debug_packet(String msg, Packet packet, String to) {
@@ -1396,6 +1401,11 @@ public class SessionManager extends AbstractMessageReceiver
 		} else {
 			return isLocalDomain(domain);
 		}
+	}
+
+	@Override
+	public Set<String> getOnlineJids() {
+		return sessionsByNodeId.keySet();
 	}
 
 	private class QueueItem {
