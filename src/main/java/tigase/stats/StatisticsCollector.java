@@ -39,6 +39,8 @@ import tigase.server.AbstractComponentRegistrator;
 import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.server.ServerComponent;
+import tigase.sys.ShutdownHook;
+import tigase.sys.TigaseRuntime;
 import tigase.xml.Element;
 import tigase.xml.XMLUtils;
 import tigase.xmpp.StanzaType;
@@ -56,7 +58,7 @@ import tigase.util.JIDUtils;
  */
 public class StatisticsCollector
 	extends AbstractComponentRegistrator<StatisticsContainer>
-	implements XMPPService {
+	implements XMPPService, ShutdownHook {
 
   private static final Logger log =
 		Logger.getLogger("tigase.stats.StatisticsCollector");
@@ -87,6 +89,7 @@ public class StatisticsCollector
 		} catch (Exception ex) {
 			log.log(Level.SEVERE, "Can not install Statistics MXBean: ", ex);
 		}
+		TigaseRuntime.getTigaseRuntime().addShutdownHook(this);
 	}
 
 	@Override
@@ -270,6 +273,16 @@ public class StatisticsCollector
 				return null;
 			}
 		}
+	}
+
+	@Override
+	public String shutdown() {
+		List<StatRecord> allStats = getAllStats();
+		StringBuilder sb = new StringBuilder();
+		for (StatRecord statRecord : allStats) {
+			sb.append(statRecord.toString()).append('\n');
+		}
+		return sb.toString();
 	}
 
 }

@@ -141,4 +141,12 @@ public class StatRecord {
 		return component;
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(component).append('/').append(description);
+		sb.append('[').append(unit).append(']').append(" = ").append(value);
+		return sb.toString();
+	}
+
 } // StatRecord
