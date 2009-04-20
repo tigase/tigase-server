@@ -452,7 +452,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 					getFromAddress(getUniqueId(service)),
 					service.getDataReceiver(), StanzaType.set, 
 					UUID.randomUUID().toString());
-				addOutPacketWithTimeout(command, stoppedHandler, 5l, TimeUnit.SECONDS);
+				addOutPacketWithTimeout(command, stoppedHandler, 15l, TimeUnit.SECONDS);
 				if (log.isLoggable(Level.FINE)) {
 					log.fine("Service stopped, sending packet: " + command.getStringData());
 				}
