@@ -22,16 +22,16 @@
 
 package tigase.sys;
 
+import java.util.Set;
+
 /**
- * Created: Feb 19, 2009 12:17:03 PM
+ * Created: Apr 19, 2009 12:15:07 AM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public interface ShutdownHook {
+public interface OnlineJidsReporter {
 
-	String getName();
-
-	String shutdown();
+  Set<String> getOnlineJids();
 
 }

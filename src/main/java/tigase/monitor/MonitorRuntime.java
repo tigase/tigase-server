@@ -22,8 +22,16 @@
 
 package tigase.monitor;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadInfo;
+import java.lang.management.ThreadMXBean;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.Set;
+import java.util.logging.Logger;
 import tigase.sys.CPULoadListener;
 import tigase.sys.MemoryChangeListener;
+import tigase.sys.OnlineJidsReporter;
 import tigase.sys.ShutdownHook;
 import tigase.sys.TigaseRuntime;
 
@@ -35,10 +43,20 @@ import tigase.sys.TigaseRuntime;
  */
 public class MonitorRuntime extends TigaseRuntime {
 
+  /**
+   * Variable <code>log</code> is a class logger.
+   */
+  private static final Logger log =
+					Logger.getLogger(MonitorRuntime.class.getName());
+
 	private static MonitorRuntime runtime = null;
+	private LinkedList<ShutdownHook> shutdownHooks =
+					new LinkedList<ShutdownHook>();
+	private LinkedList<OnlineJidsReporter> onlineJidsReporters =
+					new LinkedList<OnlineJidsReporter>();
 
 	private MonitorRuntime() {
-		
+		Runtime.getRuntime().addShutdownHook(new MainShutdownThread());
 	}
 	
 	public static MonitorRuntime getMonitorRuntime() {
@@ -49,18 +67,123 @@ public class MonitorRuntime extends TigaseRuntime {
 	}
 
 	@Override
-	public void addShutdownHook(ShutdownHook hook) {
+	public synchronized void addShutdownHook(ShutdownHook hook) {
+		shutdownHooks.add(hook);
+	}
+
+	@Override
+	public synchronized void addMemoryChangeListener(MemoryChangeListener memListener) {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 	@Override
-	public void addMemoryChangeListener(MemoryChangeListener memListener) {
+	public synchronized void addCPULoadListener(CPULoadListener cpuListener) {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 	@Override
-	public void addCPULoadListener(CPULoadListener cpuListener) {
-		throw new UnsupportedOperationException("Not supported yet.");
+	public synchronized void addOnlineJidsReporter(OnlineJidsReporter onlineReporter) {
+		onlineJidsReporters.add(onlineReporter);
+	}
+
+	@Override
+	public synchronized Set<String> getOnlineJids() {
+		if (onlineJidsReporters.size() == 1) {
+			return onlineJidsReporters.getFirst().getOnlineJids();
+		} else {
+			if (onlineJidsReporters.size() > 1) {
+				Set<String> onlineJids = new LinkedHashSet<String>();
+				for (OnlineJidsReporter onlineJidsReporter : onlineJidsReporters) {
+					onlineJids.addAll(onlineJidsReporter.getOnlineJids());
+				}
+				return onlineJids;
+			}
+		}
+		return null;
+	}
+
+	private class ShutdownHandlerThread extends Thread {
+
+		private ShutdownHook hook = null;
+		private String result = null;
+
+		public ShutdownHandlerThread(ThreadGroup group, ShutdownHook hook) {
+			super(group, hook.getName());
+			this.hook = hook;
+			setDaemon(true);
+		}
+
+		@Override
+		public void run () {
+			result = hook.shutdown();
+		}
+
+		public String getResultMessage() {
+			return result;
+		}
+
+	}
+	
+	private class MainShutdownThread extends Thread {
+
+		public MainShutdownThread() {
+			super();
+			setName("MainShutdownThread");
+		}
+
+		@Override
+		public void run() {
+			System.out.println("ShutdownThread started...");
+			log.warning("ShutdownThread started...");
+			LinkedList<ShutdownHandlerThread> thlist = 
+							new LinkedList<ShutdownHandlerThread>();
+			ThreadGroup threads =
+							new ThreadGroup(Thread.currentThread().getThreadGroup(),
+							"Tigase Shutdown");
+			for (ShutdownHook shutdownHook : shutdownHooks) {
+				ShutdownHandlerThread thr = 
+								new ShutdownHandlerThread(threads, shutdownHook);
+				thr.start();
+				thlist.add(thr);
+			}
+			// We allow for max 10 secs for the shutdown code to run...
+			long shutdownStart = System.currentTimeMillis();
+			while (threads.activeCount() > 0 &&
+							(System.currentTimeMillis() - shutdownStart) < 10000) {
+				try {
+					sleep(100);
+				} catch (Exception e) {	}
+			}
+			StringBuilder sb = new StringBuilder();
+			for (ShutdownHandlerThread shutdownHandlerThread : thlist) {
+				if (shutdownHandlerThread.getResultMessage() != null) {
+					sb.append(shutdownHandlerThread.getResultMessage());
+				}
+			}
+			ThreadMXBean thBean = ManagementFactory.getThreadMXBean();
+			sb.append("\nTotal number of threads: " + thBean.getThreadCount()).append('\n');
+			long[] tids = thBean.findDeadlockedThreads();
+			if (tids != null && tids.length > 0) {
+				sb.append("Locked threads:\n");
+				ThreadInfo[] lockedThreads = thBean.getThreadInfo(tids);
+				for (ThreadInfo threadInfo : lockedThreads) {
+				sb.append("Locked thread " + threadInfo.getThreadName() + " on " +
+								threadInfo.getLockInfo().toString()).append('\n');
+					StackTraceElement[] ste = threadInfo.getStackTrace();
+					for (StackTraceElement stackTraceElement : ste) {
+						sb.append(stackTraceElement.toString()).append('\n');
+					}
+				}
+			} else {
+				sb.append("No locked threads.\n");
+			}
+			if (sb.length() > 0) {
+				System.out.println(sb.toString());
+				log.warning(sb.toString());
+			}
+			System.out.println("ShutdownThread finished...");
+			log.warning("ShutdownThread finished...");
+		}
 	}
 
 }

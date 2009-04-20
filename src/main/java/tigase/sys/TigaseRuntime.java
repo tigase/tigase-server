@@ -22,6 +22,9 @@
 
 package tigase.sys;
 
+import java.util.Set;
+import tigase.monitor.MonitorRuntime;
+
 /**
  * Created: Feb 19, 2009 12:15:02 PM
  *
@@ -31,7 +34,7 @@ package tigase.sys;
 public abstract class TigaseRuntime {
 
 	public static TigaseRuntime getTigaseRuntime() {
-		return null;
+		return MonitorRuntime.getMonitorRuntime();
 	}
 	
 	public abstract void addShutdownHook(ShutdownHook hook);
@@ -39,6 +42,10 @@ public abstract class TigaseRuntime {
 	public abstract void addMemoryChangeListener(MemoryChangeListener memListener);
 
 	public abstract void addCPULoadListener(CPULoadListener cpuListener);
+
+	public abstract void addOnlineJidsReporter(OnlineJidsReporter onlineReporter);
+
+	public abstract Set<String> getOnlineJids();
 
 	public ResourceState getMemoryState() {
 		return ResourceState.GREEN;
