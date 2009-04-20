@@ -27,8 +27,12 @@ import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
 import java.text.NumberFormat;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
+import java.util.logging.Logger;
 import tigase.server.Packet;
 
 /**
@@ -38,6 +42,12 @@ import tigase.server.Packet;
  * @version $Rev$
  */
 public class CPUMonitor extends AbstractMonitor {
+
+  /**
+   * Variable <code>log</code> is a class logger.
+   */
+  private static final Logger log =
+					Logger.getLogger(CPUMonitor.class.getName());
 
 	private int historySize = 100;
 	private long lastCpuUsage = 0;
@@ -49,6 +59,42 @@ public class CPUMonitor extends AbstractMonitor {
 	private ThreadMXBean thBean = null;
 	private OperatingSystemMXBean osBean = null;
 	private NumberFormat format = NumberFormat.getPercentInstance();
+
+	private String checkForDeadLock() {
+		long[] tids = thBean.findDeadlockedThreads();
+		if (tids != null && tids.length > 0) {
+			StringBuilder sb = new StringBuilder();
+			sb.append("Locked threads " + tids.length + ":\n");
+			Set<Long> tidSet = new LinkedHashSet<Long>();
+			for (long tid : tids) {
+				tidSet.add(tid);
+			}
+			ThreadGroup rootGroup = Thread.currentThread().getThreadGroup();
+			while (rootGroup.getParent() != null)
+				rootGroup = rootGroup.getParent();
+			int allThreadsCount = thBean.getThreadCount();
+			Thread[] allThreads = new Thread[allThreadsCount];
+			rootGroup.enumerate(allThreads, true);
+			for (Thread thread : allThreads) {
+				if (tidSet.contains(thread.getId())) {
+					ThreadInfo threadInfo = thBean.getThreadInfo(thread.getId());
+					sb.append("Locked thread [" + thread.getId() + "] " +
+									threadInfo.getThreadName() + " on " +
+									threadInfo.getLockInfo().toString() +
+									", locked synchronizers: " +
+									Arrays.toString(threadInfo.getLockedSynchronizers()) +
+									", locked monitors: " +
+									Arrays.toString(threadInfo.getLockedMonitors())).append('\n');
+					StackTraceElement[] ste = thread.getStackTrace();
+					for (StackTraceElement stackTraceElement : ste) {
+						sb.append("  " + stackTraceElement.toString()).append('\n');
+					}
+				}
+			}
+			return sb.toString();
+		}
+		return null;
+	}
 
 	private enum command {
 		maxthread(" - Returns information about the most active thread."),
@@ -165,6 +211,16 @@ public class CPUMonitor extends AbstractMonitor {
 		thBean = ManagementFactory.getThreadMXBean();
 		osBean = ManagementFactory.getOperatingSystemMXBean();
 		format.setMaximumFractionDigits(2);
+		if (thBean.isCurrentThreadCpuTimeSupported()) {
+			thBean.setThreadCpuTimeEnabled(true);
+		} else {
+			log.warning("Current thread CPU Time is NOT supported.");
+		}
+		if (thBean.isThreadContentionMonitoringSupported()) {
+			thBean.setThreadContentionMonitoringEnabled(true);
+		} else {
+			log.warning("Thread contention monitoring is NOT supported.");
+		}
 	}
 
 	@Override
@@ -192,6 +248,11 @@ public class CPUMonitor extends AbstractMonitor {
 								format.format(totalUsage) + ", last minute: " +
 								format.format(recentCpu(6)), results, this);
 			}
+		}
+		String result = checkForDeadLock();
+		if (result != null) {
+			System.out.println("Dead-locked threads:\n" + result);
+			prepareWarning("Dead-locked threads:\n" + result, results, this);
 		}
 	}
 
