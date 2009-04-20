@@ -156,10 +156,25 @@ case "${1}" in
 
   stop)
     PID=`cat $TIGASE_PID 2>/dev/null`
+    if [ -z "$PID" ] ; then
+      echo "Tigase is not running."
+      exit 0
+    fi
     echo "Shutting down Tigase: $PID"
     kill $PID 2>/dev/null
-    sleep 2
-    kill -9 $PID 2>/dev/null
+    for ((i=1; i <= 10; i++)) ; do
+      if ps -p $PID > /dev/null ; then
+        echo "$i. Waiting for the server to terminate..."
+        sleep 1
+      else
+        echo "$i. Tigase terminated."
+        break
+      fi
+    done
+    if ps -p $PID > /dev/null ; then
+      echo "Forcing the server to terminate."
+      kill -9 $PID 2>/dev/null
+    fi
     rm -f $TIGASE_PID
     echo "STOPPED `date`" >>${TIGASE_CONSOLE_LOG}
     ;;
