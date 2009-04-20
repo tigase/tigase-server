@@ -26,6 +26,7 @@ import java.nio.channels.CancelledKeyException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
+import java.util.LinkedList;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
@@ -244,6 +245,11 @@ public class SocketReadThread implements Runnable {
 	 */
 	@Override
 	public void run() {
+		// IOServices must be added to thread pool after they are removed from
+		// the selector and the selector and key is cleared, otherwise we have
+		// dead-lock somewhere down in the:
+		// java.nio.channels.spi.AbstractSelectableChannel.removeKey(AbstractSelectableChannel.java:111)
+		LinkedList<IOService> forCompletion = new LinkedList<IOService>();
     while (!stopping) {
       try {
 				clientsSel.select();
@@ -291,7 +297,12 @@ public class SocketReadThread implements Runnable {
 								// and
 								// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6403933
 								sk.cancel();
-								completionService.submit(s);
+								forCompletion.add(s);
+							  // IOServices must be added to thread pool after they are removed from
+							  // the selector and the selector and key is cleared, otherwise we have
+							  // dead-lock somewhere down in the:
+							  // java.nio.channels.spi.AbstractSelectableChannel.removeKey(AbstractSelectableChannel.java:111)
+							  //completionService.submit(s);
 							} catch (CancelledKeyException e) {
 								if (log.isLoggable(Level.FINEST)) {
 									log.finest("CancelledKeyException, stopping the connection: "
@@ -311,6 +322,10 @@ public class SocketReadThread implements Runnable {
 					clientsSel.selectNow();
 				}
 				addAllWaiting();
+				IOService serv = null;
+				while ((serv = forCompletion.poll()) != null) {
+					completionService.submit(serv);
+				}
 				//clientsSel.selectNow();
 			} catch (CancelledKeyException brokene) {
 				// According to Java API that should not happen.
