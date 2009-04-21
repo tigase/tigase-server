@@ -66,6 +66,7 @@ public class DiskMonitor extends AbstractMonitor {
 				File[] linRoots = getLinuxRoots();
 				roots = linRoots;
 				break;
+			case sunos:
 			case solaris:
 				File[] solRoots = getSolarisRoots();
 				roots = solRoots;
@@ -179,6 +180,7 @@ public class DiskMonitor extends AbstractMonitor {
 	private File[] getMacRoots() {
 		File volumes = new File("/Volumes");
 		return volumes.listFiles(new FileFilter() {
+			@Override
 			public boolean accept(File path) {
 				return path.isDirectory();
 			}
