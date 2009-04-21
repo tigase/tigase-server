@@ -209,7 +209,7 @@ public abstract class IOService implements Callable<IOService> {
    *
    * @return a <code>boolean</code> value
    */
-  public synchronized boolean isConnected() {
+  public boolean isConnected() {
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("socketIO = " + socketIO);
 		}
@@ -276,13 +276,15 @@ public abstract class IOService implements Callable<IOService> {
 		}
   }
 
-	public synchronized void forceStop() {
+	public void forceStop() {
 		if (log.isLoggable(Level.FINER)) {
 			log.finer("Force stop called...");
 		}
 		try {
 			if (socketIO != null) {
-				socketIO.stop();
+				synchronized (socketIO) {
+					socketIO.stop();
+				}
 			}
 		} catch (Exception e) {
 			// Well, do nothing, we are closing the connection anyway....
@@ -353,7 +355,7 @@ public abstract class IOService implements Callable<IOService> {
   protected char[] readData() throws IOException {
 		setLastTransferTime();
     CharBuffer cb = null;
-		synchronized (decoder) {
+		synchronized (socketIO) {
 			try {
 				//			resizeInputBuffer();
 				ByteBuffer tmpBuffer = socketIO.read(socketInput);
@@ -397,7 +399,7 @@ public abstract class IOService implements Callable<IOService> {
    * @exception IOException if an error occurs
    */
   protected void writeData(final String data) {
-		synchronized (encoder) {
+		synchronized (socketIO) {
 			try {
 				if (data != null && data.length() > 0) {
 					if (log.isLoggable(Level.FINEST)) {
