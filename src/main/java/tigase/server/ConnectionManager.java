@@ -380,7 +380,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 
 	public void writePacketsToSocket(IO serv, Queue<Packet> packets) {
 		if (serv != null) {
-			synchronized (serv) {
+			//synchronized (serv) {
 				if (packets != null && packets.size() > 0) {
 					Packet p = null;
 					while ((p = packets.poll()) != null) {
@@ -398,7 +398,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 						} // end of try-catch
 					} // end of try-catch
 				}
-			}
+			//}
 		} else {
 			if (log.isLoggable(Level.FINE)) {
 				log.fine("Can't find service for packets: <" + packets.toString() + "> ");
@@ -408,7 +408,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 
 	public boolean writePacketToSocket(IO ios, Packet p) {
 		if (ios != null) {
-			synchronized (ios) {
+			//synchronized (ios) {
 				ios.addPacketToSend(p);
 				try {
 					ios.processWaitingPackets();
@@ -422,7 +422,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 						log.log(Level.WARNING, "Exception stopping XMPPIOService: ", e1);
 					} // end of try-catch
 				} // end of try-catch
-			}
+			//}
 		} else {
 			if (log.isLoggable(Level.FINE)) {
 				log.fine("Can't find service for packet: <" + p.getElemName() + "> " +
@@ -433,7 +433,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 	}
 
 	protected void writeRawData(IO ios, String data) {
-		synchronized (ios) {
+		//synchronized (ios) {
 			try {
 				ios.writeRawData(data);
 				readThread.addSocketService(ios);
@@ -445,7 +445,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 					log.log(Level.WARNING, "Exception stopping XMPPIOService: ", e1);
 				} // end of try-catch
 			}
-		}
+		//}
 	}
 
 	/**
@@ -508,7 +508,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 	}
 
 	public void serviceStopped(IO service) {
-		synchronized(service) {
+		//synchronized(service) {
 			String id = getUniqueId(service);
 			if (log.isLoggable(Level.FINER)) {
     			log.finer("[[" + getName() + "]] Connection stopped: " + id);
@@ -527,12 +527,12 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 					Thread.dumpStack();
 				}
 			}
-		}
+		//}
 	}
 
 	@TODO(note="Do something if service with the same unique ID is already started, possibly kill the old one...")
 	public void serviceStarted(final IO service) {
-		synchronized(services) {
+		//synchronized(services) {
 			String id = getUniqueId(service);
 			if (log.isLoggable(Level.FINER)) {
     			log.finer("[[" + getName() + "]] Connection started: " + id);
@@ -553,7 +553,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 				}
 			}
 			services.put(id, service);
-		}
+		//}
 	}
 
 	protected String getUniqueId(IO serv) {
