@@ -78,8 +78,8 @@ public class XMPPIOService extends IOService {
 //    * methods to be executed concurrently as they process data received from
 //    * socket and the data should be processed in proper order.
 //    */
-	private Lock writeLock = new ReentrantLock();
-	private Lock readLock = new ReentrantLock();
+	//private Lock writeLock = new ReentrantLock();
+	//private Lock readLock = new ReentrantLock();
 
 	//private boolean streamClosed = false;
 
@@ -140,6 +140,7 @@ public class XMPPIOService extends IOService {
    *
    * @exception IOException if an error occurs
    */
+	@Override
   public void stop() {
 // 		if (!streamClosed) {
 // 			streamClosed = true;
@@ -187,6 +188,7 @@ public class XMPPIOService extends IOService {
    * Describe <code>processWaitingPackets</code> method here.
    *
    */
+	@Override
   public void processWaitingPackets() throws IOException {
 		Packet packet = null;
 		while ((packet = waitingPackets.poll()) != null) {
@@ -204,12 +206,12 @@ public class XMPPIOService extends IOService {
     // We change state of this object in this method
     // It can be called by many threads simultanously
     // so we need to make it thread-safe
- 		writeLock.lock();
-		try {
+// 		writeLock.lock();
+//		try {
 			writeData(data);
-		} finally {
- 			writeLock.unlock();
-		}
+//		} finally {
+// 			writeLock.unlock();
+//		}
 	}
 
 	/**
@@ -223,8 +225,8 @@ public class XMPPIOService extends IOService {
     // It can be called by many threads simultanously
     // so we need to make it thread-safe
 		//log.finer("About to read socket data.");
- 		readLock.lock();
-    try {
+// 		readLock.lock();
+//    try {
 			if (isConnected()) {
 				char[] data = readData();
 
@@ -281,9 +283,9 @@ public class XMPPIOService extends IOService {
 				}
 				forceStop();
 			}
-    } finally {
-			readLock.unlock();
-    }
+//    } finally {
+//			readLock.unlock();
+//    }
   }
 
 	@Override
