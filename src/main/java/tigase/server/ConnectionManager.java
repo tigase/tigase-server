@@ -593,8 +593,13 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 	@Override
 	public List<StatRecord> getStatistics() {
 		List<StatRecord> stats = super.getStatistics();
-		stats.add(new StatRecord(getName(), "Open connections", "int",
-				services.size(), Level.INFO));
+		if (services.size() > 0) {
+			stats.add(new StatRecord(getName(), "Open connections", "int",
+							services.size(), Level.INFO));
+		} else {
+			stats.add(new StatRecord(getName(), "Open connections", "int",
+							services.size(), Level.FINEST));
+		}
 		stats.add(new StatRecord(getName(), "Watchdog runs", "long",
 				watchdogRuns, Level.FINE));
 		stats.add(new StatRecord(getName(), "Watchdog tests", "long",
