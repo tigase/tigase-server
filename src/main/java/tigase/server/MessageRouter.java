@@ -684,7 +684,7 @@ public class MessageRouter extends AbstractMessageReceiver {
 		NumberFormat format = NumberFormat.getNumberInstance();
 		format.setMaximumFractionDigits(4);
 		stats.add(new StatRecord(getName(), "Load average", "double",
-						format.format(osBean.getSystemLoadAverage()), Level.INFO));
+						format.format(osBean.getSystemLoadAverage()), Level.FINE));
 		stats.add(new StatRecord(getName(), "CPUs no", "int",
 						osBean.getAvailableProcessors(), Level.FINEST));
 
@@ -717,13 +717,13 @@ public class MessageRouter extends AbstractMessageReceiver {
 		stats.add(new StatRecord(getName(), "Used Heap", "long", 
 						format.format(heap.getUsed()/1024), Level.INFO));
 		stats.add(new StatRecord(getName(), "Free Heap", "long",
-						format.format((heap.getMax() - heap.getUsed())/1024), Level.INFO));
+						format.format((heap.getMax() - heap.getUsed())/1024), Level.FINE));
 		stats.add(new StatRecord(getName(), "Max NonHeap mem", "long", 
-						format.format(nonHeap.getMax()/1024), Level.INFO));
+						format.format(nonHeap.getMax()/1024), Level.FINE));
 		stats.add(new StatRecord(getName(), "Used NonHeap", "long",
-						format.format(nonHeap.getUsed()/1024), Level.INFO));
+						format.format(nonHeap.getUsed()/1024), Level.FINE));
 		stats.add(new StatRecord(getName(), "Free NonHeap", "long",
-						format.format((nonHeap.getMax() - nonHeap.getUsed())/1024), Level.INFO));
+						format.format((nonHeap.getMax() - nonHeap.getUsed())/1024), Level.FINE));
 
 		return stats;
 	}

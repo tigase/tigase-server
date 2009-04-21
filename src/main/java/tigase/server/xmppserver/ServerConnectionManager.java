@@ -662,9 +662,9 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
             }
 		}
  		stats.add(new StatRecord(getName(), "Open s2s connections", "int",
- 				open_s2s_connections, Level.INFO));
+ 				open_s2s_connections, Level.FINE));
 		stats.add(new StatRecord(getName(), "Packets queued", "int",
-				waiting_packets, Level.INFO));
+				waiting_packets, Level.FINE));
 		stats.add(new StatRecord(getName(), "Connected servers", "int",
 				connected_servers, Level.FINE));
 		stats.add(new StatRecord(getName(), "Connection instances", "int",

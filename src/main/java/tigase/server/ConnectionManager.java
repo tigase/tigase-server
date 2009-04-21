@@ -594,7 +594,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 	public List<StatRecord> getStatistics() {
 		List<StatRecord> stats = super.getStatistics();
 		stats.add(new StatRecord(getName(), "Open connections", "int",
-				services.size(), Level.FINE));
+				services.size(), Level.INFO));
 		stats.add(new StatRecord(getName(), "Watchdog runs", "long",
 				watchdogRuns, Level.FINE));
 		stats.add(new StatRecord(getName(), "Watchdog tests", "long",

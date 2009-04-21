@@ -296,16 +296,36 @@ public abstract class AbstractMessageReceiver
 			in_queue_size += in_priority_sizes[queue.ordinal()];
 			out_queue_size += out_priority_sizes[queue.ordinal()];
 		}
-		stats.add(new StatRecord(getName(), "Total In queues wait", "int",
-						in_queue_size, Level.FINE));
-		stats.add(new StatRecord(getName(), "Total Out queues wait", "int",
-						out_queue_size, Level.FINE));
+		if (in_queue_size > 0) {
+			stats.add(new StatRecord(getName(), "Total In queues wait", "int",
+							in_queue_size, Level.INFO));
+		} else {
+			stats.add(new StatRecord(getName(), "Total In queues wait", "int",
+							in_queue_size, Level.FINEST));
+		}
+		if (out_queue_size > 0) {
+			stats.add(new StatRecord(getName(), "Total Out queues wait", "int",
+							out_queue_size, Level.INFO));
+		} else {
+			stats.add(new StatRecord(getName(), "Total Out queues wait", "int",
+							out_queue_size, Level.FINEST));
+		}
     stats.add(new StatRecord(getName(), StatisticType.MAX_QUEUE_SIZE,
-				maxQueueSize, Level.FINE));
-    stats.add(new StatRecord(getName(), StatisticType.IN_QUEUE_OVERFLOW,
-				statReceivedMessagesEr, Level.FINE));
-    stats.add(new StatRecord(getName(), StatisticType.OUT_QUEUE_OVERFLOW,
-				statSentMessagesEr, Level.FINE));
+				maxQueueSize, Level.FINEST));
+		if (statReceivedMessagesEr > 0) {
+			stats.add(new StatRecord(getName(), StatisticType.IN_QUEUE_OVERFLOW,
+							statReceivedMessagesEr, Level.INFO));
+		} else {
+			stats.add(new StatRecord(getName(), StatisticType.IN_QUEUE_OVERFLOW,
+							statReceivedMessagesEr, Level.FINEST));
+		}
+		if (statSentMessagesEr > 0) {
+			stats.add(new StatRecord(getName(), StatisticType.OUT_QUEUE_OVERFLOW,
+							statSentMessagesEr, Level.INFO));
+		} else {
+			stats.add(new StatRecord(getName(), StatisticType.OUT_QUEUE_OVERFLOW,
+							statSentMessagesEr, Level.FINEST));
+		}
 		long res = 0;
 		for (long ppt : processPacketTimings) {
 			res += ppt;

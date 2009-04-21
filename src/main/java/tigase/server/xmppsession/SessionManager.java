@@ -1368,21 +1368,27 @@ public class SessionManager extends AbstractMessageReceiver
 		stats.add(new StatRecord(getName(), "Open connections", "int",
 				connectionsByFrom.size(), Level.FINE));
 		stats.add(new StatRecord(getName(), "Registered accounts", "long",
-				user_repository.getUsersCount(), Level.INFO));
+				user_repository.getUsersCount(), Level.FINEST));
 		stats.add(new StatRecord(getName(), "Open authorized sessions", "int",
 				sessionsByNodeId.size(), Level.INFO));
 		stats.add(new StatRecord(getName(), "Closed connections", "long",
 				closedConnections, Level.FINER));
-		stats.add(new StatRecord(getName(), "Authentication timouts", "long",
-						authTimeouts, Level.FINEST));
+		if (authTimeouts > 0) {
+			stats.add(new StatRecord(getName(), "Authentication timouts", "long",
+							authTimeouts, Level.INFO));
+		} else {
+			stats.add(new StatRecord(getName(), "Authentication timouts", "long",
+							authTimeouts, Level.FINEST));
+		}
 		for (Map.Entry<String, ProcessorThreads> procent : processors.entrySet()) {
 			ProcessorThreads proc = procent.getValue();
-			if (proc.getName().equals("roster-presence")) {
+			if (proc.getTotalQueueSize() > 0 || proc.dropedPackets > 0) {
 				stats.add(new StatRecord(getName(), "Processor: " + procent.getKey(),
 								"String", "Queue: " + proc.getTotalQueueSize() +
 								", AvTime: " + proc.averageTime() +
 								", Runs: " + proc.cntRuns + ", Lost: " + proc.dropedPackets,
 								Level.INFO));
+
 			} else {
 				stats.add(new StatRecord(getName(), "Processor: " + procent.getKey(),
 								"String", "Queue: " + proc.getTotalQueueSize() +

@@ -385,7 +385,7 @@ public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
 	public List<StatRecord> getStatistics() {
 		List<StatRecord> stats = new LinkedList<StatRecord>();
 		stats.add(new StatRecord(getName(), "Number of VHosts", "int",
-						repo.size(), Level.INFO));
+						repo.size(), Level.FINE));
 		stats.add(new StatRecord(getName(), "Checks: is local domain", "long",
 						isLocalDomainCalls, Level.FINER));
 		stats.add(new StatRecord(getName(), "Checks: is anonymous domain", "long",
