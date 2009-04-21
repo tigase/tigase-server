@@ -95,11 +95,13 @@ public class JabberIqAuth extends XMPPProcessor
 
 	@Override
 	public int concurrentQueuesNo() {
-		return Runtime.getRuntime().availableProcessors();
+		return Runtime.getRuntime().availableProcessors() / 2;
 	}
 
 	@Override
 	public int concurrentThreadsPerQueue() {
+		// Packet processing does matter for roster/presence therefore
+		// we need a single thread for each queue.
 		return 2;
 	}
 

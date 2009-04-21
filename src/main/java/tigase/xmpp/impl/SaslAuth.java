@@ -61,6 +61,7 @@ public class SaslAuth extends XMPPProcessor
 		new Element("feature", new String[] {"var"}, new String[] {XMLNS})
 	};
 
+	@Override
   public Element[] supDiscoFeatures(final XMPPResourceConnection session)
 	{ return DISCO_FEATURES; }
 
@@ -74,14 +75,30 @@ public class SaslAuth extends XMPPProcessor
 		success;
   }
 
+	@Override
 	public String id() { return ID; }
 
+	@Override
 	public String[] supElements()
 	{ return ELEMENTS; }
 
+	@Override
   public String[] supNamespaces()
 	{ return XMLNSS; }
 
+	@Override
+	public int concurrentQueuesNo() {
+		return Runtime.getRuntime().availableProcessors() / 2;
+	}
+
+	@Override
+	public int concurrentThreadsPerQueue() {
+		// Packet processing does matter for roster/presence therefore
+		// we need a single thread for each queue.
+		return 2;
+	}
+
+	@Override
   public Element[] supStreamFeatures(final XMPPResourceConnection session)	{
     if (session == null || session.isAuthorized()) {
       return null;
