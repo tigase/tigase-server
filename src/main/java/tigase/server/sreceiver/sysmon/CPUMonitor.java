@@ -84,7 +84,9 @@ public class CPUMonitor extends AbstractMonitor {
 									", locked synchronizers: " +
 									Arrays.toString(threadInfo.getLockedSynchronizers()) +
 									", locked monitors: " +
-									Arrays.toString(threadInfo.getLockedMonitors())).append('\n');
+									Arrays.toString(threadInfo.getLockedMonitors()) +
+									" by [" + threadInfo.getLockOwnerId() + "] " +
+									threadInfo.getLockOwnerName()).append('\n');
 					StackTraceElement[] ste = thread.getStackTrace();
 					for (StackTraceElement stackTraceElement : ste) {
 						sb.append("  " + stackTraceElement.toString()).append('\n');
