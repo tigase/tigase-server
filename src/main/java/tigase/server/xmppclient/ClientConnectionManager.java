@@ -73,19 +73,13 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 	private static final String ROUTING_MODE_PROP_KEY = "multi-mode";
 	private static final boolean ROUTING_MODE_PROP_VAL = true;
 	private static final String ROUTING_ENTRY_PROP_KEY = ".+";
-	//private static final String ROUTING_ENTRY_PROP_VAL = DEF_SM_NAME + "@localhost";
-
-	//public static final String HOSTNAMES_PROP_KEY = "hostnames";
-	//public String[] HOSTNAMES_PROP_VAL =	{"localhost", "hostname"};
 
 	protected RoutingsContainer routings = null;
-	//protected Set<String> hostnames = new TreeSet<String>();
 
 	private Map<String, XMPPProcessorIfc> processors =
 		new ConcurrentSkipListMap<String, XMPPProcessorIfc>();
 	private ReceiverEventHandler stoppedHandler = newStoppedHandler();
 	private ReceiverEventHandler startedHandler = newStartedHandler();
-	private long lastMinuteDisconnects = 0;
 
 	@Override
 	public void processPacket(final Packet packet) {
@@ -182,11 +176,6 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 										", to: " + newAddress);
 					}
 					Packet response = null;
-// 				response = packet.commandResult(null);
-// 				Command.addFieldValue(response, "session-id", command_sessionId);
-// 				Command.addFieldValue(response, "action", "close");
-// 				response.getElement().setAttribute("to", old_receiver);
-// 				addOutPacket(response);
 					response = packet.commandResult(null);
 					Command.addFieldValue(response, "session-id", command_sessionId);
 					Command.addFieldValue(response, "action", "activate");
@@ -281,19 +270,12 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 			}
 			// 			results.offer(new Packet(new Element("OK")));
 		} // end of while ()
-// 		return results;
 		return null;
 	}
 
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> props = super.getDefaults(params);
-//		if (params.get(GEN_VIRT_HOSTS) != null) {
-//			HOSTNAMES_PROP_VAL = ((String)params.get(GEN_VIRT_HOSTS)).split(",");
-//		} else {
-//			HOSTNAMES_PROP_VAL = DNSResolver.getDefHostNames();
-//		}
-//		props.put(HOSTNAMES_PROP_KEY, HOSTNAMES_PROP_VAL);
 		Boolean r_mode = (Boolean)params.get(getName() + "/" + ROUTINGS_PROP_KEY
 			+ "/" + ROUTING_MODE_PROP_KEY);
 		if (r_mode == null) {
@@ -331,13 +313,6 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 					(String)entry.getValue());
 			} // end of if (entry.getKey().startsWith(ROUTINGS_PROP_KEY + "/"))
 		} // end of for ()
-//		String[] hnames = (String[])props.get(HOSTNAMES_PROP_KEY);
-//		clearRoutings();
-//		hostnames.clear();
-//		for (String host: hnames) {
-//			addRouting(getName() + "@" + host);
-//			hostnames.add(host);
-//		} // end of for ()
 	}
 
 	private XMPPResourceConnection getXMPPSession(Packet p) {
@@ -448,7 +423,6 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 	@Override
 	public void serviceStopped(XMPPIOService service) {
 		super.serviceStopped(service);
-		++lastMinuteDisconnects;
 		// It might be a Bosh service in which case it is ignored here.
 		if (service.getXMLNS() == XMLNS) {
 			//		XMPPIOService serv = (XMPPIOService)service;
@@ -459,7 +433,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 					UUID.randomUUID().toString());
 				// In case of mass-disconnects, adjust the timeout properly
 				addOutPacketWithTimeout(command, stoppedHandler, 
-								30l+(lastMinuteDisconnects/10), TimeUnit.SECONDS);
+								15l, TimeUnit.SECONDS);
 				if (log.isLoggable(Level.FINE)) {
 					log.fine("Service stopped, sending packet: " + command.getStringData());
 				}
@@ -469,12 +443,6 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 				}
 			}
 		}
-	}
-
-	@Override
-	public void everyMinute() {
-		super.everyMinute();
-		lastMinuteDisconnects = 0;
 	}
 
 	@Override

@@ -296,14 +296,14 @@ public abstract class AbstractMessageReceiver
 			in_queue_size += in_priority_sizes[queue.ordinal()];
 			out_queue_size += out_priority_sizes[queue.ordinal()];
 		}
-		if (in_queue_size > 0) {
+		if (in_queue_size > 10) {
 			stats.add(new StatRecord(getName(), "Total In queues wait", "int",
 							in_queue_size, Level.INFO));
 		} else {
 			stats.add(new StatRecord(getName(), "Total In queues wait", "int",
 							in_queue_size, Level.FINEST));
 		}
-		if (out_queue_size > 0) {
+		if (out_queue_size > 10) {
 			stats.add(new StatRecord(getName(), "Total Out queues wait", "int",
 							out_queue_size, Level.INFO));
 		} else {
@@ -330,10 +330,18 @@ public abstract class AbstractMessageReceiver
 		for (long ppt : processPacketTimings) {
 			res += ppt;
 		}
-		stats.add(new StatRecord(getName(),
-						"Average processing time on last " +
-						processPacketTimings.length + " runs [ms]", "long",
-				(res/processPacketTimings.length), Level.FINEST));
+		long prcessingTime = res / processPacketTimings.length;
+		if (prcessingTime > 10) {
+			stats.add(new StatRecord(getName(),
+							"Average processing time on last " +
+							processPacketTimings.length + " runs [ms]", "long",
+							prcessingTime, Level.FINE));
+		} else {
+			stats.add(new StatRecord(getName(),
+							"Average processing time on last " +
+							processPacketTimings.length + " runs [ms]", "long",
+							prcessingTime, Level.FINEST));
+		}
     return stats;
   }
 

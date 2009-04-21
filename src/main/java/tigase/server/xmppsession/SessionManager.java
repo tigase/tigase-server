@@ -29,7 +29,6 @@ import java.io.FileReader;
 import java.security.Security;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -64,7 +63,6 @@ import tigase.server.AbstractMessageReceiver;
 import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.server.Permissions;
-import tigase.server.Priority;
 import tigase.server.ReceiverEventHandler;
 import tigase.server.XMPPServer;
 import tigase.stats.StatRecord;
@@ -72,6 +70,9 @@ import tigase.sys.OnlineJidsReporter;
 import tigase.sys.TigaseRuntime;
 import tigase.util.JIDUtils;
 import tigase.util.PriorityQueue;
+import tigase.util.ProcessingThreads;
+import tigase.util.QueueItem;
+import tigase.util.WorkerThread;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.NotAuthorizedException;
@@ -86,6 +87,7 @@ import tigase.xmpp.XMPPSession;
 import tigase.xmpp.XMPPStopListenerIfc;
 import tigase.xmpp.ConnectionStatus;
 
+import tigase.xmpp.XMPPException;
 import tigase.xmpp.XMPPPacketFilterIfc;
 import static tigase.server.xmppsession.SessionManagerConfig.*;
 
@@ -119,10 +121,8 @@ public class SessionManager extends AbstractMessageReceiver
 	private NonAuthUserRepository naUserRepository = null;
 	private PacketFilter filter = null;
 
-	//private String[] hostnames = {"localhost"};
 	private String[] admins = {"admin@localhost"};
 	private String[] trusted = {"admin@localhost"};
-	//private String[] anon_peers = {"admin@localhost"};
 
 	private ConcurrentHashMap<String, XMPPSession> sessionsByNodeId =
 		new ConcurrentHashMap<String, XMPPSession>();
@@ -131,8 +131,8 @@ public class SessionManager extends AbstractMessageReceiver
 
 	private Map<String, XMPPPreprocessorIfc> preProcessors =
 					new ConcurrentSkipListMap<String, XMPPPreprocessorIfc>();
-	private Map<String, ProcessorThreads> processors =
-					new ConcurrentSkipListMap<String, ProcessorThreads>();
+	private Map<String, ProcessingThreads<ProcessorWorkerThread>> processors =
+					new ConcurrentSkipListMap<String, ProcessingThreads<ProcessorWorkerThread>>();
 	private Map<String, XMPPPostprocessorIfc> postProcessors =
 					new ConcurrentSkipListMap<String, XMPPPostprocessorIfc>();
 	private Map<String, XMPPStopListenerIfc> stopListeners =
@@ -143,6 +143,9 @@ public class SessionManager extends AbstractMessageReceiver
 					new ConcurrentSkipListMap<String, XMPPPacketFilterIfc>();
 	private Map<String, AdminCommandIfc> adminCommands =
 					new ConcurrentSkipListMap<String, AdminCommandIfc>();
+	private ProcessingThreads<SessionCloseWorkerThread> sessionCloseThread =
+					new ProcessingThreads<SessionCloseWorkerThread>(new SessionCloseWorkerThread(),
+					4, 1, maxQueueSize, "session-close");
 	private Timer authenticationWatchdog = new Timer("SM authentocation watchdog");
 
 	private ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
@@ -475,10 +478,6 @@ public class SessionManager extends AbstractMessageReceiver
 		}
 	}
 
-//	protected String[] getVHosts() {
-//		return hostnames;
-//	}
-
 	private boolean isAdmin(String jid) {
 		for (String adm: admins) {
 			if (adm.equals(JIDUtils.getNodeID(jid))) {
@@ -552,20 +551,20 @@ public class SessionManager extends AbstractMessageReceiver
 	private void walk(final Packet packet,
 		final XMPPResourceConnection connection, final Element elem,
 		final Queue<Packet> results) {
-		for (ProcessorThreads proc_t: processors.values()) {
+		for (ProcessingThreads<ProcessorWorkerThread> proc_t: processors.values()) {
 			String xmlns = elem.getXMLNS();
 			if (xmlns == null) { xmlns = "jabber:client";	}
-			if (proc_t.processor.isSupporting(elem.getName(), xmlns)) {
+			XMPPProcessorIfc processor = proc_t.getWorkerThread().processor;
+			if (processor.isSupporting(elem.getName(), xmlns)) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("XMPPProcessorIfc: "+proc_t.processor.getClass().getSimpleName()+
-						" ("+proc_t.processor.id()+")"+"\n Request: "+elem.toString()
+					log.finest("XMPPProcessorIfc: "+processor.getClass().getSimpleName()+
+						" ("+processor.id()+")"+"\n Request: "+elem.toString()
 						+ (connection != null ? ", " + connection.getConnectionId() : " null"));
 				}
 				if (proc_t.addItem(packet, connection)) {
-					packet.processedBy(proc_t.processor.id());
+					packet.processedBy(processor.id());
 				} else {
 //					proc_t.debugQueue();
-					proc_t.packetDroped();
 					if (log.isLoggable(Level.FINE)) {
 						log.fine("Can not add packet: " + packet.toString() +
 										" to processor: " + proc_t.getName() +
@@ -676,7 +675,8 @@ public class SessionManager extends AbstractMessageReceiver
 			break;
 		case STREAM_CLOSED:
 			fastAddOutPacket(pc.okResult((String)null, 0));
-			closeConnection(pc.getFrom(), false);
+			sessionCloseThread.addItem(pc, null);
+			//closeConnection(pc.getFrom(), false);
 			processing_result = true;
 			break;
 		case BROADCAST_TO_ONLINE:
@@ -1030,14 +1030,10 @@ public class SessionManager extends AbstractMessageReceiver
 		addOutPackets(results);
 	}
 
-//	private XMPPSession getXMPPSession(Packet p) {
-//		return connectionsByFrom.get(p.getFrom()).getParentSession();
-//	}
-
 	private List<Element> getFeatures(XMPPResourceConnection session) {
 		List<Element> results = new LinkedList<Element>();
-		for (ProcessorThreads proc_t: processors.values()) {
-			Element[] features = proc_t.processor.supStreamFeatures(session);
+		for (ProcessingThreads<ProcessorWorkerThread> proc_t: processors.values()) {
+			Element[] features = proc_t.getWorkerThread().processor.supStreamFeatures(session);
 			if (features != null) {
 				results.addAll(Arrays.asList(features));
 			} // end of if (features != null)
@@ -1057,7 +1053,11 @@ public class SessionManager extends AbstractMessageReceiver
 		XMPPProcessorIfc proc = ProcessorFactory.getProcessor(comp_id);
 		boolean loaded = false;
 		if (proc != null) {
-			ProcessorThreads pt = new ProcessorThreads(proc);
+			ProcessorWorkerThread worker = new ProcessorWorkerThread(proc);
+			ProcessingThreads<ProcessorWorkerThread> pt =
+							new ProcessingThreads<ProcessorWorkerThread>(worker,
+							proc.concurrentQueuesNo(), proc.concurrentThreadsPerQueue(),
+							maxQueueSize, proc.id());
 			processors.put(comp_id, pt);
 			log.config("Added processor: " + proc.getClass().getSimpleName()
 				+ " for plugin id: " + comp_id);
@@ -1182,11 +1182,6 @@ public class SessionManager extends AbstractMessageReceiver
 						}
 					}
 				}
-// 				if (entry.getKey().startsWith(PLUGINS_CONF_PROP_KEY + "/" + comp_id)) {
-// 					plugin_settings.put(
-// 						entry.getKey().substring((PLUGINS_CONF_PROP_KEY +
-// 								"/" + comp_id + "/").length()), entry.getValue());
-// 				}
 			}
 			if (plugin_settings.size() > 0) {
 				if (log.isLoggable(Level.FINEST)) {
@@ -1195,24 +1190,10 @@ public class SessionManager extends AbstractMessageReceiver
 				plugin_config.put(comp_id, plugin_settings);
 			}
 		} // end of for (String comp_id: plugins)
-//		hostnames = (String[])props.get(HOSTNAMES_PROP_KEY);
-//		clearRoutings();
-//		for (String host: hostnames) {
-//			addRouting(host);
-//// 			XMPPResourceConnection conn = createUserSession(NULL_ROUTING, host, host);
-//// 			conn.setDummy(true);
-//		} // end of for ()
-//		addRouting(getComponentId());
-//		anonymous_domains.clear();
-//		anonymous_domains.addAll(
-//			Arrays.asList((String[])props.get(ANONYMOUS_DOMAINS_PROP_KEY)));
-// 		serverSession =
 		createUserSession(NULL_ROUTING, getDefHostName(),
 						getComponentId() + "/server");
 		admins = (String[])props.get(ADMINS_PROP_KEY);
 		trusted = (String[])props.get(TRUSTED_PROP_KEY);
-		//anon_peers = (String[])props.get(ANONYMOUS_PEERS_PROP_KEY);
-		//Arrays.sort(anon_peers);
 		// Loading admin scripts....
 		String descrStr = "AS:Description: ";
 		String cmdIdStr = "AS:CommandId: ";
@@ -1316,8 +1297,8 @@ public class SessionManager extends AbstractMessageReceiver
 						isLocalDomain(jid))) {
 			Element query = serviceEntity.getDiscoInfo(node);
 			if (node == null) {
-				for (ProcessorThreads proc_t : processors.values()) {
-					Element[] discoFeatures = proc_t.processor.supDiscoFeatures(null);
+				for (ProcessingThreads<ProcessorWorkerThread> proc_t : processors.values()) {
+					Element[] discoFeatures = proc_t.getWorkerThread().processor.supDiscoFeatures(null);
 					if (discoFeatures != null) {
 						query.addChildren(Arrays.asList(discoFeatures));
 					} // end of if (discoFeatures != null)
@@ -1338,8 +1319,8 @@ public class SessionManager extends AbstractMessageReceiver
 	@Override
 	public List<Element> getDiscoFeatures() {
 		List<Element> features = new LinkedList<Element>();
-		for (ProcessorThreads proc_t: processors.values()) {
-			Element[] discoFeatures = proc_t.processor.supDiscoFeatures(null);
+		for (ProcessingThreads<ProcessorWorkerThread> proc_t: processors.values()) {
+			Element[] discoFeatures = proc_t.getWorkerThread().processor.supDiscoFeatures(null);
 			if (discoFeatures != null) {
 				features.addAll(Arrays.asList(discoFeatures));
 			} // end of if (discoFeatures != null)
@@ -1355,11 +1336,6 @@ public class SessionManager extends AbstractMessageReceiver
 						(result != null ? result.toString() : null));
         }
 		return result;
-//		if (jid != null && getName().equals(JIDUtils.getNodeNick(jid))) {
-//			return serviceEntity.getDiscoItems(node, jid);
-//		} else {
-//			return serviceEntity.getDiscoItems(node, jid);
-//		}
 	}
 
 	@Override
@@ -1380,22 +1356,38 @@ public class SessionManager extends AbstractMessageReceiver
 			stats.add(new StatRecord(getName(), "Authentication timouts", "long",
 							authTimeouts, Level.FINEST));
 		}
-		for (Map.Entry<String, ProcessorThreads> procent : processors.entrySet()) {
-			ProcessorThreads proc = procent.getValue();
-			if (proc.getTotalQueueSize() > 0 || proc.dropedPackets > 0) {
+		for (Map.Entry<String, ProcessingThreads<ProcessorWorkerThread>> procent : processors.entrySet()) {
+			ProcessingThreads<ProcessorWorkerThread> proc = procent.getValue();
+			if (proc.getTotalQueueSize() > 0 || proc.getDroppedPackets() > 0) {
 				stats.add(new StatRecord(getName(), "Processor: " + procent.getKey(),
 								"String", "Queue: " + proc.getTotalQueueSize() +
-								", AvTime: " + proc.averageTime() +
-								", Runs: " + proc.cntRuns + ", Lost: " + proc.dropedPackets,
+								", AvTime: " + proc.getAverageProcessingTime() +
+								", Runs: " + proc.getTotalRuns() + ", Lost: " + proc.getDroppedPackets(),
 								Level.INFO));
-
 			} else {
 				stats.add(new StatRecord(getName(), "Processor: " + procent.getKey(),
 								"String", "Queue: " + proc.getTotalQueueSize() +
-								", AvTime: " + proc.averageTime() +
-								", Runs: " + proc.cntRuns + ", Lost: " + proc.dropedPackets,
+								", AvTime: " + proc.getAverageProcessingTime() +
+								", Runs: " + proc.getTotalRuns() + ", Lost: " + proc.getDroppedPackets(),
 								Level.FINEST));
 			}
+		}
+		if (sessionCloseThread.getTotalQueueSize() > 0 || sessionCloseThread.getDroppedPackets() > 0) {
+			stats.add(new StatRecord(getName(), "Processor: " +
+							sessionCloseThread.getName(),
+							"String", "Queue: " + sessionCloseThread.getTotalQueueSize() +
+							", AvTime: " + sessionCloseThread.getAverageProcessingTime() +
+							", Runs: " + sessionCloseThread.getTotalRuns() + ", Lost: " +
+							sessionCloseThread.getDroppedPackets(),
+							Level.INFO));
+		} else {
+			stats.add(new StatRecord(getName(), "Processor: " +
+							sessionCloseThread.getName(),
+							"String", "Queue: " + sessionCloseThread.getTotalQueueSize() +
+							", AvTime: " + sessionCloseThread.getAverageProcessingTime() +
+							", Runs: " + sessionCloseThread.getTotalRuns() + ", Lost: " +
+							sessionCloseThread.getDroppedPackets(),
+							Level.FINEST));
 		}
 		return stats;
 	}
@@ -1414,149 +1406,59 @@ public class SessionManager extends AbstractMessageReceiver
 		return sessionsByNodeId.keySet();
 	}
 
-	private class QueueItem {
-		Packet packet;
-		XMPPResourceConnection conn;
+	private class SessionCloseWorkerThread extends WorkerThread {
+
+		@Override
+		public WorkerThread getNewInstance(PriorityQueue<QueueItem> queue) {
+			SessionCloseWorkerThread worker = new SessionCloseWorkerThread();
+			worker.setQueue(queue);
+			return worker;
+		}
+
+		@Override
+		public void process(QueueItem item) {
+			closeConnection(item.packet.getFrom(), false);
+		}
+		
 	}
 
-	private class ProcessorThreads {
+	private class ProcessorWorkerThread extends WorkerThread {
 
-		private boolean stopped = false;
 		private XMPPProcessorIfc processor = null;
-		private LinkedList<ProcessorWorkerThread> workerThreads =
-						new LinkedList<ProcessorWorkerThread>();
-//		private PriorityQueue<QueueItem> nullQueue = new PriorityQueue<QueueItem>(
-//						Priority.values().length, maxQueueSize / maxPluginsNo);
-		private ArrayList<PriorityQueue<QueueItem>> queues =
-						new ArrayList<PriorityQueue<QueueItem>>();
+		private LinkedList<Packet> local_results = new LinkedList<Packet>();
 
-		// Packets are put in queues in such a way that all packets for the same
-		// user end-up in the same queue. This is important in some cases as
-		// packet processing order does matter in some cases, especially for
-		// roster processing.
-		// Therefore it is also recommended that there is a single thread for
-		// each queue but we can ditribute load increasing number of queues.
-		private int numQueues = 2;
-		private int numWorkerThreads = 1;
-		private int maxQueueSizeDef = maxQueueSize/maxPluginsNo;
-
-		private long cntRuns = 0;
-		private long dropedPackets = 0;
-
-		public ProcessorThreads(XMPPProcessorIfc processor) {
+		public ProcessorWorkerThread(XMPPProcessorIfc processor) {
 			this.processor = processor;
-			numQueues = processor.concurrentQueuesNo();
-			numWorkerThreads = processor.concurrentThreadsPerQueue();
-			if ("roster-presence".equals(processor.id()) ||
-							"jabber:iq:auth".equals(processor.id()) ||
-							"urn:ietf:params:xml:ns:xmpp-sasl".equals(processor.id())) {
-				maxQueueSizeDef = maxQueueSize * 10;
-			}
-
-			for (int i = 0; i < numQueues; i++) {
-				queues.add(new PriorityQueue<QueueItem>(Priority.values().length, 
-								maxQueueSizeDef));
-				for (int j = 0; j < numWorkerThreads; j++) {
-					ProcessorWorkerThread t = new ProcessorWorkerThread(queues.get(i));
-					t.setDaemon(true);
-					t.setName(processor.id() + " Queue " + i + " Worker " + j);
-					t.start();
-					workerThreads.add(t);
-				}
-			}
-//			ProcessorWorkerThread t = new ProcessorWorkerThread(nullQueue);
-//			t.setDaemon(true);
-//			t.setName(processor.id() + " Null Queue Worker");
-//			t.start();
-//			workerThreads.add(t);
 		}
 
-		public String getName() {
-			return processor.id();
+		@Override
+		public WorkerThread getNewInstance(PriorityQueue<QueueItem> queue) {
+			ProcessorWorkerThread worker = new ProcessorWorkerThread(processor);
+			worker.setQueue(queue);
+			return worker;
 		}
 
-		private int getTotalQueueSize() {
-			int ret = 0;
-			for (PriorityQueue<QueueItem> pq : queues) {
-				ret += pq.totalSize();
-			}
-//			ret += nullQueue.totalSize();
-			return ret;
-		}
-
-		public boolean addItem(Packet packet, XMPPResourceConnection conn) {
-			boolean ret = false;
-			QueueItem item = new QueueItem();
-			item.conn = conn;
-			item.packet = packet;
+		@Override
+		public void process(QueueItem item) {
 			try {
-				// Queueing packets per user...
-				ret = queues.get(Math.abs(conn.getUserId().hashCode() %
-								numQueues)).offer(item, packet.getPriority().ordinal());
-			} catch (Exception e) {
-				// Otherwise per destination address
-				ret = queues.get(Math.abs(packet.getTo().hashCode() %
-								numQueues)).offer(item, packet.getPriority().ordinal());
-				//ret = nullQueue.offer(item, packet.getPriority().ordinal());
-			}
-			return ret;
-		}
-
-		private void packetDroped() {
-			++dropedPackets;
-		}
-
-		private long averageTime() {
-			long average = 0;
-			for (ProcessorWorkerThread processorWorkerThread : workerThreads) {
-				average += processorWorkerThread.cntAverageTime;
-			}
-			return average / workerThreads.size();
-		}
-
-		private class ProcessorWorkerThread
-						extends Thread {
-			private LinkedList<Packet> local_results = new LinkedList<Packet>();
-			private PriorityQueue<QueueItem> queue = null;
-			private long cntAverageTime = 0;
-
-			private ProcessorWorkerThread(PriorityQueue<QueueItem> queue) {
-				this.queue = queue;
-			}
-
-			@Override
-			public void run() {
-				while (!stopped) {
-					QueueItem item = null;
-					try {
-						//XXX - not very nice, getting the current time can be slooooooow
-						item = queue.take();
-						long start = System.currentTimeMillis();
-						if (item.conn != null) {
-							// Not sure if this synchronization is needed at all
-							synchronized (item.conn) {
-								processor.process(item.packet, item.conn, naUserRepository,
-												local_results, plugin_config.get(processor.id()));
-								setPermissions(item.conn, local_results);
-							}
-						} else {
-							processor.process(item.packet, null, naUserRepository,
-											local_results, plugin_config.get(processor.id()));
-						}
-						addOutPackets(item.packet, item.conn, local_results);
-						++cntRuns;
-						cntAverageTime =
-										(cntAverageTime + (System.currentTimeMillis() - start)) / 2;
-					} catch (PacketErrorTypeException e) {
-						log.info("Already error packet, ignoring: " + item.packet.toString());
-					} catch (Exception e) {
-						log.log(Level.SEVERE, "Exception during packet processing: " +
-										item.packet.toString(), e);
-					}
+				if (item.conn != null) {
+					// Not sure if this synchronization is needed at all
+					processor.process(item.packet, item.conn, naUserRepository,
+									local_results, plugin_config.get(processor.id()));
+					setPermissions(item.conn, local_results);
+				} else {
+					processor.process(item.packet, null, naUserRepository,
+									local_results, plugin_config.get(processor.id()));
 				}
+				addOutPackets(item.packet, item.conn, local_results);
+			} catch (PacketErrorTypeException e) {
+				log.info("Already error packet, ignoring: " + item.packet.toString());
+			} catch (XMPPException e) {
+				log.log(Level.WARNING, "Exception during packet processing: " +
+								item.packet.toString(), e);
 			}
 		}
-
+		
 	}
 
 	private class AuthenticationTimer extends TimerTask {
