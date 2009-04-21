@@ -459,7 +459,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 					UUID.randomUUID().toString());
 				// In case of mass-disconnects, adjust the timeout properly
 				addOutPacketWithTimeout(command, stoppedHandler, 
-								5l+(lastMinuteDisconnects/10), TimeUnit.SECONDS);
+								30l+(lastMinuteDisconnects/10), TimeUnit.SECONDS);
 				if (log.isLoggable(Level.FINE)) {
 					log.fine("Service stopped, sending packet: " + command.getStringData());
 				}
@@ -527,7 +527,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 			// a packet.
 			log.warning("No response within time limit received for a packet: " +
 							packet.toString());
-			addOutPacketWithTimeout(packet, stoppedHandler, 30l, TimeUnit.SECONDS);
+			addOutPacketWithTimeout(packet, stoppedHandler, 60l, TimeUnit.SECONDS);
 		}
 
 		@Override
