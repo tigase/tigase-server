@@ -85,6 +85,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 		new ConcurrentSkipListMap<String, XMPPProcessorIfc>();
 	private ReceiverEventHandler stoppedHandler = newStoppedHandler();
 	private ReceiverEventHandler startedHandler = newStartedHandler();
+	private long lastMinuteDisconnects = 0;
 
 	@Override
 	public void processPacket(final Packet packet) {
@@ -271,10 +272,13 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 				log.finest("Processing socket data: " + p.getStringData());
 			}
 			p.setFrom(getFromAddress(id));
-			p.setTo(serv.getDataReceiver());
-// 			p.setTo(serv.getDataReceiver() != null ? serv.getDataReceiver()
-// 				: routings.computeRouting(hostname));
-			addOutPacket(p);
+			String receiver = serv.getDataReceiver();
+			if (receiver != null) {
+				p.setTo(serv.getDataReceiver());
+				addOutPacket(p);
+			} else {
+				// Hm, receiver is not set yet..., ignoring
+			}
 			// 			results.offer(new Packet(new Element("OK")));
 		} // end of while ()
 // 		return results;
@@ -444,6 +448,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 	@Override
 	public void serviceStopped(XMPPIOService service) {
 		super.serviceStopped(service);
+		++lastMinuteDisconnects;
 		// It might be a Bosh service in which case it is ignored here.
 		if (service.getXMLNS() == XMLNS) {
 			//		XMPPIOService serv = (XMPPIOService)service;
@@ -452,7 +457,9 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 					getFromAddress(getUniqueId(service)),
 					service.getDataReceiver(), StanzaType.set, 
 					UUID.randomUUID().toString());
-				addOutPacketWithTimeout(command, stoppedHandler, 15l, TimeUnit.SECONDS);
+				// In case of mass-disconnects, adjust the timeout properly
+				addOutPacketWithTimeout(command, stoppedHandler, 
+								5l+(lastMinuteDisconnects/10), TimeUnit.SECONDS);
 				if (log.isLoggable(Level.FINE)) {
 					log.fine("Service stopped, sending packet: " + command.getStringData());
 				}
@@ -462,6 +469,12 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 				}
 			}
 		}
+	}
+
+	@Override
+	public void everyMinute() {
+		super.everyMinute();
+		lastMinuteDisconnects = 0;
 	}
 
 	@Override
@@ -514,15 +527,15 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 			// a packet.
 			log.warning("No response within time limit received for a packet: " +
 							packet.toString());
-			addOutPacketWithTimeout(packet, stoppedHandler, 5l, TimeUnit.SECONDS);
+			addOutPacketWithTimeout(packet, stoppedHandler, 30l, TimeUnit.SECONDS);
 		}
 
 		@Override
 		public void responseReceived(Packet packet, Packet response) {
 			// Great, nothing to worry about.
 			if (log.isLoggable(Level.FINEST)) {
-    			log.finest("Response for stop received...");
-            }
+				log.finest("Response for stop received...");
+			}
 		}
 
 	}
