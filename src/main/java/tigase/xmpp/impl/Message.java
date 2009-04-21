@@ -99,13 +99,14 @@ public class Message extends XMPPProcessor implements XMPPProcessorIfc {
 				// which should rceive the result packet for the final delivery
 				// to the end-user. In most cases this is a c2s or Bosh component
 				// which keep the user connection.
-				result.setTo(session.getConnectionId());
+				result.setTo(session.getConnectionId(packet.getElemTo()));
 				// In most cases this might be skept, however if there is a
 				// problem during packet delivery an error might be sent back
 				result.setFrom(packet.getTo());
 				// Don't forget to add the packet to the results queue or it
 				// will be lost.
 				results.offer(result);
+				return;
 			} // end of else
 
 			// Remember to cut the resource part off before comparing JIDs
