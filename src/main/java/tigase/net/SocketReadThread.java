@@ -128,7 +128,12 @@ public class SocketReadThread implements Runnable {
 	}
 
 	public void addSocketService(IOService s) {
-		socketReadThread[incrementAndGet()].addSocketServicePriv(s);
+		// Due to a delayed SelectionKey cancelling deregistering
+		// nature this distribution doesn't work well, it leads to
+		// dead-lock. Let's make sure the service is always processed
+		// by the same thread thus the same Selector.
+		//socketReadThread[incrementAndGet()].addSocketServicePriv(s);
+		socketReadThread[s.hashCode() % socketReadThread.length].addSocketServicePriv(s);
 	}
 
 	public void addSocketServicePriv(IOService s) {
