@@ -31,7 +31,7 @@ package tigase.util;
 public class OSUtils {
 
 	public enum OS {
-		windows, linux, solaris, mac, unix, other;
+		windows, linux, sunos, solaris, mac, unix, other;
 	}
 
 	public static OS getOSType() {
