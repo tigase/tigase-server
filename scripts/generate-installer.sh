@@ -1,7 +1,7 @@
 #!/bin/bash
 
-IZPACK_DIR="/usr/local/IzPack421"
-#IZPACK_DIR="/Applications/IzPack"
+#IZPACK_DIR="/usr/local/IzPack421"
+IZPACK_DIR="/Applications/IzPack"
 
 export TIGVER=`grep -m 1 "Tigase-Version:" MANIFEST.MF | sed -e "s/Tigase-Version: \(.*\)/\\1/"`
 sed -e "s/<appversion>\([^<]*\)<\/appversion>/<appversion>$TIGVER<\/appversion>/" \
