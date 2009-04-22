@@ -1,27 +1,26 @@
 How to generate installer:
 ---------------------------
 
-This directory contains files needed to configure and extend IzPack installer in 
-order to create Tigase installer. 
-To generate installer:
+Tigase installer modifications are of two kinds:
+1. Tigase panels are provided in src/main/izpack/java directory for easy tracking in svn.
 
-1. Install chosen version of IzPack including source code.
+2. Modifications related to the IzPack installer are provided as a patch file. Unfortunately one of 
+src/main/izpack/changes.patch
 
-2. In order to compile custom Tigase panels you need to first compile IzPack
-classes. You can use the included build.xml which is in the src directory of 
-IzPack install. Just enter this dir and type: ant all 
+important: build.xml for izpack has conflicting changes related to both TigasePanels and to generic IzPack
+functionality. This is why it is only provided in the patch. If you add/remove panels you will need to
+modify the patch too. 
 
-3. Make sure that the bin/panels directory of IzPack is writable by 
-generate-installer.sh script. Compiled custom panels will be placed here before 
-running installer compiler. 
 
-4. Modify the script/generate-installer.sh. Change the IZPACK_DIR
-variable to point to the IzPack instalation directory e.g.
-IZPACK_DIR="/usr/local/IzPack421"
+The first time after checking Tigase server source code and after you change some installation code i.e. 
+improve IzPack installer or add some panels, you will need to build the patched installer.
+You can use the scripts/prepare-installer.sh to download needed IzPack version, install it in a local
+directory, automaticaly patch it and build at the end. If the IzPack version of installer gets
+downloaded you can comment the svn checkout line to not download it every time when you prepare
+installer generator. 
 
-5. To start the installation process run the scripts/generate-installer.sh 
-file you will find in the main server source code directory. You should start 
-it from the server root dir.
 
-6. Generated files (jar and exe) will be placed in the packages dir of 
-Tigase codebase.
+After creating compiler generator it will sit in the installer/izpack.patched directory. You can use
+the script/generate-installer.sh to create TigaseInstaller from it without regeneratting installer
+generator every time.
+
