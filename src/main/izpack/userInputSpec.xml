@@ -33,31 +33,30 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 	<panel order="0">
 		<field type="title" txt="Select what you want to do next:"
 					 bold="true" size="2"/>
-		<field type="staticText" align="left" id="staticText.text"
+		<field type="staticText" align="left" 
 					 txt="On this panel you can specify whether you want to install only or configure already installed server or to do both. If you are just installing a server on your machine it is a good idea to do both steps."/>
 		<field type="space"/>
 		<field type="divider"/>
 		<field type="space"/>
 
 		<field type="check" variable="serverInstall">
-			<description align="left" txt="The wizards you want to execute"
-									 id="description.check.1"/>
-			<spec txt="Installation of the Tigase Server" id="serverInstall.label"
+			<description align="left" txt="The wizards you want to execute" />
+			<spec txt="Installation of the Tigase Server" 
 						true="on" false="off"	set="true"/>
 		</field>
 		<field type="check" variable="serverConfig">
-			<spec txt="Configuration of the Tigase Server" id="serverConfig.label"
+			<spec txt="Configuration of the Tigase Server" 
 						true="on" false="off"	set="true"/>
 		</field>
 		<field type="space"/>
 		<field type="divider"/>
 		<field type="space"/>
-		<field type="staticText" align="left" id="staticText.text"
+		<field type="staticText" align="left" 
 					 txt="Please note!"/>
-		<field type="staticText" align="left" id="staticText.text"
+		<field type="staticText" align="left"
 					 txt="While the Tigase server is quite stable and well tested application the installer itself is a new addition. Take precautions especially if you upgrade the server from earlier version. Backup old server files and the database."/>
 		<field type="space"/>
-		<field type="staticText" align="left" id="staticText.text"
+		<field type="staticText" align="left" 
 					 txt="If you notice any problems please report them to address: artur.hefczyc@tigase.org"/>
 	</panel>
 
@@ -85,13 +84,13 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 	<panel order="2">
 		<field type="title" txt="Basic Tigase server configuration"
 					 bold="true" size="2" />
-		<field type="staticText" align="left" id="staticText.text"
+		<field type="staticText" align="left" 
 					 txt="On this panel you can specify basic configuration settings for the Tigase server."/>
 		<field type="space" />
-		<field type="staticText" align="left" id="staticText.text"
+		<field type="staticText" align="left" 
 					 txt="Based on your selection here more configuration options might be presented later on. After the configuration is complete init.properties file will be created."/>
 		<field type="space" />
-		<field type="staticText" align="left" id="staticText.text"
+		<field type="staticText" align="left" 
 					 txt="You can optionally restart the server at the end of the process if you like."/>
 		<field type="divider" />
 		<field type="space"/>
@@ -100,13 +99,13 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 <!-- 			<description align="left" id="description.configType" -->
 <!-- 									 txt="Stick to the default unless you are realy sure you want something else."/> -->
 			<spec txt="Configuration type">
-				<choice txt="Default installation" id="configType.label.1"
+				<choice txt="Default installation" 
 								value="--gen-config-def"  set="true"/>
-				<choice txt="Default plus extra components" id="configType.label.2"
+				<choice txt="Default plus extra components" 
 								value="--gen-config-all" />
-				<choice txt="Session Manager only" id="configType.label.3"
+				<choice txt="Session Manager only" 
 								value="--gen-config-sm" />
-				<choice txt="Network connectivity only" id="configType.label.4"
+				<choice txt="Network connectivity only" 
 								value="--gen-config-cs" />
 			</spec>
 		</field>
@@ -125,15 +124,15 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 
 		<field type="combo" variable="dbType">
 			<spec txt="Select database">
-				<choice txt="Derby (built-in database)" id="dbType.label.1"
+				<choice txt="Derby (built-in database)" 
 								value="Derby" set="true"/>
-				<choice txt="MySQL" id="dbType.label.2"
+				<choice txt="MySQL" 
 								value="MySQL"/>
-				<choice txt="PostgreSQL" id="dbType.label.3"
+				<choice txt="PostgreSQL" 
 								value="PostgreSQL"/>
-				<choice txt="SQLServer" id="dbType.label.3"
+				<choice txt="SQLServer" 
 								value="SQLServer"/>
-				<choice txt="Other..." id="dbType.label.3"
+				<choice txt="Other..." 
 								value="Other"/>
 			</spec>
 		</field>
@@ -143,7 +142,7 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 		<field type="space"/>
 
 		<field type="check" variable="advancedConfig">
-			<spec txt="Advanced configuration options" id="advancedConfig.label"
+			<spec txt="Advanced configuration options" 
 						true="on" false="off"	set="false"/>
 		</field>
 	</panel>
@@ -151,33 +150,28 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 	<!-- Advanced configuration -->
 	<panel order="3">
 		<field type="title" txt="Advanced configuration options:" bold="true" size="2"/>
-		<field type="staticText" align="left" id="staticText.text"
+		<field type="staticText" align="left" 
 					 txt="This panel offer advanced configuration options. Please do not change them unless you know what you are doing."/>
 		<field type="space"/>
 		<field type="divider"/>
 		<field type="space"/>
 
 		<field type="check" variable="authDB">
-			<spec txt="Separate authentication database" id="authDB.label"
+			<spec txt="Separate authentication database" 
 						true="on" false="off"	set="false"/>
 		</field>
 
 		<field type="check" variable="mucComponent">
-			<description align="left" txt="Select optional components to run"
-									 id="mucComponent.check"/>
-			<spec txt="MUC" id="mucComponent.label"
-						true="on" false="off"	set="true"/>
+			<description align="left" txt="Select optional components to run" />
+			<spec txt="MUC" true="on" false="off"	set="true"/>
 		</field>
 		<field type="check" variable="pubsubComponent">
-			<spec txt="PubSub" id="pubsubComponent.label"
-						true="on" false="off"	set="false"/>
+			<spec txt="PubSub" true="on" false="off"	set="false"/>
 		</field>
 
 		<field type="check" variable="clusterMode">
-			<description align="left" txt="Do you want your server to run in the cluster mode?"
-									 id="clusterMode.check"/>
-			<spec txt="Cluster mode" id="clusterMode.label"
-						true="true" false="false"	set="false"/>
+			<description align="left" txt="Do you want your server to run in the cluster mode?" />
+			<spec txt="Cluster mode" true="true" false="false"	set="false"/>
 		</field>
 		<field type="text" align="left" variable="clusterNodes">
 			<spec txt="Cluster nodes list" size="30" set="$HOST_NAME"/>
@@ -186,22 +180,17 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 		<field type="space"/>
 
 		<field type="check" variable="serverDebug">
-			<description align="left" txt="Select components for debug logging"
-									 id="serverDebug.check"/>
-			<spec txt="Base server" id="serverDebug.label"
-						true="server" false="off"	set="true"/>
+			<description align="left" txt="Select components for debug logging" />
+			<spec txt="Base server" true="server" false="off"	set="true"/>
 		</field>
 		<field type="check" variable="pluginsDebug">
-			<spec txt="Plugins debug" id="pluginsDebug.label"
-						true="xmpp.impl" false="off"	set="false"/>
+			<spec txt="Plugins debug" true="xmpp.impl" false="off"	set="false"/>
 		</field>
 		<field type="check" variable="dbDebug">
-			<spec txt="Database debug" id="dbDebug.label"
-						true="db" false="off"	set="false"/>
+			<spec txt="Database debug" true="db" false="off"	set="false"/>
 		</field>
 		<field type="check" variable="clusterDebug">
-			<spec txt="Cluster debug" id="clusterDebug.label"
-						true="cluster" false="off"	set="false"/>
+			<spec txt="Cluster debug" true="cluster" false="off"	set="false"/>
 		</field>
 
 	</panel>
@@ -209,8 +198,7 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 	<!-- Plugins selection -->
 	<panel order="4">
 		<field type="title" txt="Plugins selection:" bold="true" size="2"/>
-		<field type="staticText" align="left" id="staticText.text"
-					 txt="Please selected/deselect plugins to be loaded by the server."/>
+		<field type="staticText" align="left" txt="Please selected/deselect plugins to be loaded by the server."/>
 		<field type="space"/>
 		<field type="divider"/>
 		<field type="space"/>
@@ -218,72 +206,55 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 uvme:vcard-temp,http://jabber.org/protocol/commands,jabber:iq:private,urn:xmpp:ping,uvme:iq:games-list,uvme:jabber:iq:search
 
 		<field type="check" variable="nonSaslAuthPlugin">
-			<spec txt="Non-SASL Authentication" id="nonSaslAuthPlugin.label"
-						true="jabber:iq:auth" false="off"	set="true"/>
+			<spec txt="Non-SASL Authentication" true="jabber:iq:auth" false="off"	set="true"/>
 		</field>
 		<field type="check" variable="saslAuthPlugin">
-			<spec txt="SASL Authentication" id="saslAuthPlugin.label"
-						true="urn:ietf:params:xml:ns:xmpp-sasl" false="off"	set="true"/>
+			<spec txt="SASL Authentication" true="urn:ietf:params:xml:ns:xmpp-sasl" false="off"	set="true"/>
 		</field>
 		<field type="check" variable="resBindPlugin">
-			<spec txt="Resource Bind" id="resBindPlugin.label"
-						true="urn:ietf:params:xml:ns:xmpp-bind" false="off" set="true"/>
+			<spec txt="Resource Bind" true="urn:ietf:params:xml:ns:xmpp-bind" false="off" set="true"/>
 		</field>
 		<field type="check" variable="sessionBindPlugin">
-			<spec txt="Session bind" id="sessionBindPlugin.label"
-						true="urn:ietf:params:xml:ns:xmpp-session" false="off"	set="true"/>
+			<spec txt="Session bind" true="urn:ietf:params:xml:ns:xmpp-session" false="off"	set="true"/>
 		</field>
 		<field type="check" variable="registerPlugin">
-			<spec txt="User registration" id="registerPlugin.label"
-						true="jabber:iq:register" false="off"	set="true"/>
+			<spec txt="User registration" true="jabber:iq:register" false="off"	set="true"/>
 		</field>
 		<field type="check" variable="rosterPlugin">
-			<spec txt="Presence/Roster management" id="rosterPlugin.label"
-						true="roster-presence" false="off"	set="true"/>
+			<spec txt="Presence/Roster management" true="roster-presence" false="off"	set="true"/>
 		</field>
 		<field type="check" variable="basicFilterPlugin">
-			<spec txt="Basic filter" id="basicFilterPlugin.label"
- 						true="basic-filter" false="off"	set="true"/>
+			<spec txt="Basic filter" true="basic-filter" false="off"	set="true"/>
 		</field>
 		<field type="check" variable="domainFilterPlugin">
-			<spec txt="Domain filter" id="domainFilterPlugin.label"
- 						true="domain-filter" false="off"	set="true"/>
+			<spec txt="Domain filter" true="domain-filter" false="off"	set="true"/>
 		</field>
 		<field type="check" variable="privacyPlugin">
-			<spec txt="Privacy lists" id="privacyPlugin.label"
-						true="jabber:iq:privacy" false="off"	set="true"/>
+			<spec txt="Privacy lists" true="jabber:iq:privacy" false="off"	set="true"/>
 		</field>
 		<field type="check" variable="versionPlugin">
-			<spec txt="Software version" id="versionPlugin.label"
-						true="jabber:iq:version" false="off"	set="true"/>
+			<spec txt="Software version" true="jabber:iq:version" false="off"	set="true"/>
 		</field>
 		<field type="check" variable="statsPlugin">
-			<spec txt="Server statistics" id="statsPlugin.label"
-						true="http://jabber.org/protocol/stats" false="off"	set="true"/>
+			<spec txt="Server statistics" true="http://jabber.org/protocol/stats" false="off"	set="true"/>
 		</field>
 		<field type="check" variable="tlsPlugin">
-			<spec txt="TLS" id="tlsPlugin.label"
-						true="starttls" false="off"	set="true"/>
+			<spec txt="TLS" true="starttls" false="off"	set="true"/>
 		</field>
 		<field type="check" variable="msgOfflinePlugin">
-			<spec txt="Offline message storage" id="msgOfflinePlugin.label"
-						true="msgoffline" false="off"	set="true"/>
+			<spec txt="Offline message storage" true="msgoffline" false="off"	set="true"/>
 		</field>
 		<field type="check" variable="vcardPlugin">
-			<spec txt="vCard" id="vcardPlugin.label"
-						true="vcard-temp" false="off"	set="true"/>
+			<spec txt="vCard" true="vcard-temp" false="off"	set="true"/>
 		</field>
 		<field type="check" variable="commandsPlugin">
-			<spec txt="Ad-hoc commands" id="commandsPlugin.label"
-						true="http://jabber.org/protocol/commands" false="off"	set="true"/>
+			<spec txt="Ad-hoc commands" true="http://jabber.org/protocol/commands" false="off"	set="true"/>
 		</field>
 		<field type="check" variable="privatePlugin">
-			<spec txt="Private data storage" id="privatePlugin.label"
-						true="jabber:iq:private" false="off"	set="true"/>
+			<spec txt="Private data storage" true="jabber:iq:private" false="off"	set="true"/>
 		</field>
 		<field type="check" variable="pingPlugin">
-			<spec txt="Ping" id="pingPlugin.label"
-						true="urn:xmpp:ping" false="off"	set="true"/>
+			<spec txt="Ping" true="urn:xmpp:ping" false="off"	set="true"/>
 		</field>
 
 	</panel>
@@ -291,14 +262,12 @@ uvme:vcard-temp,http://jabber.org/protocol/commands,jabber:iq:private,urn:xmpp:p
 	<!-- Database configuration -->
 	<panel order="5">
 		<field type="title" txt="Database configuration:" bold="true" size="2"/>
-		<field type="staticText" align="left" id="staticText.text"
-					 txt="You have selected $dbType database. This database needs additional configuration parameters. Please enter all required information."/>
+		<field type="staticText" align="left" txt="You have selected $dbType database. This database needs additional configuration parameters. Please enter all required information."/>
 		<field type="space"/>
 		<field type="divider"/>
 		<field type="space"/>
 
-		<field type="staticText" align="left" id="staticText.text"
-					 txt="$dbType super user account will be used only to create and configure database for the Tigase server. It will not be used by the Tigase server later on."/>
+		<field type="staticText" align="left" txt="$dbType super user account will be used only to create and configure database for the Tigase server. It will not be used by the Tigase server later on."/>
 		<field type="space"/>
 		<field type="text" align="left" variable="dbSuperuser">
 			<spec txt="Super user account name:" size="20" set="root"/>
@@ -309,16 +278,14 @@ uvme:vcard-temp,http://jabber.org/protocol/commands,jabber:iq:private,urn:xmpp:p
 				<pwd txt="Retype password:" size="20" set=""/>
 			</spec>
 			<validator class="com.izforge.izpack.util.PasswordEqualityValidator"
-								 txt="Both passwords must match."
-								 id="dbSuperpass.validator"/>
+								 txt="Both passwords must match." />
 		</field>
 
 		<field type="space"/>
 		<field type="divider"/>
 		<field type="space"/>
 
-		<field type="staticText" align="left" id="staticText.text"
-					 txt="$dbType database details. It will be created automatically if it does not exist."/>
+		<field type="staticText" align="left" txt="$dbType database details. It will be created automatically if it does not exist."/>
 
 		<field type="space"/>
 		<field type="text" align="left" variable="dbUser">
@@ -343,38 +310,27 @@ uvme:vcard-temp,http://jabber.org/protocol/commands,jabber:iq:private,urn:xmpp:p
 	<panel order="6">
 		<field type="title" txt="Authentication database configuration:"
 					 bold="true" size="2"/>
-		<field type="staticText" align="left" id="staticText.text"
-					 txt="You have selected a separate authentication database. You have to provide more details about this database."/>
+		<field type="staticText" align="left" txt="You have selected a separate authentication database. You have to provide more details about this database."/>
 		<field type="space"/>
 		<field type="divider"/>
 		<field type="space"/>
 
 		<field type="combo" variable="dbAuthType">
 			<spec txt="Select database">
-				<choice txt="Derby" id="dbAuthType.label.1"
-								value="derby" set="true"/>
-				<choice txt="MySQL" id="dbAuthType.label.2"
-								value="mysql"/>
-				<choice txt="PostgreSQL" id="dbAuthType.label.3"
-								value="postgresql"/>
-				<choice txt="SQL Server" id="dbAuthType.label.4"
-								value="jtds:sqlserver"/>
+				<choice txt="Derby" value="derby" set="true"/>
+				<choice txt="MySQL" value="mysql"/>
+				<choice txt="PostgreSQL" value="postgresql"/>
+				<choice txt="SQL Server" value="jtds:sqlserver"/>
 			</spec>
 		</field>
 		<field type="combo" variable="dbAuthHandle">
 			<spec txt="Select database">
-				<choice txt="Tigase Standard" id="dbAuthHandle.label.1"
-								value="Standard" set="true"/>
-				<choice txt="Tigase Auth" id="dbAuthHandle.label.2"
-								value="tigase-auth" set="true"/>
-				<choice txt="Tigase Custom" id="dbAuthHandle.label.3"
-								value="tigase-custom"/>
-				<choice txt="Drupal" id="dbAuthHandle.label.4"
-								value="drupal"/>
-				<choice txt="Libresource" id="dbAuthHandle.label.5"
-								value="libresource"/>
-				<choice txt="Your custom" id="dbAuthHandle.label.6"
-								value="Enter your class here"/>
+				<choice txt="Tigase Standard" value="Standard" set="true"/>
+				<choice txt="Tigase Auth" value="tigase-auth" set="true"/>
+				<choice txt="Tigase Custom" value="tigase-custom"/>
+				<choice txt="Drupal" value="drupal"/>
+				<choice txt="Libresource" value="libresource"/>
+				<choice txt="Your custom" value="Enter your class here"/>
 			</spec>
 		</field>
 		<field type="text" align="left" variable="dbAuthUser">
