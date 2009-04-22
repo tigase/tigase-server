@@ -649,6 +649,12 @@ public class SessionManager extends AbstractMessageReceiver
 			//closeConnection(pc.getFrom(), false);
 			processing_result = true;
 			break;
+		case STREAM_CLOSED_UPDATE:
+			// Note! We don't send response to this packet....
+			sessionCloseThread.addItem(pc, null);
+			//closeConnection(pc.getFrom(), false);
+			processing_result = true;
+			break;
 		case BROADCAST_TO_ONLINE:
 			String from = pc.getFrom();
 			boolean trusted = false;

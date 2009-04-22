@@ -95,24 +95,30 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 		} else {
 			if (!writePacketToSocket(packet)) {
 				// Connection closed or broken, send message back to the SM
-				try {
-					Packet error =
-									Authorization.ITEM_NOT_FOUND.getResponseMessage(packet,
-									"The user connection is no longer active.", true);
-					addOutPacket(error);
-				} catch (PacketErrorTypeException e) {
-					if (log.isLoggable(Level.FINEST)) {
-						log.finest(
-										"Ups, already error packet. Dropping it to prevent infinite loop.");
+				// if this is not IQ result...
+				if (packet.getType() != StanzaType.result) {
+					try {
+						Packet error =
+										Authorization.ITEM_NOT_FOUND.getResponseMessage(packet,
+										"The user connection is no longer active.", true);
+						addOutPacket(error);
+					} catch (PacketErrorTypeException e) {
+						if (log.isLoggable(Level.FINEST)) {
+							log.finest(
+											"Ups, already error packet. Dropping it to prevent infinite loop.");
+						}
 					}
 				}
 				// In case the SessionManager lost synchronization for any reason, let's
 				// notify it that the user connection no longer exists.
-				Packet command = Command.STREAM_CLOSED.getPacket(null, null,
+				Packet command = Command.STREAM_CLOSED_UPDATE.getPacket(null, null,
 								StanzaType.set, UUID.randomUUID().toString());
 				command.setFrom(packet.getTo());
 				command.setTo(packet.getFrom());
-				addOutPacketWithTimeout(command, stoppedHandler, 5l, TimeUnit.SECONDS);
+				// Note! we don't want to receive response to this request, thus
+				// STREAM_CLOSED_UPDATE instead of STREAM_CLOSED
+				addOutPacket(command);
+//				addOutPacketWithTimeout(command, stoppedHandler, 15l, TimeUnit.SECONDS);
 				log.fine("Sending a command to close the remote session for non-existen Bosh connection: " +
 								command.toString());
 			}

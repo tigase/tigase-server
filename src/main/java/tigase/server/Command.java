@@ -57,6 +57,7 @@ public enum Command {
 	 * connection or stream has been closed.
 	 */
 	STREAM_CLOSED(Priority.SYSTEM),
+	STREAM_CLOSED_UPDATE(Priority.SYSTEM),
 	/**
 	 * Sends a command from SM to the connection holder to confirm whether the
 	 * connection is still active. Expects result for ok, error or timeout
