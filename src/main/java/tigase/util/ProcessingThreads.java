@@ -110,10 +110,14 @@ public class ProcessingThreads<E extends WorkerThread> {
 
 	public long getAverageProcessingTime() {
 		long average = 0;
+		int counters = 0;
 		for (WorkerThread workerThread : workerThreads) {
-			average += workerThread.getAverageProcessingTime();
+			if (workerThread.getAverageProcessingTime() > 0) {
+				average += workerThread.getAverageProcessingTime();
+				++counters;
+			}
 		}
-		return average/workerThreads.size();
+		return average/counters;
 	}
 
 	public boolean addItem(Packet packet, XMPPResourceConnection conn) {

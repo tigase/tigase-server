@@ -65,9 +65,10 @@ public abstract class WorkerThread extends Thread {
 				item = queue.take();
 				long start = System.currentTimeMillis();
 				process(item);
-				averageProcessingTime =
-								(averageProcessingTime + (System.currentTimeMillis() - start)) /
-								2;
+				long end = System.currentTimeMillis() - start;
+				if (end > 0) {
+				averageProcessingTime =	(averageProcessingTime + end) / 2;
+				}
 			} catch (Exception e) {
 				log.log(Level.SEVERE, "Exception during packet processing: " +
 								item.packet.toString(), e);
