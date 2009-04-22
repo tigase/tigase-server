@@ -385,20 +385,21 @@ public class BoshConnectionManager extends ClientConnectionManager
 	/**
 	 *
 	 * @param packet
+	 * @param bs
 	 * @return
 	 */
 	@Override
 	public boolean addOutStreamOpen(Packet packet, BoshSession bs) {
 		packet.setFrom(getFromAddress(bs.getSid().toString()));
 		packet.setTo(bs.getDataReceiver());
-		return addOutPacketWithTimeout(packet, startedHandler, 5l, TimeUnit.SECONDS);
+		return addOutPacketWithTimeout(packet, startedHandler, 15l, TimeUnit.SECONDS);
 	}
 
 	@Override
 	public boolean addOutStreamClosed(Packet packet, BoshSession bs) {
 		packet.setFrom(getFromAddress(bs.getSid().toString()));
 		packet.setTo(bs.getDataReceiver());
-		return addOutPacketWithTimeout(packet, stoppedHandler, 5l, TimeUnit.SECONDS);
+		return addOutPacketWithTimeout(packet, stoppedHandler, 15l, TimeUnit.SECONDS);
 	}
 
 	@Override

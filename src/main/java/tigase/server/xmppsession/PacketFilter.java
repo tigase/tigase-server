@@ -239,9 +239,9 @@ public class PacketFilter {
 			try {
 				results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 						"You must authorize session first.", true));
-				log.warning("NotAuthorizedException for packet: "	+ packet.getStringData());
+				log.info("NotAuthorizedException for packet: "	+ packet.getStringData());
 			} catch (PacketErrorTypeException e2) {
-				log.warning("Packet processing exception: " + e2);
+				log.info("Packet processing exception: " + e2);
 			}
 		} // end of try-catch
 
