@@ -146,6 +146,9 @@ public class SessionManager extends AbstractMessageReceiver
 	private ProcessingThreads<SessionCloseWorkerThread> sessionCloseThread =
 					new ProcessingThreads<SessionCloseWorkerThread>(new SessionCloseWorkerThread(),
 					4, 1, maxQueueSize, "session-close");
+	private ProcessingThreads<SessionOpenWorkerThread> sessionOpenThread =
+					new ProcessingThreads<SessionOpenWorkerThread>(new SessionOpenWorkerThread(this),
+					1, 1, maxQueueSize, "session-open");
 	private Timer authenticationWatchdog = new Timer("SM authentocation watchdog");
 
 	private ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
@@ -624,43 +627,10 @@ public class SessionManager extends AbstractMessageReceiver
 		XMPPResourceConnection connection =	connectionsByFrom.get(pc.getFrom());
 		switch (pc.getCommand()) {
 		case STREAM_OPENED:
-			// It might be existing opened stream after TLS/SASL authorization
-			// If not, it means this is new stream
-			if (connection == null) {
-				if (log.isLoggable(Level.FINER)) {
-					log.finer("Adding resource connection for: " + pc.getFrom());
-				}
-				final String hostname = Command.getFieldValue(pc, "hostname");
-				connection = new XMPPResourceConnection(pc.getFrom(),
-					user_repository, auth_repository, this,
-					isAnonymousEnabled(hostname));
-				if (hostname != null) {
-					if (log.isLoggable(Level.FINEST)) {
-						log.finest("Setting hostname " + hostname
-							+ " for connection: " + connection.getConnectionId());
-					}
-					connection.setDomain(hostname);
-				} // end of if (hostname != null)
-				else {
-					connection.setDomain(getDefHostName());
-				} // end of if (hostname != null) else
-				//connection.setAnonymousPeers(anon_peers);
-				connectionsByFrom.put(pc.getFrom(), connection);
-				authenticationWatchdog.schedule(new AuthenticationTimer(pc.getFrom()),
-								MINUTE);
-			} else {
-				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Stream opened for existing session, authorized: "
-						+ connection.isAuthorized());
-				}
-			} // end of else
-			connection.setSessionId(Command.getFieldValue(pc, "session-id"));
-			connection.setDefLang(Command.getFieldValue(pc, "xml:lang"));
-			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Setting session-id " + connection.getSessionId()
-					+ " for connection: " + connection.getConnectionId());
-			}
-			fastAddOutPacket(pc.okResult((String) null, 0));
+			// Response is sent from the thread when opening user session is
+			// completed.
+			//fastAddOutPacket(pc.okResult((String) null, 0));
+			sessionOpenThread.addItem(pc, connection);
 			processing_result = true;
 			break;
 		case GETFEATURES:
@@ -1406,6 +1376,64 @@ public class SessionManager extends AbstractMessageReceiver
 		return sessionsByNodeId.keySet();
 	}
 
+	private class SessionOpenWorkerThread extends WorkerThread {
+
+		private SessionManager sm = null;
+
+		public SessionOpenWorkerThread(SessionManager sm) {
+			this.sm = sm;
+		}
+
+		@Override
+		public WorkerThread getNewInstance(PriorityQueue<QueueItem> queue) {
+			SessionOpenWorkerThread worker = new SessionOpenWorkerThread(sm);
+			worker.setQueue(queue);
+			return worker;
+		}
+
+		@Override
+		public void process(QueueItem item) {
+			// It might be existing opened stream after TLS/SASL authorization
+			// If not, it means this is new stream
+			if (item.conn == null) {
+				if (log.isLoggable(Level.FINER)) {
+					log.finer("Adding resource connection for: " + item.packet.getFrom());
+				}
+				final String hostname = Command.getFieldValue(item.packet, "hostname");
+				item.conn = new XMPPResourceConnection(item.packet.getFrom(),
+					user_repository, auth_repository, sm,
+					isAnonymousEnabled(hostname));
+				if (hostname != null) {
+					if (log.isLoggable(Level.FINEST)) {
+						log.finest("Setting hostname " + hostname
+							+ " for connection: " + item.conn.getConnectionId());
+					}
+					item.conn.setDomain(hostname);
+				} // end of if (hostname != null)
+				else {
+					item.conn.setDomain(getDefHostName());
+				} // end of if (hostname != null) else
+				//connection.setAnonymousPeers(anon_peers);
+				connectionsByFrom.put(item.packet.getFrom(), item.conn);
+				authenticationWatchdog.schedule(new AuthenticationTimer(item.packet.getFrom()),
+								MINUTE);
+			} else {
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("Stream opened for existing session, authorized: "
+						+ item.conn.isAuthorized());
+				}
+			} // end of else
+			item.conn.setSessionId(Command.getFieldValue(item.packet, "session-id"));
+			item.conn.setDefLang(Command.getFieldValue(item.packet, "xml:lang"));
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Setting session-id " + item.conn.getSessionId()
+					+ " for connection: " + item.conn.getConnectionId());
+			}
+			fastAddOutPacket(item.packet.okResult((String) null, 0));
+		}
+		
+	}
+
 	private class SessionCloseWorkerThread extends WorkerThread {
 
 		@Override
@@ -1419,7 +1447,7 @@ public class SessionManager extends AbstractMessageReceiver
 		public void process(QueueItem item) {
 			closeConnection(item.packet.getFrom(), false);
 		}
-		
+
 	}
 
 	private class ProcessorWorkerThread extends WorkerThread {

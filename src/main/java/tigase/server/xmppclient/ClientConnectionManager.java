@@ -357,17 +357,12 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 		if (lang == null) {
 			lang = "en";
 		}
-		String id = (String)serv.getSessionData().get(XMPPIOService.SESSION_ID_KEY);
-		if (id == null) {
-			id = UUID.randomUUID().toString();
-			serv.getSessionData().put(XMPPIOService.SESSION_ID_KEY, id);
-			serv.setXMLNS(XMLNS);
-		}
+
 		if (hostname == null) {
 			return "<?xml version='1.0'?><stream:stream"
 				+ " xmlns='" + XMLNS + "'"
 				+ " xmlns:stream='http://etherx.jabber.org/streams'"
-				+ " id='" + id + "'"
+				+ " id='tigase-error-tigase'"
 				+ " from='" + getDefHostName() + "'"
         + " version='1.0' xml:lang='en'>"
 				+ "<stream:error>"
@@ -381,7 +376,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 			return "<?xml version='1.0'?><stream:stream"
 				+ " xmlns='" + XMLNS + "'"
 				+ " xmlns:stream='http://etherx.jabber.org/streams'"
-				+ " id='" + id + "'"
+				+ " id='tigase-error-tigase'"
 				+ " from='" + getDefHostName() + "'"
         + " version='1.0' xml:lang='en'>"
 				+ "<stream:error>"
@@ -391,13 +386,11 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 				;
 		} // end of if (!hostnames.contains(hostname))
 
-// 		try {
-			writeRawData(serv, "<?xml version='1.0'?><stream:stream"
-				+ " xmlns='" + XMLNS + "'"
-				+ " xmlns:stream='http://etherx.jabber.org/streams'"
-				+ " from='" + hostname + "'"
-				+ " id='" + id + "'"
-				+ " version='1.0' xml:lang='en'>");
+		String id = (String) serv.getSessionData().get(XMPPIOService.SESSION_ID_KEY);
+		if (id == null) {
+			id = UUID.randomUUID().toString();
+			serv.getSessionData().put(XMPPIOService.SESSION_ID_KEY, id);
+			serv.setXMLNS(XMLNS);
 			serv.getSessionData().put(XMPPIOService.HOSTNAME_KEY, hostname);
 			serv.setDataReceiver(routings.computeRouting(hostname));
 			Packet streamOpen = Command.STREAM_OPENED.getPacket(
@@ -407,16 +400,18 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 			Command.addFieldValue(streamOpen, "session-id", id);
 			Command.addFieldValue(streamOpen, "hostname", hostname);
 			Command.addFieldValue(streamOpen, "xml:lang", lang);
-			addOutPacketWithTimeout(streamOpen, startedHandler, 5l, TimeUnit.SECONDS);
-//			if (attribs.get("version") != null) {
-//				addOutPacket(Command.GETFEATURES.getPacket(
-//					getFromAddress(getUniqueId(serv)),
-//					serv.getDataReceiver(), StanzaType.get, "sess2", null));
-//			} // end of if (attribs.get("version") != null)
-// 		} catch (IOException e) {
-// 			serv.stop();
-// 		}
-
+			addOutPacketWithTimeout(streamOpen, startedHandler, 15l, TimeUnit.SECONDS);
+		} else {
+			addOutPacket(Command.GETFEATURES.getPacket(getFromAddress(getUniqueId(serv)),
+							serv.getDataReceiver(), StanzaType.get,
+							UUID.randomUUID().toString(),
+							null));
+		}
+		writeRawData(serv, "<?xml version='1.0'?><stream:stream" +
+						" xmlns='" + XMLNS + "'" +
+						" xmlns:stream='http://etherx.jabber.org/streams'" +
+						" from='" + hostname + "'" +
+						" id='" + id + "'" + " version='1.0' xml:lang='en'>");
 		return null;
 	}
 
