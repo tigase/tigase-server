@@ -268,16 +268,43 @@ public abstract class AbstractMessageReceiver
 	@Override
   public List<StatRecord> getStatistics() {
     List<StatRecord> stats = new LinkedList<StatRecord>();
-		stats.add(new StatRecord(getName(), "Last second packets", "int",
-				seconds[(sec_idx == 0 ? 59 : sec_idx - 1)], Level.FINE));
-		stats.add(new StatRecord(getName(), "Last minute packets", "int",
-				minutes[(min_idx == 0 ? 59 : min_idx - 1)], Level.FINE));
-		stats.add(new StatRecord(getName(), "Last hour packets", "int",
-				curr_hour, Level.FINE));
-    stats.add(new StatRecord(getName(), StatisticType.MSG_RECEIVED_OK,
-				statReceivedMessagesOk, Level.FINE));
-    stats.add(new StatRecord(getName(), StatisticType.MSG_SENT_OK,
-				statSentMessagesOk, Level.FINE));
+		long tmp = seconds[(sec_idx == 0 ? 59 : sec_idx - 1)];
+		if (tmp > 0) {
+			stats.add(new StatRecord(getName(), "Last second packets", "int",
+							tmp, Level.FINE));
+		} else {
+			stats.add(new StatRecord(getName(), "Last second packets", "int",
+							tmp, Level.FINEST));
+		}
+		tmp = minutes[(min_idx == 0 ? 59 : min_idx - 1)];
+		if (tmp > 0) {
+			stats.add(new StatRecord(getName(), "Last minute packets", "int",
+							tmp, Level.FINE));
+		} else {
+			stats.add(new StatRecord(getName(), "Last minute packets", "int",
+							tmp, Level.FINEST));
+		}
+		if (curr_hour > 0) {
+			stats.add(new StatRecord(getName(), "Last hour packets", "int",
+							curr_hour, Level.FINE));
+		} else {
+			stats.add(new StatRecord(getName(), "Last hour packets", "int",
+							curr_hour, Level.FINEST));
+		}
+		if (statReceivedMessagesOk > 0) {
+			stats.add(new StatRecord(getName(), StatisticType.MSG_RECEIVED_OK,
+							statReceivedMessagesOk, Level.FINE));
+		} else {
+			stats.add(new StatRecord(getName(), StatisticType.MSG_RECEIVED_OK,
+							statReceivedMessagesOk, Level.FINEST));
+		}
+		if (statSentMessagesOk > 0) {
+			stats.add(new StatRecord(getName(), StatisticType.MSG_SENT_OK,
+							statSentMessagesOk, Level.FINE));
+		} else {
+			stats.add(new StatRecord(getName(), StatisticType.MSG_SENT_OK,
+							statSentMessagesOk, Level.FINEST));
+		}
 		int[] in_priority_sizes = in_queues.get(0).size();
 		for (int i = 1; i < in_queues.size(); i++) {
 			int[] tmp_pr_sizes = in_queues.get(i).size();

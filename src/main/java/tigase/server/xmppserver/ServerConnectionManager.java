@@ -644,8 +644,8 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 		int open_s2s_connections = incoming.size();
 		int connected_servers = 0;
 		int server_connections_instances = connectionsByLocalRemote.size();
-		for (Map.Entry<String, ServerConnections> entry:
-      connectionsByLocalRemote.entrySet()) {
+		for (Map.Entry<String, ServerConnections> entry : connectionsByLocalRemote.
+						entrySet()) {
 			ServerConnections conn = entry.getValue();
 			waiting_packets += conn.getWaitingPackets().size();
 			if (conn.isOutgoingConnected()) {
@@ -653,22 +653,42 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 				++connected_servers;
 			}
 			if (log.isLoggable(Level.FINEST)) {
-    			log.finest("s2s instance: " + entry.getKey() +
-							", waitingQueue: " + conn.getWaitingPackets().size() +
-                            ", outgoingIsNull(): " + conn.outgoingIsNull() +
-							", outgoingActive: " + conn.isOutgoingConnected() +
-							", OutgoingState: " + conn.getOutgoingState().toString() +
-							", db_keys.size(): " + conn.getDBKeysSize());
-            }
+				log.finest("s2s instance: " + entry.getKey() +
+								", waitingQueue: " + conn.getWaitingPackets().size() +
+								", outgoingIsNull(): " + conn.outgoingIsNull() +
+								", outgoingActive: " + conn.isOutgoingConnected() +
+								", OutgoingState: " + conn.getOutgoingState().toString() +
+								", db_keys.size(): " + conn.getDBKeysSize());
+			}
 		}
- 		stats.add(new StatRecord(getName(), "Open s2s connections", "int",
- 				open_s2s_connections, Level.FINE));
-		stats.add(new StatRecord(getName(), "Packets queued", "int",
-				waiting_packets, Level.FINE));
-		stats.add(new StatRecord(getName(), "Connected servers", "int",
-				connected_servers, Level.FINE));
-		stats.add(new StatRecord(getName(), "Connection instances", "int",
-				server_connections_instances, Level.FINER));
+		if (open_s2s_connections > 0) {
+			stats.add(new StatRecord(getName(), "Open s2s connections", "int",
+							open_s2s_connections, Level.FINE));
+		} else {
+			stats.add(new StatRecord(getName(), "Open s2s connections", "int",
+							open_s2s_connections, Level.FINEST));
+		}
+		if (waiting_packets > 0) {
+			stats.add(new StatRecord(getName(), "Packets queued", "int",
+							waiting_packets, Level.FINE));
+		} else {
+			stats.add(new StatRecord(getName(), "Packets queued", "int",
+							waiting_packets, Level.FINEST));
+		}
+		if (connected_servers > 0) {
+			stats.add(new StatRecord(getName(), "Connected servers", "int",
+							connected_servers, Level.FINE));
+		} else {
+			stats.add(new StatRecord(getName(), "Connected servers", "int",
+							connected_servers, Level.FINEST));
+		}
+		if (server_connections_instances > 0) {
+			stats.add(new StatRecord(getName(), "Connection instances", "int",
+							server_connections_instances, Level.FINER));
+		} else {
+			stats.add(new StatRecord(getName(), "Connection instances", "int",
+							server_connections_instances, Level.FINEST));
+		}
 		return stats;
 	}
 

@@ -600,12 +600,27 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 			stats.add(new StatRecord(getName(), "Open connections", "int",
 							services.size(), Level.FINEST));
 		}
-		stats.add(new StatRecord(getName(), "Watchdog runs", "long",
-				watchdogRuns, Level.FINE));
-		stats.add(new StatRecord(getName(), "Watchdog tests", "long",
-				watchdogTests, Level.FINE));
-		stats.add(new StatRecord(getName(), "Watchdog stopped", "long",
-				watchdogStopped, Level.FINE));
+		if (watchdogRuns > 0) {
+			stats.add(new StatRecord(getName(), "Watchdog runs", "long",
+							watchdogRuns, Level.FINE));
+		} else {
+			stats.add(new StatRecord(getName(), "Watchdog runs", "long",
+							watchdogRuns, Level.FINEST));
+		}
+		if (watchdogTests > 0) {
+			stats.add(new StatRecord(getName(), "Watchdog tests", "long",
+							watchdogTests, Level.FINE));
+		} else {
+			stats.add(new StatRecord(getName(), "Watchdog tests", "long",
+							watchdogTests, Level.FINEST));
+		}
+		if (watchdogStopped > 0) {
+			stats.add(new StatRecord(getName(), "Watchdog stopped", "long",
+							watchdogStopped, Level.FINE));
+		} else {
+			stats.add(new StatRecord(getName(), "Watchdog stopped", "long",
+							watchdogStopped, Level.FINEST));
+		}
 // 		StringBuilder sb = new StringBuilder("All connected: ");
 // 		for (IOService serv: services.values()) {
 // 			sb.append("\nService ID: " + getUniqueId(serv)
