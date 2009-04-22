@@ -1,0 +1,2041 @@
+diff --git a/.gitignore b/.gitignore
+index 330ec13..dcc7292 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -1,3 +1,37 @@
++
++# /
+ /_build
+ /_dist
+ /eclipse-bin
++
++# /bin/
++/bin/panels
++/bin/customActions
++
++# /doc/
++/doc/izpack
++
++# /lib/
++/lib/compiler.jar
++/lib/installer.jar
++/lib/izevent.jar
++/lib/standalone-compiler.jar
++/lib/uninstaller-ext.jar
++/lib/uninstaller.jar
++
++# /src/dist-files/
++/src/dist-files/.xvpics
++
++# /src/native/COIOSHelper/src/
++/src/native/COIOSHelper/src/Release
++
++# /src/native/ShellLink/
++/src/native/ShellLink/ShellLink.vcproj.BISSOLDOM.blf.user
++
++# /src/native/ShellLink/src/
++/src/native/ShellLink/src/Release
++
++# /utils/
++#
++#
++*.class
+diff --git a/src/build.xml b/src/build.xml
+index 60e52dc..ba14e23 100644
+--- a/src/build.xml
++++ b/src/build.xml
+@@ -611,7 +611,9 @@
+         </build-panel>
+         <build-panel name="CheckedHelloPanel">
+             <include name="com/izforge/izpack/panels/CheckedHelloPanel.java"/>
++	        <include name="com/izforge/izpack/panels/CheckedHelloPanelConsoleHelper.java"/>
+             <include name="com/izforge/izpack/panels/HelloPanel.java"/>
++	        <include name="com/izforge/izpack/panels/HelloPanelConsoleHelper.java"/>
+             <include name="com/izforge/izpack/util/os/*RegistryHandler.java"/>
+             <include name="com/izforge/izpack/util/OSClassHelper.java"/>
+             <include name="com/izforge/izpack/util/os/WrappedNativeLibException.java"/>
+@@ -642,6 +644,7 @@
+             <include name="com/izforge/izpack/panels/PacksModel.java"/>
+             <include name="com/izforge/izpack/panels/PacksPanel.java"/>
+             <include name="com/izforge/izpack/panels/PacksPanelAutomationHelper.java"/>
++	        <include name="com/izforge/izpack/panels/PacksPanelConsoleHelper.java"/>
+             <include name="com/izforge/izpack/panels/PacksPanelBase.java"/>
+             <include name="com/izforge/izpack/panels/PacksPanelInterface.java"/>
+         </build-panel>
+@@ -655,12 +658,15 @@
+         </build-panel>
+         <build-panel name="HTMLLicencePanel">
+             <include name="com/izforge/izpack/panels/HTMLLicencePanel.java"/>
++	        <include name="com/izforge/izpack/panels/HTMLLicencePanelConsoleHelper.java"/>
+         </build-panel>
+         <build-panel name="HTMLInfoPanel">
+             <include name="com/izforge/izpack/panels/HTMLInfoPanel.java"/>
++	        <include name="com/izforge/izpack/panels/HTMLInfoPanelConsoleHelper.java"/>
+         </build-panel>
+         <build-panel name="TargetPanel">
+             <include name="com/izforge/izpack/panels/PathInputPanel.java"/>
++	        <include name="com/izforge/izpack/panels/PathInputPanelConsoleHelper.java"/>
+             <include name="com/izforge/izpack/panels/PathSelectionPanel.java"/>
+             <include name="com/izforge/izpack/panels/TargetPanel.java"/>
+             <include name="com/izforge/izpack/panels/TargetPanelAutomationHelper.java"/>
+@@ -674,7 +680,9 @@
+         </build-panel>
+         <build-panel name="JDKPathPanel">
+             <include name="com/izforge/izpack/panels/JDKPathPanel.java"/>
++	        <include name="com/izforge/izpack/panels/JDKPathPanelConsoleHelper.java"/>
+             <include name="com/izforge/izpack/panels/PathInputPanel.java"/>
++	        <include name="com/izforge/izpack/panels/PathInputPanelConsoleHelper.java"/>
+             <include name="com/izforge/izpack/panels/PathSelectionPanel.java"/>
+             <include name="com/izforge/izpack/util/os/*RegistryHandler.java"/>
+             <include name="com/izforge/izpack/util/OSClassHelper.java"/>
+@@ -684,6 +692,22 @@
+             <include name="com/coi/tools/os/izpack/Registry.java"/>
+             <include name="com/coi/tools/os/izpack/COIOSHelper.java"/>
+         </build-panel>
++	 <build-panel name="TigaseJDKPathPanel">
++            <include name="com/izforge/izpack/panels/TigaseJDKPathPanel.java"/>
++	    <include name="com/izforge/izpack/panels/TigaseJDKPathPanelConsoleHelper.java"/>
++	    <include name="com/izforge/izpack/panels/JDKPathPanelConsoleHelper.java"/>
++            <include name="com/izforge/izpack/panels/PathInputPanel.java"/>
++	    <include name="com/izforge/izpack/panels/PathInputPanelConsoleHelper.java"/>
++            <include name="com/izforge/izpack/panels/PathSelectionPanel.java"/>
++            <include name="com/izforge/izpack/panels/TigaseInstallerCommon.java"/>		
++            <include name="com/izforge/izpack/util/os/*RegistryHandler.java"/>
++            <include name="com/izforge/izpack/util/OSClassHelper.java"/>
++            <include name="com/izforge/izpack/util/os/WrappedNativeLibException.java"/>
++            <include name="com/coi/tools/os/win/*.java"/>
++            <include name="com/coi/tools/os/win/resources/NativeLibErr*.java"/>
++            <include name="com/coi/tools/os/izpack/Registry.java"/>
++            <include name="com/coi/tools/os/izpack/COIOSHelper.java"/>
++        </build-panel>
+         <build-panel name="XInfoPanel">
+             <include name="com/izforge/izpack/panels/XInfoPanel.java"/>
+         </build-panel>
+@@ -776,6 +800,35 @@
+             <include name="com/izforge/izpack/panels/HTMLHelloPanel.java"/>
+             <include name="com/izforge/izpack/panels/HTMLInfoPanel.java"/>
+         </build-panel>
++
++        <!-- tigase panels -->
++        <build-panel name="DerbyPathPanel">
++            <include name="com/izforge/izpack/panels/DerbyPathPanel.java"/>
++             <include name="com/izforge/izpack/panels/TigaseInstallerCommon.java"/>		
++           <include name="com/izforge/izpack/panels/TigaseConfigConst.java"/>
++             <include name="com/izforge/izpack/panels/TargetPanel.java"/>
++           <include name="com/izforge/izpack/panels/TargetPanelAutomationHelper.java"/>
++            <include name="com/izforge/izpack/panels/PathInputPanel.java"/>
++        </build-panel>
++
++        <build-panel name="TigaseConfigLoadPanel">
++            <include name="com/izforge/izpack/panels/TigaseConfigLoadPanel.java"/>
++              <include name="com/izforge/izpack/panels/TigaseInstallerCommon.java"/>		
++          <include name="com/izforge/izpack/panels/TigaseConfigConst.java"/>
++        </build-panel>
++
++        <build-panel name="TigaseConfigSavePanel">
++            <include name="com/izforge/izpack/panels/TigaseConfigSavePanel.java"/>
++               <include name="com/izforge/izpack/panels/TigaseInstallerCommon.java"/>		
++         <include name="com/izforge/izpack/panels/TigaseConfigConst.java"/>
++        </build-panel>
++
++        <build-panel name="TigaseDBCheckPanel">
++            <include name="com/izforge/izpack/panels/TigaseDBCheckPanel.java"/>
++                <include name="com/izforge/izpack/panels/TigaseInstallerCommon.java"/>		
++        <include name="com/izforge/izpack/panels/TigaseConfigConst.java"/>
++        </build-panel>
++
+     </target>
+ 
+     <!--
+@@ -811,6 +864,7 @@
+             <fileset dir="${build.dir}">
+                 <include name="com/izforge/izpack/event/*.class"/>
+                 <include name="com/izforge/izpack/util/IoHelper.class"/>
++<!--                <exclude name="com/izforge/izpack/event/*Compiler*.class"/> -->
+             </fileset>
+         </jar>
+     </target>
+diff --git a/src/lib/com/izforge/izpack/installer/ConsoleHelper.java b/src/lib/com/izforge/izpack/installer/ConsoleHelper.java
+new file mode 100644
+index 0000000..5f6531b
+--- /dev/null
++++ b/src/lib/com/izforge/izpack/installer/ConsoleHelper.java
+@@ -0,0 +1,100 @@
++package com.izforge.izpack.installer;
++
++import java.io.BufferedReader;
++import java.io.IOException;
++import java.io.InputStreamReader;
++
++public class ConsoleHelper 
++{
++	public void readEnter() 
++	throws IOException 
++	{
++		systemInAsReader().readLine();
++	}
++	
++	public void displayAndBlock(String msg) 
++	throws IOException 
++	{
++		System.out.println(msg);
++		readEnter();
++	}
++	
++	
++	private BufferedReader reader = null;
++	public BufferedReader systemInAsReader() 
++	{
++		if (reader == null)
++		{
++			reader = new BufferedReader(
++					new InputStreamReader(System.in));
++		}
++		return reader;
++	}
++
++	public void displayLabel(String label) {
++		System.out.println(label);
++	}
++	
++	public void displayPrompt(String prompt) {
++		System.out.print(prompt + ": ");
++	}
++
++	public <T> T readUntilValid(
++			String prompt, 
++			ValidatingConverter<String, T> converter) 
++	throws IOException 
++	{
++		BufferedReader sysIn = systemInAsReader(); 
++		
++		T result = null;
++		do 
++		{
++			displayPrompt(prompt);
++			String line = sysIn.readLine();
++			Option<T> validationResult = 
++				converter.convert(line);
++			if (validationResult.isDefined) 
++			{
++				result = validationResult.value;
++			} else {
++				String errorMsg = validationResult.msg;
++				displayLabel(errorMsg);
++			}
++			
++		} while (result == null);
++		
++		return result;
++		
++	}
++
++	public int chooseAction(String... actions) 
++	throws IOException {
++		final int numberOfActions = actions.length;
++		if (numberOfActions < 2) {
++			throw new IllegalArgumentException("Invalid number of " +
++					"actions to choose from");
++		}
++		
++		for (int i = 0 ; i < numberOfActions ; i++) {
++			displayLabel( (i+1) + ".  " + actions[i]);
++		}
++		
++		String prompt = "Choose number (1-" + numberOfActions + ")";
++		return readUntilValid(prompt, new ValidatingConverter<String, Integer>() {
++			public Option<Integer> convert(String from) {
++				int number = 0;
++				try {
++					number = Integer.parseInt(from);
++				} catch (NumberFormatException nfe)  {
++					return Option.empty("Illegal number");
++				}
++				
++				if (number < 1 || number > numberOfActions) {
++					return Option.empty("Choice not in range");
++				}
++				
++				return Option.full(number);
++			}
++		});
++	}	
++}
+\ No newline at end of file
+diff --git a/src/lib/com/izforge/izpack/installer/ConsoleInstallHelper.java b/src/lib/com/izforge/izpack/installer/ConsoleInstallHelper.java
+new file mode 100644
+index 0000000..e9284c1
+--- /dev/null
++++ b/src/lib/com/izforge/izpack/installer/ConsoleInstallHelper.java
+@@ -0,0 +1,55 @@
++package com.izforge.izpack.installer;
++
++import java.io.BufferedReader;
++import java.io.IOException;
++import java.util.Arrays;
++import java.util.List;
++
++
++public class ConsoleInstallHelper {
++	// helpers
++	public final ConsoleHelper console = new ConsoleHelper();
++	public final IOHelper io = new IOHelper();
++	public final ResourceHelper resource = new ResourceHelper();
++	public final ConsolePager pager = new ConsolePager();
++	public final HTMLHelper html = new HTMLHelper();
++	public final VariablesHelper variables = new VariablesHelper();
++	
++	// singleton, use getInstance
++	public static ConsoleInstallHelper getInstance() { return instance; }
++	private ConsoleInstallHelper() {}
++	private static final ConsoleInstallHelper instance = new ConsoleInstallHelper();
++		
++}
++
++
++class IOHelper {
++	
++	public String readAll(BufferedReader reader) 
++	throws IOException 
++	{
++		StringBuilder builder = new StringBuilder();
++		
++		String line = "";
++		do 
++		{
++			line = reader.readLine();
++			if (line != null) 
++			{
++				builder.append(line);
++				builder.append("\n");
++			}
++		} while (line != null);
++		
++		return builder.toString();
++	}
++	
++}
++
++
++class TextHelper {
++	List<String> convertToLines(String stringWithNewlines) {
++		String[] lines = stringWithNewlines.split("\n");
++		return Arrays.asList(lines);
++	}
++}
+diff --git a/src/lib/com/izforge/izpack/installer/ConsoleMenu.java b/src/lib/com/izforge/izpack/installer/ConsoleMenu.java
+new file mode 100644
+index 0000000..e0fb163
+--- /dev/null
++++ b/src/lib/com/izforge/izpack/installer/ConsoleMenu.java
+@@ -0,0 +1,114 @@
++package com.izforge.izpack.installer;
++
++import java.io.IOException;
++import java.util.List;
++
++
++public abstract class ConsoleMenu {
++	private final ConsoleHelper console;
++	private boolean finished = false;
++	
++	public ConsoleMenu(ConsoleHelper console) {
++		this.console = console;
++	}
++
++	public void run() 
++	throws IOException 
++	{
++		while (isFinished() == false) 
++		{
++			displayMenu();
++			console.displayPrompt("Choose action");
++			String userChoice = console.systemInAsReader().readLine();
++			runAction(userChoice);
++		}
++	}
++
++	public boolean isFinished() {
++		return finished;
++	}
++
++	protected abstract List<IConsoleMenuItem> getMenuItems();
++	protected abstract String getHeader();
++
++	private IConsoleMenuItem redisplayMenuItem = new IConsoleMenuItem() {
++		public String renderToString() {
++			return "Redisplay menu";
++		}
++		public void runAction() {
++			displayMenu();
++		}
++	};
++
++	private IConsoleMenuItem finishMenuItem = new IConsoleMenuItem() {
++		public String renderToString() {
++			return "Finish";
++		}
++		public void runAction() {
++			finished = true;
++		}
++	};
++
++	private IConsoleMenuItem invalidActionMenuItem = new IConsoleMenuItem() {
++		public String renderToString() {
++			return "ZONK !!"; // shouldn't be called
++		}
++		public void runAction() {
++			console.displayLabel("Invalid command");
++		}
++	};
++
++
++	private void displayItem(IConsoleMenuItem item, String prefix) {
++		String itemStr = item.renderToString();
++		console.displayLabel(prefix + " => " + itemStr);
++	}
++	
++	private void displayMenu() {
++		List<IConsoleMenuItem> items = getMenuItems();
++		console.displayLabel("------");
++		console.displayLabel(getHeader());
++		for (int i = 0 ; i < items.size() ; i++) {
++			IConsoleMenuItem item = items.get(i);
++			displayItem(item, "" + (i+1));
++		}
++		displayItem(redisplayMenuItem, "r");
++		displayItem(finishMenuItem, "f");
++	}
++
++	// by default run command by number, feel free to override
++	void runAction(String cmd) {
++		
++		List<? extends IConsoleMenuItem> menuItems = getMenuItems();
++
++		int nmbOfItems = menuItems.size();
++		int nmb = 0;
++		try {
++			nmb = Integer.parseInt(cmd);
++		}
++		catch (NumberFormatException nfe) {
++			nmb = -1;
++		}
++
++		IConsoleMenuItem chosenAction = null;
++		if (nmb >= 1 && nmb <= nmbOfItems) 
++		{
++			chosenAction = menuItems.get(nmb-1);
++		} 
++		else if ("r".equals(cmd)) 
++		{
++			chosenAction = redisplayMenuItem;
++		} 
++		else if ("f".equals(cmd)) 
++		{
++			chosenAction = finishMenuItem;
++		} else 
++		{
++			chosenAction = invalidActionMenuItem;
++		}
++		
++		chosenAction.runAction();
++	}
++	
++	
++}
+\ No newline at end of file
+diff --git a/src/lib/com/izforge/izpack/installer/ConsolePager.java b/src/lib/com/izforge/izpack/installer/ConsolePager.java
+new file mode 100644
+index 0000000..bf2ad7f
+--- /dev/null
++++ b/src/lib/com/izforge/izpack/installer/ConsolePager.java
+@@ -0,0 +1,41 @@
++package com.izforge.izpack.installer;
++
++import java.io.IOException;
++import java.util.List;
++
++public class ConsolePager 
++{
++	private static TextHelper textHelper = new TextHelper();
++	
++	private static int DEFAULT_NO_OF_LINES = 20;
++	private static String DEFAULT_PROMPT = "--- Press ENTER to continue ---";
++	
++	public void displayLongText(String text) 
++	throws IOException 
++	{
++		displayLongText(
++				text, 
++				DEFAULT_NO_OF_LINES,
++				DEFAULT_PROMPT);
++	}
++	
++	public void displayLongText(
++			String text, 
++			int noOfLinesEach, 
++			String continuePrompt) 
++	throws IOException 
++	{
++		List<String> lines = textHelper.convertToLines(text);
++		
++		ConsoleHelper helper = new ConsoleHelper();
++		for (int i = 0 ; i < lines.size() ; i++) 
++		{
++			System.out.println(lines.get(i));
++			if (i != 0 && i % noOfLinesEach == 0) 
++			{
++				helper.displayAndBlock(continuePrompt);
++			}
++		}
++	}
++	
++}
+\ No newline at end of file
+diff --git a/src/lib/com/izforge/izpack/installer/HTMLHelper.java b/src/lib/com/izforge/izpack/installer/HTMLHelper.java
+new file mode 100644
+index 0000000..1c0e7d6
+--- /dev/null
++++ b/src/lib/com/izforge/izpack/installer/HTMLHelper.java
+@@ -0,0 +1,40 @@
++package com.izforge.izpack.installer;
++
++
++public class HTMLHelper {
++	
++	public String extractTextFromSimplifiedHTML(String htmlString) {
++		// pattern relates to replace, when updating
++		// be careful to keep the indexes in order
++		// replacements will be performed in the same order
++		// as they are in the two arrays
++		String[] patterns = {
++				"<[^>]*>",
++				"&lt;",
++				"&gt;",
++				"&amp;",
++				"&copy;",
++				"&ldquo;",
++				"&rdquo;"
++		};
++		String[] replaces = {
++				"", // remove tags
++				"<", // resolve <
++				">", // resolve >
++				"&", // resolve &
++				"(C)", // turns &copy; to "(C)"
++				"\"", // resolve left quotation
++				"\"", // resolve right quotation
++		};
++		
++		String result = htmlString;
++		for (int i = 0 ; i < patterns.length ; i++) {
++			String pattern = patterns[i];
++			String replace = replaces[i];
++			result = result.replaceAll(pattern, replace);
++		}
++		
++		return result;
++	}
++	
++}
+\ No newline at end of file
+diff --git a/src/lib/com/izforge/izpack/installer/IConsoleMenuItem.java b/src/lib/com/izforge/izpack/installer/IConsoleMenuItem.java
+new file mode 100644
+index 0000000..b737d3b
+--- /dev/null
++++ b/src/lib/com/izforge/izpack/installer/IConsoleMenuItem.java
+@@ -0,0 +1,6 @@
++package com.izforge.izpack.installer;
++
++public interface IConsoleMenuItem {
++	public String renderToString();
++	public void runAction();
++}
+\ No newline at end of file
+diff --git a/src/lib/com/izforge/izpack/installer/Option.java b/src/lib/com/izforge/izpack/installer/Option.java
+new file mode 100644
+index 0000000..f3abcae
+--- /dev/null
++++ b/src/lib/com/izforge/izpack/installer/Option.java
+@@ -0,0 +1,25 @@
++package com.izforge.izpack.installer;
++
++// Optional parameter (makes optional parameters handling explicit)
++// it has two states:
++//   defined -> isDefined == true, value holds value
++//   undefined -> isDefined == false, msg holds reason of emptiness
++public class Option<T> {
++	public final boolean isDefined;
++	public final T value;
++	public final String msg;
++	
++	private Option(boolean isDefined, T value, String msg) {
++		this.isDefined = isDefined;
++		this.value = value;
++		this.msg = msg;
++	}
++	
++	public static <T> Option<T> full(T value) {
++		return new Option<T>(true, value, null);
++	}
++	
++	public static <T> Option<T> empty(String msg) {
++		return new Option<T>(false, null, msg);
++	}
++}
+diff --git a/src/lib/com/izforge/izpack/installer/PanelConsoleHelper.java b/src/lib/com/izforge/izpack/installer/PanelConsoleHelper.java
+index b6d9daa..7810bb9 100644
+--- a/src/lib/com/izforge/izpack/installer/PanelConsoleHelper.java
++++ b/src/lib/com/izforge/izpack/installer/PanelConsoleHelper.java
+@@ -24,6 +24,10 @@ import java.io.BufferedReader;
+ import java.io.IOException;
+ import java.io.InputStreamReader;
+ 
++import com.izforge.izpack.LocaleDatabase;
++import com.izforge.izpack.Panel;
++import com.izforge.izpack.util.VariableSubstitutor;
++
+ /**
+  * Abstract class implementing basic functions needed by all panel console helpers.
+  * 
+@@ -32,9 +36,9 @@ import java.io.InputStreamReader;
+ abstract public class PanelConsoleHelper 
+ {
+ 
++	public enum PanelContinuation { CONTINUE, QUIT, REDISPLAY };
+ 
+-
+-    public int askEndOfConsolePanel()
++    private PanelContinuation askEndOfConsolePanel()
+     {
+         try
+         {
+@@ -45,13 +49,15 @@ abstract public class PanelConsoleHelper
+                 String strIn = br.readLine();
+                 if (strIn.equals("1"))
+                 {
+-                    return 1;
++                    return PanelContinuation.CONTINUE;
+                 }
+                 else if (strIn.equals("2"))
+                 {
+-                    return 2;
++                    return PanelContinuation.QUIT;
++                }
++                else if (strIn.equals("3")) { 
++                	return PanelContinuation.REDISPLAY; 
+                 }
+-                else if (strIn.equals("3")) { return 3; }
+             }
+ 
+         }
+@@ -59,7 +65,94 @@ abstract public class PanelConsoleHelper
+         {
+             e.printStackTrace();
+         }
+-        return 2;
++        return PanelContinuation.QUIT;
++    }
++    
++    protected boolean continueQuitOrReboot(
++    		AutomatedInstallData idata, PanelConsole panel
++    		) {
++    	PanelContinuation userChoice = askEndOfConsolePanel();
++        if (userChoice == PanelContinuation.CONTINUE)
++        {
++            return true;
++        }
++        else if (userChoice == PanelContinuation.QUIT)
++        {
++            return false;
++        }
++        else
++        {
++            return panel.runConsole(idata);
++        }
++    }
++    
++
++    
++    private String extractPanelNameFromConsoleHelperClassName(String className) {
++        final String consoleHelperSuffix = "ConsoleHelper";
++        final int suffixIndex = className.indexOf(consoleHelperSuffix);
++        if (suffixIndex == -1) {
++        	throw new IllegalStateException("Trying to get i18n info from a " +
++        			"class which is not a ConsoleHelper, not allowed");
++        }
++    	return className.substring(0, suffixIndex);
++    }
++
++    // this method gets i18n string for the panel related to the caller 
++    // console helper object, to be used only from classes with name ending with 
++    // ConsoleHelper suffix
++    protected String getI18nStringForClass(String subkey, String alternateClass, AutomatedInstallData idata)
++    {
++        final String thisClassName = getClass().getName();
++        final String panelClassName = extractPanelNameFromConsoleHelperClassName(thisClassName);
++        
++    	return (getI18nStringForClass(panelClassName, subkey, alternateClass, null, idata));
++    }
++
++    private String getI18nStringForClass(
++    		String curClassName, 
++    		String subkey, 
++    		String alternateClass,
++    		Panel metadata,
++    		AutomatedInstallData idata)
++    {
++
++        int nameStart = curClassName.lastIndexOf('.') + 1;
++        curClassName = curClassName.substring(nameStart, curClassName.length());
++        StringBuffer buf = new StringBuffer();
++        buf.append(curClassName).append(".").append(subkey);
++        String fullkey = buf.toString();
++        String panelid = null;
++        if (metadata != null)
++        {
++            panelid = metadata.getPanelid();
++        }
++        String retval = null;
++        if (panelid != null)
++        {
++            buf.append(".");
++            buf.append(panelid);
++            retval = idata.langpack.getString(buf.toString());
++        }
++        if (retval == null || retval.startsWith(fullkey))
++        {
++            retval = idata.langpack.getString(fullkey);
++        }
++        if (retval == null || retval.startsWith(fullkey))
++        {
++            if (alternateClass == null) { return (null); }
++            buf.delete(0, buf.length());
++            buf.append(alternateClass).append(".").append(subkey);
++            retval = idata.langpack.getString(buf.toString());
++        }
++        if (retval != null && retval.indexOf('$') > -1)
++        {
++            VariableSubstitutor substitutor = new VariableSubstitutor(idata.getVariables());
++            retval = substitutor.substitute(retval, null);
++        }
++        return (retval);
+     }
+ 
++    
++    
+ }
+diff --git a/src/lib/com/izforge/izpack/installer/ResourceHelper.java b/src/lib/com/izforge/izpack/installer/ResourceHelper.java
+new file mode 100644
+index 0000000..2f5a28f
+--- /dev/null
++++ b/src/lib/com/izforge/izpack/installer/ResourceHelper.java
+@@ -0,0 +1,31 @@
++package com.izforge.izpack.installer;
++
++import java.io.BufferedReader;
++import java.io.InputStreamReader;
++import java.net.URL;
++
++public class ResourceHelper {
++	
++	public String getResourceAsString(String resourceId) 
++	throws ResourceNotFoundException
++	{
++        try
++        {
++            URL url = ResourceManager.getInstance().getURL(resourceId);
++            if (url == null) 
++            {
++            	throw new RuntimeException("Invalid resource URL");
++            }
++            
++            InputStreamReader reader = new InputStreamReader(url.openStream());
++            BufferedReader bufferedReader = new BufferedReader(reader);
++            return new IOHelper().readAll(bufferedReader);
++        }
++        catch (Exception ex)
++        {
++            throw new ResourceNotFoundException(
++            		"Error loading resource " + resourceId);
++        }
++	}
++
++}
+\ No newline at end of file
+diff --git a/src/lib/com/izforge/izpack/installer/ValidatingConverter.java b/src/lib/com/izforge/izpack/installer/ValidatingConverter.java
+new file mode 100644
+index 0000000..36542e3
+--- /dev/null
++++ b/src/lib/com/izforge/izpack/installer/ValidatingConverter.java
+@@ -0,0 +1,8 @@
++package com.izforge.izpack.installer;
++
++//does conversion and validates results
++//see Option for result description
++public abstract class ValidatingConverter<F, T> {
++	public abstract Option<T> convert(F from);
++}
++
+diff --git a/src/lib/com/izforge/izpack/installer/VariablesHelper.java b/src/lib/com/izforge/izpack/installer/VariablesHelper.java
+new file mode 100644
+index 0000000..55c7f9b
+--- /dev/null
++++ b/src/lib/com/izforge/izpack/installer/VariablesHelper.java
+@@ -0,0 +1,28 @@
++package com.izforge.izpack.installer;
++
++import java.util.Properties;
++
++import com.izforge.izpack.util.VariableSubstitutor;
++
++
++public class VariablesHelper {
++	public String expand(String string_to_parse, Properties variables) {
++        try
++        {
++            // Initialize the variable substitutor
++            VariableSubstitutor vs = new VariableSubstitutor(variables);
++
++            // Parses the info text
++            string_to_parse = vs.substitute(string_to_parse, null);
++        }
++        catch (Exception err)
++        {
++            err.printStackTrace();
++        }
++        return string_to_parse;
++	}
++	
++	public String expand(String string_to_parse, AutomatedInstallData idata) {
++		return expand(string_to_parse, idata.getVariables());
++	}
++}
+\ No newline at end of file
+diff --git a/src/lib/com/izforge/izpack/panels/CheckedHelloPanelConsoleHelper.java b/src/lib/com/izforge/izpack/panels/CheckedHelloPanelConsoleHelper.java
+new file mode 100644
+index 0000000..d5feff3
+--- /dev/null
++++ b/src/lib/com/izforge/izpack/panels/CheckedHelloPanelConsoleHelper.java
+@@ -0,0 +1,4 @@
++package com.izforge.izpack.panels;
++
++public class CheckedHelloPanelConsoleHelper 
++extends HelloPanelConsoleHelper {}
+diff --git a/src/lib/com/izforge/izpack/panels/HTMLInfoPanel.java b/src/lib/com/izforge/izpack/panels/HTMLInfoPanel.java
+index 8a14d89..a47d3ff 100644
+--- a/src/lib/com/izforge/izpack/panels/HTMLInfoPanel.java
++++ b/src/lib/com/izforge/izpack/panels/HTMLInfoPanel.java
+@@ -46,6 +46,8 @@ public class HTMLInfoPanel extends IzPanel
+ 
+     private static final long serialVersionUID = 3257008769514025270L;
+ 
++    static final String HTMLINFO_PANEL_NAME = "HTMLInfoPanel";
++
+     /** Resource prefix for panel. */
+     protected String panelResourcePrefixStr;
+ 
+@@ -65,7 +67,7 @@ public class HTMLInfoPanel extends IzPanel
+      */
+     public HTMLInfoPanel(InstallerFrame parent, InstallData idata)
+     {
+-        this(parent,idata,"HTMLInfoPanel",true);
++        this(parent,idata,HTMLINFO_PANEL_NAME,true);
+     }
+ 
+     /**
+diff --git a/src/lib/com/izforge/izpack/panels/HTMLInfoPanelConsoleHelper.java b/src/lib/com/izforge/izpack/panels/HTMLInfoPanelConsoleHelper.java
+new file mode 100644
+index 0000000..1b4c9d6
+--- /dev/null
++++ b/src/lib/com/izforge/izpack/panels/HTMLInfoPanelConsoleHelper.java
+@@ -0,0 +1,61 @@
++package com.izforge.izpack.panels;
++
++import java.io.IOException;
++import java.io.PrintWriter;
++import java.util.Properties;
++
++import com.izforge.izpack.installer.AutomatedInstallData;
++import com.izforge.izpack.installer.ConsoleInstallHelper;
++import com.izforge.izpack.installer.PanelConsole;
++import com.izforge.izpack.installer.PanelConsoleHelper;
++import com.izforge.izpack.installer.ResourceNotFoundException;
++
++
++// hardcoded resource name, should work only for standard one html panel
++// uses simple html format, and extracts text from it using regex
++// only interactive mode implemented
++public class HTMLInfoPanelConsoleHelper extends PanelConsoleHelper implements PanelConsole 
++{
++	private ConsoleInstallHelper helper = ConsoleInstallHelper.getInstance();
++		
++	public boolean runConsole(AutomatedInstallData installData) 
++	{
++		try {
++			// load resource
++			//TODO how to get resource id from installData?
++			String resourceId = "HTMLInfoPanel.info"; 
++			String htmlInfo = helper.resource.getResourceAsString(resourceId);
++			htmlInfo = helper.variables.expand(htmlInfo, installData);
++			
++			// convert from html
++			String info = helper.html.extractTextFromSimplifiedHTML(htmlInfo);
++
++			// display using pager
++			helper.pager.displayLongText(info);
++		}
++		catch (ResourceNotFoundException re) {
++			throw new RuntimeException("Error locating resource", re);
++		}
++		catch (IOException ioe) {
++			throw new RuntimeException("Unexpected I/O exception", ioe);	
++		}
++				
++		return continueQuitOrReboot(installData, this);
++	}
++
++	
++	
++	
++	// not implemented
++	
++	public boolean runConsoleFromPropertiesFile(
++			AutomatedInstallData installData, Properties p) {
++		return false;
++	}
++
++	public boolean runGeneratePropertiesFile(AutomatedInstallData installData,
++			PrintWriter printWriter) {
++		return false;
++	}
++
++}
+diff --git a/src/lib/com/izforge/izpack/panels/HTMLLicencePanelConsoleHelper.java b/src/lib/com/izforge/izpack/panels/HTMLLicencePanelConsoleHelper.java
+new file mode 100644
+index 0000000..43f143c
+--- /dev/null
++++ b/src/lib/com/izforge/izpack/panels/HTMLLicencePanelConsoleHelper.java
+@@ -0,0 +1,67 @@
++package com.izforge.izpack.panels;
++
++import java.io.IOException;
++import java.io.PrintWriter;
++import java.util.Properties;
++
++import com.izforge.izpack.installer.AutomatedInstallData;
++import com.izforge.izpack.installer.ConsoleInstallHelper;
++import com.izforge.izpack.installer.PanelConsole;
++import com.izforge.izpack.installer.PanelConsoleHelper;
++import com.izforge.izpack.installer.ResourceNotFoundException;
++
++public class HTMLLicencePanelConsoleHelper 
++extends PanelConsoleHelper 
++implements PanelConsole
++{
++
++	private ConsoleInstallHelper helper = ConsoleInstallHelper.getInstance();
++	
++	public boolean runConsole(AutomatedInstallData installData) {
++		String headerLabel = installData.langpack.getString("LicencePanel.info");
++		helper.console.displayLabel(headerLabel);
++		
++		try {
++			// load resource
++			//TODO how to get resource id from installData?
++			String resourceId = "HTMLLicencePanel.licence"; 
++			String htmlInfo = helper.resource.getResourceAsString(resourceId);
++			htmlInfo = helper.variables.expand(htmlInfo, installData);
++			
++			// convert from html
++			String info = helper.html.extractTextFromSimplifiedHTML(htmlInfo);
++
++			// display using pager
++			helper.pager.displayLongText(info);
++			
++			String iAgree = installData.langpack.getString("LicencePanel.agree");
++			String iDoNotAgree = installData.langpack.getString("LicencePanel.notagree");
++			switch (helper.console.chooseAction(iAgree, iDoNotAgree)) {
++			case 1: return continueQuitOrReboot(installData, this);
++			case 2: return false;
++			}
++			
++		}
++		catch (ResourceNotFoundException re) {
++			throw new RuntimeException("Error locating resource", re);
++		}
++		catch (IOException ioe) {
++			throw new RuntimeException("Unexpected I/O exception", ioe);	
++		}
++		
++		// should be unreachable
++		return false;
++	}
++
++	
++	// not implemented
++	public boolean runConsoleFromPropertiesFile(
++			AutomatedInstallData installData, Properties p) {
++		return false;
++	}
++
++	public boolean runGeneratePropertiesFile(AutomatedInstallData installData,
++			PrintWriter printWriter) {
++		return false;
++	}
++}
+diff --git a/src/lib/com/izforge/izpack/panels/HelloPanelConsoleHelper.java b/src/lib/com/izforge/izpack/panels/HelloPanelConsoleHelper.java
+index bfb075a..f42d5f0 100644
+--- a/src/lib/com/izforge/izpack/panels/HelloPanelConsoleHelper.java
++++ b/src/lib/com/izforge/izpack/panels/HelloPanelConsoleHelper.java
+@@ -26,6 +26,7 @@ import java.util.Properties;
+ 
+ import com.izforge.izpack.Info;
+ import com.izforge.izpack.installer.AutomatedInstallData;
++import com.izforge.izpack.installer.ConsoleInstallHelper;
+ import com.izforge.izpack.installer.PanelConsole;
+ import com.izforge.izpack.installer.PanelConsoleHelper;
+ 
+@@ -36,6 +37,8 @@ import com.izforge.izpack.installer.PanelConsoleHelper;
+  */
+ public class HelloPanelConsoleHelper extends PanelConsoleHelper implements PanelConsole
+ {
++	
++	private static ConsoleInstallHelper helper = ConsoleInstallHelper.getInstance();
+ 
+     public boolean runConsoleFromPropertiesFile(AutomatedInstallData installData, Properties p)
+     {
+@@ -53,6 +56,7 @@ public class HelloPanelConsoleHelper extends PanelConsoleHelper implements Panel
+         String str;
+         str = idata.langpack.getString("HelloPanel.welcome1") + idata.info.getAppName() + " "
+                 + idata.info.getAppVersion() + idata.langpack.getString("HelloPanel.welcome2");
++        str = helper.variables.expand(str, idata);
+         System.out.println(str);
+         ArrayList<Info.Author> authors = idata.info.getAuthors();
+         int size = authors.size();
+@@ -75,18 +79,7 @@ public class HelloPanelConsoleHelper extends PanelConsoleHelper implements Panel
+             str = idata.langpack.getString("HelloPanel.url") + idata.info.getAppURL();
+             System.out.println(str);
+         }
+-        int i = askEndOfConsolePanel();
+-        if (i == 1)
+-        {
+-            return true;
+-        }
+-        else if (i == 2)
+-        {
+-            return false;
+-        }
+-        else
+-        {
+-            return runConsole(idata);
+-        }
++        
++        return continueQuitOrReboot(idata, this);
+     }
+ }
+diff --git a/src/lib/com/izforge/izpack/panels/JDKPathPanelConsoleHelper.java b/src/lib/com/izforge/izpack/panels/JDKPathPanelConsoleHelper.java
+new file mode 100644
+index 0000000..00d3b03
+--- /dev/null
++++ b/src/lib/com/izforge/izpack/panels/JDKPathPanelConsoleHelper.java
+@@ -0,0 +1,51 @@
++package com.izforge.izpack.panels;
++
++import java.io.File;
++import java.io.PrintWriter;
++import java.util.Properties;
++
++import com.izforge.izpack.installer.AutomatedInstallData;
++import com.izforge.izpack.installer.Option;
++import com.izforge.izpack.installer.ValidatingConverter;
++
++public class JDKPathPanelConsoleHelper extends PathInputPanelConsoleHelper {
++
++	private final static String JDK_PATH_VARIABLE_NAME = "JDKPath";
++	
++	public boolean runConsole(AutomatedInstallData installData) {
++		return super.runConsole(installData);
++	}
++
++	public boolean runConsoleFromPropertiesFile(
++			AutomatedInstallData installData, Properties p) {
++		return super.runConsoleFromPropertiesFile(installData, p);
++	}
++
++	public boolean runGeneratePropertiesFile(AutomatedInstallData installData,
++			PrintWriter printWriter) {
++		return super.runGeneratePropertiesFile(installData, printWriter);
++	}
++
++	// sorry, no proper version validation, no version check
++	// everything needs to be extracted
++	// or (preferably) accessed from JDKPathPanel, I couldn't do it, too complicated :/
++	public ValidatingConverter<String, File> getPathValidator() {
++		return new ValidatingConverter<String, File>() {
++			public Option<File> convert(String line) {
++				File file = new File(line);
++				if (file.exists() == false) {
++					return Option.empty("Path doesn't exist");
++				} else {
++					return Option.full(file);
++				}
++			}        	
++		};
++	}	
++
++	public void onResult(File inputPath, AutomatedInstallData iData) {
++		iData.setVariable(
++				JDK_PATH_VARIABLE_NAME, 
++				inputPath.getAbsolutePath().toString());
++	}
++
++}
+\ No newline at end of file
+diff --git a/src/lib/com/izforge/izpack/panels/PacksPanelConsoleHelper.java b/src/lib/com/izforge/izpack/panels/PacksPanelConsoleHelper.java
+new file mode 100644
+index 0000000..2b9b45f
+--- /dev/null
++++ b/src/lib/com/izforge/izpack/panels/PacksPanelConsoleHelper.java
+@@ -0,0 +1,118 @@
++package com.izforge.izpack.panels;
++
++import java.io.IOException;
++import java.io.PrintWriter;
++import java.util.ArrayList;
++import java.util.List;
++import java.util.Properties;
++
++import com.izforge.izpack.Pack;
++import com.izforge.izpack.installer.AutomatedInstallData;
++import com.izforge.izpack.installer.ConsoleInstallHelper;
++import com.izforge.izpack.installer.ConsoleMenu;
++import com.izforge.izpack.installer.IConsoleMenuItem;
++import com.izforge.izpack.installer.PanelConsole;
++import com.izforge.izpack.installer.PanelConsoleHelper;
++import com.izforge.izpack.panels.PacksHelper.PackSelection;
++public class PacksPanelConsoleHelper 
++extends PanelConsoleHelper 
++implements PanelConsole 
++{
++
++	private PacksHelper packsHelper = new PacksHelper();
++	private ConsoleInstallHelper helper = ConsoleInstallHelper.getInstance();
++	
++	public boolean runConsole(final AutomatedInstallData installData) {
++
++		final List<IConsoleMenuItem> items 
++			= packsHelper.getPacksSelections(installData);
++		try {
++			final String info = installData.langpack.getString("PacksPanel.info");
++			
++			ConsoleMenu consoleMenu = new ConsoleMenu(helper.console) {
++				protected List<IConsoleMenuItem> getMenuItems() {
++					return items;
++				}
++
++				protected String getHeader() {
++					return info;
++				}
++			};
++			consoleMenu.run();
++			
++			List<Pack> selectedPacks = new ArrayList<Pack>();
++			for (IConsoleMenuItem pack : items) {
++				PackSelection selection = (PackSelection) pack;
++				if (selection.isSelected) 
++				{
++					selectedPacks.add(selection.getPack());
++				}
++			}
++			
++			installData.selectedPacks = selectedPacks;
++			
++		} catch (IOException e) {
++			e.printStackTrace();
++			return false;
++		} 
++		
++		return continueQuitOrReboot(installData, this);
++	}
++
++	
++	
++	
++	// not implemented
++	public boolean runConsoleFromPropertiesFile(
++			AutomatedInstallData installData, Properties p) {
++		return false;
++	}
++
++	public boolean runGeneratePropertiesFile(AutomatedInstallData installData,
++			PrintWriter printWriter) {
++		return false;
++	}
++
++}
++
++class PacksHelper {
++	
++	public List<IConsoleMenuItem> getPacksSelections(AutomatedInstallData installData) {
++		List<IConsoleMenuItem> result = new ArrayList<IConsoleMenuItem>();
++		for (Pack pack : installData.allPacks) {
++			result.add(new PackSelection(pack)); 
++		}
++		return result;
++	}
++	
++	class PackSelection implements IConsoleMenuItem {
++		final Pack pack;
++		boolean isSelected;
++		
++		public PackSelection(Pack pack) {
++			this.pack = pack;
++			this.isSelected = pack.preselected;
++		}
++
++		public Pack getPack() {
++			return pack;
++		}
++
++		public String renderToString() {
++			String option = "";
++			if (pack.required == false) {
++				String selected = isSelected ? "x" : " ";
++				option = "[" + selected + "] ";
++			}
++			return option + pack.name + ", " + pack.description;
++		}
++
++		public void runAction() {
++			if (pack.required == false) {
++				isSelected = !isSelected;
++			} 
++		}
++	}
++	
++}
++
+diff --git a/src/lib/com/izforge/izpack/panels/PathInputPanelConsoleHelper.java b/src/lib/com/izforge/izpack/panels/PathInputPanelConsoleHelper.java
+new file mode 100644
+index 0000000..4be8dd1
+--- /dev/null
++++ b/src/lib/com/izforge/izpack/panels/PathInputPanelConsoleHelper.java
+@@ -0,0 +1,67 @@
++package com.izforge.izpack.panels;
++
++import java.io.File;
++import java.io.IOException;
++import java.io.PrintWriter;
++import java.util.Properties;
++
++import com.izforge.izpack.installer.AutomatedInstallData;
++import com.izforge.izpack.installer.ConsoleInstallHelper;
++import com.izforge.izpack.installer.PanelConsole;
++import com.izforge.izpack.installer.PanelConsoleHelper;
++import com.izforge.izpack.installer.ValidatingConverter;
++
++public abstract class PathInputPanelConsoleHelper extends PanelConsoleHelper implements PanelConsole {
++
++    protected ConsoleInstallHelper helper = ConsoleInstallHelper.getInstance();
++    
++    private String getIntroText(AutomatedInstallData installData) {
++        String introText = getI18nStringForClass("extendedIntro", "PathInputPanel", installData);
++        if (introText == null || introText.endsWith("extendedIntro")
++                || introText.indexOf('$') > -1)
++        {
++            introText = getI18nStringForClass("intro", "PathInputPanel", installData);
++            if (introText == null || introText.endsWith("intro"))
++            {
++                introText = "";
++            }
++        }
++        return introText;
++    }
++    
++	public boolean runConsole(AutomatedInstallData installData) 
++	{
++		try {
++			final String introText = getIntroText(installData);
++	        helper.console.displayLabel(introText);
++	        
++	        // get valid path
++	        ValidatingConverter<String, File> pathValidator = getPathValidator();
++			File inputPath = helper.console.readUntilValid(
++					"Enter path",
++					pathValidator);	
++			
++			onResult(inputPath, installData);
++		}
++		catch (IOException ioe) {
++			throw new RuntimeException("Unexpected I/O exception", ioe);	
++		}
++		
++		return true;
++	}
++
++	public abstract ValidatingConverter<String, File> getPathValidator();
++	
++	abstract public void onResult(File inputPath, AutomatedInstallData iData);
++
++	public boolean runConsoleFromPropertiesFile(
++			AutomatedInstallData installData, Properties p) {
++		return false;
++	}
++
++	public boolean runGeneratePropertiesFile(AutomatedInstallData installData,
++			PrintWriter printWriter) {
++		return false;
++	}
++
++}
+diff --git a/src/lib/com/izforge/izpack/panels/TargetPanelConsoleHelper.java b/src/lib/com/izforge/izpack/panels/TargetPanelConsoleHelper.java
+index 964eec9..a3f0d85 100644
+--- a/src/lib/com/izforge/izpack/panels/TargetPanelConsoleHelper.java
++++ b/src/lib/com/izforge/izpack/panels/TargetPanelConsoleHelper.java
+@@ -95,19 +95,7 @@ public class TargetPanelConsoleHelper extends PanelConsoleHelper implements Pane
+         strTargetPath = vs.substitute(strTargetPath, null);
+ 
+         idata.setInstallPath(strTargetPath);
+-        int i = askEndOfConsolePanel();
+-        if (i == 1)
+-        {
+-            return true;
+-        }
+-        else if (i == 2)
+-        {
+-            return false;
+-        }
+-        else
+-        {
+-            return runConsole(idata);
+-        }
+ 
++        return continueQuitOrReboot(idata, this);
+     }
+ }
+diff --git a/src/lib/com/izforge/izpack/panels/UserInputPanelConsoleHelper.java b/src/lib/com/izforge/izpack/panels/UserInputPanelConsoleHelper.java
+index ca9a659..714aa19 100644
+--- a/src/lib/com/izforge/izpack/panels/UserInputPanelConsoleHelper.java
++++ b/src/lib/com/izforge/izpack/panels/UserInputPanelConsoleHelper.java
+@@ -25,6 +25,7 @@ import java.io.IOException;
+ import java.io.InputStreamReader;
+ import java.io.PrintWriter;
+ import java.util.ArrayList;
++import java.util.Arrays;
+ import java.util.Iterator;
+ import java.util.List;
+ import java.util.Properties;
+@@ -33,6 +34,7 @@ import java.util.Vector;
+ import com.izforge.izpack.Panel;
+ import com.izforge.izpack.adaptator.IXMLElement;
+ import com.izforge.izpack.installer.AutomatedInstallData;
++import com.izforge.izpack.installer.ConsoleInstallHelper;
+ import com.izforge.izpack.installer.PanelConsole;
+ import com.izforge.izpack.installer.PanelConsoleHelper;
+ import com.izforge.izpack.util.Debug;
+@@ -47,6 +49,8 @@ import com.izforge.izpack.util.VariableSubstitutor;
+ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements PanelConsole
+ {
+ 
++	private ConsoleInstallHelper helper = ConsoleInstallHelper.getInstance();
++	
+     protected int instanceNumber = 0;
+ 
+     private static int instanceCount = 0;
+@@ -68,6 +72,8 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
+     private static final String SET = "set";
+ 
+     private static final String TEXT = "txt";
++    
++    private static final String ID = "id";
+ 
+     private static final String SPEC = "spec";
+ 
+@@ -78,7 +84,15 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
+     private static final String COMBO_FIELD = "combo";
+ 
+     private static final String STATIC_TEXT = "staticText";
+-
++    
++    private static final String TITLE_TEXT = "title";
++
++    private static final String SPACE_TEXT = "space";
++    
++    private static final String DIVIDER_TEXT = "divider";
++    
++    private static final String CHECK_FIELD = "check";
++    
+     private static final String CHOICE = "choice";
+ 
+     private static final String VALUE = "value";
+@@ -88,6 +102,8 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
+     private static final String DESCRIPTION = "description";
+ 
+     private static final String TRUE = "true";
++    
++    private static final String FALSE = "false";
+ 
+     public List<Input> listInputs;
+ 
+@@ -103,7 +119,7 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
+         Iterator<Input> inputIterator = listInputs.iterator();
+         while (inputIterator.hasNext())
+         {
+-            String strVariableName = ((Input) inputIterator.next()).strVariableName;
++            String strVariableName = ((Input) inputIterator.next()).getVariableName();
+             String strVariableValue = p.getProperty(strVariableName);
+             if (strVariableValue != null)
+             {
+@@ -120,7 +136,7 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
+         Iterator<Input> inputIterator = listInputs.iterator();
+         while (inputIterator.hasNext())
+         {
+-            printWriter.println(((Input) inputIterator.next()).strVariableName + "=");
++            printWriter.println(((Input) inputIterator.next()).getVariableName() + "=");
+         }
+         return true;
+     }
+@@ -133,37 +149,14 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
+         while (inputsIterator.hasNext())
+         {
+             Input input = inputsIterator.next();
+-            String text = input.strText;
+-            if (text != null)
+-            {
+-                System.out.println(text);
+-            }
+-            if (TEXT_FIELD.equals(input.strFieldType))
+-            {
+-                status = status && processTextField(input, idata);
+-            }
+-            else if (COMBO_FIELD.equals(input.strFieldType)
+-                    || RADIO_FIELD.equals(input.strFieldType))
+-            {
+-                status = status && processComboRadioField(input, idata);
+-            }
+-
+-        }
+-
+-        int i = askEndOfConsolePanel();
+-        if (i == 1)
+-        {
+-            return true;
+-        }
+-        else if (i == 2)
+-        {
+-            return false;
+-        }
+-        else
+-        {
+-            return runConsole(idata);
++            try {
++				status = status && input.process(idata);
++			} catch (IOException e) {
++				throw new RuntimeException("I/O error", e);
++			} 
+         }
+ 
++        return continueQuitOrReboot(idata, this);
+     }
+ 
+     public boolean collectInputs(AutomatedInstallData idata)
+@@ -218,144 +211,6 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
+         return true;
+     }
+ 
+-    boolean processTextField(Input input, AutomatedInstallData idata)
+-    {
+-        String variable = input.strVariableName;
+-        String set;
+-        String fieldText;
+-        if ((variable == null) || (variable.length() == 0)) { return false; }
+-
+-        if (input.listChoices.size() == 0)
+-        {
+-            Debug.trace("Error: no spec element defined in file field");
+-            return false;
+-        }
+-        set = input.strDefaultValue;
+-        if (set == null)
+-        {
+-            set = idata.getVariable(variable);
+-            if (set == null)
+-            {
+-                set = "";
+-            }
+-        }
+-        else
+-        {
+-            if (set != null && !"".equals(set))
+-            {
+-
+-                VariableSubstitutor vs = new VariableSubstitutor(idata.getVariables());
+-                set = vs.substitute(set, null);
+-            }
+-        }
+-
+-        fieldText = input.listChoices.get(0).strText;
+-        System.out.println(fieldText + " [" + set + "] ");
+-        try
+-        {
+-            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+-            String strIn = br.readLine();
+-            if (!strIn.trim().equals(""))
+-            {
+-                idata.setVariable(variable, strIn);
+-            }
+-            else
+-            {
+-                idata.setVariable(variable, set);
+-            }
+-        }
+-        catch (IOException e)
+-        {
+-            e.printStackTrace();
+-        }
+-        return true;
+-
+-    }
+-
+-    boolean processComboRadioField(Input input, AutomatedInstallData idata)
+-    {// TODO protection if selection not valid and no set value
+-        String variable = input.strVariableName;
+-        if ((variable == null) || (variable.length() == 0)) { return false; }
+-        String currentvariablevalue = idata.getVariable(variable);
+-        boolean userinput = false;
+-        List<Choice> lisChoices = input.listChoices;
+-        if (lisChoices.size() == 0)
+-        {
+-            Debug.trace("Error: no spec element defined in file field");
+-            return false;
+-        }
+-        if (currentvariablevalue != null)
+-        {
+-            userinput = true;
+-        }
+-        for (int i = 0; i < lisChoices.size(); i++)
+-        {
+-            Choice choice = lisChoices.get(i);
+-            String value = choice.strValue;
+-            if (userinput)
+-            {
+-                if ((value != null) && (value.length() > 0) && (currentvariablevalue.equals(value)))
+-                {
+-                    input.iSelectedChoice = i;
+-                }
+-            }
+-            else
+-            {
+-                String set = choice.strSet;
+-                if (set != null)
+-                {
+-                    if (set != null && !"".equals(set))
+-                    {
+-                        VariableSubstitutor vs = new VariableSubstitutor(idata.getVariables());
+-                        set = vs.substitute(set, null);
+-                    }
+-                    if (set.equals(TRUE))
+-                    {
+-                        input.iSelectedChoice = i;
+-                    }
+-                }
+-            }
+-            System.out.println(i + "  [" + (input.iSelectedChoice == i ? "x" : " ") + "] "
+-                    + (choice.strText != null ? choice.strText : ""));
+-        }
+-
+-        try
+-        {
+-            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+-            boolean bKeepAsking = true;
+-
+-            while (bKeepAsking)
+-            {
+-                System.out.println("input selection:");
+-                String strIn = br.readLine();
+-                // take default value if default value exists and no user input
+-                if (strIn.trim().equals("") && input.iSelectedChoice != -1)
+-                {
+-                    bKeepAsking = false;
+-                }
+-                int j = -1;
+-                try
+-                {
+-                    j = Integer.valueOf(strIn).intValue();
+-                }
+-                catch (Exception ex)
+-                {}
+-                // take user input if user input is valid
+-                if (j >= 0 && j < lisChoices.size())
+-                {
+-                    input.iSelectedChoice = j;
+-                    bKeepAsking = false;
+-                }
+-            }
+-        }
+-        catch (IOException e)
+-        {
+-            e.printStackTrace();
+-        }
+-        idata.setVariable(variable, input.listChoices.get(input.iSelectedChoice).strValue);
+-        return true;
+-
+-    }
+ 
+     public Input getInputFromField(IXMLElement field)
+     {
+@@ -365,11 +220,10 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
+         {
+             String strText = null;
+             strText = field.getAttribute(TEXT);
+-            return new Input(strVariableName, null, null, STATIC_TEXT, strText, 0);
++            return new StaticText(strVariableName, strText);
+         }
+         if (TEXT_FIELD.equals(strFieldType))
+         {
+-            List<Choice> choicesList = new ArrayList<Choice>();
+             String strFieldText = null;
+             String strSet = null;
+             String strText = null;
+@@ -384,8 +238,8 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
+             {
+                 strFieldText = description.getAttribute(TEXT);
+             }
+-            choicesList.add(new Choice(strText, null, strSet));
+-            return new Input(strVariableName, strSet, choicesList, TEXT_FIELD, strFieldText, 0);
++            Choice choice = new Choice(strText, null, strSet);
++            return new Text(strVariableName, true, strSet, choice, strFieldText);
+ 
+         }
+         else if (COMBO_FIELD.equals(strFieldType) || RADIO_FIELD.equals(strFieldType))
+@@ -409,44 +263,342 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
+                 choicesList.add(new Choice(choice.getAttribute(TEXT), choice.getAttribute(VALUE),
+                         choice.getAttribute(SET)));
+             }
+-            return new Input(strVariableName, null, choicesList, COMBO_FIELD, strFieldText, -1);
++            return new Combo(strVariableName, choicesList, strFieldText);
++            
++//            return new Input(strVariableName, null, choicesList, COMBO_FIELD, strFieldText, -1);
++        } 
++        else if (CHECK_FIELD.equals(strFieldType))
++        {
++        	String strFieldText = "";
++            Description description = null;
++            Spec spec = null;
++        	
++        	IXMLElement descriptionElem = field.getFirstChildNamed(DESCRIPTION);
++        	if (descriptionElem != null)
++            {
++                description = new Description(descriptionElem);
++            }
++        	
++        	IXMLElement specElem = field.getFirstChildNamed(SPEC);
++            if (specElem != null) {
++            	spec = new Spec(specElem);
++            }
++        	
++        	return new Check(strVariableName, spec, description);
++        }
++        else if (TITLE_TEXT.equals(strFieldType))
++        {
++            String strText = null;
++            strText = field.getAttribute(TEXT);
++            return new Title(strText);        	
++        } 
++        else if (SPACE_TEXT.equals(strFieldType)) 
++        {
++        	return new Space();
++        }
++        else if (DIVIDER_TEXT.equals(strFieldType))
++        {
++        
++        	return new Divider();
+         }
+         else
+         {
+-            System.out.println(strFieldType + " field collection not implemented");
++        	System.out.println(strFieldType + " field collection not implemented");
+ 
+         }
+         return null;
+     }
+ 
+-    public class Input
+-    {
+-
+-        public Input(String strVariableName, String strDefaultValue, List<Choice> listChoices,
+-                String strFieldType, String strText, int iSelectedChoice)
+-        {
+-            this.strVariableName = strVariableName;
+-            this.strDefaultValue = strDefaultValue;
+-            this.listChoices = listChoices;
+-            this.strFieldType = strFieldType;
+-            this.strText = strText;
+-            this.iSelectedChoice = iSelectedChoice;
+-        }
+-
+-        String strVariableName;
+-
+-        String strDefaultValue;
++    
++    abstract class Input {
++    	private final String variableName;
++
++    	public String getVariableName() {
++			return variableName;
++		}
++		
++		protected Input(String variableName) {
++    		this.variableName = variableName;
++    	}
++		
++    	abstract boolean process(AutomatedInstallData idata)
++    	throws IOException;
++    
++    	// string input, default is always valid
++    	protected boolean isValid(String value) 
++    	{
++    		return true;
++    	}
++    	
++    	String inputValidValue() throws IOException {
++    		boolean isValidValue = false;
++    		
++            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
++    		while (false == isValidValue) {
++                String strIn = br.readLine();
++                if (isValid(strIn))
++                {
++                	return strIn;
++                } 
++                else 
++                {
++                	System.out.print("Invalid value. Try again: ");
++                }
++    		}
++    		
++    		// should be unreachable in practice
++    		return "";
++    	}
++    	
++    	
++    }
++    
++    public class Text extends Input {
++		private final String strDefaultValue;
++		protected final String text;
++		private final Choice choice;
++		private final boolean doesInput;
++
++		public Text(String variableName, boolean doesInput,
++				String defaultValue, Choice choice, String text) {
++			super(variableName);
++			this.doesInput = doesInput;
++			this.strDefaultValue = defaultValue;
++			this.choice = choice;
++			this.text = text;
++		}
++
++		boolean process(AutomatedInstallData idata) {
++            String variable = getVariableName();
++            String set;
++            String fieldText;
++            if (doesInput)
++            	if ((variable == null) || (variable.length() == 0)) 
++            	{ 
++            		return false; 
++            	}
++
++            set = strDefaultValue;
++            if (set == null)
++            {
++                if (variable != null) {
++                	set = idata.getVariable(variable);
++                }
++                if (set == null)
++                {
++                    set = "";
++                }
++            }
++            else
++            {
++                if (set != null && !"".equals(set))
++                {
++                    VariableSubstitutor vs = new VariableSubstitutor(idata.getVariables());
++                    set = vs.substitute(set, null);
++                }
++            }
+ 
+-        List<Choice> listChoices;
++            fieldText = (choice == null) ? text  : choice.strText;
++            System.out.print(fieldText);
++            if (doesInput) System.out.print(" [" + set + "] ");
++            System.out.println();
++            
++            if (doesInput) {
++	            try
++	            {
++	                BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
++	                String strIn = br.readLine();
++	                if (!strIn.trim().equals(""))
++	                {
++	                    idata.setVariable(variable, strIn);
++	                }
++	                else
++	                {
++	                    idata.setVariable(variable, set);
++	                }
++	            }
++	            catch (IOException e)
++	            {
++	                e.printStackTrace();
++	            }
++            }
++            return true;
+ 
+-        String strFieldType;
++		}
++    }
++    
++    class StaticText extends Text {
++    	public StaticText(String strVariableName, String text) {
++    		super(strVariableName, false, null, null, text);
++		}
++    }
+ 
+-        String strText;
++    class Title extends Text {
++    	public Title(String text) {
++			super(null, false, null, null, text);
++		}
+ 
+-        int iSelectedChoice = -1;
++		boolean process(AutomatedInstallData idata) {
++			System.out.println("*** " + text);
++			return true;
++		}
+     }
+-
+-    public class Choice
++    
++    class Space extends Text {
++    	public Space() {
++    		super(null, false, null, null, "");
++    	}
++    }
++    
++    class Divider extends Text {
++    	public Divider() {
++    		super(null, false, null, null, "-------------------");
++    	}
++    }
++    
++    class Combo extends Input{
++    	
++		private final List<Choice> listChoices;
++		private int iSelectedChoice = -1;
++
++		public Combo(String strVariableName, List<Choice> listChoices,
++				String strFieldText) {
++			super(strVariableName);
++			this.listChoices = listChoices;
++		}
++
++		boolean process(AutomatedInstallData idata) {
++			
++			String variable = getVariableName();
++	        if ((variable == null) || (variable.length() == 0)) { return false; }
++	        String currentvariablevalue = idata.getVariable(variable);
++	        boolean userinput = false;
++	        List<Choice> lisChoices = listChoices;
++	        if (lisChoices.size() == 0)
++	        {
++	            Debug.trace("Error: no spec element defined in file field");
++	            return false;
++	        }
++	        if (currentvariablevalue != null)
++	        {
++	            userinput = true;
++	        }
++	        for (int i = 0; i < lisChoices.size(); i++)
++	        {
++	            Choice choice = lisChoices.get(i);
++	            String value = choice.strValue;
++	            if (userinput)
++	            {
++	                if ((value != null) && (value.length() > 0) && (currentvariablevalue.equals(value)))
++	                {
++	                    iSelectedChoice = i;
++	                }
++	            }
++	            else
++	            {
++	                String set = choice.strSet;
++	                if (set != null)
++	                {
++	                    if (set != null && !"".equals(set))
++	                    {
++	                        VariableSubstitutor vs = new VariableSubstitutor(idata.getVariables());
++	                        set = vs.substitute(set, null);
++	                    }
++	                    if (set.equals(TRUE))
++	                    {
++	                        iSelectedChoice = i;
++	                    }
++	                }
++	            }
++	            System.out.println(i + "  [" + (iSelectedChoice == i ? "x" : " ") + "] "
++	                    + (choice.strText != null ? choice.strText : ""));
++	        }
++
++	        try
++	        {
++	            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
++	            boolean bKeepAsking = true;
++
++	            while (bKeepAsking)
++	            {
++	                System.out.println("input selection:");
++	                String strIn = br.readLine();
++	                // take default value if default value exists and no user input
++	                if (strIn.trim().equals("") && iSelectedChoice != -1)
++	                {
++	                    bKeepAsking = false;
++	                }
++	                int j = -1;
++	                try
++	                {
++	                    j = Integer.valueOf(strIn).intValue();
++	                }
++	                catch (Exception ex)
++	                {}
++	                // take user input if user input is valid
++	                if (j >= 0 && j < lisChoices.size())
++	                {
++	                    iSelectedChoice = j;
++	                    bKeepAsking = false;
++	                }
++	            }
++	        }
++	        catch (IOException e)
++	        {
++	            e.printStackTrace();
++	        }
++	        idata.setVariable(variable, listChoices.get(iSelectedChoice).strValue);
++	        return true;
++		}
++    
++    }
++ 
++    class Check extends Input {
++    	private final Spec spec;
++		private final Description description;
++
++		public Check(String strVariableName, Spec spec, Description description) {
++    		super(strVariableName);
++			this.spec = spec;
++			this.description = description;
++    	}
++
++		boolean process(AutomatedInstallData idata) 
++		throws IOException {
++			System.out.println(getInitialPrompt());
++			String input = inputValidValue();
++			idata.setVariable(getVariableName(), input);
++			return true;
++		}
++		
++		private String getInitialPrompt() {
++			List<Object> choices = Arrays.asList(spec.getIsTrue(), spec.getIsFalse());
++			StringBuilder result = new StringBuilder();
++			if (description != null)
++			{
++				result.append(description.getText() + "\n");
++			}
++			result.append(spec.getTxt() + "\n");
++			result.append(formatChoices(choices));
++			return result.toString();
++		}
++		
++		private String formatChoices(Object ...choices) {
++			StringBuilder result = new StringBuilder();
++			for (Object choice : choices) {
++				result.append(choice);
++			}
++			return result.toString();
++		}
++		
++		protected boolean isValid(String input) {
++			return spec.isTrue.equals(input) || spec.isFalse.equals(input);
++		}
++		
++		
++    }
++    
++    class Choice
+     {
+ 
+         public Choice(String strText, String strValue, String strSet)
+@@ -457,9 +609,59 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
+         }
+ 
+         String strText;
+-
+         String strValue;
+-
+         String strSet;
++        
++    }
++    
++    class Description {
++
++    	private final String text;
++		private final String id;
++
++		public String getText() {
++			return text;
++		}
++
++		public String getId() {
++			return id;
++		}
++
++		public Description(IXMLElement elem) {
++    		text = elem.getAttribute(TEXT);
++    		id = elem.getAttribute(ID);
++		}
++    }
++    
++    class Spec {
++
++    	private final Object txt;
++		private final Object id;
++		private final Object isTrue;
++		private final Object isFalse;
++		
++		public Object getTxt() {
++			return txt;
++		}
++
++		public Object getId() {
++			return id;
++		}
++
++		public Object getIsTrue() {
++			return isTrue;
++		}
++
++		public Object getIsFalse() {
++			return isFalse;
++		}
++
++		public Spec(IXMLElement spec) {
++			txt = spec.getAttribute(TEXT);
++			id = spec.getAttribute(ID);
++			isTrue = spec.getAttribute(TRUE);
++			isFalse = spec.getAttribute(FALSE);
++        	// set attribute - what for?
++		}
+     }
+ }
