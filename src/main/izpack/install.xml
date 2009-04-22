@@ -140,6 +140,7 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 		<res id="Heading.image" src="src/main/izpack/resources/pics/tiger.png"/>
 		<res id="userInputSpec.xml" src="src/main/izpack/userInputSpec.xml" />
 		<res id="packsLang.xml" src="src/main/izpack/resources/packsLang.xml"/>
+		<res id="panelsLangPack.xml" src="src/main/izpack/resources/panelsLangPack.xml"/>
 		<res id="shortcutSpec.xml" src="src/main/izpack/shortcutSpec.xml"/>
 		<res id="Unix_shortcutSpec.xml" src="src/main/izpack/Unix_shortcutSpec.xml"/>
 		<res id="RegistrySpec.xml" src="src/main/izpack/RegistrySpec.xml"/>

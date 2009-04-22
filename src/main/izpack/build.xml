@@ -3,7 +3,7 @@
 <!-- <property name="installer.path" value="/usr/local/IzPack421"/> --> 
 
   <target name="compile">
-    <javac srcdir="java" destdir="target">
+    <javac srcdir="java" destdir="target" debug="on">
       <classpath>
 	<pathelement location="java"/>
 	<pathelement location="${installer.path}/_build"/>
@@ -11,41 +11,53 @@
 	<pathelement location="${installer.path}/bin/panels/TargetPanel.jar"/>
       </classpath>
     </javac>
+	<copy todir="target/com/izforge/izpack/panels">
+		<fileset dir="java"/>
+	</copy>
   </target>
 
   <target name="jar" depends="compile">
     
     <jar destfile="${installer.path}/bin/panels/DerbyPathPanel.jar">
       <fileset dir="target">
-	<include name="**/DerbyPathPanel.class"/>
-	<include name="**/TigaseConfigConst.class"/>
+	<include name="**/DerbyPathPanel.*"/>
+	<include name="**/TigaseConfigConst.*"/>
+	<include name="**/TigaseInstallerCommon.*"/>
       </fileset>
     </jar>
 
     <jar destfile="${installer.path}/bin/panels/TigaseConfigLoadPanel.jar">
       <fileset dir="target">
-	<include name="**/TigaseConfigLoadPanel.class"/>
-	<include name="**/TigaseConfigConst.class"/>
+	<include name="**/TigaseConfigLoadPanel.*"/>
+	<include name="**/TigaseConfigConst.*"/>
+	<include name="**/TigaseInstallerCommon.*"/>
+
       </fileset>
     </jar>
 
     <jar destfile="${installer.path}/bin/panels/TigaseConfigSavePanel.jar">
       <fileset dir="target">
-	<include name="**/TigaseConfigSavePanel.class"/>
-	<include name="**/TigaseConfigConst.class"/>
+	<include name="**/TigaseConfigSavePanel.*"/>
+	<include name="**/TigaseConfigConst.*"/>
+	<include name="**/TigaseInstallerCommon.*"/>
+
       </fileset>
     </jar>
 
     <jar destfile="${installer.path}/bin/panels/TigaseDBCheckPanel.jar">
       <fileset dir="target">
-	<include name="**/TigaseDBCheckPanel*.class"/>
-	<include name="**/TigaseConfigConst.class"/>
+	<include name="**/TigaseDBCheckPanel*.*"/>
+	<include name="**/TigaseConfigConst.*"/>
+	<include name="**/TigaseInstallerCommon.*"/>
+
       </fileset>
     </jar>
     <jar destfile="${installer.path}/bin/panels/TigaseJDKPathPanel.jar">
       <fileset dir="target">
-	<include name="**/TigaseJDKPathPanel*.class"/>
-	<include name="**/TigaseConfigConst.class"/>
+	<include name="**/TigaseJDKPathPanel*.*"/>
+	<include name="**/TigaseConfigConst.*"/>
+	<include name="**/TigaseInstallerCommon.*"/>
+
       </fileset>
     </jar>
  

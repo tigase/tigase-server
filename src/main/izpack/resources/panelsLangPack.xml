@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="iso-8859-1" standalone="yes" ?>
+
+ <!-- The English langpack -->
+
+ <langpack>
+	 <str id="DerbyPathPanel.headline" txt="Derby Database Path"/>
+	 <str id="DerbyPathPanel.intro" txt="The Derby database has been selected. It needs a directory to store data files."/>
+	 <str id="DerbyPathPanel.info" txt="Select the Derby database path:"/>
+	 <str id="TigaseConfigLoadPanel.info" txt="Existing Tigase server configuration"/>
+	 <str id="TigaseConfigSavePanel.info" txt="New Tigase server configuration generated. Press 'Next' to save the configuration, 'Prev' to make changes. You can also edit settings here and press 'Next' to save them."/>
+	 <str id="TigaseDBCheckPanel.info" txt="Checking database connection and the database schema."/>
+
+	<str id="TigaseJDKPathPanel.extendedIntro" txt="The installed application needs a JDK between version ${JDKPathPanel.minVersion} and ${JDKPathPanel.maxVersion}. A java runtime environment (JRE) will be not sufficient."/>
+	<str id="TigaseJDKPathPanel.intro" txt="The installed application needs a JDK. A java runtime environment (JRE) will be not sufficient."/>
+	<str id="TigaseJDKPathPanel.info" txt="Select the JDK path:"/>
+	<str id="TigaseJDKPathPanel.badVersion1" txt="The chosen JDK has the wrong version (available: "/>
+	<str id="TigaseJDKPathPanel.badVersion2" txt=" required: "/>
+	<str id="TigaseJDKPathPanel.badVersion3" txt=") should this JDK be used anyway?"/>
+	<str id="TigaseJDKPathPanel.nonValidPathInReg" txt="The Windows registry contains a non-valid path for this JDK. Should this JDK be used anyway?"/>
+	<str id="TigaseJDKPathPanel.jdkDownload" txt="&lt;html&gt;&lt;p&gt;If you don't have JDK installed on your system please go to address: &lt;a href='http://java.sun.com/javase/downloads/'&gt;http://java.sun.com/javase/downloads&lt;/a&gt; and select JDK. Download it and install and proceed with the Tigase server installation.&lt;/p&gt;&lt;p&gt; You need at least ${JDKPathPanel.minVersion} version of Java JDK.&lt;/p&gt;&lt;/html&gt;"/>
+
+
+
+ </langpack>
