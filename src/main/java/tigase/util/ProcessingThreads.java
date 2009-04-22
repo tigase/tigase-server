@@ -117,7 +117,11 @@ public class ProcessingThreads<E extends WorkerThread> {
 				++counters;
 			}
 		}
-		return average/counters;
+		if (counters > 0) {
+			return average / counters;
+		} else {
+			return 0;
+		}
 	}
 
 	public boolean addItem(Packet packet, XMPPResourceConnection conn) {
