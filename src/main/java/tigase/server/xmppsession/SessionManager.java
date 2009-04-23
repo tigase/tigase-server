@@ -1426,7 +1426,7 @@ public class SessionManager extends AbstractMessageReceiver
 				//connection.setAnonymousPeers(anon_peers);
 				connectionsByFrom.put(item.packet.getFrom(), item.conn);
 				authenticationWatchdog.schedule(new AuthenticationTimer(item.packet.getFrom()),
-								MINUTE);
+								2*MINUTE);
 			} else {
 				if (log.isLoggable(Level.FINEST)) {
 					log.finest("Stream opened for existing session, authorized: "
