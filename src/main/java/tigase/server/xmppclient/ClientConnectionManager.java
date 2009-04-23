@@ -494,7 +494,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 		public void timeOutExpired(Packet packet) {
 			// Ups, doesn't look good, the server is either oveloaded or lost
 			// a packet.
-			log.warning("No response within time limit received for a packet: " +
+			log.info("No response within time limit received for a packet: " +
 							packet.toString());
 			addOutPacketWithTimeout(packet, stoppedHandler, 60l, TimeUnit.SECONDS);
 		}
@@ -516,7 +516,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 			// If we still haven't received confirmation from the SM then
 			// the packet either has been lost or the server is overloaded
 			// In either case we disconnect the connection.
-			log.warning("No response within time limit received for a packet: " +
+			log.info("No response within time limit received for a packet: " +
 							packet.toString());
 			XMPPIOService serv = getXMPPIOService(packet.getFrom());
 			if (serv != null) {
