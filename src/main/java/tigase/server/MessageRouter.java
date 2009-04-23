@@ -638,6 +638,10 @@ public class MessageRouter extends AbstractMessageReceiver {
 			results.offer(packet.okResult(query, 0));
 	}
 
+	@Override
+	public int processingThreads() {
+		return 4;
+	}
 
 	public Element getDiscoInfo(String node, String jid) {
 		Element query = serviceEntity.getDiscoInfo(null);

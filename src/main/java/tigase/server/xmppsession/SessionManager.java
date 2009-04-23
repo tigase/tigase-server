@@ -480,6 +480,10 @@ public class SessionManager extends AbstractMessageReceiver
 			res.setPermissions(perms);
 		}
 	}
+	@Override
+	public int processingThreads() {
+		return 4;
+	}
 
 	private boolean isAdmin(String jid) {
 		for (String adm: admins) {
