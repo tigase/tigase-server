@@ -185,7 +185,7 @@ public class SessionManager extends AbstractMessageReceiver
 					if (!"session-id-sess-man".equals(xrc.getSessionId())) {
 						if (currentTime - xrc.getLastAccessed() > maxIdleTime && currentTime - xrc.getCreationTime() > reaperInterval) {
 							if (log.isLoggable(Level.WARNING)) {
-								log.warning("Logging out " + xrc.getSessionId() + " after >" + (maxIdleTime/1000) + " seconds of inactivity");
+								log.info("Logging out " + xrc.getSessionId() + " after >" + (maxIdleTime/1000) + " seconds of inactivity");
 							}
 							try {
 								xrc.logout();
@@ -482,7 +482,7 @@ public class SessionManager extends AbstractMessageReceiver
 	}
 	@Override
 	public int processingThreads() {
-		return 4;
+		return 8;
 	}
 
 	private boolean isAdmin(String jid) {
@@ -1480,7 +1480,6 @@ public class SessionManager extends AbstractMessageReceiver
 		public void process(QueueItem item) {
 			try {
 				if (item.conn != null) {
-					// Not sure if this synchronization is needed at all
 					processor.process(item.packet, item.conn, naUserRepository,
 									local_results, plugin_config.get(processor.id()));
 					setPermissions(item.conn, local_results);
