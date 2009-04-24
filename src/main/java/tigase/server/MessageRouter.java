@@ -640,7 +640,7 @@ public class MessageRouter extends AbstractMessageReceiver {
 
 	@Override
 	public int processingThreads() {
-		return 4;
+		return 8;
 	}
 
 	public Element getDiscoInfo(String node, String jid) {
