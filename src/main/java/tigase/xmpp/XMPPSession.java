@@ -23,9 +23,9 @@ package tigase.xmpp;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 import java.util.logging.Level;
@@ -63,7 +63,7 @@ public class XMPPSession {
 	 * @param username
 	 */
 	public XMPPSession(final String username) {
-		sessionData = new LinkedHashMap<String, Object>();
+		sessionData = new ConcurrentHashMap<String, Object>();
 		activeResources = new CopyOnWriteArrayList<XMPPResourceConnection>();
 		this.username = username;
 		this.creationTime = System.currentTimeMillis();

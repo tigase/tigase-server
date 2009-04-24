@@ -21,9 +21,9 @@
  */
 package tigase.xmpp;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import tigase.util.JIDUtils;
@@ -111,10 +111,12 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	public XMPPResourceConnection(String connectionId, UserRepository rep,
 		UserAuthRepository authRepo, SessionManagerHandler loginHandler, boolean anon_allowed) {
 		super(rep, authRepo, anon_allowed);
+		long currTime = System.currentTimeMillis();
 		this.connectionId = connectionId;
 		this.loginHandler = loginHandler;
-		this.creationTime = System.currentTimeMillis();
-    sessionData = new LinkedHashMap<String, Object>(4, 0.9f);
+		this.creationTime = currTime;
+		this.lastAccessed = currTime;
+    sessionData = new ConcurrentHashMap<String, Object>(4, 0.9f);
 	}
 
 	public boolean isLocalDomain(String outDomain, boolean includeComponents) {
