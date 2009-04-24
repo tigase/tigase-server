@@ -482,7 +482,7 @@ public class SessionManager extends AbstractMessageReceiver
 	}
 	@Override
 	public int processingThreads() {
-		return 8;
+		return Runtime.getRuntime().availableProcessors();
 	}
 
 	private boolean isAdmin(String jid) {

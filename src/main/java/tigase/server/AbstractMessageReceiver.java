@@ -389,7 +389,7 @@ public abstract class AbstractMessageReceiver
 
   public void setMaxQueueSize(int maxQueueSize) {
 		if (this.maxQueueSize != maxQueueSize || in_queues.size() == 0) {
-      this.maxQueueSize = maxQueueSize;
+      this.maxQueueSize = maxQueueSize/processingThreads();
 			if (in_queues.size() == 0) {
 				for (int i = 0; i < in_queues_size; i++) {
 					in_queues.add(new PriorityQueue<Packet>(pr_cache.length, maxQueueSize));
