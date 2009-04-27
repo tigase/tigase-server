@@ -208,7 +208,7 @@ public abstract class Presence {
 				// If the buddy is already online send just initial presence
 				// otherwise send probe.
 				if (onlineJids.contains(buddy)) {
-					sendPresence(null, buddy, session.getUserId(), results, presOnline);
+					sendPresence(null, buddy, session.getJID(), results, presOnline);
 				} else {
 					sendPresence(null, buddy, session.getUserId(), results, presProbe);
 				}
@@ -700,8 +700,8 @@ public abstract class Presence {
 								for (XMPPResourceConnection conn : session.getActiveSessions()) {
 									Element pres = (Element) conn.getSessionData(PRESENCE_KEY);
 									if (pres != null) {
-										sendPresence(null, packet.getElemFrom(), conn.getJID(),
-														results, pres);
+										sendPresence(null, JIDUtils.getNodeID(packet.getElemFrom()),
+														conn.getJID(), results, pres);
 										if (log.isLoggable(Level.FINEST)) {
 											log.finest("Received presence from a new buddy, sending presence to: " +
 															packet.getElemFrom());
@@ -836,8 +836,8 @@ public abstract class Presence {
 							for (XMPPResourceConnection conn : session.getActiveSessions()) {
 								Element pres = (Element) conn.getSessionData(PRESENCE_KEY);
 								if (pres != null) {
-									sendPresence(null, packet.getElemFrom(), conn.getJID(),
-													results, pres);
+									sendPresence(null, JIDUtils.getNodeID(packet.getElemFrom()),
+													conn.getJID(), results, pres);
 									if (log.isLoggable(Level.FINEST)) {
 										log.finest("Received probe, sending presence response to: " +
 														packet.getElemFrom());
