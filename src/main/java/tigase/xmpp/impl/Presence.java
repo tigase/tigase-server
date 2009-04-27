@@ -192,6 +192,9 @@ public abstract class Presence {
 	protected static void broadcastProbe(final XMPPResourceConnection session,
 					final Queue<Packet> results, final Map<String, Object> settings)
 					throws NotAuthorizedException, TigaseDBException {
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Broadcasting probes for: " + session.getUserId());
+		}
 		Element presOnline = (Element) session.getSessionData(PRESENCE_KEY);
 		if (presOnline == null) {
 			presOnline = new Element(PRESENCE_ELEMENT_NAME);
@@ -199,7 +202,7 @@ public abstract class Presence {
 			presOnline.setXMLNS(XMLNS);
 		}
 		Element presProbe = presOnline.clone();
-		presOnline.setAttribute("type", StanzaType.probe.toString());
+		presProbe.setAttribute("type", StanzaType.probe.toString());
 		String[] buddies = roster_util.getBuddies(session, TO_SUBSCRIBED, false);
 		buddies = DynamicRoster.addBuddies(session, settings, buddies);
 		if (buddies != null) {
@@ -208,8 +211,14 @@ public abstract class Presence {
 				// If the buddy is already online send just initial presence
 				// otherwise send probe.
 				if (onlineJids.contains(buddy)) {
+					if (log.isLoggable(Level.FINEST)) {
+						log.finest("Buddy is online, sending initial: " + buddy);
+					}
 					sendPresence(null, buddy, session.getJID(), results, presOnline);
 				} else {
+					if (log.isLoggable(Level.FINEST)) {
+						log.finest("Buddy is offline, sending probe: " + buddy);
+					}
 					sendPresence(null, buddy, session.getUserId(), results, presProbe);
 				}
 			} // end of for (String buddy: buddies)
