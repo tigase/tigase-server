@@ -1369,6 +1369,23 @@ public class SessionManager extends AbstractMessageReceiver
 							sessionCloseThread.getDroppedPackets(),
 							Level.FINEST));
 		}
+		if (sessionOpenThread.getTotalQueueSize() > 0 || sessionOpenThread.getDroppedPackets() > 0) {
+			stats.add(new StatRecord(getName(), "Processor: " +
+							sessionOpenThread.getName(),
+							"String", "Queue: " + sessionOpenThread.getTotalQueueSize() +
+							", AvTime: " + sessionOpenThread.getAverageProcessingTime() +
+							", Runs: " + sessionOpenThread.getTotalRuns() + ", Lost: " +
+							sessionOpenThread.getDroppedPackets(),
+							Level.INFO));
+		} else {
+			stats.add(new StatRecord(getName(), "Processor: " +
+							sessionOpenThread.getName(),
+							"String", "Queue: " + sessionOpenThread.getTotalQueueSize() +
+							", AvTime: " + sessionOpenThread.getAverageProcessingTime() +
+							", Runs: " + sessionOpenThread.getTotalRuns() + ", Lost: " +
+							sessionOpenThread.getDroppedPackets(),
+							Level.FINEST));
+		}
 		return stats;
 	}
 
