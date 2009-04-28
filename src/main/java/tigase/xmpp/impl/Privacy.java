@@ -112,7 +112,7 @@ public class Privacy {
 			Element list = getList(session, lName);
 			session.putCommonSessionData(ACTIVE, list);
 		} else {
-			session.putCommonSessionData(ACTIVE, null);
+			session.removeCommonSessionData(ACTIVE);
 		}
 	}
 

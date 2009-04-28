@@ -294,4 +294,8 @@ public class XMPPSession {
 		sessionData.put(key, value);
 	}
 
+	Object removeCommonSessionData(String key) {
+		return sessionData.remove(key);
+	}
+
 } // XMPPSession

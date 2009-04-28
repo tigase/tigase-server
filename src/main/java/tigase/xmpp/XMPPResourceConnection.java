@@ -139,6 +139,11 @@ public class XMPPResourceConnection extends RepositoryAccess {
 			parentSession.getCommonSessionData(key);
 	}
 
+	public Object removeCommonSessionData(String key) {
+		return parentSession == null ? null :
+			parentSession.removeCommonSessionData(key);
+	}
+
 	public void setConnectionStatus(ConnectionStatus status) {
 		connectionStatus = status;
 	}
