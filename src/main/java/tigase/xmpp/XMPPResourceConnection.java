@@ -437,6 +437,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 		return auth_res;
 	}
 
+	@Override
   public final Authorization loginPlain(String user, String password)
 		throws NotAuthorizedException, AuthorizationException, TigaseDBException {
 		Authorization result = super.loginPlain(user, password);
@@ -446,6 +447,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 		return result;
 	}
 
+	@Override
   public final Authorization loginDigest(String user, String digest,
 		String id, String alg)
 		throws NotAuthorizedException, AuthorizationException, TigaseDBException {
@@ -456,6 +458,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 		return result;
 	}
 
+	@Override
   public final Authorization loginOther(Map<String, Object> props)
 		throws NotAuthorizedException, AuthorizationException, TigaseDBException {
 		Authorization result = super.loginOther(props);
@@ -485,6 +488,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 		return "tig" + (++id_counter);
 	}
 
+	@Override
 	public void queryAuth(Map<String, Object> authProps) {
 		super.queryAuth(authProps);
 	}
