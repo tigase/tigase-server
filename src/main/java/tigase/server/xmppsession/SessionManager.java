@@ -163,6 +163,8 @@ public class SessionManager extends AbstractMessageReceiver
 	private ServiceEntity serviceEntity = null;
 //	private ServiceEntity adminDisco = null;
 
+	private int maxUserSessions = 0;
+	private long totalUserSessions = 0;
 	private long closedConnections = 0;
 	private long authTimeouts = 0;
 	private int maxPluginsNo = 0;
@@ -1227,8 +1229,12 @@ public class SessionManager extends AbstractMessageReceiver
 	protected void registerNewSession(String userId, XMPPResourceConnection conn) {
 		XMPPSession session = sessionsByNodeId.get(userId);
 		if (session == null) {
+			++totalUserSessions;
 			session = new XMPPSession(JIDUtils.getNodeNick(userId));
 			sessionsByNodeId.put(userId, session);
+			if (sessionsByNodeId.size() > maxUserSessions) {
+				maxUserSessions = sessionsByNodeId.size();
+			}
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("Created new XMPPSession for: " + userId);
 			}
@@ -1329,6 +1335,10 @@ public class SessionManager extends AbstractMessageReceiver
 				sessionsByNodeId.size(), Level.INFO));
 		stats.add(new StatRecord(getName(), "Closed connections", "long",
 				closedConnections, Level.FINER));
+		stats.add(new StatRecord(getName(), "Maximum number of open sessions", "int",
+				maxUserSessions, Level.INFO));
+		stats.add(new StatRecord(getName(), "Total number of user sessions", "long",
+				totalUserSessions, Level.FINER));
 		if (authTimeouts > 0) {
 			stats.add(new StatRecord(getName(), "Authentication timouts", "long",
 							authTimeouts, Level.INFO));
