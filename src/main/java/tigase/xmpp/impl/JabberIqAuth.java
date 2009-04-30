@@ -95,7 +95,7 @@ public class JabberIqAuth extends XMPPProcessor
 
 	@Override
 	public int concurrentQueuesNo() {
-		return Runtime.getRuntime().availableProcessors() / 2;
+		return 1 + Runtime.getRuntime().availableProcessors() / 2;
 	}
 
 	@Override
