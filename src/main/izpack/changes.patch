@@ -157,10 +157,10 @@ index 60e52dc..ba14e23 100644
      </target>
 diff --git a/src/lib/com/izforge/izpack/installer/ConsoleHelper.java b/src/lib/com/izforge/izpack/installer/ConsoleHelper.java
 new file mode 100644
-index 0000000..5f6531b
+index 0000000..ba8f164
 --- /dev/null
 +++ b/src/lib/com/izforge/izpack/installer/ConsoleHelper.java
-@@ -0,0 +1,100 @@
+@@ -0,0 +1,168 @@
 +package com.izforge.izpack.installer;
 +
 +import java.io.BufferedReader;
@@ -199,7 +199,19 @@ index 0000000..5f6531b
 +	}
 +	
 +	public void displayPrompt(String prompt) {
-+		System.out.print(prompt + ": ");
++		
++		// cut : or :SPACE suffix
++		String[] suffixesToCut = { ":", ": " };
++		String newPrompt = prompt;
++		for (String suffix : suffixesToCut) {
++			if (newPrompt.endsWith(suffix)) 
++			{
++				int endIndex = newPrompt.length()-suffix.length();
++				newPrompt = newPrompt.substring(0, endIndex);
++			}
++		}
++		
++		System.out.print(newPrompt + ": ");
 +	}
 +
 +	public <T> T readUntilValid(
@@ -259,7 +271,63 @@ index 0000000..5f6531b
 +				return Option.full(number);
 +			}
 +		});
++	}
++
++	public void displayEmptyLine() {
++		System.out.println();
++		
++	}
++
++	private interface IPasswordReader {
++		String getPassword(String prompt) throws IOException;
++	}
++	private IPasswordReader passwordReader = null;
++
++	private IPasswordReader getPasswordReader() 
++	{
++		if (passwordReader == null)  // create only once
++		{
++// doesn't seem to work for me anyway :/
++//			if (System.console() != null) 
++//			{
++//				// java 6 passwords support
++//				passwordReader = new IPasswordReader() 
++//				{
++//					public String getPassword(String prompt) throws IOException 
++//					{
++//						displayPrompt(prompt);
++//						char[] pwd = System.console().readPassword(); 
++//						return pwd == null ? null : pwd.toString();
++//					}
++//				};
++//			} 
++//			else 
++//			{
++				// fall back to display password on console :(
++				passwordReader = new IPasswordReader() 
++				{
++					public String getPassword(String prompt) throws IOException 
++					{
++						System.out.println("WARNING: password will be visible while entering");
++						displayPrompt(prompt);
++						return systemInAsReader().readLine();
++					}
++				};
++//			}
++		}
++		return passwordReader;
++	}
++	
++	public String askForPassword(String prompt) 
++	throws IOException 
++	{
++		return getPasswordReader().getPassword(prompt);
++	}
++
++	public void displayMessage(String msg) {
++		System.out.println(msg);
 +	}	
++	
 +}
 \ No newline at end of file
 diff --git a/src/lib/com/izforge/izpack/installer/ConsoleInstallHelper.java b/src/lib/com/izforge/izpack/installer/ConsoleInstallHelper.java
@@ -325,10 +393,10 @@ index 0000000..e9284c1
 +}
 diff --git a/src/lib/com/izforge/izpack/installer/ConsoleMenu.java b/src/lib/com/izforge/izpack/installer/ConsoleMenu.java
 new file mode 100644
-index 0000000..e0fb163
+index 0000000..da3246c
 --- /dev/null
 +++ b/src/lib/com/izforge/izpack/installer/ConsoleMenu.java
-@@ -0,0 +1,114 @@
+@@ -0,0 +1,116 @@
 +package com.izforge.izpack.installer;
 +
 +import java.io.IOException;
@@ -337,7 +405,7 @@ index 0000000..e0fb163
 +
 +public abstract class ConsoleMenu {
 +	private final ConsoleHelper console;
-+	private boolean finished = false;
++	private boolean done = false;
 +	
 +	public ConsoleMenu(ConsoleHelper console) {
 +		this.console = console;
@@ -346,17 +414,18 @@ index 0000000..e0fb163
 +	public void run() 
 +	throws IOException 
 +	{
-+		while (isFinished() == false) 
++		while (isDone() == false) 
 +		{
-+			displayMenu();
++			displayMenu();			
++			console.displayEmptyLine();
 +			console.displayPrompt("Choose action");
 +			String userChoice = console.systemInAsReader().readLine();
 +			runAction(userChoice);
 +		}
 +	}
 +
-+	public boolean isFinished() {
-+		return finished;
++	public boolean isDone() {
++		return done;
 +	}
 +
 +	protected abstract List<IConsoleMenuItem> getMenuItems();
@@ -371,12 +440,12 @@ index 0000000..e0fb163
 +		}
 +	};
 +
-+	private IConsoleMenuItem finishMenuItem = new IConsoleMenuItem() {
++	private IConsoleMenuItem doneMenuItem = new IConsoleMenuItem() {
 +		public String renderToString() {
-+			return "Finish";
++			return "Done";
 +		}
 +		public void runAction() {
-+			finished = true;
++			done = true;
 +		}
 +	};
 +
@@ -399,15 +468,16 @@ index 0000000..e0fb163
 +		List<IConsoleMenuItem> items = getMenuItems();
 +		console.displayLabel("------");
 +		console.displayLabel(getHeader());
++		console.displayEmptyLine();
++		
 +		for (int i = 0 ; i < items.size() ; i++) {
 +			IConsoleMenuItem item = items.get(i);
 +			displayItem(item, "" + (i+1));
 +		}
 +		displayItem(redisplayMenuItem, "r");
-+		displayItem(finishMenuItem, "f");
++		displayItem(doneMenuItem, "d");
 +	}
 +
-+	// by default run command by number, feel free to override
 +	void runAction(String cmd) {
 +		
 +		List<? extends IConsoleMenuItem> menuItems = getMenuItems();
@@ -430,9 +500,9 @@ index 0000000..e0fb163
 +		{
 +			chosenAction = redisplayMenuItem;
 +		} 
-+		else if ("f".equals(cmd)) 
++		else if ("d".equals(cmd)) 
 +		{
-+			chosenAction = finishMenuItem;
++			chosenAction = doneMenuItem;
 +		} else 
 +		{
 +			chosenAction = invalidActionMenuItem;
@@ -584,21 +654,20 @@ index 0000000..f3abcae
 +	}
 +}
 diff --git a/src/lib/com/izforge/izpack/installer/PanelConsoleHelper.java b/src/lib/com/izforge/izpack/installer/PanelConsoleHelper.java
-index b6d9daa..7810bb9 100644
+index b6d9daa..053c035 100644
 --- a/src/lib/com/izforge/izpack/installer/PanelConsoleHelper.java
 +++ b/src/lib/com/izforge/izpack/installer/PanelConsoleHelper.java
-@@ -24,6 +24,10 @@ import java.io.BufferedReader;
+@@ -24,6 +24,9 @@ import java.io.BufferedReader;
  import java.io.IOException;
  import java.io.InputStreamReader;
  
-+import com.izforge.izpack.LocaleDatabase;
 +import com.izforge.izpack.Panel;
 +import com.izforge.izpack.util.VariableSubstitutor;
 +
  /**
   * Abstract class implementing basic functions needed by all panel console helpers.
   * 
-@@ -32,9 +36,9 @@ import java.io.InputStreamReader;
+@@ -32,9 +35,9 @@ import java.io.InputStreamReader;
  abstract public class PanelConsoleHelper 
  {
  
@@ -610,7 +679,7 @@ index b6d9daa..7810bb9 100644
      {
          try
          {
-@@ -45,13 +49,15 @@ abstract public class PanelConsoleHelper
+@@ -45,13 +48,15 @@ abstract public class PanelConsoleHelper
                  String strIn = br.readLine();
                  if (strIn.equals("1"))
                  {
@@ -629,7 +698,7 @@ index b6d9daa..7810bb9 100644
              }
  
          }
-@@ -59,7 +65,94 @@ abstract public class PanelConsoleHelper
+@@ -59,7 +64,94 @@ abstract public class PanelConsoleHelper
          {
              e.printStackTrace();
          }
@@ -846,10 +915,10 @@ index 8a14d89..a47d3ff 100644
      /**
 diff --git a/src/lib/com/izforge/izpack/panels/HTMLInfoPanelConsoleHelper.java b/src/lib/com/izforge/izpack/panels/HTMLInfoPanelConsoleHelper.java
 new file mode 100644
-index 0000000..1b4c9d6
+index 0000000..aac6d9a
 --- /dev/null
 +++ b/src/lib/com/izforge/izpack/panels/HTMLInfoPanelConsoleHelper.java
-@@ -0,0 +1,61 @@
+@@ -0,0 +1,63 @@
 +package com.izforge.izpack.panels;
 +
 +import java.io.IOException;
@@ -886,10 +955,12 @@ index 0000000..1b4c9d6
 +			helper.pager.displayLongText(info);
 +		}
 +		catch (ResourceNotFoundException re) {
-+			throw new RuntimeException("Error locating resource", re);
++			re.printStackTrace();
++			return false;
 +		}
 +		catch (IOException ioe) {
-+			throw new RuntimeException("Unexpected I/O exception", ioe);	
++			ioe.printStackTrace();
++			return false;
 +		}
 +				
 +		return continueQuitOrReboot(installData, this);
@@ -913,10 +984,10 @@ index 0000000..1b4c9d6
 +}
 diff --git a/src/lib/com/izforge/izpack/panels/HTMLLicencePanelConsoleHelper.java b/src/lib/com/izforge/izpack/panels/HTMLLicencePanelConsoleHelper.java
 new file mode 100644
-index 0000000..43f143c
+index 0000000..c3e994c
 --- /dev/null
 +++ b/src/lib/com/izforge/izpack/panels/HTMLLicencePanelConsoleHelper.java
-@@ -0,0 +1,67 @@
+@@ -0,0 +1,69 @@
 +package com.izforge.izpack.panels;
 +
 +import java.io.IOException;
@@ -962,10 +1033,12 @@ index 0000000..43f143c
 +			
 +		}
 +		catch (ResourceNotFoundException re) {
-+			throw new RuntimeException("Error locating resource", re);
++			re.printStackTrace();
++			return false;
 +		}
 +		catch (IOException ioe) {
-+			throw new RuntimeException("Unexpected I/O exception", ioe);	
++			ioe.printStackTrace();
++			return false;
 +		}
 +		
 +		// should be unreachable
@@ -1218,10 +1291,10 @@ index 0000000..2b9b45f
 +
 diff --git a/src/lib/com/izforge/izpack/panels/PathInputPanelConsoleHelper.java b/src/lib/com/izforge/izpack/panels/PathInputPanelConsoleHelper.java
 new file mode 100644
-index 0000000..4be8dd1
+index 0000000..cfc0dd8
 --- /dev/null
 +++ b/src/lib/com/izforge/izpack/panels/PathInputPanelConsoleHelper.java
-@@ -0,0 +1,67 @@
+@@ -0,0 +1,68 @@
 +package com.izforge.izpack.panels;
 +
 +import java.io.File;
@@ -1268,7 +1341,8 @@ index 0000000..4be8dd1
 +			onResult(inputPath, installData);
 +		}
 +		catch (IOException ioe) {
-+			throw new RuntimeException("Unexpected I/O exception", ioe);	
++			ioe.printStackTrace();
++			return false;
 +		}
 +		
 +		return true;
@@ -1315,7 +1389,7 @@ index 964eec9..a3f0d85 100644
      }
  }
 diff --git a/src/lib/com/izforge/izpack/panels/UserInputPanelConsoleHelper.java b/src/lib/com/izforge/izpack/panels/UserInputPanelConsoleHelper.java
-index ca9a659..714aa19 100644
+index ca9a659..1245897 100644
 --- a/src/lib/com/izforge/izpack/panels/UserInputPanelConsoleHelper.java
 +++ b/src/lib/com/izforge/izpack/panels/UserInputPanelConsoleHelper.java
 @@ -25,6 +25,7 @@ import java.io.IOException;
@@ -1326,24 +1400,16 @@ index ca9a659..714aa19 100644
  import java.util.Iterator;
  import java.util.List;
  import java.util.Properties;
-@@ -33,6 +34,7 @@ import java.util.Vector;
+@@ -33,6 +34,8 @@ import java.util.Vector;
  import com.izforge.izpack.Panel;
  import com.izforge.izpack.adaptator.IXMLElement;
  import com.izforge.izpack.installer.AutomatedInstallData;
++import com.izforge.izpack.installer.ConsoleHelper;
 +import com.izforge.izpack.installer.ConsoleInstallHelper;
  import com.izforge.izpack.installer.PanelConsole;
  import com.izforge.izpack.installer.PanelConsoleHelper;
  import com.izforge.izpack.util.Debug;
-@@ -47,6 +49,8 @@ import com.izforge.izpack.util.VariableSubstitutor;
- public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements PanelConsole
- {
- 
-+	private ConsoleInstallHelper helper = ConsoleInstallHelper.getInstance();
-+	
-     protected int instanceNumber = 0;
- 
-     private static int instanceCount = 0;
-@@ -68,6 +72,8 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
+@@ -68,6 +71,8 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
      private static final String SET = "set";
  
      private static final String TEXT = "txt";
@@ -1352,7 +1418,7 @@ index ca9a659..714aa19 100644
  
      private static final String SPEC = "spec";
  
-@@ -78,7 +84,15 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
+@@ -78,16 +83,28 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
      private static final String COMBO_FIELD = "combo";
  
      private static final String STATIC_TEXT = "staticText";
@@ -1369,7 +1435,11 @@ index ca9a659..714aa19 100644
      private static final String CHOICE = "choice";
  
      private static final String VALUE = "value";
-@@ -88,6 +102,8 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
+ 
+     private static final String RADIO_FIELD = "radio";
++    
++    private static final String PASSWORD_FIELD = "password";
+ 
      private static final String DESCRIPTION = "description";
  
      private static final String TRUE = "true";
@@ -1378,7 +1448,7 @@ index ca9a659..714aa19 100644
  
      public List<Input> listInputs;
  
-@@ -103,7 +119,7 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
+@@ -103,7 +120,7 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
          Iterator<Input> inputIterator = listInputs.iterator();
          while (inputIterator.hasNext())
          {
@@ -1387,7 +1457,7 @@ index ca9a659..714aa19 100644
              String strVariableValue = p.getProperty(strVariableName);
              if (strVariableValue != null)
              {
-@@ -120,7 +136,7 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
+@@ -120,7 +137,7 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
          Iterator<Input> inputIterator = listInputs.iterator();
          while (inputIterator.hasNext())
          {
@@ -1396,7 +1466,7 @@ index ca9a659..714aa19 100644
          }
          return true;
      }
-@@ -133,37 +149,14 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
+@@ -133,37 +150,14 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
          while (inputsIterator.hasNext())
          {
              Input input = inputsIterator.next();
@@ -1440,7 +1510,11 @@ index ca9a659..714aa19 100644
      }
  
      public boolean collectInputs(AutomatedInstallData idata)
-@@ -218,144 +211,6 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
+@@ -215,147 +209,10 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
+             }
+             listInputs.add(getInputFromField(field));
+         }
++        
          return true;
      }
  
@@ -1585,7 +1659,7 @@ index ca9a659..714aa19 100644
  
      public Input getInputFromField(IXMLElement field)
      {
-@@ -365,11 +220,10 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
+@@ -365,11 +222,10 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
          {
              String strText = null;
              strText = field.getAttribute(TEXT);
@@ -1598,18 +1672,40 @@ index ca9a659..714aa19 100644
              String strFieldText = null;
              String strSet = null;
              String strText = null;
-@@ -384,8 +238,8 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
+@@ -384,9 +240,29 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
              {
                  strFieldText = description.getAttribute(TEXT);
              }
 -            choicesList.add(new Choice(strText, null, strSet));
 -            return new Input(strVariableName, strSet, choicesList, TEXT_FIELD, strFieldText, 0);
+-
 +            Choice choice = new Choice(strText, null, strSet);
 +            return new Text(strVariableName, true, strSet, choice, strFieldText);
- 
++        }
++        else if (PASSWORD_FIELD.equals(strFieldType)) {
++            IXMLElement spec = field.getFirstChildNamed(SPEC);
++            String pwd1, pwd2;
++            if (spec != null)
++            {
++            	List<IXMLElement> pwdElements = field.getChildrenNamed("pwd");
++            	if (pwdElements.size() != 2) {
++            		throw new RuntimeException("Currently only two pwd values" +
++            				" are supported in a password field");
++            	}
++            	pwd1 = pwdElements.get(0).getAttribute("txt");
++            	pwd2 = pwdElements.get(1).getAttribute("txt");
++            	if (pwd1 == null || pwd2 == null) {
++            		throw new RuntimeException("Pwd elements need to specify " +
++            				"a text attribute in a password field");
++            	}
++            } else {
++            	throw new RuntimeException("Password field needs specification");
++            }
++            return new Password(strVariableName, pwd1, pwd2);
          }
          else if (COMBO_FIELD.equals(strFieldType) || RADIO_FIELD.equals(strFieldType))
-@@ -409,44 +263,342 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
+         {
+@@ -409,44 +285,384 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
                  choicesList.add(new Choice(choice.getAttribute(TEXT), choice.getAttribute(VALUE),
                          choice.getAttribute(SET)));
              }
@@ -1620,7 +1716,6 @@ index ca9a659..714aa19 100644
 +        } 
 +        else if (CHECK_FIELD.equals(strFieldType))
 +        {
-+        	String strFieldText = "";
 +            Description description = null;
 +            Spec spec = null;
 +        	
@@ -1680,6 +1775,10 @@ index ca9a659..714aa19 100644
 -        String strDefaultValue;
 +    
 +    abstract class Input {
++    	
++    	protected ConsoleInstallHelper helper 
++    		= ConsoleInstallHelper.getInstance();
++    	
 +    	private final String variableName;
 +
 +    	public String getVariableName() {
@@ -1769,6 +1868,7 @@ index ca9a659..714aa19 100644
  
 -        List<Choice> listChoices;
 +            fieldText = (choice == null) ? text  : choice.strText;
++            fieldText = helper.variables.expand(fieldText, idata);
 +            System.out.print(fieldText);
 +            if (doesInput) System.out.print(" [" + set + "] ");
 +            System.out.println();
@@ -1798,6 +1898,43 @@ index ca9a659..714aa19 100644
 +		}
 +    }
 +    
++    class Password extends Input {
++
++		private final String pwd1;
++		private final String pwd2;
++
++		protected Password(String variableName, String pwd1, String pwd2) {
++			super(variableName);
++			this.pwd1 = pwd1;
++			this.pwd2 = pwd2;
++		}
++
++		boolean process(AutomatedInstallData idata) throws IOException {
++			
++			String input1 = null;
++			String input2 = null;
++			
++			while (true) {
++				input1 = helper.console.askForPassword(pwd1);
++				input2 = helper.console.askForPassword(pwd2);
++				
++				if (input1 != null && input1.equals(input2)) 
++				{
++					break; // we have two the same non-null passwords
++				} 
++				else 
++				{
++					helper.console.displayMessage("Please enter two " +
++							"non-empty passwords");
++				}
++			}
++			
++            idata.setVariable(getVariableName(), input1);
++			
++			return true;
++		}
++    }
++    
 +    class StaticText extends Text {
 +    	public StaticText(String strVariableName, String text) {
 +    		super(strVariableName, false, null, null, text);
@@ -1812,7 +1949,8 @@ index ca9a659..714aa19 100644
  
 -        int iSelectedChoice = -1;
 +		boolean process(AutomatedInstallData idata) {
-+			System.out.println("*** " + text);
++			String expandedTxt = helper.variables.expand(text, idata);
++			System.out.println("*** " + expandedTxt);
 +			return true;
 +		}
      }
@@ -1977,7 +2115,7 @@ index ca9a659..714aa19 100644
      {
  
          public Choice(String strText, String strValue, String strSet)
-@@ -457,9 +609,59 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
+@@ -457,9 +673,59 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
          }
  
          String strText;
