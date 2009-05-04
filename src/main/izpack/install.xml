@@ -135,9 +135,15 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 		<res id="HTMLInfoPanel.info" src="package.html"/>
 		<res id="HTMLLicencePanel.licence" src="License.html"/>
 		<res id="TigaseLogo" src="src/main/izpack/resources/pics/tiger.png"/>
+
+		<!--images-->
 		<res id="Installer.image"
 				 src="src/main/izpack/resources/pics/tigase-install-logo.png"/>
 		<res id="Heading.image" src="src/main/izpack/resources/pics/tiger.png"/>
+		<res id="JavaPowered.image" src="src/main/izpack/resources/pics/Java_powered_logo_rgb.png"/>
+		<res id="SolarisReady.image" src="src/main/izpack/resources/pics/solaris_ready.png"/>
+		<res id="Tiger.image" src="src/main/izpack/resources/pics/tiger.png"/>
+
 		<res id="userInputSpec.xml" src="src/main/izpack/userInputSpec.xml" />
 		<res id="packsLang.xml" src="src/main/izpack/resources/packsLang.xml"/>
 		<res id="panelsLangPack.xml" src="src/main/izpack/resources/panelsLangPack.xml"/>
