@@ -7,21 +7,20 @@
  * b. GNU Lesser General Public License v3
  *    http://www.gnu.org/licenses/lgpl-3.0.html
  *
- * Version: 2.2
+ * Version: 2.3
  */
 
 /* Configure here vvv */
-//def tigase_config = "/etc/tigase/tigase.xml"
-def tigase_config = "/home/smoku/tigase-converter/tigase.xml"
+def tigase_config = "/etc/tigase/tigase.xml"
 
-//def source = "jdbc:postgresql://jabberd.db.host/jabberd?user=tigase"
-//def feeder = new jabberd2(source)
+def source = "jdbc:postgresql://jabberd.db.host/jabberd?user=tigase"
+def feeder = new jabberd2(source)
 
 //def source = "jdbc:mysql://localhost/ejabberd?useOldAliasMetadataBehavior=true&user=tigase&password=secret"
 //def feeder = new ejabberd(source)
 
-def source = "jdbc:hsqldb:/var/lib/openfire/embedded-db/openfire"
-def feeder = new OpenFire(source)
+//def source = "jdbc:hsqldb:/var/lib/openfire/embedded-db/openfire"
+//def feeder = new OpenFire(source)
 /* Configure here ^^^ */
 
 

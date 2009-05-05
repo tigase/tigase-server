@@ -53,7 +53,7 @@ wrap_tag('KEY',wrap_tag('TYPE',"key-type")||wrap_tag('CRED',"key-cred")) ||
 FROM vcard WHERE "collection-owner" = ?''',
 	privacylists: 'SELECT DISTINCT list AS name FROM "privacy-items" WHERE "collection-owner" = ?',
 	privacyitems: 'SELECT type,value,deny,"order",block FROM "privacy-items" WHERE "collection-owner" = ? AND list = ?',
-	privacydefault: 'SELECT "default" FROM "privacy-default" WHERE "collection-owner" = ?',
+	privacydefault: 'SELECT "default" AS "name" FROM "privacy-default" WHERE "collection-owner" = ?',
 	privatestorage: 'SELECT ns,xml FROM "private" WHERE "collection-owner" = ?'
 ]
 

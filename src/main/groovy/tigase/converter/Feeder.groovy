@@ -46,13 +46,13 @@ def eachVcard(UID, closure) {
 
 def eachPrivacy(UID, closure) {
 	sql.eachRow(sourceSQL["privacylists"], [UID], {
-		closureList(it.name, it.list)
+		closure(it.name, it.list)
 	})
 }
 
 def setPrivacyDefault(UID, closure) {
 	def prdef = sql.firstRow(sourceSQL["privacydefault"], [UID])
-	if (prdef != null) closure(prdef.default)
+	if (prdef != null) closure(prdef.name)
 }
 
 def eachPrivate(UID, closure) {

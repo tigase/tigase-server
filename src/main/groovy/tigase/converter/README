@@ -9,6 +9,12 @@ Tigase Converter
     http://www.gnu.org/licenses/lgpl-3.0.html
 
 
+* Supported source servers:
+  - jabberd 2.2.x
+  - ejabberd 2.x ODBC
+  - OpenFire 3.6.x
+
+
 * Configuration
   - Edit converter.groovy:
     - enter correct path to tigase.xml

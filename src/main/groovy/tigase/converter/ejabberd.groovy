@@ -23,7 +23,7 @@ mysql: [
 	vCard: 'SELECT vcard FROM vcard WHERE username = ?',
 	privacylists: 'SELECT name,id FROM privacy_list WHERE username = ?',
 	privacyitems: 'SELECT t AS type,value,action,ord AS "order",match_all,match_iq,match_message,match_presence_in,match_presence_out FROM privacy_list_data WHERE id = ?',
-	privacydefault: 'SELECT name AS "default" FROM privacy_default_list WHERE username = ?',
+	privacydefault: 'SELECT name FROM privacy_default_list WHERE username = ?',
 	privatestorage: 'SELECT namespace AS ns, data AS xml FROM private_storage WHERE username = ?'
 ]
 
