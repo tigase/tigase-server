@@ -521,6 +521,16 @@ public class DrupalAuth implements UserAuthRepository {
 		} // end of try-catch
 	}
 
+	@Override
+	public long getUsersCount() {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	@Override
+	public long getUsersCount(String domain) {
+		return 0;
+	}
+
 	private class SaslCallbackHandler implements CallbackHandler {
 
 		private Map<String, Object> options = null;

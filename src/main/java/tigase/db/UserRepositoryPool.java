@@ -374,4 +374,19 @@ public class UserRepositoryPool implements UserRepository {
 		}
 	}
 
+	@Override
+	public long getUsersCount(String domain) {
+		UserRepository repo = takeRepo();
+		if (repo != null) {
+			try {
+				return repo.getUsersCount(domain);
+			} finally {
+				addRepo(repo);
+			}
+		} else {
+			log.warning("repo is NULL, pool empty? - " + repoPool.size());
+		}
+		return 0;
+	}
+
 }

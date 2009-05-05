@@ -21,7 +21,6 @@
  */
 package tigase.db.jdbc;
 
-import java.math.BigDecimal;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
@@ -47,7 +46,6 @@ import javax.security.sasl.SaslException;
 import javax.security.sasl.SaslServer;
 
 import tigase.util.Base64;
-import tigase.auth.SaslPLAIN;
 import tigase.db.AuthorizationException;
 import tigase.db.DBInitException;
 import tigase.db.TigaseDBException;
@@ -495,6 +493,16 @@ public class LibreSourceAuth implements UserAuthRepository {
 		} catch (SaslException e) {
 			throw new AuthorizationException("Sasl exception.", e);
 		} // end of try-catch
+	}
+
+	@Override
+	public long getUsersCount() {
+		return 0;
+	}
+
+	@Override
+	public long getUsersCount(String domain) {
+		return 0;
 	}
 
 	private class SaslCallbackHandler implements CallbackHandler {

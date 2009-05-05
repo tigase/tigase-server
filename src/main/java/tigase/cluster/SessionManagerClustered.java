@@ -81,6 +81,7 @@ public class SessionManagerClustered extends SessionManager
 	private Timer delayedTasks = null;
 	private Set<String> cluster_nodes = new LinkedHashSet<String>();
 	private Set<String> broken_nodes = new LinkedHashSet<String>();
+	private ClusteringStrategyIfc strategy = null;
 	//	private ArrayList<MethodCall> methods = new ArrayList<MethodCall>();
 
 	@SuppressWarnings("unchecked")
@@ -116,7 +117,9 @@ public class SessionManagerClustered extends SessionManager
 					conn.putSessionData(SESSION_PACKETS, packets);
 				}
 				packets.offer(packet);
-				log.finest("Packet put on hold: " + packet.toString());
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("Packet put on hold: " + packet.toString());
+				}
 				return;
 			case REDIRECT:
 				sendPacketRedirect(packet, (String)conn.getSessionData("redirect-to"));

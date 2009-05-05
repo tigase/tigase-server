@@ -34,6 +34,7 @@ import tigase.db.TigaseDBException;
 import tigase.db.UserNotFoundException;
 import tigase.db.AuthorizationException;
 
+import tigase.vhosts.VHostItem;
 import static tigase.db.NonAuthUserRepository.*;
 
 /**
@@ -60,6 +61,7 @@ public abstract class RepositoryAccess {
 
 	private static final String ANONYMOUS_MECH = "ANONYMOUS";
 
+	protected VHostItem domain = null;
 	/**
    * Handle to user repository - permanent data base for storing user data.
    */
@@ -71,7 +73,7 @@ public abstract class RepositoryAccess {
    * It becomes <code>AUTHORIZED</code>
    */
 	private Authorization authState = Authorization.NOT_AUTHORIZED;
-	private boolean anon_allowed = false;
+//	private boolean anon_allowed = false;
 	private boolean is_anonymous = false;
 
 	/**
@@ -82,18 +84,15 @@ public abstract class RepositoryAccess {
 	 * @param auth
 	 * @param anon_allowed
 	 */
-	public RepositoryAccess(UserRepository rep, UserAuthRepository auth,
-		boolean anon_allowed) {
+	public RepositoryAccess(UserRepository rep, UserAuthRepository auth) {
 		repo = rep;
 		authRepo = auth;
-		this.anon_allowed = anon_allowed;
+//		this.anon_allowed = anon_allowed;
 	}
 
 	public abstract String getUserId() throws NotAuthorizedException;
 
 	public abstract String getUserName() throws NotAuthorizedException;
-
-	public abstract String getDomain();
 
 	public Authorization unregister(final String name_param)
 		throws NotAuthorizedException, TigaseDBException {
@@ -135,7 +134,20 @@ public abstract class RepositoryAccess {
       return changeRegistration(user_name, pass_param, email_param);
     }
 
-    if (user_name == null || user_name.equals("")
+		// new user registration, let's check limits...
+		if (!domain.isRegisterEnabled()) {
+			throw new NotAuthorizedException("Registration is now allowed for this domain");
+		}
+
+		if (domain.getMaxUsersNumber() > 0) {
+			long domainUsers = authRepo.getUsersCount(domain.getVhost());
+			if (domainUsers >= domain.getMaxUsersNumber()) {
+				throw new NotAuthorizedException(
+								"Maximum users number for the domain exceeded.");
+			}
+		}
+
+		if (user_name == null || user_name.equals("")
       || pass_param == null || pass_param.equals("")) {
       return Authorization.NOT_ACCEPTABLE;
     }
@@ -189,6 +201,15 @@ public abstract class RepositoryAccess {
 // 			log.log(Level.SEVERE, "Repository access exception.", e);
 		} // end of try-catch
   }
+
+	public void setDomain(final VHostItem domain) {
+		this.domain = domain;
+	}
+
+	public String getDomain() {
+		return domain.getVhost();
+	}
+
 
 	/**
 	 * Gets the value of authState
@@ -257,7 +278,7 @@ public abstract class RepositoryAccess {
 		throws NotAuthorizedException, AuthorizationException, TigaseDBException {
 		try {
 			String mech = (String)props.get(UserAuthRepository.MACHANISM_KEY);
-			if (anon_allowed && mech != null && mech.equals(ANONYMOUS_MECH)) {
+			if (domain.isAnonymousEnabled() && mech != null && mech.equals(ANONYMOUS_MECH)) {
 				is_anonymous = true;
 				props.put(UserAuthRepository.USER_ID_KEY, UUID.randomUUID().toString());
 				authState = Authorization.AUTHORIZED;
@@ -324,7 +345,7 @@ public abstract class RepositoryAccess {
 
 	public void queryAuth(Map<String, Object> authProps) {
 		authRepo.queryAuth(authProps);
-		if (anon_allowed
+		if (domain.isAnonymousEnabled()
 			&& (authProps.get(UserAuthRepository.PROTOCOL_KEY)
 				== UserAuthRepository.PROTOCOL_VAL_SASL)) {
 			String[] auth_mechs =

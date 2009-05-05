@@ -97,6 +97,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	private CallableStatement user_del_sp = null;
 	private CallableStatement node_add_sp = null;
 
+	private PreparedStatement users_domain_count_st = null;
 	private PreparedStatement data_for_node_st = null;
 	private PreparedStatement keys_for_node_st = null;
 	private PreparedStatement nodes_for_node_st = null;
@@ -175,6 +176,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		return result;
 	}
 
+	@Override
 	public boolean userExists(String user) {
 		try {
 			getUserUID(user, false);
@@ -328,6 +330,9 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		query = "{ call TigAddNode(?, ?, ?) }";
 		node_add_sp = conn.prepareCall(query);
 
+		query = "select count(*) from tig_users where user_id like ?";
+		users_domain_count_st = conn.prepareCall(query);
+
 		query = "select pval from " + pairs_tbl
 			+ " where (nid = ?) AND (pkey = ?)";
 		data_for_node_st = conn.prepareStatement(query);
@@ -408,6 +413,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		}
 	}
 
+	@Override
 	public String getResourceUri() { return db_conn; }
 
 	/**
@@ -415,6 +421,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	 *
 	 * @param connection_str a <code>String</code> value
 	 */
+	@Override
 	public void initRepository(final String connection_str,
 		Map<String, String> params) throws DBInitException {
 		db_conn = connection_str;
@@ -437,16 +444,43 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	 *
 	 * @return a <code>long</code> number of user accounts in database.
 	 */
+	@Override
 	public long getUsersCount() {
 		ResultSet rs = null;
 		try {
 			checkConnection();
-			// Load all user count from database
-			rs = users_count_sp.executeQuery();
 			long users = -1;
-			if (rs.next()) {
-				users = rs.getLong(1);
-			} // end of while (rs.next())
+			synchronized (users_count_sp) {
+				// Load all user count from database
+				rs = users_count_sp.executeQuery();
+				if (rs.next()) {
+					users = rs.getLong(1);
+				} // end of while (rs.next())
+			}
+			return users;
+		} catch (SQLException e) {
+			return -1;
+			//throw new TigaseDBException("Problem loading user list from repository", e);
+		} finally {
+			release(null, rs);
+			rs = null;
+		}
+	}
+
+	@Override
+	public long getUsersCount(String domain) {
+		ResultSet rs = null;
+		try {
+			checkConnection();
+			long users = -1;
+			synchronized (users_domain_count_st) {
+				// Load all user count from database
+				users_domain_count_st.setString(1, "%@" + domain);
+				rs = users_domain_count_st.executeQuery();
+				if (rs.next()) {
+					users = rs.getLong(1);
+				} // end of while (rs.next())
+			}
 			return users;
 		} catch (SQLException e) {
 			return -1;
@@ -463,6 +497,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	 *
 	 * @return a <code>List</code> of user IDs from database.
 	 */
+	@Override
 	public List<String> getUsers() throws TigaseDBException {
 		ResultSet rs = null;
 		try {
@@ -558,8 +593,10 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 			query = "delete from " + nodes_tbl + " where uid = " + uid;
 			stmt.executeUpdate(query);
 			// Remove user account from users table
-			user_del_sp.setString(1, user_id);
-			user_del_sp.executeUpdate();
+			synchronized (user_del_sp) {
+				user_del_sp.setString(1, user_id);
+				user_del_sp.executeUpdate();
+			}
 		} catch (SQLException e) {
 			throw new TigaseDBException("Error removing user from repository: "
 				+ query, e);

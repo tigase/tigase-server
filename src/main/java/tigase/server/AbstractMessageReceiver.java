@@ -43,6 +43,7 @@ import tigase.stats.StatisticsContainer;
 import tigase.util.JIDUtils;
 import tigase.util.DNSResolver;
 import tigase.util.PriorityQueue;
+import tigase.vhosts.VHostItem;
 import tigase.vhosts.VHostListener;
 import tigase.vhosts.VHostManagerIfc;
 
@@ -597,6 +598,10 @@ public abstract class AbstractMessageReceiver
 	public boolean isLocalDomainOrComponent(String domain) {
 		return vHostManager != null ? vHostManager.isLocalDomainOrComponent(domain)
 						: false;
+	}
+
+	public VHostItem getVHostItem(String domain) {
+		return vHostManager != null ? vHostManager.getVHostItem(domain) : null;
 	}
 
 //	public Set<String> getRoutings() {

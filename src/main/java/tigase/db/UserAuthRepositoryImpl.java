@@ -81,6 +81,7 @@ public class UserAuthRepositoryImpl implements UserAuthRepository {
 		this.repo = repo;
 	}
 
+	@Override
 	public String getResourceUri() { return repo.getResourceUri(); }
 
 	private String getPassword(final String user)
@@ -95,6 +96,7 @@ public class UserAuthRepositoryImpl implements UserAuthRepository {
 	 *
 	 * @param authProps a <code>Map</code> value
 	 */
+	@Override
 	public void queryAuth(final Map<String, Object> authProps) {
 		String protocol = (String)authProps.get(PROTOCOL_KEY);
 		if (protocol.equals(PROTOCOL_VAL_NONSASL)) {
@@ -111,6 +113,7 @@ public class UserAuthRepositoryImpl implements UserAuthRepository {
 	 * @param string a <code>String</code> value
 	 * @exception DBInitException if an error occurs
 	 */
+	@Override
 	public void initRepository(final String string, Map<String, String> params)
     throws DBInitException { }
 
@@ -123,6 +126,7 @@ public class UserAuthRepositoryImpl implements UserAuthRepository {
 	 * @exception UserNotFoundException if an error occurs
 	 * @exception TigaseDBException if an error occurs
 	 */
+	@Override
 	public boolean plainAuth(final String user, final String password)
 		throws UserNotFoundException, TigaseDBException {
 		String db_password = getPassword(user);
@@ -142,6 +146,7 @@ public class UserAuthRepositoryImpl implements UserAuthRepository {
 	 * @exception TigaseDBException if an error occurs
 	 * @exception AuthorizationException if an error occurs
 	 */
+	@Override
 	public boolean digestAuth(final String user, final String digest,
 		final String id, final String alg)
 		throws UserNotFoundException, TigaseDBException, AuthorizationException {
@@ -167,6 +172,7 @@ public class UserAuthRepositoryImpl implements UserAuthRepository {
 	 * @exception TigaseDBException if an error occurs
 	 * @exception AuthorizationException if an error occurs
 	 */
+	@Override
 	public boolean otherAuth(final Map<String, Object> props)
 		throws UserNotFoundException, TigaseDBException, AuthorizationException {
 		String proto = (String)props.get(PROTOCOL_KEY);
@@ -176,6 +182,7 @@ public class UserAuthRepositoryImpl implements UserAuthRepository {
 		throw new AuthorizationException("Protocol is not supported.");
 	}
 
+	@Override
 	public void logout(final String user) {}
 
 	/**
@@ -186,6 +193,7 @@ public class UserAuthRepositoryImpl implements UserAuthRepository {
 	 * @exception UserExistsException if an error occurs
 	 * @exception TigaseDBException if an error occurs
 	 */
+	@Override
 	public void addUser(final String user, final String password)
 		throws UserExistsException, TigaseDBException {
 		repo.addUser(user);
@@ -202,6 +210,7 @@ public class UserAuthRepositoryImpl implements UserAuthRepository {
 	 * @exception UserExistsException if an error occurs
 	 * @exception TigaseDBException if an error occurs
 	 */
+	@Override
 	public void updatePassword(final String user, final String password)
 		throws TigaseDBException {
 		repo.setData(user, PASSWORD_KEY, password);
@@ -214,6 +223,7 @@ public class UserAuthRepositoryImpl implements UserAuthRepository {
 	 * @exception UserNotFoundException if an error occurs
 	 * @exception TigaseDBException if an error occurs
 	 */
+	@Override
 	public void removeUser(final String user)
 		throws UserNotFoundException, TigaseDBException {
 		repo.removeUser(user);
@@ -255,6 +265,16 @@ public class UserAuthRepositoryImpl implements UserAuthRepository {
 		} // end of try-catch
 	}
 
+	@Override
+	public long getUsersCount() {
+		return repo.getUsersCount();
+	}
+
+	@Override
+	public long getUsersCount(String domain) {
+		return repo.getUsersCount(domain);
+	}
+
 	private class SaslCallbackHandler implements CallbackHandler {
 
 		private Map<String, Object> options = null;
@@ -271,6 +291,7 @@ public class UserAuthRepositoryImpl implements UserAuthRepository {
 		 * @exception IOException if an error occurs
 		 * @exception UnsupportedCallbackException if an error occurs
 		 */
+		@Override
 		public void handle(final Callback[] callbacks)
 			throws IOException, UnsupportedCallbackException {
 

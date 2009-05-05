@@ -89,4 +89,6 @@ public interface VHostManagerIfc {
 	 */
 	ServerComponent[] getComponentsForNonLocalDomain(String domain);
 
+	VHostItem getVHostItem(String domain);
+
 }

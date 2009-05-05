@@ -291,4 +291,9 @@ public class DummyRepository implements UserRepository {
 	public void addDataList(String user, String subnode, String key, String[] list) {
 	}
 
+	@Override
+	public long getUsersCount(String domain) {
+		return 0;
+	}
+
 }

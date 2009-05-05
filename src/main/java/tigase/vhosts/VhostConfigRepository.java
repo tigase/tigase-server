@@ -23,9 +23,12 @@
 package tigase.vhosts;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import java.util.Set;
 import java.util.logging.Logger;
 import tigase.util.DNSResolver;
 import static tigase.conf.Configurable.*;
@@ -60,10 +63,14 @@ public class VhostConfigRepository implements VHostRepository {
 	@Override
 	public void setProperties(Map<String, Object> properties) {
 		String[] hostnames = (String[]) properties.get(HOSTNAMES_PROP_KEY);
+		String[] anons = (String[]) properties.get(ANONYMOUS_DOMAINS_PROP_KEY);
+		Set<String> anonset = new HashSet<String>();
+		Collections.addAll(anonset, anons);
 		if (hostnames != null && hostnames.length > 0) {
 			vhosts.clear();
 			for (String hostname : hostnames) {
 				VHostItem item = new VHostItem(hostname);
+				item.setAnonymousEnabled(anonset.contains(hostname));
 				vhosts.put(hostname, item);
 			}
 		} else {

@@ -80,11 +80,14 @@ public class TigaseAuth implements UserAuthRepository {
 	private CallableStatement update_pass_plain_pw_sp = null;
 	private CallableStatement user_login_plain_pw_sp = null;
 	private CallableStatement user_logout_sp = null;
+	private CallableStatement users_count_sp = null;
+
 	/**
 	 * Prepared statement for testing whether database connection is still
 	 * working. If not connection to database is recreated.
 	 */
 	private PreparedStatement conn_valid_st = null;
+	private PreparedStatement users_domain_count_st = null;
 
 	/**
 	 * Connection validation helper.
@@ -127,6 +130,13 @@ public class TigaseAuth implements UserAuthRepository {
 
 		query = "{ call TigUserLogout(?) }";
 		user_logout_sp = conn.prepareCall(query);
+
+		query = "{ call TigAllUsersCount() }";
+		users_count_sp = conn.prepareCall(query);
+
+		query = "select count(*) from tig_users where user_id like ?";
+		users_domain_count_st = conn.prepareCall(query);
+
 	}
 
 	/**
@@ -196,6 +206,7 @@ public class TigaseAuth implements UserAuthRepository {
 	 *
 	 * @param authProps a <code>Map</code> value
 	 */
+	@Override
 	public void queryAuth(final Map<String, Object> authProps) {
 		String protocol = (String)authProps.get(PROTOCOL_KEY);
 		if (protocol.equals(PROTOCOL_VAL_NONSASL)) {
@@ -226,6 +237,7 @@ public class TigaseAuth implements UserAuthRepository {
 	 * @param connection_str a <code>String</code> value
 	 * @exception DBInitException if an error occurs
 	 */
+	@Override
 	public void initRepository(final String connection_str,
 		Map<String, String> params) throws DBInitException {
 		db_conn = connection_str;
@@ -241,7 +253,61 @@ public class TigaseAuth implements UserAuthRepository {
 		}
 	}
 
+	@Override
 	public String getResourceUri() { return db_conn; }
+
+	/**
+	 * <code>getUsersCount</code> method is thread safe. It uses local variable
+	 * for storing <code>Statement</code>.
+	 *
+	 * @return a <code>long</code> number of user accounts in database.
+	 */
+	@Override
+	public long getUsersCount() {
+		ResultSet rs = null;
+		try {
+			checkConnection();
+			long users = -1;
+			synchronized (users_count_sp) {
+				// Load all user count from database
+				rs = users_count_sp.executeQuery();
+				if (rs.next()) {
+					users = rs.getLong(1);
+				} // end of while (rs.next())
+			}
+			return users;
+		} catch (SQLException e) {
+			return -1;
+			//throw new TigaseDBException("Problem loading user list from repository", e);
+		} finally {
+			release(null, rs);
+			rs = null;
+		}
+	}
+
+	@Override
+	public long getUsersCount(String domain) {
+		ResultSet rs = null;
+		try {
+			checkConnection();
+			long users = -1;
+			synchronized (users_domain_count_st) {
+				// Load all user count from database
+				users_domain_count_st.setString(1, "%@" + domain);
+				rs = users_domain_count_st.executeQuery();
+				if (rs.next()) {
+					users = rs.getLong(1);
+				} // end of while (rs.next())
+			}
+			return users;
+		} catch (SQLException e) {
+			return -1;
+			//throw new TigaseDBException("Problem loading user list from repository", e);
+		} finally {
+			release(null, rs);
+			rs = null;
+		}
+	}
 
 	/**
 	 * Describe <code>plainAuth</code> method here.
@@ -252,6 +318,7 @@ public class TigaseAuth implements UserAuthRepository {
 	 * @exception UserNotFoundException if an error occurs
 	 * @exception TigaseDBException if an error occurs
 	 */
+	@Override
 	public boolean plainAuth(final String user, final String password)
 		throws UserNotFoundException, TigaseDBException, AuthorizationException {
 		ResultSet rs = null;

@@ -93,8 +93,6 @@ public class SaslAuth extends XMPPProcessor
 
 	@Override
 	public int concurrentThreadsPerQueue() {
-		// Packet processing does matter for roster/presence therefore
-		// we need a single thread for each queue.
 		return 2;
 	}
 

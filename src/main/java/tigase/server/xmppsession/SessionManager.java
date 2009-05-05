@@ -73,6 +73,7 @@ import tigase.util.PriorityQueue;
 import tigase.util.ProcessingThreads;
 import tigase.util.QueueItem;
 import tigase.util.WorkerThread;
+import tigase.vhosts.VHostItem;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.NotAuthorizedException;
@@ -593,8 +594,17 @@ public class SessionManager extends AbstractMessageReceiver
 	protected XMPPResourceConnection createUserSession(String conn_id,
 		String domain, String user_jid) {
 		XMPPResourceConnection connection = new XMPPResourceConnection(conn_id,
-			user_repository, auth_repository, this, false);
-		connection.setDomain(domain);
+			user_repository, auth_repository, this);
+		VHostItem vitem = getVHostItem(domain);
+		if (vitem == null) {
+			// This shouldn't generally happen. Must mean misconfiguration.
+			if (log.isLoggable(Level.INFO)) {
+				log.info("Can't get VHostItem for domain: " + domain +
+								", using default one instead: " + getDefHostName());
+			}
+			vitem = new VHostItem(getDefHostName());
+		}
+		connection.setDomain(vitem.getUnmodifiableVHostItem());
 		// Dummy session ID, we might decide later to set real thing here
 		connection.setSessionId("session-id-"+JIDUtils.getNodeNick(user_jid));
 		//connection.setAnonymousPeers(anon_peers);
@@ -614,10 +624,10 @@ public class SessionManager extends AbstractMessageReceiver
 		return def*10;
 	}
 
-	private boolean isAnonymousEnabled(String domain) {
-		return vHostManager != null ? vHostManager.isAnonymousEnabled(domain) : 
-			false;
-	}
+//	private boolean isAnonymousEnabled(String domain) {
+//		return vHostManager != null ? vHostManager.isAnonymousEnabled(domain) :
+//			false;
+//	}
 
 	protected boolean processCommand(Packet pc) {
 		if (!(pc.getElemTo() == null) &&
@@ -1438,18 +1448,23 @@ public class SessionManager extends AbstractMessageReceiver
 				}
 				final String hostname = Command.getFieldValue(item.packet, "hostname");
 				item.conn = new XMPPResourceConnection(item.packet.getFrom(),
-					user_repository, auth_repository, sm,
-					isAnonymousEnabled(hostname));
+					user_repository, auth_repository, sm);
+				VHostItem vitem = null;
 				if (hostname != null) {
 					if (log.isLoggable(Level.FINEST)) {
 						log.finest("Setting hostname " + hostname
 							+ " for connection: " + item.conn.getConnectionId());
 					}
-					item.conn.setDomain(hostname);
-				} // end of if (hostname != null)
-				else {
-					item.conn.setDomain(getDefHostName());
-				} // end of if (hostname != null) else
+					vitem = getVHostItem(hostname);
+				}
+				if (vitem == null) {
+					if (log.isLoggable(Level.INFO)) {
+						log.info("Can't get VHostItem for domain: " + hostname +
+										", using default one instead: " + getDefHostName());
+					}
+					vitem = new VHostItem(getDefHostName());
+				}
+				item.conn.setDomain(vitem.getUnmodifiableVHostItem());
 				//connection.setAnonymousPeers(anon_peers);
 				connectionsByFrom.put(item.packet.getFrom(), item.conn);
 				authenticationWatchdog.schedule(new AuthenticationTimer(item.packet.getFrom()),

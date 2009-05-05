@@ -32,6 +32,7 @@ import tigase.db.UserAuthRepository;
 import tigase.db.TigaseDBException;
 import tigase.server.xmppsession.SessionManagerHandler;
 import tigase.db.AuthorizationException;
+import tigase.vhosts.VHostItem;
 
 /**
  * Describe class XMPPResourceConnection here.
@@ -73,8 +74,6 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	private long creationTime = 0;
 	private long authenticationTime = 0;
 
-	private String domain = null;
-
 	/**
 	 * This variable is to keep relates XMPPIOService ID only.
 	 */
@@ -109,8 +108,8 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	 * @param anon_allowed
 	 */
 	public XMPPResourceConnection(String connectionId, UserRepository rep,
-		UserAuthRepository authRepo, SessionManagerHandler loginHandler, boolean anon_allowed) {
-		super(rep, authRepo, anon_allowed);
+		UserAuthRepository authRepo, SessionManagerHandler loginHandler) {
+		super(rep, authRepo);
 		long currTime = System.currentTimeMillis();
 		this.connectionId = connectionId;
 		this.loginHandler = loginHandler;
@@ -221,7 +220,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	public void setParentSession(final XMPPSession parent) {
 		this.parentSession = parent;
 		if (parentSession != null) {
-			userId = JIDUtils.getNodeID(parentSession.getUserName(), domain);
+			userId = JIDUtils.getNodeID(parentSession.getUserName(), domain.getVhost());
 			userJid = userId + (resource != null ? ("/" + resource) : "/" + sessionId);
 		}
 	}
@@ -299,14 +298,6 @@ public class XMPPResourceConnection extends RepositoryAccess {
       throw new NotAuthorizedException(NOT_AUTHORIZED_MSG);
     } // end of if (username == null)
 		return parentSession.getJIDs();
-	}
-
-	public void setDomain(final String domain) {
-		this.domain = domain;
-	}
-
-	public String getDomain() {
-		return domain;
 	}
 
 	/**

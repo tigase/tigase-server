@@ -76,6 +76,14 @@ public interface UserRepository {
 	long getUsersCount();
 
 	/**
+	 * This method is only used by the server statistics component to report
+	 * number of registered users for given domain.
+	 * @param domain
+	 * @return a <code>long</code> number of registered users in the repository.
+	 */
+	long getUsersCount(String domain);
+
+	/**
 	 * Method <code>userExists</code> checks whether the user (or repository top node)
 	 * exists in the database. The method doesn't throw any exception nor it creates
 	 * the user in case it is missing. It just checjs wether the user is already

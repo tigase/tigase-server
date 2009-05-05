@@ -201,6 +201,9 @@ public class TigaseCustomAuth implements UserAuthRepository {
 	 * </pre>
 	 */
 	public static final String DEF_USERLOGOUT_KEY = "user-logout-query";
+	public static final String DEF_USERS_COUNT_KEY = "users-count-query";
+	public static final String DEF_USERS_DOMAIN_COUNT_KEY = "" +
+					"users-domain-count-query";
 	/**
 	 * Comma separated list of NON-SASL authentication mechanisms. Possible mechanisms
 	 * are: <code>password</code> and <code>digest</code>. <code>digest</code>
@@ -228,6 +231,10 @@ public class TigaseCustomAuth implements UserAuthRepository {
 	public static final String DEF_USERLOGIN_QUERY
     = "{ call TigUserLoginPlainPw(?, ?) }";
 	public static final String DEF_USERLOGOUT_QUERY = "{ call TigUserLogout(?) }";
+	public static final String DEF_USERS_COUNT_QUERY =
+					"{ call TigAllUsersCount() }";
+	public static final String DEF_USERS_DOMAIN_COUNT_QUERY = "" +
+					"select count(*) from tig_users where user_id like ?";
 
 	public static final String DEF_NONSASL_MECHS = "password";
 	public static final String DEF_SASL_MECHS = "PLAIN";
@@ -241,6 +248,8 @@ public class TigaseCustomAuth implements UserAuthRepository {
 	private String getpassword_query = DEF_GETPASSWORD_QUERY;
 	private String updatepassword_query = DEF_UPDATEPASSWORD_QUERY;
 	private String userlogin_query = DEF_USERLOGIN_QUERY;
+	private String useracount_query = DEF_USERS_COUNT_QUERY;
+	private String userdomaincount_query = DEF_USERS_DOMAIN_COUNT_QUERY;
 	// It is better just to not call the query if it is not defined by the user
 	// By default it is null then and not called.
 	private String userlogout_query = null;
@@ -264,6 +273,8 @@ public class TigaseCustomAuth implements UserAuthRepository {
 	private PreparedStatement update_pass = null;
 	private PreparedStatement user_login = null;
 	private PreparedStatement user_logout = null;
+	private PreparedStatement users_domain_count = null;
+	private PreparedStatement users_count = null;
 	/**
 	 * Prepared statement for testing whether database connection is still
 	 * working. If not connection to database is recreated.
@@ -303,6 +314,8 @@ public class TigaseCustomAuth implements UserAuthRepository {
 		get_pass = prepareQuery(getpassword_query);
 		update_pass = prepareQuery(updatepassword_query);
 		user_login = prepareQuery(userlogin_query);
+		users_count = prepareQuery(useracount_query);
+		users_domain_count = prepareQuery(userdomaincount_query);;
 		if (userlogout_query != null && !userlogout_query.isEmpty()) {
 			user_logout = prepareQuery(userlogout_query);
 		}
@@ -439,7 +452,10 @@ public class TigaseCustomAuth implements UserAuthRepository {
 			userlogin_active = true;
 		}
 		userlogout_query = getParamWithDef(params, DEF_USERLOGOUT_KEY, null);
-
+		useracount_query = getParamWithDef(params, DEF_USERS_COUNT_KEY,
+						DEF_USERS_COUNT_QUERY);
+		userdomaincount_query = getParamWithDef(params, DEF_USERS_DOMAIN_COUNT_KEY,
+						DEF_USERS_DOMAIN_COUNT_QUERY);
 		nonsasl_mechs = getParamWithDef(params, DEF_NONSASL_MECHS_KEY,
 			DEF_NONSASL_MECHS).split(",");
 		sasl_mechs = getParamWithDef(params, DEF_SASL_MECHS_KEY,
@@ -456,7 +472,61 @@ public class TigaseCustomAuth implements UserAuthRepository {
 		}
 	}
 
+	@Override
 	public String getResourceUri() { return db_conn; }
+
+	/**
+	 * <code>getUsersCount</code> method is thread safe. It uses local variable
+	 * for storing <code>Statement</code>.
+	 *
+	 * @return a <code>long</code> number of user accounts in database.
+	 */
+	@Override
+	public long getUsersCount() {
+		ResultSet rs = null;
+		try {
+			checkConnection();
+			long users = -1;
+			synchronized (users_count) {
+				// Load all user count from database
+				rs = users_count.executeQuery();
+				if (rs.next()) {
+					users = rs.getLong(1);
+				} // end of while (rs.next())
+			}
+			return users;
+		} catch (SQLException e) {
+			return -1;
+			//throw new TigaseDBException("Problem loading user list from repository", e);
+		} finally {
+			release(null, rs);
+			rs = null;
+		}
+	}
+
+	@Override
+	public long getUsersCount(String domain) {
+		ResultSet rs = null;
+		try {
+			checkConnection();
+			long users = -1;
+			synchronized (users_domain_count) {
+				// Load all user count from database
+				users_domain_count.setString(1, "%@" + domain);
+				rs = users_domain_count.executeQuery();
+				if (rs.next()) {
+					users = rs.getLong(1);
+				} // end of while (rs.next())
+			}
+			return users;
+		} catch (SQLException e) {
+			return -1;
+			//throw new TigaseDBException("Problem loading user list from repository", e);
+		} finally {
+			release(null, rs);
+			rs = null;
+		}
+	}
 
 	private boolean userLoginAuth(final String user, final String password)
 		throws UserNotFoundException, TigaseDBException, AuthorizationException {

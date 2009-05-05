@@ -99,8 +99,11 @@ public class VHostItem {
 	private boolean enabled = true;
 	private boolean anonymousEnabled = true;
 	private boolean registerEnabled = true;
-	private long maxUsersNumber = 99999999999L;
+	private long maxUsersNumber = 0L;
 	private String otherDomainParams = null;
+	private VHostItem unmodifiableItem = null;
+
+	private VHostItem() {	}
 
 	/**
 	 * The constructor creates the <code>VHostItem</code> instance for a given
@@ -137,6 +140,13 @@ public class VHostItem {
 		}
 		otherDomainParams =
 						elem.getCData("/" + VHOST_ELEM + "/" + OTHER_PARAMS_ELEM);
+	}
+
+	public VHostItem getUnmodifiableVHostItem() {
+		if (unmodifiableItem == null) {
+			unmodifiableItem = new UnmodifiableVHostItem();
+		}
+		return unmodifiableItem;
 	}
 
 	/**
@@ -266,8 +276,7 @@ public class VHostItem {
 
 	/**
 	 * This method allows to set the maximum number of user accounts allowed for
-	 * this domain. The default value of this parameter is:
-	 * <code>99999999999L</code>.
+	 * this domain. The default value of this parameter is: <code>0L</code>.
 	 * @param maxUsersNumber is a <code>long</code> value specifying the maximum
 	 * number of user accounts allowed for this domain.
 	 */
@@ -304,6 +313,177 @@ public class VHostItem {
 	 */
 	public String getVhost() {
 		return vhost;
+	}
+
+	private class UnmodifiableVHostItem extends VHostItem {
+
+		@Override
+		public VHostItem getUnmodifiableVHostItem() {
+			return this;
+		}
+
+		/**
+	 * The method exports the <code>VHostItem</code> object to XML representation.
+	 * @return an <code>Element</code> object with vhost information.
+	 */
+		@Override
+		public Element toXML() {
+			return VHostItem.this.toXML();
+		}
+
+		/**
+	 * Returns an array with the server components names which should process
+	 * packets sent to this domain or <code>null</code> (default) if there is
+	 * no specific component assigned to this domain.
+	 * @return a <code>String[]</code> object with server component names.
+	 */
+		@Override
+		public String[] getComps() {
+			return VHostItem.this.getComps();
+		}
+
+		/**
+	 * Sets an array with the server component names by which packets to this
+	 * domain can be processed. Every local domain will be handled by
+	 * <code>VHostListener</code> which returns <code>true</code> for
+	 * <code>handlesLocalDomains()</code> method call and by all components
+	 * set via this method.
+	 * @param comps is an <code>String[]</code> array with server component names.
+	 */
+		@Override
+		public void setComps(String[] comps) {
+			throw new UnsupportedOperationException("This is unmodifiable instance of VHostItem");
+		}
+
+		/**
+	 * Checks whether this domain is set as enabled or not. This is domain own
+	 * configuration parameter which allows to temporarly disable domain so packets
+	 * for this domain are not processed normally. Instead the server returns
+	 * an error.
+	 * @return a <code>boolean</code> value <code>true</code> if the domain is
+	 * enabled and <code>false</code> if the domain is disabled.
+	 */
+		@Override
+		public boolean isEnabled() {
+			return VHostItem.this.isEnabled();
+		}
+
+		/**
+	 * This method allows to enable or disable local domain. If the domain is
+	 * disabled packets sent for this domain are not processed normally, instead
+	 * the server returns an error to the sender.
+	 * Domain is enabled by default.
+	 * @param enabled is a <code>boolean</code> value indicating whether the
+	 * domain is enabled or not.
+	 */
+		@Override
+		public void setEnabled(boolean enabled) {
+			throw new UnsupportedOperationException("This is unmodifiable instance of VHostItem");
+		}
+
+		/**
+	 * The method checks whether user registration is enabled for this domain
+	 * or not. This is the domain own configuration parameter which allows to
+	 * disable user accounts registration via XMPP per domain basis.
+	 * @return a <code>boolean</code> value indicating whether user account
+	 * registration is allowed for this domain.
+	 */
+		@Override
+		public boolean isRegisterEnabled() {
+			return VHostItem.this.isRegisterEnabled();
+		}
+
+		/**
+	 * This method allows to enable or disable user account registration for this
+	 * domain. By default user account registration is enabled.
+	 * @param enabled is a <code>boolean</code> value indicating whether user
+	 * account registration is allowed for this domain or not.
+	 */
+		@Override
+		public void setRegisterEnabled(boolean enabled) {
+			throw new UnsupportedOperationException("This is unmodifiable instance of VHostItem");
+		}
+
+		/**
+	 * This method checks whether anonymous login is enabled for this domain.
+	 * This is the domain own configuration parameter which allows to disable
+	 * anonymous logins on per domain basis.
+	 * @return a <code>boolean</code> value indicating whether anonymous logins
+	 * are allowed for this domain.
+	 */
+		@Override
+		public boolean isAnonymousEnabled() {
+			return VHostItem.this.isAnonymousEnabled();
+		}
+
+		/**
+	 * This method allows to enable or disable anonymous logins for this domain.
+	 * By default anonymous logins are enabled.
+	 * @param enabled is a <code>boolean</code> value indicating whether anonymous
+	 * logins are allowed for this domain.
+	 */
+		@Override
+		public void setAnonymousEnabled(boolean enabled) {
+			throw new UnsupportedOperationException("This is unmodifiable instance of VHostItem");
+		}
+
+		/**
+	 * This method returns the maximum number of user accounts allowed for
+	 * this domain. This parameter is to allow for limiting number of users
+	 * on per domain basis.
+	 * @return a <code>long</code> value indicating the maximum number of
+	 * user accounts allowed for this domain.
+	 */
+		@Override
+		public long getMaxUsersNumber() {
+			return VHostItem.this.getMaxUsersNumber();
+		}
+
+		/**
+	 * This method allows to set the maximum number of user accounts allowed for
+	 * this domain. The default value of this parameter is: <code>0L</code>.
+	 * @param maxUsersNumber is a <code>long</code> value specifying the maximum
+	 * number of user accounts allowed for this domain.
+	 */
+		@Override
+		public void setMaxUsersNumber(long maxUsersNumber) {
+			throw new UnsupportedOperationException("This is unmodifiable instance of VHostItem");
+		}
+
+		/**
+	 * This method allows to access the virtual domain other configuration
+	 * parameters. This is future feature API and it is not used right now.
+	 * It allows to access configuration parameters which are not specified
+	 * at the time of API definition.
+	 * @return a <code>String</code> value with domain extra parameters.
+	 */
+		@Override
+		public String getOtherDomainParams() {
+			return VHostItem.this.getOtherDomainParams();
+		}
+
+		/**
+	 * This method allows to set extra configuration parameters for the virtual
+	 * domain.  This is future feature API and it is not used right now.
+	 * It allows to access configuration parameters which are not specified
+	 * at the time of API definition.
+	 * @param otherParams is a <code>String</code> value with domain extra
+	 * parameters.
+	 */
+		@Override
+		public void setOtherDomainParams(String otherParams) {
+			throw new UnsupportedOperationException("This is unmodifiable instance of VHostItem");
+		}
+
+		/**
+	 * This method return a virtual host name as a <code>String</code> value.
+	 * @return a <code>String</code> value with the virtual domain name.
+	 */
+		@Override
+		public String getVhost() {
+			return VHostItem.this.getVhost();
+		}
+
 	}
 
 }

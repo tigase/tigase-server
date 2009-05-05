@@ -22,7 +22,6 @@
 package tigase.db;
 
 import java.util.Map;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * Describe interface UserAuthRepository here.
@@ -49,6 +48,21 @@ public interface UserAuthRepository {
 	public static final String USER_ID_KEY = "user-id";
 
 	/**
+	 * This method is only used by the server statistics component to report
+	 * number of registered users.
+	 * @return a <code>long</code> number of registered users in the repository.
+	 */
+	long getUsersCount();
+
+	/**
+	 * This method is only used by the server statistics component to report
+	 * number of registered users for given domain.
+	 * @param domain
+	 * @return a <code>long</code> number of registered users in the repository.
+	 */
+	long getUsersCount(String domain);
+
+	/**
 	 * <code>queryAuth</code> returns mechanisms available for authentication.
 	 *
 	 * @param authProps a <code>Map</code> value with parameters for authentication.
@@ -61,9 +75,10 @@ public interface UserAuthRepository {
 	 * Connection to database might be established during the first authentication
 	 * request.
 	 *
-	 * @param conn_str a <code>String</code> value of database connection string.
+	 * @param resource_uri a <code>String</code> value of database connection string.
 	 * The string must also contain database user name and password if required
 	 * for connection.
+	 * @param params 
 	 * @exception DBInitException if an error occurs during access database. It won't
 	 * happen however as in this method we do simple variable assigment.
 	 */
@@ -124,7 +139,7 @@ public interface UserAuthRepository {
 	/**
 	 * Describe <code>otherAuth</code> method here.
 	 *
-	 * @param props a <code>Map</code> value
+	 * @param authProps a <code>Map</code> value
 	 * @return a <code>boolean</code> value
 	 * @exception UserNotFoundException if an error occurs
 	 * @exception TigaseDBException if an error occurs
@@ -149,6 +164,7 @@ public interface UserAuthRepository {
 	 *
 	 * @param user a <code>String</code> value
 	 * @param password a <code>String</code> value
+	 * @throws UserNotFoundException
 	 * @exception TigaseDBException if an error occurs
 	 */
   void updatePassword(String user, String password)

@@ -21,14 +21,11 @@
  */
 package tigase.db.xml;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.logging.Logger;
 
 import tigase.db.AuthorizationException;
-import tigase.db.DBInitException;
 import tigase.db.TigaseDBException;
 import tigase.db.UserAuthRepository;
 import tigase.db.UserAuthRepositoryImpl;
@@ -138,6 +135,18 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
 
 	public synchronized List<String> getUsers() {
 		return xmldb.getAllNode1s();
+	}
+
+	public synchronized long getUsersCount(String domain) {
+		long res = 0;
+		String jidEnd = "@" + domain;
+		List<String> jids = getUsers();
+		for (String string : jids) {
+			if (string.endsWith(jidEnd)) {
+				++res;
+			}
+		}
+		return res;
 	}
 
 	public synchronized long getUsersCount() {

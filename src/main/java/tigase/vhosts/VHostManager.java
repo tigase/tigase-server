@@ -267,6 +267,11 @@ public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
 	}
 
 	@Override
+	public VHostItem getVHostItem(String domain) {
+		return repo.getVHost(domain);
+	}
+
+	@Override
 	public boolean isLocalDomainOrComponent(String domain) {
 		boolean result = isLocalDomain(domain);
 		if (!result) {
