@@ -1,0 +1,28 @@
+Tigase Converter
+
+ Copyright (c) 2009 "Tomasz Sterna" <tomek@xiaoka.com>
+
+ License: (either of)
+ a. Creative Commons Attribution-Share Alike 3.0 Unported
+    http://creativecommons.org/licenses/by-sa/3.0/
+ b. GNU Lesser General Public License v3
+    http://www.gnu.org/licenses/lgpl-3.0.html
+
+
+* Configuration
+  - Edit converter.groovy:
+    - enter correct path to tigase.xml
+    - uncomment relevant source and feeder definitions
+      (and comment-out unneded ones)
+
+* Running
+  - Give executable permission to converter.groovy and converter.sh
+    $ chmod +x converter.groovy converter.sh
+  - Launch converter.sh
+    (You may need to alter libraries paths)
+
+* Bugs/Suggestions/Patches
+  - Drop me an e-mail at: tomek@xiaoka.com
+
+
+Good luck!
