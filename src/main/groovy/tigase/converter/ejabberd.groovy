@@ -59,13 +59,14 @@ def eachRoster(JID, closure) {
 def eachPrivacy(JID, closure) {
 	sql.eachRow(sourceSQL["privacylists"], [JID], {
 		def listname = it.name
+		def listid = it.id
 		def writer = new StringWriter()
 		def xml = new MarkupBuilder(writer)
 		xml.setOmitNullAttributes(true)
 		xml.list(name:listname) {
-			sql.eachRow(sourceSQL["privacyitems"], [it.id], { row ->
+			sql.eachRow(sourceSQL["privacyitems"], [listid], { row ->
 				def type = null
-				switch (it.type) {
+				switch (row.type) {
 					case "j":
 						type = "jid"
 						break
