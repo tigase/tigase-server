@@ -399,6 +399,11 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 			serv.setXMLNS(XMLNS);
 			serv.getSessionData().put(XMPPIOService.HOSTNAME_KEY, hostname);
 			serv.setDataReceiver(routings.computeRouting(hostname));
+			writeRawData(serv, "<?xml version='1.0'?><stream:stream" +
+							" xmlns='" + XMLNS + "'" +
+							" xmlns:stream='http://etherx.jabber.org/streams'" +
+							" from='" + hostname + "'" +
+							" id='" + id + "'" + " version='1.0' xml:lang='en'>");
 			Packet streamOpen = Command.STREAM_OPENED.getPacket(
 				getFromAddress(getUniqueId(serv)),
 				serv.getDataReceiver(), StanzaType.set, UUID.randomUUID().toString(),
@@ -408,16 +413,16 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 			Command.addFieldValue(streamOpen, "xml:lang", lang);
 			addOutPacketWithTimeout(streamOpen, startedHandler, 15l, TimeUnit.SECONDS);
 		} else {
+			writeRawData(serv, "<?xml version='1.0'?><stream:stream" +
+							" xmlns='" + XMLNS + "'" +
+							" xmlns:stream='http://etherx.jabber.org/streams'" +
+							" from='" + hostname + "'" +
+							" id='" + id + "'" + " version='1.0' xml:lang='en'>");
 			addOutPacket(Command.GETFEATURES.getPacket(getFromAddress(getUniqueId(serv)),
 							serv.getDataReceiver(), StanzaType.get,
 							UUID.randomUUID().toString(),
 							null));
 		}
-		writeRawData(serv, "<?xml version='1.0'?><stream:stream" +
-						" xmlns='" + XMLNS + "'" +
-						" xmlns:stream='http://etherx.jabber.org/streams'" +
-						" from='" + hostname + "'" +
-						" id='" + id + "'" + " version='1.0' xml:lang='en'>");
 		return null;
 	}
 
