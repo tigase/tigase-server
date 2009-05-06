@@ -65,7 +65,9 @@ public class VhostConfigRepository implements VHostRepository {
 		String[] hostnames = (String[]) properties.get(HOSTNAMES_PROP_KEY);
 		String[] anons = (String[]) properties.get(ANONYMOUS_DOMAINS_PROP_KEY);
 		Set<String> anonset = new HashSet<String>();
-		Collections.addAll(anonset, anons);
+		if (anons != null) {
+			Collections.addAll(anonset, anons);
+		}
 		if (hostnames != null && hostnames.length > 0) {
 			vhosts.clear();
 			for (String hostname : hostnames) {
