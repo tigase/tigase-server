@@ -76,7 +76,8 @@ domains.each{ DOMAIN ->
 		if (roster != "") user_repo.setData(JID, null, RosterAbstract.ROSTER, roster);
 
 		feeder.eachVcard(UID, { VCARD ->
-			user_repo.setData(JID, VCardTemp.ID, VCardTemp.VCARD_KEY, VCARD);
+			user_repo.setData(JID, NonAuthUserRepository.PUBLIC_DATA_NODE + "/" + VCardTemp.ID,
+					VCardTemp.VCARD_KEY, VCARD);
 		})
 
 		feeder.eachPrivacy(UID, { NAME, LIST ->
