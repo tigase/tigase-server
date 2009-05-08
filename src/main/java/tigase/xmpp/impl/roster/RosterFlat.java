@@ -64,9 +64,13 @@ public class RosterFlat extends RosterAbstract {
 		Queue<Element> elems = domHandler.getParsedElements();
 		if (elems != null && elems.size() > 0) {
 			for (Element elem : elems) {
-				RosterElement relem = new RosterElement(elem);
-				if (!addBuddy(relem, roster)) {
+				try {
+					RosterElement relem = new RosterElement(elem);
+					if (!addBuddy(relem, roster)) {
 						break;
+					}
+				} catch (Exception e) {
+					log.warning("Can't load roster element: " + elem.toString());
 				}
 			}
 		}

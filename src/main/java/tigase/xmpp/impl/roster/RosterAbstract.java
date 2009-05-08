@@ -602,7 +602,7 @@ public abstract class RosterAbstract {
 		update.addChild(query);
 		for (XMPPResourceConnection conn: session.getActiveSessions()) {
 			Element conn_update = update.clone();
-			conn_update.setAttribute("to", conn.getJID());
+			conn_update.setAttribute("to", conn.getUserId());
 			conn_update.setAttribute("id", "rst"+session.nextStanzaId());
 			Packet pack_update = new Packet(conn_update);
 			pack_update.setTo(conn.getConnectionId());
