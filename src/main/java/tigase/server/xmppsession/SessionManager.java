@@ -1105,7 +1105,7 @@ public class SessionManager extends AbstractMessageReceiver
 		}
 		auth_repository = (UserAuthRepository) props.get(SHARED_AUTH_REPO_PROP_KEY);
 		if (user_repository != null) {
-			log.config("Using shared repository instance.");
+			log.config("Using shared auth repository instance.");
 		} else {
 			Map<String, String> user_repo_params = new LinkedHashMap<String, String>();
 			Map<String, String> auth_repo_params = new LinkedHashMap<String, String>();
