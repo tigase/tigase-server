@@ -1,5 +1,5 @@
 #!/bin/bash
-LIBS="/usr/share/tigase-server/lib /usr/share/openfire/lib"
+LIBS="/usr/share/tigase/lib /usr/share/openfire/lib"
 
 # Locale check
 if ! locale | grep -iq '^LC_CTYPE=.*\.utf8.\?$'; then
