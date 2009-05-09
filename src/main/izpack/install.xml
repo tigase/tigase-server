@@ -41,7 +41,6 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 		<appversion>${ENV[TIGVER]}</appversion>
 		<authors>
 			<author name="Artur Hefczyc" email="artur.hefczyc@tigase.org"/>
-			<author name="Bartosz Małkowski" email="bartosz.malkowski@tigase.org"/>
 		</authors>
 		<url>http://www.tigase.org/</url>
 		<appsubpath>Tigase-$APP_VER</appsubpath>

@@ -9,12 +9,12 @@ PATCHED_IZPACK_DIR="izpack.patched"
 # create installer directory
 if [ ! -e $INSTALLER_DIR ] ; then
 	mkdir $INSTALLER_DIR || exit -1
-#fi
+fi
 
 # create original izpack dir
 if [ -e $INSTALLER_DIR/$ORIGINAL_IZPACK_DIR ] ; then
 	rm -rf $INSTALLER_DIR/$ORIGINAL_IZPACK_DIR || exit -1
-#fi
+fi
 
 # checkout izpack from svn repository
 svn checkout $SVN_URL --revision $REVISION $INSTALLER_DIR/$ORIGINAL_IZPACK_DIR || exit -1
