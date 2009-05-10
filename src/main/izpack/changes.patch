@@ -41,7 +41,7 @@ index 330ec13..dcc7292 100644
 +#
 +*.class
 diff --git a/src/build.xml b/src/build.xml
-index 60e52dc..ba14e23 100644
+index 60e52dc..3285efd 100644
 --- a/src/build.xml
 +++ b/src/build.xml
 @@ -611,7 +611,9 @@
@@ -111,7 +111,7 @@ index 60e52dc..ba14e23 100644
          <build-panel name="XInfoPanel">
              <include name="com/izforge/izpack/panels/XInfoPanel.java"/>
          </build-panel>
-@@ -776,6 +800,35 @@
+@@ -776,6 +800,38 @@
              <include name="com/izforge/izpack/panels/HTMLHelloPanel.java"/>
              <include name="com/izforge/izpack/panels/HTMLInfoPanel.java"/>
          </build-panel>
@@ -129,25 +129,28 @@ index 60e52dc..ba14e23 100644
 +        <build-panel name="TigaseConfigLoadPanel">
 +            <include name="com/izforge/izpack/panels/TigaseConfigLoadPanel.java"/>
 +              <include name="com/izforge/izpack/panels/TigaseInstallerCommon.java"/>		
++		<include name="com/izforge/izpack/panels/TigaseConfigLoadPanelConsoleHelper.java"/>
 +          <include name="com/izforge/izpack/panels/TigaseConfigConst.java"/>
 +        </build-panel>
 +
 +        <build-panel name="TigaseConfigSavePanel">
 +            <include name="com/izforge/izpack/panels/TigaseConfigSavePanel.java"/>
 +               <include name="com/izforge/izpack/panels/TigaseInstallerCommon.java"/>		
++		<include name="com/izforge/izpack/panels/TigaseConfigSavePanelConsoleHelper.java"/>
 +         <include name="com/izforge/izpack/panels/TigaseConfigConst.java"/>
 +        </build-panel>
 +
 +        <build-panel name="TigaseDBCheckPanel">
 +            <include name="com/izforge/izpack/panels/TigaseDBCheckPanel.java"/>
 +                <include name="com/izforge/izpack/panels/TigaseInstallerCommon.java"/>		
++		<include name="com/izforge/izpack/panels/TigaseDBCheckPanelConsoleHelper.java"/>
 +        <include name="com/izforge/izpack/panels/TigaseConfigConst.java"/>
 +        </build-panel>
 +
      </target>
  
      <!--
-@@ -811,6 +864,7 @@
+@@ -811,6 +867,7 @@
              <fileset dir="${build.dir}">
                  <include name="com/izforge/izpack/event/*.class"/>
                  <include name="com/izforge/izpack/util/IoHelper.class"/>
@@ -157,10 +160,10 @@ index 60e52dc..ba14e23 100644
      </target>
 diff --git a/src/lib/com/izforge/izpack/installer/ConsoleHelper.java b/src/lib/com/izforge/izpack/installer/ConsoleHelper.java
 new file mode 100644
-index 0000000..ba8f164
+index 0000000..6a40663
 --- /dev/null
 +++ b/src/lib/com/izforge/izpack/installer/ConsoleHelper.java
-@@ -0,0 +1,168 @@
+@@ -0,0 +1,172 @@
 +package com.izforge.izpack.installer;
 +
 +import java.io.BufferedReader;
@@ -326,6 +329,10 @@ index 0000000..ba8f164
 +
 +	public void displayMessage(String msg) {
 +		System.out.println(msg);
++	}
++
++	public void displayRaw(String msg) {
++		System.out.print(msg);
 +	}	
 +	
 +}

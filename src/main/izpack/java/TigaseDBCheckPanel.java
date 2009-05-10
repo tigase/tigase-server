@@ -22,41 +22,33 @@
 
 package com.izforge.izpack.panels;
 
-import com.izforge.izpack.Info;
-import com.izforge.izpack.gui.IzPanelLayout;
-import com.izforge.izpack.gui.LabelFactory;
-import com.izforge.izpack.gui.LayoutConstants;
-import com.izforge.izpack.installer.InstallData;
-import com.izforge.izpack.installer.InstallerFrame;
-import com.izforge.izpack.installer.ResourceManager;
-import com.izforge.izpack.util.Debug;
-import com.izforge.izpack.installer.IzPanel;
-import com.izforge.izpack.util.*;
-
-import javax.swing.*;
-import javax.swing.table.TableModel;
-import javax.swing.table.AbstractTableModel;
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.Properties;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.File;
-import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.CallableStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Properties;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.SwingUtilities;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableModel;
+
+import com.izforge.izpack.gui.IzPanelLayout;
+import com.izforge.izpack.installer.InstallData;
+import com.izforge.izpack.installer.InstallerFrame;
+import com.izforge.izpack.installer.IzPanel;
+import com.izforge.izpack.installer.ResourceManager;
+import com.izforge.izpack.panels.TigaseDBHelper.MsgTarget;
+import com.izforge.izpack.panels.TigaseDBHelper.ResultMessage;
+import com.izforge.izpack.panels.TigaseDBHelper.TigaseDBTask;
+import com.izforge.izpack.util.Debug;
+import com.izforge.izpack.util.VariableSubstitutor;
 
 /**
  * The Hello panel class.
@@ -71,21 +63,10 @@ public class TigaseDBCheckPanel extends IzPanel {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private static final int DB_CONNEC_POS = 0;
-	private static final int DB_EXISTS_POS = 1;
-	private static final int DB_SCHEMA_POS = 2;
-	private static final int DB_CONVER_POS = 3;
-
 	private JTable table = null;
-	private boolean connection_ok = false;
-	private boolean db_ok = false;
-	private boolean schema_ok = false;
-	private boolean schema_exists = false;
-	private boolean conv_ok = false;
-
-	private String res_prefix = "";
-	private String schema_ver_query = TigaseConfigConst.DERBY_GETSCHEMAVER_QUERY;
 	private Timer delayedTasks = new Timer("DelayedTasks", true);
+
+	private final InstallData idata;
 
 	/**
 	 * The constructor.
@@ -95,23 +76,25 @@ public class TigaseDBCheckPanel extends IzPanel {
 	 */
 	public TigaseDBCheckPanel(InstallerFrame parent, InstallData idata) {
 		super(parent, TigaseInstallerCommon.init(idata), new IzPanelLayout());
+		this.idata = idata;
 
 		// The config label.
 		String msg = parent.langpack.getString("TigaseDBCheckPanel.info");
 		add(createMultiLineLabel(msg));
 		add(IzPanelLayout.createParagraphGap());
 
-		final String[] names = new String[] {"Action", "Result"};
-		final String[][] datas = new String[][] {
-				{"Checking connection to the database", ""},
-				{"Checking if the database exists", ""},
-				{"Checking the database schema", ""},
- 				{"Checking whether the database needs conversion", ""}
-		};
-
+		final String[] columnNames = new String[] {"Action", "Result"};
+		
+		TigaseDBTask[] tasks = TigaseDBHelper.Tasks.getTasksInOrder();
+		final String[][] data = new String[tasks.length][];
+		for (int i = 0 ; i < tasks.length ; i++) {
+			TigaseDBTask task = tasks[i];
+			data[i] = new String[] { task.getDescription(), "" };
+		}
+		
 		TableModel dataModel = new AbstractTableModel() {
-				private String[] columnNames = names;
-				private Object[][] data = datas;
+//				private String[] columnNames = names;
+//				private Object[][] data = datas;
 				public int getColumnCount() { return columnNames.length; }
 				public int getRowCount() { return data.length; }
 				public String getColumnName(int col) { return columnNames[col]; }
@@ -119,7 +102,7 @@ public class TigaseDBCheckPanel extends IzPanel {
 				public Class getColumnClass(int c) { return getValueAt(0, c).getClass(); }
 				public boolean isCellEditable(int row, int col) { return false; }
 				public void setValueAt(Object value, int row, int col) {
-					data[row][col] = value;
+					data[row][col] = value.toString();
 					fireTableCellUpdated(row, col);
 				}
       };
@@ -138,16 +121,157 @@ public class TigaseDBCheckPanel extends IzPanel {
 	public void panelActivate() {
 		super.panelActivate();
 		parent.lockNextButton();
+		
+		final TigaseDBHelper dbHelper = new TigaseDBHelper();
+		
 		delayedTasks.schedule(new TimerTask() {
-				public void run() {
-					table.setValueAt(validateDBConnection(), DB_CONNEC_POS, 1);
-					table.setValueAt(validateDBExists(), DB_EXISTS_POS, 1);
-					table.setValueAt(validateDBSchema(), DB_SCHEMA_POS, 1);
-					table.setValueAt(validateDBConversion(), DB_CONVER_POS, 1);
-					parent.unlockNextButton();
-				}
-			}, 500);
+				
+			public void run() {
+				TigaseDBTask[] tasks = TigaseDBHelper.Tasks.getTasksInOrder();
+				
+				for (int i = 0 ; i < tasks.length ; i++) {
+					TigaseDBTask task = tasks[i];
+					final int row = i;
+					
+					MsgTarget msgTarget = new MsgTarget() {
+						public ResultMessage addResultMessage() {
+							return new ResultMessage() {
+								private String fullMsg = "";
 
+								public void append(String msg) {
+									fullMsg += msg;
+									SwingUtilities.invokeLater(new Runnable() {
+										public void run() {
+											table.getModel().setValueAt(fullMsg, row, 1);
+										}
+									});
+								}
+							};
+						}
+					};
+						
+					task.execute(dbHelper, idata.getVariables(), msgTarget);
+				}
+				parent.unlockNextButton();
+			}
+		}, 500);
+	}
+
+	/**
+	 * Indicates wether the panel has been validated or not.
+	 *
+	 * @return Always true.
+	 */
+	public boolean isValidated() {
+		return true;
+	}
+
+}
+
+
+class TigaseDBHelper {
+
+	private boolean schema_ok = false;
+	private boolean connection_ok = false;
+	private boolean db_ok = false;
+	private String schema_ver_query = TigaseConfigConst.DERBY_GETSCHEMAVER_QUERY;
+	private String res_prefix = "";
+	private boolean schema_exists = false;
+
+
+	static final int DB_CONNEC_POS = 0;
+	static final int DB_EXISTS_POS = 1;
+	static final int DB_SCHEMA_POS = 2;
+	static final int DB_CONVER_POS = 3;
+
+
+	enum SQL_LOAD_STATE {
+		INIT, IN_SQL;
+	}
+
+
+	private ArrayList<String> loadSQLQueries(
+			String resource, 
+			String res_prefix, 
+			Properties variables) 
+			throws Exception 
+			{
+		ArrayList<String> results = new ArrayList<String>();
+		VariableSubstitutor vs = new VariableSubstitutor(variables);
+		BufferedReader br =
+			new BufferedReader(new
+					InputStreamReader(ResourceManager.getInstance().getInputStream(resource)));
+		String line = null;
+		String sql_query = "";
+		SQL_LOAD_STATE state = SQL_LOAD_STATE.INIT;
+		while ((line = br.readLine()) != null) {
+			switch (state) {
+			case INIT:
+				if (line.startsWith("-- QUERY START:")) {
+					sql_query = "";
+					state = SQL_LOAD_STATE.IN_SQL;
+				}
+				if (line.startsWith("-- LOAD SCHEMA:")) {
+					results.addAll(loadSchemaQueries(res_prefix, variables));
+				}
+				break;
+			case IN_SQL:
+				if (line.startsWith("-- QUERY END:")) {
+					state = SQL_LOAD_STATE.INIT;
+					sql_query = sql_query.trim();
+					if (sql_query.endsWith(";")) {
+						sql_query = sql_query.substring(0, sql_query.length()-1);
+					}
+					if (sql_query.endsWith("//")) {
+						sql_query = sql_query.substring(0, sql_query.length()-2);
+					}
+					results.add(vs.substitute(sql_query, null));
+				}
+				if (line.isEmpty() || line.trim().startsWith("--")) {
+					continue;
+				} else {
+					sql_query += " " + line.trim();
+				}
+				break;
+			default:
+				break;
+			}
+		}
+		br.close();
+		return results;
+			}
+
+	private ArrayList<String> loadSchemaQueries(
+			String res_prefix, 
+			Properties variables) 
+			throws Exception 
+			{
+		ArrayList<String> queries = loadSQLQueries(res_prefix + ".schema", res_prefix, variables);
+		queries.addAll(loadSQLQueries(res_prefix + ".sp", res_prefix, variables));
+		queries.addAll(loadSQLQueries(res_prefix + ".props", res_prefix, variables));
+		return queries;
+			}	
+
+	public void validateDBConnection(MsgTarget msgTarget) {
+		connection_ok = false;
+		String db_conn = TigaseConfigConst.props.getProperty("root-db-uri");
+		if (db_conn == null) {
+			msgTarget.addResultMessage().append("Missing DB connection URL");
+			return;
+		} else {
+			selectDatabase(db_conn);
+			try {
+				Connection conn = DriverManager.getConnection(db_conn);
+				conn.close();
+				connection_ok = true;
+				msgTarget.addResultMessage().append("Connection OK");
+				return;
+			} catch (Exception e) {
+				//e.printStackTrace();
+				msgTarget.addResultMessage().append(e.getMessage());
+				return;
+			}
+		}
 	}
 
 	private void selectDatabase(String db_uri) {
@@ -167,50 +291,34 @@ public class TigaseDBCheckPanel extends IzPanel {
 		}
 	}
 
-	private String validateDBConnection() {
-		connection_ok = false;
-		String db_conn = TigaseConfigConst.props.getProperty("root-db-uri");
-		if (db_conn == null) {
-			return "Missing DB connection URL";
-		} else {
-			selectDatabase(db_conn);
-			try {
-				Connection conn = DriverManager.getConnection(db_conn);
-				conn.close();
-				connection_ok = true;
-				return "Connection OK";
-			} catch (Exception e) {
-				//e.printStackTrace();
-				return e.getMessage();
-			}
-		}
-	}
-
-	private String validateDBExists() {
+	public void validateDBExists(Properties variables, MsgTarget msgTarget) {
 		if (!connection_ok) {
-			return "Connection not validated";
+			msgTarget.addResultMessage().append("Connection not validated");
+			return;
 		}
-		String result = "Exists OK";
+
 		db_ok = false;
 		String db_conn = TigaseConfigConst.props.getProperty("--user-db-uri");
 		if (db_conn == null) {
-			return "Missing DB connection URL";
+			msgTarget.addResultMessage().append("Missing DB connection URL");
+			return;
 		} else {
 			Connection conn = null;
 			try {
 				conn = DriverManager.getConnection(db_conn);
 				conn.close();
 				db_ok = true;
-				return result;
+				msgTarget.addResultMessage().append("Exists OK");
+				return;
 			} catch (Exception e) {
-				result = "Doesn't exist";
-				table.setValueAt(result, DB_EXISTS_POS, 1);
-				result += ", creating...";
-				table.setValueAt(result, DB_EXISTS_POS, 1);
+				ResultMessage resulMessage = msgTarget.addResultMessage();
+				resulMessage.append("Doesn't exist");
+				resulMessage.append(", creating...");				
+
 				db_conn = TigaseConfigConst.props.getProperty("root-db-uri");
 				try {
 					conn = DriverManager.getConnection(db_conn);
-					ArrayList<String> queries = loadSQLQueries(res_prefix + ".create");
+					ArrayList<String> queries = loadSQLQueries(res_prefix + ".create", res_prefix, variables);
 					for (String query: queries) {
 						Debug.trace("Executing query: " + query);
 						Statement stmt = conn.createStatement();
@@ -224,22 +332,63 @@ public class TigaseDBCheckPanel extends IzPanel {
 						}
 					}
 					conn.close();
-					result += " OK";
+					resulMessage.append(" OK");
 					db_ok = true;
 				} catch (Exception ex) {
-					result += ex.getMessage();
+					resulMessage.append(ex.getMessage());
 				}
 			}
 		}
-		return result;
 	}
 
-	private String validateDBSchema() {
+	public void validateDBConversion(Properties variables, MsgTarget msgTarget) {
 		if (!connection_ok) {
-			return "Connection not validated";
+			msgTarget.addResultMessage().append("Connection not validated");
+			return;
 		}
 		if (!db_ok) {
-			return "Database not validated";
+			msgTarget.addResultMessage().append("Database not validated");
+			return;
+		}
+		if (schema_ok) {
+			msgTarget.addResultMessage().append("Conversion not needed");
+			return;
+		}
+		if (!schema_exists) {
+			msgTarget.addResultMessage().append("Something wrong, the schema still is not loaded...");
+			return;
+		}
+		String db_conn = TigaseConfigConst.props.getProperty("root-tigase-db-uri");
+		try {
+			//conn.close();
+			ResultMessage resultMessage = msgTarget.addResultMessage();
+			resultMessage.append("Converting...");
+
+			Connection conn = DriverManager.getConnection(db_conn);
+			Statement stmt = conn.createStatement();
+			ArrayList<String> queries = loadSQLQueries(res_prefix + ".upgrade", res_prefix, variables);
+			for (String query: queries) {
+				Debug.trace("Executing query: " + query);
+				stmt.execute(query);
+			}
+			stmt.close();
+			conn.close();
+			schema_ok = true;
+			resultMessage.append(" completed OK");
+		} catch (Exception ex) {
+			msgTarget.addResultMessage().append("Can't upgrade schema: " + ex.getMessage());
+			return;
+		}
+	}
+
+	public void validateDBSchema(Properties variables, MsgTarget msgTarget) {
+		if (!connection_ok) {
+			msgTarget.addResultMessage().append("Connection not validated");
+			return;
+		}
+		if (!db_ok) {
+			msgTarget.addResultMessage().append("Database not validated");
+			return;
 		}
 		schema_exists = false;
 		schema_ok = false;
@@ -270,7 +419,8 @@ public class TigaseDBCheckPanel extends IzPanel {
 			Debug.trace("Exception, posibly schema hasn't been loaded yet: " + e);
 		}
 		if (schema_ok) {
-			return "Schema OK, accounts number: " + users;
+			msgTarget.addResultMessage().append("Schema OK, accounts number: " + users);
+			return;
 		}
 		if (!schema_exists) {
 			Debug.trace("DB schema doesn't exists, creating one...");
@@ -279,7 +429,7 @@ public class TigaseDBCheckPanel extends IzPanel {
 				//conn.close();
 				conn = DriverManager.getConnection(db_conn);
 				Statement stmt = conn.createStatement();
-				ArrayList<String> queries = loadSchemaQueries();
+				ArrayList<String> queries = loadSchemaQueries(res_prefix, variables);
 				for (String query: queries) {
 					Debug.trace("Executing query: " + query);
 					stmt.execute(query);
@@ -287,114 +437,69 @@ public class TigaseDBCheckPanel extends IzPanel {
 				stmt.close();
 				conn.close();
 				schema_ok = true;
-				return "New schema loaded OK";
+				msgTarget.addResultMessage().append("New schema loaded OK");
+				return;
 			} catch (Exception ex) {
-				return "Can't load schema: " + ex.getMessage();
+				msgTarget.addResultMessage().append("Can't load schema: " + ex.getMessage());
+				return;
 			}
 		} else {
-			return "Old schema, accounts number: " + users;
+			msgTarget.addResultMessage().append("Old schema, accounts number: " + users);
+			return;
 		}
 	}
-
-	private ArrayList<String> loadSchemaQueries() throws Exception {
-		ArrayList<String> queries = loadSQLQueries(res_prefix + ".schema");
-		queries.addAll(loadSQLQueries(res_prefix + ".sp"));
-		queries.addAll(loadSQLQueries(res_prefix + ".props"));
-		return queries;
-	}
-
-	private String validateDBConversion() {
-		if (!connection_ok) {
-			return "Connection not validated";
-		}
-		if (!db_ok) {
-			return "Database not validated";
-		}
-		if (schema_ok) {
-			return "Conversion not needed";
-		}
-		if (!schema_exists) {
-			return "Something wrong, the schema still is not loaded....";
-		}
-		String result = "Converting...";
-		table.setValueAt(result, DB_CONVER_POS, 1);
-		String db_conn = TigaseConfigConst.props.getProperty("root-tigase-db-uri");
-		try {
-			//conn.close();
-			Connection conn = DriverManager.getConnection(db_conn);
-			Statement stmt = conn.createStatement();
-			ArrayList<String> queries = loadSQLQueries(res_prefix + ".upgrade");
-			for (String query: queries) {
-				Debug.trace("Executing query: " + query);
-				stmt.execute(query);
+	
+	enum Tasks implements TigaseDBTask {
+		VALIDATE_CONNECTION("Checking connection to the database") {
+			public void execute(TigaseDBHelper helper, Properties variables, MsgTarget msgTarget) {
+				helper.validateDBConnection(msgTarget);
 			}
-			stmt.close();
-			conn.close();
-			schema_ok = true;
-			result += " completed OK";
-		} catch (Exception ex) {
-			return "Can't upgrade schema: " + ex.getMessage();
-		}
-		return result;
-	}
-
-	private enum SQL_LOAD_STATE {
-		INIT, IN_SQL;
-	}
-
-	private ArrayList<String> loadSQLQueries(String resource) throws Exception {
-		ArrayList<String> results = new ArrayList<String>();
-		VariableSubstitutor vs = new VariableSubstitutor(idata.getVariables());
-		BufferedReader br =
-      new BufferedReader(new
-				InputStreamReader(ResourceManager.getInstance().getInputStream(resource)));
-		String line = null;
-		String sql_query = "";
-		SQL_LOAD_STATE state = SQL_LOAD_STATE.INIT;
-		while ((line = br.readLine()) != null) {
-			switch (state) {
-			case INIT:
-				if (line.startsWith("-- QUERY START:")) {
-					sql_query = "";
-					state = SQL_LOAD_STATE.IN_SQL;
-				}
-				if (line.startsWith("-- LOAD SCHEMA:")) {
-					results.addAll(loadSchemaQueries());
-				}
-				break;
-			case IN_SQL:
-				if (line.startsWith("-- QUERY END:")) {
-					state = SQL_LOAD_STATE.INIT;
-					sql_query = sql_query.trim();
-					if (sql_query.endsWith(";")) {
-						sql_query = sql_query.substring(0, sql_query.length()-1);
-					}
-					if (sql_query.endsWith("//")) {
-						sql_query = sql_query.substring(0, sql_query.length()-2);
-					}
-					results.add(vs.substitute(sql_query, null));
-				}
-				if (line.isEmpty() || line.trim().startsWith("--")) {
-					continue;
-				} else {
-					sql_query += " " + line.trim();
-				}
-				break;
-			default:
-				break;
+		},
+		VALIDATE_DB_EXISTS("Checking if the database exists") {
+			public void execute(TigaseDBHelper helper, Properties variables, MsgTarget msgTarget) {
+				helper.validateDBExists(variables, msgTarget);
 			}
+		},					
+		VALIDATE_DB_SCHEMA("Checking the database schema") {
+			public void execute(TigaseDBHelper helper, Properties variables, MsgTarget msgHandler) {
+				helper.validateDBSchema(variables, msgHandler);
+			}
+		},					
+		VALIDATE_DB_CONVERSION("Checking whether the database needs conversion") {
+			public void execute(TigaseDBHelper helper, Properties variables, MsgTarget msgHandler) {
+				helper.validateDBConversion(variables, msgHandler);
+			}
+		};					
+
+		private final String description;
+		
+		private Tasks(String description) {
+			this.description = description;
 		}
-		br.close();
-		return results;
+		
+		public String getDescription() {
+			return description;
+		}
+		
+		// override to change order
+		public static TigaseDBTask[] getTasksInOrder() {
+			return values();
+		}
+	}
+	
+	
+	static interface TigaseDBTask {
+		String getDescription();
+		abstract void execute(TigaseDBHelper helper, Properties variables, MsgTarget msgTarget);
 	}
 
-	/**
-	 * Indicates wether the panel has been validated or not.
-	 *
-	 * @return Always true.
-	 */
-	public boolean isValidated() {
-		return true;
+	static interface MsgTarget {
+		abstract ResultMessage addResultMessage();	
 	}
 
+	static interface ResultMessage {
+		void append(String msg);
+	}	
+	
 }
+

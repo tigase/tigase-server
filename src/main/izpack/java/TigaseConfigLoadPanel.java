@@ -22,25 +22,23 @@
 
 package com.izforge.izpack.panels;
 
-import com.izforge.izpack.Info;
+import java.io.File;
+import java.io.FileReader;
+import java.util.Properties;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+
 import com.izforge.izpack.gui.IzPanelLayout;
 import com.izforge.izpack.gui.LabelFactory;
-import com.izforge.izpack.gui.LayoutConstants;
+import com.izforge.izpack.installer.AutomatedInstallData;
 import com.izforge.izpack.installer.InstallData;
 import com.izforge.izpack.installer.InstallerFrame;
 import com.izforge.izpack.installer.IzPanel;
 import com.izforge.izpack.util.Debug;
-
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.Properties;
-import java.util.Set;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
-import java.io.FileReader;
-import java.io.File;
 
 /**
  * The Hello panel class.
@@ -56,7 +54,6 @@ public class TigaseConfigLoadPanel extends IzPanel {
 	private static final long serialVersionUID = 1L;
 
 	private JTextArea textArea = null;
-	private String config = "";
 
 	/**
 	 * The constructor.
@@ -71,7 +68,7 @@ public class TigaseConfigLoadPanel extends IzPanel {
 		add(LabelFactory.create(parent.langpack.getString("TigaseConfigLoadPanel.info"),
 				parent.icons.getImageIcon("edit"), LEADING), NEXT_LINE);
 		// The text area which shows the info.
-		textArea = new JTextArea(config);
+		textArea = new JTextArea("");
 		textArea.setCaretPosition(0);
 		textArea.setEditable(false);
 		JScrollPane scroller = new JScrollPane(textArea);
@@ -84,13 +81,28 @@ public class TigaseConfigLoadPanel extends IzPanel {
 		super.panelActivate();
 		// Existing configuration loading
 		Debug.trace("panelActivate called for load pael");
-		loadConfig();
+		String config = new TigaseConfigLoadHelper().loadConfig(idata);
+		textArea.setText(config);
 	}
 
-	private void loadConfig() {
+
+	/**
+	 * Indicates whether the panel has been validated or not.
+	 *
+	 * @return Always true.
+	 */
+	public boolean isValidated() {
+		return true;
+	}
+
+}
+
+class TigaseConfigLoadHelper {
+	
+	String loadConfig(AutomatedInstallData idata) {
 		// Try to read the config file.
 		File configPath = null;
-		config = "";
+		StringBuilder config = new StringBuilder();
 		try {
 			if (idata.getVariable("searchTigaseHome") == null
 				|| idata.getVariable("searchTigaseHome").isEmpty()) {
@@ -105,7 +117,7 @@ public class TigaseConfigLoadPanel extends IzPanel {
 				props.load(new FileReader(configPath));
 				Debug.trace("Loading init.properties file...");
 				for (String name: props.stringPropertyNames()) {
-					config += name + " = " + props.getProperty(name) + "\n";
+					config.append(name + " = " + props.getProperty(name) + "\n");
 				}
 				Debug.trace(config);
 				Debug.trace("Done.");
@@ -117,7 +129,7 @@ public class TigaseConfigLoadPanel extends IzPanel {
 
 						if (varName.equals(TigaseConfigConst.DEBUG)) {
 							if (props.getProperty(name) != null) {
-								parseDebugs(props.getProperty(name));
+								parseDebugs(props.getProperty(name), idata);
 								Debug.trace("Loaded: " + varName + " = " + props.getProperty(name));
 							} else {
 								Debug.trace("Missing configuration for " + varName);
@@ -127,7 +139,7 @@ public class TigaseConfigLoadPanel extends IzPanel {
 
 						if (varName.equals(TigaseConfigConst.PLUGINS)) {
 							if (props.getProperty(name) != null) {
-								parsePlugins(props.getProperty(name));
+								parsePlugins(props.getProperty(name), idata);
 								Debug.trace("Loaded: " + varName + " = " + props.getProperty(name));
 							} else {
 								Debug.trace("Missing configuration for " + varName);
@@ -137,7 +149,7 @@ public class TigaseConfigLoadPanel extends IzPanel {
 
 						if (varName.equals(TigaseConfigConst.USER_DB_URI)) {
 							if (props.getProperty(name) != null) {
-								parseUserDbUri(props.getProperty(name));
+								parseUserDbUri(props.getProperty(name), idata);
 								Debug.trace("Loaded: " + varName + " = " + props.getProperty(name));
 							} else {
 								Debug.trace("Missing configuration for " + varName);
@@ -196,7 +208,7 @@ public class TigaseConfigLoadPanel extends IzPanel {
 
 						if (varName.equals(TigaseConfigConst.AUTH_DB_URI)) {
 							if (props.getProperty(name) != null) {
-								parseAuthDbUri(props.getProperty(name));
+								parseAuthDbUri(props.getProperty(name), idata);
 								Debug.trace("Loaded: " + varName + " = " + props.getProperty(name));
 							} else {
 								Debug.trace("Missing configuration for " + varName);
@@ -211,19 +223,21 @@ public class TigaseConfigLoadPanel extends IzPanel {
 				}
 				Debug.trace("Done.");
 			} else {
-				config += "The config file: " + configPath + " seems to not exist...";
+				config.append("The config file: " + configPath + " seems to not exist...");
 			}
 		} catch (Exception err) {
-			config = "Error : could not load the config file: " + configPath + "\n";
-			config += err.toString() + "\n";
+			StringBuilder errorConfig = new StringBuilder();
+			errorConfig.append("Error : could not load the config file: " + configPath + "\n");
+			errorConfig.append(err.toString() + "\n");
 			for (StackTraceElement ste: err.getStackTrace()) {
-				config += ste.toString() + "\n";
+				errorConfig.append(ste.toString() + "\n");
 			}
+			return errorConfig.toString();
 		}
-		textArea.setText(config);
+		return config.toString();
 	}
 
-	private void parseDebugs(String debugs) {
+	private void parseDebugs(String debugs, AutomatedInstallData idata) {
 		String[] ardebugs = debugs.split(",");
 		Set<String> knownDebugs = TigaseConfigConst.debugMap.keySet();
 		for (String debug: ardebugs) {
@@ -233,7 +247,7 @@ public class TigaseConfigLoadPanel extends IzPanel {
 		}
 	}
 
-	private void parsePlugins(String plugins) {
+	private void parsePlugins(String plugins, AutomatedInstallData idata) {
 		String[] arplugins = plugins.split(",");
 		Set<String> knownPlugins = TigaseConfigConst.pluginsMap.keySet();
 		for (String plugin: arplugins) {
@@ -243,11 +257,11 @@ public class TigaseConfigLoadPanel extends IzPanel {
 		}
 	}
 
-	private Pattern dbUriPattern =
+	private static Pattern dbUriPattern =
     Pattern.compile(
 			"jdbc:([^:]+(:[^:]+)?):(//([^/]+))?/?([0-9.a-zA-Z_/-]+)[;\\?]?(user=([^;&]+))?[;&]?(password=([^;&]+))?[;&]?(.*)");
 
-	private void parseUserDbUri(String dbUri) {
+	private void parseUserDbUri(String dbUri, AutomatedInstallData idata) {
 		Matcher m = dbUriPattern.matcher(dbUri);
 		if (m.matches()) {
 			String jdbcDriver = m.group(1);
@@ -290,7 +304,7 @@ public class TigaseConfigLoadPanel extends IzPanel {
 		}
 	}
 
-	private void parseAuthDbUri(String dbUri) {
+	private void parseAuthDbUri(String dbUri, AutomatedInstallData idata) {
 		Matcher m = dbUriPattern.matcher(dbUri);
 		if (m.matches()) {
 			String jdbcDriver = m.group(1);
@@ -321,14 +335,5 @@ public class TigaseConfigLoadPanel extends IzPanel {
 			Debug.trace("Hm, the dbAuthUri doesn't match regex: " + dbUri);
 		}
 	}
-
-	/**
-	 * Indicates wether the panel has been validated or not.
-	 *
-	 * @return Always true.
-	 */
-	public boolean isValidated() {
-		return true;
-	}
-
+	
 }
