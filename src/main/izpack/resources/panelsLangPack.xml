@@ -19,6 +19,7 @@
 	<str id="TigaseJDKPathPanel.nonValidPathInReg" txt="The Windows registry contains a non-valid path for this JDK. Should this JDK be used anyway?"/>
 	<str id="TigaseJDKPathPanel.jdkDownload" txt="&lt;html&gt;&lt;p&gt;If you don't have JDK installed on your system please go to address: &lt;a href='http://java.sun.com/javase/downloads/'&gt;http://java.sun.com/javase/downloads&lt;/a&gt; and select JDK. Download it and install and proceed with the Tigase server installation.&lt;/p&gt;&lt;p&gt; You need at least ${JDKPathPanel.minVersion} version of Java JDK.&lt;/p&gt;&lt;/html&gt;"/>
 
-
+	<str id="TigaseJDKPathPanel.headline" txt="JDK Path"/>
+	<str id="TigaseJDKPathPanel.summaryCaption" txt="JDK Path"/>
 
  </langpack>
