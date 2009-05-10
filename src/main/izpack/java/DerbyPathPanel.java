@@ -1,5 +1,6 @@
 package com.izforge.izpack.panels;
 
+import com.izforge.izpack.installer.AutomatedInstallData;
 import com.izforge.izpack.installer.InstallData;
 import com.izforge.izpack.installer.InstallerFrame;
 import com.izforge.izpack.util.AbstractUIHandler;
@@ -26,6 +27,8 @@ public class DerbyPathPanel extends PathInputPanel {
 
 	private String variableName = null;
 
+	private DerbyPathPanelHelper helper = new DerbyPathPanelHelper();
+	
 	/**
 	 * The constructor.
 	 *
@@ -35,7 +38,7 @@ public class DerbyPathPanel extends PathInputPanel {
 	public DerbyPathPanel(InstallerFrame parent, InstallData idata) {
 		super(parent, TigaseInstallerCommon.init(idata));
 		setMustExist(false);
-		setVariableName("DerbyDBPath");
+		setVariableName(helper.getVariableName());
 	}
 
 	/**
@@ -60,27 +63,28 @@ public class DerbyPathPanel extends PathInputPanel {
 	{
 		// Resolve the default for chosenPath
 		super.panelActivate();
-		String chosenPath = "";
 		// The variable will be exist if we enter this panel
 		// second time. We would maintain the previos
 		// selected path.
-		if (idata.getVariable(getVariableName()) != null) {
-			chosenPath = idata.getVariable(getVariableName());
-		} else {
-			if (OsVersion.IS_WINDOWS)	{
-				chosenPath = idata.getVariable(getVariableName()+".windows");
-			}
-			if (OsVersion.IS_OSX)	{
-				chosenPath = idata.getVariable(getVariableName()+".mac");
-			} else {
-				if (OsVersion.IS_UNIX)	{
-					chosenPath = idata.getVariable(getVariableName()+".unix");
-				}
-			}
-		}
-		VariableSubstitutor vs = new VariableSubstitutor(idata.getVariables());
-		chosenPath = vs.substitute(chosenPath, null);
-		// Set the path for method pathIsValid ...
+//		if (idata.getVariable(getVariableName()) != null) {
+//			chosenPath = idata.getVariable(getVariableName());
+//		} else {
+//			if (OsVersion.IS_WINDOWS)	{
+//				chosenPath = idata.getVariable(getVariableName()+".windows");
+//			}
+//			if (OsVersion.IS_OSX)	{
+//				chosenPath = idata.getVariable(getVariableName()+".mac");
+//			} else {
+//				if (OsVersion.IS_UNIX)	{
+//					chosenPath = idata.getVariable(getVariableName()+".unix");
+//				}
+//			}
+//		}
+//		VariableSubstitutor vs = new VariableSubstitutor(idata.getVariables());
+//		chosenPath = vs.substitute(chosenPath, null);
+//		// Set the path for method pathIsValid ...
+		
+		String chosenPath = helper.getDefaultPath(idata);
 		pathSelectionPanel.setPath(chosenPath);
 
 		if (!pathIsValid())
@@ -127,5 +131,37 @@ public class DerbyPathPanel extends PathInputPanel {
 	public String getSummaryBody()
 	{
 		return (idata.getVariable(getVariableName()));
+	}
+}
+
+class DerbyPathPanelHelper {
+	
+	String getVariableName() {
+		return "DerbyDBPath";
+	}
+	
+	String getDefaultPath(AutomatedInstallData idata) {
+		String chosenPath = "";
+		if (idata.getVariable(getVariableName()) != null) {
+			chosenPath = idata.getVariable(getVariableName());
+		} else {
+			if (OsVersion.IS_WINDOWS)	{
+				chosenPath = idata.getVariable(getVariableName()+".windows");
+			}
+			if (OsVersion.IS_OSX)	{
+				chosenPath = idata.getVariable(getVariableName()+".mac");
+			} else {
+				if (OsVersion.IS_UNIX)	{
+					chosenPath = idata.getVariable(getVariableName()+".unix");
+				}
+			}
+		}
+		VariableSubstitutor vs = new VariableSubstitutor(idata.getVariables());
+		chosenPath = vs.substitute(chosenPath, null);
+		return chosenPath;
+	}
+
+	public void setDefaultPath(AutomatedInstallData installData) {
+		installData.setVariable(getVariableName(), getDefaultPath(installData));
 	}
 }
