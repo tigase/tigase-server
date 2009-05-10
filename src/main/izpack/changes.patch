@@ -41,7 +41,7 @@ index 330ec13..dcc7292 100644
 +#
 +*.class
 diff --git a/src/build.xml b/src/build.xml
-index 60e52dc..3285efd 100644
+index 60e52dc..f2e66c8 100644
 --- a/src/build.xml
 +++ b/src/build.xml
 @@ -611,7 +611,9 @@
@@ -111,7 +111,7 @@ index 60e52dc..3285efd 100644
          <build-panel name="XInfoPanel">
              <include name="com/izforge/izpack/panels/XInfoPanel.java"/>
          </build-panel>
-@@ -776,6 +800,38 @@
+@@ -776,6 +800,39 @@
              <include name="com/izforge/izpack/panels/HTMLHelloPanel.java"/>
              <include name="com/izforge/izpack/panels/HTMLInfoPanel.java"/>
          </build-panel>
@@ -120,6 +120,7 @@ index 60e52dc..3285efd 100644
 +        <build-panel name="DerbyPathPanel">
 +            <include name="com/izforge/izpack/panels/DerbyPathPanel.java"/>
 +             <include name="com/izforge/izpack/panels/TigaseInstallerCommon.java"/>		
++	     <include name="com/izforge/izpack/panels/DerbyPathPanelConsoleHelper.java"/>
 +           <include name="com/izforge/izpack/panels/TigaseConfigConst.java"/>
 +             <include name="com/izforge/izpack/panels/TargetPanel.java"/>
 +           <include name="com/izforge/izpack/panels/TargetPanelAutomationHelper.java"/>
@@ -150,7 +151,7 @@ index 60e52dc..3285efd 100644
      </target>
  
      <!--
-@@ -811,6 +867,7 @@
+@@ -811,6 +868,7 @@
              <fileset dir="${build.dir}">
                  <include name="com/izforge/izpack/event/*.class"/>
                  <include name="com/izforge/izpack/util/IoHelper.class"/>
@@ -1174,7 +1175,7 @@ index 0000000..00d3b03
 \ No newline at end of file
 diff --git a/src/lib/com/izforge/izpack/panels/PacksPanelConsoleHelper.java b/src/lib/com/izforge/izpack/panels/PacksPanelConsoleHelper.java
 new file mode 100644
-index 0000000..2b9b45f
+index 0000000..9cf07d8
 --- /dev/null
 +++ b/src/lib/com/izforge/izpack/panels/PacksPanelConsoleHelper.java
 @@ -0,0 +1,118 @@
@@ -1259,7 +1260,7 @@ index 0000000..2b9b45f
 +	
 +	public List<IConsoleMenuItem> getPacksSelections(AutomatedInstallData installData) {
 +		List<IConsoleMenuItem> result = new ArrayList<IConsoleMenuItem>();
-+		for (Pack pack : installData.allPacks) {
++		for (Pack pack : installData.availablePacks) {
 +			result.add(new PackSelection(pack)); 
 +		}
 +		return result;
