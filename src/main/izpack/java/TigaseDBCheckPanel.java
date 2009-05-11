@@ -26,10 +26,15 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -448,6 +453,85 @@ class TigaseDBHelper {
 			return;
 		}
 	}
+
+	protected void addXmppAdminAccount(Properties variables,
+			MsgTarget msgTarget) {
+
+		// part 1, check db preconditions
+		if (!connection_ok) {
+			msgTarget.addResultMessage().append("Connection not validated");
+			return;
+		}
+		if (!db_ok) {
+			msgTarget.addResultMessage().append("Database not validated");
+			return;
+		}
+
+		if (!schema_ok) {
+			msgTarget.addResultMessage().append("Database schema is invalid");
+			return;
+		}
+
+		// part 2, acquire reqired fields and validate them
+		Object admins = variables.get("admins");
+		Set<String> jids = new LinkedHashSet<String>();
+		if (admins != null) {
+			String[] adminsStr = admins.toString().split(",");
+			for (String adminStr : adminsStr) {
+				String jid = adminStr.trim();
+				if (jid != null && jid != "") {
+					jids.add(jid);
+				}
+			}
+		}
+		if (jids.size() < 1) {
+			msgTarget.addResultMessage().append("Error: No admin users entered");
+			return;
+		}
+		
+		Object pwdObj = variables.get("adminsPwd");
+		if (pwdObj == null) {
+			msgTarget.addResultMessage().append("Error: No admin password enetered");
+			return;
+		}
+		String pwd = pwdObj.toString();
+		
+		
+		
+		//part 3, connect to db and add admin users
+		String db_conn = TigaseConfigConst.props.getProperty("root-tigase-db-uri");		
+		Connection conn = null;
+		PreparedStatement stmtAdd = null;
+		PreparedStatement stmtCheck = null;
+		try {
+			conn = DriverManager.getConnection(db_conn);
+			stmtAdd = conn.prepareStatement("call TigAddUserPlainPw(?, ?)");
+			stmtCheck = conn.prepareStatement("call TigGetUserDBUid(?)", ResultSet.TYPE_FORWARD_ONLY);
+			
+			stmtAdd.setString(2, pwd);
+			for (String jid : jids) {
+				stmtCheck.setString(1, jid);
+				ResultSet rs = stmtCheck.executeQuery();
+				if (rs.next()) {
+					// we have a user
+				} else {
+					stmtAdd.setString(1, jid);
+					stmtAdd.execute();										
+				}
+			}
+			
+			stmtCheck.close();
+			stmtAdd.close();
+			conn.close();
+			msgTarget.addResultMessage().append("Added admins OK");
+			return;
+		} 
+		catch (Exception exc) {
+			msgTarget.addResultMessage()
+				.append("Error adding users: " + exc.getMessage());
+		}
+	}	
+
 	
 	enum Tasks implements TigaseDBTask {
 		VALIDATE_CONNECTION("Checking connection to the database") {
@@ -461,15 +545,20 @@ class TigaseDBHelper {
 			}
 		},					
 		VALIDATE_DB_SCHEMA("Checking the database schema") {
-			public void execute(TigaseDBHelper helper, Properties variables, MsgTarget msgHandler) {
-				helper.validateDBSchema(variables, msgHandler);
+			public void execute(TigaseDBHelper helper, Properties variables, MsgTarget msgTarget) {
+				helper.validateDBSchema(variables, msgTarget);
 			}
 		},					
 		VALIDATE_DB_CONVERSION("Checking whether the database needs conversion") {
-			public void execute(TigaseDBHelper helper, Properties variables, MsgTarget msgHandler) {
-				helper.validateDBConversion(variables, msgHandler);
+			public void execute(TigaseDBHelper helper, Properties variables, MsgTarget msgTarget) {
+				helper.validateDBConversion(variables, msgTarget);
 			}
-		};					
+		}/*,
+		ADD_ADMIN_XMPP_ACCOUNT("Adding XMPP admin accounts") {
+			public void execute(TigaseDBHelper helper, Properties variables, MsgTarget msgTarget) {
+				helper.addXmppAdminAccount(variables, msgTarget);
+			}
+		}*/;
 
 		private final String description;
 		
@@ -499,7 +588,7 @@ class TigaseDBHelper {
 
 	static interface ResultMessage {
 		void append(String msg);
-	}	
+	}
 	
 }
 

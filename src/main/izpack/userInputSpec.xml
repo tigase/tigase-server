@@ -122,6 +122,10 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 			<spec txt="Server administrators" size="30" set="admin@$HOST_NAME"/>
 		</field>
 
+		<field type="text" align="right" variable="adminsPwd">
+			<spec txt="Admin password" size="30" set="tigase"/>
+		</field>
+
 		<field type="combo" variable="dbType">
 			<spec txt="Select database">
 				<choice txt="Derby (built-in database)" 
