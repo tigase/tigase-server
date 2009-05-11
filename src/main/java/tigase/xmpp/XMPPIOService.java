@@ -25,8 +25,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import tigase.net.IOService;
@@ -187,7 +185,8 @@ public class XMPPIOService extends IOService {
   /**
    * Describe <code>processWaitingPackets</code> method here.
    *
-   */
+	 * @throws IOException
+	 */
 	@Override
   public void processWaitingPackets() throws IOException {
 		Packet packet = null;
@@ -225,6 +224,11 @@ public class XMPPIOService extends IOService {
     // It can be called by many threads simultanously
     // so we need to make it thread-safe
 		//log.finer("About to read socket data.");
+		// Correction:
+		// The design is that this method should not be called concurrently by
+		// multiple threads. However it may happen in some specific cases.
+		// There is a 'non-blocking' synchronization in IOService.call() method
+		// implemented instead.
 // 		readLock.lock();
 //    try {
 			if (isConnected()) {

@@ -24,6 +24,7 @@ package tigase.server.sreceiver;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryUsage;
+import java.util.Date;
 import java.util.Map;
 import java.util.Queue;
 import tigase.server.Packet;
@@ -63,7 +64,7 @@ public class PubSubTestsTask extends RepoRosterTask {
 
 	private boolean memoryLow() {
 		MemoryUsage heap = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();
-		return new Long(heap.getUsed()).doubleValue()/new Long(heap.getMax()).doubleValue() > 0.7;
+		return new Long(heap.getUsed()).doubleValue()/new Long(heap.getMax()).doubleValue() > 0.8;
 	}
 
 	private enum command {
@@ -219,11 +220,20 @@ public class PubSubTestsTask extends RepoRosterTask {
 
 	private void runInThread(final Runnable job, final Packet packet) {
 		Thread thr = new Thread() {
+			@Override
 			public void run() {
+				long gen_start = System.currentTimeMillis();
 				job.run();
+				long gen_end = System.currentTimeMillis();
+				long gen_time = gen_end - gen_start;
+				long gen_hours = gen_time / 3600000;
+				long gen_mins = (gen_time - (gen_hours * 3600000)) / 60000;
+				long gen_secs = (gen_time - ((gen_hours * 3600000) + (gen_mins * 60000))) / 1000;
 				addOutPacket(Packet.getMessage(packet.getElemFrom(),
-								packet.getElemTo(), StanzaType.chat,
-								"Generation of the test data completed.",
+								packet.getElemTo(), StanzaType.chat, "" + new Date() +
+								" Generation of the test data completed.\n" +
+								"Generated in: " +
+								gen_hours + "h, " +	gen_mins + "m, " + gen_secs + "sec",
 								"PubSub testing task", null));
 
 			}
@@ -305,8 +315,8 @@ public class PubSubTestsTask extends RepoRosterTask {
 				pars = parseNumbers(body_split, 1, 2);
 				if (pars != null) {
 					addOutPacket(Packet.getMessage(packet.getElemFrom(),
-									packet.getElemTo(), StanzaType.chat,
-									"Task accepted, processing...", "PubSub testing task", null));
+									packet.getElemTo(), StanzaType.chat, "" + new Date() +
+									" Task accepted, processing...", "PubSub testing task", null));
 					runInThread(new Runnable() {
 						@Override
 						public void run() {

@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import tigase.io.IOInterface;
@@ -297,23 +298,40 @@ public abstract class IOService implements Callable<IOService> {
 		}
 	}
 
+	private AtomicBoolean writeInProgress = new AtomicBoolean(false);
+	private AtomicBoolean readInProgress = new AtomicBoolean(false);
+
   /**
    * Method <code>run</code> is used to perform
    *
-   */
+	 * @throws IOException
+	 */
+	@Override
   public IOService call() throws IOException {
 		// It is not safe to call below function here....
 		// It might be already executing in different thread...
 		// and we don't want to put any locking or synchronization
 		//		processWaitingPackets();
-		writeData(null);
+
+		// Non-blocking 'kind of' synchronization.
+		// This method is executed for both reading and writing from/to
+		// network socket. It tries to do everything in one go, however
+		// If either reading or writing is in progress then it should skip
+		// the step.
+		if (writeInProgress.compareAndSet(false, true)) {
+			writeData(null);
+			writeInProgress.set(false);
+		}
 		if (stopping) {
 			stop();
 		} else {
-			processSocketData();
-			if (receivedPackets() > 0 && serviceListener != null) {
-				serviceListener.packetsReady(this);
-			} // end of if (receivedPackets.size() > 0)
+			if (readInProgress.compareAndSet(false, true)) {
+				processSocketData();
+				if (receivedPackets() > 0 && serviceListener != null) {
+					serviceListener.packetsReady(this);
+				} // end of if (receivedPackets.size() > 0)
+				readInProgress.set(false);
+			}
 		}
     return this;
   }
