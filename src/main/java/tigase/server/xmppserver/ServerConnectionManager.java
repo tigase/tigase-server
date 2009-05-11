@@ -79,6 +79,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 	public static final String MAX_PACKET_WAITING_TIME_PROP_KEY =
 		"max-packet-waiting-time";
 	public static final long MAX_PACKET_WAITING_TIME_PROP_VAL = 7*MINUTE;
+	private long new_connection_thread_counter = 0;
 
 //	private String[] hostnames = HOSTNAMES_PROP_VAL;
 
@@ -177,13 +178,13 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 			if (serv_conn == null
 				|| (!serv_conn.sendPacket(packet) && serv_conn.needsConnection())) {
 				if (log.isLoggable(Level.FINEST)) {
-    				log.finest("Couldn't send packet, creating a new connection.");
-                }
+					log.finest("Couldn't send packet, creating a new connection.");
+				}
 				createServerConnection(cid, packet, serv_conn);
 			} else {
 				if (log.isLoggable(Level.FINEST)) {
-    				log.finest("Packet seems to be sent correctly: " + packet.toString());
-                }
+					log.finest("Packet seems to be sent correctly: " + packet.toString());
+				}
 			}
 		} // end of else
 	}
@@ -211,7 +212,24 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 	 * @param serv_conn a <code>ServerConnections</code> which was called for
 	 * the packet.
 	 */
-	private void createServerConnection(String cid, Packet packet,
+	private void createServerConnection(final String cid, final Packet packet,
+		final ServerConnections serv_conn) {
+		// Spawning a new thread for each new server connection is not the most
+		// optimal solution but I have no idea how to do it better and solve
+		// the long DNS resolution problem.
+		// On the other hand, new server connections are not opened as often
+		// so it should not be a big problem. Let's see how it works.
+    Thread new_connection_thread = new Thread("NewServerConnection-" +
+						(++new_connection_thread_counter)) {
+			@Override
+			public void run() {
+				createServerConnectionInThread(cid, packet, serv_conn);
+			}
+		};
+		new_connection_thread.start();
+	}
+
+	private void createServerConnectionInThread(String cid, Packet packet,
 		ServerConnections serv_conn) {
 
 		ServerConnections conns = serv_conn;
@@ -225,12 +243,12 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 			conns.setConnecting();
 			new ConnectionWatchdogTask(conns, localhost, remotehost);
 			if (log.isLoggable(Level.FINEST)) {
-    			log.finest("Connecting a new s2s service: " + cid);
-            }
+				log.finest("Connecting a new s2s service: " + cid);
+			}
 		} else {
 			if (log.isLoggable(Level.FINEST)) {
-    			log.finest("Couldn't open a new s2s service: (UknownHost??) " + cid);
-            }
+				log.finest("Couldn't open a new s2s service: (UknownHost??) " + cid);
+			}
 			// Can't establish connection...., unknown host??
 			Queue<Packet> waitingPackets = conns.getWaitingPackets();
 			// Well, is somebody injects a packet with the same sender and
@@ -283,8 +301,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 			port_props.put("socket", SocketType.plain);
 			port_props.put("type", ConnectionType.connect);
 			port_props.put("port-no", 5269);
-			String cid =
-				getConnectionId(localhost, remotehost);
+			String cid = getConnectionId(localhost, remotehost);
 			port_props.put("cid", cid);
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("STARTING new connection: " + cid);
@@ -394,19 +411,19 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 		String remote_hostname =
 			(String)serv.getSessionData().get("remote-hostname");
 		if (!JIDUtils.getNodeHost(packet_from).equals(remote_hostname)) {
-    			if (log.isLoggable(Level.FINER)) {
-            		log.finer("Invalid hostname from the remote server, expected: "
-                		+ remote_hostname);
-                }
+			if (log.isLoggable(Level.FINER)) {
+				log.finer("Invalid hostname from the remote server, expected: " +
+								remote_hostname);
+			}
 			generateStreamError("invalid-from", serv);
 			return false;
 		}
 		String local_hostname =	(String)serv.getSessionData().get("local-hostname");
 		if (!JIDUtils.getNodeHost(packet_to).equals(local_hostname)) {
-    		if (log.isLoggable(Level.FINER)) {
-            	log.finer("Invalid hostname of the local server, expected: "
-                	+ local_hostname);
-            }
+			if (log.isLoggable(Level.FINER)) {
+				log.finer("Invalid hostname of the local server, expected: " +
+								local_hostname);
+			}
 			generateStreamError("host-unknown", serv);
 			return false;
 		}
@@ -453,8 +470,8 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 		Map<String, String> attribs) {
 
 		if (log.isLoggable(Level.FINER)) {
-    		log.finer("Stream opened: " + attribs.toString());
-        }
+			log.finer("Stream opened: " + attribs.toString());
+		}
 
 		switch (serv.connectionType()) {
 		case connect: {
@@ -533,8 +550,8 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 	@Override
 	public void xmppStreamClosed(XMPPIOService serv) {
 		if (log.isLoggable(Level.FINER)) {
-    		log.finer("Stream closed: " + getConnectionId(serv));
-        }
+			log.finer("Stream closed: " + getConnectionId(serv));
+		}
 	}
 
 	@Override
@@ -853,9 +870,9 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 					// Incorrect dialback packet, it happens for some servers....
 					// I don't know yet what software they use.
 					// Let's just disconnect and signal unrecoverable conection error
-        			if (log.isLoggable(Level.FINER)) {
-        				log.finer("Incorrect diablack packet: " + packet.getStringData());
-                    }
+					if (log.isLoggable(Level.FINER)) {
+						log.finer("Incorrect diablack packet: " + packet.getStringData());
+					}
 					bouncePacketsBack(Authorization.SERVICE_UNAVAILABLE, cid);
 					generateStreamError("bad-format", serv);
 				}
@@ -865,16 +882,16 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 				//XMPPIOService connect_serv = handshakingByHost_Type.get(connect_jid);
 				switch (packet.getType()) {
 				case valid:
-        			if (log.isLoggable(Level.FINER)) {
-    					log.finer("Connection: " + cid
-            				+ " is valid, adding to available services.");
-                    }
+					if (log.isLoggable(Level.FINER)) {
+						log.finer("Connection: " + cid +
+										" is valid, adding to available services.");
+					}
 					serv_conns.handleDialbackSuccess();
 					break;
 				default:
-        			if (log.isLoggable(Level.FINER)) {
-        				log.finer("Connection: " + cid + " is invalid!! Stopping...");
-                    }
+					if (log.isLoggable(Level.FINER)) {
+						log.finer("Connection: " + cid + " is invalid!! Stopping...");
+					}
 					serv_conns.handleDialbackFailure();
 					break;
 				} // end of switch (packet.getType())
@@ -937,9 +954,9 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 				// Incorrect dialback packet, it happens for some servers....
 				// I don't know yet what software they use.
 				// Let's just disconnect and signal unrecoverable conection error
-    			if (log.isLoggable(Level.FINER)) {
-    				log.finer("Incorrect diablack packet: " + packet.getStringData());
-                }
+				if (log.isLoggable(Level.FINER)) {
+					log.finer("Incorrect diablack packet: " + packet.getStringData());
+				}
 				bouncePacketsBack(Authorization.SERVICE_UNAVAILABLE, cid);
 				generateStreamError("bad-format", serv);
 			}
@@ -1039,37 +1056,36 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 			if (conns.getOutgoingState() ==
 							ServerConnections.OutgoingState.CONNECTING) {
 				if (log.isLoggable(Level.FINEST)) {
-    				log.finest("Connecting timeout expired, still connecting: " +
-								conns.getCID());
-                }
+					log.finest("Connecting timeout expired, still connecting: " +
+									conns.getCID());
+				}
 				Queue<Packet> waiting = conns.getWaitingPackets();
 				if (waiting.size() > 0) {
 					if (conns.waitingTime() > maxPacketWaitingTime) {
-        				if (log.isLoggable(Level.FINEST)) {
-    						log.finest("Max packets waiting time expired, sending all back: " +
-										conns.getCID());
-                        }
+						if (log.isLoggable(Level.FINEST)) {
+							log.finest("Max packets waiting time expired, sending all back: " +
+											conns.getCID());
+						}
 						conns.stopAll();
 						bouncePacketsBack(Authorization.REMOTE_SERVER_TIMEOUT, 
 										conns.getCID());
 					} else {
-        				if (log.isLoggable(Level.FINEST)) {
-            				log.finest("Reconnecting: " +	conns.getCID());
-                        }
+						if (log.isLoggable(Level.FINEST)) {
+							log.finest("Reconnecting: " + conns.getCID());
+						}
 						createServerConnection(conns.getCID(), null, conns);
 					}
 				} else {
 					conns.stopAll();
-    				if (log.isLoggable(Level.FINEST)) {
-        				log.finest("No packets waiting in queue, giving up: " +
-									conns.getCID());
-                    }
+					if (log.isLoggable(Level.FINEST)) {
+						log.finest("No packets waiting in queue, giving up: " + conns.getCID());
+					}
 				}
 			} else {
 				if (log.isLoggable(Level.FINEST)) {
-    				log.finest("Connecting timeout expired: " + conns.getCID() +
-								", connection state is: " +	conns.getOutgoingState());
-                }
+					log.finest("Connecting timeout expired: " + conns.getCID() +
+									", connection state is: " + conns.getOutgoingState());
+				}
 			}
 		}
 
