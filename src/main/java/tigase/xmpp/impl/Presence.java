@@ -610,7 +610,7 @@ public abstract class Presence {
 							} // end of if (type == StanzaType.available)
 
 							// Broadcast initial presence to 'from' or 'both' contacts
-							sendPresenceBroadcast(type, session, SUB_FROM,
+							sendPresenceBroadcast(type, session, FROM_SUBSCRIBED,
 											results, packet.getElement(), settings);
 
 							// Broadcast initial presence to other available user resources
