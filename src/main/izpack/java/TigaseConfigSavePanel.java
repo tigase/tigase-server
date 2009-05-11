@@ -53,6 +53,8 @@ public class TigaseConfigSavePanel extends IzPanel {
 
 	private JTextArea textArea = null;
 
+	private final TigaseConfigSaveHelper helper = new TigaseConfigSaveHelper();
+
 
 	/**
 	 * The constructor.
@@ -79,44 +81,11 @@ public class TigaseConfigSavePanel extends IzPanel {
 
 	public void panelActivate() {
 		super.panelActivate();
-		// Existing configuration loading
-		String config = new TigaseConfigSaveHelper().showConfig(idata);
+		String config = helper.showConfig(idata);
 		textArea.setText(config);
 	}
 
 
-	private void saveConfig() {
-		// Try to read the config file.
-		File configPath = null;
-		File xmlConfigPath = null;
-		try {
-			if (idata.getVariable("searchTigaseHome") == null
-				|| idata.getVariable("searchTigaseHome").isEmpty()) {
-				configPath = new File(idata.getVariable("INSTALL_PATH"),
-					"etc/init.properties");
-				xmlConfigPath = new File(idata.getVariable("INSTALL_PATH"),
-					"etc/tigase.xml");
-			} else {
-				configPath = new File(idata.getVariable("searchTigaseHome"),
-					"etc/init.properties");
-				xmlConfigPath = new File(idata.getVariable("searchTigaseHome"),
-					"etc/tigase.xml");
-			}
-			FileWriter fw = new FileWriter(configPath, false);
-			fw.write(textArea.getText());
-			fw.close();
-			if (xmlConfigPath.exists()) {
-				xmlConfigPath.delete();
-			}
-		} catch (Exception err) {
-			String error = "Error : could not write to the config file: " + configPath + "\n";
-			error += err.toString() + "\n";
-			for (StackTraceElement ste: err.getStackTrace()) {
-				error += ste.toString() + "\n";
-			}
-			emitError("Can not write to config file", error);
-		}
-	}
 
 	/**
 	 * Indicates wether the panel has been validated or not.
@@ -124,7 +93,10 @@ public class TigaseConfigSavePanel extends IzPanel {
 	 * @return Always true.
 	 */
 	public boolean isValidated() {
-		saveConfig();
+		String errorStr =  helper.saveConfig(idata, textArea.getText());
+		if (errorStr != null) {
+			emitError("Can not write to config file", errorStr);
+		}
 		return true;
 	}
 
@@ -375,4 +347,39 @@ class TigaseConfigSaveHelper {
 		return result != null ? result : "derby";
 	}
 	
+	// returns null if ok, error string on error
+	String saveConfig(AutomatedInstallData idata, String config) {
+		// Try to read the config file.
+		File configPath = null;
+		File xmlConfigPath = null;
+		try {
+			if (idata.getVariable("searchTigaseHome") == null
+				|| idata.getVariable("searchTigaseHome").isEmpty()) {
+				configPath = new File(idata.getVariable("INSTALL_PATH"),
+					"etc/init.properties");
+				xmlConfigPath = new File(idata.getVariable("INSTALL_PATH"),
+					"etc/tigase.xml");
+			} else {
+				configPath = new File(idata.getVariable("searchTigaseHome"),
+					"etc/init.properties");
+				xmlConfigPath = new File(idata.getVariable("searchTigaseHome"),
+					"etc/tigase.xml");
+			}
+			FileWriter fw = new FileWriter(configPath, false);
+			fw.write(config);
+			fw.close();
+			if (xmlConfigPath.exists()) {
+				xmlConfigPath.delete();
+			}
+		} catch (Exception err) {
+			String error = "Error : could not write to the config file: " + configPath + "\n";
+			error += err.toString() + "\n";
+			for (StackTraceElement ste: err.getStackTrace()) {
+				error += ste.toString() + "\n";
+			}
+			return error;
+		}
+		return null;
+	}
+
 }
