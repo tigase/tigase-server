@@ -1,0 +1,122 @@
+tigase-server (4.1.5-b1627-xk2) hardy; urgency=low
+
+  * Added tigase.extras.io.PEMSSLContextContainer as default
+    tigase.io.SSLContextContainer in init.properties
+  * Added dependency: libbcprov-java. Required by PEMSSLContextContainer.
+
+ -- Tomasz Sterna <tomek@xiaoka.com>  Tue, 12 May 2009 10:51:21 +0000
+
+tigase-server (4.1.5-b1627-xk1) hardy; urgency=low
+
+  * Updated to SVN revision 1627:\nReverted to old and apparently
+    correct behaviour with sending initial presence to all from and both
+    contacts.
+
+ -- Tomasz Sterna <tomek@xiaoka.com>  Mon, 11 May 2009 22:37:08 +0000
+
+tigase-server (4.1.5-b1626-xk1) hardy; urgency=low
+
+  * Updated to SVN revision 1626:\nProbably fixed a bug with concurrent
+    data reading from network socket. Each new server connection is
+    opened in a separate thread to avoid DNS blocking.
+
+ -- Tomasz Sterna <tomek@xiaoka.com>  Mon, 11 May 2009 18:11:33 +0000
+
+tigase-server (4.1.5-b1624-xk1) hardy; urgency=low
+
+  * Updated to SVN revision 1624:\nadding xmpp admin user from installer
+    unneeded file cleanup config file saving fix in console installer
+
+ -- Tomasz Sterna <tomek@xiaoka.com>  Mon, 11 May 2009 12:11:09 +0000
+
+tigase-server (4.1.5-b1621-xk1) hardy; urgency=low
+
+  * Updated to SVN revision 1621:\nMerge branch 'dbfix'
+
+ -- Tomasz Sterna <tomek@xiaoka.com>  Sun, 10 May 2009 20:11:08 +0000
+
+tigase-server (4.1.5-b1620-xk1) hardy; urgency=low
+
+  * Updated to SVN revision 1620:\nAdded db and config screens Fixed
+    wrong Derby location selection in console mode Improved packs
+    selection, ignoring packs for other systems
+
+ -- Tomasz Sterna <tomek@xiaoka.com>  Sun, 10 May 2009 16:11:08 +0000
+
+tigase-server (4.1.5-b1616-xk3) hardy; urgency=low
+
+  * Added Stored procedures for Digest Auth
+
+ -- Tomasz Sterna <tomek@xiaoka.com>  Sun, 10 May 2009 00:56:21 +0000
+
+tigase-server (4.1.5-b1616-xk2) hardy; urgency=low
+
+  * Added digest auth methods to TigaseAuth.
+
+ -- Tomasz Sterna <tomek@xiaoka.com>  Sun, 10 May 2009 00:01:56 +0000
+
+tigase-server (4.1.5-b1616-xk1) hardy; urgency=low
+
+  * Updated to SVN revision 1616:\nA few fixes and spelling corrections
+    in scripts
+
+ -- Tomasz Sterna <tomek@xiaoka.com>  Sat, 09 May 2009 16:11:08 +0000
+
+tigase-server (4.1.5-b1615-xk2) hardy; urgency=low
+
+  * Fixed init script to properly include JDBC drivers
+
+ -- Tomasz Sterna <tomek@xiaoka.com>  Fri, 08 May 2009 10:14:32 +0000
+
+tigase-server (4.1.5-b1615-xk1) hardy; urgency=low
+
+  * Updated to SVN revision 1615
+
+ -- Tomasz Sterna <tomek@xiaoka.com>  Fri, 08 May 2009 09:01:07 +0000
+
+tigase-server (4.1.5-b1614-xk1) hardy; urgency=low
+
+  * Updated to SVN revision 1614
+
+ -- Tomasz Sterna <tomek@xiaoka.com>  Fri, 08 May 2009 09:00:07 +0000
+
+tigase-server (4.1.5-b1613-xk1) hardy; urgency=low
+
+  * Updated to SVN revision 1613
+  * Separated packages:
+    - tigase-xmltools
+    - tigase-utils
+    - tigase-extras
+    - tigase-muc
+    - tigase-pubsub
+  * Using /usr/share/tigase for all Tigase shared data
+
+ -- Tomasz Sterna <tomek@xiaoka.com>  Thu, 07 May 2009 13:46:50 +0000
+
+tigase-server (4.1.4-xk2) dapper; urgency=low
+
+  * Moved Derby Database to /var/spool/tigase/tigase-derbydb
+
+ -- Tomasz Sterna <tomek@xiaoka.com>  Fri, 17 Apr 2009 10:30:21 +0000
+
+tigase-server (4.1.4-xk1) unstable; urgency=low
+
+  * Updated Tigase to version 4.1.4:
+    * tigase-extras-0.3.0.jar
+    * tigase-muc-1.0.2.jar
+    * tigase-pubsub-1.0.1.jar
+    * tigase-server-4.1.4.jar
+    * tigase-utils-3.1.2.jar
+    * tigase-xmltools-3.1.1.jar
+  * Updated SQLDB connectors:
+    * mysql-connector-java-5.1.7.tar.gz
+    * postgresql-8.3-604.jdbc3.jar
+
+ -- Tomasz Sterna <tomek@xiaoka.com>  Mon, 16 Mar 2009 09:40:18 +0000
+
+tigase-server (4.1.0-b1315-1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Tomasz Sterna <tomek@xiaoka.com>  Thu, 13 Mar 2009 10:42:12 +0200
+

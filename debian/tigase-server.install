@@ -1,0 +1,8 @@
+target/*.jar	usr/share/tigase/lib
+scripts/*.sh	usr/share/tigase/scripts
+debian/*.sh	usr/share/tigase/scripts
+database	usr/share/tigase
+etc		usr/share/tigase
+etc/init.properties	etc/tigase
+certs			etc/tigase
+*.html		usr/share/doc/tigase-server

@@ -1,0 +1,5 @@
+usr/share/tigase
+usr/share/tigase/lib
+var/log/tigase
+var/run
+var/spool/tigase

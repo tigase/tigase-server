@@ -1,0 +1,5 @@
+# Defaults for tigase-server see /etc/init.d/tigase-server for more
+#TIGASE_DBDRV="-Djdbc.drivers=com.mysql.jdbc.Driver:org.postgresql.Driver:org.apache.derby.jdbc.EmbeddedDriver"
+#TIGASE_USER=tigase
+
+NO_START=1

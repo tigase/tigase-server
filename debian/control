@@ -1,0 +1,23 @@
+Source: tigase-server
+Section: net
+Priority: extra
+Maintainer: Tomasz Sterna <tomek@xiaoka.com>
+Build-Depends: cdbs, debhelper (>= 5), sun-java6-jdk, maven2
+Standards-Version: 3.8.0
+
+Package: tigase-server
+Architecture: all
+Depends: sun-java6-jre | sun-java6-jdk, sun-java6-javadb | libmysql-java | libpg-java,
+ tigase-xmltools, tigase-utils, tigase-extras, libbcprov-java,
+ adduser, ${misc:Depends}
+Description: Open Source and Free (GPLv3) Java based Jabber/XMPP server
+ The design and implementation goals of the Tigase Jabber/XMPP Server
+  * Make the server robust and reliable.
+  * Make the server secure communication platform.
+  * Make flexible server which can be applied to different use cases.
+  * Make extensible server which takes full advantage of XMPP protocol
+    extensibility.
+  * Make the server easy to setup and maintain.
+ .
+ See http://www.tigase.org/
+Homepage: http://www.tigase.org/

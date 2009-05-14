@@ -1,0 +1,11 @@
+--- scripts/tigase.sh.org    2009-03-05 16:16:15.000000000 +0100
++++ scripts/tigase.sh        2009-03-05 16:55:37.000000000 +0100
+@@ -146,7 +146,7 @@
+   start)
+     echo "Starting Tigase: "
+
+-    if [ -f ${TIGASE_PID} ]
++    if [ -f ${TIGASE_PID} ] && kill -0 $(<${TIGASE_PID}) 2>/dev/null
+     then
+       echo "Already Running!!"
+       exit 1

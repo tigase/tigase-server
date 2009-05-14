@@ -1,0 +1,19 @@
+#!/usr/bin/make -f
+# debian/rules for Jetty (uses CDBS)
+
+include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/rules/simple-patchsys.mk
+
+build:
+	mvn package
+
+clean::
+	rm -rf target
+
+binary-post-install/tigase-server::
+	mv debian/tigase-server/usr/share/tigase/database debian/tigase-server/usr/share/tigase/server-database
+	sed -i 's#jars/\|libs/#lib/#g' debian/tigase-server/usr/share/tigase/scripts/*.sh
+	sed -i 's#lib/tigase-server[^.]*.jar#lib/'`basename debian/tigase-server/usr/share/tigase/lib/tigase-server*.jar`'#g' debian/tigase-server/usr/share/tigase/scripts/*.sh
+	chmod +x debian/tigase-server/usr/share/tigase/scripts/*.sh
+	cat debian/init.properties >> debian/tigase-server/etc/tigase/init.properties
+	find debian/tigase-server -depth -type d -name .svn -exec rm -rf {} \;
