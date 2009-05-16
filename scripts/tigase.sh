@@ -39,7 +39,7 @@
 
 function usage()
 {
-  echo "Usage: $0 {start|stop|run|restart|check} params-file.conf"
+  echo "Usage: $0 {start|stop|run|restart|check} [params-file.conf]"
   exit 1
 }
 
@@ -55,6 +55,7 @@ if [ -z "${2}" ] ; then
   else
 		TIGASE_PARAMS=""
   fi
+  echo "No params-file.conf given. Using: '$TIGASE_PARAMS'"
 else
   TIGASE_PARAMS=${2}
 fi
