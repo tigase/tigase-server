@@ -28,7 +28,7 @@ import java.util.List;
  * <code>UserRepository</code> interface defines all functionalities required
  * to store user data.
  * It contains adding, removing and searching methods. User repository is
- * organized as hierachical data base. It means you can add items to repository
+ * organized as hierarchical data base. It means you can add items to repository
  * on different levels like files in file systems. Instead, however of working
  * with directories you work with nodes. You can create many levels of nodes and
  * store data on any level. It helps to organize data in more logical order.
@@ -86,10 +86,10 @@ public interface UserRepository {
 	/**
 	 * Method <code>userExists</code> checks whether the user (or repository top node)
 	 * exists in the database. The method doesn't throw any exception nor it creates
-	 * the user in case it is missing. It just checjs wether the user is already
+	 * the user in case it is missing. It just checks whether the user is already
 	 * in the database.
 	 *
-	 * Please don't overuser this method. All other methods
+	 * Please don't overuse this method. All other methods
 	 * throw <code>UserNotFoundException</code> exception in case the user is missing
 	 * for which you executed the method. The exception is thrown unless
 	 * <code>userAutoCreate</code> property is set to true. In such case the exception
@@ -105,7 +105,7 @@ public interface UserRepository {
 	boolean userExists(String user);
 
 	/**
-   * This <code>addUser</code> method allows to add new user to reposiotry.
+   * This <code>addUser</code> method allows to add new user to repository.
    * It <b>must</b> throw en exception <code>UserExistsException</code> if such
    * user already exists because user <b>must</b> be unique within user
    * repository data base.<br/>
@@ -130,7 +130,7 @@ public interface UserRepository {
    *
    * @param user a <code>String</code> value of user id consisting of user name
    * and domain address.
-	 * @exception UserNotFoundException if user id hasn't been found in reository.
+	 * @exception UserNotFoundException if user id hasn't been found in repository.
 	 * @throws TigaseDBException if database backend error occurs.
    */
   void removeUser(String user) throws UserNotFoundException, TigaseDBException;
@@ -148,7 +148,7 @@ public interface UserRepository {
    * @param key a <code>String</code> with which the needed values list is
    * associated.
    * @return a <code>String[]</code> value
-	 * @exception UserNotFoundException if user id hasn't been found in reository.
+	 * @exception UserNotFoundException if user id hasn't been found in repository.
 	 * @throws TigaseDBException if database backend error occurs.
    */
   String[] getDataList(String user, String subnode, String key)
@@ -169,7 +169,7 @@ public interface UserRepository {
    * @param def a <code>String</code> value which is returned in case if data
    * for specified key does not exixist in repository.
    * @return a <code>String</code> value
-	 * @exception UserNotFoundException if user id hasn't been found in reository.
+	 * @exception UserNotFoundException if user id hasn't been found in repository.
 	 * @throws TigaseDBException if database backend error occurs.
    */
   String getData(String user, String subnode, String key, String def)
@@ -188,7 +188,7 @@ public interface UserRepository {
    * @param key a <code>String</code> with which the needed value is
    * associated.
    * @return a <code>String</code> value
-	 * @exception UserNotFoundException if user id hasn't been found in reository.
+	 * @exception UserNotFoundException if user id hasn't been found in repository.
 	 * @throws TigaseDBException if database backend error occurs.
    */
   String getData(String user, String subnode, String key)
@@ -204,7 +204,7 @@ public interface UserRepository {
    * @param key a <code>String</code> with which the needed value is
    * associated.
    * @return a <code>String</code> value
-	 * @exception UserNotFoundException if user id hasn't been found in reository.
+	 * @exception UserNotFoundException if user id hasn't been found in repository.
 	 * @throws TigaseDBException if database backend error occurs.
    */
   String getData(String user, String key)
@@ -220,7 +220,7 @@ public interface UserRepository {
    * stored. Node path has the same form as directory path on file system:
    * <pre>/root/subnode1/subnode2</pre>.
    * @return a <code>String[]</code> value is an array of all direct subnodes.
-	 * @exception UserNotFoundException if user id hasn't been found in reository.
+	 * @exception UserNotFoundException if user id hasn't been found in repository.
 	 * @throws TigaseDBException if database backend error occurs.
    */
   String[] getSubnodes(String user, String subnode)
@@ -234,7 +234,7 @@ public interface UserRepository {
    * stored. User ID consists of user name and domain name.
    * @return a <code>String[]</code> value is an array of all <em>root</em>
    * nodes for given user.
-   * @exception UserNotFoundException if user id hasn't been found in reository.
+   * @exception UserNotFoundException if user id hasn't been found in repository.
 	 * @throws TigaseDBException if database backend error occurs.
    */
   String[] getSubnodes(String user)
@@ -253,7 +253,7 @@ public interface UserRepository {
    * stored. Node path has the same form as directory path on file system:
    * <pre>/root/subnode1/subnode2</pre>.
    * @return a <code>String[]</code> value
-   * @exception UserNotFoundException if user id hasn't been found in reository.
+   * @exception UserNotFoundException if user id hasn't been found in repository.
 	 * @throws TigaseDBException if database backend error occurs.
    */
   String[] getKeys(String user, String subnode)
@@ -269,7 +269,7 @@ public interface UserRepository {
    * @param user a <code>String</code> value of user ID for which data must be
    * stored. User ID consists of user name and domain name.
    * @return a <code>String[]</code> value
-   * @exception UserNotFoundException if user id hasn't been found in reository.
+   * @exception UserNotFoundException if user id hasn't been found in repository.
 	 * @throws TigaseDBException if database backend error occurs.
    */
   String[] getKeys(String user)
@@ -277,7 +277,7 @@ public interface UserRepository {
 
   /**
    * <code>removeData</code> method removes pair (key, value) from user
-   * reposiotry in given subnode.
+   * repository in given subnode.
    * If the key exists in user repository there is always a value
    * associated with this key - even empty <code>String</code>. If key does not
    * exist the <code>null</code> value is returned from repository backend or
@@ -289,7 +289,7 @@ public interface UserRepository {
    * stored. Node path has the same form as directory path on file system:
    * <pre>/root/subnode1/subnode2</pre>.
    * @param key a <code>String</code> for which the value is to be removed.
-   * @exception UserNotFoundException if user id hasn't been found in reository.
+   * @exception UserNotFoundException if user id hasn't been found in repository.
 	 * @throws TigaseDBException if database backend error occurs.
    */
   void removeData(String user, String subnode, String key)
@@ -297,7 +297,7 @@ public interface UserRepository {
 
   /**
    * <code>removeData</code> method removes pair (key, value) from user
-   * reposiotry in default repository node.
+   * repository in default repository node.
    * If the key exists in user repository there is always a value
    * associated with this key - even empty <code>String</code>. If key does not
    * exist the <code>null</code> value is returned from repository backend or
@@ -306,7 +306,7 @@ public interface UserRepository {
    * @param user a <code>String</code> value of user ID for which data must be
    * stored. User ID consists of user name and domain name.
    * @param key a <code>String</code> for which the value is to be removed.
-   * @exception UserNotFoundException if user id hasn't been found in reository.
+   * @exception UserNotFoundException if user id hasn't been found in repository.
 	 * @throws TigaseDBException if database backend error occurs.
    */
   void removeData(String user, String key)
@@ -322,7 +322,7 @@ public interface UserRepository {
    * @param subnode a <code>String</code> value is a node path to subnode which
    * has to be removed. Node path has the same form as directory path on file
    * system: <pre>/root/subnode1/subnode2</pre>.
-   * @exception UserNotFoundException if user id hasn't been found in reository.
+   * @exception UserNotFoundException if user id hasn't been found in repository.
 	 * @throws TigaseDBException if database backend error occurs.
    */
   void removeSubnode(String user, String subnode)
@@ -344,7 +344,7 @@ public interface UserRepository {
    * associated.
    * @param value a <code>String</code> value to be associated with the
    * specified key.
-   * @exception UserNotFoundException if user id hasn't been found in reository.
+   * @exception UserNotFoundException if user id hasn't been found in repository.
 	 * @throws TigaseDBException if database backend error occurs.
    */
   void setData(String user, String subnode, String key, String value)
@@ -364,7 +364,7 @@ public interface UserRepository {
    * associated.
    * @param value a <code>String</code> value to be associated with the
    * specified key.
-   * @exception UserNotFoundException if user id hasn't been found in reository.
+   * @exception UserNotFoundException if user id hasn't been found in repository.
 	 * @throws TigaseDBException if database backend error occurs.
    */
   void setData(String user, String key, String value)
@@ -384,9 +384,9 @@ public interface UserRepository {
    * <pre>/root/subnode1/subnode2</pre>.
    * @param key a <code>String</code> with which the specified values list is to
    * be associated.
-   * @param list a <code>String[]</code> is an array of values to be assosiated
+   * @param list a <code>String[]</code> is an array of values to be associated
    * with the specified key.
-   * @exception UserNotFoundException if user id hasn't been found in reository.
+   * @exception UserNotFoundException if user id hasn't been found in repository.
 	 * @throws TigaseDBException if database backend error occurs.
    */
   void setDataList(String user, String subnode, String key, String[] list)
@@ -405,9 +405,9 @@ public interface UserRepository {
    * <pre>/root/subnode1/subnode2</pre>.
    * @param key a <code>String</code> with which the specified values list is to
    * be associated.
-   * @param list a <code>String[]</code> is an array of values to be assosiated
+   * @param list a <code>String[]</code> is an array of values to be associated
    * with the specified key.
-   * @exception UserNotFoundException if user id hasn't been found in reository.
+   * @exception UserNotFoundException if user id hasn't been found in repository.
 	 * @throws TigaseDBException if database backend error occurs.
 	 */
 	void addDataList(String user, String subnode, String key, String[] list)
