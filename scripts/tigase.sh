@@ -141,7 +141,7 @@ case "${1}" in
   start)
     echo "Starting Tigase: "
 
-    if [ -f ${TIGASE_PID} ]
+    if [ -f ${TIGASE_PID} ] && kill -0 $(<${TIGASE_PID}) 2>/dev/null
     then
       echo "Already Running!!"
       exit 1
