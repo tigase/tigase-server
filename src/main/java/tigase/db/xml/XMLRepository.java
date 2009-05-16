@@ -88,7 +88,7 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
 	public String getResourceUri() { return xmldb.getDBFileName(); }
 
   /**
-   * This <code>addUser</code> method allows to add new user to reposiotry.
+   * This <code>addUser</code> method allows to add new user to repository.
    * It <b>must</b> throw en exception <code>UserExistsException</code> if such
    * user already exists because user <b>must</b> be unique within user
    * repository data base.<br/>
@@ -122,7 +122,7 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
    *
    * @param user a <code>String</code> value of user id consisting of user name
    * and domain address.
-   * @exception UserNotFoundException if user id hasn't been found in reository.
+   * @exception UserNotFoundException if user id hasn't been found in repository.
    */
   public synchronized void removeUser(final String user)
 		throws UserNotFoundException {
@@ -170,7 +170,7 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
    * associated.
    * @param value a <code>String</code> value to be associated with the
    * specified key.
-   * @exception UserNotFoundException if user id hasn't been found in reository.
+   * @exception UserNotFoundException if user id hasn't been found in repository.
    */
   public synchronized void setData(final String user, final String subnode,
     final String key, final String value)
@@ -205,7 +205,7 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
    * associated.
    * @param value a <code>String</code> value to be associated with the
    * specified key.
-   * @exception UserNotFoundException if user id hasn't been found in reository.
+   * @exception UserNotFoundException if user id hasn't been found in repository.
    */
   public void setData(final String user, final String key,
     final String value)
@@ -227,9 +227,9 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
    * <pre>/root/subnode1/subnode2</pre>.
    * @param key a <code>String</code> with which the specified values list is to
    * be associated.
-   * @param list a <code>String[]</code> is an array of values to be assosiated
+   * @param list a <code>String[]</code> is an array of values to be associated
    * with the specified key.
-   * @exception UserNotFoundException if user id hasn't been found in reository.
+   * @exception UserNotFoundException if user id hasn't been found in repository.
    */
   public synchronized void setDataList(final String user, final String subnode,
     final String key, final String[] list)
@@ -263,9 +263,9 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
    * <pre>/root/subnode1/subnode2</pre>.
    * @param key a <code>String</code> with which the specified values list is to
    * be associated.
-   * @param list a <code>String[]</code> is an array of values to be assosiated
+   * @param list a <code>String[]</code> is an array of values to be associated
    * with the specified key.
-   * @exception UserNotFoundException if user id hasn't been found in reository.
+   * @exception UserNotFoundException if user id hasn't been found in repository.
 	 */
   public synchronized void addDataList(final String user, final String subnode,
     final String key, final String[] list)
@@ -300,7 +300,7 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
    * @param key a <code>String</code> with which the needed values list is
    * associated.
    * @return a <code>String[]</code> value
-   * @exception UserNotFoundException if user id hasn't been found in reository.
+   * @exception UserNotFoundException if user id hasn't been found in repository.
    */
   public synchronized String[] getDataList(final String user, final String subnode,
     final String key)
@@ -334,9 +334,9 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
    * @param key a <code>String</code> with which the needed value is
    * associated.
    * @param def a <code>String</code> value which is returned in case if data
-   * for specified key does not exixist in repository.
+   * for specified key does not exist in repository.
    * @return a <code>String</code> value
-   * @exception UserNotFoundException if user id hasn't been found in reository.
+   * @exception UserNotFoundException if user id hasn't been found in repository.
    */
   public synchronized String getData(final String user, final String subnode,
     final String key, final String def)
@@ -370,7 +370,7 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
    * @param key a <code>String</code> with which the needed value is
    * associated.
    * @return a <code>String</code> value
-   * @exception UserNotFoundException if user id hasn't been found in reository.
+   * @exception UserNotFoundException if user id hasn't been found in repository.
    */
   public String getData(final String user, final String subnode,
     final String key)
@@ -388,7 +388,7 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
    * @param key a <code>String</code> with which the needed value is
    * associated.
    * @return a <code>String</code> value
-   * @exception UserNotFoundException if user id hasn't been found in reository.
+   * @exception UserNotFoundException if user id hasn't been found in repository.
    */
   public String getData(final String user, final String key)
     throws UserNotFoundException, TigaseDBException {
@@ -405,7 +405,7 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
    * stored. Node path has the same form as directory path on file system:
    * <pre>/root/subnode1/subnode2</pre>.
    * @return a <code>String[]</code> value is an array of all direct subnodes.
-   * @exception UserNotFoundException if user id hasn't been found in reository.
+   * @exception UserNotFoundException if user id hasn't been found in repository.
    */
   public synchronized String[] getSubnodes(final String user, final String subnode)
     throws UserNotFoundException, TigaseDBException {
@@ -433,7 +433,7 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
    * stored. User ID consists of user name and domain name.
    * @return a <code>String[]</code> value is an array of all <em>root</em>
    * nodes for given user.
-   * @exception UserNotFoundException if user id hasn't been found in reository.
+   * @exception UserNotFoundException if user id hasn't been found in repository.
    */
   public String[] getSubnodes(final String user)
     throws UserNotFoundException, TigaseDBException {
@@ -453,7 +453,7 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
    * stored. Node path has the same form as directory path on file system:
    * <pre>/root/subnode1/subnode2</pre>.
    * @return a <code>String[]</code> value
-   * @exception UserNotFoundException if user id hasn't been found in reository.
+   * @exception UserNotFoundException if user id hasn't been found in repository.
    */
   public synchronized String[] getKeys(final String user, final String subnode)
     throws UserNotFoundException, TigaseDBException {
@@ -483,7 +483,7 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
    * @param user a <code>String</code> value of user ID for which data must be
    * stored. User ID consists of user name and domain name.
    * @return a <code>String[]</code> value
-   * @exception UserNotFoundException if user id hasn't been found in reository.
+   * @exception UserNotFoundException if user id hasn't been found in repository.
    */
   public String[] getKeys(final String user)
     throws UserNotFoundException, TigaseDBException {
@@ -492,7 +492,7 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
 
   /**
    * <code>removeData</code> method removes pair (key, value) from user
-   * reposiotry in given subnode.
+   * repository in given subnode.
    * If the key exists in user repository there is always a value
    * associated with this key - even empty <code>String</code>. If key does not
    * exist the <code>null</code> value is returned from repository backend or
@@ -504,7 +504,7 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
    * stored. Node path has the same form as directory path on file system:
    * <pre>/root/subnode1/subnode2</pre>.
    * @param key a <code>String</code> for which the value is to be removed.
-   * @exception UserNotFoundException if user id hasn't been found in reository.
+   * @exception UserNotFoundException if user id hasn't been found in repository.
    */
   public synchronized void removeData(final String user, final String subnode,
     final String key)
@@ -520,7 +520,7 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
 
   /**
    * <code>removeData</code> method removes pair (key, value) from user
-   * reposiotry in default repository node.
+   * repository in default repository node.
    * If the key exists in user repository there is always a value
    * associated with this key - even empty <code>String</code>. If key does not
    * exist the <code>null</code> value is returned from repository backend or
@@ -529,7 +529,7 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
    * @param user a <code>String</code> value of user ID for which data must be
    * stored. User ID consists of user name and domain name.
    * @param key a <code>String</code> for which the value is to be removed.
-   * @exception UserNotFoundException if user id hasn't been found in reository.
+   * @exception UserNotFoundException if user id hasn't been found in repository.
    */
   public void removeData(final String user, final String key)
     throws UserNotFoundException {
@@ -546,7 +546,7 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
    * @param subnode a <code>String</code> value is a node path to subnode which
    * has to be removed. Node path has the same form as directory path on file
    * system: <pre>/root/subnode1/subnode2</pre>.
-   * @exception UserNotFoundException if user id hasn't been found in reository.
+   * @exception UserNotFoundException if user id hasn't been found in repository.
    */
   public synchronized void removeSubnode(final String user, final String subnode)
     throws UserNotFoundException {
@@ -633,4 +633,4 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
 		auth.queryAuth(authProps);
 	}
 
-} // SaslCallbackHandler} // XMLRepository
+} // XMLRepository
