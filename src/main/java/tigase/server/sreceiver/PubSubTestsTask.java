@@ -207,6 +207,7 @@ public class PubSubTestsTask extends RepoRosterTask {
 			}
 			while (memoryLow()) {
 				try {
+					System.gc();
 					Thread.sleep(delay);
 				} catch (Exception e) { }
 			}
