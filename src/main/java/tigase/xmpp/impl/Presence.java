@@ -46,7 +46,6 @@ import static tigase.xmpp.impl.roster.RosterAbstract.SubscriptionType;
 import static tigase.xmpp.impl.roster.RosterAbstract.PresenceType;
 import static tigase.xmpp.impl.roster.RosterAbstract.TO_SUBSCRIBED;
 import static tigase.xmpp.impl.roster.RosterAbstract.FROM_SUBSCRIBED;
-import static tigase.xmpp.impl.roster.RosterAbstract.SUB_FROM;
 
 /**
  * Describe class Presence here.
@@ -190,33 +189,17 @@ public abstract class Presence {
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Broadcasting probes for: " + session.getUserId());
 		}
-		Element presOnline = (Element) session.getSessionData(PRESENCE_KEY);
-		if (presOnline == null) {
-			presOnline = new Element(PRESENCE_ELEMENT_NAME);
-			presOnline.setAttribute("type", StanzaType.unavailable.toString());
-			presOnline.setXMLNS(XMLNS);
-		}
-		Element presProbe = presOnline.clone();
+		Element presProbe = new Element(PRESENCE_ELEMENT_NAME);
+		presProbe.setXMLNS(XMLNS);
 		presProbe.setAttribute("type", StanzaType.probe.toString());
 		String[] buddies = roster_util.getBuddies(session, TO_SUBSCRIBED, false);
 		buddies = DynamicRoster.addBuddies(session, settings, buddies);
 		if (buddies != null) {
-			Set<String> onlineJids = TigaseRuntime.getTigaseRuntime().getOnlineJids();
 			for (String buddy : buddies) {
-				// If the buddy is already online send just initial presence
-				// otherwise send probe.
-				if (onlineJids.contains(buddy)) {
-					if (log.isLoggable(Level.FINEST)) {
-						log.finest("Buddy is online, sending initial: " + buddy);
-					}
-					roster_util.setBuddyOnline(session, buddy, true);
-					sendPresence(null, buddy, session.getJID(), results, presOnline);
-				} else {
-					if (log.isLoggable(Level.FINEST)) {
-						log.finest("Buddy is offline, sending probe: " + buddy);
-					}
-					sendPresence(null, buddy, session.getUserId(), results, presProbe);
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("Sending probe to: " + buddy);
 				}
+				sendPresence(null, buddy, session.getUserId(), results, presProbe);
 			} // end of for (String buddy: buddies)
 		} // end of if (buddies == null)
 	}
@@ -239,9 +222,8 @@ public abstract class Presence {
 					final XMPPResourceConnection session,
 					final EnumSet<SubscriptionType> subscrs,
 					final Queue<Packet> results, final Element pres,
-					final Map<String, Object> settings)
+					final Map<String, Object> settings, boolean onlineOnly)
 					throws NotAuthorizedException, TigaseDBException {
-		boolean onlineOnly = true;
 		String from = session.getJID();
 		String[] buddies = roster_util.getBuddies(session, subscrs, onlineOnly);
 		buddies = DynamicRoster.addBuddies(session, settings, buddies);
@@ -603,15 +585,16 @@ public abstract class Presence {
 							if (first && type == StanzaType.available) {
 								// Send presence probes to 'to' or 'both' contacts
 								broadcastProbe(session, results, settings);
-//								sendPresenceBroadcast(StanzaType.probe, session, TO_SUBSCRIBED,
-//												results, null, settings);
 								// Resend pending in subscription requests
 								resendPendingInRequests(session, results);
-							} // end of if (type == StanzaType.available)
-
-							// Broadcast initial presence to 'from' or 'both' contacts
-							sendPresenceBroadcast(type, session, FROM_SUBSCRIBED,
-											results, packet.getElement(), settings);
+								// Broadcast initial presence to 'from' or 'both' contacts
+								sendPresenceBroadcast(type, session, FROM_SUBSCRIBED,
+												results, packet.getElement(), settings, false);
+							} else {
+								// Broadcast initial presence to 'from' or 'both' contacts
+								sendPresenceBroadcast(type, session, FROM_SUBSCRIBED,
+												results, packet.getElement(), settings, true);
+							}
 
 							// Broadcast initial presence to other available user resources
 							//				Element presence = packet.getElement().clone();
@@ -696,32 +679,33 @@ public abstract class Presence {
 							break;
 						}
 						String presBuddy = JIDUtils.getNodeID(packet.getElemFrom());
-						boolean online = StanzaType.unavailable != packet.getType();
 						// If other users are in 'to' or 'both' contacts, broadcast
 						// their preseces to all active resources
 						if (roster_util.isSubscribedTo(session, presBuddy) ||
 										(DynamicRoster.getBuddyItem(session, settings, presBuddy) != null) ||
 										// This might be just unsubscribed buddy
 										(roster_util.isBuddyOnline(session, presBuddy))) {
+							boolean online = StanzaType.unavailable != packet.getType();
 							if (log.isLoggable(Level.FINEST)) {
 								log.finest("Received initial presence, setting buddy: " +
 												packet.getElemFrom() + " online status to: " + online);
 							}
-							if (!roster_util.isBuddyOnline(session, presBuddy)) {
-								// The buddy wasn't online before so it needs our presence too
-								for (XMPPResourceConnection conn : session.getActiveSessions()) {
-									Element pres = (Element) conn.getSessionData(PRESENCE_KEY);
-									if (pres != null) {
-										if (log.isLoggable(Level.FINEST)) {
-											log.finest("Received presence from a new buddy, sending presence to: " +
-															packet.getElemFrom());
-										}
-										sendPresence(null, JIDUtils.getNodeID(packet.getElemFrom()),
-														conn.getJID(), results, pres);
-									}
-								}
-							}
+//							if (!roster_util.isBuddyOnline(session, presBuddy)) {
+//								// The buddy wasn't online before so it needs our presence too
+//								for (XMPPResourceConnection conn : session.getActiveSessions()) {
+//									Element pres = (Element) conn.getSessionData(PRESENCE_KEY);
+//									if (pres != null) {
+//										if (log.isLoggable(Level.FINEST)) {
+//											log.finest("Received presence from a new buddy, sending presence to: " +
+//															packet.getElemFrom());
+//										}
+//										sendPresence(null, JIDUtils.getNodeID(packet.getElemFrom()),
+//														conn.getJID(), results, pres);
+//									}
+//								}
+//							}
 							updatePresenceChange(packet.getElement(), session, results);
+							roster_util.setBuddyOnline(session, packet.getElemFrom(), online);
 						} else {
 							// The code below looks like a bug to me.
 							// If the buddy is not subscribed I should ignore all presences
@@ -740,7 +724,6 @@ public abstract class Presence {
 //							result.setFrom(packet.getTo());
 //							results.offer(result);
 						}
-						roster_util.setBuddyOnline(session, packet.getElemFrom(), online);
 						break;
 					case in_subscribe:
 						// If the buddy is already subscribed then auto-reply with sybscribed
