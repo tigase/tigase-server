@@ -240,7 +240,10 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 					<include name="database/*.sql"/>
 					<include name="database/*.schema"/>
 <!-- 					<exclude name="logs/*.log*"/> -->
+					<include name="etc/jmx.access"/>
+					<include name="etc/jmx.password"/>"
 				</fileset>
+				<file src="src/main/groovy/tigase/admin/UserRosterManagementExt.groovy" targetdir="$INSTALL_PATH/scripts/admin" />
 				<parsable targetfile="$INSTALL_PATH/etc/init.properties"/>
 				<parsable targetfile="$INSTALL_PATH/etc/tigase.conf"/>
 			</pack>
