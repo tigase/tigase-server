@@ -483,6 +483,7 @@ public class SessionManager extends AbstractMessageReceiver
 			res.setPermissions(perms);
 		}
 	}
+
 	@Override
 	public int processingThreads() {
 		return Runtime.getRuntime().availableProcessors();
@@ -511,14 +512,14 @@ public class SessionManager extends AbstractMessageReceiver
 		if (isLocalDomain(to)) {
 			if (packet.getElemName().equals("message")) {
 				// Yes this packet is for admin....
-    			if (log.isLoggable(Level.FINER)) {
-    				log.finer("Packet for admin: " + packet.getStringData());
-                }
+				if (log.isLoggable(Level.FINER)) {
+					log.finer("Packet for admin: " + packet.getStringData());
+				}
 				sendToAdmins(packet);
 			} else {
-    			if (log.isLoggable(Level.FINER)) {
-    				log.finer("Packet for hostname: " + packet.getStringData());
-                }
+				if (log.isLoggable(Level.FINER)) {
+					log.finer("Packet for hostname: " + packet.getStringData());
+				}
 				Packet host_pac =
           new Packet(packet.getElement().clone());
 				host_pac.getElement().setAttribute("to", getComponentId());
@@ -533,9 +534,9 @@ public class SessionManager extends AbstractMessageReceiver
 
 	protected void sendToAdmins(Packet packet) {
 		for (String admin: admins) {
-   			if (log.isLoggable(Level.FINER)) {
-    			log.finer("Sending packet to admin: " + admin);
-            }
+			if (log.isLoggable(Level.FINER)) {
+				log.finer("Sending packet to admin: " + admin);
+			}
 			Packet admin_pac =
         new Packet(packet.getElement().clone());
 			admin_pac.getElement().setAttribute("to", admin);
@@ -551,8 +552,8 @@ public class SessionManager extends AbstractMessageReceiver
 		XMPPSession session = getSession(jid);
 		if (session != null) {
 			if (log.isLoggable(Level.FINEST)) {
-    			log.finest("Session not null, getting resource for jid: " + jid);
-            }
+				log.finest("Session not null, getting resource for jid: " + jid);
+			}
 			return session.getResourceConnection(jid);
 		} // end of if (session != null)
 		return null;
