@@ -130,9 +130,7 @@ fi
 
 CLASSPATH="${CLASSPATH}${TIGASE_JAR}"
 
-for lib in ${TIGASE_HOME}/libs/* ; do
-  CLASSPATH="${CLASSPATH}:$lib"
-done
+CLASSPATH="`ls -d ${TIGASE_HOME}/libs/*.jar 2>/dev/null | grep -v wrapper | tr '\n' :`${CLASSPATH}"
 
 TIGASE_CMD="${JAVA} ${JAVA_OPTIONS} -cp ${CLASSPATH} ${TIGASE_RUN}"
 
