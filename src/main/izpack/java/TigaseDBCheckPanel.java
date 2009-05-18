@@ -559,8 +559,6 @@ class TigaseDBHelper {
 				helper.addXmppAdminAccount(variables, msgTarget);
 			}
 		};
-
-		private final String description;
 		
 		private Tasks(String description) {
 			this.description = description;
