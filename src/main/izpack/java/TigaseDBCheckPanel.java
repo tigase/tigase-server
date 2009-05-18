@@ -553,12 +553,12 @@ class TigaseDBHelper {
 			public void execute(TigaseDBHelper helper, Properties variables, MsgTarget msgTarget) {
 				helper.validateDBConversion(variables, msgTarget);
 			}
-		}/*,
+		},
 		ADD_ADMIN_XMPP_ACCOUNT("Adding XMPP admin accounts") {
 			public void execute(TigaseDBHelper helper, Properties variables, MsgTarget msgTarget) {
 				helper.addXmppAdminAccount(variables, msgTarget);
 			}
-		}*/;
+		};
 
 		private final String description;
 		
