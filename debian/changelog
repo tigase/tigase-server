@@ -1,3 +1,36 @@
+tigase-server (4.1.5-b1637-xk1) hardy; urgency=low
+
+  * Updated to SVN revision 1637:\nPresence incorrect broadcast fixed
+    for probe and initial presence. Code formatting update CLASSPATH
+    generating now excludes wrapper libraries
+
+ -- Tomasz Sterna <tomek@xiaoka.com>  Mon, 18 May 2009 13:33:22 +0000
+
+tigase-server (4.1.5-b1634-xk1) hardy; urgency=low
+
+  * Updated to SVN revision 1634:\nAdded GC calls when memory is Low.
+
+ -- Tomasz Sterna <tomek@xiaoka.com>  Sun, 17 May 2009 20:11:09 +0000
+
+tigase-server (4.1.5-b1633-xk1) hardy; urgency=low
+
+  * Updated to SVN revision 1633:\nTypo fixes.
+
+ -- Tomasz Sterna <tomek@xiaoka.com>  Sat, 16 May 2009 18:11:09 +0000
+
+tigase-server (4.1.5-b1632-xk1) hardy; urgency=low
+
+  * Updated to SVN revision 1632:\nTypo fixes.
+
+ -- Tomasz Sterna <tomek@xiaoka.com>  Sat, 16 May 2009 16:11:08 +0000
+
+tigase-server (4.1.5-b1631-xk1) hardy; urgency=low
+
+  * Updated to SVN revision 1631:\navoid-stale-pid.patch was merged to
+    SVN Added info about using discovered config file
+
+ -- Tomasz Sterna <tomek@xiaoka.com>  Sat, 16 May 2009 12:11:08 +0000
+
 tigase-server (4.1.5-b1628-xk1) hardy; urgency=low
 
   * Updated to SVN revision 1628:\nAdded debian source directory

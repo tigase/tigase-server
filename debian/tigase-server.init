@@ -122,8 +122,8 @@ fi
 # Put all jars in classpath
 CLASSPATH="$TIGASE_JAR"
 
-for lib in $TIGASE_HOME/lib/*.jar \
-           /usr/lib/jvm/java-6-sun/db/lib/derby.jar \
+CLASSPATH="`ls -d $TIGASE_HOME/lib/*.jar 2>/dev/null | grep -v wrapper | tr -d '\n' :`$CLASSPATH"
+for lib in /usr/lib/jvm/java-6-sun/db/lib/derby.jar \
            /usr/share/java/postgresql.jar \
            /usr/share/java/mysql.jar \
            /usr/share/java/bcprov.jar ; do
