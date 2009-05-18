@@ -559,6 +559,11 @@ class TigaseDBHelper {
 				helper.addXmppAdminAccount(variables, msgTarget);
 			}
 		};
+<<<<<<< HEAD:src/main/izpack/java/TigaseDBCheckPanel.java
+=======
+
+		private final String description;
+>>>>>>> activated user adding task:src/main/izpack/java/TigaseDBCheckPanel.java
 		
 		private Tasks(String description) {
 			this.description = description;
