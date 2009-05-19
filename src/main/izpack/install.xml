@@ -63,12 +63,14 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 		<variable name="DerbyDBPath.windows" value="${INSTALL_PATH}\tigasedb"/>
 		<variable name="DerbyDBPath.mac" value="${INSTALL_PATH}/tigasedb"/>
 		<variable name="DerbyDBPath.unix" value="${INSTALL_PATH}/tigasedb"/>
+		<variable name="JDKPath" value="$JAVA_HOME"/>
 	</variables>
 
+<!-- moved to variables 
 	<dynamicvariables>
 		<variable name="JDKPath" value="$JAVA_HOME"/>
 	</dynamicvariables>
-
+-->
 	<conditions>
 		<condition type="variable" id="installSelected">
 			<name>serverInstall</name>
