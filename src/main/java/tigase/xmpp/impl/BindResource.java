@@ -47,7 +47,7 @@ import tigase.db.NonAuthUserRepository;
 public class BindResource extends XMPPProcessor
 	implements XMPPProcessorIfc {
 
-  private static final String RESOURCE_KEY = "Resource-Binded";
+  protected static final String RESOURCE_KEY = "Resource-Binded";
   private static final String XMLNS = "urn:ietf:params:xml:ns:xmpp-bind";
   private static final Logger log =
 		Logger.getLogger("tigase.xmpp.impl.BindResource");
@@ -64,29 +64,33 @@ public class BindResource extends XMPPProcessor
 
   private static int resGenerator = 0;
 
+	@Override
 	public String id() { return ID; }
 
+	@Override
 	public String[] supElements()
 	{ return ELEMENTS; }
 
+	@Override
   public String[] supNamespaces()
 	{ return XMLNSS; }
 
+	@Override
   public Element[] supStreamFeatures(final XMPPResourceConnection session)	{
-		if (session == null) {
-			return null;
-		}
-    if (session.getSessionData(RESOURCE_KEY) != null
-				|| !session.isAuthorized()) {
-      return null;
-    } else {
+		if (session != null &&
+						session.getSessionData(RESOURCE_KEY) == null &&
+						session.isAuthorized()) {
       return FEATURES;
+    } else {
+      return null;
     } // end of if (session.isAuthorized()) else
 	}
 
+	@Override
   public Element[] supDiscoFeatures(final XMPPResourceConnection session)
 	{ return DISCO_FEATURES; }
 
+	@Override
   public void process(final Packet packet, final XMPPResourceConnection session,
 		final NonAuthUserRepository repo, final Queue<Packet> results,
 		final Map<String, Object> settings)
