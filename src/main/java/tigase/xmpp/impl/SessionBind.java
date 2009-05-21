@@ -79,7 +79,8 @@ public class SessionBind extends XMPPProcessor
 
 	@Override
   public Element[] supStreamFeatures(final XMPPResourceConnection session)	{
-    if (session.getSessionData(SESSION_KEY) == null &&
+    if (session != null &&
+						session.getSessionData(SESSION_KEY) == null &&
 						session.getSessionData(BindResource.RESOURCE_KEY) != null) {
       return FEATURES;
     } else {
