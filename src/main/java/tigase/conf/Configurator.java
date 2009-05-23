@@ -497,6 +497,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 		try {
 			String cls_name = (String)props.get(USER_REPO_CLASS_PROP_KEY);
 			String res_uri = (String)props.get(USER_REPO_URL_PROP_KEY);
+			repo_pool.initRepository(res_uri, user_repo_params);
 			for (int i = 0; i < repo_pool_size; i++) {
 				user_repository =
 								RepositoryFactory.getUserRepository(getName() + "-" + (i+1),
