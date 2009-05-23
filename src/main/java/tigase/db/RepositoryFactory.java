@@ -78,7 +78,7 @@ public class RepositoryFactory {
 		throws ClassNotFoundException, InstantiationException,
 					 IllegalAccessException, DBInitException {
 		// XMLRepository is different as you can not have many instances accessing
-		// the same file, thus we have to detect it and return always a hadle
+		// the same file, thus we have to detect it and return always a handle
 		// to the same repository instance if it is accessing the same file
 		if (class_name.equals("tigase.db.xml.XMLRepository")) {
 			comp_name = resource;

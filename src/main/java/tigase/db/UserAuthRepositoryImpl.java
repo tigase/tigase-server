@@ -67,7 +67,7 @@ public class UserAuthRepositoryImpl implements UserAuthRepository {
 	private static final String[] sasl_mechs =
 	{
 		"PLAIN"
-		,	"DIGEST-MD5"
+		, "DIGEST-MD5"
 		, "CRAM-MD5"
 	};
 
