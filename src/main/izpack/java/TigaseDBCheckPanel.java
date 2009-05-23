@@ -26,13 +26,10 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.Timer;
@@ -43,6 +40,12 @@ import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
+
+import tigase.db.DBInitException;
+import tigase.db.RepositoryFactory;
+import tigase.db.TigaseDBException;
+import tigase.db.UserAuthRepository;
+import tigase.db.UserExistsException;
 
 import com.izforge.izpack.gui.IzPanelLayout;
 import com.izforge.izpack.installer.InstallData;
@@ -457,6 +460,7 @@ class TigaseDBHelper {
 	protected void addXmppAdminAccount(Properties variables,
 			MsgTarget msgTarget) {
 
+		
 		// part 1, check db preconditions
 		if (!connection_ok) {
 			msgTarget.addResultMessage().append("Connection not validated");
@@ -496,39 +500,37 @@ class TigaseDBHelper {
 		}
 		String pwd = pwdObj.toString();
 		
-		
-		
-		//part 3, connect to db and add admin users
-		String db_conn = TigaseConfigConst.props.getProperty("root-tigase-db-uri");		
-		Connection conn = null;
-		PreparedStatement stmtAdd = null;
-		PreparedStatement stmtCheck = null;
+		String className = TigaseConfigConst.props.getProperty("--auth-db");
+		if (className == null) 
+			className = TigaseConfigConst.props.getProperty("--user-db");;
+		String resource = TigaseConfigConst.props.getProperty("--auth-db-uri");
+		if (resource == null) 
+			resource = TigaseConfigConst.props.getProperty("--user-db-uri");
+
 		try {
-			conn = DriverManager.getConnection(db_conn);
-			stmtAdd = conn.prepareStatement("call TigAddUserPlainPw(?, ?)");
-			stmtCheck = conn.prepareStatement("call TigGetUserDBUid(?)", ResultSet.TYPE_FORWARD_ONLY);
+			UserAuthRepository repo = RepositoryFactory.getAuthRepository(
+					"installer", className, resource, null);
 			
-			stmtAdd.setString(2, pwd);
 			for (String jid : jids) {
-				stmtCheck.setString(1, jid);
-				ResultSet rs = stmtCheck.executeQuery();
-				if (rs.next()) {
-					// we have a user
-				} else {
-					stmtAdd.setString(1, jid);
-					stmtAdd.execute();										
-				}
+				try {
+					repo.addUser(jid, pwd);
+				} catch (UserExistsException e) {
+					// user is already there, we swallow the exception
+				} 
 			}
 			
-			stmtCheck.close();
-			stmtAdd.close();
-			conn.close();
-			msgTarget.addResultMessage().append("Added admins OK");
-			return;
-		} 
-		catch (Exception exc) {
-			msgTarget.addResultMessage()
-				.append("Error adding users: " + exc.getMessage());
+			msgTarget.addResultMessage().append("All users added");
+			
+		} catch (DBInitException e) {
+			msgTarget.addResultMessage().append("Error initializing DB");
+		} catch (TigaseDBException e) {
+			msgTarget.addResultMessage().append("DB error: " + e.getMessage());
+		} catch (ClassNotFoundException e) {
+			msgTarget.addResultMessage().append("Error locating connector");
+		} catch (InstantiationException e) {
+			msgTarget.addResultMessage().append("Error initializing connector");
+		} catch (IllegalAccessException e) {
+			msgTarget.addResultMessage().append("Illegal access");
 		}
 	}	
 
@@ -559,11 +561,8 @@ class TigaseDBHelper {
 				helper.addXmppAdminAccount(variables, msgTarget);
 			}
 		};
-<<<<<<< HEAD:src/main/izpack/java/TigaseDBCheckPanel.java
-=======
 
 		private final String description;
->>>>>>> activated user adding task:src/main/izpack/java/TigaseDBCheckPanel.java
 		
 		private Tasks(String description) {
 			this.description = description;
