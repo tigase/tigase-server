@@ -90,6 +90,16 @@ public class XMPPSession {
 		return activeResources.size();
 	}
 
+	public int getResSizeForConnStatus(ConnectionStatus status) {
+		int result = 0;
+		for (XMPPResourceConnection conn : activeResources) {
+			if (conn.getConnectionStatus() == status) {
+				++result;
+			}
+		}
+		return result;
+	}
+
 //	public void resourceSet(XMPPResourceConnection conn) {
 //		//activeResources.remove(conn);
 //		String cur_res = conn.getResource();
@@ -215,8 +225,8 @@ public class XMPPSession {
 
 	public synchronized XMPPResourceConnection getResourceConnection(final String jid) {
 		if (log.isLoggable(Level.FINEST)) {
-    		log.finest("Called for: " + jid);
-        }
+			log.finest("Called for: " + jid);
+		}
 		if (activeResources.size() == 0) {
 			return null;
 		} // end of if (activeResources.size() == 0)
@@ -232,16 +242,16 @@ public class XMPPSession {
 		XMPPResourceConnection conn = getResourceForJID(jid);
 		if (conn != null) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Number of resources: " + activeResources.size()
-					+ ", got resource for jid: " + jid);
-				}
+				log.finest("Number of resources: " + activeResources.size() +
+								", got resource for jid: " + jid);
+			}
 			return conn;
 		} // end of if (conn != null)
 
 		// There is no active resource for this jid, so let's return
 		// connection with the highest priority:
 		ArrayList<XMPPResourceConnection> al =
-			new ArrayList<XMPPResourceConnection>();
+						new ArrayList<XMPPResourceConnection>();
 //		al.add(activeResources.get(0));
 //		int highest_priority = al.get(0).getPriority();
 		int highest_priority = 0;
@@ -251,7 +261,7 @@ public class XMPPSession {
 			if (!conn_tmp.isAuthorized()) {
 				log.info("Old XMPP connection which is not authorized anymore, removing..." +
 								conn_tmp.getConnectionId());
-				it.remove();
+				activeResources.remove(conn_tmp);
 			}
 			if (conn_tmp.getPriority() == highest_priority) {
 				al.add(conn_tmp);
@@ -290,11 +300,11 @@ public class XMPPSession {
 		return sessionData.get(key);
 	}
 
-	void putCommonSessionData(String key, Object value) {
+	protected void putCommonSessionData(String key, Object value) {
 		sessionData.put(key, value);
 	}
 
-	Object removeCommonSessionData(String key) {
+	protected Object removeCommonSessionData(String key) {
 		return sessionData.remove(key);
 	}
 
