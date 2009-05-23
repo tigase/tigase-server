@@ -98,7 +98,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 	 * components....
 	 */
 	private String routerCompName = null;
-	// Default user repsitory instance which can be shared among components
+	// Default user repository instance which can be shared among components
 	private UserRepository user_repository = null;
 	private UserRepositoryPool repo_pool = null;
 	private Map<String, String> user_repo_params = null;

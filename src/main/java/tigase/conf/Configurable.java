@@ -231,7 +231,7 @@ public interface Configurable extends ServerComponent {
 	void setProperties(Map<String, Object> properties);
 
   /**
-   * Returns defualt configuration settings for this object.
+   * Returns default configuration settings for this object.
 	 * @param params
 	 * @return
 	 */
