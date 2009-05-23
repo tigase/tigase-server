@@ -60,7 +60,7 @@ public class OfflineMessages extends XMPPProcessor
 	implements XMPPPostprocessorIfc, XMPPProcessorIfc {
 
   /**
-   * Private logger for class instancess.
+   * Private logger for class instances.
    */
   private static Logger log =
 		Logger.getLogger("tigase.xmpp.impl.OfflineMessage");

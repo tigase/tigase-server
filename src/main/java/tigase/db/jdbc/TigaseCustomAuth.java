@@ -68,7 +68,7 @@ import static tigase.db.UserAuthRepository.*;
  * ends before processing.
  *
  * Please don't use semicolon <code>';'</code> at the end of the query as many
- * JDBC drivers get confused and the query may not work for unknown obious
+ * JDBC drivers get confused and the query may not work for unknown obvious
  * reason.
  *
  * Some queries take arguments. Arguments are marked by question marks
@@ -96,7 +96,7 @@ import static tigase.db.UserAuthRepository.*;
 public class TigaseCustomAuth implements UserAuthRepository {
 
   /**
-   * Private logger for class instancess.
+   * Private logger for class instances.
    */
   private static final Logger log =
     Logger.getLogger("tigase.db.jdbc.TigaseCustomAuth");
@@ -146,7 +146,7 @@ public class TigaseCustomAuth implements UserAuthRepository {
 	 */
 	public static final String DEF_DELUSER_KEY = "del-user-query";
 	/**
-	 * Rertieves user password from the database for given user_id (JID).
+	 * Retrieves user password from the database for given user_id (JID).
 	 *
 	 * Takes 1 argument: <code>(user_id (JID))</code>
 	 *
