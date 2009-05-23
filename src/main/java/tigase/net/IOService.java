@@ -431,14 +431,15 @@ public abstract class IOService implements Callable<IOService> {
 
 					setLastTransferTime();
 					addWritten(data.length());
+					empty_read_call_count = 0;
 				} else {
 					if (socketIO.waitingToSend()) {
 						socketIO.write(null);
 
 						setLastTransferTime();
+						empty_read_call_count = 0;
 					}
 				}
-				empty_read_call_count = 0;
 			} catch (Exception e) {
 				forceStop();
 			}
