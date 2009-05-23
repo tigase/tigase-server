@@ -41,7 +41,9 @@ package tigase.xmpp;
 public enum ConnectionStatus {
 
 	INIT, ON_HOLD, REDIRECT, NORMAL,
-  // The temp state is a special state used in the session transfer
-  TEMP;
+  // The TEMP state is a special state used in the session transfer
+  TEMP,
+	// The REMOTE state is for user session on remote cluster nodes
+	REMOTE;
 
 }
