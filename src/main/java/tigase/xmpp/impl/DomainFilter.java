@@ -110,13 +110,13 @@ public class DomainFilter extends XMPPProcessor
 		DOMAINS domains =
 						(DOMAINS)session.getCommonSessionData(ALLOWED_DOMAINS_KEY);
 		if (log.isLoggable(Level.FINEST)) {
-    		log.finest("domains read from user session: " + domains);
-        }
+			log.finest("domains read from user session: " + domains);
+		}
 		if (domains == null) {
 			String dbDomains = session.getData(null, ALLOWED_DOMAINS_KEY, null);
 			if (log.isLoggable(Level.FINEST)) {
-    			log.finest("Domains read from database: " + dbDomains);
-            }
+				log.finest("Domains read from database: " + dbDomains);
+			}
 			domains = DOMAINS.valueof(dbDomains);
 			if (domains == null) {
 				if (session.isAnonymous()) {
