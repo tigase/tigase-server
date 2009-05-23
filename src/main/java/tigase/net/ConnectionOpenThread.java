@@ -83,9 +83,9 @@ public class ConnectionOpenThread implements Runnable {
 			Thread thrd = new Thread(acceptThread);
 			thrd.setName("ConnectionOpenThread");
 			thrd.start();
-            if (log.isLoggable(Level.FINER)) {
-            	log.finer("ConnectionOpenThread started.");
-            }
+			if (log.isLoggable(Level.FINER)) {
+				log.finer("ConnectionOpenThread started.");
+			}
 		} // end of if (acceptThread == null)
 		return acceptThread;
 	}
@@ -114,11 +114,10 @@ public class ConnectionOpenThread implements Runnable {
 	private void addPort(ConnectionOpenListener al)
 		throws IOException {
 
-		if (al.getIfcs() == null || al.getIfcs().length == 0
-			|| al.getIfcs()[0].equals("ifc") || al.getIfcs()[0].equals("*")) {
+		if (al.getIfcs() == null || al.getIfcs().length == 0 ||
+						al.getIfcs()[0].equals("ifc") || al.getIfcs()[0].equals("*")) {
 			addISA(new InetSocketAddress(al.getPort()), al);
-		} // end of if (ip == null || ip.equals(""))
-		else {
+		} else {
 			for (String ifc: al.getIfcs()) {
 				addISA(new InetSocketAddress(ifc, al.getPort()), al);
 			} // end of for ()
@@ -140,8 +139,8 @@ public class ConnectionOpenThread implements Runnable {
 			break;
 		case connect:
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Setting up 'connect' channel for: "
-					+ isa.getAddress() + "/" + isa.getPort());
+				log.finest("Setting up 'connect' channel for: " + isa.getAddress() +
+								"/" + isa.getPort());
 			}
 			SocketChannel sc = SocketChannel.open();
 			sc.socket().setReceiveBufferSize(RECEIVE_BUFFER_SIZE);
@@ -168,6 +167,7 @@ public class ConnectionOpenThread implements Runnable {
 
   }
 
+	@Override
 	public void run() {
 
     while (!stopping) {
@@ -201,9 +201,9 @@ public class ConnectionOpenThread implements Runnable {
 							sc.configureBlocking(false);
 							sc.socket().setSoLinger(false, 0);
 							sc.socket().setReuseAddress(true);
-                            if (log.isLoggable(Level.FINER)) {
-                            	log.finer("Registered new client socket: "+sc);
-                            }
+							if (log.isLoggable(Level.FINER)) {
+								log.finer("Registered new client socket: " + sc);
+							}
 							ConnectionOpenListener al = (ConnectionOpenListener)sk.attachment();
 							al.accept(sc);
 						} catch (java.net.SocketException e) {
@@ -221,8 +221,7 @@ public class ConnectionOpenThread implements Runnable {
         //stopping = true;
       } // end of catch
       catch (Exception e) {
-        log.log(Level.SEVERE,
-          "Other service exception.", e);
+        log.log(Level.SEVERE, "Other service exception.", e);
         //stopping = true;
       } // end of catch
     }
