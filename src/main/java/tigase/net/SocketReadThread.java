@@ -108,7 +108,6 @@ public class SocketReadThread implements Runnable {
 	}
 
 	public void setMaxThreadPerCPU(int threads) {
-		int cpus = Runtime.getRuntime().availableProcessors();
 		setMaxThread(threads * cpus);
 	}
 
@@ -218,7 +217,7 @@ public class SocketReadThread implements Runnable {
 			IOService serv = (IOService) sk.attachment();
 			SocketChannel sc = serv.getSocketChannel();
 			if (sc == null || !sc.isConnected()) {
-				cancelled = false;
+				cancelled = true;
 				sk.cancel();
 				try {
 					log.info("Forcing stopping the service: " + serv.getUniqueId());
