@@ -343,14 +343,18 @@ public class ClusterElement {
 	}
 
 	public void addDataPacket(Packet packet) {
+		addDataPacket(packet.getElement());
+	}
+
+	public void addDataPacket(Element packet) {
 		if (packets == null) {
 			packets = new ArrayList<Element>();
 		}
-		packets.add(packet.getElement());
+		packets.add(packet);
 		if (elem.findChild(CLUSTER_DATA_PATH) == null) {
 			elem.addChild(new Element(CLUSTER_DATA_EL_NAME));
 		}
-		elem.findChild(CLUSTER_DATA_PATH).addChild(packet.getElement());
+		elem.findChild(CLUSTER_DATA_PATH).addChild(packet);
 	}
 
 	public List<Element> getDataPackets() {

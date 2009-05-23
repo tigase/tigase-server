@@ -1182,8 +1182,9 @@ public class SessionManager extends AbstractMessageReceiver
 				plugin_config.put(comp_id, plugin_settings);
 			}
 		} // end of for (String comp_id: plugins)
-		loginUserSession(NULL_ROUTING, getDefHostName(),
-						getComponentId(), null, ConnectionStatus.NORMAL, getComponentId());
+		registerNewSession(getComponentId(), createUserSession(NULL_ROUTING, getDefHostName()));
+//		loginUserSession(NULL_ROUTING, getDefHostName(),
+//						getComponentId(), null, ConnectionStatus.NORMAL, getComponentId());
 		String[] admins_tmp = (String[])props.get(ADMINS_PROP_KEY);
 		if (admins_tmp != null) {
 			for (String admin : admins_tmp) {
@@ -1286,7 +1287,7 @@ public class SessionManager extends AbstractMessageReceiver
 			Authorization auth = conn.loginToken(user_id, xmpp_sessionId, conn_id);
 			if (auth == Authorization.AUTHORIZED) {
 				handleLogin(JIDUtils.getNodeNick(user_id), conn);
-				registerNewSession(JIDUtils.getNodeID(user_id), conn);
+				//registerNewSession(JIDUtils.getNodeID(user_id), conn);
 				if (resource != null) {
 					conn.setResource(resource);
 				}
@@ -1344,6 +1345,11 @@ public class SessionManager extends AbstractMessageReceiver
 
 	@Override
 	public void handleResourceBind(XMPPResourceConnection conn) {
+
+	}
+
+	@Override
+	public void handlePresenceSet(XMPPResourceConnection conn) {
 
 	}
 

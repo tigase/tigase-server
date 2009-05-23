@@ -46,6 +46,7 @@ import static tigase.xmpp.impl.roster.RosterAbstract.SubscriptionType;
 import static tigase.xmpp.impl.roster.RosterAbstract.PresenceType;
 import static tigase.xmpp.impl.roster.RosterAbstract.TO_SUBSCRIBED;
 import static tigase.xmpp.impl.roster.RosterAbstract.FROM_SUBSCRIBED;
+import static tigase.xmpp.XMPPResourceConnection.PRESENCE_KEY;
 
 /**
  * Describe class Presence here.
@@ -58,12 +59,6 @@ import static tigase.xmpp.impl.roster.RosterAbstract.FROM_SUBSCRIBED;
  */
 public abstract class Presence {
 
-	/**
-	 * Constant <code>PRESENCE_KEY</code> is a key in temporary session data
-	 * where the last presence sent by the userto server is stored,
-	 * either initial presence or off-line presence before disconnecting.
-	 */
-	public static final String PRESENCE_KEY = "user-presence";
 	/**
 	 * <code>DIRECT_PRESENCE</code> is a key in temporary session data for
 	 * the collection of JIDs where direct presence was sent.
@@ -458,6 +453,27 @@ public abstract class Presence {
 		}
 	}
 
+	protected static void outInitialAnonymous(Packet packet, XMPPResourceConnection session,
+					Queue<Packet> results) throws NotAuthorizedException {
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Anonymous session: " + session.getUserId());
+		}
+		String peer = JIDUtils.getNodeID(packet.getElemTo());
+		String nick = packet.getElemCData("/presence/nick");
+		if (nick == null) {
+			nick = session.getUserName();
+		}
+		Packet rost_update =
+						new Packet(JabberIqRoster.createRosterPacket("set",
+						session.nextStanzaId(), peer, peer, session.getUserId(),
+						nick, new String[]{"Anonymous peers"}, null,
+						JabberIqRoster.ANON));
+		results.offer(rost_update);
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Sending roster update: " + rost_update.toString());
+		}
+	}
+
 	@SuppressWarnings({"unchecked", "fallthrough"})
 	public static void process(final Packet packet,
 					final XMPPResourceConnection session,
@@ -528,23 +544,7 @@ public abstract class Presence {
 						if (packet.getElemTo() != null) {
 							// Yes this is it, send direct presence
 							if (session.isAnonymous()) {
-								if (log.isLoggable(Level.FINEST)) {
-									log.finest("Anonymous session: " + session.getUserId());
-								}
-								String peer = JIDUtils.getNodeID(packet.getElemTo());
-								String nick = packet.getElemCData("/presence/nick");
-								if (nick == null) {
-									nick = session.getUserName();
-								}
-								Packet rost_update =
-												new Packet(JabberIqRoster.createRosterPacket("set",
-												session.nextStanzaId(), peer, peer, session.getUserId(),
-												nick, new String[]{"Anonymous peers"}, null,
-												JabberIqRoster.ANON));
-								results.offer(rost_update);
-								if (log.isLoggable(Level.FINEST)) {
-									log.finest("Sending roster update: " + rost_update.toString());
-								}
+								outInitialAnonymous(packet, session, results);
 							}
 							Element result = packet.getElement().clone();
 							results.offer(new Packet(result));
@@ -564,23 +564,7 @@ public abstract class Presence {
 
 							// Store user presence for later time...
 							// To send response to presence probes for example.
-							session.putSessionData(PRESENCE_KEY, packet.getElement());
-
-							// Parse resource priority:
-							String priority = packet.getElemCData("/presence/priority");
-							if (priority != null) {
-								int pr = 1;
-								try {
-									pr = Integer.decode(priority);
-								} catch (NumberFormatException e) {
-									if (log.isLoggable(Level.FINER)) {
-										log.finer("Incorrect priority value: " + priority +
-														", setting 1 as default.");
-									}
-									pr = 1;
-								}
-								session.setPriority(pr);
-							}
+							session.setPresence(packet.getElement());
 
 							// Special actions on the first availability presence
 							if (first && type == StanzaType.available) {

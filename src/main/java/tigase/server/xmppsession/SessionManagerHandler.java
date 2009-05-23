@@ -42,6 +42,8 @@ public interface SessionManagerHandler {
 
 	void handleResourceBind(XMPPResourceConnection conn);
 
+	void handlePresenceSet(XMPPResourceConnection conn);
+
 	boolean isLocalDomain(String domain, boolean includeComponents);
 
 }

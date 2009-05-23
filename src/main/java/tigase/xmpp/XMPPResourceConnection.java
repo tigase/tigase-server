@@ -32,6 +32,7 @@ import tigase.db.UserAuthRepository;
 import tigase.db.TigaseDBException;
 import tigase.server.xmppsession.SessionManagerHandler;
 import tigase.db.AuthorizationException;
+import tigase.xml.Element;
 
 /**
  * Describe class XMPPResourceConnection here.
@@ -49,6 +50,13 @@ public class XMPPResourceConnection extends RepositoryAccess {
    */
   private static final Logger log =
 		Logger.getLogger("tigase.xmpp.XMPPResourceConnection");
+
+	/**
+	 * Constant <code>PRESENCE_KEY</code> is a key in temporary session data
+	 * where the last presence sent by the userto server is stored,
+	 * either initial presence or off-line presence before disconnecting.
+	 */
+	public static final String PRESENCE_KEY = "user-presence";
 
 	private SessionManagerHandler loginHandler = null;
 	private XMPPSession parentSession = null;
@@ -197,6 +205,31 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	public final void removeSessionData(final String key) {
     lastAccessed = System.currentTimeMillis();
 		sessionData.remove(key);
+	}
+
+	public void setPresence(Element packet) {
+		putSessionData(PRESENCE_KEY, packet);
+
+		// Parse resource priority:
+		String pr_str = packet.getCData("/presence/priority");
+		if (pr_str != null) {
+			int pr = 1;
+			try {
+				pr = Integer.decode(pr_str);
+			} catch (NumberFormatException e) {
+				if (log.isLoggable(Level.FINER)) {
+					log.finer("Incorrect priority value: " + pr_str +
+									", setting 1 as default.");
+				}
+				pr = 1;
+			}
+			setPriority(pr);
+		}
+		loginHandler.handlePresenceSet(this);
+	}
+
+	public Element getPresence() {
+		return (Element)getSessionData(PRESENCE_KEY);
 	}
 
 	public void setPriority(final int priority) {

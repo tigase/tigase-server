@@ -81,6 +81,7 @@ public class SessionManagerClustered extends SessionManager
 	private static final String TOKEN = "token";
 	private static final String TRANSFER = "transfer";
 	private static final String AUTH_TIME = "auth-time";
+	private static final String CLUSTER_BROADCAST = "cluster-broadcast";
 
 	private Timer delayedTasks = null;
 	private ClusteringStrategyIfc strategy = null;
@@ -151,12 +152,11 @@ public class SessionManagerClustered extends SessionManager
 									loginUserSession(connectionId, domain, userId, resource,
 									ConnectionStatus.REMOTE, xmpp_sessionId);
 					if (res_con != null) {
-						String pr_str = clel.getMethodParam(PRIORITY);
-						try {
-							int priority = Integer.parseInt(pr_str);
-							res_con.setPriority(priority);
-						} catch (Exception e) {
-							res_con.setPriority(1);
+						List<Element> packs = clel.getDataPackets();
+						for (Element elem : packs) {
+							if (elem.getName() == Presence.PRESENCE_ELEMENT_NAME) {
+								res_con.setPresence(elem);
+							}
 						}
 						res_con.putSessionData(SM_ID, packet.getElemFrom());
 						updateUserResources(res_con, results);
@@ -221,13 +221,18 @@ public class SessionManagerClustered extends SessionManager
 	protected void updateUserResources(XMPPResourceConnection session,
 					Queue<Packet> results) {
 		try {
+			Element pres_update = session.getPresence();
 			for (XMPPResourceConnection conn : session.getActiveSessions()) {
 				if (log.isLoggable(Level.FINER)) {
 					log.finer("Update presence change to: " + conn.getJID());
 				}
 				if (conn != session && conn.isResourceSet() &&
 								conn.getConnectionStatus() != ConnectionStatus.REMOTE) {
-					Element pres_update = new Element(Presence.PRESENCE_ELEMENT_NAME);
+					if (pres_update != null) {
+						pres_update = pres_update.clone();
+					} else {
+						pres_update = new Element(Presence.PRESENCE_ELEMENT_NAME);
+					}
 					pres_update.setAttribute("from", session.getJID());
 					pres_update.setAttribute("to", conn.getUserId());
 					Packet pack_update = new Packet(pres_update);
@@ -399,14 +404,12 @@ public class SessionManagerClustered extends SessionManager
 			String xmpp_sessionId = conn.getSessionId();
 			String connectionId = conn.getConnectionId();
 			String resource = conn.getResource();
-			int priority = conn.getPriority();
 			long authTime = conn.getAuthTime();
 			Map<String, String> params = new LinkedHashMap<String, String>();
 			params.put(USER_ID, userId);
 			params.put(XMPP_SESSION_ID, xmpp_sessionId);
 			params.put(RESOURCE, resource);
 			params.put(CONNECTION_ID, connectionId);
-			params.put(PRIORITY, "" + priority);
 			params.put(AUTH_TIME, "" + authTime);
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("Sending user: " + userId +
@@ -414,12 +417,16 @@ public class SessionManagerClustered extends SessionManager
 								", xmpp_sessionId: " + xmpp_sessionId +
 								", connectionId: " + connectionId);
 			}
+			Element presence = conn.getPresence();
 			for (String node : cl_nodes) {
 				if (!node.equals(getComponentId())) {
-					Element check_session_el = ClusterElement.createClusterMethodCall(
+					ClusterElement clel = ClusterElement.createClusterMethodCall(
 									getComponentId(), node, StanzaType.set,
-									ClusterMethods.USER_CONNECTED.toString(), params).
-									getClusterElement();
+									ClusterMethods.USER_CONNECTED.toString(), params);
+					if (presence != null) {
+						clel.addDataPacket(presence);
+					}
+					Element check_session_el = clel.getClusterElement();
 					fastAddOutPacket(new Packet(check_session_el));
 				}
 			}
@@ -431,13 +438,16 @@ public class SessionManagerClustered extends SessionManager
 	}
 
 	@Override
-	public void handleResourceBind(XMPPResourceConnection conn) {
-		super.handleResourceBind(conn);
+	public void handlePresenceSet(XMPPResourceConnection conn) {
+		super.handlePresenceSet(conn);
 		if (conn.getConnectionStatus() == ConnectionStatus.REMOTE) {
 			return;
 		}
-		String[] cl_nodes = strategy.getAllNodes();
-		broadcastUserConnected(conn, cl_nodes);
+		if (conn.getSessionData(CLUSTER_BROADCAST) == null) {
+			String[] cl_nodes = strategy.getAllNodes();
+			broadcastUserConnected(conn, cl_nodes);
+			conn.putSessionData(CLUSTER_BROADCAST, CLUSTER_BROADCAST);
+		}
 	}
 
 	@Override

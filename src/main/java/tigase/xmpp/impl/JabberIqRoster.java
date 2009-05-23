@@ -234,7 +234,7 @@ public abstract class JabberIqRoster {
 			String type = request.getAttribute("/iq/query/item", "type");
 			if (type != null && type.equals(ANON)) {
         roster_util.setBuddySubscription(session, SubscriptionType.both, buddy);
-				Element pres = (Element)session.getSessionData(Presence.PRESENCE_KEY);
+				Element pres = (Element)session.getSessionData(XMPPResourceConnection.PRESENCE_KEY);
 				if (pres == null) {
 					pres = new Element("presence");
 				} else {
