@@ -658,7 +658,9 @@ public class MessageRouter extends AbstractMessageReceiver {
 	@Override
 	public List<StatRecord> getStatistics() {
 		List<StatRecord> stats = super.getStatistics();
-    long uptime = ManagementFactory.getRuntimeMXBean().getUptime();
+    stats.add(new StatRecord(getName(), "Local hostname", "String",	getDefHostName(),
+						Level.INFO));
+		long uptime = ManagementFactory.getRuntimeMXBean().getUptime();
 		long days = uptime / (24 * HOUR);
 		long hours = (uptime - (days * 24 * HOUR)) / HOUR;
 		long minutes = (uptime - (days * 24 * HOUR + hours * HOUR)) / MINUTE;
