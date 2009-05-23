@@ -105,6 +105,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	private PreparedStatement remove_key_data_st = null;
 	private PreparedStatement conn_valid_st = null;
 
+	// Cache moved to connection pool
 	private Map<String, Object> cache = null;
 
 	private long lastConnectionValidated = 0;
@@ -784,7 +785,14 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 			uid = getUserUID(user_id, autoCreateUser);
 			nid = getNodeNID(uid, subnode);
 			if (nid < 0) {
-				nid = createNodePath(user_id, subnode);
+				try {
+					nid = createNodePath(user_id, subnode);
+				} catch (SQLException e) {
+					// This may happen in cluster node, when 2 nodes at the same
+					// time write data to the same location, like offline messages....
+					// Let's try to get the nid again.
+					nid = getNodeNID(uid, subnode);
+				}
 			}
 			synchronized (insert_key_val_st) {
 				insert_key_val_st.setLong(1, nid);
