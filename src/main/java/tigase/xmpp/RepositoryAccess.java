@@ -306,14 +306,15 @@ public abstract class RepositoryAccess {
 		return token.toString();
 	}
 
-	public Authorization loginToken(String xmpp_sessionId, String token)
+	public Authorization loginToken(String userId, String xmpp_sessionId,
+					String token)
 	  throws NotAuthorizedException, TigaseDBException {
     try {
-			String db_token = repo.getData(getUserId(), "tokens", xmpp_sessionId);
+			String db_token = repo.getData(userId, "tokens", xmpp_sessionId);
 			if (token.equals(db_token)) {
 				authState = Authorization.AUTHORIZED;
 				login();
-				repo.removeData(getUserId(), "tokens", xmpp_sessionId);
+				repo.removeData(userId, "tokens", xmpp_sessionId);
 			}
     } catch (UserNotFoundException e) {
       log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
