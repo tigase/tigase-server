@@ -61,6 +61,9 @@ public class SampleSocketThread extends Thread {
 	/**
 	 * Creates a new <code>SampleSocketThread</code> instance.
 	 *
+	 *
+	 * @param handler
+	 * @throws IOException
 	 */
 	public SampleSocketThread(SocketHandler handler) throws IOException {
 		this.handler = handler;
@@ -110,6 +113,7 @@ public class SampleSocketThread extends Thread {
 	 * Describe <code>run</code> method here.
 	 *
 	 */
+	@Override
 	public void run() {
     while (!stopping) {
       try {

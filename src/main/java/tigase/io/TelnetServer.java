@@ -28,19 +28,15 @@ import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
-import java.util.logging.SocketHandler;
 
 import static tigase.io.SSLContextContainerIfc.*;
 
@@ -82,6 +78,7 @@ public class TelnetServer implements SampleSocketThread.SocketHandler {
 		reader.addForAccept(new InetSocketAddress(port));
 	}
 
+	@Override
 	public void handleIOInterface(IOInterface ioifc) throws IOException {
 		ByteBuffer socketInput =
 			ByteBuffer.allocate(ioifc.getSocketChannel().socket().getReceiveBufferSize());
@@ -97,6 +94,7 @@ public class TelnetServer implements SampleSocketThread.SocketHandler {
 		reader.addIOInterface(ioifc);
 	}
 
+	@Override
 	public void handleSocketAccept(SocketChannel sc) throws IOException {
 		iosock = new SocketIO(sc);
 		if (ssl) {
@@ -118,10 +116,10 @@ public class TelnetServer implements SampleSocketThread.SocketHandler {
 	}
 
 	public void run() throws IOException {
-		InputStreamReader reader = new InputStreamReader(System.in);
+		InputStreamReader isr = new InputStreamReader(System.in);
 		char[] buff = new char[1024];
 		for (;;) {
-			int res = reader.read(buff);
+			int res = isr.read(buff);
 			if (iosock != null) {
 				ByteBuffer dataBuffer = coder.encode(CharBuffer.wrap(buff, 0, res));
 				iosock.write(dataBuffer);
@@ -136,6 +134,7 @@ public class TelnetServer implements SampleSocketThread.SocketHandler {
 	 * Describe <code>main</code> method here.
 	 *
 	 * @param args a <code>String[]</code> value
+	 * @throws Exception
 	 */
 	public static void main(final String[] args) throws Exception {
 		parseParams(args);
