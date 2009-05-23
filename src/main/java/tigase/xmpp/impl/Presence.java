@@ -288,7 +288,7 @@ public abstract class Presence {
 				// Send to old resource presence about new resource
 				Element pres_update = new Element(PRESENCE_ELEMENT_NAME);
 				pres_update.setAttribute("from", session.getJID());
-				pres_update.setAttribute("to", conn.getJID());
+				pres_update.setAttribute("to", conn.getUserId());
 				pres_update.setAttribute("type", StanzaType.unavailable.toString());
 				pres_update.setXMLNS(XMLNS);
 				Packet pack_update = new Packet(pres_update);
@@ -312,6 +312,7 @@ public abstract class Presence {
 	 * we have to change 'to' attribute to full resource JID.
 	 * @param session a <code>XMPPResourceConnection</code> value keeping
 	 * connection session object.
+	 * @param results 
 	 * @exception NotAuthorizedException if an error occurs
 	 */
 	protected static void updateUserResources(final Element presence,
@@ -322,17 +323,17 @@ public abstract class Presence {
 				log.finer("Update presence change to: " + conn.getJID());
 			}
 			if (conn != session && conn.isResourceSet()) {
-				// Send to new resource presence about old resource
+				// Send to old resource presence about new resource
 				Element pres_update = presence.clone();
 				pres_update.setAttribute("from", session.getJID());
-				pres_update.setAttribute("to", conn.getJID());
+				pres_update.setAttribute("to", conn.getUserId());
 				Packet pack_update = new Packet(pres_update);
 				pack_update.setTo(conn.getConnectionId());
 				results.offer(pack_update);
 				Element presence_el = (Element) conn.getSessionData(PRESENCE_KEY);
 				if (presence_el != null) {
 					pres_update = presence_el.clone();
-					pres_update.setAttribute("to", session.getJID());
+					pres_update.setAttribute("to", session.getUserId());
 					pres_update.setAttribute("from", conn.getJID());
 					pack_update = new Packet(pres_update);
 					pack_update.setTo(session.getConnectionId());
