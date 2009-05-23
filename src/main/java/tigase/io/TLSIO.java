@@ -71,16 +71,16 @@ public class TLSIO implements IOInterface {
     tlsWrapper = wrapper;
     tlsInput = ByteBuffer.allocate(tlsWrapper.getAppBuffSize());
 		if (log.isLoggable(Level.FINER)) {
-    		log.finer("TLS Socket created, connected: " + io.isConnected());
-        }
+			log.finer("TLS Socket created, connected: " + io.isConnected());
+		}
 		if (tlsWrapper.isClientMode()) {
-   			if (log.isLoggable(Level.FINER)) {
-    			log.finer("TLS - client mode, starting handshaking now...");
-            }
+			if (log.isLoggable(Level.FINER)) {
+				log.finer("TLS - client mode, starting handshaking now...");
+			}
 			write(ByteBuffer.allocate(0));
-   			if (log.isLoggable(Level.FINER)) {
-                log.finer("Handshaking completed, you can send data now.");
-            }
+			if (log.isLoggable(Level.FINER)) {
+				log.finer("Handshaking completed, you can send data now.");
+			}
 		} // end of if (tlsWrapper.isClientMode())
   }
 
@@ -89,9 +89,9 @@ public class TLSIO implements IOInterface {
 		input.flip();
     do_loop:
     do {
-   			if (log.isLoggable(Level.FINER)) {
-    			log.finer("Decoding data: " + input.remaining());
-            }
+			if (log.isLoggable(Level.FINER)) {
+				log.finer("Decoding data: " + input.remaining());
+			}
       tlsInput = tlsWrapper.unwrap(input, tlsInput);
 //       if (input.hasRemaining()) {
 //         input.compact();
@@ -101,23 +101,23 @@ public class TLSIO implements IOInterface {
         write(ByteBuffer.allocate(0));
         break;
       case UNDERFLOW:
-                int netSize = tlsWrapper.getPacketBuffSize();
-    			if (log.isLoggable(Level.FINER)) {
-                    log.finer("tlsWrapper.getStatus() = UNDERFLOW");
-                    log.finer("PacketBuffSize="+netSize);
-                    log.finer("input.capacity()="+input.capacity());
-                    log.finer("tlsInput.capacity()="+tlsInput.capacity());
-                    log.finer("input.remaining()="+input.remaining());
-                    log.finer("tlsInput.remaining()="+tlsInput.remaining());
-                }
+				int netSize = tlsWrapper.getPacketBuffSize();
+				if (log.isLoggable(Level.FINER)) {
+					log.finer("tlsWrapper.getStatus() = UNDERFLOW");
+					log.finer("PacketBuffSize=" + netSize);
+					log.finer("input.capacity()=" + input.capacity());
+					log.finer("tlsInput.capacity()=" + tlsInput.capacity());
+					log.finer("input.remaining()=" + input.remaining());
+					log.finer("tlsInput.remaining()=" + tlsInput.remaining());
+				}
 				// Obtain more inbound network data for src,
 				// then retry the operation.
 				throw new BufferUnderflowException();
       case CLOSED:
-        if (tlsWrapper.getStatus() == TLSStatus.CLOSED) {
-   			if (log.isLoggable(Level.FINER)) {
-					log.finer("TLS Socket closed...");
-            }
+				if (tlsWrapper.getStatus() == TLSStatus.CLOSED) {
+					if (log.isLoggable(Level.FINER)) {
+						log.finer("TLS Socket closed...");
+					}
           throw new EOFException("Socket has been closed.");
         } // end of if (tlsWrapper.getStatus() == TLSStatus.CLOSED)
         break do_loop;
@@ -139,9 +139,9 @@ public class TLSIO implements IOInterface {
   public ByteBuffer read(ByteBuffer buff) throws IOException {
     buff = io.read(buff);
 		if (io.bytesRead() > 0) {
-   			if (log.isLoggable(Level.FINER)) {
-    			log.finer("Read bytes: " + bytesRead());
-            }
+			if (log.isLoggable(Level.FINER)) {
+				log.finer("Read bytes: " + bytesRead());
+			}
       return decodeData(buff);
     } else {
       return null;
@@ -154,9 +154,9 @@ public class TLSIO implements IOInterface {
 			return io.write(null);
 		}
     int result = 0;
-    if (log.isLoggable(Level.FINER)) {
-        log.finer("TLS - Writing data, remaining: " + buff.remaining());
-    }
+		if (log.isLoggable(Level.FINER)) {
+			log.finer("TLS - Writing data, remaining: " + buff.remaining());
+		}
     int wr = 0;
 		do {
 			ByteBuffer tlsOutput = ByteBuffer.allocate(tlsWrapper.getNetBuffSize());
@@ -182,9 +182,9 @@ public class TLSIO implements IOInterface {
 
 	@Override
   public void stop() throws IOException {
-	if (log.isLoggable(Level.FINEST)) {
-		log.finest("Stop called...");
-	}
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Stop called...");
+		}
     io.stop();
     tlsWrapper.close();
   }
