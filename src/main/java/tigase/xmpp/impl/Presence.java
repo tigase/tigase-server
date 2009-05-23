@@ -154,14 +154,16 @@ public abstract class Presence {
 		String[] buddies = roster_util.getBuddies(session, FROM_SUBSCRIBED, true);
 		buddies = DynamicRoster.addBuddies(session, settings, buddies);
 		if (buddies != null) {
-			Set<String> onlineJids = TigaseRuntime.getTigaseRuntime().getOnlineJids();
+//			Set<String> onlineJids = TigaseRuntime.getTigaseRuntime().getOnlineJids();
 			for (String buddy : buddies) {
 				// If buddy is a local buddy and he is offline, don't send him packet...
-				String buddy_domain = JIDUtils.getNodeHost(buddy);
-				if (!session.isLocalDomain(buddy_domain, false) ||
-								onlineJids.contains(buddy)) {
-					sendPresence(null, buddy, session.getJID(), results, pres);
-				}
+				// Hm, it doesn't work well in the cluster mode....
+//				String buddy_domain = JIDUtils.getNodeHost(buddy);
+//				if (!session.isLocalDomain(buddy_domain, false) ||
+//								onlineJids.contains(buddy)) {
+//					sendPresence(null, buddy, session.getJID(), results, pres);
+//				}
+				sendPresence(null, buddy, session.getJID(), results, pres);
 			} // end of for (String buddy: buddies)
 		} // end of if (buddies == null)
 		broadcastDirectPresences(null, session, results, pres);
@@ -578,7 +580,7 @@ public abstract class Presence {
 							} else {
 								// Broadcast initial presence to 'from' or 'both' contacts
 								sendPresenceBroadcast(type, session, FROM_SUBSCRIBED,
-												results, packet.getElement(), settings, true);
+												results, packet.getElement(), settings, false);
 							}
 
 							// Broadcast initial presence to other available user resources
