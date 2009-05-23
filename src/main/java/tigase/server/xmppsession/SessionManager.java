@@ -44,6 +44,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Enumeration;
+import java.util.concurrent.CopyOnWriteArraySet;
 import javax.script.Bindings;
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
@@ -54,6 +55,7 @@ import tigase.db.NonAuthUserRepository;
 import tigase.db.RepositoryFactory;
 import tigase.db.TigaseDBException;
 import tigase.db.UserAuthRepository;
+import tigase.db.UserExistsException;
 import tigase.db.UserNotFoundException;
 import tigase.db.UserRepository;
 import tigase.disco.ServiceEntity;
@@ -122,8 +124,10 @@ public class SessionManager extends AbstractMessageReceiver
 	private NonAuthUserRepository naUserRepository = null;
 	private PacketFilter filter = null;
 
-	private String[] admins = {"admin@localhost"};
-	private String[] trusted = {"admin@localhost"};
+	private Set<String> admins = new CopyOnWriteArraySet<String>();
+	//{"admin@localhost"};
+	private Set<String> trusted = new CopyOnWriteArraySet<String>();
+	//{"admin@localhost"};
 
 	private ConcurrentHashMap<String, XMPPSession> sessionsByNodeId =
 		new ConcurrentHashMap<String, XMPPSession>();
@@ -165,7 +169,9 @@ public class SessionManager extends AbstractMessageReceiver
 //	private ServiceEntity adminDisco = null;
 
 	private int maxUserSessions = 0;
+	private int maxUserConnections = 0;
 	private long totalUserSessions = 0;
+	private long totalUserConnections = 0;
 	private long closedConnections = 0;
 	private long authTimeouts = 0;
 	private int maxPluginsNo = 0;
@@ -174,43 +180,43 @@ public class SessionManager extends AbstractMessageReceiver
 	private long reaperInterval = 60 * 1000;
 	private long maxIdleTime = 86400 * 1000;
 
-	@Override
-	public void start() {
-		super.start();
-
-		reaperTask = new Timer("Session reaper task", true);
-		reaperTask.schedule(new TimerTask() {
-			@Override
-			public void run() {
-				long currentTime = System.currentTimeMillis();
-				for (Enumeration<XMPPResourceConnection> e = connectionsByFrom.elements(); e.hasMoreElements(); ) {
-					XMPPResourceConnection xrc = e.nextElement();
-					if (!"session-id-sess-man".equals(xrc.getSessionId())) {
-						if (currentTime - xrc.getLastAccessed() > maxIdleTime && currentTime - xrc.getCreationTime() > reaperInterval) {
-							if (log.isLoggable(Level.WARNING)) {
-								log.info("Logging out " + xrc.getSessionId() + " after >" + (maxIdleTime/1000) + " seconds of inactivity");
-							}
-							try {
-								xrc.logout();
-							} catch (NotAuthorizedException ex) {
-								if (log.isLoggable(Level.WARNING)) {
-									log.warning("Could not logout " + xrc.getSessionId() + ": " + ex.getMessage());
-								}
-							}
-						}
-					}
-				}
-			}
-		}, reaperInterval, reaperInterval);
-	}
-
-	@Override
-	public void stop() {
-		super.stop();
-
-		reaperTask.cancel();
-		reaperTask = null;
-	}
+//	@Override
+//	public void start() {
+//		super.start();
+//
+//		reaperTask = new Timer("Session reaper task", true);
+//		reaperTask.schedule(new TimerTask() {
+//			@Override
+//			public void run() {
+//				long currentTime = System.currentTimeMillis();
+//				for (Enumeration<XMPPResourceConnection> e = connectionsByFrom.elements(); e.hasMoreElements(); ) {
+//					XMPPResourceConnection xrc = e.nextElement();
+//					if (!"session-id-sess-man".equals(xrc.getSessionId())) {
+//						if (currentTime - xrc.getLastAccessed() > maxIdleTime && currentTime - xrc.getCreationTime() > reaperInterval) {
+//							if (log.isLoggable(Level.WARNING)) {
+//								log.info("Logging out " + xrc.getSessionId() + " after >" + (maxIdleTime/1000) + " seconds of inactivity");
+//							}
+//							try {
+//								xrc.logout();
+//							} catch (NotAuthorizedException ex) {
+//								if (log.isLoggable(Level.WARNING)) {
+//									log.warning("Could not logout " + xrc.getSessionId() + ": " + ex.getMessage());
+//								}
+//							}
+//						}
+//					}
+//				}
+//			}
+//		}, reaperInterval, reaperInterval);
+//	}
+//
+//	@Override
+//	public void stop() {
+//		super.stop();
+//
+//		reaperTask.cancel();
+//		reaperTask = null;
+//	}
 
 	@Override
 	public void setName(String name) {
@@ -498,13 +504,19 @@ public class SessionManager extends AbstractMessageReceiver
 		return false;
 	}
 
-	private boolean isTrusted(String jid) {
-		for (String trust: trusted) {
-			if (trust.equals(JIDUtils.getNodeID(jid))) {
-				return true;
-			}
+	protected boolean isTrusted(String jid) {
+		if (trusted.contains(JIDUtils.getNodeID(jid))) {
+			return true;
 		}
 		return isAdmin(jid);
+	}
+
+	protected boolean addTrusted(String jid) {
+		return trusted.add(JIDUtils.getNodeID(jid));
+	}
+
+	protected boolean delTrusted(String jid) {
+		return trusted.remove(JIDUtils.getNodeID(jid));
 	}
 
 	protected boolean processAdminsOrDomains(Packet packet) {
@@ -590,34 +602,6 @@ public class SessionManager extends AbstractMessageReceiver
 				walk(packet, connection, child, results);
 			} // end of for (Element child: children)
 		} // end of if (children != null)
-	}
-
-	protected XMPPResourceConnection createUserSession(String conn_id,
-		String domain, String user_jid) {
-		XMPPResourceConnection connection = new XMPPResourceConnection(conn_id,
-			user_repository, auth_repository, this);
-		VHostItem vitem = getVHostItem(domain);
-		if (vitem == null) {
-			// This shouldn't generally happen. Must mean misconfiguration.
-			if (log.isLoggable(Level.INFO)) {
-				log.info("Can't get VHostItem for domain: " + domain +
-								", using default one instead: " + getDefHostName());
-			}
-			vitem = new VHostItem(getDefHostName());
-		}
-		connection.setDomain(vitem.getUnmodifiableVHostItem());
-		// Dummy session ID, we might decide later to set real thing here
-		connection.setSessionId("session-id-"+JIDUtils.getNodeNick(user_jid));
-		//connection.setAnonymousPeers(anon_peers);
-		connectionsByFrom.put(conn_id, connection);
-		registerNewSession(JIDUtils.getNodeID(user_jid), connection);
-		try {
-			connection.setResource(JIDUtils.getNodeResource(user_jid));
-		} catch (NotAuthorizedException e) {
-			log.warning("Something wrong with authorization: " + e
-				+ ", for user: " + user_jid);
-		}
-		return connection;
 	}
 
 	@Override
@@ -736,12 +720,10 @@ public class SessionManager extends AbstractMessageReceiver
 						if (connection == null) {
 							String user_jid = Command.getFieldValue(pc, "jid");
 							String hostname = JIDUtils.getNodeHost(user_jid);
-							connection = createUserSession(pc.getElemFrom(), hostname, user_jid);
-							connection.setSessionId("USER_STATUS");
-							user_repository.setData(JIDUtils.getNodeID(user_jid), "tokens",
-								"USER_STATUS", "USER_STATUS");
-							connection.loginToken("USER_STATUS", "USER_STATUS");
-							handleLogin(JIDUtils.getNodeNick(user_jid), connection);
+							connection = loginUserSession(pc.getElemFrom(), hostname,
+											JIDUtils.getNodeID(user_jid),
+											JIDUtils.getNodeResource(user_jid), ConnectionStatus.NORMAL,
+											"USER_STATUS");
 							connection.putSessionData("jingle", "active");
 							fastAddOutPacket(pc.okResult((String)null, 0));
 							if (presence == null) {
@@ -944,7 +926,7 @@ public class SessionManager extends AbstractMessageReceiver
 		} // end of if (conn != null) else
 	}
 
-	private void closeSession(XMPPResourceConnection conn, boolean closeOnly) {
+	protected void closeSession(XMPPResourceConnection conn, boolean closeOnly) {
 		if (!closeOnly) {
 			Queue<Packet> results = new LinkedList<Packet>();
 			for (XMPPStopListenerIfc stopProc: stopListeners.values()) {
@@ -967,13 +949,15 @@ public class SessionManager extends AbstractMessageReceiver
 					if (session.getActiveResourcesSize() <= 1) {
 						session = sessionsByNodeId.remove(userId);
 						if (session == null) {
-							log.info("UPS can't remove session, not found in map: " + userId);
+							log.info("UPS can't remove, session not found in map: " + userId);
 						} else {
 							if (log.isLoggable(Level.FINER)) {
 								log.finer("Number of user sessions: " + sessionsByNodeId.size());
 							}
 						} // end of else
-						auth_repository.logout(userId);
+						if (conn.getConnectionStatus() == ConnectionStatus.NORMAL) {
+							auth_repository.logout(userId);
+						}
 					} else {
 						if (log.isLoggable(Level.FINER)) {
 							StringBuilder sb = new StringBuilder();
@@ -1014,7 +998,7 @@ public class SessionManager extends AbstractMessageReceiver
 	protected boolean fastAddOutPacket(Packet packet) {
 		return super.addOutPacket(packet);
 	}
-
+	
 	protected void addOutPackets(Packet packet, XMPPResourceConnection conn,
 					Queue<Packet> results) {
 		for (XMPPPacketFilterIfc outfilter : outFilters.values()) {
@@ -1109,7 +1093,6 @@ public class SessionManager extends AbstractMessageReceiver
 			log.config("Using shared auth repository instance.");
 		} else {
 			Map<String, String> user_repo_params = new LinkedHashMap<String, String>();
-			Map<String, String> auth_repo_params = new LinkedHashMap<String, String>();
 			for (Map.Entry<String, Object> entry : props.entrySet()) {
 				if (entry.getKey().startsWith(USER_REPO_PARAMS_NODE)) {
 					// Split the key to configuration nodes separated with '/'
@@ -1117,14 +1100,6 @@ public class SessionManager extends AbstractMessageReceiver
 					// The plugin ID part may contain many IDs separated with comma ','
 					if (nodes.length > 1) {
 						user_repo_params.put(nodes[1], entry.getValue().toString());
-					}
-				}
-				if (entry.getKey().startsWith(AUTH_REPO_PARAMS_NODE)) {
-					// Split the key to configuration nodes separated with '/'
-					String[] nodes = entry.getKey().split("/");
-					// The plugin ID part may contain many IDs separated with comma ','
-					if (nodes.length > 1) {
-						auth_repo_params.put(nodes[1], entry.getValue().toString());
 					}
 				}
 			}
@@ -1137,6 +1112,21 @@ public class SessionManager extends AbstractMessageReceiver
 			} catch (Exception e) {
 				log.log(Level.SEVERE, "Can't initialize user repository: ", e);
 			} // end of try-catch
+		}
+		if (auth_repository != null) {
+			log.config("Using shared auth repository.");
+		} else {
+			Map<String, String> auth_repo_params = new LinkedHashMap<String, String>();
+			for (Map.Entry<String, Object> entry : props.entrySet()) {
+				if (entry.getKey().startsWith(AUTH_REPO_PARAMS_NODE)) {
+					// Split the key to configuration nodes separated with '/'
+					String[] nodes = entry.getKey().split("/");
+					// The plugin ID part may contain many IDs separated with comma ','
+					if (nodes.length > 1) {
+						auth_repo_params.put(nodes[1], entry.getValue().toString());
+					}
+				}
+			}
 			try {
 				String cls_name = (String) props.get(AUTH_REPO_CLASS_PROP_KEY);
 				String res_uri = (String) props.get(AUTH_REPO_URL_PROP_KEY);
@@ -1146,6 +1136,15 @@ public class SessionManager extends AbstractMessageReceiver
 			} catch (Exception e) {
 				log.log(Level.SEVERE, "Can't initialize auth repository: ", e);
 			} // end of try-catch
+		}
+		try {
+			// Add component ID to database if it is not there yet.
+			auth_repository.addUser(getComponentId(),
+							UUID.randomUUID().toString());
+		} catch (UserExistsException e) {
+			// Just ignore....
+		} catch (TigaseDBException ex) {
+			log.log(Level.WARNING, "Problem accessing auth repository: ", ex);
 		}
 
 		naUserRepository = new NARepository(user_repository);
@@ -1183,10 +1182,20 @@ public class SessionManager extends AbstractMessageReceiver
 				plugin_config.put(comp_id, plugin_settings);
 			}
 		} // end of for (String comp_id: plugins)
-		createUserSession(NULL_ROUTING, getDefHostName(),
-						getComponentId() + "/server");
-		admins = (String[])props.get(ADMINS_PROP_KEY);
-		trusted = (String[])props.get(TRUSTED_PROP_KEY);
+		loginUserSession(NULL_ROUTING, getDefHostName(),
+						getComponentId(), null, ConnectionStatus.NORMAL, getComponentId());
+		String[] admins_tmp = (String[])props.get(ADMINS_PROP_KEY);
+		if (admins_tmp != null) {
+			for (String admin : admins_tmp) {
+				admins.add(admin);
+			}
+		}
+		String[] trusted_tmp = (String[])props.get(TRUSTED_PROP_KEY);
+		if (trusted_tmp != null) {
+			for (String trust : trusted_tmp) {
+				trusted.add(trust);
+			}
+		}
 		// Loading admin scripts....
 		String descrStr = "AS:Description: ";
 		String cmdIdStr = "AS:CommandId: ";
@@ -1237,15 +1246,73 @@ public class SessionManager extends AbstractMessageReceiver
 		return true;
 	}
 
+	protected XMPPResourceConnection createUserSession(String conn_id,
+		String domain) {
+		XMPPResourceConnection connection = new XMPPResourceConnection(conn_id,
+			user_repository, auth_repository, this);
+		VHostItem vitem = null;
+		if (domain != null) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Setting hostname " + domain + " for connection: " + conn_id);
+			}
+			vitem = getVHostItem(domain);
+		}
+		if (vitem == null) {
+			// This shouldn't generally happen. Must mean misconfiguration.
+			if (log.isLoggable(Level.INFO)) {
+				log.info("Can't get VHostItem for domain: " + domain +
+								", using default one instead: " + getDefHostName());
+			}
+			vitem = new VHostItem(getDefHostName());
+		}
+		connection.setDomain(vitem.getUnmodifiableVHostItem());
+		//connection.setAnonymousPeers(anon_peers);
+		connectionsByFrom.put(conn_id, connection);
+		int currSize = connectionsByFrom.size();
+		if (currSize > maxUserConnections) {
+			maxUserConnections = currSize;
+		}
+		++totalUserConnections;
+		return connection;
+	}
+
+	protected XMPPResourceConnection loginUserSession(String conn_id,
+					String domain, String user_id, String resource,
+					ConnectionStatus conn_st, String xmpp_sessionId) {
+		try {
+			XMPPResourceConnection conn = createUserSession(conn_id, domain);
+			conn.setSessionId(xmpp_sessionId);
+			user_repository.setData(user_id, "tokens", xmpp_sessionId, conn_id);
+			Authorization auth = conn.loginToken(user_id, xmpp_sessionId, conn_id);
+			if (auth == Authorization.AUTHORIZED) {
+				handleLogin(JIDUtils.getNodeNick(user_id), conn);
+				registerNewSession(JIDUtils.getNodeID(user_id), conn);
+				if (resource != null) {
+					conn.setResource(resource);
+				}
+				conn.setConnectionStatus(conn_st);
+			} else {
+				connectionsByFrom.remove(conn_id);
+				return null;
+			}
+			return conn;
+		} catch (Exception ex) {
+			log.log(Level.WARNING,
+							"Problem logging user: " + user_id + "/" + resource, ex);
+		}
+		return null;
+	}
+
 	protected void registerNewSession(String userId, XMPPResourceConnection conn) {
 		XMPPSession session = sessionsByNodeId.get(userId);
 		if (session == null) {
-			++totalUserSessions;
 			session = new XMPPSession(JIDUtils.getNodeNick(userId));
 			sessionsByNodeId.put(userId, session);
-			if (sessionsByNodeId.size() > maxUserSessions) {
-				maxUserSessions = sessionsByNodeId.size();
+			int currSize = sessionsByNodeId.size();
+			if (currSize > maxUserSessions) {
+				maxUserSessions = currSize;
 			}
+			++totalUserSessions;
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("Created new XMPPSession for: " + userId);
 			}
@@ -1267,13 +1334,18 @@ public class SessionManager extends AbstractMessageReceiver
 	@Override
 	public void handleLogin(String userName, XMPPResourceConnection conn) {
 		if (log.isLoggable(Level.FINEST)) {
-    		log.finest("handleLogin called for: " + userName + ", conn_id: " +
-        					conn.getConnectionId());
-        }
+			log.finest("handleLogin called for: " + userName + ", conn_id: " +
+							conn.getConnectionId());
+		}
 		String userId = JIDUtils.getNodeID(userName, conn.getDomain());
 		registerNewSession(userId, conn);
+		conn.setConnectionStatus(ConnectionStatus.NORMAL);
 	}
 
+	@Override
+	public void handleResourceBind(XMPPResourceConnection conn) {
+
+	}
 
 	@Override
 	public void handleLogout(String userName, XMPPResourceConnection conn) {
@@ -1338,17 +1410,21 @@ public class SessionManager extends AbstractMessageReceiver
 	@Override
 	public List<StatRecord> getStatistics() {
 		List<StatRecord> stats = super.getStatistics();
-		stats.add(new StatRecord(getName(), "Open connections", "int",
-				connectionsByFrom.size(), Level.FINE));
 		stats.add(new StatRecord(getName(), "Registered accounts", "long",
 				user_repository.getUsersCount(), Level.FINEST));
-		stats.add(new StatRecord(getName(), "Open authorized sessions", "int",
-				sessionsByNodeId.size(), Level.INFO));
-		stats.add(new StatRecord(getName(), "Closed connections", "long",
+		stats.add(new StatRecord(getName(), "Open user connections", "int",
+				connectionsByFrom.size(), Level.INFO));
+		stats.add(new StatRecord(getName(), "Maximum user connections", "int",
+				maxUserConnections, Level.INFO));
+		stats.add(new StatRecord(getName(), "Total user connections", "long",
+				totalUserConnections, Level.FINER));
+		stats.add(new StatRecord(getName(), "Closed user connections", "long",
 				closedConnections, Level.FINER));
-		stats.add(new StatRecord(getName(), "Maximum number of open sessions", "int",
-				maxUserSessions, Level.INFO));
-		stats.add(new StatRecord(getName(), "Total number of user sessions", "long",
+		stats.add(new StatRecord(getName(), "Open user sessions", "int",
+				sessionsByNodeId.size(), Level.FINE));
+		stats.add(new StatRecord(getName(), "Maximum user sessions", "int",
+				maxUserSessions, Level.FINE));
+		stats.add(new StatRecord(getName(), "Total user sessions", "long",
 				totalUserSessions, Level.FINER));
 		if (authTimeouts > 0) {
 			stats.add(new StatRecord(getName(), "Authentication timouts", "long",
@@ -1448,26 +1524,7 @@ public class SessionManager extends AbstractMessageReceiver
 					log.finer("Adding resource connection for: " + item.packet.getFrom());
 				}
 				final String hostname = Command.getFieldValue(item.packet, "hostname");
-				item.conn = new XMPPResourceConnection(item.packet.getFrom(),
-					user_repository, auth_repository, sm);
-				VHostItem vitem = null;
-				if (hostname != null) {
-					if (log.isLoggable(Level.FINEST)) {
-						log.finest("Setting hostname " + hostname
-							+ " for connection: " + item.conn.getConnectionId());
-					}
-					vitem = getVHostItem(hostname);
-				}
-				if (vitem == null) {
-					if (log.isLoggable(Level.INFO)) {
-						log.info("Can't get VHostItem for domain: " + hostname +
-										", using default one instead: " + getDefHostName());
-					}
-					vitem = new VHostItem(getDefHostName());
-				}
-				item.conn.setDomain(vitem.getUnmodifiableVHostItem());
-				//connection.setAnonymousPeers(anon_peers);
-				connectionsByFrom.put(item.packet.getFrom(), item.conn);
+				item.conn = createUserSession(item.packet.getFrom(), hostname);
 				authenticationWatchdog.schedule(new AuthenticationTimer(item.packet.getFrom()),
 								2*MINUTE);
 			} else {
