@@ -686,7 +686,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 			} catch (SocketException e) {
 				// Accept side for component service is not ready yet?
 				// Let's wait for a few secs and try again.
-				log.log(Level.FINEST, "Problem reconnecting the service: ", e);
+				log.log(Level.FINEST, "Problem reconnecting the service: ");
 				Integer reconnects = (Integer)port_props.get(MAX_RECONNECTS_PROP_KEY);
 				if (reconnects != null) {
 					int recon = reconnects.intValue();
@@ -726,7 +726,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 		public void run() {
 			while (true) {
 				try {
-					// Sleep for 1 minute
+					// Sleep...
 					Thread.sleep(10*MINUTE);
 					++watchdogRuns;
 					// Walk through all connections and check whether they are
@@ -735,48 +735,47 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 					// on Exception
 					doForAllServices(new ServiceChecker() {
 						@Override
-							public void check(final XMPPIOService service,
-								final String serviceId) {
-								// 								for (IO service: services.values()) {
-								//						service = (XMPPIOService)serv;
-								try {
-									if (null != service) {
-										long curr_time = System.currentTimeMillis();
-										long lastTransfer = service.getLastTransferTime();
-										if (curr_time - lastTransfer >= getMaxInactiveTime()) {
-											// Stop the service is max keep-alive time is acceeded
-											// for non-active connections.
-                                			if (log.isLoggable(Level.INFO)) {
-                                                log.info(getName()
-                                                    + ": Max inactive time exceeded, stopping: "
-                                                    + serviceId);
-                                            }
-    										++watchdogStopped;
-											service.stop();
-										} else if (curr_time - lastTransfer >= (29*MINUTE)) {
-                                            // At least once an hour check if the connection is
-                                            // still alive.
-                                            service.writeRawData(" ");
-											++watchdogTests;
+						public void check(final XMPPIOService service,
+										final String serviceId) {
+							// 								for (IO service: services.values()) {
+							//						service = (XMPPIOService)serv;
+							try {
+								if (null != service) {
+									long curr_time = System.currentTimeMillis();
+									long lastTransfer = service.getLastTransferTime();
+									if (curr_time - lastTransfer >= getMaxInactiveTime()) {
+										// Stop the service is max keep-alive time is acceeded
+										// for non-active connections.
+										if (log.isLoggable(Level.INFO)) {
+											log.info(getName() +
+															": Max inactive time exceeded, stopping: " +
+															serviceId);
 										}
-									}
-								} catch (Exception e) {
-									// Close the service....
-									try {
-										if (service != null) {
-											log.info(getName()
-												+ "Found dead connection, stopping: "
-												+ serviceId);
-											++watchdogStopped;
-											service.stop();
-										}
-									} catch (Exception ignore) {
-										// Do nothing here as we expect Exception to be thrown here...
+										++watchdogStopped;
+										service.stop();
+									} else if (curr_time - lastTransfer >= (29 * MINUTE)) {
+										// At least once an hour check if the connection is
+										// still alive.
+										service.writeRawData(" ");
+										++watchdogTests;
 									}
 								}
-								// 								}
+							} catch (Exception e) {
+								// Close the service....
+								try {
+									if (service != null) {
+										log.info(getName() +
+														"Found dead connection, stopping: " + serviceId);
+										++watchdogStopped;
+										service.stop();
+									}
+								} catch (Exception ignore) {
+									// Do nothing here as we expect Exception to be thrown here...
+									}
 							}
-						});
+						// 								}
+						}
+					});
 				} catch (InterruptedException e) { /* Do nothing here */ }
 			}
 		}
