@@ -32,7 +32,6 @@ import tigase.db.UserAuthRepository;
 import tigase.db.TigaseDBException;
 import tigase.server.xmppsession.SessionManagerHandler;
 import tigase.db.AuthorizationException;
-import tigase.vhosts.VHostItem;
 
 /**
  * Describe class XMPPResourceConnection here.
@@ -357,6 +356,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 			parentSession.addResourceConnection(this);
 		}
 		userJid = getUserId() + (resource != null ? ("/" + resource) : "/" + sessionId);
+		loginHandler.handleResourceBind(this);
 	}
 
 	/**
@@ -400,6 +400,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 		super.logout();
 	}
 
+	@Override
 	protected void login() {
 		authenticationTime = System.currentTimeMillis();
 	}
@@ -412,6 +413,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 		return creationTime;
 	}
 
+	@Override
 	public Authorization unregister(final String name_param)
 		throws NotAuthorizedException, TigaseDBException {
 		Authorization auth_res = super.unregister(name_param);
