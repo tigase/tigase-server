@@ -1371,6 +1371,43 @@ index 0000000..cfc0dd8
 +	}
 +
 +}
+diff --git a/src/lib/com/izforge/izpack/panels/TargetPanel.java b/src/lib/com/izforge/izpack/panels/TargetPanel.java
+index 7cf4ce2..03004f0 100644
+--- a/src/lib/com/izforge/izpack/panels/TargetPanel.java
++++ b/src/lib/com/izforge/izpack/panels/TargetPanel.java
+@@ -21,6 +21,8 @@
+ 
+ package com.izforge.izpack.panels;
+ 
++import java.io.File;
++
+ import com.izforge.izpack.installer.InstallData;
+ import com.izforge.izpack.installer.InstallerFrame;
+ import com.izforge.izpack.adaptator.IXMLElement;
+@@ -84,7 +86,22 @@ public class TargetPanel extends PathInputPanel
+      */
+     public boolean isValidated()
+     {
+-        // Standard behavior of PathInputPanel.
++    	{
++    		// TODO: to be removed later
++    		// currently it is done to avoid installation 
++    		// over old Tigase directory, as there is a bug in the unpacker
++    		// http://jira.codehaus.org/browse/IZPACK-395
++    		File testDir = new File(pathSelectionPanel.getPath());
++    		File serverFile = new File(testDir, "jars/tigase-server.jar");
++    		if (serverFile.exists()) {
++    			String msg = "Installation over existing Tigase directory \n" +
++    					"is not supported right now.";
++    			emitError("Error", msg);
++    			return false;
++    		}
++    	}
++    	
++    	// Standard behavior of PathInputPanel.
+         if (!super.isValidated())
+         {
+             return (false);
 diff --git a/src/lib/com/izforge/izpack/panels/TargetPanelConsoleHelper.java b/src/lib/com/izforge/izpack/panels/TargetPanelConsoleHelper.java
 index 964eec9..a3f0d85 100644
 --- a/src/lib/com/izforge/izpack/panels/TargetPanelConsoleHelper.java
