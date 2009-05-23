@@ -22,11 +22,14 @@
 
 package tigase.db;
 
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import tigase.util.SimpleCache;
 
 /**
  * Created: Jan 28, 2009 8:46:53 PM
@@ -39,6 +42,7 @@ public class UserRepositoryPool implements UserRepository {
   private static final Logger log =
     Logger.getLogger(UserRepositoryPool.class.getName());
 
+	private Map<String, Object> cache = null;
 	private LinkedBlockingQueue<UserRepository> repoPool =
 					new LinkedBlockingQueue<UserRepository>();
 
@@ -59,7 +63,14 @@ public class UserRepositoryPool implements UserRepository {
 	@Override
 	public void initRepository(String resource_uri,
 					Map<String, String> params)
-					throws DBInitException {	}
+					throws DBInitException {
+		if (resource_uri.contains("cacheRepo=off")) {
+			log.fine("Disabling cache.");
+			cache = Collections.synchronizedMap(new RepoCache(0, -1000));
+		} else {
+			cache = Collections.synchronizedMap(new RepoCache(10000, 60 * 1000));
+		}
+	}
 
 	@Override
 	public String getResourceUri() {
@@ -160,6 +171,10 @@ public class UserRepositoryPool implements UserRepository {
 	@Override
 	public String getData(String user, String subnode, String key, String def)
 					throws UserNotFoundException, TigaseDBException {
+		String data = (String)cache.get(user + "/" + subnode + "/" + key);
+		if (data != null) {
+			return data;
+		}
 		UserRepository repo = takeRepo();
 		if (repo != null) {
 			try {
@@ -176,6 +191,10 @@ public class UserRepositoryPool implements UserRepository {
 	@Override
 	public String getData(String user, String subnode, String key)
 					throws UserNotFoundException, TigaseDBException {
+		String data = (String)cache.get(user + "/" + subnode + "/" + key);
+		if (data != null) {
+			return data;
+		}
 		UserRepository repo = takeRepo();
 		if (repo != null) {
 			try {
@@ -192,6 +211,10 @@ public class UserRepositoryPool implements UserRepository {
 	@Override
 	public String getData(String user, String key)
 					throws UserNotFoundException, TigaseDBException {
+		String data = (String)cache.get(user + "/" + key);
+		if (data != null) {
+			return data;
+		}
 		UserRepository repo = takeRepo();
 		if (repo != null) {
 			try {
@@ -272,6 +295,7 @@ public class UserRepositoryPool implements UserRepository {
 	@Override
 	public void removeData(String user, String subnode, String key)
 					throws UserNotFoundException, TigaseDBException {
+		cache.remove(user + "/" + subnode + "/" + key);
 		UserRepository repo = takeRepo();
 		if (repo != null) {
 			try {
@@ -287,6 +311,7 @@ public class UserRepositoryPool implements UserRepository {
 	@Override
 	public void removeData(String user, String key)
 					throws UserNotFoundException, TigaseDBException {
+		cache.remove(user + "/" + key);
 		UserRepository repo = takeRepo();
 		if (repo != null) {
 			try {
@@ -302,6 +327,7 @@ public class UserRepositoryPool implements UserRepository {
 	@Override
 	public void removeSubnode(String user, String subnode)
 					throws UserNotFoundException, TigaseDBException {
+		cache.remove(user + "/" + subnode);
 		UserRepository repo = takeRepo();
 		if (repo != null) {
 			try {
@@ -327,6 +353,7 @@ public class UserRepositoryPool implements UserRepository {
 		} else {
 			log.warning("repo is NULL, pool empty? - " + repoPool.size());
 		}
+		cache.put(user + "/" + subnode + "/" + key, value);
 	}
 
 	@Override
@@ -342,6 +369,7 @@ public class UserRepositoryPool implements UserRepository {
 		} else {
 			log.warning("repo is NULL, pool empty? - " + repoPool.size());
 		}
+		cache.put(user + "/" + key, value);
 	}
 
 	@Override
@@ -387,6 +415,30 @@ public class UserRepositoryPool implements UserRepository {
 			log.warning("repo is NULL, pool empty? - " + repoPool.size());
 		}
 		return 0;
+	}
+
+	private class RepoCache extends SimpleCache<String, Object> {
+
+		public RepoCache(int maxsize, long cache_time) {
+			super(maxsize, cache_time);
+		}
+
+		@Override
+		public Object remove(Object key) {
+			if (cache_off) { return null; }
+
+			Object val = super.remove(key);
+			String strk = key.toString();
+			Iterator<String> ks = keySet().iterator();
+			while (ks.hasNext()) {
+				String k = ks.next().toString();
+				if (k.startsWith(strk)) {
+					ks.remove();
+				} // end of if (k.startsWith(strk))
+			} // end of while (ks.hasNext())
+			return val;
+		}
+
 	}
 
 }
