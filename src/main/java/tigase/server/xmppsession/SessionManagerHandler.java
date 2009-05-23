@@ -40,6 +40,8 @@ public interface SessionManagerHandler {
 
 	void handleLogout(String userName, XMPPResourceConnection conn);
 
+	void handleResourceBind(XMPPResourceConnection conn);
+
 	boolean isLocalDomain(String domain, boolean includeComponents);
 
 }
