@@ -52,7 +52,9 @@ public class SocketIO implements IOInterface {
   /**
    * Creates a new <code>SocketIO</code> instance.
    *
-   */
+	 * @param sock
+	 * @throws IOException
+	 */
   public SocketIO(final SocketChannel sock) throws IOException {
     channel = sock;
 		channel.configureBlocking(false);
@@ -67,17 +69,17 @@ public class SocketIO implements IOInterface {
 
 	@Override
   public void stop() throws IOException {
-	if (log.isLoggable(Level.FINEST)) {
-		log.finest("Stop called.");
-	}
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Stop called.");
+		}
     channel.close();
   }
 
 	@Override
   public boolean isConnected() {
-	if (log.isLoggable(Level.FINEST)) {
-		log.finest("Is connected: " + channel.isConnected());
-	}
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Is connected: " + channel.isConnected());
+		}
     return channel.isConnected();
   }
 
@@ -104,18 +106,18 @@ public class SocketIO implements IOInterface {
 		if (!dataBuffer.hasRemaining()) {
 			dataToSend.poll();
 		}
-	if (log.isLoggable(Level.FINER)) {
-	    log.finer("Wrote to channel " + result + " bytes.");
-	}
+		if (log.isLoggable(Level.FINER)) {
+			log.finer("Wrote to channel " + result + " bytes.");
+		}
     return result;
   }
 
 	@Override
   public ByteBuffer read(final ByteBuffer buff) throws IOException {
     bytesRead = channel.read(buff);
-	if (log.isLoggable(Level.FINER)) {
-    	log.finer("Read from channel " + bytesRead + " bytes.");
-	}
+		if (log.isLoggable(Level.FINER)) {
+			log.finer("Read from channel " + bytesRead + " bytes.");
+		}
     if (bytesRead == -1) {
       throw new EOFException("Channel has been closed.");
     } // end of if (result == -1)
