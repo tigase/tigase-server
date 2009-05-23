@@ -26,9 +26,9 @@ import java.nio.channels.CancelledKeyException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.concurrent.CompletionService;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -37,6 +37,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
 import tigase.annotations.TODO;
 
 /**
@@ -62,8 +63,8 @@ public class SocketReadThread implements Runnable {
 	//private boolean selecting = false;
 	private int empty_selections = 0;
 
-  private final ConcurrentLinkedQueue<IOService> waiting =
-    new ConcurrentLinkedQueue<IOService>();
+  private final ConcurrentSkipListSet<IOService> waiting =
+    new ConcurrentSkipListSet<IOService>(new IOServiceComparator());
   private Selector clientsSel = null;
 	private static ThreadPoolExecutor executor = null;
   /**
@@ -136,7 +137,7 @@ public class SocketReadThread implements Runnable {
 	}
 
 	public void addSocketServicePriv(IOService s) {
-    waiting.offer(s);
+    waiting.add(s);
 		// Calling lazy wakeup to avoid multiple wakeup calls
 		// when lots of new services are added....
 		clientsSel.wakeup();
@@ -157,38 +158,50 @@ public class SocketReadThread implements Runnable {
 	private void addAllWaiting() throws IOException {
 
     IOService s = null;
-    while ((s = waiting.poll()) != null) {
-      final SocketChannel sc = s.getSocketChannel();
+    while ((s = waiting.pollFirst()) != null) {
+      SocketChannel sc = s.getSocketChannel();
       try {
 				if (sc.isConnected()) {
 					int sel_key = READ_ONLY;
-    				if (log.isLoggable(Level.FINEST)) {
-        				log.finest("ADDED OP_READ: " + s.getUniqueId());
-                    }
+					if (log.isLoggable(Level.FINEST)) {
+						log.finest("ADDED OP_READ: " + s.getUniqueId());
+					}
 					if (s.waitingToSend()) {
 						sel_key = READ_WRITE;
-        				if (log.isLoggable(Level.FINEST)) {
-            				log.finest("ADDED OP_WRITE: " + s.getUniqueId());
-                        }
+						if (log.isLoggable(Level.FINEST)) {
+							log.finest("ADDED OP_WRITE: " + s.getUniqueId());
+						}
 					}
 					sc.register(clientsSel, sel_key, s);
 				} else {
-    				if (log.isLoggable(Level.FINEST)) {
-        				log.finest("Socket not connected: " + s.getUniqueId());
-                    }
+					if (log.isLoggable(Level.FINEST)) {
+						log.finest("Socket not connected: " + s.getUniqueId());
+					}
 					try {
-        				if (log.isLoggable(Level.FINER)) {
-            				log.finer("Forcing stopping the service: " + s.getUniqueId());
-                        }
+						if (log.isLoggable(Level.FINER)) {
+							log.finer("Forcing stopping the service: " + s.getUniqueId());
+						}
 						s.forceStop();
-					} catch (Exception e) {	}
+					} catch (Exception e) {
+						if (log.isLoggable(Level.FINEST)) {
+							log.log(Level.FINEST, "Exception while stopping service: " +
+											s.getUniqueId(), e);
+						}
+					}
 				}
 			} catch (Exception e) {
-        // Ignore such channel
-				if (log.isLoggable(Level.FINEST)) {
-    				log.log(Level.FINEST, "ERROR adding channel for: " + s.getUniqueId()
-        				+ ", exception: " + e, e);
-                }
+				if (log.isLoggable(Level.FINER)) {
+					log.log(Level.FINER, "Forcing stopping the service: " +
+									s.getUniqueId(), e);
+				}
+				try {
+					s.forceStop();
+				} catch (Exception ez) {
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "Exception while stopping service: " +
+										s.getUniqueId(), ez);
+					}
+				}
       } // end of try-catch
     } // end of for ()
 
@@ -237,7 +250,7 @@ public class SocketReadThread implements Runnable {
 			for (SelectionKey sk: tempSel.keys()) {
 				IOService serv = (IOService)sk.attachment();
 				sk.cancel();
-				waiting.offer(serv);
+				waiting.add(serv);
 			}
 			tempSel.close();
 		}
@@ -408,5 +421,20 @@ public class SocketReadThread implements Runnable {
     }
 
   }
+
+	private class IOServiceComparator implements Comparator<IOService> {
+
+		@Override
+		public int compare(IOService o1, IOService o2) {
+			if (o1.hashCode() < o2.hashCode()) {
+				return -1;
+			}
+			if (o1.hashCode() > o2.hashCode()) {
+				return 1;
+			}
+			return 0;
+		}
+
+	}
 
 } // SocketReadThread

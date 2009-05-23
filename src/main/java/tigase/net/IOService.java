@@ -289,6 +289,10 @@ public abstract class IOService implements Callable<IOService> {
 			}
 		} catch (Exception e) {
 			// Well, do nothing, we are closing the connection anyway....
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Exception while stopping service: " +
+								getUniqueId(), e);
+			}
 		} finally {
 			if (serviceListener != null) {
 				IOServiceListener tmp = serviceListener;
