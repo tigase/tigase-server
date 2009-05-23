@@ -49,10 +49,12 @@ public class SessionTransferMC implements MethodCall {
 		criteria = new MethodCallCriteria(ClusterMethods.SESSION_TRANSFER.toString());
 	}
 
+	@Override
 	public Criteria getModuleCriteria() {
 		return criteria;
 	}
 
+	@Override
 	public List<Element> process(final Element element) {
 		return null;
 	}

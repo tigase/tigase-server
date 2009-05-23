@@ -22,10 +22,8 @@ package tigase.cluster;
 
 import java.util.Set;
 import java.util.Map;
-import java.util.List;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.Arrays;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
@@ -61,6 +59,7 @@ public class ServerConnectionClustered extends ServerConnectionManager
 	private static final String VALID = "valid";
 
 	private Set<String> cluster_nodes = new LinkedHashSet<String>();
+	private String[] cl_nodes_array = new String[0];
 
 	public void processPacket(Packet packet) {
 		if (log.isLoggable(Level.FINEST)) {
@@ -91,7 +90,7 @@ public class ServerConnectionClustered extends ServerConnectionManager
 				if (local_key != null) {
 					valid = local_key.equals(key);
 				} else {
-					result = ClusterElement.createForNextNode(clel, cluster_nodes,
+					result = ClusterElement.createForNextNode(clel, cl_nodes_array,
 						getComponentId());
 				}
 				if (result == null) {
@@ -127,7 +126,7 @@ public class ServerConnectionClustered extends ServerConnectionManager
 			String from = packet.getElemFrom();
 			clel.addVisitedNode(from);
 			addOutPacket(new Packet(ClusterElement.createForNextNode(clel,
-						cluster_nodes, getComponentId()).getClusterElement()));
+						cl_nodes_array, getComponentId()).getClusterElement()));
 			break;
 		default:
 			break;
@@ -145,6 +144,7 @@ public class ServerConnectionClustered extends ServerConnectionManager
 		return cluster_node;
 	}
 
+	@Override
 	protected String getLocalDBKey(String cid, String key, String forkey_sessionId,
 		String asking_sessionId) {
 		String local_key = super.getLocalDBKey(cid, key, forkey_sessionId,
@@ -169,15 +169,19 @@ public class ServerConnectionClustered extends ServerConnectionManager
 		}
 	}
 
+	@Override
 	public void nodesConnected(Set<String> node_hostnames) {
 		for (String node: node_hostnames) {
 			cluster_nodes.add(getName() + "@" + node);
+			cl_nodes_array = cluster_nodes.toArray(new String[cluster_nodes.size()]);
 		}
 	}
 
+	@Override
 	public void nodesDisconnected(Set<String> node_hostnames) {
 		for (String node: node_hostnames) {
 			cluster_nodes.remove(getName() + "@" + node);
+			cl_nodes_array = cluster_nodes.toArray(new String[cluster_nodes.size()]);
 		}
 	}
 

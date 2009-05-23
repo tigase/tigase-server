@@ -22,6 +22,10 @@
 
 package tigase.cluster;
 
+import java.util.Map;
+import java.util.Queue;
+import tigase.server.Packet;
+
 /**
  * Created: May 2, 2009 4:36:03 PM
  *
@@ -29,5 +33,23 @@ package tigase.cluster;
  * @version $Rev$
  */
 public interface ClusteringStrategyIfc {
+
+	//void init(String smName);
+
+	Map<String, Object> getDefaults(Map<String, Object> params);
+
+	void setProperties(Map<String, Object> props);
+
+	String[] getNodesForJid(String jid);
+
+	String[] getAllNodes();
+
+	void nodeConnected(String jid);
+
+	void nodeDisconnected(String jid);
+
+	void userConnected(String jid, String sm, Queue<Packet> results);
+
+	void userDisconnected(String jid, String sm, Queue<Packet> results);
 
 }

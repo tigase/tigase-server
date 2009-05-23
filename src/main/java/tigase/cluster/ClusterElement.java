@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
@@ -219,18 +220,19 @@ public class ClusterElement {
 	}
 
 	public static ClusterElement createForNextNode(ClusterElement clel,
-		Set<String> cluster_nodes, String comp_id) {
+					String[] cluster_nodes, String comp_id) {
 		if (log.isLoggable(Level.FINEST)) {
-    		log.finest("Calculating a next node from nodes: " + cluster_nodes.toString());
-        }
-		if (cluster_nodes.size() > 0) {
+			log.finest("Calculating a next node from nodes: " +
+							Arrays.toString(cluster_nodes));
+		}
+		if (cluster_nodes.length > 0) {
 			String next_node = null;
 			for (String cluster_node: cluster_nodes) {
 				if (!clel.isVisitedNode(cluster_node) && !cluster_node.equals(comp_id)) {
 					next_node = cluster_node;
-    				if (log.isLoggable(Level.FINEST)) {
-        				log.finest("Found next cluster node: " + next_node);
-                    }
+					if (log.isLoggable(Level.FINEST)) {
+						log.finest("Found next cluster node: " + next_node);
+					}
 					break;
 				}
 			}
@@ -239,9 +241,9 @@ public class ClusterElement {
 			if (next_node == null && !comp_id.equals(clel.getFirstNode())) {
 				next_node = clel.getFirstNode();
 				if (log.isLoggable(Level.FINEST)) {
-    				log.finest("No more cluster nodes found, sending back to the first node: "
-        				+ next_node);
-                }
+					log.finest("No more cluster nodes found, sending back to the first node: " +
+									next_node);
+				}
 			}
 			if (next_node != null) {
 				ClusterElement result = clel.nextClusterNode(next_node);

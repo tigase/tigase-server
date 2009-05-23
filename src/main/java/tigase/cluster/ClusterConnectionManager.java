@@ -73,8 +73,6 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
   public static final String SECRET_PROP_KEY = "secret";
   public String SECRET_PROP_VAL =	"someSecret";
 	public static final String PORT_LOCAL_HOST_PROP_KEY = "local-host";
-	public String PORT_LOCAL_HOST_PROP_VAL = "localhost";
-	public String PORT_REMOTE_HOST_PROP_VAL = "comp-1.localhost";
 	public static final String PORT_ROUTING_TABLE_PROP_KEY = "routing-table";
 	public String[] PORT_IFC_PROP_VAL = {"*"};
 	public static final String RETURN_SERVICE_DISCO_KEY = "service-disco";
@@ -353,6 +351,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 		return props;
 	}
 
+	@Override
 	protected Map<String, Object> getParamsForPort(int port) {
     Map<String, Object> defs = new LinkedHashMap<String, Object>();
 		defs.put(SECRET_PROP_KEY, SECRET_PROP_VAL);
@@ -362,15 +361,18 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 		return defs;
 	}
 
+	@Override
 	protected int[] getDefPlainPorts() {
 		return PORTS;
 	}
 
+	@Override
 	protected String getUniqueId(XMPPIOService serv) {
 		//		return (String)serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
 		return serv.getRemoteAddress();
 	}
 
+	@Override
 	public void serviceStopped(XMPPIOService service) {
 		super.serviceStopped(service);
 		Map<String, Object> sessionData = service.getSessionData();
@@ -455,6 +457,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 		} // end of switch (service.connectionType())
 	}
 
+	@Override
 	public String xmppStreamOpened(XMPPIOService service,
 		Map<String, String> attribs) {
 
@@ -501,6 +504,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 		return null;
 	}
 
+	@Override
 	public void xmppStreamClosed(XMPPIOService serv) {
 		log.info("Stream closed.");
 	}
@@ -512,6 +516,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 	 *
 	 * @return a <code>long</code> value
 	 */
+	@Override
 	protected long getMaxInactiveTime() {
 		return 1000*24*HOUR;
 	}
@@ -543,6 +548,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 		serviceEntity.addItems(item);
 	}
 
+	@Override
 	public Element getDiscoInfo(String node, String jid) {
 		if (jid != null && getName().equals(JIDUtils.getNodeNick(jid))) {
 			return serviceEntity.getDiscoInfo(node);
@@ -550,8 +556,10 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 		return null;
 	}
 
+	@Override
 	public 	List<Element> getDiscoFeatures() { return null; }
 
+	@Override
 	public List<Element> getDiscoItems(String node, String jid) {
 		if (getName().equals(JIDUtils.getNodeNick(jid))) {
 			return serviceEntity.getDiscoItems(node, null);
@@ -561,20 +569,32 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 		}
 	}
 
+	@Override
 	protected XMPPIOService getXMPPIOServiceInstance() {
 		return new XMPPIOService();
 	}
 
+	@Override
 	public List<StatRecord> getStatistics() {
 		List<StatRecord> stats = super.getStatistics();
-		stats.add(new StatRecord(getName(), "Total disconnects", "long",
-				totalNodeDisconnects, Level.INFO));
+		if (totalNodeDisconnects > 0) {
+			stats.add(new StatRecord(getName(), "Total disconnects", "long",
+							totalNodeDisconnects, Level.FINE));
+		} else {
+			stats.add(new StatRecord(getName(), "Total disconnects", "long",
+							totalNodeDisconnects, Level.FINEST));
+		}
 
 		stats.add(new StatRecord(getName(), "Last day disconnects", "array",
 				Arrays.toString(lastDay), Level.FINE));
 		stats.add(new StatRecord(getName(), "Last hour disconnects", "array",
-				Arrays.toString(lastHour), Level.INFO));
+				Arrays.toString(lastHour), Level.FINE));
 		return stats;
+	}
+	
+	@Override
+	protected Integer getMaxQueueSize(int def) {
+		return def*10;
 	}
 
 }
