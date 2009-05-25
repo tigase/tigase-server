@@ -1022,6 +1022,11 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 	}
 
 	@Override
+	protected boolean isHighThroughput() {
+		return true;
+	}
+
+	@Override
 	protected XMPPIOService getXMPPIOServiceInstance() {
 		return new XMPPIOService();
 	}
