@@ -613,7 +613,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 		}
 		if (watchdogRuns > 0) {
 			stats.add(new StatRecord(getName(), "Watchdog runs", "long",
-							watchdogRuns, Level.FINE));
+							watchdogRuns, Level.FINER));
 		} else {
 			stats.add(new StatRecord(getName(), "Watchdog runs", "long",
 							watchdogRuns, Level.FINEST));
@@ -645,6 +645,10 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 	}
 
 	protected abstract IO getXMPPIOServiceInstance();
+
+	protected boolean isHighThroughput() {
+		return false;
+	}
 
 	private class ConnectionListenerImpl implements ConnectionOpenListener {
 
@@ -714,6 +718,24 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 				log.log(Level.WARNING, "Can not accept connection.", e);
 				serv.stop();
 			} // end of try-catch
+		}
+
+		@Override
+		public int getReceiveBufferSize() {
+			if (isHighThroughput()) {
+				return 64*1024;
+			} else {
+				return DEF_RECEIVE_BUFFER_SIZE;
+			}
+		}
+
+		@Override
+		public int getTrafficClass() {
+			if (isHighThroughput()) {
+				return IPTOS_THROUGHPUT;
+			} else {
+				return DEF_TRAFFIC_CLASS;
+			}
 		}
 
 	}
