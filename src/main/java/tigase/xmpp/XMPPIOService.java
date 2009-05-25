@@ -233,53 +233,55 @@ public class XMPPIOService extends IOService {
 //    try {
 			if (isConnected()) {
 				char[] data = readData();
-
-				// Yes check again if we are still connected as
-				// servce might be disconnected during data read
-				if (isConnected()) {
-					if (data != null) {
-						if (log.isLoggable(Level.FINEST)) {
-						log.finest("READ:\n" + new String(data));
-						}
-						// This is log for debuging only,
-						// in normal mode don't even call below code
-						assert debug(new String(data), "--RECEIVED:");
-						try {
-							parser.parse(domHandler, data, 0, data.length);
-							if (domHandler.parseError()) {
-								log.warning("Data parsing error: " + new String(data));
-								domHandler = new XMPPDomBuilderHandler(this);
+				while (data != null && data.length > 0) {
+					// Yes check again if we are still connected as
+					// servce might be disconnected during data read
+					if (isConnected()) {
+						if (data != null) {
+							if (log.isLoggable(Level.FINEST)) {
+								log.finest("READ:\n" + new String(data));
 							}
-							Queue<Element> elems = domHandler.getParsedElements();
-							if (elems.size() > 0) {
-								readCompleted();
-							}
-							Element elem = null;
-							while ((elem = elems.poll()) != null) {
-								//	assert debug(elem.toString() + "\n");
-								//log.finer("Read element: " + elem.getName());
-								if (log.isLoggable(Level.FINEST)) {
-									log.finest("Read packet: " + elem.toString());
+							// This is log for debuging only,
+							// in normal mode don't even call below code
+							assert debug(new String(data), "--RECEIVED:");
+							try {
+								parser.parse(domHandler, data, 0, data.length);
+								if (domHandler.parseError()) {
+									log.warning("Data parsing error: " + new String(data));
+									domHandler = new XMPPDomBuilderHandler(this);
 								}
-								//							System.out.print(elem.toString());
-								addReceivedPacket(new Packet(elem));
-							} // end of while ((elem = elems.poll()) != null)
-						}	catch (Exception ex) {
-							log.log(Level.INFO, "Incorrect XML data: " + new String(data)
-								+ ", stopping connection: " + getUniqueId()
-								+ ", exception: ", ex);
-							forceStop();
-						} // end of try-catch
+								Queue<Element> elems = domHandler.getParsedElements();
+								if (elems.size() > 0) {
+									readCompleted();
+								}
+								Element elem = null;
+								while ((elem = elems.poll()) != null) {
+									//	assert debug(elem.toString() + "\n");
+									//log.finer("Read element: " + elem.getName());
+									if (log.isLoggable(Level.FINEST)) {
+										log.finest("Read packet: " + elem.toString());
+									}
+									//							System.out.print(elem.toString());
+									addReceivedPacket(new Packet(elem));
+								} // end of while ((elem = elems.poll()) != null)
+							} catch (Exception ex) {
+								log.log(Level.INFO, "Incorrect XML data: " + new String(data) +
+												", stopping connection: " + getUniqueId() +
+												", exception: ", ex);
+								forceStop();
+							} // end of try-catch
+						} else {
+							if (log.isLoggable(Level.FINEST)) {
+								log.finest("Nothing read!!");
+							}
+						}
 					} else {
 						if (log.isLoggable(Level.FINEST)) {
-							log.finest("Nothing read!!");
+							log.finest("Service disconnected during read");
 						}
+						forceStop();
 					}
-				} else {
-					if (log.isLoggable(Level.FINEST)) {
-						log.finest("Service disconnected during read");
-					}
-					forceStop();
+					data = readData();
 				}
 			} else {
 				if (log.isLoggable(Level.FINE)) {
