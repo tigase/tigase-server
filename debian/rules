@@ -15,6 +15,7 @@ binary-post-install/tigase-server::
 	sed -i 's#jars/\|libs/#lib/#g' debian/tigase-server/usr/share/tigase/scripts/*.sh
 	sed -i 's#lib/tigase-server[^.]*.jar#lib/'`basename debian/tigase-server/usr/share/tigase/lib/tigase-server*.jar`'#g' debian/tigase-server/usr/share/tigase/scripts/*.sh
 	sed -i 's#lib/derby#/usr/lib/jvm/java-6-sun/db/lib/derby#g' debian/tigase-server/usr/share/tigase/scripts/*.sh
+	sed -i 's#database/#server-database/#g' debian/tigase-server/usr/share/tigase/scripts/*.sh
 	chmod +x debian/tigase-server/usr/share/tigase/scripts/*.sh
 	cat debian/init.properties >> debian/tigase-server/etc/tigase/init.properties
 	find debian/tigase-server -depth -type d -name .svn -exec rm -rf {} \;
