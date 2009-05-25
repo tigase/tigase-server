@@ -43,7 +43,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.Enumeration;
 import java.util.concurrent.CopyOnWriteArraySet;
 import javax.script.Bindings;
 import javax.script.ScriptEngineFactory;
@@ -917,7 +916,6 @@ public class SessionManager extends AbstractMessageReceiver
 		if (log.isLoggable(Level.FINER)) {
 			log.finer("Stream closed from: " + connectionId);
 		}
-		++closedConnections;
 		XMPPResourceConnection connection = connectionsByFrom.remove(connectionId);
 		if (connection != null) {
 			closeSession(connection, closeOnly);
@@ -977,6 +975,7 @@ public class SessionManager extends AbstractMessageReceiver
 		} catch (Exception e) {
 			log.log(Level.WARNING, "Exception closing session... ", e);
 		}
+		++closedConnections;
 		conn.streamClosed();
 	}
 
