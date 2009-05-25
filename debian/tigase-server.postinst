@@ -21,6 +21,7 @@ case "$1" in
 		if [ -n "$DERBYDB" ] && [ ! -d "$DERBYDB" ]
 		then
 			echo "Creating Derby database for Tigase in \`$DERBYDB' ..."
+			update-alternatives --set java /usr/lib/jvm/java-6-sun/jre/bin/java
 			OLDCWD=`pwd`
 			cd /usr/share/tigase
 			scripts/derby-db-create.sh "$DERBYDB" >/dev/null

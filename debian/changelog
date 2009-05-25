@@ -1,3 +1,18 @@
+tigase-server (4.1.5-b1678-xk1) hardy; urgency=low
+
+  * Updated to SVN revision 1678: Attempt to make data reading more
+    efficient, reading as much characters from the network socket as
+    possible in a single method run.
+
+ -- Tomasz Sterna <tomek@xiaoka.com>  Mon, 25 May 2009 12:11:09 +0000
+
+tigase-server (4.1.5-b1677-xk1) hardy; urgency=low
+
+  * Updated to SVN revision 1677: Added check for JRE version to init
+    script
+
+ -- Tomasz Sterna <tomek@xiaoka.com>  Mon, 25 May 2009 10:11:08 +0000
+
 tigase-server (4.1.5-b1676-xk2) hardy; urgency=low
 
   * Checking JRE version during init.d startup script.
