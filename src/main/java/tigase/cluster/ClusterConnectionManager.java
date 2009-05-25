@@ -597,4 +597,9 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 		return def*10;
 	}
 
+	@Override
+	protected boolean isHighThroughput() {
+		return true;
+	}
+
 }
