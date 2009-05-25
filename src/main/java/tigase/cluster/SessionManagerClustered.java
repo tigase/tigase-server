@@ -93,9 +93,15 @@ public class SessionManagerClustered extends SessionManager
 			log.finest("Received packet: " + packet.toString());
 		}
 		if (packet.getElemName() == ClusterElement.CLUSTER_EL_NAME &&
-						packet.getElement().getXMLNS() == ClusterElement.XMLNS &&
-						isTrusted(packet.getElemFrom())) {
-			processClusterPacket(packet);
+						packet.getElement().getXMLNS() == ClusterElement.XMLNS) {
+			if (isTrusted(packet.getElemFrom())) {
+				processClusterPacket(packet);
+			} else {
+				if (log.isLoggable(Level.WARNING)) {
+					log.log(Level.WARNING, "Cluster packet from untrusted source: " +
+									packet.toString());
+				}
+			}
 			return;
 		}
 
