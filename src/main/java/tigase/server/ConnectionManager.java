@@ -600,6 +600,17 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 			stats.add(new StatRecord(getName(), "Open connections", "int",
 							services.size(), Level.FINEST));
 		}
+		int waitingToSendSize = 0;
+		for (XMPPIOService serv : services.values()) {
+			waitingToSendSize += serv.waitingToSendSize();
+		}
+		if (waitingToSendSize > 0) {
+			stats.add(new StatRecord(getName(), "Waiting to send", "int",
+							waitingToSendSize, Level.FINE));
+		} else {
+			stats.add(new StatRecord(getName(), "Waiting to send", "int",
+							waitingToSendSize, Level.FINEST));
+		}
 		if (watchdogRuns > 0) {
 			stats.add(new StatRecord(getName(), "Watchdog runs", "long",
 							watchdogRuns, Level.FINE));
