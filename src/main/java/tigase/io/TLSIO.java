@@ -209,4 +209,9 @@ public class TLSIO implements IOInterface {
 		return io.waitingToSend();
 	}
 
+	@Override
+	public int waitingToSendSize() {
+		return io.waitingToSendSize();
+	}
+
 } // TLSIO

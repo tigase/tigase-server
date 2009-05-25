@@ -98,13 +98,20 @@ public class SocketIO implements IOInterface {
 		if (buff != null) {
 			dataToSend.offer(buff);
 		}
-		ByteBuffer dataBuffer = dataToSend.peek();
-    int result = channel.write(dataBuffer);
-		if (result == -1) {
-			throw new EOFException("Channel has been closed.");
-		} // end of if (res == -1)
-		if (!dataBuffer.hasRemaining()) {
-			dataToSend.poll();
+		int result = 0;
+		ByteBuffer dataBuffer = null;
+		while ((dataBuffer = dataToSend.peek()) != null) {
+			int res = channel.write(dataBuffer);
+			if (res == -1) {
+				throw new EOFException("Channel has been closed.");
+			} else {
+				result += res;
+			}
+			if (!dataBuffer.hasRemaining()) {
+				dataToSend.poll();
+			} else {
+				break;
+			}
 		}
 		if (log.isLoggable(Level.FINER)) {
 			log.finer("Wrote to channel " + result + " bytes.");
@@ -139,5 +146,9 @@ public class SocketIO implements IOInterface {
 		return dataToSend.size() > 0;
 	}
 
+	@Override
+	public int waitingToSendSize() {
+		return dataToSend.size();
+	}
 
 } // SocketIO

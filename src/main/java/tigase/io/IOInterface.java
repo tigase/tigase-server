@@ -52,4 +52,6 @@ public interface IOInterface {
 
 	boolean waitingToSend();
 
+	int waitingToSendSize();
+
 } // IOInterface
