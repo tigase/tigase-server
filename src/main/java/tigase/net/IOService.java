@@ -414,6 +414,10 @@ public abstract class IOService implements Callable<IOService> {
 		return socketIO.waitingToSend();
 	}
 
+	public int waitingToSendSize() {
+		return socketIO.waitingToSendSize();
+	}
+
 	/**
    * Describe <code>writeData</code> method here.
    *
