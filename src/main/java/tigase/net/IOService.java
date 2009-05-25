@@ -35,6 +35,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import tigase.io.IOInterface;
@@ -302,7 +303,7 @@ public abstract class IOService implements Callable<IOService> {
 		}
 	}
 
-	private final AtomicBoolean writeInProgress = new AtomicBoolean(false);
+	private final AtomicInteger writeInProgress = new AtomicInteger(0);
 	private final AtomicBoolean readInProgress = new AtomicBoolean(false);
 
   /**
@@ -322,11 +323,11 @@ public abstract class IOService implements Callable<IOService> {
 		// network socket. It tries to do everything in one go, however
 		// If either reading or writing is in progress then it should skip
 		// the step.
-		if (writeInProgress.compareAndSet(false, true)) {
+		if (writeInProgress.compareAndSet(0, 1)) {
 			try {
 				writeData(null);
 			} finally {
-				writeInProgress.set(false);
+				writeInProgress.decrementAndGet();
 			}
 		}
 		if (stopping) {
@@ -401,7 +402,7 @@ public abstract class IOService implements Callable<IOService> {
 					// and the select thinks there are some bytes waiting for reading
 					// and 0 bytes are read
 					if ((++empty_read_call_count) > MAX_ALLOWED_EMPTY_CALLS &&
-									!writeInProgress.get()) {
+									writeInProgress.get() == 0) {
 						log.warning("Max allowed empty calls excceeded, closing connection.");
 						forceStop();
 					}
@@ -434,6 +435,7 @@ public abstract class IOService implements Callable<IOService> {
    * @exception IOException if an error occurs
    */
   protected void writeData(final String data) {
+		writeInProgress.incrementAndGet();
 		// Avoid concurrent calls here (one from call() and another from
 		// application)
 		synchronized (writeInProgress) {
@@ -463,6 +465,7 @@ public abstract class IOService implements Callable<IOService> {
 				forceStop();
 			}
 		}
+		writeInProgress.decrementAndGet();
   }
 
   /**

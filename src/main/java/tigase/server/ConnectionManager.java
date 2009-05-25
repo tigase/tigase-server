@@ -800,11 +800,11 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 										log.info(getName() +
 														"Found dead connection, stopping: " + serviceId);
 										++watchdogStopped;
-										service.stop();
+										service.forceStop();
 									}
 								} catch (Exception ignore) {
 									// Do nothing here as we expect Exception to be thrown here...
-									}
+								}
 							}
 						// 								}
 						}
