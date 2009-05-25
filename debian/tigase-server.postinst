@@ -21,8 +21,6 @@ case "$1" in
 		if [ -n "$DERBYDB" ] && [ ! -d "$DERBYDB" ] && [ -r /usr/lib/jvm/java-6-sun/db/lib/derby.jar ]
 		then
 			echo "Creating Derby database for Tigase in \`$DERBYDB' ..."
-			update-alternatives --set java /usr/lib/jvm/java-6-sun/jre/bin/java
-			export CLASSPATH="/usr/lib/jvm/java-6-sun/db/lib/derby.jar:/usr/lib/jvm/java-6-sun/db/lib/derbytools.jar:$CLASSPATH"
 			OLDCWD=`pwd`
 			cd /usr/share/tigase
 			scripts/derby-db-create.sh "$DERBYDB" >/dev/null
@@ -43,3 +41,23 @@ case "$1" in
 esac
 
 #DEBHELPER#
+#!/bin/bash
+
+[[ "$1" = "" ]] && \
+  echo "Give me a path to the location where you want to have the database created" && \
+  exit 1
+
+
+java -Dij.protocol=jdbc:derby: -Dij.database="$1;create=true" \
+		-Dderby.system.home=`pwd` \
+		-cp libs/derby.jar:libs/derbytools.jar:jars/tigase-server.jar \
+		org.apache.derby.tools.ij database/derby-schema-4.sql
+java -Dij.protocol=jdbc:derby: -Dij.database="$1" \
+		-Dderby.system.home=`pwd` \
+		-cp libs/derby.jar:libs/derbytools.jar:jars/tigase-server.jar \
+		org.apache.derby.tools.ij database/derby-schema-4-sp.schema
+java -Dij.protocol=jdbc:derby: -Dij.database="$1" \
+		-Dderby.system.home=`pwd` \
+		-cp libs/derby.jar:libs/derbytools.jar:jars/tigase-server.jar \
+		org.apache.derby.tools.ij database/derby-schema-4-props.sql
+
