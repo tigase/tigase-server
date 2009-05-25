@@ -47,12 +47,6 @@ public class ConnectionOpenThread implements Runnable {
 
   private static final Logger log =
 		Logger.getLogger("tigase.net.ConnectionOpenThread");
-	/**
-	 * <code>RECEIVE_BUFFER_SIZE</code> defines a size for TCP/IP packets.
-	 * XMPP data packets are quite small usually, below 1kB so we don't need
-	 * big TCP/IP data buffers.
-	 */
-	private static final int RECEIVE_BUFFER_SIZE = 2*1024;
 
   protected long accept_counter = 0;
 
@@ -132,7 +126,7 @@ public class ConnectionOpenThread implements Runnable {
 				log.finest("Setting up 'accept' channel...");
 			}
 			ServerSocketChannel ssc = ServerSocketChannel.open();
-			ssc.socket().setReceiveBufferSize(RECEIVE_BUFFER_SIZE);
+			ssc.socket().setReceiveBufferSize(al.getReceiveBufferSize());
 			ssc.configureBlocking(false);
 			ssc.socket().bind(isa);
 			ssc.register(selector, SelectionKey.OP_ACCEPT, al);
@@ -143,7 +137,8 @@ public class ConnectionOpenThread implements Runnable {
 								"/" + isa.getPort());
 			}
 			SocketChannel sc = SocketChannel.open();
-			sc.socket().setReceiveBufferSize(RECEIVE_BUFFER_SIZE);
+			sc.socket().setReceiveBufferSize(al.getReceiveBufferSize());
+			sc.socket().setTrafficClass(al.getTrafficClass());
 			sc.configureBlocking(false);
 			sc.connect(isa);
 			sc.register(selector, SelectionKey.OP_CONNECT, al);
@@ -205,6 +200,8 @@ public class ConnectionOpenThread implements Runnable {
 								log.finer("Registered new client socket: " + sc);
 							}
 							ConnectionOpenListener al = (ConnectionOpenListener)sk.attachment();
+							sc.socket().setTrafficClass(al.getTrafficClass());
+							sc.socket().setReceiveBufferSize(al.getReceiveBufferSize());
 							al.accept(sc);
 						} catch (java.net.SocketException e) {
 							log.log(Level.INFO,

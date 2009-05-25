@@ -302,8 +302,8 @@ public abstract class IOService implements Callable<IOService> {
 		}
 	}
 
-	private AtomicBoolean writeInProgress = new AtomicBoolean(false);
-	private AtomicBoolean readInProgress = new AtomicBoolean(false);
+	private final AtomicBoolean writeInProgress = new AtomicBoolean(false);
+	private final AtomicBoolean readInProgress = new AtomicBoolean(false);
 
   /**
    * Method <code>run</code> is used to perform
@@ -323,18 +323,24 @@ public abstract class IOService implements Callable<IOService> {
 		// If either reading or writing is in progress then it should skip
 		// the step.
 		if (writeInProgress.compareAndSet(false, true)) {
-			writeData(null);
-			writeInProgress.set(false);
+			try {
+				writeData(null);
+			} finally {
+				writeInProgress.set(false);
+			}
 		}
 		if (stopping) {
 			stop();
 		} else {
 			if (readInProgress.compareAndSet(false, true)) {
-				processSocketData();
-				if (receivedPackets() > 0 && serviceListener != null) {
-					serviceListener.packetsReady(this);
-				} // end of if (receivedPackets.size() > 0)
-				readInProgress.set(false);
+				try {
+					processSocketData();
+					if (receivedPackets() > 0 && serviceListener != null) {
+						serviceListener.packetsReady(this);
+					} // end of if (receivedPackets.size() > 0)
+				} finally {
+					readInProgress.set(false);
+				}
 			}
 		}
     return this;
@@ -366,7 +372,7 @@ public abstract class IOService implements Callable<IOService> {
 	}
 
 	private long empty_read_call_count = 0;
-	private static final long MAX_ALLOWED_EMPTY_CALLS = 100;
+	private static final long MAX_ALLOWED_EMPTY_CALLS = 1000;
 
 	/**
    * Describe <code>readData</code> method here.
@@ -377,7 +383,9 @@ public abstract class IOService implements Callable<IOService> {
   protected char[] readData() throws IOException {
 		setLastTransferTime();
     CharBuffer cb = null;
-		synchronized (socketIO) {
+		// Generally it should not happen as it is called only in 
+		// call() which has concurrent call protection.
+//		synchronized (socketIO) {
 			try {
 				//			resizeInputBuffer();
 				ByteBuffer tmpBuffer = socketIO.read(socketInput);
@@ -392,7 +400,8 @@ public abstract class IOService implements Callable<IOService> {
 					// sometimes it happens that the connection has been lost
 					// and the select thinks there are some bytes waiting for reading
 					// and 0 bytes are read
-					if ((++empty_read_call_count) > MAX_ALLOWED_EMPTY_CALLS) {
+					if ((++empty_read_call_count) > MAX_ALLOWED_EMPTY_CALLS &&
+									!writeInProgress.get()) {
 						log.warning("Max allowed empty calls excceeded, closing connection.");
 						forceStop();
 					}
@@ -406,7 +415,7 @@ public abstract class IOService implements Callable<IOService> {
 				//			eof.printStackTrace();
 				forceStop();
 			} // end of try-catch
-		}
+//		}
     return cb != null ? cb.array() : null;
   }
 
@@ -425,7 +434,9 @@ public abstract class IOService implements Callable<IOService> {
    * @exception IOException if an error occurs
    */
   protected void writeData(final String data) {
-		synchronized (socketIO) {
+		// Avoid concurrent calls here (one from call() and another from
+		// application)
+		synchronized (writeInProgress) {
 			try {
 				if (data != null && data.length() > 0) {
 					if (log.isLoggable(Level.FINEST)) {

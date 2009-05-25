@@ -34,6 +34,19 @@ import java.nio.channels.SocketChannel;
  */
 public interface ConnectionOpenListener {
 
+	public static final int IPTOS_LOWCOST = 0x02;
+	public static final int IPTOS_RELIABILITY = 0x04;
+	public static final int IPTOS_THROUGHPUT = 0x08;
+	public static final int IPTOS_LOWDELAY = 0x10;
+	/**
+	 * <code>RECEIVE_BUFFER_SIZE</code> defines a size for TCP/IP packets.
+	 * XMPP data packets are quite small usually, below 1kB so we don't need
+	 * big TCP/IP data buffers.
+	 */
+	public static final int DEF_RECEIVE_BUFFER_SIZE = 2*1024;
+	public static final int DEF_TRAFFIC_CLASS = IPTOS_LOWCOST;
+
+
 	void accept(SocketChannel sc);
 
 	int getPort();
@@ -41,5 +54,9 @@ public interface ConnectionOpenListener {
 	String[] getIfcs();
 
 	ConnectionType getConnectionType();
+
+	int getReceiveBufferSize();
+
+	int getTrafficClass();
 
 } // ConnectionOpenListener
