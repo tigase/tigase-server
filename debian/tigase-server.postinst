@@ -22,7 +22,7 @@ case "$1" in
 		then
 			echo "Creating Derby database for Tigase in \`$DERBYDB' ..."
 			update-alternatives --set java /usr/lib/jvm/java-6-sun/jre/bin/java
-			export CLASSPATH="/usr/lib/jvm/java-6-sun/db/lib/derby.jar:$CLASSPATH"
+			export CLASSPATH="/usr/lib/jvm/java-6-sun/db/lib/derby.jar:/usr/lib/jvm/java-6-sun/db/lib/derbytools.jar:$CLASSPATH"
 			OLDCWD=`pwd`
 			cd /usr/share/tigase
 			scripts/derby-db-create.sh "$DERBYDB" >/dev/null

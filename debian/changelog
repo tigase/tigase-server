@@ -1,3 +1,14 @@
+tigase-server (4.1.5-b1683-xk1) hardy; urgency=low
+
+  * Updated to SVN revision 1683: Added statistics displaying number of
+    data buffers waiting in the I/O component. Attempt to make data
+    writing more efficient by writing as much data as possible in a
+    single method call. Added method returning number of buffers waiting
+    to send in the I/O. Switching to Sun Java implementation during
+    postinstall Added derby jar to CLASSPATH during postinst
+
+ -- Tomasz Sterna <tomek@xiaoka.com>  Mon, 25 May 2009 14:10:17 +0000
+
 tigase-server (4.1.5-b1678-xk1) hardy; urgency=low
 
   * Updated to SVN revision 1678: Attempt to make data reading more
