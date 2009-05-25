@@ -47,9 +47,7 @@ TIGASE_OPTIONS="--property-file /etc/tigase/init.properties"
 # defined in /etc/default/tigase-server)
 JDK_DIRS="
 	  /usr/lib/jvm/java-6-sun \
-	  /usr/lib/jvm/java-1.5.0-sun \
 	  /usr/lib/j2sdk1.6-sun \
-	  /usr/lib/j2sdk1.5-sun \
 	 "
 
 # End of variables that can be overwritten in /etc/default/tigase-server
@@ -77,7 +75,7 @@ fi
 
 # Check whether startup has been disabled
 if [ "$NO_START" != "0" -a "$1" != "stop" ]; then 
-	[ "$VERBOSE" != "no" ] && echo "Not starting tigase-server - edit /etc/default/tigase-server and change NO_START to be 0 (or comment it out).";
+	[ "$VERBOSE" != "no" ] && echo "Not starting $DESC - edit /etc/default/tigase-server and change NO_START to be 0 (or comment it out).";
 	exit 0;
 fi
 
@@ -109,20 +107,23 @@ PIDFILE="/var/run/$NAME.pid"
 LOGDIR="/var/log/tigase"
 
 ##################################################
-# Check for JAVA_HOME
+# Check for JAVA_HOME and JRE version
 ##################################################
-if [ -z "$JAVA_HOME" ]; then
-    echo "Could not start $DESC because no Java Development Kit"
-    echo "(JDK) was found. Please download and install JDK 1.5 or higher and set"
-    echo "JAVA_HOME in /etc/default/tigase-server to the JDK's installation directory."
-    exit 0
-
+if [ -z "$JAVA_HOME" ] || ! "$JAVA" -version 2>&1 | grep -q 'java version[^0-9]\+\([2-9]\|1\.[6-9]\)'; then
+	if [ -z "$JAVA_HOME" ]; then
+		echo "Could not start $DESC because no Java Runtime Environment (JRE) was found."
+	else
+		echo "$DESC needs Sun Java(TM) SE Runtime Environment at least version 1.6."
+	fi
+	echo "Please download and install JRE 1.6 or higher and set"
+	echo "JAVA_HOME in /etc/default/tigase-server to the JRE's installation directory."
+	exit 0
 fi
 
 # Put all jars in classpath
 CLASSPATH="$TIGASE_JAR"
 
-CLASSPATH="`ls -d $TIGASE_HOME/lib/*.jar 2>/dev/null | grep -v wrapper | tr -d '\n' :`$CLASSPATH"
+CLASSPATH="`ls -d $TIGASE_HOME/lib/*.jar 2>/dev/null | grep -v wrapper | tr '\n' :`$CLASSPATH"
 for lib in /usr/lib/jvm/java-6-sun/db/lib/derby.jar \
            /usr/share/java/postgresql.jar \
            /usr/share/java/mysql.jar \

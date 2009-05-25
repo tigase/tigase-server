@@ -1,3 +1,105 @@
+tigase-server (4.1.5-b1676-xk2) hardy; urgency=low
+
+  * Checking JRE version during init.d startup script.
+
+ -- Tomasz Sterna <tomek@xiaoka.com>  Mon, 25 May 2009 08:52:49 +0000
+
+tigase-server (4.1.5-b1676-xk1) hardy; urgency=low
+
+  * Updated to SVN revision 1676: Presence optimizations switched off
+    temporarily. Fixed problem with excessive CPU usage by tigase.net
+
+ -- Tomasz Sterna <tomek@xiaoka.com>  Sun, 24 May 2009 00:11:09 +0000
+
+tigase-server (4.1.5-b1674-xk1) hardy; urgency=low
+
+  * Updated to SVN revision 1674: Fixed a bug with SM initialization and
+    now the cluster sends broadcast to all cluster nodes about new user
+    connection after initial presence.
+
+ -- Tomasz Sterna <tomek@xiaoka.com>  Sat, 23 May 2009 20:11:09 +0000
+
+tigase-server (4.1.5-b1673-xk1) hardy; urgency=low
+
+  * Updated to SVN revision 1673: Typo fixes. Typo fixes. Typo fixes.
+
+ -- Tomasz Sterna <tomek@xiaoka.com>  Sat, 23 May 2009 18:11:09 +0000
+
+tigase-server (4.1.5-b1670-xk1) hardy; urgency=low
+
+  * Updated to SVN revision 1670: Broadcasted presence are always sent
+    to bare user jid now. Added msg and check to block user installing
+    over existing Tigase dir Broadcasted presence are always sent to
+    bare user jid now. Added new connection status: REMOTE for user
+    connections established to different cluster nodes. Fixed a bug with
+    token authentication which used getUserId() which couldn't work as
+    user id is only available after successful authentication. Now it
+    takes user id as a parameter. Minor code adjustments. Added method
+    returning number of user connections with a given connection status
+    and fixed a bug in removing invalid user connections from the list.
+    Added callback: handleResourceBind(), now special actions can be
+    performed on the user resource bind. Major code fixes and
+    improvements related to the new clustering implementation. Minor
+    code adjustments. Added local domain name to the statistics list to
+    make it easier to find out from which cluster node statistics come.
+    Logic bug fixed. Code changes related to a possible bug in detecting
+    empty read calls, tests don't show any improvements though. Minor
+    code adjustements. Minor code adjustements. Minor code adjustements.
+    Minor code adjustements. A few fixes related to possible conflicts
+    in the cluster mode. Added simple caching code for the connection
+    pool. Added initRepository call for the connection pool to allow for
+    the pool to initialize itself. For now it initializes internal
+    cache. Clustering code reworked and new, simpler but more effective
+    implementation created. No more connections hangs on resource bind
+    in case of cluster communications problems. Fresh code needs more
+    tests though.
+
+ -- Tomasz Sterna <tomek@xiaoka.com>  Sat, 23 May 2009 12:11:10 +0000
+
+tigase-server (4.1.5-b1649-xk1) hardy; urgency=low
+
+  * Updated to SVN revision 1649: changed the code adding admin in the
+    installer to use Tigase repo classes
+
+ -- Tomasz Sterna <tomek@xiaoka.com>  Sat, 23 May 2009 10:11:08 +0000
+
+tigase-server (4.1.5-b1648-xk1) hardy; urgency=low
+
+  * Updated to SVN revision 1648: Fixed incorrect features providing, i
+    hope.... Fixed incorrect features providing, i hope....
+
+ -- Tomasz Sterna <tomek@xiaoka.com>  Thu, 21 May 2009 16:26:41 +0000
+
+tigase-server (4.1.5-b1646-xk1) hardy; urgency=low
+
+  * Updated to SVN revision 1646: Fixed incorrect features providing, i
+    hope....
+
+ -- Tomasz Sterna <tomek@xiaoka.com>  Wed, 20 May 2009 22:11:08 +0000
+
+tigase-server (4.1.5-b1645-xk1) hardy; urgency=low
+
+  * Updated to SVN revision 1645: fixed installer bug, where user
+    selection of JDK path was overwrited by JAVA_HOME
+
+ -- Tomasz Sterna <tomek@xiaoka.com>  Tue, 19 May 2009 08:11:09 +0000
+
+tigase-server (4.1.5-b1644-xk1) hardy; urgency=low
+
+  * Updated to SVN revision 1644: activated user adding task adding xmpp
+    admin user from installer activated user adding task Added jmx files
+    to the installation and a groovy script for user mgmt
+
+ -- Tomasz Sterna <tomek@xiaoka.com>  Mon, 18 May 2009 16:11:08 +0000
+
+tigase-server (4.1.5-b1640-xk2) hardy; urgency=low
+
+  * Updated to SVN revision 1640
+    Merged r1637 to debian init script
+  * Fixed bug in init script
+
+ -- Tomasz Sterna <tomek@xiaoka.com>  Mon, 18 May 2009 13:50:04 +0000
+
 tigase-server (4.1.5-b1637-xk1) hardy; urgency=low
 
   * Updated to SVN revision 1637:\nPresence incorrect broadcast fixed
