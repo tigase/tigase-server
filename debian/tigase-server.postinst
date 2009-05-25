@@ -18,10 +18,11 @@ case "$1" in
 	if grep -q 'db=derby$' /etc/tigase/init.properties
 		DERBYDB=`sed -n 's/.*user-db-uri.*jdbc:derby://;s/;.*//p' /etc/tigase/init.properties`
 	then
-		if [ -n "$DERBYDB" ] && [ ! -d "$DERBYDB" ]
+		if [ -n "$DERBYDB" ] && [ ! -d "$DERBYDB" ] && [ -r /usr/lib/jvm/java-6-sun/db/lib/derby.jar ]
 		then
 			echo "Creating Derby database for Tigase in \`$DERBYDB' ..."
 			update-alternatives --set java /usr/lib/jvm/java-6-sun/jre/bin/java
+			export CLASSPATH="/usr/lib/jvm/java-6-sun/db/lib/derby.jar:$CLASSPATH"
 			OLDCWD=`pwd`
 			cd /usr/share/tigase
 			scripts/derby-db-create.sh "$DERBYDB" >/dev/null
