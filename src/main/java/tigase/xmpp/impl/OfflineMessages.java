@@ -114,6 +114,18 @@ public class OfflineMessages extends XMPPProcessor
 	@Override
 	public String id() { return ID; }
 
+	@Override
+	public int concurrentQueuesNo() {
+		return Runtime.getRuntime().availableProcessors() * 2;
+	}
+
+	@Override
+	public int concurrentThreadsPerQueue() {
+		// Packet processing order does matter for roster/presence therefore
+		// we need a single thread for each queue.
+		return 2;
+	}
+
 	// Implementation of tigase.xmpp.XMPPProcessorIfc
 
 	/**

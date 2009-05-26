@@ -88,7 +88,7 @@ public class SaslAuth extends XMPPProcessor
 
 	@Override
 	public int concurrentQueuesNo() {
-		return 1 + Runtime.getRuntime().availableProcessors() / 2;
+		return Runtime.getRuntime().availableProcessors();
 	}
 
 	@Override
