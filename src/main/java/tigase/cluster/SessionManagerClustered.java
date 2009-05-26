@@ -113,7 +113,7 @@ public class SessionManagerClustered extends SessionManager
 		XMPPResourceConnection conn = getXMPPResourceConnection(packet);
 		if (conn == null
 			&& (isBrokenPacket(packet) || processAdminsOrDomains(packet)
-				|| sentToNextNode(packet))) {
+				|| sendToNextNode(packet))) {
 			return;
 		}
 		processPacket(packet, conn);
@@ -127,7 +127,7 @@ public class SessionManagerClustered extends SessionManager
 			for (Element elem: elems) {
 				Packet el_packet = new Packet(elem);
 				XMPPResourceConnection conn = getXMPPResourceConnection(el_packet);
-				if (conn != null || !sentToNextNode(packet)) {
+				if (conn != null || !sendToNextNode(packet, el_packet.getElemTo())) {
 					processPacket(el_packet, conn);
 				}
 			}
@@ -256,8 +256,7 @@ public class SessionManagerClustered extends SessionManager
 		}
 	}
 
-	protected boolean sentToNextNode(ClusterElement clel) {
-		String userId = clel.getMethodParam(USER_ID);
+	protected boolean sendToNextNode(ClusterElement clel, String userId) {
 		ClusterElement next_clel = ClusterElement.createForNextNode(clel,
 			strategy.getNodesForJid(userId), getComponentId());
 		if (next_clel != null) {
@@ -268,7 +267,7 @@ public class SessionManagerClustered extends SessionManager
 		}
 	}
 
-	protected boolean sentToNextNode(Packet packet) {
+	protected boolean sendToNextNode(Packet packet) {
 		String userId = JIDUtils.getNodeID(packet.getElemTo());
 		String cluster_node = getFirstClusterNode(userId);
 		if (cluster_node != null) {
@@ -294,7 +293,7 @@ public class SessionManagerClustered extends SessionManager
 			strategy = strategy_tmp;
 		} catch (Exception e) {
 			log.log(Level.SEVERE,
-							"Can not create VHost repository instance for class: " +
+							"Can not clustering strategy instance for class: " +
 							strategy_class, e);
 		}
 	}
@@ -316,7 +315,7 @@ public class SessionManagerClustered extends SessionManager
 			}
 		} catch (Exception e) {
 			log.log(Level.SEVERE,
-							"Can not instantiate VHosts repository for class: " +
+							"Can not instantiate clustering strategy for class: " +
 							strategy_class, e);
 		}
 		return props;
