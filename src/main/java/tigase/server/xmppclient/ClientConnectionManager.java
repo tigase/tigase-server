@@ -411,7 +411,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 			Command.addFieldValue(streamOpen, "session-id", id);
 			Command.addFieldValue(streamOpen, "hostname", hostname);
 			Command.addFieldValue(streamOpen, "xml:lang", lang);
-			addOutPacketWithTimeout(streamOpen, startedHandler, 15l, TimeUnit.SECONDS);
+			addOutPacketWithTimeout(streamOpen, startedHandler, 45l, TimeUnit.SECONDS);
 		} else {
 			writeRawData(serv, "<?xml version='1.0'?><stream:stream" +
 							" xmlns='" + XMLNS + "'" +
@@ -439,7 +439,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 					UUID.randomUUID().toString());
 				// In case of mass-disconnects, adjust the timeout properly
 				addOutPacketWithTimeout(command, stoppedHandler, 
-								15l, TimeUnit.SECONDS);
+								60l, TimeUnit.SECONDS);
 				if (log.isLoggable(Level.FINE)) {
 					log.fine("Service stopped, sending packet: " + command.getStringData());
 				}
