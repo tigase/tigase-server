@@ -157,7 +157,8 @@ public abstract class IOService implements Callable<IOService> {
   /**
 	 * This method returns the time of last transfer in any direction
 	 * through this service. It is used to help detect dead connections.
-   */
+	 * @return
+	 */
 	public long getLastTransferTime() {
 		return lastTransferTime;
 	}
