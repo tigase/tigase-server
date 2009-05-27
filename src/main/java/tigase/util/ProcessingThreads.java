@@ -135,7 +135,7 @@ public class ProcessingThreads<E extends WorkerThread> {
 							numQueues)).offer(item, packet.getPriority().ordinal());
 		} catch (Exception e) {
 			// Otherwise per destination address
-			ret = queues.get(Math.abs(packet.getTo().hashCode() %
+			ret = queues.get(Math.abs(packet.getFrom().hashCode() %
 							numQueues)).offer(item, packet.getPriority().ordinal());
 		//ret = nullQueue.offer(item, packet.getPriority().ordinal());
 		}
