@@ -373,41 +373,46 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 	}
 
 	@Override
-	public void serviceStopped(XMPPIOService service) {
-		super.serviceStopped(service);
-		Map<String, Object> sessionData = service.getSessionData();
-		String[] routings = (String[])sessionData.get(PORT_ROUTING_TABLE_PROP_KEY);
-		if (routings != null) {
-			updateRoutings(routings, false);
-		}
-		ConnectionType type = service.connectionType();
-		if (type == ConnectionType.connect) {
-			addWaitingTask(sessionData);
+	public boolean serviceStopped(XMPPIOService service) {
+		boolean result = super.serviceStopped(service);
+		// Make sure it runs just once for each disconnect
+		if (result) {
+			Map<String, Object> sessionData = service.getSessionData();
+			String[] routings =
+							(String[]) sessionData.get(PORT_ROUTING_TABLE_PROP_KEY);
+			if (routings != null) {
+				updateRoutings(routings, false);
+			}
+			ConnectionType type = service.connectionType();
+			if (type == ConnectionType.connect) {
+				addWaitingTask(sessionData);
 			//reconnectService(sessionData, connectionDelay);
-		} // end of if (type == ConnectionType.connect)
-		//		removeRouting(serv.getRemoteHost());
-		String addr = (String)sessionData.get(PORT_REMOTE_HOST_PROP_KEY);
-		log.info("Disonnected from: " + addr);
-		updateServiceDiscovery(addr, XMLNS + " disconnected");
-		Map<String, String> method_params = new LinkedHashMap<String, String>();
-		method_params.put("disconnected", addr);
-		addOutPacket(new Packet(ClusterElement.createClusterMethodCall(
-					getComponentId(), cluster_controller_id,
-					StanzaType.set, ClusterMethods.UPDATE_NODES.toString(),
-					method_params).getClusterElement()));
-		++totalNodeDisconnects;
-		int hour = TimeUtils.getHourNow();
-		if (lastDayIdx != hour) {
-			lastDayIdx = hour;
-			lastDay[hour] = 0;
+			} // end of if (type == ConnectionType.connect)
+			//		removeRouting(serv.getRemoteHost());
+			String addr = (String) sessionData.get(PORT_REMOTE_HOST_PROP_KEY);
+			log.info("Disonnected from: " + addr);
+			updateServiceDiscovery(addr, XMLNS + " disconnected");
+			Map<String, String> method_params = new LinkedHashMap<String, String>();
+			method_params.put("disconnected", addr);
+			addOutPacket(new Packet(ClusterElement.createClusterMethodCall(
+							getComponentId(), cluster_controller_id,
+							StanzaType.set, ClusterMethods.UPDATE_NODES.toString(),
+							method_params).getClusterElement()));
+			++totalNodeDisconnects;
+			int hour = TimeUtils.getHourNow();
+			if (lastDayIdx != hour) {
+				lastDayIdx = hour;
+				lastDay[hour] = 0;
+			}
+			++lastDay[hour];
+			int minute = TimeUtils.getMinuteNow();
+			if (lastHourIdx != minute) {
+				lastHourIdx = minute;
+				lastHour[minute] = 0;
+			}
+			++lastHour[minute];
 		}
-		++lastDay[hour];
-		int minute = TimeUtils.getMinuteNow();
-		if (lastHourIdx != minute) {
-			lastHourIdx = minute;
-			lastHour[minute] = 0;
-		}
-		++lastHour[minute];
+		return result;
 	}
 
 	@Override

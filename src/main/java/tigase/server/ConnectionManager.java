@@ -136,7 +136,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 	private long watchdogStopped = 0;
 	private LinkedList<Map<String, Object>> waitingTasks =
 					new LinkedList<Map<String, Object>>();
-	private Map<String, IO> services =
+	private ConcurrentSkipListMap<String, IO> services =
 		new ConcurrentSkipListMap<String, IO>();
 	private Set<ConnectionListenerImpl> pending_open =
 		Collections.synchronizedSet(new HashSet<ConnectionListenerImpl>());;
@@ -507,26 +507,32 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 		serviceStopped(ios);
 	}
 
-	public void serviceStopped(IO service) {
+	/**
+	 * 
+	 * @param service
+	 * @return
+	 */
+	public boolean serviceStopped(IO service) {
 		//synchronized(service) {
-			String id = getUniqueId(service);
-			if (log.isLoggable(Level.FINER)) {
-    			log.finer("[[" + getName() + "]] Connection stopped: " + id);
-            }
-			// id might be null if service is stopped in accept method due to
-			// an exception during establishing TCP/IP connection
-			IO serv = (id != null ? services.get(id) : null);
-			if (serv == service) {
-				services.remove(id);
-			} else {
-				if (id != null) {
-					// Is it at all possible to happen???
-					// let's log it for now....
-					log.warning("[[" + getName() +
-									"]] Attempt to stop incorrect service: " + id);
-					Thread.dumpStack();
-				}
+		String id = getUniqueId(service);
+		if (log.isLoggable(Level.FINER)) {
+			log.finer("[[" + getName() + "]] Connection stopped: " + id);
+		}
+		// id might be null if service is stopped in accept method due to
+		// an exception during establishing TCP/IP connection
+		//IO serv = (id != null ? services.get(id) : null);
+		if (id != null) {
+			boolean result = services.remove(id, service);
+			if (!result) {
+				// Is it at all possible to happen???
+				// let's log it for now....
+				log.warning("[[" + getName() +
+								"]] Attempt to stop incorrect service: " + id);
+				Thread.dumpStack();
 			}
+			return result;
+		}
+		return false;
 		//}
 	}
 

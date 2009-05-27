@@ -333,22 +333,26 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 	}
 
 	@Override
-	public void serviceStopped(XMPPIOService service) {
-		super.serviceStopped(service);
-		Map<String, Object> sessionData = service.getSessionData();
-		String[] routings = (String[])sessionData.get(PORT_ROUTING_TABLE_PROP_KEY);
-		updateRoutings(routings, false);
-		ConnectionType type = service.connectionType();
-		if (type == ConnectionType.connect) {
-			addWaitingTask(sessionData);
+	public boolean serviceStopped(XMPPIOService service) {
+		boolean result = super.serviceStopped(service);
+		if (result) {
+			Map<String, Object> sessionData = service.getSessionData();
+			String[] routings =
+							(String[]) sessionData.get(PORT_ROUTING_TABLE_PROP_KEY);
+			updateRoutings(routings, false);
+			ConnectionType type = service.connectionType();
+			if (type == ConnectionType.connect) {
+				addWaitingTask(sessionData);
 			//reconnectService(sessionData, connectionDelay);
-		} // end of if (type == ConnectionType.connect)
-		//		removeRouting(serv.getRemoteHost());
-		String addr = (String)sessionData.get(PORT_REMOTE_HOST_PROP_KEY);
-		if (log.isLoggable(Level.FINE)) {
-			log.fine("Disonnected from: " + addr);
+			} // end of if (type == ConnectionType.connect)
+			//		removeRouting(serv.getRemoteHost());
+			String addr = (String) sessionData.get(PORT_REMOTE_HOST_PROP_KEY);
+			if (log.isLoggable(Level.FINE)) {
+				log.fine("Disonnected from: " + addr);
+			}
+			updateServiceDiscovery(addr, "XEP-0114 disconnected");
 		}
-		updateServiceDiscovery(addr, "XEP-0114 disconnected");
+		return result;
 	}
 
 	@Override

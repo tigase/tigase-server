@@ -22,11 +22,9 @@
 
 package tigase.server.xmppserver;
 
-import java.io.IOException;
 import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -39,23 +37,18 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import tigase.db.UserRepository;
 import tigase.net.ConnectionType;
 //import tigase.net.IOService;
 import tigase.net.SocketType;
 import tigase.server.ConnectionManager;
-import tigase.server.MessageReceiver;
 import tigase.server.Packet;
-import tigase.disco.XMPPService;
 import tigase.util.Algorithms;
 import tigase.util.DNSResolver;
 import tigase.util.JIDUtils;
 import tigase.xml.Element;
-import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPIOService;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.PacketErrorTypeException;
@@ -606,6 +599,7 @@ public class ServerConnectionManagerOLD extends ConnectionManager<XMPPIOService>
 		} // end of switch (service.connectionType())
 	}
 
+	@Override
 	public List<StatRecord> getStatistics() {
 		List<StatRecord> stats = super.getStatistics();
 		stats.add(new StatRecord(getName(), "Open s2s connections", "int",
@@ -645,8 +639,9 @@ public class ServerConnectionManagerOLD extends ConnectionManager<XMPPIOService>
 		return stats;
 	}
 
-	public void serviceStopped(final XMPPIOService service) {
-		super.serviceStopped(service);
+	@Override
+	public boolean serviceStopped(final XMPPIOService service) {
+		boolean result = super.serviceStopped(service);
 		String local_hostname =
 			(String)service.getSessionData().get("local-hostname");
 		String remote_hostname =
@@ -660,7 +655,7 @@ public class ServerConnectionManagerOLD extends ConnectionManager<XMPPIOService>
 			log.info("remote-hostname is NULL, local-hostname: " + local_hostname
 				+ ", local address: " + service.getLocalAddress()
 				+ ", remote address: " + service.getRemoteAddress());
-			return;
+			return result;
 		}
 		String cid = getConnectionId(local_hostname, remote_hostname,
 			service.connectionType());
@@ -693,7 +688,7 @@ public class ServerConnectionManagerOLD extends ConnectionManager<XMPPIOService>
 			stopped = true;
 		}
 		if (!stopped) {
-			return;
+			return result;
 		}
 		log.fine("s2s stopped: " + cid);
 		// Some servers close just 1 of dialback connections and even though
@@ -736,6 +731,7 @@ public class ServerConnectionManagerOLD extends ConnectionManager<XMPPIOService>
 				addWaitingPacket(cid, null, waitingPackets);
 			}
 		}
+		return result;
 	}
 
 	public void handleDialbackSuccess(final String connect_jid) {

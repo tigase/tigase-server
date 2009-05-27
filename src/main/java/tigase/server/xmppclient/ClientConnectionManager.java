@@ -96,7 +96,12 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 			if (!writePacketToSocket(packet)) {
 				// Connection closed or broken, send message back to the SM
 				// if this is not IQ result...
-				if (packet.getType() != StanzaType.result) {
+				// Ignore also all presence packets with available, unavailble
+				if (packet.getType() != StanzaType.result &&
+								packet.getType() != StanzaType.available &&
+								packet.getType() != StanzaType.unavailable &&
+								packet.getType() != StanzaType.error &&
+								!(packet.getElemName() == "presence" && packet.getType() == null)) {
 					try {
 						Packet error =
 										Authorization.ITEM_NOT_FOUND.getResponseMessage(packet,
@@ -111,16 +116,21 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 				}
 				// In case the SessionManager lost synchronization for any reason, let's
 				// notify it that the user connection no longer exists.
-				Packet command = Command.STREAM_CLOSED_UPDATE.getPacket(null, null,
-								StanzaType.set, UUID.randomUUID().toString());
-				command.setFrom(packet.getTo());
-				command.setTo(packet.getFrom());
-				// Note! we don't want to receive response to this request, thus
-				// STREAM_CLOSED_UPDATE instead of STREAM_CLOSED
-				addOutPacket(command);
+				// But in case of mass-disconnects we might have lot's of presences
+				// floating around, so just skip sending stream_close for all the
+				// offline presences
+				if (packet.getType() != StanzaType.unavailable) {
+					Packet command = Command.STREAM_CLOSED_UPDATE.getPacket(null, null,
+									StanzaType.set, UUID.randomUUID().toString());
+					command.setFrom(packet.getTo());
+					command.setTo(packet.getFrom());
+					// Note! we don't want to receive response to this request, thus
+					// STREAM_CLOSED_UPDATE instead of STREAM_CLOSED
+					addOutPacket(command);
 //				addOutPacketWithTimeout(command, stoppedHandler, 15l, TimeUnit.SECONDS);
-				log.fine("Sending a command to close the remote session for non-existen Bosh connection: " +
-								command.toString());
+					log.fine("Sending a command to close the remote session for non-existen Bosh connection: " +
+									command.toString());
+				}
 			}
 		} // end of else
 	}
@@ -427,28 +437,37 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 	}
 
 	@Override
-	public void serviceStopped(XMPPIOService service) {
-		super.serviceStopped(service);
+	public boolean serviceStopped(XMPPIOService service) {
+		boolean result = super.serviceStopped(service);
 		// It might be a Bosh service in which case it is ignored here.
 		if (service.getXMLNS() == XMLNS) {
 			//		XMPPIOService serv = (XMPPIOService)service;
-			if (service.getDataReceiver() != null) {
-				Packet command = Command.STREAM_CLOSED.getPacket(
-					getFromAddress(getUniqueId(service)),
-					service.getDataReceiver(), StanzaType.set, 
-					UUID.randomUUID().toString());
-				// In case of mass-disconnects, adjust the timeout properly
-				addOutPacketWithTimeout(command, stoppedHandler, 
-								60l, TimeUnit.SECONDS);
-				if (log.isLoggable(Level.FINE)) {
-					log.fine("Service stopped, sending packet: " + command.getStringData());
-				}
-			} else {
-				if (log.isLoggable(Level.FINE)) {
-					log.fine("Service stopped, before stream:stream received");
+			// The method may be called more than one time for a single
+			// but we want to send a notification just once
+			if (result) {
+				if (service.getDataReceiver() != null) {
+					Packet command = Command.STREAM_CLOSED.getPacket(
+									getFromAddress(getUniqueId(service)),
+									service.getDataReceiver(), StanzaType.set,
+									UUID.randomUUID().toString());
+					// In case of mass-disconnects, adjust the timeout properly
+					addOutPacketWithTimeout(command, stoppedHandler,
+									120l, TimeUnit.SECONDS);
+					if (log.isLoggable(Level.FINE)) {
+						log.fine("Service stopped, sending packet: " +
+										command.getStringData());
+					}
+//					// For testing only.
+//					System.out.println("Service stopped: " + service.getUniqueId());
+//					Thread.dumpStack();
+				} else {
+					if (log.isLoggable(Level.FINE)) {
+						log.fine("Service stopped, before stream:stream received");
+					}
 				}
 			}
 		}
+		return result;
 	}
 
 	@Override

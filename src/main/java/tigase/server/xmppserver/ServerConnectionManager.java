@@ -710,74 +710,79 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 	}
 
 	@Override
-	public void serviceStopped(final XMPPIOService serv) {
-		super.serviceStopped(serv);
-		switch (serv.connectionType()) {
-		case connect:
-			String local_hostname =
-			  (String)serv.getSessionData().get("local-hostname");
-			String remote_hostname =
-			  (String)serv.getSessionData().get("remote-hostname");
-			if (remote_hostname == null) {
-				// There is something wrong...
-				// It may happen only when remote host connecting to Tigase
-				// closed connection before it send any db:... packet
-				// so remote domain is not known.
-				// Let's do nothing for now.
-				log.info("remote-hostname is NULL, local-hostname: " + local_hostname
-					+ ", local address: " + serv.getLocalAddress()
-					+ ", remote address: " + serv.getRemoteAddress());
-			} else {
-				String cid = getConnectionId(local_hostname, remote_hostname);
-				ServerConnections serv_conns = getServerConnections(cid);
-				if (serv_conns == null) {
-					log.warning("There is no ServerConnections for stopped service: "
-						+ serv.getUniqueId() + ", cid: " + cid);
-					if (log.isLoggable(Level.FINEST)) {
-						log.finest("Counters: ioservices: " + countIOServices()
-							+ ", s2s connections: " + countOpenConnections());
-					}
-					return;
-				}
-				serv_conns.serviceStopped(serv);
-				Queue<Packet> waiting = serv_conns.getWaitingPackets();
-				if (waiting.size() > 0) {
-					if (serv_conns.waitingTime() > maxPacketWaitingTime) {
-						bouncePacketsBack(Authorization.REMOTE_SERVER_TIMEOUT, cid);
+	public boolean serviceStopped(XMPPIOService serv) {
+		boolean result = super.serviceStopped(serv);
+		if (result) {
+			switch (serv.connectionType()) {
+				case connect:
+					String local_hostname =
+									(String) serv.getSessionData().get("local-hostname");
+					String remote_hostname =
+									(String) serv.getSessionData().get("remote-hostname");
+					if (remote_hostname == null) {
+						// There is something wrong...
+						// It may happen only when remote host connecting to Tigase
+						// closed connection before it send any db:... packet
+						// so remote domain is not known.
+						// Let's do nothing for now.
+						log.info("remote-hostname is NULL, local-hostname: " +
+										local_hostname + ", local address: " +
+										serv.getLocalAddress() + ", remote address: " +
+										serv.getRemoteAddress());
 					} else {
-						createServerConnection(cid, null, serv_conns);
+						String cid = getConnectionId(local_hostname, remote_hostname);
+						ServerConnections serv_conns = getServerConnections(cid);
+						if (serv_conns == null) {
+							log.warning("There is no ServerConnections for stopped service: " +
+											serv.getUniqueId() + ", cid: " + cid);
+							if (log.isLoggable(Level.FINEST)) {
+								log.finest("Counters: ioservices: " + countIOServices() +
+												", s2s connections: " + countOpenConnections());
+							}
+							return result;
+						}
+						serv_conns.serviceStopped(serv);
+						Queue<Packet> waiting = serv_conns.getWaitingPackets();
+						if (waiting.size() > 0) {
+							if (serv_conns.waitingTime() > maxPacketWaitingTime) {
+								bouncePacketsBack(Authorization.REMOTE_SERVER_TIMEOUT, cid);
+							} else {
+								createServerConnection(cid, null, serv_conns);
+							}
+						}
 					}
-				}
-			}
-			break;
-		case accept:
-			String session_id = (String)serv.getSessionData().get(serv.SESSION_ID_KEY);
-			if (session_id != null) {
-				XMPPIOService rem = incoming.remove(session_id);
-				if (rem == null) {
-					if (log.isLoggable(Level.FINE)) {
-						log.fine("No service with given SESSION_ID: " + session_id);
+					break;
+				case accept:
+					String session_id = (String) serv.getSessionData().get(
+									serv.SESSION_ID_KEY);
+					if (session_id != null) {
+						XMPPIOService rem = incoming.remove(session_id);
+						if (rem == null) {
+							if (log.isLoggable(Level.FINE)) {
+								log.fine("No service with given SESSION_ID: " + session_id);
+							}
+						} else {
+							if (log.isLoggable(Level.FINER)) {
+								log.finer("Connection removed: " + session_id);
+							}
+						}
+					} else {
+						if (log.isLoggable(Level.FINE)) {
+							log.fine("session_id is null, didn't remove the connection");
+						}
 					}
-				} else {
-					if (log.isLoggable(Level.FINER)) {
-						log.finer("Connection removed: " + session_id);
-					}
-				}
-			} else {
-				if (log.isLoggable(Level.FINE)) {
-					log.fine("session_id is null, didn't remove the connection");
-				}
-			}
-			break;
-		default:
-			log.severe("Warning, program shouldn't reach that point.");
-			break;
-		} // end of switch (serv.connectionType())
+					break;
+				default:
+					log.severe("Warning, program shouldn't reach that point.");
+					break;
+			} // end of switch (serv.connectionType())
 
-		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Counters: ioservices: " + countIOServices()
-				+ ", s2s connections: " + countOpenConnections());
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Counters: ioservices: " + countIOServices() +
+								", s2s connections: " + countOpenConnections());
+			}
 		}
+		return result;
 	}
 
 	private void generateStreamError(String error_el, XMPPIOService serv) {
