@@ -54,7 +54,6 @@ import tigase.db.NonAuthUserRepository;
 import tigase.db.RepositoryFactory;
 import tigase.db.TigaseDBException;
 import tigase.db.UserAuthRepository;
-import tigase.db.UserExistsException;
 import tigase.db.UserNotFoundException;
 import tigase.db.UserRepository;
 import tigase.disco.ServiceEntity;
@@ -651,7 +650,9 @@ public class SessionManager extends AbstractMessageReceiver
 			break;
 		case STREAM_CLOSED_UPDATE:
 			// Note! We don't send response to this packet....
-			sessionCloseThread.addItem(pc, null);
+			if (connectionsByFrom.get(pc.getFrom()) != null) {
+				sessionCloseThread.addItem(pc, null);
+			}
 			//closeConnection(pc.getFrom(), false);
 			processing_result = true;
 			break;
@@ -930,6 +931,20 @@ public class SessionManager extends AbstractMessageReceiver
 			for (XMPPStopListenerIfc stopProc: stopListeners.values()) {
 				stopProc.stopped(conn, results, plugin_config.get(stopProc.id()));
 			} // end of for ()
+//			// TESTING ONLY, to be removed
+//			try {
+//				String nick = conn.getUserName();
+//				String nick_num = nick.substring("load-tester_".length());
+//				int num = Integer.parseInt(nick_num);
+//				if (num < 11) {
+//					log.warning("Disconnected: " + nick +
+//									", connId: " + conn.getConnectionId() +
+//									", sending: " + results.toString());
+//				}
+//			} catch (Exception e) {
+//				log.log(Level.WARNING, "some problem: " + conn.getConnectionId(), e);
+//			}
+//			// TESTING ONLY, to be removed
 			addOutPackets(null, conn, results);
 		}
 		try {
@@ -1136,15 +1151,15 @@ public class SessionManager extends AbstractMessageReceiver
 				log.log(Level.SEVERE, "Can't initialize auth repository: ", e);
 			} // end of try-catch
 		}
-		try {
-			// Add component ID to database if it is not there yet.
-			auth_repository.addUser(getComponentId(),
-							UUID.randomUUID().toString());
-		} catch (UserExistsException e) {
-			// Just ignore....
-		} catch (TigaseDBException ex) {
-			log.log(Level.WARNING, "Problem accessing auth repository: ", ex);
-		}
+//		try {
+//			// Add component ID to database if it is not there yet.
+//			auth_repository.addUser(getComponentId(),
+//							UUID.randomUUID().toString());
+//		} catch (UserExistsException e) {
+//			// Just ignore....
+//		} catch (TigaseDBException ex) {
+//			log.log(Level.WARNING, "Problem accessing auth repository: ", ex);
+//		}
 
 		naUserRepository = new NARepository(user_repository);
 		String[] plugins = (String[])props.get(PLUGINS_PROP_KEY);
