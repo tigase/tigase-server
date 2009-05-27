@@ -27,7 +27,6 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
@@ -65,6 +64,13 @@ public class SocketReadThread implements Runnable {
 
   private final ConcurrentSkipListSet<IOService> waiting =
     new ConcurrentSkipListSet<IOService>(new IOServiceComparator());
+			// IOServices must be added to thread pool after they are removed from
+		// the selector and the selector and key is cleared, otherwise we have
+		// dead-lock somewhere down in the:
+		// java.nio.channels.spi.AbstractSelectableChannel.removeKey(AbstractSelectableChannel.java:111)
+	private ConcurrentSkipListSet<IOService> forCompletion =
+					new ConcurrentSkipListSet<IOService>(new IOServiceComparator());
+
   private Selector clientsSel = null;
 	private static ThreadPoolExecutor executor = null;
   /**
@@ -117,15 +123,15 @@ public class SocketReadThread implements Runnable {
 		executor.setMaximumPoolSize(threads);
 	}
 
-	private static final Object threadNoSync = new Object();
-	private int incrementAndGet() {
-		int result = 0;
-		synchronized (threadNoSync) {
-			threadNo = (threadNo + 1) % socketReadThread.length;
-			result = threadNo;
-		}
-		return result;
-	}
+//	private static final Object threadNoSync = new Object();
+//	private int incrementAndGet() {
+//		int result = 0;
+//		synchronized (threadNoSync) {
+//			threadNo = (threadNo + 1) % socketReadThread.length;
+//			result = threadNo;
+//		}
+//		return result;
+//	}
 
 	public void addSocketService(IOService s) {
 		// Due to a delayed SelectionKey cancelling deregistering
@@ -262,11 +268,6 @@ public class SocketReadThread implements Runnable {
 	 */
 	@Override
 	public void run() {
-		// IOServices must be added to thread pool after they are removed from
-		// the selector and the selector and key is cleared, otherwise we have
-		// dead-lock somewhere down in the:
-		// java.nio.channels.spi.AbstractSelectableChannel.removeKey(AbstractSelectableChannel.java:111)
-		LinkedList<IOService> forCompletion = new LinkedList<IOService>();
     while (!stopping) {
       try {
 				clientsSel.select();
@@ -302,9 +303,7 @@ public class SocketReadThread implements Runnable {
 										sb.append(", ready for READING");
 									}
 									sb.append(", readyOps() = " + sk.readyOps());
-									if (log.isLoggable(Level.FINEST)) {
-										log.finest(sb.toString());
-									}
+									log.finest(sb.toString());
 								}
 								//         Set<SelectionKey> selected_keys = clientsSel.selectedKeys();
 								//         for (SelectionKey sk : selected_keys) {
@@ -340,7 +339,7 @@ public class SocketReadThread implements Runnable {
 				}
 				addAllWaiting();
 				IOService serv = null;
-				while ((serv = forCompletion.poll()) != null) {
+				while ((serv = forCompletion.pollFirst()) != null) {
 					completionService.submit(serv);
 				}
 				//clientsSel.selectNow();
@@ -388,25 +387,22 @@ public class SocketReadThread implements Runnable {
 		}
 
 		@Override
-    public void run() {
+		public void run() {
 
-      for (;;) {
-        try {
-          final IOService service = completionService.take().get();
-          if (service.isConnected()
-						//&& !service.getSocketChannel().isRegistered()
-							) {
+			for (;;) {
+				try {
+					final IOService service = completionService.take().get();
+					if (service.isConnected()) {
 						if (log.isLoggable(Level.FINEST)) {
 							log.finest("COMPLETED: " + service.getUniqueId());
 						}
-            addSocketService(service);
-          } else {
-				if (log.isLoggable(Level.FINEST)) {
-					log.finest("REMOVED: " + service.getUniqueId());
-				}
-			} // end of else
-        }
-        catch (ExecutionException e) {
+						addSocketService(service);
+					} else {
+						if (log.isLoggable(Level.FINEST)) {
+							log.finest("REMOVED: " + service.getUniqueId());
+						}
+					} // end of else
+				} catch (ExecutionException e) {
           log.log(Level.WARNING, "Protocol execution exception.", e);
           // TODO: Do something with this
         } // end of catch
@@ -426,13 +422,7 @@ public class SocketReadThread implements Runnable {
 
 		@Override
 		public int compare(IOService o1, IOService o2) {
-			if (o1.hashCode() < o2.hashCode()) {
-				return -1;
-			}
-			if (o1.hashCode() > o2.hashCode()) {
-				return 1;
-			}
-			return 0;
+			return o1.getUniqueId().compareTo(o2.getUniqueId());
 		}
 
 	}
