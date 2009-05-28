@@ -1359,10 +1359,12 @@ public class SessionManager extends AbstractMessageReceiver
 			List<XMPPResourceConnection> connections = session.getActiveResources();
 			if (connections != null) {
 				for (XMPPResourceConnection connection : connections) {
-					addOutPacketWithTimeout(Command.CHECK_USER_CONNECTION.getPacket(
-									getComponentId(), connection.getConnectionId(),
-									StanzaType.get, UUID.randomUUID().toString()),
-									connectionCheckCommandHandler, 7l, TimeUnit.SECONDS);
+					if (connection != conn) {
+						addOutPacketWithTimeout(Command.CHECK_USER_CONNECTION.getPacket(
+										getComponentId(), connection.getConnectionId(),
+										StanzaType.get, UUID.randomUUID().toString()),
+										connectionCheckCommandHandler, 30l, TimeUnit.SECONDS);
+					}
 				}
 			}
 		}
