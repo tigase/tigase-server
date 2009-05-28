@@ -47,6 +47,7 @@ import tigase.net.SocketReadThread;
 import tigase.net.SocketType;
 import tigase.stats.StatRecord;
 import tigase.util.JIDUtils;
+import tigase.util.Numbers;
 import tigase.xmpp.XMPPIOService;
 import tigase.xmpp.XMPPIOServiceListener;
 
@@ -68,6 +69,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 	private static final Logger log =
     Logger.getLogger("tigase.server.ConnectionManager");
 
+	public static final String NET_BUFFER_ST_PROP_KEY = "--net-buff-standard";
+	public static final String NET_BUFFER_HT_PROP_KEY = "--net-buff-high-throughput";
 	protected static final String PORT_KEY = "port-no";
 	protected static final String PROP_KEY = "connections/";
 	protected static final String PORTS_PROP_KEY = PROP_KEY + "ports";
@@ -125,6 +128,9 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 	protected static final String TLS_ALLOW_INVALID_CERTS_PROP_VAL =
 		ALLOW_INVALID_CERTS_VAL;
 	protected static final String MAX_RECONNECTS_PROP_KEY = "max-reconnects";
+	protected static final String NET_BUFFER_PROP_KEY = "net-buffer";
+	protected static final int NET_BUFFER_ST_PROP_VAL = 2 * 1024;
+	protected static final int NET_BUFFER_HT_PROP_VAL = 64 * 1024;
 
 	private static ConnectionOpenThread connectThread =
 		ConnectionOpenThread.getInstance();
@@ -142,6 +148,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 		Collections.synchronizedSet(new HashSet<ConnectionListenerImpl>());;
 	protected long connectionDelay = 2 * SECOND;
 	private boolean initializationCompleted = false;
+	protected int net_buffer = NET_BUFFER_ST_PROP_VAL;
 //	protected long startDelay = 5 * SECOND;
 
 	@Override
@@ -190,6 +197,16 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 		} else {
 			props.put(TLS_CONTAINER_CLASS_PROP_KEY, TLS_CONTAINER_CLASS_PROP_VAL);
 		}
+
+		int buffSize = NET_BUFFER_ST_PROP_VAL;
+		if (isHighThroughput()) {
+			buffSize = Numbers.parseSizeInt((String)params.get(NET_BUFFER_HT_PROP_KEY),
+							NET_BUFFER_HT_PROP_VAL);
+		} else {
+			buffSize = Numbers.parseSizeInt((String)params.get(NET_BUFFER_ST_PROP_KEY),
+							NET_BUFFER_ST_PROP_VAL);
+		}
+		props.put(NET_BUFFER_PROP_KEY, buffSize);
 
 		int ports_size = 0;
 		int[] ports = (int[])params.get(getName() + "/" + PORTS_PROP_KEY);
@@ -270,6 +287,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 	@Override
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
+		net_buffer = (Integer)props.get(NET_BUFFER_PROP_KEY);
 		releaseListeners();
 		int[] ports = (int[])props.get(PORTS_PROP_KEY);
 		if (ports != null) {
@@ -728,11 +746,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 
 		@Override
 		public int getReceiveBufferSize() {
-			if (isHighThroughput()) {
-				return 64*1024;
-			} else {
-				return DEF_RECEIVE_BUFFER_SIZE;
-			}
+			return net_buffer;
 		}
 
 		@Override
