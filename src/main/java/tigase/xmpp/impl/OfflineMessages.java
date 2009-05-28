@@ -116,7 +116,7 @@ public class OfflineMessages extends XMPPProcessor
 
 	@Override
 	public int concurrentQueuesNo() {
-		return Runtime.getRuntime().availableProcessors() * 2;
+		return Runtime.getRuntime().availableProcessors();
 	}
 
 	@Override

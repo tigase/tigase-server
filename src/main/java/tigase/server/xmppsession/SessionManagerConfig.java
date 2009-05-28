@@ -21,6 +21,8 @@
  */
 package tigase.server.xmppsession;
 
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import tigase.util.DNSResolver;
 import java.util.Map;
 
@@ -39,6 +41,7 @@ public class SessionManagerConfig {
 
 	public static final String PLUGINS_PROP_KEY = "plugins";
 	public static final String PLUGINS_CONF_PROP_KEY = "plugins-conf";
+	public static final String PLUGINS_CONCURRENCY_PROP_KEY = "plugins-concurrency";
 
 	//	public static final String ANONYMOUS_PEERS_PROP_KEY = "anonymous-peers";
 
@@ -83,6 +86,12 @@ public class SessionManagerConfig {
 	protected static final String ADMIN_SCRIPTS_PROP_KEY = "admin-scripts-dir";
 	protected static final String ADMIN_SCRIPTS_PROP_VAL = "scripts/admin/";
 
+	private static boolean addPlugin(LinkedHashSet<String> plugins, String plugin) {
+		String[] pla = plugin.split("=");
+		plugins.add(pla[0]);
+		return pla.length > 1;
+	}
+
 	public static void getDefaults(Map<String, Object> props,
 		Map<String, Object> params) {
 
@@ -108,23 +117,42 @@ public class SessionManagerConfig {
 			params.get(GEN_AUTH_DB).toString().equals("pgsql") ||
 			params.get(GEN_AUTH_DB).toString().equals("derby") ||
 			params.get(GEN_AUTH_DB).toString().equals("tigase-auth");
-		String str_plugins = (String)params.get(GEN_SM_PLUGINS);
-		if (str_plugins != null) {
-			props.put(PLUGINS_PROP_KEY, str_plugins.split(","));
+		LinkedHashSet<String> plugins = new LinkedHashSet<String>();
+		if ((Boolean) params.get(GEN_TEST)) {
+			Collections.addAll(plugins, PLUGINS_TEST_PROP_VAL);
 		} else {
-			if ((Boolean)params.get(GEN_TEST)) {
-				props.put(PLUGINS_PROP_KEY, PLUGINS_TEST_PROP_VAL);
+			if (full_comps) {
+				// Some plugins are not loaded during tests at least until proper
+				// test cases are created for them. Sample case is off-line message
+				// storage which may impact some test cases.
+				Collections.addAll(plugins, PLUGINS_FULL_PROP_VAL);
 			} else {
-				if (full_comps) {
-					// Some plugins are not loaded during tests at least until proper
-					// test cases are created for them. Sample case is off-line message
-					// storage which may impact some test cases.
-					props.put(PLUGINS_PROP_KEY, PLUGINS_FULL_PROP_VAL);
-				} else {
-					props.put(PLUGINS_PROP_KEY, PLUGINS_NO_REG_PROP_VAL);
+				Collections.addAll(plugins, PLUGINS_NO_REG_PROP_VAL);
+			}
+		}
+		String str_plugins = (String)params.get(GEN_SM_PLUGINS);
+		String plugin_concurrency = "";
+		if (str_plugins != null) {
+			String[] conf_plugins = str_plugins.split(",");
+			for (String plugin : conf_plugins) {
+				switch (plugin.charAt(0)) {
+					case '+':
+						if (addPlugin(plugins, plugin.substring(1))) {
+							plugin_concurrency += plugin.substring(1) + ",";
+						}
+						break;
+					case '-':
+						plugins.remove(plugin.substring(1));
+						break;
+					default:
+						if (addPlugin(plugins, plugin)) {
+							plugin_concurrency += plugin + ",";
+						}
 				}
 			}
 		}
+		props.put(PLUGINS_PROP_KEY, plugins.toArray(new String[plugins.size()]));
+		props.put(PLUGINS_CONCURRENCY_PROP_KEY, plugin_concurrency);
 
 		if (params.get(GEN_VIRT_HOSTS) != null) {
 			HOSTNAMES_PROP_VAL = ((String)params.get(GEN_VIRT_HOSTS)).split(",");

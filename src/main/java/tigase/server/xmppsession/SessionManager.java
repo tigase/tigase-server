@@ -1039,51 +1039,53 @@ public class SessionManager extends AbstractMessageReceiver
 		return props;
 	}
 
-	private void addPlugin(String comp_id) {
-		System.out.println("Loading plugin: " + comp_id + " ...");
-		XMPPProcessorIfc proc = ProcessorFactory.getProcessor(comp_id);
+	private void addPlugin(String plug_id, Integer conc) {
+		XMPPProcessorIfc proc = ProcessorFactory.getProcessor(plug_id);
+		int concurrency = (conc != null ? conc 
+						: (proc != null ? proc.concurrentQueuesNo() : 0));
+		System.out.println("Loading plugin: " + plug_id + "=" + concurrency + " ...");
 		boolean loaded = false;
 		if (proc != null) {
 			ProcessorWorkerThread worker = new ProcessorWorkerThread(proc);
 			ProcessingThreads<ProcessorWorkerThread> pt =
 							new ProcessingThreads<ProcessorWorkerThread>(worker,
-							proc.concurrentQueuesNo(), proc.concurrentThreadsPerQueue(),
+							concurrency, proc.concurrentThreadsPerQueue(),
 							maxQueueSize, proc.id());
-			processors.put(comp_id, pt);
+			processors.put(plug_id, pt);
 			log.config("Added processor: " + proc.getClass().getSimpleName()
-				+ " for plugin id: " + comp_id);
+				+ " for plugin id: " + plug_id);
 			loaded = true;
 		}
-		XMPPPreprocessorIfc preproc = ProcessorFactory.getPreprocessor(comp_id);
+		XMPPPreprocessorIfc preproc = ProcessorFactory.getPreprocessor(plug_id);
 		if (preproc != null) {
-			preProcessors.put(comp_id, preproc);
+			preProcessors.put(plug_id, preproc);
 			log.config("Added preprocessor: " + preproc.getClass().getSimpleName()
-				+ " for plugin id: " + comp_id);
+				+ " for plugin id: " + plug_id);
 			loaded = true;
 		}
-		XMPPPostprocessorIfc postproc = ProcessorFactory.getPostprocessor(comp_id);
+		XMPPPostprocessorIfc postproc = ProcessorFactory.getPostprocessor(plug_id);
 		if (postproc != null) {
-			postProcessors.put(comp_id, postproc);
+			postProcessors.put(plug_id, postproc);
 			log.config("Added postprocessor: " + postproc.getClass().getSimpleName()
-				+ " for plugin id: " + comp_id);
+				+ " for plugin id: " + plug_id);
 			loaded = true;
 		}
-		XMPPStopListenerIfc stoplist = ProcessorFactory.getStopListener(comp_id);
+		XMPPStopListenerIfc stoplist = ProcessorFactory.getStopListener(plug_id);
 		if (stoplist != null) {
-			stopListeners.put(comp_id, stoplist);
+			stopListeners.put(plug_id, stoplist);
 			log.config("Added stopped processor: " + stoplist.getClass().getSimpleName()
-				+ " for plugin id: " + comp_id);
+				+ " for plugin id: " + plug_id);
 			loaded = true;
 		}
-		XMPPPacketFilterIfc filterproc = ProcessorFactory.getPacketFilter(comp_id);
+		XMPPPacketFilterIfc filterproc = ProcessorFactory.getPacketFilter(plug_id);
 		if (filterproc != null) {
-			outFilters.put(comp_id, filterproc);
+			outFilters.put(plug_id, filterproc);
 			log.config("Added packet filter: " + filterproc.getClass().getSimpleName()
-				+ " for plugin id: " + comp_id);
+				+ " for plugin id: " + plug_id);
 			loaded = true;
 		}
 		if (!loaded) {
-			log.warning("No implementation found for plugin id: " + comp_id);
+			log.warning("No implementation found for plugin id: " + plug_id);
 		} // end of if (!loaded)
 	}
 
@@ -1162,17 +1164,38 @@ public class SessionManager extends AbstractMessageReceiver
 //		}
 
 		naUserRepository = new NARepository(user_repository);
+
+		LinkedHashMap<String, Integer> plugins_concurrency =
+						new LinkedHashMap<String, Integer>();
+		String[] plugins_conc =
+						((String)props.get(PLUGINS_CONCURRENCY_PROP_KEY)).split(",");
+		if (plugins_conc != null && plugins_conc.length > 0) {
+			for (String plugc : plugins_conc) {
+				if (!plugc.trim().isEmpty()) {
+					String[] pc = plugc.split("=");
+					try {
+						int conc = Integer.parseInt(pc[1]);
+						plugins_concurrency.put(pc[0], conc);
+						log.config("Concurrency for plugin: " + pc[0] + " set to: " + conc);
+					} catch (Exception e) {
+						log.log(Level.WARNING, "Plugin concurrency parsing error for: " +
+										plugc + ", ", e);
+					}
+				}
+			}
+		}
+
 		String[] plugins = (String[])props.get(PLUGINS_PROP_KEY);
 		maxPluginsNo = plugins.length;
 		processors.clear();
-		for (String comp_id: plugins) {
-			if (comp_id.equals("presence")) {
+		for (String plug_id: plugins) {
+			if (plug_id.equals("presence")) {
 				log.warning("Your configuration is outdated!"
 					+ " Note 'presence' and 'jaber:iq:roster' plugins are no longer exist."
 					+ " Use 'roster-presence' plugin instead, loading automaticly...");
-				comp_id = "roster-presence";
+				plug_id = "roster-presence";
 			}
-			addPlugin(comp_id);
+			addPlugin(plug_id, plugins_concurrency.get(plug_id));
 			Map<String, Object> plugin_settings =
 				new ConcurrentSkipListMap<String, Object>();
 			for (Map.Entry<String, Object> entry: props.entrySet()) {
@@ -1183,7 +1206,7 @@ public class SessionManager extends AbstractMessageReceiver
 					if (nodes.length > 2) {
 						String[] ids = nodes[1].split(",");
 						Arrays.sort(ids);
-						if (Arrays.binarySearch(ids, comp_id) >= 0) {
+						if (Arrays.binarySearch(ids, plug_id) >= 0) {
 							plugin_settings.put(nodes[2], entry.getValue());
 						}
 					}
@@ -1193,7 +1216,7 @@ public class SessionManager extends AbstractMessageReceiver
 				if (log.isLoggable(Level.FINEST)) {
 					log.finest(plugin_settings.toString());
 				}
-				plugin_config.put(comp_id, plugin_settings);
+				plugin_config.put(plug_id, plugin_settings);
 			}
 		} // end of for (String comp_id: plugins)
 		registerNewSession(getComponentId(), createUserSession(NULL_ROUTING, getDefHostName()));
