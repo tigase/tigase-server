@@ -2,6 +2,7 @@
 
 <html>
 	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<title>Tigase XMPP (Jabber) server ver ${APP_VER}</title>
 	</head>
 	<body bgcolor="white">
@@ -9,18 +10,38 @@
 
 		<p>Copyright &copy; 2004 Tigase.org. &lt;http://www.tigase.org/&gt;</p>
 
-		<p><strong>Tigase Jabber/XMPP Server</strong> is
-		<strong>Open Source and Free  (GPLv3)</strong>
-		<a href="http://java.sun.com">Java</a> based server. The goals behind the design and implementation of the server are: </p>
+		<p>The <strong>Tigase Jabber/XMPP Server</strong> is <strong>Open Source and Free  (GPLv3)</strong> <a href="http://java.sun.com">Java</a> based server.</p>
+
+		<p>The server offers complete implementation of the XMPP protocol with a long list
+		of extensions. Effcient, reliable and very extensible can be easily integrated
+		it with your systems.</p>
+
+		<p>The unique features of the Tigase server are</p>
 
 		<ol>
-			<li>Make the server robust and reliable.</li>
-			<li>Make the server secure communication platform.</li>
-			<li>Make flexible server which can be applied to different use cases.</li>
-			<li>Make extensible server which takes full advantage of XMPP protocol
-			extensibility.</li>
-			<li>Make the server easy to setup and maintain.</li>
+			<li>High performance and scalability. Was tested with up to 500 000 concurrent
+			 users connected to a single machine.</li>
+			<li>High reliability. Tries to run as long as possible and tried to automaticaly
+			 recover from detected problems.</li>
+			<li>Built-in many self monitoring functions. You can check your systems statistics
+			 via XMPP, JMX, HTTP, SNMP or you can automatically receive notifications about
+			 possible problems.</li>
+			<li>Scripting support - scripts can be loaded/reloaded at run time.
+			 Many scripting languages are supported</li>
+			<li>Virtual hosts support. You can have virtually unlimited virtual hosts which
+			 can be added/removed at runtime. You can temporarily block vhost or limit
+			 number of users per vhost.</li>
+			<li>There is much more... check the official change log and the project website.</li>
 		</ol>
+
+		<p>People who contributed to the project in alphabetical order:</p>
+		<ul>
+			<li>Artur Hefczyc (kobit)</li>
+			<li>Bartosz Małkowski (bmalkow)</li>
+			<li>Mateusz Fiołka</li>
+			<li>Tomasz Sterna (smoku)</li>
+			<li>... and many others.</li>
+		</ul>
 
 		<h2>Installtion, configuration and compilation</h2>
 
@@ -39,9 +60,6 @@
 		number in all correspondence regarding the server.</p>
 
 
-		<h2>Logos</h2>
-		<img src="Tiger.image"/>
-		<img src="JavaPowered.image"/>
-		<img src="SolarisReady.image"/>
+		<img src="Tiger.image"/>	<img src="JavaPowered.image"/>	<img src="SolarisReady.image"/>
  </body>
 </html>
