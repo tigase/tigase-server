@@ -31,6 +31,14 @@ patch -d $INSTALLER_DIR/$PATCHED_IZPACK_DIR -p 1 < src/main/izpack/changes.patch
 # add custom TigasePanels
 cp src/main/izpack/java/*.java $INSTALLER_DIR/$PATCHED_IZPACK_DIR/src/lib/com/izforge/izpack/panels
 
+# add tigase classes to installer build path
+mkdir $INSTALLER_DIR/$PATCHED_IZPACK_DIR/tigaseLib
+for tigase_lib in jars/tigase-server.jar libs/tigase-utils.jar libs/tigase-xmltools.jar 
+do
+	cp $tigase_lib $INSTALLER_DIR/$PATCHED_IZPACK_DIR/tigaseLib/`basename $tigase_lib`
+done
+
+
 # make the new installer compiler
 cd $INSTALLER_DIR/$PATCHED_IZPACK_DIR/src
 ant dist || exit -1

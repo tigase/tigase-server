@@ -41,10 +41,31 @@ index 330ec13..dcc7292 100644
 +#
 +*.class
 diff --git a/src/build.xml b/src/build.xml
-index 60e52dc..f2e66c8 100644
+index 60e52dc..c62cc00 100644
 --- a/src/build.xml
 +++ b/src/build.xml
-@@ -611,7 +611,9 @@
+@@ -572,7 +572,6 @@
+             <!-- sourcepath is cleared so there's no mistaking what goes into the Panel -->
+             <javac srcdir="@{srcdir}"
+                    destdir="${bin.dir}/panels/@{name}"
+-                   classpath="${installer.jar}"
+                    sourcepath=""
+                    optimize="on"
+                    deprecation="on"
+@@ -581,6 +580,12 @@
+                    target="${compat.target}"
+                    debuglevel="${debuglevel}">
+                 <panel-fileset/>
++				<classpath> 
++					<pathelement location="${installer.jar}"/> 
++					<pathelement location="${basedir}/tigaseLib/tigase-server.jar"/> 
++					<pathelement location="${basedir}/tigaseLib/tigase-utils.jar"/> 
++					<pathelement location="${basedir}/tigaseLib/tigase-xmltools.jar"/> 
++				</classpath> 
+             </javac>
+             <jar jarfile="${bin.dir}/panels/@{name}.jar" basedir="${bin.dir}/panels/@{name}"/>
+         </sequential>
+@@ -611,7 +616,9 @@
          </build-panel>
          <build-panel name="CheckedHelloPanel">
              <include name="com/izforge/izpack/panels/CheckedHelloPanel.java"/>
@@ -54,7 +75,7 @@ index 60e52dc..f2e66c8 100644
              <include name="com/izforge/izpack/util/os/*RegistryHandler.java"/>
              <include name="com/izforge/izpack/util/OSClassHelper.java"/>
              <include name="com/izforge/izpack/util/os/WrappedNativeLibException.java"/>
-@@ -642,6 +644,7 @@
+@@ -642,6 +649,7 @@
              <include name="com/izforge/izpack/panels/PacksModel.java"/>
              <include name="com/izforge/izpack/panels/PacksPanel.java"/>
              <include name="com/izforge/izpack/panels/PacksPanelAutomationHelper.java"/>
@@ -62,7 +83,7 @@ index 60e52dc..f2e66c8 100644
              <include name="com/izforge/izpack/panels/PacksPanelBase.java"/>
              <include name="com/izforge/izpack/panels/PacksPanelInterface.java"/>
          </build-panel>
-@@ -655,12 +658,15 @@
+@@ -655,12 +663,15 @@
          </build-panel>
          <build-panel name="HTMLLicencePanel">
              <include name="com/izforge/izpack/panels/HTMLLicencePanel.java"/>
@@ -78,7 +99,7 @@ index 60e52dc..f2e66c8 100644
              <include name="com/izforge/izpack/panels/PathSelectionPanel.java"/>
              <include name="com/izforge/izpack/panels/TargetPanel.java"/>
              <include name="com/izforge/izpack/panels/TargetPanelAutomationHelper.java"/>
-@@ -674,7 +680,9 @@
+@@ -674,7 +685,9 @@
          </build-panel>
          <build-panel name="JDKPathPanel">
              <include name="com/izforge/izpack/panels/JDKPathPanel.java"/>
@@ -88,7 +109,7 @@ index 60e52dc..f2e66c8 100644
              <include name="com/izforge/izpack/panels/PathSelectionPanel.java"/>
              <include name="com/izforge/izpack/util/os/*RegistryHandler.java"/>
              <include name="com/izforge/izpack/util/OSClassHelper.java"/>
-@@ -684,6 +692,22 @@
+@@ -684,6 +697,22 @@
              <include name="com/coi/tools/os/izpack/Registry.java"/>
              <include name="com/coi/tools/os/izpack/COIOSHelper.java"/>
          </build-panel>
@@ -111,7 +132,7 @@ index 60e52dc..f2e66c8 100644
          <build-panel name="XInfoPanel">
              <include name="com/izforge/izpack/panels/XInfoPanel.java"/>
          </build-panel>
-@@ -776,6 +800,39 @@
+@@ -776,6 +805,39 @@
              <include name="com/izforge/izpack/panels/HTMLHelloPanel.java"/>
              <include name="com/izforge/izpack/panels/HTMLInfoPanel.java"/>
          </build-panel>
@@ -151,7 +172,7 @@ index 60e52dc..f2e66c8 100644
      </target>
  
      <!--
-@@ -811,6 +868,7 @@
+@@ -811,6 +873,7 @@
              <fileset dir="${build.dir}">
                  <include name="com/izforge/izpack/event/*.class"/>
                  <include name="com/izforge/izpack/util/IoHelper.class"/>
