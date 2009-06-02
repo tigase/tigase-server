@@ -1104,9 +1104,9 @@ public class SessionManager extends AbstractMessageReceiver
 		} else {
 			log.config("Using shared repository pool.");
 		}
-		auth_repository = (UserAuthRepository) props.get(SHARED_AUTH_REPO_PROP_KEY);
 		if (user_repository != null) {
-			log.config("Using shared auth repository instance.");
+			log.config("Using shared repository instance: " +
+							user_repository.getClass().getName());
 		} else {
 			Map<String, String> user_repo_params = new LinkedHashMap<String, String>();
 			for (Map.Entry<String, Object> entry : props.entrySet()) {
@@ -1129,8 +1129,10 @@ public class SessionManager extends AbstractMessageReceiver
 				log.log(Level.SEVERE, "Can't initialize user repository: ", e);
 			} // end of try-catch
 		}
+		auth_repository = (UserAuthRepository) props.get(SHARED_AUTH_REPO_PROP_KEY);
 		if (auth_repository != null) {
-			log.config("Using shared auth repository.");
+			log.config("Using shared auth repository instance: " +
+							auth_repository.getClass().getName());
 		} else {
 			Map<String, String> auth_repo_params = new LinkedHashMap<String, String>();
 			for (Map.Entry<String, Object> entry : props.entrySet()) {
@@ -1169,8 +1171,10 @@ public class SessionManager extends AbstractMessageReceiver
 						new LinkedHashMap<String, Integer>();
 		String[] plugins_conc =
 						((String)props.get(PLUGINS_CONCURRENCY_PROP_KEY)).split(",");
+		log.config("Loading concurrency plugins list: " + Arrays.toString(plugins_conc));
 		if (plugins_conc != null && plugins_conc.length > 0) {
 			for (String plugc : plugins_conc) {
+				log.config("Loading: " + plugc);
 				if (!plugc.trim().isEmpty()) {
 					String[] pc = plugc.split("=");
 					try {
@@ -1186,6 +1190,7 @@ public class SessionManager extends AbstractMessageReceiver
 		}
 
 		String[] plugins = (String[])props.get(PLUGINS_PROP_KEY);
+		log.config("Loaded plugins list: " + Arrays.toString(plugins));
 		maxPluginsNo = plugins.length;
 		processors.clear();
 		for (String plug_id: plugins) {
@@ -1195,6 +1200,7 @@ public class SessionManager extends AbstractMessageReceiver
 					+ " Use 'roster-presence' plugin instead, loading automaticly...");
 				plug_id = "roster-presence";
 			}
+			log.config("Loading and configuring plugin: " + plug_id);
 			addPlugin(plug_id, plugins_concurrency.get(plug_id));
 			Map<String, Object> plugin_settings =
 				new ConcurrentSkipListMap<String, Object>();
@@ -1213,8 +1219,8 @@ public class SessionManager extends AbstractMessageReceiver
 				}
 			}
 			if (plugin_settings.size() > 0) {
-				if (log.isLoggable(Level.FINEST)) {
-					log.finest(plugin_settings.toString());
+				if (log.isLoggable(Level.CONFIG)) {
+					log.config("Plugin configuration: " + plugin_settings.toString());
 				}
 				plugin_config.put(plug_id, plugin_settings);
 			}

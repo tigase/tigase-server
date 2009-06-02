@@ -309,9 +309,9 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 
 	@Override
 	public void componentAdded(Configurable component) {
-		if (log.isLoggable(Level.FINER)) {
-    		log.finer(" component: " + component.getName());
-        }
+		if (log.isLoggable(Level.CONFIG)) {
+			log.config(" component: " + component.getName());
+		}
 		ServiceEntity item = config_list.findNode(component.getName());
 		if (item == null) {
 			item = new ServiceEntity(getName(), component.getName(),
@@ -379,11 +379,10 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> defaults = new TreeMap<String, Object>();
-		defaults.put(LOGGING_KEY + "java.util.logging.ConsoleHandler.level", "WARNING");
 		if ((Boolean)params.get(GEN_TEST)) {
 			defaults.put(LOGGING_KEY + ".level", "WARNING");
 		} else {
-			defaults.put(LOGGING_KEY + ".level", "INFO");
+			defaults.put(LOGGING_KEY + ".level", "CONFIG");
 		}
 		defaults.put(LOGGING_KEY + "handlers",
 			"java.util.logging.ConsoleHandler java.util.logging.FileHandler");
@@ -400,8 +399,6 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 			"logs/tigase.log");
 		defaults.put(LOGGING_KEY + "tigase.useParentHandlers", "true");
 		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.level", "ALL");
-		defaults.put(LOGGING_KEY + "java.util.logging.ConsoleHandler.level",
-						"WARNING");
 		if (params.get(GEN_DEBUG) != null) {
 			String[] packs = ((String)params.get(GEN_DEBUG)).split(",");
 			for (String pack: packs) {
