@@ -24,6 +24,7 @@ package tigase.server;
 import java.io.IOException;
 import java.net.SocketException;
 import java.nio.channels.SocketChannel;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -178,6 +179,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
+		log.config(getName() + " defaults: " + params.toString());
 		Map<String, Object> props = super.getDefaults(params);
 		props.put(TLS_USE_PROP_KEY, TLS_USE_PROP_VAL);
 		props.put(TLS_DEF_CERT_PROP_KEY, TLS_DEF_CERT_PROP_VAL);
@@ -208,9 +210,23 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 		}
 		props.put(NET_BUFFER_PROP_KEY, buffSize);
 
+		int[] ports = null;
+		String ports_str = (String)params.get("--" + getName() + "-ports");
+		if (ports_str != null) {
+			String[] ports_stra = ports_str.split(",");
+			ports = new int[ports_stra.length];
+			int k = 0;
+			for (String p : ports_stra) {
+				try {
+					ports[k++] = Integer.parseInt(p);
+				} catch (Exception e) {
+					log.warning("Incorrect ports default settings: " + p);
+				}
+			}
+		}
 		int ports_size = 0;
-		int[] ports = (int[])params.get(getName() + "/" + PORTS_PROP_KEY);
 		if (ports != null) {
+			log.config("Port settings preset: " + Arrays.toString(ports));
 			for (int port: ports) {
 				putDefPortParams(props, port, SocketType.plain);
 			} // end of for (int i = 0; i < idx; i++)
@@ -250,6 +266,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 
 	private void putDefPortParams(Map<String, Object> props, int port,
 		SocketType sock) {
+		log.config("Generating defaults for port: " + port);
 		props.put(PROP_KEY + port + "/" + PORT_TYPE_PROP_KEY,
 			ConnectionType.accept);
 		props.put(PROP_KEY + port + "/" + PORT_SOCKET_PROP_KEY,	sock);

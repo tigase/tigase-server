@@ -182,31 +182,59 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 					} else {
 						Object val = value;
 						if (key.matches(".*\\[[LISBlisb]\\]$")) {
-							char c = key.charAt(key.length()-2);
-							key = key.substring(0, key.length()-3);
+							char c = key.charAt(key.length() - 2);
+							key = key.substring(0, key.length() - 3);
 							try {
 								switch (c) {
-								case 'L':
-									// Long value
-									val = Long.decode(value);
-									break;
-								case 'I':
-									// Integer value
-									val = Integer.decode(value);
-									break;
-								case 'B':
-									// Boolean value
-									val = Boolean.valueOf(Boolean.parseBoolean(value));
-									log.config("Found Boolean property: " +
-													val.toString());
-									break;
-								case 's':
-									// Comma separated, Strings array
-									val = value.split(",");
-									break;
-								default:
-									// Do nothing, default to String
-									break;
+									case 'L':
+										// Long value
+										val = Long.decode(value);
+										break;
+									case 'I':
+										// Integer value
+										val = Integer.decode(value);
+										break;
+									case 'B':
+										// Boolean value
+										val = Boolean.valueOf(Boolean.parseBoolean(value));
+										log.config("Found Boolean property: " +
+														val.toString());
+										break;
+									case 's':
+										// Comma separated, Strings array
+										val = value.split(",");
+										break;
+									case 'i':
+									  // Comma separated, int array
+										String[] ints_str = value.split(",");
+										int[] ints = new int[ints_str.length];
+										int k = 0;
+										for (String i : ints_str) {
+											try {
+												ints[k++] = Integer.parseInt(i);
+											} catch (Exception e) {
+												log.warning("Incorrect int array settins: " + i);
+											}
+										}
+										val = ints;
+										break;
+									case 'l':
+									  // Comma separated, long array
+										String[] longs_str = value.split(",");
+										long[] longs = new long[longs_str.length];
+										int j = 0;
+										for (String i : longs_str) {
+											try {
+												longs[j++] = Long.parseLong(i);
+											} catch (Exception e) {
+												log.warning("Incorrect long array settins: " + i);
+											}
+										}
+										val = longs;
+										break;
+									default:
+										// Do nothing, default to String
+										break;
 								}
 							} catch (Exception e) {
 								log.log(Level.CONFIG, "Incorrect parameter modifier", e);
