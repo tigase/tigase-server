@@ -212,7 +212,8 @@ public class ServerConnections {
 			handler.writePacketsToSocket(outgoing, all);
 			return true;
 		} else {
-			log.warning("Something wrong, the method was called when the outgoing connection is null.");
+			log.warning("Something wrong, the method was called when the outgoing " +
+							"connection is null for cid: " + cid);
 			outgoing = null;
 			conn_state = OutgoingState.NULL;
 			return false;
