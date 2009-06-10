@@ -159,11 +159,12 @@ public class StatisticsCollector
 			return;
 		}
 
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest(packet.getCommand().name() + " command received: " +
+							packet.getStringData());
+		}
 		switch (packet.getCommand()) {
 		case GETSTATS: {
-			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Command received: " + packet.getStringData());
-			}
 			//			Element statistics = new Element("statistics");
 			Element iq =
 				ElementUtils.createIqQuery(packet.getElemTo(), packet.getElemFrom(),
@@ -195,22 +196,36 @@ public class StatisticsCollector
 				results.offer(result);
 				return;
 			}
-			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Command received: " + packet.getStringData());
-			}
 			String tmp_val = Command.getFieldValue(packet, "Stats level");
 			if (tmp_val != null) {
 				statsLevel = Level.parse(tmp_val);
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("statsLevel parsed to: " + statsLevel.getName());
+				}
 			}
 			List<StatRecord> stats = null;
 			if (packet.getStrCommand().equals("stats")) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("Getting all stats for level: " + statsLevel.getName());
+				}
 				stats = getAllStats(statsLevel.intValue());
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("All stats for level loaded: " + statsLevel.getName());
+				}
 			} else {
 				String[] spl = packet.getStrCommand().split("/");
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("Getting stats for component: " + spl[1] +
+									", level: " + statsLevel.getName());
+				}
 				stats = getComponentStats(spl[1], statsLevel.intValue());
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("Stats loaded for component: " + spl[1] +
+									", level: " + statsLevel.getName());
+				}
 			}
+			Packet result = packet.commandResult(Command.DataType.form);
 			if (stats != null && stats.size() > 0) {
-				Packet result = packet.commandResult(Command.DataType.form);
 				for (StatRecord rec: stats) {
 					if (rec.getType() == StatisticType.LIST) {
 						Command.addFieldMultiValue(result,
@@ -224,13 +239,16 @@ public class StatisticsCollector
 										XMLUtils.escape(rec.getValue()));
 					}
 				}
-				Command.addFieldValue(result, "Stats level", statsLevel.getName(),
-					"Stats level",
-					new String[] {Level.INFO.getName(), Level.FINE.getName(),
-												Level.FINER.getName(), Level.FINEST.getName()},
-					new String[] {Level.INFO.getName(), Level.FINE.getName(),
-												Level.FINER.getName(), Level.FINEST.getName()});
-				results.offer(result);
+			}
+			Command.addFieldValue(result, "Stats level", statsLevel.getName(),
+							"Stats level",
+							new String[]{Level.INFO.getName(), Level.FINE.getName(),
+								Level.FINER.getName(), Level.FINEST.getName()},
+							new String[]{Level.INFO.getName(), Level.FINE.getName(),
+								Level.FINER.getName(), Level.FINEST.getName()});
+			results.offer(result);
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Returning stats result: " + result.toString());
 			}
 			break;
 		}
