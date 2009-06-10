@@ -328,6 +328,26 @@ public enum Command {
 		notes.setCData(XMLUtils.escape(note));
 	}
 
+	public static void addTitle(final Packet packet, final String title) {
+		Element iq = packet.getElement();
+		Element command = iq.getChild(COMMAND_EL);
+		Element x = command.getChild("x", "jabber:x:data");
+		if (x == null) {
+			x = addDataForm(command, DataType.submit);
+		}
+		x.addChild(new Element("title", title));
+	}
+
+	public static void addInstructions(final Packet packet, final String instructions) {
+		Element iq = packet.getElement();
+		Element command = iq.getChild(COMMAND_EL);
+		Element x = command.getChild("x", "jabber:x:data");
+		if (x == null) {
+			x = addDataForm(command, DataType.submit);
+		}
+		x.addChild(new Element("instructions", instructions));
+	}
+
 	/**
 	 * Simple method for adding a new field to the command data form. Only field
 	 * name (variable name) and field default value can be set.
