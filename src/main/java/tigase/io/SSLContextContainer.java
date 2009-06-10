@@ -22,10 +22,8 @@
 package tigase.io;
 
 import java.io.FileInputStream;
-import java.security.KeyStore.PasswordProtection;
 import java.security.KeyStore;
 import java.security.SecureRandom;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -82,6 +80,7 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 // 		init(k_store, k_passwd, t_store, t_passwd);
 // 	}
 
+	@Override
 	public void init(Map<String, String> params) {
 		String k_store = params.get(JKS_KEYSTORE_FILE_KEY);
 		String k_passwd = params.get(JKS_KEYSTORE_PWD_KEY);
@@ -90,6 +89,7 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 		init(k_store, k_passwd, t_store, t_passwd);
 	}
 
+	@Override
 	public void addCertificates(Map<String, String> params) {
 		init(params);
 	}
@@ -159,6 +159,7 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 		} // end of try-catch
 	}
 
+	@Override
 	public SSLContext getSSLContext(final String protocol, String hostname) {
 		if (hostname == null) {
 			hostname = def_cert_alias;
@@ -203,12 +204,15 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 
     // Implementation of javax.net.ssl.X509TrustManager
 
+		@Override
     public void checkClientTrusted(final X509Certificate[] x509CertificateArray,
       final String string) throws CertificateException { }
 
+		@Override
     public void checkServerTrusted(final X509Certificate[] x509CertificateArray,
       final String string) throws CertificateException { }
 
+		@Override
     public X509Certificate[] getAcceptedIssuers() { return acceptedIssuers; }
 
   }
