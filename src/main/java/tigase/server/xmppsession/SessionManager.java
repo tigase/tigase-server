@@ -1250,35 +1250,40 @@ public class SessionManager extends AbstractMessageReceiver
 		initBindings(binds);
 		try {
 			File adminDir = new File(scriptsPath);
-			for (File f : adminDir.listFiles()) {
-				String cmdId = null;
-				String cmdDescr = null;
-				file = f;
-				StringBuilder sb = new StringBuilder();
-				BufferedReader buffr = new BufferedReader(new FileReader(file));
-				String line = null;
-				while ((line = buffr.readLine()) != null) {
-					sb.append(line + "\n");
-					int idx = line.indexOf(descrStr);
-					if (idx >= 0) {
-						cmdDescr = line.substring(idx + descrStr.length());
+			if (adminDir != null) {
+				for (File f : adminDir.listFiles()) {
+					String cmdId = null;
+					String cmdDescr = null;
+					file = f;
+					StringBuilder sb = new StringBuilder();
+					BufferedReader buffr = new BufferedReader(new FileReader(file));
+					String line = null;
+					while ((line = buffr.readLine()) != null) {
+						sb.append(line + "\n");
+						int idx = line.indexOf(descrStr);
+						if (idx >= 0) {
+							cmdDescr = line.substring(idx + descrStr.length());
+						}
+						idx = line.indexOf(cmdIdStr);
+						if (idx >= 0) {
+							cmdId = line.substring(idx + cmdIdStr.length());
+						}
 					}
-					idx = line.indexOf(cmdIdStr);
-					if (idx >= 0) {
-						cmdId = line.substring(idx + cmdIdStr.length());
+					buffr.close();
+					if (cmdId == null || cmdDescr == null) {
+						log.warning("Admin script found but it has no command ID or command description: " +
+										file);
+						continue;
 					}
+					int idx = file.toString().lastIndexOf(".");
+					String ext = file.toString().substring(idx + 1);
+					addCommand.addAdminScript(cmdId, cmdDescr, sb.toString(), null,
+									ext, binds);
+					log.config("Loaded admin command from file: " + file +
+									", id: " + cmdId + ", ext: " + ext + ", descr: " + cmdDescr);
 				}
-				buffr.close();
-				if (cmdId == null || cmdDescr == null) {
-					log.warning("Admin script found but it has no command ID or command description: " + file);
-					continue;
-				}
-				int idx = file.toString().lastIndexOf(".");
-				String ext = file.toString().substring(idx + 1);
-				addCommand.addAdminScript(cmdId, cmdDescr, sb.toString(), null,
-								ext, binds);
-				log.config("Loaded admin command from file: " + file +
-								", id: " + cmdId + ", ext: " + ext + ", descr: " + cmdDescr);
+			} else {
+				log.warning("Admin scripts directory is missing: " + adminDir);
 			}
 		} catch (Exception e) {
 			log.log(Level.WARNING, "Can't load the admin script file: " + file, e);
