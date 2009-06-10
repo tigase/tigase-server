@@ -32,11 +32,14 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
+import tigase.annotations.TODO;
 import tigase.conf.Configurable;
+import tigase.server.filters.PacketCounter;
 import tigase.stats.StatRecord;
 import tigase.stats.StatisticType;
 import tigase.stats.StatisticsContainer;
@@ -96,6 +99,11 @@ public abstract class AbstractMessageReceiver
   private PriorityQueue<Packet> out_queue =
 		new PriorityQueue<Packet>(pr_cache.length, maxQueueSize);
 
+	private CopyOnWriteArrayList<PacketFilterIfc> incoming_filters =
+					new CopyOnWriteArrayList<PacketFilterIfc>();
+	private CopyOnWriteArrayList<PacketFilterIfc> outgoing_filters =
+					new CopyOnWriteArrayList<PacketFilterIfc>();
+
 	// 	private String sync = "SyncObject";
 	private Timer receiverTasks = null;
 	private ConcurrentHashMap<String, ReceiverTask> waitingTasks =
@@ -122,14 +130,14 @@ public abstract class AbstractMessageReceiver
    * Variable <code>statAddedMessagesOk</code> keeps counter of successfuly
    * added messages to queue.
    */
-  private long statReceivedMessagesOk = 0;
-  private long statSentMessagesOk = 0;
+  private long statReceivedPacketsOk = 0;
+  private long statSentPacketsOk = 0;
   /**
    * Variable <code>statAddedMessagesEr</code> keeps counter of unsuccessfuly
    * added messages due to queue overflow.
    */
-  private long statReceivedMessagesEr = 0;
-  private long statSentMessagesEr = 0;
+  private long statReceivedPacketsEr = 0;
+  private long statSentPacketsEr = 0;
 
 	/**
 	 * Describe <code>getComponentId</code> method here.
@@ -144,9 +152,33 @@ public abstract class AbstractMessageReceiver
 	@Override
 	public void initializationCompleted() {}
 
+	private boolean filterPacket(Packet packet,
+					CopyOnWriteArrayList<PacketFilterIfc> filters) {
+		boolean result = false;
+		for (PacketFilterIfc packetFilterIfc : filters) {
+			result = packetFilterIfc.filter(packet);
+			if (result) {
+				break;
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * This method can be overwritten in extending classes to get a different
+	 * packets distribution to different threads. For PubSub, probably better
+	 * packets distribution to different threads would be based on the
+	 * sender address rather then destination address.
+	 * @param packet
+	 * @return
+	 */
+	public int hashCodeForPacket(Packet packet) {
+		return packet.getTo().hashCode();
+	}
+
 	@Override
   public boolean addPacketNB(Packet packet) {
-		int queueIdx = Math.abs(packet.getTo().hashCode() %	in_queues_size);
+		int queueIdx = Math.abs(hashCodeForPacket(packet) %	in_queues_size);
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("[" + getName() + "] queueIdx=" + queueIdx +
 							", " + packet.toString());
@@ -157,11 +189,11 @@ public abstract class AbstractMessageReceiver
 		boolean result = in_queues.get(queueIdx).offer(packet,
 						packet.getPriority().ordinal());
 		if (result) {
-			++statReceivedMessagesOk;
+			++statReceivedPacketsOk;
 			++curr_second;
 		} else {
 			// Queue overflow!
-			++statReceivedMessagesEr;
+			++statReceivedPacketsEr;
 		}
 		return result;
   }
@@ -183,7 +215,7 @@ public abstract class AbstractMessageReceiver
 
 	@Override
 	public boolean addPacket(Packet packet) {
-		int queueIdx = Math.abs(packet.getTo().hashCode() %	in_queues_size);
+		int queueIdx = Math.abs(hashCodeForPacket(packet) %	in_queues_size);
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("[" + getName() + "] queueIdx=" + queueIdx +
 							", " + packet.toString());
@@ -193,10 +225,10 @@ public abstract class AbstractMessageReceiver
 //							getName() + ":" + QueueType.IN_QUEUE);
 			//in_queue.put(packet, packet.getPriority().ordinal());
 			in_queues.get(queueIdx).put(packet, packet.getPriority().ordinal());
-			++statReceivedMessagesOk;
+			++statReceivedPacketsOk;
 			++curr_second;
 		} catch (InterruptedException e) {
-			++statReceivedMessagesEr;
+			++statReceivedPacketsEr;
 			return false;
 		} // end of try-catch
 		return true;
@@ -217,11 +249,11 @@ public abstract class AbstractMessageReceiver
 //						getName() + ":" + QueueType.OUT_QUEUE);
 		result = out_queue.offer(packet, packet.getPriority().ordinal());
 		if (result) {
-			++statSentMessagesOk;
+			++statSentPacketsOk;
 			//++curr_second;
 		} else {
 			// Queue overflow!
-			++statSentMessagesEr;
+			++statSentPacketsEr;
 		}
 		return result;
 	}
@@ -241,10 +273,10 @@ public abstract class AbstractMessageReceiver
 //			out_queue.put(packet, packet.getPriority().ordinal(),
 //							getName() + ":" + QueueType.OUT_QUEUE);
 			out_queue.put(packet, packet.getPriority().ordinal());
-			++statSentMessagesOk;
+			++statSentPacketsOk;
 			//++curr_second;
 		} catch (InterruptedException e) {
-			++statSentMessagesEr;
+			++statSentPacketsEr;
 			return false;
 		} // end of try-catch
 		return true;
@@ -292,19 +324,19 @@ public abstract class AbstractMessageReceiver
 			stats.add(new StatRecord(getName(), "Last hour packets", "int",
 							curr_hour, Level.FINEST));
 		}
-		if (statReceivedMessagesOk > 0) {
+		if (statReceivedPacketsOk > 0) {
 			stats.add(new StatRecord(getName(), StatisticType.MSG_RECEIVED_OK,
-							statReceivedMessagesOk, Level.FINE));
+							statReceivedPacketsOk, Level.FINE));
 		} else {
 			stats.add(new StatRecord(getName(), StatisticType.MSG_RECEIVED_OK,
-							statReceivedMessagesOk, Level.FINEST));
+							statReceivedPacketsOk, Level.FINEST));
 		}
-		if (statSentMessagesOk > 0) {
+		if (statSentPacketsOk > 0) {
 			stats.add(new StatRecord(getName(), StatisticType.MSG_SENT_OK,
-							statSentMessagesOk, Level.FINE));
+							statSentPacketsOk, Level.FINE));
 		} else {
 			stats.add(new StatRecord(getName(), StatisticType.MSG_SENT_OK,
-							statSentMessagesOk, Level.FINEST));
+							statSentPacketsOk, Level.FINEST));
 		}
 		int[] in_priority_sizes = in_queues.get(0).size();
 		for (int i = 1; i < in_queues.size(); i++) {
@@ -340,19 +372,19 @@ public abstract class AbstractMessageReceiver
 		}
     stats.add(new StatRecord(getName(), StatisticType.MAX_QUEUE_SIZE,
 				maxQueueSize, Level.FINEST));
-		if (statReceivedMessagesEr > 0) {
+		if (statReceivedPacketsEr > 0) {
 			stats.add(new StatRecord(getName(), StatisticType.IN_QUEUE_OVERFLOW,
-							statReceivedMessagesEr, Level.INFO));
+							statReceivedPacketsEr, Level.INFO));
 		} else {
 			stats.add(new StatRecord(getName(), StatisticType.IN_QUEUE_OVERFLOW,
-							statReceivedMessagesEr, Level.FINEST));
+							statReceivedPacketsEr, Level.FINEST));
 		}
-		if (statSentMessagesEr > 0) {
+		if (statSentPacketsEr > 0) {
 			stats.add(new StatRecord(getName(), StatisticType.OUT_QUEUE_OVERFLOW,
-							statSentMessagesEr, Level.INFO));
+							statSentPacketsEr, Level.INFO));
 		} else {
 			stats.add(new StatRecord(getName(), StatisticType.OUT_QUEUE_OVERFLOW,
-							statSentMessagesEr, Level.FINEST));
+							statSentPacketsEr, Level.FINEST));
 		}
 		long res = 0;
 		for (long ppt : processPacketTimings) {
@@ -370,6 +402,12 @@ public abstract class AbstractMessageReceiver
 							processPacketTimings.length + " runs [ms]", "long",
 							prcessingTime, Level.FINEST));
 		}
+		for (PacketFilterIfc packetFilter : incoming_filters) {
+			packetFilter.getStatistics(stats);
+		}
+		for (PacketFilterIfc packetFilter : outgoing_filters) {
+			packetFilter.getStatistics(stats);
+		}
     return stats;
   }
 
@@ -378,6 +416,7 @@ public abstract class AbstractMessageReceiver
 	 * @param props
 	 */
 	@Override
+	@TODO(note="Replace fixed filers loading with configurable options for that")
   public void setProperties(Map<String, Object> props) {
 		int queueSize = (Integer)props.get(MAX_QUEUE_SIZE_PROP_KEY);
 		//stopThreads();
@@ -385,6 +424,14 @@ public abstract class AbstractMessageReceiver
 		//startThreads();
 		defHostname = (String)props.get(DEF_HOSTNAME_PROP_KEY);
 		compId = (String)props.get(COMPONENT_ID_PROP_KEY);
+		incoming_filters.clear();
+		outgoing_filters.clear();
+		PacketFilterIfc counter = new PacketCounter();
+		counter.init(getName(), QueueType.IN_QUEUE);
+		incoming_filters.add(counter);
+		counter = new PacketCounter();
+		counter.init(getName(), QueueType.OUT_QUEUE);
+		outgoing_filters.add(counter);
 		//addRouting(getComponentId());
   }
 
@@ -554,14 +601,14 @@ public abstract class AbstractMessageReceiver
 	@Override
 	public void start() {
 		if (log.isLoggable(Level.FINER)) {
-			log.finer(getName() + ": starting queue management threads ...");
+			log.info(getName() + ": starting queue management threads ...");
 		}
 		startThreads();
   }
 
   public void stop() {
 		if (log.isLoggable(Level.FINER)) {
-			log.finer(getName() + ": stopping queue management threads ...");
+			log.info(getName() + ": stopping queue management threads ...");
 		}
 		stopThreads();
   }
@@ -673,8 +720,6 @@ public abstract class AbstractMessageReceiver
 		return 1;
 	}
 
-	private enum QueueType { IN_QUEUE, OUT_QUEUE }
-
 	private class QueueListener extends Thread {
 
 		private PriorityQueue<Packet> queue;
@@ -712,20 +757,24 @@ public abstract class AbstractMessageReceiver
 //								log.finest("[" + getName() + "]  " +
 //												"No task found for id: " + id);
 								long startPPT = System.currentTimeMillis();
-								processPacket(packet);
+								if (!filterPacket(packet, incoming_filters)) {
+									processPacket(packet);
+								}
 								processPacketTimings[pptIdx] =
 												System.currentTimeMillis() - startPPT;
 								pptIdx = (pptIdx + 1) % processPacketTimings.length;
 							}
 							break;
 						case OUT_QUEUE:
-							if (parent != null) {
-								parent.addPacket(packet);
-							} else {
-								// It may happen for MessageRouter and this is intentional
-								addPacketNB(packet);
-							//log.warning("[" + getName() + "]  " + "No parent!");
-							} // end of else
+							if (!filterPacket(packet, outgoing_filters)) {
+								if (parent != null) {
+									parent.addPacket(packet);
+								} else {
+									// It may happen for MessageRouter and this is intentional
+									addPacketNB(packet);
+								//log.warning("[" + getName() + "]  " + "No parent!");
+								} // end of else
+							}
 							break;
 						default:
 							log.severe("Unknown queue element type: " + type);
