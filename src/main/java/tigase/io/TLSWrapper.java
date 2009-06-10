@@ -30,7 +30,6 @@ import javax.net.ssl.SSLEngineResult;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import java.nio.ByteBuffer;
-import tigase.conf.Configurator;
 
 /**
  * Describe class TLSWrapper here.
@@ -58,6 +57,10 @@ public class TLSWrapper {
 	/**
 	 * Creates a new <code>TLSWrapper</code> instance.
 	 *
+	 *
+	 * @param sslc
+	 * @param eventHandler
+	 * @param clientMode 
 	 */
 	public TLSWrapper(SSLContext sslc, TLSEventHandler eventHandler,
 		boolean clientMode) {
