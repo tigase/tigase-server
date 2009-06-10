@@ -270,7 +270,7 @@ public class MessageRouter extends AbstractMessageReceiver {
 		comp = getLocalComponent(id);
 		if (comp != null) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Packet is processing by: " + comp.getComponentId());
+				log.finest("Packet will be processed by: " + comp.getComponentId());
 			}
 			Queue<Packet> results = new LinkedList<Packet>();
 			if (comp == this) {
@@ -318,9 +318,9 @@ public class MessageRouter extends AbstractMessageReceiver {
 			Queue<Packet> results = new LinkedList<Packet>();
 			for (ServerComponent serverComponent : comps) {
 				if (log.isLoggable(Level.FINEST)) {
-    				log.finest("Packet processed by: " +
-								serverComponent.getComponentId());
-                }
+					log.finest("Packet will be processed by: " +
+									serverComponent.getComponentId());
+				}
 				serverComponent.processPacket(packet, results);
 				if (results.size() > 0) {
 					for (Packet res : results) {
@@ -332,8 +332,8 @@ public class MessageRouter extends AbstractMessageReceiver {
 			}
 		} else {
 			if (log.isLoggable(Level.FINEST)) {
-    			log.finest("There is no component for the packet, sending it back");
-            }
+				log.finest("There is no component for the packet, sending it back");
+			}
 			try {
 				addOutPacketNB(
 					Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet,
