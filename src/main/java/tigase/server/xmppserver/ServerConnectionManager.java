@@ -838,7 +838,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 		if (serv_cid != null && !cid.equals(serv_cid)) {
 			log.info("Somebody tries to reuse connection?"
 				+ " old_cid: " + serv_cid + ", new_cid: " + cid);
-	}
+		}
 
 		// <db:result>
 		if ((packet.getElemName() == RESULT_EL_NAME) ||
