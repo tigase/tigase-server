@@ -202,6 +202,18 @@ public class Packet {
 		return elem.getXMLNS();
 	}
 
+	public String getIQXMLNS() {
+		return elem.getXMLNS("/iq/query");
+	}
+
+	public String getIQChildName() {
+		List<Element> children = elem.getChildren();
+		if (children != null && children.size() > 0) {
+			return children.get(0).getName();
+		}
+		return null;
+	}
+
 	public boolean isXMLNS(String elementPath, String xmlns) {
 		String this_xmlns = elem.getXMLNS(elementPath);
 		if (this_xmlns == xmlns) {
