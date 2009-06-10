@@ -60,6 +60,7 @@ public class PubSubTestsTask extends RepoRosterTask {
 					new String[]{"xmlns", "type"},
 					new String[]{"jabber:x:data", "submit"});
 	private boolean stop = false;
+	private long packetsGenerated = 0;
 
 
 	private boolean memoryLow() {
@@ -234,7 +235,8 @@ public class PubSubTestsTask extends RepoRosterTask {
 								packet.getElemTo(), StanzaType.chat, "" + new Date() +
 								" Generation of the test data completed.\n" +
 								"Generated in: " +
-								gen_hours + "h, " +	gen_mins + "m, " + gen_secs + "sec",
+								gen_hours + "h, " +	gen_mins + "m, " + gen_secs + "sec" +
+								", packets generated: " + packetsGenerated,
 								"PubSub testing task", null));
 
 			}
@@ -336,6 +338,13 @@ public class PubSubTestsTask extends RepoRosterTask {
 				break;
 		}
 	}
+
+	@Override
+	protected boolean addOutPacket(Packet packet) {
+		++packetsGenerated;
+		return super.addOutPacket(packet);
+	}
+
 
 	@Override
 	protected void processMessage(Packet packet, Queue<Packet> results) {

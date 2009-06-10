@@ -439,8 +439,8 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 	public void processPacket(final Packet packet, final Queue<Packet> results) {
 		++packets_received;
 		if (log.isLoggable(Level.FINEST)) {
-    		log.finest(getJID() + ": " + "Processing packet: " + packet.toString());
-        }
+			log.finest(getJID() + ": " + "Processing packet: " + packet.toString());
+		}
 		if (packet.getType() == StanzaType.error) {
 			log.fine("Ignoring error stanza: " + packet.toString());
 			return;
