@@ -172,7 +172,7 @@ public class TLSIO implements IOInterface {
       tlsOutput.flip();
 			wr = io.write(tlsOutput);
 			result += wr;
-    } while (buff.hasRemaining() && wr > 0);
+    } while (buff.hasRemaining());
     if (tlsWrapper.getStatus() == TLSStatus.NEED_WRITE) {
       write(ByteBuffer.allocate(0));
     } // end of if ()
