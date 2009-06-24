@@ -74,12 +74,13 @@ public class SocketIO implements IOInterface {
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Stop called.");
 		}
-		if (isRemoteAddress("81.142.228.219")) {
-			log.warning("Stop called.");
-		}
+//		if (isRemoteAddress("81.142.228.219")) {
+//			log.warning("Stop called.");
+//		}
     channel.close();
   }
 
+	@Override
 	public boolean isRemoteAddress(String addr) {
 		return remoteAddress.equals(addr);
 	}
@@ -122,9 +123,9 @@ public class SocketIO implements IOInterface {
 		if (log.isLoggable(Level.FINER)) {
 			log.finer("Wrote to channel " + result + " bytes.");
 		}
-		if (isRemoteAddress("81.142.228.219")) {
-			log.warning("Wrote to channel " + result + " bytes.");
-		}
+//		if (isRemoteAddress("81.142.228.219")) {
+//			log.warning("Wrote to channel " + result + " bytes.");
+//		}
     return result;
   }
 
