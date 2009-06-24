@@ -48,6 +48,7 @@ public class SocketIO implements IOInterface {
 
   private SocketChannel channel = null;
   private int bytesRead = 0;
+	private String remoteAddress = null;
 
   /**
    * Creates a new <code>SocketIO</code> instance.
@@ -60,6 +61,7 @@ public class SocketIO implements IOInterface {
 		channel.configureBlocking(false);
 		channel.socket().setSoLinger(false, 0);
 		channel.socket().setReuseAddress(true);
+		remoteAddress = channel.socket().getInetAddress().getHostAddress();
   }
 
 	@Override
@@ -72,14 +74,18 @@ public class SocketIO implements IOInterface {
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Stop called.");
 		}
+		if (isRemoteAddress("81.142.228.219")) {
+			log.warning("Stop called.");
+		}
     channel.close();
   }
 
+	public boolean isRemoteAddress(String addr) {
+		return remoteAddress.equals(addr);
+	}
+
 	@Override
   public boolean isConnected() {
-		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Is connected: " + channel.isConnected());
-		}
     return channel.isConnected();
   }
 
@@ -115,6 +121,9 @@ public class SocketIO implements IOInterface {
 		}
 		if (log.isLoggable(Level.FINER)) {
 			log.finer("Wrote to channel " + result + " bytes.");
+		}
+		if (isRemoteAddress("81.142.228.219")) {
+			log.warning("Wrote to channel " + result + " bytes.");
 		}
     return result;
   }

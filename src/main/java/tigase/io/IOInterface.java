@@ -54,4 +54,6 @@ public interface IOInterface {
 
 	int waitingToSendSize();
 
+	boolean isRemoteAddress(String addr);
+
 } // IOInterface

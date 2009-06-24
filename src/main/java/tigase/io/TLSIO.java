@@ -157,6 +157,10 @@ public class TLSIO implements IOInterface {
 		if (log.isLoggable(Level.FINER)) {
 			log.finer("TLS - Writing data, remaining: " + buff.remaining());
 		}
+		if (isRemoteAddress("81.142.228.219")) {
+			log.warning("TLS - Writing data, remaining: " + buff.remaining());
+		}
+
     int wr = 0;
 		do {
 			ByteBuffer tlsOutput = ByteBuffer.allocate(tlsWrapper.getNetBuffSize());
@@ -172,6 +176,9 @@ public class TLSIO implements IOInterface {
     if (tlsWrapper.getStatus() == TLSStatus.NEED_WRITE) {
       write(ByteBuffer.allocate(0));
     } // end of if ()
+		if (isRemoteAddress("81.142.228.219")) {
+			log.warning("TLS - written: " + result);
+		}
     return result;
   }
 
@@ -212,6 +219,11 @@ public class TLSIO implements IOInterface {
 	@Override
 	public int waitingToSendSize() {
 		return io.waitingToSendSize();
+	}
+
+	@Override
+	public boolean isRemoteAddress(String addr) {
+		return io.isRemoteAddress(addr);
 	}
 
 } // TLSIO
