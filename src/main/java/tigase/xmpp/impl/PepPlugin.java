@@ -38,7 +38,7 @@ public class PepPlugin extends XMPPProcessor implements XMPPProcessorIfc {
 
 	private static final String[] ELEMENTS = { "pubsub" };
 
-	private static final String ID = _XMLNS;
+	private static final String ID = "pep";
 
 	private static final Logger log = Logger.getLogger("tigase.xmpp.impl.PepPlugin");
 
