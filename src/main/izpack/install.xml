@@ -247,10 +247,11 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 					<include name="etc/jmx.access"/>
 					<include name="etc/jmx.password"/>"
 				</fileset>
-				<file src="src/main/groovy/tigase/admin/UserRosterManagementExt.groovy" targetdir="$INSTALL_PATH/scripts/admin" />
 				<parsable targetfile="$INSTALL_PATH/etc/init.properties"/>
 				<parsable targetfile="$INSTALL_PATH/etc/tigase.conf"/>
 			</pack>
+			
+
 			<pack name="Unix Files" required="yes">
 				<os family="unix"/>
 				<description>Files needed to run the server on Unix like systems</description>
@@ -310,6 +311,18 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 					<include name="libs/jdmkrt.jar"/>
 				</fileset>
 			</pack>
+			
+			<pack name="Groovy scripting" required="no">
+				<description>Various Groovy scripts extending server functionality</description>
+				<fileset dir="src/main/groovy/tigase/admin" targetdir="$INSTALL_PATH/scripts/admin">
+					<include name="*.*"/>
+				</fileset>
+				<fileset dir="libs" targetdir="$INSTALL_PATH/libs">
+					<include name="groovy-engine.jar"/>
+					<include name="groovy-all-1.5.7.jar"/>
+				</fileset>
+			</pack>
+						
 			<pack name="Derby Database" required="no" preselected="yes">
 <!-- 						installGroups="Derby Database"> -->
 				<description>Derby database and JDBC driver</description>
