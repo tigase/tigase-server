@@ -1454,6 +1454,19 @@ index 964eec9..a3f0d85 100644
 +        return continueQuitOrReboot(idata, this);
      }
  }
+diff --git a/src/lib/com/izforge/izpack/panels/UserInputPanel.java b/src/lib/com/izforge/izpack/panels/UserInputPanel.java
+index fbda7e9..5e46d4e 100644
+--- a/src/lib/com/izforge/izpack/panels/UserInputPanel.java
++++ b/src/lib/com/izforge/izpack/panels/UserInputPanel.java
+@@ -2456,6 +2456,8 @@ public class UserInputPanel extends IzPanel implements ActionListener, ItemListe
+                 if (value.equals(trueValue))
+                 {
+                     set = TRUE;
++                } else {
++                	set = FALSE;
+                 }
+             }
+         }
 diff --git a/src/lib/com/izforge/izpack/panels/UserInputPanelConsoleHelper.java b/src/lib/com/izforge/izpack/panels/UserInputPanelConsoleHelper.java
 index ca9a659..1245897 100644
 --- a/src/lib/com/izforge/izpack/panels/UserInputPanelConsoleHelper.java
