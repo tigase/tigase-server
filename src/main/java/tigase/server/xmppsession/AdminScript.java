@@ -72,8 +72,8 @@ public class AdminScript extends AbstractAdminCommand {
 			compiledScript = ((Compilable)scriptEngine).compile(script);
 		}
 		log.info("Initialized script command, lang: " + this.language +
-						", ext: " + ext +
-						", script text: \n" + this.script);
+						", ext: " + ext);
+						//", script text: \n" + this.script);
 	}
 
 	@Override
