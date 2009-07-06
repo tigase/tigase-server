@@ -23,7 +23,6 @@ package tigase.net;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.SocketException;
 import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -155,8 +154,8 @@ public class ConnectionOpenThread implements Runnable {
     while ((al = waiting.poll()) != null) {
 			try {
 				addPort(al);
-			} catch (SocketException e) {
-				log.warning("Error: " + e + " creating connection for: " + al.getPort());
+			} catch (Exception e) {
+				log.warning("Error: " + e + " creating connection for: " + al.toString());
 			} // end of try-catch
     } // end of for ()
 
