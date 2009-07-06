@@ -55,6 +55,7 @@ import tigase.server.Permissions;
 import tigase.server.ServerComponent;
 import tigase.util.ClassUtil;
 import tigase.util.JIDUtils;
+import tigase.util.tracer.TigaseTracer;
 import tigase.xml.Element;
 import tigase.xml.XMLUtils;
 import tigase.xml.db.XMLDBException;
@@ -473,12 +474,28 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 	  defaults.put(AUTH_REPO_URL_PROP_KEY, auth_repo_url);
 		defaults.put(AUTH_REPO_PARAMS_NODE + "/param-1", "value-1");
 
+		// Setup tracer, this is a temporarily code...
+		String ips = (String)params.get(TigaseTracer.TRACER_IPS_PROP_KEY);
+		if (ips != null) {
+			String[] ipsa = ips.split(",");
+			for (String ip : ipsa) {
+				TigaseTracer.addIP(ip);
+			}
+		}
+		String jids = (String)params.get(TigaseTracer.TRACER_JIDS_PROP_KEY);
+		if (jids != null) {
+			String[] jidsa = jids.split(",");
+			for (String jid : jidsa) {
+				TigaseTracer.addJid(jid);
+			}
+		}
+
 		return defaults;
 	}
 
   /**
    * Sets all configuration properties for object.
-	 * @param properties
+	 * @param props
 	 */
 	@Override
 	public void setProperties(final Map<String, Object> props) {
