@@ -700,6 +700,11 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 		}
 
 		@Override
+		public String toString() {
+			return port_props.toString();
+		}
+
+		@Override
 		public int getPort() {
 			return (Integer)port_props.get(PORT_KEY);
 		}
