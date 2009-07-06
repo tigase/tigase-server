@@ -560,28 +560,24 @@ public class SessionManagerClusteredOld extends SessionManager
 	}
 
 	@Override
-	public void nodesConnected(Set<String> node_hostnames) {
-		log.fine("Nodes connected: " + node_hostnames.toString());
-		for (String host : node_hostnames) {
-			String jid = getName() + "@" + host;
-			strategy.nodeConnected(jid);
-			addTrusted(jid);
-		}
+	public void nodeConnected(String node) {
+		log.fine("Nodes connected: " + node);
+		String jid = getName() + "@" + node;
+		strategy.nodeConnected(jid);
+		addTrusted(jid);
 	}
 
 	@Override
-	public void nodesDisconnected(Set<String> node_hostnames) {
-		log.fine("Nodes disconnected: " + node_hostnames.toString());
-		for (String host : node_hostnames) {
-			String jid = getName() + "@" + host;
-			strategy.nodeDisconnected(jid);
-			delTrusted(jid);
-		}
+	public void nodeDisconnected(String node) {
+		log.fine("Nodes disconnected: " + node);
+		String jid = getName() + "@" + node;
+		strategy.nodeDisconnected(jid);
+		delTrusted(jid);
 	}
 
 	protected String getFirstClusterNode(String userId) {
 		String cluster_node = null;
-		String[] nodes = strategy.getNodesForJid(userId);
+		List<String> nodes = strategy.getNodesForJid(userId);
 		for (String node: nodes) {
 			if (!node.equals(getComponentId())) {
 				cluster_node = node;
@@ -639,6 +635,10 @@ public class SessionManagerClusteredOld extends SessionManager
 	public void start() {
 		super.start();
 		delayedTasks = new Timer("SM Cluster Delayed Tasks", true);
+	}
+
+	@Override
+	public void setClusterController(ClusterController cl_controller) {
 	}
 
 }

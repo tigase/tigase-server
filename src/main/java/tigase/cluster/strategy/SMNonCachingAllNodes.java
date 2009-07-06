@@ -22,10 +22,11 @@
 
 package tigase.cluster.strategy;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.Set;
-import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 import tigase.cluster.ClusteringStrategyIfc;
 import tigase.server.Packet;
@@ -44,8 +45,8 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
   private static final Logger log =
     Logger.getLogger(SMNonCachingAllNodes.class.getName());
 
-	private Set<String> cluster_nodes = new ConcurrentSkipListSet<String>();
-	private String[] cl_nodes_array = new String[0];
+	//private Set<String> cluster_nodes = new ConcurrentSkipListSet<String>();
+	private List<String> cl_nodes_list = new CopyOnWriteArrayList<String>();
 	//private String smName = null;
 
 	@Override
@@ -58,22 +59,21 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 	}
 
 	@Override
-	public String[] getNodesForJid(String jid) {
-		return cl_nodes_array;
+	public List<String> getNodesForJid(String jid) {
+		Collections.rotate(cl_nodes_list, 1);
+		return cl_nodes_list;
 	}
 
 	@Override
 	public void nodeConnected(String jid) {
-		cluster_nodes.add(jid);
-		cl_nodes_array = cluster_nodes.toArray(new String[cluster_nodes.size()]);
-		log.fine("Cluster nodes: " + cluster_nodes.toString());
+		cl_nodes_list.add(jid);
+		log.fine("Cluster nodes: " + cl_nodes_list.toString());
 	}
 
 	@Override
 	public void nodeDisconnected(String jid) {
-		cluster_nodes.remove(jid);
-		cl_nodes_array = cluster_nodes.toArray(new String[cluster_nodes.size()]);
-		log.fine("Cluster nodes: " + cluster_nodes.toString());
+		cl_nodes_list.remove(jid);
+		log.fine("Cluster nodes: " + cl_nodes_list.toString());
 	}
 
 	@Override
@@ -85,8 +85,8 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 	}
 
 	@Override
-	public String[] getAllNodes() {
-		return cl_nodes_array;
+	public List<String> getAllNodes() {
+		return cl_nodes_list;
 	}
 
 //	@Override

@@ -20,10 +20,10 @@
  */
 package tigase.cluster;
 
-import java.util.Set;
 import java.util.Map;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
@@ -58,9 +58,10 @@ public class ServerConnectionClustered extends ServerConnectionManager
 	private static final String ASKING_SESSION_ID = "asking_sessionId";
 	private static final String VALID = "valid";
 
-	private Set<String> cluster_nodes = new LinkedHashSet<String>();
-	private String[] cl_nodes_array = new String[0];
+	//private Set<String> cluster_nodes = new LinkedHashSet<String>();
+	private List<String> cl_nodes_array = new CopyOnWriteArrayList<String>();
 
+	@Override
 	public void processPacket(Packet packet) {
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Received packet: " + packet.toString());
@@ -135,7 +136,7 @@ public class ServerConnectionClustered extends ServerConnectionManager
 
 	protected String getFirstClusterNode() {
 		String cluster_node = null;
-		for (String node: cluster_nodes) {
+		for (String node: cl_nodes_array) {
 			if (!node.equals(getComponentId())) {
 				cluster_node = node;
 				break;
@@ -170,19 +171,17 @@ public class ServerConnectionClustered extends ServerConnectionManager
 	}
 
 	@Override
-	public void nodesConnected(Set<String> node_hostnames) {
-		for (String node: node_hostnames) {
-			cluster_nodes.add(getName() + "@" + node);
-			cl_nodes_array = cluster_nodes.toArray(new String[cluster_nodes.size()]);
-		}
+	public void nodeConnected(String node) {
+		cl_nodes_array.add(getName() + "@" + node);
 	}
 
 	@Override
-	public void nodesDisconnected(Set<String> node_hostnames) {
-		for (String node: node_hostnames) {
-			cluster_nodes.remove(getName() + "@" + node);
-			cl_nodes_array = cluster_nodes.toArray(new String[cluster_nodes.size()]);
-		}
+	public void nodeDisconnected(String node) {
+		cl_nodes_array.remove(getName() + "@" + node);
+	}
+
+	@Override
+	public void setClusterController(ClusterController cl_controller) {
 	}
 
 }

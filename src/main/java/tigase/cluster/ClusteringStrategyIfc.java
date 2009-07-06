@@ -22,6 +22,7 @@
 
 package tigase.cluster;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import tigase.server.Packet;
@@ -40,9 +41,9 @@ public interface ClusteringStrategyIfc {
 
 	void setProperties(Map<String, Object> props);
 
-	String[] getNodesForJid(String jid);
+	List<String> getNodesForJid(String jid);
 
-	String[] getAllNodes();
+	List<String> getAllNodes();
 
 	void nodeConnected(String jid);
 

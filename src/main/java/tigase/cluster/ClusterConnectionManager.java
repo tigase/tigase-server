@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.List;
 import java.util.Queue;
 import java.util.LinkedHashMap;
+import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -61,7 +62,7 @@ import tigase.util.TimeUtils;
  * @version $Rev$
  */
 public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
-	implements XMPPService {
+	implements XMPPService, ClusteredComponent {
 
   /**
    * Variable <code>log</code> is a class logger.
@@ -84,6 +85,8 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 	public static final String CLUSTER_CONTR_ID_PROP_KEY = "cluster-controller-id";
 	public static final boolean CONNECT_ALL_PROP_VAL = false;
 	public static final String XMLNS = "tigase:cluster";
+
+	private ClusterController clusterController = null;
 
 	private ServiceEntity serviceEntity = null;
 	//private boolean service_disco = RETURN_SERVICE_DISCO_VAL;
@@ -264,12 +267,13 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 			(String)serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
 		log.info("Connected to: " + addr);
 		updateServiceDiscovery(addr, XMLNS + " connected");
-		Map<String, String> method_params = new LinkedHashMap<String, String>();
-		method_params.put("connected", addr);
-		addOutPacket(new Packet(ClusterElement.createClusterMethodCall(
-					getComponentId(), cluster_controller_id,
-					StanzaType.set, ClusterMethods.UPDATE_NODES.toString(),
-					method_params).getClusterElement()));
+		clusterController.nodeConnected(addr);
+//		Map<String, String> method_params = new LinkedHashMap<String, String>();
+//		method_params.put("connected", addr);
+//		addOutPacket(new Packet(ClusterElement.createClusterMethodCall(
+//					getComponentId(), cluster_controller_id,
+//					StanzaType.set, ClusterMethods.UPDATE_NODES.toString(),
+//					method_params).getClusterElement()));
 // 		synchronized (waiting_packs) {
 // 			LinkedHashMap<Long, Packet> waiting_packets =
 //         waiting_packs.get(serv.getRemoteAddress());
@@ -392,12 +396,14 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 			String addr = (String) sessionData.get(PORT_REMOTE_HOST_PROP_KEY);
 			log.info("Disonnected from: " + addr);
 			updateServiceDiscovery(addr, XMLNS + " disconnected");
-			Map<String, String> method_params = new LinkedHashMap<String, String>();
-			method_params.put("disconnected", addr);
-			addOutPacket(new Packet(ClusterElement.createClusterMethodCall(
-							getComponentId(), cluster_controller_id,
-							StanzaType.set, ClusterMethods.UPDATE_NODES.toString(),
-							method_params).getClusterElement()));
+			clusterController.nodeDisconnected(addr);
+
+//			Map<String, String> method_params = new LinkedHashMap<String, String>();
+//			method_params.put("disconnected", addr);
+//			addOutPacket(new Packet(ClusterElement.createClusterMethodCall(
+//							getComponentId(), cluster_controller_id,
+//							StanzaType.set, ClusterMethods.UPDATE_NODES.toString(),
+//							method_params).getClusterElement()));
 			++totalNodeDisconnects;
 			int hour = TimeUtils.getHourNow();
 			if (lastDayIdx != hour) {
@@ -605,6 +611,19 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 	@Override
 	protected boolean isHighThroughput() {
 		return true;
+	}
+
+	@Override
+	public void setClusterController(ClusterController cl_controller) {
+		this.clusterController = cl_controller;
+	}
+
+	@Override
+	public void nodeConnected(String node) {
+	}
+
+	@Override
+	public void nodeDisconnected(String node) {
 	}
 
 }

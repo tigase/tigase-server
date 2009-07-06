@@ -141,22 +141,27 @@ public class VirtualComponent
 	private String discoType = null;
 	private String[] discoFeatures = null;
 
+	@Override
 	public void setName(String name) {
 		this.name = name;
 		this.componentId = JIDUtils.getNodeID(name, DNSResolver.getDefaultHostname());
 	}
 
+	@Override
 	public String getName() {
 		return name;
 	}
 
+	@Override
 	public String getComponentId() {
 		return componentId;
 	}
 
+	@Override
 	public void release() {
 	}
 
+	@Override
 	public void processPacket(Packet packet, Queue<Packet> results) {
 		if (redirectTo != null) {
 			packet.setTo(redirectTo);
@@ -166,22 +171,27 @@ public class VirtualComponent
 		}
 	}
 
+	@Override
 	public void initializationCompleted() {
 	}
 
+	@Override
 	public Element getDiscoInfo(String node, String jid) {
 		return null;
 	}
 
+	@Override
 	public List<Element> getDiscoItems(String node, String jid) {
 		Element result = serviceEntity.getDiscoItem(null, getName() + "." + jid);
 		return Arrays.asList(result);
 	}
 
+	@Override
 	public List<Element> getDiscoFeatures() {
 		return null;
 	}
 
+	@Override
 	public void setProperties(Map<String, Object> properties) {
 
 		String redirect = (String) properties.get(REDIRECT_TO_PROP_KEY);
@@ -207,6 +217,7 @@ public class VirtualComponent
 		}
 	}
 
+	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> defs = new LinkedHashMap<String, Object>();
 

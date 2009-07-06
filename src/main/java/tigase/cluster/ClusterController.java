@@ -21,13 +21,10 @@
 package tigase.cluster;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.LinkedHashSet;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.conf.Configurable;
@@ -64,6 +61,7 @@ public class ClusterController
 	private ServiceEntity serviceEntity = null;
 	//private ServiceEntity stats_modules = null;
 	private Level statsLevel = Level.INFO;
+	private String this_node = DNSResolver.getDefaultHostname();;
 	private String my_hostname = null;
 
 	@Override
@@ -76,7 +74,9 @@ public class ClusterController
 		serviceEntity.addFeatures(CMD_FEATURES);
 	}
 
+	@Override
 	public void componentAdded(ClusteredComponent component) {
+		component.setClusterController(this);
 		ServiceEntity item = serviceEntity.findNode(component.getName());
 		if (item == null) {
 			item = new ServiceEntity(getName(), component.getName(),
@@ -88,12 +88,15 @@ public class ClusterController
 		}
 	}
 
+	@Override
 	public boolean isCorrectType(ServerComponent component) {
 		return component instanceof ClusteredComponent;
 	}
 
+	@Override
 	public void componentRemoved(ClusteredComponent component) {}
 
+	@Override
 	public Element getDiscoInfo(String node, String jid) {
 		if (jid != null && getName().equals(JIDUtils.getNodeNick(jid))) {
 			return serviceEntity.getDiscoInfo(node);
@@ -101,8 +104,10 @@ public class ClusterController
 		return null;
 	}
 
+	@Override
 	public 	List<Element> getDiscoFeatures() { return null; }
 
+	@Override
 	public List<Element> getDiscoItems(String node, String jid) {
 		if (getName().equals(JIDUtils.getNodeNick(jid))) {
 			return serviceEntity.getDiscoItems(node, jid);
@@ -112,33 +117,19 @@ public class ClusterController
 		}
 	}
 
+	@Override
 	public void processPacket(final Packet packet, final Queue<Packet> results) {
-		if (packet.getElement().getName() == ClusterElement.CLUSTER_EL_NAME) {
-			ClusterElement clem = new ClusterElement(packet.getElement());
-			if (ClusterMethods.UPDATE_NODES.toString().equals(clem.getMethodName())) {
-				String connected_nodes = clem.getMethodParam("connected");
-				String disconnected_nodes = clem.getMethodParam("disconnected");
-				for (ClusteredComponent comp: components.values()) {
-					if (connected_nodes != null) {
-						comp.nodesConnected(new
-							LinkedHashSet<String>(Arrays.asList(connected_nodes.split(","))));
-					}
-					if (disconnected_nodes != null) {
-						comp.nodesDisconnected(new
-							LinkedHashSet<String>(Arrays.asList(disconnected_nodes.split(","))));
-					}
-				}
-				if (connected_nodes != null) {
-					results.add(sendClusterNotification("Cluster nodes have been connected (" +
-									(new Date()) + ")", "\nNew cluster nodes connected",
-									connected_nodes));
-				}
-				if (disconnected_nodes != null) {
-					results.add(sendClusterNotification("Cluster nodes have been disconnected (" +
-									(new Date()) + ")", "\nDisconnected cluster nodes",
-									disconnected_nodes));
-				}
-			}
+	}
+
+	public void nodeConnected(String  node) {
+		for (ClusteredComponent comp : components.values()) {
+			comp.nodeConnected(node);
+		}
+	}
+
+	public void nodeDisconnected(String  node) {
+		for (ClusteredComponent comp : components.values()) {
+			comp.nodeDisconnected(node);
 		}
 	}
 
@@ -150,7 +141,7 @@ public class ClusterController
 		}
 		int cnt = 0;
 		for (String node: nodes.split(",")) {
-			message += "" + (++cnt) + ". " + node;
+			message += "" + (++cnt) + ". " + node + " connected to " + this_node;
 		}
 		Packet p_msg = Packet.getMessage(my_hostname,
 			JIDUtils.getJID(getName(), my_hostname, null), StanzaType.normal,
@@ -158,10 +149,12 @@ public class ClusterController
 		return p_msg;
 	}
 
+	@Override
 	public void setProperties(Map<String, Object> properties) {
 		my_hostname = (String) properties.get(MY_DOMAIN_NAME_PROP_KEY);
 	}
 
+	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> defs = new LinkedHashMap<String, Object>();
 		String[] local_domains = DNSResolver.getDefHostNames();

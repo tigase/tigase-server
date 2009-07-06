@@ -20,7 +20,6 @@
  */
 package tigase.cluster;
 
-import java.util.Set;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
@@ -47,30 +46,40 @@ public class ClientConnectionClustered extends ClientConnectionManager
   private static final Logger log =
     Logger.getLogger("tigase.cluster.ClientConnectionClustered");
 
-	public void nodesConnected(Set<String> node_hostnames) {}
+	@Override
+	public void nodeConnected(String node) {}
 
-	public void nodesDisconnected(Set<String> node_hostnames) {
+	/**
+	 * 
+	 * @param node
+	 */
+	@Override
+	public void nodeDisconnected(String node) {
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Disconnected nodes: " + node_hostnames.toString());
+			log.finest("Disconnected nodes: " + node);
 		}
-		for (String node: node_hostnames) {
-			final String hostname = node;
-			doForAllServices(new ServiceChecker() {
-					public void check(final XMPPIOService service, final String serviceId) {
-						String dataReceiver = service.getDataReceiver();
-						if (log.isLoggable(Level.FINEST)) {
-							log.finest("Checking service for dataReceiver: " + dataReceiver);
-						}
-						if (dataReceiver != null
-							&& JIDUtils.getNodeHost(dataReceiver).equals(hostname)) {
-							if (log.isLoggable(Level.FINEST)) {
-								log.finest("Stopping service because corresponding cluster node stopped.");
-							}
-							service.stop();
-						}
+		final String hostname = node;
+		doForAllServices(new ServiceChecker() {
+			@Override
+			public void check(final XMPPIOService service, final String serviceId) {
+				String dataReceiver = service.getDataReceiver();
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("Checking service for dataReceiver: " + dataReceiver);
+				}
+				if (dataReceiver != null &&
+								JIDUtils.getNodeHost(dataReceiver).equals(hostname)) {
+					if (log.isLoggable(Level.FINEST)) {
+						log.finest(
+										"Stopping service because corresponding cluster node stopped.");
 					}
-				});
-		}
+					service.stop();
+				}
+			}
+		});
+	}
+
+	@Override
+	public void setClusterController(ClusterController cl_controller) {
 	}
 
 }

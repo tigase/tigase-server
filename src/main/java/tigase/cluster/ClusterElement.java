@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
@@ -120,13 +119,28 @@ public class ClusterElement {
 	 */
 	public ClusterElement(Element elem) {
 		this.elem = elem;
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Parsing cluster element: " + elem.toString());
+		}
 		packets = elem.getChildren(CLUSTER_DATA_PATH);
 		first_node = elem.getCData(FIRST_NODE_PATH);
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("First node found: " + first_node);
+		}
 		visited_nodes = new LinkedHashSet<String>();
 		List<Element> nodes = elem.getChildren(VISITED_NODES_PATH);
 		if (nodes != null) {
+			int cnt = 0;
 			for (Element node: nodes) {
 				visited_nodes.add(node.getCData());
+				++cnt;
+			}
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Found and added visited nodes: " + cnt);
+			}
+		} else {
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("No visited nodes found");
 			}
 		}
 		Element method_call = elem.findChild(CLUSTER_METHOD_PATH);
@@ -220,12 +234,12 @@ public class ClusterElement {
 	}
 
 	public static ClusterElement createForNextNode(ClusterElement clel,
-					String[] cluster_nodes, String comp_id) {
+					List<String> cluster_nodes, String comp_id) {
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Calculating a next node from nodes: " +
-							Arrays.toString(cluster_nodes));
+							cluster_nodes.toString());
 		}
-		if (cluster_nodes.length > 0) {
+		if (cluster_nodes.size() > 0) {
 			String next_node = null;
 			for (String cluster_node: cluster_nodes) {
 				if (!clel.isVisitedNode(cluster_node) && !cluster_node.equals(comp_id)) {
@@ -236,15 +250,15 @@ public class ClusterElement {
 					break;
 				}
 			}
-			// The next node can not be the node which is processing the
-			// packet now. adding now: getFirstNode() != comp_id
-			if (next_node == null && !comp_id.equals(clel.getFirstNode())) {
-				next_node = clel.getFirstNode();
-				if (log.isLoggable(Level.FINEST)) {
-					log.finest("No more cluster nodes found, sending back to the first node: " +
-									next_node);
-				}
-			}
+//			// The next node can not be the node which is processing the
+//			// packet now. adding now: getFirstNode() != comp_id
+//			if (next_node == null && !comp_id.equals(clel.getFirstNode())) {
+//				next_node = clel.getFirstNode();
+//				if (log.isLoggable(Level.FINEST)) {
+//					log.finest("No more cluster nodes found, sending back to the first node: " +
+//									next_node);
+//				}
+//			}
 			if (next_node != null) {
 				ClusterElement result = clel.nextClusterNode(next_node);
 				result.addVisitedNode(comp_id);

@@ -20,7 +20,6 @@
  */
 package tigase.cluster;
 
-import java.util.Set;
 import tigase.server.ServerComponent;
 
 /**
@@ -34,8 +33,10 @@ import tigase.server.ServerComponent;
  */
 public interface ClusteredComponent extends ServerComponent {
 
-	void nodesConnected(Set<String> node_hostnames);
+	void setClusterController(ClusterController cl_controller);
 
-	void nodesDisconnected(Set<String> node_hostnames);
+	void nodeConnected(String node);
+
+	void nodeDisconnected(String node);
 
 }
