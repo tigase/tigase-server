@@ -286,6 +286,20 @@ public class XMPPResourceConnection extends RepositoryAccess {
     return userJid;
   }
 
+	/**
+   * Returns full user JID for this session without throwing the
+   * <code>NotAuthorizedException</code> exception if session is not authorized
+	 * yet and therefore user name and resource is not known yet.
+	 * Please note this method if for logging using only to avoid excessive use
+	 * of try/catch for debugging code. It may return null.
+   *
+   * @return a <code>String</code> value of calculated user full JID for this
+   * session including resource name.
+   */
+	public final String getjid() {
+		return userJid;
+	}
+
   /**
    * Returns user JID but without <em>resource</em> part. This is real user ID
    * not session ID.
