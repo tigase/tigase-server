@@ -65,7 +65,7 @@ public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
 					"tigase.vhosts.VHostJDBCRepository";
 
 	private static final Logger log =
-					Logger.getLogger("tigase.vhosts.VHostManager");
+					Logger.getLogger(VHostManager.class.getName());
 
   private LinkedHashSet<VHostListener> localDomainsHandlers =
 					new LinkedHashSet<VHostListener>();
