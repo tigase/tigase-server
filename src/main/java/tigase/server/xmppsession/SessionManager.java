@@ -812,9 +812,9 @@ public class SessionManager extends AbstractMessageReceiver
 						admin = connection != null && connection.isAuthorized() &&
 										isAdmin(connection.getUserId());
 						if (admin) {
-                			if (log.isLoggable(Level.FINER)) {
-                				log.finer("Processing admin command: " + pc.toString());
-                            }
+							if (log.isLoggable(Level.FINER)) {
+								log.finer("Processing admin command: " + pc.toString());
+							}
 							int hashIdx = strCommand.indexOf('#');
 							String scriptId = strCommand.substring(hashIdx + 1);
 							AdminCommandIfc com = adminCommands.get(scriptId);
@@ -840,12 +840,12 @@ public class SessionManager extends AbstractMessageReceiver
 					}
 					if (!admin) {
 						try {
-                			if (log.isLoggable(Level.FINER)) {
-                				log.finer("Command rejected non-admin detected: " +
-											(connection != null ? (connection.isAuthorized() + ": " +
-											connection.getUserId())
-											: "null"));
-                            }
+							if (log.isLoggable(Level.FINER)) {
+								log.finer("Command rejected non-admin detected: " +
+												(connection != null ? (connection.isAuthorized() +
+												": " + connection.getUserId())
+												: "null"));
+							}
 							addOutPacket(Authorization.FORBIDDEN.getResponseMessage(pc,
 											"Only Administrator can call the command.", true));
 						} catch (Exception e) {
@@ -1330,6 +1330,7 @@ public class SessionManager extends AbstractMessageReceiver
 					ConnectionStatus conn_st, String xmpp_sessionId) {
 		try {
 			XMPPResourceConnection conn = createUserSession(conn_id, domain);
+			conn.setConnectionStatus(conn_st);
 			conn.setSessionId(xmpp_sessionId);
 			user_repository.setData(user_id, "tokens", xmpp_sessionId, conn_id);
 			Authorization auth = conn.loginToken(user_id, xmpp_sessionId, conn_id);
@@ -1339,7 +1340,6 @@ public class SessionManager extends AbstractMessageReceiver
 				if (resource != null) {
 					conn.setResource(resource);
 				}
-				conn.setConnectionStatus(conn_st);
 			} else {
 				connectionsByFrom.remove(conn_id);
 				return null;
@@ -1390,7 +1390,9 @@ public class SessionManager extends AbstractMessageReceiver
 		}
 		String userId = JIDUtils.getNodeID(userName, conn.getDomain());
 		registerNewSession(userId, conn);
-		conn.setConnectionStatus(ConnectionStatus.NORMAL);
+		if (conn.getConnectionStatus() != ConnectionStatus.REMOTE) {
+			conn.setConnectionStatus(ConnectionStatus.NORMAL);
+		}
 	}
 
 	@Override
