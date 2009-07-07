@@ -62,7 +62,7 @@ public abstract class TigaseConfigConst {
 	 "sessionBindPlugin", "registerPlugin", "rosterPlugin", "privacyPlugin",
 	 "versionPlugin", "statsPlugin", "tlsPlugin", "msgOfflinePlugin",
 	 "vcardPlugin", "commandsPlugin", "privatePlugin", "pingPlugin",
-	 "basicFilterPlugin", "domainFilterPlugin"};
+	 "basicFilterPlugin", "domainFilterPlugin", "pepPlugin"};
 	public static LinkedHashMap<String, String> pluginsMap =
     new LinkedHashMap<String, String>();
 
@@ -128,8 +128,19 @@ public abstract class TigaseConfigConst {
 		pluginsMap.put("urn:xmpp:ping", "pingPlugin");
 		pluginsMap.put("basic-filter", "basicFilterPlugin");
 		pluginsMap.put("domain-filter", "domainFilterPlugin");
+		pluginsMap.put("pep", "pepPlugin");
 	}
 
+	public static String getPluginId(String pluginVarNameToFind) {
+		for (String pluginId : pluginsMap.keySet()) {
+			String pluginVarName = pluginsMap.get(pluginId);
+			if (pluginVarName.equals(pluginVarNameToFind)) {
+				return pluginId;
+			}
+		}
+		return null;
+	}
+	
 	public static final String PGSQL_DRIVER = "org.postgresql.Driver";
 	public static final String MYSQL_DRIVER = "com.mysql.jdbc.Driver";
 	public static final String DERBY_DRIVER = "org.apache.derby.jdbc.EmbeddedDriver";

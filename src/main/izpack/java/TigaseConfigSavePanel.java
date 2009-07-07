@@ -304,13 +304,22 @@ class TigaseConfigSaveHelper {
 				Debug.trace("Missing idata for: " + plugin);
 				continue;
 			}
-			if (!idata.getVariable(plugin).equals("off")) {
-				if (!plugins.isEmpty()) {
-					plugins += ",";
-				}
-				plugins += idata.getVariable(plugin);
+			
+			final String value = idata.getVariable(plugin);
+			final String prefix;
+			final String pluginId = TigaseConfigConst.getPluginId(plugin);
+			if (value.equals("off")) {
+				prefix = "-";
+			} else {
+				prefix = "+";
+			} 
+			
+			if (!plugins.isEmpty()) {
+				plugins += ",";
 			}
+			plugins += prefix + pluginId;
 		}
+		
 		return plugins;
 	}
 
