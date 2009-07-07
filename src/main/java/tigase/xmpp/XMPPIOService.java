@@ -51,7 +51,7 @@ public class XMPPIOService extends IOService {
 		Logger.getLogger("tigase.xmpp.XMPPIOService");
 
   private XMPPDomBuilderHandler domHandler = null;
-	private SimpleParser parser = SingletonFactory.getParserInstance();
+	protected SimpleParser parser = SingletonFactory.getParserInstance();
 	private XMPPIOServiceListener serviceListener = null;
 
   /**
@@ -306,7 +306,7 @@ public class XMPPIOService extends IOService {
    *
    * @param packet a <code>Packet</code> value of processing results.
    */
-  private void addReceivedPacket(final Packet packet) {
+  protected void addReceivedPacket(final Packet packet) {
     receivedPackets.offer(packet);
   }
 
