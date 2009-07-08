@@ -373,7 +373,7 @@ public abstract class IOService implements Callable<IOService> {
 		decoder.reset();
 	}
 
-	private long empty_read_call_count = 0;
+	public long empty_read_call_count = 0;
 	private static final long MAX_ALLOWED_EMPTY_CALLS = 1000;
 
 	/**
