@@ -22,6 +22,9 @@ drop procedure if exists TigUpdatePassword;
 drop procedure if exists TigUpdatePasswordPlainPw;
 -- QUERY END:
 -- QUERY START:
+drop procedure if exists TigUpdatePasswordPlainPwRev;
+-- QUERY END:
+-- QUERY START:
 drop procedure if exists TigGetPassword;
 -- QUERY END:
 -- QUERY START:
