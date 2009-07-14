@@ -34,6 +34,7 @@ import java.util.logging.Logger;
 import tigase.server.Packet;
 import tigase.server.sreceiver.PropertyItem;
 import tigase.server.sreceiver.RepoRosterTask;
+import tigase.stats.StatisticsList;
 import tigase.util.ClassUtil;
 import tigase.xmpp.StanzaType;
 
@@ -67,7 +68,7 @@ public class SystemMonitorTask extends RepoRosterTask {
 	private String[] selected_monitors = null;
 	private Map<String, ResourceMonitorIfc> monitors =
 					new LinkedHashMap<String, ResourceMonitorIfc>();
-	private double warning_threshold = 0.9;
+	private float warning_threshold = 0.8f;
 
 	private enum command {
 		help(" - Displays help info."),
@@ -255,7 +256,7 @@ public class SystemMonitorTask extends RepoRosterTask {
 			// In fact it can be null if this is just a configuration change
 			// in this case only changed properties are passed to the task
 			try {
-				double tresh = Double.parseDouble(threshold);
+				float tresh = Float.parseFloat(threshold);
 				warning_threshold = tresh;
 			} catch (Exception e) {
 				log.warning("Incorrect warning threshold, using default" + threshold);
@@ -357,7 +358,7 @@ public class SystemMonitorTask extends RepoRosterTask {
 				if (body_split.length > 1) {
 					boolean correct = false;
 					try {
-						double newthreshold = Double.parseDouble(body_split[1]);
+						float newthreshold = Float.parseFloat(body_split[1]);
 						if (newthreshold > 0 && newthreshold < 1) {
 							warning_threshold = newthreshold;
 							for (Map.Entry<String, ResourceMonitorIfc> resmon : monitors.entrySet()) {
@@ -418,6 +419,14 @@ public class SystemMonitorTask extends RepoRosterTask {
 								"This is response to your message: [" + body + "]",
 								"Response", null));
 			}
+		}
+	}
+
+	@Override
+	public void getStatistics(StatisticsList list) {
+    super.getStatistics(list);
+		for (ResourceMonitorIfc monitor : monitors.values()) {
+			monitor.getStatistics(list);
 		}
 	}
 

@@ -31,6 +31,7 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.logging.MemoryHandler;
 import tigase.conf.Configurator;
+import tigase.stats.StatisticsList;
 import tigase.util.LogFormatter;
 
 /**
@@ -49,6 +50,7 @@ public class LogMonitor extends AbstractMonitor {
 	private Level levelTreshold = Level.WARNING;
 	private int maxLogBuffer = 1000*1000;
 	private long lastWarningSent = 0;
+	private long logWarings = 0;
 
 	private enum command {
 		setlevel(" [package=level] - Sets logging level for specified package."),
@@ -159,7 +161,7 @@ public class LogMonitor extends AbstractMonitor {
 	}
 
 	@Override
-	public void init(String jid, double treshold, SystemMonitorTask smTask) {
+	public void init(String jid, float treshold, SystemMonitorTask smTask) {
 		super.init(jid, treshold, smTask);
 		registerHandler();
 	}
@@ -224,10 +226,11 @@ public class LogMonitor extends AbstractMonitor {
 
 		@Override
 		public synchronized void flush() {
-			String logBuff = logsToString();
-			// We don't want to flood the system with this in case of
-			// some frequent error....
+			++logWarings;
 			if (System.currentTimeMillis() - lastWarningSent > 5*MINUTE) {
+				String logBuff = logsToString();
+				// We don't want to flood the system with this in case of
+				// some frequent error....
 				sendWarningOut(logBuff, null);
 				lastWarningSent = System.currentTimeMillis();
 			}
@@ -257,6 +260,12 @@ public class LogMonitor extends AbstractMonitor {
 			super.push();
 			flush();
 		}
+	}
+
+	@Override
+	public void getStatistics(StatisticsList list) {
+    super.getStatistics(list);
+		list.add("log-mon", "Log warings", logWarings, Level.FINE);
 	}
 
 }

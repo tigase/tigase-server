@@ -28,6 +28,7 @@ import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.server.Packet;
+import tigase.stats.StatisticsList;
 
 /**
  * Created: Jun 20, 2009 3:42:32 PM
@@ -63,17 +64,6 @@ public class N270Monitor extends AbstractMonitor {
 		checkCPUTemperature();
 		checkCPUFrequency();
 		checkCPUThrottling();
-	}
-
-	@Override
-	public String getState() {
-		StringBuilder sb = new StringBuilder("CPU temperature: " + cpu_temp + " C\n");
-		for (int i = 0; i < cpu_thrott_st.length; i++) {
-			sb.append("CPU " + i + ": FREQ: " + cpu_freq[i] + 
-							" MHz, Throtting: T" + cpu_thrott_st[i] +
-							" - " + cpu_thrott_pr[i] + "%\n");
-		}
-		return sb.toString();
 	}
 
 	private void checkCPUFrequency() {
@@ -132,5 +122,44 @@ public class N270Monitor extends AbstractMonitor {
 			}
 		}
 	}
+
+	@Override
+	public String getState() {
+		StringBuilder sb = new StringBuilder("CPU temperature: " + cpu_temp + " C\n");
+		for (int i = 0; i < cpu_thrott_st.length; i++) {
+			sb.append("CPU " + i + ": FREQ: " + cpu_freq[i] +
+							" MHz, Throtting: T" + cpu_thrott_st[i] +
+							" - " + cpu_thrott_pr[i] + "%\n");
+		}
+		return sb.toString();
+	}
+
+	private final static String N270_MON = "cpu-mon";
+
+	@Override
+	public void getStatistics(StatisticsList list) {
+    super.getStatistics(list);
+		list.add(N270_MON, "CPU temp", this.cpu_temp, Level.INFO);
+		if (list.checkLevel(Level.FINE)) {
+			StringBuilder cpu_freq_str = new StringBuilder();
+			StringBuilder cpu_thr_str = new StringBuilder();
+			for (int i = 0; i < cpu_thrott_st.length; i++) {
+				if (cpu_freq_str.length() > 0) {
+					cpu_freq_str.append(", ");
+				}
+				cpu_freq_str.append("CPU").append(i).append(": ");
+				cpu_freq_str.append(cpu_freq[i]).append(" MHz");
+				if (cpu_thr_str.length() > 0) {
+					cpu_thr_str.append(", ");
+				}
+				cpu_thr_str.append("CPU").append(i).append(": T");
+				cpu_thr_str.append(cpu_thrott_st[i]).append(" - ");
+				cpu_thr_str.append(cpu_thrott_pr[i]).append("%");
+			}
+			list.add(N270_MON, "CPU freq", cpu_freq_str.toString(), Level.FINE);
+			list.add(N270_MON, "CPU throt", cpu_thr_str.toString(), Level.FINE);
+		}
+	}
+
 
 }

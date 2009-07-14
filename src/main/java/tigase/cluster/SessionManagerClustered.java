@@ -43,6 +43,8 @@ import tigase.server.xmppsession.SessionManager;
 import tigase.xml.Element;
 import tigase.xmpp.XMPPSession;
 import tigase.annotations.TODO;
+import tigase.stats.StatRecord;
+import tigase.stats.StatisticsList;
 import tigase.util.DNSResolver;
 import tigase.xmpp.impl.Presence;
 
@@ -115,6 +117,9 @@ public class SessionManagerClustered extends SessionManager
 			return;
 		} // end of if (pc.isCommand())
 		XMPPResourceConnection conn = getXMPPResourceConnection(packet);
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Ressource connection found: " + conn);
+		}
 		if (conn == null
 			&& (isBrokenPacket(packet) || processAdminsOrDomains(packet)
 				|| sendToNextNode(packet))) {
@@ -192,8 +197,21 @@ public class SessionManagerClustered extends SessionManager
 				} else {
 					// Ignoring this, nothing special to do.
 					if (log.isLoggable(Level.FINEST)) {
-						log.finest("Ignoring USER_CONNECTED for: " + userId +
-										", from: " + packet.getElemFrom());
+						if (session == null) {
+							log.finest("Ignoring USER_INITIAL_PRESENCE for: " + userId +
+											", from: " + packet.getElemFrom() +
+											", there is no other session for the user on this node.");
+						} else {
+							if (session.getResourceForResource(resource) != null) {
+								log.finest("Ignoring USER_INITIAL_PRESENCE for: " + userId +
+												", from: " + packet.getElemFrom() +
+												", there is already a session on this node for this resource.");
+							} else {
+								log.finest("Ignoring USER_INITIAL_PRESENCE for: " + userId +
+												", from: " + packet.getElemFrom() +
+												", reason unknown, please contact devs.");
+							}
+						}
 					}
 				}
 			}
@@ -305,8 +323,7 @@ public class SessionManagerClustered extends SessionManager
 	}
 
 	protected boolean sendToNextNode(Packet packet) {
-		String userId = JIDUtils.getNodeID(packet.getElemTo());
-		String cluster_node = getFirstClusterNode(userId);
+		String cluster_node = getFirstClusterNode(packet.getElemTo());
 		if (cluster_node != null) {
 			String sess_man_id = getComponentId();
 			ClusterElement clel = new ClusterElement(sess_man_id, cluster_node,
@@ -402,13 +419,15 @@ public class SessionManagerClustered extends SessionManager
 		sendToAdmins(p_msg);
 	}
 
-	protected String getFirstClusterNode(String userId) {
+	protected String getFirstClusterNode(String userJid) {
 		String cluster_node = null;
-		List<String> nodes = strategy.getNodesForJid(userId);
-		for (String node: nodes) {
-			if (!node.equals(getComponentId())) {
-				cluster_node = node;
-				break;
+		List<String> nodes = strategy.getNodesForJid(userJid);
+		if (nodes != null) {
+			for (String node : nodes) {
+				if (!node.equals(getComponentId())) {
+					cluster_node = node;
+					break;
+				}
 			}
 		}
 		return cluster_node;
@@ -613,6 +632,17 @@ public class SessionManagerClustered extends SessionManager
 
 	@Override
 	public void setClusterController(ClusterController cl_controller) {
+	}
+
+	/**
+	 *
+	 * @param level 
+	 * @return
+	 */
+	@Override
+	public void getStatistics(StatisticsList list) {
+		super.getStatistics(list);
+		strategy.getStatistics(list);
 	}
 
 }

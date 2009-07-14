@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.List;
 import java.util.Queue;
 import java.util.LinkedHashMap;
-import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -46,11 +45,11 @@ import tigase.util.Algorithms;
 import tigase.util.JIDUtils;
 import tigase.util.DNSResolver;
 import tigase.xml.Element;
-import tigase.xmpp.StanzaType;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.XMPPIOService;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.stats.StatRecord;
+import tigase.stats.StatisticsList;
 import tigase.util.TimeUtils;
 
 /**
@@ -586,21 +585,14 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 	}
 
 	@Override
-	public List<StatRecord> getStatistics() {
-		List<StatRecord> stats = super.getStatistics();
-		if (totalNodeDisconnects > 0) {
-			stats.add(new StatRecord(getName(), "Total disconnects", "long",
-							totalNodeDisconnects, Level.FINE));
-		} else {
-			stats.add(new StatRecord(getName(), "Total disconnects", "long",
-							totalNodeDisconnects, Level.FINEST));
-		}
+	public void getStatistics(StatisticsList list) {
+		super.getStatistics(list);
+		list.add(getName(), "Total disconnects", totalNodeDisconnects, Level.FINE);
 
-		stats.add(new StatRecord(getName(), "Last day disconnects", "array",
-				Arrays.toString(lastDay), Level.FINE));
-		stats.add(new StatRecord(getName(), "Last hour disconnects", "array",
-				Arrays.toString(lastHour), Level.FINE));
-		return stats;
+		list.add(getName(), "Last day disconnects", Arrays.toString(lastDay),
+						Level.FINE);
+		list.add(getName(), "Last hour disconnects", Arrays.toString(lastHour),
+						Level.FINE);
 	}
 	
 	@Override

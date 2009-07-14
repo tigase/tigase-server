@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import tigase.server.Packet;
+import tigase.stats.StatisticsList;
 
 /**
  * Created: May 2, 2009 4:36:03 PM
@@ -119,5 +120,35 @@ public interface ClusteringStrategyIfc {
 	 * user disconnection by the implementation.
 	 */
 	void userDisconnected(String jid, String node, Queue<Packet> results);
+
+	/**
+	 * This method returns <code>'true'</code> if it needs online users syncronization
+	 * upon the node connection to the cluster. Normally it should return <code>'false'</code>.
+	 *
+	 * It it return <code>'true'</code> then the synchronization starts. All online users
+	 * from all other nodes would sent in batches and the synchronization can take
+	 * any amount of time.
+	 * @return a boolean value whether synchronization is needed.
+	 */
+	boolean needsSync();
+
+	/**
+	 * If <code>needsSync()</code> returns <code>'true'</code> this method can be
+	 * called at any time. It normally would update online users in batches of 100
+	 * users for each node and the synchronization can take any time.
+	 *
+	 * If the list contains a String <code>'COMPLETED'</code> it means that synchronization
+	 * which the given node has been completed. No more syncOnline methods for this
+	 * node should be called after that unless the node re-connects.
+	 * @param jids is a list of user full JIDs which are connected to a given node.
+	 * @param node is a cluster node id which holds all the given user JIDs.
+	 */
+	void syncOnline(List<String> jids, String node);
+
+	/**
+	 * Add the strategy statistics to the List.
+	 * @param list
+	 */
+	void getStatistics(StatisticsList list);
 
 }

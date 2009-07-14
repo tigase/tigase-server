@@ -22,6 +22,9 @@
 
 package tigase.sys;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.OperatingSystemMXBean;
+import java.lang.management.ThreadMXBean;
 import java.util.Set;
 import tigase.monitor.MonitorRuntime;
 
@@ -32,6 +35,15 @@ import tigase.monitor.MonitorRuntime;
  * @version $Rev$
  */
 public abstract class TigaseRuntime {
+
+	protected static final long SECOND = 1000;
+	protected static final long MINUTE = 60*SECOND;
+	protected static final long HOUR = 60*MINUTE;
+
+	private int cpus = Runtime.getRuntime().availableProcessors();
+	private long prevUptime = 0;
+	private long prevCputime = 0;
+	private float cpuUsage = 0F;
 
 	public static TigaseRuntime getTigaseRuntime() {
 		return MonitorRuntime.getMonitorRuntime();
@@ -53,6 +65,88 @@ public abstract class TigaseRuntime {
 
 	public ResourceState getCPUState() {
 		return ResourceState.GREEN;
+	}
+
+	public long getProcessCPUTime() {
+		long result = 0;
+		OperatingSystemMXBean osMXBean = ManagementFactory.getOperatingSystemMXBean();
+		if (osMXBean instanceof com.sun.management.OperatingSystemMXBean) {
+			// The easy way if possible
+			com.sun.management.OperatingSystemMXBean sunOSMXBean =
+							(com.sun.management.OperatingSystemMXBean)osMXBean;
+			result = sunOSMXBean.getProcessCpuTime();
+		} else {
+			// The hard way...
+			ThreadMXBean thBean = ManagementFactory.getThreadMXBean();
+			for (long thid : thBean.getAllThreadIds()) {
+				result += thBean.getThreadCpuTime(thid);
+			}
+		}
+		return result;
+	}
+
+	public long getUptime() {
+		return ManagementFactory.getRuntimeMXBean().getUptime();
+	}
+
+	public String getUptimeString() {
+		long uptime = ManagementFactory.getRuntimeMXBean().getUptime();
+		long days = uptime / (24 * HOUR);
+		long hours = (uptime - (days * 24 * HOUR)) / HOUR;
+		long minutes = (uptime - (days * 24 * HOUR + hours * HOUR)) / MINUTE;
+		long seconds =
+			(uptime - (days * 24 * HOUR + hours * HOUR + minutes * MINUTE)) / SECOND;
+		StringBuilder sb = new StringBuilder();
+		sb.append(days > 0 ? days + " day, " : "");
+		sb.append(hours > 0 ? hours + " hour, " : "");
+		sb.append(minutes > 0 ? minutes + " min, " : "");
+		sb.append(seconds > 0 ? seconds + " sec" : "");
+		return sb.toString();
+	}
+
+	public int getCPUsNumber() {
+		return cpus;
+	}
+
+	public float getCPUUsage() {
+		long currCputime = -1;
+		long elapsedCpu = -1;
+		long currUptime = getUptime();
+		long elapsedTime = currUptime - prevUptime;
+		if (prevUptime > 0L && elapsedTime > 500L) {
+			currCputime = getProcessCPUTime();
+			elapsedCpu = currCputime - prevCputime;
+			cpuUsage = Math.min(99.99F, elapsedCpu / (elapsedTime * 10000F * cpus));
+		}
+    if (elapsedTime > 500L) {
+			prevUptime = currUptime;
+			prevCputime = currCputime;
+		}
+//		System.out.println("currUptime: " + currUptime +
+//						"- prevUptime: " + prevUptime + " = elapsedTime: " + elapsedTime +
+//						"\n, currCputime: " + currCputime +
+//						" - prevCputime: " + prevCputime + " = elapsedCpu: " + elapsedCpu);
+		return cpuUsage;
+	}
+
+	public double getLoadAverage() {
+		return ManagementFactory.getOperatingSystemMXBean().getSystemLoadAverage();
+	}
+
+	public int getThreadsNumber() {
+		return ManagementFactory.getThreadMXBean().getThreadCount();
+	}
+
+	public long getHeapMemMax() {
+		return ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getMax();
+	}
+
+	public long getHeapMemUsed() {
+		return ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed();
+	}
+
+	public float getHeapMemUsage() {
+		return (getHeapMemUsed() * 100F) / getHeapMemMax();
 	}
 
 }

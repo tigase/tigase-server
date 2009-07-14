@@ -37,8 +37,8 @@ public class StatRecord {
 
 	private StatisticType type = StatisticType.OTHER;
 	private Level level = Level.INFO;
-// 	private long longValue = -1;
-// 	private int intValue = -1;
+  private long longValue = -1;
+ 	private int intValue = -1;
 
 	private String description = null;
 	private String unit = null;
@@ -56,7 +56,7 @@ public class StatRecord {
 	 */
 	public StatRecord(String comp, StatisticType type, long value, Level level) {
 		this.type = type;
-		//		longValue = value;
+		this.longValue = value;
 		this.description = type.getDescription();
 		this.unit = type.getUnit();
 		this.value = "" + value;
@@ -66,7 +66,7 @@ public class StatRecord {
 
 	public StatRecord(String comp, StatisticType type, int value, Level level) {
 		this.type = type;
-		//intValue = value;
+		this.intValue = value;
 		this.description = type.getDescription();
 		this.unit = type.getUnit();
 		this.value = "" + value;
@@ -78,7 +78,7 @@ public class StatRecord {
 		Level level) {
 		this.description = description;
 		this.unit = unit;
-		//intValue = value;
+		this.intValue = value;
 		this.value = "" + value;
 		this.level = level;
 		this.component = comp;
@@ -98,7 +98,7 @@ public class StatRecord {
 		Level level) {
 		this.description = description;
 		this.unit = unit;
-		//longValue = value;
+		this.longValue = value;
 		this.value = "" + value;
 		this.level = level;
 		this.component = comp;
@@ -139,6 +139,14 @@ public class StatRecord {
 
 	public String getComponent() {
 		return component;
+	}
+
+	public long getLongValue() {
+		return this.longValue;
+	}
+
+	public int getIntValue() {
+		return this.intValue;
 	}
 
 	@Override

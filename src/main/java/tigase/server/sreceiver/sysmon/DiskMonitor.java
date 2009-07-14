@@ -34,6 +34,7 @@ import java.util.Queue;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import tigase.server.Packet;
+import tigase.stats.StatisticsList;
 import tigase.util.OSUtils;
 
 /**
@@ -50,7 +51,7 @@ public class DiskMonitor extends AbstractMonitor {
 	private File[] roots = null;
 
 	@Override
-	public void init(String jid, double treshold, SystemMonitorTask smTask) {
+	public void init(String jid, float treshold, SystemMonitorTask smTask) {
 		super.init(jid, treshold, smTask);
 		roots = File.listRoots();
 		findAllRoots();
@@ -192,6 +193,11 @@ public class DiskMonitor extends AbstractMonitor {
 	@Override
 	public void destroy() {
 		// Nothing to destroy....
+	}
+
+	@Override
+	public void getStatistics(StatisticsList list) {
+    super.getStatistics(list);
 	}
 
 }

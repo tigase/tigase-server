@@ -40,6 +40,7 @@ import tigase.server.Permissions;
 import tigase.server.ServerComponent;
 import tigase.stats.StatRecord;
 import tigase.stats.StatisticsContainer;
+import tigase.stats.StatisticsList;
 import tigase.util.JIDUtils;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
@@ -387,19 +388,17 @@ public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
 	}
 
 	@Override
-	public List<StatRecord> getStatistics() {
-		List<StatRecord> stats = new LinkedList<StatRecord>();
-		stats.add(new StatRecord(getName(), "Number of VHosts", "int",
-						repo.size(), Level.FINE));
-		stats.add(new StatRecord(getName(), "Checks: is local domain", "long",
-						isLocalDomainCalls, Level.FINER));
-		stats.add(new StatRecord(getName(), "Checks: is anonymous domain", "long",
-						isAnonymousEnabledCalls, Level.FINER));
-		stats.add(new StatRecord(getName(), "Get components for local domain", "long",
-						getComponentsForLocalDomainCalls, Level.FINER));
-		stats.add(new StatRecord(getName(), "Get components for non-local domain", "long",
-						getComponentsForNonLocalDomainCalls, Level.FINER));
-		return stats;
+	public void getStatistics(StatisticsList list) {
+		list.add(getName(), "Number of VHosts",
+						repo.size(), Level.FINE);
+		list.add(getName(), "Checks: is local domain",
+						isLocalDomainCalls, Level.FINER);
+		list.add(getName(), "Checks: is anonymous domain",
+						isAnonymousEnabledCalls, Level.FINER);
+		list.add(getName(), "Get components for local domain",
+						getComponentsForLocalDomainCalls, Level.FINER);
+		list.add(getName(), "Get components for non-local domain",
+						getComponentsForNonLocalDomainCalls, Level.FINER);
 	}
 
 	private void addCompletedVHostsField(Packet result) {

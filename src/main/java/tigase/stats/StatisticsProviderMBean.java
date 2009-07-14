@@ -56,18 +56,50 @@ public interface StatisticsProviderMBean
 
 	/**
 	 * Operation exposed for management
-	 * @param param0 Statistics level, 0 - All, 500 - Medium, 800 - Minimal
+	 * @param level Statistics level, 0 - All, 500 - Medium, 800 - Minimal
 	 * @return java.util.Map<String, String>
 	 */
-	public Map<String, String> getAllStats(int param0);
+	public Map<String, String> getAllStats(int level);
 
 	/**
 	 * Operation exposed for management
-	 * @param param0 The component name to provide statistics for
-	 * @param param1 Statistics level, 0 - All, 500 - Medium, 800 - Minimal
+	 * @param compName The component name to provide statistics for
+	 * @param level Statistics level, 0 - All, 500 - Medium, 800 - Minimal
 	 * @return java.util.Map<String, String>
 	 */
-	public Map<String, String> getComponentStats(String param0, int param1);
+	public Map<String, String> getComponentStats(String compName, int level);
+
+  public int getCPUsNumber();
+
+	public long getUptime();
+
+	public long getProcesCPUTime();
+
+	public int getConnectionsNumber();
+
+	public int getClusterCacheSize();
+
+	public int getQueueSize();
+
+	public long getQueueOverflow();
+
+	public long getPacketsNumber();
+
+	public long getClusterPackets();
+
+	public long getMessagesNumber();
+
+	public long getPresencesNumber();
+
+	public long getIQOtherNumber();
+
+	public long getIQAuthNumber();
+
+	public float getCPUUsage();
+
+	public float getHeapMemUsage();
+
+	public String getSystemDetails();
 	
 }
 

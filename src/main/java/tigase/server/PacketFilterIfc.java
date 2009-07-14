@@ -22,8 +22,7 @@
 
 package tigase.server;
 
-import java.util.List;
-import tigase.stats.StatRecord;
+import tigase.stats.StatisticsList;
 
 /**
  * Created: Jun 8, 2009 1:29:49 PM
@@ -37,6 +36,6 @@ public interface PacketFilterIfc {
 
 	boolean filter(Packet packet);
 
-	void getStatistics(List<StatRecord> stats);
+	void getStatistics(StatisticsList list);
 
 }

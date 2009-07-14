@@ -52,7 +52,7 @@ public class TigaseTracer {
 	private static final String DEF_DIR = "logs";
 	private static final long DEF_MAX_FILE_SIZE = 10000000;
 	private static final int DEF_FILES_COUNT = 5;
-	private static final String DEF_FILE_NAME = "trace.log";
+	private static final String DEF_FILE_NAME = "packet-tracing.log";
 
 	private static TigaseTracer instance = null;
 	private static CopyOnWriteArraySet<String> ips =

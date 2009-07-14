@@ -25,7 +25,6 @@ package tigase.stats;
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Queue;
 import java.util.logging.Level;
@@ -60,6 +59,9 @@ public class StatisticsCollector
 	extends AbstractComponentRegistrator<StatisticsContainer>
 	implements XMPPService, ShutdownHook {
 
+	public static final String STATISTICS_MBEAN_NAME =
+					"tigase.stats:type=StatisticsProvider";
+
   private static final Logger log =
 		Logger.getLogger("tigase.stats.StatisticsCollector");
 
@@ -82,7 +84,7 @@ public class StatisticsCollector
 		serviceEntity.addFeatures(CMD_FEATURES);
 		try {
 			StatisticsProvider sp = new StatisticsProvider(this);
-			String objName = "tigase.stats:type=StatisticsProvider";
+			String objName = STATISTICS_MBEAN_NAME;
 			ObjectName on = new ObjectName(objName);
 			ManagementFactory.getPlatformMBeanServer().registerMBean(sp, on);
 			Configurator.putMXBean(objName, sp);
@@ -118,33 +120,24 @@ public class StatisticsCollector
 	@Override
 	public void componentRemoved(StatisticsContainer component) {}
 
-	public List<StatRecord> getAllStats() {
-		return getAllStats(Level.ALL.intValue());
+	public StatisticsList getAllStats() {
+		StatisticsList list = new StatisticsList(Level.ALL);
+		getAllStats(list);
+		return list;
 	}
 
-	public List<StatRecord> getAllStats(int level) {
-		List<StatRecord> result = new ArrayList<StatRecord>();
+	public void getAllStats(StatisticsList list) {
 		for (StatisticsContainer comp : components.values()) {
-			result.addAll(getComponentStats(comp.getName(), level));
+			getComponentStats(comp.getName(), list);
 		}
-		return result;
 	}
 
-	public List<StatRecord> getComponentStats(String name, int level) {
+	public void getComponentStats(String name, StatisticsList list) {
 		List<StatRecord> result = null;
 		StatisticsContainer stats = components.get(name);
 		if (stats != null) {
-			result = stats.getStatistics();
-			if (result != null) {
-				for (Iterator<StatRecord> it = result.iterator(); it.hasNext();) {
-					StatRecord statRecord = it.next();
-					if (statRecord.getLevel().intValue() < level) {
-						it.remove();
-					}
-				}
-			}
+			stats.getStatistics(list);
 		}
-		return result;
 	}
 
 	public List<String> getComponentsNames() {
@@ -170,8 +163,8 @@ public class StatisticsCollector
 				ElementUtils.createIqQuery(packet.getElemTo(), packet.getElemFrom(),
 					StanzaType.result, packet.getElemId(), STATS_XMLNS);
 			Element query = iq.getChild("query");
-			List<StatRecord> stats = getAllStats();
-			if (stats != null && stats.size() > 0) {
+			StatisticsList stats = getAllStats();
+			if (stats != null) {
 				for (StatRecord record: stats) {
 					Element item = new Element("stat");
 					item.addAttribute("name", record.getComponent() + "/"
@@ -203,12 +196,12 @@ public class StatisticsCollector
 					log.finest("statsLevel parsed to: " + statsLevel.getName());
 				}
 			}
-			List<StatRecord> stats = null;
+			StatisticsList list = new StatisticsList(statsLevel);
 			if (packet.getStrCommand().equals("stats")) {
 				if (log.isLoggable(Level.FINEST)) {
 					log.finest("Getting all stats for level: " + statsLevel.getName());
 				}
-				stats = getAllStats(statsLevel.intValue());
+				getAllStats(list);
 				if (log.isLoggable(Level.FINEST)) {
 					log.finest("All stats for level loaded: " + statsLevel.getName());
 				}
@@ -218,15 +211,15 @@ public class StatisticsCollector
 					log.finest("Getting stats for component: " + spl[1] +
 									", level: " + statsLevel.getName());
 				}
-				stats = getComponentStats(spl[1], statsLevel.intValue());
+				getComponentStats(spl[1], list);
 				if (log.isLoggable(Level.FINEST)) {
 					log.finest("Stats loaded for component: " + spl[1] +
 									", level: " + statsLevel.getName());
 				}
 			}
 			Packet result = packet.commandResult(Command.DataType.form);
-			if (stats != null && stats.size() > 0) {
-				for (StatRecord rec: stats) {
+			if (list != null) {
+				for (StatRecord rec: list) {
 					if (rec.getType() == StatisticType.LIST) {
 						Command.addFieldMultiValue(result,
 										XMLUtils.escape(rec.getComponent() + "/" + rec.
@@ -295,7 +288,7 @@ public class StatisticsCollector
 
 	@Override
 	public String shutdown() {
-		List<StatRecord> allStats = getAllStats();
+		StatisticsList allStats = getAllStats();
 		StringBuilder sb = new StringBuilder();
 		for (StatRecord statRecord : allStats) {
 			sb.append(statRecord.toString()).append('\n');

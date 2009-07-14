@@ -237,9 +237,9 @@ public class ClusterElement {
 					List<String> cluster_nodes, String comp_id) {
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Calculating a next node from nodes: " +
-							cluster_nodes.toString());
+							(cluster_nodes != null ? cluster_nodes.toString() : "null"));
 		}
-		if (cluster_nodes.size() > 0) {
+		if (cluster_nodes != null && cluster_nodes.size() > 0) {
 			String next_node = null;
 			for (String cluster_node: cluster_nodes) {
 				if (!clel.isVisitedNode(cluster_node) && !cluster_node.equals(comp_id)) {

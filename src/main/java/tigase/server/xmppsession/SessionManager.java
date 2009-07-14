@@ -66,6 +66,7 @@ import tigase.server.Permissions;
 import tigase.server.ReceiverEventHandler;
 import tigase.server.XMPPServer;
 import tigase.stats.StatRecord;
+import tigase.stats.StatisticsList;
 import tigase.sys.OnlineJidsReporter;
 import tigase.sys.TigaseRuntime;
 import tigase.util.JIDUtils;
@@ -1466,82 +1467,58 @@ public class SessionManager extends AbstractMessageReceiver
 	}
 
 	@Override
-	public List<StatRecord> getStatistics() {
-		List<StatRecord> stats = super.getStatistics();
-		stats.add(new StatRecord(getName(), "Registered accounts", "long",
-				user_repository.getUsersCount(), Level.FINEST));
-		stats.add(new StatRecord(getName(), "Open user connections", "int",
-				connectionsByFrom.size(), Level.INFO));
-		stats.add(new StatRecord(getName(), "Maximum user connections", "int",
-				maxUserConnections, Level.INFO));
-		stats.add(new StatRecord(getName(), "Total user connections", "long",
-				totalUserConnections, Level.FINER));
-		stats.add(new StatRecord(getName(), "Closed user connections", "long",
-				closedConnections, Level.FINER));
-		stats.add(new StatRecord(getName(), "Open user sessions", "int",
-				sessionsByNodeId.size(), Level.FINE));
-		stats.add(new StatRecord(getName(), "Maximum user sessions", "int",
-				maxUserSessions, Level.FINE));
-		stats.add(new StatRecord(getName(), "Total user sessions", "long",
-				totalUserSessions, Level.FINER));
-		if (authTimeouts > 0) {
-			stats.add(new StatRecord(getName(), "Authentication timouts", "long",
-							authTimeouts, Level.INFO));
-		} else {
-			stats.add(new StatRecord(getName(), "Authentication timouts", "long",
-							authTimeouts, Level.FINEST));
+	public void getStatistics(StatisticsList list) {
+		super.getStatistics(list);
+		if (list.checkLevel(Level.FINEST)) {
+			list.add(getName(), "Registered accounts",
+							user_repository.getUsersCount(), Level.FINEST);
 		}
+		list.add(getName(), "Open user connections",
+				connectionsByFrom.size(), Level.INFO);
+		list.add(getName(), "Maximum user connections",
+				maxUserConnections, Level.INFO);
+		list.add(getName(), "Total user connections",
+				totalUserConnections, Level.FINER);
+		list.add(getName(), "Closed user connections",
+						closedConnections, Level.FINER);
+		list.add(getName(), "Open user sessions",
+				sessionsByNodeId.size(), Level.FINE);
+		list.add(getName(), "Maximum user sessions",
+				maxUserSessions, Level.FINE);
+		list.add(getName(), "Total user sessions",
+				totalUserSessions, Level.FINER);
+		list.add(getName(), "Authentication timouts",
+						authTimeouts, Level.INFO);
 		for (Map.Entry<String, ProcessingThreads<ProcessorWorkerThread>> procent : processors.entrySet()) {
 			ProcessingThreads<ProcessorWorkerThread> proc = procent.getValue();
-			if (proc.getTotalQueueSize() > 0 || proc.getDroppedPackets() > 0) {
-				stats.add(new StatRecord(getName(), "Processor: " + procent.getKey(),
-								"String", "Queue: " + proc.getTotalQueueSize() +
+			if (list.checkLevel(Level.INFO, proc.getTotalQueueSize() + proc.getDroppedPackets())) {
+				list.add(getName(), "Processor: " + procent.getKey(),
+								"Queue: " + proc.getTotalQueueSize() +
 								", AvTime: " + proc.getAverageProcessingTime() +
 								", Runs: " + proc.getTotalRuns() + ", Lost: " + proc.getDroppedPackets(),
-								Level.INFO));
-			} else {
-				stats.add(new StatRecord(getName(), "Processor: " + procent.getKey(),
-								"String", "Queue: " + proc.getTotalQueueSize() +
-								", AvTime: " + proc.getAverageProcessingTime() +
-								", Runs: " + proc.getTotalRuns() + ", Lost: " + proc.getDroppedPackets(),
-								Level.FINEST));
+								Level.INFO);
 			}
 		}
-		if (sessionCloseThread.getTotalQueueSize() > 0 || sessionCloseThread.getDroppedPackets() > 0) {
-			stats.add(new StatRecord(getName(), "Processor: " +
+		if (list.checkLevel(Level.INFO,
+						sessionCloseThread.getTotalQueueSize() + sessionCloseThread.getDroppedPackets())) {
+			list.add(getName(), "Processor: " +
 							sessionCloseThread.getName(),
-							"String", "Queue: " + sessionCloseThread.getTotalQueueSize() +
+							"Queue: " + sessionCloseThread.getTotalQueueSize() +
 							", AvTime: " + sessionCloseThread.getAverageProcessingTime() +
 							", Runs: " + sessionCloseThread.getTotalRuns() + ", Lost: " +
 							sessionCloseThread.getDroppedPackets(),
-							Level.INFO));
-		} else {
-			stats.add(new StatRecord(getName(), "Processor: " +
-							sessionCloseThread.getName(),
-							"String", "Queue: " + sessionCloseThread.getTotalQueueSize() +
-							", AvTime: " + sessionCloseThread.getAverageProcessingTime() +
-							", Runs: " + sessionCloseThread.getTotalRuns() + ", Lost: " +
-							sessionCloseThread.getDroppedPackets(),
-							Level.FINEST));
+							Level.INFO);
 		}
-		if (sessionOpenThread.getTotalQueueSize() > 0 || sessionOpenThread.getDroppedPackets() > 0) {
-			stats.add(new StatRecord(getName(), "Processor: " +
+		if (list.checkLevel(Level.INFO,
+						sessionOpenThread.getTotalQueueSize() + sessionOpenThread.getDroppedPackets())) {
+			list.add(getName(), "Processor: " +
 							sessionOpenThread.getName(),
-							"String", "Queue: " + sessionOpenThread.getTotalQueueSize() +
+							"Queue: " + sessionOpenThread.getTotalQueueSize() +
 							", AvTime: " + sessionOpenThread.getAverageProcessingTime() +
 							", Runs: " + sessionOpenThread.getTotalRuns() + ", Lost: " +
 							sessionOpenThread.getDroppedPackets(),
-							Level.INFO));
-		} else {
-			stats.add(new StatRecord(getName(), "Processor: " +
-							sessionOpenThread.getName(),
-							"String", "Queue: " + sessionOpenThread.getTotalQueueSize() +
-							", AvTime: " + sessionOpenThread.getAverageProcessingTime() +
-							", Runs: " + sessionOpenThread.getTotalRuns() + ", Lost: " +
-							sessionOpenThread.getDroppedPackets(),
-							Level.FINEST));
+							Level.INFO);
 		}
-		return stats;
 	}
 
 	@Override

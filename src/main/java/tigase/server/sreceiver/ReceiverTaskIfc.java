@@ -26,6 +26,7 @@ import java.util.Queue;
 import java.util.List;
 import tigase.server.Packet;
 import tigase.stats.StatRecord;
+import tigase.stats.StatisticsList;
 
 /**
  * This is <code>StanzaReceiver</code> task which can receive XMPP packets
@@ -212,5 +213,7 @@ public interface ReceiverTaskIfc {
 	void removeSubscribers(Queue<Packet> results, String... subscr);
 
 	void setRosterItemModerationAccepted(RosterItem ri, boolean accepted);
+
+	void getStatistics(StatisticsList list);
 
 } // ReceiverTaskIfc

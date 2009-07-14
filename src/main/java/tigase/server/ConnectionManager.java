@@ -47,6 +47,7 @@ import tigase.net.IOService;
 import tigase.net.SocketReadThread;
 import tigase.net.SocketType;
 import tigase.stats.StatRecord;
+import tigase.stats.StatisticsList;
 import tigase.util.JIDUtils;
 import tigase.util.Numbers;
 import tigase.xmpp.XMPPIOService;
@@ -632,47 +633,17 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 	}
 
 	@Override
-	public List<StatRecord> getStatistics() {
-		List<StatRecord> stats = super.getStatistics();
-		if (services.size() > 0) {
-			stats.add(new StatRecord(getName(), "Open connections", "int",
-							services.size(), Level.INFO));
-		} else {
-			stats.add(new StatRecord(getName(), "Open connections", "int",
-							services.size(), Level.FINEST));
-		}
+	public void getStatistics(StatisticsList list) {
+		super.getStatistics(list);
+		list.add(getName(), "Open connections", services.size(), Level.INFO);
 		int waitingToSendSize = 0;
 		for (XMPPIOService serv : services.values()) {
 			waitingToSendSize += serv.waitingToSendSize();
 		}
-		if (waitingToSendSize > 0) {
-			stats.add(new StatRecord(getName(), "Waiting to send", "int",
-							waitingToSendSize, Level.FINE));
-		} else {
-			stats.add(new StatRecord(getName(), "Waiting to send", "int",
-							waitingToSendSize, Level.FINEST));
-		}
-		if (watchdogRuns > 0) {
-			stats.add(new StatRecord(getName(), "Watchdog runs", "long",
-							watchdogRuns, Level.FINER));
-		} else {
-			stats.add(new StatRecord(getName(), "Watchdog runs", "long",
-							watchdogRuns, Level.FINEST));
-		}
-		if (watchdogTests > 0) {
-			stats.add(new StatRecord(getName(), "Watchdog tests", "long",
-							watchdogTests, Level.FINE));
-		} else {
-			stats.add(new StatRecord(getName(), "Watchdog tests", "long",
-							watchdogTests, Level.FINEST));
-		}
-		if (watchdogStopped > 0) {
-			stats.add(new StatRecord(getName(), "Watchdog stopped", "long",
-							watchdogStopped, Level.FINE));
-		} else {
-			stats.add(new StatRecord(getName(), "Watchdog stopped", "long",
-							watchdogStopped, Level.FINEST));
-		}
+		list.add(getName(), "Waiting to send", waitingToSendSize, Level.FINE);
+		list.add(getName(), "Watchdog runs", watchdogRuns, Level.FINER);
+		list.add(getName(), "Watchdog tests", watchdogTests, Level.FINE);
+		list.add(getName(), "Watchdog stopped", watchdogStopped, Level.FINE);
 // 		StringBuilder sb = new StringBuilder("All connected: ");
 // 		for (IOService serv: services.values()) {
 // 			sb.append("\nService ID: " + getUniqueId(serv)
@@ -682,7 +653,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 // 				+ ", connection-type: " + serv.connectionType());
 // 		}
 // 		log.finest(sb.toString());
-		return stats;
 	}
 
 	protected abstract IO getXMPPIOServiceInstance();

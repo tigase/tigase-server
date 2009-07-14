@@ -26,14 +26,23 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.server.Packet;
+import tigase.stats.StatisticsList;
+import tigase.sys.TigaseRuntime;
 
 /**
  * Created: Dec 10, 2008 12:27:15 PM
@@ -50,19 +59,26 @@ public class CPUMonitor extends AbstractMonitor {
 					Logger.getLogger(CPUMonitor.class.getName());
 
 	private int historySize = 100;
-	private long lastCpuUsage = 0;
-	private long lastCpuChecked = 0;
-	private double[] cpuUsage = new double[historySize];
+	private long prevUptime = TigaseRuntime.getTigaseRuntime().getUptime();;
+	private long prevCputime = TigaseRuntime.getTigaseRuntime().getProcessCPUTime();
+
+//	private long lastCpuUsage = 0;
+//	private long lastCpuChecked = 0;
+	private float[] cpuUsage = new float[historySize];
 	private int cpuUsageIdx = 0;
 	private double[] loadAverage = new double[historySize];
 	private int loadAverageIdx = 0;
 	private ThreadMXBean thBean = null;
 	private OperatingSystemMXBean osBean = null;
-	private NumberFormat format = NumberFormat.getPercentInstance();
+	private NumberFormat format = NumberFormat.getNumberInstance();
+	private Map<Long, ThreadData> threads =
+					new LinkedHashMap<Long, ThreadData>();
+	private int deadLockedThreadsNo = 0;
 
 	private String checkForDeadLock() {
 		long[] tids = thBean.findDeadlockedThreads();
 		if (tids != null && tids.length > 0) {
+			deadLockedThreadsNo = tids.length;
 			StringBuilder sb = new StringBuilder();
 			sb.append("Locked threads " + tids.length + ":\n");
 			Set<Long> tidSet = new LinkedHashSet<Long>();
@@ -132,13 +148,13 @@ public class CPUMonitor extends AbstractMonitor {
 		ThreadInfo ti = thBean.getThreadInfo(thid);
 		if (ti != null) {
 			Map<Thread, StackTraceElement[]> map = Thread.getAllStackTraces();
-			long maxCpu = thBean.getThreadCpuTime(thid);
-			double totalUsage = (new Long(maxCpu).doubleValue() / 1000000) /
-							new Long(System.currentTimeMillis()).doubleValue();
 			StringBuilder sb =
 							new StringBuilder("Thread: " + ti.getThreadName() +
 							", ID: " + ti.getThreadId());
-			sb.append(", CPU usage: " + format.format(totalUsage) + "\n");
+			ThreadData td = threads.get(thid);
+			if (td != null) {
+				sb.append(", CPU usage: " + format.format(td.cpuUse) + "%\n");
+			}
 			if (stack) {
 				sb.append(ti.toString());
 				sb.append(getStackTrace(map, thid));
@@ -163,15 +179,12 @@ public class CPUMonitor extends AbstractMonitor {
 						return "Incorrect Thread ID";
 					}
 				}
-				long maxCpu = 0;
-				long id = 0;
-				for (long thid : thBean.getAllThreadIds()) {
-					if (thBean.getThreadCpuTime(thid) >= maxCpu) {
-						maxCpu = thBean.getThreadCpuTime(thid);
-						id = thid;
-					}
+				List<ThreadData> sorted = sortThreadCPUUse();
+        if (sorted.size() > 0) {
+					return getThreadInfo(sorted.get(0).id, true);
+				} else {
+					return "No max threads info yet.";
 				}
-				return getThreadInfo(id, true);
 			case allthreads:
 				boolean extend = false;
 				if (com.length > 1 && com[1].equals("ex")) {
@@ -184,6 +197,26 @@ public class CPUMonitor extends AbstractMonitor {
 				return sb.toString();
 		}
 		return null;
+	}
+
+	private List<ThreadData> sortThreadCPUUse() {
+		ArrayList<ThreadData> list =
+						new ArrayList<ThreadData>(threads.values());
+		Collections.sort(list, new Comparator<ThreadData>() {
+
+			@Override
+			public int compare(ThreadData o1, ThreadData o2) {
+				if (o1.cpuUse < o2.cpuUse) {
+					return 1;
+				}
+				if (o1.cpuUse > o2.cpuUse) {
+					return -1;
+				}
+				return 0;
+			}
+
+		});
+		return list;
 	}
 
 	@Override
@@ -208,11 +241,15 @@ public class CPUMonitor extends AbstractMonitor {
 	}
 
 	@Override
-	public void init(String jid, double treshold, SystemMonitorTask smTask) {
+	public void init(String jid, float treshold, SystemMonitorTask smTask) {
 		super.init(jid, treshold, smTask);
 		thBean = ManagementFactory.getThreadMXBean();
 		osBean = ManagementFactory.getOperatingSystemMXBean();
-		format.setMaximumFractionDigits(2);
+		format.setMaximumFractionDigits(1);
+//		if (format instanceof DecimalFormat) {
+//			DecimalFormat decf = (DecimalFormat)format;
+//			decf.applyPattern(decf.toPattern()+"%");
+//		}
 		if (thBean.isCurrentThreadCpuTimeSupported()) {
 			thBean.setThreadCpuTimeEnabled(true);
 		} else {
@@ -227,28 +264,25 @@ public class CPUMonitor extends AbstractMonitor {
 
 	@Override
 	public void check10Secs(Queue<Packet> results) {
-		long cpuTime = 0;
-		for (long thid : thBean.getAllThreadIds()) {
-			cpuTime += thBean.getThreadCpuTime(thid);
-		}
-		long tmpCPU = lastCpuUsage;
-		lastCpuUsage = cpuTime;
-		cpuTime -= tmpCPU;
-		double totalUsage = (new Long(cpuTime).doubleValue() / 1000000) /
-						new Long(System.currentTimeMillis() - lastCpuChecked).doubleValue();
-		lastCpuChecked = System.currentTimeMillis();
-		cpuUsageIdx = setValueInArr(cpuUsage, cpuUsageIdx, totalUsage);
+		long currUptime = TigaseRuntime.getTigaseRuntime().getUptime();
+		long currCputime = TigaseRuntime.getTigaseRuntime().getProcessCPUTime();
+		float cpuUse = calcCPUUse(prevUptime, currUptime, prevCputime, currCputime,
+						TigaseRuntime.getTigaseRuntime().getCPUsNumber());
+		prevUptime = currUptime;
+		prevCputime = currCputime;
+		cpuUsageIdx = setValueInArr(cpuUsage, cpuUsageIdx, cpuUse);
 		loadAverageIdx = setValueInArr(loadAverage, loadAverageIdx,
 						osBean.getSystemLoadAverage());
-		if ((totalUsage > treshold) && (recentCpu(6) > treshold)) {
-			prepareWarning("High CPU usage, current: " + format.format(totalUsage) +
-							", last minute: " +
-							format.format(recentCpu(6)), results, this);
+		float thresh = treshold * 100;
+		if ((cpuUse > thresh) && (recentCpu(6) > thresh)) {
+			prepareWarning("High CPU usage, current: " + format.format(cpuUse) +
+							"%, last minute: " +
+							format.format(recentCpu(6)) + "%", results, this);
 		} else {
-			if (totalUsage < (treshold * 0.75)) {
+			if (cpuUse < (thresh * 0.75)) {
 				prepareCalmDown("CPU usage is now low again, current: " +
-								format.format(totalUsage) + ", last minute: " +
-								format.format(recentCpu(6)), results, this);
+								format.format(cpuUse) + "%, last minute: " +
+								format.format(recentCpu(6)) + "%", results, this);
 			}
 		}
 		String result = checkForDeadLock();
@@ -256,6 +290,7 @@ public class CPUMonitor extends AbstractMonitor {
 			System.out.println("Dead-locked threads:\n" + result);
 			prepareWarning("Dead-locked threads:\n" + result, results, this);
 		}
+		updateThreadCPUUse();
 	}
 
 	private double recentCpu(int histCheck) {
@@ -280,13 +315,87 @@ public class CPUMonitor extends AbstractMonitor {
 		NumberFormat formd = NumberFormat.getNumberInstance();
 		formd.setMaximumFractionDigits(4);
 		return "Current CPU usage is: " + format.format(cpuUsage[idx]) +
-						", Last minute CPU usage is: " + format.format(recentCpu(6)) +
-						", Load average is: " + formd.format(loadAverage[idx]) + "\n";
+						"%, Last minute CPU usage is: " + format.format(recentCpu(6)) +
+						"%, Load average is: " + formd.format(loadAverage[idx]) + "\n";
 	}
 
 	@Override
 	public void destroy() {
 		// Nothing to destroy
+	}
+
+	private static final String CPU_MON = "cpu-mon";
+
+	@Override
+	public void getStatistics(StatisticsList list) {
+    super.getStatistics(list);
+		list.add(CPU_MON, "Deadlocked threads no", deadLockedThreadsNo, Level.INFO);
+		List<ThreadData> sorted = sortThreadCPUUse();
+		if (sorted.size() > 0) {
+			ThreadData td = sorted.get(0);
+			list.add(CPU_MON, "1st max CPU thread",
+							td.name + ": " + format.format(td.cpuUse) + "%", Level.INFO);
+		}
+		if (sorted.size() > 1) {
+			ThreadData td = sorted.get(1);
+			list.add(CPU_MON, "2nd max CPU thread",
+							td.name + ": " + format.format(td.cpuUse) + "%", Level.FINE);
+		}
+		if (sorted.size() > 2) {
+			ThreadData td = sorted.get(2);
+			list.add(CPU_MON, "3rd max CPU thread",
+							td.name + ": " + format.format(td.cpuUse) + "%", Level.FINER);
+		}
+		if (sorted.size() > 3) {
+			ThreadData td = sorted.get(3);
+			list.add(CPU_MON, "4th max CPU thread",
+							td.name + ": " + format.format(td.cpuUse) + "%", Level.FINEST);
+		}
+	}
+
+	public float calcCPUUse(long prevUptime, long currUptime, long prevCputime,
+					long currCputime, int cpus) {
+		long elapsedTime = currUptime - prevUptime;
+		long elapsedCpu = currCputime - prevCputime;
+		return Math.min(99.99F, elapsedCpu / (elapsedTime * 10000F * cpus));
+	}
+
+	private void updateThreadCPUUse() {
+		long currUptime = TigaseRuntime.getTigaseRuntime().getUptime();
+    long[] allIds = thBean.getAllThreadIds();
+		for (long l : allIds) {
+			ThreadData td = threads.get(l);
+			if (td == null) {
+				ThreadInfo ti = thBean.getThreadInfo(l);
+				td = new ThreadData();
+				td.id = l;
+				td.name = ti.getThreadName();
+				td.prevCputime = thBean.getThreadCpuTime(l);
+				td.prevUptime = currUptime;
+				threads.put(l, td);
+			} else {
+        long currCputime = thBean.getThreadCpuTime(l);
+				if ((currCputime) > 0) {
+					td.cpuUse = calcCPUUse(td.prevUptime, currUptime, td.prevCputime,
+									currCputime, 1);
+//					System.out.println(td.name + " - td.prevUptime: " + td.prevUptime +
+//									", currUptime: " + currUptime +
+//									", td.prevCputime: " + td.prevCputime +
+//									", currCputime: " + currCputime +
+//									", td.cpuUse: " + td.cpuUse);
+				}
+				td.prevCputime = currCputime;
+				td.prevUptime = currUptime;
+			}
+		}
+	}
+
+	private class ThreadData {
+		long id = 0;
+		String name = "";
+		float cpuUse = 0F;
+		long prevUptime = 0;
+		long prevCputime = 0;
 	}
 
 }

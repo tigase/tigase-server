@@ -53,6 +53,7 @@ import tigase.xmpp.XMPPIOService;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.stats.StatRecord;
+import tigase.stats.StatisticsList;
 
 /**
  * Class ServerConnectionManagerOLD
@@ -597,46 +598,6 @@ public class ServerConnectionManagerOLD extends ConnectionManager<XMPPIOService>
 			// Do nothing, more data should come soon...
 			break;
 		} // end of switch (service.connectionType())
-	}
-
-	@Override
-	public List<StatRecord> getStatistics() {
-		List<StatRecord> stats = super.getStatistics();
-		stats.add(new StatRecord(getName(), "Open s2s connections", "int",
-				servicesByHost_Type.size(), Level.INFO));
-		int waiting = 0;
-		for (Queue<Packet> q: waitingPackets.values()) {
-			waiting += q.size();
-		}
-		stats.add(new StatRecord(getName(), "Packets queued", "int",
-				waiting, Level.INFO));
-		stats.add(new StatRecord(getName(), "Connecting s2s connections", "int",
-				connectingByHost_Type.size(), Level.FINE));
-		stats.add(new StatRecord(getName(), "Handshaking s2s connections", "int",
-				handshakingByHost_Type.size(), Level.FINER));
-// 		StringBuilder sb = new StringBuilder("Handshaking: ");
-// 		for (IOService serv: handshakingByHost_Type.values()) {
-// 			sb.append("\nService ID: " + getUniqueId(serv)
-// 				+ ", local-hostname: " + serv.getSessionData().get("local-hostname")
-// 				+ ", remote-hostname: " + serv.getSessionData().get("remote-hostname")
-// 				+ ", is-connected: " + serv.isConnected()
-// 				+ ", connection-type: " + serv.connectionType());
-// 		}
-// 		log.finest(sb.toString());
-		LinkedList<String> waiting_qs = new LinkedList<String>();
-		for (Map.Entry<String, ServerPacketQueue> entry: waitingPackets.entrySet()) {
-			if (entry.getValue().size() > 0) {
-				waiting_qs.add(entry.getKey() + ":  " + entry.getValue().size());
-			}
-		}
-		if (waiting_qs.size() > 0) {
-			stats.add(new StatRecord(getName(), "Packets queued for each connection",
-					waiting_qs,	Level.FINER));
-		}
-		ArrayList<String> all_s2s = new ArrayList<String>(servicesByHost_Type.keySet());
-		Collections.sort(all_s2s);
-		stats.add(new StatRecord(getName(), "s2s connections", all_s2s,	Level.FINEST));
-		return stats;
 	}
 
 	@Override

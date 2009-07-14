@@ -34,6 +34,7 @@ import java.util.logging.Logger;
 import javax.management.Notification;
 import javax.management.NotificationEmitter;
 import javax.management.NotificationListener;
+import tigase.stats.StatisticsList;
 
 /**
  * Created: Dec 10, 2008 1:23:17 PM
@@ -62,7 +63,7 @@ public class MemMonitor extends AbstractMonitor
 	}
 
 	@Override
-	public void init(String jid, double treshold, SystemMonitorTask smTask) {
+	public void init(String jid, float treshold, SystemMonitorTask smTask) {
 		super.init(jid, treshold, smTask);
 		memoryMXBean = ManagementFactory.getMemoryMXBean();
 		NotificationEmitter emitter = (NotificationEmitter)memoryMXBean;
@@ -152,6 +153,11 @@ public class MemMonitor extends AbstractMonitor
 			}
 		}
 		return sb.toString();
+	}
+
+	@Override
+	public void getStatistics(StatisticsList list) {
+    super.getStatistics(list);
 	}
 
 }

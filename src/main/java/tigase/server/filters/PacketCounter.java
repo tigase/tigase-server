@@ -31,7 +31,7 @@ import java.util.logging.Logger;
 import tigase.server.Packet;
 import tigase.server.PacketFilterIfc;
 import tigase.server.QueueType;
-import tigase.stats.StatRecord;
+import tigase.stats.StatisticsList;
 import tigase.xml.Element;
 
 /**
@@ -116,22 +116,13 @@ public class PacketCounter implements PacketFilterIfc {
 	}
 
 	@Override
-	public void getStatistics(List<StatRecord> stats) {
-		if (msgCounter > 0) {
-			stats.add(new StatRecord(name, qType.name() + " messages", "long",
-							msgCounter, Level.FINEST));
-		}
-		if (presCounter > 0) {
-			stats.add(new StatRecord(name, qType.name() + " presences", "long",
-							presCounter, Level.FINEST));
-		}
-		if (iqCounters[0] > 0) {
-			stats.add(new StatRecord(name, qType.name() + " IQ no XMLNS", "long",
-							iqCounters[0], Level.FINEST));
-		}
+	public void getStatistics(StatisticsList list) {
+		list.add(name, qType.name() + " messages", msgCounter, Level.FINER);
+		list.add(name, qType.name() + " presences",	presCounter, Level.FINER);
+		list.add(name, qType.name() + " IQ no XMLNS", iqCounters[0], Level.FINEST);
 		for (Entry<String, Integer> iqCounter : iqCounterIdx.entrySet()) {
-			stats.add(new StatRecord(name, qType.name() + " IQ " + iqCounter.getKey(),
-							"long", iqCounters[iqCounter.getValue()], Level.FINEST));
+			list.add(name, qType.name() + " IQ " + iqCounter.getKey(),
+							iqCounters[iqCounter.getValue()], Level.FINEST);
 		}
 	}
 

@@ -43,6 +43,7 @@ import tigase.server.filters.PacketCounter;
 import tigase.stats.StatRecord;
 import tigase.stats.StatisticType;
 import tigase.stats.StatisticsContainer;
+import tigase.stats.StatisticsList;
 import tigase.util.JIDUtils;
 import tigase.util.DNSResolver;
 import tigase.util.PriorityQueue;
@@ -301,45 +302,16 @@ public abstract class AbstractMessageReceiver
   public abstract void processPacket(Packet packet);
 
 	@Override
-  public List<StatRecord> getStatistics() {
-    List<StatRecord> stats = new LinkedList<StatRecord>();
+  public void getStatistics(StatisticsList list) {
 		long tmp = seconds[(sec_idx == 0 ? 59 : sec_idx - 1)];
-		if (tmp > 0) {
-			stats.add(new StatRecord(getName(), "Last second packets", "int",
-							tmp, Level.FINE));
-		} else {
-			stats.add(new StatRecord(getName(), "Last second packets", "int",
-							tmp, Level.FINEST));
-		}
+		list.add(getName(), "Last second packets", tmp, Level.FINE);
 		tmp = minutes[(min_idx == 0 ? 59 : min_idx - 1)];
-		if (tmp > 0) {
-			stats.add(new StatRecord(getName(), "Last minute packets", "int",
-							tmp, Level.FINE));
-		} else {
-			stats.add(new StatRecord(getName(), "Last minute packets", "int",
-							tmp, Level.FINEST));
-		}
-		if (curr_hour > 0) {
-			stats.add(new StatRecord(getName(), "Last hour packets", "int",
-							curr_hour, Level.FINE));
-		} else {
-			stats.add(new StatRecord(getName(), "Last hour packets", "int",
-							curr_hour, Level.FINEST));
-		}
-		if (statReceivedPacketsOk > 0) {
-			stats.add(new StatRecord(getName(), StatisticType.MSG_RECEIVED_OK,
-							statReceivedPacketsOk, Level.FINE));
-		} else {
-			stats.add(new StatRecord(getName(), StatisticType.MSG_RECEIVED_OK,
-							statReceivedPacketsOk, Level.FINEST));
-		}
-		if (statSentPacketsOk > 0) {
-			stats.add(new StatRecord(getName(), StatisticType.MSG_SENT_OK,
-							statSentPacketsOk, Level.FINE));
-		} else {
-			stats.add(new StatRecord(getName(), StatisticType.MSG_SENT_OK,
-							statSentPacketsOk, Level.FINEST));
-		}
+		list.add(getName(), "Last minute packets", tmp, Level.FINE);
+		list.add(getName(), "Last hour packets", curr_hour, Level.FINE);
+		list.add(getName(), StatisticType.MSG_RECEIVED_OK.getDescription(),
+						statReceivedPacketsOk, Level.FINE);
+		list.add(getName(), StatisticType.MSG_SENT_OK.getDescription(),
+						statSentPacketsOk, Level.FINE);
 		int[] in_priority_sizes = in_queues.get(0).size();
 		for (int i = 1; i < in_queues.size(); i++) {
 			int[] tmp_pr_sizes = in_queues.get(i).size();
@@ -351,66 +323,38 @@ public abstract class AbstractMessageReceiver
 		int[] out_priority_sizes = out_queue.size();
 		int out_queue_size = 0;
 		for (Priority queue : Priority.values()) {
-			stats.add(new StatRecord(getName(), "In queue: " + queue.name(), "int",
-							in_priority_sizes[queue.ordinal()], Level.FINEST));
-			stats.add(new StatRecord(getName(), "Out queue: " + queue.name(), "int",
-							out_priority_sizes[queue.ordinal()], Level.FINEST));
+			list.add(getName(), "In queue: " + queue.name(),
+							in_priority_sizes[queue.ordinal()], Level.FINEST);
+			list.add(getName(), "Out queue: " + queue.name(),
+							out_priority_sizes[queue.ordinal()], Level.FINEST);
 			in_queue_size += in_priority_sizes[queue.ordinal()];
 			out_queue_size += out_priority_sizes[queue.ordinal()];
 		}
-		if (in_queue_size > 10) {
-			stats.add(new StatRecord(getName(), "Total In queues wait", "int",
-							in_queue_size, Level.INFO));
-		} else {
-			stats.add(new StatRecord(getName(), "Total In queues wait", "int",
-							in_queue_size, Level.FINEST));
-		}
-		if (out_queue_size > 10) {
-			stats.add(new StatRecord(getName(), "Total Out queues wait", "int",
-							out_queue_size, Level.INFO));
-		} else {
-			stats.add(new StatRecord(getName(), "Total Out queues wait", "int",
-							out_queue_size, Level.FINEST));
-		}
-    stats.add(new StatRecord(getName(), StatisticType.MAX_QUEUE_SIZE,
-				maxQueueSize, Level.FINEST));
-		if (statReceivedPacketsEr > 0) {
-			stats.add(new StatRecord(getName(), StatisticType.IN_QUEUE_OVERFLOW,
-							statReceivedPacketsEr, Level.INFO));
-		} else {
-			stats.add(new StatRecord(getName(), StatisticType.IN_QUEUE_OVERFLOW,
-							statReceivedPacketsEr, Level.FINEST));
-		}
-		if (statSentPacketsEr > 0) {
-			stats.add(new StatRecord(getName(), StatisticType.OUT_QUEUE_OVERFLOW,
-							statSentPacketsEr, Level.INFO));
-		} else {
-			stats.add(new StatRecord(getName(), StatisticType.OUT_QUEUE_OVERFLOW,
-							statSentPacketsEr, Level.FINEST));
-		}
+		list.add(getName(), "Total In queues wait",
+						in_queue_size, Level.INFO);
+		list.add(getName(), "Total Out queues wait",
+						out_queue_size, Level.INFO);
+		list.add(getName(), StatisticType.MAX_QUEUE_SIZE.getDescription(),
+						maxQueueSize, Level.FINEST);
+		list.add(getName(), StatisticType.IN_QUEUE_OVERFLOW.getDescription(),
+						statReceivedPacketsEr, Level.INFO);
+		list.add(getName(), StatisticType.OUT_QUEUE_OVERFLOW.getDescription(),
+						statSentPacketsEr, Level.INFO);
 		long res = 0;
 		for (long ppt : processPacketTimings) {
 			res += ppt;
 		}
 		long prcessingTime = res / processPacketTimings.length;
-		if (prcessingTime > 10) {
-			stats.add(new StatRecord(getName(),
-							"Average processing time on last " +
-							processPacketTimings.length + " runs [ms]", "long",
-							prcessingTime, Level.FINE));
-		} else {
-			stats.add(new StatRecord(getName(),
-							"Average processing time on last " +
-							processPacketTimings.length + " runs [ms]", "long",
-							prcessingTime, Level.FINEST));
-		}
+		list.add(getName(),
+						"Average processing time on last " +
+						processPacketTimings.length + " runs [ms]",
+						prcessingTime, Level.FINE);
 		for (PacketFilterIfc packetFilter : incoming_filters) {
-			packetFilter.getStatistics(stats);
+			packetFilter.getStatistics(list);
 		}
 		for (PacketFilterIfc packetFilter : outgoing_filters) {
-			packetFilter.getStatistics(stats);
+			packetFilter.getStatistics(list);
 		}
-    return stats;
   }
 
   /**

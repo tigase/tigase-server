@@ -30,6 +30,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 import tigase.cluster.ClusteringStrategyIfc;
 import tigase.server.Packet;
+import tigase.stats.StatRecord;
+import tigase.stats.StatisticsList;
 
 /**
  * Created: May 13, 2009 9:53:44 AM
@@ -88,6 +90,23 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 	public List<String> getAllNodes() {
 		return cl_nodes_list;
 	}
+
+	@Override
+	public boolean needsSync() {
+		return false;
+	}
+
+	@Override
+	public void syncOnline(List<String> jids, String node) {
+		// It doesn't support syncronization anyway so it should not
+		// be called. Instead of leaving it empty the exception is thrown
+		// to detect implementation bugs which would caused this method to call
+		// even though needsSync() returns false.
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	@Override
+	public void getStatistics(StatisticsList list) {	}
 
 //	@Override
 //	public void init(String smName) {

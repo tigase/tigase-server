@@ -39,6 +39,7 @@ import tigase.xmpp.Authorization;
 import tigase.xmpp.PacketErrorTypeException;
 import java.util.LinkedList;
 
+import tigase.stats.StatisticsList;
 import static tigase.server.sreceiver.PropertyConstants.*;
 import static tigase.server.sreceiver.TaskCommons.*;
 
@@ -584,5 +585,8 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 	public Map<String, RosterItem> getRoster() {
 		return roster;
 	}
+
+	@Override
+	public void getStatistics(StatisticsList list)  {}
 
 } // AbstractReceiverTask

@@ -27,6 +27,7 @@ import java.util.LinkedHashSet;
 import java.util.Queue;
 import java.util.Set;
 import tigase.server.Packet;
+import tigase.stats.StatisticsList;
 import tigase.xml.XMLUtils;
 import tigase.xmpp.StanzaType;
 
@@ -41,10 +42,10 @@ public abstract class AbstractMonitor implements ResourceMonitorIfc {
 	protected Set<Object> warningsSent = new LinkedHashSet<Object>();
 	private String jid = null;
 	private SystemMonitorTask smTask = null;
-	protected double treshold = 0.9;
+	protected float treshold = 0.8F;
 
 	@Override
-	public void init(String jid, double treshold, SystemMonitorTask smTask) {
+	public void init(String jid, float treshold, SystemMonitorTask smTask) {
 		this.jid = jid;
 		this.treshold = treshold;
 		this.smTask = smTask;
@@ -95,6 +96,12 @@ public abstract class AbstractMonitor implements ResourceMonitorIfc {
 		}
 	}
 
+	public int setValueInArr(float[] arr, int idx, float val) {
+		arr[idx] = val;
+		++idx; idx %= arr.length;
+		return idx;
+	}
+
 	public int setValueInArr(double[] arr, int idx, double val) {
 		arr[idx] = val;
 		++idx; idx %= arr.length;
@@ -130,6 +137,11 @@ public abstract class AbstractMonitor implements ResourceMonitorIfc {
 	@Override
 	public boolean isMonitorCommand(String command) {
 		return false;
+	}
+
+	@Override
+	public void getStatistics(StatisticsList list) {
+
 	}
 
 }

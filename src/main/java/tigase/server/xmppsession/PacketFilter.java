@@ -95,10 +95,11 @@ public class PacketFilter {
 											"You must authenticate session first, before you" +
 											" can send any message or presence packet.",
 											true));
-							log.info("Session details: connectionId=" +
-											session.getConnectionId() + ", sessionId=" + 
-											session.getSessionId() + ", ConnectionStatus=" + 
-											session.getConnectionStatus());
+							log.fine("Packet received before the session has been authenticated." +
+											"Session details: connectionId=" + session.getConnectionId() +
+											", sessionId=" + session.getSessionId() +
+											", ConnectionStatus=" + session.getConnectionStatus() +
+											", packet=" + packet.toString());
 							return true;
 						}
 					}

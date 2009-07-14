@@ -49,6 +49,7 @@ import tigase.xmpp.XMPPIOService;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.stats.StatRecord;
+import tigase.stats.StatisticsList;
 
 /**
  * Class ServerConnectionManager
@@ -655,8 +656,8 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 	}
 
 	@Override
-	public List<StatRecord> getStatistics() {
-		List<StatRecord> stats = super.getStatistics();
+	public void getStatistics(StatisticsList list) {
+		super.getStatistics(list);
 		int waiting_packets = 0;
 		int open_s2s_connections = incoming.size();
 		int connected_servers = 0;
@@ -678,35 +679,14 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 								", db_keys.size(): " + conn.getDBKeysSize());
 			}
 		}
-		if (open_s2s_connections > 0) {
-			stats.add(new StatRecord(getName(), "Open s2s connections", "int",
-							open_s2s_connections, Level.FINE));
-		} else {
-			stats.add(new StatRecord(getName(), "Open s2s connections", "int",
-							open_s2s_connections, Level.FINEST));
-		}
-		if (waiting_packets > 0) {
-			stats.add(new StatRecord(getName(), "Packets queued", "int",
-							waiting_packets, Level.FINE));
-		} else {
-			stats.add(new StatRecord(getName(), "Packets queued", "int",
-							waiting_packets, Level.FINEST));
-		}
-		if (connected_servers > 0) {
-			stats.add(new StatRecord(getName(), "Connected servers", "int",
-							connected_servers, Level.FINE));
-		} else {
-			stats.add(new StatRecord(getName(), "Connected servers", "int",
-							connected_servers, Level.FINEST));
-		}
-		if (server_connections_instances > 0) {
-			stats.add(new StatRecord(getName(), "Connection instances", "int",
-							server_connections_instances, Level.FINER));
-		} else {
-			stats.add(new StatRecord(getName(), "Connection instances", "int",
-							server_connections_instances, Level.FINEST));
-		}
-		return stats;
+		list.add(getName(), "Open s2s connections",
+						open_s2s_connections, Level.FINE);
+		list.add(getName(), "Packets queued",
+						waiting_packets, Level.FINE);
+		list.add(getName(), "Connected servers",
+						connected_servers, Level.FINE);
+		list.add(getName(), "Connection instances",
+						server_connections_instances, Level.FINER);
 	}
 
 	@Override

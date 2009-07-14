@@ -22,7 +22,6 @@
 
 package tigase.stats;
 
-import java.util.List;
 import tigase.server.ServerComponent;
 
 /**
@@ -39,6 +38,6 @@ import tigase.server.ServerComponent;
  */
 public interface StatisticsContainer extends ServerComponent {
 
-  public List<StatRecord> getStatistics();
+  public void getStatistics(StatisticsList list);
 
 }

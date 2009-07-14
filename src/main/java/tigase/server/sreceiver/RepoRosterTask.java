@@ -30,6 +30,7 @@ import tigase.db.UserExistsException;
 import tigase.db.UserRepository;
 import tigase.server.Packet;
 
+import tigase.stats.StatisticsList;
 import static tigase.server.sreceiver.PropertyConstants.*;
 import static tigase.server.sreceiver.TaskCommons.*;
 

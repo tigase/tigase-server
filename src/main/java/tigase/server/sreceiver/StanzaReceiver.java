@@ -42,6 +42,7 @@ import tigase.disco.XMPPService;
 import tigase.server.AbstractMessageReceiver;
 import tigase.server.Command;
 import tigase.server.Packet;
+import tigase.stats.StatisticsList;
 import tigase.util.ClassUtil;
 import tigase.util.DNSResolver;
 import tigase.util.JIDUtils;
@@ -743,6 +744,14 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	@Override
 	public boolean addOutPacket(Packet packet) {
 		return super.addOutPacket(packet);
+	}
+
+	@Override
+	public void getStatistics(StatisticsList list) {
+		super.getStatistics(list);
+		for (ReceiverTaskIfc task : task_instances.values()) {
+			task.getStatistics(list);
+		}
 	}
 
 } // StanzaReceiver
