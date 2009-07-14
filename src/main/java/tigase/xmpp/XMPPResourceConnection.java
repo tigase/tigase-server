@@ -533,4 +533,9 @@ public class XMPPResourceConnection extends RepositoryAccess {
 		super.queryAuth(authProps);
 	}
 
+	@Override
+	public String toString() {
+		return "user_jid=" + userJid + ", connectioId=" + connectionId;
+	}
+
 } // XMPPResourceConnection
