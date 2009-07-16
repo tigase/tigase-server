@@ -58,14 +58,14 @@ public class RosterFlat extends RosterAbstract {
 					new Long(Runtime.getRuntime().maxMemory() / 250000L).intValue();
 
 	public static void parseRoster(String roster_str,
-					Map<String, RosterElement> roster) {
+					Map<String, RosterElement> roster, XMPPResourceConnection session) {
 		DomBuilderHandler domHandler = new DomBuilderHandler();
 		parser.parse(domHandler, roster_str.toCharArray(), 0, roster_str.length());
 		Queue<Element> elems = domHandler.getParsedElements();
 		if (elems != null && elems.size() > 0) {
 			for (Element elem : elems) {
 				try {
-					RosterElement relem = new RosterElement(elem);
+					RosterElement relem = new RosterElement(elem, session);
 					if (!addBuddy(relem, roster)) {
 						break;
 					}
@@ -86,7 +86,7 @@ public class RosterFlat extends RosterAbstract {
 			log.finest("Loaded user roster: " + roster_str);
 		}
 		if (roster_str != null && !roster_str.isEmpty()) {
-			parseRoster(roster_str, roster);
+			parseRoster(roster_str, roster, session);
 		} else {
 			// Try to load a roster from the 'old' style roster storage and
 			// convert it the the flat roster storage
@@ -97,7 +97,7 @@ public class RosterFlat extends RosterAbstract {
 					String name = oldRoster.getBuddyName(session, buddy);
 					SubscriptionType subscr = oldRoster.getBuddySubscription(session, buddy);
 					String[] groups = oldRoster.getBuddyGroups(session, buddy);
-					RosterElement relem = new RosterElement(buddy, name, groups);
+					RosterElement relem = new RosterElement(buddy, name, groups, session);
 					relem.setSubscription(subscr);
 					if (!addBuddy(relem, roster)) {
 						break;
@@ -238,7 +238,7 @@ public class RosterFlat extends RosterAbstract {
 		RosterElement relem = getRosterElement(session, buddy);
 		if (relem == null) {
 			Map<String, RosterElement> roster = getUserRoster(session);
-			relem = new RosterElement(buddy, name, groups);
+			relem = new RosterElement(buddy, name, groups, session);
 			if (addBuddy(relem, roster)) {
 				saveUserRoster(session);
 			} else {

@@ -26,6 +26,7 @@ import tigase.xml.Element;
 import java.util.logging.Logger;
 import tigase.util.JIDUtils;
 
+import tigase.xmpp.XMPPResourceConnection;
 import static tigase.xmpp.impl.roster.RosterAbstract.SubscriptionType;
 
 /**
@@ -48,7 +49,7 @@ public class RosterElement {
 	private static final String SUBS_ATT = "subs";
 	private static final String GRP_ATT = "groups";
 
-
+	private XMPPResourceConnection session = null;
 	private SubscriptionType subscription = null;
 	private String[] groups = null;
 	private String name = null;
@@ -72,12 +73,14 @@ public class RosterElement {
 	}
 	private boolean presence_sent = false;
 
-	public RosterElement(String jid, String name, String[] groups) {
-		this.jid = jid.toLowerCase();
+	public RosterElement(String jid, String name, String[] groups,
+					XMPPResourceConnection session) {
+		this.session = session;
+		setJid(jid);
 		if (name == null) {
-			this.name = JIDUtils.getNodeNick(jid);
+			this.name = JIDUtils.getNodeNick(this.jid);
 			if (this.name == null || this.name.isEmpty()) {
-				this.name = jid;
+				this.name = this.jid;
 			}
 		} else {
 			this.name = name;
@@ -92,9 +95,10 @@ public class RosterElement {
 	 *
 	 * @param roster_el
 	 */
-	public RosterElement(Element roster_el) {
+	public RosterElement(Element roster_el, XMPPResourceConnection session) {
+		this.session = session;
 		if (roster_el.getName() == ELEM_NAME) {
-			jid = roster_el.getAttribute(JID_ATT).toLowerCase();
+			setJid(roster_el.getAttribute(JID_ATT));
 			name = roster_el.getAttribute(NAME_ATT);
 			if (name == null || name.isEmpty()) {
 				name = JIDUtils.getNodeNick(jid);
@@ -113,6 +117,14 @@ public class RosterElement {
 		String grps = roster_el.getAttribute(GRP_ATT);
 		if (grps != null && !grps.isEmpty()) {
 			groups = grps.split(",");
+		}
+	}
+
+	private void setJid(String jid) {
+		this.jid = jid.toLowerCase();
+		String buddy_domain = JIDUtils.getNodeHost(this.jid);
+		if (session.isLocalDomain(buddy_domain, false)) {
+			this.jid = this.jid.intern();
 		}
 	}
 
