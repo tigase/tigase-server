@@ -50,6 +50,10 @@ public class StatisticsList implements Iterable<StatRecord> {
 		return compStats;
 	}
 
+	public LinkedHashMap<String, StatRecord> getCompStats(String comp) {
+		return stats.get(comp);
+	}
+
 	public boolean checkLevel(Level recordLevel) {
 		return recordLevel.intValue() >= statLevel.intValue();
 	}

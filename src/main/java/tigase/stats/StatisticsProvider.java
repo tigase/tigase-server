@@ -27,6 +27,8 @@ import javax.management.*;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Level;
 import tigase.server.QueueType;
 import tigase.sys.TigaseRuntime;
@@ -289,67 +291,67 @@ public class StatisticsProvider extends StandardMBean
 
 	@Override
 	public int getConnectionsNumber() {
-		cache.updateIfOlder(1000);
+		//cache.updateIfOlder(1000);
 		return cache.clientConnections;
 	}
 
 	@Override
 	public int getClusterCacheSize() {
-		cache.updateIfOlder(1000);
+		//cache.updateIfOlder(1000);
 		return cache.clusterCache;
 	}
 
 	@Override
 	public int getQueueSize() {
-		cache.updateIfOlder(1000);
+		//cache.updateIfOlder(1000);
 		return cache.queueSize;
 	}
 
 	@Override
 	public long getQueueOverflow() {
-		cache.updateIfOlder(1000);
+		//cache.updateIfOlder(1000);
 		return cache.queueOverflow;
 	}
 
 	@Override
 	public long getPacketsNumber() {
-		cache.updateIfOlder(1000);
+		//cache.updateIfOlder(1000);
 		return cache.smPackets;
 	}
 
 	@Override
 	public long getClusterPackets() {
-		cache.updateIfOlder(1000);
+		//cache.updateIfOlder(1000);
 		return cache.clusterPackets;
 	}
 
 	@Override
 	public String getSystemDetails() {
-		cache.updateIfOlder(1000);
+		//cache.updateIfOlder(1000);
 		return cache.systemDetails;
 	}
 
 	@Override
 	public long getMessagesNumber() {
-		cache.updateIfOlder(1000);
+		//cache.updateIfOlder(1000);
 		return cache.messagesNumber;
 	}
 
 	@Override
 	public long getPresencesNumber() {
-		cache.updateIfOlder(1000);
+		//cache.updateIfOlder(1000);
 		return cache.presencesNumber;
 	}
 
 	@Override
 	public long getIQOtherNumber() {
-		cache.updateIfOlder(1000);
+		//cache.updateIfOlder(1000);
 		return cache.iqOtherNumber;
 	}
 
 	@Override
 	public long getIQAuthNumber() {
-		cache.updateIfOlder(1000);
+		//cache.updateIfOlder(1000);
 		return cache.iqAuthNumber;
 	}
 
@@ -363,26 +365,44 @@ public class StatisticsProvider extends StandardMBean
 		private static final String C2S_COMP = "c2s";
 		private static final String BOSH_COMP = "bosh";
 
-		private long lastUpdate = 0;
-		private StatisticsList allStats = new StatisticsList(Level.ALL);
+		//private long lastUpdate = 0;
+		private StatisticsList allStats = new StatisticsList(Level.FINER);
 		private long clusterPackets = 0;
 		private long smPackets = 0;
 		private int clientConnections = 0;
 		private int clusterCache = 0;
 		private int queueSize = 0;
 		private long queueOverflow = 0;
+		private long lastPresencesSent = 0;
+		private long presences_sent_per_update = 0;
+		private long lastPresencesReceived = 0;
+		private long presences_received_per_update = 0;
 		private long messagesNumber = 0;
 		private long presencesNumber = 0;
 		private long iqOtherNumber = 0;
 		private long iqAuthNumber = 0;
 		private String systemDetails = "";
+		private Timer updateTimer = null;
+		private int inter = 10;
+		private int cnt = 0;
 
-		private synchronized void updateIfOlder(long time) {
-		  if (System.currentTimeMillis() - lastUpdate > time) {
-				update();
-				updateSystemDetails();
-			}
+		private StatisticsCache() {
+			updateTimer = new Timer("stats-cache", true);
+			updateTimer.schedule(new TimerTask() {
+				@Override
+				public void run() {
+					update();
+					updateSystemDetails();
+				}
+			}, 10*1000, 1000);
 		}
+
+//		private synchronized void updateIfOlder(long time) {
+//		  if (System.currentTimeMillis() - lastUpdate > time) {
+//				update();
+//				updateSystemDetails();
+//			}
+//		}
 
 		private void update() {
 			allStats = new StatisticsList(Level.FINER);
@@ -405,10 +425,21 @@ public class StatisticsProvider extends StandardMBean
 							" messages", 0L);
 			messagesNumber += allStats.getValue(SM_COMP, QueueType.OUT_QUEUE.name() +
 							" messages", 0L);
-			presencesNumber = allStats.getValue(SM_COMP, QueueType.IN_QUEUE.name() +
+			long currPresencesReceived =
+							allStats.getValue(SM_COMP, QueueType.IN_QUEUE.name() +
 							" presences", 0L);
-			presencesNumber += allStats.getValue(SM_COMP, QueueType.OUT_QUEUE.name() +
+			long currPresencesSent =
+							allStats.getValue(SM_COMP, QueueType.OUT_QUEUE.name() +
 							" presences", 0L);
+			presencesNumber = currPresencesReceived + currPresencesSent;
+			if (++cnt >= inter) {
+				presences_sent_per_update = (currPresencesSent - lastPresencesSent) / 10;
+				presences_received_per_update = (currPresencesReceived -
+								lastPresencesReceived) / 10;
+				lastPresencesSent = currPresencesSent;
+				lastPresencesReceived = currPresencesReceived;
+				cnt = 0;
+			}
 			queueSize = 0;
 			queueOverflow = 0;
 			for (StatRecord rec : allStats) {
@@ -454,12 +485,18 @@ public class StatisticsProvider extends StandardMBean
 			if (cpu_thread != null) {
 				sb.append("\n   ").append(cpu_thread);
 			}
-			LinkedHashMap<String, StatRecord> compStats = allStats.addCompStats(SM_COMP);
-			for (StatRecord rec : compStats.values()) {
-				if (rec.getDescription().startsWith("Processor:")) {
-					sb.append("\n").append(rec.getDescription()).append(rec.getValue());
+			LinkedHashMap<String, StatRecord> compStats = allStats.getCompStats(SM_COMP);
+			if (compStats != null) {
+				for (StatRecord rec : compStats.values()) {
+					if (rec.getDescription().startsWith("Processor:")) {
+						sb.append("\n").append(rec.getDescription()).append(rec.getValue());
+					}
 				}
 			}
+			sb.append("\nSM presences received: ").append(lastPresencesReceived);
+			sb.append(" / ").append(presences_received_per_update);
+			sb.append("\nSM presences sent: ").append(lastPresencesSent);
+			sb.append(" / ").append(presences_sent_per_update);
 			systemDetails = sb.toString();
 		}
 
