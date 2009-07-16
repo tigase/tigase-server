@@ -48,7 +48,6 @@ import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.XMPPIOService;
 import tigase.xmpp.PacketErrorTypeException;
-import tigase.stats.StatRecord;
 import tigase.stats.StatisticsList;
 import tigase.util.TimeUtils;
 
@@ -111,7 +110,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 	@Override
 	public void processPacket(Packet packet) {
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Processing packet: " + packet.getStringData());
+			log.finest("Processing packet: " + packet.toString());
 		}
 		if (packet.getElemTo() != null
 			&& packet.getElemTo().equals(getComponentId())) {
