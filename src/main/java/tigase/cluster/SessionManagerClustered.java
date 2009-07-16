@@ -43,7 +43,6 @@ import tigase.server.xmppsession.SessionManager;
 import tigase.xml.Element;
 import tigase.xmpp.XMPPSession;
 import tigase.annotations.TODO;
-import tigase.stats.StatRecord;
 import tigase.stats.StatisticsList;
 import tigase.util.DNSResolver;
 import tigase.xmpp.impl.Presence;
@@ -324,6 +323,9 @@ public class SessionManagerClustered extends SessionManager
 
 	protected boolean sendToNextNode(Packet packet) {
 		String cluster_node = getFirstClusterNode(packet.getElemTo());
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Cluster node found: " + cluster_node);
+		}
 		if (cluster_node != null) {
 			String sess_man_id = getComponentId();
 			ClusterElement clel = new ClusterElement(sess_man_id, cluster_node,
@@ -636,13 +638,31 @@ public class SessionManagerClustered extends SessionManager
 
 	/**
 	 *
-	 * @param level 
-	 * @return
+	 * @param list
 	 */
 	@Override
 	public void getStatistics(StatisticsList list) {
 		super.getStatistics(list);
 		strategy.getStatistics(list);
+	}
+
+//	/**
+//	 *
+//	 * @return
+//	 */
+//	@Override
+//	public Set<String> getOnlineJids() {
+//		return strategy.getOnlineJids();
+//	}
+
+	@Override
+	public boolean hasCompleteJidsInfo() {
+		return strategy.hasCompleteJidsInfo();
+	}
+
+	@Override
+	public boolean containsJid(String jid) {
+		return super.containsJid(jid) || strategy.containsJid(jid);
 	}
 
 }
