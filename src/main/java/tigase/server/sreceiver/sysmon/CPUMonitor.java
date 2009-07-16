@@ -26,18 +26,17 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
-import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.server.Packet;
@@ -72,7 +71,7 @@ public class CPUMonitor extends AbstractMonitor {
 	private OperatingSystemMXBean osBean = null;
 	private NumberFormat format = NumberFormat.getNumberInstance();
 	private Map<Long, ThreadData> threads =
-					new LinkedHashMap<Long, ThreadData>();
+					new ConcurrentSkipListMap<Long, ThreadData>();
 	private int deadLockedThreadsNo = 0;
 
 	private String checkForDeadLock() {
