@@ -37,6 +37,7 @@ import tigase.xmpp.XMPPException;
 import tigase.server.Packet;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
+import tigase.sys.TigaseRuntime;
 import tigase.util.JIDUtils;
 import tigase.xmpp.impl.roster.RosterAbstract;
 import tigase.xmpp.impl.roster.RosterFactory;
@@ -75,6 +76,33 @@ public abstract class Presence {
 	private static final String[] XMLNSS = {XMLNS};
 	private static RosterAbstract roster_util =
 					RosterFactory.getRosterImplementation(true);
+	private static TigaseRuntime runtime = TigaseRuntime.getTigaseRuntime();
+	private static long requiredYes = 0;
+	private static long requiredNo = 0;
+
+  private static boolean requiresPresenceSending(String buddy, 
+					XMPPResourceConnection session) {
+		String buddy_domain = JIDUtils.getNodeHost(buddy);
+		boolean result = !runtime.hasCompleteJidsInfo() ||
+						!session.isLocalDomain(buddy_domain, false) ||
+								runtime.isJidOnline(buddy);
+		if (log.isLoggable(Level.FINEST)) {
+			if (result) {
+				++requiredYes;
+			} else {
+				++requiredNo;
+			}
+			log.finest("Yes/No: " + requiredYes + " / " + requiredNo +
+							", buddy: " + buddy +
+							", result=" + result +
+							", !runtime.hasCompleteJidsInfo()=" +
+							!runtime.hasCompleteJidsInfo() +
+							", !session.isLocalDomain(buddy_domain, false)=" + !session.
+							isLocalDomain(buddy_domain, false) +
+							", runtime.isJidOnline(buddy)=" + runtime.isJidOnline(buddy));
+		}
+		return result;
+	}
 
 	/**
 	 * <code>stopped</code> method is called when user disconnects or logs-out.
@@ -155,13 +183,10 @@ public abstract class Presence {
 //			Set<String> onlineJids = TigaseRuntime.getTigaseRuntime().getOnlineJids();
 			for (String buddy : buddies) {
 				// If buddy is a local buddy and he is offline, don't send him packet...
-				// Hm, it doesn't work well in the cluster mode....
-//				String buddy_domain = JIDUtils.getNodeHost(buddy);
-//				if (!session.isLocalDomain(buddy_domain, false) ||
-//								onlineJids.contains(buddy)) {
-//					sendPresence(null, buddy, session.getJID(), results, pres);
-//				}
-				sendPresence(StanzaType.unavailable, buddy, from, results, pres);
+				if (requiresPresenceSending(buddy, session)) {
+					sendPresence(StanzaType.unavailable, buddy, from, results, pres);
+				}
+//				sendPresence(StanzaType.unavailable, buddy, from, results, pres);
 			} // end of for (String buddy: buddies)
 		} // end of if (buddies == null)
 		broadcastDirectPresences(StanzaType.unavailable, session, results, pres);
@@ -191,10 +216,12 @@ public abstract class Presence {
 		buddies = DynamicRoster.addBuddies(session, settings, buddies);
 		if (buddies != null) {
 			for (String buddy : buddies) {
-				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Sending probe to: " + buddy);
+				if (requiresPresenceSending(buddy, session)) {
+					if (log.isLoggable(Level.FINEST)) {
+						log.finest("Sending probe to: " + buddy);
+					}
+					sendPresence(null, buddy, session.getUserId(), results, presProbe);
 				}
-				sendPresence(null, buddy, session.getUserId(), results, presProbe);
 			} // end of for (String buddy: buddies)
 		} // end of if (buddies == null)
 	}
@@ -224,7 +251,9 @@ public abstract class Presence {
 		buddies = DynamicRoster.addBuddies(session, settings, buddies);
 		if (buddies != null) {
 			for (String buddy : buddies) {
-				sendPresence(t, buddy, from, results, pres);
+				if (requiresPresenceSending(buddy, session)) {
+					sendPresence(t, buddy, from, results, pres);
+				}
 			} // end of for (String buddy: buddies)
 		} // end of if (buddies == null)
 		broadcastDirectPresences(t, session, results, pres);
