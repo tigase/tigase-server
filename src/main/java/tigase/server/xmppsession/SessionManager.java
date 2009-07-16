@@ -1530,9 +1530,19 @@ public class SessionManager extends AbstractMessageReceiver
 		}
 	}
 
+//	@Override
+//	public Set<String> getOnlineJids() {
+//		return sessionsByNodeId.keySet();
+//	}
+
 	@Override
-	public Set<String> getOnlineJids() {
-		return sessionsByNodeId.keySet();
+	public boolean hasCompleteJidsInfo() {
+		return true;
+	}
+
+	@Override
+	public boolean containsJid(String jid) {
+		return sessionsByNodeId.keySet().contains(jid);
 	}
 
 	private class SessionOpenWorkerThread extends WorkerThread {
