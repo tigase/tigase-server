@@ -250,11 +250,11 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	}
 
 	public void setParentSession(final XMPPSession parent) {
-		this.parentSession = parent;
-		if (parentSession != null) {
-			userId = JIDUtils.getNodeID(parentSession.getUserName(), domain.getVhost());
+		if (parent != null) {
+			userId = JIDUtils.getNodeID(parent.getUserName(), domain.getVhost());
 			userJid = userId + (resource != null ? ("/" + resource) : "/" + sessionId);
 		}
+		this.parentSession = parent;
 	}
 
 	public XMPPSession getParentSession() {
