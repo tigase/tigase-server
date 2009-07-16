@@ -23,7 +23,6 @@ package tigase.server;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
@@ -40,7 +39,6 @@ import java.util.regex.Pattern;
 import tigase.annotations.TODO;
 import tigase.conf.Configurable;
 import tigase.server.filters.PacketCounter;
-import tigase.stats.StatRecord;
 import tigase.stats.StatisticType;
 import tigase.stats.StatisticsContainer;
 import tigase.stats.StatisticsList;
@@ -118,13 +116,19 @@ public abstract class AbstractMessageReceiver
 	protected VHostManagerIfc vHostManager = null;
 	//private Set<String> routings = new CopyOnWriteArraySet<String>();
 	private Set<Pattern> regexRoutings = new CopyOnWriteArraySet<Pattern>();
-	private long curr_second = 0;
-	private long curr_minute = 0;
-	private long curr_hour = 0;
-	private long[] seconds = new long[60];
-	private int sec_idx = 0;
-	private long[] minutes = new long[60];
-	private int min_idx = 0;
+	private long last_second_packets = 0;
+	private long packets_per_second = 0;
+	private long last_minute_packets = 0;
+	private long packets_per_minute = 0;
+	private long last_hour_packets = 0;
+	private long packets_per_hour = 0;
+//	private long curr_second = 0;
+//	private long curr_minute = 0;
+//	private long curr_hour = 0;
+//	private long[] seconds = new long[60];
+//	private int sec_idx = 0;
+//	private long[] minutes = new long[60];
+//	private int min_idx = 0;
 	private String compId = null;
 	private long[] processPacketTimings = new long[100];
 	private int pptIdx = 0;
@@ -193,7 +197,7 @@ public abstract class AbstractMessageReceiver
 						packet.getPriority().ordinal());
 		if (result) {
 			++statReceivedPacketsOk;
-			++curr_second;
+//			++curr_second;
 		} else {
 			// Queue overflow!
 			++statReceivedPacketsEr;
@@ -229,7 +233,7 @@ public abstract class AbstractMessageReceiver
 			//in_queue.put(packet, packet.getPriority().ordinal());
 			in_queues.get(queueIdx).put(packet, packet.getPriority().ordinal());
 			++statReceivedPacketsOk;
-			++curr_second;
+//			++curr_second;
 		} catch (InterruptedException e) {
 			++statReceivedPacketsEr;
 			return false;
@@ -303,11 +307,14 @@ public abstract class AbstractMessageReceiver
 
 	@Override
   public void getStatistics(StatisticsList list) {
-		long tmp = seconds[(sec_idx == 0 ? 59 : sec_idx - 1)];
-		list.add(getName(), "Last second packets", tmp, Level.FINE);
-		tmp = minutes[(min_idx == 0 ? 59 : min_idx - 1)];
-		list.add(getName(), "Last minute packets", tmp, Level.FINE);
-		list.add(getName(), "Last hour packets", curr_hour, Level.FINE);
+//		long tmp = seconds[(sec_idx == 0 ? 59 : sec_idx - 1)];
+//		list.add(getName(), "Last second packets", tmp, Level.FINE);
+		list.add(getName(), "Last second packets", packets_per_second, Level.FINE);
+//		tmp = minutes[(min_idx == 0 ? 59 : min_idx - 1)];
+//		list.add(getName(), "Last minute packets", tmp, Level.FINE);
+		list.add(getName(), "Last minute packets", packets_per_minute, Level.FINE);
+//		list.add(getName(), "Last hour packets", curr_hour, Level.FINE);
+		list.add(getName(), "Last hour packets", packets_per_hour, Level.FINE);
 		list.add(getName(), StatisticType.MSG_RECEIVED_OK.getDescription(),
 						statReceivedPacketsOk, Level.FINE);
 		list.add(getName(), StatisticType.MSG_SENT_OK.getDescription(),
@@ -489,26 +496,35 @@ public abstract class AbstractMessageReceiver
 	}
 
 	public synchronized void everySecond() {
-		curr_minute -= seconds[sec_idx];
-		seconds[sec_idx] = curr_second;
-		curr_second = 0;
-		curr_minute += seconds[sec_idx];
-		if (sec_idx >= 59) {
-			sec_idx = 0;
-		} else {
-			++sec_idx;
-		}
+//		curr_minute -= seconds[sec_idx];
+//		seconds[sec_idx] = curr_second;
+//		curr_second = 0;
+//		curr_minute += seconds[sec_idx];
+//		if (sec_idx >= 59) {
+//			sec_idx = 0;
+//		} else {
+//			++sec_idx;
+//		}
+    packets_per_second = statReceivedPacketsOk - last_second_packets;
+		last_second_packets = statReceivedPacketsOk;
 	}
 
 	public synchronized void everyMinute() {
-		curr_hour -= minutes[min_idx];
-		minutes[min_idx] = curr_minute;
-		curr_hour += minutes[min_idx];
-		if (min_idx >= 59) {
-			min_idx = 0;
-		} else {
-			++min_idx;
-		}
+//		curr_hour -= minutes[min_idx];
+//		minutes[min_idx] = curr_minute;
+//		curr_hour += minutes[min_idx];
+//		if (min_idx >= 59) {
+//			min_idx = 0;
+//		} else {
+//			++min_idx;
+//		}
+    packets_per_minute = statReceivedPacketsOk - last_minute_packets;
+		last_minute_packets = statReceivedPacketsOk;
+	}
+
+	public synchronized void everyHour() {
+    packets_per_hour = statReceivedPacketsOk - last_hour_packets;
+		last_hour_packets = statReceivedPacketsOk;
 	}
 
 	private void startThreads() {
@@ -542,6 +558,12 @@ public abstract class AbstractMessageReceiver
 					everyMinute();
 				}
 			}, MINUTE, MINUTE);
+		receiverTasks.schedule(new TimerTask() {
+			@Override
+				public void run() {
+					everyHour();
+				}
+			}, HOUR, HOUR);
 	}
 
 	@Override
