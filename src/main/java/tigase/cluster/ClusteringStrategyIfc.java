@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Queue;
 import tigase.server.Packet;
 import tigase.stats.StatisticsList;
+import tigase.sys.OnlineJidsReporter;
 
 /**
  * Created: May 2, 2009 4:36:03 PM
@@ -34,7 +35,7 @@ import tigase.stats.StatisticsList;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public interface ClusteringStrategyIfc {
+public interface ClusteringStrategyIfc extends OnlineJidsReporter {
 
 	//void init(String smName);
 
