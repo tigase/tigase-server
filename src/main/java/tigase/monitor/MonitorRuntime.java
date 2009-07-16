@@ -87,19 +87,31 @@ public class MonitorRuntime extends TigaseRuntime {
 	}
 
 	@Override
-	public synchronized Set<String> getOnlineJids() {
+	public boolean hasCompleteJidsInfo() {
 		if (onlineJidsReporters.size() == 1) {
-			return onlineJidsReporters.getFirst().getOnlineJids();
+			return onlineJidsReporters.getFirst().hasCompleteJidsInfo();
 		} else {
-			if (onlineJidsReporters.size() > 1) {
-				Set<String> onlineJids = new LinkedHashSet<String>();
-				for (OnlineJidsReporter onlineJidsReporter : onlineJidsReporters) {
-					onlineJids.addAll(onlineJidsReporter.getOnlineJids());
+			for (OnlineJidsReporter onlineJidsReporter : onlineJidsReporters) {
+				if (!onlineJidsReporter.hasCompleteJidsInfo()) {
+					return false;
 				}
-				return onlineJids;
 			}
 		}
-		return null;
+		return true;
+	}
+
+	@Override
+	public boolean isJidOnline(String jid) {
+		if (onlineJidsReporters.size() == 1) {
+			return onlineJidsReporters.getFirst().containsJid(jid);
+		} else {
+			for (OnlineJidsReporter onlineJidsReporter : onlineJidsReporters) {
+				if (onlineJidsReporter.containsJid(jid)) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	private class ShutdownHandlerThread extends Thread {
