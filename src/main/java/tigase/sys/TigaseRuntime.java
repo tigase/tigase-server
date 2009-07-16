@@ -57,7 +57,9 @@ public abstract class TigaseRuntime {
 
 	public abstract void addOnlineJidsReporter(OnlineJidsReporter onlineReporter);
 
-	public abstract Set<String> getOnlineJids();
+	public abstract boolean hasCompleteJidsInfo();
+
+	public abstract boolean isJidOnline(String jid);
 
 	public ResourceState getMemoryState() {
 		return ResourceState.GREEN;

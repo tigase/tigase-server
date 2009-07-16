@@ -22,8 +22,6 @@
 
 package tigase.sys;
 
-import java.util.Set;
-
 /**
  * Created: Apr 19, 2009 12:15:07 AM
  *
@@ -32,6 +30,10 @@ import java.util.Set;
  */
 public interface OnlineJidsReporter {
 
-  Set<String> getOnlineJids();
+  //Set<String> getOnlineJids();
+
+	boolean hasCompleteJidsInfo();
+
+	boolean containsJid(String jid);
 
 }
