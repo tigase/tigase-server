@@ -28,7 +28,8 @@ import java.nio.channels.SocketChannel;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import tigase.net.ConnectionOpenListener;
 
 /**
  * Describe class SocketIO here.
@@ -43,8 +44,7 @@ public class SocketIO implements IOInterface {
 
   private static Logger log = Logger.getLogger("tigase.io.SocketIO");
 
-	private Queue<ByteBuffer> dataToSend =
-		new ConcurrentLinkedQueue<ByteBuffer>();
+	private Queue<ByteBuffer> dataToSend = null;
 
   private SocketChannel channel = null;
   private int bytesRead = 0;
@@ -62,6 +62,11 @@ public class SocketIO implements IOInterface {
 		channel.socket().setSoLinger(false, 0);
 		channel.socket().setReuseAddress(true);
 		remoteAddress = channel.socket().getInetAddress().getHostAddress();
+		if (channel.socket().getTrafficClass() == ConnectionOpenListener.IPTOS_THROUGHPUT) {
+			dataToSend = new LinkedBlockingQueue<ByteBuffer>(10000);
+		} else {
+			dataToSend = new LinkedBlockingQueue<ByteBuffer>(100);
+		}
   }
 
 	@Override
