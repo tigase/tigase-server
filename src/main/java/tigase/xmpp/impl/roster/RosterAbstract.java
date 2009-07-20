@@ -37,6 +37,7 @@ import tigase.xmpp.XMPPResourceConnection;
 import tigase.util.JIDUtils;
 import tigase.db.UserRepository;
 import tigase.db.TigaseDBException;
+import tigase.util.Algorithms;
 
 /**
  * Describe class RosterAbstract here.
@@ -60,6 +61,7 @@ public abstract class RosterAbstract {
   public static final String GROUP = "group";
   public static final String NAME = "name";
   public static final String SUBSCRIPTION = "subscription";
+	public static final String ROSTERHASH = "rosterhash";
 
 	public enum PresenceType {
 		out_initial,
@@ -504,7 +506,22 @@ public abstract class RosterAbstract {
     return ROSTER + "/" + JIDUtils.getNodeID(buddy);
   }
 
-  public String[] getBuddies(final XMPPResourceConnection session,
+	public String getBuddiesHash(final XMPPResourceConnection session) {
+		return (String)session.getCommonSessionData(ROSTERHASH);
+	}
+
+	protected void updateRosterHash(String roster_str,
+					XMPPResourceConnection session) {
+		String roster_hash = null;
+		try {
+			roster_hash = Algorithms.hexDigest("", roster_str, "MD5");
+		} catch (Exception e) {
+			roster_hash = null;
+		}
+		session.putCommonSessionData(ROSTERHASH, roster_hash);
+	}
+
+	public String[] getBuddies(final XMPPResourceConnection session,
 		final EnumSet<SubscriptionType> subscrs, boolean onlineOnly)
     throws NotAuthorizedException, TigaseDBException {
     final String[] allBuddies = getBuddies(session, onlineOnly);

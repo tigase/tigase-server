@@ -82,6 +82,7 @@ public class RosterFlat extends RosterAbstract {
 						new LinkedHashMap<String, RosterElement>();
 		session.putCommonSessionData(ROSTER, roster);
 		String roster_str = session.getData(null, ROSTER, null);
+		updateRosterHash(roster_str, session);
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Loaded user roster: " + roster_str);
 		}
