@@ -27,7 +27,6 @@ import java.nio.channels.SocketChannel;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -46,7 +45,6 @@ import tigase.net.ConnectionType;
 import tigase.net.IOService;
 import tigase.net.SocketReadThread;
 import tigase.net.SocketType;
-import tigase.stats.StatRecord;
 import tigase.stats.StatisticsList;
 import tigase.util.JIDUtils;
 import tigase.util.Numbers;
@@ -69,7 +67,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 	extends AbstractMessageReceiver implements XMPPIOServiceListener {
 
 	private static final Logger log =
-    Logger.getLogger("tigase.server.ConnectionManager");
+    Logger.getLogger(ConnectionManager.class.getName());
 
 	public static final String NET_BUFFER_ST_PROP_KEY = "--net-buff-standard";
 	public static final String NET_BUFFER_HT_PROP_KEY = "--net-buff-high-throughput";
