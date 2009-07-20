@@ -57,6 +57,7 @@ public class RosterPresence  extends XMPPProcessor
   private static final String[] XMLNSS = {
 		Presence.XMLNS, JabberIqRoster.XMLNS, JabberIqRoster.XMLNS_DYNAMIC};
   private static final Element[] DISCO_FEATURES =	JabberIqRoster.DISCO_FEATURES;
+	private static final Element[] FEATURES =	JabberIqRoster.FEATURES;
 
 	@Override
 	public String id() { return ID; }
@@ -64,6 +65,10 @@ public class RosterPresence  extends XMPPProcessor
 	@Override
 	public String[] supElements()
 	{ return ELEMENTS; }
+
+	@Override
+	public Element[] supStreamFeatures(final XMPPResourceConnection session)
+	{ return FEATURES; }
 
 	@Override
   public String[] supNamespaces()

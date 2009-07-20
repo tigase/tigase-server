@@ -72,6 +72,10 @@ public abstract class JabberIqRoster {
 		new Element("feature", new String[] {"var"}, new String[] {XMLNS}),
 		new Element("feature", new String[] {"var"}, new String[] {XMLNS_DYNAMIC})
 	};
+	protected static final Element[] FEATURES = {
+		new Element("ver", new String[]{"xmlns"},
+		new String[]{"urn:xmpp:features:rosterver"})
+	};
 	public static final String ANON = "anon";
 	private static RosterAbstract roster_util =
     RosterFactory.getRosterImplementation(true);
@@ -271,6 +275,8 @@ public abstract class JabberIqRoster {
 		final XMPPResourceConnection session,	final Queue<Packet> results,
 		final Map<String, Object> settings)
     throws NotAuthorizedException, TigaseDBException {
+		String incomingHash = packet.getElement().getAttribute("/iq/query", "ver");
+		String storedHash = "";
 		List<Element> its = DynamicRoster.getRosterItems(session, settings);
 		if (its != null && its.size() > 0) {
 			for (Iterator<Element> it = its.iterator(); it.hasNext();) {
@@ -286,11 +292,20 @@ public abstract class JabberIqRoster {
 				}
 			}
 		}
+		if (incomingHash != null) {
+			storedHash = roster_util.getBuddiesHash(session);
+			if (incomingHash.equals(storedHash)) {
+				results.offer(packet.okResult((String) null, 0));
+				return;
+			}
+		}
     String[] buddies = roster_util.getBuddies(session, false);
     if (buddies != null) {
 			Element query = new Element("query");
 			query.setXMLNS(XMLNS);
-      for (String buddy : buddies) {
+			if (incomingHash != null)
+				query.setAttribute("ver", storedHash);
+			for (String buddy : buddies) {
  				try {
 					Element buddy_item = roster_util.getBuddyItem(session, buddy);
 					//String item_group = buddy_item.getCData("/item/group");
