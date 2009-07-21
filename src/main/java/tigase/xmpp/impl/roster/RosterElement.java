@@ -123,7 +123,7 @@ public class RosterElement {
 	private void setJid(String jid) {
 		this.jid = jid.toLowerCase();
 		String buddy_domain = JIDUtils.getNodeHost(this.jid);
-		if (session.isLocalDomain(buddy_domain, false)) {
+		if (session != null && session.isLocalDomain(buddy_domain, false)) {
 			this.jid = this.jid.intern();
 		}
 	}
