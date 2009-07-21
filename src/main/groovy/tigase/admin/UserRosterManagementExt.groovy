@@ -121,12 +121,12 @@ def updateRoster = { jid, i_jid, i_name, i_groups, i_subscr ->
 		String rosterStr = repository.getData(JIDUtils.getNodeID(jid), null,
 			RosterAbstract.ROSTER, null) ?: ""
 		Map<String, RosterElement> roster = new LinkedHashMap<String, RosterElement>()
-		RosterFlat.parseRoster(rosterStr, roster)
+		RosterFlat.parseRoster(rosterStr, roster, null)
 		if (remove_item) {
 			roster.remove(i_jid)
 		} else {
 			RosterElement rel = new RosterElement(i_jid, i_name,
-					i_groups ? i_groups.split(",") : null)
+					i_groups ? i_groups.split(",") : null, null)
 				rel.setSubscription(RosterAbstract.SubscriptionType.valueOf(i_subscr))
 			roster.put(i_jid, rel)
 		}

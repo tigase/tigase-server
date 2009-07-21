@@ -133,7 +133,7 @@ class RosterChangesControler {
 		String rosterStr = repository.getData(ownerJid, null, RosterAbstract.ROSTER, null)
 		rosterStr = (rosterStr == null) ? "" : rosterStr
 		Map<String, RosterElement> roster = new LinkedHashMap<String, RosterElement>()
-		RosterFlat.parseRoster(rosterStr, roster)
+		RosterFlat.parseRoster(rosterStr, roster, null)
 		modifyFunc(roster)
 		StringBuilder sb = new StringBuilder()
 		for (RosterElement relem: roster.values())
@@ -148,7 +148,7 @@ class RosterChangesControler {
 				RosterElement userToAdd = roster.get(jidToAdd)
 				if (userToAdd == null) {
 					userToAdd = new RosterElement(
-							jidToAdd, jidToAdd, groups)
+							jidToAdd, jidToAdd, groups, null)
 				}
 				userToAdd.setSubscription(subscription(subscriptionType))
 				userToAdd.setGroups(groups)
