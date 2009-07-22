@@ -67,30 +67,30 @@ public class PacketCounter implements PacketFilterIfc {
 			incIQCounter(xmlns != null ? xmlns : packet.getIQChildName());
 		}
 		// TESTING ONLY START
-		try {
-			String node_name = null;
-			List<Element> children = packet.getElemChildren("/iq/pubsub");
-			if (children != null) {
-				for (Element elem : children) {
-					node_name = elem.getAttribute("node");
-					if (node_name != null) {
-						break;
-					}
-				}
-			}
-			if (node_name != null) {
-				String node_no = node_name.substring("node-".length());
-				int no = Integer.parseInt(node_no);
-				if ((lastNodeNo + 1 != no) && (lastNodeNo != no)) {
-					log.warning(name + ":" + qType.name() +
-									": Incorrect node number, lastNodeNo = " + lastNodeNo +
-									", current number: " + no + ", or packet: " + packet.toString());
-				}
-				lastNodeNo = no;
-			}
-		} catch (Exception e) {
-			//e.printStackTrace();
-		}
+//		try {
+//			String node_name = null;
+//			List<Element> children = packet.getElemChildren("/iq/pubsub");
+//			if (children != null) {
+//				for (Element elem : children) {
+//					node_name = elem.getAttribute("node");
+//					if (node_name != null) {
+//						break;
+//					}
+//				}
+//			}
+//			if (node_name != null) {
+//				String node_no = node_name.substring("node-".length());
+//				int no = Integer.parseInt(node_no);
+//				if ((lastNodeNo + 1 != no) && (lastNodeNo != no)) {
+//					log.warning(name + ":" + qType.name() +
+//									": Incorrect node number, lastNodeNo = " + lastNodeNo +
+//									", current number: " + no + ", or packet: " + packet.toString());
+//				}
+//				lastNodeNo = no;
+//			}
+//		} catch (Exception e) {
+//			//e.printStackTrace();
+//		}
 		// TESTING ONLY END
 		return false;
 	}
