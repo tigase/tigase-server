@@ -127,10 +127,10 @@ public class TigaseTracer {
 		if (ip != null && ips.contains(ip)) {
 			return waiting.offer(format(ip, id, point, msg, packet));
 		}
-		if (to_jid != null && jids.contains(JIDUtils.getNodeID(to_jid))) {
+		if (to_jid != null && jids.contains(to_jid)) {
 			return waiting.offer(format("TO: " + to_jid, id, point, msg, packet));
 		}
-		if (from_jid != null && jids.contains(JIDUtils.getNodeID(from_jid))) {
+		if (from_jid != null && jids.contains(from_jid)) {
 			return waiting.offer(format("FROM: " + from_jid, id, point, msg, packet));
 		}
 		if (cid != null && cids.contains(cid)) {
