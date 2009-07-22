@@ -238,7 +238,7 @@ public abstract class RepositoryAccess {
    * @return a <code>boolean</code> value which informs whether this session has
    * been already authorized or not.
    */
-  public final boolean isAuthorized() {
+  public boolean isAuthorized() {
     return authState == Authorization.AUTHORIZED;
   }
 

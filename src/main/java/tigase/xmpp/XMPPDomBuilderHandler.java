@@ -156,8 +156,8 @@ public class XMPPDomBuilderHandler implements SimpleHandler {
 		if (idx > 0) {
 			tmp_name_prefix = tmp_name.substring(0, idx);
 			if (log.isLoggable(Level.FINEST)) {
-    			log.finest("Found prefixed element name, prefix: " + tmp_name_prefix);
-            }
+				log.finest("Found prefixed element name, prefix: " + tmp_name_prefix);
+			}
 		}
 		if (tmp_name_prefix != null) {
 			for (String pref : namespaces.keySet()) {
@@ -166,8 +166,8 @@ public class XMPPDomBuilderHandler implements SimpleHandler {
 					tmp_name = tmp_name.substring(pref.length() + 1, tmp_name.length());
 					prefix = pref;
 					if (log.isLoggable(Level.FINEST)) {
-                		log.finest("new_xmlns = " + new_xmlns);
-                    }
+						log.finest("new_xmlns = " + new_xmlns);
+					}
 				} // end of if (tmp_name.startsWith(xmlns))
 			} // end of for (String xmlns: namespaces.keys())
 		}

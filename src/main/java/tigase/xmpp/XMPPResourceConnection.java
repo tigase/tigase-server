@@ -150,7 +150,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 			parentSession.removeCommonSessionData(key);
 	}
 
-	public void setConnectionStatus(ConnectionStatus status) {
+	public synchronized void setConnectionStatus(ConnectionStatus status) {
 		connectionStatus = status;
 	}
 
@@ -228,6 +228,12 @@ public class XMPPResourceConnection extends RepositoryAccess {
 		loginHandler.handlePresenceSet(this);
 	}
 
+	/**
+	 * Returns last presence packet with the user presence status or <code>null</code>
+	 * if the user has not yet sent an initial presence.
+	 * @return an <code>Element</code> with last presence status received
+	 * from the user.
+	 */
 	public Element getPresence() {
 		return (Element)getSessionData(PRESENCE_KEY);
 	}
@@ -240,7 +246,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 		return priority;
 	}
 
-	public void streamClosed() {
+	public synchronized void streamClosed() {
 		if (parentSession != null) {
 			parentSession.streamClosed(this);
 		} // end of if (parentSession != null)
@@ -249,7 +255,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 		sessionId = null;
 	}
 
-	public void setParentSession(final XMPPSession parent) {
+	public synchronized void setParentSession(final XMPPSession parent) {
 		if (parent != null) {
 			userId = JIDUtils.getNodeID(parent.getUserName(), domain.getVhost());
 			userJid = userId + (resource != null ? ("/" + resource) : "/" + sessionId);
@@ -280,7 +286,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
    * been authorized yet and some parts of user JID are not known yet.
    */
   public final String getJID() throws NotAuthorizedException {
-    if (parentSession == null) {
+    if (!isAuthorized()) {
       throw new NotAuthorizedException(NOT_AUTHORIZED_MSG);
     } // end of if (username == null)
     return userJid;
@@ -317,7 +323,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
    */
 	@Override
   public final String getUserId() throws NotAuthorizedException {
-    if (parentSession == null) {
+    if (!isAuthorized()) {
       throw new NotAuthorizedException(NOT_AUTHORIZED_MSG);
     } // end of if (username == null)
     return userId;
@@ -325,7 +331,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 
 	@Override
 	public final String getUserName() throws NotAuthorizedException {
-    if (parentSession == null) {
+    if (!isAuthorized()) {
       throw new NotAuthorizedException(NOT_AUTHORIZED_MSG);
     } // end of if (username == null)
     return parentSession.getUserName();
@@ -333,17 +339,22 @@ public class XMPPResourceConnection extends RepositoryAccess {
 
 	public List<XMPPResourceConnection> getActiveSessions()
 		throws NotAuthorizedException {
-    if (parentSession == null) {
+    if (!isAuthorized()) {
       throw new NotAuthorizedException(NOT_AUTHORIZED_MSG);
     } // end of if (username == null)
 		return parentSession.getActiveResources();
 	}
 
 	public String[] getAllResourcesJIDs() throws NotAuthorizedException {
-    if (parentSession == null) {
+    if (!isAuthorized()) {
       throw new NotAuthorizedException(NOT_AUTHORIZED_MSG);
     } // end of if (username == null)
 		return parentSession.getJIDs();
+	}
+
+	@Override
+	public boolean isAuthorized() {
+		return super.isAuthorized() && parentSession != null;
 	}
 
 	/**
@@ -391,7 +402,8 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	 * @param argResource Value to assign to this.resource
 	 * @throws NotAuthorizedException
 	 */
-	public void setResource(final String argResource) throws NotAuthorizedException {
+	public synchronized void setResource(final String argResource)
+					throws NotAuthorizedException {
 		this.resource = argResource;
 		// There is really unlikely a parent session would be null here but it may
 		// happen when the user disconnects just after sending resource bind.
@@ -440,7 +452,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	}
 
 	@Override
-	public final void logout()
+	public synchronized final void logout()
 		throws NotAuthorizedException {
 		loginHandler.handleLogout(getUserName(), this);
 		streamClosed();
@@ -478,7 +490,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	}
 
 	@Override
-  public final Authorization loginPlain(String user, String password)
+  public synchronized final Authorization loginPlain(String user, String password)
 		throws NotAuthorizedException, AuthorizationException, TigaseDBException {
 		Authorization result = super.loginPlain(user, password);
 		if (result == Authorization.AUTHORIZED) {
@@ -488,7 +500,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	}
 
 	@Override
-  public final Authorization loginDigest(String user, String digest,
+  public synchronized final Authorization loginDigest(String user, String digest,
 		String id, String alg)
 		throws NotAuthorizedException, AuthorizationException, TigaseDBException {
 		Authorization result = super.loginDigest(user, digest, id, alg);
@@ -499,7 +511,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	}
 
 	@Override
-  public final Authorization loginOther(Map<String, Object> props)
+  public synchronized final Authorization loginOther(Map<String, Object> props)
 		throws NotAuthorizedException, AuthorizationException, TigaseDBException {
 		Authorization result = super.loginOther(props);
 		if (result == Authorization.AUTHORIZED) {
