@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import tigase.server.QueueType;
 import tigase.sys.TigaseRuntime;
 
@@ -40,6 +41,9 @@ import tigase.sys.TigaseRuntime;
  */
 public class StatisticsProvider extends StandardMBean
 				implements StatisticsProviderMBean {
+
+	private static final Logger log =
+    Logger.getLogger(StatisticsProvider.class.getName());
 
 	private StatisticsCollector theRef;
 
@@ -266,7 +270,7 @@ public class StatisticsProvider extends StandardMBean
 
 	@Override
 	public float getCPUUsage() {
-		return TigaseRuntime.getTigaseRuntime().getCPUUsage();
+		return cache.cpuUsage;
 	}
 
 	@Override
@@ -355,6 +359,20 @@ public class StatisticsProvider extends StandardMBean
 		return cache.iqAuthNumber;
 	}
 
+	@Override
+	public int getSMQueueSize() {
+		return cache.smQueue;
+	}
+
+	@Override
+	public int getCLQueueSize() {
+		return cache.clQueue;
+	}
+
+	@Override
+	public int getCLIOQueueSize() {
+		return cache.clIOQueue;
+	}
 
 	private StatisticsCache cache = new StatisticsCache();
 
@@ -381,18 +399,26 @@ public class StatisticsProvider extends StandardMBean
 		private long presencesNumber = 0;
 		private long iqOtherNumber = 0;
 		private long iqAuthNumber = 0;
+		private int smQueue = 0;
+		private int clQueue = 0;
+		private int clIOQueue = 0;
 		private String systemDetails = "";
 		private Timer updateTimer = null;
 		private int inter = 10;
 		private int cnt = 0;
+		private float cpuUsage = 0f;
 
 		private StatisticsCache() {
 			updateTimer = new Timer("stats-cache", true);
-			updateTimer.schedule(new TimerTask() {
+			updateTimer.scheduleAtFixedRate(new TimerTask() {
 				@Override
 				public void run() {
-					update();
-					updateSystemDetails();
+					try {
+						update();
+						updateSystemDetails();
+					} catch (Exception e) {
+						log.log(Level.WARNING, "Problem retrieving statistics: ", e);
+					}
 				}
 			}, 10*1000, 1000);
 		}
@@ -405,6 +431,7 @@ public class StatisticsProvider extends StandardMBean
 //		}
 
 		private void update() {
+			cpuUsage = TigaseRuntime.getTigaseRuntime().getCPUUsage();
 			allStats = new StatisticsList(Level.FINER);
 			theRef.getAllStats(allStats);
 			//System.out.println(allStats.toString());
@@ -420,6 +447,7 @@ public class StatisticsProvider extends StandardMBean
 							"Open connections", 0) +
 							allStats.getValue(BOSH_COMP,
 							"Open connections", 0);
+			clIOQueue = allStats.getValue(CL_COMP, "Waiting to send", 0);
 			clusterCache = allStats.getValue("cl-caching-strat", "Cached JIDs", 0);
 			messagesNumber = allStats.getValue(SM_COMP, QueueType.IN_QUEUE.name() +
 							" messages", 0L);
@@ -442,6 +470,8 @@ public class StatisticsProvider extends StandardMBean
 			}
 			queueSize = 0;
 			queueOverflow = 0;
+			smQueue = 0;
+			clQueue = 0;
 			for (StatRecord rec : allStats) {
 				if (rec.getDescription() == StatisticType.IN_QUEUE_OVERFLOW.getDescription() ||
 								rec.getDescription() == StatisticType.OUT_QUEUE_OVERFLOW.getDescription()) {
@@ -450,6 +480,12 @@ public class StatisticsProvider extends StandardMBean
 				if (rec.getDescription() == "Total In queues wait" ||
 								rec.getDescription() == "Total Out queues wait") {
 					queueSize += rec.getIntValue();
+					if (rec.getComponent().equals(SM_COMP)) {
+						smQueue += rec.getIntValue();
+					}
+					if (rec.getComponent().equals(CL_COMP)) {
+						clQueue += rec.getIntValue();
+					}
 				}
 			}
 			//System.out.println("clusterPackets: " + clusterPackets +
@@ -493,10 +529,10 @@ public class StatisticsProvider extends StandardMBean
 					}
 				}
 			}
-			sb.append("\nSM presences received: ").append(lastPresencesReceived);
-			sb.append(" / ").append(presences_received_per_update);
-			sb.append("\nSM presences sent: ").append(lastPresencesSent);
-			sb.append(" / ").append(presences_sent_per_update);
+			sb.append("\nSM presences received: Tot - ").append(lastPresencesReceived);
+			sb.append(" / ").append(presences_received_per_update).append(" last sec");
+			sb.append("\nSM presences sent: Tot - ").append(lastPresencesSent);
+			sb.append(" / ").append(presences_sent_per_update).append(" last sec");
 			systemDetails = sb.toString();
 		}
 

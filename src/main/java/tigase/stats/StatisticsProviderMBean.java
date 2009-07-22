@@ -81,6 +81,12 @@ public interface StatisticsProviderMBean
 
 	public int getQueueSize();
 
+	public int getSMQueueSize();
+
+	public int getCLQueueSize();
+
+	public int getCLIOQueueSize();
+
 	public long getQueueOverflow();
 
 	public long getPacketsNumber();
