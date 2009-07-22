@@ -93,7 +93,8 @@ public class JabberIqPrivacy extends XMPPProcessor
 	@Override
 	public void filter(Packet packet, XMPPResourceConnection session,
 					NonAuthUserRepository repo, Queue<Packet> results) {
-		if (session == null || results == null || results.size() == 0) {
+		if (session == null || !session.isAuthorized() ||
+						results == null || results.size() == 0) {
 			return;
 		}
 		for (Iterator<Packet> it = results.iterator(); it.hasNext();) {
