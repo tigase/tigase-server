@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.Queue;
 import java.util.Map;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import tigase.xml.Element;
@@ -167,6 +169,20 @@ public class RosterFlat extends RosterAbstract {
 			return roster.keySet().toArray(new String[0]);
 		}
   }
+
+	@Override
+	public List<Element> getRosterItems(XMPPResourceConnection session, boolean onlineOnly)
+					throws NotAuthorizedException, TigaseDBException {
+		LinkedList<Element> items = new LinkedList<Element>();
+		Map<String, RosterElement> roster = getUserRoster(session);
+		for (RosterElement relem : roster.values()) {
+			if (relem.isOnline() || !onlineOnly) {
+				items.add(relem.getRosterItem());
+			}
+		}
+		return items;
+	}
+
 
 	@Override
   public String getBuddyName(final XMPPResourceConnection session,

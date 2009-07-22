@@ -26,6 +26,7 @@ import tigase.xml.Element;
 import java.util.logging.Logger;
 import tigase.util.JIDUtils;
 
+import tigase.xml.XMLUtils;
 import tigase.xmpp.XMPPResourceConnection;
 import static tigase.xmpp.impl.roster.RosterAbstract.SubscriptionType;
 
@@ -55,6 +56,7 @@ public class RosterElement {
 	private String name = null;
 	private String jid = null;
 	private boolean online = false;
+	//private Element item = null;
 
 	public boolean isOnline() {
 		return online;
@@ -138,6 +140,7 @@ public class RosterElement {
 
 	public void setName(String name) {
 		this.name = name;
+		//item = null;
 	}
 
 	public String[] getGroups() {
@@ -146,6 +149,7 @@ public class RosterElement {
 
 	public void setGroups(String[] groups) {
 		this.groups = groups;
+		//item = null;
 	}
 
 	public SubscriptionType getSubscription() {
@@ -158,6 +162,7 @@ public class RosterElement {
 		} else {
 			this.subscription = subscription;
 		}
+		//item = null;
 	}
 
 	public Element getRosterElement() {
@@ -173,6 +178,28 @@ public class RosterElement {
 			elem.setAttribute(GRP_ATT, grps);
 		}
 		return elem;
+	}
+
+	public Element getRosterItem() {
+		// This is actually not a good idea to cache the item element.
+		// This causes a huge memory consumption and usually the item
+		// is needed only once at the roster retrieving time.
+		//if (item == null) {
+			Element item = new Element("item");
+			item.setAttribute("jid", jid);
+			item.addAttributes(subscription.getSubscriptionAttr());
+			if (name != null) {
+				item.setAttribute("name", XMLUtils.escape(name));
+			}
+			if (groups != null) {
+				for (String gr : groups) {
+					Element group = new Element("group");
+					group.setCData(XMLUtils.escape(gr));
+					item.addChild(group);
+				} // end of for ()
+			} // end of if-else
+		//}
+		return item;
 	}
 
 	void addGroups(String[] groups) {
@@ -191,6 +218,7 @@ public class RosterElement {
 				this.groups = groupsSet.toArray(new String[groupsSet.size()]);
 			}
 		}
+		//item = null;
 	}
 
 }

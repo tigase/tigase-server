@@ -23,9 +23,11 @@ package tigase.xmpp.impl.roster;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Queue;
 import java.util.Map;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import tigase.server.Packet;
@@ -537,6 +539,20 @@ public abstract class RosterAbstract {
     } // end of for ()
     return list.toArray(new String[list.size()]);
   }
+
+	public List<Element> getRosterItems(XMPPResourceConnection session, boolean online)
+    throws NotAuthorizedException, TigaseDBException {
+    LinkedList<Element> items = new LinkedList<Element>();
+		String[] buddies = getBuddies(session, online);
+		if (buddies != null) {
+			for (String buddy : buddies) {
+					Element buddy_item = getBuddyItem(session, buddy);
+					//String item_group = buddy_item.getCData("/item/group");
+					items.add(buddy_item);
+			}
+		}
+		return items;
+	}
 
 	public boolean updateBuddySubscription(
 		final XMPPResourceConnection session,	final PresenceType presence,
