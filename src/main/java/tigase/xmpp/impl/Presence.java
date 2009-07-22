@@ -680,6 +680,11 @@ public abstract class Presence {
 						} // end of if (subscr_changed)
 						break;
 					case in_initial:
+						if (session.getPresence() == null) {
+							// If the user has not yet sent initial presence then ignore
+							// the probe.
+							return;
+						}
 						if (packet.getElemFrom() == null) {
 							// That really happened already. It looks like a bug in tigase
 							// let's try to catch it here....
@@ -836,6 +841,11 @@ public abstract class Presence {
 						}
 						break;
 					case in_probe:
+						if (session.getPresence() == null) {
+							// If the user has not yet sent initial presence then ignore
+							// the probe.
+							return;
+						}
 						SubscriptionType buddy_subscr = null;
 						if (DynamicRoster.getBuddyItem(session, settings,
 										packet.getElemFrom()) != null) {
