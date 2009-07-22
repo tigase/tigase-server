@@ -24,8 +24,6 @@ package tigase.server;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryUsage;
-import java.lang.management.OperatingSystemMXBean;
-import java.lang.management.ThreadMXBean;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
@@ -48,7 +46,6 @@ import tigase.xmpp.PacketErrorTypeException;
 import tigase.disco.XMPPService;
 import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
-import tigase.stats.StatRecord;
 
 import tigase.stats.StatisticsList;
 import tigase.sys.TigaseRuntime;
@@ -157,13 +154,11 @@ public class MessageRouter extends AbstractMessageReceiver {
 		}
 	}
 
-	private ServerComponent getLocalComponent(String jid) {
+	private ServerComponent getLocalComponent(String jid, String host, String nick) {
 		ServerComponent comp = components_byId.get(jid);
 		if (comp != null) {
 			return comp;
 		}
-		String host = JIDUtils.getNodeHost(jid);
-		String nick = JIDUtils.getNodeNick(jid);
 
 		if (nick != null) {
 			comp = components.get(nick);
@@ -250,7 +245,8 @@ public class MessageRouter extends AbstractMessageReceiver {
 		}
 
 		ServerComponent comp = packet.getElemTo() == null ? null
-      : getLocalComponent(packet.getElemTo());
+      : getLocalComponent(packet.getElemTo(), packet.getElemToHost(),
+			packet.getElemToNick());
 		if (packet.isServiceDisco() && packet.getType() != null &&
 						packet.getType() == StanzaType.get &&
 						((comp != null && !(comp instanceof DisableDisco)) ||
@@ -268,8 +264,9 @@ public class MessageRouter extends AbstractMessageReceiver {
 			}
 			return;
 		}
-		String id =  JIDUtils.getNodeID(packet.getTo());
-		comp = getLocalComponent(id);
+//		String id =  packet.getToId();
+		comp = getLocalComponent(packet.getToId(), packet.getToHost(),
+						packet.getToNick());
 		if (comp != null) {
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("Packet will be processed by: " + comp.getComponentId());
@@ -293,7 +290,7 @@ public class MessageRouter extends AbstractMessageReceiver {
 		// Let's try to find message receiver quick way
 		// In case if packet is handled internally:
 //		String nick = JIDUtils.getNodeNick(packet.getTo());
-		String host = JIDUtils.getNodeHost(packet.getTo());
+		String host = packet.getToHost();
 //		MessageReceiver first = null;
 		// Below code probably never get's executed anyway.
 		// All components included in commented code below should
@@ -311,7 +308,7 @@ public class MessageRouter extends AbstractMessageReceiver {
 
 		ServerComponent[] comps = getComponentsForLocalDomain(host);
 		if (comps == null) {
-			comps = getServerComponentsForRegex(id);
+			comps = getServerComponentsForRegex(packet.getToId());
 		}
 		if (comps == null && !isLocalDomain(host)) {
 			comps = getComponentsForNonLocalDomain(host);
@@ -583,7 +580,7 @@ public class MessageRouter extends AbstractMessageReceiver {
 	private void processDiscoQuery(final Packet packet,
 		final Queue<Packet> results) {
 			String jid = packet.getElemTo();
-			String nick = JIDUtils.getNodeNick(jid);
+			String nick = packet.getElemToNick();
 			String node = packet.getAttribute("/iq/query", "node");
 			Element query = packet.getElement().getChild("query").clone();
 
@@ -624,7 +621,8 @@ public class MessageRouter extends AbstractMessageReceiver {
 						}
 					} // end of for ()
 				} else {
-					ServerComponent comp = getLocalComponent(packet.getElemTo());
+					ServerComponent comp = getLocalComponent(packet.getElemTo(),
+									packet.getElemToHost(), packet.getElemToNick());
 					if (comp != null && comp instanceof XMPPService) {
 						List<Element> items = ((XMPPService)comp).getDiscoItems(node, jid);
 						if (log.isLoggable(Level.FINEST)) {

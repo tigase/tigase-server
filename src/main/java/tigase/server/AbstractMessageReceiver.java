@@ -546,19 +546,19 @@ public abstract class AbstractMessageReceiver
 			out_thread.start();
 		} // end of if (thread == null || ! thread.isAlive())
 		receiverTasks = new Timer(getName() + " tasks", true);
-		receiverTasks.schedule(new TimerTask() {
+		receiverTasks.scheduleAtFixedRate(new TimerTask() {
 			@Override
 				public void run() {
 					everySecond();
 				}
 			}, SECOND, SECOND);
-		receiverTasks.schedule(new TimerTask() {
+		receiverTasks.scheduleAtFixedRate(new TimerTask() {
 			@Override
 				public void run() {
 					everyMinute();
 				}
 			}, MINUTE, MINUTE);
-		receiverTasks.schedule(new TimerTask() {
+		receiverTasks.scheduleAtFixedRate(new TimerTask() {
 			@Override
 				public void run() {
 					everyHour();

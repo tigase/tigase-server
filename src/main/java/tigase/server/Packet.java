@@ -28,6 +28,7 @@ import java.util.LinkedHashSet;
 import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
 import tigase.disco.XMPPService;
+import tigase.util.JIDUtils;
 
 /**
  * Class Packet
@@ -68,18 +69,25 @@ public class Packet {
 	private final StanzaType type;
 	private final boolean routed;
 	private String to = null;
+	private String toId = null;
+	private String toHost = null;
+	private String toNick = null;
 	private String from = null;
 	private String id = null;
 	private Permissions permissions = Permissions.NONE;
 	private String packetToString = null;
 	private Priority priority = Priority.NORMAL;
+	private String iqQueryXMLNS = null;
+	private String elemTo = null;
+	private String elemToId = null;
+	private String elemToHost = null;
+	private String elemToNick = null;
 
   public Packet(final Element elem) {
 		if (elem == null) {
 			throw new NullPointerException();
 		} // end of if (elem == null)
 		this.elem = elem;
-		this.id = elem.getAttribute("id");
 		if (elem.getAttribute("type") != null) {
 			type = StanzaType.valueof(elem.getAttribute("type"));
 		} else {
@@ -119,6 +127,7 @@ public class Packet {
 		else {
 			routed = false;
 		} // end of if (elem.getName().equals("route")) else
+		initVars();
 	}
 
 	public Packet(String el_name, String from, String to, StanzaType type) {
@@ -131,6 +140,26 @@ public class Packet {
 		this.cmd = false;
 		this.routed = false;
 		this.serviceDisco = false;
+		initVars();
+	}
+
+	private void initVars() {
+		elemTo = elem.getAttribute("to");
+		if (elemTo != null) {
+			elemToHost = JIDUtils.getNodeHost(elemTo);
+			elemToNick = JIDUtils.getNodeNick(elemTo);
+			elemToId = JIDUtils.getNodeID(elemTo);
+		}
+		id = elem.getAttribute("id");
+		initTo();
+	}
+
+	private void initTo() {
+		if (to != null) {
+			toId = JIDUtils.getNodeID(to);
+			toHost = JIDUtils.getNodeHost(to);
+			toNick = JIDUtils.getNodeNick(to);
+		}
 	}
 
 	public void setPriority(Priority priority) {
@@ -203,7 +232,10 @@ public class Packet {
 	}
 
 	public String getIQXMLNS() {
-		return elem.getXMLNS("/iq/query");
+		if (iqQueryXMLNS == null) {
+			iqQueryXMLNS = elem.getXMLNS("/iq/query");
+		}
+		return iqQueryXMLNS;
 	}
 
 	public String getIQChildName() {
@@ -223,12 +255,24 @@ public class Packet {
 	}
 
 	public String getTo() {
-		return to != null ? to : getElemTo();
+		return to != null ? to : elemTo;
+	}
+
+	public String getToId() {
+		return toId != null ? toId : elemToId;
+	}
+
+	public String getToHost() {
+		return toHost != null ? toHost : elemToHost;
+	}
+
+	public String getToNick() {
+		return toNick != null ? toNick : elemToNick;
 	}
 
 	public void setTo(final String to) {
-		packetToString = null;
 		this.to = to;
+		initTo();
 	}
 
 	public String getFrom() {
@@ -249,8 +293,16 @@ public class Packet {
 	 * @return
 	 */
   public String getElemTo() {
-    return elem.getAttribute("to");
+		return elemTo;
   }
+
+	public String getElemToHost() {
+		return elemToHost;
+	}
+
+	public String getElemToNick() {
+		return elemToNick;
+	}
 
 	public String getAttribute(String path, String attr_name) {
 		return elem.getAttribute(path, attr_name);
@@ -265,7 +317,7 @@ public class Packet {
   }
 
 	public String getElemId() {
-    return elem.getAttribute("id");
+		return id;
 	}
 
 	public String getElemCData(final String path) {
