@@ -33,6 +33,9 @@ public class Numbers {
 	//public static char[] sizeChars = {'k', 'K', 'm', 'M', 'g', 'G', 't', 'T'};
 
 	public static int parseSizeInt(String size, int def) {
+		if (size == null) {
+			return def;
+		}
 		int result = def;
 		String toParse = size;
 		int multiplier = 1;

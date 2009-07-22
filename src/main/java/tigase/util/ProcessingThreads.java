@@ -130,10 +130,18 @@ public class ProcessingThreads<E extends WorkerThread> {
 		item.conn = conn;
 		item.packet = packet;
 		try {
-			// Queueing packets per user...
-			ret = queues.get(Math.abs(conn.getUserId().hashCode() %
-							numQueues)).offer(item, packet.getPriority().ordinal());
+			if (item.conn != null && item.conn.isAuthorized()) {
+				// Queueing packets per user...
+				ret = queues.get(Math.abs(conn.getUserId().hashCode() %
+								numQueues)).offer(item, packet.getPriority().ordinal());
+			} else {
+				// Otherwise per destination address
+				ret = queues.get(Math.abs(packet.getFrom().hashCode() %
+								numQueues)).offer(item, packet.getPriority().ordinal());
+			}
 		} catch (Exception e) {
+			// This should not happen, but just in case until we are sure all 
+			// cases are catched.
 			// Otherwise per destination address
 			ret = queues.get(Math.abs(packet.getFrom().hashCode() %
 							numQueues)).offer(item, packet.getPriority().ordinal());
