@@ -110,6 +110,12 @@ public class RosterPresence  extends XMPPProcessor
 			}
 			return;
 		} // end of if (session == null)
+		if (!session.isAuthorized()) {
+			if (log.isLoggable(Level.FINE)) {
+				log.fine("Session is not authorized, ignoring packet: " + packet.toString());
+			}
+			return;
+		}
 
 		if (packet.getElemName().equals(PRESENCE)) {
 			Presence.process(packet, session, repo, results, settings);
