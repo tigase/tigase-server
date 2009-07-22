@@ -396,7 +396,7 @@ public abstract class IOService implements Callable<IOService> {
 					tmpBuffer.flip();
 					cb = decoder.decode(tmpBuffer);
 					tmpBuffer.clear();
-					addRead(cb.array().length);
+					//addRead(cb.array().length);
 				} else {
 					// Detecting infinite read 0 bytes
 					// sometimes it happens that the connection has been lost
@@ -452,7 +452,7 @@ public abstract class IOService implements Callable<IOService> {
 					socketIO.write(dataBuffer);
 
 					setLastTransferTime();
-					addWritten(data.length());
+					//addWritten(data.length());
 					empty_read_call_count = 0;
 				} else {
 					if (socketIO.waitingToSend()) {
