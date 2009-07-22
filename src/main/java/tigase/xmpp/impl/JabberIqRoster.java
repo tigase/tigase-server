@@ -250,8 +250,8 @@ public abstract class JabberIqRoster {
 			}
 			Element new_buddy = roster_util.getBuddyItem(session, buddy);
 			if (log.isLoggable(Level.FINEST)) {
-    			log.finest("1. New Buddy: " + new_buddy.toString());
-            }
+				log.finest("1. New Buddy: " + new_buddy.toString());
+			}
       if (roster_util.getBuddySubscription(session, buddy) == null) {
 				roster_util.setBuddySubscription(session, SubscriptionType.none, buddy);
       } // end of if (getBuddySubscription(session, buddy) == null)
@@ -264,8 +264,8 @@ public abstract class JabberIqRoster {
 			}
 			new_buddy = roster_util.getBuddyItem(session, buddy);
 			if (log.isLoggable(Level.FINEST)) {
-    			log.finest("2. New Buddy: " + new_buddy.toString());
-            }
+				log.finest("2. New Buddy: " + new_buddy.toString());
+			}
       results.offer(packet.okResult((String)null, 0));
       roster_util.updateBuddyChange(session, results, new_buddy);
     } // end of else
@@ -299,34 +299,45 @@ public abstract class JabberIqRoster {
 				return;
 			}
 		}
-    String[] buddies = roster_util.getBuddies(session, false);
-    if (buddies != null) {
+		List<Element> ritems = roster_util.getRosterItems(session, false);
+		if (ritems != null && ritems.size() > 0) {
 			Element query = new Element("query");
 			query.setXMLNS(XMLNS);
 			if (incomingHash != null)
 				query.setAttribute("ver", storedHash);
-			for (String buddy : buddies) {
- 				try {
-					Element buddy_item = roster_util.getBuddyItem(session, buddy);
-					//String item_group = buddy_item.getCData("/item/group");
-					query.addChild(buddy_item);
-				} catch (TigaseDBException e) {
-					// It happens that some weird JIDs drive database crazy and
-					// it throws exceptions. Let's for now just ignore those
-					// contacts....
-					log.info("Can not retrieve data for contact: " + buddy
-						+ ", an exception occurs: " + e);
-				}
-      }
-			if (query.getChildren() != null && query.getChildren().size() > 0) {
-				results.offer(packet.okResult(query, 0));
-			} else {
-				results.offer(packet.okResult((String)null, 1));
-			} // end of if (buddies != null) else
+			query.addChildren(ritems);
+			results.offer(packet.okResult(query, 0));
 		} else {
 			results.offer(packet.okResult((String)null, 1));
 		}
-		if (its != null) {
+//    String[] buddies = roster_util.getBuddies(session, false);
+//    if (buddies != null) {
+//			Element query = new Element("query");
+//			query.setXMLNS(XMLNS);
+//			if (incomingHash != null)
+//				query.setAttribute("ver", storedHash);
+//			for (String buddy : buddies) {
+// 				try {
+//					Element buddy_item = roster_util.getBuddyItem(session, buddy);
+//					//String item_group = buddy_item.getCData("/item/group");
+//					query.addChild(buddy_item);
+//				} catch (TigaseDBException e) {
+//					// It happens that some weird JIDs drive database crazy and
+//					// it throws exceptions. Let's for now just ignore those
+//					// contacts....
+//					log.info("Can not retrieve data for contact: " + buddy
+//						+ ", an exception occurs: " + e);
+//				}
+//      }
+//			if (query.getChildren() != null && query.getChildren().size() > 0) {
+//				results.offer(packet.okResult(query, 0));
+//			} else {
+//				results.offer(packet.okResult((String)null, 1));
+//			} // end of if (buddies != null) else
+//		} else {
+//			results.offer(packet.okResult((String)null, 1));
+//		}
+		if (its != null && its.size() > 0) {
 			LinkedList<Element> items = new LinkedList<Element>(its);
 			while (items.size() > 0) {
 				Element iq = new Element("iq",
