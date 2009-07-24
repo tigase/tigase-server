@@ -318,12 +318,6 @@ public class StatisticsProvider extends StandardMBean
 	}
 
 	@Override
-	public long getPacketsNumber() {
-		//cache.updateIfOlder(1000);
-		return cache.smPackets;
-	}
-
-	@Override
 	public long getClusterPackets() {
 		//cache.updateIfOlder(1000);
 		return cache.clusterPackets;
@@ -376,6 +370,36 @@ public class StatisticsProvider extends StandardMBean
 
 	private StatisticsCache cache = new StatisticsCache();
 
+	@Override
+	public long getSMPacketsNumber() {
+		return cache.smPackets;
+	}
+
+	@Override
+	public float getSMPacketsNumberPerSec() {
+		return cache.smPacketsPerSec;
+	}
+
+	@Override
+	public float getClusterPacketsPerSec() {
+		return cache.clusterPacketsPerSec;
+	}
+
+	@Override
+	public float getMessagesNumberPerSec() {
+		return cache.messagesPerSec;
+	}
+
+	@Override
+	public float getPresencesNumberPerSec() {
+		return cache.presencesPerSec;
+	}
+
+	@Override
+	public float getIQOtherNumberPerSec() {
+		return cache.iqOtherNumberPerSec;
+	}
+
 	private class StatisticsCache {
 
 		private static final String CL_COMP = "cl-comp";
@@ -385,8 +409,14 @@ public class StatisticsProvider extends StandardMBean
 
 		//private long lastUpdate = 0;
 		private StatisticsList allStats = new StatisticsList(Level.FINER);
+		private long prevClusterPackets = 0;
 		private long clusterPackets = 0;
+		private float prevClusterPacketsPerSec = 0;
+		private float clusterPacketsPerSec = 0;
+		private long prevSmPackets = 0;
 		private long smPackets = 0;
+		private float prevSmPacketsPerSec = 0;
+		private float smPacketsPerSec = 0;
 		private int clientConnections = 0;
 		private int clusterCache = 0;
 		private int queueSize = 0;
@@ -395,9 +425,17 @@ public class StatisticsProvider extends StandardMBean
 		private long presences_sent_per_update = 0;
 		private long lastPresencesReceived = 0;
 		private long presences_received_per_update = 0;
+		private long prevMessagesNumber = 0;
 		private long messagesNumber = 0;
+		private float prevMessagesPerSec = 0;
+		private float messagesPerSec = 0;
+		private long prevPresencesNumber = 0;
 		private long presencesNumber = 0;
+		private float prevPresencesPerSec = 0;
+		private float presencesPerSec = 0;
 		private long iqOtherNumber = 0;
+		private float prevIqOtherNumberPerSec = 0;
+		private float iqOtherNumberPerSec = 0;
 		private long iqAuthNumber = 0;
 		private int smQueue = 0;
 		private int clQueue = 0;
@@ -407,6 +445,7 @@ public class StatisticsProvider extends StandardMBean
 		private int inter = 10;
 		private int cnt = 0;
 		private float cpuUsage = 0f;
+		private float prevCpuUsage = 0f;
 
 		private StatisticsCache() {
 			updateTimer = new Timer("stats-cache", true);
@@ -431,28 +470,52 @@ public class StatisticsProvider extends StandardMBean
 //		}
 
 		private void update() {
-			cpuUsage = TigaseRuntime.getTigaseRuntime().getCPUUsage();
+			float temp = cpuUsage;
+			cpuUsage = (prevCpuUsage + (temp * 2) +
+							TigaseRuntime.getTigaseRuntime().getCPUUsage()) / 4;
+			prevCpuUsage = temp;
+
 			allStats = new StatisticsList(Level.FINER);
 			theRef.getAllStats(allStats);
 			//System.out.println(allStats.toString());
+
 			clusterPackets = allStats.getValue(CL_COMP,
 							StatisticType.MSG_RECEIVED_OK.getDescription(), 0L) +
 							allStats.getValue(CL_COMP,
 							StatisticType.MSG_SENT_OK.getDescription(), 0L);
+			temp = clusterPacketsPerSec;
+			clusterPacketsPerSec = (prevClusterPacketsPerSec + (temp * 2f) +
+							(clusterPackets - prevClusterPackets)) / 4f;
+			prevClusterPacketsPerSec = temp;
+			prevClusterPackets = clusterPackets;
+
 			smPackets = allStats.getValue(SM_COMP,
 							StatisticType.MSG_RECEIVED_OK.getDescription(), 0L) +
 							allStats.getValue(SM_COMP,
 							StatisticType.MSG_SENT_OK.getDescription(), 0L);
+			temp = smPacketsPerSec;
+			smPacketsPerSec = (prevSmPacketsPerSec + (temp * 2f) +
+							(smPackets - prevSmPackets)) / 4f;
+			prevSmPacketsPerSec = temp;
+			prevSmPackets = smPackets;
+
 			clientConnections = allStats.getValue(C2S_COMP,
 							"Open connections", 0) +
 							allStats.getValue(BOSH_COMP,
 							"Open connections", 0);
 			clIOQueue = allStats.getValue(CL_COMP, "Waiting to send", 0);
 			clusterCache = allStats.getValue("cl-caching-strat", "Cached JIDs", 0);
+
 			messagesNumber = allStats.getValue(SM_COMP, QueueType.IN_QUEUE.name() +
+							" messages", 0L) +
+							allStats.getValue(SM_COMP, QueueType.OUT_QUEUE.name() +
 							" messages", 0L);
-			messagesNumber += allStats.getValue(SM_COMP, QueueType.OUT_QUEUE.name() +
-							" messages", 0L);
+			temp = messagesPerSec;
+			messagesPerSec = (prevMessagesPerSec + (temp * 2f) +
+							(messagesNumber - prevMessagesNumber)) / 4f;
+			prevMessagesPerSec = temp;
+			prevMessagesNumber = messagesNumber;
+
 			long currPresencesReceived =
 							allStats.getValue(SM_COMP, QueueType.IN_QUEUE.name() +
 							" presences", 0L);
@@ -460,6 +523,11 @@ public class StatisticsProvider extends StandardMBean
 							allStats.getValue(SM_COMP, QueueType.OUT_QUEUE.name() +
 							" presences", 0L);
 			presencesNumber = currPresencesReceived + currPresencesSent;
+			temp = presencesPerSec;
+			presencesPerSec = (prevPresencesPerSec + (temp * 2f) +
+							(presencesNumber - prevPresencesNumber)) / 4f;
+			prevPresencesPerSec = temp;
+			prevPresencesNumber = presencesNumber;
 			if (++cnt >= inter) {
 				presences_sent_per_update = (currPresencesSent - lastPresencesSent) / 10;
 				presences_received_per_update = (currPresencesReceived -

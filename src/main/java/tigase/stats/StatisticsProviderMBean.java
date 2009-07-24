@@ -89,7 +89,7 @@ public interface StatisticsProviderMBean
 
 	public long getQueueOverflow();
 
-	public long getPacketsNumber();
+	public long getSMPacketsNumber();
 
 	public long getClusterPackets();
 
@@ -97,7 +97,17 @@ public interface StatisticsProviderMBean
 
 	public long getPresencesNumber();
 
+	public float getSMPacketsNumberPerSec();
+
+	public float getClusterPacketsPerSec();
+
+	public float getMessagesNumberPerSec();
+
+	public float getPresencesNumberPerSec();
+
 	public long getIQOtherNumber();
+
+	public float getIQOtherNumberPerSec();
 
 	public long getIQAuthNumber();
 
