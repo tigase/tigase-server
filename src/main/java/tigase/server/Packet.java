@@ -254,6 +254,10 @@ public class Packet {
 		return false;
 	}
 
+	public boolean isElement(String name, String xmlns) {
+		return elem.getName() == name && xmlns == elem.getXMLNS();
+	}
+
 	public String getTo() {
 		return to != null ? to : elemTo;
 	}
