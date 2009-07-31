@@ -70,6 +70,11 @@ public enum Command {
 	 */
 	STARTTLS(Priority.NORMAL),
 	/**
+	 * Command sent from the session manager to a connection manager to start
+	 * zlib compression on the connection stream.
+	 */
+	STARTZLIB(Priority.NORMAL),
+	/**
 	 * Command sent between a connection manager and the session manager to
 	 * retrieve stream features.
 	 */
