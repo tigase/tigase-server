@@ -143,6 +143,9 @@ public class SocketIO implements IOInterface {
     if (bytesRead == -1) {
       throw new EOFException("Channel has been closed.");
     } // end of if (result == -1)
+		if (bytesRead > 0) {
+			buff.flip();
+		}
     return buff;
   }
 

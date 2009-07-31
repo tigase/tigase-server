@@ -42,7 +42,7 @@ public class TLSIO implements IOInterface {
   /**
    * Variable <code>log</code> is a class logger.
    */
-  private static Logger log = Logger.getLogger("tigase.io.TLSIO");
+  private static Logger log = Logger.getLogger(TLSIO.class.getName());
 
   private IOInterface io = null;
   /**
@@ -86,7 +86,7 @@ public class TLSIO implements IOInterface {
 
   private ByteBuffer decodeData(ByteBuffer input) throws IOException {
     TLSStatus stat = null;
-		input.flip();
+		//input.flip();
     do_loop:
     do {
 			if (log.isLoggable(Level.FINER)) {
@@ -132,17 +132,18 @@ public class TLSIO implements IOInterface {
     } else {
       input.clear();
     }
+		tlsInput.flip();
     return tlsInput;
   }
 
 	@Override
   public ByteBuffer read(ByteBuffer buff) throws IOException {
-    buff = io.read(buff);
+    ByteBuffer tmpBuffer = io.read(buff);
 		if (io.bytesRead() > 0) {
 			if (log.isLoggable(Level.FINER)) {
 				log.finer("Read bytes: " + bytesRead());
 			}
-      return decodeData(buff);
+      return decodeData(tmpBuffer);
     } else {
       return null;
     } // end of else
@@ -164,6 +165,7 @@ public class TLSIO implements IOInterface {
     int wr = 0;
 		do {
 			ByteBuffer tlsOutput = ByteBuffer.allocate(tlsWrapper.getNetBuffSize());
+			// Not sure if this is really needed, I guess not...
       tlsOutput.clear();
       tlsWrapper.wrap(buff, tlsOutput);
       if (tlsWrapper.getStatus() == TLSStatus.CLOSED) {

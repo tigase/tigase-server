@@ -44,6 +44,7 @@ import tigase.io.TLSIO;
 import tigase.io.TLSUtil;
 import tigase.io.TLSWrapper;
 import tigase.io.BufferUnderflowException;
+import tigase.io.ZLibIO;
 import tigase.util.TimeUtils;
 
 /**
@@ -184,6 +185,10 @@ public abstract class IOService implements Callable<IOService> {
 		socketIO = new TLSIO(socketIO, wrapper);
 		setLastTransferTime();
   }
+
+	public void startZLib(int level) {
+		socketIO = new ZLibIO(socketIO, level);
+	}
 
 	public void setIOServiceListener(IOServiceListener sl) {
 		this.serviceListener = sl;
@@ -393,10 +398,15 @@ public abstract class IOService implements Callable<IOService> {
 				ByteBuffer tmpBuffer = socketIO.read(socketInput);
 				if (socketIO.bytesRead() > 0) {
 					empty_read_call_count = 0;
-					tmpBuffer.flip();
-					cb = decoder.decode(tmpBuffer);
-					tmpBuffer.clear();
-					//addRead(cb.array().length);
+					// There might be some characters read from the network
+					// but the buffer may still be null or empty because there might
+					// be not enough data to decode TLS or compressed buffer.
+					if (tmpBuffer != null) {
+						//tmpBuffer.flip();
+						cb = decoder.decode(tmpBuffer);
+						tmpBuffer.clear();
+						//addRead(cb.array().length);
+					}
 				} else {
 					// Detecting infinite read 0 bytes
 					// sometimes it happens that the connection has been lost
@@ -433,7 +443,6 @@ public abstract class IOService implements Callable<IOService> {
    * Describe <code>writeData</code> method here.
    *
    * @param data a <code>String</code> value
-   * @exception IOException if an error occurs
    */
   protected void writeData(final String data) {
 		writeInProgress.incrementAndGet();
