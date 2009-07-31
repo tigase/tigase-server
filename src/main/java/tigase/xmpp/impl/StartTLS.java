@@ -45,10 +45,10 @@ import tigase.db.NonAuthUserRepository;
 public class StartTLS extends XMPPProcessor
 	implements XMPPProcessorIfc {
 
-  private static Logger log = Logger.getLogger("tigase.xmpp.impl.StartTLS");
+  private static Logger log = Logger.getLogger(StartTLS.class.getName());
 
   private static final String XMLNS = "urn:ietf:params:xml:ns:xmpp-tls";
-	private static final String TLS_STARTED_KEY = "TLS-Started";
+	//private static final String TLS_STARTED_KEY = "TLS-Started";
 	public static final String TLS_REQUIRED_KEY = "tls-required";
 
 	private static final String ID = "starttls";
@@ -61,26 +61,25 @@ public class StartTLS extends XMPPProcessor
   private static final Element[] F_NOT_REQUIRED = {
 		new Element("starttls", new String[] {"xmlns"}, new String[] {XMLNS})};
 
-	private Element proceed = null;
-	private Element failure = null;
+	private Element proceed = new Element("proceed",
+					new String[] {"xmlns"}, new String[] {XMLNS});
+	private Element failure = new Element("failure",
+					new String[] {"xmlns"}, new String[] {XMLNS});
 
-	public StartTLS() {
-		proceed = new Element("proceed");
-		proceed.setXMLNS(XMLNS);
-		failure = new Element("failure");
-		failure.setXMLNS(XMLNS);
-	}
-
+	@Override
 	public String id() { return ID; }
 
+	@Override
 	public String[] supElements()	{ return ELEMENTS; }
 
+	@Override
   public String[] supNamespaces()	{ return XMLNSS; }
 
+	@Override
   public Element[] supStreamFeatures(final XMPPResourceConnection session)	{
     // If session does not exist, just return null, we don't provide features
 		// for non-existen stream
-		if (session != null && session.getSessionData(TLS_STARTED_KEY) == null) {
+		if (session != null && session.getSessionData(ID) == null) {
       if (session.getSessionData(TLS_REQUIRED_KEY) != null
 				&& session.getSessionData(TLS_REQUIRED_KEY).equals("true")) {
         return F_REQUIRED;
@@ -93,6 +92,7 @@ public class StartTLS extends XMPPProcessor
     } // end of if (session.isAuthorized()) else
 	}
 
+	@Override
   public void process(final Packet packet, final XMPPResourceConnection session,
 		final NonAuthUserRepository repo, final Queue<Packet> results,
 		final Map<String, Object> settings) {
@@ -101,21 +101,19 @@ public class StartTLS extends XMPPProcessor
 			return;
 		} // end of if (session == null)
 
-		if (packet.getElement().getName().equals("starttls")) {
-			session.putSessionData(TLS_STARTED_KEY, "true");
-			//results.offer(packet.swapFromTo(proceed));
+		if (packet.isElement("starttls", XMLNS)) {
+			session.putSessionData(ID, "true");
 			Packet result = Command.STARTTLS.getPacket(packet.getTo(),
-				packet.getFrom(), StanzaType.set, "1", Command.DataType.submit);
-			Command.setData(result, new Element("proceed",
-					new String[] {"xmlns"},
-					new String[] {"urn:ietf:params:xml:ns:xmpp-tls"}));
+				packet.getFrom(), StanzaType.set, session.nextStanzaId(),
+				Command.DataType.submit);
+			Command.setData(result, proceed);
 			results.offer(result);
 		} // end of if (packet.getElement().getName().equals("starttls"))
 		else {
       log.warning("Unknown TLS element: " + packet.getStringData());
 			results.offer(packet.swapFromTo(failure));
 			results.offer(Command.CLOSE.getPacket(packet.getTo(),
-					packet.getFrom(), StanzaType.set, "1"));
+					packet.getFrom(), StanzaType.set, session.nextStanzaId()));
 		} // end of if (packet.getElement().getName().equals("starttls")) else
 	}
 
