@@ -360,32 +360,28 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 
 	// Implementation of tigase.db.UserRepository
 
-	private void checkDBSchema() {
+	private void checkDBSchema() throws SQLException {
 		String schema_version = "1.0";
-		try {
-			String query =
-        (derby_mode ? DERBY_GETSCHEMAVER_QUERY : JDBC_GETSCHEMAVER_QUERY);
-			Statement stmt = conn.createStatement();
-			ResultSet rs = stmt.executeQuery(query);
-			if (rs.next()) {
-				schema_version = rs.getString(1);
-				if ("4.0".equals(schema_version)) {
-					return;
-				}
+				
+		String query =
+			(derby_mode ? DERBY_GETSCHEMAVER_QUERY : JDBC_GETSCHEMAVER_QUERY);
+		Statement stmt = conn.createStatement();
+		ResultSet rs = stmt.executeQuery(query);
+		if (rs.next()) {
+			schema_version = rs.getString(1);
+			if (false == "4.0".equals(schema_version)) {
+				System.err.println("\n\nPlease upgrade database schema now.");
+				System.err.println("Current scheme version is: " + schema_version
+						+ ", expected: 4.0");
+				System.err.println("Check the schema upgrade guide at the address:");
+				System.err.println("http://www.tigase.org/en/mysql-db-schema-upgrade-4-0");
+				System.err.println("----");
+				System.err.println("If you have upgraded your schema and you are still");
+				System.err.println("experiencing this problem please contact support at");
+				System.err.println("e-mail address: support@tigase.org");
+				//e.printStackTrace();
+				System.exit(100);
 			}
-			throw new TigaseDBException("Incorect DB schema version.");
-		} catch (Exception e) {
-			System.err.println("\n\nPlease upgrade database schema now.");
-			System.err.println("Current scheme version is: " + schema_version
-				+ ", expected: 4.0");
-			System.err.println("Check the schema upgrade guide at the address:");
-			System.err.println("http://www.tigase.org/en/mysql-db-schema-upgrade-4-0");
-			System.err.println("----");
-			System.err.println("If you have upgraded your schema and you are still");
-			System.err.println("experiencing this problem please contact support at");
-			System.err.println("e-mail address: support@tigase.org");
-			//e.printStackTrace();
-			System.exit(100);
 		}
 	}
 
