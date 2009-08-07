@@ -1316,6 +1316,9 @@ public class SessionManager extends AbstractMessageReceiver
 			vitem = new VHostItem(getDefHostName());
 		}
 		connection.setDomain(vitem.getUnmodifiableVHostItem());
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Domain set for connectionId " + conn_id);
+		}
 		//connection.setAnonymousPeers(anon_peers);
 		connectionsByFrom.put(conn_id, connection);
 		int currSize = connectionsByFrom.size();
