@@ -617,6 +617,14 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 
 	public abstract void xmppStreamClosed(IO serv);
 
+	/**
+	 * The method is called upon XMPP stream open event.
+	 * @param s is an XMPPIOService object associated with the newly opened network
+	 * connection.
+	 * @param attribs is a Map with all attributes found in the XMPP Stream open element.
+	 * @return A String of raw data which should be sent back to the network
+	 * connection.
+	 */
 	@SuppressWarnings({"unchecked"})
 	@Override
 	public String streamOpened(XMPPIOService s, Map<String, String> attribs) {
@@ -624,12 +632,29 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 		return xmppStreamOpened(serv, attribs);
 	}
 
+	/**
+	 * Method is called on the new XMPP Stream open event. This method is normally
+	 * called from streamOpen(...) method.
+	 * @param s is an IOService object associated with the network connection
+	 * where the XMPP Stream open event occured.
+	 * @param attribs is a Map with all attributes found in the XMPP Stream open element.
+	 * @return A String of raw data which should be sent back to the network
+	 * connection.
+	 */
 	public abstract String xmppStreamOpened(IO s, Map<String, String> attribs);
 
+	/**
+	 * Returns number of active network connections (IOServices).
+	 * @return number of active network connections (IOServices).
+	 */
 	protected int countIOServices() {
 		return services.size();
 	}
 
+	/**
+	 * Generates the component statistics.
+	 * @param list is a collection to put the component statistics in.
+	 */
 	@Override
 	public void getStatistics(StatisticsList list) {
 		super.getStatistics(list);
@@ -750,6 +775,12 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 
 	}
 
+	/**
+	 * Perform a given action defined by ServiceChecker for all active IOService
+	 * objects (active network connections).
+	 * @param checker is a <code>ServiceChecker</code> instance defining an action
+	 * to perform for all IOService objects.
+	 */
 	protected void doForAllServices(ServiceChecker checker) {
 		for (IO service: services.values()) {
 			checker.check(service, getUniqueId(service));
