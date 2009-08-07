@@ -24,6 +24,7 @@ package tigase.io;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import tigase.stats.StatisticsList;
 
 /**
  * Describe interface IOInterface here.
@@ -55,5 +56,7 @@ public interface IOInterface {
 	int waitingToSendSize();
 
 	boolean isRemoteAddress(String addr);
+
+	void getStatistics(StatisticsList list);
 
 } // IOInterface

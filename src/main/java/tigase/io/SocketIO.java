@@ -30,6 +30,7 @@ import java.util.logging.Level;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 import tigase.net.ConnectionOpenListener;
+import tigase.stats.StatisticsList;
 
 /**
  * Describe class SocketIO here.
@@ -49,6 +50,8 @@ public class SocketIO implements IOInterface {
   private SocketChannel channel = null;
   private int bytesRead = 0;
 	private String remoteAddress = null;
+	private long bytesSent = 0;
+	private long bytesReceived = 0;
 
   /**
    * Creates a new <code>SocketIO</code> instance.
@@ -131,6 +134,7 @@ public class SocketIO implements IOInterface {
 //		if (isRemoteAddress("81.142.228.219")) {
 //			log.warning("Wrote to channel " + result + " bytes.");
 //		}
+		bytesSent += result;
     return result;
   }
 
@@ -145,6 +149,7 @@ public class SocketIO implements IOInterface {
     } // end of if (result == -1)
 		if (bytesRead > 0) {
 			buff.flip();
+			bytesReceived += bytesRead;
 		}
     return buff;
   }
@@ -167,6 +172,12 @@ public class SocketIO implements IOInterface {
 	@Override
 	public int waitingToSendSize() {
 		return dataToSend.size();
+	}
+
+	@Override
+	public void getStatistics(StatisticsList list) {
+		list.add("socketio", "Bytes sent", bytesSent, Level.FINE);
+		list.add("socketio", "Bytes received", bytesReceived, Level.FINE);
 	}
 
 } // SocketIO

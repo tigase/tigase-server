@@ -25,12 +25,9 @@ package tigase.io;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
-import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.zip.DataFormatException;
-import java.util.zip.Deflater;
-import java.util.zip.Inflater;
+import tigase.stats.StatisticsList;
 import tigase.util.ZLibWrapper;
 
 /**
@@ -121,6 +118,19 @@ public class ZLibIO implements IOInterface {
 	@Override
 	public boolean isRemoteAddress(String addr) {
 		return io.isRemoteAddress(addr);
+	}
+
+	@Override
+	public void getStatistics(StatisticsList list) {
+		if (io != null) {
+			io.getStatistics(list);
+		}
+		if (zlib != null) {
+			list.add("zlibio", "Average compression rate",
+					zlib.averageCompressionRate(), Level.FINE);
+			list.add("zlibio", "Average decompression rate",
+					zlib.averageDecompressionRate(), Level.FINE);
+		}
 	}
 
 }

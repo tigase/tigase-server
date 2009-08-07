@@ -27,6 +27,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.logging.Logger;
 import java.util.logging.Level;
+import tigase.stats.StatisticsList;
 
 /**
  * Describe class TLSIO here.
@@ -226,6 +227,13 @@ public class TLSIO implements IOInterface {
 	@Override
 	public boolean isRemoteAddress(String addr) {
 		return io.isRemoteAddress(addr);
+	}
+
+	@Override
+	public void getStatistics(StatisticsList list) {
+		if (io != null) {
+			io.getStatistics(list);
+		}
 	}
 
 } // TLSIO
