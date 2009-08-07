@@ -45,6 +45,7 @@ import tigase.io.TLSUtil;
 import tigase.io.TLSWrapper;
 import tigase.io.BufferUnderflowException;
 import tigase.io.ZLibIO;
+import tigase.stats.StatisticsList;
 import tigase.util.TimeUtils;
 
 /**
@@ -477,6 +478,12 @@ public abstract class IOService implements Callable<IOService> {
 		}
 		writeInProgress.decrementAndGet();
   }
+
+	public void getStatistics(StatisticsList list) {
+		if (socketIO != null) {
+			socketIO.getStatistics(list);
+		}
+	}
 
   /**
    * Describe <code>debug</code> method here.
