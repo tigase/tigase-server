@@ -33,6 +33,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.net.UnknownHostException;
 
+import java.util.zip.Deflater;
 import tigase.net.ConnectionType;
 //import tigase.net.IOService;
 import tigase.net.SocketType;
@@ -41,6 +42,7 @@ import tigase.server.Packet;
 import tigase.disco.XMPPService;
 import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
+import tigase.server.ServiceChecker;
 import tigase.util.Algorithms;
 import tigase.util.JIDUtils;
 import tigase.util.DNSResolver;
@@ -82,14 +84,18 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 	public static final String CONNECT_ALL_PROP_KEY = "connect-all";
 	public static final String CLUSTER_CONTR_ID_PROP_KEY = "cluster-controller-id";
 	public static final boolean CONNECT_ALL_PROP_VAL = false;
+	public static final String COMPRESS_STREAM_PROP_KEY = "compress-stream";
+	public static final boolean COMPRESS_STREAM_PROP_VAL = true;
 	public static final String XMLNS = "tigase:cluster";
 
 	private ClusterController clusterController = null;
+	private IOServiceStatisticsGetter ioStatsGetter = new IOServiceStatisticsGetter();
 
 	private ServiceEntity serviceEntity = null;
 	//private boolean service_disco = RETURN_SERVICE_DISCO_VAL;
 	private String identity_type = IDENTITY_TYPE_VAL;
 	private boolean connect_all = CONNECT_ALL_PROP_VAL;
+	private boolean compress_stream = COMPRESS_STREAM_PROP_VAL;
 	//	private boolean notify_admins = NOTIFY_ADMINS_PROP_VAL;
 	//	private String[] admins = new String[] {};
 	private String cluster_controller_id = null;
@@ -287,6 +293,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 		super.setProperties(props);
 		//service_disco = (Boolean)props.get(RETURN_SERVICE_DISCO_KEY);
 		identity_type = (String)props.get(IDENTITY_TYPE_KEY);
+		compress_stream = (Boolean)props.get(COMPRESS_STREAM_PROP_KEY);
 
 		//serviceEntity = new ServiceEntity(getName(), "external", "XEP-0114");
 		serviceEntity = new ServiceEntity(XMLNS + " " + getName(), null, XMLNS);
@@ -342,7 +349,8 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 			props.put(CLUSTER_NODES_PROP_KEY, new String[] {getDefHostName()});
 		}
 		props.put(CLUSTER_CONTR_ID_PROP_KEY,
-			DEF_CLUST_CONTR_NAME + "@" + getDefHostName());
+				DEF_CLUST_CONTR_NAME + "@" + getDefHostName());
+		props.put(COMPRESS_STREAM_PROP_KEY, COMPRESS_STREAM_PROP_VAL);
 // 		props.put(NOTIFY_ADMINS_PROP_KEY, NOTIFY_ADMINS_PROP_VAL);
 // 		if (params.get(GEN_ADMINS) != null) {
 // 			admins = ((String)params.get(GEN_ADMINS)).split(",");
@@ -436,6 +444,10 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 		log.info("cluster connection opened: " + serv.getRemoteAddress()
 			+ ", type: " + serv.connectionType().toString()
 			+ ", id=" + serv.getUniqueId());
+		if (compress_stream) {
+			log.info("Starting stream compression for: " + serv.getUniqueId());
+			serv.startZLib(Deflater.BEST_COMPRESSION);
+		}
 // 		String addr =
 // 			(String)service.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
 // 		addRouting(addr);
@@ -592,6 +604,14 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 						Level.FINE);
 		list.add(getName(), "Last hour disconnects", Arrays.toString(lastHour),
 						Level.FINE);
+		ioStatsGetter.reset();
+		doForAllServices(ioStatsGetter);
+		list.add(getName(), "Average compression ratio",
+				ioStatsGetter.getAverageCompressionRatio(), Level.FINE);
+		list.add(getName(), "Average decompression ratio",
+				ioStatsGetter.getAverageDecompressionRatio(), Level.FINE);
+		list.add(getName(), "Bytes sent", ioStatsGetter.getBytesSent(), Level.FINE);
+		list.add(getName(), "Bytes received", ioStatsGetter.getBytesReceived(), Level.FINE);
 	}
 	
 	@Override
@@ -615,6 +635,51 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 
 	@Override
 	public void nodeDisconnected(String node) {
+	}
+
+	private class IOServiceStatisticsGetter implements ServiceChecker {
+
+		private float compressionRatio = 0f;
+		private float decompressionRatio = 0f;
+		private int counter = 0;
+		private long bytesReceived = 0;
+		private long bytesSent = 0;
+		private StatisticsList list = new StatisticsList(Level.ALL);
+
+		@Override
+		public void check(XMPPIOService service, String serviceId) {
+			service.getStatistics(list);
+			compressionRatio += list.getValue("zlibio", "Average compression rate", -1f);
+			decompressionRatio += list.getValue("zlibio", "Average decompression rate", -1f);
+			++counter;
+			bytesReceived += list.getValue("socketio", "Bytes received", -1l);
+			bytesSent += list.getValue("socketio", "Bytes sent", -1l);
+		}
+
+		public float getAverageCompressionRatio() {
+			return compressionRatio / counter;
+		}
+
+		public float getAverageDecompressionRatio() {
+			return decompressionRatio / counter;
+		}
+
+		public long getBytesSent() {
+			return bytesSent;
+		}
+
+		public long getBytesReceived() {
+			return bytesReceived;
+		}
+
+		public void reset() {
+			bytesReceived = 0;
+			bytesSent = 0;
+			compressionRatio = 0f;
+			decompressionRatio = 0f;
+			counter = 0;
+		}
+
 	}
 
 }
