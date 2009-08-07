@@ -94,8 +94,7 @@ public class StatisticsList implements Iterable<StatRecord> {
 		return false;
 	}
 
-	public boolean add(String comp, String description, int value,
-					Level recordLevel) {
+	public boolean add(String comp, String description, int value, Level recordLevel) {
 		if (checkLevel(recordLevel, value)) {
 			LinkedHashMap<String, StatRecord> compStats = stats.get(comp);
 			if (compStats == null) {
@@ -108,14 +107,26 @@ public class StatisticsList implements Iterable<StatRecord> {
 		return false;
 	}
 
-	public boolean add(String comp, String description, String value,
-					Level recordLevel) {
+	public boolean add(String comp, String description, String value, Level recordLevel) {
 		if (checkLevel(recordLevel)) {
 			LinkedHashMap<String, StatRecord> compStats = stats.get(comp);
 			if (compStats == null) {
 				compStats = addCompStats(comp);
 			}
 			compStats.put(description, new StatRecord(comp, description, "String",
+							value, recordLevel));
+			return true;
+		}
+		return false;
+	}
+
+	public boolean add(String comp, String description, float value, Level recordLevel) {
+		if (checkLevel(recordLevel)) {
+			LinkedHashMap<String, StatRecord> compStats = stats.get(comp);
+			if (compStats == null) {
+				compStats = addCompStats(comp);
+			}
+			compStats.put(description, new StatRecord(comp, description, "float",
 							value, recordLevel));
 			return true;
 		}
@@ -129,6 +140,18 @@ public class StatisticsList implements Iterable<StatRecord> {
 			StatRecord rec = compStats.get(description);
 			if (rec != null) {
 				result = rec.getLongValue();
+			}
+		}
+		return result;
+	}
+
+	public float getValue(String comp, String description, float def) {
+		float result = def;
+		LinkedHashMap<String, StatRecord> compStats = stats.get(comp);
+		if (compStats != null) {
+			StatRecord rec = compStats.get(description);
+			if (rec != null) {
+				result = rec.getFloatValue();
 			}
 		}
 		return result;

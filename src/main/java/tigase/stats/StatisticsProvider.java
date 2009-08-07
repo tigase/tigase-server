@@ -23,7 +23,6 @@
 package tigase.stats;
 
 import java.util.List;
-import javax.management.*;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -31,6 +30,13 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.management.MBeanAttributeInfo;
+import javax.management.MBeanInfo;
+import javax.management.MBeanNotificationInfo;
+import javax.management.MBeanOperationInfo;
+import javax.management.MBeanParameterInfo;
+import javax.management.NotCompliantMBeanException;
+import javax.management.StandardMBean;
 import tigase.server.QueueType;
 import tigase.sys.TigaseRuntime;
 
@@ -400,6 +406,21 @@ public class StatisticsProvider extends StandardMBean
 		return cache.iqOtherNumberPerSec;
 	}
 
+	@Override
+	public float getClusterCompressionRatio() {
+		return cache.clusterCompressionRatio;
+	}
+
+	@Override
+	public long getClusterNetworkBytes() {
+		return cache.clusterNetworkBytes;
+	}
+
+	@Override
+	public float getClusterNetworkBytesPerSecond() {
+		return cache.clusterNetworkBytesPerSecond;
+	}
+
 	private class StatisticsCache {
 
 		private static final String CL_COMP = "cl-comp";
@@ -446,6 +467,11 @@ public class StatisticsProvider extends StandardMBean
 		private int cnt = 0;
 		private float cpuUsage = 0f;
 		private float prevCpuUsage = 0f;
+		private float clusterCompressionRatio = 0f;
+		private long prevClusterNetworkBytes = 0L;
+		private long clusterNetworkBytes = 0L;
+		private float prevClusterNetworkBytesPerSecond = 0L;
+		private float clusterNetworkBytesPerSecond = 0L;
 
 		private StatisticsCache() {
 			updateTimer = new Timer("stats-cache", true);
@@ -479,6 +505,10 @@ public class StatisticsProvider extends StandardMBean
 			theRef.getAllStats(allStats);
 			//System.out.println(allStats.toString());
 
+			clusterCompressionRatio = (allStats.getValue(CL_COMP,
+							"Average compression ratio", -1f) +
+							allStats.getValue(CL_COMP,
+							"Average decompression ratio", -1f)) / 2f;
 			clusterPackets = allStats.getValue(CL_COMP,
 							StatisticType.MSG_RECEIVED_OK.getDescription(), 0L) +
 							allStats.getValue(CL_COMP,
@@ -515,6 +545,14 @@ public class StatisticsProvider extends StandardMBean
 							(messagesNumber - prevMessagesNumber)) / 4f;
 			prevMessagesPerSec = temp;
 			prevMessagesNumber = messagesNumber;
+
+			clusterNetworkBytes = allStats.getValue(CL_COMP, "Bytes sent", 0L) +
+							allStats.getValue(CL_COMP, "Bytes received", 0L);
+			temp = clusterNetworkBytesPerSecond;
+			clusterNetworkBytesPerSecond = (prevClusterNetworkBytesPerSecond + (temp * 2f) +
+							(clusterNetworkBytes - prevClusterNetworkBytes)) / 4f;
+			prevClusterNetworkBytesPerSecond = temp;
+			prevClusterNetworkBytes = clusterNetworkBytes;
 
 			long currPresencesReceived =
 							allStats.getValue(SM_COMP, QueueType.IN_QUEUE.name() +
@@ -601,6 +639,8 @@ public class StatisticsProvider extends StandardMBean
 			sb.append(" / ").append(presences_received_per_update).append(" last sec");
 			sb.append("\nSM presences sent: Tot - ").append(lastPresencesSent);
 			sb.append(" / ").append(presences_sent_per_update).append(" last sec");
+			sb.append("\nCluster compression ratio: " + clusterCompressionRatio);
+			sb.append("\nCluster network bytes/sec: " + clusterNetworkBytesPerSecond);
 			systemDetails = sb.toString();
 		}
 

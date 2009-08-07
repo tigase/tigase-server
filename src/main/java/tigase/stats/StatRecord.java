@@ -39,70 +39,13 @@ public class StatRecord {
 	private Level level = Level.INFO;
   private long longValue = -1;
  	private int intValue = -1;
+	private float floatValue = -1f;
 
 	private String description = null;
 	private String unit = null;
 	private String value = null;
 	private List<String> listValue = null;
 	private String component = null;
-
-	/**
-	 * Creates a new <code>StatRecord</code> instance.
-	 *
-	 * @param comp
-	 * @param type a <code>StatisticType</code> value
-	 * @param value a <code>long</code> value
-	 * @param level
-	 */
-	public StatRecord(String comp, StatisticType type, long value, Level level) {
-		this.type = type;
-		this.longValue = value;
-		this.description = type.getDescription();
-		this.unit = type.getUnit();
-		this.value = "" + value;
-		this.level = level;
-		this.component = comp;
-	}
-
-	public StatRecord(String comp, StatisticType type, int value, Level level) {
-		this.type = type;
-		this.intValue = value;
-		this.description = type.getDescription();
-		this.unit = type.getUnit();
-		this.value = "" + value;
-		this.level = level;
-		this.component = comp;
-	}
-
-	public StatRecord(String comp, String description, String unit, int value,
-		Level level) {
-		this.description = description;
-		this.unit = unit;
-		this.intValue = value;
-		this.value = "" + value;
-		this.level = level;
-		this.component = comp;
-	}
-
-	public StatRecord(String comp, String description, List<String> value,
-		Level level) {
-		this.type = StatisticType.LIST;
-		this.unit = type.getUnit();
-		this.component = comp;
-		this.description = description;
-		this.listValue = value;
-		this.level = level;
-	}
-
-	public StatRecord(String comp, String description, String unit, long value,
-		Level level) {
-		this.description = description;
-		this.unit = unit;
-		this.longValue = value;
-		this.value = "" + value;
-		this.level = level;
-		this.component = comp;
-	}
 
 	public StatRecord(String comp, String description, String unit,	String value,
 		Level level) {
@@ -111,6 +54,41 @@ public class StatRecord {
 		this.value = value;
 		this.level = level;
 		this.component = comp;
+	}
+
+	public StatRecord(String comp, String description, String unit, int value,
+		Level level) {
+		this(comp, description, unit, "" + value, level);
+		this.intValue = value;
+	}
+
+	public StatRecord(String comp, StatisticType type, long value, Level level) {
+		this(comp, type.getDescription(), type.getUnit(), "" + value, level);
+		this.type = type;
+		this.longValue = value;
+	}
+
+	public StatRecord(String comp, StatisticType type, int value, Level level) {
+		this(comp, type.getDescription(), type.getUnit(), "" + value, level);
+		this.type = type;
+		this.intValue = value;
+	}
+
+	public StatRecord(String comp, String description, List<String> value, Level level) {
+		this(comp, description, StatisticType.LIST.getUnit(), null, level);
+		this.type = StatisticType.LIST;
+		this.listValue = value;
+	}
+
+	public StatRecord(String comp, String description, String unit, long value,
+		Level level) {
+		this(comp, description, unit, "" + value, level);
+		this.longValue = value;
+	}
+
+	StatRecord(String comp, String description, String unit, float value, Level level) {
+		this(comp, description, unit, "" + value, level);
+		this.floatValue = value;
 	}
 
 	public String getDescription() {
@@ -155,6 +133,10 @@ public class StatRecord {
 		sb.append(component).append('/').append(description);
 		sb.append('[').append(unit).append(']').append(" = ").append(value);
 		return sb.toString();
+	}
+
+	float getFloatValue() {
+		return this.floatValue;
 	}
 
 } // StatRecord
