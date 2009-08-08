@@ -100,11 +100,9 @@ public class StanzaSender extends AbstractMessageReceiver
 	/**
    * Variable <code>log</code> is a class logger.
    */
-  private static final Logger log =
-    Logger.getLogger("tigase.server.ssender.StanzaSender");
+  private static final Logger log = Logger.getLogger(StanzaSender.class.getName());
 
-	private static final SimpleParser parser =
-		SingletonFactory.getParserInstance();
+	private static final SimpleParser parser = SingletonFactory.getParserInstance();
 	//private long interval = INTERVAL_PROP_VAL;
 	private Map<String, SenderTask> tasks_list =
 		new LinkedHashMap<String, SenderTask>();
@@ -116,6 +114,7 @@ public class StanzaSender extends AbstractMessageReceiver
 	 * Describe <code>release</code> method here.
 	 *
 	 */
+	@Override
 	public void release() {
 		super.release();
 	}
@@ -125,6 +124,7 @@ public class StanzaSender extends AbstractMessageReceiver
 	 *
 	 * @param packet a <code>Packet</code> value
 	 */
+	@Override
 	public void processPacket(final Packet packet) {
 		// do nothing, this component is to send packets not to receive
 		// (for now)
@@ -137,6 +137,7 @@ public class StanzaSender extends AbstractMessageReceiver
 	 *
 	 * @param props a <code>Map</code> value
 	 */
+	@Override
 	public void setProperties(final Map<String, Object> props) {
 		super.setProperties(props);
 
@@ -182,6 +183,7 @@ public class StanzaSender extends AbstractMessageReceiver
 	 * @param params a <code>Map</code> value
 	 * @return a <code>Map</code> value
 	 */
+	@Override
 	public Map<String, Object> getDefaults(final Map<String, Object> params) {
 		Map<String, Object> defs = super.getDefaults(params);
 		defs.put(INTERVAL_PROP_KEY, INTERVAL_PROP_VAL);
@@ -234,14 +236,17 @@ public class StanzaSender extends AbstractMessageReceiver
 		return defs;
 	}
 
+	@Override
 	public void handleStanza(String stanza) {
 		parseXMLData(stanza);
 	}
 
+	@Override
 	public void handleStanza(Packet stanza) {
 		addOutPacket(stanza);
 	}
 
+	@Override
 	public void handleStanzas(Queue<Packet> results) {
 		addOutPackets(results);
 	}

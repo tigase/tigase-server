@@ -27,10 +27,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 //import java.sql.Date;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.Queue;
 import java.util.LinkedList;
 import java.util.logging.Level;
@@ -238,6 +235,7 @@ public class DrupalForumTask extends SenderTask {
 	 * @exception IOException if an error occurs during task or data storage
 	 * initialization.
 	 */
+	@Override
 	public void init(StanzaHandler handler, String initString) throws IOException {
 		this.handler = handler;
 		db_conn = initString;
@@ -258,10 +256,12 @@ public class DrupalForumTask extends SenderTask {
 	 *
 	 * @return a <code>String</code> value of initialization string.
 	 */
+	@Override
 	public String getInitString() {
 		return db_conn;
 	}
 
+	@Override
 	public boolean cancel() {
 		boolean result = super.cancel();
 		try {
@@ -347,6 +347,7 @@ public class DrupalForumTask extends SenderTask {
 	/**
 	 * <code>run</code> method is where all task work is done.
 	 */
+	@Override
 	public void run() {
 // 		log.info("Task " + getName()
 //  			+ ", timestamp = " + lastCommentsCheck

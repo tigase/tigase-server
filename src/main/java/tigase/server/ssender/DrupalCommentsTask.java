@@ -86,6 +86,11 @@ public class DrupalCommentsTask extends SenderTask {
 	 */
 	private PreparedStatement get_new_comments = null;
 	/**
+	 * <code>get_new_topics</code> is a prepared statement for retrieving all
+	 * new topics for drupal forum.
+	 */
+	private PreparedStatement get_new_topics = null;
+	/**
 	 * <code>conn_valid_st</code> is a prepared statement keeping query used
 	 * to validate connection to database:
 	 * <pre>select 1</pre>
@@ -105,7 +110,12 @@ public class DrupalCommentsTask extends SenderTask {
 	 *
 	 */
 	protected long lastCommentsCheck = -1;
-
+	/**
+	 * <code>lastCheck</code> keeps time of last forum topics check so it
+	 * gets only new posts.
+	 *
+	 */
+	protected long lastTopicsCheck = -1;
 	/**
 	 * <code>lastConnectionValidated</code> variable keeps time where the
 	 * connection was validated for the last time.
@@ -115,7 +125,7 @@ public class DrupalCommentsTask extends SenderTask {
 	 * <code>connectionValidateInterval</code> is kind of constant keeping minimum
 	 * interval for validating connection to database.
 	 */
-	private long connectionValidateInterval = 1000*60;
+	private long connectionValidateInterval = SECOND*60;
 
 	/**
 	 * <code>release</code> method releases some SQL query variables.
@@ -183,6 +193,15 @@ public class DrupalCommentsTask extends SenderTask {
 			+ "from comments where"
 			+ " (status = 0) and (timestamp > ?);";
 		get_new_comments = conn.prepareStatement(query);
+
+		query = "select users.name as name, node_revisions.title as title,"
+			+ " node_revisions.body as body"
+			+ " from forum, node_revisions, users where"
+			+ " (status = 1) and (node_revisions.timestamp > ?)"
+			+ " and users.uid = node_revisions.uid"
+			+ " and node_revisions.vid = forum.vid;";
+		get_new_topics = conn.prepareStatement(query);
+
 	}
 
 	/**
@@ -197,11 +216,13 @@ public class DrupalCommentsTask extends SenderTask {
 	 * @exception IOException if an error occurs during task or data storage
 	 * initialization.
 	 */
+	@Override
 	public void init(StanzaHandler handler, String initString) throws IOException {
 		this.handler = handler;
 		db_conn = initString;
 		findExtraParams(db_conn);
 		lastCommentsCheck = System.currentTimeMillis() / SECOND;
+		lastTopicsCheck =  System.currentTimeMillis() / SECOND;
 
 		try {
 			initRepo();
@@ -216,10 +237,12 @@ public class DrupalCommentsTask extends SenderTask {
 	 *
 	 * @return a <code>String</code> value of initialization string.
 	 */
+	@Override
 	public String getInitString() {
 		return db_conn;
 	}
 
+	@Override
 	public boolean cancel() {
 		boolean result = super.cancel();
 		try {
@@ -232,11 +255,40 @@ public class DrupalCommentsTask extends SenderTask {
 		return result;
 	}
 
+	private void newTopics(Queue<Packet> results) {
+		ResultSet rs = null;
+		try {
+			checkConnection();
+			get_new_topics.setLong(1, lastTopicsCheck);
+			lastTopicsCheck = System.currentTimeMillis() / SECOND;
+			rs = get_new_topics.executeQuery();
+			while (rs.next()) {
+				String name = rs.getString("name");
+				String title = rs.getString("title");
+				String body = rs.getString("body");
+				Packet msg = Packet.getMessage(jid, getName(), StanzaType.normal,
+					"New post by " + name + ":\n\n" + XMLUtils.escape(body),
+					XMLUtils.escape(title), null);
+				log.fine("Sending new topic: " + msg.toString());
+				results.offer(msg);
+			}
+		} catch (SQLException e) {
+			// Let's ignore it for now.
+			log.log(Level.WARNING, "Error retrieving stanzas from database: ", e);
+			// It should probably do kind of auto-stop???
+			// if so just uncomment below line:
+			//this.cancel();
+		} finally {
+			release(rs);
+			rs = null;
+		}
+	}
+
 	private void newComments(Queue<Packet> results) {
 		ResultSet rs = null;
 		try {
 			checkConnection();
-			//			log.info("timestamp = " + lastCommentsCheck.toString());
+//			log.info("timestamp = " + lastCommentsCheck);
 			get_new_comments.setLong(1, lastCommentsCheck);
 			lastCommentsCheck = System.currentTimeMillis() / SECOND;
 			rs = get_new_comments.executeQuery();
@@ -265,6 +317,7 @@ public class DrupalCommentsTask extends SenderTask {
 
 	protected Queue<Packet> getNewPackets() {
 		Queue<Packet> results = new LinkedList<Packet>();
+		newTopics(results);
 		newComments(results);
 		return results;
 	}
@@ -272,10 +325,11 @@ public class DrupalCommentsTask extends SenderTask {
 	/**
 	 * <code>run</code> method is where all task work is done.
 	 */
+	@Override
 	public void run() {
 // 		log.info("Task " + getName()
 //  			+ ", timestamp = " + lastCommentsCheck
-// // 			+ ", getTime() = " + lastCommentsCheck.getTime()
+ // 			+ ", getTime() = " + lastCommentsCheck.getTime()
 // 			+ ", System.currentTimeMillis() = " + System.currentTimeMillis());
 		Queue<Packet> results = getNewPackets();
 		handler.handleStanzas(results);
