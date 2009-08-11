@@ -366,12 +366,16 @@ public class CPUMonitor extends AbstractMonitor {
 			ThreadData td = threads.get(l);
 			if (td == null) {
 				ThreadInfo ti = thBean.getThreadInfo(l);
-				td = new ThreadData();
-				td.id = l;
-				td.name = ti.getThreadName();
-				td.prevCputime = thBean.getThreadCpuTime(l);
-				td.prevUptime = currUptime;
-				threads.put(l, td);
+				if (ti != null) {
+					td = new ThreadData();
+					td.id = l;
+					td.name = ti.getThreadName();
+					td.prevCputime = thBean.getThreadCpuTime(l);
+					td.prevUptime = currUptime;
+					threads.put(l, td);
+				} else {
+					log.finer("ThreadInfo null for thread: " + l);
+				}
 			} else {
         long currCputime = thBean.getThreadCpuTime(l);
 				if ((currCputime) > 0) {
