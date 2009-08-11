@@ -125,21 +125,23 @@ public class XMPPSession {
 	 *
 	 * @param conn
 	 */
-	public synchronized void addResourceConnection(XMPPResourceConnection conn) {
+	public void addResourceConnection(XMPPResourceConnection conn) {
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Adding resource connection for username : " + username
-				+ ", id: " + conn.getConnectionId());
-			}
+			log.finest("Adding resource connection for username : " + username +
+					", id: " + conn.getConnectionId());
+		}
 		XMPPResourceConnection old_res = getResourceForResource(conn.getResource());
 		// If they are equal, just ignore this. It may happen only for USER_STATUS
 		// command where the user session is artificialy created....
 		if (old_res != conn) {
 			if (old_res != null) {
 				if (log.isLoggable(Level.FINEST)) {
-    				log.finest("Found old resource connection, id: " +
-        							old_res.getConnectionId());
-                }
-				try { old_res.logout(); } catch (Exception e) {
+					log.finest("Found old resource connection, id: " +
+							old_res.getConnectionId());
+				}
+				try {
+					old_res.logout();
+				} catch (Exception e) {
 					log.log(Level.INFO,
 						"Exception during closing old connection, ignoring.", e);
 				}
@@ -166,7 +168,7 @@ public class XMPPSession {
 		}
 	}
 
-	public synchronized void removeResourceConnection(XMPPResourceConnection conn) {
+	public void removeResourceConnection(XMPPResourceConnection conn) {
 		activeResources.remove(conn);
 		conn.setParentSession(null);
 	}
