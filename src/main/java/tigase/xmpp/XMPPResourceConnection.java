@@ -150,10 +150,6 @@ public class XMPPResourceConnection extends RepositoryAccess {
 			parentSession.removeCommonSessionData(key);
 	}
 
-	public synchronized void setConnectionStatus(ConnectionStatus status) {
-		connectionStatus = status;
-	}
-
 	public ConnectionStatus getConnectionStatus() {
 		return connectionStatus;
 	}
@@ -244,23 +240,6 @@ public class XMPPResourceConnection extends RepositoryAccess {
 
 	public int getPriority() {
 		return priority;
-	}
-
-	public synchronized void streamClosed() {
-		if (parentSession != null) {
-			parentSession.streamClosed(this);
-		} // end of if (parentSession != null)
-		parentSession = null;
-		resource = null;
-		sessionId = null;
-	}
-
-	public synchronized void setParentSession(final XMPPSession parent) {
-		if (parent != null) {
-			userId = JIDUtils.getNodeID(parent.getUserName(), domain.getVhost());
-			userJid = userId + (resource != null ? ("/" + resource) : "/" + sessionId);
-		}
-		this.parentSession = parent;
 	}
 
 	public XMPPSession getParentSession() {
@@ -397,28 +376,6 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	}
 
 	/**
-	 * Sets the value of resource
-	 *
-	 * @param argResource Value to assign to this.resource
-	 * @throws NotAuthorizedException
-	 */
-	public synchronized void setResource(final String argResource)
-					throws NotAuthorizedException {
-		this.resource = argResource;
-		// There is really unlikely a parent session would be null here but it may
-		// happen when the user disconnects just after sending resource bind.
-		// Due to asynchronous nature of packets processing in the Tigase the
-		// the authorization might be cancelled while resource bind packet still
-		// waits in the queue.....
-		// This has already happened....
-		if (parentSession != null) {
-			parentSession.addResourceConnection(this);
-		}
-		userJid = getUserId() + (resource != null ? ("/" + resource) : "/" + sessionId);
-		loginHandler.handleResourceBind(this);
-	}
-
-	/**
 	 * Gets the value of lastAccessed
 	 *
 	 * @return the value of lastAccessed
@@ -451,12 +408,102 @@ public class XMPPResourceConnection extends RepositoryAccess {
 			: parentSession.getResourceConnection(jid).getConnectionId());
 	}
 
+	public void streamClosed() {
+		if (parentSession != null) {
+			synchronized (this) {
+				parentSession.streamClosed(this);
+			}
+		} // end of if (parentSession != null)
+		parentSession = null;
+		resource = null;
+		sessionId = null;
+	}
+
+	public void setParentSession(final XMPPSession parent) {
+		if (parent != null) {
+			synchronized (this) {
+				userId = JIDUtils.getNodeID(parent.getUserName(), domain.getVhost());
+				userJid = userId + (resource != null ? ("/" + resource) : "/" +
+						sessionId);
+			}
+		}
+		this.parentSession = parent;
+	}
+
+	/**
+	 * Sets the value of resource
+	 *
+	 * @param argResource Value to assign to this.resource
+	 * @throws NotAuthorizedException
+	 */
+	public void setResource(final String argResource)
+					throws NotAuthorizedException {
+    if (!isAuthorized()) {
+      throw new NotAuthorizedException(NOT_AUTHORIZED_MSG);
+    } // end of if (username == null)
+		this.resource = argResource;
+		// This is really unlikely a parent session would be null here but it may
+		// happen when the user disconnects just after sending resource bind.
+		// Due to asynchronous nature of packets processing in the Tigase the
+		// the authorization might be cancelled while resource bind packet still
+		// waits in the queue.....
+		// This has already happened....
+		if (parentSession != null) {
+			parentSession.addResourceConnection(this);
+		}
+		userJid = getUserId() + (resource != null ? ("/" + resource) : "/" + sessionId);
+		loginHandler.handleResourceBind(this);
+	}
+
+	public synchronized void setConnectionStatus(ConnectionStatus status) {
+		connectionStatus = status;
+	}
+
 	@Override
-	public synchronized final void logout()
+	public final void logout()
 		throws NotAuthorizedException {
 		loginHandler.handleLogout(getUserName(), this);
 		streamClosed();
 		super.logout();
+	}
+
+	@Override
+  public final Authorization loginPlain(String user, String password)
+		throws NotAuthorizedException, AuthorizationException, TigaseDBException {
+		Authorization result = super.loginPlain(user, password);
+		if (result == Authorization.AUTHORIZED) {
+			loginHandler.handleLogin(user, this);
+		} // end of if (result == Authorization.AUTHORIZED)
+		return result;
+	}
+
+	@Override
+  public final Authorization loginDigest(String user, String digest,
+		String id, String alg)
+		throws NotAuthorizedException, AuthorizationException, TigaseDBException {
+		Authorization result = super.loginDigest(user, digest, id, alg);
+		if (result == Authorization.AUTHORIZED) {
+			loginHandler.handleLogin(user, this);
+		} // end of if (result == Authorization.AUTHORIZED)
+		return result;
+	}
+
+	@Override
+  public final Authorization loginOther(Map<String, Object> props)
+		throws NotAuthorizedException, AuthorizationException, TigaseDBException {
+		Authorization result = super.loginOther(props);
+		if (result == Authorization.AUTHORIZED) {
+			String user = (String)props.get(UserAuthRepository.USER_ID_KEY);
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("UserAuthRepository.USER_ID_KEY: " + user);
+			}
+			String nick = JIDUtils.getNodeNick(user);
+			if (nick == null) {
+				nick = user;
+			} // end of if (nick == null)
+			loginHandler.handleLogin(nick, this);
+		} // end of if (result == Authorization.AUTHORIZED)
+		return result;
 	}
 
 	@Override
@@ -487,45 +534,6 @@ public class XMPPResourceConnection extends RepositoryAccess {
 // 			logout();
 // 		} // end of if (res == Authorization.AUTHORIZED)
 		return auth_res;
-	}
-
-	@Override
-  public synchronized final Authorization loginPlain(String user, String password)
-		throws NotAuthorizedException, AuthorizationException, TigaseDBException {
-		Authorization result = super.loginPlain(user, password);
-		if (result == Authorization.AUTHORIZED) {
-			loginHandler.handleLogin(user, this);
-		} // end of if (result == Authorization.AUTHORIZED)
-		return result;
-	}
-
-	@Override
-  public synchronized final Authorization loginDigest(String user, String digest,
-		String id, String alg)
-		throws NotAuthorizedException, AuthorizationException, TigaseDBException {
-		Authorization result = super.loginDigest(user, digest, id, alg);
-		if (result == Authorization.AUTHORIZED) {
-			loginHandler.handleLogin(user, this);
-		} // end of if (result == Authorization.AUTHORIZED)
-		return result;
-	}
-
-	@Override
-  public synchronized final Authorization loginOther(Map<String, Object> props)
-		throws NotAuthorizedException, AuthorizationException, TigaseDBException {
-		Authorization result = super.loginOther(props);
-		if (result == Authorization.AUTHORIZED) {
-			String user = (String)props.get(UserAuthRepository.USER_ID_KEY);
-			if (log.isLoggable(Level.FINEST)) {
-				log.finest("UserAuthRepository.USER_ID_KEY: " + user);
-			}
-			String nick = JIDUtils.getNodeNick(user);
-			if (nick == null) {
-				nick = user;
-			} // end of if (nick == null)
-			loginHandler.handleLogin(nick, this);
-		} // end of if (result == Authorization.AUTHORIZED)
-		return result;
 	}
 
 // 	public boolean isDummy() {
