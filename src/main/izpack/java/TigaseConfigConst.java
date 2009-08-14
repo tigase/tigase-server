@@ -62,7 +62,7 @@ public abstract class TigaseConfigConst {
 	 "sessionBindPlugin", "registerPlugin", "rosterPlugin", "privacyPlugin",
 	 "versionPlugin", "statsPlugin", "tlsPlugin", "msgOfflinePlugin",
 	 "vcardPlugin", "commandsPlugin", "privatePlugin", "pingPlugin",
-	 "basicFilterPlugin", "domainFilterPlugin", "pepPlugin"};
+	 "basicFilterPlugin", "domainFilterPlugin", "pepPlugin", "zlibPlugin"};
 	public static LinkedHashMap<String, String> pluginsMap =
     new LinkedHashMap<String, String>();
 
@@ -129,6 +129,7 @@ public abstract class TigaseConfigConst {
 		pluginsMap.put("basic-filter", "basicFilterPlugin");
 		pluginsMap.put("domain-filter", "domainFilterPlugin");
 		pluginsMap.put("pep", "pepPlugin");
+		pluginsMap.put("zlib", "zlibPlugin");
 	}
 
 	public static String getPluginId(String pluginVarNameToFind) {

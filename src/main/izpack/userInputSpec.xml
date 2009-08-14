@@ -263,7 +263,9 @@ uvme:vcard-temp,http://jabber.org/protocol/commands,jabber:iq:private,urn:xmpp:p
 		<field type="check" variable="pepPlugin">
 			<spec txt="Personal eventing (PEP)" true="urn:xmpp:ping" false="off"	set="true"/>
 		</field>
-
+		<field type="check" variable="zlibPlugin">
+			<spec txt="Zlib stream compression (new, experimental)" true="zlib" false="off" set="false"/>
+		</field>
 
 	</panel>
 
