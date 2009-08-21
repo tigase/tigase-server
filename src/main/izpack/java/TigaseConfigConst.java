@@ -34,7 +34,7 @@ import java.util.Properties;
  */
 public abstract class TigaseConfigConst {
 
-	public static Properties props = null;
+	public static Properties props = new Properties();
 
 	public static LinkedHashMap<String, String> tigaseIzPackMap =
     new LinkedHashMap<String, String>();

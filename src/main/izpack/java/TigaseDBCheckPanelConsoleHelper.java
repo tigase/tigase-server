@@ -7,8 +7,8 @@ import com.izforge.izpack.installer.AutomatedInstallData;
 import com.izforge.izpack.installer.ConsoleInstallHelper;
 import com.izforge.izpack.installer.PanelConsole;
 import com.izforge.izpack.installer.PanelConsoleHelper;
-import com.izforge.izpack.panels.TigaseDBHelper.ResultMessage;
-import com.izforge.izpack.panels.TigaseDBHelper.TigaseDBTask;
+import com.izforge.izpack.panels.TigaseInstallerDBHelper.ResultMessage;
+import com.izforge.izpack.panels.TigaseInstallerDBHelper.TigaseDBTask;
 
 public class TigaseDBCheckPanelConsoleHelper extends PanelConsoleHelper implements PanelConsole {
 
@@ -16,15 +16,15 @@ public class TigaseDBCheckPanelConsoleHelper extends PanelConsoleHelper implemen
 	
 	public boolean runConsole(AutomatedInstallData installData) {
 		
-		TigaseDBHelper dbHelper = new TigaseDBHelper();
+		TigaseInstallerDBHelper dbHelper = new TigaseInstallerDBHelper();
 	
 		helper.console.displayLabel("Performing DB tasks");
 				
-		for (TigaseDBTask task : TigaseDBHelper.Tasks.getTasksInOrder()) {
+		for (TigaseDBTask task : TigaseInstallerDBHelper.Tasks.getTasksInOrder()) {
 			helper.console.displayEmptyLine();
 			helper.console.displayRaw(task.getDescription() + "  ");
 			
-			TigaseDBHelper.MsgTarget msgTarget = new TigaseDBHelper.MsgTarget() {
+			TigaseInstallerDBHelper.MsgTarget msgTarget = new TigaseInstallerDBHelper.MsgTarget() {
 				public ResultMessage addResultMessage() {
 					helper.console.displayEmptyLine();
 					return new ResultMessage() {

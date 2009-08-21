@@ -13,7 +13,8 @@ extends PanelConsoleHelper implements PanelConsole {
 	public boolean runConsole(AutomatedInstallData installData) {
 		TigaseConfigSaveHelper helper = new TigaseConfigSaveHelper();
 		
-		String config =  helper.showConfig(installData);
+		String config =  helper.showConfig(
+				new IzPackInstallDataVariablesSource(installData));
 		helper.saveConfig(installData, config);
 		
 		return true;

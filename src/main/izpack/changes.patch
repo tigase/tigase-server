@@ -41,7 +41,7 @@ index 330ec13..dcc7292 100644
 +#
 +*.class
 diff --git a/src/build.xml b/src/build.xml
-index 60e52dc..c62cc00 100644
+index 60e52dc..b29e756 100644
 --- a/src/build.xml
 +++ b/src/build.xml
 @@ -572,7 +572,6 @@
@@ -132,7 +132,7 @@ index 60e52dc..c62cc00 100644
          <build-panel name="XInfoPanel">
              <include name="com/izforge/izpack/panels/XInfoPanel.java"/>
          </build-panel>
-@@ -776,6 +805,39 @@
+@@ -776,6 +805,40 @@
              <include name="com/izforge/izpack/panels/HTMLHelloPanel.java"/>
              <include name="com/izforge/izpack/panels/HTMLInfoPanel.java"/>
          </build-panel>
@@ -167,12 +167,13 @@ index 60e52dc..c62cc00 100644
 +                <include name="com/izforge/izpack/panels/TigaseInstallerCommon.java"/>		
 +		<include name="com/izforge/izpack/panels/TigaseDBCheckPanelConsoleHelper.java"/>
 +        <include name="com/izforge/izpack/panels/TigaseConfigConst.java"/>
++		<include name="com/izforge/izpack/panels/TigaseInstallerDBHelper.java"/>
 +        </build-panel>
 +
      </target>
  
      <!--
-@@ -811,6 +873,7 @@
+@@ -811,6 +874,7 @@
              <fileset dir="${build.dir}">
                  <include name="com/izforge/izpack/event/*.class"/>
                  <include name="com/izforge/izpack/util/IoHelper.class"/>
@@ -920,6 +921,179 @@ index 0000000..d5feff3
 +
 +public class CheckedHelloPanelConsoleHelper 
 +extends HelloPanelConsoleHelper {}
+diff --git a/src/lib/com/izforge/izpack/panels/DerbyPathPanel.java b/src/lib/com/izforge/izpack/panels/DerbyPathPanel.java
+new file mode 100644
+index 0000000..7d66dc2
+--- /dev/null
++++ b/src/lib/com/izforge/izpack/panels/DerbyPathPanel.java
+@@ -0,0 +1,167 @@
++package com.izforge.izpack.panels;
++
++import com.izforge.izpack.installer.AutomatedInstallData;
++import com.izforge.izpack.installer.InstallData;
++import com.izforge.izpack.installer.InstallerFrame;
++import com.izforge.izpack.util.AbstractUIHandler;
++import com.izforge.izpack.util.FileExecutor;
++import com.izforge.izpack.util.OsVersion;
++import com.izforge.izpack.util.os.RegistryDefaultHandler;
++import com.izforge.izpack.util.os.RegistryHandler;
++import com.izforge.izpack.util.VariableSubstitutor;
++
++import java.io.File;
++import java.util.Arrays;
++import java.util.HashSet;
++import java.util.Set;
++import java.util.StringTokenizer;
++
++/**
++ * Panel which asks for the Derby database path.
++ *
++ * @author Klaus Bartz
++ */
++public class DerbyPathPanel extends PathInputPanel {
++
++	private static final long serialVersionUID = 1L;
++
++	private String variableName = null;
++
++	private DerbyPathPanelHelper helper = new DerbyPathPanelHelper();
++	
++	/**
++	 * The constructor.
++	 *
++	 * @param parent The parent window.
++	 * @param idata  The installation data.
++	 */
++	public DerbyPathPanel(InstallerFrame parent, InstallData idata) {
++		super(parent, TigaseInstallerCommon.init(idata));
++		setMustExist(false);
++		setVariableName(helper.getVariableName());
++	}
++
++	/**
++	 * Indicates wether the panel has been validated or not.
++	 *
++	 * @return Wether the panel has been validated or not.
++	 */
++	public boolean isValidated()
++	{
++		boolean retval = false;
++		if (super.isValidated()) {
++			idata.setVariable(getVariableName(), pathSelectionPanel.getPath());
++			return true;
++		}
++		return false;
++	}
++
++	/**
++	 * Called when the panel becomes active.
++	 */
++	public void panelActivate()
++	{
++		// Resolve the default for chosenPath
++		super.panelActivate();
++		// The variable will be exist if we enter this panel
++		// second time. We would maintain the previos
++		// selected path.
++//		if (idata.getVariable(getVariableName()) != null) {
++//			chosenPath = idata.getVariable(getVariableName());
++//		} else {
++//			if (OsVersion.IS_WINDOWS)	{
++//				chosenPath = idata.getVariable(getVariableName()+".windows");
++//			}
++//			if (OsVersion.IS_OSX)	{
++//				chosenPath = idata.getVariable(getVariableName()+".mac");
++//			} else {
++//				if (OsVersion.IS_UNIX)	{
++//					chosenPath = idata.getVariable(getVariableName()+".unix");
++//				}
++//			}
++//		}
++//		VariableSubstitutor vs = new VariableSubstitutor(idata.getVariables());
++//		chosenPath = vs.substitute(chosenPath, null);
++//		// Set the path for method pathIsValid ...
++		
++		String chosenPath = helper.getDefaultPath(idata);
++		pathSelectionPanel.setPath(chosenPath);
++
++		if (!pathIsValid())
++		{
++			chosenPath = "";
++		}
++		// Set the default to the path selection panel.
++		pathSelectionPanel.setPath(chosenPath);
++// 		String var = idata.getVariable("DerbyPathPanel.skipIfValid");
++// 		// Should we skip this panel?
++// 		if (chosenPath.length() > 0 && var != null && "yes".equalsIgnoreCase(var))
++// 		{
++// 			idata.setVariable(getVariableName(), chosenPath);
++// 			parent.skipPanel();
++// 		}
++
++	}
++
++	/**
++	 * Returns the name of the variable which should be used for the path.
++	 *
++	 * @return the name of the variable which should be used for the path
++	 */
++	public String getVariableName()
++	{
++		return variableName;
++	}
++
++	/**
++	 * Sets the name for the variable which should be set with the path.
++	 *
++	 * @param string variable name to be used
++	 */
++	public void setVariableName(String string)
++	{
++		variableName = string;
++	}
++
++	/*
++	 * (non-Javadoc)
++	 * 
++	 * @see com.izforge.izpack.installer.IzPanel#getSummaryBody()
++	 */
++	public String getSummaryBody()
++	{
++		return (idata.getVariable(getVariableName()));
++	}
++}
++
++class DerbyPathPanelHelper {
++	
++	String getVariableName() {
++		return "DerbyDBPath";
++	}
++	
++	String getDefaultPath(AutomatedInstallData idata) {
++		String chosenPath = "";
++		if (idata.getVariable(getVariableName()) != null) {
++			chosenPath = idata.getVariable(getVariableName());
++		} else {
++			if (OsVersion.IS_WINDOWS)	{
++				chosenPath = idata.getVariable(getVariableName()+".windows");
++			}
++			if (OsVersion.IS_OSX)	{
++				chosenPath = idata.getVariable(getVariableName()+".mac");
++			} else {
++				if (OsVersion.IS_UNIX)	{
++					chosenPath = idata.getVariable(getVariableName()+".unix");
++				}
++			}
++		}
++		VariableSubstitutor vs = new VariableSubstitutor(idata.getVariables());
++		chosenPath = vs.substitute(chosenPath, null);
++		return chosenPath;
++	}
++
++	public void setDefaultPath(AutomatedInstallData installData) {
++		installData.setVariable(getVariableName(), getDefaultPath(installData));
++	}
++}
 diff --git a/src/lib/com/izforge/izpack/panels/HTMLInfoPanel.java b/src/lib/com/izforge/izpack/panels/HTMLInfoPanel.java
 index 8a14d89..a47d3ff 100644
 --- a/src/lib/com/izforge/izpack/panels/HTMLInfoPanel.java
@@ -1454,6 +1628,1290 @@ index 964eec9..a3f0d85 100644
 +        return continueQuitOrReboot(idata, this);
      }
  }
+diff --git a/src/lib/com/izforge/izpack/panels/TigaseConfigConst.java b/src/lib/com/izforge/izpack/panels/TigaseConfigConst.java
+new file mode 100644
+index 0000000..2952d2e
+--- /dev/null
++++ b/src/lib/com/izforge/izpack/panels/TigaseConfigConst.java
+@@ -0,0 +1,157 @@
++/*  Tigase Project
++ *  Copyright (C) 2004-2007 "Artur Hefczyc" <artur.hefczyc@tigase.org>
++ *
++ * This program is free software: you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation, either version 3 of the License.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program. Look for COPYING file in the top folder.
++ * If not, see http://www.gnu.org/licenses/.
++ *
++ * $Rev$
++ * Last modified by $Author$
++ * $Date$
++ */
++package com.izforge.izpack.panels;
++
++import java.util.LinkedHashMap;
++import java.util.Properties;
++
++/**
++ * Describe class TigaseConfigConst here.
++ *
++ *
++ * Created: Sat Oct 25 21:23:06 2008
++ *
++ * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
++ * @version $Rev$
++ */
++public abstract class TigaseConfigConst {
++
++	public static Properties props = null;
++
++	public static LinkedHashMap<String, String> tigaseIzPackMap =
++    new LinkedHashMap<String, String>();
++// 	public static LinkedHashMap<String, String> izPackTigaseMap =
++//     new LinkedHashMap<String, String>();
++
++	public static LinkedHashMap<String, String> userDBMap =
++    new LinkedHashMap<String, String>();
++
++	public static LinkedHashMap<String, String> userDBUriMap =
++    new LinkedHashMap<String, String>();
++
++	public static final String SERVER_DEBUG = "serverDebug";
++	public static final String PLUGIN_DEBUG = "pluginsDebug";
++	public static final String DB_DEBUG = "dbDebug";
++	public static final String CLUSTER_DEBUG = "clusterDebug";
++
++	public static String[] ALL_DEBUGS =
++	{SERVER_DEBUG, PLUGIN_DEBUG, DB_DEBUG, CLUSTER_DEBUG};
++	public static LinkedHashMap<String, String> debugMap =
++    new LinkedHashMap<String, String>();
++
++	public static String[] ALL_PLUGINS =
++	{"nonSaslAuthPlugin", "saslAuthPlugin", "resBindPlugin",
++	 "sessionBindPlugin", "registerPlugin", "rosterPlugin", "privacyPlugin",
++	 "versionPlugin", "statsPlugin", "tlsPlugin", "msgOfflinePlugin",
++	 "vcardPlugin", "commandsPlugin", "privatePlugin", "pingPlugin",
++	 "basicFilterPlugin", "domainFilterPlugin", "pepPlugin", "zlibPlugin"};
++	public static LinkedHashMap<String, String> pluginsMap =
++    new LinkedHashMap<String, String>();
++
++	// Special variable names:
++	public static final String DB_TYPE = "dbType";
++	public static final String AUTH_DB = "authDB";
++	public static final String AUTH_HANDLE = "dbAuthHandle";
++	public static final String MUC_COMP = "mucComponent";
++	public static final String PUBSUB_COMP = "pubsubComponent";
++	public static final String PLUGINS = "plugins";
++	public static final String DEBUG = "debug";
++	public static final String USER_DB_URI = "userDBUri";
++	public static final String AUTH_DB_URI = "dbAuthType";
++
++	static {
++		tigaseIzPackMap.put("config-type", "configType");
++		tigaseIzPackMap.put("--virt-hosts", "virtualDomains");
++		tigaseIzPackMap.put("--admins", "admins");
++		tigaseIzPackMap.put("--user-db", DB_TYPE);
++		tigaseIzPackMap.put("--auth-db", AUTH_HANDLE);
++		tigaseIzPackMap.put("--muc", MUC_COMP);
++		tigaseIzPackMap.put("--pubsub", PUBSUB_COMP);
++		tigaseIzPackMap.put("--cluster-mode", "clusterMode");
++		tigaseIzPackMap.put("--cluster-nodes", "clusterNodes");
++		tigaseIzPackMap.put("--debug", DEBUG);
++		tigaseIzPackMap.put("--sm-plugins", PLUGINS);
++		tigaseIzPackMap.put("--user-db-uri", USER_DB_URI);
++		tigaseIzPackMap.put("--auth-db-uri", AUTH_DB_URI);
++// 		for (Map.Entry entry: tigaseIzPackMap.entrySet()) {
++// 			izPackTigaseMap.put(entry.getValue(), entry.getKey());
++// 		}
++
++		userDBMap.put("Derby", "derby");
++		userDBMap.put("MySQL", "mysql");
++		userDBMap.put("PostgreSQL", "pgsql");
++		userDBMap.put("SQLServer", "jtds:sqlserver");
++
++		userDBUriMap.put("derby", "Derby");
++		userDBUriMap.put("mysql", "MySQL");
++		userDBUriMap.put("postgresql", "PostgreSQL");
++		userDBUriMap.put("pgsql", "PostgreSQL");
++		userDBUriMap.put("jtds:sqlserver", "SQLServer");
++
++		debugMap.put("server", SERVER_DEBUG);
++		debugMap.put("db", DB_DEBUG);
++		debugMap.put("xmpp.impl", PLUGIN_DEBUG);
++		debugMap.put("cluster", CLUSTER_DEBUG);
++
++		pluginsMap.put("jabber:iq:auth", "nonSaslAuthPlugin");
++		pluginsMap.put("urn:ietf:params:xml:ns:xmpp-sasl", "saslAuthPlugin");
++		pluginsMap.put("urn:ietf:params:xml:ns:xmpp-bind", "resBindPlugin");
++		pluginsMap.put("urn:ietf:params:xml:ns:xmpp-session", "sessionBindPlugin");
++		pluginsMap.put("jabber:iq:register", "registerPlugin");
++		pluginsMap.put("roster-presence", "rosterPlugin");
++		pluginsMap.put("jabber:iq:privacy", "privacyPlugin");
++		pluginsMap.put("jabber:iq:version", "versionPlugin");
++		pluginsMap.put("http://jabber.org/protocol/stats", "statsPlugin");
++		pluginsMap.put("starttls", "tlsPlugin");
++		pluginsMap.put("msgoffline", "msgOfflinePlugin");
++		pluginsMap.put("vcard-temp", "vcardPlugin");
++		pluginsMap.put("http://jabber.org/protocol/commands", "commandsPlugin");
++		pluginsMap.put("jabber:iq:private", "privatePlugin");
++		pluginsMap.put("urn:xmpp:ping", "pingPlugin");
++		pluginsMap.put("basic-filter", "basicFilterPlugin");
++		pluginsMap.put("domain-filter", "domainFilterPlugin");
++		pluginsMap.put("pep", "pepPlugin");
++		pluginsMap.put("zlib", "zlibPlugin");
++	}
++
++	public static String getPluginId(String pluginVarNameToFind) {
++		for (String pluginId : pluginsMap.keySet()) {
++			String pluginVarName = pluginsMap.get(pluginId);
++			if (pluginVarName.equals(pluginVarNameToFind)) {
++				return pluginId;
++			}
++		}
++		return null;
++	}
++	
++	public static final String PGSQL_DRIVER = "org.postgresql.Driver";
++	public static final String MYSQL_DRIVER = "com.mysql.jdbc.Driver";
++	public static final String DERBY_DRIVER = "org.apache.derby.jdbc.EmbeddedDriver";
++
++	public static final String JDBC_CHECKUSERTABLE_QUERY
++    = "select count(*) from tig_users";
++
++	public static final String JDBC_GETSCHEMAVER_QUERY
++    = "select TigGetDBProperty('schema-version')";
++	public static final String DERBY_GETSCHEMAVER_QUERY
++    = "values TigGetDBProperty('schema-version')";
++
++}
+diff --git a/src/lib/com/izforge/izpack/panels/TigaseConfigLoadPanel.java b/src/lib/com/izforge/izpack/panels/TigaseConfigLoadPanel.java
+new file mode 100644
+index 0000000..576c754
+--- /dev/null
++++ b/src/lib/com/izforge/izpack/panels/TigaseConfigLoadPanel.java
+@@ -0,0 +1,339 @@
++/*
++ * Tigase Jabber/XMPP Server
++ * Copyright (C) 2004-2007 "Artur Hefczyc" <artur.hefczyc@tigase.org>
++ *
++ * This program is free software: you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation, either version 3 of the License.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program. Look for COPYING file in the top folder.
++ * If not, see http://www.gnu.org/licenses/.
++ *
++ * $Rev$
++ * Last modified by $Author$
++ * $Date$
++ */
++
++package com.izforge.izpack.panels;
++
++import java.io.File;
++import java.io.FileReader;
++import java.util.Properties;
++import java.util.Set;
++import java.util.regex.Matcher;
++import java.util.regex.Pattern;
++
++import javax.swing.JScrollPane;
++import javax.swing.JTextArea;
++
++import com.izforge.izpack.gui.IzPanelLayout;
++import com.izforge.izpack.gui.LabelFactory;
++import com.izforge.izpack.installer.AutomatedInstallData;
++import com.izforge.izpack.installer.InstallData;
++import com.izforge.izpack.installer.InstallerFrame;
++import com.izforge.izpack.installer.IzPanel;
++import com.izforge.izpack.util.Debug;
++
++/**
++ * The Hello panel class.
++ *
++ * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
++ * @version $Rev$
++ */
++public class TigaseConfigLoadPanel extends IzPanel {
++
++	/**
++	 *
++	 */
++	private static final long serialVersionUID = 1L;
++
++	private JTextArea textArea = null;
++
++	/**
++	 * The constructor.
++	 *
++	 * @param parent The parent.
++	 * @param idata  The installation data.
++	 */
++	public TigaseConfigLoadPanel(InstallerFrame parent, InstallData idata) {
++		super(parent, TigaseInstallerCommon.init(idata), new IzPanelLayout());
++
++		// The config label.
++		add(LabelFactory.create(parent.langpack.getString("TigaseConfigLoadPanel.info"),
++				parent.icons.getImageIcon("edit"), LEADING), NEXT_LINE);
++		// The text area which shows the info.
++		textArea = new JTextArea("");
++		textArea.setCaretPosition(0);
++		textArea.setEditable(false);
++		JScrollPane scroller = new JScrollPane(textArea);
++		add(scroller, NEXT_LINE);
++		// At end of layouting we should call the completeLayout method also they do nothing.
++		getLayoutHelper().completeLayout();
++	}
++
++	public void panelActivate() {
++		super.panelActivate();
++		// Existing configuration loading
++		Debug.trace("panelActivate called for load pael");
++		String config = new TigaseConfigLoadHelper().loadConfig(idata);
++		textArea.setText(config);
++	}
++
++
++	/**
++	 * Indicates whether the panel has been validated or not.
++	 *
++	 * @return Always true.
++	 */
++	public boolean isValidated() {
++		return true;
++	}
++
++}
++
++class TigaseConfigLoadHelper {
++	
++	String loadConfig(AutomatedInstallData idata) {
++		// Try to read the config file.
++		File configPath = null;
++		StringBuilder config = new StringBuilder();
++		try {
++			if (idata.getVariable("searchTigaseHome") == null
++				|| idata.getVariable("searchTigaseHome").isEmpty()) {
++				configPath = new File(idata.getVariable("INSTALL_PATH"),
++					"etc/init.properties");
++			} else {
++				configPath = new File(idata.getVariable("searchTigaseHome"),
++					"etc/init.properties");
++			}
++			if (configPath.exists()) {
++				Properties props = new Properties();
++				props.load(new FileReader(configPath));
++				Debug.trace("Loading init.properties file...");
++				for (String name: props.stringPropertyNames()) {
++					config.append(name + " = " + props.getProperty(name) + "\n");
++				}
++				Debug.trace(config);
++				Debug.trace("Done.");
++				Debug.trace("Loading variables....");
++				for (String name: TigaseConfigConst.tigaseIzPackMap.keySet()) {
++					String varName = TigaseConfigConst.tigaseIzPackMap.get(name);
++					if (varName != null) {
++						Debug.trace("Loading: " + varName + " = " + props.getProperty(name));
++
++						if (varName.equals(TigaseConfigConst.DEBUG)) {
++							if (props.getProperty(name) != null) {
++								parseDebugs(props.getProperty(name), idata);
++								Debug.trace("Loaded: " + varName + " = " + props.getProperty(name));
++							} else {
++								Debug.trace("Missing configuration for " + varName);
++							}
++							continue;
++						}
++
++						if (varName.equals(TigaseConfigConst.PLUGINS)) {
++							if (props.getProperty(name) != null) {
++								parsePlugins(props.getProperty(name), idata);
++								Debug.trace("Loaded: " + varName + " = " + props.getProperty(name));
++							} else {
++								Debug.trace("Missing configuration for " + varName);
++							}
++							continue;
++						}
++
++						if (varName.equals(TigaseConfigConst.USER_DB_URI)) {
++							if (props.getProperty(name) != null) {
++								parseUserDbUri(props.getProperty(name), idata);
++								Debug.trace("Loaded: " + varName + " = " + props.getProperty(name));
++							} else {
++								Debug.trace("Missing configuration for " + varName);
++							}
++							continue;
++						}
++
++						if (varName.equals(TigaseConfigConst.DB_TYPE)) {
++							if (props.getProperty(name) != null) {
++								String dbType =
++                  TigaseConfigConst.userDBUriMap.get(props.getProperty(name));
++								if (dbType == null) {
++									dbType = "Other";
++								}
++								idata.setVariable(TigaseConfigConst.DB_TYPE, dbType);
++								Debug.trace("Loaded: " + varName + " = " + dbType);
++							} else {
++								Debug.trace("Missing configuration for " + varName);
++							}
++							continue;
++						}
++
++						if (varName.equals(TigaseConfigConst.AUTH_HANDLE)) {
++							if (props.getProperty(name) != null) {
++								idata.setVariable(TigaseConfigConst.AUTH_HANDLE,
++									props.getProperty(name));
++								Debug.trace("Loaded: " + varName + " = " + props.getProperty(name));
++							} else {
++								Debug.trace("Missing configuration for " + varName);
++							}
++							continue;
++						}
++
++						if (varName.equals(TigaseConfigConst.MUC_COMP)) {
++							if ((props.getProperty("--comp-name-1") != null
++									&& props.getProperty("--comp-name-1").equals("muc"))
++								|| (props.getProperty("--comp-name-2") != null
++									&& props.getProperty("--comp-name-2").equals("muc"))) {
++									idata.setVariable(TigaseConfigConst.MUC_COMP, "on");
++							}
++								Debug.trace("Loaded: " + varName + " = " +
++									idata.getVariable(TigaseConfigConst.MUC_COMP));
++							continue;
++						}
++
++						if (varName.equals(TigaseConfigConst.PUBSUB_COMP)) {
++							if ((props.getProperty("--comp-name-1") != null
++									&& props.getProperty("--comp-name-1").equals("pubsub"))
++								|| (props.getProperty("--comp-name-2") != null
++									&& props.getProperty("--comp-name-2").equals("pubsub"))) {
++									idata.setVariable(TigaseConfigConst.PUBSUB_COMP, "on");
++							}
++							Debug.trace("Load: " + "--comp-name-" + " = " + "pubsub");
++							continue;
++						}
++
++						if (varName.equals(TigaseConfigConst.AUTH_DB_URI)) {
++							if (props.getProperty(name) != null) {
++								parseAuthDbUri(props.getProperty(name), idata);
++								Debug.trace("Loaded: " + varName + " = " + props.getProperty(name));
++							} else {
++								Debug.trace("Missing configuration for " + varName);
++							}
++							continue;
++						}
++
++						if (props.getProperty(name) != null) {
++							idata.setVariable(varName, props.getProperty(name));
++						}
++					}
++				}
++				Debug.trace("Done.");
++			} else {
++				config.append("The config file: " + configPath + " seems to not exist...");
++			}
++		} catch (Exception err) {
++			StringBuilder errorConfig = new StringBuilder();
++			errorConfig.append("Error : could not load the config file: " + configPath + "\n");
++			errorConfig.append(err.toString() + "\n");
++			for (StackTraceElement ste: err.getStackTrace()) {
++				errorConfig.append(ste.toString() + "\n");
++			}
++			return errorConfig.toString();
++		}
++		return config.toString();
++	}
++
++	private void parseDebugs(String debugs, AutomatedInstallData idata) {
++		String[] ardebugs = debugs.split(",");
++		Set<String> knownDebugs = TigaseConfigConst.debugMap.keySet();
++		for (String debug: ardebugs) {
++			if (knownDebugs.contains(debug)) {
++				idata.setVariable(TigaseConfigConst.debugMap.get(debug), debug);
++			}
++		}
++	}
++
++	private void parsePlugins(String plugins, AutomatedInstallData idata) {
++		String[] arplugins = plugins.split(",");
++		Set<String> knownPlugins = TigaseConfigConst.pluginsMap.keySet();
++		for (String plugin: arplugins) {
++			if (knownPlugins.contains(plugin)) {
++				idata.setVariable(TigaseConfigConst.pluginsMap.get(plugin), plugin);
++			}
++		}
++	}
++
++	private static Pattern dbUriPattern =
++    Pattern.compile(
++			"jdbc:([^:]+(:[^:]+)?):(//([^/]+))?/?([0-9.a-zA-Z_/-]+)[;\\?]?(user=([^;&]+))?[;&]?(password=([^;&]+))?[;&]?(.*)");
++
++	private void parseUserDbUri(String dbUri, AutomatedInstallData idata) {
++		Matcher m = dbUriPattern.matcher(dbUri);
++		if (m.matches()) {
++			String jdbcDriver = m.group(1);
++			String host = m.group(4);
++			String dbName = m.group(5);
++			String userName = m.group(7);
++			String userPass = m.group(9);
++			String otherPars = m.group(10);
++// 		idata.setVariable(TigaseConfigConst.DB_TYPE,
++// 			TigaseConfigConst.userDBUriMap.get(jdbcDriver));
++			if (jdbcDriver.equals("mysql")) {
++				idata.setVariable("dbSuperuser", "root");
++			}
++			if (jdbcDriver.equals("postgresql")) {
++				idata.setVariable("dbSuperuser", "postgres");
++			}
++			if (host != null) {
++				idata.setVariable("dbHost", host);
++			}
++			if (dbName != null) {
++				if (jdbcDriver.equals("derby")) {
++					idata.setVariable("DerbyDBPath", "/" + dbName);
++					Debug.trace("DerbyDBPath set to /" + dbName);
++				} else {
++					idata.setVariable("dbName", dbName);
++					Debug.trace("dbName read: " + dbName);
++				}
++			}
++			if (userName != null) {
++				idata.setVariable("dbUser", userName);
++			}
++			if (userPass != null) {
++				idata.setVariable("dbPass", userPass);
++			}
++			if (otherPars != null) {
++				idata.setVariable("dbParams", otherPars);
++			}
++		} else {
++			Debug.trace("Hm, the dbUri doesn't match regex: " + dbUri);
++		}
++	}
++
++	private void parseAuthDbUri(String dbUri, AutomatedInstallData idata) {
++		Matcher m = dbUriPattern.matcher(dbUri);
++		if (m.matches()) {
++			String jdbcDriver = m.group(1);
++			String host = m.group(4);
++			String dbName = m.group(5);
++			String userName = m.group(7);
++			String userPass = m.group(9);
++			String otherPars = m.group(10);
++			if (jdbcDriver != null) {
++				idata.setVariable("dbAuthType", jdbcDriver);
++			}
++			if (host != null) {
++				idata.setVariable("dbAuthHost", host);
++			}
++			if (dbName != null) {
++				idata.setVariable("dbAuthName", dbName);
++			}
++			if (userName != null) {
++				idata.setVariable("dbAuthUser", userName);
++			}
++			if (userPass != null) {
++				idata.setVariable("dbAuthPass", userPass);
++			}
++			if (otherPars != null) {
++				idata.setVariable("dbAuthParams", otherPars);
++			}
++		} else {
++			Debug.trace("Hm, the dbAuthUri doesn't match regex: " + dbUri);
++		}
++	}
++	
++}
+diff --git a/src/lib/com/izforge/izpack/panels/TigaseConfigLoadPanelConsoleHelper.java b/src/lib/com/izforge/izpack/panels/TigaseConfigLoadPanelConsoleHelper.java
+new file mode 100644
+index 0000000..8b418b1
+--- /dev/null
++++ b/src/lib/com/izforge/izpack/panels/TigaseConfigLoadPanelConsoleHelper.java
+@@ -0,0 +1,29 @@
++package com.izforge.izpack.panels;
++
++import java.io.PrintWriter;
++import java.util.Properties;
++
++import com.izforge.izpack.installer.AutomatedInstallData;
++import com.izforge.izpack.installer.PanelConsole;
++import com.izforge.izpack.installer.PanelConsoleHelper;
++
++public class TigaseConfigLoadPanelConsoleHelper  extends PanelConsoleHelper implements PanelConsole {
++
++	public boolean runConsole(AutomatedInstallData installData) {
++		new TigaseConfigLoadHelper().loadConfig(installData);
++		return true;
++	}
++
++	public boolean runConsoleFromPropertiesFile(
++			AutomatedInstallData installData, Properties p) {
++		new TigaseConfigLoadHelper().loadConfig(installData);
++		return true;
++	}
++
++	public boolean runGeneratePropertiesFile(AutomatedInstallData installData,
++			PrintWriter printWriter) {
++		new TigaseConfigLoadHelper().loadConfig(installData);
++		return true;
++	}
++
++}
+diff --git a/src/lib/com/izforge/izpack/panels/TigaseConfigSavePanel.java b/src/lib/com/izforge/izpack/panels/TigaseConfigSavePanel.java
+new file mode 100644
+index 0000000..05cd89b
+--- /dev/null
++++ b/src/lib/com/izforge/izpack/panels/TigaseConfigSavePanel.java
+@@ -0,0 +1,414 @@
++/*
++ * Tigase Jabber/XMPP Server
++ * Copyright (C) 2004-2007 "Artur Hefczyc" <artur.hefczyc@tigase.org>
++ *
++ * This program is free software: you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation, either version 3 of the License.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program. Look for COPYING file in the top folder.
++ * If not, see http://www.gnu.org/licenses/.
++ *
++ * $Rev$
++ * Last modified by $Author$
++ * $Date$
++ */
++
++package com.izforge.izpack.panels;
++
++import java.io.File;
++import java.io.FileWriter;
++import java.util.Map;
++import java.util.Properties;
++
++import javax.swing.JScrollPane;
++import javax.swing.JTextArea;
++
++import com.izforge.izpack.gui.IzPanelLayout;
++import com.izforge.izpack.installer.AutomatedInstallData;
++import com.izforge.izpack.installer.InstallData;
++import com.izforge.izpack.installer.InstallerFrame;
++import com.izforge.izpack.installer.IzPanel;
++import com.izforge.izpack.util.Debug;
++import com.izforge.izpack.util.OsVersion;
++
++/**
++ * The Hello panel class.
++ *
++ * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
++ * @version $Rev$
++ */
++public class TigaseConfigSavePanel extends IzPanel {
++
++	/**
++	 *
++	 */
++	private static final long serialVersionUID = 1L;
++
++	private JTextArea textArea = null;
++
++	private final TigaseConfigSaveHelper helper = new TigaseConfigSaveHelper();
++
++
++	/**
++	 * The constructor.
++	 *
++	 * @param parent The parent.
++	 * @param idata  The installation data.
++	 */
++	public TigaseConfigSavePanel(InstallerFrame parent, InstallData idata) {
++		super(parent, TigaseInstallerCommon.init(idata), new IzPanelLayout());
++
++		// The config label.
++		String msg = parent.langpack.getString("TigaseConfigSavePanel.info");
++		add(createMultiLineLabel(msg));
++		add(IzPanelLayout.createParagraphGap());
++		// The text area which shows the info.
++		textArea = new JTextArea("");
++		textArea.setCaretPosition(0);
++		textArea.setEditable(true);
++		JScrollPane scroller = new JScrollPane(textArea);
++		add(scroller, NEXT_LINE);
++		// At end of layouting we should call the completeLayout method also they do nothing.
++		getLayoutHelper().completeLayout();
++	}
++
++	public void panelActivate() {
++		super.panelActivate();
++		String config = helper.showConfig(
++				new IzPackInstallDataVariablesSource(idata));
++		textArea.setText(config);
++	}
++
++
++
++	/**
++	 * Indicates wether the panel has been validated or not.
++	 *
++	 * @return Always true.
++	 */
++	public boolean isValidated() {
++		String errorStr =  helper.saveConfig(idata, textArea.getText());
++		if (errorStr != null) {
++			emitError("Can not write to config file", errorStr);
++		}
++		return true;
++	}
++
++}
++
++abstract class VariablesSource {
++	abstract String getVariable(String key);
++}
++
++class IzPackInstallDataVariablesSource extends VariablesSource {
++	private final AutomatedInstallData idata;
++
++	public IzPackInstallDataVariablesSource(AutomatedInstallData idata) {
++		this.idata = idata;
++		
++	}
++
++	@Override
++	String getVariable(String key) {
++		return idata.getVariable(key);
++	}
++}
++
++class TigaseConfigSaveHelper {
++	
++	String showConfig(VariablesSource variablesSource) {
++		TigaseConfigConst.props = new Properties();
++		StringBuilder config = new StringBuilder();
++		int comp_idx = 0;
++		for (Map.Entry<String, String> entry:
++        TigaseConfigConst.tigaseIzPackMap.entrySet()) {
++			String varName = entry.getValue();
++			String varValue = variablesSource.getVariable(varName);
++
++			if (varName.equals(TigaseConfigConst.DEBUG)) {
++				String debugVar = getDebugs(variablesSource);
++				if (!debugVar.isEmpty()) {
++					TigaseConfigConst.props.setProperty(entry.getKey(), debugVar);
++				}
++				Debug.trace("Set: " + entry.getKey() + " = " + debugVar);
++				continue;
++			}
++			if (varName.equals(TigaseConfigConst.PLUGINS)) {
++				String pluginsVar = getPlugins(variablesSource);
++				if (!pluginsVar.isEmpty()) {
++					TigaseConfigConst.props.setProperty(entry.getKey(), pluginsVar);
++				}
++				Debug.trace("Set: " + entry.getKey() + " = " + pluginsVar);
++				continue;
++			}
++			if (varName.equals(TigaseConfigConst.USER_DB_URI)) {
++				TigaseConfigConst.props.setProperty(entry.getKey(), getDBUri(variablesSource));
++				TigaseConfigConst.props.setProperty("root-tigase-db-uri",
++					getRootTigaseDBUri(variablesSource));
++				TigaseConfigConst.props.setProperty("root-db-uri", getRootDBUri(variablesSource));
++				Debug.trace("Set: " + entry.getKey() + " = " + getDBUri(variablesSource));
++				continue;
++			}
++
++			if (varValue == null) continue;
++
++			if (varName.equals(TigaseConfigConst.DB_TYPE)) {
++				TigaseConfigConst.props.setProperty(entry.getKey(), getUserDB(variablesSource));
++				Debug.trace("Set: " + entry.getKey() + " = " + getUserDB(variablesSource));
++				continue;
++			}
++			if (varName.equals(TigaseConfigConst.AUTH_HANDLE)) {
++				TigaseConfigConst.props.setProperty(entry.getKey(),
++					getAuthHandler(varValue, variablesSource));
++				Debug.trace("Set: " + entry.getKey() + " = " + getAuthHandler(varValue, variablesSource));
++				continue;
++			}
++			if (varName.equals(TigaseConfigConst.MUC_COMP)) {
++				if (varValue.equals("on")) {
++					++comp_idx;
++					TigaseConfigConst.props.setProperty("--comp-name-"+comp_idx, "muc");
++					TigaseConfigConst.props.setProperty("--comp-class-"+comp_idx,
++						"tigase.muc.MUCComponent");
++				}
++				Debug.trace("Set: " + "--comp-name-"+comp_idx + " = " + "muc");
++				continue;
++			}
++			if (varName.equals(TigaseConfigConst.PUBSUB_COMP)) {
++				if (varValue.equals("on")) {
++					++comp_idx;
++					TigaseConfigConst.props.setProperty("--comp-name-"+comp_idx, "pubsub");
++					TigaseConfigConst.props.setProperty("--comp-class-"+comp_idx,
++						"tigase.pubsub.PubSubClusterComponent");
++				}
++				Debug.trace("Set: " + "--comp-name-"+comp_idx + " = " + "pubsub");
++				continue;
++			}
++			if (varName.equals(TigaseConfigConst.AUTH_DB_URI)) {
++				String auth_db_uri = getAuthUri(variablesSource);
++				if (auth_db_uri != null) {
++					TigaseConfigConst.props.setProperty(entry.getKey(), auth_db_uri);
++					Debug.trace("Set: " + entry.getKey() + " = " + auth_db_uri);
++				} else {
++					Debug.trace("Not set: " + entry.getKey());
++				}
++				continue;
++			}
++			if (!varValue.trim().isEmpty()) {
++				TigaseConfigConst.props.setProperty(entry.getKey(), varValue);
++			}
++			Debug.trace("Set: " + entry.getKey() + " = " + varValue);
++		}
++		for (String name: TigaseConfigConst.props.stringPropertyNames()) {
++			if (!name.startsWith("root")) {
++				config.append(name + " = " + TigaseConfigConst.props.getProperty(name) + "\n");
++			}
++		}
++		return config.toString();
++	}
++
++	private String getDBUri(VariablesSource variablesSource) {
++		String db_uri = "jdbc:";
++		String database = getUserDB(variablesSource);
++		if (database.equals("pgsql")) {
++			db_uri += "postgresql:";
++		} else {
++			db_uri += database + ":";
++		}
++		if (database.equals("derby")) {
++			String derby_path = variablesSource.getVariable("DerbyDBPath");
++			if (OsVersion.IS_WINDOWS) {
++				derby_path = derby_path.replace("\\", "\\\\");
++			}
++			db_uri += derby_path;
++		} else {
++			db_uri += "//" + variablesSource.getVariable("dbHost");
++			db_uri += "/" + variablesSource.getVariable("dbName");
++			db_uri += "?user=" + variablesSource.getVariable("dbUser");
++			if (variablesSource.getVariable("dbPass") != null
++				&& !variablesSource.getVariable("dbPass").isEmpty()) {
++				db_uri += "&password=" + variablesSource.getVariable("dbPass");
++			}
++		}
++		return db_uri;
++	}
++
++	private String getRootTigaseDBUri(VariablesSource variablesSource) {
++		String db_uri = "jdbc:";
++		String database = getUserDB(variablesSource);
++		if (database.equals("pgsql")) {
++			db_uri += "postgresql:";
++		} else {
++			db_uri += database + ":";
++		}
++		if (database.equals("derby")) {
++			db_uri += variablesSource.getVariable("DerbyDBPath") + ";create=true";
++		} else {
++			db_uri += "//" + variablesSource.getVariable("dbHost");
++			db_uri += "/" + variablesSource.getVariable("dbName");
++			db_uri += "?user=" + variablesSource.getVariable("dbSuperuser");
++			if (variablesSource.getVariable("dbSuperpass") != null
++				&& !variablesSource.getVariable("dbSuperpass").isEmpty()) {
++				db_uri += "&password=" + variablesSource.getVariable("dbSuperpass");
++			}
++		}
++		return db_uri;
++	}
++
++	private String getRootDBUri(VariablesSource variablesSource) {
++		String db_uri = "jdbc:";
++		String db = "";
++		String database = getUserDB(variablesSource);
++		if (database.equals("pgsql")) {
++			db_uri += "postgresql:";
++			db = "/postgres";
++		} else {
++			db_uri += database + ":";
++			if (database.equals("mysql")) {
++				db = "/mysql";
++			}
++		}
++		if (database.equals("derby")) {
++			db_uri += variablesSource.getVariable("DerbyDBPath") + ";create=true";
++		} else {
++			db_uri += "//" + variablesSource.getVariable("dbHost");
++			db_uri += db;
++			db_uri += "?user=" + variablesSource.getVariable("dbSuperuser");
++			if (variablesSource.getVariable("dbSuperpass") != null
++				&& !variablesSource.getVariable("dbSuperpass").isEmpty()) {
++				db_uri += "&password=" + variablesSource.getVariable("dbSuperpass");
++			}
++		}
++		return db_uri;
++	}
++
++	private String getAuthUri(VariablesSource variablesSource) {
++		String db_uri = "jdbc:";
++		String database = variablesSource.getVariable(TigaseConfigConst.AUTH_DB_URI);
++		db_uri += database + ":";
++		if (database.equals("derby")) {
++			String derby_path = variablesSource.getVariable("DerbyDBPath");
++			if (derby_path != null) {
++				db_uri += derby_path;
++			} else {
++				return null;
++			}
++		} else {
++			db_uri += "//" + variablesSource.getVariable("dbAuthHost");
++			db_uri += "/" + variablesSource.getVariable("dbAuthName");
++			db_uri += "?user=" + variablesSource.getVariable("dbAuthUser");
++			if (variablesSource.getVariable("dbAuthPass") != null
++				&& !variablesSource.getVariable("dbAuthPass").isEmpty()) {
++				db_uri += "&password=" + variablesSource.getVariable("dbAuthPass");
++			}
++		}
++		return db_uri;
++	}
++
++	private String getPlugins(VariablesSource variablesSource) {
++		String plugins = "";
++		if (variablesSource.getVariable(TigaseConfigConst.ALL_PLUGINS[0]) == null) {
++			// The Panel with debuging settings was not shown so all
++			// settins are null, then we set a default: 'server'
++			return "";
++		}
++		for (String plugin: TigaseConfigConst.ALL_PLUGINS) {
++			if (variablesSource.getVariable(plugin) == null) {
++				Debug.trace("Missing variables for: " + plugin);
++				continue;
++			}
++			
++			final String value = variablesSource.getVariable(plugin);
++			final String prefix;
++			final String pluginId = TigaseConfigConst.getPluginId(plugin);
++			if (value.equals("off")) {
++				prefix = "-";
++			} else {
++				prefix = "+";
++			} 
++			
++			if (!plugins.isEmpty()) {
++				plugins += ",";
++			}
++			plugins += prefix + pluginId;
++		}
++		
++		return plugins;
++	}
++
++	private String getDebugs(VariablesSource variablesSource) {
++
++		String debugs = "";
++		if (variablesSource.getVariable(TigaseConfigConst.ALL_DEBUGS[0]) == null) {
++			// The Panel with debuging settings was not shown so all
++			// settins are null, then we set a default: 'server'
++			return "server";
++		}
++		for (String deb: TigaseConfigConst.ALL_DEBUGS) {
++			if (variablesSource.getVariable(deb) == null 
++					|| variablesSource.getVariable(deb).equals("off")) {
++				continue;
++			}
++			if (!debugs.isEmpty()) {
++				debugs += ",";
++			}
++			debugs += variablesSource.getVariable(deb);
++		}
++		return debugs;
++	}
++
++	private String getAuthHandler(String var, VariablesSource variablesSource) {
++		if (var.equals("Standard")) {
++			return getUserDB(variablesSource);
++		}
++		return var;
++	}
++
++	private String getUserDB(VariablesSource variablesSource) {
++		String dbVar = variablesSource.getVariable(TigaseConfigConst.DB_TYPE);
++		String result = TigaseConfigConst.userDBMap.get(dbVar);
++		return result != null ? result : "derby";
++	}
++	
++	// returns null if ok, error string on error
++	String saveConfig(AutomatedInstallData variablesSource, String config) {
++		// Try to read the config file.
++		File configPath = null;
++		File xmlConfigPath = null;
++		try {
++			if (variablesSource.getVariable("searchTigaseHome") == null
++				|| variablesSource.getVariable("searchTigaseHome").isEmpty()) {
++				configPath = new File(variablesSource.getVariable("INSTALL_PATH"),
++					"etc/init.properties");
++				xmlConfigPath = new File(variablesSource.getVariable("INSTALL_PATH"),
++					"etc/tigase.xml");
++			} else {
++				configPath = new File(variablesSource.getVariable("searchTigaseHome"),
++					"etc/init.properties");
++				xmlConfigPath = new File(variablesSource.getVariable("searchTigaseHome"),
++					"etc/tigase.xml");
++			}
++			FileWriter fw = new FileWriter(configPath, false);
++			fw.write(config);
++			fw.close();
++			if (xmlConfigPath.exists()) {
++				xmlConfigPath.delete();
++			}
++		} catch (Exception err) {
++			String error = "Error : could not write to the config file: " + configPath + "\n";
++			error += err.toString() + "\n";
++			for (StackTraceElement ste: err.getStackTrace()) {
++				error += ste.toString() + "\n";
++			}
++			return error;
++		}
++		return null;
++	}
++
++}
+\ No newline at end of file
+diff --git a/src/lib/com/izforge/izpack/panels/TigaseConfigSavePanelConsoleHelper.java b/src/lib/com/izforge/izpack/panels/TigaseConfigSavePanelConsoleHelper.java
+new file mode 100644
+index 0000000..1858e6f
+--- /dev/null
++++ b/src/lib/com/izforge/izpack/panels/TigaseConfigSavePanelConsoleHelper.java
+@@ -0,0 +1,35 @@
++package com.izforge.izpack.panels;
++
++import java.io.PrintWriter;
++import java.util.Properties;
++
++import com.izforge.izpack.installer.AutomatedInstallData;
++import com.izforge.izpack.installer.PanelConsole;
++import com.izforge.izpack.installer.PanelConsoleHelper;
++
++public class TigaseConfigSavePanelConsoleHelper  
++extends PanelConsoleHelper implements PanelConsole {
++
++	public boolean runConsole(AutomatedInstallData installData) {
++		TigaseConfigSaveHelper helper = new TigaseConfigSaveHelper();
++		
++		String config =  helper.showConfig(
++				new IzPackInstallDataVariablesSource(installData));
++		helper.saveConfig(installData, config);
++		
++		return true;
++	}
++
++	
++	
++	public boolean runConsoleFromPropertiesFile(
++			AutomatedInstallData installData, Properties p) {
++		return false;
++	}
++
++	public boolean runGeneratePropertiesFile(AutomatedInstallData installData,
++			PrintWriter printWriter) {
++		return false;
++	}
++
++}
+diff --git a/src/lib/com/izforge/izpack/panels/TigaseDBCheckPanel.java b/src/lib/com/izforge/izpack/panels/TigaseDBCheckPanel.java
+new file mode 100644
+index 0000000..dd0cc46
+--- /dev/null
++++ b/src/lib/com/izforge/izpack/panels/TigaseDBCheckPanel.java
+@@ -0,0 +1,160 @@
++/*
++ * Tigase Jabber/XMPP Server
++ * Copyright (C) 2004-2007 "Artur Hefczyc" <artur.hefczyc@tigase.org>
++ *
++ * This program is free software: you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation, either version 3 of the License.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program. Look for COPYING file in the top folder.
++ * If not, see http://www.gnu.org/licenses/.
++ *
++ * $Rev$
++ * Last modified by $Author$
++ * $Date$
++ */
++
++package com.izforge.izpack.panels;
++
++import java.util.Timer;
++import java.util.TimerTask;
++
++import javax.swing.JScrollPane;
++import javax.swing.JTable;
++import javax.swing.SwingUtilities;
++import javax.swing.table.AbstractTableModel;
++import javax.swing.table.TableModel;
++
++import com.izforge.izpack.gui.IzPanelLayout;
++import com.izforge.izpack.installer.InstallData;
++import com.izforge.izpack.installer.InstallerFrame;
++import com.izforge.izpack.installer.IzPanel;
++import com.izforge.izpack.panels.TigaseInstallerDBHelper.MsgTarget;
++import com.izforge.izpack.panels.TigaseInstallerDBHelper.ResultMessage;
++import com.izforge.izpack.panels.TigaseInstallerDBHelper.TigaseDBTask;
++
++/**
++ * The Hello panel class.
++ *
++ * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
++ * @version $Rev$
++ */
++public class TigaseDBCheckPanel extends IzPanel {
++
++	/**
++	 *
++	 */
++	private static final long serialVersionUID = 1L;
++
++	private JTable table = null;
++	private Timer delayedTasks = new Timer("DelayedTasks", true);
++
++	private final InstallData idata;
++
++	/**
++	 * The constructor.
++	 *
++	 * @param parent The parent.
++	 * @param idata  The installation data.
++	 */
++	public TigaseDBCheckPanel(InstallerFrame parent, InstallData idata) {
++		super(parent, TigaseInstallerCommon.init(idata), new IzPanelLayout());
++		this.idata = idata;
++
++		// The config label.
++		String msg = parent.langpack.getString("TigaseDBCheckPanel.info");
++		add(createMultiLineLabel(msg));
++		add(IzPanelLayout.createParagraphGap());
++
++		final String[] columnNames = new String[] {"Action", "Result"};
++		
++		TigaseDBTask[] tasks = TigaseInstallerDBHelper.Tasks.getTasksInOrder();
++		final String[][] data = new String[tasks.length][];
++		for (int i = 0 ; i < tasks.length ; i++) {
++			TigaseDBTask task = tasks[i];
++			data[i] = new String[] { task.getDescription(), "" };
++		}
++		
++		TableModel dataModel = new AbstractTableModel() {
++//				private String[] columnNames = names;
++//				private Object[][] data = datas;
++				public int getColumnCount() { return columnNames.length; }
++				public int getRowCount() { return data.length; }
++				public String getColumnName(int col) { return columnNames[col]; }
++				public Object getValueAt(int row, int col) { return data[row][col]; }
++				public Class getColumnClass(int c) { return getValueAt(0, c).getClass(); }
++				public boolean isCellEditable(int row, int col) { return false; }
++				public void setValueAt(Object value, int row, int col) {
++					data[row][col] = value.toString();
++					fireTableCellUpdated(row, col);
++				}
++      };
++		// The table area which shows the info.
++		table = new JTable(dataModel);
++		//		table.setEditable(false);
++		//add(table, NEXT_LINE);
++		JScrollPane scroller = new JScrollPane(table);
++		table.setFillsViewportHeight(true);
++		add(scroller, NEXT_LINE);
++		// At end of layouting we should call the completeLayout
++		// method also they do nothing.
++		getLayoutHelper().completeLayout();
++	}
++
++	public void panelActivate() {
++		super.panelActivate();
++		parent.lockNextButton();
++		
++		final TigaseInstallerDBHelper dbHelper = new TigaseInstallerDBHelper();
++		
++		delayedTasks.schedule(new TimerTask() {
++				
++			public void run() {
++				TigaseDBTask[] tasks = TigaseInstallerDBHelper.Tasks.getTasksInOrder();
++				
++				for (int i = 0 ; i < tasks.length ; i++) {
++					TigaseDBTask task = tasks[i];
++					final int row = i;
++					
++					MsgTarget msgTarget = new MsgTarget() {
++						public ResultMessage addResultMessage() {
++							return new ResultMessage() {
++								private String fullMsg = "";
++
++								public void append(String msg) {
++									fullMsg += msg;
++									SwingUtilities.invokeLater(new Runnable() {
++										public void run() {
++											table.getModel().setValueAt(fullMsg, row, 1);
++										}
++									});
++								}
++							};
++						}
++					};
++						
++					task.execute(dbHelper, idata.getVariables(), msgTarget);
++				}
++				parent.unlockNextButton();
++			}
++		}, 500);
++	}
++
++	/**
++	 * Indicates wether the panel has been validated or not.
++	 *
++	 * @return Always true.
++	 */
++	public boolean isValidated() {
++		return true;
++	}
++
++}
++
++
+diff --git a/src/lib/com/izforge/izpack/panels/TigaseDBCheckPanelConsoleHelper.java b/src/lib/com/izforge/izpack/panels/TigaseDBCheckPanelConsoleHelper.java
+new file mode 100644
+index 0000000..101e248
+--- /dev/null
++++ b/src/lib/com/izforge/izpack/panels/TigaseDBCheckPanelConsoleHelper.java
+@@ -0,0 +1,62 @@
++package com.izforge.izpack.panels;
++
++import java.io.PrintWriter;
++import java.util.Properties;
++
++import com.izforge.izpack.installer.AutomatedInstallData;
++import com.izforge.izpack.installer.ConsoleInstallHelper;
++import com.izforge.izpack.installer.PanelConsole;
++import com.izforge.izpack.installer.PanelConsoleHelper;
++import com.izforge.izpack.panels.TigaseInstallerDBHelper.ResultMessage;
++import com.izforge.izpack.panels.TigaseInstallerDBHelper.TigaseDBTask;
++
++public class TigaseDBCheckPanelConsoleHelper extends PanelConsoleHelper implements PanelConsole {
++
++	private ConsoleInstallHelper helper = ConsoleInstallHelper.getInstance();
++	
++	public boolean runConsole(AutomatedInstallData installData) {
++		
++		TigaseInstallerDBHelper dbHelper = new TigaseInstallerDBHelper();
++	
++		helper.console.displayLabel("Performing DB tasks");
++				
++		for (TigaseDBTask task : TigaseInstallerDBHelper.Tasks.getTasksInOrder()) {
++			helper.console.displayEmptyLine();
++			helper.console.displayRaw(task.getDescription() + "  ");
++			
++			TigaseInstallerDBHelper.MsgTarget msgTarget = new TigaseInstallerDBHelper.MsgTarget() {
++				public ResultMessage addResultMessage() {
++					helper.console.displayEmptyLine();
++					return new ResultMessage() {
++						public void append(String msg) {
++							helper.console.displayRaw(msg);
++						}
++					};
++				}
++			};
++
++			task.execute(dbHelper, installData.getVariables(), msgTarget);
++		}
++		
++		helper.console.displayEmptyLine();
++		helper.console.displayEmptyLine();
++		helper.console.displayEmptyLine();
++
++		return true;
++	}
++
++
++	
++	// not implemented
++	
++	public boolean runConsoleFromPropertiesFile(
++			AutomatedInstallData installData, Properties p) {
++		return false;
++	}
++
++	public boolean runGeneratePropertiesFile(AutomatedInstallData installData,
++			PrintWriter printWriter) {
++		return false;
++	}
++
++}
+diff --git a/src/lib/com/izforge/izpack/panels/TigaseInstallerDbHelperFunctionalTest.java b/src/lib/com/izforge/izpack/panels/TigaseInstallerDbHelperFunctionalTest.java
+new file mode 100644
+index 0000000..f1d2afb
+--- /dev/null
++++ b/src/lib/com/izforge/izpack/panels/TigaseInstallerDbHelperFunctionalTest.java
+@@ -0,0 +1,39 @@
++package com.izforge.izpack.panels;
++
++import java.util.Properties;
++
++import com.izforge.izpack.panels.TigaseInstallerDBHelper.MsgTarget;
++import com.izforge.izpack.panels.TigaseInstallerDBHelper.ResultMessage;
++import com.izforge.izpack.panels.TigaseInstallerDBHelper.TigaseDBTask;
++
++public class TigaseInstallerDbHelperFunctionalTest {
++
++	public static void main(String[] args) {
++		testPostgres();
++	}
++
++	private static void testPostgres() {
++		
++		TigaseInstallerDBHelper helper = new TigaseInstallerDBHelper();
++		Properties variables = new Properties();
++		
++		for (final TigaseDBTask task : 
++			TigaseInstallerDBHelper.Tasks.getTasksInOrder()) 
++		{
++			MsgTarget msgTarget = new MsgTarget() {
++				public ResultMessage addResultMessage() {
++					System.err.println("Task: " + task.getDescription());
++					return new ResultMessage() {
++						public void append(String msg) {
++							System.err.print(msg);
++						}
++					};
++				}
++			};
++			
++			task.execute(helper, variables, msgTarget);
++		}
++		
++	}
++	
++}
 diff --git a/src/lib/com/izforge/izpack/panels/UserInputPanel.java b/src/lib/com/izforge/izpack/panels/UserInputPanel.java
 index fbda7e9..5e46d4e 100644
 --- a/src/lib/com/izforge/izpack/panels/UserInputPanel.java
