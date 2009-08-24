@@ -65,7 +65,6 @@ import tigase.server.Packet;
 import tigase.server.Permissions;
 import tigase.server.ReceiverEventHandler;
 import tigase.server.XMPPServer;
-import tigase.stats.StatRecord;
 import tigase.stats.StatisticsList;
 import tigase.sys.OnlineJidsReporter;
 import tigase.sys.TigaseRuntime;
@@ -128,31 +127,38 @@ public class SessionManager extends AbstractMessageReceiver
 	private Set<String> trusted = new CopyOnWriteArraySet<String>();
 	//{"admin@localhost"};
 
+	/**
+	 * A Map with bare user JID as a key and a user session object as a value.
+	 */
 	private ConcurrentHashMap<String, XMPPSession> sessionsByNodeId =
 		new ConcurrentHashMap<String, XMPPSession>();
-	private ConcurrentHashMap<String, XMPPResourceConnection> connectionsByFrom =
+	/**
+	 * A Map with connectionID as a key and an object with all the user connection
+	 * data as a value
+	 */
+	protected ConcurrentHashMap<String, XMPPResourceConnection> connectionsByFrom =
 		new ConcurrentHashMap<String, XMPPResourceConnection>();
 
 	private Map<String, XMPPPreprocessorIfc> preProcessors =
-					new ConcurrentSkipListMap<String, XMPPPreprocessorIfc>();
+			new ConcurrentSkipListMap<String, XMPPPreprocessorIfc>();
 	private Map<String, ProcessingThreads<ProcessorWorkerThread>> processors =
-					new ConcurrentSkipListMap<String, ProcessingThreads<ProcessorWorkerThread>>();
+			new ConcurrentSkipListMap<String, ProcessingThreads<ProcessorWorkerThread>>();
 	private Map<String, XMPPPostprocessorIfc> postProcessors =
-					new ConcurrentSkipListMap<String, XMPPPostprocessorIfc>();
+			new ConcurrentSkipListMap<String, XMPPPostprocessorIfc>();
 	private Map<String, XMPPStopListenerIfc> stopListeners =
-					new ConcurrentSkipListMap<String, XMPPStopListenerIfc>();
+			new ConcurrentSkipListMap<String, XMPPStopListenerIfc>();
 	private Map<String, Map<String, Object>> plugin_config =
-					new ConcurrentSkipListMap<String, Map<String, Object>>();
+			new ConcurrentSkipListMap<String, Map<String, Object>>();
 	private Map<String, XMPPPacketFilterIfc> outFilters =
-					new ConcurrentSkipListMap<String, XMPPPacketFilterIfc>();
+			new ConcurrentSkipListMap<String, XMPPPacketFilterIfc>();
 	private Map<String, AdminCommandIfc> adminCommands =
-					new ConcurrentSkipListMap<String, AdminCommandIfc>();
+			new ConcurrentSkipListMap<String, AdminCommandIfc>();
 	private ProcessingThreads<SessionCloseWorkerThread> sessionCloseThread =
-					new ProcessingThreads<SessionCloseWorkerThread>(new SessionCloseWorkerThread(),
-					4, 1, maxQueueSize, "session-close");
+			new ProcessingThreads<SessionCloseWorkerThread>(
+			new SessionCloseWorkerThread(), 4, 1, maxQueueSize, "session-close");
 	private ProcessingThreads<SessionOpenWorkerThread> sessionOpenThread =
-					new ProcessingThreads<SessionOpenWorkerThread>(new SessionOpenWorkerThread(this),
-					1, 1, maxQueueSize, "session-open");
+			new ProcessingThreads<SessionOpenWorkerThread>(
+			new SessionOpenWorkerThread(this), 1, 1, maxQueueSize, "session-open");
 	private Timer authenticationWatchdog = new Timer("SM authentocation watchdog");
 
 	private ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
