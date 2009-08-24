@@ -670,14 +670,14 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 				++open_s2s_connections;
 				++connected_servers;
 			}
-			if (log.isLoggable(Level.FINEST)) {
-				log.finest("s2s instance: " + entry.getKey() +
-								", waitingQueue: " + conn.getWaitingPackets().size() +
-								", outgoingIsNull(): " + conn.outgoingIsNull() +
-								", outgoingActive: " + conn.isOutgoingConnected() +
-								", OutgoingState: " + conn.getOutgoingState().toString() +
-								", db_keys.size(): " + conn.getDBKeysSize());
-			}
+//			if (log.isLoggable(Level.FINEST)) {
+//				log.finest("s2s instance: " + entry.getKey() +
+//								", waitingQueue: " + conn.getWaitingPackets().size() +
+//								", outgoingIsNull(): " + conn.outgoingIsNull() +
+//								", outgoingActive: " + conn.isOutgoingConnected() +
+//								", OutgoingState: " + conn.getOutgoingState().toString() +
+//								", db_keys.size(): " + conn.getDBKeysSize());
+//			}
 		}
 		list.add(getName(), "Open s2s connections",
 						open_s2s_connections, Level.FINE);
