@@ -205,7 +205,7 @@ public class SessionManagerClusteredOld extends SessionManager
 					XMPPResourceConnection conn = getXMPPResourceConnection(pack);
 					if (conn == null) {
 						ClusterElement response = clel.createMethodResponse(packet.getTo(),
-										packet.getFrom(),	StanzaType.error.toString(), null);
+										packet.getFrom(),	StanzaType.error, null);
 						Packet resp_pack = new Packet(response.getClusterElement());
 						fastAddOutPacket(resp_pack);
 						log.info("No local session for redirected packet, sending error back: " +
@@ -275,7 +275,7 @@ public class SessionManagerClusteredOld extends SessionManager
 								Map<String, String> res_vals = new LinkedHashMap<String, String>();
 								res_vals.put(TRANSFER, "accept");
 								ClusterElement result = clel.createMethodResponse(getComponentId(),
-									node_found, "result", res_vals);
+									node_found, StanzaType.result, res_vals);
 								fastAddOutPacket(new Packet(result.getClusterElement()));
 								conn.putSessionData("redirect-to", node_found);
 								sendAllOnHold(conn);
@@ -315,7 +315,7 @@ public class SessionManagerClusteredOld extends SessionManager
 						res_vals.put(TRANSFER, "cancel");
 						for (String node: cancel_nodes) {
 							ClusterElement result = clel.createMethodResponse(getComponentId(),
-								node, "result", res_vals);
+								node, StanzaType.result, res_vals);
 							log.finest("Sending sesstion transfer CANCEL to node: " + node);
 							fastAddOutPacket(new Packet(result.getClusterElement()));
 						}

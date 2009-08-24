@@ -99,7 +99,7 @@ public class ServerConnectionClustered extends ServerConnectionManager
 
 					res_vals.put(VALID, "" + valid);
 					result = clel.createMethodResponse(getComponentId(),
-						"result", res_vals);
+						StanzaType.result, res_vals);
 				}
 				addOutPacket(new Packet(result.getClusterElement()));
 			}

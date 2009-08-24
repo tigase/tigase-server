@@ -22,6 +22,7 @@
 
 package tigase.cluster;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -65,6 +66,7 @@ public class SessionManagerClustered extends SessionManager
 	public static final String STRATEGY_CLASS_PROP_VAL =
 					"tigase.cluster.strategy.SMNonCachingAllNodes";
 	public static final String MY_DOMAIN_NAME_PROP_KEY = "domain-name";
+	public static final int SYNC_MAX_BATCH_SIZE = 1000;
 
 	/**
    * Variable <code>log</code> is a class logger.
@@ -86,6 +88,7 @@ public class SessionManagerClustered extends SessionManager
 	private static final String AUTH_TIME = "auth-time";
 	private static final String CL_BR_INITIAL_PRESENCE = "cl-br-init-pres";
 	private static final String CL_BR_USER_CONNECTED = "cl-br-user_conn";
+	private static final String SYNC_ONLINE_JIDS = "sync-jids";
 
 	private Timer delayedTasks = null;
 	private ClusteringStrategyIfc strategy = null;
@@ -149,105 +152,174 @@ public class SessionManagerClustered extends SessionManager
 	protected void processClusterPacket(Packet packet) {
 		Queue<Packet> results = new LinkedList<Packet>();
 		final ClusterElement clel = new ClusterElement(packet.getElement());
+		ClusterMethods method = ClusterMethods.parseMethod(clel.getMethodName());
 		switch (packet.getType()) {
-		case set:
-			if (clel.getMethodName() == null) {
-				processPacket(clel);
-			}
-			if (ClusterMethods.USER_INITIAL_PRESENCE.name().equals(clel.getMethodName())) {
-				String userId = clel.getMethodParam(USER_ID);
-				String resource = clel.getMethodParam(RESOURCE);
-				XMPPSession session = getSession(userId);
-				if (session != null && session.getResourceForResource(resource) == null) {
-					String connectionId = clel.getMethodParam(CONNECTION_ID);
-					String xmpp_sessionId = clel.getMethodParam(XMPP_SESSION_ID);
-					String domain = JIDUtils.getNodeHost(userId);
-					XMPPResourceConnection res_con =
+			case set:
+				if (clel.getMethodName() == null) {
+					processPacket(clel);
+				}
+				switch (method) {
+					case USER_INITIAL_PRESENCE: {
+						String userId = clel.getMethodParam(USER_ID);
+						String resource = clel.getMethodParam(RESOURCE);
+						XMPPSession session = getSession(userId);
+						if (session != null && session.getResourceForResource(resource) ==
+								null) {
+							String connectionId = clel.getMethodParam(CONNECTION_ID);
+							String xmpp_sessionId = clel.getMethodParam(XMPP_SESSION_ID);
+							String domain = JIDUtils.getNodeHost(userId);
+							XMPPResourceConnection res_con =
 									loginUserSession(connectionId, domain, userId, resource,
 									ConnectionStatus.REMOTE, xmpp_sessionId);
-					if (res_con != null) {
-						List<Element> packs = clel.getDataPackets();
-						for (Element elem : packs) {
-							if (elem.getName() == Presence.PRESENCE_ELEMENT_NAME) {
-								res_con.setPresence(elem);
-							}
-						}
-						res_con.putSessionData(SM_ID, packet.getElemFrom());
-						// Send the presence from the new user connection to all local
-						// (non-remote) user connections
-						updateUserResources(res_con, results);
-						for (XMPPResourceConnection xrc : session.getActiveResources()) {
-							if (xrc.getConnectionStatus() != ConnectionStatus.REMOTE &&
+							if (res_con != null) {
+								List<Element> packs = clel.getDataPackets();
+								for (Element elem : packs) {
+									if (elem.getName() == Presence.PRESENCE_ELEMENT_NAME) {
+										res_con.setPresence(elem);
+									}
+								}
+								res_con.putSessionData(SM_ID, packet.getElemFrom());
+								// Send the presence from the new user connection to all local
+								// (non-remote) user connections
+								updateUserResources(res_con, results);
+								for (XMPPResourceConnection xrc : session.getActiveResources()) {
+									if (xrc.getConnectionStatus() != ConnectionStatus.REMOTE &&
 											xrc.getPresence() != null) {
-								broadcastUserPresence(xrc, packet.getElemFrom());
-							}
-						}
-						if (log.isLoggable(Level.FINEST)) {
-							log.finest("Added remote session for: " + userId +
+										broadcastUserPresence(xrc, packet.getElemFrom());
+									}
+								}
+								if (log.isLoggable(Level.FINEST)) {
+									log.finest("Added remote session for: " + userId +
 											", from: " + packet.getElemFrom());
-						}
-					} else {
-						if (log.isLoggable(Level.INFO)) {
-							log.info("Couldn't create user session for: " + userId +
+								}
+							} else {
+								if (log.isLoggable(Level.INFO)) {
+									log.info("Couldn't create user session for: " + userId +
 											", resource: " + resource +
 											", connectionId: " + connectionId);
-						}
-					}
-				} else {
-					// Ignoring this, nothing special to do.
-					if (log.isLoggable(Level.FINEST)) {
-						if (session == null) {
-							log.finest("Ignoring USER_INITIAL_PRESENCE for: " + userId +
+								}
+							}
+						} else {
+							// Ignoring this, nothing special to do.
+							if (log.isLoggable(Level.FINEST)) {
+								if (session == null) {
+									log.finest("Ignoring USER_INITIAL_PRESENCE for: " + userId +
 											", from: " + packet.getElemFrom() +
 											", there is no other session for the user on this node.");
-						} else {
-							if (session.getResourceForResource(resource) != null) {
-								log.finest("Ignoring USER_INITIAL_PRESENCE for: " + userId +
+								} else {
+									if (session.getResourceForResource(resource) != null) {
+										log.finest(
+												"Ignoring USER_INITIAL_PRESENCE for: " + userId +
 												", from: " + packet.getElemFrom() +
 												", there is already a session on this node for this resource.");
-							} else {
-								log.finest("Ignoring USER_INITIAL_PRESENCE for: " + userId +
+									} else {
+										log.finest("Ignoring USER_INITIAL_PRESENCE for: " + userId +
 												", from: " + packet.getElemFrom() +
 												", reason unknown, please contact devs.");
+									}
+								}
 							}
 						}
+						break;
 					}
-				}
-			}
-			if (ClusterMethods.USER_CONNECTED.name().equals(clel.getMethodName())) {
-				String userId = clel.getMethodParam(USER_ID);
-				String resource = clel.getMethodParam(RESOURCE);
-				strategy.userConnected(userId + "/" + resource, packet.getElemFrom(),
+					case USER_CONNECTED: {
+						String userId = clel.getMethodParam(USER_ID);
+						String resource = clel.getMethodParam(RESOURCE);
+						strategy.usersConnected(packet.getElemFrom(),
+								results, userId + "/" + resource);
+						break;
+					}
+					case USER_DISCONNECTED: {
+						String userId = clel.getMethodParam(USER_ID);
+						String resource = clel.getMethodParam(RESOURCE);
+						strategy.userDisconnected(userId + "/" + resource,
+								packet.getElemFrom(),
 								results);
-			}
-			if (ClusterMethods.USER_DISCONNECTED.name().equals(clel.getMethodName())) {
-				String userId = clel.getMethodParam(USER_ID);
-				String resource = clel.getMethodParam(RESOURCE);
-				strategy.userDisconnected(userId + "/" + resource, packet.getElemFrom(),
-								results);
-				XMPPSession session = getSession(userId);
-				if (session != null) {
-					String connectionId = clel.getMethodParam(CONNECTION_ID);
-					// Possible performance bottleneck if there are many users with
-					// multiple connections to different nodes. If all disconnect at
-					// the same time we might have a problem here.
-					closeConnection(connectionId, true);
-					if (log.isLoggable(Level.FINEST)) {
-						log.finest("Removed remote session for: " + userId +
+						XMPPSession session = getSession(userId);
+						if (session != null) {
+							String connectionId = clel.getMethodParam(CONNECTION_ID);
+							// Possible performance bottleneck if there are many users with
+							// multiple connections to different nodes. If all disconnect at
+							// the same time we might have a problem here.
+							closeConnection(connectionId, true);
+							if (log.isLoggable(Level.FINEST)) {
+								log.finest("Removed remote session for: " + userId +
 										", from: " + packet.getElemFrom());
+							}
+						}
+						break;
 					}
 				}
-			}
-			break;
-		case result:
-			break;
-		case error:
-			String from = packet.getElemFrom();
-			clel.addVisitedNode(from);
-			processPacket(clel);
-			break;
-		default:
-			break;
+				break;
+			case get:
+				switch (method) {
+					case SYNC_ONLINE:
+						// Send back all online users on this node
+						Collection<XMPPResourceConnection> conns = connectionsByFrom.values();
+						int counter = 0;
+						StringBuilder sb = new StringBuilder(40000);
+						for (XMPPResourceConnection conn : conns) {
+							String jid = null;
+							// Exception would be thrown for all not-authenticated yet connection
+							// We don't have to worry about them, just ignore all of them
+							// They should be synchronized later on using standard cluster
+							// notifications.
+							try {
+								jid = conn.getJID();
+							} catch (Exception e) {
+								jid = null;
+							}
+							if (jid != null) {
+								sb.append(',').append(jid);
+								if (++counter > SYNC_MAX_BATCH_SIZE) {
+									// Send a new batch...
+									ClusterElement resp = clel.createMethodResponse(getComponentId(),
+											StanzaType.result, null);
+									resp.addMethodResult(SYNC_ONLINE_JIDS, sb.toString());
+									fastAddOutPacket(new Packet(resp.getClusterElement()));
+									counter = 0;
+									// Not sure which is better, create a new StringBuilder instance
+									// or clearing existing up...., let's clear it up for now.
+									sb.delete(0, sb.length());
+								}
+							}
+						}
+						if (sb.length() > 0) {
+							// Send a new batch...
+							ClusterElement resp = clel.createMethodResponse(getComponentId(),
+									StanzaType.result, null);
+							resp.addMethodResult(SYNC_ONLINE_JIDS, sb.toString());
+							fastAddOutPacket(new Packet(resp.getClusterElement()));
+						}
+						break;
+					default:
+						// Do nothing...
+				}
+				break;
+			case result:
+				switch (method) {
+					case SYNC_ONLINE:
+						// Notify clustering strategy about SYNC_ONLINE response
+						String jids = clel.getMethodResultVal(SYNC_ONLINE_JIDS);
+						if (jids != null) {
+							String[] jidsa = jids.split(",");
+							strategy.usersConnected(packet.getElemFrom(), results, jidsa);
+						} else {
+							log.warning("Sync online packet with empty jids list! Please check this out: " +
+									packet.toString());
+						}
+						break;
+					default:
+						// Do nothing...
+				}
+				break;
+			case error:
+				String from = packet.getElemFrom();
+				clel.addVisitedNode(from);
+				processPacket(clel);
+				break;
+			default:
+				break;
 		}
 		addOutPackets(results);
 	}
@@ -393,6 +465,9 @@ public class SessionManagerClustered extends SessionManager
 		strategy.nodeConnected(jid);
 		sendAdminNotification("Cluster node '" + node + "' connected (" +
 						(new Date()) + ")", "New cluster node connected: " + node, node);
+		if (strategy.needsSync()) {
+			requestSync(jid);
+		}
 	}
 
 	@Override
@@ -663,6 +738,13 @@ public class SessionManagerClustered extends SessionManager
 	@Override
 	public boolean containsJid(String jid) {
 		return super.containsJid(jid) || strategy.containsJid(jid);
+	}
+
+	private void requestSync(String node) {
+		ClusterElement clel = 
+				ClusterElement.createClusterMethodCall(getComponentId(), node, StanzaType.get,
+				ClusterMethods.SYNC_ONLINE.name(), null);
+		fastAddOutPacket(new Packet(clel.getClusterElement()));
 	}
 
 }

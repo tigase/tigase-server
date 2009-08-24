@@ -32,6 +32,15 @@ package tigase.cluster;
 public enum ClusterMethods {
 
 	UPDATE_NODES, CHECK_DB_KEY, SESSION_TRANSFER, PACKET_REDIRECT, 
-	USER_CONNECTED, USER_DISCONNECTED, USER_INITIAL_PRESENCE;
+	USER_CONNECTED, USER_DISCONNECTED, USER_INITIAL_PRESENCE, SYNC_ONLINE, 
+	OTHER;
+
+	public static ClusterMethods parseMethod(String method) {
+		try {
+			return ClusterMethods.valueOf(method);
+		} catch (Exception e) {
+			return OTHER;
+		}
+	}
 
 }

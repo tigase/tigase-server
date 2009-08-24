@@ -105,12 +105,14 @@ public interface ClusteringStrategyIfc extends OnlineJidsReporter {
 	/**
 	 * This is a handler method which is called when a user connects to some
 	 * node in the cluster.
-	 * @param jid is a user full JID just connected to the cluster.
+	 * @param jids is a list of full user JIDs which just connected to the cluster.
+	 * Normally there is only one JID provided, however, in some cases
+	 * (during syncronization) there might be more than one.
 	 * @param node is a cluster node id where the jid is connected to.
 	 * @param results is a collection of packets which can be generated upon the
 	 * user connection by the implementation.
 	 */
-	void userConnected(String jid, String node, Queue<Packet> results);
+	void usersConnected(String node, Queue<Packet> results, String ... jids);
 
 	/**
 	 * This is a handler method which is called when a user disconnects from some
@@ -133,18 +135,18 @@ public interface ClusteringStrategyIfc extends OnlineJidsReporter {
 	 */
 	boolean needsSync();
 
-	/**
-	 * If <code>needsSync()</code> returns <code>'true'</code> this method can be
-	 * called at any time. It normally would update online users in batches of 100
-	 * users for each node and the synchronization can take any time.
-	 *
-	 * If the list contains a String <code>'COMPLETED'</code> it means that synchronization
-	 * which the given node has been completed. No more syncOnline methods for this
-	 * node should be called after that unless the node re-connects.
-	 * @param jids is a list of user full JIDs which are connected to a given node.
-	 * @param node is a cluster node id which holds all the given user JIDs.
-	 */
-	void syncOnline(List<String> jids, String node);
+//	/**
+//	 * If <code>needsSync()</code> returns <code>'true'</code> this method can be
+//	 * called at any time. It normally would update online users in batches of 100
+//	 * users for each node and the synchronization can take any time.
+//	 *
+//	 * If the list contains a String <code>'COMPLETED'</code> it means that synchronization
+//	 * which the given node has been completed. No more syncOnline methods for this
+//	 * node should be called after that unless the node re-connects.
+//	 * @param jids is a list of user full JIDs which are connected to a given node.
+//	 * @param node is a cluster node id which holds all the given user JIDs.
+//	 */
+//	void syncOnline(List<String> jids, String node);
 
 	/**
 	 * Add the strategy statistics to the List.

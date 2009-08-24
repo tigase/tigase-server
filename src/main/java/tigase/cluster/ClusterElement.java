@@ -197,17 +197,17 @@ public class ClusterElement {
 		return result_cl;
 	}
 
-	public ClusterElement createMethodResponse(String from, String type,
+	public ClusterElement createMethodResponse(String from, StanzaType type,
 		Map<String, String> results) {
 		return createMethodResponse(from, null, type, results);
 	}
 
 	public ClusterElement createMethodResponse(String from, String to,
-		String type, Map<String, String> results) {
+		StanzaType type, Map<String, String> results) {
 		Element result_el = elem.clone();
 		result_el.setAttribute("from", from);
 		result_el.setAttribute("to", (to != null ? to : first_node));
-		result_el.setAttribute("type", type);
+		result_el.setAttribute("type", type.name());
 		Element res = new Element(CLUSTER_METHOD_RESULTS_EL_NAME);
 		result_el.findChild(CLUSTER_METHOD_PATH).addChild(res);
 		ClusterElement result_cl = new ClusterElement(result_el);

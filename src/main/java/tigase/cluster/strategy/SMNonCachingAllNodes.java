@@ -79,7 +79,7 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 	}
 
 	@Override
-	public void userConnected(String jid, String sm, Queue<Packet> results) {
+	public void usersConnected(String sm, Queue<Packet> results, String ... jid) {
 	}
 
 	@Override
@@ -94,15 +94,6 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 	@Override
 	public boolean needsSync() {
 		return false;
-	}
-
-	@Override
-	public void syncOnline(List<String> jids, String node) {
-		// It doesn't support syncronization anyway so it should not
-		// be called. Instead of leaving it empty the exception is thrown
-		// to detect implementation bugs which would caused this method to call
-		// even though needsSync() returns false.
-		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 	@Override
