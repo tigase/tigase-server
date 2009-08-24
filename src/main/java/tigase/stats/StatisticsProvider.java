@@ -51,6 +51,7 @@ public class StatisticsProvider extends StandardMBean
 	private static final Logger log =
     Logger.getLogger(StatisticsProvider.class.getName());
 
+	private StatisticsCache cache = new StatisticsCache();
 	private StatisticsCollector theRef;
 
 	public StatisticsProvider(StatisticsCollector theRef)
@@ -374,8 +375,6 @@ public class StatisticsProvider extends StandardMBean
 		return cache.clIOQueue;
 	}
 
-	private StatisticsCache cache = new StatisticsCache();
-
 	@Override
 	public long getSMPacketsNumber() {
 		return cache.smPackets;
@@ -428,6 +427,8 @@ public class StatisticsProvider extends StandardMBean
 		private static final String C2S_COMP = "c2s";
 		private static final String BOSH_COMP = "bosh";
 
+		private Timer updateTimer = null;
+
 		//private long lastUpdate = 0;
 		private StatisticsList allStats = new StatisticsList(Level.FINER);
 		private long prevClusterPackets = 0;
@@ -462,7 +463,6 @@ public class StatisticsProvider extends StandardMBean
 		private int clQueue = 0;
 		private int clIOQueue = 0;
 		private String systemDetails = "";
-		private Timer updateTimer = null;
 		private int inter = 10;
 		private int cnt = 0;
 		private float cpuUsage = 0f;
