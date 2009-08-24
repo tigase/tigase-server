@@ -288,7 +288,7 @@ public class DrupalCommentsTask extends SenderTask {
 		ResultSet rs = null;
 		try {
 			checkConnection();
-//			log.info("timestamp = " + lastCommentsCheck);
+			log.info("New comment check, timestamp = " + lastCommentsCheck);
 			get_new_comments.setLong(1, lastCommentsCheck);
 			lastCommentsCheck = System.currentTimeMillis() / SECOND;
 			rs = get_new_comments.executeQuery();

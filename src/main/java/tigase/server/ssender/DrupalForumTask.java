@@ -309,7 +309,7 @@ public class DrupalForumTask extends SenderTask {
 		ResultSet rs = null;
 		try {
 			checkConnection();
-			//			log.info("timestamp = " + lastCommentsCheck.toString());
+			log.info("New comment check, timestamp = " + lastCommentsCheck);
 			get_new_comments.setLong(1, lastCommentsCheck);
 			lastCommentsCheck = System.currentTimeMillis() / SECOND;
 			get_new_comments.setLong(2, forumId);

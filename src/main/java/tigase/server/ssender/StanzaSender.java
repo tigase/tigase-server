@@ -160,7 +160,7 @@ public class StanzaSender extends AbstractMessageReceiver
 					(Long)props.get(task_name + "/" + TASK_INTERVAL_PROP_KEY);
 				try {
 					SenderTask task = (SenderTask)Class.forName(task_class).newInstance();
-					task.setName(task_name + "@" + getComponentId());
+					task.setName(getComponentId() + "/" + task_name);
 					task.init(this, task_init);
 
 					// Install new task
