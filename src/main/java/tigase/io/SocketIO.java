@@ -66,7 +66,7 @@ public class SocketIO implements IOInterface {
 		channel.socket().setReuseAddress(true);
 		remoteAddress = channel.socket().getInetAddress().getHostAddress();
 		if (channel.socket().getTrafficClass() == ConnectionOpenListener.IPTOS_THROUGHPUT) {
-			dataToSend = new LinkedBlockingQueue<ByteBuffer>(10000);
+			dataToSend = new LinkedBlockingQueue<ByteBuffer>(100000);
 		} else {
 			dataToSend = new LinkedBlockingQueue<ByteBuffer>(100);
 		}
