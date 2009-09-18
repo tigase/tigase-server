@@ -360,6 +360,7 @@ public class TigaseAuth implements UserAuthRepository {
 	 * @exception TigaseDBException if an error occurs
 	 * @exception AuthorizationException if an error occurs
 	 */
+	@Override
 	public boolean digestAuth(final String user, final String digest,
 		final String id, final String alg)
 		throws UserNotFoundException, TigaseDBException, AuthorizationException {
@@ -375,6 +376,7 @@ public class TigaseAuth implements UserAuthRepository {
 	 * @exception TigaseDBException if an error occurs
 	 * @exception AuthorizationException if an error occurs
 	 */
+	@Override
 	public boolean otherAuth(final Map<String, Object> props)
 		throws UserNotFoundException, TigaseDBException, AuthorizationException {
 		String proto = (String)props.get(PROTOCOL_KEY);
@@ -388,6 +390,7 @@ public class TigaseAuth implements UserAuthRepository {
 		throw new AuthorizationException("Protocol is not supported: " + proto);
 	}
 
+	@Override
 	public void logout(final String user)
 		throws UserNotFoundException, TigaseDBException {
 		try {
@@ -409,6 +412,7 @@ public class TigaseAuth implements UserAuthRepository {
 	 * @exception UserExistsException if an error occurs
 	 * @exception TigaseDBException if an error occurs
 	 */
+	@Override
 	public void addUser(final String user, final String password)
 		throws UserExistsException, TigaseDBException {
 		ResultSet rs = null;
