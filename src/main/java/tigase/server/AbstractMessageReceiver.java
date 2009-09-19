@@ -180,6 +180,16 @@ public abstract class AbstractMessageReceiver
 	 * @return
 	 */
 	public int hashCodeForPacket(Packet packet) {
+		if (packet.getFrom() != null && packet.getFrom() != packet.getElemFrom()) {
+			// This comes from connection manager so the best way is to get hashcode
+			// by the connectionId, which is in the getFrom()
+			return packet.getFrom().hashCode();
+		}
+		// If not, then a better way is to get hashCode from the elemTo address
+		// as this would be by the destination address user name:
+		if (packet.getElemTo() != null) {
+			return packet.getElemTo().hashCode();
+		}
 		return packet.getTo().hashCode();
 	}
 
@@ -520,6 +530,7 @@ public abstract class AbstractMessageReceiver
 //		}
     packets_per_minute = statReceivedPacketsOk - last_minute_packets;
 		last_minute_packets = statReceivedPacketsOk;
+		receiverTasks.purge();
 	}
 
 	public synchronized void everyHour() {
