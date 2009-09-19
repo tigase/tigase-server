@@ -32,5 +32,5 @@ import tigase.xmpp.XMPPIOService;
  * @version $Rev$
  */
 public interface ServiceChecker {
-	void check(XMPPIOService service, String serviceId);
+	void check(XMPPIOService service);
 }
