@@ -34,6 +34,7 @@ import java.util.logging.Logger;
 import java.net.UnknownHostException;
 
 import java.util.zip.Deflater;
+import tigase.annotations.TODO;
 import tigase.net.ConnectionType;
 //import tigase.net.IOService;
 import tigase.net.SocketType;
@@ -106,12 +107,46 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 //     new LinkedHashMap<String, Long>();
 // 	private LinkedHashMap<String, Long> recieved_acks =
 //     new LinkedHashMap<String, Long>();
+	private int nodesNo = 0;
 
 	private long totalNodeDisconnects = 0;
 	private long[] lastDay = new long[24];
 	private long[] lastHour = new long[60];
 	private int lastDayIdx = 0;
 	private int lastHourIdx = 0;
+
+	/**
+	 * This method can be overwritten in extending classes to get a different
+	 * packets distribution to different threads. For PubSub, probably better
+	 * packets distribution to different threads would be based on the
+	 * sender address rather then destination address.
+	 * @param packet
+	 * @return
+	 */
+	@Override
+	public int hashCodeForPacket(Packet packet) {
+		// There is a separate connection to each cluster node, ideally we want to
+		// process packets in a separate thread for each connection, so let's try
+		// to get the hash code by the destination node address
+		if (packet.getElemTo() != null) {
+			return packet.getElemTo().hashCode();
+		}
+		return packet.getTo().hashCode();
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	@Override
+	@TODO(note="The number of threads should be equal or greater to number of cluster nodes.")
+	public int processingThreads() {
+		// This should work well as far as nodesNo is initialized before this
+		// method is called which is true only during program startup time.
+		// In case of reconfiguration or new node joining this might not be
+		// the case. Low priority issue though.
+		return Math.max(Runtime.getRuntime().availableProcessors(), nodesNo);
+	}
 
 	@Override
 	public void processPacket(Packet packet) {
@@ -306,6 +341,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 		connectionDelay = 5*SECOND;
 		String[] cl_nodes = (String[])props.get(CLUSTER_NODES_PROP_KEY);
 		if (cl_nodes != null) {
+			nodesNo = cl_nodes.length;
 			for (String node: cl_nodes) {
 				String host = JIDUtils.getNodeHost(node);
 				log.config("Found cluster node host: " + host);
@@ -344,6 +380,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 			for (int i = 0; i < cl_nodes.length; i++) {
 				cl_nodes[i] = JIDUtils.getNodeHost(cl_nodes[i]);
 			}
+			nodesNo = cl_nodes.length;
 			props.put(CLUSTER_NODES_PROP_KEY, cl_nodes);
 		} else {
 			props.put(CLUSTER_NODES_PROP_KEY, new String[] {getDefHostName()});
@@ -612,6 +649,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 				ioStatsGetter.getAverageDecompressionRatio(), Level.FINE);
 		list.add(getName(), "Bytes sent", ioStatsGetter.getBytesSent(), Level.FINE);
 		list.add(getName(), "Bytes received", ioStatsGetter.getBytesReceived(), Level.FINE);
+		list.add(getName(), "Waiting to send", ioStatsGetter.getWaitingToSend(), Level.FINE);
 	}
 	
 	@Override
@@ -644,16 +682,18 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 		private int counter = 0;
 		private long bytesReceived = 0;
 		private long bytesSent = 0;
+		private int clIOQueue = 0;
 		private StatisticsList list = new StatisticsList(Level.ALL);
 
 		@Override
-		public void check(XMPPIOService service, String serviceId) {
+		public void check(XMPPIOService service) {
 			service.getStatistics(list);
 			compressionRatio += list.getValue("zlibio", "Average compression rate", -1f);
 			decompressionRatio += list.getValue("zlibio", "Average decompression rate", -1f);
 			++counter;
 			bytesReceived += list.getValue("socketio", "Bytes received", -1l);
 			bytesSent += list.getValue("socketio", "Bytes sent", -1l);
+			clIOQueue += service.waitingToSendSize();
 		}
 
 		public float getAverageCompressionRatio() {
@@ -672,12 +712,17 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 			return bytesReceived;
 		}
 
+		public int getWaitingToSend() {
+			return clIOQueue;
+		}
+
 		public void reset() {
 			bytesReceived = 0;
 			bytesSent = 0;
 			compressionRatio = 0f;
 			decompressionRatio = 0f;
 			counter = 0;
+			clIOQueue = 0;
 		}
 
 	}
