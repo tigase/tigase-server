@@ -270,6 +270,9 @@ public class ClusterElement {
 
 	protected void parseMethodCall(Element method_call) {
 		method_name = method_call.getAttribute(CLUSTER_NAME_ATTR);
+		if (method_name != null) {
+			method_name = method_name.intern();
+		}
 		method_params = new LinkedHashMap<String, String>();
 		List<Element> children = method_call.getChildren();
 		if (children != null) {
