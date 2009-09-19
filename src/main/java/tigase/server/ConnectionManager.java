@@ -144,6 +144,9 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 					new LinkedList<Map<String, Object>>();
 	private ConcurrentSkipListMap<String, IO> services =
 		new ConcurrentSkipListMap<String, IO>();
+	// services.size() call is very slow due to the implementation details
+	// Therefore for often size retrieval this value is calculated separately.
+	private int services_size = 0;
 	private Set<ConnectionListenerImpl> pending_open =
 		Collections.synchronizedSet(new HashSet<ConnectionListenerImpl>());;
 	protected long connectionDelay = 2 * SECOND;
@@ -563,6 +566,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 				log.warning("[[" + getName() +
 								"]] Attempt to stop incorrect service: " + id);
 				Thread.dumpStack();
+			} else {
+				--services_size;
 			}
 			return result;
 		}
@@ -574,9 +579,9 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 	public void serviceStarted(final IO service) {
 		//synchronized(services) {
 			String id = getUniqueId(service);
-			if (log.isLoggable(Level.FINER)) {
-    			log.finer("[[" + getName() + "]] Connection started: " + id);
-            }
+		if (log.isLoggable(Level.FINER)) {
+			log.finer("[[" + getName() + "]] Connection started: " + id);
+		}
 			IO serv = services.get(id);
 			if (serv != null) {
 				if (serv == service) {
@@ -593,6 +598,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 				}
 			}
 			services.put(id, service);
+			++services_size;
 		//}
 	}
 
@@ -658,12 +664,14 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 	@Override
 	public void getStatistics(StatisticsList list) {
 		super.getStatistics(list);
-		list.add(getName(), "Open connections", services.size(), Level.INFO);
-		int waitingToSendSize = 0;
-		for (XMPPIOService serv : services.values()) {
-			waitingToSendSize += serv.waitingToSendSize();
+		list.add(getName(), "Open connections", services_size, Level.INFO);
+		if (list.checkLevel(Level.FINEST)) {
+			int waitingToSendSize = 0;
+			for (XMPPIOService serv : services.values()) {
+				waitingToSendSize += serv.waitingToSendSize();
+			}
+			list.add(getName(), "Waiting to send", waitingToSendSize, Level.FINEST);
 		}
-		list.add(getName(), "Waiting to send", waitingToSendSize, Level.FINE);
 		list.add(getName(), "Watchdog runs", watchdogRuns, Level.FINER);
 		list.add(getName(), "Watchdog tests", watchdogTests, Level.FINE);
 		list.add(getName(), "Watchdog stopped", watchdogStopped, Level.FINE);
@@ -783,7 +791,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 	 */
 	protected void doForAllServices(ServiceChecker checker) {
 		for (IO service: services.values()) {
-			checker.check(service, getUniqueId(service));
+			checker.check(service);
 		}
 	}
 
@@ -809,8 +817,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 					// on Exception
 					doForAllServices(new ServiceChecker() {
 						@Override
-						public void check(final XMPPIOService service,
-										final String serviceId) {
+						public void check(final XMPPIOService service) {
 							// 								for (IO service: services.values()) {
 							//						service = (XMPPIOService)serv;
 							try {
@@ -823,7 +830,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 										if (log.isLoggable(Level.INFO)) {
 											log.info(getName() +
 															": Max inactive time exceeded, stopping: " +
-															serviceId);
+															service.getUniqueId());
 										}
 										++watchdogStopped;
 										service.stop();
@@ -839,7 +846,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 								try {
 									if (service != null) {
 										log.info(getName() +
-														"Found dead connection, stopping: " + serviceId);
+														"Found dead connection, stopping: " + service.getUniqueId());
 										++watchdogStopped;
 										service.forceStop();
 									}
