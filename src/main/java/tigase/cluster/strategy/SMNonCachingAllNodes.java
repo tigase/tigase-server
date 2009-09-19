@@ -26,7 +26,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 import tigase.cluster.ClusteringStrategyIfc;
@@ -107,6 +106,11 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 	@Override
 	public boolean containsJid(String jid) {
 		return false;
+	}
+
+	@Override
+	public String[] getConnectionIdsForJid(String jid) {
+		return null;
 	}
 
 //	@Override

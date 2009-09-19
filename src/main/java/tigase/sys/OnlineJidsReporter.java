@@ -36,4 +36,6 @@ public interface OnlineJidsReporter {
 
 	boolean containsJid(String jid);
 
+	String[] getConnectionIdsForJid(String jid);
+
 }

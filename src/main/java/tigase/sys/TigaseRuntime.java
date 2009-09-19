@@ -23,9 +23,11 @@
 package tigase.sys;
 
 import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryPoolMXBean;
+import java.lang.management.MemoryUsage;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.ThreadMXBean;
-import java.util.Set;
+import java.util.List;
 import tigase.monitor.MonitorRuntime;
 
 /**
@@ -44,6 +46,7 @@ public abstract class TigaseRuntime {
 	private long prevUptime = 0;
 	private long prevCputime = 0;
 	private float cpuUsage = 0F;
+	private MemoryPoolMXBean oldMemPool = null;
 
 	public static TigaseRuntime getTigaseRuntime() {
 		return MonitorRuntime.getMonitorRuntime();
@@ -60,6 +63,18 @@ public abstract class TigaseRuntime {
 	public abstract boolean hasCompleteJidsInfo();
 
 	public abstract boolean isJidOnline(String jid);
+
+	public abstract String[] getConnectionIdsForJid(String jid);
+
+	protected TigaseRuntime() {
+		List<MemoryPoolMXBean> memPools = ManagementFactory.getMemoryPoolMXBeans();
+		for (MemoryPoolMXBean memoryPoolMXBean : memPools) {
+			if (memoryPoolMXBean.getName().toLowerCase().contains("old")) {
+				oldMemPool = memoryPoolMXBean;
+				break;
+			}
+		}
+	}
 
 	public ResourceState getMemoryState() {
 		return ResourceState.GREEN;
@@ -139,16 +154,46 @@ public abstract class TigaseRuntime {
 		return ManagementFactory.getThreadMXBean().getThreadCount();
 	}
 
+	/**
+	 * We try to return OLD memory pool size as this is what is the most interesting
+	 * to us. If this is not possible then we return total Heap size.
+	 * @return
+	 */
 	public long getHeapMemMax() {
+		if (oldMemPool != null) {
+			MemoryUsage memUsage = oldMemPool.getUsage();
+			return memUsage.getMax();
+		}
 		return ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getMax();
 	}
 
+	/**
+	 * We try to return OLD memory pool size as this is what is the most interesting
+	 * to us. If this is not possible then we return total Heap used.
+	 * @return
+	 */
 	public long getHeapMemUsed() {
+		if (oldMemPool != null) {
+			MemoryUsage memUsage = oldMemPool.getUsage();
+			return memUsage.getUsed();
+		}
 		return ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed();
 	}
 
 	public float getHeapMemUsage() {
 		return (getHeapMemUsed() * 100F) / getHeapMemMax();
+	}
+
+	public long getNonHeapMemMax() {
+		return ManagementFactory.getMemoryMXBean().getNonHeapMemoryUsage().getMax();
+	}
+
+	public long getNonHeapMemUsed() {
+		return ManagementFactory.getMemoryMXBean().getNonHeapMemoryUsage().getUsed();
+	}
+
+	public float getNonHeapMemUsage() {
+		return (getNonHeapMemUsed() * 100F) / getNonHeapMemMax();
 	}
 
 }

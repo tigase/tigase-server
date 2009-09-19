@@ -93,6 +93,7 @@ public class SessionManagerClustered extends SessionManager
 	private Timer delayedTasks = null;
 	private ClusteringStrategyIfc strategy = null;
 	private String my_hostname = null;
+	private int nodesNo = 0;
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -225,8 +226,9 @@ public class SessionManagerClustered extends SessionManager
 					case USER_CONNECTED: {
 						String userId = clel.getMethodParam(USER_ID);
 						String resource = clel.getMethodParam(RESOURCE);
+						String connectionId = clel.getMethodParam(CONNECTION_ID);
 						strategy.usersConnected(packet.getElemFrom(),
-								results, userId + "/" + resource);
+								results, userId + "/" + resource + "#" + connectionId);
 						break;
 					}
 					case USER_DISCONNECTED: {
@@ -265,7 +267,7 @@ public class SessionManagerClustered extends SessionManager
 							// They should be synchronized later on using standard cluster
 							// notifications.
 							try {
-								jid = conn.getJID();
+								jid = conn.getJID() + "#" + conn.getConnectionId();
 							} catch (Exception e) {
 								jid = null;
 							}
@@ -453,6 +455,10 @@ public class SessionManagerClustered extends SessionManager
 		}
 //		defs.put(LOCAL_DOMAINS_PROP_KEY, LOCAL_DOMAINS_PROP_VAL);
 		props.put(MY_DOMAIN_NAME_PROP_KEY, local_domains[0]);
+		if (params.get(CLUSTER_NODES) != null) {
+			String[] cl_nodes = ((String)params.get(CLUSTER_NODES)).split(",");
+			nodesNo = cl_nodes.length;
+		}
 
 		return props;
 	}
@@ -562,15 +568,15 @@ public class SessionManagerClustered extends SessionManager
 					throws NotAuthorizedException	{
 		String userId = conn.getUserId();
 		String resource = conn.getResource();
+		String connectionId = conn.getConnectionId();
 		Map<String, String> params = new LinkedHashMap<String, String>();
 		params.put(USER_ID, userId);
 		params.put(RESOURCE, resource);
+		params.put(CONNECTION_ID, connectionId);
 		if (full_details) {
 			String xmpp_sessionId = conn.getSessionId();
-			String connectionId = conn.getConnectionId();
 			long authTime = conn.getAuthTime();
 			params.put(XMPP_SESSION_ID, xmpp_sessionId);
-			params.put(CONNECTION_ID, connectionId);
 			params.put(AUTH_TIME, "" + authTime);
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("Sending user: " + userId +
@@ -588,16 +594,25 @@ public class SessionManagerClustered extends SessionManager
 		return params;
 	}
 
-	private void sendBroadcastPacket(Element elem, String node,
-					Map<String, String> params, ClusterMethods methodCall) {
+	private void sendBroadcastPackets(Element data,	Map<String, String> params,
+			ClusterMethods methodCall, String ... nodes) {
 		ClusterElement clel = ClusterElement.createClusterMethodCall(
-						getComponentId(), node, StanzaType.set,
+						getComponentId(), nodes[0], StanzaType.set,
 						methodCall.toString(), params);
-		if (elem != null) {
-			clel.addDataPacket(elem);
+		if (data != null) {
+			clel.addDataPacket(data);
 		}
 		Element check_session_el = clel.getClusterElement();
-		fastAddOutPacket(new Packet(check_session_el));
+		if (!nodes[0].equals(getComponentId())) {
+			fastAddOutPacket(new Packet(check_session_el));
+		}
+		for (int i = 1; i < nodes.length; i++) {
+			if (!nodes[i].equals(getComponentId())) {
+				Element elem = check_session_el.clone();
+				elem.setAttribute("to", nodes[i]);
+				fastAddOutPacket(new Packet(elem));
+			}
+		}
 	}
 
 	private void broadcastUserPresence(XMPPResourceConnection conn,
@@ -605,12 +620,8 @@ public class SessionManagerClustered extends SessionManager
 		try {
 			Map<String, String> params = prepareBroadcastParams(conn, true);
 			Element presence = conn.getPresence();
-			for (String node : cl_nodes) {
-				if (!node.equals(getComponentId())) {
-					sendBroadcastPacket(presence, node, params,
-									ClusterMethods.USER_INITIAL_PRESENCE);
-				}
-			}
+			sendBroadcastPackets(presence, params,
+					ClusterMethods.USER_INITIAL_PRESENCE, cl_nodes);
 		} catch (Exception e) {
 			log.log(Level.WARNING,
 							"Problem with broadcast user initial presence message for: " +
@@ -627,12 +638,9 @@ public class SessionManagerClustered extends SessionManager
 				log.log(Level.WARNING, "Something wrong. Initial presence NULL!!",
 								Thread.currentThread().getStackTrace());
 			}
-			for (String node : cl_nodes) {
-				if (!node.equals(getComponentId())) {
-					sendBroadcastPacket(presence, node, params,
-									ClusterMethods.USER_INITIAL_PRESENCE);
-				}
-			}
+			sendBroadcastPackets(presence, params,
+					ClusterMethods.USER_INITIAL_PRESENCE,
+					cl_nodes.toArray(new String[cl_nodes.size()]));
 		} catch (Exception e) {
 			log.log(Level.WARNING,
 							"Problem with broadcast user initial presence for: " +
@@ -674,12 +682,8 @@ public class SessionManagerClustered extends SessionManager
 			List<String> cl_nodes = strategy.getAllNodes();
 			try {
 				Map<String, String> params = prepareBroadcastParams(conn, false);
-				for (String node : cl_nodes) {
-					if (!node.equals(getComponentId())) {
-						sendBroadcastPacket(null, node, params,
-										ClusterMethods.USER_CONNECTED);
-					}
-				}
+				sendBroadcastPackets(null, params, ClusterMethods.USER_CONNECTED, 
+						cl_nodes.toArray(new String[cl_nodes.size()]));
 			} catch (Exception e) {
 				log.log(Level.WARNING,
 								"Problem with broadcast user connected for: " +
@@ -738,6 +742,20 @@ public class SessionManagerClustered extends SessionManager
 	@Override
 	public boolean containsJid(String jid) {
 		return super.containsJid(jid) || strategy.containsJid(jid);
+	}
+	
+	@Override
+	public String[] getConnectionIdsForJid(String jid) {
+		String[] ids = super.getConnectionIdsForJid(jid);
+		if (ids == null) {
+			ids = strategy.getConnectionIdsForJid(jid);
+		}
+		return ids;
+	}
+
+	@Override
+	public int processingThreads() {
+		return Math.max(nodesNo, super.processingThreads());
 	}
 
 	private void requestSync(String node) {

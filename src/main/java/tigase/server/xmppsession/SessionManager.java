@@ -180,6 +180,7 @@ public class SessionManager extends AbstractMessageReceiver
 	private long closedConnections = 0;
 	private long authTimeouts = 0;
 	private int maxPluginsNo = 0;
+	private boolean skipPrivacy = false;
 
 	private Timer reaperTask = null;
 	private long reaperInterval = 60 * 1000;
@@ -263,6 +264,32 @@ public class SessionManager extends AbstractMessageReceiver
 		TigaseRuntime.getTigaseRuntime().addOnlineJidsReporter(this);
 	}
 
+//	/**
+//	 * This method can be overwritten in extending classes to get a different
+//	 * packets distribution to different threads. For PubSub, probably better
+//	 * packets distribution to different threads would be based on the
+//	 * sender address rather then destination address.
+//	 * @param packet
+//	 * @return
+//	 */
+//	@Override
+//	public int hashCodeForPacket(Packet packet) {
+//		if (packet.getFrom() != null && packet.getFrom() != packet.getElemFrom()) {
+//			// This comes from connection manager so the best way is to get hashcode
+//			// by the connectionId, which is in the getFrom()
+//			return packet.getFrom().hashCode();
+//		}
+//		// If not, then a better way is to get hashCode from the elemTo address
+//		// as this would be by the destination address user name:
+//		if (packet.getElemTo() != null) {
+//			return packet.getElemTo().hashCode();
+//		}
+//		// Otherwise, just get the default....
+//		return super.hashCodeForPacket(packet);
+//	}
+
+
+
 //	private void debug_packet(String msg, Packet packet, String to) {
 //		if (packet.getElemTo().equals(to)) {
 //			log.finest(msg + ", packet: " + packet.getStringData());
@@ -317,10 +344,10 @@ public class SessionManager extends AbstractMessageReceiver
 				fastAddOutPacket(p);
 				return true;
 			}
-			// It doesn't look good, there should reaaly be a connection for
+			// It doesn't look good, there should really be a connection for
 			// this packet....
 			// returning error back...
-			log.info("Broken packet: " + p.toString());
+			log.fine("Broken packet: " + p.toString());
 			try {
 				Packet error =
 						Authorization.SERVICE_UNAVAILABLE.getResponseMessage(p,
@@ -328,7 +355,7 @@ public class SessionManager extends AbstractMessageReceiver
 				error.setTo(p.getFrom());
 				fastAddOutPacket(error);
 			} catch (PacketErrorTypeException e) {
-				log.info("Packet processing exception: " + e);
+				log.fine("Packet is error type already: " + p.toString());
 			}
 			return true;
 		}
@@ -436,8 +463,7 @@ public class SessionManager extends AbstractMessageReceiver
 					error =	Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet,
 						"Service not available.", true);
 				} catch (PacketErrorTypeException e) {
-					log.info("Packet processing exception: " + e
-						+ ", packet: " + packet.toString());
+					log.fine("Service not available. Packet is error type already: " + packet.toString());
 				}
 			} else {
 				if (packet.getElemFrom() != null || conn != null) {
@@ -445,8 +471,7 @@ public class SessionManager extends AbstractMessageReceiver
 						error = Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
 							"Feature not supported yet.", true);
 					} catch (PacketErrorTypeException e) {
-						log.info("Packet processing exception: " + e
-							+ ", packet: " + packet.toString());
+						log.fine("Feature not supported yet. Packet is error type already: " + packet.toString());
 					}
 				}
 			}
@@ -651,7 +676,7 @@ public class SessionManager extends AbstractMessageReceiver
 			break;
 		case STREAM_CLOSED:
 			fastAddOutPacket(pc.okResult((String)null, 0));
-			sessionCloseThread.addItem(pc, null);
+			sessionCloseThread.addItem(pc, connection);
 			//closeConnection(pc.getFrom(), false);
 			processing_result = true;
 			break;
@@ -701,8 +726,7 @@ public class SessionManager extends AbstractMessageReceiver
 							"You don't have enough permission to brodcast packet.", true));
 				}
 			} catch (PacketErrorTypeException e) {
-				log.warning("Packet processing exception: " + e
-					+ ", packet: " + pc.toString());
+				log.fine("Packet is error type already: " + pc.toString());
 			}
 			processing_result = true;
 			break;
@@ -1101,6 +1125,8 @@ public class SessionManager extends AbstractMessageReceiver
 		super.setProperties(props);
 
 		Security.insertProviderAt(new TigaseSaslProvider(), 6);
+
+		skipPrivacy = (Boolean)props.get(SKIP_PRIVACY_PROP_KEY);
 
 		filter = new PacketFilter();
 		// Is there a shared user repository pool? If so I want to use it:
@@ -1551,7 +1577,22 @@ public class SessionManager extends AbstractMessageReceiver
 
 	@Override
 	public boolean containsJid(String jid) {
-		return sessionsByNodeId.keySet().contains(jid);
+		return sessionsByNodeId.containsKey(jid);
+	}
+
+	public boolean skipPrivacy() {
+		return skipPrivacy;
+	}
+
+	@Override
+	public String[] getConnectionIdsForJid(String jid) {
+		if (skipPrivacy()) {
+			XMPPSession session = sessionsByNodeId.get(jid);
+			if (session != null) {
+				return session.getConnectionIds();
+			}
+		}
+		return null;
 	}
 
 	private class SessionOpenWorkerThread extends WorkerThread {

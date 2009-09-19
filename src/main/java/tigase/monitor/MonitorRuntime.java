@@ -54,6 +54,7 @@ public class MonitorRuntime extends TigaseRuntime {
 					new LinkedList<OnlineJidsReporter>();
 
 	private MonitorRuntime() {
+		super();
 		Runtime.getRuntime().addShutdownHook(new MainShutdownThread());
 	}
 	
@@ -110,6 +111,26 @@ public class MonitorRuntime extends TigaseRuntime {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 *
+	 * @param jid
+	 * @return
+	 */
+	@Override
+	public String[] getConnectionIdsForJid(String jid) {
+		if (onlineJidsReporters.size() == 1) {
+			return onlineJidsReporters.getFirst().getConnectionIdsForJid(jid);
+		} else {
+			for (OnlineJidsReporter onlineJidsReporter : onlineJidsReporters) {
+				String[] connIds = onlineJidsReporter.getConnectionIdsForJid(jid);
+				if (connIds != null) {
+					return connIds;
+				}
+			}
+		}
+		return null;
 	}
 
 	private class ShutdownHandlerThread extends Thread {
