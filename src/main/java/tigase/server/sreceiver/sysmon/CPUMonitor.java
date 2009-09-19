@@ -343,11 +343,21 @@ public class CPUMonitor extends AbstractMonitor {
 		if (sorted.size() > 2) {
 			ThreadData td = sorted.get(2);
 			list.add(CPU_MON, "3rd max CPU thread",
-							td.name + ": " + format.format(td.cpuUse) + "%", Level.FINER);
+							td.name + ": " + format.format(td.cpuUse) + "%", Level.FINE);
 		}
 		if (sorted.size() > 3) {
 			ThreadData td = sorted.get(3);
 			list.add(CPU_MON, "4th max CPU thread",
+							td.name + ": " + format.format(td.cpuUse) + "%", Level.FINER);
+		}
+		if (sorted.size() > 4) {
+			ThreadData td = sorted.get(4);
+			list.add(CPU_MON, "5th max CPU thread",
+							td.name + ": " + format.format(td.cpuUse) + "%", Level.FINER);
+		}
+		if (sorted.size() > 5) {
+			ThreadData td = sorted.get(5);
+			list.add(CPU_MON, "6th max CPU thread",
 							td.name + ": " + format.format(td.cpuUse) + "%", Level.FINEST);
 		}
 	}
