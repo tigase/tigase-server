@@ -178,7 +178,7 @@ public class PepPlugin extends XMPPProcessor implements XMPPProcessorIfc {
 	private void processPEPPublish(final Packet packet, final String node, final Element pepItem,
 			final XMPPResourceConnection session, final NonAuthUserRepository repo, final Queue<Packet> results,
 			final Map<String, Object> settings) throws NotAuthorizedException, TigaseDBException {
-		String[] buddies = roster.getBuddies(session, SUBSCRITION_TYPES, true);
+		String[] buddies = roster.getBuddies(session, SUBSCRITION_TYPES);
 
 		final Element event = new Element("event", new String[] { "xmlns" },
 				new String[] { "http://jabber.org/protocol/pubsub#event" });

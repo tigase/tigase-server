@@ -523,10 +523,13 @@ public abstract class RosterAbstract {
 		session.putCommonSessionData(ROSTERHASH, roster_hash);
 	}
 
+//	public String[] getBuddies(final XMPPResourceConnection session,
+//		final EnumSet<SubscriptionType> subscrs, boolean onlineOnly)
 	public String[] getBuddies(final XMPPResourceConnection session,
-		final EnumSet<SubscriptionType> subscrs, boolean onlineOnly)
+		final EnumSet<SubscriptionType> subscrs)
     throws NotAuthorizedException, TigaseDBException {
-    final String[] allBuddies = getBuddies(session, onlineOnly);
+//    final String[] allBuddies = getBuddies(session, onlineOnly);
+    final String[] allBuddies = getBuddies(session);
     if (allBuddies == null) {
       return null;
     } // end of if (allBuddies == null)
@@ -540,10 +543,12 @@ public abstract class RosterAbstract {
     return list.toArray(new String[list.size()]);
   }
 
-	public List<Element> getRosterItems(XMPPResourceConnection session, boolean online)
+//	public List<Element> getRosterItems(XMPPResourceConnection session, boolean online)
+	public List<Element> getRosterItems(XMPPResourceConnection session)
     throws NotAuthorizedException, TigaseDBException {
     LinkedList<Element> items = new LinkedList<Element>();
-		String[] buddies = getBuddies(session, online);
+//		String[] buddies = getBuddies(session, online);
+		String[] buddies = getBuddies(session);
 		if (buddies != null) {
 			for (String buddy : buddies) {
 					Element buddy_item = getBuddyItem(session, buddy);
@@ -644,8 +649,10 @@ public abstract class RosterAbstract {
 		} // end of for (XMPPResourceConnection conn: sessions)
 	}
 
-  public abstract String[] getBuddies(final XMPPResourceConnection session,
-					boolean onlineOnly)
+//  public abstract String[] getBuddies(final XMPPResourceConnection session,
+//					boolean onlineOnly)
+//					throws NotAuthorizedException, TigaseDBException;
+  public abstract String[] getBuddies(final XMPPResourceConnection session)
 					throws NotAuthorizedException, TigaseDBException;
 
   public abstract String getBuddyName(final XMPPResourceConnection session,
@@ -683,13 +690,13 @@ public abstract class RosterAbstract {
 		final String buddy, final String[] groups)
 		throws NotAuthorizedException, TigaseDBException;
 
-	public abstract void setBuddyOnline(final XMPPResourceConnection session,
-					final String buddy, final boolean online)
-					throws NotAuthorizedException, TigaseDBException;
-
-	public abstract boolean isBuddyOnline(final XMPPResourceConnection session,
-					final String buddy)
-					throws NotAuthorizedException, TigaseDBException;
+//	public abstract void setBuddyOnline(final XMPPResourceConnection session,
+//					final String buddy, final boolean online)
+//					throws NotAuthorizedException, TigaseDBException;
+//
+//	public abstract boolean isBuddyOnline(final XMPPResourceConnection session,
+//					final String buddy)
+//					throws NotAuthorizedException, TigaseDBException;
 
 //   public abstract void setBuddyGroups(XMPPResourceConnection session,
 // 		String buddy, String[] groups)

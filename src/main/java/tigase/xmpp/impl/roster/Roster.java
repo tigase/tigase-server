@@ -114,23 +114,23 @@ public class Roster extends RosterAbstract {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
-	@Override
-	public String[] getBuddies(XMPPResourceConnection session, boolean onlineOnly)
-					throws NotAuthorizedException, TigaseDBException {
-		throw new UnsupportedOperationException("Not supported yet.");
-	}
+//	@Override
+//	public String[] getBuddies(XMPPResourceConnection session, boolean onlineOnly)
+//					throws NotAuthorizedException, TigaseDBException {
+//		throw new UnsupportedOperationException("Not supported yet.");
+//	}
 
-	@Override
-	public void setBuddyOnline(XMPPResourceConnection session, String buddy,
-					boolean online)
-					throws NotAuthorizedException, TigaseDBException {
-		throw new UnsupportedOperationException("Not supported yet.");
-	}
-
-	@Override
-	public boolean isBuddyOnline(XMPPResourceConnection session, String buddy)
-					throws NotAuthorizedException, TigaseDBException {
-		throw new UnsupportedOperationException("Not supported yet.");
-	}
+//	@Override
+//	public void setBuddyOnline(XMPPResourceConnection session, String buddy,
+//					boolean online)
+//					throws NotAuthorizedException, TigaseDBException {
+//		throw new UnsupportedOperationException("Not supported yet.");
+//	}
+//
+//	@Override
+//	public boolean isBuddyOnline(XMPPResourceConnection session, String buddy)
+//					throws NotAuthorizedException, TigaseDBException {
+//		throw new UnsupportedOperationException("Not supported yet.");
+//	}
 
 } // Roster

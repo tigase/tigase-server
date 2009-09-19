@@ -55,16 +55,16 @@ public class RosterElement {
 	private String[] groups = null;
 	private String name = null;
 	private String jid = null;
-	private boolean online = false;
+	//private boolean online = false;
 	//private Element item = null;
 
-	public boolean isOnline() {
-		return online;
-	}
-
-	public void setOnline(boolean online) {
-		this.online = online;
-	}
+//	public boolean isOnline() {
+//		return online;
+//	}
+//
+//	public void setOnline(boolean online) {
+//		this.online = online;
+//	}
 
 	public boolean isPresence_sent() {
 		return presence_sent;

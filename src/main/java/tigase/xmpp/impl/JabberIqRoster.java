@@ -299,7 +299,7 @@ public abstract class JabberIqRoster {
 				return;
 			}
 		}
-		List<Element> ritems = roster_util.getRosterItems(session, false);
+		List<Element> ritems = roster_util.getRosterItems(session);
 		if (ritems != null && ritems.size() > 0) {
 			Element query = new Element("query");
 			query.setXMLNS(XMLNS);
