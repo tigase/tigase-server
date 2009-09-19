@@ -61,7 +61,7 @@ public class ClientConnectionClustered extends ClientConnectionManager
 		final String hostname = node;
 		doForAllServices(new ServiceChecker() {
 			@Override
-			public void check(final XMPPIOService service, final String serviceId) {
+			public void check(final XMPPIOService service) {
 				String dataReceiver = service.getDataReceiver();
 				if (log.isLoggable(Level.FINEST)) {
 					log.finest("Checking service for dataReceiver: " + dataReceiver);
