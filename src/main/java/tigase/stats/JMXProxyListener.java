@@ -30,7 +30,7 @@ package tigase.stats;
  */
 public interface JMXProxyListener {
 
-	void connected(String id);
+	void connected(String id, StatisticsProviderMBean bean);
 
 	void disconnected(String id);
 	

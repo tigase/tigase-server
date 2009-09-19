@@ -115,6 +115,8 @@ public interface StatisticsProviderMBean
 
 	public float getHeapMemUsage();
 
+	public float getNonHeapMemUsage();
+
 	public String getSystemDetails();
 
 	public float getClusterCompressionRatio();
@@ -122,6 +124,16 @@ public interface StatisticsProviderMBean
 	public long getClusterNetworkBytes();
 	
 	public float getClusterNetworkBytesPerSecond();
+
+	public float[] getCPUUsageHistory();
+
+	public float[] getHeapUsageHistory();
+
+	public float[] getSMPacketsPerSecHistory();
+
+	public float[] getCLPacketsPerSecHistory();
+
+	public int[] getConnectionsNumberHistory();
 
 }
 
