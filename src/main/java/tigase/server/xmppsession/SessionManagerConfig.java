@@ -85,6 +85,8 @@ public class SessionManagerConfig {
 
 	protected static final String ADMIN_SCRIPTS_PROP_KEY = "admin-scripts-dir";
 	protected static final String ADMIN_SCRIPTS_PROP_VAL = "scripts/admin/";
+	protected static final String SKIP_PRIVACY_PROP_KEY = "skip-privacy";
+	private static final boolean SKIP_PRIVACY_PROP_VAL = false;
 
 	private static boolean addPlugin(LinkedHashSet<String> plugins, String plugin) {
 		String[] pla = plugin.split("=");
@@ -153,6 +155,10 @@ public class SessionManagerConfig {
 		}
 		props.put(PLUGINS_PROP_KEY, plugins.toArray(new String[plugins.size()]));
 		props.put(PLUGINS_CONCURRENCY_PROP_KEY, plugin_concurrency);
+
+		String skip_privacy = (String)params.get("--" + SKIP_PRIVACY_PROP_KEY);
+		props.put(SKIP_PRIVACY_PROP_KEY,
+				skip_privacy != null && skip_privacy.equals("true"));
 
 		if (params.get(GEN_VIRT_HOSTS) != null) {
 			HOSTNAMES_PROP_VAL = ((String)params.get(GEN_VIRT_HOSTS)).split(",");
