@@ -31,16 +31,31 @@ package tigase.cluster;
  */
 public enum ClusterMethods {
 
-	UPDATE_NODES, CHECK_DB_KEY, SESSION_TRANSFER, PACKET_REDIRECT, 
-	USER_CONNECTED, USER_DISCONNECTED, USER_INITIAL_PRESENCE, SYNC_ONLINE, 
-	OTHER;
+	// Put the most expected methods first to parse them quickly
+	USER_CONNECTED, USER_DISCONNECTED, USER_INITIAL_PRESENCE,
+	SYNC_ONLINE, OTHER,
+	CHECK_DB_KEY
+	// These should really be removed as they are not used anymore.
+	//UPDATE_NODES,  SESSION_TRANSFER, PACKET_REDIRECT
+	;
 
 	public static ClusterMethods parseMethod(String method) {
-		try {
-			return ClusterMethods.valueOf(method);
-		} catch (Exception e) {
-			return OTHER;
+		// For some reason below code is really slow
+		// I am implementing less pretty but more efficient way then.
+//		try {
+//			return ClusterMethods.valueOf(method);
+//		} catch (Exception e) {
+//			return OTHER;
+//		}
+
+		for (ClusterMethods meth : values()) {
+			// Code below assumes the 'method' is got from intern() so we can use
+			// reference equality here.
+			if (method == meth.name()) {
+				return meth;
+			}
 		}
+		return OTHER;
 	}
 
 }
