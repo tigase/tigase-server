@@ -115,6 +115,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 		}
 	}
 
+	@Override
 	public Queue<Packet> processSocketData(XMPPIOService serv) {
 		Packet p = null;
 		while ((p = serv.getReceivedPackets().poll()) != null) {
@@ -396,6 +397,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 		} // end of switch (service.connectionType())
 	}
 
+	@Override
 	public String xmppStreamOpened(XMPPIOService service,
 		Map<String, String> attribs) {
 
@@ -440,6 +442,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 		return null;
 	}
 
+	@Override
 	public void xmppStreamClosed(XMPPIOService serv) {
         if (log.isLoggable(Level.FINER)) {
         	log.finer("Stream closed.");
@@ -453,6 +456,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 	 *
 	 * @return a <code>long</code> value
 	 */
+	@Override
 	protected long getMaxInactiveTime() {
 		return 1000*24*HOUR;
 	}
@@ -486,6 +490,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 		serviceEntity.addItems(item);
 	}
 
+	@Override
 	public Element getDiscoInfo(String node, String jid) {
 		if (jid != null && getName().equals(JIDUtils.getNodeNick(jid))) {
 			return serviceEntity.getDiscoInfo(node);
@@ -493,8 +498,10 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 		return null;
 	}
 
+	@Override
 	public 	List<Element> getDiscoFeatures() { return null; }
 
+	@Override
 	public List<Element> getDiscoItems(String node, String jid) {
 		if (getName().equals(JIDUtils.getNodeNick(jid))) {
 			return serviceEntity.getDiscoItems(node, null);
@@ -504,6 +511,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 		}
 	}
 
+	@Override
 	protected XMPPIOService getXMPPIOServiceInstance() {
 		return new XMPPIOService();
 	}
