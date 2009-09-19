@@ -30,10 +30,13 @@ import java.lang.management.MemoryUsage;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.List;
+import java.util.Queue;
+import java.util.Random;
 import java.util.logging.Logger;
 import javax.management.Notification;
 import javax.management.NotificationEmitter;
 import javax.management.NotificationListener;
+import tigase.server.Packet;
 import tigase.stats.StatisticsList;
 
 /**
@@ -159,5 +162,17 @@ public class MemMonitor extends AbstractMonitor
 	public void getStatistics(StatisticsList list) {
     super.getStatistics(list);
 	}
+
+	private static int GC_INTERVAL = 40;
+	private int gc_cnt = new Random(System.currentTimeMillis()).nextInt(GC_INTERVAL);
+	@Override
+	public void check1Min(Queue<Packet> results) {
+		if (++gc_cnt >= GC_INTERVAL) {
+			Runtime.getRuntime().gc();
+			gc_cnt = 0;
+		}
+	}
+
+
 
 }
