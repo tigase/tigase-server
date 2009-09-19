@@ -208,9 +208,9 @@ public class XMPPDomBuilderHandler implements SimpleHandler {
 
 	@Override
   public void endElement(StringBuilder name) {
-	if (log.isLoggable(Level.FINEST)) {
-    	log.finest("End element name: "+name);
-	}
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("End element name: " + name);
+		}
 
     String tmp_name = name.toString();
 		if (tmp_name.equals(ELEM_STREAM_STREAM)) {
