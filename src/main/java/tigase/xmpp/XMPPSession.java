@@ -182,6 +182,15 @@ public class XMPPSession {
 		return result;
 	}
 
+	public String[] getConnectionIds() {
+		String[] result = new String[activeResources.size()];
+		int idx = 0;
+		for (XMPPResourceConnection conn: activeResources) {
+			result[idx++] = conn.getConnectionId();
+		} // end of for (XMPPResourceConnection conn: activeResources)
+		return result;
+	}
+
 	public XMPPResourceConnection getResourceForResource(final String resource) {
 		if (resource != null && resource.length() > 0) {
 			for (XMPPResourceConnection conn: activeResources) {
