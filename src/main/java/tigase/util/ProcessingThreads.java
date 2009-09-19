@@ -136,15 +136,27 @@ public class ProcessingThreads<E extends WorkerThread> {
 								numQueues)).offer(item, packet.getPriority().ordinal());
 			} else {
 				// Otherwise per destination address
-				ret = queues.get(Math.abs(packet.getFrom().hashCode() %
-								numQueues)).offer(item, packet.getPriority().ordinal());
+				// If the packet elemTo is set then used it, otherwise just packetTo:
+				if (packet.getElemTo() != null) {
+					ret = queues.get(Math.abs(packet.getElemTo().hashCode() %
+							numQueues)).offer(item, packet.getPriority().ordinal());
+				} else {
+					ret = queues.get(Math.abs(packet.getTo().hashCode() %
+							numQueues)).offer(item, packet.getPriority().ordinal());
+				}
 			}
 		} catch (Exception e) {
 			// This should not happen, but just in case until we are sure all 
 			// cases are catched.
 			// Otherwise per destination address
-			ret = queues.get(Math.abs(packet.getFrom().hashCode() %
+				// If the packet elemTo is set then used it, otherwise just packetTo:
+				if (packet.getElemTo() != null) {
+					ret = queues.get(Math.abs(packet.getElemTo().hashCode() %
 							numQueues)).offer(item, packet.getPriority().ordinal());
+				} else {
+					ret = queues.get(Math.abs(packet.getTo().hashCode() %
+							numQueues)).offer(item, packet.getPriority().ordinal());
+				}
 		//ret = nullQueue.offer(item, packet.getPriority().ordinal());
 		}
 		if (!ret) {
