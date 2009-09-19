@@ -33,6 +33,7 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.zip.Deflater;
 import tigase.server.Command;
 import tigase.server.ConnectionManager;
 import tigase.server.Packet;
@@ -65,7 +66,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
    * Variable <code>log</code> is a class logger.
    */
   private static final Logger log =
-    Logger.getLogger("tigase.server.xmppclient.ClientConnectionManager");
+    Logger.getLogger(ClientConnectionManager.class.getName());
 
 	private static final String XMLNS = "jabber:client";
 
@@ -80,6 +81,17 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 		new ConcurrentSkipListMap<String, XMPPProcessorIfc>();
 	private ReceiverEventHandler stoppedHandler = newStoppedHandler();
 	private ReceiverEventHandler startedHandler = newStartedHandler();
+
+	/**
+	 * This is mostly for testing purpose. We want to investigate massive 
+	 * (10k per node) connections drops at the same time during tests with Tsung. 
+	 * I suspect this might be due to problems with one of the tsung VMs working 
+	 * in the cluster generating load.
+	 * If I am right then all disconnects should come from only one or just a few
+	 * machines. If I am not right disconnects should be distributed evenly among
+	 * all Tsung IPs.
+	 */
+	private IPMonitor ipMonitor = new IPMonitor();
 
 	@Override
 	public void processPacket(final Packet packet) {
@@ -148,6 +160,32 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 					result.setTo(packet.getTo());
 					writePacketToSocket(result);
 				} // end of if (packet.getType() == StanzaType.get)
+				break;
+			case STARTZLIB:
+				if (serv != null) {
+					if (log.isLoggable(Level.FINER)) {
+						log.finer("Starting zlib compression: " + serv.getUniqueId());
+					}
+					try {
+						Element compressed =
+										Command.getData(packet, "compressed", null);
+						Packet p_compressed = new Packet(compressed);
+						SocketReadThread readThread = SocketReadThread.getInstance();
+						readThread.removeSocketService(serv);
+						//					writePacketToSocket(serv, p_proceed);
+						serv.addPacketToSend(p_compressed);
+						serv.processWaitingPackets();
+						serv.startZLib(Deflater.BEST_COMPRESSION);
+						//					serv.call();
+						readThread.addSocketService(serv);
+					} catch (IOException ex) {
+						Logger.getLogger(ClientConnectionManager.class.getName()).
+										log(Level.SEVERE, null, ex);
+					}
+				} else {
+					log.warning("Can't find sevice for STARTZLIB command: " +
+									packet.getStringData());
+				}
 				break;
 			case STARTTLS:
 				if (serv != null) {
@@ -443,8 +481,9 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 		if (service.getXMLNS() == XMLNS) {
 			//		XMPPIOService serv = (XMPPIOService)service;
 			// The method may be called more than one time for a single
-			// but we want to send a notification just once
+			// connection but we want to send a notification just once
 			if (result) {
+				ipMonitor.addDisconnect(service.getRemoteAddress());
 				if (service.getDataReceiver() != null) {
 					Packet command = Command.STREAM_CLOSED.getPacket(
 									getFromAddress(getUniqueId(service)),
@@ -490,6 +529,19 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 	}
 
 	@Override
+	public void start() {
+		super.start();
+		ipMonitor = new IPMonitor();
+		ipMonitor.start();
+	}
+
+	@Override
+  public void stop() {
+		super.stop();
+		ipMonitor.stopThread();
+	}
+
+	@Override
 	protected XMPPIOService getXMPPIOServiceInstance() {
 		return new XMPPIOService();
 	}
@@ -505,6 +557,19 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 	@Override
 	protected Integer getMaxQueueSize(int def) {
 		return def * 10;
+	}
+
+	/**
+	 * This method can be overwritten in extending classes to get a different
+	 * packets distribution to different threads. For PubSub, probably better
+	 * packets distribution to different threads would be based on the
+	 * sender address rather then destination address.
+	 * @param packet
+	 * @return
+	 */
+	@Override
+	public int hashCodeForPacket(Packet packet) {
+		return packet.getTo().hashCode();
 	}
 
 	@Override
