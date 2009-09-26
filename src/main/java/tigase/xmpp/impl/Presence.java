@@ -44,7 +44,6 @@ import tigase.xmpp.impl.roster.RosterFactory;
 
 import static tigase.xmpp.impl.roster.RosterAbstract.SubscriptionType;
 import static tigase.xmpp.impl.roster.RosterAbstract.PresenceType;
-import static tigase.xmpp.impl.roster.RosterAbstract.TO_SUBSCRIBED;
 import static tigase.xmpp.impl.roster.RosterAbstract.SUB_TO;
 import static tigase.xmpp.impl.roster.RosterAbstract.SUB_FROM;
 import static tigase.xmpp.impl.roster.RosterAbstract.SUB_BOTH;
@@ -743,11 +742,11 @@ public abstract class Presence {
 						} // end of if (subscr_changed)
 						break;
 					case in_initial:
-						if (session.getPresence() == null) {
-							// If the user has not yet sent initial presence then ignore
-							// the probe.
-							return;
-						}
+//						if (session.getPresence() == null) {
+//							// If the user has not yet sent initial presence then ignore
+//							// the probe.
+//							return;
+//						}
 						if (packet.getElemFrom() == null) {
 							// That really happened already. It looks like a bug in tigase
 							// let's try to catch it here....
