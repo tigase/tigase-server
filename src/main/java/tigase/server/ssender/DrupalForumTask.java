@@ -289,7 +289,7 @@ public class DrupalForumTask extends SenderTask {
 				String body = rs.getString("body");
 				Packet msg = Packet.getMessage(jid, getName(), StanzaType.normal,
 					"New post by " + name + ":\n\n" + XMLUtils.escape(body),
-					XMLUtils.escape(title), null);
+					XMLUtils.escape(title), null, null);
 				log.fine("Sending new topic: " + msg.toString());
 				results.offer(msg);
 			}
@@ -321,7 +321,7 @@ public class DrupalForumTask extends SenderTask {
 				String comment = rs.getString("comment");
 				Packet msg = Packet.getMessage(jid, getName(), StanzaType.normal,
 					"New comment by " + name + ":\n\n" + XMLUtils.escape(comment),
-					XMLUtils.escape(subject), thread);
+					XMLUtils.escape(subject), thread, null);
 				log.fine("Sending new comment: " + msg.toString());
 				results.offer(msg);
 			}

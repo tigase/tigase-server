@@ -40,6 +40,7 @@ import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.XMPPException;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
+import tigase.server.Priority;
 import tigase.xmpp.impl.roster.RosterAbstract;
 import tigase.xmpp.impl.roster.RosterFactory;
 
@@ -193,7 +194,18 @@ public abstract class JabberIqRoster {
 			}
 			String type = request.getAttribute("/iq/query/item", "type");
 			if (sub != SubscriptionType.none && (type == null || !type.equals(ANON))) {
+				// Unavailable presence should be sent first, otherwise it will be blocked by
+				// the server after the subscription is cancelled
 				Element pres = new Element("presence");
+				pres.setAttribute("to", buddy);
+				pres.setAttribute("from", session.getJID());
+				pres.setAttribute("type", "unavailable");
+				Packet pres_packet = new Packet(pres);
+				// We have to set a higher priority for this particular unavailable packet
+				// to make sure it is delivered before subscription cancellation
+				pres_packet.setPriority(Priority.HIGH);
+				results.offer(pres_packet);
+				pres = new Element("presence");
 				pres.setAttribute("to", buddy);
 				pres.setAttribute("from", session.getUserId());
 				pres.setAttribute("type", "unsubscribe");
@@ -202,11 +214,6 @@ public abstract class JabberIqRoster {
 				pres.setAttribute("to", buddy);
 				pres.setAttribute("from", session.getUserId());
 				pres.setAttribute("type", "unsubscribed");
-				results.offer(new Packet(pres));
-				pres = new Element("presence");
-				pres.setAttribute("to", buddy);
-				pres.setAttribute("from", session.getJID());
-				pres.setAttribute("type", "unavailable");
 				results.offer(new Packet(pres));
 			}
 			// It happens sometimes that the client still think the buddy

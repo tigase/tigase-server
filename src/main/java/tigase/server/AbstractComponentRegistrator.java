@@ -41,7 +41,9 @@ public abstract class AbstractComponentRegistrator<E extends ServerComponent>
 
 	private String name = null;
 	private String componentId = null;
+	private long packetId = 0;
 	protected Map<String, E> components = new LinkedHashMap<String, E>();
+
 
 	/**
 	 * Creates a new <code>AbstractComponentRegistrator</code> instance.
@@ -99,6 +101,15 @@ public abstract class AbstractComponentRegistrator<E extends ServerComponent>
 	@Override
 	public String getComponentId() {
 		return componentId;
+	}
+
+	public String newPacketId(String prefix) {
+		StringBuilder sb = new StringBuilder(32);
+		if (prefix != null) {
+			sb.append(prefix).append("-");
+		}
+		sb.append(getName()).append(++packetId);
+		return sb.toString();
 	}
 
 	@Override

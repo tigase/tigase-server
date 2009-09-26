@@ -552,11 +552,14 @@ public class Packet {
 	}
 
 	public static Packet getMessage(String to, String from, StanzaType type,
-		String body, String subject, String thread) {
+		String body, String subject, String thread, String id) {
 		Element message = new Element("message",
 			new Element[] {new Element("body", body)},
 			new String[] {"to", "from", "type"},
 			new String[] {to, from, type.toString()});
+		if (id != null) {
+			message.addAttribute("id", id);
+		}
 		if (subject != null) {
 			message.addChild(new Element("subject", subject));
 		}

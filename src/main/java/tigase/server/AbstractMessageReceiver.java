@@ -145,6 +145,7 @@ public abstract class AbstractMessageReceiver
    */
   private long statReceivedPacketsEr = 0;
   private long statSentPacketsEr = 0;
+	private long packetId = 0;
 
 	/**
 	 * Describe <code>getComponentId</code> method here.
@@ -191,6 +192,15 @@ public abstract class AbstractMessageReceiver
 			return packet.getElemTo().hashCode();
 		}
 		return packet.getTo().hashCode();
+	}
+
+	public String newPacketId(String prefix) {
+		StringBuilder sb = new StringBuilder(32);
+		if (prefix != null) {
+			sb.append(prefix).append("-");
+		}
+		sb.append(getName()).append(++packetId);
+		return sb.toString();
 	}
 
 	@Override

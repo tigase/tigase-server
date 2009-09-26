@@ -237,7 +237,7 @@ public class PubSubTestsTask extends RepoRosterTask {
 								"Generated in: " +
 								gen_hours + "h, " +	gen_mins + "m, " + gen_secs + "sec" +
 								", packets generated: " + packetsGenerated,
-								"PubSub testing task", null));
+								"PubSub testing task", null, packet.getId()));
 
 			}
 		};
@@ -256,7 +256,7 @@ public class PubSubTestsTask extends RepoRosterTask {
 			case help:
 				results.offer(Packet.getMessage(packet.getElemFrom(),
 								packet.getElemTo(), StanzaType.chat, commandsHelp(),
-								"Commands description", null));
+								"Commands description", null, packet.getId()));
 				break;
 			case setdelay:
 				pars = parseNumbers(body_split, 1, 1);
@@ -269,7 +269,8 @@ public class PubSubTestsTask extends RepoRosterTask {
 				if (pars != null) {
 					addOutPacket(Packet.getMessage(packet.getElemFrom(),
 									packet.getElemTo(), StanzaType.chat,
-									"Task accepted, processing...", "PubSub testing task", null));
+									"Task accepted, processing...", "PubSub testing task", null,
+									packet.getId()));
 					runInThread(new Runnable() {
 						@Override
 						public void run() {
@@ -279,7 +280,8 @@ public class PubSubTestsTask extends RepoRosterTask {
 				} else {
 					results.offer(Packet.getMessage(packet.getElemFrom(),
 									packet.getElemTo(), StanzaType.chat,
-									"Incorrect command parameters.", "PubSub testing task", null));
+									"Incorrect command parameters.", "PubSub testing task", null,
+									packet.getId()));
 					return;
 				}
 				break;
@@ -289,7 +291,8 @@ public class PubSubTestsTask extends RepoRosterTask {
 					if (pars != null) {
 						addOutPacket(Packet.getMessage(packet.getElemFrom(),
 										packet.getElemTo(), StanzaType.chat,
-										"Task accepted, processing...", "PubSub testing task", null));
+										"Task accepted, processing...", "PubSub testing task", null,
+										packet.getId()));
 						runInThread(new Runnable() {
 							@Override
 							public void run() {
@@ -301,7 +304,8 @@ public class PubSubTestsTask extends RepoRosterTask {
 						results.offer(
 										Packet.getMessage(packet.getElemFrom(),
 										packet.getElemTo(), StanzaType.chat,
-										"Incorrect command parameters.", "PubSub testing task", null));
+										"Incorrect command parameters.", "PubSub testing task", null,
+										packet.getId()));
 						return;
 
 					}
@@ -310,7 +314,7 @@ public class PubSubTestsTask extends RepoRosterTask {
 										Packet.getMessage(packet.getElemFrom(),
 										packet.getElemTo(), StanzaType.chat,
 										"There are no pubsub nodes created yet.",
-										"PubSub testing task", null));
+										"PubSub testing task", null, packet.getId()));
 						return;
 				}
 				break;
@@ -319,7 +323,8 @@ public class PubSubTestsTask extends RepoRosterTask {
 				if (pars != null) {
 					addOutPacket(Packet.getMessage(packet.getElemFrom(),
 									packet.getElemTo(), StanzaType.chat, "" + new Date() +
-									" Task accepted, processing...", "PubSub testing task", null));
+									" Task accepted, processing...", "PubSub testing task", null,
+									packet.getId()));
 					runInThread(new Runnable() {
 						@Override
 						public void run() {
@@ -329,7 +334,8 @@ public class PubSubTestsTask extends RepoRosterTask {
 				} else {
 					results.offer(Packet.getMessage(packet.getElemFrom(),
 									packet.getElemTo(), StanzaType.chat,
-									"Incorrect command parameters.", "PubSub testing task", null));
+									"Incorrect command parameters.", "PubSub testing task", null,
+									packet.getId()));
 					return;
 				}
 				break;

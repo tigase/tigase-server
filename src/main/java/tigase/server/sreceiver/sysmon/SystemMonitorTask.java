@@ -342,7 +342,7 @@ public class SystemMonitorTask extends RepoRosterTask {
 			case help:
 				results.offer(Packet.getMessage(packet.getElemFrom(),
 								packet.getElemTo(), StanzaType.chat, commandsHelp(),
-								"Commands description", null));
+								"Commands description", null, packet.getId()));
 				break;
 			case state:
 				StringBuilder sb = new StringBuilder("\n");
@@ -352,7 +352,7 @@ public class SystemMonitorTask extends RepoRosterTask {
 				}
 				results.offer(Packet.getMessage(packet.getElemFrom(),
 								packet.getElemTo(), StanzaType.chat, sb.toString(),
-								"Monitors State", null));
+								"Monitors State", null, packet.getId()));
 				break;
 			case threshold:
 				if (body_split.length > 1) {
@@ -371,20 +371,20 @@ public class SystemMonitorTask extends RepoRosterTask {
 						results.offer(Packet.getMessage(packet.getElemFrom(),
 										packet.getElemTo(), StanzaType.chat,
 										"New threshold set to: " + warning_threshold + "\n",
-										"Threshold command.", null));
+										"Threshold command.", null, packet.getId()));
 					} else {
 						results.offer(Packet.getMessage(packet.getElemFrom(),
 										packet.getElemTo(), StanzaType.chat,
 										"Incorrect threshold givenm using the old threshold: " +
 										warning_threshold + "\n" +
 										"Correct threshold is a float point number 0 < N < 1.",
-										"Threshold command.", null));
+										"Threshold command.", null, packet.getId()));
 					}
 				} else {
 					results.offer(Packet.getMessage(packet.getElemFrom(),
 									packet.getElemTo(), StanzaType.chat,
 									"Current threshold value is: " + warning_threshold,
-									"Threshold command.", null));
+									"Threshold command.", null, packet.getId()));
 				}
 				break;
 		}
@@ -401,7 +401,7 @@ public class SystemMonitorTask extends RepoRosterTask {
 		}
 		results.offer(Packet.getMessage(packet.getElemFrom(),
 						packet.getElemTo(), StanzaType.chat, result,
-						monitor.getClass().getSimpleName() + " command.", null));
+						monitor.getClass().getSimpleName() + " command.", null, packet.getId()));
 	}
 
 	@Override
@@ -417,7 +417,7 @@ public class SystemMonitorTask extends RepoRosterTask {
 				results.offer(Packet.getMessage(packet.getElemFrom(),
 								packet.getElemTo(), StanzaType.normal,
 								"This is response to your message: [" + body + "]",
-								"Response", null));
+								"Response", null, packet.getId()));
 			}
 		}
 	}

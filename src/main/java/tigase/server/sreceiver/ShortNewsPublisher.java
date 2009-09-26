@@ -290,7 +290,7 @@ public class ShortNewsPublisher extends RepoRosterTask {
 				results.offer(Packet.getMessage(packet.getElemFrom(),
 						packet.getElemTo(), StanzaType.normal,
 						"Your post has been successfuly submitted.",
-						"Short news submitions result.", null));
+						"Short news submitions result.", null, packet.getId()));
 			} else {
 				// if body is null it might be an empty message used for
 				// announcing other side that the user has just started typing
@@ -298,7 +298,7 @@ public class ShortNewsPublisher extends RepoRosterTask {
 				results.offer(Packet.getMessage(packet.getElemFrom(),
 								packet.getElemTo(), StanzaType.normal,
 								"Missing body, post has NOT been submitted.",
-								"Short news submitions result.", null));
+								"Short news submitions result.", null, packet.getId()));
 			}
 		} catch (SQLException e) {
 			log.log(Level.SEVERE, "Problem inserting new post: "
@@ -306,7 +306,7 @@ public class ShortNewsPublisher extends RepoRosterTask {
 			results.offer(Packet.getMessage(packet.getElemFrom(),
 					packet.getElemTo(), StanzaType.normal,
 					"There was a problem with post submitting: " + e,
-					"Short news submitions result.", null));
+					"Short news submitions result.", null, packet.getId()));
 		}
 	}
 
@@ -362,21 +362,21 @@ public class ShortNewsPublisher extends RepoRosterTask {
 			case help:
 				results.offer(Packet.getMessage(packet.getElemFrom(),
 						packet.getElemTo(), StanzaType.chat, commandsHelp(),
-						"Commands description", null));
+						"Commands description", null, packet.getId()));
 				break;
 			case update:
 				updatePost(packet, Long.parseLong(body_split[1]));
 				results.offer(Packet.getMessage(packet.getElemFrom(),
 						packet.getElemTo(), StanzaType.normal,
 						"Post " + body_split[1] + " successfuly updated.",
-						"Command execution result", null));
+						"Command execution result", null, packet.getId()));
 				break;
 			case delete:
 				deletePost(Long.parseLong(body_split[1]));
 				results.offer(Packet.getMessage(packet.getElemFrom(),
 						packet.getElemTo(), StanzaType.normal,
 						"Post " + body_split[1] + " successfuly deleted.",
-						"Command execution result", null));
+						"Command execution result", null, packet.getId()));
 				break;
 			default:
 				break;
@@ -388,7 +388,7 @@ public class ShortNewsPublisher extends RepoRosterTask {
 			log.log(Level.WARNING, error_text, e);
 			results.offer(Packet.getMessage(packet.getElemFrom(),
 					packet.getElemTo(), StanzaType.normal, error_text,
-					"Problem with command execution", null));
+					"Problem with command execution", null, packet.getId()));
 		}
 	}
 

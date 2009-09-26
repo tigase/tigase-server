@@ -63,7 +63,7 @@ public abstract class AbstractMonitor implements ResourceMonitorIfc {
 							XMLUtils.escape("Warning! High resource usage alert from: " +
 							getClass().getSimpleName() + "\n" +
 							new Date() + " - " + text),
-							"System Monitor Alert", null);
+							"System Monitor Alert", null, null);
 			results.add(result);
 			warningsSent.add(warning);
 		}
@@ -76,7 +76,7 @@ public abstract class AbstractMonitor implements ResourceMonitorIfc {
 							XMLUtils.escape("Calm down! Resource usage notification from: " +
 							getClass().getSimpleName() + "\n" +
 							new Date() + " - " + text),
-							"System Monitor Alert", null);
+							"System Monitor Alert", null, null);
 			results.add(result);
 			warningsSent.remove(warning);
 		}
@@ -88,7 +88,7 @@ public abstract class AbstractMonitor implements ResourceMonitorIfc {
 							XMLUtils.escape("Warning! High resource usage alert from: " +
 							getClass().getSimpleName() + "\n" +
 							new Date() + " - " + text),
-							"System Monitor Alert", null);
+							"System Monitor Alert", null, null);
 			smTask.sendPacketOut(result);
 			if (warning != null) {
 				warningsSent.add(warning);

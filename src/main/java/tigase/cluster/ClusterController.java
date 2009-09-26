@@ -145,7 +145,7 @@ public class ClusterController
 		}
 		Packet p_msg = Packet.getMessage(my_hostname,
 			JIDUtils.getJID(getName(), my_hostname, null), StanzaType.normal,
-			message, subject, "xyz");
+			message, subject, "xyz", newPacketId(null));
 		return p_msg;
 	}
 

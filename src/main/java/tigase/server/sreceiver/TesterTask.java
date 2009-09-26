@@ -49,10 +49,12 @@ public class TesterTask extends AbstractReceiverTask {
 
 	private enum command { help, genn; };
 
+	@Override
 	public String getType() {
 		return TASK_TYPE;
 	}
 
+	@Override
 	public String getHelp() {
 		return TASK_HELP;
 	}
@@ -88,7 +90,7 @@ public class TesterTask extends AbstractReceiverTask {
 		case help:
 			results.offer(Packet.getMessage(packet.getElemFrom(),
 					packet.getElemTo(), StanzaType.chat, commandsHelp(),
-					"Commands description", null));
+					"Commands description", null, packet.getId()));
 			break;
 		case genn:
 			try {
@@ -98,18 +100,18 @@ public class TesterTask extends AbstractReceiverTask {
 					results.offer(Packet.getMessage("nonename_" + i + "@" + domain,
 							packet.getElemTo(), StanzaType.normal,
 							"Traffic generattion: " + number,
-							"Internal load test", null));
+							"Internal load test", null, packet.getId()));
 				}
 				results.offer(Packet.getMessage(packet.getElemFrom(),
 						packet.getElemTo(), StanzaType.normal,
 						"Completed " + number,
-						"Response", null));
+						"Response", null, packet.getId()));
 			} catch (Exception e) {
 				results.offer(Packet.getMessage(packet.getElemFrom(),
 						packet.getElemTo(), StanzaType.normal,
 						"Incorrect command parameter: "
 						+ (body_split.length > 1 ? body_split[1] : null)
-						+ ", expecting Integer.", "Response", null));
+						+ ", expecting Integer.", "Response", null, packet.getId()));
 			}
 			break;
 		}
@@ -123,7 +125,7 @@ public class TesterTask extends AbstractReceiverTask {
 			results.offer(Packet.getMessage(packet.getElemFrom(),
 					packet.getElemTo(), StanzaType.normal,
 					"This is response to your message: [" + body + "]",
-					"Response", null));
+					"Response", null, packet.getId()));
 		}
 	}
 

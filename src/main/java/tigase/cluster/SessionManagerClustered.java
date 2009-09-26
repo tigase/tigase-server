@@ -498,7 +498,7 @@ public class SessionManagerClustered extends SessionManager
 		message += node + " connected to " + getDefHostName();
 		Packet p_msg = Packet.getMessage(getDefHostName(),
 			JIDUtils.getNodeID(getName(), my_hostname), StanzaType.normal, message,
-			subject, "xyz");
+			subject, "xyz", newPacketId(null));
 		sendToAdmins(p_msg);
 	}
 
