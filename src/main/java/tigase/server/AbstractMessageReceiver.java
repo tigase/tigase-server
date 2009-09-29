@@ -79,7 +79,7 @@ public abstract class AbstractMessageReceiver
    */
   private static final Logger log =
     Logger.getLogger("tigase.abstract.AbstractMessageReceiver");
-	private static final TigaseTracer tracer = TigaseTracer.getTracer("abstract");
+//	private static final TigaseTracer tracer = TigaseTracer.getTracer("abstract");
 
   protected int maxQueueSize = MAX_QUEUE_SIZE_PROP_VAL;
 	private String defHostname = DEF_HOSTNAME_PROP_VAL;
@@ -738,8 +738,8 @@ public abstract class AbstractMessageReceiver
 //					}
 					switch (type) {
 						case IN_QUEUE:
-							tracer.trace(null, packet.getElemTo(), packet.getElemFrom(),
-											packet.getFrom(),	getName(), type.name(), null, packet);
+//							tracer.trace(null, packet.getElemTo(), packet.getElemFrom(),
+//											packet.getFrom(),	getName(), type.name(), null, packet);
 							String id = packet.getTo() + packet.getId();
 							ReceiverTask task = waitingTasks.remove(id);
 							if (task != null) {
@@ -757,8 +757,8 @@ public abstract class AbstractMessageReceiver
 							}
 							break;
 						case OUT_QUEUE:
-							tracer.trace(null, packet.getElemTo(), packet.getElemFrom(),
-											packet.getTo(),	getName(), type.name(), null, packet);
+//							tracer.trace(null, packet.getElemTo(), packet.getElemFrom(),
+//											packet.getTo(),	getName(), type.name(), null, packet);
 							if (!filterPacket(packet, outgoing_filters)) {
 								if (parent != null) {
 									parent.addPacket(packet);
