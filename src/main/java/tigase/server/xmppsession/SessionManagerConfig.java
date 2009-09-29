@@ -106,7 +106,7 @@ public class SessionManagerConfig {
 		String auth_repo_class = params.get(GEN_AUTH_DB) != null
 						? (String)params.get(GEN_AUTH_DB) : DERBY_REPO_CLASS_PROP_VAL;
 		String auth_repo_url = params.get(GEN_AUTH_DB_URI) != null
-						? (String)params.get(GEN_AUTH_DB_URI) : DERBY_REPO_URL_PROP_VAL;
+						? (String)params.get(GEN_AUTH_DB_URI) : user_repo_url;
 		
 		props.put(USER_REPO_CLASS_PROP_KEY, user_repo_class);
 		props.put(USER_REPO_URL_PROP_KEY, user_repo_url);
