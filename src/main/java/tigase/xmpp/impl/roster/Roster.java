@@ -43,29 +43,34 @@ public class Roster extends RosterAbstract {
    */
   private static Logger log =	Logger.getLogger("tigase.xmpp.impl.Roster");
 
+	@Override
   public String[] getBuddies(final XMPPResourceConnection session)
     throws NotAuthorizedException, TigaseDBException {
     return session.getDataGroups(ROSTER);
   }
 
+	@Override
   public String getBuddyName(final XMPPResourceConnection session,
 		final String buddy)
     throws NotAuthorizedException, TigaseDBException {
     return session.getData(groupNode(buddy), NAME, null);
   }
 
+	@Override
   public void setBuddyName(final XMPPResourceConnection session,
 		final String buddy, final String name)
     throws NotAuthorizedException, TigaseDBException {
     session.setData(groupNode(buddy), NAME, name);
   }
 
+	@Override
   public void setBuddySubscription(final XMPPResourceConnection session,
     final SubscriptionType subscription, final String buddy)
 		throws NotAuthorizedException, TigaseDBException {
     session.setData(groupNode(buddy), SUBSCRIPTION, subscription.toString());
   }
 
+	@Override
   public SubscriptionType getBuddySubscription(
 		final XMPPResourceConnection session,
     final String buddy) throws NotAuthorizedException, TigaseDBException {
@@ -77,12 +82,14 @@ public class Roster extends RosterAbstract {
 		return null;
   }
 
+	@Override
 	public boolean removeBuddy(final XMPPResourceConnection session,
 		final String jid) throws NotAuthorizedException, TigaseDBException {
 		session.removeDataGroup(groupNode(jid));
 		return true;
 	}
 
+	@Override
 	public void addBuddy(XMPPResourceConnection session,
 		String jid, String name, String[] groups)
     throws NotAuthorizedException, TigaseDBException {
@@ -95,6 +102,7 @@ public class Roster extends RosterAbstract {
     session.setDataList(groupNode(jid), GROUPS, groups);
 	}
 
+	@Override
   public String[] getBuddyGroups(final XMPPResourceConnection session,
 		final String buddy)
     throws NotAuthorizedException, TigaseDBException {

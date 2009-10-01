@@ -208,7 +208,9 @@ public class RosterFlat extends RosterAbstract {
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("Setting name: '"+name+"' for buddy: " + buddy);
 			}
-			relem.setName(name);
+			if (name != null && !name.isEmpty()) {
+				relem.setName(name);
+			}
 			saveUserRoster(session);
 		} else {
 			log.warning("Setting buddy name for non-existen contact: " + buddy);
@@ -268,8 +270,12 @@ public class RosterFlat extends RosterAbstract {
 				log.finest("Added buddy to roster: " + jid);
 			}
 		} else {
-			relem.setName(name);
-			relem.setGroups(groups);
+			if (name != null && !name.isEmpty()) {
+				relem.setName(name);
+			}
+			if (groups != null && groups.length > 0) {
+				relem.setGroups(groups);
+			}
 			saveUserRoster(session);
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("Updated buddy in roster: " + jid);
