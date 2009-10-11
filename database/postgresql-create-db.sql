@@ -31,3 +31,5 @@ create user ${dbUser} with password '${dbPass}';
 -- QUERY START: add user
 GRANT ALL ON database ${dbName} TO ${dbUser};
 -- QUERY END: add user
+
+ALTER DATABASE ${dbName} OWNER TO ${dbUser};
