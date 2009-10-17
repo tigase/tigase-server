@@ -68,7 +68,11 @@ if [ -z "${JAVA_HOME}" ] ; then
   exit 1
 fi
 if [ -z "${TIGASE_HOME}" ] ; then
-  TIGASE_HOME=`dirname ${0}`
+  if [ ${0:0:1} = '/' ] ; then
+    TIGASE_HOME=${0}
+  else
+    TIGASE_HOME=${PWD}/${0}
+  fi
   TIGASE_HOME=`dirname ${TIGASE_HOME}`
   TIGASE_JAR=""
 fi
