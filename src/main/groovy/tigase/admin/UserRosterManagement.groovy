@@ -21,8 +21,12 @@
  */
 
 /*
+
+Update user roster entry.
+
 AS:Description: Update user roster entry
 AS:CommandId: user-roster-management
+AS:Component: sess-man
 */
 
 package tigase.admin

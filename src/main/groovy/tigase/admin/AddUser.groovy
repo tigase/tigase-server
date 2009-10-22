@@ -27,6 +27,7 @@ http://xmpp.org/extensions/xep-0133.html#add-user
 
 AS:Description: User add administrator command.
 AS:CommandId: add-user
+AS:Component: sess-man
 */
 
 package tigase.admin

@@ -25,6 +25,7 @@ Example Hello World admin script for the script development guide.
 
 AS:Description: Hello World Script.
 AS:CommandId: hello
+AS:Component: sess-man
 */
 
 package tigase.admin

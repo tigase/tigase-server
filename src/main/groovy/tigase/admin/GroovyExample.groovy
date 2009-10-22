@@ -20,6 +20,15 @@
  * $Date: $
  */
 
+/*
+
+This is an example script for Tigase scripting support.
+
+AS:Description: An example script for Tigase scripting guide
+AS:CommandId: groovy-example
+AS:Component: sess-man
+*/
+
 package tigase.admin
 
 import tigase.server.Command

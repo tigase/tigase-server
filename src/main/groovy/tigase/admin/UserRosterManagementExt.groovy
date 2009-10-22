@@ -24,10 +24,11 @@
 /*
 
 Update user roster entry, extended version.
-If both given JIDs are local rosters for both users are updated accordingly.
+If both given JIDs are local, rosters for both users are updated accordingly.
 
 AS:Description: Update user roster entry, extended version.
 AS:CommandId: user-roster-management-ext
+AS:Component: sess-man
 */
 
 package tigase.admin

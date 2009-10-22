@@ -21,8 +21,9 @@
  */
 
 /*
-Description: Command to change user inter-domain communication permission.
-CommandId: user-domain-perm
+AS:Description: Command to change user inter-domain communication permission.
+AS:CommandId: user-domain-perm
+AS:Component: sess-man
 */
 
 package tigase.admin
