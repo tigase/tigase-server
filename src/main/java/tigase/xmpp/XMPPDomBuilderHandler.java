@@ -54,11 +54,12 @@ import tigase.xml.SimpleHandler;
  * <p>
  * Created: Sat Oct  2 22:01:34 2004
  * </p>
+ * @param <RefObject>
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 
-public class XMPPDomBuilderHandler implements SimpleHandler {
+public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 
   private static Logger log =
     Logger.getLogger("tigase.xmpp.XMPPDomBuilderHandler");
@@ -70,19 +71,20 @@ public class XMPPDomBuilderHandler implements SimpleHandler {
 
   private Object parserState = null;
   private String top_xmlns = null;
-	private XMPPIOService service = null;
+	private XMPPIOService<RefObject> service = null;
 	private boolean error = false;
 
   private LinkedList<Element> all_roots = new LinkedList<Element>();
   private Stack<Element> el_stack = new Stack<Element>();
 	private Map<String, String> namespaces = new TreeMap<String, String>();
 
-  public XMPPDomBuilderHandler(XMPPIOService ioserv, ElementFactory factory) {
+  public XMPPDomBuilderHandler(XMPPIOService<RefObject> ioserv,
+			ElementFactory factory) {
     customFactory = factory;
 		service = ioserv;
   }
 
-  public XMPPDomBuilderHandler(XMPPIOService ioserv) {
+  public XMPPDomBuilderHandler(XMPPIOService<RefObject> ioserv) {
     customFactory = defaultFactory;
 		service = ioserv;
   }

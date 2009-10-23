@@ -39,10 +39,12 @@ import tigase.xml.SingletonFactory;
  *
  * Created: Tue Feb  7 07:15:02 2006
  *
+ * @param <RefObject> is a refrence object stored by this service. This is e reference
+ * to higher level data object keeping more information about the connection.
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class XMPPIOService extends IOService {
+public class XMPPIOService<RefObject> extends IOService<RefObject> {
 
   /**
    * Variable <code>log</code> is a class logger.
@@ -50,7 +52,7 @@ public class XMPPIOService extends IOService {
   private static final Logger log =
 		Logger.getLogger("tigase.xmpp.XMPPIOService");
 
-  private XMPPDomBuilderHandler domHandler = null;
+  private XMPPDomBuilderHandler<RefObject> domHandler = null;
 	protected SimpleParser parser = SingletonFactory.getParserInstance();
 	private XMPPIOServiceListener serviceListener = null;
 
@@ -86,7 +88,7 @@ public class XMPPIOService extends IOService {
 	 *
 	 */
 	public XMPPIOService() {
-		domHandler = new XMPPDomBuilderHandler(this);
+		domHandler = new XMPPDomBuilderHandler<RefObject>(this);
 	}
 
 	public void setXMLNS(String xmlns) {
@@ -97,14 +99,16 @@ public class XMPPIOService extends IOService {
 		return this.xmlns;
 	}
 
+	@SuppressWarnings({"unchecked"})
 	public void setIOServiceListener(XMPPIOServiceListener sl) {
 		this.serviceListener = sl;
 		super.setIOServiceListener(sl);
 	}
 
+	@SuppressWarnings({"unchecked"})
 	protected void xmppStreamOpened(Map<String, String> attribs) {
 		if (serviceListener != null) {
-			String response = serviceListener.streamOpened(this, attribs);
+			String response = serviceListener.xmppStreamOpened(this, attribs);
 			try {
 				if (log.isLoggable(Level.FINEST)) {
 					log.finest("Sending data: " + response);
@@ -147,10 +151,11 @@ public class XMPPIOService extends IOService {
 		super.stop();
   }
 
+	@SuppressWarnings({"unchecked"})
 	protected void xmppStreamClosed() {
 		//streamClosed = true;
 		if (serviceListener != null) {
-			serviceListener.streamClosed(this);
+			serviceListener.xmppStreamClosed(this);
 		}
     try {
 			if (log.isLoggable(Level.FINEST)) {
@@ -248,7 +253,7 @@ public class XMPPIOService extends IOService {
 								parser.parse(domHandler, data, 0, data.length);
 								if (domHandler.parseError()) {
 									log.warning("Data parsing error: " + new String(data));
-									domHandler = new XMPPDomBuilderHandler(this);
+									domHandler = new XMPPDomBuilderHandler<RefObject>(this);
 								}
 								Queue<Element> elems = domHandler.getParsedElements();
 								if (elems.size() > 0) {

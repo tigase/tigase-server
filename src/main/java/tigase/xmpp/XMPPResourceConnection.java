@@ -125,6 +125,10 @@ public class XMPPResourceConnection extends RepositoryAccess {
     sessionData = new ConcurrentHashMap<String, Object>(4, 0.9f);
 	}
 
+	public String getSMComponentId() {
+		return loginHandler.getComponentId();
+	}
+
 	public boolean isLocalDomain(String outDomain, boolean includeComponents) {
 		return loginHandler.isLocalDomain(outDomain, includeComponents);
 	}

@@ -30,13 +30,15 @@ import tigase.net.IOServiceListener;
  *
  * Created: Wed Feb  8 10:19:41 2006
  *
+ * @param <IO> 
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public interface XMPPIOServiceListener extends IOServiceListener {
+public interface XMPPIOServiceListener<IO extends XMPPIOService> 
+		extends IOServiceListener<IO> {
 
-	String streamOpened(XMPPIOService serv, Map<String, String> attribs);
+	String xmppStreamOpened(IO serv, Map<String, String> attribs);
 
-	void streamClosed(XMPPIOService serv);
+	void xmppStreamClosed(IO serv);
 
 } // XMPPIOServiceListener
