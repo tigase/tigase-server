@@ -21,9 +21,7 @@
  */
 package tigase.xmpp.impl;
 
-import java.util.Arrays;
 import java.util.Queue;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import tigase.server.Command;
@@ -50,7 +48,7 @@ import tigase.db.NonAuthUserRepository;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public abstract class ServiceDiscovery extends XMPPProcessor
+public class ServiceDiscovery extends XMPPProcessor
 	implements XMPPProcessorIfc {
 
 	private static final Logger log =
@@ -73,95 +71,65 @@ public abstract class ServiceDiscovery extends XMPPProcessor
 			new String[] {XMPPServiceCollector.ITEMS_XMLNS})
 	};
 
+	@Override
 	public String id() { return ID; }
 
+	@Override
 	public String[] supElements()	{ return ELEMENTS; }
 
+	@Override
   public String[] supNamespaces()	{ return XMLNSS; }
 
+	@Override
   public Element[] supDiscoFeatures(final XMPPResourceConnection session)
 	{ return DISCO_FEATURES; }
 
+	@Override
 	public void process(final Packet packet, final XMPPResourceConnection session,
 		final NonAuthUserRepository repo, final Queue<Packet> results,
 		final Map<String, Object> settings)
 		throws XMPPException {
+		// Service discovery is normally processed by MessageRouter so no processing
+		// is needed here. This plugin exists only to make sure the elemFrom address
+		// is set properly and it is set by the packet filter before it gets here.
+		// All we need to do here is passing the packet back.
 
+		// Fast packet processing if the session is null
 		if (session == null) {
+			results.offer(new Packet(packet.getElement()));
 			return;
-		} // end of if (session == null)
+		}
 
 		try {
-			// Maybe it is message to admininstrator:
-			String nodeId = null;
-			String nodeNick = null;
-			if (packet.getElemTo() != null) {
-				nodeId = JIDUtils.getNodeID(packet.getElemTo());
-				nodeNick = JIDUtils.getNodeNick(packet.getElemTo());
-			} // end of if (packet.getElemTo() != null)
-
-			if (packet.isCommand()) {
-				if (packet.getCommand() == Command.GETDISCO
-					&& packet.getType() == StanzaType.result) {
-					// Send it back to user.
-					Element query = Command.getData(packet, "query", null);
-					Element iq =
-						ElementUtils.createIqQuery(session.getDomain(), session.getJID(),
-							StanzaType.result, packet.getElemId(), query);
-					Packet result = new Packet(iq);
-					result.setTo(session.getConnectionId());
-					result.getElement().setAttribute("from",
-						Command.getFieldValue(packet,	"jid"));
-					results.offer(result);
-					return;
-				} else {
-					return;
-				}
-			}
-
-			// If ID part of user account contains only host name
-			// and this is local domain it is message to admin
-			if (nodeId == null || nodeId.equals("")
-				|| (nodeNick == null && nodeId.endsWith(session.getDomain()))) {
-				Element query = packet.getElement().getChild("query");
-				Packet discoCommand = Command.GETDISCO.getPacket(session.getJID(),
-					session.getDomain(), StanzaType.get, packet.getElemId(), 
-					Command.DataType.submit);
-				Command.addFieldValue(discoCommand, "xmlns", query.getXMLNS());
-				Command.addFieldValue(discoCommand, "jid", packet.getElemTo());
-				if (query.getAttribute("node") != null) {
-					Command.addFieldValue(discoCommand, "node", query.getAttribute("node"));
-				} // end of if (query.getAttribute("node") != null)
-				results.offer(discoCommand);
-				return;
-			}
-
-			if (nodeId.equals(session.getUserId())) {
+			// Remember to cut the resource part off before comparing JIDs
+			String id = JIDUtils.getNodeID(packet.getElemTo());
+			// Checking if this is a packet TO the owner of the session
+			if (session.getUserId().equals(id)) {
 				// Yes this is message to 'this' client
 				Element elem = packet.getElement().clone();
 				Packet result = new Packet(elem);
+				// This is where and how we set the address of the component
+				// which should rceive the result packet for the final delivery
+				// to the end-user. In most cases this is a c2s or Bosh component
+				// which keep the user connection.
 				result.setTo(session.getConnectionId(packet.getElemTo()));
+				// In most cases this might be skept, however if there is a
+				// problem during packet delivery an error might be sent back
 				result.setFrom(packet.getTo());
+				// Don't forget to add the packet to the results queue or it
+				// will be lost.
 				results.offer(result);
-			} else {
-				// This is message to some other client so I need to
-				// set proper 'from' attribute whatever it is set to now.
-				// Actually processor should not modify request but in this
-				// case it is absolutely safe and recommended to set 'from'
-				// attribute
-				Element result = packet.getElement().clone();
-				// Not needed anymore. Packet filter does it for all stanzas.
-// 				// According to spec we must set proper FROM attribute
-// 				result.setAttribute("from", session.getJID());
-				results.offer(new Packet(result));
-			} // end of else
-		} catch (NotAuthorizedException e) {
-      log.warning(
-				"Received stats request but user session is not authorized yet: " +
-        packet.getStringData());
+				return;
+			}
+
+			// Otherwise just pass the packet for further processing
+			results.offer(new Packet(packet.getElement()));
+		} catch (Exception e) {
+			log.warning("NotAuthorizedException for packet: "	+ packet.getStringData());
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 					"You must authorize session first.", true));
-		} // end of try-catch
+		}
+		// If the packet is addressed to the user of this session, make sure it gets through
 	}
 
 } // ServiceDiscovery
