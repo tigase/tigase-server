@@ -397,11 +397,11 @@ public class SystemMonitorTask extends RepoRosterTask {
 		String result = monitor.runCommand(body_split);
 		if (result == null) {
 			result = "Monitor " + monitor.getClass().getSimpleName() +
-							" command was run but returned no results.";
+					" command was run but returned no results.";
 		}
 		results.offer(Packet.getMessage(packet.getElemFrom(),
-						packet.getElemTo(), StanzaType.chat, result,
-						monitor.getClass().getSimpleName() + " command.", null, packet.getId()));
+				packet.getElemTo(), StanzaType.chat, result,
+				monitor.getClass().getSimpleName() + " command.", null, packet.getId()));
 	}
 
 	@Override
@@ -415,9 +415,9 @@ public class SystemMonitorTask extends RepoRosterTask {
 			} else {
 				String body = packet.getElemCData("/message/body");
 				results.offer(Packet.getMessage(packet.getElemFrom(),
-								packet.getElemTo(), StanzaType.normal,
-								"This is response to your message: [" + body + "]",
-								"Response", null, packet.getId()));
+						packet.getElemTo(), StanzaType.normal,
+						"This is response to your message: [" + body + "]",
+						"Response", null, packet.getId()));
 			}
 		}
 	}
