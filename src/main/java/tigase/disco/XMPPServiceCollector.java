@@ -80,12 +80,13 @@ public abstract class XMPPServiceCollector
 			|| packet.isXMLNS("/iq/query", ITEMS_XMLNS)) {
 
 			String jid = packet.getElemTo();
+			String from = packet.getElemFrom();
 			String node = packet.getAttribute("/iq/query", "node");
 			Element query = packet.getElement().getChild("query").clone();
 
 			if (packet.isXMLNS("/iq/query", INFO_XMLNS)) {
 				for (XMPPService comp: components.values()) {
-					Element resp = comp.getDiscoInfo(node, jid);
+					Element resp = comp.getDiscoInfo(node, jid, from);
 					if (resp != null) {
 						query = resp;
 						break;
@@ -95,7 +96,7 @@ public abstract class XMPPServiceCollector
 
 			if (packet.isXMLNS("/iq/query", ITEMS_XMLNS)) {
 				for (XMPPService comp: components.values()) {
-					List<Element> items =	comp.getDiscoItems(node, jid);
+					List<Element> items =	comp.getDiscoItems(node, jid, from);
 					if (items != null && items.size() > 0) {
 						query.addChildren(items);
 					} // end of if (stats != null && stats.count() > 0)

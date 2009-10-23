@@ -41,7 +41,7 @@ import tigase.xml.Element;
  */
 public class ServiceEntity {
 
-	private static Logger log = Logger.getLogger("tigase.disco.ServiceEntity");
+	private static Logger log = Logger.getLogger(ServiceEntity.class.getName());
 	
 	private String jid = null;
 	private String node = null;
@@ -49,6 +49,7 @@ public class ServiceEntity {
 	private List<String> features = null;
 	private List<ServiceIdentity> identities = null;
 	private Set<ServiceEntity> items = null;
+	private boolean adminOnly = false;
 
 	/**
 	 * Creates a new <code>ServiceEntity</code> instance.
@@ -62,6 +63,21 @@ public class ServiceEntity {
 		this.jid = jid;
 		this.node = node;
 		this.name = name;
+	}
+
+	public ServiceEntity(String jid, String node, String name, boolean adminOnly) {
+		this.jid = jid;
+		this.node = node;
+		this.name = name;
+		this.adminOnly = adminOnly;
+	}
+
+	public void setAdminOnly(boolean adminOnly) {
+		this.adminOnly = adminOnly;
+	}
+
+	public boolean isAdminOnly() {
+		return adminOnly;
 	}
 
 	/**
@@ -180,43 +196,55 @@ public class ServiceEntity {
 		return name;
 	}
 
+	public Element getDiscoInfo(String node) {
+		return getDiscoInfo(node, true);
+	}
+
 	/**
 	 * Describe <code>getDiscoInfo</code> method here.
 	 *
 	 * @param node a <code>String</code> value
 	 * @return an <code>Element</code> value
 	 */
-	public Element getDiscoInfo(String node) {
+	public Element getDiscoInfo(String node, boolean admin) {
 		//System.out.println("Node: " + node);
 		if (log.isLoggable(Level.FINEST)) {
-    		log.finest("Node: " + node);
-        }
+			log.finest("Node: " + node);
+		}
 		Element query = null;
 		if (node == null) {
+			// If the node is for admins only and this is not admin return null
+			if (adminOnly && !admin) {
+				return null;
+			}
 			if (log.isLoggable(Level.FINEST)) {
-    			log.finest("It's me: " + toString());
-            }
+				log.finest("It's me: " + toString());
+			}
 			query = new Element("query",
-				new String[] {"xmlns"},
-				new String[] {"http://jabber.org/protocol/disco#info"});
+					new String[]{"xmlns"},
+					new String[]{"http://jabber.org/protocol/disco#info"});
 			if (identities != null) {
-				for (ServiceIdentity ident: identities) {
+				for (ServiceIdentity ident : identities) {
 					query.addChild(ident.getElement());
 				}
 			}
 			if (features != null) {
-				for (String feature: features) {
+				for (String feature : features) {
 					query.addChild(new Element("feature",
-							new String[] {"var"},
-							new String[] {feature}));
+							new String[]{"var"},
+							new String[]{feature}));
 				}
 			}
 		} else {
 			ServiceEntity entity = findNode(node);
+			// If the entity is for admins only and this is not admin return null
+			if (entity != null && entity.adminOnly && !admin) {
+				entity = null;
+			}
 			if (entity != null) {
 				if (log.isLoggable(Level.FINEST)) {
-    				log.finest("Found child node: " + entity.toString());
-                }
+					log.finest("Found child node: " + entity.toString());
+				}
 				query = entity.getDiscoInfo(null);
 				query.setAttribute("node", node);
 			}
@@ -267,10 +295,17 @@ public class ServiceEntity {
 	}
 
 	public List<Element> getItems(String node, String jid) {
+		return getItems(node, jid, true);
+	}
+
+	public List<Element> getItems(String node, String jid, boolean admin) {
 		List<Element> result = null;
 		if (items != null) {
 			result = new ArrayList<Element>();
 			for (ServiceEntity item: items) {
+				if (item.adminOnly && !admin) {
+					continue;
+				}
 				result.add(item.getDiscoItem(node, jid));
 			}
 		}
@@ -278,22 +313,29 @@ public class ServiceEntity {
 	}
 
 	public List<Element> getDiscoItems(String node, String jid) {
+		return getDiscoItems(node, jid, true);
+	}
+
+	public List<Element> getDiscoItems(String node, String jid, boolean admin) {
 		//System.out.println("node: " + node + ", jid: " + jid);
 		if (log.isLoggable(Level.FINEST)) {
-    		log.finest("node: " + node + ", jid: " + jid);
-        }
+			log.finest("node: " + node + ", jid: " + jid);
+		}
 		List<Element> result = null;
 		if (node == null) {
-			result = getItems(null, jid);
+			result = getItems(null, jid, admin);
 		} else {
 			ServiceEntity entity = findNode(node);
+			if (entity != null && entity.adminOnly && !admin) {
+				entity = null;
+			}
 			//System.out.println("Found disco entity: " + entity.toString());
 			if (log.isLoggable(Level.FINEST)) {
-    			log.finest("Found disco entity: " +
-							(entity != null ? entity.toString() : null));
-            }
+				log.finest("Found disco entity: " +
+						(entity != null ? entity.toString() : null));
+			}
 			if (entity != null) {
-				result = entity.getItems(node, jid);
+				result = entity.getItems(node, jid, admin);
 			}
 		}
 		return result;
@@ -308,13 +350,13 @@ public class ServiceEntity {
 	public ServiceEntity findNode(String node) {
 		//System.out.println("Looking for a node: " + node);
 		if (log.isLoggable(Level.FINEST)) {
-    		log.finest("Looking for a node: " + node);
-        }
+			log.finest("Looking for a node: " + node);
+		}
 		if (this.node != null && this.node.equals(node)) {
 			//System.out.println("Looking for a node: " + node);
 			if (log.isLoggable(Level.FINEST)) {
-    			log.finest("Found myself: " + toString());
-            }
+				log.finest("Found myself: " + toString());
+			}
 			return this;
 		}
 		if (items == null) {
