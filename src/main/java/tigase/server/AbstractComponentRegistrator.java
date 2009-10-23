@@ -23,8 +23,6 @@ package tigase.server;
 
 import java.util.Map;
 import java.util.LinkedHashMap;
-import tigase.util.JIDUtils;
-import tigase.util.DNSResolver;
 
 /**
  * Describe class AbstractComponentRegistrator here.
@@ -37,10 +35,8 @@ import tigase.util.DNSResolver;
  * @version $Rev$
  */
 public abstract class AbstractComponentRegistrator<E extends ServerComponent>
-	implements ComponentRegistrator {
+	extends BasicComponent implements ComponentRegistrator {
 
-	private String name = null;
-	private String componentId = null;
 	private long packetId = 0;
 	protected Map<String, E> components = new LinkedHashMap<String, E>();
 
@@ -87,22 +83,6 @@ public abstract class AbstractComponentRegistrator<E extends ServerComponent>
 	@Override
 	public void release() {}
 
-	@Override
-	public void setName(String name) {
-		this.name = name;
-		this.componentId = JIDUtils.getNodeID(name, DNSResolver.getDefaultHostname());
-	}
-
-	@Override
-	public String getName() {
-		return name;
-	}
-
-	@Override
-	public String getComponentId() {
-		return componentId;
-	}
-
 	public String newPacketId(String prefix) {
 		StringBuilder sb = new StringBuilder(32);
 		if (prefix != null) {
@@ -111,9 +91,6 @@ public abstract class AbstractComponentRegistrator<E extends ServerComponent>
 		sb.append(getName()).append(++packetId);
 		return sb.toString();
 	}
-
-	@Override
-	public void initializationCompleted() {}
 
 	public abstract void componentRemoved(E component);
 

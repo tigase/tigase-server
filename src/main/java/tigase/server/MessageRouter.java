@@ -38,7 +38,6 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import tigase.xml.Element;
-import tigase.util.JIDUtils;
 import tigase.util.UpdatesChecker;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.StanzaType;
@@ -249,11 +248,9 @@ public class MessageRouter extends AbstractMessageReceiver {
 			packet.getElemToNick());
 		if (packet.isServiceDisco() && packet.getType() != null &&
 						packet.getType() == StanzaType.get &&
+						packet.getElemFrom() != null &&
 						((comp != null && !(comp instanceof DisableDisco)) ||
 						isLocalDomain(packet.getElemTo()))) {
-			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Processing disco query by: " + getComponentId());
-			}
 			Queue<Packet> results = new LinkedList<Packet>();
 			processDiscoQuery(packet, results);
 			if (results.size() > 0) {
@@ -578,64 +575,68 @@ public class MessageRouter extends AbstractMessageReceiver {
 	}
 
 	private void processDiscoQuery(final Packet packet,
-		final Queue<Packet> results) {
-			String jid = packet.getElemTo();
-			String nick = packet.getElemToNick();
-			String node = packet.getAttribute("/iq/query", "node");
-			Element query = packet.getElement().getChild("query").clone();
+			final Queue<Packet> results) {
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Processing disco query by: " + packet.toString());
+		}
+		String jid = packet.getElemTo();
+		String nick = packet.getElemToNick();
+		String from = packet.getElemFrom();
+		String node = packet.getAttribute("/iq/query", "node");
+		Element query = packet.getElement().getChild("query").clone();
 
-			if (packet.isXMLNS("/iq/query", INFO_XMLNS)) {
-				if (isLocalDomain(jid) && node == null) {
-					query = getDiscoInfo(node, jid);
-					for (XMPPService comp: xmppServices.values()) {
-						List<Element> features = comp.getDiscoFeatures();
-						if (features != null) {
-							query.addChildren(features);
-						}
-					} // end of for ()
-				} else {
-					for (XMPPService comp: xmppServices.values()) {
-						//						if (jid.startsWith(comp.getName() + ".")) {
-							Element resp = comp.getDiscoInfo(node, jid);
-							if (resp != null) {
-								query = resp;
-								break;
-							}
-							//						}
-					} // end of for ()
+		if (packet.isXMLNS("/iq/query", INFO_XMLNS)) {
+			if (isLocalDomain(jid) && node == null) {
+				query = getDiscoInfo(node, jid, from);
+				for (XMPPService comp : xmppServices.values()) {
+					List<Element> features = comp.getDiscoFeatures(from);
+					if (features != null) {
+						query.addChildren(features);
+					}
 				}
+			} else {
+				for (XMPPService comp : xmppServices.values()) {
+					//						if (jid.startsWith(comp.getName() + ".")) {
+					Element resp = comp.getDiscoInfo(node, jid, from);
+					if (resp != null) {
+						query = resp;
+						break;
+					}
+					//						}
+					}
 			}
+		}
 
-			if (packet.isXMLNS("/iq/query", ITEMS_XMLNS)) {
-				boolean localDomain = isLocalDomain(jid);
-				if (localDomain) {
-					for (XMPPService comp: xmppServices.values()) {
-						//	if (localDomain || (nick != null && comp.getName().equals(nick))) {
-						List<Element> items =	comp.getDiscoItems(node, jid);
-						if (log.isLoggable(Level.FINEST)) {
-							log.finest("DiscoItems processed by: " + comp.getComponentId()
-								+ ", items: " + (items == null ? null : items.toString()));
-						}
-						if (items != null && items.size() > 0) {
-							query.addChildren(items);
-						}
-					} // end of for ()
-				} else {
-					ServerComponent comp = getLocalComponent(packet.getElemTo(),
-									packet.getElemToHost(), packet.getElemToNick());
-					if (comp != null && comp instanceof XMPPService) {
-						List<Element> items = ((XMPPService)comp).getDiscoItems(node, jid);
-						if (log.isLoggable(Level.FINEST)) {
-							log.finest("DiscoItems processed by: " + comp.getComponentId()
-								+ ", items: " + (items == null ? null : items.toString()));
-						}
-						if (items != null && items.size() > 0) {
-							query.addChildren(items);
-						}
+		if (packet.isXMLNS("/iq/query", ITEMS_XMLNS)) {
+			boolean localDomain = isLocalDomain(jid);
+			if (localDomain) {
+				for (XMPPService comp : xmppServices.values()) {
+					//	if (localDomain || (nick != null && comp.getName().equals(nick))) {
+					List<Element> items = comp.getDiscoItems(node, jid, from);
+					if (log.isLoggable(Level.FINEST)) {
+						log.finest("DiscoItems processed by: " + comp.getComponentId() +
+								", items: " + (items == null ? null : items.toString()));
+					}
+					if (items != null && items.size() > 0) {
+						query.addChildren(items);
+					}
+				} // end of for ()
+			} else {
+				ServerComponent comp = getLocalComponent(packet.getElemTo(),
+						packet.getElemToHost(), packet.getElemToNick());
+				if (comp != null && comp instanceof XMPPService) {
+					List<Element> items = ((XMPPService)comp).getDiscoItems(node, jid, from);
+					if (log.isLoggable(Level.FINEST)) {
+						log.finest("DiscoItems processed by: " + comp.getComponentId() +
+								", items: " + (items == null ? null : items.toString()));
+					}
+					if (items != null && items.size() > 0) {
+						query.addChildren(items);
 					}
 				}
 			}
-			results.offer(packet.okResult(query, 0));
+		}
+		results.offer(packet.okResult(query, 0));
 	}
 
 	@Override
@@ -643,7 +644,8 @@ public class MessageRouter extends AbstractMessageReceiver {
 		return Runtime.getRuntime().availableProcessors();
 	}
 
-	public Element getDiscoInfo(String node, String jid) {
+	@Override
+	public Element getDiscoInfo(String node, String jid, String from) {
 		Element query = serviceEntity.getDiscoInfo(null);
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Returing disco-info: " + query.toString());
@@ -651,9 +653,9 @@ public class MessageRouter extends AbstractMessageReceiver {
 		return query;
 	}
 
-	public List<Element> getDiscoItems(String node, String jid) {
-		return null;
-	}
+//	public List<Element> getDiscoItems(String node, String jid) {
+//		return null;
+//	}
 
 	@Override
 	public void getStatistics(StatisticsList list) {

@@ -1,5 +1,3 @@
 package tigase.server;
 
-@Deprecated
-public interface DisableDisco {
-}
+public interface DisableDisco { }

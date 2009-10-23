@@ -26,26 +26,23 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import java.util.LinkedHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 import tigase.annotations.TODO;
-import tigase.conf.Configurable;
 import tigase.server.filters.PacketCounter;
 import tigase.stats.StatisticType;
 import tigase.stats.StatisticsContainer;
 import tigase.stats.StatisticsList;
-import tigase.util.JIDUtils;
-import tigase.util.DNSResolver;
+import tigase.util.PatternComparator;
 import tigase.util.PriorityQueue;
-import tigase.util.tracer.TigaseTracer;
 import tigase.vhosts.VHostItem;
 import tigase.vhosts.VHostListener;
 import tigase.vhosts.VHostManagerIfc;
@@ -59,16 +56,14 @@ import tigase.vhosts.VHostManagerIfc;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public abstract class AbstractMessageReceiver
-  implements StatisticsContainer, MessageReceiver, Configurable, VHostListener {
+public abstract class AbstractMessageReceiver extends BasicComponent
+  implements StatisticsContainer, MessageReceiver, VHostListener {
 
 	protected static final long SECOND = 1000;
 	protected static final long MINUTE = 60*SECOND;
 	protected static final long HOUR = 60*MINUTE;
 
-	private String DEF_HOSTNAME_PROP_VAL = DNSResolver.getDefaultHostname();
 	public static final String MAX_QUEUE_SIZE_PROP_KEY = "max-queue-size";
-	//  public static final Integer MAX_QUEUE_SIZE_PROP_VAL = Integer.MAX_VALUE;
   public static final Integer MAX_QUEUE_SIZE_PROP_VAL =
     new Long(Runtime.getRuntime().maxMemory()/400000L).intValue();
 
@@ -82,14 +77,8 @@ public abstract class AbstractMessageReceiver
 //	private static final TigaseTracer tracer = TigaseTracer.getTracer("abstract");
 
   protected int maxQueueSize = MAX_QUEUE_SIZE_PROP_VAL;
-	private String defHostname = DEF_HOSTNAME_PROP_VAL;
 
   private MessageReceiver parent = null;
-
-//	private final EnumMap<Priority, LinkedBlockingQueue<Packet>> in_queues =
-//					new EnumMap<Priority, LinkedBlockingQueue<Packet>>(Priority.class);
-//	private final EnumMap<Priority, LinkedBlockingQueue<Packet>> out_queues =
-//					new EnumMap<Priority, LinkedBlockingQueue<Packet>>(Priority.class);
 
 	// Array cache to speed processing up....
 	private Priority[] pr_cache = Priority.values();
@@ -101,35 +90,24 @@ public abstract class AbstractMessageReceiver
 		new PriorityQueue<Packet>(pr_cache.length, maxQueueSize);
 
 	private CopyOnWriteArrayList<PacketFilterIfc> incoming_filters =
-					new CopyOnWriteArrayList<PacketFilterIfc>();
+			new CopyOnWriteArrayList<PacketFilterIfc>();
 	private CopyOnWriteArrayList<PacketFilterIfc> outgoing_filters =
-					new CopyOnWriteArrayList<PacketFilterIfc>();
+			new CopyOnWriteArrayList<PacketFilterIfc>();
 
-	// 	private String sync = "SyncObject";
 	private Timer receiverTasks = null;
 	private ConcurrentHashMap<String, ReceiverTask> waitingTasks =
 					new ConcurrentHashMap<String, ReceiverTask>(16, 0.75f, 4);
 	private LinkedList<QueueListener> processingThreads = null;
 	private QueueListener out_thread = null;
-  //private boolean stopped = false;
-  private String name = null;
 	protected VHostManagerIfc vHostManager = null;
-	//private Set<String> routings = new CopyOnWriteArraySet<String>();
-	private Set<Pattern> regexRoutings = new CopyOnWriteArraySet<Pattern>();
+	private Set<Pattern> regexRoutings = 
+			new ConcurrentSkipListSet<Pattern>(new PatternComparator());
 	private long last_second_packets = 0;
 	private long packets_per_second = 0;
 	private long last_minute_packets = 0;
 	private long packets_per_minute = 0;
 	private long last_hour_packets = 0;
 	private long packets_per_hour = 0;
-//	private long curr_second = 0;
-//	private long curr_minute = 0;
-//	private long curr_hour = 0;
-//	private long[] seconds = new long[60];
-//	private int sec_idx = 0;
-//	private long[] minutes = new long[60];
-//	private int min_idx = 0;
-	private String compId = null;
 	private long[] processPacketTimings = new long[100];
 	private int pptIdx = 0;
 
@@ -146,19 +124,6 @@ public abstract class AbstractMessageReceiver
   private long statReceivedPacketsEr = 0;
   private long statSentPacketsEr = 0;
 	private long packetId = 0;
-
-	/**
-	 * Describe <code>getComponentId</code> method here.
-	 *
-	 * @return a <code>String</code> value
-	 */
-	@Override
-	public String getComponentId() {
-		return compId;
-	}
-	
-	@Override
-	public void initializationCompleted() {}
 
 	private boolean filterPacket(Packet packet,
 					CopyOnWriteArrayList<PacketFilterIfc> filters) {
@@ -191,7 +156,10 @@ public abstract class AbstractMessageReceiver
 		if (packet.getElemTo() != null) {
 			return packet.getElemTo().hashCode();
 		}
-		return packet.getTo().hashCode();
+		if (packet.getTo() != null) {
+			return packet.getTo().hashCode();
+		}
+		return 1;
 	}
 
 	public String newPacketId(String prefix) {
@@ -210,14 +178,10 @@ public abstract class AbstractMessageReceiver
 			log.finest("[" + getName() + "] queueIdx=" + queueIdx +
 							", " + packet.toString());
 		}
-//		boolean result = in_queue.offer(packet, packet.getPriority().ordinal(),
-//						getName() + ":" + QueueType.IN_QUEUE);
-		//boolean result = in_queue.offer(packet, packet.getPriority().ordinal());
 		boolean result = in_queues.get(queueIdx).offer(packet,
 						packet.getPriority().ordinal());
 		if (result) {
 			++statReceivedPacketsOk;
-//			++curr_second;
 		} else {
 			// Queue overflow!
 			++statReceivedPacketsEr;
@@ -248,12 +212,8 @@ public abstract class AbstractMessageReceiver
 							", " + packet.toString());
 		}
 		try {
-//			in_queue.put(packet, packet.getPriority().ordinal(),
-//							getName() + ":" + QueueType.IN_QUEUE);
-			//in_queue.put(packet, packet.getPriority().ordinal());
 			in_queues.get(queueIdx).put(packet, packet.getPriority().ordinal());
 			++statReceivedPacketsOk;
-//			++curr_second;
 		} catch (InterruptedException e) {
 			++statReceivedPacketsEr;
 			return false;
@@ -272,12 +232,9 @@ public abstract class AbstractMessageReceiver
 			log.finest("[" + getName() + "]  " + packet.toString());
 		}
 		boolean result = false;
-//		result = out_queue.offer(packet, packet.getPriority().ordinal(),
-//						getName() + ":" + QueueType.OUT_QUEUE);
 		result = out_queue.offer(packet, packet.getPriority().ordinal());
 		if (result) {
 			++statSentPacketsOk;
-			//++curr_second;
 		} else {
 			// Queue overflow!
 			++statSentPacketsEr;
@@ -297,11 +254,8 @@ public abstract class AbstractMessageReceiver
 			log.finest("[" + getName() + "]  " + packet.toString());
 		}
 		try {
-//			out_queue.put(packet, packet.getPriority().ordinal(),
-//							getName() + ":" + QueueType.OUT_QUEUE);
 			out_queue.put(packet, packet.getPriority().ordinal());
 			++statSentPacketsOk;
-			//++curr_second;
 		} catch (InterruptedException e) {
 			++statSentPacketsEr;
 			return false;
@@ -327,18 +281,13 @@ public abstract class AbstractMessageReceiver
 
 	@Override
   public void getStatistics(StatisticsList list) {
-//		long tmp = seconds[(sec_idx == 0 ? 59 : sec_idx - 1)];
-//		list.add(getName(), "Last second packets", tmp, Level.FINE);
 		list.add(getName(), "Last second packets", packets_per_second, Level.FINE);
-//		tmp = minutes[(min_idx == 0 ? 59 : min_idx - 1)];
-//		list.add(getName(), "Last minute packets", tmp, Level.FINE);
 		list.add(getName(), "Last minute packets", packets_per_minute, Level.FINE);
-//		list.add(getName(), "Last hour packets", curr_hour, Level.FINE);
 		list.add(getName(), "Last hour packets", packets_per_hour, Level.FINE);
 		list.add(getName(), StatisticType.MSG_RECEIVED_OK.getDescription(),
-						statReceivedPacketsOk, Level.FINE);
+				statReceivedPacketsOk, Level.FINE);
 		list.add(getName(), StatisticType.MSG_SENT_OK.getDescription(),
-						statSentPacketsOk, Level.FINE);
+				statSentPacketsOk, Level.FINE);
 		int[] in_priority_sizes = in_queues.get(0).size();
 		for (int i = 1; i < in_queues.size(); i++) {
 			int[] tmp_pr_sizes = in_queues.get(i).size();
@@ -391,12 +340,9 @@ public abstract class AbstractMessageReceiver
 	@Override
 	@TODO(note="Replace fixed filers loading with configurable options for that")
   public void setProperties(Map<String, Object> props) {
+		super.setProperties(props);
 		int queueSize = (Integer)props.get(MAX_QUEUE_SIZE_PROP_KEY);
-		//stopThreads();
 		setMaxQueueSize(queueSize);
-		//startThreads();
-		defHostname = (String)props.get(DEF_HOSTNAME_PROP_KEY);
-		compId = (String)props.get(COMPONENT_ID_PROP_KEY);
 		incoming_filters.clear();
 		outgoing_filters.clear();
 		PacketFilterIfc counter = new PacketCounter();
@@ -405,7 +351,6 @@ public abstract class AbstractMessageReceiver
 		counter = new PacketCounter();
 		counter.init(getName(), QueueType.OUT_QUEUE);
 		outgoing_filters.add(counter);
-		//addRouting(getComponentId());
   }
 
   public void setMaxQueueSize(int maxQueueSize) {
@@ -424,10 +369,6 @@ public abstract class AbstractMessageReceiver
     } // end of if (this.maxQueueSize != maxQueueSize)
   }
 
-	//   public void setLocalAddresses(String[] addresses) {
-	//     localAddresses = addresses;
-	//   }
-
 	protected Integer getMaxQueueSize(int def) {
 		return def;
 	}
@@ -437,8 +378,7 @@ public abstract class AbstractMessageReceiver
    */
 	@Override
   public Map<String, Object> getDefaults(Map<String, Object> params) {
-    Map<String, Object> defs = new LinkedHashMap<String, Object>();
-		//maxQueueSize = MAX_QUEUE_SIZE_PROP_VAL;
+    Map<String, Object> defs = super.getDefaults(params);
 		String queueSize = (String)params.get(GEN_MAX_QUEUE_SIZE);
 		int queueSizeInt = MAX_QUEUE_SIZE_PROP_VAL;
 		if (queueSize != null) {
@@ -449,17 +389,6 @@ public abstract class AbstractMessageReceiver
 			}
 		}
 		defs.put(MAX_QUEUE_SIZE_PROP_KEY, getMaxQueueSize(queueSizeInt));
-// 		if (params.get(GEN_VIRT_HOSTS) != null) {
-// 			DEF_HOSTNAME_PROP_VAL = ((String)params.get(GEN_VIRT_HOSTS)).split(",")[0];
-// 		} else {
-		// The default hostname must be a real name of the machine and is a separate
-		// thing from virtual hostnames. This is a critical parameter for proper
-		// MessageRouter working.
-		DEF_HOSTNAME_PROP_VAL = DNSResolver.getDefaultHostname();
-// 		}
-		defs.put(DEF_HOSTNAME_PROP_KEY, DEF_HOSTNAME_PROP_VAL);
-		defs.put(COMPONENT_ID_PROP_KEY, compId);
-
     return defs;
   }
 
@@ -471,20 +400,13 @@ public abstract class AbstractMessageReceiver
 	@Override
   public void setParent(MessageReceiver parent) {
     this.parent = parent;
-		//addRouting(getDefHostName());
   }
 
 	@Override
   public void setName(String name) {
-    this.name = name;
-		compId = JIDUtils.getNodeID(name, defHostname);
+		super.setName(name);
 		in_queues_size = processingThreads();
 		setMaxQueueSize(maxQueueSize);
-  }
-
-	@Override
-  public String getName() {
-    return name;
   }
 
 	private void stopThreads() {
@@ -516,28 +438,11 @@ public abstract class AbstractMessageReceiver
 	}
 
 	public synchronized void everySecond() {
-//		curr_minute -= seconds[sec_idx];
-//		seconds[sec_idx] = curr_second;
-//		curr_second = 0;
-//		curr_minute += seconds[sec_idx];
-//		if (sec_idx >= 59) {
-//			sec_idx = 0;
-//		} else {
-//			++sec_idx;
-//		}
     packets_per_second = statReceivedPacketsOk - last_second_packets;
 		last_second_packets = statReceivedPacketsOk;
 	}
 
 	public synchronized void everyMinute() {
-//		curr_hour -= minutes[min_idx];
-//		minutes[min_idx] = curr_minute;
-//		curr_hour += minutes[min_idx];
-//		if (min_idx >= 59) {
-//			min_idx = 0;
-//		} else {
-//			++min_idx;
-//		}
     packets_per_minute = statReceivedPacketsOk - last_minute_packets;
 		last_minute_packets = statReceivedPacketsOk;
 		receiverTasks.purge();
@@ -550,20 +455,18 @@ public abstract class AbstractMessageReceiver
 
 	private void startThreads() {
 		if (processingThreads == null) {
-			//stopped = false;
 			processingThreads = new LinkedList<QueueListener>();
 			for (int i = 0; i < in_queues_size; i++) {
 				QueueListener in_thread =
 								new QueueListener(in_queues.get(i), QueueType.IN_QUEUE);
-				in_thread.setName("in_" + i + "-" + name);
+				in_thread.setName("in_" + i + "-" + getName());
 				in_thread.start();
 				processingThreads.add(in_thread);
 			}
 		} // end of if (thread == null || ! thread.isAlive())
 		if (out_thread == null || ! out_thread.isAlive()) {
-			//stopped = false;
 			out_thread = new QueueListener(out_queue, QueueType.OUT_QUEUE);
-			out_thread.setName("out_" + name);
+			out_thread.setName("out_" + getName());
 			out_thread.start();
 		} // end of if (thread == null || ! thread.isAlive())
 		receiverTasks = new Timer(getName() + " tasks", true);
@@ -603,11 +506,6 @@ public abstract class AbstractMessageReceiver
   }
 
 	@Override
-	public String getDefHostName() {
-		return defHostname;
-	}
-
-	@Override
 	public boolean handlesLocalDomains() {
 		return false;
 	}
@@ -639,27 +537,6 @@ public abstract class AbstractMessageReceiver
 	public VHostItem getVHostItem(String domain) {
 		return vHostManager != null ? vHostManager.getVHostItem(domain) : null;
 	}
-
-//	public Set<String> getRoutings() {
-//		return routings;
-//	}
-
-//	public void addRouting(String address) {
-//		routings.add(address);
-//		log.fine(getName() + " - added routing: " + address);
-//	}
-
-//	public boolean removeRouting(String address) {
-//		return routings.remove(address);
-//	}
-
-//	public void clearRoutings() {
-//		routings.clear();
-//	}
-
-//	public boolean isInRoutings(String host) {
-//		return routings.contains(host);
-//	}
 
 	public Set<Pattern> getRegexRoutings() {
 		return regexRoutings;
@@ -726,6 +603,7 @@ public abstract class AbstractMessageReceiver
 				log.finest(getName() + " starting queue processing.");
 			}
 			Packet packet = null;
+			Queue<Packet> results = new LinkedList<Packet>();
 			while (! threadStopped) {
 				try {
 					// Now process next waiting packet
@@ -738,6 +616,7 @@ public abstract class AbstractMessageReceiver
 //					}
 					switch (type) {
 						case IN_QUEUE:
+							long startPPT = System.currentTimeMillis();
 //							tracer.trace(null, packet.getElemTo(), packet.getElemFrom(),
 //											packet.getFrom(),	getName(), type.name(), null, packet);
 							String id = packet.getTo() + packet.getId();
@@ -747,12 +626,22 @@ public abstract class AbstractMessageReceiver
 							} else {
 //								log.finest("[" + getName() + "]  " +
 //												"No task found for id: " + id);
-								long startPPT = System.currentTimeMillis();
-								if (!filterPacket(packet, incoming_filters)) {
+								// Maybe this is a command for local processing...
+								boolean processed = false;
+								if (packet.isCommand() && getComponentId().equals(packet.getElemTo())) {
+									processed = processScriptCommand(packet, results);
+									if (processed) {
+										Packet result = null;
+										while ((result = results.poll()) != null) {
+											addOutPacket(result);
+										}
+									}
+								}
+								if (!processed && !filterPacket(packet, incoming_filters)) {
 									processPacket(packet);
 								}
 								processPacketTimings[pptIdx] =
-												System.currentTimeMillis() - startPPT;
+										System.currentTimeMillis() - startPPT;
 								pptIdx = (pptIdx + 1) % processPacketTimings.length;
 							}
 							break;

@@ -42,7 +42,6 @@ import tigase.io.TLSUtil;
 import tigase.net.ConnectionOpenListener;
 import tigase.net.ConnectionOpenThread;
 import tigase.net.ConnectionType;
-import tigase.net.IOService;
 import tigase.net.SocketReadThread;
 import tigase.net.SocketType;
 import tigase.stats.StatisticsList;
@@ -64,7 +63,7 @@ import static tigase.io.SSLContextContainerIfc.*;
  * @version $Rev$
  */
 public abstract class ConnectionManager<IO extends XMPPIOService>
-	extends AbstractMessageReceiver implements XMPPIOServiceListener {
+	extends AbstractMessageReceiver implements XMPPIOServiceListener<IO> {
 
 	private static final Logger log =
     Logger.getLogger(ConnectionManager.class.getName());
@@ -77,7 +76,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 	protected static final String PORT_TYPE_PROP_KEY = "type";
 	protected static final String PORT_SOCKET_PROP_KEY = "socket";
 	protected static final String PORT_IFC_PROP_KEY = "ifc";
-	private static final String[] PORT_IFC_PROP_VAL = {"*"};
+	public String[] PORT_IFC_PROP_VAL = {"*"};
 	protected static final String PORT_CLASS_PROP_KEY = "class";
 	protected static final String PORT_REMOTE_HOST_PROP_KEY = "remote-host";
 	protected static final String PORT_REMOTE_HOST_PROP_VAL = "localhost";
@@ -131,6 +130,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 	protected static final String NET_BUFFER_PROP_KEY = "net-buffer";
 	protected static final int NET_BUFFER_ST_PROP_VAL = 2 * 1024;
 	protected static final int NET_BUFFER_HT_PROP_VAL = 64 * 1024;
+
+	public static final String PORT_LOCAL_HOST_PROP_KEY = "local-host";
 
 	private static ConnectionOpenThread connectThread =
 		ConnectionOpenThread.getInstance();
@@ -396,20 +397,21 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 
 	// Implementation of tigase.net.PacketListener
 
-	/**
-	 * Describe <code>packetsReady</code> method here.
-	 *
-	 * @param s an <code>IOService</code> value
-	 * @throws IOException
-	 */
-	@SuppressWarnings({"unchecked"})
-	public void packetsReady(IOService s) throws IOException {
-		if (log.isLoggable(Level.FINEST)) {
-			log.finest("packetsReady called");
-		}
-		IO serv = (IO)s;
-		packetsReady(serv);
-	}
+//	/**
+//	 * Describe <code>packetsReady</code> method here.
+//	 *
+//	 * @param s an <code>IOService</code> value
+//	 * @throws IOException
+//	 */
+//	@SuppressWarnings({"unchecked"})
+//	@Override
+//	public void packetsReady(IOService s) throws IOException {
+//		if (log.isLoggable(Level.FINEST)) {
+//			log.finest("packetsReady called");
+//		}
+//		IO serv = (IO)s;
+//		packetsReady(serv);
+//	}
 
 	public void packetsReady(IO serv) throws IOException {
 		writePacketsToSocket(serv, processSocketData(serv));
@@ -537,18 +539,19 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 
 	public abstract Queue<Packet> processSocketData(IO serv);
 
-	@SuppressWarnings({"unchecked"})
-	@Override
-	public void serviceStopped(IOService s) {
-		IO ios = (IO)s;
-		serviceStopped(ios);
-	}
+//	@SuppressWarnings({"unchecked"})
+//	@Override
+//	public void serviceStopped(IOService s) {
+//		IO ios = (IO)s;
+//		serviceStopped(ios);
+//	}
 
 	/**
 	 * 
 	 * @param service
 	 * @return
 	 */
+	@Override
 	public boolean serviceStopped(IO service) {
 		//synchronized(service) {
 		String id = getUniqueId(service);
@@ -614,41 +617,41 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 		return JIDUtils.getNodeResource(jid);
 	}
 
-	@SuppressWarnings({"unchecked"})
-	@Override
-	public void streamClosed(XMPPIOService s) {
-		IO serv = (IO)s;
-		xmppStreamClosed(serv);
-	}
-
-	public abstract void xmppStreamClosed(IO serv);
-
-	/**
-	 * The method is called upon XMPP stream open event.
-	 * @param s is an XMPPIOService object associated with the newly opened network
-	 * connection.
-	 * @param attribs is a Map with all attributes found in the XMPP Stream open element.
-	 * @return A String of raw data which should be sent back to the network
-	 * connection.
-	 */
-	@SuppressWarnings({"unchecked"})
-	@Override
-	public String streamOpened(XMPPIOService s, Map<String, String> attribs) {
-		IO serv = (IO)s;
-		return xmppStreamOpened(serv, attribs);
-	}
-
-	/**
-	 * Method is called on the new XMPP Stream open event. This method is normally
-	 * called from streamOpen(...) method.
-	 * @param s is an IOService object associated with the network connection
-	 * where the XMPP Stream open event occured.
-	 * @param attribs is a Map with all attributes found in the XMPP Stream open element.
-	 * @return A String of raw data which should be sent back to the network
-	 * connection.
-	 */
-	public abstract String xmppStreamOpened(IO s, Map<String, String> attribs);
-
+//	@SuppressWarnings({"unchecked"})
+//	@Override
+//	public void streamClosed(IO s) {
+//		IO serv = (IO)s;
+//		xmppStreamClosed(serv);
+//	}
+//
+//	public abstract void xmppStreamClosed(IO serv);
+//
+//	/**
+//	 * The method is called upon XMPP stream open event.
+//	 * @param s is an XMPPIOService object associated with the newly opened network
+//	 * connection.
+//	 * @param attribs is a Map with all attributes found in the XMPP Stream open element.
+//	 * @return A String of raw data which should be sent back to the network
+//	 * connection.
+//	 */
+//	@SuppressWarnings({"unchecked"})
+//	@Override
+//	public String streamOpened(IO s, Map<String, String> attribs) {
+//		IO serv = (IO)s;
+//		return xmppStreamOpened(serv, attribs);
+//	}
+//
+//	/**
+//	 * Method is called on the new XMPP Stream open event. This method is normally
+//	 * called from streamOpen(...) method.
+//	 * @param s is an IOService object associated with the network connection
+//	 * where the XMPP Stream open event occured.
+//	 * @param attribs is a Map with all attributes found in the XMPP Stream open element.
+//	 * @return A String of raw data which should be sent back to the network
+//	 * connection.
+//	 */
+//	public abstract String xmppStreamOpened(IO s, Map<String, String> attribs);
+//
 	/**
 	 * Returns number of active network connections (IOServices).
 	 * @return number of active network connections (IOServices).
@@ -667,7 +670,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 		list.add(getName(), "Open connections", services_size, Level.INFO);
 		if (list.checkLevel(Level.FINEST)) {
 			int waitingToSendSize = 0;
-			for (XMPPIOService serv : services.values()) {
+			for (IO serv : services.values()) {
 				waitingToSendSize += serv.waitingToSendSize();
 			}
 			list.add(getName(), "Waiting to send", waitingToSendSize, Level.FINEST);
@@ -731,6 +734,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 			return SocketType.valueOf(port_props.get(PORT_SOCKET_PROP_KEY).toString());
 		}
 
+		@SuppressWarnings({"unchecked"})
 		@Override
 		public void accept(SocketChannel sc) {
 

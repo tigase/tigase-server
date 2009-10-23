@@ -143,7 +143,7 @@ public class Packet {
 		initVars();
 	}
 
-	private void initVars() {
+	public void initVars() {
 		elemTo = elem.getAttribute("to");
 		if (elemTo != null) {
 			elemToHost = JIDUtils.getNodeHost(elemTo);
