@@ -225,7 +225,8 @@ public class Gateway extends AbstractMessageReceiver
 		return null;
 	}
 
-	private boolean isAdmin(String jid) {
+	@Override
+	public boolean isAdmin(String jid) {
 		for (String adm: admins) {
 			if (adm.equals(JIDUtils.getNodeID(jid))) {
 				return true;
@@ -550,9 +551,11 @@ public class Gateway extends AbstractMessageReceiver
 		}
 	}
 
-	public 	List<Element> getDiscoFeatures() { return null; }
+	@Override
+	public 	List<Element> getDiscoFeatures(String from) { return null; }
 
-	public List<Element> getDiscoItems(String node, String jid) {
+	@Override
+	public List<Element> getDiscoItems(String node, String jid, String from) {
 		if (jid.startsWith(getName()+".")) {
 			return serviceEntity.getDiscoItems(node, null);
 		} else {
@@ -561,7 +564,8 @@ public class Gateway extends AbstractMessageReceiver
 		}
 	}
 
-	public Element getDiscoInfo(String node, String jid) {
+	@Override
+	public Element getDiscoInfo(String node, String jid, String from) {
 		if (jid != null && jid.startsWith(getName()+".")) {
 			return serviceEntity.getDiscoInfo(node);
 		}
