@@ -33,7 +33,6 @@ import javax.management.ObjectName;
 import tigase.conf.Configurator;
 import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
-import tigase.disco.XMPPService;
 import tigase.server.AbstractComponentRegistrator;
 import tigase.server.Command;
 import tigase.server.Packet;
@@ -55,9 +54,9 @@ import tigase.util.JIDUtils;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class StatisticsCollector
-	extends AbstractComponentRegistrator<StatisticsContainer>
-	implements XMPPService, ShutdownHook {
+public class StatisticsCollector 
+		extends AbstractComponentRegistrator<StatisticsContainer>
+		implements ShutdownHook {
 
 	public static final String STATISTICS_MBEAN_NAME =
 					"tigase.stats:type=StatisticsProvider";
@@ -251,39 +250,42 @@ public class StatisticsCollector
 	}
 
 	@Override
-	public Element getDiscoInfo(String node, String jid) {
-		if (jid != null && getName().equals(JIDUtils.getNodeNick(jid))) {
+	public Element getDiscoInfo(String node, String jid, String from) {
+		if (jid != null && getName().equals(JIDUtils.getNodeNick(jid)) && isAdmin(from)) {
 			return serviceEntity.getDiscoInfo(node);
 		}
 		return null;
 	}
 
 	@Override
-	public 	List<Element> getDiscoFeatures() { return null; }
+	public 	List<Element> getDiscoFeatures(String from) { return null; }
 
 	@Override
-	public List<Element> getDiscoItems(String node, String jid) {
-		if (getName().equals(JIDUtils.getNodeNick(jid)) ||
-						getComponentId().equals(jid)) {
-			List<Element> items = serviceEntity.getDiscoItems(node, jid);
-			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Processing discoItems for node: " + node + ", result: "
-					+ (items == null ? null : items.toString()));
-			}
-			return items;
-		} else {
-			if (node == null) {
-				Element item = serviceEntity.getDiscoItem(null,
-								JIDUtils.getNodeID(getName(), jid));
-    			if (log.isLoggable(Level.FINEST)) {
-        			log.finest("Processing discoItems, result: " +
-            					(item == null ? null : item.toString()));
-                }
-				return Arrays.asList(item);
+	public List<Element> getDiscoItems(String node, String jid, String from) {
+		if (isAdmin(from)) {
+			if (getName().equals(JIDUtils.getNodeNick(jid)) ||
+					getComponentId().equals(jid)) {
+				List<Element> items = serviceEntity.getDiscoItems(node, jid);
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("Processing discoItems for node: " + node + ", result: " + 
+							(items == null ? null : items.toString()));
+				}
+				return items;
 			} else {
-				return null;
+				if (node == null) {
+					Element item = serviceEntity.getDiscoItem(null,
+							JIDUtils.getNodeID(getName(), jid));
+					if (log.isLoggable(Level.FINEST)) {
+						log.finest("Processing discoItems, result: " +
+								(item == null ? null : item.toString()));
+					}
+					return Arrays.asList(item);
+				} else {
+					return null;
+				}
 			}
 		}
+		return null;
 	}
 
 	@Override
