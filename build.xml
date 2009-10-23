@@ -39,8 +39,7 @@
  </target>
 
  <target name="jar-file" description="Create jar file, called from other targets">
-  <compile srcdir="${src}"
-   xlint="-Xlint:all"/>
+  <compile srcdir="${src}" xlint="-Xlint:all,-path"/>
   <jarfile
    filename="${projectname}-${jarfile}"
    excludes="**/*TestCase*.*,TestAll.*"/>
