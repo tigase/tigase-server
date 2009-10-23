@@ -59,7 +59,8 @@ import tigase.xmpp.PacketErrorTypeException;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
+public class ClientConnectionManager
+		extends ConnectionManager<XMPPIOService<Object>> {
 	//	implements XMPPService {
 
   /**
@@ -148,7 +149,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 	}
 
 	protected void processCommand(final Packet packet) {
-		XMPPIOService serv = getXMPPIOService(packet);
+		XMPPIOService<Object> serv = getXMPPIOService(packet);
 		switch (packet.getCommand()) {
 			case GETFEATURES:
 				if (packet.getType() == StanzaType.result) {
@@ -282,7 +283,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 	}
 
 	protected String changeDataReceiver(Packet packet, String newAddress,
-		String command_sessionId, XMPPIOService serv) {
+		String command_sessionId, XMPPIOService<Object> serv) {
 		if (serv != null) {
 			String serv_sessionId =
           (String)serv.getSessionData().get(XMPPIOService.SESSION_ID_KEY);
@@ -300,7 +301,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 	}
 
 	@Override
-	public Queue<Packet> processSocketData(XMPPIOService serv) {
+	public Queue<Packet> processSocketData(XMPPIOService<Object> serv) {
 
 		String id = getUniqueId(serv);
 		//String hostname = (String)serv.getSessionData().get(serv.HOSTNAME_KEY);
@@ -370,7 +371,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 	}
 
 	private XMPPResourceConnection getXMPPSession(Packet p) {
-		XMPPIOService serv = getXMPPIOService(p);
+		XMPPIOService<Object> serv = getXMPPIOService(p);
 		return serv == null ? null :
 			(XMPPResourceConnection)serv.getSessionData().get("xmpp-session");
 	}
@@ -401,7 +402,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 	}
 
 	@Override
-	public String xmppStreamOpened(XMPPIOService serv,
+	public String xmppStreamOpened(XMPPIOService<Object> serv,
 		Map<String, String> attribs) {
 		if (log.isLoggable(Level.FINER)) {
 			log.finer("Stream opened: " + attribs.toString());
@@ -475,7 +476,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 	}
 
 	@Override
-	public boolean serviceStopped(XMPPIOService service) {
+	public boolean serviceStopped(XMPPIOService<Object> service) {
 		boolean result = super.serviceStopped(service);
 		// It might be a Bosh service in which case it is ignored here.
 		if (service.getXMLNS() == XMLNS) {
@@ -510,7 +511,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 	}
 
 	@Override
-	public void xmppStreamClosed(XMPPIOService serv) {
+	public void xmppStreamClosed(XMPPIOService<Object> serv) {
 		if (log.isLoggable(Level.FINER)) {
 			log.finer("Stream closed: " + serv.getUniqueId());
 		}
@@ -542,8 +543,8 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 	}
 
 	@Override
-	protected XMPPIOService getXMPPIOServiceInstance() {
-		return new XMPPIOService();
+	protected XMPPIOService<Object> getXMPPIOServiceInstance() {
+		return new XMPPIOService<Object>();
 	}
 
 	protected ReceiverEventHandler newStoppedHandler() {
@@ -577,6 +578,16 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 		return Runtime.getRuntime().availableProcessors();
 	}
 
+	@Override
+	public String getDiscoDescription() {
+		return "Client connection manager";
+	}
+
+	@Override
+	public String getDiscoCategory() {
+		return "c2s";
+	}
+
 	private class StoppedHandler implements ReceiverEventHandler {
 
 		@Override
@@ -607,7 +618,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService> {
 			// In either case we disconnect the connection.
 			log.info("No response within time limit received for a packet: " +
 							packet.toString());
-			XMPPIOService serv = getXMPPIOService(packet.getFrom());
+			XMPPIOService<Object> serv = getXMPPIOService(packet.getFrom());
 			if (serv != null) {
 				serv.stop();
 			} else {
