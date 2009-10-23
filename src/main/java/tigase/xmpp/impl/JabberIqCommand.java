@@ -91,8 +91,8 @@ public class JabberIqCommand extends XMPPProcessor implements XMPPProcessorIfc {
 
 		try {
 			if (log.isLoggable(Level.FINEST)) {
-    			log.finest("Received packet: " + packet.getStringData());
-            }
+				log.finest("Received packet: " + packet.getStringData());
+			}
 
 			// Not needed anymore. Packet filter does it for all stanzas.
 // 			// For all messages coming from the owner of this account set
@@ -102,6 +102,10 @@ public class JabberIqCommand extends XMPPProcessor implements XMPPProcessorIfc {
 // 				packet.getElement().setAttribute("from", session.getJID());
 // 			} // end of if (packet.getFrom().equals(session.getConnectionId()))
 
+			if (packet.getElemTo() == null) {
+				packet.getElement().setAttribute("to", session.getSMComponentId());
+				packet.initVars();
+			}
 			String id = JIDUtils.getNodeID(packet.getElemTo());
 
 			if (id.equals(session.getUserId())) {
