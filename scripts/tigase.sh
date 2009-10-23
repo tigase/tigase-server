@@ -67,12 +67,14 @@ if [ -z "${JAVA_HOME}" ] ; then
   echo "Please set it to correct value before starting the sever."
   exit 1
 fi
+set -x
 if [ -z "${TIGASE_HOME}" ] ; then
   if [ ${0:0:1} = '/' ] ; then
     TIGASE_HOME=${0}
   else
     TIGASE_HOME=${PWD}/${0}
   fi
+  TIGASE_HOME=`dirname ${TIGASE_HOME}`
   TIGASE_HOME=`dirname ${TIGASE_HOME}`
   TIGASE_JAR=""
 fi
