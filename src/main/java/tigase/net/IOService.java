@@ -66,10 +66,12 @@ import tigase.util.TimeUtils;
  * <p>
  * Created: Tue Sep 28 23:00:34 2004
  * </p>
+ * @param <RefObject> is a refrence object stored by this service. This is e reference
+ * to higher level data object keeping more information about the connection.
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public abstract class IOService implements Callable<IOService> {
+public abstract class IOService<RefObject> implements Callable<IOService> {
 
   /**
    * Variable <code>log</code> is a class logger.
@@ -102,8 +104,9 @@ public abstract class IOService implements Callable<IOService> {
 	private long[] wrData = new long[60];
 	private int lastMinuteRd = 0;
 	private int lastMinuteWr = 0;
+	private RefObject refObject = null;
 
-	private IOServiceListener serviceListener = null;
+	private IOServiceListener<IOService<RefObject>> serviceListener = null;
 
 	private ConcurrentMap<String, Object> sessionData =
 		new ConcurrentHashMap<String, Object>(4, 0.75f, 4);
@@ -117,6 +120,14 @@ public abstract class IOService implements Callable<IOService> {
   private CharsetDecoder decoder = Charset.forName("UTF-8").newDecoder();
 
 	private String dataReceiver = null;
+
+	public void setRefObject(RefObject refObject) {
+		this.refObject = refObject;
+	}
+	
+	public RefObject getRefObject() {
+		return refObject;
+	}
 
 	private void addRead(long read) {
 		int minute = TimeUtils.getMinuteNow();
@@ -191,7 +202,7 @@ public abstract class IOService implements Callable<IOService> {
 		socketIO = new ZLibIO(socketIO, level);
 	}
 
-	public void setIOServiceListener(IOServiceListener sl) {
+	public void setIOServiceListener(IOServiceListener<IOService<RefObject>> sl) {
 		this.serviceListener = sl;
 	}
 
@@ -303,7 +314,7 @@ public abstract class IOService implements Callable<IOService> {
 			}
 		} finally {
 			if (serviceListener != null) {
-				IOServiceListener tmp = serviceListener;
+				IOServiceListener<IOService<RefObject>> tmp = serviceListener;
 				serviceListener = null;
 				tmp.serviceStopped(this);
 			}

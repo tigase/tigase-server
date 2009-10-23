@@ -266,6 +266,7 @@ public class SocketReadThread implements Runnable {
 	 * Describe <code>run</code> method here.
 	 *
 	 */
+	@SuppressWarnings({"unchecked"})
 	@Override
 	public void run() {
     while (!stopping) {
