@@ -46,4 +46,6 @@ public interface SessionManagerHandler {
 
 	boolean isLocalDomain(String domain, boolean includeComponents);
 
+	String getComponentId();
+
 }

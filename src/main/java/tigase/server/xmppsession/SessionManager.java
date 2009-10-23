@@ -23,9 +23,7 @@
 package tigase.server.xmppsession;
 
 //import tigase.auth.TigaseConfiguration;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
+import tigase.server.script.CommandIfc;
 import java.security.Security;
 import java.util.Arrays;
 import java.util.Collection;
@@ -45,8 +43,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.concurrent.CopyOnWriteArraySet;
 import javax.script.Bindings;
-import javax.script.ScriptEngineFactory;
-import javax.script.ScriptEngineManager;
 import tigase.auth.TigaseSaslProvider;
 import tigase.conf.Configurable;
 import tigase.db.DataOverwriteException;
@@ -56,8 +52,6 @@ import tigase.db.TigaseDBException;
 import tigase.db.UserAuthRepository;
 import tigase.db.UserNotFoundException;
 import tigase.db.UserRepository;
-import tigase.disco.ServiceEntity;
-import tigase.disco.ServiceIdentity;
 import tigase.disco.XMPPService;
 import tigase.server.AbstractMessageReceiver;
 import tigase.server.Command;
@@ -104,8 +98,7 @@ import static tigase.server.xmppsession.SessionManagerConfig.*;
  * @version $Rev$
  */
 public class SessionManager extends AbstractMessageReceiver
-	implements Configurable, XMPPService, SessionManagerHandler,
-				OnlineJidsReporter {
+	implements Configurable, SessionManagerHandler,	OnlineJidsReporter {
 
   /**
    * Variable <code>log</code> is a class logger.
@@ -122,7 +115,6 @@ public class SessionManager extends AbstractMessageReceiver
 	private NonAuthUserRepository naUserRepository = null;
 	private PacketFilter filter = null;
 
-	private Set<String> admins = new CopyOnWriteArraySet<String>();
 	//{"admin@localhost"};
 	private Set<String> trusted = new CopyOnWriteArraySet<String>();
 	//{"admin@localhost"};
@@ -151,8 +143,6 @@ public class SessionManager extends AbstractMessageReceiver
 			new ConcurrentSkipListMap<String, Map<String, Object>>();
 	private Map<String, XMPPPacketFilterIfc> outFilters =
 			new ConcurrentSkipListMap<String, XMPPPacketFilterIfc>();
-	private Map<String, AdminCommandIfc> adminCommands =
-			new ConcurrentSkipListMap<String, AdminCommandIfc>();
 	private ProcessingThreads<SessionCloseWorkerThread> sessionCloseThread =
 			new ProcessingThreads<SessionCloseWorkerThread>(
 			new SessionCloseWorkerThread(), 4, 1, maxQueueSize, "session-close");
@@ -161,8 +151,6 @@ public class SessionManager extends AbstractMessageReceiver
 			new SessionOpenWorkerThread(this), 1, 1, maxQueueSize, "session-open");
 	private Timer authenticationWatchdog = new Timer("SM authentocation watchdog");
 
-	private ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
-
 	private ConnectionCheckCommandHandler connectionCheckCommandHandler =
 					new ConnectionCheckCommandHandler();
 
@@ -170,7 +158,6 @@ public class SessionManager extends AbstractMessageReceiver
 
 	//private XMPPResourceConnection serverSession = null;
 
-	private ServiceEntity serviceEntity = null;
 //	private ServiceEntity adminDisco = null;
 
 	private int maxUserSessions = 0;
@@ -227,40 +214,31 @@ public class SessionManager extends AbstractMessageReceiver
 	@Override
 	public void setName(String name) {
 		super.setName(name);
-		serviceEntity = new ServiceEntity(name, "sm", "Session manager");
-		serviceEntity.addIdentities(
-			new ServiceIdentity("component", "sm", "Session manager"));
-		AdminCommandIfc command = new AddScriptCommand();
-		command.init(AdminCommandIfc.ADD_SCRIPT_CMD, "New command script");
-		adminCommands.put(command.getCommandId(), command);
-		ServiceEntity item = new ServiceEntity(getName(),
-						"http://jabber.org/protocol/admin#" + command.getCommandId(),
-						command.getDescription());
-		item.addIdentities(
-						new ServiceIdentity("component", "generic", command.getDescription()),
-						new ServiceIdentity("automation", "command-node",	command.getDescription()));
-		item.addFeatures(CMD_FEATURES);
-		serviceEntity.addItems(item);
-		command = new RemoveScriptCommand();
-		command.init(AdminCommandIfc.DEL_SCRIPT_CMD, "Remove command script");
-		adminCommands.put(command.getCommandId(), command);
-		item = new ServiceEntity(getName(), 
-						"http://jabber.org/protocol/admin#" + command.getCommandId(),
-						command.getDescription());
-		item.addIdentities(
-						new ServiceIdentity("component", "generic", command.getDescription()),
-						new ServiceIdentity("automation", "command-node",	command.getDescription()));
-		item.addFeatures(CMD_FEATURES);
-		serviceEntity.addItems(item);
-		List<ScriptEngineFactory> scriptFactories = 
-						scriptEngineManager.getEngineFactories();
-		if (scriptFactories != null) {
-			for (ScriptEngineFactory scriptEngineFactory : scriptFactories) {
-				log.info("Found script engine for language: " +
-								scriptEngineFactory.getLanguageName() + ", version: " +
-								scriptEngineFactory.getLanguageVersion());
-			}
-		}
+//		serviceEntity = new ServiceEntity(name, "sm", "Session manager");
+//		serviceEntity.addIdentities(
+//			new ServiceIdentity("component", "sm", "Session manager"));
+//		CommandIfc command = new AddScriptCommand();
+//		command.init(CommandIfc.ADD_SCRIPT_CMD, "New command script");
+//		adminCommands.put(command.getCommandId(), command);
+//		ServiceEntity item = new ServiceEntity(getName(),
+//						"http://jabber.org/protocol/admin#" + command.getCommandId(),
+//						command.getDescription());
+//		item.addIdentities(
+//						new ServiceIdentity("component", "generic", command.getDescription()),
+//						new ServiceIdentity("automation", "command-node",	command.getDescription()));
+//		item.addFeatures(CMD_FEATURES);
+//		serviceEntity.addItems(item);
+//		command = new RemoveScriptCommand();
+//		command.init(CommandIfc.DEL_SCRIPT_CMD, "Remove command script");
+//		adminCommands.put(command.getCommandId(), command);
+//		item = new ServiceEntity(getName(),
+//						"http://jabber.org/protocol/admin#" + command.getCommandId(),
+//						command.getDescription());
+//		item.addIdentities(
+//						new ServiceIdentity("component", "generic", command.getDescription()),
+//						new ServiceIdentity("automation", "command-node",	command.getDescription()));
+//		item.addFeatures(CMD_FEATURES);
+//		serviceEntity.addItems(item);
 		TigaseRuntime.getTigaseRuntime().addOnlineJidsReporter(this);
 	}
 
@@ -523,15 +501,6 @@ public class SessionManager extends AbstractMessageReceiver
 	@Override
 	public int processingThreads() {
 		return Runtime.getRuntime().availableProcessors();
-	}
-
-	private boolean isAdmin(String jid) {
-		for (String adm: admins) {
-			if (adm.equals(JIDUtils.getNodeID(jid))) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	protected boolean isTrusted(String jid) {
@@ -834,81 +803,79 @@ public class SessionManager extends AbstractMessageReceiver
 			processing_result = true;
 			break;
 		case OTHER:
-			String strCommand = pc.getStrCommand();
-			if (strCommand != null && strCommand.contains(ADMIN_COMMAND_NODE)) {
-				Command.Action action = Command.getAction(pc);
-				if (action != Command.Action.cancel) {
-					boolean admin = false;
-					try {
-						admin = connection != null && connection.isAuthorized() &&
-										isAdmin(connection.getUserId());
-						if (admin) {
-							if (log.isLoggable(Level.FINER)) {
-								log.finer("Processing admin command: " + pc.toString());
-							}
-							int hashIdx = strCommand.indexOf('#');
-							String scriptId = strCommand.substring(hashIdx + 1);
-							AdminCommandIfc com = adminCommands.get(scriptId);
-							if (com == null) {
-								Packet result = pc.commandResult(Command.DataType.result);
-								Command.addTextField(result, "Error", "The command: " + scriptId +
-												" is not available yet.");
-								fastAddOutPacket(result);
-							} else {
-								Bindings binds = scriptEngineManager.getBindings();
-								initBindings(binds);
-								Queue<Packet> results = new LinkedList<Packet>();
-								com.runCommand(pc, binds, results);
-								addOutPackets(results);
-							}
-						}
-					} catch (NotAuthorizedException e) {
-						admin = false;
-					} catch (Exception e) {
-						log.log(Level.WARNING,
-										"Unknown admin command processing exception: " +
-										pc.toString(), e);
-					}
-					if (!admin) {
-						try {
-							if (log.isLoggable(Level.FINER)) {
-								log.finer("Command rejected non-admin detected: " +
-												(connection != null ? (connection.isAuthorized() +
-												": " + connection.getUserId())
-												: "null"));
-							}
-							addOutPacket(Authorization.FORBIDDEN.getResponseMessage(pc,
-											"Only Administrator can call the command.", true));
-						} catch (Exception e) {
-							log.info("Problem sending FORBIDDEN error: " + e +
-											", packet: " + pc.toString());
-						}
-					}
-				} else {
-					Packet result = pc.commandResult(Command.DataType.result);
-					Command.addTextField(result, "Note", "Command canceled.");
-					fastAddOutPacket(result);
-
-				}
-				processing_result = true;
-			} else {
-				log.info("Other command found: " + pc.getStrCommand());
-			}
-			break;
+//			String strCommand = pc.getStrCommand();
+//			if (strCommand != null && strCommand.contains(ADMIN_COMMAND_NODE)) {
+//				Command.Action action = Command.getAction(pc);
+//				if (action != Command.Action.cancel) {
+//					boolean admin = false;
+//					try {
+//						admin = connection != null && connection.isAuthorized() &&
+//										isAdmin(connection.getUserId());
+//						if (admin) {
+//							if (log.isLoggable(Level.FINER)) {
+//								log.finer("Processing admin command: " + pc.toString());
+//							}
+//							int hashIdx = strCommand.indexOf('#');
+//							String scriptId = strCommand.substring(hashIdx + 1);
+//							CommandIfc com = adminCommands.get(scriptId);
+//							if (com == null) {
+//								Packet result = pc.commandResult(Command.DataType.result);
+//								Command.addTextField(result, "Error", "The command: " + scriptId +
+//												" is not available yet.");
+//								fastAddOutPacket(result);
+//							} else {
+//								Bindings binds = scriptEngineManager.getBindings();
+//								initBindings(binds);
+//								Queue<Packet> results = new LinkedList<Packet>();
+//								com.runCommand(pc, binds, results);
+//								addOutPackets(results);
+//							}
+//						}
+//					} catch (NotAuthorizedException e) {
+//						admin = false;
+//					} catch (Exception e) {
+//						log.log(Level.WARNING,
+//										"Unknown admin command processing exception: " +
+//										pc.toString(), e);
+//					}
+//					if (!admin) {
+//						try {
+//							if (log.isLoggable(Level.FINER)) {
+//								log.finer("Command rejected non-admin detected: " +
+//												(connection != null ? (connection.isAuthorized() +
+//												": " + connection.getUserId())
+//												: "null"));
+//							}
+//							addOutPacket(Authorization.FORBIDDEN.getResponseMessage(pc,
+//											"Only Administrator can call the command.", true));
+//						} catch (Exception e) {
+//							log.info("Problem sending FORBIDDEN error: " + e +
+//											", packet: " + pc.toString());
+//						}
+//					}
+//				} else {
+//					Packet result = pc.commandResult(Command.DataType.result);
+//					Command.addTextField(result, "Note", "Command canceled.");
+//					fastAddOutPacket(result);
+//
+//				}
+//				processing_result = true;
+//			} else {
+//				log.info("Other command found: " + pc.getStrCommand());
+//			}
+//			break;
 		default:
 			break;
 		} // end of switch (pc.getCommand())
 		return processing_result;
 	}
 
-	private void initBindings(Bindings binds) {
-		binds.put(AdminCommandIfc.ADMN_CMDS, adminCommands);
-		binds.put(AdminCommandIfc.AUTH_REPO, auth_repository);
-		binds.put(AdminCommandIfc.USER_CONN, connectionsByFrom);
-		binds.put(AdminCommandIfc.USER_REPO, user_repository);
-		binds.put(AdminCommandIfc.USER_SESS, sessionsByNodeId);
-		binds.put(AdminCommandIfc.ADMN_DISC, serviceEntity);
-		binds.put(AdminCommandIfc.SCRI_MANA, scriptEngineManager);
+	public void initBindings(Bindings binds) {
+		super.initBindings(binds);
+		binds.put(CommandIfc.AUTH_REPO, auth_repository);
+		binds.put(CommandIfc.USER_CONN, connectionsByFrom);
+		binds.put(CommandIfc.USER_REPO, user_repository);
+		binds.put(CommandIfc.USER_SESS, sessionsByNodeId);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -1261,12 +1228,12 @@ public class SessionManager extends AbstractMessageReceiver
 		registerNewSession(getComponentId(), createUserSession(NULL_ROUTING, getDefHostName()));
 //		loginUserSession(NULL_ROUTING, getDefHostName(),
 //						getComponentId(), null, ConnectionStatus.NORMAL, getComponentId());
-		String[] admins_tmp = (String[])props.get(ADMINS_PROP_KEY);
-		if (admins_tmp != null) {
-			for (String admin : admins_tmp) {
-				admins.add(admin);
-			}
-		}
+//		String[] admins_tmp = (String[])props.get(ADMINS_PROP_KEY);
+//		if (admins_tmp != null) {
+//			for (String admin : admins_tmp) {
+//				admins.add(admin);
+//			}
+//		}
 		String[] trusted_tmp = (String[])props.get(TRUSTED_PROP_KEY);
 		if (trusted_tmp != null) {
 			for (String trust : trusted_tmp) {
@@ -1274,53 +1241,53 @@ public class SessionManager extends AbstractMessageReceiver
 			}
 		}
 		// Loading admin scripts....
-		String descrStr = "AS:Description: ";
-		String cmdIdStr = "AS:CommandId: ";
-		String scriptsPath = (String) props.get(ADMIN_SCRIPTS_PROP_KEY);
-		File file = null;
-		AddScriptCommand addCommand = new AddScriptCommand();
-		Bindings binds = scriptEngineManager.getBindings();
-		initBindings(binds);
-		try {
-			File adminDir = new File(scriptsPath);
-			if (adminDir != null) {
-				for (File f : adminDir.listFiles()) {
-					String cmdId = null;
-					String cmdDescr = null;
-					file = f;
-					StringBuilder sb = new StringBuilder();
-					BufferedReader buffr = new BufferedReader(new FileReader(file));
-					String line = null;
-					while ((line = buffr.readLine()) != null) {
-						sb.append(line + "\n");
-						int idx = line.indexOf(descrStr);
-						if (idx >= 0) {
-							cmdDescr = line.substring(idx + descrStr.length());
-						}
-						idx = line.indexOf(cmdIdStr);
-						if (idx >= 0) {
-							cmdId = line.substring(idx + cmdIdStr.length());
-						}
-					}
-					buffr.close();
-					if (cmdId == null || cmdDescr == null) {
-						log.warning("Admin script found but it has no command ID or command description: " +
-										file);
-						continue;
-					}
-					int idx = file.toString().lastIndexOf(".");
-					String ext = file.toString().substring(idx + 1);
-					addCommand.addAdminScript(cmdId, cmdDescr, sb.toString(), null,
-									ext, binds);
-					log.config("Loaded admin command from file: " + file +
-									", id: " + cmdId + ", ext: " + ext + ", descr: " + cmdDescr);
-				}
-			} else {
-				log.warning("Admin scripts directory is missing: " + adminDir);
-			}
-		} catch (Exception e) {
-			log.log(Level.WARNING, "Can't load the admin script file: " + file, e);
-		}
+//		String descrStr = "AS:Description: ";
+//		String cmdIdStr = "AS:CommandId: ";
+//		String scriptsPath = (String) props.get(ADMIN_SCRIPTS_PROP_KEY);
+//		File file = null;
+//		AddScriptCommand addCommand = new AddScriptCommand();
+//		Bindings binds = scriptEngineManager.getBindings();
+//		initBindings(binds);
+//		try {
+//			File adminDir = new File(scriptsPath);
+//			if (adminDir != null && adminDir.exists()) {
+//				for (File f : adminDir.listFiles()) {
+//					String cmdId = null;
+//					String cmdDescr = null;
+//					file = f;
+//					StringBuilder sb = new StringBuilder();
+//					BufferedReader buffr = new BufferedReader(new FileReader(file));
+//					String line = null;
+//					while ((line = buffr.readLine()) != null) {
+//						sb.append(line + "\n");
+//						int idx = line.indexOf(descrStr);
+//						if (idx >= 0) {
+//							cmdDescr = line.substring(idx + descrStr.length());
+//						}
+//						idx = line.indexOf(cmdIdStr);
+//						if (idx >= 0) {
+//							cmdId = line.substring(idx + cmdIdStr.length());
+//						}
+//					}
+//					buffr.close();
+//					if (cmdId == null || cmdDescr == null) {
+//						log.warning("Admin script found but it has no command ID or command description: " +
+//										file);
+//						continue;
+//					}
+//					int idx = file.toString().lastIndexOf(".");
+//					String ext = file.toString().substring(idx + 1);
+//					addCommand.addAdminScript(cmdId, cmdDescr, sb.toString(), null,
+//									ext, binds);
+//					log.config("Loaded admin command from file: " + file +
+//									", id: " + cmdId + ", ext: " + ext + ", descr: " + cmdDescr);
+//				}
+//			} else {
+//				log.warning("Admin scripts directory is missing: " + adminDir);
+//			}
+//		} catch (Exception e) {
+//			log.log(Level.WARNING, "Can't load the admin script file: " + file, e);
+//		}
 	}
 
 	@Override
@@ -1455,10 +1422,14 @@ public class SessionManager extends AbstractMessageReceiver
 	}
 
 	@Override
-	public Element getDiscoInfo(String node, String jid) {
+	public Element getDiscoInfo(String node, String jid, String from) {
 		if (jid != null && (getName().equals(JIDUtils.getNodeNick(jid)) ||
 						isLocalDomain(jid))) {
-			Element query = serviceEntity.getDiscoInfo(node);
+			Element query = super.getDiscoInfo(node, jid, from);
+			if (query == null) {
+				query = new Element("query");
+				query.setXMLNS(XMPPService.INFO_XMLNS);
+			}
 			if (node == null) {
 				for (ProcessingThreads<ProcessorWorkerThread> proc_t : processors.values()) {
 					Element[] discoFeatures = proc_t.getWorkerThread().processor.supDiscoFeatures(null);
@@ -1468,20 +1439,24 @@ public class SessionManager extends AbstractMessageReceiver
 				}
 			}
 			if (log.isLoggable(Level.FINEST)) {
-    			log.finest("Found disco info: " +
-							(query != null ? query.toString() : null));
-            }
+				log.finest("Found disco info: " +
+						(query != null ? query.toString() : null));
+			}
 			return query;
 		}
 		if (log.isLoggable(Level.FINEST)) {
-    		log.finest("Not found disco info for node: " + node + ", jid: " + jid);
-        }
+			log.finest("Not found disco info for node: " + node + ", jid: " + jid);
+		}
 		return null;
 	}
 
 	@Override
-	public List<Element> getDiscoFeatures() {
+	public List<Element> getDiscoFeatures(String from) {
 		List<Element> features = new LinkedList<Element>();
+		List<Element> tmp = super.getDiscoFeatures(from);
+		if (tmp != null) {
+			features.addAll(tmp);
+		}
 		for (ProcessingThreads<ProcessorWorkerThread> proc_t: processors.values()) {
 			Element[] discoFeatures = proc_t.getWorkerThread().processor.supDiscoFeatures(null);
 			if (discoFeatures != null) {
@@ -1492,14 +1467,24 @@ public class SessionManager extends AbstractMessageReceiver
 	}
 
 	@Override
-	public List<Element> getDiscoItems(String node, String jid) {
-		List<Element> result = serviceEntity.getDiscoItems(node, jid);
-		if (log.isLoggable(Level.FINEST)) {
-    		log.finest("Found disco items: " +
-						(result != null ? result.toString() : null));
-        }
-		return result;
+	public String getDiscoDescription() {
+		return "Session manager";
 	}
+
+	@Override
+	public String getDiscoCategory() {
+		return "sm";
+	}
+
+//	@Override
+//	public List<Element> getDiscoItems(String node, String jid) {
+//		List<Element> result = serviceEntity.getDiscoItems(node, jid);
+//		if (log.isLoggable(Level.FINEST)) {
+//			log.finest("Found disco items: " +
+//					(result != null ? result.toString() : null));
+//		}
+//		return result;
+//	}
 
 	@Override
 	public void getStatistics(StatisticsList list) {

@@ -55,7 +55,7 @@ public class SessionManagerConfig {
 	 "roster-presence", "jabber:iq:privacy", "msgoffline",
 	 "jabber:iq:version", "http://jabber.org/protocol/stats", "starttls",
 	 "vcard-temp", "http://jabber.org/protocol/commands", "jabber:iq:private",
-	 "urn:xmpp:ping", "basic-filter", "domain-filter"};
+	 "urn:xmpp:ping", "basic-filter", "domain-filter", "disco"};
 	/**
 	 * List of plugins loaded when the server is loaded in test mode.
 	 * Some plugins like off-line message storage is disabled during tests.
@@ -66,7 +66,7 @@ public class SessionManagerConfig {
 	 "roster-presence", "jabber:iq:privacy", "jabber:iq:version",
 	 "http://jabber.org/protocol/stats", "starttls",
 	 "vcard-temp", "http://jabber.org/protocol/commands", "jabber:iq:private",
-	 "urn:xmpp:ping", "basic-filter", "domain-filter"};
+	 "urn:xmpp:ping", "basic-filter", "domain-filter", "disco"};
 
 	private static final String[] PLUGINS_FULL_PROP_VAL =
 	{"jabber:iq:register", "jabber:iq:auth", "urn:ietf:params:xml:ns:xmpp-sasl",
@@ -74,7 +74,7 @@ public class SessionManagerConfig {
 	 "roster-presence", "jabber:iq:privacy", "jabber:iq:version",
 	 "http://jabber.org/protocol/stats", "starttls", "msgoffline",
 	 "vcard-temp", "http://jabber.org/protocol/commands", "jabber:iq:private",
-	 "urn:xmpp:ping", "basic-filter", "domain-filter"};
+	 "urn:xmpp:ping", "basic-filter", "domain-filter", "disco"};
 
 	private static String[] HOSTNAMES_PROP_VAL =	{"localhost", "hostname"};
 	private static String[] ANONYMOUS_DOMAINS_PROP_VAL = {"localhost", "hostname"};
@@ -169,15 +169,15 @@ public class SessionManagerConfig {
 		}
 //		props.put(HOSTNAMES_PROP_KEY, HOSTNAMES_PROP_VAL);
 //		props.put(ANONYMOUS_DOMAINS_PROP_KEY, ANONYMOUS_DOMAINS_PROP_VAL);
-		if (params.get(GEN_ADMINS) != null) {
-			ADMINS_PROP_VAL = ((String)params.get(GEN_ADMINS)).split(",");
-		} else {
-			ADMINS_PROP_VAL = new String[HOSTNAMES_PROP_VAL.length];
-			for (int i = 0; i < ADMINS_PROP_VAL.length; i++) {
-				ADMINS_PROP_VAL[i] = "admin@"+HOSTNAMES_PROP_VAL[i];
-			} // end of for (int i = 0; i < ADMINS_PROP_VAL.length; i++)
-		}
-		props.put(ADMINS_PROP_KEY, ADMINS_PROP_VAL);
+//		if (params.get(GEN_ADMINS) != null) {
+//			ADMINS_PROP_VAL = ((String)params.get(GEN_ADMINS)).split(",");
+//		} else {
+//			ADMINS_PROP_VAL = new String[HOSTNAMES_PROP_VAL.length];
+//			for (int i = 0; i < ADMINS_PROP_VAL.length; i++) {
+//				ADMINS_PROP_VAL[i] = "admin@"+HOSTNAMES_PROP_VAL[i];
+//			} // end of for (int i = 0; i < ADMINS_PROP_VAL.length; i++)
+//		}
+//		props.put(ADMINS_PROP_KEY, ADMINS_PROP_VAL);
 		//		props.put(ANONYMOUS_PEERS_PROP_KEY, ADMINS_PROP_VAL);
 		if (params.get(GEN_TRUSTED) != null) {
 			TRUSTED_PROP_VAL = ((String)params.get(GEN_TRUSTED)).split(",");
