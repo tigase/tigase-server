@@ -176,18 +176,18 @@ public class VirtualComponent
 	}
 
 	@Override
-	public Element getDiscoInfo(String node, String jid) {
+	public Element getDiscoInfo(String node, String jid, String from) {
 		return null;
 	}
 
 	@Override
-	public List<Element> getDiscoItems(String node, String jid) {
+	public List<Element> getDiscoItems(String node, String jid, String from) {
 		Element result = serviceEntity.getDiscoItem(null, getName() + "." + jid);
 		return Arrays.asList(result);
 	}
 
 	@Override
-	public List<Element> getDiscoFeatures() {
+	public List<Element> getDiscoFeatures(String from) {
 		return null;
 	}
 

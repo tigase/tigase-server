@@ -50,7 +50,7 @@ import tigase.xmpp.StanzaType;
  */
 public class ClusterController
 	extends AbstractComponentRegistrator<ClusteredComponent>
-	implements XMPPService, Configurable {
+	implements Configurable {
 
   private static final Logger log =
 		Logger.getLogger("tigase.cluster.ClusterController");
@@ -58,7 +58,7 @@ public class ClusterController
 	public static final String MY_DOMAIN_NAME_PROP_KEY = "domain-name";
 	public static final String MY_DOMAIN_NAME_PROP_VAL =	"localhost";
 
-	private ServiceEntity serviceEntity = null;
+	//private ServiceEntity serviceEntity = null;
 	//private ServiceEntity stats_modules = null;
 	private Level statsLevel = Level.INFO;
 	private String this_node = DNSResolver.getDefaultHostname();;
@@ -67,25 +67,27 @@ public class ClusterController
 	@Override
 	public void setName(String name) {
 		super.setName(name);
-		serviceEntity = new ServiceEntity(name, "load", "Server clustering");
-		serviceEntity.addIdentities(
-			new ServiceIdentity("component", "load", "Server clustering"));
-		serviceEntity.addFeatures(DEF_FEATURES);
-		serviceEntity.addFeatures(CMD_FEATURES);
+//		serviceEntity = new ServiceEntity(name, "load", "Server clustering");
+//		serviceEntity.addIdentities(
+//			new ServiceIdentity("component", "load", "Server clustering"));
+//		serviceEntity.addFeatures(DEF_FEATURES);
+//		serviceEntity.addFeatures(CMD_FEATURES);
 	}
 
 	@Override
 	public void componentAdded(ClusteredComponent component) {
 		component.setClusterController(this);
-		ServiceEntity item = serviceEntity.findNode(component.getName());
-		if (item == null) {
-			item = new ServiceEntity(getName(), component.getName(),
-				"Component: " + component.getName());
-			item.addFeatures(CMD_FEATURES);
-			item.addIdentities(new ServiceIdentity("automation", "command-node",
-						"Component: " + component.getName()));
-			serviceEntity.addItems(item);
-		}
+		updateServiceDiscoveryItem(getName(), component.getName(),
+				"Component: " + component.getName(), true);
+//		ServiceEntity item = serviceEntity.findNode(component.getName());
+//		if (item == null) {
+//			item = new ServiceEntity(getName(), component.getName(),
+//				"Component: " + component.getName());
+//			item.addFeatures(CMD_FEATURES);
+//			item.addIdentities(new ServiceIdentity("automation", "command-node",
+//						"Component: " + component.getName()));
+//			serviceEntity.addItems(item);
+//		}
 	}
 
 	@Override
@@ -97,26 +99,36 @@ public class ClusterController
 	public void componentRemoved(ClusteredComponent component) {}
 
 	@Override
-	public Element getDiscoInfo(String node, String jid) {
-		if (jid != null && getName().equals(JIDUtils.getNodeNick(jid))) {
-			return serviceEntity.getDiscoInfo(node);
-		}
-		return null;
+	public String getDiscoDescription() {
+		return "Server clustering";
 	}
 
 	@Override
-	public 	List<Element> getDiscoFeatures() { return null; }
-
-	@Override
-	public List<Element> getDiscoItems(String node, String jid) {
-		if (getName().equals(JIDUtils.getNodeNick(jid))) {
-			return serviceEntity.getDiscoItems(node, jid);
-		} else {
-			return Arrays.asList(serviceEntity.getDiscoItem(null,
-					JIDUtils.getNodeID(getName(), jid)));
-		}
+	public String getDiscoCategory() {
+		return "load";
 	}
 
+//	@Override
+//	public Element getDiscoInfo(String node, String jid, String from) {
+//		if (jid != null && getName().equals(JIDUtils.getNodeNick(jid))) {
+//			return serviceEntity.getDiscoInfo(node);
+//		}
+//		return null;
+//	}
+//
+//	@Override
+//	public 	List<Element> getDiscoFeatures(String from) { return null; }
+//
+//	@Override
+//	public List<Element> getDiscoItems(String node, String jid, String from) {
+//		if (getName().equals(JIDUtils.getNodeNick(jid))) {
+//			return serviceEntity.getDiscoItems(node, jid);
+//		} else {
+//			return Arrays.asList(serviceEntity.getDiscoItem(null,
+//					JIDUtils.getNodeID(getName(), jid)));
+//		}
+//	}
+//
 	@Override
 	public void processPacket(final Packet packet, final Queue<Packet> results) {
 	}
@@ -151,12 +163,13 @@ public class ClusterController
 
 	@Override
 	public void setProperties(Map<String, Object> properties) {
+		super.setProperties(properties);
 		my_hostname = (String) properties.get(MY_DOMAIN_NAME_PROP_KEY);
 	}
 
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
-		Map<String, Object> defs = new LinkedHashMap<String, Object>();
+		Map<String, Object> defs = super.getDefaults(params);
 		String[] local_domains = DNSResolver.getDefHostNames();
 		if (params.get(GEN_VIRT_HOSTS) != null) {
 			local_domains = ((String) params.get(GEN_VIRT_HOSTS)).split(",");

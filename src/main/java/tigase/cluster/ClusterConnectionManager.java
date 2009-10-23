@@ -40,7 +40,6 @@ import tigase.net.ConnectionType;
 import tigase.net.SocketType;
 import tigase.server.ConnectionManager;
 import tigase.server.Packet;
-import tigase.disco.XMPPService;
 import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
 import tigase.server.ServiceChecker;
@@ -62,8 +61,8 @@ import tigase.util.TimeUtils;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
-	implements XMPPService, ClusteredComponent {
+public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Object>>
+	implements ClusteredComponent {
 
   /**
    * Variable <code>log</code> is a class logger.
@@ -92,7 +91,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 	private ClusterController clusterController = null;
 	private IOServiceStatisticsGetter ioStatsGetter = new IOServiceStatisticsGetter();
 
-	private ServiceEntity serviceEntity = null;
+//	private ServiceEntity serviceEntity = null;
 	//private boolean service_disco = RETURN_SERVICE_DISCO_VAL;
 	private String identity_type = IDENTITY_TYPE_VAL;
 	private boolean connect_all = CONNECT_ALL_PROP_VAL;
@@ -189,7 +188,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 	}
 
 	@Override
-	public Queue<Packet> processSocketData(XMPPIOService serv) {
+	public Queue<Packet> processSocketData(XMPPIOService<Object> serv) {
 		Packet p = null;
 		while ((p = serv.getReceivedPackets().poll()) != null) {
 			if (log.isLoggable(Level.FINEST)) {
@@ -256,7 +255,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 // 		}
 // 	}
 
-	private void processHandshake(Packet p, XMPPIOService serv) {
+	private void processHandshake(Packet p, XMPPIOService<Object> serv) {
 		switch (serv.connectionType()) {
 		case connect: {
 			String data = p.getElemCData();
@@ -298,14 +297,14 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 		} // end of switch (service.connectionType())
 	}
 
-	protected void serviceConnected(XMPPIOService serv) {
+	protected void serviceConnected(XMPPIOService<Object> serv) {
 		String[] routings =
 			(String[])serv.getSessionData().get(PORT_ROUTING_TABLE_PROP_KEY);
 		updateRoutings(routings, true);
 		String addr =
 			(String)serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
 		log.info("Connected to: " + addr);
-		updateServiceDiscovery(addr, XMLNS + " connected");
+		updateServiceDiscoveryItem(addr, addr, XMLNS + " connected", true);
 		clusterController.nodeConnected(addr);
 //		Map<String, String> method_params = new LinkedHashMap<String, String>();
 //		method_params.put("connected", addr);
@@ -331,9 +330,9 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 		compress_stream = (Boolean)props.get(COMPRESS_STREAM_PROP_KEY);
 
 		//serviceEntity = new ServiceEntity(getName(), "external", "XEP-0114");
-		serviceEntity = new ServiceEntity(XMLNS + " " + getName(), null, XMLNS);
-		serviceEntity.addIdentities(
-			new ServiceIdentity("component", identity_type, XMLNS + " " + getName()));
+//		serviceEntity = new ServiceEntity(XMLNS + " " + getName(), null, XMLNS);
+//		serviceEntity.addIdentities(
+//			new ServiceIdentity("component", identity_type, XMLNS + " " + getName()));
 		connect_all = (Boolean)props.get(CONNECT_ALL_PROP_KEY);
 		cluster_controller_id = (String)props.get(CLUSTER_CONTR_ID_PROP_KEY);
 // 		notify_admins = (Boolean)props.get(NOTIFY_ADMINS_PROP_KEY);
@@ -414,13 +413,13 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 	}
 
 	@Override
-	protected String getUniqueId(XMPPIOService serv) {
+	protected String getUniqueId(XMPPIOService<Object> serv) {
 		//		return (String)serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
 		return serv.getRemoteAddress();
 	}
 
 	@Override
-	public boolean serviceStopped(XMPPIOService service) {
+	public boolean serviceStopped(XMPPIOService<Object> service) {
 		boolean result = super.serviceStopped(service);
 		// Make sure it runs just once for each disconnect
 		if (result) {
@@ -438,7 +437,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 			//		removeRouting(serv.getRemoteHost());
 			String addr = (String) sessionData.get(PORT_REMOTE_HOST_PROP_KEY);
 			log.info("Disonnected from: " + addr);
-			updateServiceDiscovery(addr, XMLNS + " disconnected");
+			updateServiceDiscoveryItem(addr, addr, XMLNS + " disconnected", true);
 			clusterController.nodeDisconnected(addr);
 
 //			Map<String, String> method_params = new LinkedHashMap<String, String>();
@@ -476,7 +475,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 	}
 
 	@Override
-	public void serviceStarted(XMPPIOService serv) {
+	public void serviceStarted(XMPPIOService<Object> serv) {
 		super.serviceStarted(serv);
 		log.info("cluster connection opened: " + serv.getRemoteAddress()
 			+ ", type: " + serv.connectionType().toString()
@@ -516,7 +515,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 	}
 
 	@Override
-	public String xmppStreamOpened(XMPPIOService service,
+	public String xmppStreamOpened(XMPPIOService<Object> service,
 		Map<String, String> attribs) {
 
 		log.info("Stream opened: " + attribs.toString());
@@ -563,7 +562,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 	}
 
 	@Override
-	public void xmppStreamClosed(XMPPIOService serv) {
+	public void xmppStreamClosed(XMPPIOService<Object> serv) {
 		log.info("Stream closed.");
 	}
 
@@ -599,37 +598,48 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService>
 		}
 	}
 
-	private void updateServiceDiscovery(String jid, String name) {
-		ServiceEntity item = new ServiceEntity(jid, null, name);
-		//item.addIdentities(new ServiceIdentity("component", identity_type, name));
-		log.info("Modifing service-discovery info: " + item.toString());
-		serviceEntity.addItems(item);
+//	private void updateServiceDiscovery(String jid, String name) {
+//		ServiceEntity item = new ServiceEntity(jid, null, name);
+//		//item.addIdentities(new ServiceIdentity("component", identity_type, name));
+//		log.info("Modifing service-discovery info: " + item.toString());
+//		serviceEntity.addItems(item);
+//	}
+//
+//	@Override
+//	public Element getDiscoInfo(String node, String jid) {
+//		if (jid != null && getName().equals(JIDUtils.getNodeNick(jid))) {
+//			return serviceEntity.getDiscoInfo(node);
+//		}
+//		return null;
+//	}
+//
+//	@Override
+//	public 	List<Element> getDiscoFeatures() { return null; }
+//
+//	@Override
+//	public List<Element> getDiscoItems(String node, String jid) {
+//		if (getName().equals(JIDUtils.getNodeNick(jid))) {
+//			return serviceEntity.getDiscoItems(node, null);
+//		} else {
+// 			return Arrays.asList(serviceEntity.getDiscoItem(null,
+//					JIDUtils.getNodeID(getName(), jid)));
+//		}
+//	}
+//
+
+	@Override
+	public String getDiscoDescription() {
+		return XMLNS + " " + getName();
 	}
 
 	@Override
-	public Element getDiscoInfo(String node, String jid) {
-		if (jid != null && getName().equals(JIDUtils.getNodeNick(jid))) {
-			return serviceEntity.getDiscoInfo(node);
-		}
-		return null;
+	public String getDiscoCategory() {
+		return identity_type;
 	}
 
 	@Override
-	public 	List<Element> getDiscoFeatures() { return null; }
-
-	@Override
-	public List<Element> getDiscoItems(String node, String jid) {
-		if (getName().equals(JIDUtils.getNodeNick(jid))) {
-			return serviceEntity.getDiscoItems(node, null);
-		} else {
- 			return Arrays.asList(serviceEntity.getDiscoItem(null,
-					JIDUtils.getNodeID(getName(), jid)));
-		}
-	}
-
-	@Override
-	protected XMPPIOService getXMPPIOServiceInstance() {
-		return new XMPPIOService();
+	protected XMPPIOService<Object> getXMPPIOServiceInstance() {
+		return new XMPPIOService<Object>();
 	}
 
 	@Override
