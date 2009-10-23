@@ -629,7 +629,8 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		return processed;
 	}
 
-	protected boolean isAdmin(String jid) {
+	@Override
+	public boolean isAdmin(String jid) {
 		return Arrays.binarySearch(admins, JIDUtils.getNodeID(jid)) >= 0;
 	}
 
@@ -717,7 +718,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	 * @return an <code>Element</code> value
 	 */
 	@Override
-	public Element getDiscoInfo(String node, String jid) {
+	public Element getDiscoInfo(String node, String jid, String from) {
 		if (jid != null && jid.startsWith(getName()+".")) {
 			return serviceEntity.getDiscoInfo(node);
 		}
@@ -725,10 +726,10 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	}
 
 	@Override
-	public 	List<Element> getDiscoFeatures() { return null; }
+	public 	List<Element> getDiscoFeatures(String from) { return null; }
 
 	@Override
-	public List<Element> getDiscoItems(String node, String jid) {
+	public List<Element> getDiscoItems(String node, String jid, String from) {
 		if (jid.startsWith(getName()+".")) {
 			return serviceEntity.getDiscoItems(node, null);
 		} else {
