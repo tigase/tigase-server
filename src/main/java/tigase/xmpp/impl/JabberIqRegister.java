@@ -93,18 +93,18 @@ public class JabberIqRegister extends XMPPProcessor
 
 	@Override
 	public void process(final Packet packet, final XMPPResourceConnection session,
-		final NonAuthUserRepository repo, final Queue<Packet> results,
-		final Map<String, Object> settings)
-		throws XMPPException {
+			final NonAuthUserRepository repo, final Queue<Packet> results,
+			final Map<String, Object> settings)
+			throws XMPPException {
 
 		if (log.isLoggable(Level.FINEST)) {
-    		log.finest("Processing packet: " + packet.toString());
-        }
+			log.finest("Processing packet: " + packet.toString());
+		}
 
 		if (session == null) {
 			if (log.isLoggable(Level.FINEST)) {
-    			log.finest("Session is null, ignoring");
-            }
+				log.finest("Session is null, ignoring");
+			}
 			return;
 		} // end of if (session == null)
 
