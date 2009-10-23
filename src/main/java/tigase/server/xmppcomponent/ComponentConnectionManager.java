@@ -53,7 +53,7 @@ import tigase.xmpp.PacketErrorTypeException;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
+public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<Object>>
 	implements XMPPService {
 
 	public int[] PORTS = {5555};
@@ -61,14 +61,12 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 	public SocketType PORT_SOCKET_PROP_VAL = SocketType.plain;
   public static final String SECRET_PROP_KEY = "secret";
   public String SECRET_PROP_VAL =	"someSecret";
-	public static final String PORT_LOCAL_HOST_PROP_KEY = "local-host";
 	public String PORT_LOCAL_HOST_PROP_VAL = "localhost";
 	public String PORT_REMOTE_HOST_PROP_VAL = "comp-1.localhost";
 	public static final String PORT_ROUTING_TABLE_PROP_KEY = "routing-table";
 	public String[] PORT_ROUTING_TABLE_PROP_VAL =
 	{ PORT_REMOTE_HOST_PROP_VAL, ".*@" + PORT_REMOTE_HOST_PROP_VAL,
 		".*\\." + PORT_REMOTE_HOST_PROP_VAL };
-	public String[] PORT_IFC_PROP_VAL = {"*"};
 	public static final String PACK_ROUTED_KEY = "pack-routed";
 	public boolean PACK_ROUTED_VAL = false;
 	public static final String RETURN_SERVICE_DISCO_KEY = "service-disco";
@@ -86,7 +84,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
    * Variable <code>log</code> is a class logger.
    */
   private static final Logger log =
-    Logger.getLogger("tigase.server.xmppcomponent.ComponentConnectionManager");
+    Logger.getLogger(ComponentConnectionManager.class.getName());
 
 	@Override
 	public void processPacket(Packet packet) {
@@ -116,7 +114,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 	}
 
 	@Override
-	public Queue<Packet> processSocketData(XMPPIOService serv) {
+	public Queue<Packet> processSocketData(XMPPIOService<Object> serv) {
 		Packet p = null;
 		while ((p = serv.getReceivedPackets().poll()) != null) {
 			if (log.isLoggable(Level.FINER)) {
@@ -138,7 +136,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 		return null;
 	}
 
-	private void processHandshake(Packet p, XMPPIOService serv) {
+	private void processHandshake(Packet p, XMPPIOService<Object> serv) {
 		switch (serv.connectionType()) {
 		case connect: {
 			String data = p.getElemCData();
@@ -328,13 +326,13 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 	}
 
 	@Override
-	protected String getUniqueId(XMPPIOService serv) {
+	protected String getUniqueId(XMPPIOService<Object> serv) {
 		//		return (String)serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
 		return service_id;
 	}
 
 	@Override
-	public boolean serviceStopped(XMPPIOService service) {
+	public boolean serviceStopped(XMPPIOService<Object> service) {
 		boolean result = super.serviceStopped(service);
 		if (result) {
 			Map<String, Object> sessionData = service.getSessionData();
@@ -362,7 +360,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 	}
 
 	@Override
-	public void serviceStarted(XMPPIOService serv) {
+	public void serviceStarted(XMPPIOService<Object> serv) {
 		super.serviceStarted(serv);
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("c2c connection opened: " + serv.getRemoteAddress()
@@ -398,12 +396,12 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 	}
 
 	@Override
-	public String xmppStreamOpened(XMPPIOService service,
+	public String xmppStreamOpened(XMPPIOService<Object> service,
 		Map<String, String> attribs) {
 
-        if (log.isLoggable(Level.FINER)) {
-        	log.finer("Stream opened: " + attribs.toString());
-        }
+		if (log.isLoggable(Level.FINER)) {
+			log.finer("Stream opened: " + attribs.toString());
+		}
 
 		switch (service.connectionType()) {
 		case connect: {
@@ -443,10 +441,10 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 	}
 
 	@Override
-	public void xmppStreamClosed(XMPPIOService serv) {
-        if (log.isLoggable(Level.FINER)) {
-        	log.finer("Stream closed.");
-        }
+	public void xmppStreamClosed(XMPPIOService<Object> serv) {
+		if (log.isLoggable(Level.FINER)) {
+			log.finer("Stream closed.");
+		}
 	}
 
 	/**
@@ -491,7 +489,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 	}
 
 	@Override
-	public Element getDiscoInfo(String node, String jid) {
+	public Element getDiscoInfo(String node, String jid, String from) {
 		if (jid != null && getName().equals(JIDUtils.getNodeNick(jid))) {
 			return serviceEntity.getDiscoInfo(node);
 		}
@@ -499,10 +497,10 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 	}
 
 	@Override
-	public 	List<Element> getDiscoFeatures() { return null; }
+	public 	List<Element> getDiscoFeatures(String from) { return null; }
 
 	@Override
-	public List<Element> getDiscoItems(String node, String jid) {
+	public List<Element> getDiscoItems(String node, String jid, String from) {
 		if (getName().equals(JIDUtils.getNodeNick(jid))) {
 			return serviceEntity.getDiscoItems(node, null);
 		} else {
@@ -512,8 +510,8 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService>
 	}
 
 	@Override
-	protected XMPPIOService getXMPPIOServiceInstance() {
-		return new XMPPIOService();
+	protected XMPPIOService<Object> getXMPPIOServiceInstance() {
+		return new XMPPIOService<Object>();
 	}
 
 }
