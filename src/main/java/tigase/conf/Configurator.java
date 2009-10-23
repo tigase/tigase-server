@@ -72,8 +72,7 @@ import tigase.xmpp.PacketErrorTypeException;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class Configurator extends AbstractComponentRegistrator<Configurable>
-	implements Configurable, XMPPService {
+public class Configurator extends AbstractComponentRegistrator<Configurable> {
 
 	public static final String PROPERTY_FILENAME_PROP_KEY = "--property-file";
 	private static final String LOGGING_KEY = "logging/";
@@ -407,7 +406,7 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
-		Map<String, Object> defaults = new TreeMap<String, Object>();
+		Map<String, Object> defaults = super.getDefaults(params);
 		if ((Boolean)params.get(GEN_TEST)) {
 			defaults.put(LOGGING_KEY + ".level", "WARNING");
 		} else {
@@ -499,12 +498,13 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 	 */
 	@Override
 	public void setProperties(final Map<String, Object> props) {
+		super.setProperties(props);
 		setupLogManager(props);
 		demoMode = (Boolean)props.get("demo-mode");
 		int repo_pool_size = 1;
 		try {
 			repo_pool_size =
-							Integer.parseInt((String) props.get(USER_REPO_POOL_SIZE_PROP_KEY));
+					Integer.parseInt((String)props.get(USER_REPO_POOL_SIZE_PROP_KEY));
 		} catch (Exception e) {
 			repo_pool_size = 1;
 		}
@@ -1301,28 +1301,31 @@ public class Configurator extends AbstractComponentRegistrator<Configurable>
 	}
 
 	@Override
-	public Element getDiscoInfo(String node, String jid) {
-		if (jid != null && getName().equals(JIDUtils.getNodeNick(jid))) {
+	public Element getDiscoInfo(String node, String jid, String from) {
+		if (jid != null && getName().equals(JIDUtils.getNodeNick(jid)) && isAdmin(from)) {
 			return serviceEntity.getDiscoInfo(node);
 		}
 		return null;
 	}
 
 	@Override
-	public 	List<Element> getDiscoFeatures() { return null; }
+	public 	List<Element> getDiscoFeatures(String from) { return null; }
 
 	@Override
-	public List<Element> getDiscoItems(String node, String jid) {
-		if (getName().equals(JIDUtils.getNodeNick(jid))) {
-			return serviceEntity.getDiscoItems(node, jid);
-		} else {
-			if (node == null) {
-				return Arrays.asList(serviceEntity.getDiscoItem(null,
-								JIDUtils.getNodeID(getName(), jid)));
+	public List<Element> getDiscoItems(String node, String jid, String from) {
+		if (isAdmin(from)) {
+			if (getName().equals(JIDUtils.getNodeNick(jid))) {
+				return serviceEntity.getDiscoItems(node, jid);
 			} else {
-				return null;
+				if (node == null) {
+					return Arrays.asList(serviceEntity.getDiscoItem(null,
+							JIDUtils.getNodeID(getName(), jid)));
+				} else {
+					return null;
+				}
 			}
 		}
+		return null;
 	}
 
 }

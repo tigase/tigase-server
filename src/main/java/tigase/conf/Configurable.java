@@ -106,6 +106,7 @@ public interface Configurable extends ServerComponent {
 	public static final String GEN_DEBUG = "--debug";
 	public static final String GEN_DEBUG_PACKAGES = "--debug-packages";
 	public static final String GEN_MAX_QUEUE_SIZE = "--max-queue-size";
+	public static final String GEN_SCRIPT_DIR = "--script-dir";
 
 	public static final String GEN_SREC_DB = "--gen-srec-db";
 	public static final String GEN_SREC_DB_URI = "--gen-srec-db-uri";
