@@ -155,7 +155,7 @@ public class BoshConnectionManager extends ClientConnectionManager
 
 	@Override
 	protected String changeDataReceiver(Packet packet, String newAddress,
-		String command_sessionId, XMPPIOService serv) {
+		String command_sessionId, XMPPIOService<Object> serv) {
 		BoshSession session = getBoshSession(packet.getTo());
 		if (session != null) {
 			String sessionId = session.getSessionId();
@@ -172,7 +172,7 @@ public class BoshConnectionManager extends ClientConnectionManager
 	}
 
 	@Override
-	public Queue<Packet> processSocketData(XMPPIOService srv) {
+	public Queue<Packet> processSocketData(XMPPIOService<Object> srv) {
 		BoshIOService serv = (BoshIOService)srv;
 		Packet p = null;
 		while ((p = serv.getReceivedPackets().poll()) != null) {
@@ -405,6 +405,16 @@ public class BoshConnectionManager extends ClientConnectionManager
 	@Override
 	protected ReceiverEventHandler newStartedHandler() {
 		return new StartedHandler();
+	}
+
+	@Override
+	public String getDiscoDescription() {
+		return "Bosh connection manager";
+	}
+
+	@Override
+	public String getDiscoCategory() {
+		return "c2s";
 	}
 
 	private class StartedHandler implements ReceiverEventHandler {

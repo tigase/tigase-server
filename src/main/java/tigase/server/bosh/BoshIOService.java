@@ -39,7 +39,7 @@ import tigase.xmpp.PacketErrorTypeException;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class BoshIOService extends XMPPIOService {
+public class BoshIOService extends XMPPIOService<Object> {
 
   /**
    * Variable <code>log</code> is a class logger.
