@@ -21,18 +21,16 @@
 package tigase.vhosts;
 
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import tigase.conf.Configurable;
+import tigase.db.ComponentRepository;
 import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
 import tigase.server.AbstractComponentRegistrator;
-import tigase.disco.XMPPService;
 import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.server.Permissions;
@@ -55,8 +53,7 @@ import tigase.xmpp.StanzaType;
  * @version $Rev$
  */
 public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
-	implements XMPPService, VHostManagerIfc, Configurable,
-				StatisticsContainer {
+	implements VHostManagerIfc, StatisticsContainer {
 
 	public static final String VHOSTS_REPO_CLASS_PROPERTY = "--vhost-repo-class";
 	public static final String VHOSTS_REPO_CLASS_PROP_KEY = "repository-class";
@@ -72,11 +69,9 @@ public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
 					new LinkedHashSet<VHostListener>();
 	private LinkedHashSet<VHostListener> nameSubdomainsHandlers =
 					new LinkedHashSet<VHostListener>();
-//	private LinkedHashMap<String, VHostItem> vhosts =
-//					new LinkedHashMap<String, VHostItem>();
 
 	private ServiceEntity serviceEntity = null;
-	private VHostRepository repo = null;
+	private ComponentRepository<VHostItem> repo = null;
 	private long isLocalDomainCalls = 0;
 	private long isAnonymousEnabledCalls = 0;
 	private long getComponentsForLocalDomainCalls = 0;
@@ -224,39 +219,42 @@ public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
 	}
 
 	@Override
-	public List<Element> getDiscoFeatures() { return null; }
+	public List<Element> getDiscoFeatures(String from) { return null; }
 
 	@Override
-	public Element getDiscoInfo(String node, String jid) {
-		if (jid != null && getName().equals(JIDUtils.getNodeNick(jid))) {
+	public Element getDiscoInfo(String node, String jid, String from) {
+		if (jid != null && getName().equals(JIDUtils.getNodeNick(jid)) && isAdmin(from)) {
 			return serviceEntity.getDiscoInfo(node);
 		}
 		return null;
 	}
 
 	@Override
-	public List<Element> getDiscoItems(String node, String jid) {
-		if (getName().equals(JIDUtils.getNodeNick(jid)) ||
-						getComponentId().equals(jid)) {
-			List<Element> items = serviceEntity.getDiscoItems(node, jid);
-			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Processing discoItems for node: " + node + ", result: "	+
-								(items == null ? null : items.toString()));
-			}
-			return items;
-		} else {
-			if (node == null) {
-				Element item = serviceEntity.getDiscoItem(null,
-								JIDUtils.getNodeID(getName(), jid));
+	public List<Element> getDiscoItems(String node, String jid, String from) {
+		if (isAdmin(from)) {
+			if (getName().equals(JIDUtils.getNodeNick(jid)) ||
+					getComponentId().equals(jid)) {
+				List<Element> items = serviceEntity.getDiscoItems(node, jid);
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Processing discoItems, result: " +
-									(item == null ? null : item.toString()));
+					log.finest("Processing discoItems for node: " + node + ", result: " +
+							(items == null ? null : items.toString()));
 				}
-				return Arrays.asList(item);
+				return items;
 			} else {
-				return null;
+				if (node == null) {
+					Element item = serviceEntity.getDiscoItem(null,
+							JIDUtils.getNodeID(getName(), jid));
+					if (log.isLoggable(Level.FINEST)) {
+						log.finest("Processing discoItems, result: " +
+								(item == null ? null : item.toString()));
+					}
+					return Arrays.asList(item);
+				} else {
+					return null;
+				}
 			}
 		}
+		return null;
 	}
 
 	@Override
@@ -267,7 +265,7 @@ public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
 
 	@Override
 	public VHostItem getVHostItem(String domain) {
-		return repo.getVHost(domain);
+		return repo.getItem(domain);
 	}
 
 	@Override
@@ -289,7 +287,7 @@ public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
 	@Override
 	public boolean isAnonymousEnabled(String domain) {
 		++isAnonymousEnabledCalls;
-		VHostItem vhost = repo.getVHost(domain);
+		VHostItem vhost = repo.getItem(domain);
 		if (vhost == null) {
 			return false;
 		} else {
@@ -312,7 +310,7 @@ public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
 	@Override
 	public ServerComponent[] getComponentsForLocalDomain(String domain) {
 		++getComponentsForLocalDomainCalls;
-		VHostItem vhost = repo.getVHost(domain);
+		VHostItem vhost = repo.getItem(domain);
 		if (vhost == null) {
 			// This is not a local domain.
 			// Maybe this is a 'name' subdomain: 'pubsub'.domain.name
@@ -351,11 +349,13 @@ public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
 	}
 
 	@Override
+	@SuppressWarnings({"unchecked"})
 	public void setProperties(Map<String, Object> properties) {
+		super.setProperties(properties);
 		String repo_class = (String)properties.get(VHOSTS_REPO_CLASS_PROP_KEY);
 		try {
-			VHostRepository repo_tmp =
-							(VHostRepository) Class.forName(repo_class).newInstance();
+			ComponentRepository<VHostItem> repo_tmp =
+					(ComponentRepository<VHostItem>)Class.forName(repo_class).newInstance();
 			repo_tmp.setProperties(properties);
 			repo = repo_tmp;
 		} catch (Exception e) {
@@ -366,16 +366,17 @@ public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
 	}
 
 	@Override
+	@SuppressWarnings({"unchecked"})
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
-		Map<String, Object> defs = new LinkedHashMap<String, Object>();
+		Map<String, Object> defs = super.getDefaults(params);
 		String repo_class = (String)params.get(VHOSTS_REPO_CLASS_PROPERTY);
 		if (repo_class == null) {
 			repo_class = VHOSTS_REPO_CLASS_PROP_VAL;
 		}
 		defs.put(VHOSTS_REPO_CLASS_PROP_KEY, repo_class);
 		try {
-			VHostRepository repo_tmp =
-							(VHostRepository) Class.forName(repo_class).newInstance();
+			ComponentRepository<VHostItem> repo_tmp =
+					(ComponentRepository<VHostItem>)Class.forName(repo_class).newInstance();
 			repo_tmp.getDefaults(defs, params);
 		} catch (Exception e) {
 			log.log(Level.SEVERE,
@@ -418,7 +419,7 @@ public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
 			String enabled = Command.getFieldValue(packet, "Enabled");
 			vhost.setEnabled(enabled == null || enabled.isEmpty() ||
 							"true".equals(enabled));
-			repo.addVHost(vhost);
+			repo.addItem(vhost);
 			addCompletedVHostsField(result);
 		} else {
 			Command.addFieldValue(result, "Note",
@@ -429,7 +430,7 @@ public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
 	private void updateVHostRemove(Packet packet, Packet result) {
 		String vh = Command.getFieldValue(packet, "VHost");
 		if (vh != null && !vh.isEmpty()) {
-			repo.removeVHost(vh);
+			repo.removeItem(vh);
 			addCompletedVHostsField(result);
 		} else {
 			Command.addFieldValue(result, "Note",

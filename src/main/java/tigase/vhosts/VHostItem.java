@@ -21,6 +21,7 @@
 package tigase.vhosts;
 
 import java.util.logging.Logger;
+import tigase.db.RepositoryItem;
 import tigase.xml.Element;
 
 /**
@@ -48,7 +49,7 @@ import tigase.xml.Element;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class VHostItem {
+public class VHostItem implements RepositoryItem {
 
 	private static final Logger log =
 					Logger.getLogger("tigase.vhosts.VHostItem");
@@ -103,7 +104,7 @@ public class VHostItem {
 	private String otherDomainParams = null;
 	private VHostItem unmodifiableItem = null;
 
-	private VHostItem() {	}
+	public VHostItem() {	}
 
 	/**
 	 * The constructor creates the <code>VHostItem</code> instance for a given
@@ -153,7 +154,8 @@ public class VHostItem {
 	 * The method exports the <code>VHostItem</code> object to XML representation.
 	 * @return an <code>Element</code> object with vhost information.
 	 */
-	public Element toXML() {
+	@Override
+	public Element toElement() {
 		String comps_str = "";
 		if (comps != null && comps.length > 0) {
 			for (String comp : comps) {
@@ -312,7 +314,44 @@ public class VHostItem {
 	 * @return a <code>String</code> value with the virtual domain name.
 	 */
 	public String getVhost() {
-		return vhost;
+		return this.vhost;
+	}
+
+	@Override
+	public void initFromPropertyString(String propString) {
+		this.vhost = propString;
+	}
+
+	@Override
+	public String toPropertyString() {
+		return this.vhost;
+	}
+
+	@Override
+	public void initFromElement(Element elem) {
+		vhost = elem.getAttribute(HOSTNAME_ATT);
+		enabled = Boolean.parseBoolean(elem.getAttribute(ENABLED_ATT));
+		anonymousEnabled =
+						Boolean.parseBoolean(elem.getAttribute(ANONYMOUS_ENABLED_ATT));
+		registerEnabled =
+						Boolean.parseBoolean(elem.getAttribute(REGISTER_ENABLED_ATT));
+		try {
+			maxUsersNumber = Long.parseLong(elem.getAttribute(MAX_USERS_NUMBER_ATT));
+		} catch (Exception e) {
+			log.warning("Can not parse max users number: " +
+							elem.getAttribute(MAX_USERS_NUMBER_ATT));
+		}
+		String comps_str = elem.getCData("/" + VHOST_ELEM + "/" + COMPONENTS_ELEM);
+		if (comps_str != null && !comps_str.isEmpty()) {
+			comps = comps_str.split(",");
+		}
+		otherDomainParams =
+						elem.getCData("/" + VHOST_ELEM + "/" + OTHER_PARAMS_ELEM);
+	}
+
+	@Override
+	public String getKey() {
+		return this.vhost;
 	}
 
 	private class UnmodifiableVHostItem extends VHostItem {
@@ -327,8 +366,8 @@ public class VHostItem {
 	 * @return an <code>Element</code> object with vhost information.
 	 */
 		@Override
-		public Element toXML() {
-			return VHostItem.this.toXML();
+		public Element toElement() {
+			return VHostItem.this.toElement();
 		}
 
 		/**
@@ -482,6 +521,18 @@ public class VHostItem {
 		@Override
 		public String getVhost() {
 			return VHostItem.this.getVhost();
+		}
+
+		@Override
+		public void initFromPropertyString(String propString) {
+			throw new UnsupportedOperationException(
+					"This is unmodifiable instance of VHostItem");
+		}
+
+		@Override
+		public void initFromElement(Element elem) {
+			throw new UnsupportedOperationException(
+					"This is unmodifiable instance of VHostItem");
 		}
 
 	}

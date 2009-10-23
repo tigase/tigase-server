@@ -22,36 +22,42 @@
 
 package tigase.vhosts;
 
-
-import tigase.db.comp.ConfigRepository;
+import tigase.util.DNSResolver;
+import static tigase.conf.Configurable.*;
 
 /**
- * Created: Nov 27, 2008 1:53:58 PM
+ * Created: Oct 3, 2009 4:26:09 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class VhostConfigRepository extends ConfigRepository<VHostItem> {
-	
+public abstract class VHostRepoDefaults {
 
-	@Override
-	public String[] getDefaultPropetyItems() {
-		return VHostRepoDefaults.getDefaultPropetyItems();
+	private static final String vhost_user = "vhost-manager";
+	private static final String vhost_list_pkey = "vhosts-lists";
+
+	public static String getRepoUser() {
+		return vhost_user;
 	}
 
-	@Override
-	public String getPropertyKey() {
-		return VHostRepoDefaults.getPropertyKey();
+	public static String getItemsListPKey() {
+		return vhost_list_pkey;
 	}
 
-	@Override
-	public String getConfigKey() {
-		return VHostRepoDefaults.getConfigKey();
+	public static String[] getDefaultPropetyItems() {
+		return DNSResolver.getDefHostNames();
 	}
 
-	@Override
-	public VHostItem getItemInstance() {
-		return VHostRepoDefaults.getItemInstance();
+	public static String getPropertyKey() {
+		return GEN_VIRT_HOSTS;
+	}
+
+	public static String getConfigKey() {
+		return HOSTNAMES_PROP_KEY;
+	}
+
+	public static VHostItem getItemInstance() {
+		return new VHostItem();
 	}
 
 }
