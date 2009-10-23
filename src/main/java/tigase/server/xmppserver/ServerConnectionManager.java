@@ -25,7 +25,6 @@ package tigase.server.xmppserver;
 import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Timer;
@@ -48,7 +47,6 @@ import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPIOService;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.PacketErrorTypeException;
-import tigase.stats.StatRecord;
 import tigase.stats.StatisticsList;
 
 /**
@@ -60,14 +58,15 @@ import tigase.stats.StatisticsList;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
-	implements ConnectionHandlerIfc {
+public class ServerConnectionManager
+		extends ConnectionManager<XMPPIOService<Object>>
+		implements ConnectionHandlerIfc<XMPPIOService<Object>> {
 
 	/**
    * Variable <code>log</code> is a class logger.
    */
   private static final Logger log =
-    Logger.getLogger("tigase.server.xmppserver.ServerConnectionManager");
+    Logger.getLogger(ServerConnectionManager.class.getName());
 
 	private static final String XMLNS_DB_ATT = "xmlns:db";
 	private static final String XMLNS_DB_VAL = "jabber:server:dialback";
@@ -107,10 +106,14 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 	 * Incoming (accept) services by sessionId. Some servers (EJabberd) opens
 	 * many connections for each domain, especially when in cluster mode.
 	 */
-	private ConcurrentSkipListMap<String, XMPPIOService> incoming =
-    new ConcurrentSkipListMap<String, XMPPIOService>();
+	private ConcurrentSkipListMap<String, XMPPIOService<Object>> incoming =
+    new ConcurrentSkipListMap<String, XMPPIOService<Object>>();
 
 	private Timer connectionWatchdog = new Timer("s2s connections watchdog");
+	private static Map<String, ConnectionWatchdogTask> waitingTasks =
+			new LinkedHashMap<String, ConnectionWatchdogTask>();
+
+
 
 	protected ServerConnections getServerConnections(String cid) {
 		return connectionsByLocalRemote.get(cid);
@@ -326,7 +329,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 			JIDUtils.getNodeHost(packet.getElemTo()), null);
 	}
 
-	private String getConnectionId(XMPPIOService service) {
+	private String getConnectionId(XMPPIOService<Object> service) {
 		String local_hostname =
 			(String)service.getSessionData().get("local-hostname");
 		String remote_hostname =
@@ -337,7 +340,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 	}
 
 	@Override
-	public Queue<Packet> processSocketData(XMPPIOService serv) {
+	public Queue<Packet> processSocketData(XMPPIOService<Object> serv) {
 		Queue<Packet> packets = serv.getReceivedPackets();
 		Packet p = null;
 		while ((p = packets.poll()) != null) {
@@ -392,7 +395,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 	}
 
 
-	private void processStreamError(Packet packet, XMPPIOService serv) {
+	private void processStreamError(Packet packet, XMPPIOService<Object> serv) {
 		Authorization author = Authorization.RECIPIENT_UNAVAILABLE;
 		if (packet.getElement().getChild("host-unknown") != null) {
 			author = Authorization.REMOTE_SERVER_NOT_FOUND;
@@ -402,7 +405,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 		serv.stop();
 	}
 
-	private boolean checkPacket(Packet packet, XMPPIOService serv) {
+	private boolean checkPacket(Packet packet, XMPPIOService<Object> serv) {
 		String packet_from = packet.getElemFrom();
 		String packet_to = packet.getElemTo();
 		if (packet_from == null || packet_to == null) {
@@ -441,7 +444,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 		if (session_id == null) {
 			return false;
 		}
-		XMPPIOService serv = incoming.get(session_id);
+		XMPPIOService<Object> serv = incoming.get(session_id);
 		if (serv == null || serv.getSessionData().get("valid") == null) {
 			return false;
 		} else {
@@ -467,7 +470,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 	}
 
 	@Override
-	public String xmppStreamOpened(XMPPIOService serv,
+	public String xmppStreamOpened(XMPPIOService<Object> serv,
 		Map<String, String> attribs) {
 
 		if (log.isLoggable(Level.FINER)) {
@@ -549,7 +552,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 	}
 
 	@Override
-	public void xmppStreamClosed(XMPPIOService serv) {
+	public void xmppStreamClosed(XMPPIOService<Object> serv) {
 		if (log.isLoggable(Level.FINER)) {
 			log.finer("Stream closed: " + getConnectionId(serv));
 		}
@@ -615,7 +618,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 	}
 
 	@Override
-	public void serviceStarted(XMPPIOService serv) {
+	public void serviceStarted(XMPPIOService<Object> serv) {
 		super.serviceStarted(serv);
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("s2s connection opened: " + serv.getRemoteAddress()
@@ -690,7 +693,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 	}
 
 	@Override
-	public boolean serviceStopped(XMPPIOService serv) {
+	public boolean serviceStopped(XMPPIOService<Object> serv) {
 		boolean result = super.serviceStopped(serv);
 		if (result) {
 			switch (serv.connectionType()) {
@@ -734,9 +737,9 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 					break;
 				case accept:
 					String session_id = (String) serv.getSessionData().get(
-									serv.SESSION_ID_KEY);
+									XMPPIOService.SESSION_ID_KEY);
 					if (session_id != null) {
-						XMPPIOService rem = incoming.remove(session_id);
+						XMPPIOService<Object> rem = incoming.remove(session_id);
 						if (rem == null) {
 							if (log.isLoggable(Level.FINE)) {
 								log.fine("No service with given SESSION_ID: " + session_id);
@@ -765,7 +768,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 		return result;
 	}
 
-	private void generateStreamError(String error_el, XMPPIOService serv) {
+	private void generateStreamError(String error_el, XMPPIOService<Object> serv) {
 		Element error = new Element("stream:error",
 			new Element[] {
 				new Element(error_el,
@@ -782,7 +785,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 		}
 	}
 
-	public synchronized void processDialback(Packet packet, XMPPIOService serv) {
+	public synchronized void processDialback(Packet packet, XMPPIOService<Object> serv) {
 
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("DIALBACK - " + packet.getStringData());
@@ -808,7 +811,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 		}
 		String cid = getConnectionId(local_hostname, remote_hostname);
 		ServerConnections serv_conns = getServerConnections(cid);
-		String session_id = (String)serv.getSessionData().get(serv.SESSION_ID_KEY);
+		String session_id = (String)serv.getSessionData().get(XMPPIOService.SESSION_ID_KEY);
 		String serv_local_hostname =
       (String)serv.getSessionData().get("local-hostname");
 		String serv_remote_hostname =
@@ -950,7 +953,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 	}
 
 	public boolean sendToIncoming(String session_id, Packet packet) {
-		XMPPIOService serv = incoming.get(session_id);
+		XMPPIOService<Object> serv = incoming.get(session_id);
 		if (serv != null) {
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("Sending to incoming connectin: " + session_id
@@ -967,7 +970,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 	}
 
 	public void validateIncoming(String session_id, boolean valid) {
-		XMPPIOService serv = incoming.get(session_id);
+		XMPPIOService<Object> serv = incoming.get(session_id);
 		if (serv != null) {
 			serv.getSessionData().put("valid", valid);
 			if (!valid) {
@@ -1012,12 +1015,19 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService>
 	}
 
 	@Override
-	protected XMPPIOService getXMPPIOServiceInstance() {
-		return new XMPPIOService();
+	protected XMPPIOService<Object> getXMPPIOServiceInstance() {
+		return new XMPPIOService<Object>();
 	}
 
-	private static Map<String, ConnectionWatchdogTask> waitingTasks =
-					new LinkedHashMap<String, ConnectionWatchdogTask>();
+	@Override
+	public String getDiscoDescription() {
+		return "Server connection manager";
+	}
+
+	@Override
+	public String getDiscoCategory() {
+		return "s2s";
+	}
 
 	private class ConnectionWatchdogTask extends TimerTask {
 

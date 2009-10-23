@@ -31,13 +31,14 @@ import tigase.server.Packet;
  *
  * Created: Wed Jun 11 22:13:31 2008
  *
+ * @param <IO> 
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public interface ConnectionHandlerIfc {
+public interface ConnectionHandlerIfc<IO extends XMPPIOService> {
 
-	boolean writePacketToSocket(XMPPIOService serv, Packet packet);
+	boolean writePacketToSocket(IO serv, Packet packet);
 
-	void writePacketsToSocket(XMPPIOService serv, Queue<Packet> packets);
+	void writePacketsToSocket(IO serv, Queue<Packet> packets);
 
 }

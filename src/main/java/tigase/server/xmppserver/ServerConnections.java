@@ -54,7 +54,7 @@ public class ServerConnections {
 	/**
 	 * Outgoing (connect) service for data packets.
 	 */
-	private XMPPIOService outgoing = null;
+	private XMPPIOService<Object> outgoing = null;
 	private OutgoingState conn_state = OutgoingState.NULL;
 
 // 	/**
@@ -83,7 +83,7 @@ public class ServerConnections {
 	private long receivedPackets = 0;
 	private String cid = null;
 
-	private ConnectionHandlerIfc handler = null;
+	private ConnectionHandlerIfc<XMPPIOService<Object>> handler = null;
 
 	/**
 	 * Keeps the creation time. After some time the queue and all
@@ -99,7 +99,7 @@ public class ServerConnections {
 	 *
 	 * @param handler 
 	 */
-	public ServerConnections(ConnectionHandlerIfc handler, String cid) {
+	public ServerConnections(ConnectionHandlerIfc<XMPPIOService<Object>> handler, String cid) {
 		this.handler = handler;
 		this.cid = cid;
 	}
@@ -253,8 +253,8 @@ public class ServerConnections {
 		return db_keys.get(sessionId);
 	}
 
-	public synchronized void addOutgoing(XMPPIOService serv) {
-		XMPPIOService old = outgoing;
+	public synchronized void addOutgoing(XMPPIOService<Object> serv) {
+		XMPPIOService<Object> old = outgoing;
 		if (outgoing != serv) {
 			outgoing = serv;
 			conn_state = OutgoingState.HANDSHAKING;
@@ -322,11 +322,11 @@ public class ServerConnections {
 		return outgoing != null && outgoing.isConnected();
 	}
 
-	public boolean isOutgoing(XMPPIOService serv) {
+	public boolean isOutgoing(XMPPIOService<Object> serv) {
 		return serv == outgoing;
 	}
 
-	public void serviceStopped(XMPPIOService serv) {
+	public void serviceStopped(XMPPIOService<Object> serv) {
 		String session_id = 
 						(String) serv.getSessionData().get(XMPPIOService.SESSION_ID_KEY);
 		if (session_id != null) {
