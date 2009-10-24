@@ -32,6 +32,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.script.Bindings;
 import tigase.db.ComponentRepository;
 import tigase.net.ConnectionType;
 import tigase.net.SocketType;
@@ -63,7 +64,7 @@ public class ComponentProtocol
 	public static final String EXTCOMP_REPO_CLASS_PROPERTY = "--extcomp-repo-class";
 	public static final String EXTCOMP_REPO_CLASS_PROP_KEY = "repository-class";
 	public static final String EXTCOMP_REPO_CLASS_PROP_VAL =
-					"tigase.server.ext.CompConfigRepository";
+					"tigase.server.ext.CompDBRepository";
 	public static final String PACK_ROUTED_KEY = "pack-routed";
 	public static final String RETURN_SERVICE_DISCO_KEY = "service-disco";
 	public static final boolean RETURN_SERVICE_DISCO_VAL = true;
@@ -168,8 +169,6 @@ public class ComponentProtocol
 		}
 		return result;
 	}
-
-
 
 	@Override
 	public void xmppStreamClosed(XMPPIOService<ComponentConnection> serv) {	}
@@ -443,6 +442,12 @@ public class ComponentProtocol
 	@Override
 	public CompRepoItem getCompRepoItem(String hostname) {
 		return repo.getItem(hostname);
+	}
+
+	@Override
+	public void initBindings(Bindings binds) {
+		super.initBindings(binds);
+		binds.put(ComponentRepository.COMP_REPO_BIND, repo);
 	}
 
 }

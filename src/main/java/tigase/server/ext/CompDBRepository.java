@@ -22,15 +22,20 @@
 
 package tigase.server.ext;
 
-import tigase.db.comp.ConfigRepository;
+import tigase.db.comp.UserRepoRepository;
 
 /**
- * Created: Oct 3, 2009 2:00:30 PM
+ * Created: Oct 24, 2009 3:55:41 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class CompConfigRepository extends ConfigRepository<CompRepoItem> {
+public class CompDBRepository extends UserRepoRepository<CompRepoItem> {
+
+	@Override
+	public String getRepoUser() {
+		return CompRepoDefaults.getRepoUser();
+	}
 
 	@Override
 	public String[] getDefaultPropetyItems() {

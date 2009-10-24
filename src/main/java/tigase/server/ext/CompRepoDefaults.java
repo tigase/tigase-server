@@ -22,34 +22,39 @@
 
 package tigase.server.ext;
 
-import tigase.db.comp.ConfigRepository;
-
 /**
- * Created: Oct 3, 2009 2:00:30 PM
+ * Created: Oct 24, 2009 3:57:36 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class CompConfigRepository extends ConfigRepository<CompRepoItem> {
+public abstract class CompRepoDefaults {
 
-	@Override
-	public String[] getDefaultPropetyItems() {
-		return CompRepoDefaults.getDefaultPropetyItems();
+	private static final String comp_user = "ext-comp-manager";
+	private static final String comp_list_pkey = "ext-comp-lists";
+
+	public static String getRepoUser() {
+		return comp_user;
 	}
 
-	@Override
-	public String getPropertyKey() {
-		return CompRepoDefaults.getPropertyKey();
+	public static String getItemsListPKey() {
+		return comp_list_pkey;
 	}
 
-	@Override
-	public String getConfigKey() {
-		return CompRepoDefaults.getConfigKey();
+	public static String[] getDefaultPropetyItems() {
+		return new String[] {"muc.domain.tld:passwd:listen:5277:accept"};
 	}
 
-	@Override
-	public CompRepoItem getItemInstance() {
-		return CompRepoDefaults.getItemInstance();
+	public static String getPropertyKey() {
+		return "--external";
+	}
+
+	public static String getConfigKey() {
+		return "comp-items";
+	}
+
+	public static CompRepoItem getItemInstance() {
+		return new CompRepoItem();
 	}
 
 }
