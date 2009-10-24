@@ -48,6 +48,8 @@ import java.util.Map;
 public interface ComponentRepository<Item extends RepositoryItem> 
 		extends Iterable<Item> {
 
+	public static final String COMP_REPO_BIND = "comp_repo";
+
 	/**
 	 * The method is called to obtain defualt configuration settings if there are
 	 * any for this repository implementation The configuration settings are
@@ -134,5 +136,11 @@ public interface ComponentRepository<Item extends RepositoryItem>
 	 * @return
 	 */
 	Collection<Item> allItems();
+
+	/**
+	 * Creates a new, uninitialized instance of the repository Item.
+	 * @return a new, uninitialized instance of the repository Item.
+	 */
+	Item getItemInstance();
 
 }
