@@ -186,10 +186,11 @@ public class BasicComponent implements Configurable, XMPPService {
 					if (log.isLoggable(Level.FINER)) {
 						log.finer("Processing admin command: " + pc.toString());
 					}
-					Bindings binds = com.getBindings();
-					if (binds == null) {
-						binds = scriptEngineManager.getBindings();
-					}
+//					Bindings binds = com.getBindings();
+//					if (binds == null) {
+//						binds = scriptEngineManager.getBindings();
+//					}
+					Bindings binds = scriptEngineManager.getBindings();
 					initBindings(binds);
 					com.runCommand(pc, binds, results);
 				} else {
@@ -246,12 +247,21 @@ public class BasicComponent implements Configurable, XMPPService {
 								}
 							}
 							buffr.close();
-							if (cmdId == null || cmdDescr == null) {
+							if (cmdId == null || cmdDescr == null || comp == null) {
 								log.warning("Admin script found but it has no command ID or command description: " +
 										file);
 								continue;
 							}
-							if (!getName().equals(comp)) {
+							// What components should load the script....
+							String[] comp_names = comp.split(",");
+							boolean found = false;
+							for (String cmp : comp_names) {
+								found = getName().equals(cmp);
+								if (found) {
+									break;
+								}
+							}
+							if (!found) {
 								log.info("Admin script for a different component: " + comp);
 								continue;
 							}
