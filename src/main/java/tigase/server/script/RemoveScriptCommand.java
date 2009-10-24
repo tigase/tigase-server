@@ -22,8 +22,6 @@
 
 package tigase.server.script;
 
-import tigase.server.script.CommandIfc;
-import tigase.server.script.AbstractScriptCommand;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Queue;
@@ -86,7 +84,7 @@ public class RemoveScriptCommand extends AbstractScriptCommand {
 
 	@Override
 	public Bindings getBindings() {
-		throw new UnsupportedOperationException("Not supported yet.");
+		return null;
 	}
 
 }
