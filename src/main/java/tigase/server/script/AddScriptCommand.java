@@ -33,9 +33,6 @@ import javax.script.Bindings;
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-import tigase.disco.ServiceEntity;
-import tigase.disco.ServiceIdentity;
-import tigase.disco.XMPPService;
 import tigase.server.Command;
 import tigase.server.Packet;
 
