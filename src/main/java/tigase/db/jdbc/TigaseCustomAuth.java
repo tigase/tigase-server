@@ -598,10 +598,10 @@ public class TigaseCustomAuth implements UserAuthRepository {
 			final String db_password = getPassword(user);
 			try {
 				final String digest_db_pass =	Algorithms.hexDigest(id, db_password, alg);
-   				if (log.isLoggable(Level.FINEST)) {
-       				log.finest("Comparing passwords, given: " + digest
-            			+ ", db: " + digest_db_pass);
-                }
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("Comparing passwords, given: " + digest + ", db: " +
+							digest_db_pass);
+				}
 				return digest.equals(digest_db_pass);
 			} catch (NoSuchAlgorithmException e) {
 				throw new AuthorizationException("No such algorithm.", e);
