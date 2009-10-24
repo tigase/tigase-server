@@ -47,7 +47,7 @@ if (jid == null || domain == null ||
 	(domain == DomainFilter.DOMAINS.LIST.name() && domainList == null)) {
 	def res = (Packet)p.commandResult(Command.DataType.form);
 	Command.addFieldValue(res, JID, jid ?: "", "jid-single", "User JID")
-	domainStr = []
+	def domainStr = []
   DomainFilter.DOMAINS.values().each { domainStr += it.name() }
 	Command.addFieldValue(res, DOMAIN, domain ?: domainStr[0], "List of domains",
 		(String[])domainStr, (String[])domainStr)
