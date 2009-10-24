@@ -140,6 +140,7 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 			log.log(Level.SEVERE,
 					"Problem with loading items list from the database.", ex);
 		}
+		log.config("All loaded items: " + items.toString());
 	}
 
 	@Override
