@@ -186,11 +186,11 @@ public class BasicComponent implements Configurable, XMPPService {
 					if (log.isLoggable(Level.FINER)) {
 						log.finer("Processing admin command: " + pc.toString());
 					}
-//					Bindings binds = com.getBindings();
-//					if (binds == null) {
-//						binds = scriptEngineManager.getBindings();
-//					}
-					Bindings binds = scriptEngineManager.getBindings();
+					Bindings binds = com.getBindings();
+					if (binds == null) {
+						binds = scriptEngineManager.getBindings();
+					}
+//					Bindings binds = scriptEngineManager.getBindings();
 					initBindings(binds);
 					com.runCommand(pc, binds, results);
 				} else {

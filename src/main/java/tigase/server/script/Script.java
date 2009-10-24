@@ -22,7 +22,6 @@
 
 package tigase.server.script;
 
-import tigase.server.script.AbstractScriptCommand;
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Queue;
@@ -83,14 +82,14 @@ public class Script extends AbstractScriptCommand {
 		ScriptContext context = null;
 		StringWriter writer = null;
 		try {
-			Bindings localBinds = scriptEngine.createBindings();
-			localBinds.put(PACKET, packet);
+			//Bindings localBinds = scriptEngine.createBindings();
+			binds.put(PACKET, packet);
 			// Workaround for Python which doesn't return values and can overwrite
 			// values only if type is correct
 			Object res = "";
-			localBinds.put("result", res);
+			binds.put("result", res);
 			context = scriptEngine.getContext();
-			context.setBindings(localBinds, ScriptContext.ENGINE_SCOPE);
+			context.setBindings(binds, ScriptContext.ENGINE_SCOPE);
 			writer = new StringWriter();
 			context.setErrorWriter(writer);
 			if (compiledScript != null) {
@@ -102,9 +101,9 @@ public class Script extends AbstractScriptCommand {
 				// Yes, Python doesn't return results normally
 				// (or I don't know how to do it)
 				// Python can either return a Packet as 'packet' or string as 'result'
-				res = localBinds.get("result");
+				res = binds.get("result");
 				if (res.toString().isEmpty()) {
-					res = localBinds.get(PACKET);
+					res = binds.get(PACKET);
 					if (res == packet) {
 						// Ups, apparently the script returned no results, to avoid infinite loop
 						// we have to handle this somehow...
