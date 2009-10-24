@@ -22,6 +22,7 @@
 
 package tigase.db;
 
+import tigase.server.Packet;
 import tigase.xml.Element;
 
 /**
@@ -84,5 +85,20 @@ public interface RepositoryItem {
 	 * @return an Item key.
 	 */
 	String getKey();
+
+	/**
+	 * The method is used for handling ad-hoc commands. The 'empty' ad-hoc command
+	 * packet is provided and the Item should fill it with fields for the user.
+	 * @param packet with empty ad-hoc command to fill with fields
+	 */
+	void addCommandFields(Packet packet);
+
+	/**
+	 * The method used for handling ad-hoc commands. After a user fills all given field
+	 * the ad-hoc command packet is passed back to the item to initialize it with
+	 * data. Similar method to initFromElement(), but the data source is different.
+	 * @param packet with ad-hoc command filled by the user.
+	 */
+	void initFromCommand(Packet packet);
 
 }
