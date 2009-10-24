@@ -105,6 +105,11 @@ public class Script extends AbstractScriptCommand {
 				res = localBinds.get("result");
 				if (res.toString().isEmpty()) {
 					res = localBinds.get(PACKET);
+					if (res == packet) {
+						// Ups, apparently the script returned no results, to avoid infinite loop
+						// we have to handle this somehow...
+						res = "Script finished with no errors but returned no results.";
+					}
 				}
 			}
 			if (res instanceof Packet) {
