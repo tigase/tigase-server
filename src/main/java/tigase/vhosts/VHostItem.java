@@ -22,6 +22,7 @@ package tigase.vhosts;
 
 import java.util.logging.Logger;
 import tigase.db.RepositoryItem;
+import tigase.server.Packet;
 import tigase.xml.Element;
 
 /**
@@ -329,6 +330,10 @@ public class VHostItem implements RepositoryItem {
 
 	@Override
 	public void initFromElement(Element elem) {
+		if (elem.getName() != VHOST_ELEM) {
+			throw new IllegalArgumentException("Incorrect element name, expected: " +
+					VHOST_ELEM);
+		}
 		vhost = elem.getAttribute(HOSTNAME_ATT);
 		enabled = Boolean.parseBoolean(elem.getAttribute(ENABLED_ATT));
 		anonymousEnabled =
@@ -352,6 +357,16 @@ public class VHostItem implements RepositoryItem {
 	@Override
 	public String getKey() {
 		return this.vhost;
+	}
+
+	@Override
+	public void addCommandFields(Packet packet) {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	@Override
+	public void initFromCommand(Packet packet) {
+		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 	private class UnmodifiableVHostItem extends VHostItem {

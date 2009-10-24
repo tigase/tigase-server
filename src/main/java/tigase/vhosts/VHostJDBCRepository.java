@@ -22,7 +22,6 @@
 
 package tigase.vhosts;
 
-import java.util.logging.Logger;
 import tigase.db.comp.UserRepoRepository;
 
 /**
@@ -46,17 +45,9 @@ import tigase.db.comp.UserRepoRepository;
  */
 public class VHostJDBCRepository extends UserRepoRepository<VHostItem> {
 
-	private static final Logger log =
-			Logger.getLogger(VHostJDBCRepository.class.getName());
-
 	@Override
 	public String getRepoUser() {
 		return VHostRepoDefaults.getRepoUser();
-	}
-
-	@Override
-	public String getItemsListPKey() {
-		return VHostRepoDefaults.getItemsListPKey();
 	}
 
 	@Override
@@ -77,6 +68,11 @@ public class VHostJDBCRepository extends UserRepoRepository<VHostItem> {
 	@Override
 	public VHostItem getItemInstance() {
 		return VHostRepoDefaults.getItemInstance();
+	}
+
+	@Override
+	public String getItemsListPKey() {
+		return VHostRepoDefaults.getItemsListPKey();
 	}
 
 }
