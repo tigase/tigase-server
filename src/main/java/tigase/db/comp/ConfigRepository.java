@@ -52,8 +52,6 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	
 	public abstract String getConfigKey();
 
-	public abstract Item getItemInstance();
-
 	@Override
 	public void getDefaults(Map<String, Object> defs,
 			Map<String, Object> params) {
