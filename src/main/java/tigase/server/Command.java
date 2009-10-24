@@ -530,9 +530,12 @@ public enum Command {
 		x.addChild(field);
 	}
 
-	public static void addTextField(final Packet packet, final String t_name,
-					final String t_value) {
-		addFieldValue(packet, t_name, t_value, "fixed");
+	public static void addTextField(Packet packet, String f_name, String f_value) {
+		addFieldValue(packet, f_name, f_value, "fixed");
+	}
+
+	public static void addHiddenField(Packet packet, String f_name, String f_value) {
+		addFieldValue(packet, f_name, f_value, "hidden");
 	}
 
 	public static void addFieldValue(final Packet packet,
