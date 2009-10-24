@@ -53,26 +53,26 @@ def userPassVer = Command.getFieldValue(packet, PASSWORD_VERIFY)
 def userEmail = Command.getFieldValue(packet, EMAIL)
 
 if (userJid == null || userPass == null || userPassVer == null || userEmail == null) {
-	def res = p.commandResult(Command.DataType.form);
+	def result = p.commandResult(Command.DataType.form);
 
-  Command.addTitle(res, "Adding a User")
-	Command.addInstructions(res, "Fill out this form to add a user.")
+  Command.addTitle(result, "Adding a User")
+	Command.addInstructions(result, "Fill out this form to add a user.")
 
-	Command.addFieldValue(res, "FORM_TYPE", "http://jabber.org/protocol/admin",
+	Command.addFieldValue(result, "FORM_TYPE", "http://jabber.org/protocol/admin",
     "hidden")
-	Command.addFieldValue(res, JID, userJid ?: "", "jid-single",
+	Command.addFieldValue(result, JID, userJid ?: "", "jid-single",
     "The Jabber ID for the account to be added")
-	Command.addFieldValue(res, PASSWORD, userPass ?: "", "text-private",
+	Command.addFieldValue(result, PASSWORD, userPass ?: "", "text-private",
 	  "The password for this account")
-	Command.addFieldValue(res, PASSWORD_VERIFY, userPassVer ?: "", "text-private",
+	Command.addFieldValue(result, PASSWORD_VERIFY, userPassVer ?: "", "text-private",
 	  "Retype password")
-	Command.addFieldValue(res, EMAIL, userEmail ?: "", "text-single",
+	Command.addFieldValue(result, EMAIL, userEmail ?: "", "text-single",
 	  "Email address")
 
-	return res
+	return result
 }
 
-Packet result = p.commandResult(Command.DataType.result)
+def result = p.commandResult(Command.DataType.result)
 try {
   auth_repo.addUser(userJid, userPass)
   user_repo.setData(userJid, "email", userEmail);
