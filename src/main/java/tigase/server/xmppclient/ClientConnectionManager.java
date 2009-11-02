@@ -209,10 +209,14 @@ public class ClientConnectionManager
 						//					writePacketToSocket(serv, p_proceed);
 						serv.addPacketToSend(p_proceed);
 						serv.processWaitingPackets();
+						while (serv.waitingToSend()) {
+							serv.writeRawData(null);
+							Thread.sleep(10);
+						}
 						serv.startTLS(false);
 						//					serv.call();
 						readThread.addSocketService(serv);
-					} catch (IOException e) {
+					} catch (Exception e) {
 						log.warning("Error starting TLS: " + e);
 					} // end of try-catch
 				} else {
