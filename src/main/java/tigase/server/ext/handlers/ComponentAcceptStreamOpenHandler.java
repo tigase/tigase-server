@@ -22,16 +22,17 @@
 
 package tigase.server.ext.handlers;
 
-import java.security.NoSuchAlgorithmException;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
 import java.util.UUID;
-import java.util.logging.Level;
 import java.util.logging.Logger;
+import tigase.server.Packet;
 import tigase.server.ext.CompRepoItem;
 import tigase.server.ext.ComponentConnection;
 import tigase.server.ext.ComponentProtocolHandler;
+import tigase.server.ext.ExtProcessor;
 import tigase.server.ext.StreamOpenHandler;
-import tigase.util.Algorithms;
 import tigase.xmpp.XMPPIOService;
 
 import static tigase.server.ext.ComponentProtocolHandler.*;
@@ -50,7 +51,8 @@ public class ComponentAcceptStreamOpenHandler implements StreamOpenHandler {
   private static final Logger log =
     Logger.getLogger(ComponentAcceptStreamOpenHandler.class.getName());
 
-	private String[] xmlnss = new String[]{"jabber:component:accept"};
+	private static final String XMLNS = "jabber:component:accept";
+	private String[] xmlnss = new String[]{XMLNS};
 
 	@Override
 	public String streamOpened(XMPPIOService<ComponentConnection> serv,
@@ -60,33 +62,48 @@ public class ComponentAcceptStreamOpenHandler implements StreamOpenHandler {
 			case connect: {
 				String id = attribs.get("id");
 				serv.getSessionData().put(XMPPIOService.SESSION_ID_KEY, id);
-				String secret =
-						((CompRepoItem)serv.getSessionData().get(REPO_ITEM_KEY)).
-						getAuthPasswd();
-				try {
-					String digest = Algorithms.hexDigest(id, secret, "SHA");
-					return "<handshake>" + digest + "</handshake>";
-				} catch (NoSuchAlgorithmException e) {
-					log.log(Level.SEVERE, "Can not generate digest for pass phrase.", e);
-					serv.stop();
-					return null;
+				ExtProcessor proc = handler.getProcessor("handshake");
+				if (proc != null) {
+					Queue<Packet> results = new LinkedList<Packet>();
+					proc.startProcessing(null, serv, handler, results);
+					if (results != null) {
+						StringBuilder sb = new StringBuilder();
+						for (Packet p : results) {
+							sb.append(p.getElement().toString());
+						}
+						return sb.toString();
+					}
+				} else {
+					log.warning("Required processor is not available: 'handshake'");
 				}
+				return null;
 			}
 			case accept: {
 				String hostname = attribs.get("to");
 				CompRepoItem repoItem = handler.getCompRepoItem(hostname);
-				serv.getSessionData().put(REPO_ITEM_KEY, repoItem);
-				serv.getSessionData().put(XMPPIOService.HOSTNAME_KEY, hostname);
-				String id = UUID.randomUUID().toString();
-				serv.getSessionData().put(XMPPIOService.SESSION_ID_KEY, id);
-				// This should be done only, after authentication is completed
-				// addComponentConnection(hostname, serv);
-				return "<stream:stream" +
-						" xmlns='jabber:component:accept'" +
-						" xmlns:stream='http://etherx.jabber.org/streams'" +
-						" from='" + hostname + "'" +
-						" id='" + id + "'" +
-						">";
+				if (repoItem != null) {
+					serv.getSessionData().put(REPO_ITEM_KEY, repoItem);
+					serv.getSessionData().put(XMPPIOService.HOSTNAME_KEY, hostname);
+					log.finest("CompRepoItem for " + hostname + " set: " + repoItem.
+							toString());
+					String id = UUID.randomUUID().toString();
+					serv.getSessionData().put(XMPPIOService.SESSION_ID_KEY, id);
+					log.finest("ID generated and set: " + id);
+					// This should be done only, after authentication is completed
+					// addComponentConnection(hostname, serv);
+					return "<stream:stream" +
+							" xmlns='" + XMLNS + "'" +
+							" xmlns:stream='http://etherx.jabber.org/streams'" +
+							" from='" + hostname + "'" +
+							" id='" + id + "'" +
+							">";
+				} else {
+					return "<stream:stream" +
+							" xmlns='" + XMLNS + "'" +
+							" xmlns:stream='http://etherx.jabber.org/streams'" +
+							" from='" + hostname + "'" +
+							"><stream:error><host-unknown xmlns='urn:ietf:params:xml:ns:xmpp-streams'/></stream:error>";
+				}
 			}
 			default:
 				// Do nothing, more data should come soon...
@@ -110,7 +127,7 @@ public class ComponentAcceptStreamOpenHandler implements StreamOpenHandler {
 				// This should be done only, after authentication is completed
 				//addComponentConnection(hostname, serv);
 				String data = "<stream:stream" +
-						" xmlns='jabber:component:accept'" +
+						" xmlns='" + XMLNS + "'" +
 						" xmlns:stream='http://etherx.jabber.org/streams'" +
 						" to='" + repoItem.getDomain() + "'" +
 						">";

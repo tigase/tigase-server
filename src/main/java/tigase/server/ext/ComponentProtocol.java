@@ -42,7 +42,11 @@ import tigase.server.ext.handlers.ComponentAcceptStreamOpenHandler;
 import tigase.server.ext.handlers.ComponentConnectStreamOpenHandler;
 import tigase.server.ext.handlers.HandshakeProcessor;
 import tigase.server.ext.handlers.JabberClientStreamOpenHandler;
+import tigase.server.ext.handlers.SASLProcessor;
+import tigase.server.ext.handlers.StartTLSProcessor;
+import tigase.server.ext.handlers.StreamFeaturesProcessor;
 import tigase.stats.StatisticsList;
+import tigase.xml.Element;
 import tigase.xmpp.XMPPIOService;
 
 /**
@@ -87,7 +91,7 @@ public class ComponentProtocol
 	 * network. In most cases if not all, these processors handle just
 	 * protocol traffic, all the rest traffic should be passed on to MR.
 	 */
-	private List<ExtProcessor> processors = new ArrayList<ExtProcessor>();
+	private Map<String, ExtProcessor> processors = new LinkedHashMap<String, ExtProcessor>();
 	private UnknownXMLNSStreamOpenHandler unknownXMLNSHandler =
 			new UnknownXMLNSStreamOpenHandler();
 	private ComponentRepository<CompRepoItem> repo = null;
@@ -126,7 +130,7 @@ public class ComponentProtocol
 				log.finest("Processing socket data: " + p.getStringData());
 			}
 			boolean processed = false;
-			for (ExtProcessor proc : processors) {
+			for (ExtProcessor proc : processors.values()) {
 				processed |= proc.process(p, serv, this, results);
 				Packet res = null;
 				while ((res = results.poll()) != null) {
@@ -180,15 +184,23 @@ public class ComponentProtocol
 			log.finest("Stream opened: " + serv.getRemoteAddress() +
 					", xmlns: " + attribs.get("xmlns") +
 					", type: " + serv.connectionType().toString() +
-					", id=" + serv.getUniqueId());
+					", uniqueId=" + serv.getUniqueId() +
+					", to=" + attribs.get("to"));
 		}
 		String s_xmlns = attribs.get("xmlns");
+		String result = null;
 		StreamOpenHandler handler = streamOpenHandlers.get(s_xmlns);
 		if (handler == null || s_xmlns == null) {
-			return unknownXMLNSHandler.streamOpened(serv, attribs, this);
+			log.finest("unknownXMLNSHandler is processing request");
+			result = unknownXMLNSHandler.streamOpened(serv, attribs, this);
 		} else {
-			return handler.streamOpened(serv, attribs, this);
+			log.finest(handler.getClass().getName() + " is processing request");
+			result = handler.streamOpened(serv, attribs, this);
 		}
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Sending back: " + result);
+		}
+		return result;
 	}
 
 	@Override
@@ -206,7 +218,7 @@ public class ComponentProtocol
 		String result = null;
 		if (handler == null) {
 			// Well, that's a but, we should not be here...
-			log.warning("This is a bug, xmlns not set for the component protocol.");
+			log.fine("XMLNS not set, accepting a new connection with xmlns auto-detection.");
 		} else {
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("cid: " + (String)serv.getSessionData().get("cid") +
@@ -345,7 +357,7 @@ public class ComponentProtocol
 			repo.getDefaults(defs, params);
 		} catch (Exception e) {
 			log.log(Level.SEVERE,
-							"Can not instantiate VHosts repository for class: " +
+							"Can not instantiate items repository for class: " +
 							repo_class, e);
 		}
 		defs.put(PACK_ROUTED_KEY, PACK_ROUTED_VAL);
@@ -367,17 +379,21 @@ public class ComponentProtocol
 			repo_tmp.setProperties(properties);
 			repo = repo_tmp;
 		} catch (Exception e) {
-			log.log(Level.SEVERE,
-							"Can not create VHost repository instance for class: " +
+			log.log(Level.SEVERE, "Can not create items repository instance for class: " +
 							repo_class, e);
 		}
 		// Activate all connections for which parameters are defined in the repository
 		for (CompRepoItem repoItem : repo) {
+			log.info("Loaded repoItem: " + repoItem.toString());
 			if (repoItem.getPort() > 0) {
 				Map<String, Object> port_props = new LinkedHashMap<String, Object>();
 				port_props.put(PORT_KEY, repoItem.getPort());
-				port_props.put(PORT_LOCAL_HOST_PROP_KEY, repoItem.getDomain());
-				port_props.put(PORT_REMOTE_HOST_PROP_KEY, repoItem.getRemoteHost());
+				if (repoItem.getDomain() != null) {
+					port_props.put(PORT_LOCAL_HOST_PROP_KEY, repoItem.getDomain());
+				}
+				if (repoItem.getRemoteHost() != null) {
+					port_props.put(PORT_REMOTE_HOST_PROP_KEY, repoItem.getRemoteHost());
+				}
 				port_props.put(PORT_TYPE_PROP_KEY, repoItem.getConnectionType());
 				port_props.put(PORT_SOCKET_PROP_KEY, SocketType.plain);
 				port_props.put(PORT_IFC_PROP_KEY, PORT_IFC_PROP_VAL);
@@ -387,8 +403,15 @@ public class ComponentProtocol
 				addWaitingTask(port_props);
 			}
 		}
-		processors = new ArrayList<ExtProcessor>();
-		processors.add(new HandshakeProcessor());
+		processors = new LinkedHashMap<String, ExtProcessor>();
+		ExtProcessor proc = new HandshakeProcessor();
+		processors.put(proc.getId(), proc);
+		proc = new StreamFeaturesProcessor();
+		processors.put(proc.getId(), proc);
+		proc = new StartTLSProcessor();
+		processors.put(proc.getId(), proc);
+		proc = new SASLProcessor();
+		processors.put(proc.getId(), proc);
 	}
 
 	@Override
@@ -448,6 +471,28 @@ public class ComponentProtocol
 	public void initBindings(Bindings binds) {
 		super.initBindings(binds);
 		binds.put(ComponentRepository.COMP_REPO_BIND, repo);
+	}
+
+	@Override
+	public List<Element> getStreamFeatures(XMPPIOService<ComponentConnection> serv) {
+		List<Element> results = new LinkedList<Element>();
+		for (ExtProcessor proc : processors.values()) {
+			List<Element> proc_res = proc.getStreamFeatures(serv, this);
+			if (proc_res != null) {
+				results.addAll(proc_res);
+			}
+		}
+		return results;
+	}
+
+	@Override
+	public ExtProcessor getProcessor(String key) {
+		return processors.get(key);
+	}
+
+	@Override
+	public StreamOpenHandler getStreamOpenHandler(String xmlns) {
+		return streamOpenHandlers.get(xmlns);
 	}
 
 }

@@ -22,6 +22,8 @@
 
 package tigase.server.ext;
 
+import java.util.List;
+import tigase.xml.Element;
 import tigase.xmpp.XMPPIOService;
 
 /**
@@ -34,8 +36,14 @@ public interface ComponentProtocolHandler {
 
 	public static final String REPO_ITEM_KEY = "repo-item";
 
-	public void authenticated(XMPPIOService<ComponentConnection> serv);
+	void authenticated(XMPPIOService<ComponentConnection> serv);
 
-	public CompRepoItem getCompRepoItem(String hostname);
+	CompRepoItem getCompRepoItem(String hostname);
+
+	List<Element> getStreamFeatures(XMPPIOService<ComponentConnection> serv);
+
+	ExtProcessor getProcessor(String string);
+
+	StreamOpenHandler getStreamOpenHandler(String xmlns);
 
 }

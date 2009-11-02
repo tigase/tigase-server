@@ -22,6 +22,8 @@
 
 package tigase.server.ext.handlers;
 
+import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,6 +35,8 @@ import tigase.server.ext.ExtProcessor;
 import tigase.util.Algorithms;
 import tigase.xml.Element;
 import tigase.xmpp.XMPPIOService;
+
+import static tigase.server.ext.ComponentProtocolHandler.*;
 
 /**
  * Created: Oct 21, 2009 1:58:56 PM
@@ -48,11 +52,14 @@ public class HandshakeProcessor implements ExtProcessor {
   private static final Logger log =
     Logger.getLogger(HandshakeProcessor.class.getName());
 
+	private static final String EL_NAME = "handshake";
+	private static final String ID = EL_NAME;
+
 	@Override
 	public boolean process(Packet p, XMPPIOService<ComponentConnection> serv,
 			ComponentProtocolHandler handler, Queue<Packet> results) {
 		boolean result = false;
-		if (p.getElemName() == "handshake") {
+		if (p.getElemName() == EL_NAME) {
 			result = true;
 			switch (serv.connectionType()) {
 				case connect: {
@@ -99,6 +106,34 @@ public class HandshakeProcessor implements ExtProcessor {
 			} // end of switch (service.connectionType())
 		}
 		return result;
+	}
+
+	@Override
+	public List<Element> getStreamFeatures(XMPPIOService<ComponentConnection> serv,
+			ComponentProtocolHandler handler) {
+		return null;
+	}
+
+	@Override
+	public String getId() {
+		return ID;
+	}
+
+	@Override
+	public void startProcessing(Packet p,
+			XMPPIOService<ComponentConnection> serv, ComponentProtocolHandler handler,
+			Queue<Packet> results) {
+		String secret =
+				((CompRepoItem)serv.getSessionData().get(REPO_ITEM_KEY)).getAuthPasswd();
+		try {
+			String id = (String)serv.getSessionData().get(XMPPIOService.SESSION_ID_KEY);
+			String digest = Algorithms.hexDigest(id, secret, "SHA");
+			Packet result = new Packet(new Element(EL_NAME, digest));
+			results.offer(result);
+		} catch (NoSuchAlgorithmException e) {
+			log.log(Level.SEVERE, "Can not generate digest for pass phrase.", e);
+			serv.stop();
+		}
 	}
 
 }

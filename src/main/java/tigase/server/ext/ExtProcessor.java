@@ -22,8 +22,10 @@
 
 package tigase.server.ext;
 
+import java.util.List;
 import java.util.Queue;
 import tigase.server.Packet;
+import tigase.xml.Element;
 import tigase.xmpp.XMPPIOService;
 
 /**
@@ -34,7 +36,15 @@ import tigase.xmpp.XMPPIOService;
  */
 public interface ExtProcessor {
 
-	public boolean process(Packet p, XMPPIOService<ComponentConnection> serv,
+	String getId();
+
+	boolean process(Packet p, XMPPIOService<ComponentConnection> serv,
 			ComponentProtocolHandler handler, Queue<Packet> results);
+
+	void startProcessing(Packet p, XMPPIOService<ComponentConnection> serv,
+			ComponentProtocolHandler handler, Queue<Packet> results);
+
+	List<Element> getStreamFeatures(XMPPIOService<ComponentConnection> serv,
+			ComponentProtocolHandler handler);
 
 }
