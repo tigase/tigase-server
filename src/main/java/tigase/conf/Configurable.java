@@ -71,7 +71,7 @@ public interface Configurable extends ServerComponent {
 	/**
 	 * Constant <code>GEN_CONFIG_COMP</code> keeps parameter name for
 	 * configuration with a single (given as an extra parameter) component
-	 * and XEP-0114 component loaded and preconfigured to connect to other
+	 * and XEP-0114 or XEP-0225 component loaded and preconfigured to connect to other
 	 * Jabber/XMPP server instance (either Tigase or any different server).
 	 */
 	public static final String GEN_CONFIG_COMP = GEN_CONFIG + "-comp";
@@ -157,6 +157,7 @@ public interface Configurable extends ServerComponent {
 	public static final String DEF_C2S_NAME = "c2s";
 	public static final String DEF_S2S_NAME = "s2s";
 	public static final String DEF_EXT_COMP_NAME = "ext-comp";
+	public static final String DEF_COMP_PROT_NAME = "ext";
 	public static final String DEF_CL_COMP_NAME = "cl-comp";
 	public static final String DEF_SSEND_NAME = "ssend";
 	public static final String DEF_SRECV_NAME = "srecv";
@@ -182,6 +183,8 @@ public interface Configurable extends ServerComponent {
 		"tigase.cluster.SessionManagerClustered";
 	public static final String EXT_COMP_CLASS_NAME =
 		"tigase.server.xmppcomponent.ComponentConnectionManager";
+	public static final String COMP_PROT_CLASS_NAME =
+		"tigase.server.ext.ComponentProtocol";
 	public static final String CL_COMP_CLASS_NAME =
 		"tigase.cluster.ClusterConnectionManager";
 	public static final String SSEND_COMP_CLASS_NAME =

@@ -61,6 +61,8 @@ public class MessageRouterConfig {
 	{	DEF_EXT_COMP_NAME, DEF_SM_NAME };
 	private static final String[] CS_MSG_RECEIVERS_NAMES_PROP_VAL =
 	{	DEF_C2S_NAME, DEF_S2S_NAME, DEF_EXT_COMP_NAME, DEF_BOSH_NAME };
+	private static final String[] COMP_MSG_RECEIVERS_NAMES_PROP_VAL =
+	{	DEF_COMP_PROT_NAME };
 
 	private static final Map<String, String> COMPONENT_CLASSES =
 		new LinkedHashMap<String, String>();
@@ -72,6 +74,7 @@ public class MessageRouterConfig {
 		COMPONENT_CLASSES.put(DEF_C2S_NAME, C2S_COMP_CLASS_NAME);
 		COMPONENT_CLASSES.put(DEF_S2S_NAME, S2S_COMP_CLASS_NAME);
 		COMPONENT_CLASSES.put(DEF_EXT_COMP_NAME, EXT_COMP_CLASS_NAME);
+		COMPONENT_CLASSES.put(DEF_COMP_PROT_NAME, COMP_PROT_CLASS_NAME);
 		COMPONENT_CLASSES.put(DEF_CL_COMP_NAME, CL_COMP_CLASS_NAME);
 		COMPONENT_CLASSES.put(DEF_SM_NAME, SM_COMP_CLASS_NAME);
 		COMPONENT_CLASSES.put(DEF_SSEND_NAME, SSEND_COMP_CLASS_NAME);
@@ -141,15 +144,9 @@ public class MessageRouterConfig {
 			if (config_type.equals(GEN_CONFIG_CS)) {
 				rcv_names = CS_MSG_RECEIVERS_NAMES_PROP_VAL;
 			}
-			// You can now add a component for any server instance type
-			// and you can also add many different components this way...
-// 			if (config_type.equals(GEN_CONFIG_COMP)) {
-// 				String c_name = (String)params.get(GEN_COMP_NAME);
-// 				String c_class = (String)params.get(GEN_COMP_CLASS);
-// 				rcv_names = new String[] {c_name};
-// 				defs.put(MSG_RECEIVERS_PROP_KEY + c_name + ".class", c_class);
-// 				defs.put(MSG_RECEIVERS_PROP_KEY + c_name + ".active", true);
-// 			}
+ 			if (config_type.equals(GEN_CONFIG_COMP)) {
+ 				rcv_names = COMP_MSG_RECEIVERS_NAMES_PROP_VAL;
+ 			}
 		}
 
 		Arrays.sort(rcv_names);
