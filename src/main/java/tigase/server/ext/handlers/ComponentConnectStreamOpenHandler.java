@@ -22,6 +22,7 @@
 
 package tigase.server.ext.handlers;
 
+import java.util.List;
 import java.util.Map;
 import tigase.server.ext.ComponentConnection;
 import tigase.server.ext.ComponentProtocolHandler;
@@ -39,7 +40,7 @@ public class ComponentConnectStreamOpenHandler implements StreamOpenHandler {
 	private String[] xmlnss = new String[]{"jabber:component:connect"};
 
 	@Override
-	public String streamOpened(XMPPIOService<ComponentConnection> serv,
+	public String streamOpened(XMPPIOService<List<ComponentConnection>> serv,
 			Map<String, String> attribs, ComponentProtocolHandler handler) {
 		// Not sure if this is really used. For sure it is not well documented
 		// and perhaps it is not worth implementing, unless someone requests it
@@ -52,7 +53,7 @@ public class ComponentConnectStreamOpenHandler implements StreamOpenHandler {
 	}
 
 	@Override
-	public String serviceStarted(XMPPIOService<ComponentConnection> s) {
+	public String serviceStarted(XMPPIOService<List<ComponentConnection>> s) {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 

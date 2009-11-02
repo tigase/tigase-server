@@ -56,7 +56,7 @@ public class HandshakeProcessor implements ExtProcessor {
 	private static final String ID = EL_NAME;
 
 	@Override
-	public boolean process(Packet p, XMPPIOService<ComponentConnection> serv,
+	public boolean process(Packet p, XMPPIOService<List<ComponentConnection>> serv,
 			ComponentProtocolHandler handler, Queue<Packet> results) {
 		boolean result = false;
 		if (p.getElemName() == EL_NAME) {
@@ -109,7 +109,7 @@ public class HandshakeProcessor implements ExtProcessor {
 	}
 
 	@Override
-	public List<Element> getStreamFeatures(XMPPIOService<ComponentConnection> serv,
+	public List<Element> getStreamFeatures(XMPPIOService<List<ComponentConnection>> serv,
 			ComponentProtocolHandler handler) {
 		return null;
 	}
@@ -121,7 +121,7 @@ public class HandshakeProcessor implements ExtProcessor {
 
 	@Override
 	public void startProcessing(Packet p,
-			XMPPIOService<ComponentConnection> serv, ComponentProtocolHandler handler,
+			XMPPIOService<List<ComponentConnection>> serv, ComponentProtocolHandler handler,
 			Queue<Packet> results) {
 		String secret =
 				((CompRepoItem)serv.getSessionData().get(REPO_ITEM_KEY)).getAuthPasswd();

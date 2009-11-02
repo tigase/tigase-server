@@ -64,7 +64,7 @@ public class SASLProcessor implements ExtProcessor {
 	}
 
 	@Override
-	public boolean process(Packet p, XMPPIOService<ComponentConnection> serv,
+	public boolean process(Packet p, XMPPIOService<List<ComponentConnection>> serv,
 			ComponentProtocolHandler handler,	Queue<Packet> results) {
 		if (p.isElement("auth", XMLNS)) {
 			String cdata = p.getElemCData();
@@ -152,7 +152,7 @@ public class SASLProcessor implements ExtProcessor {
 	}
 
 	@Override
-	public void startProcessing(Packet p, XMPPIOService<ComponentConnection> serv,
+	public void startProcessing(Packet p, XMPPIOService<List<ComponentConnection>> serv,
 			ComponentProtocolHandler handler, Queue<Packet> results) {
 		CompRepoItem comp_item = 
 				(CompRepoItem)serv.getSessionData().get(REPO_ITEM_KEY);
@@ -168,7 +168,7 @@ public class SASLProcessor implements ExtProcessor {
 	}
 
 	@Override
-	public List<Element> getStreamFeatures(XMPPIOService<ComponentConnection> serv,
+	public List<Element> getStreamFeatures(XMPPIOService<List<ComponentConnection>> serv,
 			ComponentProtocolHandler handler) {
 		if (serv.getSessionData().get(ID) != null) {
 			return null;

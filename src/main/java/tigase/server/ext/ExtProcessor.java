@@ -38,13 +38,13 @@ public interface ExtProcessor {
 
 	String getId();
 
-	boolean process(Packet p, XMPPIOService<ComponentConnection> serv,
+	boolean process(Packet p, XMPPIOService<List<ComponentConnection>> serv,
 			ComponentProtocolHandler handler, Queue<Packet> results);
 
-	void startProcessing(Packet p, XMPPIOService<ComponentConnection> serv,
+	void startProcessing(Packet p, XMPPIOService<List<ComponentConnection>> serv,
 			ComponentProtocolHandler handler, Queue<Packet> results);
 
-	List<Element> getStreamFeatures(XMPPIOService<ComponentConnection> serv,
+	List<Element> getStreamFeatures(XMPPIOService<List<ComponentConnection>> serv,
 			ComponentProtocolHandler handler);
 
 }

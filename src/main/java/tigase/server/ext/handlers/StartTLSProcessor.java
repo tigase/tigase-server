@@ -60,7 +60,7 @@ public class StartTLSProcessor implements ExtProcessor {
 		return ID;
 	}
 
-	private void initTLS(XMPPIOService<ComponentConnection> serv, String data,
+	private void initTLS(XMPPIOService<List<ComponentConnection>> serv, String data,
 			boolean client) {
 		try {
 			serv.writeRawData(data);
@@ -76,7 +76,7 @@ public class StartTLSProcessor implements ExtProcessor {
 	}
 
 	@Override
-	public boolean process(Packet p, XMPPIOService<ComponentConnection> serv,
+	public boolean process(Packet p, XMPPIOService<List<ComponentConnection>> serv,
 			ComponentProtocolHandler handler,
 			Queue<Packet> results) {
 		if (p.getElemName() == EL_NAME) {
@@ -100,7 +100,7 @@ public class StartTLSProcessor implements ExtProcessor {
 	}
 
 	@Override
-	public void startProcessing(Packet p, XMPPIOService<ComponentConnection> serv,
+	public void startProcessing(Packet p, XMPPIOService<List<ComponentConnection>> serv,
 			ComponentProtocolHandler handler,	Queue<Packet> results) {
 			results.offer(new Packet(new Element(EL_NAME,
 					new String[] {"xmlns"},
@@ -108,7 +108,7 @@ public class StartTLSProcessor implements ExtProcessor {
 	}
 
 	@Override
-	public List<Element> getStreamFeatures(XMPPIOService<ComponentConnection> serv,
+	public List<Element> getStreamFeatures(XMPPIOService<List<ComponentConnection>> serv,
 			ComponentProtocolHandler handler) {
 		if (serv.getSessionData().get(ID) != null) {
 			return null;

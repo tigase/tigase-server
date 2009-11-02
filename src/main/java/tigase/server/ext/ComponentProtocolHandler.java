@@ -35,15 +35,23 @@ import tigase.xmpp.XMPPIOService;
 public interface ComponentProtocolHandler {
 
 	public static final String REPO_ITEM_KEY = "repo-item";
+	public static final String AUTHENTICATED_KEY = "authenticated";
+	public static final String EXTCOMP_BIND_HOSTNAMES_PROP_KEY = "bind-ext-hostnames";
 
-	void authenticated(XMPPIOService<ComponentConnection> serv);
+	void authenticated(XMPPIOService<List<ComponentConnection>> serv);
+
+	void bindHostname(String hostname, XMPPIOService<List<ComponentConnection>> serv);
+
+	void unbindHostname(String hostname, XMPPIOService<List<ComponentConnection>> serv);
 
 	CompRepoItem getCompRepoItem(String hostname);
 
-	List<Element> getStreamFeatures(XMPPIOService<ComponentConnection> serv);
+	List<Element> getStreamFeatures(XMPPIOService<List<ComponentConnection>> serv);
 
 	ExtProcessor getProcessor(String string);
 
 	StreamOpenHandler getStreamOpenHandler(String xmlns);
+
+	String newPacketId(String prefix);
 
 }

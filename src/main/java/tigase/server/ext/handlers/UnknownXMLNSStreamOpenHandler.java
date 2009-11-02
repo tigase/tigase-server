@@ -22,6 +22,7 @@
 
 package tigase.server.ext.handlers;
 
+import java.util.List;
 import java.util.Map;
 import tigase.server.ext.ComponentConnection;
 import tigase.server.ext.ComponentProtocolHandler;
@@ -37,7 +38,7 @@ import tigase.xmpp.XMPPIOService;
 public class UnknownXMLNSStreamOpenHandler implements StreamOpenHandler {
 
 	@Override
-	public String streamOpened(XMPPIOService<ComponentConnection> serv,
+	public String streamOpened(XMPPIOService<List<ComponentConnection>> serv,
 			Map<String, String> attribs, ComponentProtocolHandler handler) {
 		String xmlns = attribs.get("xmlns");
 		StringBuilder sb =
@@ -71,7 +72,7 @@ public class UnknownXMLNSStreamOpenHandler implements StreamOpenHandler {
 	}
 
 	@Override
-	public String serviceStarted(XMPPIOService<ComponentConnection> s) {
+	public String serviceStarted(XMPPIOService<List<ComponentConnection>> s) {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 

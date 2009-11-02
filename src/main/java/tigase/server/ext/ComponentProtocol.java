@@ -24,12 +24,14 @@ package tigase.server.ext;
 
 import tigase.server.ext.handlers.UnknownXMLNSStreamOpenHandler;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.script.Bindings;
@@ -38,6 +40,7 @@ import tigase.net.ConnectionType;
 import tigase.net.SocketType;
 import tigase.server.ConnectionManager;
 import tigase.server.Packet;
+import tigase.server.ext.handlers.BindProcessor;
 import tigase.server.ext.handlers.ComponentAcceptStreamOpenHandler;
 import tigase.server.ext.handlers.ComponentConnectStreamOpenHandler;
 import tigase.server.ext.handlers.HandshakeProcessor;
@@ -56,7 +59,7 @@ import tigase.xmpp.XMPPIOService;
  * @version $Rev$
  */
 public class ComponentProtocol
-		extends ConnectionManager<XMPPIOService<ComponentConnection>>
+		extends ConnectionManager<XMPPIOService<List<ComponentConnection>>>
 		implements ComponentProtocolHandler {
 
   /**
@@ -69,6 +72,7 @@ public class ComponentProtocol
 	public static final String EXTCOMP_REPO_CLASS_PROP_KEY = "repository-class";
 	public static final String EXTCOMP_REPO_CLASS_PROP_VAL =
 					"tigase.server.ext.CompDBRepository";
+	public static final String EXTCOMP_BIND_HOSTNAMES = "--bind-ext-hostnames";
 	public static final String PACK_ROUTED_KEY = "pack-routed";
 	public static final String RETURN_SERVICE_DISCO_KEY = "service-disco";
 	public static final boolean RETURN_SERVICE_DISCO_VAL = true;
@@ -96,6 +100,7 @@ public class ComponentProtocol
 			new UnknownXMLNSStreamOpenHandler();
 	private ComponentRepository<CompRepoItem> repo = null;
 	private String identity_type = IDENTITY_TYPE_VAL;
+	private String[] hostnamesToBind = null;
 	//private ServiceEntity serviceEntity = null;
 
 
@@ -122,7 +127,7 @@ public class ComponentProtocol
 	}
 
 	@Override
-	public Queue<Packet> processSocketData(XMPPIOService<ComponentConnection> serv) {
+	public Queue<Packet> processSocketData(XMPPIOService<List<ComponentConnection>> serv) {
 		Packet p = null;
 		Queue<Packet> results = new LinkedList<Packet>();
 		while ((p = serv.getReceivedPackets().poll()) != null) {
@@ -132,10 +137,7 @@ public class ComponentProtocol
 			boolean processed = false;
 			for (ExtProcessor proc : processors.values()) {
 				processed |= proc.process(p, serv, this, results);
-				Packet res = null;
-				while ((res = results.poll()) != null) {
-					writePacketToSocket(serv, res);
-				}
+				writePacketsToSocket(serv, results);
 			}
 			if (!processed) {
 				if (p.isRouted()) {
@@ -148,13 +150,13 @@ public class ComponentProtocol
 	}
 
 	@Override
-	protected XMPPIOService<ComponentConnection> getXMPPIOService(Packet p) {
-		XMPPIOService<ComponentConnection> result = null;
+	protected XMPPIOService<List<ComponentConnection>> getXMPPIOService(Packet p) {
+		XMPPIOService<List<ComponentConnection>> result = null;
 		String hostname = p.getElemToHost();
 		ArrayList<ComponentConnection> conns = connections.get(hostname);
 		if (conns != null) {
 			for (ComponentConnection componentConnection : conns) {
-				XMPPIOService<ComponentConnection> serv = componentConnection.getService();
+				XMPPIOService<List<ComponentConnection>> serv = componentConnection.getService();
 				if (serv != null) {
 					if (serv.isConnected()) {
 						result = serv;
@@ -175,10 +177,10 @@ public class ComponentProtocol
 	}
 
 	@Override
-	public void xmppStreamClosed(XMPPIOService<ComponentConnection> serv) {	}
+	public void xmppStreamClosed(XMPPIOService<List<ComponentConnection>> serv) {	}
 
 	@Override
-	public String xmppStreamOpened(XMPPIOService<ComponentConnection> serv,
+	public String xmppStreamOpened(XMPPIOService<List<ComponentConnection>> serv,
 			Map<String, String> attribs) {
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Stream opened: " + serv.getRemoteAddress() +
@@ -204,7 +206,7 @@ public class ComponentProtocol
 	}
 
 	@Override
-	public void serviceStarted(XMPPIOService<ComponentConnection> serv) {
+	public void serviceStarted(XMPPIOService<List<ComponentConnection>> serv) {
 		super.serviceStarted(serv);
 		String xmlns =
 				((CompRepoItem)serv.getSessionData().get(REPO_ITEM_KEY)).getXMLNS();
@@ -237,8 +239,8 @@ public class ComponentProtocol
 	}
 
 	@Override
-	protected XMPPIOService<ComponentConnection> getXMPPIOServiceInstance() {
-		return new XMPPIOService<ComponentConnection>();
+	protected XMPPIOService<List<ComponentConnection>> getXMPPIOServiceInstance() {
+		return new XMPPIOService<List<ComponentConnection>>();
 	}
 
 	@Override
@@ -252,9 +254,14 @@ public class ComponentProtocol
 	}
 
 	private synchronized void addComponentConnection(String hostname,
-			XMPPIOService<ComponentConnection> s) {
+			XMPPIOService<List<ComponentConnection>> s) {
 		ComponentConnection conn = new ComponentConnection(hostname, s);
-		s.setRefObject(conn);
+		List<ComponentConnection> refObject = s.getRefObject();
+		if (refObject == null) {
+			refObject = new CopyOnWriteArrayList<ComponentConnection>();
+			s.setRefObject(refObject);
+		}
+		refObject.add(conn);
 		ArrayList<ComponentConnection> conns = connections.get(hostname);
 		if (conns == null) {
 			conns = new ArrayList<ComponentConnection>();
@@ -286,7 +293,7 @@ public class ComponentProtocol
 				log.fine("A component connection NOT removed for: " + hostname);
 			}
 			for (ComponentConnection compCon : conns) {
-				XMPPIOService<ComponentConnection> serv = compCon.getService();
+				XMPPIOService<List<ComponentConnection>> serv = compCon.getService();
 				if (serv != null && serv.isConnected()) {
 					// There is still an active connection for this host
 					result = true;
@@ -303,31 +310,24 @@ public class ComponentProtocol
 	}
 
 	@Override
-	public boolean serviceStopped(XMPPIOService<ComponentConnection> service) {
+	public boolean serviceStopped(XMPPIOService<List<ComponentConnection>> service) {
 		boolean result = super.serviceStopped(service);
 		if (result) {
 			Map<String, Object> sessionData = service.getSessionData();
 			String hostname = (String)sessionData.get(XMPPIOService.HOSTNAME_KEY);
 			if (hostname != null && !hostname.isEmpty()) {
-				ComponentConnection conn = service.getRefObject();
-				boolean moreConnections = false;
-				if (conn != null) {
-					moreConnections = removeComponentConnection(hostname, conn);
+				List<ComponentConnection> conns = service.getRefObject();
+				if (conns != null) {
+					for (ComponentConnection conn : conns) {
+						boolean moreConnections = removeComponentConnection(conn.getDomain(), conn);
+						if (!moreConnections) {
+							removeRoutings(conn.getDomain());
+						}
+					}
 				} else {
 					// Nothing to do, let's log this however.
 					log.finer("Closing XMPPIOService has not yet set ComponentConnection as RefObject: " +
 							hostname + ", id: " + service.getUniqueId());
-				}
-				if (!moreConnections) {
-					String[] routings = new String[]{hostname, ".*@" + hostname, ".*\\." +
-						hostname};
-					updateRoutings(routings, false);
-					//		removeRouting(serv.getRemoteHost());
-					//String addr = (String)sessionData.get(PORT_REMOTE_HOST_PROP_KEY);
-					if (log.isLoggable(Level.FINE)) {
-						log.fine("Disonnected from: " + hostname);
-					}
-					updateServiceDiscoveryItem(hostname, null, "XEP-0114 disconnected", false);
 				}
 			} else {
 				// Stopped service which hasn't sent initial stream open yet
@@ -341,6 +341,18 @@ public class ComponentProtocol
 			} // end of if (type == ConnectionType.connect)
 		}
 		return result;
+	}
+
+	private void removeRoutings(String hostname) {
+		String[] routings = new String[]{hostname, ".*@" + hostname, ".*\\." +
+			hostname};
+		updateRoutings(routings, false);
+		//		removeRouting(serv.getRemoteHost());
+		//String addr = (String)sessionData.get(PORT_REMOTE_HOST_PROP_KEY);
+		if (log.isLoggable(Level.FINE)) {
+			log.fine("Disonnected from: " + hostname);
+		}
+		updateServiceDiscoveryItem(hostname, null, "XEP-0114 disconnected", false);
 	}
 
 	@Override
@@ -363,6 +375,12 @@ public class ComponentProtocol
 		defs.put(PACK_ROUTED_KEY, PACK_ROUTED_VAL);
 		defs.put(RETURN_SERVICE_DISCO_KEY, RETURN_SERVICE_DISCO_VAL);
 		defs.put(IDENTITY_TYPE_KEY, IDENTITY_TYPE_VAL);
+		String bind_hostnames = (String)params.get(EXTCOMP_BIND_HOSTNAMES);
+		if (bind_hostnames != null) {
+			defs.put(EXTCOMP_BIND_HOSTNAMES_PROP_KEY, bind_hostnames.split(","));
+		} else {
+			defs.put(EXTCOMP_BIND_HOSTNAMES_PROP_KEY, new String[] {""});
+		}
 		return defs;
 	}
 
@@ -403,6 +421,11 @@ public class ComponentProtocol
 				addWaitingTask(port_props);
 			}
 		}
+		hostnamesToBind = (String[])properties.get(EXTCOMP_BIND_HOSTNAMES_PROP_KEY);
+		if (hostnamesToBind.length == 1 && hostnamesToBind[0].isEmpty()) {
+			hostnamesToBind = null;
+		}
+		log.config("Hostnames to bind: " + Arrays.toString(hostnamesToBind));
 		processors = new LinkedHashMap<String, ExtProcessor>();
 		ExtProcessor proc = new HandshakeProcessor();
 		processors.put(proc.getId(), proc);
@@ -411,6 +434,8 @@ public class ComponentProtocol
 		proc = new StartTLSProcessor();
 		processors.put(proc.getId(), proc);
 		proc = new SASLProcessor();
+		processors.put(proc.getId(), proc);
+		proc = new BindProcessor();
 		processors.put(proc.getId(), proc);
 	}
 
@@ -450,9 +475,23 @@ public class ComponentProtocol
 	}
 
 	@Override
-	public void authenticated(XMPPIOService<ComponentConnection> serv) {
-		//CompRepoItem comp = (CompRepoItem)serv.getSessionData().get(REPO_ITEM_KEY);
+	public void authenticated(XMPPIOService<List<ComponentConnection>> serv) {
+		serv.getSessionData().put(AUTHENTICATED_KEY, Boolean.TRUE);
 		String hostname = (String)serv.getSessionData().get(XMPPIOService.HOSTNAME_KEY);
+		bindHostname(hostname, serv);
+		if (hostnamesToBind != null) {
+			serv.getSessionData().put(EXTCOMP_BIND_HOSTNAMES_PROP_KEY, hostnamesToBind);
+			ExtProcessor proc = getProcessor("bind");
+			if (proc != null) {
+				Queue<Packet> results = new LinkedList<Packet>();
+				proc.startProcessing(null, serv, this, results);
+				writePacketsToSocket(serv, results);
+			}
+		}
+	}
+
+	@Override
+	public void bindHostname(String hostname, XMPPIOService<List<ComponentConnection>> serv) {
 		String[] routings = new String[] { hostname, ".*@" + hostname, ".*\\." + hostname };
 		updateRoutings(routings, true);
 		if (log.isLoggable(Level.FINE)) {
@@ -460,6 +499,26 @@ public class ComponentProtocol
 		}
 		updateServiceDiscoveryItem(hostname, null, "XEP-0114 connected", false);
 		addComponentConnection(hostname, serv);
+	}
+
+	@Override
+	public void unbindHostname(String hostname, XMPPIOService<List<ComponentConnection>> serv) {
+		ArrayList<ComponentConnection> conns = connections.get(hostname);
+		if (conns != null) {
+			ComponentConnection conn = null;
+			for (ComponentConnection componentConnection : conns) {
+				if (componentConnection.getService() == serv) {
+					conn = componentConnection;
+				}
+			}
+			if (conn != null) {
+				boolean moreConnections =
+						removeComponentConnection(conn.getDomain(), conn);
+				if (!moreConnections) {
+					removeRoutings(conn.getDomain());
+				}
+			}
+		}
 	}
 
 	@Override
@@ -474,7 +533,7 @@ public class ComponentProtocol
 	}
 
 	@Override
-	public List<Element> getStreamFeatures(XMPPIOService<ComponentConnection> serv) {
+	public List<Element> getStreamFeatures(XMPPIOService<List<ComponentConnection>> serv) {
 		List<Element> results = new LinkedList<Element>();
 		for (ExtProcessor proc : processors.values()) {
 			List<Element> proc_res = proc.getStreamFeatures(serv, this);

@@ -35,11 +35,11 @@ import tigase.xmpp.XMPPIOService;
 public class ComponentConnection implements Comparable<ComponentConnection> {
 
 	private List<String> resources = new ArrayList<String>();
-	private XMPPIOService<ComponentConnection> service = null;
+	private XMPPIOService<List<ComponentConnection>> service = null;
 	private String domain = null;
 
 	public ComponentConnection(String domain, 
-			XMPPIOService<ComponentConnection> service) {
+			XMPPIOService<List<ComponentConnection>> service) {
 		this.domain = domain;
 		this.service = service;
 	}
@@ -52,8 +52,12 @@ public class ComponentConnection implements Comparable<ComponentConnection> {
 		return service.getUniqueId().compareTo(o.service.getUniqueId());
 	}
 
-	public XMPPIOService<ComponentConnection> getService() {
+	public XMPPIOService<List<ComponentConnection>> getService() {
 		return service;
+	}
+
+	public String getDomain() {
+		return domain;
 	}
 
 }

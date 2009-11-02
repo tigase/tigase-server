@@ -23,6 +23,7 @@
 package tigase.server.ext.handlers;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.UUID;
@@ -55,7 +56,7 @@ public class ComponentAcceptStreamOpenHandler implements StreamOpenHandler {
 	private String[] xmlnss = new String[]{XMLNS};
 
 	@Override
-	public String streamOpened(XMPPIOService<ComponentConnection> serv,
+	public String streamOpened(XMPPIOService<List<ComponentConnection>> serv,
 			Map<String, String> attribs, ComponentProtocolHandler handler) {
 
 		switch (serv.connectionType()) {
@@ -118,7 +119,7 @@ public class ComponentAcceptStreamOpenHandler implements StreamOpenHandler {
 	}
 
 	@Override
-	public String serviceStarted(XMPPIOService<ComponentConnection> serv) {
+	public String serviceStarted(XMPPIOService<List<ComponentConnection>> serv) {
 		switch (serv.connectionType()) {
 			case connect:
 				CompRepoItem repoItem = (CompRepoItem)serv.getSessionData().get(REPO_ITEM_KEY);

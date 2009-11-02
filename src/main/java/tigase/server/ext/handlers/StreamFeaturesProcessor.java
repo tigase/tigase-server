@@ -57,7 +57,7 @@ public class StreamFeaturesProcessor implements ExtProcessor {
 	}
 
 	@Override
-	public boolean process(Packet p, XMPPIOService<ComponentConnection> serv,
+	public boolean process(Packet p, XMPPIOService<List<ComponentConnection>> serv,
 			ComponentProtocolHandler handler,	Queue<Packet> results) {
 		if (p.isElement("features", "http://etherx.jabber.org/streams")) {
 			log.fine("Received stream features: " + p.toString());
@@ -79,13 +79,13 @@ public class StreamFeaturesProcessor implements ExtProcessor {
 
 	@Override
 	public void startProcessing(Packet p,
-			XMPPIOService<ComponentConnection> serv, ComponentProtocolHandler handler,
-			Queue<Packet> results) {
+			XMPPIOService<List<ComponentConnection>> serv,
+			ComponentProtocolHandler handler,	Queue<Packet> results) {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 	@Override
-	public List<Element> getStreamFeatures(XMPPIOService<ComponentConnection> serv,
+	public List<Element> getStreamFeatures(XMPPIOService<List<ComponentConnection>> serv,
 			ComponentProtocolHandler handler) {
 		return null;
 	}

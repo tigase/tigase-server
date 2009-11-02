@@ -22,6 +22,7 @@
 
 package tigase.server.ext;
 
+import java.util.List;
 import java.util.Map;
 import tigase.xmpp.XMPPIOService;
 
@@ -35,9 +36,9 @@ public interface StreamOpenHandler {
 
 	String[] getXMLNSs();
 
-	String streamOpened(XMPPIOService<ComponentConnection> s, 
+	String streamOpened(XMPPIOService<List<ComponentConnection>> s,
 			Map<String, String> attribs, ComponentProtocolHandler handler);
 
-	String serviceStarted(XMPPIOService<ComponentConnection> s);
+	String serviceStarted(XMPPIOService<List<ComponentConnection>> s);
 
 }
