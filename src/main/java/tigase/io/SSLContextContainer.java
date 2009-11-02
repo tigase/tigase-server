@@ -174,8 +174,11 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 					kmf = kmfs.get(def_cert_alias);
 				} // end of if (kmf == null)
 				if (kmf != null && tmf != null) {
-					sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(),
-						secureRandom);
+//					sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(),
+//						secureRandom);
+					sslContext.init(kmf.getKeyManagers(),
+							new X509TrustManager[]{new FakeTrustManager()},
+							secureRandom);
 				} else {
 					if (kmf == null) {
 						log.warning("No certificate found for host: " + hostname);
