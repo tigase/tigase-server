@@ -126,6 +126,30 @@ public class ComponentProtocol
 		}
 	}
 
+	/**
+	 * This method can be overwritten in extending classes to get a different
+	 * packets distribution to different threads. For PubSub, probably better
+	 * packets distribution to different threads would be based on the
+	 * sender address rather then destination address.
+	 * @param packet
+	 * @return
+	 */
+	@Override
+	public int hashCodeForPacket(Packet packet) {
+		if (packet.getElemTo() != null) {
+			return packet.getElemTo().hashCode();
+		}
+		if (packet.getTo() != null) {
+			return packet.getTo().hashCode();
+		}
+		return super.hashCodeForPacket(packet);
+	}
+
+	@Override
+	public int processingThreads() {
+		return Runtime.getRuntime().availableProcessors();
+	}
+
 	@Override
 	public Queue<Packet> processSocketData(XMPPIOService<List<ComponentConnection>> serv) {
 		Packet p = null;
