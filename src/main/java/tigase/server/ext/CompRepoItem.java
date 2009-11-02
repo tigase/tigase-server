@@ -124,7 +124,7 @@ public class CompRepoItem implements RepositoryItem {
 		if (input.equals("connect")) {
 			result = ConnectionType.connect;
 		}
-		if (input.equals("accept")) {
+		if (input.equals("accept") || input.equals("listen")) {
 			result = ConnectionType.accept;
 		}
 		return result;
