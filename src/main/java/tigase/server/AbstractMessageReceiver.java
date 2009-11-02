@@ -162,6 +162,10 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 		return 1;
 	}
 
+	public int processingThreads() {
+		return 1;
+	}
+
 	public String newPacketId(String prefix) {
 		StringBuilder sb = new StringBuilder(32);
 		if (prefix != null) {
@@ -580,10 +584,6 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	public final void processPacket(final Packet packet,
 		final Queue<Packet> results)	{
 		addPacketNB(packet);
-	}
-
-	public int processingThreads() {
-		return 1;
 	}
 
 	private class QueueListener extends Thread {
