@@ -99,7 +99,7 @@ public class TLSIO implements IOInterface {
 //       } // end of if (input.hasRemaining())
       switch (tlsWrapper.getStatus()) {
       case NEED_WRITE:
-        write(ByteBuffer.allocate(0));
+        writeBuff(ByteBuffer.allocate(0));
         break;
       case UNDERFLOW:
 				int netSize = tlsWrapper.getPacketBuffSize();
@@ -150,20 +150,8 @@ public class TLSIO implements IOInterface {
     } // end of else
   }
 
-	@Override
-  public int write(final ByteBuffer buff) throws IOException {
-		if (buff == null) {
-			return io.write(null);
-		}
-    int result = 0;
-		if (log.isLoggable(Level.FINER)) {
-			log.finer("TLS - Writing data, remaining: " + buff.remaining());
-		}
-//		if (isRemoteAddress("81.142.228.219")) {
-//			log.warning("TLS - Writing data, remaining: " + buff.remaining());
-//		}
-
-    int wr = 0;
+	private int writeBuff(ByteBuffer buff) throws IOException {
+		int result = 0;
 		do {
 			ByteBuffer tlsOutput = ByteBuffer.allocate(tlsWrapper.getNetBuffSize());
 			// Not sure if this is really needed, I guess not...
@@ -173,12 +161,53 @@ public class TLSIO implements IOInterface {
         throw new EOFException("Socket has been closed.");
       } // end of if (tlsWrapper.getStatus() == TLSStatus.CLOSED)
       tlsOutput.flip();
-			wr = io.write(tlsOutput);
+			int wr = io.write(tlsOutput);
 			result += wr;
     } while (buff.hasRemaining());
     if (tlsWrapper.getStatus() == TLSStatus.NEED_WRITE) {
-      write(ByteBuffer.allocate(0));
+      writeBuff(ByteBuffer.allocate(0));
     } // end of if ()
+		return result;
+	}
+
+	@Override
+  public int write(final ByteBuffer buff) throws IOException {
+
+		TLSStatus stat = tlsWrapper.getStatus();
+		while (stat != TLSStatus.OK && stat != TLSStatus.CLOSED) {
+			switch (stat) {
+				case NEED_WRITE:
+					writeBuff(ByteBuffer.allocate(0));
+					break;
+				case NEED_READ:
+					ByteBuffer rbuff = read(ByteBuffer.allocate(tlsWrapper.getNetBuffSize()));
+					break;
+				case CLOSED:
+					if (tlsWrapper.getStatus() == TLSStatus.CLOSED) {
+						if (log.isLoggable(Level.FINER)) {
+							log.finer("TLS Socket closed...");
+						}
+						throw new EOFException("Socket has been closed.");
+					} // end of if (tlsWrapper.getStatus() == TLSStatus.CLOSED)
+					break;
+				default:
+			}
+			stat = tlsWrapper.getStatus();
+		}
+
+
+		if (buff == null) {
+			return io.write(null);
+		}
+		if (log.isLoggable(Level.FINER)) {
+			log.finer("TLS - Writing data, remaining: " + buff.remaining());
+		}
+    int result = writeBuff(buff);
+
+//		if (isRemoteAddress("81.142.228.219")) {
+//			log.warning("TLS - Writing data, remaining: " + buff.remaining());
+//		}
+
 //		if (isRemoteAddress("81.142.228.219")) {
 //			log.warning("TLS - written: " + result);
 //		}
@@ -194,6 +223,7 @@ public class TLSIO implements IOInterface {
   public void stop() throws IOException {
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Stop called...");
+			//Thread.dumpStack();
 		}
     io.stop();
     tlsWrapper.close();
