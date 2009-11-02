@@ -245,13 +245,13 @@ public class UserAuthRepositoryImpl implements UserAuthRepository {
 			byte[] in_data =
 				(data_str != null ? Base64.decode(data_str) : new byte[0]);
 			if (log.isLoggable(Level.FINEST)) {
-    			log.finest("response: " + new String(in_data));
-            }
+				log.finest("response: " + new String(in_data));
+			}
 			byte[] challenge = ss.evaluateResponse(in_data);
 			if (log.isLoggable(Level.FINEST)) {
-    			log.finest("challenge: " +
-        			(challenge != null ? new String(challenge) : "null"));
-            }
+				log.finest("challenge: " +
+						(challenge != null ? new String(challenge) : "null"));
+			}
 			String challenge_str = (challenge != null && challenge.length > 0
 				? Base64.encode(challenge) : null);
 			props.put(RESULT_KEY, challenge_str);
@@ -298,18 +298,18 @@ public class UserAuthRepositoryImpl implements UserAuthRepository {
 			String jid = null;
 
 			for (int i = 0; i < callbacks.length; i++) {
-                if (log.isLoggable(Level.FINEST)) {
-    				log.finest("Callback: " + callbacks[i].getClass().getSimpleName());
-                }
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("Callback: " + callbacks[i].getClass().getSimpleName());
+				}
 				if (callbacks[i] instanceof RealmCallback) {
 					RealmCallback rc = (RealmCallback)callbacks[i];
 					String realm = (String)options.get(REALM_KEY);
 					if (realm != null) {
 						rc.setText(realm);
 					} // end of if (realm == null)
-        			if (log.isLoggable(Level.FINEST)) {
-            			log.finest("RealmCallback: " + realm);
-                    }
+					if (log.isLoggable(Level.FINEST)) {
+						log.finest("RealmCallback: " + realm);
+					}
 				} else if (callbacks[i] instanceof NameCallback) {
 					NameCallback nc = (NameCallback)callbacks[i];
 					String user_name = nc.getName();
@@ -318,17 +318,17 @@ public class UserAuthRepositoryImpl implements UserAuthRepository {
 					} // end of if (name == null)
 					jid = JIDUtils.getNodeID(user_name, (String)options.get(REALM_KEY));
 					options.put(USER_ID_KEY, jid);
-        			if (log.isLoggable(Level.FINEST)) {
-            			log.finest("NameCallback: " + user_name);
-                    }
+					if (log.isLoggable(Level.FINEST)) {
+						log.finest("NameCallback: " + user_name);
+					}
 				} else if (callbacks[i] instanceof PasswordCallback) {
 					PasswordCallback pc = (PasswordCallback)callbacks[i];
 					try {
 						String passwd = getPassword(jid);
 						pc.setPassword(passwd.toCharArray());
-               			if (log.isLoggable(Level.FINEST)) {
-                    		log.finest("PasswordCallback: " +	passwd);
-                        }
+						if (log.isLoggable(Level.FINEST)) {
+							log.finest("PasswordCallback: " + passwd);
+						}
 					} catch (Exception e) {
 						throw new IOException("Password retrieving problem.", e);
 					} // end of try-catch
@@ -336,10 +336,10 @@ public class UserAuthRepositoryImpl implements UserAuthRepository {
 					AuthorizeCallback authCallback = ((AuthorizeCallback)callbacks[i]);
 					String authenId = authCallback.getAuthenticationID();
 					String authorId = authCallback.getAuthorizationID();
-        			if (log.isLoggable(Level.FINEST)) {
-            			log.finest("AuthorizeCallback: authenId: " + authenId);
-            			log.finest("AuthorizeCallback: authorId: " + authorId);
-                    }
+					if (log.isLoggable(Level.FINEST)) {
+						log.finest("AuthorizeCallback: authenId: " + authenId);
+						log.finest("AuthorizeCallback: authorId: " + authorId);
+					}
 					if (authenId.equals(authorId)) {
 						authCallback.setAuthorized(true);
 					} // end of if (authenId.equals(authorId))
