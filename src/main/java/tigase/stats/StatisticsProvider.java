@@ -538,48 +538,48 @@ public class StatisticsProvider extends StandardMBean
 					}
 				}
 			}, 10*1000, 1000);
-			updateTimer.scheduleAtFixedRate(new TimerTask() {
-				@Override
-				public void run() {
-					try {
-						File f = new File("stats-dumps");
-						if (!f.exists()) {
-							f.mkdir();
-						}
-						SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HHmmss");
-						File output_file = new File(f, sdf.format(new Date()));
-						FileWriter fos = new FileWriter(output_file);
-						float[] cpu_history = cpu_usage_history.getCurrentHistory();
-						float[] heap_history = heap_usage_history.getCurrentHistory();
-						float[] sm_history = smpacks_history.getCurrentHistory();
-						float[] cl_history = clpacks_history.getCurrentHistory();
-						int[] conns = conns_history.getCurrentHistory();
-						for (int c : conns) {
-							fos.write(","+c);
-						}
-						fos.write('\n');
-						for (float fl : cpu_history) {
-							fos.write(","+fl);
-						}
-						fos.write('\n');
-						for (float fl : heap_history) {
-							fos.write(","+fl);
-						}
-						fos.write('\n');
-						for (float fl : sm_history) {
-							fos.write(","+fl);
-						}
-						fos.write('\n');
-						for (float fl : cl_history) {
-							fos.write(","+fl);
-						}
-						fos.write('\n');
-						fos.close();
-					} catch (Exception e) {
-						log.log(Level.WARNING, "Problem dumping statistics: ", e);
-					}
-				}
-			}, HOUR, HOUR);
+//			updateTimer.scheduleAtFixedRate(new TimerTask() {
+//				@Override
+//				public void run() {
+//					try {
+//						File f = new File("stats-dumps");
+//						if (!f.exists()) {
+//							f.mkdir();
+//						}
+//						SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HHmmss");
+//						File output_file = new File(f, sdf.format(new Date()));
+//						FileWriter fos = new FileWriter(output_file);
+//						float[] cpu_history = cpu_usage_history.getCurrentHistory();
+//						float[] heap_history = heap_usage_history.getCurrentHistory();
+//						float[] sm_history = smpacks_history.getCurrentHistory();
+//						float[] cl_history = clpacks_history.getCurrentHistory();
+//						int[] conns = conns_history.getCurrentHistory();
+//						for (int c : conns) {
+//							fos.write(","+c);
+//						}
+//						fos.write('\n');
+//						for (float fl : cpu_history) {
+//							fos.write(","+fl);
+//						}
+//						fos.write('\n');
+//						for (float fl : heap_history) {
+//							fos.write(","+fl);
+//						}
+//						fos.write('\n');
+//						for (float fl : sm_history) {
+//							fos.write(","+fl);
+//						}
+//						fos.write('\n');
+//						for (float fl : cl_history) {
+//							fos.write(","+fl);
+//						}
+//						fos.write('\n');
+//						fos.close();
+//					} catch (Exception e) {
+//						log.log(Level.WARNING, "Problem dumping statistics: ", e);
+//					}
+//				}
+//			}, HOUR, HOUR);
 		}
 
 //		private synchronized void updateIfOlder(long time) {
