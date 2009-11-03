@@ -215,8 +215,8 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		throws SQLException, TigaseDBException, UserNotFoundException {
 		String query = buildNodeQuery(uid, node_path);
 		if (log.isLoggable(Level.FINEST)) {
-    		log.finest(query);
-        }
+			log.finest(query);
+		}
 		Statement stmt = null;
 		ResultSet rs = null;
 		long nid = -1;
@@ -233,10 +233,10 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 					log.info("Missing root node, database upgrade or bug in the code? Adding missing root node now.");
 					nid = addNode(uid, -1, "root");
 				} else {
-    				if (log.isLoggable(Level.FINEST)) {
-    					log.finest("Missing nid for node path: "
-        					+ node_path + " and uid: " + uid);
-                    }
+					if (log.isLoggable(Level.FINEST)) {
+						log.finest("Missing nid for node path: " + node_path + " and uid: " +
+								uid);
+					}
 				}
 			}
 			return nid;
