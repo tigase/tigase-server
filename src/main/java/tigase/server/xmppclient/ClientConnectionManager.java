@@ -101,7 +101,7 @@ public class ClientConnectionManager
 				+ ", type: " + packet.getType());
 		}
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Processing packet: " + packet.getStringData());
+			log.finest("Processing packet: " + packet.toStringSecure());
 		}
 		if (packet.isCommand() && packet.getCommand() != Command.OTHER) {
 			processCommand(packet);
@@ -142,7 +142,7 @@ public class ClientConnectionManager
 					addOutPacket(command);
 //				addOutPacketWithTimeout(command, stoppedHandler, 15l, TimeUnit.SECONDS);
 					log.fine("Sending a command to close the remote session for non-existen Bosh connection: " +
-									command.toString());
+									command.toStringSecure());
 				}
 			}
 		} // end of else
@@ -243,7 +243,7 @@ public class ClientConnectionManager
 				} else {
 					if (log.isLoggable(Level.FINEST)) {
 						log.finest("Connection for REDIRECT command does not exist, ignoring " +
-										"packet: " + packet.toString());
+										"packet: " + packet.toStringSecure());
 					}
 				}
 				break;
@@ -275,7 +275,7 @@ public class ClientConnectionManager
 					} catch (PacketErrorTypeException e) {
 						// Hm, error already, ignoring...
 						log.info("Error packet is not really expected here: " +
-										packet.toString());
+										packet.toStringSecure());
 					}
 				}
 				break;
@@ -317,7 +317,7 @@ public class ClientConnectionManager
 					+ ", type: " + p.getType());
 			}
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Processing socket data: " + p.getStringData());
+				log.finest("Processing socket data: " + p.toStringSecure());
 			}
 			p.setFrom(getFromAddress(id));
 			String receiver = serv.getDataReceiver();
@@ -599,7 +599,7 @@ public class ClientConnectionManager
 			// Ups, doesn't look good, the server is either oveloaded or lost
 			// a packet.
 			log.info("No response within time limit received for a packet: " +
-							packet.toString());
+							packet.toStringSecure());
 			addOutPacketWithTimeout(packet, stoppedHandler, 60l, TimeUnit.SECONDS);
 		}
 
@@ -621,7 +621,7 @@ public class ClientConnectionManager
 			// the packet either has been lost or the server is overloaded
 			// In either case we disconnect the connection.
 			log.info("No response within time limit received for a packet: " +
-							packet.toString());
+							packet.toStringSecure());
 			XMPPIOService<Object> serv = getXMPPIOService(packet.getFrom());
 			if (serv != null) {
 				serv.stop();
