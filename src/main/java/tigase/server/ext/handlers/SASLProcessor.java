@@ -100,9 +100,11 @@ public class SASLProcessor implements ExtProcessor {
 			return true;
 		}
 		if (p.isElement("abort", XMLNS)) {
+			serv.stop();
 			return true;
 		}
 		if (p.isElement("failure", XMLNS)) {
+			serv.stop();
 			return true;
 		}
 		return false;
