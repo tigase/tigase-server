@@ -50,6 +50,8 @@ import tigase.server.ext.handlers.StartTLSProcessor;
 import tigase.server.ext.handlers.StreamFeaturesProcessor;
 import tigase.stats.StatisticsList;
 import tigase.xml.Element;
+import tigase.xmpp.Authorization;
+import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.XMPPIOService;
 
 /**
@@ -164,10 +166,26 @@ public class ComponentProtocol
 				writePacketsToSocket(serv, results);
 			}
 			if (!processed) {
-				if (p.isRouted()) {
-					p = p.unpackRouted();
-				} // end of if (p.isRouted())
-				addOutPacket(p);
+				// This might be a bit slow, need to be tested.
+				// Possibly a local variable in XMPPIOService might be needed
+				// to improve performance
+				if (serv.getSessionData().get(AUTHENTICATED_KEY) == Boolean.TRUE) {
+					if (p.isRouted()) {
+						p = p.unpackRouted();
+					} // end of if (p.isRouted())
+					addOutPacket(p);
+				} else {
+					try {
+						Packet error =
+								Authorization.NOT_AUTHORIZED.getResponseMessage(p,
+								"Connection not yet authorized to send this packet.", true);
+						writePacketToSocket(serv, error);
+					} catch (PacketErrorTypeException ex) {
+						// Already error packet, just ignore to prevent infinite loop
+						log.fine("Received an error packet from unauthorized connection: " +
+								p.toString());
+					}
+				}
 			}
 		} // end of while ()
 		return null;
@@ -377,6 +395,7 @@ public class ComponentProtocol
 			log.fine("Disonnected from: " + hostname);
 		}
 		updateServiceDiscoveryItem(hostname, null, "XEP-0114 disconnected", false);
+		removeComponentDomain(hostname);
 	}
 
 	@Override
@@ -517,12 +536,18 @@ public class ComponentProtocol
 	@Override
 	public void bindHostname(String hostname, XMPPIOService<List<ComponentConnection>> serv) {
 		String[] routings = new String[] { hostname, ".*@" + hostname, ".*\\." + hostname };
+		if (serv.connectionType() == ConnectionType.connect) {
+			// Most likely we have an external component here which doesn't have any
+			// connections managers. In such a case the best routings settings would be: .*
+			 routings = new String[] { ".*" };
+		}
 		updateRoutings(routings, true);
 		if (log.isLoggable(Level.FINE)) {
 			log.fine("Authenticated: " + hostname);
 		}
 		updateServiceDiscoveryItem(hostname, null, "XEP-0114 connected", false);
 		addComponentConnection(hostname, serv);
+		addComponentDomain(hostname);
 	}
 
 	@Override
