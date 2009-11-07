@@ -325,7 +325,7 @@ public class SessionManager extends AbstractMessageReceiver
 			// It doesn't look good, there should really be a connection for
 			// this packet....
 			// returning error back...
-			log.fine("Broken packet: " + p.toString());
+			log.fine("Broken packet: " + p.toStringSecure());
 			try {
 				Packet error =
 						Authorization.SERVICE_UNAVAILABLE.getResponseMessage(p,
@@ -333,7 +333,7 @@ public class SessionManager extends AbstractMessageReceiver
 				error.setTo(p.getFrom());
 				fastAddOutPacket(error);
 			} catch (PacketErrorTypeException e) {
-				log.fine("Packet is error type already: " + p.toString());
+				log.fine("Packet is error type already: " + p.toStringSecure());
 			}
 			return true;
 		}
@@ -343,7 +343,7 @@ public class SessionManager extends AbstractMessageReceiver
 	@Override
 	public void processPacket(final Packet packet) {
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Received packet: " + packet.toString());
+			log.finest("Received packet: " + packet.toStringSecure());
 		}
 		if (packet.isCommand() && processCommand(packet)) {
 			packet.processedBy("SessionManager");
@@ -361,7 +361,7 @@ public class SessionManager extends AbstractMessageReceiver
 	protected void processPacket(Packet packet, XMPPResourceConnection conn) {
 		packet.setTo(getComponentId());
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("processing packet: " + packet.toString() +
+			log.finest("processing packet: " + packet.toStringSecure() +
 							", connectionID: " +
 							(conn != null ? conn.getConnectionId() : "null"));
 		}
@@ -372,10 +372,10 @@ public class SessionManager extends AbstractMessageReceiver
 			if (filter.preprocess(packet, conn, naUserRepository, results)) {
 				packet.processedBy("filter-foward");
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Packet preprocessed: " + packet.toString());
+					log.finest("Packet preprocessed: " + packet.toStringSecure());
 					if (results.size() > 0) {
 						for (Packet p: results) {
-							log.finest("Preprocess result: " + p.toString());
+							log.finest("Preprocess result: " + p.toStringSecure());
 						}
 					}
 				}
@@ -401,7 +401,7 @@ public class SessionManager extends AbstractMessageReceiver
 			if (filter.forward(packet, conn, naUserRepository, results)) {
 				packet.processedBy("filter-foward");
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Packet forwarded: " + packet.toString());
+					log.finest("Packet forwarded: " + packet.toStringSecure());
 				}
 				addOutPackets(packet, conn, results);
 				return;
@@ -428,7 +428,7 @@ public class SessionManager extends AbstractMessageReceiver
 
 		if (!packet.wasProcessed()) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Packet not processed: " + packet.toString());
+				log.finest("Packet not processed: " + packet.toStringSecure());
 			}
 			Packet error = null;
 			if (stop
@@ -441,7 +441,7 @@ public class SessionManager extends AbstractMessageReceiver
 					error =	Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet,
 						"Service not available.", true);
 				} catch (PacketErrorTypeException e) {
-					log.fine("Service not available. Packet is error type already: " + packet.toString());
+					log.fine("Service not available. Packet is error type already: " + packet.toStringSecure());
 				}
 			} else {
 				if (packet.getElemFrom() != null || conn != null) {
@@ -449,7 +449,7 @@ public class SessionManager extends AbstractMessageReceiver
 						error = Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
 							"Feature not supported yet.", true);
 					} catch (PacketErrorTypeException e) {
-						log.fine("Feature not supported yet. Packet is error type already: " + packet.toString());
+						log.fine("Feature not supported yet. Packet is error type already: " + packet.toStringSecure());
 					}
 				}
 			}
@@ -588,7 +588,7 @@ public class SessionManager extends AbstractMessageReceiver
 				} else {
 //					proc_t.debugQueue();
 					if (log.isLoggable(Level.FINE)) {
-						log.fine("Can not add packet: " + packet.toString() +
+						log.fine("Can not add packet: " + packet.toStringSecure() +
 										" to processor: " + proc_t.getName() +
 										" internal queue full.");
 					}
@@ -695,7 +695,7 @@ public class SessionManager extends AbstractMessageReceiver
 							"You don't have enough permission to brodcast packet.", true));
 				}
 			} catch (PacketErrorTypeException e) {
-				log.fine("Packet is error type already: " + pc.toString());
+				log.fine("Packet is error type already: " + pc.toStringSecure());
 			}
 			processing_result = true;
 			break;
@@ -744,7 +744,7 @@ public class SessionManager extends AbstractMessageReceiver
 // 									"The user resource already exists.", true));
 							if (log.isLoggable(Level.FINEST)) {
 								log.finest("USER_STATUS set to true for user who is already available: "
-									+ pc.toString());
+									+ pc.toStringSecure());
 							}
 						}
 						if (presence != null) {
@@ -761,7 +761,7 @@ public class SessionManager extends AbstractMessageReceiver
 							addOutPacket(Authorization.ITEM_NOT_FOUND.getResponseMessage(pc,
 									"The user resource you want to remove does not exist.", true));
 							log.info("Can not find resource connection for packet: " +
-								pc.toString());
+								pc.toStringSecure());
 						}
 					}
 				} else {
@@ -769,7 +769,7 @@ public class SessionManager extends AbstractMessageReceiver
 						addOutPacket(Authorization.FORBIDDEN.getResponseMessage(pc,
 								"Only trusted entity can do it.", true));
 					} catch (PacketErrorTypeException e) {
-						log.warning("Packet error type when not expected: " + pc.toString());
+						log.warning("Packet error type when not expected: " + pc.toStringSecure());
 					}
 				}
 			} catch (Exception e) {
@@ -797,7 +797,7 @@ public class SessionManager extends AbstractMessageReceiver
 				}
 			} else {
 				if (log.isLoggable(Level.FINE)) {
-					log.fine("Redirect for non-existen connection: " + pc.toString());
+					log.fine("Redirect for non-existen connection: " + pc.toStringSecure());
 				}
 			}
 			processing_result = true;
@@ -1669,10 +1669,10 @@ public class SessionManager extends AbstractMessageReceiver
 				}
 				addOutPackets(item.packet, item.conn, local_results);
 			} catch (PacketErrorTypeException e) {
-				log.info("Already error packet, ignoring: " + item.packet.toString());
+				log.info("Already error packet, ignoring: " + item.packet.toStringSecure());
 			} catch (XMPPException e) {
 				log.log(Level.WARNING, "Exception during packet processing: " +
-								item.packet.toString(), e);
+								item.packet.toStringSecure(), e);
 			}
 		}
 		

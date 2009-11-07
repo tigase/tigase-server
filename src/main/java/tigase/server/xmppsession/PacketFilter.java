@@ -102,7 +102,7 @@ public class PacketFilter {
 										"Session details: connectionId=" + session.getConnectionId() +
 										", sessionId=" + session.getSessionId() +
 										", ConnectionStatus=" + session.getConnectionStatus() +
-										", packet=" + packet.toString());
+										", packet=" + packet.toStringSecure());
 							}
 							return true;
 						}
@@ -136,7 +136,7 @@ public class PacketFilter {
 						packet.getElement().setAttribute("from", from_jid);
 					} else {
 						log.warning("Session is authenticated but session.getJid() is empty: " +
-										packet.toString());
+										packet.toStringSecure());
 					}
 				}
 			}
@@ -144,7 +144,7 @@ public class PacketFilter {
 			// Ignore this packet
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("Ignoring packet with an error to non-existen user session: " +
-								packet.toString());
+								packet.toStringSecure());
 			}
 		} catch (Exception e) {
 			log.log(Level.FINEST, "Packet preprocessing exception: ", e);
@@ -181,7 +181,7 @@ public class PacketFilter {
 		} // end of if (session == null)
 
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Processing packet: " + packet.toString());
+			log.finest("Processing packet: " + packet.toStringSecure());
 		}
 
 		try {
@@ -248,7 +248,7 @@ public class PacketFilter {
 				return true;
 			}
 		} catch (PacketErrorTypeException e) {
-			log.info("Error packet, ignoring... " + packet.toString());
+			log.info("Error packet, ignoring... " + packet.toStringSecure());
 		} catch (NotAuthorizedException e) {
 			try {
 				results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
