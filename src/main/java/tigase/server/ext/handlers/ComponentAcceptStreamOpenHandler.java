@@ -62,6 +62,10 @@ public class ComponentAcceptStreamOpenHandler implements StreamOpenHandler {
 		switch (serv.connectionType()) {
 			case connect: {
 				String id = attribs.get("id");
+				if (id == null) {
+					serv.stop();
+					return null;
+				}
 				serv.getSessionData().put(XMPPIOService.SESSION_ID_KEY, id);
 				ExtProcessor proc = handler.getProcessor("handshake");
 				if (proc != null) {
@@ -102,8 +106,10 @@ public class ComponentAcceptStreamOpenHandler implements StreamOpenHandler {
 					return "<stream:stream" +
 							" xmlns='" + XMLNS + "'" +
 							" xmlns:stream='http://etherx.jabber.org/streams'" +
-							" from='" + hostname + "'" +
-							"><stream:error><host-unknown xmlns='urn:ietf:params:xml:ns:xmpp-streams'/></stream:error>";
+							" from='" + hostname + "'>" +
+							"<stream:error>" +
+							"<host-unknown xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>" +
+							"</stream:error></stream:stream>";
 				}
 			}
 			default:
