@@ -25,6 +25,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.db.ComponentRepository;
@@ -69,6 +70,8 @@ public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
 					new LinkedHashSet<VHostListener>();
 	private LinkedHashSet<VHostListener> nameSubdomainsHandlers =
 					new LinkedHashSet<VHostListener>();
+	private CopyOnWriteArraySet<String> registeredComponentDomains =
+			new CopyOnWriteArraySet<String>();
 
 	private ServiceEntity serviceEntity = null;
 	private ComponentRepository<VHostItem> repo = null;
@@ -272,6 +275,9 @@ public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
 	public boolean isLocalDomainOrComponent(String domain) {
 		boolean result = isLocalDomain(domain);
 		if (!result) {
+			result = registeredComponentDomains.contains(domain);
+		}
+		if (!result) {
 			int idx = domain.indexOf('.');
 			if (idx > 0) {
 				String name = domain.substring(0, idx);
@@ -440,6 +446,16 @@ public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
 
 	private void prepareVHostRemove(Packet result) {
 		Command.addFieldValue(result, "VHost", "");
+	}
+
+	@Override
+	public void addComponentDomain(String domain) {
+		registeredComponentDomains.add(domain);
+	}
+
+	@Override
+	public void removeComponentDomain(String domain) {
+		registeredComponentDomains.remove(domain);
 	}
 
 }

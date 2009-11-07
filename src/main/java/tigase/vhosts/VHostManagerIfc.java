@@ -89,6 +89,30 @@ public interface VHostManagerIfc {
 	 */
 	ServerComponent[] getComponentsForNonLocalDomain(String domain);
 
+	/**
+	 * Returns an object with all domain properties for given domain.
+	 * @param domain is a domain name
+	 * @return a VHostItem object with all domain properties.
+	 */
 	VHostItem getVHostItem(String domain);
+
+	/**
+	 * Adds a component domain to the collection of local component domains.
+	 * This is mainly needed/used by an external components connecting to the
+	 * server and binding hostnames. Normally the s2s component have no way of
+	 * knowing about this new and temporary domains handled by the server and
+	 * would refuse all connections for these domains. Adding them to a collection
+	 * of component domains allows the s2s to detect them and accept connection
+	 * for them.
+	 * @param domain is a component domain name added to the collection.
+	 */
+	void addComponentDomain(String domain);
+
+	/**
+	 * Removes a domain previously registered by a component. It should not be
+	 * normally used.
+	 * @param domain is a component domain name being removed from the collection.
+	 */
+	void removeComponentDomain(String domain);
 
 }
