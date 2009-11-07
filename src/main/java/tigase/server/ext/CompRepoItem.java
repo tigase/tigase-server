@@ -73,14 +73,13 @@ public class CompRepoItem implements RepositoryItem {
 	public void initFromPropertyString(String propString) {
 		String[] props = propString.split(":");
 		if (props.length > 0) {
-			domain = props[0];
-			routings = new String[] { domain, ".*@" + domain, ".*\\." + domain };
+			setDomain(props[0]);
 		}
 		if (props.length > 1) {
 			auth_pass = props[1];
 		}
 		if (props.length > 2) {
-			type = parseConnectionType(props[2]);
+			setConnectionType(props[2]);
 		}
 		if (props.length > 3) {
 			port = parsePortNo(props[3]);
@@ -89,8 +88,7 @@ public class CompRepoItem implements RepositoryItem {
 			remoteHost = props[4];
 		}
 		if (props.length > 5) {
-			prop_xmlns = props[5];
-			xmlns = parseProtoXMLNS(prop_xmlns);
+			setProtocol(props[5]);
 		}
 	}
 
@@ -142,13 +140,12 @@ public class CompRepoItem implements RepositoryItem {
 			throw new IllegalArgumentException("Incorrect element name, expected: " +
 					REPO_ITEM_ELEM_NAME);
 		}
-		domain = elem.getAttribute(DOMAIN_ATTR);
-		routings = new String[]{domain, ".*@" + domain, ".*\\." + domain};
+		setDomain(elem.getAttribute(DOMAIN_ATTR));
 		auth_pass = elem.getAttribute(PASSWORD_ATTR);
 		remoteHost = elem.getAttribute(REMOTE_HOST_ATTR);
 		String tmp = elem.getAttribute(CONN_TYPE_ATTR);
 		if (tmp != null) {
-			type = parseConnectionType(tmp);
+			setConnectionType(tmp);
 		}
 		tmp = elem.getAttribute(PORT_NO_ATTR);
 		if (tmp != null) {
@@ -156,8 +153,7 @@ public class CompRepoItem implements RepositoryItem {
 		}
 		tmp = elem.getAttribute(PROTO_XMLNS_ATTR);
 		if (tmp != null) {
-			prop_xmlns = tmp;
-			xmlns = parseProtoXMLNS(prop_xmlns);
+			setProtocol(tmp);
 		}
 		tmp = elem.getAttribute(ROUTINGS_ATTR);
 		if (tmp != null) {
@@ -243,6 +239,11 @@ public class CompRepoItem implements RepositoryItem {
 		return domain;
 	}
 
+	public void setDomain(String domain) {
+		this.domain = domain;
+		routings = new String[]{domain, ".*@" + domain, ".*\\." + domain};
+	}
+
 	public ConnectionType getConnectionType() {
 		return type;
 	}
@@ -274,6 +275,27 @@ public class CompRepoItem implements RepositoryItem {
 	@Override
 	public String toString() {
 		return toPropertyString();
+	}
+
+	void setPassword(String password) {
+		this.auth_pass = password;
+	}
+
+	void setPort(int port) {
+		this.port = port;
+	}
+
+	void setRemoteDomain(String remote_domain) {
+		this.remoteHost = remote_domain;
+	}
+
+	void setProtocol(String protocol) {
+		this.prop_xmlns = protocol;
+		this.xmlns = parseProtoXMLNS(protocol);
+	}
+
+	void setConnectionType(String connection_type) {
+		this.type = parseConnectionType(connection_type);
 	}
 
 }
