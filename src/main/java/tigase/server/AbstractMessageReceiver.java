@@ -26,7 +26,6 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
@@ -180,7 +179,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 		int queueIdx = Math.abs(hashCodeForPacket(packet) %	in_queues_size);
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("[" + getName() + "] queueIdx=" + queueIdx +
-							", " + packet.toString());
+							", " + packet.toStringSecure());
 		}
 		boolean result = in_queues.get(queueIdx).offer(packet,
 						packet.getPriority().ordinal());
@@ -213,7 +212,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 		int queueIdx = Math.abs(hashCodeForPacket(packet) %	in_queues_size);
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("[" + getName() + "] queueIdx=" + queueIdx +
-							", " + packet.toString());
+							", " + packet.toStringSecure());
 		}
 		try {
 			in_queues.get(queueIdx).put(packet, packet.getPriority().ordinal());
@@ -233,7 +232,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	 */
 	protected boolean addOutPacketNB(Packet packet) {
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("[" + getName() + "]  " + packet.toString());
+			log.finest("[" + getName() + "]  " + packet.toStringSecure());
 		}
 		boolean result = false;
 		result = out_queue.offer(packet, packet.getPriority().ordinal());
@@ -255,7 +254,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 
 	protected boolean addOutPacket(Packet packet) {
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("[" + getName() + "]  " + packet.toString());
+			log.finest("[" + getName() + "]  " + packet.toStringSecure());
 		}
 		try {
 			out_queue.put(packet, packet.getPriority().ordinal());
@@ -542,6 +541,14 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 		return vHostManager != null ? vHostManager.getVHostItem(domain) : null;
 	}
 
+	public void addComponentDomain(String domain) {
+		vHostManager.addComponentDomain(domain);
+	}
+
+	public void removeComponentDomain(String domain) {
+		vHostManager.removeComponentDomain(domain);
+	}
+
 	public Set<Pattern> getRegexRoutings() {
 		return regexRoutings;
 	}
@@ -569,10 +576,10 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	public boolean isInRegexRoutings(String address) {
 		// 		log.finest(getName() + " looking for regex routings: " + address);
 		for (Pattern pat: regexRoutings) {
-			if (pat.matcher(address).matches()) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest(getName() + " matched against pattern: " + pat.toString());
+					log.finest(getName() + " matching: " + address + " against " + pat.toString());
 				}
+			if (pat.matcher(address).matches()) {
 				return true;
 			}
 			// 			log.finest(getName() + " matching failed against pattern: " + pat.toString());
@@ -668,7 +675,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 				} catch (Exception e) {
 					log.log(Level.SEVERE, "[" + getName() +
 									"] Exception during packet processing: " +
-									packet.toString(), e);
+									packet.toStringSecure(), e);
 				} // end of try-catch
 			} // end of while (! threadStopped)
 		}
