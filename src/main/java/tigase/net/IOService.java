@@ -30,6 +30,7 @@ import java.nio.channels.SocketChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CharsetDecoder;
+import java.nio.charset.MalformedInputException;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
@@ -187,6 +188,8 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 				(String)sessionData.get(HOSTNAME_KEY)), null, clientMode);
 		socketIO = new TLSIO(socketIO, wrapper);
 		setLastTransferTime();
+		encoder.reset();
+		decoder.reset();
   }
 
   public void startTLS(final boolean clientMode)
@@ -196,6 +199,8 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 				(String)sessionData.get(HOSTNAME_KEY)), null, clientMode);
 		socketIO = new TLSIO(socketIO, wrapper);
 		setLastTransferTime();
+		encoder.reset();
+		decoder.reset();
   }
 
 	public void startZLib(int level) {
@@ -374,7 +379,8 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 	private void resizeInputBuffer() throws IOException {
 		int netSize = socketIO.getInputPacketSize();
 		// Resize buffer if needed.
-		if (netSize > socketInput.remaining()) {
+//		if (netSize > socketInput.remaining()) {
+		if (netSize > socketInput.capacity() - socketInput.remaining()) {
 			if (log.isLoggable(Level.FINE)) {
 				log.fine("Resizing buffer to "
 					+ (netSize + socketInput.capacity())
@@ -383,6 +389,30 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 			ByteBuffer b = ByteBuffer.allocate(netSize+socketInput.capacity());
 			b.put(socketInput);
 			socketInput = b;
+		} else {
+//			if (log.isLoggable(Level.FINEST)) {
+//				log.finer("     Before flip()");
+//				log.finer("input.capacity()=" + socketInput.capacity());
+//				log.finer("input.remaining()=" + socketInput.remaining());
+//				log.finer("input.limit()=" + socketInput.limit());
+//				log.finer("input.position()=" + socketInput.position());
+//			}
+//			socketInput.flip();
+//			if (log.isLoggable(Level.FINEST)) {
+//				log.finer("     Before compact()");
+//				log.finer("input.capacity()=" + socketInput.capacity());
+//				log.finer("input.remaining()=" + socketInput.remaining());
+//				log.finer("input.limit()=" + socketInput.limit());
+//				log.finer("input.position()=" + socketInput.position());
+//			}
+			socketInput.compact();
+//			if (log.isLoggable(Level.FINEST)) {
+//				log.finer("     After compact()");
+//				log.finer("input.capacity()=" + socketInput.capacity());
+//				log.finer("input.remaining()=" + socketInput.remaining());
+//				log.finer("input.limit()=" + socketInput.limit());
+//				log.finer("input.position()=" + socketInput.position());
+//			}
 		}
 	}
 
@@ -430,12 +460,18 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 						forceStop();
 					}
 				}
-			} catch (BufferUnderflowException underfl) {
+			} catch (BufferUnderflowException ex) {
 				// Obtain more inbound network data for src,
 				// then retry the operation.
 				resizeInputBuffer();
 				return null;
+//			} catch (MalformedInputException ex) {
+//				// This happens after TLS initialization sometimes, maybe reset helps
+//				decoder.reset();
 			} catch (Exception eof) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "Exception reading data: ", eof);
+				}
 				//			eof.printStackTrace();
 				forceStop();
 			} // end of try-catch
@@ -464,7 +500,11 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 			try {
 				if (data != null && data.length() > 0) {
 					if (log.isLoggable(Level.FINEST)) {
-						log.finest("Writing data: " + data);
+						if (data.length() < 256) {
+							log.finest("Writing data: " + data);
+						} else {
+							log.finest("Writing data: " + data.length());
+						}
 					}
 					ByteBuffer dataBuffer = null;
 					encoder.reset();

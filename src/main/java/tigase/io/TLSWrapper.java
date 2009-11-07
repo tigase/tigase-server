@@ -97,6 +97,7 @@ public class TLSWrapper {
 		if (tlsEngineResult != null &&
 			tlsEngineResult.getStatus() == Status.BUFFER_UNDERFLOW) {
 			status = TLSStatus.UNDERFLOW;
+			//status = TLSStatus.NEED_READ;
 		} // end of if (tlsEngine.getStatus() == Status.BUFFER_UNDERFLOW)
 		else {
 			if (tlsEngineResult != null &&

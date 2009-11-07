@@ -92,8 +92,25 @@ public class TLSIO implements IOInterface {
     do {
 			if (log.isLoggable(Level.FINER)) {
 				log.finer("Decoding data: " + input.remaining());
+				log.finer("input.capacity()=" + input.capacity());
+				log.finer("input.remaining()=" + input.remaining());
+				log.finer("input.limit()=" + input.limit());
+				log.finer("input.position()=" + input.position());
 			}
       tlsInput = tlsWrapper.unwrap(input, tlsInput);
+			if (log.isLoggable(Level.FINEST)) {
+				int netSize = tlsWrapper.getPacketBuffSize();
+				log.finer("tlsWrapper.getStatus() = " + tlsWrapper.getStatus().name());
+				log.finer("PacketBuffSize=" + netSize);
+				log.finer("input.capacity()=" + input.capacity());
+				log.finer("input.remaining()=" + input.remaining());
+				log.finer("input.limit()=" + input.limit());
+				log.finer("input.position()=" + input.position());
+				log.finer("tlsInput.capacity()=" + tlsInput.capacity());
+				log.finer("tlsInput.remaining()=" + tlsInput.remaining());
+				log.finer("tlsInput.limit()=" + tlsInput.limit());
+				log.finer("tlsInput.position()=" + tlsInput.position());
+			}
 //       if (input.hasRemaining()) {
 //         input.compact();
 //       } // end of if (input.hasRemaining())
@@ -102,15 +119,19 @@ public class TLSIO implements IOInterface {
         writeBuff(ByteBuffer.allocate(0));
         break;
       case UNDERFLOW:
-				int netSize = tlsWrapper.getPacketBuffSize();
-				if (log.isLoggable(Level.FINER)) {
-					log.finer("tlsWrapper.getStatus() = UNDERFLOW");
-					log.finer("PacketBuffSize=" + netSize);
-					log.finer("input.capacity()=" + input.capacity());
-					log.finer("tlsInput.capacity()=" + tlsInput.capacity());
-					log.finer("input.remaining()=" + input.remaining());
-					log.finer("tlsInput.remaining()=" + tlsInput.remaining());
-				}
+//				if (log.isLoggable(Level.FINER) && !log.isLoggable(Level.FINEST)) {
+//					int netSize = tlsWrapper.getPacketBuffSize();
+//					log.finer("tlsWrapper.getStatus() = UNDERFLOW");
+//					log.finer("PacketBuffSize=" + netSize);
+//					log.finer("input.capacity()=" + input.capacity());
+//					log.finer("input.remaining()=" + input.remaining());
+//					log.finer("input.limit()=" + input.limit());
+//					log.finer("input.position()=" + input.position());
+//					log.finer("tlsInput.capacity()=" + tlsInput.capacity());
+//					log.finer("tlsInput.remaining()=" + tlsInput.remaining());
+//					log.finer("tlsInput.limit()=" + tlsInput.limit());
+//					log.finer("tlsInput.position()=" + tlsInput.position());
+//				}
 				// Obtain more inbound network data for src,
 				// then retry the operation.
 				throw new BufferUnderflowException();
@@ -142,7 +163,7 @@ public class TLSIO implements IOInterface {
     ByteBuffer tmpBuffer = io.read(buff);
 		if (io.bytesRead() > 0) {
 			if (log.isLoggable(Level.FINER)) {
-				log.finer("Read bytes: " + bytesRead());
+				log.finer("Read bytes: " + io.bytesRead());
 			}
       return decodeData(tmpBuffer);
     } else {
