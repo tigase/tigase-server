@@ -146,6 +146,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 				updateRoutings(routings, true);
 				String addr =
 					(String)serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
+				addComponentDomain(addr);
 				if (log.isLoggable(Level.FINE)) {
 					log.fine("Connected to: " + addr);
 				}
@@ -175,6 +176,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 					updateRoutings(routings, true);
 					String addr = 
 									(String)serv.getSessionData().get(XMPPIOService.HOSTNAME_KEY);
+					addComponentDomain(addr);
 					if (log.isLoggable(Level.FINE)) {
 						log.fine("Connected to: " + addr);
 					}
@@ -268,7 +270,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 							// This is specialized configuration for a single
 							// external component so all traffic should go through
 							// the external component (it acts as like s2s component)
-							PORT_ROUTING_TABLE_PROP_VAL =	new String[] { "*" };
+							PORT_ROUTING_TABLE_PROP_VAL =	new String[] { ".*" };
 						} else {
 							String regex_host = PORT_REMOTE_HOST_PROP_VAL.replace(".", "\\.");
 							PORT_ROUTING_TABLE_PROP_VAL =
@@ -346,6 +348,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 			} // end of if (type == ConnectionType.connect)
 			//		removeRouting(serv.getRemoteHost());
 			String addr = (String) sessionData.get(PORT_REMOTE_HOST_PROP_KEY);
+			removeComponentDomain(addr);
 			if (log.isLoggable(Level.FINE)) {
 				log.fine("Disonnected from: " + addr);
 			}
@@ -461,6 +464,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 
 	private void updateRoutings(String[] routings, boolean add) {
 		if (add) {
+			log.info("Adding routings: " + Arrays.toString(routings));
 			for (String route: routings) {
 				try {
 					addRegexRouting(route);
@@ -469,6 +473,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 				}
 			}
 		} else {
+			log.info("Removing routings: " + Arrays.toString(routings));
 			for (String route: routings) {
 				try {
 					removeRegexRouting(route);
