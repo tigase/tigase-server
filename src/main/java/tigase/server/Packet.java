@@ -76,6 +76,7 @@ public class Packet {
 	private String id = null;
 	private Permissions permissions = Permissions.NONE;
 	private String packetToString = null;
+	private String packetToStringSecure = null;
 	private Priority priority = Priority.NORMAL;
 	private String iqQueryXMLNS = null;
 	private String elemTo = null;
@@ -176,6 +177,7 @@ public class Packet {
 
 	public void setPermissions(Permissions perm) {
 		packetToString = null;
+		packetToStringSecure = null;
 		permissions = perm;
 	}
 
@@ -285,6 +287,7 @@ public class Packet {
 
 	public void setFrom(final String from) {
 		packetToString = null;
+		packetToStringSecure = null;
 		this.from = from;
 	}
 
@@ -356,6 +359,15 @@ public class Packet {
 							", priority="+priority;
 		}
 		return "to=" + to + ", from=" + from + packetToString;
+	}
+
+	public String toStringSecure() {
+		if (packetToStringSecure == null) {
+			packetToStringSecure = ", data=" + elem.toStringSecure() +
+							", XMLNS="+elem.getXMLNS() +
+							", priority="+priority;
+		}
+		return "to=" + to + ", from=" + from + packetToStringSecure;
 	}
 
 	public boolean isRouted() {
