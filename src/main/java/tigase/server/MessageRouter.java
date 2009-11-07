@@ -62,13 +62,11 @@ import static tigase.server.MessageRouterConfig.*;
 public class MessageRouter extends AbstractMessageReceiver {
 	//	implements XMPPService {
 
-	public static final String INFO_XMLNS =
-		"http://jabber.org/protocol/disco#info";
-	public static final String ITEMS_XMLNS =
-		"http://jabber.org/protocol/disco#items";
+//	public static final String INFO_XMLNS =	"http://jabber.org/protocol/disco#info";
+//	public static final String ITEMS_XMLNS = "http://jabber.org/protocol/disco#items";
 
   private static final Logger log =
-    Logger.getLogger("tigase.server.MessageRouter");
+    Logger.getLogger(MessageRouter.class.getName());
 
 	//private static final long startupTime = System.currentTimeMillis();
 
@@ -118,10 +116,11 @@ public class MessageRouter extends AbstractMessageReceiver {
 						results.offer(result);
 						//processPacket(result);
 						new Timer("Stopping...", true).schedule(new TimerTask() {
-								public void run() {
-									System.exit(0);
-								}
-							}, 2000);
+							@Override
+							public void run() {
+								System.exit(0);
+							}
+						}, 2000);
 					}
 				}
 			}
@@ -139,10 +138,10 @@ public class MessageRouter extends AbstractMessageReceiver {
 	private ServerComponent[] getServerComponentsForRegex(String id) {
 		LinkedHashSet<ServerComponent> comps = new LinkedHashSet<ServerComponent>();
 		for (MessageReceiver mr: receivers.values()) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Checking routings for: " + mr.getName());
+			}
 			if (mr.isInRegexRoutings(id)) {
-				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Found receiver: " + mr.getName());
-				}
 				comps.add(mr);
 			}
 		}
@@ -207,7 +206,7 @@ public class MessageRouter extends AbstractMessageReceiver {
 		// Intentionally comparing to static, final String
 		if (packet.getTo() == NULL_ROUTING) {
 			log.info("NULL routing, it is normal if server doesn't know how to"
-				+ " process packet: " + packet.toString());
+				+ " process packet: " + packet.toStringSecure());
 			try {
 				Packet error =
 					Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
@@ -224,7 +223,7 @@ public class MessageRouter extends AbstractMessageReceiver {
 // 				+ ", type: " + packet.getType());
 // 		}
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Processing packet: " + packet.toString());
+			log.finest("Processing packet: " + packet.toStringSecure());
 		}
 
 		// Detect inifinite loop if from == to
@@ -239,7 +238,7 @@ public class MessageRouter extends AbstractMessageReceiver {
 						packet.getElemFrom() != null &&
 						packet.getElemFrom().equals(packet.getTo()))) {
 			log.warning("Possible infinite loop, dropping packet: "
-				+ packet.toString());
+				+ packet.toStringSecure());
 			return;
 		}
 
@@ -338,7 +337,7 @@ public class MessageRouter extends AbstractMessageReceiver {
 				// This packet is to local domain, we don't want to send it out
 				// drop packet :-(
 				log.warning("Can't process packet to local domain, dropping..."
-					+ packet.toString());
+					+ packet.toStringSecure());
 			}
 		}
 
@@ -577,7 +576,7 @@ public class MessageRouter extends AbstractMessageReceiver {
 	private void processDiscoQuery(final Packet packet,
 			final Queue<Packet> results) {
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Processing disco query by: " + packet.toString());
+			log.finest("Processing disco query by: " + packet.toStringSecure());
 		}
 		String jid = packet.getElemTo();
 		String nick = packet.getElemToNick();
