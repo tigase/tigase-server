@@ -153,6 +153,16 @@ public class ComponentProtocol
 	}
 
 	@Override
+	protected Integer getMaxQueueSize(int def) {
+		return def*10;
+	}
+
+	@Override
+	protected boolean isHighThroughput() {
+		return true;
+	}
+
+	@Override
 	public Queue<Packet> processSocketData(XMPPIOService<List<ComponentConnection>> serv) {
 		Packet p = null;
 		Queue<Packet> results = new LinkedList<Packet>();
