@@ -96,7 +96,11 @@ public class ServiceDiscovery extends XMPPProcessor
 
 		// Fast packet processing if the session is null
 		if (session == null) {
-			results.offer(new Packet(packet.getElement()));
+			// This causes an infinite loop if the target user is offline,
+			// Let't try returning an error instead - entity-unavailable
+			// results.offer(new Packet(packet.getElement()));
+			results.offer(Authorization.RECIPIENT_UNAVAILABLE.getResponseMessage(
+					packet, "The target is unavailable at this time.", true));
 			return;
 		}
 
