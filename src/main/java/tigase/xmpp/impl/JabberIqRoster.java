@@ -180,102 +180,115 @@ public abstract class JabberIqRoster {
 	private static void processSetRequest(final Packet packet,
 		final XMPPResourceConnection session,	final Queue<Packet> results,
 		final Map<String, Object> settings)
-    throws NotAuthorizedException, TigaseDBException {
+    throws NotAuthorizedException, TigaseDBException, PacketErrorTypeException {
 
-		Element request = packet.getElement();
-    Element item =  request.findChild("/iq/query/item");
-
-    String buddy = JIDUtils.getNodeID(item.getAttribute("jid"));
-    String subscription = item.getAttribute("subscription");
-    if (subscription != null && subscription.equals("remove")) {
-			SubscriptionType sub = roster_util.getBuddySubscription(session, buddy);
-			if (sub == null) {
-				sub = SubscriptionType.none;
-			}
-			String type = request.getAttribute("/iq/query/item", "type");
-			if (sub != SubscriptionType.none && (type == null || !type.equals(ANON))) {
-				// Unavailable presence should be sent first, otherwise it will be blocked by
-				// the server after the subscription is cancelled
-				Element pres = new Element("presence");
-				pres.setAttribute("to", buddy);
-				pres.setAttribute("from", session.getJID());
-				pres.setAttribute("type", "unavailable");
-				Packet pres_packet = new Packet(pres);
-				// We have to set a higher priority for this particular unavailable packet
-				// to make sure it is delivered before subscription cancellation
-				pres_packet.setPriority(Priority.HIGH);
-				results.offer(pres_packet);
-				pres = new Element("presence");
-				pres.setAttribute("to", buddy);
-				pres.setAttribute("from", session.getUserId());
-				pres.setAttribute("type", "unsubscribe");
-				results.offer(new Packet(pres));
-				pres = new Element("presence");
-				pres.setAttribute("to", buddy);
-				pres.setAttribute("from", session.getUserId());
-				pres.setAttribute("type", "unsubscribed");
-				results.offer(new Packet(pres));
-			}
-			// It happens sometimes that the client still think the buddy
-			// is in the roster while he isn't. In such a case just ensure the
-			// client that the buddy has been removed for sure
-			Element it = new Element("item");
-			it.setAttribute("jid", buddy);
-			it.setAttribute("subscription", "remove");
-			roster_util.updateBuddyChange(session, results, it);
-			roster_util.removeBuddy(session, buddy);
-      results.offer(packet.okResult((String)null, 0));
-    } else {
-      Element dynamicItem = DynamicRoster.getBuddyItem(session, settings, buddy);
-			String name = request.getAttribute("/iq/query/item", "name");
+		//Element request = packet.getElement();
+		List<Element> items = packet.getElemChildren("/iq/query");
+		if (items != null) {
+			for (Element item : items) {
+				String buddy = JIDUtils.getNodeID(item.getAttribute("jid"));
+				String subscription = item.getAttribute("subscription");
+				if (subscription != null && subscription.equals("remove")) {
+					SubscriptionType sub =
+							roster_util.getBuddySubscription(session, buddy);
+					if (sub == null) {
+						sub = SubscriptionType.none;
+					}
+					String type = item.getAttribute("type");
+					if (sub != SubscriptionType.none && (type == null ||
+							!type.equals(ANON))) {
+						// Unavailable presence should be sent first, otherwise it will be blocked by
+						// the server after the subscription is cancelled
+						Element pres = new Element("presence");
+						pres.setAttribute("to", buddy);
+						pres.setAttribute("from", session.getJID());
+						pres.setAttribute("type", "unavailable");
+						Packet pres_packet = new Packet(pres);
+						// We have to set a higher priority for this particular unavailable packet
+						// to make sure it is delivered before subscription cancellation
+						pres_packet.setPriority(Priority.HIGH);
+						results.offer(pres_packet);
+						pres = new Element("presence");
+						pres.setAttribute("to", buddy);
+						pres.setAttribute("from", session.getUserId());
+						pres.setAttribute("type", "unsubscribe");
+						results.offer(new Packet(pres));
+						pres = new Element("presence");
+						pres.setAttribute("to", buddy);
+						pres.setAttribute("from", session.getUserId());
+						pres.setAttribute("type", "unsubscribed");
+						results.offer(new Packet(pres));
+					}
+					// It happens sometimes that the client still thinks the buddy
+					// is in the roster while he isn't. In such a case just ensure the
+					// client that the buddy has been removed for sure
+					Element it = new Element("item");
+					it.setAttribute("jid", buddy);
+					it.setAttribute("subscription", "remove");
+					roster_util.updateBuddyChange(session, results, it);
+					roster_util.removeBuddy(session, buddy);
+				} else {
+					Element dynamicItem = DynamicRoster.getBuddyItem(session, settings,
+							buddy);
+					String name = item.getAttribute("name");
 //       if (name == null) {
 //         name = buddy;
 //       } // end of if (name == null)
-      List<Element> groups = item.getChildren();
-			String[] gr = null;
-      if (groups != null && groups.size() > 0) {
-        gr = new String[groups.size()];
-        int cnt = 0;
-        for (Element group : groups) {
-					gr[cnt++] = (group.getCData() == null ? "" : group.getCData());
-        } // end of for (ElementData group : groups)
-      }
-			//roster_util.setBuddyGroups(session, buddy, gr);
-      roster_util.addBuddy(session, buddy, name, gr);
-			String type = request.getAttribute("/iq/query/item", "type");
-			if (type != null && type.equals(ANON)) {
-        roster_util.setBuddySubscription(session, SubscriptionType.both, buddy);
-				Element pres = (Element)session.getSessionData(XMPPResourceConnection.PRESENCE_KEY);
-				if (pres == null) {
-					pres = new Element("presence");
-				} else {
-					pres = pres.clone();
-				}
-				pres.setAttribute("to", buddy);
-				pres.setAttribute("from", session.getJID());
-				results.offer(new Packet(pres));
+					List<Element> groups = item.getChildren();
+					String[] gr = null;
+					if (groups != null && groups.size() > 0) {
+						gr = new String[groups.size()];
+						int cnt = 0;
+						for (Element group : groups) {
+							gr[cnt++] = (group.getCData() == null ? "" : group.getCData());
+						} // end of for (ElementData group : groups)
+					}
+					//roster_util.setBuddyGroups(session, buddy, gr);
+					roster_util.addBuddy(session, buddy, name, gr);
+					String type = item.getAttribute("type");
+					if (type != null && type.equals(ANON)) {
+						roster_util.setBuddySubscription(session, SubscriptionType.both,
+								buddy);
+						Element pres = (Element)session.getSessionData(
+								XMPPResourceConnection.PRESENCE_KEY);
+						if (pres == null) {
+							pres = new Element("presence");
+						} else {
+							pres = pres.clone();
+						}
+						pres.setAttribute("to", buddy);
+						pres.setAttribute("from", session.getJID());
+						results.offer(new Packet(pres));
+					}
+					Element new_buddy = roster_util.getBuddyItem(session, buddy);
+					if (log.isLoggable(Level.FINEST)) {
+						log.finest("1. New Buddy: " + new_buddy.toString());
+					}
+					if (roster_util.getBuddySubscription(session, buddy) == null) {
+						roster_util.setBuddySubscription(session, SubscriptionType.none,
+								buddy);
+					} // end of if (getBuddySubscription(session, buddy) == null)
+					if (dynamicItem != null) {
+						roster_util.setBuddySubscription(session, SubscriptionType.both,
+								buddy);
+						String[] itemGroups = getItemGroups(dynamicItem);
+						if (itemGroups != null) {
+							roster_util.addBuddyGroup(session, buddy, itemGroups);
+						}
+					}
+					new_buddy = roster_util.getBuddyItem(session, buddy);
+					if (log.isLoggable(Level.FINEST)) {
+						log.finest("2. New Buddy: " + new_buddy.toString());
+					}
+					roster_util.updateBuddyChange(session, results, new_buddy);
+				} // end of else
 			}
-			Element new_buddy = roster_util.getBuddyItem(session, buddy);
-			if (log.isLoggable(Level.FINEST)) {
-				log.finest("1. New Buddy: " + new_buddy.toString());
-			}
-      if (roster_util.getBuddySubscription(session, buddy) == null) {
-				roster_util.setBuddySubscription(session, SubscriptionType.none, buddy);
-      } // end of if (getBuddySubscription(session, buddy) == null)
-			if (dynamicItem != null) {
-				roster_util.setBuddySubscription(session, SubscriptionType.both, buddy);
-				String[] itemGroups = getItemGroups(dynamicItem);
-				if (itemGroups != null) {
-					roster_util.addBuddyGroup(session, buddy, itemGroups);
-				}
-			}
-			new_buddy = roster_util.getBuddyItem(session, buddy);
-			if (log.isLoggable(Level.FINEST)) {
-				log.finest("2. New Buddy: " + new_buddy.toString());
-			}
-      results.offer(packet.okResult((String)null, 0));
-      roster_util.updateBuddyChange(session, results, new_buddy);
-    } // end of else
+			results.offer(packet.okResult((String)null, 0));
+		} else {
+			log.warning("No items found in roster set request: " + packet.toString());
+			results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
+					"No items found in the roster set request",	true));
+		}
   }
 
 	private static void processGetRequest(final Packet packet,
