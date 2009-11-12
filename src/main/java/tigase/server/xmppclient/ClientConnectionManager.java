@@ -47,7 +47,7 @@ import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 //import tigase.net.IOService;
 import tigase.net.SocketReadThread;
-import tigase.server.ReceiverEventHandler;
+import tigase.server.ReceiverTimeoutHandler;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.PacketErrorTypeException;
 
@@ -80,8 +80,8 @@ public class ClientConnectionManager
 
 	private Map<String, XMPPProcessorIfc> processors =
 		new ConcurrentSkipListMap<String, XMPPProcessorIfc>();
-	private ReceiverEventHandler stoppedHandler = newStoppedHandler();
-	private ReceiverEventHandler startedHandler = newStartedHandler();
+	private ReceiverTimeoutHandler stoppedHandler = newStoppedHandler();
+	private ReceiverTimeoutHandler startedHandler = newStartedHandler();
 
 	/**
 	 * This is mostly for testing purpose. We want to investigate massive 
@@ -551,11 +551,11 @@ public class ClientConnectionManager
 		return new XMPPIOService<Object>();
 	}
 
-	protected ReceiverEventHandler newStoppedHandler() {
+	protected ReceiverTimeoutHandler newStoppedHandler() {
 		return new StoppedHandler();
 	}
 
-	protected ReceiverEventHandler newStartedHandler() {
+	protected ReceiverTimeoutHandler newStartedHandler() {
 		return new StartedHandler();
 	}
 
@@ -592,7 +592,7 @@ public class ClientConnectionManager
 		return "c2s";
 	}
 
-	private class StoppedHandler implements ReceiverEventHandler {
+	private class StoppedHandler implements ReceiverTimeoutHandler {
 
 		@Override
 		public void timeOutExpired(Packet packet) {
@@ -613,7 +613,7 @@ public class ClientConnectionManager
 
 	}
 
-	private class StartedHandler implements ReceiverEventHandler {
+	private class StartedHandler implements ReceiverTimeoutHandler {
 
 		@Override
 		public void timeOutExpired(Packet packet) {
