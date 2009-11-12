@@ -89,7 +89,7 @@ public class SASLProcessor implements ExtProcessor {
 						new Element[]{new Element("not-authorized")},
 						new String[] {"xmlns"},
 						new String[] {XMLNS});
-				results.offer(new Packet(failure));
+				handler.authenticationFailed(serv, new Packet(failure));
 			}
 			serv.getSessionData().put(ID, ID);
 			return true;

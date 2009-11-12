@@ -65,8 +65,7 @@ public class BindProcessor implements ExtProcessor {
 	public boolean process(Packet p, XMPPIOService<List<ComponentConnection>> serv,
 			ComponentProtocolHandler handler, Queue<Packet> results) {
 		if (p.isXMLNS("/iq/bind", XMLNS)) {
-			if (p.getType() == StanzaType.set &&
-					serv.getSessionData().get(AUTHENTICATED_KEY) == Boolean.TRUE) {
+			if (p.getType() == StanzaType.set && serv.isAuthenticated()) {
 				String hostname = p.getElemCData("/iq/bind/hostname");
 				handler.bindHostname(hostname, serv);
 				results.offer(new Packet(okResult(p.getElement())));
@@ -76,8 +75,7 @@ public class BindProcessor implements ExtProcessor {
 			return true;
 		}
 		if (p.isXMLNS("/iq/unbind", XMLNS)) {
-			if (p.getType() == StanzaType.set &&
-					serv.getSessionData().get(AUTHENTICATED_KEY) == Boolean.TRUE) {
+			if (p.getType() == StanzaType.set && serv.isAuthenticated()) {
 				String hostname = p.getElemCData("/iq/unbind/hostname");
 				handler.unbindHostname(hostname, serv);
 				results.offer(new Packet(okResult(p.getElement())));

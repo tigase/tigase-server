@@ -69,6 +69,7 @@ public class HandshakeProcessor implements ExtProcessor {
 						handler.authenticated(serv);
 					} else {
 						log.warning("Incorrect packet received: " + p.getStringData());
+						serv.stop();
 					}
 					break;
 				}
