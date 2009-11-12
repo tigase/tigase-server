@@ -23,6 +23,7 @@
 package tigase.server.ext;
 
 import java.util.List;
+import tigase.server.Packet;
 import tigase.xml.Element;
 import tigase.xmpp.XMPPIOService;
 
@@ -35,7 +36,7 @@ import tigase.xmpp.XMPPIOService;
 public interface ComponentProtocolHandler {
 
 	public static final String REPO_ITEM_KEY = "repo-item";
-	public static final String AUTHENTICATED_KEY = "authenticated";
+//	public static final String AUTHENTICATED_KEY = "authenticated";
 	public static final String EXTCOMP_BIND_HOSTNAMES_PROP_KEY = "bind-ext-hostnames";
 
 	void authenticated(XMPPIOService<List<ComponentConnection>> serv);
@@ -53,5 +54,7 @@ public interface ComponentProtocolHandler {
 	StreamOpenHandler getStreamOpenHandler(String xmlns);
 
 	String newPacketId(String prefix);
+
+	void authenticationFailed(XMPPIOService<List<ComponentConnection>> serv, Packet packet);
 
 }

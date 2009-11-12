@@ -30,8 +30,10 @@ import java.util.List;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.script.Bindings;
@@ -80,6 +82,9 @@ public class ComponentProtocol
 	public static final boolean RETURN_SERVICE_DISCO_VAL = true;
 	public static final String IDENTITY_TYPE_KEY = "identity-type";
 	public static final String IDENTITY_TYPE_VAL = "generic";
+	public static final String CLOSE_ON_SEQUENCE_ERROR_PROP_KEY = "close-on-seq-error";
+	public static final String MAX_AUTH_ATTEMPTS_PROP_KEY = "max-auth-attempts";
+	public static final String AUTHENTICATION_TIMEOUT_PROP_KEY = "auth-timeout";
 	public boolean PACK_ROUTED_VAL = false;
 
 	/**
@@ -104,6 +109,10 @@ public class ComponentProtocol
 	private String identity_type = IDENTITY_TYPE_VAL;
 	private String[] hostnamesToBind = null;
 	//private ServiceEntity serviceEntity = null;
+	private boolean closeOnSequenceError = true;
+	private int maxAuthenticationAttempts = 1;
+	// In seconds
+	private long authenticationTimeOut = 15;
 
 
 	public ComponentProtocol() {
@@ -179,7 +188,7 @@ public class ComponentProtocol
 				// This might be a bit slow, need to be tested.
 				// Possibly a local variable in XMPPIOService might be needed
 				// to improve performance
-				if (serv.getSessionData().get(AUTHENTICATED_KEY) == Boolean.TRUE) {
+				if (serv.isAuthenticated()) {
 					if (p.isRouted()) {
 						p = p.unpackRouted();
 					} // end of if (p.isRouted())
@@ -194,6 +203,9 @@ public class ComponentProtocol
 						// Already error packet, just ignore to prevent infinite loop
 						log.fine("Received an error packet from unauthorized connection: " +
 								p.toString());
+					}
+					if (closeOnSequenceError) {
+						serv.stop();
 					}
 				}
 			}
@@ -260,6 +272,7 @@ public class ComponentProtocol
 	@Override
 	public void serviceStarted(XMPPIOService<List<ComponentConnection>> serv) {
 		super.serviceStarted(serv);
+		addTimerTask(new AuthenticationTimer(serv), authenticationTimeOut, TimeUnit.SECONDS);
 		String xmlns =
 				((CompRepoItem)serv.getSessionData().get(REPO_ITEM_KEY)).getXMLNS();
 		if (log.isLoggable(Level.FINEST)) {
@@ -434,6 +447,14 @@ public class ComponentProtocol
 		} else {
 			defs.put(EXTCOMP_BIND_HOSTNAMES_PROP_KEY, new String[] {""});
 		}
+//	private boolean closeOnSequenceError = true;
+//	private int maxAuthenticationAttempts = 1;
+//	// In seconds
+//	private long authenticationTimeOut = 15;
+
+		defs.put(CLOSE_ON_SEQUENCE_ERROR_PROP_KEY, closeOnSequenceError);
+		defs.put(MAX_AUTH_ATTEMPTS_PROP_KEY, maxAuthenticationAttempts);
+		defs.put(AUTHENTICATION_TIMEOUT_PROP_KEY, authenticationTimeOut);
 		return defs;
 	}
 
@@ -528,8 +549,23 @@ public class ComponentProtocol
 	}
 
 	@Override
+	public void authenticationFailed(XMPPIOService<List<ComponentConnection>> serv,
+				Packet packet) {
+			writePacketToSocket(serv, packet);
+			Integer fails = (Integer)serv.getSessionData().get("auth-fails");
+			if (fails == null) {
+				fails = 1;
+			} else {
+				fails += 1;
+			}
+			if (fails >= maxAuthenticationAttempts) {
+				serv.stop();
+			}
+	}
+
+	@Override
 	public void authenticated(XMPPIOService<List<ComponentConnection>> serv) {
-		serv.getSessionData().put(AUTHENTICATED_KEY, Boolean.TRUE);
+		serv.setAuthenticated(true);
 		String hostname = (String)serv.getSessionData().get(XMPPIOService.HOSTNAME_KEY);
 		bindHostname(hostname, serv);
 		if (hostnamesToBind != null) {
@@ -611,6 +647,23 @@ public class ComponentProtocol
 	@Override
 	public StreamOpenHandler getStreamOpenHandler(String xmlns) {
 		return streamOpenHandlers.get(xmlns);
+	}
+
+	private class AuthenticationTimer extends TimerTask {
+
+		private XMPPIOService<List<ComponentConnection>> serv = null;
+
+		private AuthenticationTimer(XMPPIOService<List<ComponentConnection>> serv) {
+			this.serv = serv;
+		}
+
+		@Override
+		public void run() {
+			if (!serv.isAuthenticated()) {
+				serv.stop();
+			}
+		}
+
 	}
 
 }
