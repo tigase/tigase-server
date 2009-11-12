@@ -55,6 +55,7 @@ public class XMPPIOService<RefObject> extends IOService<RefObject> {
   private XMPPDomBuilderHandler<RefObject> domHandler = null;
 	protected SimpleParser parser = SingletonFactory.getParserInstance();
 	private XMPPIOServiceListener serviceListener = null;
+	private boolean authenticated = false;
 
   /**
    * The <code>waitingPackets</code> queue keeps data which have to be processed.
@@ -314,5 +315,13 @@ public class XMPPIOService<RefObject> extends IOService<RefObject> {
   protected void addReceivedPacket(final Packet packet) {
     receivedPackets.offer(packet);
   }
+
+	public void setAuthenticated(boolean authenticated) {
+		this.authenticated = authenticated;
+	}
+
+	public boolean isAuthenticated() {
+		return authenticated;
+	}
 
 } // XMPPIOService
