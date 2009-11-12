@@ -31,7 +31,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.Timer;
 
 //import tigase.cluster.methodcalls.SessionTransferMC;
 import tigase.server.Packet;
@@ -90,7 +89,6 @@ public class SessionManagerClustered extends SessionManager
 	private static final String CL_BR_USER_CONNECTED = "cl-br-user_conn";
 	private static final String SYNC_ONLINE_JIDS = "sync-jids";
 
-	private Timer delayedTasks = null;
 	private ClusteringStrategyIfc strategy = null;
 	private String my_hostname = null;
 	private int nodesNo = 0;
@@ -699,17 +697,17 @@ public class SessionManagerClustered extends SessionManager
 	}
 
 
-	@Override
-	public void release() {
-		delayedTasks.cancel();
-		super.release();
-	}
+//	@Override
+//	public void release() {
+//		//delayedTasks.cancel();
+//		super.release();
+//	}
 
-	@Override
-	public void start() {
-		super.start();
-		delayedTasks = new Timer("SM Cluster Delayed Tasks", true);
-	}
+//	@Override
+//	public void start() {
+//		super.start();
+//		//delayedTasks = new Timer("SM Cluster Delayed Tasks", true);
+//	}
 
 	@Override
 	public void setClusterController(ClusterController cl_controller) {
