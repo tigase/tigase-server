@@ -33,7 +33,6 @@ import java.util.Map;
 import java.util.LinkedHashMap;
 import java.util.Queue;
 import java.util.Set;
-import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -57,7 +56,7 @@ import tigase.server.AbstractMessageReceiver;
 import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.server.Permissions;
-import tigase.server.ReceiverEventHandler;
+import tigase.server.ReceiverTimeoutHandler;
 import tigase.server.XMPPServer;
 import tigase.stats.StatisticsList;
 import tigase.sys.OnlineJidsReporter;
@@ -149,7 +148,6 @@ public class SessionManager extends AbstractMessageReceiver
 	private ProcessingThreads<SessionOpenWorkerThread> sessionOpenThread =
 			new ProcessingThreads<SessionOpenWorkerThread>(
 			new SessionOpenWorkerThread(this), 1, 1, maxQueueSize, "session-open");
-	private Timer authenticationWatchdog = new Timer("SM authentocation watchdog");
 
 	private ConnectionCheckCommandHandler connectionCheckCommandHandler =
 					new ConnectionCheckCommandHandler();
@@ -169,7 +167,6 @@ public class SessionManager extends AbstractMessageReceiver
 	private int maxPluginsNo = 0;
 	private boolean skipPrivacy = false;
 
-	private Timer reaperTask = null;
 	private long reaperInterval = 60 * 1000;
 	private long maxIdleTime = 86400 * 1000;
 
@@ -1605,8 +1602,7 @@ public class SessionManager extends AbstractMessageReceiver
 				}
 				final String hostname = Command.getFieldValue(item.packet, "hostname");
 				item.conn = createUserSession(item.packet.getFrom(), hostname);
-				authenticationWatchdog.schedule(new AuthenticationTimer(item.packet.getFrom()),
-								2*MINUTE);
+				addTimerTask(new AuthenticationTimer(item.packet.getFrom()), 2, TimeUnit.MINUTES);
 			} else {
 				if (log.isLoggable(Level.FINEST)) {
 					log.finest("Stream opened for existing session, authorized: "
@@ -1700,24 +1696,24 @@ public class SessionManager extends AbstractMessageReceiver
 
 	}
 
-	private class ConnectionCheckCommandHandler implements ReceiverEventHandler {
+	private class ConnectionCheckCommandHandler implements ReceiverTimeoutHandler {
 
 		@Override
 		public void timeOutExpired(Packet packet) {
-   			if (log.isLoggable(Level.FINER)) {
-    			log.finer("Connection checker timeout expired, closing connection: " +
-							packet.getTo());
-            }
+			if (log.isLoggable(Level.FINER)) {
+				log.finer("Connection checker timeout expired, closing connection: " +
+						packet.getTo());
+			}
 			closeConnection(packet.getTo(), false);
 		}
 
 		@Override
 		public void responseReceived(Packet packet, Packet response) {
 			if (response.getType() == StanzaType.error) {
-    			if (log.isLoggable(Level.FINER)) {
-    				log.finer("Connection checker error received, closing connection: " +
+				if (log.isLoggable(Level.FINER)) {
+					log.finer("Connection checker error received, closing connection: " +
 							packet.getTo());
-                }
+				}
 				// The connection is not longer active, closing the user session here.
 				closeConnection(packet.getTo(), false);
 			}
