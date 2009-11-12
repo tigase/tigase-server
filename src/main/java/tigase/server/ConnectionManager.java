@@ -32,7 +32,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
-import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Level;
@@ -136,7 +135,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 	private static ConnectionOpenThread connectThread =
 		ConnectionOpenThread.getInstance();
 	private static SocketReadThread readThread = SocketReadThread.getInstance();
-	private Timer delayedTasks = null;
 	private Thread watchdog = null;
 	private long watchdogRuns = 0;
 	private long watchdogTests = 0;
@@ -293,15 +291,17 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 		pending_open.clear();
 	}
 
+	@Override
 	public void release() {
-		delayedTasks.cancel();
+		//delayedTasks.cancel();
 		releaseListeners();
 		super.release();
 	}
 
+	@Override
 	public void start() {
 		super.start();
-		delayedTasks = new Timer(getName() + " - delayed connections", true);
+		//delayedTasks = new Timer(getName() + " - delayed connections", true);
 	}
 
 	@Override
@@ -367,7 +367,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 			log.finer("Reconnecting service for: " + getName()
 				+ ", scheduling next try in " + (delay / 1000) + "secs");
 		}
-		delayedTasks.schedule(new TimerTask() {
+		addTimerTask(new TimerTask() {
+			@Override
 				public void run() {
 					String host = (String)port_props.get(PORT_REMOTE_HOST_PROP_KEY);
 					if (host == null) {
