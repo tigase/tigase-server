@@ -27,11 +27,11 @@ import java.security.NoSuchAlgorithmException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Queue;
-import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.net.ConnectionType;
@@ -109,7 +109,6 @@ public class ServerConnectionManager
 	private ConcurrentSkipListMap<String, XMPPIOService<Object>> incoming =
     new ConcurrentSkipListMap<String, XMPPIOService<Object>>();
 
-	private Timer connectionWatchdog = new Timer("s2s connections watchdog");
 	private static Map<String, ConnectionWatchdogTask> waitingTasks =
 			new LinkedHashMap<String, ConnectionWatchdogTask>();
 
@@ -1045,7 +1044,7 @@ public class ServerConnectionManager
 			if (task != null) {
 				task.cancel();
 			}
-			connectionWatchdog.schedule(this, 2 * MINUTE);
+			addTimerTask(this, 2, TimeUnit.MINUTES);
 			waitingTasks.put(key, this);
 		}
 
