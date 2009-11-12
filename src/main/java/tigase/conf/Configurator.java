@@ -84,7 +84,6 @@ public class Configurator extends AbstractComponentRegistrator<Configurable> {
 	private static MonitoringSetupIfc monitoring = null;
 
 	private ConfigRepository repository = null;
-	//	private Timer delayedTask = new Timer("ConfiguratorTask", true);
 	private Map<String, Object> defConfigParams =
 		new LinkedHashMap<String, Object>();
 	private Map<String, Object> defProperties =
