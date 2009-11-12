@@ -26,14 +26,13 @@ import java.util.LinkedHashMap;
 import java.util.Queue;
 import java.util.LinkedList;
 import java.util.UUID;
-import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.server.Command;
 import tigase.server.Packet;
-import tigase.server.ReceiverEventHandler;
+import tigase.server.ReceiverTimeoutHandler;
 import tigase.util.JIDUtils;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.Authorization;
@@ -80,8 +79,8 @@ public class BoshConnectionManager extends ClientConnectionManager
 	private int concurrent_requests = CONCURRENT_REQUESTS_PROP_VAL;
 	private int hold_requests = HOLD_REQUESTS_PROP_VAL;
 	private long max_pause = MAX_PAUSE_PROP_VAL;
-	private ReceiverEventHandler stoppedHandler = newStoppedHandler();
-	private ReceiverEventHandler startedHandler = newStartedHandler();
+	private ReceiverTimeoutHandler stoppedHandler = newStoppedHandler();
+	private ReceiverTimeoutHandler startedHandler = newStartedHandler();
 
 	private final Map<UUID, BoshSession> sessions =
 		new LinkedHashMap<UUID, BoshSession>();
@@ -348,12 +347,11 @@ public class BoshConnectionManager extends ClientConnectionManager
 	}
 
 
-	private Timer boshTasks = new Timer("BoshTasks");
-
 	@Override
 	public TimerTask scheduleTask(BoshSession bs, long delay) {
 		BoshTask bt = new BoshTask(bs);
-		boshTasks.schedule(bt, delay);
+		addTimerTask(bt, delay);
+		//boshTasks.schedule(bt, delay);
 		return bt;
 	}
 
@@ -403,7 +401,7 @@ public class BoshConnectionManager extends ClientConnectionManager
 	}
 
 	@Override
-	protected ReceiverEventHandler newStartedHandler() {
+	protected ReceiverTimeoutHandler newStartedHandler() {
 		return new StartedHandler();
 	}
 
@@ -417,7 +415,7 @@ public class BoshConnectionManager extends ClientConnectionManager
 		return "c2s";
 	}
 
-	private class StartedHandler implements ReceiverEventHandler {
+	private class StartedHandler implements ReceiverTimeoutHandler {
 
 		@Override
 		public void timeOutExpired(Packet packet) {
