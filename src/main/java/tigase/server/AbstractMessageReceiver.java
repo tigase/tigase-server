@@ -94,8 +94,8 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 			new CopyOnWriteArrayList<PacketFilterIfc>();
 
 	private Timer receiverTasks = null;
-	private ConcurrentHashMap<String, ReceiverTask> waitingTasks =
-					new ConcurrentHashMap<String, ReceiverTask>(16, 0.75f, 4);
+	private ConcurrentHashMap<String, PacketReceiverTask> waitingTasks =
+					new ConcurrentHashMap<String, PacketReceiverTask>(16, 0.75f, 4);
 	private LinkedList<QueueListener> processingThreads = null;
 	private QueueListener out_thread = null;
 	protected VHostManagerIfc vHostManager = null;
@@ -246,10 +246,18 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	}
 
 	protected boolean addOutPacketWithTimeout(Packet packet,
-					ReceiverEventHandler handler, long delay,	TimeUnit unit) {
+					ReceiverTimeoutHandler handler, long delay,	TimeUnit unit) {
 		// It is automatically added to collections and the Timer
-		new ReceiverTask(handler, delay, unit, packet);
+		new PacketReceiverTask(handler, delay, unit, packet);
 		return addOutPacket(packet);
+	}
+
+	protected void addTimerTask(TimerTask task, long delay, TimeUnit unit) {
+		receiverTasks.schedule(task, unit.toMillis(delay));
+	}
+
+	protected void addTimerTask(TimerTask task, long delay) {
+		receiverTasks.schedule(task, delay);
 	}
 
 	protected boolean addOutPacket(Packet packet) {
@@ -627,7 +635,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 //							tracer.trace(null, packet.getElemTo(), packet.getElemFrom(),
 //											packet.getFrom(),	getName(), type.name(), null, packet);
 							String id = packet.getTo() + packet.getId();
-							ReceiverTask task = waitingTasks.remove(id);
+							PacketReceiverTask task = waitingTasks.remove(id);
 							if (task != null) {
 								task.handleResponse(packet);
 							} else {
@@ -682,13 +690,13 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 
 	}
 
-	private class ReceiverTask extends TimerTask {
+	private class PacketReceiverTask extends TimerTask {
 
-		private ReceiverEventHandler handler = null;
+		private ReceiverTimeoutHandler handler = null;
 		private Packet packet = null;
 		private String id = null;
 
-		private ReceiverTask(ReceiverEventHandler handler, long delay,
+		private PacketReceiverTask(ReceiverTimeoutHandler handler, long delay,
 						TimeUnit unit, Packet packet) {
 			super();
 			this.handler = handler;
@@ -706,7 +714,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 		
 		public void handleTimeout() {
 //			log.finest("[" + getName() + "]  " + "Fired timeout for id: " + id);
-			waitingTasks.remove(packet.getFrom() + packet.getId());
+			waitingTasks.remove(id);
 			handler.timeOutExpired(packet);
 		}
 
