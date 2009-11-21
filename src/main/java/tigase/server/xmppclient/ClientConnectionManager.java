@@ -255,6 +255,9 @@ public class ClientConnectionManager
 				break;
 			case CLOSE:
 				if (serv != null) {
+					try {
+						serv.writeRawData("</stream:stream>");
+					} catch (Exception e) {	}
 					serv.stop();
 				} else {
 					if (log.isLoggable(Level.FINE)) {
