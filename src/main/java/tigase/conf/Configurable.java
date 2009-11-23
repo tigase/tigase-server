@@ -220,14 +220,6 @@ public interface Configurable extends ServerComponent {
 
 	public static final String NULL_ROUTING = "NULL";
 
-	/**
-	 * Get object name. This name corresponds to section in configuration.
-	 *
-	 * @return a <code>String</code> value of object name.
-	 */
-	@Override
-	String getName();
-
   /**
    * Sets all configuration properties for the object.
 	 * @param properties
