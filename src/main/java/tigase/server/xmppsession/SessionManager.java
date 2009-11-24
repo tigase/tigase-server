@@ -1371,6 +1371,10 @@ public class SessionManager extends AbstractMessageReceiver
 			if (connections != null) {
 				for (XMPPResourceConnection connection : connections) {
 					if (connection != conn) {
+						if (log.isLoggable(Level.FINEST)) {
+							log.finest("Checking connection: " + connection.getConnectionId() +
+									", user JID: " + connection.getjid());
+						}
 						addOutPacketWithTimeout(Command.CHECK_USER_CONNECTION.getPacket(
 										getComponentId(), connection.getConnectionId(),
 										StanzaType.get, UUID.randomUUID().toString()),
