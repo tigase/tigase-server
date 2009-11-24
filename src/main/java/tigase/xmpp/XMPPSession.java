@@ -23,6 +23,7 @@ package tigase.xmpp;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -130,41 +131,56 @@ public class XMPPSession {
 			log.finest("Adding resource connection for username : " + username +
 					", id: " + conn.getConnectionId());
 		}
-		XMPPResourceConnection old_res = getResourceForResource(conn.getResource());
-		// If they are equal, just ignore this. It may happen only for USER_STATUS
-		// command where the user session is artificialy created....
-		if (old_res != conn) {
-			if (old_res != null) {
+		// There is a bug somewhere which causes to allow for 2 or more connections
+		// with the same resource. Let's try to catch the case here and fix it....
+		String resource = conn.getResource();
+		if (resource != null) {
+			LinkedList<XMPPResourceConnection> old_ress =
+					new LinkedList<XMPPResourceConnection>();
+			for (XMPPResourceConnection act_conn : activeResources) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Found old resource connection, id: " +
-							old_res.getConnectionId());
+					log.finest("Resource checking: " + act_conn.getResource() +
+							", connectionID: " + act_conn.getConnectionId());
 				}
-				try {
-					old_res.logout();
-				} catch (Exception e) {
-					log.log(Level.INFO,
-						"Exception during closing old connection, ignoring.", e);
+				if (resource.equalsIgnoreCase(act_conn.getResource())) {
+					old_ress.add(act_conn);
+				} // end of if (resource.equals(conn.getResource()))
+			} // end of for (XMPPResourceConnection conn: activeResources)
+			XMPPResourceConnection old_res = null;
+			while ((old_res = old_ress.poll()) != null) {
+				// If they are equal, just ignore this. It may happen only for USER_STATUS
+				// command where the user session is artificialy created....
+				if (old_res != conn) {
+					if (log.isLoggable(Level.FINEST)) {
+					log.finest("Found old resource connection, id: " + old_res.getConnectionId());
+					}
+					try {
+						old_res.logout();
+					} catch (Exception e) {
+						log.log(Level.INFO,
+								"Exception during closing old connection, ignoring.", e);
+					}
+					removeResourceConnection(old_res);
 				}
-				removeResourceConnection(old_res);
-			} // end of if (old_res != null)
-			// The connection could have been already added with null resource
-			// to avoid adding it twice let's check if it is already there
-			old_res = getResourceForConnectionId(conn.getConnectionId());
-			if (old_res == null) {
-				activeResources.add(conn);
-				conn.setParentSession(this);
 			}
-			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Number of active resources is: " + activeResources.size());
+		}
+		// The connection could have been already added with null resource
+		// to avoid adding it twice let's check if it is already there
+		XMPPResourceConnection old_res = getResourceForConnectionId(conn.getConnectionId());
+		if (old_res == null) {
+			activeResources.add(conn);
+			conn.setParentSession(this);
+		}
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Number of active resources is: " + activeResources.size());
 			
-				if (activeResources.size() > 1) {
-					int i = 0;
-					for (XMPPResourceConnection res: activeResources) {
-						log.finest("RES " + (++i) + ": " + res.getResource() + ", "
-							+ res.getConnectionId());
-					} // end of for (XMPPResourceConnection res: activeResources)
-				} // end of if (activeResources.size() > 1)
-			}
+			if (activeResources.size() > 1) {
+				int i = 0;
+				for (XMPPResourceConnection res : activeResources) {
+					log.finest("RES " + (++i) + ": " + res.getResource() + ", " + res.
+							getConnectionId());
+				} // end of for (XMPPResourceConnection res: activeResources)
+			} // end of if (activeResources.size() > 1)
 		}
 	}
 
@@ -194,10 +210,10 @@ public class XMPPSession {
 	public XMPPResourceConnection getResourceForResource(final String resource) {
 		if (resource != null && resource.length() > 0) {
 			for (XMPPResourceConnection conn: activeResources) {
-    			if (log.isLoggable(Level.FINEST)) {
-        			log.finest("Resource checking: " + conn.getResource() +
-								", connectionID: " + conn.getConnectionId());
-                }
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("Resource checking: " + conn.getResource() +
+							", connectionID: " + conn.getConnectionId());
+				}
 				if (resource.equalsIgnoreCase(conn.getResource())) {
 					return conn;
 				} // end of if (resource.equals(conn.getResource()))
