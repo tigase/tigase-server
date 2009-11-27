@@ -65,9 +65,6 @@ public class BasicComponent implements Configurable, XMPPService {
   private static final Logger log =
     Logger.getLogger(BasicComponent.class.getName());
 
-	public static final String SCRIPT_DESCRIPTION = "AS:Description:";
-	public static final String SCRIPT_ID = "AS:CommandId:";
-	public static final String SCRIPT_COMPONENT = "AS:Component:";
 	public static final String SCRIPTS_DIR_PROP_KEY = "scripts-dir";
 	public static final String SCRIPTS_DIR_PROP_DEF = "scripts/admin";
 
@@ -80,6 +77,8 @@ public class BasicComponent implements Configurable, XMPPService {
 	protected Set<String> admins = new CopyOnWriteArraySet<String>();
 	private ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
 	private ServiceEntity serviceEntity = null;
+	private String scriptsBaseDir = null;
+	private String scriptsCompDir = null;
 
 	@Override
 	public void setName(String name) {
@@ -120,8 +119,9 @@ public class BasicComponent implements Configurable, XMPPService {
 		command = new RemoveScriptCommand();
 		command.init(CommandIfc.DEL_SCRIPT_CMD, "Remove command script");
 		scriptCommands.put(command.getCommandId(), command);
-		String scripts_dir = (String)props.get(SCRIPTS_DIR_PROP_KEY);
-		loadScripts(scripts_dir);
+		scriptsBaseDir = (String)props.get(SCRIPTS_DIR_PROP_KEY);
+		scriptsCompDir = scriptsBaseDir + "/" + getName();
+		loadScripts();
 	}
 
 	@Override
@@ -161,6 +161,9 @@ public class BasicComponent implements Configurable, XMPPService {
 		binds.put(CommandIfc.SCRI_MANA, scriptEngineManager);
 		binds.put(CommandIfc.ADMN_CMDS, scriptCommands);
 		binds.put(CommandIfc.ADMN_DISC, serviceEntity);
+		binds.put(CommandIfc.SCRIPT_BASE_DIR, scriptsBaseDir);
+		binds.put(CommandIfc.SCRIPT_COMP_DIR, scriptsCompDir);
+		binds.put(CommandIfc.COMPONENT_NAME, getName());
 	}
 
 	protected boolean processScriptCommand(Packet pc, Queue<Packet> results) {
@@ -210,12 +213,12 @@ public class BasicComponent implements Configurable, XMPPService {
 		return false;
 	}
 
-	private void loadScripts(String scripts_dir) {
+	private void loadScripts() {
 		File file = null;
 		AddScriptCommand addCommand = new AddScriptCommand();
 		Bindings binds = scriptEngineManager.getBindings();
 		initBindings(binds);
-		String[] dirs = new String[] {scripts_dir, scripts_dir + "/" + getName()};
+		String[] dirs = new String[] {scriptsBaseDir, scriptsCompDir};
 		for (String scriptsPath : dirs) {
 			try {
 				File adminDir = new File(scriptsPath);
@@ -232,18 +235,18 @@ public class BasicComponent implements Configurable, XMPPService {
 							String line = null;
 							while ((line = buffr.readLine()) != null) {
 								sb.append(line + "\n");
-								int idx = line.indexOf(SCRIPT_DESCRIPTION);
+								int idx = line.indexOf(CommandIfc.SCRIPT_DESCRIPTION);
 								if (idx >= 0) {
-									cmdDescr = line.substring(idx + SCRIPT_DESCRIPTION.length()).
+									cmdDescr = line.substring(idx + CommandIfc.SCRIPT_DESCRIPTION.length()).
 											trim();
 								}
-								idx = line.indexOf(SCRIPT_ID);
+								idx = line.indexOf(CommandIfc.SCRIPT_ID);
 								if (idx >= 0) {
-									cmdId = line.substring(idx + SCRIPT_ID.length()).trim();
+									cmdId = line.substring(idx + CommandIfc.SCRIPT_ID.length()).trim();
 								}
-								idx = line.indexOf(SCRIPT_COMPONENT);
+								idx = line.indexOf(CommandIfc.SCRIPT_COMPONENT);
 								if (idx >= 0) {
-									comp = line.substring(idx + SCRIPT_COMPONENT.length()).trim();
+									comp = line.substring(idx + CommandIfc.SCRIPT_COMPONENT.length()).trim();
 								}
 							}
 							buffr.close();
