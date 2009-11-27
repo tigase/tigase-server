@@ -22,7 +22,8 @@
 
 package tigase.server.script;
 
-import tigase.server.xmppsession.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Created: Jan 2, 2009 2:32:17 PM
@@ -31,6 +32,28 @@ import tigase.server.xmppsession.*;
  * @version $Rev$
  */
 public abstract class AbstractScriptCommand implements CommandIfc {
+
+	public static final Map<String, String> lineCommentStart = 
+			new LinkedHashMap<String, String>();
+	
+	static {
+		lineCommentStart.put("groovy", "//");	
+		lineCommentStart.put("scala", "//");	
+		lineCommentStart.put("python", "#");	
+		lineCommentStart.put("py", "#");
+		lineCommentStart.put("js", "//");
+		lineCommentStart.put("ruby", "#");	
+		lineCommentStart.put("rb", "#");
+		lineCommentStart.put("perl", "#");	
+		lineCommentStart.put("pl", "#");
+		lineCommentStart.put("awk", "//");	
+		lineCommentStart.put("lisp", ";");	
+		lineCommentStart.put("el", ";");
+		lineCommentStart.put("cl", ";");
+		lineCommentStart.put("gc1", ";");
+		lineCommentStart.put("gc3", ";");
+		lineCommentStart.put("java", "//");	
+	}
 
 	private String commandId = null;
 	private String description = null;

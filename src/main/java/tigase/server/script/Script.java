@@ -71,9 +71,23 @@ public class Script extends AbstractScriptCommand {
 		if (scriptEngine instanceof Compilable) {
 			compiledScript = ((Compilable)scriptEngine).compile(script);
 		}
+		if (this.language == null) {
+			this.language = scriptEngine.getFactory().getLanguageName();
+		}
+		if (this.ext == null) {
+			this.ext = scriptEngine.getFactory().getExtensions().get(0);
+		}
 		log.info("Initialized script command, lang: " + this.language +
-						", ext: " + ext);
+						", ext: " + this.ext);
 						//", script text: \n" + this.script);
+	}
+
+	public String getLanguageName() {
+		return language;
+	}
+
+	public String getFileExtension() {
+		return ext;
 	}
 
 	@Override

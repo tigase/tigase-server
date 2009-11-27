@@ -41,12 +41,19 @@ public interface CommandIfc {
 	public static final String USER_CONN = "userConnections";
 	public static final String ADMN_DISC = "adminDisco";
 	public static final String SCRI_MANA = "scriptManager";
+	public static final String SCRIPT_BASE_DIR = "scriptBaseDir";
+	public static final String SCRIPT_COMP_DIR = "scriptCompDir";
+	public static final String COMPONENT_NAME = "componentName";
 
+	public static final String SCRIPT_DESCRIPTION = "AS:Description:";
+	public static final String SCRIPT_ID = "AS:CommandId:";
+	public static final String SCRIPT_COMPONENT = "AS:Component:";
 	public static final String LANGUAGE = "Language";
 	public static final String COMMAND_ID = "Command Id";
 	public static final String SCRIPT_TEXT = "Script text";
 	public static final String SCRIPT_RESULT = "Script result";
 	public static final String DESCRIPT = "Description";
+	public static final String SAVE_TO_DISK = "Save to disk";
 	public static final String PACKET = "packet";
 
 	public static final String ADD_SCRIPT_CMD = "add-script";

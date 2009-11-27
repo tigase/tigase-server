@@ -22,6 +22,9 @@
 
 package tigase.server.script;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -54,6 +57,7 @@ public class AddScriptCommand extends AbstractScriptCommand {
 		String commandId = Command.getFieldValue(packet, COMMAND_ID);
 		String description = Command.getFieldValue(packet, DESCRIPT);
 		String[] scriptText = Command.getFieldValues(packet, SCRIPT_TEXT);
+		boolean saveToDisk = Command.getCheckBoxFieldValue(packet, SAVE_TO_DISK);
 		if (isEmpty(language) || isEmpty(commandId) || isEmpty(description) ||
 						scriptText == null) {
 			results.offer(prepareScriptCommand(packet, binds));
@@ -65,11 +69,14 @@ public class AddScriptCommand extends AbstractScriptCommand {
 				}
 			}
 			try {
-				addAdminScript(commandId, description, sb.toString(), language,
+				Script s = addAdminScript(commandId, description, sb.toString(), language,
 								null, binds);
 				Packet result = packet.commandResult(Command.DataType.result);
 				Command.addTextField(result, "Note", "Script loaded successfuly.");
 				results.offer(result);
+				if (saveToDisk) {
+					saveCommandToDisk(commandId, description, sb, s.getFileExtension(), binds);
+				}
 			} catch (Exception e) {
 				log.log(Level.WARNING, "Can't initialize script: ", e);
 				Packet result = packet.commandResult(Command.DataType.result);
@@ -89,7 +96,7 @@ public class AddScriptCommand extends AbstractScriptCommand {
 	}
 
 	@SuppressWarnings({"unchecked"})
-	public boolean addAdminScript(String cmdId, String cmdDescr, String script,
+	public Script addAdminScript(String cmdId, String cmdDescr, String script,
 					String lang, String ext, Bindings binds) throws ScriptException {
 		Script as = new Script();
 		as.init(cmdId, cmdDescr, script, lang, ext, binds);
@@ -105,7 +112,7 @@ public class AddScriptCommand extends AbstractScriptCommand {
 //						new ServiceIdentity("automation", "command-node", cmdDescr));
 //		item.addFeatures(XMPPService.CMD_FEATURES);
 //		serviceEntity.addItems(item);
-		return true;
+		return as;
 	}
 
 	private Packet prepareScriptCommand(Packet packet, Bindings binds) {
@@ -131,14 +138,32 @@ public class AddScriptCommand extends AbstractScriptCommand {
 			}
 			Command.addFieldValue(result, LANGUAGE, def, LANGUAGE, langs, langs);
 		}
-		Command.addFieldMultiValue(result, SCRIPT_TEXT,
-						Collections.nCopies(1, ""));
+		Command.addFieldMultiValue(result, SCRIPT_TEXT,	Collections.nCopies(1, ""));
+		Command.addCheckBoxField(result, SAVE_TO_DISK, true);
 		return result;
 	}
 
 	@Override
 	public Bindings getBindings() {
 		return null;
+	}
+
+	private void saveCommandToDisk(String commandId, String description,
+			StringBuilder sb, String fileExtension, Bindings binds) throws IOException {
+		File fileName = new File((String)binds.get(SCRIPT_COMP_DIR),
+				commandId + "." + fileExtension);
+		log.info("Saving command: " + commandId + " to disk file: " + fileName.toString());
+		FileWriter fw = new FileWriter(fileName, false);
+		String comment = lineCommentStart.get(fileExtension);
+		if (comment == null) {
+			comment = "//";
+		}
+		fw.write(comment + " " + SCRIPT_DESCRIPTION + " " + description + '\n');
+		fw.write(comment + " " + SCRIPT_ID + " " + commandId + '\n');
+		fw.write(comment + " " + SCRIPT_COMPONENT + " " +
+				binds.get(COMPONENT_NAME) + '\n');
+		fw.write(sb.toString());
+		fw.close();
 	}
 
 }
