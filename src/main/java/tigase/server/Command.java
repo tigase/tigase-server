@@ -534,6 +534,10 @@ public enum Command {
 		addFieldValue(packet, f_name, f_value, "fixed");
 	}
 
+	public static void addCheckBoxField(Packet packet, String f_name, boolean f_value) {
+		addFieldValue(packet, f_name, Boolean.toString(f_value), "boolean");
+	}
+
 	public static void addHiddenField(Packet packet, String f_name, String f_value) {
 		addFieldValue(packet, f_name, f_value, "hidden");
 	}
@@ -582,8 +586,7 @@ public enum Command {
 		command.addChildren(data);
 	}
 
-	public static String getFieldValue(final Packet packet,
-		final String f_name) {
+	public static String getFieldValue(Packet packet, String f_name) {
 		Element iq = packet.getElement();
 		Element command = iq.getChild(COMMAND_EL, XMLNS);
 		Element x = command.getChild("x", "jabber:x:data");
@@ -602,6 +605,15 @@ public enum Command {
 			}
 		}
 		return null;
+	}
+
+	public static boolean getCheckBoxFieldValue(Packet packet, String f_name) {
+		String result = getFieldValue(packet, f_name);
+		if (result == null) {
+			return false;
+		}
+		result = result.trim();
+		return result.equalsIgnoreCase("true") || result.equals("1");
 	}
 
 	public static String[] getFieldValues(final Packet packet,
