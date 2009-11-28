@@ -25,6 +25,11 @@ package tigase.server;
 import tigase.stats.StatisticsList;
 
 /**
+ * An interface for loadable packet filters to the Tigase server. Every Tigase component
+ * can have an independent list of packet filters for outgoing and incoming traffic.
+ * A filter can make any change to the processed packet or can block the packet from
+ * further processing. Please refer to the <code>filter()</code> method for more details.
+ *
  * Created: Jun 8, 2009 1:29:49 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -32,10 +37,43 @@ import tigase.stats.StatisticsList;
  */
 public interface PacketFilterIfc {
 
+	/**
+	 * The method initializes the filter. It is always called only once after an instance
+	 * of the filter has been created.
+	 * @param name is a component name which loaded and initialized the filter. This is
+	 * the name of the component which uses the filter.
+	 * @param qType is a packet queue type, differnt one for outgoing traffic and different
+	 * for incoming. A filter may want to treat the traffic differently depending on the
+	 * direction it flows.
+	 */
 	void init(String name, QueueType qType);
 
+	/**
+	 * This is the actual packet filtering method. It receives a packet as a parameter
+	 * and may make any change to the packet it wishes, remove or add specific payloads
+	 * or redirect the packet to specific destination. It may also optionally block the packet
+	 * from further processing. This means that the packet is effectivelly dropped and
+	 * forgotten.
+	 *
+	 * If the method returns <code>true</code> then the packet is blocked and
+	 * dropped. Therefore in most circumstances the method should return false.
+	 * @param packet for the filter processing.
+	 *
+	 * Please note, the packet filtering may affect performance significantly therefore
+	 * this method should be carefully tested and optimized under a high load.
+	 *
+	 * @return a boolean value which means: "is the packet blocked?". Therefore
+	 * <code>true</code> return value means the packet is blocked.
+	 */
 	boolean filter(Packet packet);
 
+	/**
+	 * A filter may optionally return some processing statistics. Please note the method
+	 * may be called quite frequently (once a second) therefore no expensive calculation
+	 * should be performed inside the method.
+	 * @param list of statistics created by the master object. The packet instance should
+	 * add its statistics to the list.
+	 */
 	void getStatistics(StatisticsList list);
 
 }
