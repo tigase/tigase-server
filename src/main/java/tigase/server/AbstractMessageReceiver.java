@@ -65,6 +65,12 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	public static final String MAX_QUEUE_SIZE_PROP_KEY = "max-queue-size";
   public static final Integer MAX_QUEUE_SIZE_PROP_VAL =
     new Long(Runtime.getRuntime().maxMemory()/400000L).intValue();
+	public static final String INCOMING_FILTERS_PROP_KEY = "incoming-filters";
+	public static final String INCOMING_FILTERS_PROP_VAL =
+			"tigase.server.filters.PacketCounter";
+	public static final String OUTGOING_FILTERS_PROP_KEY = "outgoing-filters";
+	public static final String OUTGOING_FILTERS_PROP_VAL =
+			"tigase.server.filters.PacketCounter";
 
   // String added intentionally!! 
 	// Don't change to AbstractMessageReceiver.class.getName()
@@ -356,12 +362,36 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 		setMaxQueueSize(queueSize);
 		incoming_filters.clear();
 		outgoing_filters.clear();
-		PacketFilterIfc counter = new PacketCounter();
-		counter.init(getName(), QueueType.IN_QUEUE);
-		incoming_filters.add(counter);
-		counter = new PacketCounter();
-		counter.init(getName(), QueueType.OUT_QUEUE);
-		outgoing_filters.add(counter);
+		String filters = (String)props.get(INCOMING_FILTERS_PROP_KEY);
+		if (filters != null && !filters.trim().isEmpty()) {
+			String[] incoming = filters.trim().split(",");
+			for (String inc : incoming) {
+				try {
+					PacketFilterIfc filter = (PacketFilterIfc)Class.forName(inc).newInstance();
+					filter.init(getName(), QueueType.IN_QUEUE);
+					incoming_filters.add(filter);
+					log.config(getName() + " loaded incoming filter: " + inc);
+				} catch (Exception e) {
+					log.log(Level.WARNING, "Problem loading filter: " + inc +
+							" in component: " + getName(), e);
+				}
+			}
+		}
+		filters = (String)props.get(OUTGOING_FILTERS_PROP_KEY);
+		if (filters != null && !filters.trim().isEmpty()) {
+			String[] outgoing = filters.trim().split(",");
+			for (String out : outgoing) {
+				try {
+					PacketFilterIfc filter = (PacketFilterIfc)Class.forName(out).newInstance();
+					filter.init(getName(), QueueType.OUT_QUEUE);
+					outgoing_filters.add(filter);
+					log.config(getName() + " loaded outgoing filter: " + out);
+				} catch (Exception e) {
+					log.log(Level.WARNING, "Problem loading filter: " + out +
+							" in component: " + getName(), e);
+				}
+			}
+		}
   }
 
   public void setMaxQueueSize(int maxQueueSize) {
@@ -400,6 +430,8 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 			}
 		}
 		defs.put(MAX_QUEUE_SIZE_PROP_KEY, getMaxQueueSize(queueSizeInt));
+		defs.put(INCOMING_FILTERS_PROP_KEY, INCOMING_FILTERS_PROP_VAL);
+		defs.put(OUTGOING_FILTERS_PROP_KEY, OUTGOING_FILTERS_PROP_VAL);
     return defs;
   }
 
