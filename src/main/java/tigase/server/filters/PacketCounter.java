@@ -23,7 +23,6 @@
 package tigase.server.filters;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Level;
@@ -32,7 +31,6 @@ import tigase.server.Packet;
 import tigase.server.PacketFilterIfc;
 import tigase.server.QueueType;
 import tigase.stats.StatisticsList;
-import tigase.xml.Element;
 
 /**
  * Created: Jun 8, 2009 1:47:31 PM
