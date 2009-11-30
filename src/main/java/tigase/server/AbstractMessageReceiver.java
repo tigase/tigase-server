@@ -36,7 +36,6 @@ import java.util.logging.Logger;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 import tigase.annotations.TODO;
-import tigase.server.filters.PacketCounter;
 import tigase.stats.StatisticType;
 import tigase.stats.StatisticsContainer;
 import tigase.stats.StatisticsList;
@@ -130,12 +129,12 @@ public abstract class AbstractMessageReceiver extends BasicComponent
   private long statSentPacketsEr = 0;
 	private long packetId = 0;
 
-	private boolean filterPacket(Packet packet,
+	private Packet filterPacket(Packet packet,
 					CopyOnWriteArrayList<PacketFilterIfc> filters) {
-		boolean result = false;
+		Packet result = packet;
 		for (PacketFilterIfc packetFilterIfc : filters) {
-			result = packetFilterIfc.filter(packet);
-			if (result) {
+			result = packetFilterIfc.filter(result);
+			if (result == null) {
 				break;
 			}
 		}
@@ -684,7 +683,8 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 										}
 									}
 								}
-								if (!processed && !filterPacket(packet, incoming_filters)) {
+								if (!processed && 
+										((packet = filterPacket(packet, incoming_filters)) != null)) {
 									processPacket(packet);
 								}
 								processPacketTimings[pptIdx] =
@@ -695,7 +695,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 						case OUT_QUEUE:
 //							tracer.trace(null, packet.getElemTo(), packet.getElemFrom(),
 //											packet.getTo(),	getName(), type.name(), null, packet);
-							if (!filterPacket(packet, outgoing_filters)) {
+							if ((packet = filterPacket(packet, outgoing_filters)) != null) {
 								if (parent != null) {
 									parent.addPacket(packet);
 								} else {

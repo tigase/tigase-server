@@ -51,21 +51,32 @@ public interface PacketFilterIfc {
 	/**
 	 * This is the actual packet filtering method. It receives a packet as a parameter
 	 * and may make any change to the packet it wishes, remove or add specific payloads
-	 * or redirect the packet to specific destination. It may also optionally block the packet
-	 * from further processing. This means that the packet is effectivelly dropped and
-	 * forgotten.
+	 * or redirect the packet to specific destination. <strong>Please note!</strong> it is
+	 * recommended not to modify the actual packet itself. If the filter needs to make
+	 * any changes to the packet it should create a copy of the object, then make
+	 * any changes on the copy and return the copy as the result.
+	 * It may also optionally block the packet from further processing. This means
+	 * that the packet is effectivelly dropped and forgotten.
 	 *
-	 * If the method returns <code>true</code> then the packet is blocked and
-	 * dropped. Therefore in most circumstances the method should return false.
+	 * If the method returns a <code>Packet</code> as a result. It is normally recommended
+	 * not to modify the existing packet as it maybe processed simultanuously by other
+	 * components/threads at the same time. Modifying packet while it is being processed
+	 * may lead to unpredictable results. Therefore, if the filter wants to modify the
+	 * packet it should create a copy of the packet and return modified copy from
+	 * the method.
+	 * If the filter decided to block the packet it just has to return null. In most cases,
+	 * however the method returns the packet it received as a parameter to method call.
 	 * @param packet for the filter processing.
 	 *
 	 * Please note, the packet filtering may affect performance significantly therefore
 	 * this method should be carefully tested and optimized under a high load.
 	 *
-	 * @return a boolean value which means: "is the packet blocked?". Therefore
-	 * <code>true</code> return value means the packet is blocked.
+	 * @return a Packet object which is further processed by the system. If the
+	 * method decided to block the packet it returns null. If the method want the
+	 * packet to be processed without any modifications it returns the same object
+	 * it received as a parameter. It may also return a modified copy of the Packet.
 	 */
-	boolean filter(Packet packet);
+	Packet filter(Packet packet);
 
 	/**
 	 * A filter may optionally return some processing statistics. Please note the method

@@ -53,7 +53,7 @@ public class PacketCounter implements PacketFilterIfc {
 	private int lastNodeNo = -1;
 
 	@Override
-	public boolean filter(Packet packet) {
+	public Packet filter(Packet packet) {
 		if (packet.getElemName() == "message") {
 			++msgCounter;
 		}
@@ -90,7 +90,7 @@ public class PacketCounter implements PacketFilterIfc {
 //			//e.printStackTrace();
 //		}
 		// TESTING ONLY END
-		return false;
+		return packet;
 	}
 
 	private synchronized void incIQCounter(String xmlns) {
