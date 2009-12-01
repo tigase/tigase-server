@@ -37,7 +37,7 @@ def p = (Packet)packet
 def name = Command.getFieldValue(packet, "name")
 
 if (name == null) {
-	def res = p.commandResult(Command.DataType.form);
+	def res = p.commandResult(Command.DataType.form)
 	Command.addTitle(res, "Hello World Script")
 	Command.addInstructions(res, "Please provide some details")
 	Command.addFieldValue(res, "name", name ?: "", "text-single",
