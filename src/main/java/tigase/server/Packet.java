@@ -48,7 +48,7 @@ public class Packet {
 
 	/**
 	 * Constant <code>OLDTO</code> is kind of hack to store old request address
-	 * when the packet is processed by the session mamaner. The problem is that
+	 * when the packet is processed by the session manager. The problem is that
 	 * SessionManager may work for many virtual domains but has just one real
 	 * address. So to forward the request to the SessionManager the 'to' address
 	 * is replaced with the real SessionManager address. The response however
@@ -370,6 +370,14 @@ public class Packet {
 		return "to=" + to + ", from=" + from + packetToStringSecure;
 	}
 
+	public String toString(boolean secure) {
+		if (secure) {
+			return toStringSecure();
+		} else {
+			return toString();
+		}
+	}
+
 	public boolean isRouted() {
 		return routed;
 	}
@@ -396,6 +404,14 @@ public class Packet {
 	}
 
 	public Packet swapFromTo(final Element el) {
+		Packet packet = new Packet(el);
+		packet.setTo(getFrom());
+		packet.setFrom(getTo());
+		return packet;
+	}
+
+	public Packet swapFromTo() {
+		Element el = elem.clone();
 		Packet packet = new Packet(el);
 		packet.setTo(getFrom());
 		packet.setFrom(getTo());
