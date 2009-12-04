@@ -22,9 +22,13 @@
 
 package tigase.server.test;
 
+import java.util.Arrays;
+import java.util.Map;
 import java.util.logging.Logger;
 import tigase.server.AbstractMessageReceiver;
 import tigase.server.Packet;
+import tigase.util.JIDUtils;
+import tigase.xmpp.StanzaType;
 
 /**
  * A test component used to demonstrate API and for running different kinds of
@@ -39,11 +43,123 @@ public class TestComponent extends AbstractMessageReceiver {
 	private static final Logger log =
 			Logger.getLogger(TestComponent.class.getName());
 
+	private static final String BAD_WORDS_KEY = "bad-words";
+	private static final String WHITELIST_KEY = "white-list";
+	private static final String PREPEND_TEXT_KEY = "log-prepend";
+	private static final String SECURE_LOGGING_KEY = "secure-logging";
+	private static final String ABUSE_ADDRESS_KEY = "abuse-address";
+	private static final String NOTIFICATION_FREQ_KEY = "notification-freq";
+
+  private String[] badWords = {"word1", "word2", "word3"};
+	private String[] whiteList = {"admin@localhost"};
+	private String prependText = "Spam detected: ";
+	private String abuseAddress = "abuse@locahost";
+	private int notificationFrequency = 10;
+	private int delayCounter = 0;
+	private boolean secureLogging = false;
+	private long spamCounter = 0;
+	private long totalSpamCounter = 0;
+	private long messagesCounter = 0;
+
 	@Override
 	public void processPacket(Packet packet) {
-		if (packet != null) {
-			log.finest("My packet: " + packet.toString());
+		// Is this packet a message?
+		if ("message" == packet.getElemName()) {
+			updateServiceDiscoveryItem(getName(), "messages",
+					"Messages processed: [" + (++messagesCounter) + "]", true);
+			String from = JIDUtils.getNodeID(packet.getElemFrom());
+			// Is sender on the whitelist?
+			if (Arrays.binarySearch(whiteList, from) < 0) {
+				// The sender is not on whitelist so let's check the content
+				String body = packet.getElemCData("/message/body");
+				if (body != null && !body.isEmpty()) {
+					body = body.toLowerCase();
+					for (String word : badWords) {
+						if (body.contains(word)) {
+							log.finest(prependText + packet.toString(secureLogging));
+							++spamCounter;
+							updateServiceDiscoveryItem(getName(), "spam", "Spam caught: [" +
+									(++totalSpamCounter) + "]", true);
+							return;
+						}
+					}
+				}
+			}
 		}
+		// Not a SPAM, return it for further processing
+		Packet result = packet.swapElemFromTo();
+		addOutPacket(result);
+	}
+
+	@Override
+	public int processingThreads() {
+		return Runtime.getRuntime().availableProcessors();
+	}
+
+	@Override
+	public int hashCodeForPacket(Packet packet) {
+		if (packet.getElemTo() != null) {
+			return packet.getElemTo().hashCode();
+		}
+		// This should not happen, every packet must have a destination
+		// address, but maybe our SPAM checker is used for checking
+		// strange kind of packets too....
+		if (packet.getElemFrom() != null) {
+			return packet.getElemFrom().hashCode();
+		}
+		// If this really happens on your system you should look carefully
+		// at packets arriving to your component and decide a better way
+		// to calculate hashCode
+		return 1;
+	}
+
+	@Override
+	public Map<String, Object> getDefaults(Map<String, Object> params) {
+		Map<String, Object> defs = super.getDefaults(params);
+		defs.put(BAD_WORDS_KEY, badWords);
+		defs.put(WHITELIST_KEY, whiteList);
+		defs.put(PREPEND_TEXT_KEY, prependText);
+		defs.put(SECURE_LOGGING_KEY, secureLogging);
+		defs.put(ABUSE_ADDRESS_KEY, abuseAddress);
+		defs.put(NOTIFICATION_FREQ_KEY, notificationFrequency);
+		return defs;
+	}
+
+	@Override
+	public void setProperties(Map<String, Object> props) {
+		super.setProperties(props);
+		badWords = (String[])props.get(BAD_WORDS_KEY);
+		whiteList = (String[])props.get(WHITELIST_KEY);
+		Arrays.sort(whiteList);
+		prependText = (String)props.get(PREPEND_TEXT_KEY);
+		secureLogging = (Boolean)props.get(SECURE_LOGGING_KEY);
+		abuseAddress = (String)props.get(ABUSE_ADDRESS_KEY);
+		notificationFrequency = (Integer)props.get(NOTIFICATION_FREQ_KEY);
+		updateServiceDiscoveryItem(getName(), null, getDiscoDescription(),
+				"automation", "spam-filtering", true,
+				"tigase:x:spam-filter", "tigase:x:spam-reporting");
+	}
+
+	@Override
+	public synchronized void everyMinute() {
+		super.everyMinute();
+		if ((++delayCounter) >= notificationFrequency) {
+			addOutPacket(Packet.getMessage(abuseAddress, getComponentId(),
+					StanzaType.chat, "Detected spam messages: " + spamCounter,
+					"Spam counter", null, newPacketId("spam-")));
+			delayCounter = 0;
+			spamCounter = 0;
+		}
+	}
+
+	@Override
+	public String getDiscoDescription() {
+		return "Spam filtering";
+	}
+
+	@Override
+	public String getDiscoCategoryType() {
+		return "spam";
 	}
 
 }

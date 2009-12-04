@@ -25,7 +25,6 @@ package tigase.cluster;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.List;
 import java.util.Queue;
 import java.util.LinkedHashMap;
 import java.util.UUID;
@@ -40,8 +39,6 @@ import tigase.net.ConnectionType;
 import tigase.net.SocketType;
 import tigase.server.ConnectionManager;
 import tigase.server.Packet;
-import tigase.disco.ServiceEntity;
-import tigase.disco.ServiceIdentity;
 import tigase.server.ServiceChecker;
 import tigase.util.Algorithms;
 import tigase.util.JIDUtils;
@@ -633,7 +630,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 	}
 
 	@Override
-	public String getDiscoCategory() {
+	public String getDiscoCategoryType() {
 		return identity_type;
 	}
 

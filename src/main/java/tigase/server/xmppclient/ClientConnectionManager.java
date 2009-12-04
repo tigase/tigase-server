@@ -591,7 +591,7 @@ public class ClientConnectionManager
 	}
 
 	@Override
-	public String getDiscoCategory() {
+	public String getDiscoCategoryType() {
 		return "c2s";
 	}
 

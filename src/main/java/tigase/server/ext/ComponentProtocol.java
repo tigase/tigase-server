@@ -314,7 +314,7 @@ public class ComponentProtocol
 	}
 
 	@Override
-	public String getDiscoCategory() {
+	public String getDiscoCategoryType() {
 		return identity_type;
 	}
 

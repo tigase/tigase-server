@@ -1473,7 +1473,7 @@ public class SessionManager extends AbstractMessageReceiver
 	}
 
 	@Override
-	public String getDiscoCategory() {
+	public String getDiscoCategoryType() {
 		return "sm";
 	}
 

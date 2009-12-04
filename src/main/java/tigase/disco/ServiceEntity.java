@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import tigase.xml.Element;
@@ -46,7 +46,7 @@ public class ServiceEntity {
 	private String jid = null;
 	private String node = null;
 	private String name = null;
-	private List<String> features = null;
+	private Set<String> features = null;
 	private List<ServiceIdentity> identities = null;
 	private Set<ServiceEntity> items = null;
 	private boolean adminOnly = false;
@@ -118,9 +118,14 @@ public class ServiceEntity {
 	 */
 	public void addFeatures(String... features) {
 		if (this.features == null) {
-			this.features = new ArrayList<String>();
+			this.features = new LinkedHashSet<String>();
 		}
 		Collections.addAll(this.features, features);
+	}
+
+	public void setFeatures(String ... features) {
+		this.features = null;
+		addFeatures(features);
 	}
 
 	/**
@@ -144,7 +149,7 @@ public class ServiceEntity {
 	 */
 	public void addItems(ServiceEntity... items) {
 		if (this.items == null) {
-			this.items = new HashSet<ServiceEntity>();
+			this.items = new LinkedHashSet<ServiceEntity>();
 		}
 		// It may look very strange but look at equals() method....
 		// So some items which might be the same from the Set point of
@@ -391,6 +396,10 @@ public class ServiceEntity {
 	@Override
 	public String toString() {
 		return getDiscoItem(null, null).toString();
+	}
+
+	public void setDescription(String description) {
+		this.name = description;
 	}
 
 }

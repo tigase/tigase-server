@@ -111,7 +111,7 @@ public class BasicComponent implements Configurable, XMPPService {
 		}
 		serviceEntity = new ServiceEntity(name, null, getDiscoDescription(), true);
 		serviceEntity.addIdentities(
-			new ServiceIdentity("component", getDiscoCategory(), getDiscoDescription()));
+			new ServiceIdentity("component", getDiscoCategoryType(), getDiscoDescription()));
 		serviceEntity.addFeatures("http://jabber.org/protocol/commands");
 		CommandIfc command = new AddScriptCommand();
 		command.init(CommandIfc.ADD_SCRIPT_CMD, "New command script");
@@ -355,7 +355,7 @@ public class BasicComponent implements Configurable, XMPPService {
 					}
 				}
 			} else {
-				result = serviceEntity.getDiscoItems(null, null, isAdmin(from));
+				result = serviceEntity.getDiscoItems(null, jid,	isAdmin(from));
 				if (result != null) {
 					for (Iterator<Element> it = result.iterator(); it.hasNext();) {
 						Element element = it.next();
@@ -398,7 +398,7 @@ public class BasicComponent implements Configurable, XMPPService {
 		return "Undefined description";
 	}
 
-	public String getDiscoCategory() {
+	public String getDiscoCategoryType() {
 		return "generic";
 	}
 
@@ -406,21 +406,47 @@ public class BasicComponent implements Configurable, XMPPService {
 		return defHostname;
 	}
 
-	public void updateServiceDiscoveryItem(String jid, String node, String name,
+	public void updateServiceDiscoveryItem(String jid, String node, String description,
 			boolean admin) {
-		ServiceEntity item = new ServiceEntity(jid, node, name, admin);
-		//item.addIdentities(new ServiceIdentity("component", identity_type, name));
-		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Modifying service-discovery info: " + item.toString());
-		}
-		serviceEntity.addItems(item);
-//		if (!admin) {
-//			serviceEntity.setAdminOnly(admin);
-//		}
+		updateServiceDiscoveryItem(jid, node, description, admin, (String[])null);
 	}
 
-	public void removeServiceDiscoveryItem(String jid, String node, String name) {
-		ServiceEntity item = new ServiceEntity(jid, node, name);
+	public void updateServiceDiscoveryItem(String jid, String node, String description,
+			boolean admin, String ... features) {
+		updateServiceDiscoveryItem(jid, node, description, null, null, admin, features);
+	}
+
+	public void updateServiceDiscoveryItem(String jid, String node, String description,
+			String category, String type, boolean admin, String ... features) {
+		if (serviceEntity.getJID().equals(jid) && serviceEntity.getNode() == node) {
+			serviceEntity.setDescription(description);
+			if (category != null || type != null) {
+				serviceEntity.addIdentities(new ServiceIdentity(category, type, description));
+			}
+			if (features != null) {
+				serviceEntity.setFeatures("http://jabber.org/protocol/commands");
+				serviceEntity.addFeatures(features);
+			}
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Modifying service-discovery info: " + serviceEntity.toString());
+			}
+		} else {
+			ServiceEntity item = new ServiceEntity(jid, node, description, admin);
+			if (category != null || type != null) {
+				item.addIdentities(new ServiceIdentity(category, type, description));
+			}
+			if (features != null) {
+				item.addFeatures(features);
+			}
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Adding new item: " + item.toString());
+			}
+			serviceEntity.addItems(item);
+		}
+	}
+
+	public void removeServiceDiscoveryItem(String jid, String node, String description) {
+		ServiceEntity item = new ServiceEntity(jid, node, description);
 		//item.addIdentities(new ServiceIdentity("component", identity_type, name));
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Modifying service-discovery info, removing: " + item.toString());

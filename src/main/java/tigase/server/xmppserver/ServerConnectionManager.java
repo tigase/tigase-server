@@ -1024,7 +1024,7 @@ public class ServerConnectionManager
 	}
 
 	@Override
-	public String getDiscoCategory() {
+	public String getDiscoCategoryType() {
 		return "s2s";
 	}
 

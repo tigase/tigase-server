@@ -104,7 +104,7 @@ public class ClusterController
 	}
 
 	@Override
-	public String getDiscoCategory() {
+	public String getDiscoCategoryType() {
 		return "load";
 	}
 
