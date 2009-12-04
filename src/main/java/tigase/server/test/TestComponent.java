@@ -24,9 +24,11 @@ package tigase.server.test;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.server.AbstractMessageReceiver;
 import tigase.server.Packet;
+import tigase.stats.StatisticsList;
 import tigase.util.JIDUtils;
 import tigase.xmpp.StanzaType;
 
@@ -50,7 +52,7 @@ public class TestComponent extends AbstractMessageReceiver {
 	private static final String ABUSE_ADDRESS_KEY = "abuse-address";
 	private static final String NOTIFICATION_FREQ_KEY = "notification-freq";
 
-  private String[] badWords = {"word1", "word2", "word3"};
+	private String[] badWords = {"word1", "word2", "word3"};
 	private String[] whiteList = {"admin@localhost"};
 	private String prependText = "Spam detected: ";
 	private String abuseAddress = "abuse@locahost";
@@ -160,6 +162,16 @@ public class TestComponent extends AbstractMessageReceiver {
 	@Override
 	public String getDiscoCategoryType() {
 		return "spam";
+	}
+
+	@Override
+	public void getStatistics(StatisticsList list) {
+		super.getStatistics(list);
+		list.add(getName(), "Spam messages found", totalSpamCounter, Level.INFO);
+		list.add(getName(), "All messages processed", messagesCounter, Level.FINE);
+		if (list.checkLevel(Level.FINEST)) {
+			// Some very expensive statistics generation code...
+		}
 	}
 
 }
