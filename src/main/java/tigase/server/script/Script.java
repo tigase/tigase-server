@@ -132,7 +132,7 @@ public class Script extends AbstractScriptCommand {
 					results.addAll((Queue<Packet>) res);
 				} else {
 					Packet result = packet.commandResult(Command.DataType.result);
-					Command.addTextField(result, "Note", "Script execution result.");
+					//Command.addTextField(result, "Note", "Script execution result");
 					String[] text = null;
 					if (res != null) {
 						text = res.toString().split("\n");
