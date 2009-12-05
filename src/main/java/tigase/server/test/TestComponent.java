@@ -23,9 +23,13 @@
 package tigase.server.test;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.script.Bindings;
 import tigase.server.AbstractMessageReceiver;
 import tigase.server.Packet;
 import tigase.stats.StatisticsList;
@@ -52,8 +56,23 @@ public class TestComponent extends AbstractMessageReceiver {
 	private static final String ABUSE_ADDRESS_KEY = "abuse-address";
 	private static final String NOTIFICATION_FREQ_KEY = "notification-freq";
 
-	private String[] badWords = {"word1", "word2", "word3"};
-	private String[] whiteList = {"admin@localhost"};
+	private static final String BAD_WORDS_VAR = "badWords";
+	private static final String WHITE_LIST_VAR = "whiteList";
+	private static final String[] INITIAL_BAD_WORDS = {"word1", "word2", "word3"};
+	private static final String[] INITIAL_WHITE_LIST = {"admin@localhost"};
+
+	/**
+	 * This might be changed in one threads while it is iterated in
+	 * processPacket(...) in another thread. We expect that changes are very rare
+	 * and small, most of operations are just contains(...) and iteration.
+	 */
+	private Set<String> badWords = new CopyOnWriteArraySet<String>();
+	/**
+	 * This might be changed in one threads while it is iterated in
+	 * processPacket(...) in another thread. We expect that changes are very rare
+	 * and small, most of operations are just contains(...) and iteration.
+	 */
+	private Set<String> whiteList = new CopyOnWriteArraySet<String>();
 	private String prependText = "Spam detected: ";
 	private String abuseAddress = "abuse@locahost";
 	private int notificationFrequency = 10;
@@ -71,7 +90,7 @@ public class TestComponent extends AbstractMessageReceiver {
 					"Messages processed: [" + (++messagesCounter) + "]", true);
 			String from = JIDUtils.getNodeID(packet.getElemFrom());
 			// Is sender on the whitelist?
-			if (Arrays.binarySearch(whiteList, from) < 0) {
+			if (!whiteList.contains(from)) {
 				// The sender is not on whitelist so let's check the content
 				String body = packet.getElemCData("/message/body");
 				if (body != null && !body.isEmpty()) {
@@ -118,8 +137,10 @@ public class TestComponent extends AbstractMessageReceiver {
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> defs = super.getDefaults(params);
-		defs.put(BAD_WORDS_KEY, badWords);
-		defs.put(WHITELIST_KEY, whiteList);
+		Collections.addAll(badWords, INITIAL_BAD_WORDS);
+		Collections.addAll(whiteList, INITIAL_WHITE_LIST);
+		defs.put(BAD_WORDS_KEY, INITIAL_BAD_WORDS);
+		defs.put(WHITELIST_KEY, INITIAL_WHITE_LIST);
 		defs.put(PREPEND_TEXT_KEY, prependText);
 		defs.put(SECURE_LOGGING_KEY, secureLogging);
 		defs.put(ABUSE_ADDRESS_KEY, abuseAddress);
@@ -130,9 +151,8 @@ public class TestComponent extends AbstractMessageReceiver {
 	@Override
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
-		badWords = (String[])props.get(BAD_WORDS_KEY);
-		whiteList = (String[])props.get(WHITELIST_KEY);
-		Arrays.sort(whiteList);
+		Collections.addAll(badWords, (String[])props.get(BAD_WORDS_KEY));
+		Collections.addAll(whiteList, (String[])props.get(WHITELIST_KEY));
 		prependText = (String)props.get(PREPEND_TEXT_KEY);
 		secureLogging = (Boolean)props.get(SECURE_LOGGING_KEY);
 		abuseAddress = (String)props.get(ABUSE_ADDRESS_KEY);
@@ -172,6 +192,13 @@ public class TestComponent extends AbstractMessageReceiver {
 		if (list.checkLevel(Level.FINEST)) {
 			// Some very expensive statistics generation code...
 		}
+	}
+
+	@Override
+	public void initBindings(Bindings binds) {
+		super.initBindings(binds);
+		binds.put(BAD_WORDS_VAR, badWords);
+		binds.put(WHITE_LIST_VAR, whiteList);
 	}
 
 }
