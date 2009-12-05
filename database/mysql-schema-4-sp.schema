@@ -80,10 +80,10 @@ delimiter //
 
 -- QUERY START:
 -- Database properties get - function
-create function TigGetDBProperty(_tkey varchar(255)) returns mediumtext
+create function TigGetDBProperty(_tkey varchar(255) CHARSET utf8) returns mediumtext CHARSET utf8
 READS SQL DATA
 begin
-	declare _result mediumtext;
+	declare _result mediumtext CHARSET utf8;
 
 	select pval into _result from tig_pairs, tig_users
 		where (pkey = _tkey) AND (user_id = 'db-properties')
@@ -95,19 +95,19 @@ end //
 
 -- QUERY START:
 -- Database properties set - procedure
-create procedure TigPutDBProperty(_tkey varchar(255), _tval mediumtext)
+create procedure TigPutDBProperty(_tkey varchar(255) CHARSET utf8, _tval mediumtext CHARSET utf8)
 begin
   if exists( select pval from tig_pairs, tig_users where
-		(user_id = 'db-properties') AND (tig_users.uid = tig_pairs.uid)
-		AND (pkey = _tkey))
+    (user_id = 'db-properties') AND (tig_users.uid = tig_pairs.uid)
+    AND (pkey = _tkey))
   then
-	  update tig_pairs, tig_users set pval = _tval
-      where (user_id = 'db-properties') AND (tig_users.uid = tig_pairs.uid)
-        AND (pkey = _tkey);
+    update tig_pairs, tig_users set pval = _tval
+    where (user_id = 'db-properties') AND (tig_users.uid = tig_pairs.uid)
+      AND (pkey = _tkey);
   else
     insert into tig_pairs (pkey, pval, uid)
-		  select _tkey, _tval, uid from tig_users
-			  where (user_id = 'db-properties');
+      select _tkey, _tval, uid from tig_users
+        where (user_id = 'db-properties');
   end if;
 end //
 -- QUERY END:
@@ -121,7 +121,7 @@ end //
 -- is already running.
 create procedure TigInitdb()
 begin
-	update tig_users set online_status = 0;
+  update tig_users set online_status = 0;
 end //
 -- QUERY END:
 
@@ -129,7 +129,7 @@ end //
 -- Add a new user to the database assuming the user password is already
 -- encoded properly according to the database settings.
 -- If password is not encoded TigAddUserPlainPw should be used instead.
-create procedure TigAddUser(_user_id varchar(2049), _user_pw varchar(255))
+create procedure TigAddUser(_user_id varchar(2049) CHARSET utf8, _user_pw varchar(255) CHARSET utf8)
 begin
 	declare res_uid bigint unsigned;
 
@@ -148,7 +148,7 @@ end //
 -- QUERY START:
 -- Takes plain text user password and converts it to internal representation
 -- and creates a new user account.
-create procedure TigAddUserPlainPw(_user_id varchar(2049), _user_pw varchar(255))
+create procedure TigAddUserPlainPw(_user_id varchar(2049) CHARSET utf8, _user_pw varchar(255) CHARSET utf8)
 begin
 	case TigGetDBProperty('password-encoding')
 		when 'MD5-PASSWORD' then
@@ -166,7 +166,7 @@ end //
 -- QUERY START:
 -- Low level database user id as big number. Used only for performance reasons
 -- and save database space. Besides JID is too large to server as UID
-create procedure TigGetUserDBUid(_user_id varchar(2049))
+create procedure TigGetUserDBUid(_user_id varchar(2049) CHARSET utf8)
 begin
 	select uid from tig_users where user_id = _user_id;
 end //
@@ -174,7 +174,7 @@ end //
 
 -- QUERY START:
 -- Removes a user from the database
-create procedure TigRemoveUser(_user_id varchar(2049))
+create procedure TigRemoveUser(_user_id varchar(2049) CHARSET utf8)
 begin
 	declare res_uid bigint unsigned;
 
@@ -188,7 +188,7 @@ end //
 
 -- QUERY START:
 -- Returns user's password from the database
-create procedure TigGetPassword(_user_id varchar(2049))
+create procedure TigGetPassword(_user_id varchar(2049) CHARSET utf8)
 begin
 	select user_pw from tig_users where user_id = _user_id;
 end //
@@ -196,7 +196,7 @@ end //
 
 -- QUERY START:
 -- Takes plain text user password and converts it to internal representation
-create procedure TigUpdatePasswordPlainPw(_user_id varchar(2049), _user_pw varchar(255))
+create procedure TigUpdatePasswordPlainPw(_user_id varchar(2049) CHARSET utf8, _user_pw varchar(255) CHARSET utf8)
 begin
 	case TigGetDBProperty('password-encoding')
 		when 'MD5-PASSWORD' then
@@ -215,7 +215,7 @@ end //
 -- Variant of TigUpdatePasswordPlainPw SP with parameters in reverse order.
 -- Some implementations require the parameters to be in the same order as
 -- the update query.
-create procedure TigUpdatePasswordPlainPwRev(_user_pw varchar(255), _user_id varchar(2049))
+create procedure TigUpdatePasswordPlainPwRev(_user_pw varchar(255) CHARSET utf8, _user_id varchar(2049) CHARSET utf8)
 begin
 	call TigUpdatePasswordPlainPw(_user_id, _user_pw);
 end //
@@ -223,7 +223,7 @@ end //
 
 -- QUERY START:
 -- Update user password
-create procedure TigUpdatePassword(_user_id varchar(2049), _user_pw varchar(255))
+create procedure TigUpdatePassword(_user_id varchar(2049) CHARSET utf8, _user_pw varchar(255) CHARSET utf8)
 begin
 	update tig_users set user_pw = _user_pw where user_id = _user_id;
 end //
@@ -267,7 +267,7 @@ end //
 -- QUERY START:
 -- Performs user login for a plain text password, converting it to an internal
 -- representation if necessary
-create procedure TigUserLoginPlainPw(_user_id varchar(2049), _user_pw varchar(255))
+create procedure TigUserLoginPlainPw(_user_id varchar(2049) CHARSET utf8, _user_pw varchar(255) CHARSET utf8)
 begin
 	case TigGetDBProperty('password-encoding')
 		when 'MD5-PASSWORD' then
@@ -287,7 +287,7 @@ end //
 -- on failure.
 -- If the login is successful it also increases online_status and sets
 -- last_login time to the current timestamp
-create procedure TigUserLogin(_user_id varchar(2049), _user_pw varchar(255))
+create procedure TigUserLogin(_user_id varchar(2049) CHARSET utf8, _user_pw varchar(255) CHARSET utf8)
 begin
 	if exists(select user_id from tig_users
 		where (account_status > 0) AND (user_id = _user_id) AND (user_pw = _user_pw))
@@ -305,7 +305,7 @@ end //
 
 -- QUERY START:
 -- It decreases online_status and sets last_logout time to the current timestamp
-create procedure TigUserLogout(_user_id varchar(2049))
+create procedure TigUserLogout(_user_id varchar(2049) CHARSET utf8)
 begin
 	update tig_users
 		set online_status = greatest(online_status - 1, 0),
@@ -316,7 +316,7 @@ end //
 
 -- QUERY START:
 -- Disable user account
-create procedure TigDisableAccount(_user_id varchar(2049))
+create procedure TigDisableAccount(_user_id varchar(2049) CHARSET utf8)
 begin
 	update tig_users set account_status = 0 where user_id = _user_id;
 end //
@@ -324,7 +324,7 @@ end //
 
 -- QUERY START:
 -- Enable user account
-create procedure TigEnableAccount(_user_id varchar(2049))
+create procedure TigEnableAccount(_user_id varchar(2049) CHARSET utf8)
 begin
 	update tig_users set account_status = 1 where user_id = _user_id;
 end //
@@ -350,7 +350,7 @@ end //
 
 -- QUERY START:
 -- Helper procedure for adding a new node
-create procedure TigAddNode(_parent_nid bigint, _uid bigint, _node varchar(255))
+create procedure TigAddNode(_parent_nid bigint, _uid bigint, _node varchar(255) CHARSET utf8)
 begin
 	insert into tig_nodes (parent_nid, uid, node)
 		values (_parent_nid, _uid, _node);
@@ -360,8 +360,8 @@ end //
 
 -- QUERY START:
 -- For testing only:
-create procedure TigTestAddUser(_user_id varchar(2049), _user_passwd varchar(255),
-			 success_text text, failure_text text)
+create procedure TigTestAddUser(_user_id varchar(2049) CHARSET utf8, _user_passwd varchar(255) CHARSET utf8,
+			 success_text text CHARSET utf8, failure_text text CHARSET utf8)
 begin
 	declare insert_status int default 0;
 	DECLARE CONTINUE HANDLER FOR 1062 SET insert_status=1;
@@ -378,11 +378,11 @@ end //
 create procedure TigUsers2Ver4Convert()
 begin
 
-	declare _user_id varchar(2049);
-	declare _password varchar(255);
+	declare _user_id varchar(2049) CHARSET utf8;
+	declare _password varchar(255) CHARSET utf8;
 	declare _parent_nid bigint;
 	declare _uid bigint;
-	declare _node varchar(255);
+	declare _node varchar(255) CHARSET utf8;
 	declare l_last_row_fetched int default 0;
 
 	DECLARE cursor_users CURSOR FOR
