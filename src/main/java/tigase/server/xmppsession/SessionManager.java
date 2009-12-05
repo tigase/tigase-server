@@ -867,6 +867,7 @@ public class SessionManager extends AbstractMessageReceiver
 		return processing_result;
 	}
 
+	@Override
 	public void initBindings(Bindings binds) {
 		super.initBindings(binds);
 		binds.put(CommandIfc.AUTH_REPO, auth_repository);
