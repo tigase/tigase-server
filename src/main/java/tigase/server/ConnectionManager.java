@@ -33,7 +33,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 import java.util.TimerTask;
-import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.annotations.TODO;
@@ -141,8 +141,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 	private long watchdogStopped = 0;
 	private LinkedList<Map<String, Object>> waitingTasks =
 					new LinkedList<Map<String, Object>>();
-	private ConcurrentSkipListMap<String, IO> services =
-		new ConcurrentSkipListMap<String, IO>();
+	private ConcurrentHashMap<String, IO> services =
+		new ConcurrentHashMap<String, IO>();
 	// services.size() call is very slow due to the implementation details
 	// Therefore for often size retrieval this value is calculated separately.
 	private int services_size = 0;
