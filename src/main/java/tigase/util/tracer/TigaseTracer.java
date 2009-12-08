@@ -28,11 +28,10 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Calendar;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.server.Packet;
-import tigase.util.JIDUtils;
 
 /**
  * Created: Jun 30, 2009 5:18:10 PM
@@ -55,12 +54,12 @@ public class TigaseTracer {
 	private static final String DEF_FILE_NAME = "packet-tracing.log";
 
 	private static TigaseTracer instance = null;
-	private static CopyOnWriteArraySet<String> ips =
-					new CopyOnWriteArraySet<String>();
-	private static CopyOnWriteArraySet<String> jids =
-					new CopyOnWriteArraySet<String>();
-	private static CopyOnWriteArraySet<String> cids =
-					new CopyOnWriteArraySet<String>();
+	private static ConcurrentSkipListSet<String> ips =
+					new ConcurrentSkipListSet<String>();
+	private static ConcurrentSkipListSet<String> jids =
+					new ConcurrentSkipListSet<String>();
+	private static ConcurrentSkipListSet<String> cids =
+					new ConcurrentSkipListSet<String>();
 
 	private ArrayBlockingQueue<String> waiting =
 					new ArrayBlockingQueue<String>(10000, true);

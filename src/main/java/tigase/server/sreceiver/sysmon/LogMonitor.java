@@ -30,7 +30,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.logging.MemoryHandler;
-import tigase.conf.Configurator;
+import tigase.conf.ConfiguratorOld;
 import tigase.stats.StatisticsList;
 import tigase.util.LogFormatter;
 
@@ -172,7 +172,7 @@ public class LogMonitor extends AbstractMonitor {
 	}
 
 	private String getCurrentLevels() {
-		String[] configLines = Configurator.logManagerConfiguration.split("\n");
+		String[] configLines = ConfiguratorOld.logManagerConfiguration.split("\n");
 		Map<String, String> results = new LinkedHashMap<String, String>();
 		for (String string : configLines) {
 			if (string.contains(".level") && !string.contains("FileHandler") &&

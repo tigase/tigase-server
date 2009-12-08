@@ -25,22 +25,22 @@ package tigase.server.xmppsession;
 //import tigase.auth.TigaseConfiguration;
 import tigase.server.script.CommandIfc;
 import java.security.Security;
+import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 import java.util.TimerTask;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.concurrent.CopyOnWriteArraySet;
 import javax.script.Bindings;
 import tigase.auth.TigaseSaslProvider;
 import tigase.conf.Configurable;
@@ -105,7 +105,7 @@ public class SessionManager extends AbstractMessageReceiver
   private static final Logger log =
 					Logger.getLogger(SessionManager.class.getName());
 
-	protected static final String SESSION_PACKETS = "session-packets";
+	//protected static final String SESSION_PACKETS = "session-packets";
 	protected static final String ADMIN_COMMAND_NODE =
 					"http://jabber.org/protocol/admin";
 
@@ -115,7 +115,7 @@ public class SessionManager extends AbstractMessageReceiver
 	private PacketFilter filter = null;
 
 	//{"admin@localhost"};
-	private Set<String> trusted = new CopyOnWriteArraySet<String>();
+	private Set<String> trusted = new ConcurrentSkipListSet<String>();
 	//{"admin@localhost"};
 
 	/**
@@ -131,17 +131,17 @@ public class SessionManager extends AbstractMessageReceiver
 		new ConcurrentHashMap<String, XMPPResourceConnection>();
 
 	private Map<String, XMPPPreprocessorIfc> preProcessors =
-			new ConcurrentSkipListMap<String, XMPPPreprocessorIfc>();
+			new ConcurrentHashMap<String, XMPPPreprocessorIfc>();
 	private Map<String, ProcessingThreads<ProcessorWorkerThread>> processors =
-			new ConcurrentSkipListMap<String, ProcessingThreads<ProcessorWorkerThread>>();
+			new ConcurrentHashMap<String, ProcessingThreads<ProcessorWorkerThread>>();
 	private Map<String, XMPPPostprocessorIfc> postProcessors =
-			new ConcurrentSkipListMap<String, XMPPPostprocessorIfc>();
+			new ConcurrentHashMap<String, XMPPPostprocessorIfc>();
 	private Map<String, XMPPStopListenerIfc> stopListeners =
-			new ConcurrentSkipListMap<String, XMPPStopListenerIfc>();
+			new ConcurrentHashMap<String, XMPPStopListenerIfc>();
 	private Map<String, Map<String, Object>> plugin_config =
-			new ConcurrentSkipListMap<String, Map<String, Object>>();
+			new ConcurrentHashMap<String, Map<String, Object>>();
 	private Map<String, XMPPPacketFilterIfc> outFilters =
-			new ConcurrentSkipListMap<String, XMPPPacketFilterIfc>();
+			new ConcurrentHashMap<String, XMPPPacketFilterIfc>();
 	private ProcessingThreads<SessionCloseWorkerThread> sessionCloseThread =
 			new ProcessingThreads<SessionCloseWorkerThread>(
 			new SessionCloseWorkerThread(), 4, 1, maxQueueSize, "session-close");
@@ -362,7 +362,7 @@ public class SessionManager extends AbstractMessageReceiver
 							", connectionID: " +
 							(conn != null ? conn.getConnectionId() : "null"));
 		}
-		Queue<Packet> results = new LinkedList<Packet>();
+		Queue<Packet> results = new ArrayDeque<Packet>();
 
 		boolean stop = false;
 		if (!stop) {
@@ -778,27 +778,27 @@ public class SessionManager extends AbstractMessageReceiver
 			}
 			processing_result = true;
 			break;
-		case REDIRECT:
-			if (connection != null) {
-				String action = Command.getFieldValue(pc, "action");
-				if (action.equals("close")) {
-					if (log.isLoggable(Level.FINE)) {
-						log.fine("Closing redirected connections: " + pc.getFrom());
-					}
-					sendAllOnHold(connection);
-					closeConnection(pc.getFrom(), true);
-				} else {
-					if (log.isLoggable(Level.FINE)) {
-						log.fine("Activating redirected connections: " + pc.getFrom());
-					}
-				}
-			} else {
-				if (log.isLoggable(Level.FINE)) {
-					log.fine("Redirect for non-existen connection: " + pc.toStringSecure());
-				}
-			}
-			processing_result = true;
-			break;
+//		case REDIRECT:
+//			if (connection != null) {
+//				String action = Command.getFieldValue(pc, "action");
+//				if (action.equals("close")) {
+//					if (log.isLoggable(Level.FINE)) {
+//						log.fine("Closing redirected connections: " + pc.getFrom());
+//					}
+//					sendAllOnHold(connection);
+//					closeConnection(pc.getFrom(), true);
+//				} else {
+//					if (log.isLoggable(Level.FINE)) {
+//						log.fine("Activating redirected connections: " + pc.getFrom());
+//					}
+//				}
+//			} else {
+//				if (log.isLoggable(Level.FINE)) {
+//					log.fine("Redirect for non-existen connection: " + pc.toStringSecure());
+//				}
+//			}
+//			processing_result = true;
+//			break;
 		case OTHER:
 //			String strCommand = pc.getStrCommand();
 //			if (strCommand != null && strCommand.contains(ADMIN_COMMAND_NODE)) {
@@ -876,38 +876,38 @@ public class SessionManager extends AbstractMessageReceiver
 		binds.put(CommandIfc.USER_SESS, sessionsByNodeId);
 	}
 
-	@SuppressWarnings("unchecked")
-	protected void sendAllOnHold(XMPPResourceConnection conn) {
-		String remote_smId = (String)conn.getSessionData("redirect-to");
-		LinkedList<Packet> packets =
-      (LinkedList<Packet>)conn.getSessionData(SESSION_PACKETS);
-		if (remote_smId == null) {
-			if (log.isLoggable(Level.FINEST)) {
-				log.finest("No address for remote SM to redirect packets, processing locally.");
-			}
-			if (packets != null) {
-				Packet sess_pack = null;
-				while (((sess_pack = packets.poll()) != null) &&
-								// Temporarily fix, need a better solution. For some reason
-								// the mode has been sent back from normal to on_hold during
-								// loop execution leading to infinite loop.
-								// Possibly buggy client sent a second authentication packet
-								// executing a second handleLogin call....
-								(conn.getConnectionStatus() != ConnectionStatus.ON_HOLD)) {
-					processPacket(sess_pack);
-				}
-			}
-			return;
-		}
-		conn.setConnectionStatus(ConnectionStatus.REDIRECT);
-		if (packets != null) {
-			Packet sess_pack = null;
-			while ((sess_pack = packets.poll()) != null) {
-				sess_pack.setTo(remote_smId);
-				fastAddOutPacket(sess_pack);
-			}
-		}
-	}
+//	@SuppressWarnings("unchecked")
+//	protected void sendAllOnHold(XMPPResourceConnection conn) {
+//		String remote_smId = (String)conn.getSessionData("redirect-to");
+//		ArrayDeque<Packet> packets =
+//      (ArrayDeque<Packet>)conn.getSessionData(SESSION_PACKETS);
+//		if (remote_smId == null) {
+//			if (log.isLoggable(Level.FINEST)) {
+//				log.finest("No address for remote SM to redirect packets, processing locally.");
+//			}
+//			if (packets != null) {
+//				Packet sess_pack = null;
+//				while (((sess_pack = packets.poll()) != null) &&
+//								// Temporarily fix, need a better solution. For some reason
+//								// the mode has been sent back from normal to on_hold during
+//								// loop execution leading to infinite loop.
+//								// Possibly buggy client sent a second authentication packet
+//								// executing a second handleLogin call....
+//								(conn.getConnectionStatus() != ConnectionStatus.ON_HOLD)) {
+//					processPacket(sess_pack);
+//				}
+//			}
+//			return;
+//		}
+//		conn.setConnectionStatus(ConnectionStatus.REDIRECT);
+//		if (packets != null) {
+//			Packet sess_pack = null;
+//			while ((sess_pack = packets.poll()) != null) {
+//				sess_pack.setTo(remote_smId);
+//				fastAddOutPacket(sess_pack);
+//			}
+//		}
+//	}
 
 	protected void closeConnection(String connectionId, boolean closeOnly) {
 		if (log.isLoggable(Level.FINER)) {
@@ -923,7 +923,7 @@ public class SessionManager extends AbstractMessageReceiver
 
 	protected void closeSession(XMPPResourceConnection conn, boolean closeOnly) {
 		if (!closeOnly) {
-			Queue<Packet> results = new LinkedList<Packet>();
+			Queue<Packet> results = new ArrayDeque<Packet>();
 			for (XMPPStopListenerIfc stopProc: stopListeners.values()) {
 				stopProc.stopped(conn, results, plugin_config.get(stopProc.id()));
 			} // end of for ()
@@ -1201,7 +1201,7 @@ public class SessionManager extends AbstractMessageReceiver
 			log.config("Loading and configuring plugin: " + plug_id);
 			addPlugin(plug_id, plugins_concurrency.get(plug_id));
 			Map<String, Object> plugin_settings =
-				new ConcurrentSkipListMap<String, Object>();
+				new ConcurrentHashMap<String, Object>();
 			for (Map.Entry<String, Object> entry: props.entrySet()) {
 				if (entry.getKey().startsWith(PLUGINS_CONF_PROP_KEY)) {
 					// Split the key to configuration nodes separated with '/'
@@ -1644,7 +1644,7 @@ public class SessionManager extends AbstractMessageReceiver
 	private class ProcessorWorkerThread extends WorkerThread {
 
 		private XMPPProcessorIfc processor = null;
-		private LinkedList<Packet> local_results = new LinkedList<Packet>();
+		private ArrayDeque<Packet> local_results = new ArrayDeque<Packet>();
 
 		public ProcessorWorkerThread(XMPPProcessorIfc processor) {
 			this.processor = processor;

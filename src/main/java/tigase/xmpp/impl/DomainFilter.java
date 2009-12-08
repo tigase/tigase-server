@@ -23,7 +23,7 @@
 package tigase.xmpp.impl;
 
 import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.ArrayDeque;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -157,7 +157,7 @@ public class DomainFilter extends XMPPProcessor
 			if (domains == DOMAINS.ALL) {
 				return;
 			}
-			Queue<Packet> errors = new LinkedList<Packet>();
+			Queue<Packet> errors = new ArrayDeque<Packet>();
 			for (Iterator<Packet> it = results.iterator(); it.hasNext();) {
 				Packet res = it.next();
 				if (domains == DOMAINS.BLOCK) {

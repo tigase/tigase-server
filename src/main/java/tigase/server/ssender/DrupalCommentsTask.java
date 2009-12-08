@@ -28,8 +28,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 //import java.sql.Date;
+import java.util.ArrayDeque;
 import java.util.Queue;
-import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.server.Packet;
@@ -316,7 +316,7 @@ public class DrupalCommentsTask extends SenderTask {
 	}
 
 	protected Queue<Packet> getNewPackets() {
-		Queue<Packet> results = new LinkedList<Packet>();
+		Queue<Packet> results = new ArrayDeque<Packet>();
 		newTopics(results);
 		newComments(results);
 		return results;

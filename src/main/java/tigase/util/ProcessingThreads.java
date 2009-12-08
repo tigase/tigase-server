@@ -22,8 +22,8 @@
 
 package tigase.util;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import tigase.server.Packet;
 import tigase.server.Priority;
 import tigase.xmpp.XMPPResourceConnection;
@@ -37,7 +37,7 @@ import tigase.xmpp.XMPPResourceConnection;
  */
 public class ProcessingThreads<E extends WorkerThread> {
 
-	private LinkedList<E> workerThreads =	new LinkedList<E>();
+	private ArrayDeque<E> workerThreads =	new ArrayDeque<E>();
 	private ArrayList<PriorityQueue<QueueItem>> queues =
 					new ArrayList<PriorityQueue<QueueItem>>();
 

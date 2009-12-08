@@ -21,9 +21,9 @@
  */
 package tigase.xmpp;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -135,8 +135,8 @@ public class XMPPSession {
 		// with the same resource. Let's try to catch the case here and fix it....
 		String resource = conn.getResource();
 		if (resource != null) {
-			LinkedList<XMPPResourceConnection> old_ress =
-					new LinkedList<XMPPResourceConnection>();
+			ArrayDeque<XMPPResourceConnection> old_ress =
+					new ArrayDeque<XMPPResourceConnection>();
 			for (XMPPResourceConnection act_conn : activeResources) {
 				if (log.isLoggable(Level.FINEST)) {
 					log.finest("Resource checking: " + act_conn.getResource() +

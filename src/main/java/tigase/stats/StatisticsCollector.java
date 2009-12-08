@@ -30,7 +30,7 @@ import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.management.ObjectName;
-import tigase.conf.Configurator;
+import tigase.conf.ConfiguratorOld;
 import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
 import tigase.server.AbstractComponentRegistrator;
@@ -86,7 +86,7 @@ public class StatisticsCollector
 			String objName = STATISTICS_MBEAN_NAME;
 			ObjectName on = new ObjectName(objName);
 			ManagementFactory.getPlatformMBeanServer().registerMBean(sp, on);
-			Configurator.putMXBean(objName, sp);
+			ConfiguratorOld.putMXBean(objName, sp);
 		} catch (Exception ex) {
 			log.log(Level.SEVERE, "Can not install Statistics MXBean: ", ex);
 		}

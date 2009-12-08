@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.server.Packet;
@@ -71,7 +71,7 @@ public class CPUMonitor extends AbstractMonitor {
 	private OperatingSystemMXBean osBean = null;
 	private NumberFormat format = NumberFormat.getNumberInstance();
 	private Map<Long, ThreadData> threads =
-					new ConcurrentSkipListMap<Long, ThreadData>();
+					new ConcurrentHashMap<Long, ThreadData>();
 	private int deadLockedThreadsNo = 0;
 
 	private String checkForDeadLock() {

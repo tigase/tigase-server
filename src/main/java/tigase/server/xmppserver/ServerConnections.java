@@ -20,9 +20,9 @@
  */
 package tigase.server.xmppserver;
 
+import java.util.ArrayDeque;
 import java.util.Queue;
-import java.util.LinkedList;
-import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Logger;
 import java.util.logging.Level;
@@ -61,8 +61,8 @@ public class ServerConnections {
 // 	 * Incoming (accept) services session:id. Some servers (EJabberd) opens
 // 	 * many connections for each domain, especially when in cluster mode.
 // 	 */
-// 	private ConcurrentSkipListMap<String, XMPPIOService> incoming =
-//     new ConcurrentSkipListMap<String, XMPPIOService>();
+// 	private ConcurrentHashMap<String, XMPPIOService> incoming =
+//     new ConcurrentHashMap<String, XMPPIOService>();
 
 	/**
 	 * Normal packets between users on different servers
@@ -76,8 +76,8 @@ public class ServerConnections {
 	private ConcurrentLinkedQueue<Packet> waitingControlPackets =
 		new ConcurrentLinkedQueue<Packet>();
 
-	private ConcurrentSkipListMap<String, String> db_keys =
-    new ConcurrentSkipListMap<String, String>();
+	private ConcurrentHashMap<String, String> db_keys =
+    new ConcurrentHashMap<String, String>();
 
 	private long sentPackets = 0;
 	private long receivedPackets = 0;
@@ -200,7 +200,7 @@ public class ServerConnections {
 	public synchronized boolean handleDialbackSuccess() {
 		if (outgoing != null && conn_state == OutgoingState.HANDSHAKING) {
 			setValid();
-			LinkedList<Packet> all = new LinkedList<Packet>();
+			ArrayDeque<Packet> all = new ArrayDeque<Packet>();
 			Packet packet = null;
 			while ((packet = waitingControlPackets.poll()) != null) {
 				all.offer(packet);

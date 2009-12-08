@@ -22,6 +22,7 @@
 
 package tigase.server.ext;
 
+import java.util.ArrayDeque;
 import tigase.server.ext.handlers.UnknownXMLNSStreamOpenHandler;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,7 +32,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 import java.util.TimerTask;
-import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -94,7 +95,7 @@ public class ComponentProtocol
 	 * is a List of connections.
 	 */
 	private Map<String, ArrayList<ComponentConnection>> connections =
-			new ConcurrentSkipListMap<String, ArrayList<ComponentConnection>>();
+			new ConcurrentHashMap<String, ArrayList<ComponentConnection>>();
 	private Map<String, StreamOpenHandler> streamOpenHandlers =
 			new LinkedHashMap<String, StreamOpenHandler>();
 	/**
@@ -174,7 +175,7 @@ public class ComponentProtocol
 	@Override
 	public Queue<Packet> processSocketData(XMPPIOService<List<ComponentConnection>> serv) {
 		Packet p = null;
-		Queue<Packet> results = new LinkedList<Packet>();
+		Queue<Packet> results = new ArrayDeque<Packet>();
 		while ((p = serv.getReceivedPackets().poll()) != null) {
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("Processing socket data: " + p.getStringData());
@@ -515,7 +516,7 @@ public class ComponentProtocol
 
 	@Override
 	public void getStatistics(StatisticsList list) {
-		// Warning size() for ConcurrentSkipListMap is very slow
+		// Warning size() for ConcurrentHashMap is very slow
 		// unless we have a huge number of domains this should not be a problem though.
 		list.add(getName(), "Number of external domains",
 						connections.size(), Level.FINE);
@@ -572,7 +573,7 @@ public class ComponentProtocol
 			serv.getSessionData().put(EXTCOMP_BIND_HOSTNAMES_PROP_KEY, hostnamesToBind);
 			ExtProcessor proc = getProcessor("bind");
 			if (proc != null) {
-				Queue<Packet> results = new LinkedList<Packet>();
+				Queue<Packet> results = new ArrayDeque<Packet>();
 				proc.startProcessing(null, serv, this, results);
 				writePacketsToSocket(serv, results);
 			}

@@ -21,6 +21,7 @@
  */
 package tigase.server.sreceiver;
 
+import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -28,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.conf.Configurable;
@@ -174,15 +175,15 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	 * by the user.
 	 */
 	private Map<String, TaskType> task_types =
-		new ConcurrentSkipListMap<String, TaskType>();
+		new ConcurrentHashMap<String, TaskType>();
 	/**
 	 * This map keeps all active tasks instances as pairs: (JabberID, task)
 	 */
 	private Map<String, ReceiverTaskIfc> task_instances =
-		new ConcurrentSkipListMap<String, ReceiverTaskIfc>();
+		new ConcurrentHashMap<String, ReceiverTaskIfc>();
 
 	private Map<String, TaskCommandIfc> commands =
-		new ConcurrentSkipListMap<String, TaskCommandIfc>();
+		new ConcurrentHashMap<String, TaskCommandIfc>();
 
 	private ServiceEntity serviceEntity = null;
 	private String[] admins = {"admin@localhost"};
@@ -245,7 +246,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 			new ServiceIdentity("component", "generic", task.getJID()));
 		item.addFeatures(CMD_FEATURES);
 		serviceEntity.addItems(item);
-		Queue<Packet> results = new LinkedList<Packet>();
+		Queue<Packet> results = new ArrayDeque<Packet>();
 		task.init(results);
 		addOutPackets(results);
 		task_types.get(task.getType()).instanceAdded();
@@ -285,7 +286,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 			JIDUtils.getNodeNick(task.getJID()), task.getDescription());
 		serviceEntity.removeItems(item);
 		task_instances.remove(task.getJID());
-		Queue<Packet> results = new LinkedList<Packet>();
+		Queue<Packet> results = new ArrayDeque<Packet>();
 		task.destroy(results);
 		addOutPackets(results);
 		task_types.get(task.getType()).instanceRemoved();
@@ -300,7 +301,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 
 	protected void removeTaskSubscribers(ReceiverTaskIfc task,
 		String... subscr) {
-		Queue<Packet> results = new LinkedList<Packet>();
+		Queue<Packet> results = new ArrayDeque<Packet>();
 		task.removeSubscribers(results, subscr);
 		addOutPackets(results);
 	}
@@ -696,7 +697,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 			if (log.isLoggable(Level.FINEST)) {
     			log.finest("Found a task for packet: " + task.getJID());
             }
-			Queue<Packet> results = new LinkedList<Packet>();
+			Queue<Packet> results = new ArrayDeque<Packet>();
 			task.processPacket(packet, results);
 			addOutPackets(results);
 		} // end of if (task != null)

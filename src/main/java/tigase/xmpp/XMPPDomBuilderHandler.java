@@ -22,10 +22,10 @@
 
 package tigase.xmpp;
 
+import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.EmptyStackException;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Stack;
@@ -74,7 +74,7 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 	private XMPPIOService<RefObject> service = null;
 	private boolean error = false;
 
-  private LinkedList<Element> all_roots = new LinkedList<Element>();
+  private ArrayDeque<Element> all_roots = new ArrayDeque<Element>();
   private Stack<Element> el_stack = new Stack<Element>();
 	private Map<String, String> namespaces = new TreeMap<String, String>();
 

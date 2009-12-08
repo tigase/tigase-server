@@ -22,8 +22,8 @@
 
 package tigase.xmpp;
 
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -65,7 +65,7 @@ public class ProcessorFactory {
 
 			processors = new TreeMap<String, XMPPImplIfc>();
 
-      LinkedList<String> elems = new LinkedList<String>();
+      ArrayList<String> elems = new ArrayList<String>();
       for (Class<XMPPImplIfc> cproc: procs) {
  				XMPPImplIfc xproc = cproc.newInstance();
 				processors.put(xproc.id(), xproc);

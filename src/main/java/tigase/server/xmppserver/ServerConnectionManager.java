@@ -30,7 +30,7 @@ import java.util.Queue;
 import java.util.TimerTask;
 import java.util.TreeMap;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -100,14 +100,14 @@ public class ServerConnectionManager
 	 * Services connected and autorized/autenticated
 	 */
 	private Map<String, ServerConnections> connectionsByLocalRemote =
-		new ConcurrentSkipListMap<String, ServerConnections>();
+		new ConcurrentHashMap<String, ServerConnections>();
 
 	/**
 	 * Incoming (accept) services by sessionId. Some servers (EJabberd) opens
 	 * many connections for each domain, especially when in cluster mode.
 	 */
-	private ConcurrentSkipListMap<String, XMPPIOService<Object>> incoming =
-    new ConcurrentSkipListMap<String, XMPPIOService<Object>>();
+	private ConcurrentHashMap<String, XMPPIOService<Object>> incoming =
+    new ConcurrentHashMap<String, XMPPIOService<Object>>();
 
 	private static Map<String, ConnectionWatchdogTask> waitingTasks =
 			new LinkedHashMap<String, ConnectionWatchdogTask>();

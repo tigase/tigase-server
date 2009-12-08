@@ -24,7 +24,7 @@ package tigase.xmpp.impl;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.LinkedList;
+import java.util.ArrayDeque;
 import java.util.Queue;
 import java.util.Map;
 import java.util.logging.Level;
@@ -358,7 +358,7 @@ public abstract class JabberIqRoster {
 //			results.offer(packet.okResult((String)null, 1));
 //		}
 		if (its != null && its.size() > 0) {
-			LinkedList<Element> items = new LinkedList<Element>(its);
+			ArrayDeque<Element> items = new ArrayDeque<Element>(its);
 			while (items.size() > 0) {
 				Element iq = new Element("iq",
 					new String[] {"type", "id", "to"},

@@ -22,10 +22,10 @@
 
 package tigase.server.test;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -64,15 +64,15 @@ public class TestComponent extends AbstractMessageReceiver {
 	/**
 	 * This might be changed in one threads while it is iterated in
 	 * processPacket(...) in another thread. We expect that changes are very rare
-	 * and small, most of operations are just contains(...) and iteration.
+	 * and small, most of operations are just iterations.
 	 */
 	private Set<String> badWords = new CopyOnWriteArraySet<String>();
 	/**
 	 * This might be changed in one threads while it is iterated in
 	 * processPacket(...) in another thread. We expect that changes are very rare
-	 * and small, most of operations are just contains(...) and iteration.
+	 * and small, most of operations are just contains(...).
 	 */
-	private Set<String> whiteList = new CopyOnWriteArraySet<String>();
+	private Set<String> whiteList = new ConcurrentSkipListSet<String>();
 	private String prependText = "Spam detected: ";
 	private String abuseAddress = "abuse@locahost";
 	private int notificationFrequency = 10;

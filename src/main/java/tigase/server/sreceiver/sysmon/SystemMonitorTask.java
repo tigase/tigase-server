@@ -22,8 +22,8 @@
 
 package tigase.server.sreceiver.sysmon;
 
+import java.util.ArrayDeque;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
@@ -107,7 +107,7 @@ public class SystemMonitorTask extends RepoRosterTask {
 	}
 
 	protected void sendPacketsOut(Queue<Packet> input) {
-		Queue<Packet> results = new LinkedList<Packet>();
+		Queue<Packet> results = new ArrayDeque<Packet>();
 		for (Packet packet : input) {
 			if (packet.getElemName() == "message" || packet.getElemTo() == null ||
 							packet.getElemTo().isEmpty()) {
@@ -122,7 +122,7 @@ public class SystemMonitorTask extends RepoRosterTask {
 	}
 
 	protected void sendPacketOut(Packet input) {
-		Queue<Packet> results = new LinkedList<Packet>();
+		Queue<Packet> results = new ArrayDeque<Packet>();
 		if (input.getElemName() == "message" || input.getElemTo() == null ||
 						input.getElemTo().isEmpty()) {
 			super.processMessage(input, results);
@@ -135,7 +135,7 @@ public class SystemMonitorTask extends RepoRosterTask {
 	}
 
 	private void monitor10Secs() {
-		Queue<Packet> results = new LinkedList<Packet>();
+		Queue<Packet> results = new ArrayDeque<Packet>();
 		for (ResourceMonitorIfc monitor : monitors.values()) {
 			monitor.check10Secs(results);
 		}
@@ -143,7 +143,7 @@ public class SystemMonitorTask extends RepoRosterTask {
 	}
 	
 	private void monitor1Min() {
-		Queue<Packet> results = new LinkedList<Packet>();
+		Queue<Packet> results = new ArrayDeque<Packet>();
 		for (ResourceMonitorIfc monitor : monitors.values()) {
 			monitor.check1Min(results);
 		}
@@ -151,7 +151,7 @@ public class SystemMonitorTask extends RepoRosterTask {
 	}
 	
 	private void monitor1Hour() {
-		Queue<Packet> results = new LinkedList<Packet>();
+		Queue<Packet> results = new ArrayDeque<Packet>();
 		for (ResourceMonitorIfc monitor : monitors.values()) {
 			monitor.check1Hour(results);
 		}
@@ -159,7 +159,7 @@ public class SystemMonitorTask extends RepoRosterTask {
 	}
 	
 	private void monitor1Day() {
-		Queue<Packet> results = new LinkedList<Packet>();
+		Queue<Packet> results = new ArrayDeque<Packet>();
 		for (ResourceMonitorIfc monitor : monitors.values()) {
 			monitor.check1Day(results);
 		}

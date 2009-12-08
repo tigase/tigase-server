@@ -22,7 +22,7 @@
 
 package tigase.server.ext.handlers;
 
-import java.util.LinkedList;
+import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -69,7 +69,7 @@ public class ComponentAcceptStreamOpenHandler implements StreamOpenHandler {
 				serv.getSessionData().put(XMPPIOService.SESSION_ID_KEY, id);
 				ExtProcessor proc = handler.getProcessor("handshake");
 				if (proc != null) {
-					Queue<Packet> results = new LinkedList<Packet>();
+					Queue<Packet> results = new ArrayDeque<Packet>();
 					proc.startProcessing(null, serv, handler, results);
 					if (results != null) {
 						StringBuilder sb = new StringBuilder();

@@ -24,7 +24,7 @@ package tigase.server.filters;
 
 import java.util.Arrays;
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.server.Packet;
@@ -46,8 +46,8 @@ public class PacketCounter implements PacketFilterIfc {
 	private String name = null;
 	private long msgCounter = 0;
 	private long presCounter = 0;
-	private ConcurrentSkipListMap<String, Integer> iqCounterIdx =
-					new ConcurrentSkipListMap<String, Integer>();
+	private ConcurrentHashMap<String, Integer> iqCounterIdx =
+					new ConcurrentHashMap<String, Integer>();
 	private long[] iqCounters = new long[1];
 
 	private int lastNodeNo = -1;

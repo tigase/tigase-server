@@ -21,10 +21,10 @@
  */
 package tigase.server.bosh;
 
+import java.util.ArrayDeque;
 import java.util.Map;
 import java.util.LinkedHashMap;
 import java.util.Queue;
-import java.util.LinkedList;
 import java.util.UUID;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
@@ -106,7 +106,7 @@ public class BoshConnectionManager extends ClientConnectionManager
 		BoshSession session = getBoshSession(packet.getTo());
 		if (session != null) {
 			synchronized (session) {
-				Queue<Packet> out_results = new LinkedList<Packet>();
+				Queue<Packet> out_results = new ArrayDeque<Packet>();
 				session.processPacket(packet, out_results);
 				addOutPackets(out_results, session);
 			}
@@ -175,7 +175,7 @@ public class BoshConnectionManager extends ClientConnectionManager
 		BoshIOService serv = (BoshIOService)srv;
 		Packet p = null;
 		while ((p = serv.getReceivedPackets().poll()) != null) {
-			Queue<Packet> out_results = new LinkedList<Packet>();
+			Queue<Packet> out_results = new ArrayDeque<Packet>();
 			BoshSession bs = null;
 			String sid_str = null;
 			synchronized (sessions) {
@@ -370,7 +370,7 @@ public class BoshConnectionManager extends ClientConnectionManager
 
 		@Override
 		public void run() {
-			Queue<Packet> out_results = new LinkedList<Packet>();
+			Queue<Packet> out_results = new ArrayDeque<Packet>();
 			if (bs.task(out_results, this)) {
 				log.fine("Closing session for BS task: " + bs.getSid());
 				sessions.remove(bs.getSid());

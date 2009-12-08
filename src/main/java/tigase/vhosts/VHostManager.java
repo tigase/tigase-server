@@ -25,7 +25,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.db.ComponentRepository;
@@ -70,8 +70,8 @@ public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
 					new LinkedHashSet<VHostListener>();
 	private LinkedHashSet<VHostListener> nameSubdomainsHandlers =
 					new LinkedHashSet<VHostListener>();
-	private CopyOnWriteArraySet<String> registeredComponentDomains =
-			new CopyOnWriteArraySet<String>();
+	private ConcurrentSkipListSet<String> registeredComponentDomains =
+			new ConcurrentSkipListSet<String>();
 
 	private ServiceEntity serviceEntity = null;
 	private ComponentRepository<VHostItem> repo = null;

@@ -29,7 +29,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import java.util.logging.Level;
@@ -79,7 +79,7 @@ public class ClientConnectionManager
 	protected RoutingsContainer routings = null;
 
 	private Map<String, XMPPProcessorIfc> processors =
-		new ConcurrentSkipListMap<String, XMPPProcessorIfc>();
+		new ConcurrentHashMap<String, XMPPProcessorIfc>();
 	private ReceiverTimeoutHandler stoppedHandler = newStoppedHandler();
 	private ReceiverTimeoutHandler startedHandler = newStartedHandler();
 
