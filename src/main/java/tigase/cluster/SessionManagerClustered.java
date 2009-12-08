@@ -22,6 +22,7 @@
 
 package tigase.cluster;
 
+import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Date;
 import java.util.logging.Level;
@@ -29,7 +30,6 @@ import java.util.logging.Logger;
 import java.util.Map;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.LinkedList;
 import java.util.Queue;
 
 //import tigase.cluster.methodcalls.SessionTransferMC;
@@ -149,7 +149,7 @@ public class SessionManagerClustered extends SessionManager
 
 	@TODO(note="Possible performance bottleneck if there are many users with multiple connections to different nodes.")
 	protected void processClusterPacket(Packet packet) {
-		Queue<Packet> results = new LinkedList<Packet>();
+		Queue<Packet> results = new ArrayDeque<Packet>();
 		final ClusterElement clel = new ClusterElement(packet.getElement());
 		ClusterMethods method = ClusterMethods.parseMethod(clel.getMethodName());
 		switch (packet.getType()) {
