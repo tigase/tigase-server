@@ -26,7 +26,7 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryUsage;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.LinkedList;
+import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -34,9 +34,10 @@ import java.util.TreeMap;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.LinkedHashSet;
-import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 import java.util.logging.Level;
+import tigase.conf.ConfiguratorAbstract;
 import tigase.xml.Element;
 import tigase.util.UpdatesChecker;
 import tigase.xmpp.Authorization;
@@ -59,7 +60,8 @@ import static tigase.server.MessageRouterConfig.*;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class MessageRouter extends AbstractMessageReceiver {
+public class MessageRouter extends AbstractMessageReceiver 
+		implements MessageRouterIfc {
 	//	implements XMPPService {
 
 //	public static final String INFO_XMLNS =	"http://jabber.org/protocol/disco#info";
@@ -74,20 +76,20 @@ public class MessageRouter extends AbstractMessageReceiver {
 	private String disco_name = DISCO_NAME_PROP_VAL;
 	private boolean disco_show_version = DISCO_SHOW_VERSION_PROP_VAL;
 
-  private ComponentRegistrator config = null;
+  private ConfiguratorAbstract config = null;
 	private ServiceEntity serviceEntity = null;
 	private UpdatesChecker updates_checker = null;
 
 	private Map<String, XMPPService> xmppServices =
-		new ConcurrentSkipListMap<String, XMPPService>();
+		new ConcurrentHashMap<String, XMPPService>();
   private Map<String, ServerComponent> components =
-    new ConcurrentSkipListMap<String, ServerComponent>();
+    new ConcurrentHashMap<String, ServerComponent>();
   private Map<String, ServerComponent> components_byId =
-    new ConcurrentSkipListMap<String, ServerComponent>();
+    new ConcurrentHashMap<String, ServerComponent>();
   private Map<String, ComponentRegistrator> registrators =
-    new ConcurrentSkipListMap<String, ComponentRegistrator>();
+    new ConcurrentHashMap<String, ComponentRegistrator>();
   private Map<String, MessageReceiver> receivers =
-    new ConcurrentSkipListMap<String, MessageReceiver>();
+    new ConcurrentHashMap<String, MessageReceiver>();
 
 	public void processPacketMR(final Packet packet, final Queue<Packet> results) {
 		if (packet.getPermissions() != Permissions.ADMIN) {
@@ -250,7 +252,7 @@ public class MessageRouter extends AbstractMessageReceiver {
 						packet.getElemFrom() != null &&
 						((comp != null && !(comp instanceof DisableDisco)) ||
 						isLocalDomain(packet.getElemTo()))) {
-			Queue<Packet> results = new LinkedList<Packet>();
+			Queue<Packet> results = new ArrayDeque<Packet>();
 			processDiscoQuery(packet, results);
 			if (results.size() > 0) {
 				for (Packet res: results) {
@@ -267,7 +269,7 @@ public class MessageRouter extends AbstractMessageReceiver {
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("Packet will be processed by: " + comp.getComponentId());
 			}
-			Queue<Packet> results = new LinkedList<Packet>();
+			Queue<Packet> results = new ArrayDeque<Packet>();
 			if (comp == this) {
 				processPacketMR(packet, results);
 			} else {
@@ -310,7 +312,7 @@ public class MessageRouter extends AbstractMessageReceiver {
 			comps = getComponentsForNonLocalDomain(host);
 		}
 		if (comps != null) {
-			Queue<Packet> results = new LinkedList<Packet>();
+			Queue<Packet> results = new ArrayDeque<Packet>();
 			for (ServerComponent serverComponent : comps) {
 				if (log.isLoggable(Level.FINEST)) {
 					log.finest("Packet will be processed by: " +
@@ -395,7 +397,8 @@ public class MessageRouter extends AbstractMessageReceiver {
 		return vHostManager.getComponentsForNonLocalDomain(domain);
 	}
 
-  public void setConfig(ComponentRegistrator config) {
+	@Override
+  public void setConfig(ConfiguratorAbstract config) {
     components.put(getName(), this);
     this.config = config;
     addRegistrator(config);
