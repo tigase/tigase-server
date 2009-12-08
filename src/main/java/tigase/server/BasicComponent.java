@@ -33,8 +33,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.script.Bindings;
@@ -73,8 +73,8 @@ public class BasicComponent implements Configurable, XMPPService {
 	private String compId = null;
 	private String defHostname = DEF_HOSTNAME_PROP_VAL;
 	private Map<String, CommandIfc> scriptCommands =
-			new ConcurrentSkipListMap<String, CommandIfc>();
-	protected Set<String> admins = new CopyOnWriteArraySet<String>();
+			new ConcurrentHashMap<String, CommandIfc>();
+	protected Set<String> admins = new ConcurrentSkipListSet<String>();
 	private ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
 	private ServiceEntity serviceEntity = null;
 	private String scriptsBaseDir = null;
