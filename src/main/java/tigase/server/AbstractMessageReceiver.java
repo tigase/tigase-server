@@ -21,8 +21,8 @@
  */
 package tigase.server;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
@@ -101,7 +101,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	private Timer receiverTasks = null;
 	private ConcurrentHashMap<String, PacketReceiverTask> waitingTasks =
 					new ConcurrentHashMap<String, PacketReceiverTask>(16, 0.75f, 4);
-	private LinkedList<QueueListener> processingThreads = null;
+	private ArrayDeque<QueueListener> processingThreads = null;
 	private QueueListener out_thread = null;
 	protected VHostManagerIfc vHostManager = null;
 	private Set<Pattern> regexRoutings = 
@@ -497,7 +497,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 
 	private void startThreads() {
 		if (processingThreads == null) {
-			processingThreads = new LinkedList<QueueListener>();
+			processingThreads = new ArrayDeque<QueueListener>();
 			for (int i = 0; i < in_queues_size; i++) {
 				QueueListener in_thread =
 								new QueueListener(in_queues.get(i), QueueType.IN_QUEUE);
@@ -649,7 +649,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 				log.finest(getName() + " starting queue processing.");
 			}
 			Packet packet = null;
-			Queue<Packet> results = new LinkedList<Packet>();
+			Queue<Packet> results = new ArrayDeque<Packet>();
 			while (! threadStopped) {
 				try {
 					// Now process next waiting packet
