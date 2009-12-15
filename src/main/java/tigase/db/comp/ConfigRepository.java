@@ -42,8 +42,6 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 
 	private static final Logger log = Logger.getLogger(ConfigRepository.class.getName());
 
-	public static final String ANONYMOUS_DOMAINS_PROP_KEY = "anonymous-domains";
-
 	protected LinkedHashMap<String, Item> items = new LinkedHashMap<String, Item>();
 
 	public abstract String[] getDefaultPropetyItems();

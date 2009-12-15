@@ -45,7 +45,7 @@ import tigase.net.SocketReadThread;
 import tigase.net.SocketType;
 import tigase.stats.StatisticsList;
 import tigase.util.JIDUtils;
-import tigase.util.Numbers;
+import tigase.util.DataTypes;
 import tigase.xmpp.XMPPIOService;
 import tigase.xmpp.XMPPIOServiceListener;
 
@@ -203,10 +203,10 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 
 		int buffSize = NET_BUFFER_ST_PROP_VAL;
 		if (isHighThroughput()) {
-			buffSize = Numbers.parseSizeInt((String)params.get(NET_BUFFER_HT_PROP_KEY),
+			buffSize = DataTypes.parseSizeInt((String)params.get(NET_BUFFER_HT_PROP_KEY),
 							NET_BUFFER_HT_PROP_VAL);
 		} else {
-			buffSize = Numbers.parseSizeInt((String)params.get(NET_BUFFER_ST_PROP_KEY),
+			buffSize = DataTypes.parseSizeInt((String)params.get(NET_BUFFER_ST_PROP_KEY),
 							NET_BUFFER_ST_PROP_VAL);
 		}
 		props.put(NET_BUFFER_PROP_KEY, buffSize);

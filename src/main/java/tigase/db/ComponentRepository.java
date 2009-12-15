@@ -79,8 +79,9 @@ public interface ComponentRepository<Item extends RepositoryItem>
 	 * permanent storage. After this method is completed the item should no
 	 * longer be availble in the component repository.
 	 * @param key a <code>String</code> with domain name to remove.
+	 * @throws TigaseDBException
 	 */
-	void removeItem(String key);
+	void removeItem(String key) throws TigaseDBException;
 
 	/**
 	 * The method adds a new or updates existing Item in the repository.
@@ -88,8 +89,9 @@ public interface ComponentRepository<Item extends RepositoryItem>
 	 * call is finished a new added item must be available in the component repository.
 	 * The method adds the item to memory cache and permamnent storage.
 	 * @param item a <code>Item</code> with all it's configuration parameters.
+	 * @throws TigaseDBException
 	 */
-	void addItem(Item item);
+	void addItem(Item item) throws TigaseDBException;
 
 	/**
 	 * The method returns all item configuration parameters for a key
@@ -114,15 +116,19 @@ public interface ComponentRepository<Item extends RepositoryItem>
 	 * externally by third-party system. When all modifications are done this
 	 * method is called to refresh the class cache. Whether the implementation
 	 * load whole list or just last modifications is implementation dependent.
+	 *
+	 * @throws TigaseDBException
 	 */
-	void reload();
+	void reload() throws TigaseDBException;
 
 	/**
 	 * The method is called to store all data in the database. It is used when the
 	 * repository has been changed in some way and the changes have to be put to
 	 * a permanent storage for later retrieval.
+	 *
+	 * @throws TigaseDBException
 	 */
-	void store();
+	void store() throws TigaseDBException;
 
 	/**
 	 * The method returns number of itens in the repository.
@@ -134,8 +140,9 @@ public interface ComponentRepository<Item extends RepositoryItem>
 	/**
 	 * Retuns a collection with all items stored in the repository.
 	 * @return
+	 * @throws TigaseDBException
 	 */
-	Collection<Item> allItems();
+	Collection<Item> allItems() throws TigaseDBException;
 
 	/**
 	 * Creates a new, uninitialized instance of the repository Item.

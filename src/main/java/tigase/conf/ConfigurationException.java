@@ -22,12 +22,34 @@
 
 package tigase.conf;
 
+import java.io.IOException;
+
 /**
- * Created: Dec 7, 2009 4:09:52 PM
  *
- * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
+ * @author kobit
  */
-public class Configurator extends ConfiguratorAbstract {
+public class ConfigurationException extends IOException {
+
+  private static final long serialVersionUID = 1L;
+
+	/**
+     * Creates a new instance of <code>ConfigurationException</code> without detail message.
+	 */
+	public ConfigurationException() {
+		super();
+	}
+
+
+	/**
+     * Constructs an instance of <code>ConfigurationException</code> with the specified detail message.
+     * @param msg the detail message.
+     */
+	public ConfigurationException(String msg) {
+		super(msg);
+	}
+
+	ConfigurationException(String string, Exception e) {
+		super(string, e);
+	}
 
 }

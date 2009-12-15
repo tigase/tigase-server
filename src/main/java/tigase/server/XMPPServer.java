@@ -21,8 +21,8 @@
  */
 package tigase.server;
 
-import tigase.conf.Configurator;
-import tigase.xml.db.XMLDBException;
+import tigase.conf.ConfigurationException;
+import tigase.conf.ConfiguratorAbstract;
 
 /**
  * Describe class XMPPServer here.
@@ -36,8 +36,10 @@ import tigase.xml.db.XMLDBException;
 public class XMPPServer {
 
 	public static final String NAME = "Tigase";
+	public static final String CONFIGURATOR_PROP_KEY = "tigase-configurator";
 
-	private static String config_file = "tigase-config.xml";
+	private static final String DEF_CONFIGURATOR = "tigase.conf.Configurator";
+
 	private static String server_name = "message-router";
   private static boolean debug = false;
   private static boolean monit = false;
@@ -53,11 +55,10 @@ public class XMPPServer {
   public static String help() {
     return "\n"
       + "Parameters:\n"
-      + " -h                this help message\n"
-      + " -v                prints server version info\n"
-      + " -c file           location of configuration file\n"
-      + " -d [true|false]   turn on|off debug mode\n"
-      + " -m                turn on server monitor\n"
+      + " -h               this help message\n"
+      + " -v               prints server version info\n"
+      + " -d [true|false]    turn on|off debug mode\n"
+      + " -m               turn on server monitor\n"
 			+ " -n server-name    sets server name\n"
       ;
   }
@@ -87,15 +88,6 @@ public class XMPPServer {
         if (args[i].equals("-v")) {
           System.out.print(version());
           System.exit(0);
-        } // end of if (args[i].equals("-h"))
-        if (args[i].equals("-c")) {
-          if (i+1 == args.length) {
-            System.out.print(help());
-            System.exit(1);
-          } // end of if (i+1 == args.length)
-          else {
-            config_file = args[++i];
-          } // end of else
         } // end of if (args[i].equals("-h"))
         if (args[i].equals("-n")) {
           if (i+1 == args.length) {
@@ -146,25 +138,37 @@ public class XMPPServer {
 			+ "java.util.logging.ConsoleHandler.level=ALL\n"
 			+ "java.util.logging.ConsoleHandler.formatter=tigase.util.LogFormatter\n"
 			;
-		Configurator.loadLogManagerConfig(initial_config);
-
-		Configurator config = null;
+		ConfiguratorAbstract.loadLogManagerConfig(initial_config);
+		ConfiguratorAbstract config = null;
 		try {
-			config = new Configurator(config_file, args);
-		} catch (XMLDBException e) {
+			String config_class_name = System.getProperty(CONFIGURATOR_PROP_KEY,
+					DEF_CONFIGURATOR);
+			config = (ConfiguratorAbstract)Class.forName(config_class_name).newInstance();
+			config.init(args);
+			//config = new ConfiguratorOld(config_file, args);
+			config.setName("basic-conf");
+			String message_router_class_name = config.getMessageRouterClassName();
+			MessageRouterIfc router = (MessageRouterIfc)Class.forName(
+					message_router_class_name).newInstance();
+			router.setName(server_name);
+			router.setConfig(config);
+			router.start();
+		} catch (ConfigurationException e) {
 			System.err.println("");
 			System.err.println("  --------------------------------------");
 			System.err.println("  ERROR! Terminating the server process.");
-			System.err.println("  Invalid XML configuration file: " + config_file);
+			System.err.println("  Invalid configuration data: " + e);
 			System.err.println("  Please fix the problem and start the server again.");
 			System.exit(1);
+		} catch (Exception e) {
+			System.err.println("");
+			System.err.println("  --------------------------------------");
+			System.err.println("  ERROR! Terminating the server process.");
+			System.err.println("  Problem initializing the server: " + e);
+			System.err.println("  Please fix the problem and start the server again.");
+			e.printStackTrace();
+			System.exit(1);
 		}
-		config.setName("basic-conf");
-		MessageRouter router = new MessageRouter();
-		router.setName(server_name);
-		router.setConfig(config);
-
-		router.start();
 
 	}
 

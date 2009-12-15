@@ -29,6 +29,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.db.ComponentRepository;
+import tigase.db.TigaseDBException;
 import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
 import tigase.server.AbstractComponentRegistrator;
@@ -190,7 +191,12 @@ public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
 		}
 		switch (packet.getCommand()) {
 			case VHOSTS_RELOAD:
-				repo.reload();
+				try {
+					repo.reload();
+				} catch (TigaseDBException ex) {
+					log.log(Level.WARNING,
+							"Problem reloading VHost repository: ",	ex);
+				}
 				addCompletedVHostsField(result);
 				results.offer(result);
 				break;
@@ -425,7 +431,12 @@ public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
 			String enabled = Command.getFieldValue(packet, "Enabled");
 			vhost.setEnabled(enabled == null || enabled.isEmpty() ||
 							"true".equals(enabled));
-			repo.addItem(vhost);
+			try {
+				repo.addItem(vhost);
+			} catch (TigaseDBException ex) {
+					log.log(Level.WARNING,
+							"Problem adding VHost item to repository: ", ex);
+			}
 			addCompletedVHostsField(result);
 		} else {
 			Command.addFieldValue(result, "Note",
@@ -436,7 +447,12 @@ public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
 	private void updateVHostRemove(Packet packet, Packet result) {
 		String vh = Command.getFieldValue(packet, "VHost");
 		if (vh != null && !vh.isEmpty()) {
-			repo.removeItem(vh);
+			try {
+				repo.removeItem(vh);
+			} catch (TigaseDBException ex) {
+					log.log(Level.WARNING,
+							"Problem removing VHost item from repository: ", ex);
+			}
 			addCompletedVHostsField(result);
 		} else {
 			Command.addFieldValue(result, "Note",

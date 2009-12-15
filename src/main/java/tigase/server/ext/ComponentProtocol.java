@@ -23,6 +23,7 @@
 package tigase.server.ext;
 
 import java.util.ArrayDeque;
+import tigase.db.TigaseDBException;
 import tigase.server.ext.handlers.UnknownXMLNSStreamOpenHandler;
 import java.util.ArrayList;
 import java.util.Arrays;
