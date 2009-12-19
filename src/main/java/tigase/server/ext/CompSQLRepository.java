@@ -102,8 +102,7 @@ public class CompSQLRepository extends JDBCAbstract
 	private CompConfigRepository configRepo = new CompConfigRepository();
 
 	@Override
-	public void initRepository(String conn_str,
-			Map<String, String> params)
+	public void initRepository(String conn_str, Map<String, String> params)
 			throws SQLException {
 		// Don't need to do anything special here, initRepo() is called authomatically
 		// if needed on each DB query, but then if there a problem with a connection
@@ -115,8 +114,7 @@ public class CompSQLRepository extends JDBCAbstract
 	}
 
 	@Override
-	public void getDefaults(Map<String, Object> defs,
-			Map<String, Object> params) {
+	public void getDefaults(Map<String, Object> defs, Map<String, Object> params) {
 		configRepo.getDefaults(defs, params);
 		String repo_uri = DERBY_REPO_URL_PROP_VAL;
 		if (params.get(GEN_USER_DB_URI) != null) {
