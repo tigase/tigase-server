@@ -48,6 +48,7 @@ import tigase.xmpp.XMPPIOService;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.stats.StatisticsList;
+import tigase.util.DNSEntry;
 
 /**
  * Class ServerConnectionManager
@@ -295,15 +296,15 @@ public class ServerConnectionManager
 		//		dumpCurrentStack(Thread.currentThread().getStackTrace());
 
 		try {
-			String ipAddress = DNSResolver.getHostSRV_IP(remotehost);
+			DNSEntry dns_entry = DNSResolver.getHostSRV_Entry(remotehost);
 			Map<String, Object> port_props = new TreeMap<String, Object>();
-			port_props.put("remote-ip", ipAddress);
+			port_props.put("remote-ip", dns_entry.getIp());
 			port_props.put("local-hostname", localhost);
 			port_props.put("remote-hostname", remotehost);
-			port_props.put("ifc", new String[] {ipAddress});
+			port_props.put("ifc", new String[] {dns_entry.getIp()});
 			port_props.put("socket", SocketType.plain);
 			port_props.put("type", ConnectionType.connect);
-			port_props.put("port-no", 5269);
+			port_props.put("port-no", dns_entry.getPort());
 			String cid = getConnectionId(localhost, remotehost);
 			port_props.put("cid", cid);
 			if (log.isLoggable(Level.FINEST)) {
