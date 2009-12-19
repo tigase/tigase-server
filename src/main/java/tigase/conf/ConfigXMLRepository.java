@@ -24,8 +24,6 @@ package tigase.conf;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.TreeMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.List;
@@ -35,10 +33,8 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import tigase.annotations.TODO;
 import tigase.db.TigaseDBException;
 import tigase.xml.db.NodeNotFoundException;
-import tigase.xml.db.NodeExistsException;
 import tigase.xml.db.XMLDB;
 import tigase.xml.db.XMLDBException;
 
@@ -52,7 +48,6 @@ import tigase.xml.db.XMLDBException;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@TODO(note="Implement access methods for other primitive types.")
 public class ConfigXMLRepository extends ConfigurationCache {
 
   public static final String XMPP_CONFIG_FILE_PROPERTY_KEY = "xmpp.config.file";
