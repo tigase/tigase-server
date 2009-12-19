@@ -113,4 +113,15 @@ public interface ConfigRepositoryIfc extends ComponentRepository<ConfigItem> {
 	 */
 	void addItem(String key, Object value) throws ConfigurationException;
 
+	/**
+	 * This is used to load a configuration for a selected cluster node. The configuration
+	 * repository (file or database) may contain settings for all cluster nodes, some
+	 * of the settings may be exclusive to one or another cluster node. This method
+	 * informs the repository what node name (hostname) it is running on.
+	 * @param hostname
+	 */
+	void setDefHostname(String hostname);
+
+	Map<String, Object> getInitProperties();
+
 }

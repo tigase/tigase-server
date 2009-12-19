@@ -31,6 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import tigase.db.TigaseDBException;
 
 /**
@@ -42,6 +44,12 @@ import tigase.db.TigaseDBException;
 public class ConfigurationCache implements ConfigRepositoryIfc {
 
 	/**
+	 * Private logger for class instancess.
+   */
+  private static final Logger log =
+			Logger.getLogger(ConfigurationCache.class.getName());
+
+	/**
 	 * Even though every element has a component name field the whole
 	 * configuration is grouped by the component name anyway to improve
 	 * access time to the configuration.
@@ -50,6 +58,27 @@ public class ConfigurationCache implements ConfigRepositoryIfc {
 	 */
 	private Map<String, Set<ConfigItem>> config =
 			new LinkedHashMap<String, Set<ConfigItem>>();
+	private String hostname = null;
+
+	@Override
+	public void getDefaults(Map<String, Object> defs, Map<String, Object> params) {
+		// Nothing for now, empty configuration for the repository
+	}
+
+	@Override
+	public void setProperties(Map<String, Object> properties) {
+		// Nothing for now, empty configuration for the repository
+	}
+
+	@Override
+	public void reload() throws TigaseDBException {
+		// Do nothing, this is in memory config repository only
+	}
+
+	@Override
+	public void store() throws TigaseDBException {
+		// Do nothing, this is in memory config repository only
+	}
 
 	@Override
 	public void init(Map<String, Object> params)
@@ -57,37 +86,16 @@ public class ConfigurationCache implements ConfigRepositoryIfc {
 	}
 
 	@Override
-	public Map<String, Object> getProperties(String compName)
-			throws ConfigurationException {
-		// It must not return a null value, even if configuration for the
-		// component does not exist yet, it has to initialized to create new one.
-		Map<String, Object> result = new LinkedHashMap<String, Object>();
-		// Let's convert the internal representation of the configuration to that
-		// used by the components.
-		Set<ConfigItem> confItems = config.get(compName);
-		if (confItems != null) {
-			for (ConfigItem item : confItems) {
-				String key = item.getConfigKey();
-				Object value = item.getConfigVal();
-				result.put(key, value);
-			}
-		}
-		// Hopefuly this doesn't happen.... or I have a bug somewhere
-		return result;
+	public Map<String, Object> getInitProperties() {
+		return null;
 	}
 
-	@Override
-	public void putProperties(String compName, Map<String, Object> props)
-			throws ConfigurationException {
-		for (Map.Entry<String, Object> entry : props.entrySet()) {
-			ConfigItem item = new ConfigItem();
-			item.setNodeKey(compName, entry.getKey(), entry.getValue());
-			addItem(compName, item);
-		}
+	public Set<ConfigItem> getItemsForComponent(String compName) {
+		return config.get(compName);
 	}
 
 	public ConfigItem getItem(String compName, String node, String key) {
-		Set<ConfigItem> confItems = config.get(compName);
+		Set<ConfigItem> confItems = getItemsForComponent(compName);
 		if (confItems != null) {
 			for (ConfigItem item : confItems) {
 				if (item.isNodeKey(node, key)) {
@@ -115,25 +123,6 @@ public class ConfigurationCache implements ConfigRepositoryIfc {
 	}
 
 	@Override
-	public Object get(String compName, String node, String key, Object def) {
-		ConfigItem item = getItem(compName, node, key);
-		if (item != null) {
-			return item.getConfigVal();
-		}
-		return def;
-	}
-
-	@Override
-	public void set(String compName, String node, String key, Object value) {
-		ConfigItem item = getItem(compName, node, key);
-		if (item == null) {
-			item = getItemInstance();
-		}
-		item.set(compName, node, key, value);
-		addItem(compName, item);
-	}
-
-	@Override
 	public String[] getCompNames() {
 		return config.keySet().toArray(new String[config.size()]);
 	}
@@ -155,21 +144,58 @@ public class ConfigurationCache implements ConfigRepositoryIfc {
 	}
 
 	@Override
+	public int size() {
+		int result = 0;
+		for (Set<ConfigItem> items : config.values()) {
+			result += items.size();
+		}
+		return result;
+	}
+
+	@Override
+	public Collection<ConfigItem> allItems() throws TigaseDBException {
+		List<ConfigItem> result = new ArrayList<ConfigItem>();
+		for (Set<ConfigItem> items : config.values()) {
+			result.addAll(items);
+		}
+		return result;
+	}
+
+	@Override
+	public void putProperties(String compName, Map<String, Object> props)
+			throws ConfigurationException {
+		for (Map.Entry<String, Object> entry : props.entrySet()) {
+			ConfigItem item = new ConfigItem();
+			item.setNodeKey(compName, entry.getKey(), entry.getValue());
+			addItem(compName, item);
+		}
+	}
+
+	@Override
+	public Object get(String compName, String node, String key, Object def) {
+		ConfigItem item = getItem(compName, node, key);
+		if (item != null) {
+			return item.getConfigVal();
+		}
+		return def;
+	}
+
+	@Override
+	public void set(String compName, String node, String key, Object value) {
+		ConfigItem item = getItem(compName, node, key);
+		if (item == null) {
+			item = getItemInstance();
+		}
+		item.set(compName, node, key, value);
+		addItem(compName, item);
+	}
+
+	@Override
 	public void remove(String compName, String node, String key) {
 		ConfigItem item = getItem(compName, node, key);
 		if (item != null) {
 			removeItem(compName, item);
 		}
-	}
-
-	@Override
-	public void getDefaults(Map<String, Object> defs, Map<String, Object> params) {
-		// Nothing for now, empty configuration for the repository
-	}
-
-	@Override
-	public void setProperties(Map<String, Object> properties) {
-		// Nothing for now, empty configuration for the repository
 	}
 
 	@Override
@@ -224,37 +250,28 @@ public class ConfigurationCache implements ConfigRepositoryIfc {
 	}
 
 	@Override
+	public Map<String, Object> getProperties(String compName)
+			throws ConfigurationException {
+		// It must not return a null value, even if configuration for the
+		// component does not exist yet, it has to initialized to create new one.
+		Map<String, Object> result = new LinkedHashMap<String, Object>();
+		// Let's convert the internal representation of the configuration to that
+		// used by the components.
+		Set<ConfigItem> confItems = getItemsForComponent(compName);
+		if (confItems != null) {
+			for (ConfigItem item : confItems) {
+				String key = item.getConfigKey();
+				Object value = item.getConfigVal();
+				result.put(key, value);
+			}
+		}
+		// Hopefuly this doesn't happen.... or I have a bug somewhere
+		return result;
+	}
+
+	@Override
 	public boolean contains(String key) {
 		return getItem(key) != null;
-	}
-
-	@Override
-	public void reload() throws TigaseDBException {
-		// Do nothing, this is in memory config repository only
-	}
-
-	@Override
-	public void store() throws TigaseDBException {
-		// Do nothing, this is in memory config repository only
-	}
-
-	@Override
-	public int size() {
-		int result = 0;
-		for (Set<ConfigItem> items : config.values()) {
-			result += items.size();
-		}
-		return result;
-	}
-
-	@Override
-	public Collection<ConfigItem> allItems()
-			throws TigaseDBException {
-		List<ConfigItem> result = new ArrayList<ConfigItem>();
-		for (Set<ConfigItem> items : config.values()) {
-			result.addAll(items);
-		}
-		return result;
 	}
 
 	@Override
@@ -264,43 +281,22 @@ public class ConfigurationCache implements ConfigRepositoryIfc {
 
 	@Override
 	public Iterator<ConfigItem> iterator() {
-		return new ConfigurationCacheIterator();
+		try {
+			Collection<ConfigItem> items = allItems();
+			return items != null ? items.iterator() : null;
+		} catch (TigaseDBException ex) {
+			log.log(Level.WARNING, "Problem accessing repository: ", ex);
+			return null;
+		}
 	}
 
-	private class ConfigurationCacheIterator implements Iterator<ConfigItem> {
+	@Override
+	public void setDefHostname(String hostname) {
+		this.hostname = hostname;
+	}
 
-		Iterator<Set<ConfigItem>> compsIt = config.values().iterator();
-		Iterator<ConfigItem> recIt = null;
-
-		@Override
-		public boolean hasNext() {
-      if (recIt == null || !recIt.hasNext()) {
-				if (compsIt.hasNext()) {
-					recIt = compsIt.next().iterator();
-				} else {
-					return false;
-				}
-			}
-			return recIt.hasNext();
-		}
-
-		@Override
-		public ConfigItem next() throws NoSuchElementException {
-      if (recIt == null || !recIt.hasNext()) {
-				if (compsIt.hasNext()) {
-					recIt = compsIt.next().iterator();
-				} else {
-					throw new NoSuchElementException("No more statistics.");
-				}
-			}
-			return recIt.next();
-		}
-
-		@Override
-		public void remove() {
-			throw new UnsupportedOperationException("Not supported yet.");
-		}
-
+	public String getDefHostname() {
+		return this.hostname;
 	}
 
 }

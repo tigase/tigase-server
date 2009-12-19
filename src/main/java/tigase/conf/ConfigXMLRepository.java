@@ -499,4 +499,13 @@ public class ConfigXMLRepository implements ConfigRepositoryIfc {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
+	@Override
+	public void setDefHostname(String hostname) {
+	}
+
+	@Override
+	public Map<String, Object> getInitProperties() {
+		return null;
+	}
+
 } // ConfigXMLRepository

@@ -28,19 +28,23 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
+import javax.script.Bindings;
+import tigase.db.ComponentRepository;
 import tigase.db.RepositoryFactory;
+import tigase.db.TigaseDBException;
 import tigase.db.UserAuthRepository;
 import tigase.db.UserRepository;
 import tigase.db.UserRepositoryPool;
 import tigase.server.AbstractComponentRegistrator;
 import tigase.server.ServerComponent;
-import tigase.util.DataTypes;
 
 /**
  * Created: Dec 7, 2009 4:15:31 PM
@@ -55,8 +59,8 @@ public abstract class ConfiguratorAbstract
 		Logger.getLogger(ConfiguratorAbstract.class.getName());
 
 	public static final String PROPERTY_FILENAME_PROP_KEY = "--property-file";
-	public static final String CONFIG_REPO_CLASS_PROP_KEY = "config-repo-class";
-	public static final String CONFIG_REPO_CLASS_INIT_KEY = "--config-repo-class";
+	public static final String CONFIG_REPO_CLASS_PROP_KEY = "tigase-config-repo-class";
+	public static final String CONFIG_REPO_CLASS_INIT_KEY = "--tigase-config-repo-class";
 	private static final String LOGGING_KEY = "logging/";
 
 	public static String logManagerConfiguration = null;
@@ -80,7 +84,7 @@ public abstract class ConfiguratorAbstract
 	 * Configuration settings read from the init.properties file or any other source
 	 * which provides startup configuration.
 	 */
-	private Map<String, Object> initSettings = new LinkedHashMap<String, Object>();
+	private List<String> initSettings = new LinkedList<String>();
 
 	@Override
 	public boolean isCorrectType(ServerComponent component) {
@@ -343,13 +347,7 @@ public abstract class ConfiguratorAbstract
 						//defProperties.remove(key);
 						log.config("Added default config parameter: (" + key + "=" + value + ")");
 					} else {
-						Object val = value;
-						if (key.matches(".*\\[[LISBlisb]\\]$")) {
-							char c = key.charAt(key.length() - 2);
-							key = key.substring(0, key.length() - 3);
-							val = DataTypes.decodeValueType(c, value);
-						}
-						initSettings.put(key.trim(), val);
+						initSettings.add(key + "=" + value);
 					}
 				}
 			} catch (FileNotFoundException e) {
@@ -363,7 +361,7 @@ public abstract class ConfiguratorAbstract
 	}
 
 
-	public void init(String[] args) throws ConfigurationException {
+	public void init(String[] args) throws ConfigurationException, TigaseDBException {
 		parseArgs(args);
 		String cnf_class_name = System.getProperty(CONFIG_REPO_CLASS_PROP_KEY);
 		if (cnf_class_name != null) {
@@ -374,14 +372,25 @@ public abstract class ConfiguratorAbstract
 			try {
 			  configRepo = (ConfigRepositoryIfc)Class.forName(cnf_class_name).newInstance();
 			} catch (Exception e) {
-				log.log(Level.WARNING, "Propeblem initializing configuration system: ", e);
-				System.err.println("Propeblem initializing configuration system: " + e);
+				log.log(Level.SEVERE, "Problem initializing configuration system: ", e);
+				log.log(Level.SEVERE, "Please check settings, and rerun the server.");
+				log.log(Level.SEVERE, "Server is stopping now.");
+				System.err.println("Problem initializing configuration system: " + e);
+				System.err.println("Please check settings, and rerun the server.");
+				System.err.println("Server is stopping now.");
 				System.exit(1);
 			}
 		}
+		configRepo.setDefHostname(getDefHostName());
 		configRepo.init(initProperties);
-		for (Map.Entry<String, Object> entry : initSettings.entrySet()) {
-			configRepo.addItem(entry.getKey(), entry.getValue());
+		for (String prop : initSettings) {
+			ConfigItem item = configRepo.getItemInstance();
+			item.initFromPropertyString(prop);
+			configRepo.addItem(item);
+		}
+		Map<String, Object> repoInitProps = configRepo.getInitProperties();
+		if (repoInitProps != null) {
+			initProperties.putAll(repoInitProps);
 		}
 	}
 
@@ -398,8 +407,6 @@ public abstract class ConfiguratorAbstract
 			throws ConfigurationException {
 		return configRepo.getProperties(nodeId);
 	}
-
-
 
 	private void setupLogManager(Map<String, Object> properties) {
 		Set<Map.Entry<String, Object>> entries = properties.entrySet();
@@ -429,6 +436,12 @@ public abstract class ConfiguratorAbstract
     } catch (IOException e) {
       log.log(Level.SEVERE, "Can not configure logManager", e);
     } // end of try-catch
+	}
+
+	@Override
+	public void initBindings(Bindings binds) {
+		super.initBindings(binds);
+		binds.put(ComponentRepository.COMP_REPO_BIND, configRepo);
 	}
 
 }

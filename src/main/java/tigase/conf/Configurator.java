@@ -30,4 +30,14 @@ package tigase.conf;
  */
 public class Configurator extends ConfiguratorAbstract {
 
+	@Override
+	public String getDiscoDescription() {
+		return "Configuration management";
+	}
+
+	@Override
+	public String getDiscoCategoryType() {
+		return "generic";
+	}
+
 }
