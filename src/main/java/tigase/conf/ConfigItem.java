@@ -22,8 +22,11 @@
 
 package tigase.conf;
 
+import java.util.logging.Logger;
 import tigase.db.RepositoryItem;
+import tigase.server.Command;
 import tigase.server.Packet;
+import tigase.util.DataTypes;
 import tigase.xml.Element;
 
 /**
@@ -34,15 +37,31 @@ import tigase.xml.Element;
  */
 public class ConfigItem implements RepositoryItem {
 
+	/**
+	 * Private logger for class instancess.
+   */
+  private static final Logger log = Logger.getLogger(ConfigItem.class.getName());
+
 	public enum FLAGS {
 		INITIAL,
 		DEFAULT,
 		UPDATED;
 	}
 
-	enum TYPE {
+	public static final String REPO_ITEM_ELEM_NAME = "prop";
+	public static final String CLUSTER_NODE_ATTR = "cluster-node";
+	public static final String COMPONENT_NAME_ATTR = "comp-name";
+	public static final String NODE_NAME_ATTR = "node-name";
+	public static final String KEY_NAME_ATTR = "key-name";
+	public static final String VALUE_ATTR = "value";
+	public static final String FLAG_ATTR = "flag";
+	public static final String VALUE_TYPE_ATTR = "value-type";
 
-	}
+	//public static final String CLUSTER_NODE_LABEL = "Cluster node";
+	public static final String COMPONENT_NAME_LABEL = "Component name";
+	public static final String NODE_NAME_LABEL = "Property node name";
+	public static final String KEY_NAME_LABEL = "Property key name";
+	public static final String VALUE_LABEL = "Propety value";
 
 	private String clusterNode = null;
 	private String compName = null;
@@ -82,15 +101,19 @@ public class ConfigItem implements RepositoryItem {
 		return value;
 	}
 
+	public String getConfigValToString() {
+		return DataTypes.valueToString(value);
+	}
+
 	public String getCompName() {
 		return compName;
 	}
 
 	public void set(String clusterNode, String compName, String nodeName, String key,
 			Object value, FLAGS flag) {
-		if (clusterNode != null) {
-			this.clusterNode = clusterNode;
-		}
+//		if (clusterNode != null) {
+//			this.clusterNode = clusterNode;
+//		}
 		if (compName != null) {
 			this.compName = compName;
 		}
@@ -106,11 +129,20 @@ public class ConfigItem implements RepositoryItem {
 		if (flag != null) {
 			this.flag = flag;
 		}
+		lastModificationTime = System.currentTimeMillis();
 	}
 
-	public void set(String compName, String nodeName, String key, Object value,
-			FLAGS flag) {
-		set(null, compName, nodeName, key, value, flag);
+	public void set(String compName_m, String nodeName_m, String key_m,
+			String value_str_m, char val_type_m, String flag_str_m) {
+		Object value_m = DataTypes.decodeValueType(val_type_m, value_str_m);
+		ConfigItem.FLAGS flag_m = ConfigItem.FLAGS.DEFAULT;
+		try {
+			flag = ConfigItem.FLAGS.valueOf(flag_str_m);
+		} catch (Exception e) {
+			log.warning("Incorrect config item flag: " + flag_str_m	+ ", setting DEFAULT.");
+			flag = ConfigItem.FLAGS.DEFAULT;
+		}
+		set(null, compName_m, nodeName_m, key_m, value_m, flag_m);
 	}
 
 	public void set(String compName, String nodeName, String key, Object value) {
@@ -185,12 +217,37 @@ public class ConfigItem implements RepositoryItem {
 
 	@Override
 	public void initFromPropertyString(String propString) {
-		throw new UnsupportedOperationException("Not supported yet.");
+		String[] prop = propString.split("=");
+		String key = prop[0].trim();
+		Object val = prop[1];
+		if (key.matches(".*\\[[LISBlisb]\\]$")) {
+			char c = key.charAt(key.length() - 2);
+			key = key.substring(0, key.length() - 3);
+			val = DataTypes.decodeValueType(c, prop[1]);
+		}
+		int idx1 = key.indexOf("/");
+		if (idx1 > 0) {
+			String compNameMeth = key.substring(0, idx1);
+			int idx2 = key.lastIndexOf("/");
+			String nodeNameMeth = null;
+			String keyNameMeth = key.substring(idx2 + 1);
+			if (idx1 != idx2) {
+				nodeNameMeth = key.substring(idx1 + 1, idx2);
+			}
+			set(compNameMeth, nodeNameMeth, keyNameMeth, val);
+		} else {
+			throw new IllegalArgumentException("You have to provide a key with at least" +
+					" 'component_name/key_name': " + key);
+		}
 	}
 
 	@Override
 	public String toPropertyString() {
-		throw new UnsupportedOperationException("Not supported yet.");
+		char t = DataTypes.getTypeId(value);
+		String result = getKey() + "[" + t + "]=";
+		String varr = DataTypes.valueToString(value);
+		result += varr;
+		return result;
 	}
 
 	@Override
@@ -198,9 +255,37 @@ public class ConfigItem implements RepositoryItem {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
+//	public static final String REPO_ITEM_ELEM_NAME = "prop";
+//	public static final String CLUSTER_NODE_ATTR = "cluster-node";
+//	public static final String COMPONENT_NAME_ATTR = "comp-name";
+//	public static final String NODE_NAME_ATTR = "node-name";
+//	public static final String KEY_NAME_ATTR = "key-name";
+//	public static final String VALUE_ATTR = "value";
+//	public static final String FLAG_ATTR = "flag";
+//	public static final String VALUE_TYPE_ATTR = "value-type";
+//
+//	private String clusterNode = null;
+//	private String compName = null;
+//	private String nodeName = null;
+//	private String keyName = null;
+//	private Object value = null;
+//  private FLAGS flag = FLAGS.DEFAULT;
+
 	@Override
 	public Element toElement() {
-		throw new UnsupportedOperationException("Not supported yet.");
+		Element elem = new Element(REPO_ITEM_ELEM_NAME);
+		if (clusterNode != null) {
+			elem.addAttribute(CLUSTER_NODE_ATTR, clusterNode);
+		}
+		elem.addAttribute(COMPONENT_NAME_ATTR, compName);
+		if (nodeName != null) {
+			elem.addAttribute(NODE_NAME_ATTR, nodeName);
+		}
+		elem.addAttribute(KEY_NAME_ATTR, keyName);
+		elem.addAttribute(VALUE_ATTR, DataTypes.valueToString(value));
+		elem.addAttribute(VALUE_TYPE_ATTR, "" + DataTypes.getTypeId(value));
+		elem.addAttribute(FLAG_ATTR, flag.name());
+		return elem;
 	}
 
 	/**
@@ -218,12 +303,66 @@ public class ConfigItem implements RepositoryItem {
 
 	@Override
 	public void addCommandFields(Packet packet) {
-		throw new UnsupportedOperationException("Not supported yet.");
+//		Command.addFieldValue(packet, CLUSTER_NODE_LABEL,
+//				(clusterNode != null ? clusterNode : ""));
+		Command.addFieldValue(packet, COMPONENT_NAME_LABEL,
+				(compName != null ? compName : ""));
+		Command.addFieldValue(packet, NODE_NAME_LABEL,
+				(nodeName != null ? nodeName : ""));
+		Command.addFieldValue(packet, KEY_NAME_LABEL,
+				(keyName != null ? keyName : ""));
+		String value_label = VALUE_LABEL;
+		String value_str = "";
+		if (value != null) {
+			value_str =  DataTypes.valueToString(value);
+			value_label += " [" + DataTypes.getTypeId(value) + "]";
+		}
+		Command.addFieldValue(packet, value_label, value_str);
 	}
 
 	@Override
 	public void initFromCommand(Packet packet) {
-		throw new UnsupportedOperationException("Not supported yet.");
+//		String tmp = Command.getFieldValue(packet, CLUSTER_NODE_LABEL);
+//		if (tmp != null && !tmp.isEmpty()) {
+//			clusterNode = tmp;
+//		}
+		String tmp = Command.getFieldValue(packet, COMPONENT_NAME_LABEL);
+		if (tmp != null && !tmp.isEmpty()) {
+			compName = tmp;
+		}
+		tmp = Command.getFieldValue(packet, NODE_NAME_LABEL);
+		if (tmp != null && !tmp.isEmpty()) {
+			nodeName = tmp;
+		}
+		tmp = Command.getFieldValue(packet, KEY_NAME_LABEL);
+		if (tmp != null && !tmp.isEmpty()) {
+			keyName = tmp;
+		}
+		String value_label = VALUE_LABEL;
+		if (value != null) {
+			value_label += " [" + DataTypes.getTypeId(value) + "]";
+		}
+		tmp = Command.getFieldValue(packet, value_label);
+		if (tmp != null && !tmp.isEmpty()) {
+			if (value != null) {
+				char t = DataTypes.getTypeId(value);
+				value = DataTypes.decodeValueType(t, tmp);
+			} else {
+				value = tmp;
+			}
+		}
+	}
+
+	public FLAGS getFlag() {
+		return flag;
+	}
+
+	public String getClusterNode() {
+		return clusterNode;
+	}
+
+	public String getNodeName() {
+		return nodeName;
 	}
 
 }
