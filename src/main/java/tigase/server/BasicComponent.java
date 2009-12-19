@@ -154,7 +154,9 @@ public class BasicComponent implements Configurable, XMPPService {
 
 	@Override
 	public void processPacket(Packet packet, Queue<Packet> results) {
-		throw new UnsupportedOperationException("Not supported yet.");
+		if (packet.isCommand() && getComponentId().equals(packet.getElemTo())) {
+			processScriptCommand(packet, results);
+		}
 	}
 
 	public void initBindings(Bindings binds) {
@@ -225,7 +227,7 @@ public class BasicComponent implements Configurable, XMPPService {
 				if (adminDir != null && adminDir.exists()) {
 					for (File f : adminDir.listFiles()) {
 						// Just regular files here....
-						if (f.isFile()) {
+						if (f.isFile() && !f.toString().endsWith("~")) {
 							String cmdId = null;
 							String cmdDescr = null;
 							String comp = null;
