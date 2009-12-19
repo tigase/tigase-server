@@ -321,7 +321,7 @@ public abstract class ConfiguratorAbstract
 					key = args[i];  val = Boolean.TRUE;
 					continue;
 				}
-				if ((args[i].startsWith("--") && !args[i].startsWith(GEN_CONFIG))) {
+				if ((args[i].startsWith("-") && !args[i].startsWith(GEN_CONFIG))) {
 					key = args[i];  val = args[++i];
 				}
 				if (key != null) {
@@ -342,7 +342,7 @@ public abstract class ConfiguratorAbstract
 				Set<String> prop_keys = defProps.stringPropertyNames();
 				for (String key: prop_keys) {
 					String value = defProps.getProperty(key).trim();
-					if (key.startsWith("--") || key.equals("config-type")) {
+					if (key.startsWith("-") || key.equals("config-type")) {
 						initProperties.put(key.trim(), value);
 						//defProperties.remove(key);
 						log.config("Added default config parameter: (" + key + "=" + value + ")");
