@@ -228,6 +228,7 @@ public class MessageRouterConfig {
 
 	public MessageRouterConfig(Map<String, Object> props) {
 		this.props = props;
+		//System.out.println("MessageRouterConfig() properties: " + props.toString());
 	}
 
 	public String[] getRegistrNames() {
@@ -235,6 +236,7 @@ public class MessageRouterConfig {
 		log.config(Arrays.toString(names));
 		ArrayList<String> al = new ArrayList<String>();
 		for (String name: names) {
+			//System.out.println("Checking: '" + REGISTRATOR_PROP_KEY + name + ".active'");
 			if ((Boolean)props.get(REGISTRATOR_PROP_KEY + name + ".active")) {
 				al.add(name);
 			} // end of if ((Boolean)props.get())
