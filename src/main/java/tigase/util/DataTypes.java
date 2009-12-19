@@ -22,6 +22,7 @@
 
 package tigase.util;
 
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -94,7 +95,7 @@ public class DataTypes {
 
 	public static Object decodeValueType(char typeId, String value)
 			throws IllegalArgumentException {
-		Object result = value;
+		Object result = value.trim();
 		try {
 			switch (typeId) {
 				case 'L':
@@ -111,7 +112,13 @@ public class DataTypes {
 					break;
 				case 's':
 					// Comma separated, Strings array
-					result = value.split(",");
+					String[] s_str = value.split(",");
+					String[] trimed_str = new String[s_str.length];
+					int si = 0;
+					for (String s : s_str) {
+						trimed_str[si++] = s.trim();
+					}
+					result = trimed_str;
 					break;
 				case 'l':
 					// Comma separated, long array
@@ -151,6 +158,30 @@ public class DataTypes {
 			throw new IllegalArgumentException(e);
 		}
 		return result;
+	}
+
+	public static String valueToString(Object value) {
+		char t = getTypeId(value);
+		String varr = value.toString();
+		switch (t) {
+			case 'l':
+				varr = Arrays.toString((long[])value);
+				break;
+			case 'i':
+				varr = Arrays.toString((int[])value);
+				break;
+			case 'b':
+				varr = Arrays.toString((boolean[])value);
+				break;
+			default:
+				if (value.getClass().isArray()) {
+					varr = Arrays.toString((Object[])value);
+				}
+		}
+		if (value.getClass().isArray()) {
+			varr = varr.substring(1, varr.length() - 1);
+		}
+		return varr;
 	}
 
 	public static char getTypeId(Object instance) {
