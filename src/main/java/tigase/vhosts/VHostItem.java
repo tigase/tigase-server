@@ -114,7 +114,7 @@ public class VHostItem implements RepositoryItem {
 	 * @param vhost is a <code>String</code> value with a domain name.
 	 */
 	public VHostItem(String vhost) {
-		this.vhost = vhost;
+		setVHost(vhost);
 	}
 
 	/**
@@ -124,7 +124,7 @@ public class VHostItem implements RepositoryItem {
 	 * @param elem is an <code>Element</code> object with virtual domain settings.
 	 */
 	public VHostItem(Element elem) {
-		vhost = elem.getAttribute(HOSTNAME_ATT);
+		setVHost(elem.getAttribute(HOSTNAME_ATT));
 		enabled = Boolean.parseBoolean(elem.getAttribute(ENABLED_ATT));
 		anonymousEnabled =
 						Boolean.parseBoolean(elem.getAttribute(ANONYMOUS_ENABLED_ATT));
@@ -318,9 +318,13 @@ public class VHostItem implements RepositoryItem {
 		return this.vhost;
 	}
 
+	public void setVHost(String vhost) {
+		this.vhost = vhost.toLowerCase();
+	}
+
 	@Override
 	public void initFromPropertyString(String propString) {
-		this.vhost = propString;
+		setVHost(propString);
 	}
 
 	@Override
@@ -334,7 +338,7 @@ public class VHostItem implements RepositoryItem {
 			throw new IllegalArgumentException("Incorrect element name, expected: " +
 					VHOST_ELEM);
 		}
-		vhost = elem.getAttribute(HOSTNAME_ATT);
+		setVHost(elem.getAttribute(HOSTNAME_ATT));
 		enabled = Boolean.parseBoolean(elem.getAttribute(ENABLED_ATT));
 		anonymousEnabled =
 						Boolean.parseBoolean(elem.getAttribute(ANONYMOUS_ENABLED_ATT));
