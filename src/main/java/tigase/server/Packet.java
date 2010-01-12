@@ -28,7 +28,6 @@ import java.util.LinkedHashSet;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
-import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 
 /**
@@ -242,32 +241,45 @@ public class Packet {
 		this.packetTo = to;
 	}
 
-	public JID getTo() {
-		return packetTo != null ? packetTo : stanzaTo;
-	}
-
-	public BareJID getToBareJID() {
-		return packetTo != null ? packetTo.getBareJID()
-				: (stanzaTo != null ? stanzaTo.getBareJID() : null);
-	}
-
-	public String getToHost() {
-		return packetTo != null ? packetTo.getDomain()
-				: (stanzaTo != null ? stanzaTo.getDomain() : null);
-	}
-
-	public String getToNick() {
-		return packetTo != null ? packetTo.getLocalpart()
-				: (stanzaTo != null ? stanzaTo.getLocalpart() : null);
+	public JID getPacketTo() {
+		return this.packetTo;
 	}
 
 	public void setPacketFrom(JID from) {
 		this.packetFrom = from;
 	}
 
+	public JID getPacketFrom() {
+		return this.packetFrom;
+	}
+
+	public JID getTo() {
+		return packetTo != null ? packetTo : stanzaTo;
+	}
+
 	public JID getFrom() {
 		return packetFrom != null ? packetFrom : stanzaFrom;
 	}
+
+	/**
+	 *
+	 * @return
+	 * @deprecated use getStanzaTo() instead
+	 */
+	@Deprecated
+	public String getElemTo() {
+		return stanzaTo != null ? stanzaTo.toString() : null;
+	}
+
+	/**
+	 *
+	 * @return
+	 * @deprecated use getStanzaFrom() instead.
+	 */
+	@Deprecated
+  public String getElemFrom() {
+		return stanzaFrom != null ? stanzaFrom.toString() : null;
+   }
 
 	/**
    * Returns packet destination address.
@@ -277,13 +289,13 @@ public class Packet {
 		return stanzaTo;
   }
 
-	public String getStanzaToHost() {
-		return stanzaTo != null ? stanzaTo.getDomain() : null;
-	}
-
-	public String getStanzaToNick() {
-		return stanzaTo != null ? stanzaTo.getLocalpart() : null;
-	}
+  /**
+   * Returns packet source address.
+	 * @return
+	 */
+  public JID getStanzaFrom() {
+    return stanzaFrom;
+  }
 
 	public String getAttribute(String key) {
 		return elem.getAttribute(key);
@@ -292,14 +304,6 @@ public class Packet {
 	public String getAttribute(String path, String attr_name) {
 		return elem.getAttribute(path, attr_name);
 	}
-
-  /**
-   * Returns packet source address.
-	 * @return
-	 */
-  public JID getStanzaFrom() {
-    return stanzaFrom;
-  }
 
 	public String getElemCData(final String path) {
 		return elem.getCData(path);
@@ -312,18 +316,6 @@ public class Packet {
 	public String getElemCData() {
 		return elem.getCData();
 	}
-
-//  public byte[] getByteData() {
-//    return elem.toString().getBytes();
-//  }
-//
-//  public String getStringData() {
-//    return elem.toString();
-//  }
-//
-//  public char[] getCharData() {
-//    return elem.toString().toCharArray();
-//  }
 
 	@Override
 	public String toString() {
@@ -363,26 +355,12 @@ public class Packet {
 		return result;
 	}
 
-// 	public Packet packRouted(final String from, final String to) {
-// 		Element routed = new Element("route", null, new String[] {"to", "from"},
-// 			new String[] {to, from});
-// 		routed.addChild(elem);
-// 		return new Packet(routed);
-// 	}
-
 	public Packet packRouted() {
 		Element routedp = new Element("route", new String[] {"to", "from"},
 			new String[] {getTo().toString(), getFrom().toString()});
 		routedp.addChild(elem);
 		return packetInstance(routedp, getFrom(), getTo());
 	}
-
-//	public Packet swapFromTo(Element el) throws TigaseStringprepException {
-//		Packet packet = packetInstance(el);
-//		packet.setPacketTo(getFrom());
-//		packet.setPacketFrom(getTo());
-//		return packet;
-//	}
 
 	public Packet swapFromTo(Element el, JID stanzaFrom, JID stanzaTo) {
 		Packet packet = packetInstance(el, stanzaFrom, stanzaTo);
@@ -410,11 +388,6 @@ public class Packet {
 		} // end of if (children == null) else
 		return null;
 	}
-
-// 	public Packet errorResult(final String errorType, final String errorCondition,
-// 			final String errorText, final boolean includeOriginalXML) {
-// 		return errorResult(errorType, null, errorCondition, errorText, includeOriginalXML);
-// 	}
 
 	public Packet errorResult(final String errorType, final Integer errorCode,
 		final String errorCondition, final String errorText,

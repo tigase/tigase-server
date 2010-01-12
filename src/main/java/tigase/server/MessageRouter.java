@@ -298,7 +298,7 @@ public class MessageRouter extends AbstractMessageReceiver
 		// Let's try to find message receiver quick way
 		// In case if packet is handled internally:
 //		String nick = JIDUtils.getNodeNick(packet.getTo());
-		String host = packet.getToHost();
+		String host = packet.getTo().getDomain();
 //		MessageReceiver first = null;
 		// Below code probably never get's executed anyway.
 		// All components included in commented code below should
