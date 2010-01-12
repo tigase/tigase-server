@@ -31,9 +31,56 @@ import tigase.xmpp.StanzaType;
 import tigase.xmpp.JID;
 
 /**
- * Class Packet
+ * Objects of this class carry a single XMPP packet (stanza).
+ * The XMPP stanza is carried as an XML element in DOM structure by the
+ * Packet object which contains some extra information and convenience methods
+ * to quickly access the most important stanza information.<p/>
+ * The stanza is accessible directly through the <code>getElement()</code> method
+ * and then it can be handles as an XML object. <br/>
+ * <strong>Please note! Even though the <code>Packet</code> object and carried the
+ * stanza <code>Element</code> is not unmodifiable it should be treated as such. This
+ * particular <code>Packet</code> can be processed concurrently at the same time in
+ * different components or plugins of the Tigase server. Modifying it may lead to
+ * unexpected and hard to diagnoze behaviours. Every time you want to change or
+ * update the object you should obtaina a copy of it using one of the utility methods:
+ * <code>copyElementOnly()</code>, <code>swapFromTo(...)</code>,
+ * <code>errorResult(...)</code>, <code>okResult(...)</code>,
+ * <code>swapStanzaFromTo(...)</code></strong><p/>
+ * There are no public constructors for the class, instead you have to use factory
+ * methods: <code>packetInstance(...)</code> which return instance of one of the
+ * classes: <code>Iq</code>, <code>Message</code> or <code>Presence</code>.
+ * While creating a new <code>Packet</code> instance JIDs are parsed and processed
+ * through the stringprep. Hence some of the factory methods may throw
+ * <code>TigaseStringprepException</code> exception. You can avoid this by using
+ * the methods which accept preparsed JIDs. Reusing preparsed JIDs is highly
+ * recommended.
+ * <p/>
+ * There are 3 kinds of addresses available from the <code>Packet</code> object:
+ * <em>PacketFrom/To</em>, <em>StanzaFrom/To</em> and <em>From/To</em>.<br/>
+ * <em>Stanza</em> addresses are the normal XMPP addresses parsed from the XML
+ * stanza and as a convenience are available through methods as JID objects. This is
+ * not only convenient to the developer but also this is important for performance
+ * reasons as parsing JID and processing it through stringprep is quite expensive
+ * operation so it is better to do it once and reuse the parsed objects. Please note
+ * that any of them can be null. Note also. You should avoid parsing stanza JIDs
+ * from the XML element in your code as this may impact the server performance.
+ * Reuse the JIDs provided from the <code>Packet</code> methods.<br/>
+ * <em>Packet</em> addresses are also JID objects but they may contain a different
+ * values from the <em>Stanza</em> addresses. These are the Tigase internal
+ * addresses used by the server and they usually contain Tigase component source
+ * and destination address. In most cases they are used between connection managers
+ * and session managers and can be ignored by other code. One advantage of setting
+ * <code>PacketFrom</code> address to address of your component
+ * (<code>getComponentId()</code>) address is that if there is a packet delivery problem
+ * it will be returned back to the sender with apropriate error message.<br/>
+ * <em>Simple From/To</em> addresses contains values following the logic: If
+ * PacketFrom/To is not null then it contains PacketFrom/To values otherwise it
+ * contains StanzaFrom/To values. This is because the Tigase server tries always
+ * to deliver and process the <code>Packet</code> using PacketFrom/To addresses if
+ * they are null then Stanza addresses are used instead. So these are just convenience
+ * methods which allow avoiding extra <code>IFs</code> in the program code and also
+ * save some CPU cycles.
  *
- * Represent one XMPP packet.
  *
  * Created: Tue Nov 22 07:07:11 2005
  *
@@ -494,7 +541,7 @@ public class Packet {
 		return result;
 	}
 
-	public Packet swapElemFromTo() {
+	public Packet swapStanzaFromTo() {
 		Element copy = elem.clone();
 		copy.setAttribute("to", getStanzaFrom().toString());
 		copy.setAttribute("from", getStanzaTo().toString());
@@ -503,7 +550,12 @@ public class Packet {
 		return result;
 	}
 
-	public Packet swapElemFromTo(final StanzaType type) {
+	@Deprecated
+	public Packet swapElemFromTo() {
+		return swapStanzaFromTo();
+	}
+
+	public Packet swapStanzaFromTo(final StanzaType type) {
 		Element copy = elem.clone();
 		copy.setAttribute("to", getStanzaFrom().toString());
 		copy.setAttribute("from", getStanzaTo().toString());
@@ -511,6 +563,11 @@ public class Packet {
 		Packet result = packetInstance(copy, getStanzaTo(), getStanzaFrom());
 		result.setPriority(priority);
 		return result;
+	}
+
+	@Deprecated
+	public Packet swapElemFromTo(final StanzaType type) {
+		return swapStanzaFromTo(type);
 	}
 
 	public boolean isCommand() {
