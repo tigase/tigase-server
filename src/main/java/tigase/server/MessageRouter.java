@@ -49,6 +49,7 @@ import tigase.disco.ServiceIdentity;
 
 import tigase.stats.StatisticsList;
 import tigase.sys.TigaseRuntime;
+import tigase.xmpp.JID;
 import static tigase.server.MessageRouterConfig.*;
 
 /**
@@ -84,14 +85,23 @@ public class MessageRouter extends AbstractMessageReceiver
 		new ConcurrentHashMap<String, XMPPService>();
   private Map<String, ServerComponent> components =
     new ConcurrentHashMap<String, ServerComponent>();
-  private Map<String, ServerComponent> components_byId =
-    new ConcurrentHashMap<String, ServerComponent>();
+  private Map<JID, ServerComponent> components_byId =
+    new ConcurrentHashMap<JID, ServerComponent>();
   private Map<String, ComponentRegistrator> registrators =
     new ConcurrentHashMap<String, ComponentRegistrator>();
   private Map<String, MessageReceiver> receivers =
     new ConcurrentHashMap<String, MessageReceiver>();
 
-	public void processPacketMR(final Packet packet, final Queue<Packet> results) {
+	public void processPacketMR(Packet packet, Queue<Packet> results) {
+		Iq iq = null;
+		if (packet instanceof Iq) {
+			iq = (Iq)packet;
+		} else {
+			// Not a command for sure...
+			log.warning("I expect command (Iq) packet here, instead I got: " + packet.
+					toString());
+			return;
+		}
 		if (packet.getPermissions() != Permissions.ADMIN) {
 			try {
 				Packet res = Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
@@ -105,30 +115,32 @@ public class MessageRouter extends AbstractMessageReceiver
 		}
 
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Command received: " + packet.getStringData());
+			log.finest("Command received: " + iq.toString());
 		}
-		switch (packet.getCommand()) {
-		case OTHER:
-			if (packet.getStrCommand() != null) {
-				if (packet.getStrCommand().startsWith("controll/")) {
-					String[] spl = packet.getStrCommand().split("/");
-					String cmd = spl[1];
-					if (cmd.equals("stop")) {
-						Packet result = packet.commandResult(Command.DataType.result);
-						results.offer(result);
-						//processPacket(result);
-						new Timer("Stopping...", true).schedule(new TimerTask() {
-							@Override
-							public void run() {
-								System.exit(0);
-							}
-						}, 2000);
+		switch (iq.getCommand()) {
+			case OTHER:
+				if (iq.getStrCommand() != null) {
+					if (iq.getStrCommand().startsWith("controll/")) {
+						String[] spl = iq.getStrCommand().split("/");
+						String cmd = spl[1];
+						if (cmd.equals("stop")) {
+							Packet result =
+									iq.commandResult(Command.DataType.result);
+							results.offer(result);
+							//processPacket(result);
+							new Timer("Stopping...", true).schedule(new TimerTask() {
+
+								@Override
+								public void run() {
+									System.exit(0);
+								}
+							}, 2000);
+						}
 					}
 				}
-			}
-			break;
-		default:
-			break;
+				break;
+			default:
+				break;
 		}
 	}
 
@@ -154,26 +166,27 @@ public class MessageRouter extends AbstractMessageReceiver
 		}
 	}
 
-	private ServerComponent getLocalComponent(String jid, String host, String nick) {
+	private ServerComponent getLocalComponent(JID jid) {
 		ServerComponent comp = components_byId.get(jid);
 		if (comp != null) {
 			return comp;
 		}
 
-		if (nick != null) {
-			comp = components.get(nick);
-			if (comp != null && 
-							(isLocalDomain(host) || host.equals(getDefHostName()))) {
+		if (jid.getLocalpart() != null) {
+			comp = components.get(jid.getLocalpart());
+			if (comp != null
+					&& (isLocalDomain(jid.getDomain())
+					|| jid.getDomain().equals(getDefHostName()))) {
 				return comp;
 			}
 		}
-		int idx = host.indexOf('.');
+		int idx = jid.getDomain().indexOf('.');
 		if (idx > 0) {
-			String cmpName = host.substring(0, idx);
-			String basename = host.substring(idx + 1);
+			String cmpName = jid.getDomain().substring(0, idx);
+			String basename = jid.getDomain().substring(idx + 1);
 			comp = components.get(cmpName);
-			if (comp != null &&
-							(isLocalDomain(basename) || basename.equals(getDefHostName()))) {
+			if (comp != null 
+					&& (isLocalDomain(basename) || basename.equals(getDefHostName()))) {
 				return comp;
 			}
 		}
@@ -200,8 +213,7 @@ public class MessageRouter extends AbstractMessageReceiver
 	public void processPacket(Packet packet) {
 
 		if (packet.getTo() == null) {
-			log.warning("Packet with TO attribute set to NULL: "
-				+	packet.getStringData());
+			log.warning("Packet with TO attribute set to NULL: " +	packet.toString());
 			return;
 		} // end of if (packet.getTo() == null)
 
@@ -237,21 +249,20 @@ public class MessageRouter extends AbstractMessageReceiver
 						packet.getFrom() != null &&
 						packet.getFrom().equals(packet.getTo())) ||
 						(packet.getFrom() == NULL_ROUTING &&
-						packet.getElemFrom() != null &&
-						packet.getElemFrom().equals(packet.getTo()))) {
+						packet.getStanzaFrom() != null &&
+						packet.getStanzaFrom().equals(packet.getTo()))) {
 			log.warning("Possible infinite loop, dropping packet: "
 				+ packet.toStringSecure());
 			return;
 		}
 
-		ServerComponent comp = packet.getElemTo() == null ? null
-      : getLocalComponent(packet.getElemTo(), packet.getElemToHost(),
-			packet.getElemToNick());
+		ServerComponent comp = packet.getStanzaTo() == null ? null
+      : getLocalComponent(packet.getStanzaTo());
 		if (packet.isServiceDisco() && packet.getType() != null &&
 						packet.getType() == StanzaType.get &&
-						packet.getElemFrom() != null &&
+						packet.getStanzaFrom() != null &&
 						((comp != null && !(comp instanceof DisableDisco)) ||
-						isLocalDomain(packet.getElemTo()))) {
+						isLocalDomain(packet.getStanzaTo().toString()))) {
 			Queue<Packet> results = new ArrayDeque<Packet>();
 			processDiscoQuery(packet, results);
 			if (results.size() > 0) {
@@ -263,8 +274,7 @@ public class MessageRouter extends AbstractMessageReceiver
 			return;
 		}
 //		String id =  packet.getToId();
-		comp = getLocalComponent(packet.getToId(), packet.getToHost(),
-						packet.getToNick());
+		comp = getLocalComponent(packet.getTo());
 		if (comp != null) {
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("Packet will be processed by: " + comp.getComponentId());
@@ -306,7 +316,7 @@ public class MessageRouter extends AbstractMessageReceiver
 
 		ServerComponent[] comps = getComponentsForLocalDomain(host);
 		if (comps == null) {
-			comps = getServerComponentsForRegex(packet.getToId());
+			comps = getServerComponentsForRegex(packet.getTo().getBareJID().toString());
 		}
 		if (comps == null && !isLocalDomain(host)) {
 			comps = getComponentsForNonLocalDomain(host);
@@ -581,14 +591,13 @@ public class MessageRouter extends AbstractMessageReceiver
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Processing disco query by: " + packet.toStringSecure());
 		}
-		String jid = packet.getElemTo();
-		String nick = packet.getElemToNick();
-		String from = packet.getElemFrom();
+		JID jid = packet.getStanzaTo();
+		JID from = packet.getStanzaFrom();
 		String node = packet.getAttribute("/iq/query", "node");
 		Element query = packet.getElement().getChild("query").clone();
 
 		if (packet.isXMLNS("/iq/query", INFO_XMLNS)) {
-			if (isLocalDomain(jid) && node == null) {
+			if (isLocalDomain(jid.toString()) && node == null) {
 				query = getDiscoInfo(node, jid, from);
 				for (XMPPService comp : xmppServices.values()) {
 					List<Element> features = comp.getDiscoFeatures(from);
@@ -610,7 +619,7 @@ public class MessageRouter extends AbstractMessageReceiver
 		}
 
 		if (packet.isXMLNS("/iq/query", ITEMS_XMLNS)) {
-			boolean localDomain = isLocalDomain(jid);
+			boolean localDomain = isLocalDomain(jid.toString());
 			if (localDomain) {
 				for (XMPPService comp : xmppServices.values()) {
 					//	if (localDomain || (nick != null && comp.getName().equals(nick))) {
@@ -624,8 +633,7 @@ public class MessageRouter extends AbstractMessageReceiver
 					}
 				} // end of for ()
 			} else {
-				ServerComponent comp = getLocalComponent(packet.getElemTo(),
-						packet.getElemToHost(), packet.getElemToNick());
+				ServerComponent comp = getLocalComponent(jid);
 				if (comp != null && comp instanceof XMPPService) {
 					List<Element> items = ((XMPPService)comp).getDiscoItems(node, jid, from);
 					if (log.isLoggable(Level.FINEST)) {
@@ -647,7 +655,7 @@ public class MessageRouter extends AbstractMessageReceiver
 	}
 
 	@Override
-	public Element getDiscoInfo(String node, String jid, String from) {
+	public Element getDiscoInfo(String node, JID jid, JID from) {
 		Element query = serviceEntity.getDiscoInfo(null);
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Returing disco-info: " + query.toString());

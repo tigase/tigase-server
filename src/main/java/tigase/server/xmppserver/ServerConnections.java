@@ -29,6 +29,7 @@ import java.util.logging.Level;
 
 import tigase.xmpp.XMPPIOService;
 import tigase.server.Packet;
+import tigase.xmpp.BareJID;
 
 /**
  * Describe class ServerConnections here.
@@ -81,7 +82,7 @@ public class ServerConnections {
 
 	private long sentPackets = 0;
 	private long receivedPackets = 0;
-	private String cid = null;
+	private CID cid = null;
 
 	private ConnectionHandlerIfc<XMPPIOService<Object>> handler = null;
 
@@ -97,14 +98,16 @@ public class ServerConnections {
 	 * Creates a new <code>ServerConnections</code> instance.
 	 *
 	 *
-	 * @param handler 
+	 * @param handler
+	 * @param cid
 	 */
-	public ServerConnections(ConnectionHandlerIfc<XMPPIOService<Object>> handler, String cid) {
+	public ServerConnections(ConnectionHandlerIfc<XMPPIOService<Object>> handler,
+			CID cid) {
 		this.handler = handler;
 		this.cid = cid;
 	}
 
-	public String getCID() {
+	public CID getCID() {
 		return cid;
 	}
 
@@ -143,7 +146,7 @@ public class ServerConnections {
 	public synchronized boolean sendControlPacket(Packet packet) {
 		boolean result = false;
 		if (outgoing != null && outgoing.isConnected()
-			&& (conn_state == OutgoingState.OK
+				&& (conn_state == OutgoingState.OK
 				|| conn_state == OutgoingState.HANDSHAKING)) {
 			result = handler.writePacketToSocket(outgoing, packet);
 			if (!result) {
@@ -154,8 +157,8 @@ public class ServerConnections {
 		if (!result) {
 			addControlPacket(packet);
 			if (log.isLoggable(Level.FINEST)) {
-    			log.finest("Inserted to waiting queue packet: " + packet.toString());
-            }
+				log.finest("Inserted to waiting queue packet: " + packet);
+			}
 		}
 		return result;
 	}

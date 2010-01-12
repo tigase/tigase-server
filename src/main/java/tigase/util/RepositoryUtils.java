@@ -30,6 +30,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.Writer;
+import tigase.xmpp.JID;
 import tigase.xmpp.impl.roster.RosterAbstract;
 
 /**
@@ -95,15 +96,15 @@ public class RepositoryUtils {
 		}
 	}
 
-	public static void printNode(String user, UserRepository repo,
+	public static void printNode(JID user, UserRepository repo,
 		String prefix, String node)	throws Exception {
 		if (node != null) {
 			System.out.println(prefix + "node: " + node);
 		} // end of if (node != null)
-		String[] keys = repo.getKeys(user, node);
+		String[] keys = repo.getKeys(user.toString(), node);
 		if (keys != null) {
 			for (String key: keys) {
-				String[] vals = repo.getDataList(user, node, key);
+				String[] vals = repo.getDataList(user.toString(), node, key);
 				if (vals != null) {
 					StringBuilder valstr = new StringBuilder();
 					for (String val: vals) {
@@ -115,7 +116,7 @@ public class RepositoryUtils {
 				} // end of if (vals != null) else
 			} // end of for (String key: keys)
 		} // end of if (keys != null)
-		String[] nodes = repo.getSubnodes(user, node);
+		String[] nodes = repo.getSubnodes(user.toString(), node);
 		if (nodes != null) {
 			for (String subnode: nodes) {
 				printNode(user, repo, prefix + "  ",
@@ -127,13 +128,13 @@ public class RepositoryUtils {
 	public static void printRepoContent(UserRepository repo)
 		throws Exception {
 		if (user != null) {
-			printNode(user, repo, "  ", subnode);
+			printNode(new JID(user), repo, "  ", subnode);
 		} else {
 			List<String> users = repo.getUsers();
 			if (users != null) {
 				for (String usr: users) {
 					System.out.println(usr);
-					printNode(usr, repo, "  ", subnode);
+					printNode(new JID(usr), repo, "  ", subnode);
 				} // end of for (String user: users)
 			} else {
 				System.out.println("There are no user accounts in repository.");
@@ -141,29 +142,28 @@ public class RepositoryUtils {
 		}
 	}
 
-	public static boolean checkJID(String jid) {
-		String nick_check = JIDUtils.checkNickName(JIDUtils.getNodeNick(jid));
-		if (nick_check != null) {
-			System.out.println("      Invalid nickname - " + JIDUtils.getNodeNick(jid)
-				+ ": " + nick_check);
-			return false;
-		}
-		String host_check = JIDUtils.checkNickName(JIDUtils.getNodeHost(jid));
-		if (host_check != null) {
-			System.out.println("      Invalid hostname - " + JIDUtils.getNodeHost(jid)
-				+ ": " + host_check);
-			return false;
-		}
-		return true;
-	}
+//	public static boolean checkJID(JID jid) {
+//		String nick_check = JIDUtils.checkNickName(JIDUtils.getNodeNick(jid));
+//		if (nick_check != null) {
+//			System.out.println("      Invalid nickname - " + JIDUtils.getNodeNick(jid)
+//				+ ": " + nick_check);
+//			return false;
+//		}
+//		String host_check = JIDUtils.checkNickName(JIDUtils.getNodeHost(jid));
+//		if (host_check != null) {
+//			System.out.println("      Invalid hostname - " + JIDUtils.getNodeHost(jid)
+//				+ ": " + host_check);
+//			return false;
+//		}
+//		return true;
+//	}
 
-	public static boolean checkContact(String user, UserRepository repo,
-		String contact) throws Exception {
-		if (!checkJID(contact)) {
-			return false;
-		}
+	public static boolean checkContact(JID user, UserRepository repo,
+			String cont) throws Exception {
 		//String[] keys = repo.getKeys(user, "roster/"+contact);
-		String[] vals = repo.getDataList(user, "roster/"+contact, RosterAbstract.GROUPS);
+		JID contact = new JID(cont);
+		String[] vals = repo.getDataList(user.toString(), "roster/" + contact,
+				RosterAbstract.GROUPS);
 		if (vals == null || vals.length == 0) {
 			System.out.println("      Empty groups list");
 			if (!allowed_empty_groups) {
@@ -183,50 +183,39 @@ public class RepositoryUtils {
 
 	private static long counter = 0;
 
-	public static void repairUserRoster(String user, UserRepository repo)
+	public static void repairUserRoster(JID user, UserRepository repo)
 		throws Exception {
 		System.out.println("  " + (++counter) + ". " + user + " roster: ");
-		if (!checkJID(user)) {
-			System.out.println("    Invalid user ID, should be removed...");
-			String[] contacts = repo.getSubnodes(user, "roster");
-			if (contacts == null || contacts.length == 0) {
-				System.out.println("    empty contact list, save to remove...");
-				repo.removeUser(user);
-			} else {
-				System.out.println("    non-empty contact list, leaving for now...");
-			}
+		String[] contacts = repo.getSubnodes(user.toString(), "roster");
+		if (contacts != null) {
+			for (String contact : contacts) {
+				System.out.println("    contact: " + contact);
+				boolean valid = checkContact(user, repo, contact);
+				if (valid) {
+					System.out.println("      looks OK");
+				} else {
+					System.out.println("      should be REMOVED");
+					String contact_node = "roster/" + contact;
+					System.out.println("      removing node: " + contact_node);
+					repo.removeSubnode(user.toString(), contact_node);
+					System.out.println("      DONE.");
+				}
+			} // end of for (String node: nodes)
 		} else {
-			String[] contacts = repo.getSubnodes(user, "roster");
-			if (contacts != null) {
-				for (String contact: contacts) {
-					System.out.println("    contact: " + contact);
-					boolean valid = checkContact(user, repo, contact);
-					if (valid) {
-						System.out.println("      looks OK");
-					} else {
-						System.out.println("      should be REMOVED");
-						String contact_node = "roster/" + contact;
-						System.out.println("      removing node: " + contact_node);
-						repo.removeSubnode(user, contact_node);
-						System.out.println("      DONE.");
-					}
-				} // end of for (String node: nodes)
-			} else {
-				System.out.println("    empty roster...");
-			}
+			System.out.println("    empty roster...");
 		}
 	}
 
 	public static void repairRoster(UserRepository repo)
 		throws Exception {
 		if (user != null) {
-			repairUserRoster(user, repo);
+			repairUserRoster(new JID(user), repo);
 		} else {
 			List<String> users = repo.getUsers();
 			if (users != null) {
 				for (String usr: users) {
 					//System.out.println(usr);
-					repairUserRoster(usr, repo);
+					repairUserRoster(new JID(usr), repo);
 				} // end of for (String user: users)
 			} else {
 				System.out.println("There are no user accounts in repository.");
@@ -234,34 +223,24 @@ public class RepositoryUtils {
 		}
 	}
 
-	public static void exportUserRoster(String user, UserRepository repo, Writer w)
+	public static void exportUserRoster(JID user, UserRepository repo, Writer w)
 		throws Exception {
 		System.out.println("  " + (++counter) + ". " + user + " roster: ");
-		if (!checkJID(user)) {
-			System.out.println("    Invalid user ID, should be removed...");
-			String[] contacts = repo.getSubnodes(user, "roster");
-			if (contacts == null || contacts.length == 0) {
-				System.out.println("    empty contact list, save to remove...");
-				repo.removeUser(user);
-			} else {
-				System.out.println("    non-empty contact list, leaving for now...");
-			}
-		} else {
-			String[] contacts = repo.getSubnodes(user, "roster");
-			if (contacts != null) {
+		String[] contacts = repo.getSubnodes(user.toString(), "roster");
+		if (contacts != null) {
 				for (String contact: contacts) {
 					System.out.println("    contact: " + contact);
 					boolean valid = checkContact(user, repo, contact);
 					if (valid) {
 						System.out.println("      looks OK");
-						String password = repo.getData(user, "password");
+						String password = repo.getData(user.toString(), "password");
 						String[] groups =
-              repo.getDataList(user, "roster/"+contact, RosterAbstract.GROUPS);
+              repo.getDataList(user.toString(), "roster/"+contact, RosterAbstract.GROUPS);
 						String contact_nick =
-              repo.getData(user, "roster/"+contact, RosterAbstract.NAME);
+              repo.getData(user.toString(), "roster/"+contact, RosterAbstract.NAME);
 						String subscription =
-              repo.getData(user, "roster/"+contact, RosterAbstract.SUBSCRIPTION);
-						StringBuilder sb = new StringBuilder(user);
+              repo.getData(user.toString(), "roster/"+contact, RosterAbstract.SUBSCRIPTION);
+						StringBuilder sb = new StringBuilder(user.toString());
 						sb.append(",");
 						if (password != null) {
 							sb.append(password);
@@ -293,19 +272,18 @@ public class RepositoryUtils {
 			} else {
 				System.out.println("    empty roster...");
 			}
-		}
 	}
 
 	public static void exportRoster(UserRepository repo, Writer w)
 	  throws Exception {
 		if (user != null) {
-			exportUserRoster(user, repo, w);
+			exportUserRoster(new JID(user), repo, w);
 		} else {
 			List<String> users = repo.getUsers();
 			if (users != null) {
 				for (String usr: users) {
 					//System.out.println(usr);
-					exportUserRoster(usr, repo, w);
+					exportUserRoster(new JID(usr), repo, w);
 				} // end of for (String user: users)
 			} else {
 				System.out.println("There are no user accounts in repository.");
@@ -688,7 +666,7 @@ public class RepositoryUtils {
 		if (check_roster && src_repo != null) {
 			System.out.println("Checking roster:");
 			if (user != null) {
-				repairUserRoster(user, src_repo);
+				repairUserRoster(new JID(user), src_repo);
 			} else {
 				repairRoster(src_repo);
 			} // end of else
@@ -728,7 +706,7 @@ public class RepositoryUtils {
 		if (export_data && src_repo != null) {
 			FileWriter fr = new FileWriter(export_file);
 			if (user != null) {
-				exportUserRoster(user, src_repo, fr);
+				exportUserRoster(new JID(user), src_repo, fr);
 			} else {
 				exportRoster(src_repo, fr);
 			} // end of else
@@ -749,9 +727,9 @@ public class RepositoryUtils {
 					System.out.println(src_repo.getData(user, subnode, key, null));
 				} else {
 					if (node) {
-						printNode(user, src_repo, "  ", subnode);
+						printNode(new JID(user), src_repo, "  ", subnode);
 					} else {
-						printNode(user, src_repo, "", null);
+						printNode(new JID(user), src_repo, "", null);
 					} // end of else
 				} // end of else
 			} else {

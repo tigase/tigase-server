@@ -97,8 +97,8 @@ public class StartZLib extends XMPPProcessor
 			Command.setData(result, compressed);
 			results.offer(result);
 		}	else {
-      log.warning("Unknown ZLIB element: " + packet.getStringData());
-			results.offer(packet.swapFromTo(failure));
+      log.warning("Unknown ZLIB element: " + packet);
+			results.offer(packet.swapFromTo(failure, null, null));
 			results.offer(Command.CLOSE.getPacket(packet.getTo(),
 					packet.getFrom(), StanzaType.set, session.nextStanzaId()));
 		}

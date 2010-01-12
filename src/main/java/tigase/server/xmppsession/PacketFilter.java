@@ -24,17 +24,17 @@ package tigase.server.xmppsession;
 import java.util.Queue;
 import java.util.logging.Logger;
 import java.util.logging.Level;
-import tigase.conf.Configurable;
 import tigase.db.NonAuthUserRepository;
+import tigase.server.BasicComponent;
 import tigase.server.Packet;
 import tigase.sys.TigaseRuntime;
-import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.PacketErrorTypeException;
-import tigase.util.JIDUtils;
+import tigase.xmpp.BareJID;
+import tigase.xmpp.JID;
 
 //import static tigase.xmpp.impl.Roster.PresenceType;
 
@@ -128,12 +128,23 @@ public class PacketFilter {
 					}
 					return true;
 				} else {
-					String from_jid = session.getJID();
-					if (from_jid != null && !from_jid.isEmpty()) {
-						if (log.isLoggable(Level.FINEST)) {
-							log.finest("Setting correct from attribute: " + from_jid);
+					JID from_jid = session.getJID();
+					if (from_jid != null) {
+						// Do not replace current settings if there is at least correct BareJID
+						// already set.
+						if (packet.getStanzaFrom() == null
+								|| !from_jid.getBareJID().equals(packet.getStanzaFrom().getBareJID())) {
+							if (log.isLoggable(Level.FINEST)) {
+								log.finest("Setting correct from attribute: " + from_jid);
+							}
+							packet.getElement().setAttribute("from", from_jid.toString());
+							packet.initVars(from_jid, packet.getStanzaTo());
+						} else {
+							if (log.isLoggable(Level.FINEST)) {
+								log.finest("Skipping setting correct from attribute: " + from_jid
+										+ ", is already correct.");
+							}
 						}
-						packet.getElement().setAttribute("from", from_jid);
 					} else {
 						log.warning("Session is authenticated but session.getJid() is empty: " +
 										packet.toStringSecure());
@@ -186,7 +197,7 @@ public class PacketFilter {
 
 		try {
 			// Can not forward packet if there is no destination address
-			if (packet.getElemTo() == null) {
+			if (packet.getStanzaTo() == null) {
 				// If this is simple <iq type="result"/> then ignore it
 				// and consider it OK
 				if (packet.getElemName().equals("iq")
@@ -195,8 +206,7 @@ public class PacketFilter {
 					return true;
 				}
 				if (log.isLoggable(Level.INFO)) {
-					log.info("No 'to' address, can't deliver packet: " + packet.
-							getStringData());
+					log.info("No 'to' address, can't deliver packet: " + packet.toString());
 				}
 				return false;
 			}
@@ -214,32 +224,34 @@ public class PacketFilter {
 
 			//String id = null;
 
-			String to = JIDUtils.getNodeID(packet.getElemTo());
-			if (to.equals(session.getUserId())) {
+			JID to = packet.getStanzaTo();
+			if (to.getBareJID().equals(session.getUserId())) {
 				// Yes this is message to 'this' client
-				if (session.getConnectionId() == Configurable.NULL_ROUTING) {
+				if (session.getConnectionId() == BasicComponent.NULL_ROUTING) {
 					results.offer(Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(
 									packet, "Features not implemented yet.", true));
 				} else {
 					if (log.isLoggable(Level.FINEST)) {
 						log.finest("Yes, this is packet to 'this' client: " + to);
 					}
-					Element elem = packet.getElement().clone();
-					Packet result = new Packet(elem);
-					result.setTo(session.getConnectionId(packet.getElemTo()));
-					if (log.isLoggable(Level.FINEST)) {
-						log.finest("Setting to: " + result.getTo());
-					}
-					result.setFrom(packet.getTo());
+//					Element elem = packet.getElement().clone();
+//					Packet result = new Packet(elem);
+//					result.setTo(session.getConnectionId(packet.getElemTo()));
+//					if (log.isLoggable(Level.FINEST)) {
+//						log.finest("Setting to: " + result.getTo());
+//					}
+//					result.setFrom(packet.getTo());
+					Packet result = packet.copyElementOnly();
+					result.setPacketFrom(packet.getTo());
+					result.setPacketTo(session.getConnectionId(packet.getStanzaTo()));
 					results.offer(result);
 				}
 				return true;
 			} // end of else
 
-			String from = JIDUtils.getNodeID(packet.getElemFrom());
+			BareJID from = packet.getStanzaFrom().getBareJID();
 			if (from.equals(session.getUserId())) {
-				Element elem = packet.getElement().clone();
-				Packet result = new Packet(elem);
+				Packet result = packet.copyElementOnly();
 //				String[] connIds = runtime.getConnectionIdsForJid(to);
 //				if (connIds != null && connIds.length > 0) {
 //					result.setTo(connIds[0]);
@@ -253,7 +265,7 @@ public class PacketFilter {
 			try {
 				results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 						"You must authorize session first.", true));
-				log.info("NotAuthorizedException for packet: "	+ packet.getStringData());
+				log.info("NotAuthorizedException for packet: "	+ packet.toString());
 			} catch (PacketErrorTypeException e2) {
 				log.info("Packet processing exception: " + e2);
 			}

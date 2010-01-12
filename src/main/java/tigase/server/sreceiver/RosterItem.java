@@ -21,6 +21,8 @@
  */
 package tigase.server.sreceiver;
 
+import tigase.xmpp.JID;
+
 /**
  * Describe class RosterItem here.
  *
@@ -32,7 +34,7 @@ package tigase.server.sreceiver;
  */
 public class RosterItem {
 
-	private String jid = null;
+	private JID jid = null;
 	private boolean online = false;
 	private boolean subscribed = false;
 	private boolean moderation_accepted = false;
@@ -43,7 +45,7 @@ public class RosterItem {
 	 * Creates a new <code>RosterItem</code> instance.
 	 *
 	 */
-	public RosterItem(String jid) {
+	public RosterItem(JID jid) {
 		this.jid = jid;
 	}
 
@@ -52,7 +54,7 @@ public class RosterItem {
 	 *
 	 * @return the value of jid
 	 */
-	public String getJid() {
+	public JID getJid() {
 		return this.jid;
 	}
 

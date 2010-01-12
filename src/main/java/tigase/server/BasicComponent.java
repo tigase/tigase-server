@@ -47,9 +47,11 @@ import tigase.server.script.AddScriptCommand;
 import tigase.server.script.CommandIfc;
 import tigase.server.script.RemoveScriptCommand;
 import tigase.util.DNSResolver;
-import tigase.util.JIDUtils;
+import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
+import tigase.xmpp.BareJID;
+import tigase.xmpp.JID;
 
 /**
  * Created: Oct 17, 2009 7:49:05 PM
@@ -64,26 +66,39 @@ public class BasicComponent implements Configurable, XMPPService {
    */
   private static final Logger log =
     Logger.getLogger(BasicComponent.class.getName());
+	public static JID NULL_ROUTING = null;
 
 	public static final String SCRIPTS_DIR_PROP_KEY = "scripts-dir";
 	public static final String SCRIPTS_DIR_PROP_DEF = "scripts/admin";
 
 	private String DEF_HOSTNAME_PROP_VAL = DNSResolver.getDefaultHostname();
 	private String name = null;
-	private String compId = null;
+	private JID compId = null;
 	private String defHostname = DEF_HOSTNAME_PROP_VAL;
 	private Map<String, CommandIfc> scriptCommands =
 			new ConcurrentHashMap<String, CommandIfc>();
-	protected Set<String> admins = new ConcurrentSkipListSet<String>();
+	protected Set<BareJID> admins = new ConcurrentSkipListSet<BareJID>();
 	private ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
 	private ServiceEntity serviceEntity = null;
 	private String scriptsBaseDir = null;
 	private String scriptsCompDir = null;
 
+	static {
+		try {
+			NULL_ROUTING = new JID("NULL");
+		} catch (Exception e) {
+			log.log(Level.WARNING, "Problem initializing class: ", e);
+		}
+	}
+
 	@Override
 	public void setName(String name) {
     this.name = name;
-		compId = JIDUtils.getNodeID(name, defHostname);
+		try {
+			compId = new JID(name, defHostname, null);
+		} catch (TigaseStringprepException ex) {
+			log.log(Level.WARNING, "Problem setting component ID: ", ex);
+		}
 	}
 
 	@Override
@@ -92,7 +107,7 @@ public class BasicComponent implements Configurable, XMPPService {
 	}
 
 	@Override
-	public String getComponentId() {
+	public JID getComponentId() {
 		return compId;
 	}
 
@@ -101,12 +116,20 @@ public class BasicComponent implements Configurable, XMPPService {
 
 	@Override
 	public void setProperties(Map<String, Object> props) {
-		compId = (String)props.get(COMPONENT_ID_PROP_KEY);
+		try {
+			compId = new JID((String)props.get(COMPONENT_ID_PROP_KEY));
+		} catch (TigaseStringprepException ex) {
+			log.log(Level.WARNING, "Problem setting component ID: ", ex);
+		}
 		defHostname = (String)props.get(DEF_HOSTNAME_PROP_KEY);
 		String[] admins_tmp = (String[])props.get(ADMINS_PROP_KEY);
 		if (admins_tmp != null) {
 			for (String admin : admins_tmp) {
-				admins.add(admin);
+				try {
+					admins.add(BareJID.bareJIDInstance(admin));
+				} catch (TigaseStringprepException ex) {
+					log.log(Level.CONFIG, "Incorrect admin JID: ", ex);
+				}
 			}
 		}
 		serviceEntity = new ServiceEntity(name, null, getDiscoDescription(), true);
@@ -127,7 +150,7 @@ public class BasicComponent implements Configurable, XMPPService {
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
     Map<String, Object> defs = new LinkedHashMap<String, Object>();
-		defs.put(COMPONENT_ID_PROP_KEY, compId);
+		defs.put(COMPONENT_ID_PROP_KEY, compId.toString());
 		DEF_HOSTNAME_PROP_VAL = DNSResolver.getDefaultHostname();
 		defs.put(DEF_HOSTNAME_PROP_KEY, DEF_HOSTNAME_PROP_VAL);
 		String[] adm =  null;
@@ -145,8 +168,8 @@ public class BasicComponent implements Configurable, XMPPService {
 		return defs;
 	}
 
-	public boolean isAdmin(String jid) {
-		return admins.contains(JIDUtils.getNodeID(jid));
+	public boolean isAdmin(JID jid) {
+		return admins.contains(jid.getBareJID());
 	}
 
 	@Override
@@ -154,7 +177,7 @@ public class BasicComponent implements Configurable, XMPPService {
 
 	@Override
 	public void processPacket(Packet packet, Queue<Packet> results) {
-		if (packet.isCommand() && getComponentId().equals(packet.getElemTo())) {
+		if (packet.isCommand() && getComponentId().equals(packet.getStanzaTo())) {
 			processScriptCommand(packet, results);
 		}
 	}
@@ -169,24 +192,25 @@ public class BasicComponent implements Configurable, XMPPService {
 	}
 
 	protected boolean processScriptCommand(Packet pc, Queue<Packet> results) {
-		if (pc.getElemFrom() == null) {
+		if (pc.getStanzaFrom() == null) {
 			// The packet has not gone through session manager yet
 			return false;
 		}
-		Command.Action action = Command.getAction(pc);
+		Iq iqc = (Iq)pc;
+		Command.Action action = Command.getAction(iqc);
 		if (action == Command.Action.cancel) {
-			Packet result = pc.commandResult(Command.DataType.result);
+			Packet result = iqc.commandResult(Command.DataType.result);
 			Command.addTextField(result, "Note", "Command canceled.");
 			results.offer(result);
 			return true;
 		}
 
-		String strCommand = pc.getStrCommand();
+		String strCommand = iqc.getStrCommand();
 		CommandIfc com = scriptCommands.get(strCommand);
 		if (strCommand != null && com != null) {
 			boolean admin = false;
 			try {
-				admin = isAdmin(pc.getElemFrom());
+				admin = isAdmin(iqc.getStanzaFrom());
 				if (admin) {
 					if (log.isLoggable(Level.FINER)) {
 						log.finer("Processing admin command: " + pc.toString());
@@ -197,10 +221,10 @@ public class BasicComponent implements Configurable, XMPPService {
 					}
 //					Bindings binds = scriptEngineManager.getBindings();
 					initBindings(binds);
-					com.runCommand(pc, binds, results);
+					com.runCommand(iqc, binds, results);
 				} else {
 					if (log.isLoggable(Level.FINER)) {
-						log.finer("Command rejected non-admin detected: " + pc.getElemFrom());
+						log.finer("Command rejected non-admin detected: " + pc.getStanzaFrom());
 					}
 					results.offer(Authorization.FORBIDDEN.getResponseMessage(pc,
 							"Only Administrator can call the command.", true));
@@ -299,7 +323,7 @@ public class BasicComponent implements Configurable, XMPPService {
 	}
 
 	@Override
-	public List<Element> getDiscoFeatures(String from) {
+	public List<Element> getDiscoFeatures(JID from) {
 		return getDiscoFeatures();
 	}
 
@@ -307,19 +331,19 @@ public class BasicComponent implements Configurable, XMPPService {
 	 * Exists for backward compatibility with the old API.
 	 */
 	@Deprecated
-	public Element getDiscoInfo(String node, String jid) {
+	public Element getDiscoInfo(String node, JID jid) {
 		return null;
 	}
 
 	@Override
-	public Element getDiscoInfo(String node, String jid, String from) {
+	public Element getDiscoInfo(String node, JID jid, JID from) {
 		// This is only to support the old depreciated API.
 		Element result = getDiscoInfo(node, jid);
 		if (result != null) {
 			return result;
 		}
 		// OLD API support end
-		if (getName().equals(JIDUtils.getNodeNick(jid))) {
+		if (getName().equals(jid.getLocalpart())) {
 			return serviceEntity.getDiscoInfo(node, isAdmin(from));
 		}
 		return null;
@@ -331,19 +355,19 @@ public class BasicComponent implements Configurable, XMPPService {
 	 * @deprecated
 	 */
 	@Deprecated
-	public List<Element> getDiscoItems(String node, String jid) {
+	public List<Element> getDiscoItems(String node, JID jid) {
 		return null;
 	}
 
 	@Override
-	public List<Element> getDiscoItems(String node, String jid, String from) {
+	public List<Element> getDiscoItems(String node, JID jid, JID from) {
 		// This is only to support the old depreciated API.
 		List<Element> result = getDiscoItems(node, jid);
 		if (result != null) {
 			return result;
 		}
 		// OLD API support end
-		if (getName().equals(JIDUtils.getNodeNick(jid))) {
+		if (getName().equals(jid.getLocalpart())) {
 			if (node != null) {
 //				result = serviceEntity.getDiscoItems(null, null, isAdmin(from));
 //			} else {
@@ -353,11 +377,11 @@ public class BasicComponent implements Configurable, XMPPService {
 						result.add(new Element("item",
 								new String[]{"node", "name", "jid"},
 								new String[]{comm.getCommandId(), comm.getDescription(),
-									getComponentId()}));
+									getComponentId().toString()}));
 					}
 				}
 			} else {
-				result = serviceEntity.getDiscoItems(null, jid,	isAdmin(from));
+				result = serviceEntity.getDiscoItems(null, jid.toString(),	isAdmin(from));
 				if (result != null) {
 					for (Iterator<Element> it = result.iterator(); it.hasNext();) {
 						Element element = it.next();
@@ -376,7 +400,7 @@ public class BasicComponent implements Configurable, XMPPService {
 		} else {
 			Element res = null;
 			if (!serviceEntity.isAdminOnly() || isAdmin(from)) {
-				res = serviceEntity.getDiscoItem(null, JIDUtils.getNodeID(getName(), jid));
+				res = serviceEntity.getDiscoItem(null, BareJID.toString(getName(), jid.toString()));
 			}
 			result = serviceEntity.getDiscoItems(null, null, isAdmin(from));
 			if (res != null) {

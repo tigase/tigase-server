@@ -53,7 +53,7 @@ import tigase.db.UserAuthRepository;
 import tigase.db.UserExistsException;
 import tigase.db.UserNotFoundException;
 import tigase.util.Algorithms;
-import tigase.util.JIDUtils;
+import tigase.xmpp.BareJID;
 
 import static tigase.db.UserAuthRepository.*;
 
@@ -368,7 +368,7 @@ public class TigaseCustomAuth implements UserAuthRepository {
 		try {
 			checkConnection();
 			synchronized (get_pass) {
-				get_pass.setString(1, JIDUtils.getNodeID(user));
+				get_pass.setString(1, BareJID.jidToBareJID(user));
 				rs = get_pass.executeQuery();
 				if (rs.next()) {
 					return rs.getString(1);
@@ -534,7 +534,7 @@ public class TigaseCustomAuth implements UserAuthRepository {
 		try {
 			checkConnection();
 			synchronized (user_login) {
-				String user_id = JIDUtils.getNodeID(user);
+				String user_id = BareJID.jidToBareJID(user);
 				user_login.setString(1, user_id);
 				user_login.setString(2, password);
 				rs = user_login.executeQuery();
@@ -638,7 +638,7 @@ public class TigaseCustomAuth implements UserAuthRepository {
 			try {
 				checkConnection();
 				synchronized (user_logout) {
-					user_logout.setString(1, JIDUtils.getNodeID(user));
+					user_logout.setString(1, BareJID.jidToBareJID(user));
 					user_logout.execute();
 				}
 			} catch (SQLException e) {
@@ -661,7 +661,7 @@ public class TigaseCustomAuth implements UserAuthRepository {
 		try {
 			checkConnection();
 			synchronized (add_user) {
-				add_user.setString(1, JIDUtils.getNodeID(user));
+				add_user.setString(1, BareJID.jidToBareJID(user));
 				add_user.setString(2, password);
 				boolean is_result = add_user.execute();
 				if (is_result) {
@@ -691,7 +691,7 @@ public class TigaseCustomAuth implements UserAuthRepository {
 			checkConnection();
 			synchronized (update_pass) {
 				update_pass.setString(1, password);
-				update_pass.setString(2, JIDUtils.getNodeID(user));
+				update_pass.setString(2, BareJID.jidToBareJID(user));
 				update_pass.execute();
 			}
 		} catch (SQLException e) {
@@ -711,7 +711,7 @@ public class TigaseCustomAuth implements UserAuthRepository {
 		try {
 			checkConnection();
 			synchronized (remove_user) {
-				remove_user.setString(1, JIDUtils.getNodeID(user));
+				remove_user.setString(1, BareJID.jidToBareJID(user));
 				remove_user.execute();
 			}
 		} catch (SQLException e) {
@@ -742,8 +742,8 @@ public class TigaseCustomAuth implements UserAuthRepository {
 		String user_name = new String(in_data, auth_idx, user_idx - auth_idx);
 		++user_idx;
 		String jid = user_name;
-		if (JIDUtils.getNodeNick(user_name) == null) {
-			jid = JIDUtils.getNodeID(user_name, domain);
+		if (BareJID.parseJID(user_name)[0] == null) {
+			jid = BareJID.toString(user_name, domain);
 		}
 		props.put(USER_ID_KEY, jid);
 		String passwd =	new String(in_data, user_idx, in_data.length - user_idx);
@@ -802,6 +802,7 @@ public class TigaseCustomAuth implements UserAuthRepository {
 		 * @exception IOException if an error occurs
 		 * @exception UnsupportedCallbackException if an error occurs
 		 */
+		@Override
 		public void handle(final Callback[] callbacks)
 			throws IOException, UnsupportedCallbackException {
 
@@ -826,7 +827,7 @@ public class TigaseCustomAuth implements UserAuthRepository {
 					if (user_name == null) {
 						user_name = nc.getDefaultName();
 					} // end of if (name == null)
-					jid = JIDUtils.getNodeID(user_name, (String)options.get(REALM_KEY));
+					jid = BareJID.toString(user_name, (String)options.get(REALM_KEY));
 					options.put(USER_ID_KEY, jid);
 					if (log.isLoggable(Level.FINEST)) {
 						log.finest("NameCallback: " + user_name);

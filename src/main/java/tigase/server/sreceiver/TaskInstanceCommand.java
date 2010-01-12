@@ -30,8 +30,10 @@ import java.util.LinkedHashMap;
 import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.stats.StatRecord;
+import tigase.util.TigaseStringprepException;
 import tigase.xml.XMLUtils;
 import tigase.db.TigaseDBException;
+import tigase.xmpp.JID;
 import tigase.xmpp.StanzaType;
 
 import static tigase.server.sreceiver.TaskCommons.*;
@@ -202,7 +204,7 @@ public class TaskInstanceCommand implements TaskCommandIfc {
 	}
 
 	private void manageUsers(Packet packet, Packet result,
-		StanzaReceiver receiv) {
+		StanzaReceiver receiv) throws TigaseStringprepException {
 		String task_name = Command.getFieldValue(packet, TASK_NAME_FIELD);
 		ReceiverTaskIfc task = receiv.getTaskInstances().get(task_name);
 		String user_action = Command.getFieldValue(packet, USER_ACTION_FIELD);
@@ -215,7 +217,7 @@ public class TaskInstanceCommand implements TaskCommandIfc {
 			List<String> moderated = new LinkedList<String>();
 			for (RosterItem ri: task.getRoster().values()) {
 				if (!ri.isModerationAccepted()) {
-					moderated.add(ri.getJid());
+					moderated.add(ri.getJid().toString());
 				}
 			}
 			if (moderated.size() > 0) {
@@ -232,7 +234,7 @@ public class TaskInstanceCommand implements TaskCommandIfc {
 			String[] all_subscr = new String[task.getRoster().values().size()];
 			int idx = 0;
 			for (RosterItem ri: task.getRoster().values()) {
-				all_subscr[idx++] = ri.getJid();
+				all_subscr[idx++] = ri.getJid().toString();
 			}
 			Command.addFieldValue(result, SUBSCRIBERS_FIELD, all_subscr[0],
 				SUBSCRIBERS_FIELD, all_subscr, all_subscr);
@@ -243,17 +245,22 @@ public class TaskInstanceCommand implements TaskCommandIfc {
 			switch (USER_ACTION.valueOf(user_action)) {
 			case APROVE_PENDING_MODERATIONS:
 				if (jids != null) {
-					Map<String, RosterItem> roster = task.getRoster();
+					Map<JID, RosterItem> roster = task.getRoster();
 					for (String jid: jids) {
-						RosterItem ri = roster.get(jid);
+					try {
+						RosterItem ri = roster.get(new JID(jid));
 						if (ri != null) {
-								task.setRosterItemModerationAccepted(ri, true);
-								receiv.addOutPacket(getMessage(ri.getJid(), task.getJID(),
-										StanzaType.headline, "Your subscription has been approved."));
+							task.setRosterItemModerationAccepted(ri, true);
+							receiv.addOutPacket(getMessage(ri.getJid(), task.getJID(),
+									StanzaType.headline, "Your subscription has been approved."));
 						} else {
-							log.warning("Missing jid: " + jid
-								+ " in task: " + task_name + " roster.");
+							log.warning("Missing jid: " + jid + " in task: " + task_name +
+									" roster.");
 						}
+					} catch (TigaseStringprepException ex) {
+						Logger.getLogger(TaskInstanceCommand.class.getName()).
+								log(Level.SEVERE, null, ex);
+					}
 					}
 					Command.addFieldValue(result, "Info",
 						"Subscriptions have been approved.", "fixed");
@@ -264,11 +271,14 @@ public class TaskInstanceCommand implements TaskCommandIfc {
 				break;
 			case REJECT_PENDING_MODERATIONS:
 				if (jids != null) {
+					JID[] jjids = new JID[jids.length];
+					int idx = 0;
 					for (String jid: jids) {
-						receiv.addOutPacket(getMessage(jid, task.getJID(),
+						jjids[idx] = new JID(jid);
+						receiv.addOutPacket(getMessage(task.getJID(), jjids[idx++],
 								StanzaType.headline, "Your subscription has been rejected."));
 					}
-					receiv.removeTaskSubscribers(task, jids);
+					receiv.removeTaskSubscribers(task, jjids);
 					Command.addFieldValue(result, "Info",
 						"Subscriptions have been rejected.", "fixed");
 				} else {
@@ -277,7 +287,7 @@ public class TaskInstanceCommand implements TaskCommandIfc {
 				}
 				break;
 			case SELECT_USER:
-				String jid = Command.getFieldValue(packet, SUBSCRIBERS_FIELD);
+				JID jid = new JID(Command.getFieldValue(packet, SUBSCRIBERS_FIELD));
 				RosterItem ri = task.getRoster().get(jid);
 				if (ri != null) {
 					String roster_action =
@@ -287,7 +297,7 @@ public class TaskInstanceCommand implements TaskCommandIfc {
 						Command.addAction(result, Command.Action.complete);
 						Command.addFieldValue(result, "Info",
 							"Update subscription data for: " + jid, "fixed");
-						Command.addFieldValue(result, SUBSCRIBERS_FIELD, jid, "hidden");
+						Command.addFieldValue(result, SUBSCRIBERS_FIELD, jid.toString(), "hidden");
 						String[] actions = ROSTER_ACTION.strValues();
 						Command.addFieldValue(result, ROSTER_ACTION_FIELD, actions[0],
 							"Select action", actions, actions);
@@ -353,7 +363,7 @@ public class TaskInstanceCommand implements TaskCommandIfc {
 	@Override
 	public void processCommand(Packet packet, Packet result,
 		StanzaReceiver receiv) {
-		String task_name = packet.getElemTo();
+		String task_name = packet.getStanzaTo().toString();
 		ReceiverTaskIfc task = receiv.getTaskInstances().get(task_name);
 		if (task == null) {
 			task_name = Command.getFieldValue(packet, TASK_NAME_FIELD);
@@ -362,9 +372,9 @@ public class TaskInstanceCommand implements TaskCommandIfc {
 			} // end of if (task_name != null)
 		} // end of if (task == null)
 		if (task != null) {
-			task_name = task.getJID();
-			if (!(receiv.isAdmin(packet.getElemFrom())
-					|| task.isAdmin(packet.getElemFrom()))) {
+			task_name = task.getJID().toString();
+			if (!(receiv.isAdmin(packet.getStanzaFrom())
+					|| task.isAdmin(packet.getStanzaFrom()))) {
 				Command.addFieldValue(result, "Info",
 					"You are not administrator of: " + task_name + " task.", "fixed");
 				Command.addFieldValue(result, "Info",
@@ -384,7 +394,12 @@ public class TaskInstanceCommand implements TaskCommandIfc {
 				editConfiguration(packet, result, receiv);
 				break;
 			case USER_MANAGEMENT:
-				manageUsers(packet, result, receiv);
+				try {
+					manageUsers(packet, result, receiv);
+				} catch (TigaseStringprepException ex) {
+					Logger.getLogger(TaskInstanceCommand.class.getName()).
+							log(Level.SEVERE, null, ex);
+				}
 				break;
 			case REMOVE_TASK:
 				removeTask(packet, result, receiv);

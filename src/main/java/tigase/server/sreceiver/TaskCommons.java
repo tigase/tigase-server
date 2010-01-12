@@ -26,6 +26,7 @@ import tigase.server.Command;
 import tigase.xml.XMLUtils;
 import tigase.xml.Element;
 import tigase.server.Packet;
+import tigase.xmpp.JID;
 import tigase.xmpp.StanzaType;
 
 import static tigase.server.sreceiver.PropertyConstants.*;
@@ -77,11 +78,11 @@ public abstract class TaskCommons {
 		} // end of for (Map.Entry entry: prop.entrySet())
 	}
 
-	public static Packet getPresence(String to, String from, StanzaType type,
+	public static Packet getPresence(JID from, JID to, StanzaType type,
 		String nick, String status) {
 		Element presence = new Element("presence",
 			new String[] {"to", "from", "type"},
-			new String[] {to, from, type.toString()});
+			new String[] {to.toString(), from.toString(), type.toString()});
 		if (nick != null) {
 			//<x xmlns="vcard-temp:x:update"><nickname>tus</nickname></x>
 			//<nick xmlns="http://jabber.org/protocol/nick">tus</nick>
@@ -92,22 +93,22 @@ public abstract class TaskCommons {
 		if (status != null) {
 			presence.addChild(new Element("status", status));
 		}
-		return new Packet(presence);
+		return Packet.packetInstance(presence, from, to);
 	}
 
-	public static Packet getPresence(String to, String from, StanzaType type) {
+	public static Packet getPresence(JID from, JID to, StanzaType type) {
 		return getPresence(to, from, type, null, null);
 	}
 
-	public static Packet getMessage(String to, String from, StanzaType type,
+	public static Packet getMessage(JID from, JID to, StanzaType type,
 		String body) {
 		Element message = new Element("message",
 			new Element[] {
 				new Element("subject", "Automatic system message"),
 				new Element("body", body)},
 			new String[] {"to", "from", "type"},
-			new String[] {to, from, type.toString()});
-		return new Packet(message);
+			new String[] {to.toString(), from.toString(), type.toString()});
+		return Packet.packetInstance(message, from, to);
 	}
 
 	public static boolean parseBool(final Object val) {

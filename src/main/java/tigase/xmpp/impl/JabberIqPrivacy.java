@@ -40,7 +40,8 @@ import tigase.xmpp.XMPPException;
 import tigase.xml.Element;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
-import tigase.util.JIDUtils;
+import tigase.xmpp.BareJID;
+import tigase.xmpp.JID;
 import tigase.xmpp.XMPPPacketFilterIfc;
 import tigase.xmpp.impl.roster.RosterAbstract;
 import tigase.xmpp.impl.roster.RosterFactory;
@@ -154,17 +155,17 @@ public class JabberIqPrivacy extends XMPPProcessor
 							type = ITEM_TYPE.valueOf(item.getAttribute(TYPE));
 						} // end of if (item.getAttribute(TYPE) != null)
 						String value = item.getAttribute(VALUE);
-						String sessionUserId = session.getUserId();
-						String jid = packet.getElemFrom();
+						BareJID sessionUserId = session.getUserId();
+						JID jid = packet.getStanzaFrom();
 						boolean packetIn = true;
-						if (jid == null || sessionUserId.equals(JIDUtils.getNodeID(jid))) {
-							jid = packet.getElemTo();
+						if (jid == null || sessionUserId.equals(jid.getBareJID())) {
+							jid = packet.getStanzaTo();
 							packetIn = false;
 						}
 						if (jid != null) {
 							switch (type) {
 							case jid:
-								type_matched = jid.contains(value);
+								type_matched = jid.toString().contains(value);
 								break;
 							case group:
 								String[] groups = roster_util.getBuddyGroups(session, jid);
@@ -310,7 +311,7 @@ public class JabberIqPrivacy extends XMPPProcessor
 		} catch (NotAuthorizedException e) {
       log.warning(
 				"Received privacy request but user session is not authorized yet: " +
-        packet.getStringData());
+        packet.toString());
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 					"You must authorize session first.", true));
 		} catch (TigaseDBException e) {

@@ -21,6 +21,7 @@
  */
 package tigase.server.xmppsession;
 
+import tigase.xmpp.JID;
 import tigase.xmpp.XMPPResourceConnection;
 
 /**
@@ -46,6 +47,6 @@ public interface SessionManagerHandler {
 
 	boolean isLocalDomain(String domain, boolean includeComponents);
 
-	String getComponentId();
+	JID getComponentId();
 
 }

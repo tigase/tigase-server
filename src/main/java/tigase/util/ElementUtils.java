@@ -22,6 +22,7 @@
 package tigase.util;
 
 import tigase.xml.Element;
+import tigase.xmpp.JID;
 import tigase.xmpp.StanzaType;
 
 /**
@@ -35,22 +36,22 @@ import tigase.xmpp.StanzaType;
  */
 public class ElementUtils {
 
-	public static Element createIqQuery(final String from, final String to,
-		final StanzaType type, final String id, final String xmlns) {
+	public static Element createIqQuery(JID from, JID to, StanzaType type,
+			String id, String xmlns) {
 		Element iq = new Element("iq",
 			new String[] {"from", "to", "type", "id"},
-			new String[] {from, to, type.toString(), id});
+			new String[] {from.toString(), to.toString(), type.toString(), id});
 		Element query = new Element("query");
 		query.setXMLNS(xmlns);
 		iq.addChild(query);
 		return iq;
 	}
 
-	public static Element createIqQuery(final String from, final String to,
-		final StanzaType type, final String id, final Element query) {
+	public static Element createIqQuery(JID from, JID to, StanzaType type,
+			String id, Element query) {
 		Element iq = new Element("iq",
 			new String[] {"from", "to", "type", "id"},
-			new String[] {from, to, type.toString(), id});
+			new String[] {from.toString(), to.toString(), type.toString(), id});
 		iq.addChild(query);
 		return iq;
 	}

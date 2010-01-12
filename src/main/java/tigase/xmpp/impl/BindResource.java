@@ -25,6 +25,7 @@ import java.util.Queue;
 import java.util.Map;
 import java.util.logging.Logger;
 import tigase.server.Packet;
+import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.StanzaType;
@@ -111,13 +112,27 @@ public class BindResource extends XMPPProcessor
     try {
 			switch (type) {
 			case set:
-        final String resource = request.getChildCData("/iq/bind/resource");
-        if (resource == null || resource.equals("")) {
-          session.setResource("tigase-"+(++resGenerator));
-        } else {
-          session.setResource(resource);
-        } // end of if (resource == null) else
-				packet.getElement().setAttribute("from", session.getJID());
+        String resource = request.getChildCData("/iq/bind/resource");
+				try {
+					if (resource == null || resource.trim().isEmpty()) {
+						resource = "tigase-" + (++resGenerator);
+						session.setResource(resource);
+					} else {
+						try {
+							session.setResource(resource);
+						} catch (TigaseStringprepException ex) {
+							// User provided resource is invalid, generating different server one
+							log.info("Incrrect resource provided by the user: " + resource
+									+ ", generating a different one by the server.");
+							resource = "tigase-" + (++resGenerator);
+							session.setResource(resource);
+						}
+					} // end of if (resource == null) else
+				} catch (TigaseStringprepException ex) {
+					log.warning("stringprep problem with the server generated resource: "
+							+ resource);
+				}
+				packet.getElement().setAttribute("from", session.getJID().toString());
         session.putSessionData(RESOURCE_KEY, "true");
 				results.offer(packet.okResult("<jid>" + session.getJID() + "</jid>", 1));
 				break;

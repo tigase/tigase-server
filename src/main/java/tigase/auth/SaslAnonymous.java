@@ -21,20 +21,13 @@
  */
 package tigase.auth;
 
-import java.util.Arrays;
 import java.util.Map;
 import java.util.UUID;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
-import javax.security.sasl.AuthorizeCallback;
-import javax.security.sasl.RealmCallback;
 import javax.security.sasl.SaslException;
 import javax.security.sasl.SaslServer;
-import java.security.NoSuchAlgorithmException;
-import tigase.util.Algorithms;
-import tigase.util.JIDUtils;
 
 /**
  * Describe class SaslAnonymous here.

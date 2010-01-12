@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.List;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xml.Element;
+import tigase.xmpp.JID;
 import tigase.xmpp.NotAuthorizedException;
 
 /**
@@ -108,7 +109,7 @@ public interface DynamicRosterIfc {
 	 * @exception NotAuthorizedException may be thrown if the connection session
 	 * is not yet authenticated but authorization is required to access roster data.
 	 */
-	String[] getBuddies(XMPPResourceConnection session)
+	JID[] getBuddies(XMPPResourceConnection session)
 		throws NotAuthorizedException;
 
 	/**
@@ -129,7 +130,7 @@ public interface DynamicRosterIfc {
 	 * @exception NotAuthorizedException may be thrown if the connection session
 	 * is not yet authenticated but authorization is required to access roster data.
 	 */
-	Element getBuddyItem(XMPPResourceConnection session, String buddy)
+	Element getBuddyItem(XMPPResourceConnection session, JID buddy)
 		throws NotAuthorizedException;
 
 	/**

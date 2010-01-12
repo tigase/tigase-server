@@ -22,6 +22,8 @@
 
 package tigase.sys;
 
+import tigase.xmpp.JID;
+
 /**
  * Created: Apr 19, 2009 12:15:07 AM
  *
@@ -34,8 +36,8 @@ public interface OnlineJidsReporter {
 
 	boolean hasCompleteJidsInfo();
 
-	boolean containsJid(String jid);
+	boolean containsJid(JID jid);
 
-	String[] getConnectionIdsForJid(String jid);
+	JID[] getConnectionIdsForJid(JID jid);
 
 }

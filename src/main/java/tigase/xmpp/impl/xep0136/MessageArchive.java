@@ -30,7 +30,6 @@ import tigase.xmpp.XMPPException;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
-import tigase.xmpp.NotAuthorizedException;
 
 import tigase.server.Packet;
 

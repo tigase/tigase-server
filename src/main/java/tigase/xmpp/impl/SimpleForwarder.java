@@ -28,12 +28,12 @@ import tigase.db.NonAuthUserRepository;
 import tigase.server.Packet;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
+import tigase.xmpp.BareJID;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.XMPPException;
-import tigase.util.JIDUtils;
 
 /**
  * Describe class SimpleForwarder here.
@@ -72,12 +72,13 @@ public abstract class SimpleForwarder
 	 * @param session a <code>XMPPResourceConnection</code> value
 	 * @param repo a <code>NonAuthUserRepository</code> value
 	 * @param results a <code>Queue</code> value
+	 * @param settings
+	 * @throws XMPPException
 	 */
 	@Override
-	public void process(final Packet packet, final XMPPResourceConnection session,
-		final NonAuthUserRepository repo, final Queue<Packet> results,
-		final Map<String, Object> settings)
-		throws XMPPException {
+	public void process(Packet packet, XMPPResourceConnection session,
+		NonAuthUserRepository repo, Queue<Packet> results,
+			Map<String, Object> settings) throws XMPPException {
 
 		if (session == null) {
 			return;
@@ -85,22 +86,20 @@ public abstract class SimpleForwarder
 
 		try {
 
-			String id = JIDUtils.getNodeID(packet.getElemTo());
+			BareJID id = packet.getStanzaTo().getBareJID();
 
 			if (id.equals(session.getUserId())) {
 				// Yes this is message to 'this' client
-				Element elem = packet.getElement().clone();
-				Packet result = new Packet(elem);
-				result.setTo(session.getConnectionId());
-				result.setFrom(packet.getTo());
+				Packet result = packet.copyElementOnly();
+				result.setPacketTo(session.getConnectionId());
+				result.setPacketFrom(packet.getTo());
 				results.offer(result);
 			} else {
 				// This is message to some other client
-				Element result = packet.getElement().clone();
-				results.offer(new Packet(result));
+				results.offer(packet.copyElementOnly());
 			} // end of else
 		} catch (NotAuthorizedException e) {
-			log.warning("NotAuthorizedException for packet: "	+ packet.getStringData());
+			log.warning("NotAuthorizedException for packet: "	+ packet);
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 					"You must authorize session first.", true));
 		} // end of try-catch

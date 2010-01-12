@@ -31,9 +31,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.script.Bindings;
 import tigase.server.AbstractMessageReceiver;
+import tigase.server.Message;
 import tigase.server.Packet;
 import tigase.stats.StatisticsList;
-import tigase.util.JIDUtils;
+import tigase.util.TigaseStringprepException;
+import tigase.xmpp.JID;
 import tigase.xmpp.StanzaType;
 
 /**
@@ -74,7 +76,7 @@ public class TestComponent extends AbstractMessageReceiver {
 	 */
 	private Set<String> whiteList = new ConcurrentSkipListSet<String>();
 	private String prependText = "Spam detected: ";
-	private String abuseAddress = "abuse@locahost";
+	private JID abuseAddress = null;
 	private int notificationFrequency = 10;
 	private int delayCounter = 0;
 	private boolean secureLogging = false;
@@ -88,9 +90,9 @@ public class TestComponent extends AbstractMessageReceiver {
 		if ("message" == packet.getElemName()) {
 			updateServiceDiscoveryItem(getName(), "messages",
 					"Messages processed: [" + (++messagesCounter) + "]", true);
-			String from = JIDUtils.getNodeID(packet.getElemFrom());
+			JID from = packet.getStanzaFrom();
 			// Is sender on the whitelist?
-			if (!whiteList.contains(from)) {
+			if (!whiteList.contains(from.getBareJID().toString())) {
 				// The sender is not on whitelist so let's check the content
 				String body = packet.getElemCData("/message/body");
 				if (body != null && !body.isEmpty()) {
@@ -119,14 +121,14 @@ public class TestComponent extends AbstractMessageReceiver {
 
 	@Override
 	public int hashCodeForPacket(Packet packet) {
-		if (packet.getElemTo() != null) {
-			return packet.getElemTo().hashCode();
+		if (packet.getStanzaTo() != null) {
+			return packet.getStanzaTo().hashCode();
 		}
 		// This should not happen, every packet must have a destination
 		// address, but maybe our SPAM checker is used for checking
 		// strange kind of packets too....
-		if (packet.getElemFrom() != null) {
-			return packet.getElemFrom().hashCode();
+		if (packet.getStanzaFrom() != null) {
+			return packet.getStanzaFrom().hashCode();
 		}
 		// If this really happens on your system you should look carefully
 		// at packets arriving to your component and decide a better way
@@ -155,7 +157,13 @@ public class TestComponent extends AbstractMessageReceiver {
 		Collections.addAll(whiteList, (String[])props.get(WHITELIST_KEY));
 		prependText = (String)props.get(PREPEND_TEXT_KEY);
 		secureLogging = (Boolean)props.get(SECURE_LOGGING_KEY);
-		abuseAddress = (String)props.get(ABUSE_ADDRESS_KEY);
+		try {
+			abuseAddress =
+					new JID((String)props.get(ABUSE_ADDRESS_KEY));
+		} catch (TigaseStringprepException ex) {
+			log.warning("Incorrect abuseAddress, stringprep error: "
+					+ (String)props.get(ABUSE_ADDRESS_KEY));
+		}
 		notificationFrequency = (Integer)props.get(NOTIFICATION_FREQ_KEY);
 		updateServiceDiscoveryItem(getName(), null, getDiscoDescription(),
 				"automation", "spam-filtering", true,
@@ -166,7 +174,7 @@ public class TestComponent extends AbstractMessageReceiver {
 	public synchronized void everyMinute() {
 		super.everyMinute();
 		if ((++delayCounter) >= notificationFrequency) {
-			addOutPacket(Packet.getMessage(abuseAddress, getComponentId(),
+			addOutPacket(Message.getMessage(getComponentId(), abuseAddress,
 					StanzaType.chat, "Detected spam messages: " + spamCounter,
 					"Spam counter", null, newPacketId("spam-")));
 			delayCounter = 0;

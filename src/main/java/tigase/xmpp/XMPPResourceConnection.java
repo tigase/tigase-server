@@ -26,12 +26,12 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 import java.util.logging.Level;
-import tigase.util.JIDUtils;
 import tigase.db.UserRepository;
 import tigase.db.UserAuthRepository;
 import tigase.db.TigaseDBException;
 import tigase.server.xmppsession.SessionManagerHandler;
 import tigase.db.AuthorizationException;
+import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
 
 /**
@@ -84,14 +84,14 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	/**
 	 * This variable is to keep relates XMPPIOService ID only.
 	 */
-	private String connectionId = null;
+	private JID connectionId = null;
 
 	private int priority = 0;
 
 	//private boolean dummy = false;
 
-	private String userJid = null;
-	private String userId = null;
+	private JID userJid = null;
+//	private String userId = null;
 	//	private String[] anon_peers = null;
 
 	private long id_counter = 0;
@@ -112,9 +112,8 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	 * @param rep
 	 * @param authRepo
 	 * @param loginHandler
-	 * @param anon_allowed
 	 */
-	public XMPPResourceConnection(String connectionId, UserRepository rep,
+	public XMPPResourceConnection(JID connectionId, UserRepository rep,
 		UserAuthRepository authRepo, SessionManagerHandler loginHandler) {
 		super(rep, authRepo);
 		long currTime = System.currentTimeMillis();
@@ -125,7 +124,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
     sessionData = new ConcurrentHashMap<String, Object>(4, 0.9f);
 	}
 
-	public String getSMComponentId() {
+	public JID getSMComponentId() {
 		return loginHandler.getComponentId();
 	}
 
@@ -268,7 +267,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
    * @exception NotAuthorizedException when this session has not
    * been authorized yet and some parts of user JID are not known yet.
    */
-  public final String getJID() throws NotAuthorizedException {
+  public final JID getJID() throws NotAuthorizedException {
     if (!isAuthorized()) {
       throw new NotAuthorizedException(NOT_AUTHORIZED_MSG);
     } // end of if (username == null)
@@ -285,7 +284,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
    * @return a <code>String</code> value of calculated user full JID for this
    * session including resource name.
    */
-	public final String getjid() {
+	public final JID getjid() {
 		return userJid;
 	}
 
@@ -305,11 +304,11 @@ public class XMPPResourceConnection extends RepositoryAccess {
    * @see #getJID()
    */
 	@Override
-  public final String getUserId() throws NotAuthorizedException {
+  public final BareJID getUserId() throws NotAuthorizedException {
     if (!isAuthorized()) {
       throw new NotAuthorizedException(NOT_AUTHORIZED_MSG);
     } // end of if (username == null)
-    return userId;
+    return userJid.getBareJID();
   }
 
 	@Override
@@ -328,7 +327,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 		return parentSession.getActiveResources();
 	}
 
-	public String[] getAllResourcesJIDs() throws NotAuthorizedException {
+	public JID[] getAllResourcesJIDs() throws NotAuthorizedException {
     if (!isAuthorized()) {
       throw new NotAuthorizedException(NOT_AUTHORIZED_MSG);
     } // end of if (username == null)
@@ -402,12 +401,12 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	 *
 	 * @return the value of connectionId
 	 */
-	public String getConnectionId() {
+	public JID getConnectionId() {
     lastAccessed = System.currentTimeMillis();
 		return this.connectionId;
 	}
 
-	public String getConnectionId(String jid) {
+	public JID getConnectionId(JID jid) {
 		return ((parentSession == null || jid == null) ? this.connectionId
 			: parentSession.getResourceConnection(jid).getConnectionId());
 	}
@@ -423,15 +422,18 @@ public class XMPPResourceConnection extends RepositoryAccess {
 		sessionId = null;
 	}
 
-	public void setParentSession(final XMPPSession parent) {
+	public void setParentSession(final XMPPSession parent) throws TigaseStringprepException {
 		if (parent != null) {
 			synchronized (this) {
-				userId = JIDUtils.getNodeID(parent.getUserName(), domain.getVhost());
-				userJid = userId + (resource != null ? ("/" + resource) : "/" +
-						sessionId);
+				userJid = new JID(parent.getUserName(), domain.getVhost(),
+						(resource != null ? resource : sessionId));
 			}
 		}
 		this.parentSession = parent;
+	}
+
+	public void removeParentSession(final XMPPSession parent) {
+		this.parentSession = null;
 	}
 
 	/**
@@ -439,9 +441,10 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	 *
 	 * @param argResource Value to assign to this.resource
 	 * @throws NotAuthorizedException
+	 * @throws TigaseStringprepException 
 	 */
 	public void setResource(final String argResource)
-					throws NotAuthorizedException {
+					throws NotAuthorizedException, TigaseStringprepException {
     if (!isAuthorized()) {
       throw new NotAuthorizedException(NOT_AUTHORIZED_MSG);
     } // end of if (username == null)
@@ -455,7 +458,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 		if (parentSession != null) {
 			parentSession.addResourceConnection(this);
 		}
-		userJid = getUserId() + (resource != null ? ("/" + resource) : "/" + sessionId);
+		userJid.setResource(resource != null ? resource : sessionId);
 		loginHandler.handleResourceBind(this);
 	}
 
@@ -501,7 +504,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("UserAuthRepository.USER_ID_KEY: " + user);
 			}
-			String nick = JIDUtils.getNodeNick(user);
+			String nick = BareJID.parseJID(user)[0];
 			if (nick == null) {
 				nick = user;
 			} // end of if (nick == null)
@@ -524,7 +527,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	}
 
 	@Override
-	public Authorization unregister(final String name_param)
+	public Authorization unregister(String name_param)
 		throws NotAuthorizedException, TigaseDBException {
 		Authorization auth_res = super.unregister(name_param);
 // 		if (auth_res == Authorization.AUTHORIZED) {

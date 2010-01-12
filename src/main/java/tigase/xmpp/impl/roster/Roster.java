@@ -22,10 +22,11 @@
 package tigase.xmpp.impl.roster;
 
 import java.util.logging.Logger;
+import tigase.util.TigaseStringprepException;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
-import tigase.util.JIDUtils;
 import tigase.db.TigaseDBException;
+import tigase.xmpp.JID;
 
 /**
  * Describe class Roster here.
@@ -44,28 +45,42 @@ public class Roster extends RosterAbstract {
   private static Logger log =	Logger.getLogger("tigase.xmpp.impl.Roster");
 
 	@Override
-  public String[] getBuddies(final XMPPResourceConnection session)
+  public JID[] getBuddies(final XMPPResourceConnection session)
     throws NotAuthorizedException, TigaseDBException {
-    return session.getDataGroups(ROSTER);
+		String[] jids = session.getDataGroups(ROSTER);
+		if (jids != null && jids.length > 0) {
+			JID[] result = new JID[jids.length];
+			int idx = 0;
+			for (String jid : jids) {
+				try {
+					result[idx++] = new JID(jid);
+				} catch (TigaseStringprepException ex) {
+					log.warning("Can't load user jid from database, stringprep problem: "
+							+ jid);
+				}
+			}
+			return result;
+		} else {
+			return null;
+		}
   }
 
 	@Override
-  public String getBuddyName(final XMPPResourceConnection session,
-		final String buddy)
+  public String getBuddyName(final XMPPResourceConnection session, JID buddy)
     throws NotAuthorizedException, TigaseDBException {
     return session.getData(groupNode(buddy), NAME, null);
   }
 
 	@Override
   public void setBuddyName(final XMPPResourceConnection session,
-		final String buddy, final String name)
+		JID buddy, final String name)
     throws NotAuthorizedException, TigaseDBException {
     session.setData(groupNode(buddy), NAME, name);
   }
 
 	@Override
   public void setBuddySubscription(final XMPPResourceConnection session,
-    final SubscriptionType subscription, final String buddy)
+    final SubscriptionType subscription, JID buddy)
 		throws NotAuthorizedException, TigaseDBException {
     session.setData(groupNode(buddy), SUBSCRIPTION, subscription.toString());
   }
@@ -73,7 +88,7 @@ public class Roster extends RosterAbstract {
 	@Override
   public SubscriptionType getBuddySubscription(
 		final XMPPResourceConnection session,
-    final String buddy) throws NotAuthorizedException, TigaseDBException {
+    JID buddy) throws NotAuthorizedException, TigaseDBException {
 		//		return SubscriptionType.both;
 		String subscr = session.getData(groupNode(buddy),	SUBSCRIPTION, null);
 		if (subscr != null) {
@@ -84,18 +99,21 @@ public class Roster extends RosterAbstract {
 
 	@Override
 	public boolean removeBuddy(final XMPPResourceConnection session,
-		final String jid) throws NotAuthorizedException, TigaseDBException {
+		JID jid) throws NotAuthorizedException, TigaseDBException {
 		session.removeDataGroup(groupNode(jid));
 		return true;
 	}
 
 	@Override
 	public void addBuddy(XMPPResourceConnection session,
-		String jid, String name, String[] groups)
+		JID jid, String name, String[] groups)
     throws NotAuthorizedException, TigaseDBException {
-		String nick = JIDUtils.getNodeNick(jid);
-		if (nick == null) {
-			nick = jid;
+		String nick = name;
+		if (nick == null || nick.trim().isEmpty()) {
+			nick = jid.getLocalpart();
+			if (nick == null || nick.trim().isEmpty()) {
+				nick = jid.toString();
+			}
 		}
 		session.setData(groupNode(jid), NAME, nick);
     session.setData(groupNode(jid), SUBSCRIPTION, SubscriptionType.none.toString());
@@ -104,19 +122,19 @@ public class Roster extends RosterAbstract {
 
 	@Override
   public String[] getBuddyGroups(final XMPPResourceConnection session,
-		final String buddy)
+		JID buddy)
     throws NotAuthorizedException, TigaseDBException {
     return session.getDataList(groupNode(buddy), GROUPS);
   }
 
 	@Override
-	public boolean containsBuddy(XMPPResourceConnection session, String buddy)
+	public boolean containsBuddy(XMPPResourceConnection session, JID buddy)
 					throws NotAuthorizedException, TigaseDBException {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 	@Override
-	public boolean addBuddyGroup(XMPPResourceConnection session, String buddy,
+	public boolean addBuddyGroup(XMPPResourceConnection session, JID buddy,
 					String[] groups)
 					throws NotAuthorizedException, TigaseDBException {
 		throw new UnsupportedOperationException("Not supported yet.");

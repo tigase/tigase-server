@@ -292,13 +292,15 @@ public class ConfigSQLRepository extends ConfigurationCache {
 
 		private ConfigItem createItemFromRS(ResultSet rs) throws SQLException {
 			ConfigItem result = getItemInstance();
+			String clusterNode = rs.getString(CLUSTER_NODE_COLUMN);
 			String compName = rs.getString(COMPONENT_NAME_COLUMN);
 			String nodeName = rs.getString(NODE_NAME_COLUMN);
 			String keyName = rs.getString(KEY_NAME_COLUMN);
 			String value_str = rs.getString(VALUE_COLUMN);
 			String value_type = rs.getString(VALUE_TYPE_COLUMN);
 			String flag_str = rs.getString(FLAG_COLUMN);
-			result.set(compName, nodeName, keyName, value_str, value_type.charAt(0), flag_str);
+			result.set(clusterNode, compName, nodeName, keyName, value_str,
+					value_type.charAt(0), flag_str);
 			return result;
 		}
 

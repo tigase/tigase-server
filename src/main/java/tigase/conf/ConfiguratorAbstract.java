@@ -315,13 +315,11 @@ public abstract class ConfiguratorAbstract
 				Object val = null;
 				if (args[i].startsWith(GEN_CONFIG)) {
 					key = "config-type";	val = args[i];
-					continue;
 				}
 				if (args[i].startsWith(GEN_TEST)) {
 					key = args[i];  val = Boolean.TRUE;
-					continue;
 				}
-				if ((args[i].startsWith("-") && !args[i].startsWith(GEN_CONFIG))) {
+				if (key == null && args[i].startsWith("-") && !args[i].startsWith(GEN_CONFIG)) {
 					key = args[i];  val = args[++i];
 				}
 				if (key != null) {

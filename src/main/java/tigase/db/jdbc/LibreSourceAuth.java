@@ -53,7 +53,7 @@ import tigase.db.UserAuthRepository;
 import tigase.db.UserExistsException;
 import tigase.db.UserNotFoundException;
 import tigase.util.Algorithms;
-import tigase.util.JIDUtils;
+import tigase.xmpp.BareJID;
 
 import static tigase.db.UserAuthRepository.*;
 
@@ -158,7 +158,7 @@ public class LibreSourceAuth implements UserAuthRepository {
 		try {
 			synchronized (update_last_login_st) {
 				update_last_login_st.setDate(1, new Date(System.currentTimeMillis()));
-				update_last_login_st.setString(2, JIDUtils.getNodeNick(user));
+				update_last_login_st.setString(2, BareJID.parseJID(user)[0]);
 				update_last_login_st.executeUpdate();
 			}
 		} catch (SQLException e) {
@@ -171,7 +171,7 @@ public class LibreSourceAuth implements UserAuthRepository {
 		try {
 			synchronized (update_online_status) {
 				update_online_status.setInt(1, status);
-				update_online_status.setString(2, JIDUtils.getNodeNick(user));
+				update_online_status.setString(2, BareJID.parseJID(user)[0]);
 				update_online_status.executeUpdate();
 			}
 		} catch (SQLException e) {
@@ -184,7 +184,7 @@ public class LibreSourceAuth implements UserAuthRepository {
 		ResultSet rs = null;
 		try {
 			synchronized (status_st) {
-				status_st.setString(1, JIDUtils.getNodeNick(user));
+				status_st.setString(1, BareJID.parseJID(user)[0]);
 				rs = status_st.executeQuery();
 				if (rs.next()) {
 					int res = rs.getInt(1);
@@ -203,7 +203,7 @@ public class LibreSourceAuth implements UserAuthRepository {
 		ResultSet rs = null;
 		try {
 			synchronized (pass_st) {
-				pass_st.setString(1, JIDUtils.getNodeNick(user));
+				pass_st.setString(1, BareJID.parseJID(user)[0]);
 				rs = pass_st.executeQuery();
 				if (rs.next()) {
 					return rs.getString(1);
@@ -397,12 +397,12 @@ public class LibreSourceAuth implements UserAuthRepository {
 // 				+ "', '" + ls_digest(password) + "');";
 			String query = "insert into " + users_tbl
 				+ " (username_, passworddigest_)"
-				+ " values ('" + JIDUtils.getNodeNick(user)
+				+ " values ('" + BareJID.parseJID(user)[0]
 				+ "', '" + password + "');";
 			stmt.executeUpdate(query);
 			query = "insert into " + profiles_tbl
 				+ " (id_, accountstatus_)"
-				+ " values ('" + JIDUtils.getNodeNick(user) + "', 0);";
+				+ " values ('" + BareJID.parseJID(user)[0] + "', 0);";
 			stmt.executeUpdate(query);
 		} catch (SQLException e) {
 			throw new UserExistsException("Error while adding user to repository, user exists?", e);
@@ -426,7 +426,7 @@ public class LibreSourceAuth implements UserAuthRepository {
 			checkConnection();
 			synchronized (update_password) {
 				update_password.setString(1, password);
-				update_password.setString(2, JIDUtils.getNodeNick(user));
+				update_password.setString(2, BareJID.parseJID(user)[0]);
 				update_password.executeUpdate();
 			}
 		} catch (SQLException e) {
@@ -448,10 +448,10 @@ public class LibreSourceAuth implements UserAuthRepository {
 			checkConnection();
 			stmt = conn.createStatement();
 			String query = "delete from " + users_tbl
-				+ " where (username_ = '" + JIDUtils.getNodeNick(user)	+ "');";
+				+ " where (username_ = '" + BareJID.parseJID(user)[0]	+ "');";
 			stmt.executeUpdate(query);
 			query = "delete from " + profiles_tbl
-				+ " where (id_ = '" + JIDUtils.getNodeNick(user)	+ "');";
+				+ " where (id_ = '" + BareJID.parseJID(user)[0]	+ "');";
 			stmt.executeUpdate(query);
 		} catch (SQLException e) {
 			throw new UserExistsException("Error while adding user to repository, user exists?", e);
@@ -545,7 +545,7 @@ public class LibreSourceAuth implements UserAuthRepository {
 					if (user_name == null) {
 						user_name = nc.getDefaultName();
 					} // end of if (name == null)
-					jid = JIDUtils.getNodeID(user_name, (String)options.get(REALM_KEY));
+					jid = BareJID.toString(user_name, (String)options.get(REALM_KEY));
 					options.put(USER_ID_KEY, jid);
     				if (log.isLoggable(Level.FINEST)) {
     					log.finest("NameCallback: " + user_name);

@@ -34,6 +34,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import tigase.server.Command;
+import tigase.server.Iq;
 import tigase.server.Packet;
 
 /**
@@ -92,7 +93,7 @@ public class Script extends AbstractScriptCommand {
 
 	@Override
 	@SuppressWarnings({"unchecked"})
-	public void runCommand(Packet packet, Bindings binds, Queue<Packet> results) {
+	public void runCommand(Iq packet, Bindings binds, Queue<Packet> results) {
 		ScriptContext context = null;
 		StringWriter writer = null;
 		try {

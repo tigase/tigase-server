@@ -68,7 +68,7 @@ public class HandshakeProcessor implements ExtProcessor {
 						// According to XEP-0114 the authentication was successful
 						handler.authenticated(serv);
 					} else {
-						log.warning("Incorrect packet received: " + p.getStringData());
+						log.warning("Incorrect packet received: " + p);
 						serv.stop();
 					}
 					break;
@@ -90,7 +90,7 @@ public class HandshakeProcessor implements ExtProcessor {
 						// Password digest matches, authentication OK
 						if (digest != null && digest.equals(loc_digest)) {
 							handler.authenticated(serv);
-							Packet resp = new Packet(new Element("handshake"));
+							Packet resp = Packet.packetInstance(new Element("handshake"), null, null);
 							results.offer(resp);
 						} else {
 							log.info("Handshaking passwords don't match, disconnecting...");
@@ -129,7 +129,7 @@ public class HandshakeProcessor implements ExtProcessor {
 		try {
 			String id = (String)serv.getSessionData().get(XMPPIOService.SESSION_ID_KEY);
 			String digest = Algorithms.hexDigest(id, secret, "SHA");
-			Packet result = new Packet(new Element(EL_NAME, digest));
+			Packet result = Packet.packetInstance(new Element(EL_NAME, digest), null, null);
 			results.offer(result);
 		} catch (NoSuchAlgorithmException e) {
 			log.log(Level.SEVERE, "Can not generate digest for pass phrase.", e);

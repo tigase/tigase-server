@@ -22,8 +22,9 @@ package tigase.server.sreceiver;
 
 import tigase.server.Packet;
 import tigase.xmpp.StanzaType;
-import tigase.util.JIDUtils;
 import java.util.Queue;
+import tigase.server.Message;
+import tigase.xmpp.JID;
 
 /**
  * Describe class TesterTask here.
@@ -88,30 +89,31 @@ public class TesterTask extends AbstractReceiverTask {
 		command comm = command.valueOf(body_split[0].substring(2));
 		switch (comm) {
 		case help:
-			results.offer(Packet.getMessage(packet.getElemFrom(),
-					packet.getElemTo(), StanzaType.chat, commandsHelp(),
-					"Commands description", null, packet.getId()));
+			results.offer(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(),
+					StanzaType.chat, commandsHelp(),
+					"Commands description", null, packet.getStanzaId()));
 			break;
 		case genn:
 			try {
 				int number = Integer.parseInt(body_split[1]);
-				String domain = JIDUtils.getNodeHost(packet.getElemFrom());
+				String domain = packet.getStanzaFrom().getDomain();
 				for (int i = 0; i < number; i++) {
-					results.offer(Packet.getMessage("nonename_" + i + "@" + domain,
-							packet.getElemTo(), StanzaType.normal,
+					results.offer(Message.getMessage(packet.getStanzaTo(), 
+							new JID("nonename_" + i + "@" + domain),
+							StanzaType.normal,
 							"Traffic generattion: " + number,
-							"Internal load test", null, packet.getId()));
+							"Internal load test", null, packet.getStanzaId()));
 				}
-				results.offer(Packet.getMessage(packet.getElemFrom(),
-						packet.getElemTo(), StanzaType.normal,
+				results.offer(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(),
+						StanzaType.normal,
 						"Completed " + number,
-						"Response", null, packet.getId()));
+						"Response", null, packet.getStanzaId()));
 			} catch (Exception e) {
-				results.offer(Packet.getMessage(packet.getElemFrom(),
-						packet.getElemTo(), StanzaType.normal,
+				results.offer(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(),
+						StanzaType.normal,
 						"Incorrect command parameter: "
 						+ (body_split.length > 1 ? body_split[1] : null)
-						+ ", expecting Integer.", "Response", null, packet.getId()));
+						+ ", expecting Integer.", "Response", null, packet.getStanzaId()));
 			}
 			break;
 		}
@@ -122,10 +124,10 @@ public class TesterTask extends AbstractReceiverTask {
 			runCommand(packet, results);
 		} else {
 			String body = packet.getElemCData("/message/body");
-			results.offer(Packet.getMessage(packet.getElemFrom(),
-					packet.getElemTo(), StanzaType.normal,
+			results.offer(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(),
+					StanzaType.normal,
 					"This is response to your message: [" + body + "]",
-					"Response", null, packet.getId()));
+					"Response", null, packet.getStanzaId()));
 		}
 	}
 

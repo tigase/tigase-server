@@ -20,23 +20,18 @@
  */
 package tigase.cluster;
 
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.conf.Configurable;
-import tigase.disco.ServiceEntity;
-import tigase.disco.ServiceIdentity;
-import tigase.disco.XMPPService;
 import tigase.server.AbstractComponentRegistrator;
+import tigase.server.Message;
 import tigase.server.Packet;
 import tigase.server.ServerComponent;
 import tigase.util.DNSResolver;
-import tigase.xml.Element;
-import tigase.util.JIDUtils;
+import tigase.util.TigaseStringprepException;
+import tigase.xmpp.JID;
 import tigase.xmpp.StanzaType;
 
 /**
@@ -62,7 +57,8 @@ public class ClusterController
 	//private ServiceEntity stats_modules = null;
 	private Level statsLevel = Level.INFO;
 	private String this_node = DNSResolver.getDefaultHostname();;
-	private String my_hostname = null;
+	private JID my_hostname = null;
+	private JID my_address = null;
 
 	@Override
 	public void setName(String name) {
@@ -145,8 +141,7 @@ public class ClusterController
 		}
 	}
 
-	private Packet sendClusterNotification(String msg, String subject,
-					String nodes) {
+	private Packet sendClusterNotification(String msg, String subject, String nodes) {
 		String message = msg;
 		if (nodes != null) {
 			message = msg + "\n";
@@ -155,16 +150,24 @@ public class ClusterController
 		for (String node: nodes.split(",")) {
 			message += "" + (++cnt) + ". " + node + " connected to " + this_node;
 		}
-		Packet p_msg = Packet.getMessage(my_hostname,
-			JIDUtils.getJID(getName(), my_hostname, null), StanzaType.normal,
-			message, subject, "xyz", newPacketId(null));
+		Packet p_msg = Message.getMessage(my_address, my_hostname, StanzaType.normal,
+				message, subject, "xyz", newPacketId(null));
 		return p_msg;
 	}
 
 	@Override
 	public void setProperties(Map<String, Object> properties) {
-		super.setProperties(properties);
-		my_hostname = (String) properties.get(MY_DOMAIN_NAME_PROP_KEY);
+		try {
+			super.setProperties(properties);
+			my_hostname =
+					new JID((String)properties.get(MY_DOMAIN_NAME_PROP_KEY));
+			my_address =
+					new JID(getName(),
+					(String)properties.get(MY_DOMAIN_NAME_PROP_KEY), null);
+		} catch (TigaseStringprepException ex) {
+			log.warning("Addressing problem, stringprep failed for: "
+					+ (String)properties.get(MY_DOMAIN_NAME_PROP_KEY));
+		}
 	}
 
 	@Override

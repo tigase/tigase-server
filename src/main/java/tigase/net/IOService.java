@@ -30,7 +30,6 @@ import java.nio.channels.SocketChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CharsetDecoder;
-import java.nio.charset.MalformedInputException;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
@@ -48,6 +47,7 @@ import tigase.io.BufferUnderflowException;
 import tigase.io.ZLibIO;
 import tigase.stats.StatisticsList;
 import tigase.util.TimeUtils;
+import tigase.xmpp.JID;
 
 /**
  * <code>IOService</code> offers thread thread safe
@@ -120,7 +120,7 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
   private CharsetEncoder encoder = Charset.forName("UTF-8").newEncoder();
   private CharsetDecoder decoder = Charset.forName("UTF-8").newDecoder();
 
-	private String dataReceiver = null;
+	private JID dataReceiver = null;
 
 	public void setRefObject(RefObject refObject) {
 		this.refObject = refObject;
@@ -156,11 +156,11 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 		return wrData;
 	}
 
-	public void setDataReceiver(String address) {
+	public void setDataReceiver(JID address) {
 		this.dataReceiver = address;
 	}
 
-	public String getDataReceiver() {
+	public JID getDataReceiver() {
 		return this.dataReceiver;
 	}
 

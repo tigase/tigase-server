@@ -34,6 +34,7 @@ import tigase.server.AbstractComponentRegistrator;
 import tigase.stats.StatRecord;
 import tigase.stats.StatisticsContainer;
 import tigase.xml.Element;
+import tigase.xmpp.JID;
 
 /**
  * Class XMPPServiceCollector
@@ -52,11 +53,6 @@ public abstract class XMPPServiceCollector
   private static final Logger log =
     Logger.getLogger("tigase.server.XMPPServiceCollector");
 
-	public static final String INFO_XMLNS =
-		"http://jabber.org/protocol/disco#info";
-	public static final String ITEMS_XMLNS =
-		"http://jabber.org/protocol/disco#items";
-
 	private ServiceEntity serviceEntity = null;
 
 	public XMPPServiceCollector() {
@@ -66,21 +62,25 @@ public abstract class XMPPServiceCollector
 					" ver. " + tigase.server.XMPPServer.getImplementationVersion())});
 	}
 
+	@Override
 	public void componentAdded(XMPPService component) {	}
 
+	@Override
 	public boolean isCorrectType(ServerComponent component) {
 		return component instanceof XMPPService;
 	}
 
+	@Override
 	public void componentRemoved(XMPPService component) {}
 
+	@Override
 	public void processPacket(final Packet packet, final Queue<Packet> results) {
 
 		if (packet.isXMLNS("/iq/query", INFO_XMLNS)
 			|| packet.isXMLNS("/iq/query", ITEMS_XMLNS)) {
 
-			String jid = packet.getElemTo();
-			String from = packet.getElemFrom();
+			JID jid = packet.getStanzaTo();
+			JID from = packet.getStanzaFrom();
 			String node = packet.getAttribute("/iq/query", "node");
 			Element query = packet.getElement().getChild("query").clone();
 

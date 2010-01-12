@@ -25,8 +25,8 @@ import java.util.logging.Level;
 
 import tigase.server.ServiceChecker;
 import tigase.xmpp.XMPPIOService;
-import tigase.util.JIDUtils;
 import tigase.server.xmppclient.ClientConnectionManager;
+import tigase.xmpp.JID;
 
 /**
  * Describe class ClientConnectionClustered here.
@@ -62,15 +62,14 @@ public class ClientConnectionClustered extends ClientConnectionManager
 		doForAllServices(new ServiceChecker() {
 			@Override
 			public void check(final XMPPIOService service) {
-				String dataReceiver = service.getDataReceiver();
+				JID dataReceiver = service.getDataReceiver();
 				if (log.isLoggable(Level.FINEST)) {
 					log.finest("Checking service for dataReceiver: " + dataReceiver);
 				}
-				if (dataReceiver != null &&
-								JIDUtils.getNodeHost(dataReceiver).equals(hostname)) {
+				if (dataReceiver != null && dataReceiver.getDomain().equals(hostname)) {
 					if (log.isLoggable(Level.FINEST)) {
 						log.finest(
-										"Stopping service because corresponding cluster node stopped.");
+								"Stopping service because corresponding cluster node stopped.");
 					}
 					service.stop();
 				}

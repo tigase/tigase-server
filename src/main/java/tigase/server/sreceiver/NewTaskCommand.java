@@ -23,11 +23,13 @@ package tigase.server.sreceiver;
 
 import java.util.Map;
 import java.util.LinkedHashMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.server.Command;
 import tigase.server.Packet;
-import tigase.util.JIDUtils;
+import tigase.util.TigaseStringprepException;
 import tigase.xml.XMLUtils;
+import tigase.xmpp.BareJID;
 
 import static tigase.server.sreceiver.PropertyConstants.*;
 import static tigase.server.sreceiver.TaskCommons.*;
@@ -51,6 +53,7 @@ public class NewTaskCommand implements TaskCommandIfc {
 	 *
 	 * @return a <code>String</code> value
 	 */
+	@Override
 	public String getNodeName() {
 		return "new-task";
 	}
@@ -60,13 +63,14 @@ public class NewTaskCommand implements TaskCommandIfc {
 	 *
 	 * @return a <code>String</code> value
 	 */
+	@Override
 	public String getDescription() {
 		return "Add new task...";
 	}
 
 	private boolean checkTaskName(String task_name, Packet result,
 		StanzaReceiver receiv) {
-		String msg = JIDUtils.checkNickName(task_name);
+		String msg = BareJID.parseJID(task_name)[0];
 		if (msg != null) {
 			Command.addFieldValue(result, "Info",
 				"Note!! " + msg + ", please provide valid task name.", "fixed");
@@ -126,13 +130,13 @@ public class NewTaskCommand implements TaskCommandIfc {
 		Map<String, PropertyItem> default_props = task_t.getDefaultParams();
 		PropertyItem pi = default_props.get(TASK_OWNER_PROP_KEY);
 		if (pi != null) {
-			pi.setValue(JIDUtils.getNodeID(packet.getElemFrom()));
+			pi.setValue(packet.getStanzaFrom().getBareJID().toString());
 		}
 		propertyItems2Command(default_props, result);
 	}
 
 	private void newTask_Step3(Packet packet, Packet result,
-		StanzaReceiver receiv) {
+		StanzaReceiver receiv) throws TigaseStringprepException {
 		String task_name = Command.getFieldValue(packet, TASK_NAME_FIELD);
 		String task_type = Command.getFieldValue(packet, TASK_TYPE_FIELD);
 		Map<String, PropertyItem> default_props =
@@ -164,6 +168,7 @@ public class NewTaskCommand implements TaskCommandIfc {
 	 * @param receiv
 	 * @param reciv a <code>StanzaReceiver</code> value
 	 */
+	@Override
 	public void processCommand(Packet packet, Packet result,
 		StanzaReceiver receiv) {
 		String task_name = Command.getFieldValue(packet, TASK_NAME_FIELD);
@@ -202,7 +207,12 @@ public class NewTaskCommand implements TaskCommandIfc {
 			newTask_Step2(packet, result, receiv);
 			return;
 		} // end of if (step == null || step.equals("step1"))
-		newTask_Step3(packet, result, receiv);
+		try {
+			newTask_Step3(packet, result, receiv);
+		} catch (TigaseStringprepException ex) {
+			Logger.getLogger(NewTaskCommand.class.getName()).log(Level.SEVERE, null,
+					ex);
+		}
 	}
 
 } // NewTaskCommand

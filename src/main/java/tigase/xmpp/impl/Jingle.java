@@ -21,7 +21,6 @@
  */
 package tigase.xmpp.impl;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Queue;
 import java.util.Map;
@@ -29,15 +28,13 @@ import java.util.logging.Logger;
 import java.util.logging.Level;
 import tigase.db.NonAuthUserRepository;
 import tigase.server.Packet;
-import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.XMPPImplIfc;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.XMPPException;
-import tigase.util.JIDUtils;
+import tigase.xmpp.BareJID;
 
 /**
  * Describe class Jingle here.
@@ -78,7 +75,10 @@ public class Jingle extends XMPPProcessor implements XMPPProcessorIfc {
 	 * @param conn a <code>XMPPResourceConnection</code> value
 	 * @param nonAuthUserRepo a <code>NonAuthUserRepository</code> value
 	 * @param results a <code>Queue</code> value
+	 * @param settings
+	 * @throws XMPPException 
 	 */
+	@Override
 	public void process(final Packet packet, final XMPPResourceConnection conn,
 		final NonAuthUserRepository nonAuthUserRepo, final Queue<Packet> results,
 		final Map<String, Object> settings)
@@ -88,8 +88,8 @@ public class Jingle extends XMPPProcessor implements XMPPProcessorIfc {
 
 		try {
 			if (log.isLoggable(Level.FINEST)) {
-    			log.finest("Received packet: " + packet.getStringData());
-            }
+				log.finest("Received packet: " + packet);
+			}
 
 			// Not needed anymore. Packet filter does it for all stanzas.
 // 			// For all messages coming from the owner of this account set
@@ -99,7 +99,7 @@ public class Jingle extends XMPPProcessor implements XMPPProcessorIfc {
 // 				packet.getElement().setAttribute("from", conn.getJID());
 // 			} // end of if (packet.getFrom().equals(session.getConnectionId()))
 
-			String id = JIDUtils.getNodeID(packet.getElemTo());
+			BareJID id = packet.getStanzaTo().getBareJID();
 
 			if (id.equals(conn.getUserId())) {
 				// Yes this is message to 'this' client
@@ -120,18 +120,16 @@ public class Jingle extends XMPPProcessor implements XMPPProcessorIfc {
 					}
 				}
 
-				Element elem = packet.getElement().clone();
-				Packet result = new Packet(elem);
-				result.setTo(session.getConnectionId());
-				result.setFrom(packet.getTo());
+				Packet result = packet.copyElementOnly();
+				result.setPacketTo(session.getConnectionId());
+				result.setPacketFrom(packet.getTo());
 				results.offer(result);
 			} else {
 				// This is message to some other client
-				Element result = packet.getElement().clone();
-				results.offer(new Packet(result));
+				results.offer(packet.copyElementOnly());
 			} // end of else
 		} catch (NotAuthorizedException e) {
-			log.warning("NotAuthorizedException for packet: "	+ packet.getStringData());
+			log.warning("NotAuthorizedException for packet: "	+ packet);
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 					"You must authorize session first.", true));
 		} // end of try-catch

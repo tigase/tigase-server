@@ -38,6 +38,7 @@ import javax.management.NotificationEmitter;
 import javax.management.NotificationListener;
 import tigase.server.Packet;
 import tigase.stats.StatisticsList;
+import tigase.xmpp.JID;
 
 /**
  * Created: Dec 10, 2008 1:23:17 PM
@@ -66,7 +67,7 @@ public class MemMonitor extends AbstractMonitor
 	}
 
 	@Override
-	public void init(String jid, float treshold, SystemMonitorTask smTask) {
+	public void init(JID jid, float treshold, SystemMonitorTask smTask) {
 		super.init(jid, treshold, smTask);
 		memoryMXBean = ManagementFactory.getMemoryMXBean();
 		NotificationEmitter emitter = (NotificationEmitter)memoryMXBean;

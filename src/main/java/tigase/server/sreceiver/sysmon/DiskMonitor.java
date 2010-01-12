@@ -36,6 +36,7 @@ import java.util.logging.Level;
 import tigase.server.Packet;
 import tigase.stats.StatisticsList;
 import tigase.util.OSUtils;
+import tigase.xmpp.JID;
 
 /**
  * Created: Dec 10, 2008 8:14:53 PM
@@ -51,7 +52,7 @@ public class DiskMonitor extends AbstractMonitor {
 	private File[] roots = null;
 
 	@Override
-	public void init(String jid, float treshold, SystemMonitorTask smTask) {
+	public void init(JID jid, float treshold, SystemMonitorTask smTask) {
 		super.init(jid, treshold, smTask);
 		roots = File.listRoots();
 		findAllRoots();

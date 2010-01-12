@@ -44,8 +44,8 @@ import tigase.net.ConnectionType;
 import tigase.net.SocketReadThread;
 import tigase.net.SocketType;
 import tigase.stats.StatisticsList;
-import tigase.util.JIDUtils;
 import tigase.util.DataTypes;
+import tigase.xmpp.JID;
 import tigase.xmpp.XMPPIOService;
 import tigase.xmpp.XMPPIOServiceListener;
 
@@ -614,8 +614,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 		return getServiceId(packet.getTo());
 	}
 
-	protected String getServiceId(String jid) {
-		return JIDUtils.getNodeResource(jid);
+	protected String getServiceId(JID jid) {
+		return jid.getResource();
 	}
 
 //	@SuppressWarnings({"unchecked"})

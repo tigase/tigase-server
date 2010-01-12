@@ -150,15 +150,15 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	 * @return
 	 */
 	public int hashCodeForPacket(Packet packet) {
-		if (packet.getFrom() != null && packet.getFrom() != packet.getElemFrom()) {
+		if (packet.getFrom() != null && packet.getFrom() != packet.getStanzaFrom()) {
 			// This comes from connection manager so the best way is to get hashcode
 			// by the connectionId, which is in the getFrom()
 			return packet.getFrom().hashCode();
 		}
 		// If not, then a better way is to get hashCode from the elemTo address
 		// as this would be by the destination address user name:
-		if (packet.getElemTo() != null) {
-			return packet.getElemTo().hashCode();
+		if (packet.getStanzaTo() != null) {
+			return packet.getStanzaTo().hashCode();
 		}
 		if (packet.getTo() != null) {
 			return packet.getTo().hashCode();
@@ -665,7 +665,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 							long startPPT = System.currentTimeMillis();
 //							tracer.trace(null, packet.getElemTo(), packet.getElemFrom(),
 //											packet.getFrom(),	getName(), type.name(), null, packet);
-							String id = packet.getTo() + packet.getId();
+							String id = packet.getTo().toString() + packet.getStanzaId();
 							PacketReceiverTask task = waitingTasks.remove(id);
 							if (task != null) {
 								task.handleResponse(packet);
@@ -674,7 +674,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 //												"No task found for id: " + id);
 								// Maybe this is a command for local processing...
 								boolean processed = false;
-								if (packet.isCommand() && getComponentId().equals(packet.getElemTo())) {
+								if (packet.isCommand() && getComponentId().equals(packet.getStanzaTo())) {
 									processed = processScriptCommand(packet, results);
 									if (processed) {
 										Packet result = null;
@@ -733,7 +733,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 			super();
 			this.handler = handler;
 			this.packet = packet;
-			id = packet.getFrom() + packet.getId();
+			id = packet.getFrom().toString() + packet.getStanzaId();
 			waitingTasks.put(id, this);
 			receiverTasks.schedule(this, unit.toMillis(delay));
 //			log.finest("[" + getName() + "]  " + "Added timeout task for: " + id);

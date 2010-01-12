@@ -26,9 +26,11 @@ import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Queue;
 import java.util.Set;
+import tigase.server.Message;
 import tigase.server.Packet;
 import tigase.stats.StatisticsList;
 import tigase.xml.XMLUtils;
+import tigase.xmpp.JID;
 import tigase.xmpp.StanzaType;
 
 /**
@@ -40,12 +42,12 @@ import tigase.xmpp.StanzaType;
 public abstract class AbstractMonitor implements ResourceMonitorIfc {
 
 	protected Set<Object> warningsSent = new LinkedHashSet<Object>();
-	private String jid = null;
+	private JID jid = null;
 	private SystemMonitorTask smTask = null;
 	protected float treshold = 0.8F;
 
 	@Override
-	public void init(String jid, float treshold, SystemMonitorTask smTask) {
+	public void init(JID jid, float treshold, SystemMonitorTask smTask) {
 		this.jid = jid;
 		this.treshold = treshold;
 		this.smTask = smTask;
@@ -59,7 +61,7 @@ public abstract class AbstractMonitor implements ResourceMonitorIfc {
 	public void prepareWarning(String text, Queue<Packet> results,
 					Object warning) {
 		if (!warningsSent.contains(warning)) {
-			Packet result = Packet.getMessage("", jid, StanzaType.normal,
+			Packet result = Message.getMessage(jid, null, StanzaType.normal,
 							XMLUtils.escape("Warning! High resource usage alert from: " +
 							getClass().getSimpleName() + "\n" +
 							new Date() + " - " + text),
@@ -72,7 +74,7 @@ public abstract class AbstractMonitor implements ResourceMonitorIfc {
 	public void prepareCalmDown(String text, Queue<Packet> results,
 					Object warning) {
 		if (warningsSent.contains(warning)) {
-			Packet result = Packet.getMessage("", jid, StanzaType.normal,
+			Packet result = Message.getMessage(jid, null, StanzaType.normal,
 							XMLUtils.escape("Calm down! Resource usage notification from: " +
 							getClass().getSimpleName() + "\n" +
 							new Date() + " - " + text),
@@ -84,7 +86,7 @@ public abstract class AbstractMonitor implements ResourceMonitorIfc {
 
 	public void sendWarningOut(String text, Object warning) {
 		if (warning == null || !warningsSent.contains(warning)) {
-			Packet result = Packet.getMessage("", jid, StanzaType.normal,
+			Packet result = Message.getMessage(jid, null, StanzaType.normal,
 							XMLUtils.escape("Warning! High resource usage alert from: " +
 							getClass().getSimpleName() + "\n" +
 							new Date() + " - " + text),

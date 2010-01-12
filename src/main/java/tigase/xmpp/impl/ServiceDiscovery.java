@@ -27,17 +27,14 @@ import java.util.logging.Logger;
 import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.disco.XMPPServiceCollector;
-import tigase.util.JIDUtils;
-import tigase.util.ElementUtils;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
-import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.XMPPException;
 import tigase.db.NonAuthUserRepository;
+import tigase.xmpp.BareJID;
 
 /**
  * Implementation of JEP-030.
@@ -106,20 +103,19 @@ public class ServiceDiscovery extends XMPPProcessor
 
 		try {
 			// Remember to cut the resource part off before comparing JIDs
-			String id = JIDUtils.getNodeID(packet.getElemTo());
+			BareJID id = packet.getStanzaTo().getBareJID();
 			// Checking if this is a packet TO the owner of the session
 			if (session.getUserId().equals(id)) {
 				// Yes this is message to 'this' client
-				Element elem = packet.getElement().clone();
-				Packet result = new Packet(elem);
+				Packet result = packet.copyElementOnly();
 				// This is where and how we set the address of the component
 				// which should rceive the result packet for the final delivery
 				// to the end-user. In most cases this is a c2s or Bosh component
 				// which keep the user connection.
-				result.setTo(session.getConnectionId(packet.getElemTo()));
+				result.setPacketTo(session.getConnectionId(packet.getStanzaTo()));
 				// In most cases this might be skept, however if there is a
 				// problem during packet delivery an error might be sent back
-				result.setFrom(packet.getTo());
+				result.setPacketFrom(packet.getTo());
 				// Don't forget to add the packet to the results queue or it
 				// will be lost.
 				results.offer(result);
@@ -127,9 +123,9 @@ public class ServiceDiscovery extends XMPPProcessor
 			}
 
 			// Otherwise just pass the packet for further processing
-			results.offer(new Packet(packet.getElement()));
+			results.offer(packet.copyElementOnly());
 		} catch (Exception e) {
-			log.warning("NotAuthorizedException for packet: "	+ packet.getStringData());
+			log.warning("NotAuthorizedException for packet: "	+ packet);
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 					"You must authorize session first.", true));
 		}

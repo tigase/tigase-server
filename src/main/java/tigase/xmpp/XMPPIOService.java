@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 import java.util.logging.Level;
 import tigase.net.IOService;
 import tigase.server.Packet;
+import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xml.SimpleParser;
 import tigase.xml.SingletonFactory;
@@ -180,7 +181,7 @@ public class XMPPIOService<RefObject> extends IOService<RefObject> {
    *
    * @param packet a <code>Packet</code> value of data to process.
    */
-  public void addPacketToSend(final Packet packet) {
+  public void addPacketToSend(Packet packet) {
     waitingPackets.offer(packet);
   }
 
@@ -200,9 +201,9 @@ public class XMPPIOService<RefObject> extends IOService<RefObject> {
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("Sending packet: " + packet.toString());
 			}
-			writeRawData(packet.getStringData());
+			writeRawData(packet.getElement().toString());
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("SENT: " + packet.getStringData());
+				log.finest("SENT: " + packet.getElement().toString());
 			}
 		} // end of while (packet = waitingPackets.poll() != null)
   }
@@ -250,6 +251,7 @@ public class XMPPIOService<RefObject> extends IOService<RefObject> {
 							// This is log for debuging only,
 							// in normal mode don't even call below code
 							assert debug(new String(data), "--RECEIVED:");
+							Element elem = null;
 							try {
 								parser.parse(domHandler, data, 0, data.length);
 								if (domHandler.parseError()) {
@@ -260,7 +262,6 @@ public class XMPPIOService<RefObject> extends IOService<RefObject> {
 								if (elems.size() > 0) {
 									readCompleted();
 								}
-								Element elem = null;
 								while ((elem = elems.poll()) != null) {
 									//	assert debug(elem.toString() + "\n");
 									//log.finer("Read element: " + elem.getName());
@@ -268,8 +269,11 @@ public class XMPPIOService<RefObject> extends IOService<RefObject> {
 										log.finest("Read packet: " + elem.toString());
 									}
 									//							System.out.print(elem.toString());
-									addReceivedPacket(new Packet(elem));
+									addReceivedPacket(Packet.packetInstance(elem));
 								} // end of while ((elem = elems.poll()) != null)
+							} catch (TigaseStringprepException ex) {
+								log.log(Level.INFO, "Incorrect to/from JID format for stanza: "
+										+ elem.toString(), ex);
 							} catch (Exception ex) {
 								log.log(Level.INFO, "Incorrect XML data: " + new String(data) +
 												", stopping connection: " + getUniqueId() +

@@ -11,10 +11,12 @@ import java.util.logging.Logger;
 import tigase.conf.Configurable;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
+import tigase.server.BasicComponent;
 import tigase.server.Packet;
-import tigase.util.JIDUtils;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
+import tigase.xmpp.BareJID;
+import tigase.xmpp.JID;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.XMPPException;
@@ -59,14 +61,15 @@ public class PepPlugin extends XMPPProcessor implements XMPPProcessorIfc {
 		this.supportedNodes.add("http://jabber.org/protocol/geoloc");
 	}
 
-	private void forward(final Packet packet, final XMPPResourceConnection session, final NonAuthUserRepository repo,
-			final Queue<Packet> results, final Map<String, Object> settings) throws XMPPException {
+	private void forward(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
+			Queue<Packet> results, Map<String, Object> settings) throws XMPPException {
 
-		final String pubSubComponentUrl = settings == null ? null : (String) settings.get(PUBSUB_COMPONENT_URL);
+		String pubSubComponentUrl = settings == null ? null : (String) settings.get(PUBSUB_COMPONENT_URL);
 
 		if (session == null || pubSubComponentUrl == null) {
-			if (log.isLoggable(Level.FINE))
+			if (log.isLoggable(Level.FINE)) {
 				log.fine("Packet reject. No Session or PubSub Component URL.");
+			}
 			return;
 		} // end of if (session == null)
 
@@ -74,40 +77,41 @@ public class PepPlugin extends XMPPProcessor implements XMPPProcessorIfc {
 
 			packet.getElement().setAttribute("to", pubSubComponentUrl);
 
-			String id = JIDUtils.getNodeID(packet.getElemTo());
+			BareJID id = packet.getStanzaTo().getBareJID();
 
 			if (id.equals(session.getUserId())) {
 				// Yes this is message to 'this' client
-				Element elem = packet.getElement().clone();
-				Packet result = new Packet(elem);
-				result.setTo(session.getConnectionId());
-				result.setFrom(packet.getTo());
+				Packet result = packet.copyElementOnly();
+				result.setPacketTo(session.getConnectionId());
+				result.setPacketFrom(packet.getTo());
 				results.offer(result);
 			} else {
 				// This is message to some other client
-				Element result = packet.getElement().clone();
-				results.offer(new Packet(result));
+				results.offer(packet.copyElementOnly());
 			} // end of else
 		} catch (NotAuthorizedException e) {
-			log.warning("NotAuthorizedException for packet: " + packet.getStringData());
-			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet, "You must authorize session first.", true));
+			log.warning("NotAuthorizedException for packet: " + packet);
+			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
+					"You must authorize session first.", true));
 		} // end of try-catch
 
 	}
 
+	@Override
 	public String id() {
 		return ID;
 	}
 
-	public void process(final Packet packet, final XMPPResourceConnection session, final NonAuthUserRepository repo,
-			final Queue<Packet> results, final Map<String, Object> settings) throws XMPPException {
+	@Override
+	public void process(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
+			Queue<Packet> results, Map<String, Object> settings) throws XMPPException {
 
 		if (session == null) {
 			try {
 				results.offer(Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet, "Service not available.", true));
 			} catch (PacketErrorTypeException e) {
 				if (log.isLoggable(Level.FINE)) {
-					log.fine("This is already error packet, ignoring... " + packet.toString());
+					log.fine("This is already error packet, ignoring... " + packet);
 				}
 			}
 			return;
@@ -115,18 +119,18 @@ public class PepPlugin extends XMPPProcessor implements XMPPProcessorIfc {
 
 		try {
 
-			String id = session.getDomain();
-			if (packet.getElemTo() != null) {
-				id = JIDUtils.getNodeID(packet.getElemTo());
+			BareJID id = session.getDomainAsJID().getBareJID();
+			if (packet.getStanzaTo() != null) {
+				id = packet.getStanzaTo().getBareJID();
 			}
-			if (id == null || id.equals("") || id.equalsIgnoreCase(session.getDomain())
-					|| session.getConnectionId() == Configurable.NULL_ROUTING) {
+			if (id == null || id.equals(session.getDomainAsJID().getBareJID())
+					|| session.getConnectionId() == BasicComponent.NULL_ROUTING) {
 
 				List<Element> x = packet.getElemChildren("/iq/pubsub");
 				boolean processed = false;
 				for (Element element : x) {
-					final String action = element.getName();
-					final String node = element.getAttribute("node");
+					String action = element.getName();
+					String node = element.getAttribute("node");
 					if (this.supportedNodes.contains(node)) {
 						if (action == "retract") {
 							Element item = element.getChild("item", null);
@@ -154,52 +158,55 @@ public class PepPlugin extends XMPPProcessor implements XMPPProcessorIfc {
 
 				return;
 			}
-			if (packet.getElemTo() == null) {
+			if (packet.getStanzaTo() == null) {
 				forward(packet, session, repo, results, settings);
 				return;
 			}
 			if (id.equals(session.getUserId())) {
-				Element elem = packet.getElement().clone();
-				Packet result = new Packet(elem);
-				result.setTo(session.getConnectionId(packet.getElemTo()));
-				result.setFrom(packet.getTo());
+				Packet result = packet.copyElementOnly();
+				result.setPacketTo(session.getConnectionId(packet.getStanzaTo()));
+				result.setPacketFrom(packet.getTo());
 				results.offer(result);
 			} else {
-				Element result = packet.getElement().clone();
-				results.offer(new Packet(result));
+				results.offer(packet.copyElementOnly());
 			}
 		} catch (NotAuthorizedException e) {
-			log.warning("NotAuthorizedException for packet: " + packet.getStringData());
+			log.warning("NotAuthorizedException for packet: " + packet);
 		} catch (TigaseDBException e) {
-			log.warning("TigaseDBException for packet: " + packet.getStringData());
+			log.warning("TigaseDBException for packet: " + packet);
 		}
 	}
 
-	private void processPEPPublish(final Packet packet, final String node, final Element pepItem,
-			final XMPPResourceConnection session, final NonAuthUserRepository repo, final Queue<Packet> results,
-			final Map<String, Object> settings) throws NotAuthorizedException, TigaseDBException {
-		String[] buddies = roster.getBuddies(session, SUBSCRITION_TYPES);
+	private void processPEPPublish(Packet packet, String node, Element pepItem,
+			XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results,
+			Map<String, Object> settings) throws NotAuthorizedException, TigaseDBException {
+		JID[] buddies = roster.getBuddies(session, SUBSCRITION_TYPES);
 
-		final Element event = new Element("event", new String[] { "xmlns" },
-				new String[] { "http://jabber.org/protocol/pubsub#event" });
-		final Element items = new Element("items", new String[] { "node" }, new String[] { node });
+		Element event = new Element("event", new String[]{"xmlns"},
+				new String[]{"http://jabber.org/protocol/pubsub#event"});
+		Element items = new Element("items", new String[]{"node"},
+				new String[]{node});
 		event.addChild(items);
 		items.addChild(pepItem);
 
-		final String from = JIDUtils.getNodeID(packet.getElemFrom());
+		JID from = packet.getStanzaFrom();
 
-		for (String buddy : buddies) {
-			final Element message = new Element("message", new String[] { "from", "to", "type", "id" }, new String[] { from,
-					buddy, "headline", packet.getElemId() });
+		for (JID buddy : buddies) {
+			Element message =
+					new Element("message",
+					new String[]{"from", "to", "type", "id"},
+					new String[]{from.toString(), buddy.toString(), "headline", packet.getStanzaId()});
 			message.addChild(event);
 
-			results.offer(new Packet(message));
+			results.offer(Packet.packetInstance(message, from, buddy));
 		}
-		final Element message = new Element("message", new String[] { "from", "to", "type", "id" }, new String[] { from,
-				packet.getElemFrom(), "headline", packet.getElemId() });
+		Element message = 
+				new Element("message",
+				new String[]{"from", "to", "type", "id"},
+				new String[]{from.toString(), from.toString(), "headline", packet.getStanzaId()});
 		message.addChild(event);
 
-		results.offer(new Packet(message));
+		results.offer(Packet.packetInstance(message, from, from));
 	}
 
 	@Override

@@ -30,7 +30,6 @@ import java.util.logging.Logger;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 import tigase.server.Packet;
-import tigase.util.JIDUtils;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.PacketErrorTypeException;
@@ -162,17 +161,17 @@ public class DomainFilter extends XMPPProcessor
 				Packet res = it.next();
 				if (domains == DOMAINS.BLOCK) {
 					if ((res.getType() != StanzaType.error) &&
-									((res.getElemFrom() != null &&
-									!JIDUtils.getNodeID(res.getElemFrom()).equals(session.getUserId())) ||
-									(res.getElemTo() != null &&
-									!JIDUtils.getNodeID(res.getElemTo()).equals(session.getUserId())))) {
+									((res.getStanzaFrom() != null &&
+									!res.getStanzaFrom().getBareJID().equals(session.getUserId())) ||
+									(res.getStanzaTo() != null &&
+									!res.getStanzaTo().getBareJID().equals(session.getUserId())))) {
 						removePacket(it, res, errors, "Communication blocked.");
 					}
 					continue;
 				}
-				String outDomain = res.getElemTo();
-				if (outDomain != null) {
-					outDomain = JIDUtils.getNodeHost(outDomain).intern();
+				String outDomain = null;
+				if (res.getStanzaTo() != null) {
+					outDomain = res.getStanzaTo().getDomain();
 				}
 				switch (domains) {
 					case LOCAL:
@@ -191,6 +190,8 @@ public class DomainFilter extends XMPPProcessor
 						String[] allowedDomains = getDomainsList(session);
 						boolean found = false;
 						for (String domain : allowedDomains) {
+							// Intentionally comparing domains by reference instead of value
+							// domain is processed through the String.intern() method
 							if (domain == outDomain) {
 								found = true;
 								break;
@@ -246,20 +247,19 @@ public class DomainFilter extends XMPPProcessor
 			if (domains == DOMAINS.ALL) {
 				return stop;
 			}
-			String outDomain = packet.getElemFrom();
+			String outDomain =
+					packet.getStanzaFrom() != null ? packet.getStanzaFrom().getDomain() : null;
 			if (session.getConnectionId().equals(packet.getFrom())) {
-				outDomain = packet.getElemTo();
-			}
-			if (outDomain != null) {
-				outDomain = JIDUtils.getNodeHost(outDomain).intern();
+				outDomain = 
+						packet.getStanzaTo() != null ? packet.getStanzaTo().getDomain() : null;
 			}
 			switch (domains) {
 				case BLOCK:
 					if ((packet.getType() == StanzaType.error) ||
-									(packet.getElemFrom() == null ||
-									JIDUtils.getNodeID(packet.getElemFrom()).equals(session.getUserId())) &&
-									(packet.getElemTo() == null ||
-									JIDUtils.getNodeID(packet.getElemTo()).equals(session.getUserId()))) {
+									(packet.getStanzaFrom() == null ||
+									packet.getStanzaFrom().getBareJID().equals(session.getUserId())) &&
+									(packet.getStanzaTo() == null ||
+									packet.getStanzaTo().getBareJID().equals(session.getUserId()))) {
 						return stop;
 					} else {
 						removePacket(null, packet, results, "Communication blocked.");

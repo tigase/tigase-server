@@ -35,7 +35,7 @@ import tigase.db.NonAuthUserRepository;
 import tigase.db.UserNotFoundException;
 import tigase.db.TigaseDBException;
 import tigase.server.Packet;
-import tigase.util.JIDUtils;
+import tigase.util.TigaseStringprepException;
 import tigase.xml.DomBuilderHandler;
 import tigase.xml.Element;
 import tigase.xml.SimpleParser;
@@ -213,7 +213,7 @@ public class OfflineMessages extends XMPPProcessor
 			} catch (UserNotFoundException e) {
 				if (log.isLoggable(Level.FINEST)) {
 					log.finest("UserNotFoundException at trying to save packet for off-line user." +
-									packet.getStringData());
+									packet);
 				}
 			} // end of try-catch
 		} // end of if (conn == null)
@@ -235,12 +235,12 @@ public class OfflineMessages extends XMPPProcessor
 			synchronized (formater) {
 				stamp = formater.format(new Date());
 			}
-			String from = JIDUtils.getNodeHost(pac.getElemTo());
+			String from = pac.getStanzaTo().getDomain();
 			Element x = new Element("delay", "Offline Storage",
 				new String[] {"from", "stamp", "xmlns"},
 				new String[] {from, stamp, "urn:xmpp:delay"});
 			packet.addChild(x);
-			String user_id = JIDUtils.getNodeID(pac.getElemTo());
+			String user_id = pac.getStanzaTo().getBareJID().toString();
 			repo.addOfflineDataList(user_id, ID,
 				"messages", new String[] {packet.toString()});
 			return true;
@@ -264,7 +264,11 @@ public class OfflineMessages extends XMPPProcessor
 			Queue<Element> elems = domHandler.getParsedElements();
 			Element elem = null;
 			while ((elem = elems.poll()) != null) {
-				pacs.offer(new Packet(elem));
+				try {
+					pacs.offer(Packet.packetInstance(elem));
+				} catch (TigaseStringprepException ex) {
+					log.warning("Packet addressing problem, stringprep failed: " + elem);
+				}
 			} // end of while (elem = elems.poll() != null)
 			try {
 				Collections.sort(pacs, new StampComparator());

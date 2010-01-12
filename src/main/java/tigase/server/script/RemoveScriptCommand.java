@@ -29,6 +29,7 @@ import java.util.Set;
 import javax.script.Bindings;
 import tigase.disco.ServiceEntity;
 import tigase.server.Command;
+import tigase.server.Iq;
 import tigase.server.Packet;
 
 /**
@@ -41,7 +42,7 @@ public class RemoveScriptCommand extends AbstractScriptCommand {
 
 	@Override
 	@SuppressWarnings({"unchecked"})
-	public void runCommand(Packet packet, Bindings binds, Queue<Packet> results) {
+	public void runCommand(Iq packet, Bindings binds, Queue<Packet> results) {
 		String commandId = Command.getFieldValue(packet, COMMAND_ID);
 		if (isEmpty(commandId)) {
 			results.offer(prepareScriptCommand(packet, binds));
@@ -62,7 +63,7 @@ public class RemoveScriptCommand extends AbstractScriptCommand {
 	}
 
 	@SuppressWarnings({"unchecked"})
-	private Packet prepareScriptCommand(Packet packet, Bindings binds) {
+	private Packet prepareScriptCommand(Iq packet, Bindings binds) {
 		Packet result = null;
 		Map<String, CommandIfc> adminCommands =
 						(Map<String, CommandIfc>) binds.get(ADMN_CMDS);

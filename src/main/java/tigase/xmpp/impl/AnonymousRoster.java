@@ -25,8 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import tigase.util.JIDUtils;
 import tigase.xml.Element;
+import tigase.xmpp.JID;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
 //import tigase.xmpp.impl.Roster;
@@ -44,21 +44,24 @@ import tigase.xmpp.XMPPResourceConnection;
  */
 public class AnonymousRoster implements DynamicRosterIfc {
 
+	@Override
 	public void init(Map<String, Object> props) {}
 
+	@Override
 	public void init(String par) {}
 
 	@SuppressWarnings({"unchecked"})
-	public String[] getBuddies(XMPPResourceConnection session)
+	@Override
+	public JID[] getBuddies(XMPPResourceConnection session)
 		throws NotAuthorizedException {
 		if (session.isAnonymous()) {
-			Set<String> direct_presences =
-			    (Set<String>)session.getSessionData(Presence.DIRECT_PRESENCE);
+			Set<JID> direct_presences =
+			    (Set<JID>)session.getSessionData(Presence.DIRECT_PRESENCE);
 			if (direct_presences != null) {
-				String[] result = new String[direct_presences.size()];
+				JID[] result = new JID[direct_presences.size()];
 				int i = 0;
-				for (String peer: direct_presences) {
-					result[i++] = JIDUtils.getNodeID(peer);
+				for (JID peer: direct_presences) {
+					result[i++] = peer;
 				}
 				return result;
 			}
@@ -66,17 +69,18 @@ public class AnonymousRoster implements DynamicRosterIfc {
 		return null;
 	}
 
-	public Element getBuddyItem(XMPPResourceConnection session, String buddy)
+	@Override
+	public Element getBuddyItem(XMPPResourceConnection session, JID buddy)
 		throws NotAuthorizedException {
 		if (session.isAnonymous()) {
-			String[] anon_peers = getBuddies(session);
+			JID[] anon_peers = getBuddies(session);
 			if (anon_peers != null) {
-				for (String peer: anon_peers) {
-					if (peer.equals(JIDUtils.getNodeID(buddy))) {
+				for (JID peer: anon_peers) {
+					if (peer.getBareJID().equals(buddy.getBareJID())) {
 						Element item = new Element("item", new Element[] {
 								new Element("group", "Anonymous peers")},
 							new String[] {"jid", "subscription", "name"},
-							new String[] {peer, "both", JIDUtils.getNodeNick(peer)});
+							new String[] {peer.toString(), "both", peer.getLocalpart()});
 						return item;
 					}
 				}
@@ -85,17 +89,18 @@ public class AnonymousRoster implements DynamicRosterIfc {
 		return null;
 	}
 
+	@Override
 	public List<Element> getRosterItems(XMPPResourceConnection session)
 		throws NotAuthorizedException {
 		if (session.isAnonymous()) {
-			String[] anon_peers = getBuddies(session);
+			JID[] anon_peers = getBuddies(session);
 			if (anon_peers != null) {
 				ArrayList<Element> al = new ArrayList<Element>();
-				for (String peer: anon_peers) {
+				for (JID peer: anon_peers) {
 					Element item = new Element("item", new Element[] {
 							new Element("group", "Anonymous peers")},
 						new String[] {"jid", "subscription", "name"},
-						new String[] {peer, "both", JIDUtils.getNodeNick(peer)});
+						new String[] {peer.toString(), "both", peer.getLocalpart()});
 					al.add(item);
 				}
 				return al;
@@ -104,8 +109,10 @@ public class AnonymousRoster implements DynamicRosterIfc {
 		return null;
 	}
 
+	@Override
 	public void setItemExtraData(Element item) { }
 
+	@Override
 	public Element getItemExtraData(Element item) { return null; }
 
 }

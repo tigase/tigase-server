@@ -34,14 +34,16 @@ import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
 import tigase.server.AbstractComponentRegistrator;
 import tigase.server.Command;
+import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.Permissions;
 import tigase.server.ServerComponent;
 import tigase.stats.StatisticsContainer;
 import tigase.stats.StatisticsList;
-import tigase.util.JIDUtils;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
+import tigase.xmpp.BareJID;
+import tigase.xmpp.JID;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
 
@@ -169,27 +171,30 @@ public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
 			}
 			return;
 		}
-		Command.Action action = Command.getAction(packet);
+
+		Iq iqc = (Iq)packet;
+
+		Command.Action action = Command.getAction(iqc);
 		if (action == Command.Action.cancel) {
-			Packet result = packet.commandResult(null);
+			Packet result = iqc.commandResult(null);
 			results.offer(result);
 			return;
 		}
 
 		if (log.isLoggable(Level.INFO)) {
-			log.info("Processing command: " + packet.toString());
+			log.info("Processing command: " + iqc.toString());
 		}
 		Packet result = null;
-		if (packet.getCommand() == Command.VHOSTS_RELOAD ||
-						Command.getData(packet) != null) {
-			result = packet.commandResult(Command.DataType.result);
+		if (iqc.getCommand() == Command.VHOSTS_RELOAD ||
+						Command.getData(iqc) != null) {
+			result = iqc.commandResult(Command.DataType.result);
 		} else {
-			result = packet.commandResult(Command.DataType.form);
+			result = iqc.commandResult(Command.DataType.form);
 		}
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Preparing result: " + result.toString());
 		}
-		switch (packet.getCommand()) {
+		switch (iqc.getCommand()) {
 			case VHOSTS_RELOAD:
 				try {
 					repo.reload();
@@ -228,22 +233,22 @@ public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
 	}
 
 	@Override
-	public List<Element> getDiscoFeatures(String from) { return null; }
+	public List<Element> getDiscoFeatures(JID from) { return null; }
 
 	@Override
-	public Element getDiscoInfo(String node, String jid, String from) {
-		if (jid != null && getName().equals(JIDUtils.getNodeNick(jid)) && isAdmin(from)) {
+	public Element getDiscoInfo(String node, JID jid, JID from) {
+		if (jid != null && getName().equals(jid.getLocalpart()) && isAdmin(from)) {
 			return serviceEntity.getDiscoInfo(node);
 		}
 		return null;
 	}
 
 	@Override
-	public List<Element> getDiscoItems(String node, String jid, String from) {
+	public List<Element> getDiscoItems(String node, JID jid, JID from) {
 		if (isAdmin(from)) {
-			if (getName().equals(JIDUtils.getNodeNick(jid)) ||
+			if (getName().equals(jid.getLocalpart()) ||
 					getComponentId().equals(jid)) {
-				List<Element> items = serviceEntity.getDiscoItems(node, jid);
+				List<Element> items = serviceEntity.getDiscoItems(node, jid.toString());
 				if (log.isLoggable(Level.FINEST)) {
 					log.finest("Processing discoItems for node: " + node + ", result: " +
 							(items == null ? null : items.toString()));
@@ -252,7 +257,7 @@ public class VHostManager	extends AbstractComponentRegistrator<VHostListener>
 			} else {
 				if (node == null) {
 					Element item = serviceEntity.getDiscoItem(null,
-							JIDUtils.getNodeID(getName(), jid));
+							BareJID.toString(getName(), jid.toString()));
 					if (log.isLoggable(Level.FINEST)) {
 						log.finest("Processing discoItems, result: " +
 								(item == null ? null : item.toString()));

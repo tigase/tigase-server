@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 import tigase.cluster.ClusteringStrategyIfc;
 import tigase.server.Packet;
 import tigase.stats.StatisticsList;
+import tigase.xmpp.JID;
 
 /**
  * Created: May 13, 2009 9:53:44 AM
@@ -47,7 +48,7 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
     Logger.getLogger(SMNonCachingAllNodes.class.getName());
 
 	//private Set<String> cluster_nodes = new ConcurrentSkipListSet<String>();
-	private List<String> cl_nodes_list = new CopyOnWriteArrayList<String>();
+	private List<JID> cl_nodes_list = new CopyOnWriteArrayList<JID>();
 	//private String smName = null;
 
 	@Override
@@ -60,33 +61,33 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 	}
 
 	@Override
-	public List<String> getNodesForJid(String jid) {
+	public List<JID> getNodesForJid(JID jid) {
 		Collections.rotate(cl_nodes_list, 1);
 		return cl_nodes_list;
 	}
 
 	@Override
-	public void nodeConnected(String jid) {
+	public void nodeConnected(JID jid) {
 		cl_nodes_list.add(jid);
 		log.fine("Cluster nodes: " + cl_nodes_list.toString());
 	}
 
 	@Override
-	public void nodeDisconnected(String jid) {
+	public void nodeDisconnected(JID jid) {
 		cl_nodes_list.remove(jid);
 		log.fine("Cluster nodes: " + cl_nodes_list.toString());
 	}
 
 	@Override
-	public void usersConnected(String sm, Queue<Packet> results, String ... jid) {
+	public void usersConnected(JID sm, Queue<Packet> results, JID ... jid) {
 	}
 
 	@Override
-	public void userDisconnected(String jid, String sm, Queue<Packet> results) {
+	public void userDisconnected(JID sm, Queue<Packet> results, JID jid) {
 	}
 
 	@Override
-	public List<String> getAllNodes() {
+	public List<JID> getAllNodes() {
 		return cl_nodes_list;
 	}
 
@@ -104,12 +105,12 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 	}
 
 	@Override
-	public boolean containsJid(String jid) {
+	public boolean containsJid(JID jid) {
 		return false;
 	}
 
 	@Override
-	public String[] getConnectionIdsForJid(String jid) {
+	public JID[] getConnectionIdsForJid(JID jid) {
 		return null;
 	}
 

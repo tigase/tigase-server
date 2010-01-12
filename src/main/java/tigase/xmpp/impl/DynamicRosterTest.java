@@ -29,8 +29,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import java.util.logging.Level;
-import tigase.util.JIDUtils;
+import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
+import tigase.xmpp.JID;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
 
@@ -51,8 +52,8 @@ public class DynamicRosterTest implements DynamicRosterIfc {
 	public void setItemExtraData(Element item) {
 		String jid = item.getAttribute("jid");
 		if (log.isLoggable(Level.FINEST)) {
-    		log.finest("Storing item: " + item + ", for jid=" + jid);
-        }
+			log.finest("Storing item: " + item + ", for jid=" + jid);
+		}
 		memStorage.put(jid, item);
 	}
 
@@ -61,8 +62,8 @@ public class DynamicRosterTest implements DynamicRosterIfc {
 		String jid = item.getAttribute("jid");
 		Element result = memStorage.get(jid);
 		if (log.isLoggable(Level.FINEST)) {
-    		log.finest("Retrieving item: " + result + ", for jid=" + jid);
-        }
+			log.finest("Retrieving item: " + result + ", for jid=" + jid);
+		}
 		return result;
 	}
 
@@ -73,9 +74,13 @@ public class DynamicRosterTest implements DynamicRosterIfc {
 	public void init(String par) {}
 
 	@Override
-	public String[] getBuddies(XMPPResourceConnection session)
+	public JID[] getBuddies(XMPPResourceConnection session)
 					throws NotAuthorizedException {
-		return new String[] {"dynrost@test-d"};
+		try {
+			return new JID[]{new JID("dynrost@test-d")};
+		} catch (TigaseStringprepException ex) {
+			return null;
+		}
 	}
 
 	private Element getBuddy() {
@@ -88,9 +93,9 @@ public class DynamicRosterTest implements DynamicRosterIfc {
 	}
 
 	@Override
-	public Element getBuddyItem(XMPPResourceConnection session, String buddy)
+	public Element getBuddyItem(XMPPResourceConnection session, JID buddy)
 					throws NotAuthorizedException {
-		if ("dynrost@test-d".equals(JIDUtils.getNodeID(buddy))) {
+		if ("dynrost@test-d".equals(buddy.getBareJID().toString())) {
 			return getBuddy();
 		} else {
 			return null;

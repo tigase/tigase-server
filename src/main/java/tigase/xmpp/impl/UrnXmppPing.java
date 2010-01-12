@@ -21,7 +21,6 @@
  */
 package tigase.xmpp.impl;
 
-import java.util.Arrays;
 import java.util.Queue;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -29,10 +28,12 @@ import java.util.logging.Level;
 
 import tigase.conf.Configurable;
 import tigase.db.NonAuthUserRepository;
+import tigase.server.BasicComponent;
 import tigase.server.Packet;
-import tigase.util.JIDUtils;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
+import tigase.xmpp.BareJID;
+import tigase.xmpp.JID;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPProcessor;
@@ -62,13 +63,15 @@ public class UrnXmppPing extends XMPPProcessor implements XMPPProcessorIfc {
 
 	private static final String[] XMLNSS = { XMLNS };
 
+	@Override
 	public String id() {
 		return ID;
 	}
 
-	public void process(final Packet packet, final XMPPResourceConnection session,
-		final NonAuthUserRepository repo, final Queue<Packet> results,
-		final Map<String, Object> settings) {
+	@Override
+	public void process(Packet packet, XMPPResourceConnection session,
+		NonAuthUserRepository repo, Queue<Packet> results,
+		Map<String, Object> settings) {
 
 		if (session == null) {
 			try {
@@ -82,38 +85,39 @@ public class UrnXmppPing extends XMPPProcessor implements XMPPProcessorIfc {
 			}
 			return;
 		}
-		String id = session.getDomain();
-		if (packet.getElemTo() != null) {
-			id = JIDUtils.getNodeID(packet.getElemTo());
+		BareJID id = session.getDomainAsJID().getBareJID();
+		if (packet.getStanzaTo() != null) {
+			id = packet.getStanzaTo().getBareJID();
 		}
-		if (id == null || id.equals("") || id.equalsIgnoreCase(session.getDomain())
-			|| session.getConnectionId() == Configurable.NULL_ROUTING) {
+		if (id == null || id.toString().equals(session.getDomain())
+			|| session.getConnectionId() == BasicComponent.NULL_ROUTING) {
 			results.offer(packet.okResult((Element) null, 0));
 			return;
 		}
 
 		try {
 			if (id.equals(session.getUserId())) {
-				Element elem = packet.getElement().clone();
-				Packet result = new Packet(elem);
-				result.setTo(session.getConnectionId(packet.getElemTo()));
-				result.setFrom(packet.getTo());
+				Packet result = packet.copyElementOnly();
+				result.setPacketTo(session.getConnectionId(packet.getStanzaTo()));
+				result.setPacketFrom(packet.getTo());
 				results.offer(result);
 			} else {
-				Element result = packet.getElement().clone();
-				results.offer(new Packet(result));
+				results.offer(packet.copyElementOnly());
 			}
 		} catch (NotAuthorizedException e) {
-			log.warning("NotAuthorizedException for packet: " + packet.getStringData());
+			log.warning("NotAuthorizedException for packet: " + packet);
 		}
 	}
 
+	@Override
 	public Element[] supDiscoFeatures(final XMPPResourceConnection session) {
 		return DISCO_FEATURES;
 	}
 
+	@Override
 	public String[] supElements() {	return ELEMENTS; }
 
+	@Override
 	public String[] supNamespaces() {	return XMLNSS; }
 
 }

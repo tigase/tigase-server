@@ -22,11 +22,12 @@ package tigase.xmpp.impl.roster;
 
 import java.util.HashSet;
 import java.util.Set;
+import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
 import java.util.logging.Logger;
-import tigase.util.JIDUtils;
 
 import tigase.xml.XMLUtils;
+import tigase.xmpp.JID;
 import tigase.xmpp.XMPPResourceConnection;
 import static tigase.xmpp.impl.roster.RosterAbstract.SubscriptionType;
 
@@ -54,7 +55,7 @@ public class RosterElement {
 	private SubscriptionType subscription = null;
 	private String[] groups = null;
 	private String name = null;
-	private String jid = null;
+	private JID jid = null;
 	//private boolean online = false;
 	//private Element item = null;
 
@@ -75,18 +76,11 @@ public class RosterElement {
 	}
 	private boolean presence_sent = false;
 
-	public RosterElement(String jid, String name, String[] groups,
+	public RosterElement(JID jid, String name, String[] groups,
 					XMPPResourceConnection session) {
 		this.session = session;
 		setJid(jid);
-		if (name == null) {
-			this.name = JIDUtils.getNodeNick(this.jid);
-			if (this.name == null || this.name.isEmpty()) {
-				this.name = this.jid;
-			}
-		} else {
-			this.name = name;
-		}
+		setName(name);
 		this.groups = groups;
 		this.subscription = SubscriptionType.none;
 	}
@@ -96,18 +90,15 @@ public class RosterElement {
 	 *
 	 *
 	 * @param roster_el
+	 * @param session
+	 * @throws TigaseStringprepException
 	 */
-	public RosterElement(Element roster_el, XMPPResourceConnection session) {
+	public RosterElement(Element roster_el, XMPPResourceConnection session)
+			throws TigaseStringprepException {
 		this.session = session;
 		if (roster_el.getName() == ELEM_NAME) {
 			setJid(roster_el.getAttribute(JID_ATT));
-			name = roster_el.getAttribute(NAME_ATT);
-			if (name == null || name.isEmpty()) {
-				name = JIDUtils.getNodeNick(jid);
-				if (this.name == null || this.name.isEmpty()) {
-					this.name = jid;
-				}
-			}
+			setName(roster_el.getAttribute(NAME_ATT));
 			if (roster_el.getAttribute(SUBS_ATT) == null) {
 				subscription = SubscriptionType.none;
 			} else {
@@ -122,15 +113,15 @@ public class RosterElement {
 		}
 	}
 
-	private void setJid(String jid) {
-		this.jid = jid.toLowerCase();
-		String buddy_domain = JIDUtils.getNodeHost(this.jid);
-		if (session != null && session.isLocalDomain(buddy_domain, false)) {
-			this.jid = this.jid.intern();
-		}
+	private void setJid(JID jid) {
+		this.jid = jid;
 	}
 
-	public String getJid() {
+	private void setJid(String jid) throws TigaseStringprepException {
+		this.jid = new JID(jid);
+	}
+
+	public JID getJid() {
 		return jid;
 	}
 
@@ -139,8 +130,14 @@ public class RosterElement {
 	}
 
 	public void setName(String name) {
-		this.name = name;
-		//item = null;
+		if (name == null) {
+			this.name = this.jid.getLocalpart();
+			if (this.name == null || this.name.trim().isEmpty()) {
+				this.name = this.jid.getBareJID().toString();
+			}
+		} else {
+			this.name = name;
+		}
 	}
 
 	public String[] getGroups() {
@@ -168,7 +165,7 @@ public class RosterElement {
 	public Element getRosterElement() {
 		Element elem = new Element(ELEM_NAME,
 			new String[] {JID_ATT, SUBS_ATT, NAME_ATT},
-			new String[] {jid, subscription.toString(), name});
+			new String[] {jid.toString(), subscription.toString(), name});
 		if (groups != null && groups.length > 0) {
 			String grps = "";
 			for (String group: groups) {
@@ -186,7 +183,7 @@ public class RosterElement {
 		// is needed only once at the roster retrieving time.
 		//if (item == null) {
 			Element item = new Element("item");
-			item.setAttribute("jid", jid);
+			item.setAttribute("jid", jid.toString());
 			item.addAttributes(subscription.getSubscriptionAttr());
 			if (name != null) {
 				item.setAttribute("name", XMLUtils.escape(name));

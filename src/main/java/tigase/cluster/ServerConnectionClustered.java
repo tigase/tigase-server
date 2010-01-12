@@ -26,13 +26,14 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 import java.util.logging.Level;
+import tigase.util.TigaseStringprepException;
 
-
-import tigase.util.JIDUtils;
 import tigase.xmpp.StanzaType;
 import tigase.server.Packet;
+import tigase.server.xmppserver.CID;
 import tigase.server.xmppserver.ServerConnectionManager;
 import tigase.xml.Element;
+import tigase.xmpp.JID;
 
 /**
  * Describe class ServerConnectionClustered here.
@@ -52,14 +53,14 @@ public class ServerConnectionClustered extends ServerConnectionManager
   private static final Logger log =
     Logger.getLogger("tigase.cluster.ServerConnectionClustered");
 
-	private static final String CID = "cid";
-	private static final String KEY = "key";
+	private static final String CID_P = "cid";
+	private static final String KEY_P = "key";
 	private static final String FORKEY_SESSION_ID = "forkey_sessionId";
 	private static final String ASKING_SESSION_ID = "asking_sessionId";
 	private static final String VALID = "valid";
 
 	//private Set<String> cluster_nodes = new LinkedHashSet<String>();
-	private List<String> cl_nodes_array = new CopyOnWriteArrayList<String>();
+	private List<JID> cl_nodes_array = new CopyOnWriteArrayList<JID>();
 
 	@Override
 	public void processPacket(Packet packet) {
@@ -76,32 +77,37 @@ public class ServerConnectionClustered extends ServerConnectionManager
 
 	protected void processClusterPacket(Packet packet) {
 		ClusterElement clel = new ClusterElement(packet.getElement());
-		clel.addVisitedNode(getComponentId());
+		clel.addVisitedNode(getComponentId().toString());
 		switch (packet.getType()) {
 		case set:
 			if (ClusterMethods.CHECK_DB_KEY.toString().equals(clel.getMethodName())) {
-				String cid = clel.getMethodParam(CID);
-				String key = clel.getMethodParam(KEY);
+				String cid = clel.getMethodParam(CID_P);
+				String key = clel.getMethodParam(KEY_P);
 				String forkey_sessionId = clel.getMethodParam(FORKEY_SESSION_ID);
 				String asking_sessionId = clel.getMethodParam(ASKING_SESSION_ID);
 				String local_key =
-          super.getLocalDBKey(cid, key, forkey_sessionId, asking_sessionId);
+          super.getLocalDBKey(new CID(cid), key, forkey_sessionId, asking_sessionId);
 				ClusterElement result = null;
 				boolean valid = false;
 				if (local_key != null) {
 					valid = local_key.equals(key);
 				} else {
 					result = ClusterElement.createForNextNode(clel, cl_nodes_array,
-						getComponentId());
+							getComponentId());
 				}
 				if (result == null) {
 					Map<String, String> res_vals = new LinkedHashMap<String, String>();
 
 					res_vals.put(VALID, "" + valid);
-					result = clel.createMethodResponse(getComponentId(),
+					result = clel.createMethodResponse(getComponentId().toString(),
 						StanzaType.result, res_vals);
 				}
-				addOutPacket(new Packet(result.getClusterElement()));
+				try {
+					addOutPacket(Packet.packetInstance(result.getClusterElement()));
+				} catch (TigaseStringprepException ex) {
+					log.warning("Cluster packet addressing problem, stringprep failed for: "
+							+ result.getClusterElement());
+				}
 			}
 			break;
 		case get:
@@ -109,13 +115,13 @@ public class ServerConnectionClustered extends ServerConnectionManager
 			break;
 		case result:
 			if (ClusterMethods.CHECK_DB_KEY.toString().equals(clel.getMethodName())) {
-				String cid = clel.getMethodParam(CID);
-				String key = clel.getMethodParam(KEY);
+				CID cid = new CID(clel.getMethodParam(CID_P));
+				String key = clel.getMethodParam(KEY_P);
 				String forkey_sessionId = clel.getMethodParam(FORKEY_SESSION_ID);
 				String asking_sessionId = clel.getMethodParam(ASKING_SESSION_ID);
 				boolean valid = "true".equals(clel.getMethodResultVal(VALID));
-				String from = JIDUtils.getNodeNick(cid);
-				String to = JIDUtils.getNodeHost(cid);
+				String from = cid.getFromHost();
+				String to = cid.getToHost();
 				sendVerifyResult(from, to, forkey_sessionId, valid,
 					getServerConnections(cid), asking_sessionId);
 			}
@@ -124,19 +130,25 @@ public class ServerConnectionClustered extends ServerConnectionManager
 			// There might be many different errors...
 			// But they all mean the cluster node is unreachable.
 			// Let's leave custom handling each error type for later...
-			String from = packet.getElemFrom();
-			clel.addVisitedNode(from);
-			addOutPacket(new Packet(ClusterElement.createForNextNode(clel,
-						cl_nodes_array, getComponentId()).getClusterElement()));
+			JID from = packet.getStanzaFrom();
+			clel.addVisitedNode(from.toString());
+			Element result = ClusterElement.createForNextNode(clel, cl_nodes_array,
+					getComponentId()).getClusterElement();
+			try {
+				addOutPacket(Packet.packetInstance(result));
+			} catch (TigaseStringprepException ex) {
+				log.warning("Cluster packet addressing problem, stringprep failed for: "
+						+ result);
+			}
 			break;
 		default:
 			break;
 		}
 	}
 
-	protected String getFirstClusterNode() {
-		String cluster_node = null;
-		for (String node: cl_nodes_array) {
+	protected JID getFirstClusterNode() {
+		JID cluster_node = null;
+		for (JID node: cl_nodes_array) {
 			if (!node.equals(getComponentId())) {
 				cluster_node = node;
 				break;
@@ -146,25 +158,24 @@ public class ServerConnectionClustered extends ServerConnectionManager
 	}
 
 	@Override
-	protected String getLocalDBKey(String cid, String key, String forkey_sessionId,
+	protected String getLocalDBKey(CID cid, String key, String forkey_sessionId,
 		String asking_sessionId) {
 		String local_key = super.getLocalDBKey(cid, key, forkey_sessionId,
 			asking_sessionId);
 		if (local_key != null) {
 			return local_key;
 		} else {
-			String cluster_node = getFirstClusterNode();
+			JID cluster_node = getFirstClusterNode();
 			if (cluster_node != null) {
 				Map<String, String> params = new LinkedHashMap<String, String>();
-				params.put(CID, cid);
-				params.put(KEY, key);
+				params.put(CID_P, cid.toString());
+				params.put(KEY_P, key);
 				params.put(FORKEY_SESSION_ID, forkey_sessionId);
 				params.put(ASKING_SESSION_ID, asking_sessionId);
-				Element check_db_key =
-          ClusterElement.createClusterMethodCall(getComponentId(), cluster_node,
-						StanzaType.set, ClusterMethods.CHECK_DB_KEY.toString(),
-						params).getClusterElement();
-				addOutPacket(new Packet(check_db_key));
+				Element result = ClusterElement.createClusterMethodCall(getComponentId().
+						toString(), cluster_node.toString(), StanzaType.set, ClusterMethods.CHECK_DB_KEY.
+						toString(), params).getClusterElement();
+				addOutPacket(Packet.packetInstance(result, getComponentId(), cluster_node));
 			}
 			return null;
 		}
@@ -172,12 +183,20 @@ public class ServerConnectionClustered extends ServerConnectionManager
 
 	@Override
 	public void nodeConnected(String node) {
-		cl_nodes_array.add(getName() + "@" + node);
+		try {
+			cl_nodes_array.add(new JID(getName(), node, null));
+		} catch (TigaseStringprepException ex) {
+			log.warning("Node address is incorrect, stringprep failed for: " + node);
+		}
 	}
 
 	@Override
 	public void nodeDisconnected(String node) {
-		cl_nodes_array.remove(getName() + "@" + node);
+		try {
+			cl_nodes_array.remove(new JID(getName(), node, null));
+		} catch (TigaseStringprepException ex) {
+			log.warning("Node address is incorrect, stringprep failed for: " + node);
+		}
 	}
 
 	@Override

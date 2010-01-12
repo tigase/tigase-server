@@ -23,6 +23,7 @@ package tigase.server.ssender;
 
 import java.io.IOException;
 import java.util.TimerTask;
+import tigase.xmpp.JID;
 
 /**
  * Describe class SenderTask here.
@@ -35,13 +36,13 @@ import java.util.TimerTask;
  */
 public abstract class SenderTask extends TimerTask {
 
-	private String name = null;
+	private JID name = null;
 
-	public void setName(String name) {
+	public void setName(JID name) {
 		this.name = name;
 	}
 
-	public String getName() {
+	public JID getName() {
 		return name;
 	}
 

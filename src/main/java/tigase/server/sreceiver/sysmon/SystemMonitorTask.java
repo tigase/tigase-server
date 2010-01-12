@@ -31,11 +31,13 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import tigase.server.Message;
 import tigase.server.Packet;
 import tigase.server.sreceiver.PropertyItem;
 import tigase.server.sreceiver.RepoRosterTask;
 import tigase.stats.StatisticsList;
 import tigase.util.ClassUtil;
+import tigase.xmpp.JID;
 import tigase.xmpp.StanzaType;
 
 import static tigase.server.sreceiver.PropertyConstants.*;
@@ -66,8 +68,8 @@ public class SystemMonitorTask extends RepoRosterTask {
 
 	private String[] all_monitors = null;
 	private String[] selected_monitors = null;
-	private Map<String, ResourceMonitorIfc> monitors =
-					new LinkedHashMap<String, ResourceMonitorIfc>();
+	private Map<JID, ResourceMonitorIfc> monitors =
+					new LinkedHashMap<JID, ResourceMonitorIfc>();
 	private float warning_threshold = 0.8f;
 
 	private enum command {
@@ -109,8 +111,7 @@ public class SystemMonitorTask extends RepoRosterTask {
 	protected void sendPacketsOut(Queue<Packet> input) {
 		Queue<Packet> results = new ArrayDeque<Packet>();
 		for (Packet packet : input) {
-			if (packet.getElemName() == "message" || packet.getElemTo() == null ||
-							packet.getElemTo().isEmpty()) {
+			if (packet.getElemName() == "message" || packet.getStanzaTo() == null) {
 				super.processMessage(packet, results);
 			} else {
 				results.add(packet);
@@ -123,8 +124,7 @@ public class SystemMonitorTask extends RepoRosterTask {
 
 	protected void sendPacketOut(Packet input) {
 		Queue<Packet> results = new ArrayDeque<Packet>();
-		if (input.getElemName() == "message" || input.getElemTo() == null ||
-						input.getElemTo().isEmpty()) {
+		if (input.getElemName() == "message" || input.getStanzaTo() == null) {
 			super.processMessage(input, results);
 		} else {
 			results.add(input);
@@ -280,13 +280,13 @@ public class SystemMonitorTask extends RepoRosterTask {
 				try {
 					ResourceMonitorIfc resMon =
 									(ResourceMonitorIfc) Class.forName(string).newInstance();
-					String monJid = getJID() + "/" + resMon.getClass().getSimpleName();
+					JID monJid = new JID(getJID() + "/" + resMon.getClass().getSimpleName());
 					resMon.init(monJid, warning_threshold, this);
 					monitors.put(monJid, resMon);
 					log.config("Loaded resource monitor: " + monJid);
 				} catch (Exception ex) {
-					log.log(Level.SEVERE,
-									"Can't instantiate resource monitor: " + string, ex);
+					log.log(Level.SEVERE, "Can't instantiate resource monitor: " + string,
+							ex);
 				}
 			}
 		}
@@ -340,9 +340,9 @@ public class SystemMonitorTask extends RepoRosterTask {
 		command comm = command.valueOf(body_split[0].substring(2));
 		switch (comm) {
 			case help:
-				results.offer(Packet.getMessage(packet.getElemFrom(),
-								packet.getElemTo(), StanzaType.chat, commandsHelp(),
-								"Commands description", null, packet.getId()));
+				results.offer(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(),
+								StanzaType.chat, commandsHelp(),
+								"Commands description", null, packet.getStanzaId()));
 				break;
 			case state:
 				StringBuilder sb = new StringBuilder("\n");
@@ -350,9 +350,9 @@ public class SystemMonitorTask extends RepoRosterTask {
 					sb.append(resmon.getClass().getSimpleName() + ":\n");
 					sb.append(resmon.getState() + "\n");
 				}
-				results.offer(Packet.getMessage(packet.getElemFrom(),
-								packet.getElemTo(), StanzaType.chat, sb.toString(),
-								"Monitors State", null, packet.getId()));
+				results.offer(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(),
+								 StanzaType.chat, sb.toString(),
+								"Monitors State", null, packet.getStanzaId()));
 				break;
 			case threshold:
 				if (body_split.length > 1) {
@@ -361,30 +361,32 @@ public class SystemMonitorTask extends RepoRosterTask {
 						float newthreshold = Float.parseFloat(body_split[1]);
 						if (newthreshold > 0 && newthreshold < 1) {
 							warning_threshold = newthreshold;
-							for (Map.Entry<String, ResourceMonitorIfc> resmon : monitors.entrySet()) {
+							for (Map.Entry<JID, ResourceMonitorIfc> resmon : monitors.entrySet()) {
 								resmon.getValue().init(resmon.getKey(), warning_threshold, this);
 							}
 							correct = true;
 						}
 					} catch (Exception e) { }
 					if (correct) {
-						results.offer(Packet.getMessage(packet.getElemFrom(),
-										packet.getElemTo(), StanzaType.chat,
+						results.offer(Message.getMessage(packet.getStanzaTo(), packet.
+								getStanzaFrom(),
+										StanzaType.chat,
 										"New threshold set to: " + warning_threshold + "\n",
-										"Threshold command.", null, packet.getId()));
+										"Threshold command.", null, packet.getStanzaId()));
 					} else {
-						results.offer(Packet.getMessage(packet.getElemFrom(),
-										packet.getElemTo(), StanzaType.chat,
+						results.offer(Message.getMessage(packet.getStanzaTo(), packet.
+								getStanzaFrom(),
+										StanzaType.chat,
 										"Incorrect threshold givenm using the old threshold: " +
 										warning_threshold + "\n" +
 										"Correct threshold is a float point number 0 < N < 1.",
-										"Threshold command.", null, packet.getId()));
+										"Threshold command.", null, packet.getStanzaId()));
 					}
 				} else {
-					results.offer(Packet.getMessage(packet.getElemFrom(),
-									packet.getElemTo(), StanzaType.chat,
+					results.offer(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(),
+									StanzaType.chat,
 									"Current threshold value is: " + warning_threshold,
-									"Threshold command.", null, packet.getId()));
+									"Threshold command.", null, packet.getStanzaId()));
 				}
 				break;
 		}
@@ -399,9 +401,9 @@ public class SystemMonitorTask extends RepoRosterTask {
 			result = "Monitor " + monitor.getClass().getSimpleName() +
 					" command was run but returned no results.";
 		}
-		results.offer(Packet.getMessage(packet.getElemFrom(),
-				packet.getElemTo(), StanzaType.chat, result,
-				monitor.getClass().getSimpleName() + " command.", null, packet.getId()));
+		results.offer(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(),
+				StanzaType.chat, result,
+				monitor.getClass().getSimpleName() + " command.", null, packet.getStanzaId()));
 	}
 
 	@Override
@@ -414,10 +416,10 @@ public class SystemMonitorTask extends RepoRosterTask {
 				runMonitorCommand(monitor, packet, results);
 			} else {
 				String body = packet.getElemCData("/message/body");
-				results.offer(Packet.getMessage(packet.getElemFrom(),
-						packet.getElemTo(), StanzaType.normal,
+				results.offer(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(),
+						StanzaType.normal,
 						"This is response to your message: [" + body + "]",
-						"Response", null, packet.getId()));
+						"Response", null, packet.getStanzaId()));
 			}
 		}
 	}

@@ -33,11 +33,12 @@ import java.util.logging.Logger;
 import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.server.ReceiverTimeoutHandler;
-import tigase.util.JIDUtils;
+import tigase.util.TigaseStringprepException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.XMPPIOService;
 import tigase.server.xmppclient.ClientConnectionManager;
+import tigase.xmpp.JID;
 
 import tigase.xmpp.PacketErrorTypeException;
 import static tigase.server.bosh.Constants.*;
@@ -96,8 +97,8 @@ public class BoshConnectionManager extends ClientConnectionManager
 // 		}
 // 	}
 
-	protected BoshSession getBoshSession(String jid) {
-		UUID sid = UUID.fromString(JIDUtils.getNodeResource(jid));
+	protected BoshSession getBoshSession(JID jid) {
+		UUID sid = UUID.fromString(jid.getResource());
 		return sessions.get(sid);
 	}
 
@@ -153,13 +154,13 @@ public class BoshConnectionManager extends ClientConnectionManager
 	}
 
 	@Override
-	protected String changeDataReceiver(Packet packet, String newAddress,
+	protected JID changeDataReceiver(Packet packet, JID newAddress,
 		String command_sessionId, XMPPIOService<Object> serv) {
 		BoshSession session = getBoshSession(packet.getTo());
 		if (session != null) {
 			String sessionId = session.getSessionId();
 			if (sessionId.equals(command_sessionId)) {
-				String old_receiver = session.getDataReceiver();
+				JID old_receiver = session.getDataReceiver();
 				session.setDataReceiver(newAddress);
 				return old_receiver;
 			} else {
@@ -191,10 +192,24 @@ public class BoshConnectionManager extends ClientConnectionManager
 				if (sid_str == null) {
 					String hostname = p.getAttribute("to");
 					if (hostname != null && isLocalDomain(hostname)) {
-						bs = new BoshSession(getDefHostName(),
-										routings.computeRouting(hostname), this);
-						sid = bs.getSid();
-						sessions.put(sid, bs);
+						try {
+							bs =
+									new BoshSession(getDefHostName(),
+									new JID(routings.computeRouting(hostname)), this);
+							sid = bs.getSid();
+							sessions.put(sid, bs);
+						} catch (TigaseStringprepException ex) {
+							log.info("Addressing problem, stringprep failed for: "
+									+ routings.computeRouting(hostname) + ", closing connection");
+							try {
+								serv.sendErrorAndStop(Authorization.INTERNAL_SERVER_ERROR, p,
+										"Internal server error....");
+							} catch (Exception e) {
+								log.log(Level.WARNING,
+										"Problem sending invalid hostname error for sid =  "
+										+ sid, e);
+							}
+						}
 					} else {
 						log.info("Invalid hostname. Closing invalid connection");
 						try {
@@ -238,15 +253,20 @@ public class BoshConnectionManager extends ClientConnectionManager
 
 	private void addOutPackets(Queue<Packet> out_results, BoshSession bs) {
 		for (Packet res: out_results) {
-			res.setFrom(getFromAddress(bs.getSid().toString()));
-			res.setTo(bs.getDataReceiver());
-			addOutPacket(res);
+			try {
+				res.setPacketFrom(getFromAddress(bs.getSid().toString()));
+				res.setPacketTo(bs.getDataReceiver());
+				addOutPacket(res);
+			} catch (TigaseStringprepException ex) {
+				log.warning("Packet addressing problem, stringprep processing failed, dropping: "
+						+ res);
+			}
 		}
 		out_results.clear();
 	}
 
-	private String getFromAddress(String id) {
-		return JIDUtils.getJID(getName(), getDefHostName(), id);
+	private JID getFromAddress(String id) throws TigaseStringprepException {
+		return new JID(getName(), getDefHostName(), id);
 	}
 
 	@Override
@@ -388,16 +408,30 @@ public class BoshConnectionManager extends ClientConnectionManager
 	 */
 	@Override
 	public boolean addOutStreamOpen(Packet packet, BoshSession bs) {
-		packet.setFrom(getFromAddress(bs.getSid().toString()));
-		packet.setTo(bs.getDataReceiver());
-		return addOutPacketWithTimeout(packet, startedHandler, 15l, TimeUnit.SECONDS);
+		try {
+			packet.setPacketFrom(getFromAddress(bs.getSid().toString()));
+			packet.setPacketTo(bs.getDataReceiver());
+			return addOutPacketWithTimeout(packet, startedHandler, 15l,
+					TimeUnit.SECONDS);
+		} catch (TigaseStringprepException ex) {
+			log.warning("Packet addressing problem, stringprep processing failed, dropping: "
+					+ packet);
+		}
+		return false;
 	}
 
 	@Override
 	public boolean addOutStreamClosed(Packet packet, BoshSession bs) {
-		packet.setFrom(getFromAddress(bs.getSid().toString()));
-		packet.setTo(bs.getDataReceiver());
-		return addOutPacketWithTimeout(packet, stoppedHandler, 15l, TimeUnit.SECONDS);
+		try {
+			packet.setPacketFrom(getFromAddress(bs.getSid().toString()));
+			packet.setPacketTo(bs.getDataReceiver());
+			return addOutPacketWithTimeout(packet, stoppedHandler, 15l,
+					TimeUnit.SECONDS);
+		} catch (TigaseStringprepException ex) {
+			log.warning("Packet addressing problem, stringprep processing failed, dropping: "
+					+ packet);
+		}
+		return false;
 	}
 
 	@Override

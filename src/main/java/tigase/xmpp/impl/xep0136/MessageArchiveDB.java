@@ -23,18 +23,17 @@ package tigase.xmpp.impl.xep0136;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Types;
 import java.util.Map;
 import java.util.Date;
 import java.util.Collections;
 import java.util.logging.Logger;
+import tigase.server.Packet;
 
 import tigase.util.JDBCAbstract;
-import tigase.util.JIDUtils;
 import tigase.xml.Element;
 
 import tigase.util.SimpleCache;
+import tigase.xmpp.BareJID;
 
 /**
  * Describe class MessageArchiveDB here.
@@ -250,17 +249,17 @@ public class MessageArchiveDB extends JDBCAbstract {
 		return result;
 	}
 
-	public void saveMessage(Element message, boolean full_content, String defLang)
+	public void saveMessage(Packet message, boolean full_content, String defLang)
     throws SQLException {
-		String from_str = JIDUtils.getNodeID(message.getAttribute("from"));
-		String to_str = JIDUtils.getNodeID(message.getAttribute("to"));
-		long[] ids = getJidsIds(from_str, to_str);
-		long from_id = (ids[0] != LONG_NULL ? ids[0] : addJidID(from_str));
-		long to_id = (ids[1] != LONG_NULL ? ids[1] : addJidID(to_str));
+		BareJID from_str = message.getStanzaFrom().getBareJID();
+		BareJID to_str = message.getStanzaTo().getBareJID();
+		long[] ids = getJidsIds(from_str.toString(), to_str.toString());
+		long from_id = (ids[0] != LONG_NULL ? ids[0] : addJidID(from_str.toString()));
+		long to_id = (ids[1] != LONG_NULL ? ids[1] : addJidID(to_str.toString()));
 
-		String thread = message.getCData("/message/thread");
+		String thread = message.getElemCData("/message/thread");
 		long thread_id = LONG_NULL;
-		String subject = message.getCData("/message/subject");
+		String subject = message.getElemCData("/message/subject");
 		long subject_id = LONG_NULL;
 		if (thread != null && !thread.trim().isEmpty()) {
 			thread_id = addThreadID(thread);

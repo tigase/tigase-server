@@ -28,6 +28,7 @@ import java.util.Queue;
 import tigase.server.Packet;
 import tigase.stats.StatisticsList;
 import tigase.sys.OnlineJidsReporter;
+import tigase.xmpp.JID;
 
 /**
  * Created: May 2, 2009 4:36:03 PM
@@ -80,27 +81,27 @@ public interface ClusteringStrategyIfc extends OnlineJidsReporter {
 	 * @param jid is a user full JID.
 	 * @return List of cluster nodes to which the user can be connected.
 	 */
-	List<String> getNodesForJid(String jid);
+	List<JID> getNodesForJid(JID jid);
 
 	/**
 	 * The method retutns all cluster nodes currently connected to the cluster.
 	 * @return List of all cluster nodes currently connected to the cluster.
 	 */
-	List<String> getAllNodes();
+	List<JID> getAllNodes();
 
 	/**
 	 * This is a handler method which is called when a new node connects to
 	 * the cluster.
 	 * @param node is a cluster node id.
 	 */
-	void nodeConnected(String node);
+	void nodeConnected(JID node);
 
 	/**
 	 * This is a handler method which is called when a node disconnects from
 	 * the cluster.
 	 * @param node is a cluster node id.
 	 */
-	void nodeDisconnected(String node);
+	void nodeDisconnected(JID node);
 
 	/**
 	 * This is a handler method which is called when a user connects to some
@@ -112,7 +113,7 @@ public interface ClusteringStrategyIfc extends OnlineJidsReporter {
 	 * @param results is a collection of packets which can be generated upon the
 	 * user connection by the implementation.
 	 */
-	void usersConnected(String node, Queue<Packet> results, String ... jids);
+	void usersConnected(JID node, Queue<Packet> results, JID ... jids);
 
 	/**
 	 * This is a handler method which is called when a user disconnects from some
@@ -122,7 +123,7 @@ public interface ClusteringStrategyIfc extends OnlineJidsReporter {
 	 * @param results is a collection of packets which can be generated upon the
 	 * user disconnection by the implementation.
 	 */
-	void userDisconnected(String jid, String node, Queue<Packet> results);
+	void userDisconnected(JID node, Queue<Packet> results, JID jid);
 
 	/**
 	 * This method returns <code>'true'</code> if it needs online users syncronization

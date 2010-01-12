@@ -110,8 +110,8 @@ public class StartTLS extends XMPPProcessor
 			results.offer(result);
 		} // end of if (packet.getElement().getName().equals("starttls"))
 		else {
-      log.warning("Unknown TLS element: " + packet.getStringData());
-			results.offer(packet.swapFromTo(failure));
+      log.warning("Unknown TLS element: " + packet);
+			results.offer(packet.swapFromTo(failure, null, null));
 			results.offer(Command.CLOSE.getPacket(packet.getTo(),
 					packet.getFrom(), StanzaType.set, session.nextStanzaId()));
 		} // end of if (packet.getElement().getName().equals("starttls")) else

@@ -137,8 +137,8 @@ public class ProcessingThreads<E extends WorkerThread> {
 			} else {
 				// Otherwise per destination address
 				// If the packet elemTo is set then used it, otherwise just packetTo:
-				if (packet.getElemTo() != null) {
-					ret = queues.get(Math.abs(packet.getElemTo().hashCode() %
+				if (packet.getStanzaTo() != null) {
+					ret = queues.get(Math.abs(packet.getStanzaTo().hashCode() %
 							numQueues)).offer(item, packet.getPriority().ordinal());
 				} else {
 					ret = queues.get(Math.abs(packet.getTo().hashCode() %
@@ -150,8 +150,8 @@ public class ProcessingThreads<E extends WorkerThread> {
 			// cases are catched.
 			// Otherwise per destination address
 				// If the packet elemTo is set then used it, otherwise just packetTo:
-				if (packet.getElemTo() != null) {
-					ret = queues.get(Math.abs(packet.getElemTo().hashCode() %
+				if (packet.getStanzaTo() != null) {
+					ret = queues.get(Math.abs(packet.getStanzaTo().hashCode() %
 							numQueues)).offer(item, packet.getPriority().ordinal());
 				} else {
 					ret = queues.get(Math.abs(packet.getTo().hashCode() %

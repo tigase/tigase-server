@@ -30,12 +30,12 @@ import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
+import tigase.xmpp.BareJID;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.XMPPException;
-import tigase.util.JIDUtils;
 
 /**
  * Describe class JabberIqCommand here.
@@ -91,7 +91,7 @@ public class JabberIqCommand extends XMPPProcessor implements XMPPProcessorIfc {
 
 		try {
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Received packet: " + packet.getStringData());
+				log.finest("Received packet: " + packet.toString());
 			}
 
 			// Not needed anymore. Packet filter does it for all stanzas.
@@ -102,26 +102,25 @@ public class JabberIqCommand extends XMPPProcessor implements XMPPProcessorIfc {
 // 				packet.getElement().setAttribute("from", session.getJID());
 // 			} // end of if (packet.getFrom().equals(session.getConnectionId()))
 
-			if (packet.getElemTo() == null) {
-				packet.getElement().setAttribute("to", session.getSMComponentId());
-				packet.initVars();
+			if (packet.getStanzaTo() == null) {
+				packet.getElement().setAttribute("to", session.getSMComponentId().toString());
+				packet.initVars(packet.getStanzaFrom(), session.getSMComponentId());
 			}
-			String id = JIDUtils.getNodeID(packet.getElemTo());
+			BareJID id = packet.getStanzaTo().getBareJID();
 
 			if (id.equals(session.getUserId())) {
 				// Yes this is message to 'this' client
-				Element elem = packet.getElement().clone();
-				Packet result = new Packet(elem);
-				result.setTo(session.getConnectionId(packet.getElemTo()));
-				result.setFrom(packet.getTo());
+				Packet result = packet.copyElementOnly();
+				result.setPacketTo(session.getConnectionId(packet.getStanzaTo()));
+				result.setPacketFrom(packet.getTo());
 				results.offer(result);
 			} else {
 				// This is message to some other client
-				Element result = packet.getElement().clone();
-				results.offer(new Packet(result));
+				Packet result = packet.copyElementOnly();
+				results.offer(result);
 			} // end of else
 		} catch (NotAuthorizedException e) {
-			log.warning("NotAuthorizedException for packet: "	+ packet.getStringData());
+			log.warning("NotAuthorizedException for packet: "	+ packet.toString());
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 					"You must authorize session first.", true));
 		} // end of try-catch

@@ -157,18 +157,18 @@ public class SaslAuth extends XMPPProcessor
 				(String)authProps.get(UserAuthRepository.RESULT_KEY);
 			if (result == Authorization.AUTHORIZED) {
 				results.offer(packet.swapFromTo(createReply(ElementType.success,
-							challenge_data)));
+							challenge_data), null, null));
 				authProps.clear();
 				session.removeSessionData(XMLNS+"-authProps");
 			} else {
 				results.offer(packet.swapFromTo(createReply(ElementType.challenge,
-							challenge_data)));
+							challenge_data), null, null));
 			}
 		} catch (Exception e) {
 			//e.printStackTrace();
 			session.removeSessionData(XMLNS+"-authProps");
 			results.offer(packet.swapFromTo(createReply(ElementType.failure,
-						"<not-authorized/>")));
+						"<not-authorized/>"), null, null));
 			Integer retries = (Integer)session.getSessionData("auth-retries");
 			if (retries == null) {
 				retries = new Integer(0);
@@ -177,7 +177,7 @@ public class SaslAuth extends XMPPProcessor
 				session.putSessionData("auth-retries", new Integer(retries.intValue() + 1));
 			} else {
 				results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
-						StanzaType.set, packet.getElemId()));
+						StanzaType.set, packet.getStanzaId()));
 			}
 		} // end of try-catch
   }

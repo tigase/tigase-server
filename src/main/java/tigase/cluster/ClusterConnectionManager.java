@@ -41,14 +41,15 @@ import tigase.server.ConnectionManager;
 import tigase.server.Packet;
 import tigase.server.ServiceChecker;
 import tigase.util.Algorithms;
-import tigase.util.JIDUtils;
 import tigase.util.DNSResolver;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.XMPPIOService;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.stats.StatisticsList;
+import tigase.util.TigaseStringprepException;
 import tigase.util.TimeUtils;
+import tigase.xmpp.BareJID;
 
 /**
  * Class ClusterConnectionManager
@@ -124,8 +125,8 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 		// There is a separate connection to each cluster node, ideally we want to
 		// process packets in a separate thread for each connection, so let's try
 		// to get the hash code by the destination node address
-		if (packet.getElemTo() != null) {
-			return packet.getElemTo().hashCode();
+		if (packet.getStanzaTo() != null) {
+			return packet.getStanzaTo().hashCode();
 		}
 		return packet.getTo().hashCode();
 	}
@@ -149,8 +150,8 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Processing packet: " + packet.toString());
 		}
-		if (packet.getElemTo() != null
-			&& packet.getElemTo().equals(getComponentId())) {
+		if (packet.getStanzaTo() != null
+				&& packet.getStanzaTo().equals(getComponentId())) {
 			try {
 				addOutPacket(
 					Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
@@ -189,17 +190,23 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 		Packet p = null;
 		while ((p = serv.getReceivedPackets().poll()) != null) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Processing socket data: " + p.getStringData());
+				log.finest("Processing socket data: " + p);
 			}
 			if (p.getElemName().equals("handshake")) {
 				processHandshake(p, serv);
 			} else {
+				Packet result = p;
 				if (p.isRouted()) {
 // 					processReceivedRid(p, serv);
 // 					processReceivedAck(p, serv);
-					p = p.unpackRouted();
+					try {
+						result = p.unpackRouted();
+					} catch (TigaseStringprepException ex) {
+						log.warning("Packet stringprep addressing problem, dropping packet: " + p);
+						return null;
+					}
 				} // end of if (p.isRouted())
-				addOutPacket(p);
+				addOutPacket(result);
 			}
 		} // end of while ()
 		return null;
@@ -259,7 +266,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 			if (data == null) {
 				serviceConnected(serv);
 			} else {
-				log.warning("Incorrect packet received: " + p.getStringData());
+				log.warning("Incorrect packet received: " + p);
 			}
 			break;
 		}
@@ -276,7 +283,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
         				+", digest="+loc_digest);
                 }
 				if (digest != null && digest.equals(loc_digest)) {
-					Packet resp = new Packet(new Element("handshake"));
+					Packet resp = Packet.packetInstance(new Element("handshake"), null, null);
 					writePacketToSocket(serv, resp);
 					serviceConnected(serv);
 				} else {
@@ -339,7 +346,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 		if (cl_nodes != null) {
 			nodesNo = cl_nodes.length;
 			for (String node: cl_nodes) {
-				String host = JIDUtils.getNodeHost(node);
+				String host = BareJID.parseJID(node)[1];
 				log.config("Found cluster node host: " + host);
 				if (!host.equals(getDefHostName())
 					&& (host.hashCode() > getDefHostName().hashCode() || connect_all)) {
@@ -374,7 +381,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 		if (params.get(CLUSTER_NODES) != null) {
 			String[] cl_nodes = ((String)params.get(CLUSTER_NODES)).split(",");
 			for (int i = 0; i < cl_nodes.length; i++) {
-				cl_nodes[i] = JIDUtils.getNodeHost(cl_nodes[i]);
+				cl_nodes[i] = BareJID.parseJID(cl_nodes[i])[1];
 			}
 			nodesNo = cl_nodes.length;
 			props.put(CLUSTER_NODES_PROP_KEY, cl_nodes);
@@ -463,11 +470,11 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 	@Override
 	protected String getServiceId(Packet packet) {
 		try {
-			return DNSResolver.getHostIP(JIDUtils.getNodeHost(packet.getTo()));
+			return DNSResolver.getHostIP(packet.getTo().getDomain());
 		} catch (UnknownHostException e) {
-			log.warning("Uknown host exception for address: "
-				+ JIDUtils.getNodeHost(packet.getTo()));
-			return JIDUtils.getNodeHost(packet.getTo());
+			log.warning("Uknown host exception for address: " 
+					+ packet.getTo().getDomain());
+			return packet.getTo().getDomain();
 		}
 	}
 

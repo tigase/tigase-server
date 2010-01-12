@@ -2,11 +2,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>  <modelVersion>4.0.0</modelVersion>
+  </properties>
+  <modelVersion>4.0.0</modelVersion>
   <groupId>tigase</groupId>
   <artifactId>tigase-server</artifactId>
   <name>TigaseXMPPServer</name>
-  <version>4.4.0-SNAPSHOT</version>
+  <version>5.0.0-SNAPSHOT</version>
   <description>Tigase XMPP Server</description>
   <url>http://www.tigase.org/</url>
   <issueManagement>
@@ -48,6 +49,7 @@
       		<source>1.6</source>
       		<target>1.6</target>
       		<encoding>UTF-8</encoding>
+      	 <showDeprecation>true</showDeprecation>
       	</configuration>
       </plugin>
       <plugin>
@@ -103,7 +105,7 @@
     <dependency>
       <groupId>tigase</groupId>
       <artifactId>tigase-utils</artifactId>
-      <version>3.3.5</version>
+      <version>3.3.9-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -126,3 +128,4 @@
     </snapshotRepository>
   </distributionManagement>
 </project>
+

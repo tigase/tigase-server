@@ -37,10 +37,10 @@ import tigase.xmpp.StanzaType;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPException;
-import tigase.util.JIDUtils;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.UserNotFoundException;
 import tigase.db.TigaseDBException;
+import tigase.xmpp.BareJID;
 
 /**
  * Describe class VCardTemp here.
@@ -113,7 +113,7 @@ public class VCardTemp extends XMPPProcessor implements XMPPProcessorIfc {
 			&& packet.getType() == StanzaType.get) {
 			try {
 				String strvCard =
-					repo.getPublicData(JIDUtils.getNodeID(packet.getElemTo()),
+					repo.getPublicData(packet.getStanzaTo().getBareJID().toString(),
 						ID, VCARD_KEY, null);
 				if (strvCard != null) {
 					results.offer(parseXMLData(strvCard, packet));
@@ -128,7 +128,7 @@ public class VCardTemp extends XMPPProcessor implements XMPPProcessorIfc {
 		} // end of if (session == null)
 
 		if (session == null) {
-			log.info("Session null, dropping packet: " + packet.getStringData());
+			log.info("Session null, dropping packet: " + packet);
 			return;
 		} // end of if (session == null)
 
@@ -138,77 +138,75 @@ public class VCardTemp extends XMPPProcessor implements XMPPProcessorIfc {
 // 				packet.getElement().setAttribute("from", session.getJID());
 // 			} // end of if (packet.getFrom().equals(session.getConnectionId()))
 
-			String id = null;
-			if (packet.getElemTo() != null) {
-				id = JIDUtils.getNodeID(packet.getElemTo());
+			BareJID id = null;
+			if (packet.getStanzaTo() != null) {
+				id = packet.getStanzaTo().getBareJID();
 			} // end of if (packet.getElemTo() != null)
 			if (id == null || id.equals(session.getUserId())) {
 				StanzaType type = packet.getType();
 				switch (type) {
-				case get:
-					try {
-						String strvCard = repo.getPublicData(session.getUserId(),
-							ID, VCARD_KEY, null);
-						if (strvCard != null) {
-							results.offer(parseXMLData(strvCard, packet));
+					case get:
+						try {
+							String strvCard =
+									repo.getPublicData(session.getUserId().toString(), ID, VCARD_KEY, null);
+							if (strvCard != null) {
+								results.offer(parseXMLData(strvCard, packet));
+							} else {
+								results.offer(packet.okResult((String)null, 1));
+							} // end of if (vcard != null) else
+						} catch (UserNotFoundException e) {
+							results.offer(Authorization.ITEM_NOT_FOUND.getResponseMessage(
+									packet, "User not found", true));
+						} // end of try-catch
+						break;
+					case set:
+						if (packet.getFrom().equals(session.getConnectionId())) {
+							Element elvCard = packet.getElement().getChild(ELEMENTS[0]);
+							// This is added to support old vCard protocol where element
+							// name was all upper cases. So here I am checking both
+							// possibilities
+							if (elvCard == null) {
+								elvCard = packet.getElement().getChild(ELEMENTS[1]);
+							}
+							if (elvCard != null) {
+								if (log.isLoggable(Level.FINER)) {
+									log.finer("Adding vCard: " + elvCard);
+								}
+								session.setPublicData(ID, VCARD_KEY, elvCard.toString());
+							} else {
+								if (log.isLoggable(Level.FINER)) {
+									log.finer("Removing vCard");
+								}
+								session.removePublicData(ID, VCARD_KEY);
+							} // end of else
+							results.offer(packet.okResult((String)null, 0));
 						} else {
-							results.offer(packet.okResult((String)null, 1));
-						} // end of if (vcard != null) else
-					} catch (UserNotFoundException e) {
-						results.offer(Authorization.ITEM_NOT_FOUND.getResponseMessage(packet,
-								"User not found", true));
-					} // end of try-catch
-					break;
-				case set:
-					if (packet.getFrom().equals(session.getConnectionId())) {
-						Element elvCard = packet.getElement().getChild(ELEMENTS[0]);
-						// This is added to support old vCard protocol where element
-						// name was all upper cases. So here I am checking both
-						// possibilities
-						if (elvCard == null) {
-							elvCard = packet.getElement().getChild(ELEMENTS[1]);
-						}
-						if (elvCard != null) {
-                            if (log.isLoggable(Level.FINER)) {
-                            	log.finer("Adding vCard: " + elvCard.toString());
-                            }
-							session.setPublicData(ID, VCARD_KEY, elvCard.toString());
-						} else {
-                            if (log.isLoggable(Level.FINER)) {
-                            	log.finer("Removing vCard");
-                            }
-							session.removePublicData(ID, VCARD_KEY);
+							results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(
+									packet, "You are not authorized to set vcard data.", true));
 						} // end of else
-						results.offer(packet.okResult((String)null, 0));
-					} else {
-						results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-								"You are not authorized to set vcard data.", true));
-					} // end of else
 					break;
-				case result:
-				case error:
-					Element elem = packet.getElement().clone();
-					Packet result = new Packet(elem);
-					result.setTo(session.getConnectionId());
-					result.setFrom(packet.getTo());
-					results.offer(result);
-					break;
-				default:
-					results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
-							"Request type is incorrect", false));
-					break;
+					case result:
+					case error:
+						Packet result = packet.copyElementOnly();
+						result.setPacketTo(session.getConnectionId());
+						result.setPacketFrom(packet.getTo());
+						results.offer(result);
+						break;
+					default:
+						results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
+								"Request type is incorrect", false));
+						break;
 				} // end of switch (type)
 			} else {
-				Element result = packet.getElement().clone();
 				// According to spec we must set proper FROM attribute
 				//				result.setAttribute("from", session.getJID());
-				results.offer(new Packet(result));
+				results.offer(packet.copyElementOnly());
 			} // end of else
 		} catch (NotAuthorizedException e) {
 			e.printStackTrace();
       log.warning(
-				"Received vCard request but user session is not authorized yet: " +
-        packet.getStringData());
+					"Received vCard request but user session is not authorized yet: "
+					+ packet);
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 					"You must authorize session first.", true));
 		} catch (TigaseDBException e) {

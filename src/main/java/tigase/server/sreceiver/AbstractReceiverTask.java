@@ -30,16 +30,18 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.server.Packet;
 import tigase.stats.StatRecord;
-import tigase.util.JIDUtils;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.PacketErrorTypeException;
 import java.util.LinkedList;
 
 import tigase.stats.StatisticsList;
+import tigase.xmpp.BareJID;
+import tigase.xmpp.JID;
 import static tigase.server.sreceiver.PropertyConstants.*;
 import static tigase.server.sreceiver.TaskCommons.*;
 
@@ -57,9 +59,9 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
   private static Logger log =
 		Logger.getLogger("tigase.server.sreceiver.AbstractReceiverTask");
 
-	private String jid = null;
-	private String name = null;
-	protected String local_domain = null;
+	private JID jid = null;
+//	private String name = null;
+//	protected String local_domain = null;
 	private String description = null;
 	private Map<String, PropertyItem> props = null;
 
@@ -70,14 +72,14 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 	private SenderAddress replace_sender_address = REPLACE_SENDER_PROP_VAL;
 	private Pattern subscr_restr_regex =
 		Pattern.compile(SUBSCR_RESTR_REGEX_PROP_VAL);
-	private String owner = TASK_OWNER_PROP_VAL;
-	private String[] admins = {};
+	private JID owner = null;
+	private JID[] admins = {};
 	private StanzaReceiverIfc srecv = null;
 
 	private long packets_received = 0;
 	private long packets_sent = 0;
 
-	private Map<String, RosterItem> roster = new HashMap<String, RosterItem>();
+	private Map<JID, RosterItem> roster = new HashMap<JID, RosterItem>();
 
 	// Implementation of tigase.server.sreceiver.ReceiverTaskIfc
 
@@ -112,13 +114,13 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 	 * @param jid a <code>String</code> value
 	 */
 	@Override
-	public void setJID(final String jid) {
+	public void setJID(JID jid) {
 		this.jid = jid;
 		log.fine("JID set to: " + this.jid);
-		int idx = jid.indexOf(".");
-		this.local_domain = jid.substring(idx+1);
-		log.fine("Local domain set to: " + this.local_domain);
-		this.name = JIDUtils.getNodeNick(jid);
+//		int idx = jid.indexOf(".");
+//		this.local_domain = jid.substring(idx+1);
+//		log.fine("Local domain set to: " + this.local_domain);
+//		this.name = JIDUtils.getNodeNick(jid);
 	}
 
 	/**
@@ -127,7 +129,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 	 * @return a <code>String</code> value
 	 */
 	@Override
-	public String getJID() {
+	public JID getJID() {
 		return jid;
 	}
 
@@ -141,17 +143,17 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 		return description;
 	}
 
-	public boolean isAllowedToSubscribe(String buddy) {
+	public boolean isAllowedToSubscribe(JID buddy) {
 		boolean result = false;
 		switch (subsc_restr) {
 		case LOCAL:
-			String buddy_domain = JIDUtils.getNodeHost(buddy);
-			if (buddy_domain.equals(local_domain)) {
+			String buddy_domain = buddy.getDomain();
+			if (buddy_domain.equals(jid.getDomain())) {
 				result = true;
 			} // end of if (buddy_domain.equals(local_domain))
 			break;
 		case REGEX:
-			result = subscr_restr_regex.matcher(buddy).matches();
+			result = subscr_restr_regex.matcher(buddy.toString()).matches();
 			break;
 		default:
 			result = true;
@@ -160,7 +162,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 		return result;
 	}
 
-	public boolean isAllowedToPost(String buddy) {
+	public boolean isAllowedToPost(JID buddy) {
 		boolean result = false;
 		RosterItem ri = getRosterItem(buddy);
 		switch (send_restr) {
@@ -181,10 +183,9 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 		roster.put(ri.getJid(), ri);
 	}
 
-	public RosterItem addToRoster(String jid) {
-		String id = JIDUtils.getNodeID(jid);
-		RosterItem ri = new RosterItem(id);
-		if (id.equals(owner)) {
+	public RosterItem addToRoster(JID jid) {
+		RosterItem ri = new RosterItem(jid.copyWithoutResource());
+		if (jid.copyWithoutResource().equals(owner)) {
 			ri.setOwner(true);
 		} // end of if (id.equals(owner))
 		if (subsc_restr != SubscrRestrictions.MODERATED) {
@@ -194,12 +195,12 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 		return ri;
 	}
 
-	public RosterItem removeFromRoster(String jid) {
-		return roster.remove(JIDUtils.getNodeID(jid));
+	public RosterItem removeFromRoster(JID jid) {
+		return roster.remove(jid.copyWithoutResource());
 	}
 
-	public RosterItem getRosterItem(String jid) {
-		return roster.get(JIDUtils.getNodeID(jid));
+	public RosterItem getRosterItem(JID jid) {
+		return roster.get(jid.copyWithoutResource());
 	}
 
 	public void setRosterItemOnline(RosterItem ri, boolean online) {
@@ -231,20 +232,20 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 	 * @param results
 	 * @param new_subscr a <code>String[]</code> value
 	 */
-	public void addNewSubscribers(Queue<Packet> results, String... new_subscr) {
-		for (String buddy: new_subscr) {
+	public void addNewSubscribers(Queue<Packet> results, JID... new_subscr) {
+		for (JID buddy: new_subscr) {
 			Packet presence = null;
 			if (isAllowedToSubscribe(buddy)) {
 				if (getRosterItem(buddy) == null) {
 					addToRoster(buddy);
 				} // end of if (getRosterItem(buddy) == null)
 				log.info(getJID() + ": " + "Adding buddy to roster: " + buddy);
-				presence = getPresence(buddy, jid, StanzaType.subscribe,
-					JIDUtils.getNodeNick(jid), null);
+				presence = getPresence(jid, buddy, StanzaType.subscribe,
+					jid.getLocalpart(), null);
 			} else {
 				log.info(getJID() + ": " +
 					"Not allowed to subscribe, rejecting: " + buddy);
-				presence = getPresence(buddy, jid, StanzaType.unsubscribed);
+				presence = getPresence(jid, buddy, StanzaType.unsubscribed);
 			} // end of else
 			if (log.isLoggable(Level.FINEST)) {
     			log.finest(getJID() + ": " +
@@ -255,13 +256,13 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 	}
 
 	@Override
-	public void removeSubscribers(Queue<Packet> results, String... subscr) {
-		for (String buddy: subscr) {
+	public void removeSubscribers(Queue<Packet> results, JID... subscr) {
+		for (JID buddy: subscr) {
 			RosterItem ri = removeFromRoster(buddy);
 			if (ri != null) {
 				log.info(getJID() + ": "
 					+ "Removing buddy from roster: " + buddy);
-				results.offer(getPresence(buddy, jid, StanzaType.unsubscribed));
+				results.offer(getPresence(jid, buddy, StanzaType.unsubscribed));
 			} // end of if (getRosterItem(buddy) == null)
 		} // end of for (String buddy: new_subscr)
 	}
@@ -324,7 +325,11 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 		} // end of if (map.get(REPLACE_SENDER_PROP_KEY) != null)
 		tmp = (String)map.get(TASK_OWNER_PROP_KEY);
 		if (tmp != null && tmp.length() > 0) {
-			owner = tmp.trim();
+			try {
+				owner = new JID(tmp).copyWithoutResource();
+			} catch (TigaseStringprepException ex) {
+				log.warning("Incorrect owner JID, stringprep processing failed: " + tmp);
+			}
 			RosterItem ri = getRosterItem(owner);
 			if (ri == null) {
 				ri = addToRoster(owner);
@@ -341,14 +346,23 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 		}
 		tmp = (String)map.get(TASK_ADMINS_PROP_KEY);
 		if (tmp != null && tmp.length() > 0) {
-			admins = tmp.split(",");
-			for (String admin: admins) {
-				RosterItem ri = getRosterItem(admin.trim());
-				if (ri == null) {
-					ri = addToRoster(admin.trim());
-				} // end of if (ri == null)
-				setRosterItemAdmin(ri, true);
-				setRosterItemModerationAccepted(ri, true);
+			String[] admins_stra = tmp.split(",");
+			admins = new JID[admins_stra.length];
+			int idx = 0;
+			for (String admin: admins_stra) {
+				try {
+					JID adm = new JID(admin).copyWithoutResource();
+					admins[idx++] = adm;
+					RosterItem ri = getRosterItem(adm);
+					if (ri == null) {
+						ri = addToRoster(adm);
+					} // end of if (ri == null)
+					setRosterItemAdmin(ri, true);
+					setRosterItemModerationAccepted(ri, true);
+				} catch (TigaseStringprepException ex) {
+					log.warning("Incorrect admin JID, stringprep processing failed: "
+							+ admin);
+				}
 			} // end of for (String tmp_b: tmp_arr)
 			props.put(TASK_ADMINS_PROP_KEY,
 				new PropertyItem(TASK_ADMINS_PROP_KEY, TASK_ADMINS_DISPL_NAME, tmp));
@@ -410,11 +424,11 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 		for (RosterItem ri: roster.values()) {
 			Packet presence = null;
 			if (ri.isSubscribed()) {
-				presence = getPresence(ri.getJid(), jid, StanzaType.available,
+				presence = getPresence(jid, ri.getJid(), StanzaType.available,
 					null, getDescription());
 			} else {
-				presence = getPresence(ri.getJid(), jid, StanzaType.subscribe,
-					JIDUtils.getNodeNick(jid), null);
+				presence = getPresence(jid, ri.getJid(), StanzaType.subscribe,
+					jid.getLocalpart(), null);
 			} // end of if (ri.isSubscribed()) else
 			results.offer(presence);
 		}
@@ -423,9 +437,9 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 	@Override
 	public void destroy(Queue<Packet> results) {
 		for (RosterItem ri: roster.values()) {
-			Packet presence = getPresence(ri.getJid(), jid, StanzaType.unsubscribe);
+			Packet presence = getPresence(jid, ri.getJid(), StanzaType.unsubscribe);
 			results.offer(presence);
-			presence = getPresence(ri.getJid(), jid, StanzaType.unsubscribed);
+			presence = getPresence(jid, ri.getJid(), StanzaType.unsubscribed);
 			results.offer(presence);
 		}
 	}
@@ -450,7 +464,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 			processPresence(packet, results);
 		} // end of if (packet.getElemName().equals("presence))
 		if (packet.getElemName().equals("message")) {
-			if (isAllowedToPost(JIDUtils.getNodeID(packet.getElemFrom()))) {
+			if (isAllowedToPost(packet.getStanzaFrom())) {
 				processMessage(packet, results);
 			} else {
 				try {
@@ -469,37 +483,33 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 		if (packet.getType() != null) {
 			presence_type = packet.getType();
 		}
-		RosterItem ri = getRosterItem(packet.getElemFrom());
+		RosterItem ri = getRosterItem(packet.getStanzaFrom());
 		switch (presence_type) {
 		case available:
 		case probe:
 			if (ri != null) {
 				setRosterItemOnline(ri, true);
-				results.offer(getPresence(packet.getElemFrom(), jid,
+				results.offer(getPresence(jid, packet.getStanzaFrom(),
 						StanzaType.available, null, getDescription()));
 			} // end of if (ri != null)
 			break;
 		case unavailable:
 			if (ri != null) {
 				setRosterItemOnline(ri, false);
-			// This is really not necessary as the task is always on-line
-			// It should only mark remote contact as off-line and that's it.
-// 				results.offer(getPresence(packet.getElemFrom(), jid,
-// 						StanzaType.unavailable));
 			} // end of if (ri != null)
 			break;
 		case subscribe:
-			addNewSubscribers(results, packet.getElemFrom());
-			results.offer(getPresence(packet.getElemFrom(), jid,
+			addNewSubscribers(results, packet.getStanzaFrom());
+			results.offer(getPresence(jid, packet.getStanzaFrom(),
 					StanzaType.subscribed));
 			break;
 		case subscribed:
 			if (ri != null) {
 				setRosterItemSubscribed(ri, true);
-				results.offer(getPresence(packet.getElemFrom(), jid,
+				results.offer(getPresence(jid, packet.getStanzaFrom(),
 						StanzaType.available, null, getDescription()));
 				if (!ri.isModerationAccepted()) {
-					results.offer(getMessage(packet.getElemFrom(), jid,
+					results.offer(getMessage(jid, packet.getStanzaFrom(),
 							StanzaType.headline,
 							"You are now subscribed to " + getJID() + ".\n\n"
 							+ "Your subscription, however awaits moderation.\n\n"
@@ -510,7 +520,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 			break;
 		case unsubscribe:
 		case unsubscribed:
-			removeSubscribers(results, packet.getElemFrom());
+			removeSubscribers(results, packet.getStanzaFrom());
 			break;
 		default:
 			break;
@@ -521,29 +531,35 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 		for (RosterItem ri : roster.values()) {
 			if (ri.isSubscribed() && ri.isModerationAccepted() &&
 							(!send_to_online_only || ri.isOnline()) &&
-							(!JIDUtils.getNodeID(packet.getElemFrom()).equals(ri.getJid()))) {
+							(!packet.getStanzaFrom().copyWithoutResource().equals(ri.getJid()))) {
 				Element message = packet.getElement().clone();
 				Element body = message.getChild("body");
 				if (body == null) {
 					return;
 				} // end of if (body == null)
-				message.setAttribute("to", ri.getJid());
+				JID from = null;
+				message.setAttribute("to", ri.getJid().toString());
 				message.setAttribute("type", message_type.toString().toLowerCase());
 				switch (replace_sender_address) {
 					case REPLACE: {
 						String old_from = message.getAttribute("from");
-						message.setAttribute("from", jid);
+						from = jid;
 						String cdata = body.getCData();
 						body.setCData(old_from + " sends:\n\n" + cdata);
 						break;
 					}
 					case REMOVE:
-						message.setAttribute("from", jid);
+						from = jid;
 						break;
 					case REPLACE_SRECV: {
 						String old_from = message.getAttribute("from");
-						message.setAttribute("from", JIDUtils.getJID(srecv.getName(), 
-										local_domain, name));
+						try {
+							from = new JID(srecv.getName(), jid.getDomain(), jid.getLocalpart());
+						} catch (TigaseStringprepException ex) {
+							log.warning("Packet addressing problem, stringprep processing failed: "
+									+ BareJID.toString(srecv.getName(), jid.getDomain(), jid.getLocalpart()));
+							from = jid;
+						}
 						String cdata = body.getCData();
 						body.setCData(old_from + " sends for installation at " +
 										srecv.getDefHostName() + ":\n\n" + cdata);
@@ -552,7 +568,8 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 					default:
 						break;
 				}
-				results.offer(new Packet(message));
+				message.setAttribute("from", from.toString());
+				results.offer(Packet.packetInstance(message, from, ri.getJid()));
 			} // end of if (ri.isSubscribed() && ri.isModerationAccepted())
 		} // end of for (RosterItem ri: roster.values())
 	}
@@ -560,29 +577,29 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 	@Override
 	public List<StatRecord> getStats() {
     List<StatRecord> stats = new LinkedList<StatRecord>();
-    stats.add(new StatRecord(getJID(), "Roster size", "int",
+    stats.add(new StatRecord(getJID().toString(), "Roster size", "int",
 				roster.size(), Level.INFO));
-    stats.add(new StatRecord(getJID(), "Packets received", "long",
+    stats.add(new StatRecord(getJID().toString(), "Packets received", "long",
 				packets_received, Level.INFO));
-    stats.add(new StatRecord(getJID(), "Packets sent", "long",
+    stats.add(new StatRecord(getJID().toString(), "Packets sent", "long",
 				packets_sent, Level.INFO));
 		int moderation_needed = 0;
 		for (RosterItem ri: roster.values()) {
 			moderation_needed += (ri.isModerationAccepted() ? 0 : 1);
 		} // end of for (RosterItem ri: roster)
-    stats.add(new StatRecord(getJID(), "Awaiting moderation", "int",
+    stats.add(new StatRecord(getJID().toString(), "Awaiting moderation", "int",
 				moderation_needed, Level.INFO));
 		return stats;
 	}
 
 	@Override
-	public boolean isAdmin(String jid) {
+	public boolean isAdmin(JID jid) {
 		RosterItem ri = getRosterItem(jid);
 		return ri != null && (ri.isAdmin() || ri.isOwner());
 	}
 
 	@Override
-	public Map<String, RosterItem> getRoster() {
+	public Map<JID, RosterItem> getRoster() {
 		return roster;
 	}
 

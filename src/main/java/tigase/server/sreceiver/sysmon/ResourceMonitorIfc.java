@@ -25,6 +25,7 @@ package tigase.server.sreceiver.sysmon;
 import java.util.Queue;
 import tigase.server.Packet;
 import tigase.stats.StatisticsList;
+import tigase.xmpp.JID;
 
 /**
  * Created: Dec 10, 2008 12:12:27 PM
@@ -41,7 +42,7 @@ public interface ResourceMonitorIfc {
 	public static final long INTERVAL_1HOUR = 60 * MINUTE;
 	public static final long INTERVAL_1DAY = 24 * INTERVAL_1HOUR;
 
-	public void init(String jid, float treshold, SystemMonitorTask smTask);
+	public void init(JID jid, float treshold, SystemMonitorTask smTask);
 
 	public void destroy();
 

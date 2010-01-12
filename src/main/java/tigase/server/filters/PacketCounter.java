@@ -27,6 +27,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.PacketFilterIfc;
 import tigase.server.QueueType;
@@ -61,8 +62,8 @@ public class PacketCounter implements PacketFilterIfc {
 			++presCounter;
 		}
 		if (packet.getElemName() == "iq") {
-			String xmlns = packet.getIQXMLNS();
-			incIQCounter(xmlns != null ? xmlns : packet.getIQChildName());
+			String xmlns = ((Iq)packet).getIQXMLNS();
+			incIQCounter(xmlns != null ? xmlns : ((Iq)packet).getIQChildName());
 		}
 		// TESTING ONLY START
 //		try {

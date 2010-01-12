@@ -39,9 +39,11 @@ import tigase.disco.XMPPService;
 import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
 import tigase.util.Algorithms;
-import tigase.util.JIDUtils;
+import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
+import tigase.xmpp.BareJID;
+import tigase.xmpp.JID;
 import tigase.xmpp.XMPPIOService;
 import tigase.xmpp.PacketErrorTypeException;
 
@@ -93,10 +95,9 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 				+ ", type: " + packet.getType());
 		}
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Processing packet: " + packet.getStringData());
+			log.finest("Processing packet: " + packet);
 		}
-		if (packet.getElemTo() != null
-			&& packet.getElemTo().equals(getComponentId())) {
+		if (packet.getStanzaTo() != null && packet.getStanzaTo().equals(getComponentId())) {
 			try {
 				addOutPacket(
 					Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
@@ -122,15 +123,21 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 					+ ", type: " + p.getType());
 			}
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Processing socket data: " + p.getStringData());
+				log.finest("Processing socket data: " + p);
 			}
 			if (p.getElemName().equals("handshake")) {
 				processHandshake(p, serv);
 			} else {
+				Packet result = p;
 				if (p.isRouted()) {
-					p = p.unpackRouted();
+					try {
+						result = p.unpackRouted();
+					} catch (TigaseStringprepException ex) {
+						log.warning("Packet stringprep addressing problem, dropping packet: " + p);
+						return null;
+					}
 				} // end of if (p.isRouted())
-				addOutPacket(p);
+				addOutPacket(result);
 			}
 		} // end of while ()
 		return null;
@@ -152,7 +159,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 				}
 				updateServiceDiscovery(addr, "XEP-0114 connected");
 			} else {
-				log.warning("Incorrect packet received: " + p.getStringData());
+				log.warning("Incorrect packet received: " + p);
 			}
 			break;
 		}
@@ -169,7 +176,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 						+", digest="+loc_digest);
 				}
 				if (digest != null && digest.equals(loc_digest)) {
-					Packet resp = new Packet(new Element("handshake"));
+					Packet resp = Packet.packetInstance(new Element("handshake"));
 					writePacketToSocket(serv, resp);
 					String[] routings =
 						(String[])serv.getSessionData().get(PORT_ROUTING_TABLE_PROP_KEY);
@@ -494,23 +501,23 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 	}
 
 	@Override
-	public Element getDiscoInfo(String node, String jid, String from) {
-		if (jid != null && getName().equals(JIDUtils.getNodeNick(jid))) {
+	public Element getDiscoInfo(String node, JID jid, JID from) {
+		if (jid != null && getName().equals(jid.getLocalpart())) {
 			return serviceEntity.getDiscoInfo(node);
 		}
 		return null;
 	}
 
 	@Override
-	public 	List<Element> getDiscoFeatures(String from) { return null; }
+	public 	List<Element> getDiscoFeatures(JID from) { return null; }
 
 	@Override
-	public List<Element> getDiscoItems(String node, String jid, String from) {
-		if (getName().equals(JIDUtils.getNodeNick(jid))) {
+	public List<Element> getDiscoItems(String node, JID jid, JID from) {
+		if (getName().equals(jid.getLocalpart())) {
 			return serviceEntity.getDiscoItems(node, null);
 		} else {
- 			return Arrays.asList(serviceEntity.getDiscoItem(null,
-					JIDUtils.getNodeID(getName(), jid)));
+			return Arrays.asList(serviceEntity.getDiscoItem(null,
+					BareJID.toString(getName(), jid.toString())));
 		}
 	}
 

@@ -34,11 +34,13 @@ import java.util.logging.Logger;
 import tigase.conf.Configurable;
 import tigase.server.AbstractMessageReceiver;
 import tigase.server.Packet;
+import tigase.util.TigaseStringprepException;
 import tigase.xml.DomBuilderHandler;
 import tigase.xml.Element;
 import tigase.xml.SimpleParser;
 import tigase.xml.SingletonFactory;
 import tigase.util.DNSResolver;
+import tigase.xmpp.JID;
 
 /**
  * <code>StanzaSender</code> class implements simple cyclic tasks management
@@ -160,7 +162,8 @@ public class StanzaSender extends AbstractMessageReceiver
 					(Long)props.get(task_name + "/" + TASK_INTERVAL_PROP_KEY);
 				try {
 					SenderTask task = (SenderTask)Class.forName(task_class).newInstance();
-					task.setName(getComponentId() + "/" + task_name);
+					JID taskName = getComponentId().copyWithResource(task_name);
+					task.setName(taskName);
 					task.init(this, task_init);
 
 					// Install new task
@@ -256,8 +259,13 @@ public class StanzaSender extends AbstractMessageReceiver
 		parser.parse(domHandler, data.toCharArray(), 0, data.length());
 		Queue<Element> elems = domHandler.getParsedElements();
 		while (elems != null && elems.size() > 0) {
-			Packet result = new Packet(elems.poll());
-			addOutPacket(result);
+			Element elem = elems.poll();
+			try {
+				Packet result = Packet.packetInstance(elem);
+				addOutPacket(result);
+			} catch (TigaseStringprepException ex) {
+				log.info("Packet stringprep addressing problem, dropping packet: " + elem);
+			}
 		}
 	}
 

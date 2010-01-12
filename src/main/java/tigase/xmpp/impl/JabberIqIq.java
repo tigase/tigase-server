@@ -22,14 +22,12 @@
 package tigase.xmpp.impl;
 
 import java.util.logging.Logger;
-import java.util.Arrays;
 import java.util.Queue;
 import java.util.Map;
 import tigase.db.NonAuthUserRepository;
 import tigase.server.Packet;
 import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
-import tigase.xmpp.XMPPImplIfc;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPPreprocessorIfc;
@@ -37,10 +35,10 @@ import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.XMPPException;
-import tigase.util.JIDUtils;
 import tigase.util.Base64;
 import tigase.db.UserNotFoundException;
 import tigase.db.TigaseDBException;
+import tigase.xmpp.BareJID;
 
 /**
  * Describe class JabberIqIq here.
@@ -70,19 +68,24 @@ public class JabberIqIq extends XMPPProcessor
 		new Element("feature", new String[] {"var"}, new String[] {XMLNS})
 	};
 
+	@Override
   public Element[] supDiscoFeatures(final XMPPResourceConnection session)
 	{ return DISCO_FEATURES; }
 
 	// Implementation of tigase.xmpp.XMPPImplIfc
 
+	@Override
 	public String id() { return ID; }
 
+	@Override
 	public String[] supElements()
 	{ return ELEMENTS; }
 
+	@Override
   public String[] supNamespaces()
 	{ return XMLNSS; }
 
+	@Override
 	public boolean preProcess(Packet packet, XMPPResourceConnection session,
 		NonAuthUserRepository repo,	Queue<Packet> results) {
 		try {
@@ -98,6 +101,7 @@ public class JabberIqIq extends XMPPProcessor
 		return false;
 	}
 
+	@Override
 	public void process(Packet packet, XMPPResourceConnection session,
 		NonAuthUserRepository repo, Queue<Packet> results,
 		final Map<String, Object> settings)
@@ -107,7 +111,7 @@ public class JabberIqIq extends XMPPProcessor
 			&& packet.getType() == StanzaType.get) {
 			try {
 				String iq_level =
-					repo.getPublicData(JIDUtils.getNodeID(packet.getElemTo()), ID, LEVEL, null);
+					repo.getPublicData(packet.getStanzaTo().getBareJID().toString(), ID, LEVEL, null);
 				results.offer(getResponsePacket(packet, iq_level));
 			} catch (UserNotFoundException e) {
 				// Just ignore....
@@ -116,7 +120,7 @@ public class JabberIqIq extends XMPPProcessor
 		} // end of if (session == null)
 
 		if (session == null) {
-			log.info("Session null, dropping packet: " + packet.getStringData());
+			log.info("Session null, dropping packet: " + packet.toString());
 			return;
 		} // end of if (session == null)
 
@@ -126,9 +130,9 @@ public class JabberIqIq extends XMPPProcessor
 // 				packet.getElement().setAttribute("from", session.getJID());
 // 			} // end of if (packet.getFrom().equals(session.getConnectionId()))
 
-			String id = null;
-			if (packet.getElemTo() != null) {
-				id = JIDUtils.getNodeID(packet.getElemTo());
+			BareJID id = null;
+			if (packet.getStanzaTo() != null) {
+				id = packet.getStanzaTo().getBareJID();
 			} // end of if (packet.getElemTo() != null)
 			if (id == null || id.equals(session.getUserId())) {
 				StanzaType type = packet.getType();
@@ -149,10 +153,9 @@ public class JabberIqIq extends XMPPProcessor
 					} // end of else
 					break;
 				case result:
-					Element elem = packet.getElement().clone();
-					Packet result = new Packet(elem);
-					result.setTo(session.getConnectionId());
-					result.setFrom(packet.getTo());
+					Packet result = packet.copyElementOnly();
+					result.setPacketTo(session.getConnectionId());
+					result.setPacketFrom(packet.getTo());
 					results.offer(result);
 					break;
 				default:
@@ -161,13 +164,13 @@ public class JabberIqIq extends XMPPProcessor
 					break;
 				} // end of switch (type)
 			} else {
-				Element result = packet.getElement().clone();
-				results.offer(new Packet(result));
+				Packet result = packet.copyElementOnly();
+				results.offer(result);
 			} // end of else
 		} catch (NotAuthorizedException e) {
       log.warning(
 				"Received privacy request but user session is not authorized yet: " +
-        packet.getStringData());
+        packet.toString());
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 					"You must authorize session first.", true));
 		} catch (TigaseDBException e) {

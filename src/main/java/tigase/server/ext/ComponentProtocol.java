@@ -23,7 +23,6 @@
 package tigase.server.ext;
 
 import java.util.ArrayDeque;
-import tigase.db.TigaseDBException;
 import tigase.server.ext.handlers.UnknownXMLNSStreamOpenHandler;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,6 +52,7 @@ import tigase.server.ext.handlers.SASLProcessor;
 import tigase.server.ext.handlers.StartTLSProcessor;
 import tigase.server.ext.handlers.StreamFeaturesProcessor;
 import tigase.stats.StatisticsList;
+import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.PacketErrorTypeException;
@@ -149,8 +149,8 @@ public class ComponentProtocol
 	 */
 	@Override
 	public int hashCodeForPacket(Packet packet) {
-		if (packet.getElemTo() != null) {
-			return packet.getElemTo().hashCode();
+		if (packet.getStanzaTo() != null) {
+			return packet.getStanzaTo().hashCode();
 		}
 		if (packet.getTo() != null) {
 			return packet.getTo().hashCode();
@@ -179,7 +179,7 @@ public class ComponentProtocol
 		Queue<Packet> results = new ArrayDeque<Packet>();
 		while ((p = serv.getReceivedPackets().poll()) != null) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Processing socket data: " + p.getStringData());
+				log.finest("Processing socket data: " + p);
 			}
 			boolean processed = false;
 			for (ExtProcessor proc : processors.values()) {
@@ -191,10 +191,17 @@ public class ComponentProtocol
 				// Possibly a local variable in XMPPIOService might be needed
 				// to improve performance
 				if (serv.isAuthenticated()) {
+					Packet result = p;
 					if (p.isRouted()) {
-						p = p.unpackRouted();
+						try {
+							result = p.unpackRouted();
+						} catch (TigaseStringprepException ex) {
+							log.warning("Packet stringprep addressing problem, dropping packet: "
+									+ p);
+							return null;
+						}
 					} // end of if (p.isRouted())
-					addOutPacket(p);
+					addOutPacket(result);
 				} else {
 					try {
 						Packet error =
@@ -218,7 +225,7 @@ public class ComponentProtocol
 	@Override
 	protected XMPPIOService<List<ComponentConnection>> getXMPPIOService(Packet p) {
 		XMPPIOService<List<ComponentConnection>> result = null;
-		String hostname = p.getElemToHost();
+		String hostname = p.getStanzaTo().getDomain();
 		ArrayList<ComponentConnection> conns = connections.get(hostname);
 		if (conns != null) {
 			for (ComponentConnection componentConnection : conns) {

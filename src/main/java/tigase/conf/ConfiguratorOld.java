@@ -42,14 +42,16 @@ import tigase.disco.ServiceIdentity;
 import tigase.server.Command;
 import tigase.server.MessageReceiver;
 import tigase.server.ConnectionManager;
+import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.Permissions;
 import tigase.util.ClassUtil;
-import tigase.util.JIDUtils;
 import tigase.xml.Element;
 import tigase.xml.XMLUtils;
 import tigase.xml.db.Types.DataType;
 import tigase.xmpp.Authorization;
+import tigase.xmpp.BareJID;
+import tigase.xmpp.JID;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.PacketErrorTypeException;
 
@@ -712,26 +714,27 @@ public class ConfiguratorOld extends ConfiguratorAbstract {
 		if (!packet.isCommand()) {
 			return;
 		}
+		Iq iqc = (Iq)packet;
 
-		if (packet.getType() != null && packet.getType() == StanzaType.error) {
-			log.info("Ignoring error packet: " + packet.toString());
+		if (iqc.getType() != null && iqc.getType() == StanzaType.error) {
+			log.info("Ignoring error packet: " + iqc.toString());
 			return;
 		}
 
-		String nick = JIDUtils.getNodeNick(packet.getTo());
+		String nick = iqc.getTo().getLocalpart();
 		if (nick == null || !getName().equals(nick)) return;
 
 		String msg = "Please be careful, you are service admin and all changes"
 			+ " you make are instantly applied to live system!";
 		boolean admin = true;
-		if (packet.getPermissions() != Permissions.ADMIN) {
+		if (iqc.getPermissions() != Permissions.ADMIN) {
 			if (demoMode) {
 				admin = false;
 				msg = "You are not admin. You can safely play with the settings as"
 					+ " you can not change anything.";
-				if (packet.getStrCommand() != null
-					&& packet.getStrCommand().endsWith(DEF_SM_NAME)) {
-					Packet result = packet.commandResult(Command.DataType.result);
+				if (iqc.getStrCommand() != null
+					&& iqc.getStrCommand().endsWith(DEF_SM_NAME)) {
+					Packet result = iqc.commandResult(Command.DataType.result);
 					Command.addFieldValue(result, "Note",	msg, "fixed");
 					Command.addFieldValue(result, "Note",
 						"Restricted area, only admin can see these settings.", "fixed");
@@ -750,24 +753,24 @@ public class ConfiguratorOld extends ConfiguratorAbstract {
 		}
 
 		if (log.isLoggable(Level.FINEST)) {
-    		log.finest("Command received: " + packet.getStringData());
-        }
+			log.finest("Command received: " + iqc.toString());
+		}
 
-		Command.Action action = Command.getAction(packet);
+		Command.Action action = Command.getAction(iqc);
 		if (action == Command.Action.cancel) {
-			Packet result = packet.commandResult(null);
+			Packet result = iqc.commandResult(null);
 			results.offer(result);
 			return;
 		}
 
-		switch (packet.getCommand()) {
+		switch (iqc.getCommand()) {
 		case OTHER:
-			if (packet.getStrCommand() != null) {
-				if (packet.getStrCommand().startsWith("config/list/")) {
+			if (iqc.getStrCommand() != null) {
+				if (iqc.getStrCommand().startsWith("config/list/")) {
 				try {
-					String[] spl = packet.getStrCommand().split("/");
+					String[] spl = iqc.getStrCommand().split("/");
 					Packet result =
-							packet.commandResult(Command.DataType.result);
+							iqc.commandResult(Command.DataType.result);
 					Command.addFieldValue(result, "Note", msg, "fixed");
 					Map<String, Object> allprop = getAllProperties(spl[2]);
 					for (Map.Entry<String, Object> entry : allprop.entrySet()) {
@@ -781,10 +784,10 @@ public class ConfiguratorOld extends ConfiguratorAbstract {
 							log(Level.SEVERE, null, ex);
 				}
 				}
-				if (packet.getStrCommand().startsWith("config/set/")) {
+				if (iqc.getStrCommand().startsWith("config/set/")) {
 				try {
-					String[] spl = packet.getStrCommand().split("/");
-					Packet result = packet.commandResult(Command.DataType.result);
+					String[] spl = iqc.getStrCommand().split("/");
+					Packet result = iqc.commandResult(Command.DataType.result);
 					Command.addFieldValue(result, "Note",	msg, "fixed");
 					if (Command.getData(packet) == null) {
 						prepareConfigData(result, spl[2]);
@@ -845,7 +848,7 @@ public class ConfiguratorOld extends ConfiguratorAbstract {
 // 	}
 
 	private boolean checkComponentName(Packet result, String name) {
-		String msg = JIDUtils.checkNickName(name);
+		String msg = name;
 		if (msg != null) {
 			Command.addFieldValue(result, "Info",
 				"Note!! " + msg + ", please provide valid component name.", "fixed");
@@ -1105,25 +1108,25 @@ public class ConfiguratorOld extends ConfiguratorAbstract {
 	}
 
 	@Override
-	public Element getDiscoInfo(String node, String jid, String from) {
-		if (jid != null && getName().equals(JIDUtils.getNodeNick(jid)) && isAdmin(from)) {
+	public Element getDiscoInfo(String node, JID jid, JID from) {
+		if (jid != null && getName().equals(jid.getLocalpart()) && isAdmin(from)) {
 			return serviceEntity.getDiscoInfo(node);
 		}
 		return null;
 	}
 
 	@Override
-	public 	List<Element> getDiscoFeatures(String from) { return null; }
+	public 	List<Element> getDiscoFeatures(JID from) { return null; }
 
 	@Override
-	public List<Element> getDiscoItems(String node, String jid, String from) {
+	public List<Element> getDiscoItems(String node, JID jid, JID from) {
 		if (isAdmin(from)) {
-			if (getName().equals(JIDUtils.getNodeNick(jid))) {
-				return serviceEntity.getDiscoItems(node, jid);
+			if (getName().equals(jid.getLocalpart())) {
+				return serviceEntity.getDiscoItems(node, jid.toString());
 			} else {
 				if (node == null) {
 					return Arrays.asList(serviceEntity.getDiscoItem(null,
-							JIDUtils.getNodeID(getName(), jid)));
+							BareJID.toString(getName(), jid.toString())));
 				} else {
 					return null;
 				}

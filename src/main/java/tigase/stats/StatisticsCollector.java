@@ -35,6 +35,7 @@ import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
 import tigase.server.AbstractComponentRegistrator;
 import tigase.server.Command;
+import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.ServerComponent;
 import tigase.sys.ShutdownHook;
@@ -43,7 +44,8 @@ import tigase.xml.Element;
 import tigase.xml.XMLUtils;
 import tigase.xmpp.StanzaType;
 import tigase.util.ElementUtils;
-import tigase.util.JIDUtils;
+import tigase.xmpp.BareJID;
+import tigase.xmpp.JID;
 
 /**
  * Class StatisticsCollector
@@ -146,49 +148,53 @@ public class StatisticsCollector
 	@Override
 	public void processPacket(final Packet packet, final Queue<Packet> results) {
 
-		if (!packet.isCommand()
-			|| (packet.getType() != null && packet.getType() == StanzaType.result)) {
+		if (!packet.isCommand() || (packet.getType() == StanzaType.result)) {
 			return;
 		}
 
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest(packet.getCommand().name() + " command received: " +
-							packet.getStringData());
+			log.finest(packet.getCommand().name() + " command received: " + packet);
 		}
-		switch (packet.getCommand()) {
-		case GETSTATS: {
-			//			Element statistics = new Element("statistics");
-			Element iq =
-				ElementUtils.createIqQuery(packet.getElemTo(), packet.getElemFrom(),
-					StanzaType.result, packet.getElemId(), STATS_XMLNS);
-			Element query = iq.getChild("query");
-			StatisticsList stats = getAllStats();
-			if (stats != null) {
-				for (StatRecord record: stats) {
-					Element item = new Element("stat");
-					item.addAttribute("name", record.getComponent() + "/"
-						+ record.getDescription());
-					item.addAttribute("units", record.getUnit());
-					item.addAttribute("value", record.getValue());
-					query.addChild(item);
-				} // end of for ()
-			} // end of if (stats != null && stats.count() > 0)
-			Packet result = new Packet(iq);
-			//			Command.setData(result, statistics);
-			results.offer(result);
-			break;
-		}
+		Iq iqc = (Iq)packet;
+		switch (iqc.getCommand()) {
+			case GETSTATS: {
+				//			Element statistics = new Element("statistics");
+				Element iq = ElementUtils.createIqQuery(iqc.getStanzaTo(),
+						iqc.getStanzaFrom(), StanzaType.result, iqc.getStanzaId(),
+						STATS_XMLNS);
+				Element query = iq.getChild("query");
+				StatisticsList stats = getAllStats();
+				if (stats != null) {
+					for (StatRecord record : stats) {
+						Element item = new Element("stat");
+						item.addAttribute("name", record.getComponent() + "/"
+								+ record.getDescription());
+						item.addAttribute("units", record.getUnit());
+						item.addAttribute("value", record.getValue());
+						query.addChild(item);
+					} // end of for ()
+				} // end of if (stats != null && stats.count() > 0)
+				Packet result = Packet.packetInstance(iq, iqc.getStanzaTo(),
+						iqc.getStanzaFrom());
+				//			Command.setData(result, statistics);
+				results.offer(result);
+				break;
+			}
 		case OTHER: {
-			if (packet.getStrCommand() == null) return;
-			String nick = JIDUtils.getNodeNick(packet.getTo());
-			if (nick == null || !getName().equals(nick)) return;
-			Command.Action action = Command.getAction(packet);
+			if (iqc.getStrCommand() == null) {
+				return;
+			}
+			String nick = iqc.getTo().getLocalpart();
+			if (!getName().equals(nick)) {
+				return;
+			}
+			Command.Action action = Command.getAction(iqc);
 			if (action == Command.Action.cancel) {
-				Packet result = packet.commandResult(null);
+				Packet result = iqc.commandResult(null);
 				results.offer(result);
 				return;
 			}
-			String tmp_val = Command.getFieldValue(packet, "Stats level");
+			String tmp_val = Command.getFieldValue(iqc, "Stats level");
 			if (tmp_val != null) {
 				statsLevel = Level.parse(tmp_val);
 				if (log.isLoggable(Level.FINEST)) {
@@ -196,7 +202,7 @@ public class StatisticsCollector
 				}
 			}
 			StatisticsList list = new StatisticsList(statsLevel);
-			if (packet.getStrCommand().equals("stats")) {
+			if (iqc.getStrCommand().equals("stats")) {
 				if (log.isLoggable(Level.FINEST)) {
 					log.finest("Getting all stats for level: " + statsLevel.getName());
 				}
@@ -205,10 +211,10 @@ public class StatisticsCollector
 					log.finest("All stats for level loaded: " + statsLevel.getName());
 				}
 			} else {
-				String[] spl = packet.getStrCommand().split("/");
+				String[] spl = iqc.getStrCommand().split("/");
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Getting stats for component: " + spl[1] +
-									", level: " + statsLevel.getName());
+					log.finest("Getting stats for component: " + spl[1] 
+							+ ", level: " + statsLevel.getName());
 				}
 				getComponentStats(spl[1], list);
 				if (log.isLoggable(Level.FINEST)) {
@@ -216,31 +222,29 @@ public class StatisticsCollector
 									", level: " + statsLevel.getName());
 				}
 			}
-			Packet result = packet.commandResult(Command.DataType.form);
+			Packet result = iqc.commandResult(Command.DataType.form);
 			if (list != null) {
-				for (StatRecord rec: list) {
+				for (StatRecord rec : list) {
 					if (rec.getType() == StatisticType.LIST) {
 						Command.addFieldMultiValue(result,
-										XMLUtils.escape(rec.getComponent() + "/" + rec.
-										getDescription()),
-										rec.getListValue());
+								XMLUtils.escape(rec.getComponent() + "/"
+								+ rec.getDescription()), rec.getListValue());
 					} else {
 						Command.addFieldValue(result,
-										XMLUtils.escape(rec.getComponent() + "/" + rec.
-										getDescription()),
-										XMLUtils.escape(rec.getValue()));
+								XMLUtils.escape(rec.getComponent() + "/"
+								+ rec.getDescription()), XMLUtils.escape(rec.getValue()));
 					}
 				}
 			}
 			Command.addFieldValue(result, "Stats level", statsLevel.getName(),
-							"Stats level",
-							new String[]{Level.INFO.getName(), Level.FINE.getName(),
-								Level.FINER.getName(), Level.FINEST.getName()},
-							new String[]{Level.INFO.getName(), Level.FINE.getName(),
-								Level.FINER.getName(), Level.FINEST.getName()});
+					"Stats level",
+					new String[]{Level.INFO.getName(), Level.FINE.getName(),
+						Level.FINER.getName(), Level.FINEST.getName()},
+					new String[]{Level.INFO.getName(), Level.FINE.getName(),
+						Level.FINER.getName(), Level.FINEST.getName()});
 			results.offer(result);
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Returning stats result: " + result.toString());
+				log.finest("Returning stats result: " + result);
 			}
 			break;
 		}
@@ -250,34 +254,34 @@ public class StatisticsCollector
 	}
 
 	@Override
-	public Element getDiscoInfo(String node, String jid, String from) {
-		if (jid != null && getName().equals(JIDUtils.getNodeNick(jid)) && isAdmin(from)) {
+	public Element getDiscoInfo(String node, JID jid, JID from) {
+		if (jid != null && getName().equals(jid.getLocalpart()) && isAdmin(from)) {
 			return serviceEntity.getDiscoInfo(node);
 		}
 		return null;
 	}
 
 	@Override
-	public 	List<Element> getDiscoFeatures(String from) { return null; }
+	public 	List<Element> getDiscoFeatures(JID from) { return null; }
 
 	@Override
-	public List<Element> getDiscoItems(String node, String jid, String from) {
+	public List<Element> getDiscoItems(String node, JID jid, JID from) {
 		if (isAdmin(from)) {
-			if (getName().equals(JIDUtils.getNodeNick(jid)) ||
-					getComponentId().equals(jid)) {
-				List<Element> items = serviceEntity.getDiscoItems(node, jid);
+			if (getName().equals(jid.getLocalpart()) || getComponentId().equals(jid)) {
+				List<Element> items = serviceEntity.getDiscoItems(node, jid.toString());
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Processing discoItems for node: " + node + ", result: " + 
-							(items == null ? null : items.toString()));
+					log.finest("Processing discoItems for node: " + node + ", result: " 
+							+ (items == null ? null : items.toString()));
 				}
 				return items;
 			} else {
 				if (node == null) {
-					Element item = serviceEntity.getDiscoItem(null,
-							JIDUtils.getNodeID(getName(), jid));
+					Element item = 
+							serviceEntity.getDiscoItem(null, BareJID.toString(getName(),
+							jid.toString()));
 					if (log.isLoggable(Level.FINEST)) {
-						log.finest("Processing discoItems, result: " +
-								(item == null ? null : item.toString()));
+						log.finest("Processing discoItems, result: " 
+								+ (item == null ? null : item.toString()));
 					}
 					return Arrays.asList(item);
 				} else {

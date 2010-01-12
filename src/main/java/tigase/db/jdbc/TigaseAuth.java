@@ -39,7 +39,7 @@ import tigase.db.TigaseDBException;
 import tigase.db.UserAuthRepository;
 import tigase.db.UserExistsException;
 import tigase.db.UserNotFoundException;
-import tigase.util.JIDUtils;
+import tigase.xmpp.BareJID;
 
 import static tigase.db.UserAuthRepository.*;
 
@@ -186,7 +186,7 @@ public class TigaseAuth implements UserAuthRepository {
 		try {
 			checkConnection();
 			synchronized (get_pass_sp) {
-				get_pass_sp.setString(1, JIDUtils.getNodeID(user));
+				get_pass_sp.setString(1, BareJID.jidToBareJID(user));
 				rs = get_pass_sp.executeQuery();
 				if (rs.next()) {
 					return rs.getString(1);
@@ -325,7 +325,7 @@ public class TigaseAuth implements UserAuthRepository {
 		try {
 			checkConnection();
 			synchronized (user_login_plain_pw_sp) {
-				String user_id = JIDUtils.getNodeID(user);
+				String user_id = BareJID.jidToBareJID(user);
 				user_login_plain_pw_sp.setString(1, user_id);
 				user_login_plain_pw_sp.setString(2, password);
 				rs = user_login_plain_pw_sp.executeQuery();
@@ -396,7 +396,7 @@ public class TigaseAuth implements UserAuthRepository {
 		try {
 			checkConnection();
 			synchronized (user_logout_sp) {
-				user_logout_sp.setString(1, JIDUtils.getNodeID(user));
+				user_logout_sp.setString(1, BareJID.jidToBareJID(user));
 				user_logout_sp.execute();
 			}
 		} catch (SQLException e) {
@@ -419,7 +419,7 @@ public class TigaseAuth implements UserAuthRepository {
 		try {
 			checkConnection();
 			synchronized (add_user_plain_pw_sp) {
-				add_user_plain_pw_sp.setString(1, JIDUtils.getNodeID(user));
+				add_user_plain_pw_sp.setString(1, BareJID.jidToBareJID(user));
 				add_user_plain_pw_sp.setString(2, password);
 				rs = add_user_plain_pw_sp.executeQuery();
 			}
@@ -445,7 +445,7 @@ public class TigaseAuth implements UserAuthRepository {
 		try {
 			checkConnection();
 			synchronized (update_pass_plain_pw_sp) {
-				update_pass_plain_pw_sp.setString(1, JIDUtils.getNodeID(user));
+				update_pass_plain_pw_sp.setString(1, BareJID.jidToBareJID(user));
 				update_pass_plain_pw_sp.setString(2, password);
 				update_pass_plain_pw_sp.execute();
 			}
@@ -466,7 +466,7 @@ public class TigaseAuth implements UserAuthRepository {
 		try {
 			checkConnection();
 			synchronized (remove_user_sp) {
-				remove_user_sp.setString(1, JIDUtils.getNodeID(user));
+				remove_user_sp.setString(1, BareJID.jidToBareJID(user));
 				remove_user_sp.execute();
 			}
 		} catch (SQLException e) {
@@ -497,8 +497,8 @@ public class TigaseAuth implements UserAuthRepository {
 		String user_name = new String(in_data, auth_idx, user_idx - auth_idx);
 		++user_idx;
 		String jid = user_name;
-		if (JIDUtils.getNodeNick(user_name) == null) {
-			jid = JIDUtils.getNodeID(user_name, domain);
+		if (BareJID.parseJID(user_name)[0] == null) {
+			jid = BareJID.toString(user_name, domain);
 		}
 		props.put(USER_ID_KEY, jid);
 		String passwd =	new String(in_data, user_idx, in_data.length - user_idx);

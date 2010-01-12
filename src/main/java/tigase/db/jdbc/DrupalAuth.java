@@ -54,7 +54,7 @@ import tigase.db.UserAuthRepository;
 import tigase.db.UserExistsException;
 import tigase.db.UserNotFoundException;
 import tigase.util.Algorithms;
-import tigase.util.JIDUtils;
+import tigase.xmpp.BareJID;
 
 import static tigase.db.UserAuthRepository.*;
 
@@ -188,7 +188,7 @@ public class DrupalAuth implements UserAuthRepository {
 				BigDecimal bd = new BigDecimal((System.currentTimeMillis()/1000));
 				update_last_login_st.setBigDecimal(1, bd);
 				update_last_login_st.setBigDecimal(2, bd);
-				update_last_login_st.setString(3, JIDUtils.getNodeNick(user));
+				update_last_login_st.setString(3, BareJID.parseJID(user)[0]);
 				update_last_login_st.executeUpdate();
 			}
 		} catch (SQLException e) {
@@ -202,7 +202,7 @@ public class DrupalAuth implements UserAuthRepository {
 			try {
 				synchronized (update_online_status) {
 					update_online_status.setInt(1, status);
-					update_online_status.setString(2, JIDUtils.getNodeNick(user));
+					update_online_status.setString(2, BareJID.parseJID(user)[0]);
 					update_online_status.executeUpdate();
 				}
 			} catch (SQLException e) {
@@ -216,7 +216,7 @@ public class DrupalAuth implements UserAuthRepository {
 		ResultSet rs = null;
 		try {
 			synchronized (status_st) {
-				status_st.setString(1, JIDUtils.getNodeNick(user));
+				status_st.setString(1, BareJID.parseJID(user)[0]);
 				rs = status_st.executeQuery();
 				if (rs.next()) {
 					return (rs.getInt(1) == 1);
@@ -254,7 +254,7 @@ public class DrupalAuth implements UserAuthRepository {
 		try {
 			checkConnection();
 			synchronized (pass_st) {
-				pass_st.setString(1, JIDUtils.getNodeNick(user));
+				pass_st.setString(1, BareJID.parseJID(user)[0]);
 				rs = pass_st.executeQuery();
 				if (rs.next()) {
 					return rs.getString(1);
@@ -449,7 +449,7 @@ public class DrupalAuth implements UserAuthRepository {
 			synchronized (user_add_st) {
 				long uid = getMaxUID()+1;
 				user_add_st.setLong(1, uid);
-				user_add_st.setString(2, JIDUtils.getNodeNick(user));
+				user_add_st.setString(2, BareJID.parseJID(user)[0]);
 				user_add_st.setString(3, Algorithms.hexDigest("", password, "MD5"));
 				user_add_st.executeUpdate();
 			}
@@ -571,7 +571,7 @@ public class DrupalAuth implements UserAuthRepository {
 					if (user_name == null) {
 						user_name = nc.getDefaultName();
 					} // end of if (name == null)
-					jid = JIDUtils.getNodeID(user_name, (String)options.get(REALM_KEY));
+					jid = BareJID.toString(user_name, (String)options.get(REALM_KEY));
 					options.put(USER_ID_KEY, jid);
     				if (log.isLoggable(Level.FINEST)) {
         				log.finest("NameCallback: " + user_name);

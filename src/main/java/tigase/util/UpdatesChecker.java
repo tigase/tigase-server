@@ -96,6 +96,7 @@ public class UpdatesChecker extends Thread {
 			log.log(Level.WARNING, "Problem parsing server version.... " + version, e);
 		}
 		while (!stopped) {
+			Element message = null;
 			try {
 				sleep(interval);
 				URLConnection connection = new URL(VERSION_URL).openConnection();
@@ -145,7 +146,7 @@ public class UpdatesChecker extends Thread {
 						link = "http://www.tigase.org/files/downloads/tigase-server/tigase-server-"
             + major + "." + minor + "." + bugfix + build + ".tar.gz";
 					}
-					Element message = new Element("message",
+					message = new Element("message",
             new String[] {"to", "from"},
 						new String[] {receiver.getDefHostName(),
 													"updates.checker@" + receiver.getDefHostName()});
@@ -159,8 +160,11 @@ public class UpdatesChecker extends Thread {
 						+ major + "." + minor + "." + bugfix + "' and it is available for"
 						+ " download at address: " + link + "\n\n" + intro_msg);
 					message.addChild(body);
-					receiver.addPacket(new Packet(message));
+					receiver.addPacket(Packet.packetInstance(message));
 				}
+			} catch (TigaseStringprepException e) {
+				log.log(Level.WARNING, "Incorrect stanza address settings: " + message.toString(),
+						e);
 			} catch (IOException e) {
 				log.log(Level.WARNING, "Can not check updates for URL: " + VERSION_URL, e);
 			} catch (InterruptedException e) {

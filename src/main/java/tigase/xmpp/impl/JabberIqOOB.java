@@ -21,7 +21,6 @@
  */
 package tigase.xmpp.impl;
 
-import java.util.Arrays;
 import java.util.logging.Logger;
 
 /**
@@ -49,11 +48,14 @@ public abstract class JabberIqOOB extends SimpleForwarder {
   private static final String[] ELEMENTS = {"query"};
   private static final String[] XMLNSS = {XMLNS};
 
+	@Override
 	public String id() { return ID; }
 
+	@Override
 	public String[] supElements()
 	{ return ELEMENTS; }
 
+	@Override
   public String[] supNamespaces()
 	{ return XMLNSS; }
 

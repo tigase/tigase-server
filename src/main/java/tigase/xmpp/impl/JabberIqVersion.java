@@ -24,7 +24,6 @@ package tigase.xmpp.impl;
 import java.util.Queue;
 import java.util.Map;
 import java.util.logging.Logger;
-import tigase.conf.Configurable;
 import tigase.server.Packet;
 import tigase.server.XMPPServer;
 import tigase.xml.Element;
@@ -32,8 +31,9 @@ import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
-import tigase.util.JIDUtils;
 import tigase.db.NonAuthUserRepository;
+import tigase.server.BasicComponent;
+import tigase.xmpp.BareJID;
 
 /**
  * XEP-0092: Software Version
@@ -57,6 +57,7 @@ public class JabberIqVersion extends XMPPProcessor
   private static final Element[] DISCO_FEATURES =
 	{new Element("feature",	new String[] {"var"},	new String[] {XMLNS})};
 
+	@Override
 	public String id() { return ID; }
 
 	@Override
@@ -71,6 +72,7 @@ public class JabberIqVersion extends XMPPProcessor
   public Element[] supDiscoFeatures(final XMPPResourceConnection session)
 	{ return DISCO_FEATURES; }
 
+	@Override
 	public void process(final Packet packet, final XMPPResourceConnection session,
 		final NonAuthUserRepository repo, final Queue<Packet> results,
 		final Map<String, Object> settings) {
@@ -93,16 +95,15 @@ public class JabberIqVersion extends XMPPProcessor
 // 		} // end of try-catch
 
 		// Maybe it is message to admininstrator:
-		String id = session.getDomain();
-		if (packet.getElemTo() != null) {
-			id = JIDUtils.getNodeID(packet.getElemTo());
+		BareJID id = session.getDomainAsJID().getBareJID();
+		if (packet.getStanzaTo() != null) {
+			id = packet.getStanzaTo().getBareJID();
 		} // end of if (packet.getElemTo() != null)
 
 		// If ID part of user account contains only host name
 		// and this is local domain it is message to admin
-		if (id == null || id.equals("") ||
-						session.getConnectionId() == Configurable.NULL_ROUTING ||
-						id.equalsIgnoreCase(session.getDomain())
+		if (id == null || session.getConnectionId() == BasicComponent.NULL_ROUTING
+				|| id.toString().equals(session.getDomain())
 // 			|| (packet.getElemTo() != null && packet.getElemFrom() != null
 // 				&& packet.getElemTo().equals(packet.getElemFrom()))
 				) {
@@ -141,10 +142,9 @@ public class JabberIqVersion extends XMPPProcessor
 			// after checking if this message is just to local server
 			if (id.equals(session.getUserId())) {
 				// Yes this is message to 'this' client
-				Element elem = packet.getElement().clone();
-				Packet result = new Packet(elem);
-				result.setTo(session.getConnectionId(packet.getElemTo()));
-				result.setFrom(packet.getTo());
+				Packet result = packet.copyElementOnly();
+				result.setPacketTo(session.getConnectionId(packet.getStanzaTo()));
+				result.setPacketFrom(packet.getTo());
 				results.offer(result);
 			} else {
 				// This is message to some other client so I need to
@@ -152,15 +152,14 @@ public class JabberIqVersion extends XMPPProcessor
 				// Actually processor should not modify request but in this
 				// case it is absolutely safe and recommended to set 'from'
 				// attribute
-				Element result = packet.getElement().clone();
+				Packet result = packet.copyElementOnly();
 				// According to spec we must set proper FROM attribute
 				//				result.setAttribute("from", session.getJID());
-				results.offer(new Packet(result));
+				results.offer(result);
 			} // end of else
 		} catch (NotAuthorizedException e) {
 			// Do nothing, shouldn't happen....
-			log.warning("NotAuthorizedException for packet: "
-				+ packet.getStringData());
+			log.warning("NotAuthorizedException for packet: " + packet);
 		} // end of try-catch
 	}
 

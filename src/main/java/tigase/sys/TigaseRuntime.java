@@ -29,6 +29,7 @@ import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.ThreadMXBean;
 import java.util.List;
 import tigase.monitor.MonitorRuntime;
+import tigase.xmpp.JID;
 
 /**
  * Created: Feb 19, 2009 12:15:02 PM
@@ -62,9 +63,9 @@ public abstract class TigaseRuntime {
 
 	public abstract boolean hasCompleteJidsInfo();
 
-	public abstract boolean isJidOnline(String jid);
+	public abstract boolean isJidOnline(JID jid);
 
-	public abstract String[] getConnectionIdsForJid(String jid);
+	public abstract JID[] getConnectionIdsForJid(JID jid);
 
 	protected TigaseRuntime() {
 		List<MemoryPoolMXBean> memPools = ManagementFactory.getMemoryPoolMXBeans();

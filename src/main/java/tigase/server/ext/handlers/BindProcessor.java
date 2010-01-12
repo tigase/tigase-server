@@ -68,7 +68,7 @@ public class BindProcessor implements ExtProcessor {
 			if (p.getType() == StanzaType.set && serv.isAuthenticated()) {
 				String hostname = p.getElemCData("/iq/bind/hostname");
 				handler.bindHostname(hostname, serv);
-				results.offer(new Packet(okResult(p.getElement())));
+				results.offer(Packet.packetInstance(okResult(p.getElement()), null, null));
 			} else {
 				log.fine("Ok result received: " + p.toString());
 			}
@@ -78,7 +78,7 @@ public class BindProcessor implements ExtProcessor {
 			if (p.getType() == StanzaType.set && serv.isAuthenticated()) {
 				String hostname = p.getElemCData("/iq/unbind/hostname");
 				handler.unbindHostname(hostname, serv);
-				results.offer(new Packet(okResult(p.getElement())));
+				results.offer(Packet.packetInstance(okResult(p.getElement()), null, null));
 			} else {
 				log.fine("Ok result received: " + p.toString());
 			}
@@ -112,7 +112,7 @@ public class BindProcessor implements ExtProcessor {
 		if (hostnames != null) {
 			for (String host : hostnames) {
 				if (!host.isEmpty()) {
-					Packet bind_p = new Packet(newBindElement(host, handler));
+					Packet bind_p = Packet.packetInstance(newBindElement(host, handler), null, null);
 					log.info("Generating hostname bind packet: " + bind_p.toString());
 					results.offer(bind_p);
 				} else {

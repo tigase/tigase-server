@@ -42,12 +42,14 @@ import tigase.disco.ServiceIdentity;
 import tigase.disco.XMPPService;
 import tigase.server.AbstractMessageReceiver;
 import tigase.server.Command;
+import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.stats.StatisticsList;
 import tigase.util.ClassUtil;
 import tigase.util.DNSResolver;
-import tigase.util.JIDUtils;
+import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
+import tigase.xmpp.JID;
 import tigase.xmpp.StanzaType;
 
 import static tigase.server.sreceiver.PropertyConstants.*;
@@ -225,13 +227,13 @@ public class StanzaReceiver extends AbstractMessageReceiver
 //		return simpleJid;
 //	}
 
-	protected boolean isAllowedCreate(String jid, String task_type) {
+	protected boolean isAllowedCreate(JID jid, String task_type) {
 		TaskType tt = task_types.get(task_type);
 		switch (tt.getCreationPolicy()) {
 		case ADMIN:
 			return isAdmin(jid);
 		case LOCAL:
-			return isLocalDomain(JIDUtils.getNodeHost(jid));
+			return isLocalDomain(jid.getDomain());
 		default:
 			break;
 		}
@@ -239,11 +241,11 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	}
 
 	private void addTaskToInstances(ReceiverTaskIfc task) {
-		task_instances.put(task.getJID(), task);
-		ServiceEntity item = new ServiceEntity(task.getJID(),
-			JIDUtils.getNodeNick(task.getJID()), task.getDescription());
+		task_instances.put(task.getJID().toString(), task);
+		ServiceEntity item = new ServiceEntity(task.getJID().toString(),
+			task.getJID().getLocalpart(), task.getDescription());
 		item.addIdentities(
-			new ServiceIdentity("component", "generic", task.getJID()));
+				new ServiceIdentity("component", "generic", task.getJID().toString()));
 		item.addFeatures(CMD_FEATURES);
 		serviceEntity.addItems(item);
 		Queue<Packet> results = new ArrayDeque<Packet>();
@@ -253,8 +255,8 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	}
 
 	protected void addTaskInstance(String task_type, String task_name,
-		Map<String, Object> task_params) {
-		addTaskInstance(createTask(task_type, task_name + "@" + my_hostname,
+		Map<String, Object> task_params) throws TigaseStringprepException {
+		addTaskInstance(createTask(task_type, new JID(task_name + "@" + my_hostname),
 					task_params));
 	}
 
@@ -264,7 +266,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	 * @param task a <code>ReceiverTaskIfc</code> value
 	 */
 	protected void addTaskInstance(ReceiverTaskIfc task) {
-		if (getTask(task.getJID()) == null) {
+		if (getTask(task.getJID().toString()) == null) {
 			addTaskToInstances(task);
 			try {
 				saveTaskToRepository(task);
@@ -282,17 +284,17 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	}
 
 	protected void removeTaskInstance(ReceiverTaskIfc task) {
-		ServiceEntity item = new ServiceEntity(task.getJID(),
-			JIDUtils.getNodeNick(task.getJID()), task.getDescription());
+		ServiceEntity item = new ServiceEntity(task.getJID().toString(),
+			task.getJID().getLocalpart(), task.getDescription());
 		serviceEntity.removeItems(item);
-		task_instances.remove(task.getJID());
+		task_instances.remove(task.getJID().toString());
 		Queue<Packet> results = new ArrayDeque<Packet>();
 		task.destroy(results);
 		addOutPackets(results);
 		task_types.get(task.getType()).instanceRemoved();
 		try {
 			String repo_node = tasks_node + "/" + task.getJID();
-			repository.removeSubnode(getComponentId(), repo_node);
+			repository.removeSubnode(getComponentId().toString(), repo_node);
 		} catch (TigaseDBException e) {
 			log.log(Level.SEVERE, "Problem removing task from repository: "
 				+ task.getJID(), e);
@@ -300,7 +302,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	}
 
 	protected void removeTaskSubscribers(ReceiverTaskIfc task,
-		String... subscr) {
+		JID ... subscr) {
 		Queue<Packet> results = new ArrayDeque<Packet>();
 		task.removeSubscribers(results, subscr);
 		addOutPackets(results);
@@ -316,18 +318,18 @@ public class StanzaReceiver extends AbstractMessageReceiver
 
 	private void loadTasksFromRepository()
 		throws TigaseDBException {
-		String[] tasks_jids = repository.getSubnodes(getComponentId(), tasks_node);
+		String[] tasks_jids = repository.getSubnodes(getComponentId().toString(), tasks_node);
 		if (tasks_jids != null) {
 			for (String task_jid: tasks_jids) {
 				StringBuilder repo_node = new StringBuilder(tasks_node + "/" + task_jid);
-				String task_type = repository.getData(getComponentId(), repo_node.toString(),
+				String task_type = repository.getData(getComponentId().toString(), repo_node.toString(),
 					task_type_key);
 				repo_node.append(params_node);
-				String[] keys = repository.getKeys(getComponentId(), repo_node.toString());
+				String[] keys = repository.getKeys(getComponentId().toString(), repo_node.toString());
 				Map<String, Object> task_params = new LinkedHashMap<String, Object>();
 				if (keys != null) {
 					for (String key: keys) {
-						String[] vals = repository.getDataList(getComponentId(),
+						String[] vals = repository.getDataList(getComponentId().toString(),
 								repo_node.toString(), key);
 						if (vals.length == 1) {
 							task_params.put(key, vals[0]);
@@ -340,7 +342,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 					} // end of for (String key: keys)
 				} // end of if (keys != null)
 				try {
-					addTaskToInstances(createTask(task_type, task_jid, task_params));
+					addTaskToInstances(createTask(task_type, new JID(task_jid), task_params));
 				} catch (Exception e) {
 					log.log(Level.WARNING, "Can't create task: " + task_jid, e);
 				}
@@ -352,18 +354,18 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		throws TigaseDBException {
 
 		String repo_node = tasks_node + "/" + task.getJID();
-		repository.setData(getComponentId(), repo_node, task_type_key, task.getType());
+		repository.setData(getComponentId().toString(), repo_node, task_type_key, task.getType());
 		Map<String, PropertyItem> task_params = task.getParams();
 		repo_node += params_node;
 		for (Map.Entry<String, PropertyItem> entry: task_params.entrySet()) {
 			if (!entry.getKey().equals(USER_REPOSITORY_PROP_KEY)) {
 				if (entry.getValue().getValue().getClass().isArray()) {
-					repository.setDataList(getComponentId(), repo_node, entry.getKey(),
+					repository.setDataList(getComponentId().toString(), repo_node, entry.getKey(),
 									(String[])entry.getValue().getValue());
 					log.info("Saving task data list: " + entry.getKey() + ", value: " +
 									Arrays.toString((String[])entry.getValue().getValue()));
 				} else {
-					repository.setData(getComponentId(), repo_node, entry.getKey(),
+					repository.setData(getComponentId().toString(), repo_node, entry.getKey(),
 									entry.getValue().toString());
 					log.info("Saving task data: " + entry.getKey() + ", value: " +
 									entry.getValue().toString());
@@ -372,12 +374,12 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		}
 	}
 
-	private ReceiverTaskIfc createTask(String task_type, String task_jid,
+	private ReceiverTaskIfc createTask(String task_type, JID task_jid,
 		Map<String, Object> task_params ) {
 		//		ReceiverTaskIfc ttask = task_types.get(task_type);
 		ReceiverTaskIfc ntask = task_types.get(task_type).getTaskInstance();
 		ntask.setStanzaReceiver(this);
-		ntask.setJID(task_jid.toLowerCase());
+		ntask.setJID(task_jid);
 		task_params.put(USER_REPOSITORY_PROP_KEY, repository);
 		ntask.setParams(task_params);
 		return ntask;
@@ -428,7 +430,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 			repository = RepositoryFactory.getUserRepository(getName(),
 				cls_name, res_uri, null);
 			try {
-				repository.addUser(getComponentId());
+				repository.addUser(getComponentId().toString());
 			} catch (UserExistsException e) { /*Ignore, this is correct and expected*/	}
 
 			loadTasksFromRepository();
@@ -450,8 +452,13 @@ public class StanzaReceiver extends AbstractMessageReceiver
 										entry.getValue());
 					} // end of if (entry.getKey().startsWith())
 				} // end of for (Map.Entry entry: props.entrySet())
-				addTaskInstance(createTask(task_type, task_name + "@" + my_hostname,
-								task_params));
+				try {
+					addTaskInstance(createTask(task_type,
+							new JID(task_name + "@" + my_hostname), task_params));
+				} catch (TigaseStringprepException ex) {
+					Logger.getLogger(StanzaReceiver.class.getName()).
+							log(Level.SEVERE, null, ex);
+				}
 			} // end of for (String task_name: tasks_list)
 		}
 
@@ -526,6 +533,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 			} // end of for ()
 		} // end of for (String task_name: TASKS_LIST_PROP_VAL)
 		if ((Boolean)params.get(GEN_TEST)) {
+			log.config("Activating tester task....");
 			conf_tasks.add(TESTER_TASK_NAME);
 			defs.put(TESTER_TASK_NAME + "/" + TASK_ACTIVE_PROP_KEY, true);
 			defs.put(TESTER_TASK_NAME + "/" + TASK_TYPE_PROP_KEY, TESTER_TASK_TYPE);
@@ -610,15 +618,15 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		Element query_rep = null;
 		if (query != null && packet.getType() == StanzaType.get) {
 			query_rep =
-				serviceEntity.getDiscoInfo(JIDUtils.getNodeNick(packet.getElemTo()));
+				serviceEntity.getDiscoInfo(packet.getStanzaTo().getLocalpart());
 			processed = true;
 		} // end of if (query != null && packet.getType() == StanzaType.get)
 		query = iq.getChild("query", ITEMS_XMLNS);
 		if (query != null && packet.getType() == StanzaType.get) {
 			query_rep = query.clone();
 			List<Element> items =
-				serviceEntity.getDiscoItems(JIDUtils.getNodeNick(packet.getElemTo()),
-					packet.getElemTo());
+				serviceEntity.getDiscoItems(packet.getStanzaTo().getLocalpart(),
+					packet.getStanzaTo().toString());
 			if (items != null && items.size() > 0) {
 				query_rep.addChildren(items);
 			} // end of if (items != null && items.size() > 0)
@@ -631,8 +639,8 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	}
 
 	@Override
-	public boolean isAdmin(String jid) {
-		return Arrays.binarySearch(admins, JIDUtils.getNodeID(jid)) >= 0;
+	public boolean isAdmin(JID jid) {
+		return Arrays.binarySearch(admins, jid.getBareJID().toString()) >= 0;
 	}
 
 	/**
@@ -644,9 +652,10 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	public void processPacket(final Packet packet) {
 
 		if (packet.isCommand()) {
-			Command.Action action = Command.getAction(packet);
+			Iq iqc = (Iq)packet;
+			Command.Action action = Command.getAction(iqc);
 			if (action == Command.Action.cancel) {
-				Packet result = packet.commandResult(null);
+				Packet result = iqc.commandResult(null);
 				addOutPacket(result);
 				return;
 			}
@@ -659,8 +668,8 @@ public class StanzaReceiver extends AbstractMessageReceiver
 // 			addOutPacket(result);
 // 			return;
 
-			Packet result = packet.commandResult(Command.DataType.result);
-			String str_command = packet.getStrCommand();
+			Packet result = iqc.commandResult(Command.DataType.result);
+			String str_command = iqc.getStrCommand();
 			if (str_command != null) {
 				String[] arr_command = str_command.split("/");
 				if (arr_command.length > 1) {
@@ -683,12 +692,12 @@ public class StanzaReceiver extends AbstractMessageReceiver
 			return;
 		} // end of if (packet.getElemName().equals("iq"))
 
-		ReceiverTaskIfc task = getTask(packet.getElemTo());
+		ReceiverTaskIfc task = getTask(packet.getStanzaTo().toString());
 		if (task == null) {
-			task = getTask(JIDUtils.getNodeNick(packet.getElemTo()));
+			task = getTask(packet.getStanzaTo().getLocalpart());
 		}
 		if (task == null) {
-			String resource = JIDUtils.getNodeResource(packet.getElemTo());
+			String resource = packet.getStanzaTo().getResource();
 			if (resource != null) {
 				task = getTask(resource);
 			}
@@ -719,19 +728,19 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	 * @return an <code>Element</code> value
 	 */
 	@Override
-	public Element getDiscoInfo(String node, String jid, String from) {
-		if (jid != null && jid.startsWith(getName()+".")) {
+	public Element getDiscoInfo(String node, JID jid, JID from) {
+		if (jid != null && jid.toString().startsWith(getName()+".")) {
 			return serviceEntity.getDiscoInfo(node);
 		}
 		return null;
 	}
 
 	@Override
-	public 	List<Element> getDiscoFeatures(String from) { return null; }
+	public 	List<Element> getDiscoFeatures(JID from) { return null; }
 
 	@Override
-	public List<Element> getDiscoItems(String node, String jid, String from) {
-		if (jid.startsWith(getName()+".")) {
+	public List<Element> getDiscoItems(String node, JID jid, JID from) {
+		if (jid.toString().startsWith(getName()+".")) {
 			return serviceEntity.getDiscoItems(node, null);
 		} else {
 			if (node == null) {

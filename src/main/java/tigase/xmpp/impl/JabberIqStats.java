@@ -25,7 +25,6 @@ import java.util.Queue;
 import java.util.Map;
 import java.util.logging.Logger;
 import java.util.logging.Level;
-import tigase.conf.Configurable;
 import tigase.server.Packet;
 import tigase.server.Command;
 import tigase.xml.Element;
@@ -36,9 +35,10 @@ import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.XMPPException;
-import tigase.util.JIDUtils;
 import tigase.util.ElementUtils;
 import tigase.db.NonAuthUserRepository;
+import tigase.server.BasicComponent;
+import tigase.xmpp.BareJID;
 
 /**
  * XEP-0039: Statistics Gathering.
@@ -64,17 +64,22 @@ public class JabberIqStats extends XMPPProcessor
   private static final Element[] DISCO_FEATURES =
 	{new Element("feature",	new String[] {"var"},	new String[] {XMLNS})};
 
+	@Override
 	public String id() { return ID; }
 
+	@Override
 	public String[] supElements()
 	{ return ELEMENTS; }
 
+	@Override
   public String[] supNamespaces()
 	{ return XMLNSS; }
 
+	@Override
   public Element[] supDiscoFeatures(final XMPPResourceConnection session)
 	{ return DISCO_FEATURES; }
 
+	@Override
 	public void process(final Packet packet, final XMPPResourceConnection session,
 		final NonAuthUserRepository repo, final Queue<Packet> results,
 		final Map<String, Object> settings)
@@ -84,25 +89,25 @@ public class JabberIqStats extends XMPPProcessor
 
 		try {
 			if (log.isLoggable(Level.FINEST)) {
-    			log.finest("Received packet: " + packet.getStringData());
-            }
+				log.finest("Received packet: " + packet);
+			}
 
 			if (packet.isCommand()) {
 				if (packet.getCommand() == Command.GETSTATS
 					&& packet.getType() == StanzaType.result) {
 					// Send it back to user.
 					Element iq =
-						ElementUtils.createIqQuery(session.getDomain(), session.getJID(),
-							StanzaType.result, packet.getElemId(), XMLNS);
+						ElementUtils.createIqQuery(session.getDomainAsJID(), session.getJID(),
+							StanzaType.result, packet.getStanzaId(), XMLNS);
 					Element query = iq.getChild("query");
 					Element stats = Command.getData(packet, "statistics", null);
 					query.addChildren(stats.getChildren());
-					Packet result = new Packet(iq);
-					result.setTo(session.getConnectionId(packet.getElemTo()));
+					Packet result = Packet.packetInstance(iq, session.getSMComponentId(), session.getJID());
+					result.setPacketTo(session.getConnectionId(packet.getStanzaTo()));
 					results.offer(result);
-    				if (log.isLoggable(Level.FINEST)) {
-    					log.finest("Sending result: " + result.getStringData());
-                    }
+					if (log.isLoggable(Level.FINEST)) {
+						log.finest("Sending result: " + result);
+					}
 					return;
 				} else {
 					return;
@@ -111,58 +116,55 @@ public class JabberIqStats extends XMPPProcessor
 
 
 			// Maybe it is message to admininstrator:
-			String id = packet.getElemTo() != null ?
-				JIDUtils.getNodeID(packet.getElemTo()) : null;
+			BareJID id = packet.getStanzaTo() != null ?
+				packet.getStanzaTo().getBareJID() : null;
 
 			// If ID part of user account contains only host name
 			// and this is local domain it is message to admin
-			if (id == null || id.isEmpty() ||
-							session.getConnectionId() == Configurable.NULL_ROUTING ||
-							id.equalsIgnoreCase(session.getDomain())) {
+			if (id == null || session.getConnectionId() == BasicComponent.NULL_ROUTING
+					|| id.toString().equals(session.getDomain())) {
 				String oldto = packet.getAttribute("oldto");
 				Packet result =
-					Command.GETSTATS.getPacket(packet.getElemFrom(),
-					session.getDomain(), StanzaType.get, packet.getElemId());
+					Command.GETSTATS.getPacket(packet.getStanzaFrom(),
+					session.getDomainAsJID(), StanzaType.get, packet.getStanzaId());
 				if (oldto != null) {
 					result.getElement().setAttribute("oldto", oldto);
 				}
 				results.offer(result);
-   				if (log.isLoggable(Level.FINEST)) {
-    				log.finest("Sending result: " + result.getStringData());
-                }
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("Sending result: " + result);
+				}
 				return;
 			}
 
 			if (id.equals(session.getUserId())) {
 				// Yes this is message to 'this' client
-				Element elem = packet.getElement().clone();
-				Packet result = new Packet(elem);
-				result.setTo(session.getConnectionId(packet.getElemTo()));
-				result.setFrom(packet.getTo());
+				Packet result = packet.copyElementOnly();
+				result.setPacketTo(session.getConnectionId(packet.getStanzaTo()));
+				result.setPacketFrom(packet.getTo());
 				results.offer(result);
-   				if (log.isLoggable(Level.FINEST)) {
-    				log.finest("Sending result: " + result.getStringData());
-                }
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("Sending result: " + result);
+				}
 			} else {
 				// This is message to some other client so I need to
 				// set proper 'from' attribute whatever it is set to now.
 				// Actually processor should not modify request but in this
 				// case it is absolutely safe and recommended to set 'from'
 				// attribute
-				Element el_res = packet.getElement().clone();
 				// Not needed anymore. Packet filter does it for all stanzas.
 // 				// According to spec we must set proper FROM attribute
 // 				el_res.setAttribute("from", session.getJID());
-				Packet result = new Packet(el_res);
+				Packet result = packet.copyElementOnly();
 				results.offer(result);
-   				if (log.isLoggable(Level.FINEST)) {
-    				log.finest("Sending result: " + result.getStringData());
-                }
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("Sending result: " + result);
+				}
 			} // end of else
 		} catch (NotAuthorizedException e) {
       log.warning(
-				"Received stats request but user session is not authorized yet: " +
-        packet.getStringData());
+					"Received stats request but user session is not authorized yet: "
+					+ packet);
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 					"You must authorize session first.", true));
 		} // end of try-catch

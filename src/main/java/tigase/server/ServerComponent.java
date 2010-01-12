@@ -23,6 +23,7 @@
 package tigase.server;
 
 import java.util.Queue;
+import tigase.xmpp.JID;
 
 /**
  * Interface ServerComponent
@@ -44,7 +45,7 @@ public interface ServerComponent {
 
 	//	void setComponentId(String id);
 
-	String getComponentId();
+	JID getComponentId();
 
   void release();
 

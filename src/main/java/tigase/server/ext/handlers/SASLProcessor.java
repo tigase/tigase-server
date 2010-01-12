@@ -82,14 +82,14 @@ public class SASLProcessor implements ExtProcessor {
 				Element success = new Element("success",
 						new String[] {"xmlns"},
 						new String[] {XMLNS});
-				results.offer(new Packet(success));
+				results.offer(Packet.packetInstance(success, null, null));
 				handler.authenticated(serv);
 			} else {
 				Element failure = new Element("failure",
 						new Element[]{new Element("not-authorized")},
 						new String[] {"xmlns"},
 						new String[] {XMLNS});
-				handler.authenticationFailed(serv, new Packet(failure));
+				handler.authenticationFailed(serv, Packet.packetInstance(failure, null, null));
 			}
 			serv.getSessionData().put(ID, ID);
 			return true;
@@ -166,7 +166,7 @@ public class SASLProcessor implements ExtProcessor {
 		Element auth = new Element("auth", challenge,
 				new String[] {"xmlns", "mechanism"},
 				new String[] {XMLNS, "PLAIN"});
-		results.offer(new Packet(auth));
+		results.offer(Packet.packetInstance(auth, null, null));
 	}
 
 	@Override

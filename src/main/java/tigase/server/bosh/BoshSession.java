@@ -32,9 +32,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import tigase.server.Command;
+import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.server.Packet;
 import tigase.xmpp.Authorization;
+import tigase.xmpp.JID;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
 
@@ -85,7 +87,7 @@ public class BoshSession {
 	private String content_type = CONTENT_TYPE_DEF;
 	private String domain = null;
 	private String sessionId = null;
-	private String dataReceiver = null;
+	private JID dataReceiver = null;
 	private int[] hashCodes = null;
 	/**
 	 * <code>current_rid</code> is the table with body rids which are waiting
@@ -113,7 +115,7 @@ public class BoshSession {
 	 * @param dataReceiver
 	 * @param handler
 	 */
-	public BoshSession(String def_domain, String dataReceiver,
+	public BoshSession(String def_domain, JID dataReceiver,
 		BoshSessionTaskHandler handler) {
 		this.sid = UUID.randomUUID();
 		this.domain = def_domain;
@@ -228,11 +230,11 @@ public class BoshSession {
 		return sessionId;
 	}
 
-	public String getDataReceiver() {
+	public JID getDataReceiver() {
 		return dataReceiver;
 	}
 
-	public void setDataReceiver(String dataReceiver) {
+	public void setDataReceiver(JID dataReceiver) {
 		this.dataReceiver = dataReceiver;
 	}
 
@@ -599,21 +601,26 @@ public class BoshSession {
 							+ packet.getAttribute(CACHE_ATTR));
 					}
 				} else {
-										if (children != null) {
+					if (children != null) {
 						for (Element el: children) {
-							if (el.getXMLNS().equals(BOSH_XMLNS)) {
-								el.setXMLNS("jabber:client");
-							}
-							Packet result = new Packet(el);
-							if (filterOutPacket(result)) {
-								if (log.isLoggable(Level.FINEST)) {
-									log.finest("Sending out packet: " + result.toString());
+							try {
+								if (el.getXMLNS().equals(BOSH_XMLNS)) {
+									el.setXMLNS("jabber:client");
 								}
-								out_results.offer(result);
-							} else {
-								if (log.isLoggable(Level.FINEST)) {
-									log.finest("Out packet filtered: " + result.toString());
+								Packet result = Packet.packetInstance(el);
+								if (filterOutPacket(result)) {
+									if (log.isLoggable(Level.FINEST)) {
+										log.finest("Sending out packet: " + result.toString());
+									}
+									out_results.offer(result);
+								} else {
+									if (log.isLoggable(Level.FINEST)) {
+										log.finest("Out packet filtered: " + result.toString());
+									}
 								}
+							} catch (TigaseStringprepException ex) {
+								log.warning("Packet addressing problem, stringprep processing failed, dropping: "
+										+ el);
 							}
 						}
 					}
@@ -693,15 +700,18 @@ public class BoshSession {
 			for (Element packet : waiting_packets) {
 				try {
 					out_results.offer(Authorization.RECIPIENT_UNAVAILABLE.
-									getResponseMessage(new Packet(packet),
-									"Bosh = disconnected", true));
+							getResponseMessage(Packet.packetInstance(packet),
+							"Bosh = disconnected", true));
+				} catch (TigaseStringprepException ex) {
+					log.warning("Packet addressing problem, stringprep processing failed, dropping: "
+							+ packet);
 				} catch (PacketErrorTypeException e) {
 					log.info("Packet processing exception: " + e);
 				}
 			}
 			if (log.isLoggable(Level.FINEST)) {
-    			log.finest("Closing session, inactivity timeout expired: " + getSid());
-            }
+				log.finest("Closing session, inactivity timeout expired: " + getSid());
+			}
 			Packet command = Command.STREAM_CLOSED.getPacket(null, null,
 							StanzaType.set, UUID.randomUUID().toString());
 			handler.addOutStreamClosed(command, this);
@@ -710,8 +720,8 @@ public class BoshSession {
 		}
 		if (tt == waitTimer) {
 			if (log.isLoggable(Level.FINEST)) {
-    			log.finest("waitTimer fired: " + getSid());
-            }
+				log.finest("waitTimer fired: " + getSid());
+			}
 			BoshIOService serv = connections.poll();
 			if (serv != null) {
 				sendBody(serv, null);

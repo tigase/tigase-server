@@ -24,6 +24,7 @@ package tigase.server.script;
 
 import java.util.Queue;
 import javax.script.Bindings;
+import tigase.server.Iq;
 import tigase.server.Packet;
 
 /**
@@ -65,7 +66,7 @@ public interface CommandIfc {
 
 	String getDescription();
 
-	void runCommand(Packet packet, Bindings binds, Queue<Packet> results);
+	void runCommand(Iq packet, Bindings binds, Queue<Packet> results);
 
 	public Bindings getBindings();
 

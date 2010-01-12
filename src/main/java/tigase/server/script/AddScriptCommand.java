@@ -37,6 +37,7 @@ import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import tigase.server.Command;
+import tigase.server.Iq;
 import tigase.server.Packet;
 
 /**
@@ -52,7 +53,7 @@ public class AddScriptCommand extends AbstractScriptCommand {
 
 	@Override
 	@SuppressWarnings({"unchecked"})
-	public void runCommand(Packet packet, Bindings binds, Queue<Packet> results) {
+	public void runCommand(Iq packet, Bindings binds, Queue<Packet> results) {
 		String language = Command.getFieldValue(packet, LANGUAGE);
 		String commandId = Command.getFieldValue(packet, COMMAND_ID);
 		String description = Command.getFieldValue(packet, DESCRIPT);
@@ -115,7 +116,7 @@ public class AddScriptCommand extends AbstractScriptCommand {
 		return as;
 	}
 
-	private Packet prepareScriptCommand(Packet packet, Bindings binds) {
+	private Packet prepareScriptCommand(Iq packet, Bindings binds) {
 		Packet result = packet.commandResult(Command.DataType.form);
 		Command.addFieldValue(result, DESCRIPT, "Short description");
 		Command.addFieldValue(result, COMMAND_ID, "new-command");

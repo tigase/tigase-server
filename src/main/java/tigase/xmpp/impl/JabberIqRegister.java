@@ -30,7 +30,6 @@ import tigase.db.TigaseDBException;
 import tigase.server.Packet;
 import tigase.server.Command;
 import tigase.server.Priority;
-import tigase.util.JIDUtils;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.NotAuthorizedException;
@@ -84,18 +83,17 @@ public class JabberIqRegister extends XMPPProcessor
 	{ return XMLNSS; }
 
 	@Override
-  public Element[] supStreamFeatures(final XMPPResourceConnection session)
+  public Element[] supStreamFeatures(XMPPResourceConnection session)
 	{ return FEATURES; }
 
 	@Override
-  public Element[] supDiscoFeatures(final XMPPResourceConnection session)
+  public Element[] supDiscoFeatures(XMPPResourceConnection session)
 	{ return DISCO_FEATURES; }
 
 	@Override
-	public void process(final Packet packet, final XMPPResourceConnection session,
-			final NonAuthUserRepository repo, final Queue<Packet> results,
-			final Map<String, Object> settings)
-			throws XMPPException {
+	public void process(Packet packet, XMPPResourceConnection session,
+			NonAuthUserRepository repo, Queue<Packet> results,
+			Map<String, Object> settings) throws XMPPException {
 
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Processing packet: " + packet.toString());
@@ -109,13 +107,13 @@ public class JabberIqRegister extends XMPPProcessor
 		} // end of if (session == null)
 
 		String id = session.getDomain();
-		if (packet.getElemTo() != null) {
-			id = JIDUtils.getNodeID(packet.getElemTo());
+		if (packet.getStanzaTo() != null) {
+			id = packet.getStanzaTo().getBareJID().toString();
 		}
 
 		try {
 			if ((id.equals(session.getDomain())
-					|| id.equals(session.getUserId()))
+					|| id.equals(session.getUserId().toString()))
 				&& packet.getFrom().equals(session.getConnectionId())) {
 				Authorization result = Authorization.NOT_AUTHORIZED;
 				Element request = packet.getElement();
@@ -133,14 +131,14 @@ public class JabberIqRegister extends XMPPProcessor
 							result = Authorization.BAD_REQUEST;
 						} else {
 							try {
-								result = session.unregister(packet.getElemFrom());
+								result = session.unregister(packet.getStanzaFrom().toString());
 								Packet ok_result = packet.okResult((String)null, 0);
 								// We have to set SYSTEM priority for the packet here,
 								// otherwise the network connection is closed before the
 								// client received a response
 								ok_result.setPriority(Priority.SYSTEM);
 								results.offer(ok_result);
-								results.offer(Command.CLOSE.getPacket(session.getDomain(),
+								results.offer(Command.CLOSE.getPacket(session.getSMComponentId(),
 										session.getConnectionId(), StanzaType.set,
 										session.nextStanzaId()));
 
@@ -176,9 +174,8 @@ public class JabberIqRegister extends XMPPProcessor
 					break;
 				case result:
 					// It might be a registration request from transport for example...
-					Element elem_res = packet.getElement().clone();
-					Packet pack_res = new Packet(elem_res);
-					pack_res.setTo(session.getConnectionId());
+					Packet pack_res = packet.copyElementOnly();
+					pack_res.setPacketTo(session.getConnectionId());
 					results.offer(pack_res);
 					break;
 				default:
@@ -187,15 +184,13 @@ public class JabberIqRegister extends XMPPProcessor
 					break;
 				} // end of switch (type)
 			} else {
-				if (id.equals(session.getUserId())) {
+				if (id.equals(session.getUserId().toString())) {
 					// It might be a registration request from transport for example...
-					Element elem_res = packet.getElement().clone();
-					Packet pack_res = new Packet(elem_res);
-					pack_res.setTo(session.getConnectionId());
+					Packet pack_res = packet.copyElementOnly();
+					pack_res.setPacketTo(session.getConnectionId());
 					results.offer(pack_res);
 				} else {
-					Element result = packet.getElement().clone();
-					results.offer(new Packet(result));
+					results.offer(packet.copyElementOnly());
 				}
 			}
 		} catch (NotAuthorizedException e) {

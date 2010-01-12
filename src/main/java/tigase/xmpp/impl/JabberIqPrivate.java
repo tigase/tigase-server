@@ -23,27 +23,22 @@ package tigase.xmpp.impl;
 
 import java.util.logging.Logger;
 import java.util.logging.Level;
-import java.util.Arrays;
 import java.util.Queue;
 import java.util.List;
 import java.util.Map;
-import tigase.db.NonAuthUserRepository;
 import tigase.server.Packet;
 import tigase.xml.Element;
 import tigase.xml.SimpleParser;
 import tigase.xml.SingletonFactory;
 import tigase.xml.DomBuilderHandler;
-import tigase.xmpp.XMPPImplIfc;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPException;
-import tigase.util.JIDUtils;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.db.NonAuthUserRepository;
-import tigase.db.UserNotFoundException;
 import tigase.db.TigaseDBException;
 
 /**
@@ -100,21 +95,23 @@ public class JabberIqPrivate extends XMPPProcessor implements XMPPProcessorIfc {
 	 * @param session a <code>XMPPResourceConnection</code> value
 	 * @param repo a <code>NonAuthUserRepository</code> value
 	 * @param results a <code>Queue</code> value
+	 * @param settings
+	 * @throws XMPPException
 	 */
+	@Override
 	public void process(Packet packet, XMPPResourceConnection session,
 		NonAuthUserRepository repo, Queue<Packet> results,
-		final Map<String, Object> settings)
-		throws XMPPException {
+		Map<String, Object> settings) throws XMPPException {
 
 		// Don't do anything if session is null
 		if (session == null) {
-			log.info("Session null, dropping packet: " + packet.getStringData());
+			log.info("Session null, dropping packet: " + packet.toString());
 			return;
 		} // end of if (session == null)
 
 		try {
-			if (packet.getElemTo() != null &&
-				!JIDUtils.getNodeID(packet.getElemTo()).equals(session.getUserId())) {
+			if (packet.getStanzaTo() != null &&
+				!packet.getStanzaTo().getBareJID().equals(session.getUserId())) {
 				results.offer(Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet,
 						"You are not authorized to access this private storage.", true));
 				return;
@@ -165,7 +162,7 @@ public class JabberIqPrivate extends XMPPProcessor implements XMPPProcessorIfc {
 		} catch (NotAuthorizedException e) {
       log.warning(
 				"Received privacy request but user session is not authorized yet: " +
-        packet.getStringData());
+        packet.toString());
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 					"You must authorize session first.", true));
 		} catch (TigaseDBException e) {

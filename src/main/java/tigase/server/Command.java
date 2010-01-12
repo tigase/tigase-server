@@ -26,6 +26,7 @@ import java.util.LinkedList;
 import java.util.logging.Logger;
 import tigase.xml.Element;
 import tigase.xml.XMLUtils;
+import tigase.xmpp.JID;
 import tigase.xmpp.StanzaType;
 
 /**
@@ -222,20 +223,20 @@ public enum Command {
 		} // end of try-catch
 	}
 
-	public Packet getPacket(final String from, final String to,
-		final StanzaType type, final String id) {
+	public Packet getPacket(JID from, JID to, final StanzaType type,
+			final String id) {
 		Element elem =
 			createIqCommand(from, to, type, id, this.toString(), null);
-		Packet result = new Packet(elem);
+		Packet result = Packet.packetInstance(elem, from, to);
 		result.setPriority(priority);
 		return result;
 	}
 
-	public Packet getPacket(final String from, final String to,
-		final StanzaType type, final String id, final DataType data_type) {
+	public Packet getPacket(JID from, JID to, StanzaType type, String id,
+			DataType data_type) {
 		Element elem =
 			createIqCommand(from, to, type, id, this.toString(), data_type);
-		Packet result = new Packet(elem);
+		Packet result = Packet.packetInstance(elem, from, to);
 		result.setPriority(priority);
 		return result;
 	}
@@ -266,16 +267,16 @@ public enum Command {
 
 	}
 
-	private static Element createCommandEl(String from, String to,
+	private static Element createCommandEl(JID from, JID to,
 					StanzaType type, String id, String node, DataType data_type) {
 		Element iq = new Element("iq",
 			new String[] {"type", "id"},
 			new String[] {type.toString(), id});
 		if (from != null) {
-			iq.setAttribute("from", from);
+			iq.setAttribute("from", from.toString());
 		}
 		if (to != null) {
-			iq.setAttribute("to", to);
+			iq.setAttribute("to", to.toString());
 		}
 		Element command = new Element(COMMAND_EL,
 			new String[] {"xmlns", "node"},
@@ -294,7 +295,7 @@ public enum Command {
 		return iq;
 	}
 
-	public static Element createIqCommand(final String from, final String to,
+	public static Element createIqCommand(JID from, JID to,
 		final StanzaType type, final String id,	final String node,
 		final DataType data_type) {
 		Element iq = createCommandEl(from, to, type, id, node, data_type);

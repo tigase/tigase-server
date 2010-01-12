@@ -218,8 +218,6 @@ public interface Configurable extends ServerComponent {
 	public static final String COMPONENT_ID_PROP_KEY = "component-id";
 	public static final String CLUSTER_NODES_PROP_KEY = "cluster-nodes";
 
-	public static final String NULL_ROUTING = "NULL";
-
   /**
    * Sets all configuration properties for the object.
 	 * @param properties

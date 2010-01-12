@@ -27,8 +27,14 @@ import java.lang.management.MemoryUsage;
 import java.util.Date;
 import java.util.Map;
 import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import tigase.server.Message;
 import tigase.server.Packet;
+import tigase.sys.TigaseRuntime;
+import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
+import tigase.xmpp.JID;
 import tigase.xmpp.StanzaType;
 import static tigase.server.sreceiver.PropertyConstants.*;
 
@@ -64,8 +70,7 @@ public class PubSubTestsTask extends RepoRosterTask {
 
 
 	private boolean memoryLow() {
-		MemoryUsage heap = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();
-		return new Long(heap.getUsed()).doubleValue()/new Long(heap.getMax()).doubleValue() > 0.8;
+		return TigaseRuntime.getTigaseRuntime().getHeapMemUsage() > 80f;
 	}
 
 	private enum command {
@@ -151,7 +156,7 @@ public class PubSubTestsTask extends RepoRosterTask {
 		return res;
 	}
 
-	private Element createPubSubEl(String from, String id,
+	private Element createPubSubEl(JID from, JID to, String id,
 					String node, String pubsub_call, String xmlns) {
 		Element elem = new Element("iq",
 						new Element[]{new Element("pubsub",
@@ -161,36 +166,36 @@ public class PubSubTestsTask extends RepoRosterTask {
 							new String[]{"xmlns"},
 							new String[]{xmlns})},
 						new String[]{"type", "from", "to", "id"},
-						new String[]{"set", from, "pubsub." + local_domain, id});
+						new String[]{"set", from.toString(), to.toString(), id});
 		return elem;
 	}
 
-	private void addSubscriptionsForNode(String from, String node, int subscr) {
+	private void addSubscriptionsForNode(JID from, JID to, String node, int subscr) {
 		int j = 0;
-		Element el = createPubSubEl(from, "ids-" + (++j), node, "subscriptions",
+		Element el = createPubSubEl(from, to, "ids-" + (++j), node, "subscriptions",
 						"http://jabber.org/protocol/pubsub#owner");
 		for (int i = 0; i < subscr; i++) {
 			Element subs = new Element("subscription",
 							new String[]{"jid", "subscription"},
-							new String[]{"frank-" + i + "@" + local_domain, "subscribed"});
+							new String[]{"frank-" + i + "@" + getJID().getDomain(), "subscribed"});
 			el.findChild("/iq/pubsub/subscriptions").addChild(subs);
 			if (i % 100 == 0) {
-				addOutPacket(new Packet(el));
-				el = createPubSubEl(from, "ids-" + (++j), node,
+				addOutPacket(Packet.packetInstance(el, from, to));
+				el = createPubSubEl(from, to, "ids-" + (++j), node,
 								"subscriptions", "http://jabber.org/protocol/pubsub#owner");
 			}
 		}
-		addOutPacket(new Packet(el));
+		addOutPacket(Packet.packetInstance(el, from, to));
 	}
 
 
-	private void addSubscriptionsForNodes(String from, String[] nodes, int subscr) {
+	private void addSubscriptionsForNodes(JID from, JID to, String[] nodes, int subscr) {
 		for (String node : nodes) {
-			addSubscriptionsForNode(from, node, subscr);
+			addSubscriptionsForNode(from, to, node, subscr);
 		}
 	}
 	
-	private String[] createNodes(String from,	int ... nums) {
+	private String[] createNodes(JID from, JID to, int ... nums) {
 		String[] nodes = new String[nums[0]];
 		for (int i = 0; i < nums[0]; i++) {
 			if (stop) {
@@ -198,13 +203,13 @@ public class PubSubTestsTask extends RepoRosterTask {
 			}
 			String node = "node-" + i;
 			nodes[i] = node;
-			Element el = createPubSubEl(from, "id-" + i, node, "create",
+			Element el = createPubSubEl(from, to, "id-" + i, node, "create",
 							"http://jabber.org/protocol/pubsub");
 			el.findChild("/iq/pubsub").addChild(new Element("configure"));
 			el.findChild("/iq/pubsub/configure").addChild(conf);
-			addOutPacket(new Packet(el));
+			addOutPacket(Packet.packetInstance(el, from, to));
 			if (nums.length > 1 && nums[1] > 0) {
-				addSubscriptionsForNode(from, node, nums[1]);
+				addSubscriptionsForNode(from, to, node, nums[1]);
 			}
 			while (memoryLow()) {
 				try {
@@ -231,13 +236,13 @@ public class PubSubTestsTask extends RepoRosterTask {
 				long gen_hours = gen_time / 3600000;
 				long gen_mins = (gen_time - (gen_hours * 3600000)) / 60000;
 				long gen_secs = (gen_time - ((gen_hours * 3600000) + (gen_mins * 60000))) / 1000;
-				addOutPacket(Packet.getMessage(packet.getElemFrom(),
-								packet.getElemTo(), StanzaType.chat, "" + new Date() +
+				addOutPacket(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(),
+								StanzaType.chat, "" + new Date() +
 								" Generation of the test data completed.\n" +
 								"Generated in: " +
 								gen_hours + "h, " +	gen_mins + "m, " + gen_secs + "sec" +
 								", packets generated: " + packetsGenerated,
-								"PubSub testing task", null, packet.getId()));
+								"PubSub testing task", null, packet.getStanzaId()));
 
 			}
 		};
@@ -248,100 +253,107 @@ public class PubSubTestsTask extends RepoRosterTask {
 	private String[] last_nodes = null;
 
 	private void runCommand(final Packet packet, Queue<Packet> results) {
-		String body = packet.getElemCData("/message/body");
-		final String[] body_split = body.split("\\s");
-		command comm = command.valueOf(body_split[0].substring(2));
-		final int[] pars;
-		switch (comm) {
-			case help:
-				results.offer(Packet.getMessage(packet.getElemFrom(),
-								packet.getElemTo(), StanzaType.chat, commandsHelp(),
-								"Commands description", null, packet.getId()));
-				break;
-			case setdelay:
-				pars = parseNumbers(body_split, 1, 1);
-				if (pars != null) {
-					delay = pars[0];
-				}
-				break;
-			case newnodes:
-				pars = parseNumbers(body_split, 1, 1);
-				if (pars != null) {
-					addOutPacket(Packet.getMessage(packet.getElemFrom(),
-									packet.getElemTo(), StanzaType.chat,
-									"Task accepted, processing...", "PubSub testing task", null,
-									packet.getId()));
-					runInThread(new Runnable() {
-						@Override
-						public void run() {
-							last_nodes = createNodes(packet.getElemFrom(), pars);
-						}
-					}, packet);
-				} else {
-					results.offer(Packet.getMessage(packet.getElemFrom(),
-									packet.getElemTo(), StanzaType.chat,
-									"Incorrect command parameters.", "PubSub testing task", null,
-									packet.getId()));
-					return;
-				}
-				break;
-			case newsubscr:
-				if (last_nodes != null) {
-					pars = parseNumbers(body_split, 2, 1);
+		try {
+			String body = packet.getElemCData("/message/body");
+			final String[] body_split = body.split("\\s");
+			command comm =
+					command.valueOf(body_split[0].substring(2));
+			final int[] pars;
+			final JID to = new JID("pubsub." + getJID().getDomain());
+			switch (comm) {
+				case help:
+					results.offer(Message.getMessage(packet.getStanzaTo(),
+							packet.getStanzaFrom(), StanzaType.chat, commandsHelp(),
+							"Commands description", null, packet.getStanzaId()));
+					break;
+				case setdelay:
+					pars = parseNumbers(body_split, 1, 1);
 					if (pars != null) {
-						addOutPacket(Packet.getMessage(packet.getElemFrom(),
-										packet.getElemTo(), StanzaType.chat,
-										"Task accepted, processing...", "PubSub testing task", null,
-										packet.getId()));
+						delay = pars[0];
+					}
+					break;
+				case newnodes:
+					pars = parseNumbers(body_split, 1, 1);
+					if (pars != null) {
+						addOutPacket(Message.getMessage(packet.getStanzaTo(),
+								packet.getStanzaFrom(), StanzaType.chat,
+								"Task accepted, processing...", "PubSub testing task", null,
+								packet.getStanzaId()));
 						runInThread(new Runnable() {
+
 							@Override
 							public void run() {
-								addSubscriptionsForNode(packet.getElemFrom(),
-												body_split[1], pars[0]);
+								last_nodes = createNodes(packet.getStanzaFrom(), to, pars);
 							}
 						}, packet);
 					} else {
-						results.offer(
-										Packet.getMessage(packet.getElemFrom(),
-										packet.getElemTo(), StanzaType.chat,
-										"Incorrect command parameters.", "PubSub testing task", null,
-										packet.getId()));
+						results.offer(Message.getMessage(packet.getStanzaTo(),
+								packet.getStanzaFrom(), StanzaType.chat,
+								"Incorrect command parameters.", "PubSub testing task", null,
+								packet.getStanzaId()));
 						return;
-
 					}
-				} else {
-						results.offer(
-										Packet.getMessage(packet.getElemFrom(),
-										packet.getElemTo(), StanzaType.chat,
-										"There are no pubsub nodes created yet.",
-										"PubSub testing task", null, packet.getId()));
-						return;
-				}
-				break;
-			case newnodessubscr:
-				pars = parseNumbers(body_split, 1, 2);
-				if (pars != null) {
-					addOutPacket(Packet.getMessage(packet.getElemFrom(),
-									packet.getElemTo(), StanzaType.chat, "" + new Date() +
-									" Task accepted, processing...", "PubSub testing task", null,
-									packet.getId()));
-					runInThread(new Runnable() {
-						@Override
-						public void run() {
-							last_nodes = createNodes(packet.getElemFrom(), pars);
-						}
-					}, packet);
-				} else {
-					results.offer(Packet.getMessage(packet.getElemFrom(),
-									packet.getElemTo(), StanzaType.chat,
+					break;
+				case newsubscr:
+					if (last_nodes != null) {
+						pars = parseNumbers(body_split, 2, 1);
+						if (pars != null) {
+							addOutPacket(Message.getMessage(packet.getStanzaTo(),
+									packet.getStanzaFrom(), StanzaType.chat,
+									"Task accepted, processing...", "PubSub testing task", null,
+									packet.getStanzaId()));
+							runInThread(new Runnable() {
+
+								@Override
+								public void run() {
+									addSubscriptionsForNode(packet.getStanzaFrom(), to,
+											body_split[1], pars[0]);
+								}
+							}, packet);
+						} else {
+							results.offer(Message.getMessage(packet.getStanzaTo(),
+									packet.getStanzaFrom(), StanzaType.chat,
 									"Incorrect command parameters.", "PubSub testing task", null,
-									packet.getId()));
-					return;
-				}
-				break;
-			case stop:
-				stop = true;
-				break;
+									packet.getStanzaId()));
+							return;
+						}
+					} else {
+						results.offer(Message.getMessage(packet.getStanzaTo(),
+								packet.getStanzaFrom(), StanzaType.chat,
+								"There are no pubsub nodes created yet.", "PubSub testing task",
+								null, packet.getStanzaId()));
+						return;
+					}
+					break;
+				case newnodessubscr:
+					pars = parseNumbers(body_split, 1, 2);
+					if (pars != null) {
+						addOutPacket(Message.getMessage(packet.getStanzaTo(),
+								packet.getStanzaFrom(), StanzaType.chat,
+								"" + new Date() + " Task accepted, processing...",
+								"PubSub testing task", null, packet.getStanzaId()));
+						runInThread(new Runnable() {
+
+							@Override
+							public void run() {
+								last_nodes = createNodes(packet.getStanzaFrom(), to, pars);
+							}
+						}, packet);
+					} else {
+						results.offer(Message.getMessage(packet.getStanzaTo(),
+								packet.getStanzaFrom(), StanzaType.chat,
+								"Incorrect command parameters.", "PubSub testing task", null,
+								packet.getStanzaId()));
+						return;
+					}
+					break;
+				case stop:
+					stop = true;
+					break;
+			}
+		} catch (TigaseStringprepException ex) {
+			Logger.getLogger(PubSubTestsTask.class.getName()).log(Level.SEVERE, null,
+					ex);
 		}
 	}
 

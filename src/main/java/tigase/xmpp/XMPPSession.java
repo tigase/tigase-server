@@ -30,7 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 import java.util.logging.Level;
-import tigase.util.JIDUtils;
+import tigase.util.TigaseStringprepException;
 
 /**
  * Describe class XMPPSession here.
@@ -125,8 +125,10 @@ public class XMPPSession {
 	 * This method is called each time the resource is set for connection.
 	 *
 	 * @param conn
+	 * @throws TigaseStringprepException
 	 */
-	public void addResourceConnection(XMPPResourceConnection conn) {
+	public void addResourceConnection(XMPPResourceConnection conn) throws
+			TigaseStringprepException {
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Adding resource connection for username : " + username +
 					", id: " + conn.getConnectionId());
@@ -186,11 +188,11 @@ public class XMPPSession {
 
 	public void removeResourceConnection(XMPPResourceConnection conn) {
 		activeResources.remove(conn);
-		conn.setParentSession(null);
+		conn.removeParentSession(null);
 	}
 
-	public String[] getJIDs() throws NotAuthorizedException {
-		String[] result = new String[activeResources.size()];
+	public JID[] getJIDs() throws NotAuthorizedException {
+		JID[] result = new JID[activeResources.size()];
 		int idx = 0;
 		for (XMPPResourceConnection conn: activeResources) {
 			result[idx++] = conn.getJID();
@@ -198,8 +200,8 @@ public class XMPPSession {
 		return result;
 	}
 
-	public String[] getConnectionIds() {
-		String[] result = new String[activeResources.size()];
+	public JID[] getConnectionIds() {
+		JID[] result = new JID[activeResources.size()];
 		int idx = 0;
 		for (XMPPResourceConnection conn: activeResources) {
 			result[idx++] = conn.getConnectionId();
@@ -207,7 +209,7 @@ public class XMPPSession {
 		return result;
 	}
 
-	public XMPPResourceConnection getResourceForResource(final String resource) {
+	public XMPPResourceConnection getResourceForResource(String resource) {
 		if (resource != null && resource.length() > 0) {
 			for (XMPPResourceConnection conn: activeResources) {
 				if (log.isLoggable(Level.FINEST)) {
@@ -222,7 +224,7 @@ public class XMPPSession {
 		return null;
 	}
 
-	public XMPPResourceConnection getResourceForConnectionId(String connectionId) {
+	public XMPPResourceConnection getResourceForConnectionId(JID connectionId) {
 		for (XMPPResourceConnection conn: activeResources) {
 			if (connectionId.equals(conn.getConnectionId())) {
 				return conn;
@@ -245,12 +247,12 @@ public class XMPPSession {
 		return null;
 	}
 
-	public XMPPResourceConnection getResourceForJID(final String jid) {
-		final String resource = JIDUtils.getNodeResource(jid);
+	public XMPPResourceConnection getResourceForJID(JID jid) {
+		final String resource = jid.getResource();
 		return getResourceForResource(resource);
 	}
 
-	public synchronized XMPPResourceConnection getResourceConnection(final String jid) {
+	public synchronized XMPPResourceConnection getResourceConnection(JID jid) {
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Called for: " + jid);
 		}

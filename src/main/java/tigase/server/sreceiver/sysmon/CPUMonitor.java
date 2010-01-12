@@ -42,6 +42,7 @@ import java.util.logging.Logger;
 import tigase.server.Packet;
 import tigase.stats.StatisticsList;
 import tigase.sys.TigaseRuntime;
+import tigase.xmpp.JID;
 
 /**
  * Created: Dec 10, 2008 12:27:15 PM
@@ -240,7 +241,7 @@ public class CPUMonitor extends AbstractMonitor {
 	}
 
 	@Override
-	public void init(String jid, float treshold, SystemMonitorTask smTask) {
+	public void init(JID jid, float treshold, SystemMonitorTask smTask) {
 		super.init(jid, treshold, smTask);
 		thBean = ManagementFactory.getThreadMXBean();
 		osBean = ManagementFactory.getOperatingSystemMXBean();

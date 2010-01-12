@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import tigase.xml.Element;
+import tigase.xmpp.JID;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
 
@@ -119,7 +120,7 @@ public abstract class DynamicRoster {
 	}
 
 	public static Element getBuddyItem(final XMPPResourceConnection session,
-		final Map<String, Object> settings, String buddy)
+		final Map<String, Object> settings, JID buddy)
 		throws NotAuthorizedException {
 		DynamicRosterIfc[] dynr = getDynamicRosters(settings);
 		if (dynr != null) {
@@ -133,13 +134,13 @@ public abstract class DynamicRoster {
 		return null;
 	}
 
-	public static List<String> getBuddiesList(final XMPPResourceConnection session,
+	public static List<JID> getBuddiesList(final XMPPResourceConnection session,
 		final Map<String, Object> settings) throws NotAuthorizedException {
 		DynamicRosterIfc[] dynr = getDynamicRosters(settings);
 		if (dynr != null) {
-			ArrayList<String> result = new ArrayList<String>();
+			ArrayList<JID> result = new ArrayList<JID>();
 			for (DynamicRosterIfc dri: dynr) {
-				String[] buddies = dri.getBuddies(session);
+				JID[] buddies = dri.getBuddies(session);
 				if (buddies != null) {
 					result.addAll(Arrays.asList(buddies));
 				}
@@ -151,27 +152,27 @@ public abstract class DynamicRoster {
 		return null;
 	}
 
-	public static String[] getBuddies(final XMPPResourceConnection session,
+	public static JID[] getBuddies(final XMPPResourceConnection session,
 		final Map<String, Object> settings) throws NotAuthorizedException {
-		List<String> result = getBuddiesList(session, settings);
+		List<JID> result = getBuddiesList(session, settings);
 		if (result != null && result.size() > 0) {
-			return result.toArray(new String[result.size()]);
+			return result.toArray(new JID[result.size()]);
 		}
 		return null;
 	}
 
-	public static String[] addBuddies(final XMPPResourceConnection session,
-		final Map<String, Object> settings, String[] buddies)
+	public static JID[] addBuddies(final XMPPResourceConnection session,
+		final Map<String, Object> settings, JID[] buddies)
 		throws NotAuthorizedException {
-		List<String> result = getBuddiesList(session, settings);
+		List<JID> result = getBuddiesList(session, settings);
 		if (buddies != null) {
 			if (result == null) {
-				result = new ArrayList<String>();
+				result = new ArrayList<JID>();
 			}
 			result.addAll(Arrays.asList(buddies));
 		}
 		if (result != null && result.size() > 0) {
-			return result.toArray(new String[result.size()]);
+			return result.toArray(new JID[result.size()]);
 		}
 		return null;
 	}

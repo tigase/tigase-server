@@ -33,6 +33,7 @@ import java.util.logging.MemoryHandler;
 import tigase.conf.ConfiguratorOld;
 import tigase.stats.StatisticsList;
 import tigase.util.LogFormatter;
+import tigase.xmpp.JID;
 
 /**
  * Created: Dec 12, 2008 8:31:38 PM
@@ -161,7 +162,7 @@ public class LogMonitor extends AbstractMonitor {
 	}
 
 	@Override
-	public void init(String jid, float treshold, SystemMonitorTask smTask) {
+	public void init(JID jid, float treshold, SystemMonitorTask smTask) {
 		super.init(jid, treshold, smTask);
 		registerHandler();
 	}

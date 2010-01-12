@@ -31,6 +31,8 @@ import tigase.db.UserRepository;
 import tigase.server.Packet;
 
 import tigase.stats.StatisticsList;
+import tigase.util.TigaseStringprepException;
+import tigase.xmpp.JID;
 import static tigase.server.sreceiver.PropertyConstants.*;
 import static tigase.server.sreceiver.TaskCommons.*;
 
@@ -64,12 +66,12 @@ public abstract class RepoRosterTask extends AbstractReceiverTask {
 		try {
 			String tmp = Boolean.valueOf(ri.isSubscribed()).toString();
 			log.info(getJID() + ": " + ri.getJid() + ": subscribed = " + tmp);
-			repository.setData(getJID(), repo_node, subscribed_key, tmp);
-			repository.setData(getJID(), repo_node, owner_key,
+			repository.setData(getJID().toString(), repo_node, subscribed_key, tmp);
+			repository.setData(getJID().toString(), repo_node, owner_key,
 				Boolean.valueOf(ri.isOwner()).toString());
-			repository.setData(getJID(), repo_node, admin_key,
+			repository.setData(getJID().toString(), repo_node, admin_key,
 				Boolean.valueOf(ri.isAdmin()).toString());
-			repository.setData(getJID(), repo_node, moderation_accepted_key,
+			repository.setData(getJID().toString(), repo_node, moderation_accepted_key,
 				Boolean.valueOf(ri.isModerationAccepted()).toString());
 		} catch (TigaseDBException e) {
 			log.log(Level.SEVERE, "Problem saving roster data for: "
@@ -79,19 +81,19 @@ public abstract class RepoRosterTask extends AbstractReceiverTask {
 		} // end of try-catch
 	}
 
-	private RosterItem loadFromRepository(String jid) {
+	private RosterItem loadFromRepository(JID jid) {
 		log.info(getJID() + ": Loading roster item for: " + jid);
 		String repo_node = roster_node + "/" + jid;
 		RosterItem ri = new RosterItem(jid);
 		try {
-			String tmp = repository.getData(getJID(), repo_node, subscribed_key);
+			String tmp = repository.getData(getJID().toString(), repo_node, subscribed_key);
 			log.info(getJID() + ": " + jid + ": subscribed = " + tmp);
 			ri.setSubscribed(parseBool(tmp));
-			tmp = repository.getData(getJID(), repo_node, owner_key);
+			tmp = repository.getData(getJID().toString(), repo_node, owner_key);
 			ri.setOwner(parseBool(tmp));
-			tmp = repository.getData(getJID(), repo_node, admin_key);
+			tmp = repository.getData(getJID().toString(), repo_node, admin_key);
 			ri.setAdmin(parseBool(tmp));
-			tmp = repository.getData(getJID(), repo_node, moderation_accepted_key);
+			tmp = repository.getData(getJID().toString(), repo_node, moderation_accepted_key);
 			ri.setModerationAccepted(parseBool(tmp));
 		} catch (TigaseDBException e) {
 			log.log(Level.SEVERE, "Problem loading roster data for: " + jid, e);
@@ -102,20 +104,22 @@ public abstract class RepoRosterTask extends AbstractReceiverTask {
 	private void removeFromRepository(RosterItem ri) {
 		String repo_node = roster_node + "/" + ri.getJid();
 		try {
-			repository.removeSubnode(getJID(), repo_node);
+			repository.removeSubnode(getJID().toString(), repo_node);
 		} catch (TigaseDBException e) {
 			log.log(Level.SEVERE, "Problem removing from roster data for: " +
 				ri.getJid(), e);
 		} // end of try-catch
 	}
 
-	public RosterItem addToRoster(String jid) {
+	@Override
+	public RosterItem addToRoster(JID jid) {
 		RosterItem ri = super.addToRoster(jid);
 		saveToRepository(ri);
 		return ri;
 	}
 
-	public RosterItem removeFromRoster(String jid) {
+	@Override
+	public RosterItem removeFromRoster(JID jid) {
 		RosterItem ri = super.removeFromRoster(jid);
 		if (ri != null) {
 			removeFromRepository(ri);
@@ -123,6 +127,7 @@ public abstract class RepoRosterTask extends AbstractReceiverTask {
 		return ri;
 	}
 
+	@Override
 	public void setRosterItemSubscribed(RosterItem ri, boolean subscribed) {
 		super.setRosterItemSubscribed(ri, subscribed);
 		log.fine(getJID() + ": " +
@@ -147,11 +152,18 @@ public abstract class RepoRosterTask extends AbstractReceiverTask {
 	}
 
 	public void loadRoster() throws TigaseDBException {
-		String[] roster = repository.getSubnodes(getJID(), roster_node);
+		String[] roster = repository.getSubnodes(getJID().toString(), roster_node);
 		if (roster != null) {
 			for (String jid: roster) {
-				log.fine(getJID() + ": " + " loadin from repository: " + jid);
-				addToRoster(loadFromRepository(jid));
+				try {
+					JID rjid = new JID(jid);
+					log.fine(getJID() + ": " + " loadin from repository: " + rjid);
+					addToRoster(loadFromRepository(rjid));
+				} // end of for (String jid: roster)
+				catch (TigaseStringprepException ex) {
+					Logger.getLogger(RepoRosterTask.class.getName()).
+							log(Level.SEVERE, null, ex);
+				}
 			} // end of for (String jid: roster)
 		} // end of if (roster != null)
 	}
@@ -163,7 +175,7 @@ public abstract class RepoRosterTask extends AbstractReceiverTask {
 		if (repository != null && !loaded) {
 			try {
 				try {
-					repository.addUser(getJID());
+					repository.addUser(getJID().toString());
 				} catch (UserExistsException e) { /*Ignore, this is correct and expected*/	}
 				loaded = true;
 				loadRoster();
@@ -177,7 +189,7 @@ public abstract class RepoRosterTask extends AbstractReceiverTask {
 	public void destroy(Queue<Packet> results) {
 		super.destroy(results);
 		try {
-			repository.removeUser(getJID());
+			repository.removeUser(getJID().toString());
 		} catch (TigaseDBException e) {
 			log.log(Level.SEVERE, "Problem removing task data from repository", e);
 		} // end of try-catch

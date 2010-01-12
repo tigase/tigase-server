@@ -102,9 +102,9 @@ public class StartTLSProcessor implements ExtProcessor {
 	@Override
 	public void startProcessing(Packet p, XMPPIOService<List<ComponentConnection>> serv,
 			ComponentProtocolHandler handler,	Queue<Packet> results) {
-			results.offer(new Packet(new Element(EL_NAME,
+			results.offer(Packet.packetInstance(new Element(EL_NAME,
 					new String[] {"xmlns"},
-					new String[] {"urn:ietf:params:xml:ns:xmpp-tls"})));
+					new String[] {"urn:ietf:params:xml:ns:xmpp-tls"}), null, null));
 	}
 
 	@Override

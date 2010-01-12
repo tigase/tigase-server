@@ -25,6 +25,7 @@ package tigase.disco;
 import java.util.List;
 import tigase.xml.Element;
 import tigase.server.ServerComponent;
+import tigase.xmpp.JID;
 
 /**
  * Interface XMPPService
@@ -72,7 +73,7 @@ public interface XMPPService extends ServerComponent {
 	 * is only meant for administrators.
 	 * @return returns an XML Element with service discovery data.
 	 */
-	Element getDiscoInfo(String node, String jid, String from);
+	Element getDiscoInfo(String node, JID jid, JID from);
 
 	/**
 	 * Returns service discovery items for the component. If the JID is null then this is
@@ -85,7 +86,7 @@ public interface XMPPService extends ServerComponent {
 	 * @return a list of service discovery items for this component or the component
 	 * itself disco item for the top level request.
 	 */
-	List<Element> getDiscoItems(String node, String jid, String from);
+	List<Element> getDiscoItems(String node, JID jid, JID from);
 
 	/**
 	 * Returns features for top level disco info
@@ -96,6 +97,6 @@ public interface XMPPService extends ServerComponent {
 	 * appropriate.
 	 * @return a list of elements with service discovery features.
 	 */
-	List<Element> getDiscoFeatures(String from);
+	List<Element> getDiscoFeatures(JID from);
 
 }

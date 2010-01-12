@@ -27,6 +27,7 @@ import java.util.List;
 import tigase.server.Packet;
 import tigase.stats.StatRecord;
 import tigase.stats.StatisticsList;
+import tigase.xmpp.JID;
 
 /**
  * This is <code>StanzaReceiver</code> task which can receive XMPP packets
@@ -88,7 +89,7 @@ public interface ReceiverTaskIfc {
 	 *
 	 * @param jid a <code>String</code> value of the nick name.
 	 */
-	void setJID(String jid);
+	void setJID(JID jid);
 
 	/**
 	 * <code>getJID</code> method returns task instance
@@ -98,7 +99,7 @@ public interface ReceiverTaskIfc {
 	 * @return a <code>String</code> value of task instance JID,
 	 * @see #setJID(String)
 	 */
-	String getJID();
+	JID getJID();
 
 	/**
 	 * <code>getDescription</code> method returns a description for task instance.
@@ -200,7 +201,7 @@ public interface ReceiverTaskIfc {
 	 * @return a <code>boolean</code> value true if given user is either task admin
 	 * or task owner.
 	 */
-	boolean isAdmin(String jid);
+	boolean isAdmin(JID jid);
 
 	/**
 	 * <code>getRoster</code> returns <code>roster</code> that is a collection with
@@ -208,9 +209,9 @@ public interface ReceiverTaskIfc {
 	 *
 	 * @return a <code>Map</code> value with all user subscribed to this task.
 	 */
-	Map<String, RosterItem> getRoster();
+	Map<JID, RosterItem> getRoster();
 
-	void removeSubscribers(Queue<Packet> results, String... subscr);
+	void removeSubscribers(Queue<Packet> results, JID... subscr);
 
 	void setRosterItemModerationAccepted(RosterItem ri, boolean accepted);
 

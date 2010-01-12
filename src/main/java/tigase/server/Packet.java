@@ -25,10 +25,11 @@ package tigase.server;
 import java.util.List;
 import java.util.Set;
 import java.util.LinkedHashSet;
+import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
-import tigase.disco.XMPPService;
-import tigase.util.JIDUtils;
+import tigase.xmpp.BareJID;
+import tigase.xmpp.JID;
 
 /**
  * Class Packet
@@ -61,30 +62,90 @@ public class Packet {
 	public static final String OLDTO = "oldto";
 	public static final String OLDFROM = "oldfrom";
 
-	private final Element elem;
-	private final Command command;
-	private final String strCommand;
-	private final boolean cmd;
-	private final boolean serviceDisco;
-	private final StanzaType type;
-	private final boolean routed;
-	private String to = null;
-	private String toId = null;
-	private String toHost = null;
-	private String toNick = null;
-	private String from = null;
-	private String id = null;
+	protected Element elem;
+	private StanzaType type;
+	private boolean routed;
+	private JID packetTo = null;
+	private JID packetFrom = null;
+	private JID stanzaTo = null;
+	private JID stanzaFrom = null;
+	private String stanzaId = null;
 	private Permissions permissions = Permissions.NONE;
 	private String packetToString = null;
 	private String packetToStringSecure = null;
 	private Priority priority = Priority.NORMAL;
-	private String iqQueryXMLNS = null;
-	private String elemTo = null;
-	private String elemToId = null;
-	private String elemToHost = null;
-	private String elemToNick = null;
 
-  public Packet(final Element elem) {
+	public static Packet packetInstance(Element elem) throws TigaseStringprepException {
+		if (elem.getName() == Message.ELEM_NAME) {
+			return new Message(elem);
+		}
+		if (elem.getName() == Presence.ELEM_NAME) {
+			return new Presence(elem);
+		}
+		if (elem.getName() == Iq.ELEM_NAME) {
+			return new Iq(elem);
+		}
+		return new Packet(elem);
+	}
+
+	public static Packet packetInstance(Element elem, JID stanzaFrom, JID stanzaTo) {
+		if (elem.getName() == Message.ELEM_NAME) {
+			return new Message(elem, stanzaFrom, stanzaTo);
+		}
+		if (elem.getName() == Presence.ELEM_NAME) {
+			return new Presence(elem, stanzaFrom, stanzaTo);
+		}
+		if (elem.getName() == Iq.ELEM_NAME) {
+			return new Iq(elem, stanzaFrom, stanzaTo);
+		}
+		return new Packet(elem, stanzaFrom, stanzaTo);
+	}
+
+	public static Packet packetInstance(String el_name, String from, String to,
+			StanzaType type) throws TigaseStringprepException {
+		Element elem = new Element(el_name,
+			new String[] {"from", "to", "type"},
+			new String[] {from, to, type.toString()});
+		return packetInstance(elem);
+	}
+
+  protected Packet(final Element elem) throws TigaseStringprepException {
+		setElem(elem);
+		initVars();
+	}
+
+  protected Packet(final Element elem, JID stanzaFrom, JID stanzaTo) {
+		setElem(elem);
+		initVars(stanzaFrom, stanzaTo);
+	}
+
+	public Packet copyElementOnly() {
+		Element res_elem = elem.clone();
+		Packet result = packetInstance(res_elem, getStanzaFrom(), getStanzaTo());
+		return result;
+	}
+
+	public void initVars(JID stanzaFrom, JID stanzaTo) {
+		this.stanzaTo = stanzaTo;
+		this.stanzaFrom = stanzaFrom;
+		stanzaId = elem.getAttribute("id");
+		packetToString = null;
+	}
+
+	public void initVars() throws TigaseStringprepException {
+		String tmp = elem.getAttribute("to");
+		if (tmp != null) {
+			stanzaTo = new JID(tmp);
+		}
+		tmp = elem.getAttribute("from");
+		if (tmp != null) {
+			stanzaFrom = new JID(tmp);
+		}
+		stanzaId = elem.getAttribute("id");
+		packetToString = null;
+	}
+
+	private void setElem(Element elem) {
 		if (elem == null) {
 			throw new NullPointerException();
 		} // end of if (elem == null)
@@ -94,73 +155,21 @@ public class Packet {
 		} else {
 			type = null;
 		} // end of if (elem.getAttribute("type") != null) else
-		if (elem.getName() == "iq") {
-			Element child = elem.getChild("command", Command.XMLNS);
-			if (child != null) {
-				cmd = true;
-				strCommand = child.getAttribute("node");
-				command = Command.valueof(strCommand);
-			} else {
-				strCommand = null;
-				command = null;
-				cmd = false;
-			}
-			serviceDisco = (isXMLNS("/iq/query", XMPPService.INFO_XMLNS)
-				|| isXMLNS("/iq/query", XMPPService.ITEMS_XMLNS));
-		} else {
-			strCommand = null;
-			command = null;
-			cmd = false;
-			serviceDisco = false;
-			if (elem.getName() == "cluster") {
-				setPriority(Priority.CLUSTER);
-			}
-			if ((elem.getName() == "presence") && (type == null ||
-							type == StanzaType.available || 
-							type == StanzaType.unavailable ||
-							type == StanzaType.probe)) {
-				setPriority(Priority.PRESENCE);
-			}
+		if (elem.getName() == "cluster") {
+			setPriority(Priority.CLUSTER);
+		}
+		if ((elem.getName() == "presence")
+				&& (type == null
+				|| type == StanzaType.available
+				|| type == StanzaType.unavailable
+				|| type == StanzaType.probe)) {
+			setPriority(Priority.PRESENCE);
 		}
 		if (elem.getName().equals("route")) {
 			routed = true;
-		} // end of if (elem.getName().equals("route"))
-		else {
+		} else {
 			routed = false;
 		} // end of if (elem.getName().equals("route")) else
-		initVars();
-	}
-
-	public Packet(String el_name, String from, String to, StanzaType type) {
-		this.elem = new Element(el_name,
-			new String[] {"from", "to", "type"},
-			new String[] {from, to, type.toString()});
-		this.type = type;
-		this.strCommand = null;
-		this.command = null;
-		this.cmd = false;
-		this.routed = false;
-		this.serviceDisco = false;
-		initVars();
-	}
-
-	public void initVars() {
-		elemTo = elem.getAttribute("to");
-		if (elemTo != null) {
-			elemToHost = JIDUtils.getNodeHost(elemTo);
-			elemToNick = JIDUtils.getNodeNick(elemTo);
-			elemToId = JIDUtils.getNodeID(elemTo);
-		}
-		id = elem.getAttribute("id");
-		initTo();
-	}
-
-	private void initTo() {
-		if (to != null) {
-			toId = JIDUtils.getNodeID(to);
-			toHost = JIDUtils.getNodeHost(to);
-			toNick = JIDUtils.getNodeNick(to);
-		}
 	}
 
 	public void setPriority(Priority priority) {
@@ -171,8 +180,8 @@ public class Packet {
 		return priority;
 	}
 
-	public String getId() {
-		return id;
+	public String getStanzaId() {
+		return stanzaId;
 	}
 
 	public void setPermissions(Permissions perm) {
@@ -201,14 +210,6 @@ public class Packet {
 		return processorsIds;
 	}
 
-	public Command getCommand() {
-		return command;
-	}
-
-	public String getStrCommand() {
-		return strCommand;
-	}
-
 	public StanzaType getType() {
 		return type;
 	}
@@ -221,31 +222,8 @@ public class Packet {
 		return elem.getName();
 	}
 
-	public boolean isCommand() {
-		return cmd;
-	}
-
-	public boolean isServiceDisco() {
-		return serviceDisco;
-	}
-
 	public String getXMLNS() {
 		return elem.getXMLNS();
-	}
-
-	public String getIQXMLNS() {
-		if (iqQueryXMLNS == null) {
-			iqQueryXMLNS = elem.getXMLNS("/iq/query");
-		}
-		return iqQueryXMLNS;
-	}
-
-	public String getIQChildName() {
-		List<Element> children = elem.getChildren();
-		if (children != null && children.size() > 0) {
-			return children.get(0).getName();
-		}
-		return null;
 	}
 
 	public boolean isXMLNS(String elementPath, String xmlns) {
@@ -260,55 +238,55 @@ public class Packet {
 		return elem.getName() == name && xmlns == elem.getXMLNS();
 	}
 
-	public String getTo() {
-		return to != null ? to : elemTo;
+	public void setPacketTo(JID to) {
+		this.packetTo = to;
 	}
 
-	public String getToId() {
-		return toId != null ? toId : elemToId;
+	public JID getTo() {
+		return packetTo != null ? packetTo : stanzaTo;
+	}
+
+	public BareJID getToBareJID() {
+		return packetTo != null ? packetTo.getBareJID()
+				: (stanzaTo != null ? stanzaTo.getBareJID() : null);
 	}
 
 	public String getToHost() {
-		return toHost != null ? toHost : elemToHost;
+		return packetTo != null ? packetTo.getDomain()
+				: (stanzaTo != null ? stanzaTo.getDomain() : null);
 	}
 
 	public String getToNick() {
-		return toNick != null ? toNick : elemToNick;
+		return packetTo != null ? packetTo.getLocalpart()
+				: (stanzaTo != null ? stanzaTo.getLocalpart() : null);
 	}
 
-	public void setTo(final String to) {
-		this.to = to;
-		initTo();
+	public void setPacketFrom(JID from) {
+		this.packetFrom = from;
 	}
 
-	public String getFrom() {
-		return from != null ? from : getElemFrom();
-	}
-
-	public void setFrom(final String from) {
-		packetToString = null;
-		packetToStringSecure = null;
-		this.from = from;
-	}
-
-	public String getAttribute(String key) {
-		return elem.getAttribute(key);
+	public JID getFrom() {
+		return packetFrom != null ? packetFrom : stanzaFrom;
 	}
 
 	/**
    * Returns packet destination address.
 	 * @return
 	 */
-  public String getElemTo() {
-		return elemTo;
+  public JID getStanzaTo() {
+		return stanzaTo;
   }
 
-	public String getElemToHost() {
-		return elemToHost;
+	public String getStanzaToHost() {
+		return stanzaTo != null ? stanzaTo.getDomain() : null;
 	}
 
-	public String getElemToNick() {
-		return elemToNick;
+	public String getStanzaToNick() {
+		return stanzaTo != null ? stanzaTo.getLocalpart() : null;
+	}
+
+	public String getAttribute(String key) {
+		return elem.getAttribute(key);
 	}
 
 	public String getAttribute(String path, String attr_name) {
@@ -319,13 +297,9 @@ public class Packet {
    * Returns packet source address.
 	 * @return
 	 */
-  public String getElemFrom() {
-    return elem.getAttribute("from");
+  public JID getStanzaFrom() {
+    return stanzaFrom;
   }
-
-	public String getElemId() {
-		return id;
-	}
 
 	public String getElemCData(final String path) {
 		return elem.getCData(path);
@@ -339,17 +313,17 @@ public class Packet {
 		return elem.getCData();
 	}
 
-  public byte[] getByteData() {
-    return elem.toString().getBytes();
-  }
-
-  public String getStringData() {
-    return elem.toString();
-  }
-
-  public char[] getCharData() {
-    return elem.toString().toCharArray();
-  }
+//  public byte[] getByteData() {
+//    return elem.toString().getBytes();
+//  }
+//
+//  public String getStringData() {
+//    return elem.toString();
+//  }
+//
+//  public char[] getCharData() {
+//    return elem.toString().toCharArray();
+//  }
 
 	@Override
 	public String toString() {
@@ -358,7 +332,7 @@ public class Packet {
 							", XMLNS="+elem.getXMLNS() +
 							", priority="+priority;
 		}
-		return "to=" + to + ", from=" + from + packetToString;
+		return "from=" + packetFrom + ", to=" + packetTo + packetToString;
 	}
 
 	public String toStringSecure() {
@@ -367,7 +341,7 @@ public class Packet {
 							", XMLNS="+elem.getXMLNS() +
 							", priority="+priority;
 		}
-		return "to=" + to + ", from=" + from + packetToStringSecure;
+		return "from=" + packetFrom + ", to=" + packetTo + packetToStringSecure;
 	}
 
 	public String toString(boolean secure) {
@@ -382,10 +356,10 @@ public class Packet {
 		return routed;
 	}
 
-	public Packet unpackRouted() {
-		Packet result = new Packet(elem.getChildren().get(0));
-		result.setTo(getTo());
-		result.setFrom(getFrom());
+	public Packet unpackRouted() throws TigaseStringprepException {
+		Packet result = packetInstance(elem.getChildren().get(0));
+		result.setPacketTo(getTo());
+		result.setPacketFrom(getFrom());
 		return result;
 	}
 
@@ -398,44 +372,31 @@ public class Packet {
 
 	public Packet packRouted() {
 		Element routedp = new Element("route", new String[] {"to", "from"},
-			new String[] {getTo(), getFrom()});
+			new String[] {getTo().toString(), getFrom().toString()});
 		routedp.addChild(elem);
-		return new Packet(routedp);
+		return packetInstance(routedp, getFrom(), getTo());
 	}
 
-	public Packet swapFromTo(final Element el) {
-		Packet packet = new Packet(el);
-		packet.setTo(getFrom());
-		packet.setFrom(getTo());
+//	public Packet swapFromTo(Element el) throws TigaseStringprepException {
+//		Packet packet = packetInstance(el);
+//		packet.setPacketTo(getFrom());
+//		packet.setPacketFrom(getTo());
+//		return packet;
+//	}
+
+	public Packet swapFromTo(Element el, JID stanzaFrom, JID stanzaTo) {
+		Packet packet = packetInstance(el, stanzaFrom, stanzaTo);
+		packet.setPacketTo(getFrom());
+		packet.setPacketFrom(getTo());
 		return packet;
 	}
 
 	public Packet swapFromTo() {
 		Element el = elem.clone();
-		Packet packet = new Packet(el);
-		packet.setTo(getFrom());
-		packet.setFrom(getTo());
+		Packet packet = packetInstance(el, getStanzaFrom(), getStanzaTo());
+		packet.setPacketTo(getFrom());
+		packet.setPacketFrom(getTo());
 		return packet;
-	}
-
-	public Packet commandResult(Command.DataType cmd_type) {
-		Packet result = new Packet(command.createIqCommand(
-						getElemTo(),
-						getElemFrom(),
-						StanzaType.result, elem.getAttribute("id"), strCommand, cmd_type));
-		result.setFrom(getTo());
-		result.setTo(getFrom());
-		return result;
-	}
-
-	public static Packet commandResultForm(Packet packet) {
-		Packet result = packet.commandResult(Command.DataType.form);
-		return result;
-	}
-
-	public static Packet commandResultResult(Packet packet) {
-		Packet result = packet.commandResult(Command.DataType.result);
-		return result;
 	}
 
 	public String getErrorCondition() {
@@ -460,14 +421,14 @@ public class Packet {
 		final boolean includeOriginalXML) {
 		Element reply = new Element(elem.getName());
 		reply.setAttribute("type", StanzaType.error.toString());
-		if (getElemFrom() != null) {
-			reply.setAttribute("to", getElemFrom());
+		if (getStanzaFrom() != null) {
+			reply.setAttribute("to", getStanzaFrom().toString());
 		} // end of if (getElemFrom() != null)
-		if (getElemTo() != null) {
-			reply.setAttribute("from", getElemTo());
+		if (getStanzaTo() != null) {
+			reply.setAttribute("from", getStanzaTo().toString());
 		} // end of if (getElemTo() != null)
-		if (getElemId() != null) {
-			reply.setAttribute("id", getElemId());
+		if (getStanzaId() != null) {
+			reply.setAttribute("id", getStanzaId());
 		} // end of if (getElemId() != null)
 		if (includeOriginalXML) {
 			reply.addChildren(elem.getChildren());
@@ -493,20 +454,20 @@ public class Packet {
 			error.addChild(t);
 		} // end of if (text != null && text.length() > 0)
 		reply.addChild(error);
-		return swapFromTo(reply);
+		return swapFromTo(reply, getStanzaTo(), getStanzaFrom());
 	}
 
 	public Packet okResult(final String includeXML, final int originalXML) {
 		Element reply = new Element(elem.getName());
 		reply.setAttribute("type", StanzaType.result.toString());
-		if (getElemFrom() != null) {
-			reply.setAttribute("to", getElemFrom());
+		if (getStanzaFrom() != null) {
+			reply.setAttribute("to", getStanzaFrom().toString());
 		} // end of if (getElemFrom() != null)
-		if (getElemTo() != null) {
-			reply.setAttribute("from", getElemTo());
+		if (getStanzaTo() != null) {
+			reply.setAttribute("from", getStanzaTo().toString());
 		} // end of if (getElemFrom() != null)
-		if (getElemId() != null) {
-			reply.setAttribute("id", getElemId());
+		if (getStanzaId() != null) {
+			reply.setAttribute("id", getStanzaId());
 		} // end of if (getElemId() != null)
 		if (getAttribute(OLDTO) != null) {
 			reply.setAttribute(OLDTO, getAttribute(OLDTO));
@@ -523,7 +484,7 @@ public class Packet {
 		if (includeXML != null) {
 			new_child.setCData(includeXML);
 		} // end of if (includeOriginalXML)
-		Packet result = swapFromTo(reply);
+		Packet result = swapFromTo(reply, getStanzaTo(), getStanzaFrom());
 		result.setPriority(priority);
 		return result;
 	}
@@ -531,14 +492,14 @@ public class Packet {
 	public Packet okResult(final Element includeXML, final int originalXML) {
 		Element reply = new Element(elem.getName());
 		reply.setAttribute("type", StanzaType.result.toString());
-		if (getElemFrom() != null) {
-			reply.setAttribute("to", getElemFrom());
+		if (getStanzaFrom() != null) {
+			reply.setAttribute("to", getStanzaFrom().toString());
 		} // end of if (getElemFrom() != null)
-		if (getElemTo() != null) {
-			reply.setAttribute("from", getElemTo());
+		if (getStanzaTo() != null) {
+			reply.setAttribute("from", getStanzaTo().toString());
 		} // end of if (getElemFrom() != null)
-		if (getElemId() != null) {
-			reply.setAttribute("id", getElemId());
+		if (getStanzaId() != null) {
+			reply.setAttribute("id", getStanzaId());
 		} // end of if (getElemId() != null)
 		if (getAttribute(OLDTO) != null) {
 			reply.setAttribute(OLDTO, getAttribute(OLDTO));
@@ -555,46 +516,45 @@ public class Packet {
 		if (includeXML != null) {
 			new_child.addChild(includeXML);
 		} // end of if (includeOriginalXML)
-		Packet result = swapFromTo(reply);
+		Packet result = swapFromTo(reply, getStanzaTo(), getStanzaFrom());
 		result.setPriority(priority);
 		return result;
 	}
 
 	public Packet swapElemFromTo() {
 		Element copy = elem.clone();
-		copy.setAttribute("to", getElemFrom());
-		copy.setAttribute("from", getElemTo());
-		Packet result = new Packet(copy);
+		copy.setAttribute("to", getStanzaFrom().toString());
+		copy.setAttribute("from", getStanzaTo().toString());
+		Packet result = packetInstance(copy, getStanzaTo(), getStanzaFrom());
 		result.setPriority(priority);
 		return result;
 	}
 
 	public Packet swapElemFromTo(final StanzaType type) {
 		Element copy = elem.clone();
-		copy.setAttribute("to", getElemFrom());
-		copy.setAttribute("from", getElemTo());
+		copy.setAttribute("to", getStanzaFrom().toString());
+		copy.setAttribute("from", getStanzaTo().toString());
 		copy.setAttribute("type", type.toString());
-		Packet result = new Packet(copy);
+		Packet result = packetInstance(copy, getStanzaTo(), getStanzaFrom());
 		result.setPriority(priority);
 		return result;
 	}
 
-	public static Packet getMessage(String to, String from, StanzaType type,
-		String body, String subject, String thread, String id) {
-		Element message = new Element("message",
-			new Element[] {new Element("body", body)},
-			new String[] {"to", "from", "type"},
-			new String[] {to, from, type.toString()});
-		if (id != null) {
-			message.addAttribute("id", id);
-		}
-		if (subject != null) {
-			message.addChild(new Element("subject", subject));
-		}
-		if (thread != null) {
-			message.addChild(new Element("thread", thread));
-		}
-		return new Packet(message);
+	public boolean isCommand() {
+		return false;
+	}
+
+	public boolean isServiceDisco() {
+		return false;
+	}
+
+	public Command getCommand() {
+		return null;
+	}
+
+	public String debug() {
+		return toString()
+				+ ", stanzaFrom=" + stanzaFrom + ", stanzaTo=" + stanzaTo;
 	}
 
 }

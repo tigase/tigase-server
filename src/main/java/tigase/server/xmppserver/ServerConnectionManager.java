@@ -41,7 +41,7 @@ import tigase.server.ConnectionManager;
 import tigase.server.Packet;
 import tigase.util.Algorithms;
 import tigase.util.DNSResolver;
-import tigase.util.JIDUtils;
+import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPIOService;
@@ -49,6 +49,8 @@ import tigase.xmpp.Authorization;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.stats.StatisticsList;
 import tigase.util.DNSEntry;
+import tigase.xmpp.BareJID;
+import tigase.xmpp.JID;
 
 /**
  * Class ServerConnectionManager
@@ -100,8 +102,8 @@ public class ServerConnectionManager
 	/**
 	 * Services connected and autorized/autenticated
 	 */
-	private Map<String, ServerConnections> connectionsByLocalRemote =
-		new ConcurrentHashMap<String, ServerConnections>();
+	private Map<CID, ServerConnections> connectionsByLocalRemote =
+		new ConcurrentHashMap<CID, ServerConnections>();
 
 	/**
 	 * Incoming (accept) services by sessionId. Some servers (EJabberd) opens
@@ -115,11 +117,11 @@ public class ServerConnectionManager
 
 
 
-	protected ServerConnections getServerConnections(String cid) {
+	protected ServerConnections getServerConnections(CID cid) {
 		return connectionsByLocalRemote.get(cid);
 	}
 
-	protected ServerConnections removeServerConnections(String cid) {
+	protected ServerConnections removeServerConnections(CID cid) {
 		return connectionsByLocalRemote.remove(cid);
 	}
 
@@ -130,34 +132,33 @@ public class ServerConnectionManager
 		}
 		if (!packet.isCommand() || !processCommand(packet)) {
 
-			if (packet.getElemTo() == null) {
-				log.warning("Missing 'to' attribute, ignoring packet..."
-					+ packet.toString()
-					+ "\n This most likely happens due to missconfiguration of components domain names.");
+			if (packet.getStanzaTo() == null) {
+				log.warning(
+						"Missing 'to' attribute, ignoring packet..." + packet
+						+ "\n This most likely happens due to missconfiguration of components domain names.");
 				return;
 			}
 
-			if (packet.getElemFrom() == null) {
-				log.warning("Missing 'from' attribute, ignoring packet..."
-					+ packet.toString());
+			if (packet.getStanzaFrom() == null) {
+				log.warning("Missing 'from' attribute, ignoring packet..." + packet);
 				return;
 			}
 
 			// Check whether addressing is correct:
-			String to_hostname = JIDUtils.getNodeHost(packet.getElemTo());
+			String to_hostname = packet.getStanzaTo().getDomain();
 			// We don't send packets to local domains trough s2s, there
 			// must be something wrong with configuration
 			if (isLocalDomainOrComponent(to_hostname)) {
 				// Ups, remote hostname is the same as one of local hostname??
 				// Internal loop possible, we don't want that....
 				// Let's send the packet back....
-				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Packet addresses to localhost, I am not processing it: "
-						+ packet.getStringData());
+				if (log.isLoggable(Level.INFO)) {
+					log.info("Packet addresses to localhost, I am not processing it: "
+							+ packet);
 				}
 				try {
 					addOutPacket(
-						Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet,
+							Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet,
 							"S2S - not delivered. Server missconfiguration.", true));
 				} catch (PacketErrorTypeException e) {
 					log.warning("Packet processing exception: " + e);
@@ -167,20 +168,21 @@ public class ServerConnectionManager
 
 			// I think from_hostname needs to be different from to_hostname at
 			// this point... or s2s doesn't make sense
-			String from_hostname = JIDUtils.getNodeHost(packet.getElemFrom());
-			if (to_hostname.equals(from_hostname)) {
+			String from_hostname = packet.getStanzaFrom().getDomain();
+			// All hostnames go through String.intern()
+			if (to_hostname == from_hostname) {
 				log.warning("Dropping incorrect packet - from_hostname == to_hostname: "
-					+ packet.toString());
+					+ packet);
 				return;
 			}
 
-			String cid = getConnectionId(packet);
+			CID cid = getConnectionId(packet);
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("Connection ID is: " + cid);
 			}
 			ServerConnections serv_conn = getServerConnections(cid);
 			if (serv_conn == null
-				|| (!serv_conn.sendPacket(packet) && serv_conn.needsConnection())) {
+					|| (!serv_conn.sendPacket(packet) && serv_conn.needsConnection())) {
 				if (log.isLoggable(Level.FINEST)) {
 					log.finest("Couldn't send packet, creating a new connection.");
 				}
@@ -193,9 +195,10 @@ public class ServerConnectionManager
 		} // end of else
 	}
 
-	private ServerConnections createNewServerConnections(String cid, Packet packet) {
+	private ServerConnections createNewServerConnections(CID cid, Packet packet) {
 		ServerConnections conns = new ServerConnections(this, cid);
 		if (packet != null) {
+			// XMLNS is processed through String.intern()
 			if (packet.getElement().getXMLNS() == XMLNS_DB_VAL) {
 				conns.addControlPacket(packet);
 			} else {
@@ -216,8 +219,8 @@ public class ServerConnectionManager
 	 * @param serv_conn a <code>ServerConnections</code> which was called for
 	 * the packet.
 	 */
-	private void createServerConnection(final String cid, final Packet packet,
-		final ServerConnections serv_conn) {
+	private void createServerConnection(final CID cid, final Packet packet,
+			final ServerConnections serv_conn) {
 		// Spawning a new thread for each new server connection is not the most
 		// optimal solution but I have no idea how to do it better and solve
 		// the long DNS resolution problem.
@@ -233,7 +236,7 @@ public class ServerConnectionManager
 		new_connection_thread.start();
 	}
 
-	private void createServerConnectionInThread(String cid, Packet packet,
+	private void createServerConnectionInThread(CID cid, Packet packet,
 		ServerConnections serv_conn) {
 
 		ServerConnections conns = serv_conn;
@@ -241,8 +244,8 @@ public class ServerConnectionManager
 			conns = createNewServerConnections(cid, packet);
 		}
 
-		String localhost = JIDUtils.getNodeNick(cid);
-		String remotehost = JIDUtils.getNodeHost(cid);
+		String localhost = cid.getFromHost();
+		String remotehost = cid.getToHost();
 		if (openNewServerConnection(localhost, remotehost)) {
 			conns.setConnecting();
 			new ConnectionWatchdogTask(conns, localhost, remotehost);
@@ -305,7 +308,7 @@ public class ServerConnectionManager
 			port_props.put("socket", SocketType.plain);
 			port_props.put("type", ConnectionType.connect);
 			port_props.put("port-no", dns_entry.getPort());
-			String cid = getConnectionId(localhost, remotehost);
+			CID cid = getConnectionId(localhost, remotehost);
 			port_props.put("cid", cid);
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("STARTING new connection: " + cid);
@@ -320,22 +323,21 @@ public class ServerConnectionManager
 
 	}
 
-	private String getConnectionId(String localhost, String remotehost) {
-		return JIDUtils.getJID(localhost, remotehost, null);
+	private CID getConnectionId(String localhost, String remotehost) {
+		return new CID(localhost, remotehost);
 	}
 
-	private String getConnectionId(Packet packet) {
-		return JIDUtils.getJID(JIDUtils.getNodeHost(packet.getElemFrom()),
-			JIDUtils.getNodeHost(packet.getElemTo()), null);
+	private CID getConnectionId(Packet packet) {
+		return new CID(packet.getStanzaFrom().getDomain(),
+				packet.getStanzaTo().getDomain());
 	}
 
-	private String getConnectionId(XMPPIOService<Object> service) {
+	private CID getConnectionId(XMPPIOService<Object> service) {
 		String local_hostname =
 			(String)service.getSessionData().get("local-hostname");
 		String remote_hostname =
 			(String)service.getSessionData().get("remote-hostname");
-		String cid = getConnectionId(local_hostname,
-			(remote_hostname != null ? remote_hostname : "NULL"));
+		CID cid = getConnectionId(local_hostname, remote_hostname);
 		return cid;
 	}
 
@@ -362,7 +364,7 @@ public class ServerConnectionManager
 				} else {
 					if (checkPacket(p, serv)) {
 						if (log.isLoggable(Level.FINEST)) {
-							log.finest("Adding packet out: " + p.getStringData());
+							log.finest("Adding packet out: " + p);
 						}
 						addOutPacket(p);
 					} else {
@@ -374,14 +376,14 @@ public class ServerConnectionManager
  		return null;
 	}
 
-	private void bouncePacketsBack(Authorization author, String cid) {
+	private void bouncePacketsBack(Authorization author, CID cid) {
 		ServerConnections serv_conns = getServerConnections(cid);
 		if (serv_conns != null) {
 			Queue<Packet> waiting =	serv_conns.getWaitingPackets();
 			Packet p = null;
 			while ((p = waiting.poll()) != null) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Sending packet back: " + p.getStringData());
+					log.finest("Sending packet back: " + p);
 				}
 				try {
 					addOutPacket(author.getResponseMessage(p, "S2S - not delivered", true));
@@ -400,39 +402,38 @@ public class ServerConnectionManager
 		if (packet.getElement().getChild("host-unknown") != null) {
 			author = Authorization.REMOTE_SERVER_NOT_FOUND;
 		}
-		String cid = getConnectionId(serv);
+		CID cid = getConnectionId(serv);
 		bouncePacketsBack(author, cid);
 		serv.stop();
 	}
 
 	private boolean checkPacket(Packet packet, XMPPIOService<Object> serv) {
-		String packet_from = packet.getElemFrom();
-		String packet_to = packet.getElemTo();
+		JID packet_from = packet.getStanzaFrom();
+		JID packet_to = packet.getStanzaTo();
 		if (packet_from == null || packet_to == null) {
 			generateStreamError("improper-addressing", serv);
 			return false;
 		}
 		String remote_hostname =
 			(String)serv.getSessionData().get("remote-hostname");
-		if (!JIDUtils.getNodeHost(packet_from).equals(remote_hostname)) {
+		if (!packet_from.getDomain().equals(remote_hostname)) {
 			if (log.isLoggable(Level.FINER)) {
-				log.finer("Invalid hostname from the remote server, expected: " +
-								remote_hostname);
+				log.finer("Invalid hostname from the remote server, expected: "
+						+ remote_hostname);
 			}
 			generateStreamError("invalid-from", serv);
 			return false;
 		}
 		String local_hostname =	(String)serv.getSessionData().get("local-hostname");
-		if (!JIDUtils.getNodeHost(packet_to).equals(local_hostname)) {
+		if (!packet_to.getDomain().equals(local_hostname)) {
 			if (log.isLoggable(Level.FINER)) {
-				log.finer("Invalid hostname of the local server, expected: " +
-								local_hostname);
+				log.finer("Invalid hostname of the local server, expected: " 
+						+ local_hostname);
 			}
 			generateStreamError("host-unknown", serv);
 			return false;
 		}
-		String cid = getConnectionId(serv);
-		String session_id = (String)serv.getSessionData().get(serv.SESSION_ID_KEY);
+		String session_id = (String)serv.getSessionData().get(XMPPIOService.SESSION_ID_KEY);
 		if (!isIncomingValid(session_id)) {
 			log.info("Incoming connection hasn't been validated");
 			return false;
@@ -484,7 +485,7 @@ public class ServerConnectionManager
 				(String)serv.getSessionData().get("remote-hostname");
 			String local_hostname =
 				(String)serv.getSessionData().get("local-hostname");
-			String cid = getConnectionId(local_hostname, remote_hostname);
+			CID cid = getConnectionId(local_hostname, remote_hostname);
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("Stream opened for: " + cid);
 			}
@@ -510,7 +511,7 @@ public class ServerConnectionManager
 			Element elem = new Element(DB_RESULT_EL_NAME, key,
 				new String[] {"from", "to", XMLNS_DB_ATT},
 				new String[] {local_hostname, remote_hostname, XMLNS_DB_VAL});
-			serv_conns.addControlPacket(new Packet(elem));
+			serv_conns.addControlPacket(Packet.packetInstance(elem, null, null));
 			serv_conns.sendAllControlPackets();
 			return null;
 		}
@@ -519,9 +520,7 @@ public class ServerConnectionManager
 				(String)serv.getSessionData().get("remote-hostname");
 			String local_hostname =
 				(String)serv.getSessionData().get("local-hostname");
-			String cid = getConnectionId(
-				(local_hostname != null ? local_hostname : "NULL"),
-				(remote_hostname != null ? remote_hostname : "NULL"));
+			CID cid = getConnectionId(local_hostname, remote_hostname);
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("Stream opened for: " + cid);
 			}
@@ -648,7 +647,7 @@ public class ServerConnectionManager
 
 	private int countOpenConnections() {
 		int open_s2s_connections = incoming.size();
-		for (Map.Entry<String, ServerConnections> entry:
+		for (Map.Entry<CID, ServerConnections> entry:
       connectionsByLocalRemote.entrySet()) {
 			ServerConnections conn = entry.getValue();
 			if (conn.isOutgoingConnected()) {
@@ -665,7 +664,7 @@ public class ServerConnectionManager
 		int open_s2s_connections = incoming.size();
 		int connected_servers = 0;
 		int server_connections_instances = connectionsByLocalRemote.size();
-		for (Map.Entry<String, ServerConnections> entry : connectionsByLocalRemote.
+		for (Map.Entry<CID, ServerConnections> entry : connectionsByLocalRemote.
 						entrySet()) {
 			ServerConnections conn = entry.getValue();
 			waiting_packets += conn.getWaitingPackets().size();
@@ -713,14 +712,14 @@ public class ServerConnectionManager
 										serv.getLocalAddress() + ", remote address: " +
 										serv.getRemoteAddress());
 					} else {
-						String cid = getConnectionId(local_hostname, remote_hostname);
+						CID cid = getConnectionId(local_hostname, remote_hostname);
 						ServerConnections serv_conns = getServerConnections(cid);
 						if (serv_conns == null) {
-							log.warning("There is no ServerConnections for stopped service: " +
-											serv.getUniqueId() + ", cid: " + cid);
+							log.warning("There is no ServerConnections for stopped service: "
+									+ serv.getUniqueId() + ", cid: " + cid);
 							if (log.isLoggable(Level.FINEST)) {
-								log.finest("Counters: ioservices: " + countIOServices() +
-												", s2s connections: " + countOpenConnections());
+								log.finest("Counters: ioservices: " + countIOServices() 
+										+ ", s2s connections: " + countOpenConnections());
 							}
 							return result;
 						}
@@ -737,7 +736,7 @@ public class ServerConnectionManager
 					break;
 				case accept:
 					String session_id = (String) serv.getSessionData().get(
-									XMPPIOService.SESSION_ID_KEY);
+							XMPPIOService.SESSION_ID_KEY);
 					if (session_id != null) {
 						XMPPIOService<Object> rem = incoming.remove(session_id);
 						if (rem == null) {
@@ -788,10 +787,10 @@ public class ServerConnectionManager
 	public synchronized void processDialback(Packet packet, XMPPIOService<Object> serv) {
 
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("DIALBACK - " + packet.getStringData());
+			log.finest("DIALBACK - " + packet);
 		}
 
-		String local_hostname = JIDUtils.getNodeHost(packet.getElemTo());
+		String local_hostname = packet.getStanzaTo().getDomain();
 		// Check whether this is correct local host name...
 		if (!isLocalDomainOrComponent(local_hostname)) {
 			// Ups, this hostname is not served by this server, return stream
@@ -799,7 +798,7 @@ public class ServerConnectionManager
 			generateStreamError("host-unknown", serv);
 			return;
 		}
-		String remote_hostname = JIDUtils.getNodeHost(packet.getElemFrom());
+		String remote_hostname = packet.getStanzaFrom().getDomain();
 		// And we don't want to accept any connection which is from remote
 		// host name the same as one my localnames.......
 		if (isLocalDomainOrComponent(remote_hostname)) {
@@ -809,14 +808,14 @@ public class ServerConnectionManager
 			generateStreamError("host-unknown", serv);
 			return;
 		}
-		String cid = getConnectionId(local_hostname, remote_hostname);
+		CID cid = getConnectionId(local_hostname, remote_hostname);
 		ServerConnections serv_conns = getServerConnections(cid);
 		String session_id = (String)serv.getSessionData().get(XMPPIOService.SESSION_ID_KEY);
 		String serv_local_hostname =
       (String)serv.getSessionData().get("local-hostname");
 		String serv_remote_hostname =
       (String)serv.getSessionData().get("remote-hostname");
-		String serv_cid = serv_remote_hostname == null ? null
+		CID serv_cid = serv_remote_hostname == null ? null
       : getConnectionId(serv_local_hostname, serv_remote_hostname);
 		if (serv_cid != null && !cid.equals(serv_cid)) {
 			log.info("Somebody tries to reuse connection?"
@@ -824,8 +823,8 @@ public class ServerConnectionManager
 		}
 
 		// <db:result>
-		if ((packet.getElemName() == RESULT_EL_NAME) ||
-			(packet.getElemName() == DB_RESULT_EL_NAME)) {
+		if ((packet.getElemName() == RESULT_EL_NAME) 
+				|| (packet.getElemName() == DB_RESULT_EL_NAME)) {
 			if (packet.getType() == null) {
 				// This is incoming connection with dialback key for verification
 				if (packet.getElemCData() != null) {
@@ -838,7 +837,7 @@ public class ServerConnectionManager
 						new String[] {"id", "to", "from", XMLNS_DB_ATT},
 						new String[] {session_id, remote_hostname, local_hostname,
 													XMLNS_DB_VAL});
-					Packet result = new Packet(elem);
+					Packet result = Packet.packetInstance(elem, null, null);
 					if (serv_conns == null) {
 						serv_conns = createNewServerConnections(cid, null);
 					}
@@ -850,8 +849,7 @@ public class ServerConnectionManager
 							+ ", Counters: ioservices: " + countIOServices()
 							+ ", s2s connections: " + countOpenConnections());
 					}
-					if (!serv_conns.sendControlPacket(result)
-						&& serv_conns.needsConnection()) {
+					if (!serv_conns.sendControlPacket(result) && serv_conns.needsConnection()) {
 						createServerConnection(cid, result, serv_conns);
 					}
 				} else {
@@ -859,7 +857,7 @@ public class ServerConnectionManager
 					// I don't know yet what software they use.
 					// Let's just disconnect and signal unrecoverable conection error
 					if (log.isLoggable(Level.FINER)) {
-						log.finer("Incorrect diablack packet: " + packet.getStringData());
+						log.finer("Incorrect diablack packet: " + packet);
 					}
 					bouncePacketsBack(Authorization.SERVICE_UNAVAILABLE, cid);
 					generateStreamError("bad-format", serv);
@@ -871,8 +869,7 @@ public class ServerConnectionManager
 				switch (packet.getType()) {
 				case valid:
 					if (log.isLoggable(Level.FINER)) {
-						log.finer("Connection: " + cid +
-										" is valid, adding to available services.");
+						log.finer("Connection: " + cid + " is valid, adding to available services.");
 					}
 					serv_conns.handleDialbackSuccess();
 					break;
@@ -888,14 +885,14 @@ public class ServerConnectionManager
 
 		// <db:verify> with type 'valid' or 'invalid'
 		if ((packet.getElemName() == VERIFY_EL_NAME)
-			|| (packet.getElemName() == DB_VERIFY_EL_NAME)) {
-			if (packet.getElemId() != null) {
+				|| (packet.getElemName() == DB_VERIFY_EL_NAME)) {
+			if (packet.getStanzaId() != null) {
 
-				String forkey_session_id = packet.getElemId();
+				String forkey_session_id = packet.getStanzaId();
 				if (packet.getType() == null) {
 					// When type is NULL then it means this packet contains
 					// data for verification
-					if (packet.getElemId() != null && packet.getElemCData() != null) {
+					if (packet.getElemCData() != null) {
 						String db_key = packet.getElemCData();
 						// This might be the first dialback packet from remote server
 // 						serv.getSessionData().put("remote-hostname", remote_hostname);
@@ -918,8 +915,9 @@ public class ServerConnectionManager
 							if (log.isLoggable(Level.FINE)) {
 								log.fine("Local key for cid=" + cid + " is " + local_key);
 							}
-							sendVerifyResult(local_hostname, remote_hostname, forkey_session_id,
-								db_key.equals(local_key), serv_conns, session_id);
+							sendVerifyResult(local_hostname, remote_hostname,
+									forkey_session_id, db_key.equals(local_key), serv_conns,
+									session_id);
 						}
 					} // end of if (packet.getElemName().equals("db:verify"))
 				}	else {
@@ -928,14 +926,12 @@ public class ServerConnectionManager
 					// validated and we can now receive data from this channel.
 
 					Element elem = new Element(DB_RESULT_EL_NAME,
-						new String[] {"type", "to", "from", XMLNS_DB_ATT},
-						new String[] {packet.getType().toString(),
-													remote_hostname, local_hostname,
-													XMLNS_DB_VAL});
+							new String[]{"type", "to", "from", XMLNS_DB_ATT},
+							new String[]{packet.getType().toString(), remote_hostname,
+								local_hostname, XMLNS_DB_VAL});
 
-					sendToIncoming(forkey_session_id, new Packet(elem));
-					validateIncoming(forkey_session_id,
-						(packet.getType() == StanzaType.valid));
+					sendToIncoming(forkey_session_id, Packet.packetInstance(elem, null, null));
+					validateIncoming(forkey_session_id, (packet.getType() == StanzaType.valid));
 
 				} // end of if (packet.getType() == null) else
 			} else {
@@ -943,7 +939,7 @@ public class ServerConnectionManager
 				// I don't know yet what software they use.
 				// Let's just disconnect and signal unrecoverable conection error
 				if (log.isLoggable(Level.FINER)) {
-					log.finer("Incorrect diablack packet: " + packet.getStringData());
+					log.finer("Incorrect diablack packet: " + packet);
 				}
 				bouncePacketsBack(Authorization.SERVICE_UNAVAILABLE, cid);
 				generateStreamError("bad-format", serv);
@@ -979,7 +975,7 @@ public class ServerConnectionManager
 		}
 	}
 
-	protected String getLocalDBKey(String cid, String key, String forkey_sessionId,
+	protected String getLocalDBKey(CID cid, String key, String forkey_sessionId,
 		String asking_sessionId) {
 		ServerConnections serv_conns = getServerConnections(cid);
 		return serv_conns == null ? null : serv_conns.getDBKey(forkey_sessionId);
@@ -991,7 +987,7 @@ public class ServerConnectionManager
 		Element result_el = new Element(DB_VERIFY_EL_NAME,
 			new String[] {"from", "to", "id", "type", XMLNS_DB_ATT},
 			new String[] {from, to, forkey_sessionId, type, XMLNS_DB_VAL});
-		Packet result = new Packet(result_el);
+		Packet result = Packet.packetInstance(result_el, null, null);
 		if (!sendToIncoming(asking_sessionId, result)) {
 			log.warning("Can not send verification packet back: " + result.toString());
 		}

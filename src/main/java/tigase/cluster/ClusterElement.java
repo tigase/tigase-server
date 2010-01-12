@@ -32,6 +32,7 @@ import java.util.logging.Level;
 import tigase.xmpp.StanzaType;
 import tigase.xml.Element;
 import tigase.server.Packet;
+import tigase.xmpp.JID;
 
 /**
  * Class ClusterElement is a utility class for handling tigase cluster
@@ -153,7 +154,7 @@ public class ClusterElement {
 		if (packet != null) {
 			packets = new ArrayList<Element>();
 			visited_nodes = new LinkedHashSet<String>();
-			elem = createClusterElement(from, to, type, packet.getFrom());
+			elem = createClusterElement(from, to, type, packet.getFrom().toString());
 			if (packet.getElement().getXMLNS() == null) {
 				packet.getElement().setXMLNS("jabber:client");
 			}
@@ -234,16 +235,16 @@ public class ClusterElement {
 	}
 
 	public static ClusterElement createForNextNode(ClusterElement clel,
-					List<String> cluster_nodes, String comp_id) {
+					List<JID> cluster_nodes, JID comp_id) {
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Calculating a next node from nodes: " +
 							(cluster_nodes != null ? cluster_nodes.toString() : "null"));
 		}
 		if (cluster_nodes != null && cluster_nodes.size() > 0) {
 			String next_node = null;
-			for (String cluster_node: cluster_nodes) {
-				if (!clel.isVisitedNode(cluster_node) && !cluster_node.equals(comp_id)) {
-					next_node = cluster_node;
+			for (JID cluster_node: cluster_nodes) {
+				if (!clel.isVisitedNode(cluster_node.toString()) && !cluster_node.equals(comp_id)) {
+					next_node = cluster_node.toString();
 					if (log.isLoggable(Level.FINEST)) {
 						log.finest("Found next cluster node: " + next_node);
 					}
@@ -261,7 +262,7 @@ public class ClusterElement {
 //			}
 			if (next_node != null) {
 				ClusterElement result = clel.nextClusterNode(next_node);
-				result.addVisitedNode(comp_id);
+				result.addVisitedNode(comp_id.toString());
 				return result;
 			}
 		}

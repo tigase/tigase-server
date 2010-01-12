@@ -27,6 +27,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.conf.Configurable;
 import tigase.disco.ServiceEntity;
@@ -36,8 +37,10 @@ import tigase.server.DisableDisco;
 import tigase.server.Packet;
 import tigase.server.ServerComponent;
 import tigase.util.DNSResolver;
-import tigase.util.JIDUtils;
+import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
+import tigase.xmpp.BareJID;
+import tigase.xmpp.JID;
 
 /**
  * The purpose of this component implementation is to forward packets to a target
@@ -132,9 +135,9 @@ public class VirtualComponent
 	public static final String DISCO_FEATURES_PROP_VAL = "http://jabber.org/protocol/muc";
 
 	private String name = null;
-	private String componentId = null;
+	private JID componentId = null;
 	private ServiceEntity serviceEntity = null;
-	private String redirectTo = null;
+	private JID redirectTo = null;
 	private String discoName = null;
 	private String discoNode = null;
 	private String discoCategory = null;
@@ -144,7 +147,11 @@ public class VirtualComponent
 	@Override
 	public void setName(String name) {
 		this.name = name;
-		this.componentId = JIDUtils.getNodeID(name, DNSResolver.getDefaultHostname());
+		try {
+			this.componentId = new JID(name, DNSResolver.getDefaultHostname(), null);
+		} catch (TigaseStringprepException ex) {
+			log.log(Level.WARNING, "Problem setting component ID: ", ex);
+		}
 	}
 
 	@Override
@@ -153,7 +160,7 @@ public class VirtualComponent
 	}
 
 	@Override
-	public String getComponentId() {
+	public JID getComponentId() {
 		return componentId;
 	}
 
@@ -164,7 +171,7 @@ public class VirtualComponent
 	@Override
 	public void processPacket(Packet packet, Queue<Packet> results) {
 		if (redirectTo != null) {
-			packet.setTo(redirectTo);
+			packet.setPacketTo(redirectTo);
 			results.add(packet);
 		} else {
 			log.info("No redirectTo address, dropping packet: " + packet.toString());
@@ -176,18 +183,18 @@ public class VirtualComponent
 	}
 
 	@Override
-	public Element getDiscoInfo(String node, String jid, String from) {
+	public Element getDiscoInfo(String node, JID jid, JID from) {
 		return null;
 	}
 
 	@Override
-	public List<Element> getDiscoItems(String node, String jid, String from) {
+	public List<Element> getDiscoItems(String node, JID jid, JID from) {
 		Element result = serviceEntity.getDiscoItem(null, getName() + "." + jid);
 		return Arrays.asList(result);
 	}
 
 	@Override
-	public List<Element> getDiscoFeatures(String from) {
+	public List<Element> getDiscoFeatures(JID from) {
 		return null;
 	}
 
@@ -198,7 +205,12 @@ public class VirtualComponent
 		if (redirect == null || redirect.isEmpty()) {
 			redirectTo = null;
 		} else {
-			redirectTo = redirect;
+			try {
+				redirectTo = new JID(redirect);
+			} catch (TigaseStringprepException ex) {
+				redirectTo = null;
+				log.warning("stringprep processing failed for given redirect address: " + redirect);
+			}
 		}
 		discoName = (String) properties.get(DISCO_NAME_PROP_KEY);
 		discoNode = (String) properties.get(DISCO_NODE_PROP_KEY);
@@ -226,7 +238,7 @@ public class VirtualComponent
 			String[] cl_nodes = ((String)params.get(CLUSTER_NODES)).split(",");
 			for (String node : cl_nodes) {
 				if (!node.equals( DNSResolver.getDefaultHostname())) {
-					defs.put(REDIRECT_TO_PROP_KEY, JIDUtils.getNodeID(getName(), node));
+					defs.put(REDIRECT_TO_PROP_KEY, BareJID.toString(getName(), node));
 					break;
 				}
 			}

@@ -27,9 +27,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.db.NonAuthUserRepository;
 import tigase.server.Packet;
-import tigase.util.JIDUtils;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
+import tigase.xmpp.BareJID;
+import tigase.xmpp.JID;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPException;
 import tigase.xmpp.XMPPProcessor;
@@ -70,15 +71,14 @@ public class Message extends XMPPProcessor implements XMPPProcessorIfc {
 	{ return XMLNSS; }
 
 	@Override
-	public void process(final Packet packet, final XMPPResourceConnection session,
-		final NonAuthUserRepository repo, final Queue<Packet> results,
-		final Map<String, Object> settings)
-		throws XMPPException {
+	public void process(Packet packet, XMPPResourceConnection session,
+			NonAuthUserRepository repo, Queue<Packet> results,
+			Map<String, Object> settings) throws XMPPException {
 
 		// For performance reasons it is better to do the check
 		// before calling logging method.
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Processing packet: " + packet.toString());
+			log.finest("Processing packet: " + packet);
 		}
 
 		// You may want to skip processing completely if the user is offline.
@@ -89,20 +89,19 @@ public class Message extends XMPPProcessor implements XMPPProcessorIfc {
 		try {
 
 			// Remember to cut the resource part off before comparing JIDs
-			String id = JIDUtils.getNodeID(packet.getElemTo());
+			BareJID id = packet.getStanzaTo() != null ? packet.getStanzaTo().getBareJID() : null;
 			// Checking if this is a packet TO the owner of the session
 			if (session.getUserId().equals(id)) {
 				// Yes this is message to 'this' client
-				Element elem = packet.getElement().clone();
-				Packet result = new Packet(elem);
+				Packet result = packet.copyElementOnly();
 				// This is where and how we set the address of the component
 				// which should rceive the result packet for the final delivery
 				// to the end-user. In most cases this is a c2s or Bosh component
 				// which keep the user connection.
-				result.setTo(session.getConnectionId(packet.getElemTo()));
+				result.setPacketTo(session.getConnectionId(packet.getStanzaTo()));
 				// In most cases this might be skept, however if there is a
 				// problem during packet delivery an error might be sent back
-				result.setFrom(packet.getTo());
+				result.setPacketFrom(packet.getTo());
 				// Don't forget to add the packet to the results queue or it
 				// will be lost.
 				results.offer(result);
@@ -110,15 +109,14 @@ public class Message extends XMPPProcessor implements XMPPProcessorIfc {
 			} // end of else
 
 			// Remember to cut the resource part off before comparing JIDs
-			id = JIDUtils.getNodeID(packet.getElemFrom());
+			id = packet.getStanzaFrom() != null ? packet.getStanzaFrom().getBareJID() : null;
 			// Checking if this is maybe packet FROM the client
 			if (session.getUserId().equals(id)) {
 				// This is a packet FROM this client, the simplest action is
 				// to forward it to is't destination:
 				// Simple clone the XML element and....
-				Element result = packet.getElement().clone();
 				// ... putting it to results queue is enough
-				results.offer(new Packet(result));
+				results.offer(packet.copyElementOnly());
 				return;
 			}
 
@@ -129,21 +127,23 @@ public class Message extends XMPPProcessor implements XMPPProcessorIfc {
 			// And they usually require more complex processing
 			// This is how you check whether this is a packet FROM the user
 			// who is owner of the session:
-			id = packet.getFrom();
+			JID jid = packet.getFrom();
 			// This test is in most cases equal to checking getElemFrom()
-			if (session.getConnectionId().equals(id)) {
+			if (session.getConnectionId().equals(jid)) {
         // Do some packet specific processing here, but we are dealing
 				// with messages here which normally need just forwarding
-				Element result = packet.getElement().clone();
+				Element el_result = packet.getElement().clone();
 				// If we are here it means FROM address was missing from the
 				// packet, it is a place to set it here:
-				result.setAttribute("from", session.getJID());
+				el_result.setAttribute("from", session.getJID().toString());
+				Packet result =
+						Packet.packetInstance(el_result, session.getJID(), packet.getStanzaTo());
 				// ... putting it to results queue is enough
-				results.offer(new Packet(result));
+				results.offer(result);
 			}
 
 		} catch (NotAuthorizedException e) {
-			log.warning("NotAuthorizedException for packet: "	+ packet.getStringData());
+			log.warning("NotAuthorizedException for packet: "	+ packet);
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 					"You must authorize session first.", true));
 		} // end of try-catch

@@ -109,47 +109,58 @@ public class ConfigItem implements RepositoryItem {
 		return compName;
 	}
 
-	public void set(String clusterNode, String compName, String nodeName, String key,
-			Object value, FLAGS flag) {
-//		if (clusterNode != null) {
-//			this.clusterNode = clusterNode;
-//		}
-		if (compName != null) {
-			this.compName = compName;
+	public void set(String clusterNode_m, String compName_m, String nodeName_m,
+			String key_m, String value_str_m, char val_type_m, String flag_str_m) {
+		Object value_m = DataTypes.decodeValueType(val_type_m, value_str_m);
+		FLAGS flag_m = FLAGS.DEFAULT;
+		try {
+			flag_m = FLAGS.valueOf(flag_str_m);
+		} catch (Exception e) {
+			log.warning("Incorrect config item flag: " + flag_str_m	+ ", setting DEFAULT.");
+			flag_m = FLAGS.DEFAULT;
 		}
-		if (nodeName != null) {
-			this.nodeName = nodeName;
+		set(clusterNode_m, compName_m, nodeName_m, key_m, value_m, flag_m);
+	}
+
+	public void set(String clusterNode_m, String compName_m, String nodeName_m,
+			String key_m, Object value_m, FLAGS flag_m) {
+		if (clusterNode_m != null) {
+			this.clusterNode = clusterNode_m;
 		}
-		if (key != null) {
-			this.keyName = key;
+		if (compName_m != null) {
+			this.compName = compName_m;
 		}
-		if (value != null) {
-			this.value = value;
+		if (nodeName_m != null) {
+			this.nodeName = nodeName_m;
 		}
-		if (flag != null) {
-			this.flag = flag;
+		if (key_m != null) {
+			this.keyName = key_m;
+		}
+		if (value_m != null) {
+			this.value = value_m;
+		}
+		if (flag_m != null) {
+			this.flag = flag_m;
 		}
 		lastModificationTime = System.currentTimeMillis();
 	}
 
 	public void set(String compName_m, String nodeName_m, String key_m,
 			String value_str_m, char val_type_m, String flag_str_m) {
-		Object value_m = DataTypes.decodeValueType(val_type_m, value_str_m);
-		ConfigItem.FLAGS flag_m = ConfigItem.FLAGS.DEFAULT;
-		try {
-			flag = ConfigItem.FLAGS.valueOf(flag_str_m);
-		} catch (Exception e) {
-			log.warning("Incorrect config item flag: " + flag_str_m	+ ", setting DEFAULT.");
-			flag = ConfigItem.FLAGS.DEFAULT;
-		}
-		set(null, compName_m, nodeName_m, key_m, value_m, flag_m);
+		set(null, compName_m, nodeName_m, key_m, value_str_m, val_type_m, flag_str_m);
 	}
 
 	public void set(String compName, String nodeName, String key, Object value) {
 		set(null, compName, nodeName, key, value, null);
 	}
 
-	public void setNodeKey(String compName, String nodeKey, Object value) {
+	public void set(String clusterNode, String compName, String nodeName, String key,
+			Object value) {
+		set(clusterNode, compName, nodeName, key, value, null);
+	}
+
+	public void setNodeKey(String clusterNode, String compName, String nodeKey,
+			Object value) {
 		int key_idx = nodeKey.lastIndexOf("/");
 		String method_key = nodeKey;
 		String method_node = null;
@@ -157,7 +168,7 @@ public class ConfigItem implements RepositoryItem {
 			method_key = nodeKey.substring(key_idx + 1);
 			method_node = nodeKey.substring(0, key_idx);
 		}
-		set(compName, method_node, method_key, value);
+		set(clusterNode, compName, method_node, method_key, value);
 	}
 
 	public boolean isCompNodeKey(String comp, String node, String key) {

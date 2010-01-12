@@ -24,16 +24,15 @@ package tigase.server.sreceiver;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import tigase.server.Message;
 import tigase.server.Packet;
-import tigase.util.JIDUtils;
 import tigase.xml.XMLUtils;
+import tigase.xmpp.JID;
 import tigase.xmpp.StanzaType;
 
 import static tigase.server.sreceiver.PropertyConstants.*;
@@ -276,7 +275,7 @@ public class ShortNewsPublisher extends RepoRosterTask {
 	private void addPost(Packet packet, Queue<Packet> results) {
 		try {
 			checkConnection();
-			String author = JIDUtils.getNodeID(packet.getElemFrom());
+			String author = packet.getStanzaFrom().getBareJID().toString();
 			String subject = packet.getElemCData("/message/subject");
 			String body =  packet.getElemCData("/message/body");
 			if (body != null) {
@@ -287,26 +286,26 @@ public class ShortNewsPublisher extends RepoRosterTask {
 				insert_post.setString(2, XMLUtils.unescape(subject));
 				insert_post.setString(3, XMLUtils.unescape(body));
 				insert_post.executeUpdate();
-				results.offer(Packet.getMessage(packet.getElemFrom(),
-						packet.getElemTo(), StanzaType.normal,
+				results.offer(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(),
+						StanzaType.normal,
 						"Your post has been successfuly submitted.",
-						"Short news submitions result.", null, packet.getId()));
+						"Short news submitions result.", null, packet.getStanzaId()));
 			} else {
 				// if body is null it might be an empty message used for
 				// announcing other side that the user has just started typing
 				// message, such messages we just ignore
-				results.offer(Packet.getMessage(packet.getElemFrom(),
-								packet.getElemTo(), StanzaType.normal,
+				results.offer(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(),
+								StanzaType.normal,
 								"Missing body, post has NOT been submitted.",
-								"Short news submitions result.", null, packet.getId()));
+								"Short news submitions result.", null, packet.getStanzaId()));
 			}
 		} catch (SQLException e) {
 			log.log(Level.SEVERE, "Problem inserting new post: "
 				+ packet.toString(), e);
-			results.offer(Packet.getMessage(packet.getElemFrom(),
-					packet.getElemTo(), StanzaType.normal,
+			results.offer(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(),
+					StanzaType.normal,
 					"There was a problem with post submitting: " + e,
-					"Short news submitions result.", null, packet.getId()));
+					"Short news submitions result.", null, packet.getStanzaId()));
 		}
 	}
 
@@ -360,23 +359,23 @@ public class ShortNewsPublisher extends RepoRosterTask {
 			command comm = command.valueOf(body_split[0].substring(2));
 			switch (comm) {
 			case help:
-				results.offer(Packet.getMessage(packet.getElemFrom(),
-						packet.getElemTo(), StanzaType.chat, commandsHelp(),
-						"Commands description", null, packet.getId()));
+				results.offer(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(),
+						StanzaType.chat, commandsHelp(),
+						"Commands description", null, packet.getStanzaId()));
 				break;
 			case update:
 				updatePost(packet, Long.parseLong(body_split[1]));
-				results.offer(Packet.getMessage(packet.getElemFrom(),
-						packet.getElemTo(), StanzaType.normal,
+				results.offer(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(),
+						StanzaType.normal,
 						"Post " + body_split[1] + " successfuly updated.",
-						"Command execution result", null, packet.getId()));
+						"Command execution result", null, packet.getStanzaId()));
 				break;
 			case delete:
 				deletePost(Long.parseLong(body_split[1]));
-				results.offer(Packet.getMessage(packet.getElemFrom(),
-						packet.getElemTo(), StanzaType.normal,
+				results.offer(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(),
+						StanzaType.normal,
 						"Post " + body_split[1] + " successfuly deleted.",
-						"Command execution result", null, packet.getId()));
+						"Command execution result", null, packet.getStanzaId()));
 				break;
 			default:
 				break;
@@ -386,9 +385,9 @@ public class ShortNewsPublisher extends RepoRosterTask {
 				+ body_split[0] + ", " + body_split[1]
 				+ ", " + e;
 			log.log(Level.WARNING, error_text, e);
-			results.offer(Packet.getMessage(packet.getElemFrom(),
-					packet.getElemTo(), StanzaType.normal, error_text,
-					"Problem with command execution", null, packet.getId()));
+			results.offer(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(),
+					StanzaType.normal, error_text,
+					"Problem with command execution", null, packet.getStanzaId()));
 		}
 	}
 

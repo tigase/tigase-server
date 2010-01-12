@@ -166,7 +166,7 @@ public class ConfigurationCache implements ConfigRepositoryIfc {
 			throws ConfigurationException {
 		for (Map.Entry<String, Object> entry : props.entrySet()) {
 			ConfigItem item = new ConfigItem();
-			item.setNodeKey(compName, entry.getKey(), entry.getValue());
+			item.setNodeKey(getDefHostname(), compName, entry.getKey(), entry.getValue());
 			addItem(compName, item);
 		}
 	}
@@ -186,7 +186,7 @@ public class ConfigurationCache implements ConfigRepositoryIfc {
 		if (item == null) {
 			item = getItemInstance();
 		}
-		item.set(compName, node, key, value);
+		item.set(getDefHostname(), compName, node, key, value);
 		addItem(compName, item);
 	}
 
@@ -223,7 +223,7 @@ public class ConfigurationCache implements ConfigRepositoryIfc {
 				nodeName = key.substring(idx1 + 1, idx2);
 			}
 			ConfigItem item = getItemInstance();
-			item.set(compName, nodeName, keyName, value);
+			item.set(getDefHostname(), compName, nodeName, keyName, value);
 			addItem(compName, item);
 		} else {
 			throw new IllegalArgumentException("You have to provide a key with at least" +

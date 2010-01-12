@@ -32,9 +32,12 @@ import java.util.ArrayDeque;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import tigase.server.Message;
 import tigase.server.Packet;
+import tigase.util.TigaseStringprepException;
 import tigase.xmpp.StanzaType;
 import tigase.xml.XMLUtils;
+import tigase.xmpp.JID;
 
 /**
  * <code>DrupalCommentsTask</code> implements tasks for cyclic retrieving new
@@ -102,7 +105,7 @@ public class DrupalCommentsTask extends SenderTask {
 	 * the forum are sent.
 	 *
 	 */
-	private String jid = null;
+	private JID jid = null;
 
 	/**
 	 * <code>lastCheck</code> keeps time of last forum comments check so it
@@ -167,11 +170,11 @@ public class DrupalCommentsTask extends SenderTask {
 	 *
 	 * @param db_str a <code>String</code> value
 	 */
-	private void findExtraParams(String db_str) {
+	private void findExtraParams(String db_str) throws TigaseStringprepException {
 		String[] params = db_str.split("&");
 		for (String par: params) {
 			if (par.startsWith("jid=")) {
-				jid = par.substring("jid=".length(), par.length());
+				jid = new JID(par.substring("jid=".length(), par.length()));
 			}
 		}
 	}
@@ -220,7 +223,11 @@ public class DrupalCommentsTask extends SenderTask {
 	public void init(StanzaHandler handler, String initString) throws IOException {
 		this.handler = handler;
 		db_conn = initString;
-		findExtraParams(db_conn);
+		try {
+			findExtraParams(db_conn);
+		} catch (TigaseStringprepException ex) {
+			throw new IOException("Destination address problem, stringprep processing failed", ex);
+		}
 		lastCommentsCheck = System.currentTimeMillis() / SECOND;
 		lastTopicsCheck =  System.currentTimeMillis() / SECOND;
 
@@ -266,7 +273,7 @@ public class DrupalCommentsTask extends SenderTask {
 				String name = rs.getString("name");
 				String title = rs.getString("title");
 				String body = rs.getString("body");
-				Packet msg = Packet.getMessage(jid, getName(), StanzaType.normal,
+				Packet msg = Message.getMessage(getName(), jid, StanzaType.normal,
 					"New post by " + name + ":\n\n" + XMLUtils.escape(body),
 					XMLUtils.escape(title), null, null);
 				log.fine("Sending new topic: " + msg.toString());
@@ -297,7 +304,7 @@ public class DrupalCommentsTask extends SenderTask {
 				String thread = rs.getString("thread");
 				String subject = rs.getString("subject");
 				String comment = rs.getString("comment");
-				Packet msg = Packet.getMessage(jid, getName(), StanzaType.normal,
+				Packet msg = Message.getMessage(getName(), jid, StanzaType.normal,
 					"New comment by " + name + ":\n\n" + XMLUtils.escape(comment),
 					XMLUtils.escape(subject), thread, null);
 				log.fine("Sending new comment: " + msg.toString());
