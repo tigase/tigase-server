@@ -831,7 +831,6 @@ public abstract class Presence {
 		// We send presence probe to TO_SUBSCRIBED and initial presence to
 		// FROM_SUBSCRIBED. Most of buddies however are BOTH. So as optimalization
 		// Let's process BOTH first and then TO_ONLY and FROM_ONLY separately
-
 		JID[] buddies = roster_util.getBuddies(session, SUB_BOTH);
 
 		buddies = DynamicRoster.addBuddies(session, settings, buddies);
@@ -1256,7 +1255,7 @@ public abstract class Presence {
 }    // Presence
 
 
-//~ Formatted in Sun Code Convention on 2010.01.16 at 07:27:44 GMT
+//~ Formatted in Sun Code Convention on 2010.01.16 at 08:14:38 GMT
 
 
 //~ Formatted by Jindent --- http://www.jindent.com
