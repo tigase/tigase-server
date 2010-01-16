@@ -186,7 +186,7 @@ public class JabberIqCommand extends XMPPProcessor implements XMPPProcessorIfc {
 }
 
 
-//~ Formatted in Sun Code Convention on 2010.01.16 at 08:14:37 GMT
+//~ Formatted in Sun Code Convention
 
 
 //~ Formatted by Jindent --- http://www.jindent.com

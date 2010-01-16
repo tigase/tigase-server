@@ -1255,7 +1255,7 @@ public abstract class Presence {
 }    // Presence
 
 
-//~ Formatted in Sun Code Convention on 2010.01.16 at 08:14:38 GMT
+//~ Formatted in Sun Code Convention
 
 
 //~ Formatted by Jindent --- http://www.jindent.com
