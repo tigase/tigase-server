@@ -1,27 +1,27 @@
-/*
- * @(#)Packet.java   2010.01.12 at 10:47:44 PST
- *
- * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2010 "Artur Hefczyc" <artur.hefczyc@tigase.org>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, version 3 of the License.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. Look for COPYING file in the top folder.
- * If not, see http://www.gnu.org/licenses/.
- *
- * $Rev$
- * Last modified by $Author$
- * $Date$
- */
 
+/*
+* @(#)Packet.java   2010.01.16 at 07:05:30 GMT
+*
+* Tigase Jabber/XMPP Server
+* Copyright (C) 2004-2010 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, version 3 of the License.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. Look for COPYING file in the top folder.
+* If not, see http://www.gnu.org/licenses/.
+*
+* $Rev$
+* Last modified by $Author$
+* $Date$
+ */
 package tigase.server;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -280,7 +280,7 @@ public class Packet {
 	 */
 	public Packet copyElementOnly() {
 		Element res_elem = elem.clone();
-		Packet  result = packetInstance(res_elem, getStanzaFrom(), getStanzaTo());
+		Packet result = packetInstance(res_elem, getStanzaFrom(), getStanzaTo());
 
 		return result;
 	}
@@ -333,14 +333,14 @@ public class Packet {
 
 		reply.setAttribute("type", StanzaType.error.toString());
 
-		if (getStanzaFrom() != null) {
-			reply.setAttribute("to", getStanzaFrom().toString());
-		}    // end of if (getElemFrom() != null)
-
-		if (getStanzaTo() != null) {
-			reply.setAttribute("from", getStanzaTo().toString());
-		}    // end of if (getElemTo() != null)
-
+		// This is not needed anymore, initVars(...) takes care of that
+//  if (getStanzaFrom() != null) {
+//    reply.setAttribute("to", getStanzaFrom().toString());
+//  }    // end of if (getElemFrom() != null)
+//
+//  if (getStanzaTo() != null) {
+//    reply.setAttribute("from", getStanzaTo().toString());
+//  }    // end of if (getElemTo() != null)
 		if (getStanzaId() != null) {
 			reply.setAttribute("id", getStanzaId());
 		}    // end of if (getElemId() != null)
@@ -660,7 +660,8 @@ public class Packet {
 	 * </pre>
 	 *
 	 * @return a <code>JID</code> instance of the packet destination address or NULL if
-	 * neither the packet destination address is set nor the stanza destination address is set.
+	 * neither the packet destination address is set nor the stanza destination address
+	 * is set.
 	 */
 	public JID getTo() {
 		return (packetTo != null) ? packetTo : stanzaTo;
@@ -713,10 +714,28 @@ public class Packet {
 	 * this packet.
 	 */
 	public void initVars(JID stanzaFrom, JID stanzaTo) {
-		this.stanzaTo   = stanzaTo;
-		this.stanzaFrom = stanzaFrom;
-		stanzaId        = elem.getAttribute("id");
-		packetToString  = null;
+		if (this.stanzaFrom != stanzaFrom) {
+			this.stanzaFrom = stanzaFrom;
+
+			if (stanzaFrom == null) {
+				elem.removeAttribute("from");
+			} else {
+				elem.setAttribute("from", stanzaFrom.toString());
+			}
+		}
+
+		if (this.stanzaTo != stanzaTo) {
+			this.stanzaTo = stanzaTo;
+
+			if (stanzaTo == null) {
+				elem.removeAttribute("to");
+			} else {
+				elem.setAttribute("to", stanzaTo.toString());
+			}
+		}
+
+		stanzaId = elem.getAttribute("id");
+		packetToString = null;
 	}
 
 	/**
@@ -749,7 +768,7 @@ public class Packet {
 			stanzaFrom = new JID(tmp);
 		}
 
-		stanzaId       = elem.getAttribute("id");
+		stanzaId = elem.getAttribute("id");
 		packetToString = null;
 	}
 
@@ -777,7 +796,8 @@ public class Packet {
 	 * the same as given parameters.
 	 * This is a convenience method which logic is equal to the code below:
 	 * <pre>
-	 * return packet.getElement().getName() == name && packet.getElement().getXMLNS() == xmlns;
+	 * return packet.getElement().getName() == name
+	 *             && packet.getElement().getXMLNS() == xmlns;
 	 * </pre>
 	 *
 	 * @param name is a <code>String</code> representing the XML element name.
@@ -863,14 +883,15 @@ public class Packet {
 
 		reply.setAttribute("type", StanzaType.result.toString());
 
-		if (getStanzaFrom() != null) {
-			reply.setAttribute("to", getStanzaFrom().toString());
-		}    // end of if (getElemFrom() != null)
-
-		if (getStanzaTo() != null) {
-			reply.setAttribute("from", getStanzaTo().toString());
-		}    // end of if (getElemFrom() != null)
-
+		// Not needed anymore, initVars(...) takes care of that
+//  if (getStanzaFrom() != null) {
+//    reply.setAttribute("to", getStanzaFrom().toString());
+//  }    // end of if (getElemFrom() != null)
+//
+//  if (getStanzaTo() != null) {
+//    reply.setAttribute("from", getStanzaTo().toString());
+//  }    // end of if (getElemFrom() != null)
+//
 		if (getStanzaId() != null) {
 			reply.setAttribute("id", getStanzaId());
 		}    // end of if (getElemId() != null)
@@ -922,14 +943,15 @@ public class Packet {
 
 		reply.setAttribute("type", StanzaType.result.toString());
 
-		if (getStanzaFrom() != null) {
-			reply.setAttribute("to", getStanzaFrom().toString());
-		}    // end of if (getElemFrom() != null)
-
-		if (getStanzaTo() != null) {
-			reply.setAttribute("from", getStanzaTo().toString());
-		}    // end of if (getElemFrom() != null)
-
+		// Not needed anymore, initVars(...) takes care of that
+//  if (getStanzaFrom() != null) {
+//    reply.setAttribute("to", getStanzaFrom().toString());
+//  }    // end of if (getElemFrom() != null)
+//
+//  if (getStanzaTo() != null) {
+//    reply.setAttribute("from", getStanzaTo().toString());
+//  }    // end of if (getElemFrom() != null)
+//
 		if (getStanzaId() != null) {
 			reply.setAttribute("id", getStanzaId());
 		}    // end of if (getElemId() != null)
@@ -963,10 +985,12 @@ public class Packet {
 	}
 
 	/**
-	 * Method description
+	 * Returns a new <code>Packet</code> instance with stanza <em>routed</em>
+	 * which means an original stanza has been enclosed inside a <code>route</code>
+	 * XML element which contains additional information taken from
+	 * <code>Packet</code> packet instance internal attributes.
 	 *
-	 *
-	 * @return
+	 * @return a new <code>Packet</code> instance with <code>route</code> stanza.
 	 */
 	public Packet packRouted() {
 		Element routedp = new Element("route",
@@ -980,10 +1004,10 @@ public class Packet {
 	}
 
 	/**
-	 * Method description
+	 * The method marks that the packet has been processed by a packet processor
+	 * with a given ID.
 	 *
-	 *
-	 * @param id
+	 * @param id is a <code>String</code> instance of the packet processer identifier.
 	 */
 	public void processedBy(String id) {
 		processorsIds.add(id);
@@ -992,42 +1016,46 @@ public class Packet {
 	//~--- set methods ----------------------------------------------------------
 
 	/**
-	 * Method description
+	 * The method sets a source address for the <code>Packet</code> instance.
 	 *
 	 *
-	 * @param from
+	 * @param from is a <code>JID</code> instance of the packet new source address.
 	 */
 	public void setPacketFrom(JID from) {
 		this.packetFrom = from;
 	}
 
 	/**
-	 * Method description
+	 * The method sets a destination address for the <code>Packet</code> instance.
 	 *
 	 *
-	 * @param to
+	 * @param to is a <code>JID</code> instance of the packet new destination
+	 * address.
 	 */
 	public void setPacketTo(JID to) {
 		this.packetTo = to;
 	}
 
 	/**
-	 * Method description
+	 * The method sets permissions for the packet of a user who sent the stanza.
 	 *
 	 *
-	 * @param perm
+	 * @param perm is <code>Permissions</code> instance of the stanza sender
+	 * permissions calculated by the session manager.
 	 */
 	public void setPermissions(Permissions perm) {
-		packetToString       = null;
+		packetToString = null;
 		packetToStringSecure = null;
-		permissions          = perm;
+		permissions = perm;
 	}
 
 	/**
-	 * Method description
+	 * The method sets the packet priority. Depending on the priority the packet
+	 * is put to a queue with corresponding priority. This matter only on system
+	 * which experience overload and some packets may be delivered with a delay
+	 * if they are low priority packets.
 	 *
-	 *
-	 * @param priority
+	 * @param priority os a new <code>Priority</code> instance set for the packet.
 	 */
 	public void setPriority(Priority priority) {
 		this.priority = priority;
@@ -1036,10 +1064,12 @@ public class Packet {
 	//~--- methods --------------------------------------------------------------
 
 	/**
-	 * Method description
+	 * The method left for compatiblity with an old API reasons. Use
+	 * <code>swapStanzaFromTo()</code> instead.
 	 *
-	 *
-	 * @return
+	 * @return a new packet instance with a copy of the stanza element with
+	 * swapped source and destination addresses.
+	 * @deprecated Use <code>swapStanzaFromTo()</code> instead.
 	 */
 	@Deprecated
 	public Packet swapElemFromTo() {
@@ -1047,12 +1077,14 @@ public class Packet {
 	}
 
 	/**
-	 * Method description
+	 * The method left for compatiblity with an old API reasons. Use
+	 * <code>swapStanzaFromTo()</code> instead.
 	 *
-	 *
-	 * @param type
-	 *
-	 * @return
+	 * @param type a new stanza type which has to be set to the generated
+	 * stanza copy.
+	 * @return a new packet instance with a copy of the stanza element with
+	 * swapped source and destination addresses.
+	 * @deprecated Use <code>swapStanzaFromTo()</code> instead.
 	 */
 	@Deprecated
 	public Packet swapElemFromTo(final StanzaType type) {
@@ -1060,14 +1092,22 @@ public class Packet {
 	}
 
 	/**
-	 * Method description
+	 * The method creates a new instance of the <code>Packet</code> class with the
+	 * packet source and destination addresses swapped and sets the given stanza
+	 * element plus source and destination addresses for the new stanza.
+	 * This method gives you slightly more flexibility as you can set any source
+	 * and destination address for the new stanza.
+	 * This method is rarely used in packet processors which don't sent a simple
+	 * "ok result" response. Some data flow requires a completely new packet
+	 * to be send as a response to the original call, but the response has to be
+	 * delivered to the original sends. As an example are the SASL authentication
+	 * and TLS handshaking.
 	 *
+	 * @param el is an XML element set for the new packet.
+	 * @param stanzaFrom is the stanza source address
+	 * @param stanzaTo is the stanza destination address
 	 *
-	 * @param el
-	 * @param stanzaFrom
-	 * @param stanzaTo
-	 *
-	 * @return
+	 * @return a new <code>Packet</code> instance.
 	 */
 	public Packet swapFromTo(Element el, JID stanzaFrom, JID stanzaTo) {
 		Packet packet = packetInstance(el, stanzaFrom, stanzaTo);
@@ -1079,14 +1119,15 @@ public class Packet {
 	}
 
 	/**
-	 * Method description
+	 * Creates a new <code>Packet</code> instance with swapped packet source and
+	 * destination addresses. Please note the new packet contains unchanged copy of the
+	 * original stanza. Stanza source and destination addresses are no swapped.
 	 *
-	 *
-	 * @return
+	 * @return a new <code>Packet>/code> instance.
 	 */
 	public Packet swapFromTo() {
-		Element el     = elem.clone();
-		Packet  packet = packetInstance(el, getStanzaFrom(), getStanzaTo());
+		Element el = elem.clone();
+		Packet packet = packetInstance(el, getStanzaFrom(), getStanzaTo());
 
 		packet.setPacketTo(getFrom());
 		packet.setPacketFrom(getTo());
@@ -1095,17 +1136,19 @@ public class Packet {
 	}
 
 	/**
-	 * Method description
+	 * The method creates a new <code>Packet</code> instance with a stanza copy
+	 * with swapped source and destination addresses. The packet source and
+	 * destination addresses are set to null.
 	 *
 	 *
-	 * @return
+	 * @return a new <code>Packet</code> instance.
 	 */
 	public Packet swapStanzaFromTo() {
 		Element copy = elem.clone();
 
-		copy.setAttribute("to", getStanzaFrom().toString());
-		copy.setAttribute("from", getStanzaTo().toString());
-
+		// Not needed anymore, initVars(...) takes care of that
+//  copy.setAttribute("to", getStanzaFrom().toString());
+//  copy.setAttribute("from", getStanzaTo().toString());
 		Packet result = packetInstance(copy, getStanzaTo(), getStanzaFrom());
 
 		result.setPriority(priority);
@@ -1114,18 +1157,20 @@ public class Packet {
 	}
 
 	/**
-	 * Method description
+	 * The method creates a new <code>Packet</code> instance with a stanza copy
+	 * with swapped source and destination addresses and the given type set.
+	 * The packet source and destination addresses are set to null.
 	 *
 	 *
-	 * @param type
-	 *
-	 * @return
+	 * @param type is a new type for the stanza copy to set.
+	 * @return a new <code>Packet</code> instance.
 	 */
 	public Packet swapStanzaFromTo(final StanzaType type) {
 		Element copy = elem.clone();
 
-		copy.setAttribute("to", getStanzaFrom().toString());
-		copy.setAttribute("from", getStanzaTo().toString());
+		// Not needed anymore, initVars(...) takes care of that
+//  copy.setAttribute("to", getStanzaFrom().toString());
+//  copy.setAttribute("from", getStanzaTo().toString());
 		copy.setAttribute("type", type.toString());
 
 		Packet result = packetInstance(copy, getStanzaTo(), getStanzaFrom());
@@ -1136,10 +1181,17 @@ public class Packet {
 	}
 
 	/**
-	 * Method description
+	 * The method converts the <code>Packet</code> instance to a <code>String</code>
+	 * representation. The stanza XML element is presented as the string and all packet
+	 * attributes are also added to the string.
+	 * The method is for a debugging purposes to log the whole packet content to
+	 * the debug file for further analysis. It is recommended to use
+	 * <code>toStringSecure()</code> instead as it removes all the CData from the
+	 * stanza avoiding exposing user chat message content. The secure method
+	 * also preserves you from flooding your log files in case of a huge chunks of
+	 * data are sent in packets (user photos in vCards or files).
 	 *
-	 *
-	 * @return
+	 * @return a <code>String</code> representation of the packet instance.
 	 */
 	@Override
 	public String toString() {
@@ -1152,26 +1204,34 @@ public class Packet {
 	}
 
 	/**
-	 * Method description
+	 * Is a convenience method which allows you to call always the same method
+	 * but parametrize (configure) whether you want to get a secure packet string
+	 * representation or full representation.
 	 *
+	 * @param secure parameter specifies whether the secure packet representation
+	 * should be returned (<code>true</code> value) or the full one
+	 * (<code>false</code>).
 	 *
-	 * @param secure
-	 *
-	 * @return
+	 * @return a <code>String</code> representation of the packet instance.
 	 */
 	public String toString(boolean secure) {
+		String result;
+
 		if (secure) {
-			return toStringSecure();
+			result = toStringSecure();
 		} else {
-			return toString();
+			result = toString();
 		}
+
+		return result;
 	}
 
 	/**
-	 * Method description
+	 * The method returns a <code>String</code> representation of the packet with
+	 * all CData content replaced with text: <em>"CData size: NN"</em>. This is a
+	 * preferable method to log the packets for debuging purposes.
 	 *
-	 *
-	 * @return
+	 * @return a <code>String</code> representation of the packet instance.
 	 */
 	public String toStringSecure() {
 		if (packetToStringSecure == null) {
@@ -1183,12 +1243,16 @@ public class Packet {
 	}
 
 	/**
-	 * Method description
+	 * The method unpacks the original packet and stanza from <code>route</code>
+	 * stanza.
+	 * This is the opposite action to the <code>packRouted()</code> method.
 	 *
 	 *
-	 * @return
+	 * @return a new instance of the <code>Packet</code> class with unpacket
+	 * packet and stanza from <code>route</code> stanza.
 	 *
-	 * @throws TigaseStringprepException
+	 * @throws TigaseStringprepException if there was a problem with addresses
+	 * stringprep processing.
 	 */
 	public Packet unpackRouted() throws TigaseStringprepException {
 		Packet result = packetInstance(elem.getChildren().get(0));
@@ -1200,22 +1264,26 @@ public class Packet {
 	}
 
 	/**
-	 * Method description
+	 * The method determines whether the packet has been processed by any of
+	 * the packet processors.
+	 * In fact it says whether there has been called method
+	 * <code>processedBy(...)</code> on the packet.
 	 *
-	 *
-	 * @return
+	 * @return a <code>boolean</code> value of <code>true</code> of the packet was
+	 * processed by any processor and <code>false</code> otherwise.
 	 */
 	public boolean wasProcessed() {
 		return processorsIds.size() > 0;
 	}
 
 	/**
-	 * Method description
+	 * The method checks whether the packet has been processed by a
+	 * packet processor with the specified ID.
 	 *
+	 * @param id is a <code>String</code> instance of the packet processor identifier.
 	 *
-	 * @param id
-	 *
-	 * @return
+	 * @return a <code>boolean</code> value of <code>true</code> of the packet was
+	 * processed by a processor with specified ID and <code>false</code> otherwise.
 	 */
 	public boolean wasProcessedBy(String id) {
 		return processorsIds.contains(id);
@@ -1255,7 +1323,7 @@ public class Packet {
 }
 
 
-//~ Formatted in Sun Code Convention on 2010.01.12 at 10:47:44 PST
+//~ Formatted in Sun Code Convention on 2010.01.16 at 08:12:52 GMT
 
 
 //~ Formatted by Jindent --- http://www.jindent.com
