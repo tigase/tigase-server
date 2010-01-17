@@ -1306,24 +1306,24 @@ public class Packet {
 
 		if (elem.getName() == "cluster") {
 			setPriority(Priority.CLUSTER);
-		}
-
-		if ((elem.getName() == "presence")
-				&& ((type == null) || (type == StanzaType.available)
-						|| (type == StanzaType.unavailable) || (type == StanzaType.probe))) {
-			setPriority(Priority.PRESENCE);
-		}
-
-		if (elem.getName().equals("route")) {
-			routed = true;
 		} else {
-			routed = false;
-		}    // end of if (elem.getName().equals("route")) else
+			if ((elem.getName() == "presence")
+					&& ((type == null) || (type == StanzaType.available)
+							|| (type == StanzaType.unavailable) || (type == StanzaType.probe))) {
+				setPriority(Priority.PRESENCE);
+			} else {
+				if (elem.getName() == "route") {
+					routed = true;
+				} else {
+					routed = false;
+				}    // end of if (elem.getName().equals("route")) else
+			}
+		}
 	}
 }
 
 
-//~ Formatted in Sun Code Convention on 2010.01.16 at 08:13:16 GMT
+//~ Formatted in Sun Code Convention
 
 
 //~ Formatted by Jindent --- http://www.jindent.com
