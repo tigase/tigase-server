@@ -48,6 +48,9 @@ import tigase.server.Packet;
  * @version $Rev$
  */
 public enum Authorization {
+	/**
+	 *
+	 */
 	AUTHORIZED {
 
 		/**
@@ -56,6 +59,7 @@ public enum Authorization {
 		 *
 		 * @return
 		 */
+		@Override
 		public String getCondition() {
 			return null;
 		}
@@ -66,6 +70,7 @@ public enum Authorization {
 		 *
 		 * @return
 		 */
+		@Override
 		public int getErrorCode() {
 			return 0;
 		}
@@ -76,6 +81,7 @@ public enum Authorization {
 		 *
 		 * @return
 		 */
+		@Override
 		public String getErrorType() {
 			return null;
 		}
@@ -90,10 +96,14 @@ public enum Authorization {
 		 *
 		 * @return
 		 */
+		@Override
 		public Packet getResponseMessage(Packet p, String t, boolean i) {
 			return p.okResult(t, 0);
 		}
 	},
+	/**
+	 *
+	 */
 	BAD_REQUEST {
 
 		/**
@@ -102,6 +112,7 @@ public enum Authorization {
 		 *
 		 * @return
 		 */
+		@Override
 		public String getCondition() {
 			return "bad-request";
 		}
@@ -112,6 +123,7 @@ public enum Authorization {
 		 *
 		 * @return
 		 */
+		@Override
 		public int getErrorCode() {
 			return 400;
 		}
@@ -122,10 +134,14 @@ public enum Authorization {
 		 *
 		 * @return
 		 */
+		@Override
 		public String getErrorType() {
 			return ERR_TYPE_MODIFY;
 		}
 	},
+	/**
+	 *
+	 */
 	CONFLICT {
 
 		/**
@@ -134,6 +150,7 @@ public enum Authorization {
 		 *
 		 * @return
 		 */
+		@Override
 		public String getCondition() {
 			return "conflict";
 		}
@@ -144,6 +161,7 @@ public enum Authorization {
 		 *
 		 * @return
 		 */
+		@Override
 		public int getErrorCode() {
 			return 409;
 		}
@@ -154,10 +172,14 @@ public enum Authorization {
 		 *
 		 * @return
 		 */
+		@Override
 		public String getErrorType() {
 			return ERR_TYPE_CANCEL;
 		}
 	},
+	/**
+	 *
+	 */
 	FEATURE_NOT_IMPLEMENTED {
 
 		/**
@@ -166,6 +188,7 @@ public enum Authorization {
 		 *
 		 * @return
 		 */
+		@Override
 		public String getCondition() {
 			return "feature-not-implemented";
 		}
@@ -176,6 +199,7 @@ public enum Authorization {
 		 *
 		 * @return
 		 */
+		@Override
 		public int getErrorCode() {
 			return 501;
 		}
@@ -186,10 +210,14 @@ public enum Authorization {
 		 *
 		 * @return
 		 */
+		@Override
 		public String getErrorType() {
 			return ERR_TYPE_CANCEL;
 		}
 	},
+	/**
+	 *
+	 */
 	FORBIDDEN {
 
 		/**
@@ -198,6 +226,7 @@ public enum Authorization {
 		 *
 		 * @return
 		 */
+		@Override
 		public String getCondition() {
 			return "forbidden";
 		}
@@ -208,6 +237,7 @@ public enum Authorization {
 		 *
 		 * @return
 		 */
+		@Override
 		public int getErrorCode() {
 			return 403;
 		}
@@ -218,10 +248,14 @@ public enum Authorization {
 		 *
 		 * @return
 		 */
+		@Override
 		public String getErrorType() {
 			return ERR_TYPE_AUTH;
 		}
 	},
+	/**
+	 *
+	 */
 	GONE {
 
 		/**
@@ -230,6 +264,7 @@ public enum Authorization {
 		 *
 		 * @return
 		 */
+		@Override
 		public String getCondition() {
 			return "gone";
 		}
@@ -240,6 +275,7 @@ public enum Authorization {
 		 *
 		 * @return
 		 */
+		@Override
 		public int getErrorCode() {
 			return 302;
 		}
@@ -250,10 +286,14 @@ public enum Authorization {
 		 *
 		 * @return
 		 */
+		@Override
 		public String getErrorType() {
 			return ERR_TYPE_MODIFY;
 		}
 	},
+	/**
+	 *
+	 */
 	INTERNAL_SERVER_ERROR {
 
 		/**
@@ -262,6 +302,7 @@ public enum Authorization {
 		 *
 		 * @return
 		 */
+		@Override
 		public String getCondition() {
 			return "internal-server-error";
 		}
@@ -272,6 +313,7 @@ public enum Authorization {
 		 *
 		 * @return
 		 */
+		@Override
 		public int getErrorCode() {
 			return 500;
 		}
@@ -282,10 +324,14 @@ public enum Authorization {
 		 *
 		 * @return
 		 */
+		@Override
 		public String getErrorType() {
 			return ERR_TYPE_WAIT;
 		}
 	},
+	/**
+	 *
+	 */
 	ITEM_NOT_FOUND {
 
 		/**
@@ -294,6 +340,7 @@ public enum Authorization {
 		 *
 		 * @return
 		 */
+		@Override
 		public String getCondition() {
 			return "item-not-found";
 		}
@@ -304,6 +351,7 @@ public enum Authorization {
 		 *
 		 * @return
 		 */
+		@Override
 		public int getErrorCode() {
 			return 404;
 		}
@@ -314,10 +362,14 @@ public enum Authorization {
 		 *
 		 * @return
 		 */
+		@Override
 		public String getErrorType() {
 			return ERR_TYPE_CANCEL;
 		}
 	},
+	/**
+	 *
+	 */
 	JID_MALFORMED {
 
 		/**
@@ -326,6 +378,7 @@ public enum Authorization {
 		 *
 		 * @return
 		 */
+		@Override
 		public String getCondition() {
 			return "jid-malformed";
 		}
@@ -336,6 +389,7 @@ public enum Authorization {
 		 *
 		 * @return
 		 */
+		@Override
 		public int getErrorCode() {
 			return 400;
 		}
@@ -346,10 +400,14 @@ public enum Authorization {
 		 *
 		 * @return
 		 */
+		@Override
 		public String getErrorType() {
 			return ERR_TYPE_MODIFY;
 		}
 	},
+	/**
+	 * 
+	 */
 	NOT_ACCEPTABLE {
 
 		/**
