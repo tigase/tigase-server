@@ -801,7 +801,7 @@ public class Gateway extends AbstractMessageReceiver
 			}
 
 			if (packet.getType() == StanzaType.subscribe) {
-				addOutPacket(packet.swapElemFromTo(StanzaType.subscribed));
+				addOutPacket(packet.swapStanzaFromTo(StanzaType.subscribed));
 			}
 
 			if (packet.getType() == StanzaType.unavailable) {
@@ -817,7 +817,7 @@ public class Gateway extends AbstractMessageReceiver
 			JID id = packet.getStanzaFrom().copyWithoutResource();
 
 			if (packet.getType() == StanzaType.subscribed) {
-				addOutPacket(packet.swapElemFromTo(StanzaType.subscribed));
+				addOutPacket(packet.swapStanzaFromTo(StanzaType.subscribed));
 
 				String buddy = decodeLegacyName(packet.getStanzaTo().toString());
 
@@ -869,7 +869,7 @@ public class Gateway extends AbstractMessageReceiver
 			}
 
 			if (packet.getType() == StanzaType.subscribe) {
-				addOutPacket(packet.swapElemFromTo(StanzaType.subscribe));
+				addOutPacket(packet.swapStanzaFromTo(StanzaType.subscribe));
 
 				String buddy = decodeLegacyName(packet.getStanzaTo().toString());
 
@@ -894,7 +894,7 @@ public class Gateway extends AbstractMessageReceiver
 			}
 
 			if (packet.getType() == StanzaType.unsubscribe) {
-				Packet presence = packet.swapElemFromTo(StanzaType.unsubscribe);
+				Packet presence = packet.swapStanzaFromTo(StanzaType.unsubscribe);
 
 				if (log.isLoggable(Level.FINEST)) {
 					log.finest("Sending out presence: " + presence.toString());
@@ -904,8 +904,8 @@ public class Gateway extends AbstractMessageReceiver
 			}
 
 			if (packet.getType() == StanzaType.unsubscribed) {
-				addOutPacket(packet.swapElemFromTo(StanzaType.unsubscribe));
-				addOutPacket(packet.swapElemFromTo(StanzaType.unsubscribed));
+				addOutPacket(packet.swapStanzaFromTo(StanzaType.unsubscribe));
+				addOutPacket(packet.swapStanzaFromTo(StanzaType.unsubscribed));
 
 				String buddy = decodeLegacyName(packet.getStanzaTo().toString());
 				String roster_node = id + "/roster/" + buddy;
