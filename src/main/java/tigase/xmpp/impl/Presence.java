@@ -417,7 +417,7 @@ public abstract class Presence {
 //                }
 //              }
 //            }
-							updatePresenceChange(packet.getElement(), session, results);
+							updatePresenceChange(packet, session, results);
 
 							// roster_util.setBuddyOnline(session, packet.getElemFrom(), online);
 						} else {
@@ -463,7 +463,7 @@ public abstract class Presence {
 							roster_util.updateBuddySubscription(session,
 											pres_type,
 											packet.getStanzaFrom());
-							updatePresenceChange(packet.getElement(), session, results);
+							updatePresenceChange(packet, session, results);
 						}    // end of else
 
 						// We can't know that actually, this might come from offline storage
@@ -947,9 +947,13 @@ public abstract class Presence {
 				Element presence = new Element(PRESENCE_ELEMENT_NAME);
 
 				presence.setAttribute("type", StanzaType.subscribe.toString());
-				presence.setAttribute("from", buddy.toString());
+
+				// presence.setAttribute("from", buddy.toString());
 				presence.setXMLNS(XMLNS);
-				updatePresenceChange(presence, session, results);
+
+				Packet pres = Packet.packetInstance(presence, buddy, null);
+
+				updatePresenceChange(pres, session, results);
 			}
 		}
 	}
@@ -1120,7 +1124,7 @@ public abstract class Presence {
 	 * @param results
 	 * @exception NotAuthorizedException if an error occurs
 	 */
-	protected static void updatePresenceChange(Element presence,
+	protected static void updatePresenceChange(Packet presence,
 					XMPPResourceConnection session, Queue<Packet> results)
 					throws NotAuthorizedException {
 		boolean initial_p = ((presence.getAttribute("type") == null)
@@ -1131,35 +1135,31 @@ public abstract class Presence {
 
 			// Update presence change only for online resources that is
 			// resources which already sent initial presence.
-			if ((conn.getPresence() != null) ||!initial_p) {
+			if ((conn.getPresence() == null) && initial_p) {
+
+				// Ignore....
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("Skipping update presence change for a resource which hasn't sent initial presence yet.");
+				}
+			} else {
 				try {
 					if (log.isLoggable(Level.FINER)) {
 						log.finer("Update presence change to: " + conn.getUserId());
 					}
 
 					// Send to old resource presence about new resource
-					Element pres_update = presence.clone();
+					Packet pres_update = presence.copyElementOnly();
 
-					pres_update.setAttribute("to", conn.getUserId().toString());
-
-					Packet pack_update = Packet.packetInstance(pres_update,
-									session.getJID(),
-									conn.getJID().copyWithoutResource());
-
-					pack_update.setPacketTo(conn.getConnectionId());
-					results.offer(pack_update);
+					pres_update.initVars(presence.getStanzaFrom(),
+															 conn.getJID().copyWithoutResource());
+					pres_update.setPacketTo(conn.getConnectionId());
+					results.offer(pres_update);
 				} catch (Exception e) {
 
 					// It might be quite possible that one of the user connections
 					// is in state not allowed for sending presence, in such a case
 					// none of user connections would receive presence.
 					// This catch is to make sure all other resources receive notification.
-				}
-			} else {
-
-				// Ignore....
-				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Skipping update presence change for a resource which hasn't sent initial presence yet.");
 				}
 			}
 		}    // end of for (XMPPResourceConnection conn: sessions)
