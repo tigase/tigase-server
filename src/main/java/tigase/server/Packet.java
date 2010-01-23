@@ -282,6 +282,8 @@ public class Packet {
 		Element res_elem = elem.clone();
 		Packet result = packetInstance(res_elem, getStanzaFrom(), getStanzaTo());
 
+		result.setPriority(priority);
+
 		return result;
 	}
 
@@ -1114,6 +1116,7 @@ public class Packet {
 
 		packet.setPacketTo(getFrom());
 		packet.setPacketFrom(getTo());
+		packet.setPriority(priority);
 
 		return packet;
 	}
@@ -1131,6 +1134,7 @@ public class Packet {
 
 		packet.setPacketTo(getFrom());
 		packet.setPacketFrom(getTo());
+		packet.setPriority(priority);
 
 		return packet;
 	}
