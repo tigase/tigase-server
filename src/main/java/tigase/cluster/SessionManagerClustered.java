@@ -440,6 +440,7 @@ public class SessionManagerClustered extends SessionManager
 			strategy_tmp.setProperties(props);
 			//strategy_tmp.init(getName());
 			strategy = strategy_tmp;
+			strategy.nodeConnected(getComponentId());
 		} catch (Exception e) {
 			log.log(Level.SEVERE,
 							"Can not clustering strategy instance for class: " +
