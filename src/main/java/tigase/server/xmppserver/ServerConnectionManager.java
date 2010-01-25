@@ -349,7 +349,6 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 					String db_key = packet.getElemCData();
 
 					// initServiceMapping(local_hostname, remote_hostname, accept_jid, serv);
-
 					// <db:result> with CDATA containing KEY
 					Element elem = new Element(DB_VERIFY_EL_NAME,
 																		 db_key,
@@ -803,7 +802,6 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 //    hostnames = new String[] {"localhost"};
 //  } // end of if (hostnames == null || hostnames.length == 0)
 //  Arrays.sort(hostnames);
-
 //  addRouting("*");
 		maxPacketWaitingTime = (Long) props.get(MAX_PACKET_WAITING_TIME_PROP_KEY);
 	}
