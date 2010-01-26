@@ -172,7 +172,6 @@ public class ShortNewsPublisher extends RepoRosterTask {
 	 * post in database.
 	 */
 	private PreparedStatement update_post = null;
-
 	;
 
 	//~--- methods --------------------------------------------------------------
@@ -295,6 +294,7 @@ public class ShortNewsPublisher extends RepoRosterTask {
 
 	//~--- methods --------------------------------------------------------------
 
+	@Override
 	protected void processMessage(Packet packet, Queue<Packet> results) {
 		if (isPostCommand(packet)) {
 			runCommand(packet, results);
