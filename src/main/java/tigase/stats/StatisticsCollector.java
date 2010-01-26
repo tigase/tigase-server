@@ -482,6 +482,8 @@ public class StatisticsCollector
 
 		return sb.toString();
 	}
+
+	protected void statsUpdated() {}
 }
 
 
