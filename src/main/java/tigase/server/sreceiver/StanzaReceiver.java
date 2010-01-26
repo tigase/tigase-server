@@ -162,7 +162,6 @@ public class StanzaReceiver extends AbstractMessageReceiver
 
 //public static final String SIMPLE_JID_PROP_KEY = "simple-jid";
 //public static final String SIMPLE_JID_PROP_VAL =  "srecv@localhost";
-
 	private static final String SREC_REPO_CLASS_PROP_KEY = "srec-repo-class";
 	private static final String SREC_REPO_URL_PROP_KEY = "srec-repo-url";
 	private static final String TASKS_LIST_PROP_KEY = "tasks-list";
@@ -201,7 +200,6 @@ public class StanzaReceiver extends AbstractMessageReceiver
 // * not specified separately in configuration file.
 // */
 //private TaskCreationPolicy defaultPolicy = CREATION_POLICY_PROP_VAL;
-
 	private ServiceEntity serviceEntity = null;
 
 	/**
@@ -653,7 +651,6 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		Arrays.sort(admins);
 
 //  addRouting(my_hostname);
-
 		try {
 			String cls_name = (String) props.get(SREC_REPO_CLASS_PROP_KEY);
 			String res_uri = (String) props.get(SREC_REPO_URL_PROP_KEY);
@@ -666,13 +663,13 @@ public class StanzaReceiver extends AbstractMessageReceiver
 
 			try {
 				repository.addUser(getComponentId().toString());
-			} catch (UserExistsException e) { /* Ignore, this is correct and expected */
+			} catch (UserExistsException e) {    /* Ignore, this is correct and expected */
 			}
 
 			loadTasksFromRepository();
 		} catch (Exception e) {
 			log.log(Level.SEVERE, "Can't initialize repository: ", e);
-		}    // end of try-catch
+		}                                      // end of try-catch
 
 		String[] tasks_list = (String[]) props.get(TASKS_LIST_PROP_KEY);
 
