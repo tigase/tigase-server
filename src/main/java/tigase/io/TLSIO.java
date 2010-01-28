@@ -419,6 +419,16 @@ public class TLSIO implements IOInterface {
 
 		// The loop below falls into infinite loop for some reason.
 		// Let's try to detect it here and recover.
+		// -- After some tests....
+		// Looks like the cause has been detected. Sometimes the loop
+		// below is executed a few times for some reason. It happens that
+		// the tlsWarpper.getStatus() returns NEED_READ and it doesn't
+		// accept any more data from the input buffer.
+		// The proper handling would need reading from the socket to
+		// reset TLS to the correct state, but this involves another problems.
+		// What to do with possible user data received in such a call?
+		// It happens extremely rarely and is hard to diagnose. Let's leave it
+		// as it is now which just causes such connections to be closed.
 		int loop_cnt = 0;
 		int max_loop_runs = 1000;
 
