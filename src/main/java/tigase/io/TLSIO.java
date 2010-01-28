@@ -417,6 +417,11 @@ public class TLSIO implements IOInterface {
 		int result = 0;
 		int wr = 0;
 
+		// The loop below falls into infinite loop for some reason.
+		// Let's try to detect it here and recover.
+		int loop_cnt = 0;
+		int max_loop_runs = 1000;
+
 		do {
 			ByteBuffer tlsOutput = ByteBuffer.allocate(tlsWrapper.getNetBuffSize());
 
@@ -431,7 +436,15 @@ public class TLSIO implements IOInterface {
 			tlsOutput.flip();
 			wr = io.write(tlsOutput);
 			result += wr;
-		} while (buff.hasRemaining());
+		} while (buff.hasRemaining() && (++loop_cnt < max_loop_runs));
+
+		if (loop_cnt > (max_loop_runs / 2)) {
+			log.warning("Infinite loop detected in TLS code, tlsWrapper.getStatus(): "
+									+ tlsWrapper.getStatus());
+
+			// Let's close the connection now
+			throw new EOFException("Socket has been closed due to TLS problems.");
+		}
 
 		if (tlsWrapper.getStatus() == TLSStatus.NEED_WRITE) {
 			writeBuff(ByteBuffer.allocate(0));
