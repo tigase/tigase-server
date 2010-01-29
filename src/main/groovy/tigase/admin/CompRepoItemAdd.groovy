@@ -39,9 +39,9 @@ import tigase.server.*
 def MARKER = "command-marker"
 
 def repo = (ComponentRepository)comp_repo
-def p = (Packet)packet
+def p = (Iq)packet
 def item = repo.getItemInstance()
-def marker = Command.getFieldValue(packet, MARKER)
+def marker = Command.getFieldValue(p, MARKER)
 
 if (marker == null) {
   def result = p.commandResult(Command.DataType.form)
@@ -50,7 +50,7 @@ if (marker == null) {
 	return result
 }
 
-item.initFromCommand(packet)
+item.initFromCommand(p)
 repo.addItem(item)
 
 def result = p.commandResult(Command.DataType.result)

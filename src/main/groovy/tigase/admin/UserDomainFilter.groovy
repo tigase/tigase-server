@@ -38,14 +38,14 @@ def JID = "jid"
 def DOMAIN = "domain"
 def DOMAIN_LIST = "domainList"
 
-def p = (Packet)packet
+def p = (Iq)packet
 def jid = Command.getFieldValue(p, JID)
 def domain = Command.getFieldValue(p, DOMAIN)
 def domainList = Command.getFieldValue(p, DOMAIN_LIST)
 
 if (jid == null || domain == null || 
 	(domain == DomainFilter.DOMAINS.LIST.name() && domainList == null)) {
-	def res = (Packet)p.commandResult(Command.DataType.form);
+	def res = (Iq)p.commandResult(Command.DataType.form);
 	Command.addFieldValue(res, JID, jid ?: "", "jid-single", "User JID")
 	def domainStr = []
   DomainFilter.DOMAINS.values().each { domainStr += it.name() }
