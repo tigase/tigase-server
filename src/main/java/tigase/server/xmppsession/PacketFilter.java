@@ -174,27 +174,13 @@ public class PacketFilter {
 
 				// After authentication we require resource binding packet and
 				// nothing else:
-				if (!session.isResourceSet()
-						&& (packet.getElement().getChild("bind", "urn:ietf:params:xml:ns:xmpp-bind")
-								== null)) {
+				// actually according to XEP-0170: http://xmpp.org/extensions/xep-0170.html
+				// stream compression might occur between authentication and resource
+				// binding
+				if (session.isResourceSet()
+						|| packet.isXMLNS("/iq/bind", "urn:ietf:params:xml:ns:xmpp-bind")
+						|| packet.isXMLNS("compress", "http://jabber.org/protocol/compress")) {
 
-					// We do not accept anything without resource binding....
-					results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-									"You must bind the resource first: http://www.xmpp.org/rfcs/rfc3920.html#bind",
-									true));
-
-					if (log.isLoggable(Level.INFO)) {
-						log.info("Session details: connectionId=" + session.getConnectionId()
-										 + ", sessionId=" + session.getSessionId() + ", ConnectionStatus="
-										 + session.getConnectionStatus());
-					}
-
-					if (log.isLoggable(Level.FINEST)) {
-						log.finest("Session more detais: JID=" + session.getJID());
-					}
-
-					return true;
-				} else {
 					JID from_jid = session.getJID();
 
 					if (from_jid != null) {
@@ -220,6 +206,23 @@ public class PacketFilter {
 						log.warning("Session is authenticated but session.getJid() is empty: "
 												+ packet.toStringSecure());
 					}
+				} else {
+					// We do not accept anything without resource binding....
+					results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
+									"You must bind the resource first: http://www.xmpp.org/rfcs/rfc3920.html#bind",
+									true));
+
+					if (log.isLoggable(Level.INFO)) {
+						log.info("Session details: connectionId=" + session.getConnectionId()
+										 + ", sessionId=" + session.getSessionId() + ", ConnectionStatus="
+										 + session.getConnectionStatus());
+					}
+
+					if (log.isLoggable(Level.FINEST)) {
+						log.finest("Session more detais: JID=" + session.getJID());
+					}
+
+					return true;
 				}
 			}
 		} catch (PacketErrorTypeException e) {

@@ -51,7 +51,7 @@ public class StartTLS extends XMPPProcessor
 	//private static final String TLS_STARTED_KEY = "TLS-Started";
 	public static final String TLS_REQUIRED_KEY = "tls-required";
 
-	private static final String ID = "starttls";
+	protected static final String ID = "starttls";
   private static final String[] ELEMENTS = {"starttls", "proceed", "failure"};
   private static final String[] XMLNSS = {XMLNS, XMLNS, XMLNS};
   private static final Element[] F_REQUIRED = {
