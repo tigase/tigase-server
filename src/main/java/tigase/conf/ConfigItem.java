@@ -102,7 +102,7 @@ public class ConfigItem implements RepositoryItem {
 	}
 
 	public String getConfigValToString() {
-		return DataTypes.valueToString(value);
+		return value == null ? null : DataTypes.valueToString(value);
 	}
 
 	public String getCompName() {
@@ -259,6 +259,11 @@ public class ConfigItem implements RepositoryItem {
 		String varr = DataTypes.valueToString(value);
 		result += varr;
 		return result;
+	}
+
+	@Override
+	public String toString() {
+		return compName + "/" + nodeName + "/" + keyName + "=" + value;
 	}
 
 	@Override
