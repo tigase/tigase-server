@@ -398,6 +398,8 @@ public class ConfigSQLRepository extends ConfigurationCache {
 								log(Level.SEVERE, null, ex1);
 					}
 				}
+			} catch (Exception e) {
+				log.warning(e + "Exception while adding config item: " + item.toString());
 			}
 		}
 
