@@ -134,7 +134,7 @@ public class TestComponent extends AbstractMessageReceiver {
 		defs.put(WHITELIST_KEY, INITIAL_WHITE_LIST);
 		defs.put(PREPEND_TEXT_KEY, prependText);
 		defs.put(SECURE_LOGGING_KEY, secureLogging);
-		defs.put(ABUSE_ADDRESS_KEY, abuseAddress);
+		defs.put(ABUSE_ADDRESS_KEY, "admin@localhost");
 		defs.put(NOTIFICATION_FREQ_KEY, notificationFrequency);
 
 		return defs;
