@@ -339,7 +339,6 @@ public class ComponentProtocol
 //  private int maxAuthenticationAttempts = 1;
 //  // In seconds
 //  private long authenticationTimeOut = 15;
-
 		defs.put(CLOSE_ON_SEQUENCE_ERROR_PROP_KEY, closeOnSequenceError);
 		defs.put(MAX_AUTH_ATTEMPTS_PROP_KEY, maxAuthenticationAttempts);
 		defs.put(AUTHENTICATION_TIMEOUT_PROP_KEY, authenticationTimeOut);
