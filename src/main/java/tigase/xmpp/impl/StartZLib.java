@@ -74,8 +74,8 @@ public class StartZLib extends XMPPProcessor
 		// for non-existen stream
 		// We also do not want to provide compression if it is already started
 		// and the compression has to be available after TLS has been completed.
-		if (session != null && session.getSessionData(ID) == null &&
-				session.getSessionData(StartTLS.ID) != null) {
+		if (session != null && session.getSessionData(ID) == null) {
+//				&& session.getSessionData(StartTLS.ID) != null) {
         return FEATURES;
     } else {
       return null;
