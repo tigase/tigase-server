@@ -272,8 +272,8 @@ public class TLSIO implements IOInterface {
 
 		// The loop below falls into infinite loop for some reason.
 		// Let's try to detect it here and recover.
-		// Looks like for some reason tlsWrapper.getStatus() always returns
-		// NEED_READ status and the loop never ends.
+		// Looks like for some reason tlsWrapper.getStatus() sometimes starts to return
+		// NEED_READ status all the time and the loop never ends.
 		int loop_cnt = 0;
 		int max_loop_runs = 1000;
 
