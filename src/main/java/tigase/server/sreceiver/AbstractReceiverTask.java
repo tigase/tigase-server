@@ -185,45 +185,31 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 		Map<String, PropertyItem> defs = new TreeMap<String, PropertyItem>();
 
 		defs.put(SUBSCR_RESTRICTIONS_PROP_KEY,
-						 new PropertyItem(SUBSCR_RESTRICTIONS_PROP_KEY,
-															SUBSCR_RESTRICTIONS_DISPL_NAME,
-															SUBSCR_RESTRICTIONS_PROP_VAL));
+				new PropertyItem(SUBSCR_RESTRICTIONS_PROP_KEY, SUBSCR_RESTRICTIONS_DISPL_NAME,
+					SUBSCR_RESTRICTIONS_PROP_VAL));
 		defs.put(MESSAGE_TYPE_PROP_KEY,
-						 new PropertyItem(MESSAGE_TYPE_PROP_KEY,
-															MESSAGE_TYPE_DISPL_NAME,
-															MESSAGE_TYPE_PROP_VAL));
+				new PropertyItem(MESSAGE_TYPE_PROP_KEY, MESSAGE_TYPE_DISPL_NAME,
+					MESSAGE_TYPE_PROP_VAL));
 		defs.put(ALLOWED_SENDERS_PROP_KEY,
-						 new PropertyItem(ALLOWED_SENDERS_PROP_KEY,
-															ALLOWED_SENDERS_DISPL_NAME,
-															ALLOWED_SENDERS_PROP_VAL));
+				new PropertyItem(ALLOWED_SENDERS_PROP_KEY, ALLOWED_SENDERS_DISPL_NAME,
+					ALLOWED_SENDERS_PROP_VAL));
 		defs.put(SUBSCR_RESTR_REGEX_PROP_KEY,
-						 new PropertyItem(SUBSCR_RESTR_REGEX_PROP_KEY,
-															SUBSCR_RESTR_REGEX_DISPL_NAME,
-															SUBSCR_RESTR_REGEX_PROP_VAL));
+				new PropertyItem(SUBSCR_RESTR_REGEX_PROP_KEY, SUBSCR_RESTR_REGEX_DISPL_NAME,
+					SUBSCR_RESTR_REGEX_PROP_VAL));
 		defs.put(ONLINE_ONLY_PROP_KEY,
-						 new PropertyItem(ONLINE_ONLY_PROP_KEY,
-															ONLINE_ONLY_DISPL_NAME,
-															ONLINE_ONLY_PROP_VAL));
+				new PropertyItem(ONLINE_ONLY_PROP_KEY, ONLINE_ONLY_DISPL_NAME, ONLINE_ONLY_PROP_VAL));
 		defs.put(REPLACE_SENDER_PROP_KEY,
-						 new PropertyItem(REPLACE_SENDER_PROP_KEY,
-															REPLACE_SENDER_DISPL_NAME,
-															REPLACE_SENDER_PROP_VAL));
+				new PropertyItem(REPLACE_SENDER_PROP_KEY, REPLACE_SENDER_DISPL_NAME,
+					REPLACE_SENDER_PROP_VAL));
 		defs.put(ALLOWED_SENDERS_LIST_PROP_KEY,
-						 new PropertyItem(ALLOWED_SENDERS_LIST_PROP_KEY,
-															ALLOWED_SENDERS_LIST_DISPL_NAME,
-															ALLOWED_SENDERS_LIST_PROP_VAL));
+				new PropertyItem(ALLOWED_SENDERS_LIST_PROP_KEY, ALLOWED_SENDERS_LIST_DISPL_NAME,
+					ALLOWED_SENDERS_LIST_PROP_VAL));
 		defs.put(DESCRIPTION_PROP_KEY,
-						 new PropertyItem(DESCRIPTION_PROP_KEY,
-															DESCRIPTION_DISPL_NAME,
-															DESCRIPTION_PROP_VAL));
+				new PropertyItem(DESCRIPTION_PROP_KEY, DESCRIPTION_DISPL_NAME, DESCRIPTION_PROP_VAL));
 		defs.put(TASK_ADMINS_PROP_KEY,
-						 new PropertyItem(TASK_ADMINS_PROP_KEY,
-															TASK_ADMINS_DISPL_NAME,
-															TASK_ADMINS_PROP_VAL));
+				new PropertyItem(TASK_ADMINS_PROP_KEY, TASK_ADMINS_DISPL_NAME, TASK_ADMINS_PROP_VAL));
 		defs.put(TASK_OWNER_PROP_KEY,
-						 new PropertyItem(TASK_OWNER_PROP_KEY,
-															TASK_OWNER_DISPL_NAME,
-															TASK_OWNER_PROP_VAL));
+				new PropertyItem(TASK_OWNER_PROP_KEY, TASK_OWNER_DISPL_NAME, TASK_OWNER_PROP_VAL));
 
 		return defs;
 	}
@@ -316,21 +302,12 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 	public List<StatRecord> getStats() {
 		List<StatRecord> stats = new LinkedList<StatRecord>();
 
-		stats.add(new StatRecord(getJID().toString(),
-														 "Roster size",
-														 "int",
-														 roster.size(),
-														 Level.INFO));
-		stats.add(new StatRecord(getJID().toString(),
-														 "Packets received",
-														 "long",
-														 packets_received,
-														 Level.INFO));
-		stats.add(new StatRecord(getJID().toString(),
-														 "Packets sent",
-														 "long",
-														 packets_sent,
-														 Level.INFO));
+		stats.add(new StatRecord(getJID().toString(), "Roster size", "int", roster.size(),
+				Level.INFO));
+		stats.add(new StatRecord(getJID().toString(), "Packets received", "long",
+				packets_received, Level.INFO));
+		stats.add(new StatRecord(getJID().toString(), "Packets sent", "long", packets_sent,
+				Level.INFO));
 
 		int moderation_needed = 0;
 
@@ -338,11 +315,8 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 			moderation_needed += (ri.isModerationAccepted() ? 0 : 1);
 		}    // end of for (RosterItem ri: roster)
 
-		stats.add(new StatRecord(getJID().toString(),
-														 "Awaiting moderation",
-														 "int",
-														 moderation_needed,
-														 Level.INFO));
+		stats.add(new StatRecord(getJID().toString(), "Awaiting moderation", "int",
+				moderation_needed, Level.INFO));
 
 		return stats;
 	}
@@ -364,7 +338,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 				presence = getPresence(jid, ri.getJid(), StanzaType.available, null, getDescription());
 			} else {
 				presence = getPresence(jid, ri.getJid(), StanzaType.subscribe, jid.getLocalpart(),
-															 null);
+						null);
 			}    // end of if (ri.isSubscribed()) else
 
 			results.offer(presence);
@@ -487,7 +461,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 			} else {
 				try {
 					results.offer(Authorization.NOT_ALLOWED.getResponseMessage(packet,
-									"You are not allowed to post a message.", true));
+							"You are not allowed to post a message.", true));
 				} catch (PacketErrorTypeException e) {
 					log.warning("Packet processing exception: " + e);
 				}
@@ -560,15 +534,14 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 		if (map.get(DESCRIPTION_PROP_KEY) != null) {
 			description = (String) map.get(DESCRIPTION_PROP_KEY);
 			props.put(DESCRIPTION_PROP_KEY,
-								new PropertyItem(DESCRIPTION_PROP_KEY, DESCRIPTION_DISPL_NAME, description));
+					new PropertyItem(DESCRIPTION_PROP_KEY, DESCRIPTION_DISPL_NAME, description));
 		}    // end of if (map.get(DESCRIPTION_PROP_KEY) != null)
 
 		if (map.get(SUBSCR_RESTR_REGEX_PROP_KEY) != null) {
 			subscr_restr_regex = Pattern.compile((String) map.get(SUBSCR_RESTR_REGEX_PROP_KEY));
 			props.put(SUBSCR_RESTR_REGEX_PROP_KEY,
-								new PropertyItem(SUBSCR_RESTR_REGEX_PROP_KEY,
-																 SUBSCR_RESTR_REGEX_DISPL_NAME,
-																 subscr_restr_regex));
+					new PropertyItem(SUBSCR_RESTR_REGEX_PROP_KEY, SUBSCR_RESTR_REGEX_DISPL_NAME,
+						subscr_restr_regex));
 		}    // end of if (map.get(SUBSCR_RESTR_REGEX_PROP_KEY) != null)
 
 		String tmp = (String) map.get(SUBSCR_RESTRICTIONS_PROP_KEY);
@@ -576,9 +549,8 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 		if (tmp != null) {
 			subsc_restr = SubscrRestrictions.valueOf(tmp);
 			props.put(SUBSCR_RESTRICTIONS_PROP_KEY,
-								new PropertyItem(SUBSCR_RESTRICTIONS_PROP_KEY,
-																 SUBSCR_RESTRICTIONS_DISPL_NAME,
-																 subsc_restr));
+					new PropertyItem(SUBSCR_RESTRICTIONS_PROP_KEY, SUBSCR_RESTRICTIONS_DISPL_NAME,
+						subsc_restr));
 		}    // end of if (tmp != null)
 
 		tmp = (String) map.get(ALLOWED_SENDERS_PROP_KEY);
@@ -586,9 +558,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 		if (tmp != null) {
 			send_restr = SenderRestrictions.valueOf(tmp);
 			props.put(ALLOWED_SENDERS_PROP_KEY,
-								new PropertyItem(ALLOWED_SENDERS_PROP_KEY,
-																 ALLOWED_SENDERS_DISPL_NAME,
-																 send_restr));
+					new PropertyItem(ALLOWED_SENDERS_PROP_KEY, ALLOWED_SENDERS_DISPL_NAME, send_restr));
 		}    // end of if (tmp != null)
 
 		tmp = (String) map.get(MESSAGE_TYPE_PROP_KEY);
@@ -596,17 +566,13 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 		if (tmp != null) {
 			message_type = MessageType.valueOf(tmp);
 			props.put(MESSAGE_TYPE_PROP_KEY,
-								new PropertyItem(MESSAGE_TYPE_PROP_KEY,
-																 MESSAGE_TYPE_DISPL_NAME,
-																 message_type));
+					new PropertyItem(MESSAGE_TYPE_PROP_KEY, MESSAGE_TYPE_DISPL_NAME, message_type));
 		}    // end of if (tmp != null)
 
 		if (map.get(ONLINE_ONLY_PROP_KEY) != null) {
 			send_to_online_only = parseBool(map.get(ONLINE_ONLY_PROP_KEY));
 			props.put(ONLINE_ONLY_PROP_KEY,
-								new PropertyItem(ONLINE_ONLY_PROP_KEY,
-																 ONLINE_ONLY_DISPL_NAME,
-																 send_to_online_only));
+					new PropertyItem(ONLINE_ONLY_PROP_KEY, ONLINE_ONLY_DISPL_NAME, send_to_online_only));
 		}    // end of if (map.get(ONLINE_ONLY_PROP_KEY) != null)
 
 		tmp = (String) map.get(REPLACE_SENDER_PROP_KEY);
@@ -614,9 +580,8 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 		if (tmp != null) {
 			replace_sender_address = SenderAddress.valueOf(tmp);
 			props.put(REPLACE_SENDER_PROP_KEY,
-								new PropertyItem(REPLACE_SENDER_PROP_KEY,
-																 REPLACE_SENDER_DISPL_NAME,
-																 replace_sender_address));
+					new PropertyItem(REPLACE_SENDER_PROP_KEY, REPLACE_SENDER_DISPL_NAME,
+						replace_sender_address));
 		}    // end of if (map.get(REPLACE_SENDER_PROP_KEY) != null)
 
 		tmp = (String) map.get(TASK_OWNER_PROP_KEY);
@@ -638,12 +603,12 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 			setRosterItemAdmin(ri, true);
 			setRosterItemModerationAccepted(ri, true);
 			props.put(TASK_OWNER_PROP_KEY,
-								new PropertyItem(TASK_OWNER_PROP_KEY, TASK_OWNER_DISPL_NAME, owner));
+					new PropertyItem(TASK_OWNER_PROP_KEY, TASK_OWNER_DISPL_NAME, owner));
 		}
 
 		if (props.get(TASK_OWNER_PROP_KEY) == null) {
 			props.put(TASK_OWNER_PROP_KEY,
-								new PropertyItem(TASK_OWNER_PROP_KEY, TASK_OWNER_DISPL_NAME, ""));
+					new PropertyItem(TASK_OWNER_PROP_KEY, TASK_OWNER_DISPL_NAME, ""));
 		}
 
 		tmp = (String) map.get(TASK_ADMINS_PROP_KEY);
@@ -675,12 +640,12 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 			}        // end of for (String tmp_b: tmp_arr)
 
 			props.put(TASK_ADMINS_PROP_KEY,
-								new PropertyItem(TASK_ADMINS_PROP_KEY, TASK_ADMINS_DISPL_NAME, tmp));
+					new PropertyItem(TASK_ADMINS_PROP_KEY, TASK_ADMINS_DISPL_NAME, tmp));
 		}
 
 		if (props.get(TASK_ADMINS_PROP_KEY) == null) {
 			props.put(TASK_ADMINS_PROP_KEY,
-								new PropertyItem(TASK_ADMINS_PROP_KEY, TASK_ADMINS_DISPL_NAME, ""));
+					new PropertyItem(TASK_ADMINS_PROP_KEY, TASK_ADMINS_DISPL_NAME, ""));
 		}
 	}
 
@@ -738,7 +703,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 	 */
 	public void setRosterItemSubscribed(RosterItem ri, boolean subscribed) {
 		log.fine(getJID() + ": " + "Updating subscription for " + ri.getJid() + " to "
-						 + subscribed);
+				+ subscribed);
 		ri.setSubscribed(subscribed);
 	}
 
@@ -765,7 +730,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 		for (RosterItem ri : roster.values()) {
 			if (ri.isSubscribed() && ri.isModerationAccepted()
 					&& ( !send_to_online_only || ri.isOnline())
-					&& ( !packet.getStanzaFrom().copyWithoutResource().equals(ri.getJid()))) {
+						&& ( !packet.getStanzaFrom().copyWithoutResource().equals(ri.getJid()))) {
 				Element message = packet.getElement().clone();
 				Element body = message.getChild("body");
 
@@ -804,7 +769,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 						String cdata = body.getCData();
 
 						body.setCData(old_from + " sends for installation at " + srecv.getDefHostName()
-													+ ":\n\n" + cdata);
+								+ ":\n\n" + cdata);
 
 						break;
 					}
@@ -834,7 +799,7 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 				if (ri != null) {
 					setRosterItemOnline(ri, true);
 					results.offer(getPresence(jid, packet.getStanzaFrom(), StanzaType.available, null,
-																		getDescription()));
+							getDescription()));
 				}    // end of if (ri != null)
 
 				break;
@@ -856,14 +821,14 @@ public abstract class AbstractReceiverTask implements ReceiverTaskIfc {
 				if (ri != null) {
 					setRosterItemSubscribed(ri, true);
 					results.offer(getPresence(jid, packet.getStanzaFrom(), StanzaType.available, null,
-																		getDescription()));
+							getDescription()));
 
 					if ( !ri.isModerationAccepted()) {
 						results.offer(getMessage(jid, packet.getStanzaFrom(), StanzaType.headline,
-																		 "You are now subscribed to " + getJID() + ".\n\n"
-																		 + "Your subscription, however awaits moderation.\n\n"
-																		 + "Once your subscription is approved next message\n"
-																		 + "will be sent confirming your membership."));
+								"You are now subscribed to " + getJID() + ".\n\n"
+									+ "Your subscription, however awaits moderation.\n\n"
+										+ "Once your subscription is approved next message\n"
+											+ "will be sent confirming your membership."));
 					}
 				}    // end of if (ri != null)
 

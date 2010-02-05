@@ -122,7 +122,7 @@ public abstract class RepoRosterTask extends AbstractReceiverTask {
 					log.fine(getJID() + ": " + " loadin from repository: " + rjid);
 					addToRoster(loadFromRepository(rjid));
 				}    // end of for (String jid: roster)
-								catch (TigaseStringprepException ex) {
+						catch (TigaseStringprepException ex) {
 					Logger.getLogger(RepoRosterTask.class.getName()).log(Level.SEVERE, null, ex);
 				}
 			}      // end of for (String jid: roster)
@@ -165,15 +165,15 @@ public abstract class RepoRosterTask extends AbstractReceiverTask {
 			try {
 				try {
 					repository.addUser(getJID().toString());
-				} catch (UserExistsException e) { /* Ignore, this is correct and expected */
+				} catch (UserExistsException e) {    /* Ignore, this is correct and expected */
 				}
 
 				loaded = true;
 				loadRoster();
 			} catch (TigaseDBException e) {
 				log.log(Level.SEVERE, "Problem loading roster from repository", e);
-			}    // end of try-catch
-		}      // end of if (repository != null && !loaded)
+			}                                      // end of try-catch
+		}                                        // end of if (repository != null && !loaded)
 
 		super.setParams(map);
 	}
@@ -226,7 +226,7 @@ public abstract class RepoRosterTask extends AbstractReceiverTask {
 	public void setRosterItemSubscribed(RosterItem ri, boolean subscribed) {
 		super.setRosterItemSubscribed(ri, subscribed);
 		log.fine(getJID() + ": " + "Updating subscription for " + ri.getJid() + " to "
-						 + subscribed);
+				+ subscribed);
 		saveToRepository(ri);
 	}
 
@@ -277,23 +277,16 @@ public abstract class RepoRosterTask extends AbstractReceiverTask {
 
 			log.info(getJID() + ": " + ri.getJid() + ": subscribed = " + tmp);
 			repository.setData(getJID().toString(), repo_node, subscribed_key, tmp);
-			repository.setData(getJID().toString(),
-												 repo_node,
-												 owner_key,
-												 Boolean.valueOf(ri.isOwner()).toString());
-			repository.setData(getJID().toString(),
-												 repo_node,
-												 admin_key,
-												 Boolean.valueOf(ri.isAdmin()).toString());
-			repository.setData(getJID().toString(),
-												 repo_node,
-												 moderation_accepted_key,
-												 Boolean.valueOf(ri.isModerationAccepted()).toString());
+			repository.setData(getJID().toString(), repo_node, owner_key,
+					Boolean.valueOf(ri.isOwner()).toString());
+			repository.setData(getJID().toString(), repo_node, admin_key,
+					Boolean.valueOf(ri.isAdmin()).toString());
+			repository.setData(getJID().toString(), repo_node, moderation_accepted_key,
+					Boolean.valueOf(ri.isModerationAccepted()).toString());
 		} catch (TigaseDBException e) {
 			log.log(Level.SEVERE,
-							"Problem saving roster data for: " + "JID = " + getJID() + ", node = "
-							+ repo_node + ", RosterItem = " + ri.getJid(),
-							e);
+					"Problem saving roster data for: " + "JID = " + getJID() + ", node = " + repo_node
+						+ ", RosterItem = " + ri.getJid(), e);
 		}    // end of try-catch
 	}
 }    // RepoRosterTask
