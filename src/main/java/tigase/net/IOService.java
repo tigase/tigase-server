@@ -22,32 +22,45 @@
 
 package tigase.net;
 
+//~--- non-JDK imports --------------------------------------------------------
+
+import tigase.io.BufferUnderflowException;
+import tigase.io.IOInterface;
+import tigase.io.SocketIO;
+import tigase.io.TLSIO;
+import tigase.io.TLSUtil;
+import tigase.io.TLSWrapper;
+import tigase.io.ZLibIO;
+
+import tigase.stats.StatisticsList;
+
+import tigase.util.TimeUtils;
+
+import tigase.xmpp.JID;
+
+//~--- JDK imports ------------------------------------------------------------
+
 import java.io.IOException;
+
 import java.net.Socket;
+
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CharsetEncoder;
+
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Logger;
 import java.util.logging.Level;
-import tigase.io.IOInterface;
-import tigase.io.SocketIO;
-import tigase.io.TLSIO;
-import tigase.io.TLSUtil;
-import tigase.io.TLSWrapper;
-import tigase.io.BufferUnderflowException;
-import tigase.io.ZLibIO;
-import tigase.stats.StatisticsList;
-import tigase.util.TimeUtils;
-import tigase.xmpp.JID;
+import java.util.logging.Logger;
+
+//~--- classes ----------------------------------------------------------------
 
 /**
  * <code>IOService</code> offers thread thread safe
@@ -74,273 +87,128 @@ import tigase.xmpp.JID;
  */
 public abstract class IOService<RefObject> implements Callable<IOService> {
 
-  /**
-   * Variable <code>log</code> is a class logger.
-   */
-  private static final Logger log = Logger.getLogger("tigase.net.IOService");
-
-  /**
-   * This is key used to store session ID in temporary session data storage.
-   * As it is used by many components it is required that all components access
-   * session ID with this constant.
-   */
-  public static final String SESSION_ID_KEY = "sessionID";
-	public static final String PORT_TYPE_PROP_KEY = "type";
-	public static final String HOSTNAME_KEY = "hostname-key";
-
-  private IOInterface socketIO = null;
-	private String sslId = null;
-	private String id = null;
-	private ConnectionType connectionType = null;
-	private String local_address = null;
-	private String remote_address = null;
-  /**
-	 * This variable keeps the time of last transfer in any direction
-	 * it is used to help detect dead connections.
-   */
-	private long lastTransferTime = 0;
-	private boolean stopping = false;
-
-	private long[] rdData = new long[60];
-	private long[] wrData = new long[60];
-	private int lastMinuteRd = 0;
-	private int lastMinuteWr = 0;
-	private RefObject refObject = null;
-
-	private IOServiceListener<IOService<RefObject>> serviceListener = null;
-
-	private ConcurrentMap<String, Object> sessionData =
-		new ConcurrentHashMap<String, Object>(4, 0.75f, 4);
+	/**
+	 * Variable <code>log</code> is a class logger.
+	 */
+	private static final Logger log = Logger.getLogger("tigase.net.IOService");
 
 	/**
-   * <code>socketInput</code> buffer keeps data read from socket.
-   */
-  private ByteBuffer socketInput = null;
+	 * This is key used to store session ID in temporary session data storage.
+	 * As it is used by many components it is required that all components access
+	 * session ID with this constant.
+	 */
+	public static final String SESSION_ID_KEY = "sessionID";
 
-  private CharsetEncoder encoder = Charset.forName("UTF-8").newEncoder();
-  private CharsetDecoder decoder = Charset.forName("UTF-8").newDecoder();
+	/** Field description */
+	public static final String PORT_TYPE_PROP_KEY = "type";
 
+	/** Field description */
+	public static final String HOSTNAME_KEY = "hostname-key";
+	private static final long MAX_ALLOWED_EMPTY_CALLS = 1000;
+
+	//~--- fields ---------------------------------------------------------------
+
+	private ConnectionType connectionType = null;
 	private JID dataReceiver = null;
 
-	public void setRefObject(RefObject refObject) {
-		this.refObject = refObject;
-	}
-	
-	public RefObject getRefObject() {
-		return refObject;
-	}
-
-	private void addRead(long read) {
-		int minute = TimeUtils.getMinuteNow();
-		if (lastMinuteRd != minute) {
-			lastMinuteRd = minute;
-			rdData[minute] = 0;
-		}
-		rdData[minute] += read;
-	}
-
-	public long[] getReadCounters() {
-		return rdData;
-	}
-
-	private void addWritten(long wrote) {
-		int minute = TimeUtils.getMinuteNow();
-		if (lastMinuteWr != minute) {
-			lastMinuteWr = minute;
-			wrData[minute] = 0;
-		}
-		wrData[minute] += wrote;
-	}
-
-	public long[] getWriteCounters() {
-		return wrData;
-	}
-
-	public void setDataReceiver(JID address) {
-		this.dataReceiver = address;
-	}
-
-	public JID getDataReceiver() {
-		return this.dataReceiver;
-	}
-
-  public void setSSLId(final String id) {
-    sslId = id;
-  }
-
-  /**
-	 * This method returns the time of last transfer in any direction
-	 * through this service. It is used to help detect dead connections.
-	 * @return
-	 */
-	public long getLastTransferTime() {
-		return lastTransferTime;
-	}
-
-	private void setLastTransferTime() {
-		lastTransferTime = System.currentTimeMillis();
-	}
-
-  public void startSSL(final boolean clientMode)
-    throws IOException {
-
-		TLSWrapper wrapper = new TLSWrapper(TLSUtil.getSSLContext(sslId, "SSL",
-				(String)sessionData.get(HOSTNAME_KEY)), null, clientMode);
-		socketIO = new TLSIO(socketIO, wrapper);
-		setLastTransferTime();
-		encoder.reset();
-		decoder.reset();
-  }
-
-  public void startTLS(final boolean clientMode)
-    throws IOException {
-
-		TLSWrapper wrapper = new TLSWrapper(TLSUtil.getSSLContext(sslId, "TLS",
-				(String)sessionData.get(HOSTNAME_KEY)), null, clientMode);
-		socketIO = new TLSIO(socketIO, wrapper);
-		setLastTransferTime();
-		encoder.reset();
-		decoder.reset();
-  }
-
-	public void startZLib(int level) {
-		socketIO = new ZLibIO(socketIO, level);
-	}
-
-	public void setIOServiceListener(IOServiceListener<IOService<RefObject>> sl) {
-		this.serviceListener = sl;
-	}
-
-	public String getUniqueId() {
-		return id;
-	}
-
-	public ConnectionType connectionType() {
-		return this.connectionType;
-	}
-
-	public ConcurrentMap<String, Object> getSessionData() {
-		return sessionData;
-	}
-
-	public void setSessionData(Map<String, Object> props) {
-		sessionData = new ConcurrentHashMap<String, Object>(props);
-		connectionType =
-			ConnectionType.valueOf(sessionData.get(PORT_TYPE_PROP_KEY).toString());
-	}
-
-  /**
-   * Describe <code>isConnected</code> method here.
-   *
-   * @return a <code>boolean</code> value
-   */
-  public boolean isConnected() {
-		if (log.isLoggable(Level.FINEST)) {
-			log.finest("socketIO = " + socketIO);
-		}
-		return socketIO == null ? false : socketIO.isConnected();
-	}
-
-	public String getRemoteAddress() {
-		return remote_address;
-	}
-
-	public String getLocalAddress() {
-		return local_address;
-	}
+	/** Field description */
+	public long empty_read_call_count = 0;
+	private String id = null;
+	private int lastMinuteRd = 0;
+	private int lastMinuteWr = 0;
 
 	/**
-   * Method <code>accept</code> is used to perform
-   *
-   * @param socketChannel a <code>SocketChannel</code> value
-   */
-  public void accept(final SocketChannel socketChannel)
-    throws IOException {
-    try {
-			if (socketChannel.isConnectionPending()) {
-				socketChannel.finishConnect();
-			} // end of if (socketChannel.isConnecyionPending())
-			socketIO = new SocketIO(socketChannel);
-		} catch (IOException e) {
-			String host = (String)sessionData.get("remote-hostname");
-			if (host == null) {
-				host = (String)sessionData.get("remote-host");
-			}
-			log.info("Problem connecting to remote host: " + host +
-							", address: " + remote_address + " - exception: " + e);
-			throw e;
-		}
-    socketInput = ByteBuffer.allocate(socketIO.getInputPacketSize());
-		Socket sock = socketIO.getSocketChannel().socket();
-		local_address = sock.getLocalAddress().getHostAddress();
-		remote_address = sock.getInetAddress().getHostAddress();
-		id = local_address + "_" + sock.getLocalPort()
-			+ "_" + remote_address + "_" + sock.getPort();
-		setLastTransferTime();
-  }
+	 * This variable keeps the time of last transfer in any direction
+	 * it is used to help detect dead connections.
+	 */
+	private long lastTransferTime = 0;
+	private String local_address = null;
+	private long[] rdData = new long[60];
+	private RefObject refObject = null;
+	private String remote_address = null;
+	private IOServiceListener<IOService<RefObject>> serviceListener = null;
+	private IOInterface socketIO = null;
 
-  /**
-   * Method <code>getSocketChannel</code> is used to perform
-   *
-   * @return a <code>SocketChannel</code> value
-   */
-  public SocketChannel getSocketChannel() {
-    return socketIO.getSocketChannel();
-  }
-
-  /**
-   * Describe <code>stop</code> method here.
-   *
-   * @exception IOException if an error occurs
-   */
-  public void stop() {
-		if (socketIO != null && socketIO.waitingToSend()) {
-			stopping = true;
-		} else {
-			forceStop();
-		}
-  }
-
-	public void forceStop() {
-		if (log.isLoggable(Level.FINER)) {
-			log.finer("Force stop called...");
-		}
-		try {
-			if (socketIO != null) {
-				synchronized (socketIO) {
-					socketIO.stop();
-				}
-			}
-		} catch (Exception e) {
-			// Well, do nothing, we are closing the connection anyway....
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Exception while stopping service: " +
-								getUniqueId(), e);
-			}
-		} finally {
-			if (serviceListener != null) {
-				IOServiceListener<IOService<RefObject>> tmp = serviceListener;
-				serviceListener = null;
-				tmp.serviceStopped(this);
-			}
-		}
-	}
-
+	/**
+	 * <code>socketInput</code> buffer keeps data read from socket.
+	 */
+	private ByteBuffer socketInput = null;
+	private String sslId = null;
+	private boolean stopping = false;
+	private long[] wrData = new long[60];
+	private ConcurrentMap<String, Object> sessionData = new ConcurrentHashMap<String, Object>(4,
+																												0.75f, 4);
+	private CharsetEncoder encoder = Charset.forName("UTF-8").newEncoder();
+	private CharsetDecoder decoder = Charset.forName("UTF-8").newDecoder();
 	private final AtomicInteger writeInProgress = new AtomicInteger(0);
 	private final AtomicBoolean readInProgress = new AtomicBoolean(false);
 
-  /**
-   * Method <code>run</code> is used to perform
-   *
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @throws IOException
+	 */
+	public abstract void processWaitingPackets() throws IOException;
+
+	protected abstract void processSocketData() throws IOException;
+
+	protected abstract int receivedPackets();
+
+	/**
+	 * Method <code>accept</code> is used to perform
+	 *
+	 * @param socketChannel a <code>SocketChannel</code> value
+	 *
+	 * @throws IOException
+	 */
+	public void accept(final SocketChannel socketChannel) throws IOException {
+		try {
+			if (socketChannel.isConnectionPending()) {
+				socketChannel.finishConnect();
+			}    // end of if (socketChannel.isConnecyionPending())
+
+			socketIO = new SocketIO(socketChannel);
+		} catch (IOException e) {
+			String host = (String) sessionData.get("remote-hostname");
+
+			if (host == null) {
+				host = (String) sessionData.get("remote-host");
+			}
+
+			log.info("Problem connecting to remote host: " + host + ", address: " + remote_address
+					+ " - exception: " + e);
+
+			throw e;
+		}
+
+		socketInput = ByteBuffer.allocate(socketIO.getInputPacketSize());
+
+		Socket sock = socketIO.getSocketChannel().socket();
+
+		local_address = sock.getLocalAddress().getHostAddress();
+		remote_address = sock.getInetAddress().getHostAddress();
+		id = local_address + "_" + sock.getLocalPort() + "_" + remote_address + "_"
+				+ sock.getPort();
+		setLastTransferTime();
+	}
+
+	/**
+	 * Method <code>run</code> is used to perform
+	 *
+	 *
+	 * @return
 	 * @throws IOException
 	 */
 	@Override
-  public IOService call() throws IOException {
+	public IOService call() throws IOException {
+
 		// It is not safe to call below function here....
 		// It might be already executing in different thread...
 		// and we don't want to put any locking or synchronization
-		//		processWaitingPackets();
-
+		// processWaitingPackets();
 		// Non-blocking 'kind of' synchronization.
 		// This method is executed for both reading and writing from/to
 		// network socket. It tries to do everything in one go, however
@@ -353,172 +221,486 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 				writeInProgress.decrementAndGet();
 			}
 		}
+
 		if (stopping) {
 			stop();
 		} else {
 			if (readInProgress.compareAndSet(false, true)) {
 				try {
 					processSocketData();
-					if (receivedPackets() > 0 && serviceListener != null) {
+
+					if ((receivedPackets() > 0) && (serviceListener != null)) {
 						serviceListener.packetsReady(this);
-					} // end of if (receivedPackets.size() > 0)
+					}    // end of if (receivedPackets.size() > 0)
 				} finally {
 					readInProgress.set(false);
 				}
 			}
 		}
-    return this;
-  }
 
-	public abstract void processWaitingPackets() throws IOException;
+		return this;
+	}
 
-	protected abstract void processSocketData() throws IOException;
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public ConnectionType connectionType() {
+		return this.connectionType;
+	}
 
-	protected abstract int receivedPackets();
-
-	private void resizeInputBuffer() throws IOException {
-		int netSize = socketIO.getInputPacketSize();
-		// Resize buffer if needed.
-//		if (netSize > socketInput.remaining()) {
-		if (netSize > socketInput.capacity() - socketInput.remaining()) {
-			if (log.isLoggable(Level.FINE)) {
-				log.fine("Resizing buffer to "
-					+ (netSize + socketInput.capacity())
-					+ " bytes.");
-			}
-			ByteBuffer b = ByteBuffer.allocate(netSize+socketInput.capacity());
-			b.put(socketInput);
-			socketInput = b;
-		} else {
-//			if (log.isLoggable(Level.FINEST)) {
-//				log.finer("     Before flip()");
-//				log.finer("input.capacity()=" + socketInput.capacity());
-//				log.finer("input.remaining()=" + socketInput.remaining());
-//				log.finer("input.limit()=" + socketInput.limit());
-//				log.finer("input.position()=" + socketInput.position());
-//			}
-//			socketInput.flip();
-//			if (log.isLoggable(Level.FINEST)) {
-//				log.finer("     Before compact()");
-//				log.finer("input.capacity()=" + socketInput.capacity());
-//				log.finer("input.remaining()=" + socketInput.remaining());
-//				log.finer("input.limit()=" + socketInput.limit());
-//				log.finer("input.position()=" + socketInput.position());
-//			}
-			socketInput.compact();
-//			if (log.isLoggable(Level.FINEST)) {
-//				log.finer("     After compact()");
-//				log.finer("input.capacity()=" + socketInput.capacity());
-//				log.finer("input.remaining()=" + socketInput.remaining());
-//				log.finer("input.limit()=" + socketInput.limit());
-//				log.finer("input.position()=" + socketInput.position());
-//			}
+	/**
+	 * Method description
+	 *
+	 */
+	public void forceStop() {
+		if (log.isLoggable(Level.FINER)) {
+			log.finer("Force stop called...");
 		}
+
+		try {
+			if (socketIO != null) {
+				synchronized (socketIO) {
+					socketIO.stop();
+				}
+			}
+		} catch (Exception e) {
+
+			// Well, do nothing, we are closing the connection anyway....
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Exception while stopping service: " + getUniqueId(), e);
+			}
+		} finally {
+			if (serviceListener != null) {
+				IOServiceListener<IOService<RefObject>> tmp = serviceListener;
+
+				serviceListener = null;
+				tmp.serviceStopped(this);
+			}
+		}
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public JID getDataReceiver() {
+		return this.dataReceiver;
+	}
+
+	/**
+	 * This method returns the time of last transfer in any direction
+	 * through this service. It is used to help detect dead connections.
+	 * @return
+	 */
+	public long getLastTransferTime() {
+		return lastTransferTime;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public String getLocalAddress() {
+		return local_address;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public long[] getReadCounters() {
+		return rdData;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public RefObject getRefObject() {
+		return refObject;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public String getRemoteAddress() {
+		return remote_address;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public ConcurrentMap<String, Object> getSessionData() {
+		return sessionData;
+	}
+
+	/**
+	 * Method <code>getSocketChannel</code> is used to perform
+	 *
+	 * @return a <code>SocketChannel</code> value
+	 */
+	public SocketChannel getSocketChannel() {
+		return socketIO.getSocketChannel();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param list
+	 */
+	public void getStatistics(StatisticsList list) {
+		if (socketIO != null) {
+			socketIO.getStatistics(list);
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public String getUniqueId() {
+		return id;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public long[] getWriteCounters() {
+		return wrData;
+	}
+
+	/**
+	 * Describe <code>isConnected</code> method here.
+	 *
+	 * @return a <code>boolean</code> value
+	 */
+	public boolean isConnected() {
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("socketIO = " + socketIO);
+		}
+
+		return (socketIO == null) ? false : socketIO.isConnected();
+	}
+
+	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param address
+	 */
+	public void setDataReceiver(JID address) {
+		this.dataReceiver = address;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param sl
+	 */
+	public void setIOServiceListener(IOServiceListener<IOService<RefObject>> sl) {
+		this.serviceListener = sl;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param refObject
+	 */
+	public void setRefObject(RefObject refObject) {
+		this.refObject = refObject;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param id
+	 */
+	public void setSSLId(final String id) {
+		sslId = id;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param props
+	 */
+	public void setSessionData(Map<String, Object> props) {
+		sessionData = new ConcurrentHashMap<String, Object>(props);
+		connectionType = ConnectionType.valueOf(sessionData.get(PORT_TYPE_PROP_KEY).toString());
+	}
+
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param clientMode
+	 *
+	 * @throws IOException
+	 */
+	public void startSSL(final boolean clientMode) throws IOException {
+		TLSWrapper wrapper = new TLSWrapper(TLSUtil.getSSLContext(sslId, "SSL",
+													 (String) sessionData.get(HOSTNAME_KEY)), null, clientMode);
+
+		socketIO = new TLSIO(socketIO, wrapper);
+		setLastTransferTime();
+		encoder.reset();
+		decoder.reset();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param clientMode
+	 *
+	 * @throws IOException
+	 */
+	public void startTLS(final boolean clientMode) throws IOException {
+		TLSWrapper wrapper = new TLSWrapper(TLSUtil.getSSLContext(sslId, "TLS",
+													 (String) sessionData.get(HOSTNAME_KEY)), null, clientMode);
+
+		socketIO = new TLSIO(socketIO, wrapper);
+		setLastTransferTime();
+		encoder.reset();
+		decoder.reset();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param level
+	 */
+	public void startZLib(int level) {
+		socketIO = new ZLibIO(socketIO, level);
+	}
+
+	/**
+	 * Describe <code>stop</code> method here.
+	 *
+	 */
+	public void stop() {
+		if ((socketIO != null) && socketIO.waitingToSend()) {
+			stopping = true;
+		} else {
+			forceStop();
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public boolean waitingToSend() {
+		return socketIO.waitingToSend();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public int waitingToSendSize() {
+		return socketIO.waitingToSendSize();
+	}
+
+	/**
+	 * Describe <code>debug</code> method here.
+	 *
+	 * @param msg a <code>char[]</code> value
+	 * @return a <code>boolean</code> value
+	 */
+	protected boolean debug(final char[] msg) {
+		if (msg != null) {
+			System.out.print(new String(msg));
+
+			// log.finest("\n" + new String(msg) + "\n");
+		}    // end of if (msg != null)
+
+		return true;
+	}
+
+	/**
+	 * Describe <code>debug</code> method here.
+	 *
+	 * @param msg a <code>String</code> value
+	 * @return a <code>boolean</code> value
+	 */
+	protected boolean debug(final String msg, final String prefix) {
+		if (log.isLoggable(Level.FINEST)) {
+			if ((msg != null) && (msg.trim().length() > 0)) {
+				String log_msg = "\n"
+												 + ((connectionType() != null)
+													 ? connectionType().toString() : "null-type") + " " + prefix + "\n"
+														 + msg + "\n";
+
+				// System.out.print(log_msg);
+				log.finest(log_msg);
+			}
+		}
+
+		return true;
 	}
 
 	protected void readCompleted() {
 		decoder.reset();
 	}
 
-	public long empty_read_call_count = 0;
-	private static final long MAX_ALLOWED_EMPTY_CALLS = 1000;
-
 	/**
-   * Describe <code>readData</code> method here.
-   *
-   * @return a <code>char[]</code> value
-   * @exception IOException if an error occurs
-   */
-  protected char[] readData() throws IOException {
+	 * Describe <code>readData</code> method here.
+	 *
+	 * @return a <code>char[]</code> value
+	 * @exception IOException if an error occurs
+	 */
+	protected char[] readData() throws IOException {
 		setLastTransferTime();
-    CharBuffer cb = null;
-		// Generally it should not happen as it is called only in 
+
+		CharBuffer cb = null;
+
+		// Generally it should not happen as it is called only in
 		// call() which has concurrent call protection.
-//		synchronized (socketIO) {
-			try {
-				//			resizeInputBuffer();
-				ByteBuffer tmpBuffer = socketIO.read(socketInput);
-				if (socketIO.bytesRead() > 0) {
-					empty_read_call_count = 0;
-					// There might be some characters read from the network
-					// but the buffer may still be null or empty because there might
-					// be not enough data to decode TLS or compressed buffer.
-					if (tmpBuffer != null) {
-						//tmpBuffer.flip();
-						cb = decoder.decode(tmpBuffer);
-						tmpBuffer.clear();
-						//addRead(cb.array().length);
-					}
-				} else {
-					// Detecting infinite read 0 bytes
-					// sometimes it happens that the connection has been lost
-					// and the select thinks there are some bytes waiting for reading
-					// and 0 bytes are read
-					if ((++empty_read_call_count) > MAX_ALLOWED_EMPTY_CALLS &&
-									writeInProgress.get() == 0) {
-						log.warning("Max allowed empty calls excceeded, closing connection.");
-						forceStop();
-					}
-				}
-			} catch (BufferUnderflowException ex) {
-				// Obtain more inbound network data for src,
-				// then retry the operation.
-				resizeInputBuffer();
-				return null;
-//			} catch (MalformedInputException ex) {
-//				// This happens after TLS initialization sometimes, maybe reset helps
-//				decoder.reset();
-			} catch (Exception eof) {
-				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "Exception reading data: ", eof);
-				}
-				//			eof.printStackTrace();
-				forceStop();
-			} // end of try-catch
-//		}
-    return cb != null ? cb.array() : null;
-  }
+//  synchronized (socketIO) {
+		try {
 
-	public boolean waitingToSend() {
-		return socketIO.waitingToSend();
-	}
+			// resizeInputBuffer();
+			ByteBuffer tmpBuffer = socketIO.read(socketInput);
 
-	public int waitingToSendSize() {
-		return socketIO.waitingToSendSize();
+			if (socketIO.bytesRead() > 0) {
+				empty_read_call_count = 0;
+
+				// There might be some characters read from the network
+				// but the buffer may still be null or empty because there might
+				// be not enough data to decode TLS or compressed buffer.
+				if (tmpBuffer != null) {
+
+					// tmpBuffer.flip();
+					cb = decoder.decode(tmpBuffer);
+					tmpBuffer.clear();
+
+					// addRead(cb.array().length);
+				}
+			} else {
+
+				// Detecting infinite read 0 bytes
+				// sometimes it happens that the connection has been lost
+				// and the select thinks there are some bytes waiting for reading
+				// and 0 bytes are read
+				if ((++empty_read_call_count) > MAX_ALLOWED_EMPTY_CALLS
+						&& (writeInProgress.get() == 0)) {
+					log.warning("Max allowed empty calls excceeded, closing connection.");
+					forceStop();
+				}
+			}
+		} catch (BufferUnderflowException ex) {
+
+			// Obtain more inbound network data for src,
+			// then retry the operation.
+			resizeInputBuffer();
+
+			return null;
+
+//    } catch (MalformedInputException ex) {
+//      // This happens after TLS initialization sometimes, maybe reset helps
+//      decoder.reset();
+		} catch (Exception eof) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Exception reading data: ", eof);
+			}
+
+			// eof.printStackTrace();
+			forceStop();
+		}    // end of try-catch
+
+//  }
+		return (cb != null) ? cb.array() : null;
 	}
 
 	/**
-   * Describe <code>writeData</code> method here.
-   *
-   * @param data a <code>String</code> value
-   */
-  protected void writeData(final String data) {
+	 * Describe <code>writeData</code> method here.
+	 *
+	 * @param data a <code>String</code> value
+	 */
+	protected void writeData(final String data) {
 		writeInProgress.incrementAndGet();
+
 		// Avoid concurrent calls here (one from call() and another from
 		// application)
 		synchronized (writeInProgress) {
 			try {
-				if (data != null && data.length() > 0) {
+				if ((data != null) && (data.length() > 0)) {
 					if (log.isLoggable(Level.FINEST)) {
 						if (data.length() < 256) {
-							log.finest("Writing data: " + data);
+							log.finest("Writing data (" + data.length() + "): " + data);
 						} else {
 							log.finest("Writing data: " + data.length());
 						}
 					}
+
 					ByteBuffer dataBuffer = null;
-					encoder.reset();
-					dataBuffer = encoder.encode(CharBuffer.wrap(data));
-					encoder.flush(dataBuffer);
-					socketIO.write(dataBuffer);
+					int out_buff_size = 2048;
+					int idx_start = 0;
+					int idx_offset = Math.min(idx_start + out_buff_size, data.length());
+
+					while (idx_start < data.length()) {
+
+//          String data_str = data.substring(idx_start, idx_offset);
+//          if (log.isLoggable(Level.FINEST)) {
+//          log.finest("Writing data_str (" + data_str.length() + "), idx_start="
+//              + idx_start + ", idx_offset=" + idx_offset + ": " + data_str);
+//          }
+						encoder.reset();
+						dataBuffer = encoder.encode(CharBuffer.wrap(data, idx_start, idx_offset));
+
+//          dataBuffer = encoder.encode(CharBuffer.wrap(data));
+						encoder.flush(dataBuffer);
+						socketIO.write(dataBuffer);
+						idx_start = idx_offset;
+						idx_offset = Math.min(idx_start + out_buff_size, data.length());
+					}
 
 					setLastTransferTime();
-					//addWritten(data.length());
+
+					// addWritten(data.length());
 					empty_read_call_count = 0;
 				} else {
 					if (socketIO.waitingToSend()) {
 						socketIO.write(null);
-
 						setLastTransferTime();
 						empty_read_call_count = 0;
 					}
@@ -527,46 +709,84 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 				forceStop();
 			}
 		}
-		writeInProgress.decrementAndGet();
-  }
 
-	public void getStatistics(StatisticsList list) {
-		if (socketIO != null) {
-			socketIO.getStatistics(list);
+		writeInProgress.decrementAndGet();
+	}
+
+	private void addRead(long read) {
+		int minute = TimeUtils.getMinuteNow();
+
+		if (lastMinuteRd != minute) {
+			lastMinuteRd = minute;
+			rdData[minute] = 0;
+		}
+
+		rdData[minute] += read;
+	}
+
+	private void addWritten(long wrote) {
+		int minute = TimeUtils.getMinuteNow();
+
+		if (lastMinuteWr != minute) {
+			lastMinuteWr = minute;
+			wrData[minute] = 0;
+		}
+
+		wrData[minute] += wrote;
+	}
+
+	private void resizeInputBuffer() throws IOException {
+		int netSize = socketIO.getInputPacketSize();
+
+		// Resize buffer if needed.
+//  if (netSize > socketInput.remaining()) {
+		if (netSize > socketInput.capacity() - socketInput.remaining()) {
+			if (log.isLoggable(Level.FINE)) {
+				log.fine("Resizing buffer to " + (netSize + socketInput.capacity()) + " bytes.");
+			}
+
+			ByteBuffer b = ByteBuffer.allocate(netSize + socketInput.capacity());
+
+			b.put(socketInput);
+			socketInput = b;
+		} else {
+
+//    if (log.isLoggable(Level.FINEST)) {
+//      log.finer("     Before flip()");
+//      log.finer("input.capacity()=" + socketInput.capacity());
+//      log.finer("input.remaining()=" + socketInput.remaining());
+//      log.finer("input.limit()=" + socketInput.limit());
+//      log.finer("input.position()=" + socketInput.position());
+//    }
+//    socketInput.flip();
+//    if (log.isLoggable(Level.FINEST)) {
+//      log.finer("     Before compact()");
+//      log.finer("input.capacity()=" + socketInput.capacity());
+//      log.finer("input.remaining()=" + socketInput.remaining());
+//      log.finer("input.limit()=" + socketInput.limit());
+//      log.finer("input.position()=" + socketInput.position());
+//    }
+			socketInput.compact();
+
+//    if (log.isLoggable(Level.FINEST)) {
+//      log.finer("     After compact()");
+//      log.finer("input.capacity()=" + socketInput.capacity());
+//      log.finer("input.remaining()=" + socketInput.remaining());
+//      log.finer("input.limit()=" + socketInput.limit());
+//      log.finer("input.position()=" + socketInput.position());
+//    }
 		}
 	}
 
-  /**
-   * Describe <code>debug</code> method here.
-   *
-   * @param msg a <code>char[]</code> value
-   * @return a <code>boolean</code> value
-   */
-  protected boolean debug(final char[] msg) {
-    if (msg != null) {
-			System.out.print(new String(msg));
-			//      log.finest("\n" + new String(msg) + "\n");
-    } // end of if (msg != null)
-    return true;
-  }
+	//~--- set methods ----------------------------------------------------------
 
-  /**
-   * Describe <code>debug</code> method here.
-   *
-   * @param msg a <code>String</code> value
-   * @return a <code>boolean</code> value
-   */
-  protected boolean debug(final String msg, final String prefix) {
-	if (log.isLoggable(Level.FINEST)) {
-	    if (msg != null && msg.trim().length() > 0) {
-				String log_msg = "\n"
-					+ (connectionType() != null ?	connectionType().toString() : "null-type")
-					+ " " + prefix + "\n" + msg + "\n";
-					//			System.out.print(log_msg);
-					log.finest(log_msg);
-		}
-    }
-    return true;
-  }
+	private void setLastTransferTime() {
+		lastTransferTime = System.currentTimeMillis();
+	}
+}    // IOService
 
-}// IOService
+
+//~ Formatted in Sun Code Convention
+
+
+//~ Formatted by Jindent --- http://www.jindent.com
