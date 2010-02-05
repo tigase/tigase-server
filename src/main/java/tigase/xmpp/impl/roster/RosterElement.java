@@ -1,4 +1,5 @@
-/*  Tigase Jabber/XMPP Server
+/*
+ *   Tigase Jabber/XMPP Server
  *  Copyright (C) 2004-2008 "Artur Hefczyc" <artur.hefczyc@tigase.org>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,18 +19,28 @@
  * Last modified by $Author$
  * $Date$
  */
+
 package tigase.xmpp.impl.roster;
+
+//~--- non-JDK imports --------------------------------------------------------
+
+import tigase.util.TigaseStringprepException;
+
+import tigase.xml.Element;
+import tigase.xml.XMLUtils;
+
+import tigase.xmpp.JID;
+import tigase.xmpp.XMPPResourceConnection;
+
+import static tigase.xmpp.impl.roster.RosterAbstract.SubscriptionType;
+
+//~--- JDK imports ------------------------------------------------------------
 
 import java.util.HashSet;
 import java.util.Set;
-import tigase.util.TigaseStringprepException;
-import tigase.xml.Element;
 import java.util.logging.Logger;
 
-import tigase.xml.XMLUtils;
-import tigase.xmpp.JID;
-import tigase.xmpp.XMPPResourceConnection;
-import static tigase.xmpp.impl.roster.RosterAbstract.SubscriptionType;
+//~--- classes ----------------------------------------------------------------
 
 /**
  * Describe class RosterElement here.
@@ -41,49 +52,29 @@ import static tigase.xmpp.impl.roster.RosterAbstract.SubscriptionType;
  * @version $Rev$
  */
 public class RosterElement {
-
-  private static final Logger log =
-    Logger.getLogger("tigase.xmpp.impl.roster.RosterElement");
-
+	private static final Logger log = Logger.getLogger("tigase.xmpp.impl.roster.RosterElement");
 	private static final String ELEM_NAME = "contact";
 	private static final String JID_ATT = "jid";
 	private static final String NAME_ATT = "name";
 	private static final String SUBS_ATT = "subs";
 	private static final String GRP_ATT = "groups";
+	private static final String STRINGPREP_ATT = "preped";
 
+	//~--- fields ---------------------------------------------------------------
+
+	private String[] groups = null;
+	private JID jid = null;
+	private String name = null;
 	private XMPPResourceConnection session = null;
 	private SubscriptionType subscription = null;
-	private String[] groups = null;
-	private String name = null;
-	private JID jid = null;
-	//private boolean online = false;
-	//private Element item = null;
+	private boolean stringpreped = false;
 
-//	public boolean isOnline() {
-//		return online;
-//	}
-//
-//	public void setOnline(boolean online) {
-//		this.online = online;
-//	}
-
-	public boolean isPresence_sent() {
-		return presence_sent;
-	}
-
-	public void setPresence_sent(boolean presence_sent) {
-		this.presence_sent = presence_sent;
-	}
+	// private boolean online = false;
+	// private Element item = null;
 	private boolean presence_sent = false;
+	private boolean modified = false;
 
-	public RosterElement(JID jid, String name, String[] groups,
-					XMPPResourceConnection session) {
-		this.session = session;
-		setJid(jid);
-		setName(name);
-		this.groups = groups;
-		this.subscription = SubscriptionType.none;
-	}
+	//~--- constructors ---------------------------------------------------------
 
 	/**
 	 * Creates a new <code>RosterElement</code> instance.
@@ -96,9 +87,12 @@ public class RosterElement {
 	public RosterElement(Element roster_el, XMPPResourceConnection session)
 			throws TigaseStringprepException {
 		this.session = session;
+
 		if (roster_el.getName() == ELEM_NAME) {
+			this.stringpreped = Boolean.parseBoolean(roster_el.getAttribute(STRINGPREP_ATT));
 			setJid(roster_el.getAttribute(JID_ATT));
 			setName(roster_el.getAttribute(NAME_ATT));
+
 			if (roster_el.getAttribute(SUBS_ATT) == null) {
 				subscription = SubscriptionType.none;
 			} else {
@@ -107,115 +101,274 @@ public class RosterElement {
 		} else {
 			log.warning("Incorrect roster data: " + roster_el.toString());
 		}
+
 		String grps = roster_el.getAttribute(GRP_ATT);
-		if (grps != null && !grps.isEmpty()) {
+
+		if ((grps != null) &&!grps.isEmpty()) {
 			groups = grps.split(",");
 		}
 	}
 
-	private void setJid(JID jid) {
-		this.jid = jid;
+	/**
+	 * Constructs ...
+	 *
+	 *
+	 * @param jid
+	 * @param name
+	 * @param groups
+	 * @param session
+	 */
+	public RosterElement(JID jid, String name, String[] groups, XMPPResourceConnection session) {
+		this.stringpreped = true;
+		this.session = session;
+		this.stringpreped = true;
+		setJid(jid);
+		setName(name);
+		this.groups = groups;
+		this.subscription = SubscriptionType.none;
 	}
 
-	private void setJid(String jid) throws TigaseStringprepException {
-		this.jid = new JID(jid);
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public String[] getGroups() {
+		return groups;
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
 	public JID getJid() {
 		return jid;
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
 	public String getName() {
 		return name;
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public Element getRosterElement() {
+		Element elem = new Element(ELEM_NAME, new String[] { JID_ATT, SUBS_ATT, NAME_ATT,
+				STRINGPREP_ATT }, new String[] { jid.toString(), subscription.toString(), name,
+				"" + stringpreped });
+
+		if ((groups != null) && (groups.length > 0)) {
+			String grps = "";
+
+			for (String group : groups) {
+				grps += group + ",";
+			}
+
+			grps = grps.substring(0, grps.length() - 1);
+			elem.setAttribute(GRP_ATT, grps);
+		}
+
+		modified = false;
+
+		return elem;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public Element getRosterItem() {
+
+		// This is actually not a good idea to cache the item element.
+		// This causes a huge memory consumption and usually the item
+		// is needed only once at the roster retrieving time.
+		// if (item == null) {
+		Element item = new Element("item");
+
+		item.setAttribute("jid", jid.toString());
+		item.addAttributes(subscription.getSubscriptionAttr());
+
+		if (name != null) {
+			item.setAttribute("name", XMLUtils.escape(name));
+		}
+
+		if (groups != null) {
+			for (String gr : groups) {
+				Element group = new Element("group");
+
+				group.setCData(XMLUtils.escape(gr));
+				item.addChild(group);
+			}    // end of for ()
+		}      // end of if-else
+
+		// }
+		return item;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public SubscriptionType getSubscription() {
+		return subscription;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public boolean isModified() {
+		return modified;
+	}
+
+//public boolean isOnline() {
+//  return online;
+//}
+//
+//public void setOnline(boolean online) {
+//  this.online = online;
+//}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public boolean isPresence_sent() {
+		return presence_sent;
+	}
+
+	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param groups
+	 */
+	public void setGroups(String[] groups) {
+		this.groups = groups;
+		modified = true;
+
+		// item = null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param name
+	 */
 	public void setName(String name) {
 		if (name == null) {
 			this.name = this.jid.getLocalpart();
-			if (this.name == null || this.name.trim().isEmpty()) {
+
+			if ((this.name == null) || this.name.trim().isEmpty()) {
 				this.name = this.jid.getBareJID().toString();
 			}
 		} else {
 			this.name = name;
 		}
+
+		modified = true;
 	}
 
-	public String[] getGroups() {
-		return groups;
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param presence_sent
+	 */
+	public void setPresence_sent(boolean presence_sent) {
+		this.presence_sent = presence_sent;
 	}
 
-	public void setGroups(String[] groups) {
-		this.groups = groups;
-		//item = null;
-	}
-
-	public SubscriptionType getSubscription() {
-		return subscription;
-	}
-
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param subscription
+	 */
 	public void setSubscription(SubscriptionType subscription) {
 		if (subscription == null) {
 			this.subscription = SubscriptionType.none;
 		} else {
 			this.subscription = subscription;
 		}
-		//item = null;
+
+		modified = true;
+
+		// item = null;
 	}
 
-	public Element getRosterElement() {
-		Element elem = new Element(ELEM_NAME,
-			new String[] {JID_ATT, SUBS_ATT, NAME_ATT},
-			new String[] {jid.toString(), subscription.toString(), name});
-		if (groups != null && groups.length > 0) {
-			String grps = "";
-			for (String group: groups) {
-				grps += group + ",";
-			}
-			grps = grps.substring(0, grps.length() - 1);
-			elem.setAttribute(GRP_ATT, grps);
-		}
-		return elem;
-	}
-
-	public Element getRosterItem() {
-		// This is actually not a good idea to cache the item element.
-		// This causes a huge memory consumption and usually the item
-		// is needed only once at the roster retrieving time.
-		//if (item == null) {
-			Element item = new Element("item");
-			item.setAttribute("jid", jid.toString());
-			item.addAttributes(subscription.getSubscriptionAttr());
-			if (name != null) {
-				item.setAttribute("name", XMLUtils.escape(name));
-			}
-			if (groups != null) {
-				for (String gr : groups) {
-					Element group = new Element("group");
-					group.setCData(XMLUtils.escape(gr));
-					item.addChild(group);
-				} // end of for ()
-			} // end of if-else
-		//}
-		return item;
-	}
+	//~--- methods --------------------------------------------------------------
 
 	void addGroups(String[] groups) {
 		if (groups != null) {
 			if (this.groups == null) {
 				this.groups = groups;
 			} else {
+
 				// Groups names must be unique
 				Set<String> groupsSet = new HashSet<String>();
+
 				for (String group : this.groups) {
 					groupsSet.add(group);
 				}
+
 				for (String group : groups) {
 					groupsSet.add(group);
 				}
+
 				this.groups = groupsSet.toArray(new String[groupsSet.size()]);
 			}
 		}
-		//item = null;
+
+		// item = null;
 	}
 
+	//~--- set methods ----------------------------------------------------------
+
+	private void setJid(JID jid) {
+		this.jid = jid;
+		modified = true;
+	}
+
+	private void setJid(String jid) throws TigaseStringprepException {
+		if (stringpreped) {
+			this.jid = JID.jidInstanceNS(jid);
+		} else {
+			this.jid = JID.jidInstance(jid);
+			modified = true;
+		}
+
+		stringpreped = true;
+	}
 }
+
+
+//~ Formatted in Sun Code Convention
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

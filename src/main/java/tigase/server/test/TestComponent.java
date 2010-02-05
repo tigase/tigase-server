@@ -107,8 +107,8 @@ public class TestComponent extends AbstractMessageReceiver {
 
 		if ((++delayCounter) >= notificationFrequency) {
 			addOutPacket(Message.getMessage(getComponentId(), abuseAddress, StanzaType.chat,
-																			"Detected spam messages: " + spamCounter,
-																			"Spam counter", null, newPacketId("spam-")));
+					"Detected spam messages: " + spamCounter, "Spam counter", null,
+						newPacketId("spam-")));
 			delayCounter = 0;
 			spamCounter = 0;
 		}
@@ -233,15 +233,13 @@ public class TestComponent extends AbstractMessageReceiver {
 
 		// Is this packet a message?
 		if ("message" == packet.getElemName()) {
-			updateServiceDiscoveryItem(getName(),
-																 "messages",
-																 "Messages processed: [" + (++messagesCounter) + "]",
-																 true);
+			updateServiceDiscoveryItem(getName(), "messages",
+					"Messages processed: [" + (++messagesCounter) + "]", true);
 
 			JID from = packet.getStanzaFrom();
 
 			// Is sender on the whitelist?
-			if (!whiteList.contains(from.getBareJID().toString())) {
+			if ( !whiteList.contains(from.getBareJID().toString())) {
 
 				// The sender is not on whitelist so let's check the content
 				String body = packet.getElemCData("/message/body");
@@ -253,10 +251,8 @@ public class TestComponent extends AbstractMessageReceiver {
 						if (body.contains(word)) {
 							log.finest(prependText + packet.toString(secureLogging));
 							++spamCounter;
-							updateServiceDiscoveryItem(getName(),
-																				 "spam",
-																				 "Spam caught: [" + (++totalSpamCounter) + "]",
-																				 true);
+							updateServiceDiscoveryItem(getName(), "spam",
+									"Spam caught: [" + (++totalSpamCounter) + "]", true);
 
 							return;
 						}
@@ -299,21 +295,15 @@ public class TestComponent extends AbstractMessageReceiver {
 		secureLogging = (Boolean) props.get(SECURE_LOGGING_KEY);
 
 		try {
-			abuseAddress = new JID((String) props.get(ABUSE_ADDRESS_KEY));
+			abuseAddress = JID.jidInstance((String) props.get(ABUSE_ADDRESS_KEY));
 		} catch (TigaseStringprepException ex) {
 			log.warning("Incorrect abuseAddress, stringprep error: "
-									+ (String) props.get(ABUSE_ADDRESS_KEY));
+					+ (String) props.get(ABUSE_ADDRESS_KEY));
 		}
 
 		notificationFrequency = (Integer) props.get(NOTIFICATION_FREQ_KEY);
-		updateServiceDiscoveryItem(getName(),
-															 null,
-															 getDiscoDescription(),
-															 "automation",
-															 "spam-filtering",
-															 true,
-															 "tigase:x:spam-filter",
-															 "tigase:x:spam-reporting");
+		updateServiceDiscoveryItem(getName(), null, getDiscoDescription(), "automation",
+				"spam-filtering", true, "tigase:x:spam-filter", "tigase:x:spam-reporting");
 	}
 }
 

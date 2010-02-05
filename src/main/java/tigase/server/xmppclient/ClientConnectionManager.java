@@ -22,36 +22,48 @@
 
 package tigase.server.xmppclient;
 
+//~--- non-JDK imports --------------------------------------------------------
+
+//import tigase.net.IOService;
+import tigase.net.SocketReadThread;
+
+import tigase.server.Command;
+import tigase.server.ConnectionManager;
+import tigase.server.Iq;
+import tigase.server.Packet;
+import tigase.server.ReceiverTimeoutHandler;
+
+import tigase.util.DNSResolver;
+import tigase.util.RoutingsContainer;
+import tigase.util.TigaseStringprepException;
+
+import tigase.xml.Element;
+
+import tigase.xmpp.Authorization;
+import tigase.xmpp.JID;
+import tigase.xmpp.PacketErrorTypeException;
+import tigase.xmpp.StanzaType;
+import tigase.xmpp.XMPPIOService;
+import tigase.xmpp.XMPPProcessorIfc;
+import tigase.xmpp.XMPPResourceConnection;
+
+//~--- JDK imports ------------------------------------------------------------
+
 import java.io.IOException;
+
 import java.util.Arrays;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.Deflater;
-import tigase.server.Command;
-import tigase.server.ConnectionManager;
-import tigase.server.Packet;
-import tigase.util.DNSResolver;
-import tigase.util.RoutingsContainer;
-import tigase.util.TigaseStringprepException;
-import tigase.xml.Element;
-import tigase.xmpp.StanzaType;
-import tigase.xmpp.XMPPIOService;
-import tigase.xmpp.XMPPProcessorIfc;
-import tigase.xmpp.XMPPResourceConnection;
-//import tigase.net.IOService;
-import tigase.net.SocketReadThread;
-import tigase.server.Iq;
-import tigase.server.ReceiverTimeoutHandler;
-import tigase.xmpp.Authorization;
-import tigase.xmpp.JID;
-import tigase.xmpp.PacketErrorTypeException;
+
+//~--- classes ----------------------------------------------------------------
 
 /**
  * Class ClientConnectionManager
@@ -61,34 +73,32 @@ import tigase.xmpp.PacketErrorTypeException;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class ClientConnectionManager
-		extends ConnectionManager<XMPPIOService<Object>> {
-	//	implements XMPPService {
+public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Object>> {
 
-  /**
-   * Variable <code>log</code> is a class logger.
-   */
-  private static final Logger log =
-    Logger.getLogger(ClientConnectionManager.class.getName());
+	// implements XMPPService {
 
+	/**
+	 * Variable <code>log</code> is a class logger.
+	 */
+	private static final Logger log = Logger.getLogger(ClientConnectionManager.class.getName());
 	private static final String XMLNS = "jabber:client";
-
 	private static final String ROUTINGS_PROP_KEY = "routings";
 	private static final String ROUTING_MODE_PROP_KEY = "multi-mode";
 	private static final boolean ROUTING_MODE_PROP_VAL = true;
 	private static final String ROUTING_ENTRY_PROP_KEY = ".+";
 
-	protected RoutingsContainer routings = null;
+	//~--- fields ---------------------------------------------------------------
 
-	private Map<String, XMPPProcessorIfc> processors =
-		new ConcurrentHashMap<String, XMPPProcessorIfc>();
+	protected RoutingsContainer routings = null;
+	private Map<String, XMPPProcessorIfc> processors = new ConcurrentHashMap<String,
+																											 XMPPProcessorIfc>();
 	private ReceiverTimeoutHandler stoppedHandler = newStoppedHandler();
 	private ReceiverTimeoutHandler startedHandler = newStartedHandler();
 
 	/**
-	 * This is mostly for testing purpose. We want to investigate massive 
-	 * (10k per node) connections drops at the same time during tests with Tsung. 
-	 * I suspect this might be due to problems with one of the tsung VMs working 
+	 * This is mostly for testing purpose. We want to investigate massive
+	 * (10k per node) connections drops at the same time during tests with Tsung.
+	 * I suspect this might be due to problems with one of the tsung VMs working
 	 * in the cluster generating load.
 	 * If I am right then all disconnects should come from only one or just a few
 	 * machines. If I am not right disconnects should be distributed evenly among
@@ -96,503 +106,67 @@ public class ClientConnectionManager
 	 */
 	private IPMonitor ipMonitor = new IPMonitor();
 
-	@Override
-	public void processPacket(final Packet packet) {
-		if (log.isLoggable(Level.FINER)) {
-			log.finer("Processing packet: " + packet.getElemName()
-				+ ", type: " + packet.getType());
-		}
-		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Processing packet: " + packet.toStringSecure());
-		}
-		if (packet.isCommand() && packet.getCommand() != Command.OTHER) {
-			processCommand(packet);
-		} else {
-			if (!writePacketToSocket(packet)) {
-				// Connection closed or broken, send message back to the SM
-				// if this is not IQ result...
-				// Ignore also all presence packets with available, unavailble
-				if (packet.getType() != StanzaType.result &&
-								packet.getType() != StanzaType.available &&
-								packet.getType() != StanzaType.unavailable &&
-								packet.getType() != StanzaType.error &&
-								!(packet.getElemName() == "presence" && packet.getType() == null)) {
-					try {
-						Packet error =
-										Authorization.ITEM_NOT_FOUND.getResponseMessage(packet,
-										"The user connection is no longer active.", true);
-						addOutPacket(error);
-					} catch (PacketErrorTypeException e) {
-						if (log.isLoggable(Level.FINEST)) {
-							log.finest(
-											"Ups, already error packet. Dropping it to prevent infinite loop.");
-						}
-					}
-				}
-				// In case the SessionManager lost synchronization for any reason, let's
-				// notify it that the user connection no longer exists.
-				// But in case of mass-disconnects we might have lot's of presences
-				// floating around, so just skip sending stream_close for all the
-				// offline presences
-				if (packet.getType() != StanzaType.unavailable) {
-					Packet command = Command.STREAM_CLOSED_UPDATE.getPacket(null, null,
-									StanzaType.set, UUID.randomUUID().toString());
-					command.setPacketFrom(packet.getTo());
-					command.setPacketTo(packet.getFrom());
-					// Note! we don't want to receive response to this request, thus
-					// STREAM_CLOSED_UPDATE instead of STREAM_CLOSED
-					addOutPacket(command);
-//				addOutPacketWithTimeout(command, stoppedHandler, 15l, TimeUnit.SECONDS);
-					log.fine("Sending a command to close the remote session for non-existen Bosh connection: " +
-									command.toStringSecure());
-				}
-			}
-		} // end of else
-	}
+	//~--- get methods ----------------------------------------------------------
 
-	protected void processCommand(Packet packet) {
-		XMPPIOService<Object> serv = getXMPPIOService(packet);
-		Iq iqc = (Iq)packet;
-		switch (iqc.getCommand()) {
-			case GETFEATURES:
-				if (iqc.getType() == StanzaType.result) {
-					List<Element> features = getFeatures(getXMPPSession(iqc));
-					Element elem_features = new Element("stream:features");
-					elem_features.addChildren(features);
-					elem_features.addChildren(Command.getData(iqc));
-					Packet result = Packet.packetInstance(elem_features, null, null);
-					// Is it actually needed??
-					// TODO: check it out and remove the line
-					result.setPacketTo(iqc.getTo());
-					writePacketToSocket(result);
-				} // end of if (packet.getType() == StanzaType.get)
-				break;
-			case STARTZLIB:
-				if (serv != null) {
-					if (log.isLoggable(Level.FINER)) {
-						log.finer("Starting zlib compression: " + serv.getUniqueId());
-					}
-					try {
-						Element compressed = Command.getData(iqc, "compressed", null);
-						Packet p_compressed = Packet.packetInstance(compressed, null, null);
-						SocketReadThread readThread = SocketReadThread.getInstance();
-						readThread.removeSocketService(serv);
-						//					writePacketToSocket(serv, p_proceed);
-						serv.addPacketToSend(p_compressed);
-						serv.processWaitingPackets();
-						serv.startZLib(Deflater.BEST_COMPRESSION);
-						//					serv.call();
-						readThread.addSocketService(serv);
-					} catch (IOException ex) {
-						log.log(Level.INFO,
-								"Problem enabling zlib compression on the connection: ", ex);
-					}
-				} else {
-					log.warning("Can't find sevice for STARTZLIB command: " + iqc);
-				}
-				break;
-			case STARTTLS:
-				if (serv != null) {
-					if (log.isLoggable(Level.FINER)) {
-						log.finer("Starting TLS for connection: " + serv.getUniqueId());
-					}
-					try {
-						// Note:
-						// If you send <proceed> packet to client you must expect
-						// instant response from the client with TLS handshaking data
-						// before you will call startTLS() on server side.
-						// So the initial handshaking data might be lost as they will
-						// be processed in another thread reading data from the socket.
-						// That's why below code first removes service from reading
-						// threads pool and then sends <proceed> packet and starts TLS.
-						Element proceed = Command.getData(iqc, "proceed", null);
-						Packet p_proceed = Packet.packetInstance(proceed, null, null);
-						SocketReadThread readThread = SocketReadThread.getInstance();
-						readThread.removeSocketService(serv);
-						//					writePacketToSocket(serv, p_proceed);
-						serv.addPacketToSend(p_proceed);
-						serv.processWaitingPackets();
-						while (serv.waitingToSend()) {
-							serv.writeRawData(null);
-							Thread.sleep(10);
-						}
-						serv.startTLS(false);
-						//					serv.call();
-						readThread.addSocketService(serv);
-					} catch (Exception e) {
-						log.warning("Error starting TLS: " + e);
-					} // end of try-catch
-				} else {
-					log.warning("Can't find sevice for STARTTLS command: " + iqc);
-				} // end of else
-				break;
-			case REDIRECT:
-				String command_sessionId = Command.getFieldValue(iqc, "session-id");
-				JID newAddress = iqc.getFrom();
-				JID old_receiver = changeDataReceiver(iqc, newAddress,
-						command_sessionId, serv);
-				if (old_receiver != null) {
-					if (log.isLoggable(Level.FINE)) {
-						log.fine("Redirecting data for sessionId: " + command_sessionId
-								+ ", to: " + newAddress);
-					}
-					Packet response = null;
-					response = iqc.commandResult(null);
-					Command.addFieldValue(response, "session-id", command_sessionId);
-					Command.addFieldValue(response, "action", "activate");
-					response.getElement().setAttribute("to", newAddress.toString());
-					addOutPacket(response);
-				} else {
-					if (log.isLoggable(Level.FINEST)) {
-						log.finest("Connection for REDIRECT command does not exist, ignoring " 
-								+ "packet: " + iqc.toStringSecure());
-					}
-				}
-				break;
-			case STREAM_CLOSED:
-
-				break;
-			case GETDISCO:
-
-				break;
-			case CLOSE:
-				if (serv != null) {
-					try {
-						serv.writeRawData("</stream:stream>");
-					} catch (Exception e) {	}
-					serv.stop();
-				} else {
-					if (log.isLoggable(Level.FINE)) {
-						log.fine("Attempt to stop non-existen service for packet: " 
-								+ iqc + ", Service already stopped?");
-					}
-				} // end of if (serv != null) else
-				break;
-			case CHECK_USER_CONNECTION:
-				if (serv != null) {
-					// It's ok, the session has been found, respond with OK.
-					addOutPacket(iqc.okResult((String) null, 0));
-				} else {
-					// Session is no longer active, respond with an error.
-					try {
-						addOutPacket(Authorization.ITEM_NOT_FOUND.getResponseMessage(iqc,
-										"Connection gone.", false));
-					} catch (PacketErrorTypeException e) {
-						// Hm, error already, ignoring...
-						log.info("Error packet is not really expected here: " 
-								+ iqc.toStringSecure());
-					}
-				}
-				break;
-
-			default:
-				writePacketToSocket(iqc);
-				break;
-		} // end of switch (pc.getCommand())
-	}
-
-	protected JID changeDataReceiver(Packet packet, JID newAddress,
-		String command_sessionId, XMPPIOService<Object> serv) {
-		if (serv != null) {
-			String serv_sessionId =
-          (String)serv.getSessionData().get(XMPPIOService.SESSION_ID_KEY);
-			if (serv_sessionId.equals(command_sessionId)) {
-				JID old_receiver = serv.getDataReceiver();
-				serv.setDataReceiver(newAddress);
-				return old_receiver;
-			} else {
-				log.warning("Incorrect session ID, ignoring data redirect for: "
-					+ newAddress + ", expected: " + serv_sessionId
-					+ ", received: " + command_sessionId);
-			}
-		}
-		return null;
-	}
-
-	@Override
-	public Queue<Packet> processSocketData(XMPPIOService<Object> serv) {
-
-		String id = getUniqueId(serv);
-		//String hostname = (String)serv.getSessionData().get(serv.HOSTNAME_KEY);
-
-		Packet p = null;
-		while ((p = serv.getReceivedPackets().poll()) != null) {
-			try {
-				if (log.isLoggable(Level.FINER)) {
-					log.finer("Processing packet: " + p.getElemName() + ", type: " +
-							p.getType());
-				}
-				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Processing socket data: " + p.toStringSecure());
-				}
-				p.setPacketFrom(getFromAddress(id));
-				JID receiver = serv.getDataReceiver();
-				if (receiver != null) {
-					p.setPacketTo(serv.getDataReceiver());
-					addOutPacket(p);
-				} else {
-					// Hm, receiver is not set yet..., ignoring
-				}
-				// 			results.offer(new Packet(new Element("OK")));
-				// 			results.offer(new Packet(new Element("OK")));
-			} catch (TigaseStringprepException ex) {
-				log.warning("Packet source stringprep addressing problem, dropping. This is a bug, contact the developer!"
-						+ getName() + "@" + getDefHostName() + "/" + id);
-			}
-		} // end of while ()
-		return null;
-	}
-
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param params
+	 *
+	 * @return
+	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> props = super.getDefaults(params);
-		Boolean r_mode = (Boolean)params.get(getName() + "/" + ROUTINGS_PROP_KEY
-			+ "/" + ROUTING_MODE_PROP_KEY);
+		Boolean r_mode = (Boolean) params.get(getName() + "/" + ROUTINGS_PROP_KEY + "/"
+											 + ROUTING_MODE_PROP_KEY);
+
 		if (r_mode == null) {
-			props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_MODE_PROP_KEY,
-				ROUTING_MODE_PROP_VAL);
+			props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_MODE_PROP_KEY, ROUTING_MODE_PROP_VAL);
+
 			// If the server is configured as connection manager only node then
 			// route packets to SM on remote host where is default routing
 			// for external component.
 			// Otherwise default routing is to SM on localhost
 			if (params.get("config-type").equals(GEN_CONFIG_CS)
-				&& params.get(GEN_EXT_COMP) != null) {
-				String[] comp_params = ((String)params.get(GEN_EXT_COMP)).split(",");
+					&& (params.get(GEN_EXT_COMP) != null)) {
+				String[] comp_params = ((String) params.get(GEN_EXT_COMP)).split(",");
+
 				props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_ENTRY_PROP_KEY,
-					DEF_SM_NAME + "@" + comp_params[1]);
+						DEF_SM_NAME + "@" + comp_params[1]);
 			} else {
 				props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_ENTRY_PROP_KEY,
-					DEF_SM_NAME + "@" + DNSResolver.getDefaultHostname());
+						DEF_SM_NAME + "@" + DNSResolver.getDefaultHostname());
 			}
 		}
+
 		return props;
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
 	@Override
-	public void setProperties(Map<String, Object> props) {
-		super.setProperties(props);
-		boolean routing_mode =
-			(Boolean)props.get(ROUTINGS_PROP_KEY + "/" + ROUTING_MODE_PROP_KEY);
-		routings = new RoutingsContainer(routing_mode);
-		int idx = (ROUTINGS_PROP_KEY + "/").length();
-		for (Map.Entry<String, Object> entry: props.entrySet()) {
-			if (entry.getKey().startsWith(ROUTINGS_PROP_KEY + "/")
-				&& !entry.getKey().equals(ROUTINGS_PROP_KEY + "/" +
-					ROUTING_MODE_PROP_KEY)) {
-				routings.addRouting(entry.getKey().substring(idx),
-					(String)entry.getValue());
-			} // end of if (entry.getKey().startsWith(ROUTINGS_PROP_KEY + "/"))
-		} // end of for ()
-	}
-
-	private XMPPResourceConnection getXMPPSession(Packet p) {
-		XMPPIOService<Object> serv = getXMPPIOService(p);
-		return serv == null ? null :
-			(XMPPResourceConnection)serv.getSessionData().get("xmpp-session");
-	}
-
-	private List<Element> getFeatures(XMPPResourceConnection session) {
-		List<Element> results = new LinkedList<Element>();
-		for (XMPPProcessorIfc proc: processors.values()) {
-			Element[] features = proc.supStreamFeatures(session);
-			if (features != null) {
-				results.addAll(Arrays.asList(features));
-			} // end of if (features != null)
-		} // end of for ()
-		return results;
-	}
-
-	@Override
-	protected int[] getDefPlainPorts() {
-		return new int[] {5222};
-	}
-
-	@Override
-	protected int[] getDefSSLPorts() {
-		return new int[] {5223};
-	}
-
-	private JID getFromAddress(String id) throws TigaseStringprepException {
-		return new JID(getName(), getDefHostName(), id);
-	}
-
-	@Override
-	public String xmppStreamOpened(XMPPIOService<Object> serv,
-		Map<String, String> attribs) {
-		if (log.isLoggable(Level.FINER)) {
-			log.finer("Stream opened: " + attribs.toString());
-		}
-		final String hostname = attribs.get("to");
-		String lang = attribs.get("xml:lang");
-		if (lang == null) {
-			lang = "en";
-		}
-
-		if (hostname == null) {
-			return "<?xml version='1.0'?><stream:stream"
-				+ " xmlns='" + XMLNS + "'"
-				+ " xmlns:stream='http://etherx.jabber.org/streams'"
-				+ " id='tigase-error-tigase'"
-				+ " from='" + getDefHostName() + "'"
-        + " version='1.0' xml:lang='en'>"
-				+ "<stream:error>"
-				+ "<improper-addressing xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>"
-				+ "</stream:error>"
-				+ "</stream:stream>"
-				;
-		} // end of if (hostname == null)
-
-		if (!isLocalDomain(hostname)) {
-			return "<?xml version='1.0'?><stream:stream"
-				+ " xmlns='" + XMLNS + "'"
-				+ " xmlns:stream='http://etherx.jabber.org/streams'"
-				+ " id='tigase-error-tigase'"
-				+ " from='" + getDefHostName() + "'"
-        + " version='1.0' xml:lang='en'>"
-				+ "<stream:error>"
-				+ "<host-unknown xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>"
-				+ "</stream:error>"
-				+ "</stream:stream>"
-				;
-		} // end of if (!hostnames.contains(hostname))
-
-		String id = (String) serv.getSessionData().get(XMPPIOService.SESSION_ID_KEY);
-		try {
-			if (id == null) {
-				id = UUID.randomUUID().toString();
-				serv.getSessionData().put(XMPPIOService.SESSION_ID_KEY, id);
-				serv.setXMLNS(XMLNS);
-				serv.getSessionData().put(XMPPIOService.HOSTNAME_KEY, hostname);
-				serv.setDataReceiver(new JID(routings.computeRouting(hostname)));
-				writeRawData(serv,
-						"<?xml version='1.0'?><stream:stream" + " xmlns='" + XMLNS + "'"
-						+ " xmlns:stream='http://etherx.jabber.org/streams'" + " from='"
-						+ hostname + "'" + " id='" + id + "'"
-						+ " version='1.0' xml:lang='en'>");
-				Packet streamOpen =
-						Command.STREAM_OPENED.getPacket(getFromAddress(getUniqueId(serv)),
-						serv.getDataReceiver(), StanzaType.set,
-						UUID.randomUUID().toString(), Command.DataType.submit);
-				Command.addFieldValue(streamOpen, "session-id", id);
-				Command.addFieldValue(streamOpen, "hostname", hostname);
-				Command.addFieldValue(streamOpen, "xml:lang", lang);
-				addOutPacketWithTimeout(streamOpen, startedHandler, 45l,
-						TimeUnit.SECONDS);
-		} else {
-				writeRawData(serv, "<?xml version='1.0'?><stream:stream"
-						+ " xmlns='" + XMLNS + "'"
-						+ " xmlns:stream='http://etherx.jabber.org/streams'"
-						+ " from='" + hostname + "'" + " id='" + id + "'"
-						+ " version='1.0' xml:lang='en'>");
-				addOutPacket(Command.GETFEATURES.getPacket(
-						getFromAddress(getUniqueId(serv)),
-						serv.getDataReceiver(), StanzaType.get,
-						UUID.randomUUID().toString(),
-						null));
-			}
-		} catch (TigaseStringprepException ex) {
-			log.warning("Stringprep addressing problem, this is a bug, contact developer! "
-					+ ", data receiver: " + routings.computeRouting(hostname)
-					+ ", from address: "
-					+ getName() + "@" + getDefHostName() + "/" + getUniqueId(serv));
-			serv.stop();
-		}
-		return null;
-	}
-
-	@Override
-	public boolean serviceStopped(XMPPIOService<Object> service) {
-		boolean result = super.serviceStopped(service);
-		// It might be a Bosh service in which case it is ignored here.
-		if (service.getXMLNS() == XMLNS) {
-			//		XMPPIOService serv = (XMPPIOService)service;
-			// The method may be called more than one time for a single
-			// connection but we want to send a notification just once
-			if (result) {
-				ipMonitor.addDisconnect(service.getRemoteAddress());
-				if (service.getDataReceiver() != null) {
-					try {
-						Packet command =
-								Command.STREAM_CLOSED.getPacket(getFromAddress(getUniqueId(service)),
-								service.getDataReceiver(), StanzaType.set,
-								UUID.randomUUID().toString());
-						// In case of mass-disconnects, adjust the timeout properly
-						addOutPacketWithTimeout(command, stoppedHandler, 120l,
-								TimeUnit.SECONDS);
-						if (log.isLoggable(Level.FINE)) {
-							log.fine("Service stopped, sending packet: " + command);
-						}
-						//					// For testing only.
-						//					System.out.println("Service stopped: " + service.getUniqueId());
-						//					Thread.dumpStack();
-					} catch (TigaseStringprepException ex) {
-						log.warning("Stringprep addressing problem, this is a bug, contact developer! "
-								+ ", from address: "
-								+ getName() + "@" + getDefHostName() + "/"
-								+ getUniqueId(service));
-					}
-//					// For testing only.
-//					System.out.println("Service stopped: " + service.getUniqueId());
-//					Thread.dumpStack();
-				} else {
-					if (log.isLoggable(Level.FINE)) {
-						log.fine("Service stopped, before stream:stream received");
-					}
-				}
-			}
-		}
-		return result;
-	}
-
-	@Override
-	public void xmppStreamClosed(XMPPIOService<Object> serv) {
-		if (log.isLoggable(Level.FINER)) {
-			log.finer("Stream closed: " + serv.getUniqueId());
-		}
+	public String getDiscoCategoryType() {
+		return "c2s";
 	}
 
 	/**
-	 * Method <code>getMaxInactiveTime</code> returns max keep-alive time
-	 * for inactive connection. Let's assume user should send something
-	 * at least once every 24 hours....
+	 * Method description
 	 *
-	 * @return a <code>long</code> value
+	 *
+	 * @return
 	 */
 	@Override
-	protected long getMaxInactiveTime() {
-		return 24*HOUR;
+	public String getDiscoDescription() {
+		return "Client connection manager";
 	}
 
-	@Override
-	public void start() {
-		super.start();
-		ipMonitor = new IPMonitor();
-		ipMonitor.start();
-	}
-
-	@Override
-  public void stop() {
-		super.stop();
-		ipMonitor.stopThread();
-	}
-
-	@Override
-	protected XMPPIOService<Object> getXMPPIOServiceInstance() {
-		return new XMPPIOService<Object>();
-	}
-
-	protected ReceiverTimeoutHandler newStoppedHandler() {
-		return new StoppedHandler();
-	}
-
-	protected ReceiverTimeoutHandler newStartedHandler() {
-		return new StartedHandler();
-	}
-
-	@Override
-	protected Integer getMaxQueueSize(int def) {
-		return def * 10;
-	}
+	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * This method can be overwritten in extending classes to get a different
@@ -607,68 +181,660 @@ public class ClientConnectionManager
 		return packet.getTo().hashCode();
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param packet
+	 */
+	@Override
+	public void processPacket(final Packet packet) {
+		if (log.isLoggable(Level.FINER)) {
+			log.finer("Processing packet: " + packet.getElemName() + ", type: " + packet.getType());
+		}
+
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Processing packet: " + packet.toStringSecure());
+		}
+
+		if (packet.isCommand() && (packet.getCommand() != Command.OTHER)) {
+			processCommand(packet);
+		} else {
+			if ( !writePacketToSocket(packet)) {
+
+				// Connection closed or broken, send message back to the SM
+				// if this is not IQ result...
+				// Ignore also all presence packets with available, unavailble
+				if ((packet.getType() != StanzaType.result)
+						&& (packet.getType() != StanzaType.available)
+							&& (packet.getType() != StanzaType.unavailable)
+								&& (packet.getType() != StanzaType.error)
+									&&!((packet.getElemName() == "presence") && (packet.getType() == null))) {
+					try {
+						Packet error = Authorization.ITEM_NOT_FOUND.getResponseMessage(packet,
+														 "The user connection is no longer active.", true);
+
+						addOutPacket(error);
+					} catch (PacketErrorTypeException e) {
+						if (log.isLoggable(Level.FINEST)) {
+							log.finest("Ups, already error packet. Dropping it to prevent infinite loop.");
+						}
+					}
+				}
+
+				// In case the SessionManager lost synchronization for any reason, let's
+				// notify it that the user connection no longer exists.
+				// But in case of mass-disconnects we might have lot's of presences
+				// floating around, so just skip sending stream_close for all the
+				// offline presences
+				if (packet.getType() != StanzaType.unavailable) {
+					Packet command = Command.STREAM_CLOSED_UPDATE.getPacket(null, null, StanzaType.set,
+														 UUID.randomUUID().toString());
+
+					command.setPacketFrom(packet.getTo());
+					command.setPacketTo(packet.getFrom());
+
+					// Note! we don't want to receive response to this request, thus
+					// STREAM_CLOSED_UPDATE instead of STREAM_CLOSED
+					addOutPacket(command);
+
+//        addOutPacketWithTimeout(command, stoppedHandler, 15l, TimeUnit.SECONDS);
+					log.fine("Sending a command to close the remote session for non-existen Bosh"
+							+ " connection: " + command.toStringSecure());
+				}
+			}
+		}    // end of else
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param serv
+	 *
+	 * @return
+	 */
+	@Override
+	public Queue<Packet> processSocketData(XMPPIOService<Object> serv) {
+		String id = getUniqueId(serv);
+
+		// String hostname = (String)serv.getSessionData().get(serv.HOSTNAME_KEY);
+		Packet p = null;
+
+		while ((p = serv.getReceivedPackets().poll()) != null) {
+			if (log.isLoggable(Level.FINER)) {
+				log.finer("Processing packet: " + p.getElemName() + ", type: " + p.getType());
+			}
+
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Processing socket data: " + p.toStringSecure());
+			}
+
+			p.setPacketFrom(getFromAddress(id));
+
+			JID receiver = serv.getDataReceiver();
+
+			if (receiver != null) {
+				p.setPacketTo(serv.getDataReceiver());
+				addOutPacket(p);
+			} else {
+
+				// Hm, receiver is not set yet..., ignoring
+			}
+
+			// results.offer(new Packet(new Element("OK")));
+			// results.offer(new Packet(new Element("OK")));
+		}    // end of while ()
+
+		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
 	@Override
 	public int processingThreads() {
 		return Runtime.getRuntime().availableProcessors();
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param service
+	 *
+	 * @return
+	 */
 	@Override
-	public String getDiscoDescription() {
-		return "Client connection manager";
+	public boolean serviceStopped(XMPPIOService<Object> service) {
+		boolean result = super.serviceStopped(service);
+
+		// It might be a Bosh service in which case it is ignored here.
+		if (service.getXMLNS() == XMLNS) {
+
+			// XMPPIOService serv = (XMPPIOService)service;
+			// The method may be called more than one time for a single
+			// connection but we want to send a notification just once
+			if (result) {
+				ipMonitor.addDisconnect(service.getRemoteAddress());
+
+				if (service.getDataReceiver() != null) {
+					Packet command =
+						Command.STREAM_CLOSED.getPacket(getFromAddress(getUniqueId(service)),
+							service.getDataReceiver(), StanzaType.set, UUID.randomUUID().toString());
+
+					// In case of mass-disconnects, adjust the timeout properly
+					addOutPacketWithTimeout(command, stoppedHandler, 120l, TimeUnit.SECONDS);
+
+					if (log.isLoggable(Level.FINE)) {
+						log.fine("Service stopped, sending packet: " + command);
+					}
+
+					// // For testing only.
+					// System.out.println("Service stopped: " + service.getUniqueId());
+					// Thread.dumpStack();
+//        // For testing only.
+//        System.out.println("Service stopped: " + service.getUniqueId());
+//        Thread.dumpStack();
+				} else {
+					if (log.isLoggable(Level.FINE)) {
+						log.fine("Service stopped, before stream:stream received");
+					}
+				}
+			}
+		}
+
+		return result;
+	}
+
+	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param props
+	 */
+	@Override
+	public void setProperties(Map<String, Object> props) {
+		super.setProperties(props);
+
+		boolean routing_mode = (Boolean) props.get(ROUTINGS_PROP_KEY + "/"
+														 + ROUTING_MODE_PROP_KEY);
+
+		routings = new RoutingsContainer(routing_mode);
+
+		int idx = (ROUTINGS_PROP_KEY + "/").length();
+
+		for (Map.Entry<String, Object> entry : props.entrySet()) {
+			if (entry.getKey().startsWith(ROUTINGS_PROP_KEY + "/")
+					&&!entry.getKey().equals(ROUTINGS_PROP_KEY + "/" + ROUTING_MODE_PROP_KEY)) {
+				routings.addRouting(entry.getKey().substring(idx), (String) entry.getValue());
+			}    // end of if (entry.getKey().startsWith(ROUTINGS_PROP_KEY + "/"))
+		}      // end of for ()
+	}
+
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 */
+	@Override
+	public void start() {
+		super.start();
+		ipMonitor = new IPMonitor();
+		ipMonitor.start();
+	}
+
+	/**
+	 * Method description
+	 *
+	 */
+	@Override
+	public void stop() {
+		super.stop();
+		ipMonitor.stopThread();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param serv
+	 */
+	@Override
+	public void xmppStreamClosed(XMPPIOService<Object> serv) {
+		if (log.isLoggable(Level.FINER)) {
+			log.finer("Stream closed: " + serv.getUniqueId());
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param serv
+	 * @param attribs
+	 *
+	 * @return
+	 */
+	@Override
+	public String xmppStreamOpened(XMPPIOService<Object> serv, Map<String, String> attribs) {
+		if (log.isLoggable(Level.FINER)) {
+			log.finer("Stream opened: " + attribs.toString());
+		}
+
+		final String hostname = attribs.get("to");
+		String lang = attribs.get("xml:lang");
+
+		if (lang == null) {
+			lang = "en";
+		}
+
+		if (hostname == null) {
+			return "<?xml version='1.0'?><stream:stream" + " xmlns='" + XMLNS + "'"
+					+ " xmlns:stream='http://etherx.jabber.org/streams'" + " id='tigase-error-tigase'"
+						+ " from='" + getDefHostName() + "'" + " version='1.0' xml:lang='en'>"
+							+ "<stream:error>"
+								+ "<improper-addressing xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>"
+									+ "</stream:error>" + "</stream:stream>"
+			;
+		}    // end of if (hostname == null)
+
+		if ( !isLocalDomain(hostname)) {
+			return "<?xml version='1.0'?><stream:stream" + " xmlns='" + XMLNS + "'"
+					+ " xmlns:stream='http://etherx.jabber.org/streams'" + " id='tigase-error-tigase'"
+						+ " from='" + getDefHostName() + "'" + " version='1.0' xml:lang='en'>"
+							+ "<stream:error>"
+								+ "<host-unknown xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>"
+									+ "</stream:error>" + "</stream:stream>"
+			;
+		}    // end of if (!hostnames.contains(hostname))
+
+		String id = (String) serv.getSessionData().get(XMPPIOService.SESSION_ID_KEY);
+
+		if (id == null) {
+			id = UUID.randomUUID().toString();
+			serv.getSessionData().put(XMPPIOService.SESSION_ID_KEY, id);
+			serv.setXMLNS(XMLNS);
+			serv.getSessionData().put(XMPPIOService.HOSTNAME_KEY, hostname);
+			serv.setDataReceiver(JID.jidInstanceNS(routings.computeRouting(hostname)));
+			writeRawData(serv,
+					"<?xml version='1.0'?><stream:stream" + " xmlns='" + XMLNS + "'"
+						+ " xmlns:stream='http://etherx.jabber.org/streams'" + " from='" + hostname + "'"
+							+ " id='" + id + "'" + " version='1.0' xml:lang='en'>");
+
+			Packet streamOpen = Command.STREAM_OPENED.getPacket(getFromAddress(getUniqueId(serv)),
+														serv.getDataReceiver(), StanzaType.set,
+														UUID.randomUUID().toString(), Command.DataType.submit);
+
+			Command.addFieldValue(streamOpen, "session-id", id);
+			Command.addFieldValue(streamOpen, "hostname", hostname);
+			Command.addFieldValue(streamOpen, "xml:lang", lang);
+			addOutPacketWithTimeout(streamOpen, startedHandler, 45l, TimeUnit.SECONDS);
+		} else {
+			writeRawData(serv,
+					"<?xml version='1.0'?><stream:stream" + " xmlns='" + XMLNS + "'"
+						+ " xmlns:stream='http://etherx.jabber.org/streams'" + " from='" + hostname + "'"
+							+ " id='" + id + "'" + " version='1.0' xml:lang='en'>");
+			addOutPacket(Command.GETFEATURES.getPacket(getFromAddress(getUniqueId(serv)),
+					serv.getDataReceiver(), StanzaType.get, UUID.randomUUID().toString(), null));
+		}
+
+		return null;
+	}
+
+	protected JID changeDataReceiver(Packet packet, JID newAddress, String command_sessionId,
+			XMPPIOService<Object> serv) {
+		if (serv != null) {
+			String serv_sessionId = (String) serv.getSessionData().get(XMPPIOService.SESSION_ID_KEY);
+
+			if (serv_sessionId.equals(command_sessionId)) {
+				JID old_receiver = serv.getDataReceiver();
+
+				serv.setDataReceiver(newAddress);
+
+				return old_receiver;
+			} else {
+				log.warning("Incorrect session ID, ignoring data redirect for: " + newAddress
+						+ ", expected: " + serv_sessionId + ", received: " + command_sessionId);
+			}
+		}
+
+		return null;
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	@Override
+	protected int[] getDefPlainPorts() {
+		return new int[] { 5222 };
 	}
 
 	@Override
-	public String getDiscoCategoryType() {
-		return "c2s";
+	protected int[] getDefSSLPorts() {
+		return new int[] { 5223 };
 	}
+
+	/**
+	 * Method <code>getMaxInactiveTime</code> returns max keep-alive time
+	 * for inactive connection. Let's assume user should send something
+	 * at least once every 24 hours....
+	 *
+	 * @return a <code>long</code> value
+	 */
+	@Override
+	protected long getMaxInactiveTime() {
+		return 24 * HOUR;
+	}
+
+	@Override
+	protected Integer getMaxQueueSize(int def) {
+		return def * 10;
+	}
+
+	@Override
+	protected XMPPIOService<Object> getXMPPIOServiceInstance() {
+		return new XMPPIOService<Object>();
+	}
+
+	//~--- methods --------------------------------------------------------------
+
+	protected ReceiverTimeoutHandler newStartedHandler() {
+		return new StartedHandler();
+	}
+
+	protected ReceiverTimeoutHandler newStoppedHandler() {
+		return new StoppedHandler();
+	}
+
+	protected void processCommand(Packet packet) {
+		XMPPIOService<Object> serv = getXMPPIOService(packet);
+		Iq iqc = (Iq) packet;
+
+		switch (iqc.getCommand()) {
+			case GETFEATURES :
+				if (iqc.getType() == StanzaType.result) {
+					List<Element> features = getFeatures(getXMPPSession(iqc));
+					Element elem_features = new Element("stream:features");
+
+					elem_features.addChildren(features);
+					elem_features.addChildren(Command.getData(iqc));
+
+					Packet result = Packet.packetInstance(elem_features, null, null);
+
+					// Is it actually needed??
+					// TODO: check it out and remove the line
+					result.setPacketTo(iqc.getTo());
+					writePacketToSocket(result);
+				}    // end of if (packet.getType() == StanzaType.get)
+
+				break;
+
+			case STARTZLIB :
+				if (serv != null) {
+					if (log.isLoggable(Level.FINER)) {
+						log.finer("Starting zlib compression: " + serv.getUniqueId());
+					}
+
+					try {
+						Element compressed = Command.getData(iqc, "compressed", null);
+						Packet p_compressed = Packet.packetInstance(compressed, null, null);
+						SocketReadThread readThread = SocketReadThread.getInstance();
+
+						readThread.removeSocketService(serv);
+
+						// writePacketToSocket(serv, p_proceed);
+						serv.addPacketToSend(p_compressed);
+						serv.processWaitingPackets();
+						serv.startZLib(Deflater.BEST_COMPRESSION);
+
+						// serv.call();
+						readThread.addSocketService(serv);
+					} catch (IOException ex) {
+						log.log(Level.INFO, "Problem enabling zlib compression on the connection: ", ex);
+					}
+				} else {
+					log.warning("Can't find sevice for STARTZLIB command: " + iqc);
+				}
+
+				break;
+
+			case STARTTLS :
+				if (serv != null) {
+					if (log.isLoggable(Level.FINER)) {
+						log.finer("Starting TLS for connection: " + serv.getUniqueId());
+					}
+
+					try {
+
+						// Note:
+						// If you send <proceed> packet to client you must expect
+						// instant response from the client with TLS handshaking data
+						// before you will call startTLS() on server side.
+						// So the initial handshaking data might be lost as they will
+						// be processed in another thread reading data from the socket.
+						// That's why below code first removes service from reading
+						// threads pool and then sends <proceed> packet and starts TLS.
+						Element proceed = Command.getData(iqc, "proceed", null);
+						Packet p_proceed = Packet.packetInstance(proceed, null, null);
+						SocketReadThread readThread = SocketReadThread.getInstance();
+
+						readThread.removeSocketService(serv);
+
+						// writePacketToSocket(serv, p_proceed);
+						serv.addPacketToSend(p_proceed);
+						serv.processWaitingPackets();
+
+						while (serv.waitingToSend()) {
+							serv.writeRawData(null);
+							Thread.sleep(10);
+						}
+
+						serv.startTLS(false);
+
+						// serv.call();
+						readThread.addSocketService(serv);
+					} catch (Exception e) {
+						log.warning("Error starting TLS: " + e);
+					}    // end of try-catch
+				} else {
+					log.warning("Can't find sevice for STARTTLS command: " + iqc);
+				}      // end of else
+
+				break;
+
+			case REDIRECT :
+				String command_sessionId = Command.getFieldValue(iqc, "session-id");
+				JID newAddress = iqc.getFrom();
+				JID old_receiver = changeDataReceiver(iqc, newAddress, command_sessionId, serv);
+
+				if (old_receiver != null) {
+					if (log.isLoggable(Level.FINE)) {
+						log.fine("Redirecting data for sessionId: " + command_sessionId + ", to: "
+								+ newAddress);
+					}
+
+					Packet response = null;
+
+					response = iqc.commandResult(null);
+					Command.addFieldValue(response, "session-id", command_sessionId);
+					Command.addFieldValue(response, "action", "activate");
+					response.getElement().setAttribute("to", newAddress.toString());
+					addOutPacket(response);
+				} else {
+					if (log.isLoggable(Level.FINEST)) {
+						log.finest("Connection for REDIRECT command does not exist, ignoring "
+								+ "packet: " + iqc.toStringSecure());
+					}
+				}
+
+				break;
+
+			case STREAM_CLOSED :
+				break;
+
+			case GETDISCO :
+				break;
+
+			case CLOSE :
+				if (serv != null) {
+					try {
+						serv.writeRawData("</stream:stream>");
+					} catch (Exception e) {}
+
+					serv.stop();
+				} else {
+					if (log.isLoggable(Level.FINE)) {
+						log.fine("Attempt to stop non-existen service for packet: " + iqc
+								+ ", Service already stopped?");
+					}
+				}    // end of if (serv != null) else
+
+				break;
+
+			case CHECK_USER_CONNECTION :
+				if (serv != null) {
+
+					// It's ok, the session has been found, respond with OK.
+					addOutPacket(iqc.okResult((String) null, 0));
+				} else {
+
+					// Session is no longer active, respond with an error.
+					try {
+						addOutPacket(Authorization.ITEM_NOT_FOUND.getResponseMessage(iqc,
+								"Connection gone.", false));
+					} catch (PacketErrorTypeException e) {
+
+						// Hm, error already, ignoring...
+						log.info("Error packet is not really expected here: " + iqc.toStringSecure());
+					}
+				}
+
+				break;
+
+			default :
+				writePacketToSocket(iqc);
+
+				break;
+		}    // end of switch (pc.getCommand())
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	private List<Element> getFeatures(XMPPResourceConnection session) {
+		List<Element> results = new LinkedList<Element>();
+
+		for (XMPPProcessorIfc proc : processors.values()) {
+			Element[] features = proc.supStreamFeatures(session);
+
+			if (features != null) {
+				results.addAll(Arrays.asList(features));
+			}    // end of if (features != null)
+		}      // end of for ()
+
+		return results;
+	}
+
+	private JID getFromAddress(String id) {
+		return JID.jidInstanceNS(getName(), getDefHostName(), id);
+	}
+
+	private XMPPResourceConnection getXMPPSession(Packet p) {
+		XMPPIOService<Object> serv = getXMPPIOService(p);
+
+		return (serv == null)
+				? null : (XMPPResourceConnection) serv.getSessionData().get("xmpp-session");
+	}
+
+	//~--- inner classes --------------------------------------------------------
+
+	private class StartedHandler implements ReceiverTimeoutHandler {
+
+		/**
+		 * Method description
+		 *
+		 *
+		 * @param packet
+		 * @param response
+		 */
+		@Override
+		public void responseReceived(Packet packet, Packet response) {
+
+			// We are now ready to ask for features....
+			addOutPacket(Command.GETFEATURES.getPacket(packet.getFrom(), packet.getTo(),
+					StanzaType.get, UUID.randomUUID().toString(), null));
+		}
+
+		/**
+		 * Method description
+		 *
+		 *
+		 * @param packet
+		 */
+		@Override
+		public void timeOutExpired(Packet packet) {
+
+			// If we still haven't received confirmation from the SM then
+			// the packet either has been lost or the server is overloaded
+			// In either case we disconnect the connection.
+			log.info("No response within time limit received for a packet: "
+					+ packet.toStringSecure());
+
+			XMPPIOService<Object> serv = getXMPPIOService(packet.getFrom().toString());
+
+			if (serv != null) {
+				serv.stop();
+			} else {
+				log.fine("Attempt to stop non-existen service for packet: " + packet
+						+ ", Service already stopped?");
+			}    // end of if (serv != null) else
+		}
+	}
+
 
 	private class StoppedHandler implements ReceiverTimeoutHandler {
 
-		@Override
-		public void timeOutExpired(Packet packet) {
-			// Ups, doesn't look good, the server is either oveloaded or lost
-			// a packet.
-			log.info("No response within time limit received for a packet: " +
-							packet.toStringSecure());
-			addOutPacketWithTimeout(packet, stoppedHandler, 60l, TimeUnit.SECONDS);
-		}
-
+		/**
+		 * Method description
+		 *
+		 *
+		 * @param packet
+		 * @param response
+		 */
 		@Override
 		public void responseReceived(Packet packet, Packet response) {
+
 			// Great, nothing to worry about.
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("Response for stop received...");
 			}
 		}
 
-	}
-
-	private class StartedHandler implements ReceiverTimeoutHandler {
-
+		/**
+		 * Method description
+		 *
+		 *
+		 * @param packet
+		 */
 		@Override
 		public void timeOutExpired(Packet packet) {
-			// If we still haven't received confirmation from the SM then
-			// the packet either has been lost or the server is overloaded
-			// In either case we disconnect the connection.
-			log.info("No response within time limit received for a packet: " +
-							packet.toStringSecure());
-			XMPPIOService<Object> serv = getXMPPIOService(packet.getFrom().toString());
-			if (serv != null) {
-				serv.stop();
-			} else {
-				log.fine("Attempt to stop non-existen service for packet: "
-						+ packet + ", Service already stopped?");
-			} // end of if (serv != null) else
-		}
 
-		@Override
-		public void responseReceived(Packet packet, Packet response) {
-			// We are now ready to ask for features....
-			addOutPacket(Command.GETFEATURES.getPacket(packet.getFrom(),
-							packet.getTo(), StanzaType.get, UUID.randomUUID().toString(),
-							null));
+			// Ups, doesn't look good, the server is either oveloaded or lost
+			// a packet.
+			log.info("No response within time limit received for a packet: "
+					+ packet.toStringSecure());
+			addOutPacketWithTimeout(packet, stoppedHandler, 60l, TimeUnit.SECONDS);
 		}
-
 	}
-
 }
+
+
+//~ Formatted in Sun Code Convention
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

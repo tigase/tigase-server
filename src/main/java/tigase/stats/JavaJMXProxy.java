@@ -1,26 +1,30 @@
 /*
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2008 "Artur Hefczyc" <artur.hefczyc@tigase.org>
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
- * 
+ *
  * $Rev$
  * Last modified by $Author$
  * $Date$
  */
 
 package tigase.stats;
+
+//~--- JDK imports ------------------------------------------------------------
+
+import java.io.IOException;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -30,6 +34,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.management.MBeanServerConnection;
 import javax.management.MBeanServerInvocationHandler;
 import javax.management.Notification;
@@ -40,6 +45,10 @@ import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 
+import javax.naming.ServiceUnavailableException;
+
+//~--- classes ----------------------------------------------------------------
+
 /**
  * Created: Aug 24, 2009 12:35:28 PM
  *
@@ -47,68 +56,80 @@ import javax.management.remote.JMXServiceURL;
  * @version $Rev$
  */
 public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListener {
+	private static final Logger log = Logger.getLogger(JavaJMXProxy.class.getName());
 
-	private static final Logger log =
-    Logger.getLogger(JavaJMXProxy.class.getName());
+	//~--- fields ---------------------------------------------------------------
 
-	private List<JMXProxyListener> listeners = new LinkedList<JMXProxyListener>();
-	private StatisticsUpdater updater = null;
-	private long lastCacheUpdate = 0;
-
-	private String id = null;
-	private String hostname = null;
-	private int port = -1;
-	private String userName = null;
-	private String password = null;
-	private long interval = -1;
-	private long delay = -1;
-
-	private String urlPath = null;
-	private JMXServiceURL jmxUrl = null;
-	private JMXConnector jmxc = null;
-	private MBeanServerConnection server = null;
-	private StatisticsProviderMBean tigBean = null;
+	private float clCompressionRatio = 0;
+	private int clIOQueueSize = 0;
+	private long clNetworkBytes = 0;
+	private float clNetworkBytesPerSec = 0;
+	private float clPacketsPerSec = 0;
+	private int clQueueSize = 0;
+	private float[] clpacks_history = null;
+	private int clusterCacheSize = 0;
+	private long clusterPacketsNumber = 0;
+	private int connectionsNumber = 0;
+	private int[] conns_history = null;
 
 	// Cache section...
 	private int cpuNo = 0;
-	private long uptime = 0;
-	private long processCPUTime = 0;
-	private int connectionsNumber = 0;
-	private int clusterCacheSize = 0;
-  private int queueSize = 0;
-	private int smQueueSize = 0;
-	private int clQueueSize = 0;
-	private int clIOQueueSize = 0;
-	private long queueOverflow = 0;
-	private long smPacketsNumber = 0;
-	private long clusterPacketsNumber = 0;
-	private long messagesNumber = 0;
-	private long presencesNumber = 0;
-	private float smPacketsPerSec = 0;
-	private float clPacketsPerSec = 0;
-	private float messagesPerSec = 0;
-	private float presencesPerSec = 0;
+	private float cpuUsage = 0;
+	private float[] cpu_history = null;
+	private long delay = -1;
+	private float heapUsage = 0;
+	private float[] heap_history = null;
+	private String hostname = null;
+	private String id = null;
+	private long interval = -1;
+	private long iqAuthNumber = 0;
 	private long iqOtherNumber = 0;
 	private float iqOtherPerSec = 0;
-	private long iqAuthNumber = 0;
-	private float cpuUsage = 0;
-	private float heapUsage = 0;
+	private JMXServiceURL jmxUrl = null;
+	private JMXConnector jmxc = null;
+	private long lastCacheUpdate = 0;
+	private List<JMXProxyListener> listeners = new LinkedList<JMXProxyListener>();
+	private long messagesNumber = 0;
+	private float messagesPerSec = 0;
 	private float nonHeapUsage = 0;
-	private String sysDetails = "No details loaded yet";
-	private float clCompressionRatio = 0;
-	private long clNetworkBytes = 0;
-	private float clNetworkBytesPerSec = 0;
-
-	private float[] cpu_history = null;
-	private float[] heap_history = null;
+	private String password = null;
+	private int port = -1;
+	private long presencesNumber = 0;
+	private float presencesPerSec = 0;
+	private long processCPUTime = 0;
+	private long queueOverflow = 0;
+	private int queueSize = 0;
+	private MBeanServerConnection server = null;
+	private long smPacketsNumber = 0;
+	private float smPacketsPerSec = 0;
+	private int smQueueSize = 0;
 	private float[] smpacks_history = null;
-	private float[] clpacks_history = null;
-	private int[] conns_history = null;
-	private boolean initialized = false;
+	private String sysDetails = "No details loaded yet";
+	private StatisticsProviderMBean tigBean = null;
+	private StatisticsUpdater updater = null;
+	private long uptime = 0;
+	private String urlPath = null;
+	private String userName = null;
 	private boolean loadHistory = false;
+	private boolean initialized = false;
 
-	public JavaJMXProxy(String id, String hostname, int port,
-			String userName, String password,	long delay, long interval, boolean loadHistory) {
+	//~--- constructors ---------------------------------------------------------
+
+	/**
+	 * Constructs ...
+	 *
+	 *
+	 * @param id
+	 * @param hostname
+	 * @param port
+	 * @param userName
+	 * @param password
+	 * @param delay
+	 * @param interval
+	 * @param loadHistory
+	 */
+	public JavaJMXProxy(String id, String hostname, int port, String userName,
+											String password, long delay, long interval, boolean loadHistory) {
 		this.id = id;
 		this.hostname = hostname;
 		this.port = port;
@@ -121,10 +142,588 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 		System.out.println("Created: " + hostname);
 	}
 
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param listener
+	 */
 	public void addJMXProxyListener(JMXProxyListener listener) {
 		listeners.add(listener);
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @throws Exception
+	 */
+	public void connect() throws Exception {
+		this.jmxUrl = new JMXServiceURL("rmi", "", 0, this.urlPath);
+
+		String[] userCred = new String[] { userName, password };
+		HashMap<String, Object> env = new HashMap<String, Object>();
+
+		env.put(JMXConnector.CREDENTIALS, userCred);
+		jmxc = JMXConnectorFactory.newJMXConnector(jmxUrl, env);
+		jmxc.addConnectionNotificationListener(this, null, null);
+		jmxc.connect();
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param level
+	 *
+	 * @return
+	 */
+	@Override
+	public Map<String, String> getAllStats(int level) {
+		if (tigBean != null) {
+			return tigBean.getAllStats(level);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public int getCLIOQueueSize() {
+		return clIOQueueSize;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public float[] getCLPacketsPerSecHistory() {
+		return clpacks_history;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public int getCLQueueSize() {
+		return clQueueSize;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public float getCPUUsage() {
+		return cpuUsage;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public float[] getCPUUsageHistory() {
+		return cpu_history;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public int getCPUsNumber() {
+		return cpuNo;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public int getClusterCacheSize() {
+		return clusterCacheSize;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public float getClusterCompressionRatio() {
+		return clCompressionRatio;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public long getClusterNetworkBytes() {
+		return clNetworkBytes;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public float getClusterNetworkBytesPerSecond() {
+		return clNetworkBytesPerSec;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public long getClusterPackets() {
+		return clusterPacketsNumber;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public float getClusterPacketsPerSec() {
+		return clPacketsPerSec;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param compName
+	 * @param level
+	 *
+	 * @return
+	 */
+	@Override
+	public Map<String, String> getComponentStats(String compName, int level) {
+		if (tigBean != null) {
+			return tigBean.getComponentStats(compName, level);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public List getComponentsNames() {
+		if (tigBean != null) {
+			return tigBean.getComponentsNames();
+		}
+
+		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public int getConnectionsNumber() {
+		return connectionsNumber;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public int[] getConnectionsNumberHistory() {
+		return conns_history;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public float getHeapMemUsage() {
+		return heapUsage;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public float[] getHeapUsageHistory() {
+		return heap_history;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public long getIQAuthNumber() {
+		return iqAuthNumber;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public long getIQOtherNumber() {
+		return iqOtherNumber;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public float getIQOtherNumberPerSec() {
+		return iqOtherPerSec;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public String getId() {
+		return id;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public long getLastCacheUpdate() {
+		return lastCacheUpdate;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public long getMessagesNumber() {
+		return messagesNumber;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public float getMessagesNumberPerSec() {
+		return messagesPerSec;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public String getName() {
+		if (tigBean != null) {
+			return tigBean.getName();
+		}
+
+		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public float getNonHeapMemUsage() {
+		return nonHeapUsage;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public long getPresencesNumber() {
+		return presencesNumber;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public float getPresencesNumberPerSec() {
+		return presencesPerSec;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public long getProcesCPUTime() {
+		return processCPUTime;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public long getQueueOverflow() {
+		return queueOverflow;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public int getQueueSize() {
+		return queueSize;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public long getSMPacketsNumber() {
+		return smPacketsNumber;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public float getSMPacketsNumberPerSec() {
+		return smPacketsPerSec;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public float[] getSMPacketsPerSecHistory() {
+		return smpacks_history;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public int getSMQueueSize() {
+		return smQueueSize;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public String getSystemDetails() {
+		return sysDetails;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public long getUptime() {
+		return uptime;
+	}
+
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param notification
+	 * @param handback
+	 */
+	@Override
+	public void handleNotification(Notification notification, Object handback) {
+		if (notification.getType().equals(JMXConnectionNotification.OPENED)) {
+			System.out.println("Connected: " + hostname);
+
+			try {
+				server = jmxc.getMBeanServerConnection();
+
+				ObjectName obn = new ObjectName(StatisticsCollector.STATISTICS_MBEAN_NAME);
+
+				tigBean = MBeanServerInvocationHandler.newProxyInstance(server, obn,
+								StatisticsProviderMBean.class, false);
+
+				if (loadHistory) {
+					cpu_history = tigBean.getCPUUsageHistory();
+					System.out.println(hostname + " loaded cpu_history, size: "
+														 + cpu_history.length);
+					heap_history = tigBean.getHeapUsageHistory();
+					System.out.println(hostname + " loaded heap_history, size: "
+														 + heap_history.length);
+					smpacks_history = tigBean.getSMPacketsPerSecHistory();
+					System.out.println(hostname + " loaded smpacks_history, size: "
+														 + smpacks_history.length);
+					clpacks_history = tigBean.getCLPacketsPerSecHistory();
+					System.out.println(hostname + " loaded clpacks_history, size: "
+														 + clpacks_history.length);
+					conns_history = tigBean.getConnectionsNumberHistory();
+					System.out.println(hostname + " loaded conns_history, size: "
+														 + conns_history.length);
+				} else {
+					System.out.println(hostname + " loading history switched off.");
+				}
+
+				for (JMXProxyListener jMXProxyListener : listeners) {
+					jMXProxyListener.connected(id, this);
+				}
+
+				start();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			return;
+		}
+
+		if (notification.getType().equals(JMXConnectionNotification.CLOSED)) {
+			server = null;
+			tigBean = null;
+
+			for (JMXProxyListener jMXProxyListener : listeners) {
+				jMXProxyListener.disconnected(id);
+			}
+
+			return;
+		}
+
+		if (notification.getType().equals(JMXConnectionNotification.FAILED)) {
+			System.out.println("Reconnection to {hostName} failed...");
+
+			return;
+		}
+
+		System.out.println("Unsupported JMX notification: {notification.getType()}");
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public boolean isConnected() {
+		return tigBean != null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public boolean isInitialized() {
+		return isConnected() && initialized;
+	}
+
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 */
 	public void start() {
 		if (updater == null) {
 			updater = new StatisticsUpdater();
@@ -132,26 +731,18 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 		}
 	}
 
-	public boolean isConnected() {
-		return tigBean != null;
-	}
-
-	public void connect() throws Exception {
-		this.jmxUrl = new JMXServiceURL("rmi", "", 0, this.urlPath);
-		String[] userCred = new String[] {userName, password};
-		HashMap<String, Object> env = new HashMap<String, Object>();
-		env.put(JMXConnector.CREDENTIALS, userCred);
-		jmxc = JMXConnectorFactory.newJMXConnector(jmxUrl, env);
-		jmxc.addConnectionNotificationListener(this, null, null);
-		jmxc.connect();
-	}
-
+	/**
+	 * Method description
+	 *
+	 */
 	public void update() {
 		if (tigBean != null) {
+
 			// This doesn't ever change so it is enough to query it once
 			if (cpuNo == 0) {
 				cpuNo = tigBean.getCPUsNumber();
 			}
+
 			uptime = tigBean.getUptime();
 			processCPUTime = tigBean.getProcesCPUTime();
 			connectionsNumber = tigBean.getConnectionsNumber();
@@ -169,9 +760,10 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 			clPacketsPerSec = tigBean.getClusterPacketsPerSec();
 			messagesPerSec = tigBean.getMessagesNumberPerSec();
 			presencesPerSec = tigBean.getPresencesNumberPerSec();
-			//iqOtherNumber = tigBean.getIQOtherNumber();
-			//iqOtherPerSec = tigBean.getIQOtherNumberPerSec();
-			//iqAuthNumber = tigBean.getIQAuthNumber();
+
+			// iqOtherNumber = tigBean.getIQOtherNumber();
+			// iqOtherPerSec = tigBean.getIQOtherNumberPerSec();
+			// iqAuthNumber = tigBean.getIQAuthNumber();
 			cpuUsage = tigBean.getCPUUsage();
 			heapUsage = tigBean.getHeapMemUsage();
 			nonHeapUsage = tigBean.getNonHeapMemUsage();
@@ -184,270 +776,12 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 		}
 	}
 
-	public long getLastCacheUpdate() {
-		return lastCacheUpdate;
-	}
-
-	@Override
-	public List getComponentsNames() {
-		if (tigBean != null) {
-			return tigBean.getComponentsNames();
-		}
-		return null;
-	}
-
-	@Override
-	public String getName() {
-		if (tigBean != null) {
-			return tigBean.getName();
-		}
-		return null;
-	}
-
-	public String getId() {
-		return id;
-	}
-
-	@Override
-	public Map<String, String> getAllStats(int level) {
-		if (tigBean != null) {
-			return tigBean.getAllStats(level);
-		}
-		return null;
-	}
-
-	@Override
-	public Map<String, String> getComponentStats(String compName, int level) {
-		if (tigBean != null) {
-		return tigBean.getComponentStats(compName, level);
-		}
-		return null;
-	}
-
-	@Override
-	public int getCPUsNumber() {
-		return cpuNo;
-	}
-
-	@Override
-	public long getUptime() {
-		return uptime;
-	}
-
-	@Override
-	public long getProcesCPUTime() {
-		return processCPUTime;
-	}
-
-	@Override
-	public int getConnectionsNumber() {
-		return connectionsNumber;
-	}
-
-	@Override
-	public int getClusterCacheSize() {
-		return clusterCacheSize;
-	}
-
-	@Override
-	public int getQueueSize() {
-		return queueSize;
-	}
-
-	@Override
-	public int getSMQueueSize() {
-		return smQueueSize;
-	}
-
-	@Override
-	public int getCLQueueSize() {
-		return clQueueSize;
-	}
-
-	@Override
-	public int getCLIOQueueSize() {
-		return clIOQueueSize;
-	}
-
-	@Override
-	public long getQueueOverflow() {
-		return queueOverflow;
-	}
-
-	@Override
-	public long getSMPacketsNumber() {
-		return smPacketsNumber;
-	}
-
-	@Override
-	public long getClusterPackets() {
-		return clusterPacketsNumber;
-	}
-
-	@Override
-	public long getMessagesNumber() {
-		return messagesNumber;
-	}
-
-	@Override
-	public long getPresencesNumber() {
-		return presencesNumber;
-	}
-
-	@Override
-	public float getSMPacketsNumberPerSec() {
-		return smPacketsPerSec;
-	}
-
-	@Override
-	public float getClusterPacketsPerSec() {
-		return clPacketsPerSec;
-	}
-
-	@Override
-	public float getMessagesNumberPerSec() {
-		return messagesPerSec;
-	}
-
-	@Override
-	public float getPresencesNumberPerSec() {
-		return presencesPerSec;
-	}
-
-	@Override
-	public long getIQOtherNumber() {
-		return iqOtherNumber;
-	}
-
-	@Override
-	public float getIQOtherNumberPerSec() {
-		return iqOtherPerSec;
-	}
-
-	@Override
-	public long getIQAuthNumber() {
-		return iqAuthNumber;
-	}
-
-	@Override
-	public float getCPUUsage() {
-		return cpuUsage;
-	}
-
-	@Override
-	public float getHeapMemUsage() {
-		return heapUsage;
-	}
-
-	@Override
-	public float getNonHeapMemUsage() {
-		return nonHeapUsage;
-	}
-
-	@Override
-	public String getSystemDetails() {
-		return sysDetails;
-	}
-
-	@Override
-	public float getClusterCompressionRatio() {
-		return clCompressionRatio;
-	}
-
-	@Override
-	public long getClusterNetworkBytes() {
-		return clNetworkBytes;
-	}
-
-	@Override
-	public float getClusterNetworkBytesPerSecond() {
-		return clNetworkBytesPerSec;
-	}
-
-	public boolean isInitialized() {
-		return isConnected() && initialized;
-	}
-
-	@Override
-	public void handleNotification(Notification notification, Object handback) {
-		if (notification.getType().equals(JMXConnectionNotification.OPENED)) {
-			System.out.println("Connected: " + hostname);
-			try {
-				server = jmxc.getMBeanServerConnection();
-				ObjectName obn = new ObjectName(StatisticsCollector.STATISTICS_MBEAN_NAME);
-				tigBean = MBeanServerInvocationHandler.newProxyInstance(
-						server, obn, StatisticsProviderMBean.class, false);
-				if (loadHistory) {
-					cpu_history = tigBean.getCPUUsageHistory();
-					System.out.println(hostname + " loaded cpu_history, size: " +
-							cpu_history.length);
-					heap_history = tigBean.getHeapUsageHistory();
-					System.out.println(hostname + " loaded heap_history, size: " +
-							heap_history.length);
-					smpacks_history = tigBean.getSMPacketsPerSecHistory();
-					System.out.println(hostname + " loaded smpacks_history, size: " +
-							smpacks_history.length);
-					clpacks_history = tigBean.getCLPacketsPerSecHistory();
-					System.out.println(hostname + " loaded clpacks_history, size: " +
-							clpacks_history.length);
-					conns_history = tigBean.getConnectionsNumberHistory();
-					System.out.println(hostname + " loaded conns_history, size: " +
-							conns_history.length);
-				} else {
-					System.out.println(hostname + " loading history switched off.");
-				}
-				for (JMXProxyListener jMXProxyListener : listeners) {
-					jMXProxyListener.connected(id, this);
-				}
-				start();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			return;
-    }
-		if (notification.getType().equals(JMXConnectionNotification.CLOSED)) {
-  		server = null;
-  		tigBean = null;
-			for (JMXProxyListener jMXProxyListener : listeners) {
-	  	  jMXProxyListener.disconnected(id);
-			}
-			return;
-    }
-		if (notification.getType().equals(JMXConnectionNotification.FAILED)) {
-      System.out.println("Reconnection to {hostName} failed...");
-			return;
-		}
-    System.out.println("Unsupported JMX connection notification: {notification.getType()}");
-	}
-
-	@Override
-	public float[] getCPUUsageHistory() {
-		return cpu_history;
-	}
-
-	@Override
-	public float[] getHeapUsageHistory() {
-		return heap_history;
-	}
-
-	@Override
-	public float[] getSMPacketsPerSecHistory() {
-		return smpacks_history;
-	}
-
-	@Override
-	public float[] getCLPacketsPerSecHistory() {
-		return clpacks_history;
-	}
-
-	@Override
-	public int[] getConnectionsNumberHistory() {
-		return conns_history;
-	}
+	//~--- inner classes --------------------------------------------------------
 
 	private class StatisticsUpdater {
-
 		private Timer updateTimer = null;
+
+		//~--- constructors -------------------------------------------------------
 
 		private StatisticsUpdater() {
 			updateTimer = new Timer("stats-updater", true);
@@ -458,17 +792,30 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 						if (server == null) {
 							connect();
 						}
+
 						if (server != null) {
 							update();
 						}
+					} catch (IOException e) {
+						Throwable cause = e;
+
+						while (cause.getCause() != null) {
+							cause = cause.getCause();
+						}
+
+						log.warning(cause.getMessage() + ", retrying in " + (interval / 1000)
+												+ " seconds.");
 					} catch (Exception e) {
 						log.log(Level.WARNING, "Problem retrieving statistics: ", e);
 					}
 				}
 			}, delay, interval);
-
 		}
-		
 	}
-
 }
+
+
+//~ Formatted in Sun Code Convention
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

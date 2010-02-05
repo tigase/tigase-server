@@ -1,4 +1,5 @@
-/*  Tigase Jabber/XMPP Server
+/*
+ *   Tigase Jabber/XMPP Server
  *  Copyright (C) 2004-2007 "Artur Hefczyc" <artur.hefczyc@tigase.org>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,13 +19,22 @@
  * Last modified by $Author$
  * $Date$
  */
+
 package tigase.server.sreceiver;
 
-import tigase.server.Packet;
-import tigase.xmpp.StanzaType;
-import java.util.Queue;
+//~--- non-JDK imports --------------------------------------------------------
+
 import tigase.server.Message;
+import tigase.server.Packet;
+
 import tigase.xmpp.JID;
+import tigase.xmpp.StanzaType;
+
+//~--- JDK imports ------------------------------------------------------------
+
+import java.util.Queue;
+
+//~--- classes ----------------------------------------------------------------
 
 /**
  * Describe class TesterTask here.
@@ -36,7 +46,6 @@ import tigase.xmpp.JID;
  * @version $Rev$
  */
 public class TesterTask extends AbstractReceiverTask {
-
 	private static final String TASK_TYPE = "Tester Task";
 	private static final String TASK_HELP =
 		"This task pretends to be a user."
@@ -44,91 +53,123 @@ public class TesterTask extends AbstractReceiverTask {
 		+ " and perform some other actions. Roster of this task is stored"
 		+ " in memory only and is cleared on server restart."
 		+ " Full list of supported actions will be sent to you as a response"
-		+ " to //help message."
-		+ " The purpose of this task is testing of the Tigase server and"
+		+ " to //help message." + " The purpose of this task is testing of the Tigase server and"
 		+ " the task should not be normally loaded on to live system.";
 
-	private enum command { help, genn; };
+	//~--- constant enums -------------------------------------------------------
 
-	@Override
-	public String getType() {
-		return TASK_TYPE;
-	}
+	private enum command { help, genn; }
 
+	;
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
 	@Override
 	public String getHelp() {
 		return TASK_HELP;
 	}
 
-	private String commandsHelp() {
-		return "Available commands are:\n"
-			+ "//help - display this help info\n"
-			+ "//genn N - generates N messages to random, non-existen users on "
-      + "the server and responds with a simple reply masse: 'Completed N.'\n"
-			+ " For now you can only subsribe to and unsubscribe from task roster"
-			+ " and send a message to task as it was a user. The task will always"
-			+ " respond to your messages with following text:\n"
-			+ " This is response to your message: [your message included here]";
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public String getType() {
+		return TASK_TYPE;
 	}
 
-	private boolean isPostCommand(Packet packet) {
-		String body = packet.getElemCData("/message/body");
-		if (body != null) {
-			for (command comm: command.values()) {
-				if (body.startsWith("//" + comm.toString())) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	private void runCommand(Packet packet, Queue<Packet> results) {
-		String body = packet.getElemCData("/message/body");
-		String[] body_split = body.split(" |\n|\r");
-		command comm = command.valueOf(body_split[0].substring(2));
-		switch (comm) {
-		case help:
-			results.offer(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(),
-					StanzaType.chat, commandsHelp(),
-					"Commands description", null, packet.getStanzaId()));
-			break;
-		case genn:
-			try {
-				int number = Integer.parseInt(body_split[1]);
-				String domain = packet.getStanzaFrom().getDomain();
-				for (int i = 0; i < number; i++) {
-					results.offer(Message.getMessage(packet.getStanzaTo(), 
-							new JID("nonename_" + i + "@" + domain),
-							StanzaType.normal,
-							"Traffic generattion: " + number,
-							"Internal load test", null, packet.getStanzaId()));
-				}
-				results.offer(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(),
-						StanzaType.normal,
-						"Completed " + number,
-						"Response", null, packet.getStanzaId()));
-			} catch (Exception e) {
-				results.offer(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(),
-						StanzaType.normal,
-						"Incorrect command parameter: "
-						+ (body_split.length > 1 ? body_split[1] : null)
-						+ ", expecting Integer.", "Response", null, packet.getStanzaId()));
-			}
-			break;
-		}
-	}
+	//~--- methods --------------------------------------------------------------
 
 	protected void processMessage(Packet packet, Queue<Packet> results) {
 		if (isPostCommand(packet)) {
 			runCommand(packet, results);
 		} else {
 			String body = packet.getElemCData("/message/body");
+
 			results.offer(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(),
-					StanzaType.normal,
-					"This is response to your message: [" + body + "]",
-					"Response", null, packet.getStanzaId()));
+					StanzaType.normal, "This is response to your message: [" + body + "]", "Response",
+						null, packet.getStanzaId()));
 		}
 	}
 
+	private String commandsHelp() {
+		return "Available commands are:\n" + "//help - display this help info\n"
+				+ "//genn N - generates N messages to random, non-existen users on "
+					+ "the server and responds with a simple reply masse: 'Completed N.'\n"
+						+ " For now you can only subsribe to and unsubscribe from task roster"
+							+ " and send a message to task as it was a user. The task will always"
+								+ " respond to your messages with following text:\n"
+									+ " This is response to your message: [your message included here]";
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	private boolean isPostCommand(Packet packet) {
+		String body = packet.getElemCData("/message/body");
+
+		if (body != null) {
+			for (command comm : command.values()) {
+				if (body.startsWith("//" + comm.toString())) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	//~--- methods --------------------------------------------------------------
+
+	private void runCommand(Packet packet, Queue<Packet> results) {
+		String body = packet.getElemCData("/message/body");
+		String[] body_split = body.split(" |\n|\r");
+		command comm = command.valueOf(body_split[0].substring(2));
+
+		switch (comm) {
+			case help :
+				results.offer(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(),
+						StanzaType.chat, commandsHelp(), "Commands description", null,
+							packet.getStanzaId()));
+
+				break;
+
+			case genn :
+				try {
+					int number = Integer.parseInt(body_split[1]);
+					String domain = packet.getStanzaFrom().getDomain();
+
+					for (int i = 0; i < number; i++) {
+						results.offer(Message.getMessage(packet.getStanzaTo(),
+								JID.jidInstance("nonename_" + i + "@" + domain), StanzaType.normal,
+									"Traffic generattion: " + number, "Internal load test", null,
+										packet.getStanzaId()));
+					}
+
+					results.offer(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(),
+							StanzaType.normal, "Completed " + number, "Response", null,
+								packet.getStanzaId()));
+				} catch (Exception e) {
+					results.offer(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(),
+							StanzaType.normal,
+							"Incorrect command parameter: "
+							+ ((body_split.length > 1) ? body_split[1] : null) + ", expecting Integer.", "Response", null, packet.getStanzaId()));
+				}
+
+				break;
+		}
+	}
 }
+
+
+//~ Formatted in Sun Code Convention
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

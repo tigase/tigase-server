@@ -1,26 +1,48 @@
 /*
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2008 "Artur Hefczyc" <artur.hefczyc@tigase.org>
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
- * 
+ *
  * $Rev$
  * Last modified by $Author$
  * $Date$
  */
 
 package tigase.cluster;
+
+//~--- non-JDK imports --------------------------------------------------------
+
+import tigase.conf.Configurable;
+
+import tigase.disco.ServiceEntity;
+import tigase.disco.ServiceIdentity;
+import tigase.disco.XMPPService;
+
+import tigase.server.DisableDisco;
+import tigase.server.Packet;
+import tigase.server.ServerComponent;
+
+import tigase.util.DNSResolver;
+import tigase.util.TigaseStringprepException;
+
+import tigase.xml.Element;
+
+import tigase.xmpp.BareJID;
+import tigase.xmpp.JID;
+
+//~--- JDK imports ------------------------------------------------------------
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -29,18 +51,8 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import tigase.conf.Configurable;
-import tigase.disco.ServiceEntity;
-import tigase.disco.ServiceIdentity;
-import tigase.disco.XMPPService;
-import tigase.server.DisableDisco;
-import tigase.server.Packet;
-import tigase.server.ServerComponent;
-import tigase.util.DNSResolver;
-import tigase.util.TigaseStringprepException;
-import tigase.xml.Element;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
+
+//~--- classes ----------------------------------------------------------------
 
 /**
  * The purpose of this component implementation is to forward packets to a target
@@ -85,32 +97,38 @@ import tigase.xmpp.JID;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class VirtualComponent 
+public class VirtualComponent
 				implements ServerComponent, XMPPService, Configurable, DisableDisco {
 
-  /**
-   * Variable <code>log</code> is a class logger.
-   */
-  private static final Logger log =
-    Logger.getLogger("tigase.cluster.VirtualComponent");
+	/**
+	 * Variable <code>log</code> is a class logger.
+	 */
+	private static final Logger log = Logger.getLogger("tigase.cluster.VirtualComponent");
 
 	/**
 	 * Virtual component parameter setting packet redirect destination address.
 	 */
 	public static final String REDIRECT_TO_PROP_KEY = "redirect-to";
+
 	/**
 	 * Parameter to set service discovery item name for the virtual component
 	 * instance. You should refer to service discovery documentation for a proper
 	 * name for your component.
 	 */
 	public static final String DISCO_NAME_PROP_KEY = "disco-name";
+
+	/** Field description */
 	public static final String DISCO_NAME_PROP_VAL = "Multi User Chat";
+
 	/**
 	 * Parameter to set service discovery node name. In most cases you should leave
 	 * it empty unless you really know what you are doing.
 	 */
 	public static final String DISCO_NODE_PROP_KEY = "disco-node";
+
+	/** Field description */
 	public static final String DISCO_NODE_PROP_VAL = "";
+
 	/**
 	 * Parameter to set service discovery item type for the virtual component.
 	 * You should refer to a service discovery documentation for a correct type
@@ -118,56 +136,162 @@ public class VirtualComponent
 	 * your real component.
 	 */
 	public static final String DISCO_TYPE_PROP_KEY = "disco-type";
+
+	/** Field description */
 	public static final String DISCO_TYPE_PROP_VAL = "text";
+
 	/**
 	 * Parameter to set service discovery item category name for the virtual
 	 * component. Please refer to service discovery documentation for a correct
 	 * category or check what is returned by your real component instance.
 	 */
 	public static final String DISCO_CATEGORY_PROP_KEY = "disco-category";
+
+	/** Field description */
 	public static final String DISCO_CATEGORY_PROP_VAL = "conference";
+
 	/**
 	 * Comma separated list of features for the service discovery item
 	 * reprezented by this virtual component. Please check with the real component
 	 * to obtain a correct list of features.
 	 */
 	public static final String DISCO_FEATURES_PROP_KEY = "disco-features";
+
+	/** Field description */
 	public static final String DISCO_FEATURES_PROP_VAL = "http://jabber.org/protocol/muc";
 
-	private String name = null;
+	//~--- fields ---------------------------------------------------------------
+
 	private JID componentId = null;
-	private ServiceEntity serviceEntity = null;
-	private JID redirectTo = null;
+	private String discoCategory = null;
+	private String[] discoFeatures = null;
 	private String discoName = null;
 	private String discoNode = null;
-	private String discoCategory = null;
 	private String discoType = null;
-	private String[] discoFeatures = null;
+	private String name = null;
+	private JID redirectTo = null;
+	private ServiceEntity serviceEntity = null;
 
-	@Override
-	public void setName(String name) {
-		this.name = name;
-		try {
-			this.componentId = new JID(name, DNSResolver.getDefaultHostname(), null);
-		} catch (TigaseStringprepException ex) {
-			log.log(Level.WARNING, "Problem setting component ID: ", ex);
-		}
-	}
+	//~--- get methods ----------------------------------------------------------
 
-	@Override
-	public String getName() {
-		return name;
-	}
-
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
 	@Override
 	public JID getComponentId() {
 		return componentId;
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param params
+	 *
+	 * @return
+	 */
 	@Override
-	public void release() {
+	public Map<String, Object> getDefaults(Map<String, Object> params) {
+		Map<String, Object> defs = new LinkedHashMap<String, Object>();
+
+		defs.put(REDIRECT_TO_PROP_KEY, "");
+
+		if (params.get(CLUSTER_NODES) != null) {
+			String[] cl_nodes = ((String) params.get(CLUSTER_NODES)).split(",");
+
+			for (String node : cl_nodes) {
+				if ( !node.equals(DNSResolver.getDefaultHostname())) {
+					defs.put(REDIRECT_TO_PROP_KEY, BareJID.toString(getName(), node));
+
+					break;
+				}
+			}
+		}
+
+		defs.put(DISCO_NAME_PROP_KEY, DISCO_NAME_PROP_VAL);
+		defs.put(DISCO_NODE_PROP_KEY, DISCO_NODE_PROP_VAL);
+		defs.put(DISCO_TYPE_PROP_KEY, DISCO_TYPE_PROP_VAL);
+		defs.put(DISCO_CATEGORY_PROP_KEY, DISCO_CATEGORY_PROP_VAL);
+		defs.put(DISCO_FEATURES_PROP_KEY, DISCO_FEATURES_PROP_VAL);
+
+		return defs;
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param from
+	 *
+	 * @return
+	 */
+	@Override
+	public List<Element> getDiscoFeatures(JID from) {
+		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param node
+	 * @param jid
+	 * @param from
+	 *
+	 * @return
+	 */
+	@Override
+	public Element getDiscoInfo(String node, JID jid, JID from) {
+		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param node
+	 * @param jid
+	 * @param from
+	 *
+	 * @return
+	 */
+	@Override
+	public List<Element> getDiscoItems(String node, JID jid, JID from) {
+		Element result = serviceEntity.getDiscoItem(null, getName() + "." + jid);
+
+		return Arrays.asList(result);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public String getName() {
+		return name;
+	}
+
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 */
+	@Override
+	public void initializationCompleted() {}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param packet
+	 * @param results
+	 */
 	@Override
 	public void processPacket(Packet packet, Queue<Packet> results) {
 		if (redirectTo != null) {
@@ -178,77 +302,68 @@ public class VirtualComponent
 		}
 	}
 
+	/**
+	 * Method description
+	 *
+	 */
 	@Override
-	public void initializationCompleted() {
+	public void release() {}
+
+	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param name
+	 */
+	@Override
+	public void setName(String name) {
+		this.componentId = JID.jidInstanceNS(name, DNSResolver.getDefaultHostname(), null);
 	}
 
-	@Override
-	public Element getDiscoInfo(String node, JID jid, JID from) {
-		return null;
-	}
-
-	@Override
-	public List<Element> getDiscoItems(String node, JID jid, JID from) {
-		Element result = serviceEntity.getDiscoItem(null, getName() + "." + jid);
-		return Arrays.asList(result);
-	}
-
-	@Override
-	public List<Element> getDiscoFeatures(JID from) {
-		return null;
-	}
-
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param properties
+	 */
 	@Override
 	public void setProperties(Map<String, Object> properties) {
-
 		String redirect = (String) properties.get(REDIRECT_TO_PROP_KEY);
-		if (redirect == null || redirect.isEmpty()) {
+
+		if ((redirect == null) || redirect.isEmpty()) {
 			redirectTo = null;
 		} else {
 			try {
-				redirectTo = new JID(redirect);
+				redirectTo = JID.jidInstance(redirect);
 			} catch (TigaseStringprepException ex) {
 				redirectTo = null;
 				log.warning("stringprep processing failed for given redirect address: " + redirect);
 			}
 		}
+
 		discoName = (String) properties.get(DISCO_NAME_PROP_KEY);
 		discoNode = (String) properties.get(DISCO_NODE_PROP_KEY);
+
 		if (discoNode.isEmpty()) {
 			discoNode = null;
 		}
+
 		discoCategory = (String) properties.get(DISCO_CATEGORY_PROP_KEY);
 		discoType = (String) properties.get(DISCO_TYPE_PROP_KEY);
 		discoFeatures = ((String) properties.get(DISCO_TYPE_PROP_KEY)).split(",");
-
 		serviceEntity = new ServiceEntity(getName(), null, discoName);
-		serviceEntity.addIdentities(new ServiceIdentity(discoCategory, discoType,
-						discoName));
+		serviceEntity.addIdentities(new ServiceIdentity(discoCategory, discoType, discoName));
+
 		for (String feature : discoFeatures) {
 			serviceEntity.addFeatures(feature);
 		}
 	}
-
-	@Override
-	public Map<String, Object> getDefaults(Map<String, Object> params) {
-		Map<String, Object> defs = new LinkedHashMap<String, Object>();
-
-		defs.put(REDIRECT_TO_PROP_KEY, "");
-		if (params.get(CLUSTER_NODES) != null) {
-			String[] cl_nodes = ((String)params.get(CLUSTER_NODES)).split(",");
-			for (String node : cl_nodes) {
-				if (!node.equals( DNSResolver.getDefaultHostname())) {
-					defs.put(REDIRECT_TO_PROP_KEY, BareJID.toString(getName(), node));
-					break;
-				}
-			}
-		}
-		defs.put(DISCO_NAME_PROP_KEY, DISCO_NAME_PROP_VAL);
-		defs.put(DISCO_NODE_PROP_KEY, DISCO_NODE_PROP_VAL);
-		defs.put(DISCO_TYPE_PROP_KEY, DISCO_TYPE_PROP_VAL);
-		defs.put(DISCO_CATEGORY_PROP_KEY, DISCO_CATEGORY_PROP_VAL);
-		defs.put(DISCO_FEATURES_PROP_KEY, DISCO_FEATURES_PROP_VAL);
-		return defs;
-	}
-
 }
+
+
+//~ Formatted in Sun Code Convention
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

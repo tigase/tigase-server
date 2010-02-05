@@ -259,8 +259,7 @@ public class Packet {
 	 * @throws TigaseStringprepException if there is stanza from or to address parsing
 	 * error.
 	 */
-	public static Packet packetInstance(String el_name, String from, String to,
-					StanzaType type)
+	public static Packet packetInstance(String el_name, String from, String to, StanzaType type)
 					throws TigaseStringprepException {
 		Element elem = new Element(el_name,
 															 new String[] { "from", "to", "type" },
@@ -545,7 +544,7 @@ public class Packet {
 
 		if (children != null) {
 			for (Element cond : children) {
-				if (!cond.getName().equals("text")) {
+				if ( !cond.getName().equals("text")) {
 					return cond.getName();
 				}    // end of if (!cond.getName().equals("text"))
 			}      // end of for (Element cond: children)
@@ -761,13 +760,13 @@ public class Packet {
 		String tmp = elem.getAttribute("to");
 
 		if (tmp != null) {
-			stanzaTo = new JID(tmp);
+			stanzaTo = JID.jidInstance(tmp);
 		}
 
 		tmp = elem.getAttribute("from");
 
 		if (tmp != null) {
-			stanzaFrom = new JID(tmp);
+			stanzaFrom = JID.jidInstance(tmp);
 		}
 
 		stanzaId = elem.getAttribute("id");
@@ -997,8 +996,7 @@ public class Packet {
 	public Packet packRouted() {
 		Element routedp = new Element("route",
 																	new String[] { "to", "from" },
-																	new String[] { getTo().toString(),
-						getFrom().toString() });
+																	new String[] { getTo().toString(), getFrom().toString() });
 
 		routedp.addChild(elem);
 
@@ -1239,8 +1237,8 @@ public class Packet {
 	 */
 	public String toStringSecure() {
 		if (packetToStringSecure == null) {
-			packetToStringSecure = ", data=" + elem.toStringSecure() + ", XMLNS="
-														 + elem.getXMLNS() + ", priority=" + priority;
+			packetToStringSecure = ", data=" + elem.toStringSecure() + ", XMLNS=" + elem.getXMLNS()
+														 + ", priority=" + priority;
 		}
 
 		return "from=" + packetFrom + ", to=" + packetTo + packetToStringSecure;

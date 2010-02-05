@@ -19,25 +19,38 @@
  * Last modified by $Author$
  * $Date$
  */
+
 package tigase.server.ssender;
 
+//~--- non-JDK imports --------------------------------------------------------
+
+import tigase.server.Message;
+import tigase.server.Packet;
+
+import tigase.util.TigaseStringprepException;
+
+import tigase.xml.XMLUtils;
+
+import tigase.xmpp.JID;
+import tigase.xmpp.StanzaType;
+
+//~--- JDK imports ------------------------------------------------------------
+
 import java.io.IOException;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
 //import java.sql.Date;
 import java.util.ArrayDeque;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import tigase.server.Message;
-import tigase.server.Packet;
-import tigase.util.TigaseStringprepException;
-import tigase.xmpp.StanzaType;
-import tigase.xml.XMLUtils;
-import tigase.xmpp.JID;
+
+//~--- classes ----------------------------------------------------------------
 
 /**
  * <code>DrupalForumTask</code> implements tasks for cyclic retrieving new
@@ -64,36 +77,18 @@ import tigase.xmpp.JID;
 public class DrupalForumTask extends SenderTask {
 
 	/**
-   * Variable <code>log</code> is a class logger.
-   */
-  private static final Logger log =
-    Logger.getLogger("tigase.server.ssender.DrupalForumTask");
-
+	 * Variable <code>log</code> is a class logger.
+	 */
+	private static final Logger log = Logger.getLogger("tigase.server.ssender.DrupalForumTask");
 	private static final long SECOND = 1000;
 
-	/**
-	 * <code>handler</code> is a reference to object processing stanza
-	 * read from database.
-	 */
-	private StanzaHandler handler = null;
-	/**
-	 * <code>db_conn</code> field stores database connection string.
-	 */
-	private String db_conn = null;
+	//~--- fields ---------------------------------------------------------------
+
 	/**
 	 * <code>conn</code> variable keeps connection to database.
 	 */
 	private Connection conn = null;
-	/**
-	 * <code>get_new_topics</code> is a prepared statement for retrieving all
-	 * new topics for drupal forum.
-	 */
-	private PreparedStatement get_new_topics = null;
-	/**
-	 * <code>get_new_comments</code> is a prepared statement for retrieving all
-	 * new comments from drupal forum.
-	 */
-	private PreparedStatement get_new_comments = null;
+
 	/**
 	 * <code>conn_valid_st</code> is a prepared statement keeping query used
 	 * to validate connection to database:
@@ -102,10 +97,39 @@ public class DrupalForumTask extends SenderTask {
 	private PreparedStatement conn_valid_st = null;
 
 	/**
+	 * <code>connectionValidateInterval</code> is kind of constant keeping minimum
+	 * interval for validating connection to database.
+	 */
+	private long connectionValidateInterval = 1000 * 60;
+
+	/**
+	 * <code>db_conn</code> field stores database connection string.
+	 */
+	private String db_conn = null;
+
+	/**
 	 * <code>forumId</code> variable keeps drupal numerical forum ID which
 	 * has to be monitored for new posts.
 	 */
 	private long forumId = -1;
+
+	/**
+	 * <code>get_new_comments</code> is a prepared statement for retrieving all
+	 * new comments from drupal forum.
+	 */
+	private PreparedStatement get_new_comments = null;
+
+	/**
+	 * <code>get_new_topics</code> is a prepared statement for retrieving all
+	 * new topics for drupal forum.
+	 */
+	private PreparedStatement get_new_topics = null;
+
+	/**
+	 * <code>handler</code> is a reference to object processing stanza
+	 * read from database.
+	 */
+	private StanzaHandler handler = null;
 
 	/**
 	 * <code>jid</code> keeps destination address where all new posts from
@@ -113,13 +137,6 @@ public class DrupalForumTask extends SenderTask {
 	 *
 	 */
 	private JID jid = null;
-
-	/**
-	 * <code>lastCheck</code> keeps time of last forum topics check so it
-	 * gets only new posts.
-	 *
-	 */
-	protected long lastTopicsCheck = -1;
 
 	/**
 	 * <code>lastCheck</code> keeps time of last forum comments check so it
@@ -133,98 +150,53 @@ public class DrupalForumTask extends SenderTask {
 	 * connection was validated for the last time.
 	 */
 	private long lastConnectionValidated = 0;
-	/**
-	 * <code>connectionValidateInterval</code> is kind of constant keeping minimum
-	 * interval for validating connection to database.
-	 */
-	private long connectionValidateInterval = 1000*60;
 
 	/**
-	 * <code>release</code> method releases some SQL query variables.
+	 * <code>lastCheck</code> keeps time of last forum topics check so it
+	 * gets only new posts.
 	 *
-	 * @param rs a <code>ResultSet</code> value
 	 */
-	private void release(ResultSet rs) {
-		if (rs != null) {
-			try {
-				rs.close();
-			} catch (SQLException sqlEx) { }
-		}
-	}
+	protected long lastTopicsCheck = -1;
+
+	//~--- methods --------------------------------------------------------------
 
 	/**
-	 * <code>checkConnection</code> method checks whether connection to database
-	 * is still valid, if not it simply reconnect and reinitializes database
-	 * backend.
+	 * Method description
 	 *
-	 * @return a <code>boolean</code> value
-	 * @exception SQLException if an error occurs
+	 *
+	 * @return
 	 */
-	private boolean checkConnection() throws SQLException {
+	@Override
+	public boolean cancel() {
+		boolean result = super.cancel();
+
 		try {
-			long tmp = System.currentTimeMillis();
-			if ((tmp - lastConnectionValidated) >= connectionValidateInterval) {
-				conn_valid_st.executeQuery();
-				lastConnectionValidated = tmp;
-			} // end of if ()
+			conn_valid_st.close();
+			get_new_topics.close();
+			get_new_comments.close();
+			conn.close();
 		} catch (Exception e) {
-			initRepo();
-		} // end of try-catch
-		return true;
-	}
 
-	/**
-	 * <code>findTableName</code> method parses database connection string to find
-	 * table name where stanza packets are waiting for sending.
-	 *
-	 * @param db_str a <code>String</code> value
-	 */
-	private void findExtraParams(String db_str) throws TigaseStringprepException {
-		String[] params = db_str.split("&");
-		for (String par: params) {
-			if (par.startsWith("jid=")) {
-				jid = new JID(par.substring("jid=".length(), par.length()));
-			}
-			if (par.startsWith("forum")) {
-				try {
-					forumId =
-						Long.parseLong(par.substring("forum=".length(), par.length()));
-				} catch (NumberFormatException e) {
-					forumId = -1;
-					log.warning("Forum ID number is incorrect: "
-						+ par.substring("forum=".length(), par.length()));
-				}
-			}
+			// Ignore.
 		}
+
+		return result;
 	}
+
+	//~--- get methods ----------------------------------------------------------
 
 	/**
-	 * <code>initRepo</code> method initializes database backend - connects to
-	 * database, creates prepared statements and sets basic variables.
+	 * <code>getInitString</code> method returns initialization string passed
+	 * to it in <code>init()</code> method.
 	 *
-	 * @exception SQLException if an error occurs
+	 * @return a <code>String</code> value of initialization string.
 	 */
-	private void initRepo() throws SQLException {
-		conn = DriverManager.getConnection(db_conn);
-		conn.setAutoCommit(true);
-
-		String query = "select 1;";
-		conn_valid_st = conn.prepareStatement(query);
-
-		query = "select users.name as name, node_revisions.title as title,"
-			+ " node_revisions.body as body"
-			+ " from forum, node_revisions, users where"
-			+ " (status = 1) and (node_revisions.timestamp > ?)"
-			+ " and forum.tid = ? and users.uid = node_revisions.uid"
-			+ " and node_revisions.vid = forum.vid;";
-		get_new_topics = conn.prepareStatement(query);
-
-		query = "select name, thread, subject, comment "
-			+ "from comments where"
-			+ " (status = 0) and (timestamp > ?)"
-			+ " and (nid in (select nid from forum where tid = ?));";
-		get_new_comments = conn.prepareStatement(query);
+	@Override
+	public String getInitString() {
+		return db_conn;
 	}
+
+	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * <code>init</code> method is a task specific initialization rountine.
@@ -242,11 +214,13 @@ public class DrupalForumTask extends SenderTask {
 	public void init(StanzaHandler handler, String initString) throws IOException {
 		this.handler = handler;
 		db_conn = initString;
+
 		try {
 			findExtraParams(db_conn);
 		} catch (TigaseStringprepException ex) {
 			throw new IOException("Destination address problem, stringprep processing failed", ex);
 		}
+
 		lastTopicsCheck = System.currentTimeMillis() / SECOND;
 		lastCommentsCheck = System.currentTimeMillis() / SECOND;
 
@@ -258,62 +232,110 @@ public class DrupalForumTask extends SenderTask {
 	}
 
 	/**
-	 * <code>getInitString</code> method returns initialization string passed
-	 * to it in <code>init()</code> method.
-	 *
-	 * @return a <code>String</code> value of initialization string.
+	 * <code>run</code> method is where all task work is done.
 	 */
 	@Override
-	public String getInitString() {
-		return db_conn;
+	public void run() {
+
+//  log.info("Task " + getName()
+//      + ", timestamp = " + lastCommentsCheck
+// //      + ", getTime() = " + lastCommentsCheck.getTime()
+//    + ", System.currentTimeMillis() = " + System.currentTimeMillis());
+		Queue<Packet> results = getNewPackets();
+
+		handler.handleStanzas(results);
 	}
 
-	@Override
-	public boolean cancel() {
-		boolean result = super.cancel();
+	//~--- get methods ----------------------------------------------------------
+
+	protected Queue<Packet> getNewPackets() {
+		Queue<Packet> results = new ArrayDeque<Packet>();
+
+		newTopics(results);
+		newComments(results);
+
+		return results;
+	}
+
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * <code>checkConnection</code> method checks whether connection to database
+	 * is still valid, if not it simply reconnect and reinitializes database
+	 * backend.
+	 *
+	 * @return a <code>boolean</code> value
+	 * @exception SQLException if an error occurs
+	 */
+	private boolean checkConnection() throws SQLException {
 		try {
-			conn_valid_st.close();
-			get_new_topics.close();
-			get_new_comments.close();
-			conn.close();
+			long tmp = System.currentTimeMillis();
+
+			if ((tmp - lastConnectionValidated) >= connectionValidateInterval) {
+				conn_valid_st.executeQuery();
+				lastConnectionValidated = tmp;
+			}    // end of if ()
 		} catch (Exception e) {
-			// Ignore.
-		}
-		return result;
+			initRepo();
+		}      // end of try-catch
+
+		return true;
 	}
 
-	private void newTopics(Queue<Packet> results) {
-		ResultSet rs = null;
-		try {
-			checkConnection();
-			get_new_topics.setLong(1, lastTopicsCheck);
-			lastTopicsCheck = System.currentTimeMillis() / SECOND;
-			get_new_topics.setLong(2, forumId);
-			rs = get_new_topics.executeQuery();
-			while (rs.next()) {
-				String name = rs.getString("name");
-				String title = rs.getString("title");
-				String body = rs.getString("body");
-				Packet msg = Message.getMessage(getName(), jid, StanzaType.normal,
-					"New post by " + name + ":\n\n" + XMLUtils.escape(body),
-					XMLUtils.escape(title), null, null);
-				log.fine("Sending new topic: " + msg.toString());
-				results.offer(msg);
+	/**
+	 * <code>findTableName</code> method parses database connection string to find
+	 * table name where stanza packets are waiting for sending.
+	 *
+	 * @param db_str a <code>String</code> value
+	 */
+	private void findExtraParams(String db_str) throws TigaseStringprepException {
+		String[] params = db_str.split("&");
+
+		for (String par : params) {
+			if (par.startsWith("jid=")) {
+				jid = JID.jidInstance(par.substring("jid=".length(), par.length()));
 			}
-		} catch (SQLException e) {
-			// Let's ignore it for now.
-			log.log(Level.WARNING, "Error retrieving stanzas from database: ", e);
-			// It should probably do kind of auto-stop???
-			// if so just uncomment below line:
-			//this.cancel();
-		} finally {
-			release(rs);
-			rs = null;
+
+			if (par.startsWith("forum")) {
+				try {
+					forumId = Long.parseLong(par.substring("forum=".length(), par.length()));
+				} catch (NumberFormatException e) {
+					forumId = -1;
+					log.warning("Forum ID number is incorrect: "
+							+ par.substring("forum=".length(), par.length()));
+				}
+			}
 		}
+	}
+
+	/**
+	 * <code>initRepo</code> method initializes database backend - connects to
+	 * database, creates prepared statements and sets basic variables.
+	 *
+	 * @exception SQLException if an error occurs
+	 */
+	private void initRepo() throws SQLException {
+		conn = DriverManager.getConnection(db_conn);
+		conn.setAutoCommit(true);
+
+		String query = "select 1;";
+
+		conn_valid_st = conn.prepareStatement(query);
+		query = "select users.name as name, node_revisions.title as title,"
+				+ " node_revisions.body as body" + " from forum, node_revisions, users where"
+					+ " (status = 1) and (node_revisions.timestamp > ?)"
+						+ " and forum.tid = ? and users.uid = node_revisions.uid"
+							+ " and node_revisions.vid = forum.vid;";
+		get_new_topics = conn.prepareStatement(query);
+		query = "select name, thread, subject, comment " + "from comments where"
+				+ " (status = 0) and (timestamp > ?)"
+					+ " and (nid in (select nid from forum where tid = ?));";
+		get_new_comments = conn.prepareStatement(query);
 	}
 
 	private void newComments(Queue<Packet> results) {
 		ResultSet rs = null;
+
 		try {
 			checkConnection();
 			log.info("New comment check, timestamp = " + lastCommentsCheck);
@@ -321,47 +343,84 @@ public class DrupalForumTask extends SenderTask {
 			lastCommentsCheck = System.currentTimeMillis() / SECOND;
 			get_new_comments.setLong(2, forumId);
 			rs = get_new_comments.executeQuery();
+
 			while (rs.next()) {
 				String name = rs.getString("name");
 				String thread = rs.getString("thread");
 				String subject = rs.getString("subject");
 				String comment = rs.getString("comment");
 				Packet msg = Message.getMessage(getName(), jid, StanzaType.normal,
-					"New comment by " + name + ":\n\n" + XMLUtils.escape(comment),
-					XMLUtils.escape(subject), thread, null);
+											 "New comment by " + name + ":\n\n" + XMLUtils.escape(comment),
+											 XMLUtils.escape(subject), thread, null);
+
 				log.fine("Sending new comment: " + msg.toString());
 				results.offer(msg);
 			}
 		} catch (SQLException e) {
+
 			// Let's ignore it for now.
 			log.log(Level.WARNING, "Error retrieving stanzas from database: ", e);
+
 			// It should probably do kind of auto-stop???
 			// if so just uncomment below line:
-			//this.cancel();
+			// this.cancel();
 		} finally {
 			release(rs);
 			rs = null;
 		}
 	}
 
-	protected Queue<Packet> getNewPackets() {
-		Queue<Packet> results = new ArrayDeque<Packet>();
-		newTopics(results);
-		newComments(results);
-		return results;
+	private void newTopics(Queue<Packet> results) {
+		ResultSet rs = null;
+
+		try {
+			checkConnection();
+			get_new_topics.setLong(1, lastTopicsCheck);
+			lastTopicsCheck = System.currentTimeMillis() / SECOND;
+			get_new_topics.setLong(2, forumId);
+			rs = get_new_topics.executeQuery();
+
+			while (rs.next()) {
+				String name = rs.getString("name");
+				String title = rs.getString("title");
+				String body = rs.getString("body");
+				Packet msg = Message.getMessage(getName(), jid, StanzaType.normal,
+											 "New post by " + name + ":\n\n" + XMLUtils.escape(body),
+											 XMLUtils.escape(title), null, null);
+
+				log.fine("Sending new topic: " + msg.toString());
+				results.offer(msg);
+			}
+		} catch (SQLException e) {
+
+			// Let's ignore it for now.
+			log.log(Level.WARNING, "Error retrieving stanzas from database: ", e);
+
+			// It should probably do kind of auto-stop???
+			// if so just uncomment below line:
+			// this.cancel();
+		} finally {
+			release(rs);
+			rs = null;
+		}
 	}
 
 	/**
-	 * <code>run</code> method is where all task work is done.
+	 * <code>release</code> method releases some SQL query variables.
+	 *
+	 * @param rs a <code>ResultSet</code> value
 	 */
-	@Override
-	public void run() {
-// 		log.info("Task " + getName()
-//  			+ ", timestamp = " + lastCommentsCheck
-// // 			+ ", getTime() = " + lastCommentsCheck.getTime()
-// 			+ ", System.currentTimeMillis() = " + System.currentTimeMillis());
-		Queue<Packet> results = getNewPackets();
-		handler.handleStanzas(results);
+	private void release(ResultSet rs) {
+		if (rs != null) {
+			try {
+				rs.close();
+			} catch (SQLException sqlEx) {}
+		}
 	}
-
 }
+
+
+//~ Formatted in Sun Code Convention
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

@@ -96,11 +96,7 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 	//~--- static initializers --------------------------------------------------
 
 	static {
-		try {
-			NULL_ROUTING = new JID("NULL");
-		} catch (Exception e) {
-			log.log(Level.WARNING, "Problem initializing class: ", e);
-		}
+		NULL_ROUTING = JID.jidInstanceNS("NULL");
 	}
 
 	//~--- fields ---------------------------------------------------------------
@@ -109,8 +105,7 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 	private JID compId = null;
 	private String name = null;
 	private String defHostname = DEF_HOSTNAME_PROP_VAL;
-	private Map<String, CommandIfc> scriptCommands = new ConcurrentHashMap<String,
-																										 CommandIfc>();
+	private Map<String, CommandIfc> scriptCommands = new ConcurrentHashMap<String, CommandIfc>();
 	protected Set<BareJID> admins = new ConcurrentSkipListSet<BareJID>();
 	private ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
 	private String scriptsBaseDir = null;
@@ -320,8 +315,8 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 					for (CommandIfc comm : scriptCommands.values()) {
 						result.add(new Element("item",
 																	 new String[] { "node", "name", "jid" },
-																	 new String[] { comm.getCommandId(),
-										comm.getDescription(), getComponentId().toString() }));
+																	 new String[] { comm.getCommandId(), comm.getDescription(),
+										getComponentId().toString() }));
 					}
 				}
 			} else {
@@ -347,9 +342,8 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 		} else {
 			Element res = null;
 
-			if (!serviceEntity.isAdminOnly() || isAdmin(from)) {
-				res = serviceEntity.getDiscoItem(null,
-																				 BareJID.toString(getName(), jid.toString()));
+			if ( !serviceEntity.isAdminOnly() || isAdmin(from)) {
+				res = serviceEntity.getDiscoItem(null, BareJID.toString(getName(), jid.toString()));
 			}
 
 			result = serviceEntity.getDiscoItems(null, null, isAdmin(from));
@@ -558,7 +552,7 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 		this.name = name;
 
 		try {
-			compId = new JID(name, defHostname, null);
+			compId = JID.jidInstance(name, defHostname, null);
 		} catch (TigaseStringprepException ex) {
 			log.log(Level.WARNING, "Problem setting component ID: ", ex);
 		}
@@ -573,7 +567,7 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 	@Override
 	public void setProperties(Map<String, Object> props) {
 		try {
-			compId = new JID((String) props.get(COMPONENT_ID_PROP_KEY));
+			compId = JID.jidInstance((String) props.get(COMPONENT_ID_PROP_KEY));
 		} catch (TigaseStringprepException ex) {
 			log.log(Level.WARNING, "Problem setting component ID: ", ex);
 		}
@@ -796,8 +790,8 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 								int idx = line.indexOf(CommandIfc.SCRIPT_DESCRIPTION);
 
 								if (idx >= 0) {
-									cmdDescr =
-										line.substring(idx + CommandIfc.SCRIPT_DESCRIPTION.length()).trim();
+									cmdDescr = line.substring(idx
+																						+ CommandIfc.SCRIPT_DESCRIPTION.length()).trim();
 								}
 
 								idx = line.indexOf(CommandIfc.SCRIPT_ID);
@@ -809,16 +803,15 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 								idx = line.indexOf(CommandIfc.SCRIPT_COMPONENT);
 
 								if (idx >= 0) {
-									comp = line.substring(idx
-																				+ CommandIfc.SCRIPT_COMPONENT.length()).trim();
+									comp = line.substring(idx + CommandIfc.SCRIPT_COMPONENT.length()).trim();
 								}
 							}
 
 							buffr.close();
 
 							if ((cmdId == null) || (cmdDescr == null) || (comp == null)) {
-								log.warning("Admin script found but it has no command ID or command description: "
-														+ file);
+								log.warning("Admin script found but it has no command ID or command"
+														+ "description: " + file);
 
 								continue;
 							}
@@ -835,7 +828,7 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 								}
 							}
 
-							if (!found) {
+							if ( !found) {
 								log.info("Admin script for a different component: " + comp);
 
 								continue;
@@ -845,13 +838,12 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 							String ext = file.toString().substring(idx + 1);
 
 							addCommand.addAdminScript(cmdId, cmdDescr, sb.toString(), null, ext, binds);
-							log.config(getName() + ": Loaded admin command from file: " + file
-												 + ", id: " + cmdId + ", ext: " + ext + ", descr: " + cmdDescr);
+							log.config(getName() + ": Loaded admin command from file: " + file + ", id: "
+												 + cmdId + ", ext: " + ext + ", descr: " + cmdDescr);
 						}
 					}
 				} else {
-					log.warning("Admin scripts directory is missing: " + adminDir
-											+ ", creating...");
+					log.warning("Admin scripts directory is missing: " + adminDir + ", creating...");
 					adminDir.mkdirs();
 				}
 			} catch (Exception e) {

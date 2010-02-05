@@ -1207,8 +1207,11 @@ public abstract class Presence {
 					// Send to new resource last presence sent by the old resource
 					if (presence_el != null) {
 						pres_update = presence_el.clone();
-						pres_update.setAttribute("from", conn.getJID().toString());
-						pres_update.setAttribute("to", session.getUserId().toString());
+
+						// Below is not necessary, initVars(...) which is called from
+						// packetInstance() sets from/to attributes for stanza
+						// pres_update.setAttribute("from", conn.getJID().toString());
+						// pres_update.setAttribute("to", session.getUserId().toString());
 						pack_update = Packet.packetInstance(pres_update, conn.getJID(),
 										session.getJID().copyWithoutResource());
 						pack_update.setPacketTo(session.getConnectionId());
