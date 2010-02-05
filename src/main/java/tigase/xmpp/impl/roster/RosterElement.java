@@ -39,6 +39,7 @@ import static tigase.xmpp.impl.roster.RosterAbstract.SubscriptionType;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
+import tigase.util.XMPPStringPrepFactory;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -67,7 +68,7 @@ public class RosterElement {
 	private String name = null;
 	private XMPPResourceConnection session = null;
 	private SubscriptionType subscription = null;
-	private boolean stringpreped = false;
+	private String stringpreped = null;
 
 	// private boolean online = false;
 	// private Element item = null;
@@ -89,7 +90,7 @@ public class RosterElement {
 		this.session = session;
 
 		if (roster_el.getName() == ELEM_NAME) {
-			this.stringpreped = Boolean.parseBoolean(roster_el.getAttribute(STRINGPREP_ATT));
+			this.stringpreped = roster_el.getAttribute(STRINGPREP_ATT);
 			setJid(roster_el.getAttribute(JID_ATT));
 			setName(roster_el.getAttribute(NAME_ATT));
 
@@ -119,9 +120,8 @@ public class RosterElement {
 	 * @param session
 	 */
 	public RosterElement(JID jid, String name, String[] groups, XMPPResourceConnection session) {
-		this.stringpreped = true;
+		this.stringpreped = XMPPStringPrepFactory.STRINGPREP_PROCESSOR;
 		this.session = session;
-		this.stringpreped = true;
 		setJid(jid);
 		setName(name);
 		this.groups = groups;
@@ -356,14 +356,14 @@ public class RosterElement {
 	}
 
 	private void setJid(String jid) throws TigaseStringprepException {
-		if (stringpreped) {
+		if (XMPPStringPrepFactory.STRINGPREP_PROCESSOR.equals(stringpreped)) {
 			this.jid = JID.jidInstanceNS(jid);
 		} else {
 			this.jid = JID.jidInstance(jid);
 			modified = true;
 		}
 
-		stringpreped = true;
+		stringpreped = XMPPStringPrepFactory.STRINGPREP_PROCESSOR;
 	}
 }
 
