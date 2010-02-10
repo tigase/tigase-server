@@ -174,7 +174,7 @@ public interface Configurable extends ServerComponent {
 	public static final String USER_REPO_POOL_SIZE = "--user-repo-pool-size";
 
 	/** Field description */
-	public static final String STRINGPREP_PROCESSOR = "--stringprep.processor";
+	public static final String STRINGPREP_PROCESSOR = "--stringprep-processor";
 
 	/** Field description */
 	public static final String XML_REPO_CLASS_PROP_VAL = "tigase.db.xml.XMLRepository";
@@ -199,8 +199,7 @@ public interface Configurable extends ServerComponent {
 	public static final String DRUPAL_REPO_CLASS_PROP_VAL = "tigase.db.jdbc.DrupalAuth";
 
 	/** Field description */
-	public static final String LIBRESOURCE_REPO_CLASS_PROP_VAL =
-		"tigase.db.jdbc.LibreSourceAuth";
+	public static final String LIBRESOURCE_REPO_CLASS_PROP_VAL = "tigase.db.jdbc.LibreSourceAuth";
 
 	/** Field description */
 	public static final String SHARED_USER_REPO_PROP_KEY = "shared-user-repo";
@@ -287,23 +286,20 @@ public interface Configurable extends ServerComponent {
 		"tigase.server.xmppclient.ClientConnectionManager";
 
 	/** Field description */
-	public static final String C2S_CLUST_COMP_CLASS_NAME =
-		"tigase.cluster.ClientConnectionClustered";
+	public static final String C2S_CLUST_COMP_CLASS_NAME = "tigase.cluster.ClientConnectionClustered";
 
 	/** Field description */
 	public static final String S2S_COMP_CLASS_NAME =
 		"tigase.server.xmppserver.ServerConnectionManager";
 
 	/** Field description */
-	public static final String S2S_CLUST_COMP_CLASS_NAME =
-		"tigase.cluster.ServerConnectionClustered";
+	public static final String S2S_CLUST_COMP_CLASS_NAME = "tigase.cluster.ServerConnectionClustered";
 
 	/** Field description */
 	public static final String SM_COMP_CLASS_NAME = "tigase.server.xmppsession.SessionManager";
 
 	/** Field description */
-	public static final String SM_CLUS_COMP_CLASS_NAME =
-		"tigase.cluster.SessionManagerClustered";
+	public static final String SM_CLUS_COMP_CLASS_NAME = "tigase.cluster.SessionManagerClustered";
 
 	/** Field description */
 	public static final String EXT_COMP_CLASS_NAME =
