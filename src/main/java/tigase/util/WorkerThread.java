@@ -61,13 +61,13 @@ public abstract class WorkerThread extends Thread {
 	 */
 	public abstract WorkerThread getNewInstance(PriorityQueueAbstract<QueueItem> queue);
 
+	//~--- methods --------------------------------------------------------------
+
 //{
 //  WorkerThread worker = new WorkerThread();
 //  worker.setQueue(queue);
 //  return worker;
 //}
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -123,8 +123,7 @@ public abstract class WorkerThread extends Thread {
 					averageProcessingTime = (averageProcessingTime + end) / 2;
 				}
 			} catch (Exception e) {
-				log.log(Level.SEVERE, "Exception during packet processing: " + item.packet.toString(),
-						e);
+				log.log(Level.SEVERE, "Exception during packet processing: " + item.packet.toString(), e);
 			}
 
 			++runsCnt;
