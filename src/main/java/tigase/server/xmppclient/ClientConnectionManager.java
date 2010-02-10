@@ -129,8 +129,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 			// route packets to SM on remote host where is default routing
 			// for external component.
 			// Otherwise default routing is to SM on localhost
-			if (params.get("config-type").equals(GEN_CONFIG_CS)
-					&& (params.get(GEN_EXT_COMP) != null)) {
+			if (params.get("config-type").equals(GEN_CONFIG_CS) && (params.get(GEN_EXT_COMP) != null)) {
 				String[] comp_params = ((String) params.get(GEN_EXT_COMP)).split(",");
 
 				props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_ENTRY_PROP_KEY,
@@ -205,11 +204,10 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 				// Connection closed or broken, send message back to the SM
 				// if this is not IQ result...
 				// Ignore also all presence packets with available, unavailble
-				if ((packet.getType() != StanzaType.result)
-						&& (packet.getType() != StanzaType.available)
-							&& (packet.getType() != StanzaType.unavailable)
-								&& (packet.getType() != StanzaType.error)
-									&&!((packet.getElemName() == "presence") && (packet.getType() == null))) {
+				if ((packet.getType() != StanzaType.result) && (packet.getType() != StanzaType.available)
+						&& (packet.getType() != StanzaType.unavailable)
+							&& (packet.getType() != StanzaType.error)
+								&&!((packet.getElemName() == "presence") && (packet.getType() == null))) {
 					try {
 						Packet error = Authorization.ITEM_NOT_FOUND.getResponseMessage(packet,
 														 "The user connection is no longer active.", true);
@@ -322,9 +320,9 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 				ipMonitor.addDisconnect(service.getRemoteAddress());
 
 				if (service.getDataReceiver() != null) {
-					Packet command =
-						Command.STREAM_CLOSED.getPacket(getFromAddress(getUniqueId(service)),
-							service.getDataReceiver(), StanzaType.set, UUID.randomUUID().toString());
+					Packet command = Command.STREAM_CLOSED.getPacket(getFromAddress(getUniqueId(service)),
+														 service.getDataReceiver(), StanzaType.set,
+														 UUID.randomUUID().toString());
 
 					// In case of mass-disconnects, adjust the timeout properly
 					addOutPacketWithTimeout(command, stoppedHandler, 120l, TimeUnit.SECONDS);
@@ -362,8 +360,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
 
-		boolean routing_mode = (Boolean) props.get(ROUTINGS_PROP_KEY + "/"
-														 + ROUTING_MODE_PROP_KEY);
+		boolean routing_mode = (Boolean) props.get(ROUTINGS_PROP_KEY + "/" + ROUTING_MODE_PROP_KEY);
 
 		routings = new RoutingsContainer(routing_mode);
 
@@ -449,9 +446,8 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 			return "<?xml version='1.0'?><stream:stream" + " xmlns='" + XMLNS + "'"
 					+ " xmlns:stream='http://etherx.jabber.org/streams'" + " id='tigase-error-tigase'"
 						+ " from='" + getDefHostName() + "'" + " version='1.0' xml:lang='en'>"
-							+ "<stream:error>"
-								+ "<host-unknown xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>"
-									+ "</stream:error>" + "</stream:stream>"
+							+ "<stream:error>" + "<host-unknown xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>"
+								+ "</stream:error>" + "</stream:stream>"
 			;
 		}    // end of if (!hostnames.contains(hostname))
 
@@ -469,8 +465,8 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 							+ " id='" + id + "'" + " version='1.0' xml:lang='en'>");
 
 			Packet streamOpen = Command.STREAM_OPENED.getPacket(getFromAddress(getUniqueId(serv)),
-														serv.getDataReceiver(), StanzaType.set,
-														UUID.randomUUID().toString(), Command.DataType.submit);
+														serv.getDataReceiver(), StanzaType.set, UUID.randomUUID().toString(),
+														Command.DataType.submit);
 
 			Command.addFieldValue(streamOpen, "session-id", id);
 			Command.addFieldValue(streamOpen, "hostname", hostname);
@@ -668,8 +664,8 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 					addOutPacket(response);
 				} else {
 					if (log.isLoggable(Level.FINEST)) {
-						log.finest("Connection for REDIRECT command does not exist, ignoring "
-								+ "packet: " + iqc.toStringSecure());
+						log.finest("Connection for REDIRECT command does not exist, ignoring " + "packet: "
+								+ iqc.toStringSecure());
 					}
 				}
 
@@ -706,8 +702,8 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 					// Session is no longer active, respond with an error.
 					try {
-						addOutPacket(Authorization.ITEM_NOT_FOUND.getResponseMessage(iqc,
-								"Connection gone.", false));
+						addOutPacket(Authorization.ITEM_NOT_FOUND.getResponseMessage(iqc, "Connection gone.",
+								false));
 					} catch (PacketErrorTypeException e) {
 
 						// Hm, error already, ignoring...
@@ -766,8 +762,8 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 		public void responseReceived(Packet packet, Packet response) {
 
 			// We are now ready to ask for features....
-			addOutPacket(Command.GETFEATURES.getPacket(packet.getFrom(), packet.getTo(),
-					StanzaType.get, UUID.randomUUID().toString(), null));
+			addOutPacket(Command.GETFEATURES.getPacket(packet.getFrom(), packet.getTo(), StanzaType.get,
+					UUID.randomUUID().toString(), null));
 		}
 
 		/**
@@ -782,8 +778,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 			// If we still haven't received confirmation from the SM then
 			// the packet either has been lost or the server is overloaded
 			// In either case we disconnect the connection.
-			log.info("No response within time limit received for a packet: "
-					+ packet.toStringSecure());
+			log.info("No response within time limit received for a packet: " + packet.toStringSecure());
 
 			XMPPIOService<Object> serv = getXMPPIOService(packet.getFrom().toString());
 
@@ -826,8 +821,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 			// Ups, doesn't look good, the server is either oveloaded or lost
 			// a packet.
-			log.info("No response within time limit received for a packet: "
-					+ packet.toStringSecure());
+			log.info("No response within time limit received for a packet: " + packet.toStringSecure());
 			addOutPacketWithTimeout(packet, stoppedHandler, 60l, TimeUnit.SECONDS);
 		}
 	}

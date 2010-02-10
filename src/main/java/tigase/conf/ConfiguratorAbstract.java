@@ -34,6 +34,8 @@ import tigase.db.UserRepositoryPool;
 import tigase.server.AbstractComponentRegistrator;
 import tigase.server.ServerComponent;
 
+import tigase.xmpp.BareJID;
+
 //~--- JDK imports ------------------------------------------------------------
 
 import java.io.ByteArrayInputStream;
@@ -62,8 +64,7 @@ import javax.script.Bindings;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public abstract class ConfiguratorAbstract
-				extends AbstractComponentRegistrator<Configurable> {
+public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<Configurable> {
 
 	/** Field description */
 	public static final String CONFIG_REPO_CLASS_INIT_KEY = "--tigase-config-repo-class";
@@ -74,8 +75,7 @@ public abstract class ConfiguratorAbstract
 
 	/** Field description */
 	public static final String PROPERTY_FILENAME_PROP_KEY = "--property-file";
-	private static final Logger log =
-		Logger.getLogger(ConfiguratorAbstract.class.getName());
+	private static final Logger log = Logger.getLogger(ConfiguratorAbstract.class.getName());
 
 	/** Field description */
 	public static String logManagerConfiguration = null;
@@ -212,17 +212,16 @@ public abstract class ConfiguratorAbstract
 		}
 
 		defaults.put(LOGGING_KEY + "handlers",
-								 "java.util.logging.ConsoleHandler java.util.logging.FileHandler");
+				"java.util.logging.ConsoleHandler java.util.logging.FileHandler");
 		defaults.put(LOGGING_KEY + "java.util.logging.ConsoleHandler.formatter",
-								 "tigase.util.LogFormatter");
+				"tigase.util.LogFormatter");
 		defaults.put(LOGGING_KEY + "java.util.logging.ConsoleHandler.level", "WARNING");
 		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.append", "true");
 		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.count", "5");
 		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.formatter",
-								 "tigase.util.LogFormatter");
+				"tigase.util.LogFormatter");
 		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.limit", "10000000");
-		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.pattern",
-								 "logs/tigase.log");
+		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.pattern", "logs/tigase.log");
 		defaults.put(LOGGING_KEY + "tigase.useParentHandlers", "true");
 		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.level", "ALL");
 
@@ -335,6 +334,12 @@ public abstract class ConfiguratorAbstract
 	public void init(String[] args) throws ConfigurationException, TigaseDBException {
 		parseArgs(args);
 
+		String stringprep = (String) initProperties.get(STRINGPREP_PROCESSOR);
+
+		if (stringprep != null) {
+			BareJID.useStringprepProcessor(stringprep);
+		}
+
 		String cnf_class_name = System.getProperty(CONFIG_REPO_CLASS_PROP_KEY);
 
 		if (cnf_class_name != null) {
@@ -381,7 +386,7 @@ public abstract class ConfiguratorAbstract
 
 		if (property_filename != null) {
 			initMonitoring((String) initProperties.get(MONITORING),
-										 new File(property_filename).getParent());
+					new File(property_filename).getParent());
 		}
 	}
 
@@ -496,6 +501,15 @@ public abstract class ConfiguratorAbstract
 				log.log(Level.WARNING, "Can not read property file: " + property_filename, e);
 			}
 		}
+
+		// Set all parameters starting with '--' as a system properties with removed
+		// the starting '-' characters.
+		for (Map.Entry<String, Object> entry : initProperties.entrySet()) {
+			if (entry.getKey().startsWith("--")) {
+				System.setProperty(entry.getKey().substring(2),
+						((entry.getValue() == null) ? null : entry.getValue().toString()));
+			}
+		}
 	}
 
 	/**
@@ -508,7 +522,7 @@ public abstract class ConfiguratorAbstract
 	 * @throws ConfigurationException
 	 */
 	public void putProperties(String compId, Map<String, Object> props)
-					throws ConfigurationException {
+			throws ConfigurationException {
 		configRepo.putProperties(compId, props);
 	}
 
@@ -566,8 +580,8 @@ public abstract class ConfiguratorAbstract
 			repo_pool.initRepository(res_uri, user_repo_params);
 
 			for (int i = 0; i < repo_pool_size; i++) {
-				user_repository = RepositoryFactory.getUserRepository(getName() + "-" + (i + 1),
-								cls_name, res_uri, user_repo_params);
+				user_repository = RepositoryFactory.getUserRepository(getName() + "-" + (i + 1), cls_name,
+						res_uri, user_repo_params);
 				repo_pool.addRepo(user_repository);
 			}
 
@@ -582,7 +596,7 @@ public abstract class ConfiguratorAbstract
 			String res_uri = (String) props.get(AUTH_REPO_URL_PROP_KEY);
 
 			auth_repository = RepositoryFactory.getAuthRepository(getName(), cls_name, res_uri,
-							auth_repo_params);
+					auth_repo_params);
 			log.config("Initialized " + cls_name + " as auth repository: " + res_uri);
 		} catch (Exception e) {
 			log.log(Level.SEVERE, "Can't initialize auth repository: ", e);
@@ -605,8 +619,7 @@ public abstract class ConfiguratorAbstract
 			prop = configRepo.getProperties(compId);
 		} catch (ConfigurationException ex) {
 			log.log(Level.WARNING,
-							"Propblem retrieving configuration properties for component: " + compId,
-							ex);
+					"Propblem retrieving configuration properties for component: " + compId, ex);
 
 			return;
 		}
@@ -619,7 +632,7 @@ public abstract class ConfiguratorAbstract
 		boolean modified = false;
 
 		for (Map.Entry<String, Object> entry : defs_entries) {
-			if (!prop.containsKey(entry.getKey())) {
+			if ( !prop.containsKey(entry.getKey())) {
 				prop.put(entry.getKey(), entry.getValue());
 				modified = true;
 			}    // end of if ()
@@ -630,8 +643,7 @@ public abstract class ConfiguratorAbstract
 				configRepo.putProperties(compId, prop);
 			} catch (ConfigurationException ex) {
 				log.log(Level.WARNING,
-								"Propblem with saving configuration properties for component: " + compId,
-								ex);
+						"Propblem with saving configuration properties for component: " + compId, ex);
 			}
 		}    // end of if (modified)
 
@@ -668,7 +680,7 @@ public abstract class ConfiguratorAbstract
 				if (key.equals("java.util.logging.FileHandler.pattern")) {
 					File log_path = new File(entry.getValue().toString()).getParentFile();
 
-					if (!log_path.exists()) {
+					if ( !log_path.exists()) {
 						log_path.mkdirs();
 					}
 				}    // end of if (key.equals())

@@ -1,20 +1,20 @@
 /*
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2008 "Artur Hefczyc" <artur.hefczyc@tigase.org>
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
- * 
+ *
  * $Rev$
  * Last modified by $Author$
  * $Date$
@@ -22,11 +22,19 @@
 
 package tigase.util;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
+//~--- non-JDK imports --------------------------------------------------------
+
 import tigase.server.Packet;
 import tigase.server.Priority;
+
 import tigase.xmpp.XMPPResourceConnection;
+
+//~--- JDK imports ------------------------------------------------------------
+
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+
+//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Apr 21, 2009 8:50:50 PM
@@ -36,10 +44,9 @@ import tigase.xmpp.XMPPResourceConnection;
  * @version $Rev$
  */
 public class ProcessingThreads<E extends WorkerThread> {
-
-	private ArrayDeque<E> workerThreads =	new ArrayDeque<E>();
-	private ArrayList<PriorityQueue<QueueItem>> queues =
-					new ArrayList<PriorityQueue<QueueItem>>();
+	private long droppedPackets = 0;
+	private int maxQueueSize = 10000;
+	private String name = null;
 
 	// Packets are put in queues in such a way that all packets for the same
 	// user end-up in the same queue. This is important in some cases as
@@ -49,74 +56,126 @@ public class ProcessingThreads<E extends WorkerThread> {
 	// each queue but we can ditribute load increasing number of queues.
 	private int numQueues = 2;
 	private int numWorkerThreads = 1;
-	private int maxQueueSize = 10000;
-	private String name = null;
+	private ArrayDeque<E> workerThreads = new ArrayDeque<E>();
+	private ArrayList<PriorityQueueAbstract<QueueItem>> queues =
+		new ArrayList<PriorityQueueAbstract<QueueItem>>();
 
-	private long droppedPackets = 0;
+	//~--- constructors ---------------------------------------------------------
 
-	@SuppressWarnings({"unchecked"})
-	public ProcessingThreads(E worker, int numQueues,
-					int numWorkerThreads, int maxQueueSize, String name) {
+	/**
+	 * Constructs ...
+	 *
+	 *
+	 * @param worker
+	 * @param numQueues
+	 * @param numWorkerThreads
+	 * @param maxQueueSize
+	 * @param name
+	 */
+	@SuppressWarnings({ "unchecked" })
+	public ProcessingThreads(E worker, int numQueues, int numWorkerThreads, int maxQueueSize,
+			String name) {
 		this.numQueues = numQueues;
 		this.maxQueueSize = maxQueueSize;
 		this.numWorkerThreads = numWorkerThreads;
 		this.name = name;
 
 		for (int i = 0; i < numQueues; i++) {
-			queues.add(new PriorityQueue<QueueItem>(Priority.values().length,
-							maxQueueSize));
+			PriorityQueueAbstract<QueueItem> queue =
+				PriorityQueueAbstract.getPriorityQueue(Priority.values().length, maxQueueSize);
+
+			queues.add(queue);
+
 			for (int j = 0; j < numWorkerThreads; j++) {
 				WorkerThread t = worker.getNewInstance(queues.get(i));
+
 				t.setDaemon(true);
 				t.setName(name + " Queue " + i + " Worker " + j);
 				t.start();
-				workerThreads.add((E)t);
+				workerThreads.add((E) t);
 			}
 		}
-
 	}
 
-	public E getWorkerThread() {
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param packet
+	 * @param conn
+	 *
+	 * @return
+	 */
+	public boolean addItem(Packet packet, XMPPResourceConnection conn) {
+		boolean ret = false;
+		QueueItem item = new QueueItem();
+
+		item.conn = conn;
+		item.packet = packet;
+
 		try {
-			return workerThreads.getFirst();
+			if ((item.conn != null) && item.conn.isAuthorized()) {
+
+				// Queueing packets per user...
+				ret = queues.get(Math.abs(conn.getUserId().hashCode() % numQueues)).offer(item,
+						packet.getPriority().ordinal());
+			} else {
+
+				// Otherwise per destination address
+				// If the packet elemTo is set then used it, otherwise just packetTo:
+				if (packet.getStanzaTo() != null) {
+					ret = queues.get(Math.abs(packet.getStanzaTo().hashCode() % numQueues)).offer(item,
+							packet.getPriority().ordinal());
+				} else {
+					ret = queues.get(Math.abs(packet.getTo().hashCode() % numQueues)).offer(item,
+							packet.getPriority().ordinal());
+				}
+			}
 		} catch (Exception e) {
-			return null;
-		}
-	}
 
-	public String getName() {
-		return name;
-	}
+			// This should not happen, but just in case until we are sure all
+			// cases are catched.
+			// Otherwise per destination address
+			// If the packet elemTo is set then used it, otherwise just packetTo:
+			if (packet.getStanzaTo() != null) {
+				ret = queues.get(Math.abs(packet.getStanzaTo().hashCode() % numQueues)).offer(item,
+						packet.getPriority().ordinal());
+			} else {
+				ret = queues.get(Math.abs(packet.getTo().hashCode() % numQueues)).offer(item,
+						packet.getPriority().ordinal());
+			}
 
-	public int getTotalQueueSize() {
-		int ret = 0;
-		for (PriorityQueue<QueueItem> pq : queues) {
-			ret += pq.totalSize();
+			// ret = nullQueue.offer(item, packet.getPriority().ordinal());
 		}
+
+		if ( !ret) {
+			++droppedPackets;
+		}
+
 		return ret;
 	}
 
-	public int getTotalRuns() {
-		int ret = 0;
-		for (WorkerThread workerThread : workerThreads) {
-			ret += workerThread.getRunsCounter();
-		}
-		return ret;
-	}
+	//~--- get methods ----------------------------------------------------------
 
-	public long getDroppedPackets() {
-		return droppedPackets;
-	}
-
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
 	public long getAverageProcessingTime() {
 		long average = 0;
 		int counters = 0;
+
 		for (WorkerThread workerThread : workerThreads) {
 			if (workerThread.getAverageProcessingTime() > 0) {
 				average += workerThread.getAverageProcessingTime();
 				++counters;
 			}
 		}
+
 		if (counters > 0) {
 			return average / counters;
 		} else {
@@ -124,45 +183,75 @@ public class ProcessingThreads<E extends WorkerThread> {
 		}
 	}
 
-	public boolean addItem(Packet packet, XMPPResourceConnection conn) {
-		boolean ret = false;
-		QueueItem item = new QueueItem();
-		item.conn = conn;
-		item.packet = packet;
-		try {
-			if (item.conn != null && item.conn.isAuthorized()) {
-				// Queueing packets per user...
-				ret = queues.get(Math.abs(conn.getUserId().hashCode() %
-								numQueues)).offer(item, packet.getPriority().ordinal());
-			} else {
-				// Otherwise per destination address
-				// If the packet elemTo is set then used it, otherwise just packetTo:
-				if (packet.getStanzaTo() != null) {
-					ret = queues.get(Math.abs(packet.getStanzaTo().hashCode() %
-							numQueues)).offer(item, packet.getPriority().ordinal());
-				} else {
-					ret = queues.get(Math.abs(packet.getTo().hashCode() %
-							numQueues)).offer(item, packet.getPriority().ordinal());
-				}
-			}
-		} catch (Exception e) {
-			// This should not happen, but just in case until we are sure all 
-			// cases are catched.
-			// Otherwise per destination address
-				// If the packet elemTo is set then used it, otherwise just packetTo:
-				if (packet.getStanzaTo() != null) {
-					ret = queues.get(Math.abs(packet.getStanzaTo().hashCode() %
-							numQueues)).offer(item, packet.getPriority().ordinal());
-				} else {
-					ret = queues.get(Math.abs(packet.getTo().hashCode() %
-							numQueues)).offer(item, packet.getPriority().ordinal());
-				}
-		//ret = nullQueue.offer(item, packet.getPriority().ordinal());
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public long getDroppedPackets() {
+		return droppedPackets;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public int getTotalQueueSize() {
+		int ret = 0;
+
+		for (PriorityQueueAbstract<QueueItem> pq : queues) {
+			ret += pq.totalSize();
 		}
-		if (!ret) {
-			++droppedPackets;
-		}
+
 		return ret;
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public int getTotalRuns() {
+		int ret = 0;
+
+		for (WorkerThread workerThread : workerThreads) {
+			ret += workerThread.getRunsCounter();
+		}
+
+		return ret;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public E getWorkerThread() {
+		try {
+			return workerThreads.getFirst();
+		} catch (Exception e) {
+			return null;
+		}
+	}
 }
+
+
+//~ Formatted in Sun Code Convention
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

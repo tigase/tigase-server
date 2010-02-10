@@ -31,7 +31,7 @@ import tigase.stats.StatisticsContainer;
 import tigase.stats.StatisticsList;
 
 import tigase.util.PatternComparator;
-import tigase.util.PriorityQueue;
+import tigase.util.PriorityQueueAbstract;
 
 import tigase.vhosts.VHostItem;
 import tigase.vhosts.VHostManagerIfc;
@@ -65,14 +65,13 @@ import java.util.regex.Pattern;
  * @version $Rev$
  */
 public abstract class AbstractMessageReceiver extends BasicComponent
-				implements StatisticsContainer, MessageReceiver {
+		implements StatisticsContainer, MessageReceiver {
 
 	/** Field description */
 	public static final String INCOMING_FILTERS_PROP_KEY = "incoming-filters";
 
 	/** Field description */
-	public static final String INCOMING_FILTERS_PROP_VAL =
-		"tigase.server.filters.PacketCounter";
+	public static final String INCOMING_FILTERS_PROP_VAL = "tigase.server.filters.PacketCounter";
 
 	/** Field description */
 	public static final String MAX_QUEUE_SIZE_PROP_KEY = "max-queue-size";
@@ -81,14 +80,13 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	public static final String OUTGOING_FILTERS_PROP_KEY = "outgoing-filters";
 
 	/** Field description */
-	public static final String OUTGOING_FILTERS_PROP_VAL =
-		"tigase.server.filters.PacketCounter";
+	public static final String OUTGOING_FILTERS_PROP_VAL = "tigase.server.filters.PacketCounter";
 	protected static final long SECOND = 1000;
 	protected static final long MINUTE = 60 * SECOND;
 
 	/** Field description */
-	public static final Integer MAX_QUEUE_SIZE_PROP_VAL =
-		new Long(Runtime.getRuntime().maxMemory() / 400000L).intValue();
+	public static final Integer MAX_QUEUE_SIZE_PROP_VAL = new Long(Runtime.getRuntime().maxMemory()
+																													/ 400000L).intValue();
 	protected static final long HOUR = 60 * MINUTE;
 
 	// String added intentionally!!
@@ -97,8 +95,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
-	private static final Logger log =
-		Logger.getLogger("tigase.abstract.AbstractMessageReceiver");
+	private static final Logger log = Logger.getLogger("tigase.abstract.AbstractMessageReceiver");
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -120,12 +117,12 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	private Priority[] pr_cache = Priority.values();
 	private CopyOnWriteArrayList<PacketFilterIfc> outgoing_filters =
 		new CopyOnWriteArrayList<PacketFilterIfc>();
-	private PriorityQueue<Packet> out_queue = new PriorityQueue<Packet>(pr_cache.length,
-					maxQueueSize);
+	private PriorityQueueAbstract<Packet> out_queue =
+		PriorityQueueAbstract.getPriorityQueue(pr_cache.length, maxQueueSize);
 	private CopyOnWriteArrayList<PacketFilterIfc> incoming_filters =
 		new CopyOnWriteArrayList<PacketFilterIfc>();
-	private ArrayList<PriorityQueue<Packet>> in_queues =
-		new ArrayList<PriorityQueue<Packet>>();
+	private ArrayList<PriorityQueueAbstract<Packet>> in_queues =
+		new ArrayList<PriorityQueueAbstract<Packet>>();
 	private long[] processPacketTimings = new long[100];
 	private ArrayDeque<QueueListener> processingThreads = null;
 	private Timer receiverTasks = null;
@@ -144,11 +141,8 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	private long statSentPacketsEr = 0;
 	private long statSentPacketsOk = 0;
 	private ConcurrentHashMap<String, PacketReceiverTask> waitingTasks =
-		new ConcurrentHashMap<String, PacketReceiverTask>(16,
-					0.75f,
-					4);
-	private Set<Pattern> regexRoutings =
-		new ConcurrentSkipListSet<Pattern>(new PatternComparator());
+		new ConcurrentHashMap<String, PacketReceiverTask>(16, 0.75f, 4);
+	private Set<Pattern> regexRoutings = new ConcurrentSkipListSet<Pattern>(new PatternComparator());
 
 	//~--- methods --------------------------------------------------------------
 
@@ -173,8 +167,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 		int queueIdx = Math.abs(hashCodeForPacket(packet) % in_queues_size);
 
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("[" + getName() + "] queueIdx=" + queueIdx + ", "
-								 + packet.toStringSecure());
+			log.finest("[" + getName() + "] queueIdx=" + queueIdx + ", " + packet.toStringSecure());
 		}
 
 		try {
@@ -202,12 +195,10 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 		int queueIdx = Math.abs(hashCodeForPacket(packet) % in_queues_size);
 
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("[" + getName() + "] queueIdx=" + queueIdx + ", "
-								 + packet.toStringSecure());
+			log.finest("[" + getName() + "] queueIdx=" + queueIdx + ", " + packet.toStringSecure());
 		}
 
-		boolean result = in_queues.get(queueIdx).offer(packet,
-						packet.getPriority().ordinal());
+		boolean result = in_queues.get(queueIdx).offer(packet, packet.getPriority().ordinal());
 
 		if (result) {
 			++statReceivedPacketsOk;
@@ -351,56 +342,48 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 		list.add(getName(), "Last second packets", packets_per_second, Level.FINE);
 		list.add(getName(), "Last minute packets", packets_per_minute, Level.FINE);
 		list.add(getName(), "Last hour packets", packets_per_hour, Level.FINE);
-		list.add(getName(),
-						 StatisticType.MSG_RECEIVED_OK.getDescription(),
-						 statReceivedPacketsOk,
-						 Level.FINE);
-		list.add(getName(),
-						 StatisticType.MSG_SENT_OK.getDescription(),
-						 statSentPacketsOk,
-						 Level.FINE);
+		list.add(getName(), StatisticType.MSG_RECEIVED_OK.getDescription(), statReceivedPacketsOk,
+				Level.FINE);
+		list.add(getName(), StatisticType.MSG_SENT_OK.getDescription(), statSentPacketsOk, Level.FINE);
 
-		int[] in_priority_sizes = in_queues.get(0).size();
+		if (list.checkLevel(Level.FINEST)) {
+			int[] in_priority_sizes = in_queues.get(0).size();
 
-		for (int i = 1; i < in_queues.size(); i++) {
-			int[] tmp_pr_sizes = in_queues.get(i).size();
+			for (int i = 1; i < in_queues.size(); i++) {
+				int[] tmp_pr_sizes = in_queues.get(i).size();
 
-			for (int j = 0; j < tmp_pr_sizes.length; j++) {
-				in_priority_sizes[j] += tmp_pr_sizes[j];
+				for (int j = 0; j < tmp_pr_sizes.length; j++) {
+					in_priority_sizes[j] += tmp_pr_sizes[j];
+				}
+			}
+
+			int[] out_priority_sizes = out_queue.size();
+
+			for (int i = 0; i < in_priority_sizes.length; i++) {
+				Priority queue = Priority.values()[i];
+
+				list.add(getName(), "In queue: " + queue.name(), in_priority_sizes[queue.ordinal()],
+						Level.FINEST);
+				list.add(getName(), "Out queue: " + queue.name(), out_priority_sizes[queue.ordinal()],
+						Level.FINEST);
 			}
 		}
 
 		int in_queue_size = 0;
-		int[] out_priority_sizes = out_queue.size();
-		int out_queue_size = 0;
 
-		for (Priority queue : Priority.values()) {
-			list.add(getName(),
-							 "In queue: " + queue.name(),
-							 in_priority_sizes[queue.ordinal()],
-							 Level.FINEST);
-			list.add(getName(),
-							 "Out queue: " + queue.name(),
-							 out_priority_sizes[queue.ordinal()],
-							 Level.FINEST);
-			in_queue_size += in_priority_sizes[queue.ordinal()];
-			out_queue_size += out_priority_sizes[queue.ordinal()];
+		for (PriorityQueueAbstract<Packet> total_size : in_queues) {
+			in_queue_size += total_size.totalSize();
 		}
+
+		int out_queue_size = out_queue.totalSize();
 
 		list.add(getName(), "Total In queues wait", in_queue_size, Level.INFO);
 		list.add(getName(), "Total Out queues wait", out_queue_size, Level.INFO);
-		list.add(getName(),
-						 StatisticType.MAX_QUEUE_SIZE.getDescription(),
-						 maxQueueSize,
-						 Level.FINEST);
-		list.add(getName(),
-						 StatisticType.IN_QUEUE_OVERFLOW.getDescription(),
-						 statReceivedPacketsEr,
-						 Level.INFO);
-		list.add(getName(),
-						 StatisticType.OUT_QUEUE_OVERFLOW.getDescription(),
-						 statSentPacketsEr,
-						 Level.INFO);
+		list.add(getName(), StatisticType.MAX_QUEUE_SIZE.getDescription(), maxQueueSize, Level.FINEST);
+		list.add(getName(), StatisticType.IN_QUEUE_OVERFLOW.getDescription(), statReceivedPacketsEr,
+				Level.INFO);
+		list.add(getName(), StatisticType.OUT_QUEUE_OVERFLOW.getDescription(), statSentPacketsEr,
+				Level.INFO);
 
 		long res = 0;
 
@@ -411,10 +394,8 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 		long prcessingTime = res / processPacketTimings.length;
 
 		list.add(getName(),
-						 "Average processing time on last " + processPacketTimings.length
-						 + " runs [ms]",
-						 prcessingTime,
-						 Level.FINE);
+				"Average processing time on last " + processPacketTimings.length + " runs [ms]",
+					prcessingTime, Level.FINE);
 
 		for (PacketFilterIfc packetFilter : incoming_filters) {
 			packetFilter.getStatistics(list);
@@ -564,7 +545,10 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 
 			if (in_queues.size() == 0) {
 				for (int i = 0; i < in_queues_size; i++) {
-					in_queues.add(new PriorityQueue<Packet>(pr_cache.length, maxQueueSize));
+					PriorityQueueAbstract<Packet> queue =
+						PriorityQueueAbstract.getPriorityQueue(pr_cache.length, maxQueueSize);
+
+					in_queues.add(queue);
 				}
 			} else {
 				for (int i = 0; i < in_queues.size(); i++) {
@@ -628,9 +612,8 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 					incoming_filters.add(filter);
 					log.config(getName() + " loaded incoming filter: " + inc);
 				} catch (Exception e) {
-					log.log(Level.WARNING,
-									"Problem loading filter: " + inc + " in component: " + getName(),
-									e);
+					log.log(Level.WARNING, "Problem loading filter: " + inc + " in component: " + getName(),
+							e);
 				}
 			}
 		}
@@ -648,9 +631,8 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 					outgoing_filters.add(filter);
 					log.config(getName() + " loaded outgoing filter: " + out);
 				} catch (Exception e) {
-					log.log(Level.WARNING,
-									"Problem loading filter: " + out + " in component: " + getName(),
-									e);
+					log.log(Level.WARNING, "Problem loading filter: " + out + " in component: " + getName(),
+							e);
 				}
 			}
 		}
@@ -726,8 +708,8 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 		return result;
 	}
 
-	protected boolean addOutPacketWithTimeout(Packet packet,
-					ReceiverTimeoutHandler handler, long delay, TimeUnit unit) {
+	protected boolean addOutPacketWithTimeout(Packet packet, ReceiverTimeoutHandler handler,
+			long delay, TimeUnit unit) {
 
 		// It is automatically added to collections and the Timer
 		new PacketReceiverTask(handler, delay, unit, packet);
@@ -768,8 +750,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 
 	//~--- methods --------------------------------------------------------------
 
-	private Packet filterPacket(Packet packet,
-															CopyOnWriteArrayList<PacketFilterIfc> filters) {
+	private Packet filterPacket(Packet packet, CopyOnWriteArrayList<PacketFilterIfc> filters) {
 		Packet result = packet;
 
 		for (PacketFilterIfc packetFilterIfc : filters) {
@@ -867,7 +848,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 		//~--- constructors -------------------------------------------------------
 
 		private PacketReceiverTask(ReceiverTimeoutHandler handler, long delay, TimeUnit unit,
-															 Packet packet) {
+				Packet packet) {
 			super();
 			this.handler = handler;
 			this.packet = packet;
@@ -920,11 +901,11 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	private class QueueListener extends Thread {
 		private QueueType type = null;
 		private boolean threadStopped = false;
-		private PriorityQueue<Packet> queue;
+		private PriorityQueueAbstract<Packet> queue;
 
 		//~--- constructors -------------------------------------------------------
 
-		private QueueListener(PriorityQueue<Packet> q, QueueType type) {
+		private QueueListener(PriorityQueueAbstract<Packet> q, QueueType type) {
 			this.queue = q;
 			this.type = type;
 		}
@@ -944,7 +925,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 			Packet packet = null;
 			Queue<Packet> results = new ArrayDeque<Packet>();
 
-			while (!threadStopped) {
+			while ( !threadStopped) {
 				try {
 
 					// Now process next waiting packet
@@ -986,8 +967,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 									}
 								}
 
-								if (!processed
-										&& ((packet = filterPacket(packet, incoming_filters)) != null)) {
+								if ( !processed && ((packet = filterPacket(packet, incoming_filters)) != null)) {
 									processPacket(packet);
 								}
 
@@ -1026,9 +1006,8 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 					// stopped = true;
 				} catch (Exception e) {
 					log.log(Level.SEVERE,
-									"[" + getName() + "] Exception during packet processing: "
-									+ packet.toStringSecure(),
-									e);
+							"[" + getName() + "] Exception during packet processing: " + packet.toStringSecure(),
+								e);
 				}    // end of try-catch
 			}      // end of while (! threadStopped)
 		}

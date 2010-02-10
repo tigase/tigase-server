@@ -55,7 +55,7 @@ import tigase.stats.StatisticsList;
 import tigase.sys.OnlineJidsReporter;
 import tigase.sys.TigaseRuntime;
 
-import tigase.util.PriorityQueue;
+import tigase.util.PriorityQueueAbstract;
 import tigase.util.ProcessingThreads;
 import tigase.util.QueueItem;
 import tigase.util.TigaseStringprepException;
@@ -2001,7 +2001,7 @@ public class SessionManager extends AbstractMessageReceiver
 		 * @return
 		 */
 		@Override
-		public WorkerThread getNewInstance(PriorityQueue<QueueItem> queue) {
+		public WorkerThread getNewInstance(PriorityQueueAbstract<QueueItem> queue) {
 			ProcessorWorkerThread worker = new ProcessorWorkerThread(processor);
 
 			worker.setQueue(queue);
@@ -2051,7 +2051,7 @@ public class SessionManager extends AbstractMessageReceiver
 		 * @return
 		 */
 		@Override
-		public WorkerThread getNewInstance(PriorityQueue<QueueItem> queue) {
+		public WorkerThread getNewInstance(PriorityQueueAbstract<QueueItem> queue) {
 			SessionCloseWorkerThread worker = new SessionCloseWorkerThread();
 
 			worker.setQueue(queue);
@@ -2100,7 +2100,7 @@ public class SessionManager extends AbstractMessageReceiver
 		 * @return
 		 */
 		@Override
-		public WorkerThread getNewInstance(PriorityQueue<QueueItem> queue) {
+		public WorkerThread getNewInstance(PriorityQueueAbstract<QueueItem> queue) {
 			SessionOpenWorkerThread worker = new SessionOpenWorkerThread(sm);
 
 			worker.setQueue(queue);
