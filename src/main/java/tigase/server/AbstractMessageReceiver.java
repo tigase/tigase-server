@@ -33,9 +33,6 @@ import tigase.stats.StatisticsList;
 import tigase.util.PatternComparator;
 import tigase.util.PriorityQueueAbstract;
 
-import tigase.vhosts.VHostItem;
-import tigase.vhosts.VHostManagerIfc;
-
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.ArrayDeque;
@@ -56,8 +53,18 @@ import java.util.regex.Pattern;
 //~--- classes ----------------------------------------------------------------
 
 /**
- * Describe class AbstractMessageReceiver here.
- *
+ * This is an archetype for all classes processing user-level packets. The implementation
+ * is designed for a heavy packets processing with internal queues and number of separate
+ * threads depending on number of CPUs. Extensions of the class can process normall user
+ * packets and administrator packets via ad-hoc commands. Good examples of such
+ * components are <code>MUC</code>, <code>PubSub</code>, <code>SessionManager</code>.<p/>
+ * The class offers scripting API for administrator ad-hoc commands.<p/>
+ * By default it internally uses priority queues which in some rare cases may lead to
+ * packets reordering. When this happens and it is unacceptable for the deployment
+ * non-priority queues can be used. The queues size is limited and depends on the
+ * available memory size.<p/>
+ * Packets are processed by <code>processPacket(Packet packet)</code> method which
+ * is concurrently called from multiple threads.
  *
  * Created: Tue Nov 22 07:07:11 2005
  *
@@ -67,26 +74,62 @@ import java.util.regex.Pattern;
 public abstract class AbstractMessageReceiver extends BasicComponent
 		implements StatisticsContainer, MessageReceiver {
 
-	/** Field description */
+	/**
+	 * Configuration property key for setting incoming packets filters on the component level.
+	 */
 	public static final String INCOMING_FILTERS_PROP_KEY = "incoming-filters";
 
-	/** Field description */
+	/**
+	 * Configuration property default vakue with a default incoming packet filter loaded by
+	 * Tigase server.<p/>
+	 * This is a comma-separated list of classes which should be loaded as packet filters.
+	 * The classes must implement <code>PacketFilterIfc</code> interface.
+	 */
 	public static final String INCOMING_FILTERS_PROP_VAL = "tigase.server.filters.PacketCounter";
 
-	/** Field description */
+	/**
+	 * Configuration property key allowing to overwrite a default (memory size dependent)
+	 * size for the component internal queues. By default the queue size is adjusted to the
+	 * available memory size to avoid out of memory errors.
+	 */
 	public static final String MAX_QUEUE_SIZE_PROP_KEY = "max-queue-size";
 
-	/** Field description */
+	/** A default value for max queue size property. The value is calculated at the server
+	 * startup time using following formula: <br/>
+	 * <code>Runtime.getRuntime().maxMemory() / 400000L</code>
+	 * You can change the default queue size by setting a different value for the
+	 * <code>MAX_QUEUE_SIZE_PROP_KEY</code> property in the server configuration.
+	 */
+	public static final Integer MAX_QUEUE_SIZE_PROP_VAL =
+			new Long(Runtime.getRuntime().maxMemory() / 400000L).intValue();
+
+	/**
+	 * Configuration property key for setting outgoing packets filters on the component level.
+	 * This is a comma-separated list of classes which should be loaded as packet filters.
+	 * The classes must implement <code>PacketFilterIfc</code> interface.
+	 */
 	public static final String OUTGOING_FILTERS_PROP_KEY = "outgoing-filters";
 
-	/** Field description */
+	/**
+	 * Configuration property default vakue with a default outgoing packet filter loaded by
+	 * Tigase server.<p/>
+	 * This is a comma-separated list of classes which should be loaded as packet filters.
+	 * The classes must implement <code>PacketFilterIfc</code> interface.
+	 */
 	public static final String OUTGOING_FILTERS_PROP_VAL = "tigase.server.filters.PacketCounter";
+	/**
+	 * Constant used in time calculation procedures. Indicates a second that is 1000 milliseconds.
+	 */
 	protected static final long SECOND = 1000;
+	/**
+	 * Constant used in time calculation procedures. Indicates a minute that is 60
+	 * <code>SECOND</code>s.
+	 */
 	protected static final long MINUTE = 60 * SECOND;
-
-	/** Field description */
-	public static final Integer MAX_QUEUE_SIZE_PROP_VAL = new Long(Runtime.getRuntime().maxMemory()
-																													/ 400000L).intValue();
+	/**
+	 * Constant used in time calculation procedures. Indicates a hour that is 60
+	 * <code>MINUTE</code>s.
+	 */
 	protected static final long HOUR = 60 * MINUTE;
 
 	// String added intentionally!!
@@ -147,7 +190,15 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	//~--- methods --------------------------------------------------------------
 
 	/**
-	 * Method description
+	 * This is the main <code>Packet</code> processing method. It is called concurrently
+	 * from many threads so implementing it in thread save manner is essential. The method
+	 * is called for each packet addressed to the component. <p/>
+	 * Please note, the <code>Packet</code> instance may be processed by different parts
+	 * of the server, different components or plugins at the same time. Therefore this is
+	 * very important to tread the <code>Packet</code> instance as unmodifiable object.<p/>
+	 * Processing in this method is asynchronous, therefore there is no result value. If there
+	 * are some 'result' packets generated during processing, they should be passed back using
+	 * <code>add
 	 *
 	 *
 	 * @param packet
