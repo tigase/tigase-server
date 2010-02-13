@@ -37,6 +37,7 @@ import tigase.util.PriorityQueueAbstract;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
@@ -94,14 +95,15 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	 */
 	public static final String MAX_QUEUE_SIZE_PROP_KEY = "max-queue-size";
 
-	/** A default value for max queue size property. The value is calculated at the server
+	/**
+	 * A default value for max queue size property. The value is calculated at the server
 	 * startup time using following formula: <br/>
 	 * <code>Runtime.getRuntime().maxMemory() / 400000L</code>
 	 * You can change the default queue size by setting a different value for the
 	 * <code>MAX_QUEUE_SIZE_PROP_KEY</code> property in the server configuration.
 	 */
-	public static final Integer MAX_QUEUE_SIZE_PROP_VAL =
-			new Long(Runtime.getRuntime().maxMemory() / 400000L).intValue();
+	public static final Integer MAX_QUEUE_SIZE_PROP_VAL = new Long(Runtime.getRuntime().maxMemory()
+																													/ 400000L).intValue();
 
 	/**
 	 * Configuration property key for setting outgoing packets filters on the component level.
@@ -117,15 +119,18 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	 * The classes must implement <code>PacketFilterIfc</code> interface.
 	 */
 	public static final String OUTGOING_FILTERS_PROP_VAL = "tigase.server.filters.PacketCounter";
+
 	/**
 	 * Constant used in time calculation procedures. Indicates a second that is 1000 milliseconds.
 	 */
 	protected static final long SECOND = 1000;
+
 	/**
 	 * Constant used in time calculation procedures. Indicates a minute that is 60
 	 * <code>SECOND</code>s.
 	 */
 	protected static final long MINUTE = 60 * SECOND;
+
 	/**
 	 * Constant used in time calculation procedures. Indicates a hour that is 60
 	 * <code>MINUTE</code>s.
@@ -157,17 +162,16 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	private int pptIdx = 0;
 
 	// Array cache to speed processing up....
-	private Priority[] pr_cache = Priority.values();
-	private CopyOnWriteArrayList<PacketFilterIfc> outgoing_filters =
+	private final Priority[] pr_cache = Priority.values();
+	private final CopyOnWriteArrayList<PacketFilterIfc> outgoing_filters =
 		new CopyOnWriteArrayList<PacketFilterIfc>();
-	private PriorityQueueAbstract<Packet> out_queue =
+	private final PriorityQueueAbstract<Packet> out_queue =
 		PriorityQueueAbstract.getPriorityQueue(pr_cache.length, maxQueueSize);
-	private CopyOnWriteArrayList<PacketFilterIfc> incoming_filters =
+	private final CopyOnWriteArrayList<PacketFilterIfc> incoming_filters =
 		new CopyOnWriteArrayList<PacketFilterIfc>();
-	private ArrayList<PriorityQueueAbstract<Packet>> in_queues =
+	private final List<PriorityQueueAbstract<Packet>> in_queues =
 		new ArrayList<PriorityQueueAbstract<Packet>>();
-	private long[] processPacketTimings = new long[100];
-	private ArrayDeque<QueueListener> processingThreads = null;
+	private final long[] processPacketTimings = new long[100];
 	private Timer receiverTasks = null;
 
 	/**
@@ -183,9 +187,11 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	private long statReceivedPacketsOk = 0;
 	private long statSentPacketsEr = 0;
 	private long statSentPacketsOk = 0;
-	private ConcurrentHashMap<String, PacketReceiverTask> waitingTasks =
+	private ArrayDeque<QueueListener> threadsQueue = null;
+	private final ConcurrentHashMap<String, PacketReceiverTask> waitingTasks =
 		new ConcurrentHashMap<String, PacketReceiverTask>(16, 0.75f, 4);
-	private Set<Pattern> regexRoutings = new ConcurrentSkipListSet<Pattern>(new PatternComparator());
+	private final Set<Pattern> regexRoutings =
+		new ConcurrentSkipListSet<Pattern>(new PatternComparator());
 
 	//~--- methods --------------------------------------------------------------
 
@@ -198,20 +204,39 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	 * very important to tread the <code>Packet</code> instance as unmodifiable object.<p/>
 	 * Processing in this method is asynchronous, therefore there is no result value. If there
 	 * are some 'result' packets generated during processing, they should be passed back using
-	 * <code>add
+	 * <code>addOutPacket(Packet)</code> method.
 	 *
 	 *
-	 * @param packet
+	 * @param packet is an instance of the <code>Packet</code> class passed for processing.
 	 */
 	public abstract void processPacket(Packet packet);
 
 	/**
-	 * Method description
+	 * Method adds a <code>Packet</code> object to the internal input queue. Packets from
+	 * the input queue are later passed to the <code>processPacket(Packet)</code> method.
+	 * This is a blocking method waiting if necessary for the room if the queue is full.<p/>
+	 * The method returns a <code>boolean</code> value of <code>true</code> if the packet
+	 * has been successfuly added to the queue and <code>false</code> otherwise.<p/>
+	 * There can be many queues and many threads processing packets for the component,
+	 * however the method makes the best effort to quarantee that packets are later processed
+	 * in the correct order. For example that packets for a single user always end up in the
+	 * same exact queue. You can tweak the packets ditribution amongs threads by overwriting
+	 * <code>hashCodeForPacket(Packet)</code> method.<br/>
+	 * If there is <code>N</code> threads the packets are distributed among thread using
+	 * following logic:
+	 * <pre>
+	 * int threadNo = Math.abs(hashCodeForPacket(packet) % N);
+	 * </pre>
+	 * This is a preferred method to be used by most Tigase components. If the queues are
+	 * full the component should stop and wait for more room. The blocking methods
+	 * aim to prevent from the system overloading or wasting resources for generating packets
+	 * which can't be processed anyway.
 	 *
+	 * @param packet is a <code>Packet</code> instance being put to the component
+	 * internal input queue.
 	 *
-	 * @param packet
-	 *
-	 * @return
+	 * @return a <code>boolean</code> value of <code>true</code> if the packet
+	 * has been successfuly added to the queue and <code>false</code> otherwise.
 	 */
 	@Override
 	public boolean addPacket(Packet packet) {
@@ -234,12 +259,24 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	}
 
 	/**
-	 * Method description
+	 * This is a variant of <code>addPacket(Packet)</code> method which adds
+	 * <code>Packet</code> to in the internal input queue without blocking.<p/>
+	 * The method returns a <code>boolean</code> value of <code>true</code> if the packet
+	 * has been successfuly added to the queue and <code>false</code> otherwise.<p/>
+	 * Use of the non-blocking methods is not recommended for most of the components
+	 * implementations. The only component which is allowed to use them is the server
+	 * <code>MessageRouter</code> implementation which can not hang on any method.
+	 * This would cause a dead-lock in the application. All other components must use
+	 * blocking methods and wait if the system is under so high load that it's queues
+	 * are full.<p/>
+	 * See <code>addPacket(Packet)</code> method's documentation for some more details.
 	 *
+	 * @param packet is a <code>Packet</code> instance being put to the component
+	 * internal input queue.
 	 *
-	 * @param packet
-	 *
-	 * @return
+	 * @return a <code>boolean</code> value of <code>true</code> if the packet
+	 * has been successfuly added to the queue and <code>false</code> otherwise.
+	 * @see AbstractMessageReceiver.addPacket(Packet packet)
 	 */
 	@Override
 	public boolean addPacketNB(Packet packet) {
@@ -263,36 +300,77 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	}
 
 	/**
-	 * Method description
+	 * This is a convenience method for adding all packets stored in given queue to the
+	 * component's internal input queue.<br/>
+	 * The method calls <code>addPacket(Packet)</code> in a loop for each packet in the queue.
+	 * If the call returns <code>true</code> then the packet is removed from the given queue,
+	 * otherwise the methods ends the loop and returns <code>false</code>.<p/>
+	 * Please note, if the method returns <code>true</code> it means that all the packets
+	 * from the queue passed as a parameter have been successfuly run through the
+	 * <code>addPacket(Packet)</code> method and the queue passed as a parameter should
+	 * be empty. If the method returns false then at least one packet from the parameter
+	 * queue wasn't successfully run through the <code>addPacket(Packet)</code> method.
+	 * If the method returns <code>false</code> then the queue passed as a parameter
+	 * is not empty and it contains packet which was unseccessfully run through the
+	 * <code>addPacket(Packet)</code> method and all the packets which were not run
+	 * at all.
 	 *
 	 *
-	 * @param packets
+	 * @param packets is a <code>Queue</code> of packets for adding to the component
+	 * internal input queue. All the packets are later processed by
+	 * <code>processPacket(Packet)</code> method in the same exact order if they are
+	 * processed by the same thread. See documentation
+	 * <code>hashCodeForPacket(Packet)</code> method how to control assiging packets to
+	 * particular threads.
 	 *
-	 * @return
+	 * @return a <code>boolean</code> value of <code>true</code> if all packets has been
+	 * successfully added to the component's internal input queue and <code>false</code>
+	 * otherwise.
+	 * @see AbstractMessageReceiver.hashCodeForPacket(Packet packet)
 	 */
 	@Override
 	public boolean addPackets(Queue<Packet> packets) {
-		Packet p = null;
 		boolean result = true;
+		Packet p = packets.peek();
 
-		while ((p = packets.peek()) != null) {
+		while (p != null) {
 			result = addPacket(p);
 
 			if (result) {
 				packets.poll();
 			} else {
-				return false;
+				break;
 			}    // end of if (result) else
+
+			p = packets.peek();
 		}      // end of while ()
 
-		return true;
+		return result;
 	}
 
 	/**
-	 * Method description
+	 * Method adds a new routing address for the component. Routing addresses are used
+	 * by the <code>MessageRouter</code> to calculate packet's destination. If the packet's
+	 * destination address matches one of the component's routing addresses the packet
+	 * is added to the component's internal input queue.<p/>
+	 * By default all components accept packets addressed to the componentId and to:
+	 * <pre>
+	 * component.getName() + '@' + any virtual domain
+	 * </pre>
+	 * @TODO:
+	 * The future implementation most likely accept packets addressed to:
+	 * <pre>
+	 * any virtual domain + '/' + component.getName()
+	 * </pre>
+	 * instead.
+	 * <p/>
+	 * The routings are passed as Java regular expression strings are the extra addresses
+	 * accepted by the component. In most cases this is used by the external component
+	 * protocol implementations which can dinamically change accepted addresses depending
+	 * on the connected external components.
 	 *
-	 *
-	 * @param address
+	 * @param address is a Java regular expression string for the packet's destination address
+	 * accepted by this component.
 	 */
 	public void addRegexRouting(String address) {
 		if (log.isLoggable(Level.FINE)) {
@@ -307,16 +385,20 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	}
 
 	/**
-	 * Method description
-	 *
+	 * Method clears, removes all the component routing addresses. After this method call
+	 * the component accepts only packets addressed to default routings that is component ID
+	 * or the component name + '@' + virtual domains
 	 */
 	public void clearRegexRoutings() {
 		regexRoutings.clear();
 	}
 
 	/**
-	 * Method description
-	 *
+	 * Utility method executed precisely every hour. A component can overwrite the method
+	 * to put own code to be executed at the regular intervals of time.<p/>
+	 * Note, no extensive calculations should happen in this method nor long lasting operations.
+	 * It is essential that the method processing does not exceed 1 hour. The overiding
+	 * method must call the the super method first and only then run own code.
 	 */
 	public synchronized void everyHour() {
 		packets_per_hour = statReceivedPacketsOk - last_hour_packets;
@@ -324,8 +406,11 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	}
 
 	/**
-	 * Method description
-	 *
+	 * Utility method executed precisely every minute. A component can overwrite the method
+	 * to put own code to be executed at the regular intervals of time.<p/>
+	 * Note, no extensive calculations should happen in this method nor long lasting operations.
+	 * It is essential that the method processing does not exceed 1 minute. The overiding
+	 * method must call the the super method first and only then run own code.
 	 */
 	public synchronized void everyMinute() {
 		packets_per_minute = statReceivedPacketsOk - last_minute_packets;
@@ -334,8 +419,11 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	}
 
 	/**
-	 * Method description
-	 *
+	 * Utility method executed precisely every second. A component can overwrite the method
+	 * to put own code to be executed at the regular intervals of time.<p/>
+	 * Note, no extensive calculations should happen in this method nor long lasting operations.
+	 * It is essential that the method processing does not exceed 1 second. The overiding
+	 * method must call the the super method first and only then run own code.
 	 */
 	public synchronized void everySecond() {
 		packets_per_second = statReceivedPacketsOk - last_second_packets;
@@ -345,11 +433,19 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	//~--- get methods ----------------------------------------------------------
 
 	/**
-	 * Returns defualt configuration settings for this object.
+	 * Returns defualt configuration settings for the component as a <code>Map</code> with
+	 * keys as configuration property IDs and values as the configuration property values.
+	 * All the default parameters returned from this method are later passed to the
+	 * <code>setProperties(...)</code> method. Some of them may have changed value if they
+	 * have been overwriten in the server configurtion. The configuration property value can
+	 * be of any of the basic types: <code>int</code>, <code>long</code>,
+	 * <code>boolean</code>, <code>String</code>.
 	 *
-	 * @param params
+	 * @param params is a <code>Map</code> with some initial properties set for the
+	 * starting up server. These parameters can be used as a hints to generate component's
+	 * default configuration.
 	 *
-	 * @return
+	 * @return a <code>Map</code> with the component default configuration.
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -373,20 +469,35 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	}
 
 	/**
-	 * Method description
+	 * Method returns a <code>Set</code> with all component's routings as a precompiled
+	 * regular expression patterns. The <code>Set</code> can be empty but it can not
+	 * be null.
 	 *
-	 *
-	 * @return
+	 * @return a <code>Set</code> with all component's routings as a precompiled
+	 * regular expression patterns.
 	 */
 	public Set<Pattern> getRegexRoutings() {
 		return regexRoutings;
 	}
 
 	/**
-	 * Method description
+	 * Method returns component statistics. Please note, the method can be called every second
+	 * by the server monitoring system therefore no extensive or lengthy calculations are
+	 * allowed. If there are some statistics requiring lengthy operations like database access
+	 * they must have <code>Level.FINEST</code> assigned and must be put inside the level
+	 * guard to prevent generating them by the system monitor. The system monitor does not
+	 * collect <code>FINEST</code> statistics.<p/>
+	 * Level guard code looks like the example below:
+	 * <pre>
+	 * if (list.checkLevel(Level.FINEST)) {
+	 *   // Some CPU intensive calculations or lengthy operations
+	 *   list.add(getName(), "Statistic description", stat_value, Level.FINEST);
+	 * }
+	 * <pre>
+	 * This way you make sure your extensive operation is not executed every second by the
+	 * monitoing system and does not affect the server performance.
 	 *
-	 *
-	 * @param list
+	 * @param list is a <code>StatistcsList</code> where all statistics are stored.
 	 */
 	@Override
 	public void getStatistics(StatisticsList list) {
@@ -460,12 +571,19 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	//~--- methods --------------------------------------------------------------
 
 	/**
-	 * This method can be overwritten in extending classes to get a different
-	 * packets distribution to different threads. For PubSub, probably better
-	 * packets distribution to different threads would be based on the
-	 * sender address rather then destination address.
-	 * @param packet
-	 * @return
+	 * This method decides how incoming packets are distributed among processing threads.
+	 * Different components needs different distribution to efficient use all threads and avoid
+	 * packets re-ordering.<p/>
+	 * If there are N processing threads, packets are distributed among threads using
+	 * following code:
+	 * <pre>
+	 * int threadNo = Math.abs(hashCodeForPacket(packet) % N);
+	 * </pre>
+	 * For a PubSub component, for example, a better packets distribution would be based on
+	 * the PubSub channel name, for SM a better distribution is based on the destination
+	 * address, etc....
+	 * @param packet is a <code>Packet</code> which needs to be processed by some thread.
+	 * @return a hash code generated for the input thread.
 	 */
 	public int hashCodeForPacket(Packet packet) {
 		if ((packet.getFrom() != null) && (packet.getFrom() != packet.getStanzaFrom())) {
@@ -816,15 +934,15 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	}
 
 	private void startThreads() {
-		if (processingThreads == null) {
-			processingThreads = new ArrayDeque<QueueListener>();
+		if (threadsQueue == null) {
+			threadsQueue = new ArrayDeque<QueueListener>();
 
 			for (int i = 0; i < in_queues_size; i++) {
 				QueueListener in_thread = new QueueListener(in_queues.get(i), QueueType.IN_QUEUE);
 
 				in_thread.setName("in_" + i + "-" + getName());
 				in_thread.start();
-				processingThreads.add(in_thread);
+				threadsQueue.add(in_thread);
 			}
 		}    // end of if (thread == null || ! thread.isAlive())
 
@@ -859,8 +977,8 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 
 		// stopped = true;
 		try {
-			if (processingThreads != null) {
-				for (QueueListener in_thread : processingThreads) {
+			if (threadsQueue != null) {
+				for (QueueListener in_thread : threadsQueue) {
 					in_thread.threadStopped = true;
 					in_thread.interrupt();
 
@@ -880,7 +998,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 			}
 		} catch (InterruptedException e) {}
 
-		processingThreads = null;
+		threadsQueue = null;
 		out_thread = null;
 
 		if (receiverTasks != null) {
