@@ -1,10 +1,10 @@
 /*
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2007 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2008 "Artur Hefczyc" <artur.hefczyc@tigase.org>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation, version 3 of the License.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -49,30 +49,38 @@ import java.util.logging.Logger;
 //~--- classes ----------------------------------------------------------------
 
 /**
- * Message forwarder class. Forwards <code>Message</code> packet to it's destination
- * address.
+ * Variant of the <code>Message</code> forwarder class. This implementation forwards
+ * messages to all connected resources. <p/>
+ * When a message <strong>'from'</strong> the user is being processed, the plugin forwards
+ * the message to the destination address and also sends the message to all other connected
+ * resources.<br/>
+ * When a message <strong>'to'</strong> the user is being processed, the plugin forwards
+ * the message to all connected resources.<p/>
+ * The idea behind this implementation is to keep all connected resources synchronized with
+ * a complete chat content. User should be able to switch between connections and continue
+ * the chat.
  *
- * Created: Tue Feb 21 15:49:08 2006
+ * Created: Feb 14, 2010 4:35:45 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class Message extends XMPPProcessor implements XMPPProcessorIfc {
+public class MessageAll extends XMPPProcessor implements XMPPProcessorIfc {
 
 	/** Class loggeer */
-	private static final Logger log = Logger.getLogger(Message.class.getName());
+	private static final Logger log = Logger.getLogger(MessageAll.class.getName());
 	private static final String XMLNS = "jabber:client";
-	private static final String ID = "message";
+	private static final String ID = "message-all";
 	private static final String[] ELEMENTS = { "message" };
 	private static final String[] XMLNSS = { XMLNS };
 
 	//~--- methods --------------------------------------------------------------
 
 	/**
-	 * Returns plugin unique identifier.
+	 * Method description
 	 *
 	 *
-	 * @return pugin unique identifier.
+	 * @return
 	 */
 	@Override
 	public String id() {
@@ -116,21 +124,24 @@ public class Message extends XMPPProcessor implements XMPPProcessorIfc {
 			if (session.getUserId().equals(id)) {
 
 				// Yes this is message to 'this' client
-				Packet result = packet.copyElementOnly();
+				// Send the message to all connected resources:
+				for (XMPPResourceConnection conn : session.getActiveSessions()) {
+					Packet result = packet.copyElementOnly();
 
-				// This is where and how we set the address of the component
-				// which should rceive the result packet for the final delivery
-				// to the end-user. In most cases this is a c2s or Bosh component
-				// which keep the user connection.
-				result.setPacketTo(session.getConnectionId(packet.getStanzaTo()));
+					// This is where and how we set the address of the component
+					// which should receive the packet for the final delivery
+					// to the end-user. In most cases this is a c2s or Bosh component
+					// which keep the user connection.
+					result.setPacketTo(conn.getConnectionId());
 
-				// In most cases this might be skept, however if there is a
-				// problem during packet delivery an error might be sent back
-				result.setPacketFrom(packet.getTo());
+					// In most cases this might be skept, however if there is a
+					// problem during packet delivery an error might be sent back
+					result.setPacketFrom(packet.getTo());
 
-				// Don't forget to add the packet to the results queue or it
-				// will be lost.
-				results.offer(result);
+					// Don't forget to add the packet to the results queue or it
+					// will be lost.
+					results.offer(result);
+				}
 
 				return;
 			}    // end of else
@@ -140,6 +151,27 @@ public class Message extends XMPPProcessor implements XMPPProcessorIfc {
 
 			// Checking if this is maybe packet FROM the client
 			if (session.getUserId().equals(id)) {
+
+				// First we have to update all the other resources with this message just send
+				// from the user.
+				for (XMPPResourceConnection conn : session.getActiveSessions()) {
+
+					// Don't send the message back to the connection from which is has been
+					// received, only to all other connections.
+					if (conn != session) {
+						Packet result = packet.copyElementOnly();
+
+						// This is where and how we set the address of the component
+						// which should receive the packet for the final delivery
+						// to the end-user. In most cases this is a c2s or Bosh component
+						// which keep the user connection.
+						result.setPacketTo(conn.getConnectionId());
+
+						// Don't forget to add the packet to the results queue or it
+						// will be lost.
+						results.offer(result);
+					}
+				}
 
 				// This is a packet FROM this client, the simplest action is
 				// to forward it to is't destination:
@@ -151,30 +183,8 @@ public class Message extends XMPPProcessor implements XMPPProcessorIfc {
 			}
 
 			// Can we really reach this place here?
-			// Yes, some packets don't even have from or to address.
-			// The best example is IQ packet which is usually a request to
-			// the server for some data. Such packets may not have any addresses
-			// And they usually require more complex processing
-			// This is how you check whether this is a packet FROM the user
-			// who is owner of the session:
-			JID jid = packet.getFrom();
-
-			// This test is in most cases equal to checking getElemFrom()
-			if (session.getConnectionId().equals(jid)) {
-
-				// Do some packet specific processing here, but we are dealing
-				// with messages here which normally need just forwarding
-				Element el_result = packet.getElement().clone();
-
-				// If we are here it means FROM address was missing from the
-				// packet, it is a place to set it here:
-				el_result.setAttribute("from", session.getJID().toString());
-
-				Packet result = Packet.packetInstance(el_result, session.getJID(), packet.getStanzaTo());
-
-				// ... putting it to results queue is enough
-				results.offer(result);
-			}
+			// If the point is reached then the message packet does not have either from or
+			// to address. In such a case we ignore it.
 		} catch (NotAuthorizedException e) {
 			log.warning("NotAuthorizedException for packet: " + packet);
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
@@ -203,7 +213,7 @@ public class Message extends XMPPProcessor implements XMPPProcessorIfc {
 	public String[] supNamespaces() {
 		return XMLNSS;
 	}
-}    // Message
+}
 
 
 //~ Formatted in Sun Code Convention
