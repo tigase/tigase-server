@@ -92,7 +92,7 @@ public interface NonAuthUserRepository {
 	 * running cluster nodes. The data are stored in some temporary space outside of the
 	 * registered user data so no information for registered users can be retrieved.<p/>
 	 *
-	 * @param domain
+	 * @param domain is a DNS domain name with which the data is associated.
 	 * @param subnode a <code>String</code> value is a node path where data is
 	 * stored. Node path has the same form as directory path on file system:
 	 * <pre>/root/subnode1/subnode2</pre>.
@@ -143,7 +143,8 @@ public interface NonAuthUserRepository {
 	 * @return a <code>String[]</code> value
 	 * @exception UserNotFoundException if user id hasn't been found in reository.
 	 */
-	String[] getPublicDataList(String user, String subnode, String key) throws UserNotFoundException;
+	String[] getPublicDataList(String user, String subnode, String key)
+			throws UserNotFoundException;
 
 	/**
 	 * Retrieves and returns a value associated with given subnode and key from a publicly
@@ -173,7 +174,7 @@ public interface NonAuthUserRepository {
 	 * so no information for registered user can be overwriten.<p/>
 	 * If there is already a value for a given subnode and key it will be overwritten otherwise
 	 * a new entry will be created.
-	 * @param domain
+	 * @param domain is a DNS domain name with which the data is associated.
 	 * @param subnode a <code>String</code> value is a node path where data is
 	 * stored. Node path has the same form as directory path on file system:
 	 * <pre>/root/subnode1/subnode2</pre>.
@@ -203,6 +204,32 @@ public interface NonAuthUserRepository {
 	 * @throws TigaseDBException if there was an error during writing data to the repository.
 	 */
 	void putTempData(String subnode, String key, String value) throws TigaseDBException;
+
+	/**
+	 * The method allows to remove existing data stored in a temporary storage space associated
+	 * with a given DNS domain.
+	 * @param domain is a DNS domain name with which the data is associated.
+	 * @param subnode a <code>String</code> value is a node path where data is
+	 * stored. Node path has the same form as directory path on file system:
+	 * <pre>/root/subnode1/subnode2</pre>.
+	 * @param key a <code>String</code> with which the specified values list is to
+	 * be associated.
+	 * @throws TigaseDBException if there was an error during writing data to the repository.
+	 */
+	void removeDomainTempData(String domain, String subnode, String key)
+			throws TigaseDBException;
+
+	/**
+	 * The method allows to remove existing data stored in the Tigase instance specific
+	 * temporary storage.
+	 * @param subnode a <code>String</code> value is a node path where data is
+	 * stored. Node path has the same form as directory path on file system:
+	 * <pre>/root/subnode1/subnode2</pre>.
+	 * @param key a <code>String</code> with which the specified values list is to
+	 * be associated.
+	 * @throws TigaseDBException if there was an error during writing data to the repository.
+	 */
+	void removeTempData(String subnode, String key) throws TigaseDBException;
 }    // WriteOnlyUserRepository
 
 

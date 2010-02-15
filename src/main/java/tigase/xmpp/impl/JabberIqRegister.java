@@ -24,6 +24,8 @@ package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.annotations.TODO;
+
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 
@@ -102,6 +104,8 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 	 * @throws XMPPException
 	 */
 	@Override
+	@TODO(note = "Implement registration form configurable and loading all the fields from "
+			+ "the registration form")
 	public void process(Packet packet, XMPPResourceConnection session,
 			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
 			throws XMPPException {

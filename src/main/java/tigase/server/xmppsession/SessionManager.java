@@ -156,14 +156,14 @@ public class SessionManager extends AbstractMessageReceiver
 
 	// {"admin@localhost"};
 	private Map<String, XMPPStopListenerIfc> stopListeners = new ConcurrentHashMap<String,
-																														 XMPPStopListenerIfc>();
+		XMPPStopListenerIfc>();
 	private boolean skipPrivacy = false;
 
 	/**
 	 * A Map with bare user JID as a key and a user session object as a value.
 	 */
-	private ConcurrentHashMap<BareJID, XMPPSession> sessionsByNodeId = new ConcurrentHashMap<BareJID,
-																																			 XMPPSession>();
+	private ConcurrentHashMap<BareJID, XMPPSession> sessionsByNodeId =
+		new ConcurrentHashMap<BareJID, XMPPSession>();
 	private ProcessingThreads<SessionOpenWorkerThread> sessionOpenThread =
 		new ProcessingThreads<SessionOpenWorkerThread>(new SessionOpenWorkerThread(this), 1, 1,
 			maxQueueSize, "session-open");
@@ -173,13 +173,13 @@ public class SessionManager extends AbstractMessageReceiver
 	private Map<String, ProcessingThreads<ProcessorWorkerThread>> processors =
 		new ConcurrentHashMap<String, ProcessingThreads<ProcessorWorkerThread>>();
 	private Map<String, XMPPPreprocessorIfc> preProcessors = new ConcurrentHashMap<String,
-																														 XMPPPreprocessorIfc>();
+		XMPPPreprocessorIfc>();
 	private Map<String, XMPPPostprocessorIfc> postProcessors = new ConcurrentHashMap<String,
-																															 XMPPPostprocessorIfc>();
+		XMPPPostprocessorIfc>();
 	private Map<String, Map<String, Object>> plugin_config = new ConcurrentHashMap<String,
-																														 Map<String, Object>>();
+		Map<String, Object>>();
 	private Map<String, XMPPPacketFilterIfc> outFilters = new ConcurrentHashMap<String,
-																													XMPPPacketFilterIfc>();
+		XMPPPacketFilterIfc>();
 
 	/**
 	 * A Map with connectionID as a key and an object with all the user connection
@@ -307,7 +307,8 @@ public class SessionManager extends AbstractMessageReceiver
 	 */
 	@Override
 	public Element getDiscoInfo(String node, JID jid, JID from) {
-		if ((jid != null) && (getName().equals(jid.getLocalpart()) || isLocalDomain(jid.toString()))) {
+		if ((jid != null)
+				&& (getName().equals(jid.getLocalpart()) || isLocalDomain(jid.toString()))) {
 			Element query = super.getDiscoInfo(node, jid, from);
 
 			if (query == null) {
@@ -360,7 +361,8 @@ public class SessionManager extends AbstractMessageReceiver
 		super.getStatistics(list);
 
 		if (list.checkLevel(Level.FINEST)) {
-			list.add(getName(), "Registered accounts", user_repository.getUsersCount(), Level.FINEST);
+			list.add(getName(), "Registered accounts", user_repository.getUsersCount(),
+					Level.FINEST);
 		}
 
 		list.add(getName(), "Open user connections", connectionsByFrom.size(), Level.INFO);
@@ -377,9 +379,10 @@ public class SessionManager extends AbstractMessageReceiver
 			ProcessingThreads<ProcessorWorkerThread> proc = procent.getValue();
 
 			if (list.checkLevel(Level.INFO, proc.getTotalQueueSize() + proc.getDroppedPackets())) {
-				list.add(getName(), "Processor: " + procent.getKey(), "Queue: " + proc.getTotalQueueSize()
-						+ ", AvTime: " + proc.getAverageProcessingTime() + ", Runs: " + proc.getTotalRuns()
-							+ ", Lost: " + proc.getDroppedPackets(), Level.INFO);
+				list.add(getName(), "Processor: " + procent.getKey(),
+						"Queue: " + proc.getTotalQueueSize() + ", AvTime: "
+							+ proc.getAverageProcessingTime() + ", Runs: " + proc.getTotalRuns()
+								+ ", Lost: " + proc.getDroppedPackets(), Level.INFO);
 			}
 		}
 
@@ -414,7 +417,8 @@ public class SessionManager extends AbstractMessageReceiver
 	@Override
 	public void handleLogin(String userName, XMPPResourceConnection conn) {
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("handleLogin called for: " + userName + ", conn_id: " + conn.getConnectionId());
+			log.finest("handleLogin called for: " + userName + ", conn_id: "
+					+ conn.getConnectionId());
 		}
 
 		BareJID userId;
@@ -662,7 +666,8 @@ public class SessionManager extends AbstractMessageReceiver
 		auth_repository = (UserAuthRepository) props.get(SHARED_AUTH_REPO_PROP_KEY);
 
 		if (auth_repository != null) {
-			log.config("Using shared auth repository instance: " + auth_repository.getClass().getName());
+			log.config("Using shared auth repository instance: "
+					+ auth_repository.getClass().getName());
 		} else {
 			Map<String, String> auth_repo_params = new LinkedHashMap<String, String>();
 
@@ -821,7 +826,8 @@ public class SessionManager extends AbstractMessageReceiver
 		return super.addOutPacket(packet);
 	}
 
-	protected void addOutPackets(Packet packet, XMPPResourceConnection conn, Queue<Packet> results) {
+	protected void addOutPackets(Packet packet, XMPPResourceConnection conn,
+			Queue<Packet> results) {
 		for (XMPPPacketFilterIfc outfilter : outFilters.values()) {
 			outfilter.filter(packet, conn, naUserRepository, results);
 		}    // end of for (XMPPPostprocessorIfc postproc: postProcessors)
@@ -938,8 +944,8 @@ public class SessionManager extends AbstractMessageReceiver
 							StringBuilder sb = new StringBuilder();
 
 							for (XMPPResourceConnection res_con : session.getActiveResources()) {
-								sb.append(", res=" + res_con.getResource() + " (" + res_con.getConnectionStatus()
-										+ ")");
+								sb.append(", res=" + res_con.getResource() + " ("
+										+ res_con.getConnectionStatus() + ")");
 							}
 
 							log.finer("Number of connections is " + session.getActiveResourcesSize()
@@ -961,7 +967,7 @@ public class SessionManager extends AbstractMessageReceiver
 	protected XMPPResourceConnection createUserSession(JID conn_id, String domain)
 			throws TigaseStringprepException {
 		XMPPResourceConnection connection = new XMPPResourceConnection(conn_id, user_repository,
-																					auth_repository, this);
+			auth_repository, this);
 		VHostItem vitem = null;
 
 		if (domain != null) {
@@ -1070,7 +1076,8 @@ public class SessionManager extends AbstractMessageReceiver
 
 			// Hm, not sure what should I do now....
 			// Maybe I should treat it as message to admin....
-			log.info("Message without TO attribute set, don't know what to do wih this: " + p.toString());
+			log.info("Message without TO attribute set, don't know what to do wih this: "
+					+ p.toString());
 		}    // end of else
 
 		return conn;
@@ -1100,7 +1107,7 @@ public class SessionManager extends AbstractMessageReceiver
 
 			try {
 				Packet error = Authorization.SERVICE_UNAVAILABLE.getResponseMessage(p,
-												 "Service not available.", true);
+					"Service not available.", true);
 
 				error.setPacketTo(p.getFrom());
 				fastAddOutPacket(error);
@@ -1132,14 +1139,15 @@ public class SessionManager extends AbstractMessageReceiver
 
 	//~--- methods --------------------------------------------------------------
 
-	protected XMPPResourceConnection loginUserSession(JID conn_id, String domain, BareJID user_id,
-			String resource, ConnectionStatus conn_st, String xmpp_sessionId) {
+	protected XMPPResourceConnection loginUserSession(JID conn_id, String domain,
+			BareJID user_id, String resource, ConnectionStatus conn_st, String xmpp_sessionId) {
 		try {
 			XMPPResourceConnection conn = createUserSession(conn_id, domain);
 
 			conn.setConnectionStatus(conn_st);
 			conn.setSessionId(xmpp_sessionId);
-			user_repository.setData(user_id.toString(), "tokens", xmpp_sessionId, conn_id.toString());
+			user_repository.setData(user_id.toString(), "tokens", xmpp_sessionId,
+					conn_id.toString());
 
 			Authorization auth = conn.loginToken(user_id, xmpp_sessionId, conn_id.toString());
 
@@ -1380,7 +1388,8 @@ public class SessionManager extends AbstractMessageReceiver
 							} else {
 								addOutPacket(Authorization.ITEM_NOT_FOUND.getResponseMessage(iqc,
 										"The user resource you want to remove does not exist.", true));
-								log.info("Can not find resource connection for packet: " + iqc.toStringSecure());
+								log.info("Can not find resource connection for packet: "
+										+ iqc.toStringSecure());
 							}
 						}
 					} else {
@@ -1500,8 +1509,8 @@ public class SessionManager extends AbstractMessageReceiver
 			Packet error = null;
 
 			if (stop
-					|| ((conn == null) && (packet.getStanzaFrom() != null) && (packet.getStanzaTo() != null)
-						&&!packet.getStanzaTo().equals(getComponentId())
+					|| ((conn == null) && (packet.getStanzaFrom() != null)
+						&& (packet.getStanzaTo() != null) &&!packet.getStanzaTo().equals(getComponentId())
 							&& ((packet.getElemName() == Iq.ELEM_NAME)
 								|| (packet.getElemName() == Message.ELEM_NAME)))) {
 				try {
@@ -1568,8 +1577,8 @@ public class SessionManager extends AbstractMessageReceiver
 				for (XMPPResourceConnection connection : connections) {
 					if (connection != conn) {
 						if (log.isLoggable(Level.FINEST)) {
-							log.finest("Checking connection: " + connection.getConnectionId() + ", user JID: "
-									+ connection.getjid());
+							log.finest("Checking connection: " + connection.getConnectionId()
+									+ ", user JID: " + connection.getjid());
 						}
 
 						addOutPacketWithTimeout(Command.CHECK_USER_CONNECTION.getPacket(getComponentId(),
@@ -1604,7 +1613,8 @@ public class SessionManager extends AbstractMessageReceiver
 
 	private void addPlugin(String plug_id, Integer conc) {
 		XMPPProcessorIfc proc = ProcessorFactory.getProcessor(plug_id);
-		int concurrency = ((conc != null) ? conc : ((proc != null) ? proc.concurrentQueuesNo() : 0));
+		int concurrency = ((conc != null)
+			? conc : ((proc != null) ? proc.concurrentQueuesNo() : 0));
 
 		System.out.println("Loading plugin: " + plug_id + "=" + concurrency + " ...");
 
@@ -1626,8 +1636,8 @@ public class SessionManager extends AbstractMessageReceiver
 
 		if (preproc != null) {
 			preProcessors.put(plug_id, preproc);
-			log.config("Added preprocessor: " + preproc.getClass().getSimpleName() + " for plugin id: "
-					+ plug_id);
+			log.config("Added preprocessor: " + preproc.getClass().getSimpleName()
+					+ " for plugin id: " + plug_id);
 			loaded = true;
 		}
 
@@ -1635,8 +1645,8 @@ public class SessionManager extends AbstractMessageReceiver
 
 		if (postproc != null) {
 			postProcessors.put(plug_id, postproc);
-			log.config("Added postprocessor: " + postproc.getClass().getSimpleName() + " for plugin id: "
-					+ plug_id);
+			log.config("Added postprocessor: " + postproc.getClass().getSimpleName()
+					+ " for plugin id: " + plug_id);
 			loaded = true;
 		}
 
@@ -1802,7 +1812,8 @@ public class SessionManager extends AbstractMessageReceiver
 		public void responseReceived(Packet packet, Packet response) {
 			if (response.getType() == StanzaType.error) {
 				if (log.isLoggable(Level.FINER)) {
-					log.finer("Connection checker error received, closing connection: " + packet.getTo());
+					log.finer("Connection checker error received, closing connection: "
+							+ packet.getTo());
 				}
 
 				// The connection is not longer active, closing the user session here.
@@ -1986,7 +1997,8 @@ public class SessionManager extends AbstractMessageReceiver
 		 * @throws TigaseDBException
 		 */
 		@Override
-		public String getTempData(String subnode, String key, String def) throws TigaseDBException {
+		public String getTempData(String subnode, String key, String def)
+				throws TigaseDBException {
 			checkDomain(getDefHostName());
 
 			return rep.getData(getDefHostName(), subnode, key, def);
@@ -2023,9 +2035,42 @@ public class SessionManager extends AbstractMessageReceiver
 		 * @throws TigaseDBException
 		 */
 		@Override
-		public void putTempData(String subnode, String key, String value) throws TigaseDBException {
+		public void putTempData(String subnode, String key, String value)
+				throws TigaseDBException {
 			checkDomain(getDefHostName());
 			rep.setData(getDefHostName(), subnode, key, value);
+		}
+
+		/**
+		 * Method description
+		 *
+		 *
+		 * @param domain
+		 * @param subnode
+		 * @param key
+		 *
+		 * @throws TigaseDBException
+		 */
+		@Override
+		public void removeDomainTempData(String domain, String subnode, String key)
+				throws TigaseDBException {
+			checkDomain(getDefHostName());
+			rep.removeData(domain, subnode, key);
+		}
+
+		/**
+		 * Method description
+		 *
+		 *
+		 * @param subnode
+		 * @param key
+		 *
+		 * @throws TigaseDBException
+		 */
+		@Override
+		public void removeTempData(String subnode, String key) throws TigaseDBException {
+			checkDomain(getDefHostName());
+			rep.removeData(getDefHostName(), subnode, key);
 		}
 
 		private String calcNode(String base, String subnode) {
@@ -2210,7 +2255,8 @@ public class SessionManager extends AbstractMessageReceiver
 				addTimerTask(new AuthenticationTimer(item.packet.getFrom()), 2, TimeUnit.MINUTES);
 			} else {
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Stream opened for existing session, authorized: " + item.conn.isAuthorized());
+					log.finest("Stream opened for existing session, authorized: "
+							+ item.conn.isAuthorized());
 				}
 			}    // end of else
 
