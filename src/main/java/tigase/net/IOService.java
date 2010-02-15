@@ -63,7 +63,7 @@ import java.util.logging.Logger;
 //~--- classes ----------------------------------------------------------------
 
 /**
- * <code>IOService</code> offers thread thread safe
+ * <code>IOService</code> offers thread safe
  * <code>call()</code> method execution, however you must be prepared that other
  * methods can be called simultanously like <code>stop()</code>,
  * <code>getProtocol()</code> or <code>isConnected()</code>.
@@ -190,8 +190,7 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 
 		local_address = sock.getLocalAddress().getHostAddress();
 		remote_address = sock.getInetAddress().getHostAddress();
-		id = local_address + "_" + sock.getLocalPort() + "_" + remote_address + "_"
-				+ sock.getPort();
+		id = local_address + "_" + sock.getLocalPort() + "_" + remote_address + "_" + sock.getPort();
 		setLastTransferTime();
 	}
 
@@ -566,9 +565,8 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 		if (log.isLoggable(Level.FINEST)) {
 			if ((msg != null) && (msg.trim().length() > 0)) {
 				String log_msg = "\n"
-												 + ((connectionType() != null)
-													 ? connectionType().toString() : "null-type") + " " + prefix + "\n"
-														 + msg + "\n";
+												 + ((connectionType() != null) ? connectionType().toString() : "null-type")
+												 + " " + prefix + "\n" + msg + "\n";
 
 				// System.out.print(log_msg);
 				log.finest(log_msg);
@@ -621,8 +619,7 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 				// sometimes it happens that the connection has been lost
 				// and the select thinks there are some bytes waiting for reading
 				// and 0 bytes are read
-				if ((++empty_read_call_count) > MAX_ALLOWED_EMPTY_CALLS
-						&& (writeInProgress.get() == 0)) {
+				if ((++empty_read_call_count) > MAX_ALLOWED_EMPTY_CALLS && (writeInProgress.get() == 0)) {
 					log.warning("Max allowed empty calls excceeded, closing connection.");
 					forceStop();
 				}
