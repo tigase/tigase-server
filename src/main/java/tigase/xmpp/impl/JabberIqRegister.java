@@ -19,18 +19,20 @@
  * Last modified by $Author$
  * $Date$
  */
+
 package tigase.xmpp.impl;
 
-import java.util.Map;
-import java.util.Queue;
-import java.util.logging.Logger;
-import java.util.logging.Level;
+//~--- non-JDK imports --------------------------------------------------------
+
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
-import tigase.server.Packet;
+
 import tigase.server.Command;
+import tigase.server.Packet;
 import tigase.server.Priority;
+
 import tigase.xml.Element;
+
 import tigase.xmpp.Authorization;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.StanzaType;
@@ -38,6 +40,15 @@ import tigase.xmpp.XMPPException;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
+
+//~--- JDK imports ------------------------------------------------------------
+
+import java.util.Map;
+import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+//~--- classes ----------------------------------------------------------------
 
 /**
  * JEP-0077: In-Band Registration
@@ -48,53 +59,50 @@ import tigase.xmpp.XMPPResourceConnection;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class JabberIqRegister extends XMPPProcessor
-	implements XMPPProcessorIfc {
+public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc {
 
-  /**
-   * Private logger for class instancess.
-   */
-  private static Logger log =
-		Logger.getLogger("tigase.xmpp.impl.JabberIqRegister");
-
+	/**
+	 * Private logger for class instancess.
+	 */
+	private static Logger log = Logger.getLogger(JabberIqRegister.class.getName());
 	private static final String ID = "jabber:iq:register";
-	private static final String[] ELEMENTS = {"query"};
-  private static final String[] XMLNSS = {"jabber:iq:register"};
-  private static final Element[] FEATURES = {
-		new Element("register", new String[] {"xmlns"},
-			new String[] {"http://jabber.org/features/iq-register"})
-	};
-  private static final Element[] DISCO_FEATURES =
-	{
-		new Element("feature",
-			new String[] {"var"},
-			new String[] {"jabber:iq:register"})
-	};
+	private static final String[] ELEMENTS = { "query" };
+	private static final String[] XMLNSS = { "jabber:iq:register" };
+	private static final Element[] FEATURES = { new Element("register", new String[] { "xmlns" },
+																							new String[] {
+																								"http://jabber.org/features/iq-register" }) };
+	private static final Element[] DISCO_FEATURES = { new Element("feature", new String[] { "var" },
+																										new String[] { "jabber:iq:register" }) };
 
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
 	@Override
-	public String id() { return ID; }
+	public String id() {
+		return ID;
+	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param packet
+	 * @param session
+	 * @param repo
+	 * @param results
+	 * @param settings
+	 *
+	 * @throws XMPPException
+	 */
 	@Override
-	public String[] supElements()
-	{ return ELEMENTS; }
-
-	@Override
-	public String[] supNamespaces()
-	{ return XMLNSS; }
-
-	@Override
-  public Element[] supStreamFeatures(XMPPResourceConnection session)
-	{ return FEATURES; }
-
-	@Override
-  public Element[] supDiscoFeatures(XMPPResourceConnection session)
-	{ return DISCO_FEATURES; }
-
-	@Override
-	public void process(Packet packet, XMPPResourceConnection session,
-			NonAuthUserRepository repo, Queue<Packet> results,
-			Map<String, Object> settings) throws XMPPException {
-
+	public void process(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
+			Queue<Packet> results, Map<String, Object> settings)
+			throws XMPPException {
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Processing packet: " + packet.toString());
 		}
@@ -103,90 +111,106 @@ public class JabberIqRegister extends XMPPProcessor
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("Session is null, ignoring");
 			}
+
 			return;
-		} // end of if (session == null)
+		}    // end of if (session == null)
 
 		String id = session.getDomain();
+
 		if (packet.getStanzaTo() != null) {
 			id = packet.getStanzaTo().getBareJID().toString();
 		}
 
 		try {
-			if ((id.equals(session.getDomain())
-					|| id.equals(session.getUserId().toString()))
-				&& packet.getFrom().equals(session.getConnectionId())) {
+			if ((id.equals(session.getDomain()) || id.equals(session.getUserId().toString()))
+					&& packet.getFrom().equals(session.getConnectionId())) {
 				Authorization result = Authorization.NOT_AUTHORIZED;
 				Element request = packet.getElement();
 				StanzaType type = packet.getType();
-				switch (type) {
-				case set:
-					// Is it registration cancel request?
-					Element elem = request.findChild("/iq/query/remove");
-					if (elem != null) {
-						// Yes this is registration cancel request
-						// According to JEP-0077 there must not be any
-						// more subelemets apart from <remove/>
-						elem = request.findChild("/iq/query");
-						if (elem.getChildren().size() > 1) {
-							result = Authorization.BAD_REQUEST;
-						} else {
-							try {
-								result = session.unregister(packet.getStanzaFrom().toString());
-								Packet ok_result = packet.okResult((String)null, 0);
-								// We have to set SYSTEM priority for the packet here,
-								// otherwise the network connection is closed before the
-								// client received a response
-								ok_result.setPriority(Priority.SYSTEM);
-								results.offer(ok_result);
-								results.offer(Command.CLOSE.getPacket(session.getSMComponentId(),
-										session.getConnectionId(), StanzaType.set,
-										session.nextStanzaId()));
 
-							} catch (NotAuthorizedException e) {
-								results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-										"You must authorize session first.", true));
-							} // end of try-catch
-						}
-					} else {
-						// No, so assuming this is registration of new
-						// user or change registration details for existing user
-						String user_name = request.getChildCData("/iq/query/username");
-						String password = request.getChildCData("/iq/query/password");
-						String email = request.getChildCData("/iq/query/email");
-						result = session.register(user_name, password, email);
-						if (result == Authorization.AUTHORIZED) {
-							results.offer(result.getResponseMessage(packet, null, false));
+				switch (type) {
+					case set :
+
+						// Is it registration cancel request?
+						Element elem = request.findChild("/iq/query/remove");
+
+						if (elem != null) {
+
+							// Yes this is registration cancel request
+							// According to JEP-0077 there must not be any
+							// more subelemets apart from <remove/>
+							elem = request.findChild("/iq/query");
+
+							if (elem.getChildren().size() > 1) {
+								result = Authorization.BAD_REQUEST;
+							} else {
+								try {
+									result = session.unregister(packet.getStanzaFrom().toString());
+
+									Packet ok_result = packet.okResult((String) null, 0);
+
+									// We have to set SYSTEM priority for the packet here,
+									// otherwise the network connection is closed before the
+									// client received a response
+									ok_result.setPriority(Priority.SYSTEM);
+									results.offer(ok_result);
+									results.offer(Command.CLOSE.getPacket(session.getSMComponentId(),
+											session.getConnectionId(), StanzaType.set, session.nextStanzaId()));
+								} catch (NotAuthorizedException e) {
+									results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
+											"You must authorize session first.", true));
+								}    // end of try-catch
+							}
 						} else {
-							results.offer(result.getResponseMessage(packet,
-									"Unsuccessful registration attempt", true));
+
+							// No, so assuming this is registration of new
+							// user or change registration details for existing user
+							String user_name = request.getChildCData("/iq/query/username");
+							String password = request.getChildCData("/iq/query/password");
+							String email = request.getChildCData("/iq/query/email");
+
+							result = session.register(user_name, password, email);
+
+							if (result == Authorization.AUTHORIZED) {
+								results.offer(result.getResponseMessage(packet, null, false));
+							} else {
+								results.offer(result.getResponseMessage(packet,
+										"Unsuccessful registration attempt", true));
+							}
 						}
-					}
-					break;
-				case get:
-					results.offer(packet.okResult(
-							"<instructions>" +
-							"Choose a user name and password for use with this service." +
-							"Please provide also your e-mail address." +
-							"</instructions>" +
-							"<username/>" +
-							"<password/>" +
-							"<email/>", 1));
-					break;
-				case result:
-					// It might be a registration request from transport for example...
-					Packet pack_res = packet.copyElementOnly();
-					pack_res.setPacketTo(session.getConnectionId());
-					results.offer(pack_res);
-					break;
-				default:
-					results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
-							"Message type is incorrect", true));
-					break;
-				} // end of switch (type)
+
+						break;
+
+					case get :
+						results.offer(packet.okResult("<instructions>"
+								+ "Choose a user name and password for use with this service."
+									+ "Please provide also your e-mail address." + "</instructions>" + "<username/>"
+										+ "<password/>" + "<email/>", 1));
+
+						break;
+
+					case result :
+
+						// It might be a registration request from transport for example...
+						Packet pack_res = packet.copyElementOnly();
+
+						pack_res.setPacketTo(session.getConnectionId());
+						results.offer(pack_res);
+
+						break;
+
+					default :
+						results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
+								"Message type is incorrect", true));
+
+						break;
+				}    // end of switch (type)
 			} else {
 				if (id.equals(session.getUserId().toString())) {
+
 					// It might be a registration request from transport for example...
 					Packet pack_res = packet.copyElementOnly();
+
 					pack_res.setPacketTo(session.getConnectionId());
 					results.offer(pack_res);
 				} else {
@@ -195,13 +219,65 @@ public class JabberIqRegister extends XMPPProcessor
 			}
 		} catch (NotAuthorizedException e) {
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-					"You are not authorized to change registration settings.\n" +
-					e.getMessage(), true));
+					"You are not authorized to change registration settings.\n" + e.getMessage(), true));
 		} catch (TigaseDBException e) {
-			log.warning("Database proble, please contact admin: " +e);
+			log.warning("Database proble, please contact admin: " + e);
 			results.offer(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet,
 					"Database access problem, please contact administrator.", true));
-		} // end of try-catch
+		}    // end of try-catch
 	}
 
-} // JabberIqRegister
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 *
+	 * @return
+	 */
+	@Override
+	public Element[] supDiscoFeatures(XMPPResourceConnection session) {
+		return DISCO_FEATURES;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public String[] supElements() {
+		return ELEMENTS;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public String[] supNamespaces() {
+		return XMLNSS;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 *
+	 * @return
+	 */
+	@Override
+	public Element[] supStreamFeatures(XMPPResourceConnection session) {
+		return FEATURES;
+	}
+}    // JabberIqRegister
+
+
+//~ Formatted in Sun Code Convention
+
+
+//~ Formatted by Jindent --- http://www.jindent.com
