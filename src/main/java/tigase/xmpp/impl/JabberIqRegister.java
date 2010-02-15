@@ -43,6 +43,7 @@ import tigase.xmpp.XMPPResourceConnection;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
@@ -68,11 +69,12 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 	private static final String ID = "jabber:iq:register";
 	private static final String[] ELEMENTS = { "query" };
 	private static final String[] XMLNSS = { "jabber:iq:register" };
-	private static final Element[] FEATURES = { new Element("register", new String[] { "xmlns" },
-																							new String[] {
-																								"http://jabber.org/features/iq-register" }) };
-	private static final Element[] DISCO_FEATURES = { new Element("feature", new String[] { "var" },
-																										new String[] { "jabber:iq:register" }) };
+	private static final Element[] FEATURES = {
+		new Element("register", new String[] { "xmlns" },
+			new String[] { "http://jabber.org/features/iq-register" }) };
+	private static final Element[] DISCO_FEATURES = {
+		new Element("feature", new String[] { "var" },
+			new String[] { "jabber:iq:register" }) };
 
 	//~--- methods --------------------------------------------------------------
 
@@ -100,8 +102,8 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 	 * @throws XMPPException
 	 */
 	@Override
-	public void process(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
-			Queue<Packet> results, Map<String, Object> settings)
+	public void process(Packet packet, XMPPResourceConnection session,
+			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
 			throws XMPPException {
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Processing packet: " + packet.toString());
@@ -168,8 +170,14 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 							String user_name = request.getChildCData("/iq/query/username");
 							String password = request.getChildCData("/iq/query/password");
 							String email = request.getChildCData("/iq/query/email");
+							Map<String, String> reg_params = null;
 
-							result = session.register(user_name, password, email);
+							if ((email != null) &&!email.trim().isEmpty()) {
+								reg_params = new LinkedHashMap<String, String>();
+								reg_params.put("email", email);
+							}
+
+							result = session.register(user_name, password, reg_params);
 
 							if (result == Authorization.AUTHORIZED) {
 								results.offer(result.getResponseMessage(packet, null, false));
@@ -184,8 +192,8 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 					case get :
 						results.offer(packet.okResult("<instructions>"
 								+ "Choose a user name and password for use with this service."
-									+ "Please provide also your e-mail address." + "</instructions>" + "<username/>"
-										+ "<password/>" + "<email/>", 1));
+									+ "Please provide also your e-mail address." + "</instructions>"
+										+ "<username/>" + "<password/>" + "<email/>", 1));
 
 						break;
 
@@ -219,7 +227,8 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 			}
 		} catch (NotAuthorizedException e) {
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-					"You are not authorized to change registration settings.\n" + e.getMessage(), true));
+					"You are not authorized to change registration settings.\n" + e.getMessage(),
+						true));
 		} catch (TigaseDBException e) {
 			log.warning("Database proble, please contact admin: " + e);
 			results.offer(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet,

@@ -40,6 +40,7 @@ import static tigase.db.NonAuthUserRepository.*;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -62,7 +63,8 @@ public abstract class RepositoryAccess {
 	 * Private logger for class instancess.
 	 */
 	private static final Logger log = Logger.getLogger("tigase.xmpp.RepositoryAccess");
-	protected static final String NOT_AUTHORIZED_MSG = "Session has not been yet authorised.";
+	protected static final String NOT_AUTHORIZED_MSG =
+		"Session has not been yet authorised.";
 	protected static final String NO_ACCESS_TO_REP_MSG = "Can not access user repository.";
 	private static final String ANONYMOUS_MECH = "ANONYMOUS";
 
@@ -704,7 +706,34 @@ public abstract class RepositoryAccess {
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
 	 */
+	@Deprecated
 	public Authorization register(String name_param, String pass_param, String email_param)
+			throws NotAuthorizedException, TigaseDBException {
+		Map<String, String> reg_params = null;
+
+		if ((email_param != null) &&!email_param.trim().isEmpty()) {
+			reg_params = new LinkedHashMap<String, String>();
+			reg_params.put("email", email_param);
+		}
+
+		return register(name_param, pass_param, reg_params);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param name_param
+	 * @param pass_param
+	 * @param reg_params
+	 *
+	 * @return
+	 *
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	public Authorization register(String name_param, String pass_param,
+			Map<String, String> reg_params)
 			throws NotAuthorizedException, TigaseDBException {
 
 		// Some clients send plain user name and others send
@@ -716,7 +745,7 @@ public abstract class RepositoryAccess {
 		}    // end of if (user_mame == null || user_name.equals(""))
 
 		if (isAuthorized()) {
-			return changeRegistration(user_name, pass_param, email_param);
+			return changeRegistration(user_name, pass_param, reg_params);
 		}
 
 		// new user registration, let's check limits...
@@ -741,9 +770,9 @@ public abstract class RepositoryAccess {
 			authRepo.addUser(BareJID.toString(user_name, getDomain()), pass_param);
 			log.info("User added: " + BareJID.toString(user_name, getDomain()) + ", pass: "
 					+ pass_param);
-			setRegistration(user_name, pass_param, email_param);
+			setRegistration(user_name, pass_param, reg_params);
 			log.info("Registration data set for: " + BareJID.toString(user_name, getDomain())
-					+ ", pass: " + pass_param + ", email: " + email_param);
+					+ ", pass: " + pass_param + ", reg_params: " + reg_params.toString());
 
 			return Authorization.AUTHORIZED;
 		} catch (UserExistsException e) {
@@ -1104,8 +1133,8 @@ public abstract class RepositoryAccess {
 		return base + "/" + subnode;
 	}
 
-	private Authorization changeRegistration(final String name_param, final String pass_param,
-			final String email_param)
+	private Authorization changeRegistration(final String name_param,
+			final String pass_param, final Map<String, String> registr_params)
 			throws NotAuthorizedException, TigaseDBException {
 		if ((name_param == null) || name_param.equals("") || (pass_param == null)
 				|| pass_param.equals("")) {
@@ -1113,7 +1142,7 @@ public abstract class RepositoryAccess {
 		}
 
 		if (getUserName().equals(name_param)) {
-			setRegistration(name_param, pass_param, email_param);
+			setRegistration(name_param, pass_param, registr_params);
 
 			return Authorization.AUTHORIZED;
 		} else {
@@ -1124,13 +1153,16 @@ public abstract class RepositoryAccess {
 	//~--- set methods ----------------------------------------------------------
 
 	private void setRegistration(final String name_param, final String pass_param,
-			final String email_param)
+			final Map<String, String> registr_params)
 			throws TigaseDBException {
 		try {
 			authRepo.updatePassword(BareJID.toString(name_param, getDomain()), pass_param);
 
-			if ((email_param != null) &&!email_param.equals("")) {
-				repo.setData(BareJID.toString(name_param, getDomain()), "email", email_param);
+			if (registr_params != null) {
+				for (Map.Entry<String, String> entry : registr_params.entrySet()) {
+					repo.setData(BareJID.toString(name_param, getDomain()), entry.getKey(),
+							entry.getValue());
+				}
 			}
 		} catch (UserNotFoundException e) {
 			log.log(Level.WARNING, "Problem accessing reposiotry: ", e);
