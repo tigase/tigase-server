@@ -25,6 +25,7 @@ package tigase.xmpp.impl.roster;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.util.TigaseStringprepException;
+import tigase.util.XMPPStringPrepFactory;
 
 import tigase.xml.Element;
 import tigase.xml.XMLUtils;
@@ -39,7 +40,6 @@ import static tigase.xmpp.impl.roster.RosterAbstract.SubscriptionType;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
-import tigase.util.XMPPStringPrepFactory;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -59,6 +59,7 @@ public class RosterElement {
 	private static final String NAME_ATT = "name";
 	private static final String SUBS_ATT = "subs";
 	private static final String GRP_ATT = "groups";
+	private static final String OTHER_ATT = "other";
 	private static final String STRINGPREP_ATT = "preped";
 
 	//~--- fields ---------------------------------------------------------------
@@ -66,9 +67,10 @@ public class RosterElement {
 	private String[] groups = null;
 	private JID jid = null;
 	private String name = null;
+	private String otherData = null;
 	private XMPPResourceConnection session = null;
-	private SubscriptionType subscription = null;
 	private String stringpreped = null;
+	private SubscriptionType subscription = null;
 
 	// private boolean online = false;
 	// private Element item = null;
@@ -99,14 +101,20 @@ public class RosterElement {
 			} else {
 				subscription = SubscriptionType.valueOf(roster_el.getAttribute(SUBS_ATT));
 			}
+
+			String grps = roster_el.getAttribute(GRP_ATT);
+
+			if ((grps != null) &&!grps.trim().isEmpty()) {
+				groups = grps.split(",");
+			}
+
+			String other_data = roster_el.getAttribute(OTHER_ATT);
+
+			if ((other_data != null) &&!other_data.trim().isEmpty()) {
+				otherData = other_data;
+			}
 		} else {
 			log.warning("Incorrect roster data: " + roster_el.toString());
-		}
-
-		String grps = roster_el.getAttribute(GRP_ATT);
-
-		if ((grps != null) &&!grps.isEmpty()) {
-			groups = grps.split(",");
 		}
 	}
 
@@ -166,6 +174,16 @@ public class RosterElement {
 	 *
 	 * @return
 	 */
+	public String getOtherData() {
+		return otherData;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
 	public Element getRosterElement() {
 		Element elem = new Element(ELEM_NAME, new String[] { JID_ATT, SUBS_ATT, NAME_ATT,
 				STRINGPREP_ATT }, new String[] { jid.toString(), subscription.toString(), name,
@@ -180,6 +198,10 @@ public class RosterElement {
 
 			grps = grps.substring(0, grps.length() - 1);
 			elem.setAttribute(GRP_ATT, grps);
+		}
+
+		if (otherData != null) {
+			elem.setAttribute(OTHER_ATT, otherData);
 		}
 
 		modified = false;
@@ -292,6 +314,16 @@ public class RosterElement {
 		}
 
 		modified = true;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param other_data
+	 */
+	public void setOtherData(String other_data) {
+		otherData = other_data;
 	}
 
 	/**
