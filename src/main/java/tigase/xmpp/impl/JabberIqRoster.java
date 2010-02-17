@@ -75,16 +75,10 @@ public abstract class JabberIqRoster {
 	/**
 	 * Private logger for class instancess.
 	 */
-	private static Logger log = Logger.getLogger("tigase.xmpp.impl.JabberIqRoster");
-	protected static final String XMLNS_DYNAMIC = "jabber:iq:roster-dynamic";
+	private static Logger log = Logger.getLogger(JabberIqRoster.class.getName());
 	private static final String[] ELEMENTS = { "query", "query" };
-	private static final String[] XMLNSS = { RosterAbstract.XMLNS, XMLNS_DYNAMIC };
-	protected static final Element[] DISCO_FEATURES = {
-		new Element("feature", new String[] { "var" }, new String[] { RosterAbstract.XMLNS }),
-		new Element("feature", new String[] { "var" }, new String[] { XMLNS_DYNAMIC }) };
-	protected static final Element[] FEATURES = {
-		new Element("ver", new String[] { "xmlns" },
-			new String[] { "urn:xmpp:features:rosterver" }) };
+	private static final String[] XMLNSS = { RosterAbstract.XMLNS,
+		RosterAbstract.XMLNS_DYNAMIC };
 
 	/** Field description */
 	public static final String ANON = "anon";
@@ -176,7 +170,7 @@ public abstract class JabberIqRoster {
 						break;
 				}    // end of switch (type)
 			} else {
-				if (xmlns == XMLNS_DYNAMIC) {
+				if (xmlns == RosterAbstract.XMLNS_DYNAMIC) {
 					switch (type) {
 						case get :
 							dynamicGetRequest(packet, session, results, settings);

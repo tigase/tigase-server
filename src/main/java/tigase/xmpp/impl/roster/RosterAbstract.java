@@ -377,6 +377,19 @@ public abstract class RosterAbstract {
 	public static final String XMLNS = "jabber:iq:roster";
 
 	/** Field description */
+	public static final String XMLNS_DYNAMIC = "jabber:iq:roster-dynamic";
+
+	/** Field description */
+	public static final Element[] DISCO_FEATURES = {
+		new Element("feature", new String[] { "var" }, new String[] { XMLNS }),
+		new Element("feature", new String[] { "var" }, new String[] { XMLNS_DYNAMIC }) };
+
+	/** Field description */
+	public static final Element[] FEATURES = {
+		new Element("ver", new String[] { "xmlns" },
+			new String[] { "urn:xmpp:features:rosterver" }) };
+
+	/** Field description */
 	public static final EnumSet<SubscriptionType> SUB_NONE = EnumSet.of(SubscriptionType.none,
 		SubscriptionType.none_pending_out, SubscriptionType.none_pending_in,
 		SubscriptionType.none_pending_out_in);

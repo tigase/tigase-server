@@ -61,14 +61,14 @@ public class RosterPresence extends XMPPProcessor
 	/**
 	 * Private logger for class instancess.
 	 */
-	private static Logger log = Logger.getLogger("tigase.xmpp.impl.Presence");
+	private static Logger log = Logger.getLogger(RosterPresence.class.getName());
 	private static final String ID = "roster-presence";
 	private static final String PRESENCE = "presence";
 	private static final String[] ELEMENTS = { PRESENCE, "query", "query" };
 	private static final String[] XMLNSS = { Presence.XMLNS, RosterAbstract.XMLNS,
-			JabberIqRoster.XMLNS_DYNAMIC };
-	private static final Element[] DISCO_FEATURES = JabberIqRoster.DISCO_FEATURES;
-	private static final Element[] FEATURES = JabberIqRoster.FEATURES;
+			RosterAbstract.XMLNS_DYNAMIC };
+	private static final Element[] DISCO_FEATURES = RosterAbstract.DISCO_FEATURES;
+	private static final Element[] FEATURES = RosterAbstract.FEATURES;
 
 	//~--- methods --------------------------------------------------------------
 
