@@ -76,86 +76,19 @@ public abstract class JabberIqRoster {
 	 * Private logger for class instancess.
 	 */
 	private static Logger log = Logger.getLogger("tigase.xmpp.impl.JabberIqRoster");
-	protected static final String XMLNS = "jabber:iq:roster";
 	protected static final String XMLNS_DYNAMIC = "jabber:iq:roster-dynamic";
 	private static final String[] ELEMENTS = { "query", "query" };
-	private static final String[] XMLNSS = { XMLNS, XMLNS_DYNAMIC };
-	protected static final Element[] DISCO_FEATURES = { new Element("feature",
-																											new String[] { "var" },
-																											new String[] { XMLNS }),
-			new Element("feature", new String[] { "var" }, new String[] { XMLNS_DYNAMIC }) };
-	protected static final Element[] FEATURES = { new Element("ver", new String[] { "xmlns" },
-																								new String[] {
-																									"urn:xmpp:features:rosterver" }) };
+	private static final String[] XMLNSS = { RosterAbstract.XMLNS, XMLNS_DYNAMIC };
+	protected static final Element[] DISCO_FEATURES = {
+		new Element("feature", new String[] { "var" }, new String[] { RosterAbstract.XMLNS }),
+		new Element("feature", new String[] { "var" }, new String[] { XMLNS_DYNAMIC }) };
+	protected static final Element[] FEATURES = {
+		new Element("ver", new String[] { "xmlns" },
+			new String[] { "urn:xmpp:features:rosterver" }) };
 
 	/** Field description */
 	public static final String ANON = "anon";
 	private static RosterAbstract roster_util = RosterFactory.getRosterImplementation(true);
-
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param iq_type
-	 * @param iq_id
-	 * @param from
-	 * @param to
-	 * @param item_jid
-	 * @param item_name
-	 * @param item_groups
-	 * @param subscription
-	 * @param item_type
-	 *
-	 * @return
-	 */
-	public static Element createRosterPacket(String iq_type, String iq_id, JID from, JID to,
-			JID item_jid, String item_name, String[] item_groups, String subscription,
-				String item_type) {
-		Element iq = new Element("iq", new String[] { "type", "id" }, new String[] { iq_type,
-				iq_id });
-
-		if (from != null) {
-			iq.addAttribute("from", from.toString());
-		}
-
-		if (to != null) {
-			iq.addAttribute("to", to.toString());
-		}
-
-		Element query = new Element("query");
-
-		query.setXMLNS(XMLNS);
-		iq.addChild(query);
-
-		Element item = new Element("item", new String[] { "jid" },
-										 new String[] { item_jid.toString() });
-
-		if (item_type != null) {
-			item.addAttribute("type", item_type);
-		}
-
-		if (item_name != null) {
-			item.addAttribute(RosterAbstract.NAME, item_name);
-		}
-
-		if (subscription != null) {
-			item.addAttribute(RosterAbstract.SUBSCRIPTION, subscription);
-		}
-
-		if (item_groups != null) {
-			for (String gr : item_groups) {
-				Element group = new Element(RosterAbstract.GROUP, gr);
-
-				item.addChild(group);
-			}
-		}
-
-		query.addChild(item);
-
-		return iq;
-	}
 
 	//~--- get methods ----------------------------------------------------------
 
@@ -216,11 +149,10 @@ public abstract class JabberIqRoster {
 			}    // end of if (packet.getElemFrom() != null
 
 			// && !session.getUserId().equals(JIDUtils.getNodeID(packet.getElemFrom())))
-
 			StanzaType type = packet.getType();
 			String xmlns = packet.getElement().getXMLNS("/iq/query");
 
-			if (xmlns == XMLNS) {
+			if (xmlns == RosterAbstract.XMLNS) {
 				switch (type) {
 					case get :
 						processGetRequest(packet, session, results, settings);
@@ -417,7 +349,7 @@ public abstract class JabberIqRoster {
 		if ((ritems != null) && (ritems.size() > 0)) {
 			Element query = new Element("query");
 
-			query.setXMLNS(XMLNS);
+			query.setXMLNS(RosterAbstract.XMLNS);
 
 			if (incomingHash != null) {
 				query.setAttribute("ver", storedHash);
@@ -461,11 +393,11 @@ public abstract class JabberIqRoster {
 
 			while (items.size() > 0) {
 				Element iq = new Element("iq", new String[] { "type", "id", "to" },
-											 new String[] { "set",
+					new String[] { "set",
 						"dr-" + items.size(), session.getJID().toString() });
 				Element query = new Element("query");
 
-				query.setXMLNS(XMLNS);
+				query.setXMLNS(RosterAbstract.XMLNS);
 				iq.addChild(query);
 				query.addChild(items.poll());
 

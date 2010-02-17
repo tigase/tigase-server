@@ -1,4 +1,5 @@
-/*  Tigase Jabber/XMPP Server
+/*
+ *   Tigase Jabber/XMPP Server
  *  Copyright (C) 2004-2008 "Artur Hefczyc" <artur.hefczyc@tigase.org>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,20 +19,32 @@
  * Last modified by $Author$
  * $Date$
  */
+
 package tigase.xmpp.impl;
 
-import java.util.Queue;
-import java.util.Map;
-import java.util.logging.Logger;
-import java.util.logging.Level;
+//~--- non-JDK imports --------------------------------------------------------
+
+import tigase.db.NonAuthUserRepository;
+
 import tigase.server.Packet;
+
 import tigase.xml.Element;
+
+import tigase.xmpp.XMPPException;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
-import tigase.xmpp.XMPPStopListenerIfc;
 import tigase.xmpp.XMPPResourceConnection;
-import tigase.xmpp.XMPPException;
-import tigase.db.NonAuthUserRepository;
+import tigase.xmpp.XMPPStopListenerIfc;
+import tigase.xmpp.impl.roster.RosterAbstract;
+
+//~--- JDK imports ------------------------------------------------------------
+
+import java.util.Map;
+import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+//~--- classes ----------------------------------------------------------------
 
 /**
  * Describe class RosterPresence here.
@@ -42,78 +55,89 @@ import tigase.db.NonAuthUserRepository;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class RosterPresence  extends XMPPProcessor
-	implements XMPPProcessorIfc, XMPPStopListenerIfc {
+public class RosterPresence extends XMPPProcessor
+		implements XMPPProcessorIfc, XMPPStopListenerIfc {
 
 	/**
-   * Private logger for class instancess.
-   */
-  private static Logger log =	Logger.getLogger("tigase.xmpp.impl.Presence");
-
+	 * Private logger for class instancess.
+	 */
+	private static Logger log = Logger.getLogger("tigase.xmpp.impl.Presence");
 	private static final String ID = "roster-presence";
-
 	private static final String PRESENCE = "presence";
-	private static final String[] ELEMENTS = {PRESENCE, "query", "query"};
-  private static final String[] XMLNSS = {
-		Presence.XMLNS, JabberIqRoster.XMLNS, JabberIqRoster.XMLNS_DYNAMIC};
-  private static final Element[] DISCO_FEATURES =	JabberIqRoster.DISCO_FEATURES;
-	private static final Element[] FEATURES =	JabberIqRoster.FEATURES;
+	private static final String[] ELEMENTS = { PRESENCE, "query", "query" };
+	private static final String[] XMLNSS = { Presence.XMLNS, RosterAbstract.XMLNS,
+			JabberIqRoster.XMLNS_DYNAMIC };
+	private static final Element[] DISCO_FEATURES = JabberIqRoster.DISCO_FEATURES;
+	private static final Element[] FEATURES = JabberIqRoster.FEATURES;
 
-	@Override
-	public String id() { return ID; }
+	//~--- methods --------------------------------------------------------------
 
-	@Override
-	public String[] supElements()
-	{ return ELEMENTS; }
-
-	@Override
-	public Element[] supStreamFeatures(final XMPPResourceConnection session)
-	{ return FEATURES; }
-
-	@Override
-  public String[] supNamespaces()
-	{ return XMLNSS; }
-
-	@Override
-  public Element[] supDiscoFeatures(final XMPPResourceConnection session)
-	{ return DISCO_FEATURES; }
-
-	@Override
-	public void stopped(final XMPPResourceConnection session,
-		final Queue<Packet> results, final Map<String, Object> settings) {
-		Presence.stopped(session, results, settings);
-		JabberIqRoster.stopped(session, results, settings);
-	}
-
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
 	@Override
 	public int concurrentQueuesNo() {
 		return Runtime.getRuntime().availableProcessors() * 2;
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
 	@Override
 	public int concurrentThreadsPerQueue() {
+
 		// Packet processing order does matter for roster/presence therefore
 		// we need a single thread for each queue.
 		return 1;
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
 	@Override
-  public void process(final Packet packet,
-		final XMPPResourceConnection session,
-		final NonAuthUserRepository repo, final Queue<Packet> results,
-		final Map<String, Object> settings)
-		throws XMPPException {
+	public String id() {
+		return ID;
+	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param packet
+	 * @param session
+	 * @param repo
+	 * @param results
+	 * @param settings
+	 *
+	 * @throws XMPPException
+	 */
+	@Override
+	public void process(final Packet packet, final XMPPResourceConnection session,
+			final NonAuthUserRepository repo, final Queue<Packet> results,
+				final Map<String, Object> settings)
+			throws XMPPException {
 		if (session == null) {
 			if (log.isLoggable(Level.FINE)) {
 				log.fine("Session is null, ignoring packet: " + packet.toString());
 			}
+
 			return;
-		} // end of if (session == null)
-		if (!session.isAuthorized()) {
+		}    // end of if (session == null)
+
+		if ( !session.isAuthorized()) {
 			if (log.isLoggable(Level.FINE)) {
 				log.fine("Session is not authorized, ignoring packet: " + packet.toString());
 			}
+
 			return;
 		}
 
@@ -124,4 +148,72 @@ public class RosterPresence  extends XMPPProcessor
 		}
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param results
+	 * @param settings
+	 */
+	@Override
+	public void stopped(final XMPPResourceConnection session, final Queue<Packet> results,
+			final Map<String, Object> settings) {
+		Presence.stopped(session, results, settings);
+		JabberIqRoster.stopped(session, results, settings);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 *
+	 * @return
+	 */
+	@Override
+	public Element[] supDiscoFeatures(final XMPPResourceConnection session) {
+		return DISCO_FEATURES;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public String[] supElements() {
+		return ELEMENTS;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public String[] supNamespaces() {
+		return XMLNSS;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 *
+	 * @return
+	 */
+	@Override
+	public Element[] supStreamFeatures(final XMPPResourceConnection session) {
+		return FEATURES;
+	}
 }
+
+
+//~ Formatted in Sun Code Convention
+
+
+//~ Formatted by Jindent --- http://www.jindent.com
