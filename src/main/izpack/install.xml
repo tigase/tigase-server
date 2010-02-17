@@ -45,7 +45,7 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 		<url>http://www.tigase.org/</url>
 		<appsubpath>Tigase-$APP_VER</appsubpath>
 		<javaversion>1.6</javaversion>
-		<requiresjdk>yes</requiresjdk>
+		<requiresjdk>no</requiresjdk>
 		<pack200/>
 	</info>
 
@@ -177,7 +177,7 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 	-->
 		<panels>
 			<panel classname="CheckedHelloPanel" id="CheckedHelloPanel.id"/>
-			<panel classname="TigaseJDKPathPanel" id="TigaseJDKPathPanel.id"/>
+<!--			<panel classname="TigaseJDKPathPanel" id="TigaseJDKPathPanel.id"/> -->
 			<panel classname="UserInputPanel" id="InstallConfigPanel.id"/>
 			<panel classname="HTMLInfoPanel" condition="installSelected"
 						 id="HTMLReadmePanel.id"/>
