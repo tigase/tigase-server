@@ -125,12 +125,14 @@ public class RosterFlat extends RosterAbstract {
 	 * @param buddy
 	 * @param name
 	 * @param groups
+	 * @param otherData
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
 	 */
 	@Override
-	public void addBuddy(XMPPResourceConnection session, JID buddy, String name, String[] groups)
+	public void addBuddy(XMPPResourceConnection session, JID buddy, String name,
+			String[] groups, String otherData)
 			throws NotAuthorizedException, TigaseDBException {
 
 		// String buddy = JIDUtils.getNodeID(jid);
@@ -140,6 +142,7 @@ public class RosterFlat extends RosterAbstract {
 			Map<BareJID, RosterElement> roster = getUserRoster(session);
 
 			relem = new RosterElement(buddy, name, groups, session);
+			relem.setOtherData(otherData);
 
 			if (addBuddy(relem, roster)) {
 				saveUserRoster(session);

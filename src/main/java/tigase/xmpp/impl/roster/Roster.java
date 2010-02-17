@@ -64,12 +64,14 @@ public class Roster extends RosterAbstract {
 	 * @param jid
 	 * @param name
 	 * @param groups
+	 * @param otherData
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
 	 */
 	@Override
-	public void addBuddy(XMPPResourceConnection session, JID jid, String name, String[] groups)
+	public void addBuddy(XMPPResourceConnection session, JID jid, String name, String[] groups,
+			String otherData)
 			throws NotAuthorizedException, TigaseDBException {
 		String nick = name;
 

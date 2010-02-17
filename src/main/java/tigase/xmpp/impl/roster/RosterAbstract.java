@@ -466,12 +466,13 @@ public abstract class RosterAbstract {
 	 * @param jid
 	 * @param name
 	 * @param groups
+	 * @param otherData
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
 	 */
 	public abstract void addBuddy(XMPPResourceConnection session, JID jid, String name,
-			String[] groups)
+			String[] groups, String otherData)
 			throws NotAuthorizedException, TigaseDBException;
 
 	/**
@@ -1014,7 +1015,7 @@ public abstract class RosterAbstract {
 		}
 
 		if (current_subscription == null) {
-			addBuddy(session, jid, null, null);
+			addBuddy(session, jid, null, null, null);
 			current_subscription = SubscriptionType.none;
 		}
 

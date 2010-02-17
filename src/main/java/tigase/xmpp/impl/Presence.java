@@ -284,7 +284,7 @@ public abstract class Presence {
 								roster_util.getBuddySubscription(session, packet.getStanzaTo());
 
 							if (current_subscription == null) {
-								roster_util.addBuddy(session, packet.getStanzaTo(), null, null);
+								roster_util.addBuddy(session, packet.getStanzaTo(), null, null, null);
 							}    // end of if (current_subscription == null)
 						}
 
@@ -441,7 +441,7 @@ public abstract class Presence {
 
 							if (curr_sub == null) {
 								curr_sub = SubscriptionType.none;
-								roster_util.addBuddy(session, packet.getStanzaFrom(), null, null);
+								roster_util.addBuddy(session, packet.getStanzaFrom(), null, null, null);
 							}    // end of if (curr_sub == null)
 
 							roster_util.updateBuddySubscription(session, pres_type, packet.getStanzaFrom());
@@ -474,7 +474,7 @@ public abstract class Presence {
 
 						if (curr_sub == null) {
 							curr_sub = SubscriptionType.none;
-							roster_util.addBuddy(session, packet.getStanzaFrom(), null, null);
+							roster_util.addBuddy(session, packet.getStanzaFrom(), null, null, null);
 						}    // end of if (curr_sub == null)
 
 						subscr_changed = roster_util.updateBuddySubscription(session, pres_type,
