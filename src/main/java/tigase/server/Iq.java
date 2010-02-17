@@ -122,21 +122,29 @@ public class Iq extends Packet {
 	}
 
 	/**
-	 * Method description
+	 * Method description creates a new <code>Packet</code> instance or <code>Iq</code>
+	 * instance more specificly with a roster entry content.
 	 * TODO: Remove dependency on RosterAbstract class, possibly move the method again
 	 * to more proper location but it needs to be accessible from all parts of the application.
 	 *
-	 * @param iq_type
-	 * @param iq_id
-	 * @param from
-	 * @param to
-	 * @param item_jid
-	 * @param item_name
-	 * @param item_groups
-	 * @param subscription
-	 * @param item_type
+	 * @param iq_type is a <code>String</code> value with the stanza type: 'set', 'get',
+	 * 'result'.
+	 * @param iq_id is a <code>String</code> value with the stanza unique id.
+	 * @param from is a <code>JID</code> instance with the packet source address.
+	 * @param to is a <code>JID</code> instance with the packet destination address.
+	 * @param item_jid is a <code>JID</code> instance with the roster item JID, note in most
+	 * cases the jid should not have a resource part, but this method does not cut it off. This
+	 * is because there are cases when we want to have a resource part in the roster item.
+	 * @param item_name is a <code>String</code> vakue with the roster item name.
+	 * @param item_groups is a <code>String[]</code> array with all groups the item belongs
+	 * to.
+	 * @param subscription is a <code>String</code> instance with the item subscription state.
+	 * @param item_type is a <code>String</code> of the user item type. This is
+	 * <code>null</code> in most cases as this is not part of the XMPP RFC. Some deployments
+	 * needs some extra information about the roster item type though.
 	 *
-	 * @return
+	 * @return a new <code>Packet</code> instance or <code>Iq</code> instance more
+	 * specificly with a roster entry content.
 	 */
 	public static Iq createRosterPacket(String iq_type, String iq_id, JID from, JID to,
 			JID item_jid, String item_name, String[] item_groups, String subscription,
