@@ -155,8 +155,8 @@ public abstract class Presence {
 					case in_subscribed :
 						if (packet.getStanzaFrom() == null) {
 							if (log.isLoggable(Level.FINE)) {
-								log.fine("'in' subscription presence without valid 'from' address, dropping packet: "
-										+ packet);
+								log.fine("'in' subscription presence without valid 'from' address, "
+										+ "dropping packet: " + packet);
 							}
 
 							return;
@@ -164,8 +164,8 @@ public abstract class Presence {
 
 						if (packet.getStanzaFrom().getBareJID().equals(session.getUserId())) {
 							if (log.isLoggable(Level.FINE)) {
-								log.fine("'in' subscription to myself, not allowed, returning error for packet: "
-										+ packet);
+								log.fine("'in' subscription to myself, not allowed, returning "
+										+ "error for packet: " + packet);
 							}
 
 							results.offer(Authorization.NOT_ALLOWED.getResponseMessage(packet,
@@ -1100,7 +1100,8 @@ public abstract class Presence {
 
 				// Ignore....
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Skipping update presence change for a resource which hasn't sent initial presence yet.");
+					log.finest("Skipping update presence change for a resource which hasn't sent "
+							+ "initial presence yet.");
 				}
 			} else {
 				try {

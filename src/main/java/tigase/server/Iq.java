@@ -123,7 +123,8 @@ public class Iq extends Packet {
 
 	/**
 	 * Method description
-	 *
+	 * TODO: Remove dependency on RosterAbstract class, possibly move the method again
+	 * to more proper location but it needs to be accessible from all parts of the application.
 	 *
 	 * @param iq_type
 	 * @param iq_id
