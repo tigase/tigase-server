@@ -65,7 +65,7 @@ public class RosterFlat extends RosterAbstract {
 	private static final Logger log = Logger.getLogger("tigase.xmpp.impl.roster.RosterFlat");
 	private static final SimpleParser parser = SingletonFactory.getParserInstance();
 	private static int maxRosterSize = new Long(Runtime.getRuntime().maxMemory()
-																			 / 250000L).intValue();
+		/ 250000L).intValue();
 
 	//~--- methods --------------------------------------------------------------
 
@@ -447,7 +447,7 @@ public class RosterFlat extends RosterAbstract {
 
 	//~--- get methods ----------------------------------------------------------
 
-	private RosterElement getRosterElement(XMPPResourceConnection session, JID buddy)
+	protected RosterElement getRosterElement(XMPPResourceConnection session, JID buddy)
 			throws NotAuthorizedException, TigaseDBException {
 		Map<BareJID, RosterElement> roster = getUserRoster(session);
 
@@ -457,8 +457,8 @@ public class RosterFlat extends RosterAbstract {
 	@SuppressWarnings("unchecked")
 	private Map<BareJID, RosterElement> getUserRoster(XMPPResourceConnection session)
 			throws NotAuthorizedException, TigaseDBException {
-		Map<BareJID, RosterElement> roster =
-			(Map<BareJID, RosterElement>) session.getCommonSessionData(ROSTER);
+		Map<BareJID, RosterElement> roster = (Map<BareJID,
+			RosterElement>) session.getCommonSessionData(ROSTER);
 
 		if (roster == null) {
 			roster = loadUserRoster(session);
