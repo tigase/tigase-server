@@ -1492,9 +1492,11 @@ public class SessionManager extends AbstractMessageReceiver
 			}    // end of for (XMPPPostprocessorIfc postproc: postProcessors)
 		}      // end of if (!stop)
 
-		if ( !stop &&!packet.wasProcessed() && (packet.getStanzaTo() != null)
-				&&!isLocalDomain(packet.getStanzaTo().toString())
-					&& filter.process(packet, conn, naUserRepository, results)) {
+		if ( !stop &&!packet.wasProcessed()
+				&& ((packet.getStanzaTo() == null)
+					|| ((packet.getStanzaTo() != null)
+						&&!isLocalDomain(packet.getStanzaTo().toString()))) && filter.process(packet,
+							conn, naUserRepository, results)) {
 			packet.processedBy("filter-process");
 		}
 
