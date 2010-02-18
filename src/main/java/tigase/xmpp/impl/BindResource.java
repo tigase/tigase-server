@@ -141,7 +141,7 @@ public class BindResource extends XMPPProcessor implements XMPPProcessorIfc {
 
 					packet.initVars(session.getJID(), packet.getStanzaTo());
 					session.putSessionData(RESOURCE_KEY, "true");
-					results.offer(packet.okResult("<jid>" + session.getJID() + "</jid>", 1));
+					results.offer(packet.okResult(new Element("jid", session.getJID().toString()), 1));
 
 					break;
 
