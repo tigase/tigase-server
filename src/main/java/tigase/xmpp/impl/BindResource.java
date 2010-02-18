@@ -19,22 +19,34 @@
  * Last modified by $Author$
  * $Date$
  */
+
 package tigase.xmpp.impl;
 
-import java.util.Queue;
-import java.util.Map;
-import java.util.logging.Logger;
+//~--- non-JDK imports --------------------------------------------------------
+
+import tigase.db.NonAuthUserRepository;
+
 import tigase.server.Packet;
+
 import tigase.util.TigaseStringprepException;
+
 import tigase.xml.Element;
+
 import tigase.xmpp.Authorization;
-import tigase.xmpp.StanzaType;
 import tigase.xmpp.NotAuthorizedException;
+import tigase.xmpp.StanzaType;
+import tigase.xmpp.XMPPException;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
-import tigase.xmpp.XMPPException;
-import tigase.db.NonAuthUserRepository;
+
+//~--- JDK imports ------------------------------------------------------------
+
+import java.util.Map;
+import java.util.Queue;
+import java.util.logging.Logger;
+
+//~--- classes ----------------------------------------------------------------
 
 /**
  * RFC-3920, 7. Resource Binding
@@ -45,106 +57,162 @@ import tigase.db.NonAuthUserRepository;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class BindResource extends XMPPProcessor
-	implements XMPPProcessorIfc {
-
-  protected static final String RESOURCE_KEY = "Resource-Binded";
-  private static final String XMLNS = "urn:ietf:params:xml:ns:xmpp-bind";
-  private static final Logger log =
-		Logger.getLogger("tigase.xmpp.impl.BindResource");
-
+public class BindResource extends XMPPProcessor implements XMPPProcessorIfc {
+	protected static final String RESOURCE_KEY = "Resource-Binded";
+	private static final String XMLNS = "urn:ietf:params:xml:ns:xmpp-bind";
+	private static final Logger log = Logger.getLogger("tigase.xmpp.impl.BindResource");
 	private static final String ID = XMLNS;
-  private static final String[] ELEMENTS = {"bind"};
-  private static final String[] XMLNSS = {XMLNS};
-  private static final Element[] FEATURES = {
-		new Element("bind",	new String[] {"xmlns"}, new String[] {XMLNS})
-	};
-  private static final Element[] DISCO_FEATURES = {
-		new Element("feature", new String[] {"var"}, new String[] {XMLNS})
-	};
+	private static final String[] ELEMENTS = { "bind" };
+	private static final String[] XMLNSS = { XMLNS };
+	private static final Element[] FEATURES = {
+		new Element("bind", new String[] { "xmlns" }, new String[] { XMLNS }) };
+	private static final Element[] DISCO_FEATURES = {
+		new Element("feature", new String[] { "var" }, new String[] { XMLNS }) };
+	private static int resGenerator = 0;
 
-  private static int resGenerator = 0;
+	//~--- methods --------------------------------------------------------------
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
 	@Override
-	public String id() { return ID; }
-
-	@Override
-	public String[] supElements()
-	{ return ELEMENTS; }
-
-	@Override
-  public String[] supNamespaces()
-	{ return XMLNSS; }
-
-	@Override
-  public Element[] supStreamFeatures(final XMPPResourceConnection session)	{
-		if (session != null &&
-						session.getSessionData(RESOURCE_KEY) == null &&
-						session.isAuthorized()) {
-      return FEATURES;
-    } else {
-      return null;
-    } // end of if (session.isAuthorized()) else
+	public String id() {
+		return ID;
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param packet
+	 * @param session
+	 * @param repo
+	 * @param results
+	 * @param settings
+	 *
+	 * @throws XMPPException
+	 */
 	@Override
-  public Element[] supDiscoFeatures(final XMPPResourceConnection session)
-	{ return DISCO_FEATURES; }
-
-	@Override
-  public void process(final Packet packet, final XMPPResourceConnection session,
-		final NonAuthUserRepository repo, final Queue<Packet> results,
-		final Map<String, Object> settings)
-		throws XMPPException {
-
+	public void process(final Packet packet, final XMPPResourceConnection session,
+			final NonAuthUserRepository repo, final Queue<Packet> results,
+				final Map<String, Object> settings)
+			throws XMPPException {
 		if (session == null) {
 			return;
-		} // end of if (session == null)
+		}    // end of if (session == null)
 
-		if (!session.isAuthorized()) {
-      results.offer(session.getAuthState().getResponseMessage(packet,
-          "Session is not yet authorized.", false));
+		if ( !session.isAuthorized()) {
+			results.offer(session.getAuthState().getResponseMessage(packet,
+					"Session is not yet authorized.", false));
+
 			return;
-		} // end of if (!session.isAuthorized())
+		}    // end of if (!session.isAuthorized())
 
 		Element request = packet.getElement();
-    StanzaType type = packet.getType();
-    try {
+		StanzaType type = packet.getType();
+
+		try {
 			switch (type) {
-			case set:
-        String resource = request.getChildCData("/iq/bind/resource");
-				try {
-					if (resource == null || resource.trim().isEmpty()) {
-						resource = "tigase-" + (++resGenerator);
-						session.setResource(resource);
-					} else {
-						try {
-							session.setResource(resource);
-						} catch (TigaseStringprepException ex) {
-							// User provided resource is invalid, generating different server one
-							log.info("Incrrect resource provided by the user: " + resource
-									+ ", generating a different one by the server.");
+				case set :
+					String resource = request.getChildCData("/iq/bind/resource");
+
+					try {
+						if ((resource == null) || resource.trim().isEmpty()) {
 							resource = "tigase-" + (++resGenerator);
 							session.setResource(resource);
-						}
-					} // end of if (resource == null) else
-				} catch (TigaseStringprepException ex) {
-					log.warning("stringprep problem with the server generated resource: "
-							+ resource);
-				}
-				packet.getElement().setAttribute("from", session.getJID().toString());
-        session.putSessionData(RESOURCE_KEY, "true");
-				results.offer(packet.okResult("<jid>" + session.getJID() + "</jid>", 1));
-				break;
-			default:
-        results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
-            "Bind type is incorrect", false));
-				break;
-			} // end of switch (type)
-    } catch (NotAuthorizedException e) {
-      results.offer(session.getAuthState().getResponseMessage(packet,
-          "Session is not yet authorized.", false));
-    } // end of try-catch
+						} else {
+							try {
+								session.setResource(resource);
+							} catch (TigaseStringprepException ex) {
+
+								// User provided resource is invalid, generating different server one
+								log.info("Incrrect resource provided by the user: " + resource
+										+ ", generating a different one by the server.");
+								resource = "tigase-" + (++resGenerator);
+								session.setResource(resource);
+							}
+						}    // end of if (resource == null) else
+					} catch (TigaseStringprepException ex) {
+						log.warning("stringprep problem with the server generated resource: " + resource);
+					}
+
+					packet.initVars(session.getJID(), packet.getStanzaTo());
+					session.putSessionData(RESOURCE_KEY, "true");
+					results.offer(packet.okResult("<jid>" + session.getJID() + "</jid>", 1));
+
+					break;
+
+				default :
+					results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
+							"Bind type is incorrect", false));
+
+					break;
+			}    // end of switch (type)
+		} catch (NotAuthorizedException e) {
+			results.offer(session.getAuthState().getResponseMessage(packet,
+					"Session is not yet authorized.", false));
+		}    // end of try-catch
 	}
 
-} // BindResource
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 *
+	 * @return
+	 */
+	@Override
+	public Element[] supDiscoFeatures(final XMPPResourceConnection session) {
+		return DISCO_FEATURES;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public String[] supElements() {
+		return ELEMENTS;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public String[] supNamespaces() {
+		return XMLNSS;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 *
+	 * @return
+	 */
+	@Override
+	public Element[] supStreamFeatures(final XMPPResourceConnection session) {
+		if ((session != null) && (session.getSessionData(RESOURCE_KEY) == null)
+				&& session.isAuthorized()) {
+			return FEATURES;
+		} else {
+			return null;
+		}    // end of if (session.isAuthorized()) else
+	}
+}    // BindResource
+
+
+//~ Formatted in Sun Code Convention
+
+
+//~ Formatted by Jindent --- http://www.jindent.com
