@@ -288,6 +288,18 @@ public class RosterFlat extends RosterAbstract {
 	 * Method description
 	 *
 	 *
+	 * @param relem
+	 *
+	 * @return
+	 */
+	public Element getBuddyItem(RosterElement relem) {
+		return relem.getRosterItem();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
 	 * @param session
 	 * @param buddy
 	 *
@@ -357,7 +369,7 @@ public class RosterFlat extends RosterAbstract {
 		for (RosterElement relem : roster.values()) {
 
 //    if (relem.isOnline() || !onlineOnly) {
-			items.add(relem.getRosterItem());
+			items.add(getBuddyItem(relem));
 
 //    }
 		}
