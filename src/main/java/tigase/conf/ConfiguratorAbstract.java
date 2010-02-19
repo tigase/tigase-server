@@ -580,8 +580,8 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 			repo_pool.initRepository(res_uri, user_repo_params);
 
 			for (int i = 0; i < repo_pool_size; i++) {
-				user_repository = RepositoryFactory.getUserRepository(getName() + "-" + (i + 1), cls_name,
-						res_uri, user_repo_params);
+				user_repository = RepositoryFactory.getUserRepository(getName() + "-" + (i + 1),
+						cls_name, res_uri, user_repo_params);
 				repo_pool.addRepo(user_repository);
 			}
 
