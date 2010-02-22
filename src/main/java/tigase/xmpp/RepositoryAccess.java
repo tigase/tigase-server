@@ -63,8 +63,7 @@ public abstract class RepositoryAccess {
 	 * Private logger for class instancess.
 	 */
 	private static final Logger log = Logger.getLogger("tigase.xmpp.RepositoryAccess");
-	protected static final String NOT_AUTHORIZED_MSG =
-		"Session has not been yet authorised.";
+	protected static final String NOT_AUTHORIZED_MSG = "Session has not been yet authorised.";
 	protected static final String NO_ACCESS_TO_REP_MSG = "Can not access user repository.";
 	private static final String ANONYMOUS_MECH = "ANONYMOUS";
 
@@ -768,11 +767,18 @@ public abstract class RepositoryAccess {
 
 		try {
 			authRepo.addUser(BareJID.toString(user_name, getDomain()), pass_param);
-			log.info("User added: " + BareJID.toString(user_name, getDomain()) + ", pass: "
-					+ pass_param);
+
+			if (log.isLoggable(Level.INFO)) {
+				log.info("User added: " + BareJID.toString(user_name, getDomain()) + ", pass: "
+						+ pass_param);
+			}
+
 			setRegistration(user_name, pass_param, reg_params);
-			log.info("Registration data set for: " + BareJID.toString(user_name, getDomain())
-					+ ", pass: " + pass_param + ", reg_params: " + reg_params.toString());
+
+			if (log.isLoggable(Level.INFO)) {
+				log.info("Registration data set for: " + BareJID.toString(user_name, getDomain())
+						+ ", pass: " + pass_param + ", reg_params: " + reg_params.toString());
+			}
 
 			return Authorization.AUTHORIZED;
 		} catch (UserExistsException e) {
@@ -1133,8 +1139,8 @@ public abstract class RepositoryAccess {
 		return base + "/" + subnode;
 	}
 
-	private Authorization changeRegistration(final String name_param,
-			final String pass_param, final Map<String, String> registr_params)
+	private Authorization changeRegistration(final String name_param, final String pass_param,
+			final Map<String, String> registr_params)
 			throws NotAuthorizedException, TigaseDBException {
 		if ((name_param == null) || name_param.equals("") || (pass_param == null)
 				|| pass_param.equals("")) {
