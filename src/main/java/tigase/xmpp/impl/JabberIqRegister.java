@@ -75,8 +75,7 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 		new Element("register", new String[] { "xmlns" },
 			new String[] { "http://jabber.org/features/iq-register" }) };
 	private static final Element[] DISCO_FEATURES = {
-		new Element("feature", new String[] { "var" },
-			new String[] { "jabber:iq:register" }) };
+		new Element("feature", new String[] { "var" }, new String[] { "jabber:iq:register" }) };
 
 	//~--- methods --------------------------------------------------------------
 
@@ -128,8 +127,11 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 		}
 
 		try {
-			if ((id.equals(session.getDomain()) || id.equals(session.getUserId().toString()))
-					&& packet.getFrom().equals(session.getConnectionId())) {
+
+			// I think it does not make sense to check the 'to', just the connection ID
+//    if ((id.equals(session.getDomain()) || id.equals(session.getUserId().toString()))
+//        && packet.getFrom().equals(session.getConnectionId())) {
+			if (packet.getFrom().equals(session.getConnectionId())) {
 				Authorization result = Authorization.NOT_AUTHORIZED;
 				Element request = packet.getElement();
 				StanzaType type = packet.getType();
@@ -231,8 +233,7 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 			}
 		} catch (NotAuthorizedException e) {
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-					"You are not authorized to change registration settings.\n" + e.getMessage(),
-						true));
+					"You are not authorized to change registration settings.\n" + e.getMessage(), true));
 		} catch (TigaseDBException e) {
 			log.warning("Database proble, please contact admin: " + e);
 			results.offer(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet,
