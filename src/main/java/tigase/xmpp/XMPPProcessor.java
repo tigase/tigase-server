@@ -22,9 +22,14 @@
 
 package tigase.xmpp;
 
-import tigase.xml.Element;
-import tigase.db.UserRepository;
+//~--- non-JDK imports --------------------------------------------------------
+
 import tigase.db.TigaseDBException;
+import tigase.db.UserRepository;
+
+import tigase.xml.Element;
+
+//~--- classes ----------------------------------------------------------------
 
 /**
  * <code>XMPPProcessor</code> abstract class contains basic definition for
@@ -52,76 +57,168 @@ import tigase.db.TigaseDBException;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public abstract class XMPPProcessor
-	implements XMPPImplIfc, Comparable<XMPPProcessor> {
-
+public abstract class XMPPProcessor implements XMPPImplIfc, Comparable<XMPPProcessor> {
 	protected static final String ALL = "*";
+
+	//~--- fields ---------------------------------------------------------------
 
 	private XMPPProcessor inst = null;
 
-	protected XMPPProcessor() {	inst = this; }
+	//~--- constructors ---------------------------------------------------------
 
+	protected XMPPProcessor() {
+		inst = this;
+	}
+
+	//~--- methods --------------------------------------------------------------
+
+	// Implementation of java.lang.Comparable
+
+	/**
+	 * Method <code>compareTo</code> is used to perform
+	 *
+	 * @param proc an <code>XMPPProcessor</code> value
+	 * @return an <code>int</code> value
+	 */
 	@Override
-	public String[] supElements() { return null; }
+	public final int compareTo(final XMPPProcessor proc) {
+		return getClass().getName().compareTo(proc.getClass().getName());
+	}
 
-	@Override
-  public String[] supNamespaces() { return null; }
-
-	@Override
-  public Element[] supStreamFeatures(final XMPPResourceConnection session)
-	{ return null; }
-
-	@Override
-  public Element[] supDiscoFeatures(final XMPPResourceConnection session)
-	{ return null; }
-
-	@Override
-  public boolean isSupporting(final String element, final String ns) {
-    String[] impl_elements = supElements();
-    String[] impl_xmlns = supNamespaces();
-    if (impl_elements != null && impl_xmlns != null) {
-      for (int i = 0; i < impl_elements.length && i < impl_xmlns.length; i++) {
-				// ******   WARNING!!!! WARNING!!!!    *****
-				// This is intentional reference comparison!
-				// This method is called very, very often and it is also very expensive
-				// therefore all XML element names and xmlns are created using
-				// String.intern()
-        if ((impl_elements[i] == element || impl_elements[i] == ALL) &&
-								(impl_xmlns[i] == ns || impl_xmlns[i] == ALL)) {
-          return true;
-        } // end of if (ELEMENTS[i].equals(element) && XMLNSS[i].equals(ns))
-      } // end of for (int i = 0; i < ELEMENTS.length; i++)
-    } // end of if (impl_elements != null && impl_xmlns != null)
-    return false;
-  }
-
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
 	@Override
 	public int concurrentQueuesNo() {
 		return 2;
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
 	@Override
 	public int concurrentThreadsPerQueue() {
 		return 1;
 	}
 
-	public XMPPProcessor getInstance() { return inst; }
+	//~--- get methods ----------------------------------------------------------
 
-	// Implementation of java.lang.Comparable
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public XMPPProcessor getInstance() {
+		return inst;
+	}
 
-  /**
-   * Method <code>compareTo</code> is used to perform
-   *
-   * @param proc an <code>XMPPProcessor</code> value
-   * @return an <code>int</code> value
-   */
-	@Override
-  public final int compareTo(final XMPPProcessor proc) {
-    return
-      getClass().getName().compareTo(proc.getClass().getName());
-  }
+	//~--- methods --------------------------------------------------------------
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param rep
+	 *
+	 * @throws TigaseDBException
+	 */
 	@Override
 	public void init(UserRepository rep) throws TigaseDBException {}
 
-}// XMPPProcessor
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param element
+	 * @param ns
+	 *
+	 * @return
+	 */
+	@Override
+	public boolean isSupporting(final String element, final String ns) {
+		String[] impl_elements = supElements();
+		String[] impl_xmlns = supNamespaces();
+
+		if ((impl_elements != null) && (impl_xmlns != null)) {
+			for (int i = 0; (i < impl_elements.length) && (i < impl_xmlns.length); i++) {
+
+				// ******   WARNING!!!! WARNING!!!!    *****
+				// This is intentional reference comparison!
+				// This method is called very, very often and it is also very expensive
+				// therefore all XML element names and xmlns are created using
+				// String.intern()
+				if (((impl_elements[i] == element) || (impl_elements[i] == ALL))
+						&& ((impl_xmlns[i] == ns) || (impl_xmlns[i] == ALL))) {
+					return true;
+				}    // end of if (ELEMENTS[i].equals(element) && XMLNSS[i].equals(ns))
+			}      // end of for (int i = 0; i < ELEMENTS.length; i++)
+		}        // end of if (impl_elements != null && impl_xmlns != null)
+
+		return false;
+	}
+
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 *
+	 * @return
+	 */
+	@Override
+	public Element[] supDiscoFeatures(final XMPPResourceConnection session) {
+		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public String[] supElements() {
+		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public String[] supNamespaces() {
+		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 *
+	 * @return
+	 */
+	@Override
+	public Element[] supStreamFeatures(final XMPPResourceConnection session) {
+		return null;
+	}
+}    // XMPPProcessor
+
+
+//~ Formatted in Sun Code Convention
+
+
+//~ Formatted by Jindent --- http://www.jindent.com
