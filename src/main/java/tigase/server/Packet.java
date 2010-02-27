@@ -102,6 +102,18 @@ public class Packet {
 	private static final String ERROR_NS = "urn:ietf:params:xml:ns:xmpp-stanzas";
 
 	/**
+	 * The variable control whether the toStringSecure() hides all the CData information
+	 * from stanzas printed to logs or logs the full, detailed stanza content. By default the
+	 * variable is set to 'false' to protect users' privacy and not reveail chat content.
+	 * This is the value to be used in all production/live systems. For the debug purposes
+	 * on the test or development system it can be set to 'true' to help diagnose run-time
+	 * problems.<p/>
+	 * You can change value of the field by setting system property:
+	 * <code>'packet.debug.full'</code> to <code>'true'</code>.
+	 */
+	public static boolean FULL_DEBUG = Boolean.getBoolean("packet.debug.full");
+
+	/**
 	 * For internal Tigase use only. The session manager stores in stanza the old, original
 	 * address while the packet is processd. This is sometimes necessary as the SM works
 	 * for many virtual domains and the main SM address may be different from the address
@@ -1236,12 +1248,16 @@ public class Packet {
 	 * @return a <code>String</code> representation of the packet instance.
 	 */
 	public String toStringSecure() {
-		if (packetToStringSecure == null) {
-			packetToStringSecure = ", data=" + elem.toStringSecure() + ", XMLNS=" + elem.getXMLNS()
-														 + ", priority=" + priority;
-		}
+		if (FULL_DEBUG) {
+			return toString();
+		} else {
+			if (packetToStringSecure == null) {
+				packetToStringSecure = ", data=" + elem.toStringSecure() + ", XMLNS=" + elem.
+						getXMLNS() + ", priority=" + priority;
+			}
 
-		return "from=" + packetFrom + ", to=" + packetTo + packetToStringSecure;
+			return "from=" + packetFrom + ", to=" + packetTo + packetToStringSecure;
+		}
 	}
 
 	/**
