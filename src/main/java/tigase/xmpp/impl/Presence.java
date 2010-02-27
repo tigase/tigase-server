@@ -820,41 +820,44 @@ public abstract class Presence {
 		// going through the session manager on other node.
 		// Please note! may cause unneeded behaviour if privacy lists or other
 		// blocking mechanism is used
-		JID[] connIds = runtime.getConnectionIdsForJid(to);
+		// This is actually not such a good idea, it is always better to send the
+		// packets through the SM. The only packets which could be optimized that way
+		// are Message packets.
+//  JID[] connIds = runtime.getConnectionIdsForJid(to);
+//
+//  if ((connIds != null) && (connIds.length > 0)) {
+//    for (JID connId : connIds) {
+//      try {
+//        Packet packet = Packet.packetInstance(presence);
+//
+//        packet.setPacketTo(connId);
+//
+//        if (log.isLoggable(Level.FINEST)) {
+//          log.finest("Sending presence info: " + packet);
+//        }
+//
+//        results.offer(packet);
+//      } catch (TigaseStringprepException ex) {
+//        log.warning("Packet stringprep addressing problem, skipping presence send: "
+//            + presence);
+//      }
+//    }
+//  } else {
+		try {
 
-		if ((connIds != null) && (connIds.length > 0)) {
-			for (JID connId : connIds) {
-				try {
-					Packet packet = Packet.packetInstance(presence);
+			// Connection IDs are not available so let's send it a normal way
+			Packet packet = Packet.packetInstance(presence);
 
-					packet.setPacketTo(connId);
-
-					if (log.isLoggable(Level.FINEST)) {
-						log.finest("Sending presence info: " + packet);
-					}
-
-					results.offer(packet);
-				} catch (TigaseStringprepException ex) {
-					log.warning("Packet stringprep addressing problem, skipping presence send: "
-							+ presence);
-				}
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Sending presence info: " + packet);
 			}
-		} else {
-			try {
 
-				// Connection IDs are not available so let's send it a normal way
-				Packet packet = Packet.packetInstance(presence);
-
-				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Sending presence info: " + packet);
-				}
-
-				results.offer(packet);
-			} catch (TigaseStringprepException ex) {
-				log.warning("Packet stringprep addressing problem, skipping presence send: "
-						+ presence);
-			}
+			results.offer(packet);
+		} catch (TigaseStringprepException ex) {
+			log.warning("Packet stringprep addressing problem, skipping presence send: " + presence);
 		}
+
+//  }
 	}
 
 	/**
