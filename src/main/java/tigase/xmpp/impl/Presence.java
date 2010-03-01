@@ -415,8 +415,9 @@ public abstract class Presence {
 
 							if (pres_type == PresenceType.out_subscribed) {
 								Element presence = session.getPresence();
+								JID from = (presence == null ? session.getJID() : null);
 
-								sendPresence(StanzaType.available, null, buddy, results, presence);
+								sendPresence(StanzaType.available, from, buddy, results, presence);
 							} else {
 								sendPresence(StanzaType.unavailable, session.getJID(), buddy, results, null);
 							}
