@@ -148,6 +148,7 @@ public class SessionManager extends AbstractMessageReceiver
 	private int maxUserSessions = 0;
 	private NonAuthUserRepository naUserRepository = null;
 	private long reaperInterval = 60 * 1000;
+	private SMResourceConnection smResourceConnection = null;
 	private long totalUserConnections = 0;
 	private long totalUserSessions = 0;
 	private UserRepository user_repository = null;
@@ -779,10 +780,9 @@ public class SessionManager extends AbstractMessageReceiver
 			}
 		}    // end of for (String comp_id: plugins)
 
-		SMResourceConnection smrc = new SMResourceConnection(null, user_repository,
-			auth_repository, this);
-
-		registerNewSession(getComponentId().getBareJID(), smrc);
+		smResourceConnection = new SMResourceConnection(null, user_repository, auth_repository,
+				this);
+		registerNewSession(getComponentId().getBareJID(), smResourceConnection);
 
 		String[] trusted_tmp = (String[]) props.get(TRUSTED_PROP_KEY);
 
@@ -807,20 +807,20 @@ public class SessionManager extends AbstractMessageReceiver
 
 	@Override
 	protected boolean addOutPacket(Packet packet) {
-//		String oldto = packet.getAttribute(Packet.OLDTO);
-//
-//		if (oldto != null) {
-//			packet.getElement().setAttribute("from", oldto);
-//			packet.getElement().removeAttribute(Packet.OLDTO);
-//		}
-//
-//		String oldfrom = packet.getAttribute(Packet.OLDFROM);
-//
-//		if (oldfrom != null) {
-//			packet.getElement().setAttribute("to", oldfrom);
-//			packet.getElement().removeAttribute(Packet.OLDFROM);
-//		}
 
+//  String oldto = packet.getAttribute(Packet.OLDTO);
+//
+//  if (oldto != null) {
+//    packet.getElement().setAttribute("from", oldto);
+//    packet.getElement().removeAttribute(Packet.OLDTO);
+//  }
+//
+//  String oldfrom = packet.getAttribute(Packet.OLDFROM);
+//
+//  if (oldfrom != null) {
+//    packet.getElement().setAttribute("to", oldfrom);
+//    packet.getElement().removeAttribute(Packet.OLDFROM);
+//  }
 		return super.addOutPacket(packet);
 	}
 
@@ -1033,6 +1033,11 @@ public class SessionManager extends AbstractMessageReceiver
 			return session.getResourceConnection(jid);
 		}    // end of if (session != null)
 
+		// Maybe this is a call for the server session?
+		if (isLocalDomain(jid.toString(), false)) {
+			return smResourceConnection;
+		}
+
 		return null;
 	}
 
@@ -1186,14 +1191,14 @@ public class SessionManager extends AbstractMessageReceiver
 					log.warning("Packet for hostname, should be handled elsewhere: " + packet);
 				}
 
-//				Packet host_pac = packet.copyElementOnly();
+//      Packet host_pac = packet.copyElementOnly();
 //
-//				// No need for the line below, initVars takes care of that
-//				// host_pac.getElement().setAttribute("to", getComponentId().toString());
-//				host_pac.getElement().setAttribute(Packet.OLDTO, packet.getStanzaTo().toString());
-//				host_pac.getElement().setAttribute(Packet.OLDFROM, packet.getStanzaFrom().toString());
-//				host_pac.initVars(packet.getStanzaFrom(), getComponentId());
-//				processPacket(host_pac);
+//      // No need for the line below, initVars takes care of that
+//      // host_pac.getElement().setAttribute("to", getComponentId().toString());
+//      host_pac.getElement().setAttribute(Packet.OLDTO, packet.getStanzaTo().toString());
+//      host_pac.getElement().setAttribute(Packet.OLDFROM, packet.getStanzaFrom().toString());
+//      host_pac.initVars(packet.getStanzaFrom(), getComponentId());
+//      processPacket(host_pac);
 			}
 
 			return true;
