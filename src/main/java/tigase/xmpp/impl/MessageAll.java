@@ -28,11 +28,8 @@ import tigase.db.NonAuthUserRepository;
 
 import tigase.server.Packet;
 
-import tigase.xml.Element;
-
 import tigase.xmpp.Authorization;
 import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPException;
 import tigase.xmpp.XMPPProcessor;
@@ -100,8 +97,8 @@ public class MessageAll extends XMPPProcessor implements XMPPProcessorIfc {
 	 * @throws XMPPException
 	 */
 	@Override
-	public void process(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
-			Queue<Packet> results, Map<String, Object> settings)
+	public void process(Packet packet, XMPPResourceConnection session,
+			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
 			throws XMPPException {
 
 		// For performance reasons it is better to do the check
@@ -121,7 +118,7 @@ public class MessageAll extends XMPPProcessor implements XMPPProcessorIfc {
 			BareJID id = (packet.getStanzaTo() != null) ? packet.getStanzaTo().getBareJID() : null;
 
 			// Checking if this is a packet TO the owner of the session
-			if (session.getUserId().equals(id)) {
+			if (session.isUserId(id)) {
 
 				// Yes this is message to 'this' client
 				// Send the message to all connected resources:
@@ -150,7 +147,7 @@ public class MessageAll extends XMPPProcessor implements XMPPProcessorIfc {
 			id = (packet.getStanzaFrom() != null) ? packet.getStanzaFrom().getBareJID() : null;
 
 			// Checking if this is maybe packet FROM the client
-			if (session.getUserId().equals(id)) {
+			if (session.isUserId(id)) {
 
 				// First we have to update all the other resources with this message just send
 				// from the user.

@@ -36,6 +36,7 @@ import tigase.xml.XMLUtils;
 
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
+import tigase.xmpp.NoConnectionIdException;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPResourceConnection;
@@ -746,7 +747,7 @@ public abstract class RosterAbstract {
 			}
 		}
 
-		if ((to == null) ||!to.equals(session.getUserId())) {
+		if ((to == null) ||!session.isUserId(to)) {
 			if (INITIAL_PRESENCES.contains(type)) {
 				return PresenceType.out_initial;
 			}
@@ -770,7 +771,7 @@ public abstract class RosterAbstract {
 			// StanzaType.probe is invalid here....
 		}      // end of if (to == null || to.equals(session.getUserId()))
 
-		if ((to != null) && to.equals(session.getUserId())) {
+		if ((to != null) && session.isUserId(to)) {
 			if (INITIAL_PRESENCES.contains(type)) {
 				return PresenceType.in_initial;
 			}
@@ -964,10 +965,11 @@ public abstract class RosterAbstract {
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
+	 * @throws NoConnectionIdException
 	 */
 	public void updateBuddyChange(final XMPPResourceConnection session,
 			final Queue<Packet> results, final Element item)
-			throws NotAuthorizedException, TigaseDBException {
+			throws NotAuthorizedException, TigaseDBException, NoConnectionIdException {
 		Element update = new Element("iq");
 
 		update.setAttribute("type", StanzaType.set.toString());
@@ -981,7 +983,7 @@ public abstract class RosterAbstract {
 		for (XMPPResourceConnection conn : session.getActiveSessions()) {
 			Element conn_update = update.clone();
 
-			conn_update.setAttribute("to", conn.getUserId().toString());
+			conn_update.setAttribute("to", conn.getBareJID().toString());
 			conn_update.setAttribute("id", "rst" + session.nextStanzaId());
 
 			Packet pack_update = Packet.packetInstance(conn_update, null, conn.getJID());

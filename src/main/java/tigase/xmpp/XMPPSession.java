@@ -19,7 +19,14 @@
  * Last modified by $Author$
  * $Date$
  */
+
 package tigase.xmpp;
+
+//~--- non-JDK imports --------------------------------------------------------
+
+import tigase.util.TigaseStringprepException;
+
+//~--- JDK imports ------------------------------------------------------------
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -28,9 +35,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Logger;
 import java.util.logging.Level;
-import tigase.util.TigaseStringprepException;
+import java.util.logging.Logger;
+
+//~--- classes ----------------------------------------------------------------
 
 /**
  * Describe class XMPPSession here.
@@ -43,19 +51,23 @@ import tigase.util.TigaseStringprepException;
  */
 public class XMPPSession {
 
-  /**
-   * Private logger for class instancess.
-   */
-  private static Logger log = Logger.getLogger("tigase.xmpp.XMPPSession");
+	/**
+	 * Private logger for class instancess.
+	 */
+	private static Logger log = Logger.getLogger("tigase.xmpp.XMPPSession");
 
-  /**
-   * User name - part of user's JID
-   */
-  private String username = null;
+	//~--- fields ---------------------------------------------------------------
 
 	private CopyOnWriteArrayList<XMPPResourceConnection> activeResources = null;
 	private long creationTime = 0;
 	private Map<String, Object> sessionData = null;
+
+	/**
+	 * User name - part of user's JID
+	 */
+	private String username = null;
+
+	//~--- constructors ---------------------------------------------------------
 
 	/**
 	 * Creates a new <code>XMPPSession</code> instance.
@@ -70,56 +82,27 @@ public class XMPPSession {
 		this.creationTime = System.currentTimeMillis();
 	}
 
-	public long getLiveTime() {
-		return (System.currentTimeMillis() - creationTime);
-	}
+	//~--- methods --------------------------------------------------------------
 
-	public void streamClosed(XMPPResourceConnection conn) {
-		removeResourceConnection(conn);
-	}
-
-	public String getUserName() {
-		return username;
-	}
-
-	@SuppressWarnings({"unchecked"})
-	public List<XMPPResourceConnection> getActiveResources() {
-		return (List<XMPPResourceConnection>)activeResources.clone();
-	}
-
-	public int getActiveResourcesSize() {
-		return activeResources.size();
-	}
-
-	public int getResSizeForConnStatus(ConnectionStatus status) {
-		int result = 0;
-		for (XMPPResourceConnection conn : activeResources) {
-			if (conn.getConnectionStatus() == status) {
-				++result;
-			}
-		}
-		return result;
-	}
-
-//	public void resourceSet(XMPPResourceConnection conn) {
-//		//activeResources.remove(conn);
-//		String cur_res = conn.getResource();
-//		XMPPResourceConnection old_conn = getResourceForResource(cur_res);
-//		if (old_conn != conn) {
-//			if (old_conn != null) {
-//				log.finest("Found old resource connection for username : " + username +
-//								", id: " + old_conn.getConnectionId());
-//				try {
-//					old_conn.logout();
-//				} catch (Exception e) {
-//					log.log(Level.INFO,
-//									"Exception during closing old connection, ignoring.", e);
-//				}
-//				removeResourceConnection(old_conn);
-//			} // end of if (old_res != null)
-//			activeResources.add(conn);
-//		}
-//	}
+//public void resourceSet(XMPPResourceConnection conn) {
+//  //activeResources.remove(conn);
+//  String cur_res = conn.getResource();
+//  XMPPResourceConnection old_conn = getResourceForResource(cur_res);
+//  if (old_conn != conn) {
+//    if (old_conn != null) {
+//      log.finest("Found old resource connection for username : " + username +
+//              ", id: " + old_conn.getConnectionId());
+//      try {
+//        old_conn.logout();
+//      } catch (Exception e) {
+//        log.log(Level.INFO,
+//                "Exception during closing old connection, ignoring.", e);
+//      }
+//      removeResourceConnection(old_conn);
+//    } // end of if (old_res != null)
+//    activeResources.add(conn);
+//  }
+//}
 
 	/**
 	 * This method is called each time the resource is set for connection.
@@ -127,197 +110,101 @@ public class XMPPSession {
 	 * @param conn
 	 * @throws TigaseStringprepException
 	 */
-	public void addResourceConnection(XMPPResourceConnection conn) throws
-			TigaseStringprepException {
+	public void addResourceConnection(XMPPResourceConnection conn)
+			throws TigaseStringprepException {
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Adding resource connection for username : " + username +
-					", id: " + conn.getConnectionId());
+			log.finest("Adding resource connection for username : " + username + ", id: " + conn);
 		}
+
 		// There is a bug somewhere which causes to allow for 2 or more connections
 		// with the same resource. Let's try to catch the case here and fix it....
 		String resource = conn.getResource();
+
 		if (resource != null) {
-			ArrayDeque<XMPPResourceConnection> old_ress =
-					new ArrayDeque<XMPPResourceConnection>();
+			ArrayDeque<XMPPResourceConnection> old_ress = new ArrayDeque<XMPPResourceConnection>();
+
 			for (XMPPResourceConnection act_conn : activeResources) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Resource checking: " + act_conn.getResource() +
-							", connectionID: " + act_conn.getConnectionId());
+					log.finest("Resource checking: " + act_conn.getResource() + ", connectionID: "
+							+ act_conn);
 				}
+
 				if (resource.equalsIgnoreCase(act_conn.getResource())) {
 					old_ress.add(act_conn);
-				} // end of if (resource.equals(conn.getResource()))
-			} // end of for (XMPPResourceConnection conn: activeResources)
+				}    // end of if (resource.equals(conn.getResource()))
+			}      // end of for (XMPPResourceConnection conn: activeResources)
+
 			XMPPResourceConnection old_res = null;
+
 			while ((old_res = old_ress.poll()) != null) {
+
 				// If they are equal, just ignore this. It may happen only for USER_STATUS
 				// command where the user session is artificialy created....
 				if (old_res != conn) {
 					if (log.isLoggable(Level.FINEST)) {
-					log.finest("Found old resource connection, id: " + old_res.getConnectionId());
+						log.finest("Found old resource connection, id: " + old_res);
 					}
+
 					try {
 						old_res.logout();
 					} catch (Exception e) {
-						log.log(Level.INFO,
-								"Exception during closing old connection, ignoring.", e);
+						log.log(Level.INFO, "Exception during closing old connection, ignoring.", e);
 					}
+
 					removeResourceConnection(old_res);
 				}
 			}
 		}
+
 		// The connection could have been already added with null resource
 		// to avoid adding it twice let's check if it is already there
-		XMPPResourceConnection old_res = getResourceForConnectionId(conn.getConnectionId());
+		XMPPResourceConnection old_res;
+
+		try {
+			old_res = getResourceForConnectionId(conn.getConnectionId());
+		} catch (NoConnectionIdException ex) {
+			old_res = null;
+		}
+
 		if (old_res == null) {
 			activeResources.add(conn);
 			conn.setParentSession(this);
 		}
+
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Number of active resources is: " + activeResources.size());
-			
+
 			if (activeResources.size() > 1) {
 				int i = 0;
+
 				for (XMPPResourceConnection res : activeResources) {
-					log.finest("RES " + (++i) + ": " + res.getResource() + ", " + res.
-							getConnectionId());
-				} // end of for (XMPPResourceConnection res: activeResources)
-			} // end of if (activeResources.size() > 1)
+					log.finest("RES " + (++i) + ": " + res);
+				}    // end of for (XMPPResourceConnection res: activeResources)
+			}      // end of if (activeResources.size() > 1)
 		}
 	}
 
-	public void removeResourceConnection(XMPPResourceConnection conn) {
-		activeResources.remove(conn);
-		conn.removeParentSession(null);
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@SuppressWarnings({ "unchecked" })
+	public List<XMPPResourceConnection> getActiveResources() {
+		return (List<XMPPResourceConnection>) activeResources.clone();
 	}
 
-	public JID[] getJIDs() throws NotAuthorizedException {
-		JID[] result = new JID[activeResources.size()];
-		int idx = 0;
-		for (XMPPResourceConnection conn: activeResources) {
-			result[idx++] = conn.getJID();
-		} // end of for (XMPPResourceConnection conn: activeResources)
-		return result;
-	}
-
-	public JID[] getConnectionIds() {
-		JID[] result = new JID[activeResources.size()];
-		int idx = 0;
-		for (XMPPResourceConnection conn: activeResources) {
-			result[idx++] = conn.getConnectionId();
-		} // end of for (XMPPResourceConnection conn: activeResources)
-		return result;
-	}
-
-	public XMPPResourceConnection getResourceForResource(String resource) {
-		if (resource != null && resource.length() > 0) {
-			for (XMPPResourceConnection conn: activeResources) {
-				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Resource checking: " + conn.getResource() +
-							", connectionID: " + conn.getConnectionId());
-				}
-				if (resource.equalsIgnoreCase(conn.getResource())) {
-					return conn;
-				} // end of if (resource.equals(conn.getResource()))
-			} // end of for (XMPPResourceConnection conn: activeResources)
-		} // end of if (resource.length() > 0)
-		return null;
-	}
-
-	public XMPPResourceConnection getResourceForConnectionId(JID connectionId) {
-		for (XMPPResourceConnection conn: activeResources) {
-			if (connectionId.equals(conn.getConnectionId())) {
-				return conn;
-			} // end of if (resource.equals(conn.getResource()))
-		} // end of for (XMPPResourceConnection conn: activeResources)
-		return null;
-	}
-
-	public XMPPResourceConnection getOldestConnection() {
-		if (activeResources.size() > 0) {
-			XMPPResourceConnection result = activeResources.get(0);
-			for (XMPPResourceConnection conn: activeResources) {
-				if (result.getCreationTime() > conn.getCreationTime()) {
-					result = conn;
-				} // end of if (resource.equals(conn.getResource()))
-			} // end of for (XMPPResourceConnection conn: activeResources)
-			return result;
-		}
-		log.info("XMPPSession with no connections for user: " + username);
-		return null;
-	}
-
-	public XMPPResourceConnection getResourceForJID(JID jid) {
-		final String resource = jid.getResource();
-		return getResourceForResource(resource);
-	}
-
-	public synchronized XMPPResourceConnection getResourceConnection(JID jid) {
-		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Called for: " + jid);
-		}
-		if (activeResources.size() == 0) {
-			return null;
-		} // end of if (activeResources.size() == 0)
-
-		if (activeResources.size() == 1) {
-			XMPPResourceConnection result = activeResources.get(0);
-			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Only 1 active resource: " + result.getResource());
-			}
-			return result;
-		} // end of if (activeResources.size() == 1)
-
-		XMPPResourceConnection conn = getResourceForJID(jid);
-		if (conn != null) {
-			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Number of resources: " + activeResources.size() +
-								", got resource for jid: " + jid);
-			}
-			return conn;
-		} // end of if (conn != null)
-
-		// There is no active resource for this jid, so let's return
-		// connection with the highest priority:
-		ArrayList<XMPPResourceConnection> al =
-						new ArrayList<XMPPResourceConnection>();
-//		al.add(activeResources.get(0));
-//		int highest_priority = al.get(0).getPriority();
-		int highest_priority = 0;
-		for (Iterator<XMPPResourceConnection> it = activeResources.iterator();
-						it.hasNext();) {
-			XMPPResourceConnection conn_tmp = it.next();
-			if (!conn_tmp.isAuthorized()) {
-				log.info("Old XMPP connection which is not authorized anymore, removing..." +
-								conn_tmp.getConnectionId());
-				activeResources.remove(conn_tmp);
-			}
-			if (conn_tmp.getPriority() == highest_priority) {
-				al.add(conn_tmp);
-				continue;
-			} // end of if (conn_tmp.getPriority() == highest_priority)
-			if (conn_tmp.getPriority() > highest_priority) {
-				al.clear();
-				al.add(conn_tmp);
-				highest_priority = conn_tmp.getPriority();
-			}
-		}
-		if (al.size() == 1) {
-			// We found 1 connection with highest priority
-			return al.get(0);
-		} // end of if (al.size() == 1)
-
-		// We have a few connections with the same highest priority
-		// Let's return the one which was the most recently used.
-		XMPPResourceConnection conn_last = al.get(0);
-		long time = conn_last.getLastAccessed();
-		for (int i = 1; i < al.size(); ++i) {
-			if (al.get(i).getLastAccessed() > time) {
-				conn_last = al.get(i);
-				time = conn_last.getLastAccessed();
-			} // end of if (al.get(i).getLastAccessed() > time)
-		}
-		return conn_last;
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public int getActiveResourcesSize() {
+		return activeResources.size();
 	}
 
 	/**
@@ -329,6 +216,285 @@ public class XMPPSession {
 		return sessionData.get(key);
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 *
+	 * @throws NoConnectionIdException
+	 */
+	public JID[] getConnectionIds() {
+		JID[] result = new JID[activeResources.size()];
+		int idx = 0;
+
+		for (XMPPResourceConnection conn : activeResources) {
+			try {
+				result[idx] = conn.getConnectionId();
+				++idx;
+			} catch (NoConnectionIdException ex) {
+				// Skip connection with no connectionId set
+			}
+		}    // end of for (XMPPResourceConnection conn: activeResources)
+
+		return result;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 *
+	 * @throws NotAuthorizedException
+	 */
+	public JID[] getJIDs() throws NotAuthorizedException {
+		JID[] result = new JID[activeResources.size()];
+		int idx = 0;
+
+		for (XMPPResourceConnection conn : activeResources) {
+			result[idx++] = conn.getJID();
+		}    // end of for (XMPPResourceConnection conn: activeResources)
+
+		return result;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public long getLiveTime() {
+		return (System.currentTimeMillis() - creationTime);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public XMPPResourceConnection getOldestConnection() {
+		if (activeResources.size() > 0) {
+			XMPPResourceConnection result = activeResources.get(0);
+
+			for (XMPPResourceConnection conn : activeResources) {
+				if (result.getCreationTime() > conn.getCreationTime()) {
+					result = conn;
+				}    // end of if (resource.equals(conn.getResource()))
+			}      // end of for (XMPPResourceConnection conn: activeResources)
+
+			return result;
+		}
+
+		log.info("XMPPSession with no connections for user: " + username);
+
+		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param status
+	 *
+	 * @return
+	 */
+	public int getResSizeForConnStatus(ConnectionStatus status) {
+		int result = 0;
+
+		for (XMPPResourceConnection conn : activeResources) {
+			if (conn.getConnectionStatus() == status) {
+				++result;
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param jid
+	 *
+	 * @return
+	 */
+	public synchronized XMPPResourceConnection getResourceConnection(JID jid) {
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Called for: " + jid);
+		}
+
+		if (activeResources.size() == 0) {
+			return null;
+		}    // end of if (activeResources.size() == 0)
+
+		if (activeResources.size() == 1) {
+			XMPPResourceConnection result = activeResources.get(0);
+
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Only 1 active resource: " + result.getResource());
+			}
+
+			return result;
+		}    // end of if (activeResources.size() == 1)
+
+		XMPPResourceConnection conn = getResourceForJID(jid);
+
+		if (conn != null) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Number of resources: " + activeResources.size()
+						+ ", got resource for jid: " + jid);
+			}
+
+			return conn;
+		}    // end of if (conn != null)
+
+		// There is no active resource for this jid, so let's return
+		// connection with the highest priority:
+		ArrayList<XMPPResourceConnection> al = new ArrayList<XMPPResourceConnection>();
+
+//  al.add(activeResources.get(0));
+//  int highest_priority = al.get(0).getPriority();
+		int highest_priority = 0;
+
+		for (Iterator<XMPPResourceConnection> it = activeResources.iterator(); it.hasNext(); ) {
+			XMPPResourceConnection conn_tmp = it.next();
+
+			if ( !conn_tmp.isAuthorized()) {
+				log.info("Old XMPP connection which is not authorized anymore, removing..."
+						+ conn_tmp);
+				activeResources.remove(conn_tmp);
+			}
+
+			if (conn_tmp.getPriority() == highest_priority) {
+				al.add(conn_tmp);
+
+				continue;
+			}    // end of if (conn_tmp.getPriority() == highest_priority)
+
+			if (conn_tmp.getPriority() > highest_priority) {
+				al.clear();
+				al.add(conn_tmp);
+				highest_priority = conn_tmp.getPriority();
+			}
+		}
+
+		if (al.size() == 1) {
+
+			// We found 1 connection with highest priority
+			return al.get(0);
+		}    // end of if (al.size() == 1)
+
+		// We have a few connections with the same highest priority
+		// Let's return the one which was the most recently used.
+		XMPPResourceConnection conn_last = al.get(0);
+		long time = conn_last.getLastAccessed();
+
+		for (int i = 1; i < al.size(); ++i) {
+			if (al.get(i).getLastAccessed() > time) {
+				conn_last = al.get(i);
+				time = conn_last.getLastAccessed();
+			}    // end of if (al.get(i).getLastAccessed() > time)
+		}
+
+		return conn_last;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param connectionId
+	 *
+	 * @return
+	 */
+	public XMPPResourceConnection getResourceForConnectionId(JID connectionId) {
+		try {
+			for (XMPPResourceConnection conn : activeResources) {
+				if (connectionId.equals(conn.getConnectionId())) {
+					return conn;
+				}    // end of if (resource.equals(conn.getResource()))
+			}      // end of for (XMPPResourceConnection conn: activeResources)
+		} catch (NoConnectionIdException ex) {
+			Logger.getLogger(XMPPSession.class.getName()).log(Level.SEVERE, null, ex);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param jid
+	 *
+	 * @return
+	 */
+	public XMPPResourceConnection getResourceForJID(JID jid) {
+		final String resource = jid.getResource();
+
+		return getResourceForResource(resource);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param resource
+	 *
+	 * @return
+	 */
+	public XMPPResourceConnection getResourceForResource(String resource) {
+		if ((resource != null) && (resource.length() > 0)) {
+			for (XMPPResourceConnection conn : activeResources) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("Resource checking: " + conn.getResource() + ", connectionID: " + conn);
+				}
+
+				if (resource.equalsIgnoreCase(conn.getResource())) {
+					return conn;
+				}    // end of if (resource.equals(conn.getResource()))
+			}      // end of for (XMPPResourceConnection conn: activeResources)
+		}        // end of if (resource.length() > 0)
+
+		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public String getUserName() {
+		return username;
+	}
+
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param conn
+	 */
+	public void removeResourceConnection(XMPPResourceConnection conn) {
+		activeResources.remove(conn);
+		conn.removeParentSession(null);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param conn
+	 */
+	public void streamClosed(XMPPResourceConnection conn) {
+		removeResourceConnection(conn);
+	}
+
 	protected void putCommonSessionData(String key, Object value) {
 		sessionData.put(key, value);
 	}
@@ -336,5 +502,10 @@ public class XMPPSession {
 	protected Object removeCommonSessionData(String key) {
 		return sessionData.remove(key);
 	}
+}    // XMPPSession
 
-} // XMPPSession
+
+//~ Formatted in Sun Code Convention
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

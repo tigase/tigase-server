@@ -42,6 +42,7 @@ import tigase.xml.Element;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.ConnectionStatus;
 import tigase.xmpp.JID;
+import tigase.xmpp.NoConnectionIdException;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPResourceConnection;
@@ -231,8 +232,7 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 			conn.putSessionData(CL_BR_INITIAL_PRESENCE, CL_BR_INITIAL_PRESENCE);
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Handle presence set for" + " Connection ID: " + conn.getConnectionId()
-						+ ", User ID: " + conn.getjid());
+				log.finest("Handle presence set for" + " Connection: " + conn);
 			}
 
 			List<JID> cl_nodes = strategy.getAllNodes();
@@ -259,8 +259,7 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 			conn.putSessionData(CL_BR_USER_CONNECTED, CL_BR_USER_CONNECTED);
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Handle resource bind for" + " Connection ID: " + conn.getConnectionId()
-						+ ", User ID: " + conn.getjid());
+				log.finest("Handle resource bind for" + " Connection:: " + conn);
 			}
 
 			List<JID> cl_nodes = strategy.getAllNodes();
@@ -271,14 +270,12 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 				sendBroadcastPackets(null, params, ClusterMethods.USER_CONNECTED,
 						cl_nodes.toArray(new JID[cl_nodes.size()]));
 			} catch (Exception e) {
-				log.log(Level.WARNING,
-						"Problem with broadcast user connected for: " + conn.getConnectionId() + ", "
-							+ conn.getjid(), e);
+				log.log(Level.WARNING, "Problem with broadcast user connected for: " + conn, e);
 			}
 		} else {
 			if (log.isLoggable(Level.WARNING)) {
 				log.warning("User resourc-rebind - not implemented yet in the cluster."
-						+ " Connection ID: " + conn.getConnectionId() + ", User ID: " + conn.getjid());
+						+ " Connection: " + conn);
 			}
 		}
 	}
@@ -479,7 +476,7 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 		if ((conn.getConnectionStatus() != ConnectionStatus.REMOTE) && conn.isAuthorized()) {
 			try {
 				JID connectionId = conn.getConnectionId();
-				BareJID userId = conn.getUserId();
+				BareJID userId = conn.getBareJID();
 				String resource = conn.getResource();
 				Map<String, String> params = new LinkedHashMap<String, String>();
 
@@ -500,8 +497,7 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 					}
 				}
 			} catch (Exception ex) {
-				log.log(Level.WARNING,
-						"Problem sending user disconnect broadcast for: " + conn.getConnectionId(), ex);
+				log.log(Level.WARNING, "Problem sending user disconnect broadcast for: " + conn, ex);
 			}
 		}
 
@@ -515,10 +511,14 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 			List<XMPPResourceConnection> conns = parentSession.getActiveResources();
 
 			for (XMPPResourceConnection xrc : conns) {
-				super.closeConnection(xrc.getConnectionId(), true);
+				try {
+					super.closeConnection(xrc.getConnectionId(), true);
 
-				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Closed remote connection: " + xrc.getConnectionId());
+					if (log.isLoggable(Level.FINEST)) {
+						log.finest("Closed remote connection: " + xrc);
+					}
+				} catch (NoConnectionIdException ex) {
+					log.log(Level.WARNING, "This should not happen, check it out!, ", ex);
 				}
 			}
 		}
@@ -875,7 +875,7 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 			for (XMPPResourceConnection conn : res_con.getActiveSessions()) {
 				try {
 					if (log.isLoggable(Level.FINER)) {
-						log.finer("Update presence change to: " + conn.getJID());
+						log.finer("Update presence change to: " + conn.getjid());
 					}
 
 					if ((conn != res_con) && conn.isResourceSet()
@@ -886,9 +886,9 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 							pres_update = new Element(Presence.PRESENCE_ELEMENT_NAME);
 						}
 
-						pres_update.setAttribute("from", res_con.getJID().toString());
-						pres_update.setAttribute("to", conn.getUserId().toString());
-
+						// Below code not needed anymore, packetInstance(...) takes care of it
+//          pres_update.setAttribute("from", res_con.getJID().toString());
+//          pres_update.setAttribute("to", conn.getBareJID().toString());
 						Packet pack_update = Packet.packetInstance(pres_update, res_con.getJID(),
 							conn.getJID().copyWithoutResource());
 
@@ -896,18 +896,20 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 						results.offer(pack_update);
 					} else {
 						if (log.isLoggable(Level.FINER)) {
-							log.finer("Skipping presence update to: " + conn.getJID());
+							log.finer("Skipping presence update to: " + conn.getjid());
 						}
 					}    // end of else
+				} catch (NoConnectionIdException ex) {
+
+					// This actually should not happen... might be a bug:
+					log.log(Level.WARNING, "This should not happen, check it out!, ", ex);
 				} catch (NotAuthorizedException ex) {
 					log.warning("This should not happen, unless the connection has been "
-							+ "stopped in a concurrent thread or has not been authenticated yet: "
-								+ conn.getConnectionId());
+							+ "stopped in a concurrent thread or has not been authenticated yet: " + conn);
 				}
 			}    // end of for (XMPPResourceConnection conn: sessions)
 		} catch (NotAuthorizedException ex) {
-			log.warning("User session from another cluster node authentication problem: "
-					+ res_con.getConnectionId());
+			log.warning("User session from another cluster node authentication problem: " + res_con);
 		}
 	}
 
@@ -919,8 +921,7 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 			sendBroadcastPackets(presence, params, ClusterMethods.USER_INITIAL_PRESENCE, cl_nodes);
 		} catch (Exception e) {
 			log.log(Level.WARNING,
-					"Problem with broadcast user initial presence message for: "
-						+ conn.getConnectionId() + ", " + conn.getjid(), e);
+					"Problem with broadcast user initial presence message for: " + conn);
 		}
 	}
 
@@ -937,16 +938,14 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 			sendBroadcastPackets(presence, params, ClusterMethods.USER_INITIAL_PRESENCE,
 					cl_nodes.toArray(new JID[cl_nodes.size()]));
 		} catch (Exception e) {
-			log.log(Level.WARNING,
-					"Problem with broadcast user initial presence for: " + conn.getConnectionId() + ", "
-						+ conn.getjid(), e);
+			log.log(Level.WARNING, "Problem with broadcast user initial presence for: " + conn, e);
 		}
 	}
 
 	private Map<String, String> prepareBroadcastParams(XMPPResourceConnection conn,
 			boolean full_details)
-			throws NotAuthorizedException {
-		BareJID userId = conn.getUserId();
+			throws NotAuthorizedException, NoConnectionIdException {
+		BareJID userId = conn.getBareJID();
 		String resource = conn.getResource();
 		JID connectionId = conn.getConnectionId();
 		Map<String, String> params = new LinkedHashMap<String, String>();

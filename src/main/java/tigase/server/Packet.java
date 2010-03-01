@@ -113,30 +113,29 @@ public class Packet {
 	 */
 	public static boolean FULL_DEBUG = Boolean.getBoolean("packet.debug.full");
 
-	/**
-	 * For internal Tigase use only. The session manager stores in stanza the old, original
-	 * address while the packet is processd. This is sometimes necessary as the SM works
-	 * for many virtual domains and the main SM address may be different from the address
-	 * the user has put to the stanza.
-	 */
-	public static final String OLDFROM = "oldfrom";
-
-	/**
-	 * Constant <code>OLDTO</code> is kind of hack to store old request address
-	 * when the packet is processed by the session manager. The problem is that
-	 * SessionManager may work for many virtual domains but has just one real
-	 * address. So to forward the request to the SessionManager the 'to' address
-	 * is replaced with the real SessionManager address. The response however
-	 * needs to be sent with the 'from' address as the original request was 'to'.
-	 * Therefore 'oldto' attribute temporarly stores the old 'to' address
-	 * and after the packet processing is completed the 'from' attribute
-	 * is replaced with original 'to' value.
-	 *
-	 */
-	public static final String OLDTO = "oldto";
-
 	//~--- fields ---------------------------------------------------------------
 
+///**
+// * For internal Tigase use only. The session manager stores in stanza the old, original
+// * address while the packet is processd. This is sometimes necessary as the SM works
+// * for many virtual domains and the main SM address may be different from the address
+// * the user has put to the stanza.
+// */
+//public static final String OLDFROM = "oldfrom";
+//
+///**
+// * Constant <code>OLDTO</code> is kind of hack to store old request address
+// * when the packet is processed by the session manager. The problem is that
+// * SessionManager may work for many virtual domains but has just one real
+// * address. So to forward the request to the SessionManager the 'to' address
+// * is replaced with the real SessionManager address. The response however
+// * needs to be sent with the 'from' address as the original request was 'to'.
+// * Therefore 'oldto' attribute temporarly stores the old 'to' address
+// * and after the packet processing is completed the 'from' attribute
+// * is replaced with original 'to' value.
+// *
+// */
+//public static final String OLDTO = "oldto";
 	private JID packetFrom = null;
 	private JID packetTo = null;
 	private String packetToString = null;
@@ -272,10 +271,10 @@ public class Packet {
 	 * error.
 	 */
 	public static Packet packetInstance(String el_name, String from, String to, StanzaType type)
-					throws TigaseStringprepException {
-		Element elem = new Element(el_name,
-															 new String[] { "from", "to", "type" },
-															 new String[] { from, to, type.toString() });
+			throws TigaseStringprepException {
+		Element elem = new Element(el_name, new String[] { "from", "to", "type" },
+			new String[] { from,
+				to, type.toString() });
 
 		return packetInstance(elem);
 	}
@@ -340,8 +339,7 @@ public class Packet {
 	 * is a response to this <code>Packet</code> instance.
 	 */
 	public Packet errorResult(final String errorType, final Integer errorCode,
-														final String errorCondition, final String errorText,
-														final boolean includeOriginalXML) {
+			final String errorCondition, final String errorText, final boolean includeOriginalXML) {
 		Element reply = new Element(elem.getName());
 
 		reply.setAttribute("type", StanzaType.error.toString());
@@ -362,10 +360,9 @@ public class Packet {
 			reply.addChildren(elem.getChildren());
 		}    // end of if (includeOriginalXML)
 
-		if (getAttribute(OLDTO) != null) {
-			reply.setAttribute(OLDTO, getAttribute(OLDTO));
-		}
-
+//  if (getAttribute(OLDTO) != null) {
+//    reply.setAttribute(OLDTO, getAttribute(OLDTO));
+//  }
 		if (getAttribute("xmlns") != null) {
 			reply.setAttribute("xmlns", getAttribute("xmlns"));
 		}
@@ -384,10 +381,9 @@ public class Packet {
 		error.addChild(cond);
 
 		if (errorText != null) {
-			Element t = new Element("text",
-															errorText,
-															new String[] { "xml:lang", "xmlns" },
-															new String[] { "en", ERROR_NS });
+			Element t = new Element("text", errorText, new String[] { "xml:lang", "xmlns" },
+				new String[] { "en",
+					ERROR_NS });
 
 			error.addChild(t);
 		}    // end of if (text != null && text.length() > 0)
@@ -909,10 +905,9 @@ public class Packet {
 			reply.setAttribute("id", getStanzaId());
 		}    // end of if (getElemId() != null)
 
-		if (getAttribute(OLDTO) != null) {
-			reply.setAttribute(OLDTO, getAttribute(OLDTO));
-		}
-
+//  if (getAttribute(OLDTO) != null) {
+//    reply.setAttribute(OLDTO, getAttribute(OLDTO));
+//  }
 		Element old_child = elem;
 		Element new_child = reply;
 
@@ -951,7 +946,7 @@ public class Packet {
 	 * @return a new <code>Packet</code> instance with an OK (result) type stanza
 	 * which is a response to this <code>Packet</code> instance.
 	 */
-	public Packet okResult(final Element includeXML, final int originalXML) {
+	public Packet okResult(Element includeXML, int originalXML) {
 		Element reply = new Element(elem.getName());
 
 		reply.setAttribute("type", StanzaType.result.toString());
@@ -969,10 +964,9 @@ public class Packet {
 			reply.setAttribute("id", getStanzaId());
 		}    // end of if (getElemId() != null)
 
-		if (getAttribute(OLDTO) != null) {
-			reply.setAttribute(OLDTO, getAttribute(OLDTO));
-		}
-
+//  if (getAttribute(OLDTO) != null) {
+//    reply.setAttribute(OLDTO, getAttribute(OLDTO));
+//  }
 		Element old_child = elem;
 		Element new_child = reply;
 
@@ -1006,9 +1000,9 @@ public class Packet {
 	 * @return a new <code>Packet</code> instance with <code>route</code> stanza.
 	 */
 	public Packet packRouted() {
-		Element routedp = new Element("route",
-																	new String[] { "to", "from" },
-																	new String[] { getTo().toString(), getFrom().toString() });
+		Element routedp = new Element("route", new String[] { "to", "from" },
+			new String[] { getTo().toString(),
+				getFrom().toString() });
 
 		routedp.addChild(elem);
 
@@ -1211,7 +1205,7 @@ public class Packet {
 	public String toString() {
 		if (packetToString == null) {
 			packetToString = ", data=" + elem.toString() + ", XMLNS=" + elem.getXMLNS()
-											 + ", priority=" + priority;
+					+ ", priority=" + priority;
 		}
 
 		return "from=" + packetFrom + ", to=" + packetTo + packetToString;
@@ -1252,8 +1246,8 @@ public class Packet {
 			return toString();
 		} else {
 			if (packetToStringSecure == null) {
-				packetToStringSecure = ", data=" + elem.toStringSecure() + ", XMLNS=" + elem.
-						getXMLNS() + ", priority=" + priority;
+				packetToStringSecure = ", data=" + elem.toStringSecure() + ", XMLNS="
+						+ elem.getXMLNS() + ", priority=" + priority;
 			}
 
 			return "from=" + packetFrom + ", to=" + packetTo + packetToStringSecure;
@@ -1327,7 +1321,7 @@ public class Packet {
 		} else {
 			if ((elem.getName() == "presence")
 					&& ((type == null) || (type == StanzaType.available)
-							|| (type == StanzaType.unavailable) || (type == StanzaType.probe))) {
+						|| (type == StanzaType.unavailable) || (type == StanzaType.probe))) {
 				setPriority(Priority.PRESENCE);
 			} else {
 				if (elem.getName() == "route") {

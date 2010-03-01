@@ -36,6 +36,7 @@ import tigase.xml.Element;
 
 import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
+import tigase.xmpp.NoConnectionIdException;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
@@ -131,13 +132,45 @@ public abstract class JabberIqRoster {
 	public static void process(Packet packet, XMPPResourceConnection session,
 			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
 			throws XMPPException {
+
+		// The roster request can be between the user and the server or between the
+		// user and some other entity like transport
+		JID connectionId = session.getConnectionId();
+
+		if (connectionId.equals(packet.getPacketFrom())) {
+
+			// Packet from the user, let's check where it should go
+			if ((packet.getStanzaTo() != null)
+					&&!session.isLocalDomain(packet.getStanzaTo().toString(), false)
+						&&!session.isUserId(packet.getStanzaTo().getBareJID())) {
+				results.offer(packet.copyElementOnly());
+
+				return;
+			}
+		} else {
+
+			// Packet probably to the user, let's check where from it came
+			if (session.isUserId(packet.getStanzaTo().getBareJID())) {
+				Packet result = packet.copyElementOnly();
+
+				result.setPacketTo(session.getConnectionId(packet.getStanzaTo()));
+				result.setPacketFrom(packet.getTo());
+				results.offer(result);
+
+				return;
+			} else {
+
+				// Hm, I do not know what to do here, should not happen
+			}
+		}
+
 		try {
 			if ((packet.getStanzaFrom() != null)
-					&&!session.getUserId().equals(packet.getStanzaFrom().getBareJID())) {
+					&&!session.isUserId(packet.getStanzaFrom().getBareJID())) {
 
 				// RFC says: ignore such request
-				log.warning("Roster request 'from' attribute doesn't match session userid: "
-						+ session.getUserId() + ", request: " + packet);
+				log.warning("Roster request 'from' attribute doesn't match session: " + session
+						+ ", request: " + packet);
 
 				return;
 			}    // end of if (packet.getElemFrom() != null
@@ -382,29 +415,34 @@ public abstract class JabberIqRoster {
 //  } else {
 //    results.offer(packet.okResult((String)null, 1));
 //  }
-		if ((its != null) && (its.size() > 0)) {
-			ArrayDeque<Element> items = new ArrayDeque<Element>(its);
+		try {
+			if ((its != null) && (its.size() > 0)) {
+				ArrayDeque<Element> items = new ArrayDeque<Element>(its);
 
-			while (items.size() > 0) {
-				Element iq = new Element("iq", new String[] { "type", "id", "to" },
-					new String[] { "set",
-						"dr-" + items.size(), session.getJID().toString() });
-				Element query = new Element("query");
+				while (items.size() > 0) {
+					Element iq = new Element("iq", new String[] { "type", "id", "to" },
+						new String[] { "set",
+							"dr-" + items.size(), session.getJID().toString() });
+					Element query = new Element("query");
 
-				query.setXMLNS(RosterAbstract.XMLNS);
-				iq.addChild(query);
-				query.addChild(items.poll());
-
-				while ((query.getChildren().size() < 20) && (items.size() > 0)) {
+					query.setXMLNS(RosterAbstract.XMLNS);
+					iq.addChild(query);
 					query.addChild(items.poll());
+
+					while ((query.getChildren().size() < 20) && (items.size() > 0)) {
+						query.addChild(items.poll());
+					}
+
+					Packet rost_res = Packet.packetInstance(iq, null, session.getJID());
+
+					rost_res.setPacketTo(session.getConnectionId());
+					rost_res.setPacketFrom(packet.getTo());
+					results.offer(rost_res);
 				}
-
-				Packet rost_res = Packet.packetInstance(iq, null, session.getJID());
-
-				rost_res.setPacketTo(session.getConnectionId());
-				rost_res.setPacketFrom(packet.getTo());
-				results.offer(rost_res);
 			}
+		} catch (NoConnectionIdException ex) {
+			log.warning("Problem with roster request, no connection ID for session: " + session
+					+ ", request: " + packet);
 		}
 
 //  if (session.isAnonymous()) {
@@ -433,7 +471,7 @@ public abstract class JabberIqRoster {
 
 	private static void processSetRequest(Packet packet, XMPPResourceConnection session,
 			Queue<Packet> results, final Map<String, Object> settings)
-			throws NotAuthorizedException, TigaseDBException, PacketErrorTypeException {
+			throws XMPPException, NotAuthorizedException, TigaseDBException {
 
 		// Element request = packet.getElement();
 		List<Element> items = packet.getElemChildren("/iq/query");
@@ -447,7 +485,7 @@ public abstract class JabberIqRoster {
 				for (Element item : items) {
 					JID buddy = JID.jidInstance(item.getAttribute("jid"));
 
-					if (buddy.getBareJID().equals(session.getUserId())) {
+					if (session.isUserId(buddy.getBareJID())) {
 						results.offer(Authorization.NOT_ALLOWED.getResponseMessage(packet,
 								"User can't add himself to the roster, RFC says NO.", true));
 
@@ -483,13 +521,13 @@ public abstract class JabberIqRoster {
 							results.offer(pres_packet);
 							pres = new Element("presence");
 							pres.setAttribute("to", buddy.toString());
-							pres.setAttribute("from", session.getUserId().toString());
+							pres.setAttribute("from", session.getBareJID().toString());
 							pres.setAttribute("type", "unsubscribe");
 							results.offer(Packet.packetInstance(pres,
 									session.getJID().copyWithoutResource(), buddy));
 							pres = new Element("presence");
 							pres.setAttribute("to", buddy.toString());
-							pres.setAttribute("from", session.getUserId().toString());
+							pres.setAttribute("from", session.getBareJID().toString());
 							pres.setAttribute("type", "unsubscribed");
 							results.offer(Packet.packetInstance(pres,
 									session.getJID().copyWithoutResource(), buddy));

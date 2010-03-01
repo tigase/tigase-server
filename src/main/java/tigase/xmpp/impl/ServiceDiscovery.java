@@ -19,22 +19,33 @@
  * Last modified by $Author$
  * $Date$
  */
+
 package tigase.xmpp.impl;
 
-import java.util.Queue;
-import java.util.Map;
-import java.util.logging.Logger;
+//~--- non-JDK imports --------------------------------------------------------
+
+import tigase.db.NonAuthUserRepository;
+
+import tigase.disco.XMPPServiceCollector;
+
 import tigase.server.Command;
 import tigase.server.Packet;
-import tigase.disco.XMPPServiceCollector;
+
 import tigase.xml.Element;
+
 import tigase.xmpp.Authorization;
-import tigase.xmpp.XMPPProcessor;
-import tigase.xmpp.XMPPProcessorIfc;
+import tigase.xmpp.JID;
+import tigase.xmpp.PacketErrorTypeException;
+import tigase.xmpp.XMPPProcessorAbstract;
 import tigase.xmpp.XMPPResourceConnection;
-import tigase.xmpp.XMPPException;
-import tigase.db.NonAuthUserRepository;
-import tigase.xmpp.BareJID;
+
+//~--- JDK imports ------------------------------------------------------------
+
+import java.util.Map;
+import java.util.Queue;
+import java.util.logging.Logger;
+
+//~--- classes ----------------------------------------------------------------
 
 /**
  * Implementation of JEP-030.
@@ -45,91 +56,131 @@ import tigase.xmpp.BareJID;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class ServiceDiscovery extends XMPPProcessor
-	implements XMPPProcessorIfc {
-
-	private static final Logger log =
-    Logger.getLogger("tigase.xmpp.impl.ServiceDiscovery");
-
+public class ServiceDiscovery extends XMPPProcessorAbstract {
+	private static final Logger log = Logger.getLogger("tigase.xmpp.impl.ServiceDiscovery");
 	private static final String ID = "disco";
-  private static final String[] ELEMENTS =
-	{"query", "query", "query"};
-  private static final String[] XMLNSS = {
-    XMPPServiceCollector.INFO_XMLNS,
-		XMPPServiceCollector.ITEMS_XMLNS,
-		Command.XMLNS
-	};
-  private static final Element[] DISCO_FEATURES = {
-    new Element("feature",
-			new String[] {"var"},
-			new String[] {XMPPServiceCollector.INFO_XMLNS}),
-		new Element("feature",
-			new String[] {"var"},
-			new String[] {XMPPServiceCollector.ITEMS_XMLNS})
-	};
+	private static final String[] ELEMENTS = { "query", "query", "query" };
+	private static final String[] XMLNSS = { XMPPServiceCollector.INFO_XMLNS,
+			XMPPServiceCollector.ITEMS_XMLNS, Command.XMLNS };
+	private static final Element[] DISCO_FEATURES = {
+		new Element("feature", new String[] { "var" },
+			new String[] { XMPPServiceCollector.INFO_XMLNS }),
+		new Element("feature", new String[] { "var" },
+			new String[] { XMPPServiceCollector.ITEMS_XMLNS }) };
 
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
 	@Override
-	public String id() { return ID; }
-
-	@Override
-	public String[] supElements()	{ return ELEMENTS; }
-
-	@Override
-  public String[] supNamespaces()	{ return XMLNSS; }
-
-	@Override
-  public Element[] supDiscoFeatures(final XMPPResourceConnection session)
-	{ return DISCO_FEATURES; }
-
-	@Override
-	public void process(final Packet packet, final XMPPResourceConnection session,
-		final NonAuthUserRepository repo, final Queue<Packet> results,
-		final Map<String, Object> settings)
-		throws XMPPException {
-		// Service discovery is normally processed by MessageRouter so no processing
-		// is needed here. This plugin exists only to make sure the elemFrom address
-		// is set properly and it is set by the packet filter before it gets here.
-		// All we need to do here is passing the packet back.
-
-		// Fast packet processing if the session is null
-		if (session == null) {
-			// This causes an infinite loop if the target user is offline,
-			// Let't try returning an error instead - entity-unavailable
-			// results.offer(new Packet(packet.getElement()));
-			results.offer(Authorization.RECIPIENT_UNAVAILABLE.getResponseMessage(
-					packet, "The target is unavailable at this time.", true));
-			return;
-		}
-
-		try {
-			// Remember to cut the resource part off before comparing JIDs
-			BareJID id = packet.getStanzaTo().getBareJID();
-			// Checking if this is a packet TO the owner of the session
-			if (session.getUserId().equals(id)) {
-				// Yes this is message to 'this' client
-				Packet result = packet.copyElementOnly();
-				// This is where and how we set the address of the component
-				// which should rceive the result packet for the final delivery
-				// to the end-user. In most cases this is a c2s or Bosh component
-				// which keep the user connection.
-				result.setPacketTo(session.getConnectionId(packet.getStanzaTo()));
-				// In most cases this might be skept, however if there is a
-				// problem during packet delivery an error might be sent back
-				result.setPacketFrom(packet.getTo());
-				// Don't forget to add the packet to the results queue or it
-				// will be lost.
-				results.offer(result);
-				return;
-			}
-
-			// Otherwise just pass the packet for further processing
-			results.offer(packet.copyElementOnly());
-		} catch (Exception e) {
-			log.warning("NotAuthorizedException for packet: "	+ packet);
-			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-					"You must authorize session first.", true));
-		}
-		// If the packet is addressed to the user of this session, make sure it gets through
+	public String id() {
+		return ID;
 	}
 
-} // ServiceDiscovery
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param connectionId
+	 * @param packet
+	 * @param session
+	 * @param repo
+	 * @param results
+	 * @param settings
+	 *
+	 * @throws PacketErrorTypeException
+	 */
+	@Override
+	public void processFromUserToServerPacket(JID connectionId, Packet packet,
+			XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results,
+				Map<String, Object> settings)
+			throws PacketErrorTypeException {
+
+		// Handled elsewhere (in MessageRouter)
+		results.offer(packet.copyElementOnly());
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param packet
+	 * @param repo
+	 * @param results
+	 * @param settings
+	 *
+	 * @throws PacketErrorTypeException
+	 */
+	@Override
+	public void processNullSessionPacket(Packet packet, NonAuthUserRepository repo,
+			Queue<Packet> results, Map<String, Object> settings)
+			throws PacketErrorTypeException {
+		results.offer(Authorization.RECIPIENT_UNAVAILABLE.getResponseMessage(packet,
+				"The target is unavailable at this time.", true));
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param packet
+	 * @param session
+	 * @param repo
+	 * @param results
+	 * @param settings
+	 *
+	 * @throws PacketErrorTypeException
+	 */
+	@Override
+	public void processServerSessionPacket(Packet packet, XMPPResourceConnection session,
+			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
+			throws PacketErrorTypeException {
+
+		// Handled elsewhere (in MessageRouter)
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 *
+	 * @return
+	 */
+	@Override
+	public Element[] supDiscoFeatures(final XMPPResourceConnection session) {
+		return DISCO_FEATURES;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public String[] supElements() {
+		return ELEMENTS;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public String[] supNamespaces() {
+		return XMLNSS;
+	}
+}    // ServiceDiscovery
+
+
+//~ Formatted in Sun Code Convention
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

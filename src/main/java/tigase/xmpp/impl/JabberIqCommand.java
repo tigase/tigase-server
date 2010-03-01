@@ -63,9 +63,8 @@ public class JabberIqCommand extends XMPPProcessor implements XMPPProcessorIfc {
 	private static final String[] XMLNSS = { Command.XMLNS };
 	private static final String XMLNS = Command.XMLNS;
 	private static final String ID = XMLNS;
-	private static final Element[] DISCO_FEATURES = { new Element("feature",
-					new String[] { "var" },
-					new String[] { XMLNS }) };
+	private static final Element[] DISCO_FEATURES = {
+		new Element("feature", new String[] { "var" }, new String[] { XMLNS }) };
 
 	//~--- methods --------------------------------------------------------------
 
@@ -94,9 +93,9 @@ public class JabberIqCommand extends XMPPProcessor implements XMPPProcessorIfc {
 	 */
 	@Override
 	public void process(final Packet packet, final XMPPResourceConnection session,
-											final NonAuthUserRepository repo, final Queue<Packet> results,
-											final Map<String, Object> settings)
-					throws XMPPException {
+			final NonAuthUserRepository repo, final Queue<Packet> results,
+				final Map<String, Object> settings)
+			throws XMPPException {
 		if (session == null) {
 			return;
 		}
@@ -127,7 +126,7 @@ public class JabberIqCommand extends XMPPProcessor implements XMPPProcessorIfc {
 
 			BareJID id = packet.getStanzaTo().getBareJID();
 
-			if (id.equals(session.getUserId())) {
+			if (session.isUserId(id)) {
 
 				// Yes this is message to 'this' client
 				Packet result = packet.copyElementOnly();
@@ -145,7 +144,7 @@ public class JabberIqCommand extends XMPPProcessor implements XMPPProcessorIfc {
 		} catch (NotAuthorizedException e) {
 			log.warning("NotAuthorizedException for packet: " + packet.toString());
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-							"You must authorize session first.", true));
+					"You must authorize session first.", true));
 		}    // end of try-catch
 	}
 

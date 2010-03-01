@@ -92,8 +92,8 @@ public class Message extends XMPPProcessor implements XMPPProcessorIfc {
 	 * @throws XMPPException
 	 */
 	@Override
-	public void process(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
-			Queue<Packet> results, Map<String, Object> settings)
+	public void process(Packet packet, XMPPResourceConnection session,
+			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
 			throws XMPPException {
 
 		// For performance reasons it is better to do the check
@@ -113,7 +113,7 @@ public class Message extends XMPPProcessor implements XMPPProcessorIfc {
 			BareJID id = (packet.getStanzaTo() != null) ? packet.getStanzaTo().getBareJID() : null;
 
 			// Checking if this is a packet TO the owner of the session
-			if (session.getUserId().equals(id)) {
+			if (session.isUserId(id)) {
 
 				// Yes this is message to 'this' client
 				Packet result = packet.copyElementOnly();
@@ -139,7 +139,7 @@ public class Message extends XMPPProcessor implements XMPPProcessorIfc {
 			id = (packet.getStanzaFrom() != null) ? packet.getStanzaFrom().getBareJID() : null;
 
 			// Checking if this is maybe packet FROM the client
-			if (session.getUserId().equals(id)) {
+			if (session.isUserId(id)) {
 
 				// This is a packet FROM this client, the simplest action is
 				// to forward it to is't destination:
@@ -170,7 +170,8 @@ public class Message extends XMPPProcessor implements XMPPProcessorIfc {
 				// packet, it is a place to set it here:
 				el_result.setAttribute("from", session.getJID().toString());
 
-				Packet result = Packet.packetInstance(el_result, session.getJID(), packet.getStanzaTo());
+				Packet result = Packet.packetInstance(el_result, session.getJID(),
+					packet.getStanzaTo());
 
 				// ... putting it to results queue is enough
 				results.offer(result);

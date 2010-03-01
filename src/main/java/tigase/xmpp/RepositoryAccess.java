@@ -113,7 +113,7 @@ public abstract class RepositoryAccess {
 	 *
 	 * @throws NotAuthorizedException
 	 */
-	public abstract BareJID getUserId() throws NotAuthorizedException;
+	public abstract BareJID getBareJID() throws NotAuthorizedException;
 
 	/**
 	 * Method description
@@ -151,7 +151,7 @@ public abstract class RepositoryAccess {
 		}
 
 		try {
-			repo.addDataList(getUserId().toString(), subnode, key, list);
+			repo.addDataList(getBareJID().toString(), subnode, key, list);
 		} catch (UserNotFoundException e) {
 			log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
 
@@ -260,7 +260,7 @@ public abstract class RepositoryAccess {
 		}
 
 		try {
-			return repo.getData(getUserId().toString(), subnode, key, def);
+			return repo.getData(getBareJID().toString(), subnode, key, def);
 		} catch (UserNotFoundException e) {
 			log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
 
@@ -298,7 +298,7 @@ public abstract class RepositoryAccess {
 		}
 
 		try {
-			return repo.getSubnodes(getUserId().toString(), subnode);
+			return repo.getSubnodes(getBareJID().toString(), subnode);
 		} catch (UserNotFoundException e) {
 			log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
 
@@ -338,7 +338,7 @@ public abstract class RepositoryAccess {
 		}
 
 		try {
-			return repo.getKeys(getUserId().toString(), subnode);
+			return repo.getKeys(getBareJID().toString(), subnode);
 		} catch (UserNotFoundException e) {
 			log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
 
@@ -378,7 +378,7 @@ public abstract class RepositoryAccess {
 		}
 
 		try {
-			return repo.getDataList(getUserId().toString(), subnode, key);
+			return repo.getDataList(getBareJID().toString(), subnode, key);
 		} catch (UserNotFoundException e) {
 			log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
 
@@ -803,7 +803,7 @@ public abstract class RepositoryAccess {
 	public void removeData(String subnode, String key)
 			throws NotAuthorizedException, TigaseDBException {
 		try {
-			repo.removeData(getUserId().toString(), subnode, key);
+			repo.removeData(getBareJID().toString(), subnode, key);
 		} catch (UserNotFoundException e) {
 			log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
 
@@ -840,7 +840,7 @@ public abstract class RepositoryAccess {
 		}
 
 		try {
-			repo.removeSubnode(getUserId().toString(), subnode);
+			repo.removeSubnode(getBareJID().toString(), subnode);
 		} catch (UserNotFoundException e) {
 			log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
 
@@ -960,7 +960,7 @@ public abstract class RepositoryAccess {
 	public void setData(String subnode, String key, String value)
 			throws NotAuthorizedException, TigaseDBException {
 		try {
-			repo.setData(getUserId().toString(), subnode, key, value);
+			repo.setData(getBareJID().toString(), subnode, key, value);
 		} catch (UserNotFoundException e) {
 			log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
 
@@ -999,7 +999,7 @@ public abstract class RepositoryAccess {
 		}
 
 		try {
-			repo.setDataList(getUserId().toString(), subnode, key, list);
+			repo.setDataList(getBareJID().toString(), subnode, key, list);
 		} catch (UserNotFoundException e) {
 			log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
 

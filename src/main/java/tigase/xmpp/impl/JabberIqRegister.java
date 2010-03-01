@@ -36,6 +36,7 @@ import tigase.server.Priority;
 import tigase.xml.Element;
 
 import tigase.xmpp.Authorization;
+import tigase.xmpp.BareJID;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPException;
@@ -120,10 +121,10 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 			return;
 		}    // end of if (session == null)
 
-		String id = session.getDomain();
+		BareJID id = session.getDomainAsJID().getBareJID();
 
 		if (packet.getStanzaTo() != null) {
-			id = packet.getStanzaTo().getBareJID().toString();
+			id = packet.getStanzaTo().getBareJID();
 		}
 
 		try {
@@ -131,7 +132,7 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 			// I think it does not make sense to check the 'to', just the connection ID
 //    if ((id.equals(session.getDomain()) || id.equals(session.getUserId().toString()))
 //        && packet.getFrom().equals(session.getConnectionId())) {
-			if (packet.getFrom().equals(session.getConnectionId())) {
+			if (packet.getPacketFrom().equals(session.getConnectionId())) {
 				Authorization result = Authorization.NOT_AUTHORIZED;
 				Element request = packet.getElement();
 				StanzaType type = packet.getType();
@@ -220,7 +221,7 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 						break;
 				}    // end of switch (type)
 			} else {
-				if (id.equals(session.getUserId().toString())) {
+				if (session.isUserId(id)) {
 
 					// It might be a registration request from transport for example...
 					Packet pack_res = packet.copyElementOnly();

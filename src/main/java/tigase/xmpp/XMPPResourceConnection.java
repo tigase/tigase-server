@@ -113,12 +113,11 @@ public class XMPPResourceConnection extends RepositoryAccess {
 
 //private String userId = null;
 	// private String[] anon_peers = null;
-
 	private ConnectionStatus connectionStatus = ConnectionStatus.INIT;
 
-//private boolean onHold = false;
-
 	//~--- constructors ---------------------------------------------------------
+
+//private boolean onHold = false;
 
 	/**
 	 * Creates a new <code>XMPPResourceConnection</code> instance.
@@ -187,6 +186,30 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	}
 
 	/**
+	 * Returns user JID but without <em>resource</em> part. This is real user ID
+	 * not session ID.
+	 * To retrieve session ID - full JID refer to <code>getJID()</code>
+	 * method.<br/>
+	 * If session has not been authorized yet this method throws
+	 * <code>NotAuthorizedException</code>.
+	 *
+	 * @return a <code>String</code> value of user ID - this is user JID without
+	 * resource part. To obtain full user JID please refer to <code>getJID</code>
+	 * method.
+	 * @exception NotAuthorizedException when this session has not
+	 * been authorized yet and some parts of user JID are not known yet.
+	 * @see #getJID()
+	 */
+	@Override
+	public final BareJID getBareJID() throws NotAuthorizedException {
+		if ( !isAuthorized()) {
+			throw new NotAuthorizedException(NOT_AUTHORIZED_MSG);
+		}    // end of if (username == null)
+
+		return userJid.getBareJID();
+	}
+
+	/**
 	 *
 	 * @param key
 	 * @return
@@ -199,9 +222,16 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	 * Gets the value of connectionId
 	 *
 	 * @return the value of connectionId
+	 * @throws NoConnectionIdException
 	 */
-	public JID getConnectionId() {
+	public JID getConnectionId() throws NoConnectionIdException {
 		lastAccessed = System.currentTimeMillis();
+
+		if (this.connectionId == null) {
+			throw new NoConnectionIdException("Connection ID not set for this session. "
+					+ "This is probably the SM session to handle traffic addressed to the server itself."
+						+ " Or maybe it's a bug.");
+		}
 
 		return this.connectionId;
 	}
@@ -213,8 +243,10 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	 * @param jid
 	 *
 	 * @return
+	 *
+	 * @throws NoConnectionIdException
 	 */
-	public JID getConnectionId(JID jid) {
+	public JID getConnectionId(JID jid) throws NoConnectionIdException {
 		return (((parentSession == null) || (jid == null))
 				? this.connectionId : parentSession.getResourceConnection(jid).getConnectionId());
 	}
@@ -263,8 +295,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	 *
 	 * @return a <code>String</code> value of calculated user full JID for this
 	 * session including resource name.
-	 * @exception NotAuthorizedException when this session has not
-	 * been authorized yet and some parts of user JID are not known yet.
+	 * @throws NotAuthorizedException
 	 */
 	public final JID getJID() throws NotAuthorizedException {
 		if ( !isAuthorized()) {
@@ -358,27 +389,20 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	}
 
 	/**
-	 * Returns user JID but without <em>resource</em> part. This is real user ID
-	 * not session ID.
-	 * To retrieve session ID - full JID refer to <code>getJID()</code>
-	 * method.<br/>
-	 * If session has not been authorized yet this method throws
-	 * <code>NotAuthorizedException</code>.
+	 * To get the user bare JID please use <code>getBareJID</code> method, to check the
+	 * whether the user with given BareJID is owner of the session please use method
+	 * <code>isUserId(...)</code>. From now one the user session may handle more than
+	 * a single userId, hence getting just userId is not enough to check whether the
+	 * user Id belongs to the session.
 	 *
-	 * @return a <code>String</code> value of user ID - this is user JID without
-	 * resource part. To obtain full user JID please refer to <code>getJID</code>
-	 * method.
-	 * @exception NotAuthorizedException when this session has not
-	 * been authorized yet and some parts of user JID are not known yet.
-	 * @see #getJID()
+	 *
+	 * @return
+	 *
+	 * @throws NotAuthorizedException
 	 */
-	@Override
-	public final BareJID getUserId() throws NotAuthorizedException {
-		if ( !isAuthorized()) {
-			throw new NotAuthorizedException(NOT_AUTHORIZED_MSG);
-		}    // end of if (username == null)
-
-		return userJid.getBareJID();
+	@Deprecated
+	public BareJID getUserId() throws NotAuthorizedException {
+		return this.getBareJID();
 	}
 
 	/**
@@ -448,6 +472,35 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	 */
 	public boolean isResourceSet() {
 		return this.resource != null;
+	}
+
+	/**
+	 * Returns information whether this is a server (SessionManager) session or normal user
+	 * session. The server session is used to handle packets addressed to the server itself
+	 * (local domain name).
+	 * @return a <code>boolean</code> value of <code>true</code> if this is the server session
+	 * and <code>false</code> otherwise.
+	 */
+	public boolean isServerSession() {
+		return false;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param bareJID
+	 *
+	 * @return
+	 *
+	 * @throws NotAuthorizedException
+	 */
+	public boolean isUserId(BareJID bareJID) throws NotAuthorizedException {
+		if ( !isAuthorized()) {
+			throw new NotAuthorizedException(NOT_AUTHORIZED_MSG);
+		}    // end of if (username == null)
+
+		return userJid.getBareJID().equals(bareJID);
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -747,7 +800,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	}
 
 	/**
-	 * Sets the value of resource
+	 * Sets the connection resource
 	 *
 	 * @param argResource Value to assign to this.resource
 	 * @throws NotAuthorizedException

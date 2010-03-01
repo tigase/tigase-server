@@ -302,25 +302,24 @@ public class MessageRouter extends AbstractMessageReceiver implements MessageRou
 		// This is kind of a hack to handle packets addressed specifically for the
 		// SessionManager
 		// TODO: Replace the hack with a proper solution
-		if (packet.getTo() == NULL_ROUTING) {
-			log.info("NULL routing, it is normal if server doesn't know how to"
-					+ " process packet: " + packet.toStringSecure());
-
-			try {
-				Packet error = Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
-					"Feature not supported yet.", true);
-
-				addOutPacketNB(error);
-			} catch (PacketErrorTypeException e) {
-				log.warning("Packet processing exception: " + e);
-			}
-
-			return;
-		}
-
+//  if (packet.getTo() == NULL_ROUTING) {
+//    log.info("NULL routing, it is normal if server doesn't know how to"
+//        + " process packet: " + packet.toStringSecure());
+//
+//    try {
+//      Packet error = Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
+//        "Feature not supported yet.", true);
+//
+//      addOutPacketNB(error);
+//    } catch (PacketErrorTypeException e) {
+//      log.warning("Packet processing exception: " + e);
+//    }
+//
+//    return;
+//  }
 //  if (log.isLoggable(Level.FINER)) {
-//    log.finer("Processing packet: " + packet.getElemName()
-//      + ", type: " + packet.getType());
+//  log.finer("Processing packet: " + packet.getElemName()
+//    + ", type: " + packet.getType());
 //  }
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Processing packet: " + packet.toStringSecure());
@@ -332,9 +331,7 @@ public class MessageRouter extends AbstractMessageReceiver implements MessageRou
 		// let't try to relax restriction and block all packets with error type
 		// 2008-06-16
 		if (((packet.getType() == StanzaType.error) && (packet.getFrom() != null)
-				&& packet.getFrom().equals(packet.getTo())) || ((packet.getFrom() == NULL_ROUTING)
-					&& (packet.getStanzaFrom() != null)
-						&& packet.getStanzaFrom().equals(packet.getTo()))) {
+				&& packet.getFrom().equals(packet.getTo()))) {
 			log.warning("Possible infinite loop, dropping packet: " + packet.toStringSecure());
 
 			return;

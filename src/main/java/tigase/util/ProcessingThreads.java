@@ -119,8 +119,8 @@ public class ProcessingThreads<E extends WorkerThread> {
 			if ((item.conn != null) && item.conn.isAuthorized()) {
 
 				// Queueing packets per user...
-				ret = queues.get(Math.abs(conn.getUserId().hashCode() % numQueues)).offer(item,
-						packet.getPriority().ordinal());
+				ret = queues.get(Math.abs(conn.getJID().getBareJID().hashCode()
+						% numQueues)).offer(item, packet.getPriority().ordinal());
 			} else {
 
 				// Otherwise per destination address

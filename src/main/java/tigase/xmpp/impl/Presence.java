@@ -138,7 +138,7 @@ public abstract class Presence {
 			Map<String, Object> settings)
 			throws NotAuthorizedException, TigaseDBException {
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Broadcasting probes for: " + session.getUserId());
+			log.finest("Broadcasting probes for: " + session);
 		}
 
 		// Probe is always broadcasted with initial presence
@@ -147,7 +147,7 @@ public abstract class Presence {
 
 		presProbe.setXMLNS(XMLNS);
 		presProbe.setAttribute("type", StanzaType.probe.toString());
-		presProbe.setAttribute("from", session.getUserId().toString());
+		presProbe.setAttribute("from", session.getBareJID().toString());
 
 //  String[] buddies = roster_util.getBuddies(session, TO_SUBSCRIBED, false);
 		// We send presence probe to TO_SUBSCRIBED and initial presence to
@@ -261,7 +261,7 @@ public abstract class Presence {
 							return;
 						}
 
-						if (packet.getStanzaFrom().getBareJID().equals(session.getUserId())) {
+						if (session.isUserId(packet.getStanzaFrom().getBareJID())) {
 							if (log.isLoggable(Level.FINE)) {
 								log.fine("'in' subscription to myself, not allowed, returning "
 										+ "error for packet: " + packet);
@@ -944,11 +944,10 @@ public abstract class Presence {
 						}    // end of for (String buddy: buddies)
 					} catch (NotAuthorizedException e) {
 						if (log.isLoggable(Level.FINEST)) {
-							log.finest("Anonymous user has logged out already: "
-									+ session.getConnectionId());
+							log.finest("Anonymous user has logged out already: " + session);
 						}
 					}
-				}    // end of if (direct_presence != null)
+				}        // end of if (direct_presence != null)
 			}
 		}
 	}
@@ -988,7 +987,7 @@ public abstract class Presence {
 			} else {
 				try {
 					if (log.isLoggable(Level.FINER)) {
-						log.finer("Update presence change to: " + conn.getUserId());
+						log.finer("Update presence change to: " + conn);
 					}
 
 					// Send to old resource presence about new resource
@@ -1036,7 +1035,7 @@ public abstract class Presence {
 					Element pres_update = presence.clone();
 
 					pres_update.setAttribute("from", session.getJID().toString());
-					pres_update.setAttribute("to", conn.getUserId().toString());
+					pres_update.setAttribute("to", conn.getBareJID().toString());
 
 					Packet pack_update = Packet.packetInstance(pres_update, session.getJID(),
 						conn.getJID().copyWithoutResource());
@@ -1159,7 +1158,7 @@ public abstract class Presence {
 			Queue<Packet> results)
 			throws NotAuthorizedException {
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Anonymous session: " + session.getUserId());
+			log.finest("Anonymous session: " + session);
 		}
 
 		JID peer = packet.getStanzaTo().copyWithoutResource();
@@ -1204,7 +1203,7 @@ public abstract class Presence {
 					Element pres_update = new Element(PRESENCE_ELEMENT_NAME);
 
 					pres_update.setAttribute("from", session.getJID().toString());
-					pres_update.setAttribute("to", conn.getUserId().toString());
+					pres_update.setAttribute("to", conn.getBareJID().toString());
 					pres_update.setAttribute("type", StanzaType.unavailable.toString());
 					pres_update.setXMLNS(XMLNS);
 
