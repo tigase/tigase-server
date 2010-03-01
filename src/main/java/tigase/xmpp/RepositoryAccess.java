@@ -777,7 +777,7 @@ public abstract class RepositoryAccess {
 
 			if (log.isLoggable(Level.INFO)) {
 				log.info("Registration data set for: " + BareJID.toString(user_name, getDomain())
-						+ ", pass: " + pass_param + ", reg_params: " + reg_params.toString());
+						+ ", pass: " + pass_param + ", reg_params: " + reg_params);
 			}
 
 			return Authorization.AUTHORIZED;
