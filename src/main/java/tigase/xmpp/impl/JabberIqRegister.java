@@ -102,10 +102,11 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 	 * @param settings
 	 *
 	 * @throws XMPPException
+	 * TODO: Implement registration form configurable and loading all the fields from
+	 * the registration form
+	 * TODO: rewrite the plugin using the XMPPProcessorAbstract API
 	 */
 	@Override
-	@TODO(note = "Implement registration form configurable and loading all the fields from "
-			+ "the registration form")
 	public void process(Packet packet, XMPPResourceConnection session,
 			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
 			throws XMPPException {
@@ -132,7 +133,13 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 			// I think it does not make sense to check the 'to', just the connection ID
 //    if ((id.equals(session.getDomain()) || id.equals(session.getUserId().toString()))
 //        && packet.getFrom().equals(session.getConnectionId())) {
-			if (packet.getPacketFrom().equals(session.getConnectionId())) {
+			// Wrong thinking. The user may send an request from his own account
+			// to register with a transport or any other sevice, then the connection ID
+			// matches the session id but this is still not a request to the local
+			// server. The TO address must be checked too.....
+			// if (packet.getPacketFrom().equals(session.getConnectionId())) {
+			if (packet.getPacketFrom().equals(session.getConnectionId())
+					&& (session.isUserId(id) || session.isLocalDomain(id.toString(), false))) {
 				Authorization result = Authorization.NOT_AUTHORIZED;
 				Element request = packet.getElement();
 				StanzaType type = packet.getType();
