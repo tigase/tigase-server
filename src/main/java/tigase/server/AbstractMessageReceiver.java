@@ -102,8 +102,8 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	 * You can change the default queue size by setting a different value for the
 	 * <code>MAX_QUEUE_SIZE_PROP_KEY</code> property in the server configuration.
 	 */
-	public static final Integer MAX_QUEUE_SIZE_PROP_VAL = new Long(Runtime.getRuntime().maxMemory()
-																													/ 400000L).intValue();
+	public static final Integer MAX_QUEUE_SIZE_PROP_VAL =
+		new Long(Runtime.getRuntime().maxMemory() / 400000L).intValue();
 
 	/**
 	 * Configuration property key for setting outgoing packets filters on the component level.
@@ -121,7 +121,8 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	public static final String OUTGOING_FILTERS_PROP_VAL = "tigase.server.filters.PacketCounter";
 
 	/**
-	 * Constant used in time calculation procedures. Indicates a second that is 1000 milliseconds.
+	 * Constant used in time calculation procedures. Indicates a second that is 1000
+	 * milliseconds.
 	 */
 	protected static final long SECOND = 1000;
 
@@ -143,7 +144,8 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
-	private static final Logger log = Logger.getLogger("tigase.abstract.AbstractMessageReceiver");
+	private static final Logger log =
+		Logger.getLogger("tigase.abstract.AbstractMessageReceiver");
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -506,7 +508,8 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 		list.add(getName(), "Last hour packets", packets_per_hour, Level.FINE);
 		list.add(getName(), StatisticType.MSG_RECEIVED_OK.getDescription(), statReceivedPacketsOk,
 				Level.FINE);
-		list.add(getName(), StatisticType.MSG_SENT_OK.getDescription(), statSentPacketsOk, Level.FINE);
+		list.add(getName(), StatisticType.MSG_SENT_OK.getDescription(), statSentPacketsOk,
+				Level.FINE);
 
 		if (list.checkLevel(Level.FINEST)) {
 			int[] in_priority_sizes = in_queues.get(0).size();
@@ -541,9 +544,10 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 
 		list.add(getName(), "Total In queues wait", in_queue_size, Level.INFO);
 		list.add(getName(), "Total Out queues wait", out_queue_size, Level.INFO);
-		list.add(getName(), StatisticType.MAX_QUEUE_SIZE.getDescription(), maxQueueSize, Level.FINEST);
-		list.add(getName(), StatisticType.IN_QUEUE_OVERFLOW.getDescription(), statReceivedPacketsEr,
-				Level.INFO);
+		list.add(getName(), StatisticType.MAX_QUEUE_SIZE.getDescription(), maxQueueSize,
+				Level.FINEST);
+		list.add(getName(), StatisticType.IN_QUEUE_OVERFLOW.getDescription(),
+				statReceivedPacketsEr, Level.INFO);
 		list.add(getName(), StatisticType.OUT_QUEUE_OVERFLOW.getDescription(), statSentPacketsEr,
 				Level.INFO);
 
@@ -781,8 +785,8 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 					incoming_filters.add(filter);
 					log.config(getName() + " loaded incoming filter: " + inc);
 				} catch (Exception e) {
-					log.log(Level.WARNING, "Problem loading filter: " + inc + " in component: " + getName(),
-							e);
+					log.log(Level.WARNING,
+							"Problem loading filter: " + inc + " in component: " + getName(), e);
 				}
 			}
 		}
@@ -800,8 +804,8 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 					outgoing_filters.add(filter);
 					log.config(getName() + " loaded outgoing filter: " + out);
 				} catch (Exception e) {
-					log.log(Level.WARNING, "Problem loading filter: " + out + " in component: " + getName(),
-							e);
+					log.log(Level.WARNING,
+							"Problem loading filter: " + out + " in component: " + getName(), e);
 				}
 			}
 		}
@@ -1112,8 +1116,13 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 
 //            tracer.trace(null, packet.getElemTo(), packet.getElemFrom(),
 //                    packet.getFrom(), getName(), type.name(), null, packet);
-							String id = packet.getTo().toString() + packet.getStanzaId();
-							PacketReceiverTask task = waitingTasks.remove(id);
+							PacketReceiverTask task = null;
+
+							if (packet.getTo() != null) {
+								String id = packet.getTo().toString() + packet.getStanzaId();
+
+								task = waitingTasks.remove(id);
+							}
 
 							if (task != null) {
 								task.handleResponse(packet);
@@ -1136,7 +1145,8 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 									}
 								}
 
-								if ( !processed && ((packet = filterPacket(packet, incoming_filters)) != null)) {
+								if ( !processed
+										&& ((packet = filterPacket(packet, incoming_filters)) != null)) {
 									processPacket(packet);
 								}
 
@@ -1175,8 +1185,8 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 					// stopped = true;
 				} catch (Exception e) {
 					log.log(Level.SEVERE,
-							"[" + getName() + "] Exception during packet processing: " + packet.toStringSecure(),
-								e);
+							"[" + getName() + "] Exception during packet processing: "
+								+ packet.toStringSecure(), e);
 				}    // end of try-catch
 			}      // end of while (! threadStopped)
 		}
