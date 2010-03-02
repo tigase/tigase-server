@@ -167,7 +167,7 @@ public class StartTLSProcessor implements ExtProcessor {
 			serv.startTLS(client);
 		} catch (Exception e) {
 			log.warning("TLS mode start failed: " + e.getMessage());
-			serv.stop();
+			serv.forceStop();
 		}
 	}
 }

@@ -641,7 +641,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 						readThread.addSocketService(serv);
 					} catch (Exception e) {
 						log.warning("Error starting TLS: " + e);
-						serv.stop();
+						serv.forceStop();
 					}    // end of try-catch
 				} else {
 					log.warning("Can't find sevice for STARTTLS command: " + iqc);
