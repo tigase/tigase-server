@@ -94,6 +94,13 @@ public class ServerConnections {
 	 */
 	private long creationTime = System.currentTimeMillis();
 
+	@Override
+	public String toString() {
+		return "cid: " + cid + ", conn_state: " + conn_state.name() + ", outgoing: " + outgoing
+				+ ", waitingPackets: " + waitingPackets.size() + ", controlPacket: "
+				+ waitingControlPackets.size() + ", db_keys: " + db_keys.size();
+	}
+
 	/**
 	 * Creates a new <code>ServerConnections</code> instance.
 	 *
@@ -127,10 +134,20 @@ public class ServerConnections {
 				outgoing = null;
 			} else {
 				++sentPackets;
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("Sent on connection: "
+						+ outgoing.getSessionData().get(XMPPIOService.SESSION_ID_KEY)
+						+ " packet sent: " + packet);
+				}
 			}
 		}
 		if (!result) {
 			addDataPacket(packet);
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("Connection not ready: "
+						+ (outgoing == null ? null : outgoing.getSessionData().get(XMPPIOService.SESSION_ID_KEY))
+						+ " packet added to waiting: " + packet);
+				}
 		}
 		return result;
 	}
@@ -152,6 +169,12 @@ public class ServerConnections {
 			if (!result) {
 				outgoing.forceStop();
 				outgoing = null;
+			} else {
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("Sent on connection: "
+						+ (outgoing == null ? null : outgoing.getSessionData().get(XMPPIOService.SESSION_ID_KEY))
+						+ " control packet: " + packet);
+				}
 			}
 		}
 		if (!result) {
@@ -195,6 +218,13 @@ public class ServerConnections {
 	}
 
 	public synchronized boolean sendAllControlPackets() {
+		if (log.isLoggable(Level.FINEST)) {
+			for (Packet packet : waitingControlPackets) {
+				log.finest("Sending on connection: " 
+						+ outgoing.getSessionData().get(XMPPIOService.SESSION_ID_KEY)
+						+ " control packet: " + packet);
+			}
+		}
 		handler.writePacketsToSocket(outgoing, waitingControlPackets);
 		return true;
 	}
@@ -207,10 +237,20 @@ public class ServerConnections {
 			Packet packet = null;
 			while ((packet = waitingControlPackets.poll()) != null) {
 				all.offer(packet);
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("Sending on connection: "
+						+ outgoing.getSessionData().get(XMPPIOService.SESSION_ID_KEY)
+						+ " control packet: " + packet);
+				}
 			}
 			sentPackets += waitingPackets.size();
 			while ((packet = waitingPackets.poll()) != null) {
 				all.offer(packet);
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("Sending on connection: "
+						+ outgoing.getSessionData().get(XMPPIOService.SESSION_ID_KEY)
+						+ " packet: " + packet);
+				}
 			}
 			handler.writePacketsToSocket(outgoing, all);
 			return true;

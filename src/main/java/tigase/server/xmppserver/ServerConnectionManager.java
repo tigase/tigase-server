@@ -381,7 +381,8 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 					if (log.isLoggable(Level.FINEST)) {
 						log.finest("cid: " + cid + ", sessionId: " + session_id
 								+ ", Counters: ioservices: " + countIOServices() + ", s2s connections: "
-									+ countOpenConnections());
+								+ countOpenConnections() + ", all connections: "
+								+ connectionsByLocalRemote);
 					}
 
 					if ( !serv_conns.sendControlPacket(result) && serv_conns.needsConnection()) {
@@ -638,7 +639,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 		if (serv != null) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Sending to incoming connectin: " + session_id + " packet: "
+				log.finest("Sending to incoming connection: " + session_id + " packet: "
 						+ packet.toString());
 			}
 
@@ -729,7 +730,8 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 							if (log.isLoggable(Level.FINEST)) {
 								log.finest("Counters: ioservices: " + countIOServices()
-										+ ", s2s connections: " + countOpenConnections());
+										+ ", s2s active conns: " + countOpenConnections()
+										+ ", all connections: " + connectionsByLocalRemote);
 							}
 
 							return result;
@@ -780,8 +782,9 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 			}    // end of switch (serv.connectionType())
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Counters: ioservices: " + countIOServices() + ", s2s connections: "
-						+ countOpenConnections());
+				log.finest("Counters: ioservices: " + countIOServices()
+						+ ", s2s active conns: " + countOpenConnections()
+						+ ", all connections: " + connectionsByLocalRemote);
 			}
 		}
 
@@ -867,8 +870,10 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 				String local_hostname = (String) serv.getSessionData().get("local-hostname");
 				CID cid = getConnectionId(local_hostname, remote_hostname);
 
+				String remote_id = attribs.get("id");
+
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Stream opened for: " + cid);
+					log.finest("Connect Stream opened for: " + cid + ", session id" + remote_id);
 				}
 
 				ServerConnections serv_conns = getServerConnections(cid);
@@ -880,13 +885,13 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 				serv_conns.addOutgoing(serv);
 
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Counters: ioservices: " + countIOServices() + ", s2s connections: "
-							+ countOpenConnections());
+					log.finest("Counters: ioservices: " + countIOServices()
+							+ ", s2s active conns: " + countOpenConnections()
+							+ ", all connections: " + connectionsByLocalRemote);
 				}
 
-				String remote_id = attribs.get("id");
 
-				serv.getSessionData().put(serv.SESSION_ID_KEY, remote_id);
+				serv.getSessionData().put(XMPPIOService.SESSION_ID_KEY, remote_id);
 
 				String uuid = UUID.randomUUID().toString();
 				String key = null;
@@ -913,8 +918,10 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 				String local_hostname = (String) serv.getSessionData().get("local-hostname");
 				CID cid = getConnectionId(local_hostname, remote_hostname);
 
+				String id = UUID.randomUUID().toString();
+
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Stream opened for: " + cid);
+					log.finest("Accept Stream opened for: " + cid + ", session id: " + id);
 				}
 
 				if (remote_hostname != null) {
@@ -923,8 +930,6 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 								+ " on TLS????");
 					}
 				}
-
-				String id = UUID.randomUUID().toString();
 
 				// We don't know hostname yet so we have to save session-id in
 				// connection temp data
@@ -1074,7 +1079,8 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	}
 
 	private int countOpenConnections() {
-		int open_s2s_connections = incoming.size();
+		//int open_s2s_connections = incoming.size();
+		int open_s2s_connections = 0;
 
 		for (Map.Entry<CID, ServerConnections> entry : connectionsByLocalRemote.entrySet()) {
 			ServerConnections conn = entry.getValue();
