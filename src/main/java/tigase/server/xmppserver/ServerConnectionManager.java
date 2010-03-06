@@ -381,7 +381,9 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 					if (log.isLoggable(Level.FINEST)) {
 						log.finest(serv + ", cid: " + cid + ", sessionId: " + session_id
 								+ ", Counters: ioservices: " + countIOServices() + ", s2s connections: "
-									+ countOpenConnections() + ", all connections: " + connectionsByLocalRemote);
+									+ countOpenConnections()
+										+ (Packet.FULL_DEBUG
+											? ", all connections: " + connectionsByLocalRemote : ""));
 					}
 
 					if ( !serv_conns.sendControlPacket(result) && serv_conns.needsConnection()) {
@@ -729,8 +731,9 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 							if (log.isLoggable(Level.FINEST)) {
 								log.finest(serv + ", Counters: ioservices: " + countIOServices()
-										+ ", s2s active conns: " + countOpenConnections() + ", all connections: "
-											+ connectionsByLocalRemote);
+										+ ", s2s active conns: " + countOpenConnections()
+											+ (Packet.FULL_DEBUG
+												? ", all connections: " + connectionsByLocalRemote : ""));
 							}
 
 							return result;
@@ -782,8 +785,8 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest(serv + ", Counters: ioservices: " + countIOServices()
-						+ ", s2s active conns: " + countOpenConnections() + ", all connections: "
-							+ connectionsByLocalRemote);
+						+ ", s2s active conns: " + countOpenConnections()
+							+ (Packet.FULL_DEBUG ? ", all connections: " + connectionsByLocalRemote : ""));
 			}
 		}
 
@@ -885,8 +888,8 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 				if (log.isLoggable(Level.FINEST)) {
 					log.finest(serv + ", Counters: ioservices: " + countIOServices()
-							+ ", s2s active conns: " + countOpenConnections() + ", all connections: "
-								+ connectionsByLocalRemote);
+							+ ", s2s active conns: " + countOpenConnections()
+								+ (Packet.FULL_DEBUG ? ", all connections: " + connectionsByLocalRemote : ""));
 				}
 
 				serv.getSessionData().put(XMPPIOService.SESSION_ID_KEY, remote_id);
