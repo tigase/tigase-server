@@ -241,6 +241,17 @@ public class TLSIO implements IOInterface {
 	 * @return
 	 */
 	@Override
+	public String toString() {
+		return "TLS: " + io.toString();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
 	public boolean waitingToSend() {
 		return io.waitingToSend();
 	}
@@ -278,7 +289,7 @@ public class TLSIO implements IOInterface {
 		int max_loop_runs = 1000;
 
 		while (((stat == TLSStatus.NEED_WRITE) || (stat == TLSStatus.NEED_READ))
-					 && (++loop_cnt < max_loop_runs)) {
+				&& (++loop_cnt < max_loop_runs)) {
 			switch (stat) {
 				case NEED_WRITE :
 					writeBuff(ByteBuffer.allocate(0));
@@ -306,7 +317,7 @@ public class TLSIO implements IOInterface {
 
 		if (loop_cnt > (max_loop_runs / 2)) {
 			log.warning("Infinite loop detected in write(buff) TLS code, tlsWrapper.getStatus(): "
-									+ tlsWrapper.getStatus());
+					+ tlsWrapper.getStatus());
 
 			// Let's close the connection now
 			throw new EOFException("Socket has been closed due to TLS problems.");
@@ -416,7 +427,7 @@ public class TLSIO implements IOInterface {
 
 			stat = tlsWrapper.getStatus();
 		} while (((stat == TLSStatus.NEED_READ) || (stat == TLSStatus.OK))
-						 && input.hasRemaining());
+				&& input.hasRemaining());
 
 		if (input.hasRemaining()) {
 			input.rewind();
@@ -466,7 +477,7 @@ public class TLSIO implements IOInterface {
 
 		if (loop_cnt > (max_loop_runs / 2)) {
 			log.warning("Infinite loop detected in writeBuff(buff) TLS code, "
-									+ "tlsWrapper.getStatus(): " + tlsWrapper.getStatus());
+					+ "tlsWrapper.getStatus(): " + tlsWrapper.getStatus());
 
 			// Let's close the connection now
 			throw new EOFException("Socket has been closed due to TLS problems.");

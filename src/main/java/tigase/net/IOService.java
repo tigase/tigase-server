@@ -257,7 +257,7 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 	 */
 	public void forceStop() {
 		if (log.isLoggable(Level.FINER)) {
-			log.finer("Force stop called...");
+			log.finer("Socket: " + socketIO + ", Force stop called...");
 		}
 
 		try {
@@ -270,7 +270,8 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 
 			// Well, do nothing, we are closing the connection anyway....
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Exception while stopping service: " + getUniqueId(), e);
+				log.log(Level.FINEST,
+						"Socket: " + socketIO + ", Exception while stopping service: " + getUniqueId(), e);
 			}
 		} finally {
 			if (serviceListener != null) {
@@ -400,11 +401,13 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 	 * @return a <code>boolean</code> value
 	 */
 	public boolean isConnected() {
+		boolean result = (socketIO == null) ? false : socketIO.isConnected();
+
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("socketIO = " + socketIO);
+			log.finest("Socket: " + socketIO + ", Connected: " + result);
 		}
 
-		return (socketIO == null) ? false : socketIO.isConnected();
+		return result;
 	}
 
 	//~--- set methods ----------------------------------------------------------
@@ -534,6 +537,17 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 	 *
 	 * @return
 	 */
+	@Override
+	public String toString() {
+		return this.getUniqueId() + ", type: " + connectionType + ", Socket: " + socketIO;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
 	public boolean waitingToSend() {
 		return socketIO.waitingToSend();
 	}
@@ -630,7 +644,8 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 				// and 0 bytes are read
 				if ((++empty_read_call_count) > MAX_ALLOWED_EMPTY_CALLS
 						&& (writeInProgress.get() == 0)) {
-					log.warning("Max allowed empty calls excceeded, closing connection.");
+					log.warning("Socket: " + socketIO
+							+ ", Max allowed empty calls excceeded, closing connection.");
 					forceStop();
 				}
 			}
@@ -647,7 +662,7 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 //      decoder.reset();
 		} catch (Exception eof) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Exception reading data: ", eof);
+				log.log(Level.FINEST, "Socket: " + socketIO + ", Exception reading data", eof);
 			}
 
 			// eof.printStackTrace();
@@ -673,9 +688,10 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 				if ((data != null) && (data.length() > 0)) {
 					if (log.isLoggable(Level.FINEST)) {
 						if (data.length() < 256) {
-							log.finest("Writing data (" + data.length() + "): " + data);
+							log.finest("Socket: " + socketIO + ", Writing data (" + data.length() + "): "
+									+ data);
 						} else {
-							log.finest("Writing data: " + data.length());
+							log.finest("Socket: " + socketIO + ", Writing data: " + data.length());
 						}
 					}
 
@@ -749,7 +765,8 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 //  if (netSize > socketInput.remaining()) {
 		if (netSize > socketInput.capacity() - socketInput.remaining()) {
 			if (log.isLoggable(Level.FINE)) {
-				log.fine("Resizing buffer to " + (netSize + socketInput.capacity()) + " bytes.");
+				log.fine("Socket: " + socketIO + ", Resizing buffer to "
+						+ (netSize + socketInput.capacity()) + " bytes.");
 			}
 
 			ByteBuffer b = ByteBuffer.allocate(netSize + socketInput.capacity());

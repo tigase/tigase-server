@@ -79,8 +79,8 @@ import javax.script.Bindings;
  * @version $Rev$
  */
 public class ComponentProtocol
-				extends ConnectionManager<XMPPIOService<List<ComponentConnection>>>
-				implements ComponentProtocolHandler {
+		extends ConnectionManager<XMPPIOService<List<ComponentConnection>>>
+			implements ComponentProtocolHandler {
 
 	/**
 	 * Variable <code>log</code> is a class logger.
@@ -144,15 +144,14 @@ public class ComponentProtocol
 	private int maxAuthenticationAttempts = 1;
 	private ComponentRepository<CompRepoItem> repo = null;
 	private Map<String, StreamOpenHandler> streamOpenHandlers = new LinkedHashMap<String,
-																																StreamOpenHandler>();
+		StreamOpenHandler>();
 
 	/**
 	 * List of processors which should handle all traffic incoming from the
 	 * network. In most cases if not all, these processors handle just
 	 * protocol traffic, all the rest traffic should be passed on to MR.
 	 */
-	private Map<String, ExtProcessor> processors = new LinkedHashMap<String,
-																									 ExtProcessor>();
+	private Map<String, ExtProcessor> processors = new LinkedHashMap<String, ExtProcessor>();
 	private UnknownXMLNSStreamOpenHandler unknownXMLNSHandler =
 		new UnknownXMLNSStreamOpenHandler();
 	private String identity_type = IDENTITY_TYPE_VAL;
@@ -233,7 +232,7 @@ public class ComponentProtocol
 	 */
 	@Override
 	public void authenticationFailed(XMPPIOService<List<ComponentConnection>> serv,
-																	 Packet packet) {
+			Packet packet) {
 		writePacketToSocket(serv, packet);
 
 		Integer fails = (Integer) serv.getSessionData().get("auth-fails");
@@ -257,8 +256,7 @@ public class ComponentProtocol
 	 * @param serv
 	 */
 	@Override
-	public void bindHostname(String hostname,
-													 XMPPIOService<List<ComponentConnection>> serv) {
+	public void bindHostname(String hostname, XMPPIOService<List<ComponentConnection>> serv) {
 		String[] routings = new String[] { hostname, ".*@" + hostname, ".*\\." + hostname };
 
 		if (serv.connectionType() == ConnectionType.connect) {
@@ -318,9 +316,8 @@ public class ComponentProtocol
 			repo = (ComponentRepository<CompRepoItem>) Class.forName(repo_class).newInstance();
 			repo.getDefaults(defs, params);
 		} catch (Exception e) {
-			log.log(Level.SEVERE,
-							"Can not instantiate items repository for class: " + repo_class,
-							e);
+			log.log(Level.SEVERE, "Can not instantiate items repository for class: " + repo_class,
+					e);
 		}
 
 		defs.put(PACK_ROUTED_KEY, PACK_ROUTED_VAL);
@@ -521,15 +518,13 @@ public class ComponentProtocol
 				} else {
 					try {
 						Packet error = Authorization.NOT_AUTHORIZED.getResponseMessage(p,
-										"Connection not yet authorized to send this packet.",
-										true);
+							"Connection not yet authorized to send this packet.", true);
 
 						writePacketToSocket(serv, error);
 					} catch (PacketErrorTypeException ex) {
 
 						// Already error packet, just ignore to prevent infinite loop
-						log.fine("Received an error packet from unauthorized connection: "
-										 + p.toString());
+						log.fine("Received an error packet from unauthorized connection: " + p.toString());
 					}
 
 					if (closeOnSequenceError) {
@@ -568,8 +563,7 @@ public class ComponentProtocol
 
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Connection started: " + serv.getRemoteAddress() + ", xmlns: " + xmlns
-								 + ", type: " + serv.connectionType().toString() + ", id="
-								 + serv.getUniqueId());
+					+ ", type: " + serv.connectionType().toString() + ", id=" + serv.getUniqueId());
 		}
 
 		StreamOpenHandler handler = streamOpenHandlers.get(xmlns);
@@ -582,7 +576,7 @@ public class ComponentProtocol
 		} else {
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("cid: " + (String) serv.getSessionData().get("cid") + ", sending: "
-									 + result);
+						+ result);
 			}
 
 			result = handler.serviceStarted(serv);
@@ -624,13 +618,13 @@ public class ComponentProtocol
 
 					// Nothing to do, let's log this however.
 					log.finer("Closing XMPPIOService has not yet set ComponentConnection as RefObject: "
-										+ hostname + ", id: " + service.getUniqueId());
+							+ hostname + ", id: " + service.getUniqueId());
 				}
 			} else {
 
 				// Stopped service which hasn't sent initial stream open yet
 				log.finer("Stopped service which hasn't sent initial stream open yet"
-									+ service.getUniqueId());
+						+ service.getUniqueId());
 			}
 
 			ConnectionType type = service.connectionType();
@@ -669,8 +663,7 @@ public class ComponentProtocol
 			repo = repo_tmp;
 		} catch (Exception e) {
 			log.log(Level.SEVERE,
-							"Can not create items repository instance for class: " + repo_class,
-							e);
+					"Can not create items repository instance for class: " + repo_class, e);
 		}
 
 		// Activate all connections for which parameters are defined in the repository
@@ -695,7 +688,7 @@ public class ComponentProtocol
 				port_props.put(PORT_IFC_PROP_KEY, PORT_IFC_PROP_VAL);
 				port_props.put(MAX_RECONNECTS_PROP_KEY, (int) (120 * MINUTE));
 				port_props.put(REPO_ITEM_KEY, repoItem);
-				log.info("Starting connection: " + port_props.toString());
+				log.info("Starting connection: " + port_props);
 				addWaitingTask(port_props);
 			}
 		}
@@ -732,8 +725,7 @@ public class ComponentProtocol
 	 * @param serv
 	 */
 	@Override
-	public void unbindHostname(String hostname,
-														 XMPPIOService<List<ComponentConnection>> serv) {
+	public void unbindHostname(String hostname, XMPPIOService<List<ComponentConnection>> serv) {
 		ArrayList<ComponentConnection> conns = connections.get(hostname);
 
 		if (conns != null) {
@@ -775,11 +767,11 @@ public class ComponentProtocol
 	 */
 	@Override
 	public String xmppStreamOpened(XMPPIOService<List<ComponentConnection>> serv,
-																 Map<String, String> attribs) {
+			Map<String, String> attribs) {
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Stream opened: " + serv.getRemoteAddress() + ", xmlns: "
-								 + attribs.get("xmlns") + ", type: " + serv.connectionType().toString()
-								 + ", uniqueId=" + serv.getUniqueId() + ", to=" + attribs.get("to"));
+					+ attribs.get("xmlns") + ", type: " + serv.connectionType().toString()
+						+ ", uniqueId=" + serv.getUniqueId() + ", to=" + attribs.get("to"));
 		}
 
 		String s_xmlns = attribs.get("xmlns");
@@ -863,7 +855,7 @@ public class ComponentProtocol
 	//~--- methods --------------------------------------------------------------
 
 	private synchronized void addComponentConnection(String hostname,
-					XMPPIOService<List<ComponentConnection>> s) {
+			XMPPIOService<List<ComponentConnection>> s) {
 		ComponentConnection conn = new ComponentConnection(hostname, s);
 		List<ComponentConnection> refObject = s.getRefObject();
 
@@ -894,7 +886,7 @@ public class ComponentProtocol
 	}
 
 	private synchronized boolean removeComponentConnection(String hostname,
-					ComponentConnection conn) {
+			ComponentConnection conn) {
 		boolean result = false;
 		ArrayList<ComponentConnection> conns = connections.get(hostname);
 
@@ -920,12 +912,12 @@ public class ComponentProtocol
 					result = true;
 				} else {
 					log.warning("Null or disconnected service for ComponentConnection for host: "
-											+ hostname);
+							+ hostname);
 				}
 			}
 		} else {
-			log.warning("That should not happen, ComponentConnection is not null but the collection is: "
-									+ hostname);
+			log.warning("That should not happen, ComponentConnection is not null but "
+					+ "the collection is: " + hostname);
 		}
 
 		return result;

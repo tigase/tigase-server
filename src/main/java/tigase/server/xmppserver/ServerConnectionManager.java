@@ -310,7 +310,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	 */
 	public synchronized void processDialback(Packet packet, XMPPIOService<Object> serv) {
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("DIALBACK - " + packet);
+			log.finest(serv + ", DIALBACK - " + packet);
 		}
 
 		String local_hostname = packet.getStanzaTo().getDomain();
@@ -348,8 +348,8 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 			? null : getConnectionId(serv_local_hostname, serv_remote_hostname);
 
 		if ((serv_cid != null) &&!cid.equals(serv_cid)) {
-			log.info("Somebody tries to reuse connection?" + " old_cid: " + serv_cid + ", new_cid: "
-					+ cid);
+			log.info(serv + ", Somebody tries to reuse connection?" + " old_cid: " + serv_cid
+					+ ", new_cid: " + cid);
 		}
 
 		// <db:result>
@@ -379,10 +379,9 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 					serv.getSessionData().put("local-hostname", local_hostname);
 
 					if (log.isLoggable(Level.FINEST)) {
-						log.finest("cid: " + cid + ", sessionId: " + session_id
+						log.finest(serv + ", cid: " + cid + ", sessionId: " + session_id
 								+ ", Counters: ioservices: " + countIOServices() + ", s2s connections: "
-								+ countOpenConnections() + ", all connections: "
-								+ connectionsByLocalRemote);
+									+ countOpenConnections() + ", all connections: " + connectionsByLocalRemote);
 					}
 
 					if ( !serv_conns.sendControlPacket(result) && serv_conns.needsConnection()) {
@@ -394,7 +393,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 					// I don't know yet what software they use.
 					// Let's just disconnect and signal unrecoverable conection error
 					if (log.isLoggable(Level.FINER)) {
-						log.finer("Incorrect diablack packet: " + packet);
+						log.finer(serv + ", Incorrect diablack packet: " + packet);
 					}
 
 					bouncePacketsBack(Authorization.SERVICE_UNAVAILABLE, cid);
@@ -408,7 +407,8 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 				switch (packet.getType()) {
 					case valid :
 						if (log.isLoggable(Level.FINER)) {
-							log.finer("Connection: " + cid + " is valid, adding to available services.");
+							log.finer(serv + ", Connection: " + cid
+									+ " is valid, adding to available services.");
 						}
 
 						serv_conns.handleDialbackSuccess();
@@ -417,7 +417,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 					default :
 						if (log.isLoggable(Level.FINER)) {
-							log.finer("Connection: " + cid + " is invalid!! Stopping...");
+							log.finer(serv + ", Connection: " + cid + " is invalid!! Stopping...");
 						}
 
 						serv_conns.handleDialbackFailure();
@@ -452,12 +452,12 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 						if (local_key == null) {
 							if (log.isLoggable(Level.FINE)) {
-								log.fine("db key is not availablefor session ID: " + forkey_session_id
-										+ ", key for validation: " + db_key);
+								log.fine(serv + ", db key is not available for session ID: "
+										+ forkey_session_id + ", key for validation: " + db_key);
 							}
 						} else {
 							if (log.isLoggable(Level.FINE)) {
-								log.fine("Local key for cid=" + cid + " is " + local_key);
+								log.fine(serv + ", Local key for cid=" + cid + " is " + local_key);
 							}
 
 							sendVerifyResult(local_hostname, remote_hostname, forkey_session_id,
@@ -482,7 +482,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 				// I don't know yet what software they use.
 				// Let's just disconnect and signal unrecoverable conection error
 				if (log.isLoggable(Level.FINER)) {
-					log.finer("Incorrect diablack packet: " + packet);
+					log.finer(serv + ", Incorrect diablack packet: " + packet);
 				}
 
 				bouncePacketsBack(Authorization.SERVICE_UNAVAILABLE, cid);
@@ -570,7 +570,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 				createServerConnection(cid, packet, serv_conn);
 			} else {
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Packet seems to be sent correctly: " + packet.toString());
+					log.finest("Packet seems to be sent correctly: " + packet);
 				}
 			}
 		}    // end of else
@@ -598,7 +598,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 			}
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Processing socket data: " + p.toString());
+				log.finest(serv + ", Processing socket data: " + p);
 			}
 
 			if (p.getElement().getXMLNS() == XMLNS_DB_VAL) {
@@ -611,7 +611,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 				} else {
 					if (checkPacket(p, serv)) {
 						if (log.isLoggable(Level.FINEST)) {
-							log.finest("Adding packet out: " + p);
+							log.finest(serv + ", Adding packet out: " + p);
 						}
 
 						addOutPacket(p);
@@ -639,14 +639,14 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 		if (serv != null) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Sending to incoming connection: " + session_id + " packet: "
-						+ packet.toString());
+				log.finest(serv + ", Sending to incoming connection: " + session_id + " packet: "
+						+ packet);
 			}
 
 			return writePacketToSocket(serv, packet);
 		} else {
 			if (log.isLoggable(Level.FINER)) {
-				log.finer("Trying to send packet: " + packet.toString()
+				log.finer("Trying to send packet: " + packet
 						+ " to nonexisten connection with sessionId: " + session_id);
 			}
 
@@ -665,8 +665,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 		super.serviceStarted(serv);
 
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("s2s connection opened: " + serv.getRemoteAddress() + ", type: "
-					+ serv.connectionType().toString() + ", id=" + serv.getUniqueId());
+			log.finest("s2s connection opened: " + serv);
 		}
 
 		switch (serv.connectionType()) {
@@ -678,7 +677,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 					+ " xmlns='jabber:server'" + " xmlns:db='jabber:server:dialback'" + ">";
 
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("cid: " + serv.getSessionData().get("cid") + ", sending: " + data);
+					log.finest(serv + ", sending: " + data);
 				}
 
 				serv.xmppStreamOpen(data);
@@ -717,7 +716,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 						// closed connection before it send any db:... packet
 						// so remote domain is not known.
 						// Let's do nothing for now.
-						log.info("remote-hostname is NULL, local-hostname: " + local_hostname
+						log.info(serv + ", remote-hostname is NULL, local-hostname: " + local_hostname
 								+ ", local address: " + serv.getLocalAddress() + ", remote address: "
 									+ serv.getRemoteAddress());
 					} else {
@@ -725,13 +724,13 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 						ServerConnections serv_conns = getServerConnections(cid);
 
 						if (serv_conns == null) {
-							log.warning("There is no ServerConnections for stopped service: "
-									+ serv.getUniqueId() + ", cid: " + cid);
+							log.warning("There is no ServerConnections for stopped service: " + serv
+									+ ", cid: " + cid);
 
 							if (log.isLoggable(Level.FINEST)) {
-								log.finest("Counters: ioservices: " + countIOServices()
-										+ ", s2s active conns: " + countOpenConnections()
-										+ ", all connections: " + connectionsByLocalRemote);
+								log.finest(serv + ", Counters: ioservices: " + countIOServices()
+										+ ", s2s active conns: " + countOpenConnections() + ", all connections: "
+											+ connectionsByLocalRemote);
 							}
 
 							return result;
@@ -760,31 +759,31 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 						if (rem == null) {
 							if (log.isLoggable(Level.FINE)) {
-								log.fine("No service with given SESSION_ID: " + session_id);
+								log.fine(serv + ", No service with given SESSION_ID: " + session_id);
 							}
 						} else {
 							if (log.isLoggable(Level.FINER)) {
-								log.finer("Connection removed: " + session_id);
+								log.finer(serv + ", Connection removed: " + session_id);
 							}
 						}
 					} else {
 						if (log.isLoggable(Level.FINE)) {
-							log.fine("session_id is null, didn't remove the connection");
+							log.fine(serv + ", session_id is null, didn't remove the connection");
 						}
 					}
 
 					break;
 
 				default :
-					log.severe("Warning, program shouldn't reach that point.");
+					log.severe(serv + ", Warning, program shouldn't reach that point.");
 
 					break;
 			}    // end of switch (serv.connectionType())
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Counters: ioservices: " + countIOServices()
-						+ ", s2s active conns: " + countOpenConnections()
-						+ ", all connections: " + connectionsByLocalRemote);
+				log.finest(serv + ", Counters: ioservices: " + countIOServices()
+						+ ", s2s active conns: " + countOpenConnections() + ", all connections: "
+							+ connectionsByLocalRemote);
 			}
 		}
 
@@ -843,7 +842,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	@Override
 	public void xmppStreamClosed(XMPPIOService<Object> serv) {
 		if (log.isLoggable(Level.FINER)) {
-			log.finer("Stream closed: " + getConnectionId(serv));
+			log.finer(serv + ", Stream closed: " + getConnectionId(serv));
 		}
 	}
 
@@ -859,7 +858,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	@Override
 	public String xmppStreamOpened(XMPPIOService<Object> serv, Map<String, String> attribs) {
 		if (log.isLoggable(Level.FINER)) {
-			log.finer("Stream opened: " + attribs.toString());
+			log.finer(serv + ", Stream opened: " + attribs.toString());
 		}
 
 		switch (serv.connectionType()) {
@@ -869,11 +868,11 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 				String remote_hostname = (String) serv.getSessionData().get("remote-hostname");
 				String local_hostname = (String) serv.getSessionData().get("local-hostname");
 				CID cid = getConnectionId(local_hostname, remote_hostname);
-
 				String remote_id = attribs.get("id");
 
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Connect Stream opened for: " + cid + ", session id" + remote_id);
+					log.finest(serv + ", Connect Stream opened for: " + cid + ", session id"
+							+ remote_id);
 				}
 
 				ServerConnections serv_conns = getServerConnections(cid);
@@ -885,11 +884,10 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 				serv_conns.addOutgoing(serv);
 
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Counters: ioservices: " + countIOServices()
-							+ ", s2s active conns: " + countOpenConnections()
-							+ ", all connections: " + connectionsByLocalRemote);
+					log.finest(serv + ", Counters: ioservices: " + countIOServices()
+							+ ", s2s active conns: " + countOpenConnections() + ", all connections: "
+								+ connectionsByLocalRemote);
 				}
-
 
 				serv.getSessionData().put(XMPPIOService.SESSION_ID_KEY, remote_id);
 
@@ -917,17 +915,17 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 				String remote_hostname = (String) serv.getSessionData().get("remote-hostname");
 				String local_hostname = (String) serv.getSessionData().get("local-hostname");
 				CID cid = getConnectionId(local_hostname, remote_hostname);
-
 				String id = UUID.randomUUID().toString();
 
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Accept Stream opened for: " + cid + ", session id: " + id);
+					log.finest(serv + ", Accept Stream opened for: " + cid + ", session id: " + id);
 				}
 
 				if (remote_hostname != null) {
 					if (log.isLoggable(Level.FINE)) {
-						log.fine("Opening stream for already established connection...., trying to turn"
-								+ " on TLS????");
+						log.fine(serv
+								+ ", Opening stream for already established connection...., trying to turn"
+									+ " on TLS????");
 					}
 				}
 
@@ -943,7 +941,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 			}
 
 			default :
-				log.severe("Warning, program shouldn't reach that point.");
+				log.severe(serv + ", Warning, program shouldn't reach that point.");
 
 				break;
 		}    // end of switch (serv.connectionType())
@@ -1047,7 +1045,8 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 		if ( !packet_from.getDomain().equals(remote_hostname)) {
 			if (log.isLoggable(Level.FINER)) {
-				log.finer("Invalid hostname from the remote server, expected: " + remote_hostname);
+				log.finer(serv + ", Invalid hostname from the remote server, expected: "
+						+ remote_hostname);
 			}
 
 			generateStreamError("invalid-from", serv);
@@ -1059,7 +1058,8 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 		if ( !packet_to.getDomain().equals(local_hostname)) {
 			if (log.isLoggable(Level.FINER)) {
-				log.finer("Invalid hostname of the local server, expected: " + local_hostname);
+				log.finer(serv + ", Invalid hostname of the local server, expected: "
+						+ local_hostname);
 			}
 
 			generateStreamError("host-unknown", serv);
@@ -1070,7 +1070,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 		String session_id = (String) serv.getSessionData().get(XMPPIOService.SESSION_ID_KEY);
 
 		if ( !isIncomingValid(session_id)) {
-			log.info("Incoming connection hasn't been validated");
+			log.info(serv + ", Incoming connection hasn't been validated");
 
 			return false;
 		}
@@ -1079,7 +1079,8 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	}
 
 	private int countOpenConnections() {
-		//int open_s2s_connections = incoming.size();
+
+		// int open_s2s_connections = incoming.size();
 		int open_s2s_connections = 0;
 
 		for (Map.Entry<CID, ServerConnections> entry : connectionsByLocalRemote.entrySet()) {
@@ -1094,11 +1095,11 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	}
 
 	private ServerConnections createNewServerConnections(CID cid, Packet packet) {
-		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Creating a new ServerConnections instance: " + cid);
-		}
-
 		ServerConnections conns = new ServerConnections(this, cid);
+
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Creating a new ServerConnections instance: " + conns);
+		}
 
 		if (packet != null) {
 
@@ -1164,11 +1165,11 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 //    conns.setConnecting();
 //    new ConnectionWatchdogTask(conns, localhost, remotehost);
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Connecting a new s2s service: " + cid);
+				log.finest("Connecting a new s2s service: " + conns);
 			}
 		} else {
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Couldn't open a new s2s service: (UknownHost??) " + cid);
+				log.finest("Couldn't open a new s2s service: (UknownHost??) " + conns);
 			}
 
 			// Can't establish connection...., unknown host??
@@ -1358,7 +1359,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 			if (conns.getOutgoingState() == ServerConnections.OutgoingState.CONNECTING) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Connecting timeout expired, still connecting: " + conns.getCID());
+					log.finest("Connecting timeout expired, still connecting: " + conns);
 				}
 
 				Queue<Packet> waiting = conns.getWaitingPackets();
@@ -1366,15 +1367,14 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 				if (waiting.size() > 0) {
 					if (conns.waitingTime() > maxPacketWaitingTime) {
 						if (log.isLoggable(Level.FINEST)) {
-							log.finest("Max packets waiting time expired, sending all back: "
-									+ conns.getCID());
+							log.finest("Max packets waiting time expired, sending all back: " + conns);
 						}
 
 						conns.stopAll();
 						bouncePacketsBack(Authorization.REMOTE_SERVER_TIMEOUT, conns.getCID());
 					} else {
 						if (log.isLoggable(Level.FINEST)) {
-							log.finest("Reconnecting: " + conns.getCID());
+							log.finest("Reconnecting: " + conns);
 						}
 
 						createServerConnection(conns.getCID(), null, conns);
@@ -1383,13 +1383,12 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 					conns.stopAll();
 
 					if (log.isLoggable(Level.FINEST)) {
-						log.finest("No packets waiting in queue, giving up: " + conns.getCID());
+						log.finest("No packets waiting in queue, giving up: " + conns);
 					}
 				}
 			} else {
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Connecting timeout expired: " + conns.getCID()
-							+ ", connection state is: " + conns.getOutgoingState());
+					log.finest("Connecting timeout expired: " + conns);
 				}
 			}
 		}

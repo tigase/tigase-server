@@ -19,18 +19,29 @@
  * Last modified by $Author$
  * $Date$
  */
+
 package tigase.io;
+
+//~--- non-JDK imports --------------------------------------------------------
+
+import tigase.net.ConnectionOpenListener;
+
+import tigase.stats.StatisticsList;
+
+//~--- JDK imports ------------------------------------------------------------
 
 import java.io.EOFException;
 import java.io.IOException;
+
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
-import java.util.logging.Logger;
-import java.util.logging.Level;
+
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
-import tigase.net.ConnectionOpenListener;
-import tigase.stats.StatisticsList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+//~--- classes ----------------------------------------------------------------
 
 /**
  * Describe class SocketIO here.
@@ -42,142 +53,258 @@ import tigase.stats.StatisticsList;
  * @version $Rev$
  */
 public class SocketIO implements IOInterface {
+	private static Logger log = Logger.getLogger("tigase.io.SocketIO");
 
-  private static Logger log = Logger.getLogger("tigase.io.SocketIO");
+	//~--- fields ---------------------------------------------------------------
 
-	private Queue<ByteBuffer> dataToSend = null;
-
-  private SocketChannel channel = null;
-  private int bytesRead = 0;
-	private String remoteAddress = null;
-	private long bytesSent = 0;
+	private int bytesRead = 0;
 	private long bytesReceived = 0;
+	private long bytesSent = 0;
+	private SocketChannel channel = null;
+	private Queue<ByteBuffer> dataToSend = null;
+	private String remoteAddress = null;
 
-  /**
-   * Creates a new <code>SocketIO</code> instance.
-   *
+	//~--- constructors ---------------------------------------------------------
+
+	/**
+	 * Creates a new <code>SocketIO</code> instance.
+	 *
 	 * @param sock
 	 * @throws IOException
 	 */
-  public SocketIO(final SocketChannel sock) throws IOException {
-    channel = sock;
+	public SocketIO(final SocketChannel sock) throws IOException {
+		channel = sock;
 		channel.configureBlocking(false);
 		channel.socket().setSoLinger(false, 0);
 		channel.socket().setReuseAddress(true);
 		remoteAddress = channel.socket().getInetAddress().getHostAddress();
+
 		if (channel.socket().getTrafficClass() == ConnectionOpenListener.IPTOS_THROUGHPUT) {
 			dataToSend = new LinkedBlockingQueue<ByteBuffer>(100000);
 		} else {
 			dataToSend = new LinkedBlockingQueue<ByteBuffer>(100);
 		}
-  }
-
-	@Override
-  public SocketChannel getSocketChannel() {
-    return channel;
-  }
-
-	@Override
-  public void stop() throws IOException {
-		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Stop called.");
-		}
-//		if (isRemoteAddress("81.142.228.219")) {
-//			log.warning("Stop called.");
-//		}
-    channel.close();
-  }
-
-	@Override
-	public boolean isRemoteAddress(String addr) {
-		return remoteAddress.equals(addr);
 	}
 
-	@Override
-  public boolean isConnected() {
-    return channel.isConnected();
-  }
+	//~--- methods --------------------------------------------------------------
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
 	@Override
-  public int write(final ByteBuffer buff) throws IOException {
-//     int result = 0;
-//     while (buff.hasRemaining()) {
-//       final int res = channel.write(buff);
-//       if (res == -1) {
-//         throw new EOFException("Channel has been closed.");
-//       } // end of if (res == -1)
-//       result += res;
-//     } // end of while (out.hasRemaining())
-//     log.finer("Wrote to channel " + result + " bytes.");
-//     return result;
-		if (buff != null) {
-			dataToSend.offer(buff);
-		}
-		int result = 0;
-		ByteBuffer dataBuffer = null;
-		while ((dataBuffer = dataToSend.peek()) != null) {
-			int res = channel.write(dataBuffer);
-			if (res == -1) {
-				throw new EOFException("Channel has been closed.");
-			} else {
-				result += res;
-			}
-			if (!dataBuffer.hasRemaining()) {
-				dataToSend.poll();
-			} else {
-				break;
-			}
-		}
-		if (log.isLoggable(Level.FINER)) {
-			log.finer("Wrote to channel " + result + " bytes.");
-		}
-//		if (isRemoteAddress("81.142.228.219")) {
-//			log.warning("Wrote to channel " + result + " bytes.");
-//		}
-		bytesSent += result;
-    return result;
-  }
+	public int bytesRead() {
+		return bytesRead;
+	}
 
-	@Override
-  public ByteBuffer read(final ByteBuffer buff) throws IOException {
-    bytesRead = channel.read(buff);
-		if (log.isLoggable(Level.FINER)) {
-			log.finer("Read from channel " + bytesRead + " bytes.");
-		}
-    if (bytesRead == -1) {
-      throw new EOFException("Channel has been closed.");
-    } // end of if (result == -1)
-		if (bytesRead > 0) {
-			buff.flip();
-			bytesReceived += bytesRead;
-		}
-    return buff;
-  }
+	//~--- get methods ----------------------------------------------------------
 
-	@Override
-  public int bytesRead() {
-    return bytesRead;
-  }
-
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 *
+	 * @throws IOException
+	 */
 	@Override
 	public int getInputPacketSize() throws IOException {
 		return channel.socket().getReceiveBufferSize();
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
 	@Override
-	public boolean waitingToSend() {
-		return dataToSend.size() > 0;
+	public SocketChannel getSocketChannel() {
+		return channel;
 	}
 
-	@Override
-	public int waitingToSendSize() {
-		return dataToSend.size();
-	}
-
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param list
+	 */
 	@Override
 	public void getStatistics(StatisticsList list) {
 		list.add("socketio", "Bytes sent", bytesSent, Level.FINE);
 		list.add("socketio", "Bytes received", bytesReceived, Level.FINE);
 	}
 
-} // SocketIO
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public boolean isConnected() {
+		return channel.isConnected();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param addr
+	 *
+	 * @return
+	 */
+	@Override
+	public boolean isRemoteAddress(String addr) {
+		return remoteAddress.equals(addr);
+	}
+
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param buff
+	 *
+	 * @return
+	 *
+	 * @throws IOException
+	 */
+	@Override
+	public ByteBuffer read(final ByteBuffer buff) throws IOException {
+		bytesRead = channel.read(buff);
+
+		if (log.isLoggable(Level.FINER)) {
+			log.finer("Read from channel " + bytesRead + " bytes.");
+		}
+
+		if (bytesRead == -1) {
+			throw new EOFException("Channel has been closed.");
+		}    // end of if (result == -1)
+
+		if (bytesRead > 0) {
+			buff.flip();
+			bytesReceived += bytesRead;
+		}
+
+		return buff;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @throws IOException
+	 */
+	@Override
+	public void stop() throws IOException {
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Stop called.");
+		}
+
+//  if (isRemoteAddress("81.142.228.219")) {
+//    log.warning("Stop called.");
+//  }
+		channel.close();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public String toString() {
+		return "" + ((channel == null) ? null : channel.socket());
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public boolean waitingToSend() {
+		return dataToSend.size() > 0;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public int waitingToSendSize() {
+		return dataToSend.size();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param buff
+	 *
+	 * @return
+	 *
+	 * @throws IOException
+	 */
+	@Override
+	public int write(final ByteBuffer buff) throws IOException {
+
+//  int result = 0;
+//  while (buff.hasRemaining()) {
+//    final int res = channel.write(buff);
+//    if (res == -1) {
+//      throw new EOFException("Channel has been closed.");
+//    } // end of if (res == -1)
+//    result += res;
+//  } // end of while (out.hasRemaining())
+//  log.finer("Wrote to channel " + result + " bytes.");
+//  return result;
+		if (buff != null) {
+			dataToSend.offer(buff);
+		}
+
+		int result = 0;
+		ByteBuffer dataBuffer = null;
+
+		while ((dataBuffer = dataToSend.peek()) != null) {
+			int res = channel.write(dataBuffer);
+
+			if (res == -1) {
+				throw new EOFException("Channel has been closed.");
+			} else {
+				result += res;
+			}
+
+			if ( !dataBuffer.hasRemaining()) {
+				dataToSend.poll();
+			} else {
+				break;
+			}
+		}
+
+		if (log.isLoggable(Level.FINER)) {
+			log.finer("Wrote to channel " + result + " bytes.");
+		}
+
+//  if (isRemoteAddress("81.142.228.219")) {
+//    log.warning("Wrote to channel " + result + " bytes.");
+//  }
+		bytesSent += result;
+
+		return result;
+	}
+}    // SocketIO
+
+
+//~ Formatted in Sun Code Convention
+
+
+//~ Formatted by Jindent --- http://www.jindent.com
