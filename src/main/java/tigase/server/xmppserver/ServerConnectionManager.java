@@ -1344,7 +1344,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 				task.cancel();
 			}
 
-			addTimerTask(this, 2, TimeUnit.MINUTES);
+			addTimerTask(this, 15, TimeUnit.SECONDS);
 			waitingTasks.put(key, this);
 		}
 
@@ -1360,10 +1360,12 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 			waitingTasks.remove(key);
 
-			if (conns.getOutgoingState() == ServerConnections.OutgoingState.CONNECTING) {
+			if (conns.getOutgoingState() != ServerConnections.OutgoingState.OK) {
 				if (log.isLoggable(Level.FINEST)) {
 					log.finest("Connecting timeout expired, still connecting: " + conns);
 				}
+
+				conns.stopAll();
 
 				Queue<Packet> waiting = conns.getWaitingPackets();
 
@@ -1373,7 +1375,6 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 							log.finest("Max packets waiting time expired, sending all back: " + conns);
 						}
 
-						conns.stopAll();
 						bouncePacketsBack(Authorization.REMOTE_SERVER_TIMEOUT, conns.getCID());
 					} else {
 						if (log.isLoggable(Level.FINEST)) {
@@ -1383,8 +1384,6 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 						createServerConnection(conns.getCID(), null, conns);
 					}
 				} else {
-					conns.stopAll();
-
 					if (log.isLoggable(Level.FINEST)) {
 						log.finest("No packets waiting in queue, giving up: " + conns);
 					}
