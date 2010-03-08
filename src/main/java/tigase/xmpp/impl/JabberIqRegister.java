@@ -139,7 +139,8 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 			// server. The TO address must be checked too.....
 			// if (packet.getPacketFrom().equals(session.getConnectionId())) {
 			if (packet.getPacketFrom().equals(session.getConnectionId())
-					&& (session.isUserId(id) || session.isLocalDomain(id.toString(), false))) {
+					&& (!session.isAuthorized()
+					|| (session.isUserId(id) || session.isLocalDomain(id.toString(), false)))) {
 				Authorization result = Authorization.NOT_AUTHORIZED;
 				Element request = packet.getElement();
 				StanzaType type = packet.getType();
