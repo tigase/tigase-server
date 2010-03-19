@@ -37,6 +37,7 @@ import tigase.xml.SingletonFactory;
 
 import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
+import tigase.xmpp.NoConnectionIdException;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
@@ -209,9 +210,10 @@ public class VCardTemp extends XMPPProcessorAbstract {
 			}    // end of try-catch
 		} else {
 
-			// Skip the rest, we are not interested in any other packet, maybe we should
-			// send an error instead?
-			// TODO: investigate whether sending would be more appropriate here
+			// This is most likely a response to the user from the remote
+			// entity with vCard request results.
+			// Processed in processToUserPacket() method.
+
 		}
 	}
 
@@ -249,6 +251,18 @@ public class VCardTemp extends XMPPProcessorAbstract {
 			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
 			throws PacketErrorTypeException {
 		processNullSessionPacket(packet, repo, results, settings);
+		if (session != null && session.isAuthorized() && packet.getType() != StanzaType.get) {
+			try {
+				Packet result = packet.copyElementOnly();
+				result.setPacketTo(session.getConnectionId(packet.getStanzaTo()));
+				results.offer(result);
+			} catch (NoConnectionIdException ex) {
+				// This should not happen unless somebody sends a result vcard packet
+				// to the server itself
+				log.warning("This should not happen, unless this is a vcard result packet " +
+						"sent to the server, which should not happen: " + packet);
+			}
+		}
 	}
 
 	/**
