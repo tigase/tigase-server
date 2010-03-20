@@ -821,6 +821,9 @@ public class SessionManager extends AbstractMessageReceiver
 //    packet.getElement().setAttribute("to", oldfrom);
 //    packet.getElement().removeAttribute(Packet.OLDFROM);
 //  }
+		if (packet.getPacketFrom() == null) {
+			packet.setPacketFrom(getComponentId());
+		}
 		return super.addOutPacket(packet);
 	}
 
@@ -830,7 +833,10 @@ public class SessionManager extends AbstractMessageReceiver
 			outfilter.filter(packet, conn, naUserRepository, results);
 		}    // end of for (XMPPPostprocessorIfc postproc: postProcessors)
 
-		addOutPackets(results);
+		for (Packet p : results) {
+			addOutPacket(p);
+		}
+//		addOutPackets(results);
 	}
 
 	protected boolean addTrusted(JID jid) {
@@ -1012,6 +1018,9 @@ public class SessionManager extends AbstractMessageReceiver
 	}
 
 	protected boolean fastAddOutPacket(Packet packet) {
+		if (packet.getPacketFrom() == null) {
+			packet.setPacketFrom(getComponentId());
+		}
 		return super.addOutPacket(packet);
 	}
 
