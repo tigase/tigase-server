@@ -35,7 +35,6 @@ import tigase.server.ReceiverTimeoutHandler;
 
 import tigase.util.DNSResolver;
 import tigase.util.RoutingsContainer;
-import tigase.util.TigaseStringprepException;
 
 import tigase.xml.Element;
 
@@ -227,20 +226,20 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 				// But in case of mass-disconnects we might have lot's of presences
 				// floating around, so just skip sending stream_close for all the
 				// offline presences
-				if (packet.getType() != StanzaType.unavailable) {
+				if (packet.getType() != StanzaType.unavailable && packet.getPacketFrom() != null) {
 					Packet command = Command.STREAM_CLOSED_UPDATE.getPacket(null, null, StanzaType.set,
 						UUID.randomUUID().toString());
 
-					command.setPacketFrom(packet.getTo());
-					command.setPacketTo(packet.getFrom());
+					command.setPacketFrom(packet.getPacketTo());
+					command.setPacketTo(packet.getPacketFrom());
 
 					// Note! we don't want to receive response to this request, thus
 					// STREAM_CLOSED_UPDATE instead of STREAM_CLOSED
 					addOutPacket(command);
 
 //        addOutPacketWithTimeout(command, stoppedHandler, 15l, TimeUnit.SECONDS);
-					log.fine("Sending a command to close the remote session for non-existen Bosh"
-							+ " connection: " + command.toStringSecure());
+					log.fine("Sending a command to close the remote session for non-existen "
+							+ getName() + " connection: " + command.toStringSecure());
 				}
 			}
 		}    // end of else
