@@ -833,7 +833,8 @@ public class SessionManager extends AbstractMessageReceiver
 			outfilter.filter(packet, conn, naUserRepository, results);
 		}    // end of for (XMPPPostprocessorIfc postproc: postProcessors)
 
-		for (Packet p : results) {
+		Packet p;
+		while ((p = results.poll()) != null) {
 			addOutPacket(p);
 		}
 //		addOutPackets(results);
