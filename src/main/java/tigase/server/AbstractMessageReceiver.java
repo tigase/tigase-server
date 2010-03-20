@@ -839,6 +839,9 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	}
 
 	protected boolean addOutPacket(Packet packet) {
+		if (packet.getPacketFrom() == null) {
+			packet.setPacketFrom(getComponentId());
+		}
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("[" + getName() + "]  " + packet.toStringSecure());
 		}
@@ -862,6 +865,9 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	 * @return a <code>boolean</code> value
 	 */
 	protected boolean addOutPacketNB(Packet packet) {
+		if (packet.getPacketFrom() == null) {
+			packet.setPacketFrom(getComponentId());
+		}
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("[" + getName() + "]  " + packet.toStringSecure());
 		}
