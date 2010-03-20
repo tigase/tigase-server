@@ -24,7 +24,7 @@
 
 List users IDs connected to the server
 
-AS:Description: List of online users connected to the server
+AS:Description: List of online users
 AS:CommandId: users-list
 AS:Component: sess-man
 */
@@ -40,14 +40,14 @@ def p = (Iq)packet
 
 def users_list = []
 user_sessions.entrySet().each {
-	if (!it.getKey().toString().startsWith("sess-man")) {
-		def user = it.getKey().toString()
-		def session = (XMPPSession) it.getValue()
-		user += "  (" + session.getActiveResourcesSize() + ": "
-		session.getJIDs().each { user += it.getResource() + ", " }
-		user = user[0..user.size()-3] + ")"
+  if (!it.getKey().toString().startsWith("sess-man")) {
+    def user = it.getKey().toString()
+    def session = (XMPPSession) it.getValue()
+    user += "  (" + session.getActiveResourcesSize() + ": "
+    session.getJIDs().each { user += it.getResource() + ", " }
+    user = user[0..user.size()-3] + ")"
     users_list += user
-	}
+  }
 }
 
 def res = (Iq)p.commandResult(Command.DataType.result)
