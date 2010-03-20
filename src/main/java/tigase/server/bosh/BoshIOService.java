@@ -71,7 +71,7 @@ public class BoshIOService extends XMPPIOService<Object> {
 			sb.append(HTTP_OK_RESPONSE);
 			sb.append(CONTENT_TYPE_HEADER + content_type + EOL);
 			sb.append(CONTENT_TYPE_LENGTH + data.getBytes().length + EOL);
-			sb.append(CONNECTION + "close" + EOL);
+//			sb.append(CONNECTION + "close" + EOL);
 			sb.append(SERVER + EOL);
 			sb.append(EOL);
 			sb.append(data);
