@@ -318,8 +318,15 @@ public class XMPPIOService<RefObject> extends IOService<RefObject> {
 							parser.parse(domHandler, data, 0, data.length);
 
 							if (domHandler.parseError()) {
-								log.warning(toString() + ", Data parsing error: " + new String(data));
-								domHandler = new XMPPDomBuilderHandler<RefObject>(this);
+								if (log.isLoggable(Level.FINE)) {
+									log.fine(toString() + ", Data parsing error: " + new String(data));
+								} else {
+									log.warning(toString() + ", data parsing error, stopping connection");
+								}
+
+								forceStop();
+
+								// domHandler = new XMPPDomBuilderHandler<RefObject>(this);
 							}
 
 							Queue<Element> elems = domHandler.getParsedElements();
