@@ -24,8 +24,6 @@ package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.annotations.TODO;
-
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 
@@ -138,9 +136,10 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 			// matches the session id but this is still not a request to the local
 			// server. The TO address must be checked too.....
 			// if (packet.getPacketFrom().equals(session.getConnectionId())) {
-			if (packet.getPacketFrom().equals(session.getConnectionId())
-					&& (!session.isAuthorized()
-					|| (session.isUserId(id) || session.isLocalDomain(id.toString(), false)))) {
+			if ((packet.getPacketFrom() != null)
+					&& packet.getPacketFrom().equals(session.getConnectionId())
+						&& ( !session.isAuthorized()
+							|| (session.isUserId(id) || session.isLocalDomain(id.toString(), false)))) {
 				Authorization result = Authorization.NOT_AUTHORIZED;
 				Element request = packet.getElement();
 				StanzaType type = packet.getType();
