@@ -222,7 +222,6 @@ public class XMPPSession {
 	 *
 	 * @return
 	 *
-	 * @throws NoConnectionIdException
 	 */
 	public JID[] getConnectionIds() {
 		JID[] result = new JID[activeResources.size()];
@@ -233,6 +232,7 @@ public class XMPPSession {
 				result[idx] = conn.getConnectionId();
 				++idx;
 			} catch (NoConnectionIdException ex) {
+
 				// Skip connection with no connectionId set
 			}
 		}    // end of for (XMPPResourceConnection conn: activeResources)
@@ -246,14 +246,13 @@ public class XMPPSession {
 	 *
 	 * @return
 	 *
-	 * @throws NotAuthorizedException
 	 */
-	public JID[] getJIDs() throws NotAuthorizedException {
+	public JID[] getJIDs() {
 		JID[] result = new JID[activeResources.size()];
 		int idx = 0;
 
 		for (XMPPResourceConnection conn : activeResources) {
-			result[idx++] = conn.getJID();
+			result[idx++] = conn.getjid();
 		}    // end of for (XMPPResourceConnection conn: activeResources)
 
 		return result;

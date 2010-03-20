@@ -165,14 +165,9 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	 *
 	 * @return
 	 *
-	 * @throws NotAuthorizedException
 	 */
-	public JID[] getAllResourcesJIDs() throws NotAuthorizedException {
-		if ( !isAuthorized()) {
-			throw new NotAuthorizedException(NOT_AUTHORIZED_MSG);
-		}    // end of if (username == null)
-
-		return parentSession.getJIDs();
+	public JID[] getAllResourcesJIDs() {
+		return (parentSession == null) ? null : parentSession.getJIDs();
 	}
 
 	/**
