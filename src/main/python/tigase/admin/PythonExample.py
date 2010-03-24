@@ -26,7 +26,7 @@ num1 = Command.getFieldValue(packet, "num1")
 num2 = Command.getFieldValue(packet, "num2")
 
 if num1 is None or num2 is None:
-   res = Packet.commandResultForm(packet)
+   res = Iq.commandResultForm(packet)
    Command.addTextField(res, "Note", "This is Python script!")
    Command.addFieldValue(res, "num1", "")
    Command.addFieldValue(res, "num2", "")
