@@ -392,10 +392,8 @@ public class XMPPIOService<RefObject> extends IOService<RefObject> {
 
 	@SuppressWarnings({ "unchecked" })
 	protected void xmppStreamClosed() {
-
-		// streamClosed = true;
-		if (serviceListener != null) {
-			serviceListener.xmppStreamClosed(this);
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest(toString() + ", Received STREAM-CLOSE from the client");
 		}
 
 		try {
@@ -405,7 +403,12 @@ public class XMPPIOService<RefObject> extends IOService<RefObject> {
 
 			writeRawData("</stream:stream>");
 		} catch (IOException e) {
-			log.warning(toString() + ", Error sending stream closed data: " + e);
+			log.info(toString() + ", Error sending stream closed data: " + e);
+		}
+
+		// streamClosed = true;
+		if (serviceListener != null) {
+			serviceListener.xmppStreamClosed(this);
 		}
 
 //  try {
