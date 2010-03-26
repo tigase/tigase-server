@@ -821,9 +821,13 @@ public class SessionManager extends AbstractMessageReceiver
 //    packet.getElement().setAttribute("to", oldfrom);
 //    packet.getElement().removeAttribute(Packet.OLDFROM);
 //  }
-		if (packet.getPacketFrom() == null) {
-			packet.setPacketFrom(getComponentId());
-		}
+		// TODO: make the code below working correctly.
+		// Code below would be nice to have but it causes unexpected
+		// effects, the problem is that it needs much more testing
+		// on border cases.
+//    if (packet.getPacketFrom() == null) {
+//      packet.setPacketFrom(getComponentId());
+//    }
 		return super.addOutPacket(packet);
 	}
 
@@ -834,10 +838,11 @@ public class SessionManager extends AbstractMessageReceiver
 		}    // end of for (XMPPPostprocessorIfc postproc: postProcessors)
 
 		Packet p;
-		while ((p = results.poll()) != null) {
-			addOutPacket(p);
-		}
-//		addOutPackets(results);
+
+//  while ((p = results.poll()) != null) {
+//    addOutPacket(p);
+//  }
+		addOutPackets(results);
 	}
 
 	protected boolean addTrusted(JID jid) {
@@ -1022,6 +1027,7 @@ public class SessionManager extends AbstractMessageReceiver
 		if (packet.getPacketFrom() == null) {
 			packet.setPacketFrom(getComponentId());
 		}
+
 		return super.addOutPacket(packet);
 	}
 
