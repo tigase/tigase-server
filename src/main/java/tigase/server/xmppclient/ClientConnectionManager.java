@@ -226,7 +226,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 				// But in case of mass-disconnects we might have lot's of presences
 				// floating around, so just skip sending stream_close for all the
 				// offline presences
-				if (packet.getType() != StanzaType.unavailable && packet.getPacketFrom() != null) {
+				if ((packet.getType() != StanzaType.unavailable) && (packet.getPacketFrom() != null)) {
 					Packet command = Command.STREAM_CLOSED_UPDATE.getPacket(null, null, StanzaType.set,
 						UUID.randomUUID().toString());
 
@@ -311,41 +311,42 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	public boolean serviceStopped(XMPPIOService<Object> service) {
 		boolean result = super.serviceStopped(service);
 
-		// It might be a Bosh service in which case it is ignored here.
-		if (service.getXMLNS() == XMLNS) {
+		xmppStreamClosed(service);
 
-			// XMPPIOService serv = (XMPPIOService)service;
-			// The method may be called more than one time for a single
-			// connection but we want to send a notification just once
-			if (result) {
-				ipMonitor.addDisconnect(service.getRemoteAddress());
-
-				if (service.getDataReceiver() != null) {
-					Packet command =
-						Command.STREAM_CLOSED.getPacket(getFromAddress(getUniqueId(service)),
-							service.getDataReceiver(), StanzaType.set, UUID.randomUUID().toString());
-
-					// In case of mass-disconnects, adjust the timeout properly
-					addOutPacketWithTimeout(command, stoppedHandler, 120l, TimeUnit.SECONDS);
-
-					if (log.isLoggable(Level.FINE)) {
-						log.fine("Service stopped, sending packet: " + command);
-					}
-
-					// // For testing only.
-					// System.out.println("Service stopped: " + service.getUniqueId());
-					// Thread.dumpStack();
-//        // For testing only.
-//        System.out.println("Service stopped: " + service.getUniqueId());
-//        Thread.dumpStack();
-				} else {
-					if (log.isLoggable(Level.FINE)) {
-						log.fine("Service stopped, before stream:stream received");
-					}
-				}
-			}
-		}
-
+//  // It might be a Bosh service in which case it is ignored here.
+//  if (service.getXMLNS() == XMLNS) {
+//
+//    // XMPPIOService serv = (XMPPIOService)service;
+//    // The method may be called more than one time for a single
+//    // connection but we want to send a notification just once
+//    if (result) {
+//      ipMonitor.addDisconnect(service.getRemoteAddress());
+//
+//      if (service.getDataReceiver() != null) {
+//        Packet command =
+//          Command.STREAM_CLOSED.getPacket(getFromAddress(getUniqueId(service)),
+//            service.getDataReceiver(), StanzaType.set, UUID.randomUUID().toString());
+//
+//        // In case of mass-disconnects, adjust the timeout properly
+//        addOutPacketWithTimeout(command, stoppedHandler, 120l, TimeUnit.SECONDS);
+//
+//        if (log.isLoggable(Level.FINE)) {
+//          log.fine("Service stopped, sending packet: " + command);
+//        }
+//
+//        // // For testing only.
+//        // System.out.println("Service stopped: " + service.getUniqueId());
+//        // Thread.dumpStack();
+////      // For testing only.
+////      System.out.println("Service stopped: " + service.getUniqueId());
+////      Thread.dumpStack();
+//      } else {
+//        if (log.isLoggable(Level.FINE)) {
+//          log.fine("Service stopped, before stream:stream received");
+//        }
+//      }
+//    }
+//  }
 		return result;
 	}
 
@@ -409,6 +410,37 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	public void xmppStreamClosed(XMPPIOService<Object> serv) {
 		if (log.isLoggable(Level.FINER)) {
 			log.finer("Stream closed: " + serv.getUniqueId());
+		}
+
+		// It might be a Bosh service in which case it is ignored here.
+		// The method may be called more than one time for a single
+		// connection but we want to send a notification just once
+		if ((serv.getXMLNS() == XMLNS) && (serv.getSessionData().get("stream-closed") == null)) {
+			serv.getSessionData().put("stream-closed", "stream-closed");
+			ipMonitor.addDisconnect(serv.getRemoteAddress());
+
+			if (serv.getDataReceiver() != null) {
+				Packet command = Command.STREAM_CLOSED.getPacket(getFromAddress(getUniqueId(serv)),
+					serv.getDataReceiver(), StanzaType.set, UUID.randomUUID().toString());
+
+				// In case of mass-disconnects, adjust the timeout properly
+				addOutPacketWithTimeout(command, stoppedHandler, 120l, TimeUnit.SECONDS);
+
+				if (log.isLoggable(Level.FINE)) {
+					log.fine("Service stopped, sending packet: " + command);
+				}
+
+				// // For testing only.
+				// System.out.println("Service stopped: " + service.getUniqueId());
+				// Thread.dumpStack();
+//      // For testing only.
+//      System.out.println("Service stopped: " + service.getUniqueId());
+//      Thread.dumpStack();
+			} else {
+				if (log.isLoggable(Level.FINE)) {
+					log.fine("Service stopped, before stream:stream received");
+				}
+			}
 		}
 	}
 
