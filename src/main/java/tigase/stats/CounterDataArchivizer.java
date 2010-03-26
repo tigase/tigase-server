@@ -66,12 +66,12 @@ public class CounterDataArchivizer extends JDBCAbstract implements StatisticsArc
 	private static final String DEF_TABLE_NAME = "counter_data";
 	private static final String DEF_KEY_FIELD_NAME = "counter_name";
 	private static final String DEF_VALUE_FIELD_NAME = "counter_value";
-	private static final String VERSION_TEXT = "Tigase version: ";
-	private static final String CPU_USAGE_TEXT = "CPU usage [%]: ";
-	private static final String MEM_USAGE_TEXT = "Mem usage [%]: ";
-	private static final String USER_CONNECTIONS_TEXT = "C2s connections: ";
-	private static final String SERVER_CONNECTIONS_TEXT = "S2s connections: ";
-	private static final String UPTIME_TEXT = "Server uptime: ";
+	private static final String USER_CONNECTIONS_TEXT = "Connections c2s: ";
+	private static final String SERVER_CONNECTIONS_TEXT = "Connections s2s: ";
+	private static final String CPU_USAGE_TEXT = "Usage CPU [%]: ";
+	private static final String MEM_USAGE_TEXT = "Usage RAM [%]: ";
+	private static final String UPTIME_TEXT = "Uptime: ";
+	private static final String VERSION_TEXT = "Version: ";
 
 	//~--- fields ---------------------------------------------------------------
 
