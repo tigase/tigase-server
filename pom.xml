@@ -6,8 +6,8 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>tigase</groupId>
   <artifactId>tigase-server</artifactId>
-  <name>TigaseXMPPServer</name>
-  <version>5.0.1-SNAPSHOT</version>
+  <name>Tigase XMPP Server 5.1.0</name>
+  <version>5.1.0-SNAPSHOT</version>
   <description>Tigase XMPP Server</description>
   <url>http://www.tigase.org/</url>
   <issueManagement>
