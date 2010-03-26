@@ -394,6 +394,8 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	 * @return
 	 *
 	 * @throws NotAuthorizedException
+	 *
+	 * @deprecated
 	 */
 	@Deprecated
 	public BareJID getUserId() throws NotAuthorizedException {
