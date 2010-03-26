@@ -88,7 +88,6 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	private JMXServiceURL jmxUrl = null;
 	private JMXConnector jmxc = null;
 	private long lastCacheUpdate = 0;
-	private List<JMXProxyListener> listeners = new LinkedList<JMXProxyListener>();
 	private long messagesNumber = 0;
 	private float messagesPerSec = 0;
 	private float nonHeapUsage = 0;
@@ -100,6 +99,9 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	private long queueOverflow = 0;
 	private int queueSize = 0;
 	private MBeanServerConnection server = null;
+	private int serverConnections = 0;
+	private int[] serverConnectionsHistory = null;
+	private List<JMXProxyListener> listeners = new LinkedList<JMXProxyListener>();
 	private long smPacketsNumber = 0;
 	private float smPacketsPerSec = 0;
 	private int smQueueSize = 0;
@@ -128,8 +130,8 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	 * @param interval
 	 * @param loadHistory
 	 */
-	public JavaJMXProxy(String id, String hostname, int port, String userName,
-											String password, long delay, long interval, boolean loadHistory) {
+	public JavaJMXProxy(String id, String hostname, int port, String userName, String password,
+			long delay, long interval, boolean loadHistory) {
 		this.id = id;
 		this.hostname = hostname;
 		this.port = port;
@@ -607,6 +609,28 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	 * @return
 	 */
 	@Override
+	public int getServerConnections() {
+		return serverConnections;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public int[] getServerConnectionsHistory() {
+		return serverConnectionsHistory;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
 	public String getSystemDetails() {
 		return sysDetails;
 	}
@@ -642,24 +666,25 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 				ObjectName obn = new ObjectName(StatisticsCollector.STATISTICS_MBEAN_NAME);
 
 				tigBean = MBeanServerInvocationHandler.newProxyInstance(server, obn,
-								StatisticsProviderMBean.class, false);
+						StatisticsProviderMBean.class, false);
 
 				if (loadHistory) {
 					cpu_history = tigBean.getCPUUsageHistory();
-					System.out.println(hostname + " loaded cpu_history, size: "
-														 + cpu_history.length);
+					System.out.println(hostname + " loaded cpu_history, size: " + cpu_history.length);
 					heap_history = tigBean.getHeapUsageHistory();
-					System.out.println(hostname + " loaded heap_history, size: "
-														 + heap_history.length);
+					System.out.println(hostname + " loaded heap_history, size: " + heap_history.length);
 					smpacks_history = tigBean.getSMPacketsPerSecHistory();
 					System.out.println(hostname + " loaded smpacks_history, size: "
-														 + smpacks_history.length);
+							+ smpacks_history.length);
 					clpacks_history = tigBean.getCLPacketsPerSecHistory();
 					System.out.println(hostname + " loaded clpacks_history, size: "
-														 + clpacks_history.length);
+							+ clpacks_history.length);
 					conns_history = tigBean.getConnectionsNumberHistory();
 					System.out.println(hostname + " loaded conns_history, size: "
-														 + conns_history.length);
+							+ conns_history.length);
+					serverConnectionsHistory = tigBean.getServerConnectionsHistory();
+					System.out.println(hostname + " loaded server_conns_history, size: "
+							+ serverConnectionsHistory.length);
 				} else {
 					System.out.println(hostname + " loading history switched off.");
 				}
@@ -746,6 +771,7 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 			uptime = tigBean.getUptime();
 			processCPUTime = tigBean.getProcesCPUTime();
 			connectionsNumber = tigBean.getConnectionsNumber();
+			serverConnections = tigBean.getServerConnections();
 			clusterCacheSize = tigBean.getClusterCacheSize();
 			queueSize = tigBean.getQueueSize();
 			smQueueSize = tigBean.getSMQueueSize();
@@ -804,7 +830,7 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 						}
 
 						log.warning(cause.getMessage() + ", retrying in " + (interval / 1000)
-												+ " seconds.");
+								+ " seconds.");
 					} catch (Exception e) {
 						log.log(Level.WARNING, "Problem retrieving statistics: ", e);
 					}

@@ -75,8 +75,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 *
 	 * @throws NotCompliantMBeanException
 	 */
-	public StatisticsProvider(StatisticsCollector theRef)
-					throws NotCompliantMBeanException {
+	public StatisticsProvider(StatisticsCollector theRef) throws NotCompliantMBeanException {
 
 		// WARNING Uncomment the following call to super() to make this class
 		// compile (see BUG ID 122377)
@@ -365,12 +364,9 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	public MBeanInfo getMBeanInfo() {
 		MBeanInfo mbinfo = super.getMBeanInfo();
 
-		return new MBeanInfo(mbinfo.getClassName(),
-												 mbinfo.getDescription(),
-												 mbinfo.getAttributes(),
-												 mbinfo.getConstructors(),
-												 mbinfo.getOperations(),
-												 getNotificationInfo());
+		return new MBeanInfo(mbinfo.getClassName(), mbinfo.getDescription(),
+				mbinfo.getAttributes(), mbinfo.getConstructors(), mbinfo.getOperations(),
+					getNotificationInfo());
 	}
 
 	/**
@@ -540,6 +536,30 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * @return
 	 */
 	@Override
+	public int getServerConnections() {
+
+		// cache.updateIfOlder(1000);
+		return cache.serverConnections;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public int[] getServerConnectionsHistory() {
+		return cache.server_conns_history.getCurrentHistory();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
 	public String getSystemDetails() {
 
 		// cache.updateIfOlder(1000);
@@ -615,7 +635,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 */
 	@Override
 	protected String getDescription(MBeanOperationInfo op, MBeanParameterInfo param,
-																	int sequence) {
+			int sequence) {
 		if (op.getName().equals("getAllStats")) {
 			switch (sequence) {
 				case 0 :
@@ -663,18 +683,16 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 
 		methodSignature = new String[] { java.lang.Integer.TYPE.getName() };
 
-		if (info.getName().equals("getAllStats")
-				&& Arrays.equals(signature, methodSignature)) {
+		if (info.getName().equals("getAllStats") && Arrays.equals(signature, methodSignature)) {
 			description = "Provides statistics for all components for a given level.";
 		}
 
 		methodSignature = new String[] { java.lang.String.class.getName(),
-																		 java.lang.Integer.TYPE.getName() };
+				java.lang.Integer.TYPE.getName() };
 
 		if (info.getName().equals("getComponentStats")
 				&& Arrays.equals(signature, methodSignature)) {
-			description =
-				"Provides statistics for a given component name and statistics level.";
+			description = "Provides statistics for a given component name and statistics level.";
 		}
 
 		return description;
@@ -691,7 +709,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 */
 	@Override
 	protected String getParameterName(MBeanOperationInfo op, MBeanParameterInfo param,
-																		int sequence) {
+			int sequence) {
 		if (op.getName().equals("getAllStats")) {
 			switch (sequence) {
 				case 0 :
@@ -744,6 +762,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	private class StatisticsCache {
 		private static final String BOSH_COMP = "bosh";
 		private static final String C2S_COMP = "c2s";
+		private static final String S2S_COMP = "s2s";
 		private static final String CL_COMP = "cl-comp";
 		private static final int HISTORY_SIZE = 14400;
 		private static final long SECOND = 1000;
@@ -795,12 +814,14 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 		private float prevSmPacketsPerSec = 0;
 		private long queueOverflow = 0;
 		private int queueSize = 0;
+		private int serverConnections = 0;
 		private long smPackets = 0;
 		private float smPacketsPerSec = 0;
 		private int smQueue = 0;
 		private String systemDetails = "";
 		private Timer updateTimer = null;
 		private FloatHistoryCache smpacks_history = new FloatHistoryCache(HISTORY_SIZE);
+		private IntHistoryCache server_conns_history = new IntHistoryCache(HISTORY_SIZE);
 		private FloatHistoryCache heap_usage_history = new FloatHistoryCache(HISTORY_SIZE);
 		private FloatHistoryCache cpu_usage_history = new FloatHistoryCache(HISTORY_SIZE);
 		private IntHistoryCache conns_history = new IntHistoryCache(HISTORY_SIZE);
@@ -881,8 +902,8 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 		private void update() {
 			float temp = cpuUsage;
 
-			cpuUsage = (prevCpuUsage + (temp * 2)
-									+ TigaseRuntime.getTigaseRuntime().getCPUUsage()) / 4;
+			cpuUsage = (prevCpuUsage + (temp * 2) + TigaseRuntime.getTigaseRuntime().getCPUUsage())
+					/ 4;
 			cpu_usage_history.addItem(cpuUsage);
 			prevCpuUsage = temp;
 			heap_usage_history.addItem(getHeapMemUsage());
@@ -890,41 +911,38 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 			theRef.getAllStats(allStats);
 
 			// System.out.println(allStats.toString());
-			clusterCompressionRatio = (allStats.getValue(CL_COMP, "Average compression ratio",
-							-1f) + allStats.getValue(CL_COMP, "Average decompression ratio", -1f)) / 2f;
+			clusterCompressionRatio = (allStats.getValue(CL_COMP, "Average compression ratio", -1f)
+					+ allStats.getValue(CL_COMP, "Average decompression ratio", -1f)) / 2f;
 			clusterPacketsReceived = allStats.getValue(CL_COMP,
-							StatisticType.MSG_RECEIVED_OK.getDescription(), 0L);
+					StatisticType.MSG_RECEIVED_OK.getDescription(), 0L);
 			clusterPacketsSent = allStats.getValue(CL_COMP,
-							StatisticType.MSG_SENT_OK.getDescription(), 0L);
+					StatisticType.MSG_SENT_OK.getDescription(), 0L);
 			clusterPackets = clusterPacketsSent + clusterPacketsReceived;
 			temp = clusterPacketsPerSec;
 			clusterPacketsPerSec = (prevClusterPacketsPerSec + (temp * 2f)
-															+ (clusterPackets - prevClusterPackets)) / 4f;
+					+ (clusterPackets - prevClusterPackets)) / 4f;
 			clpacks_history.addItem(clusterPacketsPerSec);
 			prevClusterPacketsPerSec = temp;
 			prevClusterPackets = clusterPackets;
-			smPackets = allStats.getValue(SM_COMP,
-																		StatisticType.MSG_RECEIVED_OK.getDescription(),
-																		0L) + allStats.getValue(SM_COMP,
-																			StatisticType.MSG_SENT_OK.getDescription(), 0L);
+			smPackets = allStats.getValue(SM_COMP, StatisticType.MSG_RECEIVED_OK.getDescription(),
+					0L) + allStats.getValue(SM_COMP, StatisticType.MSG_SENT_OK.getDescription(), 0L);
 			temp = smPacketsPerSec;
-			smPacketsPerSec = (prevSmPacketsPerSec + (temp * 2f) + (smPackets - prevSmPackets))
-												/ 4f;
+			smPacketsPerSec = (prevSmPacketsPerSec + (temp * 2f) + (smPackets - prevSmPackets)) / 4f;
 			smpacks_history.addItem(smPacketsPerSec);
 			prevSmPacketsPerSec = temp;
 			prevSmPackets = smPackets;
 			clientConnections = allStats.getValue(C2S_COMP, "Open connections", 0)
-													+ allStats.getValue(BOSH_COMP, "Open connections", 0);
+					+ allStats.getValue(BOSH_COMP, "Open connections", 0);
 			conns_history.addItem(clientConnections);
+			serverConnections = allStats.getValue(S2S_COMP, "Open connections", 0);
+			server_conns_history.addItem(serverConnections);
 			clIOQueue = allStats.getValue(CL_COMP, "Waiting to send", 0);
 			clusterCache = allStats.getValue("cl-caching-strat", "Cached JIDs", 0);
-			messagesNumber = allStats.getValue(SM_COMP,
-																				 QueueType.IN_QUEUE.name() + " messages",
-																				 0L) + allStats.getValue(SM_COMP,
-																					 QueueType.OUT_QUEUE.name() + " messages", 0L);
+			messagesNumber = allStats.getValue(SM_COMP, QueueType.IN_QUEUE.name() + " messages", 0L)
+					+ allStats.getValue(SM_COMP, QueueType.OUT_QUEUE.name() + " messages", 0L);
 			temp = messagesPerSec;
 			messagesPerSec = (prevMessagesPerSec + (temp * 2f)
-												+ (messagesNumber - prevMessagesNumber)) / 4f;
+					+ (messagesNumber - prevMessagesNumber)) / 4f;
 			prevMessagesPerSec = temp;
 			prevMessagesNumber = messagesNumber;
 			clusterNetworkBytesSent = allStats.getValue(CL_COMP, "Bytes sent", 0L);
@@ -932,29 +950,25 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 			clusterNetworkBytes = clusterNetworkBytesSent + clusterNetworkBytesReceived;
 			temp = clusterNetworkBytesPerSecond;
 			clusterNetworkBytesPerSecond = (prevClusterNetworkBytesPerSecond + (temp * 2f)
-																			+ (clusterNetworkBytes
-																				 - prevClusterNetworkBytes)) / 4f;
+					+ (clusterNetworkBytes - prevClusterNetworkBytes)) / 4f;
 			prevClusterNetworkBytesPerSecond = temp;
 			prevClusterNetworkBytes = clusterNetworkBytes;
 
 			long currPresencesReceived = allStats.getValue(SM_COMP,
-							QueueType.IN_QUEUE.name() + " presences",
-							0L);
+				QueueType.IN_QUEUE.name() + " presences", 0L);
 			long currPresencesSent = allStats.getValue(SM_COMP,
-							QueueType.OUT_QUEUE.name() + " presences",
-							0L);
+				QueueType.OUT_QUEUE.name() + " presences", 0L);
 
 			presencesNumber = currPresencesReceived + currPresencesSent;
 			temp = presencesPerSec;
 			presencesPerSec = (prevPresencesPerSec + (temp * 2f)
-												 + (presencesNumber - prevPresencesNumber)) / 4f;
+					+ (presencesNumber - prevPresencesNumber)) / 4f;
 			prevPresencesPerSec = temp;
 			prevPresencesNumber = presencesNumber;
 
 			if (++cnt >= inter) {
 				presences_sent_per_update = (currPresencesSent - lastPresencesSent) / 10;
-				presences_received_per_update = (currPresencesReceived - lastPresencesReceived)
-																				/ 10;
+				presences_received_per_update = (currPresencesReceived - lastPresencesReceived) / 10;
 				lastPresencesSent = currPresencesSent;
 				lastPresencesReceived = currPresencesReceived;
 				cnt = 0;
@@ -968,8 +982,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 
 			for (StatRecord rec : allStats) {
 				if ((rec.getDescription() == StatisticType.IN_QUEUE_OVERFLOW.getDescription())
-						|| (rec.getDescription()
-								== StatisticType.OUT_QUEUE_OVERFLOW.getDescription())) {
+						|| (rec.getDescription() == StatisticType.OUT_QUEUE_OVERFLOW.getDescription())) {
 					queueOverflow += rec.getLongValue();
 				}
 
@@ -986,8 +999,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 					}
 
 					if (rec.getIntValue() > 10000) {
-						largeQueues += rec.getComponent() + " - queue size: " + rec.getIntValue()
-													 + "\n";
+						largeQueues += rec.getComponent() + " - queue size: " + rec.getIntValue() + "\n";
 					}
 				}
 			}
@@ -1073,7 +1085,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 			sb.append("\nCluster packets: S-" + clusterPacketsSent);
 			sb.append(" / R-" + clusterPacketsReceived);
 
-			if (!largeQueues.isEmpty()) {
+			if ( !largeQueues.isEmpty()) {
 				sb.append("\n").append(largeQueues);
 			}
 

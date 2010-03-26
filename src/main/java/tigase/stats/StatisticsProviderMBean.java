@@ -22,37 +22,19 @@
 
 package tigase.stats;
 
+//~--- JDK imports ------------------------------------------------------------
+
 import java.util.List;
 import java.util.Map;
+
+//~--- interfaces -------------------------------------------------------------
 
 /**
  * Interface StatisticsProviderMBean
  *
  * @author kobit
  */
-public interface StatisticsProviderMBean
-{
-
-//	/**
-//	 * Operation exposed for management
-//	 *
-//	 * @return java.util.Map<String, String>
-//	 */
-//	public Map getAllStats();
-
-	/**
-	 * Get Attribute exposed for management
-	 *
-	 * @return
-	 */
-	public List getComponentsNames();
-
-	/**
-	 * Get Attribute exposed for management
-	 *
-	 * @return
-	 */
-	public String getName();
+public interface StatisticsProviderMBean {
 
 	/**
 	 * Operation exposed for management
@@ -62,6 +44,102 @@ public interface StatisticsProviderMBean
 	public Map<String, String> getAllStats(int level);
 
 	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public int getCLIOQueueSize();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public float[] getCLPacketsPerSecHistory();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public int getCLQueueSize();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public float getCPUUsage();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public float[] getCPUUsageHistory();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public int getCPUsNumber();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public int getClusterCacheSize();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public float getClusterCompressionRatio();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public long getClusterNetworkBytes();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public float getClusterNetworkBytesPerSecond();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public long getClusterPackets();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public float getClusterPacketsPerSec();
+
+	/**
 	 * Operation exposed for management
 	 * @param compName The component name to provide statistics for
 	 * @param level Statistics level, 0 - All, 500 - Medium, 800 - Minimal
@@ -69,72 +147,214 @@ public interface StatisticsProviderMBean
 	 */
 	public Map<String, String> getComponentStats(String compName, int level);
 
-  public int getCPUsNumber();
+///**
+// * Operation exposed for management
+// *
+// * @return java.util.Map<String, String>
+// */
+//public Map getAllStats();
 
-	public long getUptime();
+	/**
+	 * Get Attribute exposed for management
+	 *
+	 * @return
+	 */
+	public List getComponentsNames();
 
-	public long getProcesCPUTime();
-
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
 	public int getConnectionsNumber();
 
-	public int getClusterCacheSize();
-
-	public int getQueueSize();
-
-	public int getSMQueueSize();
-
-	public int getCLQueueSize();
-
-	public int getCLIOQueueSize();
-
-	public long getQueueOverflow();
-
-	public long getSMPacketsNumber();
-
-	public long getClusterPackets();
-
-	public long getMessagesNumber();
-
-	public long getPresencesNumber();
-
-	public float getSMPacketsNumberPerSec();
-
-	public float getClusterPacketsPerSec();
-
-	public float getMessagesNumberPerSec();
-
-	public float getPresencesNumberPerSec();
-
-	public long getIQOtherNumber();
-
-	public float getIQOtherNumberPerSec();
-
-	public long getIQAuthNumber();
-
-	public float getCPUUsage();
-
-	public float getHeapMemUsage();
-
-	public float getNonHeapMemUsage();
-
-	public String getSystemDetails();
-
-	public float getClusterCompressionRatio();
-
-	public long getClusterNetworkBytes();
-	
-	public float getClusterNetworkBytesPerSecond();
-
-	public float[] getCPUUsageHistory();
-
-	public float[] getHeapUsageHistory();
-
-	public float[] getSMPacketsPerSecHistory();
-
-	public float[] getCLPacketsPerSecHistory();
-
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
 	public int[] getConnectionsNumberHistory();
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public float getHeapMemUsage();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public float[] getHeapUsageHistory();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public long getIQAuthNumber();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public long getIQOtherNumber();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public float getIQOtherNumberPerSec();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public long getMessagesNumber();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public float getMessagesNumberPerSec();
+
+	/**
+	 * Get Attribute exposed for management
+	 *
+	 * @return
+	 */
+	public String getName();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public float getNonHeapMemUsage();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public long getPresencesNumber();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public float getPresencesNumberPerSec();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public long getProcesCPUTime();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public long getQueueOverflow();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public int getQueueSize();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public long getSMPacketsNumber();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public float getSMPacketsNumberPerSec();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public float[] getSMPacketsPerSecHistory();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public int getSMQueueSize();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public int getServerConnections();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public int[] getServerConnectionsHistory();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public String getSystemDetails();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public long getUptime();
 }
 
 
+//~ Formatted in Sun Code Convention
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

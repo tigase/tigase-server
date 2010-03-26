@@ -53,8 +53,11 @@ import java.lang.management.ManagementFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -71,19 +74,31 @@ import javax.management.ObjectName;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class StatisticsCollector
-				extends AbstractComponentRegistrator<StatisticsContainer>
-				implements ShutdownHook {
+public class StatisticsCollector extends AbstractComponentRegistrator<StatisticsContainer>
+		implements ShutdownHook {
+
+	/**
+	 *
+	 */
+	public static final String STATS_ARCHIVIZERS = "--stats-archiv";
+
+	/**
+	 *
+	 */
+	public static final String STATS_ARCHIVIZERS_PROP_KEY = "stats-archiv";
 
 	/** Field description */
-	public static final String STATISTICS_MBEAN_NAME =
-		"tigase.stats:type=StatisticsProvider";
+	public static final String STATISTICS_MBEAN_NAME = "tigase.stats:type=StatisticsProvider";
 	private static final String STATS_XMLNS = "http://jabber.org/protocol/stats";
-	private static final Logger log = Logger.getLogger("tigase.stats.StatisticsCollector");
+	private static final Logger log = Logger.getLogger(StatisticsCollector.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
 
 	private ServiceEntity serviceEntity = null;
+	private StatisticsProvider sp = null;
+	private Map<String, StatisticsArchivizerIfc> archivizers = new ConcurrentSkipListMap<String,
+		StatisticsArchivizerIfc>();
+	private ArchivizerRunner arch_runner = new ArchivizerRunner();
 
 	// private ServiceEntity stats_modules = null;
 	private Level statsLevel = Level.INFO;
@@ -101,13 +116,11 @@ public class StatisticsCollector
 		ServiceEntity item = serviceEntity.findNode(component.getName());
 
 		if (item == null) {
-			item = new ServiceEntity(getName(),
-															 component.getName(),
-															 "Component: " + component.getName());
+			item = new ServiceEntity(getName(), component.getName(),
+					"Component: " + component.getName());
 			item.addFeatures(CMD_FEATURES);
-			item.addIdentities(new ServiceIdentity("automation",
-							"command-node",
-							"Component: " + component.getName()));
+			item.addIdentities(new ServiceIdentity("automation", "command-node",
+					"Component: " + component.getName()));
 			serviceEntity.addItems(item);
 		}
 	}
@@ -179,6 +192,28 @@ public class StatisticsCollector
 	 * Method description
 	 *
 	 *
+	 * @param params
+	 *
+	 * @return
+	 */
+	@Override
+	public Map<String, Object> getDefaults(Map<String, Object> params) {
+		Map<String, Object> defs = super.getDefaults(params);
+		String statsArchivizers = (String) params.get(STATS_ARCHIVIZERS);
+
+		if ((statsArchivizers != null) &&!statsArchivizers.isEmpty()) {
+			String[] archivs = statsArchivizers.split(",");
+
+			defs.put(STATS_ARCHIVIZERS_PROP_KEY, archivs);
+		}
+
+		return defs;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
 	 * @param from
 	 *
 	 * @return
@@ -225,18 +260,18 @@ public class StatisticsCollector
 
 				if (log.isLoggable(Level.FINEST)) {
 					log.finest("Processing discoItems for node: " + node + ", result: "
-										 + ((items == null) ? null : items.toString()));
+							+ ((items == null) ? null : items.toString()));
 				}
 
 				return items;
 			} else {
 				if (node == null) {
 					Element item = serviceEntity.getDiscoItem(null,
-									BareJID.toString(getName(), jid.toString()));
+						BareJID.toString(getName(), jid.toString()));
 
 					if (log.isLoggable(Level.FINEST)) {
 						log.finest("Processing discoItems, result: "
-											 + ((item == null) ? null : item.toString()));
+								+ ((item == null) ? null : item.toString()));
 					}
 
 					return Arrays.asList(item);
@@ -284,7 +319,7 @@ public class StatisticsCollector
 	 */
 	@Override
 	public void processPacket(final Packet packet, final Queue<Packet> results) {
-		if (!packet.isCommand() || (packet.getType() == StanzaType.result)) {
+		if ( !packet.isCommand() || (packet.getType() == StanzaType.result)) {
 			return;
 		}
 
@@ -298,11 +333,8 @@ public class StatisticsCollector
 			case GETSTATS : {
 
 				// Element statistics = new Element("statistics");
-				Element iq = ElementUtils.createIqQuery(iqc.getStanzaTo(),
-								iqc.getStanzaFrom(),
-								StanzaType.result,
-								iqc.getStanzaId(),
-								STATS_XMLNS);
+				Element iq = ElementUtils.createIqQuery(iqc.getStanzaTo(), iqc.getStanzaFrom(),
+					StanzaType.result, iqc.getStanzaId(), STATS_XMLNS);
 				Element query = iq.getChild("query");
 				StatisticsList stats = getAllStats();
 
@@ -310,8 +342,7 @@ public class StatisticsCollector
 					for (StatRecord record : stats) {
 						Element item = new Element("stat");
 
-						item.addAttribute("name",
-															record.getComponent() + "/" + record.getDescription());
+						item.addAttribute("name", record.getComponent() + "/" + record.getDescription());
 						item.addAttribute("units", record.getUnit());
 						item.addAttribute("value", record.getValue());
 						query.addChild(item);
@@ -333,7 +364,7 @@ public class StatisticsCollector
 
 				String nick = iqc.getTo().getLocalpart();
 
-				if (!getName().equals(nick)) {
+				if ( !getName().equals(nick)) {
 					return;
 				}
 
@@ -374,14 +405,14 @@ public class StatisticsCollector
 
 					if (log.isLoggable(Level.FINEST)) {
 						log.finest("Getting stats for component: " + spl[1] + ", level: "
-											 + statsLevel.getName());
+								+ statsLevel.getName());
 					}
 
 					getComponentStats(spl[1], list);
 
 					if (log.isLoggable(Level.FINEST)) {
 						log.finest("Stats loaded for component: " + spl[1] + ", level: "
-											 + statsLevel.getName());
+								+ statsLevel.getName());
 					}
 				}
 
@@ -391,26 +422,21 @@ public class StatisticsCollector
 					for (StatRecord rec : list) {
 						if (rec.getType() == StatisticType.LIST) {
 							Command.addFieldMultiValue(result,
-																				 XMLUtils.escape(rec.getComponent() + "/"
-																				 + rec.getDescription()),
-																				 rec.getListValue());
+									XMLUtils.escape(rec.getComponent() + "/" + rec.getDescription()),
+										rec.getListValue());
 						} else {
 							Command.addFieldValue(result,
-																		XMLUtils.escape(rec.getComponent() + "/"
-																		+ rec.getDescription()),
-																		XMLUtils.escape(rec.getValue()));
+									XMLUtils.escape(rec.getComponent() + "/" + rec.getDescription()),
+										XMLUtils.escape(rec.getValue()));
 						}
 					}
 				}
 
-				Command.addFieldValue(result,
-															"Stats level",
-															statsLevel.getName(),
-															"Stats level",
-															new String[] { Level.INFO.getName(), Level.FINE.getName(),
-								Level.FINER.getName(), Level.FINEST.getName() },
-															new String[] { Level.INFO.getName(), Level.FINE.getName(),
-								Level.FINER.getName(), Level.FINEST.getName() });
+				Command.addFieldValue(result, "Stats level", statsLevel.getName(), "Stats level",
+						new String[] { Level.INFO.getName(),
+						Level.FINE.getName(), Level.FINER.getName(),
+						Level.FINEST.getName() }, new String[] { Level.INFO.getName(),
+						Level.FINE.getName(), Level.FINER.getName(), Level.FINEST.getName() });
 				results.offer(result);
 
 				if (log.isLoggable(Level.FINEST)) {
@@ -437,20 +463,16 @@ public class StatisticsCollector
 	public void setName(String name) {
 		super.setName(name);
 		serviceEntity = new ServiceEntity(name, "stats", "Server statistics");
-		serviceEntity.addIdentities(new ServiceIdentity("component",
-						"stats",
-						"Server statistics"),
-																new ServiceIdentity("automation",
-						"command-node",
-						"All statistics"),
-																new ServiceIdentity("automation",
-						"command-list",
+		serviceEntity.addIdentities(new ServiceIdentity("component", "stats",
+				"Server statistics"), new ServiceIdentity("automation", "command-node",
+					"All statistics"), new ServiceIdentity("automation", "command-list",
 						"Statistics retrieving commands"));
 		serviceEntity.addFeatures(DEF_FEATURES);
 		serviceEntity.addFeatures(CMD_FEATURES);
 
 		try {
-			StatisticsProvider sp = new StatisticsProvider(this);
+			sp = new StatisticsProvider(this);
+
 			String objName = STATISTICS_MBEAN_NAME;
 			ObjectName on = new ObjectName(objName);
 
@@ -461,6 +483,23 @@ public class StatisticsCollector
 		}
 
 		TigaseRuntime.getTigaseRuntime().addShutdownHook(this);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param props
+	 */
+	@Override
+	public void setProperties(Map<String, Object> props) {
+		super.setProperties(props);
+
+		String[] archivs = (String[]) props.get(STATS_ARCHIVIZERS_PROP_KEY);
+
+		if (archivs != null) {
+			initStatsArchivizers(archivs, props);
+		}
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -483,7 +522,96 @@ public class StatisticsCollector
 		return sb.toString();
 	}
 
-	protected void statsUpdated() {}
+	protected void statsUpdated() {
+		synchronized (arch_runner) {
+			arch_runner.notifyAll();
+		}
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	private Map<String, Object> getArchivizerConf(String name, Map<String, Object> props) {
+		Map<String, Object> result = new LinkedHashMap<String, Object>();
+		String key_start = STATS_ARCHIVIZERS_PROP_KEY + "/" + name + "/";
+
+		for (Map.Entry<String, Object> entry : props.entrySet()) {
+			if (entry.getKey().startsWith(key_start)) {
+				String key = entry.getKey().substring(key_start.length());
+
+				log.config("Found " + name + " property: " + key + " = " + entry.getValue());
+				result.put(key, entry.getValue());
+			}
+		}
+
+		return result;
+	}
+
+	//~--- methods --------------------------------------------------------------
+
+	private void initStatsArchivizers(String[] archivs, Map<String, Object> props) {
+		for (String stat_arch_key : archivizers.keySet()) {
+			StatisticsArchivizerIfc stat_arch = archivizers.remove(stat_arch_key);
+
+			if (stat_arch != null) {
+				stat_arch.release();
+			}
+		}
+
+		for (String arch_prop : archivs) {
+			try {
+				String[] arch_prop_a = arch_prop.split(":");
+				String arch_class = arch_prop_a[0];
+				String arch_name = arch_prop_a[1];
+				StatisticsArchivizerIfc stat_arch =
+					(StatisticsArchivizerIfc) Class.forName(arch_class).newInstance();
+
+				stat_arch.init(getArchivizerConf(arch_name, props));
+				archivizers.put(arch_name, stat_arch);
+				log.config("Loaded statistics archivizer: " + arch_name + " for class: " + arch_class);
+			} catch (Exception e) {
+				log.log(Level.SEVERE, "Can't initialize statistics archivizer: " + arch_prop, e);
+			}
+		}
+	}
+
+	//~--- inner classes --------------------------------------------------------
+
+	private class ArchivizerRunner extends Thread {
+		private boolean stopped = false;
+
+		//~--- constructors -------------------------------------------------------
+
+		private ArchivizerRunner() {
+			super("stats-archivizer");
+			setDaemon(true);
+			start();
+		}
+
+		//~--- methods ------------------------------------------------------------
+
+		/**
+		 * Method description
+		 *
+		 */
+		@Override
+		public void run() {
+			while ( !stopped) {
+				try {
+					synchronized (this) {
+						this.wait();
+					}
+
+					for (Map.Entry<String, StatisticsArchivizerIfc> archiv_entry :
+							archivizers.entrySet()) {
+						archiv_entry.getValue().execute(sp);
+					}
+				} catch (InterruptedException ex) {
+
+					// Ignore...
+				}
+			}
+		}
+	}
 }
 
 
