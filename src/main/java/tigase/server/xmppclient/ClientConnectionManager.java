@@ -441,6 +441,8 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 					log.fine("Service stopped, before stream:stream received");
 				}
 			}
+
+			serv.stop();
 		}
 	}
 
