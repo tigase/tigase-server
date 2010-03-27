@@ -680,6 +680,7 @@ public abstract class RepositoryAccess {
 	 * @param authProps
 	 */
 	public void queryAuth(Map<String, Object> authProps) {
+		authProps.put(UserAuthRepository.SERVER_NAME_KEY, getDomain());
 		authRepo.queryAuth(authProps);
 
 		if (domain.isAnonymousEnabled()
