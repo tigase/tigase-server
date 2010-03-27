@@ -102,7 +102,7 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 	private String DEF_HOSTNAME_PROP_VAL = DNSResolver.getDefaultHostname();
 	private JID compId = null;
 	private String name = null;
-	private String defHostname = DEF_HOSTNAME_PROP_VAL;
+	private BareJID defHostname = BareJID.bareJIDInstanceNS(DEF_HOSTNAME_PROP_VAL);
 	private Map<String, CommandIfc> scriptCommands = new ConcurrentHashMap<String, CommandIfc>();
 	protected Set<BareJID> admins = new ConcurrentSkipListSet<BareJID>();
 	private ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
@@ -142,7 +142,7 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 	 *
 	 * @return
 	 */
-	public String getDefHostName() {
+	public BareJID getDefHostName() {
 		return defHostname;
 	}
 
@@ -549,7 +549,7 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 		this.name = name;
 
 		try {
-			compId = JID.jidInstance(name, defHostname, null);
+			compId = JID.jidInstance(name, defHostname.getDomain(), null);
 		} catch (TigaseStringprepException ex) {
 			log.log(Level.WARNING, "Problem setting component ID: ", ex);
 		}
@@ -569,7 +569,7 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 			log.log(Level.WARNING, "Problem setting component ID: ", ex);
 		}
 
-		defHostname = (String) props.get(DEF_HOSTNAME_PROP_KEY);
+		defHostname = BareJID.bareJIDInstanceNS((String) props.get(DEF_HOSTNAME_PROP_KEY));
 
 		String[] admins_tmp = (String[]) props.get(ADMINS_PROP_KEY);
 

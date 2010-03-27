@@ -63,7 +63,7 @@ import java.util.logging.Logger;
  * @version $Rev$
  */
 public class BoshConnectionManager extends ClientConnectionManager
-				implements BoshSessionTaskHandler {
+		implements BoshSessionTaskHandler {
 
 	/**
 	 * Variable <code>log</code> is a class logger.
@@ -83,7 +83,6 @@ public class BoshConnectionManager extends ClientConnectionManager
 
 //private static final String HOSTNAMES_PROP_KEY = "hostnames";
 //private String[] HOSTNAMES_PROP_VAL = {"localhost", "hostname"};
-
 //private RoutingsContainer routings = null;
 //private Set<String> hostnames = new TreeSet<String>();
 	private long max_wait = MAX_WAIT_DEF_PROP_VAL;
@@ -223,9 +222,8 @@ public class BoshConnectionManager extends ClientConnectionManager
 					String hostname = p.getAttribute("to");
 
 					if ((hostname != null) && isLocalDomain(hostname)) {
-						bs = new BoshSession(getDefHostName(),
-																 JID.jidInstanceNS(routings.computeRouting(hostname)),
-																 this);
+						bs = new BoshSession(getDefHostName().getDomain(),
+								JID.jidInstanceNS(routings.computeRouting(hostname)), this);
 						sid = bs.getSid();
 						sessions.put(sid, bs);
 					} else {
@@ -235,8 +233,7 @@ public class BoshConnectionManager extends ClientConnectionManager
 							serv.sendErrorAndStop(Authorization.NOT_ALLOWED, p, "Invalid hostname.");
 						} catch (Exception e) {
 							log.log(Level.WARNING,
-											"Problem sending invalid hostname error for sid =  " + sid,
-											e);
+									"Problem sending invalid hostname error for sid =  " + sid, e);
 						}
 					}
 				} else {
@@ -249,15 +246,8 @@ public class BoshConnectionManager extends ClientConnectionManager
 				if (bs != null) {
 					synchronized (bs) {
 						if (sid_str == null) {
-							bs.init(p,
-											serv,
-											max_wait,
-											min_polling,
-											max_inactivity,
-											concurrent_requests,
-											hold_requests,
-											max_pause,
-											out_results);
+							bs.init(p, serv, max_wait, min_polling, max_inactivity, concurrent_requests,
+									hold_requests, max_pause, out_results);
 						} else {
 							bs.processSocketPacket(p, serv, out_results);
 						}
@@ -383,22 +373,24 @@ public class BoshConnectionManager extends ClientConnectionManager
 	 */
 	public String xmppStreamOpened(BoshIOService serv, Map<String, String> attribs) {
 		if (log.isLoggable(Level.FINE)) {
-			log.fine("Ups, what just happened? Stream open. Hey, this is a Bosh connection manager. c2s and s2s are not supported on the same port as Bosh yet.");
+			log.fine("Ups, what just happened? Stream open. Hey, this is a Bosh connection manager."
+					+ " c2s and s2s are not supported on the same port as Bosh yet.");
 		}
 
 		return "<?xml version='1.0'?><stream:stream" + " xmlns='jabber:client'"
-					 + " xmlns:stream='http://etherx.jabber.org/streams'" + " id='1'" + " from='"
-					 + getDefHostName() + "'" + " version='1.0' xml:lang='en'>" + "<stream:error>"
-					 + "<invalid-namespace xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>"
-					 + "<text xmlns='urn:ietf:params:xml:ns:xmpp-streams' xml:lang='langcode'>"
-					 + "Ups, what just happened? Stream open. Hey, this is a Bosh connection manager. c2s and s2s are not supported on the same port... yet."
-					 + "</text>" + "</stream:error>" + "</stream:stream>"
+				+ " xmlns:stream='http://etherx.jabber.org/streams'" + " id='1'" + " from='"
+				+ getDefHostName() + "'" + " version='1.0' xml:lang='en'>" + "<stream:error>"
+				+ "<invalid-namespace xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>"
+				+ "<text xmlns='urn:ietf:params:xml:ns:xmpp-streams' xml:lang='langcode'>"
+				+ "Ups, what just happened? Stream open. Hey, this is a Bosh connection manager. "
+				+ "c2s and s2s are not supported on the same port... yet." + "</text>"
+				+ "</stream:error>" + "</stream:stream>"
 		;
 	}
 
 	@Override
 	protected JID changeDataReceiver(Packet packet, JID newAddress, String command_sessionId,
-																	 XMPPIOService<Object> serv) {
+			XMPPIOService<Object> serv) {
 		BoshSession session = getBoshSession(packet.getTo());
 
 		if (session != null) {
@@ -496,7 +488,7 @@ public class BoshConnectionManager extends ClientConnectionManager
 					// Session is no longer active, respond with an error.
 					try {
 						addOutPacket(Authorization.ITEM_NOT_FOUND.getResponseMessage(packet,
-										"Connection gone.", false));
+								"Connection gone.", false));
 					} catch (PacketErrorTypeException e) {
 
 						// Hm, error already, ignoring...
@@ -546,7 +538,7 @@ public class BoshConnectionManager extends ClientConnectionManager
 	//~--- get methods ----------------------------------------------------------
 
 	private JID getFromAddress(String id) {
-		return JID.jidInstanceNS(getName(), getDefHostName(), id);
+		return JID.jidInstanceNS(getName(), getDefHostName().getDomain(), id);
 	}
 
 	//~--- inner classes --------------------------------------------------------
@@ -600,7 +592,7 @@ public class BoshConnectionManager extends ClientConnectionManager
 
 			// We are now ready to ask for features....
 			addOutPacket(Command.GETFEATURES.getPacket(packet.getFrom(), packet.getTo(),
-							StanzaType.get, UUID.randomUUID().toString(), null));
+					StanzaType.get, UUID.randomUUID().toString(), null));
 		}
 
 		/**

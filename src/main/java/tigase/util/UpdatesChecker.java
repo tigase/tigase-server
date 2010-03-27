@@ -1,4 +1,5 @@
-/*  Tigase Jabber/XMPP Server
+/*
+ *   Tigase Jabber/XMPP Server
  *  Copyright (C) 2004-2008 "Artur Hefczyc" <artur.hefczyc@tigase.org>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,20 +19,30 @@
  * Last modified by $Author$
  * $Date$
  */
+
 package tigase.util;
 
+//~--- non-JDK imports --------------------------------------------------------
+
+import tigase.server.AbstractMessageReceiver;
+import tigase.server.Packet;
+import tigase.server.XMPPServer;
+
+import tigase.xml.Element;
+
+//~--- JDK imports ------------------------------------------------------------
+
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.BufferedReader;
+
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.logging.Logger;
-import java.util.logging.Level;
 
-import tigase.server.XMPPServer;
-import tigase.server.Packet;
-import tigase.server.AbstractMessageReceiver;
-import tigase.xml.Element;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+//~--- classes ----------------------------------------------------------------
 
 /**
  * Describe class UpdatesChecker here.
@@ -44,48 +55,67 @@ import tigase.xml.Element;
  */
 public class UpdatesChecker extends Thread {
 
-  /**
-   * Variable <code>log</code> is a class logger.
-   */
-  private static final Logger log =
-    Logger.getLogger("tigase.util.UpdatesChecker");
-
+	/**
+	 * Variable <code>log</code> is a class logger.
+	 */
+	private static final Logger log = Logger.getLogger("tigase.util.UpdatesChecker");
 	private static final long SECOND = 1000;
 	private static final long MINUTE = 60 * SECOND;
-  private static final long HOUR = 60 * MINUTE;
+	private static final long HOUR = 60 * MINUTE;
 	private static final long DAY = 24 * HOUR;
 	private static final String VERSION_URL =
-    "http://www.tigase.org/files/downloads/tigase-server/descript.ion";
+		"http://www.tigase.org/files/downloads/tigase-server/descript.ion";
 	private static final String FILE_START = "tigase-server-";
 
+	//~--- fields ---------------------------------------------------------------
+
+	private int bugfix_ver = 0;
+	private String intro_msg = null;
+	private int major_ver = 0;
+	private int minor_ver = 0;
 	private AbstractMessageReceiver receiver = null;
 	private long interval = 7 * DAY;
 	private boolean stopped = false;
-	private String intro_msg = null;
 
-	private int major_ver = 0;
-	private int minor_ver = 0;
-	private int bugfix_ver = 0;
+	//~--- constructors ---------------------------------------------------------
 
-	public UpdatesChecker(long interval, AbstractMessageReceiver receiver,
-		String intro_msg) {
+	/**
+	 * Constructs ...
+	 *
+	 *
+	 * @param interval
+	 * @param receiver
+	 * @param intro_msg
+	 */
+	public UpdatesChecker(long interval, AbstractMessageReceiver receiver, String intro_msg) {
 		super();
 		this.interval = interval * DAY;
-		//		this.interval = 30*SECOND;
+
+		// this.interval = 30*SECOND;
 		this.receiver = receiver;
 		this.intro_msg = intro_msg;
 		setName("UpdatesChecker");
 	}
 
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 */
 	@Override
 	public void run() {
 		String version = XMPPServer.getImplementationVersion();
 		int idx = version.indexOf('-');
+
 		if (idx > 0) {
 			version = version.substring(0, idx);
 		}
+
 		log.info("Server version: " + version);
+
 		String[] nums = version.split("\\.");
+
 		try {
 			major_ver = Integer.parseInt(nums[0]);
 			minor_ver = Integer.parseInt(nums[1]);
@@ -95,38 +125,48 @@ public class UpdatesChecker extends Thread {
 		} catch (Exception e) {
 			log.log(Level.WARNING, "Problem parsing server version.... " + version, e);
 		}
-		while (!stopped) {
+
+		while ( !stopped) {
 			Element message = null;
+
 			try {
 				sleep(interval);
+
 				URLConnection connection = new URL(VERSION_URL).openConnection();
-				connection.setConnectTimeout(1000*60);
-				connection.setReadTimeout(1000*60);
+
+				connection.setConnectTimeout(1000 * 60);
+				connection.setReadTimeout(1000 * 60);
+
 				BufferedReader buffr =
-          new BufferedReader(new InputStreamReader(connection.getInputStream()));
+					new BufferedReader(new InputStreamReader(connection.getInputStream()));
 				String line = null;
 				int major = 0;
 				int minor = 0;
 				int bugfix = 0;
 				String build = "";
+
 				while ((line = buffr.readLine()) != null) {
 					if (line.startsWith(FILE_START)) {
 						String file = line.substring(FILE_START.length());
+
 						idx = file.indexOf('-');
 						version = file.substring(0, idx);
 						log.info("Found version: " + version);
 						nums = version.split("\\.");
+
 						try {
 							int major_t = Integer.parseInt(nums[0]);
 							int minor_t = Integer.parseInt(nums[1]);
 							int bugfix_t = Integer.parseInt(nums[2]);
-							if ((major_t > major)
-								|| (major_t == major && minor_t > minor)
-								|| (major_t == major && minor_t == minor && bugfix_t > bugfix)) {
+
+							if ((major_t > major) || ((major_t == major) && (minor_t > minor))
+									|| ((major_t == major) && (minor_t == minor) && (bugfix_t > bugfix))) {
 								major = major_t;
 								minor = minor_t;
 								bugfix = bugfix_t;
+
 								int b_idx = file.indexOf('.', idx);
+
 								build = file.substring(idx, b_idx);
 							}
 						} catch (NumberFormatException e) {
@@ -134,37 +174,41 @@ public class UpdatesChecker extends Thread {
 						}
 					}
 				}
- 				if ((major > major_ver)
-					|| (major == major_ver && minor > minor_ver)
-					|| (major == major_ver && minor == minor_ver && bugfix > bugfix_ver)) {
+
+				if ((major > major_ver) || ((major == major_ver) && (minor > minor_ver))
+						|| ((major == major_ver) && (minor == minor_ver) && (bugfix > bugfix_ver))) {
 					String os_name = System.getProperty("os.name");
 					String link = null;
+
 					if (os_name.toLowerCase().contains("windows")) {
 						link = "http://www.tigase.org/files/downloads/tigase-server/tigase-server-"
-            + major + "." + minor + "." + bugfix + build + ".exe";
+								+ major + "." + minor + "." + bugfix + build + ".exe";
 					} else {
 						link = "http://www.tigase.org/files/downloads/tigase-server/tigase-server-"
-            + major + "." + minor + "." + bugfix + build + ".tar.gz";
+								+ major + "." + minor + "." + bugfix + build + ".tar.gz";
 					}
-					message = new Element("message",
-            new String[] {"to", "from"},
-						new String[] {receiver.getDefHostName(),
-													"updates.checker@" + receiver.getDefHostName()});
+
+					message = new Element("message", new String[] { "to", "from" },
+							new String[] { receiver.getDefHostName().getDomain(),
+							"updates.checker@" + receiver.getDefHostName() });
+
 					Element subject = new Element("subject",
 						"Updates checker - new version of the Tigase server");
+
 					message.addChild(subject);
+
 					Element body = new Element("body",
-						"You are currently using: '"
-						+ major_ver + "." + minor_ver + "." + bugfix_ver + "' version of Tigase"
-						+ " server. A new version of the server has been released: '"
-						+ major + "." + minor + "." + bugfix + "' and it is available for"
-						+ " download at address: " + link + "\n\n" + intro_msg);
+						"You are currently using: '" + major_ver + "." + minor_ver + "." + bugfix_ver
+						+ "' version of Tigase"
+						+ " server. A new version of the server has been released: '" + major + "."
+						+ minor + "." + bugfix + "' and it is available for" + " download at address: "
+						+ link + "\n\n" + intro_msg);
+
 					message.addChild(body);
 					receiver.addPacket(Packet.packetInstance(message));
 				}
 			} catch (TigaseStringprepException e) {
-				log.log(Level.WARNING, "Incorrect stanza address settings: " + message.toString(),
-						e);
+				log.log(Level.WARNING, "Incorrect stanza address settings: " + message.toString(), e);
 			} catch (IOException e) {
 				log.log(Level.WARNING, "Can not check updates for URL: " + VERSION_URL, e);
 			} catch (InterruptedException e) {
@@ -174,5 +218,10 @@ public class UpdatesChecker extends Thread {
 			}
 		}
 	}
-
 }
+
+
+//~ Formatted in Sun Code Convention
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

@@ -71,7 +71,7 @@ import java.util.logging.Logger;
  * @version $Rev$
  */
 public class Gateway extends AbstractMessageReceiver
-				implements Configurable, XMPPService, GatewayListener {
+		implements Configurable, XMPPService, GatewayListener {
 	private static final String AUTHORIZED_KEY = "authorized-key";
 
 	/** Field description */
@@ -87,8 +87,7 @@ public class Gateway extends AbstractMessageReceiver
 	public static final String GW_CLASS_NAME_PROP_KEY = "gw-class-name";
 
 	/** Field description */
-	public static final String GW_CLASS_NAME_PROP_VAL =
-		"tigase.extras.gateway.MsnConnection";
+	public static final String GW_CLASS_NAME_PROP_VAL = "tigase.extras.gateway.MsnConnection";
 
 	/** Field description */
 	public static final String GW_DOMAIN_NAME_PROP_KEY = "gw-domain-name";
@@ -138,7 +137,7 @@ public class Gateway extends AbstractMessageReceiver
 	private ServiceEntity serviceEntity = null;
 	private boolean is_moderated = GW_MODERATED_PROP_VAL;
 	private Map<String, GatewayConnection> gw_connections = new LinkedHashMap<String,
-																														GatewayConnection>();
+		GatewayConnection>();
 	private String gw_class_name = GW_CLASS_NAME_PROP_VAL;
 	private String[] admins = ADMINS_PROP_VAL;
 
@@ -329,9 +328,8 @@ public class Gateway extends AbstractMessageReceiver
 
 		for (JID username : jids) {
 			try {
-				addOutPacket(Packet.packetInstance(new Element(PRESENCE_ELNAME,
-								new String[] { "from", "to" },
-								new String[] { getComponentId().toString(), username.toString() })));
+				addOutPacket(Packet.packetInstance(new Element(PRESENCE_ELNAME, new String[] { "from",
+						"to" }, new String[] { getComponentId().toString(), username.toString() })));
 			} catch (TigaseStringprepException ex) {
 				Logger.getLogger(Gateway.class.getName()).log(Level.SEVERE, null, ex);
 			}
@@ -349,10 +347,9 @@ public class Gateway extends AbstractMessageReceiver
 
 		for (JID username : jids) {
 			try {
-				addOutPacket(Packet.packetInstance(new Element(PRESENCE_ELNAME,
-								new String[] { "from", "to", "type" },
-								new String[] { getComponentId().toString(), username.toString(),
-															 "unavailable" })));
+				addOutPacket(Packet.packetInstance(new Element(PRESENCE_ELNAME, new String[] { "from",
+						"to", "type" }, new String[] { getComponentId().toString(), username.toString(),
+						"unavailable" })));
 			} catch (TigaseStringprepException ex) {
 				Logger.getLogger(Gateway.class.getName()).log(Level.SEVERE, null, ex);
 			}
@@ -361,10 +358,9 @@ public class Gateway extends AbstractMessageReceiver
 
 			for (RosterItem item : roster) {
 				String from = formatJID(item.getBuddyId());
-				Element pres_el = new Element(PRESENCE_ELNAME,
-																			new String[] { "to", "from", "type" },
-																			new String[] { username.toString(), from,
-								"unavailable" });
+				Element pres_el = new Element(PRESENCE_ELNAME, new String[] { "to", "from", "type" },
+					new String[] { username.toString(),
+						from, "unavailable" });
 
 				try {
 					Packet presence = Packet.packetInstance(pres_el);
@@ -436,13 +432,13 @@ public class Gateway extends AbstractMessageReceiver
 				}
 
 				addOutPacket(Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet,
-								"Gateway is not connected.", true));
+						"Gateway is not connected.", true));
 			}
 		} catch (TigaseStringprepException ex) {
 			Logger.getLogger(Gateway.class.getName()).log(Level.SEVERE, null, ex);
 		} catch (PacketErrorTypeException e) {
 			log.info("This must have been an error already, dropping: " + packet.toString()
-							 + ", exception: " + e);
+					+ ", exception: " + e);
 		}
 	}
 
@@ -498,11 +494,10 @@ public class Gateway extends AbstractMessageReceiver
 //    if (!res_uri.contains("autoCreateUser=true")) {
 //      res_uri += "&autoCreateUser=true";
 //    } // end of if (!res_uri.contains("autoCreateUser=true"))
-			repository = RepositoryFactory.getUserRepository(getName(), cls_name, res_uri,
-							null);
+			repository = RepositoryFactory.getUserRepository(getName(), cls_name, res_uri, null);
 
 			try {
-				repository.addUser(getComponentId().toString());
+				repository.addUser(getComponentId().getBareJID());
 			} catch (UserExistsException e) {    /* Ignore, this is correct and expected */
 			}
 		} catch (Exception e) {
@@ -527,36 +522,26 @@ public class Gateway extends AbstractMessageReceiver
 
 		try {
 			if (item.getStatus().getType() != null) {
-				repository.setData(getComponentId().toString(),
-													 roster_node,
-													 PRESENCE_TYPE,
-													 item.getStatus().getType());
+				repository.setData(getComponentId().getBareJID(), roster_node, PRESENCE_TYPE,
+						item.getStatus().getType());
 			} else {
-				repository.setData(getComponentId().toString(),
-													 roster_node,
-													 PRESENCE_TYPE,
-													 "null");
+				repository.setData(getComponentId().getBareJID(), roster_node, PRESENCE_TYPE, "null");
 			}
 
 			if (item.getStatus().getShow() != null) {
-				repository.setData(getComponentId().toString(),
-													 roster_node,
-													 PRESENCE_SHOW,
-													 item.getStatus().getShow());
+				repository.setData(getComponentId().getBareJID(), roster_node, PRESENCE_SHOW,
+						item.getStatus().getShow());
 			} else {
-				repository.setData(getComponentId().toString(),
-													 roster_node,
-													 PRESENCE_SHOW,
-													 "null");
+				repository.setData(getComponentId().getBareJID(), roster_node, PRESENCE_SHOW, "null");
 			}
 		} catch (TigaseDBException e) {
 			log.log(Level.WARNING, "Problem updating repository data", e);
 		}
 
 		for (JID username : jids) {
-			Element pres_el = new Element(PRESENCE_ELNAME,
-																		new String[] { "to", "from" },
-																		new String[] { username.toString(), from });
+			Element pres_el = new Element(PRESENCE_ELNAME, new String[] { "to", "from" },
+				new String[] { username.toString(),
+					from });
 
 			if (item.getStatus().getType() != null) {
 				pres_el.setAttribute("type", item.getStatus().getType());
@@ -601,45 +586,33 @@ public class Gateway extends AbstractMessageReceiver
 			String authorized = "false";
 
 			try {
-				authorized = repository.getData(getComponentId().toString(), roster_node,
-																				AUTHORIZED_KEY);
+				authorized = repository.getData(getComponentId().getBareJID(), roster_node,
+						AUTHORIZED_KEY);
 
 				if (authorized == null) {
 
 					// Add item to the roster and send subscription request to user...
 					authorized = "false";
-					repository.setData(getComponentId().toString(),
-														 roster_node,
-														 AUTHORIZED_KEY,
-														 authorized);
-					repository.setData(getComponentId().toString(),
-														 roster_node,
-														 NAME_KEY,
-														 item.getName());
+					repository.setData(getComponentId().getBareJID(), roster_node, AUTHORIZED_KEY,
+							authorized);
+					repository.setData(getComponentId().getBareJID(), roster_node, NAME_KEY,
+							item.getName());
 				}
 
 				if (item.getStatus().getType() != null) {
-					repository.setData(getComponentId().toString(),
-														 roster_node,
-														 PRESENCE_TYPE,
-														 item.getStatus().getType());
+					repository.setData(getComponentId().getBareJID(), roster_node, PRESENCE_TYPE,
+							item.getStatus().getType());
 				} else {
-					repository.setData(getComponentId().toString(),
-														 roster_node,
-														 PRESENCE_TYPE,
-														 "null");
+					repository.setData(getComponentId().getBareJID(), roster_node, PRESENCE_TYPE,
+							"null");
 				}
 
 				if (item.getStatus().getShow() != null) {
-					repository.setData(getComponentId().toString(),
-														 roster_node,
-														 PRESENCE_SHOW,
-														 item.getStatus().getShow());
+					repository.setData(getComponentId().getBareJID(), roster_node, PRESENCE_SHOW,
+							item.getStatus().getShow());
 				} else {
-					repository.setData(getComponentId().toString(),
-														 roster_node,
-														 PRESENCE_SHOW,
-														 "null");
+					repository.setData(getComponentId().getBareJID(), roster_node, PRESENCE_SHOW,
+							"null");
 				}
 			} catch (TigaseDBException e) {
 				log.log(Level.WARNING, "Problem updating repository data", e);
@@ -648,8 +621,8 @@ public class Gateway extends AbstractMessageReceiver
 			for (JID username : jids) {
 				try {
 					Packet presence = Packet.packetInstance(new Element(PRESENCE_ELNAME,
-									new String[] { "to", "from", "type" },
-									new String[] { username.toString(), from, "subscribe" }));
+						new String[] { "to",
+							"from", "type" }, new String[] { username.toString(), from, "subscribe" }));
 
 					if (log.isLoggable(Level.FINEST)) {
 						log.finest("Sending out presence: " + presence);
@@ -676,18 +649,16 @@ public class Gateway extends AbstractMessageReceiver
 	}
 
 	private GatewayConnection findConnection(Packet packet, boolean create)
-					throws TigaseStringprepException {
+			throws TigaseStringprepException {
 		JID id = packet.getStanzaFrom().copyWithoutResource();
 		GatewayConnection conn = gw_connections.get(id.toString());
 
 		if ((conn != null) ||!create) {
 			if (conn != null) {
 				conn.addJid(packet.getStanzaFrom());
-				addOutPacket(Packet.packetInstance(new Element(PRESENCE_ELNAME,
-								new String[] { "from", "to" },
-								new String[] { getComponentId().toString(),
-															 packet.getStanzaFrom().toString() }), getComponentId(),
-															 packet.getStanzaFrom()));
+				addOutPacket(Packet.packetInstance(new Element(PRESENCE_ELNAME, new String[] { "from",
+						"to" }, new String[] { getComponentId().toString(),
+						packet.getStanzaFrom().toString() }), getComponentId(), packet.getStanzaFrom()));
 				updateRosterPresence(conn.getRoster(), packet.getStanzaFrom());
 			}
 
@@ -696,24 +667,21 @@ public class Gateway extends AbstractMessageReceiver
 
 		try {
 			if (is_moderated) {
-				String moderated = repository.getData(getComponentId().toString(),
-								id.toString(),
-								moderated_key);
+				String moderated = repository.getData(getComponentId().getBareJID(), id.toString(),
+					moderated_key);
 
 				if ((moderated == null) || moderated.equals(moderated_true)) {
 					addOutPacket(Authorization.NOT_ALLOWED.getResponseMessage(packet,
-									"Administrator approval awaiting.", true));
+							"Administrator approval awaiting.", true));
 
 					return null;
 				}
 			}
 
-			String username = repository.getData(getComponentId().toString(),
-							id.toString(),
-							username_key);
-			String password = repository.getData(getComponentId().toString(),
-							id.toString(),
-							password_key);
+			String username = repository.getData(getComponentId().getBareJID(), id.toString(),
+				username_key);
+			String password = repository.getData(getComponentId().getBareJID(), id.toString(),
+				password_key);
 
 			if ((username != null) && (password != null)) {
 				conn = gwInstance();
@@ -738,8 +706,7 @@ public class Gateway extends AbstractMessageReceiver
 	@SuppressWarnings("unchecked")
 	private GatewayConnection gwInstance() {
 		try {
-			Class<GatewayConnection> cls =
-				(Class<GatewayConnection>) Class.forName(gw_class_name);
+			Class<GatewayConnection> cls = (Class<GatewayConnection>) Class.forName(gw_class_name);
 			GatewayConnection gc = cls.newInstance();
 
 			return gc;
@@ -754,7 +721,7 @@ public class Gateway extends AbstractMessageReceiver
 		if (packet.getType() == null) {
 			log.info("Bad gateway request: " + packet.toString());
 			addOutPacket(Authorization.BAD_REQUEST.getResponseMessage(packet,
-							"IQ request must have either 'set' or 'get' type.", true));
+					"IQ request must have either 'set' or 'get' type.", true));
 
 			return;
 		}
@@ -777,7 +744,7 @@ public class Gateway extends AbstractMessageReceiver
 	}
 
 	private void processLocalPacket(Packet packet)
-					throws PacketErrorTypeException, TigaseStringprepException {
+			throws PacketErrorTypeException, TigaseStringprepException {
 		if (packet.isXMLNS("/iq/query", "jabber:iq:register")) {
 			processRegister(packet);
 		}
@@ -829,37 +796,33 @@ public class Gateway extends AbstractMessageReceiver
 				String pres_show = "null";
 
 				try {
-					repository.setData(getComponentId().toString(),
-														 roster_node,
-														 AUTHORIZED_KEY,
-														 authorized);
-					pres_type = repository.getData(getComponentId().toString(), roster_node,
-																				 PRESENCE_TYPE);
-					pres_show = repository.getData(getComponentId().toString(), roster_node,
-																				 PRESENCE_SHOW);
+					repository.setData(getComponentId().getBareJID(), roster_node, AUTHORIZED_KEY,
+							authorized);
+					pres_type = repository.getData(getComponentId().getBareJID(), roster_node,
+							PRESENCE_TYPE);
+					pres_show = repository.getData(getComponentId().getBareJID(), roster_node,
+							PRESENCE_SHOW);
 					log.fine("Added buddy do repository for: " + buddy);
 				} catch (TigaseDBException e) {
 					log.log(Level.WARNING, "Problem updating repository data", e);
 				}
 
-				Element pres_el = new Element(PRESENCE_ELNAME,
-																			new String[] { "to", "from" },
-																			new String[] { packet.getStanzaFrom().toString(),
-								packet.getStanzaTo().toString() });
+				Element pres_el = new Element(PRESENCE_ELNAME, new String[] { "to", "from" },
+					new String[] { packet.getStanzaFrom().toString(),
+						packet.getStanzaTo().toString() });
 
-				if (!pres_type.equals("null")) {
+				if ( !pres_type.equals("null")) {
 					pres_el.setAttribute("type", pres_type);
 				}
 
-				if (!pres_show.equals("null")) {
+				if ( !pres_show.equals("null")) {
 					Element show = new Element("show", pres_show);
 
 					pres_el.addChild(show);
 				}
 
-				Packet presence = Packet.packetInstance(pres_el,
-								packet.getStanzaTo(),
-								packet.getStanzaFrom());
+				Packet presence = Packet.packetInstance(pres_el, packet.getStanzaTo(),
+					packet.getStanzaFrom());
 
 				if (log.isLoggable(Level.FINEST)) {
 					log.finest("Sending out presence: " + presence.toString());
@@ -913,7 +876,7 @@ public class Gateway extends AbstractMessageReceiver
 				log.fine("Received unsubscribed presence for buddy: " + buddy);
 
 				try {
-					repository.removeSubnode(getComponentId().toString(), roster_node);
+					repository.removeSubnode(getComponentId().getBareJID(), roster_node);
 					log.fine("Removed from repository buddy: " + buddy);
 				} catch (TigaseDBException e) {
 					log.log(Level.WARNING, "Problem updating repository data", e);
@@ -926,9 +889,7 @@ public class Gateway extends AbstractMessageReceiver
 						conn.removeBuddy(buddy);
 						log.fine("Removed from roster buddy: " + buddy);
 					} catch (GatewayException e) {
-						log.log(Level.WARNING,
-										"Problem with gateway when removing buddy: " + buddy,
-										e);
+						log.log(Level.WARNING, "Problem with gateway when removing buddy: " + buddy, e);
 					}
 				}
 			}
@@ -936,14 +897,13 @@ public class Gateway extends AbstractMessageReceiver
 	}
 
 	private void processRegister(Packet packet)
-					throws PacketErrorTypeException, TigaseStringprepException {
+			throws PacketErrorTypeException, TigaseStringprepException {
 		if (packet.getType() != null) {
 			switch (packet.getType()) {
 				case get :
 					addOutPacket(packet.okResult("<instructions>" + "Please enter your "
-																			 + gw_type.toUpperCase() + " account details"
-																			 + " into the fields below." + "</instructions>"
-																			 + "<username/>" + "<password/>", 1));
+							+ gw_type.toUpperCase() + " account details" + " into the fields below."
+								+ "</instructions>" + "<username/>" + "<password/>", 1));
 
 					break;
 
@@ -953,59 +913,54 @@ public class Gateway extends AbstractMessageReceiver
 					String new_password = packet.getElemCData("/iq/query/password");
 
 					try {
-						repository.setData(getComponentId().toString(),
-															 jid.toString(),
-															 username_key,
-															 new_username);
-						repository.setData(getComponentId().toString(),
-															 jid.toString(),
-															 password_key,
-															 new_password);
+						repository.setData(getComponentId().getBareJID(), jid.toString(), username_key,
+								new_username);
+						repository.setData(getComponentId().getBareJID(), jid.toString(), password_key,
+								new_password);
 						addOutPacket(packet.okResult((String) null, 0));
 						addOutPacket(Packet.packetInstance(new Element(PRESENCE_ELNAME,
-										new String[] { "to", "from", "type" },
-										new String[] { jid.toString(), packet.getStanzaTo().toString(),
-																	 "subscribe" }), packet.getStanzaTo(), jid));
+								new String[] { "to",
+								"from", "type" }, new String[] { jid.toString(),
+								packet.getStanzaTo().toString(), "subscribe" }), packet.getStanzaTo(), jid));
 
 						if (is_moderated &&!isAdmin(jid)) {
-							repository.setData(getComponentId().toString(),
-																 jid.toString(),
-																 moderated_key,
-																 moderated_true);
+							repository.setData(getComponentId().getBareJID(), jid.toString(), moderated_key,
+									moderated_true);
 							addOutPacket(Packet.packetInstance(new Element("message",
-											new Element[] { new Element("body",
+									new Element[] {
+										new Element("body",
 											"Your subscription to the gateway needs administrator approval."
-											+ " You will be notified when your request has been processed"
-											+ " and you will be able to use the gateway since then.") },
-											new String[] { "to", "from", "type", "id" },
-											new String[] { jid.toString(), packet.getStanzaTo().toString(),
-																		 "chat", "gw-ap-1" }), packet.getStanzaTo(), jid));
+												+ " You will be notified when your request has been processed"
+													+ " and you will be able to use the gateway since then.") }, new String[] {
+														"to",
+									"from", "type", "id" }, new String[] { jid.toString(),
+									packet.getStanzaTo().toString(), "chat", "gw-ap-1" }), packet.getStanzaTo(),
+									jid));
 							sendToAdmins(new Element("message",
-																			 new Element[] { new Element("body",
-											"Gateway subscription request is awaiting for: " + jid) },
-																			 new String[] { "from", "type", "id" },
-																			 new String[] { packet.getStanzaTo().toString(),
-											"chat", "gw-ap-1" }));
+									new Element[] {
+										new Element("body",
+											"Gateway subscription request is awaiting for: "
+												+ jid) }, new String[] { "from",
+									"type", "id" }, new String[] { packet.getStanzaTo().toString(), "chat",
+									"gw-ap-1" }));
 						} else {
-							repository.setData(getComponentId().toString(),
-																 jid.toString(),
-																 moderated_key,
-																 moderated_false);
+							repository.setData(getComponentId().getBareJID(), jid.toString(), moderated_key,
+									moderated_false);
 						}
 					} catch (tigase.db.UserNotFoundException e) {
 						log.warning("This is most likely configuration error, please make"
-												+ " sure you have set '&autoCreateUser=true' property in your"
-												+ " database connection string.");
+								+ " sure you have set '&autoCreateUser=true' property in your"
+									+ " database connection string.");
 						addOutPacket(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet,
-										"Please notify administrator with the message below:\n"
-										+ "This is most likely configuration error, please make"
+								"Please notify administrator with the message below:\n"
+									+ "This is most likely configuration error, please make"
 										+ " sure you have set '&autoCreateUser=true' property in your"
-										+ " database connection string.", true));
+											+ " database connection string.", true));
 					} catch (TigaseDBException e) {
 						log.log(Level.WARNING, "Database access error: ", e);
 						addOutPacket(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet,
-										"Please notify administrator with the message below:\n"
-										+ "Database access error: " + e, true));
+								"Please notify administrator with the message below:\n"
+									+ "Database access error: " + e, true));
 					}
 
 					break;
@@ -1042,7 +997,7 @@ public class Gateway extends AbstractMessageReceiver
 	}
 
 	private void updateRosterPresence(List<RosterItem> roster, JID... to)
-					throws TigaseStringprepException {
+			throws TigaseStringprepException {
 		if (roster == null) {
 
 			// It may happen when the transport's roster is not synchronized yet
@@ -1055,9 +1010,9 @@ public class Gateway extends AbstractMessageReceiver
 			String from = formatJID(item.getBuddyId());
 
 			for (JID username : to) {
-				Element pres_el = new Element(PRESENCE_ELNAME,
-																			new String[] { "to", "from" },
-																			new String[] { username.toString(), from });
+				Element pres_el = new Element(PRESENCE_ELNAME, new String[] { "to", "from" },
+					new String[] { username.toString(),
+						from });
 
 				if (item.getStatus().getType() != null) {
 					pres_el.setAttribute("type", item.getStatus().getType());

@@ -362,7 +362,7 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 			}
 		}
 
-		configRepo.setDefHostname(getDefHostName());
+		configRepo.setDefHostname(getDefHostName().getDomain());
 		configRepo.init(initProperties);
 
 		for (String prop : initSettings) {

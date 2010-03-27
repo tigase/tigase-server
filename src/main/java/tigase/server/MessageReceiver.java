@@ -22,7 +22,15 @@
 
 package tigase.server;
 
+//~--- non-JDK imports --------------------------------------------------------
+
+import tigase.xmpp.BareJID;
+
+//~--- JDK imports ------------------------------------------------------------
+
 import java.util.Queue;
+
+//~--- interfaces -------------------------------------------------------------
 
 /**
  * Interface MessageReceiver
@@ -38,27 +46,15 @@ import java.util.Queue;
  */
 public interface MessageReceiver extends ServerComponent {
 
-//   /**
-//    * Returns array of Strings. Each String should be a regular expression
-//    * defining destination addresses for which this receiver can process
-//    * messages. There can be more than one message receiver for each messages.
-//    *
-//    * @return a <code>String[]</code> value
-//    */
-//   String[] getLocalAddresses();
-
-	//Set<String> getRoutings();
-
-	boolean isInRegexRoutings(String address);
-
-  /**
+	/**
 	 * Describe <code>addPacket</code> method here.
-   *
+	 *
 	 * @param packet a <code>Packet</code> value
 	 * @return a <code>boolean</code> value <code>true</code> if packet has been
 	 * successfully added, <code>false</code> otherwise.
 	 */
 	boolean addPacket(Packet packet);
+
 	boolean addPacketNB(Packet packet);
 
 	/**
@@ -69,6 +65,23 @@ public interface MessageReceiver extends ServerComponent {
 	 */
 	boolean addPackets(Queue<Packet> packets);
 
+	//~--- get methods ----------------------------------------------------------
+
+	BareJID getDefHostName();
+
+///**
+// * Returns array of Strings. Each String should be a regular expression
+// * defining destination addresses for which this receiver can process
+// * messages. There can be more than one message receiver for each messages.
+// *
+// * @return a <code>String[]</code> value
+// */
+//String[] getLocalAddresses();
+	// Set<String> getRoutings();
+	boolean isInRegexRoutings(String address);
+
+	//~--- set methods ----------------------------------------------------------
+
 	/**
 	 * Describe <code>setParent</code> method here.
 	 *
@@ -76,8 +89,13 @@ public interface MessageReceiver extends ServerComponent {
 	 */
 	void setParent(MessageReceiver msg_rec);
 
-	String getDefHostName();
+	//~--- methods --------------------------------------------------------------
 
 	void start();
-
 }
+
+
+//~ Formatted in Sun Code Convention
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

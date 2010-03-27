@@ -29,6 +29,7 @@ import tigase.db.UserAuthRepository;
 import tigase.db.UserExistsException;
 import tigase.db.UserRepository;
 
+import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 import tigase.xmpp.impl.roster.RosterAbstract;
 
@@ -54,15 +55,15 @@ import java.util.List;
  */
 public class RepositoryUtils {
 	private static long counter = 0;
-	private static String user1 = "user111@hostname";
-	private static String user2 = "user222@hostname";
-	private static String user3 = "user333@hostname";
+	private static BareJID user1 = BareJID.bareJIDInstanceNS("user111@hostname");
+	private static BareJID user2 = BareJID.bareJIDInstanceNS("user222@hostname");
+	private static BareJID user3 = BareJID.bareJIDInstanceNS("user333@hostname");
 	private static String src_class = "tigase.db.jdbc.JDBCRepository";
 	private static String src_uri = null;
 	private static String dst_class = null;
 	private static String dst_uri = null;
 	private static String content = null;
-	private static String user = null;
+	private static BareJID user = null;
 	private static boolean simple_test = false;
 	private static boolean add_user_test = false;
 	private static boolean copy_repos = false;
@@ -111,13 +112,12 @@ public class RepositoryUtils {
 	 *
 	 * @throws Exception
 	 */
-	public static boolean checkContact(JID user, UserRepository repo, String cont)
+	public static boolean checkContact(BareJID user, UserRepository repo, String cont)
 			throws Exception {
 
 		// String[] keys = repo.getKeys(user, "roster/"+contact);
 		JID contact = JID.jidInstanceNS(cont);
-		String[] vals = repo.getDataList(user.toString(), "roster/" + contact,
-											RosterAbstract.GROUPS);
+		String[] vals = repo.getDataList(user, "roster/" + contact, RosterAbstract.GROUPS);
 
 		if ((vals == null) || (vals.length == 0)) {
 			System.out.println("      Empty groups list");
@@ -150,7 +150,8 @@ public class RepositoryUtils {
 	 *
 	 * @throws Exception
 	 */
-	public static void copyNode(String user, String node, UserRepository src, UserRepository dst)
+	public static void copyNode(BareJID user, String node, UserRepository src,
+			UserRepository dst)
 			throws Exception {
 		String[] keys = src.getKeys(user, node);
 
@@ -187,12 +188,12 @@ public class RepositoryUtils {
 		if (user != null) {
 			copyUser(user, src, dst);
 		} else {
-			List<String> users = src.getUsers();
+			List<BareJID> users = src.getUsers();
 
 			if (users != null) {
 				System.out.println("Found " + users.size() + " in the source repository.");
 
-				for (String usr : users) {
+				for (BareJID usr : users) {
 					System.out.println("Found " + usr + " in the source repository.");
 					copyUser(usr, src, dst);
 				}    // end of for (String user: users)
@@ -216,10 +217,10 @@ public class RepositoryUtils {
 		if (user != null) {
 			copyUser(user, src, dst);
 		} else {
-			List<String> users = src.getUsers();
+			List<BareJID> users = src.getUsers();
 
 			if (users != null) {
-				for (String usr : users) {
+				for (BareJID usr : users) {
 					copyUser(usr, src, dst);
 				}    // end of for (String user: users)
 			} else {
@@ -238,9 +239,9 @@ public class RepositoryUtils {
 	 *
 	 * @throws Exception
 	 */
-	public static void copyUser(String user, UserRepository src, UserRepository dst)
+	public static void copyUser(BareJID user, UserRepository src, UserRepository dst)
 			throws Exception {
-		if ((user == null) || user.isEmpty()) {
+		if (user == null) {
 			return;
 		}
 
@@ -265,9 +266,9 @@ public class RepositoryUtils {
 	 *
 	 * @throws Exception
 	 */
-	public static void copyUser(String user, UserRepository src, UserAuthRepository dst)
+	public static void copyUser(BareJID user, UserRepository src, UserAuthRepository dst)
 			throws Exception {
-		if ((user == null) || user.isEmpty()) {
+		if ((user == null)) {
 			return;
 		}
 
@@ -294,15 +295,15 @@ public class RepositoryUtils {
 	 */
 	public static void exportRoster(UserRepository repo, Writer w) throws Exception {
 		if (user != null) {
-			exportUserRoster(JID.jidInstanceNS(user), repo, w);
+			exportUserRoster(user, repo, w);
 		} else {
-			List<String> users = repo.getUsers();
+			List<BareJID> users = repo.getUsers();
 
 			if (users != null) {
-				for (String usr : users) {
+				for (BareJID usr : users) {
 
 					// System.out.println(usr);
-					exportUserRoster(JID.jidInstanceNS(usr), repo, w);
+					exportUserRoster(usr, repo, w);
 				}    // end of for (String user: users)
 			} else {
 				System.out.println("There are no user accounts in repository.");
@@ -320,11 +321,11 @@ public class RepositoryUtils {
 	 *
 	 * @throws Exception
 	 */
-	public static void exportUserRoster(JID user, UserRepository repo, Writer w)
+	public static void exportUserRoster(BareJID user, UserRepository repo, Writer w)
 			throws Exception {
 		System.out.println("  " + (++counter) + ". " + user + " roster: ");
 
-		String[] contacts = repo.getSubnodes(user.toString(), "roster");
+		String[] contacts = repo.getSubnodes(user, "roster");
 
 		if (contacts != null) {
 			for (String contact : contacts) {
@@ -335,13 +336,11 @@ public class RepositoryUtils {
 				if (valid) {
 					System.out.println("      looks OK");
 
-					String password = repo.getData(user.toString(), "password");
-					String[] groups = repo.getDataList(user.toString(), "roster/" + contact,
-															RosterAbstract.GROUPS);
-					String contact_nick = repo.getData(user.toString(), "roster/" + contact,
-																	RosterAbstract.NAME);
-					String subscription = repo.getData(user.toString(), "roster/" + contact,
-																	RosterAbstract.SUBSCRIPTION);
+					String password = repo.getData(user, "password");
+					String[] groups = repo.getDataList(user, "roster/" + contact, RosterAbstract.GROUPS);
+					String contact_nick = repo.getData(user, "roster/" + contact, RosterAbstract.NAME);
+					String subscription = repo.getData(user, "roster/" + contact,
+						RosterAbstract.SUBSCRIPTION);
 					StringBuilder sb = new StringBuilder(user.toString());
 
 					sb.append(",");
@@ -487,14 +486,8 @@ public class RepositoryUtils {
 				}
 
 				if (src_auth != null) {
-					int idx = user.indexOf(':');
-					String name = user;
+					BareJID name = user;
 					String password = "";
-
-					if (idx >= 0) {
-						name = user.substring(0, idx);
-						password = user.substring(idx + 1, user.length());
-					}
 
 					src_auth.addUser(name, password);
 				}
@@ -565,7 +558,7 @@ public class RepositoryUtils {
 			System.out.println("Checking roster:");
 
 			if (user != null) {
-				repairUserRoster(JID.jidInstanceNS(user), src_repo);
+				repairUserRoster(user, src_repo);
 			} else {
 				repairRoster(src_repo);
 			}    // end of else
@@ -577,31 +570,30 @@ public class RepositoryUtils {
 
 			while ((line = br.readLine()) != null) {
 				String[] vals = line.split(",");
+				BareJID userId = BareJID.bareJIDInstance(vals[0].trim());
 
 				try {
-					src_repo.addUser(vals[0].trim());
+					src_repo.addUser(userId);
 				} catch (UserExistsException e) {}
 
 				if ((vals.length >= 2) && (vals[1].trim().length() > 0)) {
-					src_repo.setData(vals[0].trim(), null, "password", vals[1].trim());
+					src_repo.setData(userId, null, "password", vals[1].trim());
 				}
 
 				if ((vals.length >= 3) && (vals[2].trim().length() > 0)) {
-					src_repo.setData(vals[0].trim(), "roster/" + vals[2].trim(), "name", vals[2].trim());
+					src_repo.setData(userId, "roster/" + vals[2].trim(), "name", vals[2].trim());
 				}
 
 				if ((vals.length >= 4) && (vals[3].trim().length() > 0)) {
-					src_repo.setData(vals[0].trim(), "roster/" + vals[2].trim(), "name", vals[3].trim());
+					src_repo.setData(userId, "roster/" + vals[2].trim(), "name", vals[3].trim());
 				}
 
 				if ((vals.length >= 5) && (vals[4].trim().length() > 0)) {
-					src_repo.setData(vals[0].trim(), "roster/" + vals[2].trim(), "subscription",
-							vals[4].trim());
+					src_repo.setData(userId, "roster/" + vals[2].trim(), "subscription", vals[4].trim());
 				}
 
 				if ((vals.length >= 6) && (vals[5].trim().length() > 0)) {
-					src_repo.setData(vals[0].trim(), "roster/" + vals[2].trim(), "groups",
-							vals[5].trim());
+					src_repo.setData(userId, "roster/" + vals[2].trim(), "groups", vals[5].trim());
 				}
 			}
 
@@ -612,7 +604,7 @@ public class RepositoryUtils {
 			FileWriter fr = new FileWriter(export_file);
 
 			if (user != null) {
-				exportUserRoster(JID.jidInstanceNS(user), src_repo, fr);
+				exportUserRoster(user, src_repo, fr);
 			} else {
 				exportRoster(src_repo, fr);
 			}    // end of else
@@ -636,9 +628,9 @@ public class RepositoryUtils {
 					System.out.println(src_repo.getData(user, subnode, key, null));
 				} else {
 					if (node) {
-						printNode(JID.jidInstanceNS(user), src_repo, "  ", subnode);
+						printNode(user, src_repo, "  ", subnode);
 					} else {
-						printNode(JID.jidInstanceNS(user), src_repo, "", null);
+						printNode(user, src_repo, "", null);
 					}    // end of else
 				}      // end of else
 			} else {
@@ -652,8 +644,10 @@ public class RepositoryUtils {
 	 *
 	 *
 	 * @param args
+	 *
+	 * @throws TigaseStringprepException
 	 */
-	public static void parseParams(final String[] args) {
+	public static void parseParams(final String[] args) throws TigaseStringprepException {
 		if ((args != null) && (args.length > 0)) {
 			for (int i = 0; i < args.length; i++) {
 				if (args[i].equals("-h")) {
@@ -698,7 +692,7 @@ public class RepositoryUtils {
 				}    // end of if (args[i].equals("-h"))
 
 				if (args[i].equals("-u")) {
-					user = args[++i];
+					user = BareJID.bareJIDInstance(args[++i]);
 				}    // end of if (args[i].equals("-h"))
 
 				if (args[i].equals("-n")) {
@@ -749,17 +743,17 @@ public class RepositoryUtils {
 	 *
 	 * @throws Exception
 	 */
-	public static void printNode(JID user, UserRepository repo, String prefix, String node)
+	public static void printNode(BareJID user, UserRepository repo, String prefix, String node)
 			throws Exception {
 		if (node != null) {
 			System.out.println(prefix + "node: " + node);
 		}    // end of if (node != null)
 
-		String[] keys = repo.getKeys(user.toString(), node);
+		String[] keys = repo.getKeys(user, node);
 
 		if (keys != null) {
 			for (String key : keys) {
-				String[] vals = repo.getDataList(user.toString(), node, key);
+				String[] vals = repo.getDataList(user, node, key);
 
 				if (vals != null) {
 					StringBuilder valstr = new StringBuilder();
@@ -775,7 +769,7 @@ public class RepositoryUtils {
 			}        // end of for (String key: keys)
 		}          // end of if (keys != null)
 
-		String[] nodes = repo.getSubnodes(user.toString(), node);
+		String[] nodes = repo.getSubnodes(user, node);
 
 		if (nodes != null) {
 			for (String subnode : nodes) {
@@ -795,14 +789,14 @@ public class RepositoryUtils {
 	 */
 	public static void printRepoContent(UserRepository repo) throws Exception {
 		if (user != null) {
-			printNode(JID.jidInstanceNS(user), repo, "  ", subnode);
+			printNode(user, repo, "  ", subnode);
 		} else {
-			List<String> users = repo.getUsers();
+			List<BareJID> users = repo.getUsers();
 
 			if (users != null) {
-				for (String usr : users) {
+				for (BareJID usr : users) {
 					System.out.println(usr);
-					printNode(JID.jidInstanceNS(usr), repo, "  ", subnode);
+					printNode(usr, repo, "  ", subnode);
 				}    // end of for (String user: users)
 			} else {
 				System.out.println("There are no user accounts in repository.");
@@ -834,15 +828,15 @@ public class RepositoryUtils {
 	 */
 	public static void repairRoster(UserRepository repo) throws Exception {
 		if (user != null) {
-			repairUserRoster(JID.jidInstanceNS(user), repo);
+			repairUserRoster(user, repo);
 		} else {
-			List<String> users = repo.getUsers();
+			List<BareJID> users = repo.getUsers();
 
 			if (users != null) {
-				for (String usr : users) {
+				for (BareJID usr : users) {
 
 					// System.out.println(usr);
-					repairUserRoster(JID.jidInstanceNS(usr), repo);
+					repairUserRoster(usr, repo);
 				}    // end of for (String user: users)
 			} else {
 				System.out.println("There are no user accounts in repository.");
@@ -859,10 +853,10 @@ public class RepositoryUtils {
 	 *
 	 * @throws Exception
 	 */
-	public static void repairUserRoster(JID user, UserRepository repo) throws Exception {
+	public static void repairUserRoster(BareJID user, UserRepository repo) throws Exception {
 		System.out.println("  " + (++counter) + ". " + user + " roster: ");
 
-		String[] contacts = repo.getSubnodes(user.toString(), "roster");
+		String[] contacts = repo.getSubnodes(user, "roster");
 
 		if (contacts != null) {
 			for (String contact : contacts) {
@@ -878,7 +872,7 @@ public class RepositoryUtils {
 					String contact_node = "roster/" + contact;
 
 					System.out.println("      removing node: " + contact_node);
-					repo.removeSubnode(user.toString(), contact_node);
+					repo.removeSubnode(user, contact_node);
 					System.out.println("      DONE.");
 				}
 			}    // end of for (String node: nodes)
@@ -917,7 +911,7 @@ public class RepositoryUtils {
 	 */
 	public static void userAddTest(UserRepository re) throws Exception {
 		UserAuthRepository repo = (UserAuthRepository) re;
-		String test_user = "test111@localhost";
+		BareJID test_user = BareJID.bareJIDInstanceNS("test111@localhost");
 
 		printRepoContent(re);
 
@@ -955,9 +949,10 @@ public class RepositoryUtils {
 				+ " -aeg [true|false]  Allow empty group list for the contact\n"
 				+ " -import file  import user data from the file of following format:\n"
 				+ "         user_jid, password, roser_jid, roster_nick, subscription, group\n"
-				+ " export file   export user roster data to the specified file in the following format:\n"
-				+ "        user_jid, password, roser_jid, roster_nick, subscription, group\n" + "\n"
-				+ "\n" + "\n" + "Note! If you put UserAuthRepository implementation as a class name\n"
+				+ " -export file  export user roster data to the specified file in the following\n"
+				+ "              format: user_jid, password, roser_jid, roster_nick, subscription,\n"
+				+ "               group\n" + "\n" + "\n"
+				+ "Note! If you put UserAuthRepository implementation as a class name\n"
 				+ "      some operation are not allowed and will be silently skipped.\n"
 				+ "      Have a look at UserAuthRepository to see what operations are\n"
 				+ "      possible or what operation does make sense.\n"

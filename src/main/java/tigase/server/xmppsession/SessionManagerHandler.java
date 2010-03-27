@@ -19,10 +19,16 @@
  * Last modified by $Author$
  * $Date$
  */
+
 package tigase.server.xmppsession;
 
+//~--- non-JDK imports --------------------------------------------------------
+
+import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 import tigase.xmpp.XMPPResourceConnection;
+
+//~--- interfaces -------------------------------------------------------------
 
 /**
  * Describe interface SessionManagerHandler here.
@@ -35,18 +41,30 @@ import tigase.xmpp.XMPPResourceConnection;
  */
 public interface SessionManagerHandler {
 
+	/** Field description */
 	public static final String COMMIT_HANDLER_KEY = "LoginHandlerKey";
 
-	void handleLogin(String userName, XMPPResourceConnection conn);
-
-	void handleLogout(String userName, XMPPResourceConnection conn);
-
-	void handleResourceBind(XMPPResourceConnection conn);
-
-	void handlePresenceSet(XMPPResourceConnection conn);
-
-	boolean isLocalDomain(String domain, boolean includeComponents);
+	//~--- get methods ----------------------------------------------------------
 
 	JID getComponentId();
 
+	//~--- methods --------------------------------------------------------------
+
+	void handleLogin(BareJID userId, XMPPResourceConnection conn);
+
+	void handleLogout(BareJID userId, XMPPResourceConnection conn);
+
+	void handlePresenceSet(XMPPResourceConnection conn);
+
+	void handleResourceBind(XMPPResourceConnection conn);
+
+	//~--- get methods ----------------------------------------------------------
+
+	boolean isLocalDomain(String domain, boolean includeComponents);
 }
+
+
+//~ Formatted in Sun Code Convention
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

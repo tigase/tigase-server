@@ -31,6 +31,8 @@ import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.server.Priority;
 
+import tigase.util.TigaseStringprepException;
+
 import tigase.xml.Element;
 
 import tigase.xmpp.Authorization;
@@ -179,7 +181,7 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 							}
 						} else {
 
-							// No, so assuming this is registration of new
+							// No, so assuming this is registration of a new
 							// user or change registration details for existing user
 							String user_name = request.getChildCData("/iq/query/username");
 							String password = request.getChildCData("/iq/query/password");
@@ -239,6 +241,9 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 					results.offer(packet.copyElementOnly());
 				}
 			}
+		} catch (TigaseStringprepException ex) {
+			results.offer(Authorization.JID_MALFORMED.getResponseMessage(packet,
+					"Incorrect user name, stringprep processing failed.", true));
 		} catch (NotAuthorizedException e) {
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 					"You are not authorized to change registration settings.\n" + e.getMessage(), true));

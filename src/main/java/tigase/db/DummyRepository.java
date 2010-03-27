@@ -1,4 +1,5 @@
-/*  Tigase Jabber/XMPP Server
+/*
+ *   Tigase Jabber/XMPP Server
  *  Copyright (C) 2004-2008 "Artur Hefczyc" <artur.hefczyc@tigase.org>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,10 +19,19 @@
  * Last modified by $Author$
  * $Date$
  */
+
 package tigase.db;
+
+//~--- non-JDK imports --------------------------------------------------------
+
+import tigase.xmpp.BareJID;
+
+//~--- JDK imports ------------------------------------------------------------
 
 import java.util.List;
 import java.util.Map;
+
+//~--- classes ----------------------------------------------------------------
 
 /**
  * DummyRepository is a class with all methods empty. They don't return
@@ -37,263 +47,318 @@ import java.util.Map;
  */
 public class DummyRepository implements UserRepository {
 
+	/**
+	 * Describe <code>addDataList</code> method here.
+	 *
+	 * @param user a <code>String</code> value of user ID for which data must be
+	 * stored. User ID consists of user name and domain name.
+	 * @param subnode a <code>String</code> value is a node path where data is
+	 * stored. Node path has the same form as directory path on file system:
+	 * <pre>/root/subnode1/subnode2</pre>.
+	 * @param key a <code>String</code> with which the specified values list is to
+	 * be associated.
+	 * @param list a <code>String[]</code> is an array of values to be assosiated
+	 * with the specified key.
+	 */
+	@Override
+	public void addDataList(BareJID user, String subnode, String key, String[] list) {}
+
+	/**
+	 * Describe <code>addUser</code> method here.
+	 *
+	 * @param user a <code>String</code> value of user id consisting of user name
+	 * and domain address.
+	 */
+	@Override
+	public void addUser(BareJID user) {}
+
+	//~--- get methods ----------------------------------------------------------
+
 	// Implementation of tigase.db.UserRepository
 
 	/**
 	 * Describe <code>getData</code> method here.
 	 *
-   * @param user a <code>String</code> value of user ID for which data must be
-   * stored. User ID consists of user name and domain name.
-   * @param subnode a <code>String</code> value is a node path where data is
-   * stored. Node path has the same form as directory path on file system:
-   * <pre>/root/subnode1/subnode2</pre>.
-   * @param key a <code>String</code> with which the needed value is
-   * associated.
-   * @param def a <code>String</code> value which is returned in case if data
-   * for specified key does not exixist in repository.
-   * @return a <code>String</code> value of null always.
+	 * @param user a <code>String</code> value of user ID for which data must be
+	 * stored. User ID consists of user name and domain name.
+	 * @param subnode a <code>String</code> value is a node path where data is
+	 * stored. Node path has the same form as directory path on file system:
+	 * <pre>/root/subnode1/subnode2</pre>.
+	 * @param key a <code>String</code> with which the needed value is
+	 * associated.
+	 * @param def a <code>String</code> value which is returned in case if data
+	 * for specified key does not exixist in repository.
+	 * @return a <code>String</code> value of null always.
 	 */
-	public String getData(String user, String subnode, String key, String def) {
+	@Override
+	public String getData(BareJID user, String subnode, String key, String def) {
 		return null;
 	}
 
 	/**
 	 * Describe <code>getData</code> method here.
 	 *
-   * @param user a <code>String</code> value of user ID for which data must be
-   * stored. User ID consists of user name and domain name.
-   * @param subnode a <code>String</code> value is a node path where data is
-   * stored. Node path has the same form as directory path on file system:
-   * <pre>/root/subnode1/subnode2</pre>.
-   * @param key a <code>String</code> with which the needed value is
-   * associated.
-   * @return a <code>String</code> value of null always.
+	 * @param user a <code>String</code> value of user ID for which data must be
+	 * stored. User ID consists of user name and domain name.
+	 * @param subnode a <code>String</code> value is a node path where data is
+	 * stored. Node path has the same form as directory path on file system:
+	 * <pre>/root/subnode1/subnode2</pre>.
+	 * @param key a <code>String</code> with which the needed value is
+	 * associated.
+	 * @return a <code>String</code> value of null always.
 	 */
-	public String getData(String user, String subnode, String key) { return null; }
+	@Override
+	public String getData(BareJID user, String subnode, String key) {
+		return null;
+	}
 
 	/**
 	 * Describe <code>getData</code> method here.
 	 *
-   * @param user a <code>String</code> value of user ID for which data must be
-   * stored. User ID consists of user name and domain name.
-   * @param key a <code>String</code> with which the needed value is
-   * associated.
-   * @return a <code>String</code> value of null always.
+	 * @param user a <code>String</code> value of user ID for which data must be
+	 * stored. User ID consists of user name and domain name.
+	 * @param key a <code>String</code> with which the needed value is
+	 * associated.
+	 * @return a <code>String</code> value of null always.
 	 */
-	public String getData(String user, String key) { return null;	}
+	@Override
+	public String getData(BareJID user, String key) {
+		return null;
+	}
 
 	/**
-	 * Describe <code>initRepository</code> method here.
+	 * Describe <code>getDataList</code> method here.
 	 *
-	 * @param string a <code>String</code> value
-	 * @exception DBInitException if an error occurs
+	 * @param user a <code>String</code> value of user ID for which data must be
+	 * stored. User ID consists of user name and domain name.
+	 * @param subnode a <code>String</code> value is a node path where data is
+	 * stored. Node path has the same form as directory path on file system:
+	 * <pre>/root/subnode1/subnode2</pre>.
+	 * @param key a <code>String</code> with which the needed values list is
+	 * associated.
+	 * @return a <code>String[]</code> value
 	 */
-	public void initRepository(final String string, Map<String, String> params) {	}
+	@Override
+	public String[] getDataList(BareJID user, String subnode, String key) {
+		return null;
+	}
+
+	/**
+	 * Describe <code>getKeys</code> method here.
+	 *
+	 * @param user a <code>String</code> value of user ID for which data must be
+	 * stored. User ID consists of user name and domain name.
+	 * @param subnode a <code>String</code> value is a node path where data is
+	 * stored. Node path has the same form as directory path on file system:
+	 * <pre>/root/subnode1/subnode2</pre>.
+	 * @return a <code>String[]</code> value
+	 */
+	@Override
+	public String[] getKeys(BareJID user, String subnode) {
+		return null;
+	}
+
+	/**
+	 * Describe <code>getKeys</code> method here.
+	 *
+	 * @param user a <code>String</code> value of user ID for which data must be
+	 * stored. User ID consists of user name and domain name.
+	 * @return a <code>String[]</code> value
+	 */
+	@Override
+	public String[] getKeys(BareJID user) {
+		return null;
+	}
 
 	/**
 	 * Describe <code>getResourceUri</code> method here.
 	 *
 	 * @return a <code>String</code> value
 	 */
-	public String getResourceUri() { return null;	}
+	@Override
+	public String getResourceUri() {
+		return null;
+	}
+
+	/**
+	 * Describe <code>getSubnodes</code> method here.
+	 *
+	 * @param user a <code>String</code> value of user ID for which data must be
+	 * stored. User ID consists of user name and domain name.
+	 * @param subnode a <code>String</code> value is a node path where data is
+	 * stored. Node path has the same form as directory path on file system:
+	 * <pre>/root/subnode1/subnode2</pre>.
+	 * @return a <code>String[]</code> value
+	 */
+	@Override
+	public String[] getSubnodes(BareJID user, String subnode) {
+		return null;
+	}
+
+	/**
+	 * Describe <code>getSubnodes</code> method here.
+	 *
+	 * @param user a <code>String</code> value of user ID for which data must be
+	 * stored. User ID consists of user name and domain name.
+	 * @return a <code>String[]</code> value
+	 */
+	@Override
+	public String[] getSubnodes(BareJID user) {
+		return null;
+	}
 
 	/**
 	 * Describe <code>getUsers</code> method here.
 	 *
 	 * @return a <code>List</code> value
-	 * @exception TigaseDBException if an error occurs
 	 */
-	public List<String> getUsers() { return null; }
+	@Override
+	public List<BareJID> getUsers() {
+		return null;
+	}
 
 	/**
 	 * Describe <code>getUsersCount</code> method here.
 	 *
 	 * @return a <code>long</code> value
 	 */
-	public long getUsersCount() {	return 0; }
-
-	/**
-	 * Describe <code>addUser</code> method here.
-	 *
-   * @param user a <code>String</code> value of user id consisting of user name
-   * and domain address.
-	 */
-	public void addUser(final String user) { }
-
-	public boolean userExists(final String user) {
-		return false;
+	@Override
+	public long getUsersCount() {
+		return 0;
 	}
 
 	/**
-	 * Describe <code>removeUser</code> method here.
+	 * Method description
 	 *
-	 * @param user a <code>String</code> value
-	 * @exception UserNotFoundException if an error occurs
-	 * @exception TigaseDBException if an error occurs
-	 */
-	public void removeUser(final String user) {	}
-
-	/**
-	 * Describe <code>getDataList</code> method here.
 	 *
-   * @param user a <code>String</code> value of user ID for which data must be
-   * stored. User ID consists of user name and domain name.
-   * @param subnode a <code>String</code> value is a node path where data is
-   * stored. Node path has the same form as directory path on file system:
-   * <pre>/root/subnode1/subnode2</pre>.
-   * @param key a <code>String</code> with which the needed values list is
-   * associated.
-	 * @return a <code>String[]</code> value
-	 */
-	public String[] getDataList(String user, String subnode, String key) {
-		return null;
-	}
-
-	/**
-	 * Describe <code>getSubnodes</code> method here.
+	 * @param domain
 	 *
-   * @param user a <code>String</code> value of user ID for which data must be
-   * stored. User ID consists of user name and domain name.
-   * @param subnode a <code>String</code> value is a node path where data is
-   * stored. Node path has the same form as directory path on file system:
-   * <pre>/root/subnode1/subnode2</pre>.
-	 * @return a <code>String[]</code> value
+	 * @return
 	 */
-	public String[] getSubnodes(String user, String subnode) {
-		return null;
-	}
-
-	/**
-	 * Describe <code>getSubnodes</code> method here.
-	 *
-   * @param user a <code>String</code> value of user ID for which data must be
-   * stored. User ID consists of user name and domain name.
-	 * @return a <code>String[]</code> value
-	 */
-	public String[] getSubnodes(final String user) {
-		return null;
-	}
-
-	/**
-	 * Describe <code>getKeys</code> method here.
-	 *
-   * @param user a <code>String</code> value of user ID for which data must be
-   * stored. User ID consists of user name and domain name.
-   * @param subnode a <code>String</code> value is a node path where data is
-   * stored. Node path has the same form as directory path on file system:
-   * <pre>/root/subnode1/subnode2</pre>.
-	 * @return a <code>String[]</code> value
-	 * @exception UserNotFoundException if an error occurs
-	 * @exception TigaseDBException if an error occurs
-	 */
-	public String[] getKeys(String user, String subnode) {
-		return null;
-	}
-
-	/**
-	 * Describe <code>getKeys</code> method here.
-	 *
-   * @param user a <code>String</code> value of user ID for which data must be
-   * stored. User ID consists of user name and domain name.
-	 * @return a <code>String[]</code> value
-	 */
-	public String[] getKeys(final String user) {
-		return null;
-	}
-
-	/**
-	 * Describe <code>removeData</code> method here.
-	 *
-   * @param user a <code>String</code> value of user ID for which data must be
-   * stored. User ID consists of user name and domain name.
-   * @param subnode a <code>String</code> value is a node path where data is
-   * stored. Node path has the same form as directory path on file system:
-   * <pre>/root/subnode1/subnode2</pre>.
-   * @param key a <code>String</code> for which the value is to be removed.
-	 */
-	public void removeData(String user, String subnode, String key) {	}
-
-	/**
-	 * Describe <code>removeData</code> method here.
-	 *
-   * @param user a <code>String</code> value of user ID for which data must be
-   * stored. User ID consists of user name and domain name.
-   * @param key a <code>String</code> for which the value is to be removed.
-	 */
-	public void removeData(String user, String key) {	}
-
-	/**
-	 * Describe <code>removeSubnode</code> method here.
-	 *
-   * @param user a <code>String</code> value of user ID for which data must be
-   * stored. User ID consists of user name and domain name.
-   * @param subnode a <code>String</code> value is a node path to subnode which
-   * has to be removed. Node path has the same form as directory path on file
-   * system: <pre>/root/subnode1/subnode2</pre>.
-	 */
-	public void removeSubnode(String user, String subnode) {}
-
-	/**
-	 * Describe <code>setData</code> method here.
-	 *
-   * @param user a <code>String</code> value of user ID for which data must be
-   * stored. User ID consists of user name and domain name.
-   * @param subnode a <code>String</code> value is a node path where data is
-   * stored. Node path has the same form as directory path on file system:
-   * <pre>/root/subnode1/subnode2</pre>.
-   * @param key a <code>String</code> with which the specified value is to be
-   * associated.
-   * @param value a <code>String</code> value to be associated with the
-   * specified key.
-	 */
-	public void setData(String user, String subnode, String key, String value) {}
-
-	/**
-	 * Describe <code>setData</code> method here.
-	 *
-   * @param user a <code>String</code> value of user ID for which data must be
-   * stored. User ID consists of user name and domain name.
-   * @param key a <code>String</code> with which the specified value is to be
-   * associated.
-   * @param value a <code>String</code> value to be associated with the
-   * specified key.
-	 */
-	public void setData(String user, String key, String value) {}
-
-	/**
-	 * Describe <code>setDataList</code> method here.
-	 *
-   * @param user a <code>String</code> value of user ID for which data must be
-   * stored. User ID consists of user name and domain name.
-   * @param subnode a <code>String</code> value is a node path where data is
-   * stored. Node path has the same form as directory path on file system:
-   * <pre>/root/subnode1/subnode2</pre>.
-   * @param key a <code>String</code> with which the specified values list is to
-   * be associated.
-   * @param list a <code>String[]</code> is an array of values to be assosiated
-   * with the specified key.
-	 */
-	public void setDataList(String user, String subnode, String key, String[] list) {	}
-
-	/**
-	 * Describe <code>addDataList</code> method here.
-	 *
-   * @param user a <code>String</code> value of user ID for which data must be
-   * stored. User ID consists of user name and domain name.
-   * @param subnode a <code>String</code> value is a node path where data is
-   * stored. Node path has the same form as directory path on file system:
-   * <pre>/root/subnode1/subnode2</pre>.
-   * @param key a <code>String</code> with which the specified values list is to
-   * be associated.
-   * @param list a <code>String[]</code> is an array of values to be assosiated
-   * with the specified key.
-	 */
-	public void addDataList(String user, String subnode, String key, String[] list) {
-	}
-
 	@Override
 	public long getUsersCount(String domain) {
 		return 0;
 	}
 
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Describe <code>initRepository</code> method here.
+	 *
+	 * @param string a <code>String</code> value
+	 * @param params
+	 */
+	@Override
+	public void initRepository(String string, Map<String, String> params) {}
+
+	/**
+	 * Describe <code>removeData</code> method here.
+	 *
+	 * @param user a <code>String</code> value of user ID for which data must be
+	 * stored. User ID consists of user name and domain name.
+	 * @param subnode a <code>String</code> value is a node path where data is
+	 * stored. Node path has the same form as directory path on file system:
+	 * <pre>/root/subnode1/subnode2</pre>.
+	 * @param key a <code>String</code> for which the value is to be removed.
+	 */
+	@Override
+	public void removeData(BareJID user, String subnode, String key) {}
+
+	/**
+	 * Describe <code>removeData</code> method here.
+	 *
+	 * @param user a <code>String</code> value of user ID for which data must be
+	 * stored. User ID consists of user name and domain name.
+	 * @param key a <code>String</code> for which the value is to be removed.
+	 */
+	@Override
+	public void removeData(BareJID user, String key) {}
+
+	/**
+	 * Describe <code>removeSubnode</code> method here.
+	 *
+	 * @param user a <code>String</code> value of user ID for which data must be
+	 * stored. User ID consists of user name and domain name.
+	 * @param subnode a <code>String</code> value is a node path to subnode which
+	 * has to be removed. Node path has the same form as directory path on file
+	 * system: <pre>/root/subnode1/subnode2</pre>.
+	 */
+	@Override
+	public void removeSubnode(BareJID user, String subnode) {}
+
+	/**
+	 * Describe <code>removeUser</code> method here.
+	 *
+	 * @param user a <code>String</code> value
+	 */
+	@Override
+	public void removeUser(BareJID user) {}
+
+	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Describe <code>setData</code> method here.
+	 *
+	 * @param user a <code>String</code> value of user ID for which data must be
+	 * stored. User ID consists of user name and domain name.
+	 * @param subnode a <code>String</code> value is a node path where data is
+	 * stored. Node path has the same form as directory path on file system:
+	 * <pre>/root/subnode1/subnode2</pre>.
+	 * @param key a <code>String</code> with which the specified value is to be
+	 * associated.
+	 * @param value a <code>String</code> value to be associated with the
+	 * specified key.
+	 */
+	@Override
+	public void setData(BareJID user, String subnode, String key, String value) {}
+
+	/**
+	 * Describe <code>setData</code> method here.
+	 *
+	 * @param user a <code>String</code> value of user ID for which data must be
+	 * stored. User ID consists of user name and domain name.
+	 * @param key a <code>String</code> with which the specified value is to be
+	 * associated.
+	 * @param value a <code>String</code> value to be associated with the
+	 * specified key.
+	 */
+	@Override
+	public void setData(BareJID user, String key, String value) {}
+
+	/**
+	 * Describe <code>setDataList</code> method here.
+	 *
+	 * @param user a <code>String</code> value of user ID for which data must be
+	 * stored. User ID consists of user name and domain name.
+	 * @param subnode a <code>String</code> value is a node path where data is
+	 * stored. Node path has the same form as directory path on file system:
+	 * <pre>/root/subnode1/subnode2</pre>.
+	 * @param key a <code>String</code> with which the specified values list is to
+	 * be associated.
+	 * @param list a <code>String[]</code> is an array of values to be assosiated
+	 * with the specified key.
+	 */
+	@Override
+	public void setDataList(BareJID user, String subnode, String key, String[] list) {}
+
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param user
+	 *
+	 * @return
+	 */
+	@Override
+	public boolean userExists(BareJID user) {
+		return false;
+	}
 }
+
+
+//~ Formatted in Sun Code Convention
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

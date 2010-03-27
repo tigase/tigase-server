@@ -196,8 +196,8 @@ public class VCardTemp extends XMPPProcessorAbstract {
 			throws PacketErrorTypeException {
 		if (packet.getType() == StanzaType.get) {
 			try {
-				String strvCard = repo.getPublicData(packet.getStanzaTo().getBareJID().toString(), ID,
-					VCARD_KEY, null);
+				String strvCard = repo.getPublicData(packet.getStanzaTo().getBareJID(), ID, VCARD_KEY,
+					null);
 
 				if (strvCard != null) {
 					results.offer(parseXMLData(strvCard, packet));
@@ -213,7 +213,6 @@ public class VCardTemp extends XMPPProcessorAbstract {
 			// This is most likely a response to the user from the remote
 			// entity with vCard request results.
 			// Processed in processToUserPacket() method.
-
 		}
 	}
 
@@ -251,16 +250,19 @@ public class VCardTemp extends XMPPProcessorAbstract {
 			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
 			throws PacketErrorTypeException {
 		processNullSessionPacket(packet, repo, results, settings);
-		if (session != null && session.isAuthorized() && packet.getType() != StanzaType.get) {
+
+		if ((session != null) && session.isAuthorized() && (packet.getType() != StanzaType.get)) {
 			try {
 				Packet result = packet.copyElementOnly();
+
 				result.setPacketTo(session.getConnectionId(packet.getStanzaTo()));
 				results.offer(result);
 			} catch (NoConnectionIdException ex) {
+
 				// This should not happen unless somebody sends a result vcard packet
 				// to the server itself
-				log.warning("This should not happen, unless this is a vcard result packet " +
-						"sent to the server, which should not happen: " + packet);
+				log.warning("This should not happen, unless this is a vcard result packet "
+						+ "sent to the server, which should not happen: " + packet);
 			}
 		}
 	}

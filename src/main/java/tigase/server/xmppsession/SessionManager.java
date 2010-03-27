@@ -413,25 +413,13 @@ public class SessionManager extends AbstractMessageReceiver
 	 * Method description
 	 *
 	 *
-	 * @param userName
+	 * @param userId
 	 * @param conn
 	 */
 	@Override
-	public void handleLogin(String userName, XMPPResourceConnection conn) {
+	public void handleLogin(BareJID userId, XMPPResourceConnection conn) {
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("handleLogin called for: " + userName + ", conn_id: " + conn);
-		}
-
-		BareJID userId;
-
-		try {
-			userId = BareJID.bareJIDInstance(userName, conn.getDomain());
-		} catch (TigaseStringprepException ex) {
-			log.info("Stringprep problem for resource connection: " + conn + " and user name: "
-					+ userName);
-			handleLogout(userName, conn);
-
-			return;
+			log.finest("handleLogin called for: " + userId + ", conn_id: " + conn);
 		}
 
 		registerNewSession(userId, conn);
@@ -445,18 +433,11 @@ public class SessionManager extends AbstractMessageReceiver
 	 * Method description
 	 *
 	 *
-	 * @param userName
+	 * @param userId
 	 * @param conn
 	 */
 	@Override
-	public void handleLogout(String userName, XMPPResourceConnection conn) {
-		String domain = conn.getDomain();
-		BareJID userId;
-
-		// Stringprep is not needed here, it must have been run at least once at the login
-		// time
-		userId = BareJID.bareJIDInstanceNS(userName, domain);
-
+	public void handleLogout(BareJID userId, XMPPResourceConnection conn) {
 		XMPPSession session = sessionsByNodeId.get(userId);
 
 		if ((session != null) && (session.getActiveResourcesSize() <= 1)) {
@@ -947,7 +928,7 @@ public class SessionManager extends AbstractMessageReceiver
 						}    // end of else
 
 						if (conn.getConnectionStatus() == ConnectionStatus.NORMAL) {
-							auth_repository.logout(userJid.getBareJID().toString());
+							auth_repository.logout(userJid.getBareJID());
 						}
 					} else {
 						if (log.isLoggable(Level.FINER)) {
@@ -996,7 +977,7 @@ public class SessionManager extends AbstractMessageReceiver
 						+ getDefHostName());
 			}
 
-			vitem = new VHostItem(getDefHostName());
+			vitem = new VHostItem(getDefHostName().getDomain());
 		}
 
 		connection.setDomain(vitem.getUnmodifiableVHostItem());
@@ -1164,13 +1145,12 @@ public class SessionManager extends AbstractMessageReceiver
 
 			conn.setConnectionStatus(conn_st);
 			conn.setSessionId(xmpp_sessionId);
-			user_repository.setData(user_id.toString(), "tokens", xmpp_sessionId,
-					conn_id.toString());
+			user_repository.setData(user_id, "tokens", xmpp_sessionId, conn_id.toString());
 
 			Authorization auth = conn.loginToken(user_id, xmpp_sessionId, conn_id.toString());
 
 			if (auth == Authorization.AUTHORIZED) {
-				handleLogin(user_id.getLocalpart(), conn);
+				handleLogin(user_id, conn);
 
 				// registerNewSession(JIDUtils.getNodeID(user_id), conn);
 				if (resource != null) {
@@ -1627,7 +1607,7 @@ public class SessionManager extends AbstractMessageReceiver
 			session.addResourceConnection(conn);
 		} catch (TigaseStringprepException ex) {
 			log.info("Stringprep problem for resource connection: " + conn);
-			handleLogout(userId.getLocalpart(), conn);
+			handleLogout(userId, conn);
 		}
 	}
 
@@ -1872,7 +1852,7 @@ public class SessionManager extends AbstractMessageReceiver
 
 
 	private class NARepository implements NonAuthUserRepository {
-		private final Set<String> existing_domains = new ConcurrentSkipListSet<String>();
+		private final Set<BareJID> existing_domains = new ConcurrentSkipListSet<BareJID>();
 		private final UserRepository rep;
 
 		//~--- constructors -------------------------------------------------------
@@ -1896,7 +1876,7 @@ public class SessionManager extends AbstractMessageReceiver
 		 * @throws UserNotFoundException
 		 */
 		@Override
-		public void addOfflineData(String user, String subnode, String key, String value)
+		public void addOfflineData(BareJID user, String subnode, String key, String value)
 				throws UserNotFoundException, DataOverwriteException {
 			String node = calcNode(OFFLINE_DATA_NODE, subnode);
 
@@ -1925,7 +1905,7 @@ public class SessionManager extends AbstractMessageReceiver
 		 * @throws UserNotFoundException
 		 */
 		@Override
-		public void addOfflineDataList(String user, String subnode, String key, String[] list)
+		public void addOfflineDataList(BareJID user, String subnode, String key, String[] list)
 				throws UserNotFoundException {
 			try {
 				if (rep.userExists(user)) {
@@ -1959,7 +1939,7 @@ public class SessionManager extends AbstractMessageReceiver
 		 * @throws TigaseDBException
 		 */
 		@Override
-		public String getDomainTempData(String domain, String subnode, String key, String def)
+		public String getDomainTempData(BareJID domain, String subnode, String key, String def)
 				throws TigaseDBException {
 			checkDomain(domain);
 
@@ -1980,7 +1960,7 @@ public class SessionManager extends AbstractMessageReceiver
 		 * @throws UserNotFoundException
 		 */
 		@Override
-		public String getPublicData(String user, String subnode, String key, String def)
+		public String getPublicData(BareJID user, String subnode, String key, String def)
 				throws UserNotFoundException {
 			try {
 				return (rep.userExists(user)
@@ -2005,7 +1985,7 @@ public class SessionManager extends AbstractMessageReceiver
 		 * @throws UserNotFoundException
 		 */
 		@Override
-		public String[] getPublicDataList(String user, String subnode, String key)
+		public String[] getPublicDataList(BareJID user, String subnode, String key)
 				throws UserNotFoundException {
 			try {
 				return (rep.userExists(user)
@@ -2051,7 +2031,7 @@ public class SessionManager extends AbstractMessageReceiver
 		 * @throws TigaseDBException
 		 */
 		@Override
-		public void putDomainTempData(String domain, String subnode, String key, String value)
+		public void putDomainTempData(BareJID domain, String subnode, String key, String value)
 				throws TigaseDBException {
 			checkDomain(domain);
 			rep.setData(domain, subnode, key, value);
@@ -2085,7 +2065,7 @@ public class SessionManager extends AbstractMessageReceiver
 		 * @throws TigaseDBException
 		 */
 		@Override
-		public void removeDomainTempData(String domain, String subnode, String key)
+		public void removeDomainTempData(BareJID domain, String subnode, String key)
 				throws TigaseDBException {
 			checkDomain(getDefHostName());
 			rep.removeData(domain, subnode, key);
@@ -2114,7 +2094,7 @@ public class SessionManager extends AbstractMessageReceiver
 			return base + "/" + subnode;
 		}
 
-		private void checkDomain(String domain) throws TigaseDBException {
+		private void checkDomain(BareJID domain) throws TigaseDBException {
 			if ( !existing_domains.contains(domain) &&!rep.userExists(domain)) {
 				rep.addUser(domain);
 				existing_domains.add(domain);

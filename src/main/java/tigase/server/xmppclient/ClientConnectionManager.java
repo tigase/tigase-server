@@ -775,7 +775,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	}
 
 	private JID getFromAddress(String id) {
-		return JID.jidInstanceNS(getName(), getDefHostName(), id);
+		return JID.jidInstanceNS(getName(), getDefHostName().getDomain(), id);
 	}
 
 	private XMPPResourceConnection getXMPPSession(Packet p) {

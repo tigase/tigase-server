@@ -514,14 +514,16 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	 * @throws AuthorizationException
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
+	 * @throws TigaseStringprepException
 	 */
-	@Override
 	public final Authorization loginDigest(String user, String digest, String id, String alg)
-			throws NotAuthorizedException, AuthorizationException, TigaseDBException {
-		Authorization result = super.loginDigest(user, digest, id, alg);
+			throws NotAuthorizedException, AuthorizationException, TigaseDBException,
+			TigaseStringprepException {
+		BareJID userId = BareJID.bareJIDInstance(user, getDomain());
+		Authorization result = super.loginDigest(userId, digest, id, alg);
 
 		if (result == Authorization.AUTHORIZED) {
-			loginHandler.handleLogin(user, this);
+			loginHandler.handleLogin(userId, this);
 		}    // end of if (result == Authorization.AUTHORIZED)
 
 		return result;
@@ -545,20 +547,14 @@ public class XMPPResourceConnection extends RepositoryAccess {
 		Authorization result = super.loginOther(props);
 
 		if (result == Authorization.AUTHORIZED) {
-			String user = (String) props.get(UserAuthRepository.USER_ID_KEY);
+			BareJID user = (BareJID) props.get(UserAuthRepository.USER_ID_KEY);
 
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("UserAuthRepository.USER_ID_KEY: " + user);
 			}
 
-			String nick = BareJID.parseJID(user)[0];
-
-			if (nick == null) {
-				nick = user;
-			}    // end of if (nick == null)
-
-			loginHandler.handleLogin(nick, this);
-		}      // end of if (result == Authorization.AUTHORIZED)
+			loginHandler.handleLogin(user, this);
+		}    // end of if (result == Authorization.AUTHORIZED)
 
 		return result;
 	}
@@ -575,14 +571,16 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	 * @throws AuthorizationException
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
+	 * @throws TigaseStringprepException
 	 */
-	@Override
 	public final Authorization loginPlain(String user, String password)
-			throws NotAuthorizedException, AuthorizationException, TigaseDBException {
-		Authorization result = super.loginPlain(user, password);
+			throws NotAuthorizedException, AuthorizationException, TigaseDBException,
+			TigaseStringprepException {
+		BareJID userId = BareJID.bareJIDInstance(user, getDomain());
+		Authorization result = super.loginPlain(userId, password);
 
 		if (result == Authorization.AUTHORIZED) {
-			loginHandler.handleLogin(user, this);
+			loginHandler.handleLogin(userId, this);
 		}    // end of if (result == Authorization.AUTHORIZED)
 
 		return result;
@@ -596,7 +594,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	 */
 	@Override
 	public final void logout() throws NotAuthorizedException {
-		loginHandler.handleLogout(getUserName(), this);
+		loginHandler.handleLogout(getBareJID(), this);
 		streamClosed();
 		super.logout();
 	}
@@ -871,10 +869,11 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
+	 * @throws TigaseStringprepException
 	 */
 	@Override
 	public Authorization unregister(String name_param)
-			throws NotAuthorizedException, TigaseDBException {
+			throws NotAuthorizedException, TigaseDBException, TigaseStringprepException {
 		Authorization auth_res = super.unregister(name_param);
 
 //  if (auth_res == Authorization.AUTHORIZED) {

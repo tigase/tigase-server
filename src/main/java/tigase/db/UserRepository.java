@@ -19,10 +19,19 @@
  * Last modified by $Author$
  * $Date$
  */
+
 package tigase.db;
 
-import java.util.Map;
+//~--- non-JDK imports --------------------------------------------------------
+
+import tigase.xmpp.BareJID;
+
+//~--- JDK imports ------------------------------------------------------------
+
 import java.util.List;
+import java.util.Map;
+
+//~--- interfaces -------------------------------------------------------------
 
 /**
  * <code>UserRepository</code> interface defines all functionalities required
@@ -42,19 +51,186 @@ import java.util.List;
 public interface UserRepository {
 
 	/**
+	 * <code>addDataList</code> method adds mode entries to existing data list
+	 * associated with given key in repository under given node path.
+	 * This method is very similar to <code>setDataList(...)</code> except it
+	 * doesn't remove existing data.
 	 *
-	 * @param resource_uri
-	 * @param params
-	 * @throws tigase.db.DBInitException
+	 * @param user a <code>BareJID</code> value of user ID for which data must be
+	 * stored. User ID consists of user name and domain name.
+	 * @param subnode a <code>String</code> value is a node path where data is
+	 * stored. Node path has the same form as directory path on file system:
+	 * <pre>/root/subnode1/subnode2</pre>.
+	 * @param key a <code>String</code> with which the specified values list is to
+	 * be associated.
+	 * @param list a <code>String[]</code> is an array of values to be associated
+	 * with the specified key.
+	 * @exception UserNotFoundException if user id hasn't been found in repository.
+	 * @throws TigaseDBException if database backend error occurs.
 	 */
-	void initRepository(String resource_uri, Map<String, String> params)
-    throws DBInitException;
+	void addDataList(BareJID user, String subnode, String key, String[] list)
+			throws UserNotFoundException, TigaseDBException;
+
+	/**
+	 * This <code>addUser</code> method allows to add new user to repository.
+	 * It <b>must</b> throw en exception <code>UserExistsException</code> if such
+	 * user already exists because user <b>must</b> be unique within user
+	 * repository data base.<br/>
+	 * As one <em>XMPP</em> server can support many virtual internet domains it
+	 * is required that <code>user</code> id consists of user name and domain
+	 * address: <em>username@domain.address.net</em> for example.
+	 *
+	 * @param user a <code>BareJID</code> value of user id consisting of user name
+	 * and domain address.
+	 * @exception UserExistsException if user with the same id already exists.
+	 * @throws TigaseDBException if database backend error occurs.
+	 */
+	void addUser(BareJID user) throws UserExistsException, TigaseDBException;
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * <code>getData</code> method returns a value associated with given key for
+	 * user repository in given subnode.
+	 * If key is not found in repository given default value is returned.
+	 *
+	 * @param user a <code>BareJID</code> value of user ID for which data must be
+	 * stored. User ID consists of user name and domain name.
+	 * @param subnode a <code>String</code> value is a node path where data is
+	 * stored. Node path has the same form as directory path on file system:
+	 * <pre>/root/subnode1/subnode2</pre>.
+	 * @param key a <code>String</code> with which the needed value is
+	 * associated.
+	 * @param def a <code>String</code> value which is returned in case if data
+	 * for specified key does not exixist in repository.
+	 * @return a <code>String</code> value
+	 * @exception UserNotFoundException if user id hasn't been found in repository.
+	 * @throws TigaseDBException if database backend error occurs.
+	 */
+	String getData(BareJID user, String subnode, String key, String def)
+			throws UserNotFoundException, TigaseDBException;
+
+	/**
+	 * <code>getData</code> method returns a value associated with given key for
+	 * user repository in given subnode.
+	 * If key is not found in repository <code>null</code> value is returned.
+	 *
+	 * @param user a <code>BareJID</code> value of user ID for which data must be
+	 * stored. User ID consists of user name and domain name.
+	 * @param subnode a <code>String</code> value is a node path where data is
+	 * stored. Node path has the same form as directory path on file system:
+	 * <pre>/root/subnode1/subnode2</pre>.
+	 * @param key a <code>String</code> with which the needed value is
+	 * associated.
+	 * @return a <code>String</code> value
+	 * @exception UserNotFoundException if user id hasn't been found in repository.
+	 * @throws TigaseDBException if database backend error occurs.
+	 */
+	String getData(BareJID user, String subnode, String key)
+			throws UserNotFoundException, TigaseDBException;
+
+	/**
+	 * <code>getData</code> method returns a value associated with given key for
+	 * user repository in default subnode.
+	 * If key is not found in repository <code>null</code> value is returned.
+	 *
+	 * @param user a <code>BareJID</code> value of user ID for which data must be
+	 * stored. User ID consists of user name and domain name.
+	 * @param key a <code>String</code> with which the needed value is
+	 * associated.
+	 * @return a <code>String</code> value
+	 * @exception UserNotFoundException if user id hasn't been found in repository.
+	 * @throws TigaseDBException if database backend error occurs.
+	 */
+	String getData(BareJID user, String key) throws UserNotFoundException, TigaseDBException;
+
+	/**
+	 * <code>getDataList</code> method returns array of values associated with
+	 * given key or <code>null</code> if given key does not exist for given user
+	 * ID in given node path.
+	 *
+	 * @param user a <code>BareJID</code> value of user ID for which data must be
+	 * stored. User ID consists of user name and domain name.
+	 * @param subnode a <code>String</code> value is a node path where data is
+	 * stored. Node path has the same form as directory path on file system:
+	 * <pre>/root/subnode1/subnode2</pre>.
+	 * @param key a <code>String</code> with which the needed values list is
+	 * associated.
+	 * @return a <code>String[]</code> value
+	 * @exception UserNotFoundException if user id hasn't been found in repository.
+	 * @throws TigaseDBException if database backend error occurs.
+	 */
+	String[] getDataList(BareJID user, String subnode, String key)
+			throws UserNotFoundException, TigaseDBException;
+
+	/**
+	 * <code>getKeys</code> method returns list of all keys stored in given
+	 * subnode in user repository.
+	 * There is a value (or list of values) associated with each key. It is up to
+	 * user (developer) to know what key keeps one value and what key keeps list
+	 * of values.
+	 *
+	 * @param user a <code>BareJID</code> value of user ID for which data must be
+	 * stored. User ID consists of user name and domain name.
+	 * @param subnode a <code>String</code> value is a node path where data is
+	 * stored. Node path has the same form as directory path on file system:
+	 * <pre>/root/subnode1/subnode2</pre>.
+	 * @return a <code>String[]</code> value
+	 * @exception UserNotFoundException if user id hasn't been found in repository.
+	 * @throws TigaseDBException if database backend error occurs.
+	 */
+	String[] getKeys(BareJID user, String subnode)
+			throws UserNotFoundException, TigaseDBException;
+
+	/**
+	 * <code>getKeys</code> method returns list of all keys stored in default user
+	 * repository node.
+	 * There is some a value (or list of values) associated with each key. It is
+	 * up to user (developer) to know what key keeps one value and what key keeps
+	 * list of values.
+	 *
+	 * @param user a <code>BareJID</code> value of user ID for which data must be
+	 * stored. User ID consists of user name and domain name.
+	 * @return a <code>String[]</code> value
+	 * @exception UserNotFoundException if user id hasn't been found in repository.
+	 * @throws TigaseDBException if database backend error occurs.
+	 */
+	String[] getKeys(BareJID user) throws UserNotFoundException, TigaseDBException;
 
 	/**
 	 *
 	 * @return
 	 */
 	String getResourceUri();
+
+	/**
+	 * <code>getSubnodes</code> method returns list of all direct subnodes from
+	 * given node.
+	 *
+	 * @param user a <code>BareJID</code> value of user ID for which data must be
+	 * stored. User ID consists of user name and domain name.
+	 * @param subnode a <code>String</code> value is a node path where data is
+	 * stored. Node path has the same form as directory path on file system:
+	 * <pre>/root/subnode1/subnode2</pre>.
+	 * @return a <code>String[]</code> value is an array of all direct subnodes.
+	 * @exception UserNotFoundException if user id hasn't been found in repository.
+	 * @throws TigaseDBException if database backend error occurs.
+	 */
+	String[] getSubnodes(BareJID user, String subnode)
+			throws UserNotFoundException, TigaseDBException;
+
+	/**
+	 * <code>getSubnodes</code> method returns list of all <em>root</em> nodes for
+	 * given user.
+	 *
+	 * @param user a <code>BareJID</code> value of user ID for which data must be
+	 * stored. User ID consists of user name and domain name.
+	 * @return a <code>String[]</code> value is an array of all <em>root</em>
+	 * nodes for given user.
+	 * @exception UserNotFoundException if user id hasn't been found in repository.
+	 * @throws TigaseDBException if database backend error occurs.
+	 */
+	String[] getSubnodes(BareJID user) throws UserNotFoundException, TigaseDBException;
 
 	/**
 	 * This method is only used by the data conversion tools. They attempt
@@ -66,7 +242,7 @@ public interface UserRepository {
 	 * the user repository.
 	 * @throws tigase.db.TigaseDBException
 	 */
-	List<String> getUsers() throws TigaseDBException;
+	List<BareJID> getUsers() throws TigaseDBException;
 
 	/**
 	 * This method is only used by the server statistics component to report
@@ -82,6 +258,151 @@ public interface UserRepository {
 	 * @return a <code>long</code> number of registered users in the repository.
 	 */
 	long getUsersCount(String domain);
+
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 *
+	 * @param resource_uri
+	 * @param params
+	 * @throws tigase.db.DBInitException
+	 */
+	void initRepository(String resource_uri, Map<String, String> params) throws DBInitException;
+
+	/**
+	 * <code>removeData</code> method removes pair (key, value) from user
+	 * repository in given subnode.
+	 * If the key exists in user repository there is always a value
+	 * associated with this key - even empty <code>String</code>. If key does not
+	 * exist the <code>null</code> value is returned from repository backend or
+	 * given default value.
+	 *
+	 * @param user a <code>BareJID</code> value of user ID for which data must be
+	 * stored. User ID consists of user name and domain name.
+	 * @param subnode a <code>String</code> value is a node path where data is
+	 * stored. Node path has the same form as directory path on file system:
+	 * <pre>/root/subnode1/subnode2</pre>.
+	 * @param key a <code>String</code> for which the value is to be removed.
+	 * @exception UserNotFoundException if user id hasn't been found in repository.
+	 * @throws TigaseDBException if database backend error occurs.
+	 */
+	void removeData(BareJID user, String subnode, String key)
+			throws UserNotFoundException, TigaseDBException;
+
+	/**
+	 * <code>removeData</code> method removes pair (key, value) from user
+	 * repository in default repository node.
+	 * If the key exists in user repository there is always a value
+	 * associated with this key - even empty <code>String</code>. If key does not
+	 * exist the <code>null</code> value is returned from repository backend or
+	 * given default value.
+	 *
+	 * @param user a <code>BareJID</code> value of user ID for which data must be
+	 * stored. User ID consists of user name and domain name.
+	 * @param key a <code>String</code> for which the value is to be removed.
+	 * @exception UserNotFoundException if user id hasn't been found in repository.
+	 * @throws TigaseDBException if database backend error occurs.
+	 */
+	void removeData(BareJID user, String key) throws UserNotFoundException, TigaseDBException;
+
+	/**
+	 * <code>removeSubnode</code> method removes given subnode with all subnodes
+	 * in this node and all data stored in this node and in all subnodes.
+	 * Effectively it removes entire repository tree starting from given node.
+	 *
+	 * @param user a <code>BareJID</code> value of user ID for which data must be
+	 * stored. User ID consists of user name and domain name.
+	 * @param subnode a <code>String</code> value is a node path to subnode which
+	 * has to be removed. Node path has the same form as directory path on file
+	 * system: <pre>/root/subnode1/subnode2</pre>.
+	 * @exception UserNotFoundException if user id hasn't been found in repository.
+	 * @throws TigaseDBException if database backend error occurs.
+	 */
+	void removeSubnode(BareJID user, String subnode)
+			throws UserNotFoundException, TigaseDBException;
+
+	/**
+	 * This <code>removeUser</code> method allows to remove user and all his data
+	 * from user repository.
+	 * If given user id does not exist <code>UserNotFoundException</code> must be
+	 * thrown. As one <em>XMPP</em> server can support many virtual internet
+	 * domains it is required that <code>user</code> id consists of user name and
+	 * domain address: <em>username@domain.address.net</em> for example.
+	 *
+	 * @param user a <code>BareJID</code> value of user id consisting of user name
+	 * and domain address.
+	 * @exception UserNotFoundException if user id hasn't been found in repository.
+	 * @throws TigaseDBException if database backend error occurs.
+	 */
+	void removeUser(BareJID user) throws UserNotFoundException, TigaseDBException;
+
+	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * <code>setData</code> method sets data value for given user ID in repository
+	 * under given node path and associates it with given key.
+	 * If there already exists value for given key in given node, old value is
+	 * replaced with new value. No warning or exception is thrown in case if
+	 * methods overwrites old value.
+	 *
+	 * @param user a <code>BareJID</code> value of user ID for which data must be
+	 * stored. User ID consists of user name and domain name.
+	 * @param subnode a <code>String</code> value is a node path where data is
+	 * stored. Node path has the same form as directory path on file system:
+	 * <pre>/root/subnode1/subnode2</pre>.
+	 * @param key a <code>String</code> with which the specified value is to be
+	 * associated.
+	 * @param value a <code>String</code> value to be associated with the
+	 * specified key.
+	 * @exception UserNotFoundException if user id hasn't been found in repository.
+	 * @throws TigaseDBException if database backend error occurs.
+	 */
+	void setData(BareJID user, String subnode, String key, String value)
+			throws UserNotFoundException, TigaseDBException;
+
+	/**
+	 * This <code>setData</code> method sets data value for given user ID
+	 * associated with given key in default repository node.
+	 * Default node is dependent on implementation and usually it is root user
+	 * node. If there already exists value for given key in given node, old value
+	 * is replaced with new value. No warning or exception is thrown in case if
+	 * methods overwrites old value.
+	 *
+	 * @param user a <code>BareJID</code> value of user ID for which data must be
+	 * stored. User ID consists of user name and domain name.
+	 * @param key a <code>String</code> with which the specified value is to be
+	 * associated.
+	 * @param value a <code>String</code> value to be associated with the
+	 * specified key.
+	 * @exception UserNotFoundException if user id hasn't been found in repository.
+	 * @throws TigaseDBException if database backend error occurs.
+	 */
+	void setData(BareJID user, String key, String value)
+			throws UserNotFoundException, TigaseDBException;
+
+	/**
+	 * <code>setDataList</code> method sets list of values for given user
+	 * associated given key in repository under given node path.
+	 * If there already exist values for given key in given node, all old values are
+	 * replaced with new values. No warning or exception is thrown in case if
+	 * methods overwrites old value.
+	 *
+	 * @param user a <code>BareJID</code> value of user ID for which data must be
+	 * stored. User ID consists of user name and domain name.
+	 * @param subnode a <code>String</code> value is a node path where data is
+	 * stored. Node path has the same form as directory path on file system:
+	 * <pre>/root/subnode1/subnode2</pre>.
+	 * @param key a <code>String</code> with which the specified values list is to
+	 * be associated.
+	 * @param list a <code>String[]</code> is an array of values to be associated
+	 * with the specified key.
+	 * @exception UserNotFoundException if user id hasn't been found in repository.
+	 * @throws TigaseDBException if database backend error occurs.
+	 */
+	void setDataList(BareJID user, String subnode, String key, String[] list)
+			throws UserNotFoundException, TigaseDBException;
+
+	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method <code>userExists</code> checks whether the user (or repository top node)
@@ -99,318 +420,14 @@ public interface UserRepository {
 	 * Therefore this method should be used only to check whether the account exists
 	 * without creating it.
 	 *
-	 * @param user a <code>String</code> value
+	 * @param user a <code>BareJID</code> value
 	 * @return a <code>boolean</code> value
 	 */
-	boolean userExists(String user);
+	boolean userExists(BareJID user);
+}    // UserRepository
 
-	/**
-   * This <code>addUser</code> method allows to add new user to repository.
-   * It <b>must</b> throw en exception <code>UserExistsException</code> if such
-   * user already exists because user <b>must</b> be unique within user
-   * repository data base.<br/>
-   * As one <em>XMPP</em> server can support many virtual internet domains it
-   * is required that <code>user</code> id consists of user name and domain
-   * address: <em>username@domain.address.net</em> for example.
-   *
-   * @param user a <code>String</code> value of user id consisting of user name
-   * and domain address.
-	 * @exception UserExistsException if user with the same id already exists.
-	 * @throws TigaseDBException if database backend error occurs.
-   */
-  void addUser(String user) throws UserExistsException, TigaseDBException;
 
-  /**
-   * This <code>removeUser</code> method allows to remove user and all his data
-   * from user repository.
-   * If given user id does not exist <code>UserNotFoundException</code> must be
-   * thrown. As one <em>XMPP</em> server can support many virtual internet
-   * domains it is required that <code>user</code> id consists of user name and
-   * domain address: <em>username@domain.address.net</em> for example.
-   *
-   * @param user a <code>String</code> value of user id consisting of user name
-   * and domain address.
-	 * @exception UserNotFoundException if user id hasn't been found in repository.
-	 * @throws TigaseDBException if database backend error occurs.
-   */
-  void removeUser(String user) throws UserNotFoundException, TigaseDBException;
+//~ Formatted in Sun Code Convention
 
-  /**
-   * <code>getDataList</code> method returns array of values associated with
-   * given key or <code>null</code> if given key does not exist for given user
-   * ID in given node path.
-   *
-   * @param user a <code>String</code> value of user ID for which data must be
-   * stored. User ID consists of user name and domain name.
-   * @param subnode a <code>String</code> value is a node path where data is
-   * stored. Node path has the same form as directory path on file system:
-   * <pre>/root/subnode1/subnode2</pre>.
-   * @param key a <code>String</code> with which the needed values list is
-   * associated.
-   * @return a <code>String[]</code> value
-	 * @exception UserNotFoundException if user id hasn't been found in repository.
-	 * @throws TigaseDBException if database backend error occurs.
-   */
-  String[] getDataList(String user, String subnode, String key)
-    throws UserNotFoundException, TigaseDBException;
 
-  /**
-   * <code>getData</code> method returns a value associated with given key for
-   * user repository in given subnode.
-   * If key is not found in repository given default value is returned.
-   *
-   * @param user a <code>String</code> value of user ID for which data must be
-   * stored. User ID consists of user name and domain name.
-   * @param subnode a <code>String</code> value is a node path where data is
-   * stored. Node path has the same form as directory path on file system:
-   * <pre>/root/subnode1/subnode2</pre>.
-   * @param key a <code>String</code> with which the needed value is
-   * associated.
-   * @param def a <code>String</code> value which is returned in case if data
-   * for specified key does not exixist in repository.
-   * @return a <code>String</code> value
-	 * @exception UserNotFoundException if user id hasn't been found in repository.
-	 * @throws TigaseDBException if database backend error occurs.
-   */
-  String getData(String user, String subnode, String key, String def)
-    throws UserNotFoundException, TigaseDBException;
-
-  /**
-   * <code>getData</code> method returns a value associated with given key for
-   * user repository in given subnode.
-   * If key is not found in repository <code>null</code> value is returned.
-   *
-   * @param user a <code>String</code> value of user ID for which data must be
-   * stored. User ID consists of user name and domain name.
-   * @param subnode a <code>String</code> value is a node path where data is
-   * stored. Node path has the same form as directory path on file system:
-   * <pre>/root/subnode1/subnode2</pre>.
-   * @param key a <code>String</code> with which the needed value is
-   * associated.
-   * @return a <code>String</code> value
-	 * @exception UserNotFoundException if user id hasn't been found in repository.
-	 * @throws TigaseDBException if database backend error occurs.
-   */
-  String getData(String user, String subnode, String key)
-    throws UserNotFoundException, TigaseDBException;
-
-  /**
-   * <code>getData</code> method returns a value associated with given key for
-   * user repository in default subnode.
-   * If key is not found in repository <code>null</code> value is returned.
-   *
-   * @param user a <code>String</code> value of user ID for which data must be
-   * stored. User ID consists of user name and domain name.
-   * @param key a <code>String</code> with which the needed value is
-   * associated.
-   * @return a <code>String</code> value
-	 * @exception UserNotFoundException if user id hasn't been found in repository.
-	 * @throws TigaseDBException if database backend error occurs.
-   */
-  String getData(String user, String key)
-    throws UserNotFoundException, TigaseDBException;
-
-  /**
-   * <code>getSubnodes</code> method returns list of all direct subnodes from
-   * given node.
-   *
-   * @param user a <code>String</code> value of user ID for which data must be
-   * stored. User ID consists of user name and domain name.
-   * @param subnode a <code>String</code> value is a node path where data is
-   * stored. Node path has the same form as directory path on file system:
-   * <pre>/root/subnode1/subnode2</pre>.
-   * @return a <code>String[]</code> value is an array of all direct subnodes.
-	 * @exception UserNotFoundException if user id hasn't been found in repository.
-	 * @throws TigaseDBException if database backend error occurs.
-   */
-  String[] getSubnodes(String user, String subnode)
-    throws UserNotFoundException, TigaseDBException;
-
-  /**
-   * <code>getSubnodes</code> method returns list of all <em>root</em> nodes for
-   * given user.
-   *
-   * @param user a <code>String</code> value of user ID for which data must be
-   * stored. User ID consists of user name and domain name.
-   * @return a <code>String[]</code> value is an array of all <em>root</em>
-   * nodes for given user.
-   * @exception UserNotFoundException if user id hasn't been found in repository.
-	 * @throws TigaseDBException if database backend error occurs.
-   */
-  String[] getSubnodes(String user)
-		throws UserNotFoundException, TigaseDBException;
-
-  /**
-   * <code>getKeys</code> method returns list of all keys stored in given
-   * subnode in user repository.
-   * There is a value (or list of values) associated with each key. It is up to
-   * user (developer) to know what key keeps one value and what key keeps list
-   * of values.
-   *
-   * @param user a <code>String</code> value of user ID for which data must be
-   * stored. User ID consists of user name and domain name.
-   * @param subnode a <code>String</code> value is a node path where data is
-   * stored. Node path has the same form as directory path on file system:
-   * <pre>/root/subnode1/subnode2</pre>.
-   * @return a <code>String[]</code> value
-   * @exception UserNotFoundException if user id hasn't been found in repository.
-	 * @throws TigaseDBException if database backend error occurs.
-   */
-  String[] getKeys(String user, String subnode)
-    throws UserNotFoundException, TigaseDBException;
-
-  /**
-   * <code>getKeys</code> method returns list of all keys stored in default user
-   * repository node.
-   * There is some a value (or list of values) associated with each key. It is
-   * up to user (developer) to know what key keeps one value and what key keeps
-   * list of values.
-   *
-   * @param user a <code>String</code> value of user ID for which data must be
-   * stored. User ID consists of user name and domain name.
-   * @return a <code>String[]</code> value
-   * @exception UserNotFoundException if user id hasn't been found in repository.
-	 * @throws TigaseDBException if database backend error occurs.
-   */
-  String[] getKeys(String user)
-    throws UserNotFoundException, TigaseDBException;
-
-  /**
-   * <code>removeData</code> method removes pair (key, value) from user
-   * repository in given subnode.
-   * If the key exists in user repository there is always a value
-   * associated with this key - even empty <code>String</code>. If key does not
-   * exist the <code>null</code> value is returned from repository backend or
-   * given default value.
-   *
-   * @param user a <code>String</code> value of user ID for which data must be
-   * stored. User ID consists of user name and domain name.
-   * @param subnode a <code>String</code> value is a node path where data is
-   * stored. Node path has the same form as directory path on file system:
-   * <pre>/root/subnode1/subnode2</pre>.
-   * @param key a <code>String</code> for which the value is to be removed.
-   * @exception UserNotFoundException if user id hasn't been found in repository.
-	 * @throws TigaseDBException if database backend error occurs.
-   */
-  void removeData(String user, String subnode, String key)
-    throws UserNotFoundException, TigaseDBException;
-
-  /**
-   * <code>removeData</code> method removes pair (key, value) from user
-   * repository in default repository node.
-   * If the key exists in user repository there is always a value
-   * associated with this key - even empty <code>String</code>. If key does not
-   * exist the <code>null</code> value is returned from repository backend or
-   * given default value.
-   *
-   * @param user a <code>String</code> value of user ID for which data must be
-   * stored. User ID consists of user name and domain name.
-   * @param key a <code>String</code> for which the value is to be removed.
-   * @exception UserNotFoundException if user id hasn't been found in repository.
-	 * @throws TigaseDBException if database backend error occurs.
-   */
-  void removeData(String user, String key)
-    throws UserNotFoundException, TigaseDBException;
-
-  /**
-   * <code>removeSubnode</code> method removes given subnode with all subnodes
-   * in this node and all data stored in this node and in all subnodes.
-   * Effectively it removes entire repository tree starting from given node.
-   *
-   * @param user a <code>String</code> value of user ID for which data must be
-   * stored. User ID consists of user name and domain name.
-   * @param subnode a <code>String</code> value is a node path to subnode which
-   * has to be removed. Node path has the same form as directory path on file
-   * system: <pre>/root/subnode1/subnode2</pre>.
-   * @exception UserNotFoundException if user id hasn't been found in repository.
-	 * @throws TigaseDBException if database backend error occurs.
-   */
-  void removeSubnode(String user, String subnode)
-    throws UserNotFoundException, TigaseDBException;
-
-  /**
-   * <code>setData</code> method sets data value for given user ID in repository
-   * under given node path and associates it with given key.
-   * If there already exists value for given key in given node, old value is
-   * replaced with new value. No warning or exception is thrown in case if
-   * methods overwrites old value.
-   *
-   * @param user a <code>String</code> value of user ID for which data must be
-   * stored. User ID consists of user name and domain name.
-   * @param subnode a <code>String</code> value is a node path where data is
-   * stored. Node path has the same form as directory path on file system:
-   * <pre>/root/subnode1/subnode2</pre>.
-   * @param key a <code>String</code> with which the specified value is to be
-   * associated.
-   * @param value a <code>String</code> value to be associated with the
-   * specified key.
-   * @exception UserNotFoundException if user id hasn't been found in repository.
-	 * @throws TigaseDBException if database backend error occurs.
-   */
-  void setData(String user, String subnode, String key, String value)
-    throws UserNotFoundException, TigaseDBException;
-
-  /**
-   * This <code>setData</code> method sets data value for given user ID
-   * associated with given key in default repository node.
-   * Default node is dependent on implementation and usually it is root user
-   * node. If there already exists value for given key in given node, old value
-   * is replaced with new value. No warning or exception is thrown in case if
-   * methods overwrites old value.
-   *
-   * @param user a <code>String</code> value of user ID for which data must be
-   * stored. User ID consists of user name and domain name.
-   * @param key a <code>String</code> with which the specified value is to be
-   * associated.
-   * @param value a <code>String</code> value to be associated with the
-   * specified key.
-   * @exception UserNotFoundException if user id hasn't been found in repository.
-	 * @throws TigaseDBException if database backend error occurs.
-   */
-  void setData(String user, String key, String value)
-    throws UserNotFoundException, TigaseDBException;
-
-  /**
-   * <code>setDataList</code> method sets list of values for given user
-   * associated given key in repository under given node path.
-   * If there already exist values for given key in given node, all old values are
-   * replaced with new values. No warning or exception is thrown in case if
-   * methods overwrites old value.
-   *
-   * @param user a <code>String</code> value of user ID for which data must be
-   * stored. User ID consists of user name and domain name.
-   * @param subnode a <code>String</code> value is a node path where data is
-   * stored. Node path has the same form as directory path on file system:
-   * <pre>/root/subnode1/subnode2</pre>.
-   * @param key a <code>String</code> with which the specified values list is to
-   * be associated.
-   * @param list a <code>String[]</code> is an array of values to be associated
-   * with the specified key.
-   * @exception UserNotFoundException if user id hasn't been found in repository.
-	 * @throws TigaseDBException if database backend error occurs.
-   */
-  void setDataList(String user, String subnode, String key, String[] list)
-    throws UserNotFoundException, TigaseDBException;
-
-	/**
-	 * <code>addDataList</code> method adds mode entries to existing data list
-	 * associated with given key in repository under given node path.
-	 * This method is very similar to <code>setDataList(...)</code> except it
-	 * doesn't remove existing data.
-	 *
-   * @param user a <code>String</code> value of user ID for which data must be
-   * stored. User ID consists of user name and domain name.
-   * @param subnode a <code>String</code> value is a node path where data is
-   * stored. Node path has the same form as directory path on file system:
-   * <pre>/root/subnode1/subnode2</pre>.
-   * @param key a <code>String</code> with which the specified values list is to
-   * be associated.
-   * @param list a <code>String[]</code> is an array of values to be associated
-   * with the specified key.
-   * @exception UserNotFoundException if user id hasn't been found in repository.
-	 * @throws TigaseDBException if database backend error occurs.
-	 */
-	void addDataList(String user, String subnode, String key, String[] list)
-    throws UserNotFoundException, TigaseDBException;
-
-} // UserRepository
+//~ Formatted by Jindent --- http://www.jindent.com

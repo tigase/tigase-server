@@ -212,8 +212,8 @@ public class JabberIqIq extends XMPPProcessor
 		if ((session == null) && (packet.getType() != null)
 				&& (packet.getType() == StanzaType.get)) {
 			try {
-				String iq_level = repo.getPublicData(packet.getStanzaTo().getBareJID().toString(), ID,
-					LEVEL, null);
+				String iq_level = repo.getPublicData(packet.getStanzaTo().getBareJID(), ID, LEVEL,
+					null);
 
 				results.offer(getResponsePacket(packet, iq_level));
 			} catch (UserNotFoundException e) {

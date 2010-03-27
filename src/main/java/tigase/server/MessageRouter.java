@@ -219,7 +219,7 @@ public class MessageRouter extends AbstractMessageReceiver implements MessageRou
 	@Override
 	public void getStatistics(StatisticsList list) {
 		super.getStatistics(list);
-		list.add(getName(), "Local hostname", getDefHostName(), Level.INFO);
+		list.add(getName(), "Local hostname", getDefHostName().getDomain(), Level.INFO);
 
 		TigaseRuntime runtime = TigaseRuntime.getTigaseRuntime();
 
