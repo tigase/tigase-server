@@ -734,7 +734,8 @@ public class MessageRouter extends AbstractMessageReceiver implements MessageRou
 			comp = components.get(jid.getLocalpart());
 
 			if ((comp != null)
-					&& (isLocalDomain(jid.getDomain()) || jid.getDomain().equals(getDefHostName()))) {
+					&& (isLocalDomain(jid.getDomain())
+						|| jid.getDomain().equals(getDefHostName().getDomain()))) {
 				return comp;
 			}
 		}
@@ -751,7 +752,8 @@ public class MessageRouter extends AbstractMessageReceiver implements MessageRou
 
 			comp = components.get(cmpName);
 
-			if ((comp != null) && (isLocalDomain(basename) || basename.equals(getDefHostName()))) {
+			if ((comp != null)
+					&& (isLocalDomain(basename) || basename.equals(getDefHostName().getDomain()))) {
 				return comp;
 			}
 		}
