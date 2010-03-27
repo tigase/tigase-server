@@ -25,7 +25,6 @@ package tigase.db.comp;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.db.RepositoryFactory;
-import tigase.db.RepositoryItem;
 import tigase.db.UserExistsException;
 import tigase.db.UserRepository;
 

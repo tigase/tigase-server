@@ -24,7 +24,7 @@ package tigase.vhosts;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.db.ComponentRepository;
+import tigase.db.comp.ComponentRepository;
 import tigase.db.TigaseDBException;
 
 import tigase.disco.ServiceEntity;

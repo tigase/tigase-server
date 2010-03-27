@@ -23,7 +23,7 @@
 package tigase.server.ext;
 
 import java.util.logging.Logger;
-import tigase.db.RepositoryItem;
+import tigase.db.comp.RepositoryItem;
 import tigase.net.ConnectionType;
 import tigase.server.Command;
 import tigase.server.Packet;

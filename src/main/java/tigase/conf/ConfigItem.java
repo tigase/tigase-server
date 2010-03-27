@@ -24,7 +24,7 @@ package tigase.conf;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.db.RepositoryItem;
+import tigase.db.comp.RepositoryItem;
 
 import tigase.server.Command;
 import tigase.server.Packet;

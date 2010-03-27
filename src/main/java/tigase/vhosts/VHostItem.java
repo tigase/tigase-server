@@ -21,7 +21,7 @@
 package tigase.vhosts;
 
 import java.util.logging.Logger;
-import tigase.db.RepositoryItem;
+import tigase.db.comp.RepositoryItem;
 import tigase.server.Packet;
 import tigase.xml.Element;
 

@@ -24,7 +24,7 @@ package tigase.server.ext;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.db.ComponentRepository;
+import tigase.db.comp.ComponentRepository;
 
 import tigase.net.ConnectionType;
 import tigase.net.SocketType;
