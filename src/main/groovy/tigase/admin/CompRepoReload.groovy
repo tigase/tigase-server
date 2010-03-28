@@ -34,6 +34,7 @@ AS:Component: vhost-man,ext
 package tigase.admin
 
 import tigase.db.*
+import tigase.db.comp.*
 
 def repo = (ComponentRepository)comp_repo
 repo.reload()
