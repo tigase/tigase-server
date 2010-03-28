@@ -646,7 +646,13 @@ public class SessionManager extends AbstractMessageReceiver
 			}    // end of try-catch
 		}
 
-		auth_repository = (UserAuthRepository) props.get(SHARED_AUTH_REPO_PROP_KEY);
+		auth_repository = (UserAuthRepository) props.get(SHARED_USER_AUTH_REPO_POOL_PROP_KEY);
+
+		if (auth_repository == null) {
+			auth_repository = (UserAuthRepository) props.get(SHARED_AUTH_REPO_PROP_KEY);
+		} else {
+			log.config("Using shared auth repository pool.");
+		}
 
 		if (auth_repository != null) {
 			log.config("Using shared auth repository instance: "

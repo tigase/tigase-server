@@ -24,12 +24,13 @@ package tigase.conf;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.db.comp.ComponentRepository;
 import tigase.db.RepositoryFactory;
 import tigase.db.TigaseDBException;
 import tigase.db.UserAuthRepository;
+import tigase.db.UserAuthRepositoryPool;
 import tigase.db.UserRepository;
 import tigase.db.UserRepositoryPool;
+import tigase.db.comp.ComponentRepository;
 
 import tigase.server.AbstractComponentRegistrator;
 import tigase.server.ServerComponent;
@@ -83,6 +84,7 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 
 	//~--- fields ---------------------------------------------------------------
 
+	private UserAuthRepositoryPool auth_pool = null;
 	private Map<String, String> auth_repo_params = null;
 
 	// Default user auth repository instance which can be shared among components
@@ -545,6 +547,7 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 			repo_pool_size = 1;
 		}
 
+		auth_pool = new UserAuthRepositoryPool();
 		repo_pool = new UserRepositoryPool();
 		user_repo_params = new LinkedHashMap<String, String>();
 		auth_repo_params = new LinkedHashMap<String, String>();
@@ -595,9 +598,16 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 			String cls_name = (String) props.get(AUTH_REPO_CLASS_PROP_KEY);
 			String res_uri = (String) props.get(AUTH_REPO_URL_PROP_KEY);
 
-			auth_repository = RepositoryFactory.getAuthRepository(getName(), cls_name, res_uri,
-					auth_repo_params);
+			auth_pool.initRepository(res_uri, auth_repo_params);
+
+			for (int i = 0; i < repo_pool_size; i++) {
+				auth_repository = RepositoryFactory.getAuthRepository(getName() + "-" + (i + 1),
+						cls_name, res_uri, auth_repo_params);
+				auth_pool.addRepo(auth_repository);
+			}
+
 			log.config("Initialized " + cls_name + " as auth repository: " + res_uri);
+			log.config("Initialized user auth repository pool: " + repo_pool_size);
 		} catch (Exception e) {
 			log.log(Level.SEVERE, "Can't initialize auth repository: ", e);
 		}    // end of try-catch
@@ -652,6 +662,7 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 		prop.put(SHARED_AUTH_REPO_PROP_KEY, auth_repository);
 		prop.put(SHARED_AUTH_REPO_PARAMS_PROP_KEY, auth_repo_params);
 		prop.put(SHARED_USER_REPO_POOL_PROP_KEY, repo_pool);
+		prop.put(SHARED_USER_AUTH_REPO_POOL_PROP_KEY, auth_pool);
 		component.setProperties(prop);
 	}
 
