@@ -115,10 +115,25 @@ public abstract class TigaseRuntime {
 		long seconds =
 			(uptime - (days * 24 * HOUR + hours * HOUR + minutes * MINUTE)) / SECOND;
 		StringBuilder sb = new StringBuilder();
-		sb.append(days > 0 ? days + " day, " : "");
-		sb.append(hours > 0 ? hours + " hour, " : "");
-		sb.append(minutes > 0 ? minutes + " min, " : "");
-		sb.append(seconds > 0 ? seconds + " sec" : "");
+		sb.append(days > 0 ? days + (days == 1 ? " day" : " days") : "");
+		if (hours > 0) {
+			if (sb.length() > 0) {
+				sb.append(", ");
+			}
+			sb.append(hours + (hours == 1 ? " hour" : " hours"));
+		}
+		if (minutes > 0) {
+			if(sb.length() > 0) {
+				sb.append(", ");
+			}
+			sb.append(minutes + (minutes == 1 ? " min" : " mins"));
+		}
+		if (days == 0 && seconds > 0) {
+			if (sb.length() > 0) {
+				sb.append(", ");
+			}
+			sb.append(seconds + " sec");
+		}
 		return sb.toString();
 	}
 
