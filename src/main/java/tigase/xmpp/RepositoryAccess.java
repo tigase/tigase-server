@@ -707,6 +707,8 @@ public abstract class RepositoryAccess {
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
 	 * @throws TigaseStringprepException
+	 *
+	 * @deprecated 
 	 */
 	@Deprecated
 	public Authorization register(String name_param, String pass_param, String email_param)
