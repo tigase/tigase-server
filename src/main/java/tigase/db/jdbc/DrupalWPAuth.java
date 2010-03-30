@@ -74,7 +74,7 @@ import javax.security.sasl.SaslServer;
 //~--- classes ----------------------------------------------------------------
 
 /**
- * Describe class DrupalAuth here.
+ * Describe class DrupalWPAuth here.
  *
  *
  * Created: Sat Nov 11 22:22:04 2006
@@ -82,7 +82,7 @@ import javax.security.sasl.SaslServer;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class DrupalAuth implements UserAuthRepository {
+public class DrupalWPAuth implements UserAuthRepository {
 
 	/**
 	 * Private logger for class instancess.
@@ -92,7 +92,34 @@ public class DrupalAuth implements UserAuthRepository {
 	private static final String[] sasl_mechs = { "PLAIN" };
 
 	/** Field description */
-	public static final String DEF_USERS_TBL = "users";
+	public static final String DRUPAL_USERS_TBL = "users";
+
+	/** Field description */
+	public static final String DRUPAL_NAME_FLD = "name";
+
+	/** Field description */
+	public static final String DRUPAL_PASS_FLD = "pass";
+
+	/** Field description */
+	public static final String DRUPAL_STATUS_FLD = "status";
+
+	/** Field description */
+	public static final int DRUPAL_OK_STATUS_VAL = 1;
+
+	/** Field description */
+	public static final String WP_USERS_TBL = "wp_users";
+
+	/** Field description */
+	public static final String WP_NAME_FLD = "user_login";
+
+	/** Field description */
+	public static final String WP_PASS_FLD = "user_pass";
+
+	/** Field description */
+	public static final String WP_STATUS_FLD = "status";
+
+	/** Field description */
+	public static final int WP_OK_STATUS_VAL = 0;
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -121,14 +148,20 @@ public class DrupalAuth implements UserAuthRepository {
 	 * Connection validation helper.
 	 */
 	private long lastConnectionValidated = 0;
-	private PreparedStatement max_uid_st = null;
+
+	// private PreparedStatement max_uid_st = null;
 	private PreparedStatement pass_st = null;
 	private PreparedStatement status_st = null;
 	private PreparedStatement update_last_login_st = null;
 	private PreparedStatement update_online_status = null;
 	private PreparedStatement user_add_st = null;
-	private String users_tbl = DEF_USERS_TBL;
+	private String name_fld = DRUPAL_NAME_FLD;
+	private String users_tbl = DRUPAL_USERS_TBL;
+	private int status_val = DRUPAL_OK_STATUS_VAL;
+	private String status_fld = DRUPAL_STATUS_FLD;
+	private String pass_fld = DRUPAL_PASS_FLD;
 	private boolean online_status = false;
+	private boolean last_login = true;
 
 	//~--- methods --------------------------------------------------------------
 
@@ -147,11 +180,11 @@ public class DrupalAuth implements UserAuthRepository {
 			checkConnection();
 
 			synchronized (user_add_st) {
-				long uid = getMaxUID() + 1;
 
-				user_add_st.setLong(1, uid);
-				user_add_st.setString(2, user.getLocalpart());
-				user_add_st.setString(3, Algorithms.hexDigest("", password, "MD5"));
+				// long uid = getMaxUID() + 1;
+				// user_add_st.setLong(1, uid);
+				user_add_st.setString(1, user.getLocalpart());
+				user_add_st.setString(2, Algorithms.hexDigest("", password, "MD5"));
 				user_add_st.executeUpdate();
 			}
 		} catch (NoSuchAlgorithmException e) {
@@ -233,6 +266,16 @@ public class DrupalAuth implements UserAuthRepository {
 
 		if (db_conn.contains("online_status=true")) {
 			online_status = true;
+		}
+
+		if (db_conn.contains("wp_mode=true")) {
+			online_status = false;
+			last_login = false;
+			name_fld = WP_NAME_FLD;
+			users_tbl = WP_USERS_TBL;
+			status_val = WP_OK_STATUS_VAL;
+			status_fld = WP_STATUS_FLD;
+			pass_fld = WP_PASS_FLD;
 		}
 
 		try {
@@ -440,29 +483,28 @@ public class DrupalAuth implements UserAuthRepository {
 
 	//~--- get methods ----------------------------------------------------------
 
-	private long getMaxUID() throws SQLException {
-		ResultSet rs = null;
-
-		try {
-			synchronized (max_uid_st) {
-				rs = max_uid_st.executeQuery();
-
-				if (rs.next()) {
-					BigDecimal max_uid = rs.getBigDecimal(1);
-
-					// System.out.println("MAX UID = " + max_uid.longValue());
-					return max_uid.longValue();
-				} else {
-
-					// System.out.println("MAX UID = -1!!!!");
-					return -1;
-				}    // end of else
-			}
-		} finally {
-			release(null, rs);
-		}
-	}
-
+//private long getMaxUID() throws SQLException {
+//  ResultSet rs = null;
+//
+//  try {
+//    synchronized (max_uid_st) {
+//      rs = max_uid_st.executeQuery();
+//
+//      if (rs.next()) {
+//        BigDecimal max_uid = rs.getBigDecimal(1);
+//
+//        // System.out.println("MAX UID = " + max_uid.longValue());
+//        return max_uid.longValue();
+//      } else {
+//
+//        // System.out.println("MAX UID = -1!!!!");
+//        return -1;
+//      }    // end of else
+//    }
+//  } finally {
+//    release(null, rs);
+//  }
+//}
 	private String getPassword(BareJID user) throws SQLException, UserNotFoundException {
 		ResultSet rs = null;
 
@@ -493,21 +535,23 @@ public class DrupalAuth implements UserAuthRepository {
 	 * @exception SQLException if an error occurs on database query.
 	 */
 	private void initPreparedStatements() throws SQLException {
-		String query = "select pass from " + users_tbl + " where name = ?;";
+		String query = "select " + pass_fld + " from " + users_tbl + " where " + name_fld + " = ?";
 
 		pass_st = conn.prepareStatement(query);
-		query = "select status from " + users_tbl + " where name = ?;";
+		query = "select " + status_fld + " from " + users_tbl + " where " + name_fld + " = ?";
 		status_st = conn.prepareStatement(query);
-		query = "insert into " + users_tbl + " (uid, name, pass, status)"
-				+ " values (?, ?, ?, 1);";
+		query = "insert into " + users_tbl + " (" + name_fld + ", " + pass_fld + ", " + status_fld
+				+ ")" + " values (?, ?, " + status_val + ");";
 		user_add_st = conn.prepareStatement(query);
-		query = "select max(uid) from " + users_tbl;
-		max_uid_st = conn.prepareStatement(query);
+
+//  query = "select max(uid) from " + users_tbl;
+//  max_uid_st = conn.prepareStatement(query);
 		query = "select 1;";
 		conn_valid_st = conn.prepareStatement(query);
-		query = "update " + users_tbl + " set access=?, login=? where name=?;";
+		query = "update " + users_tbl + " set access=?, login=? where " + name_fld + " = ?";
 		update_last_login_st = conn.prepareStatement(query);
-		query = "update " + users_tbl + " set online_status=online_status+? where name=?;";
+		query = "update " + users_tbl + " set online_status=online_status+? where " + name_fld
+				+ " = ?";
 		update_online_status = conn.prepareStatement(query);
 	}
 
@@ -535,7 +579,7 @@ public class DrupalAuth implements UserAuthRepository {
 				rs = status_st.executeQuery();
 
 				if (rs.next()) {
-					return (rs.getInt(1) == 1);
+					return (rs.getInt(1) == status_val);
 				} else {
 					throw new UserNotFoundException("User does not exist: " + user);
 				}    // end of if (isnext) else
@@ -599,18 +643,20 @@ public class DrupalAuth implements UserAuthRepository {
 	}
 
 	private void updateLastLogin(BareJID user) throws TigaseDBException {
-		try {
-			synchronized (update_last_login_st) {
-				BigDecimal bd = new BigDecimal((System.currentTimeMillis() / 1000));
+		if (last_login) {
+			try {
+				synchronized (update_last_login_st) {
+					BigDecimal bd = new BigDecimal((System.currentTimeMillis() / 1000));
 
-				update_last_login_st.setBigDecimal(1, bd);
-				update_last_login_st.setBigDecimal(2, bd);
-				update_last_login_st.setString(3, user.getLocalpart());
-				update_last_login_st.executeUpdate();
-			}
-		} catch (SQLException e) {
-			throw new TigaseDBException("Error accessing repository.", e);
-		}    // end of try-catch
+					update_last_login_st.setBigDecimal(1, bd);
+					update_last_login_st.setBigDecimal(2, bd);
+					update_last_login_st.setString(3, user.getLocalpart());
+					update_last_login_st.executeUpdate();
+				}
+			} catch (SQLException e) {
+				throw new TigaseDBException("Error accessing repository.", e);
+			}    // end of try-catch
+		}
 	}
 
 	private void updateOnlineStatus(BareJID user, int status) throws TigaseDBException {
@@ -723,7 +769,7 @@ public class DrupalAuth implements UserAuthRepository {
 			}
 		}
 	}
-}    // DrupalAuth
+}    // DrupalWPAuth
 
 
 //~ Formatted in Sun Code Convention
