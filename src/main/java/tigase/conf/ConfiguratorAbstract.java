@@ -24,11 +24,15 @@ package tigase.conf;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.util.Map.Entry;
+import tigase.db.DBInitException;
 import tigase.db.RepositoryFactory;
 import tigase.db.TigaseDBException;
 import tigase.db.UserAuthRepository;
+import tigase.db.UserAuthRepositoryMDImpl;
 import tigase.db.UserAuthRepositoryPool;
 import tigase.db.UserRepository;
+import tigase.db.UserRepositoryMDImpl;
 import tigase.db.UserRepositoryPool;
 import tigase.db.comp.ComponentRepository;
 
@@ -44,6 +48,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -84,13 +89,13 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 
 	//~--- fields ---------------------------------------------------------------
 
-	private UserAuthRepositoryPool auth_pool = null;
+	private UserAuthRepositoryMDImpl auth_repo_impl = null;
 	private Map<String, String> auth_repo_params = null;
+	private UserAuthRepository auth_repository = null;
 
 	// Default user auth repository instance which can be shared among components
-	private UserAuthRepository auth_repository = null;
 	private ConfigRepositoryIfc configRepo = new ConfigurationCache();
-	private UserRepositoryPool repo_pool = null;
+	private UserRepositoryMDImpl user_repo_impl = null;
 	private Map<String, String> user_repo_params = null;
 
 	// Default user repository instance which can be shared among components
@@ -279,6 +284,33 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 		defaults.put(AUTH_REPO_CLASS_PROP_KEY, auth_repo_class);
 		defaults.put(AUTH_REPO_URL_PROP_KEY, auth_repo_url);
 		defaults.put(AUTH_REPO_PARAMS_NODE + "/param-1", "value-1");
+
+		List<String > user_repo_domains = new ArrayList<String >();
+		List<String > auth_repo_domains = new ArrayList<String >();
+		for (Map.Entry<String, Object> entry : params.entrySet()) {
+			if (entry.getKey().startsWith(GEN_USER_DB_URI)) {
+				String domain = parseUserRepoParams(entry, params, user_repo_class, defaults);
+				if (domain != null) {
+					user_repo_domains.add(domain);
+				}
+			}
+			if (entry.getKey().startsWith(GEN_AUTH_DB_URI)) {
+				String domain = parseAuthRepoParams(entry, params, auth_repo_class, defaults);
+				if (domain != null) {
+					auth_repo_domains.add(domain);
+				}
+			}
+		}
+		if (user_repo_domains.size() > 0) {
+			defaults.put(USER_REPO_DOMAINS_PROP_KEY,
+					user_repo_domains.toArray(new String[user_repo_domains.size()]));
+		}
+		if (auth_repo_domains.size() > 0) {
+			defaults.put(AUTH_REPO_DOMAINS_PROP_KEY,
+					auth_repo_domains.toArray(new String[auth_repo_domains.size()]));
+		}
+
+
 
 		// Setup tracer, this is a temporarily code...
 //  String ips = (String)params.get(TigaseTracer.TRACER_IPS_PROP_KEY);
@@ -535,7 +567,7 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 	 * @param props
 	 */
 	@Override
-	public void setProperties(final Map<String, Object> props) {
+	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
 		setupLogManager(props);
 
@@ -547,70 +579,88 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 			repo_pool_size = 1;
 		}
 
-		auth_pool = new UserAuthRepositoryPool();
-		repo_pool = new UserRepositoryPool();
-		user_repo_params = new LinkedHashMap<String, String>();
-		auth_repo_params = new LinkedHashMap<String, String>();
+		String[] user_repo_domains = (String[])props.get(USER_REPO_DOMAINS_PROP_KEY);
+		String[] auth_repo_domains = (String[])props.get(AUTH_REPO_DOMAINS_PROP_KEY);
 
-		for (Map.Entry<String, Object> entry : props.entrySet()) {
-			if (entry.getKey().startsWith(USER_REPO_PARAMS_NODE)) {
+		auth_repo_impl = new UserAuthRepositoryMDImpl();
+		user_repo_impl = new UserRepositoryMDImpl();
+		user_repository = null;
+		auth_repository = null;
 
-				// Split the key to configuration nodes separated with '/'
-				String[] nodes = entry.getKey().split("/");
-
-				// The plugin ID part may contain many IDs separated with comma ','
-				if (nodes.length > 1) {
-					user_repo_params.put(nodes[1], entry.getValue().toString());
-				}
-			}
-
-			if (entry.getKey().startsWith(AUTH_REPO_PARAMS_NODE)) {
-
-				// Split the key to configuration nodes separated with '/'
-				String[] nodes = entry.getKey().split("/");
-
-				// The plugin ID part may contain many IDs separated with comma ','
-				if (nodes.length > 1) {
-					auth_repo_params.put(nodes[1], entry.getValue().toString());
+		if (user_repo_domains != null) {
+			for (String domain : user_repo_domains) {
+				try {
+					addUserRepo(props, domain, repo_pool_size);
+				} catch (Exception e) {
+					log.log(Level.SEVERE, "Can't initialize user repository for domain: " + domain, e);
 				}
 			}
 		}
 
-		try {
-			String cls_name = (String) props.get(USER_REPO_CLASS_PROP_KEY);
-			String res_uri = (String) props.get(USER_REPO_URL_PROP_KEY);
-
-			repo_pool.initRepository(res_uri, user_repo_params);
-
-			for (int i = 0; i < repo_pool_size; i++) {
-				user_repository = RepositoryFactory.getUserRepository(getName() + "-" + (i + 1),
-						cls_name, res_uri, user_repo_params);
-				repo_pool.addRepo(user_repository);
+		if (user_repository == null) {
+			try {
+				addUserRepo(props, null, repo_pool_size);
+			} catch (Exception e) {
+				log.log(Level.SEVERE, "Can't initialize user default repository: ", e);
 			}
+		}
 
-			log.config("Initialized " + cls_name + " as user repository: " + res_uri);
-			log.config("Initialized user repository pool: " + repo_pool_size);
-		} catch (Exception e) {
-			log.log(Level.SEVERE, "Can't initialize user repository: ", e);
-		}    // end of try-catch
-
-		try {
-			String cls_name = (String) props.get(AUTH_REPO_CLASS_PROP_KEY);
-			String res_uri = (String) props.get(AUTH_REPO_URL_PROP_KEY);
-
-			auth_pool.initRepository(res_uri, auth_repo_params);
-
-			for (int i = 0; i < repo_pool_size; i++) {
-				auth_repository = RepositoryFactory.getAuthRepository(getName() + "-" + (i + 1),
-						cls_name, res_uri, auth_repo_params);
-				auth_pool.addRepo(auth_repository);
+		if (auth_repo_domains != null) {
+			for (String domain : auth_repo_domains) {
+				try {
+					addAuthRepo(props, domain, repo_pool_size);
+				} catch (Exception e) {
+					log.log(Level.SEVERE, "Can't initialize user repository for domain: " + domain, e);
+				}
 			}
+		}
 
-			log.config("Initialized " + cls_name + " as auth repository: " + res_uri);
-			log.config("Initialized user auth repository pool: " + repo_pool_size);
-		} catch (Exception e) {
-			log.log(Level.SEVERE, "Can't initialize auth repository: ", e);
-		}    // end of try-catch
+		if (auth_repository == null) {
+			try {
+				addAuthRepo(props, null, repo_pool_size);
+			} catch (Exception e) {
+				log.log(Level.SEVERE, "Can't initialize auth default repository: ", e);
+			}
+		}
+
+//		user_repo_params = getRepoParams(props, USER_REPO_PARAMS_NODE, null);
+//		auth_repo_params = getRepoParams(props, AUTH_REPO_PARAMS_NODE, null);
+//
+//		try {
+//			String cls_name = (String) props.get(USER_REPO_CLASS_PROP_KEY);
+//			String res_uri = (String) props.get(USER_REPO_URL_PROP_KEY);
+//
+//			repo_pool.initRepository(res_uri, user_repo_params);
+//
+//			for (int i = 0; i < repo_pool_size; i++) {
+//				user_repository = RepositoryFactory.getUserRepository(getName() + "-" + (i + 1),
+//						cls_name, res_uri, user_repo_params);
+//				repo_pool.addRepo(user_repository);
+//			}
+//
+//			log.config("Initialized " + cls_name + " as user repository: " + res_uri);
+//			log.config("Initialized user repository pool: " + repo_pool_size);
+//		} catch (Exception e) {
+//			log.log(Level.SEVERE, "Can't initialize user repository: ", e);
+//		}    // end of try-catch
+//
+//		try {
+//			String cls_name = (String) props.get(AUTH_REPO_CLASS_PROP_KEY);
+//			String res_uri = (String) props.get(AUTH_REPO_URL_PROP_KEY);
+//
+//			auth_pool.initRepository(res_uri, auth_repo_params);
+//
+//			for (int i = 0; i < repo_pool_size; i++) {
+//				auth_repository = RepositoryFactory.getAuthRepository(getName() + "-" + (i + 1),
+//						cls_name, res_uri, auth_repo_params);
+//				auth_pool.addRepo(auth_repository);
+//			}
+//
+//			log.config("Initialized " + cls_name + " as auth repository: " + res_uri);
+//			log.config("Initialized user auth repository pool: " + repo_pool_size);
+//		} catch (Exception e) {
+//			log.log(Level.SEVERE, "Can't initialize auth repository: ", e);
+//		}    // end of try-catch
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -661,16 +711,95 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 		prop.put(SHARED_USER_REPO_PARAMS_PROP_KEY, user_repo_params);
 		prop.put(SHARED_AUTH_REPO_PROP_KEY, auth_repository);
 		prop.put(SHARED_AUTH_REPO_PARAMS_PROP_KEY, auth_repo_params);
-		prop.put(SHARED_USER_REPO_POOL_PROP_KEY, repo_pool);
-		prop.put(SHARED_USER_AUTH_REPO_POOL_PROP_KEY, auth_pool);
+		prop.put(SHARED_USER_REPO_POOL_PROP_KEY, user_repo_impl);
+		prop.put(SHARED_USER_AUTH_REPO_POOL_PROP_KEY, auth_repo_impl);
 		component.setProperties(prop);
+	}
+
+	private void addUserRepo(Map<String, Object> props, String domain, int pool_size)
+			throws DBInitException, ClassNotFoundException, InstantiationException,
+			IllegalAccessException {
+		Map<String, String> params = getRepoParams(props, USER_REPO_PARAMS_NODE, domain);
+		String cls_name = (String)props.get(USER_REPO_CLASS_PROP_KEY +
+				(domain == null ? "" : "/" + domain));
+		String conn_url = (String)props.get(USER_REPO_URL_PROP_KEY +
+				(domain == null ? "" : "/" + domain));
+		UserRepositoryPool repo_pool = new UserRepositoryPool();
+		repo_pool.initRepository(conn_url, params);
+		for (int i = 0; i < pool_size; i++) {
+			UserRepository repo = RepositoryFactory.getUserRepository(getName() + "-" + (i + 1),
+					cls_name, conn_url, params);
+			repo_pool.addRepo(repo);
+		}
+
+		if (domain == null || domain.trim().isEmpty()) {
+			user_repo_impl.addRepo("", repo_pool);
+			user_repo_impl.setDefault(repo_pool);
+			user_repository = repo_pool;
+		} else {
+			user_repo_impl.addRepo(domain, repo_pool);
+		}
+
+		log.info("[" + domain + "] Initialized " + cls_name + " as user repository: " + conn_url);
+		log.info("[" + domain + "] Initialized user repository pool: " + pool_size);
+
+	}
+
+	private void addAuthRepo(Map<String, Object> props, String domain, int pool_size)
+			throws DBInitException, ClassNotFoundException, InstantiationException,
+			IllegalAccessException {
+		Map<String, String> params = getRepoParams(props, AUTH_REPO_PARAMS_NODE, domain);
+		String cls_name = (String)props.get(AUTH_REPO_CLASS_PROP_KEY +
+				(domain == null ? "" : "/" + domain));
+		String conn_url = (String)props.get(AUTH_REPO_URL_PROP_KEY +
+				(domain == null ? "" : "/" + domain));
+		UserAuthRepositoryPool repo_pool = new UserAuthRepositoryPool();
+		repo_pool.initRepository(conn_url, params);
+		for (int i = 0; i < pool_size; i++) {
+			UserAuthRepository repo = RepositoryFactory.getAuthRepository(getName() + "-" + (i + 1),
+					cls_name, conn_url, params);
+			repo_pool.addRepo(repo);
+		}
+
+		if (domain == null || domain.trim().isEmpty()) {
+			auth_repo_impl.addRepo("", repo_pool);
+			auth_repo_impl.setDefault(repo_pool);
+			auth_repository = repo_pool;
+		} else {
+			auth_repo_impl.addRepo(domain, repo_pool);
+		}
+
+		log.info("[" + domain + "] Initialized " + cls_name + " as user auth repository: " + conn_url);
+		log.info("[" + domain + "] Initialized user auth repository pool: " + pool_size);
+
+	}
+
+	private Map<String, String> getRepoParams(Map<String, Object> props, String repo_type,
+			String domain) {
+		Map<String, String> result = new LinkedHashMap<String, String>();
+		String prop_start = repo_type + (domain == null ? "" : "/" + domain);
+
+		for (Map.Entry<String, Object> entry : props.entrySet()) {
+			if (entry.getKey().startsWith(prop_start)) {
+
+				// Split the key to configuration nodes separated with '/'
+				String[] nodes = entry.getKey().split("/");
+
+				// The plugin ID part may contain many IDs separated with comma ','
+				if (nodes.length > 1) {
+					result.put(nodes[nodes.length - 1], entry.getValue().toString());
+				}
+			}
+		}
+		return result;
 	}
 
 	private void initMonitoring(String settings, String configDir) {
 		if ((monitoring == null) && (settings != null)) {
 			try {
-				monitoring =
-					(MonitoringSetupIfc) Class.forName("tigase.management.MonitoringSetup").newInstance();
+				String mon_cls = "tigase.management.MonitoringSetup";
+
+				monitoring = (MonitoringSetupIfc) Class.forName(mon_cls).newInstance();
 				monitoring.initMonitoring(settings, configDir);
 			} catch (Exception e) {
 				log.log(Level.WARNING, "Can not initialize monitoring: ", e);
@@ -701,6 +830,60 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 		// System.out.println("Setting logging: \n" + buff.toString());
 		loadLogManagerConfig(buff.toString());
 		log.config("DONE");
+	}
+
+	private String parseUserRepoParams(Entry<String, Object> entry,
+			Map<String, Object> params, String user_repo_class,
+			Map<String, Object> defaults) {
+		String key = entry.getKey();
+		int br_open = key.indexOf('[');
+		int br_close = key.indexOf(']');
+		if (br_open < 0 || br_close < 0) {
+			// default database is configured elsewhere
+			return null;
+		}
+		String repo_class = user_repo_class;
+		String options = key.substring(br_open+1, br_close);
+		String domain = options.split(":")[0];
+		log.info("Found DB domain: " + domain);
+		String get_user_db = GEN_USER_DB + "[" + options + "]";
+		if (params.get(get_user_db) != null) {
+			repo_class = (String)params.get(get_user_db);
+		}
+		defaults.put(USER_REPO_CLASS_PROP_KEY + "/" + domain, repo_class);
+		log.config("Setting defaults: " + USER_REPO_CLASS_PROP_KEY + "/" + domain + "="
+				+ repo_class);
+		defaults.put(USER_REPO_URL_PROP_KEY + "/" + domain, entry.getValue());
+		log.config("Setting defaults: " + USER_REPO_URL_PROP_KEY + "/" + domain + "="
+				+ entry.getValue());
+		return domain;
+	}
+
+	private String parseAuthRepoParams(Entry<String, Object> entry,
+			Map<String, Object> params, String auth_repo_class,
+			Map<String, Object> defaults) {
+		String key = entry.getKey();
+		int br_open = key.indexOf('[');
+		int br_close = key.indexOf(']');
+		if (br_open < 0 || br_close < 0) {
+			// default database is configured elsewhere
+			return null;
+		}
+		String repo_class = auth_repo_class;
+		String options = key.substring(br_open+1, br_close);
+		String domain = options.split(":")[0];
+		log.info("Found DB domain: " + domain);
+		String get_user_db = GEN_AUTH_DB + "[" + options + "]";
+		if (params.get(get_user_db) != null) {
+			repo_class = (String)params.get(get_user_db);
+		}
+		defaults.put(AUTH_REPO_CLASS_PROP_KEY + "/" + domain, repo_class);
+		log.config("Setting defaults: " + AUTH_REPO_CLASS_PROP_KEY + "/" + domain + "="
+				+ repo_class);
+		defaults.put(AUTH_REPO_URL_PROP_KEY + "/" + domain, entry.getValue());
+		log.config("Setting defaults: " + AUTH_REPO_URL_PROP_KEY + "/" + domain + "="
+				+ entry.getValue());
+		return domain;
 	}
 }
 
