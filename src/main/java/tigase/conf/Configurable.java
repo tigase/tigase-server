@@ -196,7 +196,7 @@ public interface Configurable extends ServerComponent {
 		"tigase.db.jdbc.TigaseCustomAuth";
 
 	/** Field description */
-	public static final String DRUPAL_REPO_CLASS_PROP_VAL = "tigase.db.jdbc.DrupalWPAuth";
+	public static final String DRUPALWP_REPO_CLASS_PROP_VAL = "tigase.db.jdbc.DrupalWPAuth";
 
 	/** Field description */
 	public static final String LIBRESOURCE_REPO_CLASS_PROP_VAL =
@@ -349,7 +349,10 @@ public interface Configurable extends ServerComponent {
 	/** Field description */
 	public static final String USER_REPO_POOL_SIZE_PROP_KEY = "user-repo-pool-size";
 
+	/** Field description */
 	public static final String USER_REPO_DOMAINS_PROP_KEY = "user-repo-domains";
+
+	/** Field description */
 	public static final String AUTH_REPO_DOMAINS_PROP_KEY = "auth-repo-domains";
 
 	/** Field description */
