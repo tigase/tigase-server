@@ -87,7 +87,7 @@ public class DrupalWPAuth implements UserAuthRepository {
 	/**
 	 * Private logger for class instancess.
 	 */
-	private static final Logger log = Logger.getLogger("tigase.db.jdbc.DrupalAuth");
+	private static final Logger log = Logger.getLogger(DrupalWPAuth.class.getName());
 	private static final String[] non_sasl_mechs = { "password" };
 	private static final String[] sasl_mechs = { "PLAIN" };
 
@@ -276,6 +276,9 @@ public class DrupalWPAuth implements UserAuthRepository {
 			status_val = WP_OK_STATUS_VAL;
 			status_fld = WP_STATUS_FLD;
 			pass_fld = WP_PASS_FLD;
+			log.info("Initializing Wordpress repository: " + db_conn);
+		} else {
+			log.info("Initializing Drupal repository: " + db_conn);
 		}
 
 		try {
@@ -351,18 +354,34 @@ public class DrupalWPAuth implements UserAuthRepository {
 		if (proto.equals(PROTOCOL_VAL_SASL)) {
 			String mech = (String) props.get(MACHANISM_KEY);
 
-			if (mech.equals("PLAIN")) {
-				boolean login_ok = saslAuth(props);
+			try {
+				if (mech.equals("PLAIN")) {
+					boolean login_ok = saslAuth(props);
 
-				if (login_ok) {
-					BareJID user = BareJID.bareJIDInstanceNS((String) props.get(USER_ID_KEY));
+					if (login_ok) {
+						BareJID user = (BareJID) props.get(USER_ID_KEY);
 
-					updateLastLogin(user);
-					updateOnlineStatus(user, 1);
-				}    // end of if (login_ok)
+						updateLastLogin(user);
+						updateOnlineStatus(user, 1);
 
-				return login_ok;
-			}      // end of if (mech.equals("PLAIN"))
+						if (log.isLoggable(Level.FINEST)) {
+							log.finest("User authenticated: " + user);
+						}
+					} else {
+						if (log.isLoggable(Level.FINEST)) {
+							log.finest("User NOT authenticated");
+						}
+					}
+
+					return login_ok;
+				}    // end of if (mech.equals("PLAIN"))
+			} catch (Exception e) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "OTHER authentication error: ", e);
+				}
+
+				throw new AuthorizationException("Sasl exception.", e);
+			}      // end of try-catch
 
 			throw new AuthorizationException("Mechanism is not supported: " + mech);
 		}        // end of if (proto.equals(PROTOCOL_VAL_SASL))
@@ -398,7 +417,15 @@ public class DrupalWPAuth implements UserAuthRepository {
 			if (login_ok) {
 				updateLastLogin(user);
 				updateOnlineStatus(user, 1);
-			}    // end of if (login_ok)
+
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("User authenticated: " + user);
+				}
+			} else {
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("User NOT authenticated: " + user);
+				}
+			}
 
 			return login_ok;
 		} catch (NoSuchAlgorithmException e) {
@@ -638,6 +665,16 @@ public class DrupalWPAuth implements UserAuthRepository {
 				return false;
 			}    // end of if (ss.isComplete()) else
 		} catch (SaslException e) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "SASL authentication error: ", e);
+			}
+
+			throw new AuthorizationException("Sasl exception.", e);
+		} catch (Exception e) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "SASL authentication error: ", e);
+			}
+
 			throw new AuthorizationException("Sasl exception.", e);
 		}      // end of try-catch
 	}
