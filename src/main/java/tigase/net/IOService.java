@@ -696,7 +696,7 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 					}
 
 					ByteBuffer dataBuffer = null;
-					int out_buff_size = 2048;
+					int out_buff_size = data.length();
 					int idx_start = 0;
 					int idx_offset = Math.min(idx_start + out_buff_size, data.length());
 
@@ -713,6 +713,12 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 //          dataBuffer = encoder.encode(CharBuffer.wrap(data));
 						encoder.flush(dataBuffer);
 						socketIO.write(dataBuffer);
+
+						if (log.isLoggable(Level.FINEST)) {
+							log.finest("Socket: " + socketIO + ", wrote: " + idx_offset + " of: "
+									+ data.length());
+						}
+
 						idx_start = idx_offset;
 						idx_offset = Math.min(idx_start + out_buff_size, data.length());
 					}
