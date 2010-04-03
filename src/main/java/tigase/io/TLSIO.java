@@ -297,6 +297,8 @@ public class TLSIO implements IOInterface {
 					break;
 
 				case NEED_READ :
+					// I wonder if some real data can be read from the socket here (and we would
+					// loose the data) or this is just TLS stuff here.....
 					ByteBuffer rbuff = read(ByteBuffer.allocate(tlsWrapper.getNetBuffSize()));
 
 					break;
@@ -331,15 +333,17 @@ public class TLSIO implements IOInterface {
 			throw new EOFException("Socket has been closed.");
 		}    // end of if (tlsWrapper.getStatus() == TLSStatus.CLOSED)
 
+		int result = -1;
 		if (buff == null) {
-			return io.write(null);
-		}
+			result = io.write(null);
+		} else {
 
-		if (log.isLoggable(Level.FINER)) {
-			log.finer("TLS - Writing data, remaining: " + buff.remaining());
-		}
+			if (log.isLoggable(Level.FINER)) {
+				log.finer("TLS - Writing data, remaining: " + buff.remaining());
+			}
 
-		int result = writeBuff(buff);
+			result = writeBuff(buff);
+		}
 
 //  if (isRemoteAddress("81.142.228.219")) {
 //    log.warning("TLS - Writing data, remaining: " + buff.remaining());
@@ -460,6 +464,13 @@ public class TLSIO implements IOInterface {
 		int max_loop_runs = 1000;
 
 		do {
+			if (tlsWrapper.getStatus() == TLSStatus.NEED_READ) {
+				// I wonder if some real data can be read from the socket here (and we would
+				// loose the data) or this is just TLS stuff here.....
+				ByteBuffer rbuff = read(ByteBuffer.allocate(tlsWrapper.getNetBuffSize()));
+			}
+
+
 			ByteBuffer tlsOutput = ByteBuffer.allocate(tlsWrapper.getNetBuffSize());
 
 			// Not sure if this is really needed, I guess not...

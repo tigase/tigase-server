@@ -19,17 +19,24 @@
  * Last modified by $Author$
  * $Date$
  */
+
 package tigase.io;
+
+//~--- JDK imports ------------------------------------------------------------
+
+import java.nio.ByteBuffer;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
-import javax.net.ssl.SSLException;
+import javax.net.ssl.SSLEngineResult;
 import javax.net.ssl.SSLEngineResult.HandshakeStatus;
 import javax.net.ssl.SSLEngineResult.Status;
-import javax.net.ssl.SSLEngineResult;
-import java.util.logging.Logger;
-import java.util.logging.Level;
-import java.nio.ByteBuffer;
+import javax.net.ssl.SSLException;
+
+//~--- classes ----------------------------------------------------------------
 
 /**
  * Describe class TLSWrapper here.
@@ -47,12 +54,17 @@ public class TLSWrapper {
 	 */
 	private static Logger log = Logger.getLogger("tigase.io.TLSWrapper");
 
+	//~--- fields ---------------------------------------------------------------
+
+	private int appBuffSize = 0;
+
+	// private String protocol = null;
+	private TLSEventHandler eventHandler = null;
+	private int netBuffSize = 0;
 	private SSLEngine tlsEngine = null;
 	private SSLEngineResult tlsEngineResult = null;
-	private int netBuffSize = 0;
-	private int appBuffSize = 0;
-	//	private String protocol = null;
-	private TLSEventHandler eventHandler = null;
+
+	//~--- constructors ---------------------------------------------------------
 
 	/**
 	 * Creates a new <code>TLSWrapper</code> instance.
@@ -60,10 +72,9 @@ public class TLSWrapper {
 	 *
 	 * @param sslc
 	 * @param eventHandler
-	 * @param clientMode 
+	 * @param clientMode
 	 */
-	public TLSWrapper(SSLContext sslc, TLSEventHandler eventHandler,
-		boolean clientMode) {
+	public TLSWrapper(SSLContext sslc, TLSEventHandler eventHandler, boolean clientMode) {
 		tlsEngine = sslc.createSSLEngine();
 		tlsEngine.setUseClientMode(clientMode);
 		netBuffSize = tlsEngine.getSession().getPacketBufferSize();
@@ -71,99 +82,188 @@ public class TLSWrapper {
 		this.eventHandler = eventHandler;
 	}
 
-	public boolean isClientMode() {
-	 	return tlsEngine.getUseClientMode();
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public int bytesConsumed() {
+		return tlsEngineResult.bytesConsumed();
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @throws SSLException
+	 */
 	public void close() throws SSLException {
 		tlsEngine.closeOutbound();
-		//    tlsEngine.closeInbound();
+
+		// tlsEngine.closeInbound();
 	}
 
-	public int getNetBuffSize() {
-		return netBuffSize;
-	}
+	//~--- get methods ----------------------------------------------------------
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
 	public int getAppBuffSize() {
 		return appBuffSize;
 	}
 
- 	public int getPacketBuffSize() {
- 		return tlsEngine.getSession().getPacketBufferSize();
- 	}
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public int getNetBuffSize() {
+		return netBuffSize;
+	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public int getPacketBuffSize() {
+		return tlsEngine.getSession().getPacketBufferSize();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
 	public TLSStatus getStatus() {
 		TLSStatus status = null;
-		if (tlsEngineResult != null &&
-			tlsEngineResult.getStatus() == Status.BUFFER_UNDERFLOW) {
+
+		if ((tlsEngineResult != null)
+				&& (tlsEngineResult.getStatus() == Status.BUFFER_UNDERFLOW)) {
 			status = TLSStatus.UNDERFLOW;
-			//status = TLSStatus.NEED_READ;
-		} // end of if (tlsEngine.getStatus() == Status.BUFFER_UNDERFLOW)
-		else {
-			if (tlsEngineResult != null &&
-				tlsEngineResult.getStatus() == Status.CLOSED) {
+
+			// status = TLSStatus.NEED_READ;
+		}        // end of if (tlsEngine.getStatus() == Status.BUFFER_UNDERFLOW)
+				else {
+			if ((tlsEngineResult != null) && (tlsEngineResult.getStatus() == Status.CLOSED)) {
 				status = TLSStatus.CLOSED;
-			} // end of if (tlsEngine.getStatus() == Status.BUFFER_UNDERFLOW)
-			else {
+			}      // end of if (tlsEngine.getStatus() == Status.BUFFER_UNDERFLOW)
+					else {
 				switch (tlsEngine.getHandshakeStatus()) {
-				case NEED_WRAP:
-					status = TLSStatus.NEED_WRITE;
-					break;
-				case NEED_UNWRAP:
-					status = TLSStatus.NEED_READ;
-					break;
-				case FINISHED:
-					if (eventHandler != null) {
-						eventHandler.handshakeCompleted();
-					}
-					break;
-				default:
-					status = TLSStatus.OK;
-					break;
-				} // end of switch (tlsEngine.getHandshakeStatus())
+					case NEED_WRAP :
+						status = TLSStatus.NEED_WRITE;
+
+						break;
+
+					case NEED_UNWRAP :
+						status = TLSStatus.NEED_READ;
+
+						break;
+
+					case FINISHED :
+						if (eventHandler != null) {
+							eventHandler.handshakeCompleted();
+						}
+
+						break;
+
+					default :
+						status = TLSStatus.OK;
+
+						break;
+				}    // end of switch (tlsEngine.getHandshakeStatus())
 			}
-		} // end of else
+		}        // end of else
+
 		return status;
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public boolean isClientMode() {
+		return tlsEngine.getUseClientMode();
+	}
+
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param net
+	 * @param app
+	 *
+	 * @return
+	 *
+	 * @throws SSLException
+	 */
 	public ByteBuffer unwrap(ByteBuffer net, ByteBuffer app) throws SSLException {
 		ByteBuffer out = app;
- 		out = resizeApplicationBuffer(out);
- 		tlsEngineResult = tlsEngine.unwrap(net, out);
+
+		out = resizeApplicationBuffer(out);
+		tlsEngineResult = tlsEngine.unwrap(net, out);
+
 		if (log.isLoggable(Level.FINEST)) {
- 			log.finest("unwrap() \ntlsEngineRsult.getStatus() = "
- 				+ tlsEngineResult.getStatus()
-				+ "\ntlsEngineRsult.getHandshakeStatus() = "
-				+ tlsEngineResult.getHandshakeStatus());
+			log.finest("unwrap() \ntlsEngineRsult.getStatus() = " + tlsEngineResult.getStatus()
+					+ "\ntlsEngineRsult.getHandshakeStatus() = " + tlsEngineResult.getHandshakeStatus());
 		}
+
 		if (tlsEngineResult.getHandshakeStatus() == HandshakeStatus.NEED_TASK) {
 			doTasks();
+
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("unwrap() doTasks(), handshake: " +
-					tlsEngine.getHandshakeStatus());
+				log.finest("unwrap() doTasks(), handshake: " + tlsEngine.getHandshakeStatus());
 			}
 		}
+
 		return out;
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param app
+	 * @param net
+	 *
+	 * @throws SSLException
+	 */
 	public void wrap(ByteBuffer app, ByteBuffer net) throws SSLException {
 		tlsEngineResult = tlsEngine.wrap(app, net);
+
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("wrap() \ntlsEngineRsult.getStatus() = "
-				+ tlsEngineResult.getStatus()
-				+ "\ntlsEngineRsult.getHandshakeStatus() = "
-				+ tlsEngineResult.getHandshakeStatus());
+			log.finest("tlsEngineRsult.getStatus() = " + tlsEngineResult.getStatus()
+					+ ", tlsEngineRsult.getHandshakeStatus() = " + tlsEngineResult.getHandshakeStatus());
 		}
+
 		if (tlsEngineResult.getHandshakeStatus() == HandshakeStatus.NEED_TASK) {
 			doTasks();
+
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("wrap() doTasks(): " + tlsEngine.getHandshakeStatus());
+				log.finest("doTasks(): " + tlsEngine.getHandshakeStatus());
 			}
 		}
 	}
 
-	public int bytesConsumed() {
-		return tlsEngineResult.bytesConsumed();
+	private void doTasks() {
+		Runnable runnable = null;
+
+		while ((runnable = tlsEngine.getDelegatedTask()) != null) {
+			runnable.run();
+		}    // end of while ((runnable = engine.getDelegatedTask()) != 0)
 	}
 
 	/**
@@ -172,21 +272,21 @@ public class TLSWrapper {
 	private ByteBuffer resizeApplicationBuffer(ByteBuffer app) {
 		if (app.remaining() < appBuffSize) {
 			ByteBuffer bb = ByteBuffer.allocate(app.capacity() + appBuffSize);
-			//      bb.clear();
+
+			// bb.clear();
 			app.flip();
 			bb.put(app);
+
 			return bb;
-		} // end of if (appInBuff.remaining < appBuffSize)
-		else {
+		}    // end of if (appInBuff.remaining < appBuffSize)
+				else {
 			return app;
-		} // end of else
+		}    // end of else
 	}
+}    // TLSWrapper
 
-	private void doTasks() {
-		Runnable runnable = null;
-		while ((runnable = tlsEngine.getDelegatedTask()) != null) {
-			runnable.run();
-		} // end of while ((runnable = engine.getDelegatedTask()) != 0)
-	}
 
-} // TLSWrapper
+//~ Formatted in Sun Code Convention
+
+
+//~ Formatted by Jindent --- http://www.jindent.com
