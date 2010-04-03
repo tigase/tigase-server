@@ -25,7 +25,7 @@
 User add script as described in XEP-0133:
 http://xmpp.org/extensions/xep-0133.html#add-user
 
-AS:Description: User add administrator command.
+AS:Description: Add user.
 AS:CommandId: add-user
 AS:Component: sess-man
 */
@@ -74,8 +74,9 @@ if (userJid == null || userPass == null || userPassVer == null || userEmail == n
 
 def result = p.commandResult(Command.DataType.result)
 try {
-  auth_repo.addUser(userJid, userPass)
-  user_repo.setData(userJid, "email", userEmail);
+	bareJID = BareJID.bareJIDInstance(userJid)
+  auth_repo.addUser(bareJID, userPass)
+  user_repo.setData(bareJID, "email", userEmail);
 
   Command.addTextField(result, "Note", "Operation successful");
 } catch (UserExistsException ex) {
