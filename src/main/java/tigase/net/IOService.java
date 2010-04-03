@@ -696,33 +696,32 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 					}
 
 					ByteBuffer dataBuffer = null;
-					int out_buff_size = data.length();
-					int idx_start = 0;
-					int idx_offset = Math.min(idx_start + out_buff_size, data.length());
 
-					while (idx_start < data.length()) {
+//        int out_buff_size = data.length();
+//        int idx_start = 0;
+//        int idx_offset = Math.min(idx_start + out_buff_size, data.length());
+//
+//        while (idx_start < data.length()) {
 
-//          String data_str = data.substring(idx_start, idx_offset);
-//          if (log.isLoggable(Level.FINEST)) {
-//          log.finest("Writing data_str (" + data_str.length() + "), idx_start="
-//              + idx_start + ", idx_offset=" + idx_offset + ": " + data_str);
-//          }
-						encoder.reset();
-						dataBuffer = encoder.encode(CharBuffer.wrap(data, idx_start, idx_offset));
+//        String data_str = data.substring(idx_start, idx_offset);
+//        if (log.isLoggable(Level.FINEST)) {
+//        log.finest("Writing data_str (" + data_str.length() + "), idx_start="
+//            + idx_start + ", idx_offset=" + idx_offset + ": " + data_str);
+//        }
+					encoder.reset();
 
-//          dataBuffer = encoder.encode(CharBuffer.wrap(data));
-						encoder.flush(dataBuffer);
-						socketIO.write(dataBuffer);
+//        dataBuffer = encoder.encode(CharBuffer.wrap(data, idx_start, idx_offset));
+					dataBuffer = encoder.encode(CharBuffer.wrap(data));
+					encoder.flush(dataBuffer);
+					socketIO.write(dataBuffer);
 
-						if (log.isLoggable(Level.FINEST)) {
-							log.finest("Socket: " + socketIO + ", wrote: " + idx_offset + " of: "
-									+ data.length());
-						}
-
-						idx_start = idx_offset;
-						idx_offset = Math.min(idx_start + out_buff_size, data.length());
+					if (log.isLoggable(Level.FINEST)) {
+						log.finest("Socket: " + socketIO + ", wrote: " + data.length());
 					}
 
+//        idx_start = idx_offset;
+//        idx_offset = Math.min(idx_start + out_buff_size, data.length());
+//          }
 					setLastTransferTime();
 
 					// addWritten(data.length());
