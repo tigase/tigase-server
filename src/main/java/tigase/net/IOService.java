@@ -702,7 +702,6 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 //        int idx_offset = Math.min(idx_start + out_buff_size, data.length());
 //
 //        while (idx_start < data.length()) {
-
 //        String data_str = data.substring(idx_start, idx_offset);
 //        if (log.isLoggable(Level.FINEST)) {
 //        log.finest("Writing data_str (" + data_str.length() + "), idx_start="
