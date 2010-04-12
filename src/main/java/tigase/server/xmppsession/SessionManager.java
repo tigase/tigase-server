@@ -117,8 +117,6 @@ import javax.script.Bindings;
  * Created: Tue Nov 22 07:07:11 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @author <a href="mailto:peter@stardoll.com">Peter Sandström</a> - multi-threadin
- * support for pluggins processors.
  * @version $Rev$
  */
 public class SessionManager extends AbstractMessageReceiver
