@@ -653,7 +653,7 @@ public class VHostManager extends AbstractComponentRegistrator<VHostListener>
 		String vh = Command.getFieldValue(packet, "VHost");
 
 		if ((vh != null) &&!vh.isEmpty()) {
-			VHostItem vhost = new VHostItem(vh);
+			VHostItem vhost = new VHostItem(JID.jidInstanceNS(vh));
 			String enabled = Command.getFieldValue(packet, "Enabled");
 
 			vhost.setEnabled((enabled == null) || enabled.isEmpty() || "true".equals(enabled));

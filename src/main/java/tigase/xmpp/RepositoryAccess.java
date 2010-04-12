@@ -71,7 +71,6 @@ public abstract class RepositoryAccess {
 
 	private UserAuthRepository authRepo = null;
 	protected VHostItem domain = null;
-	private JID domainAsJID = null;
 
 	/**
 	 * Handle to user repository - permanent data base for storing user data.
@@ -397,8 +396,8 @@ public abstract class RepositoryAccess {
 	 *
 	 * @return
 	 */
-	public String getDomain() {
-		return domain.getVhost();
+	public VHostItem getDomain() {
+		return domain;
 	}
 
 	/**
@@ -408,7 +407,7 @@ public abstract class RepositoryAccess {
 	 * @return
 	 */
 	public JID getDomainAsJID() {
-		return domainAsJID;
+		return domain.getVhost();
 	}
 
 	/**
@@ -570,7 +569,8 @@ public abstract class RepositoryAccess {
 			if (domain.isAnonymousEnabled() && (mech != null) && mech.equals(ANONYMOUS_MECH)) {
 				is_anonymous = true;
 				props.put(UserAuthRepository.USER_ID_KEY,
-						BareJID.bareJIDInstanceNS(UUID.randomUUID().toString(), getDomain()));
+						BareJID.bareJIDInstanceNS(UUID.randomUUID().toString(), 
+						getDomain().getVhost().getDomain()));
 				authState = Authorization.AUTHORIZED;
 				login();
 			} else {
@@ -680,7 +680,7 @@ public abstract class RepositoryAccess {
 	 * @param authProps
 	 */
 	public void queryAuth(Map<String, Object> authProps) {
-		authProps.put(UserAuthRepository.SERVER_NAME_KEY, getDomain());
+		authProps.put(UserAuthRepository.SERVER_NAME_KEY, getDomain().getVhost().getDomain());
 		authRepo.queryAuth(authProps);
 
 		if (domain.isAnonymousEnabled()
@@ -759,7 +759,7 @@ public abstract class RepositoryAccess {
 		}
 
 		if (domain.getMaxUsersNumber() > 0) {
-			long domainUsers = authRepo.getUsersCount(domain.getVhost());
+			long domainUsers = authRepo.getUsersCount(domain.getVhost().getDomain());
 
 			if (domainUsers >= domain.getMaxUsersNumber()) {
 				throw new NotAuthorizedException("Maximum users number for the domain exceeded.");
@@ -772,17 +772,19 @@ public abstract class RepositoryAccess {
 		}
 
 		try {
-			authRepo.addUser(BareJID.bareJIDInstance(user_name, getDomain()), pass_param);
+			authRepo.addUser(BareJID.bareJIDInstance(user_name, getDomain().getVhost().getDomain()),
+					pass_param);
 
 			if (log.isLoggable(Level.INFO)) {
-				log.info("User added: " + BareJID.toString(user_name, getDomain()) + ", pass: "
-						+ pass_param);
+				log.info("User added: " + BareJID.toString(user_name, 
+						getDomain().getVhost().getDomain()) + ", pass: " + pass_param);
 			}
 
 			setRegistration(user_name, pass_param, reg_params);
 
 			if (log.isLoggable(Level.INFO)) {
-				log.info("Registration data set for: " + BareJID.toString(user_name, getDomain())
+				log.info("Registration data set for: " + BareJID.toString(user_name, 
+						getDomain().getVhost().getDomain())
 						+ ", pass: " + pass_param + ", reg_params: " + reg_params);
 			}
 
@@ -1026,7 +1028,6 @@ public abstract class RepositoryAccess {
 	 */
 	public void setDomain(final VHostItem domain) throws TigaseStringprepException {
 		this.domain = domain;
-		this.domainAsJID = JID.jidInstance(domain.getVhost());
 	}
 
 	/**
@@ -1123,7 +1124,7 @@ public abstract class RepositoryAccess {
 
 		if (getUserName().equals(user_name)) {
 			try {
-				authRepo.removeUser(BareJID.bareJIDInstance(user_name, getDomain()));
+				authRepo.removeUser(BareJID.bareJIDInstance(user_name, getDomain().getVhost().getDomain()));
 
 				return Authorization.AUTHORIZED;
 			} catch (UserNotFoundException e) {
@@ -1169,11 +1170,13 @@ public abstract class RepositoryAccess {
 			final Map<String, String> registr_params)
 			throws TigaseDBException, TigaseStringprepException {
 		try {
-			authRepo.updatePassword(BareJID.bareJIDInstance(name_param, getDomain()), pass_param);
+			authRepo.updatePassword(BareJID.bareJIDInstance(name_param, 
+					getDomain().getVhost().getDomain()), pass_param);
 
 			if (registr_params != null) {
 				for (Map.Entry<String, String> entry : registr_params.entrySet()) {
-					repo.setData(BareJID.bareJIDInstance(name_param, getDomain()), entry.getKey(),
+					repo.setData(BareJID.bareJIDInstance(name_param, 
+							getDomain().getVhost().getDomain()), entry.getKey(),
 							entry.getValue());
 				}
 			}

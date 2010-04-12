@@ -130,6 +130,12 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 
 		try {
 
+			if (!session.getDomain().isRegisterEnabled()) {
+				results.offer(Authorization.NOT_ALLOWED.getResponseMessage(packet,
+						"Registration is not allowed for this domain.", true));
+				return;
+			}
+
 			// I think it does not make sense to check the 'to', just the connection ID
 //    if ((id.equals(session.getDomain()) || id.equals(session.getUserId().toString()))
 //        && packet.getFrom().equals(session.getConnectionId())) {
@@ -264,7 +270,11 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 	 */
 	@Override
 	public Element[] supDiscoFeatures(XMPPResourceConnection session) {
-		return DISCO_FEATURES;
+		if (session != null && session.getDomain().isRegisterEnabled()) {
+			return DISCO_FEATURES;
+		} else {
+			return null;
+		}
 	}
 
 	/**

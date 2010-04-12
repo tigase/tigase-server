@@ -145,8 +145,8 @@ public class SaslAuth extends XMPPProcessor
 				UserAuthRepository.PROTOCOL_VAL_SASL);
 			authProps.put(UserAuthRepository.MACHANISM_KEY,
 				request.getAttribute("/auth", "mechanism"));
-			authProps.put(UserAuthRepository.REALM_KEY, session.getDomain());
-			authProps.put(UserAuthRepository.SERVER_NAME_KEY, session.getDomain());
+			authProps.put(UserAuthRepository.REALM_KEY, session.getDomain().getVhost().getDomain());
+			authProps.put(UserAuthRepository.SERVER_NAME_KEY, session.getDomain().getVhost().getDomain());
 			session.putSessionData(XMLNS+"-authProps", authProps);
 		} // end of if (authProps == null)
 		//		String user = (String)authProps.get(UserAuthRepository.USER_ID_KEY);

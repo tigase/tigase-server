@@ -519,7 +519,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	public final Authorization loginDigest(String user, String digest, String id, String alg)
 			throws NotAuthorizedException, AuthorizationException, TigaseDBException,
 			TigaseStringprepException {
-		BareJID userId = BareJID.bareJIDInstance(user, getDomain());
+		BareJID userId = BareJID.bareJIDInstance(user, getDomain().getVhost().getDomain());
 		Authorization result = super.loginDigest(userId, digest, id, alg);
 
 		if (result == Authorization.AUTHORIZED) {
@@ -576,7 +576,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	public final Authorization loginPlain(String user, String password)
 			throws NotAuthorizedException, AuthorizationException, TigaseDBException,
 			TigaseStringprepException {
-		BareJID userId = BareJID.bareJIDInstance(user, getDomain());
+		BareJID userId = BareJID.bareJIDInstance(user, getDomain().getVhost().getDomain());
 		Authorization result = super.loginPlain(userId, password);
 
 		if (result == Authorization.AUTHORIZED) {
@@ -743,7 +743,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	public void setParentSession(final XMPPSession parent) throws TigaseStringprepException {
 		if (parent != null) {
 			synchronized (this) {
-				userJid = JID.jidInstance(parent.getUserName(), domain.getVhost(),
+				userJid = JID.jidInstance(parent.getUserName(), domain.getVhost().getDomain(),
 						((resource != null) ? resource : sessionId));
 			}
 		}

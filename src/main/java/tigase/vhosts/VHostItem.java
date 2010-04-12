@@ -23,7 +23,9 @@ package tigase.vhosts;
 import java.util.logging.Logger;
 import tigase.db.comp.RepositoryItem;
 import tigase.server.Packet;
+import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
+import tigase.xmpp.JID;
 
 /**
  * Objects of this class represent virtual host with all hosts configuration
@@ -96,7 +98,7 @@ public class VHostItem implements RepositoryItem {
 	 */
 	public static final String MAX_USERS_NUMBER_ATT = "max-users";
 
-	private String vhost = null;
+	private JID vhost = null;
 	private String[] comps = null;
 	private boolean enabled = true;
 	private boolean anonymousEnabled = true;
@@ -112,8 +114,20 @@ public class VHostItem implements RepositoryItem {
 	 * domain name with default values for all other parameters. By the default
 	 * all domain parameters are set to true.
 	 * @param vhost is a <code>String</code> value with a domain name.
+	 * @throws TigaseStringprepException if the provided string causes stringprep processing
+	 * errors.
 	 */
-	public VHostItem(String vhost) {
+	public VHostItem(String vhost) throws TigaseStringprepException {
+		setVHost(vhost);
+	}
+
+	/**
+	 * The constructor creates the <code>VHostItem</code> instance for a given
+	 * domain name with default values for all other parameters. By the default
+	 * all domain parameters are set to true.
+	 * @param vhost is a <code>String</code> value with a domain name.
+	 */
+	public VHostItem(JID vhost) {
 		setVHost(vhost);
 	}
 
@@ -124,7 +138,7 @@ public class VHostItem implements RepositoryItem {
 	 * @param elem is an <code>Element</code> object with virtual domain settings.
 	 */
 	public VHostItem(Element elem) {
-		setVHost(elem.getAttribute(HOSTNAME_ATT));
+		setVHost(JID.jidInstanceNS(elem.getAttribute(HOSTNAME_ATT)));
 		enabled = Boolean.parseBoolean(elem.getAttribute(ENABLED_ATT));
 		anonymousEnabled =
 						Boolean.parseBoolean(elem.getAttribute(ANONYMOUS_ENABLED_ATT));
@@ -173,7 +187,7 @@ public class VHostItem implements RepositoryItem {
 						},
 						new String[]{HOSTNAME_ATT, ENABLED_ATT, ANONYMOUS_ENABLED_ATT,
 							REGISTER_ENABLED_ATT, MAX_USERS_NUMBER_ATT},
-						new String[]{vhost, "" + enabled, "" + anonymousEnabled,
+						new String[]{vhost.getDomain(), "" + enabled, "" + anonymousEnabled,
 							"" + registerEnabled, "" + maxUsersNumber});
 		return elem;
 	}
@@ -314,22 +328,26 @@ public class VHostItem implements RepositoryItem {
 	 * This method return a virtual host name as a <code>String</code> value.
 	 * @return a <code>String</code> value with the virtual domain name.
 	 */
-	public String getVhost() {
+	public JID getVhost() {
 		return this.vhost;
 	}
 
-	public void setVHost(String vhost) {
-		this.vhost = vhost.toLowerCase();
+	public void setVHost(String vhost) throws TigaseStringprepException {
+		this.vhost = JID.jidInstance(vhost);
+	}
+
+	public void setVHost(JID vhost) {
+		this.vhost = vhost;
 	}
 
 	@Override
 	public void initFromPropertyString(String propString) {
-		setVHost(propString);
+		setVHost(JID.jidInstanceNS(propString));
 	}
 
 	@Override
 	public String toPropertyString() {
-		return this.vhost;
+		return this.vhost.getDomain();
 	}
 
 	@Override
@@ -338,7 +356,7 @@ public class VHostItem implements RepositoryItem {
 			throw new IllegalArgumentException("Incorrect element name, expected: " +
 					VHOST_ELEM);
 		}
-		setVHost(elem.getAttribute(HOSTNAME_ATT));
+		setVHost(JID.jidInstanceNS(elem.getAttribute(HOSTNAME_ATT)));
 		enabled = Boolean.parseBoolean(elem.getAttribute(ENABLED_ATT));
 		anonymousEnabled =
 						Boolean.parseBoolean(elem.getAttribute(ANONYMOUS_ENABLED_ATT));
@@ -360,7 +378,7 @@ public class VHostItem implements RepositoryItem {
 
 	@Override
 	public String getKey() {
-		return this.vhost;
+		return this.vhost.getDomain();
 	}
 
 	@Override
@@ -538,7 +556,7 @@ public class VHostItem implements RepositoryItem {
 	 * @return a <code>String</code> value with the virtual domain name.
 	 */
 		@Override
-		public String getVhost() {
+		public JID getVhost() {
 			return VHostItem.this.getVhost();
 		}
 
