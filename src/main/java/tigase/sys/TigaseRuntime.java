@@ -122,13 +122,13 @@ public abstract class TigaseRuntime {
 			}
 			sb.append(hours + (hours == 1 ? " hour" : " hours"));
 		}
-		if (minutes > 0) {
+		if (days == 0 && minutes > 0) {
 			if(sb.length() > 0) {
 				sb.append(", ");
 			}
 			sb.append(minutes + (minutes == 1 ? " min" : " mins"));
 		}
-		if (days == 0 && seconds > 0) {
+		if (days == 0 && hours == 0 && seconds > 0) {
 			if (sb.length() > 0) {
 				sb.append(", ");
 			}
