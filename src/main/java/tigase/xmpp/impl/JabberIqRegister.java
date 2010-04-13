@@ -270,6 +270,10 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 	 */
 	@Override
 	public Element[] supDiscoFeatures(XMPPResourceConnection session) {
+		if (log.isLoggable(Level.FINEST) && session != null) {
+				log.finest("VHostItem: " + session.getDomain());
+			}
+
 		if (session != null && session.getDomain().isRegisterEnabled()) {
 			return DISCO_FEATURES;
 		} else {
@@ -309,7 +313,15 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 	 */
 	@Override
 	public Element[] supStreamFeatures(XMPPResourceConnection session) {
+		if (log.isLoggable(Level.FINEST) && session != null) {
+				log.finest("VHostItem: " + session.getDomain());
+			}
+
+		if (session != null && session.getDomain().isRegisterEnabled()) {
 		return FEATURES;
+		} else {
+			return null;
+		}
 	}
 }    // JabberIqRegister
 

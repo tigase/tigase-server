@@ -58,6 +58,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.script.Bindings;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -98,7 +99,9 @@ public class VHostManager extends AbstractComponentRegistrator<VHostListener>
 	private ConcurrentSkipListSet<String> registeredComponentDomains =
 		new ConcurrentSkipListSet<String>();
 	private ComponentRepository<VHostItem> repo = null;
-	private ServiceEntity serviceEntity = null;
+//	private ServiceEntity serviceEntity = null;
+	private String identity_type = "generic";
+
 
 	//~--- constructors ---------------------------------------------------------
 
@@ -273,78 +276,112 @@ public class VHostManager extends AbstractComponentRegistrator<VHostListener>
 		return defs;
 	}
 
+//	/**
+//	 * Method description
+//	 *
+//	 *
+//	 * @param from
+//	 *
+//	 * @return
+//	 */
+//	@Override
+//	public List<Element> getDiscoFeatures(JID from) {
+//		return null;
+//	}
+
+//	/**
+//	 * Method description
+//	 *
+//	 *
+//	 * @param node
+//	 * @param jid
+//	 * @param from
+//	 *
+//	 * @return
+//	 */
+//	@Override
+//	public Element getDiscoInfo(String node, JID jid, JID from) {
+//		if ((jid != null) && getName().equals(jid.getLocalpart()) && isAdmin(from)) {
+//			return serviceEntity.getDiscoInfo(node);
+//		}
+//
+//		return null;
+//	}
+
+//	/**
+//	 * Method description
+//	 *
+//	 *
+//	 * @param node
+//	 * @param jid
+//	 * @param from
+//	 *
+//	 * @return
+//	 */
+//	@Override
+//	public List<Element> getDiscoItems(String node, JID jid, JID from) {
+//		if (isAdmin(from)) {
+//			if (getName().equals(jid.getLocalpart()) || getComponentId().equals(jid)) {
+//				List<Element> items = serviceEntity.getDiscoItems(node, jid.toString());
+//
+//				if (log.isLoggable(Level.FINEST)) {
+//					log.finest("Processing discoItems for node: " + node + ", result: "
+//							+ ((items == null) ? null : items.toString()));
+//				}
+//
+//				return items;
+//			} else {
+//				if (node == null) {
+//					Element item = serviceEntity.getDiscoItem(null,
+//						BareJID.toString(getName(), jid.toString()));
+//
+//					if (log.isLoggable(Level.FINEST)) {
+//						log.finest("Processing discoItems, result: "
+//								+ ((item == null) ? null : item.toString()));
+//					}
+//
+//					return Arrays.asList(item);
+//				} else {
+//					return null;
+//				}
+//			}
+//		}
+//
+//		return null;
+//	}
+
 	/**
 	 * Method description
 	 *
 	 *
-	 * @param from
-	 *
 	 * @return
 	 */
 	@Override
-	public List<Element> getDiscoFeatures(JID from) {
-		return null;
+	public String getDiscoCategoryType() {
+		return identity_type;
 	}
 
 	/**
 	 * Method description
 	 *
 	 *
-	 * @param node
-	 * @param jid
-	 * @param from
-	 *
 	 * @return
 	 */
 	@Override
-	public Element getDiscoInfo(String node, JID jid, JID from) {
-		if ((jid != null) && getName().equals(jid.getLocalpart()) && isAdmin(from)) {
-			return serviceEntity.getDiscoInfo(node);
-		}
-
-		return null;
+	public String getDiscoDescription() {
+		return "VHost Manager";
 	}
 
 	/**
 	 * Method description
 	 *
 	 *
-	 * @param node
-	 * @param jid
-	 * @param from
-	 *
-	 * @return
+	 * @param binds
 	 */
 	@Override
-	public List<Element> getDiscoItems(String node, JID jid, JID from) {
-		if (isAdmin(from)) {
-			if (getName().equals(jid.getLocalpart()) || getComponentId().equals(jid)) {
-				List<Element> items = serviceEntity.getDiscoItems(node, jid.toString());
-
-				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Processing discoItems for node: " + node + ", result: "
-							+ ((items == null) ? null : items.toString()));
-				}
-
-				return items;
-			} else {
-				if (node == null) {
-					Element item = serviceEntity.getDiscoItem(null,
-						BareJID.toString(getName(), jid.toString()));
-
-					if (log.isLoggable(Level.FINEST)) {
-						log.finest("Processing discoItems, result: "
-								+ ((item == null) ? null : item.toString()));
-					}
-
-					return Arrays.asList(item);
-				} else {
-					return null;
-				}
-			}
-		}
-
-		return null;
+	public void initBindings(Bindings binds) {
+		super.initBindings(binds);
+		binds.put(ComponentRepository.COMP_REPO_BIND, repo);
 	}
 
 	/**
@@ -460,102 +497,102 @@ public class VHostManager extends AbstractComponentRegistrator<VHostListener>
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param results
-	 */
-	@Override
-	public void processPacket(Packet packet, Queue<Packet> results) {
-		if ( !packet.isCommand()
-				|| ((packet.getType() != null) && (packet.getType() == StanzaType.result))) {
-			return;
-		}
-
-		if (packet.getPermissions() != Permissions.ADMIN) {
-			try {
-				results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-						"You are not authorized for this action.", true));
-			} catch (PacketErrorTypeException e) {
-				log.warning("Packet processing exception: " + e);
-			}
-
-			return;
-		}
-
-		Iq iqc = (Iq) packet;
-		Command.Action action = Command.getAction(iqc);
-
-		if (action == Command.Action.cancel) {
-			Packet result = iqc.commandResult(null);
-
-			results.offer(result);
-
-			return;
-		}
-
-		if (log.isLoggable(Level.INFO)) {
-			log.info("Processing command: " + iqc.toString());
-		}
-
-		Packet result = null;
-
-		if ((iqc.getCommand() == Command.VHOSTS_RELOAD) || (Command.getData(iqc) != null)) {
-			result = iqc.commandResult(Command.DataType.result);
-		} else {
-			result = iqc.commandResult(Command.DataType.form);
-		}
-
-		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Preparing result: " + result.toString());
-		}
-
-		switch (iqc.getCommand()) {
-			case VHOSTS_RELOAD :
-				try {
-					repo.reload();
-				} catch (TigaseDBException ex) {
-					log.log(Level.WARNING, "Problem reloading VHost repository: ", ex);
-				}
-
-				addCompletedVHostsField(result);
-				results.offer(result);
-
-				break;
-
-			case VHOSTS_UPDATE :
-				if (Command.getData(packet) == null) {
-					prepareVHostData(result);
-
-					if (log.isLoggable(Level.FINEST)) {
-						log.finest("Sending result back: " + result.toString());
-					}
-
-					results.offer(result);
-				} else {
-					updateVHostChanges(packet, result);
-					results.offer(result);
-				}
-
-				break;
-
-			case VHOSTS_REMOVE :
-				if (Command.getData(packet) == null) {
-					prepareVHostRemove(result);
-					results.offer(result);
-				} else {
-					updateVHostRemove(packet, result);
-					results.offer(result);
-				}
-
-				break;
-
-			default :
-				break;
-		}
-	}
+//	/**
+//	 * Method description
+//	 *
+//	 *
+//	 * @param packet
+//	 * @param results
+//	 */
+//	@Override
+//	public void processPacket(Packet packet, Queue<Packet> results) {
+//		if ( !packet.isCommand()
+//				|| ((packet.getType() != null) && (packet.getType() == StanzaType.result))) {
+//			return;
+//		}
+//
+//		if (packet.getPermissions() != Permissions.ADMIN) {
+//			try {
+//				results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
+//						"You are not authorized for this action.", true));
+//			} catch (PacketErrorTypeException e) {
+//				log.warning("Packet processing exception: " + e);
+//			}
+//
+//			return;
+//		}
+//
+//		Iq iqc = (Iq) packet;
+//		Command.Action action = Command.getAction(iqc);
+//
+//		if (action == Command.Action.cancel) {
+//			Packet result = iqc.commandResult(null);
+//
+//			results.offer(result);
+//
+//			return;
+//		}
+//
+//		if (log.isLoggable(Level.INFO)) {
+//			log.info("Processing command: " + iqc.toString());
+//		}
+//
+//		Packet result = null;
+//
+//		if ((iqc.getCommand() == Command.VHOSTS_RELOAD) || (Command.getData(iqc) != null)) {
+//			result = iqc.commandResult(Command.DataType.result);
+//		} else {
+//			result = iqc.commandResult(Command.DataType.form);
+//		}
+//
+//		if (log.isLoggable(Level.FINEST)) {
+//			log.finest("Preparing result: " + result.toString());
+//		}
+//
+//		switch (iqc.getCommand()) {
+//			case VHOSTS_RELOAD :
+//				try {
+//					repo.reload();
+//				} catch (TigaseDBException ex) {
+//					log.log(Level.WARNING, "Problem reloading VHost repository: ", ex);
+//				}
+//
+//				addCompletedVHostsField(result);
+//				results.offer(result);
+//
+//				break;
+//
+//			case VHOSTS_UPDATE :
+//				if (Command.getData(packet) == null) {
+//					prepareVHostData(result);
+//
+//					if (log.isLoggable(Level.FINEST)) {
+//						log.finest("Sending result back: " + result.toString());
+//					}
+//
+//					results.offer(result);
+//				} else {
+//					updateVHostChanges(packet, result);
+//					results.offer(result);
+//				}
+//
+//				break;
+//
+//			case VHOSTS_REMOVE :
+//				if (Command.getData(packet) == null) {
+//					prepareVHostRemove(result);
+//					results.offer(result);
+//				} else {
+//					updateVHostRemove(packet, result);
+//					results.offer(result);
+//				}
+//
+//				break;
+//
+//			default :
+//				break;
+//		}
+//	}
 
 	/**
 	 * Method description
@@ -579,33 +616,33 @@ public class VHostManager extends AbstractComponentRegistrator<VHostListener>
 	@Override
 	public void setName(String name) {
 		super.setName(name);
-		serviceEntity = new ServiceEntity(name, null, "VHosts Manager");
-		serviceEntity.addIdentities(new ServiceIdentity("component", "generic", "VHost Manager"),
-
-//  new ServiceIdentity("automation", "command-node", "All VHosts"),
-		new ServiceIdentity("automation", "command-list", "VHosts management commands"));
-		serviceEntity.addFeatures(DEF_FEATURES);
-		serviceEntity.addFeatures(CMD_FEATURES);
-
-		ServiceEntity item = new ServiceEntity(getName(), Command.VHOSTS_RELOAD.toString(),
-			"Reload VHosts from repository");
-
-		item.addFeatures(CMD_FEATURES);
-		item.addIdentities(new ServiceIdentity("automation", "command-node",
-				"Reload VHosts from repository"));
-		serviceEntity.addItems(item);
-		item = new ServiceEntity(getName(), Command.VHOSTS_UPDATE.toString(),
-				"Add/Update selected VHost information");
-		item.addFeatures(CMD_FEATURES);
-		item.addIdentities(new ServiceIdentity("automation", "command-node",
-				"Add/Update selected VHost information"));
-		serviceEntity.addItems(item);
-		item = new ServiceEntity(getName(), Command.VHOSTS_REMOVE.toString(),
-				"Remove selected VHost");
-		item.addFeatures(CMD_FEATURES);
-		item.addIdentities(new ServiceIdentity("automation", "command-node",
-				"Remove selected VHost"));
-		serviceEntity.addItems(item);
+//		serviceEntity = new ServiceEntity(name, null, "VHosts Manager");
+//		serviceEntity.addIdentities(new ServiceIdentity("component", "generic", "VHost Manager"),
+//
+////  new ServiceIdentity("automation", "command-node", "All VHosts"),
+//		new ServiceIdentity("automation", "command-list", "VHosts management commands"));
+//		serviceEntity.addFeatures(DEF_FEATURES);
+//		serviceEntity.addFeatures(CMD_FEATURES);
+//
+//		ServiceEntity item = new ServiceEntity(getName(), Command.VHOSTS_RELOAD.toString(),
+//			"Reload VHosts from repository");
+//
+//		item.addFeatures(CMD_FEATURES);
+//		item.addIdentities(new ServiceIdentity("automation", "command-node",
+//				"Reload VHosts from repository"));
+//		serviceEntity.addItems(item);
+//		item = new ServiceEntity(getName(), Command.VHOSTS_UPDATE.toString(),
+//				"Add/Update selected VHost information");
+//		item.addFeatures(CMD_FEATURES);
+//		item.addIdentities(new ServiceIdentity("automation", "command-node",
+//				"Add/Update selected VHost information"));
+//		serviceEntity.addItems(item);
+//		item = new ServiceEntity(getName(), Command.VHOSTS_REMOVE.toString(),
+//				"Remove selected VHost");
+//		item.addFeatures(CMD_FEATURES);
+//		item.addIdentities(new ServiceIdentity("automation", "command-node",
+//				"Remove selected VHost"));
+//		serviceEntity.addItems(item);
 	}
 
 	/**

@@ -22,6 +22,7 @@ package tigase.vhosts;
 
 import java.util.logging.Logger;
 import tigase.db.comp.RepositoryItem;
+import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
@@ -73,30 +74,36 @@ public class VHostItem implements RepositoryItem {
 	 * which are not defined yet.
 	 */
 	public static final String OTHER_PARAMS_ELEM = "other";
+	public static final String OTHER_PARAMS_LABEL = "Other parameters";
 	/**
 	 * This is an attribute name for storing the VHost name.
 	 */
 	public static final String HOSTNAME_ATT = "hostname";
+	public static final String HOSTNAME_LABEL = "Domain name";
 	/**
 	 * This is an attribute name for storing information whether the VHost is
 	 * enabled or disabled.
 	 */
 	public static final String ENABLED_ATT = "enabled";
+	public static final String ENABLED_LABEL = "Enabled";
 	/**
 	 * This is an attribute name for storing information whether anonymous
 	 * user can login for this domain.
 	 */
 	public static final String ANONYMOUS_ENABLED_ATT = "anon";
+	public static final String ANONYMOUS_ENABLED_LABEL = "Anonymous enabled";
 	/**
 	 * This is an attribute name for storing information whether user registration
 	 * is allowed for this domain.
 	 */
 	public static final String REGISTER_ENABLED_ATT = "register";
+	public static final String REGISTER_ENABLED_LABEL = "In-band registration";
 	/**
 	 * This is an attribute name for storing the maximum number of users for
 	 * this virtual domain.
 	 */
 	public static final String MAX_USERS_NUMBER_ATT = "max-users";
+	public static final String MAX_USERS_NUMBER_LABEL = "Max users";
 
 	private JID vhost = null;
 	private String[] comps = null;
@@ -383,12 +390,35 @@ public class VHostItem implements RepositoryItem {
 
 	@Override
 	public void addCommandFields(Packet packet) {
-		throw new UnsupportedOperationException("Not supported yet.");
+		Command.addFieldValue(packet, HOSTNAME_LABEL, vhost != null ? vhost.getDomain() : "");
+		Command.addCheckBoxField(packet, ENABLED_LABEL, enabled);
+		Command.addCheckBoxField(packet, ANONYMOUS_ENABLED_LABEL, anonymousEnabled);
+		Command.addCheckBoxField(packet, REGISTER_ENABLED_LABEL, registerEnabled);
+		Command.addFieldValue(packet, MAX_USERS_NUMBER_LABEL, "" + maxUsersNumber);
+		Command.addFieldValue(packet, OTHER_PARAMS_LABEL, otherDomainParams != null
+				? otherDomainParams : "");
 	}
 
 	@Override
 	public void initFromCommand(Packet packet) {
-		throw new UnsupportedOperationException("Not supported yet.");
+     vhost = JID.jidInstanceNS(Command.getFieldValue(packet, HOSTNAME_LABEL));
+		 enabled = Command.getCheckBoxFieldValue(packet, ENABLED_LABEL);
+		 anonymousEnabled = Command.getCheckBoxFieldValue(packet, ANONYMOUS_ENABLED_LABEL);
+		 registerEnabled = Command.getCheckBoxFieldValue(packet, REGISTER_ENABLED_LABEL);
+		 try {
+			 maxUsersNumber = Long.parseLong(Command.getFieldValue(packet,
+					 MAX_USERS_NUMBER_LABEL));
+		} catch (Exception e) {
+			log.warning("Can not parse max users number: " + Command.getFieldValue(packet,
+					 MAX_USERS_NUMBER_LABEL));
+		}
+		 otherDomainParams = Command.getFieldValue(packet, OTHER_PARAMS_LABEL);
+	}
+
+	@Override
+	public String toString() {
+		return "Domain: " + vhost + ", enabled: " + enabled + ", anonym: " + anonymousEnabled
+				+ ", register: " + registerEnabled + ", maxusers: " + maxUsersNumber;
 	}
 
 	private class UnmodifiableVHostItem extends VHostItem {
@@ -396,6 +426,11 @@ public class VHostItem implements RepositoryItem {
 		@Override
 		public VHostItem getUnmodifiableVHostItem() {
 			return this;
+		}
+
+		@Override
+		public String toString() {
+			return VHostItem.this.toString();
 		}
 
 		/**

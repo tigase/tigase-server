@@ -966,11 +966,12 @@ public class SessionManager extends AbstractMessageReceiver
 		VHostItem vitem = null;
 
 		if (domain != null) {
-			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Setting hostname " + domain + " for connection: " + conn_id);
-			}
-
 			vitem = getVHostItem(domain);
+
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Setting hostname " + domain + " for connection: " + conn_id
+						+ ", VHostItem: " + vitem);
+			}
 		}
 
 		if (vitem == null) {
