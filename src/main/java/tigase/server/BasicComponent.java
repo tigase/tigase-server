@@ -313,7 +313,7 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 					for (CommandIfc comm : scriptCommands.values()) {
 						result.add(new Element("item", new String[] { "node", "name", "jid" },
 								new String[] { comm.getCommandId(),
-								comm.getDescription(), getComponentId().toString() }));
+								comm.getDescription(), jid.toString() }));
 					}
 				}
 			} else {
