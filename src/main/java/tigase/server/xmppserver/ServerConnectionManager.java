@@ -88,6 +88,8 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	private static final String VERIFY_EL_NAME = "verify";
 	private static final String XMLNS_DB_ATT = "xmlns:db";
 	private static final String XMLNS_DB_VAL = "jabber:server:dialback";
+	private static final String XMLNS_SERVER_VAL = "jabber:server";
+	private static final String XMLNS_CLIENT_VAL = "jabber:client";
 
 	/**
 	 * Variable <code>log</code> is a class logger.
@@ -562,17 +564,22 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 			}
 
 			ServerConnections serv_conn = getServerConnections(cid);
+			Packet server_packet = packet.copyElementOnly();
+
+			if (server_packet.getXMLNS() == XMLNS_CLIENT_VAL) {
+				server_packet.getElement().setXMLNS(XMLNS_SERVER_VAL);
+			}
 
 			if ((serv_conn == null)
-					|| ( !serv_conn.sendPacket(packet) && serv_conn.needsConnection())) {
+					|| ( !serv_conn.sendPacket(server_packet) && serv_conn.needsConnection())) {
 				if (log.isLoggable(Level.FINEST)) {
 					log.finest("Couldn't send packet, creating a new connection: " + cid);
 				}
 
-				createServerConnection(cid, packet, serv_conn);
+				createServerConnection(cid, server_packet, serv_conn);
 			} else {
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Packet seems to be sent correctly: " + packet);
+					log.finest("Packet seems to be sent correctly: " + server_packet);
 				}
 			}
 		}    // end of else
@@ -595,15 +602,15 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 //    log.finer("Processing packet: " + p.getElemName()
 //      + ", type: " + p.getType());
-			if (p.getElement().getXMLNS() == null) {
-				p.getElement().setXMLNS("jabber:client");
+			if (p.getXMLNS() == XMLNS_SERVER_VAL) {
+				p.getElement().setXMLNS(XMLNS_CLIENT_VAL);
 			}
 
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest(serv + ", Processing socket data: " + p);
 			}
 
-			if (p.getElement().getXMLNS() == XMLNS_DB_VAL) {
+			if (p.getXMLNS() == XMLNS_DB_VAL) {
 				processDialback(p, serv);
 			} else {
 				if (p.getElemName() == "error") {
