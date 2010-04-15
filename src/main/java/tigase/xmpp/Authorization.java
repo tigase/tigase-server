@@ -536,6 +536,38 @@ public enum Authorization {
 			return ERR_TYPE_AUTH;
 		}
 	},
+	POLICY_VIOLATION {
+
+		/**
+		 * Method description
+		 *
+		 *
+		 * @return
+		 */
+		public String getCondition() {
+			return "policy-violation";
+		}
+
+		/**
+		 * Method description
+		 *
+		 *
+		 * @return
+		 */
+		public int getErrorCode() {
+			return 0;
+		}
+
+		/**
+		 * Method description
+		 *
+		 *
+		 * @return
+		 */
+		public String getErrorType() {
+			return ERR_TYPE_CANCEL;
+		}
+	},
 	RECIPIENT_UNAVAILABLE {
 
 		/**
