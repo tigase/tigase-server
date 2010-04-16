@@ -34,6 +34,8 @@ import tigase.xmpp.XMPPIOService;
  */
 public interface StreamOpenHandler {
 
+	public static final String XMLNS_KEY = "xmlns";
+
 	String[] getXMLNSs();
 
 	String streamOpened(XMPPIOService<List<ComponentConnection>> s,

@@ -565,10 +565,10 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 			ServerConnections serv_conn = getServerConnections(cid);
 			Packet server_packet = packet.copyElementOnly();
-
-			if (server_packet.getXMLNS() == XMLNS_CLIENT_VAL) {
-				server_packet.getElement().setXMLNS(XMLNS_SERVER_VAL);
-			}
+			server_packet.getElement().removeAttribute("xmlns");
+//			if (server_packet.getXMLNS() == XMLNS_CLIENT_VAL) {
+//				server_packet.getElement().setXMLNS(XMLNS_SERVER_VAL);
+//			}
 
 			if ((serv_conn == null)
 					|| ( !serv_conn.sendPacket(server_packet) && serv_conn.needsConnection())) {
@@ -871,6 +871,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 			log.finer(serv + ", Stream opened: " + attribs.toString());
 		}
 
+		serv.getSessionData().put("xmlns", XMLNS_SERVER_VAL);
 		switch (serv.connectionType()) {
 			case connect : {
 

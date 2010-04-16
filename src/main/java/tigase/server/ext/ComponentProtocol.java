@@ -471,6 +471,16 @@ public class ComponentProtocol
 		binds.put(ComponentRepository.COMP_REPO_BIND, repo);
 	}
 
+	@Override
+	public boolean writePacketToSocket(XMPPIOService<List<ComponentConnection>> ios, Packet p) {
+//		String xmlns = (String)ios.getSessionData().get("xmlns");
+//		if (xmlns != null) {
+//			p.getElement().setXMLNS(xmlns);
+//		}
+		p.getElement().removeAttribute("xmlns");
+		return super.writePacketToSocket(ios, p);
+	}
+
 	/**
 	 * Method description
 	 *
@@ -513,6 +523,8 @@ public class ComponentProtocol
 							return null;
 						}
 					}    // end of if (p.isRouted())
+
+					result.getElement().setXMLNS("jabber:client");
 
 					addOutPacket(result);
 				} else {

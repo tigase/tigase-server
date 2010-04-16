@@ -52,13 +52,14 @@ public class ComponentAcceptStreamOpenHandler implements StreamOpenHandler {
   private static final Logger log =
     Logger.getLogger(ComponentAcceptStreamOpenHandler.class.getName());
 
-	private static final String XMLNS = "jabber:component:accept";
+	public static final String XMLNS = "jabber:component:accept";
 	private String[] xmlnss = new String[]{XMLNS};
 
 	@Override
 	public String streamOpened(XMPPIOService<List<ComponentConnection>> serv,
 			Map<String, String> attribs, ComponentProtocolHandler handler) {
 
+		serv.getSessionData().put(XMLNS_KEY, XMLNS);
 		switch (serv.connectionType()) {
 			case connect: {
 				String id = attribs.get("id");

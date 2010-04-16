@@ -37,7 +37,8 @@ import tigase.xmpp.XMPPIOService;
  */
 public class ComponentConnectStreamOpenHandler implements StreamOpenHandler {
 
-	private String[] xmlnss = new String[]{"jabber:component:connect"};
+	public static final String XMLNS = "jabber:component:connect";
+	private String[] xmlnss = new String[]{XMLNS};
 
 	@Override
 	public String streamOpened(XMPPIOService<List<ComponentConnection>> serv,
