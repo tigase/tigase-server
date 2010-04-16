@@ -130,12 +130,6 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 
 		try {
 
-			if (!session.getDomain().isRegisterEnabled()) {
-				results.offer(Authorization.NOT_ALLOWED.getResponseMessage(packet,
-						"Registration is not allowed for this domain.", true));
-				return;
-			}
-
 			// I think it does not make sense to check the 'to', just the connection ID
 //    if ((id.equals(session.getDomain()) || id.equals(session.getUserId().toString()))
 //        && packet.getFrom().equals(session.getConnectionId())) {
@@ -148,6 +142,13 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 					&& packet.getPacketFrom().equals(session.getConnectionId())
 						&& ( !session.isAuthorized()
 							|| (session.isUserId(id) || session.isLocalDomain(id.toString(), false)))) {
+
+				if (!session.getDomain().isRegisterEnabled()) {
+					results.offer(Authorization.NOT_ALLOWED.getResponseMessage(packet,
+							"Registration is not allowed for this domain.", true));
+					return;
+				}
+
 				Authorization result = Authorization.NOT_AUTHORIZED;
 				Element request = packet.getElement();
 				StanzaType type = packet.getType();
