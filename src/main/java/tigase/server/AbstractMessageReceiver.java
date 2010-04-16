@@ -1133,7 +1133,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 								// Maybe this is a command for local processing...
 								boolean processed = false;
 
-								if (packet.isCommand()
+								if (packet.isCommand() && packet.getStanzaTo() != null
 										&& AbstractMessageReceiver.this.getName().equals(packet.getStanzaTo().getLocalpart())
 											&& isLocalDomain(packet.getStanzaTo().getDomain())) {
 									processed = processScriptCommand(packet, results);
