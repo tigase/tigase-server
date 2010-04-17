@@ -1202,6 +1202,8 @@ public class SessionManager extends AbstractMessageReceiver
 //      processPacket(host_pac);
 			}
 
+			packet.processedBy("admins-or-domains");
+
 			return true;
 		}    // end of if (isInRoutings(to))
 
@@ -1508,7 +1510,11 @@ public class SessionManager extends AbstractMessageReceiver
 		setPermissions(conn, results);
 		addOutPackets(packet, conn, results);
 
-		if ( !packet.wasProcessed()) {
+		if (packet.wasProcessed() || processAdminsOrDomains(packet)) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Packet processed by: " + packet.getProcessorsIds().toString());
+			}
+		} else {
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("Packet not processed: " + packet.toStringSecure());
 			}
@@ -1555,10 +1561,6 @@ public class SessionManager extends AbstractMessageReceiver
 					// Hm, strange, SM own session?
 					log.warning("Error packet to the SM's own session: " + error);
 				}
-			}
-		} else {
-			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Packet processed by: " + packet.getProcessorsIds().toString());
 			}
 		}    // end of else
 	}
