@@ -856,7 +856,9 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	 */
 	@Override
 	public String toString() {
-		return "user_jid=" + userJid + ", connectioId=" + connectionId;
+		return "user_jid=" + userJid + ", connectioId=" + connectionId + ", connection status="
+				+ connectionStatus + ", domain=" + domain.getVhost().getDomain() + ", authState="
+					+ getAuthState().name() + ", isAnon=" + isAnonymous();
 	}
 
 	/**

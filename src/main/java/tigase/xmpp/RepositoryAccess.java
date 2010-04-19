@@ -531,6 +531,8 @@ public abstract class RepositoryAccess {
 	 */
 	public Authorization loginDigest(BareJID userId, String digest, String id, String alg)
 			throws NotAuthorizedException, AuthorizationException, TigaseDBException {
+		isLoginAllowed();
+
 		try {
 			if (authRepo.digestAuth(userId, digest, id, alg)) {
 				authState = Authorization.AUTHORIZED;
@@ -563,14 +565,16 @@ public abstract class RepositoryAccess {
 	 */
 	public Authorization loginOther(Map<String, Object> props)
 			throws NotAuthorizedException, AuthorizationException, TigaseDBException {
+		isLoginAllowed();
+
 		try {
 			String mech = (String) props.get(UserAuthRepository.MACHANISM_KEY);
 
 			if (domain.isAnonymousEnabled() && (mech != null) && mech.equals(ANONYMOUS_MECH)) {
 				is_anonymous = true;
 				props.put(UserAuthRepository.USER_ID_KEY,
-						BareJID.bareJIDInstanceNS(UUID.randomUUID().toString(), 
-						getDomain().getVhost().getDomain()));
+						BareJID.bareJIDInstanceNS(UUID.randomUUID().toString(),
+							getDomain().getVhost().getDomain()));
 				authState = Authorization.AUTHORIZED;
 				login();
 			} else {
@@ -610,6 +614,8 @@ public abstract class RepositoryAccess {
 	 */
 	public Authorization loginPlain(BareJID userId, String password)
 			throws NotAuthorizedException, AuthorizationException, TigaseDBException {
+		isLoginAllowed();
+
 		try {
 			if (authRepo.plainAuth(userId, password)) {
 				authState = Authorization.AUTHORIZED;
@@ -638,11 +644,15 @@ public abstract class RepositoryAccess {
 	 *
 	 * @return
 	 *
+	 *
+	 * @throws AuthorizationException
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
 	 */
 	public Authorization loginToken(BareJID userId, String xmpp_sessionId, String token)
-			throws NotAuthorizedException, TigaseDBException {
+			throws NotAuthorizedException, AuthorizationException, TigaseDBException {
+		isLoginAllowed();
+
 		try {
 			String db_token = repo.getData(userId, "tokens", xmpp_sessionId);
 
@@ -708,7 +718,7 @@ public abstract class RepositoryAccess {
 	 * @throws TigaseDBException
 	 * @throws TigaseStringprepException
 	 *
-	 * @deprecated 
+	 * @deprecated
 	 */
 	@Deprecated
 	public Authorization register(String name_param, String pass_param, String email_param)
@@ -776,16 +786,17 @@ public abstract class RepositoryAccess {
 					pass_param);
 
 			if (log.isLoggable(Level.INFO)) {
-				log.info("User added: " + BareJID.toString(user_name, 
-						getDomain().getVhost().getDomain()) + ", pass: " + pass_param);
+				log.info("User added: "
+						+ BareJID.toString(user_name, getDomain().getVhost().getDomain()) + ", pass: "
+							+ pass_param);
 			}
 
 			setRegistration(user_name, pass_param, reg_params);
 
 			if (log.isLoggable(Level.INFO)) {
-				log.info("Registration data set for: " + BareJID.toString(user_name, 
-						getDomain().getVhost().getDomain())
-						+ ", pass: " + pass_param + ", reg_params: " + reg_params);
+				log.info("Registration data set for: "
+						+ BareJID.toString(user_name, getDomain().getVhost().getDomain()) + ", pass: "
+							+ pass_param + ", reg_params: " + reg_params);
 			}
 
 			return Authorization.AUTHORIZED;
@@ -1124,7 +1135,8 @@ public abstract class RepositoryAccess {
 
 		if (getUserName().equals(user_name)) {
 			try {
-				authRepo.removeUser(BareJID.bareJIDInstance(user_name, getDomain().getVhost().getDomain()));
+				authRepo.removeUser(BareJID.bareJIDInstance(user_name,
+						getDomain().getVhost().getDomain()));
 
 				return Authorization.AUTHORIZED;
 			} catch (UserNotFoundException e) {
@@ -1164,20 +1176,30 @@ public abstract class RepositoryAccess {
 		}
 	}
 
+	//~--- get methods ----------------------------------------------------------
+
+	private boolean isLoginAllowed() throws AuthorizationException {
+		if (isAuthorized()) {
+			throw new AuthorizationException("User session already authenticated. "
+					+ "Subsequent login is forbidden. You must loggin on a different connection.");
+		}
+
+		return true;
+	}
+
 	//~--- set methods ----------------------------------------------------------
 
 	private void setRegistration(final String name_param, final String pass_param,
 			final Map<String, String> registr_params)
 			throws TigaseDBException, TigaseStringprepException {
 		try {
-			authRepo.updatePassword(BareJID.bareJIDInstance(name_param, 
+			authRepo.updatePassword(BareJID.bareJIDInstance(name_param,
 					getDomain().getVhost().getDomain()), pass_param);
 
 			if (registr_params != null) {
 				for (Map.Entry<String, String> entry : registr_params.entrySet()) {
-					repo.setData(BareJID.bareJIDInstance(name_param, 
-							getDomain().getVhost().getDomain()), entry.getKey(),
-							entry.getValue());
+					repo.setData(BareJID.bareJIDInstance(name_param,
+							getDomain().getVhost().getDomain()), entry.getKey(), entry.getValue());
 				}
 			}
 		} catch (UserNotFoundException e) {
