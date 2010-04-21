@@ -57,6 +57,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -102,6 +104,7 @@ public class StatisticsCollector extends AbstractComponentRegistrator<Statistics
 
 	// private ServiceEntity stats_modules = null;
 	private Level statsLevel = Level.INFO;
+	private Timer statsArchivTasks = new Timer("stats-archivizer-tasks", true);;
 
 	//~--- methods --------------------------------------------------------------
 
@@ -562,11 +565,32 @@ public class StatisticsCollector extends AbstractComponentRegistrator<Statistics
 				String[] arch_prop_a = arch_prop.split(":");
 				String arch_class = arch_prop_a[0];
 				String arch_name = arch_prop_a[1];
-				StatisticsArchivizerIfc stat_arch =
+				final StatisticsArchivizerIfc stat_arch =
 					(StatisticsArchivizerIfc) Class.forName(arch_class).newInstance();
 
 				stat_arch.init(getArchivizerConf(arch_name, props));
-				archivizers.put(arch_name, stat_arch);
+
+				long freq = -1;
+
+				if (arch_prop_a.length > 2) {
+					try {
+						freq = Long.parseLong(arch_prop_a[2]);
+					} catch (Exception e) {
+						freq = -1;
+					}
+				}
+
+				if (freq > 0) {
+					statsArchivTasks.scheduleAtFixedRate(new TimerTask() {
+						@Override
+						public void run() {
+							stat_arch.execute(sp);
+						}
+					}, freq * 1000, freq * 1000);
+				} else {
+					archivizers.put(arch_name, stat_arch);
+				}
+
 				log.config("Loaded statistics archivizer: " + arch_name + " for class: " + arch_class);
 			} catch (Exception e) {
 				log.log(Level.SEVERE, "Can't initialize statistics archivizer: " + arch_prop, e);

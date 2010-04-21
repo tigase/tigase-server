@@ -237,6 +237,66 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	}
 
 	/**
+	 * Method description
+	 *
+	 *
+	 * @param comp
+	 *
+	 * @return
+	 */
+	public int getCompConnections(String comp) {
+		return cache.allStats.getCompConnections(comp);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param comp
+	 *
+	 * @return
+	 */
+	public long getCompIqs(String comp) {
+		return cache.allStats.getCompIq(comp);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param comp
+	 *
+	 * @return
+	 */
+	public long getCompMessages(String comp) {
+		return cache.allStats.getCompMsg(comp);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param comp
+	 *
+	 * @return
+	 */
+	public long getCompPackets(String comp) {
+		return cache.allStats.getCompPackets(comp);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param comp
+	 *
+	 * @return
+	 */
+	public long getCompPresences(String comp) {
+		return cache.allStats.getCompPres(comp);
+	}
+
+	/**
 	 * Operation exposed for management
 	 *
 	 * @param compName
@@ -491,6 +551,16 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 *
 	 * @return
 	 */
+	public long getRegistered() {
+		return cache.registered;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
 	@Override
 	public long getSMPacketsNumber() {
 		return cache.smPackets;
@@ -551,6 +621,62 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	@Override
 	public int[] getServerConnectionsHistory() {
 		return cache.server_conns_history.getCurrentHistory();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param cmp_name
+	 * @param stat
+	 * @param def
+	 *
+	 * @return
+	 */
+	public long getStats(String cmp_name, String stat, long def) {
+		return cache.allStats.getValue(cmp_name, stat, def);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param cmp_name
+	 * @param stat
+	 * @param def
+	 *
+	 * @return
+	 */
+	public float getStats(String cmp_name, String stat, float def) {
+		return cache.allStats.getValue(cmp_name, stat, def);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param cmp_name
+	 * @param stat
+	 * @param def
+	 *
+	 * @return
+	 */
+	public String getStats(String cmp_name, String stat, String def) {
+		return cache.allStats.getValue(cmp_name, stat, def);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param cmp_name
+	 * @param stat
+	 * @param def
+	 *
+	 * @return
+	 */
+	public int getStats(String cmp_name, String stat, int def) {
+		return cache.allStats.getValue(cmp_name, stat, def);
 	}
 
 	/**
@@ -814,6 +940,8 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 		private float prevSmPacketsPerSec = 0;
 		private long queueOverflow = 0;
 		private int queueSize = 0;
+		private long registered = 0;
+		private int runs_counter = 100;
 		private int serverConnections = 0;
 		private long smPackets = 0;
 		private float smPacketsPerSec = 0;
@@ -907,16 +1035,27 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 			cpu_usage_history.addItem(cpuUsage);
 			prevCpuUsage = temp;
 			heap_usage_history.addItem(getHeapMemUsage());
-			allStats = new StatisticsList(Level.FINER);
+
+			if (++runs_counter >= 100) {
+				allStats = new StatisticsList(Level.FINEST);
+				runs_counter = 0;
+			} else {
+				allStats = new StatisticsList(Level.FINER);
+			}
+
 			theRef.getAllStats(allStats);
+
+			long tmp_reg = allStats.getValue(SM_COMP, "Registered accounts", -1L);
+
+			if (tmp_reg > 0) {
+				registered = tmp_reg;
+			}
 
 			// System.out.println(allStats.toString());
 			clusterCompressionRatio = (allStats.getValue(CL_COMP, "Average compression ratio", -1f)
 					+ allStats.getValue(CL_COMP, "Average decompression ratio", -1f)) / 2f;
-			clusterPacketsReceived = allStats.getValue(CL_COMP,
-					StatisticType.MSG_RECEIVED_OK.getDescription(), 0L);
-			clusterPacketsSent = allStats.getValue(CL_COMP,
-					StatisticType.MSG_SENT_OK.getDescription(), 0L);
+			clusterPacketsReceived = allStats.getCompReceivedPackets(CL_COMP);
+			clusterPacketsSent = allStats.getCompSentPackets(CL_COMP);
 			clusterPackets = clusterPacketsSent + clusterPacketsReceived;
 			temp = clusterPacketsPerSec;
 			clusterPacketsPerSec = (prevClusterPacketsPerSec + (temp * 2f)
@@ -924,22 +1063,20 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 			clpacks_history.addItem(clusterPacketsPerSec);
 			prevClusterPacketsPerSec = temp;
 			prevClusterPackets = clusterPackets;
-			smPackets = allStats.getValue(SM_COMP, StatisticType.MSG_RECEIVED_OK.getDescription(),
-					0L) + allStats.getValue(SM_COMP, StatisticType.MSG_SENT_OK.getDescription(), 0L);
+			smPackets = allStats.getCompPackets(SM_COMP);
 			temp = smPacketsPerSec;
 			smPacketsPerSec = (prevSmPacketsPerSec + (temp * 2f) + (smPackets - prevSmPackets)) / 4f;
 			smpacks_history.addItem(smPacketsPerSec);
 			prevSmPacketsPerSec = temp;
 			prevSmPackets = smPackets;
-			clientConnections = allStats.getValue(C2S_COMP, "Open connections", 0)
-					+ allStats.getValue(BOSH_COMP, "Open connections", 0);
+			clientConnections = allStats.getCompConnections(C2S_COMP)
+					+ allStats.getCompConnections(BOSH_COMP);
 			conns_history.addItem(clientConnections);
-			serverConnections = allStats.getValue(S2S_COMP, "Open connections", 0);
+			serverConnections = allStats.getCompConnections(S2S_COMP);
 			server_conns_history.addItem(serverConnections);
 			clIOQueue = allStats.getValue(CL_COMP, "Waiting to send", 0);
 			clusterCache = allStats.getValue("cl-caching-strat", "Cached JIDs", 0);
-			messagesNumber = allStats.getValue(SM_COMP, QueueType.IN_QUEUE.name() + " messages", 0L)
-					+ allStats.getValue(SM_COMP, QueueType.OUT_QUEUE.name() + " messages", 0L);
+			messagesNumber = allStats.getCompMsg(SM_COMP);
 			temp = messagesPerSec;
 			messagesPerSec = (prevMessagesPerSec + (temp * 2f)
 					+ (messagesNumber - prevMessagesNumber)) / 4f;
@@ -954,10 +1091,8 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 			prevClusterNetworkBytesPerSecond = temp;
 			prevClusterNetworkBytes = clusterNetworkBytes;
 
-			long currPresencesReceived = allStats.getValue(SM_COMP,
-				QueueType.IN_QUEUE.name() + " presences", 0L);
-			long currPresencesSent = allStats.getValue(SM_COMP,
-				QueueType.OUT_QUEUE.name() + " presences", 0L);
+			long currPresencesReceived = allStats.getCompPresReceived(SM_COMP);
+			long currPresencesSent = allStats.getCompPresSent(SM_COMP);
 
 			presencesNumber = currPresencesReceived + currPresencesSent;
 			temp = presencesPerSec;
