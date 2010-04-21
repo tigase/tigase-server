@@ -771,6 +771,11 @@ public abstract class RepositoryAccess {
 		if (domain.getMaxUsersNumber() > 0) {
 			long domainUsers = authRepo.getUsersCount(domain.getVhost().getDomain());
 
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Current number of users for domain: " + domain.getVhost().getDomain()
+						+ " is: " + domainUsers);
+			}
+
 			if (domainUsers >= domain.getMaxUsersNumber()) {
 				throw new NotAuthorizedException("Maximum users number for the domain exceeded.");
 			}
