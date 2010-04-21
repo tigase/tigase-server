@@ -1178,7 +1178,7 @@ public class SessionManager extends AbstractMessageReceiver
 	protected boolean processAdminsOrDomains(Packet packet) {
 		JID to = packet.getStanzaTo();
 
-		if (isLocalDomain(to.toString())) {
+		if ((to != null) && isLocalDomain(to.toString())) {
 			if (packet.getElemName() == "message") {
 
 				// Yes this packet is for admin....
