@@ -417,7 +417,7 @@ public class UserRepositoryMDImpl implements UserRepository {
 		UserRepository repo = getRepo(domain);
 
 		if (repo != null) {
-			return repo.getUsersCount();
+			return repo.getUsersCount(domain);
 		} else {
 			log.log(Level.WARNING,
 					"Couldn't obtain user repository for domain: " + domain + ", not even default one!");
