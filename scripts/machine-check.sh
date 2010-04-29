@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 function usage() {
   echo "The script has to be run with following parameters:"
@@ -18,6 +18,16 @@ function check_dns() {
     else
       echo "OK, DNS settings for $1"
     fi
+  fi
+  if host -t SRV _xmpp-server._tcp.$1 | grep SRV > /dev/null ; then
+    echo "OK, SRV record found _xmpp-server._tcp.$1"
+  else
+    echo "WARNING - no SRV record _xmpp-server._tcp.$1"
+  fi
+  if host -t SRV _xmpp-client._tcp.$1 | grep SRV > /dev/null ; then
+    echo "OK, SRV record found _xmpp-client._tcp.$1"
+  else
+    echo "WARNING - no SRV record _xmpp-client._tcp.$1"
   fi
 }
 
@@ -59,30 +69,34 @@ if echo $OSTYPE | grep -i linux > /dev/null ; then
     echo "WARNING - you should not run the Tigase server from the root account."
   fi
 
-  # Checking ulimits
-  RES=`su -c - $USR "ulimit -n"`
-  if echo $RES | grep -i "user $USR does not exist" > /dev/null ; then
-    echo "WARNING - the $USR user given does not exist, run 'adduser -m $USR' to create the account"
-  else
-    if [ $RES -lt 300000 ] ; then
-      echo "WARNING - maximum open files for the $USR user is too low: $RES"
-      echo "          To fix this, add following lines to file: /etc/security/limits.conf"
-      echo "$USR               soft    nofile         500000"
-      echo "$USR               hard    nofile         500000"
-      echo "-------"
-      echo "Add these lines? (yes/no)"
-      read ans
-      if [ "$ans" = "yes" ] ; then
-        echo "$USR               soft    nofile         500000" >> /etc/security/limits.conf
-        echo "$USR               hard    nofile         500000" >> /etc/security/limits.conf
-      fi
+  if [ "$UID" == "0" ] ; then
+    # Checking ulimits
+    RES=`su -c - $USR "ulimit -n"`
+    if echo $RES | grep -i "user $USR does not exist" > /dev/null ; then
+      echo "WARNING - the $USR user given does not exist, run 'adduser -m $USR' to create the account"
     else
-      echo "OK, Max open files set to: $RES"
+      if [ $RES -lt 300000 ] ; then
+        echo "WARNING - maximum open files for the $USR user is too low: $RES"
+        echo "          To fix this, add following lines to file: /etc/security/limits.conf"
+        echo "$USR               soft    nofile         500000"
+        echo "$USR               hard    nofile         500000"
+        echo "-------"
+        echo "Add these lines? (yes/no)"
+        read ans
+        if [ "$ans" = "yes" ] ; then
+          echo "$USR               soft    nofile         500000" >> /etc/security/limits.conf
+          echo "$USR               hard    nofile         500000" >> /etc/security/limits.conf
+        fi
+      else
+        echo "OK, Max open files set to: $RES"
+      fi
     fi
+  else
+    echo "I am running not within root account, can't check limits for the $USR"
   fi
 
   # Checking kernel settings
-  RES=`sysctl fs.file-max | sed -e "s/fs.file-max *= *\([0-9]\+\)/\\1/"`
+  RES=`/sbin/sysctl fs.file-max | sed -e "s/fs.file-max *= *\([0-9]\+\)/\\1/"`
   if [ $RES -lt 600000 ] ; then
     echo "WARNING - system wide fs.file-max is too low: $RES"
     echo "          To fix this, add following line to file: /etc/sysctl.conf"
@@ -92,14 +106,14 @@ if echo $OSTYPE | grep -i linux > /dev/null ; then
     read ans
     if [ "$ans" = "yes" ] ; then
       echo "fs.file-max=1000000" >> /etc/sysctl.conf
-      sysctl -p > /dev/null
+      /sbin/sysctl -p > /dev/null
     fi
   else
     echo "OK, system wide fs.file-max set to: $RES"
   fi
 
-  LO_RES=`sysctl net.ipv4.ip_local_port_range | sed -e "s/[^=]*= *\([0-9]\+\)[^0-9]*\([0-9]\+\)/\\1/"`
-  HI_RES=`sysctl net.ipv4.ip_local_port_range | sed -e "s/[^=]*= *\([0-9]\+\)[^0-9]*\([0-9]\+\)/\\2/"`
+  LO_RES=`/sbin/sysctl net.ipv4.ip_local_port_range | sed -e "s/[^=]*= *\([0-9]\+\)[^0-9]*\([0-9]\+\)/\\1/"`
+  HI_RES=`/sbin/sysctl net.ipv4.ip_local_port_range | sed -e "s/[^=]*= *\([0-9]\+\)[^0-9]*\([0-9]\+\)/\\2/"`
   if [ $LO_RES -gt 5000 ] || [ $HI_RES -lt 64000 ] ; then
     echo "WARNING - IP port range is not optimal: $LO_RES   $HI_RES"
     echo "          Recommended: 1024   65530"
@@ -110,7 +124,7 @@ if echo $OSTYPE | grep -i linux > /dev/null ; then
     read ans     
     if [ "$ans" = "yes" ] ; then
       echo "net.ipv4.ip_local_port_range=1024 65530" >> /etc/sysctl.conf
-      sysctl -p > /dev/null
+      /sbin/sysctl -p > /dev/null
     fi
   else
     echo "OK, IP port range set to: $LO_RES   $HI_RES"
