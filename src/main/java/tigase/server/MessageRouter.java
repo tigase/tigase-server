@@ -823,9 +823,7 @@ public class MessageRouter extends AbstractMessageReceiver implements MessageRou
 					Element resp = comp.getDiscoInfo(node, jid, from);
 
 					if (resp != null) {
-						query = resp;
-
-						break;
+						query.addChildren(resp.getChildren());
 					}
 
 					// }

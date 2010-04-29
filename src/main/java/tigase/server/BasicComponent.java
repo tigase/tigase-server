@@ -337,8 +337,9 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 
 			return result;
 		} else {
-			Element res = null;
 
+			if (node == null) {
+			Element res = null;
 			if ( !serviceEntity.isAdminOnly() || isAdmin(from)) {
 				res = serviceEntity.getDiscoItem(null, BareJID.toString(getName(), jid.toString()));
 			}
@@ -359,6 +360,7 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 				} else {
 					result = Arrays.asList(res);
 				}
+			}
 			}
 
 			return result;
