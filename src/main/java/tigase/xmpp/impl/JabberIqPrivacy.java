@@ -242,12 +242,6 @@ public class JabberIqPrivacy extends XMPPProcessor
 		return DISCO_FEATURES;
 	}
 
-	;
-	;
-	;
-
-	//~--- methods --------------------------------------------------------------
-
 	/**
 	 * Method description
 	 *
