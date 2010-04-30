@@ -70,7 +70,7 @@ public class VCardTemp extends XMPPProcessorAbstract {
 	/**
 	 * Private logger for class instancess.
 	 */
-	private static Logger log = Logger.getLogger("tigase.xmpp.impl.VCardTemp");
+	private static Logger log = Logger.getLogger(VCardTemp.class.getName());
 	private static final String XMLNS = "vcard-temp";
 	private static final String ID = XMLNS;
 

@@ -29,6 +29,10 @@ import tigase.db.UserRepository;
 
 import tigase.xml.Element;
 
+//~--- JDK imports ------------------------------------------------------------
+
+import java.util.Map;
+
 //~--- classes ----------------------------------------------------------------
 
 /**
@@ -125,12 +129,13 @@ public abstract class XMPPProcessor implements XMPPImplIfc, Comparable<XMPPProce
 	 * Method description
 	 *
 	 *
-	 * @param rep
+	 *
+	 * @param settings
 	 *
 	 * @throws TigaseDBException
 	 */
 	@Override
-	public void init(UserRepository rep) throws TigaseDBException {}
+	public void init(Map<String, Object> settings) throws TigaseDBException {}
 
 	//~--- get methods ----------------------------------------------------------
 

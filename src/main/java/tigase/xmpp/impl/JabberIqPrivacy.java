@@ -158,11 +158,12 @@ public class JabberIqPrivacy extends XMPPProcessor
 	 * @param session a <code>XMPPResourceConnection</code> value
 	 * @param repo a <code>NonAuthUserRepository</code> value
 	 * @param results
+	 * @param settings
 	 * @return a <code>boolean</code> value
 	 */
 	@Override
 	public boolean preProcess(Packet packet, XMPPResourceConnection session,
-			NonAuthUserRepository repo, Queue<Packet> results) {
+			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) {
 		if ((session == null) ||!session.isAuthorized() || packet.isXMLNS("/iq/query", XMLNS)) {
 			return false;
 		}    // end of if (session == null)

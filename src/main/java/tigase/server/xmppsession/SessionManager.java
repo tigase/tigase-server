@@ -75,6 +75,7 @@ import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.ProcessorFactory;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPException;
+import tigase.xmpp.XMPPImplIfc;
 import tigase.xmpp.XMPPPacketFilterIfc;
 import tigase.xmpp.XMPPPostprocessorIfc;
 import tigase.xmpp.XMPPPreprocessorIfc;
@@ -733,35 +734,44 @@ public class SessionManager extends AbstractMessageReceiver
 			}
 
 			log.config("Loading and configuring plugin: " + plug_id);
-			addPlugin(plug_id, plugins_concurrency.get(plug_id));
 
-			Map<String, Object> plugin_settings = new ConcurrentHashMap<String, Object>();
+			XMPPImplIfc plugin = addPlugin(plug_id, plugins_concurrency.get(plug_id));
 
-			for (Map.Entry<String, Object> entry : props.entrySet()) {
-				if (entry.getKey().startsWith(PLUGINS_CONF_PROP_KEY)) {
+			if (plugin != null) {
+				Map<String, Object> plugin_settings = new ConcurrentHashMap<String, Object>();
 
-					// Split the key to configuration nodes separated with '/'
-					String[] nodes = entry.getKey().split("/");
+				for (Map.Entry<String, Object> entry : props.entrySet()) {
+					if (entry.getKey().startsWith(PLUGINS_CONF_PROP_KEY)) {
 
-					// The plugin ID part may contain many IDs separated with comma ','
-					if (nodes.length > 2) {
-						String[] ids = nodes[1].split(",");
+						// Split the key to configuration nodes separated with '/'
+						String[] nodes = entry.getKey().split("/");
 
-						Arrays.sort(ids);
+						// The plugin ID part may contain many IDs separated with comma ','
+						if (nodes.length > 2) {
+							String[] ids = nodes[1].split(",");
 
-						if (Arrays.binarySearch(ids, plug_id) >= 0) {
-							plugin_settings.put(nodes[2], entry.getValue());
+							Arrays.sort(ids);
+
+							if (Arrays.binarySearch(ids, plug_id) >= 0) {
+								plugin_settings.put(nodes[2], entry.getValue());
+							}
 						}
 					}
 				}
-			}
 
-			if (plugin_settings.size() > 0) {
-				if (log.isLoggable(Level.CONFIG)) {
-					log.config("Plugin configuration: " + plugin_settings.toString());
+				if (plugin_settings.size() > 0) {
+					if (log.isLoggable(Level.CONFIG)) {
+						log.config("Plugin configuration: " + plugin_settings.toString());
+					}
+
+					plugin_config.put(plug_id, plugin_settings);
 				}
 
-				plugin_config.put(plug_id, plugin_settings);
+				try {
+					plugin.init(plugin_settings);
+				} catch (TigaseDBException ex) {
+					log.log(Level.SEVERE, "Problem initializing plugin: " + plugin.id(), ex);
+				}
 			}
 		}    // end of for (String comp_id: plugins)
 
@@ -1471,7 +1481,8 @@ public class SessionManager extends AbstractMessageReceiver
 		// block certain packets.
 		if ( !stop) {
 			for (XMPPPreprocessorIfc preproc : preProcessors.values()) {
-				stop |= preproc.preProcess(packet, conn, naUserRepository, results);
+				stop |= preproc.preProcess(packet, conn, naUserRepository, results,
+						plugin_config.get(preproc.id()));
 			}    // end of for (XMPPPreprocessorIfc preproc: preProcessors)
 		}
 
@@ -1495,7 +1506,8 @@ public class SessionManager extends AbstractMessageReceiver
 
 		if ( !stop) {
 			for (XMPPPostprocessorIfc postproc : postProcessors.values()) {
-				postproc.postProcess(packet, conn, naUserRepository, results);
+				postproc.postProcess(packet, conn, naUserRepository, results,
+						plugin_config.get(postproc.id()));
 			}    // end of for (XMPPPostprocessorIfc postproc: postProcessors)
 		}      // end of if (!stop)
 
@@ -1631,7 +1643,8 @@ public class SessionManager extends AbstractMessageReceiver
 		}
 	}
 
-	private void addPlugin(String plug_id, Integer conc) {
+	private XMPPImplIfc addPlugin(String plug_id, Integer conc) {
+		XMPPImplIfc result = null;
 		XMPPProcessorIfc proc = ProcessorFactory.getProcessor(plug_id);
 		int concurrency = ((conc != null)
 			? conc : ((proc != null) ? proc.concurrentQueuesNo() : 0));
@@ -1650,6 +1663,7 @@ public class SessionManager extends AbstractMessageReceiver
 			log.config("Added processor: " + proc.getClass().getSimpleName() + " for plugin id: "
 					+ plug_id);
 			loaded = true;
+			result = proc;
 		}
 
 		XMPPPreprocessorIfc preproc = ProcessorFactory.getPreprocessor(plug_id);
@@ -1659,6 +1673,7 @@ public class SessionManager extends AbstractMessageReceiver
 			log.config("Added preprocessor: " + preproc.getClass().getSimpleName()
 					+ " for plugin id: " + plug_id);
 			loaded = true;
+			result = preproc;
 		}
 
 		XMPPPostprocessorIfc postproc = ProcessorFactory.getPostprocessor(plug_id);
@@ -1668,6 +1683,7 @@ public class SessionManager extends AbstractMessageReceiver
 			log.config("Added postprocessor: " + postproc.getClass().getSimpleName()
 					+ " for plugin id: " + plug_id);
 			loaded = true;
+			result = postproc;
 		}
 
 		XMPPStopListenerIfc stoplist = ProcessorFactory.getStopListener(plug_id);
@@ -1677,6 +1693,7 @@ public class SessionManager extends AbstractMessageReceiver
 			log.config("Added stopped processor: " + stoplist.getClass().getSimpleName()
 					+ " for plugin id: " + plug_id);
 			loaded = true;
+			result = stoplist;
 		}
 
 		XMPPPacketFilterIfc filterproc = ProcessorFactory.getPacketFilter(plug_id);
@@ -1686,11 +1703,14 @@ public class SessionManager extends AbstractMessageReceiver
 			log.config("Added packet filter: " + filterproc.getClass().getSimpleName()
 					+ " for plugin id: " + plug_id);
 			loaded = true;
+			result = filterproc;
 		}
 
 		if ( !loaded) {
 			log.warning("No implementation found for plugin id: " + plug_id);
 		}    // end of if (!loaded)
+
+		return result;
 	}
 
 	//~--- get methods ----------------------------------------------------------

@@ -19,11 +19,21 @@
  * Last modified by $Author$
  * $Date$
  */
+
 package tigase.xmpp;
 
-import tigase.db.UserRepository;
+//~--- non-JDK imports --------------------------------------------------------
+
 import tigase.db.TigaseDBException;
+import tigase.db.UserRepository;
+
 import tigase.xml.Element;
+
+//~--- JDK imports ------------------------------------------------------------
+
+import java.util.Map;
+
+//~--- interfaces -------------------------------------------------------------
 
 /**
  * Describe interface XMPPImplIfc here.
@@ -35,6 +45,9 @@ import tigase.xml.Element;
  * @version $Rev$
  */
 public interface XMPPImplIfc {
+	int concurrentQueuesNo();
+
+	int concurrentThreadsPerQueue();
 
 	/**
 	 * Method <code>id</code> returns a unique ID of the plugin.
@@ -46,6 +59,43 @@ public interface XMPPImplIfc {
 	 * @return a <code>String</code> value
 	 */
 	String id();
+
+	/**
+	 * Method <code>init</code> is called just after the plugin has been
+	 * loaded into memory. The idea behind this is to allow it to initialize
+	 * or check the database. This might be especially useful for plugins
+	 * which want to have a database access via non-standard stored procedures
+	 * or need schema upgrade.
+	 *
+	 * @param settings is a Map with initial processor settings from the configuration file.
+	 * @throws TigaseDBException
+	 */
+	void init(Map<String, Object> settings) throws TigaseDBException;
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method <code>isSupporting</code> takes element name and namespace for this
+	 * element and determines whether this element can be processed by this plugin.
+	 *
+	 * @param elem a <code>String</code> value
+	 * @param ns a <code>String</code> value
+	 * @return a <code>boolean</code> value
+	 */
+	boolean isSupporting(String elem, String ns);
+
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method <code>supDiscoFeatures</code> returns an array of XML
+	 * <code>Element</code>s with service discovery features which have to be
+	 * returned to the client uppon request. Service discovery features returned
+	 * by this method correspond to services supported by this plugin.
+	 *
+	 * @param session a <code>XMPPResourceConnection</code> value
+	 * @return an <code>Element[]</code> value
+	 */
+	Element[] supDiscoFeatures(XMPPResourceConnection session);
 
 	/**
 	 * Method <code>supElements</code> returns an array of element names for stanzas
@@ -75,42 +125,10 @@ public interface XMPPImplIfc {
 	 * @return an <code>Element[]</code> value
 	 */
 	Element[] supStreamFeatures(XMPPResourceConnection session);
+}    // XMPPImplIfc
 
-	/**
-	 * Method <code>supDiscoFeatures</code> returns an array of XML
-	 * <code>Element</code>s with service discovery features which have to be
-	 * returned to the client uppon request. Service discovery features returned
-	 * by this method correspond to services supported by this plugin.
-	 *
-	 * @param session a <code>XMPPResourceConnection</code> value
-	 * @return an <code>Element[]</code> value
-	 */
-	Element[] supDiscoFeatures(XMPPResourceConnection session);
 
-	/**
-	 * Method <code>isSupporting</code> takes element name and namespace for this
-	 * element and determines whether this element can be processed by this plugin.
-	 *
-	 * @param elem a <code>String</code> value
-	 * @param ns a <code>String</code> value
-	 * @return a <code>boolean</code> value
-	 */
-	boolean isSupporting(String elem, String ns);
+//~ Formatted in Sun Code Convention
 
-	/**
-	 * Method <code>init</code> is called just after the plugin has been
-	 * loaded into memory. The idea behind this is to allow it to initialize
-	 * or check the database. This might be especially useful for plugins
-	 * which want to have a database access via non-standard stored procedures
-	 * or need schema upgrade.
-	 *
-	 * @param rep an <code>UserRepository</code> value
-	 * @throws TigaseDBException 
-	 */
-	void init(UserRepository rep) throws TigaseDBException;
 
-	int concurrentQueuesNo();
-
-	int concurrentThreadsPerQueue();
-
-} // XMPPImplIfc
+//~ Formatted by Jindent --- http://www.jindent.com

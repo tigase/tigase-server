@@ -19,11 +19,21 @@
  * Last modified by $Author$
  * $Date$
  */
+
 package tigase.xmpp;
 
-import java.util.Queue;
-import tigase.server.Packet;
+//~--- non-JDK imports --------------------------------------------------------
+
 import tigase.db.NonAuthUserRepository;
+
+import tigase.server.Packet;
+
+//~--- JDK imports ------------------------------------------------------------
+
+import java.util.Map;
+import java.util.Queue;
+
+//~--- interfaces -------------------------------------------------------------
 
 /**
  * Describe interface XMPPPreprocessorIfc here.
@@ -35,8 +45,12 @@ import tigase.db.NonAuthUserRepository;
  * @version $Rev$
  */
 public interface XMPPPreprocessorIfc extends XMPPImplIfc {
-
 	boolean preProcess(Packet packet, XMPPResourceConnection session,
-		NonAuthUserRepository repo,	Queue<Packet> results);
+			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings);
+}    // XMPPPreprocessorIfc
 
-} // XMPPPreprocessorIfc
+
+//~ Formatted in Sun Code Convention
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

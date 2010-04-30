@@ -135,10 +135,12 @@ public class OfflineMessages extends XMPPProcessor
 	 * @param conn a <code>XMPPResourceConnection</code> value
 	 * @param repo a <code>NonAuthUserRepository</code> value
 	 * @param queue a <code>Queue</code> value
+	 * @param settings
 	 */
 	@Override
 	public void postProcess(final Packet packet, final XMPPResourceConnection conn,
-			final NonAuthUserRepository repo, final Queue<Packet> queue) {
+			final NonAuthUserRepository repo, final Queue<Packet> queue,
+				Map<String, Object> settings) {
 		if (conn == null) {
 			try {
 				if (savePacketForOffLineUser(packet, repo)) {
