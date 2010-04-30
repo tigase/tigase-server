@@ -1,0 +1,272 @@
+
+/*
+* Tigase Jabber/XMPP Server
+* Copyright (C) 2004-2010 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, version 3 of the License.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. Look for COPYING file in the top folder.
+* If not, see http://www.gnu.org/licenses/.
+*
+* $Rev$
+* Last modified by $Author$
+* $Date$
+ */
+package tigase.server.amp;
+
+//~--- non-JDK imports --------------------------------------------------------
+
+import tigase.disco.XMPPService;
+
+import tigase.server.AbstractMessageReceiver;
+import tigase.server.Packet;
+import tigase.server.amp.action.Drop;
+import tigase.server.amp.action.Notify;
+import tigase.server.amp.cond.Deliver;
+import tigase.server.amp.cond.ExpireAt;
+import tigase.server.amp.cond.MatchResource;
+
+import tigase.xml.Element;
+
+import tigase.xmpp.JID;
+
+//~--- JDK imports ------------------------------------------------------------
+
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+//~--- classes ----------------------------------------------------------------
+
+/**
+ * Created: Apr 26, 2010 3:22:06 PM
+ *
+ * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
+ * @version $Rev$
+ */
+public class AmpComponent extends AbstractMessageReceiver {
+	private static final Logger log = Logger.getLogger(AmpComponent.class.getName());
+	private static final String AMP_NODE = "http://jabber.org/protocol/amp";
+	private static final String AMP_XMLNS = AMP_NODE;
+	private static final String CONDITION_ATT = "condition";
+	private static final String ACTION_ATT = "action";
+	private static final Element top_feature = new Element("feature", new String[] { "var" },
+		new String[] { AMP_NODE });
+
+	//~--- fields ---------------------------------------------------------------
+
+	private Map<String, ActionIfc> actions = new ConcurrentSkipListMap<String, ActionIfc>();
+	private Map<String, ConditionIfc> conditions = new ConcurrentSkipListMap<String,
+		ConditionIfc>();
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param params
+	 *
+	 * @return
+	 */
+	@Override
+	public Map<String, Object> getDefaults(Map<String, Object> params) {
+		Map<String, Object> defs = super.getDefaults(params);
+
+		return defs;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public String getDiscoCategoryType() {
+		return "generic";
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public String getDiscoDescription() {
+		return "IM AMP Support";
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param node
+	 * @param jid
+	 * @param from
+	 *
+	 * @return
+	 */
+	@Override
+	public Element getDiscoInfo(String node, JID jid, JID from) {
+		Element query = super.getDiscoInfo(node, jid, from);
+
+		if ((jid != null)
+				&& (getName().equals(jid.getLocalpart()) || isLocalDomain(jid.toString()))
+					&& (AMP_NODE.equals(node))) {
+			if (query == null) {
+				query = new Element("query");
+				query.setXMLNS(XMPPService.INFO_XMLNS);
+			}
+
+			query.addChild(new Element("identity", new String[] { "name", "category", "type" },
+					new String[] { getDiscoDescription(),
+					"im", getDiscoCategoryType() }));
+			query.addChild(top_feature);
+
+			for (ActionIfc action : actions.values()) {
+				query.addChild(new Element("feature", new String[] { "var" },
+						new String[] { AMP_NODE + "?action=" + action.getName() }));
+			}
+
+			for (ConditionIfc cond : conditions.values()) {
+				query.addChild(new Element("feature", new String[] { "var" },
+						new String[] { AMP_NODE + "?condition=" + cond.getName() }));
+			}
+
+//    for (ProcessingThreads<ProcessorWorkerThread> proc_t : processors.values()) {
+//      Element[] discoFeatures = proc_t.getWorkerThread().processor.supDiscoFeatures(null);
+//
+//      if (discoFeatures != null) {
+//        query.addChildren(Arrays.asList(discoFeatures));
+//      }    // end of if (discoFeatures != null)
+//    }
+		}
+
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Found disco info: " + ((query != null) ? query.toString() : null));
+		}
+
+		return query;
+	}
+
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param packet
+	 */
+	@Override
+	public void processPacket(Packet packet) {
+		log.finest("My packet: " + packet);
+
+		Element amp = packet.getElement().getChild("amp");
+
+		if ((amp != null) && (amp.getXMLNS() == AMP_XMLNS)) {
+			List<Element> rules = amp.getChildren();
+
+			if ((rules != null) && (rules.size() > 0)) {
+				for (Element rule : rules) {
+					if (matchCondition(rule)) {
+						executeAction(rule);
+
+						return;
+					}
+				}
+			} else {
+				log.warning("AMP packet but empty rule-set! " + packet);
+			}
+		} else {
+			log.warning("Not an AMP packet! " + packet);
+		}
+	}
+
+	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param props
+	 */
+	@Override
+	public void setProperties(Map<String, Object> props) {
+		super.setProperties(props);
+
+		ActionIfc action = new Drop();
+
+		actions.put(action.getName(), action);
+		action = new tigase.server.amp.action.Error();
+		actions.put(action.getName(), action);
+		action = new Notify();
+		actions.put(action.getName(), action);
+
+		ConditionIfc condition = new Deliver();
+
+		conditions.put(condition.getName(), condition);
+		condition = new ExpireAt();
+		conditions.put(condition.getName(), condition);
+		condition = new MatchResource();
+		conditions.put(condition.getName(), condition);
+	}
+
+	//~--- methods --------------------------------------------------------------
+
+	private void executeAction(Element rule) {
+		String act = rule.getAttribute(ACTION_ATT);
+
+		if (act != null) {
+			ActionIfc action = actions.get(act);
+
+			if (action != null) {
+				Queue<Packet> results = action.execute(rule);
+
+				if ((results != null) && (results.size() > 0)) {
+					super.addOutPackets(results);
+				}
+			} else {
+				log.warning("No action found for act: " + act);
+			}
+		} else {
+			log.warning("No actionset for rule: " + rule);
+		}
+	}
+
+	private boolean matchCondition(Element rule) {
+		String cond = rule.getAttribute(CONDITION_ATT);
+
+		if (cond != null) {
+			ConditionIfc condition = conditions.get(cond);
+
+			if (condition != null) {
+				return condition.match(rule);
+			} else {
+				log.warning("No condition found for cond: " + cond);
+			}
+		} else {
+			log.warning("No condition set for rule: " + rule);
+		}
+
+		return false;
+	}
+}
+
+
+//~ Formatted in Sun Code Convention
+
+
+//~ Formatted by Jindent --- http://www.jindent.com
