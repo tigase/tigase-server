@@ -28,8 +28,10 @@ import tigase.disco.XMPPService;
 
 import tigase.server.AbstractMessageReceiver;
 import tigase.server.Packet;
+import tigase.server.amp.action.Alert;
 import tigase.server.amp.action.Drop;
 import tigase.server.amp.action.Notify;
+import tigase.server.amp.action.Store;
 import tigase.server.amp.cond.Deliver;
 import tigase.server.amp.cond.ExpireAt;
 import tigase.server.amp.cond.MatchResource;
@@ -55,7 +57,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class AmpComponent extends AbstractMessageReceiver {
+public class AmpComponent extends AbstractMessageReceiver implements ActionResultsHandlerIfc {
 	private static final Logger log = Logger.getLogger(AmpComponent.class.getName());
 	private static final String AMP_NODE = "http://jabber.org/protocol/amp";
 	private static final String AMP_XMLNS = AMP_NODE;
@@ -69,6 +71,34 @@ public class AmpComponent extends AbstractMessageReceiver {
 	private Map<String, ActionIfc> actions = new ConcurrentSkipListMap<String, ActionIfc>();
 	private Map<String, ConditionIfc> conditions = new ConcurrentSkipListMap<String,
 		ConditionIfc>();
+
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param packet
+	 *
+	 * @return
+	 */
+	@Override
+	public boolean addOutPacket(Packet packet) {
+		return super.addOutPacket(packet);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param packets
+	 *
+	 * @return
+	 */
+	@Override
+	public boolean addOutPackets(Queue<Packet> packets) {
+		return super.addOutPackets(packets);
+	}
 
 	//~--- get methods ----------------------------------------------------------
 
@@ -174,17 +204,26 @@ public class AmpComponent extends AbstractMessageReceiver {
 	public void processPacket(Packet packet) {
 		log.finest("My packet: " + packet);
 
-		Element amp = packet.getElement().getChild("amp");
+		ActionIfc def = null;
 
-		if ((amp != null) && (amp.getXMLNS() == AMP_XMLNS)) {
+		if (packet.getAttribute(AmpFeatureIfc.OFFLINE) == null) {
+			def = actions.get("deliver");
+		} else {
+			def = actions.get("store");
+		}
+
+		boolean exec_def = true;
+		Element amp = packet.getElement().getChild("amp", AMP_XMLNS);
+
+		if (amp != null) {
 			List<Element> rules = amp.getChildren();
 
 			if ((rules != null) && (rules.size() > 0)) {
 				for (Element rule : rules) {
-					if (matchCondition(rule)) {
-						executeAction(rule);
+					if (matchCondition(packet, rule)) {
+						exec_def = executeAction(packet, rule);
 
-						return;
+						break;
 					}
 				}
 			} else {
@@ -192,6 +231,10 @@ public class AmpComponent extends AbstractMessageReceiver {
 			}
 		} else {
 			log.warning("Not an AMP packet! " + packet);
+		}
+
+		if (exec_def) {
+			def.execute(packet, null, this);
 		}
 	}
 
@@ -214,6 +257,12 @@ public class AmpComponent extends AbstractMessageReceiver {
 		actions.put(action.getName(), action);
 		action = new Notify();
 		actions.put(action.getName(), action);
+		action = new tigase.server.amp.action.Deliver();
+		actions.put(action.getName(), action);
+		action = new Store();
+		actions.put(action.getName(), action);
+		action = new Alert();
+		actions.put(action.getName(), action);
 
 		ConditionIfc condition = new Deliver();
 
@@ -226,34 +275,32 @@ public class AmpComponent extends AbstractMessageReceiver {
 
 	//~--- methods --------------------------------------------------------------
 
-	private void executeAction(Element rule) {
+	private boolean executeAction(Packet packet, Element rule) {
 		String act = rule.getAttribute(ACTION_ATT);
 
 		if (act != null) {
 			ActionIfc action = actions.get(act);
 
 			if (action != null) {
-				Queue<Packet> results = action.execute(rule);
-
-				if ((results != null) && (results.size() > 0)) {
-					super.addOutPackets(results);
-				}
+				return action.execute(packet, rule, this);
 			} else {
 				log.warning("No action found for act: " + act);
 			}
 		} else {
 			log.warning("No actionset for rule: " + rule);
 		}
+
+		return true;
 	}
 
-	private boolean matchCondition(Element rule) {
+	private boolean matchCondition(Packet packet, Element rule) {
 		String cond = rule.getAttribute(CONDITION_ATT);
 
 		if (cond != null) {
 			ConditionIfc condition = conditions.get(cond);
 
 			if (condition != null) {
-				return condition.match(rule);
+				return condition.match(packet, rule);
 			} else {
 				log.warning("No condition found for cond: " + cond);
 			}

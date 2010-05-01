@@ -24,9 +24,14 @@ package tigase.server.amp.cond;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.server.Packet;
 import tigase.server.amp.ConditionIfc;
 
 import tigase.xml.Element;
+
+//~--- JDK imports ------------------------------------------------------------
+
+import java.util.logging.Logger;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -37,7 +42,16 @@ import tigase.xml.Element;
  * @version $Rev$
  */
 public class MatchResource implements ConditionIfc {
+
+	/**
+	 * Private logger for class instances.
+	 */
+	private static Logger log = Logger.getLogger(MatchResource.class.getName());
 	private static final String name = "match-resource";
+
+	//~--- constant enums -------------------------------------------------------
+
+	private enum MatchValue { any, exact, other; }
 
 	//~--- get methods ----------------------------------------------------------
 
@@ -58,13 +72,49 @@ public class MatchResource implements ConditionIfc {
 	 * Method description
 	 *
 	 *
-	 * @param r
+	 *
+	 * @param packet
+	 * @param rule
 	 *
 	 * @return
 	 */
 	@Override
-	public boolean match(Element r) {
-		throw new UnsupportedOperationException("Not supported yet.");
+	public boolean match(Packet packet, Element rule) {
+		String value = rule.getAttribute("value");
+		boolean result = false;
+
+		if (value != null) {
+			try {
+				MatchValue m_val = MatchValue.valueOf(value);
+				String jid_resource = (packet.getStanzaTo() != null)
+					? packet.getStanzaTo().getResource() : null;
+				String target_resource = packet.getAttribute(TO_RES);
+
+				switch (m_val) {
+					case any :
+						result = true;
+
+						break;
+
+					case other :
+						result = (jid_resource != null) && (target_resource != null)
+								&&!jid_resource.equals(target_resource);
+
+						break;
+
+					case exact :
+						result = (jid_resource != null) && jid_resource.equals(target_resource);
+
+						break;
+				}
+			} catch (Exception e) {
+				log.info("Incorrect " + name + " condition value for rule: " + rule);
+			}
+		} else {
+			log.info("No value set for rule: " + rule);
+		}
+
+		return result;
 	}
 }
 

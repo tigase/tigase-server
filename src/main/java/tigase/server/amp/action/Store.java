@@ -37,13 +37,13 @@ import java.util.Queue;
 //~--- classes ----------------------------------------------------------------
 
 /**
- * Created: Apr 27, 2010 5:35:33 PM
+ * Created: May 1, 2010 11:32:59 AM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class Drop implements ActionIfc {
-	private static final String name = "drop";
+public class Store implements ActionIfc {
+	private static final String name = "store";
 
 	//~--- methods --------------------------------------------------------------
 

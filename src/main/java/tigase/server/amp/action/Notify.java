@@ -25,13 +25,10 @@ package tigase.server.amp.action;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.server.Packet;
-import tigase.server.amp.ActionIfc;
+import tigase.server.amp.ActionAbstract;
+import tigase.server.amp.ActionResultsHandlerIfc;
 
 import tigase.xml.Element;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.Queue;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -41,7 +38,7 @@ import java.util.Queue;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class Notify implements ActionIfc {
+public class Notify extends ActionAbstract {
 	private static final String name = "notify";
 
 	//~--- methods --------------------------------------------------------------
@@ -50,13 +47,20 @@ public class Notify implements ActionIfc {
 	 * Method description
 	 *
 	 *
+	 * @param packet
 	 * @param rule
+	 * @param resultsHandler
+	 *
 	 *
 	 * @return
 	 */
 	@Override
-	public Queue<Packet> execute(Element rule) {
-		throw new UnsupportedOperationException("Not supported yet.");
+	public boolean execute(Packet packet, Element rule, ActionResultsHandlerIfc resultsHandler) {
+		Packet result = prepareAmpPacket(packet, rule);
+
+		resultsHandler.addOutPacket(result);
+
+		return true;
 	}
 
 	//~--- get methods ----------------------------------------------------------

@@ -24,9 +24,19 @@ package tigase.server.amp.cond;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.server.Packet;
 import tigase.server.amp.ConditionIfc;
 
 import tigase.xml.Element;
+
+//~--- JDK imports ------------------------------------------------------------
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
+import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -37,7 +47,16 @@ import tigase.xml.Element;
  * @version $Rev$
  */
 public class ExpireAt implements ConditionIfc {
+
+	/**
+	 * Private logger for class instances.
+	 */
+	private static Logger log = Logger.getLogger(ExpireAt.class.getName());
 	private static final String name = "expire-at";
+
+	//~--- fields ---------------------------------------------------------------
+
+	private final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
 	//~--- get methods ----------------------------------------------------------
 
@@ -58,13 +77,29 @@ public class ExpireAt implements ConditionIfc {
 	 * Method description
 	 *
 	 *
-	 * @param r
+	 *
+	 * @param packet
+	 * @param rule
 	 *
 	 * @return
 	 */
 	@Override
-	public boolean match(Element r) {
-		throw new UnsupportedOperationException("Not supported yet.");
+	public boolean match(Packet packet, Element rule) {
+		String value = rule.getAttribute("value");
+
+		if (value != null) {
+			try {
+				Date val_date = formatter.parse(value);
+
+				return val_date.before(new Date());
+			} catch (ParseException ex) {
+				log.info("Incorrect " + name + " condition value for rule: " + rule);
+			}
+		} else {
+			log.info("No value set for rule: " + rule);
+		}
+
+		return false;
 	}
 }
 

@@ -25,7 +25,9 @@ package tigase.server.amp.action;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.server.Packet;
+import tigase.server.amp.ActionAbstract;
 import tigase.server.amp.ActionIfc;
+import tigase.server.amp.ActionResultsHandlerIfc;
 
 import tigase.xml.Element;
 
@@ -41,8 +43,16 @@ import java.util.Queue;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class Error implements ActionIfc {
+public class Error extends ActionAbstract {
 	private static final String name = "error";
+	private static final String FAILED_RULES_PATH = "error/failed-rules";
+	private static final Element UNDEF_CONDITION = new Element("undefined-condition",
+		new String[] { "xmlns" }, new String[] { "urn:ietf:params:xml:ns:xmpp-stanzas" });
+	private static final Element FAILED_RULES = new Element("failed-rules",
+		new String[] { "xmlns" }, new String[] { "http://jabber.org/protocol/amp#errors" });
+	private static final Element ERROR_TEMPLATE = new Element("error",
+		new Element[] { UNDEF_CONDITION }, new String[] { "type",
+			"code" }, new String[] { "modify", "500" });
 
 	//~--- methods --------------------------------------------------------------
 
@@ -50,13 +60,25 @@ public class Error implements ActionIfc {
 	 * Method description
 	 *
 	 *
+	 * @param packet
 	 * @param rule
+	 * @param resultsHandler
+	 *
 	 *
 	 * @return
 	 */
 	@Override
-	public Queue<Packet> execute(Element rule) {
-		throw new UnsupportedOperationException("Not supported yet.");
+	public boolean execute(Packet packet, Element rule, ActionResultsHandlerIfc resultsHandler) {
+		Packet result = prepareAmpPacket(packet, rule);
+		Element error = ERROR_TEMPLATE.clone();
+		Element failed_rules = FAILED_RULES.clone();
+
+		failed_rules.addChild(rule);
+		error.addChild(failed_rules);
+		result.getElement().addChild(error);
+		resultsHandler.addOutPacket(result);
+
+		return false;
 	}
 
 	//~--- get methods ----------------------------------------------------------

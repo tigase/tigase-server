@@ -25,25 +25,24 @@ package tigase.server.amp.action;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.server.Packet;
+import tigase.server.amp.ActionAbstract;
 import tigase.server.amp.ActionIfc;
 import tigase.server.amp.ActionResultsHandlerIfc;
 
 import tigase.xml.Element;
 
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.Queue;
+import tigase.xmpp.JID;
 
 //~--- classes ----------------------------------------------------------------
 
 /**
- * Created: Apr 27, 2010 5:35:33 PM
+ * Created: May 1, 2010 11:28:40 AM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class Drop implements ActionIfc {
-	private static final String name = "drop";
+public class Deliver extends ActionAbstract {
+	private static final String name = "deliver";
 
 	//~--- methods --------------------------------------------------------------
 
@@ -60,6 +59,16 @@ public class Drop implements ActionIfc {
 	 */
 	@Override
 	public boolean execute(Packet packet, Element rule, ActionResultsHandlerIfc resultsHandler) {
+		Packet result = packet.copyElementOnly();
+		String to_conn_id = packet.getAttribute(TO_CONN_ID);
+
+		if (to_conn_id != null) {
+			result.setPacketTo(JID.jidInstanceNS(to_conn_id));
+		}
+
+		removeTigasePayload(result);
+		resultsHandler.addOutPacket(result);
+
 		return false;
 	}
 

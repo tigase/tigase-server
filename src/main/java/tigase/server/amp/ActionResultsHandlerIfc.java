@@ -22,37 +22,26 @@
  */
 package tigase.server.amp;
 
+//~--- non-JDK imports --------------------------------------------------------
+
+import tigase.server.Packet;
+
+//~--- JDK imports ------------------------------------------------------------
+
+import java.util.Queue;
+
 //~--- interfaces -------------------------------------------------------------
 
 /**
- * Created: Apr 28, 2010 5:38:24 PM
+ * Created: May 1, 2010 3:26:50 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public interface AmpFeatureIfc {
+public interface ActionResultsHandlerIfc {
+	boolean addOutPacket(Packet packet);
 
-	/** Field description */
-	public static final String AMP_XMLNS = "http://jabber.org/protocol/amp";
-
-	/** Field description */
-	public static final String FROM_CONN_ID = "from-conn-id";
-
-	/** Field description */
-	public static final String TO_CONN_ID = "to-conn-id";
-
-	/** Field description */
-	public static final String TO_RES = "to-res";
-
-	/** Field description */
-	public static final String OFFLINE = "offline";
-
-	/** Field description */
-	public static final String MSG_OFFLINE_PROP_KEY = "msg-offline";
-
-	//~--- get methods ----------------------------------------------------------
-
-	String getName();
+	boolean addOutPackets(Queue<Packet> packets);
 }
 
 

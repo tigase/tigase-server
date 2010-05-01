@@ -28,10 +28,6 @@ import tigase.server.Packet;
 
 import tigase.xml.Element;
 
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.Queue;
-
 //~--- interfaces -------------------------------------------------------------
 
 /**
@@ -41,7 +37,7 @@ import java.util.Queue;
  * @version $Rev$
  */
 public interface ActionIfc extends AmpFeatureIfc {
-	Queue<Packet> execute(Element rule);
+	boolean execute(Packet packet, Element rule, ActionResultsHandlerIfc resultsHandler);
 }
 
 

@@ -76,7 +76,7 @@ public class OfflineMessages extends XMPPProcessor
 	/**
 	 * Private logger for class instances.
 	 */
-	private static Logger log = Logger.getLogger("tigase.xmpp.impl.OfflineMessage");
+	private static Logger log = Logger.getLogger(OfflineMessages.class.getName());
 	private static final String ID = "msgoffline";
 	private static final String XMLNS = "jabber:client";
 	private static final String[] ELEMENTS = { "presence" };
@@ -87,7 +87,7 @@ public class OfflineMessages extends XMPPProcessor
 	//~--- fields ---------------------------------------------------------------
 
 	private SimpleParser parser = SingletonFactory.getParserInstance();
-	private final SimpleDateFormat formater = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+	private final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
 	//~--- methods --------------------------------------------------------------
 
@@ -308,8 +308,8 @@ public class OfflineMessages extends XMPPProcessor
 			Element packet = pac.getElement().clone();
 			String stamp = null;
 
-			synchronized (formater) {
-				stamp = formater.format(new Date());
+			synchronized (formatter) {
+				stamp = formatter.format(new Date());
 			}
 
 			String from = pac.getStanzaTo().getDomain();

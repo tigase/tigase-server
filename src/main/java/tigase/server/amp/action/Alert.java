@@ -20,39 +20,64 @@
 * Last modified by $Author$
 * $Date$
  */
-package tigase.server.amp;
+package tigase.server.amp.action;
 
-//~--- interfaces -------------------------------------------------------------
+//~--- non-JDK imports --------------------------------------------------------
+
+import tigase.server.Packet;
+import tigase.server.amp.ActionAbstract;
+import tigase.server.amp.ActionIfc;
+import tigase.server.amp.ActionResultsHandlerIfc;
+
+import tigase.xml.Element;
+
+import tigase.xmpp.JID;
+
+//~--- classes ----------------------------------------------------------------
 
 /**
- * Created: Apr 28, 2010 5:38:24 PM
+ * Created: May 1, 2010 1:39:07 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public interface AmpFeatureIfc {
+public class Alert extends ActionAbstract {
+	private static final String name = "alert";
 
-	/** Field description */
-	public static final String AMP_XMLNS = "http://jabber.org/protocol/amp";
+	//~--- methods --------------------------------------------------------------
 
-	/** Field description */
-	public static final String FROM_CONN_ID = "from-conn-id";
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param packet
+	 * @param rule
+	 *
+	 * @param resultsHandler
+	 *
+	 * @return
+	 */
+	@Override
+	public boolean execute(Packet packet, Element rule, ActionResultsHandlerIfc resultsHandler) {
+		Packet result = prepareAmpPacket(packet, rule);
 
-	/** Field description */
-	public static final String TO_CONN_ID = "to-conn-id";
+		resultsHandler.addOutPacket(result);
 
-	/** Field description */
-	public static final String TO_RES = "to-res";
-
-	/** Field description */
-	public static final String OFFLINE = "offline";
-
-	/** Field description */
-	public static final String MSG_OFFLINE_PROP_KEY = "msg-offline";
+		return false;
+	}
 
 	//~--- get methods ----------------------------------------------------------
 
-	String getName();
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public String getName() {
+		return name;
+	}
 }
 
 

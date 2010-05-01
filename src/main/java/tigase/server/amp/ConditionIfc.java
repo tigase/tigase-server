@@ -24,6 +24,8 @@ package tigase.server.amp;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.server.Packet;
+
 import tigase.xml.Element;
 
 //~--- interfaces -------------------------------------------------------------
@@ -35,7 +37,7 @@ import tigase.xml.Element;
  * @version $Rev$
  */
 public interface ConditionIfc extends AmpFeatureIfc {
-	boolean match(Element r);
+	boolean match(Packet packet, Element rule);
 }
 
 

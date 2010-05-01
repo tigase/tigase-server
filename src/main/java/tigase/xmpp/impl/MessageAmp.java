@@ -32,11 +32,9 @@ import tigase.server.Packet;
 import tigase.xml.Element;
 
 import tigase.xmpp.JID;
-import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.XMPPException;
 import tigase.xmpp.XMPPPostprocessorIfc;
 import tigase.xmpp.XMPPProcessor;
-import tigase.xmpp.XMPPProcessorAbstract;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 
@@ -57,6 +55,10 @@ import java.util.logging.Logger;
 public class MessageAmp extends XMPPProcessor
 		implements XMPPPostprocessorIfc, XMPPProcessorIfc {
 	private static Logger log = Logger.getLogger(MessageAmp.class.getName());
+	private static final String FROM_CONN_ID = "from-conn-id";
+	private static final String TO_CONN_ID = "to-conn-id";
+	private static final String TO_RES = "to-res";
+	private static final String OFFLINE = "offline";
 	private static final String AMP_JID_PROP_KEY = "amp-jid";
 	private static final String MSG_OFFLINE_PROP_KEY = "msg-offline";
 	private static final String XMLNS = "http://jabber.org/protocol/amp";
@@ -100,6 +102,10 @@ public class MessageAmp extends XMPPProcessor
 		ampJID = JID.jidInstanceNS((String) settings.get(AMP_JID_PROP_KEY));
 
 		String off_val = (String) settings.get(MSG_OFFLINE_PROP_KEY);
+
+		if (off_val == null) {
+			off_val = System.getProperty(MSG_OFFLINE_PROP_KEY);
+		}
 
 		if ((off_val != null) &&!Boolean.parseBoolean(off_val)) {
 			offlineProcessor = null;
@@ -149,9 +155,9 @@ public class MessageAmp extends XMPPProcessor
 		if ((packet.getElemName() == "presence") && (offlineProcessor != null)) {
 			offlineProcessor.process(packet, session, repo, results, settings);
 		} else {
-			Element amp = packet.getElement().getChild("amp");
+			Element amp = packet.getElement().getChild("amp", XMLNS);
 
-			if ((amp == null) || (amp.getXMLNS() != XMLNS)) {
+			if ((amp == null) || (amp.getAttribute("status") != null)) {
 				messageProcessor.process(packet, session, repo, results, settings);
 			} else {
 				Packet result = packet.copyElementOnly();
@@ -160,17 +166,20 @@ public class MessageAmp extends XMPPProcessor
 				results.offer(result);
 
 				if (session == null) {
+					result.getElement().addAttribute(OFFLINE, "1");
+
 					return;
 				}
 
-				JID connectionId = session.getConnectionId();
-
-				if (connectionId.equals(packet.getPacketFrom())) {
-					amp.addAttribute("from-conn-id", connectionId.toString());
-				}
-
 				if (session.isUserId(packet.getStanzaTo().getBareJID())) {
-					amp.addAttribute("to-conn-id", session.getConnectionId().toString());
+					result.getElement().addAttribute(TO_CONN_ID, session.getConnectionId().toString());
+					result.getElement().addAttribute(TO_RES, session.getResource());
+				} else {
+					JID connectionId = session.getConnectionId();
+
+					if (connectionId.equals(packet.getPacketFrom())) {
+						result.getElement().addAttribute(FROM_CONN_ID, connectionId.toString());
+					}
 				}
 			}
 		}
