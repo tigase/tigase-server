@@ -26,7 +26,6 @@ package tigase.server.xmppsession;
 
 import tigase.db.NonAuthUserRepository;
 
-import tigase.server.BasicComponent;
 import tigase.server.Packet;
 
 import tigase.sys.TigaseRuntime;
@@ -134,7 +133,7 @@ public class PacketFilter {
 			}
 		}
 
-		if (session == null) {
+		if ((session == null) || session.isServerSession()) {
 			return false;
 		}    // end of if (session == null)
 
