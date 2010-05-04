@@ -571,7 +571,6 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 //    if (server_packet.getXMLNS() == XMLNS_CLIENT_VAL) {
 //      server_packet.getElement().setXMLNS(XMLNS_SERVER_VAL);
 //    }
-
 			if ((serv_conn == null)
 					|| ( !serv_conn.sendPacket(server_packet) && serv_conn.needsConnection())) {
 				if (log.isLoggable(Level.FINEST)) {
