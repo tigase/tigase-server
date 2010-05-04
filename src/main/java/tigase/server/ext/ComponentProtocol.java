@@ -751,6 +751,27 @@ public class ComponentProtocol
 	 * Method description
 	 *
 	 *
+	 * @param ios
+	 * @param p
+	 *
+	 * @return
+	 */
+	@Override
+	public boolean writePacketToSocket(XMPPIOService<List<ComponentConnection>> ios, Packet p) {
+
+//  String xmlns = (String)ios.getSessionData().get("xmlns");
+//  if (xmlns != null) {
+//    p.getElement().setXMLNS(xmlns);
+//  }
+		p.getElement().removeAttribute("xmlns");
+
+		return super.writePacketToSocket(ios, p);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
 	 * @param serv
 	 */
 	@Override
