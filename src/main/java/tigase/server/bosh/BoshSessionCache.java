@@ -182,10 +182,14 @@ public class BoshSessionCache {
 	}
 
 	private Element createMessageHistory(String jid) {
+		String sdf_string = null;
+		synchronized (sdf) {
+			sdf_string = sdf.format(new Date());
+		}
 		return new Element("iq", new Element[] {
 				new Element("chat",
 					new String[] {"xmlns", "with", "start"},
-					new String[] {"urn:xmpp:tmp:archive", jid, sdf.format(new Date())})},
+					new String[] {"urn:xmpp:tmp:archive", jid, sdf_string})},
 			new String[] {"type", "id"},
 			new String[] {"result", ""+System.currentTimeMillis()});
 	}
