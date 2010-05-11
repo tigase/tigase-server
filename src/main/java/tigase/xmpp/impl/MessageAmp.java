@@ -24,10 +24,15 @@ package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.conf.Configurable;
+
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
+import tigase.db.UserNotFoundException;
 
 import tigase.server.Packet;
+import tigase.server.amp.AmpFeatureIfc;
+import tigase.server.amp.MsgRepository;
 
 import tigase.xml.Element;
 
@@ -40,8 +45,11 @@ import tigase.xmpp.XMPPResourceConnection;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import java.sql.SQLException;
+
 import java.util.Map;
 import java.util.Queue;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 //~--- classes ----------------------------------------------------------------
@@ -72,6 +80,7 @@ public class MessageAmp extends XMPPProcessor
 	//~--- fields ---------------------------------------------------------------
 
 	private JID ampJID = null;
+	private MsgRepository msg_repo = null;
 	private OfflineMessages offlineProcessor = new OfflineMessages();
 	private Message messageProcessor = new Message();
 
@@ -112,6 +121,27 @@ public class MessageAmp extends XMPPProcessor
 			DISCO_FEATURES = new Element[] {
 				new Element("feature", new String[] { "var" }, new String[] { XMLNS }) };
 		}
+
+		String msg_repo_uri = (String) settings.get(AmpFeatureIfc.AMP_MSG_REPO_URI_PROP_KEY);
+
+		if (msg_repo_uri == null) {
+			msg_repo_uri = System.getProperty(AmpFeatureIfc.AMP_MSG_REPO_URI_PROP_KEY);
+
+			if (msg_repo_uri == null) {
+				msg_repo_uri = System.getProperty(Configurable.GEN_USER_DB_URI_PROP_KEY);
+			}
+		}
+
+		if (msg_repo_uri != null) {
+			msg_repo = MsgRepository.getInstance(msg_repo_uri);
+
+			try {
+				msg_repo.initRepository(msg_repo_uri, null);
+			} catch (SQLException ex) {
+				msg_repo = null;
+				log.log(Level.WARNING, "Problem initializing connection to DB: ", ex);
+			}
+		}
 	}
 
 	/**
@@ -127,11 +157,18 @@ public class MessageAmp extends XMPPProcessor
 	@Override
 	public void postProcess(Packet packet, XMPPResourceConnection session,
 			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) {
-		if (offlineProcessor != null) {
+		if ((offlineProcessor != null) && (session == null)) {
 			Element amp = packet.getElement().getChild("amp");
 
 			if ((amp == null) || (amp.getXMLNS() != XMLNS)) {
-				offlineProcessor.postProcess(packet, session, repo, results, settings);
+				try {
+					offlineProcessor.savePacketForOffLineUser(packet, msg_repo);
+				} catch (UserNotFoundException ex) {
+					if (log.isLoggable(Level.FINEST)) {
+						log.finest("UserNotFoundException at trying to save packet for off-line user."
+								+ packet);
+					}
+				}
 			}
 		}
 	}
@@ -152,8 +189,24 @@ public class MessageAmp extends XMPPProcessor
 	public void process(Packet packet, XMPPResourceConnection session,
 			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
 			throws XMPPException {
-		if ((packet.getElemName() == "presence") && (offlineProcessor != null)) {
-			offlineProcessor.process(packet, session, repo, results, settings);
+		if (packet.getElemName() == "presence") {
+			if ((offlineProcessor != null)
+					&& offlineProcessor.loadOfflineMessages(packet, session)) {
+				try {
+					Queue<Packet> packets = offlineProcessor.restorePacketForOffLineUser(session,
+						msg_repo);
+
+					if (packets != null) {
+						if (log.isLoggable(Level.FINER)) {
+							log.finer("Sending off-line messages: " + packets.size());
+						}
+
+						results.addAll(packets);
+					}    // end of if (packets != null)
+				} catch (UserNotFoundException e) {
+					log.info("Something wrong, DB problem, cannot load offline messages. " + e);
+				}      // end of try-catch
+			}
 		} else {
 			Element amp = packet.getElement().getChild("amp", XMLNS);
 

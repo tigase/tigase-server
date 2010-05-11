@@ -129,7 +129,10 @@ public interface Configurable extends ServerComponent {
 	public static final String GEN_AUTH_DB = "--auth-db";
 
 	/** Field description */
-	public static final String GEN_USER_DB_URI = "--user-db-uri";
+	public static final String GEN_USER_DB_URI_PROP_KEY = "user-db-uri";
+
+	/** Field description */
+	public static final String GEN_USER_DB_URI = "--" + GEN_USER_DB_URI_PROP_KEY;
 
 	/** Field description */
 	public static final String GEN_AUTH_DB_URI = "--auth-db-uri";

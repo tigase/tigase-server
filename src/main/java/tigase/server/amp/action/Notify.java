@@ -30,6 +30,10 @@ import tigase.server.amp.ActionResultsHandlerIfc;
 
 import tigase.xml.Element;
 
+//~--- JDK imports ------------------------------------------------------------
+
+import java.util.Map;
+
 //~--- classes ----------------------------------------------------------------
 
 /**
@@ -69,12 +73,36 @@ public class Notify extends ActionAbstract {
 	 * Method description
 	 *
 	 *
+	 * @param params
+	 *
+	 * @return
+	 */
+	@Override
+	public Map<String, Object> getDefaults(Map<String, Object> params) {
+		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
 	 * @return
 	 */
 	@Override
 	public String getName() {
 		return name;
 	}
+
+	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param props
+	 */
+	@Override
+	public void setProperties(Map<String, Object> props) {}
 }
 
 

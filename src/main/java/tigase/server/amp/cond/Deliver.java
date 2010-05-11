@@ -31,6 +31,7 @@ import tigase.xml.Element;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import java.util.Map;
 import java.util.logging.Logger;
 
 //~--- classes ----------------------------------------------------------------
@@ -72,6 +73,19 @@ public class Deliver implements ConditionIfc {
 	}
 
 	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param params
+	 *
+	 * @return
+	 */
+	@Override
+	public Map<String, Object> getDefaults(Map<String, Object> params) {
+		return null;
+	}
 
 	/**
 	 * Method description
@@ -141,6 +155,17 @@ public class Deliver implements ConditionIfc {
 
 		return result;
 	}
+
+	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param props
+	 */
+	@Override
+	public void setProperties(Map<String, Object> props) {}
 }
 
 

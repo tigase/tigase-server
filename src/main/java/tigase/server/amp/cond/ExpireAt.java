@@ -35,6 +35,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 import java.util.Date;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -59,6 +60,19 @@ public class ExpireAt implements ConditionIfc {
 	private final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
 	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param params
+	 *
+	 * @return
+	 */
+	@Override
+	public Map<String, Object> getDefaults(Map<String, Object> params) {
+		return null;
+	}
 
 	/**
 	 * Method description
@@ -89,7 +103,11 @@ public class ExpireAt implements ConditionIfc {
 
 		if (value != null) {
 			try {
-				Date val_date = formatter.parse(value);
+				Date val_date = null;
+
+				synchronized (formatter) {
+					val_date = formatter.parse(value);
+				}
 
 				return val_date.before(new Date());
 			} catch (ParseException ex) {
@@ -101,6 +119,17 @@ public class ExpireAt implements ConditionIfc {
 
 		return false;
 	}
+
+	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param props
+	 */
+	@Override
+	public void setProperties(Map<String, Object> props) {}
 }
 
 

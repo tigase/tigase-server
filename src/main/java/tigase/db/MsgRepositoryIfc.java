@@ -20,55 +20,33 @@
 * Last modified by $Author$
 * $Date$
  */
-package tigase.server.amp;
+package tigase.db;
+
+//~--- non-JDK imports --------------------------------------------------------
+
+import tigase.xml.Element;
+
+import tigase.xmpp.JID;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.util.Map;
+import java.util.Date;
+import java.util.Queue;
 
 //~--- interfaces -------------------------------------------------------------
 
 /**
- * Created: Apr 28, 2010 5:38:24 PM
+ * Created: May 11, 2010 6:56:14 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public interface AmpFeatureIfc {
+public interface MsgRepositoryIfc {
+	Queue<Element> loadMessagesExpired(long time, boolean delete);
 
-	/** Field description */
-	public static final String AMP_MSG_REPO_URI_PARAM = "--amp-repo-uri";
+	Queue<Element> loadMessagesToJID(JID to, boolean delete) throws UserNotFoundException;
 
-	/** Field description */
-	public static final String AMP_MSG_REPO_URI_PROP_KEY = "amp-repo-uri";
-
-	/** Field description */
-	public static final String AMP_XMLNS = "http://jabber.org/protocol/amp";
-
-	/** Field description */
-	public static final String FROM_CONN_ID = "from-conn-id";
-
-	/** Field description */
-	public static final String TO_CONN_ID = "to-conn-id";
-
-	/** Field description */
-	public static final String TO_RES = "to-res";
-
-	/** Field description */
-	public static final String OFFLINE = "offline";
-
-	/** Field description */
-	public static final String MSG_OFFLINE_PROP_KEY = "msg-offline";
-
-	//~--- get methods ----------------------------------------------------------
-
-	Map<String, Object> getDefaults(Map<String, Object> params);
-
-	String getName();
-
-	//~--- set methods ----------------------------------------------------------
-
-	void setProperties(Map<String, Object> props);
+	void storeMessage(JID from, JID to, Date expired, Element msg) throws UserNotFoundException;
 }
 
 

@@ -26,12 +26,15 @@ package tigase.server.amp.action;
 
 import tigase.server.Packet;
 import tigase.server.amp.ActionAbstract;
-import tigase.server.amp.ActionIfc;
 import tigase.server.amp.ActionResultsHandlerIfc;
 
 import tigase.xml.Element;
 
 import tigase.xmpp.JID;
+
+//~--- JDK imports ------------------------------------------------------------
+
+import java.util.Map;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -78,12 +81,36 @@ public class Deliver extends ActionAbstract {
 	 * Method description
 	 *
 	 *
+	 * @param params
+	 *
+	 * @return
+	 */
+	@Override
+	public Map<String, Object> getDefaults(Map<String, Object> params) {
+		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
 	 * @return
 	 */
 	@Override
 	public String getName() {
 		return name;
 	}
+
+	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param props
+	 */
+	@Override
+	public void setProperties(Map<String, Object> props) {}
 }
 
 

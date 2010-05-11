@@ -113,6 +113,43 @@ public class AmpComponent extends AbstractMessageReceiver implements ActionResul
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> defs = super.getDefaults(params);
+		ActionIfc action = new Drop();
+
+		actions.put(action.getName(), action);
+		action = new tigase.server.amp.action.Error();
+		actions.put(action.getName(), action);
+		action = new Notify();
+		actions.put(action.getName(), action);
+		action = new tigase.server.amp.action.Deliver();
+		actions.put(action.getName(), action);
+		action = new Store();
+		actions.put(action.getName(), action);
+		action = new Alert();
+		actions.put(action.getName(), action);
+
+		ConditionIfc condition = new Deliver();
+
+		conditions.put(condition.getName(), condition);
+		condition = new ExpireAt();
+		conditions.put(condition.getName(), condition);
+		condition = new MatchResource();
+		conditions.put(condition.getName(), condition);
+
+		for (ActionIfc a : actions.values()) {
+			Map<String, Object> d = a.getDefaults(params);
+
+			if (d != null) {
+				defs.putAll(d);
+			}
+		}
+
+		for (ConditionIfc c : conditions.values()) {
+			Map<String, Object> d = c.getDefaults(params);
+
+			if (d != null) {
+				defs.putAll(d);
+			}
+		}
 
 		return defs;
 	}
@@ -250,27 +287,13 @@ public class AmpComponent extends AbstractMessageReceiver implements ActionResul
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
 
-		ActionIfc action = new Drop();
+		for (ActionIfc a : actions.values()) {
+			a.setProperties(props);
+		}
 
-		actions.put(action.getName(), action);
-		action = new tigase.server.amp.action.Error();
-		actions.put(action.getName(), action);
-		action = new Notify();
-		actions.put(action.getName(), action);
-		action = new tigase.server.amp.action.Deliver();
-		actions.put(action.getName(), action);
-		action = new Store();
-		actions.put(action.getName(), action);
-		action = new Alert();
-		actions.put(action.getName(), action);
-
-		ConditionIfc condition = new Deliver();
-
-		conditions.put(condition.getName(), condition);
-		condition = new ExpireAt();
-		conditions.put(condition.getName(), condition);
-		condition = new MatchResource();
-		conditions.put(condition.getName(), condition);
+		for (ConditionIfc c : conditions.values()) {
+			c.setProperties(props);
+		}
 	}
 
 	//~--- methods --------------------------------------------------------------
