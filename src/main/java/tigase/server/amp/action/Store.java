@@ -66,21 +66,8 @@ public class Store extends ActionAbstract {
 	//~--- fields ---------------------------------------------------------------
 
 	private Thread expiredProcessor = null;
-	private boolean offline_storage = true;
 	private MsgRepository repo = null;
 	private final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-
-	//~--- constructors ---------------------------------------------------------
-
-	/**
-	 * Constructs ...
-	 *
-	 */
-	public Store() {
-		String off_val = System.getProperty(MSG_OFFLINE_PROP_KEY);
-
-		offline_storage = (off_val == null) || Boolean.parseBoolean(off_val);
-	}
 
 	//~--- methods --------------------------------------------------------------
 
@@ -156,7 +143,7 @@ public class Store extends ActionAbstract {
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
-		Map<String, Object> defs = new LinkedHashMap<String, Object>();
+		Map<String, Object> defs = super.getDefaults(params);
 		String db_uri = (String) params.get(AMP_MSG_REPO_URI_PARAM);
 
 		if (db_uri == null) {

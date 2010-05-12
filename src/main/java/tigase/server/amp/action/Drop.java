@@ -29,10 +29,6 @@ import tigase.server.amp.ActionAbstract;
 
 import tigase.xml.Element;
 
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.Map;
-
 //~--- classes ----------------------------------------------------------------
 
 /**

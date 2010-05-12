@@ -24,6 +24,8 @@ package tigase.server.amp;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.db.UserRepository;
+
 import tigase.disco.XMPPService;
 
 import tigase.server.AbstractMessageReceiver;

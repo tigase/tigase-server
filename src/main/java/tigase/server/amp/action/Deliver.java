@@ -26,15 +26,10 @@ package tigase.server.amp.action;
 
 import tigase.server.Packet;
 import tigase.server.amp.ActionAbstract;
-import tigase.server.amp.ActionResultsHandlerIfc;
 
 import tigase.xml.Element;
 
 import tigase.xmpp.JID;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.Map;
 
 //~--- classes ----------------------------------------------------------------
 

@@ -26,13 +26,15 @@ package tigase.server.amp.action;
 
 import tigase.server.Packet;
 import tigase.server.amp.ActionAbstract;
-import tigase.server.amp.ActionResultsHandlerIfc;
 
 import tigase.xml.Element;
 
+import tigase.xmpp.PacketErrorTypeException;
+
 //~--- JDK imports ------------------------------------------------------------
 
-import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -59,9 +61,14 @@ public class Notify extends ActionAbstract {
 	 */
 	@Override
 	public boolean execute(Packet packet, Element rule) {
-		Packet result = prepareAmpPacket(packet, rule);
+		try {
+			Packet result = prepareAmpPacket(packet, rule);
 
-		resultsHandler.addOutPacket(result);
+			resultsHandler.addOutPacket(result);
+		} catch (PacketErrorTypeException ex) {
+
+			// Ignore
+		}
 
 		return true;
 	}
