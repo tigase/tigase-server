@@ -61,8 +61,6 @@ public class AmpComponent extends AbstractMessageReceiver implements ActionResul
 	private static final Logger log = Logger.getLogger(AmpComponent.class.getName());
 	private static final String AMP_NODE = "http://jabber.org/protocol/amp";
 	private static final String AMP_XMLNS = AMP_NODE;
-	private static final String CONDITION_ATT = "condition";
-	private static final String ACTION_ATT = "action";
 	private static final Element top_feature = new Element("feature", new String[] { "var" },
 		new String[] { AMP_NODE });
 
@@ -143,14 +141,13 @@ public class AmpComponent extends AbstractMessageReceiver implements ActionResul
 			}
 		}
 
-		for (ConditionIfc c : conditions.values()) {
-			Map<String, Object> d = c.getDefaults(params);
-
-			if (d != null) {
-				defs.putAll(d);
-			}
-		}
-
+//  for (ConditionIfc c : conditions.values()) {
+//    Map<String, Object> d = c.getDefaults(params);
+//
+//    if (d != null) {
+//      defs.putAll(d);
+//    }
+//  }
 		return defs;
 	}
 
@@ -271,7 +268,11 @@ public class AmpComponent extends AbstractMessageReceiver implements ActionResul
 		}
 
 		if (exec_def) {
-			def.execute(packet, null, this);
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Executing default action: " + def.getName());
+			}
+
+			def.execute(packet, null);
 		}
 	}
 
@@ -288,24 +289,30 @@ public class AmpComponent extends AbstractMessageReceiver implements ActionResul
 		super.setProperties(props);
 
 		for (ActionIfc a : actions.values()) {
-			a.setProperties(props);
+			a.setProperties(props, this);
 		}
 
-		for (ConditionIfc c : conditions.values()) {
-			c.setProperties(props);
-		}
+//  for (ConditionIfc c : conditions.values()) {
+//    c.setProperties(props, this);
+//  }
 	}
 
 	//~--- methods --------------------------------------------------------------
 
 	private boolean executeAction(Packet packet, Element rule) {
-		String act = rule.getAttribute(ACTION_ATT);
+		String act = rule.getAttribute(AmpFeatureIfc.ACTION_ATT);
 
 		if (act != null) {
 			ActionIfc action = actions.get(act);
 
 			if (action != null) {
-				return action.execute(packet, rule, this);
+				boolean result = action.execute(packet, rule);
+
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("Matched action: " + action.getName() + ", result: " + result);
+				}
+
+				return result;
 			} else {
 				log.warning("No action found for act: " + act);
 			}
@@ -317,13 +324,19 @@ public class AmpComponent extends AbstractMessageReceiver implements ActionResul
 	}
 
 	private boolean matchCondition(Packet packet, Element rule) {
-		String cond = rule.getAttribute(CONDITION_ATT);
+		String cond = rule.getAttribute(AmpFeatureIfc.CONDITION_ATT);
 
 		if (cond != null) {
 			ConditionIfc condition = conditions.get(cond);
 
 			if (condition != null) {
-				return condition.match(packet, rule);
+				boolean result = condition.match(packet, rule);;
+
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("Matched condition: " + condition.getName() + ", result: " + result);
+				}
+
+				return result;
 			} else {
 				log.warning("No condition found for cond: " + cond);
 			}

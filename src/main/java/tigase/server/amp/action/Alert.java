@@ -54,12 +54,11 @@ public class Alert extends ActionAbstract {
 	 * @param packet
 	 * @param rule
 	 *
-	 * @param resultsHandler
 	 *
 	 * @return
 	 */
 	@Override
-	public boolean execute(Packet packet, Element rule, ActionResultsHandlerIfc resultsHandler) {
+	public boolean execute(Packet packet, Element rule) {
 		Packet result = prepareAmpPacket(packet, rule);
 
 		resultsHandler.addOutPacket(result);
@@ -73,36 +72,12 @@ public class Alert extends ActionAbstract {
 	 * Method description
 	 *
 	 *
-	 * @param params
-	 *
-	 * @return
-	 */
-	@Override
-	public Map<String, Object> getDefaults(Map<String, Object> params) {
-		return null;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
 	 * @return
 	 */
 	@Override
 	public String getName() {
 		return name;
 	}
-
-	//~--- set methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param props
-	 */
-	@Override
-	public void setProperties(Map<String, Object> props) {}
 }
 
 

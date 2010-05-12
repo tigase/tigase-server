@@ -363,7 +363,7 @@ public class OfflineMessages extends XMPPProcessor
 			this.conn = conn;
 		}
 
-		//~--- methods ------------------------------------------------------------
+		//~--- get methods --------------------------------------------------------
 
 		/**
 		 * Method description
@@ -375,9 +375,11 @@ public class OfflineMessages extends XMPPProcessor
 		 * @return
 		 */
 		@Override
-		public Queue<Element> loadMessagesExpired(long time, boolean delete) {
+		public Element getMessageExpired(long time, boolean delete) {
 			throw new UnsupportedOperationException("Not supported yet.");
 		}
+
+		//~--- methods ------------------------------------------------------------
 
 		/**
 		 * Method description

@@ -78,19 +78,6 @@ public class Deliver implements ConditionIfc {
 	 * Method description
 	 *
 	 *
-	 * @param params
-	 *
-	 * @return
-	 */
-	@Override
-	public Map<String, Object> getDefaults(Map<String, Object> params) {
-		return null;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
 	 * @return
 	 */
 	@Override
@@ -155,17 +142,6 @@ public class Deliver implements ConditionIfc {
 
 		return result;
 	}
-
-	//~--- set methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param props
-	 */
-	@Override
-	public void setProperties(Map<String, Object> props) {}
 }
 
 

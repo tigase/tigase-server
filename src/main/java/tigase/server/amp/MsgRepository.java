@@ -44,6 +44,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Time;
+import java.sql.Timestamp;
 import java.sql.Types;
 
 import java.util.Collections;
@@ -51,6 +52,9 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.DelayQueue;
+import java.util.concurrent.Delayed;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -74,7 +78,7 @@ public class MsgRepository extends JDBCAbstract implements MsgRepositoryIfc {
 	private static final String CREATE_MSG_TABLE = "create table " + MSG_TABLE + " ( " + "  "
 		+ MSG_ID_COLUMN + " serial," + "  " + MSG_TIMESTAMP_COLUMN
 		+ " TIMESTAMP DEFAULT CURRENT_TIMESTAMP," + "  " + MSG_EXPIRED_COLUMN + " DATETIME,"
-		+ "  " + MSG_FROM_UID_COLUMN + " bigint unsigned NOT NULL," + "  " + MSG_TO_UID_COLUMN
+		+ "  " + MSG_FROM_UID_COLUMN + " bigint unsigned," + "  " + MSG_TO_UID_COLUMN
 		+ " bigint unsigned NOT NULL," + "  " + MSG_BODY_COLUMN + " varchar(4096) NOT NULL,"
 		+ " key (" + MSG_EXPIRED_COLUMN + "), " + " key (" + MSG_FROM_UID_COLUMN + ", "
 		+ MSG_TO_UID_COLUMN + ")," + " key (" + MSG_TO_UID_COLUMN + ", " + MSG_FROM_UID_COLUMN
@@ -86,17 +90,28 @@ public class MsgRepository extends JDBCAbstract implements MsgRepositoryIfc {
 		+ " where " + MSG_TO_UID_COLUMN + " = ?";
 	private static final String MSG_DELETE_TO_JID_QUERY = "delete from " + MSG_TABLE + " where "
 		+ MSG_TO_UID_COLUMN + " = ?";
+	private static final String MSG_DELETE_ID_QUERY = "delete from " + MSG_TABLE + " where "
+		+ MSG_ID_COLUMN + " = ?";
+	private static final String MSG_SELECT_EXPIRED_QUERY = "select * from " + MSG_TABLE
+		+ " where expired is not null order by expired";
+	private static final String MSG_SELECT_EXPIRED_BEFORE_QUERY = "select * from " + MSG_TABLE
+		+ " where expired is not null and expired <= ? order by expired";
 	private static final String GET_USER_UID_PROP_KEY = "user-uid-query";
 	private static final String GET_USER_UID_DEF_QUERY = "{ call TigGetUserDBUid(?) }";
 	private static final int MAX_UID_CACHE_SIZE = 100000;
 	private static final long MAX_UID_CACHE_TIME = 3600000;
 	private static final Map<String, MsgRepository> repos = new ConcurrentSkipListMap<String,
 		MsgRepository>();
+	private static final int MAX_QUEUE_SIZE = 1000;
 
 	//~--- fields ---------------------------------------------------------------
 
+	private PreparedStatement delete_id_st = null;
 	private PreparedStatement delete_to_jid_st = null;
+	private long earliestOffline = Long.MAX_VALUE;
 	private PreparedStatement insert_msg_st = null;
+	private PreparedStatement select_expired_before_st = null;
+	private PreparedStatement select_expired_st = null;
 	private SimpleParser parser = SingletonFactory.getParserInstance();
 	private PreparedStatement select_to_jid_st = null;
 	private String uid_query = GET_USER_UID_DEF_QUERY;
@@ -104,6 +119,7 @@ public class MsgRepository extends JDBCAbstract implements MsgRepositoryIfc {
 	private boolean initialized = false;
 	private Map<BareJID, Long> uids_cache = Collections.synchronizedMap(new SimpleCache<BareJID,
 		Long>(MAX_UID_CACHE_SIZE, MAX_UID_CACHE_TIME));
+	private DelayQueue<MsgDBItem> expiredQueue = new DelayQueue<MsgDBItem>();
 
 	//~--- get methods ----------------------------------------------------------
 
@@ -124,6 +140,51 @@ public class MsgRepository extends JDBCAbstract implements MsgRepositoryIfc {
 		}
 
 		return result;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param time
+	 * @param delete
+	 *
+	 * @return
+	 */
+	@Override
+	public Element getMessageExpired(long time, boolean delete) {
+		if (expiredQueue.size() == 0) {
+
+			// If the queue is empty load it with some elements
+			loadExpiredQueue(MAX_QUEUE_SIZE);
+		} else {
+
+			// If the queue is not empty, check whether recently saved offline message
+			// is due to expire sonner then the head of the queue.
+			MsgDBItem item = expiredQueue.peek();
+
+			if ((item != null) && (earliestOffline < item.expired.getTime())) {
+
+				// There is in fact offline message due to expire sooner then the head of the
+				// queue. Load all offline message due to expire sonner then the first element
+				// in the queue.
+				loadExpiredQueue(item.expired);
+			}
+		}
+
+		MsgDBItem item = null;
+
+		while (item == null) {
+			try {
+				item = expiredQueue.take();
+			} catch (InterruptedException ex) {}
+		}
+
+		if (delete) {
+			deleteMessage(item.db_id);
+		}
+
+		return item.msg;
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -168,20 +229,6 @@ public class MsgRepository extends JDBCAbstract implements MsgRepositoryIfc {
 			// Check if DB is correctly setup and contains all required tables.
 			checkDB();
 		}
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param time
-	 * @param delete
-	 *
-	 * @return
-	 */
-	@Override
-	public Queue<Element> loadMessagesExpired(long time, boolean delete) {
-		return null;
 	}
 
 	/**
@@ -251,23 +298,53 @@ public class MsgRepository extends JDBCAbstract implements MsgRepositoryIfc {
 	@Override
 	public void storeMessage(JID from, JID to, Date expired, Element msg)
 			throws UserNotFoundException {
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Storring expired: " + expired + " message: " + msg);
+		}
+
 		try {
 			checkConnection();
 
-			long from_uid = getUserUID(from.getBareJID());
+			long from_uid = -1;
+
+//    try {
+//
+//      // This user may not exist in our DB as this might be a user from
+//      // a remote server/different domain
+//      from_uid = getUserUID(from.getBareJID());
+//    } catch (UserNotFoundException e) {
+//      from_uid = -1;
+//    }
 			long to_uid = getUserUID(to.getBareJID());
 
 			synchronized (insert_msg_st) {
 				if (expired == null) {
-					insert_msg_st.setNull(1, Types.TIME);
+					insert_msg_st.setNull(1, Types.TIMESTAMP);
 				} else {
-					insert_msg_st.setTime(1, new Time(expired.getTime()));
+					Timestamp time = new Timestamp(expired.getTime());
+
+					insert_msg_st.setTimestamp(1, time);
 				}
 
-				insert_msg_st.setLong(2, from_uid);
+				if (from_uid <= 0) {
+					insert_msg_st.setNull(2, Types.BIGINT);
+				} else {
+					insert_msg_st.setLong(2, from_uid);
+				}
+
 				insert_msg_st.setLong(3, to_uid);
 				insert_msg_st.setString(4, msg.toString());
 				insert_msg_st.executeUpdate();
+			}
+
+			if (expired != null) {
+				if (expired.getTime() < earliestOffline) {
+					earliestOffline = expired.getTime();
+				}
+
+				if (expiredQueue.size() == 0) {
+					loadExpiredQueue(1);
+				}
 			}
 		} catch (SQLException e) {
 			log.log(Level.WARNING, "Problem adding new entry to DB: ", e);
@@ -281,6 +358,9 @@ public class MsgRepository extends JDBCAbstract implements MsgRepositoryIfc {
 		insert_msg_st = prepareQuery(MSG_INSERT_QUERY);
 		select_to_jid_st = prepareQuery(MSG_SELECT_TO_JID_QUERY);
 		delete_to_jid_st = prepareQuery(MSG_DELETE_TO_JID_QUERY);
+		delete_id_st = prepareQuery(MSG_DELETE_ID_QUERY);
+		select_expired_st = prepareQuery(MSG_SELECT_EXPIRED_QUERY);
+		select_expired_before_st = prepareQuery(MSG_SELECT_EXPIRED_BEFORE_QUERY);
 	}
 
 	private void checkDB() throws SQLException {
@@ -304,6 +384,19 @@ public class MsgRepository extends JDBCAbstract implements MsgRepositoryIfc {
 		} finally {
 			release(null, rs);
 			rs = null;
+		}
+	}
+
+	private void deleteMessage(long msg_id) {
+		try {
+			checkConnection();
+
+			synchronized (delete_id_st) {
+				delete_id_st.setLong(1, msg_id);
+				delete_id_st.executeUpdate();
+			}
+		} catch (SQLException e) {
+			log.log(Level.WARNING, "Problem removing entry from DB: ", e);
 		}
 	}
 
@@ -339,6 +432,149 @@ public class MsgRepository extends JDBCAbstract implements MsgRepositoryIfc {
 		uids_cache.put(user_id, result);
 
 		return result;
+	}
+
+	//~--- methods --------------------------------------------------------------
+
+	private void loadExpiredQueue(int min_elements) {
+		ResultSet rs = null;
+
+		try {
+			checkConnection();
+
+			synchronized (select_expired_st) {
+				rs = select_expired_st.executeQuery();
+
+				DomBuilderHandler domHandler = new DomBuilderHandler();
+				int counter = 0;
+
+				while (rs.next()
+						&& ((expiredQueue.size() < MAX_QUEUE_SIZE) || (counter++ < min_elements))) {
+					String msg_str = rs.getString(MSG_BODY_COLUMN);
+
+					parser.parse(domHandler, msg_str.toCharArray(), 0, msg_str.length());
+
+					Queue<Element> elems = domHandler.getParsedElements();
+					Element msg = elems.poll();
+
+					if (msg == null) {
+						log.info("Something wrong, loaded offline message from DB but parsed no "
+								+ "XML elements: " + msg_str);
+					} else {
+						Timestamp ts = rs.getTimestamp(MSG_EXPIRED_COLUMN);
+						MsgDBItem item = new MsgDBItem(rs.getLong(MSG_ID_COLUMN), msg, ts);
+
+						expiredQueue.offer(item);
+					}
+				}
+			}
+		} catch (SQLException e) {
+			log.log(Level.WARNING, "Problem getting offline messages from db: ", e);
+		} finally {
+			release(null, rs);
+		}
+
+		earliestOffline = Long.MAX_VALUE;
+	}
+
+	private void loadExpiredQueue(Date expired) {
+		ResultSet rs = null;
+
+		try {
+			if (expiredQueue.size() > 100 * MAX_QUEUE_SIZE) {
+				expiredQueue.clear();
+			}
+
+			checkConnection();
+
+			synchronized (select_expired_before_st) {
+				select_expired_before_st.setTimestamp(1, new Timestamp(expired.getTime()));
+				rs = select_expired_before_st.executeQuery();
+
+				DomBuilderHandler domHandler = new DomBuilderHandler();
+				int counter = 0;
+
+				while (rs.next() && (counter++ < MAX_QUEUE_SIZE)) {
+					String msg_str = rs.getString(MSG_BODY_COLUMN);
+
+					parser.parse(domHandler, msg_str.toCharArray(), 0, msg_str.length());
+
+					Queue<Element> elems = domHandler.getParsedElements();
+					Element msg = elems.poll();
+
+					if (msg == null) {
+						log.info("Something wrong, loaded offline message from DB but parsed no "
+								+ "XML elements: " + msg_str);
+					} else {
+						Timestamp ts = rs.getTimestamp(MSG_EXPIRED_COLUMN);
+						MsgDBItem item = new MsgDBItem(rs.getLong(MSG_ID_COLUMN), msg, ts);
+
+						expiredQueue.offer(item);
+					}
+				}
+			}
+		} catch (SQLException e) {
+			log.log(Level.WARNING, "Problem getting offline messages from db: ", e);
+		} finally {
+			release(null, rs);
+		}
+
+		earliestOffline = Long.MAX_VALUE;
+	}
+
+	//~--- inner classes --------------------------------------------------------
+
+	private class MsgDBItem implements Delayed {
+		private long db_id = -1;
+		private Date expired = null;
+		private Element msg = null;
+
+		//~--- constructors -------------------------------------------------------
+
+		/**
+		 * Constructs ...
+		 *
+		 *
+		 * @param db_id
+		 * @param msg
+		 * @param expired
+		 */
+		public MsgDBItem(long db_id, Element msg, Date expired) {
+			this.db_id = db_id;
+			this.msg = msg;
+			this.expired = expired;
+		}
+
+		//~--- methods ------------------------------------------------------------
+
+		/**
+		 * Method description
+		 *
+		 *
+		 * @param o
+		 *
+		 * @return
+		 */
+		@Override
+		public int compareTo(Delayed o) {
+			return (int) (getDelay(TimeUnit.NANOSECONDS) - o.getDelay(TimeUnit.NANOSECONDS));
+		}
+
+		//~--- get methods --------------------------------------------------------
+
+		/**
+		 * Method description
+		 *
+		 *
+		 * @param unit
+		 *
+		 * @return
+		 */
+		@Override
+		public long getDelay(TimeUnit unit) {
+			return unit.convert(expired.getTime() - System.currentTimeMillis(),
+					TimeUnit.MILLISECONDS);
+		}
 	}
 }
 

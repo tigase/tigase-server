@@ -55,20 +55,23 @@ public interface AmpFeatureIfc {
 	public static final String TO_RES = "to-res";
 
 	/** Field description */
+	public static final String EXPIRED = "expired";
+
+	/** Field description */
 	public static final String OFFLINE = "offline";
 
 	/** Field description */
 	public static final String MSG_OFFLINE_PROP_KEY = "msg-offline";
 
+	/** Field description */
+	public static final String CONDITION_ATT = "condition";
+
+	/** Field description */
+	public static final String ACTION_ATT = "action";
+
 	//~--- get methods ----------------------------------------------------------
 
-	Map<String, Object> getDefaults(Map<String, Object> params);
-
 	String getName();
-
-	//~--- set methods ----------------------------------------------------------
-
-	void setProperties(Map<String, Object> props);
 }
 
 

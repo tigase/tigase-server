@@ -28,6 +28,10 @@ import tigase.server.Packet;
 
 import tigase.xml.Element;
 
+//~--- JDK imports ------------------------------------------------------------
+
+import java.util.Map;
+
 //~--- interfaces -------------------------------------------------------------
 
 /**
@@ -37,7 +41,15 @@ import tigase.xml.Element;
  * @version $Rev$
  */
 public interface ActionIfc extends AmpFeatureIfc {
-	boolean execute(Packet packet, Element rule, ActionResultsHandlerIfc resultsHandler);
+	boolean execute(Packet packet, Element rule);
+
+	//~--- get methods ----------------------------------------------------------
+
+	Map<String, Object> getDefaults(Map<String, Object> params);
+
+	//~--- set methods ----------------------------------------------------------
+
+	void setProperties(Map<String, Object> props, ActionResultsHandlerIfc resultsHandler);
 }
 
 

@@ -36,7 +36,6 @@ import java.text.SimpleDateFormat;
 
 import java.util.Date;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 //~--- classes ----------------------------------------------------------------
@@ -53,7 +52,9 @@ public class ExpireAt implements ConditionIfc {
 	 * Private logger for class instances.
 	 */
 	private static Logger log = Logger.getLogger(ExpireAt.class.getName());
-	private static final String name = "expire-at";
+
+	/** Field description */
+	public static final String NAME = "expire-at";
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -65,24 +66,11 @@ public class ExpireAt implements ConditionIfc {
 	 * Method description
 	 *
 	 *
-	 * @param params
-	 *
-	 * @return
-	 */
-	@Override
-	public Map<String, Object> getDefaults(Map<String, Object> params) {
-		return null;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
 	 * @return
 	 */
 	@Override
 	public String getName() {
-		return name;
+		return NAME;
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -111,7 +99,7 @@ public class ExpireAt implements ConditionIfc {
 
 				return val_date.before(new Date());
 			} catch (ParseException ex) {
-				log.info("Incorrect " + name + " condition value for rule: " + rule);
+				log.info("Incorrect " + NAME + " condition value for rule: " + rule);
 			}
 		} else {
 			log.info("No value set for rule: " + rule);
@@ -119,17 +107,6 @@ public class ExpireAt implements ConditionIfc {
 
 		return false;
 	}
-
-	//~--- set methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param props
-	 */
-	@Override
-	public void setProperties(Map<String, Object> props) {}
 }
 
 

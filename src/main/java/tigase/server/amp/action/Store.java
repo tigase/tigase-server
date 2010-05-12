@@ -32,6 +32,9 @@ import tigase.server.Packet;
 import tigase.server.amp.ActionAbstract;
 import tigase.server.amp.ActionResultsHandlerIfc;
 import tigase.server.amp.MsgRepository;
+import tigase.server.amp.cond.ExpireAt;
+
+import tigase.util.TigaseStringprepException;
 
 import tigase.xml.Element;
 
@@ -43,6 +46,7 @@ import java.text.SimpleDateFormat;
 
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -61,6 +65,7 @@ public class Store extends ActionAbstract {
 
 	//~--- fields ---------------------------------------------------------------
 
+	private Thread expiredProcessor = null;
 	private boolean offline_storage = true;
 	private MsgRepository repo = null;
 	private final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -85,22 +90,33 @@ public class Store extends ActionAbstract {
 	 *
 	 * @param packet
 	 * @param rule
-	 * @param resultsHandler
 	 *
 	 *
 	 * @return
 	 */
 	@Override
-	public boolean execute(Packet packet, Element rule, ActionResultsHandlerIfc resultsHandler) {
+	public boolean execute(Packet packet, Element rule) {
 		if (repo != null) {
 			Date expired = null;
 			String stamp = null;
 
+			if (packet.getAttribute(EXPIRED) == null) {
+				if (rule == null) {
+					rule = getExpireAtRule(packet);
+				}
+			} else {
+				removeExpireAtRule(packet);
+				rule = null;
+			}
+
 			synchronized (formatter) {
-				try {
-					expired = formatter.parse(rule.getAttribute("value"));
-				} catch (Exception e) {
-					expired = null;
+				if (rule != null) {
+					try {
+						expired = formatter.parse(rule.getAttribute("value"));
+					} catch (Exception e) {
+						log.log(Level.INFO, "Incorrect expire-at value: " + rule.getAttribute("value"), e);
+						expired = null;
+					}
 				}
 
 				stamp = formatter.format(new Date());
@@ -110,11 +126,15 @@ public class Store extends ActionAbstract {
 
 			try {
 				Element elem = packet.getElement();
-				Element x = new Element("delay", "Offline Storage", new String[] { "from", "stamp",
-						"xmlns" }, new String[] { packet.getStanzaTo().getDomain(), stamp,
-						"urn:xmpp:delay" });
 
-				elem.addChild(x);
+				if (elem.getChild("delay", "urn:xmpp:delay") == null) {
+					Element x = new Element("delay", "Offline Storage", new String[] { "from", "stamp",
+							"xmlns" }, new String[] { packet.getStanzaTo().getDomain(), stamp,
+							"urn:xmpp:delay" });
+
+					elem.addChild(x);
+				}
+
 				repo.storeMessage(packet.getStanzaFrom(), packet.getStanzaTo(), expired, elem);
 			} catch (UserNotFoundException ex) {
 				log.info("User not found for offline message: " + packet);
@@ -168,9 +188,12 @@ public class Store extends ActionAbstract {
 	 *
 	 *
 	 * @param props
+	 * @param handler
 	 */
 	@Override
-	public void setProperties(Map<String, Object> props) {
+	public void setProperties(Map<String, Object> props, ActionResultsHandlerIfc handler) {
+		super.setProperties(props, handler);
+
 		String db_uri = (String) props.get(AMP_MSG_REPO_URI_PROP_KEY);
 
 		if (db_uri != null) {
@@ -182,6 +205,77 @@ public class Store extends ActionAbstract {
 				repo = null;
 				log.log(Level.WARNING, "Problem initializing connection to DB: ", ex);
 			}
+		}
+
+		if ((repo != null) && (expiredProcessor == null)) {
+			expiredProcessor = new Thread("expired-processor") {
+				@Override
+				public void run() {
+					while (true) {
+						Element elem = repo.getMessageExpired(0, true);
+
+						if (elem != null) {
+							elem.addAttribute(OFFLINE, "1");
+							elem.addAttribute(EXPIRED, "1");
+
+							try {
+								resultsHandler.addOutPacket(Packet.packetInstance(elem));
+							} catch (TigaseStringprepException ex) {
+								log.info("Stringprep error for offline message loaded from DB: " + elem);
+							}
+						}
+					}
+				}
+			};
+			expiredProcessor.setDaemon(true);
+			expiredProcessor.start();
+		}
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	private Element getExpireAtRule(Packet packet) {
+		Element amp = packet.getElement().getChild("amp", AMP_XMLNS);
+		List<Element> rules = amp.getChildren();
+		Element rule = null;
+
+		if ((rules != null) && (rules.size() > 0)) {
+			for (Element r : rules) {
+				String cond = r.getAttribute(CONDITION_ATT);
+
+				if ((cond != null) && cond.equals(ExpireAt.NAME)) {
+					rule = r;
+
+					break;
+				}
+			}
+		}
+
+		return rule;
+	}
+
+	//~--- methods --------------------------------------------------------------
+
+	private void removeExpireAtRule(Packet packet) {
+		Element amp = packet.getElement().getChild("amp", AMP_XMLNS);
+		List<Element> rules = amp.getChildren();
+
+		if ((rules != null) && (rules.size() > 0)) {
+			for (Element r : rules) {
+				String cond = r.getAttribute(CONDITION_ATT);
+
+				if ((cond != null) && cond.equals(ExpireAt.NAME)) {
+					amp.removeChild(r);
+
+					break;
+				}
+			}
+		}
+
+		rules = amp.getChildren();
+
+		if ((rules == null) || (rules.size() == 0)) {
+			packet.getElement().removeChild(amp);
 		}
 	}
 }

@@ -42,7 +42,9 @@ import java.util.Queue;
  * @version $Rev$
  */
 public interface MsgRepositoryIfc {
-	Queue<Element> loadMessagesExpired(long time, boolean delete);
+	Element getMessageExpired(long time, boolean delete);
+
+	//~--- methods --------------------------------------------------------------
 
 	Queue<Element> loadMessagesToJID(JID to, boolean delete) throws UserNotFoundException;
 

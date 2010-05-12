@@ -160,7 +160,7 @@ public class MessageAmp extends XMPPProcessor
 		if ((offlineProcessor != null) && (session == null)) {
 			Element amp = packet.getElement().getChild("amp");
 
-			if ((amp == null) || (amp.getXMLNS() != XMLNS)) {
+			if ((amp == null) || (amp.getXMLNS() != XMLNS) || (amp.getAttribute("status") != null)) {
 				try {
 					offlineProcessor.savePacketForOffLineUser(packet, msg_repo);
 				} catch (UserNotFoundException ex) {

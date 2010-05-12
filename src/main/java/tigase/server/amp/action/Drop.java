@@ -25,15 +25,13 @@ package tigase.server.amp.action;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.server.Packet;
-import tigase.server.amp.ActionIfc;
-import tigase.server.amp.ActionResultsHandlerIfc;
+import tigase.server.amp.ActionAbstract;
 
 import tigase.xml.Element;
 
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.Map;
-import java.util.Queue;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -43,7 +41,7 @@ import java.util.Queue;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class Drop implements ActionIfc {
+public class Drop extends ActionAbstract {
 	private static final String name = "drop";
 
 	//~--- methods --------------------------------------------------------------
@@ -54,30 +52,16 @@ public class Drop implements ActionIfc {
 	 *
 	 * @param packet
 	 * @param rule
-	 * @param resultsHandler
 	 *
 	 *
 	 * @return
 	 */
 	@Override
-	public boolean execute(Packet packet, Element rule, ActionResultsHandlerIfc resultsHandler) {
+	public boolean execute(Packet packet, Element rule) {
 		return false;
 	}
 
 	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param params
-	 *
-	 * @return
-	 */
-	@Override
-	public Map<String, Object> getDefaults(Map<String, Object> params) {
-		return null;
-	}
 
 	/**
 	 * Method description
@@ -89,17 +73,6 @@ public class Drop implements ActionIfc {
 	public String getName() {
 		return name;
 	}
-
-	//~--- set methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param props
-	 */
-	@Override
-	public void setProperties(Map<String, Object> props) {}
 }
 
 

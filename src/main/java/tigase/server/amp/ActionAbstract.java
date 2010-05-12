@@ -30,6 +30,10 @@ import tigase.xml.Element;
 
 import tigase.xmpp.JID;
 
+//~--- JDK imports ------------------------------------------------------------
+
+import java.util.Map;
+
 //~--- classes ----------------------------------------------------------------
 
 /**
@@ -39,6 +43,40 @@ import tigase.xmpp.JID;
  * @version $Rev$
  */
 public abstract class ActionAbstract implements ActionIfc {
+	protected ActionResultsHandlerIfc resultsHandler = null;
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param params
+	 *
+	 * @return
+	 */
+	@Override
+	public Map<String, Object> getDefaults(Map<String, Object> params) {
+		return null;
+	}
+
+	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param props
+	 * @param resultsHandler
+	 */
+	@Override
+	public void setProperties(Map<String, Object> props,
+			ActionResultsHandlerIfc resultsHandler) {
+		this.resultsHandler = resultsHandler;
+	}
+
+	//~--- methods --------------------------------------------------------------
+
 	protected Packet prepareAmpPacket(Packet packet, Element rule) {
 		JID old_from = packet.getStanzaFrom();
 		JID old_to = packet.getStanzaTo();
@@ -51,7 +89,11 @@ public abstract class ActionAbstract implements ActionIfc {
 			new_from = JID.jidInstanceNS(old_to.getDomain());
 		}
 
-		Packet result = Packet.packetInstance(packet.getElement(), new_from, old_from);
+		// Packet result = Packet.packetInstance(packet.getElement(), new_from, old_from);
+		Packet result = packet.copyElementOnly();
+
+		result.initVars(new_from, old_from);
+
 		Element amp = result.getElement().getChild("amp", AMP_XMLNS);
 
 		result.getElement().removeChild(amp);
@@ -73,6 +115,7 @@ public abstract class ActionAbstract implements ActionIfc {
 		packet.getElement().removeAttribute(TO_RES);
 		packet.getElement().removeAttribute(OFFLINE);
 		packet.getElement().removeAttribute(FROM_CONN_ID);
+		packet.getElement().removeAttribute(EXPIRED);
 	}
 }
 
