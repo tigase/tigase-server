@@ -121,7 +121,7 @@ def updateRoster = { jid, i_jid, i_name, i_groups, i_subscr ->
 		// Update offline
 		String rosterStr = repository.getData(JIDUtils.getNodeID(jid), null,
 			RosterAbstract.ROSTER, null) ?: ""
-		Map<String, RosterElement> roster = new LinkedHashMap<String, RosterElement>()
+		Map<BareJID, RosterElement> roster = new LinkedHashMap<BareJID, RosterElement>()
 		RosterFlat.parseRoster(rosterStr, roster, null)
 		if (remove_item) {
 			roster.remove(i_jid)
