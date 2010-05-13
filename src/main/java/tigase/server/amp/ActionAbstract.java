@@ -96,7 +96,7 @@ public abstract class ActionAbstract implements ActionIfc {
 		String sec_str = (String) params.get(AMP_SECURITY_LEVEL);
 
 		try {
-			SECURITY sec = SECURITY.valueOf(sec_str);
+			SECURITY sec = SECURITY.valueOf(sec_str.toUpperCase());
 
 			security = sec;
 		} catch (Exception e) {}
@@ -123,10 +123,13 @@ public abstract class ActionAbstract implements ActionIfc {
 		String sec_str = (String) props.get(AMP_SECURITY_LEVEL);
 
 		try {
-			SECURITY sec = SECURITY.valueOf(sec_str);
+			SECURITY sec = SECURITY.valueOf(sec_str.toUpperCase());
 
 			security = sec;
-		} catch (Exception e) {}
+		} catch (Exception e) {
+			log.log(Level.WARNING, "Incorrect amp security settings, using defaults: " + security,
+					e);
+		}
 
 		// Is there a shared user repository pool? If so I want to use it:
 		user_repository = (UserRepository) props.get(Configurable.SHARED_USER_REPO_POOL_PROP_KEY);
