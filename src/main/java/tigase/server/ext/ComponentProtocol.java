@@ -679,13 +679,16 @@ public class ComponentProtocol
 					port_props.put(PORT_LOCAL_HOST_PROP_KEY, repoItem.getDomain());
 				}
 
+				String[] remote_host = PORT_IFC_PROP_VAL;
+
 				if (repoItem.getRemoteHost() != null) {
 					port_props.put(PORT_REMOTE_HOST_PROP_KEY, repoItem.getRemoteHost());
+					remote_host = new String[] { repoItem.getRemoteHost() };
 				}
 
 				port_props.put(PORT_TYPE_PROP_KEY, repoItem.getConnectionType());
 				port_props.put(PORT_SOCKET_PROP_KEY, SocketType.plain);
-				port_props.put(PORT_IFC_PROP_KEY, PORT_IFC_PROP_VAL);
+				port_props.put(PORT_IFC_PROP_KEY, remote_host);
 				port_props.put(MAX_RECONNECTS_PROP_KEY, (int) (120 * MINUTE));
 				port_props.put(REPO_ITEM_KEY, repoItem);
 				log.info("Starting connection: " + port_props);
