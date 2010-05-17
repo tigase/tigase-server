@@ -126,6 +126,9 @@ public abstract class ActionAbstract implements ActionIfc {
 			SECURITY sec = SECURITY.valueOf(sec_str.toUpperCase());
 
 			security = sec;
+		} catch (NullPointerException e) {
+
+			// Ignore, this is expected here
 		} catch (Exception e) {
 			log.log(Level.WARNING, "Incorrect amp security settings, using defaults: " + security,
 					e);
