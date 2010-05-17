@@ -748,7 +748,7 @@ public class DrupalWPAuth implements UserAuthRepository {
 
 					if (realm != null) {
 						rc.setText(realm);
-					}          // end of if (realm == null)
+					}        // end of if (realm == null)
 
 					if (log.isLoggable(Level.FINEST)) {
 						log.finest("RealmCallback: " + realm);
@@ -760,7 +760,7 @@ public class DrupalWPAuth implements UserAuthRepository {
 
 						if (user_name == null) {
 							user_name = nc.getDefaultName();
-						}        // end of if (name == null)
+						}      // end of if (name == null)
 
 						jid = BareJID.bareJIDInstanceNS(user_name, (String) options.get(REALM_KEY));
 						options.put(USER_ID_KEY, jid);
@@ -782,7 +782,7 @@ public class DrupalWPAuth implements UserAuthRepository {
 								}
 							} catch (Exception e) {
 								throw new IOException("Password retrieving problem.", e);
-							}      // end of try-catch
+							}    // end of try-catch
 						} else {
 							if (callbacks[i] instanceof AuthorizeCallback) {
 								AuthorizeCallback authCallback = ((AuthorizeCallback) callbacks[i]);
@@ -794,9 +794,10 @@ public class DrupalWPAuth implements UserAuthRepository {
 									log.finest("AuthorizeCallback: authorId: " + authorId);
 								}
 
-								if (authenId.equals(authorId)) {
-									authCallback.setAuthorized(true);
-								}    // end of if (authenId.equals(authorId))
+								// if (authenId.equals(authorId)) {
+								authCallback.setAuthorized(true);
+
+								// }    // end of if (authenId.equals(authorId))
 							} else {
 								throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
 							}
