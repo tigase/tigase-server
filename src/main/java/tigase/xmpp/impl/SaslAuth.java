@@ -19,22 +19,34 @@
  * Last modified by $Author$
  * $Date$
  */
+
 package tigase.xmpp.impl;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Queue;
-import java.util.logging.Logger;
+//~--- non-JDK imports --------------------------------------------------------
+
 import tigase.db.NonAuthUserRepository;
 import tigase.db.UserAuthRepository;
+
 import tigase.server.Command;
 import tigase.server.Packet;
+
 import tigase.xml.Element;
+
 import tigase.xmpp.Authorization;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
+
+//~--- JDK imports ------------------------------------------------------------
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+//~--- classes ----------------------------------------------------------------
 
 /**
  * Describe class SaslAuth here.
@@ -45,150 +57,229 @@ import tigase.xmpp.XMPPResourceConnection;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class SaslAuth extends XMPPProcessor
-	implements XMPPProcessorIfc {
-
-  private static final String XMLNS = "urn:ietf:params:xml:ns:xmpp-sasl";
-
-  private static final Logger log = Logger.getLogger("tigase.xmpp.impl.SaslAuth");
-
+public class SaslAuth extends XMPPProcessor implements XMPPProcessorIfc {
+	private static final String XMLNS = "urn:ietf:params:xml:ns:xmpp-sasl";
+	private static final Logger log = Logger.getLogger(SaslAuth.class.getName());
 	private static final String ID = XMLNS;
-  private static final String[] ELEMENTS = {
-    "auth", "response", "challenge", "failure", "success", "abort"};
-  private static final String[] XMLNSS = {
-    XMLNS, XMLNS, XMLNS, XMLNS, XMLNS, XMLNS};
-  private static final Element[] DISCO_FEATURES =	{
-		new Element("feature", new String[] {"var"}, new String[] {XMLNS})
+	private static final String[] ELEMENTS = {
+		"auth", "response", "challenge", "failure", "success", "abort"
 	};
+	private static final String[] XMLNSS = {
+		XMLNS, XMLNS, XMLNS, XMLNS, XMLNS, XMLNS
+	};
+	private static final Element[] DISCO_FEATURES = {
+		new Element("feature", new String[] { "var" }, new String[] { XMLNS }) };
 
-	@Override
-  public Element[] supDiscoFeatures(final XMPPResourceConnection session)
-	{ return DISCO_FEATURES; }
+	//~--- constant enums -------------------------------------------------------
 
+	/**
+	 * Enum description
+	 *
+	 */
+	public enum ElementType {
+		auth, abort, response, challenge, failure, success;
+	}
 
-  public enum ElementType {
-    auth,
-    abort,
-    response,
-    challenge,
-		failure,
-		success;
-  }
+	//~--- methods --------------------------------------------------------------
 
-	@Override
-	public String id() { return ID; }
-
-	@Override
-	public String[] supElements()
-	{ return ELEMENTS; }
-
-	@Override
-  public String[] supNamespaces()
-	{ return XMLNSS; }
-
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
 	@Override
 	public int concurrentQueuesNo() {
 		return Runtime.getRuntime().availableProcessors();
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
 	@Override
 	public int concurrentThreadsPerQueue() {
 		return 2;
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
 	@Override
-  public Element[] supStreamFeatures(final XMPPResourceConnection session)	{
-    if (session == null || session.isAuthorized()) {
-      return null;
-    } else {
-			Map<String, Object> query = new HashMap<String, Object>();
-			query.put(UserAuthRepository.PROTOCOL_KEY,
-				UserAuthRepository.PROTOCOL_VAL_SASL);
-			session.queryAuth(query);
-			String[] auth_mechs = (String[])query.get(UserAuthRepository.RESULT_KEY);
-			Element[] mechs = new Element[auth_mechs.length];
-			int idx = 0;
-			for (String mech: auth_mechs) {
-				mechs[idx++] = new Element("mechanism", mech);
-			} // end of for (String mech: mechs)
-      return new Element[] {new Element("mechanisms", mechs,
-					new String[] {"xmlns"}, new String[] {XMLNS})};
-    } // end of if (session.isAuthorized()) else
+	public String id() {
+		return ID;
 	}
 
-  @SuppressWarnings({"unchecked"})
-  public void process(final Packet packet, final XMPPResourceConnection session,
-		final NonAuthUserRepository repo, final Queue<Packet> results,
-		final Map<String, Object> settings) {
-
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param packet
+	 * @param session
+	 * @param repo
+	 * @param results
+	 * @param settings
+	 */
+	@SuppressWarnings({ "unchecked" })
+	public void process(final Packet packet, final XMPPResourceConnection session,
+			final NonAuthUserRepository repo, final Queue<Packet> results,
+				final Map<String, Object> settings) {
 		if (session == null) {
 			return;
-		} // end of if (session == null)
+		}    // end of if (session == null)
 
 		Element request = packet.getElement();
-// 		ElementType type = null;
-// 		try {
-// 			type = ElementType.valueOf(request.getName());
-// 		} catch (IllegalArgumentException e) {
-// 			log.warning("Incorrect stanza type: " + request.getName());
-// 			results.offer(packet.swapFromTo(createReply(ElementType.failure,
-// 						"<temporary-auth-failure/>")));
-// 			results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
-// 					StanzaType.set, packet.getElemId()));
-// 			return;
-// 		} // end of try-catch
-		Map<String, Object> authProps =
-			(Map<String, Object>)(session.getSessionData(XMLNS+"-authProps"));
+
+//  ElementType type = null;
+//  try {
+//    type = ElementType.valueOf(request.getName());
+//  } catch (IllegalArgumentException e) {
+//    log.warning("Incorrect stanza type: " + request.getName());
+//    results.offer(packet.swapFromTo(createReply(ElementType.failure,
+//          "<temporary-auth-failure/>")));
+//    results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
+//        StanzaType.set, packet.getElemId()));
+//    return;
+//  } // end of try-catch
+		Map<String, Object> authProps = (Map<String,
+			Object>) (session.getSessionData(XMLNS + "-authProps"));
+
 		if (authProps == null) {
 			authProps = new HashMap<String, Object>();
-			authProps.put(UserAuthRepository.PROTOCOL_KEY,
-				UserAuthRepository.PROTOCOL_VAL_SASL);
+			authProps.put(UserAuthRepository.PROTOCOL_KEY, UserAuthRepository.PROTOCOL_VAL_SASL);
 			authProps.put(UserAuthRepository.MACHANISM_KEY,
-				request.getAttribute("/auth", "mechanism"));
+					request.getAttribute("/auth", "mechanism"));
 			authProps.put(UserAuthRepository.REALM_KEY, session.getDomain().getVhost().getDomain());
-			authProps.put(UserAuthRepository.SERVER_NAME_KEY, session.getDomain().getVhost().getDomain());
-			session.putSessionData(XMLNS+"-authProps", authProps);
-		} // end of if (authProps == null)
-		//		String user = (String)authProps.get(UserAuthRepository.USER_ID_KEY);
+			authProps.put(UserAuthRepository.SERVER_NAME_KEY,
+					session.getDomain().getVhost().getDomain());
+			session.putSessionData(XMLNS + "-authProps", authProps);
+		}    // end of if (authProps == null)
+
+		// String user = (String)authProps.get(UserAuthRepository.USER_ID_KEY);
 		authProps.put(UserAuthRepository.DATA_KEY, request.getCData());
+
 		try {
 			Authorization result = session.loginOther(authProps);
-			String challenge_data =
-				(String)authProps.get(UserAuthRepository.RESULT_KEY);
+			String challenge_data = (String) authProps.get(UserAuthRepository.RESULT_KEY);
+
 			if (result == Authorization.AUTHORIZED) {
-				results.offer(packet.swapFromTo(createReply(ElementType.success,
-							challenge_data), null, null));
+				results.offer(packet.swapFromTo(createReply(ElementType.success, challenge_data),
+						null, null));
 				authProps.clear();
-				session.removeSessionData(XMLNS+"-authProps");
+				session.removeSessionData(XMLNS + "-authProps");
 			} else {
-				results.offer(packet.swapFromTo(createReply(ElementType.challenge,
-							challenge_data), null, null));
+				results.offer(packet.swapFromTo(createReply(ElementType.challenge, challenge_data),
+						null, null));
 			}
 		} catch (Exception e) {
-			//e.printStackTrace();
-			session.removeSessionData(XMLNS+"-authProps");
-			results.offer(packet.swapFromTo(createReply(ElementType.failure,
-						"<not-authorized/>"), null, null));
-			Integer retries = (Integer)session.getSessionData("auth-retries");
+			log.log(Level.INFO, "Authentication failed: ", e);
+
+			// e.printStackTrace();
+			session.removeSessionData(XMLNS + "-authProps");
+			results.offer(packet.swapFromTo(createReply(ElementType.failure, "<not-authorized/>"),
+					null, null));
+
+			Integer retries = (Integer) session.getSessionData("auth-retries");
+
 			if (retries == null) {
 				retries = new Integer(0);
 			}
+
 			if (retries.intValue() < 3) {
 				session.putSessionData("auth-retries", new Integer(retries.intValue() + 1));
 			} else {
 				results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
 						StanzaType.set, packet.getStanzaId()));
 			}
-		} // end of try-catch
-  }
+		}    // end of try-catch
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 *
+	 * @return
+	 */
+	@Override
+	public Element[] supDiscoFeatures(final XMPPResourceConnection session) {
+		return DISCO_FEATURES;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public String[] supElements() {
+		return ELEMENTS;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public String[] supNamespaces() {
+		return XMLNSS;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 *
+	 * @return
+	 */
+	@Override
+	public Element[] supStreamFeatures(final XMPPResourceConnection session) {
+		if ((session == null) || session.isAuthorized()) {
+			return null;
+		} else {
+			Map<String, Object> query = new HashMap<String, Object>();
+
+			query.put(UserAuthRepository.PROTOCOL_KEY, UserAuthRepository.PROTOCOL_VAL_SASL);
+			session.queryAuth(query);
+
+			String[] auth_mechs = (String[]) query.get(UserAuthRepository.RESULT_KEY);
+			Element[] mechs = new Element[auth_mechs.length];
+			int idx = 0;
+
+			for (String mech : auth_mechs) {
+				mechs[idx++] = new Element("mechanism", mech);
+			}    // end of for (String mech: mechs)
+
+			return new Element[] {
+				new Element("mechanisms", mechs, new String[] { "xmlns" }, new String[] { XMLNS }) };
+		}    // end of if (session.isAuthorized()) else
+	}
 
 	private Element createReply(final ElementType type, final String cdata) {
 		Element reply = new Element(type.toString());
+
 		reply.setXMLNS(XMLNS);
+
 		if (cdata != null) {
 			reply.setCData(cdata);
-		} // end of if (cdata != null)
+		}    // end of if (cdata != null)
+
 		return reply;
 	}
+}    // SaslAuth
 
-} // SaslAuth
+
+//~ Formatted in Sun Code Convention
+
+
+//~ Formatted by Jindent --- http://www.jindent.com
