@@ -310,6 +310,9 @@ public class VCardTemp extends XMPPProcessorAbstract {
 		Queue<Element> elems = domHandler.getParsedElements();
 		Packet result = packet.okResult((Element) null, 0);
 
+		result.setPacketFrom(null);
+		result.setPacketTo(null);
+
 		for (Element el : elems) {
 			result.getElement().addChild(el);
 		}    // end of for (Element el: elems)
