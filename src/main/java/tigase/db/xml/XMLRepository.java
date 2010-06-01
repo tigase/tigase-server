@@ -414,6 +414,21 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
 	 * Method description
 	 *
 	 *
+	 * @param user
+	 *
+	 * @return
+	 *
+	 * @throws TigaseDBException
+	 */
+	@Override
+	public long getUserUID(BareJID user) throws TigaseDBException {
+		return Math.abs(user.hashCode());
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
 	 * @return
 	 */
 	@Override

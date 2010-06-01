@@ -190,7 +190,7 @@ public interface UserRepository {
 	 * list of values.
 	 *
 	 * @param user a <code>BareJID</code> value of user ID for which data must be
-	 * stored. User ID consists of user name and domain name.
+	 * stored or retrieved. User ID consists of user name and domain name.
 	 * @return a <code>String[]</code> value
 	 * @exception UserNotFoundException if user id hasn't been found in repository.
 	 * @throws TigaseDBException if database backend error occurs.
@@ -231,6 +231,18 @@ public interface UserRepository {
 	 * @throws TigaseDBException if database backend error occurs.
 	 */
 	String[] getSubnodes(BareJID user) throws UserNotFoundException, TigaseDBException;
+
+	/**
+	 * Returns a user unique ID number within the given repository. Please note it is also
+	 * possible that the ID number is unique only for the user domain. The ID is a positive
+	 * number if the user exists and negative if the user was not found in the repository.
+	 * @param user a <code>BareJID</code> value of user ID for which data must be
+	 * stored or retrieved. User ID consists of user name and domain name.
+	 * @return a user inique ID number within the repository or domain. The ID is a positive
+	 * number if the user exists and negative if the user was not found in the repository.
+	 * @throws TigaseDBException if there is a problem with accessing user repository.
+	 */
+	long getUserUID(BareJID user) throws TigaseDBException;
 
 	/**
 	 * This method is only used by the data conversion tools. They attempt

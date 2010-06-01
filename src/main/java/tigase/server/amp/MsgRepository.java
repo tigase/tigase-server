@@ -27,6 +27,7 @@ package tigase.server.amp;
 import tigase.db.MsgRepositoryIfc;
 import tigase.db.UserNotFoundException;
 
+import tigase.util.Algorithms;
 import tigase.util.JDBCAbstract;
 import tigase.util.SimpleCache;
 
@@ -39,6 +40,8 @@ import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 
 //~--- JDK imports ------------------------------------------------------------
+
+import java.security.NoSuchAlgorithmException;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -96,8 +99,20 @@ public class MsgRepository extends JDBCAbstract implements MsgRepositoryIfc {
 		+ " where expired is not null order by expired";
 	private static final String MSG_SELECT_EXPIRED_BEFORE_QUERY = "select * from " + MSG_TABLE
 		+ " where expired is not null and expired <= ? order by expired";
+	private static final String JID_TABLE = "user_jid";
+	private static final String JID_ID_COLUMN = "jid_id";
+	private static final String JID_SHA_COLUMN = "jid_sha";
+	private static final String JID_COLUMN = "jid";
+	private static final String CREATE_JID_TABLE = "create table " + JID_TABLE + " ( " + " "
+		+ JID_ID_COLUMN + " serial," + " " + JID_SHA_COLUMN + " char(128) NOT NULL," + " "
+		+ JID_COLUMN + " varchar(2049) NOT NULL," + " primary key (" + JID_ID_COLUMN + "),"
+		+ " unique key " + JID_SHA_COLUMN + " (" + JID_SHA_COLUMN + ")," + " key " + JID_COLUMN
+		+ " (" + JID_COLUMN + "(765)))";
 	private static final String GET_USER_UID_PROP_KEY = "user-uid-query";
-	private static final String GET_USER_UID_DEF_QUERY = "{ call TigGetUserDBUid(?) }";
+	private static final String GET_USER_UID_DEF_QUERY = "select " + JID_ID_COLUMN + ", "
+		+ JID_COLUMN + " from " + JID_TABLE + " where " + JID_SHA_COLUMN + " = ?";
+	private static final String ADD_USER_JID_ID_QUERY = "insert into " + JID_TABLE + " ( "
+		+ JID_SHA_COLUMN + ", " + JID_COLUMN + ") values (?, ?)";
 	private static final int MAX_UID_CACHE_SIZE = 100000;
 	private static final long MAX_UID_CACHE_TIME = 3600000;
 	private static final Map<String, MsgRepository> repos = new ConcurrentSkipListMap<String,
@@ -106,6 +121,7 @@ public class MsgRepository extends JDBCAbstract implements MsgRepositoryIfc {
 
 	//~--- fields ---------------------------------------------------------------
 
+	private PreparedStatement add_jid_id_st = null;
 	private PreparedStatement delete_id_st = null;
 	private PreparedStatement delete_to_jid_st = null;
 	private long earliestOffline = Long.MAX_VALUE;
@@ -252,6 +268,10 @@ public class MsgRepository extends JDBCAbstract implements MsgRepositoryIfc {
 
 			long to_uid = getUserUID(to.getBareJID());
 
+			if (to_uid < 0) {
+				throw new UserNotFoundException("User: " + to + " was not found in database.");
+			}
+
 			synchronized (select_to_jid_st) {
 				select_to_jid_st.setLong(1, to_uid);
 				rs = select_to_jid_st.executeQuery();
@@ -305,17 +325,17 @@ public class MsgRepository extends JDBCAbstract implements MsgRepositoryIfc {
 		try {
 			checkConnection();
 
-			long from_uid = -1;
+			long from_uid = getUserUID(from.getBareJID());
 
-//    try {
-//
-//      // This user may not exist in our DB as this might be a user from
-//      // a remote server/different domain
-//      from_uid = getUserUID(from.getBareJID());
-//    } catch (UserNotFoundException e) {
-//      from_uid = -1;
-//    }
+			if (from_uid < 0) {
+				from_uid = addUserJID(from.getBareJID());
+			}
+
 			long to_uid = getUserUID(to.getBareJID());
+
+			if (to_uid < 0) {
+				to_uid = addUserJID(to.getBareJID());
+			}
 
 			synchronized (insert_msg_st) {
 				if (expired == null) {
@@ -361,16 +381,42 @@ public class MsgRepository extends JDBCAbstract implements MsgRepositoryIfc {
 		delete_id_st = prepareQuery(MSG_DELETE_ID_QUERY);
 		select_expired_st = prepareQuery(MSG_SELECT_EXPIRED_QUERY);
 		select_expired_before_st = prepareQuery(MSG_SELECT_EXPIRED_BEFORE_QUERY);
+		add_jid_id_st = prepareQuery(ADD_USER_JID_ID_QUERY);
+	}
+
+	private long addUserJID(BareJID bareJID) throws SQLException, UserNotFoundException {
+		try {
+			String jid_sha = Algorithms.hexDigest(bareJID.toString(), "", "SHA");
+
+			synchronized (add_jid_id_st) {
+				add_jid_id_st.setString(1, jid_sha);
+				add_jid_id_st.setString(2, bareJID.toString());
+				add_jid_id_st.executeUpdate();
+			}
+
+//    // Give it some time or following select won't find a new entry MySQL bug?
+//    Thread.sleep(100);
+//    }catch (InterruptedException ex) {
+//
+//    // Do nothing
+		} catch (NoSuchAlgorithmException ex) {
+			log.log(Level.WARNING, "Configuration error or code bug: ", ex);
+
+			return -1;
+		}
+
+		return getUserUID(bareJID);
 	}
 
 	private void checkDB() throws SQLException {
 		ResultSet rs = null;
+		PreparedStatement stmt = null;
 
 		try {
 			String CHECK_TABLE_QUERY = "select count(*) from ";
-			PreparedStatement checkTableSt = prepareStatement(CHECK_TABLE_QUERY + MSG_TABLE);
 
-			rs = checkTableSt.executeQuery();
+			stmt = prepareStatement(CHECK_TABLE_QUERY + MSG_TABLE);
+			rs = stmt.executeQuery();
 
 			if (rs.next()) {
 				long count = rs.getLong(1);
@@ -378,11 +424,36 @@ public class MsgRepository extends JDBCAbstract implements MsgRepositoryIfc {
 				log.info("DB table " + MSG_TABLE + " OK, items: " + count);
 			}
 		} catch (Exception e) {
-			PreparedStatement createTable = prepareStatement(CREATE_MSG_TABLE);
-
-			createTable.executeUpdate();
+			stmt = prepareStatement(CREATE_MSG_TABLE);
+			stmt.executeUpdate();
 		} finally {
-			release(null, rs);
+			release(stmt, rs);
+			rs = null;
+			stmt = null;
+		}
+
+		try {
+			String CHECK_TABLE_QUERY = "select count(*) from ";
+
+			stmt = prepareStatement(CHECK_TABLE_QUERY + JID_TABLE);
+			rs = stmt.executeQuery();
+
+			if (rs.next()) {
+				long count = rs.getLong(1);
+
+				log.info("DB table " + JID_TABLE + " OK, items: " + count);
+			}
+		} catch (Exception e) {
+			stmt = prepareStatement(CREATE_JID_TABLE);
+			stmt.executeUpdate();
+
+			// Just in case let's clear the msg history table to make sure no offline messages
+			// are delivered to incorrect JID, there is an extra protection in the user UID reading
+			// method but to be safe, clear it out from old entries, they won't be of any use anyway
+			stmt = prepareStatement("delete from " + MSG_TABLE);
+			stmt.executeUpdate();
+		} finally {
+			release(stmt, rs);
 			rs = null;
 		}
 	}
@@ -411,25 +482,56 @@ public class MsgRepository extends JDBCAbstract implements MsgRepositoryIfc {
 
 		ResultSet rs = null;
 		long result = -1;
+		String jid_sha;
+
+		try {
+			jid_sha = Algorithms.hexDigest(user_id.toString(), "", "SHA");
+		} catch (NoSuchAlgorithmException ex) {
+			log.log(Level.WARNING, "Configuration error or code bug: ", ex);
+
+			return -1;
+		}
 
 		try {
 			synchronized (uid_st) {
-				uid_st.setString(1, user_id.toString());
+				uid_st.setString(1, jid_sha);
 				rs = uid_st.executeQuery();
 
 				if (rs.next()) {
-					result = rs.getLong(1);
+					BareJID res_jid = BareJID.bareJIDInstanceNS(rs.getString(JID_COLUMN));
+
+					if (log.isLoggable(Level.FINEST)) {
+						log.finest("Found entry for JID: " + user_id + ", DB JID: " + res_jid);
+					}
+
+					// There is a slight chance that there is the same SHA for 2 different JIDs.
+					// Even though it is impossible to store messages for both JIDs right now
+					// we have to make sure we don't send offline messages to incorrect person
+					if (user_id.equals(res_jid)) {
+						result = rs.getLong(JID_ID_COLUMN);
+					} else {
+						if (log.isLoggable(Level.FINEST)) {
+							log.finest("JIDs don't match, SHA conflict? JID: " + user_id + ", DB JID: "
+									+ res_jid);
+						}
+					}
+				} else {
+					if (log.isLoggable(Level.FINEST)) {
+						log.finest("No entry for JID: " + user_id);
+					}
 				}
 			}
 
-			if (result <= 0) {
-				throw new UserNotFoundException("User does not exist: " + user_id);
-			}    // end of if (isnext) else
+//    if (result <= 0) {
+//      throw new UserNotFoundException("User does not exist: " + user_id);
+//    }    // end of if (isnext) else
 		} finally {
 			release(null, rs);
 		}
 
-		uids_cache.put(user_id, result);
+		if (result > 0) {
+			uids_cache.put(user_id, result);
+		}
 
 		return result;
 	}

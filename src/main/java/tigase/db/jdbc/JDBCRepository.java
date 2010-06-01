@@ -512,6 +512,49 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	}
 
 	/**
+	 * Method description
+	 *
+	 *
+	 * @param user_id
+	 *
+	 * @return
+	 *
+	 * @throws TigaseDBException
+	 */
+	@Override
+	public long getUserUID(BareJID user_id) throws TigaseDBException {
+		Long cache_res = (Long) cache.get(user_id.toString());
+
+		if (cache_res != null) {
+			return cache_res.longValue();
+		}    // end of if (result != null)
+
+		ResultSet rs = null;
+		long result = -1;
+
+		try {
+			synchronized (uid_sp) {
+				uid_sp.setString(1, user_id.toString());
+				rs = uid_sp.executeQuery();
+
+				if (rs.next()) {
+					result = rs.getLong(1);
+				} else {
+					result = -1;
+				}
+			}
+		} catch (SQLException e) {
+			throw new TigaseDBException("Error retrieving user UID from repository: ", e);
+		} finally {
+			release(null, rs);
+		}
+
+		cache.put(user_id.toString(), Long.valueOf(result));
+
+		return result;
+	}
+
+	/**
 	 * <code>getUsers</code> method is thread safe. It uses local variable
 	 * for storing <code>Statement</code>.
 	 *
@@ -1173,39 +1216,15 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 
 	private long getUserUID(BareJID user_id, boolean autoCreate)
 			throws SQLException, UserNotFoundException, TigaseDBException {
-		Long cache_res = (Long) cache.get(user_id.toString());
+		long result = getUserUID(user_id);
 
-		if (cache_res != null) {
-			return cache_res.longValue();
-		}    // end of if (result != null)
-
-		ResultSet rs = null;
-		long result = -1;
-
-		try {
-			synchronized (uid_sp) {
-				uid_sp.setString(1, user_id.toString());
-				rs = uid_sp.executeQuery();
-
-				if (rs.next()) {
-					result = rs.getLong(1);
-				} else {
-					result = -1;
-				}
-
-				if (result <= 0) {
-					if (autoCreate) {
-						result = addUserRepo(user_id);
-					} else {
-						throw new UserNotFoundException("User does not exist: " + user_id);
-					}    // end of if (autoCreate) else
-				}      // end of if (isnext) else
-			}
-		} finally {
-			release(null, rs);
-		}
-
-		cache.put(user_id.toString(), Long.valueOf(result));
+		if (result <= 0) {
+			if (autoCreate) {
+				result = addUserRepo(user_id);
+			} else {
+				throw new UserNotFoundException("User does not exist: " + user_id);
+			}    // end of if (autoCreate) else
+		}      // end of if (isnext) else
 
 		return result;
 	}

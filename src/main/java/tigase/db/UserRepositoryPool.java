@@ -394,6 +394,33 @@ public class UserRepositoryPool implements UserRepository {
 	 * Method description
 	 *
 	 *
+	 * @param user
+	 *
+	 * @return
+	 *
+	 * @throws TigaseDBException
+	 */
+	@Override
+	public long getUserUID(BareJID user) throws TigaseDBException {
+		UserRepository repo = takeRepo();
+
+		if (repo != null) {
+			try {
+				return repo.getUserUID(user);
+			} finally {
+				addRepo(repo);
+			}
+		} else {
+			log.warning("repo is NULL, pool empty? - " + repoPool.size());
+		}
+
+		return -1;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
 	 * @return
 	 *
 	 * @throws TigaseDBException

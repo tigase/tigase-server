@@ -208,6 +208,21 @@ public class DummyRepository implements UserRepository {
 	}
 
 	/**
+	 * Method description
+	 *
+	 *
+	 * @param user
+	 *
+	 * @return
+	 *
+	 * @throws TigaseDBException
+	 */
+	@Override
+	public long getUserUID(BareJID user) throws TigaseDBException {
+		return -1;
+	}
+
+	/**
 	 * Describe <code>getUsers</code> method here.
 	 *
 	 * @return a <code>List</code> value

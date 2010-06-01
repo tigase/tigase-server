@@ -372,6 +372,31 @@ public class UserRepositoryMDImpl implements UserRepository {
 	 * Method description
 	 *
 	 *
+	 * @param user
+	 *
+	 * @return
+	 *
+	 * @throws TigaseDBException
+	 */
+	@Override
+	public long getUserUID(BareJID user) throws TigaseDBException {
+		UserRepository repo = getRepo(user.getDomain());
+
+		if (repo != null) {
+			return repo.getUserUID(user);
+		} else {
+			log.log(Level.WARNING,
+					"Couldn't obtain user repository for domain: " + user.getDomain()
+						+ ", not even default one!");
+		}
+
+		return -1;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
 	 * @return
 	 *
 	 * @throws TigaseDBException
