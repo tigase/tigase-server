@@ -211,7 +211,7 @@ public class CounterDataLogger extends JDBCAbstract implements StatisticsArchivi
 			checkConnection();
 
 			synchronized (insert_stats) {
-				insert_stats.setFloat(1, cpu_usage);
+				insert_stats.setFloat(1, ((cpu_usage >= 0f) ? cpu_usage : 0f));
 				insert_stats.setFloat(2, mem_usage);
 				insert_stats.setLong(3, uptime);
 				insert_stats.setInt(4, vhosts);
