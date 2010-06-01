@@ -19,18 +19,28 @@
  * Last modified by $Author$
  * $Date$
  */
+
 package tigase.xmpp.impl;
 
-import java.util.Queue;
-import java.util.logging.Logger;
-import java.util.logging.Level;
-import tigase.xml.Element;
-import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.XMPPResourceConnection;
+//~--- non-JDK imports --------------------------------------------------------
+
 import tigase.db.TigaseDBException;
+
 import tigase.xml.DomBuilderHandler;
+import tigase.xml.Element;
 import tigase.xml.SimpleParser;
 import tigase.xml.SingletonFactory;
+
+import tigase.xmpp.NotAuthorizedException;
+import tigase.xmpp.XMPPResourceConnection;
+
+//~--- JDK imports ------------------------------------------------------------
+
+import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+//~--- classes ----------------------------------------------------------------
 
 /**
  * Class defining data structure for privacy lists.
@@ -65,10 +75,9 @@ import tigase.xml.SingletonFactory;
 public class Privacy {
 
 	/**
-   * Private logger for class instancess.
-   */
-  private static Logger log =	Logger.getLogger("tigase.xmpp.impl.Privacy");
-
+	 * Private logger for class instancess.
+	 */
+	private static Logger log = Logger.getLogger("tigase.xmpp.impl.Privacy");
 	protected static final String PRIVACY = "privacy";
 	protected static final String LIST = "list";
 	protected static final String ITEM = "item";
@@ -82,18 +91,256 @@ public class Privacy {
 	protected static final String ACTIVE = "active-list";
 	protected static final String PRIVACY_LIST = "privacy-list";
 
+	//~--- methods --------------------------------------------------------------
 
-	public static String[] getLists(XMPPResourceConnection session)
-    throws NotAuthorizedException, TigaseDBException {
-    return session.getDataGroups(PRIVACY);
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param list
+	 *
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	public static void addList(XMPPResourceConnection session, Element list)
+			throws NotAuthorizedException, TigaseDBException {
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Saving privacy list: " + list.toString());
+		}
+
+		String lNode = listNode(list.getAttribute(NAME));
+
+		session.setData(lNode, PRIVACY_LIST, list.toString());
 	}
 
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 *
+	 * @return
+	 *
+	 * @throws NotAuthorizedException
+	 */
+	public static Element getActiveList(XMPPResourceConnection session)
+			throws NotAuthorizedException {
+		return (Element) session.getCommonSessionData(ACTIVE);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 *
+	 * @return
+	 *
+	 * @throws NotAuthorizedException
+	 */
+	public static String getActiveListName(XMPPResourceConnection session)
+			throws NotAuthorizedException {
+		Element list = getActiveList(session);
+
+		if (list != null) {
+			return list.getAttribute(NAME);
+		} else {
+			return null;
+		}    // end of if (list != null) else
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 *
+	 * @return
+	 *
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	public static String getDefaultList(XMPPResourceConnection session)
+			throws NotAuthorizedException, TigaseDBException {
+		return session.getData(PRIVACY, DEFAULT, null);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param list
+	 *
+	 * @return
+	 *
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	public static Element getList(XMPPResourceConnection session, String list)
+			throws NotAuthorizedException, TigaseDBException {
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Loading privacy list: " + list);
+		}
+
+		String lNode = listNode(list);
+		String list_str = session.getData(lNode, PRIVACY_LIST, null);
+
+		if ((list_str != null) &&!list_str.isEmpty()) {
+			SimpleParser parser = SingletonFactory.getParserInstance();
+			DomBuilderHandler domHandler = new DomBuilderHandler();
+
+			parser.parse(domHandler, list_str.toCharArray(), 0, list_str.length());
+
+			Queue<Element> elems = domHandler.getParsedElements();
+			Element result = elems.poll();
+
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Loaded privacy list: " + result.toString());
+			}
+
+			return result;
+		} else {
+			return getListOld(session, list);
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param list
+	 *
+	 * @return
+	 *
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	public static Element getListOld(XMPPResourceConnection session, String list)
+			throws NotAuthorizedException, TigaseDBException {
+		String lNode = listNode(list);
+		String[] items = session.getDataGroups(lNode);
+
+		if (items != null) {
+			Element eList = new Element(LIST, new String[] { NAME }, new String[] { list });
+
+			for (String item : items) {
+				String iNode = lNode + "/" + item;
+				String type = session.getData(iNode, TYPE, null);
+				String value = session.getData(iNode, VALUE, null);
+				String action = session.getData(iNode, ACTION, null);
+				String[] stanzas = session.getDataList(iNode, STANZAS);
+				Element eItem = new Element(ITEM, new String[] { ORDER, ACTION }, new String[] { item,
+						action });
+
+				if (type != null) {
+					eItem.addAttribute(TYPE, type);
+				}      // end of if (type != null)
+
+				if (value != null) {
+					eItem.addAttribute(VALUE, value);
+				}      // end of if (value != null)
+
+				if (stanzas != null) {
+					for (String stanza : stanzas) {
+						eItem.addChild(new Element(stanza));
+					}    // end of for (String stanza: stanzas)
+				}      // end of if (stanzas != null)
+
+				eList.addChild(eItem);
+			}        // end of for (String item: items)
+
+			return eList;
+		}          // end of if (items != null)
+
+		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 *
+	 * @return
+	 *
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	public static String[] getLists(XMPPResourceConnection session)
+			throws NotAuthorizedException, TigaseDBException {
+		return session.getDataGroups(PRIVACY);
+	}
+
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param list
+	 *
+	 * @return
+	 */
 	public static String listNode(final String list) {
 		return PRIVACY + "/" + list;
 	}
 
-	public static void setDefaultList(XMPPResourceConnection session,
-		Element list) throws NotAuthorizedException, TigaseDBException {
+	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param lName
+	 *
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	public static void setActiveList(XMPPResourceConnection session, String lName)
+			throws NotAuthorizedException, TigaseDBException {
+		if (lName != null) {
+			Element list = getList(session, lName);
+
+			if (list != null) {
+				session.putCommonSessionData(ACTIVE, list);
+			} else {
+				log.log(Level.INFO,
+						"Setting active list to null, do something better than that, perhaps notify user.");
+
+//      2010-05-28 23:40:34  WorkerThread.run()                  SEVERE:   Exception during packet processing: from=bosh@ds9680.flosoft-servers.net/ba94c5c5-6782-48b8-bf16-e7822ef75e98, to=sess-man@ds9680.flosoft-servers.net, data=<auth xmlns="urn:ietf:params:xml:ns:xmpp-sasl" mechanism="PLAIN">AGZsb3JpYW4ASmVuc2VuMTU2MA==</auth>, XMLNS=urn:ietf:params:xml:ns:xmpp-sasl, priority=NORMALjava.lang.NullPointerException
+//              at java.util.concurrent.ConcurrentHashMap.put(ConcurrentHashMap.java:881)
+//              at tigase.xmpp.XMPPSession.putCommonSessionData(XMPPSession.java:498)
+//              at tigase.xmpp.XMPPResourceConnection.putCommonSessionData(XMPPResourceConnection.java:628)
+//              at tigase.xmpp.impl.Privacy.setActiveList(Privacy.java:113)
+//              at tigase.xmpp.impl.JabberIqPrivacy.allowed(JabberIqPrivacy.java:276)
+//              at tigase.xmpp.impl.JabberIqPrivacy.filter(JabberIqPrivacy.java:136)
+//              at tigase.server.xmppsession.SessionManager.addOutPackets(SessionManager.java:831)
+//              at tigase.server.xmppsession.SessionManager$ProcessorWorkerThread.process(SessionManager.java:1935)
+//              at tigase.util.WorkerThread.run(WorkerThread.java:118)
+			}
+		} else {
+			session.removeCommonSessionData(ACTIVE);
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param list
+	 *
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	public static void setDefaultList(XMPPResourceConnection session, Element list)
+			throws NotAuthorizedException, TigaseDBException {
 		if (list.getAttribute(NAME) != null) {
 			session.setData(PRIVACY, DEFAULT, list.getAttribute(NAME));
 		} else {
@@ -101,136 +348,43 @@ public class Privacy {
 		}
 	}
 
-	public static String getDefaultList(XMPPResourceConnection session)
-    throws NotAuthorizedException, TigaseDBException {
-		return session.getData(PRIVACY, DEFAULT, null);
-	}
-
-	public static void setActiveList(XMPPResourceConnection session, String lName)
-    throws NotAuthorizedException, TigaseDBException {
-		if (lName != null) {
-			Element list = getList(session, lName);
-			session.putCommonSessionData(ACTIVE, list);
-		} else {
-			session.removeCommonSessionData(ACTIVE);
-		}
-	}
-
-	public static Element getActiveList(XMPPResourceConnection session)
-    throws NotAuthorizedException {
-		return (Element)session.getCommonSessionData(ACTIVE);
-	}
-
-	public static String getActiveListName(XMPPResourceConnection session)
-    throws NotAuthorizedException {
-		Element list = getActiveList(session);
-		if (list != null) {
-			return list.getAttribute(NAME);
-		} else {
-			return null;
-		} // end of if (list != null) else
-	}
-
-	public static void addList(XMPPResourceConnection session,
-					Element list)
-					throws NotAuthorizedException, TigaseDBException {
-		if (log.isLoggable(Level.FINEST)) {
-    		log.finest("Saving privacy list: " + list.toString());
-        }
-		String lNode = listNode(list.getAttribute(NAME));
-		session.setData(lNode, PRIVACY_LIST, list.toString());
-	}
-
-	public static Element getList(XMPPResourceConnection session,
-					String list)
-					throws NotAuthorizedException, TigaseDBException {
-		if (log.isLoggable(Level.FINEST)) {
-    		log.finest("Loading privacy list: " + list);
-        }
-		String lNode = listNode(list);
-		String list_str = session.getData(lNode, PRIVACY_LIST, null);
-		if (list_str != null && !list_str.isEmpty()) {
-			SimpleParser parser = SingletonFactory.getParserInstance();
-			DomBuilderHandler domHandler = new DomBuilderHandler();
-			parser.parse(domHandler, list_str.toCharArray(), 0, list_str.length());
-			Queue<Element> elems = domHandler.getParsedElements();
-			Element result = elems.poll();
-			if (log.isLoggable(Level.FINEST)) {
-    			log.finest("Loaded privacy list: " + result.toString());
-            }
-			return result;
-		} else {
-			return getListOld(session, list);
-		}
-	}
-
-	public static Element getListOld(XMPPResourceConnection session,
-					String list)
-					throws NotAuthorizedException, TigaseDBException {
-		String lNode = listNode(list);
-		String[] items = session.getDataGroups(lNode);
-		if (items != null) {
-			Element eList = new Element(LIST,
-				new String[] {NAME}, new String[] {list});
-			for (String item: items) {
-				String iNode = lNode + "/" + item;
-				String type = session.getData(iNode, TYPE, null);
-				String value = session.getData(iNode, VALUE, null);
-				String action = session.getData(iNode, ACTION, null);
-				String[] stanzas = session.getDataList(iNode, STANZAS);
-				Element eItem = new Element(ITEM,
-					new String[] {ORDER, ACTION},
-					new String[] {item, action});
-				if (type != null) {
-					eItem.addAttribute(TYPE, type);
-				} // end of if (type != null)
-				if (value != null) {
-					eItem.addAttribute(VALUE, value);
-				} // end of if (value != null)
-				if (stanzas != null) {
-					for (String stanza: stanzas) {
-					eItem.addChild(new Element(stanza));
-					} // end of for (String stanza: stanzas)
-				} // end of if (stanzas != null)
-				eList.addChild(eItem);
-			} // end of for (String item: items)
-			return eList;
-		} // end of if (items != null)
-		return null;
-	}
-
-//	public static void addListOld(XMPPResourceConnection session,
-//					Element list)
-//					throws NotAuthorizedException, TigaseDBException {
+//public static void addListOld(XMPPResourceConnection session,
+//        Element list)
+//        throws NotAuthorizedException, TigaseDBException {
 //
-//		String lNode = listNode(list.getAttribute(NAME));
+//  String lNode = listNode(list.getAttribute(NAME));
 //
-//		// Always remove this list as it is either removed or replaced
-//		// by new one. To make sure there are no old data left, let's
-//		// remove it here.
-//		session.removeDataGroup(lNode);
+//  // Always remove this list as it is either removed or replaced
+//  // by new one. To make sure there are no old data left, let's
+//  // remove it here.
+//  session.removeDataGroup(lNode);
 //
-//		if (list.getChildren() != null && list.getChildren().size() > 0) {
-//			for (Element item: list.getChildren()) {
-//				String iNode = lNode + "/" + item.getAttribute(ORDER);
-//				if (item.getAttribute(TYPE) != null) {
-//					session.setData(iNode, TYPE, item.getAttribute(TYPE));
-//				} // end of if (item.getAttribute(TYPE) != null)
-//				if (item.getAttribute(VALUE) != null) {
-//					session.setData(iNode, VALUE, item.getAttribute(VALUE));
-//				} // end of if (item.getAttribute(VALUE) != null)
-//				session.setData(iNode, ACTION, item.getAttribute(ACTION));
-//				List<Element> stanzas_list = item.getChildren();
-//				if (stanzas_list != null && stanzas_list.size() > 0) {
-//					String[] stanzas = new String[stanzas_list.size()];
-//					int cnt = -1;
-//					for (Element stanza: stanzas_list) {
-//						stanzas[++cnt] = stanza.getName();
-//					} // end of for (Element stanza: stanzas_list)
-//					session.setDataList(iNode, STANZAS, stanzas);
-//				} // end of if (stanzas_list != null && stanzas_list.size() > 0)
-//			} // end of for (Element item: list.getChildren())
-//		}
-//	}
+//  if (list.getChildren() != null && list.getChildren().size() > 0) {
+//    for (Element item: list.getChildren()) {
+//      String iNode = lNode + "/" + item.getAttribute(ORDER);
+//      if (item.getAttribute(TYPE) != null) {
+//        session.setData(iNode, TYPE, item.getAttribute(TYPE));
+//      } // end of if (item.getAttribute(TYPE) != null)
+//      if (item.getAttribute(VALUE) != null) {
+//        session.setData(iNode, VALUE, item.getAttribute(VALUE));
+//      } // end of if (item.getAttribute(VALUE) != null)
+//      session.setData(iNode, ACTION, item.getAttribute(ACTION));
+//      List<Element> stanzas_list = item.getChildren();
+//      if (stanzas_list != null && stanzas_list.size() > 0) {
+//        String[] stanzas = new String[stanzas_list.size()];
+//        int cnt = -1;
+//        for (Element stanza: stanzas_list) {
+//          stanzas[++cnt] = stanza.getName();
+//        } // end of for (Element stanza: stanzas_list)
+//        session.setDataList(iNode, STANZAS, stanzas);
+//      } // end of if (stanzas_list != null && stanzas_list.size() > 0)
+//    } // end of for (Element item: list.getChildren())
+//  }
+//}
+}    // Privacy
 
-} // Privacy
+
+//~ Formatted in Sun Code Convention
+
+
+//~ Formatted by Jindent --- http://www.jindent.com
