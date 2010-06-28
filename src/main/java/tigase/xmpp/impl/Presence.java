@@ -405,23 +405,24 @@ public abstract class Presence {
 						// subscriptions in case of synchronization loss
 						forwardPresence(results, packet, session.getJID().copyWithoutResource());
 
-						JID buddy = packet.getStanzaTo().copyWithoutResource();
+						Element initial_presence = session.getPresence();
 
-						subscr_changed = roster_util.updateBuddySubscription(session, pres_type, buddy);
+						if (initial_presence != null) {
+							JID buddy = packet.getStanzaTo().copyWithoutResource();
 
-						if (subscr_changed) {
-							roster_util.updateBuddyChange(session, results,
-									roster_util.getBuddyItem(session, buddy));
+							subscr_changed = roster_util.updateBuddySubscription(session, pres_type, buddy);
 
-							if (pres_type == PresenceType.out_subscribed) {
-								Element presence = session.getPresence();
-								JID from = (presence == null ? session.getJID() : null);
+							if (subscr_changed) {
+								roster_util.updateBuddyChange(session, results,
+										roster_util.getBuddyItem(session, buddy));
 
-								sendPresence(StanzaType.available, from, buddy, results, presence);
-							} else {
-								sendPresence(StanzaType.unavailable, session.getJID(), buddy, results, null);
-							}
-						}    // end of if (subscr_changed)
+								if (pres_type == PresenceType.out_subscribed) {
+									sendPresence(StanzaType.available, null, buddy, results, initial_presence);
+								} else {
+									sendPresence(StanzaType.unavailable, session.getJID(), buddy, results, null);
+								}
+							}    // end of if (subscr_changed)
+						}
 
 						break;
 

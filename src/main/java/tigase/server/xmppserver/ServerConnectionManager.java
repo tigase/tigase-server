@@ -115,7 +115,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	 * to remote server. If this time is exceeded then no more reconnecting
 	 * attempts are performed and packets are sent back with error information.
 	 *
-	 * Default TCP/IP timeout is 300 seconds to we can follow this convention
+	 * Default TCP/IP timeout is 300 seconds so we can follow this convention
 	 * but administrator can set different timeout in server configuration.
 	 */
 	private long maxPacketWaitingTime = MAX_PACKET_WAITING_TIME_PROP_VAL;
@@ -132,6 +132,21 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	 */
 	private Map<CID, ServerConnections> connectionsByLocalRemote = new ConcurrentHashMap<CID,
 		ServerConnections>();
+
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param packet
+	 *
+	 * @return
+	 */
+	@Override
+	public boolean addOutPacket(Packet packet) {
+		return super.addOutPacket(packet);
+	}
 
 	//~--- get methods ----------------------------------------------------------
 
@@ -275,6 +290,17 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 		// Otherwise, it might be a control packet which can be processed by single thread
 		return 1;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param port_props
+	 */
+	@Override
+	public void initNewConnection(Map<String, Object> port_props) {
+		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 	//~--- get methods ----------------------------------------------------------
@@ -565,11 +591,12 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 			ServerConnections serv_conn = getServerConnections(cid);
 			Packet server_packet = packet.copyElementOnly();
-			server_packet.getElement().removeAttribute("xmlns");
-//			if (server_packet.getXMLNS() == XMLNS_CLIENT_VAL) {
-//				server_packet.getElement().setXMLNS(XMLNS_SERVER_VAL);
-//			}
 
+			server_packet.getElement().removeAttribute("xmlns");
+
+//    if (server_packet.getXMLNS() == XMLNS_CLIENT_VAL) {
+//      server_packet.getElement().setXMLNS(XMLNS_SERVER_VAL);
+//    }
 			if ((serv_conn == null)
 					|| ( !serv_conn.sendPacket(server_packet) && serv_conn.needsConnection())) {
 				if (log.isLoggable(Level.FINEST)) {
@@ -632,6 +659,18 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 		}      // end of while ()
 
 		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param port_props
+	 */
+	@Override
+	public void reconnectionFailed(Map<String, Object> port_props) {
+
+		// TODO: handle this somehow
 	}
 
 	/**
@@ -872,6 +911,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 		}
 
 		serv.getSessionData().put("xmlns", XMLNS_SERVER_VAL);
+
 		switch (serv.connectionType()) {
 			case connect : {
 
@@ -942,7 +982,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 				// We don't know hostname yet so we have to save session-id in
 				// connection temp data
-				serv.getSessionData().put(serv.SESSION_ID_KEY, id);
+				serv.getSessionData().put(XMPPIOService.SESSION_ID_KEY, id);
 				incoming.put(id, serv);
 
 				return "<stream:stream" + " xmlns:stream='http://etherx.jabber.org/streams'"
@@ -1109,7 +1149,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 		ServerConnections conns = new ServerConnections(this, cid);
 
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Creating a new ServerConnections instance: " + conns);
+			log.log(Level.FINEST, "Creating a new ServerConnections instance: {0}", conns);
 		}
 
 		if (packet != null) {
@@ -1128,7 +1168,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	}
 
 	/**
-	 * Mehtod <code>createServerConnection</code> is called only when a new
+	 * Method <code>createServerConnection</code> is called only when a new
 	 * connection is needed for any reason for given hostnames combination.
 	 *
 	 * @param cid a <code>String</code> s2s connection ID (localhost@remotehost)
@@ -1147,7 +1187,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 			? createNewServerConnections(cid, packet) : serv_conn);
 
 		sconn.setConnecting();
-		new ConnectionWatchdogTask(sconn, cid.getFromHost(), cid.getToHost());
+		new ConnectionWatchdogTask(sconn, cid.getLocalHost(), cid.getRemoteHost());
 
 		// Spawning a new thread for each new server connection is not the most
 		// optimal solution but I have no idea how to do it better and solve
@@ -1168,8 +1208,8 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	private void createServerConnectionInThread(CID cid, Packet packet,
 			ServerConnections serv_conn) {
 		ServerConnections conns = serv_conn;
-		String localhost = cid.getFromHost();
-		String remotehost = cid.getToHost();
+		String localhost = cid.getLocalHost();
+		String remotehost = cid.getRemoteHost();
 
 		if (openNewServerConnection(localhost, remotehost)) {
 

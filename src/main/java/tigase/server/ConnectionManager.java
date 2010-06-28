@@ -172,6 +172,14 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 	 */
 	public abstract Queue<Packet> processSocketData(IO serv);
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param port_props
+	 */
+	public abstract void reconnectionFailed(Map<String, Object> port_props);
+
 	//~--- get methods ----------------------------------------------------------
 
 	protected abstract long getMaxInactiveTime();
@@ -918,8 +926,9 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 
 				// Accept side for component service is not ready yet?
 				// Let's wait for a few secs and try again.
-				log.log(Level.FINEST, "Problem reconnecting the service: " + serv);
+				log.log(Level.FINEST, "Problem reconnecting the service: {0}", serv);
 
+				boolean reconnect = false;
 				Integer reconnects = (Integer) port_props.get(MAX_RECONNECTS_PROP_KEY);
 
 				if (reconnects != null) {
@@ -927,13 +936,14 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 
 					if (recon != 0) {
 						port_props.put(MAX_RECONNECTS_PROP_KEY, (--recon));
-						reconnectService(port_props, connectionDelay);
+						reconnect = true;
 					}    // end of if (recon != 0)
-				} else {
+				}
 
-					// System.out.println(port_props.toString());
-					// e.printStackTrace();
-					// serv.stop();
+				if (reconnect) {
+					reconnectService(port_props, connectionDelay);
+				} else {
+					reconnectionFailed(port_props);
 				}
 			} catch (Exception e) {
 				log.log(Level.WARNING, "Can not accept connection.", e);

@@ -142,7 +142,7 @@ public class PacketFilter {
 			// For all messages coming from the owner of this account set
 			// proper 'from' attribute. This is actually needed for the case
 			// when the user sends a message to himself.
-			if (session.getConnectionId().equals(packet.getFrom())) {
+			if (session.getConnectionId().equals(packet.getPacketFrom())) {
 				if ( !session.isAuthorized()) {
 
 					// We allow only certain packets here...
@@ -155,11 +155,13 @@ public class PacketFilter {
 										+ " can send any message or presence packet.", true));
 
 							if (log.isLoggable(Level.FINE)) {
-								log.fine("Packet received before the session has been authenticated."
-										+ "Session details: connectionId=" + session.getConnectionId()
-											+ ", sessionId=" + session.getSessionId() + ", ConnectionStatus="
-												+ session.getConnectionStatus() + ", packet="
-													+ packet.toStringSecure());
+								log.log(Level.FINE,
+										"Packet received before the session has been authenticated."
+										+ "Session details: connectionId="
+										+ "{0}, sessionId={1}, ConnectionStatus={2}, packet={3}", new Object[] {
+											session.getConnectionId(),
+										session.getSessionId(), session.getConnectionStatus(),
+										packet.toStringSecure() });
 							}
 
 							return true;
@@ -186,7 +188,7 @@ public class PacketFilter {
 						if ((packet.getStanzaFrom() == null)
 								||!from_jid.getBareJID().equals(packet.getStanzaFrom().getBareJID())) {
 							if (log.isLoggable(Level.FINEST)) {
-								log.finest("Setting correct from attribute: " + from_jid);
+								log.log(Level.FINEST, "Setting correct from attribute: {0}", from_jid);
 							}
 
 							// No need for the line below, initVars(...) takes care of that
@@ -194,13 +196,15 @@ public class PacketFilter {
 							packet.initVars(from_jid, packet.getStanzaTo());
 						} else {
 							if (log.isLoggable(Level.FINEST)) {
-								log.finest("Skipping setting correct from attribute: " + from_jid
-										+ ", is already correct.");
+								log.log(Level.FINEST,
+										"Skipping setting correct from attribute: {0}, is already correct.",
+											from_jid);
 							}
 						}
 					} else {
-						log.warning("Session is authenticated but session.getJid() is empty: "
-								+ packet.toStringSecure());
+						log.log(Level.WARNING,
+								"Session is authenticated but session.getJid() is empty: {0}",
+									packet.toStringSecure());
 					}
 				} else {
 
@@ -210,13 +214,14 @@ public class PacketFilter {
 								true));
 
 					if (log.isLoggable(Level.INFO)) {
-						log.info("Session details: connectionId=" + session.getConnectionId()
-								+ ", sessionId=" + session.getSessionId() + ", ConnectionStatus="
-									+ session.getConnectionStatus());
+						log.log(Level.INFO,
+								"Session details: connectionId={0}, sessionId={1}, ConnectionStatus={2}",
+									new Object[] { session.getConnectionId(),
+								session.getSessionId(), session.getConnectionStatus() });
 					}
 
 					if (log.isLoggable(Level.FINEST)) {
-						log.finest("Session more detais: JID=" + session.getjid());
+						log.log(Level.FINEST, "Session more detais: JID={0}", session.getjid());
 					}
 
 					return true;
@@ -226,8 +231,9 @@ public class PacketFilter {
 
 			// Ignore this packet
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Ignoring packet with an error to non-existen user session: "
-						+ packet.toStringSecure());
+				log.log(Level.FINEST,
+						"Ignoring packet with an error to non-existen user session: {0}",
+							packet.toStringSecure());
 			}
 		} catch (Exception e) {
 			log.log(Level.FINEST, "Packet preprocessing exception: ", e);
@@ -256,7 +262,7 @@ public class PacketFilter {
 		}    // end of if (session == null)
 
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Processing packet: " + packet.toStringSecure());
+			log.log(Level.FINEST, "Processing packet: {0}", packet.toStringSecure());
 		}
 
 		try {
@@ -273,7 +279,8 @@ public class PacketFilter {
 				}
 
 				if (log.isLoggable(Level.INFO)) {
-					log.info("No 'to' address, can't deliver packet: " + packet.toString());
+					log.log(Level.INFO, "No ''to'' address, can''t deliver packet: {0}",
+							packet.toString());
 				}
 
 				return false;
@@ -314,7 +321,8 @@ public class PacketFilter {
 					result.setPacketTo(session.getConnectionId(packet.getStanzaTo()));
 					results.offer(result);
 				} catch (NoConnectionIdException ex) {
-					log.warning("Packet to the server which hasn't been properly processed: " + packet);
+					log.log(Level.WARNING,
+							"Packet to the server which hasn''t been properly processed: {0}", packet);
 				}
 
 				return true;
@@ -337,9 +345,9 @@ public class PacketFilter {
 			try {
 				results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 						"You must authorize session first.", true));
-				log.info("NotAuthorizedException for packet: " + packet.toString());
+				log.log(Level.INFO, "NotAuthorizedException for packet: {0}", packet.toString());
 			} catch (PacketErrorTypeException e2) {
-				log.info("Packet processing exception: " + e2);
+				log.log(Level.INFO, "Packet processing exception: {0}", e2);
 			}
 		}    // end of try-catch
 

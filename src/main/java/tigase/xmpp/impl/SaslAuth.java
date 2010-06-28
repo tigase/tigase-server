@@ -126,12 +126,45 @@ public class SaslAuth extends XMPPProcessor implements XMPPProcessorIfc {
 	 * @param settings
 	 */
 	@SuppressWarnings({ "unchecked" })
+	@Override
 	public void process(final Packet packet, final XMPPResourceConnection session,
 			final NonAuthUserRepository repo, final Queue<Packet> results,
 				final Map<String, Object> settings) {
 		if (session == null) {
 			return;
 		}    // end of if (session == null)
+
+		if (session.isAuthorized()) {
+
+			// Multiple authentication attempts....
+//    // Another authentication request on already authenticated connection
+//    // This is not allowed and must be forbidden.
+//    Packet res = packet.sswapFromTo(createReply(ElementType.failure, "<not-authorized/>"));
+//
+//    // Make sure it gets delivered before stream close
+//    res.setPriority(Priority.SYSTEM);
+//    results.offer(res);
+//
+//    // Optionally close the connection to make sure there is no
+//    // confusion about the connection state.
+//    results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(), StanzaType.set,
+//        packet.getElemId()));
+//
+//    if (log.isLoggable(Level.FINEST)) {
+//      log.finest("Discovered second authentication attempt: " + session.toString()
+//          + ", packet: " + packet.toString());
+//    }
+//
+//    try {
+//      session.logout();
+//    } catch (NotAuthorizedException ex) {
+//      log.finer("Unsuccessful session logout: " + session.toString());
+//    }
+//
+//    if (log.isLoggable(Level.FINEST)) {
+//      log.finest("Session after logout: " + session.toString());
+//    }
+		}
 
 		Element request = packet.getElement();
 
@@ -150,7 +183,7 @@ public class SaslAuth extends XMPPProcessor implements XMPPProcessorIfc {
 			Object>) (session.getSessionData(XMLNS + "-authProps"));
 
 		if (authProps == null) {
-			authProps = new HashMap<String, Object>();
+			authProps = new HashMap<String, Object>(10, 0.75f);
 			authProps.put(UserAuthRepository.PROTOCOL_KEY, UserAuthRepository.PROTOCOL_VAL_SASL);
 			authProps.put(UserAuthRepository.MACHANISM_KEY,
 					request.getAttribute("/auth", "mechanism"));

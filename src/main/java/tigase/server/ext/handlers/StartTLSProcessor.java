@@ -26,13 +26,12 @@ package tigase.server.ext.handlers;
 
 import tigase.server.Packet;
 import tigase.server.ext.ComponentConnection;
+import tigase.server.ext.ComponentIOService;
 import tigase.server.ext.ComponentProtocolHandler;
 import tigase.server.ext.ExtProcessor;
 import tigase.server.ext.StreamOpenHandler;
 
 import tigase.xml.Element;
-
-import tigase.xmpp.XMPPIOService;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -84,7 +83,7 @@ public class StartTLSProcessor implements ExtProcessor {
 	 * @return
 	 */
 	@Override
-	public List<Element> getStreamFeatures(XMPPIOService<List<ComponentConnection>> serv,
+	public List<Element> getStreamFeatures(ComponentIOService serv,
 			ComponentProtocolHandler handler) {
 		if (serv.getSessionData().get(ID) != null) {
 			return null;
@@ -107,8 +106,8 @@ public class StartTLSProcessor implements ExtProcessor {
 	 * @return
 	 */
 	@Override
-	public boolean process(Packet p, XMPPIOService<List<ComponentConnection>> serv,
-			ComponentProtocolHandler handler, Queue<Packet> results) {
+	public boolean process(Packet p, ComponentIOService serv, ComponentProtocolHandler handler,
+			Queue<Packet> results) {
 		if (p.getElemName() == EL_NAME) {
 			serv.getSessionData().put(ID, ID);
 
@@ -147,14 +146,13 @@ public class StartTLSProcessor implements ExtProcessor {
 	 * @param results
 	 */
 	@Override
-	public void startProcessing(Packet p, XMPPIOService<List<ComponentConnection>> serv,
+	public void startProcessing(Packet p, ComponentIOService serv,
 			ComponentProtocolHandler handler, Queue<Packet> results) {
 		results.offer(Packet.packetInstance(new Element(EL_NAME, new String[] { "xmlns" },
 				new String[] { "urn:ietf:params:xml:ns:xmpp-tls" }), null, null));
 	}
 
-	private void initTLS(XMPPIOService<List<ComponentConnection>> serv, String data,
-			boolean client) {
+	private void initTLS(ComponentIOService serv, String data, boolean client) {
 		try {
 			serv.writeRawData(data);
 			Thread.sleep(10);

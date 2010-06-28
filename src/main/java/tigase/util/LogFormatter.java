@@ -19,13 +19,19 @@
  * Last modified by $Author$
  * $Date$
  */
+
 package tigase.util;
+
+//~--- JDK imports ------------------------------------------------------------
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+
 import java.util.Calendar;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
+
+//~--- classes ----------------------------------------------------------------
 
 /**
  * Describe class LogFormatter here.
@@ -37,50 +43,82 @@ import java.util.logging.LogRecord;
  * @version $Rev$
  */
 public class LogFormatter extends Formatter {
-
-  private Calendar cal = Calendar.getInstance();
 	private static int MED_LEN = 55;
 	private static int LEVEL_OFFSET = 12;
+
+	//~--- fields ---------------------------------------------------------------
+
+	private Calendar cal = Calendar.getInstance();
+
+	//~--- constructors ---------------------------------------------------------
 
 	/**
 	 * Creates a new <code>LogFormatter</code> instance.
 	 *
 	 */
-	public LogFormatter() {	}
+	public LogFormatter() {}
 
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param record
+	 *
+	 * @return
+	 */
+	@Override
 	public synchronized String format(LogRecord record) {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder(100);
+
 		cal.setTimeInMillis(record.getMillis());
 		sb.append(String.format("%1$tF %1$tT", cal));
+
 		if (record.getSourceClassName() != null) {
 			String clsName = record.getSourceClassName();
-			int idx = clsName.lastIndexOf(".");
+			int idx = clsName.lastIndexOf('.');
+
 			if (idx >= 0) {
 				clsName = clsName.substring(idx + 1);
-			} // end of if (idx >= 0)
-			sb.append("  " + clsName);
-		} // end of if (record.getSourceClassName() != null)
+			}    // end of if (idx >= 0)
+
+			sb.append("  ").append(clsName);
+		}      // end of if (record.getSourceClassName() != null)
+
 		if (record.getSourceMethodName() != null) {
-			sb.append("." + record.getSourceMethodName() + "()");
-		} // end of if (record.getSourceMethodName() != null)
+			sb.append(".").append(record.getSourceMethodName()).append("()");
+		}    // end of if (record.getSourceMethodName() != null)
+
 		while (sb.length() < MED_LEN) {
 			sb.append(' ');
-		} // end of while (sb.length() < MEDIUM_LEN)
-		sb.append("  " + record.getLevel() + ": ");
+		}    // end of while (sb.length() < MEDIUM_LEN)
+
+		sb.append("  ").append(record.getLevel()).append(": ");
+
 		while (sb.length() < MED_LEN + LEVEL_OFFSET) {
 			sb.append(' ');
-		} // end of while (sb.length() < MEDIUM_LEN)
-		sb.append(record.getMessage());
+		}    // end of while (sb.length() < MEDIUM_LEN)
+
+		sb.append(formatMessage(record));
+
 		if (record.getThrown() != null) {
-	    try {
+			try {
 				StringWriter sw = new StringWriter();
 				PrintWriter pw = new PrintWriter(sw);
+
 				record.getThrown().printStackTrace(pw);
 				pw.close();
 				sb.append(sw.toString());
-	    } catch (Exception ex) { }
+			} catch (Exception ex) {}
 		}
+
 		return sb.toString() + "\n";
 	}
+}    // LogFormatter
 
-} // LogFormatter
+
+//~ Formatted in Sun Code Convention
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

@@ -56,7 +56,7 @@ import java.util.logging.Logger;
  * @version $Rev$
  */
 public class ServerConnectionClustered extends ServerConnectionManager
-				implements ClusteredComponent {
+		implements ClusteredComponent {
 
 	/**
 	 * Variable <code>log</code> is a class logger.
@@ -107,7 +107,7 @@ public class ServerConnectionClustered extends ServerConnectionManager
 	@Override
 	public void processPacket(Packet packet) {
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Received packet: " + packet.toString());
+			log.log(Level.FINEST, "Received packet: {0}", packet.toString());
 		}
 
 		if ((packet.getElemName() == ClusterElement.CLUSTER_EL_NAME)
@@ -149,7 +149,7 @@ public class ServerConnectionClustered extends ServerConnectionManager
 
 	@Override
 	protected String getLocalDBKey(CID cid, String key, String forkey_sessionId,
-																 String asking_sessionId) {
+			String asking_sessionId) {
 		String local_key = super.getLocalDBKey(cid, key, forkey_sessionId, asking_sessionId);
 
 		if (local_key != null) {
@@ -166,10 +166,8 @@ public class ServerConnectionClustered extends ServerConnectionManager
 				params.put(ASKING_SESSION_ID, asking_sessionId);
 
 				Element result = ClusterElement.createClusterMethodCall(getComponentId().toString(),
-								cluster_node.toString(),
-								StanzaType.set,
-								ClusterMethods.CHECK_DB_KEY.toString(),
-								params).getClusterElement();
+					cluster_node.toString(), StanzaType.set, ClusterMethods.CHECK_DB_KEY.toString(),
+					params).getClusterElement();
 
 				addOutPacket(Packet.packetInstance(result, getComponentId(), cluster_node));
 			}
@@ -192,10 +190,8 @@ public class ServerConnectionClustered extends ServerConnectionManager
 					String key = clel.getMethodParam(KEY_P);
 					String forkey_sessionId = clel.getMethodParam(FORKEY_SESSION_ID);
 					String asking_sessionId = clel.getMethodParam(ASKING_SESSION_ID);
-					String local_key = super.getLocalDBKey(new CID(cid),
-									key,
-									forkey_sessionId,
-									asking_sessionId);
+					String local_key = super.getLocalDBKey(new CID(cid), key, forkey_sessionId,
+						asking_sessionId);
 					ClusterElement result = null;
 					boolean valid = false;
 
@@ -210,14 +206,15 @@ public class ServerConnectionClustered extends ServerConnectionManager
 
 						res_vals.put(VALID, "" + valid);
 						result = clel.createMethodResponse(getComponentId().toString(), StanzaType.result,
-																							 res_vals);
+								res_vals);
 					}
 
 					try {
 						addOutPacket(Packet.packetInstance(result.getClusterElement()));
 					} catch (TigaseStringprepException ex) {
-						log.warning("Cluster packet addressing problem, stringprep failed for: "
-												+ result.getClusterElement());
+						log.log(Level.WARNING,
+								"Cluster packet addressing problem, stringprep failed for: {0}",
+									result.getClusterElement());
 					}
 				}
 
@@ -233,15 +230,11 @@ public class ServerConnectionClustered extends ServerConnectionManager
 					String forkey_sessionId = clel.getMethodParam(FORKEY_SESSION_ID);
 					String asking_sessionId = clel.getMethodParam(ASKING_SESSION_ID);
 					boolean valid = "true".equals(clel.getMethodResultVal(VALID));
-					String from = cid.getFromHost();
-					String to = cid.getToHost();
+					String from = cid.getLocalHost();
+					String to = cid.getRemoteHost();
 
-					sendVerifyResult(from,
-													 to,
-													 forkey_sessionId,
-													 valid,
-													 getServerConnections(cid),
-													 asking_sessionId);
+					sendVerifyResult(from, to, forkey_sessionId, valid, getServerConnections(cid),
+							asking_sessionId);
 				}
 
 				break;
@@ -255,9 +248,8 @@ public class ServerConnectionClustered extends ServerConnectionManager
 
 				clel.addVisitedNode(from.toString());
 
-				Element result = ClusterElement.createForNextNode(clel,
-								cl_nodes_array,
-								getComponentId()).getClusterElement();
+				Element result = ClusterElement.createForNextNode(clel, cl_nodes_array,
+					getComponentId()).getClusterElement();
 
 				try {
 					addOutPacket(Packet.packetInstance(result));

@@ -31,9 +31,9 @@ package tigase.server.xmppserver;
  * @version $Rev$
  */
 public class CID {
-	private String fromHost = null;
 	private int hash = 3;
-	private String toHost = null;
+	private String localHost = null;
+	private String remoteHost = null;
 	private String to_string = null;
 
 	//~--- constructors ---------------------------------------------------------
@@ -47,8 +47,8 @@ public class CID {
 	public CID(String cid) {
 		String[] cid_a = cid.split("@");
 
-		this.fromHost = cid_a[0].intern();
-		this.toHost = cid_a[1].intern();
+		this.localHost = cid_a[0].intern();
+		this.remoteHost = cid_a[1].intern();
 		updateToString();
 	}
 
@@ -56,12 +56,13 @@ public class CID {
 	 * Constructs ...
 	 *
 	 *
-	 * @param fromHost
-	 * @param toHost
+	 *
+	 * @param localHost
+	 * @param remoteHost
 	 */
-	public CID(String fromHost, String toHost) {
-		this.fromHost = ((fromHost == null) ? null : fromHost.intern());
-		this.toHost = ((toHost == null) ? null : toHost.intern());
+	public CID(String localHost, String remoteHost) {
+		this.localHost = ((localHost == null) ? null : localHost.intern());
+		this.remoteHost = ((remoteHost == null) ? null : remoteHost.intern());
 		updateToString();
 	}
 
@@ -78,7 +79,7 @@ public class CID {
 	@Override
 	public boolean equals(Object o) {
 		if (o instanceof CID) {
-			return (fromHost == ((CID) o).fromHost) && (toHost == ((CID) o).toHost);
+			return (localHost == ((CID) o).localHost) && (remoteHost == ((CID) o).remoteHost);
 		} else {
 			return false;
 		}
@@ -92,8 +93,8 @@ public class CID {
 	 *
 	 * @return
 	 */
-	public String getFromHost() {
-		return fromHost;
+	public String getLocalHost() {
+		return localHost;
 	}
 
 	/**
@@ -102,8 +103,8 @@ public class CID {
 	 *
 	 * @return
 	 */
-	public String getToHost() {
-		return toHost;
+	public String getRemoteHost() {
+		return remoteHost;
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -131,9 +132,9 @@ public class CID {
 	}
 
 	private void updateToString() {
-		this.to_string = "" + this.fromHost + "@" + this.toHost;
-		hash = 47 * hash + ((this.fromHost != null) ? this.fromHost.hashCode() : 0);
-		hash = 47 * hash + ((this.toHost != null) ? this.toHost.hashCode() : 0);
+		this.to_string = "" + this.localHost + "@" + this.remoteHost;
+		hash = 47 * hash + ((this.localHost != null) ? this.localHost.hashCode() : 0);
+		hash = 47 * hash + ((this.remoteHost != null) ? this.remoteHost.hashCode() : 0);
 	}
 }
 

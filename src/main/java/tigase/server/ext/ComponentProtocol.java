@@ -49,7 +49,6 @@ import tigase.xml.Element;
 
 import tigase.xmpp.Authorization;
 import tigase.xmpp.PacketErrorTypeException;
-import tigase.xmpp.XMPPIOService;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -78,9 +77,8 @@ import javax.script.Bindings;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class ComponentProtocol
-		extends ConnectionManager<XMPPIOService<List<ComponentConnection>>>
-			implements ComponentProtocolHandler {
+public class ComponentProtocol extends ConnectionManager<ComponentIOService>
+		implements ComponentProtocolHandler {
 
 	/**
 	 * Variable <code>log</code> is a class logger.
@@ -202,10 +200,10 @@ public class ComponentProtocol
 	 * @param serv
 	 */
 	@Override
-	public void authenticated(XMPPIOService<List<ComponentConnection>> serv) {
+	public void authenticated(ComponentIOService serv) {
 		serv.setAuthenticated(true);
 
-		String hostname = (String) serv.getSessionData().get(XMPPIOService.HOSTNAME_KEY);
+		String hostname = (String) serv.getSessionData().get(ComponentIOService.HOSTNAME_KEY);
 
 		bindHostname(hostname, serv);
 
@@ -231,8 +229,7 @@ public class ComponentProtocol
 	 * @param packet
 	 */
 	@Override
-	public void authenticationFailed(XMPPIOService<List<ComponentConnection>> serv,
-			Packet packet) {
+	public void authenticationFailed(ComponentIOService serv, Packet packet) {
 		writePacketToSocket(serv, packet);
 
 		Integer fails = (Integer) serv.getSessionData().get("auth-fails");
@@ -256,7 +253,7 @@ public class ComponentProtocol
 	 * @param serv
 	 */
 	@Override
-	public void bindHostname(String hostname, XMPPIOService<List<ComponentConnection>> serv) {
+	public void bindHostname(String hostname, ComponentIOService serv) {
 		String[] routings = new String[] { hostname, ".*@" + hostname, ".*\\." + hostname };
 
 		if (serv.connectionType() == ConnectionType.connect) {
@@ -409,7 +406,7 @@ public class ComponentProtocol
 	 * @return
 	 */
 	@Override
-	public List<Element> getStreamFeatures(XMPPIOService<List<ComponentConnection>> serv) {
+	public List<Element> getStreamFeatures(ComponentIOService serv) {
 		List<Element> results = new LinkedList<Element>();
 
 		for (ExtProcessor proc : processors.values()) {
@@ -480,7 +477,7 @@ public class ComponentProtocol
 	 * @return
 	 */
 	@Override
-	public Queue<Packet> processSocketData(XMPPIOService<List<ComponentConnection>> serv) {
+	public Queue<Packet> processSocketData(ComponentIOService serv) {
 		Packet p = null;
 		Queue<Packet> results = new ArrayDeque<Packet>();
 
@@ -553,10 +550,22 @@ public class ComponentProtocol
 	 * Method description
 	 *
 	 *
+	 * @param port_props
+	 */
+	@Override
+	public void reconnectionFailed(Map<String, Object> port_props) {
+
+		// TODO: handle this somehow
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
 	 * @param serv
 	 */
 	@Override
-	public void serviceStarted(XMPPIOService<List<ComponentConnection>> serv) {
+	public void serviceStarted(ComponentIOService serv) {
 		super.serviceStarted(serv);
 		addTimerTask(new AuthenticationTimer(serv), authenticationTimeOut, TimeUnit.SECONDS);
 
@@ -597,12 +606,12 @@ public class ComponentProtocol
 	 * @return
 	 */
 	@Override
-	public boolean serviceStopped(XMPPIOService<List<ComponentConnection>> service) {
+	public boolean serviceStopped(ComponentIOService service) {
 		boolean result = super.serviceStopped(service);
 
 		if (result) {
 			Map<String, Object> sessionData = service.getSessionData();
-			String hostname = (String) sessionData.get(XMPPIOService.HOSTNAME_KEY);
+			String hostname = (String) sessionData.get(ComponentIOService.HOSTNAME_KEY);
 
 			if ((hostname != null) &&!hostname.isEmpty()) {
 				List<ComponentConnection> conns = service.getRefObject();
@@ -729,7 +738,7 @@ public class ComponentProtocol
 	 * @param serv
 	 */
 	@Override
-	public void unbindHostname(String hostname, XMPPIOService<List<ComponentConnection>> serv) {
+	public void unbindHostname(String hostname, ComponentIOService serv) {
 		ArrayList<ComponentConnection> conns = connections.get(hostname);
 
 		if (conns != null) {
@@ -761,7 +770,7 @@ public class ComponentProtocol
 	 * @return
 	 */
 	@Override
-	public boolean writePacketToSocket(XMPPIOService<List<ComponentConnection>> ios, Packet p) {
+	public boolean writePacketToSocket(ComponentIOService ios, Packet p) {
 
 //  String xmlns = (String)ios.getSessionData().get("xmlns");
 //  if (xmlns != null) {
@@ -779,7 +788,7 @@ public class ComponentProtocol
 	 * @param serv
 	 */
 	@Override
-	public void xmppStreamClosed(XMPPIOService<List<ComponentConnection>> serv) {}
+	public void xmppStreamClosed(ComponentIOService serv) {}
 
 	/**
 	 * Method description
@@ -791,8 +800,7 @@ public class ComponentProtocol
 	 * @return
 	 */
 	@Override
-	public String xmppStreamOpened(XMPPIOService<List<ComponentConnection>> serv,
-			Map<String, String> attribs) {
+	public String xmppStreamOpened(ComponentIOService serv, Map<String, String> attribs) {
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Stream opened: " + serv.getRemoteAddress() + ", xmlns: "
 					+ attribs.get("xmlns") + ", type: " + serv.connectionType().toString()
@@ -831,20 +839,20 @@ public class ComponentProtocol
 	}
 
 	@Override
-	protected XMPPIOService<List<ComponentConnection>> getXMPPIOService(Packet p) {
+	protected ComponentIOService getXMPPIOService(Packet p) {
 		if (p.getStanzaTo() == null) {
 
 			// This is a bad packet actually
 			return null;
 		}
 
-		XMPPIOService<List<ComponentConnection>> result = null;
+		ComponentIOService result = null;
 		String hostname = p.getStanzaTo().getDomain();
 		ArrayList<ComponentConnection> conns = connections.get(hostname);
 
 		if (conns != null) {
 			for (ComponentConnection componentConnection : conns) {
-				XMPPIOService<List<ComponentConnection>> serv = componentConnection.getService();
+				ComponentIOService serv = componentConnection.getService();
 
 				if (serv != null) {
 					if (serv.isConnected()) {
@@ -868,8 +876,8 @@ public class ComponentProtocol
 	}
 
 	@Override
-	protected XMPPIOService<List<ComponentConnection>> getXMPPIOServiceInstance() {
-		return new XMPPIOService<List<ComponentConnection>>();
+	protected ComponentIOService getXMPPIOServiceInstance() {
+		return new ComponentIOService();
 	}
 
 	@Override
@@ -879,8 +887,7 @@ public class ComponentProtocol
 
 	//~--- methods --------------------------------------------------------------
 
-	private synchronized void addComponentConnection(String hostname,
-			XMPPIOService<List<ComponentConnection>> s) {
+	private synchronized void addComponentConnection(String hostname, ComponentIOService s) {
 		ComponentConnection conn = new ComponentConnection(hostname, s);
 		List<ComponentConnection> refObject = s.getRefObject();
 
@@ -929,7 +936,7 @@ public class ComponentProtocol
 			}
 
 			for (ComponentConnection compCon : conns) {
-				XMPPIOService<List<ComponentConnection>> serv = compCon.getService();
+				ComponentIOService serv = compCon.getService();
 
 				if ((serv != null) && serv.isConnected()) {
 
@@ -989,11 +996,11 @@ public class ComponentProtocol
 	//~--- inner classes --------------------------------------------------------
 
 	private class AuthenticationTimer extends TimerTask {
-		private XMPPIOService<List<ComponentConnection>> serv = null;
+		private ComponentIOService serv = null;
 
 		//~--- constructors -------------------------------------------------------
 
-		private AuthenticationTimer(XMPPIOService<List<ComponentConnection>> serv) {
+		private AuthenticationTimer(ComponentIOService serv) {
 			this.serv = serv;
 		}
 

@@ -335,10 +335,10 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 	}
 
 	/**
-	 * Method description
+	 * Returns a remote IP address for the TCP/IP connection.
 	 *
 	 *
-	 * @return
+	 * @return a remote IP address for the TCP/IP connection.
 	 */
 	public String getRemoteAddress() {
 		return remote_address;

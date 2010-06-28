@@ -69,7 +69,6 @@ public class XMPPIOService<RefObject> extends IOService<RefObject> {
 	private XMPPDomBuilderHandler<RefObject> domHandler = null;
 	protected SimpleParser parser = SingletonFactory.getParserInstance();
 	private XMPPIOServiceListener serviceListener = null;
-	private boolean authenticated = false;
 
 	/**
 	 * The <code>waitingPackets</code> queue keeps data which have to be processed.
@@ -139,16 +138,6 @@ public class XMPPIOService<RefObject> extends IOService<RefObject> {
 		return this.xmlns;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public boolean isAuthenticated() {
-		return authenticated;
-	}
-
 	//~--- methods --------------------------------------------------------------
 
 	/**
@@ -174,16 +163,6 @@ public class XMPPIOService<RefObject> extends IOService<RefObject> {
 	}
 
 	//~--- set methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param authenticated
-	 */
-	public void setAuthenticated(boolean authenticated) {
-		this.authenticated = authenticated;
-	}
 
 	/**
 	 * Method description

@@ -420,6 +420,18 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 	 * Method description
 	 *
 	 *
+	 * @param port_props
+	 */
+	@Override
+	public void reconnectionFailed(Map<String, Object> port_props) {
+
+		// TODO: handle this somehow
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
 	 * @param serv
 	 */
 	@Override

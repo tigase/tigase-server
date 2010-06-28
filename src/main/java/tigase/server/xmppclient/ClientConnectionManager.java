@@ -303,6 +303,17 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	 * Method description
 	 *
 	 *
+	 * @param port_props
+	 */
+	@Override
+	public void reconnectionFailed(Map<String, Object> port_props) {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
 	 * @param service
 	 *
 	 * @return
@@ -409,7 +420,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	@Override
 	public void xmppStreamClosed(XMPPIOService<Object> serv) {
 		if (log.isLoggable(Level.FINER)) {
-			log.finer("Stream closed: " + serv.getUniqueId());
+			log.log(Level.FINER, "Stream closed: {0}", serv.getUniqueId());
 		}
 
 		// It might be a Bosh service in which case it is ignored here.
@@ -425,10 +436,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 				// In case of mass-disconnects, adjust the timeout properly
 				addOutPacketWithTimeout(command, stoppedHandler, 120l, TimeUnit.SECONDS);
-
-				if (log.isLoggable(Level.FINE)) {
-					log.fine("Service stopped, sending packet: " + command);
-				}
+				log.log(Level.FINE, "Service stopped, sending packet: {0}", command);
 
 				// // For testing only.
 				// System.out.println("Service stopped: " + service.getUniqueId());
@@ -437,9 +445,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 //      System.out.println("Service stopped: " + service.getUniqueId());
 //      Thread.dumpStack();
 			} else {
-				if (log.isLoggable(Level.FINE)) {
-					log.fine("Service stopped, before stream:stream received");
-				}
+				log.fine("Service stopped, before stream:stream received");
 			}
 
 			serv.stop();
@@ -457,9 +463,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	 */
 	@Override
 	public String xmppStreamOpened(XMPPIOService<Object> serv, Map<String, String> attribs) {
-		if (log.isLoggable(Level.FINER)) {
-			log.finer("Stream opened: " + attribs.toString());
-		}
+		log.log(Level.FINER, "Stream opened: {0}", attribs);
 
 		final String hostname = attribs.get("to");
 		String lang = attribs.get("xml:lang");

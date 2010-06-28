@@ -769,12 +769,16 @@ public class Packet {
 
 		if (tmp != null) {
 			stanzaTo = JID.jidInstance(tmp);
+		} else {
+			stanzaTo = null;
 		}
 
 		tmp = elem.getAttribute("from");
 
 		if (tmp != null) {
 			stanzaFrom = JID.jidInstance(tmp);
+		} else {
+			stanzaFrom = null;
 		}
 
 		stanzaId = elem.getAttribute("id");

@@ -254,6 +254,9 @@ public interface Configurable extends ServerComponent {
 	public static final String DEF_SM_NAME = "sess-man";
 
 	/** Field description */
+	public static final String DEF_MONITOR_NAME = "monitor";
+
+	/** Field description */
 	public static final String DEF_C2S_NAME = "c2s";
 
 	/** Field description */
@@ -299,11 +302,11 @@ public interface Configurable extends ServerComponent {
 
 	/** Field description */
 	public static final String S2S_COMP_CLASS_NAME =
-		"tigase.server.xmppserver.ServerConnectionManager";
+		"tigase.server.xmppserver.S2SConnectionManager";
 
 	/** Field description */
 	public static final String S2S_CLUST_COMP_CLASS_NAME =
-		"tigase.cluster.ServerConnectionClustered";
+		"tigase.cluster.S2SConnectionClustered";
 
 	/** Field description */
 	public static final String SM_COMP_CLASS_NAME = "tigase.server.xmppsession.SessionManager";
@@ -315,6 +318,9 @@ public interface Configurable extends ServerComponent {
 	/** Field description */
 	public static final String EXT_COMP_CLASS_NAME =
 		"tigase.server.xmppcomponent.ComponentConnectionManager";
+
+	/** Field description */
+	public static final String MONITOR_CLASS_NAME = "tigase.server.monitor.MonitorComponent";
 
 	/** Field description */
 	public static final String COMP_PROT_CLASS_NAME = "tigase.server.ext.ComponentProtocol";
