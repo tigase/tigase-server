@@ -125,6 +125,16 @@ public class S2SConnection implements Comparable<S2SConnection> {
 	 *
 	 * @return
 	 */
+	public int getWaitingControlCount() {
+		return waitingControlPackets.size();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
 	public boolean isConnected() {
 		return (service != null) && service.isConnected();
 	}

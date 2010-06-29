@@ -32,8 +32,6 @@ import tigase.server.Packet;
 import tigase.util.DNSEntry;
 import tigase.util.DNSResolver;
 
-import tigase.xml.Element;
-
 import tigase.xmpp.Authorization;
 import tigase.xmpp.PacketErrorTypeException;
 
@@ -69,10 +67,12 @@ public class CIDConnections {
 
 	private CID cid = null;
 	private S2SConnectionSelector connectionSelector = null;
+	private long firstWaitingTime = 0;
 	private ConnectionHandlerIfc<S2SIOService> handler = null;
 	private int max_in_conns = 4;
 	private int max_out_conns = 4;
 	private int max_out_conns_per_ip = 2;
+	private long max_waiting_time = 15 * 60 * 1000;
 	private ReentrantLock outgoingOpenInProgress = new ReentrantLock();
 	private ReentrantLock sendInProgress = new ReentrantLock();
 	private Set<S2SConnection> outgoing_handshaking = new ConcurrentSkipListSet<S2SConnection>();
@@ -97,15 +97,18 @@ public class CIDConnections {
 	 * @param maxInConns
 	 * @param maxOutConns
 	 * @param maxOutConnsPerIP
+	 * @param max_waiting_time
 	 */
 	public CIDConnections(CID cid, ConnectionHandlerIfc<S2SIOService> handler,
-			S2SConnectionSelector selector, int maxInConns, int maxOutConns, int maxOutConnsPerIP) {
+			S2SConnectionSelector selector, int maxInConns, int maxOutConns, int maxOutConnsPerIP,
+				long max_waiting_time) {
 		this.cid = cid;
 		this.handler = handler;
 		this.connectionSelector = selector;
 		this.max_in_conns = maxInConns;
 		this.max_out_conns = maxOutConns;
 		this.max_out_conns_per_ip = maxOutConnsPerIP;
+		this.max_waiting_time = max_waiting_time;
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -146,12 +149,15 @@ public class CIDConnections {
 			log.log(Level.FINER, "{0}, connection is authenticated.", serv);
 		}
 
-		S2SConnection s2s_conn = serv.getS2SConnection();
-
-		outgoing_handshaking.remove(s2s_conn);
-		outgoing.add(s2s_conn);
 		serv.addCID(cid);
-		sendPacket(null);
+
+		if (serv.connectionType() == ConnectionType.connect) {
+			S2SConnection s2s_conn = serv.getS2SConnection();
+
+			outgoing_handshaking.remove(s2s_conn);
+			outgoing.add(s2s_conn);
+			sendPacket(null);
+		}
 	}
 
 	/**
@@ -228,6 +234,16 @@ public class CIDConnections {
 	 *
 	 * @return
 	 */
+	public int getDBKeysCount() {
+		return dbKeys.size();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
 	public int getIncomingCount() {
 		int result = 0;
 
@@ -282,6 +298,24 @@ public class CIDConnections {
 	 * Method description
 	 *
 	 *
+	 * @return
+	 */
+	public int getOutgoingHandshakingCount() {
+		int result = 0;
+
+		for (S2SConnection s2SConnection : outgoing_handshaking) {
+			if (s2SConnection.isConnected()) {
+				++result;
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
 	 * @param sessionId
 	 *
 	 * @return
@@ -318,6 +352,40 @@ public class CIDConnections {
 		}
 
 		return s2s_conn;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public int getWaitingControlCount() {
+		int result = 0;
+
+		for (S2SConnection s2sc : incoming) {
+			result += s2sc.getWaitingControlCount();
+		}
+
+		for (S2SConnection s2sc : outgoing) {
+			result += s2sc.getWaitingControlCount();
+		}
+
+		for (S2SConnection s2sc : outgoing_handshaking) {
+			result += s2sc.getWaitingControlCount();
+		}
+
+		return result;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public int getWaitingCount() {
+		return waitingPackets.size();
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -436,6 +504,10 @@ public class CIDConnections {
 
 		if (packet != null) {
 			waitingPackets.offer(packet);
+
+			if (firstWaitingTime == 0) {
+				firstWaitingTime = System.currentTimeMillis();
+			}
 		}
 
 		if (sendInProgress.tryLock()) {
@@ -553,6 +625,13 @@ public class CIDConnections {
 				}
 			}
 
+			if (firstWaitingTime + max_waiting_time <= System.currentTimeMillis()) {
+				sendPacketsBack();
+				firstWaitingTime = 0;
+
+				return;
+			}
+
 			int all_outgoing = outgoing.size() + outgoing_handshaking.size();
 
 			if (all_outgoing >= max_out_conns) {
@@ -581,18 +660,21 @@ public class CIDConnections {
 			}
 		} catch (UnknownHostException ex) {
 			log.log(Level.INFO, "Remote host not found: " + cid.getRemoteHost(), ex);
+			sendPacketsBack();
+		}
+	}
 
-			Packet p = null;
+	private void sendPacketsBack() {
+		Packet p = null;
 
-			while ((p = waitingPackets.poll()) != null) {
-				try {
-					handler.addOutPacket(Authorization.REMOTE_SERVER_NOT_FOUND.getResponseMessage(p,
-							"S2S - destination host not found", true));
-				} catch (PacketErrorTypeException e) {
-					log.log(Level.WARNING, "Packet: {0} processing exception: {1}",
-							new Object[] { p.toString(),
-							e });
-				}
+		while ((p = waitingPackets.poll()) != null) {
+			try {
+				handler.addOutPacket(Authorization.REMOTE_SERVER_NOT_FOUND.getResponseMessage(p,
+						"S2S - destination host not found", true));
+			} catch (PacketErrorTypeException e) {
+				log.log(Level.WARNING, "Packet: {0} processing exception: {1}",
+						new Object[] { p.toString(),
+						e });
 			}
 		}
 	}

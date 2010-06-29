@@ -104,7 +104,7 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 	public static final int MAX_OUT_TOTAL_CONNECTIONS_PROP_VAL = 4;
 
 	/** Field description */
-	public static final int MAX_OUT_PER_IP_CONNECTIONS_PROP_VAL = 2;
+	public static final int MAX_OUT_PER_IP_CONNECTIONS_PROP_VAL = 1;
 
 	/** Field description */
 	public static final long MAX_PACKET_WAITING_TIME_PROP_VAL = 7 * MINUTE;
@@ -210,6 +210,46 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 	@Override
 	public void getStatistics(StatisticsList list) {
 		super.getStatistics(list);
+		list.add(getName(), "CIDs number", cidConnections.size(), Level.INFO);
+
+		if (list.checkLevel(Level.FINEST)) {
+			long total_outgoing = 0;
+			long total_outgoing_handshaking = 0;
+			long total_incoming = 0;
+			long total_dbKeys = 0;
+			long total_waiting = 0;
+			long total_waiting_control = 0;
+
+			for (Map.Entry<CID, CIDConnections> cid_conn : cidConnections.entrySet()) {
+				int outgoing = cid_conn.getValue().getOutgoingCount();
+				int outgoing_handshaking = cid_conn.getValue().getOutgoingHandshakingCount();
+				int incoming = cid_conn.getValue().getIncomingCount();
+				int dbKeys = cid_conn.getValue().getDBKeysCount();
+				int waiting = cid_conn.getValue().getWaitingCount();
+				int waiting_control = cid_conn.getValue().getWaitingControlCount();
+
+				log.log(Level.FINEST,
+						"CID: {0}, OUT: {1}, OUT_HAND: {2}, IN: {3}, dbKeys: {4}, "
+							+ "waiting: {5}, waiting_control: {6}", new Object[] {
+					cid_conn.getKey(), outgoing, outgoing_handshaking, incoming, dbKeys, waiting,
+					waiting_control
+				});
+				total_outgoing += outgoing;
+				total_outgoing_handshaking += outgoing_handshaking;
+				total_incoming += incoming;
+				total_dbKeys += dbKeys;
+				total_waiting += waiting;
+				total_waiting_control += waiting_control;
+			}
+
+			list.add(getName(), "Total outgoing", total_outgoing, Level.FINEST);
+			list.add(getName(), "Total outgoing handshaking", total_outgoing_handshaking,
+					Level.FINEST);
+			list.add(getName(), "Total incoming", total_incoming, Level.FINEST);
+			list.add(getName(), "Total DB keys", total_dbKeys, Level.FINEST);
+			list.add(getName(), "Total waiting", total_waiting, Level.FINEST);
+			list.add(getName(), "Total control waiting", total_waiting_control, Level.FINEST);
+		}
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -768,7 +808,7 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 
 	private CIDConnections createNewCIDConnections(CID cid) {
 		CIDConnections cid_conns = new CIDConnections(cid, this, connSelector, maxINConnections,
-			maxOUTTotalConnections, maxOUTPerIPConnections);
+			maxOUTTotalConnections, maxOUTPerIPConnections, maxPacketWaitingTime);
 
 		cidConnections.put(cid, cid_conns);
 
