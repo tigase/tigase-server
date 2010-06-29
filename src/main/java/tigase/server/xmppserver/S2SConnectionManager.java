@@ -168,9 +168,9 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> props = super.getDefaults(params);
 
-		props.put(MAX_PACKET_WAITING_TIME_PROP_KEY, MAX_PACKET_WAITING_TIME_PROP_VAL);
+		props.put(MAX_PACKET_WAITING_TIME_PROP_KEY, MAX_PACKET_WAITING_TIME_PROP_VAL / SECOND);
 		props.put(MAX_CONNECTION_INACTIVITY_TIME_PROP_KEY,
-				MAX_CONNECTION_INACTIVITY_TIME_PROP_VAL);
+				MAX_CONNECTION_INACTIVITY_TIME_PROP_VAL / SECOND);
 		props.put(MAX_INCOMING_CONNECTIONS_PROP_KEY, MAX_INCOMING_CONNECTIONS_PROP_VAL);
 		props.put(MAX_OUT_TOTAL_CONNECTIONS_PROP_KEY, MAX_OUT_TOTAL_CONNECTIONS_PROP_VAL);
 		props.put(MAX_OUT_PER_IP_CONNECTIONS_PROP_KEY, MAX_OUT_PER_IP_CONNECTIONS_PROP_VAL);
@@ -554,8 +554,8 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 	@Override
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
-		maxPacketWaitingTime = (Long) props.get(MAX_PACKET_WAITING_TIME_PROP_KEY);
-		maxInactivityTime = (Long) props.get(MAX_CONNECTION_INACTIVITY_TIME_PROP_KEY);
+		maxPacketWaitingTime = (Long) props.get(MAX_PACKET_WAITING_TIME_PROP_KEY) * SECOND;
+		maxInactivityTime = (Long) props.get(MAX_CONNECTION_INACTIVITY_TIME_PROP_KEY) * SECOND;
 		maxOUTTotalConnections = (Integer) props.get(MAX_OUT_TOTAL_CONNECTIONS_PROP_KEY);
 		maxOUTPerIPConnections = (Integer) props.get(MAX_OUT_PER_IP_CONNECTIONS_PROP_KEY);
 		maxINConnections = (Integer) props.get(MAX_INCOMING_CONNECTIONS_PROP_KEY);
