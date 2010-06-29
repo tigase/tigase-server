@@ -43,6 +43,7 @@ import java.util.logging.Logger;
 public class S2SIOService extends XMPPIOService<Object> {
 	private static final Logger log = Logger.getLogger(S2SIOService.class.getName());
 	protected static final String S2S_CONNECTION_KEY = "s2s-connection-key";
+	protected static final String HANDSHAKING_ONLY_KEY = "handshaking-only-key";
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -50,7 +51,6 @@ public class S2SIOService extends XMPPIOService<Object> {
 	private String dbKey = null;
 	private S2SConnection s2s_conn = null;
 	private String session_id = null;
-	private boolean handshakingOnly = false;
 
 ///**
 // * This structure keeps a set of domains which are authorized to send or
@@ -77,7 +77,7 @@ public class S2SIOService extends XMPPIOService<Object> {
 //}
 
 	/**
-	 * Method description
+	 * Adds another connection id (CID) to the authenticated list for this connection
 	 *
 	 *
 	 * @param cid
@@ -116,6 +116,16 @@ public class S2SIOService extends XMPPIOService<Object> {
 	 */
 	public S2SConnection getS2SConnection() {
 		return s2s_conn;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public String getSessionId() {
+		return session_id;
 	}
 
 ///**
@@ -159,7 +169,7 @@ public class S2SIOService extends XMPPIOService<Object> {
 	 * @return
 	 */
 	public boolean isHandshakingOnly() {
-		return handshakingOnly;
+		return getSessionData().get(HANDSHAKING_ONLY_KEY) != null;
 	}
 
 	//~--- set methods ----------------------------------------------------------
@@ -178,15 +188,21 @@ public class S2SIOService extends XMPPIOService<Object> {
 	 * Method description
 	 *
 	 *
+	 * @param s2s_conn
+	 */
+	public void setS2SConnection(S2SConnection s2s_conn) {
+		this.s2s_conn = s2s_conn;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
 	 *
 	 * @param session_id
 	 */
 	public void setSessionId(String session_id) {
 		this.session_id = session_id;
-	}
-
-	void setS2SConnection(S2SConnection s2s_conn) {
-		this.s2s_conn = s2s_conn;
 	}
 }
 

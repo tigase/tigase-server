@@ -36,7 +36,9 @@ import tigase.util.Algorithms;
 import tigase.xml.Element;
 
 import tigase.xmpp.Authorization;
+import tigase.xmpp.JID;
 import tigase.xmpp.PacketErrorTypeException;
+import tigase.xmpp.StanzaType;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -69,8 +71,8 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 	private static final String XMLNS_DB_VAL = "jabber:server:dialback";
 	private static final String RESULT_EL_NAME = "result";
 	private static final String VERIFY_EL_NAME = "verify";
-	private static final String DB_RESULT_EL_NAME = "db:result";
-	private static final String DB_VERIFY_EL_NAME = "db:verify";
+	protected static final String DB_RESULT_EL_NAME = "db:result";
+	protected static final String DB_VERIFY_EL_NAME = "db:verify";
 	private static final String XMLNS_DB_ATT = "xmlns:db";
 
 	/** Field description */
@@ -441,8 +443,6 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 					log.log(Level.FINEST, "{0}, sending: {1}", new Object[] { serv, data });
 				}
 
-				serv.xmppStreamOpen(data);
-
 				S2SConnection s2s_conn =
 					(S2SConnection) serv.getSessionData().get(S2SIOService.S2S_CONNECTION_KEY);
 
@@ -454,6 +454,8 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 					s2s_conn.setS2SIOService(serv);
 					serv.setS2SConnection(s2s_conn);
 				}
+
+				serv.xmppStreamOpen(data);
 
 				break;
 
@@ -626,14 +628,14 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 				}    // end of try-catch
 
 				serv.setDBKey(key);
-				cid_conns.addDBKey(key);
+				cid_conns.addDBKey(remote_id, key);
 
 				if ( !serv.isHandshakingOnly()) {
-					Element elem = new Element(DB_RESULT_EL_NAME, key, new String[] { "from", "to",
-							XMLNS_DB_ATT }, new String[] { cid.getLocalHost(), cid.getRemoteHost(),
-							XMLNS_DB_VAL });
+					Element elem = new Element(DB_RESULT_EL_NAME, key, new String[] { XMLNS_DB_ATT },
+						new String[] { XMLNS_DB_VAL });
 
-					serv.getS2SConnection().addControlPacket(Packet.packetInstance(elem, null, null));
+					serv.getS2SConnection().addControlPacket(Packet.packetInstance(elem,
+							JID.jidInstanceNS(cid.getLocalHost()), JID.jidInstanceNS(cid.getRemoteHost())));
 				}
 
 				serv.getS2SConnection().sendAllControlPackets();
@@ -696,6 +698,13 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 		return new int[] { 5269 };
 	}
 
+	protected String getLocalDBKey(CID cid, String key, String key_sessionId,
+			String asking_sessionId) {
+		CIDConnections cid_conns = getCIDConnections(cid);
+
+		return (cid_conns == null) ? null : cid_conns.getDBKey(key_sessionId);
+	}
+
 	@Override
 	protected long getMaxInactiveTime() {
 		return maxInactivityTime;
@@ -712,6 +721,24 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 	}
 
 	//~--- methods --------------------------------------------------------------
+
+	protected boolean sendVerifyResult(String elem_name, CID cid, boolean valid,
+			String key_sessionId, String serv_sessionId) {
+		CIDConnections cid_conns = getCIDConnections(cid);
+
+		if (cid_conns != null) {
+			Packet verify_valid = getValidResponse(elem_name, cid, key_sessionId, valid, null);
+
+			return cid_conns.sendControlPacket(serv_sessionId, verify_valid);
+		} else {
+			if (log.isLoggable(Level.FINE)) {
+				log.log(Level.FINE,
+						"Can''t find CID connections for cid: {0}, can't send verify response.", cid);
+			}
+		}
+
+		return false;
+	}
 
 	private boolean checkPacket(Packet p, S2SIOService serv) {
 		if ((p.getStanzaFrom() == null) || (p.getStanzaTo() == null)) {
@@ -783,31 +810,53 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 		return new CID(localhost, remotehost);
 	}
 
-	private Element getValidResponse(String elem_name, Packet packet) {
-		Element elem = new Element(elem_name, new String[] { "from", "to", "type" },
-			new String[] { packet.getStanzaTo().toString(),
-				packet.getStanzaFrom().toString(), "valid" });
+	private Packet getValidResponse(String elem_name, CID cid, String id, Boolean valid,
+			String cdata) {
+		Element elem = new Element(elem_name);
 
-		if (packet.getStanzaId() != null) {
-			elem.addAttribute("id", packet.getStanzaId());
+		if (cdata != null) {
+			elem.setCData(cdata);
 		}
 
-		return elem;
+		if (valid != null) {
+			if (valid.booleanValue()) {
+				elem.addAttribute("type", "valid");
+			} else {
+				elem.addAttribute("type", "invalid");
+			}
+		}
+
+		if (id != null) {
+			elem.addAttribute("id", id);
+		}
+
+		Packet result = Packet.packetInstance(elem, JID.jidInstanceNS(cid.getLocalHost()),
+			JID.jidInstanceNS(cid.getRemoteHost()));
+
+		return result;
 	}
 
 	//~--- methods --------------------------------------------------------------
 
 	private void processDialback(Packet p, S2SIOService serv) {
-		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "{0}, DIALBACK - {1}", new Object[] { serv, p });
-		}
 
 		// Get the cid for which the connection has been created, the cid calculated
 		// from the packet may be different though if the remote server tries to multiplexing
 		CID cid = (CID) serv.getSessionData().get("cid");
+
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "{0}, DIALBACK packet: {1}, CID: {2}", new Object[] { serv, p,
+					cid });
+		}
+
 		CIDConnections cid_conns = getCIDConnections(cid);
 
+		// Some servers (ejabberd) do not send from/to attributes in the stream:open which
+		// violates the spec, they seem not to care though, so here we handle the case.
 		if (cid == null) {
+
+			// This actually can only happen for 'accept' connection type
+			// what we did not get in stream open we can get from here
 			cid = getConnectionId(p.getStanzaTo().getDomain(), p.getStanzaFrom().getDomain());
 			cid_conns = getCIDConnections(cid);
 
@@ -839,30 +888,57 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 			return;
 		}
 
+		String remote_key = p.getElemCData();
+
 		// Dummy dialback implementation for now....
 		if ((p.getElemName() == RESULT_EL_NAME) || (p.getElemName() == DB_RESULT_EL_NAME)) {
 			if (p.getType() == null) {
-				Element valid_result = getValidResponse(DB_RESULT_EL_NAME, p);
+				String conn_sessionId = serv.getSessionId();
+				Packet verify_req = this.getValidResponse(DB_VERIFY_EL_NAME, cid, conn_sessionId,
+					null, p.getElemCData());
 
-				writeRawData(serv, valid_result.toString());
-				serv.addCID(getConnectionId(p.getStanzaTo().getDomain(),
-						p.getStanzaFrom().getDomain()));
+				cid_conns.sendHandshakingOnly(verify_req);
 			} else {
-				serv.addCID(getConnectionId(p.getStanzaTo().getDomain(),
-						p.getStanzaFrom().getDomain()));
-				cid_conns.connectionAuthenticated(serv);
+				if (p.getType() == StanzaType.valid) {
+					serv.addCID(getConnectionId(p.getStanzaTo().getDomain(),
+							p.getStanzaFrom().getDomain()));
+					cid_conns.connectionAuthenticated(serv);
+				} else {
+					if (log.isLoggable(Level.FINE)) {
+						log.log(Level.FINE,
+								"Invalid result for DB authentication: {0}, stopping connection: {1}",
+									new Object[] { cid,
+								serv });
+					}
+
+					serv.stop();
+				}
 			}
 		}
 
 		if ((p.getElemName() == VERIFY_EL_NAME) || (p.getElemName() == DB_VERIFY_EL_NAME)) {
 			if (p.getType() == null) {
-				Element valid_result = getValidResponse(DB_VERIFY_EL_NAME, p);
+				String local_key = getLocalDBKey(cid, remote_key, p.getStanzaId(),
+					serv.getSessionId());
 
-				writeRawData(serv, valid_result.toString());
+				if (local_key == null) {
+					if (log.isLoggable(Level.FINER)) {
+						log.log(Level.FINER,
+								"The key is not available for connection: {0} maybe it is "
+									+ "located on a different node...", cid);
+					}
+				} else {
+					sendVerifyResult(DB_VERIFY_EL_NAME, cid, local_key.equals(remote_key),
+							p.getStanzaId(), serv.getSessionId());
+				}
 			} else {
+				sendVerifyResult(DB_RESULT_EL_NAME, cid, (p.getType() == StanzaType.valid), null,
+						p.getStanzaId());
+				cid_conns.connectionAuthenticated(p.getStanzaId());
 
-				// serv.addCID(getConnectionId(p.getStanzaTo().getDomain(),
-				// p.getStanzaFrom().getDomain()));
+				if (serv.isHandshakingOnly()) {
+					serv.stop();
+				}
 			}
 		}
 	}

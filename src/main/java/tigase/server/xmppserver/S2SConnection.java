@@ -78,10 +78,10 @@ public class S2SConnection implements Comparable<S2SConnection> {
 	 * Method description
 	 *
 	 *
-	 * @param packetInstance
+	 * @param packet
 	 */
-	public void addControlPacket(Packet packetInstance) {
-		waitingControlPackets.add(packetInstance);
+	public void addControlPacket(Packet packet) {
+		waitingControlPackets.add(packet);
 	}
 
 	/**

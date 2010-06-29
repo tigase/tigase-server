@@ -22,6 +22,10 @@
 
 package tigase.server.xmppserver;
 
+//~--- JDK imports ------------------------------------------------------------
+
+import java.util.logging.Logger;
+
 //~--- classes ----------------------------------------------------------------
 
 /**
@@ -31,6 +35,10 @@ package tigase.server.xmppserver;
  * @version $Rev$
  */
 public class CID {
+	private static final Logger log = Logger.getLogger(CID.class.getName());
+
+	//~--- fields ---------------------------------------------------------------
+
 	private int hash = 3;
 	private String localHost = null;
 	private String remoteHost = null;
