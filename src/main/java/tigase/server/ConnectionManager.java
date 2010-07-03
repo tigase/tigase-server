@@ -923,32 +923,37 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 				serviceStarted(serv);
 				readThread.addSocketService(serv);
 			} catch (SocketException e) {
+				if (getConnectionType() == ConnectionType.connect) {
 
-				// Accept side for component service is not ready yet?
-				// Let's wait for a few secs and try again.
-				log.log(Level.FINEST, "Problem reconnecting the service: {0}", serv);
+					// Accept side for component service is not ready yet?
+					// Let's wait for a few secs and try again.
+					log.log(Level.FINEST, "Problem reconnecting the service: {0}", serv);
 
-				boolean reconnect = false;
-				Integer reconnects = (Integer) port_props.get(MAX_RECONNECTS_PROP_KEY);
+					boolean reconnect = false;
+					Integer reconnects = (Integer) port_props.get(MAX_RECONNECTS_PROP_KEY);
 
-				if (reconnects != null) {
-					int recon = reconnects.intValue();
+					if (reconnects != null) {
+						int recon = reconnects.intValue();
 
-					if (recon != 0) {
-						port_props.put(MAX_RECONNECTS_PROP_KEY, (--recon));
-						reconnect = true;
-					}    // end of if (recon != 0)
-				}
+						if (recon != 0) {
+							port_props.put(MAX_RECONNECTS_PROP_KEY, (--recon));
+							reconnect = true;
+						}    // end of if (recon != 0)
+					}
 
-				if (reconnect) {
-					reconnectService(port_props, connectionDelay);
+					if (reconnect) {
+						reconnectService(port_props, connectionDelay);
+					} else {
+						reconnectionFailed(port_props);
+					}
 				} else {
-					reconnectionFailed(port_props);
+
+					// Ignore
 				}
 			} catch (Exception e) {
 				log.log(Level.WARNING, "Can not accept connection.", e);
 				serv.stop();
-			}        // end of try-catch
+			}          // end of try-catch
 		}
 
 		//~--- get methods --------------------------------------------------------
