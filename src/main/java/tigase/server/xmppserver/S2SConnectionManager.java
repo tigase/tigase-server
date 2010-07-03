@@ -522,8 +522,10 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 			CID cid = (CID) serv.getSessionData().get("cid");
 
 			if (cid == null) {
-				log.log(Level.WARNING, "Protocol error cid not set for outgoing connection: {0}",
-						serv);
+				if (serv.connectionType() == ConnectionType.connect) {
+					log.log(Level.WARNING, "Protocol error cid not set for outgoing connection: {0}",
+							serv);
+				}
 
 				return result;
 			}
