@@ -581,7 +581,7 @@ public class StatisticsCollector extends AbstractComponentRegistrator<Statistics
 				}
 
 				if (freq > 0) {
-					statsArchivTasks.scheduleAtFixedRate(new TimerTask() {
+					statsArchivTasks.schedule(new TimerTask() {
 						@Override
 						public void run() {
 							stat_arch.execute(sp);
