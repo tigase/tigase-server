@@ -43,6 +43,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -60,7 +61,7 @@ import java.util.logging.Logger;
 public class RosterFlat extends RosterAbstract {
 
 	/**
-	 * Private logger for class instancess.
+	 * Private logger for class instances.
 	 */
 	private static final Logger log = Logger.getLogger("tigase.xmpp.impl.roster.RosterFlat");
 	private static final SimpleParser parser = SingletonFactory.getParserInstance();
@@ -472,11 +473,17 @@ public class RosterFlat extends RosterAbstract {
 	@SuppressWarnings("unchecked")
 	private Map<BareJID, RosterElement> getUserRoster(XMPPResourceConnection session)
 			throws NotAuthorizedException, TigaseDBException {
-		Map<BareJID, RosterElement> roster = (Map<BareJID,
-			RosterElement>) session.getCommonSessionData(ROSTER);
+		Map<BareJID, RosterElement> roster = null;
 
-		if (roster == null) {
-			roster = loadUserRoster(session);
+		// The method can be called from different plugins concurrently.
+		// If the roster is not yet loaded from DB this causes concurent
+		// access problems
+		synchronized (session) {
+			roster = (Map<BareJID, RosterElement>) session.getCommonSessionData(ROSTER);
+
+			if (roster == null) {
+				roster = loadUserRoster(session);
+			}
 		}
 
 		return roster;
@@ -486,7 +493,12 @@ public class RosterFlat extends RosterAbstract {
 
 	private Map<BareJID, RosterElement> loadUserRoster(XMPPResourceConnection session)
 			throws NotAuthorizedException, TigaseDBException {
-		Map<BareJID, RosterElement> roster = new LinkedHashMap<BareJID, RosterElement>();
+
+		// In most times we just read from this data structure
+		// From time to time there might be some modification, posibly concurrent
+		// very unlikely by more than one thread
+		Map<BareJID, RosterElement> roster = new ConcurrentHashMap<BareJID, RosterElement>(100,
+			0.25f, 1);
 
 		session.putCommonSessionData(ROSTER, roster);
 
@@ -495,7 +507,7 @@ public class RosterFlat extends RosterAbstract {
 		updateRosterHash(roster_str, session);
 
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Loaded user roster: " + roster_str);
+			log.log(Level.FINEST, "Loaded user roster: {0}", roster_str);
 		}
 
 		if ((roster_str != null) &&!roster_str.isEmpty()) {
