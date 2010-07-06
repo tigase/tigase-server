@@ -123,7 +123,9 @@ public abstract class WorkerThread extends Thread {
 					averageProcessingTime = (averageProcessingTime + end) / 2;
 				}
 			} catch (Exception e) {
-				log.log(Level.SEVERE, "Exception during packet processing: " + item.packet.toString(), e);
+				log.log(Level.SEVERE,
+						this.getClass().getName() + ",(" + getName()
+							+ ") Exception during packet processing: " + item.packet.toString(), e);
 			}
 
 			++runsCnt;
