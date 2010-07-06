@@ -100,7 +100,7 @@ public class RosterFlat extends RosterAbstract {
 						break;
 					}
 				} catch (Exception e) {
-					log.warning("Can't load roster element: " + elem.toString());
+					log.log(Level.WARNING, "Can''t load roster element: {0}", elem);
 				}
 			}
 		}
@@ -152,7 +152,7 @@ public class RosterFlat extends RosterAbstract {
 			}
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Added buddy to roster: " + buddy);
+				log.log(Level.FINEST, "Added buddy to roster: {0}", buddy);
 			}
 		} else {
 			if ((name != null) &&!name.isEmpty()) {
@@ -166,7 +166,7 @@ public class RosterFlat extends RosterAbstract {
 			saveUserRoster(session);
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Updated buddy in roster: " + buddy);
+				log.log(Level.FINEST, "Updated buddy in roster: {0}", buddy);
 			}
 		}
 	}
@@ -423,7 +423,8 @@ public class RosterFlat extends RosterAbstract {
 
 		if (relem != null) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Setting name: '" + name + "' for buddy: " + buddy);
+				log.log(Level.FINEST, "Setting name: ''{0}'' for buddy: {1}", new Object[] { name,
+						buddy });
 			}
 
 			if ((name != null) &&!name.isEmpty()) {
@@ -432,7 +433,7 @@ public class RosterFlat extends RosterAbstract {
 
 			saveUserRoster(session);
 		} else {
-			log.warning("Setting buddy name for non-existen contact: " + buddy);
+			log.log(Level.WARNING, "Setting buddy name for non-existen contact: {0}", buddy);
 		}
 	}
 
@@ -457,7 +458,7 @@ public class RosterFlat extends RosterAbstract {
 			relem.setSubscription(subscription);
 			saveUserRoster(session);
 		} else {
-			log.warning("Missing roster contact for subscription set: " + buddy);
+			log.log(Level.WARNING, "Missing roster contact for subscription set: {0}", buddy);
 		}
 	}
 
@@ -547,14 +548,14 @@ public class RosterFlat extends RosterAbstract {
 	private void saveUserRoster(XMPPResourceConnection session)
 			throws NotAuthorizedException, TigaseDBException {
 		Map<BareJID, RosterElement> roster = getUserRoster(session);
-		StringBuilder sb = new StringBuilder();
+		StringBuilder sb = new StringBuilder(5000);
 
 		for (RosterElement relem : roster.values()) {
 			sb.append(relem.getRosterElement().toString());
 		}
 
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Saving user roster: " + sb.toString());
+			log.log(Level.FINEST, "Saving user roster: {0}", sb);
 		}
 
 		session.setData(null, ROSTER, sb.toString());
