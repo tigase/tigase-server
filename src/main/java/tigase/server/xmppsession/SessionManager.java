@@ -1097,6 +1097,15 @@ public class SessionManager extends AbstractMessageReceiver
 	}
 
 	protected boolean isBrokenPacket(Packet p) {
+		if (p.getFrom() == null) {
+
+			// This is actually a broken packet and we can't even return an error
+			// for it, so just log it and drop it.
+			log.log(Level.FINE, "Broken packet: {0}", p.toStringSecure());
+
+			return true;
+		}
+
 		if ( !p.getFrom().equals(p.getStanzaFrom())
 				&& ( !p.isCommand() || (p.isCommand() && (p.getCommand() == Command.OTHER)))) {
 
@@ -1116,7 +1125,7 @@ public class SessionManager extends AbstractMessageReceiver
 			// It doesn't look good, there should really be a connection for
 			// this packet....
 			// returning error back...
-			log.fine("Broken packet: " + p.toStringSecure());
+			log.log(Level.FINE, "Broken packet: {0}", p.toStringSecure());
 
 			try {
 				Packet error = Authorization.SERVICE_UNAVAILABLE.getResponseMessage(p,
@@ -1125,7 +1134,7 @@ public class SessionManager extends AbstractMessageReceiver
 				error.setPacketTo(p.getFrom());
 				fastAddOutPacket(error);
 			} catch (PacketErrorTypeException e) {
-				log.fine("Packet is error type already: " + p.toStringSecure());
+				log.log(Level.FINE, "Packet is error type already: {0}", p.toStringSecure());
 			}
 
 			return true;
