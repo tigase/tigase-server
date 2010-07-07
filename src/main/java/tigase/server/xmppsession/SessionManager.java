@@ -1102,6 +1102,15 @@ public class SessionManager extends AbstractMessageReceiver
 	}
 
 	protected boolean isBrokenPacket(Packet p) {
+		if (p.getFrom() == null) {
+
+			// This is actually a broken packet and we can't even return an error
+			// for it, so just log it and drop it.
+			log.fine("Broken packet: " + p.toStringSecure());
+
+			return true;
+		}
+
 		if ( !p.getFrom().equals(p.getStanzaFrom())
 				&& ( !p.isCommand() || (p.isCommand() && (p.getCommand() == Command.OTHER)))) {
 
