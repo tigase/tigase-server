@@ -74,7 +74,7 @@ import java.util.logging.Logger;
 public abstract class JabberIqRoster {
 
 	/**
-	 * Private logger for class instancess.
+	 * Private logger for class instance.
 	 */
 	private static Logger log = Logger.getLogger(JabberIqRoster.class.getName());
 	private static final String[] ELEMENTS = { "query", "query" };
@@ -331,10 +331,19 @@ public abstract class JabberIqRoster {
 	private static void processGetRequest(Packet packet, XMPPResourceConnection session,
 			Queue<Packet> results, Map<String, Object> settings)
 			throws NotAuthorizedException, TigaseDBException {
-		String incomingHash = packet.getElement().getAttribute("/iq/query", "ver");
-		String storedHash = "";
+
+		// Retrieve standard roster items.
+		List<Element> ritems = roster_util.getRosterItems(session);
+
+		// Retrieve all Dynamic roster elements from the roster repository
 		List<Element> its = DynamicRoster.getRosterItems(session, settings);
 
+		// There is always a chance that the same elements exist in a dynamic roster
+		// and the standard user roster. Moreover, the items in the standard roster may
+		// have a different presence subscription set.
+		// Here we make sure they are both in sync, that is for each entry which exists
+		// in both rosters we enforce 'both' subscription type for element in standard roster
+		// and remove it from the dynamic roster list.
 		if ((its != null) && (its.size() > 0)) {
 			for (Iterator<Element> it = its.iterator(); it.hasNext(); ) {
 				Element element = it.next();
@@ -354,13 +363,38 @@ public abstract class JabberIqRoster {
 						it.remove();
 					}
 				} catch (TigaseStringprepException ex) {
-					log.info("JID from dynamic roster is incorrect, stringprep failed for: "
-							+ element.getAttribute("jid"));
+					log.log(Level.INFO,
+							"JID from dynamic roster is incorrect, stringprep failed for: {0}",
+								element.getAttribute("jid"));
 					it.remove();
 				}
 			}
+
+			// Recalculate the roster hash again with dynamic roster content
+			StringBuilder roster_str = new StringBuilder(5000);
+
+			// This may seem to be redindand as this call has already been made
+			// but the roster could have been changed.
+			ritems = roster_util.getRosterItems(session);
+
+			for (Element ritem : ritems) {
+				roster_str.append(ritem.toString());
+			}
+
+			for (Element ritem : its) {
+				roster_str.append(ritem.toString());
+			}
+
+			roster_util.updateRosterHash(roster_str.toString(), session);
 		}
 
+		// Check roster version hash.
+		String incomingHash = packet.getElement().getAttribute("/iq/query", "ver");
+		String storedHash = "";
+
+		// If client provided hash and the server calculated hash are the same
+		// return the success result and abort further roster processing.
+		// No need to send the whole roster to the client.
 		if (incomingHash != null) {
 			storedHash = roster_util.getBuddiesHash(session);
 
@@ -371,8 +405,7 @@ public abstract class JabberIqRoster {
 			}
 		}
 
-		List<Element> ritems = roster_util.getRosterItems(session);
-
+		// Send the user's standard roster first
 		if ((ritems != null) && (ritems.size() > 0)) {
 			Element query = new Element("query");
 
@@ -388,33 +421,7 @@ public abstract class JabberIqRoster {
 			results.offer(packet.okResult((String) null, 1));
 		}
 
-//  String[] buddies = roster_util.getBuddies(session, false);
-//  if (buddies != null) {
-//    Element query = new Element("query");
-//    query.setXMLNS(XMLNS);
-//    if (incomingHash != null)
-//      query.setAttribute("ver", storedHash);
-//    for (String buddy : buddies) {
-//      try {
-//        Element buddy_item = roster_util.getBuddyItem(session, buddy);
-//        //String item_group = buddy_item.getCData("/item/group");
-//        query.addChild(buddy_item);
-//      } catch (TigaseDBException e) {
-//        // It happens that some weird JIDs drive database crazy and
-//        // it throws exceptions. Let's for now just ignore those
-//        // contacts....
-//        log.info("Can not retrieve data for contact: " + buddy
-//          + ", an exception occurs: " + e);
-//      }
-//    }
-//    if (query.getChildren() != null && query.getChildren().size() > 0) {
-//      results.offer(packet.okResult(query, 0));
-//    } else {
-//      results.offer(packet.okResult((String)null, 1));
-//    } // end of if (buddies != null) else
-//  } else {
-//    results.offer(packet.okResult((String)null, 1));
-//  }
+		// Push the dynamic roster items now
 		try {
 			if ((its != null) && (its.size() > 0)) {
 				ArrayDeque<Element> items = new ArrayDeque<Element>(its);
@@ -422,7 +429,7 @@ public abstract class JabberIqRoster {
 				while (items.size() > 0) {
 					Element iq = new Element("iq", new String[] { "type", "id", "to" },
 						new String[] { "set",
-							"dr-" + items.size(), session.getJID().toString() });
+							session.nextStanzaId(), session.getJID().toString() });
 					Element query = new Element("query");
 
 					query.setXMLNS(RosterAbstract.XMLNS);
@@ -441,32 +448,11 @@ public abstract class JabberIqRoster {
 				}
 			}
 		} catch (NoConnectionIdException ex) {
-			log.warning("Problem with roster request, no connection ID for session: " + session
-					+ ", request: " + packet);
+			log.log(Level.WARNING,
+					"Problem with roster request, no connection ID for session: {0}, request: {1}",
+						new Object[] { session,
+					packet });
 		}
-
-//  if (session.isAnonymous()) {
-//    log.finest("Anonymous session: " + session.getUserId());
-//    String[] anon_peers = session.getAnonymousPeers();
-//    if (anon_peers != null) {
-//      for (String peer: anon_peers) {
-//        Element iq = new Element("iq",
-//          new String[] {"type", "id", "to", "from"},
-//          new String[] {"set", session.getUserName(), peer, peer});
-//        Element query = new Element("query");
-//        query.setXMLNS(XMLNS);
-//        iq.addChild(query);
-//        Element item = new Element("item", new Element[] {
-//            new Element("group", "Anonymous peers")},
-//          new String[] {"jid", "type", "name"},
-//          new String[] {session.getUserId(), ANON, session.getUserName()});
-//        query.addChild(item);
-//        Packet rost_update = new Packet(iq);
-//        results.offer(rost_update);
-//        log.finest("Sending roster update: " + rost_update.toString());
-//      }
-//    }
-//  }
 	}
 
 	private static void processSetRequest(Packet packet, XMPPResourceConnection session,
