@@ -504,13 +504,13 @@ public class RosterFlat extends RosterAbstract {
 
 		String roster_str = session.getData(null, ROSTER, null);
 
-		updateRosterHash(roster_str, session);
-
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Loaded user roster: " + roster_str);
 		}
 
 		if ((roster_str != null) &&!roster_str.isEmpty()) {
+			updateRosterHash(roster_str, session);
+
 			boolean modified = parseRoster(roster_str, roster, session);
 
 			if (modified) {
