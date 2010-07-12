@@ -1058,7 +1058,14 @@ public abstract class RosterAbstract {
 //  }
 	}
 
-	protected void updateRosterHash(String roster_str, XMPPResourceConnection session) {
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param roster_str
+	 * @param session
+	 */
+	public void updateRosterHash(String roster_str, XMPPResourceConnection session) {
 		String roster_hash = null;
 
 		try {
