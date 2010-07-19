@@ -242,12 +242,6 @@ public class JabberIqPrivacy extends XMPPProcessor
 		return DISCO_FEATURES;
 	}
 
-	;
-	;
-	;
-
-	//~--- methods --------------------------------------------------------------
-
 	/**
 	 * Method description
 	 *
@@ -509,9 +503,16 @@ public class JabberIqPrivacy extends XMPPProcessor
 			}      // end of if (child.getName().equals("list))
 
 			if (child.getName() == ACTIVE_EL_NAME) {
-				Privacy.setActiveList(session, child.getAttribute(NAME));
-				results.offer(packet.okResult((String) null, 0));
-			}      // end of if (child.getName().equals("list))
+				Element list = Privacy.getList(session, child.getAttribute(NAME));
+
+				if (list == null) {
+					results.offer(Authorization.ITEM_NOT_FOUND.getResponseMessage(packet,
+							"Selected list not found on the server", true));
+				} else {
+					Privacy.setActiveList(session, child.getAttribute(NAME));
+					results.offer(packet.okResult((String) null, 0));
+				}
+			}    // end of if (child.getName().equals("list))
 		} else {
 			results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
 					"Only 1 element is allowed in privacy set request.", true));
