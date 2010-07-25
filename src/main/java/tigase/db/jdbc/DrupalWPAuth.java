@@ -116,7 +116,7 @@ public class DrupalWPAuth implements UserAuthRepository {
 	public static final String WP_PASS_FLD = "user_pass";
 
 	/** Field description */
-	public static final String WP_STATUS_FLD = "status";
+	public static final String WP_STATUS_FLD = "user_status";
 
 	/** Field description */
 	public static final int WP_OK_STATUS_VAL = 0;
