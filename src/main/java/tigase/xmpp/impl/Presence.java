@@ -280,6 +280,15 @@ public abstract class Presence {
 					case out_subscribed :
 					case out_unsubscribed :
 
+						// Check wheher the destination address is correct to prevent
+						// broken/corrupted roster entries:
+						if ((packet.getStanzaTo() == null) || packet.getStanzaTo().toString().isEmpty()) {
+							results.offer(Authorization.JID_MALFORMED.getResponseMessage(packet,
+									"The destination address is incorrect.", false));
+
+							return;
+						}
+
 						// According to RFC 3921 draft bis-3, both source and destination
 						// addresses must be BareJIDs
 						// No need for that, initVars(...) takes care of that
