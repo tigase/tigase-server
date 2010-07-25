@@ -19,7 +19,10 @@
  * Last modified by $Author$
  * $Date$
  */
+
 package tigase.db;
+
+//~--- classes ----------------------------------------------------------------
 
 /**
  * The <code>UserExistsException</code> is thrown when application tries to add
@@ -33,23 +36,32 @@ package tigase.db;
  * @version $Rev$
  */
 public class UserExistsException extends TigaseDBException {
+	private static final long serialVersionUID = 1L;
 
-  private static final long serialVersionUID = 1L;
+	//~--- constructors ---------------------------------------------------------
 
-  /**
-   * Creates a new <code>UserExistsException</code> instance.
-   *
-   */
-  public UserExistsException(String message) {
-    super(message);
-  }
+	/**
+	 * Creates a new <code>UserExistsException</code> instance.
+	 *
+	 * @param message
+	 */
+	public UserExistsException(String message) {
+		super(message);
+	}
 
-  /**
-   * Creates a new <code>UserExistsException</code> instance.
-   *
-   */
-  public UserExistsException(String message, Throwable cause) {
-    super(message, cause);
-  }
+	/**
+	 * Creates a new <code>UserExistsException</code> instance.
+	 *
+	 * @param message
+	 * @param cause
+	 */
+	public UserExistsException(String message, Throwable cause) {
+		super(message, cause);
+	}
+}    // UserExistsException
 
-} // UserExistsException
+
+//~ Formatted in Sun Code Convention
+
+
+//~ Formatted by Jindent --- http://www.jindent.com
