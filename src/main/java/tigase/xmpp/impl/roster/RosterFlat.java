@@ -100,7 +100,7 @@ public class RosterFlat extends RosterAbstract {
 						break;
 					}
 				} catch (Exception e) {
-					log.log(Level.WARNING, "Can''t load roster element: {0}", elem);
+					log.log(Level.WARNING, "Can't load roster element: {0}", elem);
 				}
 			}
 		}
