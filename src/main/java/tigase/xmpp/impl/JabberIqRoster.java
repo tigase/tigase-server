@@ -99,7 +99,7 @@ public abstract class JabberIqRoster {
 		List<Element> elgr = item.getChildren();
 
 		if ((elgr != null) && (elgr.size() > 0)) {
-			ArrayList<String> groups = new ArrayList<String>();
+			ArrayList<String> groups = new ArrayList<String>(1);
 
 			for (Element grp : elgr) {
 				if (grp.getName() == RosterAbstract.GROUP) {
@@ -169,8 +169,10 @@ public abstract class JabberIqRoster {
 					&&!session.isUserId(packet.getStanzaFrom().getBareJID())) {
 
 				// RFC says: ignore such request
-				log.warning("Roster request 'from' attribute doesn't match session: " + session
-						+ ", request: " + packet);
+				log.log(Level.WARNING,
+						"Roster request ''from'' attribute doesn''t match "
+							+ "session: {0}, request: {1}", new Object[] { session,
+						packet });
 
 				return;
 			}    // end of if (packet.getElemFrom() != null
