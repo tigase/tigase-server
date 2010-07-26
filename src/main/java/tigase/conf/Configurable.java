@@ -312,7 +312,7 @@ public interface Configurable extends ServerComponent {
 	public static final String SM_COMP_CLASS_NAME = "tigase.server.xmppsession.SessionManager";
 
 	/** Field description */
-	public static final String SM_CLUS_COMP_CLASS_NAME =
+	public static final String SM_CLUST_COMP_CLASS_NAME =
 		"tigase.cluster.SessionManagerClustered";
 
 	/** Field description */
@@ -321,6 +321,10 @@ public interface Configurable extends ServerComponent {
 
 	/** Field description */
 	public static final String MONITOR_CLASS_NAME = "tigase.server.monitor.MonitorComponent";
+
+	/** Field description */
+	public static final String MONITOR_CLUST_CLASS_NAME =
+		"tigase.server.monitor.MonitorClustered";
 
 	/** Field description */
 	public static final String COMP_PROT_CLASS_NAME = "tigase.server.ext.ComponentProtocol";
