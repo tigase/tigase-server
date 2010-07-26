@@ -36,12 +36,12 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class PriorityQueue<E> extends PriorityQueueAbstract<E> {
+public class PriorityQueueRelaxed<E> extends PriorityQueueAbstract<E> {
 
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
-	private static final Logger log = Logger.getLogger(PriorityQueue.class.getName());
+	private static final Logger log = Logger.getLogger(PriorityQueueRelaxed.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -53,12 +53,33 @@ public class PriorityQueue<E> extends PriorityQueueAbstract<E> {
 	/**
 	 * Constructs ...
 	 *
+	 */
+	public PriorityQueueRelaxed() {}
+
+	/**
+	 * Constructs ...
+	 *
 	 *
 	 * @param maxPriority
 	 * @param maxSize
 	 */
 	@SuppressWarnings({ "unchecked" })
-	protected PriorityQueue(int maxPriority, int maxSize) {
+	protected PriorityQueueRelaxed(int maxPriority, int maxSize) {
+		init(maxPriority, maxSize);
+	}
+
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param maxPriority
+	 * @param maxSize
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public final void init(int maxPriority, int maxSize) {
 
 //  qs = new LinkedBlockingQueue[maxPriority + 1];
 		qs = new LinkedBlockingQueue[maxPriority];
@@ -67,8 +88,6 @@ public class PriorityQueue<E> extends PriorityQueueAbstract<E> {
 			qs[i] = new LinkedBlockingQueue<E>(maxSize);
 		}
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description

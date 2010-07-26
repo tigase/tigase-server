@@ -155,6 +155,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	private long last_minute_packets = 0;
 	private long last_second_packets = 0;
 	protected int maxQueueSize = MAX_QUEUE_SIZE_PROP_VAL;
+	private PriorityQueueAbstract<Packet> out_queue = null;
 	private QueueListener out_thread = null;
 	private long packetId = 0;
 	private long packets_per_hour = 0;
@@ -167,8 +168,6 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	private final Priority[] pr_cache = Priority.values();
 	private final CopyOnWriteArrayList<PacketFilterIfc> outgoing_filters =
 		new CopyOnWriteArrayList<PacketFilterIfc>();
-	private final PriorityQueueAbstract<Packet> out_queue =
-		PriorityQueueAbstract.getPriorityQueue(pr_cache.length, maxQueueSize);
 	private final CopyOnWriteArrayList<PacketFilterIfc> incoming_filters =
 		new CopyOnWriteArrayList<PacketFilterIfc>();
 	private final List<PriorityQueueAbstract<Packet>> in_queues =
@@ -711,9 +710,15 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	 *
 	 *
 	 * @param maxQueueSize
+	 *
+	 * @throws ClassNotFoundException
+	 * @throws IllegalAccessException
+	 * @throws InstantiationException
 	 */
-	public void setMaxQueueSize(int maxQueueSize) {
+	public void setMaxQueueSize(int maxQueueSize)
+			throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 		if ((this.maxQueueSize != maxQueueSize) || (in_queues.size() == 0)) {
+			out_queue = PriorityQueueAbstract.getPriorityQueue(pr_cache.length, maxQueueSize);
 			this.maxQueueSize = maxQueueSize / processingThreads();
 
 			if (in_queues.size() == 0) {
@@ -743,7 +748,14 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	public void setName(String name) {
 		super.setName(name);
 		in_queues_size = processingThreads();
-		setMaxQueueSize(maxQueueSize);
+
+		try {
+			setMaxQueueSize(maxQueueSize);
+		} catch (Exception e) {
+			log.log(Level.SEVERE,
+					"Can't initialize component: " + getName()
+						+ ", problem with creating component queues.", e);
+		}
 	}
 
 	/**
@@ -768,7 +780,14 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 
 		int queueSize = (Integer) props.get(MAX_QUEUE_SIZE_PROP_KEY);
 
-		setMaxQueueSize(queueSize);
+		try {
+			setMaxQueueSize(queueSize);
+		} catch (Exception e) {
+			log.log(Level.SEVERE,
+					"Can't initialize component: " + getName()
+						+ ", problem with creating component queues.", e);
+		}
+
 		incoming_filters.clear();
 		outgoing_filters.clear();
 
@@ -1133,7 +1152,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 								// Maybe this is a command for local processing...
 								boolean processed = false;
 
-								if (packet.isCommand() && packet.getStanzaTo() != null
+								if (packet.isCommand() && (packet.getStanzaTo() != null)
 										&& AbstractMessageReceiver.this.getName().equals(packet.getStanzaTo().getLocalpart())
 											&& isLocalDomain(packet.getStanzaTo().getDomain())) {
 									processed = processScriptCommand(packet, results);

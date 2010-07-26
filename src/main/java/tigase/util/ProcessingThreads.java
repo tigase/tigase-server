@@ -71,10 +71,14 @@ public class ProcessingThreads<E extends WorkerThread> {
 	 * @param numWorkerThreads
 	 * @param maxQueueSize
 	 * @param name
+	 * @throws ClassNotFoundException
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
 	 */
 	@SuppressWarnings({ "unchecked" })
 	public ProcessingThreads(E worker, int numQueues, int numWorkerThreads, int maxQueueSize,
-			String name) {
+			String name)
+			throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 		this.numQueues = numQueues;
 		this.maxQueueSize = maxQueueSize;
 		this.numWorkerThreads = numWorkerThreads;

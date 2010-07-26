@@ -146,6 +146,8 @@ public class SessionManager extends AbstractMessageReceiver
 	private int maxUserSessions = 0;
 	private NonAuthUserRepository naUserRepository = null;
 	private long reaperInterval = 60 * 1000;
+	private ProcessingThreads<SessionCloseWorkerThread> sessionCloseThread = null;
+	private ProcessingThreads<SessionOpenWorkerThread> sessionOpenThread = null;
 	private SMResourceConnection smResourceConnection = null;
 	private long totalUserConnections = 0;
 	private long totalUserSessions = 0;
@@ -164,12 +166,6 @@ public class SessionManager extends AbstractMessageReceiver
 	 */
 	private ConcurrentHashMap<BareJID, XMPPSession> sessionsByNodeId =
 		new ConcurrentHashMap<BareJID, XMPPSession>();
-	private ProcessingThreads<SessionOpenWorkerThread> sessionOpenThread =
-		new ProcessingThreads<SessionOpenWorkerThread>(new SessionOpenWorkerThread(this), 1, 1,
-			maxQueueSize, "session-open");
-	private ProcessingThreads<SessionCloseWorkerThread> sessionCloseThread =
-		new ProcessingThreads<SessionCloseWorkerThread>(new SessionCloseWorkerThread(), 4, 1,
-			maxQueueSize, "session-close");
 	private Map<String, ProcessingThreads<ProcessorWorkerThread>> processors =
 		new ConcurrentHashMap<String, ProcessingThreads<ProcessorWorkerThread>>();
 	private Map<String, XMPPPreprocessorIfc> preProcessors = new ConcurrentHashMap<String,
@@ -721,58 +717,69 @@ public class SessionManager extends AbstractMessageReceiver
 		String[] plugins = (String[]) props.get(PLUGINS_PROP_KEY);
 
 		log.config("Loaded plugins list: " + Arrays.toString(plugins));
-		maxPluginsNo = plugins.length;
-		processors.clear();
 
-		for (String plug_id : plugins) {
-			if (plug_id.equals("presence")) {
-				log.warning("Your configuration is outdated!"
-						+ " Note 'presence' and 'jaber:iq:roster' plugins are no longer exist."
-							+ " Use 'roster-presence' plugin instead, loading automaticly...");
-				plug_id = "roster-presence";
-			}
+		try {
+			sessionOpenThread =
+				new ProcessingThreads<SessionOpenWorkerThread>(new SessionOpenWorkerThread(this), 1,
+					1, maxQueueSize, "session-open");
+			sessionCloseThread =
+				new ProcessingThreads<SessionCloseWorkerThread>(new SessionCloseWorkerThread(), 4, 1,
+					maxQueueSize, "session-close");
+			maxPluginsNo = plugins.length;
+			processors.clear();
 
-			log.config("Loading and configuring plugin: " + plug_id);
+			for (String plug_id : plugins) {
+				if (plug_id.equals("presence")) {
+					log.warning("Your configuration is outdated!"
+							+ " Note 'presence' and 'jaber:iq:roster' plugins are no longer exist."
+								+ " Use 'roster-presence' plugin instead, loading automaticly...");
+					plug_id = "roster-presence";
+				}
 
-			XMPPImplIfc plugin = addPlugin(plug_id, plugins_concurrency.get(plug_id));
+				log.config("Loading and configuring plugin: " + plug_id);
 
-			if (plugin != null) {
-				Map<String, Object> plugin_settings = new ConcurrentHashMap<String, Object>();
+				XMPPImplIfc plugin = addPlugin(plug_id, plugins_concurrency.get(plug_id));
 
-				for (Map.Entry<String, Object> entry : props.entrySet()) {
-					if (entry.getKey().startsWith(PLUGINS_CONF_PROP_KEY)) {
+				if (plugin != null) {
+					Map<String, Object> plugin_settings = new ConcurrentHashMap<String, Object>();
 
-						// Split the key to configuration nodes separated with '/'
-						String[] nodes = entry.getKey().split("/");
+					for (Map.Entry<String, Object> entry : props.entrySet()) {
+						if (entry.getKey().startsWith(PLUGINS_CONF_PROP_KEY)) {
 
-						// The plugin ID part may contain many IDs separated with comma ','
-						if (nodes.length > 2) {
-							String[] ids = nodes[1].split(",");
+							// Split the key to configuration nodes separated with '/'
+							String[] nodes = entry.getKey().split("/");
 
-							Arrays.sort(ids);
+							// The plugin ID part may contain many IDs separated with comma ','
+							if (nodes.length > 2) {
+								String[] ids = nodes[1].split(",");
 
-							if (Arrays.binarySearch(ids, plug_id) >= 0) {
-								plugin_settings.put(nodes[2], entry.getValue());
+								Arrays.sort(ids);
+
+								if (Arrays.binarySearch(ids, plug_id) >= 0) {
+									plugin_settings.put(nodes[2], entry.getValue());
+								}
 							}
 						}
 					}
-				}
 
-				if (plugin_settings.size() > 0) {
-					if (log.isLoggable(Level.CONFIG)) {
-						log.config("Plugin configuration: " + plugin_settings.toString());
+					if (plugin_settings.size() > 0) {
+						if (log.isLoggable(Level.CONFIG)) {
+							log.config("Plugin configuration: " + plugin_settings.toString());
+						}
+
+						plugin_config.put(plug_id, plugin_settings);
 					}
 
-					plugin_config.put(plug_id, plugin_settings);
+					try {
+						plugin.init(plugin_settings);
+					} catch (TigaseDBException ex) {
+						log.log(Level.SEVERE, "Problem initializing plugin: " + plugin.id(), ex);
+					}
 				}
-
-				try {
-					plugin.init(plugin_settings);
-				} catch (TigaseDBException ex) {
-					log.log(Level.SEVERE, "Problem initializing plugin: " + plugin.id(), ex);
-				}
-			}
-		}    // end of for (String comp_id: plugins)
+			}    // end of for (String comp_id: plugins)
+		} catch (Exception e) {
+			log.log(Level.SEVERE, "Problem with component initialization: " + getName(), e);
+		}
 
 		smResourceConnection = new SMResourceConnection(null, user_repository, auth_repository,
 				this);
@@ -1651,7 +1658,8 @@ public class SessionManager extends AbstractMessageReceiver
 		}
 	}
 
-	private XMPPImplIfc addPlugin(String plug_id, Integer conc) {
+	private XMPPImplIfc addPlugin(String plug_id, Integer conc)
+			throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 		XMPPImplIfc result = null;
 		XMPPProcessorIfc proc = ProcessorFactory.getProcessor(plug_id);
 		int concurrency = ((conc != null)
