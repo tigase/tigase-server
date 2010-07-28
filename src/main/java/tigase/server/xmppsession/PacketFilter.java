@@ -279,8 +279,7 @@ public class PacketFilter {
 				}
 
 				if (log.isLoggable(Level.INFO)) {
-					log.log(Level.INFO, "No ''to'' address, can''t deliver packet: {0}",
-							packet.toString());
+					log.log(Level.INFO, "No ''to'' address, can''t deliver packet: {0}", packet);
 				}
 
 				return false;
@@ -303,7 +302,7 @@ public class PacketFilter {
 
 				// Yes this is message to 'this' client
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Yes, this is packet to 'this' client: " + to);
+					log.log(Level.FINEST, "Yes, this is packet to ''this'' client: {0}", to);
 				}
 
 //      Element elem = packet.getElement().clone();
@@ -322,24 +321,26 @@ public class PacketFilter {
 					results.offer(result);
 				} catch (NoConnectionIdException ex) {
 					log.log(Level.WARNING,
-							"Packet to the server which hasn''t been properly processed: {0}", packet);
+							"Packet to the server which hasn't been properly processed: {0}", packet);
 				}
 
 				return true;
 			}    // end of else
 
-			BareJID from = packet.getStanzaFrom().getBareJID();
+			if (packet.getStanzaFrom() != null) {
+				BareJID from = packet.getStanzaFrom().getBareJID();
 
-			if (session.isUserId(from)) {
-				Packet result = packet.copyElementOnly();
+				if (session.isUserId(from)) {
+					Packet result = packet.copyElementOnly();
 
-//      String[] connIds = runtime.getConnectionIdsForJid(to);
-//      if (connIds != null && connIds.length > 0) {
-//        result.setTo(connIds[0]);
-//      }
-				results.offer(result);
+//        String[] connIds = runtime.getConnectionIdsForJid(to);
+//        if (connIds != null && connIds.length > 0) {
+//          result.setTo(connIds[0]);
+//        }
+					results.offer(result);
 
-				return true;
+					return true;
+				}
 			}
 		} catch (NotAuthorizedException e) {
 			try {
