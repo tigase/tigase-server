@@ -29,10 +29,12 @@ import tigase.db.UserAuthRepository;
 
 import tigase.server.Command;
 import tigase.server.Packet;
+import tigase.server.Priority;
 
 import tigase.xml.Element;
 
 import tigase.xmpp.Authorization;
+import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
@@ -137,33 +139,35 @@ public class SaslAuth extends XMPPProcessor implements XMPPProcessorIfc {
 		if (session.isAuthorized()) {
 
 			// Multiple authentication attempts....
-//    // Another authentication request on already authenticated connection
-//    // This is not allowed and must be forbidden.
-//    Packet res = packet.sswapFromTo(createReply(ElementType.failure, "<not-authorized/>"));
-//
-//    // Make sure it gets delivered before stream close
-//    res.setPriority(Priority.SYSTEM);
-//    results.offer(res);
-//
-//    // Optionally close the connection to make sure there is no
-//    // confusion about the connection state.
-//    results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(), StanzaType.set,
-//        packet.getElemId()));
-//
-//    if (log.isLoggable(Level.FINEST)) {
-//      log.finest("Discovered second authentication attempt: " + session.toString()
-//          + ", packet: " + packet.toString());
-//    }
-//
-//    try {
-//      session.logout();
-//    } catch (NotAuthorizedException ex) {
-//      log.finer("Unsuccessful session logout: " + session.toString());
-//    }
-//
-//    if (log.isLoggable(Level.FINEST)) {
-//      log.finest("Session after logout: " + session.toString());
-//    }
+			// Another authentication request on already authenticated connection
+			// This is not allowed and must be forbidden.
+			Packet res = packet.swapFromTo(createReply(ElementType.failure, "<not-authorized/>"),
+				null, null);
+
+			// Make sure it gets delivered before stream close
+			res.setPriority(Priority.SYSTEM);
+			results.offer(res);
+
+			// Optionally close the connection to make sure there is no
+			// confusion about the connection state.
+			results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(), StanzaType.set,
+					packet.getStanzaId()));
+
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Discovered second authentication attempt: {0}, packet: {1}",
+						new Object[] { session.toString(),
+						packet.toString() });
+			}
+
+			try {
+				session.logout();
+			} catch (NotAuthorizedException ex) {
+				log.log(Level.FINER, "Unsuccessful session logout: {0}", session.toString());
+			}
+
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Session after logout: {0}", session.toString());
+			}
 		}
 
 		Element request = packet.getElement();
