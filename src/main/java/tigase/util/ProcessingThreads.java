@@ -33,6 +33,8 @@ import tigase.xmpp.XMPPResourceConnection;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -44,6 +46,10 @@ import java.util.ArrayList;
  * @version $Rev$
  */
 public class ProcessingThreads<E extends WorkerThread> {
+	private static final Logger log = Logger.getLogger(ProcessingThreads.class.getName());
+
+	//~--- fields ---------------------------------------------------------------
+
 	private long droppedPackets = 0;
 	private int maxQueueSize = 10000;
 	private String name = null;
@@ -156,6 +162,10 @@ public class ProcessingThreads<E extends WorkerThread> {
 
 		if ( !ret) {
 			++droppedPackets;
+
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Packet dropped due to queue overflow: {0}", packet);
+			}
 		}
 
 		return ret;
