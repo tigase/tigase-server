@@ -38,7 +38,6 @@ import tigase.xml.Element;
 import tigase.xml.SimpleParser;
 import tigase.xml.SingletonFactory;
 
-import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.StanzaType;
@@ -51,7 +50,6 @@ import tigase.xmpp.XMPPResourceConnection;
 
 import java.text.SimpleDateFormat;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -78,10 +76,10 @@ public class OfflineMessages extends XMPPProcessor
 	/**
 	 * Private logger for class instances.
 	 */
-	private static Logger log = Logger.getLogger(OfflineMessages.class.getName());
+	private static final Logger log = Logger.getLogger(OfflineMessages.class.getName());
 	private static final String ID = "msgoffline";
-	private static final String XMLNS = "jabber:client";
-	private static final String[] ELEMENTS = { "presence" };
+	protected static final String XMLNS = "jabber:client";
+	private static final String[] ELEMENTS = { Presence.PRESENCE_ELEMENT_NAME };
 	private static final String[] XMLNSS = { XMLNS };
 	private static final Element[] DISCO_FEATURES = {
 		new Element("feature", new String[] { "var" }, new String[] { "msgoffline" }) };
@@ -144,7 +142,7 @@ public class OfflineMessages extends XMPPProcessor
 				Map<String, Object> settings) {
 		if (conn == null) {
 			try {
-				MsgRepositoryIfc msg_repo = new MsgRepositoryImpl(repo, conn);
+				MsgRepositoryIfc msg_repo = getMsgRepoImpl(repo, conn);
 
 				savePacketForOffLineUser(packet, msg_repo);
 			} catch (UserNotFoundException e) {
@@ -173,7 +171,7 @@ public class OfflineMessages extends XMPPProcessor
 			throws NotAuthorizedException {
 		if (loadOfflineMessages(packet, conn)) {
 			try {
-				MsgRepositoryIfc msg_repo = new MsgRepositoryImpl(repo, conn);
+				MsgRepositoryIfc msg_repo = getMsgRepoImpl(repo, conn);
 				Queue<Packet> packets = restorePacketForOffLineUser(conn, msg_repo);
 
 				if (packets != null) {
@@ -307,6 +305,15 @@ public class OfflineMessages extends XMPPProcessor
 	public String[] supNamespaces() {
 		return XMLNSS;
 	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	protected MsgRepositoryIfc getMsgRepoImpl(NonAuthUserRepository repo,
+			XMPPResourceConnection conn) {
+		return new MsgRepositoryImpl(repo, conn);
+	}
+
+	//~--- methods --------------------------------------------------------------
 
 	// Implementation of tigase.xmpp.XMPPProcessorIfc
 	protected boolean loadOfflineMessages(Packet packet, XMPPResourceConnection conn) {

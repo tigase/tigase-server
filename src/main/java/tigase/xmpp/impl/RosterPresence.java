@@ -59,7 +59,7 @@ public class RosterPresence extends XMPPProcessor
 		implements XMPPProcessorIfc, XMPPStopListenerIfc {
 
 	/**
-	 * Private logger for class instancess.
+	 * Private logger for class instance.
 	 */
 	private static Logger log = Logger.getLogger(RosterPresence.class.getName());
 	private static final String ID = "roster-presence";
@@ -69,6 +69,10 @@ public class RosterPresence extends XMPPProcessor
 			RosterAbstract.XMLNS_DYNAMIC };
 	private static final Element[] DISCO_FEATURES = RosterAbstract.DISCO_FEATURES;
 	private static final Element[] FEATURES = RosterAbstract.FEATURES;
+
+	//~--- fields ---------------------------------------------------------------
+
+	private JabberIqRoster rosterProc = new JabberIqRoster();
 
 	//~--- methods --------------------------------------------------------------
 
@@ -144,7 +148,7 @@ public class RosterPresence extends XMPPProcessor
 		if (packet.getElemName().equals(PRESENCE)) {
 			Presence.process(packet, session, repo, results, settings);
 		} else {
-			JabberIqRoster.process(packet, session, repo, results, settings);
+			rosterProc.process(packet, session, repo, results, settings);
 		}
 	}
 
@@ -160,7 +164,7 @@ public class RosterPresence extends XMPPProcessor
 	public void stopped(final XMPPResourceConnection session, final Queue<Packet> results,
 			final Map<String, Object> settings) {
 		Presence.stopped(session, results, settings);
-		JabberIqRoster.stopped(session, results, settings);
+		rosterProc.stopped(session, results, settings);
 	}
 
 	/**
