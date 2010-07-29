@@ -26,8 +26,6 @@ package tigase.server.amp;
 
 import tigase.conf.Configurable;
 
-import tigase.db.TigaseDBException;
-import tigase.db.UserNotFoundException;
 import tigase.db.UserRepository;
 
 import tigase.server.Packet;
@@ -40,7 +38,6 @@ import tigase.xmpp.JID;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.impl.roster.RosterAbstract;
 import tigase.xmpp.impl.roster.RosterElement;
-import tigase.xmpp.impl.roster.RosterFactory;
 import tigase.xmpp.impl.roster.RosterFlat;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -217,7 +214,7 @@ public abstract class ActionAbstract implements ActionIfc {
 			if (roster_str != null) {
 				Map<BareJID, RosterElement> roster = new LinkedHashMap<BareJID, RosterElement>();
 
-				RosterFlat.parseRoster(roster_str, roster, null);
+				RosterFlat.parseRosterUtil(roster_str, roster, null);
 
 				RosterElement re = roster.get(contact.getBareJID());
 
