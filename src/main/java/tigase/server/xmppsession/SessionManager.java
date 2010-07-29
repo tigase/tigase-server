@@ -673,7 +673,9 @@ public class SessionManager extends AbstractMessageReceiver
 
 				auth_repository = RepositoryFactory.getAuthRepository(getName(), cls_name, res_uri,
 						auth_repo_params);
-				log.config("Initialized " + cls_name + " as auth repository: " + res_uri);
+				log.log(Level.CONFIG, "Initialized {0} as auth repository: {1}",
+						new Object[] { cls_name,
+						res_uri });
 			} catch (Exception e) {
 				log.log(Level.SEVERE, "Can't initialize auth repository: ", e);
 			}    // end of try-catch
@@ -688,16 +690,19 @@ public class SessionManager extends AbstractMessageReceiver
 //  } catch (TigaseDBException ex) {
 //    log.log(Level.WARNING, "Problem accessing auth repository: ", ex);
 //  }
-		naUserRepository = new NonAuthUserRepositoryImpl(user_repository, getDefHostName());
+		naUserRepository = new NonAuthUserRepositoryImpl(user_repository, getDefHostName(),
+				Boolean.parseBoolean((String) props.get(AUTO_CREATE_OFFLINE_USER_PROP_KEY)));
 
-		LinkedHashMap<String, Integer> plugins_concurrency = new LinkedHashMap<String, Integer>();
+		LinkedHashMap<String, Integer> plugins_concurrency = new LinkedHashMap<String,
+			Integer>(20);
 		String[] plugins_conc = ((String) props.get(PLUGINS_CONCURRENCY_PROP_KEY)).split(",");
 
-		log.config("Loading concurrency plugins list: " + Arrays.toString(plugins_conc));
+		log.log(Level.CONFIG, "Loading concurrency plugins list: {0}",
+				Arrays.toString(plugins_conc));
 
 		if ((plugins_conc != null) && (plugins_conc.length > 0)) {
 			for (String plugc : plugins_conc) {
-				log.config("Loading: " + plugc);
+				log.log(Level.CONFIG, "Loading: {0}", plugc);
 
 				if ( !plugc.trim().isEmpty()) {
 					String[] pc = plugc.split("=");
@@ -706,7 +711,9 @@ public class SessionManager extends AbstractMessageReceiver
 						int conc = Integer.parseInt(pc[1]);
 
 						plugins_concurrency.put(pc[0], conc);
-						log.config("Concurrency for plugin: " + pc[0] + " set to: " + conc);
+						log.log(Level.CONFIG, "Concurrency for plugin: {0} set to: {1}",
+								new Object[] { pc[0],
+								conc });
 					} catch (Exception e) {
 						log.log(Level.WARNING, "Plugin concurrency parsing error for: " + plugc + ", ", e);
 					}
@@ -1706,8 +1713,9 @@ public class SessionManager extends AbstractMessageReceiver
 
 		if (stoplist != null) {
 			stopListeners.put(plug_id, stoplist);
-			log.config("Added stopped processor: " + stoplist.getClass().getSimpleName()
-					+ " for plugin id: " + plug_id);
+			log.log(Level.CONFIG, "Added stopped processor: {0} for plugin id: {1}",
+					new Object[] { stoplist.getClass().getSimpleName(),
+					plug_id });
 			loaded = true;
 			result = stoplist;
 		}
@@ -1716,14 +1724,15 @@ public class SessionManager extends AbstractMessageReceiver
 
 		if (filterproc != null) {
 			outFilters.put(plug_id, filterproc);
-			log.config("Added packet filter: " + filterproc.getClass().getSimpleName()
-					+ " for plugin id: " + plug_id);
+			log.log(Level.CONFIG, "Added packet filter: {0} for plugin id: {1}",
+					new Object[] { filterproc.getClass().getSimpleName(),
+					plug_id });
 			loaded = true;
 			result = filterproc;
 		}
 
 		if ( !loaded) {
-			log.warning("No implementation found for plugin id: " + plug_id);
+			log.log(Level.WARNING, "No implementation found for plugin id: {0}", plug_id);
 		}    // end of if (!loaded)
 
 		return result;

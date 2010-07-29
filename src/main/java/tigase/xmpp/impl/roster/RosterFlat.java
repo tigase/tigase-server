@@ -73,13 +73,32 @@ public class RosterFlat extends RosterAbstract {
 	 * Method description
 	 *
 	 *
+	 * @param relem
+	 * @param roster
+	 *
+	 * @return
+	 */
+	public static boolean addBuddy(RosterElement relem, Map<BareJID, RosterElement> roster) {
+		if (roster.size() < maxRosterSize) {
+			roster.put(relem.getJid().getBareJID(), relem);
+
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
 	 * @param roster_str
 	 * @param roster
 	 * @param session
 	 *
 	 * @return
 	 */
-	public static boolean parseRoster(String roster_str, Map<BareJID, RosterElement> roster,
+	public static boolean parseRosterUtil(String roster_str, Map<BareJID, RosterElement> roster,
 			XMPPResourceConnection session) {
 		boolean result = false;
 		DomBuilderHandler domHandler = new DomBuilderHandler();
@@ -105,16 +124,6 @@ public class RosterFlat extends RosterAbstract {
 		}
 
 		return result;
-	}
-
-	private static boolean addBuddy(RosterElement relem, Map<BareJID, RosterElement> roster) {
-		if (roster.size() < maxRosterSize) {
-			roster.put(relem.getJid().getBareJID(), relem);
-
-			return true;
-		}
-
-		return false;
 	}
 
 	/**
@@ -378,6 +387,21 @@ public class RosterFlat extends RosterAbstract {
 	}
 
 	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param roster_str
+	 * @param roster
+	 * @param session
+	 *
+	 * @return
+	 */
+	public boolean parseRoster(String roster_str, Map<BareJID, RosterElement> roster,
+			XMPPResourceConnection session) {
+		return parseRosterUtil(roster_str, roster, session);
+	}
 
 	/**
 	 * Method description

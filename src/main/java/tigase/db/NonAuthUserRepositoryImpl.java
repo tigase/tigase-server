@@ -53,6 +53,7 @@ public class NonAuthUserRepositoryImpl implements NonAuthUserRepository {
 
 	private BareJID defDomain = null;
 	private final Set<BareJID> existing_domains = new ConcurrentSkipListSet<BareJID>();
+	private boolean autoCreateOffline = false;
 	private final UserRepository rep;
 
 	//~--- constructors ---------------------------------------------------------
@@ -63,10 +64,13 @@ public class NonAuthUserRepositoryImpl implements NonAuthUserRepository {
 	 *
 	 * @param userRep
 	 * @param defDomain
+	 * @param autoCreateOffline
 	 */
-	public NonAuthUserRepositoryImpl(UserRepository userRep, BareJID defDomain) {
+	public NonAuthUserRepositoryImpl(UserRepository userRep, BareJID defDomain,
+			boolean autoCreateOffline) {
 		rep = userRep;
 		this.defDomain = defDomain;
+		this.autoCreateOffline = autoCreateOffline;
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -116,7 +120,7 @@ public class NonAuthUserRepositoryImpl implements NonAuthUserRepository {
 	public void addOfflineDataList(BareJID user, String subnode, String key, String[] list)
 			throws UserNotFoundException {
 		try {
-			if (rep.userExists(user)) {
+			if (autoCreateOffline || rep.userExists(user)) {
 				rep.addDataList(user, calcNode(OFFLINE_DATA_NODE, subnode), key, list);
 			} else {
 				throw new UserNotFoundException("User: " + user
@@ -125,7 +129,7 @@ public class NonAuthUserRepositoryImpl implements NonAuthUserRepository {
 		} catch (UserNotFoundException e) {
 
 			// This is quite normal for anonymous users.
-			log.info("User not found in repository: " + user);
+			log.log(Level.INFO, "User not found in repository: {0}", user);
 		} catch (TigaseDBException e) {
 			log.log(Level.SEVERE, "Problem accessing repository data.", e);
 		}    // end of try-catch
