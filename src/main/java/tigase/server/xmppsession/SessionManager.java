@@ -1469,10 +1469,12 @@ public class SessionManager extends AbstractMessageReceiver
 		packet.setPacketTo(getComponentId());
 
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("processing packet: " + packet.toStringSecure() + ", connection: " + conn);
+			log.log(Level.FINEST, "processing packet: {0}, connection: {1}",
+					new Object[] { packet.toStringSecure(),
+					conn });
 		}
 
-		Queue<Packet> results = new ArrayDeque<Packet>();
+		Queue<Packet> results = new ArrayDeque<Packet>(2);
 		boolean stop = false;
 
 		if ( !stop) {
@@ -1480,11 +1482,11 @@ public class SessionManager extends AbstractMessageReceiver
 				packet.processedBy("filter-foward");
 
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Packet preprocessed: " + packet.toStringSecure());
+					log.log(Level.FINEST, "Packet preprocessed: {0}", packet.toStringSecure());
 
 					if (results.size() > 0) {
 						for (Packet p : results) {
-							log.finest("Preprocess result: " + p.toStringSecure());
+							log.log(Level.FINEST, "Preprocess result: {0}", p.toStringSecure());
 						}
 					}
 				}
