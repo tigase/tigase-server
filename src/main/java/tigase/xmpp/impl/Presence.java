@@ -986,7 +986,8 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc, XMPPSto
 		// to the client, all other should be ignored for now.
 		// Later on the Tigase should remember who responded with
 		// an error and don't send presence updates to this entity
-		Set<JID> direct_presences = (Set<JID>) session.getSessionData(DIRECT_PRESENCE);
+		@SuppressWarnings("unchecked") Set<JID> direct_presences =
+			(Set<JID>) session.getSessionData(DIRECT_PRESENCE);
 
 		if ((direct_presences != null) && direct_presences.contains(packet.getStanzaFrom())) {
 			Packet result = packet.copyElementOnly();
