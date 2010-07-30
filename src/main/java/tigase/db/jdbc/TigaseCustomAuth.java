@@ -595,7 +595,11 @@ public class TigaseCustomAuth implements UserAuthRepository {
 
 			if (mech.equals("PLAIN")) {
 				try {
-					return saslPlainAuth(props);
+					if (saslPlainAuth(props)) {
+						return true;
+					} else {
+						throw new AuthorizationException("Authentication failed.");
+					}
 				} catch (TigaseStringprepException ex) {
 					throw new AuthorizationException("Stringprep failed for: " + props, ex);
 				}
