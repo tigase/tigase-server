@@ -50,7 +50,7 @@ import java.util.logging.Logger;
 //import static tigase.xmpp.impl.Roster.PresenceType;
 
 /**
- * Describe class PacketFilter here.
+ * Describe class DefaultPacketHandler here.
  *
  *
  * Created: Fri Feb  2 15:08:58 2007
@@ -58,7 +58,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class PacketFilter {
+public class DefaultPacketHandler {
 
 	/**
 	 * Variable <code>log</code> is a class logger.
@@ -76,10 +76,10 @@ public class PacketFilter {
 	//~--- constructors ---------------------------------------------------------
 
 	/**
-	 * Creates a new <code>PacketFilter</code> instance.
+	 * Creates a new <code>DefaultPacketHandler</code> instance.
 	 *
 	 */
-	public PacketFilter() {}
+	public DefaultPacketHandler() {}
 
 	//~--- methods --------------------------------------------------------------
 
