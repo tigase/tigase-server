@@ -50,7 +50,7 @@ import java.util.logging.Logger;
 //import static tigase.xmpp.impl.Roster.PresenceType;
 
 /**
- * Describe class DefaultPacketHandler here.
+ * Describe class PacketDefaultHandler here.
  *
  *
  * Created: Fri Feb  2 15:08:58 2007
@@ -58,7 +58,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class DefaultPacketHandler {
+public class PacketDefaultHandler {
 
 	/**
 	 * Variable <code>log</code> is a class logger.
@@ -76,10 +76,10 @@ public class DefaultPacketHandler {
 	//~--- constructors ---------------------------------------------------------
 
 	/**
-	 * Creates a new <code>DefaultPacketHandler</code> instance.
+	 * Creates a new <code>PacketDefaultHandler</code> instance.
 	 *
 	 */
-	public DefaultPacketHandler() {}
+	public PacketDefaultHandler() {}
 
 	//~--- methods --------------------------------------------------------------
 

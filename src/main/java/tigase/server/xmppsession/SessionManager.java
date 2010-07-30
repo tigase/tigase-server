@@ -135,7 +135,7 @@ public class SessionManager extends AbstractMessageReceiver
 	private long authTimeouts = 0;
 	private UserAuthRepository auth_repository = null;
 	private long closedConnections = 0;
-	private DefaultPacketHandler filter = null;
+	private PacketDefaultHandler filter = null;
 	private long maxIdleTime = 86400 * 1000;
 	private int maxPluginsNo = 0;
 	private int maxUserConnections = 0;
@@ -597,7 +597,7 @@ public class SessionManager extends AbstractMessageReceiver
 		super.setProperties(props);
 		Security.insertProviderAt(new TigaseSaslProvider(), 6);
 		skipPrivacy = (Boolean) props.get(SKIP_PRIVACY_PROP_KEY);
-		filter = new DefaultPacketHandler();
+		filter = new PacketDefaultHandler();
 
 		// Is there a shared user repository pool? If so I want to use it:
 		user_repository = (UserRepository) props.get(SHARED_USER_REPO_POOL_PROP_KEY);
