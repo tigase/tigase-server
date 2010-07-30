@@ -44,6 +44,7 @@ import tigase.xmpp.XMPPException;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.XMPPStopListenerIfc;
 import tigase.xmpp.impl.roster.RosterAbstract;
 import tigase.xmpp.impl.roster.RosterFactory;
 
@@ -73,7 +74,8 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class JabberIqRoster extends XMPPProcessor implements XMPPProcessorIfc {
+public class JabberIqRoster extends XMPPProcessor
+		implements XMPPProcessorIfc, XMPPStopListenerIfc {
 
 	/**
 	 * Private logger for class instance.
@@ -86,7 +88,10 @@ public class JabberIqRoster extends XMPPProcessor implements XMPPProcessorIfc {
 
 	/** Field description */
 	public static final String ANON = "anon";
-	private static RosterAbstract roster_util = RosterFactory.getRosterImplementation(true);
+
+	//~--- fields ---------------------------------------------------------------
+
+	protected RosterAbstract roster_util = getRosterUtil();
 
 	//~--- get methods ----------------------------------------------------------
 
@@ -165,7 +170,269 @@ public class JabberIqRoster extends XMPPProcessor implements XMPPProcessorIfc {
 		}
 	}
 
-	private static void processGetRequest(Packet packet, XMPPResourceConnection session,
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public int concurrentQueuesNo() {
+		return Runtime.getRuntime().availableProcessors() * 2;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public int concurrentThreadsPerQueue() {
+
+		// Packet processing order does matter for roster/presence therefore
+		// we need a single thread for each queue.
+		return 1;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public String id() {
+		return ID;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param packet
+	 * @param session
+	 * @param repo
+	 * @param results
+	 * @param settings
+	 *
+	 * @throws XMPPException
+	 */
+	@Override
+	public void process(Packet packet, XMPPResourceConnection session,
+			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
+			throws XMPPException {
+
+		// The roster request can be between the user and the server or between the
+		// user and some other entity like transport
+		JID connectionId = session.getConnectionId();
+
+		if (connectionId.equals(packet.getPacketFrom())) {
+
+			// Packet from the user, let's check where it should go
+			if ((packet.getStanzaTo() != null)
+					&&!session.isLocalDomain(packet.getStanzaTo().toString(), false)
+						&&!session.isUserId(packet.getStanzaTo().getBareJID())) {
+				results.offer(packet.copyElementOnly());
+
+				return;
+			}
+		} else {
+
+			// Packet probably to the user, let's check where it came from
+			if (session.isUserId(packet.getStanzaTo().getBareJID())) {
+				Packet result = packet.copyElementOnly();
+
+				result.setPacketTo(session.getConnectionId(packet.getStanzaTo()));
+				result.setPacketFrom(packet.getTo());
+				results.offer(result);
+
+				return;
+			} else {
+
+				// Hm, I do not know what to do here, should not happen
+			}
+		}
+
+		try {
+			if ((packet.getStanzaFrom() != null)
+					&&!session.isUserId(packet.getStanzaFrom().getBareJID())) {
+
+				// RFC says: ignore such request
+				log.log(Level.WARNING,
+						"Roster request ''from'' attribute doesn''t match "
+							+ "session: {0}, request: {1}", new Object[] { session,
+						packet });
+
+				return;
+			}    // end of if (packet.getElemFrom() != null
+
+			// && !session.getUserId().equals(JIDUtils.getNodeID(packet.getElemFrom())))
+			StanzaType type = packet.getType();
+			String xmlns = packet.getElement().getXMLNS("/iq/query");
+
+			if (xmlns == RosterAbstract.XMLNS) {
+				switch (type) {
+					case get :
+						processGetRequest(packet, session, results, settings);
+
+						break;
+
+					case set :
+						processSetRequest(packet, session, results, settings);
+
+						break;
+
+					case result :
+
+						// Ignore
+						break;
+
+					default :
+						results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
+								"Request type is incorrect", false));
+
+						break;
+				}    // end of switch (type)
+			} else {
+				if (xmlns == RosterAbstract.XMLNS_DYNAMIC) {
+					switch (type) {
+						case get :
+							dynamicGetRequest(packet, session, results, settings);
+
+							break;
+
+						case set :
+							dynamicSetRequest(packet, session, results, settings);
+
+							break;
+
+						case result :
+
+							// Ignore
+							break;
+
+						default :
+							results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
+									"Request type is incorrect", false));
+
+							break;
+					}    // end of switch (type)
+				} else {
+
+					// Hm, don't know what to do, unexpected name space, let's record it
+					log.warning("Unknown XMLNS for the roster plugin: " + packet);
+				}
+			}
+		} catch (NotAuthorizedException e) {
+			log.warning("Received roster request but user session is not authorized yet: " + packet);
+			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
+					"You must authorize session first.", true));
+		} catch (TigaseDBException e) {
+			log.warning("Database problem, please contact admin: " + e);
+			results.offer(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet,
+					"Database access problem, please contact administrator.", true));
+		}    // end of try-catch
+	}
+
+	/**
+	 * <code>stopped</code> method is called when user disconnects or logs-out.
+	 *
+	 * @param session a <code>XMPPResourceConnection</code> value
+	 * @param results
+	 * @param settings
+	 */
+	@Override
+	public void stopped(final XMPPResourceConnection session, final Queue<Packet> results,
+			final Map<String, Object> settings) {
+
+//  // Synchronization to avoid conflict with login/logout events
+//  // processed in the SessionManager asynchronously
+//  synchronized (session) {
+//    try {
+//      if (session.isAnonymous() && session.getAnonymousPeers() != null) {
+//        log.finest("Anonymous session: " + session.getUserId());
+//        String[] anon_peers = session.getAnonymousPeers();
+//        for (String peer: anon_peers) {
+//          Element iq = new Element("iq",
+//            new String[] {"type", "id", "to", "from"},
+//            new String[] {"set", session.getUserName(), peer, peer});
+//          Element query = new Element("query");
+//          query.setXMLNS(XMLNS);
+//          iq.addChild(query);
+//          Element item = new Element("item",
+//            new String[] {"jid", "subscription", "type"},
+//            new String[] {session.getUserId(), "remove", ANON});
+//          query.addChild(item);
+//          Packet rost_update = new Packet(iq);
+//          results.offer(rost_update);
+//          log.finest("Sending roster update: " + rost_update.toString());
+//        }
+//      }
+//    } catch (NotAuthorizedException e) {
+//      log.warning("Can not proceed with anonymous logout, session not authorized yet..."
+//        + session.getConnectionId());
+//    }
+//  }
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 *
+	 * @return
+	 */
+	@Override
+	public Element[] supDiscoFeatures(final XMPPResourceConnection session) {
+		return RosterAbstract.DISCO_FEATURES;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public String[] supElements() {
+		return ELEMENTS;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public String[] supNamespaces() {
+		return XMLNSS;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 *
+	 * @return
+	 */
+	@Override
+	public Element[] supStreamFeatures(final XMPPResourceConnection session) {
+		return RosterAbstract.FEATURES;
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	protected RosterAbstract getRosterUtil() {
+		return RosterFactory.getRosterImplementation(true);
+	}
+
+	//~--- methods --------------------------------------------------------------
+
+	private void processGetRequest(Packet packet, XMPPResourceConnection session,
 			Queue<Packet> results, Map<String, Object> settings)
 			throws NotAuthorizedException, TigaseDBException {
 
@@ -292,7 +559,7 @@ public class JabberIqRoster extends XMPPProcessor implements XMPPProcessorIfc {
 		}
 	}
 
-	private static void processSetRequest(Packet packet, XMPPResourceConnection session,
+	private void processSetRequest(Packet packet, XMPPResourceConnection session,
 			Queue<Packet> results, final Map<String, Object> settings)
 			throws XMPPException, NotAuthorizedException, TigaseDBException {
 
@@ -448,234 +715,6 @@ public class JabberIqRoster extends XMPPProcessor implements XMPPProcessorIfc {
 			results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
 					"No items found in the roster set request", true));
 		}
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String id() {
-		return ID;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param session
-	 * @param repo
-	 * @param results
-	 * @param settings
-	 *
-	 * @throws XMPPException
-	 */
-	@Override
-	public void process(Packet packet, XMPPResourceConnection session,
-			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
-			throws XMPPException {
-
-		// The roster request can be between the user and the server or between the
-		// user and some other entity like transport
-		JID connectionId = session.getConnectionId();
-
-		if (connectionId.equals(packet.getPacketFrom())) {
-
-			// Packet from the user, let's check where it should go
-			if ((packet.getStanzaTo() != null)
-					&&!session.isLocalDomain(packet.getStanzaTo().toString(), false)
-						&&!session.isUserId(packet.getStanzaTo().getBareJID())) {
-				results.offer(packet.copyElementOnly());
-
-				return;
-			}
-		} else {
-
-			// Packet probably to the user, let's check where it came from
-			if (session.isUserId(packet.getStanzaTo().getBareJID())) {
-				Packet result = packet.copyElementOnly();
-
-				result.setPacketTo(session.getConnectionId(packet.getStanzaTo()));
-				result.setPacketFrom(packet.getTo());
-				results.offer(result);
-
-				return;
-			} else {
-
-				// Hm, I do not know what to do here, should not happen
-			}
-		}
-
-		try {
-			if ((packet.getStanzaFrom() != null)
-					&&!session.isUserId(packet.getStanzaFrom().getBareJID())) {
-
-				// RFC says: ignore such request
-				log.log(Level.WARNING,
-						"Roster request ''from'' attribute doesn''t match "
-							+ "session: {0}, request: {1}", new Object[] { session,
-						packet });
-
-				return;
-			}    // end of if (packet.getElemFrom() != null
-
-			// && !session.getUserId().equals(JIDUtils.getNodeID(packet.getElemFrom())))
-			StanzaType type = packet.getType();
-			String xmlns = packet.getElement().getXMLNS("/iq/query");
-
-			if (xmlns == RosterAbstract.XMLNS) {
-				switch (type) {
-					case get :
-						processGetRequest(packet, session, results, settings);
-
-						break;
-
-					case set :
-						processSetRequest(packet, session, results, settings);
-
-						break;
-
-					case result :
-
-						// Ignore
-						break;
-
-					default :
-						results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
-								"Request type is incorrect", false));
-
-						break;
-				}    // end of switch (type)
-			} else {
-				if (xmlns == RosterAbstract.XMLNS_DYNAMIC) {
-					switch (type) {
-						case get :
-							dynamicGetRequest(packet, session, results, settings);
-
-							break;
-
-						case set :
-							dynamicSetRequest(packet, session, results, settings);
-
-							break;
-
-						case result :
-
-							// Ignore
-							break;
-
-						default :
-							results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
-									"Request type is incorrect", false));
-
-							break;
-					}    // end of switch (type)
-				} else {
-
-					// Hm, don't know what to do, unexpected name space, let's record it
-					log.warning("Unknown XMLNS for the roster plugin: " + packet);
-				}
-			}
-		} catch (NotAuthorizedException e) {
-			log.warning("Received roster request but user session is not authorized yet: " + packet);
-			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-					"You must authorize session first.", true));
-		} catch (TigaseDBException e) {
-			log.warning("Database problem, please contact admin: " + e);
-			results.offer(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet,
-					"Database access problem, please contact administrator.", true));
-		}    // end of try-catch
-	}
-
-	/**
-	 * <code>stopped</code> method is called when user disconnects or logs-out.
-	 *
-	 * @param session a <code>XMPPResourceConnection</code> value
-	 * @param results
-	 * @param settings
-	 */
-	public void stopped(final XMPPResourceConnection session, final Queue<Packet> results,
-			final Map<String, Object> settings) {
-
-//  // Synchronization to avoid conflict with login/logout events
-//  // processed in the SessionManager asynchronously
-//  synchronized (session) {
-//    try {
-//      if (session.isAnonymous() && session.getAnonymousPeers() != null) {
-//        log.finest("Anonymous session: " + session.getUserId());
-//        String[] anon_peers = session.getAnonymousPeers();
-//        for (String peer: anon_peers) {
-//          Element iq = new Element("iq",
-//            new String[] {"type", "id", "to", "from"},
-//            new String[] {"set", session.getUserName(), peer, peer});
-//          Element query = new Element("query");
-//          query.setXMLNS(XMLNS);
-//          iq.addChild(query);
-//          Element item = new Element("item",
-//            new String[] {"jid", "subscription", "type"},
-//            new String[] {session.getUserId(), "remove", ANON});
-//          query.addChild(item);
-//          Packet rost_update = new Packet(iq);
-//          results.offer(rost_update);
-//          log.finest("Sending roster update: " + rost_update.toString());
-//        }
-//      }
-//    } catch (NotAuthorizedException e) {
-//      log.warning("Can not proceed with anonymous logout, session not authorized yet..."
-//        + session.getConnectionId());
-//    }
-//  }
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 *
-	 * @return
-	 */
-	@Override
-	public Element[] supDiscoFeatures(final XMPPResourceConnection session) {
-		return RosterAbstract.DISCO_FEATURES;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String[] supElements() {
-		return ELEMENTS;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String[] supNamespaces() {
-		return XMLNSS;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 *
-	 * @return
-	 */
-	@Override
-	public Element[] supStreamFeatures(final XMPPResourceConnection session) {
-		return RosterAbstract.FEATURES;
 	}
 }    // JabberIqRoster
 

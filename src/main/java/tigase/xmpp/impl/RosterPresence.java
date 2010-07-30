@@ -73,6 +73,7 @@ public class RosterPresence extends XMPPProcessor
 	//~--- fields ---------------------------------------------------------------
 
 	private JabberIqRoster rosterProc = new JabberIqRoster();
+	private Presence presenceProc = new Presence();
 
 	//~--- methods --------------------------------------------------------------
 
@@ -146,7 +147,7 @@ public class RosterPresence extends XMPPProcessor
 		}
 
 		if (packet.getElemName().equals(PRESENCE)) {
-			Presence.process(packet, session, repo, results, settings);
+			presenceProc.process(packet, session, repo, results, settings);
 		} else {
 			rosterProc.process(packet, session, repo, results, settings);
 		}
@@ -163,7 +164,7 @@ public class RosterPresence extends XMPPProcessor
 	@Override
 	public void stopped(final XMPPResourceConnection session, final Queue<Packet> results,
 			final Map<String, Object> settings) {
-		Presence.stopped(session, results, settings);
+		presenceProc.stopped(session, results, settings);
 		rosterProc.stopped(session, results, settings);
 	}
 
