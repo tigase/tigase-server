@@ -25,6 +25,7 @@ package tigase.util;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 //~--- classes ----------------------------------------------------------------
@@ -87,6 +88,8 @@ public class PriorityQueueRelaxed<E> extends PriorityQueueAbstract<E> {
 		for (int i = 0; i < qs.length; i++) {
 			qs[i] = new LinkedBlockingQueue<E>(maxSize);
 		}
+
+		// System.out.println("PriorityQueueRelaxed Initialized: " + maxSize);
 	}
 
 	/**
@@ -199,13 +202,13 @@ public class PriorityQueueRelaxed<E> extends PriorityQueueAbstract<E> {
 
 				LinkedBlockingQueue<E> q = qs[lowestNonEmpty];
 
-				// log.finest("" + lowestNonEmpty + " taking from queue: ");
+				// log.log(Level.FINEST, "{0} taking from queue: ", lowestNonEmpty);
 				e = q.poll();
 
 //      if (e != null) {
-//        log.finest("[" + owner + "] " + lowestNonEmpty + " element read: " + e.toString());
+//        log.log(Level.FINEST, "{0} element read: {1}", new Object[] { lowestNonEmpty, e });
 //      } else {
-//        log.finest("[" + owner + "] " + lowestNonEmpty + " NULL element read!");
+//        log.log(Level.FINEST, "{0} NULL element read!", lowestNonEmpty);
 //      }
 				if ((e == null) || q.isEmpty()) {
 					lowestNonEmpty = findNextNonEmpty();
@@ -248,14 +251,18 @@ public class PriorityQueueRelaxed<E> extends PriorityQueueAbstract<E> {
 		LinkedBlockingQueue<E> q = qs[priority];
 
 		if (blocking) {
+
+//    log.log(Level.FINEST, "{0} B before element add: {1}",
+//        new Object[] { priority, element });
 			q.put(element);
 
-//    log.finest("[" + owner + "] " + priority + " B element added: " + element.toString());
-			// log.finest("" + priority + " B element added: " + element.toString());
+			// log.finest("[" + owner + "] " + priority + " B element added: " + element.toString());
+//    log.log(Level.FINEST, "{0} B element added: {1}", new Object[] { priority, element });
 		} else {
 			result = q.offer(element);
 
-			// log.finest("" + priority + " B element added: " + element.toString());
+//    log.log(Level.FINEST, "{0} NB element added: {1}", new Object[] { priority, element });
+
 //    log.finest("[" + owner + "] " + priority + " NB element added: " +
 //            element.toString() + ", result: " + result +
 //            ", lowestNonEmpty: " + lowestNonEmpty + ", size: " + q.size());

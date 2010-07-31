@@ -144,8 +144,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
-	private static final Logger log =
-		Logger.getLogger("tigase.abstract.AbstractMessageReceiver");
+	private static final Logger log = Logger.getLogger("tigase.debug.AbstractMessageReceiver");
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -155,7 +154,6 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	private long last_minute_packets = 0;
 	private long last_second_packets = 0;
 	protected int maxQueueSize = MAX_QUEUE_SIZE_PROP_VAL;
-	private PriorityQueueAbstract<Packet> out_queue = null;
 	private QueueListener out_thread = null;
 	private long packetId = 0;
 	private long packets_per_hour = 0;
@@ -168,10 +166,12 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	private final Priority[] pr_cache = Priority.values();
 	private final CopyOnWriteArrayList<PacketFilterIfc> outgoing_filters =
 		new CopyOnWriteArrayList<PacketFilterIfc>();
+	private final PriorityQueueAbstract<Packet> out_queue =
+		PriorityQueueAbstract.getPriorityQueue(pr_cache.length, maxQueueSize);
 	private final CopyOnWriteArrayList<PacketFilterIfc> incoming_filters =
 		new CopyOnWriteArrayList<PacketFilterIfc>();
 	private final List<PriorityQueueAbstract<Packet>> in_queues =
-		new ArrayList<PriorityQueueAbstract<Packet>>();
+		new ArrayList<PriorityQueueAbstract<Packet>>(pr_cache.length);
 	private final long[] processPacketTimings = new long[100];
 	private Timer receiverTasks = null;
 
@@ -724,14 +724,11 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	 *
 	 * @param maxQueueSize
 	 *
-	 * @throws ClassNotFoundException
-	 * @throws IllegalAccessException
-	 * @throws InstantiationException
 	 */
-	public void setMaxQueueSize(int maxQueueSize)
-			throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+	public void setMaxQueueSize(int maxQueueSize) {
 		if ((this.maxQueueSize != maxQueueSize) || (in_queues.size() == 0)) {
-			out_queue = PriorityQueueAbstract.getPriorityQueue(pr_cache.length, maxQueueSize);
+
+			// out_queue = PriorityQueueAbstract.getPriorityQueue(pr_cache.length, maxQueueSize);
 			this.maxQueueSize = maxQueueSize / processingThreads();
 
 			if (in_queues.size() == 0) {
@@ -761,14 +758,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	public void setName(String name) {
 		super.setName(name);
 		in_queues_size = processingThreads();
-
-		try {
-			setMaxQueueSize(maxQueueSize);
-		} catch (Exception e) {
-			log.log(Level.SEVERE,
-					"Can't initialize component: " + getName()
-						+ ", problem with creating component queues.", e);
-		}
+		setMaxQueueSize(maxQueueSize);
 	}
 
 	/**
@@ -793,14 +783,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 
 		int queueSize = (Integer) props.get(MAX_QUEUE_SIZE_PROP_KEY);
 
-		try {
-			setMaxQueueSize(queueSize);
-		} catch (Exception e) {
-			log.log(Level.SEVERE,
-					"Can't initialize component: " + getName()
-						+ ", problem with creating component queues.", e);
-		}
-
+		setMaxQueueSize(queueSize);
 		incoming_filters.clear();
 		outgoing_filters.clear();
 
@@ -1140,7 +1123,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 			}
 
 			Packet packet = null;
-			Queue<Packet> results = new ArrayDeque<Packet>();
+			Queue<Packet> results = new ArrayDeque<Packet>(2);
 
 			while ( !threadStopped) {
 				try {
@@ -1150,9 +1133,8 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 					// packet = queue.take(getName() + ":" + type);
 					packet = queue.take();
 
-//        if (log.isLoggable(Level.FINEST)) {
-//          log.finest("[" + getName() + "] packet from " + type +
-//                  " queue: " + packet.toString());
+//        if (log.isLoggable(Level.INFO)) {
+//          log.info("[" + getName() + "] packet from " + type + " queue: " + packet);
 //        }
 					switch (type) {
 						case IN_QUEUE :
@@ -1231,8 +1213,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 					// stopped = true;
 				} catch (Exception e) {
 					log.log(Level.SEVERE,
-							"[" + getName() + "] Exception during packet processing: "
-								+ packet.toStringSecure(), e);
+							"[" + getName() + "] Exception during packet processing: " + packet, e);
 				}    // end of try-catch
 			}      // end of while (! threadStopped)
 		}

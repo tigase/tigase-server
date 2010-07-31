@@ -496,24 +496,32 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 		if (id == null) {
 			id = UUID.randomUUID().toString();
+			log.log(Level.FINER, "No Session ID, generating a new one: {0}", id);
 			serv.getSessionData().put(XMPPIOService.SESSION_ID_KEY, id);
 			serv.setXMLNS(XMLNS);
 			serv.getSessionData().put(XMPPIOService.HOSTNAME_KEY, hostname);
 			serv.setDataReceiver(JID.jidInstanceNS(routings.computeRouting(hostname)));
-			writeRawData(serv,
-					"<?xml version='1.0'?><stream:stream" + " xmlns='" + XMLNS + "'"
-						+ " xmlns:stream='http://etherx.jabber.org/streams'" + " from='" + hostname + "'"
-							+ " id='" + id + "'" + " version='1.0' xml:lang='en'>");
+
+			String streamOpenData = "<?xml version='1.0'?><stream:stream" + " xmlns='" + XMLNS + "'"
+				+ " xmlns:stream='http://etherx.jabber.org/streams'" + " from='" + hostname + "'"
+				+ " id='" + id + "'" + " version='1.0' xml:lang='en'>";
+
+			log.log(Level.FINER, "Writing raw data to the socket: {0}", streamOpenData);
+			writeRawData(serv, streamOpenData);
+			log.log(Level.FINER, "DONE");
 
 			Packet streamOpen = Command.STREAM_OPENED.getPacket(getFromAddress(getUniqueId(serv)),
-				serv.getDataReceiver(), StanzaType.set, UUID.randomUUID().toString(),
+				serv.getDataReceiver(), StanzaType.set, this.newPacketId("c2s-"),
 				Command.DataType.submit);
 
 			Command.addFieldValue(streamOpen, "session-id", id);
 			Command.addFieldValue(streamOpen, "hostname", hostname);
 			Command.addFieldValue(streamOpen, "xml:lang", lang);
+			log.log(Level.FINER, "Sending a system command to SM: {0}", streamOpen);
 			addOutPacketWithTimeout(streamOpen, startedHandler, 45l, TimeUnit.SECONDS);
+			log.log(Level.FINER, "DOEN 2");
 		} else {
+			log.log(Level.FINER, "Session ID is: {0}", id);
 			writeRawData(serv,
 					"<?xml version='1.0'?><stream:stream" + " xmlns='" + XMLNS + "'"
 						+ " xmlns:stream='http://etherx.jabber.org/streams'" + " from='" + hostname + "'"

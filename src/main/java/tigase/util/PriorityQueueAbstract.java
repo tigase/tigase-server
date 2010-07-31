@@ -133,13 +133,9 @@ public abstract class PriorityQueueAbstract<E> {
 	 * @param <E>
 	 *
 	 * @return
-	 * @throws ClassNotFoundException
-	 * @throws InstantiationException
-	 * @throws IllegalAccessException
 	 */
 	@SuppressWarnings("unchecked")
-	public static <E> PriorityQueueAbstract<E> getPriorityQueue(int maxPriority, int maxSize)
-			throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+	public static <E> PriorityQueueAbstract<E> getPriorityQueue(int maxPriority, int maxSize) {
 		PriorityQueueAbstract<E> result = null;
 		String queue_class = System.getProperty(QUEUE_IMPLEMENTATION, null);
 
@@ -150,11 +146,17 @@ public abstract class PriorityQueueAbstract<E> {
 				result = new PriorityQueueRelaxed<E>(maxPriority, maxSize);
 			}
 		} else {
-			result = (PriorityQueueAbstract<E>) Class.forName(queue_class).newInstance();
+			try {
+				result = (PriorityQueueAbstract<E>) Class.forName(queue_class).newInstance();
+			} catch (Exception e) {
+				e.printStackTrace();
+				System.exit(1);
+			}
+
 			result.init(maxPriority, maxSize);
 		}
 
-		// System.out.println("Initialized queue implementation: " + result.getClass().getName());
+//  System.out.println("Initialized queue implementation: " + result.getClass().getName());
 		return result;
 	}
 }
