@@ -1359,15 +1359,14 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc, XMPPSto
 		forwardPresence(results, packet, session.getJID().copyWithoutResource());
 
 		Element initial_presence = session.getPresence();
+		JID buddy = packet.getStanzaTo().copyWithoutResource();
+		boolean subscr_changed = roster_util.updateBuddySubscription(session, pres_type, buddy);
 
-		if (initial_presence != null) {
-			JID buddy = packet.getStanzaTo().copyWithoutResource();
-			boolean subscr_changed = roster_util.updateBuddySubscription(session, pres_type, buddy);
+		if (subscr_changed) {
+			roster_util.updateBuddyChange(session, results,
+					roster_util.getBuddyItem(session, buddy));
 
-			if (subscr_changed) {
-				roster_util.updateBuddyChange(session, results,
-						roster_util.getBuddyItem(session, buddy));
-
+			if (initial_presence != null) {
 				if (pres_type == PresenceType.out_subscribed) {
 					sendPresence(StanzaType.available, null, buddy, results, initial_presence);
 				} else {
