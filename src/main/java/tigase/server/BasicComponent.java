@@ -332,35 +332,53 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 
 			// Element result = serviceEntity.getDiscoItem(null, getName() + "." + jid);
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Found disco items: " + ((result != null) ? result.toString() : null));
+				log.log(Level.FINEST, "{0} Found disco items: {1}", new Object[] { getName(),
+						((result != null) ? result.toString() : null) });
 			}
 
 			return result;
 		} else {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "{0} General disco items request, node: {1}",
+						new Object[] { getName(),
+						node });
+			}
 
 			if (node == null) {
-			Element res = null;
-			if ( !serviceEntity.isAdminOnly() || isAdmin(from)) {
-				res = serviceEntity.getDiscoItem(null, BareJID.toString(getName(), jid.toString()));
-			}
-
-			result = serviceEntity.getDiscoItems(null, null, isAdmin(from));
-
-			if (res != null) {
-				if (result != null) {
-					for (Iterator<Element> it = result.iterator(); it.hasNext(); ) {
-						Element element = it.next();
-
-						if (element.getAttribute("node") != null) {
-							it.remove();
-						}
-					}
-
-					result.add(0, res);
-				} else {
-					result = Arrays.asList(res);
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "{0} Disco items request for null node",
+							new Object[] { getName() });
 				}
-			}
+
+				Element res = null;
+
+				if ( !serviceEntity.isAdminOnly() || isAdmin(from)) {
+					res = serviceEntity.getDiscoItem(null, BareJID.toString(getName(), jid.toString()));
+
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "{0} not admin only or isAdmin, result: {1}",
+								new Object[] { getName(),
+								res });
+					}
+				}
+
+				result = serviceEntity.getDiscoItems(null, null, isAdmin(from));
+
+				if (res != null) {
+					if (result != null) {
+						for (Iterator<Element> it = result.iterator(); it.hasNext(); ) {
+							Element element = it.next();
+
+							if (element.getAttribute("node") != null) {
+								it.remove();
+							}
+						}
+
+						result.add(0, res);
+					} else {
+						result = Arrays.asList(res);
+					}
+				}
 			}
 
 			return result;

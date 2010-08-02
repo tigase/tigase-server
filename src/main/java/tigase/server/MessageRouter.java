@@ -797,20 +797,20 @@ public class MessageRouter extends AbstractMessageReceiver implements MessageRou
 
 	private void processDiscoQuery(final Packet packet, final Queue<Packet> results) {
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Processing disco query by: " + packet.toStringSecure());
+			log.log(Level.FINEST, "Processing disco query by: {0}", packet.toStringSecure());
 		}
 
-		JID jid = packet.getStanzaTo();
-		JID from = packet.getStanzaFrom();
+		JID toJid = packet.getStanzaTo();
+		JID fromJid = packet.getStanzaFrom();
 		String node = packet.getAttribute("/iq/query", "node");
 		Element query = packet.getElement().getChild("query").clone();
 
 		if (packet.isXMLNS("/iq/query", INFO_XMLNS)) {
-			if (isLocalDomain(jid.toString()) && (node == null)) {
-				query = getDiscoInfo(node, jid, from);
+			if (isLocalDomain(toJid.toString()) && (node == null)) {
+				query = getDiscoInfo(node, toJid, fromJid);
 
 				for (XMPPService comp : xmppServices.values()) {
-					List<Element> features = comp.getDiscoFeatures(from);
+					List<Element> features = comp.getDiscoFeatures(fromJid);
 
 					if (features != null) {
 						query.addChildren(features);
@@ -820,7 +820,7 @@ public class MessageRouter extends AbstractMessageReceiver implements MessageRou
 				for (XMPPService comp : xmppServices.values()) {
 
 					// if (jid.startsWith(comp.getName() + ".")) {
-					Element resp = comp.getDiscoInfo(node, jid, from);
+					Element resp = comp.getDiscoInfo(node, toJid, fromJid);
 
 					if (resp != null) {
 						query.addChildren(resp.getChildren());
@@ -832,17 +832,20 @@ public class MessageRouter extends AbstractMessageReceiver implements MessageRou
 		}
 
 		if (packet.isXMLNS("/iq/query", ITEMS_XMLNS)) {
-			boolean localDomain = isLocalDomain(jid.toString());
+			boolean localDomain = isLocalDomain(toJid.toString());
 
 			if (localDomain) {
 				for (XMPPService comp : xmppServices.values()) {
 
 					// if (localDomain || (nick != null && comp.getName().equals(nick))) {
-					List<Element> items = comp.getDiscoItems(node, jid, from);
+					List<Element> items = comp.getDiscoItems(node, toJid, fromJid);
 
 					if (log.isLoggable(Level.FINEST)) {
-						log.finest("DiscoItems processed by: " + comp.getComponentId() + ", items: "
-								+ ((items == null) ? null : items.toString()));
+						log.log(Level.FINEST,
+								"Localdomain: {0}, DiscoItems processed by: {1}, items: {2}",
+									new Object[] { toJid,
+								comp.getComponentId(),
+								(items == null) ? null : items.toString() });
 					}
 
 					if ((items != null) && (items.size() > 0)) {
@@ -850,14 +853,15 @@ public class MessageRouter extends AbstractMessageReceiver implements MessageRou
 					}
 				}    // end of for ()
 			} else {
-				ServerComponent comp = getLocalComponent(jid);
+				ServerComponent comp = getLocalComponent(toJid);
 
 				if ((comp != null) && (comp instanceof XMPPService)) {
-					List<Element> items = ((XMPPService) comp).getDiscoItems(node, jid, from);
+					List<Element> items = ((XMPPService) comp).getDiscoItems(node, toJid, fromJid);
 
 					if (log.isLoggable(Level.FINEST)) {
-						log.finest("DiscoItems processed by: " + comp.getComponentId() + ", items: "
-								+ ((items == null) ? null : items.toString()));
+						log.log(Level.FINEST, "DiscoItems processed by: {0}, items: {1}",
+								new Object[] { comp.getComponentId(),
+								(items == null) ? null : items.toString() });
 					}
 
 					if ((items != null) && (items.size() > 0)) {
