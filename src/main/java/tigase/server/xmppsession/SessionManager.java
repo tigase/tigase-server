@@ -1219,6 +1219,9 @@ public class SessionManager extends AbstractMessageReceiver
 				}
 
 				sendToAdmins(packet);
+				packet.processedBy("admins-or-domains");
+
+				return true;
 			} else {
 				if (log.isLoggable(Level.WARNING)) {
 					log.warning("Packet for hostname, should be handled elsewhere: " + packet);
@@ -1233,10 +1236,6 @@ public class SessionManager extends AbstractMessageReceiver
 //      host_pac.initVars(packet.getStanzaFrom(), getComponentId());
 //      processPacket(host_pac);
 			}
-
-			packet.processedBy("admins-or-domains");
-
-			return true;
 		}    // end of if (isInRoutings(to))
 
 		return false;
