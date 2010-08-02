@@ -304,7 +304,13 @@ public class Privacy {
 	 */
 	public static void setActiveList(XMPPResourceConnection session, String lName)
 			throws NotAuthorizedException, TigaseDBException {
-		if (lName != null) {
+		if (lName == null) {
+
+			// User declines to use current actiev list
+			session.removeCommonSessionData(ACTIVE);
+		} else {
+
+			// User selects a different active list
 			Element list = getList(session, lName);
 
 			if (list != null) {
@@ -324,8 +330,6 @@ public class Privacy {
 //              at tigase.server.xmppsession.SessionManager$ProcessorWorkerThread.process(SessionManager.java:1935)
 //              at tigase.util.WorkerThread.run(WorkerThread.java:118)
 			}
-		} else {
-			session.removeCommonSessionData(ACTIVE);
 		}
 	}
 
