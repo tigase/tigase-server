@@ -262,7 +262,6 @@ public class PriorityQueueRelaxed<E> extends PriorityQueueAbstract<E> {
 			result = q.offer(element);
 
 //    log.log(Level.FINEST, "{0} NB element added: {1}", new Object[] { priority, element });
-
 //    log.finest("[" + owner + "] " + priority + " NB element added: " +
 //            element.toString() + ", result: " + result +
 //            ", lowestNonEmpty: " + lowestNonEmpty + ", size: " + q.size());
