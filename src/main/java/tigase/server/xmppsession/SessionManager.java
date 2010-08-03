@@ -1215,7 +1215,7 @@ public class SessionManager extends AbstractMessageReceiver
 
 				// Yes this packet is for admin....
 				if (log.isLoggable(Level.FINER)) {
-					log.finer("Packet for admin: " + packet);
+					log.log(Level.FINER, "Packet for admin: {0}", packet);
 				}
 
 				sendToAdmins(packet);
@@ -1223,8 +1223,9 @@ public class SessionManager extends AbstractMessageReceiver
 
 				return true;
 			} else {
-				if (log.isLoggable(Level.WARNING)) {
-					log.warning("Packet for hostname, should be handled elsewhere: " + packet);
+				if (log.isLoggable(Level.FINER)) {
+					log.log(Level.FINER, "Packet for hostname, should be handled elsewhere: {0}",
+							packet);
 				}
 
 //      Packet host_pac = packet.copyElementOnly();
