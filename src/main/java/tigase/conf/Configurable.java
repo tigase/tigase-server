@@ -126,7 +126,19 @@ public interface Configurable extends ServerComponent {
 	public static final String GEN_USER_DB = "--user-db";
 
 	/** Field description */
+	public static final String USER_REPO_POOL_CLASS = "--user-repo-pool";
+
+	/** Field description */
+	public static final String USER_DOMAIN_POOL_CLASS = "--user-domain-repo-pool";
+
+	/** Field description */
 	public static final String GEN_AUTH_DB = "--auth-db";
+
+	/** Field description */
+	public static final String AUTH_REPO_POOL_CLASS = "--auth-repo-pool";
+
+	/** Field description */
+	public static final String AUTH_DOMAIN_POOL_CLASS = "--auth-domain-repo-pool";
 
 	/** Field description */
 	public static final String GEN_USER_DB_URI_PROP_KEY = "user-db-uri";
