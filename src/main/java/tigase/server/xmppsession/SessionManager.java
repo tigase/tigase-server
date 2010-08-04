@@ -1305,53 +1305,50 @@ public class SessionManager extends AbstractMessageReceiver
 				}
 
 				// Note! We don't send response to this packet....
-				if (connectionsByFrom.get(iqc.getFrom()) != null) {
-					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, "{0} adding to the processor: {1}",
-								new Object[] { iqc.getCommand(),
-								((connection != null) ? connection : " is null") });
-					}
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "{0} adding to the processor: {1}",
+							new Object[] { iqc.getCommand(),
+							((connection != null) ? connection : " is null") });
+				}
 
-					if (connection == null) {
+				if (connection == null) {
 
-						// Hm, the user connection does not exist here but
-						// the XMPPSession thinks it still does, a quick fix should
-						// be enough.
-						// TODO: investigate why this happens at all, an exception
-						// during connection close processing????
-						JID stanzaFrom = iqc.getStanzaFrom();
+					// Hm, the user connection does not exist here but
+					// the XMPPSession thinks it still does, a quick fix should
+					// be enough.
+					// TODO: investigate why this happens at all, an exception
+					// during connection close processing????
+					JID stanzaFrom = iqc.getStanzaFrom();
 
-						if (stanzaFrom == null) {
+					if (stanzaFrom == null) {
 
-							// This is wrong
-							log.log(Level.WARNING, "Stream close update without an user JID: {0}", iqc);
+						// This is wrong
+						log.log(Level.WARNING, "Stream close update without an user JID: {0}", iqc);
+					} else {
+						XMPPSession xs = sessionsByNodeId.get(stanzaFrom.getBareJID());
+
+						if (xs == null) {
+							log.log(Level.INFO, "Stream close for the user session which does not exist",
+									iqc);
 						} else {
-							XMPPSession xs = sessionsByNodeId.get(stanzaFrom.getBareJID());
+							XMPPResourceConnection xcr = xs.getResourceForConnectionId(iqc.getPacketFrom());
 
-							if (xs == null) {
-								log.log(Level.INFO, "Stream close for the user session which does not exist",
-										iqc);
+							if (xcr == null) {
+								log.log(Level.INFO,
+										"Stream close for the resource connection which does not exist", iqc);
 							} else {
-								XMPPResourceConnection xcr =
-									xs.getResourceForConnectionId(iqc.getPacketFrom());
+								xs.removeResourceConnection(xcr);
 
-								if (xcr == null) {
-									log.log(Level.INFO,
-											"Stream close for the resource connection which does not exist", iqc);
-								} else {
-									xs.removeResourceConnection(xcr);
-
-									if (log.isLoggable(Level.FINEST)) {
-										log.log(Level.FINEST, "{0} removed resource connection: {1}",
-												new Object[] { iqc.getCommand(),
-												xcr });
-									}
+								if (log.isLoggable(Level.FINEST)) {
+									log.log(Level.FINEST, "{0} removed resource connection: {1}",
+											new Object[] { iqc.getCommand(),
+											xcr });
 								}
 							}
 						}
-					} else {
-						sessionCloseThread.addItem(iqc, connection);
 					}
+				} else {
+					sessionCloseThread.addItem(iqc, connection);
 				}
 
 				// closeConnection(pc.getFrom(), false);
