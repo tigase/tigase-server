@@ -464,7 +464,10 @@ public class UserRepositoryMDImpl implements UserRepository {
 	 */
 	@Override
 	public void initRepository(String resource_uri, Map<String, String> params)
-			throws DBInitException {}
+			throws DBInitException {
+		log.info("Multi-domain repository pool initialized: " + resource_uri + ", params: "
+				+ params);
+	}
 
 	/**
 	 * Method description

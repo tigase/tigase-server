@@ -650,8 +650,19 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 		String userRepoMDImpl = (String) props.get(USER_DOMAIN_POOL_CLASS_PROP_KEY);
 
 		try {
+
+			// Authentication multi-domain repository pool initialization
+			Map<String, String> params = getRepoParams(props, AUTH_REPO_PARAMS_NODE, null);
+			String conn_url = (String) props.get(AUTH_REPO_URL_PROP_KEY);
+
 			auth_repo_impl = (UserAuthRepositoryMDImpl) Class.forName(authRepoMDImpl).newInstance();
+			auth_repo_impl.initRepository(conn_url, params);
+
+			// User multi-domain repository pool initialization
+			params = getRepoParams(props, USER_REPO_PARAMS_NODE, null);
+			conn_url = (String) props.get(USER_REPO_URL_PROP_KEY);
 			user_repo_impl = (UserRepositoryMDImpl) Class.forName(userRepoMDImpl).newInstance();
+			user_repo_impl.initRepository(conn_url, params);
 		} catch (Exception ex) {
 			log.log(Level.SEVERE, "An error initializing domain repository pool: ", ex);
 		}
