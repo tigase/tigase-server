@@ -503,11 +503,11 @@ public class CIDConnections {
 		}
 
 		if (packet != null) {
-			waitingPackets.offer(packet);
-
-			if (firstWaitingTime == 0) {
+			if ((firstWaitingTime == 0) || waitingPackets.isEmpty()) {
 				firstWaitingTime = System.currentTimeMillis();
 			}
+
+			waitingPackets.offer(packet);
 		}
 
 		if (sendInProgress.tryLock()) {
