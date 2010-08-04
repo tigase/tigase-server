@@ -864,7 +864,7 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 
 	private Map<String, String> getRepoParams(Map<String, Object> props, String repo_type,
 			String domain) {
-		Map<String, String> result = new LinkedHashMap<String, String>();
+		Map<String, String> result = new LinkedHashMap<String, String>(10);
 		String prop_start = repo_type + ((domain == null) ? "" : "/" + domain);
 
 		for (Map.Entry<String, Object> entry : props.entrySet()) {
@@ -914,7 +914,7 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 		String options = key.substring(br_open + 1, br_close);
 		String domain = options.split(":")[0];
 
-		log.info("Found DB domain: " + domain);
+		log.log(Level.INFO, "Found DB domain: {0}", domain);
 
 		String get_user_db = GEN_AUTH_DB + "[" + options + "]";
 
@@ -948,7 +948,7 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 		String options = key.substring(br_open + 1, br_close);
 		String domain = options.split(":")[0];
 
-		log.info("Found DB domain: " + domain);
+		log.log(Level.INFO, "Found DB domain: {0}", domain);
 
 		String get_user_db = GEN_USER_DB + "[" + options + "]";
 
@@ -968,13 +968,13 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 
 	private void setupLogManager(Map<String, Object> properties) {
 		Set<Map.Entry<String, Object>> entries = properties.entrySet();
-		StringBuilder buff = new StringBuilder();
+		StringBuilder buff = new StringBuilder(200);
 
 		for (Map.Entry<String, Object> entry : entries) {
 			if (entry.getKey().startsWith(LOGGING_KEY)) {
 				String key = entry.getKey().substring(LOGGING_KEY.length());
 
-				buff.append(key + "=" + entry.getValue() + "\n");
+				buff.append(key).append("=").append(entry.getValue()).append("\n");
 
 				if (key.equals("java.util.logging.FileHandler.pattern")) {
 					File log_path = new File(entry.getValue().toString()).getParentFile();
