@@ -107,7 +107,7 @@ public class JabberIqCommand extends XMPPProcessor implements XMPPProcessorIfc {
 //  }
 		try {
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Received packet: " + packet.toString());
+				log.log(Level.FINEST, "Received packet: {0}", packet);
 			}
 
 			// Not needed anymore. Packet filter does it for all stanzas.
@@ -142,7 +142,7 @@ public class JabberIqCommand extends XMPPProcessor implements XMPPProcessorIfc {
 				results.offer(result);
 			}    // end of else
 		} catch (NotAuthorizedException e) {
-			log.warning("NotAuthorizedException for packet: " + packet.toString());
+			log.log(Level.WARNING, "NotAuthorizedException for packet: {0}", packet);
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 					"You must authorize session first.", true));
 		}    // end of try-catch
