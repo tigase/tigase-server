@@ -178,8 +178,12 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 		String repo_uri = (String) properties.get(REPO_URI_PROP_KEY);
 
 		if ((repo_class != null) && (repo_uri != null)) {
+			log.log(Level.INFO, "Initializing custom component repository: {0}, db connection: {1}",
+					new Object[] { repo_class,
+					repo_uri });
+
 			try {
-				repo = RepositoryFactory.getUserRepository(getRepoUser().getLocalpart(), repo_class,
+				repo = RepositoryFactory.getUserRepository(getRepoUser().getDomain(), repo_class,
 						repo_uri, null);
 			} catch (Exception e) {
 				log.log(Level.SEVERE, "Can't initialize Items repository", e);
