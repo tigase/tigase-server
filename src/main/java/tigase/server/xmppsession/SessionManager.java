@@ -158,31 +158,31 @@ public class SessionManager extends AbstractMessageReceiver
 
 	// {"admin@localhost"};
 	private Map<String, XMPPStopListenerIfc> stopListeners = new ConcurrentHashMap<String,
-		XMPPStopListenerIfc>();
+		XMPPStopListenerIfc>(10);
 	private boolean skipPrivacy = false;
 
 	/**
 	 * A Map with bare user JID as a key and a user session object as a value.
 	 */
 	private ConcurrentHashMap<BareJID, XMPPSession> sessionsByNodeId =
-		new ConcurrentHashMap<BareJID, XMPPSession>();
+		new ConcurrentHashMap<BareJID, XMPPSession>(100000);
 	private Map<String, ProcessingThreads<ProcessorWorkerThread>> processors =
-		new ConcurrentHashMap<String, ProcessingThreads<ProcessorWorkerThread>>();
+		new ConcurrentHashMap<String, ProcessingThreads<ProcessorWorkerThread>>(20);
 	private Map<String, XMPPPreprocessorIfc> preProcessors = new ConcurrentHashMap<String,
-		XMPPPreprocessorIfc>();
+		XMPPPreprocessorIfc>(10);
 	private Map<String, XMPPPostprocessorIfc> postProcessors = new ConcurrentHashMap<String,
-		XMPPPostprocessorIfc>();
+		XMPPPostprocessorIfc>(10);
 	private Map<String, Map<String, Object>> plugin_config = new ConcurrentHashMap<String,
-		Map<String, Object>>();
+		Map<String, Object>>(20);
 	private Map<String, XMPPPacketFilterIfc> outFilters = new ConcurrentHashMap<String,
-		XMPPPacketFilterIfc>();
+		XMPPPacketFilterIfc>(10);
 
 	/**
 	 * A Map with connectionID as a key and an object with all the user connection
 	 * data as a value
 	 */
 	protected ConcurrentHashMap<JID, XMPPResourceConnection> connectionsByFrom =
-		new ConcurrentHashMap<JID, XMPPResourceConnection>();
+		new ConcurrentHashMap<JID, XMPPResourceConnection>(100000);
 	private ConnectionCheckCommandHandler connectionCheckCommandHandler =
 		new ConnectionCheckCommandHandler();
 
