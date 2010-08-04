@@ -92,20 +92,22 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 		// Otherwise the server would not work at all with empty Items database
 		super.getDefaults(defs, params);
 
-		// Now the real items data storage:
-		String repo_class = DERBY_REPO_CLASS_PROP_VAL;
-		String repo_uri = DERBY_REPO_URL_PROP_VAL;
-
-		if (params.get(GEN_USER_DB) != null) {
-			repo_class = (String) params.get(GEN_USER_DB);
-		}
-
-		if (params.get(GEN_USER_DB_URI) != null) {
-			repo_uri = (String) params.get(GEN_USER_DB_URI);
-		}
-
-		defs.put(REPO_CLASS_PROP_KEY, repo_class);
-		defs.put(REPO_URI_PROP_KEY, repo_uri);
+		// Do not create defaults for this, let it to use the shared repo pool as
+		// a default one. Only if the user sets settings manually it means he wants
+		// a different from the shared default.
+//  // Now the real items data storage:
+//  String repo_class = DERBY_REPO_CLASS_PROP_VAL;
+//  String repo_uri = DERBY_REPO_URL_PROP_VAL;
+//
+//  if (params.get(GEN_USER_DB) != null) {
+//    repo_class = (String) params.get(GEN_USER_DB);
+//  }
+//
+//  if (params.get(GEN_USER_DB_URI) != null) {
+//    repo_uri = (String) params.get(GEN_USER_DB_URI);
+//  }
+//  defs.put(REPO_CLASS_PROP_KEY, repo_class);
+//  defs.put(REPO_URI_PROP_KEY, repo_uri);
 	}
 
 	/**
@@ -154,7 +156,7 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 			log.log(Level.SEVERE, "Problem with loading items list from the database.", ex);
 		}
 
-		log.config("All loaded items: " + items.toString());
+		log.log(Level.CONFIG, "All loaded items: {0}", items);
 	}
 
 	//~--- set methods ----------------------------------------------------------
@@ -171,14 +173,11 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 		// Let's load items from configuration first. Later we can overwrite
 		// them with items settings in the database.
 		super.setProperties(properties);
-		repo = (UserRepository) properties.get(SHARED_USER_REPO_PROP_KEY);
 
-		if (repo != null) {
-			log.config("Using shared repository instance.");
-		} else {
-			String repo_class = (String) properties.get(REPO_CLASS_PROP_KEY);
-			String repo_uri = (String) properties.get(REPO_URI_PROP_KEY);
+		String repo_class = (String) properties.get(REPO_CLASS_PROP_KEY);
+		String repo_uri = (String) properties.get(REPO_URI_PROP_KEY);
 
+		if ((repo_class != null) && (repo_uri != null)) {
 			try {
 				repo = RepositoryFactory.getUserRepository(getRepoUser().getLocalpart(), repo_class,
 						repo_uri, null);
@@ -186,6 +185,11 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 				log.log(Level.SEVERE, "Can't initialize Items repository", e);
 				repo = null;
 			}
+		}
+
+		if (repo == null) {
+			repo = (UserRepository) properties.get(SHARED_USER_REPO_PROP_KEY);
+			log.config("Using shared repository instance.");
 		}
 
 		if (repo != null) {
