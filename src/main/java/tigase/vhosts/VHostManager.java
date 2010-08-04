@@ -81,11 +81,11 @@ public class VHostManager extends AbstractComponentRegistrator<VHostListener>
 	private long isAnonymousEnabledCalls = 0;
 	private long isLocalDomainCalls = 0;
 	private LinkedHashSet<VHostListener> localDomainsHandlers =
-		new LinkedHashSet<VHostListener>();
+		new LinkedHashSet<VHostListener>(10);
 	private LinkedHashSet<VHostListener> nonLocalDomainsHandlers =
-		new LinkedHashSet<VHostListener>();
+		new LinkedHashSet<VHostListener>(10);
 	private LinkedHashSet<VHostListener> nameSubdomainsHandlers =
-		new LinkedHashSet<VHostListener>();
+		new LinkedHashSet<VHostListener>(10);
 	private ConcurrentSkipListSet<String> registeredComponentDomains =
 		new ConcurrentSkipListSet<String>();
 	private ComponentRepository<VHostItem> repo = null;
@@ -185,7 +185,7 @@ public class VHostManager extends AbstractComponentRegistrator<VHostListener>
 
 			// Return all components for local domains and components selected
 			// for this specific domain
-			LinkedHashSet<ServerComponent> results = new LinkedHashSet<ServerComponent>();
+			LinkedHashSet<ServerComponent> results = new LinkedHashSet<ServerComponent>(10);
 
 			results.addAll(localDomainsHandlers);
 
