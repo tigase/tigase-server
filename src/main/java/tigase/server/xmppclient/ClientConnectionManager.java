@@ -227,8 +227,8 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 				// floating around, so just skip sending stream_close for all the
 				// offline presences
 				if ((packet.getType() != StanzaType.unavailable) && (packet.getPacketFrom() != null)) {
-					Packet command = Command.STREAM_CLOSED_UPDATE.getPacket(null, null, StanzaType.set,
-						UUID.randomUUID().toString());
+					Packet command = Command.STREAM_CLOSED_UPDATE.getPacket(packet.getStanzaTo(), null,
+						StanzaType.set, UUID.randomUUID().toString());
 
 					command.setPacketFrom(packet.getPacketTo());
 					command.setPacketTo(packet.getPacketFrom());
@@ -238,8 +238,10 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 					addOutPacket(command);
 
 //        addOutPacketWithTimeout(command, stoppedHandler, 15l, TimeUnit.SECONDS);
-					log.fine("Sending a command to close the remote session for non-existen "
-							+ getName() + " connection: " + command.toStringSecure());
+					log.log(Level.FINE,
+							"Sending a command to close the remote session for non-existen {0} connection: {1}",
+								new Object[] { getName(),
+							command.toStringSecure() });
 				}
 			}
 		}    // end of else

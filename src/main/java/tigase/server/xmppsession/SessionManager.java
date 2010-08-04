@@ -933,24 +933,24 @@ public class SessionManager extends AbstractMessageReceiver
 				JID userJid = conn.getJID();
 
 				if (log.isLoggable(Level.FINE)) {
-					log.fine("Closing connection for: " + userJid);
+					log.log(Level.FINE, "Closing connection for: {0}", userJid);
 				}
 
 				XMPPSession session = conn.getParentSession();
 
 				if (session != null) {
 					if (log.isLoggable(Level.FINE)) {
-						log.fine("Found parent session for: " + userJid);
+						log.log(Level.FINE, "Found parent session for: {0}", userJid);
 					}
 
 					if (session.getActiveResourcesSize() <= 1) {
 						session = sessionsByNodeId.remove(userJid.getBareJID());
 
 						if (session == null) {
-							log.info("UPS can't remove, session not found in map: " + userJid);
+							log.log(Level.INFO, "UPS can''t remove, session not found in map: {0}", userJid);
 						} else {
 							if (log.isLoggable(Level.FINER)) {
-								log.finer("Number of user sessions: " + sessionsByNodeId.size());
+								log.log(Level.FINER, "Number of user sessions: {0}", sessionsByNodeId.size());
 							}
 						}    // end of else
 
@@ -959,21 +959,22 @@ public class SessionManager extends AbstractMessageReceiver
 						}
 					} else {
 						if (log.isLoggable(Level.FINER)) {
-							StringBuilder sb = new StringBuilder();
+							StringBuilder sb = new StringBuilder(100);
 
 							for (XMPPResourceConnection res_con : session.getActiveResources()) {
-								sb.append(", res=" + res_con.getResource() + " ("
-										+ res_con.getConnectionStatus() + ")");
+								sb.append(", res=").append(res_con.getResource());
+								sb.append(" (").append(res_con.getConnectionStatus()).append(")");
 							}
 
-							log.finer("Number of connections is " + session.getActiveResourcesSize()
-									+ " for the user: " + userJid + sb.toString());
+							log.log(Level.FINER, "Number of connections is {0} for the user: {1}{2}",
+									new Object[] { session.getActiveResourcesSize(),
+									userJid, sb.toString() });
 						}
 					}    // end of else
 				}      // end of if (session.getActiveResourcesSize() == 0)
 			}
 		} catch (NotAuthorizedException e) {
-			log.info("Closed not authorized session: " + e);
+			log.log(Level.INFO, "Closed not authorized session: {0}", e);
 		} catch (Exception e) {
 			log.log(Level.WARNING, "Exception closing session... ", e);
 		}
@@ -1311,7 +1312,46 @@ public class SessionManager extends AbstractMessageReceiver
 								((connection != null) ? connection : " is null") });
 					}
 
-					sessionCloseThread.addItem(iqc, connection);
+					if (connection == null) {
+
+						// Hm, the user connection does not exist here but
+						// the XMPPSession thinks it still does, a quick fix should
+						// be enough.
+						// TODO: investigate why this happens at all, an exception
+						// during connection close processing????
+						JID stanzaFrom = iqc.getStanzaFrom();
+
+						if (stanzaFrom == null) {
+
+							// This is wrong
+							log.log(Level.WARNING, "Stream close update without an user JID: {0}", iqc);
+						} else {
+							XMPPSession xs = sessionsByNodeId.get(stanzaFrom.getBareJID());
+
+							if (xs == null) {
+								log.log(Level.INFO, "Stream close for the user session which does not exist",
+										iqc);
+							} else {
+								XMPPResourceConnection xcr =
+									xs.getResourceForConnectionId(iqc.getPacketFrom());
+
+								if (xcr == null) {
+									log.log(Level.INFO,
+											"Stream close for the resource connection which does not exist", iqc);
+								} else {
+									xs.removeResourceConnection(xcr);
+
+									if (log.isLoggable(Level.FINEST)) {
+										log.log(Level.FINEST, "{0} removed resource connection: {1}",
+												new Object[] { iqc.getCommand(),
+												xcr });
+									}
+								}
+							}
+						}
+					} else {
+						sessionCloseThread.addItem(iqc, connection);
+					}
 				}
 
 				// closeConnection(pc.getFrom(), false);
