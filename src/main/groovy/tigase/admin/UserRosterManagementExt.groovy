@@ -61,7 +61,7 @@ def actions_descr = ["Add/Update item", "Remove item",
 
 def p = (Packet)packet
 def repository = (UserRepository)userRepository
-def sessions = (Map<String, XMPPSession>)userSessions
+def sessions = (Map<BareJID, XMPPSession>)userSessions
 
 def rosterOwnerJid = Command.getFieldValue(packet, ROSTER_OWNER_JID)
 def rosterOwnerName = Command.getFieldValue(packet, ROSTER_OWNER_NAME)
@@ -101,7 +101,7 @@ def Queue<Packet> results = new LinkedList<Packet>()
 
 def updateRoster = { jid, i_jid, i_name, i_groups, i_subscr ->
 
-	def XMPPResourceConnection conn = sessions.get(jid)?.getResourceConnection(jid)
+	def XMPPResourceConnection conn = sessions.get(jid)?.getResourceConnection(jid.getBareJID())
 	if ( conn != null ) {
 		// Update online
 		RosterAbstract rosterUtil = RosterFactory.getRosterImplementation(true)
@@ -110,7 +110,7 @@ def updateRoster = { jid, i_jid, i_name, i_groups, i_subscr ->
 		if (remove_item) {
 			rosterUtil.removeBuddy(conn, i_jid)
 		} else {
-			rosterUtil.addBuddy(conn, i_jid, i_name ?: JIDUtils.getNodeNick(i_jid),
+			rosterUtil.addBuddy(conn, i_jid, i_name ?: i_jid.getLocalpart(),
 				i_groups ? i_groups.split(",") : null)
 			rosterUtil.setBuddySubscription(conn,
 				RosterAbstract.SubscriptionType.valueOf(i_subscr), i_jid)
@@ -119,7 +119,7 @@ def updateRoster = { jid, i_jid, i_name, i_groups, i_subscr ->
 		rosterUtil.updateBuddyChange(conn, results, item)
 	} else {
 		// Update offline
-		String rosterStr = repository.getData(JIDUtils.getNodeID(jid), null,
+		String rosterStr = repository.getData(jid.getBareJID(), null,
 			RosterAbstract.ROSTER, null) ?: ""
 		Map<BareJID, RosterElement> roster = new LinkedHashMap<BareJID, RosterElement>()
 		RosterFlat.parseRoster(rosterStr, roster, null)
@@ -131,14 +131,14 @@ def updateRoster = { jid, i_jid, i_name, i_groups, i_subscr ->
 				rel.setSubscription(RosterAbstract.SubscriptionType.valueOf(i_subscr))
 			roster.put(i_jid, rel)
 		}
-		StringBuilder sb = new StringBuilder()
+		StringBuilder sb = new StringBuilder(200)
 		for (RosterElement relem: roster.values())
 			sb.append(relem.getRosterElement().toString())
-		repository.setData(JIDUtils.getNodeID(jid), null, RosterAbstract.ROSTER, sb.toString());
+		repository.setData(jid.getBareJID(), null, RosterAbstract.ROSTER, sb.toString());
 	}
 }
 
-updateRoster(rosterOwnerJid, rosterItemJid, rosterItemName,
+updateRoster(JID.jidInstanceNS(rosterOwnerJid), JID.jidInstanceNS(rosterItemJid), rosterItemName,
 	rosterItemGroups, rosterItemSubscr)
 
 if (rosterAction == UPDATE_EXT || rosterAction == REMOVE_EXT) {
@@ -147,7 +147,7 @@ if (rosterAction == UPDATE_EXT || rosterAction == REMOVE_EXT) {
 		case "to" : subscr = "from"; break;
 		case "from" : subscr = "to"; break;
 	}
-	updateRoster(rosterItemJid, rosterOwnerJid, rosterOwnerName,
+	updateRoster(JID.jidInstanceNS(rosterItemJid), JID.jidInstanceNS(rosterOwnerJid), rosterOwnerName,
 		rosterItemGroups, subscr)
 }
 
@@ -155,11 +155,11 @@ if (!remove_item) {
 	Element pres = new Element("presence", 
 		(String[])["from", "to", "type"], (String[])[rosterOwnerJid, rosterItemJid,
       "probe"])
-  results.offer(new Packet(pres))
+  results.offer(Packet.packetInstance(pres))
 	pres = new Element("presence", 
 		(String[])["from", "to", "type"], (String[])[rosterItemJid, rosterOwnerJid, 
 			"probe"])
-  results.offer(new Packet(pres))
+  results.offer(Packet.packetInstance(pres))
 }
 
 Packet result = p.commandResult(Command.DataType.result)
