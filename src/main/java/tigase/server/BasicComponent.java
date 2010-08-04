@@ -740,7 +740,7 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 
 				if (admin) {
 					if (log.isLoggable(Level.FINER)) {
-						log.finer("Processing admin command: " + pc.toString());
+						log.log(Level.FINER, "Processing admin command: {0}", pc);
 					}
 
 					Bindings binds = com.getBindings();
@@ -754,15 +754,15 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 					com.runCommand(iqc, binds, results);
 				} else {
 					if (log.isLoggable(Level.FINER)) {
-						log.finer("Command rejected non-admin detected: " + pc.getStanzaFrom());
+						log.log(Level.FINER, "Command rejected non-admin detected: {0}",
+								pc.getStanzaFrom());
 					}
 
 					results.offer(Authorization.FORBIDDEN.getResponseMessage(pc,
 							"Only Administrator can call the command.", true));
 				}
 			} catch (Exception e) {
-				log.log(Level.WARNING, "Unknown admin command processing exception: " + pc.toString(),
-						e);
+				log.log(Level.WARNING, "Unknown admin command processing exception: " + pc, e);
 			}
 
 			return true;

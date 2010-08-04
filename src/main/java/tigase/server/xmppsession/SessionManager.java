@@ -891,7 +891,7 @@ public class SessionManager extends AbstractMessageReceiver
 //}
 	protected void closeConnection(JID connectionId, boolean closeOnly) {
 		if (log.isLoggable(Level.FINER)) {
-			log.finer("Stream closed from: " + connectionId);
+			log.log(Level.FINER, "Stream closed from: {0}", connectionId);
 		}
 
 		XMPPResourceConnection connection = connectionsByFrom.remove(connectionId);
@@ -899,7 +899,7 @@ public class SessionManager extends AbstractMessageReceiver
 		if (connection != null) {
 			closeSession(connection, closeOnly);
 		} else {
-			log.fine("Can not find resource connection for packet: " + connectionId);
+			log.log(Level.FINE, "Can not find resource connection for packet: {0}", connectionId);
 		}    // end of if (conn != null) else
 	}
 
@@ -1256,7 +1256,8 @@ public class SessionManager extends AbstractMessageReceiver
 		boolean processing_result = false;
 
 		if (log.isLoggable(Level.FINER)) {
-			log.finer(iqc.getCommand().toString() + " command from: " + iqc.getFrom());
+			log.log(Level.FINER, "{0} command from: {1}", new Object[] { iqc.getCommand().toString(),
+					iqc.getFrom() });
 		}
 
 		// Element command = pc.getElement();
@@ -1296,10 +1297,21 @@ public class SessionManager extends AbstractMessageReceiver
 				break;
 
 			case STREAM_CLOSED_UPDATE :
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "{0} processing comment, connection: {1}",
+							new Object[] { iqc.getCommand(),
+							((connection != null) ? connection : " is null") });
+				}
 
 				// Note! We don't send response to this packet....
 				if (connectionsByFrom.get(iqc.getFrom()) != null) {
-					sessionCloseThread.addItem(iqc, null);
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "{0} adding to the processor: {1}",
+								new Object[] { iqc.getCommand(),
+								((connection != null) ? connection : " is null") });
+					}
+
+					sessionCloseThread.addItem(iqc, connection);
 				}
 
 				// closeConnection(pc.getFrom(), false);
@@ -1907,7 +1919,7 @@ public class SessionManager extends AbstractMessageReceiver
 
 	private class ProcessorWorkerThread extends WorkerThread {
 		private XMPPProcessorIfc processor = null;
-		private ArrayDeque<Packet> local_results = new ArrayDeque<Packet>();
+		private ArrayDeque<Packet> local_results = new ArrayDeque<Packet>(100);
 
 		//~--- constructors -------------------------------------------------------
 
@@ -1917,7 +1929,7 @@ public class SessionManager extends AbstractMessageReceiver
 		 *
 		 * @param processor
 		 */
-		public ProcessorWorkerThread(XMPPProcessorIfc processor) {
+		ProcessorWorkerThread(XMPPProcessorIfc processor) {
 			this.processor = processor;
 		}
 
@@ -1962,7 +1974,8 @@ public class SessionManager extends AbstractMessageReceiver
 
 				addOutPackets(item.packet, item.conn, local_results);
 			} catch (PacketErrorTypeException e) {
-				log.info("Already error packet, ignoring: " + item.packet.toStringSecure());
+				log.log(Level.INFO, "Already error packet, ignoring: {0}",
+						item.packet.toStringSecure());
 			} catch (XMPPException e) {
 				log.log(Level.WARNING,
 						"Exception during packet processing: " + item.packet.toStringSecure(), e);
@@ -2000,6 +2013,10 @@ public class SessionManager extends AbstractMessageReceiver
 		 */
 		@Override
 		public void process(QueueItem item) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Executing connection close for: {0}", item.packet);
+			}
+
 			closeConnection(item.packet.getFrom(), false);
 		}
 	}
@@ -2016,7 +2033,7 @@ public class SessionManager extends AbstractMessageReceiver
 		 *
 		 * @param sm
 		 */
-		public SessionOpenWorkerThread(SessionManager sm) {
+		SessionOpenWorkerThread(SessionManager sm) {
 			this.sm = sm;
 		}
 
@@ -2054,7 +2071,7 @@ public class SessionManager extends AbstractMessageReceiver
 			// If not, it means this is new stream
 			if (item.conn == null) {
 				if (log.isLoggable(Level.FINER)) {
-					log.finer("Adding resource connection for: " + item.packet.getFrom());
+					log.log(Level.FINER, "Adding resource connection for: {0}", item.packet.getFrom());
 				}
 
 				final String hostname = Command.getFieldValue(item.packet, "hostname");
@@ -2062,7 +2079,8 @@ public class SessionManager extends AbstractMessageReceiver
 				try {
 					item.conn = createUserSession(item.packet.getFrom(), hostname);
 				} catch (TigaseStringprepException ex) {
-					log.warning("Incrrect hostname, did not pass stringprep processing: " + hostname);
+					log.log(Level.WARNING, "Incrrect hostname, did not pass stringprep processing: {0}",
+							hostname);
 
 					return;
 				}
@@ -2070,8 +2088,8 @@ public class SessionManager extends AbstractMessageReceiver
 				addTimerTask(new AuthenticationTimer(item.packet.getFrom()), 2, TimeUnit.MINUTES);
 			} else {
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Stream opened for existing session, authorized: "
-							+ item.conn.isAuthorized());
+					log.log(Level.FINEST, "Stream opened for existing session, authorized: {0}",
+							item.conn.isAuthorized());
 				}
 			}    // end of else
 
@@ -2079,8 +2097,9 @@ public class SessionManager extends AbstractMessageReceiver
 			item.conn.setDefLang(Command.getFieldValue(item.packet, "xml:lang"));
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Setting session-id " + item.conn.getSessionId() + " for connection: "
-						+ item.conn);
+				log.log(Level.FINEST, "Setting session-id {0} for connection: {1}",
+						new Object[] { item.conn.getSessionId(),
+						item.conn });
 			}
 
 			fastAddOutPacket(item.packet.okResult((String) null, 0));
