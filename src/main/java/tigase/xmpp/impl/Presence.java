@@ -612,6 +612,21 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc, XMPPSto
 			final NonAuthUserRepository repo, final Queue<Packet> results,
 				final Map<String, Object> settings)
 			throws XMPPException {
+		if (session == null) {
+			if (log.isLoggable(Level.FINE)) {
+				log.fine("Session is null, ignoring packet: " + packet.toString());
+			}
+
+			return;
+		}    // end of if (session == null)
+
+		if ( !session.isAuthorized()) {
+			if (log.isLoggable(Level.FINE)) {
+				log.fine("Session is not authorized, ignoring packet: " + packet.toString());
+			}
+
+			return;
+		}
 
 		// Synchronization to avoid conflict with login/logout events
 		// processed in the SessionManager asynchronously

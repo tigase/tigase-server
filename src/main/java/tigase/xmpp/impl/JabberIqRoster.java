@@ -223,6 +223,22 @@ public class JabberIqRoster extends XMPPProcessor
 			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
 			throws XMPPException {
 
+		if (session == null) {
+			if (log.isLoggable(Level.FINE)) {
+				log.fine("Session is null, ignoring packet: " + packet.toString());
+			}
+
+			return;
+		}    // end of if (session == null)
+
+		if ( !session.isAuthorized()) {
+			if (log.isLoggable(Level.FINE)) {
+				log.fine("Session is not authorized, ignoring packet: " + packet.toString());
+			}
+
+			return;
+		}
+
 		// The roster request can be between the user and the server or between the
 		// user and some other entity like transport
 		JID connectionId = session.getConnectionId();
