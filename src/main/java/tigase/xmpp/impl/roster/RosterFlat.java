@@ -318,6 +318,30 @@ public class RosterFlat extends RosterAbstract {
 	 * @throws TigaseDBException
 	 */
 	@Override
+	public Element getBuddyItem(final XMPPResourceConnection session, JID buddy)
+			throws NotAuthorizedException, TigaseDBException {
+		RosterElement relem = getRosterElement(session, buddy);
+
+		if (relem == null) {
+			return null;
+		} else {
+			return getBuddyItem(relem);
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param buddy
+	 *
+	 * @return
+	 *
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	@Override
 	public String getBuddyName(XMPPResourceConnection session, JID buddy)
 			throws NotAuthorizedException, TigaseDBException {
 		RosterElement relem = getRosterElement(session, buddy);

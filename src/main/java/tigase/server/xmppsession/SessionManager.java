@@ -771,7 +771,7 @@ public class SessionManager extends AbstractMessageReceiver
 
 					if (plugin_settings.size() > 0) {
 						if (log.isLoggable(Level.CONFIG)) {
-							log.config("Plugin configuration: " + plugin_settings.toString());
+							log.log(Level.CONFIG, "Plugin configuration: {0}", plugin_settings);
 						}
 
 						plugin_config.put(plug_id, plugin_settings);

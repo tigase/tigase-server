@@ -1013,7 +1013,9 @@ public abstract class RosterAbstract {
 		SubscriptionType current_subscription = getBuddySubscription(session, jid);
 
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("current_subscription=" + current_subscription + " for jid=" + jid);
+			log.log(Level.FINEST, "current_subscription={0} for jid={1}",
+					new Object[] { current_subscription,
+					jid });
 		}
 
 		if (current_subscription == null) {
@@ -1025,7 +1027,9 @@ public abstract class RosterAbstract {
 			presence);
 
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("new_subscription=" + new_subscription + " for presence=" + presence);
+			log.log(Level.FINEST, "new_subscription={0} for presence={1}",
+					new Object[] { new_subscription,
+					presence });
 		}
 
 		if ((current_subscription == SubscriptionType.none_pending_in)
