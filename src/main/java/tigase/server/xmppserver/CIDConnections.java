@@ -324,7 +324,8 @@ public class CIDConnections {
 		S2SConnection s2s_conn = null;
 
 		for (S2SConnection s2sc : incoming) {
-			if (sessionId.equals(s2sc.getS2SIOService().getSessionId())) {
+			if ((s2sc.getS2SIOService() != null)
+					&& sessionId.equals(s2sc.getS2SIOService().getSessionId())) {
 				s2s_conn = s2sc;
 
 				break;
@@ -333,7 +334,8 @@ public class CIDConnections {
 
 		if (s2s_conn == null) {
 			for (S2SConnection s2sc : outgoing) {
-				if (sessionId.equals(s2sc.getS2SIOService().getSessionId())) {
+				if ((s2sc.getS2SIOService() != null)
+						&& sessionId.equals(s2sc.getS2SIOService().getSessionId())) {
 					s2s_conn = s2sc;
 
 					break;
@@ -343,7 +345,8 @@ public class CIDConnections {
 
 		if (s2s_conn == null) {
 			for (S2SConnection s2sc : outgoing_handshaking) {
-				if (sessionId.equals(s2sc.getS2SIOService().getSessionId())) {
+				if ((s2sc.getS2SIOService() != null)
+						&& sessionId.equals(s2sc.getS2SIOService().getSessionId())) {
 					s2s_conn = s2sc;
 
 					break;
