@@ -222,7 +222,6 @@ public class JabberIqRoster extends XMPPProcessor
 	public void process(Packet packet, XMPPResourceConnection session,
 			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
 			throws XMPPException {
-
 		if (session == null) {
 			if (log.isLoggable(Level.FINE)) {
 				log.fine("Session is null, ignoring packet: " + packet.toString());
