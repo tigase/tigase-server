@@ -224,7 +224,7 @@ public class JabberIqRoster extends XMPPProcessor
 			throws XMPPException {
 		if (session == null) {
 			if (log.isLoggable(Level.FINE)) {
-				log.fine("Session is null, ignoring packet: " + packet.toString());
+				log.log(Level.FINE, "Session is null, ignoring packet: {0}", packet);
 			}
 
 			return;
@@ -232,7 +232,7 @@ public class JabberIqRoster extends XMPPProcessor
 
 		if ( !session.isAuthorized()) {
 			if (log.isLoggable(Level.FINE)) {
-				log.fine("Session is not authorized, ignoring packet: " + packet.toString());
+				log.log(Level.FINE, "Session is not authorized, ignoring packet: {0}", packet);
 			}
 
 			return;

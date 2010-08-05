@@ -614,7 +614,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc, XMPPSto
 			throws XMPPException {
 		if (session == null) {
 			if (log.isLoggable(Level.FINE)) {
-				log.fine("Session is null, ignoring packet: " + packet.toString());
+				log.log(Level.FINE, "Session is null, ignoring packet: {0}", packet);
 			}
 
 			return;
@@ -622,7 +622,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc, XMPPSto
 
 		if ( !session.isAuthorized()) {
 			if (log.isLoggable(Level.FINE)) {
-				log.fine("Session is not authorized, ignoring packet: " + packet.toString());
+				log.log(Level.FINE, "Session is not authorized, ignoring packet: {0}", packet);
 			}
 
 			return;
