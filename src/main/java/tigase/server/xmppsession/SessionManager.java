@@ -1666,7 +1666,7 @@ public class SessionManager extends AbstractMessageReceiver
 			++totalUserSessions;
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Created new XMPPSession for: " + userId);
+				log.log(Level.FINEST, "Created new XMPPSession for: {0}", userId);
 			}
 		} else {
 
@@ -1677,7 +1677,7 @@ public class SessionManager extends AbstractMessageReceiver
 				for (XMPPResourceConnection connection : connections) {
 					if (connection != conn) {
 						if (log.isLoggable(Level.FINEST)) {
-							log.finest("Checking connection: " + connection);
+							log.log(Level.FINEST, "Checking connection: {0}", connection);
 						}
 
 						try {
