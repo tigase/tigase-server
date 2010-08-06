@@ -1244,6 +1244,12 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc, XMPPSto
 
 			if (item != null) {
 				roster_util.updateBuddyChange(session, results, item);
+			} else {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST,
+							"Received unsubscribe request from a user who is not in the roster: {0}",
+								packet.getStanzaFrom());
+				}
 			}
 		}
 	}
@@ -1268,6 +1274,12 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc, XMPPSto
 				if (item != null) {
 					roster_util.updateBuddyChange(session, results,
 							roster_util.getBuddyItem(session, packet.getStanzaFrom()));
+				} else {
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST,
+								"Received unsubscribe request from a user who is not in the roster: {0}",
+									packet.getStanzaFrom());
+					}
 				}
 			}
 		}
