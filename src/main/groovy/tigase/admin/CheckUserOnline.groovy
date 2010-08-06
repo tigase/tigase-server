@@ -21,10 +21,6 @@
  */
 
 /*
-
-User add script as described in XEP-0133:
-http://xmpp.org/extensions/xep-0133.html#add-user
-
 AS:Description: Checks if the user is online, where he is connected from and how many connections.
 AS:CommandId: check-online-user
 AS:Component: sess-man
