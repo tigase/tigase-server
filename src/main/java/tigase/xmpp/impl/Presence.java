@@ -1259,8 +1259,13 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc, XMPPSto
 
 				// No longer needed according to RFC-3921-bis5
 				// updatePresenceChange(packet.getElement(), session, results);
-				roster_util.updateBuddyChange(session, results,
-						roster_util.getBuddyItem(session, packet.getStanzaFrom()));
+				Element item = roster_util.getBuddyItem(session, packet.getStanzaFrom());
+
+				// The roster item could have been removed in the meantime....
+				if (item != null) {
+					roster_util.updateBuddyChange(session, results,
+							roster_util.getBuddyItem(session, packet.getStanzaFrom()));
+				}
 			}
 		}
 	}
