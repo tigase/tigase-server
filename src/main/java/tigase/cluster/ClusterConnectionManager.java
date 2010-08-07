@@ -525,17 +525,17 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 			if (lastDayIdx != hour) {
 				lastDayIdx = hour;
 				lastDay[hour] = 0;
+				Arrays.fill(lastHour, 0);
 			}
 
 			++lastDay[hour];
 
 			int minute = TimeUtils.getMinuteNow();
 
-			if (lastHourIdx != minute) {
-				lastHourIdx = minute;
-				lastHour[minute] = 0;
-			}
-
+//    if (lastHourIdx != minute) {
+//      lastHourIdx = minute;
+//      lastHour[minute] = 0;
+//    }
 			++lastHour[minute];
 		}
 
