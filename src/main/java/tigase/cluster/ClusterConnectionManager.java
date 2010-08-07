@@ -120,7 +120,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 	public static final String COMPRESS_STREAM_PROP_KEY = "compress-stream";
 
 	/** Field description */
-	public static final boolean COMPRESS_STREAM_PROP_VAL = true;
+	public static final boolean COMPRESS_STREAM_PROP_VAL = false;
 
 	/** Field description */
 	public static final String XMLNS = "tigase:cluster";
@@ -336,7 +336,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 	@Override
 	public void processPacket(Packet packet) {
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Processing packet: " + packet.toString());
+			log.log(Level.FINEST, "Processing packet: {0}", packet);
 		}
 
 		if ((packet.getStanzaTo() != null) && packet.getStanzaTo().equals(getComponentId())) {
@@ -344,7 +344,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 				addOutPacket(Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
 						"Not implemented", true));
 			} catch (PacketErrorTypeException e) {
-				log.warning("Packet processing exception: " + e);
+				log.log(Level.WARNING, "Packet processing exception: {0}", e);
 			}
 
 			return;
@@ -373,7 +373,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 
 		while ((p = serv.getReceivedPackets().poll()) != null) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Processing socket data: " + p);
+				log.log(Level.FINEST, "Processing socket data: {0}", p);
 			}
 
 			if (p.getElemName().equals("handshake")) {
@@ -388,7 +388,8 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 					try {
 						result = p.unpackRouted();
 					} catch (TigaseStringprepException ex) {
-						log.warning("Packet stringprep addressing problem, dropping packet: " + p);
+						log.log(Level.WARNING,
+								"Packet stringprep addressing problem, dropping packet: {0}", p);
 
 						return null;
 					}
@@ -437,11 +438,12 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 	@Override
 	public void serviceStarted(XMPPIOService<Object> serv) {
 		super.serviceStarted(serv);
-		log.info("cluster connection opened: " + serv.getRemoteAddress() + ", type: "
-				+ serv.connectionType().toString() + ", id=" + serv.getUniqueId());
+		log.log(Level.INFO, "cluster connection opened: {0}, type: {1}, id={2}",
+				new Object[] { serv.getRemoteAddress(),
+				serv.connectionType().toString(), serv.getUniqueId() });
 
 		if (compress_stream) {
-			log.info("Starting stream compression for: " + serv.getUniqueId());
+			log.log(Level.INFO, "Starting stream compression for: {0}", serv.getUniqueId());
 			serv.startZLib(Deflater.BEST_COMPRESSION);
 		}
 
@@ -636,7 +638,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 	 */
 	@Override
 	public String xmppStreamOpened(XMPPIOService<Object> service, Map<String, String> attribs) {
-		log.info("Stream opened: " + attribs.toString());
+		log.log(Level.INFO, "Stream opened: {0}", attribs);
 
 		switch (service.connectionType()) {
 			case connect : {
@@ -650,8 +652,9 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 					String digest = Algorithms.hexDigest(id, secret, "SHA");
 
 					if (log.isLoggable(Level.FINEST)) {
-						log.finest("Calculating digest: id=" + id + ", secret=" + secret + ", digest="
-								+ digest);
+						log.log(Level.FINEST, "Calculating digest: id={0}, secret={1}, digest={2}",
+								new Object[] { id,
+								secret, digest });
 					}
 
 					return "<handshake>" + digest + "</handshake>";
@@ -730,7 +733,8 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 		try {
 			return DNSResolver.getHostIP(packet.getTo().getDomain());
 		} catch (UnknownHostException e) {
-			log.warning("Uknown host exception for address: " + packet.getTo().getDomain());
+			log.log(Level.WARNING, "Uknown host exception for address: {0}",
+					packet.getTo().getDomain());
 
 			return packet.getTo().getDomain();
 		}
@@ -762,7 +766,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 
 		String addr = (String) serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
 
-		log.info("Connected to: " + addr);
+		log.log(Level.INFO, "Connected to: {0}", addr);
 		updateServiceDiscoveryItem(addr, addr, XMLNS + " connected", true);
 		clusterController.nodeConnected(addr);
 
