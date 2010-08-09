@@ -334,7 +334,7 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 	 */
 	@Override
 	public void nodeDisconnected(String node) {
-		log.fine("Nodes disconnected: " + node);
+		log.log(Level.FINE, "Nodes disconnected: {0}", node);
 
 		JID jid = JID.jidInstanceNS(getName(), node, null);
 
@@ -357,7 +357,7 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 	@Override
 	public void processPacket(Packet packet) {
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Received packet: " + packet.toString());
+			log.log(Level.FINEST, "Received packet: {0}", packet);
 		}
 
 		if ((packet.getElemName() == ClusterElement.CLUSTER_EL_NAME)
@@ -366,11 +366,11 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 				try {
 					processClusterPacket(packet);
 				} catch (TigaseStringprepException ex) {
-					log.warning("Packet processing stringprep problem: " + packet);
+					log.log(Level.WARNING, "Packet processing stringprep problem: {0}", packet);
 				}
 			} else {
 				if (log.isLoggable(Level.WARNING)) {
-					log.log(Level.WARNING, "Cluster packet from untrusted source: " + packet);
+					log.log(Level.WARNING, "Cluster packet from untrusted source: {0}", packet);
 				}
 			}
 
@@ -387,7 +387,7 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 		XMPPResourceConnection conn = getXMPPResourceConnection(packet);
 
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Ressource connection found: " + conn);
+			log.log(Level.FINEST, "Ressource connection found: {0}", conn);
 		}
 
 		if ((conn == null)
@@ -464,8 +464,10 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 			my_address = JID.jidInstance(getName(), (String) props.get(MY_DOMAIN_NAME_PROP_KEY),
 					null);
 		} catch (TigaseStringprepException ex) {
-			log.warning("Creating component source address failed stringprep processing: "
-					+ getName() + "@" + my_hostname);
+			log.log(Level.WARNING,
+					"Creating component source address failed stringprep processing: {0}@{1}",
+						new Object[] { getName(),
+					my_hostname });
 		}
 	}
 
@@ -830,7 +832,7 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 									&& (packet.getType() != StanzaType.error)
 										&&!((packet.getElemName() == "presence") && (packet.getType() == null)))) {
 					if (log.isLoggable(Level.FINEST)) {
-						log.finest("Sending back to the first node: " + first);
+						log.log(Level.FINEST, "Sending back to the first node: {0}", first);
 					}
 
 					ClusterElement result = clel.nextClusterNode(first);
@@ -850,7 +852,7 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 		JID cluster_node = getFirstClusterNode(packet.getStanzaTo());
 
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Cluster node found: " + cluster_node);
+			log.log(Level.FINEST, "Cluster node found: {0}", cluster_node);
 		}
 
 		if (cluster_node != null) {
