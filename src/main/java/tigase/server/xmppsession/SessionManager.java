@@ -135,7 +135,7 @@ public class SessionManager extends AbstractMessageReceiver
 	private long authTimeouts = 0;
 	private UserAuthRepository auth_repository = null;
 	private long closedConnections = 0;
-	private PacketDefaultHandler filter = null;
+	private PacketDefaultHandler defPacketHandler = null;
 	private long maxIdleTime = 86400 * 1000;
 	private int maxPluginsNo = 0;
 	private int maxUserConnections = 0;
@@ -542,7 +542,7 @@ public class SessionManager extends AbstractMessageReceiver
 	@Override
 	public void processPacket(final Packet packet) {
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Received packet: " + packet.toStringSecure());
+			log.log(Level.FINEST, "Received packet: {0}", packet.toStringSecure());
 		}
 
 		if (packet.isCommand() && processCommand(packet)) {
@@ -597,7 +597,7 @@ public class SessionManager extends AbstractMessageReceiver
 		super.setProperties(props);
 		Security.insertProviderAt(new TigaseSaslProvider(), 6);
 		skipPrivacy = (Boolean) props.get(SKIP_PRIVACY_PROP_KEY);
-		filter = new PacketDefaultHandler();
+		defPacketHandler = new PacketDefaultHandler();
 
 		// Is there a shared user repository pool? If so I want to use it:
 		user_repository = (UserRepository) props.get(SHARED_USER_REPO_POOL_PROP_KEY);
@@ -723,7 +723,7 @@ public class SessionManager extends AbstractMessageReceiver
 
 		String[] plugins = (String[]) props.get(PLUGINS_PROP_KEY);
 
-		log.config("Loaded plugins list: " + Arrays.toString(plugins));
+		log.log(Level.CONFIG, "Loaded plugins list: {0}", Arrays.toString(plugins));
 
 		try {
 			sessionOpenThread =
@@ -743,12 +743,12 @@ public class SessionManager extends AbstractMessageReceiver
 					plug_id = "roster-presence";
 				}
 
-				log.config("Loading and configuring plugin: " + plug_id);
+				log.log(Level.CONFIG, "Loading and configuring plugin: {0}", plug_id);
 
 				XMPPImplIfc plugin = addPlugin(plug_id, plugins_concurrency.get(plug_id));
 
 				if (plugin != null) {
-					Map<String, Object> plugin_settings = new ConcurrentHashMap<String, Object>();
+					Map<String, Object> plugin_settings = new ConcurrentHashMap<String, Object>(10);
 
 					for (Map.Entry<String, Object> entry : props.entrySet()) {
 						if (entry.getKey().startsWith(PLUGINS_CONF_PROP_KEY)) {
@@ -1527,7 +1527,7 @@ public class SessionManager extends AbstractMessageReceiver
 		boolean stop = false;
 
 		if ( !stop) {
-			if (filter.preprocess(packet, conn, naUserRepository, results)) {
+			if (defPacketHandler.preprocess(packet, conn, naUserRepository, results)) {
 				packet.processedBy("filter-foward");
 
 				if (log.isLoggable(Level.FINEST)) {
@@ -1560,11 +1560,11 @@ public class SessionManager extends AbstractMessageReceiver
 		}
 
 		if ( !stop) {
-			if (filter.forward(packet, conn, naUserRepository, results)) {
+			if (defPacketHandler.forward(packet, conn, naUserRepository, results)) {
 				packet.processedBy("filter-foward");
 
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Packet forwarded: " + packet.toStringSecure());
+					log.log(Level.FINEST, "Packet forwarded: {0}", packet.toStringSecure());
 				}
 
 				addOutPackets(packet, conn, results);
@@ -1587,7 +1587,7 @@ public class SessionManager extends AbstractMessageReceiver
 		if ( !stop &&!packet.wasProcessed()
 				&& ((packet.getStanzaTo() == null)
 					|| ((packet.getStanzaTo() != null)
-						&&!isLocalDomain(packet.getStanzaTo().toString()))) && filter.process(packet,
+						&&!isLocalDomain(packet.getStanzaTo().toString()))) && defPacketHandler.process(packet,
 							conn, naUserRepository, results)) {
 			packet.processedBy("filter-process");
 		}
@@ -1698,7 +1698,7 @@ public class SessionManager extends AbstractMessageReceiver
 		try {
 			session.addResourceConnection(conn);
 		} catch (TigaseStringprepException ex) {
-			log.info("Stringprep problem for resource connection: " + conn);
+			log.log(Level.INFO, "Stringprep problem for resource connection: {0}", conn);
 			handleLogout(userId, conn);
 		}
 	}
@@ -1706,7 +1706,7 @@ public class SessionManager extends AbstractMessageReceiver
 	protected void sendToAdmins(Packet packet) {
 		for (BareJID admin : admins) {
 			if (log.isLoggable(Level.FINER)) {
-				log.finer("Sending packet to admin: " + admin);
+				log.log(Level.FINER, "Sending packet to admin: {0}", admin);
 			}
 
 			Packet admin_pac = packet.copyElementOnly();
