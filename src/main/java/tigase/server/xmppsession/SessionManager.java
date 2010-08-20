@@ -1597,11 +1597,12 @@ public class SessionManager extends AbstractMessageReceiver
 
 		if (packet.wasProcessed() || processAdminsOrDomains(packet)) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Packet processed by: " + packet.getProcessorsIds().toString());
+				log.log(Level.FINEST, "Packet processed by: {0}",
+						packet.getProcessorsIds().toString());
 			}
 		} else {
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Packet not processed: " + packet.toStringSecure());
+				log.log(Level.FINEST, "Packet not processed: {0}", packet.toStringSecure());
 			}
 
 			Packet error = null;
