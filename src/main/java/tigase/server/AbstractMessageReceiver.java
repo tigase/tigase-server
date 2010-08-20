@@ -964,7 +964,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 
 	private void startThreads() {
 		if (threadsQueue == null) {
-			threadsQueue = new ArrayDeque<QueueListener>();
+			threadsQueue = new ArrayDeque<QueueListener>(8);
 
 			for (int i = 0; i < in_queues_size; i++) {
 				QueueListener in_thread = new QueueListener(in_queues.get(i), QueueType.IN_QUEUE);
