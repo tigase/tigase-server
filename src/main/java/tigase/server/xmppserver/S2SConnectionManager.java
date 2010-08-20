@@ -310,7 +310,7 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 			log.log(Level.FINEST, "Processing packet: {0}", packet);
 		}
 
-		if (packet.getStanzaTo() == null) {
+		if ((packet.getStanzaTo() == null) || packet.getStanzaTo().getDomain().trim().isEmpty()) {
 			log.log(Level.WARNING,
 					"Missing ''to'' attribute, ignoring packet...{0}"
 						+ "\n This most likely happens due to missconfiguration of components"
@@ -319,7 +319,8 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 			return;
 		}
 
-		if (packet.getStanzaFrom() == null) {
+		if ((packet.getStanzaFrom() == null)
+				|| packet.getStanzaFrom().getDomain().trim().isEmpty()) {
 			log.log(Level.WARNING, "Missing ''from'' attribute, ignoring packet...{0}", packet);
 
 			return;
@@ -783,7 +784,8 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 	}
 
 	private boolean checkPacket(Packet p, S2SIOService serv) {
-		if ((p.getStanzaFrom() == null) || (p.getStanzaTo() == null)) {
+		if ((p.getStanzaFrom() == null) || (p.getStanzaFrom().getDomain().trim().isEmpty())
+				|| (p.getStanzaTo() == null) || p.getStanzaTo().getDomain().trim().isEmpty()) {
 			generateStreamError(false, "improper-addressing", serv);
 
 			return false;
