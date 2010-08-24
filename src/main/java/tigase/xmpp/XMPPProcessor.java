@@ -25,7 +25,6 @@ package tigase.xmpp;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.db.TigaseDBException;
-import tigase.db.UserRepository;
 
 import tigase.xml.Element;
 
@@ -64,15 +63,9 @@ import java.util.Map;
 public abstract class XMPPProcessor implements XMPPImplIfc, Comparable<XMPPProcessor> {
 	protected static final String ALL = "*";
 
-	//~--- fields ---------------------------------------------------------------
-
-	private XMPPProcessor inst = null;
-
 	//~--- constructors ---------------------------------------------------------
 
-	protected XMPPProcessor() {
-		inst = this;
-	}
+	protected XMPPProcessor() {}
 
 	//~--- methods --------------------------------------------------------------
 
@@ -120,7 +113,7 @@ public abstract class XMPPProcessor implements XMPPImplIfc, Comparable<XMPPProce
 	 * @return
 	 */
 	public XMPPProcessor getInstance() {
-		return inst;
+		return this;
 	}
 
 	//~--- methods --------------------------------------------------------------

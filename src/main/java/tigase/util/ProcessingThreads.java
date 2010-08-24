@@ -25,14 +25,14 @@ package tigase.util;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.server.Packet;
-import tigase.server.Priority;
 
+import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -51,7 +51,8 @@ public class ProcessingThreads<E extends WorkerThread> {
 	//~--- fields ---------------------------------------------------------------
 
 	private long droppedPackets = 0;
-	private int maxQueueSize = 10000;
+
+	// private int maxQueueSize = 10000;
 	private String name = null;
 
 	// Packets are put in queues in such a way that all packets for the same
@@ -60,20 +61,20 @@ public class ProcessingThreads<E extends WorkerThread> {
 	// roster processing.
 	// Therefore it is also recommended that there is a single thread for
 	// each queue but we can ditribute load increasing number of queues.
-	private int numQueues = 2;
+	// private int numQueues = 2;
 	private int numWorkerThreads = 1;
-	private ArrayDeque<E> workerThreads = new ArrayDeque<E>();
-	private ArrayList<PriorityQueueAbstract<QueueItem>> queues =
-		new ArrayList<PriorityQueueAbstract<QueueItem>>();
+	private ArrayList<E> workerThreads = null;
 
 	//~--- constructors ---------------------------------------------------------
+
+//private ArrayList<PriorityQueueAbstract<QueueItem>> queues =
+//  new ArrayList<PriorityQueueAbstract<QueueItem>>(1);
 
 	/**
 	 * Constructs ...
 	 *
 	 *
 	 * @param worker
-	 * @param numQueues
 	 * @param numWorkerThreads
 	 * @param maxQueueSize
 	 * @param name
@@ -82,29 +83,29 @@ public class ProcessingThreads<E extends WorkerThread> {
 	 * @throws IllegalAccessException
 	 */
 	@SuppressWarnings({ "unchecked" })
-	public ProcessingThreads(E worker, int numQueues, int numWorkerThreads, int maxQueueSize,
-			String name)
+	public ProcessingThreads(E worker, int numWorkerThreads, int maxQueueSize, String name)
 			throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-		this.numQueues = numQueues;
-		this.maxQueueSize = maxQueueSize;
+
+		// this.numQueues = numQueues;
+		// this.maxQueueSize = maxQueueSize;
 		this.numWorkerThreads = numWorkerThreads;
+		workerThreads = new ArrayList<E>(numWorkerThreads);
 		this.name = name;
 
-		for (int i = 0; i < numQueues; i++) {
-			PriorityQueueAbstract<QueueItem> queue =
-				PriorityQueueAbstract.getPriorityQueue(Priority.values().length, maxQueueSize);
+//  for (int i = 0; i < numQueues; i++) {
+		// LinkedBlockingQueue<QueueItem> queue = new LinkedBlockingQueue<QueueItem>(maxQueueSize);
+//  queues.add(queue);
+		for (int j = 0; j < numWorkerThreads; j++) {
+			WorkerThread t = worker.getNewInstance();
 
-			queues.add(queue);
-
-			for (int j = 0; j < numWorkerThreads; j++) {
-				WorkerThread t = worker.getNewInstance(queues.get(i));
-
-				t.setDaemon(true);
-				t.setName(name + " Queue " + i + " Worker " + j);
-				t.start();
-				workerThreads.add((E) t);
-			}
+			t.setQueueMaxSize(maxQueueSize);
+			t.setDaemon(true);
+			t.setName(name + " Queue Worker " + j);
+			t.start();
+			workerThreads.add((E) t);
 		}
+
+//  }
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -113,34 +114,40 @@ public class ProcessingThreads<E extends WorkerThread> {
 	 * Method description
 	 *
 	 *
+	 * @param processor
 	 * @param packet
 	 * @param conn
 	 *
 	 * @return
 	 */
-	public boolean addItem(Packet packet, XMPPResourceConnection conn) {
+	public boolean addItem(XMPPProcessorIfc processor, Packet packet, XMPPResourceConnection conn) {
 		boolean ret = false;
-		QueueItem item = new QueueItem();
-
-		item.conn = conn;
-		item.packet = packet;
+		QueueItem item = new QueueItem(processor, packet, conn);
 
 		try {
-			if ((item.conn != null) && item.conn.isAuthorized()) {
+			if ((item.getConn() != null) && item.getConn().isAuthorized()) {
 
 				// Queueing packets per user...
-				ret = queues.get(Math.abs(conn.getJID().getBareJID().hashCode()
-						% numQueues)).offer(item, packet.getPriority().ordinal());
+				ret = workerThreads.get(Math.abs(conn.getJID().getBareJID().hashCode())
+						% numWorkerThreads).offer(item);
+
+//      ret = queues.get(Math.abs(conn.getJID().getBareJID().hashCode()
+//          % numQueues)).offer(item, packet.getPriority().ordinal());
 			} else {
 
 				// Otherwise per destination address
 				// If the packet elemTo is set then used it, otherwise just packetTo:
 				if (packet.getStanzaTo() != null) {
-					ret = queues.get(Math.abs(packet.getStanzaTo().hashCode() % numQueues)).offer(item,
-							packet.getPriority().ordinal());
+					ret = workerThreads.get(Math.abs(packet.getStanzaTo().hashCode())
+							% numWorkerThreads).offer(item);
+
+//        ret = queues.get(Math.abs(packet.getStanzaTo().hashCode() % numQueues)).offer(item,
+//            packet.getPriority().ordinal());
 				} else {
-					ret = queues.get(Math.abs(packet.getTo().hashCode() % numQueues)).offer(item,
-							packet.getPriority().ordinal());
+					ret = workerThreads.get(Math.abs(packet.getTo().hashCode())).offer(item);
+
+//        ret = queues.get(Math.abs(packet.getTo().hashCode() % numQueues)).offer(item,
+//            packet.getPriority().ordinal());
 				}
 			}
 		} catch (Exception e) {
@@ -150,11 +157,10 @@ public class ProcessingThreads<E extends WorkerThread> {
 			// Otherwise per destination address
 			// If the packet elemTo is set then used it, otherwise just packetTo:
 			if (packet.getStanzaTo() != null) {
-				ret = queues.get(Math.abs(packet.getStanzaTo().hashCode() % numQueues)).offer(item,
-						packet.getPriority().ordinal());
+				ret = workerThreads.get(Math.abs(packet.getStanzaTo().hashCode())
+						% numWorkerThreads).offer(item);
 			} else {
-				ret = queues.get(Math.abs(packet.getTo().hashCode() % numQueues)).offer(item,
-						packet.getPriority().ordinal());
+				ret = workerThreads.get(Math.abs(packet.getTo().hashCode()) % numWorkerThreads).offer(item);
 			}
 
 			// ret = nullQueue.offer(item, packet.getPriority().ordinal());
@@ -226,8 +232,8 @@ public class ProcessingThreads<E extends WorkerThread> {
 	public int getTotalQueueSize() {
 		int ret = 0;
 
-		for (PriorityQueueAbstract<QueueItem> pq : queues) {
-			ret += pq.totalSize();
+		for (E pq : workerThreads) {
+			ret += pq.size();
 		}
 
 		return ret;
@@ -249,19 +255,19 @@ public class ProcessingThreads<E extends WorkerThread> {
 		return ret;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public E getWorkerThread() {
-		try {
-			return workerThreads.getFirst();
-		} catch (Exception e) {
-			return null;
-		}
-	}
+///**
+// * Method description
+// *
+// *
+// * @return
+// */
+//public E getWorkerThread() {
+//  try {
+//    return workerThreads.getFirst();
+//  } catch (Exception e) {
+//    return null;
+//  }
+//}
 }
 
 

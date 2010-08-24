@@ -56,6 +56,12 @@ public abstract class SessionManagerConfig {
 	/** Field description */
 	public static final String PLUGINS_CONCURRENCY_PROP_KEY = "plugins-concurrency";
 
+	/** Field description */
+	public static final String sessionCloseProcId = "session-close";
+
+	/** Field description */
+	public static final String sessionOpenProcId = "session-open";
+
 	// public static final String ANONYMOUS_PEERS_PROP_KEY = "anonymous-peers";
 
 	/**
@@ -63,10 +69,11 @@ public abstract class SessionManagerConfig {
 	 * in config file or at runtime.
 	 */
 	private static final String[] PLUGINS_NO_REG_PROP_VAL = {
-		"jabber:iq:auth", "urn:ietf:params:xml:ns:xmpp-sasl", "urn:ietf:params:xml:ns:xmpp-bind",
-		"urn:ietf:params:xml:ns:xmpp-session", "roster-presence", "jabber:iq:privacy",
-		"msgoffline", "jabber:iq:version", "http://jabber.org/protocol/stats", "starttls",
-		"vcard-temp", "http://jabber.org/protocol/commands", "jabber:iq:private", "urn:xmpp:ping",
+		sessionCloseProcId, sessionOpenProcId, "jabber:iq:auth", "urn:ietf:params:xml:ns:xmpp-sasl",
+		"urn:ietf:params:xml:ns:xmpp-bind", "urn:ietf:params:xml:ns:xmpp-session", "jabber:iq:roster",
+		"jabber:iq:privacy", "msgoffline", "jabber:iq:version", "http://jabber.org/protocol/stats",
+		"starttls", "vcard-temp", "http://jabber.org/protocol/commands", "jabber:iq:private",
+		"urn:xmpp:ping", "presence",
 
 		// "basic-filter",
 		"domain-filter", "disco"
@@ -77,21 +84,21 @@ public abstract class SessionManagerConfig {
 	 * Some plugins like off-line message storage is disabled during tests.
 	 */
 	private static final String[] PLUGINS_TEST_PROP_VAL = {
-		"jabber:iq:register", "jabber:iq:auth", "urn:ietf:params:xml:ns:xmpp-sasl",
-		"urn:ietf:params:xml:ns:xmpp-bind", "urn:ietf:params:xml:ns:xmpp-session",
-		"roster-presence", "jabber:iq:privacy", "jabber:iq:version",
-		"http://jabber.org/protocol/stats", "starttls", "vcard-temp",
-		"http://jabber.org/protocol/commands", "jabber:iq:private", "urn:xmpp:ping",
+		sessionCloseProcId, sessionOpenProcId, "jabber:iq:register", "jabber:iq:auth",
+		"urn:ietf:params:xml:ns:xmpp-sasl", "urn:ietf:params:xml:ns:xmpp-bind",
+		"urn:ietf:params:xml:ns:xmpp-session", "jabber:iq:roster", "jabber:iq:privacy",
+		"jabber:iq:version", "http://jabber.org/protocol/stats", "starttls", "vcard-temp",
+		"http://jabber.org/protocol/commands", "jabber:iq:private", "urn:xmpp:ping", "presence",
 
 		// "basic-filter",
 		"domain-filter", "disco"
 	};
 	private static final String[] PLUGINS_FULL_PROP_VAL = {
-		"jabber:iq:register", "jabber:iq:auth", "urn:ietf:params:xml:ns:xmpp-sasl",
-		"urn:ietf:params:xml:ns:xmpp-bind", "urn:ietf:params:xml:ns:xmpp-session",
-		"roster-presence", "jabber:iq:privacy", "jabber:iq:version",
-		"http://jabber.org/protocol/stats", "starttls", "msgoffline", "vcard-temp",
-		"http://jabber.org/protocol/commands", "jabber:iq:private", "urn:xmpp:ping",
+		sessionCloseProcId, sessionOpenProcId, "jabber:iq:register", "jabber:iq:auth",
+		"urn:ietf:params:xml:ns:xmpp-sasl", "urn:ietf:params:xml:ns:xmpp-bind",
+		"urn:ietf:params:xml:ns:xmpp-session", "jabber:iq:roster", "jabber:iq:privacy",
+		"jabber:iq:version", "http://jabber.org/protocol/stats", "starttls", "msgoffline", "vcard-temp",
+		"http://jabber.org/protocol/commands", "jabber:iq:private", "urn:xmpp:ping", "presence",
 
 		// "basic-filter",
 		"domain-filter", "disco"
@@ -107,6 +114,9 @@ public abstract class SessionManagerConfig {
 	private static final boolean SKIP_PRIVACY_PROP_VAL = false;
 	protected static final String AUTO_CREATE_OFFLINE_USER_PROP_KEY = "offline-user-autocreate";
 	protected static final String AUTO_CREATE_OFFLINE_USER_PROP_VAL = "false";
+	protected static final String SM_THREADS_POOL_PROP_KEY = "sm-threads-pool";
+	protected static final String SM_THREADS_POOL_PROP_VAL = "default";
+	protected static final String SM_THREADS_POOL_CUSTOM_PROP_VAL = "custom";
 
 	//~--- get methods ----------------------------------------------------------
 
@@ -139,7 +149,7 @@ public abstract class SessionManagerConfig {
 			|| params.get(GEN_AUTH_DB).toString().equals("pgsql")
 			|| params.get(GEN_AUTH_DB).toString().equals("derby")
 			|| params.get(GEN_AUTH_DB).toString().equals("tigase-auth");
-		LinkedHashSet<String> plugins = new LinkedHashSet<String>();
+		LinkedHashSet<String> plugins = new LinkedHashSet<String>(32);
 
 		if ((Boolean) params.get(GEN_TEST)) {
 			Collections.addAll(plugins, PLUGINS_TEST_PROP_VAL);
@@ -222,6 +232,14 @@ public abstract class SessionManagerConfig {
 
 		props.put(TRUSTED_PROP_KEY, TRUSTED_PROP_VAL);
 		props.put(AUTO_CREATE_OFFLINE_USER_PROP_KEY, AUTO_CREATE_OFFLINE_USER_PROP_VAL);
+
+		String sm_threads_pool = SM_THREADS_POOL_PROP_VAL;
+
+		if (params.get("--" + SM_THREADS_POOL_PROP_KEY) != null) {
+			sm_threads_pool = (String) params.get("--" + SM_THREADS_POOL_PROP_KEY);
+		}
+
+		props.put(SM_THREADS_POOL_PROP_KEY, sm_threads_pool);
 	}
 
 	//~--- methods --------------------------------------------------------------
