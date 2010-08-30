@@ -59,10 +59,14 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Queue;
+import java.util.TimerTask;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.Deflater;
+
+import javax.script.Bindings;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -80,8 +84,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
-	private static final Logger log =
-		Logger.getLogger("tigase.cluster.ClusterConnectionManager");
+	private static final Logger log = Logger.getLogger("tigase.cluster.ClusterConnectionManager");
 
 	/** Field description */
 	public static final String SECRET_PROP_KEY = "secret";
@@ -124,6 +127,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 
 	/** Field description */
 	public static final String XMLNS = "tigase:cluster";
+	private static final String SERVICE_CONNECTED_TIMER = "service-connected-timer";
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -160,6 +164,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 //private LinkedHashMap<String, Long> recieved_acks =
 //   new LinkedHashMap<String, Long>();
 	private int nodesNo = 0;
+	private long servConnectedTimeouts = 0;
 	private long totalNodeDisconnects = 0;
 
 	//~--- get methods ----------------------------------------------------------
@@ -273,12 +278,13 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 	public void getStatistics(StatisticsList list) {
 		super.getStatistics(list);
 		list.add(getName(), "Total disconnects", totalNodeDisconnects, Level.FINE);
+		list.add(getName(), "Service connected time-outs", servConnectedTimeouts, Level.FINE);
 		list.add(getName(), "Last day disconnects", Arrays.toString(lastDay), Level.FINE);
 		list.add(getName(), "Last hour disconnects", Arrays.toString(lastHour), Level.FINE);
 		ioStatsGetter.reset();
 		doForAllServices(ioStatsGetter);
-		list.add(getName(), "Average compression ratio",
-				ioStatsGetter.getAverageCompressionRatio(), Level.FINE);
+		list.add(getName(), "Average compression ratio", ioStatsGetter.getAverageCompressionRatio(),
+				Level.FINE);
 		list.add(getName(), "Average decompression ratio",
 				ioStatsGetter.getAverageDecompressionRatio(), Level.FINE);
 		list.add(getName(), "Bytes sent", ioStatsGetter.getBytesSent(), Level.FINE);
@@ -307,6 +313,18 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 		}
 
 		return packet.getTo().hashCode();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param binds
+	 */
+	@Override
+	public void initBindings(Bindings binds) {
+		super.initBindings(binds);
+		binds.put("clusterCM", this);
 	}
 
 	/**
@@ -388,8 +406,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 					try {
 						result = p.unpackRouted();
 					} catch (TigaseStringprepException ex) {
-						log.log(Level.WARNING,
-								"Packet stringprep addressing problem, dropping packet: {0}", p);
+						log.log(Level.WARNING, "Packet stringprep addressing problem, dropping packet: {0}", p);
 
 						return null;
 					}
@@ -437,6 +454,10 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 	 */
 	@Override
 	public void serviceStarted(XMPPIOService<Object> serv) {
+		ServiceConnectedTimer task = new ServiceConnectedTimer(serv);
+
+		serv.getSessionData().put(SERVICE_CONNECTED_TIMER, task);
+		addTimerTask(task, 10, TimeUnit.SECONDS);
 		super.serviceStarted(serv);
 		log.log(Level.INFO, "cluster connection opened: {0}, type: {1}, id={2}",
 				new Object[] { serv.getRemoteAddress(),
@@ -463,10 +484,12 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 						".*@" + remote_host, ".*\\." + remote_host });
 
 				String data = "<stream:stream" + " xmlns='" + XMLNS + "'"
-					+ " xmlns:stream='http://etherx.jabber.org/streams'" + " from='" + getDefHostName()
-					+ "'" + " to='" + remote_host + "'" + ">";
+					+ " xmlns:stream='http://etherx.jabber.org/streams'" + " from='" + getDefHostName() + "'"
+					+ " to='" + remote_host + "'" + ">";
 
-				log.info("cid: " + (String) serv.getSessionData().get("cid") + ", sending: " + data);
+				log.log(Level.INFO, "cid: {0}, sending: {1}",
+						new Object[] { (String) serv.getSessionData().get("cid"),
+						data });
 				serv.xmppStreamOpen(data);
 
 				break;
@@ -510,7 +533,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 			// removeRouting(serv.getRemoteHost());
 			String addr = (String) sessionData.get(PORT_REMOTE_HOST_PROP_KEY);
 
-			log.info("Disonnected from: " + addr);
+			log.log(Level.INFO, "Disonnected from: {0}", addr);
 			updateServiceDiscoveryItem(addr, addr, XMLNS + " disconnected", true);
 			clusterController.nodeDisconnected(addr);
 
@@ -678,9 +701,8 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 				service.getSessionData().put(XMPPIOService.SESSION_ID_KEY, id);
 
 				return "<stream:stream" + " xmlns='" + XMLNS + "'"
-						+ " xmlns:stream='http://etherx.jabber.org/streams'" + " from='"
-							+ getDefHostName() + "'" + " to='" + remote_host + "'" + " id='" + id + "'"
-								+ ">";
+						+ " xmlns:stream='http://etherx.jabber.org/streams'" + " from='" + getDefHostName()
+							+ "'" + " to='" + remote_host + "'" + " id='" + id + "'" + ">";
 			}
 
 			default :
@@ -718,7 +740,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 
 	@Override
 	protected Map<String, Object> getParamsForPort(int port) {
-		Map<String, Object> defs = new LinkedHashMap<String, Object>();
+		Map<String, Object> defs = new LinkedHashMap<String, Object>(10);
 
 		defs.put(SECRET_PROP_KEY, SECRET_PROP_VAL);
 		defs.put(PORT_TYPE_PROP_KEY, ConnectionType.accept);
@@ -733,8 +755,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 		try {
 			return DNSResolver.getHostIP(packet.getTo().getDomain());
 		} catch (UnknownHostException e) {
-			log.log(Level.WARNING, "Uknown host exception for address: {0}",
-					packet.getTo().getDomain());
+			log.log(Level.WARNING, "Uknown host exception for address: {0}", packet.getTo().getDomain());
 
 			return packet.getTo().getDomain();
 		}
@@ -769,6 +790,15 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 		log.log(Level.INFO, "Connected to: {0}", addr);
 		updateServiceDiscoveryItem(addr, addr, XMLNS + " connected", true);
 		clusterController.nodeConnected(addr);
+
+		ServiceConnectedTimer task =
+			(ServiceConnectedTimer) serv.getSessionData().get(SERVICE_CONNECTED_TIMER);
+
+		if (task == null) {
+			log.log(Level.WARNING, "Missing service connected timer task: {0}", serv);
+		} else {
+			task.cancel();
+		}
 
 //  Map<String, String> method_params = new LinkedHashMap<String, String>();
 //  method_params.put("connected", addr);
@@ -855,7 +885,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 				if (data == null) {
 					serviceConnected(serv);
 				} else {
-					log.warning("Incorrect packet received: " + p);
+					log.log(Level.WARNING, "Incorrect packet received: {0}", p);
 				}
 
 				break;
@@ -870,8 +900,9 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 					String loc_digest = Algorithms.hexDigest(id, secret, "SHA");
 
 					if (log.isLoggable(Level.FINEST)) {
-						log.finest("Calculating digest: id=" + id + ", secret=" + secret + ", digest="
-								+ loc_digest);
+						log.log(Level.FINEST, "Calculating digest: id={0}, secret={1}, digest={2}",
+								new Object[] { id,
+								secret, loc_digest });
 					}
 
 					if ((digest != null) && digest.equals(loc_digest)) {
@@ -903,7 +934,8 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 				try {
 					addRegexRouting(route);
 				} catch (Exception e) {
-					log.warning("Can not add regex routing '" + route + "' : " + e);
+					log.log(Level.WARNING, "Can not add regex routing ''{0}'' : {1}", new Object[] { route,
+							e });
 				}
 			}
 		} else {
@@ -911,7 +943,8 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 				try {
 					removeRegexRouting(route);
 				} catch (Exception e) {
-					log.warning("Can not remove regex routing '" + route + "' : " + e);
+					log.log(Level.WARNING, "Can not remove regex routing ''{0}'' : {1}", new Object[] { route,
+							e });
 				}
 			}
 		}
@@ -1012,6 +1045,30 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 			decompressionRatio = 0f;
 			counter = 0;
 			clIOQueue = 0;
+		}
+	}
+
+
+	private class ServiceConnectedTimer extends TimerTask {
+		private XMPPIOService<Object> serv = null;
+
+		//~--- constructors -------------------------------------------------------
+
+		private ServiceConnectedTimer(XMPPIOService<Object> serv) {
+			this.serv = serv;
+		}
+
+		//~--- methods ------------------------------------------------------------
+
+		/**
+		 * Method description
+		 *
+		 */
+		@Override
+		public void run() {
+			++servConnectedTimeouts;
+			log.log(Level.INFO, "ServiceConnectedTimer timeout expired, closing connection: {0}", serv);
+			serv.forceStop();
 		}
 	}
 }
