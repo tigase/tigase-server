@@ -164,8 +164,7 @@ public class TigaseAuth implements UserAuthRepository {
 	 * @exception AuthorizationException if an error occurs
 	 */
 	@Override
-	public boolean digestAuth(BareJID user, final String digest, final String id,
-			final String alg)
+	public boolean digestAuth(BareJID user, final String digest, final String id, final String alg)
 			throws UserNotFoundException, TigaseDBException, AuthorizationException {
 		throw new AuthorizationException("Not supported.");
 	}
@@ -366,18 +365,23 @@ public class TigaseAuth implements UserAuthRepository {
 				user_login_plain_pw_sp.setString(2, password);
 				rs = user_login_plain_pw_sp.executeQuery();
 
+				boolean auth_result_ok = false;
+
 				if (rs.next()) {
 					res_string = rs.getString(1);
 
-					BareJID result = BareJID.bareJIDInstance(res_string);
-					boolean auth_result_ok = user.equals(result);
+					if (res_string != null) {
+						BareJID result = BareJID.bareJIDInstance(res_string);
+
+						auth_result_ok = user.equals(result);
+					}
 
 					if (auth_result_ok) {
 						return true;
 					} else {
 						if (log.isLoggable(Level.FINE)) {
-							log.fine("Login failed, for user: '" + user + "'" + ", password: '" + password
-									+ "'" + ", from DB got: " + res_string);
+							log.fine("Login failed, for user: '" + user + "'" + ", password: '" + password + "'"
+									+ ", from DB got: " + res_string);
 						}
 					}
 				}
