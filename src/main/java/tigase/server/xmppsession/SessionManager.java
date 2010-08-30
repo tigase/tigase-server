@@ -938,7 +938,7 @@ public class SessionManager extends AbstractMessageReceiver
 
 	protected void closeSession(XMPPResourceConnection conn, boolean closeOnly) {
 		if ( !closeOnly) {
-			Queue<Packet> results = new ArrayDeque<Packet>();
+			Queue<Packet> results = new ArrayDeque<Packet>(50);
 
 			for (XMPPStopListenerIfc stopProc : stopListeners.values()) {
 				stopProc.stopped(conn, results, plugin_config.get(stopProc.id()));
@@ -1026,8 +1026,9 @@ public class SessionManager extends AbstractMessageReceiver
 			vitem = getVHostItem(domain);
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Setting hostname " + domain + " for connection: " + conn_id + ", VHostItem: "
-						+ vitem);
+				log.log(Level.FINEST, "Setting hostname {0} for connection: {1}, VHostItem: {2}",
+						new Object[] { domain,
+						conn_id, vitem });
 			}
 		}
 
@@ -1035,8 +1036,9 @@ public class SessionManager extends AbstractMessageReceiver
 
 			// This shouldn't generally happen. Must mean misconfiguration.
 			if (log.isLoggable(Level.INFO)) {
-				log.info("Can't get VHostItem for domain: " + domain + ", using default one instead: "
-						+ getDefHostName());
+				log.log(Level.INFO, "Can''t get VHostItem for domain: {0}, using default one instead: {1}",
+						new Object[] { domain,
+						getDefHostName() });
 			}
 
 			vitem = new VHostItem(getDefHostName().getDomain());
@@ -1045,7 +1047,7 @@ public class SessionManager extends AbstractMessageReceiver
 		connection.setDomain(vitem.getUnmodifiableVHostItem());
 
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Domain set for connectionId " + conn_id);
+			log.log(Level.FINEST, "Domain set for connectionId {0}", conn_id);
 		}
 
 		// connection.setAnonymousPeers(anon_peers);
@@ -1067,10 +1069,10 @@ public class SessionManager extends AbstractMessageReceiver
 	}
 
 	protected boolean fastAddOutPacket(Packet packet) {
-		if (packet.getPacketFrom() == null) {
-			packet.setPacketFrom(getComponentId());
-		}
 
+//  if (packet.getPacketFrom() == null) {
+//    packet.setPacketFrom(getComponentId());
+//  }
 		return super.addOutPacket(packet);
 	}
 
@@ -1086,7 +1088,7 @@ public class SessionManager extends AbstractMessageReceiver
 
 		if (session != null) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Session not null, getting resource for jid: " + jid);
+				log.log(Level.FINEST, "Session not null, getting resource for jid: {0}", jid);
 			}
 
 			return session.getResourceConnection(jid);
