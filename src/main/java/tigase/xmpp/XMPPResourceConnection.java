@@ -128,8 +128,8 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	 * @param authRepo
 	 * @param loginHandler
 	 */
-	public XMPPResourceConnection(JID connectionId, UserRepository rep,
-			UserAuthRepository authRepo, SessionManagerHandler loginHandler) {
+	public XMPPResourceConnection(JID connectionId, UserRepository rep, UserAuthRepository authRepo,
+			SessionManagerHandler loginHandler) {
 		super(rep, authRepo);
 
 		long currTime = System.currentTimeMillis();
@@ -687,7 +687,9 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	 * @param parent
 	 */
 	public void removeParentSession(final XMPPSession parent) {
-		this.parentSession = null;
+		synchronized (this) {
+			parentSession = null;
+		}
 	}
 
 	/**
@@ -741,14 +743,14 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	 * @throws TigaseStringprepException
 	 */
 	public void setParentSession(final XMPPSession parent) throws TigaseStringprepException {
-		if (parent != null) {
-			synchronized (this) {
+		synchronized (this) {
+			if (parent != null) {
 				userJid = JID.jidInstance(parent.getUserName(), domain.getVhost().getDomain(),
 						((resource != null) ? resource : sessionId));
 			}
-		}
 
-		this.parentSession = parent;
+			this.parentSession = parent;
+		}
 	}
 
 	/**
@@ -837,13 +839,13 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	 *
 	 */
 	public void streamClosed() {
-		if (parentSession != null) {
-			synchronized (this) {
+		synchronized (this) {
+			if (parentSession != null) {
 				parentSession.streamClosed(this);
+				parentSession = null;
 			}
 		}    // end of if (parentSession != null)
 
-		parentSession = null;
 		resource = null;
 		sessionId = null;
 	}
