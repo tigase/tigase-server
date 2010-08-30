@@ -180,8 +180,8 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 				props.putAll(strat_defs);
 			}
 		} catch (Exception e) {
-			log.log(Level.SEVERE,
-					"Can not instantiate clustering strategy for class: " + strategy_class, e);
+			log.log(Level.SEVERE, "Can not instantiate clustering strategy for class: " + strategy_class,
+					e);
 		}
 
 		String[] local_domains = DNSResolver.getDefHostNames();
@@ -274,8 +274,8 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 			}
 		} else {
 			if (log.isLoggable(Level.WARNING)) {
-				log.warning("User resourc-rebind - not implemented yet in the cluster."
-						+ " Connection: " + conn);
+				log.warning("User resourc-rebind - not implemented yet in the cluster." + " Connection: "
+						+ conn);
 			}
 		}
 	}
@@ -312,7 +312,7 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 	 */
 	@Override
 	public void nodeConnected(String node) {
-		log.fine("Nodes connected: " + node);
+		log.log(Level.FINE, "Nodes connected: {0}", node);
 
 		JID jid = JID.jidInstanceNS(getName(), node, null);
 
@@ -391,8 +391,11 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 		}
 
 		if ((conn == null)
-				&& (isBrokenPacket(packet) || processAdminsOrDomains(packet)
-					|| sendToNextNode(packet))) {
+				&& (isBrokenPacket(packet) || processAdminsOrDomains(packet) || sendToNextNode(packet))) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Ignoring/dropping packet: {0}", packet);
+			}
+
 			return;
 		}
 
@@ -455,14 +458,12 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 			strategy.nodeConnected(getComponentId());
 			addTrusted(getComponentId());
 		} catch (Exception e) {
-			log.log(Level.SEVERE,
-					"Can not clustering strategy instance for class: " + strategy_class, e);
+			log.log(Level.SEVERE, "Can not clustering strategy instance for class: " + strategy_class, e);
 		}
 
 		try {
 			my_hostname = JID.jidInstance((String) props.get(MY_DOMAIN_NAME_PROP_KEY));
-			my_address = JID.jidInstance(getName(), (String) props.get(MY_DOMAIN_NAME_PROP_KEY),
-					null);
+			my_address = JID.jidInstance(getName(), (String) props.get(MY_DOMAIN_NAME_PROP_KEY), null);
 		} catch (TigaseStringprepException ex) {
 			log.log(Level.WARNING,
 					"Creating component source address failed stringprep processing: {0}@{1}",
@@ -491,8 +492,8 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 				for (JID node : cl_nodes) {
 					if ( !node.equals(getComponentId())) {
 						Element check_session_el =
-							ClusterElement.createClusterMethodCall(getComponentId().toString(),
-								node.toString(), StanzaType.set, ClusterMethods.USER_DISCONNECTED.toString(),
+							ClusterElement.createClusterMethodCall(getComponentId().toString(), node.toString(),
+								StanzaType.set, ClusterMethods.USER_DISCONNECTED.toString(),
 								params).getClusterElement();
 
 						fastAddOutPacket(Packet.packetInstance(check_session_el, getComponentId(), node));
@@ -505,7 +506,13 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 
 		XMPPSession parentSession = conn.getParentSession();
 
-		super.closeSession(conn, closeOnly);
+		// Exception here should not normally happen, but if it does, then consequences might
+		// be severe, let's catch it then
+		try {
+			super.closeSession(conn, closeOnly);
+		} catch (Exception ex) {
+			log.log(Level.WARNING, "This should not happen, check it out!, ", ex);
+		}
 
 		if ((conn.getConnectionStatus() != ConnectionStatus.REMOTE) && (parentSession != null)
 				&& (parentSession.getActiveResourcesSize()
@@ -517,9 +524,9 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 					super.closeConnection(xrc.getConnectionId(), true);
 
 					if (log.isLoggable(Level.FINEST)) {
-						log.finest("Closed remote connection: " + xrc);
+						log.log(Level.FINEST, "Closed remote connection: {0}", xrc);
 					}
-				} catch (NoConnectionIdException ex) {
+				} catch (Exception ex) {
 					log.log(Level.WARNING, "This should not happen, check it out!, ", ex);
 				}
 			}
@@ -753,8 +760,8 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 							try {
 								strategy.usersConnected(packet.getStanzaFrom(), results, jid_j);
 							} catch (Exception e) {
-								log.log(Level.WARNING,
-										"Problem synchronizing cluster nodes for packet: " + packet, e);
+								log.log(Level.WARNING, "Problem synchronizing cluster nodes for packet: " + packet,
+										e);
 							}
 						} else {
 							log.warning("Sync online packet with empty jids list! Please check this out: "
@@ -857,12 +864,11 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 
 		if (cluster_node != null) {
 			JID sess_man_id = getComponentId();
-			ClusterElement clel = new ClusterElement(sess_man_id.toString(),
-				cluster_node.toString(), StanzaType.set, packet);
+			ClusterElement clel = new ClusterElement(sess_man_id.toString(), cluster_node.toString(),
+				StanzaType.set, packet);
 
 			clel.addVisitedNode(sess_man_id.toString());
-			fastAddOutPacket(Packet.packetInstance(clel.getClusterElement(), sess_man_id,
-					cluster_node));
+			fastAddOutPacket(Packet.packetInstance(clel.getClusterElement(), sess_man_id, cluster_node));
 
 			return true;
 		}
@@ -922,8 +928,7 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 
 			sendBroadcastPackets(presence, params, ClusterMethods.USER_INITIAL_PRESENCE, cl_nodes);
 		} catch (Exception e) {
-			log.log(Level.WARNING,
-					"Problem with broadcast user initial presence message for: " + conn);
+			log.log(Level.WARNING, "Problem with broadcast user initial presence message for: " + conn);
 		}
 	}
 
@@ -994,8 +999,8 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 
 		message += node + " connected to " + getDefHostName();
 
-		Packet p_msg = Message.getMessage(my_address, my_hostname, StanzaType.normal, message,
-			subject, "xyz", newPacketId(null));
+		Packet p_msg = Message.getMessage(my_address, my_hostname, StanzaType.normal, message, subject,
+			"xyz", newPacketId(null));
 
 		sendToAdmins(p_msg);
 	}
