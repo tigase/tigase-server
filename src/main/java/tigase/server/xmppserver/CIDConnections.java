@@ -537,8 +537,8 @@ public class CIDConnections {
 						}
 					} else {
 						if (log.isLoggable(Level.FINEST)) {
-							log.log(Level.FINEST,
-									"There is no connection available to send the packet: {0}", waiting);
+							log.log(Level.FINEST, "There is no connection available to send the packet: {0}",
+									waiting);
 						}
 
 						break;
@@ -563,8 +563,7 @@ public class CIDConnections {
 						try {
 							openOutgoingConnections();
 						} catch (Exception e) {
-							log.log(Level.WARNING, "uncaughtException in the connection opening thread: ",
-									e);
+							log.log(Level.WARNING, "uncaughtException in the connection opening thread: ", e);
 						} finally {
 
 							// Release the 'lock'
@@ -649,6 +648,15 @@ public class CIDConnections {
 				int openForIP = getOpenForIP(dNSEntry.getIp());
 
 				for (int i = openForIP; i < max_out_conns_per_ip; i++) {
+					if (dNSEntry.getIp().equals("127.0.0.1")) {
+
+						// DNS misconfiguration for the remote server (icq.jabber.cz for example)
+						// Now we assume: UnknownHostException
+						log.log(Level.INFO, "DNS misconfiguration for domain: {0}", cid.getRemoteHost());
+
+						throw new UnknownHostException("DNS misconfiguration for domain: "
+								+ cid.getRemoteHost());
+					}
 
 					// Create a new connection
 					S2SConnection s2s_conn = new S2SConnection(handler, dNSEntry.getIp());
@@ -675,8 +683,7 @@ public class CIDConnections {
 				handler.addOutPacket(Authorization.REMOTE_SERVER_NOT_FOUND.getResponseMessage(p,
 						"S2S - destination host not found", true));
 			} catch (PacketErrorTypeException e) {
-				log.log(Level.WARNING, "Packet: {0} processing exception: {1}",
-						new Object[] { p.toString(),
+				log.log(Level.WARNING, "Packet: {0} processing exception: {1}", new Object[] { p.toString(),
 						e });
 			}
 		}
