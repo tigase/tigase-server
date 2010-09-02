@@ -42,6 +42,8 @@ import tigase.xmpp.StanzaType;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import java.net.UnknownHostException;
+
 import java.security.NoSuchAlgorithmException;
 
 import java.util.Map;
@@ -243,8 +245,7 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 			}
 
 			list.add(getName(), "Total outgoing", total_outgoing, Level.FINEST);
-			list.add(getName(), "Total outgoing handshaking", total_outgoing_handshaking,
-					Level.FINEST);
+			list.add(getName(), "Total outgoing handshaking", total_outgoing_handshaking, Level.FINEST);
 			list.add(getName(), "Total incoming", total_incoming, Level.FINEST);
 			list.add(getName(), "Total DB keys", total_dbKeys, Level.FINEST);
 			list.add(getName(), "Total waiting", total_waiting, Level.FINEST);
@@ -319,8 +320,7 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 			return;
 		}
 
-		if ((packet.getStanzaFrom() == null)
-				|| packet.getStanzaFrom().getDomain().trim().isEmpty()) {
+		if ((packet.getStanzaFrom() == null) || packet.getStanzaFrom().getDomain().trim().isEmpty()) {
 			log.log(Level.WARNING, "Missing ''from'' attribute, ignoring packet...{0}", packet);
 
 			return;
@@ -329,56 +329,62 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 		// Check whether addressing is correct:
 		String to_hostname = packet.getStanzaTo().getDomain();
 
-		// We don't send packets to local domains trough s2s, there
-		// must be something wrong with configuration
-		if (isLocalDomainOrComponent(to_hostname)) {
+		try {
 
-			// Ups, remote hostname is the same as one of local hostname??
-			// Internal loop possible, we don't want that....
-			// Let's send the packet back....
-			if (log.isLoggable(Level.INFO)) {
-				log.log(Level.INFO, "Packet addresses to localhost, I am not processing it: {0}",
-						packet);
-			}
+			// We don't send packets to local domains trough s2s, there
+			// must be something wrong with configuration
+			if (isLocalDomainOrComponent(to_hostname)) {
 
-			try {
+				// Ups, remote hostname is the same as one of local hostname??
+				// Internal loop possible, we don't want that....
+				// Let's send the packet back....
+				if (log.isLoggable(Level.INFO)) {
+					log.log(Level.INFO, "Packet addresses to localhost, I am not processing it: {0}", packet);
+				}
+
 				addOutPacket(Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet,
 						"S2S - not delivered. Server missconfiguration.", true));
-			} catch (PacketErrorTypeException e) {
-				log.log(Level.WARNING, "Packet processing exception: {0}", e);
+
+				return;
 			}
 
-			return;
+			// I think from_hostname needs to be different from to_hostname at
+			// this point... or s2s doesn't make sense
+			String from_hostname = packet.getStanzaFrom().getDomain();
+
+			// All hostnames go through String.intern()
+			if (to_hostname == from_hostname) {
+				log.log(Level.WARNING, "Dropping incorrect packet - from_hostname == to_hostname: {0}",
+						packet);
+
+				return;
+			}
+
+			CID cid = getConnectionId(from_hostname, to_hostname);
+
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Connection ID is: {0}", cid);
+			}
+
+			CIDConnections cid_conns = getCIDConnections(cid);
+
+			try {
+				if (cid_conns == null) {
+					cid_conns = createNewCIDConnections(cid);
+				}
+
+				Packet server_packet = packet.copyElementOnly();
+
+				server_packet.getElement().removeAttribute("xmlns");
+				cid_conns.sendPacket(server_packet);
+			} catch (NotLocalhostException e) {
+				addOutPacket(Authorization.NOT_ACCEPTABLE.getResponseMessage(packet,
+						"S2S - Incorrect source address - none of any local virtual hosts or components.",
+							true));
+			}
+		} catch (PacketErrorTypeException e) {
+			log.log(Level.WARNING, "Packet processing exception: {0}", e);
 		}
-
-		// I think from_hostname needs to be different from to_hostname at
-		// this point... or s2s doesn't make sense
-		String from_hostname = packet.getStanzaFrom().getDomain();
-
-		// All hostnames go through String.intern()
-		if (to_hostname == from_hostname) {
-			log.log(Level.WARNING, "Dropping incorrect packet - from_hostname == to_hostname: {0}",
-					packet);
-
-			return;
-		}
-
-		CID cid = getConnectionId(from_hostname, to_hostname);
-
-		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "Connection ID is: {0}", cid);
-		}
-
-		CIDConnections cid_conns = getCIDConnections(cid);
-
-		if (cid_conns == null) {
-			cid_conns = createNewCIDConnections(cid);
-		}
-
-		Packet server_packet = packet.copyElementOnly();
-
-		server_packet.getElement().removeAttribute("xmlns");
-		cid_conns.sendPacket(server_packet);
 	}
 
 	/**
@@ -441,8 +447,7 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 		CID cid = (CID) port_props.get("cid");
 
 		if (cid == null) {
-			log.log(Level.WARNING, "Protocol error cid not set for outgoing connection: {0}",
-					port_props);
+			log.log(Level.WARNING, "Protocol error cid not set for outgoing connection: {0}", port_props);
 
 			return;
 		}
@@ -450,8 +455,8 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 		CIDConnections cid_conns = getCIDConnections(cid);
 
 		if (cid_conns == null) {
-			log.log(Level.WARNING,
-					"Protocol error cid_conns not found for outgoing connection: {0}", port_props);
+			log.log(Level.WARNING, "Protocol error cid_conns not found for outgoing connection: {0}",
+					port_props);
 
 			return;
 		} else {
@@ -524,8 +529,7 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 
 			if (cid == null) {
 				if (serv.connectionType() == ConnectionType.connect) {
-					log.log(Level.WARNING, "Protocol error cid not set for outgoing connection: {0}",
-							serv);
+					log.log(Level.WARNING, "Protocol error cid not set for outgoing connection: {0}", serv);
 				}
 
 				return result;
@@ -534,8 +538,8 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 			CIDConnections cid_conns = getCIDConnections(cid);
 
 			if (cid_conns == null) {
-				log.log(Level.WARNING,
-						"Protocol error cid_conns not found for outgoing connection: {0}", serv);
+				log.log(Level.WARNING, "Protocol error cid_conns not found for outgoing connection: {0}",
+						serv);
 
 				return result;
 			} else {
@@ -568,8 +572,7 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 		try {
 			connSelector = (S2SConnectionSelector) Class.forName(selector_str).newInstance();
 		} catch (Exception e) {
-			log.log(Level.SEVERE, "Incorrect s2s connection selector class provided: {0}",
-					selector_str);
+			log.log(Level.SEVERE, "Incorrect s2s connection selector class provided: {0}", selector_str);
 			log.log(Level.SEVERE, "Selector initialization exception: ", e);
 		}
 	}
@@ -646,8 +649,9 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 
 					// This should actually not happen. Let's be clear here about handling unexpected
 					// cases.
-					log.log(Level.WARNING, "{0} This might be a bug in s2s code, should not happen."
-							+ " Missing CIDConnections for stream open to ''connect'' service type.", serv);
+					log.log(Level.WARNING,
+							"{0} This might be a bug in s2s code, should not happen."
+								+ " Missing CIDConnections for stream open to ''connect'' service type.", serv);
 					generateStreamError(false, "internal-server-error", serv);
 
 					return null;
@@ -687,42 +691,45 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 			}
 
 			case accept : {
-				String id = UUID.randomUUID().toString();
+				try {
+					String id = UUID.randomUUID().toString();
 
-				serv.setSessionId(id);
+					serv.setSessionId(id);
 
-				String stream_open = "<stream:stream"
-					+ " xmlns:stream='http://etherx.jabber.org/streams'" + " xmlns='jabber:server'"
-					+ " xmlns:db='jabber:server:dialback'" + " id='" + id + "'";
+					String stream_open = "<stream:stream"
+						+ " xmlns:stream='http://etherx.jabber.org/streams'" + " xmlns='jabber:server'"
+						+ " xmlns:db='jabber:server:dialback'" + " id='" + id + "'";
 
-				if (cid != null) {
-					stream_open += " from='" + cid.getLocalHost() + "'" + " to='" + cid.getRemoteHost()
-							+ "'";
+					if (cid != null) {
+						stream_open += " from='" + cid.getLocalHost() + "'" + " to='" + cid.getRemoteHost()
+								+ "'";
 
-					if (cid_conns == null) {
-						cid_conns = createNewCIDConnections(cid);
-					}
+						if (cid_conns == null) {
+							cid_conns = createNewCIDConnections(cid);
+						}
 
-					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, "{0}, Accept Stream opened for: {1}, session id: {2}",
-								new Object[] { serv,
-								cid, id });
-					}
-
-					serv.getSessionData().put("cid", cid);
-					cid_conns.addIncoming(serv);
-				} else {
-					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST,
-								"{0}, Accept Stream opened for unknown CID, session id: {1}",
+						if (log.isLoggable(Level.FINEST)) {
+							log.log(Level.FINEST, "{0}, Accept Stream opened for: {1}, session id: {2}",
 									new Object[] { serv,
-								id });
+									cid, id });
+						}
+
+						serv.getSessionData().put("cid", cid);
+						cid_conns.addIncoming(serv);
+					} else {
+						if (log.isLoggable(Level.FINEST)) {
+							log.log(Level.FINEST, "{0}, Accept Stream opened for unknown CID, session id: {1}",
+									new Object[] { serv,
+									id });
+						}
 					}
+
+					stream_open += ">";
+
+					return stream_open;
+				} catch (NotLocalhostException ex) {
+					generateStreamError(false, "host-unknown", serv);
 				}
-
-				stream_open += ">";
-
-				return stream_open;
 			}
 
 			default :
@@ -810,7 +817,11 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 		return true;
 	}
 
-	private CIDConnections createNewCIDConnections(CID cid) {
+	private CIDConnections createNewCIDConnections(CID cid) throws NotLocalhostException {
+		if ( !isLocalDomainOrComponent(cid.getLocalHost())) {
+			throw new NotLocalhostException("This is not a valid localhost.");
+		}
+
 		CIDConnections cid_conns = new CIDConnections(cid, this, connSelector, maxINConnections,
 			maxOUTTotalConnections, maxOUTPerIPConnections, maxPacketWaitingTime);
 
@@ -829,8 +840,7 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 		}
 
 		strError += "<stream:error>" + "<" + error_el
-				+ " xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>" + "</stream:error>"
-					+ "</stream:stream>";
+				+ " xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>" + "</stream:error>" + "</stream:stream>";
 
 		try {
 			writeRawData(serv, strError);
@@ -889,11 +899,10 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 		CID cid = (CID) serv.getSessionData().get("cid");
 
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "{0}, DIALBACK packet: {1}, CID: {2}", new Object[] { serv, p,
-					cid });
+			log.log(Level.FINEST, "{0}, DIALBACK packet: {1}, CID: {2}", new Object[] { serv, p, cid });
 		}
 
-		CIDConnections cid_conns = getCIDConnections(cid);
+		CIDConnections cid_conns = null;
 
 		// Some servers (ejabberd) do not send from/to attributes in the stream:open which
 		// violates the spec, they seem not to care though, so here we handle the case.
@@ -905,11 +914,20 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 			cid_conns = getCIDConnections(cid);
 
 			if (cid_conns == null) {
-				cid_conns = createNewCIDConnections(cid);
+				try {
+					cid_conns = createNewCIDConnections(cid);
+				} catch (NotLocalhostException ex) {
+					log.log(Level.FINER, "{0} Incorrect local hostname: {1}", new Object[] { serv, cid });
+					generateStreamError(false, "host-unknown", serv);
+
+					return;
+				}
 			}
 
 			serv.getSessionData().put("cid", cid);
 			cid_conns.addIncoming(serv);
+		} else {
+			cid_conns = getCIDConnections(cid);
 		}
 
 		if (cid == null) {
@@ -938,14 +956,13 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 		if ((p.getElemName() == RESULT_EL_NAME) || (p.getElemName() == DB_RESULT_EL_NAME)) {
 			if (p.getType() == null) {
 				String conn_sessionId = serv.getSessionId();
-				Packet verify_req = this.getValidResponse(DB_VERIFY_EL_NAME, cid, conn_sessionId,
-					null, p.getElemCData());
+				Packet verify_req = this.getValidResponse(DB_VERIFY_EL_NAME, cid, conn_sessionId, null,
+					p.getElemCData());
 
 				cid_conns.sendHandshakingOnly(verify_req);
 			} else {
 				if (p.getType() == StanzaType.valid) {
-					serv.addCID(getConnectionId(p.getStanzaTo().getDomain(),
-							p.getStanzaFrom().getDomain()));
+					serv.addCID(getConnectionId(p.getStanzaTo().getDomain(), p.getStanzaFrom().getDomain()));
 					cid_conns.connectionAuthenticated(serv);
 				} else {
 					if (log.isLoggable(Level.FINE)) {
@@ -962,8 +979,7 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 
 		if ((p.getElemName() == VERIFY_EL_NAME) || (p.getElemName() == DB_VERIFY_EL_NAME)) {
 			if (p.getType() == null) {
-				String local_key = getLocalDBKey(cid, remote_key, p.getStanzaId(),
-					serv.getSessionId());
+				String local_key = getLocalDBKey(cid, remote_key, p.getStanzaId(), serv.getSessionId());
 
 				if (local_key == null) {
 					if (log.isLoggable(Level.FINER)) {
@@ -972,8 +988,8 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 									+ "located on a different node...", cid);
 					}
 				} else {
-					sendVerifyResult(DB_VERIFY_EL_NAME, cid, local_key.equals(remote_key),
-							p.getStanzaId(), serv.getSessionId());
+					sendVerifyResult(DB_VERIFY_EL_NAME, cid, local_key.equals(remote_key), p.getStanzaId(),
+							serv.getSessionId());
 				}
 			} else {
 				sendVerifyResult(DB_RESULT_EL_NAME, cid, (p.getType() == StanzaType.valid), null,
