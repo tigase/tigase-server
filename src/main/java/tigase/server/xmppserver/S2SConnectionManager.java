@@ -425,7 +425,14 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 							log.log(Level.FINEST, "{0}, Adding packet out: {1}", new Object[] { serv, p });
 						}
 
-						addOutPacket(p);
+						if (isLocalDomainOrComponent(p.getStanzaTo().getDomain())) {
+							addOutPacket(p);
+						} else {
+							try {
+								serv.addPacketToSend(Authorization.NOT_ACCEPTABLE.getResponseMessage(p,
+										"Not a local virtual domain or component", true));
+							} catch (PacketErrorTypeException ex) {}
+						}
 					} else {
 						return null;
 					}
