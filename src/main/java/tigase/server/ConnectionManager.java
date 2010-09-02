@@ -543,14 +543,15 @@ public abstract class ConnectionManager<IO extends XMPPIOService> extends Abstra
 
 		if (ports != null) {
 			for (int i = 0; i < ports.length; i++) {
-				Map<String, Object> port_props = new LinkedHashMap<String, Object>();
+				Map<String, Object> port_props = new LinkedHashMap<String, Object>(20);
 
 				for (Map.Entry<String, Object> entry : props.entrySet()) {
 					if (entry.getKey().startsWith(PROP_KEY + ports[i])) {
 						int idx = entry.getKey().lastIndexOf('/');
 						String key = entry.getKey().substring(idx + 1);
 
-						log.config("Adding port property key: " + key + "=" + entry.getValue());
+						log.log(Level.CONFIG, "Adding port property key: {0}={1}", new Object[] { key,
+								entry.getValue() });
 						port_props.put(key, entry.getValue());
 					}    // end of if (entry.getKey().startsWith())
 				}      // end of for ()
@@ -563,7 +564,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService> extends Abstra
 		}          // end of if (ports != null)
 
 		if ((Boolean) props.get(TLS_USE_PROP_KEY)) {
-			Map<String, String> tls_params = new LinkedHashMap<String, String>();
+			Map<String, String> tls_params = new LinkedHashMap<String, String>(20);
 
 			tls_params.put(SSL_CONTAINER_CLASS_KEY, (String) props.get(TLS_CONTAINER_CLASS_PROP_KEY));
 			tls_params.put(DEFAULT_DOMAIN_CERT_KEY, (String) props.get(TLS_DEF_CERT_PROP_KEY));
