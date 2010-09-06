@@ -28,6 +28,8 @@ import tigase.auth.SaslPLAIN;
 
 import tigase.db.AuthorizationException;
 import tigase.db.DBInitException;
+import tigase.db.DataRepository;
+import tigase.db.RepositoryFactory;
 import tigase.db.TigaseDBException;
 import tigase.db.UserAuthRepository;
 import tigase.db.UserExistsException;
@@ -48,7 +50,6 @@ import java.math.BigDecimal;
 
 import java.security.NoSuchAlgorithmException;
 
-import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -85,7 +86,7 @@ import javax.security.sasl.SaslServer;
 public class DrupalWPAuth implements UserAuthRepository {
 
 	/**
-	 * Private logger for class instancess.
+	 * Private logger for class instances.
 	 */
 	private static final Logger log = Logger.getLogger(DrupalWPAuth.class.getName());
 	private static final String[] non_sasl_mechs = { "password" };
@@ -120,41 +121,16 @@ public class DrupalWPAuth implements UserAuthRepository {
 
 	/** Field description */
 	public static final int WP_OK_STATUS_VAL = 0;
+	private static final String SELECT_PASSWORD_QUERY_KEY = "select-password-drupal-wp-query-key";
+	private static final String SELECT_STATUS_QUERY_KEY = "select-status-drupal-wp-query-key";
+	private static final String INSERT_USER_QUERY_KEY = "insert-user-drupal-wp-query-key";
+	private static final String UPDATE_LAST_LOGIN_QUERY_KEY = "update-last-login-drupal-wp-query-key";
+	private static final String UPDATE_ONLINE_STATUS_QUERY_KEY =
+		"update-online-status-drupal-wp-query-key";
 
 	//~--- fields ---------------------------------------------------------------
 
-	/**
-	 * Database active connection.
-	 */
-	private Connection conn = null;
-
-	/**
-	 * Prepared statement for testing whether database connection is still
-	 * working. If not connection to database is recreated.
-	 */
-	private PreparedStatement conn_valid_st = null;
-
-	/**
-	 * Connection validation helper.
-	 */
-	private long connectionValidateInterval = 1000 * 60;
-
-	/**
-	 * Database connection string.
-	 */
-	private String db_conn = null;
-
-	/**
-	 * Connection validation helper.
-	 */
-	private long lastConnectionValidated = 0;
-
-	// private PreparedStatement max_uid_st = null;
-	private PreparedStatement pass_st = null;
-	private PreparedStatement status_st = null;
-	private PreparedStatement update_last_login_st = null;
-	private PreparedStatement update_online_status = null;
-	private PreparedStatement user_add_st = null;
+	private DataRepository data_repo = null;
 	private String name_fld = DRUPAL_NAME_FLD;
 	private String users_tbl = DRUPAL_USERS_TBL;
 	private int status_val = DRUPAL_OK_STATUS_VAL;
@@ -177,12 +153,9 @@ public class DrupalWPAuth implements UserAuthRepository {
 	public void addUser(BareJID user, final String password)
 			throws UserExistsException, TigaseDBException {
 		try {
-			checkConnection();
+			PreparedStatement user_add_st = data_repo.getPreparedStatement(INSERT_USER_QUERY_KEY);
 
 			synchronized (user_add_st) {
-
-				// long uid = getMaxUID() + 1;
-				// user_add_st.setLong(1, uid);
 				user_add_st.setString(1, user.getLocalpart());
 				user_add_st.setString(2, Algorithms.hexDigest("", password, "MD5"));
 				user_add_st.executeUpdate();
@@ -207,8 +180,7 @@ public class DrupalWPAuth implements UserAuthRepository {
 	 * @exception AuthorizationException if an error occurs
 	 */
 	@Override
-	public boolean digestAuth(BareJID user, final String digest, final String id,
-			final String alg)
+	public boolean digestAuth(BareJID user, final String digest, final String id, final String alg)
 			throws UserNotFoundException, TigaseDBException, AuthorizationException {
 		throw new AuthorizationException("Not supported.");
 	}
@@ -223,7 +195,7 @@ public class DrupalWPAuth implements UserAuthRepository {
 	 */
 	@Override
 	public String getResourceUri() {
-		return db_conn;
+		return data_repo.getResourceUri();
 	}
 
 	/**
@@ -262,36 +234,48 @@ public class DrupalWPAuth implements UserAuthRepository {
 	@Override
 	public void initRepository(final String connection_str, Map<String, String> params)
 			throws DBInitException {
-		db_conn = connection_str;
-
-		if (db_conn.contains("online_status=true")) {
-			online_status = true;
-		}
-
-		if (db_conn.contains("wp_mode=true")) {
-			online_status = false;
-			last_login = false;
-			name_fld = WP_NAME_FLD;
-			users_tbl = WP_USERS_TBL;
-			status_val = WP_OK_STATUS_VAL;
-			status_fld = WP_STATUS_FLD;
-			pass_fld = WP_PASS_FLD;
-			log.info("Initializing Wordpress repository: " + db_conn);
-		} else {
-			log.info("Initializing Drupal repository: " + db_conn);
-		}
-
 		try {
-			initRepo();
-		} catch (SQLException e) {
-			conn = null;
+			data_repo = RepositoryFactory.getDataRepository(null, connection_str, params);
 
-			throw new DBInitException("Problem initializing jdbc connection: " + db_conn, e);
+			if (connection_str.contains("online_status=true")) {
+				online_status = true;
+			}
+
+			if (connection_str.contains("wp_mode=true")) {
+				online_status = false;
+				last_login = false;
+				name_fld = WP_NAME_FLD;
+				users_tbl = WP_USERS_TBL;
+				status_val = WP_OK_STATUS_VAL;
+				status_fld = WP_STATUS_FLD;
+				pass_fld = WP_PASS_FLD;
+				log.log(Level.INFO, "Initializing Wordpress repository: {0}", connection_str);
+			} else {
+				log.log(Level.INFO, "Initializing Drupal repository: {0}", connection_str);
+			}
+
+			String query = "select " + pass_fld + " from " + users_tbl + " where " + name_fld + " = ?";
+
+			data_repo.initPreparedStatement(SELECT_PASSWORD_QUERY_KEY, query);
+			query = "select " + status_fld + " from " + users_tbl + " where " + name_fld + " = ?";
+			data_repo.initPreparedStatement(SELECT_STATUS_QUERY_KEY, query);
+			query = "insert into " + users_tbl + " (" + name_fld + ", " + pass_fld + ", " + status_fld
+					+ ")" + " values (?, ?, " + status_val + ")";
+			data_repo.initPreparedStatement(INSERT_USER_QUERY_KEY, query);
+			query = "update " + users_tbl + " set access=?, login=? where " + name_fld + " = ?";
+			data_repo.initPreparedStatement(UPDATE_LAST_LOGIN_QUERY_KEY, query);
+			query = "update " + users_tbl + " set online_status=online_status+? where " + name_fld
+					+ " = ?";
+			data_repo.initPreparedStatement(UPDATE_ONLINE_STATUS_QUERY_KEY, query);
+		} catch (Exception e) {
+			data_repo = null;
+
+			throw new DBInitException("Problem initializing jdbc connection: " + connection_str, e);
 		}
 
 		try {
 			if (online_status) {
-				Statement stmt = conn.createStatement();
+				Statement stmt = data_repo.createStatement();
 
 				stmt.executeUpdate("update users set online_status = 0;");
 				stmt.close();
@@ -300,20 +284,20 @@ public class DrupalWPAuth implements UserAuthRepository {
 		} catch (SQLException e) {
 			if (e.getMessage().contains("'online_status'")) {
 				try {
-					Statement stmt = conn.createStatement();
+					Statement stmt = data_repo.createStatement();
 
 					stmt.executeUpdate("alter table users add online_status int default 0;");
 					stmt.close();
 					stmt = null;
 				} catch (SQLException ex) {
-					conn = null;
+					data_repo = null;
 
-					throw new DBInitException("Problem initializing jdbc connection: " + db_conn, ex);
+					throw new DBInitException("Problem initializing jdbc connection: " + connection_str, ex);
 				}
 			} else {
-				conn = null;
+				data_repo = null;
 
-				throw new DBInitException("Problem initializing jdbc connection: " + db_conn, e);
+				throw new DBInitException("Problem initializing jdbc connection: " + connection_str, e);
 			}
 		}
 	}
@@ -329,12 +313,7 @@ public class DrupalWPAuth implements UserAuthRepository {
 	 */
 	@Override
 	public void logout(BareJID user) throws UserNotFoundException, TigaseDBException {
-		try {
-			checkConnection();
-			updateOnlineStatus(user, -1);
-		} catch (SQLException e) {
-			throw new TigaseDBException("Problem accessing repository.", e);
-		}    // end of catch
+		updateOnlineStatus(user, -1);
 	}
 
 	/**
@@ -365,7 +344,7 @@ public class DrupalWPAuth implements UserAuthRepository {
 						updateOnlineStatus(user, 1);
 
 						if (log.isLoggable(Level.FINEST)) {
-							log.finest("User authenticated: " + user);
+							log.log(Level.FINEST, "User authenticated: {0}", user);
 						}
 					} else {
 						if (log.isLoggable(Level.FINEST)) {
@@ -404,8 +383,6 @@ public class DrupalWPAuth implements UserAuthRepository {
 	public boolean plainAuth(BareJID user, final String password)
 			throws UserNotFoundException, TigaseDBException, AuthorizationException {
 		try {
-			checkConnection();
-
 			if ( !isActive(user)) {
 				throw new AuthorizationException("User account has been blocked.");
 			}    // end of if (!isActive(user))
@@ -419,11 +396,11 @@ public class DrupalWPAuth implements UserAuthRepository {
 				updateOnlineStatus(user, 1);
 
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("User authenticated: " + user);
+					log.log(Level.FINEST, "User authenticated: {0}", user);
 				}
 			} else {
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("User NOT authenticated: " + user);
+					log.log(Level.FINEST, "User NOT authenticated: {0}", user);
 				}
 			}
 
@@ -478,34 +455,7 @@ public class DrupalWPAuth implements UserAuthRepository {
 	@Override
 	public void updatePassword(BareJID user, final String password)
 			throws UserNotFoundException, TigaseDBException {
-		throw new TigaseDBException("Updatin user password is not supported.");
-	}
-
-	/**
-	 * <code>checkConnection</code> method checks database connection before any
-	 * query. For some database servers (or JDBC drivers) it happens the connection
-	 * is dropped if not in use for a long time or after certain timeout passes.
-	 * This method allows us to detect the problem and reinitialize database
-	 * connection.
-	 *
-	 * @return a <code>boolean</code> value if the database connection is working.
-	 * @exception SQLException if an error occurs on database query.
-	 */
-	private boolean checkConnection() throws SQLException {
-		try {
-			synchronized (conn_valid_st) {
-				long tmp = System.currentTimeMillis();
-
-				if ((tmp - lastConnectionValidated) >= connectionValidateInterval) {
-					conn_valid_st.executeQuery();
-					lastConnectionValidated = tmp;
-				}    // end of if ()
-			}
-		} catch (Exception e) {
-			initRepo();
-		}        // end of try-catch
-
-		return true;
+		throw new TigaseDBException("Updating user password is not supported.");
 	}
 
 	//~--- get methods ----------------------------------------------------------
@@ -536,7 +486,7 @@ public class DrupalWPAuth implements UserAuthRepository {
 		ResultSet rs = null;
 
 		try {
-			checkConnection();
+			PreparedStatement pass_st = data_repo.getPreparedStatement(SELECT_PASSWORD_QUERY_KEY);
 
 			synchronized (pass_st) {
 				pass_st.setString(1, user.getLocalpart());
@@ -553,54 +503,12 @@ public class DrupalWPAuth implements UserAuthRepository {
 		}
 	}
 
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * <code>initPreparedStatements</code> method initializes internal
-	 * database connection variables such as prepared statements.
-	 *
-	 * @exception SQLException if an error occurs on database query.
-	 */
-	private void initPreparedStatements() throws SQLException {
-		String query = "select " + pass_fld + " from " + users_tbl + " where " + name_fld + " = ?";
-
-		pass_st = conn.prepareStatement(query);
-		query = "select " + status_fld + " from " + users_tbl + " where " + name_fld + " = ?";
-		status_st = conn.prepareStatement(query);
-		query = "insert into " + users_tbl + " (" + name_fld + ", " + pass_fld + ", " + status_fld
-				+ ")" + " values (?, ?, " + status_val + ");";
-		user_add_st = conn.prepareStatement(query);
-
-//  query = "select max(uid) from " + users_tbl;
-//  max_uid_st = conn.prepareStatement(query);
-		query = "select 1;";
-		conn_valid_st = conn.prepareStatement(query);
-		query = "update " + users_tbl + " set access=?, login=? where " + name_fld + " = ?";
-		update_last_login_st = conn.prepareStatement(query);
-		query = "update " + users_tbl + " set online_status=online_status+? where " + name_fld
-				+ " = ?";
-		update_online_status = conn.prepareStatement(query);
-	}
-
-	/**
-	 * <code>initRepo</code> method initializes database connection
-	 * and data repository.
-	 *
-	 * @exception SQLException if an error occurs on database query.
-	 */
-	private void initRepo() throws SQLException {
-		synchronized (db_conn) {
-			conn = DriverManager.getConnection(db_conn);
-			initPreparedStatements();
-		}
-	}
-
-	//~--- get methods ----------------------------------------------------------
-
 	private boolean isActive(BareJID user) throws SQLException, UserNotFoundException {
 		ResultSet rs = null;
 
 		try {
+			PreparedStatement status_st = data_repo.getPreparedStatement(SELECT_STATUS_QUERY_KEY);
+
 			synchronized (status_st) {
 				status_st.setString(1, user.getLocalpart());
 				rs = status_st.executeQuery();
@@ -651,7 +559,8 @@ public class DrupalWPAuth implements UserAuthRepository {
 			byte[] challenge = ss.evaluateResponse(in_data);
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("challenge: " + ((challenge != null) ? new String(challenge) : "null"));
+				log.log(Level.FINEST, "challenge: {0}",
+						((challenge != null) ? new String(challenge) : "null"));
 			}
 
 			String challenge_str = (((challenge != null) && (challenge.length > 0))
@@ -682,6 +591,9 @@ public class DrupalWPAuth implements UserAuthRepository {
 	private void updateLastLogin(BareJID user) throws TigaseDBException {
 		if (last_login) {
 			try {
+				PreparedStatement update_last_login_st =
+					data_repo.getPreparedStatement(UPDATE_LAST_LOGIN_QUERY_KEY);
+
 				synchronized (update_last_login_st) {
 					BigDecimal bd = new BigDecimal((System.currentTimeMillis() / 1000));
 
@@ -699,6 +611,9 @@ public class DrupalWPAuth implements UserAuthRepository {
 	private void updateOnlineStatus(BareJID user, int status) throws TigaseDBException {
 		if (online_status) {
 			try {
+				PreparedStatement update_online_status =
+					data_repo.getPreparedStatement(UPDATE_ONLINE_STATUS_QUERY_KEY);
+
 				synchronized (update_online_status) {
 					update_online_status.setInt(1, status);
 					update_online_status.setString(2, user.getLocalpart());
@@ -739,7 +654,7 @@ public class DrupalWPAuth implements UserAuthRepository {
 
 			for (int i = 0; i < callbacks.length; i++) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Callback: " + callbacks[i].getClass().getSimpleName());
+					log.log(Level.FINEST, "Callback: {0}", callbacks[i].getClass().getSimpleName());
 				}
 
 				if (callbacks[i] instanceof RealmCallback) {
@@ -751,7 +666,7 @@ public class DrupalWPAuth implements UserAuthRepository {
 					}        // end of if (realm == null)
 
 					if (log.isLoggable(Level.FINEST)) {
-						log.finest("RealmCallback: " + realm);
+						log.log(Level.FINEST, "RealmCallback: {0}", realm);
 					}
 				} else {
 					if (callbacks[i] instanceof NameCallback) {
@@ -766,7 +681,7 @@ public class DrupalWPAuth implements UserAuthRepository {
 						options.put(USER_ID_KEY, jid);
 
 						if (log.isLoggable(Level.FINEST)) {
-							log.finest("NameCallback: " + user_name);
+							log.log(Level.FINEST, "NameCallback: {0}", user_name);
 						}
 					} else {
 						if (callbacks[i] instanceof PasswordCallback) {
@@ -778,7 +693,7 @@ public class DrupalWPAuth implements UserAuthRepository {
 								pc.setPassword(passwd.toCharArray());
 
 								if (log.isLoggable(Level.FINEST)) {
-									log.finest("PasswordCallback: " + passwd);
+									log.log(Level.FINEST, "PasswordCallback: {0}", passwd);
 								}
 							} catch (Exception e) {
 								throw new IOException("Password retrieving problem.", e);
@@ -790,8 +705,8 @@ public class DrupalWPAuth implements UserAuthRepository {
 								String authorId = authCallback.getAuthorizationID();
 
 								if (log.isLoggable(Level.FINEST)) {
-									log.finest("AuthorizeCallback: authenId: " + authenId);
-									log.finest("AuthorizeCallback: authorId: " + authorId);
+									log.log(Level.FINEST, "AuthorizeCallback: authenId: {0}", authenId);
+									log.log(Level.FINEST, "AuthorizeCallback: authorId: {0}", authorId);
 								}
 
 								// if (authenId.equals(authorId)) {

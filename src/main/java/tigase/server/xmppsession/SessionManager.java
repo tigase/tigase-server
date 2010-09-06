@@ -637,8 +637,7 @@ public class SessionManager extends AbstractMessageReceiver
 				String cls_name = (String) props.get(USER_REPO_CLASS_PROP_KEY);
 				String res_uri = (String) props.get(USER_REPO_URL_PROP_KEY);
 
-				user_repository = RepositoryFactory.getUserRepository(getName(), cls_name, res_uri,
-						user_repo_params);
+				user_repository = RepositoryFactory.getUserRepository(cls_name, res_uri, user_repo_params);
 				log.log(Level.CONFIG, "Initialized {0} as user repository: {1}", new Object[] { cls_name,
 						res_uri });
 			} catch (Exception e) {
@@ -677,8 +676,7 @@ public class SessionManager extends AbstractMessageReceiver
 				String cls_name = (String) props.get(AUTH_REPO_CLASS_PROP_KEY);
 				String res_uri = (String) props.get(AUTH_REPO_URL_PROP_KEY);
 
-				auth_repository = RepositoryFactory.getAuthRepository(getName(), cls_name, res_uri,
-						auth_repo_params);
+				auth_repository = RepositoryFactory.getAuthRepository(cls_name, res_uri, auth_repo_params);
 				log.log(Level.CONFIG, "Initialized {0} as auth repository: {1}", new Object[] { cls_name,
 						res_uri });
 			} catch (Exception e) {

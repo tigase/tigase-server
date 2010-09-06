@@ -88,22 +88,19 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 	public static final String USER_DOMAIN_POOL_CLASS_PROP_KEY = "user-domain-repo-pool";
 
 	/** Field description */
-	public static final String USER_DOMAIN_POOL_CLASS_PROP_VAL =
-		"tigase.db.UserRepositoryMDImpl";
+	public static final String USER_DOMAIN_POOL_CLASS_PROP_VAL = "tigase.db.UserRepositoryMDImpl";
 
 	/** Field description */
 	public static final String AUTH_REPO_POOL_CLASS_PROP_KEY = "auth-repo-pool";
 
 	/** Field description */
-	public static final String AUTH_REPO_POOL_CLASS_PROP_VAL =
-		"tigase.db.UserAuthRepositoryPool";
+	public static final String AUTH_REPO_POOL_CLASS_PROP_VAL = "tigase.db.UserAuthRepositoryPool";
 
 	/** Field description */
 	public static final String AUTH_DOMAIN_POOL_CLASS_PROP_KEY = "auth-domain-repo-pool";
 
 	/** Field description */
-	public static final String AUTH_DOMAIN_POOL_CLASS_PROP_VAL =
-		"tigase.db.UserAuthRepositoryMDImpl";
+	public static final String AUTH_DOMAIN_POOL_CLASS_PROP_VAL = "tigase.db.UserAuthRepositoryMDImpl";
 	private static final String LOGGING_KEY = "logging/";
 
 	/** Field description */
@@ -587,8 +584,7 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 						initProperties.put(key.trim(), value);
 
 						// defProperties.remove(key);
-						log.log(Level.CONFIG, "Added default config parameter: ({0}={1})",
-								new Object[] { key,
+						log.log(Level.CONFIG, "Added default config parameter: ({0}={1})", new Object[] { key,
 								value });
 					} else {
 						initSettings.add(key + "=" + value);
@@ -814,8 +810,7 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 		repo_pool.initRepository(conn_url, params);
 
 		for (int i = 0; i < pool_size; i++) {
-			UserAuthRepository repo = RepositoryFactory.getAuthRepository(getName() + "-" + (i + 1),
-				cls_name, conn_url, params);
+			UserAuthRepository repo = RepositoryFactory.getAuthRepository(cls_name, conn_url, params);
 
 			repo_pool.addRepo(repo);
 		}
@@ -828,11 +823,9 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 			auth_repo_impl.addRepo(domain, repo_pool);
 		}
 
-		log.log(Level.INFO, "[{0}] Initialized {1} as user auth repository: {2}",
-				new Object[] { domain,
+		log.log(Level.INFO, "[{0}] Initialized {1} as user auth repository: {2}", new Object[] { domain,
 				cls_name, conn_url });
-		log.log(Level.INFO, "[{0}] Initialized user auth repository pool: {1}",
-				new Object[] { domain,
+		log.log(Level.INFO, "[{0}] Initialized user auth repository pool: {1}", new Object[] { domain,
 				pool_size });
 	}
 
@@ -851,8 +844,7 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 		repo_pool.initRepository(conn_url, params);
 
 		for (int i = 0; i < pool_size; i++) {
-			UserRepository repo = RepositoryFactory.getUserRepository(getName() + "-" + (i + 1),
-				cls_name, conn_url, params);
+			UserRepository repo = RepositoryFactory.getUserRepository(cls_name, conn_url, params);
 
 			repo_pool.addRepo(repo);
 		}
@@ -934,8 +926,7 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 		}
 
 		defaults.put(AUTH_REPO_CLASS_PROP_KEY + "/" + domain, repo_class);
-		log.config("Setting defaults: " + AUTH_REPO_CLASS_PROP_KEY + "/" + domain + "="
-				+ repo_class);
+		log.config("Setting defaults: " + AUTH_REPO_CLASS_PROP_KEY + "/" + domain + "=" + repo_class);
 		defaults.put(AUTH_REPO_URL_PROP_KEY + "/" + domain, entry.getValue());
 		log.config("Setting defaults: " + AUTH_REPO_URL_PROP_KEY + "/" + domain + "="
 				+ entry.getValue());
@@ -968,8 +959,7 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 		}
 
 		defaults.put(USER_REPO_CLASS_PROP_KEY + "/" + domain, repo_class);
-		log.config("Setting defaults: " + USER_REPO_CLASS_PROP_KEY + "/" + domain + "="
-				+ repo_class);
+		log.config("Setting defaults: " + USER_REPO_CLASS_PROP_KEY + "/" + domain + "=" + repo_class);
 		defaults.put(USER_REPO_URL_PROP_KEY + "/" + domain, entry.getValue());
 		log.config("Setting defaults: " + USER_REPO_URL_PROP_KEY + "/" + domain + "="
 				+ entry.getValue());

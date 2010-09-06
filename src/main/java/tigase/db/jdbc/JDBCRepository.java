@@ -26,6 +26,8 @@ package tigase.db.jdbc;
 
 import tigase.db.AuthorizationException;
 import tigase.db.DBInitException;
+import tigase.db.DataRepository;
+import tigase.db.RepositoryFactory;
 import tigase.db.TigaseDBException;
 import tigase.db.UserAuthRepository;
 import tigase.db.UserAuthRepositoryImpl;
@@ -39,9 +41,6 @@ import tigase.xmpp.BareJID;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -89,51 +88,38 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	/** Field description */
 	public static final String DEF_ROOT_NODE = "root";
 	private static final String USER_STR = "User: ";
+	private static final String GET_USER_DB_UID_QUERY = "{ call TigGetUserDBUid(?) }";
+	private static final String GET_USERS_COUNT_QUERY = "{ call TigAllUsersCount() }";
+	private static final String GET_USERS_QUERY = "{ call TigAllUsers() }";
+	private static final String ADD_USER_PLAIN_PW_QUERY = "{ call TigAddUserPlainPw(?, ?) }";
+	private static final String REMOVE_USER_QUERY = "{ call TigRemoveUser(?) }";
+	private static final String ADD_NODE_QUERY = "{ call TigAddNode(?, ?, ?) }";
+	private static final String COUNT_USERS_FOR_DOMAIN_QUERY =
+		"select count(*) from tig_users where user_id like ?";
+	private static final String DATA_FOR_NODE_QUERY = "select pval from " + DEF_PAIRS_TBL
+		+ " where (nid = ?) AND (pkey = ?)";
+	private static final String KEYS_FOR_NODE_QUERY = "select pkey from " + DEF_PAIRS_TBL
+		+ " where (nid = ?)";
+	private static final String NODES_FOR_NODE_QUERY = "select nid, node from " + DEF_NODES_TBL
+		+ " where parent_nid = ?";
+	private static final String INSERT_KEY_VAL_QUERY = "insert into " + DEF_PAIRS_TBL
+		+ " (nid, uid, pkey, pval) " + " values (?, ?, ?, ?)";
+	private static final String REMOVE_KEY_DATA_QUERY = "delete from " + DEF_PAIRS_TBL
+		+ " where (nid = ?) AND (pkey = ?)";
 
 	/** Field description */
-	public static final String DERBY_CONNVALID_QUERY = "values 1";
+	public static final String DERBY_GETSCHEMAVER_QUERY = "values TigGetDBProperty('schema-version')";
 
 	/** Field description */
-	public static final String JDBC_CONNVALID_QUERY = "select 1";
-
-	/** Field description */
-	public static final String DERBY_GETSCHEMAVER_QUERY =
-		"values TigGetDBProperty('schema-version')";
-
-	/** Field description */
-	public static final String JDBC_GETSCHEMAVER_QUERY =
-		"select TigGetDBProperty('schema-version')";
+	public static final String JDBC_GETSCHEMAVER_QUERY = "select TigGetDBProperty('schema-version')";
 
 	//~--- fields ---------------------------------------------------------------
 
-	private CallableStatement all_users_sp = null;
 	private UserAuthRepository auth = null;
 
 	// Cache moved to connection pool
 	private Map<String, Object> cache = null;
-	private Connection conn = null;
-	private PreparedStatement conn_valid_st = null;
-	private long connectionValidateInterval = 1000 * 60;
-	private PreparedStatement data_for_node_st = null;
-	private String db_conn = null;
-	private PreparedStatement insert_key_val_st = null;
-	private PreparedStatement keys_for_node_st = null;
-	private long lastConnectionValidated = 0;
-	private CallableStatement node_add_sp = null;
-	private PreparedStatement nodes_for_node_st = null;
-
-	// private String users_tbl = DEF_USERS_TBL;
-	private String nodes_tbl = DEF_NODES_TBL;
-	private String pairs_tbl = DEF_PAIRS_TBL;
-	private PreparedStatement remove_key_data_st = null;
-
-	// private String maxids_tbl = DEF_MAXIDS_TBL;
-	private String root_node = DEF_ROOT_NODE;
-	private CallableStatement uid_sp = null;
-	private CallableStatement user_add_sp = null;
-	private CallableStatement user_del_sp = null;
-	private CallableStatement users_count_sp = null;
-	private PreparedStatement users_domain_count_st = null;
+	private DataRepository data_repo = null;
 	private boolean derby_mode = false;
 	private boolean autoCreateUser = false;
 
@@ -157,7 +143,6 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		long nid = -2;
 
 		try {
-			checkConnection();
 			uid = getUserUID(user_id, autoCreateUser);
 			nid = getNodeNID(uid, subnode);
 
@@ -173,6 +158,8 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 				}
 			}
 
+			PreparedStatement insert_key_val_st = data_repo.getPreparedStatement(INSERT_KEY_VAL_QUERY);
+
 			synchronized (insert_key_val_st) {
 				insert_key_val_st.setLong(1, nid);
 				insert_key_val_st.setLong(2, uid);
@@ -184,9 +171,9 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 				}    // end of for (String val: list)
 			}
 		} catch (SQLException e) {
-			throw new TigaseDBException("Error adding data list, user_id: " + user_id
-					+ ", subnode: " + subnode + ", key: " + key + ", uid: " + uid + ", nid: " + nid
-						+ ", list: " + Arrays.toString(list), e);
+			throw new TigaseDBException("Error adding data list, user_id: " + user_id + ", subnode: "
+					+ subnode + ", key: " + key + ", uid: " + uid + ", nid: " + nid + ", list: "
+						+ Arrays.toString(list), e);
 		}
 
 		// cache.put(user_id+"/"+subnode+"/"+key, list);
@@ -236,8 +223,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	 * @exception TigaseDBException if an error occurs
 	 */
 	@Override
-	public boolean digestAuth(BareJID user, final String digest, final String id,
-			final String alg)
+	public boolean digestAuth(BareJID user, final String digest, final String id, final String alg)
 			throws UserNotFoundException, TigaseDBException, AuthorizationException {
 		return auth.digestAuth(user, digest, id, alg);
 	}
@@ -256,8 +242,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	 * @throws TigaseDBException
 	 */
 	@Override
-	public String getData(BareJID user_id, final String subnode, final String key,
-			final String def)
+	public String getData(BareJID user_id, final String subnode, final String key, final String def)
 			throws UserNotFoundException, TigaseDBException {
 
 		// String[] cache_res = (String[])cache.get(user_id+"/"+subnode+"/"+key);
@@ -267,14 +252,16 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		ResultSet rs = null;
 
 		try {
-			checkConnection();
-
 			long nid = getNodeNID(user_id, subnode);
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Loading data for key: " + key + ", user: " + user_id + ", node: "
-						+ subnode + ", def: " + def + ", found nid: " + nid);
+				log.log(Level.FINEST,
+						"Loading data for key: {0}, user: {1}, node: {2}, def: {3}, found nid: {4}",
+							new Object[] { key,
+						user_id, subnode, def, nid });
 			}
+
+			PreparedStatement data_for_node_st = data_repo.getPreparedStatement(DATA_FOR_NODE_QUERY);
 
 			synchronized (data_for_node_st) {
 				if (nid > 0) {
@@ -288,7 +275,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 						result = rs.getString(1);
 
 						if (log.isLoggable(Level.FINEST)) {
-							log.finest("Found data: " + result);
+							log.log(Level.FINEST, "Found data: {0}", result);
 						}
 					}
 
@@ -357,9 +344,8 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		ResultSet rs = null;
 
 		try {
-			checkConnection();
-
 			long nid = getNodeNID(user_id, subnode);
+			PreparedStatement data_for_node_st = data_repo.getPreparedStatement(DATA_FOR_NODE_QUERY);
 
 			synchronized (data_for_node_st) {
 				if (nid > 0) {
@@ -404,12 +390,11 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		ResultSet rs = null;
 
 		try {
-			checkConnection();
-
 			long nid = getNodeNID(user_id, subnode);
 
 			if (nid > 0) {
 				List<String> results = new ArrayList<String>();
+				PreparedStatement keys_for_node_st = data_repo.getPreparedStatement(KEYS_FOR_NODE_QUERY);
 
 				synchronized (keys_for_node_st) {
 					keys_for_node_st.setLong(1, nid);
@@ -452,7 +437,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	 */
 	@Override
 	public String getResourceUri() {
-		return db_conn;
+		return data_repo.getResourceUri();
 	}
 
 	/**
@@ -470,9 +455,8 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		ResultSet rs = null;
 
 		try {
-			checkConnection();
-
 			long nid = getNodeNID(user_id, subnode);
+			PreparedStatement nodes_for_node_st = data_repo.getPreparedStatement(NODES_FOR_NODE_QUERY);
 
 			synchronized (nodes_for_node_st) {
 				if (nid > 0) {
@@ -506,8 +490,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	 * @throws TigaseDBException
 	 */
 	@Override
-	public String[] getSubnodes(BareJID user_id)
-			throws UserNotFoundException, TigaseDBException {
+	public String[] getSubnodes(BareJID user_id) throws UserNotFoundException, TigaseDBException {
 		return getSubnodes(user_id, null);
 	}
 
@@ -533,6 +516,8 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		long result = -1;
 
 		try {
+			PreparedStatement uid_sp = data_repo.getPreparedStatement(GET_USER_DB_UID_QUERY);
+
 			synchronized (uid_sp) {
 				uid_sp.setString(1, user_id.toString());
 				rs = uid_sp.executeQuery();
@@ -555,8 +540,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	}
 
 	/**
-	 * <code>getUsers</code> method is thread safe. It uses local variable
-	 * for storing <code>Statement</code>.
+	 * <code>getUsers</code> method is thread safe.
 	 *
 	 * @return a <code>List</code> of user IDs from database.
 	 *
@@ -565,26 +549,29 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	@Override
 	public List<BareJID> getUsers() throws TigaseDBException {
 		ResultSet rs = null;
+		List<BareJID> users = null;
 
 		try {
-			checkConnection();
+			PreparedStatement all_users_sp = data_repo.getPreparedStatement(GET_USERS_QUERY);
 
-			// Load all user ids from database
-			rs = all_users_sp.executeQuery();
+			synchronized (all_users_sp) {
 
-			List<BareJID> users = new ArrayList<BareJID>();
+				// Load all user ids from database
+				rs = all_users_sp.executeQuery();
+				users = new ArrayList<BareJID>(1000);
 
-			while (rs.next()) {
-				users.add(BareJID.bareJIDInstanceNS(rs.getString(1)));
-			}    // end of while (rs.next())
-
-			return users;
+				while (rs.next()) {
+					users.add(BareJID.bareJIDInstanceNS(rs.getString(1)));
+				}    // end of while (rs.next())
+			}
 		} catch (SQLException e) {
 			throw new TigaseDBException("Problem loading user list from repository", e);
 		} finally {
 			release(null, rs);
 			rs = null;
 		}
+
+		return users;
 	}
 
 	/**
@@ -598,9 +585,8 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		ResultSet rs = null;
 
 		try {
-			checkConnection();
-
 			long users = -1;
+			PreparedStatement users_count_sp = data_repo.getPreparedStatement(GET_USERS_COUNT_QUERY);
 
 			synchronized (users_count_sp) {
 
@@ -636,9 +622,9 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		ResultSet rs = null;
 
 		try {
-			checkConnection();
-
 			long users = -1;
+			PreparedStatement users_domain_count_st =
+				data_repo.getPreparedStatement(COUNT_USERS_FOR_DOMAIN_QUERY);
 
 			synchronized (users_domain_count_st) {
 
@@ -675,19 +661,42 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	@Override
 	public void initRepository(final String connection_str, Map<String, String> params)
 			throws DBInitException {
-		db_conn = connection_str;
-
-		if (db_conn.contains("autoCreateUser=true")) {
-			autoCreateUser = true;
-		}    // end of if (db_conn.contains())
-
 		try {
-			initRepo();
-			log.info("Initialized database connection: " + connection_str);
-		} catch (SQLException e) {
-			conn = null;
+			derby_mode = connection_str.startsWith("jdbc:derby");
+			data_repo = RepositoryFactory.getDataRepository(null, connection_str, params);
+			checkDBSchema();
 
-			throw new DBInitException("Problem initializing jdbc connection: " + db_conn, e);
+			if (connection_str.contains("autoCreateUser=true")) {
+				autoCreateUser = true;
+			}    // end of if (db_conn.contains())
+
+			if (connection_str.contains("cacheRepo=off")) {
+				log.fine("Disabling cache.");
+				cache = Collections.synchronizedMap(new RepoCache(0, -1000));
+			} else {
+				cache = Collections.synchronizedMap(new RepoCache(10000, 60 * 1000));
+			}
+
+			data_repo.initPreparedStatement(GET_USER_DB_UID_QUERY, GET_USER_DB_UID_QUERY);
+			data_repo.initPreparedStatement(GET_USERS_COUNT_QUERY, GET_USERS_COUNT_QUERY);
+			data_repo.initPreparedStatement(GET_USERS_QUERY, GET_USERS_QUERY);
+			data_repo.initPreparedStatement(ADD_USER_PLAIN_PW_QUERY, ADD_USER_PLAIN_PW_QUERY);
+			data_repo.initPreparedStatement(REMOVE_USER_QUERY, REMOVE_USER_QUERY);
+			data_repo.initPreparedStatement(ADD_NODE_QUERY, ADD_NODE_QUERY);
+			data_repo.initPreparedStatement(COUNT_USERS_FOR_DOMAIN_QUERY, COUNT_USERS_FOR_DOMAIN_QUERY);
+			data_repo.initPreparedStatement(DATA_FOR_NODE_QUERY, DATA_FOR_NODE_QUERY);
+			data_repo.initPreparedStatement(KEYS_FOR_NODE_QUERY, KEYS_FOR_NODE_QUERY);
+			data_repo.initPreparedStatement(NODES_FOR_NODE_QUERY, NODES_FOR_NODE_QUERY);
+			data_repo.initPreparedStatement(INSERT_KEY_VAL_QUERY, INSERT_KEY_VAL_QUERY);
+			data_repo.initPreparedStatement(REMOVE_KEY_DATA_QUERY, REMOVE_KEY_DATA_QUERY);
+			auth = new UserAuthRepositoryImpl(this);
+
+			// initRepo();
+			log.log(Level.INFO, "Initialized database connection: {0}", connection_str);
+		} catch (Exception e) {
+			data_repo = null;
+
+			throw new DBInitException("Problem initializing jdbc connection: " + connection_str, e);
 		}
 	}
 
@@ -765,9 +774,8 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 
 		// cache.remove(user_id+"/"+subnode+"/"+key);
 		try {
-			checkConnection();
-
 			long nid = getNodeNID(user_id, subnode);
+			PreparedStatement remove_key_data_st = data_repo.getPreparedStatement(REMOVE_KEY_DATA_QUERY);
 
 			synchronized (remove_key_data_st) {
 				if (nid > 0) {
@@ -811,8 +819,6 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		}    // end of if (subnode == null)
 
 		try {
-			checkConnection();
-
 			long nid = getNodeNID(user_id, subnode);
 
 			if (nid > 0) {
@@ -840,19 +846,20 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		String query = null;
 
 		try {
-			checkConnection();
-			stmt = conn.createStatement();
+			stmt = data_repo.createStatement();
 
 			// Get user account uid
 			long uid = getUserUID(user_id, autoCreateUser);
 
 			// Remove all user enrties from pairs table
-			query = "delete from " + pairs_tbl + " where uid = " + uid;
+			query = "delete from " + DEF_PAIRS_TBL + " where uid = " + uid;
 			stmt.executeUpdate(query);
 
 			// Remove all user entries from nodes table
-			query = "delete from " + nodes_tbl + " where uid = " + uid;
+			query = "delete from " + DEF_PAIRS_TBL + " where uid = " + uid;
 			stmt.executeUpdate(query);
+
+			PreparedStatement user_del_sp = data_repo.getPreparedStatement(REMOVE_USER_QUERY);
 
 			// Remove user account from users table
 			synchronized (user_del_sp) {
@@ -883,8 +890,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	 * @throws TigaseDBException
 	 */
 	@Override
-	public void setData(BareJID user_id, final String subnode, final String key,
-			final String value)
+	public void setData(BareJID user_id, final String subnode, final String key, final String value)
 			throws UserNotFoundException, TigaseDBException {
 		setDataList(user_id, subnode, key, new String[] { value });
 	}
@@ -960,7 +966,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	private long addNode(long uid, long parent_nid, String node_name)
 			throws SQLException, TigaseDBException {
 		ResultSet rs = null;
-		long new_nid = -1;
+		PreparedStatement node_add_sp = data_repo.getPreparedStatement(ADD_NODE_QUERY);
 
 		synchronized (node_add_sp) {
 			try {
@@ -999,10 +1005,9 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	 * @exception SQLException if an error occurs
 	 */
 	private long addUserRepo(BareJID user_id) throws SQLException, TigaseDBException {
-		checkConnection();
-
 		ResultSet rs = null;
 		long uid = -1;
+		PreparedStatement user_add_sp = data_repo.getPreparedStatement(ADD_USER_PLAIN_PW_QUERY);
 
 		synchronized (user_add_sp) {
 			try {
@@ -1031,8 +1036,8 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	}
 
 	private String buildNodeQuery(long uid, String node_path) {
-		String query = "select nid as nid1 from " + nodes_tbl + " where (uid = " + uid + ")"
-			+ " AND (parent_nid is null)" + " AND (node = '" + root_node + "')";
+		String query = "select nid as nid1 from " + DEF_NODES_TBL + " where (uid = " + uid + ")"
+			+ " AND (parent_nid is null)" + " AND (node = '" + DEF_ROOT_NODE + "')";
 
 		if (node_path == null) {
 			return query;
@@ -1045,41 +1050,20 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 				String token = strtok.nextToken();
 
 				++cnt;
-				subquery = "select nid as nid" + cnt + ", node as node" + cnt + " from " + nodes_tbl
-						+ ", (" + subquery + ") nodes" + (cnt - 1) + " where (parent_nid = nid"
-							+ (cnt - 1) + ")" + " AND (node = '" + token + "')";
+				subquery = "select nid as nid" + cnt + ", node as node" + cnt + " from " + DEF_NODES_TBL
+						+ ", (" + subquery + ") nodes" + (cnt - 1) + " where (parent_nid = nid" + (cnt - 1)
+							+ ")" + " AND (node = '" + token + "')";
 			}    // end of while (strtok.hasMoreTokens())
 
 			return subquery;
 		}      // end of else
 	}
 
-	private boolean checkConnection() throws SQLException {
-		ResultSet rs = null;
-
-		try {
-			synchronized (conn_valid_st) {
-				long tmp = System.currentTimeMillis();
-
-				if ((tmp - lastConnectionValidated) >= connectionValidateInterval) {
-					rs = conn_valid_st.executeQuery();
-					lastConnectionValidated = tmp;
-				}    // end of if ()
-			}
-		} catch (Exception e) {
-			initRepo();
-		} finally {
-			release(null, rs);
-		}        // end of try-catch
-
-		return true;
-	}
-
 	// Implementation of tigase.db.UserRepository
 	private void checkDBSchema() throws SQLException {
 		String schema_version = "1.0";
 		String query = (derby_mode ? DERBY_GETSCHEMAVER_QUERY : JDBC_GETSCHEMAVER_QUERY);
-		Statement stmt = conn.createStatement();
+		Statement stmt = data_repo.createStatement();
 		ResultSet rs = stmt.executeQuery(query);
 
 		try {
@@ -1088,8 +1072,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 
 				if (false == "4.0".equals(schema_version)) {
 					System.err.println("\n\nPlease upgrade database schema now.");
-					System.err.println("Current scheme version is: " + schema_version
-							+ ", expected: 4.0");
+					System.err.println("Current scheme version is: " + schema_version + ", expected: 4.0");
 					System.err.println("Check the schema upgrade guide at the address:");
 					System.err.println("http://www.tigase.org/en/mysql-db-schema-upgrade-4-0");
 					System.err.println("----");
@@ -1142,10 +1125,10 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		String query = null;
 
 		try {
-			stmt = conn.createStatement();
-			query = "delete from " + pairs_tbl + " where nid = " + nid;
+			stmt = data_repo.createStatement();
+			query = "delete from " + DEF_PAIRS_TBL + " where nid = " + nid;
 			stmt.executeUpdate(query);
-			query = "delete from " + nodes_tbl + " where nid = " + nid;
+			query = "delete from " + DEF_NODES_TBL + " where nid = " + nid;
 			stmt.executeUpdate(query);
 		} finally {
 			release(stmt, rs);
@@ -1167,7 +1150,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		long nid = -1;
 
 		try {
-			stmt = conn.createStatement();
+			stmt = data_repo.createStatement();
 			rs = stmt.executeQuery(query);
 
 			if (rs.next()) {
@@ -1183,7 +1166,9 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 					nid = addNode(uid, -1, "root");
 				} else {
 					if (log.isLoggable(Level.FINEST)) {
-						log.finest("Missing nid for node path: " + node_path + " and uid: " + uid);
+						log.log(Level.FINEST, "Missing nid for node path: {0} and uid: {1}",
+								new Object[] { node_path,
+								uid });
 					}
 				}
 			}
@@ -1230,64 +1215,6 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 	}
 
 	//~--- methods --------------------------------------------------------------
-
-	private void initPreparedStatements() throws SQLException {
-		String query = "{ call TigGetUserDBUid(?) }";
-
-		uid_sp = conn.prepareCall(query);
-		query = "{ call TigAllUsersCount() }";
-		users_count_sp = conn.prepareCall(query);
-		query = "{ call TigAllUsers() }";
-		all_users_sp = conn.prepareCall(query);
-		query = "{ call TigAddUserPlainPw(?, ?) }";
-		user_add_sp = conn.prepareCall(query);
-		query = "{ call TigRemoveUser(?) }";
-		user_del_sp = conn.prepareCall(query);
-		query = "{ call TigAddNode(?, ?, ?) }";
-		node_add_sp = conn.prepareCall(query);
-		query = "select count(*) from tig_users where user_id like ?";
-		users_domain_count_st = conn.prepareCall(query);
-		query = "select pval from " + pairs_tbl + " where (nid = ?) AND (pkey = ?)";
-		data_for_node_st = conn.prepareStatement(query);
-		query = "select pkey from " + pairs_tbl + " where (nid = ?)";
-		keys_for_node_st = conn.prepareStatement(query);
-		query = "select nid, node from " + nodes_tbl + " where parent_nid = ?";
-		nodes_for_node_st = conn.prepareStatement(query);
-		query = "insert into " + pairs_tbl + " (nid, uid, pkey, pval) " + " values (?, ?, ?, ?)";
-		insert_key_val_st = conn.prepareStatement(query);
-		query = "delete from " + pairs_tbl + " where (nid = ?) AND (pkey = ?)";
-		remove_key_data_st = conn.prepareStatement(query);
-		query = (derby_mode ? DERBY_CONNVALID_QUERY : JDBC_CONNVALID_QUERY);
-		conn_valid_st = conn.prepareStatement(query);
-	}
-
-	private void initRepo() throws SQLException {
-		Statement stmt = null;
-		ResultSet rs = null;
-
-		try {
-			synchronized (db_conn) {
-				conn = DriverManager.getConnection(db_conn);
-				conn.setAutoCommit(true);
-				derby_mode = db_conn.startsWith("jdbc:derby");
-				checkDBSchema();
-				initPreparedStatements();
-				auth = new UserAuthRepositoryImpl(this);
-				stmt = conn.createStatement();
-
-				if (db_conn.contains("cacheRepo=off")) {
-					log.fine("Disabling cache.");
-					cache = Collections.synchronizedMap(new RepoCache(0, -1000));
-				} else {
-					cache = Collections.synchronizedMap(new RepoCache(10000, 60 * 1000));
-				}
-			}
-		} finally {
-			release(stmt, rs);
-			stmt = null;
-			rs = null;
-		}
-	}
 
 	private void release(Statement stmt, ResultSet rs) {
 		if (rs != null) {

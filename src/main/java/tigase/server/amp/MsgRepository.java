@@ -24,11 +24,12 @@ package tigase.server.amp;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.db.DataRepository;
 import tigase.db.MsgRepositoryIfc;
+import tigase.db.RepositoryFactory;
 import tigase.db.UserNotFoundException;
 
 import tigase.util.Algorithms;
-import tigase.util.JDBCAbstract;
 import tigase.util.SimpleCache;
 
 import tigase.xml.DomBuilderHandler;
@@ -46,7 +47,7 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Time;
+import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Types;
 
@@ -69,7 +70,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class MsgRepository extends JDBCAbstract implements MsgRepositoryIfc {
+public class MsgRepository implements MsgRepositoryIfc {
 	private static final Logger log = Logger.getLogger(MsgRepository.class.getName());
 	private static final String MSG_TABLE = "msg_history";
 	private static final String MSG_ID_COLUMN = "msg_id";
@@ -80,17 +81,16 @@ public class MsgRepository extends JDBCAbstract implements MsgRepositoryIfc {
 	private static final String MSG_BODY_COLUMN = "message";
 	private static final String CREATE_MSG_TABLE = "create table " + MSG_TABLE + " ( " + "  "
 		+ MSG_ID_COLUMN + " serial," + "  " + MSG_TIMESTAMP_COLUMN
-		+ " TIMESTAMP DEFAULT CURRENT_TIMESTAMP," + "  " + MSG_EXPIRED_COLUMN + " DATETIME,"
-		+ "  " + MSG_FROM_UID_COLUMN + " bigint unsigned," + "  " + MSG_TO_UID_COLUMN
-		+ " bigint unsigned NOT NULL," + "  " + MSG_BODY_COLUMN + " varchar(4096) NOT NULL,"
-		+ " key (" + MSG_EXPIRED_COLUMN + "), " + " key (" + MSG_FROM_UID_COLUMN + ", "
-		+ MSG_TO_UID_COLUMN + ")," + " key (" + MSG_TO_UID_COLUMN + ", " + MSG_FROM_UID_COLUMN
-		+ "))";
+		+ " TIMESTAMP DEFAULT CURRENT_TIMESTAMP," + "  " + MSG_EXPIRED_COLUMN + " DATETIME," + "  "
+		+ MSG_FROM_UID_COLUMN + " bigint unsigned," + "  " + MSG_TO_UID_COLUMN
+		+ " bigint unsigned NOT NULL," + "  " + MSG_BODY_COLUMN + " varchar(4096) NOT NULL," + " key ("
+		+ MSG_EXPIRED_COLUMN + "), " + " key (" + MSG_FROM_UID_COLUMN + ", " + MSG_TO_UID_COLUMN + "),"
+		+ " key (" + MSG_TO_UID_COLUMN + ", " + MSG_FROM_UID_COLUMN + "))";
 	private static final String MSG_INSERT_QUERY = "insert into " + MSG_TABLE + " ( "
 		+ MSG_EXPIRED_COLUMN + ", " + MSG_FROM_UID_COLUMN + ", " + MSG_TO_UID_COLUMN + ", "
 		+ MSG_BODY_COLUMN + ") values (?, ?, ?, ?)";
-	private static final String MSG_SELECT_TO_JID_QUERY = "select * from " + MSG_TABLE
-		+ " where " + MSG_TO_UID_COLUMN + " = ?";
+	private static final String MSG_SELECT_TO_JID_QUERY = "select * from " + MSG_TABLE + " where "
+		+ MSG_TO_UID_COLUMN + " = ?";
 	private static final String MSG_DELETE_TO_JID_QUERY = "delete from " + MSG_TABLE + " where "
 		+ MSG_TO_UID_COLUMN + " = ?";
 	private static final String MSG_DELETE_ID_QUERY = "delete from " + MSG_TABLE + " where "
@@ -104,10 +104,10 @@ public class MsgRepository extends JDBCAbstract implements MsgRepositoryIfc {
 	private static final String JID_SHA_COLUMN = "jid_sha";
 	private static final String JID_COLUMN = "jid";
 	private static final String CREATE_JID_TABLE = "create table " + JID_TABLE + " ( " + " "
-		+ JID_ID_COLUMN + " serial," + " " + JID_SHA_COLUMN + " char(128) NOT NULL," + " "
-		+ JID_COLUMN + " varchar(2049) NOT NULL," + " primary key (" + JID_ID_COLUMN + "),"
-		+ " unique key " + JID_SHA_COLUMN + " (" + JID_SHA_COLUMN + ")," + " key " + JID_COLUMN
-		+ " (" + JID_COLUMN + "(765)))";
+		+ JID_ID_COLUMN + " serial," + " " + JID_SHA_COLUMN + " char(128) NOT NULL," + " " + JID_COLUMN
+		+ " varchar(2049) NOT NULL," + " primary key (" + JID_ID_COLUMN + ")," + " unique key "
+		+ JID_SHA_COLUMN + " (" + JID_SHA_COLUMN + ")," + " key " + JID_COLUMN + " (" + JID_COLUMN
+		+ "(765)))";
 	private static final String GET_USER_UID_PROP_KEY = "user-uid-query";
 	private static final String GET_USER_UID_DEF_QUERY = "select " + JID_ID_COLUMN + ", "
 		+ JID_COLUMN + " from " + JID_TABLE + " where " + JID_SHA_COLUMN + " = ?";
@@ -121,17 +121,10 @@ public class MsgRepository extends JDBCAbstract implements MsgRepositoryIfc {
 
 	//~--- fields ---------------------------------------------------------------
 
-	private PreparedStatement add_jid_id_st = null;
-	private PreparedStatement delete_id_st = null;
-	private PreparedStatement delete_to_jid_st = null;
+	private DataRepository data_repo = null;
 	private long earliestOffline = Long.MAX_VALUE;
-	private PreparedStatement insert_msg_st = null;
-	private PreparedStatement select_expired_before_st = null;
-	private PreparedStatement select_expired_st = null;
 	private SimpleParser parser = SingletonFactory.getParserInstance();
-	private PreparedStatement select_to_jid_st = null;
 	private String uid_query = GET_USER_UID_DEF_QUERY;
-	private PreparedStatement uid_st = null;
 	private boolean initialized = false;
 	private Map<BareJID, Long> uids_cache = Collections.synchronizedMap(new SimpleCache<BareJID,
 		Long>(MAX_UID_CACHE_SIZE, MAX_UID_CACHE_TIME));
@@ -214,14 +207,13 @@ public class MsgRepository extends JDBCAbstract implements MsgRepositoryIfc {
 	 *
 	 * @throws SQLException
 	 */
-	@Override
 	public void initRepository(String conn_str, Map<String, String> map) throws SQLException {
 		if (initialized) {
 			return;
 		}
 
 		initialized = true;
-		log.info("Initializing dbAccess for db connection url: " + conn_str);
+		log.log(Level.INFO, "Initializing dbAccess for db connection url: {0}", conn_str);
 
 		if (map != null) {
 			String query = map.get(GET_USER_UID_PROP_KEY);
@@ -231,12 +223,17 @@ public class MsgRepository extends JDBCAbstract implements MsgRepositoryIfc {
 			}
 		}
 
-		setResourceUri(conn_str);
-
 		try {
-
-			// This may fail if not required tables have been created yet.
-			checkConnection();
+			data_repo = RepositoryFactory.getDataRepository(null, conn_str, map);
+			data_repo.initPreparedStatement(uid_query, uid_query);
+			data_repo.initPreparedStatement(MSG_INSERT_QUERY, MSG_INSERT_QUERY);
+			data_repo.initPreparedStatement(MSG_SELECT_TO_JID_QUERY, MSG_SELECT_TO_JID_QUERY);
+			data_repo.initPreparedStatement(MSG_DELETE_TO_JID_QUERY, MSG_DELETE_TO_JID_QUERY);
+			data_repo.initPreparedStatement(MSG_DELETE_ID_QUERY, MSG_DELETE_ID_QUERY);
+			data_repo.initPreparedStatement(MSG_SELECT_EXPIRED_QUERY, MSG_SELECT_EXPIRED_QUERY);
+			data_repo.initPreparedStatement(MSG_SELECT_EXPIRED_BEFORE_QUERY,
+					MSG_SELECT_EXPIRED_BEFORE_QUERY);
+			data_repo.initPreparedStatement(ADD_USER_JID_ID_QUERY, ADD_USER_JID_ID_QUERY);
 		} catch (Exception e) {
 
 			// Ignore for now....
@@ -258,25 +255,24 @@ public class MsgRepository extends JDBCAbstract implements MsgRepositoryIfc {
 	 * @throws UserNotFoundException
 	 */
 	@Override
-	public Queue<Element> loadMessagesToJID(JID to, boolean delete)
-			throws UserNotFoundException {
+	public Queue<Element> loadMessagesToJID(JID to, boolean delete) throws UserNotFoundException {
 		Queue<Element> result = null;
 		ResultSet rs = null;
 
 		try {
-			checkConnection();
-
 			long to_uid = getUserUID(to.getBareJID());
 
 			if (to_uid < 0) {
 				throw new UserNotFoundException("User: " + to + " was not found in database.");
 			}
 
+			PreparedStatement select_to_jid_st = data_repo.getPreparedStatement(MSG_SELECT_TO_JID_QUERY);
+
 			synchronized (select_to_jid_st) {
 				select_to_jid_st.setLong(1, to_uid);
 				rs = select_to_jid_st.executeQuery();
 
-				StringBuilder sb = new StringBuilder();
+				StringBuilder sb = new StringBuilder(1000);
 
 				while (rs.next()) {
 					sb.append(rs.getString(MSG_BODY_COLUMN));
@@ -291,6 +287,9 @@ public class MsgRepository extends JDBCAbstract implements MsgRepositoryIfc {
 			}
 
 			if (delete) {
+				PreparedStatement delete_to_jid_st =
+					data_repo.getPreparedStatement(MSG_DELETE_TO_JID_QUERY);
+
 				synchronized (delete_to_jid_st) {
 					delete_to_jid_st.setLong(1, to_uid);
 					delete_to_jid_st.executeUpdate();
@@ -319,12 +318,10 @@ public class MsgRepository extends JDBCAbstract implements MsgRepositoryIfc {
 	public void storeMessage(JID from, JID to, Date expired, Element msg)
 			throws UserNotFoundException {
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Storring expired: " + expired + " message: " + msg);
+			log.log(Level.FINEST, "Storring expired: {0} message: {1}", new Object[] { expired, msg });
 		}
 
 		try {
-			checkConnection();
-
 			long from_uid = getUserUID(from.getBareJID());
 
 			if (from_uid < 0) {
@@ -336,6 +333,8 @@ public class MsgRepository extends JDBCAbstract implements MsgRepositoryIfc {
 			if (to_uid < 0) {
 				to_uid = addUserJID(to.getBareJID());
 			}
+
+			PreparedStatement insert_msg_st = data_repo.getPreparedStatement(MSG_INSERT_QUERY);
 
 			synchronized (insert_msg_st) {
 				if (expired == null) {
@@ -371,22 +370,10 @@ public class MsgRepository extends JDBCAbstract implements MsgRepositoryIfc {
 		}
 	}
 
-	@Override
-	protected void initPreparedStatements() throws SQLException {
-		super.initPreparedStatements();
-		uid_st = prepareQuery(uid_query);
-		insert_msg_st = prepareQuery(MSG_INSERT_QUERY);
-		select_to_jid_st = prepareQuery(MSG_SELECT_TO_JID_QUERY);
-		delete_to_jid_st = prepareQuery(MSG_DELETE_TO_JID_QUERY);
-		delete_id_st = prepareQuery(MSG_DELETE_ID_QUERY);
-		select_expired_st = prepareQuery(MSG_SELECT_EXPIRED_QUERY);
-		select_expired_before_st = prepareQuery(MSG_SELECT_EXPIRED_BEFORE_QUERY);
-		add_jid_id_st = prepareQuery(ADD_USER_JID_ID_QUERY);
-	}
-
 	private long addUserJID(BareJID bareJID) throws SQLException, UserNotFoundException {
 		try {
 			String jid_sha = Algorithms.hexDigest(bareJID.toString(), "", "SHA");
+			PreparedStatement add_jid_id_st = data_repo.getPreparedStatement(ADD_USER_JID_ID_QUERY);
 
 			synchronized (add_jid_id_st) {
 				add_jid_id_st.setString(1, jid_sha);
@@ -410,13 +397,12 @@ public class MsgRepository extends JDBCAbstract implements MsgRepositoryIfc {
 
 	private void checkDB() throws SQLException {
 		ResultSet rs = null;
-		PreparedStatement stmt = null;
+		Statement stmt = data_repo.createStatement();
 
 		try {
 			String CHECK_TABLE_QUERY = "select count(*) from ";
 
-			stmt = prepareStatement(CHECK_TABLE_QUERY + MSG_TABLE);
-			rs = stmt.executeQuery();
+			rs = stmt.executeQuery(CHECK_TABLE_QUERY + MSG_TABLE);
 
 			if (rs.next()) {
 				long count = rs.getLong(1);
@@ -424,19 +410,18 @@ public class MsgRepository extends JDBCAbstract implements MsgRepositoryIfc {
 				log.info("DB table " + MSG_TABLE + " OK, items: " + count);
 			}
 		} catch (Exception e) {
-			stmt = prepareStatement(CREATE_MSG_TABLE);
-			stmt.executeUpdate();
+			stmt.executeUpdate(CREATE_MSG_TABLE);
 		} finally {
-			release(stmt, rs);
+			release(null, rs);
 			rs = null;
-			stmt = null;
+
+			// stmt = null;
 		}
 
 		try {
 			String CHECK_TABLE_QUERY = "select count(*) from ";
 
-			stmt = prepareStatement(CHECK_TABLE_QUERY + JID_TABLE);
-			rs = stmt.executeQuery();
+			rs = stmt.executeQuery(CHECK_TABLE_QUERY + JID_TABLE);
 
 			if (rs.next()) {
 				long count = rs.getLong(1);
@@ -444,23 +429,22 @@ public class MsgRepository extends JDBCAbstract implements MsgRepositoryIfc {
 				log.info("DB table " + JID_TABLE + " OK, items: " + count);
 			}
 		} catch (Exception e) {
-			stmt = prepareStatement(CREATE_JID_TABLE);
-			stmt.executeUpdate();
+			stmt.executeUpdate(CREATE_JID_TABLE);
 
 			// Just in case let's clear the msg history table to make sure no offline messages
 			// are delivered to incorrect JID, there is an extra protection in the user UID reading
 			// method but to be safe, clear it out from old entries, they won't be of any use anyway
-			stmt = prepareStatement("delete from " + MSG_TABLE);
-			stmt.executeUpdate();
+			stmt.executeUpdate("delete from " + MSG_TABLE);
 		} finally {
 			release(stmt, rs);
 			rs = null;
+			stmt = null;
 		}
 	}
 
 	private void deleteMessage(long msg_id) {
 		try {
-			checkConnection();
+			PreparedStatement delete_id_st = data_repo.getPreparedStatement(MSG_DELETE_ID_QUERY);
 
 			synchronized (delete_id_st) {
 				delete_id_st.setLong(1, msg_id);
@@ -493,6 +477,8 @@ public class MsgRepository extends JDBCAbstract implements MsgRepositoryIfc {
 		}
 
 		try {
+			PreparedStatement uid_st = data_repo.getPreparedStatement(uid_query);
+
 			synchronized (uid_st) {
 				uid_st.setString(1, jid_sha);
 				rs = uid_st.executeQuery();
@@ -501,7 +487,8 @@ public class MsgRepository extends JDBCAbstract implements MsgRepositoryIfc {
 					BareJID res_jid = BareJID.bareJIDInstanceNS(rs.getString(JID_COLUMN));
 
 					if (log.isLoggable(Level.FINEST)) {
-						log.finest("Found entry for JID: " + user_id + ", DB JID: " + res_jid);
+						log.log(Level.FINEST, "Found entry for JID: {0}, DB JID: {1}", new Object[] { user_id,
+								res_jid });
 					}
 
 					// There is a slight chance that there is the same SHA for 2 different JIDs.
@@ -511,13 +498,14 @@ public class MsgRepository extends JDBCAbstract implements MsgRepositoryIfc {
 						result = rs.getLong(JID_ID_COLUMN);
 					} else {
 						if (log.isLoggable(Level.FINEST)) {
-							log.finest("JIDs don't match, SHA conflict? JID: " + user_id + ", DB JID: "
-									+ res_jid);
+							log.log(Level.FINEST, "JIDs don''t match, SHA conflict? JID: {0}, DB JID: {1}",
+									new Object[] { user_id,
+									res_jid });
 						}
 					}
 				} else {
 					if (log.isLoggable(Level.FINEST)) {
-						log.finest("No entry for JID: " + user_id);
+						log.log(Level.FINEST, "No entry for JID: {0}", user_id);
 					}
 				}
 			}
@@ -542,7 +530,8 @@ public class MsgRepository extends JDBCAbstract implements MsgRepositoryIfc {
 		ResultSet rs = null;
 
 		try {
-			checkConnection();
+			PreparedStatement select_expired_st =
+				data_repo.getPreparedStatement(MSG_SELECT_EXPIRED_QUERY);
 
 			synchronized (select_expired_st) {
 				rs = select_expired_st.executeQuery();
@@ -560,8 +549,9 @@ public class MsgRepository extends JDBCAbstract implements MsgRepositoryIfc {
 					Element msg = elems.poll();
 
 					if (msg == null) {
-						log.info("Something wrong, loaded offline message from DB but parsed no "
-								+ "XML elements: " + msg_str);
+						log.log(Level.INFO,
+								"Something wrong, loaded offline message from DB but parsed no "
+									+ "XML elements: {0}", msg_str);
 					} else {
 						Timestamp ts = rs.getTimestamp(MSG_EXPIRED_COLUMN);
 						MsgDBItem item = new MsgDBItem(rs.getLong(MSG_ID_COLUMN), msg, ts);
@@ -587,7 +577,8 @@ public class MsgRepository extends JDBCAbstract implements MsgRepositoryIfc {
 				expiredQueue.clear();
 			}
 
-			checkConnection();
+			PreparedStatement select_expired_before_st =
+				data_repo.getPreparedStatement(MSG_SELECT_EXPIRED_BEFORE_QUERY);
 
 			synchronized (select_expired_before_st) {
 				select_expired_before_st.setTimestamp(1, new Timestamp(expired.getTime()));
@@ -605,8 +596,9 @@ public class MsgRepository extends JDBCAbstract implements MsgRepositoryIfc {
 					Element msg = elems.poll();
 
 					if (msg == null) {
-						log.info("Something wrong, loaded offline message from DB but parsed no "
-								+ "XML elements: " + msg_str);
+						log.log(Level.INFO,
+								"Something wrong, loaded offline message from DB but parsed no "
+									+ "XML elements: {0}", msg_str);
 					} else {
 						Timestamp ts = rs.getTimestamp(MSG_EXPIRED_COLUMN);
 						MsgDBItem item = new MsgDBItem(rs.getLong(MSG_ID_COLUMN), msg, ts);
@@ -622,6 +614,20 @@ public class MsgRepository extends JDBCAbstract implements MsgRepositoryIfc {
 		}
 
 		earliestOffline = Long.MAX_VALUE;
+	}
+
+	private void release(Statement stmt, ResultSet rs) {
+		if (rs != null) {
+			try {
+				rs.close();
+			} catch (SQLException sqlEx) {}
+		}
+
+		if (stmt != null) {
+			try {
+				stmt.close();
+			} catch (SQLException sqlEx) {}
+		}
 	}
 
 	//~--- inner classes --------------------------------------------------------
@@ -674,8 +680,7 @@ public class MsgRepository extends JDBCAbstract implements MsgRepositoryIfc {
 		 */
 		@Override
 		public long getDelay(TimeUnit unit) {
-			return unit.convert(expired.getTime() - System.currentTimeMillis(),
-					TimeUnit.MILLISECONDS);
+			return unit.convert(expired.getTime() - System.currentTimeMillis(), TimeUnit.MILLISECONDS);
 		}
 	}
 }

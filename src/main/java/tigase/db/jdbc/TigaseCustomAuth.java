@@ -26,6 +26,8 @@ package tigase.db.jdbc;
 
 import tigase.db.AuthorizationException;
 import tigase.db.DBInitException;
+import tigase.db.DataRepository;
+import tigase.db.RepositoryFactory;
 import tigase.db.TigaseDBException;
 import tigase.db.UserAuthRepository;
 import tigase.db.UserExistsException;
@@ -45,8 +47,6 @@ import java.io.IOException;
 
 import java.security.NoSuchAlgorithmException;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -112,7 +112,7 @@ public class TigaseCustomAuth implements UserAuthRepository {
 	/**
 	 * Private logger for class instances.
 	 */
-	private static final Logger log = Logger.getLogger("tigase.db.jdbc.TigaseCustomAuth");
+	private static final Logger log = Logger.getLogger(TigaseCustomAuth.class.getName());
 
 	/**
 	 * Query executing periodically to ensure active connection with the database.
@@ -289,60 +289,24 @@ public class TigaseCustomAuth implements UserAuthRepository {
 
 	//~--- fields ---------------------------------------------------------------
 
-	private PreparedStatement add_user = null;
-
-	/**
-	 * Database active connection.
-	 */
-	private Connection conn = null;
-
-	/**
-	 * Prepared statement for testing whether database connection is still
-	 * working. If not connection to database is recreated.
-	 */
-	private PreparedStatement conn_valid_st = null;
-
-	/**
-	 * Connection validation helper.
-	 */
-	private long connectionValidateInterval = 1000 * 60;
-	private String convalid_query = DEF_CONNVALID_QUERY;
-
-	/**
-	 * Database connection string.
-	 */
-	private String db_conn = null;
-	private PreparedStatement get_pass = null;
-	private PreparedStatement init_db = null;
+	private DataRepository data_repo = null;
 	private String initdb_query = DEF_INITDB_QUERY;
 	private String getpassword_query = DEF_GETPASSWORD_QUERY;
 	private String deluser_query = DEF_DELUSER_QUERY;
 	private String adduser_query = DEF_ADDUSER_QUERY;
-
-	/**
-	 * Connection validation helper.
-	 */
-	private long lastConnectionValidated = 0;
-	private PreparedStatement remove_user = null;
-	private PreparedStatement update_pass = null;
 	private String updatepassword_query = DEF_UPDATEPASSWORD_QUERY;
-	private PreparedStatement user_login = null;
-	private PreparedStatement user_logout = null;
 	private String userlogin_query = DEF_USERLOGIN_QUERY;
 	private String userdomaincount_query = DEF_USERS_DOMAIN_COUNT_QUERY;
-	private String useracount_query = DEF_USERS_COUNT_QUERY;
 
 	// It is better just to not call the query if it is not defined by the user
 	// By default it is null then and not called.
 	private String userlogout_query = null;
+	private String userscount_query = DEF_USERS_COUNT_QUERY;
+	private boolean userlogin_active = false;
 
 //private String userlogout_query = DEF_USERLOGOUT_QUERY;
 	private String[] sasl_mechs = DEF_SASL_MECHS.split(",");
 	private String[] nonsasl_mechs = DEF_NONSASL_MECHS.split(",");
-	private PreparedStatement users_count = null;
-	private PreparedStatement users_domain_count = null;
-	private boolean userlogin_active = false;
-	private boolean online_status = false;
 
 	//~--- methods --------------------------------------------------------------
 
@@ -360,7 +324,7 @@ public class TigaseCustomAuth implements UserAuthRepository {
 		ResultSet rs = null;
 
 		try {
-			checkConnection();
+			PreparedStatement add_user = data_repo.getPreparedStatement(adduser_query);
 
 			synchronized (add_user) {
 				add_user.setString(1, user.toString());
@@ -394,8 +358,7 @@ public class TigaseCustomAuth implements UserAuthRepository {
 	 * @exception AuthorizationException if an error occurs
 	 */
 	@Override
-	public boolean digestAuth(BareJID user, final String digest, final String id,
-			final String alg)
+	public boolean digestAuth(BareJID user, final String digest, final String id, final String alg)
 			throws UserNotFoundException, TigaseDBException, AuthorizationException {
 		if (userlogin_active) {
 			throw new AuthorizationException("Not supported.");
@@ -406,7 +369,8 @@ public class TigaseCustomAuth implements UserAuthRepository {
 				final String digest_db_pass = Algorithms.hexDigest(id, db_password, alg);
 
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Comparing passwords, given: " + digest + ", db: " + digest_db_pass);
+					log.log(Level.FINEST, "Comparing passwords, given: {0}, db: {1}", new Object[] { digest,
+							digest_db_pass });
 				}
 
 				return digest.equals(digest_db_pass);
@@ -426,7 +390,7 @@ public class TigaseCustomAuth implements UserAuthRepository {
 	 */
 	@Override
 	public String getResourceUri() {
-		return db_conn;
+		return data_repo.getResourceUri();
 	}
 
 	/**
@@ -440,9 +404,8 @@ public class TigaseCustomAuth implements UserAuthRepository {
 		ResultSet rs = null;
 
 		try {
-			checkConnection();
-
 			long users = -1;
+			PreparedStatement users_count = data_repo.getPreparedStatement(userscount_query);
 
 			synchronized (users_count) {
 
@@ -478,9 +441,8 @@ public class TigaseCustomAuth implements UserAuthRepository {
 		ResultSet rs = null;
 
 		try {
-			checkConnection();
-
 			long users = -1;
+			PreparedStatement users_domain_count = data_repo.getPreparedStatement(userdomaincount_query);
 
 			synchronized (users_domain_count) {
 
@@ -516,38 +478,75 @@ public class TigaseCustomAuth implements UserAuthRepository {
 	@Override
 	public void initRepository(final String connection_str, Map<String, String> params)
 			throws DBInitException {
-		db_conn = connection_str;
-		convalid_query = getParamWithDef(params, DEF_CONNVALID_KEY, DEF_CONNVALID_QUERY);
-		initdb_query = getParamWithDef(params, DEF_INITDB_KEY, DEF_INITDB_QUERY);
-		adduser_query = getParamWithDef(params, DEF_ADDUSER_KEY, DEF_ADDUSER_QUERY);
-		deluser_query = getParamWithDef(params, DEF_DELUSER_KEY, DEF_DELUSER_QUERY);
-		getpassword_query = getParamWithDef(params, DEF_GETPASSWORD_KEY, DEF_GETPASSWORD_QUERY);
-		updatepassword_query = getParamWithDef(params, DEF_UPDATEPASSWORD_KEY,
-				DEF_UPDATEPASSWORD_QUERY);
-
-		if ((params != null) && (params.get(DEF_USERLOGIN_KEY) != null)) {
-			userlogin_query = getParamWithDef(params, DEF_USERLOGIN_KEY, DEF_USERLOGIN_QUERY);
-			userlogin_active = true;
-		}
-
-		userlogout_query = getParamWithDef(params, DEF_USERLOGOUT_KEY, null);
-		useracount_query = getParamWithDef(params, DEF_USERS_COUNT_KEY, DEF_USERS_COUNT_QUERY);
-		userdomaincount_query = getParamWithDef(params, DEF_USERS_DOMAIN_COUNT_KEY,
-				DEF_USERS_DOMAIN_COUNT_QUERY);
-		nonsasl_mechs = getParamWithDef(params, DEF_NONSASL_MECHS_KEY,
-				DEF_NONSASL_MECHS).split(",");
-		sasl_mechs = getParamWithDef(params, DEF_SASL_MECHS_KEY, DEF_SASL_MECHS).split(",");
-
 		try {
-			initRepo();
+			data_repo = RepositoryFactory.getDataRepository(null, connection_str, params);
+			initdb_query = getParamWithDef(params, DEF_INITDB_KEY, DEF_INITDB_QUERY);
+
+			if ((initdb_query != null) &&!initdb_query.trim().isEmpty()) {
+				data_repo.initPreparedStatement(initdb_query, initdb_query);
+			}
+
+			adduser_query = getParamWithDef(params, DEF_ADDUSER_KEY, DEF_ADDUSER_QUERY);
+
+			if ((adduser_query != null) &&!adduser_query.trim().isEmpty()) {
+				data_repo.initPreparedStatement(adduser_query, adduser_query);
+			}
+
+			deluser_query = getParamWithDef(params, DEF_DELUSER_KEY, DEF_DELUSER_QUERY);
+
+			if ((deluser_query != null) &&!deluser_query.trim().isEmpty()) {
+				data_repo.initPreparedStatement(deluser_query, deluser_query);
+			}
+
+			getpassword_query = getParamWithDef(params, DEF_GETPASSWORD_KEY, DEF_GETPASSWORD_QUERY);
+
+			if ((getpassword_query != null) &&!getpassword_query.trim().isEmpty()) {
+				data_repo.initPreparedStatement(getpassword_query, getpassword_query);
+			}
+
+			updatepassword_query = getParamWithDef(params, DEF_UPDATEPASSWORD_KEY,
+					DEF_UPDATEPASSWORD_QUERY);
+
+			if ((updatepassword_query != null) &&!updatepassword_query.trim().isEmpty()) {
+				data_repo.initPreparedStatement(updatepassword_query, updatepassword_query);
+			}
+
+			if ((params != null) && (params.get(DEF_USERLOGIN_KEY) != null)
+					&& ( !params.get(DEF_USERLOGIN_KEY).trim().isEmpty())) {
+				userlogin_query = getParamWithDef(params, DEF_USERLOGIN_KEY, DEF_USERLOGIN_QUERY);
+				data_repo.initPreparedStatement(userlogin_query, userlogin_query);
+				userlogin_active = true;
+			}
+
+			userlogout_query = getParamWithDef(params, DEF_USERLOGOUT_KEY, null);
+
+			if ((userlogout_query != null) &&!userlogout_query.trim().isEmpty()) {
+				data_repo.initPreparedStatement(userlogout_query, userlogout_query);
+			}
+
+			userscount_query = getParamWithDef(params, DEF_USERS_COUNT_KEY, DEF_USERS_COUNT_QUERY);
+
+			if ((userscount_query != null) &&!userscount_query.trim().isEmpty()) {
+				data_repo.initPreparedStatement(userscount_query, userscount_query);
+			}
+
+			userdomaincount_query = getParamWithDef(params, DEF_USERS_DOMAIN_COUNT_KEY,
+					DEF_USERS_DOMAIN_COUNT_QUERY);
+
+			if ((userdomaincount_query != null) &&!userdomaincount_query.trim().isEmpty()) {
+				data_repo.initPreparedStatement(userdomaincount_query, userdomaincount_query);
+			}
+
+			nonsasl_mechs = getParamWithDef(params, DEF_NONSASL_MECHS_KEY, DEF_NONSASL_MECHS).split(",");
+			sasl_mechs = getParamWithDef(params, DEF_SASL_MECHS_KEY, DEF_SASL_MECHS).split(",");
 
 			if ((params != null) && (params.get("init-db") != null)) {
-				init_db.executeQuery();
+				initDb();
 			}
-		} catch (SQLException e) {
-			conn = null;
+		} catch (Exception e) {
+			data_repo = null;
 
-			throw new DBInitException("Problem initializing jdbc connection: " + db_conn, e);
+			throw new DBInitException("Problem initializing jdbc connection: " + connection_str, e);
 		}
 	}
 
@@ -562,17 +561,17 @@ public class TigaseCustomAuth implements UserAuthRepository {
 	 */
 	@Override
 	public void logout(BareJID user) throws UserNotFoundException, TigaseDBException {
-		if (user_logout != null) {
-			try {
-				checkConnection();
+		try {
+			PreparedStatement user_logout = data_repo.getPreparedStatement(userlogout_query);
 
+			if (user_logout != null) {
 				synchronized (user_logout) {
 					user_logout.setString(1, user.toString());
 					user_logout.execute();
 				}
-			} catch (SQLException e) {
-				throw new TigaseDBException("Problem accessing repository.", e);
 			}
+		} catch (SQLException e) {
+			throw new TigaseDBException("Problem accessing repository.", e);
 		}
 	}
 
@@ -664,7 +663,7 @@ public class TigaseCustomAuth implements UserAuthRepository {
 	@Override
 	public void removeUser(BareJID user) throws UserNotFoundException, TigaseDBException {
 		try {
-			checkConnection();
+			PreparedStatement remove_user = data_repo.getPreparedStatement(deluser_query);
 
 			synchronized (remove_user) {
 				remove_user.setString(1, user.toString());
@@ -687,7 +686,7 @@ public class TigaseCustomAuth implements UserAuthRepository {
 	public void updatePassword(BareJID user, final String password)
 			throws UserNotFoundException, TigaseDBException {
 		try {
-			checkConnection();
+			PreparedStatement update_pass = data_repo.getPreparedStatement(updatepassword_query);
 
 			synchronized (update_pass) {
 				update_pass.setString(1, password);
@@ -697,37 +696,6 @@ public class TigaseCustomAuth implements UserAuthRepository {
 		} catch (SQLException e) {
 			throw new TigaseDBException("Problem accessing repository.", e);
 		}
-	}
-
-	/**
-	 * <code>checkConnection</code> method checks database connection before any
-	 * query. For some database servers (or JDBC drivers) it happens the connection
-	 * is dropped if not in use for a long time or after certain timeout passes.
-	 * This method allows us to detect the problem and reinitialize database
-	 * connection.
-	 *
-	 * @return a <code>boolean</code> value if the database connection is working.
-	 * @exception SQLException if an error occurs on database query.
-	 */
-	private boolean checkConnection() throws SQLException {
-		ResultSet rs = null;
-
-		try {
-			synchronized (conn_valid_st) {
-				long tmp = System.currentTimeMillis();
-
-				if ((tmp - lastConnectionValidated) >= connectionValidateInterval) {
-					rs = conn_valid_st.executeQuery();
-					lastConnectionValidated = tmp;
-				}    // end of if ()
-			}
-		} catch (Exception e) {
-			initRepo();
-		} finally {
-			release(null, rs);
-		}        // end of try-catch
-
-		return true;
 	}
 
 	//~--- get methods ----------------------------------------------------------
@@ -740,9 +708,10 @@ public class TigaseCustomAuth implements UserAuthRepository {
 		String result = params.get(key);
 
 		if (result != null) {
-			log.config("Custom query loaded for '" + key + "': '" + result + "'");
+			log.log(Level.CONFIG, "Custom query loaded for ''{0}'': ''{1}''",
+					new Object[] { key, result });
 		} else {
-			log.config("Default query loaded for '" + key + "': '" + def + "'");
+			log.log(Level.CONFIG, "Default query loaded for ''{0}'': ''{1}''", new Object[] { key, def });
 		}
 
 		return (result != null) ? result.trim() : def;
@@ -752,7 +721,7 @@ public class TigaseCustomAuth implements UserAuthRepository {
 		ResultSet rs = null;
 
 		try {
-			checkConnection();
+			PreparedStatement get_pass = data_repo.getPreparedStatement(getpassword_query);
 
 			synchronized (get_pass) {
 				get_pass.setString(1, user.toString());
@@ -773,46 +742,11 @@ public class TigaseCustomAuth implements UserAuthRepository {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * <code>initPreparedStatements</code> method initializes internal
-	 * database connection variables such as prepared statements.
-	 *
-	 * @exception SQLException if an error occurs on database query.
-	 */
-	private void initPreparedStatements() throws SQLException {
-		conn_valid_st = prepareQuery(convalid_query);
-		init_db = prepareQuery(initdb_query);
-		add_user = prepareQuery(adduser_query);
-		remove_user = prepareQuery(deluser_query);
-		get_pass = prepareQuery(getpassword_query);
-		update_pass = prepareQuery(updatepassword_query);
-		user_login = prepareQuery(userlogin_query);
-		users_count = prepareQuery(useracount_query);
-		users_domain_count = prepareQuery(userdomaincount_query);
+	private void initDb() throws SQLException {
+		PreparedStatement init_db = data_repo.getPreparedStatement(initdb_query);
 
-		if ((userlogout_query != null) &&!userlogout_query.isEmpty()) {
-			user_logout = prepareQuery(userlogout_query);
-		}
-	}
-
-	/**
-	 * <code>initRepo</code> method initializes database connection
-	 * and data repository.
-	 *
-	 * @exception SQLException if an error occurs on database query.
-	 */
-	private void initRepo() throws SQLException {
-		synchronized (db_conn) {
-			conn = DriverManager.getConnection(db_conn);
-			initPreparedStatements();
-		}
-	}
-
-	private PreparedStatement prepareQuery(String query) throws SQLException {
-		if (query.startsWith(SP_STARTS_WITH)) {
-			return conn.prepareCall(query);
-		} else {
-			return conn.prepareStatement(query);
+		synchronized (init_db) {
+			init_db.executeUpdate();
 		}
 	}
 
@@ -847,13 +781,14 @@ public class TigaseCustomAuth implements UserAuthRepository {
 			byte[] in_data = ((data_str != null) ? Base64.decode(data_str) : new byte[0]);
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("response: " + new String(in_data));
+				log.log(Level.FINEST, "response: {0}", new String(in_data));
 			}
 
 			byte[] challenge = ss.evaluateResponse(in_data);
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("challenge: " + ((challenge != null) ? new String(challenge) : "null"));
+				log.log(Level.FINEST, "challenge: {0}",
+						((challenge != null) ? new String(challenge) : "null"));
 			}
 
 			String challenge_str = (((challenge != null) && (challenge.length > 0))
@@ -918,7 +853,7 @@ public class TigaseCustomAuth implements UserAuthRepository {
 		String res_string = null;
 
 		try {
-			checkConnection();
+			PreparedStatement user_login = data_repo.getPreparedStatement(userlogin_query);
 
 			synchronized (user_login) {
 
@@ -937,8 +872,10 @@ public class TigaseCustomAuth implements UserAuthRepository {
 						return true;
 					} else {
 						if (log.isLoggable(Level.FINE)) {
-							log.fine("Login failed, for user: '" + user + "'" + ", password: '" + password
-									+ "'" + ", from DB got: " + res_string);
+							log.log(Level.FINE,
+									"Login failed, for user: ''{0}" + "''" + ", password: ''" + "{1}" + "''"
+										+ ", from DB got: " + "{2}", new Object[] { user,
+									password, res_string });
 						}
 					}
 				}
@@ -983,7 +920,7 @@ public class TigaseCustomAuth implements UserAuthRepository {
 
 			for (int i = 0; i < callbacks.length; i++) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Callback: " + callbacks[i].getClass().getSimpleName());
+					log.log(Level.FINEST, "Callback: {0}", callbacks[i].getClass().getSimpleName());
 				}
 
 				if (callbacks[i] instanceof RealmCallback) {
@@ -995,7 +932,7 @@ public class TigaseCustomAuth implements UserAuthRepository {
 					}          // end of if (realm == null)
 
 					if (log.isLoggable(Level.FINEST)) {
-						log.finest("RealmCallback: " + realm);
+						log.log(Level.FINEST, "RealmCallback: {0}", realm);
 					}
 				} else {
 					if (callbacks[i] instanceof NameCallback) {
@@ -1010,7 +947,7 @@ public class TigaseCustomAuth implements UserAuthRepository {
 						options.put(USER_ID_KEY, jid);
 
 						if (log.isLoggable(Level.FINEST)) {
-							log.finest("NameCallback: " + user_name);
+							log.log(Level.FINEST, "NameCallback: {0}", user_name);
 						}
 					} else {
 						if (callbacks[i] instanceof PasswordCallback) {
@@ -1022,7 +959,7 @@ public class TigaseCustomAuth implements UserAuthRepository {
 								pc.setPassword(passwd.toCharArray());
 
 								if (log.isLoggable(Level.FINEST)) {
-									log.finest("PasswordCallback: " + passwd);
+									log.log(Level.FINEST, "PasswordCallback: {0}", passwd);
 								}
 							} catch (Exception e) {
 								throw new IOException("Password retrieving problem.", e);
@@ -1033,13 +970,13 @@ public class TigaseCustomAuth implements UserAuthRepository {
 								String authenId = authCallback.getAuthenticationID();
 
 								if (log.isLoggable(Level.FINEST)) {
-									log.finest("AuthorizeCallback: authenId: " + authenId);
+									log.log(Level.FINEST, "AuthorizeCallback: authenId: {0}", authenId);
 								}
 
 								String authorId = authCallback.getAuthorizationID();
 
 								if (log.isLoggable(Level.FINEST)) {
-									log.finest("AuthorizeCallback: authorId: " + authorId);
+									log.log(Level.FINEST, "AuthorizeCallback: authorId: {0}", authorId);
 								}
 
 								if (authenId.equals(authorId)) {

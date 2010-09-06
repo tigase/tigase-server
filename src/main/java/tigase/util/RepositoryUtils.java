@@ -127,8 +127,7 @@ public class RepositoryUtils {
 			}
 		} else {
 			for (String val : vals) {
-				if (val.equals("Upline Support") || val.equals("Support")
-						|| val.startsWith("Level ")) {
+				if (val.equals("Upline Support") || val.equals("Support") || val.startsWith("Level ")) {
 					System.out.println("      Invalid group: " + val);
 
 					return false;
@@ -150,8 +149,7 @@ public class RepositoryUtils {
 	 *
 	 * @throws Exception
 	 */
-	public static void copyNode(BareJID user, String node, UserRepository src,
-			UserRepository dst)
+	public static void copyNode(BareJID user, String node, UserRepository src, UserRepository dst)
 			throws Exception {
 		String[] keys = src.getKeys(user, node);
 
@@ -183,8 +181,7 @@ public class RepositoryUtils {
 	 *
 	 * @throws Exception
 	 */
-	public static void copyRepositories(UserRepository src, UserRepository dst)
-			throws Exception {
+	public static void copyRepositories(UserRepository src, UserRepository dst) throws Exception {
 		if (user != null) {
 			copyUser(user, src, dst);
 		} else {
@@ -212,8 +209,7 @@ public class RepositoryUtils {
 	 *
 	 * @throws Exception
 	 */
-	public static void copyRepositories(UserRepository src, UserAuthRepository dst)
-			throws Exception {
+	public static void copyRepositories(UserRepository src, UserAuthRepository dst) throws Exception {
 		if (user != null) {
 			copyUser(user, src, dst);
 		} else {
@@ -413,10 +409,8 @@ public class RepositoryUtils {
 		repo.setData(user1, "roster/buddy111", "name", "budy1");
 		repo.setData(user1, "roster/buddy222", "name", "budy2");
 		repo.setData(user1, "roster/buddy333", "name", "budy3");
-		repo.setDataList(user1, "roster/buddy111", "groups",
-				new String[] { "buddies", "friends" });
-		repo.setDataList(user2, "roster/buddy111", "groups",
-				new String[] { "buddies", "friends" });
+		repo.setDataList(user1, "roster/buddy111", "groups", new String[] { "buddies", "friends" });
+		repo.setDataList(user2, "roster/buddy111", "groups", new String[] { "buddies", "friends" });
 		repo.addDataList(user2, "roster/buddy111", "groups", new String[] { "family", "home" });
 	}
 
@@ -435,9 +429,9 @@ public class RepositoryUtils {
 		UserAuthRepository src_auth = null;
 
 		try {
-			src_repo = RepositoryFactory.getUserRepository("util", src_class, src_uri, null);
-			System.out.println("Loaded src_repo " + src_repo.getClass().getName()
-					+ " for parameters:" + "\n   src_class=" + src_class + "\n   src_uri=" + src_uri);
+			src_repo = RepositoryFactory.getUserRepository(src_class, src_uri, null);
+			System.out.println("Loaded src_repo " + src_repo.getClass().getName() + " for parameters:"
+					+ "\n   src_class=" + src_class + "\n   src_uri=" + src_uri);
 		} catch (Exception e) {
 			repo_exc = e;
 			src_repo = null;
@@ -447,9 +441,9 @@ public class RepositoryUtils {
 		// Let's try with AuthRepository....
 		if (src_repo == null) {
 			try {
-				src_auth = RepositoryFactory.getAuthRepository("util", src_class, src_uri, null);
-				System.out.println("Loaded src_auth " + src_auth.getClass().getName()
-						+ " for parameters:" + "\n   src_class=" + src_class + "\n   src_uri=" + src_uri);
+				src_auth = RepositoryFactory.getAuthRepository(src_class, src_uri, null);
+				System.out.println("Loaded src_auth " + src_auth.getClass().getName() + " for parameters:"
+						+ "\n   src_class=" + src_class + "\n   src_uri=" + src_uri);
 			} catch (Exception e) {
 				System.out.println("Incorrect source class name given (or connection URI).");
 				System.out.println("class: " + src_class);
@@ -475,8 +469,8 @@ public class RepositoryUtils {
 			if (key_val && (src_repo != null)) {
 				System.out.println("Adding key=value: " + content);
 				parseNodeKeyValue(content);
-				System.out.println("Parsed parameters: user=" + user + ", node=" + subnode + ", key="
-						+ key + ", value=" + value);
+				System.out.println("Parsed parameters: user=" + user + ", node=" + subnode + ", key=" + key
+						+ ", value=" + value);
 				src_repo.setData(user, subnode, key, value);
 			} else {
 				System.out.println("Adding user: " + user);
@@ -499,8 +493,8 @@ public class RepositoryUtils {
 				if (key_val) {
 					System.out.println("Deleting data: " + content);
 					parseNodeKeyValue(content);
-					System.out.println("Parsed parameters: user=" + user + ", node=" + subnode
-							+ ", key=" + key + ", value=" + value);
+					System.out.println("Parsed parameters: user=" + user + ", node=" + subnode + ", key="
+							+ key + ", value=" + value);
 					src_repo.removeData(user, subnode, key);
 				}    // end of if (key_val)
 
@@ -527,9 +521,9 @@ public class RepositoryUtils {
 			UserAuthRepository dst_auth = null;
 
 			try {
-				dst_repo = RepositoryFactory.getUserRepository("util", dst_class, dst_uri, null);
-				System.out.println("Loaded dst_repo " + dst_repo.getClass().getName()
-						+ " for parameters:" + "\n   src_class=" + dst_class + "\n   src_uri=" + dst_uri);
+				dst_repo = RepositoryFactory.getUserRepository(dst_class, dst_uri, null);
+				System.out.println("Loaded dst_repo " + dst_repo.getClass().getName() + " for parameters:"
+						+ "\n   src_class=" + dst_class + "\n   src_uri=" + dst_uri);
 				copyRepositories(src_repo, dst_repo);
 			} catch (Exception e) {
 				dst_exc = e;
@@ -538,10 +532,9 @@ public class RepositoryUtils {
 
 			if (dst_repo == null) {
 				try {
-					dst_auth = RepositoryFactory.getAuthRepository("util", dst_class, dst_uri, null);
+					dst_auth = RepositoryFactory.getAuthRepository(dst_class, dst_uri, null);
 					System.out.println("Loaded dst_auth " + dst_auth.getClass().getName()
-							+ " for parameters:" + "\n   src_class=" + dst_class + "\n   src_uri="
-								+ dst_uri);
+							+ " for parameters:" + "\n   src_class=" + dst_class + "\n   src_uri=" + dst_uri);
 				} catch (Exception e) {
 					System.out.println("Incorrect destination class name given (or connection URI).");
 					System.out.println("Can't initialize repository:");
@@ -773,8 +766,7 @@ public class RepositoryUtils {
 
 		if (nodes != null) {
 			for (String subnode : nodes) {
-				printNode(user, repo, prefix + "  ",
-						((node != null) ? node + "/" + subnode : subnode));
+				printNode(user, repo, prefix + "  ", ((node != null) ? node + "/" + subnode : subnode));
 			}    // end of for (String node: nodes)
 		}      // end of if (ndoes != null)
 	}

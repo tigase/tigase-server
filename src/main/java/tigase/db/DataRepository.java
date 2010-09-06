@@ -22,11 +22,19 @@
  */
 package tigase.db;
 
+//~--- JDK imports ------------------------------------------------------------
+
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import java.util.Map;
+
 //~--- interfaces -------------------------------------------------------------
 
 /**
  * The interface defines a generic data repository for storing arbitrary data in any
- * application specifc form. This interface unifies database (repository) access allowing
+ * application specific form. This interface unifies database (repository) access allowing
  * for easier way to create database connections pools or database fail-over mechanisms.
  *
  * Created: Jun 16, 2010 3:34:32 PM
@@ -34,7 +42,59 @@ package tigase.db;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public interface DataRepository {}
+public interface DataRepository {
+
+	/**
+	 * Creates a SQL statement on which SQL queries can be executed later by the
+	 * higher repository layer.
+	 * @return a newly created <code>Statement</code>
+	 * @throws SQLException if a JDBC error occurs.
+	 */
+	Statement createStatement() throws SQLException;
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Returns a prepared statement for a given key.
+	 * @param stIdKey is a statement identification key.
+	 * @return a <code>PreparedStatement</code> for the given id key or null if such a statement
+	 * does not exist.
+	 * @throws SQLException
+	 */
+	PreparedStatement getPreparedStatement(String stIdKey) throws SQLException;
+
+	/**
+	 * Returns a DB connection string or DB connection URI.
+	 * @return a <code>String</code> value representing database connection string.
+	 */
+	String getResourceUri();
+
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Initializes a prepared statement for a given query and stores it internally under the given
+	 * id key. It can be retrieved later using <code>getPreparedStatement(stIdKey)</code> method.
+	 * @param stIdKey is a statement identification key.
+	 * @param query is a query for the prepared statement.
+	 * @throws SQLException
+	 */
+	void initPreparedStatement(String stIdKey, String query) throws SQLException;
+
+	/**
+	 * The method is called to initialize the data repository. Depending on the implementation
+	 * all the initialization parameters can be passed either via <code>resource_uri</code>
+	 * parameter as the database connection string or via <code>params</code> map if
+	 * the required repository parameters are more complex or both.
+	 * @param resource_uri value in most cases representing the database connection string.
+	 * @param params is a <code>Map</code> with repository properties necessary to initialize
+	 * and perform all the functions. The initialization parameters are implementation dependent.
+	 * @throws SQLException if there was an error during repository initialization.
+	 * Some implementations, though, perform so called lazy initialization so even though there
+	 * is a problem with the underlying repository it may not be signaled through this method
+	 * call.
+	 */
+	void initRepository(String resource_uri, Map<String, String> params) throws SQLException;
+}
 
 
 //~ Formatted in Sun Code Convention

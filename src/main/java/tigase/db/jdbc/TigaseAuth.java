@@ -26,6 +26,8 @@ package tigase.db.jdbc;
 
 import tigase.db.AuthorizationException;
 import tigase.db.DBInitException;
+import tigase.db.DataRepository;
+import tigase.db.RepositoryFactory;
 import tigase.db.TigaseDBException;
 import tigase.db.UserAuthRepository;
 import tigase.db.UserExistsException;
@@ -40,9 +42,6 @@ import static tigase.db.UserAuthRepository.*;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -67,57 +66,26 @@ import java.util.logging.Logger;
 public class TigaseAuth implements UserAuthRepository {
 
 	/**
-	 * Private logger for class instancess.
+	 * Private logger for class instances.
 	 */
 	private static final Logger log = Logger.getLogger("tigase.db.jdbc.TigaseAuth");
 	private static final String[] non_sasl_mechs = { "password" };
 	private static final String[] sasl_mechs = { "PLAIN" };
-
-	/** Field description */
-	public static final String DERBY_CONNVALID_QUERY = "values 1";
-
-	/** Field description */
-	public static final String JDBC_CONNVALID_QUERY = "select 1";
+	private static final String INIT_DB_QUERY = "{ call TigInitdb() }";
+	private static final String ADD_USER_PLAIN_PW_QUERY = "{ call TigAddUserPlainPw(?, ?) }";
+	private static final String REMOVE_USER_QUERY = "{ call TigRemoveUser(?) }";
+	private static final String GET_PASSWORD_QUERY = "{ call TigGetPassword(?) }";
+	private static final String UPDATE_PASSWORD_PLAIN_PW_QUERY =
+		"{ call TigUpdatePasswordPlainPw(?, ?) }";
+	private static final String USER_LOGIN_PLAIN_PW_QUERY = "{ call TigUserLoginPlainPw(?, ?) }";
+	private static final String USER_LOGOUT_QUERY = "{ call TigUserLogout(?) }";
+	private static final String USERS_COUNT_QUERY = "{ call TigAllUsersCount() }";
+	private static final String USERS_DOMAIN_COUNT_QUERY =
+		"select count(*) from tig_users where user_id like ?";
 
 	//~--- fields ---------------------------------------------------------------
 
-	private CallableStatement add_user_plain_pw_sp = null;
-
-	/**
-	 * Database active connection.
-	 */
-	private Connection conn = null;
-
-	/**
-	 * Prepared statement for testing whether database connection is still
-	 * working. If not connection to database is recreated.
-	 */
-	private PreparedStatement conn_valid_st = null;
-
-	/**
-	 * Connection validation helper.
-	 */
-	private long connectionValidateInterval = 1000 * 60;
-
-	/**
-	 * Database connection string.
-	 */
-	private String db_conn = null;
-	private CallableStatement get_pass_sp = null;
-	private CallableStatement init_db_sp = null;
-
-	/**
-	 * Connection validation helper.
-	 */
-	private long lastConnectionValidated = 0;
-	private CallableStatement remove_user_sp = null;
-	private CallableStatement update_pass_plain_pw_sp = null;
-	private CallableStatement user_login_plain_pw_sp = null;
-	private CallableStatement user_logout_sp = null;
-	private CallableStatement users_count_sp = null;
-	private PreparedStatement users_domain_count_st = null;
-	private boolean online_status = false;
-	private boolean derby_mode = false;
+	private DataRepository data_repo = null;
 
 	//~--- methods --------------------------------------------------------------
 
@@ -135,7 +103,8 @@ public class TigaseAuth implements UserAuthRepository {
 		ResultSet rs = null;
 
 		try {
-			checkConnection();
+			PreparedStatement add_user_plain_pw_sp =
+				data_repo.getPreparedStatement(ADD_USER_PLAIN_PW_QUERY);
 
 			synchronized (add_user_plain_pw_sp) {
 				add_user_plain_pw_sp.setString(1, user.toString());
@@ -179,7 +148,7 @@ public class TigaseAuth implements UserAuthRepository {
 	 */
 	@Override
 	public String getResourceUri() {
-		return db_conn;
+		return data_repo.getResourceUri();
 	}
 
 	/**
@@ -193,9 +162,8 @@ public class TigaseAuth implements UserAuthRepository {
 		ResultSet rs = null;
 
 		try {
-			checkConnection();
-
 			long users = -1;
+			PreparedStatement users_count_sp = data_repo.getPreparedStatement(USERS_COUNT_QUERY);
 
 			synchronized (users_count_sp) {
 
@@ -231,9 +199,9 @@ public class TigaseAuth implements UserAuthRepository {
 		ResultSet rs = null;
 
 		try {
-			checkConnection();
-
 			long users = -1;
+			PreparedStatement users_domain_count_st =
+				data_repo.getPreparedStatement(USERS_DOMAIN_COUNT_QUERY);
 
 			synchronized (users_domain_count_st) {
 
@@ -269,18 +237,26 @@ public class TigaseAuth implements UserAuthRepository {
 	@Override
 	public void initRepository(final String connection_str, Map<String, String> params)
 			throws DBInitException {
-		db_conn = connection_str;
-
 		try {
-			initRepo();
+			data_repo = RepositoryFactory.getDataRepository(null, connection_str, params);
+			data_repo.initPreparedStatement(INIT_DB_QUERY, INIT_DB_QUERY);
+			data_repo.initPreparedStatement(ADD_USER_PLAIN_PW_QUERY, ADD_USER_PLAIN_PW_QUERY);
+			data_repo.initPreparedStatement(REMOVE_USER_QUERY, REMOVE_USER_QUERY);
+			data_repo.initPreparedStatement(GET_PASSWORD_QUERY, GET_PASSWORD_QUERY);
+			data_repo.initPreparedStatement(UPDATE_PASSWORD_PLAIN_PW_QUERY,
+					UPDATE_PASSWORD_PLAIN_PW_QUERY);
+			data_repo.initPreparedStatement(USER_LOGIN_PLAIN_PW_QUERY, USER_LOGIN_PLAIN_PW_QUERY);
+			data_repo.initPreparedStatement(USER_LOGOUT_QUERY, USER_LOGOUT_QUERY);
+			data_repo.initPreparedStatement(USERS_COUNT_QUERY, USERS_COUNT_QUERY);
+			data_repo.initPreparedStatement(USERS_DOMAIN_COUNT_QUERY, USERS_DOMAIN_COUNT_QUERY);
 
 			if ((params != null) && (params.get("init-db") != null)) {
-				init_db_sp.executeQuery();
+				data_repo.getPreparedStatement(INIT_DB_QUERY).executeQuery();
 			}
-		} catch (SQLException e) {
-			conn = null;
+		} catch (Exception e) {
+			data_repo = null;
 
-			throw new DBInitException("Problem initializing jdbc connection: " + db_conn, e);
+			throw new DBInitException("Problem initializing jdbc connection: " + connection_str, e);
 		}
 	}
 
@@ -296,7 +272,7 @@ public class TigaseAuth implements UserAuthRepository {
 	@Override
 	public void logout(BareJID user) throws UserNotFoundException, TigaseDBException {
 		try {
-			checkConnection();
+			PreparedStatement user_logout_sp = data_repo.getPreparedStatement(USER_LOGOUT_QUERY);
 
 			synchronized (user_logout_sp) {
 				user_logout_sp.setString(1, user.toString());
@@ -356,7 +332,8 @@ public class TigaseAuth implements UserAuthRepository {
 		String res_string = null;
 
 		try {
-			checkConnection();
+			PreparedStatement user_login_plain_pw_sp =
+				data_repo.getPreparedStatement(USER_LOGIN_PLAIN_PW_QUERY);
 
 			synchronized (user_login_plain_pw_sp) {
 
@@ -380,8 +357,10 @@ public class TigaseAuth implements UserAuthRepository {
 						return true;
 					} else {
 						if (log.isLoggable(Level.FINE)) {
-							log.fine("Login failed, for user: '" + user + "'" + ", password: '" + password + "'"
-									+ ", from DB got: " + res_string);
+							log.log(Level.FINE,
+									"Login failed, for user: ''{0}" + "''" + ", password: ''" + "{1}" + "''"
+										+ ", from DB got: " + "{2}", new Object[] { user,
+									password, res_string });
 						}
 					}
 				}
@@ -427,7 +406,7 @@ public class TigaseAuth implements UserAuthRepository {
 	@Override
 	public void removeUser(BareJID user) throws UserNotFoundException, TigaseDBException {
 		try {
-			checkConnection();
+			PreparedStatement remove_user_sp = data_repo.getPreparedStatement(REMOVE_USER_QUERY);
 
 			synchronized (remove_user_sp) {
 				remove_user_sp.setString(1, user.toString());
@@ -450,7 +429,8 @@ public class TigaseAuth implements UserAuthRepository {
 	public void updatePassword(BareJID user, final String password)
 			throws UserNotFoundException, TigaseDBException {
 		try {
-			checkConnection();
+			PreparedStatement update_pass_plain_pw_sp =
+				data_repo.getPreparedStatement(UPDATE_PASSWORD_PLAIN_PW_QUERY);
 
 			synchronized (update_pass_plain_pw_sp) {
 				update_pass_plain_pw_sp.setString(1, user.toString());
@@ -462,44 +442,13 @@ public class TigaseAuth implements UserAuthRepository {
 		}
 	}
 
-	/**
-	 * <code>checkConnection</code> method checks database connection before any
-	 * query. For some database servers (or JDBC drivers) it happens the connection
-	 * is dropped if not in use for a long time or after certain timeout passes.
-	 * This method allows us to detect the problem and reinitialize database
-	 * connection.
-	 *
-	 * @return a <code>boolean</code> value if the database connection is working.
-	 * @exception SQLException if an error occurs on database query.
-	 */
-	private boolean checkConnection() throws SQLException {
-		ResultSet rs = null;
-
-		try {
-			synchronized (conn_valid_st) {
-				long tmp = System.currentTimeMillis();
-
-				if ((tmp - lastConnectionValidated) >= connectionValidateInterval) {
-					rs = conn_valid_st.executeQuery();
-					lastConnectionValidated = tmp;
-				}    // end of if ()
-			}
-		} catch (Exception e) {
-			initRepo();
-		} finally {
-			release(null, rs);
-		}        // end of try-catch
-
-		return true;
-	}
-
 	//~--- get methods ----------------------------------------------------------
 
 	private String getPassword(BareJID user) throws SQLException, UserNotFoundException {
 		ResultSet rs = null;
 
 		try {
-			checkConnection();
+			PreparedStatement get_pass_sp = data_repo.getPreparedStatement(GET_PASSWORD_QUERY);
 
 			synchronized (get_pass_sp) {
 				get_pass_sp.setString(1, user.toString());
@@ -517,50 +466,6 @@ public class TigaseAuth implements UserAuthRepository {
 	}
 
 	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * <code>initPreparedStatements</code> method initializes internal
-	 * database connection variables such as prepared statements.
-	 *
-	 * @exception SQLException if an error occurs on database query.
-	 */
-	private void initPreparedStatements() throws SQLException {
-		String query = (derby_mode ? DERBY_CONNVALID_QUERY : JDBC_CONNVALID_QUERY);
-
-		conn_valid_st = conn.prepareStatement(query);
-		query = "{ call TigInitdb() }";
-		init_db_sp = conn.prepareCall(query);
-		query = "{ call TigAddUserPlainPw(?, ?) }";
-		add_user_plain_pw_sp = conn.prepareCall(query);
-		query = "{ call TigRemoveUser(?) }";
-		remove_user_sp = conn.prepareCall(query);
-		query = "{ call TigGetPassword(?) }";
-		get_pass_sp = conn.prepareCall(query);
-		query = "{ call TigUpdatePasswordPlainPw(?, ?) }";
-		update_pass_plain_pw_sp = conn.prepareCall(query);
-		query = "{ call TigUserLoginPlainPw(?, ?) }";
-		user_login_plain_pw_sp = conn.prepareCall(query);
-		query = "{ call TigUserLogout(?) }";
-		user_logout_sp = conn.prepareCall(query);
-		query = "{ call TigAllUsersCount() }";
-		users_count_sp = conn.prepareCall(query);
-		query = "select count(*) from tig_users where user_id like ?";
-		users_domain_count_st = conn.prepareCall(query);
-	}
-
-	/**
-	 * <code>initRepo</code> method initializes database connection
-	 * and data repository.
-	 *
-	 * @exception SQLException if an error occurs on database query.
-	 */
-	private void initRepo() throws SQLException {
-		synchronized (db_conn) {
-			conn = DriverManager.getConnection(db_conn);
-			derby_mode = db_conn.startsWith("jdbc:derby");
-			initPreparedStatements();
-		}
-	}
 
 	private void release(Statement stmt, ResultSet rs) {
 		if (rs != null) {

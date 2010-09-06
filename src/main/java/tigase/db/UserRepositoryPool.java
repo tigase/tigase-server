@@ -81,7 +81,7 @@ public class UserRepositoryPool implements UserRepository {
 				addRepo(repo);
 			}
 		} else {
-			log.warning("repo is NULL, pool empty? - " + repoPool.size());
+			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
 		}
 	}
 
@@ -115,7 +115,7 @@ public class UserRepositoryPool implements UserRepository {
 				addRepo(repo);
 			}
 		} else {
-			log.warning("repo is NULL, pool empty? - " + repoPool.size());
+			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
 		}
 	}
 
@@ -153,7 +153,7 @@ public class UserRepositoryPool implements UserRepository {
 				addRepo(repo);
 			}
 		} else {
-			log.warning("repo is NULL, pool empty? - " + repoPool.size());
+			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
 		}
 
 		return null;
@@ -190,7 +190,7 @@ public class UserRepositoryPool implements UserRepository {
 				addRepo(repo);
 			}
 		} else {
-			log.warning("repo is NULL, pool empty? - " + repoPool.size());
+			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
 		}
 
 		return null;
@@ -226,7 +226,7 @@ public class UserRepositoryPool implements UserRepository {
 				addRepo(repo);
 			}
 		} else {
-			log.warning("repo is NULL, pool empty? - " + repoPool.size());
+			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
 		}
 
 		return null;
@@ -257,7 +257,7 @@ public class UserRepositoryPool implements UserRepository {
 				addRepo(repo);
 			}
 		} else {
-			log.warning("repo is NULL, pool empty? - " + repoPool.size());
+			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
 		}
 
 		return null;
@@ -287,7 +287,7 @@ public class UserRepositoryPool implements UserRepository {
 				addRepo(repo);
 			}
 		} else {
-			log.warning("repo is NULL, pool empty? - " + repoPool.size());
+			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
 		}
 
 		return null;
@@ -315,7 +315,7 @@ public class UserRepositoryPool implements UserRepository {
 				addRepo(repo);
 			}
 		} else {
-			log.warning("repo is NULL, pool empty? - " + repoPool.size());
+			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
 		}
 
 		return null;
@@ -356,7 +356,7 @@ public class UserRepositoryPool implements UserRepository {
 				addRepo(repo);
 			}
 		} else {
-			log.warning("repo is NULL, pool empty? - " + repoPool.size());
+			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
 		}
 
 		return null;
@@ -384,7 +384,7 @@ public class UserRepositoryPool implements UserRepository {
 				addRepo(repo);
 			}
 		} else {
-			log.warning("repo is NULL, pool empty? - " + repoPool.size());
+			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
 		}
 
 		return null;
@@ -411,7 +411,7 @@ public class UserRepositoryPool implements UserRepository {
 				addRepo(repo);
 			}
 		} else {
-			log.warning("repo is NULL, pool empty? - " + repoPool.size());
+			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
 		}
 
 		return -1;
@@ -436,7 +436,7 @@ public class UserRepositoryPool implements UserRepository {
 				addRepo(repo);
 			}
 		} else {
-			log.warning("repo is NULL, pool empty? - " + repoPool.size());
+			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
 		}
 
 		return null;
@@ -459,7 +459,7 @@ public class UserRepositoryPool implements UserRepository {
 				addRepo(repo);
 			}
 		} else {
-			log.warning("repo is NULL, pool empty? - " + repoPool.size());
+			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
 		}
 
 		return 0;
@@ -484,7 +484,7 @@ public class UserRepositoryPool implements UserRepository {
 				addRepo(repo);
 			}
 		} else {
-			log.warning("repo is NULL, pool empty? - " + repoPool.size());
+			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
 		}
 
 		return 0;
@@ -537,7 +537,7 @@ public class UserRepositoryPool implements UserRepository {
 				addRepo(repo);
 			}
 		} else {
-			log.warning("repo is NULL, pool empty? - " + repoPool.size());
+			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
 		}
 	}
 
@@ -565,7 +565,7 @@ public class UserRepositoryPool implements UserRepository {
 				addRepo(repo);
 			}
 		} else {
-			log.warning("repo is NULL, pool empty? - " + repoPool.size());
+			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
 		}
 	}
 
@@ -593,7 +593,7 @@ public class UserRepositoryPool implements UserRepository {
 				addRepo(repo);
 			}
 		} else {
-			log.warning("repo is NULL, pool empty? - " + repoPool.size());
+			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
 		}
 	}
 
@@ -617,7 +617,7 @@ public class UserRepositoryPool implements UserRepository {
 				addRepo(repo);
 			}
 		} else {
-			log.warning("repo is NULL, pool empty? - " + repoPool.size());
+			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
 		}
 	}
 
@@ -647,7 +647,7 @@ public class UserRepositoryPool implements UserRepository {
 				addRepo(repo);
 			}
 		} else {
-			log.warning("repo is NULL, pool empty? - " + repoPool.size());
+			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
 		}
 
 		cache.put(user + "/" + subnode + "/" + key, value);
@@ -676,7 +676,7 @@ public class UserRepositoryPool implements UserRepository {
 				addRepo(repo);
 			}
 		} else {
-			log.warning("repo is NULL, pool empty? - " + repoPool.size());
+			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
 		}
 
 		cache.put(user + "/" + key, value);
@@ -706,7 +706,7 @@ public class UserRepositoryPool implements UserRepository {
 				addRepo(repo);
 			}
 		} else {
-			log.warning("repo is NULL, pool empty? - " + repoPool.size());
+			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
 		}
 	}
 
@@ -747,7 +747,7 @@ public class UserRepositoryPool implements UserRepository {
 				addRepo(repo);
 			}
 		} else {
-			log.warning("repo is NULL, pool empty? - " + repoPool.size());
+			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
 		}
 
 		return false;

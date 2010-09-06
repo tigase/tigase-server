@@ -183,8 +183,7 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 					repo_uri });
 
 			try {
-				repo = RepositoryFactory.getUserRepository(getRepoUser().getDomain(), repo_class,
-						repo_uri, null);
+				repo = RepositoryFactory.getUserRepository(repo_class, repo_uri, null);
 			} catch (Exception e) {
 				log.log(Level.SEVERE, "Can't initialize Items repository", e);
 				repo = null;
@@ -209,8 +208,8 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 			} catch (Exception e) {
 
 				// This is not expected so let's signal an error:
-				log.log(Level.SEVERE,
-						"Problem with adding '" + getRepoUser() + "' user to the database", e);
+				log.log(Level.SEVERE, "Problem with adding '" + getRepoUser() + "' user to the database",
+						e);
 			}
 
 			reload();

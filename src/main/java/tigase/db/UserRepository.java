@@ -179,8 +179,7 @@ public interface UserRepository {
 	 * @exception UserNotFoundException if user id hasn't been found in repository.
 	 * @throws TigaseDBException if database backend error occurs.
 	 */
-	String[] getKeys(BareJID user, String subnode)
-			throws UserNotFoundException, TigaseDBException;
+	String[] getKeys(BareJID user, String subnode) throws UserNotFoundException, TigaseDBException;
 
 	/**
 	 * <code>getKeys</code> method returns list of all keys stored in default user
@@ -198,8 +197,8 @@ public interface UserRepository {
 	String[] getKeys(BareJID user) throws UserNotFoundException, TigaseDBException;
 
 	/**
-	 *
-	 * @return
+	 * Returns a DB connection string or DB connection URI.
+	 * @return a <code>String</code> value representing database connection string.
 	 */
 	String getResourceUri();
 
@@ -274,10 +273,17 @@ public interface UserRepository {
 	//~--- methods --------------------------------------------------------------
 
 	/**
-	 *
-	 * @param resource_uri
-	 * @param params
-	 * @throws tigase.db.DBInitException
+	 * The method is called to initialize the data repository. Depending on the implementation
+	 * all the initialization parameters can be passed either via <code>resource_uri</code>
+	 * parameter as the database connection string or via <code>params</code> map if
+	 * the required repository parameters are more complex or both.
+	 * @param resource_uri value in most cases representing the database connection string.
+	 * @param params is a <code>Map</code> with repository properties necessary to initialize
+	 * and perform all the functions. The initialization parameters are implementation dependent.
+	 * @throws tigase.db.DBInitException if there was an error during repository initialization.
+	 * Some implementations, though, perform so called lazy initialization so even though there
+	 * is a problem with the underlying repository it may not be signaled through this method
+	 * call.
 	 */
 	void initRepository(String resource_uri, Map<String, String> params) throws DBInitException;
 
@@ -330,8 +336,7 @@ public interface UserRepository {
 	 * @exception UserNotFoundException if user id hasn't been found in repository.
 	 * @throws TigaseDBException if database backend error occurs.
 	 */
-	void removeSubnode(BareJID user, String subnode)
-			throws UserNotFoundException, TigaseDBException;
+	void removeSubnode(BareJID user, String subnode) throws UserNotFoundException, TigaseDBException;
 
 	/**
 	 * This <code>removeUser</code> method allows to remove user and all his data

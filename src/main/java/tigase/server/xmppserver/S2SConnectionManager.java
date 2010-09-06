@@ -42,8 +42,6 @@ import tigase.xmpp.StanzaType;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.net.UnknownHostException;
-
 import java.security.NoSuchAlgorithmException;
 
 import java.util.Map;
@@ -737,6 +735,8 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 				} catch (NotLocalhostException ex) {
 					generateStreamError(false, "host-unknown", serv);
 				}
+
+				break;
 			}
 
 			default :
