@@ -24,6 +24,7 @@ package tigase.util;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,7 +46,9 @@ public abstract class WorkerThread extends Thread {
 	//~--- fields ---------------------------------------------------------------
 
 	private long averageProcessingTime = 0;
-	private PriorityQueueAbstract<QueueItem> queue = null;
+
+//private PriorityQueueAbstract<QueueItem> queue = null;
+	private LinkedBlockingQueue<QueueItem> queue = null;
 	private long runsCnt = 0;
 	private boolean stopped = false;
 
@@ -55,11 +58,10 @@ public abstract class WorkerThread extends Thread {
 	 * Method description
 	 *
 	 *
-	 * @param queue
 	 *
 	 * @return
 	 */
-	public abstract WorkerThread getNewInstance(PriorityQueueAbstract<QueueItem> queue);
+	public abstract WorkerThread getNewInstance();
 
 	//~--- methods --------------------------------------------------------------
 
@@ -104,6 +106,18 @@ public abstract class WorkerThread extends Thread {
 	/**
 	 * Method description
 	 *
+	 *
+	 * @param item
+	 *
+	 * @return
+	 */
+	public boolean offer(QueueItem item) {
+		return queue.offer(item);
+	}
+
+	/**
+	 * Method description
+	 *
 	 */
 	@Override
 	public void run() {
@@ -124,8 +138,8 @@ public abstract class WorkerThread extends Thread {
 				}
 			} catch (Exception e) {
 				log.log(Level.SEVERE,
-						this.getClass().getName() + ",(" + getName()
-							+ ") Exception during packet processing: " + item.packet.toString(), e);
+						this.getClass().getName() + ",(" + getName() + ") Exception during packet processing: "
+							+ item.getPacket().toString(), e);
 			}
 
 			++runsCnt;
@@ -138,10 +152,28 @@ public abstract class WorkerThread extends Thread {
 	 * Method description
 	 *
 	 *
-	 * @param queue
+	 * @param maxSize
 	 */
-	public void setQueue(PriorityQueueAbstract<QueueItem> queue) {
-		this.queue = queue;
+	public void setQueueMaxSize(int maxSize) {
+		LinkedBlockingQueue<QueueItem> oldQueue = queue;
+
+		queue = new LinkedBlockingQueue<QueueItem>(maxSize);
+
+		if (oldQueue != null) {
+			queue.addAll(oldQueue);
+		}
+	}
+
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public int size() {
+		return queue.size();
 	}
 }
 

@@ -174,11 +174,12 @@ public class JabberIqIq extends XMPPProcessor
 	 * @param repo
 	 * @param results
 	 *
+	 * @param settings
 	 * @return
 	 */
 	@Override
 	public boolean preProcess(Packet packet, XMPPResourceConnection session,
-			NonAuthUserRepository repo, Queue<Packet> results) {
+			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) {
 		try {
 			if ((session != null) && (packet.getFrom() != null)
 					&& packet.getFrom().equals(session.getConnectionId())
@@ -212,8 +213,8 @@ public class JabberIqIq extends XMPPProcessor
 		if ((session == null) && (packet.getType() != null)
 				&& (packet.getType() == StanzaType.get)) {
 			try {
-				String iq_level = repo.getPublicData(packet.getStanzaTo().getBareJID().toString(), ID,
-					LEVEL, null);
+				String iq_level = repo.getPublicData(packet.getStanzaTo().getBareJID(), ID, LEVEL,
+					null);
 
 				results.offer(getResponsePacket(packet, iq_level));
 			} catch (UserNotFoundException e) {

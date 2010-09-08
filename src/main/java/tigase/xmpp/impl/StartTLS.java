@@ -54,7 +54,7 @@ import java.util.logging.Logger;
  * @version $Rev$
  */
 public class StartTLS extends XMPPProcessor implements XMPPProcessorIfc {
-	private static Logger log = Logger.getLogger(StartTLS.class.getName());
+	private static final Logger log = Logger.getLogger(StartTLS.class.getName());
 	private static final String XMLNS = "urn:ietf:params:xml:ns:xmpp-tls";
 
 	// private static final String TLS_STARTED_KEY = "TLS-Started";
@@ -65,8 +65,8 @@ public class StartTLS extends XMPPProcessor implements XMPPProcessorIfc {
 	private static final String[] ELEMENTS = { "starttls", "proceed", "failure" };
 	private static final String[] XMLNSS = { XMLNS, XMLNS, XMLNS };
 	private static final Element[] F_REQUIRED = {
-		new Element("starttls", new Element[] { new Element("required") },
-			new String[] { "xmlns" }, new String[] { XMLNS }) };
+		new Element("starttls", new Element[] { new Element("required") }, new String[] { "xmlns" },
+			new String[] { XMLNS }) };
 	private static final Element[] F_NOT_REQUIRED = {
 		new Element("starttls", new String[] { "xmlns" }, new String[] { XMLNS }) };
 
@@ -115,19 +115,18 @@ public class StartTLS extends XMPPProcessor implements XMPPProcessorIfc {
 				// This is possible and can even work but this can also be
 				// a DOS attack. Blocking it now, unless someone requests he wants
 				// to have multiple layers of TLS for his connection
-				log.warning("Multiple TLS requests, possible DOS attack, closing connection: "
-						+ packet);
+				log.warning("Multiple TLS requests, possible DOS attack, closing connection: " + packet);
 				results.offer(packet.swapFromTo(failure, null, null));
-				results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
-						StanzaType.set, session.nextStanzaId()));
+				results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(), StanzaType.set,
+						session.nextStanzaId()));
 
 				return;
 			}
 
 			session.putSessionData(ID, "true");
 
-			Packet result = Command.STARTTLS.getPacket(packet.getTo(), packet.getFrom(),
-				StanzaType.set, session.nextStanzaId(), Command.DataType.submit);
+			Packet result = Command.STARTTLS.getPacket(packet.getTo(), packet.getFrom(), StanzaType.set,
+				session.nextStanzaId(), Command.DataType.submit);
 
 			Command.setData(result, proceed);
 			results.offer(result);

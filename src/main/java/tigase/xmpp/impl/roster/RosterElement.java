@@ -136,6 +136,38 @@ public class RosterElement {
 		this.subscription = SubscriptionType.none;
 	}
 
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param groups
+	 */
+	public void addGroups(String[] groups) {
+		if (groups != null) {
+			if (this.groups == null) {
+				this.groups = groups;
+			} else {
+
+				// Groups names must be unique
+				Set<String> groupsSet = new HashSet<String>();
+
+				for (String group : this.groups) {
+					groupsSet.add(group);
+				}
+
+				for (String group : groups) {
+					groupsSet.add(group);
+				}
+
+				this.groups = groupsSet.toArray(new String[groupsSet.size()]);
+			}
+		}
+
+		// item = null;
+	}
+
 	//~--- get methods ----------------------------------------------------------
 
 	/**
@@ -353,34 +385,6 @@ public class RosterElement {
 
 		// item = null;
 	}
-
-	//~--- methods --------------------------------------------------------------
-
-	void addGroups(String[] groups) {
-		if (groups != null) {
-			if (this.groups == null) {
-				this.groups = groups;
-			} else {
-
-				// Groups names must be unique
-				Set<String> groupsSet = new HashSet<String>();
-
-				for (String group : this.groups) {
-					groupsSet.add(group);
-				}
-
-				for (String group : groups) {
-					groupsSet.add(group);
-				}
-
-				this.groups = groupsSet.toArray(new String[groupsSet.size()]);
-			}
-		}
-
-		// item = null;
-	}
-
-	//~--- set methods ----------------------------------------------------------
 
 	private void setJid(JID jid) {
 		this.jid = jid;

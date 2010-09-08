@@ -22,6 +22,10 @@
 
 package tigase.db;
 
+//~--- non-JDK imports --------------------------------------------------------
+
+import tigase.xmpp.BareJID;
+
 //~--- interfaces -------------------------------------------------------------
 
 /**
@@ -61,7 +65,7 @@ public interface NonAuthUserRepository {
 	 * @exception UserNotFoundException if user id hasn't been found in reository.
 	 * @throws DataOverwriteException
 	 */
-	void addOfflineData(String user, String subnode, String key, String value)
+	void addOfflineData(BareJID user, String subnode, String key, String value)
 			throws UserNotFoundException, DataOverwriteException;
 
 	/**
@@ -81,7 +85,7 @@ public interface NonAuthUserRepository {
 	 * with the specified key.
 	 * @exception UserNotFoundException if user id hasn't been found in reository.
 	 */
-	void addOfflineDataList(String user, String subnode, String key, String[] list)
+	void addOfflineDataList(BareJID user, String subnode, String key, String[] list)
 			throws UserNotFoundException;
 
 	//~--- get methods ----------------------------------------------------------
@@ -104,7 +108,7 @@ public interface NonAuthUserRepository {
 	 * if no entry has been found.
 	 * @throws TigaseDBException if there was an error during reading data from the repository.
 	 */
-	String getDomainTempData(String domain, String subnode, String key, String def)
+	String getDomainTempData(BareJID domain, String subnode, String key, String def)
 			throws TigaseDBException;
 
 	/**
@@ -125,7 +129,7 @@ public interface NonAuthUserRepository {
 	 * if no entry has been found.
 	 * @exception UserNotFoundException if user id hasn't been found in reository.
 	 */
-	String getPublicData(String user, String subnode, String key, String def)
+	String getPublicData(BareJID user, String subnode, String key, String def)
 			throws UserNotFoundException;
 
 	/**
@@ -143,7 +147,7 @@ public interface NonAuthUserRepository {
 	 * @return a <code>String[]</code> value
 	 * @exception UserNotFoundException if user id hasn't been found in reository.
 	 */
-	String[] getPublicDataList(String user, String subnode, String key)
+	String[] getPublicDataList(BareJID user, String subnode, String key)
 			throws UserNotFoundException;
 
 	/**
@@ -184,7 +188,7 @@ public interface NonAuthUserRepository {
 	 * with the specified key.
 	 * @throws TigaseDBException if there was an error during writing data to the repository.
 	 */
-	void putDomainTempData(String domain, String subnode, String key, String value)
+	void putDomainTempData(BareJID domain, String subnode, String key, String value)
 			throws TigaseDBException;
 
 	/**
@@ -216,7 +220,7 @@ public interface NonAuthUserRepository {
 	 * be associated.
 	 * @throws TigaseDBException if there was an error during writing data to the repository.
 	 */
-	void removeDomainTempData(String domain, String subnode, String key)
+	void removeDomainTempData(BareJID domain, String subnode, String key)
 			throws TigaseDBException;
 
 	/**

@@ -69,7 +69,7 @@ public class Script extends AbstractScriptCommand {
 		if (ext != null) {
 			scriptEngine = scriptEngineManager.getEngineByExtension(ext);
 		}
-		if (scriptEngine instanceof Compilable) {
+		if (!Packet.FULL_DEBUG && scriptEngine instanceof Compilable) {
 			compiledScript = ((Compilable)scriptEngine).compile(script);
 		}
 		if (this.language == null) {

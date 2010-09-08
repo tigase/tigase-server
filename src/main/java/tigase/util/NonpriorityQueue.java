@@ -40,11 +40,29 @@ public class NonpriorityQueue<E> extends PriorityQueueAbstract<E> {
 
 	//~--- constructors ---------------------------------------------------------
 
+	/**
+	 * Constructs ...
+	 *
+	 */
+	public NonpriorityQueue() {}
+
 	protected NonpriorityQueue(int maxSize) {
-		queue = new LinkedBlockingQueue<E>(maxSize);
+		init(maxSize, 0);
 	}
 
 	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param maxPriority
+	 * @param maxSize
+	 */
+	@Override
+	public final void init(int maxPriority, int maxSize) {
+		queue = new LinkedBlockingQueue<E>(maxSize);
+	}
 
 	/**
 	 * Method description

@@ -111,6 +111,8 @@ public class BindResource extends XMPPProcessor implements XMPPProcessorIfc {
 			return;
 		}    // end of if (!session.isAuthorized())
 
+		if (session.getSessionData(RESOURCE_KEY) != null) {}
+
 		Element request = packet.getElement();
 		StanzaType type = packet.getType();
 

@@ -20,7 +20,7 @@
  * $Date$
  */
 
-package tigase.monitor;
+package tigase.server.monitor;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;

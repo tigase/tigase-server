@@ -1,4 +1,5 @@
-/*  Tigase Jabber/XMPP Server
+/*
+ *   Tigase Jabber/XMPP Server
  *  Copyright (C) 2004-2008 "Artur Hefczyc" <artur.hefczyc@tigase.org>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,11 +19,18 @@
  * Last modified by $Author$
  * $Date$
  */
+
 package tigase.util;
+
+//~--- non-JDK imports --------------------------------------------------------
+
+import static tigase.conf.Configurable.*;
+
+//~--- JDK imports ------------------------------------------------------------
 
 import java.util.Map;
 
-import static tigase.conf.Configurable.*;
+//~--- classes ----------------------------------------------------------------
 
 /**
  * Describe class DBUtils here.
@@ -35,14 +43,26 @@ import static tigase.conf.Configurable.*;
  */
 public abstract class DBUtils {
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param params
+	 * @param primaryKey
+	 * @param secondaryKey
+	 *
+	 * @return
+	 */
 	public static String[] decodeDBParams(final Map<String, Object> params,
-		final String primaryKey, final String secondaryKey) {
+			final String primaryKey, final String secondaryKey) {
 		String repo_class = null;
 		String repo_url = null;
-		String repo = (String)params.get(primaryKey);
-		if (repo == null && secondaryKey != null) {
-			repo = (String)params.get(secondaryKey);
+		String repo = (String) params.get(primaryKey);
+
+		if ((repo == null) && (secondaryKey != null)) {
+			repo = (String) params.get(secondaryKey);
 		}
+
 		if (repo != null) {
 			if (repo.equals("mysql")) {
 				repo_class = MYSQL_REPO_CLASS_PROP_VAL;
@@ -53,7 +73,7 @@ public abstract class DBUtils {
 					repo_url = PGSQL_REPO_URL_PROP_VAL;
 				} else {
 					if (repo.equals("drupal")) {
-						repo_class = DRUPAL_REPO_CLASS_PROP_VAL;
+						repo_class = DRUPALWP_REPO_CLASS_PROP_VAL;
 						repo_url = DRUPAL_REPO_URL_PROP_VAL;
 					} else {
 						if (repo.equals("libresource")) {
@@ -66,7 +86,13 @@ public abstract class DBUtils {
 				}
 			}
 		}
-		return new String[] {repo_class, repo_url};
-	}
 
+		return new String[] { repo_class, repo_url };
+	}
 }
+
+
+//~ Formatted in Sun Code Convention
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

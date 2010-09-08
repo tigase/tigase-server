@@ -34,6 +34,7 @@ AS:Component: vhost-man,ext
 package tigase.admin
 
 import tigase.db.*
+import tigase.db.comp.*
 import tigase.server.*
 
 def MARKER = "command-marker"

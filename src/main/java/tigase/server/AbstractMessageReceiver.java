@@ -144,8 +144,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
-	private static final Logger log =
-		Logger.getLogger("tigase.abstract.AbstractMessageReceiver");
+	private static final Logger log = Logger.getLogger("tigase.debug.AbstractMessageReceiver");
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -172,7 +171,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	private final CopyOnWriteArrayList<PacketFilterIfc> incoming_filters =
 		new CopyOnWriteArrayList<PacketFilterIfc>();
 	private final List<PriorityQueueAbstract<Packet>> in_queues =
-		new ArrayList<PriorityQueueAbstract<Packet>>();
+		new ArrayList<PriorityQueueAbstract<Packet>>(pr_cache.length);
 	private final long[] processPacketTimings = new long[100];
 	private Timer receiverTasks = null;
 
@@ -245,7 +244,8 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 		int queueIdx = Math.abs(hashCodeForPacket(packet) % in_queues_size);
 
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("[" + getName() + "] queueIdx=" + queueIdx + ", " + packet.toStringSecure());
+			log.log(Level.FINEST, "[{0}] queueIdx={1}, {2}", new Object[] { getName(), queueIdx,
+					packet.toStringSecure() });
 		}
 
 		try {
@@ -253,6 +253,10 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 			++statReceivedPacketsOk;
 		} catch (InterruptedException e) {
 			++statReceivedPacketsEr;
+
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Packet dropped for unknown reason: {0}", packet);
+			}
 
 			return false;
 		}    // end of try-catch
@@ -285,7 +289,8 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 		int queueIdx = Math.abs(hashCodeForPacket(packet) % in_queues_size);
 
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("[" + getName() + "] queueIdx=" + queueIdx + ", " + packet.toStringSecure());
+			log.log(Level.FINEST, "[{0}] queueIdx={1}, {2}", new Object[] { getName(), queueIdx,
+					packet.toStringSecure() });
 		}
 
 		boolean result = in_queues.get(queueIdx).offer(packet, packet.getPriority().ordinal());
@@ -296,6 +301,10 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 
 			// Queue overflow!
 			++statReceivedPacketsEr;
+
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Packet dropped due to queue overflow: {0}", packet);
+			}
 		}
 
 		return result;
@@ -376,13 +385,15 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	 */
 	public void addRegexRouting(String address) {
 		if (log.isLoggable(Level.FINE)) {
-			log.fine(getName() + " - attempt to add regex routing: " + address);
+			log.log(Level.FINE, "{0} - attempt to add regex routing: {1}", new Object[] { getName(),
+					address });
 		}
 
 		regexRoutings.add(Pattern.compile(address, Pattern.CASE_INSENSITIVE));
 
 		if (log.isLoggable(Level.FINE)) {
-			log.fine(getName() + " - success adding regex routing: " + address);
+			log.log(Level.FINE, "{0} - success adding regex routing: {1}", new Object[] { getName(),
+					address });
 		}
 	}
 
@@ -626,7 +637,8 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 		// log.finest(getName() + " looking for regex routings: " + address);
 		for (Pattern pat : regexRoutings) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest(getName() + " matching: " + address + " against " + pat.toString());
+				log.log(Level.FINEST, "{0} matching: {1} against {2}", new Object[] { getName(),
+						address, pat.toString() });
 			}
 
 			if (pat.matcher(address).matches()) {
@@ -711,9 +723,12 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	 *
 	 *
 	 * @param maxQueueSize
+	 *
 	 */
 	public void setMaxQueueSize(int maxQueueSize) {
 		if ((this.maxQueueSize != maxQueueSize) || (in_queues.size() == 0)) {
+
+			// out_queue = PriorityQueueAbstract.getPriorityQueue(pr_cache.length, maxQueueSize);
 			this.maxQueueSize = maxQueueSize / processingThreads();
 
 			if (in_queues.size() == 0) {
@@ -783,7 +798,8 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 
 					filter.init(getName(), QueueType.IN_QUEUE);
 					incoming_filters.add(filter);
-					log.config(getName() + " loaded incoming filter: " + inc);
+					log.log(Level.CONFIG, "{0} loaded incoming filter: {1}", new Object[] { getName(),
+							inc });
 				} catch (Exception e) {
 					log.log(Level.WARNING,
 							"Problem loading filter: " + inc + " in component: " + getName(), e);
@@ -802,7 +818,8 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 
 					filter.init(getName(), QueueType.OUT_QUEUE);
 					outgoing_filters.add(filter);
-					log.config(getName() + " loaded outgoing filter: " + out);
+					log.log(Level.CONFIG, "{0} loaded outgoing filter: {1}", new Object[] { getName(),
+							out });
 				} catch (Exception e) {
 					log.log(Level.WARNING,
 							"Problem loading filter: " + out + " in component: " + getName(), e);
@@ -820,7 +837,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	@Override
 	public void start() {
 		if (log.isLoggable(Level.FINER)) {
-			log.info(getName() + ": starting queue management threads ...");
+			log.log(Level.INFO, "{0}: starting queue management threads ...", getName());
 		}
 
 		startThreads();
@@ -832,7 +849,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	 */
 	public void stop() {
 		if (log.isLoggable(Level.FINER)) {
-			log.info(getName() + ": stopping queue management threads ...");
+			log.log(Level.INFO, "{0}: stopping queue management threads ...", getName());
 		}
 
 		stopThreads();
@@ -840,7 +857,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 
 	protected boolean addOutPacket(Packet packet) {
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("[" + getName() + "]  " + packet.toStringSecure());
+			log.log(Level.FINEST, "[{0}]  {1}", new Object[] { getName(), packet.toStringSecure() });
 		}
 
 		try {
@@ -848,6 +865,10 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 			++statSentPacketsOk;
 		} catch (InterruptedException e) {
 			++statSentPacketsEr;
+
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Packet dropped for unknown reason: {0}", packet);
+			}
 
 			return false;
 		}    // end of try-catch
@@ -863,7 +884,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	 */
 	protected boolean addOutPacketNB(Packet packet) {
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("[" + getName() + "]  " + packet.toStringSecure());
+			log.log(Level.FINEST, "[{0}]  {1}", new Object[] { getName(), packet.toStringSecure() });
 		}
 
 		boolean result = false;
@@ -876,6 +897,10 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 
 			// Queue overflow!
 			++statSentPacketsEr;
+
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Packet dropped due to queue overflow: {0}", packet);
+			}
 		}
 
 		return result;
@@ -939,7 +964,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 
 	private void startThreads() {
 		if (threadsQueue == null) {
-			threadsQueue = new ArrayDeque<QueueListener>();
+			threadsQueue = new ArrayDeque<QueueListener>(8);
 
 			for (int i = 0; i < in_queues_size; i++) {
 				QueueListener in_thread = new QueueListener(in_queues.get(i), QueueType.IN_QUEUE);
@@ -1072,6 +1097,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 
 
 	private class QueueListener extends Thread {
+		private String compName = null;
 		private QueueType type = null;
 		private boolean threadStopped = false;
 		private PriorityQueueAbstract<Packet> queue;
@@ -1081,6 +1107,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 		private QueueListener(PriorityQueueAbstract<Packet> q, QueueType type) {
 			this.queue = q;
 			this.type = type;
+			compName = AbstractMessageReceiver.this.getName();
 		}
 
 		//~--- methods ------------------------------------------------------------
@@ -1096,7 +1123,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 			}
 
 			Packet packet = null;
-			Queue<Packet> results = new ArrayDeque<Packet>();
+			Queue<Packet> results = new ArrayDeque<Packet>(2);
 
 			while ( !threadStopped) {
 				try {
@@ -1106,9 +1133,8 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 					// packet = queue.take(getName() + ":" + type);
 					packet = queue.take();
 
-//        if (log.isLoggable(Level.FINEST)) {
-//          log.finest("[" + getName() + "] packet from " + type +
-//                  " queue: " + packet.toString());
+//        if (log.isLoggable(Level.INFO)) {
+//          log.info("[" + getName() + "] packet from " + type + " queue: " + packet);
 //        }
 					switch (type) {
 						case IN_QUEUE :
@@ -1133,7 +1159,9 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 								// Maybe this is a command for local processing...
 								boolean processed = false;
 
-								if (packet.isCommand() && getComponentId().equals(packet.getStanzaTo())) {
+								if (packet.isCommand() && (packet.getStanzaTo() != null)
+										&& compName.equals(packet.getStanzaTo().getLocalpart())
+											&& isLocalDomain(packet.getStanzaTo().getDomain())) {
 									processed = processScriptCommand(packet, results);
 
 									if (processed) {
@@ -1185,8 +1213,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 					// stopped = true;
 				} catch (Exception e) {
 					log.log(Level.SEVERE,
-							"[" + getName() + "] Exception during packet processing: "
-								+ packet.toStringSecure(), e);
+							"[" + getName() + "] Exception during packet processing: " + packet, e);
 				}    // end of try-catch
 			}      // end of while (! threadStopped)
 		}

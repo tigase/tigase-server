@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import tigase.db.ComponentRepository;
+import tigase.db.comp.ComponentRepository;
 import tigase.util.JDBCAbstract;
 import tigase.xml.DomBuilderHandler;
 import tigase.xml.Element;

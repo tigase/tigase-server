@@ -38,10 +38,15 @@ import tigase.xml.Element;
 
 import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
+import tigase.xmpp.NoConnectionIdException;
 import tigase.xmpp.NotAuthorizedException;
+import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPException;
+import tigase.xmpp.XMPPProcessor;
+import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.XMPPStopListenerIfc;
 import tigase.xmpp.impl.roster.RosterAbstract;
 import tigase.xmpp.impl.roster.RosterFactory;
 
@@ -73,7 +78,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public abstract class Presence {
+public class Presence extends XMPPProcessor implements XMPPProcessorIfc, XMPPStopListenerIfc {
 
 	/**
 	 * <code>DIRECT_PRESENCE</code> is a key in temporary session data for
@@ -88,15 +93,19 @@ public abstract class Presence {
 	protected static final String XMLNS = "jabber:client";
 
 	/**
-	 * Private logger for class instancess.
+	 * Private logger for class instance.
 	 */
-	private static Logger log = Logger.getLogger("tigase.xmpp.impl.Presence");
+	private static final Logger log = Logger.getLogger(Presence.class.getName());
 	private static final String[] XMLNSS = { XMLNS };
 	private static final String[] ELEMENTS = { PRESENCE_ELEMENT_NAME };
+	private static final String ID = PRESENCE_ELEMENT_NAME;
 	private static long requiredNo = 0;
 	private static long requiredYes = 0;
-	private static RosterAbstract roster_util = RosterFactory.getRosterImplementation(true);
 	private static TigaseRuntime runtime = TigaseRuntime.getTigaseRuntime();
+
+	//~--- fields ---------------------------------------------------------------
+
+	protected RosterAbstract roster_util = getRosterUtil();
 
 	//~--- methods --------------------------------------------------------------
 
@@ -112,620 +121,14 @@ public abstract class Presence {
 		Set<JID> direct_presences = (Set<JID>) session.getSessionData(DIRECT_PRESENCE);
 
 		if (direct_presences == null) {
-			direct_presences = new LinkedHashSet<JID>();
+			direct_presences = new LinkedHashSet<JID>(10);
 			session.putSessionData(DIRECT_PRESENCE, direct_presences);
 		}    // end of if (direct_presences == null)
 
 		direct_presences.add(jid);
 
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Added direct presence jid: " + jid);
-		}
-	}
-
-	/**
-	 * <code>sendPresenceBroadcast</code> method broadcasts given presence
-	 * to all budies from roster and to all users to which direct presence
-	 * was sent.
-	 *
-	 * @param session a <code>XMPPResourceConnection</code> value
-	 * @param results
-	 * @param settings
-	 * @exception NotAuthorizedException if an error occurs
-	 * @throws TigaseDBException
-	 */
-	public static void broadcastProbe(XMPPResourceConnection session, Queue<Packet> results,
-			Map<String, Object> settings)
-			throws NotAuthorizedException, TigaseDBException {
-		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Broadcasting probes for: " + session);
-		}
-
-		// Probe is always broadcasted with initial presence
-		Element presInit = session.getPresence();
-		Element presProbe = new Element(PRESENCE_ELEMENT_NAME);
-
-		presProbe.setXMLNS(XMLNS);
-		presProbe.setAttribute("type", StanzaType.probe.toString());
-		presProbe.setAttribute("from", session.getBareJID().toString());
-
-//  String[] buddies = roster_util.getBuddies(session, TO_SUBSCRIBED, false);
-		// We send presence probe to TO_SUBSCRIBED and initial presence to
-		// FROM_SUBSCRIBED. Most of buddies however are BOTH. So as optimalization
-		// Let's process BOTH first and then TO_ONLY and FROM_ONLY separately
-		JID[] buddies = roster_util.getBuddies(session, SUB_BOTH);
-
-		buddies = DynamicRoster.addBuddies(session, settings, buddies);
-
-		if (buddies != null) {
-			for (JID buddy : buddies) {
-				if (requiresPresenceSending(buddy, session)) {
-					if (log.isLoggable(Level.FINEST)) {
-						log.finest("Sending probe and intial to: " + buddy);
-					}
-
-					sendPresence(null, null, buddy, results, presProbe);
-					sendPresence(null, null, buddy, results, presInit);
-				}
-			}    // end of for (String buddy: buddies)
-		}      // end of if (buddies == null)
-
-		JID[] buddies_to = roster_util.getBuddies(session, SUB_TO);
-
-		if (buddies_to != null) {
-			for (JID buddy : buddies_to) {
-				if (requiresPresenceSending(buddy, session)) {
-					if (log.isLoggable(Level.FINEST)) {
-						log.finest("Sending probe to: " + buddy);
-					}
-
-					sendPresence(null, null, buddy, results, presProbe);
-				}
-			}    // end of for (String buddy: buddies)
-		}      // end of if (buddies == null)
-
-		JID[] buddies_from = roster_util.getBuddies(session, SUB_FROM);
-
-		if (buddies_from != null) {
-			for (JID buddy : buddies_from) {
-				if (requiresPresenceSending(buddy, session)) {
-					if (log.isLoggable(Level.FINEST)) {
-						log.finest("Sending initial to: " + buddy);
-					}
-
-					sendPresence(null, null, buddy, results, presInit);
-				}
-			}    // end of for (String buddy: buddies)
-		}      // end of if (buddies == null)
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param session
-	 * @param repo
-	 * @param results
-	 * @param settings
-	 *
-	 * @throws XMPPException
-	 */
-	@SuppressWarnings({ "unchecked", "fallthrough" })
-	public static void process(final Packet packet, final XMPPResourceConnection session,
-			final NonAuthUserRepository repo, final Queue<Packet> results,
-				final Map<String, Object> settings)
-			throws XMPPException {
-
-		// Synchronization to avoid conflict with login/logout events
-		// processed in the SessionManager asynchronously
-		synchronized (session) {
-			try {
-				JID jid = session.getJID();
-				PresenceType pres_type = roster_util.getPresenceType(session, packet);
-
-				if (pres_type == null) {
-					log.warning("Invalid presence found: " + packet);
-
-					return;
-				}    // end of if (type == null)
-
-				StanzaType type = packet.getType();
-
-				if (type == null) {
-					type = StanzaType.available;
-				}    // end of if (type == null)
-
-				// Not needed anymore. Packet filter does it for all stanzas.
-				// // For all messages coming from the owner of this account set
-				// // proper 'from' attribute
-				// if (packet.getFrom().equals(session.getConnectionId())) {
-				// packet.getElement().setAttribute("from", session.getJID());
-				// } // end of if (packet.getFrom().equals(session.getConnectionId()))
-				if (log.isLoggable(Level.FINEST)) {
-					log.finest(pres_type + " presence found: " + packet);
-				}
-
-				// All 'in' subscription presences must have a valid from address
-				switch (pres_type) {
-					case in_unsubscribe :
-					case in_subscribe :
-					case in_unsubscribed :
-					case in_subscribed :
-						if (packet.getStanzaFrom() == null) {
-							if (log.isLoggable(Level.FINE)) {
-								log.fine("'in' subscription presence without valid 'from' address, "
-										+ "dropping packet: " + packet);
-							}
-
-							return;
-						}
-
-						if (session.isUserId(packet.getStanzaFrom().getBareJID())) {
-							if (log.isLoggable(Level.FINE)) {
-								log.fine("'in' subscription to myself, not allowed, returning "
-										+ "error for packet: " + packet);
-							}
-
-							results.offer(Authorization.NOT_ALLOWED.getResponseMessage(packet,
-									"You can not subscribe to yourself.", false));
-
-							return;
-						}
-
-						break;
-
-					case out_subscribe :
-					case out_unsubscribe :
-					case out_subscribed :
-					case out_unsubscribed :
-
-						// According to RFC 3921 draft bis-3, both source and destination
-						// addresses must be BareJIDs
-						// No need for that, initVars(...) takes care of that
-//          packet.getElement().setAttribute("from",
-//              session.getJID().copyWithoutResource().toString());
-//          packet.getElement().setAttribute("to",
-//              packet.getStanzaTo().copyWithoutResource().toString());
-						packet.initVars(session.getJID().copyWithoutResource(),
-								packet.getStanzaTo().copyWithoutResource());
-
-						break;
-
-					default :
-						break;
-				}
-
-				boolean subscr_changed = false;
-
-				switch (pres_type) {
-					case out_initial :
-
-						// Is it direct presence to some entity on the network?
-						if (packet.getStanzaTo() != null) {
-
-							// Yes this is it, send direct presence
-							if (session.isAnonymous()) {
-								outInitialAnonymous(packet, session, results);
-							}
-
-							results.offer(packet.copyElementOnly());
-
-							// If this is unavailable presence, remove jid from Set
-							// otherwise add it to the Set
-							if (packet.getType() == StanzaType.unavailable) {
-								removeDirectPresenceJID(packet.getStanzaTo(), session);
-							} else {
-								addDirectPresenceJID(packet.getStanzaTo(), session);
-							}
-						} else {
-							boolean first = false;
-
-							if (session.getPresence() == null) {
-								first = true;
-							}
-
-							// Set a correct from attribute
-							// No need for that, initVars(...) takes care of that
-							// packet.getElement().setAttribute("from", jid.toString());
-							packet.initVars(jid, packet.getStanzaTo());
-
-							// Store user presence for later time...
-							// To send response to presence probes for example.
-							session.setPresence(packet.getElement());
-
-							// Special actions on the first availability presence
-							if (type == StanzaType.available) {
-								if (first) {
-
-									// Send presence probes to 'to' or 'both' contacts
-									broadcastProbe(session, results, settings);
-
-									// Resend pending in subscription requests
-									resendPendingInRequests(session, results);
-
-									// Broadcast initial presence to 'from' or 'both' contacts
-//                sendPresenceBroadcast(type, session, FROM_SUBSCRIBED,
-//                        results, packet.getElement(), settings, false);
-									// These below broadcast is handled by presenceProbe method
-									// to improve buddy checks....
-//                sendPresenceBroadcast(type, session, FROM_SUBSCRIBED,
-//                        results, packet.getElement(), settings);
-								} else {
-
-									// Broadcast initial presence to 'from' or 'both' contacts
-//                sendPresenceBroadcast(type, session, FROM_SUBSCRIBED,
-//                        results, packet.getElement(), settings, false);
-									sendPresenceBroadcast(type, session, FROM_SUBSCRIBED, results,
-											packet.getElement(), settings);
-								}
-							}
-
-							// Broadcast initial presence to other available user resources
-							// Element presence = packet.getElement().clone();
-							// Already done above, don't need to set it again here
-							// presence.setAttribute("from", session.getJID());
-							updateUserResources(packet.getElement(), session, results);
-						}
-
-						break;
-
-					case out_subscribe :
-					case out_unsubscribe :
-
-						// According to RFC-3921 I must forward all these kind presence
-						// requests, it allows to resynchronize
-						// subscriptions in case of synchronization loss
-						forwardPresence(results, packet, session.getJID().copyWithoutResource());
-
-						if (pres_type == PresenceType.out_subscribe) {
-							SubscriptionType current_subscription =
-								roster_util.getBuddySubscription(session, packet.getStanzaTo());
-
-							if (current_subscription == null) {
-								roster_util.addBuddy(session, packet.getStanzaTo(), null, null, null);
-							}    // end of if (current_subscription == null)
-						}
-
-						subscr_changed = roster_util.updateBuddySubscription(session, pres_type,
-								packet.getStanzaTo());
-
-						if (subscr_changed) {
-							roster_util.updateBuddyChange(session, results,
-									roster_util.getBuddyItem(session, packet.getStanzaTo()));
-						}    // end of if (subscr_changed)
-
-						break;
-
-					case out_subscribed :
-					case out_unsubscribed :
-
-						// According to RFC-3921 I must forward all these kind presence
-						// requests, it allows to resynchronize
-						// subscriptions in case of synchronization loss
-						forwardPresence(results, packet, session.getJID().copyWithoutResource());
-
-						JID buddy = packet.getStanzaTo().copyWithoutResource();
-
-						subscr_changed = roster_util.updateBuddySubscription(session, pres_type, buddy);
-
-						if (subscr_changed) {
-							roster_util.updateBuddyChange(session, results,
-									roster_util.getBuddyItem(session, buddy));
-
-							if (pres_type == PresenceType.out_subscribed) {
-								Element presence = session.getPresence();
-								JID from = (presence == null ? session.getJID() : null);
-
-								sendPresence(StanzaType.available, from, buddy, results, presence);
-							} else {
-								sendPresence(StanzaType.unavailable, session.getJID(), buddy, results, null);
-							}
-						}    // end of if (subscr_changed)
-
-						break;
-
-					case in_initial :
-
-//          if (session.getPresence() == null) {
-//            // If the user has not yet sent initial presence then ignore
-//            // the probe.
-//            return;
-//          }
-						if (packet.getStanzaFrom() == null) {
-
-							// That really happened already. It looks like a bug in tigase
-							// let's try to catch it here....
-							log.warning("Initial presence without from attribute set: " + packet);
-
-							return;
-						}
-
-						// If this is a direct presence to a resource which is already gone
-						// Ignore it.
-						String resource = packet.getStanzaTo().getResource();
-
-						if ((resource != null) &&!resource.isEmpty()) {
-							XMPPResourceConnection direct =
-								session.getParentSession().getResourceForResource(resource);
-
-							if (direct != null) {
-								if (log.isLoggable(Level.FINEST)) {
-									log.finest("Received direct presence from: " + packet.getStanzaFrom()
-											+ " to: " + packet.getStanzaTo());
-								}
-
-								// Send a direct presence to correct resource, otherwise ignore
-								Packet result = packet.copyElementOnly();
-
-								result.setPacketTo(direct.getConnectionId());
-								result.setPacketFrom(packet.getTo());
-								results.offer(result);
-							} else {
-								if (log.isLoggable(Level.FINEST)) {
-									log.finest("Ignoring direct presence from: " + packet.getStanzaFrom()
-											+ " to: " + packet.getStanzaTo() + ", resource gone.");
-								}
-							}
-
-							break;
-						}
-
-						JID presBuddy = packet.getStanzaFrom().copyWithoutResource();
-
-						// If other users are in 'to' or 'both' contacts, broadcast
-						// their preseces to all active resources
-						if (roster_util.isSubscribedTo(session, presBuddy)
-								|| (DynamicRoster.getBuddyItem(session, settings, presBuddy) != null)
-
-//          ||
-//          // This might be just unsubscribed buddy
-//          (roster_util.isBuddyOnline(session, presBuddy))
-						) {
-							boolean online = StanzaType.unavailable != packet.getType();
-
-							if (log.isLoggable(Level.FINEST)) {
-								log.finest("Received initial presence, setting buddy: "
-										+ packet.getStanzaFrom() + " online status to: " + online);
-							}
-
-//            if (online && !roster_util.isBuddyOnline(session, presBuddy)) {
-//              // The buddy wasn't online before so it needs our presence too
-//              for (XMPPResourceConnection conn : session.getActiveSessions()) {
-//                try {
-//                Element pres = (Element) conn.getPresence();
-//                if (pres != null) {
-//                  if (log.isLoggable(Level.FINEST)) {
-//                    log.finest("Received presence from a new buddy, sending presence to: " +
-//                            packet.getElemFrom());
-//                  }
-//                  sendPresence(null, conn.getJID(),
-//                    JIDUtils.getNodeID(packet.getElemFrom()), results, pres);
-//                }
-//              }
-//            }
-							updatePresenceChange(packet, session, results);
-
-							// roster_util.setBuddyOnline(session, packet.getElemFrom(), online);
-						} else {
-
-							// The code below looks like a bug to me.
-							// If the buddy is not subscribed I should ignore all presences
-							// states from him. Commenting this out for now....
-							// Well, it is not a bug and it is intentional.
-							// All presences received from MUC come from not subscribed buddies
-							// therefore it seems presences from unknown buddy should be passed out
-							// Hm, commenting out again, direct presence is handled elsewhere
-//            if (log.isLoggable(Level.FINEST)) {
-//              log.finest("Received presence from unsubscribed: " + packet.getElemFrom());
-//            }
-//            Element elem = packet.getElement().clone();
-//            Packet result = new Packet(elem);
-//            result.setTo(session.getConnectionId());
-//            result.setFrom(packet.getTo());
-//            results.offer(result);
-						}
-
-						break;
-
-					case in_subscribe :
-
-						// If the buddy is already subscribed then auto-reply with sybscribed
-						// presence stanza.
-						if (roster_util.isSubscribedFrom(session, packet.getStanzaFrom())) {
-							sendPresence(StanzaType.subscribed, session.getJID().copyWithoutResource(),
-									packet.getStanzaFrom(), results, null);
-						} else {
-							SubscriptionType curr_sub = roster_util.getBuddySubscription(session,
-								packet.getStanzaFrom());
-
-							if (curr_sub == null) {
-								curr_sub = SubscriptionType.none;
-								roster_util.addBuddy(session, packet.getStanzaFrom(), null, null, null);
-							}    // end of if (curr_sub == null)
-
-							roster_util.updateBuddySubscription(session, pres_type, packet.getStanzaFrom());
-							updatePresenceChange(packet, session, results);
-						}      // end of else
-
-						// We can't know that actually, this might come from offline storage
-						// roster_util.setBuddyOnline(session, packet.getElemFrom(), true);
-						break;
-
-					case in_unsubscribe :
-						subscr_changed = roster_util.updateBuddySubscription(session, pres_type,
-								packet.getStanzaFrom());
-
-						if (subscr_changed) {
-
-							// No longer needed according to RFC-3921-bis5
-							// sendPresence(StanzaType.unsubscribed, session.getJID(), packet.getElemFrom(),
-							// results, null);
-							// updatePresenceChange(packet.getElement(), session, results);
-							roster_util.updateBuddyChange(session, results,
-									roster_util.getBuddyItem(session, packet.getStanzaFrom()));
-						}
-
-						break;
-
-					case in_subscribed : {
-						SubscriptionType curr_sub = roster_util.getBuddySubscription(session,
-							packet.getStanzaFrom());
-
-						if (curr_sub == null) {
-							curr_sub = SubscriptionType.none;
-							roster_util.addBuddy(session, packet.getStanzaFrom(), null, null, null);
-						}    // end of if (curr_sub == null)
-
-						subscr_changed = roster_util.updateBuddySubscription(session, pres_type,
-								packet.getStanzaFrom());
-
-						if (subscr_changed) {
-
-							// updatePresenceChange(packet.getElement(), session, results);
-							roster_util.updateBuddyChange(session, results,
-									roster_util.getBuddyItem(session, packet.getStanzaFrom()));
-						}
-
-						// We can't know that actually, this might come from offline storage
-						// roster_util.setBuddyOnline(session, packet.getElemFrom(), true);
-					}
-
-					break;
-
-					case in_unsubscribed : {
-						SubscriptionType curr_sub = roster_util.getBuddySubscription(session,
-							packet.getStanzaFrom());
-
-						if (curr_sub != null) {
-							subscr_changed = roster_util.updateBuddySubscription(session, pres_type,
-									packet.getStanzaFrom());
-
-							if (subscr_changed) {
-
-								// No longer needed according to RFC-3921-bis5
-								// updatePresenceChange(packet.getElement(), session, results);
-								roster_util.updateBuddyChange(session, results,
-										roster_util.getBuddyItem(session, packet.getStanzaFrom()));
-							}
-						}
-					}
-
-					break;
-
-					case in_probe :
-						if (session.getPresence() == null) {
-
-							// If the user has not yet sent initial presence then ignore
-							// the probe.
-							return;
-						}
-
-						SubscriptionType buddy_subscr = null;
-
-						if (DynamicRoster.getBuddyItem(session, settings, packet.getStanzaFrom())
-								!= null) {
-							buddy_subscr = SubscriptionType.both;
-						} else {
-							buddy_subscr = roster_util.getBuddySubscription(session, packet.getStanzaFrom());
-						}
-
-						if (buddy_subscr == null) {
-							buddy_subscr = SubscriptionType.none;
-						}    // end of if (buddy_subscr == null)
-
-						switch (buddy_subscr) {
-							case none :
-							case none_pending_out :
-							case to :
-								results.offer(Authorization.FORBIDDEN.getResponseMessage(packet,
-										"Presence information is forbidden.", false));
-
-								break;
-
-							case none_pending_in :
-							case none_pending_out_in :
-							case to_pending_in :
-								results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-										"You are not authorized to get presence information.", false));
-
-								break;
-
-							default :
-								break;
-						}    // end of switch (buddy_subscr)
-
-						if (roster_util.isSubscribedFrom(buddy_subscr)) {
-							if (log.isLoggable(Level.FINEST)) {
-								log.finest("Received probe, setting buddy: " + packet.getStanzaFrom()
-										+ " as online.");
-							}
-
-//            roster_util.setBuddyOnline(session, packet.getElemFrom(), true);
-							for (XMPPResourceConnection conn : session.getActiveSessions()) {
-								try {
-									Element pres = conn.getPresence();
-
-									if (pres != null) {
-										sendPresence(null, null, packet.getStanzaFrom().copyWithoutResource(),
-												results, pres);
-
-										if (log.isLoggable(Level.FINEST)) {
-											log.finest("Received probe, sending presence response to: "
-													+ packet.getStanzaFrom());
-										}
-									}
-								} catch (Exception e) {
-
-									// It might be quite possible that one of the user connections
-									// is in state not allowed for sending presence, in such a case
-									// none of user connections would receive presence.
-									// This catch is to make sure all other resources receive notification.
-								}
-							}
-						}    // end of if (roster_util.isSubscribedFrom(session, packet.getElemFrom()))
-
-						break;
-
-					case error : {
-
-						// This is message to 'this' client probably
-						// Only error responses to DIRECT presence should be sent back
-						// to the client, all other should be ignored for now.
-						// Later on the Tigase should remember who responded with
-						// an error and don't send presence updates to this entity
-						Set<JID> direct_presences = (Set<JID>) session.getSessionData(DIRECT_PRESENCE);
-
-						if ((direct_presences != null)
-								&& direct_presences.contains(packet.getStanzaFrom())) {
-							Packet result = packet.copyElementOnly();
-
-							result.setPacketTo(session.getConnectionId());
-							result.setPacketFrom(packet.getTo());
-							results.offer(result);
-						} else {
-
-							// Ignore for now....
-						}
-					}
-
-					break;
-
-					default :
-						results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
-								"Request type is incorrect", false));
-
-						break;
-				}    // end of switch (type)
-			} catch (NotAuthorizedException e) {
-				log.info("Can not access user Roster, user session is not authorized yet: " + packet);
-				log.log(Level.FINEST, "presence problem...", e);
-
-//      results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-//          "You must authorize session first.", true));
-			} catch (TigaseDBException e) {
-				log.warning("Error accessing database for presence data: " + e);
-			}      // end of try-catch
+			log.log(Level.FINEST, "Added direct presence jid: {0}", jid);
 		}
 	}
 
@@ -746,40 +149,6 @@ public abstract class Presence {
 
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Added direct presence jid: " + jid);
-		}
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 * @param results
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
-	public static void resendPendingInRequests(XMPPResourceConnection session,
-			Queue<Packet> results)
-			throws NotAuthorizedException, TigaseDBException {
-
-//  String[] buddies = roster_util.getBuddies(session, RosterAbstract.PENDING_IN,
-//          false);
-		JID[] buddies = roster_util.getBuddies(session, RosterAbstract.PENDING_IN);
-
-		if (buddies != null) {
-			for (JID buddy : buddies) {
-				Element presence = new Element(PRESENCE_ELEMENT_NAME);
-
-				presence.setAttribute("type", StanzaType.subscribe.toString());
-
-				// presence.setAttribute("from", buddy.toString());
-				presence.setXMLNS(XMLNS);
-
-				Packet pres = Packet.packetInstance(presence, buddy, null);
-
-				updatePresenceChange(pres, session, results);
-			}
 		}
 	}
 
@@ -850,107 +219,16 @@ public abstract class Presence {
 			Packet packet = Packet.packetInstance(presence);
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Sending presence info: " + packet);
+				log.log(Level.FINEST, "Sending presence info: {0}", packet);
 			}
 
 			results.offer(packet);
 		} catch (TigaseStringprepException ex) {
-			log.warning("Packet stringprep addressing problem, skipping presence send: " + presence);
+			log.log(Level.WARNING,
+					"Packet stringprep addressing problem, skipping presence send: {0}", presence);
 		}
 
 //  }
-	}
-
-	/**
-	 * <code>sendPresenceBroadcast</code> method broadcasts given presence
-	 * to all budies from roster and to all users to which direct presence
-	 * was sent.
-	 *
-	 * @param t a <code>StanzaType</code> value
-	 * @param session a <code>XMPPResourceConnection</code> value
-	 * @param subscrs
-	 * @param results
-	 * @param pres an <code>Element</code> value
-	 * @param settings
-	 * @exception NotAuthorizedException if an error occurs
-	 * @throws TigaseDBException
-	 */
-	public static void sendPresenceBroadcast(StanzaType t, XMPPResourceConnection session,
-			EnumSet<SubscriptionType> subscrs, Queue<Packet> results, Element pres,
-
-//final Map<String, Object> settings, boolean onlineOnly)
-	Map<String, Object> settings) throws NotAuthorizedException, TigaseDBException {
-
-		// String from = session.getJID();
-//  String[] buddies = roster_util.getBuddies(session, subscrs, onlineOnly);
-		JID[] buddies = roster_util.getBuddies(session, subscrs);
-
-		buddies = DynamicRoster.addBuddies(session, settings, buddies);
-
-		if (buddies != null) {
-			for (JID buddy : buddies) {
-				if (requiresPresenceSending(buddy, session)) {
-					sendPresence(t, null, buddy, results, pres);
-				}
-			}    // end of for (String buddy: buddies)
-		}      // end of if (buddies == null)
-
-		broadcastDirectPresences(t, session, results, pres);
-	}
-
-	/**
-	 * <code>stopped</code> method is called when user disconnects or logs-out.
-	 *
-	 * @param session a <code>XMPPResourceConnection</code> value
-	 * @param results
-	 * @param settings
-	 */
-	@SuppressWarnings({ "unchecked" })
-	public static void stopped(XMPPResourceConnection session, Queue<Packet> results,
-			Map<String, Object> settings) {
-
-		// Synchronization to avoid conflict with login/logout events
-		// processed in the SessionManager asynchronously
-		synchronized (session) {
-
-			// According to the spec and logic actually offline status should
-			// not be broadcasted if initial presence was not sent by the client.
-			try {
-				if (session.getPresence() != null) {
-					broadcastOffline(session, results, settings);
-					updateOfflineChange(session, results);
-				} else {
-					broadcastDirectPresences(StanzaType.unavailable, session, results, null);
-				}
-			} catch (NotAuthorizedException e) {
-
-				// Do nothing, it may happen quite often when the user disconnects before
-				// it authenticates
-			} catch (TigaseDBException e) {
-				log.warning("Error accessing database for offline message: " + e);
-			}    // end of try-catch
-
-			if (session.isAnonymous()) {
-				Set<JID> direct_presences = (Set<JID>) session.getSessionData(DIRECT_PRESENCE);
-
-				if (direct_presences != null) {
-					try {
-						for (JID buddy : direct_presences) {
-							JID peer = buddy.copyWithoutResource();
-							Packet roster_update = Iq.createRosterPacket("set", session.nextStanzaId(),
-								peer, peer, session.getJID().copyWithoutResource(), null, null, "remove",
-								JabberIqRoster.ANON);
-
-							results.offer(roster_update);
-						}    // end of for (String buddy: buddies)
-					} catch (NotAuthorizedException e) {
-						if (log.isLoggable(Level.FINEST)) {
-							log.finest("Anonymous user has logged out already: " + session);
-						}
-					}
-				}        // end of if (direct_presence != null)
-			}
-		}
 	}
 
 	/**
@@ -1027,7 +305,7 @@ public abstract class Presence {
 		for (XMPPResourceConnection conn : session.getActiveSessions()) {
 			try {
 				if (log.isLoggable(Level.FINER)) {
-					log.finer("Update presence change to: " + conn.getJID());
+					log.log(Level.FINER, "Update presence change to: {0}", conn.getJID());
 				}
 
 				if ((conn != session) && conn.isResourceSet()) {
@@ -1035,9 +313,9 @@ public abstract class Presence {
 					// Send to old resource presence about new resource
 					Element pres_update = presence.clone();
 
-					pres_update.setAttribute("from", session.getJID().toString());
-					pres_update.setAttribute("to", conn.getBareJID().toString());
-
+					// Below settings are applied by packetInstance(...) method a few lines later
+//        pres_update.setAttribute("from", session.getJID().toString());
+//        pres_update.setAttribute("to", conn.getBareJID().toString());
 					Packet pack_update = Packet.packetInstance(pres_update, session.getJID(),
 						conn.getJID().copyWithoutResource());
 
@@ -1091,6 +369,119 @@ public abstract class Presence {
 		}      // end of if (direct_presence != null)
 	}
 
+	protected static void forwardPresence(Queue<Packet> results, Packet packet, JID from) {
+		Element result = packet.getElement().clone();
+
+		// Not needed anymore. Packet filter does it for all stanzas.
+		// According to spec we must set proper FROM attribute
+		// Yes, but packet filter puts full JID and we need a subscription
+		// presence without resource here.
+		result.setAttribute("from", from.toString());
+
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "\n\nFORWARD presence: {0}", result.toString());
+		}
+
+		results.offer(Packet.packetInstance(result, from, packet.getStanzaTo()));
+	}
+
+	protected static void outInitialAnonymous(Packet packet, XMPPResourceConnection session,
+			Queue<Packet> results)
+			throws NotAuthorizedException {
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Anonymous session: {0}", session);
+		}
+
+		JID peer = packet.getStanzaTo().copyWithoutResource();
+		String nick = packet.getElemCData("/presence/nick");
+
+		if (nick == null) {
+			nick = session.getUserName();
+		}
+
+		Packet rost_update = Iq.createRosterPacket("set", session.nextStanzaId(), peer, peer,
+			session.getJID().copyWithoutResource(), nick, new String[] { "Anonymous peers" }, null,
+			JabberIqRoster.ANON);
+
+		results.offer(rost_update);
+
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Sending roster update: {0}", rost_update);
+		}
+	}
+
+	/**
+	 * <code>updateOfflineChange</code> method broadcast off-line presence
+	 * to all other user active resources.
+	 *
+	 * @param session a <code>XMPPResourceConnection</code> value
+	 * @param results
+	 * @exception NotAuthorizedException if an error occurs
+	 */
+	protected static void updateOfflineChange(XMPPResourceConnection session,
+			Queue<Packet> results)
+			throws NotAuthorizedException {
+		for (XMPPResourceConnection conn : session.getActiveSessions()) {
+			try {
+				if (log.isLoggable(Level.FINER)) {
+					log.log(Level.FINER, "Update presence change to: {0}", conn.getJID());
+				}
+
+				if ((conn != session) && (conn.getResource() != null)
+						&&!conn.getResource().equals(session.getResource())) {
+
+					// Send to old resource presence about new resource
+					Element pres_update = new Element(PRESENCE_ELEMENT_NAME);
+
+					// Below is set also by packetInstance method.
+//        pres_update.setAttribute("from", session.getJID().toString());
+//        pres_update.setAttribute("to", conn.getBareJID().toString());
+					pres_update.setAttribute("type", StanzaType.unavailable.toString());
+					pres_update.setXMLNS(XMLNS);
+
+					Packet pack_update = Packet.packetInstance(pres_update, session.getJID(),
+						conn.getJID().copyWithoutResource());
+
+					pack_update.setPacketTo(conn.getConnectionId());
+					results.offer(pack_update);
+				} else {
+					if (log.isLoggable(Level.FINER)) {
+						log.log(Level.FINER, "Skipping presence update to: {0}", conn.getJID());
+					}
+				}    // end of else
+			} catch (Exception e) {
+
+				// It might be quite possible that one of the user connections
+				// is in state not allowed for sending presence, in such a case
+				// none of user connections would receive presence.
+				// This catch is to make sure all other resources receive notification.
+			}
+		}        // end of for (XMPPResourceConnection conn: sessions)
+	}
+
+	private static boolean requiresPresenceSending(JID buddy, XMPPResourceConnection session) {
+		String buddy_domain = buddy.getDomain();
+		boolean result = !runtime.hasCompleteJidsInfo()
+			||!session.isLocalDomain(buddy_domain, false) || runtime.isJidOnline(buddy);
+
+		if (log.isLoggable(Level.FINEST)) {
+			if (result) {
+				++requiredYes;
+			} else {
+				++requiredNo;
+			}
+
+			log.finest("Yes/No: " + requiredYes + " / " + requiredNo + ", buddy: " + buddy
+					+ ", result=" + result + ", !runtime.hasCompleteJidsInfo()="
+						+ !runtime.hasCompleteJidsInfo()
+							+ ", !session.isLocalDomain(buddy_domain, false)="
+								+ !session.isLocalDomain(buddy_domain, false)
+									+ ", runtime.isJidOnline(buddy)=" + runtime.isJidOnline(buddy));
+		}
+
+		return result;
+	}
+
 	/**
 	 * <code>sendPresenceBroadcast</code> method broadcasts given presence
 	 * to all budies from roster and to all users to which direct presence
@@ -1102,8 +493,462 @@ public abstract class Presence {
 	 * @exception NotAuthorizedException if an error occurs
 	 * @throws TigaseDBException
 	 */
-	protected static void broadcastOffline(XMPPResourceConnection session,
-			Queue<Packet> results, Map<String, Object> settings)
+	public void broadcastProbe(XMPPResourceConnection session, Queue<Packet> results,
+			Map<String, Object> settings)
+			throws NotAuthorizedException, TigaseDBException {
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Broadcasting probes for: {0}", session);
+		}
+
+		// Probe is always broadcasted with initial presence
+		Element presInit = session.getPresence();
+		Element presProbe = new Element(PRESENCE_ELEMENT_NAME);
+
+		presProbe.setXMLNS(XMLNS);
+		presProbe.setAttribute("type", StanzaType.probe.toString());
+		presProbe.setAttribute("from", session.getBareJID().toString());
+
+//  String[] buddies = roster_util.getBuddies(session, TO_SUBSCRIBED, false);
+		// We send presence probe to TO_SUBSCRIBED and initial presence to
+		// FROM_SUBSCRIBED. Most of buddies however are BOTH. So as optimalization
+		// Let's process BOTH first and then TO_ONLY and FROM_ONLY separately
+		JID[] buddies = roster_util.getBuddies(session, SUB_BOTH);
+
+		buddies = DynamicRoster.addBuddies(session, settings, buddies);
+
+		if (buddies != null) {
+			for (JID buddy : buddies) {
+				if (requiresPresenceSending(buddy, session)) {
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "Sending probe and intial to: {0}", buddy);
+					}
+
+					sendPresence(null, null, buddy, results, presProbe);
+					sendPresence(null, null, buddy, results, presInit);
+				}
+			}    // end of for (String buddy: buddies)
+		}      // end of if (buddies == null)
+
+		JID[] buddies_to = roster_util.getBuddies(session, SUB_TO);
+
+		if (buddies_to != null) {
+			for (JID buddy : buddies_to) {
+				if (requiresPresenceSending(buddy, session)) {
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "Sending probe to: {0}", buddy);
+					}
+
+					sendPresence(null, null, buddy, results, presProbe);
+				}
+			}    // end of for (String buddy: buddies)
+		}      // end of if (buddies == null)
+
+		JID[] buddies_from = roster_util.getBuddies(session, SUB_FROM);
+
+		if (buddies_from != null) {
+			for (JID buddy : buddies_from) {
+				if (requiresPresenceSending(buddy, session)) {
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "Sending initial to: {0}", buddy);
+					}
+
+					sendPresence(null, null, buddy, results, presInit);
+				}
+			}    // end of for (String buddy: buddies)
+		}      // end of if (buddies == null)
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public int concurrentQueuesNo() {
+		return Runtime.getRuntime().availableProcessors() * 2;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public int concurrentThreadsPerQueue() {
+
+		// Packet processing order does matter for roster/presence therefore
+		// we need a single thread for each queue.
+		return 1;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public String id() {
+		return ID;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param packet
+	 * @param session
+	 * @param repo
+	 * @param results
+	 * @param settings
+	 *
+	 * @throws XMPPException
+	 */
+	@SuppressWarnings({ "unchecked", "fallthrough" })
+	@Override
+	public void process(final Packet packet, final XMPPResourceConnection session,
+			final NonAuthUserRepository repo, final Queue<Packet> results,
+				final Map<String, Object> settings)
+			throws XMPPException {
+		if (session == null) {
+			if (log.isLoggable(Level.FINE)) {
+				log.log(Level.FINE, "Session is null, ignoring packet: {0}", packet);
+			}
+
+			return;
+		}    // end of if (session == null)
+
+		if ( !session.isAuthorized()) {
+			if (log.isLoggable(Level.FINE)) {
+				log.log(Level.FINE, "Session is not authorized, ignoring packet: {0}", packet);
+			}
+
+			return;
+		}
+
+		// Synchronization to avoid conflict with login/logout events
+		// processed in the SessionManager asynchronously
+		synchronized (session) {
+			try {
+				PresenceType pres_type = roster_util.getPresenceType(session, packet);
+
+				if (pres_type == null) {
+					log.log(Level.WARNING, "Invalid presence found: {0}", packet);
+
+					return;
+				}    // end of if (type == null)
+
+				StanzaType type = packet.getType();
+
+				if (type == null) {
+					type = StanzaType.available;
+				}    // end of if (type == null)
+
+				// Not needed anymore. Packet filter does it for all stanzas.
+				// // For all messages coming from the owner of this account set
+				// // proper 'from' attribute
+				// if (packet.getFrom().equals(session.getConnectionId())) {
+				// packet.getElement().setAttribute("from", session.getJID());
+				// } // end of if (packet.getFrom().equals(session.getConnectionId()))
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "{0} presence found: {1}", new Object[] { pres_type, packet });
+				}
+
+				// All 'in' subscription presences must have a valid from address
+				switch (pres_type) {
+					case in_unsubscribe :
+					case in_subscribe :
+					case in_unsubscribed :
+					case in_subscribed :
+						if (packet.getStanzaFrom() == null) {
+							if (log.isLoggable(Level.FINE)) {
+								log.fine("'in' subscription presence without valid 'from' address, "
+										+ "dropping packet: " + packet);
+							}
+
+							return;
+						}
+
+						if (session.isUserId(packet.getStanzaFrom().getBareJID())) {
+							if (log.isLoggable(Level.FINE)) {
+								log.log(Level.FINE,
+										"''in'' subscription to myself, not allowed, returning "
+											+ "error for packet: " + "{0}", packet);
+							}
+
+							results.offer(Authorization.NOT_ALLOWED.getResponseMessage(packet,
+									"You can not subscribe to yourself.", false));
+
+							return;
+						}
+
+						break;
+
+					case out_subscribe :
+					case out_unsubscribe :
+					case out_subscribed :
+					case out_unsubscribed :
+
+						// Check wheher the destination address is correct to prevent
+						// broken/corrupted roster entries:
+						if ((packet.getStanzaTo() == null) || packet.getStanzaTo().toString().isEmpty()) {
+							results.offer(Authorization.JID_MALFORMED.getResponseMessage(packet,
+									"The destination address is incorrect.", false));
+
+							return;
+						}
+
+						// According to RFC 3921 draft bis-3, both source and destination
+						// addresses must be BareJIDs
+						// No need for that, initVars(...) takes care of that
+//          packet.getElement().setAttribute("from",
+//              session.getJID().copyWithoutResource().toString());
+//          packet.getElement().setAttribute("to",
+//              packet.getStanzaTo().copyWithoutResource().toString());
+						packet.initVars(session.getJID().copyWithoutResource(),
+								packet.getStanzaTo().copyWithoutResource());
+
+						break;
+
+					default :
+						break;
+				}
+
+				switch (pres_type) {
+					case out_initial :
+						processOutInitial(packet, session, results, settings, pres_type);
+
+						break;
+
+					case out_subscribe :
+					case out_unsubscribe :
+						processOutSubscribe(packet, session, results, settings, pres_type);
+
+						break;
+
+					case out_subscribed :
+					case out_unsubscribed :
+						processOutSubscribed(packet, session, results, settings, pres_type);
+
+						break;
+
+					case in_initial :
+						processInInitial(packet, session, results, settings, pres_type);
+
+						break;
+
+					case in_subscribe :
+						processInSubscribe(packet, session, results, settings, pres_type);
+
+						break;
+
+					case in_unsubscribe :
+						processInUnsubscribe(packet, session, results, settings, pres_type);
+
+						break;
+
+					case in_subscribed :
+						processInSubscribed(packet, session, results, settings, pres_type);
+
+						break;
+
+					case in_unsubscribed :
+						processInUnsubscribed(packet, session, results, settings, pres_type);
+
+						break;
+
+					case in_probe :
+						processInProbe(packet, session, results, settings, pres_type);
+
+						break;
+
+					case error :
+						processError(packet, session, results, settings, pres_type);
+
+						break;
+
+					default :
+						results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
+								"Request type is incorrect", false));
+
+						break;
+				}    // end of switch (type)
+			} catch (NotAuthorizedException e) {
+				log.log(Level.INFO,
+						"Can not access user Roster, user session is not authorized yet: {0}", packet);
+				log.log(Level.FINEST, "presence problem...", e);
+
+//      results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
+//          "You must authorize session first.", true));
+			} catch (TigaseDBException e) {
+				log.log(Level.WARNING, "Error accessing database for presence data: {0}", e);
+			}    // end of try-catch
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param results
+	 *
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	public void resendPendingInRequests(XMPPResourceConnection session, Queue<Packet> results)
+			throws NotAuthorizedException, TigaseDBException {
+
+//  String[] buddies = roster_util.getBuddies(session, RosterAbstract.PENDING_IN,
+//          false);
+		JID[] buddies = roster_util.getBuddies(session, RosterAbstract.PENDING_IN);
+
+		if (buddies != null) {
+			for (JID buddy : buddies) {
+				Element presence = new Element(PRESENCE_ELEMENT_NAME);
+
+				presence.setAttribute("type", StanzaType.subscribe.toString());
+
+				// presence.setAttribute("from", buddy.toString());
+				presence.setXMLNS(XMLNS);
+
+				Packet pres = Packet.packetInstance(presence, buddy, null);
+
+				updatePresenceChange(pres, session, results);
+			}
+		}
+	}
+
+	/**
+	 * <code>sendPresenceBroadcast</code> method broadcasts given presence
+	 * to all buddies from roster and to all users to which direct presence
+	 * was sent.
+	 *
+	 * @param t a <code>StanzaType</code> value
+	 * @param session a <code>XMPPResourceConnection</code> value
+	 * @param subscrs
+	 * @param results
+	 * @param pres an <code>Element</code> value
+	 * @param settings
+	 * @exception NotAuthorizedException if an error occurs
+	 * @throws TigaseDBException
+	 */
+	public void sendPresenceBroadcast(StanzaType t, XMPPResourceConnection session,
+			EnumSet<SubscriptionType> subscrs, Queue<Packet> results, Element pres,
+
+//final Map<String, Object> settings, boolean onlineOnly)
+	Map<String, Object> settings) throws NotAuthorizedException, TigaseDBException {
+
+		// String from = session.getJID();
+//  String[] buddies = roster_util.getBuddies(session, subscrs, onlineOnly);
+		JID[] buddies = roster_util.getBuddies(session, subscrs);
+
+		buddies = DynamicRoster.addBuddies(session, settings, buddies);
+
+		if (buddies != null) {
+			for (JID buddy : buddies) {
+				if (requiresPresenceSending(buddy, session)) {
+					sendPresence(t, null, buddy, results, pres);
+				}
+			}    // end of for (String buddy: buddies)
+		}      // end of if (buddies == null)
+
+		broadcastDirectPresences(t, session, results, pres);
+	}
+
+	/**
+	 * <code>stopped</code> method is called when user disconnects or logs-out.
+	 *
+	 * @param session a <code>XMPPResourceConnection</code> value
+	 * @param results
+	 * @param settings
+	 */
+	@SuppressWarnings({ "unchecked" })
+	@Override
+	public void stopped(XMPPResourceConnection session, Queue<Packet> results,
+			Map<String, Object> settings) {
+
+		// Synchronization to avoid conflict with login/logout events
+		// processed in the SessionManager asynchronously
+		synchronized (session) {
+
+			// According to the spec and logic actually offline status should
+			// not be broadcasted if initial presence was not sent by the client.
+			try {
+				if (session.getPresence() != null) {
+					broadcastOffline(session, results, settings);
+					updateOfflineChange(session, results);
+				} else {
+					broadcastDirectPresences(StanzaType.unavailable, session, results, null);
+				}
+			} catch (NotAuthorizedException e) {
+
+				// Do nothing, it may happen quite often when the user disconnects before
+				// it authenticates
+			} catch (TigaseDBException e) {
+				log.warning("Error accessing database for offline message: " + e);
+			}    // end of try-catch
+
+			if (session.isAnonymous()) {
+				Set<JID> direct_presences = (Set<JID>) session.getSessionData(DIRECT_PRESENCE);
+
+				if (direct_presences != null) {
+					try {
+						for (JID buddy : direct_presences) {
+							JID peer = buddy.copyWithoutResource();
+							Packet roster_update = Iq.createRosterPacket("set", session.nextStanzaId(),
+								peer, peer, session.getJID().copyWithoutResource(), null, null, "remove",
+								JabberIqRoster.ANON);
+
+							results.offer(roster_update);
+						}    // end of for (String buddy: buddies)
+					} catch (NotAuthorizedException e) {
+						if (log.isLoggable(Level.FINEST)) {
+							log.finest("Anonymous user has logged out already: " + session);
+						}
+					}
+				}        // end of if (direct_presence != null)
+			}
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public String[] supElements() {
+		return ELEMENTS;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public String[] supNamespaces() {
+		return XMLNSS;
+	}
+
+	/**
+	 * <code>sendPresenceBroadcast</code> method broadcasts given presence
+	 * to all budies from roster and to all users to which direct presence
+	 * was sent.
+	 *
+	 * @param session a <code>XMPPResourceConnection</code> value
+	 * @param results
+	 * @param settings
+	 * @exception NotAuthorizedException if an error occurs
+	 * @throws TigaseDBException
+	 */
+	protected void broadcastOffline(XMPPResourceConnection session, Queue<Packet> results,
+			Map<String, Object> settings)
 			throws NotAuthorizedException, TigaseDBException {
 		Element pres = session.getPresence();
 
@@ -1139,116 +984,431 @@ public abstract class Presence {
 		broadcastDirectPresences(StanzaType.unavailable, session, results, pres);
 	}
 
-	protected static void forwardPresence(Queue<Packet> results, Packet packet, JID from) {
-		Element result = packet.getElement().clone();
+	//~--- get methods ----------------------------------------------------------
 
-		// Not needed anymore. Packet filter does it for all stanzas.
-		// According to spec we must set proper FROM attribute
-		// Yes, but packet filter puts full JID and we need a subscription
-		// presence without resource here.
-		result.setAttribute("from", from.toString());
-
-		if (log.isLoggable(Level.FINEST)) {
-			log.finest("\n\nFORWARD presence: " + result.toString());
-		}
-
-		results.offer(Packet.packetInstance(result, from, packet.getStanzaTo()));
+	protected RosterAbstract getRosterUtil() {
+		return RosterFactory.getRosterImplementation(true);
 	}
 
-	protected static void outInitialAnonymous(Packet packet, XMPPResourceConnection session,
-			Queue<Packet> results)
-			throws NotAuthorizedException {
-		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Anonymous session: " + session);
-		}
+	//~--- methods --------------------------------------------------------------
 
-		JID peer = packet.getStanzaTo().copyWithoutResource();
-		String nick = packet.getElemCData("/presence/nick");
+	protected void processError(Packet packet, XMPPResourceConnection session,
+			Queue<Packet> results, Map<String, Object> settings, PresenceType presenceType)
+			throws NotAuthorizedException, TigaseDBException, NoConnectionIdException {
 
-		if (nick == null) {
-			nick = session.getUserName();
-		}
+		// This is message to 'this' client probably
+		// Only error responses to DIRECT presence should be sent back
+		// to the client, all other should be ignored for now.
+		// Later on the Tigase should remember who responded with
+		// an error and don't send presence updates to this entity
+		@SuppressWarnings("unchecked") Set<JID> direct_presences =
+			(Set<JID>) session.getSessionData(DIRECT_PRESENCE);
 
-		Packet rost_update = Iq.createRosterPacket("set", session.nextStanzaId(), peer, peer,
-			session.getJID().copyWithoutResource(), nick, new String[] { "Anonymous peers" }, null,
-			JabberIqRoster.ANON);
+		if ((direct_presences != null) && direct_presences.contains(packet.getStanzaFrom())) {
+			Packet result = packet.copyElementOnly();
 
-		results.offer(rost_update);
+			result.setPacketTo(session.getConnectionId());
+			result.setPacketFrom(packet.getTo());
+			results.offer(result);
+		} else {
 
-		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Sending roster update: " + rost_update);
+			// Ignore for now....
 		}
 	}
 
-	/**
-	 * <code>updateOfflineChange</code> method broadcast off-line presence
-	 * to all other user active resources.
-	 *
-	 * @param session a <code>XMPPResourceConnection</code> value
-	 * @param results
-	 * @exception NotAuthorizedException if an error occurs
-	 */
-	protected static void updateOfflineChange(XMPPResourceConnection session,
-			Queue<Packet> results)
-			throws NotAuthorizedException {
-		for (XMPPResourceConnection conn : session.getActiveSessions()) {
-			try {
-				if (log.isLoggable(Level.FINER)) {
-					log.finer("Update presence change to: " + conn.getJID());
+	protected void processInInitial(Packet packet, XMPPResourceConnection session,
+			Queue<Packet> results, Map<String, Object> settings, PresenceType presenceType)
+			throws NoConnectionIdException, NotAuthorizedException, TigaseDBException {
+		if (packet.getStanzaFrom() == null) {
+
+			// That really happened already. It looks like a bug in tigase
+			// let's try to catch it here....
+			log.log(Level.WARNING, "Initial presence without from attribute set: {0}", packet);
+
+			return;
+		}
+
+		// If this is a direct presence to a resource which is already gone
+		// Ignore it.
+		String resource = packet.getStanzaTo().getResource();
+
+		if ((resource != null) &&!resource.isEmpty()) {
+			XMPPResourceConnection direct =
+				session.getParentSession().getResourceForResource(resource);
+
+			if (direct != null) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "Received direct presence from: {0} to: {1}",
+							new Object[] { packet.getStanzaFrom(),
+							packet.getStanzaTo() });
 				}
 
-				if ((conn != session) && (conn.getResource() != null)
-						&&!conn.getResource().equals(session.getResource())) {
+				// Send a direct presence to correct resource, otherwise ignore
+				Packet result = packet.copyElementOnly();
 
-					// Send to old resource presence about new resource
-					Element pres_update = new Element(PRESENCE_ELEMENT_NAME);
-
-					pres_update.setAttribute("from", session.getJID().toString());
-					pres_update.setAttribute("to", conn.getBareJID().toString());
-					pres_update.setAttribute("type", StanzaType.unavailable.toString());
-					pres_update.setXMLNS(XMLNS);
-
-					Packet pack_update = Packet.packetInstance(pres_update, session.getJID(),
-						conn.getJID().copyWithoutResource());
-
-					pack_update.setPacketTo(conn.getConnectionId());
-					results.offer(pack_update);
-				} else {
-					if (log.isLoggable(Level.FINER)) {
-						log.finer("Skipping presence update to: " + conn.getJID());
-					}
-				}    // end of else
-			} catch (Exception e) {
-
-				// It might be quite possible that one of the user connections
-				// is in state not allowed for sending presence, in such a case
-				// none of user connections would receive presence.
-				// This catch is to make sure all other resources receive notification.
-			}
-		}        // end of for (XMPPResourceConnection conn: sessions)
-	}
-
-	private static boolean requiresPresenceSending(JID buddy, XMPPResourceConnection session) {
-		String buddy_domain = buddy.getDomain();
-		boolean result = !runtime.hasCompleteJidsInfo()
-			||!session.isLocalDomain(buddy_domain, false) || runtime.isJidOnline(buddy);
-
-		if (log.isLoggable(Level.FINEST)) {
-			if (result) {
-				++requiredYes;
+				result.setPacketTo(direct.getConnectionId());
+				result.setPacketFrom(packet.getTo());
+				results.offer(result);
 			} else {
-				++requiredNo;
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "Ignoring direct presence from: {0} to: {1}, resource gone.",
+							new Object[] { packet.getStanzaFrom(),
+							packet.getStanzaTo() });
+				}
 			}
 
-			log.finest("Yes/No: " + requiredYes + " / " + requiredNo + ", buddy: " + buddy
-					+ ", result=" + result + ", !runtime.hasCompleteJidsInfo()="
-						+ !runtime.hasCompleteJidsInfo()
-							+ ", !session.isLocalDomain(buddy_domain, false)="
-								+ !session.isLocalDomain(buddy_domain, false)
-									+ ", runtime.isJidOnline(buddy)=" + runtime.isJidOnline(buddy));
+			return;
 		}
 
-		return result;
+		JID presBuddy = packet.getStanzaFrom().copyWithoutResource();
+
+		// If other users are in 'to' or 'both' contacts, broadcast
+		// their preseces to all active resources
+		if (roster_util.isSubscribedTo(session, presBuddy)
+				|| (DynamicRoster.getBuddyItem(session, settings, presBuddy) != null)
+
+//  ||
+//  // This might be just unsubscribed buddy
+//  (roster_util.isBuddyOnline(session, presBuddy))
+		) {
+			boolean online = StanzaType.unavailable != packet.getType();
+
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST,
+						"Received initial presence, setting buddy: {0} online status to: {1}",
+							new Object[] { packet.getStanzaFrom(),
+						online });
+			}
+
+			updatePresenceChange(packet, session, results);
+
+			// roster_util.setBuddyOnline(session, packet.getElemFrom(), online);
+		} else {
+
+			// The code below looks like a bug to me.
+			// If the buddy is not subscribed I should ignore all presences
+			// states from him. Commenting this out for now....
+			// Well, it is not a bug and it is intentional.
+			// All presences received from MUC come from not subscribed buddies
+			// therefore it seems presences from unknown buddy should be passed out
+			// Hm, commenting out again, direct presence is handled elsewhere
+//    if (log.isLoggable(Level.FINEST)) {
+//      log.finest("Received presence from unsubscribed: " + packet.getElemFrom());
+//    }
+//    Element elem = packet.getElement().clone();
+//    Packet result = new Packet(elem);
+//    result.setTo(session.getConnectionId());
+//    result.setFrom(packet.getTo());
+//    results.offer(result);
+		}
+	}
+
+	protected void processInProbe(Packet packet, XMPPResourceConnection session,
+			Queue<Packet> results, Map<String, Object> settings, PresenceType presenceType)
+			throws NotAuthorizedException, TigaseDBException, PacketErrorTypeException {
+		if (session.getPresence() == null) {
+
+			// If the user has not yet sent initial presence then ignore
+			// the probe.
+			return;
+		}
+
+		SubscriptionType buddy_subscr = null;
+
+		if (DynamicRoster.getBuddyItem(session, settings, packet.getStanzaFrom()) != null) {
+			buddy_subscr = SubscriptionType.both;
+		} else {
+			buddy_subscr = roster_util.getBuddySubscription(session, packet.getStanzaFrom());
+		}
+
+		if (buddy_subscr == null) {
+			buddy_subscr = SubscriptionType.none;
+		}    // end of if (buddy_subscr == null)
+
+		switch (buddy_subscr) {
+			case none :
+			case none_pending_out :
+			case to :
+				results.offer(Authorization.FORBIDDEN.getResponseMessage(packet,
+						"Presence information is forbidden.", false));
+
+				break;
+
+			case none_pending_in :
+			case none_pending_out_in :
+			case to_pending_in :
+				results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
+						"You are not authorized to get presence information.", false));
+
+				break;
+
+			default :
+				break;
+		}    // end of switch (buddy_subscr)
+
+		if (roster_util.isSubscribedFrom(buddy_subscr)) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Received probe, setting buddy: {0} as online.",
+						packet.getStanzaFrom());
+			}
+
+//    roster_util.setBuddyOnline(session, packet.getElemFrom(), true);
+			for (XMPPResourceConnection conn : session.getActiveSessions()) {
+				try {
+					Element pres = conn.getPresence();
+
+					if (pres != null) {
+						sendPresence(null, null, packet.getStanzaFrom().copyWithoutResource(), results,
+								pres);
+
+						if (log.isLoggable(Level.FINEST)) {
+							log.log(Level.FINEST, "Received probe, sending presence response to: {0}",
+									packet.getStanzaFrom());
+						}
+					}
+				} catch (Exception e) {
+
+					// It might be quite possible that one of the user connections
+					// is in state not allowed for sending presence, in such a case
+					// none of user connections would receive presence.
+					// This catch is to make sure all other resources receive notification.
+				}
+			}
+		}    // end of if (roster_util.isSubscribedFrom(session, packet.getElemFrom()))
+	}
+
+	protected void processInSubscribe(Packet packet, XMPPResourceConnection session,
+			Queue<Packet> results, Map<String, Object> settings, PresenceType pres_type)
+			throws NotAuthorizedException, TigaseDBException, NoConnectionIdException {
+
+		// If the buddy is already subscribed then auto-reply with sybscribed
+		// presence stanza.
+		if (roster_util.isSubscribedFrom(session, packet.getStanzaFrom())) {
+			sendPresence(StanzaType.subscribed, session.getJID().copyWithoutResource(),
+					packet.getStanzaFrom(), results, null);
+		} else {
+			SubscriptionType curr_sub = roster_util.getBuddySubscription(session,
+				packet.getStanzaFrom());
+
+			if (curr_sub == null) {
+				curr_sub = SubscriptionType.none;
+				roster_util.addBuddy(session, packet.getStanzaFrom(), null, null, null);
+			}    // end of if (curr_sub == null)
+
+			roster_util.updateBuddySubscription(session, pres_type, packet.getStanzaFrom());
+			updatePresenceChange(packet, session, results);
+		}      // end of else
+
+		// We can't know that actually, this might come from offline storage
+		// roster_util.setBuddyOnline(session, packet.getElemFrom(), true);
+	}
+
+	protected void processInSubscribed(Packet packet, XMPPResourceConnection session,
+			Queue<Packet> results, Map<String, Object> settings, PresenceType pres_type)
+			throws NotAuthorizedException, TigaseDBException, NoConnectionIdException {
+		SubscriptionType curr_sub = roster_util.getBuddySubscription(session,
+			packet.getStanzaFrom());
+
+		if (curr_sub == null) {
+			curr_sub = SubscriptionType.none;
+			roster_util.addBuddy(session, packet.getStanzaFrom(), null, null, null);
+		}    // end of if (curr_sub == null)
+
+		boolean subscr_changed = roster_util.updateBuddySubscription(session, pres_type,
+			packet.getStanzaFrom());
+
+		if (subscr_changed) {
+
+			// updatePresenceChange(packet.getElement(), session, results);
+			roster_util.updateBuddyChange(session, results,
+					roster_util.getBuddyItem(session, packet.getStanzaFrom()));
+		}
+
+		// We can't know that actually, this might come from offline storage
+		// roster_util.setBuddyOnline(session, packet.getElemFrom(), true);
+	}
+
+	protected void processInUnsubscribe(Packet packet, XMPPResourceConnection session,
+			Queue<Packet> results, Map<String, Object> settings, PresenceType pres_type)
+			throws NotAuthorizedException, TigaseDBException, NoConnectionIdException {
+		boolean subscr_changed = roster_util.updateBuddySubscription(session, pres_type,
+			packet.getStanzaFrom());
+
+		if (subscr_changed) {
+
+			// No longer needed according to RFC-3921-bis5
+			// sendPresence(StanzaType.unsubscribed, session.getJID(), packet.getElemFrom(),
+			// results, null);
+			// updatePresenceChange(packet.getElement(), session, results);
+			Element item = roster_util.getBuddyItem(session, packet.getStanzaFrom());
+
+			if (item != null) {
+				roster_util.updateBuddyChange(session, results, item);
+			} else {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST,
+							"Received unsubscribe request from a user who is not in the roster: {0}",
+								packet.getStanzaFrom());
+				}
+			}
+		}
+	}
+
+	protected void processInUnsubscribed(Packet packet, XMPPResourceConnection session,
+			Queue<Packet> results, Map<String, Object> settings, PresenceType pres_type)
+			throws NotAuthorizedException, TigaseDBException, NoConnectionIdException {
+		SubscriptionType curr_sub = roster_util.getBuddySubscription(session,
+			packet.getStanzaFrom());
+
+		if (curr_sub != null) {
+			boolean subscr_changed = roster_util.updateBuddySubscription(session, pres_type,
+				packet.getStanzaFrom());
+
+			if (subscr_changed) {
+
+				// No longer needed according to RFC-3921-bis5
+				// updatePresenceChange(packet.getElement(), session, results);
+				Element item = roster_util.getBuddyItem(session, packet.getStanzaFrom());
+
+				// The roster item could have been removed in the meantime....
+				if (item != null) {
+					roster_util.updateBuddyChange(session, results,
+							roster_util.getBuddyItem(session, packet.getStanzaFrom()));
+				} else {
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST,
+								"Received unsubscribe request from a user who is not in the roster: {0}",
+									packet.getStanzaFrom());
+					}
+				}
+			}
+		}
+	}
+
+	protected void processOutInitial(Packet packet, XMPPResourceConnection session,
+			Queue<Packet> results, Map<String, Object> settings, PresenceType type)
+			throws NotAuthorizedException, TigaseDBException {
+
+		// Is it direct presence to some entity on the network?
+		if (packet.getStanzaTo() != null) {
+
+			// Yes this is it, send direct presence
+			if (session.isAnonymous()) {
+				outInitialAnonymous(packet, session, results);
+			}
+
+			results.offer(packet.copyElementOnly());
+
+			// If this is unavailable presence, remove jid from Set
+			// otherwise add it to the Set
+			if (packet.getType() == StanzaType.unavailable) {
+				removeDirectPresenceJID(packet.getStanzaTo(), session);
+			} else {
+				addDirectPresenceJID(packet.getStanzaTo(), session);
+			}
+		} else {
+			boolean first = false;
+
+			if (session.getPresence() == null) {
+				first = true;
+			}
+
+			// Set a correct from attribute
+			// No need for that, initVars(...) takes care of that
+			// packet.getElement().setAttribute("from", jid.toString());
+			packet.initVars(session.getJID(), packet.getStanzaTo());
+
+			// Store user presence for later time...
+			// To send response to presence probes for example.
+			session.setPresence(packet.getElement());
+
+			// Special actions on the first availability presence
+			if ((packet.getType() == null) || (packet.getType() == StanzaType.available)) {
+				if (first) {
+
+					// Send presence probes to 'to' or 'both' contacts
+					broadcastProbe(session, results, settings);
+
+					// Resend pending in subscription requests
+					resendPendingInRequests(session, results);
+
+					// Broadcast initial presence to 'from' or 'both' contacts
+//        sendPresenceBroadcast(type, session, FROM_SUBSCRIBED,
+//                results, packet.getElement(), settings, false);
+					// These below broadcast is handled by presenceProbe method
+					// to improve buddy checks....
+//        sendPresenceBroadcast(type, session, FROM_SUBSCRIBED,
+//                results, packet.getElement(), settings);
+				} else {
+
+					// Broadcast initial presence to 'from' or 'both' contacts
+//        sendPresenceBroadcast(type, session, FROM_SUBSCRIBED,
+//                results, packet.getElement(), settings, false);
+					sendPresenceBroadcast(StanzaType.available, session, FROM_SUBSCRIBED, results,
+							packet.getElement(), settings);
+				}
+			}
+
+			// Broadcast initial presence to other available user resources
+			// Element presence = packet.getElement().clone();
+			// Already done above, don't need to set it again here
+			// presence.setAttribute("from", session.getJID());
+			updateUserResources(packet.getElement(), session, results);
+		}
+	}
+
+	protected void processOutSubscribe(Packet packet, XMPPResourceConnection session,
+			Queue<Packet> results, Map<String, Object> settings, PresenceType pres_type)
+			throws NotAuthorizedException, TigaseDBException, NoConnectionIdException {
+
+		// According to RFC-3921 I must forward all these kind presence
+		// requests, it allows to resynchronize
+		// subscriptions in case of synchronization loss
+		forwardPresence(results, packet, session.getJID().copyWithoutResource());
+
+		if (pres_type == PresenceType.out_subscribe) {
+			SubscriptionType current_subscription = roster_util.getBuddySubscription(session,
+				packet.getStanzaTo());
+
+			if (current_subscription == null) {
+				roster_util.addBuddy(session, packet.getStanzaTo(), null, null, null);
+			}    // end of if (current_subscription == null)
+		}
+
+		boolean subscr_changed = roster_util.updateBuddySubscription(session, pres_type,
+			packet.getStanzaTo());
+
+		if (subscr_changed) {
+			roster_util.updateBuddyChange(session, results,
+					roster_util.getBuddyItem(session, packet.getStanzaTo()));
+		}    // end of if (subscr_changed)
+	}
+
+	protected void processOutSubscribed(Packet packet, XMPPResourceConnection session,
+			Queue<Packet> results, Map<String, Object> settings, PresenceType pres_type)
+			throws NotAuthorizedException, TigaseDBException, NoConnectionIdException {
+
+		// According to RFC-3921 I must forward all these kind presence
+		// requests, it allows to resynchronize
+		// subscriptions in case of synchronization loss
+		forwardPresence(results, packet, session.getJID().copyWithoutResource());
+
+		Element initial_presence = session.getPresence();
+		JID buddy = packet.getStanzaTo().copyWithoutResource();
+		boolean subscr_changed = roster_util.updateBuddySubscription(session, pres_type, buddy);
+
+		if (subscr_changed) {
+			roster_util.updateBuddyChange(session, results,
+					roster_util.getBuddyItem(session, buddy));
+
+			if (initial_presence != null) {
+				if (pres_type == PresenceType.out_subscribed) {
+					sendPresence(StanzaType.available, null, buddy, results, initial_presence);
+				} else {
+					sendPresence(StanzaType.unavailable, session.getJID(), buddy, results, null);
+				}
+			}    // end of if (subscr_changed)
+		}
 	}
 }    // Presence
 

@@ -43,6 +43,7 @@ import tigase.xmpp.XMPPResourceConnection;
 
 import java.util.ArrayDeque;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -223,11 +224,12 @@ public class DomainFilter extends XMPPProcessor
 	 * @param repo
 	 * @param results
 	 *
+	 * @param settings
 	 * @return
 	 */
 	@Override
 	public boolean preProcess(Packet packet, XMPPResourceConnection session,
-			NonAuthUserRepository repo, Queue<Packet> results) {
+			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) {
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Processing: " + packet.toString());
 		}

@@ -266,7 +266,7 @@ public abstract class DynamicRoster {
 
 			if (dynclss != null) {
 				String[] dyncls = dynclss.split(",");
-				ArrayList<DynamicRosterIfc> al = new ArrayList<DynamicRosterIfc>();
+				ArrayList<DynamicRosterIfc> al = new ArrayList<DynamicRosterIfc>(50);
 
 				for (String cls : dyncls) {
 					try {
@@ -279,9 +279,11 @@ public abstract class DynamicRoster {
 						}
 
 						al.add(dri);
-						log.info("Initialized dynamic roster: " + cls);
+						log.log(Level.INFO, "Initialized dynamic roster: {0}", cls);
 					} catch (Exception e) {
-						log.warning("Problem initializing dynmic roster class: " + cls + ", " + e);
+						log.log(Level.WARNING, "Problem initializing dynmic roster class: {0}, {1}",
+								new Object[] { cls,
+								e });
 					}
 				}
 

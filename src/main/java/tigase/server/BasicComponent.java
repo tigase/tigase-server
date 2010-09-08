@@ -102,7 +102,7 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 	private String DEF_HOSTNAME_PROP_VAL = DNSResolver.getDefaultHostname();
 	private JID compId = null;
 	private String name = null;
-	private String defHostname = DEF_HOSTNAME_PROP_VAL;
+	private BareJID defHostname = BareJID.bareJIDInstanceNS(DEF_HOSTNAME_PROP_VAL);
 	private Map<String, CommandIfc> scriptCommands = new ConcurrentHashMap<String, CommandIfc>();
 	protected Set<BareJID> admins = new ConcurrentSkipListSet<BareJID>();
 	private ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
@@ -142,7 +142,7 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 	 *
 	 * @return
 	 */
-	public String getDefHostName() {
+	public BareJID getDefHostName() {
 		return defHostname;
 	}
 
@@ -313,7 +313,7 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 					for (CommandIfc comm : scriptCommands.values()) {
 						result.add(new Element("item", new String[] { "node", "name", "jid" },
 								new String[] { comm.getCommandId(),
-								comm.getDescription(), getComponentId().toString() }));
+								comm.getDescription(), jid.toString() }));
 					}
 				}
 			} else {
@@ -332,32 +332,52 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 
 			// Element result = serviceEntity.getDiscoItem(null, getName() + "." + jid);
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Found disco items: " + ((result != null) ? result.toString() : null));
+				log.log(Level.FINEST, "{0} Found disco items: {1}", new Object[] { getName(),
+						((result != null) ? result.toString() : null) });
 			}
 
 			return result;
 		} else {
-			Element res = null;
-
-			if ( !serviceEntity.isAdminOnly() || isAdmin(from)) {
-				res = serviceEntity.getDiscoItem(null, BareJID.toString(getName(), jid.toString()));
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "{0} General disco items request, node: {1}",
+						new Object[] { getName(),
+						node });
 			}
 
-			result = serviceEntity.getDiscoItems(null, null, isAdmin(from));
+			if (node == null) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "{0} Disco items request for null node",
+							new Object[] { getName() });
+				}
 
-			if (res != null) {
-				if (result != null) {
-					for (Iterator<Element> it = result.iterator(); it.hasNext(); ) {
-						Element element = it.next();
+				Element res = null;
 
-						if (element.getAttribute("node") != null) {
-							it.remove();
-						}
+				if ( !serviceEntity.isAdminOnly() || isAdmin(from)) {
+					res = serviceEntity.getDiscoItem(null, BareJID.toString(getName(), jid.toString()));
+
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "{0} not admin only or isAdmin, result: {1}",
+								new Object[] { getName(),
+								res });
 					}
+				}
 
-					result.add(0, res);
-				} else {
-					result = Arrays.asList(res);
+				result = serviceEntity.getDiscoItems(null, null, isAdmin(from));
+
+				if (res != null) {
+					if (result != null) {
+						for (Iterator<Element> it = result.iterator(); it.hasNext(); ) {
+							Element element = it.next();
+
+							if (element.getAttribute("node") != null) {
+								it.remove();
+							}
+						}
+
+						result.add(0, res);
+					} else {
+						result = Arrays.asList(res);
+					}
 				}
 			}
 
@@ -549,7 +569,7 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 		this.name = name;
 
 		try {
-			compId = JID.jidInstance(name, defHostname, null);
+			compId = JID.jidInstance(name, defHostname.getDomain(), null);
 		} catch (TigaseStringprepException ex) {
 			log.log(Level.WARNING, "Problem setting component ID: ", ex);
 		}
@@ -569,7 +589,7 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 			log.log(Level.WARNING, "Problem setting component ID: ", ex);
 		}
 
-		defHostname = (String) props.get(DEF_HOSTNAME_PROP_KEY);
+		defHostname = BareJID.bareJIDInstanceNS((String) props.get(DEF_HOSTNAME_PROP_KEY));
 
 		String[] admins_tmp = (String[]) props.get(ADMINS_PROP_KEY);
 
@@ -720,7 +740,7 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 
 				if (admin) {
 					if (log.isLoggable(Level.FINER)) {
-						log.finer("Processing admin command: " + pc.toString());
+						log.log(Level.FINER, "Processing admin command: {0}", pc);
 					}
 
 					Bindings binds = com.getBindings();
@@ -734,15 +754,15 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 					com.runCommand(iqc, binds, results);
 				} else {
 					if (log.isLoggable(Level.FINER)) {
-						log.finer("Command rejected non-admin detected: " + pc.getStanzaFrom());
+						log.log(Level.FINER, "Command rejected non-admin detected: {0}",
+								pc.getStanzaFrom());
 					}
 
 					results.offer(Authorization.FORBIDDEN.getResponseMessage(pc,
 							"Only Administrator can call the command.", true));
 				}
 			} catch (Exception e) {
-				log.log(Level.WARNING, "Unknown admin command processing exception: " + pc.toString(),
-						e);
+				log.log(Level.WARNING, "Unknown admin command processing exception: " + pc, e);
 			}
 
 			return true;

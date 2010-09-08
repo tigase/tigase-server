@@ -59,7 +59,7 @@ import java.util.logging.Logger;
  */
 public class Message extends XMPPProcessor implements XMPPProcessorIfc {
 
-	/** Class loggeer */
+	/** Class logger */
 	private static final Logger log = Logger.getLogger(Message.class.getName());
 	private static final String XMLNS = "jabber:client";
 	private static final String ID = "message";
@@ -99,7 +99,7 @@ public class Message extends XMPPProcessor implements XMPPProcessorIfc {
 		// For performance reasons it is better to do the check
 		// before calling logging method.
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Processing packet: " + packet);
+			log.log(Level.FINEST, "Processing packet: {0}", packet);
 		}
 
 		// You may want to skip processing completely if the user is offline.

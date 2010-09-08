@@ -1,29 +1,27 @@
+
 /*
- * @(#)ConfigurationCache.java   2010.01.14 at 05:55:57 PST
- *
- * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2010 "Artur Hefczyc" <artur.hefczyc@tigase.org>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, version 3 of the License.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. Look for COPYING file in the top folder.
- * If not, see http://www.gnu.org/licenses/.
- *
- * $Rev$
- * Last modified by $Author$
- * $Date$
+* @(#)ConfigurationCache.java   2010.01.14 at 05:55:57 PST
+*
+* Tigase Jabber/XMPP Server
+* Copyright (C) 2004-2010 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, version 3 of the License.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. Look for COPYING file in the top folder.
+* If not, see http://www.gnu.org/licenses/.
+*
+* $Rev$
+* Last modified by $Author$
+* $Date$
  */
-
-
-
 package tigase.conf;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -67,8 +65,7 @@ public class ConfigurationCache implements ConfigRepositoryIfc {
 	 * Very rarely we need access to whole configuration, in most cases
 	 * we access configuration for a particular server component.
 	 */
-	private Map<String, Set<ConfigItem>> config = new LinkedHashMap<String,
-																									Set<ConfigItem>>();
+	private Map<String, Set<ConfigItem>> config = new LinkedHashMap<String, Set<ConfigItem>>();
 	private String hostname = null;
 
 	//~--- methods --------------------------------------------------------------
@@ -119,9 +116,9 @@ public class ConfigurationCache implements ConfigRepositoryIfc {
 
 		if (idx1 > 0) {
 			String compName = key.substring(0, idx1);
-			int    idx2     = key.lastIndexOf("/");
+			int idx2 = key.lastIndexOf("/");
 			String nodeName = null;
-			String keyName  = key.substring(idx2 + 1);
+			String keyName = key.substring(idx2 + 1);
 
 			if (idx1 != idx2) {
 				nodeName = key.substring(idx1 + 1, idx2);
@@ -133,7 +130,7 @@ public class ConfigurationCache implements ConfigRepositoryIfc {
 			addItem(compName, item);
 		} else {
 			throw new IllegalArgumentException("You have to provide a key with at least"
-																				 + " 'component_name/key_name': " + key);
+					+ " 'component_name/key_name': " + key);
 		}
 	}
 
@@ -276,9 +273,9 @@ public class ConfigurationCache implements ConfigRepositoryIfc {
 
 		if (idx1 > 0) {
 			String compName = key.substring(0, idx1);
-			int    idx2     = key.lastIndexOf("/");
+			int idx2 = key.lastIndexOf("/");
 			String nodeName = null;
-			String keyName  = key.substring(idx2 + 1);
+			String keyName = key.substring(idx2 + 1);
 
 			if (idx1 != idx2) {
 				nodeName = key.substring(idx1 + 1, idx2);
@@ -287,7 +284,7 @@ public class ConfigurationCache implements ConfigRepositoryIfc {
 			return getItem(compName, nodeName, keyName);
 		} else {
 			throw new IllegalArgumentException("You have to provide a key with at least"
-																				 + " 'component_name/key_name': " + key);
+					+ " 'component_name/key_name': " + key);
 		}
 	}
 
@@ -325,8 +322,8 @@ public class ConfigurationCache implements ConfigRepositoryIfc {
 	 */
 	@Override
 	public String[] getKeys(String compName, String node) {
-		Set<String>     keysForNode = new LinkedHashSet<String>();
-		Set<ConfigItem> confItems   = config.get(compName);
+		Set<String> keysForNode = new LinkedHashSet<String>();
+		Set<ConfigItem> confItems = config.get(compName);
 
 		for (ConfigItem item : confItems) {
 			if (item.isNode(node)) {
@@ -352,8 +349,7 @@ public class ConfigurationCache implements ConfigRepositoryIfc {
 	 * @throws ConfigurationException
 	 */
 	@Override
-	public Map<String, Object> getProperties(String compName)
-					throws ConfigurationException {
+	public Map<String, Object> getProperties(String compName) throws ConfigurationException {
 
 		// It must not return a null value, even if configuration for the
 		// component does not exist yet, it has to initialized to create new one.
@@ -365,7 +361,7 @@ public class ConfigurationCache implements ConfigRepositoryIfc {
 
 		if (confItems != null) {
 			for (ConfigItem item : confItems) {
-				String key   = item.getConfigKey();
+				String key = item.getConfigKey();
 				Object value = item.getConfigVal();
 
 				result.put(key, value);
@@ -419,7 +415,7 @@ public class ConfigurationCache implements ConfigRepositoryIfc {
 	 */
 	@Override
 	public void putProperties(String compName, Map<String, Object> props)
-					throws ConfigurationException {
+			throws ConfigurationException {
 		for (Map.Entry<String, Object> entry : props.entrySet()) {
 			ConfigItem item = new ConfigItem();
 
@@ -568,7 +564,7 @@ public class ConfigurationCache implements ConfigRepositoryIfc {
 }
 
 
-//~ Formatted in Sun Code Convention on 2010.01.14 at 05:55:57 PST
+//~ Formatted in Sun Code Convention
 
 
 //~ Formatted by Jindent --- http://www.jindent.com

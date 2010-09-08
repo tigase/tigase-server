@@ -1,4 +1,5 @@
-/*  Tigase Jabber/XMPP Server
+/*
+ *   Tigase Jabber/XMPP Server
  *  Copyright (C) 2004-2008 "Artur Hefczyc" <artur.hefczyc@tigase.org>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,12 +19,21 @@
  * Last modified by $Author$
  * $Date$
  */
+
 package tigase.server.xmppserver;
 
-import java.util.Queue;
+//~--- non-JDK imports --------------------------------------------------------
+
+import tigase.server.Packet;
 
 import tigase.xmpp.XMPPIOService;
-import tigase.server.Packet;
+
+//~--- JDK imports ------------------------------------------------------------
+
+import java.util.Map;
+import java.util.Queue;
+
+//~--- interfaces -------------------------------------------------------------
 
 /**
  * Describe interface ConnectionHandlerIfc here.
@@ -31,14 +41,22 @@ import tigase.server.Packet;
  *
  * Created: Wed Jun 11 22:13:31 2008
  *
- * @param <IO> 
+ * @param <IO>
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public interface ConnectionHandlerIfc<IO extends XMPPIOService> {
+	boolean addOutPacket(Packet packet);
+
+	void initNewConnection(Map<String, Object> port_props);
 
 	boolean writePacketToSocket(IO serv, Packet packet);
 
 	void writePacketsToSocket(IO serv, Queue<Packet> packets);
-
 }
+
+
+//~ Formatted in Sun Code Convention
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

@@ -158,11 +158,12 @@ public class JabberIqPrivacy extends XMPPProcessor
 	 * @param session a <code>XMPPResourceConnection</code> value
 	 * @param repo a <code>NonAuthUserRepository</code> value
 	 * @param results
+	 * @param settings
 	 * @return a <code>boolean</code> value
 	 */
 	@Override
 	public boolean preProcess(Packet packet, XMPPResourceConnection session,
-			NonAuthUserRepository repo, Queue<Packet> results) {
+			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) {
 		if ((session == null) ||!session.isAuthorized() || packet.isXMLNS("/iq/query", XMLNS)) {
 			return false;
 		}    // end of if (session == null)
@@ -435,22 +436,22 @@ public class JabberIqPrivacy extends XMPPProcessor
 			String[] lists = Privacy.getLists(session);
 
 			if (lists != null) {
-				StringBuilder sblists = new StringBuilder();
+				StringBuilder sblists = new StringBuilder(100);
 
 				for (String list : lists) {
-					sblists.append("<list name=\"" + list + "\"/>");
+					sblists.append("<list name=\"").append(list).append("\"/>");
 				}
 
 				String list = Privacy.getDefaultList(session);
 
 				if (list != null) {
-					sblists.append("<default name=\"" + list + "\"/>");
+					sblists.append("<default name=\"").append(list).append("\"/>");
 				}    // end of if (defList != null)
 
 				list = Privacy.getActiveListName(session);
 
 				if (list != null) {
-					sblists.append("<active name=\"" + list + "\"/>");
+					sblists.append("<active name=\"").append(list).append("\"/>");
 				}    // end of if (defList != null)
 
 				results.offer(packet.okResult(sblists.toString(), 1));
@@ -503,12 +504,17 @@ public class JabberIqPrivacy extends XMPPProcessor
 			}      // end of if (child.getName().equals("list))
 
 			if (child.getName() == ACTIVE_EL_NAME) {
-				Element list = Privacy.getList(session, child.getAttribute(NAME));
 
-				if (list == null) {
+				// User selects a different active list
+				String listName = child.getAttribute(NAME);
+				Element list = Privacy.getList(session, listName);
+
+				if ((listName != null) && (list == null)) {
 					results.offer(Authorization.ITEM_NOT_FOUND.getResponseMessage(packet,
 							"Selected list not found on the server", true));
 				} else {
+
+					// This is either declining of active list use or setting a new active list
 					Privacy.setActiveList(session, child.getAttribute(NAME));
 					results.offer(packet.okResult((String) null, 0));
 				}

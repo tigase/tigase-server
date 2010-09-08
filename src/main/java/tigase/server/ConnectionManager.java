@@ -34,6 +34,8 @@ import tigase.net.ConnectionType;
 import tigase.net.SocketReadThread;
 import tigase.net.SocketType;
 
+import tigase.server.script.CommandIfc;
+
 import tigase.stats.StatisticsList;
 
 import tigase.util.DataTypes;
@@ -65,6 +67,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.script.Bindings;
+
 //~--- classes ----------------------------------------------------------------
 
 /**
@@ -77,8 +81,8 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public abstract class ConnectionManager<IO extends XMPPIOService>
-		extends AbstractMessageReceiver implements XMPPIOServiceListener<IO> {
+public abstract class ConnectionManager<IO extends XMPPIOService> extends AbstractMessageReceiver
+		implements XMPPIOServiceListener<IO> {
 	private static final Logger log = Logger.getLogger(ConnectionManager.class.getName());
 
 	/** Field description */
@@ -115,16 +119,14 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 	protected static final String TLS_CONTAINER_CLASS_PROP_KEY = TLS_PROP_KEY
 		+ SSL_CONTAINER_CLASS_KEY;
 	protected static final String TLS_CONTAINER_CLASS_PROP_VAL = SSL_CONTAINER_CLASS_VAL;
-	protected static final String TLS_SERVER_CERTS_DIR_PROP_KEY = TLS_PROP_KEY
-		+ SERVER_CERTS_DIR_KEY;
+	protected static final String TLS_SERVER_CERTS_DIR_PROP_KEY = TLS_PROP_KEY + SERVER_CERTS_DIR_KEY;
 	protected static final String TLS_SERVER_CERTS_DIR_PROP_VAL = SERVER_CERTS_DIR_VAL;
 	protected static final String TLS_TRUSTED_CERTS_DIR_PROP_KEY = TLS_PROP_KEY
 		+ TRUSTED_CERTS_DIR_KEY;
 	protected static final String TLS_TRUSTED_CERTS_DIR_PROP_VAL = TRUSTED_CERTS_DIR_VAL;
 	protected static final String TLS_ALLOW_SELF_SIGNED_CERTS_PROP_KEY = TLS_PROP_KEY
 		+ ALLOW_SELF_SIGNED_CERTS_KEY;
-	protected static final String TLS_ALLOW_SELF_SIGNED_CERTS_PROP_VAL =
-		ALLOW_SELF_SIGNED_CERTS_VAL;
+	protected static final String TLS_ALLOW_SELF_SIGNED_CERTS_PROP_VAL = ALLOW_SELF_SIGNED_CERTS_VAL;
 	protected static final String TLS_ALLOW_INVALID_CERTS_PROP_KEY = TLS_PROP_KEY
 		+ ALLOW_INVALID_CERTS_KEY;
 	protected static final String TLS_ALLOW_INVALID_CERTS_PROP_VAL = ALLOW_INVALID_CERTS_VAL;
@@ -172,6 +174,14 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 	 */
 	public abstract Queue<Packet> processSocketData(IO serv);
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param port_props
+	 */
+	public abstract void reconnectionFailed(Map<String, Object> port_props);
+
 	//~--- get methods ----------------------------------------------------------
 
 	protected abstract long getMaxInactiveTime();
@@ -204,8 +214,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 		props.put(TLS_ALLOW_INVALID_CERTS_PROP_KEY, TLS_ALLOW_INVALID_CERTS_PROP_VAL);
 
 		if (params.get("--" + SSL_CONTAINER_CLASS_KEY) != null) {
-			props.put(TLS_CONTAINER_CLASS_PROP_KEY,
-					(String) params.get("--" + SSL_CONTAINER_CLASS_KEY));
+			props.put(TLS_CONTAINER_CLASS_PROP_KEY, (String) params.get("--" + SSL_CONTAINER_CLASS_KEY));
 		} else {
 			props.put(TLS_CONTAINER_CLASS_PROP_KEY, TLS_CONTAINER_CLASS_PROP_VAL);
 		}
@@ -333,6 +342,18 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 	/**
 	 * Method description
 	 *
+	 *
+	 * @param binds
+	 */
+	@Override
+	public void initBindings(Bindings binds) {
+		super.initBindings(binds);
+		binds.put(CommandIfc.SERVICES_MAP, services);
+	}
+
+	/**
+	 * Method description
+	 *
 	 */
 	@Override
 	public void initializationCompleted() {
@@ -412,21 +433,24 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 		String id = getUniqueId(service);
 
 		if (log.isLoggable(Level.FINER)) {
-			log.finer("[[" + getName() + "]] Connection started: " + service);
+			log.log(Level.FINER, "[[{0}]] Connection started: {1}", new Object[] { getName(), service });
 		}
 
 		IO serv = services.get(id);
 
 		if (serv != null) {
 			if (serv == service) {
-				log.warning(getName()
-						+ ": That would explain a lot, adding the same service twice, ID: " + serv);
+				log.log(Level.WARNING,
+						"{0}: That would explain a lot, adding the same service twice, ID: {1}",
+							new Object[] { getName(),
+						serv });
 			} else {
 
 				// Is it at all possible to happen???
 				// let's log it for now....
-				log.warning(getName() + ": Attempt to add different service with the same ID: "
-						+ service);
+				log.log(Level.WARNING, "{0}: Attempt to add different service with the same ID: {1}",
+						new Object[] { getName(),
+						service });
 
 				// And stop the old service....
 				serv.stop();
@@ -458,7 +482,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 		String id = getUniqueId(service);
 
 		if (log.isLoggable(Level.FINER)) {
-			log.finer("[[" + getName() + "]] Connection stopped: " + service);
+			log.log(Level.FINER, "[[{0}]] Connection stopped: {1}", new Object[] { getName(), service });
 		}
 
 		// id might be null if service is stopped in accept method due to
@@ -467,14 +491,16 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 		if (id != null) {
 			boolean result = services.remove(id, service);
 
-			if ( !result) {
+			if (result) {
+				--services_size;
+			} else {
 
 				// Is it at all possible to happen???
 				// let's log it for now....
-				log.warning("[[" + getName() + "]] Attempt to stop incorrect service: " + service);
+				log.log(Level.WARNING, "[[{0}]] Attempt to stop incorrect service: {1}",
+						new Object[] { getName(),
+						service });
 				Thread.dumpStack();
-			} else {
-				--services_size;
 			}
 
 			return result;
@@ -517,14 +543,15 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 
 		if (ports != null) {
 			for (int i = 0; i < ports.length; i++) {
-				Map<String, Object> port_props = new LinkedHashMap<String, Object>();
+				Map<String, Object> port_props = new LinkedHashMap<String, Object>(20);
 
 				for (Map.Entry<String, Object> entry : props.entrySet()) {
 					if (entry.getKey().startsWith(PROP_KEY + ports[i])) {
 						int idx = entry.getKey().lastIndexOf('/');
 						String key = entry.getKey().substring(idx + 1);
 
-						log.config("Adding port property key: " + key + "=" + entry.getValue());
+						log.log(Level.CONFIG, "Adding port property key: {0}={1}", new Object[] { key,
+								entry.getValue() });
 						port_props.put(key, entry.getValue());
 					}    // end of if (entry.getKey().startsWith())
 				}      // end of for ()
@@ -537,22 +564,19 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 		}          // end of if (ports != null)
 
 		if ((Boolean) props.get(TLS_USE_PROP_KEY)) {
-			Map<String, String> tls_params = new LinkedHashMap<String, String>();
+			Map<String, String> tls_params = new LinkedHashMap<String, String>(20);
 
-			tls_params.put(SSL_CONTAINER_CLASS_KEY,
-					(String) props.get(TLS_CONTAINER_CLASS_PROP_KEY));
+			tls_params.put(SSL_CONTAINER_CLASS_KEY, (String) props.get(TLS_CONTAINER_CLASS_PROP_KEY));
 			tls_params.put(DEFAULT_DOMAIN_CERT_KEY, (String) props.get(TLS_DEF_CERT_PROP_KEY));
 			tls_params.put(JKS_KEYSTORE_FILE_KEY, (String) props.get(TLS_KEYS_STORE_PROP_KEY));
 			tls_params.put(JKS_KEYSTORE_PWD_KEY, (String) props.get(TLS_KEYS_STORE_PASSWD_PROP_KEY));
 			tls_params.put(TRUSTSTORE_FILE_KEY, (String) props.get(TLS_TRUSTS_STORE_PROP_KEY));
 			tls_params.put(TRUSTSTORE_PWD_KEY, (String) props.get(TLS_TRUSTS_STORE_PASSWD_PROP_KEY));
 			tls_params.put(SERVER_CERTS_DIR_KEY, (String) props.get(TLS_SERVER_CERTS_DIR_PROP_KEY));
-			tls_params.put(TRUSTED_CERTS_DIR_KEY,
-					(String) props.get(TLS_TRUSTED_CERTS_DIR_PROP_KEY));
+			tls_params.put(TRUSTED_CERTS_DIR_KEY, (String) props.get(TLS_TRUSTED_CERTS_DIR_PROP_KEY));
 			tls_params.put(ALLOW_SELF_SIGNED_CERTS_KEY,
 					(String) props.get(TLS_ALLOW_SELF_SIGNED_CERTS_PROP_KEY));
-			tls_params.put(ALLOW_INVALID_CERTS_KEY,
-					(String) props.get(TLS_ALLOW_INVALID_CERTS_PROP_KEY));
+			tls_params.put(ALLOW_INVALID_CERTS_KEY, (String) props.get(TLS_ALLOW_INVALID_CERTS_PROP_KEY));
 			TLSUtil.configureSSLContext(getName(), tls_params);
 		}    // end of if (use.equalsIgnoreCase())
 	}
@@ -764,11 +788,12 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 		IO ios = getXMPPIOService(p);
 
 		if (log.isLoggable(Level.FINER) &&!log.isLoggable(Level.FINEST)) {
-			log.finer(ios + ", Processing packet: " + p.getElemName() + ", type: " + p.getType());
+			log.log(Level.FINER, "{0}, Processing packet: {1}, type: {2}", new Object[] { ios,
+					p.getElemName(), p.getType() });
 		}
 
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest(ios + ", Writing packet to: " + p.getTo());
+			log.log(Level.FINEST, "{0}, Writing packet to: {1}", new Object[] { ios, p.getTo() });
 		}
 
 		if (ios != null) {
@@ -850,8 +875,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 				int port = (Integer) port_props.get(PORT_KEY);
 
 				if (log.isLoggable(Level.FINE)) {
-					log.fine("Reconnecting service for component: " + getName() + ", to remote host: "
-							+ host + " on port: " + port);
+					log.fine("Reconnecting service for component: " + getName() + ", to remote host: " + host
+							+ " on port: " + port);
 				}
 
 				startService(port_props);
@@ -915,30 +940,37 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 				serviceStarted(serv);
 				readThread.addSocketService(serv);
 			} catch (SocketException e) {
+				if (getConnectionType() == ConnectionType.connect) {
 
-				// Accept side for component service is not ready yet?
-				// Let's wait for a few secs and try again.
-				log.log(Level.FINEST, "Problem reconnecting the service: " + serv);
+					// Accept side for component service is not ready yet?
+					// Let's wait for a few secs and try again.
+					log.log(Level.FINEST, "Problem reconnecting the service: {0}", serv);
 
-				Integer reconnects = (Integer) port_props.get(MAX_RECONNECTS_PROP_KEY);
+					boolean reconnect = false;
+					Integer reconnects = (Integer) port_props.get(MAX_RECONNECTS_PROP_KEY);
 
-				if (reconnects != null) {
-					int recon = reconnects.intValue();
+					if (reconnects != null) {
+						int recon = reconnects.intValue();
 
-					if (recon != 0) {
-						port_props.put(MAX_RECONNECTS_PROP_KEY, (--recon));
+						if (recon != 0) {
+							port_props.put(MAX_RECONNECTS_PROP_KEY, (--recon));
+							reconnect = true;
+						}    // end of if (recon != 0)
+					}
+
+					if (reconnect) {
 						reconnectService(port_props, connectionDelay);
-					}    // end of if (recon != 0)
+					} else {
+						reconnectionFailed(port_props);
+					}
 				} else {
 
-					// System.out.println(port_props.toString());
-					// e.printStackTrace();
-					// serv.stop();
+					// Ignore
 				}
 			} catch (Exception e) {
 				log.log(Level.WARNING, "Can not accept connection.", e);
 				serv.stop();
-			}        // end of try-catch
+			}          // end of try-catch
 		}
 
 		//~--- get methods --------------------------------------------------------
@@ -1076,8 +1108,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService>
 										// Stop the service is max keep-alive time is acceeded
 										// for non-active connections.
 										if (log.isLoggable(Level.INFO)) {
-											log.info(getName() + ": Max inactive time exceeded, stopping: "
-													+ service);
+											log.info(getName() + ": Max inactive time exceeded, stopping: " + service);
 										}
 
 										++watchdogStopped;

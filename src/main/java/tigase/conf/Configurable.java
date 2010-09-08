@@ -126,10 +126,25 @@ public interface Configurable extends ServerComponent {
 	public static final String GEN_USER_DB = "--user-db";
 
 	/** Field description */
+	public static final String USER_REPO_POOL_CLASS = "--user-repo-pool";
+
+	/** Field description */
+	public static final String USER_DOMAIN_POOL_CLASS = "--user-domain-repo-pool";
+
+	/** Field description */
 	public static final String GEN_AUTH_DB = "--auth-db";
 
 	/** Field description */
-	public static final String GEN_USER_DB_URI = "--user-db-uri";
+	public static final String AUTH_REPO_POOL_CLASS = "--auth-repo-pool";
+
+	/** Field description */
+	public static final String AUTH_DOMAIN_POOL_CLASS = "--auth-domain-repo-pool";
+
+	/** Field description */
+	public static final String GEN_USER_DB_URI_PROP_KEY = "user-db-uri";
+
+	/** Field description */
+	public static final String GEN_USER_DB_URI = "--" + GEN_USER_DB_URI_PROP_KEY;
 
 	/** Field description */
 	public static final String GEN_AUTH_DB_URI = "--auth-db-uri";
@@ -196,10 +211,11 @@ public interface Configurable extends ServerComponent {
 		"tigase.db.jdbc.TigaseCustomAuth";
 
 	/** Field description */
-	public static final String DRUPAL_REPO_CLASS_PROP_VAL = "tigase.db.jdbc.DrupalAuth";
+	public static final String DRUPALWP_REPO_CLASS_PROP_VAL = "tigase.db.jdbc.DrupalWPAuth";
 
 	/** Field description */
-	public static final String LIBRESOURCE_REPO_CLASS_PROP_VAL = "tigase.db.jdbc.LibreSourceAuth";
+	public static final String LIBRESOURCE_REPO_CLASS_PROP_VAL =
+		"tigase.db.jdbc.LibreSourceAuth";
 
 	/** Field description */
 	public static final String SHARED_USER_REPO_PROP_KEY = "shared-user-repo";
@@ -215,6 +231,10 @@ public interface Configurable extends ServerComponent {
 
 	/** Field description */
 	public static final String SHARED_USER_REPO_POOL_PROP_KEY = "shared-user-repo-pool";
+
+	/** Field description */
+	public static final String SHARED_USER_AUTH_REPO_POOL_PROP_KEY =
+		"shared-user-auth-repo-pool";
 
 	/** Field description */
 	public static final String XML_REPO_URL_PROP_VAL = "user-repository.xml";
@@ -244,6 +264,9 @@ public interface Configurable extends ServerComponent {
 
 	/** Field description */
 	public static final String DEF_SM_NAME = "sess-man";
+
+	/** Field description */
+	public static final String DEF_MONITOR_NAME = "monitor";
 
 	/** Field description */
 	public static final String DEF_C2S_NAME = "c2s";
@@ -286,24 +309,34 @@ public interface Configurable extends ServerComponent {
 		"tigase.server.xmppclient.ClientConnectionManager";
 
 	/** Field description */
-	public static final String C2S_CLUST_COMP_CLASS_NAME = "tigase.cluster.ClientConnectionClustered";
+	public static final String C2S_CLUST_COMP_CLASS_NAME =
+		"tigase.cluster.ClientConnectionClustered";
 
 	/** Field description */
 	public static final String S2S_COMP_CLASS_NAME =
-		"tigase.server.xmppserver.ServerConnectionManager";
+		"tigase.server.xmppserver.S2SConnectionManager";
 
 	/** Field description */
-	public static final String S2S_CLUST_COMP_CLASS_NAME = "tigase.cluster.ServerConnectionClustered";
+	public static final String S2S_CLUST_COMP_CLASS_NAME =
+		"tigase.cluster.S2SConnectionClustered";
 
 	/** Field description */
 	public static final String SM_COMP_CLASS_NAME = "tigase.server.xmppsession.SessionManager";
 
 	/** Field description */
-	public static final String SM_CLUS_COMP_CLASS_NAME = "tigase.cluster.SessionManagerClustered";
+	public static final String SM_CLUST_COMP_CLASS_NAME =
+		"tigase.cluster.SessionManagerClustered";
 
 	/** Field description */
 	public static final String EXT_COMP_CLASS_NAME =
 		"tigase.server.xmppcomponent.ComponentConnectionManager";
+
+	/** Field description */
+	public static final String MONITOR_CLASS_NAME = "tigase.server.monitor.MonitorComponent";
+
+	/** Field description */
+	public static final String MONITOR_CLUST_CLASS_NAME =
+		"tigase.server.monitor.MonitorClustered";
 
 	/** Field description */
 	public static final String COMP_PROT_CLASS_NAME = "tigase.server.ext.ComponentProtocol";
@@ -340,6 +373,12 @@ public interface Configurable extends ServerComponent {
 
 	/** Field description */
 	public static final String USER_REPO_POOL_SIZE_PROP_KEY = "user-repo-pool-size";
+
+	/** Field description */
+	public static final String USER_REPO_DOMAINS_PROP_KEY = "user-repo-domains";
+
+	/** Field description */
+	public static final String AUTH_REPO_DOMAINS_PROP_KEY = "auth-repo-domains";
 
 	/** Field description */
 	public static final String AUTH_REPO_CLASS_PROP_KEY = "auth-repo-class";

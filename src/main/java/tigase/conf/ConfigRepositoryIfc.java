@@ -23,7 +23,7 @@
 package tigase.conf;
 
 import java.util.Map;
-import tigase.db.ComponentRepository;
+import tigase.db.comp.ComponentRepository;
 
 /**
  * Created: Dec 10, 2009 2:04:20 PM

@@ -22,15 +22,6 @@
 
 package tigase.util;
 
-//~--- non-JDK imports --------------------------------------------------------
-
-import tigase.server.AbstractMessageReceiver;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.logging.Logger;
-
 //~--- classes ----------------------------------------------------------------
 
 /**
@@ -51,7 +42,19 @@ public abstract class PriorityQueueAbstract<E> {
 	/** Field description */
 	public static final String NONPRIORITY_QUEUE = "nonpriority-queue";
 
+	/** Field description */
+	public static final String QUEUE_IMPLEMENTATION = "queue-implementation";
+
 	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param maxPriority
+	 * @param maxSize
+	 */
+	public abstract void init(int maxPriority, int maxSize);
 
 	// public boolean offer(E element, int priority, String owner) {
 
@@ -131,12 +134,30 @@ public abstract class PriorityQueueAbstract<E> {
 	 *
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	public static <E> PriorityQueueAbstract<E> getPriorityQueue(int maxPriority, int maxSize) {
-		if (Boolean.getBoolean(NONPRIORITY_QUEUE)) {
-			return new NonpriorityQueue<E>(maxSize);
+		PriorityQueueAbstract<E> result = null;
+		String queue_class = System.getProperty(QUEUE_IMPLEMENTATION, null);
+
+		if ((queue_class == null) || queue_class.isEmpty()) {
+			if (Boolean.getBoolean(NONPRIORITY_QUEUE)) {
+				result = new NonpriorityQueue<E>(maxSize);
+			} else {
+				result = new PriorityQueueRelaxed<E>(maxPriority, maxSize);
+			}
 		} else {
-			return new PriorityQueue<E>(maxPriority, maxSize);
+			try {
+				result = (PriorityQueueAbstract<E>) Class.forName(queue_class).newInstance();
+			} catch (Exception e) {
+				e.printStackTrace();
+				System.exit(1);
+			}
+
+			result.init(maxPriority, maxSize);
 		}
+
+//  System.out.println("Initialized queue implementation: " + result.getClass().getName());
+		return result;
 	}
 }
 

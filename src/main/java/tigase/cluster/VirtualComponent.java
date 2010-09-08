@@ -319,6 +319,7 @@ public class VirtualComponent
 	 */
 	@Override
 	public void setName(String name) {
+		this.name = name;
 		this.componentId = JID.jidInstanceNS(name, DNSResolver.getDefaultHostname(), null);
 	}
 

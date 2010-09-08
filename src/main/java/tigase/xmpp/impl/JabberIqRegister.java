@@ -31,6 +31,8 @@ import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.server.Priority;
 
+import tigase.util.TigaseStringprepException;
+
 import tigase.xml.Element;
 
 import tigase.xmpp.Authorization;
@@ -140,6 +142,13 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 					&& packet.getPacketFrom().equals(session.getConnectionId())
 						&& ( !session.isAuthorized()
 							|| (session.isUserId(id) || session.isLocalDomain(id.toString(), false)))) {
+
+				if (!session.getDomain().isRegisterEnabled()) {
+					results.offer(Authorization.NOT_ALLOWED.getResponseMessage(packet,
+							"Registration is not allowed for this domain.", true));
+					return;
+				}
+
 				Authorization result = Authorization.NOT_AUTHORIZED;
 				Element request = packet.getElement();
 				StanzaType type = packet.getType();
@@ -179,7 +188,7 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 							}
 						} else {
 
-							// No, so assuming this is registration of new
+							// No, so assuming this is registration of a new
 							// user or change registration details for existing user
 							String user_name = request.getChildCData("/iq/query/username");
 							String password = request.getChildCData("/iq/query/password");
@@ -239,6 +248,9 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 					results.offer(packet.copyElementOnly());
 				}
 			}
+		} catch (TigaseStringprepException ex) {
+			results.offer(Authorization.JID_MALFORMED.getResponseMessage(packet,
+					"Incorrect user name, stringprep processing failed.", true));
 		} catch (NotAuthorizedException e) {
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 					"You are not authorized to change registration settings.\n" + e.getMessage(), true));
@@ -259,7 +271,15 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 	 */
 	@Override
 	public Element[] supDiscoFeatures(XMPPResourceConnection session) {
-		return DISCO_FEATURES;
+		if (log.isLoggable(Level.FINEST) && session != null) {
+				log.finest("VHostItem: " + session.getDomain());
+			}
+
+		if (session != null && session.getDomain().isRegisterEnabled()) {
+			return DISCO_FEATURES;
+		} else {
+			return null;
+		}
 	}
 
 	/**
@@ -294,7 +314,15 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 	 */
 	@Override
 	public Element[] supStreamFeatures(XMPPResourceConnection session) {
+		if (log.isLoggable(Level.FINEST) && session != null) {
+				log.finest("VHostItem: " + session.getDomain());
+			}
+
+		if (session != null && session.getDomain().isRegisterEnabled()) {
 		return FEATURES;
+		} else {
+			return null;
+		}
 	}
 }    // JabberIqRegister
 

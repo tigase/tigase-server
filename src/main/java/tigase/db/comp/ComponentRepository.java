@@ -20,10 +20,11 @@
  * $Date$
  */
 
-package tigase.db;
+package tigase.db.comp;
 
 import java.util.Collection;
 import java.util.Map;
+import tigase.db.TigaseDBException;
 
 /**
  * A convenience interface for a unified access to component specific repository data.

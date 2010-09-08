@@ -132,8 +132,8 @@ public class ConnectionOpenThread implements Runnable {
 			break;
 		case connect:
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Setting up 'connect' channel for: " + isa.getAddress() +
-								"/" + isa.getPort());
+				log.log(Level.FINEST, "Setting up ''connect'' channel for: {0}/{1}",
+						new Object[]{isa.getAddress(), isa.getPort()});
 			}
 			SocketChannel sc = SocketChannel.open();
 			sc.socket().setReceiveBufferSize(al.getReceiveBufferSize());
@@ -143,7 +143,7 @@ public class ConnectionOpenThread implements Runnable {
 			sc.register(selector, SelectionKey.OP_CONNECT, al);
 			break;
 		default:
-			log.warning("Unknown connection type: " + al.getConnectionType());
+			log.log(Level.WARNING, "Unknown connection type: {0}", al.getConnectionType());
 			break;
 		} // end of switch (al.getConnectionType())
 	}

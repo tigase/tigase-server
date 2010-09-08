@@ -41,7 +41,10 @@ import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPException;
+import tigase.xmpp.XMPPProcessor;
+import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.XMPPStopListenerIfc;
 import tigase.xmpp.impl.roster.RosterAbstract;
 import tigase.xmpp.impl.roster.RosterFactory;
 
@@ -71,19 +74,24 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public abstract class JabberIqRoster {
+public class JabberIqRoster extends XMPPProcessor
+		implements XMPPProcessorIfc, XMPPStopListenerIfc {
 
 	/**
-	 * Private logger for class instancess.
+	 * Private logger for class instance.
 	 */
-	private static Logger log = Logger.getLogger(JabberIqRoster.class.getName());
+	private static final Logger log = Logger.getLogger(JabberIqRoster.class.getName());
 	private static final String[] ELEMENTS = { "query", "query" };
 	private static final String[] XMLNSS = { RosterAbstract.XMLNS,
 		RosterAbstract.XMLNS_DYNAMIC };
+	private static final String ID = RosterAbstract.XMLNS;
 
 	/** Field description */
 	public static final String ANON = "anon";
-	private static RosterAbstract roster_util = RosterFactory.getRosterImplementation(true);
+
+	//~--- fields ---------------------------------------------------------------
+
+	protected RosterAbstract roster_util = getRosterUtil();
 
 	//~--- get methods ----------------------------------------------------------
 
@@ -99,7 +107,7 @@ public abstract class JabberIqRoster {
 		List<Element> elgr = item.getChildren();
 
 		if ((elgr != null) && (elgr.size() > 0)) {
-			ArrayList<String> groups = new ArrayList<String>();
+			ArrayList<String> groups = new ArrayList<String>(1);
 
 			for (Element grp : elgr) {
 				if (grp.getName() == RosterAbstract.GROUP) {
@@ -117,6 +125,87 @@ public abstract class JabberIqRoster {
 
 	//~--- methods --------------------------------------------------------------
 
+	protected static void dynamicGetRequest(Packet packet, XMPPResourceConnection session,
+			Queue<Packet> results, Map<String, Object> settings)
+			throws NotAuthorizedException {
+		Element request = packet.getElement();
+		Element item = request.findChild("/iq/query/item");
+
+		if (item != null) {
+			Element new_item = DynamicRoster.getItemExtraData(session, settings, item);
+
+			if (new_item == null) {
+				new_item = item;
+			}
+
+			results.offer(packet.okResult(new_item, 1));
+		} else {
+			try {
+				results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
+						"Missing 'item' element, request can not be processed.", true));
+			} catch (PacketErrorTypeException ex) {
+				log.log(Level.SEVERE, "Received error packet? not possible.", ex);
+			}
+		}
+	}
+
+	protected static void dynamicSetRequest(Packet packet, XMPPResourceConnection session,
+			Queue<Packet> results, Map<String, Object> settings) {
+		Element request = packet.getElement();
+		List<Element> items = request.getChildren("/iq/query");
+
+		if ((items != null) && (items.size() > 0)) {
+			for (Element item : items) {
+				DynamicRoster.setItemExtraData(session, settings, item);
+			}
+
+			results.offer(packet.okResult((String) null, 0));
+		} else {
+			try {
+				results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
+						"Missing 'item' element, request can not be processed.", true));
+			} catch (PacketErrorTypeException ex) {
+				log.log(Level.SEVERE, "Received error packet? not possible.", ex);
+			}
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public int concurrentQueuesNo() {
+		return Runtime.getRuntime().availableProcessors() * 2;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public int concurrentThreadsPerQueue() {
+
+		// Packet processing order does matter for roster/presence therefore
+		// we need a single thread for each queue.
+		return 1;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public String id() {
+		return ID;
+	}
+
 	/**
 	 * Method description
 	 *
@@ -129,9 +218,25 @@ public abstract class JabberIqRoster {
 	 *
 	 * @throws XMPPException
 	 */
-	public static void process(Packet packet, XMPPResourceConnection session,
+	@Override
+	public void process(Packet packet, XMPPResourceConnection session,
 			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
 			throws XMPPException {
+		if (session == null) {
+			if (log.isLoggable(Level.FINE)) {
+				log.log(Level.FINE, "Session is null, ignoring packet: {0}", packet);
+			}
+
+			return;
+		}    // end of if (session == null)
+
+		if ( !session.isAuthorized()) {
+			if (log.isLoggable(Level.FINE)) {
+				log.log(Level.FINE, "Session is not authorized, ignoring packet: {0}", packet);
+			}
+
+			return;
+		}
 
 		// The roster request can be between the user and the server or between the
 		// user and some other entity like transport
@@ -149,7 +254,7 @@ public abstract class JabberIqRoster {
 			}
 		} else {
 
-			// Packet probably to the user, let's check where from it came
+			// Packet probably to the user, let's check where it came from
 			if (session.isUserId(packet.getStanzaTo().getBareJID())) {
 				Packet result = packet.copyElementOnly();
 
@@ -169,8 +274,10 @@ public abstract class JabberIqRoster {
 					&&!session.isUserId(packet.getStanzaFrom().getBareJID())) {
 
 				// RFC says: ignore such request
-				log.warning("Roster request 'from' attribute doesn't match session: " + session
-						+ ", request: " + packet);
+				log.log(Level.WARNING,
+						"Roster request ''from'' attribute doesn''t match "
+							+ "session: {0}, request: {1}", new Object[] { session,
+						packet });
 
 				return;
 			}    // end of if (packet.getElemFrom() != null
@@ -250,8 +357,9 @@ public abstract class JabberIqRoster {
 	 * @param results
 	 * @param settings
 	 */
-	public static void stopped(final XMPPResourceConnection session,
-			final Queue<Packet> results, final Map<String, Object> settings) {
+	@Override
+	public void stopped(final XMPPResourceConnection session, final Queue<Packet> results,
+			final Map<String, Object> settings) {
 
 //  // Synchronization to avoid conflict with login/logout events
 //  // processed in the SessionManager asynchronously
@@ -283,58 +391,78 @@ public abstract class JabberIqRoster {
 //  }
 	}
 
-	private static void dynamicGetRequest(Packet packet, XMPPResourceConnection session,
-			Queue<Packet> results, Map<String, Object> settings)
-			throws NotAuthorizedException {
-		Element request = packet.getElement();
-		Element item = request.findChild("/iq/query/item");
-
-		if (item != null) {
-			Element new_item = DynamicRoster.getItemExtraData(session, settings, item);
-
-			if (new_item == null) {
-				new_item = item;
-			}
-
-			results.offer(packet.okResult(new_item, 1));
-		} else {
-			try {
-				results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
-						"Missing 'item' element, request can not be processed.", true));
-			} catch (PacketErrorTypeException ex) {
-				log.log(Level.SEVERE, "Received error packet? not possible.", ex);
-			}
-		}
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 *
+	 * @return
+	 */
+	@Override
+	public Element[] supDiscoFeatures(final XMPPResourceConnection session) {
+		return RosterAbstract.DISCO_FEATURES;
 	}
 
-	private static void dynamicSetRequest(Packet packet, XMPPResourceConnection session,
-			Queue<Packet> results, Map<String, Object> settings) {
-		Element request = packet.getElement();
-		List<Element> items = request.getChildren("/iq/query");
-
-		if ((items != null) && (items.size() > 0)) {
-			for (Element item : items) {
-				DynamicRoster.setItemExtraData(session, settings, item);
-			}
-
-			results.offer(packet.okResult((String) null, 0));
-		} else {
-			try {
-				results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
-						"Missing 'item' element, request can not be processed.", true));
-			} catch (PacketErrorTypeException ex) {
-				log.log(Level.SEVERE, "Received error packet? not possible.", ex);
-			}
-		}
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public String[] supElements() {
+		return ELEMENTS;
 	}
 
-	private static void processGetRequest(Packet packet, XMPPResourceConnection session,
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public String[] supNamespaces() {
+		return XMLNSS;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 *
+	 * @return
+	 */
+	@Override
+	public Element[] supStreamFeatures(final XMPPResourceConnection session) {
+		return RosterAbstract.FEATURES;
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	protected RosterAbstract getRosterUtil() {
+		return RosterFactory.getRosterImplementation(true);
+	}
+
+	//~--- methods --------------------------------------------------------------
+
+	private void processGetRequest(Packet packet, XMPPResourceConnection session,
 			Queue<Packet> results, Map<String, Object> settings)
 			throws NotAuthorizedException, TigaseDBException {
-		String incomingHash = packet.getElement().getAttribute("/iq/query", "ver");
-		String storedHash = "";
+
+		// Retrieve standard roster items.
+		List<Element> ritems = roster_util.getRosterItems(session);
+
+		// Retrieve all Dynamic roster elements from the roster repository
 		List<Element> its = DynamicRoster.getRosterItems(session, settings);
 
+		// There is always a chance that the same elements exist in a dynamic roster
+		// and the standard user roster. Moreover, the items in the standard roster may
+		// have a different presence subscription set.
+		// Here we make sure they are both in sync, that is for each entry which exists
+		// in both rosters we enforce 'both' subscription type for element in standard roster
+		// and remove it from the dynamic roster list.
 		if ((its != null) && (its.size() > 0)) {
 			for (Iterator<Element> it = its.iterator(); it.hasNext(); ) {
 				Element element = it.next();
@@ -354,13 +482,38 @@ public abstract class JabberIqRoster {
 						it.remove();
 					}
 				} catch (TigaseStringprepException ex) {
-					log.info("JID from dynamic roster is incorrect, stringprep failed for: "
-							+ element.getAttribute("jid"));
+					log.log(Level.INFO,
+							"JID from dynamic roster is incorrect, stringprep failed for: {0}",
+								element.getAttribute("jid"));
 					it.remove();
 				}
 			}
+
+			// Recalculate the roster hash again with dynamic roster content
+			StringBuilder roster_str = new StringBuilder(5000);
+
+			// This may seem to be redindand as this call has already been made
+			// but the roster could have been changed.
+			ritems = roster_util.getRosterItems(session);
+
+			for (Element ritem : ritems) {
+				roster_str.append(ritem.toString());
+			}
+
+			for (Element ritem : its) {
+				roster_str.append(ritem.toString());
+			}
+
+			roster_util.updateRosterHash(roster_str.toString(), session);
 		}
 
+		// Check roster version hash.
+		String incomingHash = packet.getElement().getAttribute("/iq/query", "ver");
+		String storedHash = "";
+
+		// If client provided hash and the server calculated hash are the same
+		// return the success result and abort further roster processing.
+		// No need to send the whole roster to the client.
 		if (incomingHash != null) {
 			storedHash = roster_util.getBuddiesHash(session);
 
@@ -371,8 +524,7 @@ public abstract class JabberIqRoster {
 			}
 		}
 
-		List<Element> ritems = roster_util.getRosterItems(session);
-
+		// Send the user's standard roster first
 		if ((ritems != null) && (ritems.size() > 0)) {
 			Element query = new Element("query");
 
@@ -388,33 +540,7 @@ public abstract class JabberIqRoster {
 			results.offer(packet.okResult((String) null, 1));
 		}
 
-//  String[] buddies = roster_util.getBuddies(session, false);
-//  if (buddies != null) {
-//    Element query = new Element("query");
-//    query.setXMLNS(XMLNS);
-//    if (incomingHash != null)
-//      query.setAttribute("ver", storedHash);
-//    for (String buddy : buddies) {
-//      try {
-//        Element buddy_item = roster_util.getBuddyItem(session, buddy);
-//        //String item_group = buddy_item.getCData("/item/group");
-//        query.addChild(buddy_item);
-//      } catch (TigaseDBException e) {
-//        // It happens that some weird JIDs drive database crazy and
-//        // it throws exceptions. Let's for now just ignore those
-//        // contacts....
-//        log.info("Can not retrieve data for contact: " + buddy
-//          + ", an exception occurs: " + e);
-//      }
-//    }
-//    if (query.getChildren() != null && query.getChildren().size() > 0) {
-//      results.offer(packet.okResult(query, 0));
-//    } else {
-//      results.offer(packet.okResult((String)null, 1));
-//    } // end of if (buddies != null) else
-//  } else {
-//    results.offer(packet.okResult((String)null, 1));
-//  }
+		// Push the dynamic roster items now
 		try {
 			if ((its != null) && (its.size() > 0)) {
 				ArrayDeque<Element> items = new ArrayDeque<Element>(its);
@@ -422,7 +548,7 @@ public abstract class JabberIqRoster {
 				while (items.size() > 0) {
 					Element iq = new Element("iq", new String[] { "type", "id", "to" },
 						new String[] { "set",
-							"dr-" + items.size(), session.getJID().toString() });
+							session.nextStanzaId(), session.getJID().toString() });
 					Element query = new Element("query");
 
 					query.setXMLNS(RosterAbstract.XMLNS);
@@ -441,35 +567,14 @@ public abstract class JabberIqRoster {
 				}
 			}
 		} catch (NoConnectionIdException ex) {
-			log.warning("Problem with roster request, no connection ID for session: " + session
-					+ ", request: " + packet);
+			log.log(Level.WARNING,
+					"Problem with roster request, no connection ID for session: {0}, request: {1}",
+						new Object[] { session,
+					packet });
 		}
-
-//  if (session.isAnonymous()) {
-//    log.finest("Anonymous session: " + session.getUserId());
-//    String[] anon_peers = session.getAnonymousPeers();
-//    if (anon_peers != null) {
-//      for (String peer: anon_peers) {
-//        Element iq = new Element("iq",
-//          new String[] {"type", "id", "to", "from"},
-//          new String[] {"set", session.getUserName(), peer, peer});
-//        Element query = new Element("query");
-//        query.setXMLNS(XMLNS);
-//        iq.addChild(query);
-//        Element item = new Element("item", new Element[] {
-//            new Element("group", "Anonymous peers")},
-//          new String[] {"jid", "type", "name"},
-//          new String[] {session.getUserId(), ANON, session.getUserName()});
-//        query.addChild(item);
-//        Packet rost_update = new Packet(iq);
-//        results.offer(rost_update);
-//        log.finest("Sending roster update: " + rost_update.toString());
-//      }
-//    }
-//  }
 	}
 
-	private static void processSetRequest(Packet packet, XMPPResourceConnection session,
+	private void processSetRequest(Packet packet, XMPPResourceConnection session,
 			Queue<Packet> results, final Map<String, Object> settings)
 			throws XMPPException, NotAuthorizedException, TigaseDBException {
 

@@ -178,8 +178,9 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 				host = (String) sessionData.get("remote-host");
 			}
 
-			log.info("Problem connecting to remote host: " + host + ", address: " + remote_address
-					+ " - exception: " + e);
+			log.log(Level.INFO, "Problem connecting to remote host: {0}, address: {1} - exception: {2}",
+					new Object[] { host,
+					remote_address, e });
 
 			throw e;
 		}
@@ -190,8 +191,7 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 
 		local_address = sock.getLocalAddress().getHostAddress();
 		remote_address = sock.getInetAddress().getHostAddress();
-		id = local_address + "_" + sock.getLocalPort() + "_" + remote_address + "_"
-				+ sock.getPort();
+		id = local_address + "_" + sock.getLocalPort() + "_" + remote_address + "_" + sock.getPort();
 		setLastTransferTime();
 	}
 
@@ -335,10 +335,10 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 	}
 
 	/**
-	 * Method description
+	 * Returns a remote IP address for the TCP/IP connection.
 	 *
 	 *
-	 * @return
+	 * @return a remote IP address for the TCP/IP connection.
 	 */
 	public String getRemoteAddress() {
 		return remote_address;
@@ -588,8 +588,8 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 		if (log.isLoggable(Level.FINEST)) {
 			if ((msg != null) && (msg.trim().length() > 0)) {
 				String log_msg = "\n"
-					+ ((connectionType() != null) ? connectionType().toString() : "null-type") + " "
-					+ prefix + "\n" + msg + "\n";
+					+ ((connectionType() != null) ? connectionType().toString() : "null-type") + " " + prefix
+					+ "\n" + msg + "\n";
 
 				// System.out.print(log_msg);
 				log.finest(log_msg);
@@ -642,8 +642,7 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 				// sometimes it happens that the connection has been lost
 				// and the select thinks there are some bytes waiting for reading
 				// and 0 bytes are read
-				if ((++empty_read_call_count) > MAX_ALLOWED_EMPTY_CALLS
-						&& (writeInProgress.get() == 0)) {
+				if ((++empty_read_call_count) > MAX_ALLOWED_EMPTY_CALLS && (writeInProgress.get() == 0)) {
 					log.warning("Socket: " + socketIO
 							+ ", Max allowed empty calls excceeded, closing connection.");
 					forceStop();
@@ -688,35 +687,38 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 				if ((data != null) && (data.length() > 0)) {
 					if (log.isLoggable(Level.FINEST)) {
 						if (data.length() < 256) {
-							log.finest("Socket: " + socketIO + ", Writing data (" + data.length() + "): "
-									+ data);
+							log.finest("Socket: " + socketIO + ", Writing data (" + data.length() + "): " + data);
 						} else {
 							log.finest("Socket: " + socketIO + ", Writing data: " + data.length());
 						}
 					}
 
 					ByteBuffer dataBuffer = null;
-					int out_buff_size = 2048;
-					int idx_start = 0;
-					int idx_offset = Math.min(idx_start + out_buff_size, data.length());
 
-					while (idx_start < data.length()) {
+//        int out_buff_size = data.length();
+//        int idx_start = 0;
+//        int idx_offset = Math.min(idx_start + out_buff_size, data.length());
+//
+//        while (idx_start < data.length()) {
+//        String data_str = data.substring(idx_start, idx_offset);
+//        if (log.isLoggable(Level.FINEST)) {
+//        log.finest("Writing data_str (" + data_str.length() + "), idx_start="
+//            + idx_start + ", idx_offset=" + idx_offset + ": " + data_str);
+//        }
+					encoder.reset();
 
-//          String data_str = data.substring(idx_start, idx_offset);
-//          if (log.isLoggable(Level.FINEST)) {
-//          log.finest("Writing data_str (" + data_str.length() + "), idx_start="
-//              + idx_start + ", idx_offset=" + idx_offset + ": " + data_str);
-//          }
-						encoder.reset();
-						dataBuffer = encoder.encode(CharBuffer.wrap(data, idx_start, idx_offset));
+//        dataBuffer = encoder.encode(CharBuffer.wrap(data, idx_start, idx_offset));
+					dataBuffer = encoder.encode(CharBuffer.wrap(data));
+					encoder.flush(dataBuffer);
+					socketIO.write(dataBuffer);
 
-//          dataBuffer = encoder.encode(CharBuffer.wrap(data));
-						encoder.flush(dataBuffer);
-						socketIO.write(dataBuffer);
-						idx_start = idx_offset;
-						idx_offset = Math.min(idx_start + out_buff_size, data.length());
+					if (log.isLoggable(Level.FINEST)) {
+						log.finest("Socket: " + socketIO + ", wrote: " + data.length());
 					}
 
+//        idx_start = idx_offset;
+//        idx_offset = Math.min(idx_start + out_buff_size, data.length());
+//          }
 					setLastTransferTime();
 
 					// addWritten(data.length());

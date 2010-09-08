@@ -19,13 +19,19 @@
  * Last modified by $Author$
  * $Date$
  */
+
 package tigase.auth;
 
+//~--- JDK imports ------------------------------------------------------------
+
 import java.util.Map;
+
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.sasl.SaslException;
 import javax.security.sasl.SaslServer;
 import javax.security.sasl.SaslServerFactory;
+
+//~--- classes ----------------------------------------------------------------
 
 /**
  * Describe class TigaseSaslServerFactory here.
@@ -44,6 +50,8 @@ public class TigaseSaslServerFactory implements SaslServerFactory {
 	 */
 	public TigaseSaslServerFactory() {}
 
+	//~--- methods --------------------------------------------------------------
+
 	// Implementation of javax.security.sasl.SaslServerFactory
 
 	/**
@@ -57,21 +65,26 @@ public class TigaseSaslServerFactory implements SaslServerFactory {
 	 * @return a <code>SaslServer</code> value
 	 * @exception SaslException if an error occurs
 	 */
-	public SaslServer createSaslServer(final String mechanism,
-		final String protocol, final String serverName,
-		final Map<String,?> props, final CallbackHandler callbackHandler)
-		throws SaslException {
+	@Override
+	public SaslServer createSaslServer(final String mechanism, final String protocol,
+			final String serverName, final Map<String, ?> props,
+				final CallbackHandler callbackHandler)
+			throws SaslException {
 		if (mechanism.equals("PLAIN")) {
 			return new SaslPLAIN(props, callbackHandler);
-		} // end of if (mechanism.equals("PLAIN"))
+		}    // end of if (mechanism.equals("PLAIN"))
+
 		if (mechanism.equals("ANONYMOUS")) {
 			return new SaslPLAIN(props, callbackHandler);
-		} // end of if (mechanism.equals("PLAIN"))
-// 		if (mechanism.equals("DIGEST-MD5")) {
-// 			return new SaslDigestMD5(props, callbackHandler);
-// 		} // end of if (mechanism.equals("PLAIN"))
+		}    // end of if (mechanism.equals("PLAIN"))
+
+//  if (mechanism.equals("DIGEST-MD5")) {
+//    return new SaslDigestMD5(props, callbackHandler);
+//  } // end of if (mechanism.equals("PLAIN"))
 		throw new SaslException("Mechanism not supported yet.");
 	}
+
+	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Describe <code>getMechanismNames</code> method here.
@@ -79,8 +92,14 @@ public class TigaseSaslServerFactory implements SaslServerFactory {
 	 * @param map a <code>Map</code> value
 	 * @return a <code>String[]</code> value
 	 */
+	@Override
 	public String[] getMechanismNames(final Map map) {
 		return null;
 	}
+}    // TigaseSaslServerFactory
 
-} // TigaseSaslServerFactory
+
+//~ Formatted in Sun Code Convention
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

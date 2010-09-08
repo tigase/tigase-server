@@ -27,8 +27,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Logger;
-import tigase.db.ComponentRepository;
-import tigase.db.RepositoryItem;
 
 /**
  * Created: Oct 3, 2009 2:58:41 PM

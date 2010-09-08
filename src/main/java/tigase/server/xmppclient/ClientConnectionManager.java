@@ -227,8 +227,8 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 				// floating around, so just skip sending stream_close for all the
 				// offline presences
 				if ((packet.getType() != StanzaType.unavailable) && (packet.getPacketFrom() != null)) {
-					Packet command = Command.STREAM_CLOSED_UPDATE.getPacket(null, null, StanzaType.set,
-						UUID.randomUUID().toString());
+					Packet command = Command.STREAM_CLOSED_UPDATE.getPacket(packet.getStanzaTo(), null,
+						StanzaType.set, UUID.randomUUID().toString());
 
 					command.setPacketFrom(packet.getPacketTo());
 					command.setPacketTo(packet.getPacketFrom());
@@ -238,8 +238,10 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 					addOutPacket(command);
 
 //        addOutPacketWithTimeout(command, stoppedHandler, 15l, TimeUnit.SECONDS);
-					log.fine("Sending a command to close the remote session for non-existen "
-							+ getName() + " connection: " + command.toStringSecure());
+					log.log(Level.FINE,
+							"Sending a command to close the remote session for non-existen {0} connection: {1}",
+								new Object[] { getName(),
+							command.toStringSecure() });
 				}
 			}
 		}    // end of else
@@ -297,6 +299,17 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	@Override
 	public int processingThreads() {
 		return Runtime.getRuntime().availableProcessors();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param port_props
+	 */
+	@Override
+	public void reconnectionFailed(Map<String, Object> port_props) {
+		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 	/**
@@ -409,7 +422,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	@Override
 	public void xmppStreamClosed(XMPPIOService<Object> serv) {
 		if (log.isLoggable(Level.FINER)) {
-			log.finer("Stream closed: " + serv.getUniqueId());
+			log.log(Level.FINER, "Stream closed: {0}", serv.getUniqueId());
 		}
 
 		// It might be a Bosh service in which case it is ignored here.
@@ -425,10 +438,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 				// In case of mass-disconnects, adjust the timeout properly
 				addOutPacketWithTimeout(command, stoppedHandler, 120l, TimeUnit.SECONDS);
-
-				if (log.isLoggable(Level.FINE)) {
-					log.fine("Service stopped, sending packet: " + command);
-				}
+				log.log(Level.FINE, "Service stopped, sending packet: {0}", command);
 
 				// // For testing only.
 				// System.out.println("Service stopped: " + service.getUniqueId());
@@ -437,9 +447,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 //      System.out.println("Service stopped: " + service.getUniqueId());
 //      Thread.dumpStack();
 			} else {
-				if (log.isLoggable(Level.FINE)) {
-					log.fine("Service stopped, before stream:stream received");
-				}
+				log.fine("Service stopped, before stream:stream received");
 			}
 
 			serv.stop();
@@ -457,9 +465,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	 */
 	@Override
 	public String xmppStreamOpened(XMPPIOService<Object> serv, Map<String, String> attribs) {
-		if (log.isLoggable(Level.FINER)) {
-			log.finer("Stream opened: " + attribs.toString());
-		}
+		log.log(Level.FINER, "Stream opened: {0}", attribs);
 
 		final String hostname = attribs.get("to");
 		String lang = attribs.get("xml:lang");
@@ -492,24 +498,32 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 		if (id == null) {
 			id = UUID.randomUUID().toString();
+			log.log(Level.FINER, "No Session ID, generating a new one: {0}", id);
 			serv.getSessionData().put(XMPPIOService.SESSION_ID_KEY, id);
 			serv.setXMLNS(XMLNS);
 			serv.getSessionData().put(XMPPIOService.HOSTNAME_KEY, hostname);
 			serv.setDataReceiver(JID.jidInstanceNS(routings.computeRouting(hostname)));
-			writeRawData(serv,
-					"<?xml version='1.0'?><stream:stream" + " xmlns='" + XMLNS + "'"
-						+ " xmlns:stream='http://etherx.jabber.org/streams'" + " from='" + hostname + "'"
-							+ " id='" + id + "'" + " version='1.0' xml:lang='en'>");
+
+			String streamOpenData = "<?xml version='1.0'?><stream:stream" + " xmlns='" + XMLNS + "'"
+				+ " xmlns:stream='http://etherx.jabber.org/streams'" + " from='" + hostname + "'"
+				+ " id='" + id + "'" + " version='1.0' xml:lang='en'>";
+
+			log.log(Level.FINER, "Writing raw data to the socket: {0}", streamOpenData);
+			writeRawData(serv, streamOpenData);
+			log.log(Level.FINER, "DONE");
 
 			Packet streamOpen = Command.STREAM_OPENED.getPacket(getFromAddress(getUniqueId(serv)),
-				serv.getDataReceiver(), StanzaType.set, UUID.randomUUID().toString(),
+				serv.getDataReceiver(), StanzaType.set, this.newPacketId("c2s-"),
 				Command.DataType.submit);
 
 			Command.addFieldValue(streamOpen, "session-id", id);
 			Command.addFieldValue(streamOpen, "hostname", hostname);
 			Command.addFieldValue(streamOpen, "xml:lang", lang);
+			log.log(Level.FINER, "Sending a system command to SM: {0}", streamOpen);
 			addOutPacketWithTimeout(streamOpen, startedHandler, 45l, TimeUnit.SECONDS);
+			log.log(Level.FINER, "DOEN 2");
 		} else {
+			log.log(Level.FINER, "Session ID is: {0}", id);
 			writeRawData(serv,
 					"<?xml version='1.0'?><stream:stream" + " xmlns='" + XMLNS + "'"
 						+ " xmlns:stream='http://etherx.jabber.org/streams'" + " from='" + hostname + "'"
@@ -775,7 +789,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	}
 
 	private JID getFromAddress(String id) {
-		return JID.jidInstanceNS(getName(), getDefHostName(), id);
+		return JID.jidInstanceNS(getName(), getDefHostName().getDomain(), id);
 	}
 
 	private XMPPResourceConnection getXMPPSession(Packet p) {

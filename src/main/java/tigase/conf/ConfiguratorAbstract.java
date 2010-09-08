@@ -24,12 +24,16 @@ package tigase.conf;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.db.ComponentRepository;
+import tigase.db.DBInitException;
 import tigase.db.RepositoryFactory;
 import tigase.db.TigaseDBException;
 import tigase.db.UserAuthRepository;
+import tigase.db.UserAuthRepositoryMDImpl;
+import tigase.db.UserAuthRepositoryPool;
 import tigase.db.UserRepository;
+import tigase.db.UserRepositoryMDImpl;
 import tigase.db.UserRepositoryPool;
+import tigase.db.comp.ComponentRepository;
 
 import tigase.server.AbstractComponentRegistrator;
 import tigase.server.ServerComponent;
@@ -44,10 +48,12 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Level;
@@ -71,6 +77,30 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 
 	/** Field description */
 	public static final String CONFIG_REPO_CLASS_PROP_KEY = "tigase-config-repo-class";
+
+	/** Field description */
+	public static final String USER_REPO_POOL_CLASS_PROP_KEY = "user-repo-pool";
+
+	/** Field description */
+	public static final String USER_REPO_POOL_CLASS_PROP_VAL = "tigase.db.UserRepositoryPool";
+
+	/** Field description */
+	public static final String USER_DOMAIN_POOL_CLASS_PROP_KEY = "user-domain-repo-pool";
+
+	/** Field description */
+	public static final String USER_DOMAIN_POOL_CLASS_PROP_VAL = "tigase.db.UserRepositoryMDImpl";
+
+	/** Field description */
+	public static final String AUTH_REPO_POOL_CLASS_PROP_KEY = "auth-repo-pool";
+
+	/** Field description */
+	public static final String AUTH_REPO_POOL_CLASS_PROP_VAL = "tigase.db.UserAuthRepositoryPool";
+
+	/** Field description */
+	public static final String AUTH_DOMAIN_POOL_CLASS_PROP_KEY = "auth-domain-repo-pool";
+
+	/** Field description */
+	public static final String AUTH_DOMAIN_POOL_CLASS_PROP_VAL = "tigase.db.UserAuthRepositoryMDImpl";
 	private static final String LOGGING_KEY = "logging/";
 
 	/** Field description */
@@ -83,12 +113,13 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 
 	//~--- fields ---------------------------------------------------------------
 
+	private UserAuthRepositoryMDImpl auth_repo_impl = null;
 	private Map<String, String> auth_repo_params = null;
+	private UserAuthRepository auth_repository = null;
 
 	// Default user auth repository instance which can be shared among components
-	private UserAuthRepository auth_repository = null;
 	private ConfigRepositoryIfc configRepo = new ConfigurationCache();
-	private UserRepositoryPool repo_pool = null;
+	private UserRepositoryMDImpl user_repo_impl = null;
 	private Map<String, String> user_repo_params = null;
 
 	// Default user repository instance which can be shared among components
@@ -105,7 +136,7 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 	 * other source which are used to generate default configuration. All the settings
 	 * starting with '--'
 	 */
-	private Map<String, Object> initProperties = new LinkedHashMap<String, Object>();
+	private Map<String, Object> initProperties = new LinkedHashMap<String, Object>(100);
 
 	//~--- get methods ----------------------------------------------------------
 
@@ -168,7 +199,7 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 	@Override
 	public void componentAdded(Configurable component) {
 		if (log.isLoggable(Level.CONFIG)) {
-			log.config(" component: " + component.getName());
+			log.log(Level.CONFIG, " component: {0}", component.getName());
 		}
 
 		setup(component);
@@ -196,8 +227,8 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 	}
 
 	/**
-	 * Returns defualt configuration settings in case if there is no
-	 * config file.
+	 * Returns default configuration settings in case if there is no
+	 * configuration file.
 	 * @param params
 	 * @return
 	 */
@@ -241,7 +272,38 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 			}    // end of for (String pack: packs)
 		}
 
+		// Default repository pools implementations
+		String repo_pool = (String) params.get(USER_REPO_POOL_CLASS);
+
+		if (repo_pool == null) {
+			repo_pool = USER_REPO_POOL_CLASS_PROP_VAL;
+		}
+
+		defaults.put(USER_REPO_POOL_CLASS_PROP_KEY, repo_pool);
+		repo_pool = (String) params.get(USER_DOMAIN_POOL_CLASS);
+
+		if (repo_pool == null) {
+			repo_pool = USER_DOMAIN_POOL_CLASS_PROP_VAL;
+		}
+
+		defaults.put(USER_DOMAIN_POOL_CLASS_PROP_KEY, repo_pool);
+		repo_pool = (String) params.get(AUTH_REPO_POOL_CLASS);
+
+		if (repo_pool == null) {
+			repo_pool = AUTH_REPO_POOL_CLASS_PROP_VAL;
+		}
+
+		defaults.put(AUTH_REPO_POOL_CLASS_PROP_KEY, repo_pool);
+		repo_pool = (String) params.get(AUTH_DOMAIN_POOL_CLASS);
+
+		if (repo_pool == null) {
+			repo_pool = AUTH_DOMAIN_POOL_CLASS_PROP_VAL;
+		}
+
+		defaults.put(AUTH_DOMAIN_POOL_CLASS_PROP_KEY, repo_pool);
+
 		// System.out.println("Setting logging properties:\n" + defaults.toString());
+		// Default repository implementations
 		String user_repo_class = DERBY_REPO_CLASS_PROP_VAL;
 		String user_repo_url = DERBY_REPO_URL_PROP_VAL;
 		String auth_repo_class = DERBY_REPO_CLASS_PROP_VAL;
@@ -277,6 +339,37 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 		defaults.put(AUTH_REPO_CLASS_PROP_KEY, auth_repo_class);
 		defaults.put(AUTH_REPO_URL_PROP_KEY, auth_repo_url);
 		defaults.put(AUTH_REPO_PARAMS_NODE + "/param-1", "value-1");
+
+		List<String> user_repo_domains = new ArrayList<String>(10);
+		List<String> auth_repo_domains = new ArrayList<String>(10);
+
+		for (Map.Entry<String, Object> entry : params.entrySet()) {
+			if (entry.getKey().startsWith(GEN_USER_DB_URI)) {
+				String domain = parseUserRepoParams(entry, params, user_repo_class, defaults);
+
+				if (domain != null) {
+					user_repo_domains.add(domain);
+				}
+			}
+
+			if (entry.getKey().startsWith(GEN_AUTH_DB_URI)) {
+				String domain = parseAuthRepoParams(entry, params, auth_repo_class, defaults);
+
+				if (domain != null) {
+					auth_repo_domains.add(domain);
+				}
+			}
+		}
+
+		if (user_repo_domains.size() > 0) {
+			defaults.put(USER_REPO_DOMAINS_PROP_KEY,
+					user_repo_domains.toArray(new String[user_repo_domains.size()]));
+		}
+
+		if (auth_repo_domains.size() > 0) {
+			defaults.put(AUTH_REPO_DOMAINS_PROP_KEY,
+					auth_repo_domains.toArray(new String[auth_repo_domains.size()]));
+		}
 
 		// Setup tracer, this is a temporarily code...
 //  String ips = (String)params.get(TigaseTracer.TRACER_IPS_PROP_KEY);
@@ -362,7 +455,7 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 			}
 		}
 
-		configRepo.setDefHostname(getDefHostName());
+		configRepo.setDefHostname(getDefHostName().getDomain());
 		configRepo.init(initProperties);
 
 		for (String prop : initSettings) {
@@ -474,7 +567,8 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 		String property_filename = (String) initProperties.get(PROPERTY_FILENAME_PROP_KEY);
 
 		if (property_filename != null) {
-			log.config("Loading initial properties from property file: " + property_filename);
+			log.log(Level.CONFIG, "Loading initial properties from property file: {0}",
+					property_filename);
 
 			try {
 				Properties defProps = new Properties();
@@ -490,13 +584,14 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 						initProperties.put(key.trim(), value);
 
 						// defProperties.remove(key);
-						log.config("Added default config parameter: (" + key + "=" + value + ")");
+						log.log(Level.CONFIG, "Added default config parameter: ({0}={1})", new Object[] { key,
+								value });
 					} else {
 						initSettings.add(key + "=" + value);
 					}
 				}
 			} catch (FileNotFoundException e) {
-				log.warning("Given property file was not found: " + property_filename);
+				log.log(Level.WARNING, "Given property file was not found: {0}", property_filename);
 			} catch (IOException e) {
 				log.log(Level.WARNING, "Can not read property file: " + property_filename, e);
 			}
@@ -533,7 +628,7 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 	 * @param props
 	 */
 	@Override
-	public void setProperties(final Map<String, Object> props) {
+	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
 		setupLogManager(props);
 
@@ -545,62 +640,106 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 			repo_pool_size = 1;
 		}
 
-		repo_pool = new UserRepositoryPool();
-		user_repo_params = new LinkedHashMap<String, String>();
-		auth_repo_params = new LinkedHashMap<String, String>();
+		String[] user_repo_domains = (String[]) props.get(USER_REPO_DOMAINS_PROP_KEY);
+		String[] auth_repo_domains = (String[]) props.get(AUTH_REPO_DOMAINS_PROP_KEY);
+		String authRepoMDImpl = (String) props.get(AUTH_DOMAIN_POOL_CLASS_PROP_KEY);
+		String userRepoMDImpl = (String) props.get(USER_DOMAIN_POOL_CLASS_PROP_KEY);
 
-		for (Map.Entry<String, Object> entry : props.entrySet()) {
-			if (entry.getKey().startsWith(USER_REPO_PARAMS_NODE)) {
+		try {
 
-				// Split the key to configuration nodes separated with '/'
-				String[] nodes = entry.getKey().split("/");
+			// Authentication multi-domain repository pool initialization
+			Map<String, String> params = getRepoParams(props, AUTH_REPO_PARAMS_NODE, null);
+			String conn_url = (String) props.get(AUTH_REPO_URL_PROP_KEY);
 
-				// The plugin ID part may contain many IDs separated with comma ','
-				if (nodes.length > 1) {
-					user_repo_params.put(nodes[1], entry.getValue().toString());
-				}
-			}
+			auth_repo_impl = (UserAuthRepositoryMDImpl) Class.forName(authRepoMDImpl).newInstance();
+			auth_repo_impl.initRepository(conn_url, params);
 
-			if (entry.getKey().startsWith(AUTH_REPO_PARAMS_NODE)) {
+			// User multi-domain repository pool initialization
+			params = getRepoParams(props, USER_REPO_PARAMS_NODE, null);
+			conn_url = (String) props.get(USER_REPO_URL_PROP_KEY);
+			user_repo_impl = (UserRepositoryMDImpl) Class.forName(userRepoMDImpl).newInstance();
+			user_repo_impl.initRepository(conn_url, params);
+		} catch (Exception ex) {
+			log.log(Level.SEVERE, "An error initializing domain repository pool: ", ex);
+		}
 
-				// Split the key to configuration nodes separated with '/'
-				String[] nodes = entry.getKey().split("/");
+		user_repository = null;
+		auth_repository = null;
 
-				// The plugin ID part may contain many IDs separated with comma ','
-				if (nodes.length > 1) {
-					auth_repo_params.put(nodes[1], entry.getValue().toString());
+		if (user_repo_domains != null) {
+			for (String domain : user_repo_domains) {
+				try {
+					addUserRepo(props, domain, repo_pool_size);
+				} catch (Exception e) {
+					log.log(Level.SEVERE, "Can't initialize user repository for domain: " + domain, e);
 				}
 			}
 		}
 
-		try {
-			String cls_name = (String) props.get(USER_REPO_CLASS_PROP_KEY);
-			String res_uri = (String) props.get(USER_REPO_URL_PROP_KEY);
-
-			repo_pool.initRepository(res_uri, user_repo_params);
-
-			for (int i = 0; i < repo_pool_size; i++) {
-				user_repository = RepositoryFactory.getUserRepository(getName() + "-" + (i + 1),
-						cls_name, res_uri, user_repo_params);
-				repo_pool.addRepo(user_repository);
+		if (user_repository == null) {
+			try {
+				addUserRepo(props, null, repo_pool_size);
+			} catch (Exception e) {
+				log.log(Level.SEVERE, "Can't initialize user default repository: ", e);
 			}
+		}
 
-			log.config("Initialized " + cls_name + " as user repository: " + res_uri);
-			log.config("Initialized user repository pool: " + repo_pool_size);
-		} catch (Exception e) {
-			log.log(Level.SEVERE, "Can't initialize user repository: ", e);
-		}    // end of try-catch
+		if (auth_repo_domains != null) {
+			for (String domain : auth_repo_domains) {
+				try {
+					addAuthRepo(props, domain, repo_pool_size);
+				} catch (Exception e) {
+					log.log(Level.SEVERE, "Can't initialize user repository for domain: " + domain, e);
+				}
+			}
+		}
 
-		try {
-			String cls_name = (String) props.get(AUTH_REPO_CLASS_PROP_KEY);
-			String res_uri = (String) props.get(AUTH_REPO_URL_PROP_KEY);
+		if (auth_repository == null) {
+			try {
+				addAuthRepo(props, null, repo_pool_size);
+			} catch (Exception e) {
+				log.log(Level.SEVERE, "Can't initialize auth default repository: ", e);
+			}
+		}
 
-			auth_repository = RepositoryFactory.getAuthRepository(getName(), cls_name, res_uri,
-					auth_repo_params);
-			log.config("Initialized " + cls_name + " as auth repository: " + res_uri);
-		} catch (Exception e) {
-			log.log(Level.SEVERE, "Can't initialize auth repository: ", e);
-		}    // end of try-catch
+//  user_repo_params = getRepoParams(props, USER_REPO_PARAMS_NODE, null);
+//  auth_repo_params = getRepoParams(props, AUTH_REPO_PARAMS_NODE, null);
+//
+//  try {
+//    String cls_name = (String) props.get(USER_REPO_CLASS_PROP_KEY);
+//    String res_uri = (String) props.get(USER_REPO_URL_PROP_KEY);
+//
+//    repo_pool.initRepository(res_uri, user_repo_params);
+//
+//    for (int i = 0; i < repo_pool_size; i++) {
+//      user_repository = RepositoryFactory.getUserRepository(getName() + "-" + (i + 1),
+//          cls_name, res_uri, user_repo_params);
+//      repo_pool.addRepo(user_repository);
+//    }
+//
+//    log.config("Initialized " + cls_name + " as user repository: " + res_uri);
+//    log.config("Initialized user repository pool: " + repo_pool_size);
+//  } catch (Exception e) {
+//    log.log(Level.SEVERE, "Can't initialize user repository: ", e);
+//  }    // end of try-catch
+//
+//  try {
+//    String cls_name = (String) props.get(AUTH_REPO_CLASS_PROP_KEY);
+//    String res_uri = (String) props.get(AUTH_REPO_URL_PROP_KEY);
+//
+//    auth_pool.initRepository(res_uri, auth_repo_params);
+//
+//    for (int i = 0; i < repo_pool_size; i++) {
+//      auth_repository = RepositoryFactory.getAuthRepository(getName() + "-" + (i + 1),
+//          cls_name, res_uri, auth_repo_params);
+//      auth_pool.addRepo(auth_repository);
+//    }
+//
+//    log.config("Initialized " + cls_name + " as auth repository: " + res_uri);
+//    log.config("Initialized user auth repository pool: " + repo_pool_size);
+//  } catch (Exception e) {
+//    log.log(Level.SEVERE, "Can't initialize auth repository: ", e);
+//  }    // end of try-catch
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -651,15 +790,110 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 		prop.put(SHARED_USER_REPO_PARAMS_PROP_KEY, user_repo_params);
 		prop.put(SHARED_AUTH_REPO_PROP_KEY, auth_repository);
 		prop.put(SHARED_AUTH_REPO_PARAMS_PROP_KEY, auth_repo_params);
-		prop.put(SHARED_USER_REPO_POOL_PROP_KEY, repo_pool);
+		prop.put(SHARED_USER_REPO_POOL_PROP_KEY, user_repo_impl);
+		prop.put(SHARED_USER_AUTH_REPO_POOL_PROP_KEY, auth_repo_impl);
 		component.setProperties(prop);
 	}
+
+	private void addAuthRepo(Map<String, Object> props, String domain, int pool_size)
+			throws DBInitException, ClassNotFoundException, InstantiationException,
+			IllegalAccessException {
+		Map<String, String> params = getRepoParams(props, AUTH_REPO_PARAMS_NODE, domain);
+		String cls_name = (String) props.get(AUTH_REPO_CLASS_PROP_KEY
+			+ ((domain == null) ? "" : "/" + domain));
+		String conn_url = (String) props.get(AUTH_REPO_URL_PROP_KEY
+			+ ((domain == null) ? "" : "/" + domain));
+		String authRepoPoolImpl = (String) props.get(AUTH_REPO_POOL_CLASS_PROP_KEY);
+		UserAuthRepositoryPool repo_pool =
+			(UserAuthRepositoryPool) Class.forName(authRepoPoolImpl).newInstance();
+
+		repo_pool.initRepository(conn_url, params);
+
+		for (int i = 0; i < pool_size; i++) {
+			UserAuthRepository repo = RepositoryFactory.getAuthRepository(cls_name, conn_url, params);
+
+			repo_pool.addRepo(repo);
+		}
+
+		if ((domain == null) || domain.trim().isEmpty()) {
+			auth_repo_impl.addRepo("", repo_pool);
+			auth_repo_impl.setDefault(repo_pool);
+			auth_repository = repo_pool;
+		} else {
+			auth_repo_impl.addRepo(domain, repo_pool);
+		}
+
+		log.log(Level.INFO, "[{0}] Initialized {1} as user auth repository: {2}", new Object[] { domain,
+				cls_name, conn_url });
+		log.log(Level.INFO, "[{0}] Initialized user auth repository pool: {1}", new Object[] { domain,
+				pool_size });
+	}
+
+	private void addUserRepo(Map<String, Object> props, String domain, int pool_size)
+			throws DBInitException, ClassNotFoundException, InstantiationException,
+			IllegalAccessException {
+		Map<String, String> params = getRepoParams(props, USER_REPO_PARAMS_NODE, domain);
+		String cls_name = (String) props.get(USER_REPO_CLASS_PROP_KEY
+			+ ((domain == null) ? "" : "/" + domain));
+		String conn_url = (String) props.get(USER_REPO_URL_PROP_KEY
+			+ ((domain == null) ? "" : "/" + domain));
+		String userRepoPoolImpl = (String) props.get(USER_REPO_POOL_CLASS_PROP_KEY);
+		UserRepositoryPool repo_pool =
+			(UserRepositoryPool) Class.forName(userRepoPoolImpl).newInstance();
+
+		repo_pool.initRepository(conn_url, params);
+
+		for (int i = 0; i < pool_size; i++) {
+			UserRepository repo = RepositoryFactory.getUserRepository(cls_name, conn_url, params);
+
+			repo_pool.addRepo(repo);
+		}
+
+		if ((domain == null) || domain.trim().isEmpty()) {
+			user_repo_impl.addRepo("", repo_pool);
+			user_repo_impl.setDefault(repo_pool);
+			user_repository = repo_pool;
+		} else {
+			user_repo_impl.addRepo(domain, repo_pool);
+		}
+
+		log.log(Level.INFO, "[{0}] Initialized {1} as user repository: {2}", new Object[] { domain,
+				cls_name, conn_url });
+		log.log(Level.INFO, "[{0}] Initialized user repository pool: {1}", new Object[] { domain,
+				pool_size });
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	private Map<String, String> getRepoParams(Map<String, Object> props, String repo_type,
+			String domain) {
+		Map<String, String> result = new LinkedHashMap<String, String>(10);
+		String prop_start = repo_type + ((domain == null) ? "" : "/" + domain);
+
+		for (Map.Entry<String, Object> entry : props.entrySet()) {
+			if (entry.getKey().startsWith(prop_start)) {
+
+				// Split the key to configuration nodes separated with '/'
+				String[] nodes = entry.getKey().split("/");
+
+				// The plugin ID part may contain many IDs separated with comma ','
+				if (nodes.length > 1) {
+					result.put(nodes[nodes.length - 1], entry.getValue().toString());
+				}
+			}
+		}
+
+		return result;
+	}
+
+	//~--- methods --------------------------------------------------------------
 
 	private void initMonitoring(String settings, String configDir) {
 		if ((monitoring == null) && (settings != null)) {
 			try {
-				monitoring =
-					(MonitoringSetupIfc) Class.forName("tigase.management.MonitoringSetup").newInstance();
+				String mon_cls = "tigase.management.MonitoringSetup";
+
+				monitoring = (MonitoringSetupIfc) Class.forName(mon_cls).newInstance();
 				monitoring.initMonitoring(settings, configDir);
 			} catch (Exception e) {
 				log.log(Level.WARNING, "Can not initialize monitoring: ", e);
@@ -667,15 +901,81 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 		}
 	}
 
+	private String parseAuthRepoParams(Entry<String, Object> entry, Map<String, Object> params,
+			String auth_repo_class, Map<String, Object> defaults) {
+		String key = entry.getKey();
+		int br_open = key.indexOf('[');
+		int br_close = key.indexOf(']');
+
+		if ((br_open < 0) || (br_close < 0)) {
+
+			// default database is configured elsewhere
+			return null;
+		}
+
+		String repo_class = auth_repo_class;
+		String options = key.substring(br_open + 1, br_close);
+		String domain = options.split(":")[0];
+
+		log.log(Level.INFO, "Found DB domain: {0}", domain);
+
+		String get_user_db = GEN_AUTH_DB + "[" + options + "]";
+
+		if (params.get(get_user_db) != null) {
+			repo_class = (String) params.get(get_user_db);
+		}
+
+		defaults.put(AUTH_REPO_CLASS_PROP_KEY + "/" + domain, repo_class);
+		log.config("Setting defaults: " + AUTH_REPO_CLASS_PROP_KEY + "/" + domain + "=" + repo_class);
+		defaults.put(AUTH_REPO_URL_PROP_KEY + "/" + domain, entry.getValue());
+		log.config("Setting defaults: " + AUTH_REPO_URL_PROP_KEY + "/" + domain + "="
+				+ entry.getValue());
+
+		return domain;
+	}
+
+	private String parseUserRepoParams(Entry<String, Object> entry, Map<String, Object> params,
+			String user_repo_class, Map<String, Object> defaults) {
+		String key = entry.getKey();
+		int br_open = key.indexOf('[');
+		int br_close = key.indexOf(']');
+
+		if ((br_open < 0) || (br_close < 0)) {
+
+			// default database is configured elsewhere
+			return null;
+		}
+
+		String repo_class = user_repo_class;
+		String options = key.substring(br_open + 1, br_close);
+		String domain = options.split(":")[0];
+
+		log.log(Level.INFO, "Found DB domain: {0}", domain);
+
+		String get_user_db = GEN_USER_DB + "[" + options + "]";
+
+		if (params.get(get_user_db) != null) {
+			repo_class = (String) params.get(get_user_db);
+		}
+
+		defaults.put(USER_REPO_CLASS_PROP_KEY + "/" + domain, repo_class);
+		log.config("Setting defaults: " + USER_REPO_CLASS_PROP_KEY + "/" + domain + "=" + repo_class);
+		defaults.put(USER_REPO_URL_PROP_KEY + "/" + domain, entry.getValue());
+		log.config("Setting defaults: " + USER_REPO_URL_PROP_KEY + "/" + domain + "="
+				+ entry.getValue());
+
+		return domain;
+	}
+
 	private void setupLogManager(Map<String, Object> properties) {
 		Set<Map.Entry<String, Object>> entries = properties.entrySet();
-		StringBuilder buff = new StringBuilder();
+		StringBuilder buff = new StringBuilder(200);
 
 		for (Map.Entry<String, Object> entry : entries) {
 			if (entry.getKey().startsWith(LOGGING_KEY)) {
 				String key = entry.getKey().substring(LOGGING_KEY.length());
 
-				buff.append(key + "=" + entry.getValue() + "\n");
+				buff.append(key).append("=").append(entry.getValue()).append("\n");
 
 				if (key.equals("java.util.logging.FileHandler.pattern")) {
 					File log_path = new File(entry.getValue().toString()).getParentFile();

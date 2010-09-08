@@ -22,6 +22,16 @@
 
 package tigase.xmpp;
 
+//~--- non-JDK imports --------------------------------------------------------
+
+import tigase.annotations.TODO;
+
+import tigase.util.ClassUtil;
+
+//~--- JDK imports ------------------------------------------------------------
+
+import java.lang.reflect.Modifier;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
@@ -29,8 +39,8 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import tigase.annotations.TODO;
-import tigase.util.ClassUtil;
+
+//~--- classes ----------------------------------------------------------------
 
 /**
  * <code>ProcessorFactory</code> class contains functionality to load and
@@ -52,88 +62,158 @@ import tigase.util.ClassUtil;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@TODO(note="Make loading processors configurable: exclude specific classes, turn-off automatic loading and include specific classes. In all cases checking agains XMPPProcessor compatibility should be performed.")
+@TODO(
+	note = "Make loading processors configurable: exclude specific classes, turn-off automatic"
+		+ " loading and include specific classes. In all cases checking agains XMPPProcessor "
+			+ "compatibility should be performed.")
 public class ProcessorFactory {
+	private static final Logger log = Logger.getLogger(ProcessorFactory.class.getName());
+	private static final Map<String, XMPPImplIfc> processors = new TreeMap<String, XMPPImplIfc>();
 
-  private static Logger log = Logger.getLogger("tigase.xmpp.ProcessorFactory");
-  private static Map<String, XMPPImplIfc> processors = null;
+	//~--- static initializers --------------------------------------------------
 
-  static {
-    try {
-			Set<Class<XMPPImplIfc>> procs =
-				ClassUtil.getClassesImplementing(XMPPImplIfc.class);
+	static {
+		try {
+			Set<Class<XMPPImplIfc>> procs = ClassUtil.getClassesImplementing(XMPPImplIfc.class);
+			ArrayList<String> elems = new ArrayList<String>(32);
 
-			processors = new TreeMap<String, XMPPImplIfc>();
+			for (Class<XMPPImplIfc> cproc : procs) {
+				if ( !Modifier.isPublic(cproc.getModifiers())) {
+					continue;
+				}
 
-      ArrayList<String> elems = new ArrayList<String>();
-      for (Class<XMPPImplIfc> cproc: procs) {
- 				XMPPImplIfc xproc = cproc.newInstance();
+				XMPPImplIfc xproc = cproc.newInstance();
+
 				processors.put(xproc.id(), xproc);
-        String[] els = xproc.supElements();
-        String[] nss = xproc.supNamespaces();
-        if (els != null && nss != null) {
-          for (int i = 0; i < els.length; i++) {
-            elems.add("  <" + els[i] + " xmlns='" + nss[i] + "'/>\n");
-          } // end of for (int i = 0; i < els.length; i++)
-        } // end of if (nss != null)
-      } // end of for ()
-      Collections.sort(elems);
-      StringBuilder sb = new StringBuilder();
-      for (String elm : elems) {
-        sb.append(elm);
-      } // end of for ()
-			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Loaded XMPPProcessors:\n" + sb.toString());
-			}
 
-    } catch (Exception e) {
+				String[] els = xproc.supElements();
+				String[] nss = xproc.supNamespaces();
+
+				if ((els != null) && (nss != null)) {
+					for (int i = 0; i < els.length; i++) {
+						elems.add("  <" + els[i] + " xmlns='" + nss[i] + "'/>\n");
+					}    // end of for (int i = 0; i < els.length; i++)
+				}      // end of if (nss != null)
+			}        // end of for ()
+
+			Collections.sort(elems);
+
+			if (log.isLoggable(Level.FINEST)) {
+				StringBuilder sb = new StringBuilder(200);
+
+				for (String elm : elems) {
+					sb.append(elm);
+				}      // end of for ()
+
+				log.log(Level.FINEST, "Loaded XMPPProcessors:\n{0}", sb);
+			}
+		} catch (Exception e) {
 			System.out.println("Can not load XMPPProcessor implementations");
 			e.printStackTrace();
-      log.log(Level.SEVERE, "Can not load XMPPProcessor implementations", e);
-      System.exit(1);
-    } // end of try-catch
-  }
+			log.log(Level.SEVERE, "Can not load XMPPProcessor implementations", e);
+			System.exit(1);
+		}          // end of try-catch
+	}
 
+	//~--- constructors ---------------------------------------------------------
+
+	private ProcessorFactory() {}
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param id
+	 *
+	 * @return
+	 */
 	public static XMPPPacketFilterIfc getPacketFilter(String id) {
 		XMPPImplIfc imp = processors.get(id);
+
 		if (imp instanceof XMPPPacketFilterIfc) {
-			return (XMPPPacketFilterIfc)imp;
+			return (XMPPPacketFilterIfc) imp;
 		}
+
 		return null;
 	}
 
-  private ProcessorFactory() {}
-
-  public static XMPPProcessorIfc getProcessor(String id) {
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param id
+	 *
+	 * @return
+	 */
+	public static XMPPPostprocessorIfc getPostprocessor(String id) {
 		XMPPImplIfc imp = processors.get(id);
-		if (imp instanceof XMPPProcessorIfc) {
-			return (XMPPProcessorIfc)imp;
-		}
-		return null;
-  }
 
-  public static XMPPPreprocessorIfc getPreprocessor(String id) {
-		XMPPImplIfc imp = processors.get(id);
-		if (imp instanceof XMPPPreprocessorIfc) {
-			return (XMPPPreprocessorIfc)imp;
-		}
-		return null;
-  }
-
-  public static XMPPPostprocessorIfc getPostprocessor(String id) {
-		XMPPImplIfc imp = processors.get(id);
 		if (imp instanceof XMPPPostprocessorIfc) {
-			return (XMPPPostprocessorIfc)imp;
+			return (XMPPPostprocessorIfc) imp;
 		}
-		return null;
-  }
 
-  public static XMPPStopListenerIfc getStopListener(String id) {
+		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param id
+	 *
+	 * @return
+	 */
+	public static XMPPPreprocessorIfc getPreprocessor(String id) {
 		XMPPImplIfc imp = processors.get(id);
-		if (imp instanceof XMPPStopListenerIfc) {
-			return (XMPPStopListenerIfc)imp;
-		}
-		return null;
-  }
 
-}// ProcessorFactory
+		if (imp instanceof XMPPPreprocessorIfc) {
+			return (XMPPPreprocessorIfc) imp;
+		}
+
+		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param id
+	 *
+	 * @return
+	 */
+	public static XMPPProcessorIfc getProcessor(String id) {
+		XMPPImplIfc imp = processors.get(id);
+
+		if (imp instanceof XMPPProcessorIfc) {
+			return (XMPPProcessorIfc) imp;
+		}
+
+		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param id
+	 *
+	 * @return
+	 */
+	public static XMPPStopListenerIfc getStopListener(String id) {
+		XMPPImplIfc imp = processors.get(id);
+
+		if (imp instanceof XMPPStopListenerIfc) {
+			return (XMPPStopListenerIfc) imp;
+		}
+
+		return null;
+	}
+}    // ProcessorFactory
+
+
+//~ Formatted in Sun Code Convention
+
+
+//~ Formatted by Jindent --- http://www.jindent.com
