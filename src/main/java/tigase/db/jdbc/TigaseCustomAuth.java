@@ -341,7 +341,7 @@ public class TigaseCustomAuth implements UserAuthRepository {
 		} catch (SQLException e) {
 			throw new TigaseDBException("Problem accessing repository.", e);
 		} finally {
-			release(null, rs);
+			data_repo.release(null, rs);
 		}
 	}
 
@@ -423,7 +423,7 @@ public class TigaseCustomAuth implements UserAuthRepository {
 
 			// throw new TigaseDBException("Problem loading user list from repository", e);
 		} finally {
-			release(null, rs);
+			data_repo.release(null, rs);
 			rs = null;
 		}
 	}
@@ -461,7 +461,7 @@ public class TigaseCustomAuth implements UserAuthRepository {
 
 			// throw new TigaseDBException("Problem loading user list from repository", e);
 		} finally {
-			release(null, rs);
+			data_repo.release(null, rs);
 			rs = null;
 		}
 	}
@@ -736,7 +736,7 @@ public class TigaseCustomAuth implements UserAuthRepository {
 		} catch (SQLException e) {
 			throw new TigaseDBException("Problem with retrieving user password.", e);
 		} finally {
-			release(null, rs);
+			data_repo.release(null, rs);
 		}
 	}
 
@@ -747,20 +747,6 @@ public class TigaseCustomAuth implements UserAuthRepository {
 
 		synchronized (init_db) {
 			init_db.executeUpdate();
-		}
-	}
-
-	private void release(Statement stmt, ResultSet rs) {
-		if (rs != null) {
-			try {
-				rs.close();
-			} catch (SQLException sqlEx) {}
-		}
-
-		if (stmt != null) {
-			try {
-				stmt.close();
-			} catch (SQLException sqlEx) {}
 		}
 	}
 
@@ -887,7 +873,7 @@ public class TigaseCustomAuth implements UserAuthRepository {
 		} catch (SQLException e) {
 			throw new TigaseDBException("Problem accessing repository.", e);
 		} finally {
-			release(null, rs);
+			data_repo.release(null, rs);
 		}    // end of catch
 	}
 

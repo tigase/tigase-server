@@ -116,7 +116,7 @@ public class TigaseAuth implements UserAuthRepository {
 		} catch (SQLException e) {
 			throw new TigaseDBException("Problem accessing repository.", e);
 		} finally {
-			release(null, rs);
+			data_repo.release(null, rs);
 		}
 	}
 
@@ -181,7 +181,7 @@ public class TigaseAuth implements UserAuthRepository {
 
 			// throw new TigaseDBException("Problem loading user list from repository", e);
 		} finally {
-			release(null, rs);
+			data_repo.release(null, rs);
 			rs = null;
 		}
 	}
@@ -220,7 +220,7 @@ public class TigaseAuth implements UserAuthRepository {
 
 			// throw new TigaseDBException("Problem loading user list from repository", e);
 		} finally {
-			release(null, rs);
+			data_repo.release(null, rs);
 			rs = null;
 		}
 	}
@@ -372,7 +372,7 @@ public class TigaseAuth implements UserAuthRepository {
 		} catch (SQLException e) {
 			throw new TigaseDBException("Problem accessing repository.", e);
 		} finally {
-			release(null, rs);
+			data_repo.release(null, rs);
 		}    // end of catch
 	}
 
@@ -461,25 +461,11 @@ public class TigaseAuth implements UserAuthRepository {
 				}    // end of if (isnext) else
 			}
 		} finally {
-			release(null, rs);
+			data_repo.release(null, rs);
 		}
 	}
 
 	//~--- methods --------------------------------------------------------------
-
-	private void release(Statement stmt, ResultSet rs) {
-		if (rs != null) {
-			try {
-				rs.close();
-			} catch (SQLException sqlEx) {}
-		}
-
-		if (stmt != null) {
-			try {
-				stmt.close();
-			} catch (SQLException sqlEx) {}
-		}
-	}
 
 	private boolean saslAuth(final Map<String, Object> props)
 			throws UserNotFoundException, TigaseDBException, AuthorizationException,

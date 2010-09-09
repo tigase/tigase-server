@@ -288,7 +288,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		} catch (SQLException e) {
 			throw new TigaseDBException("Error getting data list.", e);
 		} finally {
-			release(null, rs);
+			data_repo.release(null, rs);
 		}
 	}
 
@@ -371,7 +371,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		} catch (SQLException e) {
 			throw new TigaseDBException("Error getting data list.", e);
 		} finally {
-			release(null, rs);
+			data_repo.release(null, rs);
 		}
 	}
 
@@ -412,7 +412,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		} catch (SQLException e) {
 			throw new TigaseDBException("Error getting subnodes list.", e);
 		} finally {
-			release(null, rs);
+			data_repo.release(null, rs);
 		}
 	}
 
@@ -477,7 +477,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		} catch (SQLException e) {
 			throw new TigaseDBException("Error getting subnodes list.", e);
 		} finally {
-			release(null, rs);
+			data_repo.release(null, rs);
 		}
 	}
 
@@ -531,7 +531,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		} catch (SQLException e) {
 			throw new TigaseDBException("Error retrieving user UID from repository: ", e);
 		} finally {
-			release(null, rs);
+			data_repo.release(null, rs);
 		}
 
 		cache.put(user_id.toString(), Long.valueOf(result));
@@ -567,7 +567,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		} catch (SQLException e) {
 			throw new TigaseDBException("Problem loading user list from repository", e);
 		} finally {
-			release(null, rs);
+			data_repo.release(null, rs);
 			rs = null;
 		}
 
@@ -604,7 +604,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 
 			// throw new TigaseDBException("Problem loading user list from repository", e);
 		} finally {
-			release(null, rs);
+			data_repo.release(null, rs);
 			rs = null;
 		}
 	}
@@ -643,7 +643,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 
 			// throw new TigaseDBException("Problem loading user list from repository", e);
 		} finally {
-			release(null, rs);
+			data_repo.release(null, rs);
 			rs = null;
 		}
 	}
@@ -869,7 +869,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		} catch (SQLException e) {
 			throw new TigaseDBException("Error removing user from repository: " + query, e);
 		} finally {
-			release(stmt, rs);
+			data_repo.release(stmt, rs);
 			stmt = null;
 			cache.remove(user_id.toString());
 
@@ -989,7 +989,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 							+ "The SP should return nid or fail");
 				}    // end of if (isnext) else
 			} finally {
-				release(null, rs);
+				data_repo.release(null, rs);
 			}
 		}
 
@@ -1026,7 +1026,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 							+ "The SP should return uid or fail");
 				}    // end of if (isnext) else
 			} finally {
-				release(null, rs);
+				data_repo.release(null, rs);
 			}
 		}
 
@@ -1085,7 +1085,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 				}
 			}
 		} finally {
-			release(stmt, rs);
+			data_repo.release(stmt, rs);
 		}    // end of try-catch
 	}
 
@@ -1131,7 +1131,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 			query = "delete from " + DEF_NODES_TBL + " where nid = " + nid;
 			stmt.executeUpdate(query);
 		} finally {
-			release(stmt, rs);
+			data_repo.release(stmt, rs);
 		}
 	}
 
@@ -1175,7 +1175,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 
 			return nid;
 		} finally {
-			release(stmt, rs);
+			data_repo.release(stmt, rs);
 			stmt = null;
 			rs = null;
 		}
@@ -1212,22 +1212,6 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		}      // end of if (isnext) else
 
 		return result;
-	}
-
-	//~--- methods --------------------------------------------------------------
-
-	private void release(Statement stmt, ResultSet rs) {
-		if (rs != null) {
-			try {
-				rs.close();
-			} catch (SQLException sqlEx) {}
-		}
-
-		if (stmt != null) {
-			try {
-				stmt.close();
-			} catch (SQLException sqlEx) {}
-		}
 	}
 
 	//~--- inner classes --------------------------------------------------------

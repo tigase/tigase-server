@@ -499,7 +499,7 @@ public class DrupalWPAuth implements UserAuthRepository {
 				}    // end of if (isnext) else
 			}
 		} finally {
-			release(null, rs);
+			data_repo.release(null, rs);
 		}
 	}
 
@@ -520,25 +520,11 @@ public class DrupalWPAuth implements UserAuthRepository {
 				}    // end of if (isnext) else
 			}
 		} finally {
-			release(null, rs);
+			data_repo.release(null, rs);
 		}
 	}
 
 	//~--- methods --------------------------------------------------------------
-
-	private void release(Statement stmt, ResultSet rs) {
-		if (rs != null) {
-			try {
-				rs.close();
-			} catch (SQLException sqlEx) {}
-		}
-
-		if (stmt != null) {
-			try {
-				stmt.close();
-			} catch (SQLException sqlEx) {}
-		}
-	}
 
 	private boolean saslAuth(final Map<String, Object> props) throws AuthorizationException {
 		try {
