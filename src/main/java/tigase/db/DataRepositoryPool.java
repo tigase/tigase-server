@@ -25,6 +25,7 @@ package tigase.db;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -47,7 +48,7 @@ public class DataRepositoryPool implements DataRepository {
 	//~--- fields ---------------------------------------------------------------
 
 	private int idx = 0;
-	private ArrayList<DataRepository> repoPool = new ArrayList<DataRepository>();
+	private ArrayList<DataRepository> repoPool = new ArrayList<DataRepository>(5);
 	private String resource_uri = null;
 
 	//~--- methods --------------------------------------------------------------
@@ -62,6 +63,29 @@ public class DataRepositoryPool implements DataRepository {
 		synchronized (repoPool) {
 			repoPool.add(repo);
 		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param tableName
+	 *
+	 * @return
+	 *
+	 * @throws SQLException
+	 */
+	@Override
+	public boolean checkTable(String tableName) throws SQLException {
+		DataRepository repo = takeRepo();
+
+		if (repo != null) {
+			return repo.checkTable(tableName);
+		} else {
+			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
+		}
+
+		return false;
 	}
 
 	/**
@@ -154,6 +178,28 @@ public class DataRepositoryPool implements DataRepository {
 
 		for (DataRepository dataRepository : repoPool) {
 			dataRepository.initRepository(resource_uri, params);
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param stmt
+	 * @param rs
+	 */
+	@Override
+	public void release(Statement stmt, ResultSet rs) {
+		if (rs != null) {
+			try {
+				rs.close();
+			} catch (SQLException sqlEx) {}
+		}
+
+		if (stmt != null) {
+			try {
+				stmt.close();
+			} catch (SQLException sqlEx) {}
 		}
 	}
 

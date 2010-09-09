@@ -58,6 +58,13 @@ public class DataRepositoryImpl implements DataRepository {
 	public static final String JDBC_CONNVALID_QUERY = "select 1";
 
 	/** Field description */
+	public static final String MYSQL_CHECK_TABLE_QUERY =
+		"select * from information_schema.tables where table_name = ?";
+
+	/** Field description */
+	public static final String OTHER_CHECK_TABLE_QUERY = "";
+
+	/** Field description */
 	public static final String SP_STARTS_WITH = "{ call";
 
 	//~--- fields ---------------------------------------------------------------
@@ -71,8 +78,46 @@ public class DataRepositoryImpl implements DataRepository {
 	private Map<String, PreparedStatement> db_statements = new ConcurrentSkipListMap<String,
 		PreparedStatement>();
 	private Map<String, String> db_queries = new ConcurrentSkipListMap<String, String>();
+	private String check_table_query = MYSQL_CHECK_TABLE_QUERY;
 
 	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param tableName
+	 *
+	 * @return
+	 *
+	 * @throws SQLException
+	 */
+	@Override
+	public boolean checkTable(String tableName) throws SQLException {
+		PreparedStatement checkTableSt = getPreparedStatement(check_table_query);
+
+		if (checkTableSt == null) {
+			return true;
+		}
+
+		boolean result = false;
+		ResultSet rs = null;
+
+		synchronized (checkTableSt) {
+			try {
+				checkTableSt.setString(1, tableName);
+				rs = checkTableSt.executeQuery();
+
+				if (rs.next()) {
+					result = true;
+				}
+			} finally {
+				release(null, rs);
+			}
+		}
+
+		return result;
+	}
 
 	/**
 	 * Method description
@@ -153,7 +198,38 @@ public class DataRepositoryImpl implements DataRepository {
 	public void initRepository(String resource_uri, Map<String, String> params) throws SQLException {
 		db_conn = resource_uri;
 		initRepo();
+
+		if ( !db_conn.contains("mysql")) {
+			check_table_query = OTHER_CHECK_TABLE_QUERY;
+		}
+
+		if ( !check_table_query.isEmpty()) {
+			initPreparedStatement(check_table_query, check_table_query);
+		}
+
 		log.log(Level.INFO, "Initialized database connection: {0}", resource_uri);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param stmt
+	 * @param rs
+	 */
+	@Override
+	public void release(Statement stmt, ResultSet rs) {
+		if (rs != null) {
+			try {
+				rs.close();
+			} catch (SQLException sqlEx) {}
+		}
+
+		if (stmt != null) {
+			try {
+				stmt.close();
+			} catch (SQLException sqlEx) {}
+		}
 	}
 
 	/**
@@ -237,20 +313,6 @@ public class DataRepositoryImpl implements DataRepository {
 			return conn.prepareCall(query);
 		} else {
 			return conn.prepareStatement(query);
-		}
-	}
-
-	private void release(Statement stmt, ResultSet rs) {
-		if (rs != null) {
-			try {
-				rs.close();
-			} catch (SQLException sqlEx) {}
-		}
-
-		if (stmt != null) {
-			try {
-				stmt.close();
-			} catch (SQLException sqlEx) {}
 		}
 	}
 }

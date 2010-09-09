@@ -25,6 +25,7 @@ package tigase.db;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -43,6 +44,15 @@ import java.util.Map;
  * @version $Rev$
  */
 public interface DataRepository {
+
+	/**
+	 * The method checks whether a table for the given name exists in the database.
+	 * @param tableName is a <code>String</code> value of the table name to check
+	 * @return <code>true</code> <code>boolean</code> value if the table exist in the
+	 * database and <code>false</code> if the table was not found.
+	 * @throws SQLException if there was a problem accessing database.
+	 */
+	boolean checkTable(String tableName) throws SQLException;
 
 	/**
 	 * Creates a SQL statement on which SQL queries can be executed later by the
@@ -94,6 +104,15 @@ public interface DataRepository {
 	 * call.
 	 */
 	void initRepository(String resource_uri, Map<String, String> params) throws SQLException;
+
+	/**
+	 * A helper method to release resources from the statement and result set. This is most common
+	 * operation for all database calls, therefore it does make sense to add such a utility method
+	 * to the API.
+	 * @param stmt a <code>Statement</code> variable to release resources for. Might be null.
+	 * @param rs a <code>ResultSet</code> variable to release resources for. Might be null.
+	 */
+	void release(Statement stmt, ResultSet rs);
 }
 
 
