@@ -24,15 +24,17 @@ package tigase.stats;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.db.DBInitException;
+import tigase.db.DataRepository;
+import tigase.db.RepositoryFactory;
 import tigase.db.TigaseDBException;
-
-import tigase.util.JDBCAbstract;
 
 //~--- JDK imports ------------------------------------------------------------
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import java.util.Map;
 import java.util.logging.Level;
@@ -46,7 +48,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class CounterDataLogger extends JDBCAbstract implements StatisticsArchivizerIfc {
+public class CounterDataLogger implements StatisticsArchivizerIfc {
 	private static final Logger log = Logger.getLogger(CounterDataLogger.class.getName());
 
 	/** Field description */
@@ -159,15 +161,14 @@ public class CounterDataLogger extends JDBCAbstract implements StatisticsArchivi
 		+ " int unsigned not null default 0," + " primary key(ts))";
 	private static final String STATS_INSERT_QUERY = "insert into " + STATS_TABLE + "("
 		+ CPU_USAGE_COL + ", " + MEM_USAGE_COL + ", " + UPTIME_COL + ", " + VHOSTS_COL + ", "
-		+ SM_PACKETS_COL + ", " + MUC_PACKETS_COL + ", " + PUBSUB_PACKETS_COL + ", "
-		+ C2S_PACKETS_COL + ", " + S2S_PACKETS_COL + ", " + EXT_PACKETS_COL + ", " + PRESENCES_COL
-		+ ", " + MESSAGES_COL + ", " + IQS_COL + ", " + REGISTERED_COL + ", " + C2S_CONNS_COL
-		+ ", " + S2S_CONNS_COL + ", " + BOSH_CONNS_COL
-		+ ") values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		+ SM_PACKETS_COL + ", " + MUC_PACKETS_COL + ", " + PUBSUB_PACKETS_COL + ", " + C2S_PACKETS_COL
+		+ ", " + S2S_PACKETS_COL + ", " + EXT_PACKETS_COL + ", " + PRESENCES_COL + ", " + MESSAGES_COL
+		+ ", " + IQS_COL + ", " + REGISTERED_COL + ", " + C2S_CONNS_COL + ", " + S2S_CONNS_COL + ", "
+		+ BOSH_CONNS_COL + ") values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 	//~--- fields ---------------------------------------------------------------
 
-	private PreparedStatement insert_stats = null;
+	private DataRepository data_repo = null;
 	private long last_c2s_packets = 0;
 	private long last_ext_packets = 0;
 	private long last_iqs = 0;
@@ -204,11 +205,11 @@ public class CounterDataLogger extends JDBCAbstract implements StatisticsArchivi
 	 *
 	 */
 	public void addStatsLogEntry(float cpu_usage, float mem_usage, long uptime, int vhosts,
-			long sm_packets, long muc_packets, long pubsub_packets, long c2s_packets,
-				long s2s_packets, long ext_packets, long presences, long messages, long iqs,
-					long registered, int c2s_conns, int s2s_conns, int bosh_conns) {
+			long sm_packets, long muc_packets, long pubsub_packets, long c2s_packets, long s2s_packets,
+				long ext_packets, long presences, long messages, long iqs, long registered, int c2s_conns,
+					int s2s_conns, int bosh_conns) {
 		try {
-			checkConnection();
+			PreparedStatement insert_stats = data_repo.getPreparedStatement(STATS_INSERT_QUERY);
 
 			synchronized (insert_stats) {
 				insert_stats.setFloat(1, ((cpu_usage >= 0f) ? cpu_usage : 0f));
@@ -257,10 +258,9 @@ public class CounterDataLogger extends JDBCAbstract implements StatisticsArchivi
 				sp.getStats("vhost-man", "Number of VHosts", 0), sm_packets - last_sm_packets,
 					muc_packets - last_muc_packets, pubsub_packets - last_pubsub_packets,
 						c2s_packets - last_c2s_packets, s2s_packets - last_s2s_packets,
-							ext_packets - last_ext_packets, presences - last_presences,
-								messages - last_messages, iqs - last_iqs, sp.getRegistered(),
-									sp.getCompConnections("c2s"), sp.getCompConnections("s2s"),
-										sp.getCompConnections("bosh"));
+							ext_packets - last_ext_packets, presences - last_presences, messages - last_messages,
+								iqs - last_iqs, sp.getRegistered(), sp.getCompConnections("c2s"),
+									sp.getCompConnections("s2s"), sp.getCompConnections("bosh"));
 		last_c2s_packets = c2s_packets;
 		last_ext_packets = ext_packets;
 		last_iqs = iqs;
@@ -282,7 +282,7 @@ public class CounterDataLogger extends JDBCAbstract implements StatisticsArchivi
 	public void init(Map<String, Object> archivizerConf) {
 		try {
 			initRepository((String) archivizerConf.get(DB_URL_PROP_KEY), null);
-		} catch (SQLException ex) {
+		} catch (Exception ex) {
 			log.log(Level.SEVERE, "Cannot initialize connection to database: ", ex);
 		}
 	}
@@ -295,12 +295,17 @@ public class CounterDataLogger extends JDBCAbstract implements StatisticsArchivi
 	 * @param map
 	 *
 	 * @throws SQLException
+	 * @throws ClassNotFoundException
+	 * @throws IllegalAccessException
+	 * @throws InstantiationException
+	 * @throws DBInitException
 	 */
-	@Override
-	public void initRepository(String conn_str, Map<String, String> map) throws SQLException {
-		log.info("Initializing dbAccess for db connection url: " + conn_str);
-		setResourceUri(conn_str);
-		checkConnection();
+	public void initRepository(String conn_str, Map<String, String> map)
+			throws SQLException, ClassNotFoundException, IllegalAccessException, InstantiationException,
+			DBInitException {
+		log.log(Level.INFO, "Initializing dbAccess for db connection url: {0}", conn_str);
+		data_repo = RepositoryFactory.getDataRepository(null, conn_str, map);
+		data_repo.initPreparedStatement(STATS_INSERT_QUERY, STATS_INSERT_QUERY);
 
 		// Check if DB is correctly setup and contains all required tables.
 		checkDB();
@@ -313,33 +318,19 @@ public class CounterDataLogger extends JDBCAbstract implements StatisticsArchivi
 	@Override
 	public void release() {}
 
-	@Override
-	protected void initPreparedStatements() throws SQLException {
-		super.initPreparedStatements();
-		insert_stats = prepareStatement(STATS_INSERT_QUERY);
-	}
-
 	private void checkDB() throws SQLException {
 		ResultSet rs = null;
+		Statement st = null;
 
 		try {
-			String CHECK_TABLE_QUERY = "select count(*) from ";
-			PreparedStatement checkTableSt = prepareStatement(CHECK_TABLE_QUERY + STATS_TABLE);
-
-			rs = checkTableSt.executeQuery();
-
-			if (rs.next()) {
-				long count = rs.getLong(1);
-
-				log.info("DB table " + STATS_TABLE + " OK, items: " + count);
+			if ( !data_repo.checkTable(STATS_TABLE)) {
+				st = data_repo.createStatement();
+				st.executeUpdate(CREATE_STATS_TABLE);
 			}
-		} catch (Exception e) {
-			PreparedStatement createTable = prepareStatement(CREATE_STATS_TABLE);
-
-			createTable.executeUpdate();
 		} finally {
-			release(null, rs);
+			data_repo.release(st, rs);
 			rs = null;
+			st = null;
 		}
 	}
 }

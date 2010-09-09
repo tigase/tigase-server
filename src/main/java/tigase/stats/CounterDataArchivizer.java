@@ -24,11 +24,13 @@ package tigase.stats;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.db.DBInitException;
+import tigase.db.DataRepository;
+import tigase.db.RepositoryFactory;
+
 import tigase.server.XMPPServer;
 
 import tigase.sys.TigaseRuntime;
-
-import tigase.util.JDBCAbstract;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -49,7 +51,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class CounterDataArchivizer extends JDBCAbstract implements StatisticsArchivizerIfc {
+public class CounterDataArchivizer implements StatisticsArchivizerIfc {
 	private static final Logger log = Logger.getLogger(CounterDataArchivizer.class.getName());
 
 	/** Field description */
@@ -75,10 +77,15 @@ public class CounterDataArchivizer extends JDBCAbstract implements StatisticsArc
 
 	//~--- fields ---------------------------------------------------------------
 
-	private PreparedStatement initEntry = null;
+	private DataRepository data_repo = null;
+	private String init_entry_query = null;
+
+	// private PreparedStatement initEntry = null;
 	private String tableName = DEF_TABLE_NAME;
 	private String keyField = DEF_KEY_FIELD_NAME;
-	private PreparedStatement updateEntry = null;
+	private String update_entry_query = null;
+
+	// private PreparedStatement updateEntry = null;
 	private String valueField = DEF_VALUE_FIELD_NAME;
 
 	//~--- methods --------------------------------------------------------------
@@ -128,6 +135,11 @@ public class CounterDataArchivizer extends JDBCAbstract implements StatisticsArc
 			valueField = prop;
 		}
 
+		init_entry_query = "insert into " + tableName + " (" + keyField + ", " + valueField + ") "
+				+ " values (?, ?) on duplicate key update " + valueField + " = ?";
+		update_entry_query = "update " + tableName + " set " + valueField + " = ? where " + keyField
+				+ " = ?";
+
 		try {
 			initRepository((String) conf.get(DB_URL_PROP_KEY), null);
 			initData(VERSION_TEXT, XMPPServer.getImplementationVersion());
@@ -136,7 +148,7 @@ public class CounterDataArchivizer extends JDBCAbstract implements StatisticsArc
 			initData(USER_CONNECTIONS_TEXT, "0");
 			initData(SERVER_CONNECTIONS_TEXT, "0");
 			initData(UPTIME_TEXT, TigaseRuntime.getTigaseRuntime().getUptimeString());
-		} catch (SQLException ex) {
+		} catch (Exception ex) {
 			log.log(Level.SEVERE, "Cannot initialize connection to database: ", ex);
 		}
 	}
@@ -150,7 +162,7 @@ public class CounterDataArchivizer extends JDBCAbstract implements StatisticsArc
 	 */
 	public void initData(String key, String value) {
 		try {
-			checkConnection();
+			PreparedStatement initEntry = data_repo.getPreparedStatement(init_entry_query);
 
 			synchronized (initEntry) {
 				initEntry.setString(1, key);
@@ -171,11 +183,17 @@ public class CounterDataArchivizer extends JDBCAbstract implements StatisticsArc
 	 * @param params
 	 *
 	 * @throws SQLException
+	 * @throws ClassNotFoundException
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws DBInitException
 	 */
-	@Override
-	public void initRepository(String conn_str, Map<String, String> params) throws SQLException {
-		setResourceUri(conn_str);
-		checkConnection();
+	public void initRepository(String conn_str, Map<String, String> params)
+			throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException,
+			DBInitException {
+		data_repo = RepositoryFactory.getDataRepository(null, conn_str, params);
+		data_repo.initPreparedStatement(init_entry_query, init_entry_query);
+		data_repo.initPreparedStatement(update_entry_query, update_entry_query);
 	}
 
 	/**
@@ -197,7 +215,7 @@ public class CounterDataArchivizer extends JDBCAbstract implements StatisticsArc
 	 */
 	public void updateData(String key, String value) {
 		try {
-			checkConnection();
+			PreparedStatement updateEntry = data_repo.getPreparedStatement(update_entry_query);
 
 			synchronized (updateEntry) {
 				updateEntry.setString(1, value);
@@ -207,18 +225,6 @@ public class CounterDataArchivizer extends JDBCAbstract implements StatisticsArc
 		} catch (SQLException e) {
 			log.log(Level.WARNING, "Problem adding new entry to DB: ", e);
 		}
-	}
-
-	@Override
-	protected void initPreparedStatements() throws SQLException {
-		super.initPreparedStatements();
-
-		String query = "insert into " + tableName + " (" + keyField + ", " + valueField + ") "
-			+ " values (?, ?) on duplicate key update " + valueField + " = ?";
-
-		initEntry = prepareStatement(query);
-		query = "update " + tableName + " set " + valueField + " = ? where " + keyField + " = ?";
-		updateEntry = prepareStatement(query);
 	}
 }
 
