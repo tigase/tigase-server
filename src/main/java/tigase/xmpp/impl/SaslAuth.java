@@ -25,7 +25,7 @@ package tigase.xmpp.impl;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.db.NonAuthUserRepository;
-import tigase.db.UserAuthRepository;
+import tigase.db.AuthRepository;
 
 import tigase.server.Command;
 import tigase.server.Packet;
@@ -188,21 +188,21 @@ public class SaslAuth extends XMPPProcessor implements XMPPProcessorIfc {
 
 		if (authProps == null) {
 			authProps = new HashMap<String, Object>(10, 0.75f);
-			authProps.put(UserAuthRepository.PROTOCOL_KEY, UserAuthRepository.PROTOCOL_VAL_SASL);
-			authProps.put(UserAuthRepository.MACHANISM_KEY,
+			authProps.put(AuthRepository.PROTOCOL_KEY, AuthRepository.PROTOCOL_VAL_SASL);
+			authProps.put(AuthRepository.MACHANISM_KEY,
 					request.getAttribute("/auth", "mechanism"));
-			authProps.put(UserAuthRepository.REALM_KEY, session.getDomain().getVhost().getDomain());
-			authProps.put(UserAuthRepository.SERVER_NAME_KEY,
+			authProps.put(AuthRepository.REALM_KEY, session.getDomain().getVhost().getDomain());
+			authProps.put(AuthRepository.SERVER_NAME_KEY,
 					session.getDomain().getVhost().getDomain());
 			session.putSessionData(XMLNS + "-authProps", authProps);
 		}    // end of if (authProps == null)
 
-		// String user = (String)authProps.get(UserAuthRepository.USER_ID_KEY);
-		authProps.put(UserAuthRepository.DATA_KEY, request.getCData());
+		// String user = (String)authProps.get(AuthRepository.USER_ID_KEY);
+		authProps.put(AuthRepository.DATA_KEY, request.getCData());
 
 		try {
 			Authorization result = session.loginOther(authProps);
-			String challenge_data = (String) authProps.get(UserAuthRepository.RESULT_KEY);
+			String challenge_data = (String) authProps.get(AuthRepository.RESULT_KEY);
 
 			if (result == Authorization.AUTHORIZED) {
 				results.offer(packet.swapFromTo(createReply(ElementType.success, challenge_data),
@@ -286,10 +286,10 @@ public class SaslAuth extends XMPPProcessor implements XMPPProcessorIfc {
 		} else {
 			Map<String, Object> query = new HashMap<String, Object>();
 
-			query.put(UserAuthRepository.PROTOCOL_KEY, UserAuthRepository.PROTOCOL_VAL_SASL);
+			query.put(AuthRepository.PROTOCOL_KEY, AuthRepository.PROTOCOL_VAL_SASL);
 			session.queryAuth(query);
 
-			String[] auth_mechs = (String[]) query.get(UserAuthRepository.RESULT_KEY);
+			String[] auth_mechs = (String[]) query.get(AuthRepository.RESULT_KEY);
 			Element[] mechs = new Element[auth_mechs.length];
 			int idx = 0;
 

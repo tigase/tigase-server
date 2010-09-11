@@ -26,8 +26,8 @@ package tigase.db.xml;
 
 import tigase.db.AuthorizationException;
 import tigase.db.TigaseDBException;
-import tigase.db.UserAuthRepository;
-import tigase.db.UserAuthRepositoryImpl;
+import tigase.db.AuthRepository;
+import tigase.db.AuthRepositoryImpl;
 import tigase.db.UserExistsException;
 import tigase.db.UserNotFoundException;
 import tigase.db.UserRepository;
@@ -60,14 +60,14 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class XMLRepository implements UserAuthRepository, UserRepository {
+public class XMLRepository implements AuthRepository, UserRepository {
 	private static final String USER_STR = "User: ";
 	private static final String NOT_FOUND_STR = " has not been found in repository.";
 	private static final Logger log = Logger.getLogger("tigase.db.xml.XMLRepository");
 
 	//~--- fields ---------------------------------------------------------------
 
-	private UserAuthRepository auth = null;
+	private AuthRepository auth = null;
 	private XMLDB xmldb = null;
 	private boolean autoCreateUser = false;
 
@@ -502,7 +502,7 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
 				autoCreateUser = true;
 			}    // end of if (db_conn.contains())
 
-			auth = new UserAuthRepositoryImpl(this);
+			auth = new AuthRepositoryImpl(this);
 			xmldb = new XMLDB(file_name);
 		} catch (Exception e) {
 			log.warning("Can not open existing user repository file, creating new one, " + e);
@@ -540,7 +540,7 @@ public class XMLRepository implements UserAuthRepository, UserRepository {
 		return auth.otherAuth(props);
 	}
 
-	// Implementation of tigase.db.UserAuthRepository
+	// Implementation of tigase.db.AuthRepository
 
 	/**
 	 * Describe <code>plainAuth</code> method here.

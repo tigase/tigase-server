@@ -24,7 +24,7 @@ package tigase.server.xmppsession;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.db.UserAuthRepository;
+import tigase.db.AuthRepository;
 import tigase.db.UserRepository;
 
 import tigase.util.TigaseStringprepException;
@@ -60,7 +60,7 @@ public class SMResourceConnection extends XMPPResourceConnection {
 	 * @param loginHandler
 	 */
 	public SMResourceConnection(JID connectionId, UserRepository rep,
-			UserAuthRepository authRepo, SessionManagerHandler loginHandler) {
+			AuthRepository authRepo, SessionManagerHandler loginHandler) {
 		super(connectionId, rep, authRepo, loginHandler);
 
 		try {

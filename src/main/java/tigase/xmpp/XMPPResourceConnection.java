@@ -26,7 +26,7 @@ package tigase.xmpp;
 
 import tigase.db.AuthorizationException;
 import tigase.db.TigaseDBException;
-import tigase.db.UserAuthRepository;
+import tigase.db.AuthRepository;
 import tigase.db.UserRepository;
 
 import tigase.server.xmppsession.SessionManagerHandler;
@@ -128,7 +128,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	 * @param authRepo
 	 * @param loginHandler
 	 */
-	public XMPPResourceConnection(JID connectionId, UserRepository rep, UserAuthRepository authRepo,
+	public XMPPResourceConnection(JID connectionId, UserRepository rep, AuthRepository authRepo,
 			SessionManagerHandler loginHandler) {
 		super(rep, authRepo);
 
@@ -549,7 +549,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 		Authorization result = super.loginOther(props);
 
 		if (result == Authorization.AUTHORIZED) {
-			BareJID user = (BareJID) props.get(UserAuthRepository.USER_ID_KEY);
+			BareJID user = (BareJID) props.get(AuthRepository.USER_ID_KEY);
 
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("UserAuthRepository.USER_ID_KEY: " + user);

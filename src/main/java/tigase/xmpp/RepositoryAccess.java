@@ -24,9 +24,9 @@ package tigase.xmpp;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.db.AuthRepository;
 import tigase.db.AuthorizationException;
 import tigase.db.TigaseDBException;
-import tigase.db.UserAuthRepository;
 import tigase.db.UserExistsException;
 import tigase.db.UserNotFoundException;
 import tigase.db.UserRepository;
@@ -69,7 +69,7 @@ public abstract class RepositoryAccess {
 
 	//~--- fields ---------------------------------------------------------------
 
-	private UserAuthRepository authRepo = null;
+	private AuthRepository authRepo = null;
 	protected VHostItem domain = null;
 
 	/**
@@ -95,7 +95,7 @@ public abstract class RepositoryAccess {
 	 * @param rep
 	 * @param auth
 	 */
-	public RepositoryAccess(UserRepository rep, UserAuthRepository auth) {
+	public RepositoryAccess(UserRepository rep, AuthRepository auth) {
 		repo = rep;
 		authRepo = auth;
 
@@ -286,8 +286,7 @@ public abstract class RepositoryAccess {
 	 * @throws TigaseDBException
 	 * @see #setData(String, String, String)
 	 */
-	public String[] getDataGroups(String subnode)
-			throws NotAuthorizedException, TigaseDBException {
+	public String[] getDataGroups(String subnode) throws NotAuthorizedException, TigaseDBException {
 		if (is_anonymous) {
 			return null;
 		}
@@ -568,11 +567,11 @@ public abstract class RepositoryAccess {
 		isLoginAllowed();
 
 		try {
-			String mech = (String) props.get(UserAuthRepository.MACHANISM_KEY);
+			String mech = (String) props.get(AuthRepository.MACHANISM_KEY);
 
 			if (domain.isAnonymousEnabled() && (mech != null) && mech.equals(ANONYMOUS_MECH)) {
 				is_anonymous = true;
-				props.put(UserAuthRepository.USER_ID_KEY,
+				props.put(AuthRepository.USER_ID_KEY,
 						BareJID.bareJIDInstanceNS(UUID.randomUUID().toString(),
 							getDomain().getVhost().getDomain()));
 				authState = Authorization.AUTHORIZED;
@@ -690,17 +689,16 @@ public abstract class RepositoryAccess {
 	 * @param authProps
 	 */
 	public void queryAuth(Map<String, Object> authProps) {
-		authProps.put(UserAuthRepository.SERVER_NAME_KEY, getDomain().getVhost().getDomain());
+		authProps.put(AuthRepository.SERVER_NAME_KEY, getDomain().getVhost().getDomain());
 		authRepo.queryAuth(authProps);
 
 		if (domain.isAnonymousEnabled()
-				&& (authProps.get(UserAuthRepository.PROTOCOL_KEY)
-					== UserAuthRepository.PROTOCOL_VAL_SASL)) {
-			String[] auth_mechs = (String[]) authProps.get(UserAuthRepository.RESULT_KEY);
+				&& (authProps.get(AuthRepository.PROTOCOL_KEY) == AuthRepository.PROTOCOL_VAL_SASL)) {
+			String[] auth_mechs = (String[]) authProps.get(AuthRepository.RESULT_KEY);
 
 			auth_mechs = Arrays.copyOf(auth_mechs, auth_mechs.length + 1);
 			auth_mechs[auth_mechs.length - 1] = ANONYMOUS_MECH;
-			authProps.put(UserAuthRepository.RESULT_KEY, auth_mechs);
+			authProps.put(AuthRepository.RESULT_KEY, auth_mechs);
 		}
 	}
 
@@ -772,8 +770,8 @@ public abstract class RepositoryAccess {
 			long domainUsers = authRepo.getUsersCount(domain.getVhost().getDomain());
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Current number of users for domain: " + domain.getVhost().getDomain()
-						+ " is: " + domainUsers);
+				log.finest("Current number of users for domain: " + domain.getVhost().getDomain() + " is: "
+						+ domainUsers);
 			}
 
 			if (domainUsers >= domain.getMaxUsersNumber()) {
@@ -791,9 +789,8 @@ public abstract class RepositoryAccess {
 					pass_param);
 
 			if (log.isLoggable(Level.INFO)) {
-				log.info("User added: "
-						+ BareJID.toString(user_name, getDomain().getVhost().getDomain()) + ", pass: "
-							+ pass_param);
+				log.info("User added: " + BareJID.toString(user_name, getDomain().getVhost().getDomain())
+						+ ", pass: " + pass_param);
 			}
 
 			setRegistration(user_name, pass_param, reg_params);
@@ -1140,8 +1137,7 @@ public abstract class RepositoryAccess {
 
 		if (getUserName().equals(user_name)) {
 			try {
-				authRepo.removeUser(BareJID.bareJIDInstance(user_name,
-						getDomain().getVhost().getDomain()));
+				authRepo.removeUser(BareJID.bareJIDInstance(user_name, getDomain().getVhost().getDomain()));
 
 				return Authorization.AUTHORIZED;
 			} catch (UserNotFoundException e) {
@@ -1203,8 +1199,8 @@ public abstract class RepositoryAccess {
 
 			if (registr_params != null) {
 				for (Map.Entry<String, String> entry : registr_params.entrySet()) {
-					repo.setData(BareJID.bareJIDInstance(name_param,
-							getDomain().getVhost().getDomain()), entry.getKey(), entry.getValue());
+					repo.setData(BareJID.bareJIDInstance(name_param, getDomain().getVhost().getDomain()),
+							entry.getKey(), entry.getValue());
 				}
 			}
 		} catch (UserNotFoundException e) {

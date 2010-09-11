@@ -24,13 +24,13 @@ package tigase.db.jdbc;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.db.AuthRepository;
+import tigase.db.AuthRepositoryImpl;
 import tigase.db.AuthorizationException;
 import tigase.db.DBInitException;
 import tigase.db.DataRepository;
 import tigase.db.RepositoryFactory;
 import tigase.db.TigaseDBException;
-import tigase.db.UserAuthRepository;
-import tigase.db.UserAuthRepositoryImpl;
 import tigase.db.UserExistsException;
 import tigase.db.UserNotFoundException;
 import tigase.db.UserRepository;
@@ -70,7 +70,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:piras@tiscali.com">Daniele</a>
  * @version $Rev$
  */
-public class JDBCRepository implements UserAuthRepository, UserRepository {
+public class JDBCRepository implements AuthRepository, UserRepository {
 	private static final Logger log = Logger.getLogger(JDBCRepository.class.getName());
 
 	/** Field description */
@@ -115,7 +115,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 
 	//~--- fields ---------------------------------------------------------------
 
-	private UserAuthRepository auth = null;
+	private AuthRepository auth = null;
 
 	// Cache moved to connection pool
 	private Map<String, Object> cache = null;
@@ -689,7 +689,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 			data_repo.initPreparedStatement(NODES_FOR_NODE_QUERY, NODES_FOR_NODE_QUERY);
 			data_repo.initPreparedStatement(INSERT_KEY_VAL_QUERY, INSERT_KEY_VAL_QUERY);
 			data_repo.initPreparedStatement(REMOVE_KEY_DATA_QUERY, REMOVE_KEY_DATA_QUERY);
-			auth = new UserAuthRepositoryImpl(this);
+			auth = new AuthRepositoryImpl(this);
 
 			// initRepo();
 			log.log(Level.INFO, "Initialized database connection: {0}", connection_str);
@@ -729,7 +729,7 @@ public class JDBCRepository implements UserAuthRepository, UserRepository {
 		return auth.otherAuth(props);
 	}
 
-	// Implementation of tigase.db.UserAuthRepository
+	// Implementation of tigase.db.AuthRepository
 
 	/**
 	 * Describe <code>plainAuth</code> method here.

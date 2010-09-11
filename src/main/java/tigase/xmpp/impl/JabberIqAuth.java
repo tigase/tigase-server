@@ -25,7 +25,7 @@ package tigase.xmpp.impl;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.db.NonAuthUserRepository;
-import tigase.db.UserAuthRepository;
+import tigase.db.AuthRepository;
 
 import tigase.server.Command;
 import tigase.server.Packet;
@@ -138,10 +138,10 @@ public class JabberIqAuth extends XMPPProcessor implements XMPPProcessorIfc {
 			case get :
 				Map<String, Object> query = new HashMap<String, Object>();
 
-				query.put(UserAuthRepository.PROTOCOL_KEY, UserAuthRepository.PROTOCOL_VAL_NONSASL);
+				query.put(AuthRepository.PROTOCOL_KEY, AuthRepository.PROTOCOL_VAL_NONSASL);
 				session.queryAuth(query);
 
-				String[] auth_mechs = (String[]) query.get(UserAuthRepository.RESULT_KEY);
+				String[] auth_mechs = (String[]) query.get(AuthRepository.RESULT_KEY);
 				StringBuilder response = new StringBuilder("<username/>");
 
 				for (String mech : auth_mechs) {

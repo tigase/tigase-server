@@ -33,7 +33,7 @@ import java.util.Map;
 //~--- interfaces -------------------------------------------------------------
 
 /**
- * Interface <code>UserAuthRepository</code> defines a proxy bridge between user
+ * Interface <code>AuthRepository</code> defines a proxy bridge between user
  * authentication data storage and the Tigase server authentication logic. Important
  * thing about the authentication repository is that it not only stores login credentials
  * but also performs actual user authentication.
@@ -45,7 +45,7 @@ import java.util.Map;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public interface UserAuthRepository {
+public interface AuthRepository {
 
 	// Query params (and otherAuth)
 
@@ -256,7 +256,7 @@ public interface UserAuthRepository {
 	 */
 	void updatePassword(BareJID user, String password)
 			throws UserNotFoundException, TigaseDBException;
-}    // UserAuthRepository
+}    // AuthRepository
 
 
 //~ Formatted in Sun Code Convention

@@ -28,11 +28,11 @@ import tigase.auth.TigaseSaslProvider;
 
 import tigase.conf.Configurable;
 
+import tigase.db.AuthRepository;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.NonAuthUserRepositoryImpl;
 import tigase.db.RepositoryFactory;
 import tigase.db.TigaseDBException;
-import tigase.db.UserAuthRepository;
 import tigase.db.UserRepository;
 
 import tigase.disco.XMPPService;
@@ -134,7 +134,7 @@ public class SessionManager extends AbstractMessageReceiver
 	//~--- fields ---------------------------------------------------------------
 
 	private long authTimeouts = 0;
-	private UserAuthRepository auth_repository = null;
+	private AuthRepository auth_repository = null;
 	private long closedConnections = 0;
 	private PacketDefaultHandler defPacketHandler = null;
 
@@ -603,16 +603,8 @@ public class SessionManager extends AbstractMessageReceiver
 		skipPrivacy = (Boolean) props.get(SKIP_PRIVACY_PROP_KEY);
 		defPacketHandler = new PacketDefaultHandler();
 
-		// Is there a shared user repository pool? If so I want to use it:
-		user_repository = (UserRepository) props.get(SHARED_USER_REPO_POOL_PROP_KEY);
-
-		if (user_repository == null) {
-
-			// Is there shared user repository instance? If so I want to use it:
-			user_repository = (UserRepository) props.get(SHARED_USER_REPO_PROP_KEY);
-		} else {
-			log.config("Using shared repository pool.");
-		}
+		// Is there shared user repository instance? If so I want to use it:
+		user_repository = (UserRepository) props.get(SHARED_USER_REPO_PROP_KEY);
 
 		if (user_repository != null) {
 			log.log(Level.CONFIG, "Using shared repository instance: {0}",
@@ -634,24 +626,19 @@ public class SessionManager extends AbstractMessageReceiver
 			}
 
 			try {
-				String cls_name = (String) props.get(USER_REPO_CLASS_PROP_KEY);
+
+				// String cls_name = (String) props.get(USER_REPO_CLASS_PROP_KEY);
 				String res_uri = (String) props.get(USER_REPO_URL_PROP_KEY);
 
-				user_repository = RepositoryFactory.getUserRepository(cls_name, res_uri, user_repo_params);
-				log.log(Level.CONFIG, "Initialized {0} as user repository: {1}", new Object[] { cls_name,
+				user_repository = RepositoryFactory.getUserRepository(null, res_uri, user_repo_params);
+				log.log(Level.CONFIG, "Initialized {0} as user repository: {1}", new Object[] { null,
 						res_uri });
 			} catch (Exception e) {
 				log.log(Level.SEVERE, "Can't initialize user repository: ", e);
 			}    // end of try-catch
 		}
 
-		auth_repository = (UserAuthRepository) props.get(SHARED_USER_AUTH_REPO_POOL_PROP_KEY);
-
-		if (auth_repository == null) {
-			auth_repository = (UserAuthRepository) props.get(SHARED_AUTH_REPO_PROP_KEY);
-		} else {
-			log.config("Using shared auth repository pool.");
-		}
+		auth_repository = (AuthRepository) props.get(SHARED_AUTH_REPO_PROP_KEY);
 
 		if (auth_repository != null) {
 			log.log(Level.CONFIG, "Using shared auth repository instance: {0}",
@@ -673,11 +660,10 @@ public class SessionManager extends AbstractMessageReceiver
 			}
 
 			try {
-				String cls_name = (String) props.get(AUTH_REPO_CLASS_PROP_KEY);
 				String res_uri = (String) props.get(AUTH_REPO_URL_PROP_KEY);
 
-				auth_repository = RepositoryFactory.getAuthRepository(cls_name, res_uri, auth_repo_params);
-				log.log(Level.CONFIG, "Initialized {0} as auth repository: {1}", new Object[] { cls_name,
+				auth_repository = RepositoryFactory.getAuthRepository(null, res_uri, auth_repo_params);
+				log.log(Level.CONFIG, "Initialized {0} as auth repository: {1}", new Object[] { null,
 						res_uri });
 			} catch (Exception e) {
 				log.log(Level.SEVERE, "Can't initialize auth repository: ", e);

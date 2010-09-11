@@ -113,8 +113,7 @@ public abstract class ActionAbstract implements ActionIfc {
 	 * @param resultsHandler
 	 */
 	@Override
-	public void setProperties(Map<String, Object> props,
-			ActionResultsHandlerIfc resultsHandler) {
+	public void setProperties(Map<String, Object> props, ActionResultsHandlerIfc resultsHandler) {
 		this.resultsHandler = resultsHandler;
 
 		String sec_str = (String) props.get(AMP_SECURITY_LEVEL);
@@ -127,24 +126,16 @@ public abstract class ActionAbstract implements ActionIfc {
 
 			// Ignore, this is expected here
 		} catch (Exception e) {
-			log.log(Level.WARNING, "Incorrect amp security settings, using defaults: " + security,
-					e);
+			log.log(Level.WARNING, "Incorrect amp security settings, using defaults: " + security, e);
 		}
 
-		// Is there a shared user repository pool? If so I want to use it:
-		user_repository = (UserRepository) props.get(Configurable.SHARED_USER_REPO_POOL_PROP_KEY);
-
-		if (user_repository == null) {
-
-			// Is there shared user repository instance? If so I want to use it:
-			user_repository = (UserRepository) props.get(Configurable.SHARED_USER_REPO_PROP_KEY);
-		}
+		// Is there shared user repository instance? If so I want to use it:
+		user_repository = (UserRepository) props.get(Configurable.SHARED_USER_REPO_PROP_KEY);
 	}
 
 	//~--- methods --------------------------------------------------------------
 
-	protected Packet prepareAmpPacket(Packet packet, Element rule)
-			throws PacketErrorTypeException {
+	protected Packet prepareAmpPacket(Packet packet, Element rule) throws PacketErrorTypeException {
 		boolean error_result = false;
 
 		switch (security) {

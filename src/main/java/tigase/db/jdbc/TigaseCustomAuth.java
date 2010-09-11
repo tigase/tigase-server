@@ -24,12 +24,12 @@ package tigase.db.jdbc;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.db.AuthRepository;
 import tigase.db.AuthorizationException;
 import tigase.db.DBInitException;
 import tigase.db.DataRepository;
 import tigase.db.RepositoryFactory;
 import tigase.db.TigaseDBException;
-import tigase.db.UserAuthRepository;
 import tigase.db.UserExistsException;
 import tigase.db.UserNotFoundException;
 
@@ -39,7 +39,7 @@ import tigase.util.TigaseStringprepException;
 
 import tigase.xmpp.BareJID;
 
-import static tigase.db.UserAuthRepository.*;
+import static tigase.db.AuthRepository.*;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -107,7 +107,7 @@ import javax.security.sasl.SaslServer;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class TigaseCustomAuth implements UserAuthRepository {
+public class TigaseCustomAuth implements AuthRepository {
 
 	/**
 	 * Private logger for class instances.
@@ -242,12 +242,9 @@ public class TigaseCustomAuth implements UserAuthRepository {
 	 * <code>PLAIN</code>, <code>DIGEST-MD5</code>, <code>CRAM-MD5</code>.
 	 *
 	 * "Non-PLAIN" mechanisms will work only with the <code>get-password-query</code>
-	 * active and only when passwords are stored in plain text formay in the database.
+	 * active and only when passwords are stored in plain text format in the database.
 	 */
 	public static final String DEF_SASL_MECHS_KEY = "sasl-mechs";
-
-	/** Field description */
-	public static final String DEF_CONNVALID_QUERY = "select 1";
 
 	/** Field description */
 	public static final String DEF_INITDB_QUERY = "{ call TigInitdb() }";
@@ -498,7 +495,7 @@ public class TigaseCustomAuth implements UserAuthRepository {
 				data_repo.initPreparedStatement(deluser_query, deluser_query);
 			}
 
-			getpassword_query = getParamWithDef(params, DEF_GETPASSWORD_KEY, DEF_GETPASSWORD_QUERY);
+			getpassword_query = getParamWithDef(params, DEF_GETPASSWORD_KEY, null);
 
 			if ((getpassword_query != null) &&!getpassword_query.trim().isEmpty()) {
 				data_repo.initPreparedStatement(getpassword_query, getpassword_query);
@@ -511,8 +508,9 @@ public class TigaseCustomAuth implements UserAuthRepository {
 				data_repo.initPreparedStatement(updatepassword_query, updatepassword_query);
 			}
 
-			if ((params != null) && (params.get(DEF_USERLOGIN_KEY) != null)
-					&& ( !params.get(DEF_USERLOGIN_KEY).trim().isEmpty())) {
+			if ((getpassword_query == null)
+					|| ((params.get(DEF_USERLOGIN_KEY) != null)
+						&& ( !params.get(DEF_USERLOGIN_KEY).trim().isEmpty()))) {
 				userlogin_query = getParamWithDef(params, DEF_USERLOGIN_KEY, DEF_USERLOGIN_QUERY);
 				data_repo.initPreparedStatement(userlogin_query, userlogin_query);
 				userlogin_active = true;
@@ -633,7 +631,7 @@ public class TigaseCustomAuth implements UserAuthRepository {
 		}
 	}
 
-	// Implementation of tigase.db.UserAuthRepository
+	// Implementation of tigase.db.AuthRepository
 
 	/**
 	 * Describe <code>queryAuth</code> method here.
@@ -848,11 +846,16 @@ public class TigaseCustomAuth implements UserAuthRepository {
 				user_login.setString(2, password);
 				rs = user_login.executeQuery();
 
+				boolean auth_result_ok = false;
+
 				if (rs.next()) {
 					res_string = rs.getString(1);
 
-					BareJID result = BareJID.bareJIDInstance(res_string);
-					boolean auth_result_ok = user.equals(result);
+					if (res_string != null) {
+						BareJID result = BareJID.bareJIDInstance(res_string);
+
+						auth_result_ok = user.equals(result);
+					}
 
 					if (auth_result_ok) {
 						return true;
@@ -866,7 +869,8 @@ public class TigaseCustomAuth implements UserAuthRepository {
 					}
 				}
 
-				throw new UserNotFoundException("User does not exist: " + user);
+				throw new UserNotFoundException("User does not exist: " + user + ", in database: "
+						+ getResourceUri());
 			}
 		} catch (TigaseStringprepException ex) {
 			throw new AuthorizationException("Stringprep failed for: " + res_string, ex);

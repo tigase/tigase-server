@@ -214,8 +214,7 @@ public interface Configurable extends ServerComponent {
 	public static final String DRUPALWP_REPO_CLASS_PROP_VAL = "tigase.db.jdbc.DrupalWPAuth";
 
 	/** Field description */
-	public static final String LIBRESOURCE_REPO_CLASS_PROP_VAL =
-		"tigase.db.jdbc.LibreSourceAuth";
+	public static final String LIBRESOURCE_REPO_CLASS_PROP_VAL = "tigase.db.jdbc.LibreSourceAuth";
 
 	/** Field description */
 	public static final String SHARED_USER_REPO_PROP_KEY = "shared-user-repo";
@@ -229,12 +228,10 @@ public interface Configurable extends ServerComponent {
 	/** Field description */
 	public static final String SHARED_AUTH_REPO_PARAMS_PROP_KEY = "shared-auth-repo-params";
 
-	/** Field description */
-	public static final String SHARED_USER_REPO_POOL_PROP_KEY = "shared-user-repo-pool";
-
-	/** Field description */
-	public static final String SHARED_USER_AUTH_REPO_POOL_PROP_KEY =
-		"shared-user-auth-repo-pool";
+///** Field description */
+//public static final String SHARED_USER_REPO_POOL_PROP_KEY = "shared-user-repo-pool";
+///** Field description */
+//public static final String SHARED_USER_AUTH_REPO_POOL_PROP_KEY = "shared-user-auth-repo-pool";
 
 	/** Field description */
 	public static final String XML_REPO_URL_PROP_VAL = "user-repository.xml";
@@ -309,23 +306,19 @@ public interface Configurable extends ServerComponent {
 		"tigase.server.xmppclient.ClientConnectionManager";
 
 	/** Field description */
-	public static final String C2S_CLUST_COMP_CLASS_NAME =
-		"tigase.cluster.ClientConnectionClustered";
+	public static final String C2S_CLUST_COMP_CLASS_NAME = "tigase.cluster.ClientConnectionClustered";
 
 	/** Field description */
-	public static final String S2S_COMP_CLASS_NAME =
-		"tigase.server.xmppserver.S2SConnectionManager";
+	public static final String S2S_COMP_CLASS_NAME = "tigase.server.xmppserver.S2SConnectionManager";
 
 	/** Field description */
-	public static final String S2S_CLUST_COMP_CLASS_NAME =
-		"tigase.cluster.S2SConnectionClustered";
+	public static final String S2S_CLUST_COMP_CLASS_NAME = "tigase.cluster.S2SConnectionClustered";
 
 	/** Field description */
 	public static final String SM_COMP_CLASS_NAME = "tigase.server.xmppsession.SessionManager";
 
 	/** Field description */
-	public static final String SM_CLUST_COMP_CLASS_NAME =
-		"tigase.cluster.SessionManagerClustered";
+	public static final String SM_CLUST_COMP_CLASS_NAME = "tigase.cluster.SessionManagerClustered";
 
 	/** Field description */
 	public static final String EXT_COMP_CLASS_NAME =
@@ -335,8 +328,7 @@ public interface Configurable extends ServerComponent {
 	public static final String MONITOR_CLASS_NAME = "tigase.server.monitor.MonitorComponent";
 
 	/** Field description */
-	public static final String MONITOR_CLUST_CLASS_NAME =
-		"tigase.server.monitor.MonitorClustered";
+	public static final String MONITOR_CLUST_CLASS_NAME = "tigase.server.monitor.MonitorClustered";
 
 	/** Field description */
 	public static final String COMP_PROT_CLASS_NAME = "tigase.server.ext.ComponentProtocol";
@@ -363,9 +355,6 @@ public interface Configurable extends ServerComponent {
 	public static final String VHOST_MAN_CLASS_NAME = "tigase.vhosts.VHostManager";
 
 	/** Field description */
-	public static final String USER_REPO_CLASS_PROP_KEY = "user-repo-class";
-
-	/** Field description */
 	public static final String USER_REPO_URL_PROP_KEY = "user-repo-url";
 
 	/** Field description */
@@ -379,9 +368,6 @@ public interface Configurable extends ServerComponent {
 
 	/** Field description */
 	public static final String AUTH_REPO_DOMAINS_PROP_KEY = "auth-repo-domains";
-
-	/** Field description */
-	public static final String AUTH_REPO_CLASS_PROP_KEY = "auth-repo-class";
 
 	/** Field description */
 	public static final String AUTH_REPO_URL_PROP_KEY = "auth-repo-url";

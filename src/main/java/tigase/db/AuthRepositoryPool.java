@@ -41,13 +41,13 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class UserAuthRepositoryPool implements UserAuthRepository {
-	private static final Logger log = Logger.getLogger(UserAuthRepositoryPool.class.getName());
+public class AuthRepositoryPool implements AuthRepository {
+	private static final Logger log = Logger.getLogger(AuthRepositoryPool.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
 
-	private LinkedBlockingQueue<UserAuthRepository> repoPool =
-		new LinkedBlockingQueue<UserAuthRepository>();
+	private LinkedBlockingQueue<AuthRepository> repoPool =
+		new LinkedBlockingQueue<AuthRepository>();
 
 	//~--- methods --------------------------------------------------------------
 
@@ -57,7 +57,7 @@ public class UserAuthRepositoryPool implements UserAuthRepository {
 	 *
 	 * @param repo
 	 */
-	public void addRepo(UserAuthRepository repo) {
+	public void addRepo(AuthRepository repo) {
 		repoPool.offer(repo);
 	}
 
@@ -74,7 +74,7 @@ public class UserAuthRepositoryPool implements UserAuthRepository {
 	@Override
 	public void addUser(BareJID user, String password)
 			throws UserExistsException, TigaseDBException {
-		UserAuthRepository repo = takeRepo();
+		AuthRepository repo = takeRepo();
 
 		if (repo != null) {
 			try {
@@ -105,7 +105,7 @@ public class UserAuthRepositoryPool implements UserAuthRepository {
 	@Override
 	public boolean digestAuth(BareJID user, String digest, String id, String alg)
 			throws UserNotFoundException, TigaseDBException, AuthorizationException {
-		UserAuthRepository repo = takeRepo();
+		AuthRepository repo = takeRepo();
 
 		if (repo != null) {
 			try {
@@ -130,7 +130,7 @@ public class UserAuthRepositoryPool implements UserAuthRepository {
 	 */
 	@Override
 	public String getResourceUri() {
-		UserAuthRepository repo = takeRepo();
+		AuthRepository repo = takeRepo();
 
 		if (repo != null) {
 			try {
@@ -153,7 +153,7 @@ public class UserAuthRepositoryPool implements UserAuthRepository {
 	 */
 	@Override
 	public long getUsersCount() {
-		UserAuthRepository repo = takeRepo();
+		AuthRepository repo = takeRepo();
 
 		if (repo != null) {
 			try {
@@ -178,7 +178,7 @@ public class UserAuthRepositoryPool implements UserAuthRepository {
 	 */
 	@Override
 	public long getUsersCount(String domain) {
-		UserAuthRepository repo = takeRepo();
+		AuthRepository repo = takeRepo();
 
 		if (repo != null) {
 			try {
@@ -219,7 +219,7 @@ public class UserAuthRepositoryPool implements UserAuthRepository {
 	 */
 	@Override
 	public void logout(BareJID user) throws UserNotFoundException, TigaseDBException {
-		UserAuthRepository repo = takeRepo();
+		AuthRepository repo = takeRepo();
 
 		if (repo != null) {
 			try {
@@ -247,7 +247,7 @@ public class UserAuthRepositoryPool implements UserAuthRepository {
 	@Override
 	public boolean otherAuth(Map<String, Object> authProps)
 			throws UserNotFoundException, TigaseDBException, AuthorizationException {
-		UserAuthRepository repo = takeRepo();
+		AuthRepository repo = takeRepo();
 
 		if (repo != null) {
 			try {
@@ -278,7 +278,7 @@ public class UserAuthRepositoryPool implements UserAuthRepository {
 	@Override
 	public boolean plainAuth(BareJID user, String password)
 			throws UserNotFoundException, TigaseDBException, AuthorizationException {
-		UserAuthRepository repo = takeRepo();
+		AuthRepository repo = takeRepo();
 
 		if (repo != null) {
 			try {
@@ -301,7 +301,7 @@ public class UserAuthRepositoryPool implements UserAuthRepository {
 	 */
 	@Override
 	public void queryAuth(Map<String, Object> authProps) {
-		UserAuthRepository repo = takeRepo();
+		AuthRepository repo = takeRepo();
 
 		if (repo != null) {
 			try {
@@ -325,7 +325,7 @@ public class UserAuthRepositoryPool implements UserAuthRepository {
 	 */
 	@Override
 	public void removeUser(BareJID user) throws UserNotFoundException, TigaseDBException {
-		UserAuthRepository repo = takeRepo();
+		AuthRepository repo = takeRepo();
 
 		if (repo != null) {
 			try {
@@ -344,7 +344,7 @@ public class UserAuthRepositoryPool implements UserAuthRepository {
 	 *
 	 * @return
 	 */
-	public UserAuthRepository takeRepo() {
+	public AuthRepository takeRepo() {
 		try {
 			return repoPool.take();
 		} catch (InterruptedException ex) {
@@ -367,7 +367,7 @@ public class UserAuthRepositoryPool implements UserAuthRepository {
 	@Override
 	public void updatePassword(BareJID user, String password)
 			throws UserNotFoundException, TigaseDBException {
-		UserAuthRepository repo = takeRepo();
+		AuthRepository repo = takeRepo();
 
 		if (repo != null) {
 			try {

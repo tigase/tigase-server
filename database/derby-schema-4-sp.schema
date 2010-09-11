@@ -89,6 +89,14 @@ CREATE procedure TigGetPassword(userId varchar(2049))
 -- QUERY END:
 
 -- QUERY START:
+CREATE procedure TigUpdatePasswordPlainPwRev(userId varchar(2049), userPw varchar(255))
+  PARAMETER STYLE JAVA
+  LANGUAGE JAVA
+  MODIFIES SQL DATA
+  EXTERNAL NAME 'tigase.db.derby.StoredProcedures.tigUpdatePasswordPlainPwRev';
+-- QUERY END:
+
+-- QUERY START:
 CREATE procedure TigUpdatePasswordPlainPw(userId varchar(2049), userPw varchar(255)) 
 	PARAMETER STYLE JAVA
 	LANGUAGE JAVA
@@ -206,5 +214,5 @@ CREATE procedure TigAddNode(parentNid bigint, uid bigint, node varchar(255))
 	LANGUAGE JAVA
 	MODIFIES SQL DATA
 	DYNAMIC RESULT SETS 1
-	EXTERNAL NAME 'tigase.db.derby.StoredProcedures.TigAddNode';
+	EXTERNAL NAME 'tigase.db.derby.StoredProcedures.tigAddNode';
 -- QUERY END:

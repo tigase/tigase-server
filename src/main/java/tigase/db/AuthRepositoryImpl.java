@@ -29,7 +29,7 @@ import tigase.util.Base64;
 
 import tigase.xmpp.BareJID;
 
-import static tigase.db.UserAuthRepository.*;
+import static tigase.db.AuthRepository.*;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -56,7 +56,7 @@ import javax.security.sasl.SaslServer;
 //~--- classes ----------------------------------------------------------------
 
 /**
- * Describe class UserAuthRepositoryImpl here.
+ * Describe class AuthRepositoryImpl here.
  *
  *
  * Created: Sat Nov 11 21:46:50 2006
@@ -64,7 +64,7 @@ import javax.security.sasl.SaslServer;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class UserAuthRepositoryImpl implements UserAuthRepository {
+public class AuthRepositoryImpl implements AuthRepository {
 	private static final Logger log = Logger.getLogger("tigase.db.UserAuthRepositoryImpl");
 	private static final String PASSWORD_KEY = "password";
 	private static final String[] non_sasl_mechs = { "password", "digest" };
@@ -77,12 +77,12 @@ public class UserAuthRepositoryImpl implements UserAuthRepository {
 	//~--- constructors ---------------------------------------------------------
 
 	/**
-	 * Creates a new <code>UserAuthRepositoryImpl</code> instance.
+	 * Creates a new <code>AuthRepositoryImpl</code> instance.
 	 *
 	 *
 	 * @param repo
 	 */
-	public UserAuthRepositoryImpl(UserRepository repo) {
+	public AuthRepositoryImpl(UserRepository repo) {
 		this.repo = repo;
 	}
 
@@ -233,7 +233,7 @@ public class UserAuthRepositoryImpl implements UserAuthRepository {
 		return (password != null) && (db_password != null) && db_password.equals(password);
 	}
 
-	// Implementation of tigase.db.UserAuthRepository
+	// Implementation of tigase.db.AuthRepository
 
 	/**
 	 * Describe <code>queryAuth</code> method here.
@@ -423,7 +423,7 @@ public class UserAuthRepositoryImpl implements UserAuthRepository {
 			}
 		}
 	}
-}    // UserAuthRepositoryImpl
+}    // AuthRepositoryImpl
 
 
 //~ Formatted in Sun Code Convention

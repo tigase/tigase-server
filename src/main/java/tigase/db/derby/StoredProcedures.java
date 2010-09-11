@@ -1,194 +1,337 @@
 package tigase.db.derby;
 
+//~--- non-JDK imports --------------------------------------------------------
+
+import tigase.util.Algorithms;
+
+//~--- JDK imports ------------------------------------------------------------
+
 import java.security.MessageDigest;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import tigase.util.Algorithms;
+//~--- classes ----------------------------------------------------------------
 
+/**
+ * Class description
+ *
+ *
+ * @version        5.1.0, 2010.09.11 at 02:08:58 BST
+ * @author         Artur Hefczyc <artur.hefczyc@tigase.org>
+ */
 public class StoredProcedures {
-
 	private static final Logger log = Logger.getLogger(StoredProcedures.class.getName());
 
-	private static String encodePassword(String encMethod, String userId, String userPw) {
-		if (encMethod != null && "MD5-PASSWORD".equals(encMethod)) {
-			return md5(userPw);
-		} else if (encMethod != null && "MD5-USERID-PASSWORD".equals(encMethod)) {
-			return md5(userId + userPw);
-		} else {
-			return userPw;
-		}
-	}
+	//~--- methods --------------------------------------------------------------
 
-	private static String md5(String data) {
-		try {
-			MessageDigest md = MessageDigest.getInstance("MD5");
-			if (data != null)
-				md.update(data.getBytes());
-			byte[] digest = md.digest();
-			return Algorithms.bytesToHex(digest);
-		} catch (Exception e) {
-			throw new RuntimeException("Error on encoding password", e);
-		}
-	}
-
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param data
+	 *
+	 * @throws SQLException
+	 */
 	public static void tigActiveAccounts(ResultSet[] data) throws SQLException {
-		Connection conn = DriverManager.getConnection("jdbc:default:connection");conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+		Connection conn = DriverManager.getConnection("jdbc:default:connection");
+
+		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+
 		try {
-			PreparedStatement ps = conn.prepareStatement("select user_id, last_login, last_logout, online_status, failed_logins, account_status from tig_users where account_status > 0");
+			PreparedStatement ps =
+				conn.prepareStatement("select user_id, last_login, last_logout, online_status, failed_logins, account_status from tig_users where account_status > 0");
+
 			data[0] = ps.executeQuery();
 		} catch (SQLException e) {
+
 			// e.printStackTrace();
-			//log.log(Level.SEVERE, "SP error", e);
+			// log.log(Level.SEVERE, "SP error", e);
 			throw e;
 		} finally {
 			conn.close();
 		}
 	}
 
-	public static void TigAddNode(long parentNid, long uid, String node, ResultSet[] data) throws SQLException {
-		Connection conn = DriverManager.getConnection("jdbc:default:connection");conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param parentNid
+	 * @param uid
+	 * @param node
+	 * @param data
+	 *
+	 * @throws SQLException
+	 */
+	public static void tigAddNode(long parentNid, long uid, String node, ResultSet[] data)
+			throws SQLException {
+		Connection conn = DriverManager.getConnection("jdbc:default:connection");
+
+		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+
 		try {
-			PreparedStatement ps = conn.prepareStatement("insert into tig_nodes (parent_nid, uid, node) values (?, ?, ?)",
+			PreparedStatement ps =
+				conn.prepareStatement("insert into tig_nodes (parent_nid, uid, node) values (?, ?, ?)",
 					Statement.RETURN_GENERATED_KEYS);
+
 			ps.setLong(1, parentNid);
 			ps.setLong(2, uid);
 			ps.setString(3, node);
-
 			ps.executeUpdate();
 			data[0] = ps.getGeneratedKeys();
 		} catch (SQLException e) {
+
 			// e.printStackTrace();
-			//log.log(Level.SEVERE, "SP error", e);
+			// log.log(Level.SEVERE, "SP error", e);
 			throw e;
 		} finally {
 			conn.close();
 		}
 	}
 
-	public static void tigAddUser(String userId, String userPw, ResultSet[] data) throws SQLException {
-		Connection conn = DriverManager.getConnection("jdbc:default:connection");conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param userId
+	 * @param userPw
+	 * @param data
+	 *
+	 * @throws SQLException
+	 */
+	public static void tigAddUser(String userId, String userPw, ResultSet[] data)
+			throws SQLException {
+		Connection conn = DriverManager.getConnection("jdbc:default:connection");
+
+		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+
 		try {
-			PreparedStatement ps = conn.prepareStatement("insert into tig_users (user_id, user_pw) values (?, ?)",
+			PreparedStatement ps =
+				conn.prepareStatement("insert into tig_users (user_id, user_pw) values (?, ?)",
 					Statement.RETURN_GENERATED_KEYS);
+
 			ps.setString(1, userId);
 			ps.setString(2, userPw);
 			ps.executeUpdate();
 
 			ResultSet rs = ps.getGeneratedKeys();
-			rs.next();
-			long generatedKey = rs.getLong(1);
 
+			rs.next();
+
+			long generatedKey = rs.getLong(1);
 			PreparedStatement ps3 = conn.prepareStatement("select uid from tig_users where uid=?");
+
 			ps3.setLong(1, generatedKey);
 			data[0] = ps3.executeQuery();
 
-			PreparedStatement ps2 = conn.prepareStatement("insert into tig_nodes (parent_nid, uid, node) values (NULL, ?, 'root')");
+			PreparedStatement ps2 =
+				conn.prepareStatement("insert into tig_nodes (parent_nid, uid, node) values (NULL, ?, 'root')");
+
 			ps2.setLong(1, generatedKey);
 			ps2.executeUpdate();
 		} catch (SQLException e) {
+
 			// e.printStackTrace();
-			//log.log(Level.SEVERE, "SP error", e);
+			// log.log(Level.SEVERE, "SP error", e);
 			throw e;
 		} finally {
 			conn.close();
 		}
 	}
 
-	public static void tigAddUserPlainPw(String userId, String userPw, ResultSet[] data) throws SQLException {
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param userId
+	 * @param userPw
+	 * @param data
+	 *
+	 * @throws SQLException
+	 */
+	public static void tigAddUserPlainPw(String userId, String userPw, ResultSet[] data)
+			throws SQLException {
 		String encMethod = tigGetDBProperty("password-encoding");
 		String encp = encodePassword(encMethod, userId, userPw);
+
 		tigAddUser(userId, encp, data);
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param data
+	 *
+	 * @throws SQLException
+	 */
 	public static void tigAllUsers(ResultSet[] data) throws SQLException {
-		Connection conn = DriverManager.getConnection("jdbc:default:connection");conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+		Connection conn = DriverManager.getConnection("jdbc:default:connection");
+
+		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+
 		try {
-			PreparedStatement ps = conn.prepareStatement("select user_id, last_login, last_logout, online_status, failed_logins, account_status from tig_users");
+			PreparedStatement ps =
+				conn.prepareStatement("select user_id, last_login, last_logout, online_status, failed_logins, account_status from tig_users");
+
 			data[0] = ps.executeQuery();
 		} catch (SQLException e) {
+
 			// e.printStackTrace();
-			//log.log(Level.SEVERE, "SP error", e);
+			// log.log(Level.SEVERE, "SP error", e);
 			throw e;
 		} finally {
 			conn.close();
 		}
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param data
+	 *
+	 * @throws SQLException
+	 */
 	public static void tigAllUsersCount(ResultSet[] data) throws SQLException {
-		Connection conn = DriverManager.getConnection("jdbc:default:connection");conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+		Connection conn = DriverManager.getConnection("jdbc:default:connection");
+
+		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+
 		try {
 			PreparedStatement ps = conn.prepareStatement("select count(*) as res_cnt from tig_users");
+
 			data[0] = ps.executeQuery();
 		} catch (SQLException e) {
+
 			// e.printStackTrace();
-			//log.log(Level.SEVERE, "SP error", e);
+			// log.log(Level.SEVERE, "SP error", e);
 			throw e;
 		} finally {
 			conn.close();
 		}
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param userId
+	 *
+	 * @throws SQLException
+	 */
 	public static void tigDisableAccount(final String userId) throws SQLException {
-		Connection conn = DriverManager.getConnection("jdbc:default:connection");conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+		Connection conn = DriverManager.getConnection("jdbc:default:connection");
+
+		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+
 		try {
-			PreparedStatement ps = conn.prepareStatement("update tig_users set account_status = 0 where user_id = ?");
+			PreparedStatement ps =
+				conn.prepareStatement("update tig_users set account_status = 0 where user_id = ?");
+
 			ps.setString(1, userId);
 			ps.executeUpdate();
 		} catch (SQLException e) {
+
 			// e.printStackTrace();
-			//log.log(Level.SEVERE, "SP error", e);
+			// log.log(Level.SEVERE, "SP error", e);
 			throw e;
 		} finally {
 			conn.close();
 		}
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param data
+	 *
+	 * @throws SQLException
+	 */
 	public static void tigDisabledAccounts(ResultSet[] data) throws SQLException {
-		Connection conn = DriverManager.getConnection("jdbc:default:connection");conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+		Connection conn = DriverManager.getConnection("jdbc:default:connection");
+
+		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+
 		try {
-			PreparedStatement ps = conn.prepareStatement("select user_id, last_login, last_logout, online_status, failed_logins, account_status from tig_users where account_status = 0");
+			PreparedStatement ps =
+				conn.prepareStatement("select user_id, last_login, last_logout, online_status, failed_logins, account_status from tig_users where account_status = 0");
+
 			data[0] = ps.executeQuery();
 		} catch (SQLException e) {
+
 			// e.printStackTrace();
-			//log.log(Level.SEVERE, "SP error", e);
+			// log.log(Level.SEVERE, "SP error", e);
 			throw e;
 		} finally {
 			conn.close();
 		}
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param userId
+	 *
+	 * @throws SQLException
+	 */
 	public static void tigEnableAccount(final String userId) throws SQLException {
-		Connection conn = DriverManager.getConnection("jdbc:default:connection");conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+		Connection conn = DriverManager.getConnection("jdbc:default:connection");
+
+		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+
 		try {
-			PreparedStatement ps = conn.prepareStatement("update tig_users set account_status = 1 where user_id = ?");
+			PreparedStatement ps =
+				conn.prepareStatement("update tig_users set account_status = 1 where user_id = ?");
+
 			ps.setString(1, userId);
 			ps.executeUpdate();
 		} catch (SQLException e) {
+
 			// e.printStackTrace();
-			//log.log(Level.SEVERE, "SP error", e);
+			// log.log(Level.SEVERE, "SP error", e);
 			throw e;
 		} finally {
 			conn.close();
 		}
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param key
+	 *
+	 * @return
+	 *
+	 * @throws SQLException
+	 */
 	public static String tigGetDBProperty(final String key) throws SQLException {
-		Connection conn = DriverManager.getConnection("jdbc:default:connection");conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+		Connection conn = DriverManager.getConnection("jdbc:default:connection");
+
+		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+
 		try {
 			String result = null;
-			if (log.isLoggable(Level.FINEST)) {
-    			log.finest("function tigGetDBProperty('" + key + "') called");
-            }
 
-			PreparedStatement ps = conn.prepareStatement("select pval from tig_pairs, tig_users where (pkey = ?) AND (user_id = 'db-properties') AND (tig_pairs.uid = tig_users.uid)");
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("function tigGetDBProperty('" + key + "') called");
+			}
+
+			PreparedStatement ps =
+				conn.prepareStatement("select pval from tig_pairs, tig_users where (pkey = ?) AND (user_id = 'db-properties') AND (tig_pairs.uid = tig_users.uid)");
 			ResultSet rs;
+
 			ps.setString(1, key);
 			rs = ps.executeQuery();
 
@@ -198,222 +341,447 @@ public class StoredProcedures {
 
 			return result;
 		} catch (SQLException e) {
+
 			// e.printStackTrace();
-			//log.log(Level.SEVERE, "SP error", e);
+			// log.log(Level.SEVERE, "SP error", e);
 			throw e;
 		} finally {
 			conn.close();
 		}
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param userId
+	 * @param data
+	 *
+	 * @throws SQLException
+	 */
 	public static void tigGetPassword(String userId, ResultSet[] data) throws SQLException {
-		Connection conn = DriverManager.getConnection("jdbc:default:connection");conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+		Connection conn = DriverManager.getConnection("jdbc:default:connection");
+
+		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+
 		try {
-			PreparedStatement ps = conn.prepareStatement("select user_pw from tig_users where user_id = ?");
+			PreparedStatement ps =
+				conn.prepareStatement("select user_pw from tig_users where user_id = ?");
+
 			ps.setString(1, userId);
 			data[0] = ps.executeQuery();
 		} catch (SQLException e) {
+
 			// e.printStackTrace();
-			//log.log(Level.SEVERE, "SP error", e);
+			// log.log(Level.SEVERE, "SP error", e);
 			throw e;
 		} finally {
 			conn.close();
 		}
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param userId
+	 * @param data
+	 *
+	 * @throws SQLException
+	 */
 	public static void tigGetUserDBUid(String userId, ResultSet[] data) throws SQLException {
-		Connection conn = DriverManager.getConnection("jdbc:default:connection");conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+		Connection conn = DriverManager.getConnection("jdbc:default:connection");
+
+		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+
 		try {
 			PreparedStatement ps = conn.prepareStatement("select uid from tig_users where user_id = ?");
+
 			ps.setString(1, userId);
 			data[0] = ps.executeQuery();
 		} catch (SQLException e) {
+
 			// e.printStackTrace();
-			//log.log(Level.SEVERE, "SP error", e);
+			// log.log(Level.SEVERE, "SP error", e);
 			throw e;
 		} finally {
 			conn.close();
 		}
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @throws SQLException
+	 */
 	public static void tigInitdb() throws SQLException {
-		Connection conn = DriverManager.getConnection("jdbc:default:connection");conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+		Connection conn = DriverManager.getConnection("jdbc:default:connection");
+
+		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+
 		try {
 			PreparedStatement ps = conn.prepareStatement("update tig_users set online_status = 0");
+
 			ps.executeUpdate();
 		} catch (SQLException e) {
+
 			// e.printStackTrace();
-			//log.log(Level.SEVERE, "SP error", e);
+			// log.log(Level.SEVERE, "SP error", e);
 			throw e;
 		} finally {
 			conn.close();
 		}
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param data
+	 *
+	 * @throws SQLException
+	 */
 	public static void tigOfflineUsers(ResultSet[] data) throws SQLException {
-		Connection conn = DriverManager.getConnection("jdbc:default:connection");conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+		Connection conn = DriverManager.getConnection("jdbc:default:connection");
+
+		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+
 		try {
-			PreparedStatement ps = conn.prepareStatement("select user_id, last_login, last_logout, online_status, failed_logins, account_status from tig_users where online_status = 0");
+			PreparedStatement ps =
+				conn.prepareStatement("select user_id, last_login, last_logout, online_status, failed_logins, account_status from tig_users where online_status = 0");
+
 			data[0] = ps.executeQuery();
 		} catch (SQLException e) {
+
 			// e.printStackTrace();
-			//log.log(Level.SEVERE, "SP error", e);
+			// log.log(Level.SEVERE, "SP error", e);
 			throw e;
 		} finally {
 			conn.close();
 		}
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param data
+	 *
+	 * @throws SQLException
+	 */
 	public static void tigOnlineUsers(ResultSet[] data) throws SQLException {
-		Connection conn = DriverManager.getConnection("jdbc:default:connection");conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+		Connection conn = DriverManager.getConnection("jdbc:default:connection");
+
+		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+
 		try {
-			PreparedStatement ps = conn.prepareStatement("select user_id, last_login, last_logout, online_status, failed_logins, account_status from tig_users where online_status > 0");
+			PreparedStatement ps =
+				conn.prepareStatement("select user_id, last_login, last_logout, online_status, failed_logins, account_status from tig_users where online_status > 0");
+
 			data[0] = ps.executeQuery();
 		} catch (SQLException e) {
+
 			// e.printStackTrace();
-			//log.log(Level.SEVERE, "SP error", e);
+			// log.log(Level.SEVERE, "SP error", e);
 			throw e;
 		} finally {
 			conn.close();
 		}
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param key
+	 * @param value
+	 *
+	 * @throws SQLException
+	 */
 	public static void tigPutDBProperty(final String key, final String value) throws SQLException {
-		Connection conn = DriverManager.getConnection("jdbc:default:connection");conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+		Connection conn = DriverManager.getConnection("jdbc:default:connection");
+
+		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+
 		try {
 			if (log.isLoggable(Level.FINEST)) {
-    			log.finest("procedure tigPutDBProperty('" + key + "', '" + value + "') called");
-            }
+				log.finest("procedure tigPutDBProperty('" + key + "', '" + value + "') called");
+			}
+
 			int result;
+
 			if (tigGetDBProperty(key) != null) {
-				PreparedStatement ps = conn.prepareStatement("update tig_pairs set tig_pairs.pval = ? where (pkey = ?) and uid = (select uid from tig_users where tig_users.user_id = 'db-properties')");
+				PreparedStatement ps =
+					conn.prepareStatement("update tig_pairs set tig_pairs.pval = ? where (pkey = ?) and uid = (select uid from tig_users where tig_users.user_id = 'db-properties')");
+
 				ps.setString(1, value);
 				ps.setString(2, key);
 				result = ps.executeUpdate();
 			} else {
-				PreparedStatement ps = conn.prepareStatement("insert into tig_pairs (pkey, pval, uid) select ?, ?, uid from tig_users where (user_id = 'db-properties')");
+				PreparedStatement ps =
+					conn.prepareStatement("insert into tig_pairs (pkey, pval, uid) select ?, ?, uid from tig_users where (user_id = 'db-properties')");
+
 				ps.setString(1, key);
 				ps.setString(2, value);
 				result = ps.executeUpdate();
 			}
+
 			if (result != 1) {
 				log.severe("Error on put properties");
 			}
 		} catch (SQLException e) {
+
 			// e.printStackTrace();
-			//log.log(Level.SEVERE, "SP error", e);
+			// log.log(Level.SEVERE, "SP error", e);
 			throw e;
 		} finally {
 			conn.close();
 		}
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param userId
+	 *
+	 * @throws SQLException
+	 */
 	public static void tigRemoveUser(final String userId) throws SQLException {
-		Connection conn = DriverManager.getConnection("jdbc:default:connection");conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+		Connection conn = DriverManager.getConnection("jdbc:default:connection");
+
+		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+
 		try {
-
 			PreparedStatement ps3 = conn.prepareStatement("select uid from tig_users where user_id = ?");
-			ps3.setString(1, userId);
-			ResultSet rs = ps3.executeQuery();
-			rs.next();
-			long uid = rs.getLong(1);
 
+			ps3.setString(1, userId);
+
+			ResultSet rs = ps3.executeQuery();
+
+			rs.next();
+
+			long uid = rs.getLong(1);
 			PreparedStatement ps1 = conn.prepareStatement("delete from tig_pairs where uid = ?");
+
 			ps1.setLong(1, uid);
 			ps1.executeUpdate();
 
 			PreparedStatement ps2 = conn.prepareStatement("delete from tig_nodes where uid = ?");
+
 			ps2.setLong(1, uid);
 			ps2.executeUpdate();
 
 			PreparedStatement ps = conn.prepareStatement("delete from tig_users where uid = ?");
+
 			ps.setLong(1, uid);
 			ps.executeUpdate();
 		} catch (SQLException e) {
+
 			// e.printStackTrace();
-			//log.log(Level.SEVERE, "SP error", e);
+			// log.log(Level.SEVERE, "SP error", e);
 			throw e;
 		} finally {
 			conn.close();
 		}
 	}
 
-	public static void tigUserLogout(final String userId) throws SQLException {
-		Connection conn = DriverManager.getConnection("jdbc:default:connection");conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-		try {
-			PreparedStatement ps = conn.prepareStatement("update tig_users set online_status = online_status - 1, last_logout = current timestamp where user_id =  ?");
-			ps.setString(1, userId);
-			ps.executeUpdate();
-		} catch (SQLException e) {
-			// e.printStackTrace();
-			//log.log(Level.SEVERE, "SP error", e);
-			throw e;
-		} finally {
-			conn.close();
-		}
-	}
-
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param userId
+	 * @param userPw
+	 *
+	 * @throws SQLException
+	 */
 	public static void tigUpdatePassword(String userId, String userPw) throws SQLException {
-		Connection conn = DriverManager.getConnection("jdbc:default:connection");conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+		Connection conn = DriverManager.getConnection("jdbc:default:connection");
+
+		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+
 		try {
-			PreparedStatement ps = conn.prepareStatement("update tig_users set user_pw = ? where user_id = ?");
+			PreparedStatement ps =
+				conn.prepareStatement("update tig_users set user_pw = ? where user_id = ?");
+
 			ps.setString(1, userPw);
 			ps.setString(2, userId);
 			ps.executeUpdate();
 		} catch (SQLException e) {
+
 			// e.printStackTrace();
-			//log.log(Level.SEVERE, "SP error", e);
+			// log.log(Level.SEVERE, "SP error", e);
 			throw e;
 		} finally {
 			conn.close();
 		}
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param userId
+	 * @param userPw
+	 *
+	 * @throws SQLException
+	 */
 	public static void tigUpdatePasswordPlainPw(String userId, String userPw) throws SQLException {
 		String encMethod = tigGetDBProperty("password-encoding");
 		String encp = encodePassword(encMethod, userId, userPw);
+
 		tigUpdatePassword(userId, encp);
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param userPw
+	 * @param userId
+	 *
+	 * @throws SQLException
+	 */
 	public static void tigUpdatePasswordPlainPwRev(String userPw, String userId) throws SQLException {
 		tigUpdatePasswordPlainPw(userId, userPw);
 	}
 
-	public static void tigUserLogin(String userId, String userPw, ResultSet[] data) throws SQLException {
-		Connection conn = DriverManager.getConnection("jdbc:default:connection");conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param userId
+	 * @param userPw
+	 * @param data
+	 *
+	 * @throws SQLException
+	 */
+	public static void tigUserLogin(String userId, String userPw, ResultSet[] data)
+			throws SQLException {
+		Connection conn = DriverManager.getConnection("jdbc:default:connection");
+
+		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+
 		try {
-			PreparedStatement ps = conn.prepareStatement("select user_id from tig_users where (account_status > 0) AND (user_id = ?) AND (user_pw = ?)");
+			PreparedStatement ps =
+				conn.prepareStatement("select user_id from tig_users where (account_status > 0) AND (user_id = ?) AND (user_pw = ?)");
+
 			ps.setString(1, userId);
 			ps.setString(2, userPw);
+
 			ResultSet rs = ps.executeQuery();
 
 			if (rs.next()) {
 				PreparedStatement x = conn.prepareStatement("values '" + userId + "'");
+
 				data[0] = x.executeQuery();
 
-				PreparedStatement flps = conn.prepareStatement("update tig_users set online_status = online_status + 1, last_login = current timestamp where user_id =  ?");
+				PreparedStatement flps =
+					conn.prepareStatement("update tig_users set online_status = online_status + 1, last_login = current timestamp where user_id =  ?");
+
 				flps.setString(1, userId);
 				flps.executeUpdate();
 			} else {
 				PreparedStatement x = conn.prepareStatement("values '-'");
+
 				data[0] = x.executeQuery();
 
-				PreparedStatement flps = conn.prepareStatement("update tig_users set failed_logins = failed_logins + 1 where user_id = ?");
+				PreparedStatement flps =
+					conn.prepareStatement("update tig_users set failed_logins = failed_logins + 1 where user_id = ?");
+
 				flps.setString(1, userId);
 				flps.executeUpdate();
 			}
 		} catch (SQLException e) {
+
 			// e.printStackTrace();
-			//log.log(Level.SEVERE, "SP error", e);
+			// log.log(Level.SEVERE, "SP error", e);
 			throw e;
 		} finally {
 			conn.close();
 		}
 	}
 
-	public static void tigUserLoginPlainPw(String userId, String userPw, ResultSet[] data) throws SQLException {
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param userId
+	 * @param userPw
+	 * @param data
+	 *
+	 * @throws SQLException
+	 */
+	public static void tigUserLoginPlainPw(String userId, String userPw, ResultSet[] data)
+			throws SQLException {
 		String encMethod = tigGetDBProperty("password-encoding");
 		String encp = encodePassword(encMethod, userId, userPw);
+
 		tigUserLogin(userId, encp, data);
 	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param userId
+	 *
+	 * @throws SQLException
+	 */
+	public static void tigUserLogout(final String userId) throws SQLException {
+		Connection conn = DriverManager.getConnection("jdbc:default:connection");
+
+		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+
+		try {
+			PreparedStatement ps =
+				conn.prepareStatement("update tig_users set online_status = online_status - 1, last_logout = current timestamp where user_id =  ?");
+
+			ps.setString(1, userId);
+			ps.executeUpdate();
+		} catch (SQLException e) {
+
+			// e.printStackTrace();
+			// log.log(Level.SEVERE, "SP error", e);
+			throw e;
+		} finally {
+			conn.close();
+		}
+	}
+
+	private static String encodePassword(String encMethod, String userId, String userPw) {
+		if ((encMethod != null) && "MD5-PASSWORD".equals(encMethod)) {
+			return md5(userPw);
+		} else {
+			if ((encMethod != null) && "MD5-USERID-PASSWORD".equals(encMethod)) {
+				return md5(userId + userPw);
+			} else {
+				return userPw;
+			}
+		}
+	}
+
+	private static String md5(String data) {
+		try {
+			MessageDigest md = MessageDigest.getInstance("MD5");
+
+			if (data != null) {
+				md.update(data.getBytes());
+			}
+
+			byte[] digest = md.digest();
+
+			return Algorithms.bytesToHex(digest);
+		} catch (Exception e) {
+			throw new RuntimeException("Error on encoding password", e);
+		}
+	}
 }
+
+
+//~ Formatted in Sun Code Convention
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

@@ -29,7 +29,7 @@ import tigase.db.DBInitException;
 import tigase.db.DataRepository;
 import tigase.db.RepositoryFactory;
 import tigase.db.TigaseDBException;
-import tigase.db.UserAuthRepository;
+import tigase.db.AuthRepository;
 import tigase.db.UserExistsException;
 import tigase.db.UserNotFoundException;
 
@@ -38,7 +38,7 @@ import tigase.util.TigaseStringprepException;
 
 import tigase.xmpp.BareJID;
 
-import static tigase.db.UserAuthRepository.*;
+import static tigase.db.AuthRepository.*;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -63,7 +63,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class TigaseAuth implements UserAuthRepository {
+public class TigaseAuth implements AuthRepository {
 
 	/**
 	 * Private logger for class instances.
@@ -376,7 +376,7 @@ public class TigaseAuth implements UserAuthRepository {
 		}    // end of catch
 	}
 
-	// Implementation of tigase.db.UserAuthRepository
+	// Implementation of tigase.db.AuthRepository
 
 	/**
 	 * Describe <code>queryAuth</code> method here.

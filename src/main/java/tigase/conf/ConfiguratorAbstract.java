@@ -24,12 +24,12 @@ package tigase.conf;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.db.AuthRepository;
+import tigase.db.AuthRepositoryMDImpl;
+import tigase.db.AuthRepositoryPool;
 import tigase.db.DBInitException;
 import tigase.db.RepositoryFactory;
 import tigase.db.TigaseDBException;
-import tigase.db.UserAuthRepository;
-import tigase.db.UserAuthRepositoryMDImpl;
-import tigase.db.UserAuthRepositoryPool;
 import tigase.db.UserRepository;
 import tigase.db.UserRepositoryMDImpl;
 import tigase.db.UserRepositoryPool;
@@ -79,28 +79,16 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 	public static final String CONFIG_REPO_CLASS_PROP_KEY = "tigase-config-repo-class";
 
 	/** Field description */
-	public static final String USER_REPO_POOL_CLASS_PROP_KEY = "user-repo-pool";
-
-	/** Field description */
-	public static final String USER_REPO_POOL_CLASS_PROP_VAL = "tigase.db.UserRepositoryPool";
-
-	/** Field description */
 	public static final String USER_DOMAIN_POOL_CLASS_PROP_KEY = "user-domain-repo-pool";
 
 	/** Field description */
 	public static final String USER_DOMAIN_POOL_CLASS_PROP_VAL = "tigase.db.UserRepositoryMDImpl";
 
 	/** Field description */
-	public static final String AUTH_REPO_POOL_CLASS_PROP_KEY = "auth-repo-pool";
-
-	/** Field description */
-	public static final String AUTH_REPO_POOL_CLASS_PROP_VAL = "tigase.db.UserAuthRepositoryPool";
-
-	/** Field description */
 	public static final String AUTH_DOMAIN_POOL_CLASS_PROP_KEY = "auth-domain-repo-pool";
 
 	/** Field description */
-	public static final String AUTH_DOMAIN_POOL_CLASS_PROP_VAL = "tigase.db.UserAuthRepositoryMDImpl";
+	public static final String AUTH_DOMAIN_POOL_CLASS_PROP_VAL = "tigase.db.AuthRepositoryMDImpl";
 	private static final String LOGGING_KEY = "logging/";
 
 	/** Field description */
@@ -113,9 +101,9 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 
 	//~--- fields ---------------------------------------------------------------
 
-	private UserAuthRepositoryMDImpl auth_repo_impl = null;
+	private AuthRepositoryMDImpl auth_repo_impl = null;
 	private Map<String, String> auth_repo_params = null;
-	private UserAuthRepository auth_repository = null;
+	private AuthRepository auth_repository = null;
 
 	// Default user auth repository instance which can be shared among components
 	private ConfigRepositoryIfc configRepo = new ConfigurationCache();
@@ -272,14 +260,16 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 			}    // end of for (String pack: packs)
 		}
 
+		String repo_pool = null;
+
 		// Default repository pools implementations
-		String repo_pool = (String) params.get(USER_REPO_POOL_CLASS);
-
-		if (repo_pool == null) {
-			repo_pool = USER_REPO_POOL_CLASS_PROP_VAL;
-		}
-
-		defaults.put(USER_REPO_POOL_CLASS_PROP_KEY, repo_pool);
+//  repo_pool = (String) params.get(USER_REPO_POOL_CLASS);
+//
+//  if (repo_pool == null) {
+//    repo_pool = USER_REPO_POOL_CLASS_PROP_VAL;
+//  }
+//
+//  defaults.put(USER_REPO_POOL_CLASS_PROP_KEY, repo_pool);
 		repo_pool = (String) params.get(USER_DOMAIN_POOL_CLASS);
 
 		if (repo_pool == null) {
@@ -287,13 +277,14 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 		}
 
 		defaults.put(USER_DOMAIN_POOL_CLASS_PROP_KEY, repo_pool);
-		repo_pool = (String) params.get(AUTH_REPO_POOL_CLASS);
 
-		if (repo_pool == null) {
-			repo_pool = AUTH_REPO_POOL_CLASS_PROP_VAL;
-		}
-
-		defaults.put(AUTH_REPO_POOL_CLASS_PROP_KEY, repo_pool);
+//  repo_pool = (String) params.get(AUTH_REPO_POOL_CLASS);
+//
+//  if (repo_pool == null) {
+//    repo_pool = AUTH_REPO_POOL_CLASS_PROP_VAL;
+//  }
+//
+//  defaults.put(AUTH_REPO_POOL_CLASS_PROP_KEY, repo_pool);
 		repo_pool = (String) params.get(AUTH_DOMAIN_POOL_CLASS);
 
 		if (repo_pool == null) {
@@ -333,10 +324,11 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 			defaults.put(USER_REPO_POOL_SIZE_PROP_KEY, "" + 1);
 		}
 
-		defaults.put(USER_REPO_CLASS_PROP_KEY, user_repo_class);
+//  defaults.put(USER_REPO_CLASS_PROP_KEY, user_repo_class);
 		defaults.put(USER_REPO_URL_PROP_KEY, user_repo_url);
 		defaults.put(USER_REPO_PARAMS_NODE + "/param-1", "value-1");
-		defaults.put(AUTH_REPO_CLASS_PROP_KEY, auth_repo_class);
+
+//  defaults.put(AUTH_REPO_CLASS_PROP_KEY, auth_repo_class);
 		defaults.put(AUTH_REPO_URL_PROP_KEY, auth_repo_url);
 		defaults.put(AUTH_REPO_PARAMS_NODE + "/param-1", "value-1");
 
@@ -651,7 +643,7 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 			Map<String, String> params = getRepoParams(props, AUTH_REPO_PARAMS_NODE, null);
 			String conn_url = (String) props.get(AUTH_REPO_URL_PROP_KEY);
 
-			auth_repo_impl = (UserAuthRepositoryMDImpl) Class.forName(authRepoMDImpl).newInstance();
+			auth_repo_impl = (AuthRepositoryMDImpl) Class.forName(authRepoMDImpl).newInstance();
 			auth_repo_impl.initRepository(conn_url, params);
 
 			// User multi-domain repository pool initialization
@@ -786,12 +778,13 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 			}
 		}    // end of if (modified)
 
-		prop.put(SHARED_USER_REPO_PROP_KEY, user_repository);
+		prop.put(SHARED_USER_REPO_PROP_KEY, user_repo_impl);
 		prop.put(SHARED_USER_REPO_PARAMS_PROP_KEY, user_repo_params);
-		prop.put(SHARED_AUTH_REPO_PROP_KEY, auth_repository);
+		prop.put(SHARED_AUTH_REPO_PROP_KEY, auth_repo_impl);
 		prop.put(SHARED_AUTH_REPO_PARAMS_PROP_KEY, auth_repo_params);
-		prop.put(SHARED_USER_REPO_POOL_PROP_KEY, user_repo_impl);
-		prop.put(SHARED_USER_AUTH_REPO_POOL_PROP_KEY, auth_repo_impl);
+
+//  prop.put(SHARED_USER_REPO_POOL_PROP_KEY, user_repo_impl);
+//  prop.put(SHARED_USER_AUTH_REPO_POOL_PROP_KEY, auth_repo_impl);
 		component.setProperties(prop);
 	}
 
@@ -799,28 +792,26 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 			throws DBInitException, ClassNotFoundException, InstantiationException,
 			IllegalAccessException {
 		Map<String, String> params = getRepoParams(props, AUTH_REPO_PARAMS_NODE, domain);
-		String cls_name = (String) props.get(AUTH_REPO_CLASS_PROP_KEY
+		String cls_name = (String) props.get(RepositoryFactory.AUTH_REPO_CLASS_PROP_KEY
 			+ ((domain == null) ? "" : "/" + domain));
 		String conn_url = (String) props.get(AUTH_REPO_URL_PROP_KEY
 			+ ((domain == null) ? "" : "/" + domain));
-		String authRepoPoolImpl = (String) props.get(AUTH_REPO_POOL_CLASS_PROP_KEY);
-		UserAuthRepositoryPool repo_pool =
-			(UserAuthRepositoryPool) Class.forName(authRepoPoolImpl).newInstance();
 
-		repo_pool.initRepository(conn_url, params);
+//  String authRepoPoolImpl = (String) props.get(AUTH_REPO_POOL_CLASS_PROP_KEY);
+//  AuthRepositoryPool repo_pool =
+//    (AuthRepositoryPool) Class.forName(authRepoPoolImpl).newInstance();
+//  repo_pool.initRepository(conn_url, params);
+//  for (int i = 0; i < pool_size; i++) {
+		AuthRepository repo = RepositoryFactory.getAuthRepository(cls_name, conn_url, params);
 
-		for (int i = 0; i < pool_size; i++) {
-			UserAuthRepository repo = RepositoryFactory.getAuthRepository(cls_name, conn_url, params);
-
-			repo_pool.addRepo(repo);
-		}
-
+//  repo_pool.addRepo(repo);
+//    }
 		if ((domain == null) || domain.trim().isEmpty()) {
-			auth_repo_impl.addRepo("", repo_pool);
-			auth_repo_impl.setDefault(repo_pool);
-			auth_repository = repo_pool;
+			auth_repo_impl.addRepo("", repo);
+			auth_repo_impl.setDefault(repo);
+			auth_repository = repo;
 		} else {
-			auth_repo_impl.addRepo(domain, repo_pool);
+			auth_repo_impl.addRepo(domain, repo);
 		}
 
 		log.log(Level.INFO, "[{0}] Initialized {1} as user auth repository: {2}", new Object[] { domain,
@@ -833,28 +824,28 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 			throws DBInitException, ClassNotFoundException, InstantiationException,
 			IllegalAccessException {
 		Map<String, String> params = getRepoParams(props, USER_REPO_PARAMS_NODE, domain);
-		String cls_name = (String) props.get(USER_REPO_CLASS_PROP_KEY
+		String cls_name = (String) props.get(RepositoryFactory.USER_REPO_CLASS_PROP_KEY
 			+ ((domain == null) ? "" : "/" + domain));
 		String conn_url = (String) props.get(USER_REPO_URL_PROP_KEY
 			+ ((domain == null) ? "" : "/" + domain));
-		String userRepoPoolImpl = (String) props.get(USER_REPO_POOL_CLASS_PROP_KEY);
-		UserRepositoryPool repo_pool =
-			(UserRepositoryPool) Class.forName(userRepoPoolImpl).newInstance();
 
-		repo_pool.initRepository(conn_url, params);
+//  String userRepoPoolImpl = (String) props.get(USER_REPO_POOL_CLASS_PROP_KEY);
+//  UserRepositoryPool repo_pool =
+//    (UserRepositoryPool) Class.forName(userRepoPoolImpl).newInstance();
+//
+//  repo_pool.initRepository(conn_url, params);
+//
+//  for (int i = 0; i < pool_size; i++) {
+		UserRepository repo = RepositoryFactory.getUserRepository(cls_name, conn_url, params);
 
-		for (int i = 0; i < pool_size; i++) {
-			UserRepository repo = RepositoryFactory.getUserRepository(cls_name, conn_url, params);
-
-			repo_pool.addRepo(repo);
-		}
-
+//  repo_pool.addRepo(repo);
+//    }
 		if ((domain == null) || domain.trim().isEmpty()) {
-			user_repo_impl.addRepo("", repo_pool);
-			user_repo_impl.setDefault(repo_pool);
-			user_repository = repo_pool;
+			user_repo_impl.addRepo("", repo);
+			user_repo_impl.setDefault(repo);
+			user_repository = repo;
 		} else {
-			user_repo_impl.addRepo(domain, repo_pool);
+			user_repo_impl.addRepo(domain, repo);
 		}
 
 		log.log(Level.INFO, "[{0}] Initialized {1} as user repository: {2}", new Object[] { domain,
@@ -925,8 +916,9 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 			repo_class = (String) params.get(get_user_db);
 		}
 
-		defaults.put(AUTH_REPO_CLASS_PROP_KEY + "/" + domain, repo_class);
-		log.config("Setting defaults: " + AUTH_REPO_CLASS_PROP_KEY + "/" + domain + "=" + repo_class);
+		defaults.put(RepositoryFactory.AUTH_REPO_CLASS_PROP_KEY + "/" + domain, repo_class);
+		log.config("Setting defaults: " + RepositoryFactory.AUTH_REPO_CLASS_PROP_KEY + "/" + domain
+				+ "=" + repo_class);
 		defaults.put(AUTH_REPO_URL_PROP_KEY + "/" + domain, entry.getValue());
 		log.config("Setting defaults: " + AUTH_REPO_URL_PROP_KEY + "/" + domain + "="
 				+ entry.getValue());
@@ -958,8 +950,9 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 			repo_class = (String) params.get(get_user_db);
 		}
 
-		defaults.put(USER_REPO_CLASS_PROP_KEY + "/" + domain, repo_class);
-		log.config("Setting defaults: " + USER_REPO_CLASS_PROP_KEY + "/" + domain + "=" + repo_class);
+		defaults.put(RepositoryFactory.USER_REPO_CLASS_PROP_KEY + "/" + domain, repo_class);
+		log.config("Setting defaults: " + RepositoryFactory.USER_REPO_CLASS_PROP_KEY + "/" + domain
+				+ "=" + repo_class);
 		defaults.put(USER_REPO_URL_PROP_KEY + "/" + domain, entry.getValue());
 		log.config("Setting defaults: " + USER_REPO_URL_PROP_KEY + "/" + domain + "="
 				+ entry.getValue());

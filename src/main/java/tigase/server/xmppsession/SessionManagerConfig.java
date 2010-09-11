@@ -130,20 +130,6 @@ public abstract class SessionManagerConfig {
 	public static void getDefaults(Map<String, Object> props, Map<String, Object> params) {
 		props.put(ADMIN_SCRIPTS_PROP_KEY, ADMIN_SCRIPTS_PROP_VAL);
 
-		String user_repo_class = (params.get(GEN_USER_DB) != null)
-			? (String) params.get(GEN_USER_DB) : DERBY_REPO_CLASS_PROP_VAL;
-		String user_repo_url = (params.get(GEN_USER_DB_URI) != null)
-			? (String) params.get(GEN_USER_DB_URI) : DERBY_REPO_URL_PROP_VAL;
-		String auth_repo_class = (params.get(GEN_AUTH_DB) != null)
-			? (String) params.get(GEN_AUTH_DB) : DERBY_REPO_CLASS_PROP_VAL;
-		String auth_repo_url = (params.get(GEN_AUTH_DB_URI) != null)
-			? (String) params.get(GEN_AUTH_DB_URI) : user_repo_url;
-
-		props.put(USER_REPO_CLASS_PROP_KEY, user_repo_class);
-		props.put(USER_REPO_URL_PROP_KEY, user_repo_url);
-		props.put(AUTH_REPO_CLASS_PROP_KEY, auth_repo_class);
-		props.put(AUTH_REPO_URL_PROP_KEY, auth_repo_url);
-
 		boolean full_comps = (params.get(GEN_AUTH_DB) == null)
 			|| params.get(GEN_AUTH_DB).toString().equals("mysql")
 			|| params.get(GEN_AUTH_DB).toString().equals("pgsql")

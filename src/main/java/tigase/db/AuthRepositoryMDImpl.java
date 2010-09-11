@@ -41,14 +41,14 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class UserAuthRepositoryMDImpl implements UserAuthRepository {
-	private static final Logger log = Logger.getLogger(UserAuthRepositoryMDImpl.class.getName());
+public class AuthRepositoryMDImpl implements AuthRepository {
+	private static final Logger log = Logger.getLogger(AuthRepositoryMDImpl.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
 
-	private UserAuthRepository def = null;
-	private ConcurrentSkipListMap<String, UserAuthRepository> repos =
-		new ConcurrentSkipListMap<String, UserAuthRepository>();
+	private AuthRepository def = null;
+	private ConcurrentSkipListMap<String, AuthRepository> repos =
+		new ConcurrentSkipListMap<String, AuthRepository>();
 
 	//~--- methods --------------------------------------------------------------
 
@@ -59,7 +59,7 @@ public class UserAuthRepositoryMDImpl implements UserAuthRepository {
 	 * @param domain
 	 * @param repo
 	 */
-	public void addRepo(String domain, UserAuthRepository repo) {
+	public void addRepo(String domain, AuthRepository repo) {
 		repos.put(domain, repo);
 	}
 
@@ -76,7 +76,7 @@ public class UserAuthRepositoryMDImpl implements UserAuthRepository {
 	@Override
 	public void addUser(BareJID user, String password)
 			throws UserExistsException, TigaseDBException {
-		UserAuthRepository repo = getRepo(user.getDomain());
+		AuthRepository repo = getRepo(user.getDomain());
 
 		if (repo != null) {
 			repo.addUser(user, password);
@@ -105,7 +105,7 @@ public class UserAuthRepositoryMDImpl implements UserAuthRepository {
 	@Override
 	public boolean digestAuth(BareJID user, String digest, String id, String alg)
 			throws UserNotFoundException, TigaseDBException, AuthorizationException {
-		UserAuthRepository repo = getRepo(user.getDomain());
+		AuthRepository repo = getRepo(user.getDomain());
 
 		if (repo != null) {
 			return repo.digestAuth(user, digest, id, alg);
@@ -128,8 +128,8 @@ public class UserAuthRepositoryMDImpl implements UserAuthRepository {
 	 *
 	 * @return
 	 */
-	public UserAuthRepository getRepo(String domain) {
-		UserAuthRepository result = repos.get(domain);
+	public AuthRepository getRepo(String domain) {
+		AuthRepository result = repos.get(domain);
 
 		if (result == null) {
 			result = def;
@@ -159,7 +159,7 @@ public class UserAuthRepositoryMDImpl implements UserAuthRepository {
 	public long getUsersCount() {
 		long result = 0;
 
-		for (UserAuthRepository repo : repos.values()) {
+		for (AuthRepository repo : repos.values()) {
 			result += repo.getUsersCount();
 		}
 
@@ -176,7 +176,7 @@ public class UserAuthRepositoryMDImpl implements UserAuthRepository {
 	 */
 	@Override
 	public long getUsersCount(String domain) {
-		UserAuthRepository repo = getRepo(domain);
+		AuthRepository repo = getRepo(domain);
 
 		if (repo != null) {
 			return repo.getUsersCount(domain);
@@ -217,7 +217,7 @@ public class UserAuthRepositoryMDImpl implements UserAuthRepository {
 	 */
 	@Override
 	public void logout(BareJID user) throws UserNotFoundException, TigaseDBException {
-		UserAuthRepository repo = getRepo(user.getDomain());
+		AuthRepository repo = getRepo(user.getDomain());
 
 		if (repo != null) {
 			repo.logout(user);
@@ -243,7 +243,7 @@ public class UserAuthRepositoryMDImpl implements UserAuthRepository {
 	@Override
 	public boolean otherAuth(Map<String, Object> authProps)
 			throws UserNotFoundException, TigaseDBException, AuthorizationException {
-		UserAuthRepository repo = getRepo((String) authProps.get(SERVER_NAME_KEY));
+		AuthRepository repo = getRepo((String) authProps.get(SERVER_NAME_KEY));
 
 		if (repo != null) {
 			return repo.otherAuth(authProps);
@@ -272,7 +272,7 @@ public class UserAuthRepositoryMDImpl implements UserAuthRepository {
 	@Override
 	public boolean plainAuth(BareJID user, String password)
 			throws UserNotFoundException, TigaseDBException, AuthorizationException {
-		UserAuthRepository repo = getRepo(user.getDomain());
+		AuthRepository repo = getRepo(user.getDomain());
 
 		if (repo != null) {
 			return repo.plainAuth(user, password);
@@ -293,7 +293,7 @@ public class UserAuthRepositoryMDImpl implements UserAuthRepository {
 	 */
 	@Override
 	public void queryAuth(Map<String, Object> authProps) {
-		UserAuthRepository repo = getRepo((String) authProps.get(SERVER_NAME_KEY));
+		AuthRepository repo = getRepo((String) authProps.get(SERVER_NAME_KEY));
 
 		if (repo != null) {
 			repo.queryAuth(authProps);
@@ -312,7 +312,7 @@ public class UserAuthRepositoryMDImpl implements UserAuthRepository {
 	 *
 	 * @return
 	 */
-	public UserAuthRepository removeRepo(String domain) {
+	public AuthRepository removeRepo(String domain) {
 		return repos.remove(domain);
 	}
 
@@ -327,7 +327,7 @@ public class UserAuthRepositoryMDImpl implements UserAuthRepository {
 	 */
 	@Override
 	public void removeUser(BareJID user) throws UserNotFoundException, TigaseDBException {
-		UserAuthRepository repo = getRepo(user.getDomain());
+		AuthRepository repo = getRepo(user.getDomain());
 
 		if (repo != null) {
 			repo.removeUser(user);
@@ -346,7 +346,7 @@ public class UserAuthRepositoryMDImpl implements UserAuthRepository {
 	 *
 	 * @param repo
 	 */
-	public void setDefault(UserAuthRepository repo) {
+	public void setDefault(AuthRepository repo) {
 		def = repo;
 	}
 
@@ -365,7 +365,7 @@ public class UserAuthRepositoryMDImpl implements UserAuthRepository {
 	@Override
 	public void updatePassword(BareJID user, String password)
 			throws UserNotFoundException, TigaseDBException {
-		UserAuthRepository repo = getRepo(user.getDomain());
+		AuthRepository repo = getRepo(user.getDomain());
 
 		if (repo != null) {
 			repo.updatePassword(user, password);

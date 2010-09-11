@@ -44,7 +44,7 @@ def PASSWORD_VERIFY = "password-verify"
 def EMAIL = "email"
 
 def p = (Packet)packet
-def auth_repo = (UserAuthRepository)authRepository
+def auth_repo = (AuthRepository)authRepository
 def user_repo = (UserRepository)userRepository
 
 def userJid = Command.getFieldValue(packet, JID)

@@ -25,7 +25,7 @@ package tigase.util;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.db.RepositoryFactory;
-import tigase.db.UserAuthRepository;
+import tigase.db.AuthRepository;
 import tigase.db.UserExistsException;
 import tigase.db.UserRepository;
 
@@ -209,7 +209,7 @@ public class RepositoryUtils {
 	 *
 	 * @throws Exception
 	 */
-	public static void copyRepositories(UserRepository src, UserAuthRepository dst) throws Exception {
+	public static void copyRepositories(UserRepository src, AuthRepository dst) throws Exception {
 		if (user != null) {
 			copyUser(user, src, dst);
 		} else {
@@ -262,7 +262,7 @@ public class RepositoryUtils {
 	 *
 	 * @throws Exception
 	 */
-	public static void copyUser(BareJID user, UserRepository src, UserAuthRepository dst)
+	public static void copyUser(BareJID user, UserRepository src, AuthRepository dst)
 			throws Exception {
 		if ((user == null)) {
 			return;
@@ -426,7 +426,7 @@ public class RepositoryUtils {
 
 		Exception repo_exc = null;
 		UserRepository src_repo = null;
-		UserAuthRepository src_auth = null;
+		AuthRepository src_auth = null;
 
 		try {
 			src_repo = RepositoryFactory.getUserRepository(src_class, src_uri, null);
@@ -518,7 +518,7 @@ public class RepositoryUtils {
 		if (copy_repos) {
 			UserRepository dst_repo = null;
 			Exception dst_exc = null;
-			UserAuthRepository dst_auth = null;
+			AuthRepository dst_auth = null;
 
 			try {
 				dst_repo = RepositoryFactory.getUserRepository(dst_class, dst_uri, null);
@@ -902,7 +902,7 @@ public class RepositoryUtils {
 	 * @throws Exception
 	 */
 	public static void userAddTest(UserRepository re) throws Exception {
-		UserAuthRepository repo = (UserAuthRepository) re;
+		AuthRepository repo = (AuthRepository) re;
 		BareJID test_user = BareJID.bareJIDInstanceNS("test111@localhost");
 
 		printRepoContent(re);

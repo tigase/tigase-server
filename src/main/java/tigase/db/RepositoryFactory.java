@@ -64,11 +64,53 @@ public abstract class RepositoryFactory {
 
 	/** Field description */
 	public static final int DATA_REPO_POOL_SIZE_PROP_VAL = 10;
+
+	/** Field description */
+	public static final String AUTH_REPO_CLASS_PROP_KEY = "auth-repo-class";
+
+	/** Field description */
+	public static final String AUTH_REPO_CLASS_PROP_VAL = "tigase.db.jdbc.TigaseCustomAuth";
+
+	/** Field description */
+	public static final String AUTH_REPO_POOL_CLASS_PROP_KEY = "auth-repo-pool";
+
+	/** Field description */
+	public static final String AUTH_REPO_POOL_CLASS_PROP_DEF = "tigase.db.AuthRepositoryPool";
+
+	/** Field description */
+	public static final String AUTH_REPO_POOL_CLASS_PROP_VAL = null;
+
+	/** Field description */
+	public static final String AUTH_REPO_POOL_SIZE_PROP_KEY = "auth-repo-pool-size";
+
+	/** Field description */
+	public static final int AUTH_REPO_POOL_SIZE_PROP_VAL = 10;
+
+	/** Field description */
+	public static final String USER_REPO_CLASS_PROP_KEY = "user-repo-class";
+
+	/** Field description */
+	public static final String USER_REPO_CLASS_PROP_VAL = "tigase.db.jdbc.JDBCRepository";
+
+	/** Field description */
+	public static final String USER_REPO_POOL_CLASS_PROP_KEY = "user-repo-pool";
+
+	/** Field description */
+	public static final String USER_REPO_POOL_CLASS_PROP_DEF = "tigase.db.UserRepositoryPool";
+
+	/** Field description */
+	public static final String USER_REPO_POOL_CLASS_PROP_VAL = null;
+
+	/** Field description */
+	public static final String USER_REPO_POOL_SIZE_PROP_KEY = "user-repo-pool-size";
+
+	/** Field description */
+	public static final int USER_REPO_POOL_SIZE_PROP_VAL = 10;
 	private static ConcurrentMap<String, UserRepository> user_repos = new ConcurrentHashMap<String,
 		UserRepository>(5);
-	private static ConcurrentMap<String, UserAuthRepository> auth_repos =
-		new ConcurrentHashMap<String, UserAuthRepository>(5);
-	private static ConcurrentMap<String, DataRepository> data_repo = new ConcurrentHashMap<String,
+	private static ConcurrentMap<String, AuthRepository> auth_repos = new ConcurrentHashMap<String,
+		AuthRepository>(5);
+	private static ConcurrentMap<String, DataRepository> data_repos = new ConcurrentHashMap<String,
 		DataRepository>(10);
 
 	//~--- get methods ----------------------------------------------------------
@@ -88,41 +130,47 @@ public abstract class RepositoryFactory {
 	 * @throws IllegalAccessException
 	 * @throws InstantiationException
 	 */
-	public static UserAuthRepository getAuthRepository(String class_name, String resource,
+	public static AuthRepository getAuthRepository(String class_name, String resource,
 			Map<String, String> params)
 			throws ClassNotFoundException, InstantiationException, IllegalAccessException,
 			DBInitException {
+		String cls = class_name;
 
-//  // XMLRepository is different as you can not have many instances accessing
-//  // the same file, thus we have to detect it and return always a hadle
-//  // to the same repository instance if it is accessing the same file
-//  if (class_name.equals("tigase.db.xml.XMLRepository")) {
-//    comp_name = resource;
-//  }
-//  ConcurrentMap<String, UserAuthRepository> repo_map = auth_repos.get(comp_name);
-//
-//  if (repo_map == null) {
-//    repo_map = new ConcurrentHashMap<String, UserAuthRepository>();
-//    auth_repos.put(comp_name, repo_map);
-//  }    // end of if (repo_map == null)
-		UserAuthRepository rep = auth_repos.get(resource);
+		if (cls == null) {
+			cls = System.getProperty(AUTH_REPO_CLASS_PROP_KEY, AUTH_REPO_CLASS_PROP_VAL);
+		}
 
-		if (rep == null) {
-			rep = tryCastUserRepository(resource);
+		cls = getRepoClass(cls);
 
-			// Make sure this is the right implementation
-			if ((rep != null) &&!rep.getClass().getName().equals(class_name)) {
-				rep = null;
-			}    // end of if (!rep.getClass().getName().equals(class_name))
+		AuthRepository repo = auth_repos.get(cls + resource);
 
-			if (rep == null) {
-				rep = (UserAuthRepository) Class.forName(getRepoClass(class_name)).newInstance();
-				rep.initRepository(resource, params);
-				auth_repos.put(resource, rep);
-			}    // end of if (rep == null)
-		}      // end of if (rep == null)
+		if (repo == null) {
+			if (System.getProperty(AUTH_REPO_POOL_CLASS_PROP_KEY, AUTH_REPO_POOL_CLASS_PROP_VAL)
+					!= null) {
+				int repo_pool_size = Integer.getInteger(AUTH_REPO_POOL_SIZE_PROP_KEY,
+					AUTH_REPO_POOL_SIZE_PROP_VAL);
+				AuthRepositoryPool repo_pool =
+					(AuthRepositoryPool) Class.forName(System.getProperty(AUTH_REPO_POOL_CLASS_PROP_KEY,
+						AUTH_REPO_POOL_CLASS_PROP_VAL)).newInstance();
 
-		return rep;
+				repo_pool.initRepository(resource, params);
+
+				for (int i = 0; i < repo_pool_size; i++) {
+					repo = (AuthRepository) Class.forName(cls).newInstance();
+					repo.initRepository(resource, params);
+					repo_pool.addRepo(repo);
+				}
+
+				repo = repo_pool;
+			} else {
+				repo = (AuthRepository) Class.forName(cls).newInstance();
+				repo.initRepository(resource, params);
+			}
+
+			auth_repos.put(cls + resource, repo);
+		}
+
+		return repo;
 	}
 
 	/**
@@ -145,15 +193,15 @@ public abstract class RepositoryFactory {
 			Map<String, String> params)
 			throws ClassNotFoundException, InstantiationException, IllegalAccessException,
 			DBInitException, SQLException {
-		DataRepository repo = data_repo.get(resource);
+		String cls = class_name;
+
+		if (cls == null) {
+			cls = System.getProperty(DATA_REPO_CLASS_PROP_KEY, DATA_REPO_CLASS_PROP_VAL);
+		}
+
+		DataRepository repo = data_repos.get(cls + resource);
 
 		if (repo == null) {
-			String cls = class_name;
-
-			if (cls == null) {
-				cls = System.getProperty(DATA_REPO_CLASS_PROP_KEY, DATA_REPO_CLASS_PROP_VAL);
-			}
-
 			int repo_pool_size = Integer.getInteger(DATA_REPO_POOL_SIZE_PROP_KEY,
 				DATA_REPO_POOL_SIZE_PROP_VAL);
 			DataRepositoryPool repo_pool =
@@ -169,7 +217,7 @@ public abstract class RepositoryFactory {
 			}
 
 			repo = repo_pool;
-			data_repo.put(resource, repo);
+			data_repos.put(cls + resource, repo);
 		}
 
 		return repo;
@@ -237,52 +285,43 @@ public abstract class RepositoryFactory {
 			Map<String, String> params)
 			throws ClassNotFoundException, InstantiationException, IllegalAccessException,
 			DBInitException {
+		String cls = class_name;
 
-//  // XMLRepository is different as you can not have many instances accessing
-//  // the same file, thus we have to detect it and return always a handle
-//  // to the same repository instance if it is accessing the same file
-//  if (class_name.equals("tigase.db.xml.XMLRepository")) {
-//    comp_name = resource;
-//  }
-//
-//  ConcurrentMap<String, UserRepository> repo_map = user_repos.get(comp_name);
-//  if (repo_map == null) {
-//    repo_map = new ConcurrentHashMap<String, UserRepository>();
-//    user_repos.put(comp_name, repo_map);
-//  }    // end of if (repo_map == null)
-		UserRepository rep = user_repos.get(resource);
-
-		if (rep == null) {
-			rep = (UserRepository) Class.forName(getRepoClass(class_name)).newInstance();
-			rep.initRepository(resource, params);
-			user_repos.put(resource, rep);
-		}    // end of if (rep == null)
-
-		return rep;
-	}
-
-	//~--- methods --------------------------------------------------------------
-
-	private static UserAuthRepository tryCastUserRepository(String resource) {
-
-		// There might be a repository class implementing both interfaces
-		// it is always better access repositories through single instance
-		// due to possible caching problems
-//  ConcurrentMap<String, UserRepository> repo_map = user_repos.get(comp_name);
-//
-//  if (repo_map == null) {
-//    repo_map = new ConcurrentHashMap<String, UserRepository>();
-//    user_repos.put(comp_name, repo_map);
-//  }    // end of if (repo_map == null)
-		UserRepository rep = user_repos.get(resource);
-
-		if (rep != null) {
-			try {
-				return (UserAuthRepository) rep;
-			} catch (Exception e) {}
+		if (cls == null) {
+			cls = System.getProperty(USER_REPO_CLASS_PROP_KEY, USER_REPO_CLASS_PROP_VAL);
 		}
 
-		return null;
+		cls = getRepoClass(cls);
+
+		UserRepository repo = user_repos.get(cls + resource);
+
+		if (repo == null) {
+			if (System.getProperty(USER_REPO_POOL_CLASS_PROP_KEY, USER_REPO_POOL_CLASS_PROP_VAL)
+					!= null) {
+				int repo_pool_size = Integer.getInteger(USER_REPO_POOL_SIZE_PROP_KEY,
+					USER_REPO_POOL_SIZE_PROP_VAL);
+				UserRepositoryPool repo_pool =
+					(UserRepositoryPool) Class.forName(System.getProperty(USER_REPO_POOL_CLASS_PROP_KEY,
+						USER_REPO_POOL_CLASS_PROP_VAL)).newInstance();
+
+				repo_pool.initRepository(resource, params);
+
+				for (int i = 0; i < repo_pool_size; i++) {
+					repo = (UserRepository) Class.forName(cls).newInstance();
+					repo.initRepository(resource, params);
+					repo_pool.addRepo(repo);
+				}
+
+				repo = repo_pool;
+			} else {
+				repo = (UserRepository) Class.forName(cls).newInstance();
+				repo.initRepository(resource, params);
+			}
+
+			user_repos.put(cls + resource, repo);
+		}
+
+		return repo;
 	}
 }    // RepositoryFactory
 
