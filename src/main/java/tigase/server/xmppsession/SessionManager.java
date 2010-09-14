@@ -341,6 +341,33 @@ public class SessionManager extends AbstractMessageReceiver
 		return null;
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param jid
+	 *
+	 * @return
+	 */
+	public XMPPResourceConnection getResourceConnection(JID jid) {
+		XMPPSession session = getSession(jid.getBareJID());
+
+		if (session != null) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Session not null, getting resource for jid: {0}", jid);
+			}
+
+			return session.getResourceConnection(jid);
+		}    // end of if (session != null)
+
+		// Maybe this is a call for the server session?
+		if (isLocalDomain(jid.toString(), false)) {
+			return smResourceConnection;
+		}
+
+		return null;
+	}
+
 //@Override
 //public List<Element> getDiscoItems(String node, String jid) {
 //  List<Element> result = serviceEntity.getDiscoItems(node, jid);
@@ -1065,25 +1092,6 @@ public class SessionManager extends AbstractMessageReceiver
 	@Override
 	protected Integer getMaxQueueSize(int def) {
 		return def * 10;
-	}
-
-	protected XMPPResourceConnection getResourceConnection(JID jid) {
-		XMPPSession session = getSession(jid.getBareJID());
-
-		if (session != null) {
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Session not null, getting resource for jid: {0}", jid);
-			}
-
-			return session.getResourceConnection(jid);
-		}    // end of if (session != null)
-
-		// Maybe this is a call for the server session?
-		if (isLocalDomain(jid.toString(), false)) {
-			return smResourceConnection;
-		}
-
-		return null;
 	}
 
 	protected XMPPSession getSession(BareJID jid) {
