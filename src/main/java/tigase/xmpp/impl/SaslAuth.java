@@ -24,8 +24,8 @@ package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.db.NonAuthUserRepository;
 import tigase.db.AuthRepository;
+import tigase.db.NonAuthUserRepository;
 
 import tigase.server.Command;
 import tigase.server.Packet;
@@ -102,17 +102,6 @@ public class SaslAuth extends XMPPProcessor implements XMPPProcessorIfc {
 	 * @return
 	 */
 	@Override
-	public int concurrentThreadsPerQueue() {
-		return 2;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
 	public String id() {
 		return ID;
 	}
@@ -141,8 +130,8 @@ public class SaslAuth extends XMPPProcessor implements XMPPProcessorIfc {
 			// Multiple authentication attempts....
 			// Another authentication request on already authenticated connection
 			// This is not allowed and must be forbidden.
-			Packet res = packet.swapFromTo(createReply(ElementType.failure, "<not-authorized/>"),
-				null, null);
+			Packet res = packet.swapFromTo(createReply(ElementType.failure, "<not-authorized/>"), null,
+				null);
 
 			// Make sure it gets delivered before stream close
 			res.setPriority(Priority.SYSTEM);
@@ -189,11 +178,9 @@ public class SaslAuth extends XMPPProcessor implements XMPPProcessorIfc {
 		if (authProps == null) {
 			authProps = new HashMap<String, Object>(10, 0.75f);
 			authProps.put(AuthRepository.PROTOCOL_KEY, AuthRepository.PROTOCOL_VAL_SASL);
-			authProps.put(AuthRepository.MACHANISM_KEY,
-					request.getAttribute("/auth", "mechanism"));
+			authProps.put(AuthRepository.MACHANISM_KEY, request.getAttribute("/auth", "mechanism"));
 			authProps.put(AuthRepository.REALM_KEY, session.getDomain().getVhost().getDomain());
-			authProps.put(AuthRepository.SERVER_NAME_KEY,
-					session.getDomain().getVhost().getDomain());
+			authProps.put(AuthRepository.SERVER_NAME_KEY, session.getDomain().getVhost().getDomain());
 			session.putSessionData(XMLNS + "-authProps", authProps);
 		}    // end of if (authProps == null)
 
@@ -205,21 +192,21 @@ public class SaslAuth extends XMPPProcessor implements XMPPProcessorIfc {
 			String challenge_data = (String) authProps.get(AuthRepository.RESULT_KEY);
 
 			if (result == Authorization.AUTHORIZED) {
-				results.offer(packet.swapFromTo(createReply(ElementType.success, challenge_data),
-						null, null));
+				results.offer(packet.swapFromTo(createReply(ElementType.success, challenge_data), null,
+						null));
 				authProps.clear();
 				session.removeSessionData(XMLNS + "-authProps");
 			} else {
-				results.offer(packet.swapFromTo(createReply(ElementType.challenge, challenge_data),
-						null, null));
+				results.offer(packet.swapFromTo(createReply(ElementType.challenge, challenge_data), null,
+						null));
 			}
 		} catch (Exception e) {
 			log.log(Level.INFO, "Authentication failed: ", e);
 
 			// e.printStackTrace();
 			session.removeSessionData(XMLNS + "-authProps");
-			results.offer(packet.swapFromTo(createReply(ElementType.failure, "<not-authorized/>"),
-					null, null));
+			results.offer(packet.swapFromTo(createReply(ElementType.failure, "<not-authorized/>"), null,
+					null));
 
 			Integer retries = (Integer) session.getSessionData("auth-retries");
 
@@ -230,8 +217,8 @@ public class SaslAuth extends XMPPProcessor implements XMPPProcessorIfc {
 			if (retries.intValue() < 3) {
 				session.putSessionData("auth-retries", new Integer(retries.intValue() + 1));
 			} else {
-				results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
-						StanzaType.set, packet.getStanzaId()));
+				results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(), StanzaType.set,
+						packet.getStanzaId()));
 			}
 		}    // end of try-catch
 	}

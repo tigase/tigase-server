@@ -24,8 +24,8 @@ package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.db.NonAuthUserRepository;
 import tigase.db.AuthRepository;
+import tigase.db.NonAuthUserRepository;
 
 import tigase.server.Command;
 import tigase.server.Packet;
@@ -86,17 +86,6 @@ public class JabberIqAuth extends XMPPProcessor implements XMPPProcessorIfc {
 	@Override
 	public int concurrentQueuesNo() {
 		return Runtime.getRuntime().availableProcessors();
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public int concurrentThreadsPerQueue() {
-		return 2;
 	}
 
 	/**
@@ -185,13 +174,13 @@ public class JabberIqAuth extends XMPPProcessor implements XMPPProcessorIfc {
 					} else {
 						results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 								"Authentication failed", false));
-						results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
-								StanzaType.set, packet.getStanzaId()));
+						results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(), StanzaType.set,
+								packet.getStanzaId()));
 					}    // end of else
 				} catch (NotAuthorizedException e) {
 					log.info("Authentication failed: " + user_name);
-					results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-							e.getMessage(), false));
+					results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet, e.getMessage(),
+							false));
 
 					Integer retries = (Integer) session.getSessionData("auth-retries");
 
@@ -202,16 +191,16 @@ public class JabberIqAuth extends XMPPProcessor implements XMPPProcessorIfc {
 					if (retries.intValue() < 3) {
 						session.putSessionData("auth-retries", new Integer(retries.intValue() + 1));
 					} else {
-						results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
-								StanzaType.set, packet.getStanzaId()));
+						results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(), StanzaType.set,
+								packet.getStanzaId()));
 					}
 				} catch (Exception e) {
 					log.info("Authentication failed: " + user_name);
 					log.log(Level.WARNING, "Authentication failed: ", e);
-					results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-							e.getMessage(), false));
-					results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
-							StanzaType.set, packet.getStanzaId()));
+					results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet, e.getMessage(),
+							false));
+					results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(), StanzaType.set,
+							packet.getStanzaId()));
 				}
 
 				break;
@@ -219,8 +208,8 @@ public class JabberIqAuth extends XMPPProcessor implements XMPPProcessorIfc {
 			default :
 				results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
 						"Message type is incorrect", false));
-				results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
-						StanzaType.set, packet.getStanzaId()));
+				results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(), StanzaType.set,
+						packet.getStanzaId()));
 
 				break;
 		}    // end of switch (type)

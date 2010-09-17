@@ -98,8 +98,11 @@ public abstract class XMPPProcessor implements XMPPImplIfc, Comparable<XMPPProce
 	 *
 	 *
 	 * @return
+	 *
+	 * @deprecated
 	 */
 	@Override
+	@Deprecated
 	public int concurrentThreadsPerQueue() {
 		return 1;
 	}

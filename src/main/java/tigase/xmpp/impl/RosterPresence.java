@@ -55,8 +55,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class RosterPresence extends XMPPProcessor
-		implements XMPPProcessorIfc, XMPPStopListenerIfc {
+public class RosterPresence extends XMPPProcessor implements XMPPProcessorIfc, XMPPStopListenerIfc {
 
 	/**
 	 * Private logger for class instance.
@@ -86,20 +85,6 @@ public class RosterPresence extends XMPPProcessor
 	@Override
 	public int concurrentQueuesNo() {
 		return Runtime.getRuntime().availableProcessors() * 2;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public int concurrentThreadsPerQueue() {
-
-		// Packet processing order does matter for roster/presence therefore
-		// we need a single thread for each queue.
-		return 1;
 	}
 
 	/**

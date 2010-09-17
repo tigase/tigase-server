@@ -224,8 +224,8 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc, XMPPSto
 
 			results.offer(packet);
 		} catch (TigaseStringprepException ex) {
-			log.log(Level.WARNING,
-					"Packet stringprep addressing problem, skipping presence send: {0}", presence);
+			log.log(Level.WARNING, "Packet stringprep addressing problem, skipping presence send: {0}",
+					presence);
 		}
 
 //  }
@@ -418,8 +418,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc, XMPPSto
 	 * @param results
 	 * @exception NotAuthorizedException if an error occurs
 	 */
-	protected static void updateOfflineChange(XMPPResourceConnection session,
-			Queue<Packet> results)
+	protected static void updateOfflineChange(XMPPResourceConnection session, Queue<Packet> results)
 			throws NotAuthorizedException {
 		for (XMPPResourceConnection conn : session.getActiveSessions()) {
 			try {
@@ -461,8 +460,8 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc, XMPPSto
 
 	private static boolean requiresPresenceSending(JID buddy, XMPPResourceConnection session) {
 		String buddy_domain = buddy.getDomain();
-		boolean result = !runtime.hasCompleteJidsInfo()
-			||!session.isLocalDomain(buddy_domain, false) || runtime.isJidOnline(buddy);
+		boolean result = !runtime.hasCompleteJidsInfo() ||!session.isLocalDomain(buddy_domain, false)
+			|| runtime.isJidOnline(buddy);
 
 		if (log.isLoggable(Level.FINEST)) {
 			if (result) {
@@ -471,12 +470,11 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc, XMPPSto
 				++requiredNo;
 			}
 
-			log.finest("Yes/No: " + requiredYes + " / " + requiredNo + ", buddy: " + buddy
-					+ ", result=" + result + ", !runtime.hasCompleteJidsInfo()="
-						+ !runtime.hasCompleteJidsInfo()
-							+ ", !session.isLocalDomain(buddy_domain, false)="
-								+ !session.isLocalDomain(buddy_domain, false)
-									+ ", runtime.isJidOnline(buddy)=" + runtime.isJidOnline(buddy));
+			log.finest("Yes/No: " + requiredYes + " / " + requiredNo + ", buddy: " + buddy + ", result="
+					+ result + ", !runtime.hasCompleteJidsInfo()=" + !runtime.hasCompleteJidsInfo()
+						+ ", !session.isLocalDomain(buddy_domain, false)="
+							+ !session.isLocalDomain(buddy_domain, false) + ", runtime.isJidOnline(buddy)="
+								+ runtime.isJidOnline(buddy));
 		}
 
 		return result;
@@ -576,20 +574,6 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc, XMPPSto
 	 * @return
 	 */
 	@Override
-	public int concurrentThreadsPerQueue() {
-
-		// Packet processing order does matter for roster/presence therefore
-		// we need a single thread for each queue.
-		return 1;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
 	public String id() {
 		return ID;
 	}
@@ -674,8 +658,8 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc, XMPPSto
 						if (session.isUserId(packet.getStanzaFrom().getBareJID())) {
 							if (log.isLoggable(Level.FINE)) {
 								log.log(Level.FINE,
-										"''in'' subscription to myself, not allowed, returning "
-											+ "error for packet: " + "{0}", packet);
+										"''in'' subscription to myself, not allowed, returning " + "error for packet: "
+											+ "{0}", packet);
 							}
 
 							results.offer(Authorization.NOT_ALLOWED.getResponseMessage(packet,
@@ -776,8 +760,8 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc, XMPPSto
 						break;
 				}    // end of switch (type)
 			} catch (NotAuthorizedException e) {
-				log.log(Level.INFO,
-						"Can not access user Roster, user session is not authorized yet: {0}", packet);
+				log.log(Level.INFO, "Can not access user Roster, user session is not authorized yet: {0}",
+						packet);
 				log.log(Level.FINEST, "presence problem...", e);
 
 //      results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
@@ -898,8 +882,8 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc, XMPPSto
 					try {
 						for (JID buddy : direct_presences) {
 							JID peer = buddy.copyWithoutResource();
-							Packet roster_update = Iq.createRosterPacket("set", session.nextStanzaId(),
-								peer, peer, session.getJID().copyWithoutResource(), null, null, "remove",
+							Packet roster_update = Iq.createRosterPacket("set", session.nextStanzaId(), peer,
+								peer, session.getJID().copyWithoutResource(), null, null, "remove",
 								JabberIqRoster.ANON);
 
 							results.offer(roster_update);
@@ -992,8 +976,8 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc, XMPPSto
 
 	//~--- methods --------------------------------------------------------------
 
-	protected void processError(Packet packet, XMPPResourceConnection session,
-			Queue<Packet> results, Map<String, Object> settings, PresenceType presenceType)
+	protected void processError(Packet packet, XMPPResourceConnection session, Queue<Packet> results,
+			Map<String, Object> settings, PresenceType presenceType)
 			throws NotAuthorizedException, TigaseDBException, NoConnectionIdException {
 
 		// This is message to 'this' client probably
@@ -1033,8 +1017,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc, XMPPSto
 		String resource = packet.getStanzaTo().getResource();
 
 		if ((resource != null) &&!resource.isEmpty()) {
-			XMPPResourceConnection direct =
-				session.getParentSession().getResourceForResource(resource);
+			XMPPResourceConnection direct = session.getParentSession().getResourceForResource(resource);
 
 			if (direct != null) {
 				if (log.isLoggable(Level.FINEST)) {
@@ -1158,8 +1141,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc, XMPPSto
 					Element pres = conn.getPresence();
 
 					if (pres != null) {
-						sendPresence(null, null, packet.getStanzaFrom().copyWithoutResource(), results,
-								pres);
+						sendPresence(null, null, packet.getStanzaFrom().copyWithoutResource(), results, pres);
 
 						if (log.isLoggable(Level.FINEST)) {
 							log.log(Level.FINEST, "Received probe, sending presence response to: {0}",
@@ -1187,8 +1169,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc, XMPPSto
 			sendPresence(StanzaType.subscribed, session.getJID().copyWithoutResource(),
 					packet.getStanzaFrom(), results, null);
 		} else {
-			SubscriptionType curr_sub = roster_util.getBuddySubscription(session,
-				packet.getStanzaFrom());
+			SubscriptionType curr_sub = roster_util.getBuddySubscription(session, packet.getStanzaFrom());
 
 			if (curr_sub == null) {
 				curr_sub = SubscriptionType.none;
@@ -1206,8 +1187,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc, XMPPSto
 	protected void processInSubscribed(Packet packet, XMPPResourceConnection session,
 			Queue<Packet> results, Map<String, Object> settings, PresenceType pres_type)
 			throws NotAuthorizedException, TigaseDBException, NoConnectionIdException {
-		SubscriptionType curr_sub = roster_util.getBuddySubscription(session,
-			packet.getStanzaFrom());
+		SubscriptionType curr_sub = roster_util.getBuddySubscription(session, packet.getStanzaFrom());
 
 		if (curr_sub == null) {
 			curr_sub = SubscriptionType.none;
@@ -1257,8 +1237,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc, XMPPSto
 	protected void processInUnsubscribed(Packet packet, XMPPResourceConnection session,
 			Queue<Packet> results, Map<String, Object> settings, PresenceType pres_type)
 			throws NotAuthorizedException, TigaseDBException, NoConnectionIdException {
-		SubscriptionType curr_sub = roster_util.getBuddySubscription(session,
-			packet.getStanzaFrom());
+		SubscriptionType curr_sub = roster_util.getBuddySubscription(session, packet.getStanzaFrom());
 
 		if (curr_sub != null) {
 			boolean subscr_changed = roster_util.updateBuddySubscription(session, pres_type,
@@ -1398,8 +1377,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc, XMPPSto
 		boolean subscr_changed = roster_util.updateBuddySubscription(session, pres_type, buddy);
 
 		if (subscr_changed) {
-			roster_util.updateBuddyChange(session, results,
-					roster_util.getBuddyItem(session, buddy));
+			roster_util.updateBuddyChange(session, results, roster_util.getBuddyItem(session, buddy));
 
 			if (initial_presence != null) {
 				if (pres_type == PresenceType.out_subscribed) {

@@ -102,20 +102,6 @@ public class OfflineMessages extends XMPPProcessor
 	}
 
 	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public int concurrentThreadsPerQueue() {
-
-		// Packet processing order does matter for roster/presence therefore
-		// we need a single thread for each queue.
-		return 2;
-	}
-
-	/**
 	 * Describe <code>id</code> method here.
 	 *
 	 * @return a <code>String</code> value
@@ -138,8 +124,7 @@ public class OfflineMessages extends XMPPProcessor
 	 */
 	@Override
 	public void postProcess(final Packet packet, final XMPPResourceConnection conn,
-			final NonAuthUserRepository repo, final Queue<Packet> queue,
-				Map<String, Object> settings) {
+			final NonAuthUserRepository repo, final Queue<Packet> queue, Map<String, Object> settings) {
 		if (conn == null) {
 			try {
 				MsgRepositoryIfc msg_repo = getMsgRepoImpl(repo, conn);
@@ -147,8 +132,7 @@ public class OfflineMessages extends XMPPProcessor
 				savePacketForOffLineUser(packet, msg_repo);
 			} catch (UserNotFoundException e) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("UserNotFoundException at trying to save packet for off-line user."
-							+ packet);
+					log.finest("UserNotFoundException at trying to save packet for off-line user." + packet);
 				}
 			}    // end of try-catch
 		}      // end of if (conn == null)
@@ -260,8 +244,9 @@ public class OfflineMessages extends XMPPProcessor
 			}
 
 			String from = pac.getStanzaTo().getDomain();
-			Element x = new Element("delay", "Offline Storage", new String[] { "from", "stamp",
-					"xmlns" }, new String[] { from, stamp, "urn:xmpp:delay" });
+			Element x = new Element("delay", "Offline Storage",
+				new String[] { "from", "stamp", "xmlns" }, new String[] { from,
+					stamp, "urn:xmpp:delay" });
 
 			elem.addChild(x);
 			repo.storeMessage(pac.getStanzaFrom(), pac.getStanzaTo(), null, elem);
@@ -400,8 +385,7 @@ public class OfflineMessages extends XMPPProcessor
 		 * @throws UserNotFoundException
 		 */
 		@Override
-		public Queue<Element> loadMessagesToJID(JID to, boolean delete)
-				throws UserNotFoundException {
+		public Queue<Element> loadMessagesToJID(JID to, boolean delete) throws UserNotFoundException {
 			try {
 				DomBuilderHandler domHandler = new DomBuilderHandler();
 				String[] msgs = conn.getOfflineDataList(ID, "messages");
@@ -448,8 +432,7 @@ public class OfflineMessages extends XMPPProcessor
 		@Override
 		public void storeMessage(JID from, JID to, Date expired, Element msg)
 				throws UserNotFoundException {
-			repo.addOfflineDataList(to.getBareJID(), ID, "messages",
-					new String[] { msg.toString() });
+			repo.addOfflineDataList(to.getBareJID(), ID, "messages", new String[] { msg.toString() });
 		}
 	}
 

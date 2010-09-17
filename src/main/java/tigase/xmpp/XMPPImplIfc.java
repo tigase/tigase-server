@@ -47,6 +47,7 @@ import java.util.Map;
 public interface XMPPImplIfc {
 	int concurrentQueuesNo();
 
+	@Deprecated
 	int concurrentThreadsPerQueue();
 
 	/**

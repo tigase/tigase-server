@@ -74,16 +74,14 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class JabberIqRoster extends XMPPProcessor
-		implements XMPPProcessorIfc, XMPPStopListenerIfc {
+public class JabberIqRoster extends XMPPProcessor implements XMPPProcessorIfc, XMPPStopListenerIfc {
 
 	/**
 	 * Private logger for class instance.
 	 */
 	private static final Logger log = Logger.getLogger(JabberIqRoster.class.getName());
 	private static final String[] ELEMENTS = { "query", "query" };
-	private static final String[] XMLNSS = { RosterAbstract.XMLNS,
-		RosterAbstract.XMLNS_DYNAMIC };
+	private static final String[] XMLNSS = { RosterAbstract.XMLNS, RosterAbstract.XMLNS_DYNAMIC };
 	private static final String ID = RosterAbstract.XMLNS;
 
 	/** Field description */
@@ -188,20 +186,6 @@ public class JabberIqRoster extends XMPPProcessor
 	 * @return
 	 */
 	@Override
-	public int concurrentThreadsPerQueue() {
-
-		// Packet processing order does matter for roster/presence therefore
-		// we need a single thread for each queue.
-		return 1;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
 	public String id() {
 		return ID;
 	}
@@ -219,8 +203,8 @@ public class JabberIqRoster extends XMPPProcessor
 	 * @throws XMPPException
 	 */
 	@Override
-	public void process(Packet packet, XMPPResourceConnection session,
-			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
+	public void process(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
+			Queue<Packet> results, Map<String, Object> settings)
 			throws XMPPException {
 		if (session == null) {
 			if (log.isLoggable(Level.FINE)) {
@@ -275,8 +259,8 @@ public class JabberIqRoster extends XMPPProcessor
 
 				// RFC says: ignore such request
 				log.log(Level.WARNING,
-						"Roster request ''from'' attribute doesn''t match "
-							+ "session: {0}, request: {1}", new Object[] { session,
+						"Roster request ''from'' attribute doesn''t match " + "session: {0}, request: {1}",
+							new Object[] { session,
 						packet });
 
 				return;
@@ -482,9 +466,8 @@ public class JabberIqRoster extends XMPPProcessor
 						it.remove();
 					}
 				} catch (TigaseStringprepException ex) {
-					log.log(Level.INFO,
-							"JID from dynamic roster is incorrect, stringprep failed for: {0}",
-								element.getAttribute("jid"));
+					log.log(Level.INFO, "JID from dynamic roster is incorrect, stringprep failed for: {0}",
+							element.getAttribute("jid"));
 					it.remove();
 				}
 			}
@@ -546,8 +529,7 @@ public class JabberIqRoster extends XMPPProcessor
 				ArrayDeque<Element> items = new ArrayDeque<Element>(its);
 
 				while (items.size() > 0) {
-					Element iq = new Element("iq", new String[] { "type", "id", "to" },
-						new String[] { "set",
+					Element iq = new Element("iq", new String[] { "type", "id", "to" }, new String[] { "set",
 							session.nextStanzaId(), session.getJID().toString() });
 					Element query = new Element("query");
 
@@ -628,14 +610,14 @@ public class JabberIqRoster extends XMPPProcessor
 							pres.setAttribute("to", buddy.toString());
 							pres.setAttribute("from", session.getBareJID().toString());
 							pres.setAttribute("type", "unsubscribe");
-							results.offer(Packet.packetInstance(pres,
-									session.getJID().copyWithoutResource(), buddy));
+							results.offer(Packet.packetInstance(pres, session.getJID().copyWithoutResource(),
+									buddy));
 							pres = new Element("presence");
 							pres.setAttribute("to", buddy.toString());
 							pres.setAttribute("from", session.getBareJID().toString());
 							pres.setAttribute("type", "unsubscribed");
-							results.offer(Packet.packetInstance(pres,
-									session.getJID().copyWithoutResource(), buddy));
+							results.offer(Packet.packetInstance(pres, session.getJID().copyWithoutResource(),
+									buddy));
 						}    // is in the roster while he isn't. In such a case just ensure the
 
 						// client that the buddy has been removed for sure
@@ -674,8 +656,7 @@ public class JabberIqRoster extends XMPPProcessor
 						if ((type != null) && type.equals(ANON)) {
 							roster_util.setBuddySubscription(session, SubscriptionType.both, buddy);
 
-							Element pres =
-								(Element) session.getSessionData(XMPPResourceConnection.PRESENCE_KEY);
+							Element pres = (Element) session.getSessionData(XMPPResourceConnection.PRESENCE_KEY);
 
 							if (pres == null) {
 								pres = new Element("presence");
@@ -696,7 +677,7 @@ public class JabberIqRoster extends XMPPProcessor
 
 						if (roster_util.getBuddySubscription(session, buddy) == null) {
 							roster_util.setBuddySubscription(session, SubscriptionType.none, buddy);
-						}    // end of if (getBuddySubscription(session, buddy) == null)
+						}      // end of if (getBuddySubscription(session, buddy) == null)
 
 						if (dynamicItem != null) {
 							roster_util.setBuddySubscription(session, SubscriptionType.both, buddy);
@@ -715,7 +696,7 @@ public class JabberIqRoster extends XMPPProcessor
 						}
 
 						roster_util.updateBuddyChange(session, results, new_buddy);
-					}      // end of else
+					}        // end of else
 
 					// end of else
 				}
