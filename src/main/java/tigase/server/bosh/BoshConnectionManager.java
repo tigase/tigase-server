@@ -68,8 +68,7 @@ public class BoshConnectionManager extends ClientConnectionManager
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
-	private static final Logger log =
-		Logger.getLogger("tigase.server.bosh.BoshConnectionManager");
+	private static final Logger log = Logger.getLogger("tigase.server.bosh.BoshConnectionManager");
 	private static final String ROUTINGS_PROP_KEY = "routings";
 	private static final String ROUTING_MODE_PROP_KEY = "multi-mode";
 	private static final boolean ROUTING_MODE_PROP_VAL = true;
@@ -201,17 +200,18 @@ public class BoshConnectionManager extends ClientConnectionManager
 		Packet p = null;
 
 		while ((p = serv.getReceivedPackets().poll()) != null) {
-			Queue<Packet> out_results = new ArrayDeque<Packet>();
+			Queue<Packet> out_results = new ArrayDeque<Packet>(2);
 			BoshSession bs = null;
 			String sid_str = null;
 
 			synchronized (sessions) {
 				if (log.isLoggable(Level.FINER)) {
-					log.finer("Processing packet: " + p.getElemName() + ", type: " + p.getType());
+					log.log(Level.FINER, "Processing packet: {0}, type: {1}", new Object[] { p.getElemName(),
+							p.getType() });
 				}
 
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Processing socket data: " + p.toString());
+					log.log(Level.FINEST, "Processing socket data: {0}", p);
 				}
 
 				sid_str = p.getAttribute(SID_ATTR);
@@ -232,8 +232,7 @@ public class BoshConnectionManager extends ClientConnectionManager
 						try {
 							serv.sendErrorAndStop(Authorization.NOT_ALLOWED, p, "Invalid hostname.");
 						} catch (Exception e) {
-							log.log(Level.WARNING,
-									"Problem sending invalid hostname error for sid =  " + sid, e);
+							log.log(Level.WARNING, "Problem sending invalid hostname error for sid =  " + sid, e);
 						}
 					}
 				} else {
@@ -379,12 +378,12 @@ public class BoshConnectionManager extends ClientConnectionManager
 
 		return "<?xml version='1.0'?><stream:stream" + " xmlns='jabber:client'"
 				+ " xmlns:stream='http://etherx.jabber.org/streams'" + " id='1'" + " from='"
-				+ getDefHostName() + "'" + " version='1.0' xml:lang='en'>" + "<stream:error>"
-				+ "<invalid-namespace xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>"
-				+ "<text xmlns='urn:ietf:params:xml:ns:xmpp-streams' xml:lang='langcode'>"
-				+ "Ups, what just happened? Stream open. Hey, this is a Bosh connection manager. "
-				+ "c2s and s2s are not supported on the same port... yet." + "</text>"
-				+ "</stream:error>" + "</stream:stream>"
+					+ getDefHostName() + "'" + " version='1.0' xml:lang='en'>" + "<stream:error>"
+						+ "<invalid-namespace xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>"
+							+ "<text xmlns='urn:ietf:params:xml:ns:xmpp-streams' xml:lang='langcode'>"
+								+ "Ups, what just happened? Stream open. Hey, this is a Bosh connection manager. "
+									+ "c2s and s2s are not supported on the same port... yet." + "</text>"
+										+ "</stream:error>" + "</stream:stream>"
 		;
 	}
 
@@ -591,8 +590,8 @@ public class BoshConnectionManager extends ClientConnectionManager
 		public void responseReceived(Packet packet, Packet response) {
 
 			// We are now ready to ask for features....
-			addOutPacket(Command.GETFEATURES.getPacket(packet.getFrom(), packet.getTo(),
-					StanzaType.get, UUID.randomUUID().toString(), null));
+			addOutPacket(Command.GETFEATURES.getPacket(packet.getFrom(), packet.getTo(), StanzaType.get,
+					UUID.randomUUID().toString(), null));
 		}
 
 		/**
