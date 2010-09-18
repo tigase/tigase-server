@@ -219,6 +219,7 @@ public class S2SConnectionClustered extends S2SConnectionManager implements Clus
 			case result :
 				if (ClusterMethods.CHECK_DB_KEY.toString().equals(clel.getMethodName())) {
 					CID connCid = new CID(clel.getMethodParam(CONN_CID));
+					CID keyCid = new CID(clel.getMethodParam(KEY_CID));
 					String key = clel.getMethodParam(KEY_P);
 					String forkey_sessionId = clel.getMethodParam(FORKEY_SESSION_ID);
 					String asking_sessionId = clel.getMethodParam(ASKING_SESSION_ID);
@@ -226,7 +227,8 @@ public class S2SConnectionClustered extends S2SConnectionManager implements Clus
 					String from = connCid.getLocalHost();
 					String to = connCid.getRemoteHost();
 
-					sendVerifyResult(DB_VERIFY_EL_NAME, connCid, valid, forkey_sessionId, asking_sessionId);
+					sendVerifyResult(DB_VERIFY_EL_NAME, connCid, keyCid, valid, forkey_sessionId,
+							asking_sessionId);
 				}
 
 				break;

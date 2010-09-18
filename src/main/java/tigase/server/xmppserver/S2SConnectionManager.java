@@ -755,6 +755,15 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 		return new int[] { 5269 };
 	}
 
+	/**
+	 *
+	 * @param connectionCid
+	 * @param keyCid
+	 * @param key
+	 * @param key_sessionId
+	 * @param asking_sessionId
+	 * @return
+	 */
 	protected String getLocalDBKey(CID connectionCid, CID keyCid, String key, String key_sessionId,
 			String asking_sessionId) {
 		CIDConnections cid_conns = getCIDConnections(keyCid);
@@ -779,18 +788,18 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 
 	//~--- methods --------------------------------------------------------------
 
-	protected boolean sendVerifyResult(String elem_name, CID cid, boolean valid,
+	protected boolean sendVerifyResult(String elem_name, CID connCid, CID keyCid, boolean valid,
 			String key_sessionId, String serv_sessionId) {
-		CIDConnections cid_conns = getCIDConnections(cid);
+		CIDConnections cid_conns = getCIDConnections(connCid);
 
 		if (cid_conns != null) {
-			Packet verify_valid = getValidResponse(elem_name, cid, key_sessionId, valid, null);
+			Packet verify_valid = getValidResponse(elem_name, keyCid, key_sessionId, valid, null);
 
 			return cid_conns.sendControlPacket(serv_sessionId, verify_valid);
 		} else {
 			if (log.isLoggable(Level.FINE)) {
 				log.log(Level.FINE,
-						"Can''t find CID connections for cid: {0}, can't send verify response.", cid);
+						"Can''t find CID connections for cid: {0}, can't send verify response.", keyCid);
 			}
 		}
 
@@ -997,11 +1006,11 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 									+ "located on a different node...", cid);
 					}
 				} else {
-					sendVerifyResult(DB_VERIFY_EL_NAME, cid, local_key.equals(remote_key), p.getStanzaId(),
-							serv.getSessionId());
+					sendVerifyResult(DB_VERIFY_EL_NAME, cid, keyCid, local_key.equals(remote_key),
+							p.getStanzaId(), serv.getSessionId());
 				}
 			} else {
-				sendVerifyResult(DB_RESULT_EL_NAME, cid, (p.getType() == StanzaType.valid), null,
+				sendVerifyResult(DB_RESULT_EL_NAME, cid, cid, (p.getType() == StanzaType.valid), null,
 						p.getStanzaId());
 				cid_conns.connectionAuthenticated(p.getStanzaId());
 
