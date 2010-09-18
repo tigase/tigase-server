@@ -52,10 +52,10 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class S2SConnectionClustered extends S2SConnectionManager
-		implements ClusteredComponent {
+public class S2SConnectionClustered extends S2SConnectionManager implements ClusteredComponent {
 	private static final Logger log = Logger.getLogger(S2SConnectionClustered.class.getName());
-	private static final String CID_P = "cid";
+	private static final String CONN_CID = "connection-cid";
+	private static final String KEY_CID = "key-cid";
 	private static final String KEY_P = "key";
 	private static final String FORKEY_SESSION_ID = "forkey_sessionId";
 	private static final String ASKING_SESSION_ID = "asking_sessionId";
@@ -139,9 +139,10 @@ public class S2SConnectionClustered extends S2SConnectionManager
 	}
 
 	@Override
-	protected String getLocalDBKey(CID cid, String key, String key_sessionId,
+	protected String getLocalDBKey(CID connectionCid, CID keyCid, String key, String key_sessionId,
 			String asking_sessionId) {
-		String local_key = super.getLocalDBKey(cid, key, key_sessionId, asking_sessionId);
+		String local_key = super.getLocalDBKey(connectionCid, keyCid, key, key_sessionId,
+			asking_sessionId);
 
 		if (local_key != null) {
 			return local_key;
@@ -152,7 +153,8 @@ public class S2SConnectionClustered extends S2SConnectionManager
 		if (cluster_node != null) {
 			Map<String, String> params = new LinkedHashMap<String, String>(6, 0.25f);
 
-			params.put(CID_P, cid.toString());
+			params.put(CONN_CID, connectionCid.toString());
+			params.put(KEY_CID, keyCid.toString());
 			params.put(KEY_P, key);
 			params.put(FORKEY_SESSION_ID, key_sessionId);
 			params.put(ASKING_SESSION_ID, asking_sessionId);
@@ -177,12 +179,13 @@ public class S2SConnectionClustered extends S2SConnectionManager
 		switch (packet.getType()) {
 			case set :
 				if (ClusterMethods.CHECK_DB_KEY.toString().equals(clel.getMethodName())) {
-					String cid = clel.getMethodParam(CID_P);
+					String connCid = clel.getMethodParam(CONN_CID);
+					String keyCid = clel.getMethodParam(KEY_CID);
 					String key = clel.getMethodParam(KEY_P);
 					String forkey_sessionId = clel.getMethodParam(FORKEY_SESSION_ID);
 					String asking_sessionId = clel.getMethodParam(ASKING_SESSION_ID);
-					String local_key = super.getLocalDBKey(new CID(cid), key, forkey_sessionId,
-						asking_sessionId);
+					String local_key = super.getLocalDBKey(new CID(connCid), new CID(keyCid), key,
+						forkey_sessionId, asking_sessionId);
 					ClusterElement result = null;
 					boolean valid = false;
 
@@ -203,9 +206,8 @@ public class S2SConnectionClustered extends S2SConnectionManager
 					try {
 						addOutPacket(Packet.packetInstance(result.getClusterElement()));
 					} catch (TigaseStringprepException ex) {
-						log.log(Level.WARNING,
-								"Cluster packet addressing problem, stringprep failed for: {0}",
-									result.getClusterElement());
+						log.log(Level.WARNING, "Cluster packet addressing problem, stringprep failed for: {0}",
+								result.getClusterElement());
 					}
 				}
 
@@ -216,15 +218,15 @@ public class S2SConnectionClustered extends S2SConnectionManager
 
 			case result :
 				if (ClusterMethods.CHECK_DB_KEY.toString().equals(clel.getMethodName())) {
-					CID cid = new CID(clel.getMethodParam(CID_P));
+					CID connCid = new CID(clel.getMethodParam(CONN_CID));
 					String key = clel.getMethodParam(KEY_P);
 					String forkey_sessionId = clel.getMethodParam(FORKEY_SESSION_ID);
 					String asking_sessionId = clel.getMethodParam(ASKING_SESSION_ID);
 					boolean valid = "true".equals(clel.getMethodResultVal(VALID));
-					String from = cid.getLocalHost();
-					String to = cid.getRemoteHost();
+					String from = connCid.getLocalHost();
+					String to = connCid.getRemoteHost();
 
-					sendVerifyResult(DB_VERIFY_EL_NAME, cid, valid, forkey_sessionId, asking_sessionId);
+					sendVerifyResult(DB_VERIFY_EL_NAME, connCid, valid, forkey_sessionId, asking_sessionId);
 				}
 
 				break;
@@ -244,8 +246,8 @@ public class S2SConnectionClustered extends S2SConnectionManager
 				try {
 					addOutPacket(Packet.packetInstance(result));
 				} catch (TigaseStringprepException ex) {
-					log.log(Level.WARNING,
-							"Cluster packet addressing problem, stringprep failed for: {0}", result);
+					log.log(Level.WARNING, "Cluster packet addressing problem, stringprep failed for: {0}",
+							result);
 				}
 
 				break;

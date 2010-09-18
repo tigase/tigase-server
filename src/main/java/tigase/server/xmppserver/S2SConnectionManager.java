@@ -755,9 +755,9 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 		return new int[] { 5269 };
 	}
 
-	protected String getLocalDBKey(CID cid, String key, String key_sessionId,
+	protected String getLocalDBKey(CID connectionCid, CID keyCid, String key, String key_sessionId,
 			String asking_sessionId) {
-		CIDConnections cid_conns = getCIDConnections(cid);
+		CIDConnections cid_conns = getCIDConnections(keyCid);
 
 		return (cid_conns == null) ? null : cid_conns.getDBKey(key_sessionId);
 	}
@@ -986,7 +986,9 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 
 		if ((p.getElemName() == VERIFY_EL_NAME) || (p.getElemName() == DB_VERIFY_EL_NAME)) {
 			if (p.getType() == null) {
-				String local_key = getLocalDBKey(cid, remote_key, p.getStanzaId(), serv.getSessionId());
+				CID keyCid = getConnectionId(p.getStanzaTo().getDomain(), p.getStanzaFrom().getDomain());
+				String local_key = getLocalDBKey(cid, keyCid, remote_key, p.getStanzaId(),
+					serv.getSessionId());
 
 				if (local_key == null) {
 					if (log.isLoggable(Level.FINER)) {
