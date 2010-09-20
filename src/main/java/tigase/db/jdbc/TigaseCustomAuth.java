@@ -526,7 +526,7 @@ public class TigaseCustomAuth implements AuthRepository {
 				userlogin_active = true;
 			}
 
-			userlogout_query = getParamWithDef(params, DEF_USERLOGOUT_KEY, DEF_USERLOGOUT_KEY);
+			userlogout_query = getParamWithDef(params, DEF_USERLOGOUT_KEY, DEF_USERLOGOUT_QUERY);
 
 			if ((userlogout_query != null)) {
 				data_repo.initPreparedStatement(userlogout_query, userlogout_query);
