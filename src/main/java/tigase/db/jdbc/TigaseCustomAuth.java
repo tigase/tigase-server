@@ -318,6 +318,10 @@ public class TigaseCustomAuth implements AuthRepository {
 	@Override
 	public void addUser(BareJID user, final String password)
 			throws UserExistsException, TigaseDBException {
+		if (adduser_query == null) {
+			return;
+		}
+
 		ResultSet rs = null;
 
 		try {
@@ -398,6 +402,10 @@ public class TigaseCustomAuth implements AuthRepository {
 	 */
 	@Override
 	public long getUsersCount() {
+		if (userscount_query == null) {
+			return -1;
+		}
+
 		ResultSet rs = null;
 
 		try {
@@ -435,6 +443,10 @@ public class TigaseCustomAuth implements AuthRepository {
 	 */
 	@Override
 	public long getUsersCount(String domain) {
+		if (userdomaincount_query == null) {
+			return -1;
+		}
+
 		ResultSet rs = null;
 
 		try {
@@ -479,59 +491,57 @@ public class TigaseCustomAuth implements AuthRepository {
 			data_repo = RepositoryFactory.getDataRepository(null, connection_str, params);
 			initdb_query = getParamWithDef(params, DEF_INITDB_KEY, DEF_INITDB_QUERY);
 
-			if ((initdb_query != null) &&!initdb_query.trim().isEmpty()) {
+			if (initdb_query != null) {
 				data_repo.initPreparedStatement(initdb_query, initdb_query);
 			}
 
 			adduser_query = getParamWithDef(params, DEF_ADDUSER_KEY, DEF_ADDUSER_QUERY);
 
-			if ((adduser_query != null) &&!adduser_query.trim().isEmpty()) {
+			if ((adduser_query != null)) {
 				data_repo.initPreparedStatement(adduser_query, adduser_query);
 			}
 
 			deluser_query = getParamWithDef(params, DEF_DELUSER_KEY, DEF_DELUSER_QUERY);
 
-			if ((deluser_query != null) &&!deluser_query.trim().isEmpty()) {
+			if ((deluser_query != null)) {
 				data_repo.initPreparedStatement(deluser_query, deluser_query);
 			}
 
 			getpassword_query = getParamWithDef(params, DEF_GETPASSWORD_KEY, null);
 
-			if ((getpassword_query != null) &&!getpassword_query.trim().isEmpty()) {
+			if ((getpassword_query != null)) {
 				data_repo.initPreparedStatement(getpassword_query, getpassword_query);
 			}
 
 			updatepassword_query = getParamWithDef(params, DEF_UPDATEPASSWORD_KEY,
 					DEF_UPDATEPASSWORD_QUERY);
 
-			if ((updatepassword_query != null) &&!updatepassword_query.trim().isEmpty()) {
+			if ((updatepassword_query != null)) {
 				data_repo.initPreparedStatement(updatepassword_query, updatepassword_query);
 			}
 
-			if ((getpassword_query == null)
-					|| ((params.get(DEF_USERLOGIN_KEY) != null)
-						&& ( !params.get(DEF_USERLOGIN_KEY).trim().isEmpty()))) {
+			if ((getpassword_query == null) || ((params.get(DEF_USERLOGIN_KEY) != null))) {
 				userlogin_query = getParamWithDef(params, DEF_USERLOGIN_KEY, DEF_USERLOGIN_QUERY);
 				data_repo.initPreparedStatement(userlogin_query, userlogin_query);
 				userlogin_active = true;
 			}
 
-			userlogout_query = getParamWithDef(params, DEF_USERLOGOUT_KEY, null);
+			userlogout_query = getParamWithDef(params, DEF_USERLOGOUT_KEY, DEF_USERLOGOUT_KEY);
 
-			if ((userlogout_query != null) &&!userlogout_query.trim().isEmpty()) {
+			if ((userlogout_query != null)) {
 				data_repo.initPreparedStatement(userlogout_query, userlogout_query);
 			}
 
 			userscount_query = getParamWithDef(params, DEF_USERS_COUNT_KEY, DEF_USERS_COUNT_QUERY);
 
-			if ((userscount_query != null) &&!userscount_query.trim().isEmpty()) {
+			if ((userscount_query != null)) {
 				data_repo.initPreparedStatement(userscount_query, userscount_query);
 			}
 
 			userdomaincount_query = getParamWithDef(params, DEF_USERS_DOMAIN_COUNT_KEY,
 					DEF_USERS_DOMAIN_COUNT_QUERY);
 
-			if ((userdomaincount_query != null) &&!userdomaincount_query.trim().isEmpty()) {
+			if ((userdomaincount_query != null)) {
 				data_repo.initPreparedStatement(userdomaincount_query, userdomaincount_query);
 			}
 
@@ -559,6 +569,10 @@ public class TigaseCustomAuth implements AuthRepository {
 	 */
 	@Override
 	public void logout(BareJID user) throws UserNotFoundException, TigaseDBException {
+		if (userlogout_query == null) {
+			return;
+		}
+
 		try {
 			PreparedStatement user_logout = data_repo.getPreparedStatement(userlogout_query);
 
@@ -660,6 +674,10 @@ public class TigaseCustomAuth implements AuthRepository {
 	 */
 	@Override
 	public void removeUser(BareJID user) throws UserNotFoundException, TigaseDBException {
+		if (deluser_query == null) {
+			return;
+		}
+
 		try {
 			PreparedStatement remove_user = data_repo.getPreparedStatement(deluser_query);
 
@@ -683,6 +701,10 @@ public class TigaseCustomAuth implements AuthRepository {
 	@Override
 	public void updatePassword(BareJID user, final String password)
 			throws UserNotFoundException, TigaseDBException {
+		if (updatepassword_query == null) {
+			return;
+		}
+
 		try {
 			PreparedStatement update_pass = data_repo.getPreparedStatement(updatepassword_query);
 
@@ -712,10 +734,22 @@ public class TigaseCustomAuth implements AuthRepository {
 			log.log(Level.CONFIG, "Default query loaded for ''{0}'': ''{1}''", new Object[] { key, def });
 		}
 
-		return (result != null) ? result.trim() : def;
+		if (result != null) {
+			result = result.trim();
+
+			if (result.isEmpty()) {
+				result = null;
+			}
+		}
+
+		return (result != null) ? result : def;
 	}
 
 	private String getPassword(BareJID user) throws TigaseDBException, UserNotFoundException {
+		if (getpassword_query == null) {
+			return null;
+		}
+
 		ResultSet rs = null;
 
 		try {
@@ -741,6 +775,10 @@ public class TigaseCustomAuth implements AuthRepository {
 	//~--- methods --------------------------------------------------------------
 
 	private void initDb() throws SQLException {
+		if (initdb_query == null) {
+			return;
+		}
+
 		PreparedStatement init_db = data_repo.getPreparedStatement(initdb_query);
 
 		synchronized (init_db) {
@@ -833,6 +871,10 @@ public class TigaseCustomAuth implements AuthRepository {
 
 	private boolean userLoginAuth(BareJID user, final String password)
 			throws UserNotFoundException, TigaseDBException, AuthorizationException {
+		if (userlogin_query == null) {
+			return false;
+		}
+
 		ResultSet rs = null;
 		String res_string = null;
 
