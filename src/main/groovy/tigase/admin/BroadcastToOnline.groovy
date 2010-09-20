@@ -55,7 +55,7 @@ if (fromJid == null || subject == null || msg_type == null || body == null) {
   Command.addTitle(res, "Message to online users")
 	Command.addInstructions(res, "Please provide message details to be sent to all online users' connections")
 
-	Command.addFieldValue(res, FROM_JID, fromJid ?: p.getStanzaFrom().getBareJID().toString(),
+	Command.addFieldValue(res, FROM_JID, fromJid ?: p.getStanzaFrom().getDomain().toString(),
     "jid-single", "From address")
 	Command.addFieldValue(res, SUBJECT, subject ?: "Message from administrators", "Subject")
 	def msg_types = ["chat", "headline", "normal"]
