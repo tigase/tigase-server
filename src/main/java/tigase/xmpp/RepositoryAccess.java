@@ -689,6 +689,14 @@ public abstract class RepositoryAccess {
 	 * @param authProps
 	 */
 	public void queryAuth(Map<String, Object> authProps) {
+		if (authRepo == null) {
+			log.severe("Authentication repository is not available! Misconfiguration error or "
+					+ "authentication database is not available. Please check your logs from the "
+						+ "server startup time.");
+
+			return;
+		}
+
 		authProps.put(AuthRepository.SERVER_NAME_KEY, getDomain().getVhost().getDomain());
 		authRepo.queryAuth(authProps);
 
