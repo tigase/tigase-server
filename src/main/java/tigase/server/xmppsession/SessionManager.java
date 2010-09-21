@@ -585,7 +585,7 @@ public class SessionManager extends AbstractMessageReceiver
 
 		XMPPResourceConnection conn = getXMPPResourceConnection(packet);
 
-		if ((conn == null) && (isBrokenPacket(packet) || processAdminsOrDomains(packet))) {
+		if ((conn == null) && (isBrokenPacket(packet)) || processAdminsOrDomains(packet)) {
 			return;
 		}
 
