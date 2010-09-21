@@ -272,8 +272,7 @@ public class Packet {
 	 */
 	public static Packet packetInstance(String el_name, String from, String to, StanzaType type)
 			throws TigaseStringprepException {
-		Element elem = new Element(el_name, new String[] { "from", "to", "type" },
-			new String[] { from,
+		Element elem = new Element(el_name, new String[] { "from", "to", "type" }, new String[] { from,
 				to, type.toString() });
 
 		return packetInstance(elem);
@@ -1208,8 +1207,15 @@ public class Packet {
 	@Override
 	public String toString() {
 		if (packetToString == null) {
-			packetToString = ", data=" + elem.toString() + ", XMLNS=" + elem.getXMLNS()
-					+ ", priority=" + priority;
+			String elemData = elem.toString();
+			int size = elemData.length();
+
+			if (size > 1024) {
+				elemData = elemData.substring(0, 1024) + " ... ";
+			}
+
+			packetToString = ", DATA=" + elemData + ", SIZE=" + size + ", XMLNS=" + elem.getXMLNS()
+					+ ", PRIORITY=" + priority + ", PERMISSION=" + permissions;
 		}
 
 		return "from=" + packetFrom + ", to=" + packetTo + packetToString;
@@ -1250,8 +1256,15 @@ public class Packet {
 			return toString();
 		} else {
 			if (packetToStringSecure == null) {
-				packetToStringSecure = ", data=" + elem.toStringSecure() + ", XMLNS="
-						+ elem.getXMLNS() + ", priority=" + priority;
+				String elemData = elem.toStringSecure();
+				int size = elemData.length();
+
+				if (size > 1024) {
+					elemData = elemData.substring(0, 1024) + " ... ";
+				}
+
+				packetToStringSecure = ", DATA=" + elemData + ", SIZE=" + size + ", XMLNS="
+						+ elem.getXMLNS() + ", PRIORITY=" + priority + ", PERMISSION=" + permissions;
 			}
 
 			return "from=" + packetFrom + ", to=" + packetTo + packetToStringSecure;
@@ -1324,8 +1337,8 @@ public class Packet {
 			setPriority(Priority.CLUSTER);
 		} else {
 			if ((elem.getName() == "presence")
-					&& ((type == null) || (type == StanzaType.available)
-						|| (type == StanzaType.unavailable) || (type == StanzaType.probe))) {
+					&& ((type == null) || (type == StanzaType.available) || (type == StanzaType.unavailable)
+						|| (type == StanzaType.probe))) {
 				setPriority(Priority.PRESENCE);
 			} else {
 				if (elem.getName() == "route") {

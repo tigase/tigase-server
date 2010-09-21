@@ -297,6 +297,7 @@ public class TLSIO implements IOInterface {
 					break;
 
 				case NEED_READ :
+
 					// I wonder if some real data can be read from the socket here (and we would
 					// loose the data) or this is just TLS stuff here.....
 					ByteBuffer rbuff = read(ByteBuffer.allocate(tlsWrapper.getNetBuffSize()));
@@ -318,8 +319,9 @@ public class TLSIO implements IOInterface {
 		}
 
 		if (loop_cnt > (max_loop_runs / 2)) {
-			log.warning("Infinite loop detected in write(buff) TLS code, tlsWrapper.getStatus(): "
-					+ tlsWrapper.getStatus());
+			log.log(Level.WARNING,
+					"Infinite loop detected in write(buff) TLS code, tlsWrapper.getStatus(): {0}",
+						tlsWrapper.getStatus());
 
 			// Let's close the connection now
 			throw new EOFException("Socket has been closed due to TLS problems.");
@@ -334,12 +336,12 @@ public class TLSIO implements IOInterface {
 		}    // end of if (tlsWrapper.getStatus() == TLSStatus.CLOSED)
 
 		int result = -1;
+
 		if (buff == null) {
 			result = io.write(null);
 		} else {
-
 			if (log.isLoggable(Level.FINER)) {
-				log.finer("TLS - Writing data, remaining: " + buff.remaining());
+				log.log(Level.FINER, "TLS - Writing data, remaining: {0}", buff.remaining());
 			}
 
 			result = writeBuff(buff);
@@ -430,8 +432,7 @@ public class TLSIO implements IOInterface {
 			}    // end of switch (tlsWrapper.getStatus())
 
 			stat = tlsWrapper.getStatus();
-		} while (((stat == TLSStatus.NEED_READ) || (stat == TLSStatus.OK))
-				&& input.hasRemaining());
+		} while (((stat == TLSStatus.NEED_READ) || (stat == TLSStatus.OK)) && input.hasRemaining());
 
 		if (input.hasRemaining()) {
 			input.rewind();
@@ -465,11 +466,11 @@ public class TLSIO implements IOInterface {
 
 		do {
 			if (tlsWrapper.getStatus() == TLSStatus.NEED_READ) {
+
 				// I wonder if some real data can be read from the socket here (and we would
 				// loose the data) or this is just TLS stuff here.....
 				ByteBuffer rbuff = read(ByteBuffer.allocate(tlsWrapper.getNetBuffSize()));
 			}
-
 
 			ByteBuffer tlsOutput = ByteBuffer.allocate(tlsWrapper.getNetBuffSize());
 

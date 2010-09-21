@@ -178,7 +178,7 @@ public class SocketIO implements IOInterface {
 		bytesRead = channel.read(buff);
 
 		if (log.isLoggable(Level.FINER)) {
-			log.finer("Read from channel " + bytesRead + " bytes.");
+			log.log(Level.FINER, "Read from channel {0} bytes.", bytesRead);
 		}
 
 		if (bytesRead == -1) {
@@ -268,6 +268,10 @@ public class SocketIO implements IOInterface {
 //  log.finer("Wrote to channel " + result + " bytes.");
 //  return result;
 		if (buff != null) {
+			if (log.isLoggable(Level.FINER)) {
+				log.log(Level.FINER, "SOCKET - Writing data, remaining: {0}", buff.remaining());
+			}
+
 			dataToSend.offer(buff);
 		}
 
@@ -291,7 +295,7 @@ public class SocketIO implements IOInterface {
 		}
 
 		if (log.isLoggable(Level.FINER)) {
-			log.finer("Wrote to channel " + result + " bytes.");
+			log.log(Level.FINER, "Wrote to channel {0} bytes.", result);
 		}
 
 //  if (isRemoteAddress("81.142.228.219")) {

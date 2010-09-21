@@ -687,9 +687,11 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 				if ((data != null) && (data.length() > 0)) {
 					if (log.isLoggable(Level.FINEST)) {
 						if (data.length() < 256) {
-							log.finest("Socket: " + socketIO + ", Writing data (" + data.length() + "): " + data);
+							log.log(Level.FINEST, "Socket: {0}, Writing data ({1}): {2}", new Object[] { socketIO,
+									data.length(), data });
 						} else {
-							log.finest("Socket: " + socketIO + ", Writing data: " + data.length());
+							log.log(Level.FINEST, "Socket: {0}, Writing data: {1}", new Object[] { socketIO,
+									data.length() });
 						}
 					}
 
@@ -713,7 +715,8 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 					socketIO.write(dataBuffer);
 
 					if (log.isLoggable(Level.FINEST)) {
-						log.finest("Socket: " + socketIO + ", wrote: " + data.length());
+						log.log(Level.FINEST, "Socket: {0}, wrote: {1}", new Object[] { socketIO,
+								data.length() });
 					}
 
 //        idx_start = idx_offset;

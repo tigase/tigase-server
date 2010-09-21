@@ -124,10 +124,8 @@ public class ZLibIO implements IOInterface {
 		}
 
 		if (zlib != null) {
-			list.add("zlibio", "Average compression rate", zlib.averageCompressionRate(),
-					Level.FINE);
-			list.add("zlibio", "Average decompression rate", zlib.averageDecompressionRate(),
-					Level.FINE);
+			list.add("zlibio", "Average compression rate", zlib.averageCompressionRate(), Level.FINE);
+			list.add("zlibio", "Average decompression rate", zlib.averageDecompressionRate(), Level.FINE);
 		}
 	}
 
@@ -248,6 +246,10 @@ public class ZLibIO implements IOInterface {
 	public int write(ByteBuffer buff) throws IOException {
 		if (buff == null) {
 			return io.write(null);
+		}
+
+		if (log.isLoggable(Level.FINER)) {
+			log.log(Level.FINER, "ZLIB - Writing data, remaining: {0}", buff.remaining());
 		}
 
 		ByteBuffer compressed_buff = zlib.compress(buff);
