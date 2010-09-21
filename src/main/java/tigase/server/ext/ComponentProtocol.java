@@ -92,8 +92,7 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 	public static final String EXTCOMP_REPO_CLASS_PROP_KEY = "repository-class";
 
 	/** Field description */
-	public static final String EXTCOMP_REPO_CLASS_PROP_VAL =
-		"tigase.server.ext.CompDBRepository";
+	public static final String EXTCOMP_REPO_CLASS_PROP_VAL = "tigase.server.ext.CompDBRepository";
 
 	/** Field description */
 	public static final String EXTCOMP_BIND_HOSTNAMES = "--bind-ext-hostnames";
@@ -136,8 +135,8 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 	 * Since for each domain we can have 1..N connections the Map value
 	 * is a List of connections.
 	 */
-	private Map<String, ArrayList<ComponentConnection>> connections =
-		new ConcurrentHashMap<String, ArrayList<ComponentConnection>>();
+	private Map<String, ArrayList<ComponentConnection>> connections = new ConcurrentHashMap<String,
+		ArrayList<ComponentConnection>>();
 	private String[] hostnamesToBind = null;
 	private int maxAuthenticationAttempts = 1;
 	private ComponentRepository<CompRepoItem> repo = null;
@@ -150,8 +149,7 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 	 * protocol traffic, all the rest traffic should be passed on to MR.
 	 */
 	private Map<String, ExtProcessor> processors = new LinkedHashMap<String, ExtProcessor>();
-	private UnknownXMLNSStreamOpenHandler unknownXMLNSHandler =
-		new UnknownXMLNSStreamOpenHandler();
+	private UnknownXMLNSStreamOpenHandler unknownXMLNSHandler = new UnknownXMLNSStreamOpenHandler();
 	private String identity_type = IDENTITY_TYPE_VAL;
 
 	// private ServiceEntity serviceEntity = null;
@@ -313,8 +311,7 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 			repo = (ComponentRepository<CompRepoItem>) Class.forName(repo_class).newInstance();
 			repo.getDefaults(defs, params);
 		} catch (Exception e) {
-			log.log(Level.SEVERE, "Can not instantiate items repository for class: " + repo_class,
-					e);
+			log.log(Level.SEVERE, "Can not instantiate items repository for class: " + repo_class, e);
 		}
 
 		defs.put(PACK_ROUTED_KEY, PACK_ROUTED_VAL);
@@ -479,11 +476,11 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 	@Override
 	public Queue<Packet> processSocketData(ComponentIOService serv) {
 		Packet p = null;
-		Queue<Packet> results = new ArrayDeque<Packet>();
+		Queue<Packet> results = new ArrayDeque<Packet>(2);
 
 		while ((p = serv.getReceivedPackets().poll()) != null) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Processing socket data: " + p);
+				log.log(Level.FINEST, "Processing socket data: {0}", p);
 			}
 
 			boolean processed = false;
@@ -505,7 +502,8 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 						try {
 							result = p.unpackRouted();
 						} catch (TigaseStringprepException ex) {
-							log.warning("Packet stringprep addressing problem, dropping packet: " + p);
+							log.log(Level.WARNING, "Packet stringprep addressing problem, dropping packet: {0}",
+									p);
 
 							return null;
 						}
@@ -522,7 +520,7 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 					} catch (PacketErrorTypeException ex) {
 
 						// Already error packet, just ignore to prevent infinite loop
-						log.fine("Received an error packet from unauthorized connection: " + p.toString());
+						log.log(Level.FINE, "Received an error packet from unauthorized connection: {0}", p);
 					}
 
 					if (closeOnSequenceError) {
@@ -585,8 +583,7 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 			log.fine("XMLNS not set, accepting a new connection with xmlns auto-detection.");
 		} else {
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("cid: " + (String) serv.getSessionData().get("cid") + ", sending: "
-						+ result);
+				log.finest("cid: " + (String) serv.getSessionData().get("cid") + ", sending: " + result);
 			}
 
 			result = handler.serviceStarted(serv);
@@ -672,8 +669,7 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 			repo_tmp.setProperties(properties);
 			repo = repo_tmp;
 		} catch (Exception e) {
-			log.log(Level.SEVERE,
-					"Can not create items repository instance for class: " + repo_class, e);
+			log.log(Level.SEVERE, "Can not create items repository instance for class: " + repo_class, e);
 		}
 
 		// Activate all connections for which parameters are defined in the repository
@@ -802,9 +798,9 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 	@Override
 	public String xmppStreamOpened(ComponentIOService serv, Map<String, String> attribs) {
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Stream opened: " + serv.getRemoteAddress() + ", xmlns: "
-					+ attribs.get("xmlns") + ", type: " + serv.connectionType().toString()
-						+ ", uniqueId=" + serv.getUniqueId() + ", to=" + attribs.get("to"));
+			log.finest("Stream opened: " + serv.getRemoteAddress() + ", xmlns: " + attribs.get("xmlns")
+					+ ", type: " + serv.connectionType().toString() + ", uniqueId=" + serv.getUniqueId()
+						+ ", to=" + attribs.get("to"));
 		}
 
 		String s_xmlns = attribs.get("xmlns");
@@ -943,8 +939,7 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 					// There is still an active connection for this host
 					result = true;
 				} else {
-					log.warning("Null or disconnected service for ComponentConnection for host: "
-							+ hostname);
+					log.warning("Null or disconnected service for ComponentConnection for host: " + hostname);
 				}
 			}
 		} else {
