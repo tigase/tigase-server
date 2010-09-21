@@ -324,13 +324,14 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 			defaults.put(USER_REPO_POOL_SIZE_PROP_KEY, "" + 1);
 		}
 
-//  defaults.put(USER_REPO_CLASS_PROP_KEY, user_repo_class);
+		defaults.put(RepositoryFactory.USER_REPO_CLASS_PROP_KEY, user_repo_class);
 		defaults.put(USER_REPO_URL_PROP_KEY, user_repo_url);
-		defaults.put(USER_REPO_PARAMS_NODE + "/param-1", "value-1");
 
-//  defaults.put(AUTH_REPO_CLASS_PROP_KEY, auth_repo_class);
+//  defaults.put(USER_REPO_PARAMS_NODE + "/param-1", "value-1");
+		defaults.put(RepositoryFactory.AUTH_REPO_CLASS_PROP_KEY, auth_repo_class);
 		defaults.put(AUTH_REPO_URL_PROP_KEY, auth_repo_url);
-		defaults.put(AUTH_REPO_PARAMS_NODE + "/param-1", "value-1");
+
+//  defaults.put(AUTH_REPO_PARAMS_NODE + "/param-1", "value-1");
 
 		List<String> user_repo_domains = new ArrayList<String>(10);
 		List<String> auth_repo_domains = new ArrayList<String>(10);
@@ -814,10 +815,9 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 			auth_repo_impl.addRepo(domain, repo);
 		}
 
-		log.log(Level.INFO, "[{0}] Initialized {1} as user auth repository: {2}", new Object[] { domain,
-				cls_name, conn_url });
-		log.log(Level.INFO, "[{0}] Initialized user auth repository pool: {1}", new Object[] { domain,
-				pool_size });
+		log.log(Level.INFO, "[{0}] Initialized {1} as user auth repository pool: {2}, url: {3}",
+				new Object[] { ((domain != null) ? domain : "DEFAULT"),
+				cls_name, pool_size, conn_url });
 	}
 
 	private void addUserRepo(Map<String, Object> props, String domain, int pool_size)
@@ -848,10 +848,9 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 			user_repo_impl.addRepo(domain, repo);
 		}
 
-		log.log(Level.INFO, "[{0}] Initialized {1} as user repository: {2}", new Object[] { domain,
-				cls_name, conn_url });
-		log.log(Level.INFO, "[{0}] Initialized user repository pool: {1}", new Object[] { domain,
-				pool_size });
+		log.log(Level.INFO, "[{0}] Initialized {1} as user repository pool:, {2} url: {3}",
+				new Object[] { ((domain != null) ? domain : "DEFAULT"),
+				cls_name, pool_size, conn_url });
 	}
 
 	//~--- get methods ----------------------------------------------------------
