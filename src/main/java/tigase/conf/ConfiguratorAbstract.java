@@ -332,7 +332,6 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 		defaults.put(AUTH_REPO_URL_PROP_KEY, auth_repo_url);
 
 //  defaults.put(AUTH_REPO_PARAMS_NODE + "/param-1", "value-1");
-
 		List<String> user_repo_domains = new ArrayList<String>(10);
 		List<String> auth_repo_domains = new ArrayList<String>(10);
 
