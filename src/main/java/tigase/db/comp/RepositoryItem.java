@@ -50,12 +50,31 @@ public interface RepositoryItem {
 	//~--- get methods ----------------------------------------------------------
 
 	/**
+	 * Returns an array with the Item administrators, that is people IDs who can manage,
+	 * configure and control less critical elements of the Item, like changing less critical
+	 * configuration settings. Administrators cannot remove the Item or change the owner or
+	 * add/remove administrators.
+	 * @return an array with the Item administrators IDs.
+	 */
+	String[] getAdmins();
+
+	/**
 	 * Returns a unique key for the item in the repository. All items are stored in
 	 * a memory cache which is a Map. And the key returned by this method is the
 	 * item identifier in the Map.
 	 * @return an Item key.
 	 */
 	String getKey();
+
+	/**
+	 * Returns the owner ID of the item.  This is used for a management to allow fine tuned
+	 * service administration with roles assigned to specific elements and items. Normally only
+	 * owner can perform some critical actions like removing the item, managing item
+	 * administrators or changing owner.<p/>
+	 * There can be only one Item owner.
+	 * @return an ID of the Item owner.
+	 */
+	String getOwner();
 
 	//~--- methods --------------------------------------------------------------
 
@@ -70,7 +89,7 @@ public interface RepositoryItem {
 	/**
 	 * The item can be also initialized from a more complex repositories: XML repository
 	 * or SQL database. In such a case more complex representation is prefered, possibly
-	 * carrying more infomration about the item. The method is called to initialize the
+	 * carrying more information about the item. The method is called to initialize the
 	 * item with a data parsed from an XML representation of the repository.
 	 *
 	 * @param elem XML Element with all the item initialization data.
@@ -87,6 +106,46 @@ public interface RepositoryItem {
 	 * @param propString is a property string to initialize the RepositoryItem.
 	 */
 	void initFromPropertyString(String propString);
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * The method checks whether the given id is one of the administrators set for the Item.
+	 * @param id is an ID of a person for which we check access permissions.
+	 * @return true of the given ID is on a list of administrators and false otherwise.
+	 */
+	boolean isAdmin(String id);
+
+	/**
+	 * The method checks whether the person with given ID is the Item owner.
+	 * @param id is an ID of a person for whom we check access permissions.
+	 * @return true of the given ID is on the Item owner and false otherwise.
+	 */
+	boolean isOwner(String id);
+
+	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Returns an array with the Item administrators, that is people IDs who can manage,
+	 * configure and control less critical elements of the Item, like changing less critical
+	 * configuration settings. Administrators cannot remove the Item or change the owner or
+	 * add/remove administrators.
+	 *
+	 * @param admins is an array with the Item administrators IDs to set for the Item.
+	 */
+	void setAdmins(String[] admins);
+
+	/**
+	 * Set the Item owner.  This is used for a management to allow fine tuned
+	 * service administration with roles assigned to specific elements and items. Normally only
+	 * owner can perform some critical actions like removing the item, managing item
+	 * administrators or changing owner.<p/>
+	 * There can be only one Item owner.
+	 * @param owner is the Item owner ID.
+	 */
+	void setOwner(String owner);
+
+	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Item data can be stored in a more comlex form than a simple property string.

@@ -24,7 +24,7 @@ package tigase.conf;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.db.comp.RepositoryItem;
+import tigase.db.comp.RepositoryItemAbstract;
 
 import tigase.server.Command;
 import tigase.server.Packet;
@@ -45,10 +45,10 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class ConfigItem implements RepositoryItem {
+public class ConfigItem extends RepositoryItemAbstract {
 
 	/**
-	 * Private logger for class instancess.
+	 * Private logger for class instance.
 	 */
 	private static final Logger log = Logger.getLogger(ConfigItem.class.getName());
 
@@ -134,6 +134,7 @@ public class ConfigItem implements RepositoryItem {
 		}
 
 		Command.addFieldValue(packet, value_label, value_str);
+		super.addCommandFields(packet);
 	}
 
 	//~--- get methods ----------------------------------------------------------
@@ -193,6 +194,17 @@ public class ConfigItem implements RepositoryItem {
 	 *
 	 * @return
 	 */
+	@Override
+	public String getElemName() {
+		return REPO_ITEM_ELEM_NAME;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
 	public FLAGS getFlag() {
 		return flag;
 	}
@@ -206,8 +218,8 @@ public class ConfigItem implements RepositoryItem {
 	 */
 	@Override
 	public String getKey() {
-		return ((compName != null) ? compName + "/" : "")
-				+ ((nodeName != null) ? nodeName + "/" : "") + keyName;
+		return ((compName != null) ? compName + "/" : "") + ((nodeName != null) ? nodeName + "/" : "")
+				+ keyName;
 	}
 
 	/**
@@ -241,6 +253,7 @@ public class ConfigItem implements RepositoryItem {
 	 */
 	@Override
 	public void initFromCommand(Packet packet) {
+		super.initFromCommand(packet);
 
 //  String tmp = Command.getFieldValue(packet, CLUSTER_NODE_LABEL);
 //  if (tmp != null && !tmp.isEmpty()) {
@@ -515,8 +528,7 @@ public class ConfigItem implements RepositoryItem {
 	 * @param key
 	 * @param value
 	 */
-	public void set(String clusterNode, String compName, String nodeName, String key,
-			Object value) {
+	public void set(String clusterNode, String compName, String nodeName, String key, Object value) {
 		set(clusterNode, compName, nodeName, key, value, null);
 	}
 
@@ -568,7 +580,7 @@ public class ConfigItem implements RepositoryItem {
 	 */
 	@Override
 	public Element toElement() {
-		Element elem = new Element(REPO_ITEM_ELEM_NAME);
+		Element elem = super.toElement();
 
 		if (clusterNode != null) {
 			elem.addAttribute(CLUSTER_NODE_ATTR, clusterNode);

@@ -44,6 +44,12 @@ import javax.script.Bindings;
 public interface CommandIfc {
 
 	/** Field description */
+	public static final String ADMINS_SET = "adminsSet";
+
+	/** Field description */
+	public static final String COMMANDS_ACL = "cmdsAcl";
+
+	/** Field description */
 	public static final String ADMN_CMDS = "adminCommands";
 
 	/** Field description */
@@ -130,7 +136,17 @@ public interface CommandIfc {
 
 	void init(String id, String description);
 
+	//~--- get methods ----------------------------------------------------------
+
+	boolean isAdminOnly();
+
+	//~--- methods --------------------------------------------------------------
+
 	void runCommand(Iq packet, Bindings binds, Queue<Packet> results);
+
+	//~--- set methods ----------------------------------------------------------
+
+	void setAdminOnly(boolean adminOnly);
 }
 
 
