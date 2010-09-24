@@ -257,7 +257,7 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 	 */
 	public void forceStop() {
 		if (log.isLoggable(Level.FINER)) {
-			log.finer("Socket: " + socketIO + ", Force stop called...");
+			log.log(Level.FINER, "Socket: {0}, Force stop called...", socketIO);
 		}
 
 		try {
