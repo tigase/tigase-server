@@ -19,12 +19,19 @@
  * Last modified by $Author$
  * $Date$
  */
+
 package tigase.xmpp;
 
-import java.util.Queue;
-import java.util.Map;
+//~--- non-JDK imports --------------------------------------------------------
+
 import tigase.server.Packet;
-import tigase.db.NonAuthUserRepository;
+
+//~--- JDK imports ------------------------------------------------------------
+
+import java.util.Map;
+import java.util.Queue;
+
+//~--- interfaces -------------------------------------------------------------
 
 /**
  * Describe interface XMPPStopListener here.
@@ -36,8 +43,11 @@ import tigase.db.NonAuthUserRepository;
  * @version $Rev$
  */
 public interface XMPPStopListenerIfc extends XMPPImplIfc {
+	void stopped(XMPPResourceConnection session, Queue<Packet> results, Map<String, Object> settings);
+}    // XMPPStopListener
 
-	void stopped(XMPPResourceConnection session, Queue<Packet> results,
-		Map<String, Object> settings);
 
-} // XMPPStopListener
+//~ Formatted in Sun Code Convention
+
+
+//~ Formatted by Jindent --- http://www.jindent.com
