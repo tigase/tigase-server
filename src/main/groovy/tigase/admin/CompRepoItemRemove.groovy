@@ -41,14 +41,24 @@ def ITEMS = "item-list"
 
 def repo = (ComponentRepository)comp_repo
 def p = (Packet)packet
+def admins = (Set)adminsSet
+def stanzaFromBare = p.getStanzaFrom().getBareJID()
+def isServiceAdmin = admins.contains(stanzaFromBare)
+
 def itemKey = Command.getFieldValue(packet, ITEMS)
 
 if (itemKey == null) {
 	def items = repo.allItems()
+	def itemsStr = []
 	if (items.size() > 0) {
+		items.each {
+			if (isServiceAdmin || it.isOwner(stanzaFromBare.toString())) {
+				itemsStr += it.getKey()
+			}
+		}
+	}
+	if(itemsStr.size() > 0) {
 		def result = p.commandResult(Command.DataType.form)
-		def itemsStr = []
-		items.each { itemsStr += it.getKey() }
 		Command.addFieldValue(result, ITEMS, itemsStr[0], "List of items",
 			(String[])itemsStr, (String[])itemsStr)
 		return result
@@ -59,9 +69,18 @@ if (itemKey == null) {
 	}
 }
 
-repo.removeItem(itemKey)
-
 def result = p.commandResult(Command.DataType.result)
-Command.addTextField(result, "Note", "Operation successful");
+def item = repo.getItem(itemKey)
+if (item == null) {
+	Command.addTextField(result, "Error", "No such item, deletion impossible.");
+} else {
+  if (isServiceAdmin || item.isOwner(stanzaFromBare.toString())) {
+		repo.removeItem(itemKey)
+		Command.addTextField(result, "Note", "Operation successful")
+	} else {
+		Command.addTextField(result, "Error", "You are not the Item owner or you have no "
+			+ "enough permission to remove the item.")
+	}
+}
 
 return result

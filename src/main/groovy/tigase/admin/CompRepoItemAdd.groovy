@@ -52,9 +52,13 @@ if (marker == null) {
 }
 
 item.initFromCommand(p)
-repo.addItem(item)
-
+def oldItem = repo.getItem(item.getKey())
 def result = p.commandResult(Command.DataType.result)
-Command.addTextField(result, "Note", "Operation successful");
+if (oldItem == null) {
+  repo.addItem(item)
+	Command.addTextField(result, "Note", "Operation successful");
+} else {
+	Command.addTextField(result, "Error", "The item is already added, you can't add it twice.");
+}
 
 return result
