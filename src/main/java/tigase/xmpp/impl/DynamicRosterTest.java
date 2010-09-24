@@ -24,8 +24,6 @@ package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.util.TigaseStringprepException;
-
 import tigase.xml.Element;
 
 import tigase.xmpp.JID;
@@ -51,7 +49,7 @@ import java.util.logging.Logger;
  * @version $Rev$
  */
 public class DynamicRosterTest implements DynamicRosterIfc {
-	private static Logger log = Logger.getLogger("tigase.xmpp.impl.DynamicRosterTest");
+	private static Logger log = Logger.getLogger(DynamicRosterTest.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -109,7 +107,7 @@ public class DynamicRosterTest implements DynamicRosterIfc {
 		Element result = memStorage.get(jid);
 
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Retrieving item: " + result + ", for jid=" + jid);
+			log.log(Level.FINEST, "Retrieving item: {0}, for jid={1}", new Object[] { result, jid });
 		}
 
 		return result;
@@ -164,7 +162,7 @@ public class DynamicRosterTest implements DynamicRosterIfc {
 		String jid = item.getAttribute("jid");
 
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Storing item: " + item + ", for jid=" + jid);
+			log.log(Level.FINEST, "Storing item: {0}, for jid={1}", new Object[] { item, jid });
 		}
 
 		memStorage.put(jid, item);
