@@ -26,7 +26,7 @@ Add an item in a component repository:
 tigase.db.ComponentRepository
 Works only for some components which actually use the repository that way.
 
-AS:Description: Add component repo item
+AS:Description: Add new item
 AS:CommandId: comp-repo-item-add
 AS:Component: vhost-man,ext
 */

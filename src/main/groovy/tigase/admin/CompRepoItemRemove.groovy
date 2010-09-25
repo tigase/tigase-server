@@ -26,7 +26,7 @@ Remove an item from a component repository:
 tigase.db.ComponentRepository
 Works only for some components which actually use the repository that way.
 
-AS:Description: Remove component repo item
+AS:Description: Remove an item
 AS:CommandId: comp-repo-item-remove
 AS:Component: vhost-man,ext
 */

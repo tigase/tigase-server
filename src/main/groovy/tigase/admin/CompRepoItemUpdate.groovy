@@ -26,7 +26,7 @@ Update an item in a component repository:
 tigase.db.ComponentRepository
 Works only for some components which actually use the repository that way.
 
-AS:Description: Update component repo item
+AS:Description: Update item configuration
 AS:CommandId: comp-repo-item-update
 AS:Component: vhost-man,ext
 */

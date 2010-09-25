@@ -25,7 +25,7 @@
 User add script as described in XEP-0133:
 http://xmpp.org/extensions/xep-0133.html#add-user
 
-AS:Description: Add user.
+AS:Description: Add user
 AS:CommandId: add-user
 AS:Component: sess-man
 */
