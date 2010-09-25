@@ -225,6 +225,9 @@ public class MsgRepository implements MsgRepositoryIfc {
 
 		try {
 			data_repo = RepositoryFactory.getDataRepository(null, conn_str, map);
+
+			// Check if DB is correctly setup and contains all required tables.
+			checkDB();
 			data_repo.initPreparedStatement(uid_query, uid_query);
 			data_repo.initPreparedStatement(MSG_INSERT_QUERY, MSG_INSERT_QUERY);
 			data_repo.initPreparedStatement(MSG_SELECT_TO_JID_QUERY, MSG_SELECT_TO_JID_QUERY);
@@ -237,10 +240,6 @@ public class MsgRepository implements MsgRepositoryIfc {
 		} catch (Exception e) {
 
 			// Ignore for now....
-		} finally {
-
-			// Check if DB is correctly setup and contains all required tables.
-			checkDB();
 		}
 	}
 
@@ -298,7 +297,7 @@ public class MsgRepository implements MsgRepositoryIfc {
 		} catch (SQLException e) {
 			log.log(Level.WARNING, "Problem getting offline messages for user: " + to, e);
 		} finally {
-			release(null, rs);
+			data_repo.release(null, rs);
 		}
 
 		return result;
@@ -397,48 +396,31 @@ public class MsgRepository implements MsgRepositoryIfc {
 
 	private void checkDB() throws SQLException {
 		ResultSet rs = null;
-		Statement stmt = data_repo.createStatement();
+		Statement st = null;
 
 		try {
-			String CHECK_TABLE_QUERY = "select count(*) from ";
-
-			rs = stmt.executeQuery(CHECK_TABLE_QUERY + MSG_TABLE);
-
-			if (rs.next()) {
-				long count = rs.getLong(1);
-
-				log.info("DB table " + MSG_TABLE + " OK, items: " + count);
+			if ( !data_repo.checkTable(MSG_TABLE)) {
+				st = data_repo.createStatement();
+				st.executeUpdate(CREATE_MSG_TABLE);;
 			}
-		} catch (Exception e) {
-			stmt.executeUpdate(CREATE_MSG_TABLE);
 		} finally {
-			release(null, rs);
+			data_repo.release(st, rs);
 			rs = null;
+			st = null;
 
 			// stmt = null;
 		}
 
 		try {
-			String CHECK_TABLE_QUERY = "select count(*) from ";
-
-			rs = stmt.executeQuery(CHECK_TABLE_QUERY + JID_TABLE);
-
-			if (rs.next()) {
-				long count = rs.getLong(1);
-
-				log.info("DB table " + JID_TABLE + " OK, items: " + count);
+			if ( !data_repo.checkTable(JID_TABLE)) {
+				st = data_repo.createStatement();
+				st.executeUpdate(CREATE_JID_TABLE);
+				st.executeUpdate("delete from " + MSG_TABLE);
 			}
-		} catch (Exception e) {
-			stmt.executeUpdate(CREATE_JID_TABLE);
-
-			// Just in case let's clear the msg history table to make sure no offline messages
-			// are delivered to incorrect JID, there is an extra protection in the user UID reading
-			// method but to be safe, clear it out from old entries, they won't be of any use anyway
-			stmt.executeUpdate("delete from " + MSG_TABLE);
 		} finally {
-			release(stmt, rs);
+			data_repo.release(st, rs);
 			rs = null;
-			stmt = null;
+			st = null;
 		}
 	}
 
@@ -514,7 +496,7 @@ public class MsgRepository implements MsgRepositoryIfc {
 //      throw new UserNotFoundException("User does not exist: " + user_id);
 //    }    // end of if (isnext) else
 		} finally {
-			release(null, rs);
+			data_repo.release(null, rs);
 		}
 
 		if (result > 0) {
@@ -563,7 +545,7 @@ public class MsgRepository implements MsgRepositoryIfc {
 		} catch (SQLException e) {
 			log.log(Level.WARNING, "Problem getting offline messages from db: ", e);
 		} finally {
-			release(null, rs);
+			data_repo.release(null, rs);
 		}
 
 		earliestOffline = Long.MAX_VALUE;
@@ -610,24 +592,10 @@ public class MsgRepository implements MsgRepositoryIfc {
 		} catch (SQLException e) {
 			log.log(Level.WARNING, "Problem getting offline messages from db: ", e);
 		} finally {
-			release(null, rs);
+			data_repo.release(null, rs);
 		}
 
 		earliestOffline = Long.MAX_VALUE;
-	}
-
-	private void release(Statement stmt, ResultSet rs) {
-		if (rs != null) {
-			try {
-				rs.close();
-			} catch (SQLException sqlEx) {}
-		}
-
-		if (stmt != null) {
-			try {
-				stmt.close();
-			} catch (SQLException sqlEx) {}
-		}
 	}
 
 	//~--- inner classes --------------------------------------------------------
