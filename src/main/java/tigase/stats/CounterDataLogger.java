@@ -305,10 +305,10 @@ public class CounterDataLogger implements StatisticsArchivizerIfc {
 			DBInitException {
 		log.log(Level.INFO, "Initializing dbAccess for db connection url: {0}", conn_str);
 		data_repo = RepositoryFactory.getDataRepository(null, conn_str, map);
-		data_repo.initPreparedStatement(STATS_INSERT_QUERY, STATS_INSERT_QUERY);
 
 		// Check if DB is correctly setup and contains all required tables.
 		checkDB();
+		data_repo.initPreparedStatement(STATS_INSERT_QUERY, STATS_INSERT_QUERY);
 	}
 
 	/**
