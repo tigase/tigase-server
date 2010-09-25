@@ -41,6 +41,10 @@ def MARKER = "command-marker"
 
 def repo = (ComponentRepository)comp_repo
 def p = (Iq)packet
+def admins = (Set)adminsSet
+def stanzaFromBare = p.getStanzaFrom().getBareJID()
+def isServiceAdmin = admins.contains(stanzaFromBare)
+
 def item = repo.getItemInstance()
 def marker = Command.getFieldValue(p, MARKER)
 
@@ -55,10 +59,21 @@ item.initFromCommand(p)
 def oldItem = repo.getItem(item.getKey())
 def result = p.commandResult(Command.DataType.result)
 if (oldItem == null) {
-  repo.addItem(item)
-	Command.addTextField(result, "Note", "Operation successful");
+	def validateResult = repo.validateItem(item)
+	if (validateResult == null || isServiceAdmin) {
+		repo.addItem(item)
+		Command.addTextField(result, "Note", "Operation successful.")
+		if (validateResult != null) {
+			Command.addTextField(result, "Note", "   ")
+			Command.addTextField(result, "Warning", validateResult)
+		}
+	} else {
+		Command.addTextField(result, "Error", "The item did not pass validation checking.")
+		Command.addTextField(result, "Note", "   ")
+		Command.addTextField(result, "Warning", validateResult)
+	}
 } else {
-	Command.addTextField(result, "Error", "The item is already added, you can't add it twice.");
+	Command.addTextField(result, "Error", "The item is already added, you can't add it twice.")
 }
 
 return result

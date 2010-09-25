@@ -99,7 +99,7 @@ def oldItem = repo.getItem(item.getKey())
 if (oldItem == null) {
 	Command.addTextField(result, "Error", "The item you try to update does not exist.");
 } else {
-	if (isServiceAdmin || item.isOwner(stanzaFromBare.toString())) {
+	if (isServiceAdmin || oldItem.isOwner(stanzaFromBare.toString())) {
 		repo.addItem(item)
 		Command.addTextField(result, "Note", "Operation successful");
 	} else {

@@ -37,6 +37,7 @@ import tigase.util.*
 import tigase.xmpp.*
 import tigase.db.*
 import tigase.xml.*
+import tigase.vhosts.*
 
 def JID = "accountjid"
 def PASSWORD = "password"
@@ -46,6 +47,10 @@ def EMAIL = "email"
 def p = (Packet)packet
 def auth_repo = (AuthRepository)authRepository
 def user_repo = (UserRepository)userRepository
+def vhost_man = (VHostManagerIfc)vhostMan
+def admins = (Set)adminsSet
+def stanzaFromBare = p.getStanzaFrom().getBareJID()
+def isServiceAdmin = admins.contains(stanzaFromBare)
 
 def userJid = Command.getFieldValue(packet, JID)
 def userPass = Command.getFieldValue(packet, PASSWORD)
@@ -75,10 +80,15 @@ if (userJid == null || userPass == null || userPassVer == null || userEmail == n
 def result = p.commandResult(Command.DataType.result)
 try {
 	bareJID = BareJID.bareJIDInstance(userJid)
-  auth_repo.addUser(bareJID, userPass)
-  user_repo.setData(bareJID, "email", userEmail);
-
-  Command.addTextField(result, "Note", "Operation successful");
+	VHostItem vhost = vhost_man.getVHostItem(bareJID.getDomain())
+	if (isServiceAdmin ||
+		(vhost != null && (vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) {
+		auth_repo.addUser(bareJID, userPass)
+		user_repo.setData(bareJID, "email", userEmail);
+		Command.addTextField(result, "Note", "Operation successful");
+	} else {
+		Command.addTextField(result, "Error", "You do not have enough permissions to create account for this domain.");
+	}
 } catch (UserExistsException ex) {
   Command.addTextField(result, "Note", "User already exists, can't be added.");
 } catch (TigaseDBException ex) {
