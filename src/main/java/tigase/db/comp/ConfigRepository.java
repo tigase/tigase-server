@@ -224,6 +224,19 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	 */
 	@Override
 	public void store() {}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param item
+	 *
+	 * @return
+	 */
+	@Override
+	public String validateItem(Item item) {
+		return null;
+	}
 }
 
 

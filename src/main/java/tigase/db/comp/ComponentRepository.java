@@ -1,20 +1,20 @@
 /*
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2008 "Artur Hefczyc" <artur.hefczyc@tigase.org>
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
- * 
+ *
  * $Rev$
  * Last modified by $Author$
  * $Date$
@@ -22,9 +22,16 @@
 
 package tigase.db.comp;
 
+//~--- non-JDK imports --------------------------------------------------------
+
+import tigase.db.TigaseDBException;
+
+//~--- JDK imports ------------------------------------------------------------
+
 import java.util.Collection;
 import java.util.Map;
-import tigase.db.TigaseDBException;
+
+//~--- interfaces -------------------------------------------------------------
 
 /**
  * A convenience interface for a unified access to component specific repository data.
@@ -46,10 +53,39 @@ import tigase.db.TigaseDBException;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public interface ComponentRepository<Item extends RepositoryItem> 
-		extends Iterable<Item> {
+public interface ComponentRepository<Item extends RepositoryItem> extends Iterable<Item> {
 
+	/** Field description */
 	public static final String COMP_REPO_BIND = "comp_repo";
+
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * The method adds a new or updates existing Item in the repository.
+	 * It needs to have all fields set correctly. After this method
+	 * call is finished a new added item must be available in the component repository.
+	 * The method adds the item to memory cache and permamnent storage.
+	 * @param item a <code>Item</code> with all it's configuration parameters.
+	 * @throws TigaseDBException
+	 */
+	void addItem(Item item) throws TigaseDBException;
+
+	/**
+	 * Retuns a collection with all items stored in the repository.
+	 * @return
+	 * @throws TigaseDBException
+	 */
+	Collection<Item> allItems() throws TigaseDBException;
+
+	/**
+	 * The method checks whether the item is stored in the repository.
+	 * @param key a <code>String</code> with key to search for.
+	 * @return a <code>boolean</code> value <code>true</code> if the item exists in
+	 * the repository or <code>false</code> of it does not.
+	 */
+	boolean contains(String key);
+
+	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * The method is called to obtain defualt configuration settings if there are
@@ -67,36 +103,8 @@ public interface ComponentRepository<Item extends RepositoryItem>
 	void getDefaults(Map<String, Object> defs, Map<String, Object> params);
 
 	/**
-	 * The method is called to set configuration for this repository
-	 * implementation. The configuration is repository implementation dependent.
-	 * There are no default settings for the repository.
-	 * @param properties a <code>Map</code> with configuration settings. Content
-	 * of this <code>Map</code> must not be modified. This read-only collection.
-	 */
-	void setProperties(Map<String, Object> properties);
-
-	/**
-	 * The method is called to remove given Item from the memory cache and
-	 * permanent storage. After this method is completed the item should no
-	 * longer be availble in the component repository.
-	 * @param key a <code>String</code> with domain name to remove.
-	 * @throws TigaseDBException
-	 */
-	void removeItem(String key) throws TigaseDBException;
-
-	/**
-	 * The method adds a new or updates existing Item in the repository.
-	 * It needs to have all fields set correctly. After this method
-	 * call is finished a new added item must be available in the component repository.
-	 * The method adds the item to memory cache and permamnent storage.
-	 * @param item a <code>Item</code> with all it's configuration parameters.
-	 * @throws TigaseDBException
-	 */
-	void addItem(Item item) throws TigaseDBException;
-
-	/**
 	 * The method returns all item configuration parameters for a key
-	 * or <code>null</code> if the item does not exist in the repository. 
+	 * or <code>null</code> if the item does not exist in the repository.
 	 * @param key a <code>String</code> with item identifier to search for.
 	 * @return a <code>Item</code> for a given key or <code>null</code>
 	 * if the item is not in the repository.
@@ -104,12 +112,12 @@ public interface ComponentRepository<Item extends RepositoryItem>
 	Item getItem(String key);
 
 	/**
-	 * The method checks whether the item is stored in the repository.
-	 * @param key a <code>String</code> with key to search for.
-	 * @return a <code>boolean</code> value <code>true</code> if the item exists in
-	 * the repository or <code>false</code> of it does not.
+	 * Creates a new, uninitialized instance of the repository Item.
+	 * @return a new, uninitialized instance of the repository Item.
 	 */
-	boolean contains(String key);
+	Item getItemInstance();
+
+	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * This method is called to reload items from the database or other
@@ -123,13 +131,26 @@ public interface ComponentRepository<Item extends RepositoryItem>
 	void reload() throws TigaseDBException;
 
 	/**
-	 * The method is called to store all data in the database. It is used when the
-	 * repository has been changed in some way and the changes have to be put to
-	 * a permanent storage for later retrieval.
-	 *
+	 * The method is called to remove given Item from the memory cache and
+	 * permanent storage. After this method is completed the item should no
+	 * longer be availble in the component repository.
+	 * @param key a <code>String</code> with domain name to remove.
 	 * @throws TigaseDBException
 	 */
-	void store() throws TigaseDBException;
+	void removeItem(String key) throws TigaseDBException;
+
+	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * The method is called to set configuration for this repository
+	 * implementation. The configuration is repository implementation dependent.
+	 * There are no default settings for the repository.
+	 * @param properties a <code>Map</code> with configuration settings. Content
+	 * of this <code>Map</code> must not be modified. This read-only collection.
+	 */
+	void setProperties(Map<String, Object> properties);
+
+	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * The method returns number of itens in the repository.
@@ -139,16 +160,26 @@ public interface ComponentRepository<Item extends RepositoryItem>
 	int size();
 
 	/**
-	 * Retuns a collection with all items stored in the repository.
-	 * @return
+	 * The method is called to store all data in the database. It is used when the
+	 * repository has been changed in some way and the changes have to be put to
+	 * a permanent storage for later retrieval.
+	 *
 	 * @throws TigaseDBException
 	 */
-	Collection<Item> allItems() throws TigaseDBException;
+	void store() throws TigaseDBException;
 
 	/**
-	 * Creates a new, uninitialized instance of the repository Item.
-	 * @return a new, uninitialized instance of the repository Item.
+	 * Performs Item validation to check whether it meets the repository policy. If validation
+	 * is successful the method returns <code>null</code>, otherwise it returns an error
+	 * description.
+	 * @param item is an <code>Item</code> object to perform validation checking upon.
+	 * @return <code>null</code> on success and an error message otherwise.
 	 */
-	Item getItemInstance();
-
+	String validateItem(Item item);
 }
+
+
+//~ Formatted in Sun Code Convention
+
+
+//~ Formatted by Jindent --- http://www.jindent.com
