@@ -52,7 +52,7 @@ import java.util.logging.Logger;
 public class ConfigurationCache implements ConfigRepositoryIfc {
 
 	/**
-	 * Private logger for class instancess.
+	 * Private logger for class instance.
 	 */
 	private static final Logger log = Logger.getLogger(ConfigurationCache.class.getName());
 
@@ -560,6 +560,19 @@ public class ConfigurationCache implements ConfigRepositoryIfc {
 	public void store() throws TigaseDBException {
 
 		// Do nothing, this is in memory config repository only
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param item
+	 *
+	 * @return
+	 */
+	@Override
+	public String validateItem(ConfigItem item) {
+		return null;
 	}
 }
 
