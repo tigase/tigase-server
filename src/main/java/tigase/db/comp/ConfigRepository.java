@@ -46,7 +46,7 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 
 	//~--- fields ---------------------------------------------------------------
 
-	protected LinkedHashMap<String, Item> items = new LinkedHashMap<String, Item>();
+	protected LinkedHashMap<String, Item> items = new LinkedHashMap<String, Item>(100);
 
 	//~--- get methods ----------------------------------------------------------
 

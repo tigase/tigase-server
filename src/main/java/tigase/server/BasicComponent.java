@@ -245,7 +245,7 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
-		Map<String, Object> defs = new LinkedHashMap<String, Object>();
+		Map<String, Object> defs = new LinkedHashMap<String, Object>(50);
 
 		defs.put(COMPONENT_ID_PROP_KEY, compId.toString());
 		DEF_HOSTNAME_PROP_VAL = DNSResolver.getDefaultHostname();
@@ -545,6 +545,7 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 	 * @param binds
 	 */
 	public void initBindings(Bindings binds) {
+		binds.put(CommandIfc.VHOST_MANAGER, vHostManager);
 		binds.put(CommandIfc.ADMINS_SET, admins);
 		binds.put(CommandIfc.COMMANDS_ACL, commandsACL);
 		binds.put(CommandIfc.SCRI_MANA, scriptEngineManager);

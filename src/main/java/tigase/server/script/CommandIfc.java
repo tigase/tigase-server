@@ -44,6 +44,9 @@ import javax.script.Bindings;
 public interface CommandIfc {
 
 	/** Field description */
+	public static final String VHOST_MANAGER = "vhostMan";
+
+	/** Field description */
 	public static final String ADMINS_SET = "adminsSet";
 
 	/** Field description */

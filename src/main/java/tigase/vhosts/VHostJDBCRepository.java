@@ -26,7 +26,18 @@ package tigase.vhosts;
 
 import tigase.db.comp.UserRepoRepository;
 
+import tigase.util.DNSEntry;
+import tigase.util.DNSResolver;
+
 import tigase.xmpp.BareJID;
+
+//~--- JDK imports ------------------------------------------------------------
+
+import java.net.UnknownHostException;
+
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -50,6 +61,33 @@ import tigase.xmpp.BareJID;
  * @version $Rev$
  */
 public class VHostJDBCRepository extends UserRepoRepository<VHostItem> {
+	private static final Logger log = Logger.getLogger(VHostJDBCRepository.class.getName());
+
+	/** Field description */
+	public static final String DOMAINS_PER_USER_LIMIT_PROP_KEY = "domains-per-user-limit";
+
+	/** Field description */
+	public static final int DOMAINS_PER_USER_LIMIT_PROP_VAL = 25;
+
+	/** Field description */
+	public static final String DNS_DEF_IP_PROP_KEY = "dns-def-ip";
+
+	/** Field description */
+	public static String DNS_DEF_IP_PROP_VAL = null;
+
+	/** Field description */
+	public static final String DNS_SRV_DEF_ADDR_PROP_KEY = "dns-srv-def-addr";
+
+	/** Field description */
+	public static String DNS_SRV_DEF_ADDR_PROP_VAL = null;
+
+	//~--- fields ---------------------------------------------------------------
+
+	private String def_ip_address = null;
+	private String def_srv_address = null;
+	private int max_domains_per_user = DOMAINS_PER_USER_LIMIT_PROP_VAL;
+
+	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
@@ -71,6 +109,32 @@ public class VHostJDBCRepository extends UserRepoRepository<VHostItem> {
 	@Override
 	public String[] getDefaultPropetyItems() {
 		return VHostRepoDefaults.getDefaultPropetyItems();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param defs
+	 * @param params
+	 */
+	@Override
+	public void getDefaults(Map<String, Object> defs, Map<String, Object> params) {
+
+		// Something to initialize database with, in case it is empty
+		// Otherwise the server would not work at all with empty Items database
+		super.getDefaults(defs, params);
+		DNS_SRV_DEF_ADDR_PROP_VAL = DNSResolver.getDefaultHostname();
+
+		try {
+			DNS_DEF_IP_PROP_VAL = DNSResolver.getHostIP(DNSResolver.getDefaultHostname());
+		} catch (Exception e) {
+			DNS_DEF_IP_PROP_VAL = DNSResolver.getDefaultHostname();
+		}
+
+		defs.put(DNS_SRV_DEF_ADDR_PROP_KEY, DNS_SRV_DEF_ADDR_PROP_VAL);
+		defs.put(DNS_DEF_IP_PROP_KEY, DNS_DEF_IP_PROP_VAL);
+		defs.put(DOMAINS_PER_USER_LIMIT_PROP_KEY, DOMAINS_PER_USER_LIMIT_PROP_VAL);
 	}
 
 	/**
@@ -115,6 +179,84 @@ public class VHostJDBCRepository extends UserRepoRepository<VHostItem> {
 	@Override
 	public BareJID getRepoUser() {
 		return VHostRepoDefaults.getRepoUser();
+	}
+
+	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param properties
+	 */
+	@Override
+	public void setProperties(Map<String, Object> properties) {
+
+		// Let's load items from configuration first. Later we can overwrite
+		// them with items settings in the database.
+		super.setProperties(properties);
+		def_srv_address = (String) properties.get(DNS_SRV_DEF_ADDR_PROP_KEY);
+		def_ip_address = (String) properties.get(DNS_DEF_IP_PROP_KEY);
+		max_domains_per_user = (Integer) properties.get(DOMAINS_PER_USER_LIMIT_PROP_KEY);
+	}
+
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param item
+	 *
+	 * @return
+	 */
+	@Override
+	public String validateItem(VHostItem item) {
+		int vhost_count = 0;
+
+		for (VHostItem it : allItems()) {
+			if (it.isOwner(item.getOwner())) {
+				++vhost_count;
+			}
+		}
+
+		if (vhost_count >= max_domains_per_user) {
+			return "Maximum number of domains exceeded for the user! Current number is: " + vhost_count;
+		}
+
+		try {
+			DNSEntry dnsEntry = DNSResolver.getHostSRV_Entry(item.getKey());
+
+			if (dnsEntry != null) {
+				if (def_ip_address.equals(dnsEntry.getIp())
+						|| def_srv_address.equals(dnsEntry.getDnsResultHost())) {
+					return null;
+				} else {
+					return "Incorrect DNS SRV settings ('" + dnsEntry.getDnsResultHost() + "', '"
+							+ dnsEntry.getIp() + "') for the given hostname: " + item.getKey();
+				}
+			}
+		} catch (UnknownHostException ex) {
+
+			// Ignore, maybe simply IP address is set in DNS
+		}
+
+		try {
+			String ipAddress = DNSResolver.getHostIP(item.getKey());
+
+			if (ipAddress != null) {
+				if (ipAddress.equals(def_ip_address)) {
+					return null;
+				} else {
+					return "Incorrect IP address: '" + ipAddress + "' found in DNS for the given host: "
+							+ item.getKey();
+				}
+			} else {
+				return "No DNS settings found for given host: " + item.getKey();
+			}
+		} catch (UnknownHostException ex1) {
+			return "There is no DNS settings for given host: " + item.getKey();
+		}
 	}
 }
 
