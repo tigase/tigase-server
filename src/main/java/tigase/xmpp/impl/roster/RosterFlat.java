@@ -140,8 +140,8 @@ public class RosterFlat extends RosterAbstract {
 	 * @throws TigaseDBException
 	 */
 	@Override
-	public void addBuddy(XMPPResourceConnection session, JID buddy, String name,
-			String[] groups, String otherData)
+	public void addBuddy(XMPPResourceConnection session, JID buddy, String name, String[] groups,
+			String otherData)
 			throws NotAuthorizedException, TigaseDBException {
 
 		// String buddy = JIDUtils.getNodeID(jid);
@@ -167,10 +167,13 @@ public class RosterFlat extends RosterAbstract {
 				relem.setName(name);
 			}
 
-			if ((groups != null) && (groups.length > 0)) {
-				relem.setGroups(groups);
-			}
+			// Hm, as one user reported this make it impossible to remove the user from
+			// all groups. Let's comments it out for now to see how it works.
+			// Probably added this some time ago , before RosterFlat to prevent NPE.
+//    if ((groups != null) && (groups.length > 0)) {
+			relem.setGroups(groups);
 
+//    }
 			saveUserRoster(session);
 
 			if (log.isLoggable(Level.FINEST)) {
@@ -486,8 +489,7 @@ public class RosterFlat extends RosterAbstract {
 
 		if (relem != null) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Setting name: ''{0}'' for buddy: {1}", new Object[] { name,
-						buddy });
+				log.log(Level.FINEST, "Setting name: ''{0}'' for buddy: {1}", new Object[] { name, buddy });
 			}
 
 			if ((name != null) &&!name.isEmpty()) {
@@ -512,8 +514,8 @@ public class RosterFlat extends RosterAbstract {
 	 * @throws TigaseDBException
 	 */
 	@Override
-	public void setBuddySubscription(XMPPResourceConnection session,
-			SubscriptionType subscription, JID buddy)
+	public void setBuddySubscription(XMPPResourceConnection session, SubscriptionType subscription,
+			JID buddy)
 			throws NotAuthorizedException, TigaseDBException {
 		RosterElement relem = getRosterElement(session, buddy);
 
@@ -577,8 +579,8 @@ public class RosterFlat extends RosterAbstract {
 		// In most times we just read from this data structure
 		// From time to time there might be some modification, posibly concurrent
 		// very unlikely by more than one thread
-		Map<BareJID, RosterElement> roster = new ConcurrentHashMap<BareJID, RosterElement>(100,
-			0.25f, 1);
+		Map<BareJID, RosterElement> roster = new ConcurrentHashMap<BareJID, RosterElement>(100, 0.25f,
+			1);
 
 		session.putCommonSessionData(ROSTER, roster);
 
