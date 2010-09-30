@@ -138,7 +138,7 @@ public class ProcessingThreads<E extends WorkerThread> {
 				// Otherwise per destination address
 				// If the packet elemTo is set then used it, otherwise just packetTo:
 				if (packet.getStanzaTo() != null) {
-					ret = workerThreads.get(Math.abs(packet.getStanzaTo().hashCode())
+					ret = workerThreads.get(Math.abs(packet.getStanzaTo().getBareJID().hashCode())
 							% numWorkerThreads).offer(item);
 
 //        ret = queues.get(Math.abs(packet.getStanzaTo().hashCode() % numQueues)).offer(item,
@@ -157,7 +157,7 @@ public class ProcessingThreads<E extends WorkerThread> {
 			// Otherwise per destination address
 			// If the packet elemTo is set then used it, otherwise just packetTo:
 			if (packet.getStanzaTo() != null) {
-				ret = workerThreads.get(Math.abs(packet.getStanzaTo().hashCode())
+				ret = workerThreads.get(Math.abs(packet.getStanzaTo().getBareJID().hashCode())
 						% numWorkerThreads).offer(item);
 			} else {
 				ret = workerThreads.get(Math.abs(packet.getTo().hashCode()) % numWorkerThreads).offer(item);
