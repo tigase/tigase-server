@@ -82,7 +82,11 @@ public class PriorityQueueStrict<E> extends PriorityQueueAbstract<E> {
 	public final void init(int maxPriority, int maxSize) {
 
 //  qs = new LinkedBlockingQueue[maxPriority + 1];
-		qs = new LinkedBlockingQueue[maxPriority];
+		// Setting a fixed priority to 3 which means all standard XMPP
+		// packets go to the same queue, preventing packets reordering
+		// 3 - SYSTEM, CLUSTER, HIGH
+//    qs = new LinkedBlockingQueue[maxPriority];
+		qs = new LinkedBlockingQueue[3];
 
 		for (int i = 0; i < qs.length; i++) {
 			qs[i] = new LinkedBlockingQueue<E>(maxSize);
@@ -238,10 +242,16 @@ public class PriorityQueueStrict<E> extends PriorityQueueAbstract<E> {
 	// TODO: Reduce synchronization but be carefull many threads are writing
 	// to queues at the same time.
 	// private boolean add(E element, int priority, boolean blocking, String owner)
-	private boolean add(E element, int priority, boolean blocking) throws InterruptedException {
-		if ((priority < 0) || (qs.length <= priority)) {
+	private boolean add(E element, int pr, boolean blocking) throws InterruptedException {
+		int priority = pr;
+
+		if (priority < 0) {
 			throw new IllegalArgumentException("parameter priority must be " + "between 0 and "
 					+ (qs.length - 1));
+		}
+
+		if (qs.length <= priority) {
+			priority = qs.length - 1;
 		}
 
 		boolean result = true;
