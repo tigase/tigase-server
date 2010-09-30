@@ -102,8 +102,8 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	 * You can change the default queue size by setting a different value for the
 	 * <code>MAX_QUEUE_SIZE_PROP_KEY</code> property in the server configuration.
 	 */
-	public static final Integer MAX_QUEUE_SIZE_PROP_VAL =
-		new Long(Runtime.getRuntime().maxMemory() / 400000L).intValue();
+	public static final Integer MAX_QUEUE_SIZE_PROP_VAL = new Long(Runtime.getRuntime().maxMemory()
+		/ 400000L).intValue();
 
 	/**
 	 * Configuration property key for setting outgoing packets filters on the component level.
@@ -519,8 +519,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 		list.add(getName(), "Last hour packets", packets_per_hour, Level.FINE);
 		list.add(getName(), StatisticType.MSG_RECEIVED_OK.getDescription(), statReceivedPacketsOk,
 				Level.FINE);
-		list.add(getName(), StatisticType.MSG_SENT_OK.getDescription(), statSentPacketsOk,
-				Level.FINE);
+		list.add(getName(), StatisticType.MSG_SENT_OK.getDescription(), statSentPacketsOk, Level.FINE);
 
 		if (list.checkLevel(Level.FINEST)) {
 			int[] in_priority_sizes = in_queues.get(0).size();
@@ -555,10 +554,9 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 
 		list.add(getName(), "Total In queues wait", in_queue_size, Level.INFO);
 		list.add(getName(), "Total Out queues wait", out_queue_size, Level.INFO);
-		list.add(getName(), StatisticType.MAX_QUEUE_SIZE.getDescription(), maxQueueSize,
-				Level.FINEST);
-		list.add(getName(), StatisticType.IN_QUEUE_OVERFLOW.getDescription(),
-				statReceivedPacketsEr, Level.INFO);
+		list.add(getName(), StatisticType.MAX_QUEUE_SIZE.getDescription(), maxQueueSize, Level.FINEST);
+		list.add(getName(), StatisticType.IN_QUEUE_OVERFLOW.getDescription(), statReceivedPacketsEr,
+				Level.INFO);
 		list.add(getName(), StatisticType.OUT_QUEUE_OVERFLOW.getDescription(), statSentPacketsEr,
 				Level.INFO);
 
@@ -611,7 +609,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 		// If not, then a better way is to get hashCode from the elemTo address
 		// as this would be by the destination address user name:
 		if (packet.getStanzaTo() != null) {
-			return packet.getStanzaTo().hashCode();
+			return packet.getStanzaTo().getBareJID().hashCode();
 		}
 
 		if (packet.getTo() != null) {
@@ -637,8 +635,8 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 		// log.finest(getName() + " looking for regex routings: " + address);
 		for (Pattern pat : regexRoutings) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "{0} matching: {1} against {2}", new Object[] { getName(),
-						address, pat.toString() });
+				log.log(Level.FINEST, "{0} matching: {1} against {2}", new Object[] { getName(), address,
+						pat.toString() });
 			}
 
 			if (pat.matcher(address).matches()) {
@@ -798,11 +796,10 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 
 					filter.init(getName(), QueueType.IN_QUEUE);
 					incoming_filters.add(filter);
-					log.log(Level.CONFIG, "{0} loaded incoming filter: {1}", new Object[] { getName(),
-							inc });
+					log.log(Level.CONFIG, "{0} loaded incoming filter: {1}", new Object[] { getName(), inc });
 				} catch (Exception e) {
-					log.log(Level.WARNING,
-							"Problem loading filter: " + inc + " in component: " + getName(), e);
+					log.log(Level.WARNING, "Problem loading filter: " + inc + " in component: " + getName(),
+							e);
 				}
 			}
 		}
@@ -818,11 +815,10 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 
 					filter.init(getName(), QueueType.OUT_QUEUE);
 					outgoing_filters.add(filter);
-					log.log(Level.CONFIG, "{0} loaded outgoing filter: {1}", new Object[] { getName(),
-							out });
+					log.log(Level.CONFIG, "{0} loaded outgoing filter: {1}", new Object[] { getName(), out });
 				} catch (Exception e) {
-					log.log(Level.WARNING,
-							"Problem loading filter: " + out + " in component: " + getName(), e);
+					log.log(Level.WARNING, "Problem loading filter: " + out + " in component: " + getName(),
+							e);
 				}
 			}
 		}
@@ -1173,8 +1169,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 									}
 								}
 
-								if ( !processed
-										&& ((packet = filterPacket(packet, incoming_filters)) != null)) {
+								if ( !processed && ((packet = filterPacket(packet, incoming_filters)) != null)) {
 									processPacket(packet);
 								}
 
