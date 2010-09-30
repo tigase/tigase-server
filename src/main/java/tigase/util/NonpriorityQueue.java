@@ -47,7 +47,7 @@ public class NonpriorityQueue<E> extends PriorityQueueAbstract<E> {
 	public NonpriorityQueue() {}
 
 	protected NonpriorityQueue(int maxSize) {
-		init(maxSize, 0);
+		init(0, maxSize);
 	}
 
 	//~--- methods --------------------------------------------------------------
