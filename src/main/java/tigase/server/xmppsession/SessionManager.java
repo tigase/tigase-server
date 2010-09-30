@@ -136,6 +136,7 @@ public class SessionManager extends AbstractMessageReceiver
 	private long authTimeouts = 0;
 	private AuthRepository auth_repository = null;
 	private long closedConnections = 0;
+	private DefaultHandlerProc defHandlerProc = null;
 	private PacketDefaultHandler defPacketHandler = null;
 
 	// private long reaperInterval = 60 * 1000;
@@ -1297,7 +1298,7 @@ public class SessionManager extends AbstractMessageReceiver
 				// Response is sent from the thread when opening user session is
 				// completed.
 				// fastAddOutPacket(pc.okResult((String) null, 0));
-				ProcessingThreads<ProcessorWorkerThread> pt = workerThreads.get(sessionCloseProc.id());
+				ProcessingThreads<ProcessorWorkerThread> pt = workerThreads.get(sessionOpenProc.id());
 
 				if (pt == null) {
 					pt = workerThreads.get(defPluginsThreadsPool);
@@ -1575,9 +1576,17 @@ public class SessionManager extends AbstractMessageReceiver
 		}      // end of if (!stop)
 
 		if ( !stop &&!packet.wasProcessed()
-				&& ((packet.getStanzaTo() == null) || ( !isLocalDomain(packet.getStanzaTo().toString())))
-					&& defPacketHandler.process(packet, conn, naUserRepository, results)) {
-			packet.processedBy("filter-process");
+				&& ((packet.getStanzaTo() == null) || ( !isLocalDomain(packet.getStanzaTo().toString())))) {
+			if (defPacketHandler.canHandle(packet, conn)) {
+				ProcessingThreads<ProcessorWorkerThread> pt = workerThreads.get(defHandlerProc.id());
+
+				if (pt == null) {
+					pt = workerThreads.get(defPluginsThreadsPool);
+				}
+
+				pt.addItem(defHandlerProc, packet, conn);
+				packet.processedBy(defHandlerProc.id());
+			}
 		}
 
 		setPermissions(conn, results);
@@ -1717,6 +1726,11 @@ public class SessionManager extends AbstractMessageReceiver
 		if (plug_id.equals(sessionCloseProcId)) {
 			sessionCloseProc = new SessionCloseProc();
 			proc = sessionCloseProc;
+		}
+
+		if (plug_id.equals(defaultHandlerProcId)) {
+			defHandlerProc = new DefaultHandlerProc();
+			proc = defHandlerProc;
 		}
 
 		if (proc == null) {
@@ -1974,6 +1988,55 @@ public class SessionManager extends AbstractMessageReceiver
 			}
 
 			closeConnection(packet.getTo(), false);
+		}
+	}
+
+
+	private class DefaultHandlerProc extends XMPPProcessor implements XMPPProcessorIfc {
+
+		/**
+		 * Method description
+		 *
+		 *
+		 * @return
+		 */
+		@Override
+		public int concurrentQueuesNo() {
+			return 4;
+		}
+
+		/**
+		 * Method description
+		 *
+		 *
+		 * @return
+		 */
+		@Override
+		public String id() {
+			return defaultHandlerProcId;
+		}
+
+		/**
+		 * Method description
+		 *
+		 *
+		 * @param packet
+		 * @param session
+		 * @param repo
+		 * @param results
+		 * @param settings
+		 *
+		 * @throws XMPPException
+		 */
+		@Override
+		public void process(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
+				Queue<Packet> results, Map<String, Object> settings)
+				throws XMPPException {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Executing default packet handler for: {0}", packet);
+			}
+
+			defPacketHandler.process(packet, session, repo, results);
 		}
 	}
 

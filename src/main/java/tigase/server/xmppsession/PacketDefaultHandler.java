@@ -89,6 +89,41 @@ public class PacketDefaultHandler {
 	 *
 	 * @param packet
 	 * @param session
+	 *
+	 * @return
+	 */
+	public boolean canHandle(Packet packet, XMPPResourceConnection session) {
+		if (session == null) {
+			return false;
+		}    // end of if (session == null)
+
+		// Cannot forward packet if there is no destination address
+		if (packet.getStanzaTo() == null) {
+
+			// If this is simple <iq type="result"/> then ignore it
+			// and consider it OK
+			if ((packet.getElemName() == "iq") && (packet.getType() == StanzaType.result)) {
+
+				// Nothing to do....
+				return true;
+			}
+
+			if (log.isLoggable(Level.INFO)) {
+				log.log(Level.INFO, "No ''to'' address, can''t deliver packet: {0}", packet);
+			}
+
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param packet
+	 * @param session
 	 * @param repo
 	 * @param results
 	 *
@@ -127,8 +162,7 @@ public class PacketDefaultHandler {
 	public boolean preprocess(final Packet packet, final XMPPResourceConnection session,
 			final NonAuthUserRepository repo, final Queue<Packet> results) {
 		for (int i = 0; i < IGNORE_PACKETS.length; i++) {
-			if ((packet.getElemName() == IGNORE_PACKETS[i])
-					&& (packet.getType() == IGNORE_TYPES[i])) {
+			if ((packet.getElemName() == IGNORE_PACKETS[i]) && (packet.getType() == IGNORE_TYPES[i])) {
 				return true;
 			}
 		}
@@ -157,9 +191,9 @@ public class PacketDefaultHandler {
 							if (log.isLoggable(Level.FINE)) {
 								log.log(Level.FINE,
 										"Packet received before the session has been authenticated."
-										+ "Session details: connectionId="
-										+ "{0}, sessionId={1}, ConnectionStatus={2}, packet={3}", new Object[] {
-											session.getConnectionId(),
+											+ "Session details: connectionId="
+												+ "{0}, sessionId={1}, ConnectionStatus={2}, packet={3}", new Object[] {
+													session.getConnectionId(),
 										session.getSessionId(), session.getConnectionStatus(),
 										packet.toStringSecure() });
 							}
@@ -197,14 +231,12 @@ public class PacketDefaultHandler {
 						} else {
 							if (log.isLoggable(Level.FINEST)) {
 								log.log(Level.FINEST,
-										"Skipping setting correct from attribute: {0}, is already correct.",
-											from_jid);
+										"Skipping setting correct from attribute: {0}, is already correct.", from_jid);
 							}
 						}
 					} else {
-						log.log(Level.WARNING,
-								"Session is authenticated but session.getJid() is empty: {0}",
-									packet.toStringSecure());
+						log.log(Level.WARNING, "Session is authenticated but session.getJid() is empty: {0}",
+								packet.toStringSecure());
 					}
 				} else {
 
@@ -231,9 +263,8 @@ public class PacketDefaultHandler {
 
 			// Ignore this packet
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST,
-						"Ignoring packet with an error to non-existen user session: {0}",
-							packet.toStringSecure());
+				log.log(Level.FINEST, "Ignoring packet with an error to non-existen user session: {0}",
+						packet.toStringSecure());
 			}
 		} catch (Exception e) {
 			log.log(Level.FINEST, "Packet preprocessing exception: ", e);
@@ -253,37 +284,14 @@ public class PacketDefaultHandler {
 	 * @param repo
 	 * @param results
 	 *
-	 * @return
 	 */
-	public boolean process(final Packet packet, final XMPPResourceConnection session,
-			final NonAuthUserRepository repo, final Queue<Packet> results) {
-		if (session == null) {
-			return false;
-		}    // end of if (session == null)
-
+	public void process(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
+			Queue<Packet> results) {
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Processing packet: {0}", packet.toStringSecure());
 		}
 
 		try {
-
-			// Can not forward packet if there is no destination address
-			if (packet.getStanzaTo() == null) {
-
-				// If this is simple <iq type="result"/> then ignore it
-				// and consider it OK
-				if (packet.getElemName().equals("iq") && (packet.getType() == StanzaType.result)) {
-
-					// Nothing to do....
-					return true;
-				}
-
-				if (log.isLoggable(Level.INFO)) {
-					log.log(Level.INFO, "No ''to'' address, can''t deliver packet: {0}", packet);
-				}
-
-				return false;
-			}
 
 			// Already done in forward method....
 			// No need to repeat this (performance - everything counts...)
@@ -297,6 +305,15 @@ public class PacketDefaultHandler {
 //    } // end of if (packet.getFrom().equals(session.getConnectionId()))
 			// String id = null;
 			JID to = packet.getStanzaTo();
+
+			// If this is simple <iq type="result"/> then ignore it
+			// and consider it OK
+			if ((to == null) && (packet.getElemName() == "iq")
+					&& (packet.getType() == StanzaType.result)) {
+
+				// Nothing to do....
+				return;
+			}
 
 			if (session.isUserId(to.getBareJID())) {
 
@@ -320,11 +337,11 @@ public class PacketDefaultHandler {
 					result.setPacketTo(session.getConnectionId(packet.getStanzaTo()));
 					results.offer(result);
 				} catch (NoConnectionIdException ex) {
-					log.log(Level.WARNING,
-							"Packet to the server which hasn't been properly processed: {0}", packet);
+					log.log(Level.WARNING, "Packet to the server which hasn't been properly processed: {0}",
+							packet);
 				}
 
-				return true;
+				return;
 			}    // end of else
 
 			if (packet.getStanzaFrom() != null) {
@@ -339,7 +356,7 @@ public class PacketDefaultHandler {
 //        }
 					results.offer(result);
 
-					return true;
+					return;
 				}
 			}
 		} catch (NotAuthorizedException e) {
@@ -351,8 +368,6 @@ public class PacketDefaultHandler {
 				log.log(Level.INFO, "Packet processing exception: {0}", e2);
 			}
 		}    // end of try-catch
-
-		return false;
 	}
 }
 
