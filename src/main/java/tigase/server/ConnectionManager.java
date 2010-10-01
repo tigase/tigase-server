@@ -793,7 +793,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService> extends Abstra
 		}
 
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "{0}, Writing packet to: {1}", new Object[] { ios, p.getTo() });
+			log.log(Level.FINEST, "{0}, Writing packet: {1}", new Object[] { ios, p });
 		}
 
 		if (ios != null) {
