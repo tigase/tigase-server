@@ -605,6 +605,14 @@ public abstract class ConnectionManager<IO extends XMPPIOService> extends Abstra
 	 */
 	public boolean writePacketToSocket(IO ios, Packet p) {
 		if (ios != null) {
+			if (log.isLoggable(Level.FINER) &&!log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINER, "{0}, Processing packet: {1}, type: {2}", new Object[] { ios,
+						p.getElemName(), p.getType() });
+			}
+
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "{0}, Writing packet: {1}", new Object[] { ios, p });
+			}
 
 			// synchronized (ios) {
 			ios.addPacketToSend(p);
@@ -651,6 +659,15 @@ public abstract class ConnectionManager<IO extends XMPPIOService> extends Abstra
 				Packet p = null;
 
 				while ((p = packets.poll()) != null) {
+					if (log.isLoggable(Level.FINER) &&!log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINER, "{0}, Processing packet: {1}, type: {2}", new Object[] { serv,
+								p.getElemName(), p.getType() });
+					}
+
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "{0}, Writing packet: {1}", new Object[] { serv, p });
+					}
+
 					serv.addPacketToSend(p);
 				}      // end of for ()
 
@@ -788,15 +805,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService> extends Abstra
 	protected boolean writePacketToSocket(Packet p) {
 		IO ios = getXMPPIOService(p);
 
-		if (log.isLoggable(Level.FINER) &&!log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINER, "{0}, Processing packet: {1}, type: {2}", new Object[] { ios,
-					p.getElemName(), p.getType() });
-		}
-
-		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "{0}, Writing packet: {1}", new Object[] { ios, p });
-		}
-
 		if (ios != null) {
 			return writePacketToSocket(ios, p);
 		} else {
@@ -806,15 +814,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService> extends Abstra
 
 	protected boolean writePacketToSocket(Packet p, String serviceId) {
 		IO ios = getXMPPIOService(serviceId);
-
-		if (log.isLoggable(Level.FINER) &&!log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINER, "{0}, Processing packet: {1}, type: {2}", new Object[] { ios,
-					p.getElemName(), p.getType() });
-		}
-
-		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "{0}, Writing packet to: {1}", new Object[] { ios, p });
-		}
 
 		if (ios != null) {
 			return writePacketToSocket(ios, p);
