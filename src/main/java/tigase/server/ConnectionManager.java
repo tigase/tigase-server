@@ -807,11 +807,12 @@ public abstract class ConnectionManager<IO extends XMPPIOService> extends Abstra
 		IO ios = getXMPPIOService(serviceId);
 
 		if (log.isLoggable(Level.FINER) &&!log.isLoggable(Level.FINEST)) {
-			log.finer(ios + ", Processing packet: " + p.getElemName() + ", type: " + p.getType());
+			log.log(Level.FINER, "{0}, Processing packet: {1}, type: {2}", new Object[] { ios,
+					p.getElemName(), p.getType() });
 		}
 
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest(ios + ", Writing packet to: " + p.getTo());
+			log.log(Level.FINEST, "{0}, Writing packet to: {1}", new Object[] { ios, p });
 		}
 
 		if (ios != null) {
