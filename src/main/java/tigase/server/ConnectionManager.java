@@ -627,8 +627,9 @@ public abstract class ConnectionManager<IO extends XMPPIOService> extends Abstra
 			// }
 		} else {
 			if (log.isLoggable(Level.FINE)) {
-				log.fine("Can't find service for packet: <" + p.getElemName() + "> " + p.getTo()
-						+ ", service id: " + getServiceId(p));
+				log.log(Level.FINE, "Can''t find service for packet: <{0}> {1}, service id: {2}",
+						new Object[] { p.getElemName(),
+						p.getTo(), getServiceId(p) });
 			}
 		}    // end of if (ios != null) else
 
@@ -670,7 +671,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService> extends Abstra
 			// }
 		} else {
 			if (log.isLoggable(Level.FINE)) {
-				log.fine("Can't find service for packets: [" + packets + "] ");
+				log.log(Level.FINE, "Can''t find service for packets: [{0}] ", packets);
 			}
 		}          // end of if (ios != null) else
 	}
@@ -860,8 +861,9 @@ public abstract class ConnectionManager<IO extends XMPPIOService> extends Abstra
 
 	private void reconnectService(final Map<String, Object> port_props, long delay) {
 		if (log.isLoggable(Level.FINER)) {
-			log.finer("Reconnecting service for: " + getName() + ", scheduling next try in "
-					+ (delay / 1000) + "secs");
+			log.log(Level.FINER, "Reconnecting service for: {0}, scheduling next try in {1}secs",
+					new Object[] { getName(),
+					delay / 1000 });
 		}
 
 		addTimerTask(new TimerTask() {
@@ -876,8 +878,10 @@ public abstract class ConnectionManager<IO extends XMPPIOService> extends Abstra
 				int port = (Integer) port_props.get(PORT_KEY);
 
 				if (log.isLoggable(Level.FINE)) {
-					log.fine("Reconnecting service for component: " + getName() + ", to remote host: " + host
-							+ " on port: " + port);
+					log.log(Level.FINE,
+							"Reconnecting service for component: {0}, to remote host: {1} on port: {2}",
+								new Object[] { getName(),
+							host, port });
 				}
 
 				startService(port_props);
