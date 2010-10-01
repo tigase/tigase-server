@@ -29,6 +29,7 @@ import tigase.server.Packet;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 //~--- classes ----------------------------------------------------------------
@@ -52,12 +53,12 @@ public class EchoComponent extends AbstractMessageReceiver {
 	 */
 	@Override
 	public void processPacket(Packet packet) {
-		log.finest("Received: " + packet);
+		log.log(Level.FINEST, "Received: {0}", packet);
 
 		Packet result = packet.swapStanzaFromTo();
 
 		addOutPacket(result);
-		log.finest("Sent back: " + result);
+		log.log(Level.FINEST, "Sent back: {0}", result);
 	}
 }
 
