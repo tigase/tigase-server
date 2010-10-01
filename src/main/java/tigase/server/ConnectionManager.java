@@ -842,7 +842,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService> extends Abstra
 	}
 
 	private void putDefPortParams(Map<String, Object> props, int port, SocketType sock) {
-		log.config("Generating defaults for port: " + port);
+		log.log(Level.CONFIG, "Generating defaults for port: {0}", port);
 		props.put(PROP_KEY + port + "/" + PORT_TYPE_PROP_KEY, ConnectionType.accept);
 		props.put(PROP_KEY + port + "/" + PORT_SOCKET_PROP_KEY, sock);
 		props.put(PROP_KEY + port + "/" + PORT_IFC_PROP_KEY, PORT_IFC_PROP_VAL);
