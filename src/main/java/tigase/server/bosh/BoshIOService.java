@@ -127,7 +127,8 @@ public class BoshIOService extends XMPPIOService<Object> {
 		sb.append("Access-Control-Allow-Methods: GET, POST, OPTIONS" + EOL);
 		sb.append("Access-Control-Allow-Headers: Content-Type" + EOL);
 		sb.append("Access-Control-Max-Age: 86400" + EOL);
-		sb.append("X-error-code").append(code).append(EOL);
+
+//  sb.append("X-error-code").append(code).append(EOL);
 		sb.append(CONNECTION + "close" + EOL);
 		sb.append(SERVER).append(EOL);
 		sb.append(EOL);
