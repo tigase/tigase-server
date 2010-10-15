@@ -60,11 +60,11 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 	//~--- fields ---------------------------------------------------------------
 
 	// private Set<String> cluster_nodes = new ConcurrentSkipListSet<String>();
-	private List<JID> cl_nodes_list = new CopyOnWriteArrayList<JID>();
-
-	// private String smName = null;
+	private CopyOnWriteArrayList<JID> cl_nodes_list = new CopyOnWriteArrayList<JID>();
 
 	//~--- methods --------------------------------------------------------------
+
+	// private String smName = null;
 
 	/**
 	 * Method description
@@ -128,8 +128,13 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 	 */
 	@Override
 	public List<JID> getNodesForJid(JID jid) {
-		Collections.rotate(cl_nodes_list, 1);
 
+		// The code below, actually causes problems if there is a high traffic and
+		// disconnects/reconnects occur between nodes. There is a race condition problem.
+		// Adding a synchronization might be a solution but also a big performance problem.
+		// Most of small systems have 2 cluster nodes anyway, so the code below is useless.
+		// For bigger installation I recommend a different clustering strategy anyway.
+		// Collections.rotate(cl_nodes_list, 1);
 		return cl_nodes_list;
 	}
 
@@ -174,8 +179,9 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 	 */
 	@Override
 	public void nodeConnected(JID jid) {
-		cl_nodes_list.add(jid);
-		log.log(Level.FINE, "Cluster nodes: {0}", cl_nodes_list.toString());
+		boolean result = cl_nodes_list.addIfAbsent(jid);
+
+		log.log(Level.FINE, "Cluster nodes: {0}, added: {1}", new Object[] { cl_nodes_list, result });
 	}
 
 	/**
@@ -186,8 +192,9 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 	 */
 	@Override
 	public void nodeDisconnected(JID jid) {
-		cl_nodes_list.remove(jid);
-		log.log(Level.FINE, "Cluster nodes: {0}", cl_nodes_list.toString());
+		boolean result = cl_nodes_list.remove(jid);
+
+		log.log(Level.FINE, "Cluster nodes: {0}, removed: {1}", new Object[] { cl_nodes_list, result });
 	}
 
 	//~--- set methods ----------------------------------------------------------
