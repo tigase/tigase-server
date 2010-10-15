@@ -144,7 +144,12 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 	 * @return
 	 */
 	public boolean canCallCommand(JID jid, String commandId) {
-		boolean result = false;
+		boolean result = isAdmin(jid);
+
+		if (result) {
+			return true;
+		}
+
 		EnumSet<CmdAcl> acl = commandsACL.get(ALL_PROP_KEY);
 
 		if (acl != null) {
@@ -154,9 +159,7 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 		if ( !result) {
 			acl = commandsACL.get(commandId);
 
-			if (acl == null) {
-				result = isAdmin(jid);
-			} else {
+			if (acl != null) {
 				result = checkCommandAcl(jid, acl);
 			}
 		}
@@ -404,7 +407,7 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 					result = new LinkedList<Element>();
 
 					for (CommandIfc comm : scriptCommands.values()) {
-						if ( !comm.isAdminOnly()) {
+						if ( !comm.isAdminOnly() || isAdminFrom) {
 							result.add(new Element("item", new String[] { "node", "name", "jid" },
 									new String[] { comm.getCommandId(),
 									comm.getDescription(), jid.toString() }));
