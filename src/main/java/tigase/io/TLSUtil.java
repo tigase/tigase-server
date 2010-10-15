@@ -19,15 +19,25 @@
  * Last modified by $Author$
  * $Date$
  */
+
 package tigase.io;
 
-import java.util.Map;
-import java.util.HashMap;
-import javax.net.ssl.SSLContext;
-import java.util.logging.Logger;
-import java.util.logging.Level;
+//~--- non-JDK imports --------------------------------------------------------
 
 import static tigase.io.SSLContextContainerIfc.*;
+
+//~--- JDK imports ------------------------------------------------------------
+
+import java.security.cert.CertificateParsingException;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.net.ssl.SSLContext;
+
+//~--- classes ----------------------------------------------------------------
 
 /**
  * Describe class TLSUtil here.
@@ -39,42 +49,66 @@ import static tigase.io.SSLContextContainerIfc.*;
  * @version $Rev$
  */
 public abstract class TLSUtil {
+	private static final Logger log = Logger.getLogger(TLSUtil.class.getName());
 
-  private static final Logger log = Logger.getLogger("tigase.io.TLSUtil");
+//private static Map<String, SSLContextContainerIfc> sslContexts =
+//  new HashMap<String, SSLContextContainerIfc>();
+	private static SSLContextContainerIfc sslContextContainer = null;
 
-	private static Map<String, SSLContextContainerIfc> sslContexts =
-		new HashMap<String, SSLContextContainerIfc>();
+	//~--- methods --------------------------------------------------------------
 
-  public static void configureSSLContext(String id, Map<String, String> params) {
-		String sslCC_class = params.get(SSL_CONTAINER_CLASS_KEY);
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param params
+	 *
+	 * @throws CertificateParsingException
+	 */
+	public static void addCertificate(Map<String, String> params) throws CertificateParsingException {
+		sslContextContainer.addCertificates(params);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param params
+	 */
+	public static void configureSSLContext(Map<String, Object> params) {
+		String sslCC_class = (String) params.get(SSL_CONTAINER_CLASS_KEY);
+
 		if (sslCC_class == null) {
 			sslCC_class = SSL_CONTAINER_CLASS_VAL;
 		}
+
 		try {
-			SSLContextContainerIfc sslCC =
-				(SSLContextContainerIfc)Class.forName(sslCC_class).newInstance();
-			sslCC.init(params);
-			sslContexts.put(id, sslCC);
+			sslContextContainer = (SSLContextContainerIfc) Class.forName(sslCC_class).newInstance();
+			sslContextContainer.init(params);
 		} catch (Exception e) {
 			log.log(Level.SEVERE, "Can not initialize SSL Container: " + sslCC_class, e);
+			sslContextContainer = null;
 		}
-  }
-
-//   public static void configureSSLContext(String id,
-// 		String k_store, String k_passwd, String def_cert_alias) {
-// 		SSLContextContainer sslCC =
-// 			new SSLContextContainer(k_store, k_passwd, def_cert_alias);
-// 		sslContexts.put(id, sslCC);
-// 	}
-
-//   public static void configureSSLContext(String id) {
-// 		SSLContextContainer sslCC =	new SSLContextContainer();
-// 		sslContexts.put(id, sslCC);
-// 	}
-
-	public static SSLContext getSSLContext(String id, String protocol,
-		String hostname) {
-		return sslContexts.get(id).getSSLContext(protocol, hostname);
 	}
 
-} // TLSUtil
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param protocol
+	 * @param hostname
+	 *
+	 * @return
+	 */
+	public static SSLContext getSSLContext(String protocol, String hostname) {
+		return sslContextContainer.getSSLContext(protocol, hostname);
+	}
+}    // TLSUtil
+
+
+//~ Formatted in Sun Code Convention
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

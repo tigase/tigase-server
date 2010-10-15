@@ -26,19 +26,21 @@ package tigase.conf;
 
 import tigase.db.AuthRepository;
 import tigase.db.AuthRepositoryMDImpl;
-import tigase.db.AuthRepositoryPool;
 import tigase.db.DBInitException;
 import tigase.db.RepositoryFactory;
 import tigase.db.TigaseDBException;
 import tigase.db.UserRepository;
 import tigase.db.UserRepositoryMDImpl;
-import tigase.db.UserRepositoryPool;
 import tigase.db.comp.ComponentRepository;
+
+import tigase.io.TLSUtil;
 
 import tigase.server.AbstractComponentRegistrator;
 import tigase.server.ServerComponent;
 
 import tigase.xmpp.BareJID;
+
+import static tigase.io.SSLContextContainerIfc.*;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -363,6 +365,26 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 					auth_repo_domains.toArray(new String[auth_repo_domains.size()]));
 		}
 
+		// TLS/SSL configuration
+		if (params.get("--" + SSL_CONTAINER_CLASS_KEY) != null) {
+			defaults.put(SSL_CONTAINER_CLASS_KEY, (String) params.get("--" + SSL_CONTAINER_CLASS_KEY));
+		} else {
+			defaults.put(SSL_CONTAINER_CLASS_KEY, SSL_CONTAINER_CLASS_VAL);
+		}
+
+		if (params.get("--" + SERVER_CERTS_LOCATION_KEY) != null) {
+			defaults.put(SERVER_CERTS_LOCATION_KEY,
+					(String) params.get("--" + SERVER_CERTS_LOCATION_KEY));
+		} else {
+			defaults.put(SERVER_CERTS_LOCATION_KEY, SERVER_CERTS_LOCATION_VAL);
+		}
+
+		if (params.get("--" + DEFAULT_DOMAIN_CERT_KEY) != null) {
+			defaults.put(DEFAULT_DOMAIN_CERT_KEY, (String) params.get("--" + DEFAULT_DOMAIN_CERT_KEY));
+		} else {
+			defaults.put(DEFAULT_DOMAIN_CERT_KEY, DEFAULT_DOMAIN_CERT_VAL);
+		}
+
 		// Setup tracer, this is a temporarily code...
 //  String ips = (String)params.get(TigaseTracer.TRACER_IPS_PROP_KEY);
 //  if (ips != null) {
@@ -623,6 +645,7 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
 		setupLogManager(props);
+		TLSUtil.configureSSLContext(props);
 
 		int repo_pool_size = 1;
 

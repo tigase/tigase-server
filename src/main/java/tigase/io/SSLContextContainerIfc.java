@@ -1,4 +1,5 @@
-/*  Tigase Jabber/XMPP Server
+/*
+ *   Tigase Jabber/XMPP Server
  *  Copyright (C) 2004-2008 "Artur Hefczyc" <artur.hefczyc@tigase.org>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,11 +19,20 @@
  * Last modified by $Author$
  * $Date$
  */
+
 package tigase.io;
 
+//~--- JDK imports ------------------------------------------------------------
+
 import java.io.File;
+
+import java.security.cert.CertificateParsingException;
+
 import java.util.Map;
+
 import javax.net.ssl.SSLContext;
+
+//~--- interfaces -------------------------------------------------------------
 
 /**
  * Describe interface SSLContextContainerIfc here.
@@ -43,59 +53,69 @@ public interface SSLContextContainerIfc {
 	 * refer to the implementation for more details.
 	 */
 	public static final String SSL_CONTAINER_CLASS_KEY = "ssl-container-class";
+
 	/**
 	 * Constant <code>SSL_CONTAINER_CLASS_VAL</code> keeps default container
 	 * implementation class loaded if none is specified in configuration file.
 	 */
-	public static final String SSL_CONTAINER_CLASS_VAL =
-		"tigase.io.SSLContextContainer";
+	public static final String SSL_CONTAINER_CLASS_VAL = "tigase.io.SSLContextContainer";
+
+	/** Field description */
+	public static final String PEM_CERTIFICATE_KEY = "pem-certficate";
 
 	/**
 	 * Constant <code>DEFAULT_DOMAIN_CERT_KEY</code> is a key pointing to the domain
 	 * with default certificate.
 	 */
-	public static final String DEFAULT_DOMAIN_CERT_KEY = "def-cert-alias";
+	public static final String DEFAULT_DOMAIN_CERT_KEY = "ssl-def-cert-domain";
+
 	/**
 	 * Constant <code>DEFAULT_DOMAIN_CERT_VAL</code> keeps default value for a
 	 * domain with default certificate.
 	 */
 	public static final String DEFAULT_DOMAIN_CERT_VAL = "default";
+
 	/**
 	 * Constant <code>JKS_KEYSTORE_FILE_KEY</code> is a key pointing to a JKS
 	 * keystore file.
 	 */
 	public static final String JKS_KEYSTORE_FILE_KEY = "keys-store";
+
 	/**
 	 * Constant <code>JKS_KEYSTORE_FILE_VAL</code> keeps default value for a
 	 * JKS keystore file.
 	 */
-	public static final String JKS_KEYSTORE_FILE_VAL =
-		"certs" + File.separator + "rsa-keystore";
+	public static final String JKS_KEYSTORE_FILE_VAL = "certs" + File.separator + "rsa-keystore";
+
 	/**
 	 * Constant <code>JKS_KEYSTORE_PWD_KEY</code> is a key pointing to a private
 	 * key password,
 	 */
 	public static final String JKS_KEYSTORE_PWD_KEY = "keys-store-password";
+
 	/**
 	 * Constant <code>JKS_KEYSTORE_PWD_VAL</code> is a default private key
 	 * password.
 	 */
 	public static final String JKS_KEYSTORE_PWD_VAL = "keystore";
+
 	/**
 	 * Constant <code>TRUSTSTORE_FILE_KEY</code> is a key pointing to a trust
 	 * store file.
 	 */
 	public static final String TRUSTSTORE_FILE_KEY = "trusts-store";
+
 	/**
 	 * Constant <code>TRUSTSTORE_FILE_VAL</code> is a default truststore file.
 	 */
-	public static final String TRUSTSTORE_FILE_VAL =
-		"certs" + File.separator + "truststore";
+	public static final String TRUSTSTORE_FILE_VAL = "certs" + File.separator + "truststore";
+
 	/**
 	 * Constant <code>TRUSTSTORE_PWD_KEY</code> is a key pointing to a trustore
 	 * file password.
 	 */
 	public static final String TRUSTSTORE_PWD_KEY = "trusts-store-password";
+
 	/**
 	 * Constant <code>TRUSTSTORE_PWD_VAL</code> is a default password for truststore
 	 * file.
@@ -112,18 +132,21 @@ public interface SSLContextContainerIfc {
 	 * stores a certificate which is a default certificate for the server if
 	 * certificate for specific domain is missing.
 	 */
-	public static final String SERVER_CERTS_DIR_KEY = "server-certs-dir";
+	public static final String SERVER_CERTS_LOCATION_KEY = "ssl-certs-location";
+
 	/**
 	 * Constant <code>SERVER_CERTS_DIR_VAL</code> is a default directory name
 	 * where all certificate files are stored.
 	 *
 	 */
-	public static final String SERVER_CERTS_DIR_VAL = "certs/";
+	public static final String SERVER_CERTS_LOCATION_VAL = "certs/";
+
 	/**
 	 * Constant <code>TRUSTED_CERTS_DIR_KEY</code> is a key pointing to a configuration
 	 * parameter where all trusted certificates are stored.
 	 */
 	public static final String TRUSTED_CERTS_DIR_KEY = "trusted-certs-dir";
+
 	/**
 	 * Constant <code>TRUSTED_CERTS_DIR_VAL</code> is a default directory name
 	 * where all trusted certificates are stored.
@@ -136,11 +159,13 @@ public interface SSLContextContainerIfc {
 	 * acceptable for the server.
 	 */
 	public static final String ALLOW_SELF_SIGNED_CERTS_KEY = "allow-self-signed-certs";
+
 	/**
 	 * Constant <code>ALLOW_SELF_SIGNED_CERTS_VAL</code> is a default configuration
 	 * value specifying if self-signed certificates are allowed by the server.
 	 */
 	public static final String ALLOW_SELF_SIGNED_CERTS_VAL = "true";
+
 	/**
 	 * Constant <code>ALLOW_INVALID_CERTS_KEY</code> is a key pointing to a
 	 * configuration parameters specyfying if invalid certificates are acceptable
@@ -150,12 +175,30 @@ public interface SSLContextContainerIfc {
 	 * and can be set ot <code>true</code> in development invironment.
 	 */
 	public static final String ALLOW_INVALID_CERTS_KEY = "allow-invalid-certs";
+
 	/**
 	 * Constant <code>ALLOW_INVALID_CERTS_VAL</code> is a default configuration
 	 * parameter specifying if invalid certificates are acceptable by the server.
 	 *
 	 */
 	public static final String ALLOW_INVALID_CERTS_VAL = "false";
+
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method <code>addCertificates</code> allows to add more certificates at run
+	 * time after the container has bee already initialized. This is to avoid server
+	 * restart if there are certificates updates or new certificates for new virtual
+	 * domain.
+	 * The method should add new certificates or replace existing one if there
+	 * is already a certificate for a domain.
+	 *
+	 * @param params a <code>Map</code> value with configuration parameters.
+	 * @throws CertificateParsingException
+	 */
+	void addCertificates(Map<String, String> params) throws CertificateParsingException;
+
+	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method <code>getSSLContext</code> creates and returns new SSLContext for
@@ -171,6 +214,8 @@ public interface SSLContextContainerIfc {
 	 */
 	SSLContext getSSLContext(String protocol, String hostname);
 
+	//~--- methods --------------------------------------------------------------
+
 	/**
 	 * Method <code>init</code> method initializes the container. If the container
 	 * has been already initialized then it should clear all the data and
@@ -184,18 +229,11 @@ public interface SSLContextContainerIfc {
 	 *
 	 * @param params a <code>Map</code> value
 	 */
-	void init(Map<String, String> params);
-
-	/**
-	 * Method <code>addCertificates</code> allows to add more certificates at run
-	 * time after the container has bee already initialized. This is to avoid server
-	 * restart if there are certificates updates or new certificates for new virtual
-	 * domain.
-	 * The method should add new certificates or replace existing one if there
-	 * is already a certificate for a domain.
-	 *
-	 * @param params a <code>Map</code> value with configuration parameters.
-	 */
-	void addCertificates(Map<String, String> params);
-
+	void init(Map<String, Object> params);
 }
+
+
+//~ Formatted in Sun Code Convention
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

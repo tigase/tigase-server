@@ -44,8 +44,6 @@ import tigase.xmpp.JID;
 import tigase.xmpp.XMPPIOService;
 import tigase.xmpp.XMPPIOServiceListener;
 
-import static tigase.io.SSLContextContainerIfc.*;
-
 //~--- JDK imports ------------------------------------------------------------
 
 import java.io.IOException;
@@ -104,32 +102,33 @@ public abstract class ConnectionManager<IO extends XMPPIOService> extends Abstra
 	protected static final boolean TLS_USE_PROP_VAL = true;
 	protected static final String TLS_REQUIRED_PROP_KEY = TLS_PROP_KEY + "required";
 	protected static final boolean TLS_REQUIRED_PROP_VAL = false;
-	protected static final String TLS_KEYS_STORE_PROP_KEY = TLS_PROP_KEY + JKS_KEYSTORE_FILE_KEY;
-	protected static final String TLS_KEYS_STORE_PROP_VAL = JKS_KEYSTORE_FILE_VAL;
-	protected static final String TLS_DEF_CERT_PROP_KEY = TLS_PROP_KEY + DEFAULT_DOMAIN_CERT_KEY;
-	protected static final String TLS_DEF_CERT_PROP_VAL = DEFAULT_DOMAIN_CERT_VAL;
-	protected static final String TLS_KEYS_STORE_PASSWD_PROP_KEY = TLS_PROP_KEY
-		+ JKS_KEYSTORE_PWD_KEY;
-	protected static final String TLS_KEYS_STORE_PASSWD_PROP_VAL = JKS_KEYSTORE_PWD_VAL;
-	protected static final String TLS_TRUSTS_STORE_PASSWD_PROP_KEY = TLS_PROP_KEY
-		+ TRUSTSTORE_PWD_KEY;
-	protected static final String TLS_TRUSTS_STORE_PASSWD_PROP_VAL = TRUSTSTORE_PWD_VAL;
-	protected static final String TLS_TRUSTS_STORE_PROP_KEY = TLS_PROP_KEY + TRUSTSTORE_FILE_KEY;
-	protected static final String TLS_TRUSTS_STORE_PROP_VAL = TRUSTSTORE_FILE_VAL;
-	protected static final String TLS_CONTAINER_CLASS_PROP_KEY = TLS_PROP_KEY
-		+ SSL_CONTAINER_CLASS_KEY;
-	protected static final String TLS_CONTAINER_CLASS_PROP_VAL = SSL_CONTAINER_CLASS_VAL;
-	protected static final String TLS_SERVER_CERTS_DIR_PROP_KEY = TLS_PROP_KEY + SERVER_CERTS_DIR_KEY;
-	protected static final String TLS_SERVER_CERTS_DIR_PROP_VAL = SERVER_CERTS_DIR_VAL;
-	protected static final String TLS_TRUSTED_CERTS_DIR_PROP_KEY = TLS_PROP_KEY
-		+ TRUSTED_CERTS_DIR_KEY;
-	protected static final String TLS_TRUSTED_CERTS_DIR_PROP_VAL = TRUSTED_CERTS_DIR_VAL;
-	protected static final String TLS_ALLOW_SELF_SIGNED_CERTS_PROP_KEY = TLS_PROP_KEY
-		+ ALLOW_SELF_SIGNED_CERTS_KEY;
-	protected static final String TLS_ALLOW_SELF_SIGNED_CERTS_PROP_VAL = ALLOW_SELF_SIGNED_CERTS_VAL;
-	protected static final String TLS_ALLOW_INVALID_CERTS_PROP_KEY = TLS_PROP_KEY
-		+ ALLOW_INVALID_CERTS_KEY;
-	protected static final String TLS_ALLOW_INVALID_CERTS_PROP_VAL = ALLOW_INVALID_CERTS_VAL;
+
+//protected static final String TLS_KEYS_STORE_PROP_KEY = TLS_PROP_KEY + JKS_KEYSTORE_FILE_KEY;
+//protected static final String TLS_KEYS_STORE_PROP_VAL = JKS_KEYSTORE_FILE_VAL;
+//protected static final String TLS_DEF_CERT_PROP_KEY = TLS_PROP_KEY + DEFAULT_DOMAIN_CERT_KEY;
+//protected static final String TLS_DEF_CERT_PROP_VAL = DEFAULT_DOMAIN_CERT_VAL;
+//protected static final String TLS_KEYS_STORE_PASSWD_PROP_KEY = TLS_PROP_KEY
+//  + JKS_KEYSTORE_PWD_KEY;
+//protected static final String TLS_KEYS_STORE_PASSWD_PROP_VAL = JKS_KEYSTORE_PWD_VAL;
+//protected static final String TLS_TRUSTS_STORE_PASSWD_PROP_KEY = TLS_PROP_KEY
+//  + TRUSTSTORE_PWD_KEY;
+//protected static final String TLS_TRUSTS_STORE_PASSWD_PROP_VAL = TRUSTSTORE_PWD_VAL;
+//protected static final String TLS_TRUSTS_STORE_PROP_KEY = TLS_PROP_KEY + TRUSTSTORE_FILE_KEY;
+//protected static final String TLS_TRUSTS_STORE_PROP_VAL = TRUSTSTORE_FILE_VAL;
+//protected static final String TLS_CONTAINER_CLASS_PROP_KEY = TLS_PROP_KEY
+//  + SSL_CONTAINER_CLASS_KEY;
+//protected static final String TLS_CONTAINER_CLASS_PROP_VAL = SSL_CONTAINER_CLASS_VAL;
+//protected static final String TLS_SERVER_CERTS_DIR_PROP_KEY = TLS_PROP_KEY + SERVER_CERTS_DIR_KEY;
+//protected static final String TLS_SERVER_CERTS_DIR_PROP_VAL = SERVER_CERTS_DIR_VAL;
+//protected static final String TLS_TRUSTED_CERTS_DIR_PROP_KEY = TLS_PROP_KEY
+//  + TRUSTED_CERTS_DIR_KEY;
+//protected static final String TLS_TRUSTED_CERTS_DIR_PROP_VAL = TRUSTED_CERTS_DIR_VAL;
+//protected static final String TLS_ALLOW_SELF_SIGNED_CERTS_PROP_KEY = TLS_PROP_KEY
+//  + ALLOW_SELF_SIGNED_CERTS_KEY;
+//protected static final String TLS_ALLOW_SELF_SIGNED_CERTS_PROP_VAL = ALLOW_SELF_SIGNED_CERTS_VAL;
+//protected static final String TLS_ALLOW_INVALID_CERTS_PROP_KEY = TLS_PROP_KEY
+//  + ALLOW_INVALID_CERTS_KEY;
+//protected static final String TLS_ALLOW_INVALID_CERTS_PROP_VAL = ALLOW_INVALID_CERTS_VAL;
 	protected static final String MAX_RECONNECTS_PROP_KEY = "max-reconnects";
 	protected static final String NET_BUFFER_PROP_KEY = "net-buffer";
 	protected static final int NET_BUFFER_ST_PROP_VAL = 2 * 1024;
@@ -203,21 +202,22 @@ public abstract class ConnectionManager<IO extends XMPPIOService> extends Abstra
 		Map<String, Object> props = super.getDefaults(params);
 
 		props.put(TLS_USE_PROP_KEY, TLS_USE_PROP_VAL);
-		props.put(TLS_DEF_CERT_PROP_KEY, TLS_DEF_CERT_PROP_VAL);
-		props.put(TLS_KEYS_STORE_PROP_KEY, TLS_KEYS_STORE_PROP_VAL);
-		props.put(TLS_KEYS_STORE_PASSWD_PROP_KEY, TLS_KEYS_STORE_PASSWD_PROP_VAL);
-		props.put(TLS_TRUSTS_STORE_PROP_KEY, TLS_TRUSTS_STORE_PROP_VAL);
-		props.put(TLS_TRUSTS_STORE_PASSWD_PROP_KEY, TLS_TRUSTS_STORE_PASSWD_PROP_VAL);
-		props.put(TLS_SERVER_CERTS_DIR_PROP_KEY, TLS_SERVER_CERTS_DIR_PROP_VAL);
-		props.put(TLS_TRUSTED_CERTS_DIR_PROP_KEY, TLS_TRUSTED_CERTS_DIR_PROP_VAL);
-		props.put(TLS_ALLOW_SELF_SIGNED_CERTS_PROP_KEY, TLS_ALLOW_SELF_SIGNED_CERTS_PROP_VAL);
-		props.put(TLS_ALLOW_INVALID_CERTS_PROP_KEY, TLS_ALLOW_INVALID_CERTS_PROP_VAL);
 
-		if (params.get("--" + SSL_CONTAINER_CLASS_KEY) != null) {
-			props.put(TLS_CONTAINER_CLASS_PROP_KEY, (String) params.get("--" + SSL_CONTAINER_CLASS_KEY));
-		} else {
-			props.put(TLS_CONTAINER_CLASS_PROP_KEY, TLS_CONTAINER_CLASS_PROP_VAL);
-		}
+//  props.put(TLS_DEF_CERT_PROP_KEY, TLS_DEF_CERT_PROP_VAL);
+//  props.put(TLS_KEYS_STORE_PROP_KEY, TLS_KEYS_STORE_PROP_VAL);
+//  props.put(TLS_KEYS_STORE_PASSWD_PROP_KEY, TLS_KEYS_STORE_PASSWD_PROP_VAL);
+//  props.put(TLS_TRUSTS_STORE_PROP_KEY, TLS_TRUSTS_STORE_PROP_VAL);
+//  props.put(TLS_TRUSTS_STORE_PASSWD_PROP_KEY, TLS_TRUSTS_STORE_PASSWD_PROP_VAL);
+//  props.put(TLS_SERVER_CERTS_DIR_PROP_KEY, TLS_SERVER_CERTS_DIR_PROP_VAL);
+//  props.put(TLS_TRUSTED_CERTS_DIR_PROP_KEY, TLS_TRUSTED_CERTS_DIR_PROP_VAL);
+//  props.put(TLS_ALLOW_SELF_SIGNED_CERTS_PROP_KEY, TLS_ALLOW_SELF_SIGNED_CERTS_PROP_VAL);
+//  props.put(TLS_ALLOW_INVALID_CERTS_PROP_KEY, TLS_ALLOW_INVALID_CERTS_PROP_VAL);
+//
+//  if (params.get("--" + SSL_CONTAINER_CLASS_KEY) != null) {
+//    props.put(TLS_CONTAINER_CLASS_PROP_KEY, (String) params.get("--" + SSL_CONTAINER_CLASS_KEY));
+//  } else {
+//    props.put(TLS_CONTAINER_CLASS_PROP_KEY, TLS_CONTAINER_CLASS_PROP_VAL);
+//  }
 
 		int buffSize = NET_BUFFER_ST_PROP_VAL;
 
@@ -566,18 +566,18 @@ public abstract class ConnectionManager<IO extends XMPPIOService> extends Abstra
 		if ((Boolean) props.get(TLS_USE_PROP_KEY)) {
 			Map<String, String> tls_params = new LinkedHashMap<String, String>(20);
 
-			tls_params.put(SSL_CONTAINER_CLASS_KEY, (String) props.get(TLS_CONTAINER_CLASS_PROP_KEY));
-			tls_params.put(DEFAULT_DOMAIN_CERT_KEY, (String) props.get(TLS_DEF_CERT_PROP_KEY));
-			tls_params.put(JKS_KEYSTORE_FILE_KEY, (String) props.get(TLS_KEYS_STORE_PROP_KEY));
-			tls_params.put(JKS_KEYSTORE_PWD_KEY, (String) props.get(TLS_KEYS_STORE_PASSWD_PROP_KEY));
-			tls_params.put(TRUSTSTORE_FILE_KEY, (String) props.get(TLS_TRUSTS_STORE_PROP_KEY));
-			tls_params.put(TRUSTSTORE_PWD_KEY, (String) props.get(TLS_TRUSTS_STORE_PASSWD_PROP_KEY));
-			tls_params.put(SERVER_CERTS_DIR_KEY, (String) props.get(TLS_SERVER_CERTS_DIR_PROP_KEY));
-			tls_params.put(TRUSTED_CERTS_DIR_KEY, (String) props.get(TLS_TRUSTED_CERTS_DIR_PROP_KEY));
-			tls_params.put(ALLOW_SELF_SIGNED_CERTS_KEY,
-					(String) props.get(TLS_ALLOW_SELF_SIGNED_CERTS_PROP_KEY));
-			tls_params.put(ALLOW_INVALID_CERTS_KEY, (String) props.get(TLS_ALLOW_INVALID_CERTS_PROP_KEY));
-			TLSUtil.configureSSLContext(getName(), tls_params);
+//    tls_params.put(SSL_CONTAINER_CLASS_KEY, (String) props.get(TLS_CONTAINER_CLASS_PROP_KEY));
+//    tls_params.put(DEFAULT_DOMAIN_CERT_KEY, (String) props.get(TLS_DEF_CERT_PROP_KEY));
+//    tls_params.put(JKS_KEYSTORE_FILE_KEY, (String) props.get(TLS_KEYS_STORE_PROP_KEY));
+//    tls_params.put(JKS_KEYSTORE_PWD_KEY, (String) props.get(TLS_KEYS_STORE_PASSWD_PROP_KEY));
+//    tls_params.put(TRUSTSTORE_FILE_KEY, (String) props.get(TLS_TRUSTS_STORE_PROP_KEY));
+//    tls_params.put(TRUSTSTORE_PWD_KEY, (String) props.get(TLS_TRUSTS_STORE_PASSWD_PROP_KEY));
+//    tls_params.put(SERVER_CERTS_DIR_KEY, (String) props.get(TLS_SERVER_CERTS_DIR_PROP_KEY));
+//    tls_params.put(TRUSTED_CERTS_DIR_KEY, (String) props.get(TLS_TRUSTED_CERTS_DIR_PROP_KEY));
+//    tls_params.put(ALLOW_SELF_SIGNED_CERTS_KEY,
+//        (String) props.get(TLS_ALLOW_SELF_SIGNED_CERTS_PROP_KEY));
+//    tls_params.put(ALLOW_INVALID_CERTS_KEY, (String) props.get(TLS_ALLOW_INVALID_CERTS_PROP_KEY));
+//    TLSUtil.configureSSLContext(getName(), tls_params);
 		}    // end of if (use.equalsIgnoreCase())
 	}
 
@@ -930,7 +930,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService> extends Abstra
 		public void accept(SocketChannel sc) {
 			IO serv = getXMPPIOServiceInstance();
 
-			serv.setSSLId(getName());
+			// serv.setSSLId(getName());
 			serv.setIOServiceListener(ConnectionManager.this);
 			serv.setSessionData(port_props);
 

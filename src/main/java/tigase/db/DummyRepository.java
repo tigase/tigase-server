@@ -45,7 +45,7 @@ import java.util.Map;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class DummyRepository implements UserRepository {
+public class DummyRepository implements UserRepository, AuthRepository {
 
 	/**
 	 * Describe <code>addDataList</code> method here.
@@ -71,6 +71,41 @@ public class DummyRepository implements UserRepository {
 	 */
 	@Override
 	public void addUser(BareJID user) {}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param user
+	 * @param password
+	 *
+	 * @throws TigaseDBException
+	 * @throws UserExistsException
+	 */
+	@Override
+	public void addUser(BareJID user, String password)
+			throws UserExistsException, TigaseDBException {}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param user
+	 * @param digest
+	 * @param id
+	 * @param alg
+	 *
+	 * @return
+	 *
+	 * @throws AuthorizationException
+	 * @throws TigaseDBException
+	 * @throws UserNotFoundException
+	 */
+	@Override
+	public boolean digestAuth(BareJID user, String digest, String id, String alg)
+			throws UserNotFoundException, TigaseDBException, AuthorizationException {
+		return false;
+	}
 
 	//~--- get methods ----------------------------------------------------------
 
@@ -267,6 +302,64 @@ public class DummyRepository implements UserRepository {
 	public void initRepository(String string, Map<String, String> params) {}
 
 	/**
+	 * Method description
+	 *
+	 *
+	 * @param user
+	 *
+	 * @throws TigaseDBException
+	 * @throws UserNotFoundException
+	 */
+	@Override
+	public void logout(BareJID user) throws UserNotFoundException, TigaseDBException {}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param authProps
+	 *
+	 * @return
+	 *
+	 * @throws AuthorizationException
+	 * @throws TigaseDBException
+	 * @throws UserNotFoundException
+	 */
+	@Override
+	public boolean otherAuth(Map<String, Object> authProps)
+			throws UserNotFoundException, TigaseDBException, AuthorizationException {
+		return false;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param user
+	 * @param password
+	 *
+	 * @return
+	 *
+	 * @throws AuthorizationException
+	 * @throws TigaseDBException
+	 * @throws UserNotFoundException
+	 */
+	@Override
+	public boolean plainAuth(BareJID user, String password)
+			throws UserNotFoundException, TigaseDBException, AuthorizationException {
+		return false;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param authProps
+	 */
+	@Override
+	public void queryAuth(Map<String, Object> authProps) {}
+
+	/**
 	 * Describe <code>removeData</code> method here.
 	 *
 	 * @param user a <code>String</code> value of user ID for which data must be
@@ -357,6 +450,20 @@ public class DummyRepository implements UserRepository {
 	public void setDataList(BareJID user, String subnode, String key, String[] list) {}
 
 	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param user
+	 * @param password
+	 *
+	 * @throws TigaseDBException
+	 * @throws UserNotFoundException
+	 */
+	@Override
+	public void updatePassword(BareJID user, String password)
+			throws UserNotFoundException, TigaseDBException {}
 
 	/**
 	 * Method description

@@ -34,8 +34,6 @@ import tigase.io.ZLibIO;
 
 import tigase.stats.StatisticsList;
 
-import tigase.util.TimeUtils;
-
 import tigase.xmpp.JID;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -67,10 +65,10 @@ import java.util.logging.Logger;
  * <code>call()</code> method execution, however you must be prepared that other
  * methods can be called simultanously like <code>stop()</code>,
  * <code>getProtocol()</code> or <code>isConnected()</code>.
- * <br/>It is recomended that developers extend <code>AbsractServerService</code>
+ * <br/>It is recommended that developers extend <code>AbsractServerService</code>
  * rather then implement <code>ServerService</code> interface directly.
  * <p>If you directly implement <code>ServerService</code> interface you must
- * take care about <code>SocketChannel</code> I/O, queueing tasks, processing
+ * take care about <code>SocketChannel</code> I/O, queuing tasks, processing
  * results and thread safe execution of <code>call()</code> method. If you
  * however extend <code>IOService</code> class all this basic
  * operation are implemented and you have only to take care about parsing data
@@ -80,7 +78,7 @@ import java.util.logging.Logger;
  * <p>
  * Created: Tue Sep 28 23:00:34 2004
  * </p>
- * @param <RefObject> is a refrence object stored by this service. This is e reference
+ * @param <RefObject> is a reference object stored by this service. This is e reference
  * to higher level data object keeping more information about the connection.
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
@@ -112,10 +110,8 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 	private JID dataReceiver = null;
 
 	/** Field description */
-	public long empty_read_call_count = 0;
+	private long empty_read_call_count = 0;
 	private String id = null;
-	private int lastMinuteRd = 0;
-	private int lastMinuteWr = 0;
 
 	/**
 	 * This variable keeps the time of last transfer in any direction
@@ -133,7 +129,6 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 	 * <code>socketInput</code> buffer keeps data read from socket.
 	 */
 	private ByteBuffer socketInput = null;
-	private String sslId = null;
 	private boolean stopping = false;
 	private long[] wrData = new long[60];
 	private ConcurrentMap<String, Object> sessionData = new ConcurrentHashMap<String, Object>(4,
@@ -446,16 +441,6 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 	 * Method description
 	 *
 	 *
-	 * @param id
-	 */
-	public void setSSLId(final String id) {
-		sslId = id;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
 	 * @param props
 	 */
 	public void setSessionData(Map<String, Object> props) {
@@ -478,7 +463,7 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 			throw new IllegalStateException("SSL mode is already activated.");
 		}
 
-		TLSWrapper wrapper = new TLSWrapper(TLSUtil.getSSLContext(sslId, "SSL",
+		TLSWrapper wrapper = new TLSWrapper(TLSUtil.getSSLContext("SSL",
 			(String) sessionData.get(HOSTNAME_KEY)), null, clientMode);
 
 		socketIO = new TLSIO(socketIO, wrapper);
@@ -500,7 +485,7 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 			throw new IllegalStateException("TLS mode is already activated.");
 		}
 
-		TLSWrapper wrapper = new TLSWrapper(TLSUtil.getSSLContext(sslId, "TLS",
+		TLSWrapper wrapper = new TLSWrapper(TLSUtil.getSSLContext("TLS",
 			(String) sessionData.get(HOSTNAME_KEY)), null, clientMode);
 
 		socketIO = new TLSIO(socketIO, wrapper);
@@ -739,28 +724,6 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 		}
 
 		writeInProgress.decrementAndGet();
-	}
-
-	private void addRead(long read) {
-		int minute = TimeUtils.getMinuteNow();
-
-		if (lastMinuteRd != minute) {
-			lastMinuteRd = minute;
-			rdData[minute] = 0;
-		}
-
-		rdData[minute] += read;
-	}
-
-	private void addWritten(long wrote) {
-		int minute = TimeUtils.getMinuteNow();
-
-		if (lastMinuteWr != minute) {
-			lastMinuteWr = minute;
-			wrData[minute] = 0;
-		}
-
-		wrData[minute] += wrote;
 	}
 
 	private void resizeInputBuffer() throws IOException {
