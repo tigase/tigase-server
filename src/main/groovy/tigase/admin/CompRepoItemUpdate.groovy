@@ -74,13 +74,13 @@ if (itemKey == null) {
 if (marker == null) {
 	def item = repo.getItem(itemKey)
 	if (item == null) {
-		Command.addTextField(result, "Error", "No such item, deletion impossible.");
+		Command.addTextField(result, "Error", "No such item, update impossible.");
 	} else {
 		if (isServiceAdmin || item.isOwner(stanzaFromBare.toString()) || item.isAdmin(stanzaFromBare.toString())) {
 			def result = p.commandResult(Command.DataType.form)
 			item.addCommandFields(result)
 			Command.addHiddenField(result, MARKER, MARKER)
-			Command.addHiddenField(result, ITEMS, ITEMS)
+			Command.addHiddenField(result, ITEMS, itemKey)
 			return result
 		} else {
 			def result = p.commandResult(Command.DataType.result)
