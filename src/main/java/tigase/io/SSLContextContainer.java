@@ -95,15 +95,21 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 	@Override
 	public void addCertificates(Map<String, String> params) throws CertificateParsingException {
 		String pemCert = params.get(PEM_CERTIFICATE_KEY);
+		String saveToDiskVal = params.get(CERT_SAVE_TO_DISK_KEY);
+		boolean saveToDisk = (saveToDiskVal != null) && saveToDiskVal.equalsIgnoreCase("true");
 
 		if (pemCert != null) {
 			try {
 				CertificateEntry entry =
 					CertificateUtil.parseCertificate(new CharArrayReader(pemCert.toCharArray()));
 				X509Certificate cert = (X509Certificate) entry.getCertChain()[0];
-				String alias = getCertAlias(cert, null);
+				String alias = params.get(CERT_ALIAS_KEY);
 
-				addCertificateEntry(entry, alias, true);
+				if (alias == null) {
+					alias = getCertAlias(cert, null);
+				}
+
+				addCertificateEntry(entry, alias, saveToDisk);
 				sslContexts.remove(alias);
 			} catch (Exception ex) {
 				throw new CertificateParsingException("Problem adding a new certificate.", ex);
@@ -231,16 +237,10 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 	//~--- get methods ----------------------------------------------------------
 
 	private String getCertAlias(X509Certificate cert, File file) {
-		X500Principal princ = cert.getSubjectX500Principal();
-		String name = princ.getName();
-		String[] all = name.split(",");
+		String name = CertificateUtil.getCertCName(cert);
 
-		for (String n : all) {
-			String[] ns = n.trim().split("=");
-
-			if (ns[0].equals("CN")) {
-				return ns[1];
-			}
+		if (name != null) {
+			return name;
 		}
 
 		// Cannot get alias from certificate, let's try to get it from file name

@@ -63,6 +63,12 @@ public interface SSLContextContainerIfc {
 	/** Field description */
 	public static final String PEM_CERTIFICATE_KEY = "pem-certficate";
 
+	/** Field description */
+	public static final String CERT_SAVE_TO_DISK_KEY = "cert-save-to-disk";
+
+	/** Field description */
+	public static final String CERT_ALIAS_KEY = "cert-alias";
+
 	/**
 	 * Constant <code>DEFAULT_DOMAIN_CERT_KEY</code> is a key pointing to the domain
 	 * with default certificate.
