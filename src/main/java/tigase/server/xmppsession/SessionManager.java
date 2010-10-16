@@ -1238,6 +1238,12 @@ public class SessionManager extends AbstractMessageReceiver
 	}
 
 	protected boolean processAdminsOrDomains(Packet packet) {
+		if ((packet.getStanzaFrom() == null) && (packet.getPacketFrom() != null)) {
+
+			// The packet, probably did not went through the first state of processing yet.
+			return false;
+		}
+
 		JID to = packet.getStanzaTo();
 
 		if ((to != null) && isLocalDomain(to.toString())) {
