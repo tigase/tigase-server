@@ -29,6 +29,8 @@ import tigase.db.MsgRepositoryIfc;
 import tigase.db.RepositoryFactory;
 import tigase.db.UserNotFoundException;
 
+import tigase.server.Packet;
+
 import tigase.util.Algorithms;
 import tigase.util.SimpleCache;
 
@@ -317,7 +319,8 @@ public class MsgRepository implements MsgRepositoryIfc {
 	public void storeMessage(JID from, JID to, Date expired, Element msg)
 			throws UserNotFoundException {
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "Storring expired: {0} message: {1}", new Object[] { expired, msg });
+			log.log(Level.FINEST, "Storring expired: {0} message: {1}", new Object[] { expired,
+					Packet.elemToString(msg) });
 		}
 
 		try {
