@@ -221,6 +221,7 @@ public class TLSWrapper {
 
 		if (tlsEngineResult.getStatus() == Status.BUFFER_OVERFLOW) {
 			out = resizeApplicationBuffer(net, out);
+			tlsEngineResult = tlsEngine.unwrap(net, out);
 		}
 
 		if (tlsEngineResult.getHandshakeStatus() == HandshakeStatus.NEED_TASK) {
