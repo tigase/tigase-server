@@ -147,8 +147,7 @@ public class TLSWrapper {
 	public TLSStatus getStatus() {
 		TLSStatus status = null;
 
-		if ((tlsEngineResult != null)
-				&& (tlsEngineResult.getStatus() == Status.BUFFER_UNDERFLOW)) {
+		if ((tlsEngineResult != null) && (tlsEngineResult.getStatus() == Status.BUFFER_UNDERFLOW)) {
 			status = TLSStatus.UNDERFLOW;
 
 			// status = TLSStatus.NEED_READ;
@@ -213,12 +212,15 @@ public class TLSWrapper {
 	public ByteBuffer unwrap(ByteBuffer net, ByteBuffer app) throws SSLException {
 		ByteBuffer out = app;
 
-		out = resizeApplicationBuffer(out);
 		tlsEngineResult = tlsEngine.unwrap(net, out);
 
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("unwrap() \ntlsEngineRsult.getStatus() = " + tlsEngineResult.getStatus()
 					+ "\ntlsEngineRsult.getHandshakeStatus() = " + tlsEngineResult.getHandshakeStatus());
+		}
+
+		if (tlsEngineResult.getStatus() == Status.BUFFER_OVERFLOW) {
+			out = resizeApplicationBuffer(net, out);
 		}
 
 		if (tlsEngineResult.getHandshakeStatus() == HandshakeStatus.NEED_TASK) {
@@ -269,19 +271,32 @@ public class TLSWrapper {
 	/**
 	 * Method <code>resizeApplicationBuffer</code> is used to perform
 	 */
-	private ByteBuffer resizeApplicationBuffer(ByteBuffer app) {
-		if (app.remaining() < appBuffSize) {
-			ByteBuffer bb = ByteBuffer.allocate(app.capacity() + appBuffSize);
+	private ByteBuffer resizeApplicationBuffer(ByteBuffer net, ByteBuffer app) {
 
-			// bb.clear();
-			app.flip();
-			bb.put(app);
+//  if (appBuffSize > app.remaining()) {
+//    if (net.remaining() > app.remaining()) {
+//    if (appBuffSize > app.capacity() - app.remaining()) {
+//      if (log.isLoggable(Level.FINE)) {
+//        log.fine("Resizing tlsInput to " + (appBuffSize + app.capacity()) + " bytes.");
+//      }
+//
+//      ByteBuffer bb = ByteBuffer.allocate(app.capacity() + appBuffSize);
+		if (log.isLoggable(Level.FINE)) {
+			log.fine("Resizing tlsInput to " + (2048 + app.capacity()) + " bytes.");
+		}
 
-			return bb;
-		}    // end of if (appInBuff.remaining < appBuffSize)
-				else {
-			return app;
-		}    // end of else
+		ByteBuffer bb = ByteBuffer.allocate(app.capacity() + 2048);
+
+		// bb.clear();
+		app.flip();
+		bb.put(app);
+
+		return bb;
+
+//  } else {
+//
+//    return app;
+//  }    // end of else
 	}
 }    // TLSWrapper
 

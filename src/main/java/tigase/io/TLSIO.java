@@ -203,6 +203,13 @@ public class TLSIO implements IOInterface {
 	 */
 	@Override
 	public ByteBuffer read(ByteBuffer buff) throws IOException {
+		if (log.isLoggable(Level.FINER)) {
+			log.finer("input.capacity()=" + buff.capacity());
+			log.finer("input.remaining()=" + buff.remaining());
+			log.finer("input.limit()=" + buff.limit());
+			log.finer("input.position()=" + buff.position());
+		}
+
 		ByteBuffer tmpBuffer = io.read(buff);
 
 		if (io.bytesRead() > 0) {
@@ -358,6 +365,7 @@ public class TLSIO implements IOInterface {
 
 	private ByteBuffer decodeData(ByteBuffer input) throws IOException {
 		TLSStatus stat = null;
+		boolean continueLoop = true;
 
 		// input.flip();
 		// do_loop:
@@ -368,6 +376,10 @@ public class TLSIO implements IOInterface {
 				log.finer("input.remaining()=" + input.remaining());
 				log.finer("input.limit()=" + input.limit());
 				log.finer("input.position()=" + input.position());
+				log.finer("tlsInput.capacity()=" + tlsInput.capacity());
+				log.finer("tlsInput.remaining()=" + tlsInput.remaining());
+				log.finer("tlsInput.limit()=" + tlsInput.limit());
+				log.finer("tlsInput.position()=" + tlsInput.position());
 			}
 
 			tlsInput = tlsWrapper.unwrap(input, tlsInput);
@@ -413,7 +425,17 @@ public class TLSIO implements IOInterface {
 //        }
 					// Obtain more inbound network data for src,
 					// then retry the operation.
-					throw new BufferUnderflowException();
+					// If there is some data ready to read, let's try to read it before we increase
+					// the buffer size
+					// throw new BufferUnderflowException();
+					if (tlsInput.capacity() == tlsInput.remaining()) {
+						throw new BufferUnderflowException();
+					} else {
+						input.compact();
+						continueLoop = false;
+					}
+
+					break;
 
 				case CLOSED :
 
@@ -432,12 +454,15 @@ public class TLSIO implements IOInterface {
 			}    // end of switch (tlsWrapper.getStatus())
 
 			stat = tlsWrapper.getStatus();
-		} while (((stat == TLSStatus.NEED_READ) || (stat == TLSStatus.OK)) && input.hasRemaining());
+		} while (continueLoop && ((stat == TLSStatus.NEED_READ) || (stat == TLSStatus.OK))
+				&& input.hasRemaining());
 
-		if (input.hasRemaining()) {
-			input.rewind();
-		} else {
-			input.clear();
+		if (continueLoop) {
+			if (input.hasRemaining()) {
+				input.rewind();
+			} else {
+				input.clear();
+			}
 		}
 
 		tlsInput.flip();

@@ -616,9 +616,22 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 				if (tmpBuffer != null) {
 
 					// tmpBuffer.flip();
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST,
+								"Socket: " + socketIO + ", Reading network binary data: " + tmpBuffer.remaining());
+					}
+
 					cb = decoder.decode(tmpBuffer);
+
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST,
+								"Socket: " + socketIO + ", Decoded character data: " + cb.array().length);
+					}
+
+					// TODO: maybe compact instead????
 					tmpBuffer.clear();
 
+					// socketInput.compact();
 					// addRead(cb.array().length);
 				}
 			} else {
@@ -646,7 +659,7 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 //      decoder.reset();
 		} catch (Exception eof) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Socket: " + socketIO + ", Exception reading data", eof);
+				log.log(Level.FINEST, "Socket: " + socketIO + ", Exception reading data" + eof);
 			}
 
 			// eof.printStackTrace();
@@ -732,12 +745,17 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 		// Resize buffer if needed.
 //  if (netSize > socketInput.remaining()) {
 		if (netSize > socketInput.capacity() - socketInput.remaining()) {
+
+			// int newSize = netSize + socketInput.capacity();
+			int newSize = socketInput.capacity() + 2048;
+
 			if (log.isLoggable(Level.FINE)) {
-				log.fine("Socket: " + socketIO + ", Resizing buffer to "
-						+ (netSize + socketInput.capacity()) + " bytes.");
+				log.log(Level.FINE, "Socket: {0}, Resizing socketInput to {1} bytes.",
+						new Object[] { socketIO,
+						newSize });
 			}
 
-			ByteBuffer b = ByteBuffer.allocate(netSize + socketInput.capacity());
+			ByteBuffer b = ByteBuffer.allocate(newSize);
 
 			b.put(socketInput);
 			socketInput = b;
@@ -758,6 +776,10 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 //      log.finer("input.limit()=" + socketInput.limit());
 //      log.finer("input.position()=" + socketInput.position());
 //    }
+			if (log.isLoggable(Level.FINE)) {
+				log.log(Level.FINE, "Socket: {0}, Compacting socketInput.", socketIO);
+			}
+
 			socketInput.compact();
 
 //    if (log.isLoggable(Level.FINEST)) {
