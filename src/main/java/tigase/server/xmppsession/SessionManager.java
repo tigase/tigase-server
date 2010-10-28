@@ -54,7 +54,6 @@ import tigase.stats.StatisticsList;
 import tigase.sys.OnlineJidsReporter;
 import tigase.sys.TigaseRuntime;
 
-import tigase.util.PriorityQueueAbstract;
 import tigase.util.ProcessingThreads;
 import tigase.util.QueueItem;
 import tigase.util.TigaseStringprepException;
@@ -1894,7 +1893,7 @@ public class SessionManager extends AbstractMessageReceiver
 					log.log(Level.FINEST,
 							"XMPPProcessorIfc: {0} ({1}" + ")" + "\n Request: " + "{2}, conn: {3}",
 								new Object[] { processor.getClass().getSimpleName(),
-							processor.id(), elem.toString(), connection });
+							processor.id(), packet, connection });
 				}
 
 				ProcessingThreads<ProcessorWorkerThread> pt = workerThreads.get(processor.id());
