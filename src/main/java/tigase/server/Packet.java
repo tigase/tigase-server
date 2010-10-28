@@ -183,6 +183,44 @@ public class Packet {
 	//~--- methods --------------------------------------------------------------
 
 	/**
+	 * Method description
+	 *
+	 *
+	 * @param el
+	 *
+	 * @return
+	 */
+	public static String elemToString(Element el) {
+		String elemData = el.toString();
+		int size = elemData.length();
+
+		if (size > 1024) {
+			elemData = elemData.substring(0, 1024) + " ... ";
+		}
+
+		return elemData;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param el
+	 *
+	 * @return
+	 */
+	public static String elemToStringSecure(Element el) {
+		String elemData = el.toStringSecure();
+		int size = elemData.length();
+
+		if (size > 1024) {
+			elemData = elemData.substring(0, 1024) + " ... ";
+		}
+
+		return elemData;
+	}
+
+	/**
 	 * The method returns <code>Packet</code> instance.
 	 * More specificly it returns instance of one of the following classes: <code>Iq</code>,
 	 * <code>Message</code> or <code>Presence</code>. It takes stanza XML element
@@ -1207,15 +1245,10 @@ public class Packet {
 	@Override
 	public String toString() {
 		if (packetToString == null) {
-			String elemData = elem.toString();
-			int size = elemData.length();
+			String elemData = elemToString(elem);
 
-			if (size > 1024) {
-				elemData = elemData.substring(0, 1024) + " ... ";
-			}
-
-			packetToString = ", DATA=" + elemData + ", SIZE=" + size + ", XMLNS=" + elem.getXMLNS()
-					+ ", PRIORITY=" + priority + ", PERMISSION=" + permissions;
+			packetToString = ", DATA=" + elemData + ", SIZE=" + elem.toString().length() + ", XMLNS="
+					+ elem.getXMLNS() + ", PRIORITY=" + priority + ", PERMISSION=" + permissions;
 		}
 
 		return "from=" + packetFrom + ", to=" + packetTo + packetToString;
@@ -1256,15 +1289,11 @@ public class Packet {
 			return toString();
 		} else {
 			if (packetToStringSecure == null) {
-				String elemData = elem.toStringSecure();
-				int size = elemData.length();
+				String elemData = elemToStringSecure(elem);
 
-				if (size > 1024) {
-					elemData = elemData.substring(0, 1024) + " ... ";
-				}
-
-				packetToStringSecure = ", DATA=" + elemData + ", SIZE=" + size + ", XMLNS="
-						+ elem.getXMLNS() + ", PRIORITY=" + priority + ", PERMISSION=" + permissions;
+				packetToStringSecure = ", DATA=" + elemData + ", SIZE=" + elem.toString().length()
+						+ ", XMLNS=" + elem.getXMLNS() + ", PRIORITY=" + priority + ", PERMISSION="
+							+ permissions;
 			}
 
 			return "from=" + packetFrom + ", to=" + packetTo + packetToStringSecure;
