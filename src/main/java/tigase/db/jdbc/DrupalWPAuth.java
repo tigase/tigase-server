@@ -26,12 +26,12 @@ package tigase.db.jdbc;
 
 import tigase.auth.SaslPLAIN;
 
+import tigase.db.AuthRepository;
 import tigase.db.AuthorizationException;
 import tigase.db.DBInitException;
 import tigase.db.DataRepository;
 import tigase.db.RepositoryFactory;
 import tigase.db.TigaseDBException;
-import tigase.db.AuthRepository;
 import tigase.db.UserExistsException;
 import tigase.db.UserNotFoundException;
 
@@ -340,6 +340,13 @@ public class DrupalWPAuth implements AuthRepository {
 					if (login_ok) {
 						BareJID user = (BareJID) props.get(USER_ID_KEY);
 
+						// Unforutnately, unlike with painAuth we have to check whether the user
+						// is active after successful authentication as before it is completed the
+						// user id is not known
+						if ( !isActive(user)) {
+							throw new AuthorizationException("User account has been blocked.");
+						}    // end of if (!isActive(user))
+
 						updateLastLogin(user);
 						updateOnlineStatus(user, 1);
 
@@ -353,17 +360,17 @@ public class DrupalWPAuth implements AuthRepository {
 					}
 
 					return login_ok;
-				}    // end of if (mech.equals("PLAIN"))
+				}        // end of if (mech.equals("PLAIN"))
 			} catch (Exception e) {
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "OTHER authentication error: ", e);
 				}
 
 				throw new AuthorizationException("Sasl exception.", e);
-			}      // end of try-catch
+			}          // end of try-catch
 
 			throw new AuthorizationException("Mechanism is not supported: " + mech);
-		}        // end of if (proto.equals(PROTOCOL_VAL_SASL))
+		}            // end of if (proto.equals(PROTOCOL_VAL_SASL))
 
 		throw new AuthorizationException("Protocol is not supported: " + proto);
 	}
