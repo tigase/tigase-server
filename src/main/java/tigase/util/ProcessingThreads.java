@@ -134,20 +134,27 @@ public class ProcessingThreads<E extends WorkerThread> {
 //      ret = queues.get(Math.abs(conn.getJID().getBareJID().hashCode()
 //          % numQueues)).offer(item, packet.getPriority().ordinal());
 			} else {
+				if (packet.getPacketFrom() != null) {
 
-				// Otherwise per destination address
-				// If the packet elemTo is set then used it, otherwise just packetTo:
-				if (packet.getStanzaTo() != null) {
-					ret = workerThreads.get(Math.abs(packet.getStanzaTo().getBareJID().hashCode())
+					// Queueing packets per user's connection...
+					ret = workerThreads.get(Math.abs(packet.getPacketFrom().hashCode())
 							% numWorkerThreads).offer(item);
-
-//        ret = queues.get(Math.abs(packet.getStanzaTo().hashCode() % numQueues)).offer(item,
-//            packet.getPriority().ordinal());
 				} else {
-					ret = workerThreads.get(Math.abs(packet.getTo().hashCode())).offer(item);
 
-//        ret = queues.get(Math.abs(packet.getTo().hashCode() % numQueues)).offer(item,
-//            packet.getPriority().ordinal());
+					// Otherwise per destination address
+					// If the packet elemTo is set then used it, otherwise just packetTo:
+					if (packet.getStanzaTo() != null) {
+						ret = workerThreads.get(Math.abs(packet.getStanzaTo().getBareJID().hashCode())
+								% numWorkerThreads).offer(item);
+
+//          ret = queues.get(Math.abs(packet.getStanzaTo().hashCode() % numQueues)).offer(item,
+//              packet.getPriority().ordinal());
+					} else {
+						ret = workerThreads.get(Math.abs(packet.getTo().hashCode())).offer(item);
+
+//          ret = queues.get(Math.abs(packet.getTo().hashCode() % numQueues)).offer(item,
+//              packet.getPriority().ordinal());
+					}
 				}
 			}
 		} catch (Exception e) {
