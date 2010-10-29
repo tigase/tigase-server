@@ -175,7 +175,7 @@ public class JabberIqAuth extends XMPPProcessor implements XMPPProcessorIfc {
 						results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 								"Authentication failed", false));
 						results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(), StanzaType.set,
-								packet.getStanzaId()));
+								session.nextStanzaId()));
 					}    // end of else
 				} catch (NotAuthorizedException e) {
 					log.info("Authentication failed: " + user_name);
@@ -192,7 +192,7 @@ public class JabberIqAuth extends XMPPProcessor implements XMPPProcessorIfc {
 						session.putSessionData("auth-retries", new Integer(retries.intValue() + 1));
 					} else {
 						results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(), StanzaType.set,
-								packet.getStanzaId()));
+								session.nextStanzaId()));
 					}
 				} catch (Exception e) {
 					log.info("Authentication failed: " + user_name);
@@ -200,7 +200,7 @@ public class JabberIqAuth extends XMPPProcessor implements XMPPProcessorIfc {
 					results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet, e.getMessage(),
 							false));
 					results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(), StanzaType.set,
-							packet.getStanzaId()));
+							session.nextStanzaId()));
 				}
 
 				break;
@@ -209,7 +209,7 @@ public class JabberIqAuth extends XMPPProcessor implements XMPPProcessorIfc {
 				results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
 						"Message type is incorrect", false));
 				results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(), StanzaType.set,
-						packet.getStanzaId()));
+						session.nextStanzaId()));
 
 				break;
 		}    // end of switch (type)

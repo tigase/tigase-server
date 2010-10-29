@@ -140,7 +140,7 @@ public class SaslAuth extends XMPPProcessor implements XMPPProcessorIfc {
 			// Optionally close the connection to make sure there is no
 			// confusion about the connection state.
 			results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(), StanzaType.set,
-					packet.getStanzaId()));
+					session.nextStanzaId()));
 
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Discovered second authentication attempt: {0}, packet: {1}",
@@ -218,7 +218,7 @@ public class SaslAuth extends XMPPProcessor implements XMPPProcessorIfc {
 				session.putSessionData("auth-retries", new Integer(retries.intValue() + 1));
 			} else {
 				results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(), StanzaType.set,
-						packet.getStanzaId()));
+						session.nextStanzaId()));
 			}
 		}    // end of try-catch
 	}
