@@ -969,7 +969,6 @@ public enum Command {
 		iq.setAttribute("id", id);
 
 //  }
-
 		if (to != null) {
 			iq.setAttribute("to", to.toString());
 		}
