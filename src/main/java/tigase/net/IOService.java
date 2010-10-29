@@ -608,8 +608,8 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 
 			// resizeInputBuffer();
 			// Maybe we can shring the packet??
-			if ((socketInput.remaining() == socketInput.capacity())
-					&& (socketInput.capacity() > socketInputSize)) {
+			if ((socketInput.capacity() > socketInputSize)
+					&& (socketInput.remaining() == socketInput.capacity())) {
 
 				// Yes, looks like we can
 				if (log.isLoggable(Level.FINE)) {
