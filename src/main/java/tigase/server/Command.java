@@ -963,9 +963,12 @@ public enum Command {
 			iq.setAttribute("from", from.toString());
 		}
 
-		if (id != null) {
-			iq.setAttribute("id", id);
-		}
+		// The IQ packet (and command for that matter) should have the id attribute
+		// therefore if it is not set then NPE should be thrown.
+//  if (id != null) {
+		iq.setAttribute("id", id);
+
+//  }
 
 		if (to != null) {
 			iq.setAttribute("to", to.toString());
