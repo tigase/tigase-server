@@ -129,6 +129,7 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 	 * <code>socketInput</code> buffer keeps data read from socket.
 	 */
 	private ByteBuffer socketInput = null;
+	private int socketInputSize = 2048;
 	private boolean stopping = false;
 	private long[] wrData = new long[60];
 	private ConcurrentMap<String, Object> sessionData = new ConcurrentHashMap<String, Object>(4,
@@ -180,7 +181,8 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 			throw e;
 		}
 
-		socketInput = ByteBuffer.allocate(socketIO.getInputPacketSize());
+		socketInputSize = socketIO.getSocketChannel().socket().getReceiveBufferSize();
+		socketInput = ByteBuffer.allocate(socketInputSize);
 
 		Socket sock = socketIO.getSocketChannel().socket();
 
@@ -605,6 +607,20 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 		try {
 
 			// resizeInputBuffer();
+			// Maybe we can shring the packet??
+			if ((socketInput.remaining() == socketInput.capacity())
+					&& (socketInput.capacity() > socketInputSize)) {
+
+				// Yes, looks like we can
+				if (log.isLoggable(Level.FINE)) {
+					log.log(Level.FINE, "Socket: {0}, Resizing socketInput down to {1} bytes.",
+							new Object[] { socketIO,
+							socketIO.getInputPacketSize() });
+				}
+
+				socketInput = ByteBuffer.allocate(socketInputSize);
+			}
+
 			ByteBuffer tmpBuffer = socketIO.read(socketInput);
 
 			if (socketIO.bytesRead() > 0) {
@@ -747,7 +763,7 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 		if (netSize > socketInput.capacity() - socketInput.remaining()) {
 
 			// int newSize = netSize + socketInput.capacity();
-			int newSize = socketInput.capacity() + 2048;
+			int newSize = socketInput.capacity() + socketInputSize;
 
 			if (log.isLoggable(Level.FINE)) {
 				log.log(Level.FINE, "Socket: {0}, Resizing socketInput to {1} bytes.",
