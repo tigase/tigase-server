@@ -1326,13 +1326,15 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc, XMPPSto
 					sendPresenceBroadcast(StanzaType.available, session, FROM_SUBSCRIBED, results,
 							packet.getElement(), settings);
 				}
-			}
 
-			// Broadcast initial presence to other available user resources
-			// Element presence = packet.getElement().clone();
-			// Already done above, don't need to set it again here
-			// presence.setAttribute("from", session.getJID());
-			updateUserResources(packet.getElement(), session, results);
+				// Broadcast initial presence to other available user resources
+				// Element presence = packet.getElement().clone();
+				// Already done above, don't need to set it again here
+				// presence.setAttribute("from", session.getJID());
+				updateUserResources(packet.getElement(), session, results);
+			} else {
+				stopped(session, results, settings);
+			}
 		}
 	}
 
