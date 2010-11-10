@@ -91,9 +91,9 @@ public class DomainFilter extends XMPPProcessor
 	//~--- static fields --------------------------------------------------------
 
 	/**
-	 * Private logger for class instancess.
+	 * Private logger for class instances.
 	 */
-	private static Logger log = Logger.getLogger("tigase.xmpp.impl.DomainFilter");
+	private static final Logger log = Logger.getLogger(DomainFilter.class.getName());
 
 	/** Field description */
 	public static final String ALLOWED_DOMAINS_LIST_KEY = "allowed-domains-list";
@@ -116,8 +116,8 @@ public class DomainFilter extends XMPPProcessor
 	 * @param results
 	 */
 	@Override
-	public void filter(Packet packet, XMPPResourceConnection session,
-			NonAuthUserRepository repo, Queue<Packet> results) {
+	public void filter(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
+			Queue<Packet> results) {
 		if ((session == null) || (results == null) || (results.size() == 0)) {
 			return;
 		}
@@ -130,7 +130,7 @@ public class DomainFilter extends XMPPProcessor
 				return;
 			}
 
-			Queue<Packet> errors = new ArrayDeque<Packet>();
+			Queue<Packet> errors = new ArrayDeque<Packet>(1);
 
 			for (Iterator<Packet> it = results.iterator(); it.hasNext(); ) {
 				Packet res = it.next();
@@ -162,9 +162,9 @@ public class DomainFilter extends XMPPProcessor
 						break;
 
 					case OWN :
-						if ((outDomain != null) &&!outDomain.equals(session.getDomain())) {
-							removePacket(it, res, errors,
-									"You can only communicate within your own domain.");
+						if ((outDomain != null)
+								&&!outDomain.equals(session.getDomain().getVhost().getDomain())) {
+							removePacket(it, res, errors, "You can only communicate within your own domain.");
 						}
 
 						break;
@@ -231,7 +231,7 @@ public class DomainFilter extends XMPPProcessor
 	public boolean preProcess(Packet packet, XMPPResourceConnection session,
 			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) {
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Processing: " + packet.toString());
+			log.log(Level.FINEST, "Processing: {0}", packet);
 		}
 
 		boolean stop = false;
@@ -248,7 +248,7 @@ public class DomainFilter extends XMPPProcessor
 			DOMAINS domains = getDomains(session);
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("DOMAINS setting is: " + domains.name());
+				log.log(Level.FINEST, "DOMAINS setting is: {0}", domains.name());
 			}
 
 			// Fast return when user is authorized to send packets to any domain
@@ -264,8 +264,10 @@ public class DomainFilter extends XMPPProcessor
 					outDomain = (packet.getStanzaTo() != null) ? packet.getStanzaTo().getDomain() : null;
 				}
 			} catch (NoConnectionIdException ex) {
-				log.warning("No connection id for session, even though this is not a server session: "
-						+ session + ", request: " + packet);
+				log.log(Level.WARNING,
+						"No connection id for session, even though this is not a server "
+							+ "session: {0}, request: {1}", new Object[] { session,
+						packet });
 			}
 
 			switch (domains) {
@@ -282,7 +284,7 @@ public class DomainFilter extends XMPPProcessor
 					}
 
 					if (log.isLoggable(Level.FINEST)) {
-						log.finest("BLOCK, blocking packet: " + packet.toString());
+						log.log(Level.FINEST, "BLOCK, blocking packet: {0}", packet);
 					}
 
 					break;
@@ -294,28 +296,27 @@ public class DomainFilter extends XMPPProcessor
 						stop = true;
 
 						if (log.isLoggable(Level.FINEST)) {
-							log.finest("LOCAL Domains only, blocking packet: " + packet.toString());
+							log.log(Level.FINEST, "LOCAL Domains only, blocking packet: {0}", packet);
 						}
 					} else {
 						if (log.isLoggable(Level.FINEST)) {
-							log.finest("LOCAL Domains only, packet not blocked: " + packet.toString());
+							log.log(Level.FINEST, "LOCAL Domains only, packet not blocked: {0}", packet);
 						}
 					}
 
 					break;
 
 				case OWN :
-					if ((outDomain != null) &&!outDomain.equals(session.getDomain())) {
-						removePacket(null, packet, results,
-								"You can only communicate within your own domain.");
+					if ((outDomain != null) &&!outDomain.equals(session.getDomain().getVhost().getDomain())) {
+						removePacket(null, packet, results, "You can only communicate within your own domain.");
 						stop = true;
 
 						if (log.isLoggable(Level.FINEST)) {
-							log.finest("OWN Domain only, blocking packet: " + packet.toString());
+							log.log(Level.FINEST, "OWN Domain only, blocking packet: {0}", packet);
 						}
 					} else {
 						if (log.isLoggable(Level.FINEST)) {
-							log.finest("OWN Domain only, packet not blocked: " + packet.toString());
+							log.log(Level.FINEST, "OWN Domain only, packet not blocked: {0}", packet);
 						}
 					}
 
@@ -339,11 +340,11 @@ public class DomainFilter extends XMPPProcessor
 						stop = true;
 
 						if (log.isLoggable(Level.FINEST)) {
-							log.finest("LISTED Domains only, blocking packet: " + packet.toString());
+							log.log(Level.FINEST, "LISTED Domains only, blocking packet: {0}", packet);
 						}
 					} else {
 						if (log.isLoggable(Level.FINEST)) {
-							log.finest("LISTED Domain only, packet not blocked: " + packet.toString());
+							log.log(Level.FINEST, "LISTED Domain only, packet not blocked: {0}", packet);
 						}
 					}
 
@@ -389,14 +390,14 @@ public class DomainFilter extends XMPPProcessor
 		DOMAINS domains = (DOMAINS) session.getCommonSessionData(ALLOWED_DOMAINS_KEY);
 
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("domains read from user session: " + domains);
+			log.log(Level.FINEST, "domains read from user session: {0}", domains);
 		}
 
 		if (domains == null) {
 			String dbDomains = session.getData(null, ALLOWED_DOMAINS_KEY, null);
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Domains read from database: " + dbDomains);
+				log.log(Level.FINEST, "Domains read from database: {0}", dbDomains);
 			}
 
 			domains = DOMAINS.valueof(dbDomains);
@@ -417,8 +418,7 @@ public class DomainFilter extends XMPPProcessor
 
 	private String[] getDomainsList(XMPPResourceConnection session)
 			throws NotAuthorizedException, TigaseDBException {
-		String[] allowedDomains =
-			(String[]) session.getCommonSessionData(ALLOWED_DOMAINS_LIST_KEY);
+		String[] allowedDomains = (String[]) session.getCommonSessionData(ALLOWED_DOMAINS_LIST_KEY);
 
 		if (allowedDomains == null) {
 			String dbDomains = session.getData(null, ALLOWED_DOMAINS_KEY, null);
@@ -437,8 +437,7 @@ public class DomainFilter extends XMPPProcessor
 
 	//~--- methods --------------------------------------------------------------
 
-	private void removePacket(Iterator<Packet> it, Packet res, Queue<Packet> errors,
-			String msg) {
+	private void removePacket(Iterator<Packet> it, Packet res, Queue<Packet> errors, String msg) {
 		if (it != null) {
 			it.remove();
 		}
@@ -446,7 +445,7 @@ public class DomainFilter extends XMPPProcessor
 		try {
 			errors.add(Authorization.FORBIDDEN.getResponseMessage(res, msg, true));
 		} catch (PacketErrorTypeException ex) {
-			log.log(Level.FINE, "Already error packet, dropping it..: " + res.toString());
+			log.log(Level.FINE, "Already error packet, dropping it..: {0}", res);
 		}
 	}
 }
