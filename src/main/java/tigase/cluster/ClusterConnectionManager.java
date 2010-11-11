@@ -84,7 +84,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
-	private static final Logger log = Logger.getLogger("tigase.cluster.ClusterConnectionManager");
+	private static final Logger log = Logger.getLogger(ClusterConnectionManager.class.getName());
 
 	/** Field description */
 	public static final String SECRET_PROP_KEY = "secret";
@@ -606,6 +606,11 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 		connectionDelay = 5 * SECOND;
 
 		String[] cl_nodes = (String[]) props.get(CLUSTER_NODES_PROP_KEY);
+		int[] ports = (int[]) props.get(PORTS_PROP_KEY);
+
+		if (ports != null) {
+			PORTS = ports;
+		}
 
 		if (cl_nodes != null) {
 			nodesNo = cl_nodes.length;
@@ -613,13 +618,13 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 			for (String node : cl_nodes) {
 				String host = BareJID.parseJID(node)[1];
 
-				log.config("Found cluster node host: " + host);
+				log.log(Level.CONFIG, "Found cluster node host: {0}", host);
 
-				if ( !host.equals(getDefHostName())
+				if ( !host.equals(getDefHostName().getDomain())
 						&& ((host.hashCode() > getDefHostName().hashCode()) || connect_all)) {
-					log.config("Trying to connect to cluster node: " + host);
+					log.log(Level.CONFIG, "Trying to connect to cluster node: {0}", host);
 
-					Map<String, Object> port_props = new LinkedHashMap<String, Object>();
+					Map<String, Object> port_props = new LinkedHashMap<String, Object>(12);
 
 					port_props.put(SECRET_PROP_KEY, SECRET_PROP_VAL);
 					port_props.put(PORT_LOCAL_HOST_PROP_KEY, getDefHostName());
