@@ -139,7 +139,7 @@ public abstract class WorkerThread extends Thread {
 			} catch (Exception e) {
 				log.log(Level.SEVERE,
 						this.getClass().getName() + ",(" + getName() + ") Exception during packet processing: "
-							+ item.getPacket().toString(), e);
+							+ item.getPacket(), e);
 			}
 
 			++runsCnt;
