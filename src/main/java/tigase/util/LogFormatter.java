@@ -28,6 +28,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import java.util.Calendar;
+import java.util.Map;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
@@ -43,6 +45,10 @@ import java.util.logging.LogRecord;
  * @version $Rev$
  */
 public class LogFormatter extends Formatter {
+
+	/** Field description */
+	public static final Map<Integer, LogWithStackTraceEntry> errors =
+		new ConcurrentSkipListMap<Integer, LogWithStackTraceEntry>();
 	private static int MED_LEN = 55;
 	private static int LEVEL_OFFSET = 12;
 
@@ -110,10 +116,29 @@ public class LogFormatter extends Formatter {
 				record.getThrown().printStackTrace(pw);
 				pw.close();
 				sb.append(sw.toString());
+				addError(record.getThrown(), sw.toString(), sb.toString());
 			} catch (Exception ex) {}
 		}
 
 		return sb.toString() + "\n";
+	}
+
+	private void addError(Throwable thrown, String stack, String log_msg) {
+		Integer code = stack.hashCode();
+		LogWithStackTraceEntry entry = errors.get(code);
+
+		if (entry == null) {
+			String msg = thrown.getMessage();
+
+			if (msg == null) {
+				msg = thrown.toString();
+			}
+
+			entry = new LogWithStackTraceEntry(msg, log_msg);
+			errors.put(code, entry);
+		}
+
+		entry.increment();
 	}
 }    // LogFormatter
 
