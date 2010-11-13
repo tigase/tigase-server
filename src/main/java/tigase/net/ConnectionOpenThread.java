@@ -35,8 +35,10 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -59,12 +61,15 @@ public class ConnectionOpenThread implements Runnable {
 	/**
 	 *
 	 */
-	public static long throttling = 10000;
+	public static long def_throttling = 200;
+
+	/** Field description */
+	public static Map<Integer, PortThrottlingData> throttling = new ConcurrentHashMap<Integer,
+		PortThrottlingData>(10);
 
 	//~--- fields ---------------------------------------------------------------
 
 	protected long accept_counter = 0;
-	private long lastSecondConnections = 0;
 	private Selector selector = null;
 	private boolean stopping = false;
 	private Timer timer = null;
@@ -82,7 +87,9 @@ public class ConnectionOpenThread implements Runnable {
 		timer.scheduleAtFixedRate(new TimerTask() {
 			@Override
 			public void run() {
-				lastSecondConnections = 0;
+				for (PortThrottlingData portData : throttling.values()) {
+					portData.lastSecondConnections = 0;
+				}
 			}
 		}, 1000, 1000);
 
@@ -103,13 +110,12 @@ public class ConnectionOpenThread implements Runnable {
 	 * @return
 	 */
 	public static ConnectionOpenThread getInstance() {
-		Long new_throttling = Long.getLong("new-connections-throttling");
 
-		if (new_throttling != null) {
-			throttling = new_throttling;
-			log.log(Level.WARNING, "New connections throttling set to: {0}", throttling);
-		}
-
+		// Long new_throttling = Long.getLong("new-connections-throttling");
+//  if (new_throttling != null) {
+//    throttling = new_throttling;
+//    log.log(Level.WARNING, "New connections throttling set to: {0}", throttling);
+//  }
 		if (acceptThread == null) {
 			acceptThread = new ConnectionOpenThread();
 
@@ -190,6 +196,27 @@ public class ConnectionOpenThread implements Runnable {
 						if (log.isLoggable(Level.FINEST)) {
 							log.finest("OP_ACCEPT");
 						}
+
+						PortThrottlingData port_throttling = throttling.get(nextReady.socket().getLocalPort());
+
+						if (port_throttling != null) {
+							++port_throttling.lastSecondConnections;
+
+							if (port_throttling.lastSecondConnections > port_throttling.throttling) {
+								if (log.isLoggable(Level.FINER)) {
+									log.log(Level.FINER, "New connections throttling level exceeded, closing: {0}",
+											sc);
+								}
+
+								sc.close();
+								sc = null;
+							}
+						} else {
+
+							// Hm, this should not happen actually
+							log.log(Level.WARNING, "Throttling not configured for port: {0}",
+									nextReady.socket().getLocalPort());
+						}
 					}    // end of if (sk.readyOps() & SelectionKey.OP_ACCEPT)
 
 					if ((sk.readyOps() & SelectionKey.OP_CONNECT) != 0) {
@@ -202,34 +229,24 @@ public class ConnectionOpenThread implements Runnable {
 					}    // end of if (sk.readyOps() & SelectionKey.OP_ACCEPT)
 
 					if (sc != null) {
-						++lastSecondConnections;
 
 						// We have to catch exception here as sometimes socket is closed
 						// or connection is broken before we start configuring it here
 						// then whatever we do on the socket it throws an exception
 						try {
-							if (lastSecondConnections <= throttling) {
-								sc.configureBlocking(false);
-								sc.socket().setSoLinger(false, 0);
-								sc.socket().setReuseAddress(true);
+							sc.configureBlocking(false);
+							sc.socket().setSoLinger(false, 0);
+							sc.socket().setReuseAddress(true);
 
-								if (log.isLoggable(Level.FINER)) {
-									log.log(Level.FINER, "Registered new client socket: {0}", sc);
-								}
-
-								ConnectionOpenListener al = (ConnectionOpenListener) sk.attachment();
-
-								sc.socket().setTrafficClass(al.getTrafficClass());
-								sc.socket().setReceiveBufferSize(al.getReceiveBufferSize());
-								al.accept(sc);
-							} else {
-								if (log.isLoggable(Level.FINER)) {
-									log.log(Level.FINER, "New connections throttling level exceeded, closing: {0}",
-											sc);
-								}
-
-								sc.close();
+							if (log.isLoggable(Level.FINER)) {
+								log.log(Level.FINER, "Registered new client socket: {0}", sc);
 							}
+
+							ConnectionOpenListener al = (ConnectionOpenListener) sk.attachment();
+
+							sc.socket().setTrafficClass(al.getTrafficClass());
+							sc.socket().setReceiveBufferSize(al.getReceiveBufferSize());
+							al.accept(sc);
 						} catch (java.net.SocketException e) {
 							log.log(Level.INFO, "Socket closed instantly after it had been opened?", e);
 						}
@@ -289,6 +306,17 @@ public class ConnectionOpenThread implements Runnable {
 	private void addISA(InetSocketAddress isa, ConnectionOpenListener al) throws IOException {
 		switch (al.getConnectionType()) {
 			case accept :
+				long port_throttling = getThrottlingForPort(isa.getPort());
+
+				throttling.put(isa.getPort(), new PortThrottlingData(port_throttling));
+
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST,
+							"Setting up throttling for the port {0} to {1} connections per second.",
+								new Object[] { isa.getPort(),
+							port_throttling });
+				}
+
 				if (log.isLoggable(Level.FINEST)) {
 					log.finest("Setting up 'accept' channel...");
 				}
@@ -335,6 +363,69 @@ public class ConnectionOpenThread implements Runnable {
 				addISA(new InetSocketAddress(ifc, al.getPort()), al);
 			}    // end of for ()
 		}      // end of if (ip == null || ip.equals("")) else
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	private long getThrottlingForPort(int port) {
+		long result = def_throttling;
+		String throttling_prop = System.getProperty("new-connections-throttling");
+
+		if (throttling != null) {
+			String[] all_ports_thr = throttling_prop.split(",");
+
+			for (String port_thr : all_ports_thr) {
+				String[] port_thr_ar = port_thr.split(":");
+
+				if (port_thr_ar.length == 2) {
+					try {
+						int port_no = Integer.parseInt(port_thr_ar[0]);
+
+						if (port_no == port) {
+							return Long.parseLong(port_thr_ar[1]);
+						}
+					} catch (Exception e) {
+
+						// bad configuration
+						log.log(Level.WARNING,
+								"Connections throttling configuration error, bad format, "
+									+ "check the documentation for a correct syntax, "
+										+ "port throttling config: {0}", port_thr);
+					}
+				} else {
+
+					// bad configuration
+					log.log(Level.WARNING, "Connections throttling configuration error, bad format, "
+							+ "check the documentation for a correct syntax, "
+								+ "port throttling config: {0}", port_thr);
+				}
+			}
+		}
+
+		return result;
+	}
+
+	//~--- inner classes --------------------------------------------------------
+
+	private class PortThrottlingData {
+
+		/** Field description */
+		protected long lastSecondConnections = 0;
+
+		/** Field description */
+		protected long throttling = def_throttling;
+
+		//~--- constructors -------------------------------------------------------
+
+		/**
+		 * Constructs ...
+		 *
+		 *
+		 * @param throttling_prop
+		 */
+		private PortThrottlingData(long throttling_prop) {
+			throttling = throttling_prop;
+		}
 	}
 }    // ConnectionOpenThread
 
