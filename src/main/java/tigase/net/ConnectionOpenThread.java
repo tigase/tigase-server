@@ -61,7 +61,16 @@ public class ConnectionOpenThread implements Runnable {
 	/**
 	 *
 	 */
-	public static long def_throttling = 200;
+	public static final long def_5222_throttling = 200;
+
+	/** Field description */
+	public static final long def_5223_throttling = 50;
+
+	/** Field description */
+	public static final long def_5280_throttling = 1000;
+
+	/** Field description */
+	public static final long def_5269_throttling = 100;
 
 	/** Field description */
 	public static Map<Integer, PortThrottlingData> throttling = new ConcurrentHashMap<Integer,
@@ -368,7 +377,25 @@ public class ConnectionOpenThread implements Runnable {
 	//~--- get methods ----------------------------------------------------------
 
 	private long getThrottlingForPort(int port) {
-		long result = def_throttling;
+		long result = def_5222_throttling;
+
+		switch (port) {
+			case 5223 :
+				result = def_5223_throttling;
+
+				break;
+
+			case 5269 :
+				result = def_5269_throttling;
+
+				break;
+
+			case 5280 :
+				result = def_5280_throttling;
+
+				break;
+		}
+
 		String throttling_prop = System.getProperty("new-connections-throttling");
 
 		if (throttling != null) {
@@ -413,7 +440,7 @@ public class ConnectionOpenThread implements Runnable {
 		protected long lastSecondConnections = 0;
 
 		/** Field description */
-		protected long throttling = def_throttling;
+		protected long throttling;
 
 		//~--- constructors -------------------------------------------------------
 
