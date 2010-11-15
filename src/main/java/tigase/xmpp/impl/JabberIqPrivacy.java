@@ -34,6 +34,7 @@ import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
+import tigase.xmpp.NoConnectionIdException;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPException;
@@ -55,6 +56,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 //~--- classes ----------------------------------------------------------------
@@ -72,9 +74,9 @@ public class JabberIqPrivacy extends XMPPProcessor
 		implements XMPPProcessorIfc, XMPPPreprocessorIfc, XMPPPacketFilterIfc {
 
 	/**
-	 * Private logger for class instancess.
+	 * Private logger for class instances.
 	 */
-	private static Logger log = Logger.getLogger("tigase.xmpp.impl.JabberIqPrivacy");
+	private static Logger log = Logger.getLogger(JabberIqPrivacy.class.getName());
 	private static final String XMLNS = "jabber:iq:privacy";
 	private static final String ID = XMLNS;
 	private static final String[] ELEMENTS = { "query" };
@@ -123,19 +125,31 @@ public class JabberIqPrivacy extends XMPPProcessor
 	 * @param results
 	 */
 	@Override
-	public void filter(Packet packet, XMPPResourceConnection session,
-			NonAuthUserRepository repo, Queue<Packet> results) {
-		if ((session == null) ||!session.isAuthorized() || (results == null)
-				|| (results.size() == 0)) {
+	public void filter(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
+			Queue<Packet> results) {
+		if ((session == null) ||!session.isAuthorized() || (results == null) || (results.size() == 0)) {
 			return;
 		}
 
 		for (Iterator<Packet> it = results.iterator(); it.hasNext(); ) {
 			Packet res = it.next();
 
-			if ( !res.isXMLNS("/iq/query", XMLNS) &&!allowed(res, session)) {
-				it.remove();
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Checking outbound packet: {0}", res);
 			}
+
+			// Always allow presence unavailable to go, privacy lists packets and
+			// all other which are allowed by privacy rules
+			if ((res.getType() == StanzaType.unavailable) || res.isXMLNS("/iq/query", XMLNS)
+					|| allowed(res, session)) {
+				continue;
+			}
+
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Packet not allowed to go, removing: {0}", res);
+			}
+
+			it.remove();
 		}
 	}
 
@@ -219,12 +233,12 @@ public class JabberIqPrivacy extends XMPPProcessor
 					break;
 			}    // end of switch (type)
 		} catch (NotAuthorizedException e) {
-			log.warning("Received privacy request but user session is not authorized yet: "
-					+ packet.toString());
+			log.log(Level.WARNING,
+					"Received privacy request but user session is not authorized yet: {0}", packet);
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 					"You must authorize session first.", true));
 		} catch (TigaseDBException e) {
-			log.warning("Database proble, please contact admin: " + e);
+			log.log(Level.WARNING, "Database proble, please contact admin: {0}", e);
 			results.offer(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet,
 					"Database access problem, please contact administrator.", true));
 		}
@@ -267,6 +281,13 @@ public class JabberIqPrivacy extends XMPPProcessor
 
 	private boolean allowed(Packet packet, XMPPResourceConnection session) {
 		try {
+
+			// If this is a preprocessing phase, always allow all packets to
+			// make it possible for the client to communicate with the server.
+			if (session.getConnectionId().equals(packet.getPacketFrom())) {
+				return true;
+			}
+
 			Element list = Privacy.getActiveList(session);
 
 			if ((list == null) && (session.getSessionData(PRIVACY_INIT_KEY) == null)) {
@@ -279,6 +300,10 @@ public class JabberIqPrivacy extends XMPPProcessor
 
 				session.putSessionData(PRIVACY_INIT_KEY, "");
 			}                    // end of if (lName == null)
+
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Active privcy list: {0}", list);
+			}
 
 			if (list != null) {
 				List<Element> items = list.getChildren();
@@ -416,12 +441,15 @@ public class JabberIqPrivacy extends XMPPProcessor
 					}          // end of for (Element item: items)
 				}            // end of if (items != null)
 			}              // end of if (lName != null)
+		} catch (NoConnectionIdException e) {
+
+			// Always allow, this is server dummy session
 		} catch (NotAuthorizedException e) {
 
 //    results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 //        "You must authorize session first.", true));
 		} catch (TigaseDBException e) {
-			log.warning("Database problem, please notify the admin. " + e);
+			log.log(Level.WARNING, "Database problem, please notify the admin. {0}", e);
 		}
 
 		return true;
