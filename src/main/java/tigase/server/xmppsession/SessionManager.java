@@ -2078,13 +2078,11 @@ public class SessionManager extends AbstractMessageReceiver
 			XMPPProcessorIfc processor = item.getProcessor();
 
 			try {
+				processor.process(item.getPacket(), item.getConn(), naUserRepository, local_results,
+						plugin_config.get(processor.id()));
+
 				if (item.getConn() != null) {
-					processor.process(item.getPacket(), item.getConn(), naUserRepository, local_results,
-							plugin_config.get(processor.id()));
 					setPermissions(item.getConn(), local_results);
-				} else {
-					processor.process(item.getPacket(), null, naUserRepository, local_results,
-							plugin_config.get(processor.id()));
 				}
 
 				addOutPackets(item.getPacket(), item.getConn(), local_results);
