@@ -75,9 +75,9 @@ import java.util.logging.Logger;
 public class Privacy {
 
 	/**
-	 * Private logger for class instancess.
+	 * Private logger for class instances.
 	 */
-	private static Logger log = Logger.getLogger("tigase.xmpp.impl.Privacy");
+	private static Logger log = Logger.getLogger(Privacy.class.getName());
 	protected static final String PRIVACY = "privacy";
 	protected static final String LIST = "list";
 	protected static final String ITEM = "item";
@@ -106,7 +106,7 @@ public class Privacy {
 	public static void addList(XMPPResourceConnection session, Element list)
 			throws NotAuthorizedException, TigaseDBException {
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Saving privacy list: " + list.toString());
+			log.log(Level.FINEST, "Saving privacy list: {0}", list);
 		}
 
 		String lNode = listNode(list.getAttribute(NAME));
@@ -183,7 +183,7 @@ public class Privacy {
 	public static Element getList(XMPPResourceConnection session, String list)
 			throws NotAuthorizedException, TigaseDBException {
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Loading privacy list: " + list);
+			log.log(Level.FINEST, "Loading privacy list: {0}", list);
 		}
 
 		String lNode = listNode(list);
@@ -199,7 +199,7 @@ public class Privacy {
 			Element result = elems.poll();
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Loaded privacy list: " + result.toString());
+				log.log(Level.FINEST, "Loaded privacy list: {0}", result);
 			}
 
 			return result;
@@ -318,17 +318,6 @@ public class Privacy {
 			} else {
 				log.log(Level.INFO,
 						"Setting active list to null, do something better than that, perhaps notify user.");
-
-//      2010-05-28 23:40:34  WorkerThread.run()                  SEVERE:   Exception during packet processing: from=bosh@ds9680.flosoft-servers.net/ba94c5c5-6782-48b8-bf16-e7822ef75e98, to=sess-man@ds9680.flosoft-servers.net, data=<auth xmlns="urn:ietf:params:xml:ns:xmpp-sasl" mechanism="PLAIN">AGZsb3JpYW4ASmVuc2VuMTU2MA==</auth>, XMLNS=urn:ietf:params:xml:ns:xmpp-sasl, priority=NORMALjava.lang.NullPointerException
-//              at java.util.concurrent.ConcurrentHashMap.put(ConcurrentHashMap.java:881)
-//              at tigase.xmpp.XMPPSession.putCommonSessionData(XMPPSession.java:498)
-//              at tigase.xmpp.XMPPResourceConnection.putCommonSessionData(XMPPResourceConnection.java:628)
-//              at tigase.xmpp.impl.Privacy.setActiveList(Privacy.java:113)
-//              at tigase.xmpp.impl.JabberIqPrivacy.allowed(JabberIqPrivacy.java:276)
-//              at tigase.xmpp.impl.JabberIqPrivacy.filter(JabberIqPrivacy.java:136)
-//              at tigase.server.xmppsession.SessionManager.addOutPackets(SessionManager.java:831)
-//              at tigase.server.xmppsession.SessionManager$ProcessorWorkerThread.process(SessionManager.java:1935)
-//              at tigase.util.WorkerThread.run(WorkerThread.java:118)
 			}
 		}
 	}
