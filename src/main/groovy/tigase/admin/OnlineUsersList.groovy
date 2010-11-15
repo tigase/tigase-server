@@ -21,7 +21,6 @@
  */
 
 /*
-
 List users IDs connected to the server
 
 AS:Description: List of online users
