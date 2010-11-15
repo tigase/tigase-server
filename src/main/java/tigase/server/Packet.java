@@ -741,7 +741,7 @@ public class Packet {
 	//~--- methods --------------------------------------------------------------
 
 	/**
-	 * The method allows for resyncing stanza JIDs stored in the packet with the
+	 * The method allows for re-syncing stanza JIDs stored in the packet with the
 	 * attributes of the stanza if they have been changed for any reason.
 	 * <strong>Method mostly used internally only.</strong> Normally stanza carried by this
 	 * Packet instance
@@ -1247,8 +1247,10 @@ public class Packet {
 		if (packetToString == null) {
 			String elemData = elemToString(elem);
 
-			packetToString = ", DATA=" + elemData + ", SIZE=" + elem.toString().length() + ", XMLNS="
-					+ elem.getXMLNS() + ", PRIORITY=" + priority + ", PERMISSION=" + permissions;
+			packetToString = calcToString(elemData);
+
+//    ", DATA=" + elemData + ", SIZE=" + elem.toString().length() + ", XMLNS="
+//    + elem.getXMLNS() + ", PRIORITY=" + priority + ", PERMISSION=" + permissions;
 		}
 
 		return "from=" + packetFrom + ", to=" + packetTo + packetToString;
@@ -1291,9 +1293,11 @@ public class Packet {
 			if (packetToStringSecure == null) {
 				String elemData = elemToStringSecure(elem);
 
-				packetToStringSecure = ", DATA=" + elemData + ", SIZE=" + elem.toString().length()
-						+ ", XMLNS=" + elem.getXMLNS() + ", PRIORITY=" + priority + ", PERMISSION="
-							+ permissions;
+				packetToStringSecure = calcToString(elemData);
+
+//      ", DATA=" + elemData + ", SIZE=" + elem.toString().length()
+//      + ", XMLNS=" + elem.getXMLNS() + ", PRIORITY=" + priority + ", PERMISSION="
+//        + permissions;
 			}
 
 			return "from=" + packetFrom + ", to=" + packetTo + packetToStringSecure;
@@ -1345,6 +1349,12 @@ public class Packet {
 	 */
 	public boolean wasProcessedBy(String id) {
 		return processorsIds.contains(id);
+	}
+
+	private String calcToString(String elemData) {
+		return ", DATA=" + elemData + ", SIZE=" + elem.toString().length() + ", XMLNS="
+				+ elem.getXMLNS() + ", PRIORITY=" + priority + ", PERMISSION=" + permissions + ", TYPE="
+					+ type;
 	}
 
 	//~--- set methods ----------------------------------------------------------
