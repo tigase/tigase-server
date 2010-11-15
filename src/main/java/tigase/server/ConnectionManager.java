@@ -26,8 +26,6 @@ package tigase.server;
 
 import tigase.annotations.TODO;
 
-import tigase.io.TLSUtil;
-
 import tigase.net.ConnectionOpenListener;
 import tigase.net.ConnectionOpenThread;
 import tigase.net.ConnectionType;
@@ -197,7 +195,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService> extends Abstra
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
-		log.config(getName() + " defaults: " + params.toString());
+		log.log(Level.CONFIG, "{0} defaults: {1}", new Object[] { getName(), params.toString() });
 
 		Map<String, Object> props = super.getDefaults(params);
 
@@ -218,7 +216,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService> extends Abstra
 //  } else {
 //    props.put(TLS_CONTAINER_CLASS_PROP_KEY, TLS_CONTAINER_CLASS_PROP_VAL);
 //  }
-
 		int buffSize = NET_BUFFER_ST_PROP_VAL;
 
 		if (isHighThroughput()) {
