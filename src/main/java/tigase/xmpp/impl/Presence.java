@@ -102,6 +102,8 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc, XMPPSto
 	private static long requiredNo = 0;
 	private static long requiredYes = 0;
 	private static TigaseRuntime runtime = TigaseRuntime.getTigaseRuntime();
+	private static final String OFFLINE_RES_SENT = "offline-res-sent";
+	private static final String OFFLINE_BUD_SENT = "offline-bud-sent";
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -130,6 +132,67 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc, XMPPSto
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Added direct presence jid: {0}", jid);
 		}
+	}
+
+	/**
+	 * <code>sendPresenceBroadcast</code> method broadcasts given presence
+	 * to all buddies from roster and to all users to which direct presence
+	 * was sent.
+	 *
+	 * @param session a <code>XMPPResourceConnection</code> value
+	 * @param results
+	 * @param settings
+	 * @param roster_util
+	 * @exception NotAuthorizedException if an error occurs
+	 * @throws TigaseDBException
+	 */
+	public static void broadcastOffline(XMPPResourceConnection session, Queue<Packet> results,
+			Map<String, Object> settings, RosterAbstract roster_util)
+			throws NotAuthorizedException, TigaseDBException {
+
+		// Preventing sending offline notifications more than once
+		if (session.getSessionData(OFFLINE_BUD_SENT) != null) {
+			return;
+		}
+
+		session.putSessionData(OFFLINE_BUD_SENT, OFFLINE_BUD_SENT);
+
+		Element pres = session.getPresence();
+
+		if (pres != null) {
+			pres.setAttribute("type", StanzaType.unavailable.toString());
+			sendPresenceBroadcast(StanzaType.unavailable, session, FROM_SUBSCRIBED, results, pres,
+					settings, roster_util);
+		} else {
+			broadcastDirectPresences(StanzaType.unavailable, session, results, pres);
+		}
+
+//  // String from = session.getJID();
+////String[] buddies = roster_util.getBuddies(session, FROM_SUBSCRIBED, false);
+//  JID[] buddies = roster_util.getBuddies(session, FROM_SUBSCRIBED);
+//
+//  buddies = DynamicRoster.addBuddies(session, settings, buddies);
+//
+//  // Only broadcast offline presence if there are any buddies expecting it
+//  // and only if the user has sent initial presence before.
+//  if ((buddies != null) && (pres != null)) {
+//
+////  Set<String> onlineJids = TigaseRuntime.getTigaseRuntime().getOnlineJids();
+//    // Below code is not needed, this should be done while the presence
+//    // is being processed and saved
+//    // pres.setAttribute("from", from);
+//    for (JID buddy : buddies) {
+//
+//      // If buddy is a local buddy and he is offline, don't send him packet...
+//      if (requiresPresenceSending(buddy, session)) {
+//        sendPresence(StanzaType.unavailable, null, buddy, results, pres);
+//      }
+//
+////    sendPresence(StanzaType.unavailable, from, buddy, results, pres);
+//    }    // end of for (String buddy: buddies)
+//  }      // end of if (buddies == null)
+//
+//  broadcastDirectPresences(StanzaType.unavailable, session, results, pres);
 	}
 
 	/**
@@ -229,6 +292,51 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc, XMPPSto
 		}
 
 //  }
+	}
+
+	/**
+	 * <code>sendPresenceBroadcast</code> method broadcasts given presence
+	 * to all buddies from roster and to all users to which direct presence
+	 * was sent.
+	 *
+	 * @param t a <code>StanzaType</code> value
+	 * @param session a <code>XMPPResourceConnection</code> value
+	 * @param subscrs
+	 * @param results
+	 * @param pres an <code>Element</code> value
+	 * @param settings
+	 * @param roster_util
+	 * @exception NotAuthorizedException if an error occurs
+	 * @throws TigaseDBException
+	 */
+	public static void sendPresenceBroadcast(StanzaType t, XMPPResourceConnection session,
+			EnumSet<SubscriptionType> subscrs, Queue<Packet> results, Element pres,
+
+//final Map<String, Object> settings, boolean onlineOnly)
+	Map<String, Object> settings, RosterAbstract roster_util)
+			throws NotAuthorizedException, TigaseDBException {
+
+		// String from = session.getJID();
+//  String[] buddies = roster_util.getBuddies(session, subscrs, onlineOnly);
+		RosterAbstract roster = roster_util;
+
+		if (roster == null) {
+			roster = RosterFactory.getRosterImplementation(true);
+		}
+
+		JID[] buddies = roster.getBuddies(session, subscrs);
+
+		buddies = DynamicRoster.addBuddies(session, settings, buddies);
+
+		if (buddies != null) {
+			for (JID buddy : buddies) {
+				if (requiresPresenceSending(buddy, session)) {
+					sendPresence(t, null, buddy, results, pres);
+				}
+			}    // end of for (String buddy: buddies)
+		}      // end of if (buddies == null)
+
+		broadcastDirectPresences(t, session, results, pres);
 	}
 
 	/**
@@ -420,6 +528,14 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc, XMPPSto
 	 */
 	protected static void updateOfflineChange(XMPPResourceConnection session, Queue<Packet> results)
 			throws NotAuthorizedException {
+
+		// Preventing sending offline notifications more than once
+		if (session.getSessionData(OFFLINE_RES_SENT) != null) {
+			return;
+		}
+
+		session.putSessionData(OFFLINE_RES_SENT, OFFLINE_RES_SENT);
+
 		for (XMPPResourceConnection conn : session.getActiveSessions()) {
 			try {
 				if (log.isLoggable(Level.FINER)) {
@@ -806,43 +922,6 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc, XMPPSto
 	}
 
 	/**
-	 * <code>sendPresenceBroadcast</code> method broadcasts given presence
-	 * to all buddies from roster and to all users to which direct presence
-	 * was sent.
-	 *
-	 * @param t a <code>StanzaType</code> value
-	 * @param session a <code>XMPPResourceConnection</code> value
-	 * @param subscrs
-	 * @param results
-	 * @param pres an <code>Element</code> value
-	 * @param settings
-	 * @exception NotAuthorizedException if an error occurs
-	 * @throws TigaseDBException
-	 */
-	public void sendPresenceBroadcast(StanzaType t, XMPPResourceConnection session,
-			EnumSet<SubscriptionType> subscrs, Queue<Packet> results, Element pres,
-
-//final Map<String, Object> settings, boolean onlineOnly)
-	Map<String, Object> settings) throws NotAuthorizedException, TigaseDBException {
-
-		// String from = session.getJID();
-//  String[] buddies = roster_util.getBuddies(session, subscrs, onlineOnly);
-		JID[] buddies = roster_util.getBuddies(session, subscrs);
-
-		buddies = DynamicRoster.addBuddies(session, settings, buddies);
-
-		if (buddies != null) {
-			for (JID buddy : buddies) {
-				if (requiresPresenceSending(buddy, session)) {
-					sendPresence(t, null, buddy, results, pres);
-				}
-			}    // end of for (String buddy: buddies)
-		}      // end of if (buddies == null)
-
-		broadcastDirectPresences(t, session, results, pres);
-	}
-
-	/**
 	 * <code>stopped</code> method is called when user disconnects or logs-out.
 	 *
 	 * @param session a <code>XMPPResourceConnection</code> value
@@ -862,7 +941,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc, XMPPSto
 			// not be broadcasted if initial presence was not sent by the client.
 			try {
 				if (session.getPresence() != null) {
-					broadcastOffline(session, results, settings);
+					broadcastOffline(session, results, settings, roster_util);
 					updateOfflineChange(session, results);
 				} else {
 					broadcastDirectPresences(StanzaType.unavailable, session, results, null);
@@ -918,54 +997,6 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc, XMPPSto
 	@Override
 	public String[] supNamespaces() {
 		return XMLNSS;
-	}
-
-	/**
-	 * <code>sendPresenceBroadcast</code> method broadcasts given presence
-	 * to all budies from roster and to all users to which direct presence
-	 * was sent.
-	 *
-	 * @param session a <code>XMPPResourceConnection</code> value
-	 * @param results
-	 * @param settings
-	 * @exception NotAuthorizedException if an error occurs
-	 * @throws TigaseDBException
-	 */
-	protected void broadcastOffline(XMPPResourceConnection session, Queue<Packet> results,
-			Map<String, Object> settings)
-			throws NotAuthorizedException, TigaseDBException {
-		Element pres = session.getPresence();
-
-		if (pres != null) {
-			pres.setAttribute("type", StanzaType.unavailable.toString());
-		}
-
-		// String from = session.getJID();
-//  String[] buddies = roster_util.getBuddies(session, FROM_SUBSCRIBED, false);
-		JID[] buddies = roster_util.getBuddies(session, FROM_SUBSCRIBED);
-
-		buddies = DynamicRoster.addBuddies(session, settings, buddies);
-
-		// Only broadcast offline presence if there are any buddies expecting it
-		// and only if the user has sent initial presence before.
-		if ((buddies != null) && (pres != null)) {
-
-//    Set<String> onlineJids = TigaseRuntime.getTigaseRuntime().getOnlineJids();
-			// Below code is not needed, this should be done while the presence
-			// is being processed and saved
-			// pres.setAttribute("from", from);
-			for (JID buddy : buddies) {
-
-				// If buddy is a local buddy and he is offline, don't send him packet...
-				if (requiresPresenceSending(buddy, session)) {
-					sendPresence(StanzaType.unavailable, null, buddy, results, pres);
-				}
-
-//      sendPresence(StanzaType.unavailable, from, buddy, results, pres);
-			}    // end of for (String buddy: buddies)
-		}      // end of if (buddies == null)
-
-		broadcastDirectPresences(StanzaType.unavailable, session, results, pres);
 	}
 
 	//~--- get methods ----------------------------------------------------------
@@ -1268,7 +1299,10 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc, XMPPSto
 			Queue<Packet> results, Map<String, Object> settings, PresenceType type)
 			throws NotAuthorizedException, TigaseDBException {
 
-		// Is it direct presence to some entity on the network?
+//  if (session != null) {
+//    throw new NullPointerException("THIS IS A TEST!!");
+//  }
+		// Is it a direct presence to some entity on the network?
 		if (packet.getStanzaTo() != null) {
 
 			// Yes this is it, send direct presence
@@ -1303,6 +1337,9 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc, XMPPSto
 
 			// Special actions on the first availability presence
 			if ((packet.getType() == null) || (packet.getType() == StanzaType.available)) {
+				session.removeSessionData(OFFLINE_BUD_SENT);
+				session.removeSessionData(OFFLINE_RES_SENT);
+
 				if (first) {
 
 					// Send presence probes to 'to' or 'both' contacts
@@ -1324,7 +1361,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc, XMPPSto
 //        sendPresenceBroadcast(type, session, FROM_SUBSCRIBED,
 //                results, packet.getElement(), settings, false);
 					sendPresenceBroadcast(StanzaType.available, session, FROM_SUBSCRIBED, results,
-							packet.getElement(), settings);
+							packet.getElement(), settings, roster_util);
 				}
 
 				// Broadcast initial presence to other available user resources
