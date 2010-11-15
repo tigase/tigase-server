@@ -1,4 +1,5 @@
-/*  Tigase Jabber/XMPP Server
+/*
+ *   Tigase Jabber/XMPP Server
  *  Copyright (C) 2004-2008 "Artur Hefczyc" <artur.hefczyc@tigase.org>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,15 +19,23 @@
  * Last modified by $Author$
  * $Date$
  */
+
 package tigase.cluster;
 
-import java.util.logging.Logger;
-import java.util.logging.Level;
+//~--- non-JDK imports --------------------------------------------------------
 
 import tigase.server.ServiceChecker;
-import tigase.xmpp.XMPPIOService;
 import tigase.server.xmppclient.ClientConnectionManager;
+
 import tigase.xmpp.JID;
+import tigase.xmpp.XMPPIOService;
+
+//~--- JDK imports ------------------------------------------------------------
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+//~--- classes ----------------------------------------------------------------
 
 /**
  * Describe class ClientConnectionClustered here.
@@ -38,19 +47,26 @@ import tigase.xmpp.JID;
  * @version $Rev$
  */
 public class ClientConnectionClustered extends ClientConnectionManager
-	implements ClusteredComponent {
+		implements ClusteredComponent {
 
-  /**
-   * Variable <code>log</code> is a class logger.
-   */
-  private static final Logger log =
-    Logger.getLogger("tigase.cluster.ClientConnectionClustered");
+	/**
+	 * Variable <code>log</code> is a class logger.
+	 */
+	private static final Logger log = Logger.getLogger(ClientConnectionClustered.class.getName());
 
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param node
+	 */
 	@Override
 	public void nodeConnected(String node) {}
 
 	/**
-	 * 
+	 *
 	 * @param node
 	 */
 	@Override
@@ -58,27 +74,43 @@ public class ClientConnectionClustered extends ClientConnectionManager
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Disconnected nodes: " + node);
 		}
+
 		final String hostname = node;
+
 		doForAllServices(new ServiceChecker() {
 			@Override
 			public void check(final XMPPIOService service) {
 				JID dataReceiver = service.getDataReceiver();
+
 				if (log.isLoggable(Level.FINEST)) {
 					log.finest("Checking service for dataReceiver: " + dataReceiver);
 				}
-				if (dataReceiver != null && dataReceiver.getDomain().equals(hostname)) {
+
+				if ((dataReceiver != null) && dataReceiver.getDomain().equals(hostname)) {
 					if (log.isLoggable(Level.FINEST)) {
-						log.finest(
-								"Stopping service because corresponding cluster node stopped.");
+						log.finest("Stopping service because corresponding cluster node stopped.");
 					}
+
 					service.stop();
 				}
 			}
 		});
 	}
 
-	@Override
-	public void setClusterController(ClusterController cl_controller) {
-	}
+	//~--- set methods ----------------------------------------------------------
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param cl_controller
+	 */
+	@Override
+	public void setClusterController(ClusterController cl_controller) {}
 }
+
+
+//~ Formatted in Sun Code Convention
+
+
+//~ Formatted by Jindent --- http://www.jindent.com
