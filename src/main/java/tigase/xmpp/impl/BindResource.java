@@ -44,6 +44,7 @@ import tigase.xmpp.XMPPResourceConnection;
 
 import java.util.Map;
 import java.util.Queue;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 //~--- classes ----------------------------------------------------------------
@@ -58,9 +59,9 @@ import java.util.logging.Logger;
  * @version $Rev$
  */
 public class BindResource extends XMPPProcessor implements XMPPProcessorIfc {
+	private static final Logger log = Logger.getLogger(BindResource.class.getName());
 	protected static final String RESOURCE_KEY = "Resource-Binded";
 	private static final String XMLNS = "urn:ietf:params:xml:ns:xmpp-bind";
-	private static final Logger log = Logger.getLogger("tigase.xmpp.impl.BindResource");
 	private static final String ID = XMLNS;
 	private static final String[] ELEMENTS = { "bind" };
 	private static final String[] XMLNSS = { XMLNS };
@@ -131,14 +132,16 @@ public class BindResource extends XMPPProcessor implements XMPPProcessorIfc {
 							} catch (TigaseStringprepException ex) {
 
 								// User provided resource is invalid, generating different server one
-								log.info("Incrrect resource provided by the user: " + resource
-										+ ", generating a different one by the server.");
+								log.log(Level.INFO,
+										"Incrrect resource provided by the user: {0}, generating a "
+											+ "different one by the server.", resource);
 								resource = "tigase-" + (++resGenerator);
 								session.setResource(resource);
 							}
 						}    // end of if (resource == null) else
 					} catch (TigaseStringprepException ex) {
-						log.warning("stringprep problem with the server generated resource: " + resource);
+						log.log(Level.WARNING, "stringprep problem with the server generated resource: {0}",
+								resource);
 					}
 
 					packet.initVars(session.getJID(), packet.getStanzaTo());
