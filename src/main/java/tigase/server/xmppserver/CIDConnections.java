@@ -546,7 +546,17 @@ public class CIDConnections {
 				}
 
 				if ( !packetSent) {
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "No packet could be sent, trying to open more connections: {0}",
+								cid);
+					}
+
 					checkOpenConnections();
+				} else {
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST,
+								"Some packets were sent, not trying to open more connections: {0}", cid);
+					}
 				}
 			} finally {
 				sendInProgress.unlock();
@@ -572,6 +582,10 @@ public class CIDConnections {
 					}
 				}
 			}, 0);
+		} else {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Outgoing open in progress, skipping for: {0}", cid);
+			}
 		}
 	}
 
@@ -613,7 +627,11 @@ public class CIDConnections {
 		port_props.put("type", ConnectionType.connect);
 		port_props.put("port-no", port);
 		port_props.put("cid", cid);
-		log.log(Level.FINEST, "STARTING new connection: {0}", cid);
+
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "STARTING new connection: {0}", cid);
+		}
+
 		handler.initNewConnection(port_props);
 	}
 
@@ -624,6 +642,10 @@ public class CIDConnections {
 			for (S2SConnection out_conn : outgoing) {
 				if ( !out_conn.isConnected()) {
 					outgoing.remove(out_conn);
+
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "Removing inactive connection: {0}", out_conn);
+					}
 				}
 			}
 
@@ -631,13 +653,26 @@ public class CIDConnections {
 				sendPacketsBack();
 				firstWaitingTime = 0;
 
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "S2S Timeout expired, sending back: {0}", waitingPackets);
+				}
+
 				return;
 			}
 
 			int all_outgoing = outgoing.size() + outgoing_handshaking.size();
 
 			if (all_outgoing >= max_out_conns) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST,
+							"Exceeded max number of outgoing connections, not doing anything: {0}", all_outgoing);
+				}
+
 				return;
+			}
+
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Checking DNS for host: {0}", cid.getRemoteHost());
 			}
 
 			// Check DNS entries
@@ -652,7 +687,9 @@ public class CIDConnections {
 
 						// DNS misconfiguration for the remote server (icq.jabber.cz for example)
 						// Now we assume: UnknownHostException
-						log.log(Level.INFO, "DNS misconfiguration for domain: {0}", cid.getRemoteHost());
+						if (log.isLoggable(Level.INFO)) {
+							log.log(Level.INFO, "DNS misconfiguration for domain: {0}", cid.getRemoteHost());
+						}
 
 						throw new UnknownHostException("DNS misconfiguration for domain: "
 								+ cid.getRemoteHost());

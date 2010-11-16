@@ -55,8 +55,7 @@ public class S2SConnection implements Comparable<S2SConnection> {
 	/**
 	 * Control packets for s2s connection establishing
 	 */
-	private ConcurrentLinkedQueue<Packet> waitingControlPackets =
-		new ConcurrentLinkedQueue<Packet>();
+	private ConcurrentLinkedQueue<Packet> waitingControlPackets = new ConcurrentLinkedQueue<Packet>();
 
 	//~--- constructors ---------------------------------------------------------
 
@@ -181,6 +180,19 @@ public class S2SConnection implements Comparable<S2SConnection> {
 	 */
 	public void setS2SIOService(S2SIOService serv) {
 		this.service = serv;
+	}
+
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public String toString() {
+		return "S2S: " + service;
 	}
 }
 
