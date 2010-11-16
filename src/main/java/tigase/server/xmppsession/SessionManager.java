@@ -1511,6 +1511,9 @@ public class SessionManager extends AbstractMessageReceiver
 	}
 
 	protected void processPacket(Packet packet, XMPPResourceConnection conn) {
+
+		// TODO: check if this is really necessary, seems to be even harmful in some cases
+		// like when the error is generated as a response to a bad packet.
 		packet.setPacketTo(getComponentId());
 
 		if (log.isLoggable(Level.FINEST)) {
