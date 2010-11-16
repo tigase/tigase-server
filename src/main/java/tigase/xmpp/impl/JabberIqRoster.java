@@ -320,15 +320,16 @@ public class JabberIqRoster extends XMPPProcessor implements XMPPProcessorIfc, X
 				} else {
 
 					// Hm, don't know what to do, unexpected name space, let's record it
-					log.warning("Unknown XMLNS for the roster plugin: " + packet);
+					log.log(Level.WARNING, "Unknown XMLNS for the roster plugin: {0}", packet);
 				}
 			}
 		} catch (NotAuthorizedException e) {
-			log.warning("Received roster request but user session is not authorized yet: " + packet);
+			log.log(Level.WARNING, "Received roster request but user session is not authorized yet: {0}",
+					packet);
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 					"You must authorize session first.", true));
 		} catch (TigaseDBException e) {
-			log.warning("Database problem, please contact admin: " + e);
+			log.log(Level.WARNING, "Database problem, please contact admin:", e);
 			results.offer(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet,
 					"Database access problem, please contact administrator.", true));
 		}    // end of try-catch
@@ -672,7 +673,7 @@ public class JabberIqRoster extends XMPPProcessor implements XMPPProcessorIfc, X
 						Element new_buddy = roster_util.getBuddyItem(session, buddy);
 
 						if (log.isLoggable(Level.FINEST)) {
-							log.finest("1. New Buddy: " + new_buddy.toString());
+							log.log(Level.FINEST, "1. New Buddy: {0}", new_buddy.toString());
 						}
 
 						if (roster_util.getBuddySubscription(session, buddy) == null) {
@@ -692,7 +693,7 @@ public class JabberIqRoster extends XMPPProcessor implements XMPPProcessorIfc, X
 						new_buddy = roster_util.getBuddyItem(session, buddy);
 
 						if (log.isLoggable(Level.FINEST)) {
-							log.finest("2. New Buddy: " + new_buddy.toString());
+							log.log(Level.FINEST, "2. New Buddy: {0}", new_buddy.toString());
 						}
 
 						roster_util.updateBuddyChange(session, results, new_buddy);
@@ -707,7 +708,7 @@ public class JabberIqRoster extends XMPPProcessor implements XMPPProcessorIfc, X
 						"Buddy JID is incorrct, stringprep failed.", true));
 			}
 		} else {
-			log.warning("No items found in roster set request: " + packet);
+			log.log(Level.WARNING, "No items found in roster set request: {0}", packet);
 			results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
 					"No items found in the roster set request", true));
 		}
