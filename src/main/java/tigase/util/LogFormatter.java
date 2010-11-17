@@ -109,15 +109,29 @@ public class LogFormatter extends Formatter {
 		sb.append(formatMessage(record));
 
 		if (record.getThrown() != null) {
-			try {
-				StringWriter sw = new StringWriter();
-				PrintWriter pw = new PrintWriter(sw);
 
-				record.getThrown().printStackTrace(pw);
-				pw.close();
-				sb.append(sw.toString());
-				addError(record.getThrown(), sw.toString(), sb.toString());
-			} catch (Exception ex) {}
+			// StringWriter sw = new StringWriter();
+			// PrintWriter pw = new PrintWriter(sw);
+			StackTraceElement[] stackTrace = record.getThrown().getStackTrace();
+
+			// Do not put the first line of the stack trace to the 'stack' used for
+			// hashcode calculation because sometimes the same stack contains different
+			// message and we do not want it to be used for the hashcode calculation
+			// to make sure we do not have memory leak here.
+			sb.append('\n').append(stackTrace[0].toString());
+
+			if (stackTrace.length > 1) {
+				StringBuilder st_sb = new StringBuilder(1024);
+
+				for (int i = 1; i < stackTrace.length; i++) {
+					st_sb.append('\n').append(stackTrace[i].toString());
+				}
+
+				sb.append(st_sb.toString());
+				addError(record.getThrown(), st_sb.toString(), sb.toString());
+			} else {
+				addError(record.getThrown(), "", sb.toString());
+			}
 		}
 
 		return sb.toString() + "\n";
