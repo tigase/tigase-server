@@ -307,7 +307,7 @@ public class ConnectionOpenThread implements Runnable {
 			try {
 				addPort(al);
 			} catch (Exception e) {
-				log.log(Level.WARNING, "Error: {0} creating connection for: {1}", new Object[] { e, al });
+				log.log(Level.WARNING, "Error: creating connection for: " + al, e);
 			}    // end of try-catch
 		}      // end of for ()
 	}
@@ -398,7 +398,7 @@ public class ConnectionOpenThread implements Runnable {
 
 		String throttling_prop = System.getProperty("new-connections-throttling");
 
-		if (throttling != null) {
+		if (throttling_prop != null) {
 			String[] all_ports_thr = throttling_prop.split(",");
 
 			for (String port_thr : all_ports_thr) {
