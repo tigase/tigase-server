@@ -109,24 +109,23 @@ public class LogFormatter extends Formatter {
 		sb.append(formatMessage(record));
 
 		if (record.getThrown() != null) {
+			StringWriter sw = new StringWriter();
+			PrintWriter pw = new PrintWriter(sw);
 
-			// StringWriter sw = new StringWriter();
-			// PrintWriter pw = new PrintWriter(sw);
+			record.getThrown().printStackTrace(pw);
+
 			StackTraceElement[] stackTrace = record.getThrown().getStackTrace();
 
 			// Do not put the first line of the stack trace to the 'stack' used for
 			// hashcode calculation because sometimes the same stack contains different
 			// message and we do not want it to be used for the hashcode calculation
 			// to make sure we do not have memory leak here.
-			sb.append('\n').append(stackTrace[0].toString());
+			sb.append('\n').append(record.getThrown().toString());
 
-			if (stackTrace.length > 1) {
+			if ((stackTrace.length > 0) || (record.getThrown().getCause() != null)) {
 				StringBuilder st_sb = new StringBuilder(1024);
 
-				for (int i = 1; i < stackTrace.length; i++) {
-					st_sb.append('\n').append(stackTrace[i].toString());
-				}
-
+				getStackTrace(st_sb, record.getThrown());
 				sb.append(st_sb.toString());
 				addError(record.getThrown(), st_sb.toString(), sb.toString());
 			} else {
@@ -153,6 +152,28 @@ public class LogFormatter extends Formatter {
 		}
 
 		entry.increment();
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	private void getStackTrace(StringBuilder sb, Throwable th) {
+		if (sb.length() > 0) {
+			sb.append("\nCaused by: ").append(th.toString());
+		}
+
+		StackTraceElement[] stackTrace = th.getStackTrace();
+
+		if ((stackTrace != null) && (stackTrace.length > 0)) {
+			for (int i = 0; i < stackTrace.length; i++) {
+				sb.append("\n\tat ").append(stackTrace[i].toString());
+			}
+		}
+
+		Throwable cause = th.getCause();
+
+		if (cause != null) {
+			getStackTrace(sb, cause);
+		}
 	}
 }    // LogFormatter
 
