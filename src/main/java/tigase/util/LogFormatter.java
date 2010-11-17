@@ -109,28 +109,13 @@ public class LogFormatter extends Formatter {
 		sb.append(formatMessage(record));
 
 		if (record.getThrown() != null) {
-			StringWriter sw = new StringWriter();
-			PrintWriter pw = new PrintWriter(sw);
-
-			record.getThrown().printStackTrace(pw);
-
-			StackTraceElement[] stackTrace = record.getThrown().getStackTrace();
-
-			// Do not put the first line of the stack trace to the 'stack' used for
-			// hashcode calculation because sometimes the same stack contains different
-			// message and we do not want it to be used for the hashcode calculation
-			// to make sure we do not have memory leak here.
 			sb.append('\n').append(record.getThrown().toString());
 
-			if ((stackTrace.length > 0) || (record.getThrown().getCause() != null)) {
-				StringBuilder st_sb = new StringBuilder(1024);
+			StringBuilder st_sb = new StringBuilder(1024);
 
-				getStackTrace(st_sb, record.getThrown());
-				sb.append(st_sb.toString());
-				addError(record.getThrown(), st_sb.toString(), sb.toString());
-			} else {
-				addError(record.getThrown(), "", sb.toString());
-			}
+			getStackTrace(st_sb, record.getThrown());
+			sb.append(st_sb.toString());
+			addError(record.getThrown(), st_sb.toString(), sb.toString());
 		}
 
 		return sb.toString() + "\n";
