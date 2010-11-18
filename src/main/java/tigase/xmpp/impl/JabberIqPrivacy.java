@@ -291,14 +291,18 @@ public class JabberIqPrivacy extends XMPPProcessor
 			Element list = Privacy.getActiveList(session);
 
 			if ((list == null) && (session.getSessionData(PRIVACY_INIT_KEY) == null)) {
+
+				// First mark the session as privacy lists loaded for it, this way if there
+				// is an axception thrown during database call for this user we won't
+				// call it again for the same user.
+				session.putSessionData(PRIVACY_INIT_KEY, "");
+
 				String lName = Privacy.getDefaultList(session);
 
 				if (lName != null) {
 					Privacy.setActiveList(session, lName);
 					list = Privacy.getActiveList(session);
 				}                  // end of if (lName != null)
-
-				session.putSessionData(PRIVACY_INIT_KEY, "");
 			}                    // end of if (lName == null)
 
 			if (log.isLoggable(Level.FINEST)) {
