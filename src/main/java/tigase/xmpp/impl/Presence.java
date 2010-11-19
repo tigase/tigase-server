@@ -500,6 +500,10 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc, XMPPSto
 			log.log(Level.FINEST, "Anonymous session: {0}", session);
 		}
 
+		if ((packet.getType() != null) && (packet.getType() != StanzaType.available)) {
+			return;
+		}
+
 		JID peer = packet.getStanzaTo().copyWithoutResource();
 		String nick = packet.getElemCData("/presence/nick");
 
@@ -951,29 +955,29 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc, XMPPSto
 				// Do nothing, it may happen quite often when the user disconnects before
 				// it authenticates
 			} catch (TigaseDBException e) {
-				log.warning("Error accessing database for offline message: " + e);
+				log.log(Level.WARNING, "Error accessing database for offline message: ", e);
 			}    // end of try-catch
 
-			if (session.isAnonymous()) {
-				Set<JID> direct_presences = (Set<JID>) session.getSessionData(DIRECT_PRESENCE);
-
-				if (direct_presences != null) {
-					try {
-						for (JID buddy : direct_presences) {
-							JID peer = buddy.copyWithoutResource();
-							Packet roster_update = Iq.createRosterPacket("set", session.nextStanzaId(), peer,
-								peer, session.getJID().copyWithoutResource(), null, null, "remove",
-								JabberIqRoster.ANON);
-
-							results.offer(roster_update);
-						}    // end of for (String buddy: buddies)
-					} catch (NotAuthorizedException e) {
-						if (log.isLoggable(Level.FINEST)) {
-							log.finest("Anonymous user has logged out already: " + session);
-						}
-					}
-				}        // end of if (direct_presence != null)
-			}
+//    if (session.isAnonymous()) {
+//      Set<JID> direct_presences = (Set<JID>) session.getSessionData(DIRECT_PRESENCE);
+//
+//      if (direct_presences != null) {
+//        try {
+//          for (JID buddy : direct_presences) {
+//            JID peer = buddy.copyWithoutResource();
+//            Packet roster_update = Iq.createRosterPacket("set", session.nextStanzaId(), peer,
+//              peer, session.getJID().copyWithoutResource(), null, null, "remove",
+//              JabberIqRoster.ANON);
+//
+//            results.offer(roster_update);
+//          }    // end of for (String buddy: buddies)
+//        } catch (NotAuthorizedException e) {
+//          if (log.isLoggable(Level.FINEST)) {
+//            log.log(Level.FINEST, "Anonymous user has logged out already: {0}", session);
+//          }
+//        }
+//      }        // end of if (direct_presence != null)
+//    }
 		}
 	}
 
@@ -1306,10 +1310,9 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc, XMPPSto
 		if (packet.getStanzaTo() != null) {
 
 			// Yes this is it, send direct presence
-			if (session.isAnonymous()) {
-				outInitialAnonymous(packet, session, results);
-			}
-
+//    if (session.isAnonymous()) {
+//      outInitialAnonymous(packet, session, results);
+//    }
 			results.offer(packet.copyElementOnly());
 
 			// If this is unavailable presence, remove jid from Set
