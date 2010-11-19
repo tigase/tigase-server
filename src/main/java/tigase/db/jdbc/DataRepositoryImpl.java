@@ -250,8 +250,8 @@ public class DataRepositoryImpl implements DataRepository {
 				long tmp = System.currentTimeMillis();
 
 				if ((tmp - lastConnectionValidated) >= connectionValidateInterval) {
-					rs = conn_valid_st.executeQuery();
 					lastConnectionValidated = tmp;
+					rs = conn_valid_st.executeQuery();
 				}    // end of if ()
 			}
 		} catch (Exception e) {
@@ -295,6 +295,7 @@ public class DataRepositoryImpl implements DataRepository {
 
 		try {
 			synchronized (db_conn) {
+				db_statements.clear();
 				conn = DriverManager.getConnection(db_conn);
 				conn.setAutoCommit(true);
 				derby_mode = db_conn.startsWith("jdbc:derby");
