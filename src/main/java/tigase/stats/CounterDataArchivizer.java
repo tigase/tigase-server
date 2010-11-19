@@ -74,7 +74,7 @@ public class CounterDataArchivizer implements StatisticsArchivizerIfc {
 	private static final String MEM_USAGE_TEXT = "Usage RAM [%]: ";
 	private static final String UPTIME_TEXT = "Uptime: ";
 	private static final String VERSION_TEXT = "Version: ";
-	private static final String VHOSTS_TEXT = "VHosts";
+	private static final String VHOSTS_TEXT = "VHosts: ";
 
 	//~--- fields ---------------------------------------------------------------
 
