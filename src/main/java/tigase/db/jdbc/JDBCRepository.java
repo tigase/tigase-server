@@ -286,7 +286,8 @@ public class JDBCRepository implements AuthRepository, UserRepository {
 				}    // end of if (nid > 0) else
 			}
 		} catch (SQLException e) {
-			throw new TigaseDBException("Error getting data list.", e);
+			throw new TigaseDBException("Error getting user data for: " + user_id + "/" + subnode + "/"
+					+ key, e);
 		} finally {
 			data_repo.release(null, rs);
 		}
@@ -369,7 +370,8 @@ public class JDBCRepository implements AuthRepository, UserRepository {
 				}    // end of if (nid > 0) else
 			}
 		} catch (SQLException e) {
-			throw new TigaseDBException("Error getting data list.", e);
+			throw new TigaseDBException("Error getting data list for: " + user_id + "/" + subnode + "/"
+					+ key, e);
 		} finally {
 			data_repo.release(null, rs);
 		}
