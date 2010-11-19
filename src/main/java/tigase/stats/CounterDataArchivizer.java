@@ -74,6 +74,7 @@ public class CounterDataArchivizer implements StatisticsArchivizerIfc {
 	private static final String MEM_USAGE_TEXT = "Usage RAM [%]: ";
 	private static final String UPTIME_TEXT = "Uptime: ";
 	private static final String VERSION_TEXT = "Version: ";
+	private static final String VHOSTS_TEXT = "VHosts";
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -107,6 +108,7 @@ public class CounterDataArchivizer implements StatisticsArchivizerIfc {
 		initData(USER_CONNECTIONS_TEXT, format.format(sp.getConnectionsNumber()));
 		initData(SERVER_CONNECTIONS_TEXT, format.format(sp.getServerConnections()));
 		initData(UPTIME_TEXT, TigaseRuntime.getTigaseRuntime().getUptimeString());
+		initData(VHOSTS_TEXT, format.format(sp.getStats("vhost-man", "Number of VHosts", 0)));
 	}
 
 	/**
@@ -147,6 +149,7 @@ public class CounterDataArchivizer implements StatisticsArchivizerIfc {
 			initData(MEM_USAGE_TEXT, "0");
 			initData(USER_CONNECTIONS_TEXT, "0");
 			initData(SERVER_CONNECTIONS_TEXT, "0");
+			initData(VHOSTS_TEXT, "0");
 			initData(UPTIME_TEXT, TigaseRuntime.getTigaseRuntime().getUptimeString());
 		} catch (Exception ex) {
 			log.log(Level.SEVERE, "Cannot initialize connection to database: ", ex);
