@@ -22,19 +22,23 @@
 
 package tigase.disco;
 
-import java.util.HashSet;
+//~--- non-JDK imports --------------------------------------------------------
+
+import tigase.server.AbstractComponentRegistrator;
+import tigase.server.Packet;
+import tigase.server.ServerComponent;
+
+import tigase.xml.Element;
+
+import tigase.xmpp.JID;
+
+//~--- JDK imports ------------------------------------------------------------
+
 import java.util.List;
 import java.util.Queue;
 import java.util.logging.Logger;
-import tigase.server.ServerComponent;
-import tigase.server.Command;
-import tigase.server.Packet;
-import tigase.server.MessageRouter;
-import tigase.server.AbstractComponentRegistrator;
-import tigase.stats.StatRecord;
-import tigase.stats.StatisticsContainer;
-import tigase.xml.Element;
-import tigase.xmpp.JID;
+
+//~--- classes ----------------------------------------------------------------
 
 /**
  * Class XMPPServiceCollector
@@ -44,67 +48,113 @@ import tigase.xmpp.JID;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public abstract class XMPPServiceCollector
-	extends AbstractComponentRegistrator<XMPPService> {
+public abstract class XMPPServiceCollector extends AbstractComponentRegistrator<XMPPService> {
 
-  /**
-   * Variable <code>log</code> is a class logger.
-   */
-  private static final Logger log =
-    Logger.getLogger("tigase.server.XMPPServiceCollector");
+	/**
+	 * Variable <code>log</code> is a class logger.
+	 */
+	@SuppressWarnings("unused")
+	private static final Logger log = Logger.getLogger(XMPPServiceCollector.class.getName());
+
+	//~--- fields ---------------------------------------------------------------
 
 	private ServiceEntity serviceEntity = null;
 
+	//~--- constructors ---------------------------------------------------------
+
+	/**
+	 * Constructs ...
+	 *
+	 */
 	public XMPPServiceCollector() {
 		serviceEntity = new ServiceEntity("Tigase", "server", "Session manager");
 		serviceEntity.addIdentities(new ServiceIdentity[] {
-				new ServiceIdentity("server", "im", tigase.server.XMPPServer.NAME +
-					" ver. " + tigase.server.XMPPServer.getImplementationVersion())});
+			new ServiceIdentity("server", "im",
+				tigase.server.XMPPServer.NAME + " ver. "
+					+ tigase.server.XMPPServer.getImplementationVersion()) });
 	}
 
-	@Override
-	public void componentAdded(XMPPService component) {	}
+	//~--- methods --------------------------------------------------------------
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param component
+	 */
+	@Override
+	public void componentAdded(XMPPService component) {}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param component
+	 */
+	@Override
+	public void componentRemoved(XMPPService component) {}
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param component
+	 *
+	 * @return
+	 */
 	@Override
 	public boolean isCorrectType(ServerComponent component) {
 		return component instanceof XMPPService;
 	}
 
-	@Override
-	public void componentRemoved(XMPPService component) {}
+	//~--- methods --------------------------------------------------------------
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param packet
+	 * @param results
+	 */
 	@Override
 	public void processPacket(final Packet packet, final Queue<Packet> results) {
-
-		if (packet.isXMLNS("/iq/query", INFO_XMLNS)
-			|| packet.isXMLNS("/iq/query", ITEMS_XMLNS)) {
-
+		if (packet.isXMLNS("/iq/query", INFO_XMLNS) || packet.isXMLNS("/iq/query", ITEMS_XMLNS)) {
 			JID jid = packet.getStanzaTo();
 			JID from = packet.getStanzaFrom();
 			String node = packet.getAttribute("/iq/query", "node");
 			Element query = packet.getElement().getChild("query").clone();
 
 			if (packet.isXMLNS("/iq/query", INFO_XMLNS)) {
-				for (XMPPService comp: components.values()) {
+				for (XMPPService comp : components.values()) {
 					Element resp = comp.getDiscoInfo(node, jid, from);
+
 					if (resp != null) {
 						query = resp;
+
 						break;
 					}
-				} // end of for ()
+				}      // end of for ()
 			}
 
 			if (packet.isXMLNS("/iq/query", ITEMS_XMLNS)) {
-				for (XMPPService comp: components.values()) {
-					List<Element> items =	comp.getDiscoItems(node, jid, from);
-					if (items != null && items.size() > 0) {
+				for (XMPPService comp : components.values()) {
+					List<Element> items = comp.getDiscoItems(node, jid, from);
+
+					if ((items != null) && (items.size() > 0)) {
 						query.addChildren(items);
-					} // end of if (stats != null && stats.count() > 0)
-				} // end of for ()
+					}    // end of if (stats != null && stats.count() > 0)
+				}      // end of for ()
 			}
+
 			results.offer(packet.okResult(query, 0));
 		}
-
 	}
-
 }
+
+
+//~ Formatted in Sun Code Convention
+
+
+//~ Formatted by Jindent --- http://www.jindent.com
