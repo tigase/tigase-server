@@ -1303,6 +1303,8 @@ public class SessionManager extends AbstractMessageReceiver
 				processing_result = true;
 			}
 
+			break;
+
 			case STREAM_OPENED : {
 
 				// Response is sent from the thread when opening user session is
