@@ -1298,6 +1298,11 @@ public class SessionManager extends AbstractMessageReceiver
 		XMPPResourceConnection connection = connectionsByFrom.get(iqc.getFrom());
 
 		switch (iqc.getCommand()) {
+			case CLOSE : {
+				log.log(Level.WARNING, "Unexpected packet: {0}", pc);
+				processing_result = true;
+			}
+
 			case STREAM_OPENED : {
 
 				// Response is sent from the thread when opening user session is
