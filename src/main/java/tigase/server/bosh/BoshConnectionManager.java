@@ -468,11 +468,11 @@ public class BoshConnectionManager extends ClientConnectionManager
 		switch (packet.getCommand()) {
 			case CLOSE :
 				if (session != null) {
-					log.fine("Closing session for command CLOSE: " + session.getSid());
+					log.log(Level.FINE, "Closing session for command CLOSE: {0}", session.getSid());
 					session.close();
 					sessions.remove(session.getSid());
 				} else {
-					log.info("Session does not exist for packet: " + packet.toString());
+					log.log(Level.INFO, "Session does not exist for packet: {0}", packet);
 				}
 
 				break;
@@ -491,7 +491,7 @@ public class BoshConnectionManager extends ClientConnectionManager
 					} catch (PacketErrorTypeException e) {
 
 						// Hm, error already, ignoring...
-						log.info("Error packet is not really expected here: " + packet.toString());
+						log.log(Level.INFO, "Error packet is not really expected here: {0}", packet);
 					}
 				}
 

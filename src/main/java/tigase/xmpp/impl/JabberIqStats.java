@@ -106,12 +106,11 @@ public class JabberIqStats extends XMPPProcessor implements XMPPProcessorIfc {
 
 		try {
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Received packet: " + packet);
+				log.log(Level.FINEST, "Received packet: {0}", packet);
 			}
 
 			if (packet.isCommand()) {
-				if ((packet.getCommand() == Command.GETSTATS)
-						&& (packet.getType() == StanzaType.result)) {
+				if ((packet.getCommand() == Command.GETSTATS) && (packet.getType() == StanzaType.result)) {
 
 					// Send it back to user.
 					Element iq = ElementUtils.createIqQuery(session.getDomainAsJID(), session.getJID(),
@@ -121,14 +120,13 @@ public class JabberIqStats extends XMPPProcessor implements XMPPProcessorIfc {
 
 					query.addChildren(stats.getChildren());
 
-					Packet result = Packet.packetInstance(iq, session.getSMComponentId(),
-						session.getJID());
+					Packet result = Packet.packetInstance(iq, session.getSMComponentId(), session.getJID());
 
 					result.setPacketTo(session.getConnectionId(packet.getStanzaTo()));
 					results.offer(result);
 
 					if (log.isLoggable(Level.FINEST)) {
-						log.finest("Sending result: " + result);
+						log.log(Level.FINEST, "Sending result: {0}", result);
 					}
 
 					return;
