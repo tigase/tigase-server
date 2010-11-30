@@ -3,6 +3,11 @@
 IZPACK_DIR="installer/izpack.patched"
 #IZPACK_DIR="/Applications/IzPack"
 
+# create packages directory
+if [ ! -e packages ] ; then
+	mkdir packages || exit -1
+fi
+
 export TIGVER=`grep -m 1 "Tigase-Version:" MANIFEST.MF | sed -e "s/Tigase-Version: \(.*\)/\\1/"`
 sed -e "s/<appversion>\([^<]*\)<\/appversion>/<appversion>$TIGVER<\/appversion>/" \
     src/main/izpack/install.xml > src/main/izpack/install_copy.xml

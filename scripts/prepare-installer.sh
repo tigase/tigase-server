@@ -1,10 +1,10 @@
 #!/bin/bash
 
 INSTALLER_DIR="installer"
-SVN_URL="http://svn.codehaus.org/izpack/izpack-src/trunk/"
-REVISION=2739
 ORIGINAL_IZPACK_DIR="izpack.original"
 PATCHED_IZPACK_DIR="izpack.patched"
+
+GIT_URL="git://git.codehaus.org/izpack.git"
 
 # create installer directory
 if [ ! -e $INSTALLER_DIR ] ; then
@@ -16,8 +16,11 @@ if [ -e $INSTALLER_DIR/$ORIGINAL_IZPACK_DIR ] ; then
 	rm -rf $INSTALLER_DIR/$ORIGINAL_IZPACK_DIR || exit -1
 fi
 
-# checkout izpack from svn repository
-svn checkout $SVN_URL --revision $REVISION $INSTALLER_DIR/$ORIGINAL_IZPACK_DIR || exit -1
+# clone IzPack git repository
+git clone $GIT_URL $INSTALLER_DIR/$ORIGINAL_IZPACK_DIR || exit -1
+cd $INSTALLER_DIR/$ORIGINAL_IZPACK_DIR/
+	git checkout fde79de81836dbf4c594d6a6f184e27d756ae009 || exit -1
+cd ../../
 
 # create patched directory
 if [ -e $INSTALLER_DIR/$PATCHED_IZPACK_DIR ] ; then
@@ -25,11 +28,22 @@ if [ -e $INSTALLER_DIR/$PATCHED_IZPACK_DIR ] ; then
 fi
 cp -r $INSTALLER_DIR/$ORIGINAL_IZPACK_DIR $INSTALLER_DIR/$PATCHED_IZPACK_DIR || exit -1
 
+#checkout correct revision of the sources from local repository
+cd $INSTALLER_DIR/$PATCHED_IZPACK_DIR/
+git checkout v4.3.0
+cd ../../
+
 # apply patch
 patch -d $INSTALLER_DIR/$PATCHED_IZPACK_DIR -p 1 < src/main/izpack/changes.patch || exit -1 
 
 # add custom TigasePanels
 cp src/main/izpack/java/*.java $INSTALLER_DIR/$PATCHED_IZPACK_DIR/src/lib/com/izforge/izpack/panels
+
+#copy utilities from newer sources
+if [ ! -e $INSTALLER_DIR/$PATCHED_IZPACK_DIR/utils/wrappers/ ] ; then
+	mkdir -p $INSTALLER_DIR/$PATCHED_IZPACK_DIR/utils/wrappers || exit -1
+	cp -r $INSTALLER_DIR/$ORIGINAL_IZPACK_DIR/izpack-utils/src/main/resources/utils/wrappers $INSTALLER_DIR/$PATCHED_IZPACK_DIR/utils || exit -1
+fi
 
 # add tigase classes to installer build path
 mkdir $INSTALLER_DIR/$PATCHED_IZPACK_DIR/tigaseLib

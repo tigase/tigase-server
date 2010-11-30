@@ -24,3 +24,8 @@ After creating compiler generator it will sit in the installer/izpack.patched di
 the script/generate-installer.sh to create TigaseInstaller from it without regeneratting installer
 generator every time.
 
+Requirements to build the installer (various steps):
+- git
+- python2
+- the docutils module (see http://docutils.sourceforge.net/)
+- a LaTeX distribution to invoke 'pdflatex' (MikTeX, TeXLive, teTeX, ...)

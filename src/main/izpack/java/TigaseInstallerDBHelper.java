@@ -15,8 +15,9 @@ import java.util.Set;
 import tigase.db.DBInitException;
 import tigase.db.RepositoryFactory;
 import tigase.db.TigaseDBException;
-import tigase.db.UserAuthRepository;
+import tigase.db.AuthRepository;
 import tigase.db.UserExistsException;
+import tigase.xmpp.BareJID;
 
 import com.izforge.izpack.installer.ResourceManager;
 import com.izforge.izpack.installer.ResourceNotFoundException;
@@ -331,13 +332,13 @@ class TigaseInstallerDBHelper {
 
 		// part 2, acquire reqired fields and validate them
 		Object admins = variables.get("admins");
-		Set<String> jids = new LinkedHashSet<String>();
+		Set<BareJID> jids = new LinkedHashSet<BareJID>();
 		if (admins != null) {
 			String[] adminsStr = admins.toString().split(",");
 			for (String adminStr : adminsStr) {
 				String jid = adminStr.trim();
-				if (jid != null && jid != "") {
-					jids.add(jid);
+				if (jid != null && !jid.equals("")) {
+					jids.add(BareJID.bareJIDInstanceNS(jid));
 				}
 			}
 		}
@@ -361,10 +362,10 @@ class TigaseInstallerDBHelper {
 			resource = TigaseConfigConst.props.getProperty("root-tigase-db-uri");
 
 		try {
-			UserAuthRepository repo = RepositoryFactory.getAuthRepository(
-					"installer", className, resource, null);
+			AuthRepository repo = RepositoryFactory.getAuthRepository(
+					className, resource, null);
 			
-			for (String jid : jids) {
+			for (BareJID jid : jids) {
 				try {
 					repo.addUser(jid, pwd);
 				} catch (UserExistsException e) {
