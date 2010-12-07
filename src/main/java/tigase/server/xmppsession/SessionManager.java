@@ -1562,6 +1562,13 @@ public class SessionManager extends AbstractMessageReceiver
 			for (XMPPPreprocessorIfc preproc : preProcessors.values()) {
 				stop |= preproc.preProcess(packet, conn, naUserRepository, results,
 						plugin_config.get(preproc.id()));
+
+				if (stop && log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "Packet blocked by: {0}, packet{1}", new Object[] { preproc.id(),
+							packet });
+
+					break;
+				}
 			}    // end of for (XMPPPreprocessorIfc preproc: preProcessors)
 		}
 
@@ -1570,7 +1577,7 @@ public class SessionManager extends AbstractMessageReceiver
 				packet.processedBy("filter-foward");
 
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "Packet forwarded: {0}", packet.toStringSecure());
+					log.log(Level.FINEST, "Packet forwarded: {0}", packet);
 				}
 
 				addOutPackets(packet, conn, results);
