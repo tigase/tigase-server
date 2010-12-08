@@ -48,6 +48,8 @@ import java.nio.channels.SocketChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
+import java.nio.charset.CoderResult;
+import java.nio.charset.MalformedInputException;
 
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -136,6 +138,7 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 		0.75f, 4);
 	private CharsetEncoder encoder = Charset.forName("UTF-8").newEncoder();
 	private CharsetDecoder decoder = Charset.forName("UTF-8").newDecoder();
+	private CharBuffer cb = CharBuffer.allocate(2048);
 	private final AtomicInteger writeInProgress = new AtomicInteger(0);
 	private final AtomicBoolean readInProgress = new AtomicBoolean(false);
 
@@ -258,8 +261,12 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 		}
 
 		try {
-			if (socketIO != null) {
+			if ((socketIO != null) && socketIO.isConnected()) {
 				synchronized (socketIO) {
+					if (log.isLoggable(Level.FINER)) {
+						log.log(Level.FINER, "Calling stop on: {0}", socketIO);
+					}
+
 					socketIO.stop();
 				}
 			}
@@ -272,10 +279,18 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 			}
 		} finally {
 			if (serviceListener != null) {
+				if (log.isLoggable(Level.FINER)) {
+					log.log(Level.FINER, "Calling stop on the listener: {0}", serviceListener);
+				}
+
 				IOServiceListener<IOService<RefObject>> tmp = serviceListener;
 
 				serviceListener = null;
 				tmp.serviceStopped(this);
+			} else {
+				if (log.isLoggable(Level.FINER)) {
+					log.log(Level.FINER, "Service listener is null: {0}", socketIO);
+				}
 			}
 		}
 	}
@@ -401,7 +416,12 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 		boolean result = (socketIO == null) ? false : socketIO.isConnected();
 
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Socket: " + socketIO + ", Connected: " + result);
+
+//    Throwable thr = new Throwable();
+//
+//    thr.fillInStackTrace();
+//    log.log(Level.FINEST, "Socket: " + socketIO + ", Connected: " + result, thr);
+			log.log(Level.FINEST, "Socket: {0}, Connected: {1}", new Object[] { socketIO, result });
 		}
 
 		return result;
@@ -599,7 +619,12 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 	protected char[] readData() throws IOException {
 		setLastTransferTime();
 
-		CharBuffer cb = null;
+		if (log.isLoggable(Level.FINEST) && (empty_read_call_count > 10)) {
+			Throwable thr = new Throwable();
+
+			thr.fillInStackTrace();
+			log.log(Level.FINEST, "Socket: " + socketIO, thr);
+		}
 
 		// Generally it should not happen as it is called only in
 		// call() which has concurrent call protection.
@@ -607,7 +632,7 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 		try {
 
 			// resizeInputBuffer();
-			// Maybe we can shring the packet??
+			// Maybe we can shring the input buffer??
 			if ((socketInput.capacity() > socketInputSize)
 					&& (socketInput.remaining() == socketInput.capacity())) {
 
@@ -615,10 +640,19 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 				if (log.isLoggable(Level.FINE)) {
 					log.log(Level.FINE, "Socket: {0}, Resizing socketInput down to {1} bytes.",
 							new Object[] { socketIO,
-							socketIO.getInputPacketSize() });
+							socketInputSize });
 				}
 
 				socketInput = ByteBuffer.allocate(socketInputSize);
+				cb = CharBuffer.allocate(socketInputSize * 4);
+			}
+
+			if (log.isLoggable(Level.FINEST)) {
+				log.finer("Before read from socket.");
+				log.finer("socketInput.capacity()=" + socketInput.capacity());
+				log.finer("socketInput.remaining()=" + socketInput.remaining());
+				log.finer("socketInput.limit()=" + socketInput.limit());
+				log.finer("socketInput.position()=" + socketInput.position());
 			}
 
 			ByteBuffer tmpBuffer = socketIO.read(socketInput);
@@ -626,29 +660,105 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 			if (socketIO.bytesRead() > 0) {
 				empty_read_call_count = 0;
 
+				char[] result = null;
+
 				// There might be some characters read from the network
 				// but the buffer may still be null or empty because there might
 				// be not enough data to decode TLS or compressed buffer.
 				if (tmpBuffer != null) {
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "Socket: {0}, Reading network binary data: {1}",
+								new Object[] { socketIO,
+								socketIO.bytesRead() });
+					}
+
+					if (log.isLoggable(Level.FINEST)) {
+						log.finer("Before decodng data");
+						log.finer("socketInput.capacity()=" + socketInput.capacity());
+						log.finer("socketInput.remaining()=" + socketInput.remaining());
+						log.finer("socketInput.limit()=" + socketInput.limit());
+						log.finer("socketInput.position()=" + socketInput.position());
+						log.finer("tmpBuffer.capacity()=" + tmpBuffer.capacity());
+						log.finer("tmpBuffer.remaining()=" + tmpBuffer.remaining());
+						log.finer("tmpBuffer.limit()=" + tmpBuffer.limit());
+						log.finer("tmpBuffer.position()=" + tmpBuffer.position());
+						log.finer("cb.capacity()=" + cb.capacity());
+						log.finer("cb.remaining()=" + cb.remaining());
+						log.finer("cb.limit()=" + cb.limit());
+						log.finer("cb.position()=" + cb.position());
+					}
 
 					// tmpBuffer.flip();
-					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST,
-								"Socket: " + socketIO + ", Reading network binary data: " + tmpBuffer.remaining());
+					if (cb.capacity() < tmpBuffer.remaining() * 4) {
+						if (log.isLoggable(Level.FINEST)) {
+							log.log(Level.FINEST, "Socket: {0}, resizing character buffer to: {1}",
+									new Object[] { socketIO,
+									tmpBuffer.remaining() });
+						}
+
+						cb = CharBuffer.allocate(tmpBuffer.remaining() * 4);
 					}
 
-					cb = decoder.decode(tmpBuffer);
+					CoderResult cr = decoder.decode(tmpBuffer, cb, false);
 
-					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST,
-								"Socket: " + socketIO + ", Decoded character data: " + cb.array().length);
+					if (cr.isMalformed()) {
+						throw new MalformedInputException(tmpBuffer.remaining());
 					}
 
-					// TODO: maybe compact instead????
-					tmpBuffer.clear();
+					if (cb.remaining() > 0) {
+						cb.flip();
+						result = new char[cb.remaining()];
+						cb.get(result);
 
-					// socketInput.compact();
-					// addRead(cb.array().length);
+						if (log.isLoggable(Level.FINEST)) {
+							log.log(Level.FINEST, "Socket: {0}, Decoded character data: {1}",
+									new Object[] { socketIO,
+									new String(result) });
+						}
+
+						if (log.isLoggable(Level.FINEST)) {
+							log.finer("Just after decoding.");
+							log.finer("tmpBuffer.capacity()=" + tmpBuffer.capacity());
+							log.finer("tmpBuffer.remaining()=" + tmpBuffer.remaining());
+							log.finer("tmpBuffer.limit()=" + tmpBuffer.limit());
+							log.finer("tmpBuffer.position()=" + tmpBuffer.position());
+							log.finer("cb.capacity()=" + cb.capacity());
+							log.finer("cb.remaining()=" + cb.remaining());
+							log.finer("cb.limit()=" + cb.limit());
+							log.finer("cb.position()=" + cb.position());
+						}
+					}
+
+					if (cr.isUnderflow() && (tmpBuffer.remaining() > 0)) {
+						if (log.isLoggable(Level.FINEST)) {
+							log.log(Level.FINEST, "Socket: {0}, UTF-8 decoder data underflow: {1}",
+									new Object[] { socketIO,
+									tmpBuffer.remaining() });
+						}
+
+						// cb.compact();
+						tmpBuffer.compact();
+					} else {
+
+						// cb.clear();
+						tmpBuffer.clear();
+					}
+
+					cb.clear();
+
+					if (log.isLoggable(Level.FINEST)) {
+						log.finer("Before return from method.");
+						log.finer("tmpBuffer.capacity()=" + tmpBuffer.capacity());
+						log.finer("tmpBuffer.remaining()=" + tmpBuffer.remaining());
+						log.finer("tmpBuffer.limit()=" + tmpBuffer.limit());
+						log.finer("tmpBuffer.position()=" + tmpBuffer.position());
+						log.finer("cb.capacity()=" + cb.capacity());
+						log.finer("cb.remaining()=" + cb.remaining());
+						log.finer("cb.limit()=" + cb.limit());
+						log.finer("cb.position()=" + cb.position());
+					}
+
+					return result;
 				}
 			} else {
 
@@ -675,7 +785,7 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 //      decoder.reset();
 		} catch (Exception eof) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Socket: " + socketIO + ", Exception reading data" + eof);
+				log.log(Level.FINEST, "Socket: " + socketIO + ", Exception reading data", eof);
 			}
 
 			// eof.printStackTrace();
@@ -683,7 +793,7 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 		}    // end of try-catch
 
 //  }
-		return (cb != null) ? cb.array() : null;
+		return null;
 	}
 
 	/**
