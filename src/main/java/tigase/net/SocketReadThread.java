@@ -179,6 +179,10 @@ public class SocketReadThread implements Runnable {
 	 * @param s
 	 */
 	public void addSocketServicePriv(IOService s) {
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Adding to waiting: {0}", s);
+		}
+
 		waiting.add(s);
 
 		// Calling lazy wakeup to avoid multiple wakeup calls
@@ -376,6 +380,10 @@ public class SocketReadThread implements Runnable {
 	//~--- methods --------------------------------------------------------------
 
 	private void addAllWaiting() throws IOException {
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("waiting.size(): " + waiting.size());
+		}
+
 		IOService s = null;
 
 		// boolean added = false;
