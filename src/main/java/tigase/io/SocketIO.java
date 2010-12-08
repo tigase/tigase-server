@@ -145,7 +145,7 @@ public class SocketIO implements IOInterface {
 	 */
 	@Override
 	public boolean isConnected() {
-		return channel.isConnected();
+		return channel.isOpen();
 	}
 
 	/**
