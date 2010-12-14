@@ -489,11 +489,12 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 		// maybe it should be initialized init initializationCompleted but
 		// Then some stuff might be missing. Let's try to do it here for now
 		// and maybe change it later.
-		String property_filename = (String) initProperties.get(PROPERTY_FILENAME_PROP_KEY);
+		String property_filenames = (String) initProperties.get(PROPERTY_FILENAME_PROP_KEY);
 
-		if (property_filename != null) {
-			initMonitoring((String) initProperties.get(MONITORING),
-					new File(property_filename).getParent());
+		if (property_filenames != null) {
+			String[] prop_files = property_filenames.split(",");
+
+			initMonitoring((String) initProperties.get(MONITORING), new File(prop_files[0]).getParent());
 		}
 	}
 
@@ -578,36 +579,40 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 			}      // end of for (int i = 0; i < args.length; i++)
 		}
 
-		String property_filename = (String) initProperties.get(PROPERTY_FILENAME_PROP_KEY);
+		String property_filenames = (String) initProperties.get(PROPERTY_FILENAME_PROP_KEY);
 
-		if (property_filename != null) {
-			log.log(Level.CONFIG, "Loading initial properties from property file: {0}",
-					property_filename);
+		if (property_filenames != null) {
+			String[] prop_files = property_filenames.split(",");
 
-			try {
-				Properties defProps = new Properties();
+			for (String property_filename : prop_files) {
+				log.log(Level.CONFIG, "Loading initial properties from property file: {0}",
+						property_filename);
 
-				defProps.load(new FileReader(property_filename));
+				try {
+					Properties defProps = new Properties();
 
-				Set<String> prop_keys = defProps.stringPropertyNames();
+					defProps.load(new FileReader(property_filename));
 
-				for (String key : prop_keys) {
-					String value = defProps.getProperty(key).trim();
+					Set<String> prop_keys = defProps.stringPropertyNames();
 
-					if (key.startsWith("-") || key.equals("config-type")) {
-						initProperties.put(key.trim(), value);
+					for (String key : prop_keys) {
+						String value = defProps.getProperty(key).trim();
 
-						// defProperties.remove(key);
-						log.log(Level.CONFIG, "Added default config parameter: ({0}={1})", new Object[] { key,
-								value });
-					} else {
-						initSettings.add(key + "=" + value);
+						if (key.startsWith("-") || key.equals("config-type")) {
+							initProperties.put(key.trim(), value);
+
+							// defProperties.remove(key);
+							log.log(Level.CONFIG, "Added default config parameter: ({0}={1})", new Object[] { key,
+									value });
+						} else {
+							initSettings.add(key + "=" + value);
+						}
 					}
+				} catch (FileNotFoundException e) {
+					log.log(Level.WARNING, "Given property file was not found: {0}", property_filename);
+				} catch (IOException e) {
+					log.log(Level.WARNING, "Can not read property file: " + property_filename, e);
 				}
-			} catch (FileNotFoundException e) {
-				log.log(Level.WARNING, "Given property file was not found: {0}", property_filename);
-			} catch (IOException e) {
-				log.log(Level.WARNING, "Can not read property file: " + property_filename, e);
 			}
 		}
 
