@@ -672,14 +672,11 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 					heap_history = tigBean.getHeapUsageHistory();
 					System.out.println(hostname + " loaded heap_history, size: " + heap_history.length);
 					smpacks_history = tigBean.getSMPacketsPerSecHistory();
-					System.out.println(hostname + " loaded smpacks_history, size: "
-							+ smpacks_history.length);
+					System.out.println(hostname + " loaded smpacks_history, size: " + smpacks_history.length);
 					clpacks_history = tigBean.getCLPacketsPerSecHistory();
-					System.out.println(hostname + " loaded clpacks_history, size: "
-							+ clpacks_history.length);
+					System.out.println(hostname + " loaded clpacks_history, size: " + clpacks_history.length);
 					conns_history = tigBean.getConnectionsNumberHistory();
-					System.out.println(hostname + " loaded conns_history, size: "
-							+ conns_history.length);
+					System.out.println(hostname + " loaded conns_history, size: " + conns_history.length);
 					serverConnectionsHistory = tigBean.getServerConnectionsHistory();
 					System.out.println(hostname + " loaded server_conns_history, size: "
 							+ serverConnectionsHistory.length);
@@ -827,8 +824,9 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 							cause = cause.getCause();
 						}
 
-						log.warning(cause.getMessage() + ", retrying in " + (interval / 1000)
-								+ " seconds.");
+						log.log(Level.WARNING, "{0}, retrying in {1} seconds.",
+								new Object[] { cause.getMessage(),
+								interval / 1000 });
 					} catch (Exception e) {
 						log.log(Level.WARNING, "Problem retrieving statistics: ", e);
 					}
