@@ -292,7 +292,11 @@ public abstract class IOService<RefObject> implements Callable<IOService<?>>, TL
 				IOServiceListener<IOService<RefObject>> tmp = serviceListener;
 
 				serviceListener = null;
-				tmp.serviceStopped(this);
+
+				// The temp can still be null if the forceStop is called concurrently
+				if (tmp != null) {
+					tmp.serviceStopped(this);
+				}
 			} else {
 				if (log.isLoggable(Level.FINER)) {
 					log.log(Level.FINER, "Service listener is null: {0}", socketIO);
