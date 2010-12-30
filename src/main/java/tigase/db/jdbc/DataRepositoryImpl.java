@@ -246,19 +246,24 @@ public class DataRepositoryImpl implements DataRepository {
 		ResultSet rs = null;
 
 		try {
-			synchronized (conn_valid_st) {
-				long tmp = System.currentTimeMillis();
+			long tmp = System.currentTimeMillis();
 
+			synchronized (conn_valid_st) {
 				if ((tmp - lastConnectionValidated) >= connectionValidateInterval) {
 					lastConnectionValidated = tmp;
 					rs = conn_valid_st.executeQuery();
 				}    // end of if ()
 			}
+
+			if (((conn_valid_st == null) || conn_valid_st.isClosed())
+					&& ((tmp - lastConnectionValidated) >= 1000)) {
+				initRepo();
+			}    // end of if ()
 		} catch (Exception e) {
 			initRepo();
 		} finally {
 			release(null, rs);
-		}        // end of try-catch
+		}      // end of try-catch
 
 		return true;
 	}
