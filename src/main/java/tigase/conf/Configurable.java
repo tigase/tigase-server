@@ -328,7 +328,7 @@ public interface Configurable extends ServerComponent {
 	public static final String MONITOR_CLASS_NAME = "tigase.server.monitor.MonitorComponent";
 
 	/** Field description */
-	public static final String MONITOR_CLUST_CLASS_NAME = "tigase.server.monitor.MonitorClustered";
+	public static final String MONITOR_CLUST_CLASS_NAME = "tigase.cluster.MonitorClustered";
 
 	/** Field description */
 	public static final String COMP_PROT_CLASS_NAME = "tigase.server.ext.ComponentProtocol";
