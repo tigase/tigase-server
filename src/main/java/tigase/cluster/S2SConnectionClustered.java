@@ -65,6 +65,51 @@ public class S2SConnectionClustered extends S2SConnectionManager implements Clus
 
 	private List<JID> cl_nodes_array = new CopyOnWriteArrayList<JID>();
 
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param connectionCid
+	 * @param keyCid
+	 * @param key
+	 * @param key_sessionId
+	 * @param asking_sessionId
+	 *
+	 * @return
+	 */
+	@Override
+	public String getLocalDBKey(CID connectionCid, CID keyCid, String key, String key_sessionId,
+			String asking_sessionId) {
+		String local_key = super.getLocalDBKey(connectionCid, keyCid, key, key_sessionId,
+			asking_sessionId);
+
+		if (local_key != null) {
+			return local_key;
+		}
+
+		JID cluster_node = getFirstClusterNode();
+
+		if (cluster_node != null) {
+			Map<String, String> params = new LinkedHashMap<String, String>(6, 0.25f);
+
+			params.put(CONN_CID, connectionCid.toString());
+			params.put(KEY_CID, keyCid.toString());
+			params.put(KEY_P, key);
+			params.put(FORKEY_SESSION_ID, key_sessionId);
+			params.put(ASKING_SESSION_ID, asking_sessionId);
+
+			Element result = ClusterElement.createClusterMethodCall(getComponentId().toString(),
+				cluster_node.toString(), StanzaType.set, ClusterMethods.CHECK_DB_KEY.toString(),
+				params).getClusterElement();
+
+			addOutPacket(Packet.packetInstance(result, getComponentId(), cluster_node));
+		}
+
+		return null;
+	}
+
 	//~--- methods --------------------------------------------------------------
 
 	/**
@@ -138,37 +183,6 @@ public class S2SConnectionClustered extends S2SConnectionManager implements Clus
 		return cluster_node;
 	}
 
-	@Override
-	protected String getLocalDBKey(CID connectionCid, CID keyCid, String key, String key_sessionId,
-			String asking_sessionId) {
-		String local_key = super.getLocalDBKey(connectionCid, keyCid, key, key_sessionId,
-			asking_sessionId);
-
-		if (local_key != null) {
-			return local_key;
-		}
-
-		JID cluster_node = getFirstClusterNode();
-
-		if (cluster_node != null) {
-			Map<String, String> params = new LinkedHashMap<String, String>(6, 0.25f);
-
-			params.put(CONN_CID, connectionCid.toString());
-			params.put(KEY_CID, keyCid.toString());
-			params.put(KEY_P, key);
-			params.put(FORKEY_SESSION_ID, key_sessionId);
-			params.put(ASKING_SESSION_ID, asking_sessionId);
-
-			Element result = ClusterElement.createClusterMethodCall(getComponentId().toString(),
-				cluster_node.toString(), StanzaType.set, ClusterMethods.CHECK_DB_KEY.toString(),
-				params).getClusterElement();
-
-			addOutPacket(Packet.packetInstance(result, getComponentId(), cluster_node));
-		}
-
-		return null;
-	}
-
 	//~--- methods --------------------------------------------------------------
 
 	protected void processClusterPacket(Packet packet) {
@@ -228,7 +242,7 @@ public class S2SConnectionClustered extends S2SConnectionManager implements Clus
 					String to = connCid.getRemoteHost();
 
 					sendVerifyResult(DB_VERIFY_EL_NAME, connCid, keyCid, valid, forkey_sessionId,
-							asking_sessionId);
+							asking_sessionId, null, false);
 				}
 
 				break;

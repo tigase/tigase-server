@@ -19,7 +19,10 @@
  * Last modified by $Author$
  * $Date$
  */
+
 package tigase.io;
+
+//~--- interfaces -------------------------------------------------------------
 
 /**
  * Describe interface TLSEventHandler here.
@@ -31,7 +34,11 @@ package tigase.io;
  * @version $Rev$
  */
 public interface TLSEventHandler {
-
-	void handshakeCompleted();
-
+	void handshakeCompleted(TLSWrapper wrapper);
 }
+
+
+//~ Formatted in Sun Code Convention
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

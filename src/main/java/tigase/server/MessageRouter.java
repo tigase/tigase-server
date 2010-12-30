@@ -139,7 +139,7 @@ public class MessageRouter extends AbstractMessageReceiver implements MessageRou
 	 * @param registr
 	 */
 	public void addRegistrator(ComponentRegistrator registr) {
-		log.info("Adding registrator: " + registr.getClass().getSimpleName());
+		log.log(Level.INFO, "Adding registrator: {0}", registr.getClass().getSimpleName());
 		registrators.put(registr.getName(), registr);
 		addComponent(registr);
 
@@ -595,19 +595,20 @@ public class MessageRouter extends AbstractMessageReceiver implements MessageRou
 //      Collections.addAll(this.localAddresses, localAddresses);
 //      this.localAddresses.add(getDefHostName());
 //    }
-			Map<String, ComponentRegistrator> tmp_reg = registrators;
-			Map<String, MessageReceiver> tmp_rec = receivers;
-
-			components = new TreeMap<String, ServerComponent>();
-			registrators = new TreeMap<String, ComponentRegistrator>();
-			receivers = new TreeMap<String, MessageReceiver>();
-			setConfig(config);
-
+//      Map<String, ComponentRegistrator> tmp_reg = registrators;
+//      Map<String, MessageReceiver> tmp_rec = receivers;
+//
+//      components = new TreeMap<String, ServerComponent>();
+//      registrators = new TreeMap<String, ComponentRegistrator>();
+//      receivers = new TreeMap<String, MessageReceiver>();
+//      setConfig(config);
 			MessageRouterConfig conf = new MessageRouterConfig(props);
 			String[] reg_names = conf.getRegistrNames();
 
 			for (String name : reg_names) {
-				ComponentRegistrator cr = tmp_reg.remove(name);
+
+				// First remove it and later, add it again if still active
+				ComponentRegistrator cr = registrators.remove(name);
 				String cls_name = (String) props.get(REGISTRATOR_PROP_KEY + name + ".class");
 
 				try {
@@ -621,26 +622,25 @@ public class MessageRouter extends AbstractMessageReceiver implements MessageRou
 					}    // end of if (cr == null)
 
 					addRegistrator(cr);
-				}      // end of try
-						catch (Exception e) {
+				} catch (Exception e) {
 					e.printStackTrace();
 				}      // end of try-catch
 			}        // end of for (String name: reg_names)
 
-			for (ComponentRegistrator cr : tmp_reg.values()) {
-				cr.release();
-			}        // end of for ()
-
-			tmp_reg.clear();
-
+//    for (ComponentRegistrator cr : tmp_reg.values()) {
+//      cr.release();
+//    }        // end of for ()
+//
+//    tmp_reg.clear();
 			String[] msgrcv_names = conf.getMsgRcvNames();
 
 			for (String name : msgrcv_names) {
 				if (log.isLoggable(Level.FINER)) {
-					log.finer("Loading and registering message receiver: " + name);
+					log.log(Level.FINER, "Loading and registering message receiver: {0}", name);
 				}
 
-				ServerComponent mr = tmp_rec.remove(name);
+				// First remove it and later, add it again if still active
+				ServerComponent mr = receivers.remove(name);
 				String cls_name = (String) props.get(MSG_RECEIVERS_PROP_KEY + name + ".class");
 
 				try {
@@ -669,12 +669,11 @@ public class MessageRouter extends AbstractMessageReceiver implements MessageRou
 				}      // end of try-catch
 			}        // end of for (String name: reg_names)
 
-			for (MessageReceiver mr : tmp_rec.values()) {
-				mr.release();
-			}        // end of for ()
-
-			tmp_rec.clear();
-
+//    for (MessageReceiver mr : tmp_rec.values()) {
+//      mr.release();
+//    }        // end of for ()
+//
+//    tmp_rec.clear();
 			if ((Boolean) props.get(UPDATES_CHECKING_PROP_KEY)) {
 				installUpdatesChecker((Long) props.get(UPDATES_CHECKING_INTERVAL_PROP_KEY));
 			} else {
@@ -685,7 +684,7 @@ public class MessageRouter extends AbstractMessageReceiver implements MessageRou
 		}          // end of try-finally
 
 		for (ServerComponent comp : components.values()) {
-			log.info("Initialization completed notification to: " + comp.getName());
+			log.log(Level.INFO, "Initialization completed notification to: {0}", comp.getName());
 			comp.initializationCompleted();
 		}
 

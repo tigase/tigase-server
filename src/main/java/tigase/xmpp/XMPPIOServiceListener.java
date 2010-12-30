@@ -19,10 +19,18 @@
  * Last modified by $Author$
  * $Date$
  */
+
 package tigase.xmpp;
 
-import java.util.Map;
+//~--- non-JDK imports --------------------------------------------------------
+
 import tigase.net.IOServiceListener;
+
+//~--- JDK imports ------------------------------------------------------------
+
+import java.util.Map;
+
+//~--- interfaces -------------------------------------------------------------
 
 /**
  * Describe interface XMPPIOServiceListener here.
@@ -30,15 +38,18 @@ import tigase.net.IOServiceListener;
  *
  * Created: Wed Feb  8 10:19:41 2006
  *
- * @param <IO> 
+ * @param <IO>
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public interface XMPPIOServiceListener<IO extends XMPPIOService> 
-		extends IOServiceListener<IO> {
-
-	String xmppStreamOpened(IO serv, Map<String, String> attribs);
-
+public interface XMPPIOServiceListener<IO extends XMPPIOService<?>> extends IOServiceListener<IO> {
 	void xmppStreamClosed(IO serv);
 
-} // XMPPIOServiceListener
+	String xmppStreamOpened(IO serv, Map<String, String> attribs);
+}    // XMPPIOServiceListener
+
+
+//~ Formatted in Sun Code Convention
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

@@ -73,7 +73,7 @@ public class SocketReadThread implements Runnable {
 	 * There is only one thread pool used by all server modules. Each module requiring
 	 * separate threads for tasks processing must have access to server thread pool.
 	 */
-	private static CompletionService<IOService> completionService = null;
+	private static CompletionService<IOService<?>> completionService = null;
 	private static int threadNo = 0;
 	private static final int READ_ONLY = SelectionKey.OP_READ;
 	private static final int READ_WRITE = SelectionKey.OP_READ | SelectionKey.OP_WRITE;
@@ -85,15 +85,15 @@ public class SocketReadThread implements Runnable {
 	// private boolean selecting = false;
 	private int empty_selections = 0;
 	private boolean stopping = false;
-	private final ConcurrentSkipListSet<IOService> waiting =
-		new ConcurrentSkipListSet<IOService>(new IOServiceComparator());
+	private ConcurrentSkipListSet<IOService<?>> waiting =
+		new ConcurrentSkipListSet<IOService<?>>(new IOServiceComparator());
 
 	// IOServices must be added to thread pool after they are removed from
 	// the selector and the selector and key is cleared, otherwise we have
 	// dead-lock somewhere down in the:
 	// java.nio.channels.spi.AbstractSelectableChannel.removeKey(AbstractSelectableChannel.java:111)
-	private ConcurrentSkipListSet<IOService> forCompletion =
-		new ConcurrentSkipListSet<IOService>(new IOServiceComparator());
+	private ConcurrentSkipListSet<IOService<?>> forCompletion =
+		new ConcurrentSkipListSet<IOService<?>>(new IOServiceComparator());
 
 	//~--- constructors ---------------------------------------------------------
 
@@ -126,7 +126,7 @@ public class SocketReadThread implements Runnable {
 
 			executor = new ThreadPoolExecutor(nThreads, nThreads, 0L, TimeUnit.MILLISECONDS,
 					new LinkedBlockingQueue<Runnable>());
-			completionService = new ExecutorCompletionService<IOService>(executor);
+			completionService = new ExecutorCompletionService<IOService<?>>(executor);
 			socketReadThread = new SocketReadThread[cpus];
 
 			for (int i = 0; i < socketReadThread.length; i++) {
@@ -138,7 +138,7 @@ public class SocketReadThread implements Runnable {
 				thrd.start();
 			}
 
-			log.warning("" + socketReadThread.length + " SocketReadThreads started.");
+			log.log(Level.WARNING, "{0} SocketReadThreads started.", socketReadThread.length);
 		}    // end of if (acceptThread == null)
 
 		return socketReadThread[0];
@@ -162,7 +162,7 @@ public class SocketReadThread implements Runnable {
 	 *
 	 * @param s
 	 */
-	public void addSocketService(IOService s) {
+	public void addSocketService(IOService<?> s) {
 
 		// Due to a delayed SelectionKey cancelling deregistering
 		// nature this distribution doesn't work well, it leads to
@@ -178,12 +178,13 @@ public class SocketReadThread implements Runnable {
 	 *
 	 * @param s
 	 */
-	public void addSocketServicePriv(IOService s) {
+	@SuppressWarnings("unchecked")
+	public void addSocketServicePriv(IOService<?> s) {
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Adding to waiting: {0}", s);
 		}
 
-		waiting.add(s);
+		waiting.add((IOService<Object>) s);
 
 		// Calling lazy wakeup to avoid multiple wakeup calls
 		// when lots of new services are added....
@@ -198,7 +199,7 @@ public class SocketReadThread implements Runnable {
 	 *
 	 * @param s
 	 */
-	public void removeSocketService(IOService s) {
+	public void removeSocketService(IOService<Object> s) {
 		SelectionKey key = s.getSocketChannel().keyFor(clientsSel);
 
 		if ((key != null) && (key.attachment() == s)) {
@@ -218,7 +219,7 @@ public class SocketReadThread implements Runnable {
 				clientsSel.select();
 
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Selector AWAKE: " + clientsSel);
+					log.log(Level.FINEST, "Selector AWAKE: {0}", clientsSel);
 				}
 
 				Set<SelectionKey> selected = clientsSel.selectedKeys();
@@ -261,7 +262,7 @@ public class SocketReadThread implements Runnable {
 										sb.append(", ready for READING");
 									}
 
-									sb.append(", readyOps() = " + sk.readyOps());
+									sb.append(", readyOps() = ").append(sk.readyOps());
 									log.finest(sb.toString());
 								}
 
@@ -283,14 +284,15 @@ public class SocketReadThread implements Runnable {
 								// completionService.submit(s);
 							} catch (CancelledKeyException e) {
 								if (log.isLoggable(Level.FINEST)) {
-									log.finest("CancelledKeyException, stopping the connection: " + s.getUniqueId());
+									log.log(Level.FINEST, "CancelledKeyException, stopping the connection: {0}",
+											s.getUniqueId());
 								}
 
 								try {
 									s.forceStop();
 								} catch (Exception ex2) {
 									if (log.isLoggable(Level.WARNING)) {
-										log.warning("got exception during forceStop: " + e);
+										log.log(Level.WARNING, "got exception during forceStop: {0}", e);
 									}
 								}
 							}
@@ -381,7 +383,7 @@ public class SocketReadThread implements Runnable {
 
 	private void addAllWaiting() throws IOException {
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("waiting.size(): " + waiting.size());
+			log.log(Level.FINEST, "waiting.size(): {0}", waiting.size());
 		}
 
 		IOService s = null;
@@ -395,14 +397,14 @@ public class SocketReadThread implements Runnable {
 					int sel_key = READ_ONLY;
 
 					if (log.isLoggable(Level.FINEST)) {
-						log.finest("ADDED OP_READ: " + s.getUniqueId());
+						log.log(Level.FINEST, "ADDED OP_READ: {0}", s.getUniqueId());
 					}
 
 					if (s.waitingToSend()) {
 						sel_key = READ_WRITE;
 
 						if (log.isLoggable(Level.FINEST)) {
-							log.finest("ADDED OP_WRITE: " + s.getUniqueId());
+							log.log(Level.FINEST, "ADDED OP_WRITE: {0}", s.getUniqueId());
 						}
 					}
 
@@ -411,12 +413,12 @@ public class SocketReadThread implements Runnable {
 					// added = true;
 				} else {
 					if (log.isLoggable(Level.FINEST)) {
-						log.finest("Socket not connected: " + s.getUniqueId());
+						log.log(Level.FINEST, "Socket not connected: {0}", s.getUniqueId());
 					}
 
 					try {
 						if (log.isLoggable(Level.FINER)) {
-							log.finer("Forcing stopping the service: " + s.getUniqueId());
+							log.log(Level.FINER, "Forcing stopping the service: {0}", s.getUniqueId());
 						}
 
 						s.forceStop();
@@ -449,7 +451,7 @@ public class SocketReadThread implements Runnable {
 	// Implementation of java.lang.Runnable
 	private synchronized void recreateSelector() throws IOException {
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Recreating selector, opened channels: " + clientsSel.keys().size());
+			log.log(Level.FINEST, "Recreating selector, opened channels: {0}", clientsSel.keys().size());
 		}
 
 		empty_selections = 0;
@@ -468,7 +470,7 @@ public class SocketReadThread implements Runnable {
 		// Sometimes this is just a broken connection which causes
 		// selector spin... this is the cheaper solution....
 		for (SelectionKey sk : clientsSel.keys()) {
-			IOService serv = (IOService) sk.attachment();
+			IOService<?> serv = (IOService<?>) sk.attachment();
 			SocketChannel sc = serv.getSocketChannel();
 
 			if ((sc == null) ||!sc.isConnected()) {
@@ -476,7 +478,7 @@ public class SocketReadThread implements Runnable {
 				sk.cancel();
 
 				try {
-					log.info("Forcing stopping the service: " + serv.getUniqueId());
+					log.log(Level.INFO, "Forcing stopping the service: {0}", serv.getUniqueId());
 					serv.forceStop();
 				} catch (Exception e) {}
 			}
@@ -495,7 +497,7 @@ public class SocketReadThread implements Runnable {
 			clientsSel = Selector.open();
 
 			for (SelectionKey sk : tempSel.keys()) {
-				IOService serv = (IOService) sk.attachment();
+				IOService<?> serv = (IOService<?>) sk.attachment();
 
 				sk.cancel();
 				waiting.add(serv);
@@ -507,7 +509,7 @@ public class SocketReadThread implements Runnable {
 
 	//~--- inner classes --------------------------------------------------------
 
-	private class IOServiceComparator implements Comparator<IOService> {
+	private class IOServiceComparator implements Comparator<IOService<?>> {
 
 		/**
 		 * Method description
@@ -519,7 +521,7 @@ public class SocketReadThread implements Runnable {
 		 * @return
 		 */
 		@Override
-		public int compare(IOService o1, IOService o2) {
+		public int compare(IOService<?> o1, IOService<?> o2) {
 			return o1.getUniqueId().compareTo(o2.getUniqueId());
 		}
 	}
@@ -547,17 +549,17 @@ public class SocketReadThread implements Runnable {
 		public void run() {
 			for (;;) {
 				try {
-					final IOService service = completionService.take().get();
+					IOService<?> service = completionService.take().get();
 
 					if (service.isConnected()) {
 						if (log.isLoggable(Level.FINEST)) {
-							log.finest("COMPLETED: " + service.getUniqueId());
+							log.log(Level.FINEST, "COMPLETED: {0}", service.getUniqueId());
 						}
 
 						addSocketService(service);
 					} else {
 						if (log.isLoggable(Level.FINEST)) {
-							log.finest("REMOVED: " + service.getUniqueId());
+							log.log(Level.FINEST, "REMOVED: {0}", service.getUniqueId());
 						}
 					}    // end of else
 				} catch (ExecutionException e) {

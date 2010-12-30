@@ -53,7 +53,7 @@ public class TLSIO implements IOInterface {
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
-	private static Logger log = Logger.getLogger(TLSIO.class.getName());
+	private static final Logger log = Logger.getLogger(TLSIO.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -94,10 +94,11 @@ public class TLSIO implements IOInterface {
 	public TLSIO(final IOInterface ioi, final TLSWrapper wrapper) throws IOException {
 		io = ioi;
 		tlsWrapper = wrapper;
+		tlsWrapper.setDebugId(toString());
 		tlsInput = ByteBuffer.allocate(tlsWrapper.getAppBuffSize());
 
 		if (log.isLoggable(Level.FINER)) {
-			log.finer("TLS Socket created, connected: " + io.isConnected());
+			log.log(Level.FINER, "TLS Socket created: {0}", io.toString());
 		}
 
 		if (tlsWrapper.isClientMode()) {
@@ -106,10 +107,6 @@ public class TLSIO implements IOInterface {
 			}
 
 			write(ByteBuffer.allocate(0));
-
-			if (log.isLoggable(Level.FINER)) {
-				log.finer("Handshaking completed, you can send data now.");
-			}
 		}    // end of if (tlsWrapper.isClientMode())
 	}
 
@@ -203,18 +200,18 @@ public class TLSIO implements IOInterface {
 	 */
 	@Override
 	public ByteBuffer read(ByteBuffer buff) throws IOException {
-		if (log.isLoggable(Level.FINER)) {
-			log.finer("input.capacity()=" + buff.capacity());
-			log.finer("input.remaining()=" + buff.remaining());
-			log.finer("input.limit()=" + buff.limit());
-			log.finer("input.position()=" + buff.position());
-		}
 
+//  if (log.isLoggable(Level.FINER)) {
+//    log.finer("input.capacity()=" + buff.capacity());
+//    log.finer("input.remaining()=" + buff.remaining());
+//    log.finer("input.limit()=" + buff.limit());
+//    log.finer("input.position()=" + buff.position());
+//  }
 		ByteBuffer tmpBuffer = io.read(buff);
 
 		if (io.bytesRead() > 0) {
 			if (log.isLoggable(Level.FINER)) {
-				log.finer("Read bytes: " + io.bytesRead());
+				log.log(Level.FINER, "Read bytes: {0}, {1}", new Object[] { io.bytesRead(), toString() });
 			}
 
 			return decodeData(tmpBuffer);
@@ -348,7 +345,9 @@ public class TLSIO implements IOInterface {
 			result = io.write(null);
 		} else {
 			if (log.isLoggable(Level.FINER)) {
-				log.log(Level.FINER, "TLS - Writing data, remaining: {0}", buff.remaining());
+				log.log(Level.FINER, "TLS - Writing data, remaining: {0}, {1}",
+						new Object[] { buff.remaining(),
+						toString() });
 			}
 
 			result = writeBuff(buff);
@@ -370,38 +369,37 @@ public class TLSIO implements IOInterface {
 		// input.flip();
 		// do_loop:
 		do {
-			if (log.isLoggable(Level.FINER)) {
-				log.finer("Decoding data: " + input.remaining());
-				log.finer("input.capacity()=" + input.capacity());
-				log.finer("input.remaining()=" + input.remaining());
-				log.finer("input.limit()=" + input.limit());
-				log.finer("input.position()=" + input.position());
-				log.finer("tlsInput.capacity()=" + tlsInput.capacity());
-				log.finer("tlsInput.remaining()=" + tlsInput.remaining());
-				log.finer("tlsInput.limit()=" + tlsInput.limit());
-				log.finer("tlsInput.position()=" + tlsInput.position());
-			}
 
+//    if (log.isLoggable(Level.FINER)) {
+//      log.finer("Decoding data: " + input.remaining());
+//      log.finer("input.capacity()=" + input.capacity());
+//      log.finer("input.remaining()=" + input.remaining());
+//      log.finer("input.limit()=" + input.limit());
+//      log.finer("input.position()=" + input.position());
+//      log.finer("tlsInput.capacity()=" + tlsInput.capacity());
+//      log.finer("tlsInput.remaining()=" + tlsInput.remaining());
+//      log.finer("tlsInput.limit()=" + tlsInput.limit());
+//      log.finer("tlsInput.position()=" + tlsInput.position());
+//    }
 			tlsInput = tlsWrapper.unwrap(input, tlsInput);
 
-			if (log.isLoggable(Level.FINEST)) {
-				int netSize = tlsWrapper.getPacketBuffSize();
-
-				log.finer("tlsWrapper.getStatus() = " + tlsWrapper.getStatus().name());
-				log.finer("PacketBuffSize=" + netSize);
-				log.finer("input.capacity()=" + input.capacity());
-				log.finer("input.remaining()=" + input.remaining());
-				log.finer("input.limit()=" + input.limit());
-				log.finer("input.position()=" + input.position());
-				log.finer("tlsInput.capacity()=" + tlsInput.capacity());
-				log.finer("tlsInput.remaining()=" + tlsInput.remaining());
-				log.finer("tlsInput.limit()=" + tlsInput.limit());
-				log.finer("tlsInput.position()=" + tlsInput.position());
-			}
-
+//    if (log.isLoggable(Level.FINEST)) {
+//      int netSize = tlsWrapper.getPacketBuffSize();
+//
+//      log.finer("tlsWrapper.getStatus() = " + tlsWrapper.getStatus().name());
+//      log.finer("PacketBuffSize=" + netSize);
+//      log.finer("input.capacity()=" + input.capacity());
+//      log.finer("input.remaining()=" + input.remaining());
+//      log.finer("input.limit()=" + input.limit());
+//      log.finer("input.position()=" + input.position());
+//      log.finer("tlsInput.capacity()=" + tlsInput.capacity());
+//      log.finer("tlsInput.remaining()=" + tlsInput.remaining());
+//      log.finer("tlsInput.limit()=" + tlsInput.limit());
+//      log.finer("tlsInput.position()=" + tlsInput.position());
+//    }
 //    if (input.hasRemaining()) {
-//      input.compact();
-//    } // end of if (input.hasRemaining())
+//    input.compact();
+//    }// end of if (input.hasRemaining())
 			switch (tlsWrapper.getStatus()) {
 				case NEED_WRITE :
 					writeBuff(ByteBuffer.allocate(0));

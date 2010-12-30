@@ -27,6 +27,7 @@ package tigase.io;
 import java.io.FileInputStream;
 
 import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -148,6 +149,26 @@ public class SSLContextContainerOLD implements SSLContextContainerIfc {
 		}        // end of if (sslContext == null)
 
 		return sslContext;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public KeyStore getTrustStore() {
+		KeyStore trustKeyStore = null;
+
+		try {
+			trustKeyStore = KeyStore.getInstance("JKS");
+			trustKeyStore.load(null, new char[0]);
+		} catch (Exception ex) {
+			trustKeyStore = null;
+		}
+
+		return trustKeyStore;
 	}
 
 	//~--- methods --------------------------------------------------------------

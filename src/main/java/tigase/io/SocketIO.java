@@ -145,6 +145,10 @@ public class SocketIO implements IOInterface {
 	 */
 	@Override
 	public boolean isConnected() {
+
+		// More correct would be calling both methods, however in the Tigase
+		// all SocketChannels are connected before SocketIO is created.
+		// return channel.isOpen() && channel.isConnected();
 		return channel.isOpen();
 	}
 
@@ -178,7 +182,8 @@ public class SocketIO implements IOInterface {
 		bytesRead = channel.read(buff);
 
 		if (log.isLoggable(Level.FINER)) {
-			log.log(Level.FINER, "Read from channel {0} bytes.", bytesRead);
+			log.log(Level.FINER, "Read from channel {0} bytes, {1}", new Object[] { bytesRead,
+					toString() });
 		}
 
 		if (bytesRead == -1) {
@@ -230,7 +235,7 @@ public class SocketIO implements IOInterface {
 	 */
 	@Override
 	public boolean waitingToSend() {
-		return dataToSend.size() > 0;
+		return isConnected() && (dataToSend.size() > 0);
 	}
 
 	/**
@@ -269,7 +274,9 @@ public class SocketIO implements IOInterface {
 //  return result;
 		if (buff != null) {
 			if (log.isLoggable(Level.FINER)) {
-				log.log(Level.FINER, "SOCKET - Writing data, remaining: {0}", buff.remaining());
+				log.log(Level.FINER, "SOCKET - Writing data, remaining: {0}, {1}",
+						new Object[] { buff.remaining(),
+						toString() });
 			}
 
 			dataToSend.offer(buff);
@@ -295,7 +302,7 @@ public class SocketIO implements IOInterface {
 		}
 
 		if (log.isLoggable(Level.FINER)) {
-			log.log(Level.FINER, "Wrote to channel {0} bytes.", result);
+			log.log(Level.FINER, "Wrote to channel {0} bytes, {1}", new Object[] { result, toString() });
 		}
 
 //  if (isRemoteAddress("81.142.228.219")) {

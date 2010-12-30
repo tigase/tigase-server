@@ -26,6 +26,7 @@ package tigase.io;
 
 import java.io.File;
 
+import java.security.KeyStore;
 import java.security.cert.CertificateParsingException;
 
 import java.util.Map;
@@ -130,8 +131,9 @@ public interface SSLContextContainerIfc {
 
 	/**
 	 * Constant <code>SERVER_CERTS_DIR_KEY</code> is a key pointing to a
-	 * configuration parameter with directory name where all server certificates
-	 * are stored.
+	 * configuration parameter with directory names where all server certificates
+	 * are stored. This can be a comma separated list of directories, instead of a single
+	 * directory name.
 	 * Certificates are stored in <code>*.pem</code> files where the first part
 	 * of the file name is a domain name i.e.: <code>yourdomain.com.pem</code>.
 	 * There is one exception though. The file named <code>default.pem</code>
@@ -149,7 +151,8 @@ public interface SSLContextContainerIfc {
 
 	/**
 	 * Constant <code>TRUSTED_CERTS_DIR_KEY</code> is a key pointing to a configuration
-	 * parameter where all trusted certificates are stored.
+	 * parameter where all trusted certificates are stored. This can be a comma separated list
+	 * of directories.
 	 */
 	public static final String TRUSTED_CERTS_DIR_KEY = "trusted-certs-dir";
 
@@ -220,6 +223,13 @@ public interface SSLContextContainerIfc {
 	 */
 	SSLContext getSSLContext(String protocol, String hostname);
 
+	/**
+	 * Returns a trust store with all trusted certificates.
+	 * @return a KeyStore with all trusted certificates, the KeyStore can be empty but cannot
+	 * be null.
+	 */
+	KeyStore getTrustStore();
+
 	//~--- methods --------------------------------------------------------------
 
 	/**
@@ -229,7 +239,7 @@ public interface SSLContextContainerIfc {
 	 * If there is only one certificate loaded it is a default one as well.
 	 * Otherwise the certificate from <code>default.pem</code> file should be
 	 * used as a default one.
-	 * Deafault certificate can be also set through the settings in the
+	 * Default certificate can be also set through the settings in the
 	 * <code>Map</code> given as a parameter. <code>DEFAULT_DOMAIN_CERT_KEY</code>
 	 * points to the domain which holds default certificate.
 	 *

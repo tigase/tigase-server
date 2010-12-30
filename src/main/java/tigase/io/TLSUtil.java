@@ -28,9 +28,9 @@ import static tigase.io.SSLContextContainerIfc.*;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import java.security.KeyStore;
 import java.security.cert.CertificateParsingException;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -104,6 +104,16 @@ public abstract class TLSUtil {
 	 */
 	public static SSLContext getSSLContext(String protocol, String hostname) {
 		return sslContextContainer.getSSLContext(protocol, hostname);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public static KeyStore getTrustStore() {
+		return sslContextContainer.getTrustStore();
 	}
 }    // TLSUtil
 

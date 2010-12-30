@@ -24,30 +24,35 @@ package tigase.server.xmppserver;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.net.ConnectionType;
-
 import tigase.server.ConnectionManager;
 import tigase.server.Packet;
+import tigase.server.xmppserver.proc.Dialback;
+import tigase.server.xmppserver.proc.PacketChecker;
+import tigase.server.xmppserver.proc.StartTLS;
+import tigase.server.xmppserver.proc.StartZlib;
+import tigase.server.xmppserver.proc.StreamError;
+import tigase.server.xmppserver.proc.StreamFeatures;
+import tigase.server.xmppserver.proc.StreamOpen;
 
 import tigase.stats.StatisticsList;
-
-import tigase.util.Algorithms;
 
 import tigase.xml.Element;
 
 import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
 import tigase.xmpp.PacketErrorTypeException;
-import tigase.xmpp.StanzaType;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.security.NoSuchAlgorithmException;
-
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.UUID;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -60,7 +65,7 @@ import java.util.logging.Logger;
  * @version $Rev$
  */
 public class S2SConnectionManager extends ConnectionManager<S2SIOService>
-		implements ConnectionHandlerIfc<S2SIOService> {
+		implements S2SConnectionHandlerIfc<S2SIOService> {
 
 	/**
 	 * Variable <code>log</code> is a class logger.
@@ -68,12 +73,8 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 	private static final Logger log = Logger.getLogger(S2SConnectionManager.class.getName());
 	private static final String XMLNS_SERVER_VAL = "jabber:server";
 	private static final String XMLNS_CLIENT_VAL = "jabber:client";
-	private static final String XMLNS_DB_VAL = "jabber:server:dialback";
-	private static final String RESULT_EL_NAME = "result";
-	private static final String VERIFY_EL_NAME = "verify";
 	protected static final String DB_RESULT_EL_NAME = "db:result";
 	protected static final String DB_VERIFY_EL_NAME = "db:verify";
-	private static final String XMLNS_DB_ATT = "xmlns:db";
 
 	/** Field description */
 	public static final String MAX_PACKET_WAITING_TIME_PROP_KEY = "max-packet-waiting-time";
@@ -101,7 +102,7 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 	public static final int MAX_INCOMING_CONNECTIONS_PROP_VAL = 4;
 
 	/** Field description */
-	public static final int MAX_OUT_TOTAL_CONNECTIONS_PROP_VAL = 4;
+	public static final int MAX_OUT_TOTAL_CONNECTIONS_PROP_VAL = 1;
 
 	/** Field description */
 	public static final int MAX_OUT_PER_IP_CONNECTIONS_PROP_VAL = 1;
@@ -139,6 +140,13 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 	private Map<CID, CIDConnections> cidConnections = new ConcurrentHashMap<CID,
 		CIDConnections>(10000);
 
+	/**
+	 * List of processors which should handle all traffic incoming from the
+	 * network. In most cases if not all, these processors handle just
+	 * protocol traffic, all the rest traffic should be passed on to MR.
+	 */
+	private Map<String, S2SProcessor> processors = new LinkedHashMap<String, S2SProcessor>(10);
+
 	//~--- methods --------------------------------------------------------------
 
 	/**
@@ -154,7 +162,44 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 		return super.addOutPacket(packet);
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param task
+	 * @param delay
+	 * @param unit
+	 */
+	@Override
+	public void addTimerTask(TimerTask task, long delay, TimeUnit unit) {
+		super.addTimerTask(task, delay, unit);
+	}
+
 	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param cid
+	 * @param createNew
+	 *
+	 * @return
+	 *
+	 * @throws LocalhostException
+	 * @throws NotLocalhostException
+	 */
+	@Override
+	public CIDConnections getCIDConnections(CID cid, boolean createNew)
+			throws NotLocalhostException, LocalhostException {
+		CIDConnections result = getCIDConnections(cid);
+
+		if ((result == null) && createNew && (cid != null)) {
+			result = createNewCIDConnections(cid);
+		}
+
+		return result;
+	}
 
 	/**
 	 * Method description
@@ -202,6 +247,32 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 	}
 
 	/**
+	 *
+	 * @param connectionCid
+	 * @param keyCid
+	 * @param key
+	 * @param key_sessionId
+	 * @param asking_sessionId
+	 * @return
+	 */
+	@Override
+	public String getLocalDBKey(CID connectionCid, CID keyCid, String key, String key_sessionId,
+			String asking_sessionId) {
+		CIDConnections cid_conns = getCIDConnections(keyCid);
+		String result = (cid_conns == null) ? null : cid_conns.getDBKey(key_sessionId);
+
+		if (result == null) {
+
+			// In piggybacking mode the DB key can be available in the connectionCID rather then
+			// keyCID
+			cid_conns = getCIDConnections(connectionCid);
+			result = (cid_conns == null) ? null : cid_conns.getDBKey(key_sessionId);
+		}
+
+		return result;
+	}
+
+	/**
 	 * Method description
 	 *
 	 *
@@ -212,43 +283,78 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 		super.getStatistics(list);
 		list.add(getName(), "CIDs number", cidConnections.size(), Level.INFO);
 
-		if (list.checkLevel(Level.FINEST)) {
+		if (list.checkLevel(Level.FINER)) {
 			long total_outgoing = 0;
+			long total_outgoing_tls = 0;
 			long total_outgoing_handshaking = 0;
 			long total_incoming = 0;
+			long total_incoming_tls = 0;
 			long total_dbKeys = 0;
 			long total_waiting = 0;
 			long total_waiting_control = 0;
 
 			for (Map.Entry<CID, CIDConnections> cid_conn : cidConnections.entrySet()) {
 				int outgoing = cid_conn.getValue().getOutgoingCount();
+				int outgoing_tls = cid_conn.getValue().getOutgoingTLSCount();
 				int outgoing_handshaking = cid_conn.getValue().getOutgoingHandshakingCount();
 				int incoming = cid_conn.getValue().getIncomingCount();
+				int incoming_tls = cid_conn.getValue().getIncomingTLSCount();
 				int dbKeys = cid_conn.getValue().getDBKeysCount();
 				int waiting = cid_conn.getValue().getWaitingCount();
 				int waiting_control = cid_conn.getValue().getWaitingControlCount();
 
-				log.log(Level.FINEST,
-						"CID: {0}, OUT: {1}, OUT_HAND: {2}, IN: {3}, dbKeys: {4}, "
-							+ "waiting: {5}, waiting_control: {6}", new Object[] {
-					cid_conn.getKey(), outgoing, outgoing_handshaking, incoming, dbKeys, waiting,
-					waiting_control
-				});
+				if (log.isLoggable(Level.FINEST)) {
+
+//        Throwable thr = new Throwable();
+//
+//        thr.fillInStackTrace();
+//        log.log(Level.FINEST, "Called from: ", thr);
+					log.log(Level.FINEST,
+							"CID: {0}, OUT: {1}, OUT_HAND: {2}, IN: {3}, dbKeys: {4}, "
+								+ "waiting: {5}, waiting_control: {6}", new Object[] {
+						cid_conn.getKey(), outgoing, outgoing_handshaking, incoming, dbKeys, waiting,
+						waiting_control
+					});
+				}
+
 				total_outgoing += outgoing;
+				total_outgoing_tls += outgoing_tls;
 				total_outgoing_handshaking += outgoing_handshaking;
 				total_incoming += incoming;
+				total_incoming_tls += incoming_tls;
 				total_dbKeys += dbKeys;
 				total_waiting += waiting;
 				total_waiting_control += waiting_control;
 			}
 
-			list.add(getName(), "Total outgoing", total_outgoing, Level.FINEST);
+			list.add(getName(), "Total outgoing", total_outgoing, Level.FINER);
+			list.add(getName(), "Total outgoing TLS", total_outgoing_tls, Level.FINER);
 			list.add(getName(), "Total outgoing handshaking", total_outgoing_handshaking, Level.FINEST);
-			list.add(getName(), "Total incoming", total_incoming, Level.FINEST);
+			list.add(getName(), "Total incoming", total_incoming, Level.FINER);
+			list.add(getName(), "Total incoming TLS", total_incoming_tls, Level.FINER);
 			list.add(getName(), "Total DB keys", total_dbKeys, Level.FINEST);
 			list.add(getName(), "Total waiting", total_waiting, Level.FINEST);
 			list.add(getName(), "Total control waiting", total_waiting_control, Level.FINEST);
 		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 * @param serv
+	 * @return
+	 */
+	@Override
+	public List<Element> getStreamFeatures(S2SIOService serv) {
+		List<Element> results = new ArrayList<Element>(10);
+
+		for (S2SProcessor proc : processors.values()) {
+			proc.streamFeatures(serv, results);
+		}
+
+		return results;
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -324,53 +430,53 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 			return;
 		}
 
-		// Check whether addressing is correct:
 		String to_hostname = packet.getStanzaTo().getDomain();
 
 		try {
 
-			// We don't send packets to local domains trough s2s, there
-			// must be something wrong with configuration
-			if (isLocalDomainOrComponent(to_hostname)) {
-
-				// Ups, remote hostname is the same as one of local hostname??
-				// Internal loop possible, we don't want that....
-				// Let's send the packet back....
-				if (log.isLoggable(Level.INFO)) {
-					log.log(Level.INFO, "Packet addresses to localhost, I am not processing it: {0}", packet);
-				}
-
-				addOutPacket(Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet,
-						"S2S - not delivered. Server missconfiguration.", true));
-
-				return;
-			}
-
-			// I think from_hostname needs to be different from to_hostname at
-			// this point... or s2s doesn't make sense
+			// Code commented out below is not needed anymore
+			// following call below takes care of hostnames checking: getCIDConnections(cid, true);
+//    // Check whether addressing is correct:
+//
+//      // We don't send packets to local domains trough s2s, there
+//      // must be something wrong with configuration
+//      if (isLocalDomainOrComponent(to_hostname)) {
+//
+//        // Ups, remote hostname is the same as one of local hostname??
+//        // Internal loop possible, we don't want that....
+//        // Let's send the packet back....
+//        if (log.isLoggable(Level.INFO)) {
+//          log.log(Level.INFO, "Packet addresses to localhost, I am not processing it: {0}", packet);
+//        }
+//
+//        addOutPacket(Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet,
+//            "S2S - not delivered. Server missconfiguration.", true));
+//
+//        return;
+//      }
+//
 			String from_hostname = packet.getStanzaFrom().getDomain();
 
-			// All hostnames go through String.intern()
-			if (to_hostname == from_hostname) {
-				log.log(Level.WARNING, "Dropping incorrect packet - from_hostname == to_hostname: {0}",
-						packet);
-
-				return;
-			}
-
-			CID cid = getConnectionId(from_hostname, to_hostname);
+			// Code commented out below is not needed anymore
+			// following call below takes care of hostnames checking: getCIDConnections(cid, true);
+//    // I think from_hostname needs to be different from to_hostname at
+//    // this point... or s2s doesn't make sense
+//
+//    // All hostnames go through String.intern()
+//    if (to_hostname == from_hostname) {
+//      log.log(Level.WARNING, "Dropping incorrect packet - from_hostname == to_hostname: {0}",
+//          packet);
+//
+//      return;
+//    }
+			CID cid = new CID(from_hostname, to_hostname);
 
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Connection ID is: {0}", cid);
 			}
 
-			CIDConnections cid_conns = getCIDConnections(cid);
-
 			try {
-				if (cid_conns == null) {
-					cid_conns = createNewCIDConnections(cid);
-				}
-
+				CIDConnections cid_conns = getCIDConnections(cid, true);
 				Packet server_packet = packet.copyElementOnly();
 
 				server_packet.getElement().removeAttribute("xmlns");
@@ -378,6 +484,10 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 			} catch (NotLocalhostException e) {
 				addOutPacket(Authorization.NOT_ACCEPTABLE.getResponseMessage(packet,
 						"S2S - Incorrect source address - none of any local virtual hosts or components.",
+							true));
+			} catch (LocalhostException e) {
+				addOutPacket(Authorization.NOT_ACCEPTABLE.getResponseMessage(packet,
+						"S2S - Incorrect destinationaddress - one of local virtual hosts or components.",
 							true));
 			}
 		} catch (PacketErrorTypeException e) {
@@ -397,46 +507,46 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 	public Queue<Packet> processSocketData(S2SIOService serv) {
 		Queue<Packet> packets = serv.getReceivedPackets();
 		Packet p = null;
+		Queue<Packet> results = new ArrayDeque<Packet>(2);
 
 		while ((p = packets.poll()) != null) {
-
-//    log.finer("Processing packet: " + p.getElemName()
-//      + ", type: " + p.getType());
-			if (p.getXMLNS() == XMLNS_SERVER_VAL) {
-				p.getElement().setXMLNS(XMLNS_CLIENT_VAL);
-			}
-
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "{0}, Processing socket data: {1}", new Object[] { serv, p });
+				log.log(Level.FINEST, "Processing socket data: {0}", p);
 			}
 
-			if (p.getXMLNS() == XMLNS_DB_VAL) {
-				processDialback(p, serv);
-			} else {
-				if (p.getElemName() == "error") {
-					processStreamError(p, serv);
+			boolean processed = false;
 
-					return null;
-				} else {
-					if (checkPacket(p, serv)) {
+			for (S2SProcessor proc : processors.values()) {
+				processed |= proc.process(p, serv, results);
+				writePacketsToSocket(serv, results);
+			}
+
+			if ( !processed) {
+
+//      log.finer("Processing packet: " + p.getElemName()
+//        + ", type: " + p.getType());
+				if (p.getXMLNS() == XMLNS_SERVER_VAL) {
+					p.getElement().setXMLNS(XMLNS_CLIENT_VAL);
+				}
+
+				try {
+					if (isLocalDomainOrComponent(p.getStanzaTo().getDomain())) {
 						if (log.isLoggable(Level.FINEST)) {
 							log.log(Level.FINEST, "{0}, Adding packet out: {1}", new Object[] { serv, p });
 						}
 
-						if (isLocalDomainOrComponent(p.getStanzaTo().getDomain())) {
-							addOutPacket(p);
-						} else {
-							try {
-								serv.addPacketToSend(Authorization.NOT_ACCEPTABLE.getResponseMessage(p,
-										"Not a local virtual domain or component", true));
-							} catch (PacketErrorTypeException ex) {}
-						}
+						addOutPacket(p);
 					} else {
-						return null;
+						try {
+							serv.addPacketToSend(Authorization.NOT_ACCEPTABLE.getResponseMessage(p,
+									"Not a local virtual domain or component", true));
+						} catch (PacketErrorTypeException ex) {}
 					}
+				} catch (Exception e) {
+					log.log(Level.INFO, "Unexpected exception for packet: " + p, e);
 				}
-			}    // end of else
-		}      // end of while ()
+			}
+		}    // end of while ()
 
 		return null;
 	}
@@ -473,6 +583,46 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 	 * Method description
 	 *
 	 *
+	 * @param elem_name
+	 * @param connCid
+	 * @param keyCid
+	 * @param valid
+	 * @param key_sessionId
+	 * @param serv_sessionId
+	 * @param cdata
+	 * @param handshakingOnly
+	 *
+	 * @return
+	 */
+	@Override
+	public boolean sendVerifyResult(String elem_name, CID connCid, CID keyCid, Boolean valid,
+			String key_sessionId, String serv_sessionId, String cdata, boolean handshakingOnly) {
+		CIDConnections cid_conns = getCIDConnections(connCid);
+
+		if (cid_conns != null) {
+			Packet verify_valid = getValidResponse(elem_name, keyCid, key_sessionId, valid, cdata);
+
+			if (handshakingOnly) {
+				cid_conns.sendHandshakingOnly(verify_valid);
+
+				return true;
+			} else {
+				return cid_conns.sendControlPacket(serv_sessionId, verify_valid);
+			}
+		} else {
+			if (log.isLoggable(Level.FINE)) {
+				log.log(Level.FINE, "Can't find CID connections for cid: {0}, can't send verify response.",
+						keyCid);
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
 	 * @param serv
 	 */
 	@Override
@@ -480,41 +630,9 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 		super.serviceStarted(serv);
 		log.log(Level.FINEST, "s2s connection opened: {0}", serv);
 
-		switch (serv.connectionType()) {
-			case connect :
-				CID cid = (CID) serv.getSessionData().get("cid");
-
-				// Send init xmpp stream here
-				// XMPPIOService serv = (XMPPIOService)service;
-				String data = "<stream:stream" + " xmlns:stream='http://etherx.jabber.org/streams'"
-					+ " xmlns='jabber:server'" + " xmlns:db='jabber:server:dialback'" + " from='"
-					+ cid.getLocalHost() + "'" + " to='" + cid.getRemoteHost() + "'" + ">";
-
-				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0}, sending: {1}", new Object[] { serv, data });
-				}
-
-				S2SConnection s2s_conn =
-					(S2SConnection) serv.getSessionData().get(S2SIOService.S2S_CONNECTION_KEY);
-
-				if (s2s_conn == null) {
-					log.log(Level.WARNING,
-							"Protocol error s2s_connection not set for outgoing connection: {0}", serv);
-					serv.stop();
-				} else {
-					s2s_conn.setS2SIOService(serv);
-					serv.setS2SConnection(s2s_conn);
-				}
-
-				serv.xmppStreamOpen(data);
-
-				break;
-
-			default :
-
-				// Do nothing, more data should come soon...
-				break;
-		}    // end of switch (service.connectionType())
+		for (S2SProcessor proc : processors.values()) {
+			proc.serviceStarted(serv);
+		}
 	}
 
 	/**
@@ -530,25 +648,8 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 		boolean result = super.serviceStopped(serv);
 
 		if (result) {
-			CID cid = (CID) serv.getSessionData().get("cid");
-
-			if (cid == null) {
-				if (serv.connectionType() == ConnectionType.connect) {
-					log.log(Level.WARNING, "Protocol error cid not set for outgoing connection: {0}", serv);
-				}
-
-				return result;
-			}
-
-			CIDConnections cid_conns = getCIDConnections(cid);
-
-			if (cid_conns == null) {
-				log.log(Level.WARNING, "Protocol error cid_conns not found for outgoing connection: {0}",
-						serv);
-
-				return result;
-			} else {
-				cid_conns.connectionStopped(serv);
+			for (S2SProcessor proc : processors.values()) {
+				proc.serviceStopped(serv);
 			}
 		}
 
@@ -566,6 +667,21 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 	@Override
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
+
+		// TODO: Make used processors list a configurarble thing
+		processors.clear();
+		processors.put(Dialback.class.getName(), new Dialback());
+		processors.put(PacketChecker.class.getName(), new PacketChecker());
+		processors.put(StartTLS.class.getName(), new StartTLS());
+		processors.put(StartZlib.class.getName(), new StartZlib());
+		processors.put(StreamError.class.getName(), new StreamError());
+		processors.put(StreamFeatures.class.getName(), new StreamFeatures());
+		processors.put(StreamOpen.class.getName(), new StreamOpen());
+
+		for (S2SProcessor proc : processors.values()) {
+			proc.init(this);
+		}
+
 		maxPacketWaitingTime = (Long) props.get(MAX_PACKET_WAITING_TIME_PROP_KEY) * SECOND;
 		maxInactivityTime = (Long) props.get(MAX_CONNECTION_INACTIVITY_TIME_PROP_KEY) * SECOND;
 		maxOUTTotalConnections = (Integer) props.get(MAX_OUT_TOTAL_CONNECTIONS_PROP_KEY);
@@ -591,9 +707,38 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 	 * @param serv
 	 */
 	@Override
+	public void tlsHandshakeCompleted(S2SIOService serv) {
+		for (S2SProcessor proc : processors.values()) {
+			proc.serviceStarted(serv);
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param ios
+	 * @param data
+	 */
+	@Override
+	public void writeRawData(S2SIOService ios, String data) {
+		super.writeRawData(ios, data);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param serv
+	 */
+	@Override
 	public void xmppStreamClosed(S2SIOService serv) {
 		if (log.isLoggable(Level.FINER)) {
 			log.log(Level.FINER, "{0}, Stream closed.", new Object[] { serv });
+		}
+
+		for (S2SProcessor proc : processors.values()) {
+			proc.streamClosed(serv);
 		}
 	}
 
@@ -612,140 +757,21 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 			log.log(Level.FINER, "{0}, Stream opened: {1}", new Object[] { serv, attribs });
 		}
 
-//  if ((remote_hostname == null) || (local_hostname == null)) {
-//    generateStreamError(serv.connectionType() == ConnectionType.accept,
-//        "improper-addressing", serv);
-//
-//    return null;
-//  }
-//
-//  if ( !this.isLocalDomainOrComponent(local_hostname)) {
-//    generateStreamError(serv.connectionType() == ConnectionType.accept, "host-unknown",
-//        serv);
-//
-//    return null;
-//  }
-		CID cid = (CID) serv.getSessionData().get("cid");
+		StringBuilder sb = new StringBuilder(256);
 
-		if (cid == null) {
-			String remote_hostname = attribs.get("from");
-			String local_hostname = attribs.get("to");
+		for (S2SProcessor proc : processors.values()) {
+			String res = proc.streamOpened(serv, attribs);
 
-			if ((remote_hostname != null) && (local_hostname != null)) {
-				cid = getConnectionId(local_hostname, remote_hostname);
+			if (res != null) {
+				sb.append(res);
 			}
 		}
 
-		CIDConnections cid_conns = getCIDConnections(cid);
+		if (log.isLoggable(Level.FINER)) {
+			log.log(Level.FINER, "{0}, Sending stream open: {1}", new Object[] { serv, sb });
+		}
 
-		switch (serv.connectionType()) {
-			case connect : {
-
-				// It must be always set for connect connection type
-				String remote_id = attribs.get("id");
-
-				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0}, Connect Stream opened for: {1}, session id{2}",
-							new Object[] { serv,
-							cid, remote_id });
-				}
-
-				if (cid_conns == null) {
-
-					// This should actually not happen. Let's be clear here about handling unexpected
-					// cases.
-					log.log(Level.WARNING,
-							"{0} This might be a bug in s2s code, should not happen."
-								+ " Missing CIDConnections for stream open to ''connect'' service type.", serv);
-					generateStreamError(false, "internal-server-error", serv);
-
-					return null;
-				}
-
-				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0}, stream open for cid: {1}, outgoint: {2}, incoming: {3}",
-							new Object[] { serv,
-							cid, cid_conns.getOutgoingCount(), cid_conns.getIncomingCount() });
-				}
-
-				serv.setSessionId(remote_id);
-
-				String uuid = UUID.randomUUID().toString();
-				String key = null;
-
-				try {
-					key = Algorithms.hexDigest(remote_id, uuid, "SHA");
-				} catch (NoSuchAlgorithmException e) {
-					key = uuid;
-				}    // end of try-catch
-
-				serv.setDBKey(key);
-				cid_conns.addDBKey(remote_id, key);
-
-				if ( !serv.isHandshakingOnly()) {
-					Element elem = new Element(DB_RESULT_EL_NAME, key, new String[] { XMLNS_DB_ATT },
-						new String[] { XMLNS_DB_VAL });
-
-					serv.getS2SConnection().addControlPacket(Packet.packetInstance(elem,
-							JID.jidInstanceNS(cid.getLocalHost()), JID.jidInstanceNS(cid.getRemoteHost())));
-				}
-
-				serv.getS2SConnection().sendAllControlPackets();
-
-				return null;
-			}
-
-			case accept : {
-				try {
-					String id = UUID.randomUUID().toString();
-
-					serv.setSessionId(id);
-
-					String stream_open = "<stream:stream"
-						+ " xmlns:stream='http://etherx.jabber.org/streams'" + " xmlns='jabber:server'"
-						+ " xmlns:db='jabber:server:dialback'" + " id='" + id + "'";
-
-					if (cid != null) {
-						stream_open += " from='" + cid.getLocalHost() + "'" + " to='" + cid.getRemoteHost()
-								+ "'";
-
-						if (cid_conns == null) {
-							cid_conns = createNewCIDConnections(cid);
-						}
-
-						if (log.isLoggable(Level.FINEST)) {
-							log.log(Level.FINEST, "{0}, Accept Stream opened for: {1}, session id: {2}",
-									new Object[] { serv,
-									cid, id });
-						}
-
-						serv.getSessionData().put("cid", cid);
-						cid_conns.addIncoming(serv);
-					} else {
-						if (log.isLoggable(Level.FINEST)) {
-							log.log(Level.FINEST, "{0}, Accept Stream opened for unknown CID, session id: {1}",
-									new Object[] { serv,
-									id });
-						}
-					}
-
-					stream_open += ">";
-
-					return stream_open;
-				} catch (NotLocalhostException ex) {
-					generateStreamError(false, "host-unknown", serv);
-				}
-
-				break;
-			}
-
-			default :
-				log.log(Level.SEVERE, "{0}, Warning, program shouldn't reach that point.", serv);
-
-				break;
-		}    // end of switch (serv.connectionType())
-
-		return null;
+		return (sb.length() == 0) ? null : sb.toString();
 	}
 
 	//~--- get methods ----------------------------------------------------------
@@ -753,22 +779,6 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 	@Override
 	protected int[] getDefPlainPorts() {
 		return new int[] { 5269 };
-	}
-
-	/**
-	 *
-	 * @param connectionCid
-	 * @param keyCid
-	 * @param key
-	 * @param key_sessionId
-	 * @param asking_sessionId
-	 * @return
-	 */
-	protected String getLocalDBKey(CID connectionCid, CID keyCid, String key, String key_sessionId,
-			String asking_sessionId) {
-		CIDConnections cid_conns = getCIDConnections(keyCid);
-
-		return (cid_conns == null) ? null : cid_conns.getDBKey(key_sessionId);
 	}
 
 	@Override
@@ -788,54 +798,14 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 
 	//~--- methods --------------------------------------------------------------
 
-	protected boolean sendVerifyResult(String elem_name, CID connCid, CID keyCid, boolean valid,
-			String key_sessionId, String serv_sessionId) {
-		CIDConnections cid_conns = getCIDConnections(connCid);
-
-		if (cid_conns != null) {
-			Packet verify_valid = getValidResponse(elem_name, keyCid, key_sessionId, valid, null);
-
-			return cid_conns.sendControlPacket(serv_sessionId, verify_valid);
-		} else {
-			if (log.isLoggable(Level.FINE)) {
-				log.log(Level.FINE,
-						"Can''t find CID connections for cid: {0}, can't send verify response.", keyCid);
-			}
-		}
-
-		return false;
-	}
-
-	private boolean checkPacket(Packet p, S2SIOService serv) {
-		if ((p.getStanzaFrom() == null) || (p.getStanzaFrom().getDomain().trim().isEmpty())
-				|| (p.getStanzaTo() == null) || p.getStanzaTo().getDomain().trim().isEmpty()) {
-			generateStreamError(false, "improper-addressing", serv);
-
-			return false;
-		}
-
-		CID cid = getConnectionId(p.getStanzaTo().getDomain(), p.getStanzaFrom().getDomain());
-
-		// String remote_hostname = (String) serv.getSessionData().get("remote-hostname");
-		if ( !serv.isAuthenticated(cid)) {
-			if (log.isLoggable(Level.FINER)) {
-				log.log(Level.FINER,
-						"{0}, Invalid hostname from the remote server for packet: "
-							+ "{1}, authenticated domains for this connection: {2}", new Object[] { serv,
-						p, serv.getCIDs() });
-			}
-
-			generateStreamError(false, "invalid-from", serv);
-
-			return false;
-		}
-
-		return true;
-	}
-
-	private CIDConnections createNewCIDConnections(CID cid) throws NotLocalhostException {
+	private CIDConnections createNewCIDConnections(CID cid)
+			throws NotLocalhostException, LocalhostException {
 		if ( !isLocalDomainOrComponent(cid.getLocalHost())) {
-			throw new NotLocalhostException("This is not a valid localhost.");
+			throw new NotLocalhostException("This is not a valid localhost: " + cid.getLocalHost());
+		}
+
+		if (isLocalDomainOrComponent(cid.getRemoteHost())) {
+			throw new LocalhostException("This is not a valid remotehost: " + cid.getRemoteHost());
 		}
 
 		CIDConnections cid_conns = new CIDConnections(cid, this, connSelector, maxINConnections,
@@ -846,26 +816,6 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 		return cid_conns;
 	}
 
-	private void generateStreamError(boolean initStream, String error_el, S2SIOService serv) {
-		String strError = "";
-
-		if (initStream) {
-			strError += "<?xml version='1.0'?><stream:stream" + " xmlns='" + XMLNS_SERVER_VAL + "'"
-					+ " xmlns:stream='http://etherx.jabber.org/streams'" + " id='tigase-server-error'"
-						+ " from='" + getDefHostName() + "'" + " xml:lang='en'>";
-		}
-
-		strError += "<stream:error>" + "<" + error_el
-				+ " xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>" + "</stream:error>" + "</stream:stream>";
-
-		try {
-			writeRawData(serv, strError);
-			serv.stop();
-		} catch (Exception e) {
-			serv.forceStop();
-		}
-	}
-
 	//~--- get methods ----------------------------------------------------------
 
 	private CIDConnections getCIDConnections(CID cid) {
@@ -874,10 +824,6 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 		}
 
 		return cidConnections.get(cid);
-	}
-
-	private CID getConnectionId(String localhost, String remotehost) {
-		return new CID(localhost, remotehost);
 	}
 
 	private Packet getValidResponse(String elem_name, CID cid, String id, Boolean valid,
@@ -904,125 +850,6 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 			JID.jidInstanceNS(cid.getRemoteHost()));
 
 		return result;
-	}
-
-	//~--- methods --------------------------------------------------------------
-
-	private void processDialback(Packet p, S2SIOService serv) {
-
-		// Get the cid for which the connection has been created, the cid calculated
-		// from the packet may be different though if the remote server tries to multiplexing
-		CID cid = (CID) serv.getSessionData().get("cid");
-
-		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "{0}, DIALBACK packet: {1}, CID: {2}", new Object[] { serv, p, cid });
-		}
-
-		CIDConnections cid_conns = null;
-
-		// Some servers (ejabberd) do not send from/to attributes in the stream:open which
-		// violates the spec, they seem not to care though, so here we handle the case.
-		if (cid == null) {
-
-			// This actually can only happen for 'accept' connection type
-			// what we did not get in stream open we can get from here
-			cid = getConnectionId(p.getStanzaTo().getDomain(), p.getStanzaFrom().getDomain());
-			cid_conns = getCIDConnections(cid);
-
-			if (cid_conns == null) {
-				try {
-					cid_conns = createNewCIDConnections(cid);
-				} catch (NotLocalhostException ex) {
-					log.log(Level.FINER, "{0} Incorrect local hostname: {1}", new Object[] { serv, cid });
-					generateStreamError(false, "host-unknown", serv);
-
-					return;
-				}
-			}
-
-			serv.getSessionData().put("cid", cid);
-			cid_conns.addIncoming(serv);
-		} else {
-			cid_conns = getCIDConnections(cid);
-		}
-
-		if (cid == null) {
-			log.log(Level.WARNING,
-					"{0} This might be a bug in the code or there was no stream "
-						+ "open on this connection, CID is not set.", serv);
-			generateStreamError(false, "reset", serv);
-
-			return;
-		}
-
-		if (cid_conns == null) {
-
-			// Hm, this should not happen, is it a bug?
-			log.log(Level.INFO, "{0} CID connections not found for cid: {1}, packet: {2}",
-					new Object[] { serv,
-					cid, p });
-			generateStreamError(false, "reset", serv);
-
-			return;
-		}
-
-		String remote_key = p.getElemCData();
-
-		// Dummy dialback implementation for now....
-		if ((p.getElemName() == RESULT_EL_NAME) || (p.getElemName() == DB_RESULT_EL_NAME)) {
-			if (p.getType() == null) {
-				String conn_sessionId = serv.getSessionId();
-				Packet verify_req = this.getValidResponse(DB_VERIFY_EL_NAME, cid, conn_sessionId, null,
-					p.getElemCData());
-
-				cid_conns.sendHandshakingOnly(verify_req);
-			} else {
-				if (p.getType() == StanzaType.valid) {
-					serv.addCID(getConnectionId(p.getStanzaTo().getDomain(), p.getStanzaFrom().getDomain()));
-					cid_conns.connectionAuthenticated(serv);
-				} else {
-					if (log.isLoggable(Level.FINE)) {
-						log.log(Level.FINE,
-								"Invalid result for DB authentication: {0}, stopping connection: {1}",
-									new Object[] { cid,
-								serv });
-					}
-
-					serv.stop();
-				}
-			}
-		}
-
-		if ((p.getElemName() == VERIFY_EL_NAME) || (p.getElemName() == DB_VERIFY_EL_NAME)) {
-			if (p.getType() == null) {
-				CID keyCid = getConnectionId(p.getStanzaTo().getDomain(), p.getStanzaFrom().getDomain());
-				String local_key = getLocalDBKey(cid, keyCid, remote_key, p.getStanzaId(),
-					serv.getSessionId());
-
-				if (local_key == null) {
-					if (log.isLoggable(Level.FINER)) {
-						log.log(Level.FINER,
-								"The key is not available for connection: {0} maybe it is "
-									+ "located on a different node...", cid);
-					}
-				} else {
-					sendVerifyResult(DB_VERIFY_EL_NAME, cid, keyCid, local_key.equals(remote_key),
-							p.getStanzaId(), serv.getSessionId());
-				}
-			} else {
-				sendVerifyResult(DB_RESULT_EL_NAME, cid, cid, (p.getType() == StanzaType.valid), null,
-						p.getStanzaId());
-				cid_conns.connectionAuthenticated(p.getStanzaId());
-
-				if (serv.isHandshakingOnly()) {
-					serv.stop();
-				}
-			}
-		}
-	}
-
-	private void processStreamError(Packet p, S2SIOService serv) {
-		serv.stop();
 	}
 }
 

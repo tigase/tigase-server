@@ -22,9 +22,16 @@
 
 package tigase.io;
 
+//~--- non-JDK imports --------------------------------------------------------
+
+import tigase.cert.CertCheckResult;
+import tigase.cert.CertificateUtil;
+
 //~--- JDK imports ------------------------------------------------------------
 
 import java.nio.ByteBuffer;
+
+import java.security.cert.Certificate;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,6 +42,7 @@ import javax.net.ssl.SSLEngineResult;
 import javax.net.ssl.SSLEngineResult.HandshakeStatus;
 import javax.net.ssl.SSLEngineResult.Status;
 import javax.net.ssl.SSLException;
+import javax.net.ssl.SSLPeerUnverifiedException;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -52,11 +60,12 @@ public class TLSWrapper {
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
-	private static Logger log = Logger.getLogger("tigase.io.TLSWrapper");
+	private static final Logger log = Logger.getLogger(TLSWrapper.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
 
 	private int appBuffSize = 0;
+	private String debugId = null;
 
 	// private String protocol = null;
 	private TLSEventHandler eventHandler = null;
@@ -76,6 +85,11 @@ public class TLSWrapper {
 	 */
 	public TLSWrapper(SSLContext sslc, TLSEventHandler eventHandler, boolean clientMode) {
 		tlsEngine = sslc.createSSLEngine();
+
+		if ( !clientMode) {
+			tlsEngine.getSSLParameters().setWantClientAuth(true);
+		}
+
 		tlsEngine.setUseClientMode(clientMode);
 		netBuffSize = tlsEngine.getSession().getPacketBufferSize();
 		appBuffSize = tlsEngine.getSession().getApplicationBufferSize();
@@ -116,6 +130,36 @@ public class TLSWrapper {
 	 */
 	public int getAppBuffSize() {
 		return appBuffSize;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 * @param revocationEnabled
+	 * @return
+	 */
+	public CertCheckResult getCertificateStatus(boolean revocationEnabled) {
+		Certificate[] peerChain = null;
+
+		try {
+			peerChain = tlsEngine.getSession().getPeerCertificates();
+		} catch (SSLPeerUnverifiedException ex) {
+
+			// This normally happens when the peer is in a client mode and does not
+			// send any certificate, even though we set: setWantClientAuth(true)
+			return CertCheckResult.none;
+		}
+
+		try {
+			return CertificateUtil.validateCertificate(peerChain, TLSUtil.getTrustStore(),
+					revocationEnabled);
+		} catch (Exception ex) {
+			log.log(Level.WARNING, "Problem validating certificate", ex);
+		}
+
+		return CertCheckResult.invalid;
 	}
 
 	/**
@@ -168,13 +212,6 @@ public class TLSWrapper {
 
 						break;
 
-					case FINISHED :
-						if (eventHandler != null) {
-							eventHandler.handshakeCompleted();
-						}
-
-						break;
-
 					default :
 						status = TLSStatus.OK;
 
@@ -196,6 +233,18 @@ public class TLSWrapper {
 		return tlsEngine.getUseClientMode();
 	}
 
+	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param id
+	 */
+	public void setDebugId(String id) {
+		debugId = id;
+	}
+
 	//~--- methods --------------------------------------------------------------
 
 	/**
@@ -215,8 +264,16 @@ public class TLSWrapper {
 		tlsEngineResult = tlsEngine.unwrap(net, out);
 
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("unwrap() \ntlsEngineRsult.getStatus() = " + tlsEngineResult.getStatus()
-					+ "\ntlsEngineRsult.getHandshakeStatus() = " + tlsEngineResult.getHandshakeStatus());
+			log.log(Level.FINEST,
+					"{0}, unwrap() tlsEngineRsult.getStatus() = {1}, "
+						+ "tlsEngineRsult.getHandshakeStatus() = {2}", new Object[] { debugId,
+					tlsEngineResult.getStatus(), tlsEngineResult.getHandshakeStatus() });
+		}
+
+		if (tlsEngineResult.getHandshakeStatus() == SSLEngineResult.HandshakeStatus.FINISHED) {
+			if (eventHandler != null) {
+				eventHandler.handshakeCompleted(this);
+			}
 		}
 
 		if (tlsEngineResult.getStatus() == Status.BUFFER_OVERFLOW) {
@@ -228,7 +285,9 @@ public class TLSWrapper {
 			doTasks();
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("unwrap() doTasks(), handshake: " + tlsEngine.getHandshakeStatus());
+				log.log(Level.FINEST, "unwrap() doTasks(), handshake: {0}, {1}",
+						new Object[] { tlsEngine.getHandshakeStatus(),
+						debugId });
 			}
 		}
 
@@ -248,15 +307,24 @@ public class TLSWrapper {
 		tlsEngineResult = tlsEngine.wrap(app, net);
 
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("tlsEngineRsult.getStatus() = " + tlsEngineResult.getStatus()
-					+ ", tlsEngineRsult.getHandshakeStatus() = " + tlsEngineResult.getHandshakeStatus());
+			log.log(Level.FINEST,
+					"{0}, tlsEngineRsult.getStatus() = {1}, tlsEngineRsult.getHandshakeStatus() = {2}",
+						new Object[] { debugId,
+					tlsEngineResult.getStatus(), tlsEngineResult.getHandshakeStatus() });
+		}
+
+		if (tlsEngineResult.getHandshakeStatus() == SSLEngineResult.HandshakeStatus.FINISHED) {
+			if (eventHandler != null) {
+				eventHandler.handshakeCompleted(this);
+			}
 		}
 
 		if (tlsEngineResult.getHandshakeStatus() == HandshakeStatus.NEED_TASK) {
 			doTasks();
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("doTasks(): " + tlsEngine.getHandshakeStatus());
+				log.log(Level.FINEST, "doTasks(): {0}, {1}", new Object[] { tlsEngine.getHandshakeStatus(),
+						debugId });
 			}
 		}
 	}
@@ -283,7 +351,9 @@ public class TLSWrapper {
 //
 //      ByteBuffer bb = ByteBuffer.allocate(app.capacity() + appBuffSize);
 		if (log.isLoggable(Level.FINE)) {
-			log.fine("Resizing tlsInput to " + (2048 + app.capacity()) + " bytes.");
+			log.log(Level.FINE, "Resizing tlsInput to {0} bytes, {1}",
+					new Object[] { (2048 + app.capacity()),
+					debugId });
 		}
 
 		ByteBuffer bb = ByteBuffer.allocate(app.capacity() + 2048);

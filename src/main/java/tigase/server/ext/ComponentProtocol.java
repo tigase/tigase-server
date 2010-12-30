@@ -148,7 +148,7 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 	 * network. In most cases if not all, these processors handle just
 	 * protocol traffic, all the rest traffic should be passed on to MR.
 	 */
-	private Map<String, ExtProcessor> processors = new LinkedHashMap<String, ExtProcessor>();
+	private Map<String, ExtProcessor> processors = new LinkedHashMap<String, ExtProcessor>(10);
 	private UnknownXMLNSStreamOpenHandler unknownXMLNSHandler = new UnknownXMLNSStreamOpenHandler();
 	private String identity_type = IDENTITY_TYPE_VAL;
 
@@ -433,27 +433,6 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 	//~--- methods --------------------------------------------------------------
 
 	/**
-	 * This method can be overwritten in extending classes to get a different
-	 * packets distribution to different threads. For PubSub, probably better
-	 * packets distribution to different threads would be based on the
-	 * sender address rather then destination address.
-	 * @param packet
-	 * @return
-	 */
-	@Override
-	public int hashCodeForPacket(Packet packet) {
-		if (packet.getStanzaTo() != null) {
-			return packet.getStanzaTo().hashCode();
-		}
-
-		if (packet.getTo() != null) {
-			return packet.getTo().hashCode();
-		}
-
-		return super.hashCodeForPacket(packet);
-	}
-
-	/**
 	 * Method description
 	 *
 	 *
@@ -475,10 +454,11 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 	 */
 	@Override
 	public Queue<Packet> processSocketData(ComponentIOService serv) {
+		Queue<Packet> packets = serv.getReceivedPackets();
 		Packet p = null;
 		Queue<Packet> results = new ArrayDeque<Packet>(2);
 
-		while ((p = serv.getReceivedPackets().poll()) != null) {
+		while ((p = packets.poll()) != null) {
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Processing socket data: {0}", p);
 			}
@@ -531,17 +511,6 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 		}    // end of while ()
 
 		return null;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public int processingThreads() {
-		return Runtime.getRuntime().availableProcessors();
 	}
 
 	/**
@@ -725,6 +694,15 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 	}
 
 	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param service
+	 */
+	@Override
+	public void tlsHandshakeCompleted(ComponentIOService service) {}
 
 	/**
 	 * Method description

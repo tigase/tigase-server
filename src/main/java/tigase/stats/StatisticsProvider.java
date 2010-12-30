@@ -24,8 +24,6 @@ package tigase.stats;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.server.QueueType;
-
 import tigase.sys.TigaseRuntime;
 
 import tigase.util.FloatHistoryCache;
@@ -424,9 +422,8 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	public MBeanInfo getMBeanInfo() {
 		MBeanInfo mbinfo = super.getMBeanInfo();
 
-		return new MBeanInfo(mbinfo.getClassName(), mbinfo.getDescription(),
-				mbinfo.getAttributes(), mbinfo.getConstructors(), mbinfo.getOperations(),
-					getNotificationInfo());
+		return new MBeanInfo(mbinfo.getClassName(), mbinfo.getDescription(), mbinfo.getAttributes(),
+				mbinfo.getConstructors(), mbinfo.getOperations(), getNotificationInfo());
 	}
 
 	/**
@@ -733,8 +730,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 				description = "List of components names for which statistics are available";
 			} else {
 				if (info.getName().equals("Name")) {
-					description =
-						"This is a component name - name of the statistics collector component,";
+					description = "This is a component name - name of the statistics collector component,";
 				} else {
 					if (info.getName().equals("getUptime")) {
 						description = "Returns JVM uptime.";
@@ -760,8 +756,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * @return
 	 */
 	@Override
-	protected String getDescription(MBeanOperationInfo op, MBeanParameterInfo param,
-			int sequence) {
+	protected String getDescription(MBeanOperationInfo op, MBeanParameterInfo param, int sequence) {
 		if (op.getName().equals("getAllStats")) {
 			switch (sequence) {
 				case 0 :
@@ -816,8 +811,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 		methodSignature = new String[] { java.lang.String.class.getName(),
 				java.lang.Integer.TYPE.getName() };
 
-		if (info.getName().equals("getComponentStats")
-				&& Arrays.equals(signature, methodSignature)) {
+		if (info.getName().equals("getComponentStats") && Arrays.equals(signature, methodSignature)) {
 			description = "Provides statistics for a given component name and statistics level.";
 		}
 
@@ -834,8 +828,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * @return
 	 */
 	@Override
-	protected String getParameterName(MBeanOperationInfo op, MBeanParameterInfo param,
-			int sequence) {
+	protected String getParameterName(MBeanOperationInfo op, MBeanParameterInfo param, int sequence) {
 		if (op.getName().equals("getAllStats")) {
 			switch (sequence) {
 				case 0 :
@@ -864,7 +857,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 
 	private Map<String, String> getMapFromList(StatisticsList list) {
 		if (list != null) {
-			Map<String, String> result = new LinkedHashMap<String, String>();
+			Map<String, String> result = new LinkedHashMap<String, String>(300);
 
 			for (StatRecord rec : list) {
 				String key = rec.getComponent() + "/" + rec.getDescription();
@@ -1030,8 +1023,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 		private void update() {
 			float temp = cpuUsage;
 
-			cpuUsage = (prevCpuUsage + (temp * 2) + TigaseRuntime.getTigaseRuntime().getCPUUsage())
-					/ 4;
+			cpuUsage = (prevCpuUsage + (temp * 2) + TigaseRuntime.getTigaseRuntime().getCPUUsage()) / 4;
 			cpu_usage_history.addItem(cpuUsage);
 			prevCpuUsage = temp;
 			heap_usage_history.addItem(getHeapMemUsage());
@@ -1078,8 +1070,8 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 			clusterCache = allStats.getValue("cl-caching-strat", "Cached JIDs", 0);
 			messagesNumber = allStats.getCompMsg(SM_COMP);
 			temp = messagesPerSec;
-			messagesPerSec = (prevMessagesPerSec + (temp * 2f)
-					+ (messagesNumber - prevMessagesNumber)) / 4f;
+			messagesPerSec = (prevMessagesPerSec + (temp * 2f) + (messagesNumber - prevMessagesNumber))
+					/ 4f;
 			prevMessagesPerSec = temp;
 			prevMessagesNumber = messagesNumber;
 			clusterNetworkBytesSent = allStats.getValue(CL_COMP, "Bytes sent", 0L);
@@ -1209,16 +1201,16 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 				}
 			}
 
-			sb.append("\nSM presences received: Tot - ").append(lastPresencesReceived);
+			sb.append("\nSM presences rec Tot: ").append(lastPresencesReceived);
 			sb.append(" / ").append(presences_received_per_update).append(" last sec");
-			sb.append("\nSM presences sent: Tot - ").append(lastPresencesSent);
+			sb.append("\nSM presences sent Tot: ").append(lastPresencesSent);
 			sb.append(" / ").append(presences_sent_per_update).append(" last sec");
-			sb.append("\nCluster bytes/sec: " + clusterNetworkBytesPerSecond);
-			sb.append(", compression: " + clusterCompressionRatio);
-			sb.append("\nCluster bytes: S-" + clusterNetworkBytesSent);
-			sb.append(" / R-" + clusterNetworkBytesReceived);
-			sb.append("\nCluster packets: S-" + clusterPacketsSent);
-			sb.append(" / R-" + clusterPacketsReceived);
+			sb.append("\nCluster bytes/sec: ").append(clusterNetworkBytesPerSecond);
+			sb.append(", compress: ").append(clusterCompressionRatio);
+			sb.append("\nCluster bytes: [S] ").append(clusterNetworkBytesSent);
+			sb.append(" / [R] ").append(clusterNetworkBytesReceived);
+			sb.append("\nCluster packets: [S] ").append(clusterPacketsSent);
+			sb.append(" / [R] ").append(clusterPacketsReceived);
 
 			if ( !largeQueues.isEmpty()) {
 				sb.append("\n").append(largeQueues);

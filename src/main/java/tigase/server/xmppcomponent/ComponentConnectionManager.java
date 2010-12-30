@@ -95,8 +95,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
-	private static final Logger log =
-		Logger.getLogger(ComponentConnectionManager.class.getName());
+	private static final Logger log = Logger.getLogger(ComponentConnectionManager.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -434,12 +433,10 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 				// XMPPIOService serv = (XMPPIOService)service;
 				String compName = (String) serv.getSessionData().get(PORT_LOCAL_HOST_PROP_KEY);
 				String data = "<stream:stream" + " xmlns='jabber:component:accept'"
-					+ " xmlns:stream='http://etherx.jabber.org/streams'" + " to='" + compName + "'"
-					+ ">";
+					+ " xmlns:stream='http://etherx.jabber.org/streams'" + " to='" + compName + "'" + ">";
 
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("cid: " + (String) serv.getSessionData().get("cid") + ", sending: "
-							+ data);
+					log.finest("cid: " + (String) serv.getSessionData().get("cid") + ", sending: " + data);
 				}
 
 				serv.xmppStreamOpen(data);
@@ -517,6 +514,15 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 	}
 
 	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param service
+	 */
+	@Override
+	public void tlsHandshakeCompleted(XMPPIOService<Object> service) {}
 
 	/**
 	 * Method description
@@ -653,8 +659,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 				String data = p.getElemCData();
 
 				if (data == null) {
-					String[] routings =
-						(String[]) serv.getSessionData().get(PORT_ROUTING_TABLE_PROP_KEY);
+					String[] routings = (String[]) serv.getSessionData().get(PORT_ROUTING_TABLE_PROP_KEY);
 
 					updateRoutings(routings, true);
 
@@ -692,8 +697,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 
 						writePacketToSocket(serv, resp);
 
-						String[] routings =
-							(String[]) serv.getSessionData().get(PORT_ROUTING_TABLE_PROP_KEY);
+						String[] routings = (String[]) serv.getSessionData().get(PORT_ROUTING_TABLE_PROP_KEY);
 
 						updateRoutings(routings, true);
 

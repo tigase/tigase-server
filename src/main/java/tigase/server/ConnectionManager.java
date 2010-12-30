@@ -77,8 +77,8 @@ import javax.script.Bindings;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public abstract class ConnectionManager<IO extends XMPPIOService> extends AbstractMessageReceiver
-		implements XMPPIOServiceListener<IO> {
+public abstract class ConnectionManager<IO extends XMPPIOService<?>>
+		extends AbstractMessageReceiver implements XMPPIOServiceListener<IO> {
 	private static final Logger log = Logger.getLogger(ConnectionManager.class.getName());
 
 	/** Field description */
@@ -337,6 +337,27 @@ public abstract class ConnectionManager<IO extends XMPPIOService> extends Abstra
 	//~--- methods --------------------------------------------------------------
 
 	/**
+	 * This method can be overwritten in extending classes to get a different
+	 * packets distribution to different threads. For PubSub, probably better
+	 * packets distribution to different threads would be based on the
+	 * sender address rather then destination address.
+	 * @param packet
+	 * @return
+	 */
+	@Override
+	public int hashCodeForPacket(Packet packet) {
+		if (packet.getStanzaTo() != null) {
+			return packet.getStanzaTo().hashCode();
+		}
+
+		if (packet.getTo() != null) {
+			return packet.getTo().hashCode();
+		}
+
+		return super.hashCodeForPacket(packet);
+	}
+
+	/**
 	 * Method description
 	 *
 	 *
@@ -402,6 +423,17 @@ public abstract class ConnectionManager<IO extends XMPPIOService> extends Abstra
 	@Override
 	public void processPacket(Packet packet) {
 		writePacketToSocket(packet);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public int processingThreads() {
+		return Runtime.getRuntime().availableProcessors();
 	}
 
 	/**
@@ -685,7 +717,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService> extends Abstra
 			// }
 		} else {
 			if (log.isLoggable(Level.FINE)) {
-				log.log(Level.FINE, "Can''t find service for packets: [{0}] ", packets);
+				log.log(Level.FINE, "Can't find service for packets: [{0}] ", packets);
 			}
 		}          // end of if (ios != null) else
 	}
@@ -857,9 +889,12 @@ public abstract class ConnectionManager<IO extends XMPPIOService> extends Abstra
 
 	private void reconnectService(final Map<String, Object> port_props, long delay) {
 		if (log.isLoggable(Level.FINER)) {
-			log.log(Level.FINER, "Reconnecting service for: {0}, scheduling next try in {1}secs",
-					new Object[] { getName(),
-					delay / 1000 });
+			String cid = "" + port_props.get("local-hostname") + "@" + port_props.get("remote-hostname");
+
+			log.log(Level.FINER,
+					"Reconnecting service for: {0}, scheduling next try in {1}secs, cid: {2}",
+						new Object[] { getName(),
+					delay / 1000, cid });
 		}
 
 		addTimerTask(new TimerTask() {
@@ -925,6 +960,12 @@ public abstract class ConnectionManager<IO extends XMPPIOService> extends Abstra
 		@SuppressWarnings({ "unchecked" })
 		@Override
 		public void accept(SocketChannel sc) {
+			String cid = "" + port_props.get("local-hostname") + "@" + port_props.get("remote-hostname");
+
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Accept called for service: {0}", cid);
+			}
+
 			IO serv = getXMPPIOServiceInstance();
 
 			// serv.setSSLId(getName());
@@ -945,7 +986,11 @@ public abstract class ConnectionManager<IO extends XMPPIOService> extends Abstra
 
 					// Accept side for component service is not ready yet?
 					// Let's wait for a few secs and try again.
-					log.log(Level.FINEST, "Problem reconnecting the service: {0}", serv);
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "Problem reconnecting the service: {0}, cid: {1}",
+								new Object[] { serv,
+								cid });
+					}
 
 					boolean reconnect = false;
 					Integer reconnects = (Integer) port_props.get(MAX_RECONNECTS_PROP_KEY);
@@ -969,6 +1014,10 @@ public abstract class ConnectionManager<IO extends XMPPIOService> extends Abstra
 					// Ignore
 				}
 			} catch (Exception e) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "Can not accept connection cid: " + cid, e);
+				}
+
 				log.log(Level.WARNING, "Can not accept connection.", e);
 				serv.stop();
 			}          // end of try-catch

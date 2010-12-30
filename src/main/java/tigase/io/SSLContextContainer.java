@@ -44,8 +44,9 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
-import java.security.spec.InvalidKeySpecException;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Level;
@@ -54,8 +55,6 @@ import java.util.logging.Logger;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.X509TrustManager;
-
-import javax.security.auth.x500.X500Principal;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -70,17 +69,19 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 
 	//~--- fields ---------------------------------------------------------------
 
-	private File certsDir = null;
+	private File[] certsDirs = null;
 	private String def_cert_alias = null;
 	private String email = "admin@tigase.org";
 	private char[] emptyPass = new char[0];
 	private String o = "Tigase.org";
 	private String ou = "XMPP Service";
 	private SecureRandom secureRandom = null;
+	private KeyStore trustKeyStore = null;
+	private X509TrustManager[] tms = new X509TrustManager[] { new FakeTrustManager() };
 	private Map<String, SSLContext> sslContexts = new ConcurrentSkipListMap<String, SSLContext>();
 	private Map<String, KeyManagerFactory> kmfs = new ConcurrentSkipListMap<String,
 		KeyManagerFactory>();
-	private X509TrustManager[] tms = new X509TrustManager[] { new FakeTrustManager() };
+	private ArrayList<X509Certificate> acceptedIssuers = new ArrayList<X509Certificate>(200);
 
 	//~--- methods --------------------------------------------------------------
 
@@ -169,6 +170,17 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 		return sslContext;
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public KeyStore getTrustStore() {
+		return trustKeyStore;
+	}
+
 	//~--- methods --------------------------------------------------------------
 
 	/**
@@ -186,32 +198,56 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 				def_cert_alias = DEFAULT_DOMAIN_CERT_VAL;
 			}
 
-			String pemDir = (String) params.get(SERVER_CERTS_LOCATION_KEY);
+			String pemD = (String) params.get(SERVER_CERTS_LOCATION_KEY);
 
-			if (pemDir == null) {
-				pemDir = SERVER_CERTS_LOCATION_VAL;
+			if (pemD == null) {
+				pemD = SERVER_CERTS_LOCATION_VAL;
 			}
 
-			log.log(Level.CONFIG, "Loading server certificates from PEM directory: {0}", pemDir);
-			certsDir = new File(pemDir);
-			secureRandom = new SecureRandom();
-			secureRandom.nextInt();
+			String[] pemDirs = pemD.split(",");
 
-			for (File file : certsDir.listFiles(new PEMFileFilter())) {
-				try {
-					CertificateEntry certEntry = CertificateUtil.loadCertificate(file);
-					X509Certificate cert = (X509Certificate) certEntry.getCertChain()[0];
-					String alias = getCertAlias(cert, file);
+			certsDirs = new File[pemDirs.length];
 
-					addCertificateEntry(certEntry, alias, false);
-					log.log(Level.CONFIG, "Loaded server certificate for alias: {0}", alias);
-				} catch (Exception ex) {
-					log.log(Level.WARNING, "Cannot load certficate from file: " + file, ex);
+			int certsDirsIdx = -1;
+
+			for (String pemDir : pemDirs) {
+				log.log(Level.CONFIG, "Loading server certificates from PEM directory: {0}", pemDir);
+				certsDirs[++certsDirsIdx] = new File(pemDir);
+				secureRandom = new SecureRandom();
+				secureRandom.nextInt();
+
+				for (File file : certsDirs[certsDirsIdx].listFiles(new PEMFileFilter())) {
+					try {
+						CertificateEntry certEntry = CertificateUtil.loadCertificate(file);
+						X509Certificate cert = (X509Certificate) certEntry.getCertChain()[0];
+						String alias = getCertAlias(cert, file);
+
+						addCertificateEntry(certEntry, alias, false);
+						log.log(Level.CONFIG, "Loaded server certificate for alias: {0}", alias);
+					} catch (Exception ex) {
+						log.log(Level.WARNING, "Cannot load certficate from file: " + file, ex);
+					}
 				}
 			}
 		} catch (Exception ex) {
 			log.log(Level.WARNING, "There was a problem initializing SSL certificates.", ex);
 		}
+
+		String trustLoc = (String) params.get(TRUSTED_CERTS_DIR_KEY);
+
+		if (trustLoc == null) {
+			trustLoc = TRUSTED_CERTS_DIR_VAL;
+		}
+
+		final String[] trustLocations = trustLoc.split(",");
+
+		// It may take a while, let's do it in background
+		new Thread() {
+			@Override
+			public void run() {
+				loadTrustedCerts(trustLocations);
+			}
+		}.start();
 	}
 
 	private KeyManagerFactory addCertificateEntry(CertificateEntry entry, String alias, boolean store)
@@ -228,7 +264,7 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 		kmfs.put(alias, kmf);
 
 		if (store) {
-			CertificateUtil.storeCertificate(new File(certsDir, alias + ".pem").toString(), entry);
+			CertificateUtil.storeCertificate(new File(certsDirs[0], alias + ".pem").toString(), entry);
 		}
 
 		return kmf;
@@ -247,10 +283,67 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 		return file.getName().substring(0, file.getName().length() - 4);
 	}
 
+	//~--- methods --------------------------------------------------------------
+
+	private void loadTrustedCerts(String[] trustLocations) {
+		int counter = 0;
+		long start = System.currentTimeMillis();
+
+		try {
+			log.log(Level.CONFIG, "Loading trustKeyStore from locations: {0}",
+					Arrays.toString(trustLocations));
+			trustKeyStore = KeyStore.getInstance("JKS");
+			trustKeyStore.load(null, emptyPass);
+
+			for (String location : trustLocations) {
+				File root = new File(location);
+				File[] files = root.listFiles(new PEMFileFilter());
+
+				if (files != null) {
+					for (File file : files) {
+						try {
+							CertificateEntry certEntry = CertificateUtil.loadCertificate(file);
+							Certificate[] chain = certEntry.getCertChain();
+
+							if (chain != null) {
+								for (Certificate cert : chain) {
+									if (cert instanceof X509Certificate) {
+										X509Certificate crt = (X509Certificate) cert;
+										String alias = crt.getSubjectX500Principal().getName();
+
+										trustKeyStore.setCertificateEntry(alias, crt);
+										acceptedIssuers.add(crt);
+										log.log(Level.FINEST, "Imported certificate: {0}", alias);
+										++counter;
+									}
+								}
+							}
+						} catch (Exception e) {
+							log.log(Level.WARNING, "Problem loading certificate from file: {0}", file);
+						}
+					}
+				}
+			}
+		} catch (Exception ex) {
+			log.log(Level.WARNING,
+					"An error loading trusted certificates from locations: "
+						+ Arrays.toString(trustLocations), ex);
+		}
+
+		tms = new X509TrustManager[] {
+			new FakeTrustManager(acceptedIssuers.toArray(new X509Certificate[acceptedIssuers.size()])) };
+
+		long seconds = (System.currentTimeMillis() - start) / 1000;
+
+		log.log(Level.CONFIG, "Loaded {0} trust certificates, it took {1} seconds.",
+				new Object[] { counter,
+				seconds });
+	}
+
 	//~--- inner classes --------------------------------------------------------
 
 	private static class FakeTrustManager implements X509TrustManager {
-		private X509Certificate[] acceptedIssuers = null;
+		private X509Certificate[] issuers = null;
 
 		//~--- constructors -------------------------------------------------------
 
@@ -258,7 +351,7 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 		 * Constructs ...
 		 *
 		 */
-		public FakeTrustManager() {}
+		FakeTrustManager() {}
 
 		/**
 		 * Constructs ...
@@ -266,8 +359,8 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 		 *
 		 * @param ai
 		 */
-		public FakeTrustManager(X509Certificate[] ai) {
-			acceptedIssuers = ai;
+		FakeTrustManager(X509Certificate[] ai) {
+			issuers = ai;
 		}
 
 		//~--- methods ------------------------------------------------------------
@@ -312,7 +405,7 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 		 */
 		@Override
 		public X509Certificate[] getAcceptedIssuers() {
-			return acceptedIssuers;
+			return issuers;
 		}
 	}
 

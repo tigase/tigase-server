@@ -648,6 +648,15 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 	 * Method description
 	 *
 	 *
+	 * @param service
+	 */
+	@Override
+	public void tlsHandshakeCompleted(XMPPIOService<Object> service) {}
+
+	/**
+	 * Method description
+	 *
+	 *
 	 * @param serv
 	 */
 	@Override

@@ -24,9 +24,12 @@ package tigase.net;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.cert.CertCheckResult;
+
 import tigase.io.BufferUnderflowException;
 import tigase.io.IOInterface;
 import tigase.io.SocketIO;
+import tigase.io.TLSEventHandler;
 import tigase.io.TLSIO;
 import tigase.io.TLSUtil;
 import tigase.io.TLSWrapper;
@@ -85,12 +88,12 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public abstract class IOService<RefObject> implements Callable<IOService> {
+public abstract class IOService<RefObject> implements Callable<IOService<?>>, TLSEventHandler {
 
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
-	private static final Logger log = Logger.getLogger("tigase.net.IOService");
+	private static final Logger log = Logger.getLogger(IOService.class.getName());
 
 	/**
 	 * This is key used to store session ID in temporary session data storage.
@@ -105,6 +108,9 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 	/** Field description */
 	public static final String HOSTNAME_KEY = "hostname-key";
 	private static final long MAX_ALLOWED_EMPTY_CALLS = 1000;
+
+	/** Field description */
+	public static final String CERT_CHECK_RESULT = "cert-check-result";
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -203,7 +209,7 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 	 * @throws IOException
 	 */
 	@Override
-	public IOService call() throws IOException {
+	public IOService<?> call() throws IOException {
 
 		// It is not safe to call below function here....
 		// It might be already executing in different thread...
@@ -407,6 +413,30 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 		return wrData;
 	}
 
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param wrapper
+	 */
+	@Override
+	public void handshakeCompleted(TLSWrapper wrapper) {
+		CertCheckResult certCheckResult = wrapper.getCertificateStatus(false);
+
+		sessionData.put(CERT_CHECK_RESULT, certCheckResult);
+
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "{0}, TLS handshake completed: {1}", new Object[] { this,
+					certCheckResult });
+		}
+
+		serviceListener.tlsHandshakeCompleted(this);
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
 	/**
 	 * Describe <code>isConnected</code> method here.
 	 *
@@ -417,10 +447,12 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 
 		if (log.isLoggable(Level.FINEST)) {
 
-//    Throwable thr = new Throwable();
+//    if (socketIO.getSocketChannel().socket().getLocalPort() == 5269) {
+//      Throwable thr = new Throwable();
 //
-//    thr.fillInStackTrace();
-//    log.log(Level.FINEST, "Socket: " + socketIO + ", Connected: " + result, thr);
+//      thr.fillInStackTrace();
+//      log.log(Level.FINEST, "Socket: " + socketIO + ", Connected: " + result, thr);
+//    }
 			log.log(Level.FINEST, "Socket: {0}, Connected: {1}", new Object[] { socketIO, result });
 		}
 
@@ -480,13 +512,13 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 	 *
 	 * @throws IOException
 	 */
-	public void startSSL(final boolean clientMode) throws IOException {
+	public void startSSL(boolean clientMode) throws IOException {
 		if (socketIO instanceof TLSIO) {
 			throw new IllegalStateException("SSL mode is already activated.");
 		}
 
 		TLSWrapper wrapper = new TLSWrapper(TLSUtil.getSSLContext("SSL",
-			(String) sessionData.get(HOSTNAME_KEY)), null, clientMode);
+			(String) sessionData.get(HOSTNAME_KEY)), this, clientMode);
 
 		socketIO = new TLSIO(socketIO, wrapper);
 		setLastTransferTime();
@@ -502,18 +534,40 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 	 *
 	 * @throws IOException
 	 */
-	public void startTLS(final boolean clientMode) throws IOException {
+	public void startTLS(boolean clientMode) throws IOException {
 		if (socketIO instanceof TLSIO) {
 			throw new IllegalStateException("TLS mode is already activated.");
 		}
 
-		TLSWrapper wrapper = new TLSWrapper(TLSUtil.getSSLContext("TLS",
-			(String) sessionData.get(HOSTNAME_KEY)), null, clientMode);
+		// This should not take more then 100ms
+		int counter = 0;
 
-		socketIO = new TLSIO(socketIO, wrapper);
-		setLastTransferTime();
-		encoder.reset();
-		decoder.reset();
+		while (isConnected() && waitingToSend() && (++counter < 10)) {
+			writeData(null);
+
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException ex) {}
+		}
+
+		if (counter >= 10) {
+			stop();
+		} else {
+			String tls_hostname = (String) sessionData.get(HOSTNAME_KEY);
+
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "{0}, Starting TLS for domain: {1}", new Object[] { this,
+						tls_hostname });
+			}
+
+			TLSWrapper wrapper = new TLSWrapper(TLSUtil.getSSLContext("TLS", tls_hostname), this,
+				clientMode);
+
+			socketIO = new TLSIO(socketIO, wrapper);
+			setLastTransferTime();
+			encoder.reset();
+			decoder.reset();
+		}
 	}
 
 	/**
@@ -647,14 +701,13 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 				cb = CharBuffer.allocate(socketInputSize * 4);
 			}
 
-			if (log.isLoggable(Level.FINEST)) {
-				log.finer("Before read from socket.");
-				log.finer("socketInput.capacity()=" + socketInput.capacity());
-				log.finer("socketInput.remaining()=" + socketInput.remaining());
-				log.finer("socketInput.limit()=" + socketInput.limit());
-				log.finer("socketInput.position()=" + socketInput.position());
-			}
-
+//    if (log.isLoggable(Level.FINEST)) {
+//      log.finer("Before read from socket.");
+//      log.finer("socketInput.capacity()=" + socketInput.capacity());
+//      log.finer("socketInput.remaining()=" + socketInput.remaining());
+//      log.finer("socketInput.limit()=" + socketInput.limit());
+//      log.finer("socketInput.position()=" + socketInput.position());
+//    }
 			ByteBuffer tmpBuffer = socketIO.read(socketInput);
 
 			if (socketIO.bytesRead() > 0) {
@@ -672,22 +725,21 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 								socketIO.bytesRead() });
 					}
 
-					if (log.isLoggable(Level.FINEST)) {
-						log.finer("Before decodng data");
-						log.finer("socketInput.capacity()=" + socketInput.capacity());
-						log.finer("socketInput.remaining()=" + socketInput.remaining());
-						log.finer("socketInput.limit()=" + socketInput.limit());
-						log.finer("socketInput.position()=" + socketInput.position());
-						log.finer("tmpBuffer.capacity()=" + tmpBuffer.capacity());
-						log.finer("tmpBuffer.remaining()=" + tmpBuffer.remaining());
-						log.finer("tmpBuffer.limit()=" + tmpBuffer.limit());
-						log.finer("tmpBuffer.position()=" + tmpBuffer.position());
-						log.finer("cb.capacity()=" + cb.capacity());
-						log.finer("cb.remaining()=" + cb.remaining());
-						log.finer("cb.limit()=" + cb.limit());
-						log.finer("cb.position()=" + cb.position());
-					}
-
+//        if (log.isLoggable(Level.FINEST)) {
+//          log.finer("Before decodng data");
+//          log.finer("socketInput.capacity()=" + socketInput.capacity());
+//          log.finer("socketInput.remaining()=" + socketInput.remaining());
+//          log.finer("socketInput.limit()=" + socketInput.limit());
+//          log.finer("socketInput.position()=" + socketInput.position());
+//          log.finer("tmpBuffer.capacity()=" + tmpBuffer.capacity());
+//          log.finer("tmpBuffer.remaining()=" + tmpBuffer.remaining());
+//          log.finer("tmpBuffer.limit()=" + tmpBuffer.limit());
+//          log.finer("tmpBuffer.position()=" + tmpBuffer.position());
+//          log.finer("cb.capacity()=" + cb.capacity());
+//          log.finer("cb.remaining()=" + cb.remaining());
+//          log.finer("cb.limit()=" + cb.limit());
+//          log.finer("cb.position()=" + cb.position());
+//        }
 					// tmpBuffer.flip();
 					if (cb.capacity() < tmpBuffer.remaining() * 4) {
 						if (log.isLoggable(Level.FINEST)) {
@@ -716,17 +768,17 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 									new String(result) });
 						}
 
-						if (log.isLoggable(Level.FINEST)) {
-							log.finer("Just after decoding.");
-							log.finer("tmpBuffer.capacity()=" + tmpBuffer.capacity());
-							log.finer("tmpBuffer.remaining()=" + tmpBuffer.remaining());
-							log.finer("tmpBuffer.limit()=" + tmpBuffer.limit());
-							log.finer("tmpBuffer.position()=" + tmpBuffer.position());
-							log.finer("cb.capacity()=" + cb.capacity());
-							log.finer("cb.remaining()=" + cb.remaining());
-							log.finer("cb.limit()=" + cb.limit());
-							log.finer("cb.position()=" + cb.position());
-						}
+//          if (log.isLoggable(Level.FINEST)) {
+//            log.finer("Just after decoding.");
+//            log.finer("tmpBuffer.capacity()=" + tmpBuffer.capacity());
+//            log.finer("tmpBuffer.remaining()=" + tmpBuffer.remaining());
+//            log.finer("tmpBuffer.limit()=" + tmpBuffer.limit());
+//            log.finer("tmpBuffer.position()=" + tmpBuffer.position());
+//            log.finer("cb.capacity()=" + cb.capacity());
+//            log.finer("cb.remaining()=" + cb.remaining());
+//            log.finer("cb.limit()=" + cb.limit());
+//            log.finer("cb.position()=" + cb.position());
+//          }
 					}
 
 					if (cr.isUnderflow() && (tmpBuffer.remaining() > 0)) {
@@ -746,18 +798,17 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 
 					cb.clear();
 
-					if (log.isLoggable(Level.FINEST)) {
-						log.finer("Before return from method.");
-						log.finer("tmpBuffer.capacity()=" + tmpBuffer.capacity());
-						log.finer("tmpBuffer.remaining()=" + tmpBuffer.remaining());
-						log.finer("tmpBuffer.limit()=" + tmpBuffer.limit());
-						log.finer("tmpBuffer.position()=" + tmpBuffer.position());
-						log.finer("cb.capacity()=" + cb.capacity());
-						log.finer("cb.remaining()=" + cb.remaining());
-						log.finer("cb.limit()=" + cb.limit());
-						log.finer("cb.position()=" + cb.position());
-					}
-
+//        if (log.isLoggable(Level.FINEST)) {
+//          log.finer("Before return from method.");
+//          log.finer("tmpBuffer.capacity()=" + tmpBuffer.capacity());
+//          log.finer("tmpBuffer.remaining()=" + tmpBuffer.remaining());
+//          log.finer("tmpBuffer.limit()=" + tmpBuffer.limit());
+//          log.finer("tmpBuffer.position()=" + tmpBuffer.position());
+//          log.finer("cb.capacity()=" + cb.capacity());
+//          log.finer("cb.remaining()=" + cb.remaining());
+//          log.finer("cb.limit()=" + cb.limit());
+//          log.finer("cb.position()=" + cb.position());
+//        }
 					return result;
 				}
 			} else {
@@ -767,8 +818,8 @@ public abstract class IOService<RefObject> implements Callable<IOService> {
 				// and the select thinks there are some bytes waiting for reading
 				// and 0 bytes are read
 				if ((++empty_read_call_count) > MAX_ALLOWED_EMPTY_CALLS && (writeInProgress.get() == 0)) {
-					log.warning("Socket: " + socketIO
-							+ ", Max allowed empty calls excceeded, closing connection.");
+					log.log(Level.WARNING,
+							"Socket: {0}, Max allowed empty calls excceeded, closing connection.", socketIO);
 					forceStop();
 				}
 			}

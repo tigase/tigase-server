@@ -151,13 +151,14 @@ public class XMPPIOService<RefObject> extends IOService<RefObject> {
 
 		while ((packet = waitingPackets.poll()) != null) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest(toString() + ", Sending packet: " + packet);
+				log.log(Level.FINEST, "{0}, Sending packet: {1}", new Object[] { toString(), packet });
 			}
 
 			writeRawData(packet.getElement().toString());
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest(toString() + ", SENT: " + packet.getElement().toString());
+				log.log(Level.FINEST, "{0}, SENT: {1}", new Object[] { toString(),
+						packet.getElement().toString() });
 			}
 		}    // end of while (packet = waitingPackets.poll() != null)
 	}
@@ -233,13 +234,14 @@ public class XMPPIOService<RefObject> extends IOService<RefObject> {
 	public void xmppStreamOpen(final String data) {
 		try {
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest(toString() + ", Sending data: " + data);
+				log.log(Level.FINEST, "{0}, Sending data: {1}", new Object[] { toString(), data });
 			}
 
 			writeRawData(data);
 			assert debug(data, "--SENT:");
 		} catch (IOException e) {
-			log.warning(toString() + ", Error sending stream open data: " + e);
+			log.log(Level.WARNING, "{0}, Error sending stream open data: {1}", new Object[] { toString(),
+					e });
 			forceStop();
 		}
 	}
@@ -277,83 +279,66 @@ public class XMPPIOService<RefObject> extends IOService<RefObject> {
 		if (isConnected()) {
 			char[] data = readData();
 
-			while ((data != null) && (data.length > 0)) {
-
-				// Yes check again if we are still connected as
-				// servce might be disconnected during data read
-				if (isConnected()) {
-					if (data != null) {
-						if (log.isLoggable(Level.FINEST)) {
-							log.finest(toString() + ", READ:\n" + new String(data));
-						}
-
-						// This is log for debuging only,
-						// in normal mode don't even call below code
-						assert debug(new String(data), "--RECEIVED:");
-
-						Element elem = null;
-
-						try {
-							parser.parse(domHandler, data, 0, data.length);
-
-							if (domHandler.parseError()) {
-								if (log.isLoggable(Level.FINE)) {
-									log.fine(toString() + ", Data parsing error: " + new String(data));
-								} else {
-									log.warning(toString() + ", data parsing error, stopping connection");
-								}
-
-								forceStop();
-
-								// domHandler = new XMPPDomBuilderHandler<RefObject>(this);
-							}
-
-							Queue<Element> elems = domHandler.getParsedElements();
-
-							if (elems.size() > 0) {
-								readCompleted();
-							}
-
-							while ((elem = elems.poll()) != null) {
-
-								// assert debug(elem.toString() + "\n");
-								// log.finer("Read element: " + elem.getName());
-								if (log.isLoggable(Level.FINEST)) {
-									log.finest(toString() + ", Read packet: " + elem.toString());
-								}
-
-								// System.out.print(elem.toString());
-								addReceivedPacket(Packet.packetInstance(elem));
-							}    // end of while ((elem = elems.poll()) != null)
-						} catch (TigaseStringprepException ex) {
-							log.log(Level.INFO,
-									toString() + ", Incorrect to/from JID format for stanza: "
-										+ elem.toString(), ex);
-						} catch (Exception ex) {
-							log.log(Level.INFO,
-									toString() + ", Incorrect XML data: " + new String(data)
-										+ ", stopping connection: " + getUniqueId() + ", exception: ", ex);
-							forceStop();
-						}    // end of try-catch
-					} else {
-						if (log.isLoggable(Level.FINEST)) {
-							log.finest(toString() + ", Nothing read!!");
-						}
-					}
-				} else {
-					if (log.isLoggable(Level.FINEST)) {
-						log.finest(toString() + ", Service disconnected during read");
-					}
-
-					forceStop();
+			while (isConnected() && (data != null) && (data.length > 0)) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "{0}, READ:\n{1}", new Object[] { toString(), new String(data) });
 				}
+
+				// This is log for debuging only,
+				// in normal mode don't even call below code
+				assert debug(new String(data), "--RECEIVED:");
+
+				Element elem = null;
+
+				try {
+					parser.parse(domHandler, data, 0, data.length);
+
+					if (domHandler.parseError()) {
+						if (log.isLoggable(Level.FINE)) {
+							log.log(Level.FINE, "{0}, Data parsing error: {1}", new Object[] { toString(),
+									new String(data) });
+						} else {
+							log.log(Level.WARNING, "{0}, data parsing error, stopping connection", toString());
+						}
+
+						forceStop();
+
+						// domHandler = new XMPPDomBuilderHandler<RefObject>(this);
+					}
+
+					Queue<Element> elems = domHandler.getParsedElements();
+
+					if (elems.size() > 0) {
+						readCompleted();
+					}
+
+					while ((elem = elems.poll()) != null) {
+
+						// assert debug(elem.toString() + "\n");
+						// log.finer("Read element: " + elem.getName());
+						if (log.isLoggable(Level.FINEST)) {
+							log.log(Level.FINEST, "{0}, Read packet: {1}", new Object[] { toString(), elem });
+						}
+
+						// System.out.print(elem.toString());
+						addReceivedPacket(Packet.packetInstance(elem));
+					}    // end of while ((elem = elems.poll()) != null)
+				} catch (TigaseStringprepException ex) {
+					log.log(Level.INFO,
+							toString() + ", Incorrect to/from JID format for stanza: " + elem.toString(), ex);
+				} catch (Exception ex) {
+					log.log(Level.INFO,
+							toString() + ", Incorrect XML data: " + new String(data) + ", stopping connection: "
+								+ getUniqueId() + ", exception: ", ex);
+					forceStop();
+				}    // end of try-catch
 
 				data = readData();
 			}
 		} else {
 			if (log.isLoggable(Level.FINE)) {
-				log.fine(toString()
-						+ ", function called when the service is not connected! forceStop()");
+				log.log(Level.FINE, "{0}, function called when the service is not connected! forceStop()",
+						toString());
 			}
 
 			forceStop();
@@ -372,17 +357,18 @@ public class XMPPIOService<RefObject> extends IOService<RefObject> {
 	@SuppressWarnings({ "unchecked" })
 	protected void xmppStreamClosed() {
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest(toString() + ", Received STREAM-CLOSE from the client");
+			log.log(Level.FINEST, "{0}, Received STREAM-CLOSE from the client", toString());
 		}
 
 		try {
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest(toString() + ", Sending data: </stream:stream>");
+				log.log(Level.FINEST, "{0}, Sending data: </stream:stream>", toString());
 			}
 
 			writeRawData("</stream:stream>");
 		} catch (IOException e) {
-			log.info(toString() + ", Error sending stream closed data: " + e);
+			log.log(Level.INFO, "{0}, Error sending stream closed data: {1}", new Object[] { toString(),
+					e });
 		}
 
 		// streamClosed = true;
@@ -404,16 +390,19 @@ public class XMPPIOService<RefObject> extends IOService<RefObject> {
 
 			try {
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest(toString() + ", Sending data: " + response);
+					log.log(Level.FINEST, "{0}, Sending data: {1}", new Object[] { toString(), response });
 				}
 
 				writeRawData(response);
+				processWaitingPackets();
 
 				if ((response != null) && response.endsWith("</stream:stream>")) {
 					stop();
 				}    // end of if (response.endsWith())
 			} catch (IOException e) {
-				log.warning(toString() + ", Error sending stream open data: " + e);
+				log.log(Level.WARNING, "{0}, Error sending stream open data: {1}",
+						new Object[] { toString(),
+						e });
 				forceStop();
 			}
 		}

@@ -30,6 +30,7 @@ import tigase.xmpp.XMPPIOService;
 
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 //~--- classes ----------------------------------------------------------------
@@ -42,7 +43,9 @@ import java.util.logging.Logger;
  */
 public class S2SIOService extends XMPPIOService<Object> {
 	private static final Logger log = Logger.getLogger(S2SIOService.class.getName());
-	protected static final String S2S_CONNECTION_KEY = "s2s-connection-key";
+
+	/** Field description */
+	public static final String S2S_CONNECTION_KEY = "s2s-connection-key";
 	protected static final String HANDSHAKING_ONLY_KEY = "handshaking-only-key";
 
 	//~--- fields ---------------------------------------------------------------
@@ -83,6 +86,10 @@ public class S2SIOService extends XMPPIOService<Object> {
 	 * @param cid
 	 */
 	public void addCID(CID cid) {
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "{0}, Adding CID to authenticated: {1}", new Object[] { this, cid });
+		}
+
 		authenticatedCIDs.add(cid);
 	}
 
@@ -203,6 +210,21 @@ public class S2SIOService extends XMPPIOService<Object> {
 	 */
 	public void setSessionId(String session_id) {
 		this.session_id = session_id;
+	}
+
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public String toString() {
+		CID cid = (CID) getSessionData().get("cid");
+
+		return "CID: " + cid + ", " + super.toString();
 	}
 }
 

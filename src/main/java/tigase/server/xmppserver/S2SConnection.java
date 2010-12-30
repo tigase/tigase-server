@@ -47,7 +47,7 @@ public class S2SConnection implements Comparable<S2SConnection> {
 
 	//~--- fields ---------------------------------------------------------------
 
-	private ConnectionHandlerIfc<S2SIOService> handler = null;
+	private S2SConnectionHandlerIfc<S2SIOService> handler = null;
 	private String ipAddress = null;
 	private S2SIOService service = null;
 	private OutgoingState conn_state = OutgoingState.NULL;
@@ -66,7 +66,7 @@ public class S2SConnection implements Comparable<S2SConnection> {
 	 * @param handler
 	 * @param ip
 	 */
-	public S2SConnection(ConnectionHandlerIfc<S2SIOService> handler, String ip) {
+	public S2SConnection(S2SConnectionHandlerIfc<S2SIOService> handler, String ip) {
 		this.handler = handler;
 		this.ipAddress = ip;
 	}

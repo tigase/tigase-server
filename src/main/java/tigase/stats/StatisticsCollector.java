@@ -119,8 +119,7 @@ public class StatisticsCollector extends AbstractComponentRegistrator<Statistics
 		ServiceEntity item = serviceEntity.findNode(component.getName());
 
 		if (item == null) {
-			item = new ServiceEntity(getName(), component.getName(),
-					"Component: " + component.getName());
+			item = new ServiceEntity(getName(), component.getName(), "Component: " + component.getName());
 			item.addFeatures(CMD_FEATURES);
 			item.addIdentities(new ServiceIdentity("automation", "command-node",
 					"Component: " + component.getName()));
@@ -173,7 +172,6 @@ public class StatisticsCollector extends AbstractComponentRegistrator<Statistics
 	 * @param list
 	 */
 	public void getComponentStats(String name, StatisticsList list) {
-		List<StatRecord> result = null;
 		StatisticsContainer stats = components.get(name);
 
 		if (stats != null) {
@@ -262,8 +260,9 @@ public class StatisticsCollector extends AbstractComponentRegistrator<Statistics
 				List<Element> items = serviceEntity.getDiscoItems(node, jid.toString());
 
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Processing discoItems for node: " + node + ", result: "
-							+ ((items == null) ? null : items.toString()));
+					log.log(Level.FINEST, "Processing discoItems for node: {0}, result: {1}",
+							new Object[] { node,
+							(items == null) ? null : items.toString() });
 				}
 
 				return items;
@@ -273,8 +272,8 @@ public class StatisticsCollector extends AbstractComponentRegistrator<Statistics
 						BareJID.toString(getName(), jid.toString()));
 
 					if (log.isLoggable(Level.FINEST)) {
-						log.finest("Processing discoItems, result: "
-								+ ((item == null) ? null : item.toString()));
+						log.log(Level.FINEST, "Processing discoItems, result: {0}",
+								((item == null) ? null : item.toString()));
 					}
 
 					return Arrays.asList(item);
@@ -327,7 +326,8 @@ public class StatisticsCollector extends AbstractComponentRegistrator<Statistics
 		}
 
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest(packet.getCommand().name() + " command received: " + packet);
+			log.log(Level.FINEST, "{0} command received: {1}", new Object[] { packet.getCommand().name(),
+					packet });
 		}
 
 		Iq iqc = (Iq) packet;
@@ -387,7 +387,7 @@ public class StatisticsCollector extends AbstractComponentRegistrator<Statistics
 					statsLevel = Level.parse(tmp_val);
 
 					if (log.isLoggable(Level.FINEST)) {
-						log.finest("statsLevel parsed to: " + statsLevel.getName());
+						log.log(Level.FINEST, "statsLevel parsed to: {0}", statsLevel.getName());
 					}
 				}
 
@@ -395,27 +395,29 @@ public class StatisticsCollector extends AbstractComponentRegistrator<Statistics
 
 				if (iqc.getStrCommand().equals("stats")) {
 					if (log.isLoggable(Level.FINEST)) {
-						log.finest("Getting all stats for level: " + statsLevel.getName());
+						log.log(Level.FINEST, "Getting all stats for level: {0}", statsLevel.getName());
 					}
 
 					getAllStats(list);
 
 					if (log.isLoggable(Level.FINEST)) {
-						log.finest("All stats for level loaded: " + statsLevel.getName());
+						log.log(Level.FINEST, "All stats for level loaded: {0}", statsLevel.getName());
 					}
 				} else {
 					String[] spl = iqc.getStrCommand().split("/");
 
 					if (log.isLoggable(Level.FINEST)) {
-						log.finest("Getting stats for component: " + spl[1] + ", level: "
-								+ statsLevel.getName());
+						log.log(Level.FINEST, "Getting stats for component: {0}, level: {1}",
+								new Object[] { spl[1],
+								statsLevel.getName() });
 					}
 
 					getComponentStats(spl[1], list);
 
 					if (log.isLoggable(Level.FINEST)) {
-						log.finest("Stats loaded for component: " + spl[1] + ", level: "
-								+ statsLevel.getName());
+						log.log(Level.FINEST, "Stats loaded for component: {0}, level: {1}",
+								new Object[] { spl[1],
+								statsLevel.getName() });
 					}
 				}
 
@@ -437,13 +439,13 @@ public class StatisticsCollector extends AbstractComponentRegistrator<Statistics
 
 				Command.addFieldValue(result, "Stats level", statsLevel.getName(), "Stats level",
 						new String[] { Level.INFO.getName(),
-						Level.FINE.getName(), Level.FINER.getName(),
-						Level.FINEST.getName() }, new String[] { Level.INFO.getName(),
+						Level.FINE.getName(), Level.FINER.getName(), Level.FINEST.getName() }, new String[] {
+						Level.INFO.getName(),
 						Level.FINE.getName(), Level.FINER.getName(), Level.FINEST.getName() });
 				results.offer(result);
 
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Returning stats result: " + result);
+					log.log(Level.FINEST, "Returning stats result: {0}", result);
 				}
 
 				break;
@@ -466,10 +468,9 @@ public class StatisticsCollector extends AbstractComponentRegistrator<Statistics
 	public void setName(String name) {
 		super.setName(name);
 		serviceEntity = new ServiceEntity(name, "stats", "Server statistics");
-		serviceEntity.addIdentities(new ServiceIdentity("component", "stats",
-				"Server statistics"), new ServiceIdentity("automation", "command-node",
-					"All statistics"), new ServiceIdentity("automation", "command-list",
-						"Statistics retrieving commands"));
+		serviceEntity.addIdentities(new ServiceIdentity("component", "stats", "Server statistics"),
+				new ServiceIdentity("automation", "command-node", "All statistics"),
+					new ServiceIdentity("automation", "command-list", "Statistics retrieving commands"));
 		serviceEntity.addFeatures(DEF_FEATURES);
 		serviceEntity.addFeatures(CMD_FEATURES);
 
@@ -516,7 +517,7 @@ public class StatisticsCollector extends AbstractComponentRegistrator<Statistics
 	@Override
 	public String shutdown() {
 		StatisticsList allStats = getAllStats();
-		StringBuilder sb = new StringBuilder();
+		StringBuilder sb = new StringBuilder(4096);
 
 		for (StatRecord statRecord : allStats) {
 			sb.append(statRecord.toString()).append('\n');
@@ -534,14 +535,15 @@ public class StatisticsCollector extends AbstractComponentRegistrator<Statistics
 	//~--- get methods ----------------------------------------------------------
 
 	private Map<String, Object> getArchivizerConf(String name, Map<String, Object> props) {
-		Map<String, Object> result = new LinkedHashMap<String, Object>();
+		Map<String, Object> result = new LinkedHashMap<String, Object>(4);
 		String key_start = STATS_ARCHIVIZERS_PROP_KEY + "/" + name + "/";
 
 		for (Map.Entry<String, Object> entry : props.entrySet()) {
 			if (entry.getKey().startsWith(key_start)) {
 				String key = entry.getKey().substring(key_start.length());
 
-				log.config("Found " + name + " property: " + key + " = " + entry.getValue());
+				log.log(Level.CONFIG, "Found {0} property: {1} = {2}", new Object[] { name, key,
+						entry.getValue() });
 				result.put(key, entry.getValue());
 			}
 		}
@@ -591,7 +593,9 @@ public class StatisticsCollector extends AbstractComponentRegistrator<Statistics
 					archivizers.put(arch_name, stat_arch);
 				}
 
-				log.config("Loaded statistics archivizer: " + arch_name + " for class: " + arch_class);
+				log.log(Level.CONFIG, "Loaded statistics archivizer: {0} for class: {1}",
+						new Object[] { arch_name,
+						arch_class });
 			} catch (Exception e) {
 				log.log(Level.SEVERE, "Can't initialize statistics archivizer: " + arch_prop, e);
 			}
@@ -625,8 +629,7 @@ public class StatisticsCollector extends AbstractComponentRegistrator<Statistics
 						this.wait();
 					}
 
-					for (Map.Entry<String, StatisticsArchivizerIfc> archiv_entry :
-							archivizers.entrySet()) {
+					for (Map.Entry<String, StatisticsArchivizerIfc> archiv_entry : archivizers.entrySet()) {
 						archiv_entry.getValue().execute(sp);
 					}
 				} catch (InterruptedException ex) {

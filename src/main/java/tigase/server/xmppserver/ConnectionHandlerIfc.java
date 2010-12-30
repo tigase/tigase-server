@@ -32,6 +32,8 @@ import tigase.xmpp.XMPPIOService;
 
 import java.util.Map;
 import java.util.Queue;
+import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 //~--- interfaces -------------------------------------------------------------
 
@@ -45,11 +47,7 @@ import java.util.Queue;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public interface ConnectionHandlerIfc<IO extends XMPPIOService> {
-	boolean addOutPacket(Packet packet);
-
-	void initNewConnection(Map<String, Object> port_props);
-
+public interface ConnectionHandlerIfc<IO extends XMPPIOService<?>> {
 	boolean writePacketToSocket(IO serv, Packet packet);
 
 	void writePacketsToSocket(IO serv, Queue<Packet> packets);

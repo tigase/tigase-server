@@ -1173,8 +1173,14 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 									processPacket(packet);
 								}
 
-								processPacketTimings[pptIdx] = System.currentTimeMillis() - startPPT;
+								// It is all concurrent so we have to use a local index variable
+								int idx = pptIdx;
+
 								pptIdx = (pptIdx + 1) % processPacketTimings.length;
+
+								long timing = System.currentTimeMillis() - startPPT;
+
+								processPacketTimings[idx] = timing;
 							}
 
 							break;
