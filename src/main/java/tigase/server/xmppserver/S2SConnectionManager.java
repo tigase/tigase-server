@@ -283,7 +283,7 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 		super.getStatistics(list);
 		list.add(getName(), "CIDs number", cidConnections.size(), Level.INFO);
 
-		if (list.checkLevel(Level.FINER)) {
+		if (list.checkLevel(Level.FINEST)) {
 			long total_outgoing = 0;
 			long total_outgoing_tls = 0;
 			long total_outgoing_handshaking = 0;
@@ -327,11 +327,11 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 				total_waiting_control += waiting_control;
 			}
 
-			list.add(getName(), "Total outgoing", total_outgoing, Level.FINER);
-			list.add(getName(), "Total outgoing TLS", total_outgoing_tls, Level.FINER);
+			list.add(getName(), "Total outgoing", total_outgoing, Level.FINEST);
+			list.add(getName(), "Total outgoing TLS", total_outgoing_tls, Level.FINEST);
 			list.add(getName(), "Total outgoing handshaking", total_outgoing_handshaking, Level.FINEST);
-			list.add(getName(), "Total incoming", total_incoming, Level.FINER);
-			list.add(getName(), "Total incoming TLS", total_incoming_tls, Level.FINER);
+			list.add(getName(), "Total incoming", total_incoming, Level.FINEST);
+			list.add(getName(), "Total incoming TLS", total_incoming_tls, Level.FINEST);
 			list.add(getName(), "Total DB keys", total_dbKeys, Level.FINEST);
 			list.add(getName(), "Total waiting", total_waiting, Level.FINEST);
 			list.add(getName(), "Total control waiting", total_waiting_control, Level.FINEST);
@@ -446,7 +446,8 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService>
 //        // Internal loop possible, we don't want that....
 //        // Let's send the packet back....
 //        if (log.isLoggable(Level.INFO)) {
-//          log.log(Level.INFO, "Packet addresses to localhost, I am not processing it: {0}", packet);
+//          log.log(Level.INFO, "Packet addresses to localhost,"
+//      + " I am not processing it: {0}", packet);
 //        }
 //
 //        addOutPacket(Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet,
