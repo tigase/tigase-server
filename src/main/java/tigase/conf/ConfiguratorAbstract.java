@@ -114,6 +114,7 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 
 	// Default user repository instance which can be shared among components
 	private UserRepository user_repository = null;
+	private boolean setup_in_progress = false;
 
 	/**
 	 * Configuration settings read from the init.properties file or any other source
@@ -771,6 +772,16 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 	 * @param component
 	 */
 	public void setup(Configurable component) {
+
+		// Try to avoid recursive execution of the method
+		if (component == this) {
+			if (setup_in_progress) {
+				return;
+			} else {
+				setup_in_progress = true;
+			}
+		}
+
 		String compId = component.getName();
 		Map<String, Object> prop = null;
 
@@ -814,6 +825,10 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 //  prop.put(SHARED_USER_REPO_POOL_PROP_KEY, user_repo_impl);
 //  prop.put(SHARED_USER_AUTH_REPO_POOL_PROP_KEY, auth_repo_impl);
 		component.setProperties(prop);
+
+		if (component == this) {
+			setup_in_progress = false;
+		}
 	}
 
 	private void addAuthRepo(Map<String, Object> props, String domain, int pool_size)
