@@ -67,6 +67,9 @@ public class Dialback extends S2SAbstractProcessor {
 	private static final Logger log = Logger.getLogger(Dialback.class.getName());
 	private static final Element features = new Element("dialback", new String[] { "xmlns" },
 		new String[] { "urn:xmpp:features:dialback" });
+	private static final Element features_required = new Element("dialback",
+		new Element[] { new Element("required") }, new String[] { "xmlns" },
+		new String[] { "urn:xmpp:features:dialback" });
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -223,7 +226,14 @@ public class Dialback extends S2SAbstractProcessor {
 	 */
 	@Override
 	public void streamFeatures(S2SIOService serv, List<Element> results) {
-		results.add(features);
+		CertCheckResult certCheckResult =
+			(CertCheckResult) serv.getSessionData().get(S2SIOService.CERT_CHECK_RESULT);
+
+		if (certCheckResult == CertCheckResult.trusted) {
+			results.add(features);
+		} else {
+			results.add(features_required);
+		}
 	}
 
 	/**
