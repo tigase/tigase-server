@@ -132,10 +132,15 @@ public class CIDConnections {
 	 * @param serv
 	 */
 	public void addIncoming(S2SIOService serv) {
-		S2SConnection s2s_conn = new S2SConnection(handler, serv.getRemoteAddress());
+		S2SConnection s2s_conn = serv.getS2SConnection();
 
-		s2s_conn.setS2SIOService(serv);
-		serv.setS2SConnection(s2s_conn);
+		if (s2s_conn == null) {
+			s2s_conn = new S2SConnection(handler, serv.getRemoteAddress());
+			s2s_conn.setS2SIOService(serv);
+			serv.setS2SConnection(s2s_conn);
+		}
+
+		// TODO: check if this should be moved inside the IF
 		incoming.add(s2s_conn);
 	}
 
