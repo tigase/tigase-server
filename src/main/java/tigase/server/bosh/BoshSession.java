@@ -865,14 +865,21 @@ public class BoshSession {
 				// http://forum.ag-software.de/thread/969
 				Element stanza = waiting_packets.poll();
 
-				stanza.setXMLNS(XMLNS_CLIENT_VAL);
+				if (stanza.getXMLNS() == null) {
+					stanza.setXMLNS(XMLNS_CLIENT_VAL);
+				}
+
 				body.addChild(stanza);
 
 				while ((waiting_packets.size() > 0) && (body.getChildren().size() < MAX_PACKETS)) {
 
 					// body.addChild(applyFilters(waiting_packets.poll()));
 					stanza = waiting_packets.poll();
-					stanza.setXMLNS(XMLNS_CLIENT_VAL);
+
+					if (stanza.getXMLNS() == null) {
+						stanza.setXMLNS(XMLNS_CLIENT_VAL);
+					}
+
 					body.addChild(stanza);
 				}
 			}
