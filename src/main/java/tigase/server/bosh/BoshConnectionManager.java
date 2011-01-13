@@ -29,8 +29,6 @@ import tigase.server.Packet;
 import tigase.server.ReceiverTimeoutHandler;
 import tigase.server.xmppclient.ClientConnectionManager;
 
-import tigase.util.TigaseStringprepException;
-
 import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
 import tigase.xmpp.PacketErrorTypeException;

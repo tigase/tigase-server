@@ -19,7 +19,10 @@
  * Last modified by $Author$
  * $Date$
  */
+
 package tigase.server.bosh;
+
+//~--- classes ----------------------------------------------------------------
 
 /**
  * Describe class Constants here.
@@ -32,27 +35,24 @@ package tigase.server.bosh;
  */
 public abstract class Constants {
 
+	/** Field description */
 	public static final String BOSH_VERSION = "1.6";
-
 	protected static final int MAX_PACKETS = 2;
-
+	protected static final String XMLNS_CLIENT_VAL = "jabber:client";
 	protected static final String MAX_WAIT_DEF_PROP_KEY = "max-wait";
 	protected static final long MAX_WAIT_DEF_PROP_VAL = 30;
 	protected static final String MIN_POLLING_PROP_KEY = "min-polling";
 	protected static final long MIN_POLLING_PROP_VAL = 10;
 	protected static final String MAX_INACTIVITY_PROP_KEY = "max-inactivity";
 	protected static final long MAX_INACTIVITY_PROP_VAL = 10;
-	protected static final String CONCURRENT_REQUESTS_PROP_KEY =
-		"concurrent-requests";
+	protected static final String CONCURRENT_REQUESTS_PROP_KEY = "concurrent-requests";
 	protected static final int CONCURRENT_REQUESTS_PROP_VAL = 2;
 	protected static final String HOLD_REQUESTS_PROP_KEY = "hold-requests";
 	protected static final int HOLD_REQUESTS_PROP_VAL = 1;
 	protected static final String MAX_PAUSE_PROP_KEY = "max-inactivity";
 	protected static final long MAX_PAUSE_PROP_VAL = 10;
-
 	protected static final String BOSH_XMLNS = "http://jabber.org/protocol/httpbind";
 	protected static final String BODY_EL_NAME = "body";
-
 	protected static final String CONTENT_ATTR = "content";
 	protected static final String WAIT_ATTR = "wait";
 	protected static final String HOLD_ATTR = "hold";
@@ -73,22 +73,27 @@ public abstract class Constants {
 	protected static final String AUTHID_ATTR = "authid";
 	protected static final String RESTART_ATTR = "xmpp:restart";
 	protected static final String LANG_ATTR = "xml:lang";
-
 	protected static final String CACHE_ATTR = "cache";
 	protected static final String CACHE_ID_ATTR = "cache-id";
+	protected static final String CONTENT_TYPE_DEF = "text/xml; charset=utf-8";
+
+	//~--- constant enums -------------------------------------------------------
 
 	protected enum CacheAction {
 		on, off, set, add, get, get_all, remove;
 	}
-// 	protected static final String CACHE_ON = "on";
-// 	protected static final String CACHE_OFF = "off";
-// 	protected static final String CACHE_SET = "set";
-// 	protected static final String CACHE_ADD = "add";
-// 	protected static final String CACHE_GET = "get";
-// 	protected static final String CACHE_GET_ALL = "get-all";
-// 	protected static final String CACHE_REMOVE = "remove";
 
-	protected static final String CONTENT_TYPE_DEF = "text/xml; charset=utf-8";
-
-
+//protected static final String CACHE_ON = "on";
+//protected static final String CACHE_OFF = "off";
+//protected static final String CACHE_SET = "set";
+//protected static final String CACHE_ADD = "add";
+//protected static final String CACHE_GET = "get";
+//protected static final String CACHE_GET_ALL = "get-all";
+//protected static final String CACHE_REMOVE = "remove";
 }
+
+
+//~ Formatted in Sun Code Convention
+
+
+//~ Formatted by Jindent --- http://www.jindent.com
