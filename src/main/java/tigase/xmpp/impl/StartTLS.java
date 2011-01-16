@@ -40,6 +40,7 @@ import tigase.xmpp.XMPPResourceConnection;
 
 import java.util.Map;
 import java.util.Queue;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 //~--- classes ----------------------------------------------------------------
@@ -109,13 +110,14 @@ public class StartTLS extends XMPPProcessor implements XMPPProcessorIfc {
 		}    // end of if (session == null)
 
 		if (packet.isElement("starttls", XMLNS)) {
-			if ("true".equals(session.getSessionData(ID))) {
+			if (session.getSessionData(ID) != null) {
 
 				// Somebody tries to activate multiple TLS layers.
 				// This is possible and can even work but this can also be
 				// a DOS attack. Blocking it now, unless someone requests he wants
 				// to have multiple layers of TLS for his connection
-				log.warning("Multiple TLS requests, possible DOS attack, closing connection: " + packet);
+				log.log(Level.WARNING,
+						"Multiple TLS requests, possible DOS attack, closing connection: {0}", packet);
 				results.offer(packet.swapFromTo(failure, null, null));
 				results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(), StanzaType.set,
 						session.nextStanzaId()));
@@ -131,7 +133,7 @@ public class StartTLS extends XMPPProcessor implements XMPPProcessorIfc {
 			Command.setData(result, proceed);
 			results.offer(result);
 		} else {
-			log.warning("Unknown TLS element: " + packet);
+			log.log(Level.WARNING, "Unknown TLS element: {0}", packet);
 			results.offer(packet.swapFromTo(failure, null, null));
 			results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(), StanzaType.set,
 					session.nextStanzaId()));
