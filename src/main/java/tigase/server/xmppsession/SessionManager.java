@@ -794,26 +794,7 @@ public class SessionManager extends AbstractMessageReceiver
 				XMPPImplIfc plugin = addPlugin(plug_id, plugins_concurrency.get(plug_id));
 
 				if (plugin != null) {
-					Map<String, Object> plugin_settings = new ConcurrentHashMap<String, Object>(10);
-
-					for (Map.Entry<String, Object> entry : props.entrySet()) {
-						if (entry.getKey().startsWith(PLUGINS_CONF_PROP_KEY)) {
-
-							// Split the key to configuration nodes separated with '/'
-							String[] nodes = entry.getKey().split("/");
-
-							// The plugin ID part may contain many IDs separated with comma ','
-							if (nodes.length > 2) {
-								String[] ids = nodes[1].split(",");
-
-								Arrays.sort(ids);
-
-								if (Arrays.binarySearch(ids, plug_id) >= 0) {
-									plugin_settings.put(nodes[2], entry.getValue());
-								}
-							}
-						}
-					}
+					Map<String, Object> plugin_settings = getPluginSettings(plug_id, props);
 
 					if (plugin_settings.size() > 0) {
 						if (log.isLoggable(Level.CONFIG)) {
@@ -1854,6 +1835,53 @@ public class SessionManager extends AbstractMessageReceiver
 		}      // end of for ()
 
 		return results;
+	}
+
+	private Map<String, Object> getPluginSettings(String plug_id, Map<String, Object> props) {
+		Map<String, Object> plugin_settings = new ConcurrentHashMap<String, Object>(10);
+
+		// First set all options common for all plugins and then set all options specific to the
+		// plugin to make sure specific options can overwrite common options
+		for (Map.Entry<String, Object> entry : props.entrySet()) {
+			if (entry.getKey().startsWith(PLUGINS_CONF_PROP_KEY)) {
+
+				// Split the key to configuration nodes separated with '/'
+				String[] nodes = entry.getKey().split("/");
+
+				// Settings option for all plugins
+				if (nodes.length == 2) {
+					plugin_settings.put(nodes[1], entry.getValue());
+					log.log(Level.CONFIG, "Adding a common plugins option: {0} = {1}",
+							new Object[] { nodes[1],
+							entry.getValue() });
+				}
+			}
+		}
+
+		// Now set plugin specific options
+		for (Map.Entry<String, Object> entry : props.entrySet()) {
+			if (entry.getKey().startsWith(PLUGINS_CONF_PROP_KEY)) {
+
+				// Split the key to configuration nodes separated with '/'
+				String[] nodes = entry.getKey().split("/");
+
+				// The plugin ID part may contain many IDs separated with comma ','
+				if (nodes.length > 2) {
+					String[] ids = nodes[1].split(",");
+
+					Arrays.sort(ids);
+
+					if (Arrays.binarySearch(ids, plug_id) >= 0) {
+						plugin_settings.put(nodes[2], entry.getValue());
+						log.log(Level.CONFIG, "Adding a specific plugins option [{0}]: {1} = {2}",
+								new Object[] { plug_id,
+								nodes[1], entry.getValue() });
+					}
+				}
+			}
+		}
+
+		return plugin_settings;
 	}
 
 	//~--- set methods ----------------------------------------------------------
