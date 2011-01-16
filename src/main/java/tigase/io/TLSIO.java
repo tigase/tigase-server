@@ -50,6 +50,9 @@ import java.util.logging.Logger;
  */
 public class TLSIO implements IOInterface {
 
+	/** Field description */
+	public static final String TLS_CAPS = "tls-caps";
+
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
@@ -123,6 +126,19 @@ public class TLSIO implements IOInterface {
 		return io.bytesRead();
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param caps
+	 *
+	 * @return
+	 */
+	@Override
+	public boolean checkCapabilities(String caps) {
+		return caps.contains(TLS_CAPS) || io.checkCapabilities(caps);
+	}
+
 	//~--- get methods ----------------------------------------------------------
 
 	/**
@@ -154,11 +170,12 @@ public class TLSIO implements IOInterface {
 	 *
 	 *
 	 * @param list
+	 * @param reset
 	 */
 	@Override
-	public void getStatistics(StatisticsList list) {
+	public void getStatistics(StatisticsList list, boolean reset) {
 		if (io != null) {
-			io.getStatistics(list);
+			io.getStatistics(list, reset);
 		}
 	}
 

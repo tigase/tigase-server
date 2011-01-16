@@ -390,10 +390,11 @@ public abstract class IOService<RefObject> implements Callable<IOService<?>>, TL
 	 *
 	 *
 	 * @param list
+	 * @param reset
 	 */
-	public void getStatistics(StatisticsList list) {
+	public void getStatistics(StatisticsList list, boolean reset) {
 		if (socketIO != null) {
-			socketIO.getStatistics(list);
+			socketIO.getStatistics(list, reset);
 		}
 	}
 
@@ -539,7 +540,7 @@ public abstract class IOService<RefObject> implements Callable<IOService<?>>, TL
 	 * @throws IOException
 	 */
 	public void startTLS(boolean clientMode) throws IOException {
-		if (socketIO instanceof TLSIO) {
+		if (socketIO.checkCapabilities(TLSIO.TLS_CAPS)) {
 			throw new IllegalStateException("TLS mode is already activated.");
 		}
 
@@ -581,6 +582,10 @@ public abstract class IOService<RefObject> implements Callable<IOService<?>>, TL
 	 * @param level
 	 */
 	public void startZLib(int level) {
+		if (socketIO.checkCapabilities(ZLibIO.ZLIB_CAPS)) {
+			throw new IllegalStateException("ZLIB mode is already activated.");
+		}
+
 		socketIO = new ZLibIO(socketIO, level);
 	}
 

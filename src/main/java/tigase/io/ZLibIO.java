@@ -48,6 +48,9 @@ import java.util.logging.Logger;
  */
 public class ZLibIO implements IOInterface {
 
+	/** Field description */
+	public static final String ZLIB_CAPS = "zlib-caps";
+
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
@@ -85,6 +88,19 @@ public class ZLibIO implements IOInterface {
 		return io.bytesRead();
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param caps
+	 *
+	 * @return
+	 */
+	@Override
+	public boolean checkCapabilities(String caps) {
+		return caps.contains(ZLIB_CAPS) || io.checkCapabilities(caps);
+	}
+
 	//~--- get methods ----------------------------------------------------------
 
 	/**
@@ -116,11 +132,12 @@ public class ZLibIO implements IOInterface {
 	 *
 	 *
 	 * @param list
+	 * @param reset
 	 */
 	@Override
-	public void getStatistics(StatisticsList list) {
+	public void getStatistics(StatisticsList list, boolean reset) {
 		if (io != null) {
-			io.getStatistics(list);
+			io.getStatistics(list, reset);
 		}
 
 		if (zlib != null) {

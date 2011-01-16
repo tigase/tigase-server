@@ -19,12 +19,21 @@
  * Last modified by $Author$
  * $Date$
  */
+
 package tigase.io;
 
+//~--- non-JDK imports --------------------------------------------------------
+
+import tigase.stats.StatisticsList;
+
+//~--- JDK imports ------------------------------------------------------------
+
 import java.io.IOException;
+
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
-import tigase.stats.StatisticsList;
+
+//~--- interfaces -------------------------------------------------------------
 
 /**
  * Describe interface IOInterface here.
@@ -36,27 +45,37 @@ import tigase.stats.StatisticsList;
  * @version $Rev$
  */
 public interface IOInterface {
+	int bytesRead();
 
-  SocketChannel getSocketChannel();
+	boolean checkCapabilities(String caps);
 
-  void stop() throws IOException;
-
-  boolean isConnected();
-
-  int write(final ByteBuffer buff) throws IOException;
-
-  ByteBuffer read(final ByteBuffer buff) throws IOException;
-
-  int bytesRead();
+	//~--- get methods ----------------------------------------------------------
 
 	int getInputPacketSize() throws IOException;
+
+	SocketChannel getSocketChannel();
+
+	void getStatistics(StatisticsList list, boolean reset);
+
+	boolean isConnected();
+
+	boolean isRemoteAddress(String addr);
+
+	//~--- methods --------------------------------------------------------------
+
+	ByteBuffer read(final ByteBuffer buff) throws IOException;
+
+	void stop() throws IOException;
 
 	boolean waitingToSend();
 
 	int waitingToSendSize();
 
-	boolean isRemoteAddress(String addr);
+	int write(final ByteBuffer buff) throws IOException;
+}    // IOInterface
 
-	void getStatistics(StatisticsList list);
 
-} // IOInterface
+//~ Formatted in Sun Code Convention
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

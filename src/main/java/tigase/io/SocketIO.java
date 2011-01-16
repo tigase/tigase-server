@@ -53,10 +53,11 @@ import java.util.logging.Logger;
  * @version $Rev$
  */
 public class SocketIO implements IOInterface {
-	private static Logger log = Logger.getLogger("tigase.io.SocketIO");
+	private static final Logger log = Logger.getLogger(SocketIO.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
 
+	private long buffOverflow = 0;
 	private int bytesRead = 0;
 	private long bytesReceived = 0;
 	private long bytesSent = 0;
@@ -99,6 +100,19 @@ public class SocketIO implements IOInterface {
 		return bytesRead;
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param caps
+	 *
+	 * @return
+	 */
+	@Override
+	public boolean checkCapabilities(String caps) {
+		return false;
+	}
+
 	//~--- get methods ----------------------------------------------------------
 
 	/**
@@ -130,11 +144,19 @@ public class SocketIO implements IOInterface {
 	 *
 	 *
 	 * @param list
+	 * @param reset
 	 */
 	@Override
-	public void getStatistics(StatisticsList list) {
+	public void getStatistics(StatisticsList list, boolean reset) {
 		list.add("socketio", "Bytes sent", bytesSent, Level.FINE);
 		list.add("socketio", "Bytes received", bytesReceived, Level.FINE);
+		list.add("socketio", "Buffers overflow", buffOverflow, Level.FINE);
+
+		if (reset) {
+			bytesSent = 0;
+			bytesReceived = 0;
+			buffOverflow = 0;
+		}
 	}
 
 	/**
@@ -279,7 +301,9 @@ public class SocketIO implements IOInterface {
 						toString() });
 			}
 
-			dataToSend.offer(buff);
+			if ( !dataToSend.offer(buff)) {
+				++buffOverflow;
+			}
 		}
 
 		int result = 0;
