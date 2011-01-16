@@ -1,4 +1,5 @@
-/*  Tigase Jabber/XMPP Server
+/*
+ *   Tigase Jabber/XMPP Server
  *  Copyright (C) 2004-2008 "Artur Hefczyc" <artur.hefczyc@tigase.org>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,9 +19,14 @@
  * Last modified by $Author$
  * $Date$
  */
+
 package tigase.server;
 
+//~--- non-JDK imports --------------------------------------------------------
+
 import tigase.xmpp.XMPPIOService;
+
+//~--- interfaces -------------------------------------------------------------
 
 /**
  * Describe interface ServiceChecker here.
@@ -28,9 +34,16 @@ import tigase.xmpp.XMPPIOService;
  *
  * Created: Sat Jun 21 22:45:52 2008
  *
+ * @param <IO>
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public interface ServiceChecker {
-	void check(XMPPIOService service);
+public interface ServiceChecker<IO extends XMPPIOService<?>> {
+	void check(IO service);
 }
+
+
+//~ Formatted in Sun Code Convention
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

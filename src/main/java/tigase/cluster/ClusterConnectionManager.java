@@ -287,8 +287,6 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 				Level.FINE);
 		list.add(getName(), "Average decompression ratio",
 				ioStatsGetter.getAverageDecompressionRatio(), Level.FINE);
-		list.add(getName(), "Bytes sent", ioStatsGetter.getBytesSent(), Level.FINE);
-		list.add(getName(), "Bytes received", ioStatsGetter.getBytesReceived(), Level.FINE);
 		list.add(getName(), "Waiting to send", ioStatsGetter.getWaitingToSend(), Level.FINE);
 	}
 
@@ -966,9 +964,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 
 	//~--- inner classes --------------------------------------------------------
 
-	private class IOServiceStatisticsGetter implements ServiceChecker {
-		private long bytesReceived = 0;
-		private long bytesSent = 0;
+	private class IOServiceStatisticsGetter implements ServiceChecker<XMPPIOService<Object>> {
 		private int clIOQueue = 0;
 		private float compressionRatio = 0f;
 		private int counter = 0;
@@ -984,13 +980,11 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 		 * @param service
 		 */
 		@Override
-		public void check(XMPPIOService service) {
-			service.getStatistics(list);
+		public void check(XMPPIOService<Object> service) {
+			service.getStatistics(list, true);
 			compressionRatio += list.getValue("zlibio", "Average compression rate", -1f);
 			decompressionRatio += list.getValue("zlibio", "Average decompression rate", -1f);
 			++counter;
-			bytesReceived += list.getValue("socketio", "Bytes received", -1l);
-			bytesSent += list.getValue("socketio", "Bytes sent", -1l);
 			clIOQueue += service.waitingToSendSize();
 		}
 
@@ -1022,26 +1016,6 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 		 *
 		 * @return
 		 */
-		public long getBytesReceived() {
-			return bytesReceived;
-		}
-
-		/**
-		 * Method description
-		 *
-		 *
-		 * @return
-		 */
-		public long getBytesSent() {
-			return bytesSent;
-		}
-
-		/**
-		 * Method description
-		 *
-		 *
-		 * @return
-		 */
 		public int getWaitingToSend() {
 			return clIOQueue;
 		}
@@ -1053,12 +1027,15 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 		 *
 		 */
 		public void reset() {
-			bytesReceived = 0;
-			bytesSent = 0;
+
+			// Statistics are reset on the low socket level instead. This way we do not loose
+			// any stats in case of the disconnection.
+//    bytesReceived = 0;
+//    bytesSent = 0;
+			clIOQueue = 0;
+			counter = 0;
 			compressionRatio = 0f;
 			decompressionRatio = 0f;
-			counter = 0;
-			clIOQueue = 0;
 		}
 	}
 

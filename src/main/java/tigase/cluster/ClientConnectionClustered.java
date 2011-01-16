@@ -72,18 +72,18 @@ public class ClientConnectionClustered extends ClientConnectionManager
 	@Override
 	public void nodeDisconnected(String node) {
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Disconnected nodes: " + node);
+			log.log(Level.FINEST, "Disconnected nodes: {0}", node);
 		}
 
 		final String hostname = node;
 
-		doForAllServices(new ServiceChecker() {
+		doForAllServices(new ServiceChecker<XMPPIOService<Object>>() {
 			@Override
-			public void check(final XMPPIOService service) {
+			public void check(XMPPIOService<Object> service) {
 				JID dataReceiver = service.getDataReceiver();
 
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Checking service for dataReceiver: " + dataReceiver);
+					log.log(Level.FINEST, "Checking service for dataReceiver: {0}", dataReceiver);
 				}
 
 				if ((dataReceiver != null) && dataReceiver.getDomain().equals(hostname)) {

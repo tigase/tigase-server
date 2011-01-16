@@ -141,10 +141,13 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 	/** Field description */
 	public String[] PORT_IFC_PROP_VAL = { "*" };
+	private long bytesReceived = 0;
+	private long bytesSent = 0;
 
 	// services.size() call is very slow due to the implementation details
 	// Therefore for often size retrieval this value is calculated separately.
 	private int services_size = 0;
+	private long socketOverflow = 0;
 	private Thread watchdog = null;
 	private long watchdogRuns = 0;
 	private long watchdogStopped = 0;
@@ -154,6 +157,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	private Set<ConnectionListenerImpl> pending_open =
 		Collections.synchronizedSet(new HashSet<ConnectionListenerImpl>());;
 	protected int net_buffer = NET_BUFFER_ST_PROP_VAL;
+	private IOServiceStatisticsGetter ioStatsGetter = new IOServiceStatisticsGetter();
 
 //protected long startDelay = 5 * SECOND;
 	private boolean initializationCompleted = false;
@@ -184,6 +188,20 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	protected abstract long getMaxInactiveTime();
 
 	protected abstract IO getXMPPIOServiceInstance();
+
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 */
+	@Override
+	public synchronized void everyMinute() {
+		super.everyMinute();
+		doForAllServices(ioStatsGetter);
+	}
+
+	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
@@ -319,6 +337,9 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 			list.add(getName(), "Waiting to send", waitingToSendSize, Level.FINEST);
 		}
 
+		list.add(getName(), "Bytes sent", bytesSent, Level.FINE);
+		list.add(getName(), "Bytes received", bytesReceived, Level.FINE);
+		list.add(getName(), "Socket overflow", socketOverflow, Level.FINE);
 		list.add(getName(), "Watchdog runs", watchdogRuns, Level.FINER);
 		list.add(getName(), "Watchdog tests", watchdogTests, Level.FINE);
 		list.add(getName(), "Watchdog stopped", watchdogStopped, Level.FINE);
@@ -506,6 +527,14 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	 */
 	@Override
 	public boolean serviceStopped(IO service) {
+
+		// Hopefuly there is no exception at this point, but just in case...
+		// This is a very fresh code after all
+		try {
+			ioStatsGetter.check(service);
+		} catch (Exception e) {
+			log.log(Level.INFO, "Nothing serious to worry about but please notify the developer.", e);
+		}
 
 		// synchronized(service) {
 		String id = getUniqueId(service);
@@ -780,7 +809,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	 * @param checker is a <code>ServiceChecker</code> instance defining an action
 	 * to perform for all IOService objects.
 	 */
-	protected void doForAllServices(ServiceChecker checker) {
+	protected void doForAllServices(ServiceChecker<IO> checker) {
 		for (IO service : services.values()) {
 			checker.check(service);
 		}
@@ -1118,6 +1147,27 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	}
 
 
+	private class IOServiceStatisticsGetter implements ServiceChecker<IO> {
+		private StatisticsList list = new StatisticsList(Level.ALL);
+
+		//~--- methods ------------------------------------------------------------
+
+		/**
+		 * Method description
+		 *
+		 *
+		 * @param service
+		 */
+		@Override
+		public synchronized void check(IO service) {
+			service.getStatistics(list, true);
+			bytesReceived += list.getValue("socketio", "Bytes received", -1l);
+			bytesSent += list.getValue("socketio", "Bytes sent", -1l);
+			socketOverflow += list.getValue("socketio", "Buffers overflow", -1l);
+		}
+	}
+
+
 	/**
 	 * Looks in all established connections and checks whether any of them
 	 * is dead....
@@ -1142,7 +1192,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 					// really alive...., try to send space for each service which
 					// is inactive for hour or more and close the service
 					// on Exception
-					doForAllServices(new ServiceChecker() {
+					doForAllServices(new ServiceChecker<IO>() {
 						@Override
 						public void check(final XMPPIOService service) {
 
@@ -1158,7 +1208,9 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 										// Stop the service is max keep-alive time is acceeded
 										// for non-active connections.
 										if (log.isLoggable(Level.INFO)) {
-											log.info(getName() + ": Max inactive time exceeded, stopping: " + service);
+											log.log(Level.INFO, "{0}: Max inactive time exceeded, stopping: {1}",
+													new Object[] { getName(),
+													service });
 										}
 
 										++watchdogStopped;
