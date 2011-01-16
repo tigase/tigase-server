@@ -67,6 +67,12 @@ public class DataRepositoryImpl implements DataRepository {
 	/** Field description */
 	public static final String SP_STARTS_WITH = "{ call";
 
+	/** Field description */
+	public static final int QUERY_TIMEOUT = 2;
+
+	/** Field description */
+	public static final int DB_CONN_TIMEOUT = 5;
+
 	//~--- fields ---------------------------------------------------------------
 
 	private Connection conn = null;
@@ -278,12 +284,14 @@ public class DataRepositoryImpl implements DataRepository {
 		String query = (derby_mode ? DERBY_CONNVALID_QUERY : JDBC_CONNVALID_QUERY);
 
 		conn_valid_st = prepareQuery(query);
+		conn_valid_st.setQueryTimeout(QUERY_TIMEOUT);
 
 		for (String key : db_queries.keySet()) {
 			query = db_queries.get(key);
 
 			PreparedStatement st = prepareQuery(query);
 
+			st.setQueryTimeout(QUERY_TIMEOUT);
 			db_statements.put(key, st);
 		}
 	}
@@ -295,21 +303,26 @@ public class DataRepositoryImpl implements DataRepository {
 	 * @exception SQLException if an error occurs on database query.
 	 */
 	private void initRepo() throws SQLException {
-		Statement stmt = null;
+
+		// Statement stmt = null;
 		ResultSet rs = null;
 
 		try {
 			synchronized (db_conn) {
 				db_statements.clear();
+				DriverManager.setLoginTimeout(DB_CONN_TIMEOUT);
 				conn = DriverManager.getConnection(db_conn);
 				conn.setAutoCommit(true);
 				derby_mode = db_conn.startsWith("jdbc:derby");
 				initPreparedStatements();
-				stmt = conn.createStatement();
+
+				// stmt = conn.createStatement();
 			}
 		} finally {
-			release(stmt, rs);
-			stmt = null;
+			release(null, rs);
+
+			// release(stmt, rs);
+			// stmt = null;
 			rs = null;
 		}
 	}
