@@ -60,8 +60,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class MessageAmp extends XMPPProcessor
-		implements XMPPPostprocessorIfc, XMPPProcessorIfc {
+public class MessageAmp extends XMPPProcessor implements XMPPPostprocessorIfc, XMPPProcessorIfc {
 	private static Logger log = Logger.getLogger(MessageAmp.class.getName());
 	private static final String FROM_CONN_ID = "from-conn-id";
 	private static final String TO_CONN_ID = "to-conn-id";
@@ -109,6 +108,8 @@ public class MessageAmp extends XMPPProcessor
 	public void init(Map<String, Object> settings) throws TigaseDBException {
 		super.init(settings);
 		ampJID = JID.jidInstanceNS((String) settings.get(AMP_JID_PROP_KEY));
+		log.log(Level.CONFIG, "Loaded AMP_JID option: {0} = {1}", new Object[] { AMP_JID_PROP_KEY,
+				ampJID });
 
 		String off_val = (String) settings.get(MSG_OFFLINE_PROP_KEY);
 
@@ -186,15 +187,13 @@ public class MessageAmp extends XMPPProcessor
 	 * @throws XMPPException
 	 */
 	@Override
-	public void process(Packet packet, XMPPResourceConnection session,
-			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
+	public void process(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
+			Queue<Packet> results, Map<String, Object> settings)
 			throws XMPPException {
 		if (packet.getElemName() == "presence") {
-			if ((offlineProcessor != null)
-					&& offlineProcessor.loadOfflineMessages(packet, session)) {
+			if ((offlineProcessor != null) && offlineProcessor.loadOfflineMessages(packet, session)) {
 				try {
-					Queue<Packet> packets = offlineProcessor.restorePacketForOffLineUser(session,
-						msg_repo);
+					Queue<Packet> packets = offlineProcessor.restorePacketForOffLineUser(session, msg_repo);
 
 					if (packets != null) {
 						if (log.isLoggable(Level.FINER)) {
