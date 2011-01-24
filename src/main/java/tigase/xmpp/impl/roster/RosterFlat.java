@@ -429,6 +429,26 @@ public class RosterFlat extends RosterAbstract {
 		return items;
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param buddy
+	 *
+	 * @return
+	 *
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	@Override
+	public boolean isOnline(XMPPResourceConnection session, JID buddy)
+			throws NotAuthorizedException, TigaseDBException {
+		RosterElement relem = getRosterElement(session, buddy);
+
+		return (relem != null) && relem.isOnline();
+	}
+
 	//~--- methods --------------------------------------------------------------
 
 	/**
@@ -444,6 +464,26 @@ public class RosterFlat extends RosterAbstract {
 	public boolean parseRoster(String roster_str, Map<BareJID, RosterElement> roster,
 			XMPPResourceConnection session) {
 		return parseRosterUtil(roster_str, roster, session);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param buddy
+	 *
+	 * @return
+	 *
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	@Override
+	public boolean presenceSent(XMPPResourceConnection session, JID buddy)
+			throws NotAuthorizedException, TigaseDBException {
+		RosterElement relem = getRosterElement(session, buddy);
+
+		return (relem != null) && relem.isPresence_sent();
 	}
 
 	/**
@@ -524,6 +564,48 @@ public class RosterFlat extends RosterAbstract {
 			saveUserRoster(session);
 		} else {
 			log.log(Level.WARNING, "Missing roster contact for subscription set: {0}", buddy);
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param buddy
+	 * @param online
+	 *
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	@Override
+	public void setOnline(XMPPResourceConnection session, JID buddy, boolean online)
+			throws NotAuthorizedException, TigaseDBException {
+		RosterElement relem = getRosterElement(session, buddy);
+
+		if (relem != null) {
+			relem.setOnline(online);
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param buddy
+	 * @param sent
+	 *
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	@Override
+	public void setPresenceSent(XMPPResourceConnection session, JID buddy, boolean sent)
+			throws NotAuthorizedException, TigaseDBException {
+		RosterElement relem = getRosterElement(session, buddy);
+
+		if (relem != null) {
+			relem.setPresence_sent(sent);
 		}
 	}
 

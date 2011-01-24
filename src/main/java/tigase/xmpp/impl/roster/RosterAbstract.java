@@ -270,16 +270,15 @@ public abstract class RosterAbstract {
 				SubscriptionType.from                                 // Table 8.
 				);
 
-		private EnumMap<PresenceType, SubscriptionType> stateTransition =
-			new EnumMap<PresenceType, SubscriptionType>(PresenceType.class);
+		private EnumMap<PresenceType, SubscriptionType> stateTransition = new EnumMap<PresenceType,
+			SubscriptionType>(PresenceType.class);
 
 		//~--- constructors -------------------------------------------------------
 
-		private StateTransition(SubscriptionType out_subscribed,
-				SubscriptionType out_unsubscribed, SubscriptionType in_subscribe,
-					SubscriptionType in_unsubscribe, SubscriptionType in_subscribed,
-						SubscriptionType in_unsubscribed, SubscriptionType out_subscribe,
-							SubscriptionType out_unsubscribe) {
+		private StateTransition(SubscriptionType out_subscribed, SubscriptionType out_unsubscribed,
+				SubscriptionType in_subscribe, SubscriptionType in_unsubscribe,
+					SubscriptionType in_subscribed, SubscriptionType in_unsubscribed,
+						SubscriptionType out_subscribe, SubscriptionType out_unsubscribe) {
 			stateTransition.put(PresenceType.out_subscribed, out_subscribed);
 			stateTransition.put(PresenceType.out_unsubscribed, out_unsubscribed);
 			stateTransition.put(PresenceType.in_subscribe, in_subscribe);
@@ -387,8 +386,7 @@ public abstract class RosterAbstract {
 
 	/** Field description */
 	public static final Element[] FEATURES = {
-		new Element("ver", new String[] { "xmlns" },
-			new String[] { "urn:xmpp:features:rosterver" }) };
+		new Element("ver", new String[] { "xmlns" }, new String[] { "urn:xmpp:features:rosterver" }) };
 
 	/** Field description */
 	public static final EnumSet<SubscriptionType> SUB_NONE = EnumSet.of(SubscriptionType.none,
@@ -407,13 +405,12 @@ public abstract class RosterAbstract {
 	public static final EnumSet<SubscriptionType> SUB_BOTH = EnumSet.of(SubscriptionType.both);
 
 	/** Field description */
-	public static final EnumSet<SubscriptionType> TO_SUBSCRIBED =
-		EnumSet.of(SubscriptionType.to, SubscriptionType.to_pending_in, SubscriptionType.both);
+	public static final EnumSet<SubscriptionType> TO_SUBSCRIBED = EnumSet.of(SubscriptionType.to,
+		SubscriptionType.to_pending_in, SubscriptionType.both);
 
 	/** Field description */
-	public static final EnumSet<SubscriptionType> FROM_SUBSCRIBED =
-		EnumSet.of(SubscriptionType.from, SubscriptionType.from_pending_out,
-			SubscriptionType.both);
+	public static final EnumSet<SubscriptionType> FROM_SUBSCRIBED = EnumSet.of(SubscriptionType.from,
+		SubscriptionType.from_pending_out, SubscriptionType.both);
 
 	/** Field description */
 	public static final EnumSet<StanzaType> INITIAL_PRESENCES = EnumSet.of(StanzaType.available,
@@ -448,8 +445,7 @@ public abstract class RosterAbstract {
 		subsToStateMap.put(SubscriptionType.none, StateTransition.none);
 		subsToStateMap.put(SubscriptionType.none_pending_out, StateTransition.none_pending_out);
 		subsToStateMap.put(SubscriptionType.none_pending_in, StateTransition.none_pending_in);
-		subsToStateMap.put(SubscriptionType.none_pending_out_in,
-				StateTransition.none_pending_out_in);
+		subsToStateMap.put(SubscriptionType.none_pending_out_in, StateTransition.none_pending_out_in);
 		subsToStateMap.put(SubscriptionType.to, StateTransition.to);
 		subsToStateMap.put(SubscriptionType.to_pending_in, StateTransition.to_pending_in);
 		subsToStateMap.put(SubscriptionType.from, StateTransition.from);
@@ -574,7 +570,37 @@ public abstract class RosterAbstract {
 			JID buddy)
 			throws NotAuthorizedException, TigaseDBException;
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param jid
+	 *
+	 * @return
+	 *
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	public abstract boolean isOnline(XMPPResourceConnection session, JID jid)
+			throws NotAuthorizedException, TigaseDBException;
+
 	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param jid
+	 *
+	 * @return
+	 *
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	public abstract boolean presenceSent(XMPPResourceConnection session, JID jid)
+			throws NotAuthorizedException, TigaseDBException;
 
 	/**
 	 * Method description
@@ -621,6 +647,34 @@ public abstract class RosterAbstract {
 	 */
 	public abstract void setBuddySubscription(final XMPPResourceConnection session,
 			final SubscriptionType subscription, JID buddy)
+			throws NotAuthorizedException, TigaseDBException;
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param jid
+	 * @param online
+	 *
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	public abstract void setOnline(XMPPResourceConnection session, JID jid, boolean online)
+			throws NotAuthorizedException, TigaseDBException;
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param jid
+	 * @param sent
+	 *
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	public abstract void setPresenceSent(XMPPResourceConnection session, JID jid, boolean sent)
 			throws NotAuthorizedException, TigaseDBException;
 
 	//~--- get methods ----------------------------------------------------------
@@ -733,8 +787,7 @@ public abstract class RosterAbstract {
 	 *
 	 * @throws NotAuthorizedException
 	 */
-	public PresenceType getPresenceType(final XMPPResourceConnection session,
-			final Packet packet)
+	public PresenceType getPresenceType(final XMPPResourceConnection session, final Packet packet)
 			throws NotAuthorizedException {
 		BareJID to = (packet.getStanzaTo() != null) ? packet.getStanzaTo().getBareJID() : null;
 		StanzaType type = packet.getType();
@@ -967,8 +1020,8 @@ public abstract class RosterAbstract {
 	 * @throws TigaseDBException
 	 * @throws NoConnectionIdException
 	 */
-	public void updateBuddyChange(final XMPPResourceConnection session,
-			final Queue<Packet> results, final Element item)
+	public void updateBuddyChange(final XMPPResourceConnection session, final Queue<Packet> results,
+			final Element item)
 			throws NotAuthorizedException, TigaseDBException, NoConnectionIdException {
 		Element update = new Element("iq");
 
@@ -1023,8 +1076,7 @@ public abstract class RosterAbstract {
 			current_subscription = SubscriptionType.none;
 		}
 
-		final SubscriptionType new_subscription = getStateTransition(current_subscription,
-			presence);
+		final SubscriptionType new_subscription = getStateTransition(current_subscription, presence);
 
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "new_subscription={0} for presence={1}",

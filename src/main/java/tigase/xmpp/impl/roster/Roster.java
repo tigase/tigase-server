@@ -50,7 +50,7 @@ import java.util.logging.Logger;
 public class Roster extends RosterAbstract {
 
 	/**
-	 * Private logger for class instancess.
+	 * Private logger for class instances.
 	 */
 	private static Logger log = Logger.getLogger("tigase.xmpp.impl.Roster");
 
@@ -223,7 +223,43 @@ public class Roster extends RosterAbstract {
 		return null;
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param jid
+	 *
+	 * @return
+	 *
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	@Override
+	public boolean isOnline(XMPPResourceConnection session, JID jid)
+			throws NotAuthorizedException, TigaseDBException {
+		return true;
+	}
+
 	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param jid
+	 *
+	 * @return
+	 *
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	@Override
+	public boolean presenceSent(XMPPResourceConnection session, JID jid)
+			throws NotAuthorizedException, TigaseDBException {
+		return false;
+	}
 
 	/**
 	 * Method description
@@ -281,6 +317,36 @@ public class Roster extends RosterAbstract {
 			throws NotAuthorizedException, TigaseDBException {
 		session.setData(groupNode(buddy), SUBSCRIPTION, subscription.toString());
 	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param jid
+	 * @param online
+	 *
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	@Override
+	public void setOnline(XMPPResourceConnection session, JID jid, boolean online)
+			throws NotAuthorizedException, TigaseDBException {}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param jid
+	 * @param sent
+	 *
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	@Override
+	public void setPresenceSent(XMPPResourceConnection session, JID jid, boolean sent)
+			throws NotAuthorizedException, TigaseDBException {}
 
 //@Override
 //public String[] getBuddies(XMPPResourceConnection session, boolean onlineOnly)

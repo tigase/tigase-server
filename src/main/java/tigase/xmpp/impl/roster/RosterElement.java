@@ -71,10 +71,10 @@ public class RosterElement {
 	private XMPPResourceConnection session = null;
 	private String stringpreped = null;
 	private SubscriptionType subscription = null;
-
-	// private boolean online = false;
-	// private Element item = null;
 	private boolean presence_sent = false;
+
+	// private Element item = null;
+	private boolean online = false;
 	private boolean modified = false;
 
 	//~--- constructors ---------------------------------------------------------
@@ -295,13 +295,15 @@ public class RosterElement {
 		return modified;
 	}
 
-//public boolean isOnline() {
-//  return online;
-//}
-//
-//public void setOnline(boolean online) {
-//  this.online = online;
-//}
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public boolean isOnline() {
+		return online;
+	}
 
 	/**
 	 * Method description
@@ -346,6 +348,16 @@ public class RosterElement {
 		}
 
 		modified = true;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param online
+	 */
+	public void setOnline(boolean online) {
+		this.online = online;
 	}
 
 	/**
