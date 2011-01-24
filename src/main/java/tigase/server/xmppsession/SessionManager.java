@@ -406,9 +406,10 @@ public class SessionManager extends AbstractMessageReceiver
 			ProcessingThreads<ProcessorWorkerThread> proc = procent.getValue();
 
 			if (list.checkLevel(Level.INFO, proc.getTotalQueueSize() + proc.getDroppedPackets())) {
-				list.add(getName(), "Processor: " + procent.getKey(), "Queue: " + proc.getTotalQueueSize()
-						+ ", AvTime: " + proc.getAverageProcessingTime() + ", Runs: " + proc.getTotalRuns()
-							+ ", Lost: " + proc.getDroppedPackets(), Level.INFO);
+				list.add(getName(), "Processor: " + procent.getKey(), ", Queue: "
+						+ proc.getTotalQueueSize() + ", AvTime: " + proc.getAverageProcessingTime()
+							+ ", Runs: " + proc.getTotalRuns() + ", Lost: "
+								+ proc.getDroppedPackets(), Level.INFO);
 			}
 		}
 
