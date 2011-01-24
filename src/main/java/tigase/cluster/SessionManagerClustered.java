@@ -266,6 +266,16 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 		strategy.getStatistics(list);
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public ClusteringStrategyIfc getStrategy() {
+		return strategy;
+	}
+
 	//~--- methods --------------------------------------------------------------
 
 	/**
