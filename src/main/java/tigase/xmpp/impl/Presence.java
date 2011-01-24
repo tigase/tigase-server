@@ -102,8 +102,12 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc, XMPPSto
 	private static long requiredNo = 0;
 	private static long requiredYes = 0;
 	private static TigaseRuntime runtime = TigaseRuntime.getTigaseRuntime();
-	private static final String OFFLINE_RES_SENT = "offline-res-sent";
-	private static final String OFFLINE_BUD_SENT = "offline-bud-sent";
+
+	/** Field description */
+	public static final String OFFLINE_RES_SENT = "offline-res-sent";
+
+	/** Field description */
+	public static final String OFFLINE_BUD_SENT = "offline-bud-sent";
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -579,24 +583,27 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc, XMPPSto
 	}
 
 	private static boolean requiresPresenceSending(JID buddy, XMPPResourceConnection session) {
-		String buddy_domain = buddy.getDomain();
-		boolean result = !runtime.hasCompleteJidsInfo() ||!session.isLocalDomain(buddy_domain, false)
-			|| runtime.isJidOnline(buddy);
+		boolean result = true;
 
-		if (log.isLoggable(Level.FINEST)) {
-			if (result) {
-				++requiredYes;
-			} else {
-				++requiredNo;
-			}
-
-			log.finest("Yes/No: " + requiredYes + " / " + requiredNo + ", buddy: " + buddy + ", result="
-					+ result + ", !runtime.hasCompleteJidsInfo()=" + !runtime.hasCompleteJidsInfo()
-						+ ", !session.isLocalDomain(buddy_domain, false)="
-							+ !session.isLocalDomain(buddy_domain, false) + ", runtime.isJidOnline(buddy)="
-								+ runtime.isJidOnline(buddy));
-		}
-
+		// Let's try saver but maybe less optimized approach first.
+		// We send presence updates only to people who are marked as online
+//  String buddy_domain = buddy.getDomain();
+//  boolean result = !runtime.hasCompleteJidsInfo() ||!session.isLocalDomain(buddy_domain, false)
+//    || runtime.isJidOnline(buddy);
+//
+//  if (log.isLoggable(Level.FINEST)) {
+//    if (result) {
+//      ++requiredYes;
+//    } else {
+//      ++requiredNo;
+//    }
+//
+//    log.finest("Yes/No: " + requiredYes + " / " + requiredNo + ", buddy: " + buddy + ", result="
+//        + result + ", !runtime.hasCompleteJidsInfo()=" + !runtime.hasCompleteJidsInfo()
+//          + ", !session.isLocalDomain(buddy_domain, false)="
+//            + !session.isLocalDomain(buddy_domain, false) + ", runtime.isJidOnline(buddy)="
+//              + runtime.isJidOnline(buddy));
+//  }
 		return result;
 	}
 
