@@ -580,6 +580,13 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 		for (PacketFilterIfc packetFilter : outgoing_filters) {
 			packetFilter.getStatistics(list);
 		}
+
+		if (list.checkLevel(Level.FINEST)) {
+			for (QueueListener thread : threadsQueue) {
+				list.add(getName(), "Processed packets " + thread.getName(), thread.packetCounter,
+						Level.FINEST);
+			}
+		}
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -1106,6 +1113,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 
 	private class QueueListener extends Thread {
 		private String compName = null;
+		private long packetCounter = 0;
 		private QueueType type = null;
 		private boolean threadStopped = false;
 		private PriorityQueueAbstract<Packet> queue;
@@ -1127,7 +1135,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 		@Override
 		public void run() {
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest(getName() + " starting queue processing.");
+				log.log(Level.FINEST, "{0} starting queue processing.", getName());
 			}
 
 			Packet packet = null;
@@ -1140,6 +1148,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 //        log.finest("[" + getName() + "] before take... " + type);
 					// packet = queue.take(getName() + ":" + type);
 					packet = queue.take();
+					++packetCounter;
 
 //        if (log.isLoggable(Level.INFO)) {
 //          log.info("[" + getName() + "] packet from " + type + " queue: " + packet);
@@ -1216,7 +1225,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 							break;
 
 						default :
-							log.severe("Unknown queue element type: " + type);
+							log.log(Level.SEVERE, "Unknown queue element type: {0}", type);
 
 							break;
 					}          // end of switch (qel.type)
