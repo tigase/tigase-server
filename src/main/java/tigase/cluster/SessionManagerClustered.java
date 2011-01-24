@@ -144,7 +144,7 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 
 			sendBroadcastPackets(presence, params, ClusterMethods.USER_INITIAL_PRESENCE, cl_nodes);
 		} catch (Exception e) {
-			log.log(Level.WARNING, "Problem with broadcast user initial presence message for: " + conn);
+			log.log(Level.WARNING, "Problem with broadcast user initial presence message for: {0}", conn);
 		}
 	}
 
@@ -296,7 +296,7 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 			conn.putSessionData(CL_BR_INITIAL_PRESENCE, CL_BR_INITIAL_PRESENCE);
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Handle presence set for" + " Connection: " + conn);
+				log.log(Level.FINEST, "Handle presence set for Connection: {0}", conn);
 			}
 
 			List<JID> cl_nodes = strategy.getAllNodes();
@@ -443,12 +443,15 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 			params.put(AUTH_TIME, "" + authTime);
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Sending user: " + userId + " session, resource: " + resource
-						+ ", xmpp_sessionId: " + xmpp_sessionId + ", connectionId: " + connectionId);
+				log.log(Level.FINEST,
+						"Sending user: {0} session, resource: {1}, xmpp_sessionId: {2}, connectionId: {3}",
+							new Object[] { userId,
+						resource, xmpp_sessionId, connectionId });
 			}
 		} else {
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Sending user: " + userId + " session, resource: " + resource);
+				log.log(Level.FINEST, "Sending user: {0} session, resource: {1}", new Object[] { userId,
+						resource });
 			}
 		}
 
@@ -699,7 +702,7 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 	@TODO(note = "Possible performance bottleneck if there are many users with multiple "
 			+ "connections to different nodes.")
 	protected void processClusterPacket(Packet packet) throws TigaseStringprepException {
-		Queue<Packet> results = new ArrayDeque<Packet>();
+		Queue<Packet> results = new ArrayDeque<Packet>(10);
 		final ClusterElement clel = new ClusterElement(packet.getElement());
 		ClusterMethods method = ClusterMethods.parseMethod(clel.getMethodName());
 
@@ -740,18 +743,23 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 								for (XMPPResourceConnection xrc : session.getActiveResources()) {
 									if ((xrc.getConnectionStatus() != ConnectionStatus.REMOTE)
 											&& (xrc.getPresence() != null)) {
+
+										// Notify remote user's connections about this local connection, if it exist
 										broadcastUserPresence(xrc, packet.getStanzaFrom());
 									}
 								}
 
 								if (log.isLoggable(Level.FINEST)) {
-									log.finest("Added remote session for: " + userId + ", from: "
-											+ packet.getStanzaFrom());
+									log.log(Level.FINEST, "Added remote session for: {0}, from: {1}",
+											new Object[] { userId,
+											packet.getStanzaFrom() });
 								}
 							} else {
 								if (log.isLoggable(Level.INFO)) {
-									log.info("Couldn't create user session for: " + userId + ", resource: "
-											+ resource + ", connectionId: " + connectionId);
+									log.log(Level.INFO,
+											"Couldn''t create user session for: {0}, resource: {1}, connectionId: {2}",
+												new Object[] { userId,
+											resource, connectionId });
 								}
 							}
 						} else {
@@ -759,17 +767,21 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 							// Ignoring this, nothing special to do.
 							if (log.isLoggable(Level.FINEST)) {
 								if (session == null) {
-									log.finest("Ignoring USER_INITIAL_PRESENCE for: " + userId + ", from: "
-											+ packet.getStanzaFrom()
-												+ ", there is no other session for the user on this node.");
+									log.log(Level.FINEST,
+											"Ignoring USER_INITIAL_PRESENCE for: {0}, from: {1}, there is no other session for the user on this node.",
+												new Object[] { userId,
+											packet.getStanzaFrom() });
 								} else {
 									if (session.getResourceForResource(resource) != null) {
-										log.finest("Ignoring USER_INITIAL_PRESENCE for: " + userId + ", from: "
-												+ packet.getStanzaFrom()
-													+ ", there is already a session on this node for this resource.");
+										log.log(Level.FINEST,
+												"Ignoring USER_INITIAL_PRESENCE for: {0}, from: {1}, there is already a session on this node for this resource.",
+													new Object[] { userId,
+												packet.getStanzaFrom() });
 									} else {
-										log.finest("Ignoring USER_INITIAL_PRESENCE for: " + userId + ", from: "
-												+ packet.getStanzaFrom() + ", reason unknown, please contact devs.");
+										log.log(Level.FINEST,
+												"Ignoring USER_INITIAL_PRESENCE for: {0}, from: {1}, reason unknown, please contact devs.",
+													new Object[] { userId,
+												packet.getStanzaFrom() });
 									}
 								}
 							}
@@ -1025,7 +1037,7 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 			for (XMPPResourceConnection conn : res_con.getActiveSessions()) {
 				try {
 					if (log.isLoggable(Level.FINER)) {
-						log.finer("Update presence change to: " + conn.getjid());
+						log.log(Level.FINER, "Update presence change to: {0}", conn.getjid());
 					}
 
 					if ((conn != res_con) && conn.isResourceSet()
@@ -1046,7 +1058,7 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 						results.offer(pack_update);
 					} else {
 						if (log.isLoggable(Level.FINER)) {
-							log.finer("Skipping presence update to: " + conn.getjid());
+							log.log(Level.FINER, "Skipping presence update to: {0}", conn.getjid());
 						}
 					}    // end of else
 				} catch (NoConnectionIdException ex) {
@@ -1054,12 +1066,13 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 					// This actually should not happen... might be a bug:
 					log.log(Level.WARNING, "This should not happen, check it out!, ", ex);
 				} catch (NotAuthorizedException ex) {
-					log.warning("This should not happen, unless the connection has been "
-							+ "stopped in a concurrent thread or has not been authenticated yet: " + conn);
+					log.log(Level.WARNING, "This should not happen, unless the connection has been "
+							+ "stopped in a concurrent thread or has not been authenticated yet: " + "{0}", conn);
 				}
 			}    // end of for (XMPPResourceConnection conn: sessions)
 		} catch (NotAuthorizedException ex) {
-			log.warning("User session from another cluster node authentication problem: " + res_con);
+			log.log(Level.WARNING, "User session from another cluster node authentication problem: {0}",
+					res_con);
 		}
 	}
 

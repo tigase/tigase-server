@@ -25,7 +25,7 @@ package tigase.server.xmppclient;
 //~--- non-JDK imports --------------------------------------------------------
 
 //import tigase.net.IOService;
-import tigase.net.SocketReadThread;
+import tigase.net.SocketThread;
 
 import tigase.server.Command;
 import tigase.server.ConnectionManager;
@@ -626,9 +626,9 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 					try {
 						Element compressed = Command.getData(iqc, "compressed", null);
 						Packet p_compressed = Packet.packetInstance(compressed, null, null);
-						SocketReadThread readThread = SocketReadThread.getInstance();
 
-						readThread.removeSocketService(serv);
+						// SocketThread readThread = SocketThread.getInstance();
+						SocketThread.removeSocketService(serv);
 
 						// writePacketToSocket(serv, p_proceed);
 						serv.addPacketToSend(p_compressed);
@@ -636,7 +636,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 						serv.startZLib(Deflater.BEST_COMPRESSION);
 
 						// serv.call();
-						readThread.addSocketService(serv);
+						SocketThread.addSocketService(serv);
 					} catch (IOException ex) {
 						log.log(Level.INFO, "Problem enabling zlib compression on the connection: ", ex);
 					}
@@ -664,15 +664,15 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 						// threads pool and then sends <proceed> packet and starts TLS.
 						Element proceed = Command.getData(iqc, "proceed", null);
 						Packet p_proceed = Packet.packetInstance(proceed, null, null);
-						SocketReadThread readThread = SocketReadThread.getInstance();
 
-						readThread.removeSocketService(serv);
+						// SocketThread readThread = SocketThread.getInstance();
+						SocketThread.removeSocketService(serv);
 
 						// writePacketToSocket(serv, p_proceed);
 						serv.addPacketToSend(p_proceed);
 						serv.processWaitingPackets();
 						serv.startTLS(false);
-						readThread.addSocketService(serv);
+						SocketThread.addSocketService(serv);
 					} catch (Exception e) {
 						log.log(Level.WARNING, "Error starting TLS: {0}", e);
 						serv.forceStop();

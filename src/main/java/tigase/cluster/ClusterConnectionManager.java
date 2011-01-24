@@ -57,6 +57,7 @@ import java.security.NoSuchAlgorithmException;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.TimerTask;
@@ -302,6 +303,30 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 	 */
 	@Override
 	public int hashCodeForPacket(Packet packet) {
+
+		// If this is a cluster packet let's try to do a bit more smart hashing
+		// based on the stanza from/to addresses
+		if (packet.getElemName() == ClusterElement.CLUSTER_EL_NAME) {
+			List<Element> children = packet.getElemChildren(ClusterElement.CLUSTER_DATA_PATH);
+
+			if ((children != null) && (children.size() > 0)) {
+				String stanzaAdd = children.get(0).getAttribute("to");
+
+				if (stanzaAdd != null) {
+					return stanzaAdd.hashCode();
+				} else {
+
+					// This might be user's initial presence. In such a case we take stanzaFrom instead
+					stanzaAdd = children.get(0).getAttribute("from");
+
+					if (stanzaAdd != null) {
+						return stanzaAdd.hashCode();
+					} else {
+						log.log(Level.WARNING, "No stanzaTo or from for cluster packet: {0}", packet);
+					}
+				}
+			}
+		}
 
 		// There is a separate connection to each cluster node, ideally we want to
 		// process packets in a separate thread for each connection, so let's try

@@ -50,7 +50,7 @@ import java.util.logging.Logger;
 //~--- classes ----------------------------------------------------------------
 
 /**
- * Describe class SocketReadThread here.
+ * Describe class SocketThread here.
  *
  *
  * Created: Mon Jan 30 12:01:17 2006
@@ -58,13 +58,14 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class SocketReadThread implements Runnable {
+public class SocketThread implements Runnable {
 	private static final Logger log = Logger.getLogger("tigase.net.SocketReadThread");
 
 	/** Field description */
 	public static final int DEF_MAX_THREADS_PER_CPU = 5;
 	private static final int MAX_EMPTY_SELECTIONS = 10;
-	private static SocketReadThread[] socketReadThread = null;
+	private static SocketThread[] socketReadThread = null;
+	private static SocketThread[] socketWriteThread = null;
 	private static int cpus = Runtime.getRuntime().availableProcessors();
 	private static ThreadPoolExecutor executor = null;
 
@@ -78,15 +79,55 @@ public class SocketReadThread implements Runnable {
 	private static final int READ_ONLY = SelectionKey.OP_READ;
 	private static final int READ_WRITE = SelectionKey.OP_READ | SelectionKey.OP_WRITE;
 
+	//~--- static initializers --------------------------------------------------
+
+	static {
+		if (socketReadThread == null) {
+			int nThreads = (cpus * DEF_MAX_THREADS_PER_CPU) / 2 + 1;
+
+			executor = new ThreadPoolExecutor(nThreads, nThreads, 0L, TimeUnit.MILLISECONDS,
+					new LinkedBlockingQueue<Runnable>());
+			completionService = new ExecutorCompletionService<IOService<?>>(executor);
+			socketReadThread = new SocketThread[cpus];
+			socketWriteThread = new SocketThread[cpus];
+
+			for (int i = 0; i < socketReadThread.length; i++) {
+				socketReadThread[i] = new SocketThread();
+				socketReadThread[i].reading = true;
+
+				Thread thrd = new Thread(socketReadThread[i]);
+
+				thrd.setName("socketReadThread_CPU-" + i);
+				thrd.start();
+			}
+
+			log.log(Level.WARNING, "{0} socketReadThreads started.", socketReadThread.length);
+
+			for (int i = 0; i < socketWriteThread.length; i++) {
+				socketWriteThread[i] = new SocketThread();
+				socketWriteThread[i].writing = true;
+
+				Thread thrd = new Thread(socketWriteThread[i]);
+
+				thrd.setName("socketWriteThread_CPU-" + i);
+				thrd.start();
+			}
+
+			log.log(Level.WARNING, "{0} socketWriteThreads started.", socketWriteThread.length);
+		}    // end of if (acceptThread == null)
+	}
+
 	//~--- fields ---------------------------------------------------------------
 
 	private Selector clientsSel = null;
 
 	// private boolean selecting = false;
 	private int empty_selections = 0;
-	private boolean stopping = false;
+	private boolean reading = false;
+	private boolean writing = false;
 	private ConcurrentSkipListSet<IOService<?>> waiting =
 		new ConcurrentSkipListSet<IOService<?>>(new IOServiceComparator());
+	private boolean stopping = false;
 
 	// IOServices must be added to thread pool after they are removed from
 	// the selector and the selector and key is cleared, otherwise we have
@@ -98,10 +139,10 @@ public class SocketReadThread implements Runnable {
 	//~--- constructors ---------------------------------------------------------
 
 	/**
-	 * Creates a new <code>SocketReadThread</code> instance.
+	 * Creates a new <code>SocketThread</code> instance.
 	 *
 	 */
-	private SocketReadThread() {
+	private SocketThread() {
 		try {
 			clientsSel = Selector.open();
 		} catch (Exception e) {
@@ -112,48 +153,25 @@ public class SocketReadThread implements Runnable {
 		new ResultsListener().start();
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public static SocketReadThread getInstance() {
-		if (socketReadThread == null) {
-			int nThreads = cpus * DEF_MAX_THREADS_PER_CPU;
-
-			executor = new ThreadPoolExecutor(nThreads, nThreads, 0L, TimeUnit.MILLISECONDS,
-					new LinkedBlockingQueue<Runnable>());
-			completionService = new ExecutorCompletionService<IOService<?>>(executor);
-			socketReadThread = new SocketReadThread[cpus];
-
-			for (int i = 0; i < socketReadThread.length; i++) {
-				socketReadThread[i] = new SocketReadThread();
-
-				Thread thrd = new Thread(socketReadThread[i]);
-
-				thrd.setName("SocketReadThread_CPU-" + i);
-				thrd.start();
-			}
-
-			log.log(Level.WARNING, "{0} SocketReadThreads started.", socketReadThread.length);
-		}    // end of if (acceptThread == null)
-
-		return socketReadThread[0];
-	}
-
 	//~--- methods --------------------------------------------------------------
 
+///**
+// * Method description
+// *
+// *
+// * @return
+// */
+//public static SocketThread getInstance() {
+//  return socketReadThread[0];
+//}
 //private static final Object threadNoSync = new Object();
 //private int incrementAndGet() {
-//  int result = 0;
-//  synchronized (threadNoSync) {
-//    threadNo = (threadNo + 1) % socketReadThread.length;
-//    result = threadNo;
-//  }
-//  return result;
+//int result = 0;
+//synchronized (threadNoSync) {
+//  threadNo = (threadNo + 1) % socketReadThread.length;
+//  result = threadNo;
+//}
+//return result;
 //}
 
 	/**
@@ -162,7 +180,7 @@ public class SocketReadThread implements Runnable {
 	 *
 	 * @param s
 	 */
-	public void addSocketService(IOService<?> s) {
+	public static void addSocketService(IOService<?> s) {
 
 		// Due to a delayed SelectionKey cancelling deregistering
 		// nature this distribution doesn't work well, it leads to
@@ -170,6 +188,32 @@ public class SocketReadThread implements Runnable {
 		// by the same thread thus the same Selector.
 		// socketReadThread[incrementAndGet()].addSocketServicePriv(s);
 		socketReadThread[s.hashCode() % socketReadThread.length].addSocketServicePriv(s);
+
+		if (s.waitingToSend()) {
+			socketWriteThread[s.hashCode() % socketWriteThread.length].addSocketServicePriv(s);
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param s
+	 */
+	public static void removeSocketService(IOService<Object> s) {
+		Selector clientsSel = socketReadThread[s.hashCode() % socketReadThread.length].clientsSel;
+		SelectionKey key = s.getSocketChannel().keyFor(clientsSel);
+
+		if ((key != null) && (key.attachment() == s)) {
+			key.cancel();
+		}    // end of if (key != null)
+
+		clientsSel = socketWriteThread[s.hashCode() % socketWriteThread.length].clientsSel;
+		key = s.getSocketChannel().keyFor(clientsSel);
+
+		if ((key != null) && (key.attachment() == s)) {
+			key.cancel();
+		}    // end of if (key != null)
 	}
 
 	/**
@@ -191,20 +235,6 @@ public class SocketReadThread implements Runnable {
 		clientsSel.wakeup();
 
 		// wakeupHelper.wakeup();
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param s
-	 */
-	public void removeSocketService(IOService<Object> s) {
-		SelectionKey key = s.getSocketChannel().keyFor(clientsSel);
-
-		if ((key != null) && (key.attachment() == s)) {
-			key.cancel();
-		}    // end of if (key != null)
 	}
 
 	/**
@@ -394,21 +424,21 @@ public class SocketReadThread implements Runnable {
 
 			try {
 				if (sc.isConnected()) {
-					int sel_key = READ_ONLY;
+					if (reading) {
+						sc.register(clientsSel, SelectionKey.OP_READ, s);
 
-					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, "ADDED OP_READ: {0}", s.getUniqueId());
+						if (log.isLoggable(Level.FINEST)) {
+							log.log(Level.FINEST, "ADDED OP_READ: {0}", s.getUniqueId());
+						}
 					}
 
-					if (s.waitingToSend()) {
-						sel_key = READ_WRITE;
+					if (writing) {
+						sc.register(clientsSel, SelectionKey.OP_WRITE, s);
 
 						if (log.isLoggable(Level.FINEST)) {
 							log.log(Level.FINEST, "ADDED OP_WRITE: {0}", s.getUniqueId());
 						}
 					}
-
-					sc.register(clientsSel, sel_key, s);
 
 					// added = true;
 				} else {
@@ -576,7 +606,7 @@ public class SocketReadThread implements Runnable {
 			}        // end of for ()
 		}
 	}
-}    // SocketReadThread
+}    // SocketThread
 
 
 //~ Formatted in Sun Code Convention

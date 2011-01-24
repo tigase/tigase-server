@@ -29,7 +29,7 @@ import tigase.annotations.TODO;
 import tigase.net.ConnectionOpenListener;
 import tigase.net.ConnectionOpenThread;
 import tigase.net.ConnectionType;
-import tigase.net.SocketReadThread;
+import tigase.net.SocketThread;
 import tigase.net.SocketType;
 
 import tigase.server.script.CommandIfc;
@@ -135,7 +135,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	/** Field description */
 	public static final String PORT_LOCAL_HOST_PROP_KEY = "local-host";
 	private static ConnectionOpenThread connectThread = ConnectionOpenThread.getInstance();
-	private static SocketReadThread readThread = SocketReadThread.getInstance();
+
+	// private static SocketThread readThread = SocketThread.getInstance();
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -677,7 +678,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 			try {
 				ios.processWaitingPackets();
-				readThread.addSocketService(ios);
+				SocketThread.addSocketService(ios);
 
 				return true;
 			} catch (Exception e) {
@@ -731,7 +732,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 				try {
 					serv.processWaitingPackets();
-					readThread.addSocketService(serv);
+					SocketThread.addSocketService(serv);
 				} catch (Exception e) {
 					log.log(Level.WARNING, serv + "Exception during writing packets: ", e);
 
@@ -885,7 +886,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		// synchronized (ios) {
 		try {
 			ios.writeRawData(data);
-			readThread.addSocketService(ios);
+			SocketThread.addSocketService(ios);
 		} catch (Exception e) {
 			log.log(Level.WARNING, ios + "Exception during writing data: " + data, e);
 
@@ -1009,7 +1010,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 				}    // end of if (socket == SocketType.ssl)
 
 				serviceStarted(serv);
-				readThread.addSocketService(serv);
+				SocketThread.addSocketService(serv);
 			} catch (SocketException e) {
 				if (getConnectionType() == ConnectionType.connect) {
 

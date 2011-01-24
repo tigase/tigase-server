@@ -33,6 +33,8 @@ import tigase.stats.StatisticsList;
 import tigase.util.PatternComparator;
 import tigase.util.PriorityQueueAbstract;
 
+import tigase.xml.Element;
+
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.ArrayDeque;
@@ -153,6 +155,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	private long last_hour_packets = 0;
 	private long last_minute_packets = 0;
 	private long last_second_packets = 0;
+	private int out_queues_size = 1;
 	protected int maxQueueSize = MAX_QUEUE_SIZE_PROP_VAL;
 	private QueueListener out_thread = null;
 	private long packetId = 0;
@@ -166,8 +169,10 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	private final Priority[] pr_cache = Priority.values();
 	private final CopyOnWriteArrayList<PacketFilterIfc> outgoing_filters =
 		new CopyOnWriteArrayList<PacketFilterIfc>();
-	private final PriorityQueueAbstract<Packet> out_queue =
-		PriorityQueueAbstract.getPriorityQueue(pr_cache.length, maxQueueSize);
+	private final List<PriorityQueueAbstract<Packet>> out_queues =
+		new ArrayList<PriorityQueueAbstract<Packet>>(pr_cache.length);
+
+	// PriorityQueueAbstract.getPriorityQueue(pr_cache.length, maxQueueSize);
 	private final CopyOnWriteArrayList<PacketFilterIfc> incoming_filters =
 		new CopyOnWriteArrayList<PacketFilterIfc>();
 	private final List<PriorityQueueAbstract<Packet>> in_queues =
@@ -217,11 +222,11 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	 * the input queue are later passed to the <code>processPacket(Packet)</code> method.
 	 * This is a blocking method waiting if necessary for the room if the queue is full.<p/>
 	 * The method returns a <code>boolean</code> value of <code>true</code> if the packet
-	 * has been successfuly added to the queue and <code>false</code> otherwise.<p/>
+	 * has been successfully added to the queue and <code>false</code> otherwise.<p/>
 	 * There can be many queues and many threads processing packets for the component,
-	 * however the method makes the best effort to quarantee that packets are later processed
+	 * however the method makes the best effort to guarantee that packets are later processed
 	 * in the correct order. For example that packets for a single user always end up in the
-	 * same exact queue. You can tweak the packets ditribution amongs threads by overwriting
+	 * same exact queue. You can tweak the packets distribution among threads by overwriting
 	 * <code>hashCodeForPacket(Packet)</code> method.<br/>
 	 * If there is <code>N</code> threads the packets are distributed among thread using
 	 * following logic:
@@ -237,7 +242,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	 * internal input queue.
 	 *
 	 * @return a <code>boolean</code> value of <code>true</code> if the packet
-	 * has been successfuly added to the queue and <code>false</code> otherwise.
+	 * has been successfully added to the queue and <code>false</code> otherwise.
 	 */
 	@Override
 	public boolean addPacket(Packet packet) {
@@ -533,13 +538,26 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 				}
 			}
 
-			int[] out_priority_sizes = out_queue.size();
+			int[] out_priority_sizes = out_queues.get(0).size();
+
+			for (int i = 1; i < out_queues.size(); i++) {
+				int[] tmp_pr_sizes = out_queues.get(i).size();
+
+				for (int j = 0; j < tmp_pr_sizes.length; j++) {
+					out_priority_sizes[j] += tmp_pr_sizes[j];
+				}
+			}
 
 			for (int i = 0; i < in_priority_sizes.length; i++) {
 				Priority queue = Priority.values()[i];
 
 				list.add(getName(), "In queue: " + queue.name(), in_priority_sizes[queue.ordinal()],
 						Level.FINEST);
+			}
+
+			for (int i = 0; i < out_priority_sizes.length; i++) {
+				Priority queue = Priority.values()[i];
+
 				list.add(getName(), "Out queue: " + queue.name(), out_priority_sizes[queue.ordinal()],
 						Level.FINEST);
 			}
@@ -551,7 +569,11 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 			in_queue_size += total_size.totalSize();
 		}
 
-		int out_queue_size = out_queue.totalSize();
+		int out_queue_size = 0;
+
+		for (PriorityQueueAbstract<Packet> total_size : out_queues) {
+			out_queue_size += total_size.totalSize();
+		}
 
 		list.add(getName(), "Total In queues wait", in_queue_size, Level.INFO);
 		list.add(getName(), "Total Out queues wait", out_queue_size, Level.INFO);
@@ -612,10 +634,25 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 		// one destination address. We have to handle them differently or they all are
 		// processed by a single thread which is not good
 		if (packet.getElemName() == "cluster") {
+			List<Element> children = packet.getElemChildren("/cluster/data");
 
-			// TODO: make it more inteligent to avoid packets reordering.
-			// for now to run some tests we make it simple
-			return packet.toString().hashCode();
+			if ((children != null) && (children.size() > 0)) {
+				String stanzaAdd = children.get(0).getAttribute("to");
+
+				if (stanzaAdd != null) {
+					return stanzaAdd.hashCode();
+				} else {
+
+					// This might be user's initial presence. In such a case we take stanzaFrom instead
+					stanzaAdd = children.get(0).getAttribute("from");
+
+					if (stanzaAdd != null) {
+						return stanzaAdd.hashCode();
+					} else {
+						log.log(Level.WARNING, "No stanzaTo or from for cluster packet: {0}", packet);
+					}
+				}
+			}
 		}
 
 		if ((packet.getFrom() != null) && (packet.getFrom() != packet.getStanzaFrom())) {
@@ -746,7 +783,9 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 		if ((this.maxQueueSize != maxQueueSize) || (in_queues.size() == 0)) {
 
 			// out_queue = PriorityQueueAbstract.getPriorityQueue(pr_cache.length, maxQueueSize);
-			this.maxQueueSize = maxQueueSize / processingThreads();
+			// Processing threads number is split to incoming and outgoing queues...
+			// So real processing threads number of in_queues is processingThreads()/2
+			this.maxQueueSize = (maxQueueSize / processingThreads()) * 2;
 
 			if (in_queues.size() == 0) {
 				for (int i = 0; i < in_queues_size; i++) {
@@ -761,7 +800,20 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 				}
 			}
 
-			out_queue.setMaxSize(maxQueueSize);
+			if (out_queues.size() == 0) {
+				for (int i = 0; i < out_queues_size; i++) {
+					PriorityQueueAbstract<Packet> queue =
+						PriorityQueueAbstract.getPriorityQueue(pr_cache.length, maxQueueSize);
+
+					out_queues.add(queue);
+				}
+			} else {
+				for (int i = 0; i < out_queues.size(); i++) {
+					out_queues.get(i).setMaxSize(maxQueueSize);
+				}
+			}
+
+//    out_queue.setMaxSize(maxQueueSize);
 		}    // end of if (this.maxQueueSize != maxQueueSize)
 	}
 
@@ -774,7 +826,8 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	@Override
 	public void setName(String name) {
 		super.setName(name);
-		in_queues_size = processingThreads();
+		in_queues_size = processingThreads() / 2 + 1;
+		out_queues_size = processingThreads() / 2 + 1;
 		setMaxQueueSize(maxQueueSize);
 	}
 
@@ -871,12 +924,15 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	}
 
 	protected boolean addOutPacket(Packet packet) {
+		int queueIdx = Math.abs(hashCodeForPacket(packet) % out_queues_size);
+
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "[{0}]  {1}", new Object[] { getName(), packet.toStringSecure() });
+			log.log(Level.FINEST, "[{0}]  queueIdx={1}, {2}", new Object[] { getName(), queueIdx,
+					packet.toStringSecure() });
 		}
 
 		try {
-			out_queue.put(packet, packet.getPriority().ordinal());
+			out_queues.get(queueIdx).put(packet, packet.getPriority().ordinal());
 			++statSentPacketsOk;
 		} catch (InterruptedException e) {
 			++statSentPacketsEr;
@@ -898,13 +954,16 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	 * @return a <code>boolean</code> value
 	 */
 	protected boolean addOutPacketNB(Packet packet) {
+		int queueIdx = Math.abs(hashCodeForPacket(packet) % out_queues_size);
+
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "[{0}]  {1}", new Object[] { getName(), packet.toStringSecure() });
+			log.log(Level.FINEST, "[{0}]  queueIdx={1}, {2}", new Object[] { getName(), queueIdx,
+					packet.toStringSecure() });
 		}
 
 		boolean result = false;
 
-		result = out_queue.offer(packet, packet.getPriority().ordinal());
+		result = out_queues.get(queueIdx).offer(packet, packet.getPriority().ordinal());
 
 		if (result) {
 			++statSentPacketsOk;
@@ -988,14 +1047,21 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 				in_thread.start();
 				threadsQueue.add(in_thread);
 			}
+
+			for (int i = 0; i < out_queues_size; i++) {
+				QueueListener out_thread = new QueueListener(out_queues.get(i), QueueType.OUT_QUEUE);
+
+				out_thread.setName("out_" + i + "-" + getName());
+				out_thread.start();
+				threadsQueue.add(out_thread);
+			}
 		}    // end of if (thread == null || ! thread.isAlive())
 
-		if ((out_thread == null) ||!out_thread.isAlive()) {
-			out_thread = new QueueListener(out_queue, QueueType.OUT_QUEUE);
-			out_thread.setName("out_" + getName());
-			out_thread.start();
-		}    // end of if (thread == null || ! thread.isAlive())
-
+//  if ((out_thread == null) ||!out_thread.isAlive()) {
+//    out_thread = new QueueListener(out_queue, QueueType.OUT_QUEUE);
+//    out_thread.setName("out_" + getName());
+//    out_thread.start();
+//  }    // end of if (thread == null || ! thread.isAlive())
 		receiverTasks = new Timer(getName() + " tasks", true);
 		receiverTasks.scheduleAtFixedRate(new TimerTask() {
 			@Override
