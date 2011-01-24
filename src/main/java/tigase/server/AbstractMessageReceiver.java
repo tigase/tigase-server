@@ -517,6 +517,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 		list.add(getName(), "Last second packets", packets_per_second, Level.FINE);
 		list.add(getName(), "Last minute packets", packets_per_minute, Level.FINE);
 		list.add(getName(), "Last hour packets", packets_per_hour, Level.FINE);
+		list.add(getName(), "Processing threads", processingThreads(), Level.FINER);
 		list.add(getName(), StatisticType.MSG_RECEIVED_OK.getDescription(), statReceivedPacketsOk,
 				Level.FINE);
 		list.add(getName(), StatisticType.MSG_SENT_OK.getDescription(), statSentPacketsOk, Level.FINE);
@@ -599,6 +600,17 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	 * @return a hash code generated for the input thread.
 	 */
 	public int hashCodeForPacket(Packet packet) {
+
+		// Cluster packets make things harder, they all have one source address and
+		// one destination address. We have to handle them differently or they all are
+		// processed by a single thread which is not good
+		if (packet.getElemName() == "cluster") {
+
+			// TODO: make it more inteligent to avoid packets reordering.
+			// for now to run some tests we make it simple
+			return packet.toString().hashCode();
+		}
+
 		if ((packet.getFrom() != null) && (packet.getFrom() != packet.getStanzaFrom())) {
 
 			// This comes from connection manager so the best way is to get hashcode
