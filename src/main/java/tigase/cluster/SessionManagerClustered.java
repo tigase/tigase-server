@@ -76,15 +76,21 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 	private static final String AUTH_TIME = "auth-time";
 	private static final String CL_BR_INITIAL_PRESENCE = "cl-br-init-pres";
 	private static final String CL_BR_USER_CONNECTED = "cl-br-user_conn";
-	private static final String CONNECTION_ID = "connectionId";
+
+	/** Field description */
+	public static final String CONNECTION_ID = "connectionId";
 	private static final String CREATION_TIME = "creationTime";
 	private static final String ERROR_CODE = "errorCode";
 
 	/** Field description */
 	public static final String MY_DOMAIN_NAME_PROP_KEY = "domain-name";
 	private static final String PRIORITY = "priority";
-	private static final String RESOURCE = "resource";
-	private static final String SM_ID = "smId";
+
+	/** Field description */
+	public static final String RESOURCE = "resource";
+
+	/** Field description */
+	public static final String SM_ID = "smId";
 
 	/** Field description */
 	public static final String STRATEGY_CLASS_PROPERTY = "--sm-cluster-strategy-class";
@@ -98,11 +104,17 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 
 	/** Field description */
 	public static final int SYNC_MAX_BATCH_SIZE = 1000;
-	private static final String SYNC_ONLINE_JIDS = "sync-jids";
+
+	/** Field description */
+	public static final String SYNC_ONLINE_JIDS = "sync-jids";
 	private static final String TOKEN = "token";
 	private static final String TRANSFER = "transfer";
-	private static final String USER_ID = "userId";
-	private static final String XMPP_SESSION_ID = "xmppSessionId";
+
+	/** Field description */
+	public static final String USER_ID = "userId";
+
+	/** Field description */
+	public static final String XMPP_SESSION_ID = "xmppSessionId";
 
 	/**
 	 * Variable <code>log</code> is a class logger.
@@ -117,6 +129,48 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 	private ClusteringStrategyIfc strategy = null;
 
 	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param conn
+	 * @param cl_nodes
+	 */
+	public void broadcastUserPresence(XMPPResourceConnection conn, JID... cl_nodes) {
+		try {
+			Map<String, String> params = prepareBroadcastParams(conn, true);
+			Element presence = conn.getPresence();
+
+			sendBroadcastPackets(presence, params, ClusterMethods.USER_INITIAL_PRESENCE, cl_nodes);
+		} catch (Exception e) {
+			log.log(Level.WARNING, "Problem with broadcast user initial presence message for: " + conn);
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param conn
+	 * @param cl_nodes
+	 */
+	public void broadcastUserPresence(XMPPResourceConnection conn, List<JID> cl_nodes) {
+		try {
+			Map<String, String> params = prepareBroadcastParams(conn, true);
+			Element presence = conn.getPresence();
+
+			if (presence == null) {
+				log.log(Level.WARNING, "Something wrong. Initial presence NULL!!",
+						Thread.currentThread().getStackTrace());
+			}
+
+			sendBroadcastPackets(presence, params, ClusterMethods.USER_INITIAL_PRESENCE,
+					cl_nodes.toArray(new JID[cl_nodes.size()]));
+		} catch (Exception e) {
+			log.log(Level.WARNING, "Problem with broadcast user initial presence for: " + conn, e);
+		}
+	}
 
 	/**
 	 * Method description
@@ -351,6 +405,50 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 	 * Method description
 	 *
 	 *
+	 * @param conn
+	 * @param full_details
+	 *
+	 * @return
+	 *
+	 * @throws NoConnectionIdException
+	 * @throws NotAuthorizedException
+	 */
+	public Map<String, String> prepareBroadcastParams(XMPPResourceConnection conn,
+			boolean full_details)
+			throws NotAuthorizedException, NoConnectionIdException {
+		BareJID userId = conn.getBareJID();
+		String resource = conn.getResource();
+		JID connectionId = conn.getConnectionId();
+		Map<String, String> params = new LinkedHashMap<String, String>();
+
+		params.put(USER_ID, userId.toString());
+		params.put(RESOURCE, resource);
+		params.put(CONNECTION_ID, connectionId.toString());
+
+		if (full_details) {
+			String xmpp_sessionId = conn.getSessionId();
+			long authTime = conn.getAuthTime();
+
+			params.put(XMPP_SESSION_ID, xmpp_sessionId);
+			params.put(AUTH_TIME, "" + authTime);
+
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Sending user: " + userId + " session, resource: " + resource
+						+ ", xmpp_sessionId: " + xmpp_sessionId + ", connectionId: " + connectionId);
+			}
+		} else {
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Sending user: " + userId + " session, resource: " + resource);
+			}
+		}
+
+		return params;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
 	 * @param packet
 	 */
 	@SuppressWarnings("unchecked")
@@ -411,6 +509,40 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 	@Override
 	public int processingThreads() {
 		return Math.max(nodesNo, super.processingThreads());
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param data
+	 * @param params
+	 * @param methodCall
+	 * @param nodes
+	 */
+	public void sendBroadcastPackets(Element data, Map<String, String> params,
+			ClusterMethods methodCall, JID... nodes) {
+		ClusterElement clel = ClusterElement.createClusterMethodCall(getComponentId().toString(),
+			nodes[0].toString(), StanzaType.set, methodCall.toString(), params);
+
+		if (data != null) {
+			clel.addDataPacket(data);
+		}
+
+		Element check_session_el = clel.getClusterElement();
+
+		if ( !nodes[0].equals(getComponentId())) {
+			fastAddOutPacket(Packet.packetInstance(check_session_el, getComponentId(), nodes[0]));
+		}
+
+		for (int i = 1; i < nodes.length; i++) {
+			if ( !nodes[i].equals(getComponentId())) {
+				Element elem = check_session_el.clone();
+
+				elem.setAttribute("to", nodes[i].toString());
+				fastAddOutPacket(Packet.packetInstance(elem, getComponentId(), nodes[i]));
+			}
+		}
 	}
 
 	//~--- set methods ----------------------------------------------------------
@@ -921,66 +1053,6 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 		}
 	}
 
-	private void broadcastUserPresence(XMPPResourceConnection conn, JID... cl_nodes) {
-		try {
-			Map<String, String> params = prepareBroadcastParams(conn, true);
-			Element presence = conn.getPresence();
-
-			sendBroadcastPackets(presence, params, ClusterMethods.USER_INITIAL_PRESENCE, cl_nodes);
-		} catch (Exception e) {
-			log.log(Level.WARNING, "Problem with broadcast user initial presence message for: " + conn);
-		}
-	}
-
-	private void broadcastUserPresence(XMPPResourceConnection conn, List<JID> cl_nodes) {
-		try {
-			Map<String, String> params = prepareBroadcastParams(conn, true);
-			Element presence = conn.getPresence();
-
-			if (presence == null) {
-				log.log(Level.WARNING, "Something wrong. Initial presence NULL!!",
-						Thread.currentThread().getStackTrace());
-			}
-
-			sendBroadcastPackets(presence, params, ClusterMethods.USER_INITIAL_PRESENCE,
-					cl_nodes.toArray(new JID[cl_nodes.size()]));
-		} catch (Exception e) {
-			log.log(Level.WARNING, "Problem with broadcast user initial presence for: " + conn, e);
-		}
-	}
-
-	private Map<String, String> prepareBroadcastParams(XMPPResourceConnection conn,
-			boolean full_details)
-			throws NotAuthorizedException, NoConnectionIdException {
-		BareJID userId = conn.getBareJID();
-		String resource = conn.getResource();
-		JID connectionId = conn.getConnectionId();
-		Map<String, String> params = new LinkedHashMap<String, String>();
-
-		params.put(USER_ID, userId.toString());
-		params.put(RESOURCE, resource);
-		params.put(CONNECTION_ID, connectionId.toString());
-
-		if (full_details) {
-			String xmpp_sessionId = conn.getSessionId();
-			long authTime = conn.getAuthTime();
-
-			params.put(XMPP_SESSION_ID, xmpp_sessionId);
-			params.put(AUTH_TIME, "" + authTime);
-
-			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Sending user: " + userId + " session, resource: " + resource
-						+ ", xmpp_sessionId: " + xmpp_sessionId + ", connectionId: " + connectionId);
-			}
-		} else {
-			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Sending user: " + userId + " session, resource: " + resource);
-			}
-		}
-
-		return params;
-	}
-
 	private void requestSync(JID node) {
 		ClusterElement clel = ClusterElement.createClusterMethodCall(getComponentId().toString(),
 			node.toString(), StanzaType.get, ClusterMethods.SYNC_ONLINE.name(), null);
@@ -1003,31 +1075,6 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 			"xyz", newPacketId(null));
 
 		sendToAdmins(p_msg);
-	}
-
-	private void sendBroadcastPackets(Element data, Map<String, String> params,
-			ClusterMethods methodCall, JID... nodes) {
-		ClusterElement clel = ClusterElement.createClusterMethodCall(getComponentId().toString(),
-			nodes[0].toString(), StanzaType.set, methodCall.toString(), params);
-
-		if (data != null) {
-			clel.addDataPacket(data);
-		}
-
-		Element check_session_el = clel.getClusterElement();
-
-		if ( !nodes[0].equals(getComponentId())) {
-			fastAddOutPacket(Packet.packetInstance(check_session_el, getComponentId(), nodes[0]));
-		}
-
-		for (int i = 1; i < nodes.length; i++) {
-			if ( !nodes[i].equals(getComponentId())) {
-				Element elem = check_session_el.clone();
-
-				elem.setAttribute("to", nodes[i].toString());
-				fastAddOutPacket(Packet.packetInstance(elem, getComponentId(), nodes[i]));
-			}
-		}
 	}
 }
 
