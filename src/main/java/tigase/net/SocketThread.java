@@ -62,7 +62,7 @@ public class SocketThread implements Runnable {
 	private static final Logger log = Logger.getLogger("tigase.net.SocketReadThread");
 
 	/** Field description */
-	public static final int DEF_MAX_THREADS_PER_CPU = 5;
+	public static final int DEF_MAX_THREADS_PER_CPU = 8;
 	private static final int MAX_EMPTY_SELECTIONS = 10;
 	private static SocketThread[] socketReadThread = null;
 	private static SocketThread[] socketWriteThread = null;
@@ -88,8 +88,8 @@ public class SocketThread implements Runnable {
 			executor = new ThreadPoolExecutor(nThreads, nThreads, 0L, TimeUnit.MILLISECONDS,
 					new LinkedBlockingQueue<Runnable>());
 			completionService = new ExecutorCompletionService<IOService<?>>(executor);
-			socketReadThread = new SocketThread[cpus];
-			socketWriteThread = new SocketThread[cpus];
+			socketReadThread = new SocketThread[nThreads];
+			socketWriteThread = new SocketThread[nThreads];
 
 			for (int i = 0; i < socketReadThread.length; i++) {
 				socketReadThread[i] = new SocketThread();
@@ -97,7 +97,7 @@ public class SocketThread implements Runnable {
 
 				Thread thrd = new Thread(socketReadThread[i]);
 
-				thrd.setName("socketReadThread_CPU-" + i);
+				thrd.setName("socketReadThread-" + i);
 				thrd.start();
 			}
 
@@ -109,7 +109,7 @@ public class SocketThread implements Runnable {
 
 				Thread thrd = new Thread(socketWriteThread[i]);
 
-				thrd.setName("socketWriteThread_CPU-" + i);
+				thrd.setName("socketWriteThread-" + i);
 				thrd.start();
 			}
 
@@ -581,29 +581,31 @@ public class SocketThread implements Runnable {
 				try {
 					IOService<?> service = completionService.take().get();
 
-					if (service.isConnected()) {
-						if (log.isLoggable(Level.FINEST)) {
-							log.log(Level.FINEST, "COMPLETED: {0}", service.getUniqueId());
-						}
+					if (service != null) {
+						if (service.isConnected()) {
+							if (log.isLoggable(Level.FINEST)) {
+								log.log(Level.FINEST, "COMPLETED: {0}", service.getUniqueId());
+							}
 
-						addSocketService(service);
-					} else {
-						if (log.isLoggable(Level.FINEST)) {
-							log.log(Level.FINEST, "REMOVED: {0}", service.getUniqueId());
-						}
-					}    // end of else
+							addSocketService(service);
+						} else {
+							if (log.isLoggable(Level.FINEST)) {
+								log.log(Level.FINEST, "REMOVED: {0}", service.getUniqueId());
+							}
+						}    // end of else
+					}
 				} catch (ExecutionException e) {
 					log.log(Level.WARNING, "Protocol execution exception.", e);
 
 					// TODO: Do something with this
-				}      // end of catch
+				}        // end of catch
 						catch (InterruptedException e) {
 					log.log(Level.WARNING, "Protocol execution interrupted.", e);
-				}      // end of try-catch
+				}        // end of try-catch
 						catch (Exception e) {
 					log.log(Level.WARNING, "Protocol execution unknown exception.", e);
-				}      // end of catch
-			}        // end of for ()
+				}        // end of catch
+			}          // end of for ()
 		}
 	}
 }    // SocketThread
