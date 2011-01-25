@@ -321,7 +321,7 @@ public class SocketIO implements IOInterface {
 				result += res;
 
 				for (ByteBuffer byteBuffer : buffs) {
-					if ( !dataBuffer.hasRemaining()) {
+					if ( !byteBuffer.hasRemaining()) {
 						dataToSend.poll();
 					} else {
 						break;
