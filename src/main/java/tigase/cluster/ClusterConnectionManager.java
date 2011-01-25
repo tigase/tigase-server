@@ -62,6 +62,8 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.TimerTask;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -112,6 +114,15 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 	public static final String CONNECT_ALL_PAR = "--cluster-connect-all";
 
 	/** Field description */
+	public static final String CLUSTER_CONNECTIONS_PER_NODE_PAR = "--cluster-connections-per-node";
+
+	/** Field description */
+	public static final int CLUSTER_CONNECTIONS_PER_NODE_VAL = 2;
+
+	/** Field description */
+	public static final String CLUSTER_CONNECTIONS_PER_NODE_PROP_KEY = "cluster-connections-per-node";
+
+	/** Field description */
 	public static final String CONNECT_ALL_PROP_KEY = "connect-all";
 
 	/** Field description */
@@ -141,30 +152,19 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 	/** Field description */
 	public String SECRET_PROP_VAL = "someSecret";
 	private ClusterController clusterController = null;
-
-	// private boolean notify_admins = NOTIFY_ADMINS_PROP_VAL;
-	// private String[] admins = new String[] {};
 	private String cluster_controller_id = null;
 	private IOServiceStatisticsGetter ioStatsGetter = new IOServiceStatisticsGetter();
-
-//private ServiceEntity serviceEntity = null;
-	// private boolean service_disco = RETURN_SERVICE_DISCO_VAL;
 	private String identity_type = IDENTITY_TYPE_VAL;
+	private Map<String, CopyOnWriteArrayList<XMPPIOService<Object>>> connectionsPool =
+		new ConcurrentSkipListMap<String, CopyOnWriteArrayList<XMPPIOService<Object>>>();
 	private boolean connect_all = CONNECT_ALL_PROP_VAL;
 	private boolean compress_stream = COMPRESS_STREAM_PROP_VAL;
 	private long[] lastDay = new long[24];
 	private int lastDayIdx = 0;
 	private long[] lastHour = new long[60];
 	private int lastHourIdx = 0;
-
-//private LinkedHashMap<String, LinkedHashMap<Long, Packet>> waiting_packs =
-//   new LinkedHashMap<String, LinkedHashMap<Long, Packet>>();
-//private LinkedHashMap<String, Long> sent_rids = new LinkedHashMap<String, Long>();
-//private LinkedHashMap<String, Long> recieved_rids =
-//   new LinkedHashMap<String, Long>();
-//private LinkedHashMap<String, Long> recieved_acks =
-//   new LinkedHashMap<String, Long>();
 	private int nodesNo = 0;
+	private int per_node_conns = CLUSTER_CONNECTIONS_PER_NODE_VAL;
 	private long servConnectedTimeouts = 0;
 	private long totalNodeDisconnects = 0;
 
@@ -208,13 +208,19 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 		props.put(CLUSTER_CONTR_ID_PROP_KEY, DEF_CLUST_CONTR_NAME + "@" + getDefHostName());
 		props.put(COMPRESS_STREAM_PROP_KEY, COMPRESS_STREAM_PROP_VAL);
 
-//  props.put(NOTIFY_ADMINS_PROP_KEY, NOTIFY_ADMINS_PROP_VAL);
-//  if (params.get(GEN_ADMINS) != null) {
-//    admins = ((String)params.get(GEN_ADMINS)).split(",");
-//  } else {
-//    admins = new String[] { "admin@localhost" };
-//  }
-//  props.put(ADMINS_PROP_KEY, admins);
+		String conns = (String) params.get(CLUSTER_CONNECTIONS_PER_NODE_PAR);
+		int conns_int = CLUSTER_CONNECTIONS_PER_NODE_VAL;
+
+		if (conns != null) {
+			try {
+				conns_int = Integer.parseInt(conns);
+			} catch (Exception e) {
+				conns_int = CLUSTER_CONNECTIONS_PER_NODE_VAL;
+			}
+		}
+
+		props.put(CLUSTER_CONNECTIONS_PER_NODE_PROP_KEY, conns_int);
+
 		return props;
 	}
 
@@ -228,35 +234,6 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 	public String getDiscoCategoryType() {
 		return identity_type;
 	}
-
-//private void updateServiceDiscovery(String jid, String name) {
-//  ServiceEntity item = new ServiceEntity(jid, null, name);
-//  //item.addIdentities(new ServiceIdentity("component", identity_type, name));
-//  log.info("Modifing service-discovery info: " + item.toString());
-//  serviceEntity.addItems(item);
-//}
-//
-//@Override
-//public Element getDiscoInfo(String node, String jid) {
-//  if (jid != null && getName().equals(JIDUtils.getNodeNick(jid))) {
-//    return serviceEntity.getDiscoInfo(node);
-//  }
-//  return null;
-//}
-//
-//@Override
-//public  List<Element> getDiscoFeatures() { return null; }
-//
-//@Override
-//public List<Element> getDiscoItems(String node, String jid) {
-//  if (getName().equals(JIDUtils.getNodeNick(jid))) {
-//    return serviceEntity.getDiscoItems(node, null);
-//  } else {
-//    return Arrays.asList(serviceEntity.getDiscoItem(null,
-//        JIDUtils.getNodeID(getName(), jid)));
-//  }
-//}
-//
 
 	/**
 	 * Method description
@@ -391,7 +368,11 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 			return;
 		}
 
-		writePacketToSocket(packet.packRouted());
+		if (packet.getElemName() == ClusterElement.CLUSTER_EL_NAME) {
+			writePacketToSocket(packet);
+		} else {
+			writePacketToSocket(packet.packRouted());
+		}
 
 //  if (packet.getElemName() == ClusterElement.CLUSTER_EL_NAME) {
 //    writePacketToSocket(packet);
@@ -454,7 +435,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 		// method is called which is true only during program startup time.
 		// In case of reconfiguration or new node joining this might not be
 		// the case. Low priority issue though.
-		return Math.max(Runtime.getRuntime().availableProcessors(), nodesNo) * 4;
+		return Math.max(Runtime.getRuntime().availableProcessors(), nodesNo) * 8;
 	}
 
 	/**
@@ -491,15 +472,10 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 			serv.startZLib(Deflater.BEST_COMPRESSION);
 		}
 
-//  String addr =
-//    (String)service.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
-//  addRouting(addr);
-		// addRouting(serv.getRemoteHost());
 		switch (serv.connectionType()) {
 			case connect :
 
 				// Send init xmpp stream here
-				// XMPPIOService serv = (XMPPIOService)service;
 				String remote_host = (String) serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
 
 				serv.getSessionData().put(XMPPIOService.HOSTNAME_KEY, remote_host);
@@ -540,32 +516,37 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 		if (result) {
 			Map<String, Object> sessionData = service.getSessionData();
 			String[] routings = (String[]) sessionData.get(PORT_ROUTING_TABLE_PROP_KEY);
+			String ip = service.getRemoteAddress();
+			CopyOnWriteArrayList<XMPPIOService<Object>> conns = connectionsPool.get(ip);
 
-			if (routings != null) {
-				updateRoutings(routings, false);
+			if (conns == null) {
+				conns = new CopyOnWriteArrayList<XMPPIOService<Object>>();
+				connectionsPool.put(ip, conns);
+			}
+
+			int size = conns.size();
+
+			conns.remove(service);
+
+			if (size == 1) {
+				if (routings != null) {
+					updateRoutings(routings, false);
+				}
+
+				String addr = (String) sessionData.get(PORT_REMOTE_HOST_PROP_KEY);
+
+				// removeRouting(serv.getRemoteHost());
+				log.log(Level.INFO, "Disonnected from: {0}", addr);
+				updateServiceDiscoveryItem(addr, addr, XMLNS + " disconnected", true);
+				clusterController.nodeDisconnected(addr);
 			}
 
 			ConnectionType type = service.connectionType();
 
 			if (type == ConnectionType.connect) {
 				addWaitingTask(sessionData);
-
-				// reconnectService(sessionData, connectionDelay);
 			}    // end of if (type == ConnectionType.connect)
 
-			// removeRouting(serv.getRemoteHost());
-			String addr = (String) sessionData.get(PORT_REMOTE_HOST_PROP_KEY);
-
-			log.log(Level.INFO, "Disonnected from: {0}", addr);
-			updateServiceDiscoveryItem(addr, addr, XMLNS + " disconnected", true);
-			clusterController.nodeDisconnected(addr);
-
-//    Map<String, String> method_params = new LinkedHashMap<String, String>();
-//    method_params.put("disconnected", addr);
-//    addOutPacket(new Packet(ClusterElement.createClusterMethodCall(
-//            getComponentId(), cluster_controller_id,
-//            StanzaType.set, ClusterMethods.UPDATE_NODES.toString(),
-//            method_params).getClusterElement()));
 			++totalNodeDisconnects;
 
 			int hour = TimeUtils.getHourNow();
@@ -580,10 +561,6 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 
 			int minute = TimeUtils.getMinuteNow();
 
-//    if (lastHourIdx != minute) {
-//      lastHourIdx = minute;
-//      lastHour[minute] = 0;
-//    }
 			++lastHour[minute];
 		}
 
@@ -612,20 +589,11 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 	@Override
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
-
-		// service_disco = (Boolean)props.get(RETURN_SERVICE_DISCO_KEY);
 		identity_type = (String) props.get(IDENTITY_TYPE_KEY);
 		compress_stream = (Boolean) props.get(COMPRESS_STREAM_PROP_KEY);
-
-		// serviceEntity = new ServiceEntity(getName(), "external", "XEP-0114");
-//  serviceEntity = new ServiceEntity(XMLNS + " " + getName(), null, XMLNS);
-//  serviceEntity.addIdentities(
-//    new ServiceIdentity("component", identity_type, XMLNS + " " + getName()));
 		connect_all = (Boolean) props.get(CONNECT_ALL_PROP_KEY);
 		cluster_controller_id = (String) props.get(CLUSTER_CONTR_ID_PROP_KEY);
-
-//  notify_admins = (Boolean)props.get(NOTIFY_ADMINS_PROP_KEY);
-//  admins = (String[])props.get(ADMINS_PROP_KEY);
+		per_node_conns = (Integer) props.get(CLUSTER_CONNECTIONS_PER_NODE_PROP_KEY);
 		connectionDelay = 5 * SECOND;
 
 		String[] cl_nodes = (String[]) props.get(CLUSTER_NODES_PROP_KEY);
@@ -645,19 +613,21 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 
 				if ( !host.equals(getDefHostName().getDomain())
 						&& ((host.hashCode() > getDefHostName().hashCode()) || connect_all)) {
-					log.log(Level.CONFIG, "Trying to connect to cluster node: {0}", host);
+					for (int i = 0; i < per_node_conns; ++i) {
+						log.log(Level.CONFIG, "Trying to connect to cluster node: {0}", host);
 
-					Map<String, Object> port_props = new LinkedHashMap<String, Object>(12);
+						Map<String, Object> port_props = new LinkedHashMap<String, Object>(12);
 
-					port_props.put(SECRET_PROP_KEY, SECRET_PROP_VAL);
-					port_props.put(PORT_LOCAL_HOST_PROP_KEY, getDefHostName());
-					port_props.put(PORT_TYPE_PROP_KEY, ConnectionType.connect);
-					port_props.put(PORT_SOCKET_PROP_KEY, SocketType.plain);
-					port_props.put(PORT_REMOTE_HOST_PROP_KEY, host);
-					port_props.put(PORT_IFC_PROP_KEY, new String[] { host });
-					port_props.put(MAX_RECONNECTS_PROP_KEY, 99999999);
-					port_props.put(PORT_KEY, PORTS[0]);
-					addWaitingTask(port_props);
+						port_props.put(SECRET_PROP_KEY, SECRET_PROP_VAL);
+						port_props.put(PORT_LOCAL_HOST_PROP_KEY, getDefHostName());
+						port_props.put(PORT_TYPE_PROP_KEY, ConnectionType.connect);
+						port_props.put(PORT_SOCKET_PROP_KEY, SocketType.plain);
+						port_props.put(PORT_REMOTE_HOST_PROP_KEY, host);
+						port_props.put(PORT_IFC_PROP_KEY, new String[] { host });
+						port_props.put(MAX_RECONNECTS_PROP_KEY, 99999999);
+						port_props.put(PORT_KEY, PORTS[0]);
+						addWaitingTask(port_props);
+					}
 
 					// reconnectService(port_props, connectionDelay);
 				}
@@ -787,24 +757,23 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 		return defs;
 	}
 
-	@Override
-	protected String getServiceId(Packet packet) {
-		try {
-			return DNSResolver.getHostIP(packet.getTo().getDomain());
-		} catch (UnknownHostException e) {
-			log.log(Level.WARNING, "Uknown host exception for address: {0}", packet.getTo().getDomain());
-
-			return packet.getTo().getDomain();
-		}
-	}
-
-	@Override
-	protected String getUniqueId(XMPPIOService<Object> serv) {
-
-		// return (String)serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
-		return serv.getRemoteAddress();
-	}
-
+//@Override
+//protected String getServiceId(Packet packet) {
+//  try {
+//    return DNSResolver.getHostIP(packet.getTo().getDomain());
+//  } catch (UnknownHostException e) {
+//    log.log(Level.WARNING, "Uknown host exception for address: {0}", packet.getTo().getDomain());
+//
+//    return packet.getTo().getDomain();
+//  }
+//}
+//
+//@Override
+//protected String getUniqueId(XMPPIOService<Object> serv) {
+//
+//  // return (String)serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
+//  return serv.getRemoteAddress();
+//}
 	@Override
 	protected XMPPIOService<Object> getXMPPIOServiceInstance() {
 		return new XMPPIOService<Object>();
@@ -819,14 +788,27 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 
 	protected void serviceConnected(XMPPIOService<Object> serv) {
 		String[] routings = (String[]) serv.getSessionData().get(PORT_ROUTING_TABLE_PROP_KEY);
+		String ip = serv.getRemoteAddress();
+		CopyOnWriteArrayList<XMPPIOService<Object>> conns = connectionsPool.get(ip);
 
-		updateRoutings(routings, true);
+		if (conns == null) {
+			conns = new CopyOnWriteArrayList<XMPPIOService<Object>>();
+			connectionsPool.put(ip, conns);
+		}
 
-		String addr = (String) serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
+		int size = conns.size();
 
-		log.log(Level.INFO, "Connected to: {0}", addr);
-		updateServiceDiscoveryItem(addr, addr, XMLNS + " connected", true);
-		clusterController.nodeConnected(addr);
+		conns.add(serv);
+
+		if (size == 0) {
+			updateRoutings(routings, true);
+
+			String addr = (String) serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
+
+			log.log(Level.INFO, "Connected to: {0}", addr);
+			updateServiceDiscoveryItem(addr, addr, XMLNS + " connected", true);
+			clusterController.nodeConnected(addr);
+		}
 
 		ServiceConnectedTimer task =
 			(ServiceConnectedTimer) serv.getSessionData().get(SERVICE_CONNECTED_TIMER);
@@ -836,84 +818,34 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 		} else {
 			task.cancel();
 		}
-
-//  Map<String, String> method_params = new LinkedHashMap<String, String>();
-//  method_params.put("connected", addr);
-//  addOutPacket(new Packet(ClusterElement.createClusterMethodCall(
-//        getComponentId(), cluster_controller_id,
-//        StanzaType.set, ClusterMethods.UPDATE_NODES.toString(),
-//        method_params).getClusterElement()));
-//  synchronized (waiting_packs) {
-//    LinkedHashMap<Long, Packet> waiting_packets =
-//       waiting_packs.get(serv.getRemoteAddress());
-//    if (waiting_packets == null) {
-//      waiting_packets = new LinkedHashMap<Long, Packet>();
-//      waiting_ack.put(serv.getRemoteAddress(), waiting_packets);
-//    }
-//  }
 	}
 
 	@Override
 	protected boolean writePacketToSocket(Packet p) {
+		String ip = p.getTo().getDomain();
 
-//  long rid = ++send_rid;
-//  p.getElement().setAttribute("rid", ""+rid);
-//  synchronized (waiting_packs) {
-//    LinkedHashMap<Long, Packet> waiting_packets =
-//       waiting_packs.get(getServiceId(p));
-//    if (waiting_packets == null) {
-//      waiting_packets = new LinkedHashMap<Long, Packet>();
-//      waiting_ack.put(getServiceId(p), waiting_packets);
-//    }
-//    waiting_packets.put(rid, p);
-//  }
-		return super.writePacketToSocket(p);
+		try {
+			ip = DNSResolver.getHostIP(p.getTo().getDomain());
+		} catch (UnknownHostException ex) {
+			ip = p.getTo().getDomain();
+		}
+
+		int code = Math.abs(hashCodeForPacket(p));
+		CopyOnWriteArrayList<XMPPIOService<Object>> conns = connectionsPool.get(ip);
+
+		if ((conns != null) && (conns.size() > 0)) {
+			XMPPIOService<Object> serv = conns.get(code % conns.size());
+
+			return super.writePacketToSocket(serv, p);
+		} else {
+			log.log(Level.WARNING, "No cluster connection to send a packet: {0}", p);
+
+			return false;
+		}
+
+		// return super.writePacketToSocket(p);
 	}
 
-//private void processReceivedAck(Packet packet, XMPPIOService serv) {
-//  String ack_str = packet.getAttribute("ack");
-//  if (ack_str == null) {
-//    log.warning("ack attribute is null for packet: " + packet.toString()
-//      + ", please update all cluster nodes.");
-//  } else {
-//    try {
-//      long r_ack = Long.parseLong(ack_str);
-//      synchronized (waiting_packs) {
-//        LinkedHashMap<Long, Packet> waiting_packets =
-//           waiting_packs.get(serv.getRemoteAddress());
-//        if (waiting_packets == null) {
-//          log.warning("Checking ACK and waiting_packets is null for packet: " +
-//            packet);
-//          return;
-//        }
-//        long last_ack = received_acks.get(serv.getRemoteAddress());
-//        if (r_ack == (++last_ack)) {
-//          received_acks.put(serv.getRemoteAddress(), r_ack);
-//          Packet p = waiting_packets.remove(r_ack);
-//          if (p == null) {
-//            log.warning("Packet for r_ack = " + r_ack + " not found...");
-//          }
-//        } else {
-//        }
-//      }
-//    } catch (NumberFormatException e) {
-//      log.warning("Incorrect ack value in packet: " + packet.toString());
-//    }
-//  }
-//}
-//private void processReceivedRid(Packet packet, XMPPIOService serv) {
-//  String rid_str = packet.getAttribute("rid");
-//  if (rid_str == null) {
-//    log.warning("rid attribute is null for packet: " + packet.toString()
-//      + ", please update all cluster nodes.");
-//  } else {
-//    try {
-//      long r_rid = Long.parseLong(rid_str);
-//    } catch (NumberFormatException e) {
-//      log.warning("Incorrect rid value in packet: " + packet.toString());
-//    }
-//  }
-//}
 	private void processHandshake(Packet p, XMPPIOService<Object> serv) {
 		switch (serv.connectionType()) {
 			case connect : {
