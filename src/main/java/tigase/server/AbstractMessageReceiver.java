@@ -286,7 +286,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent
 	 * internal input queue.
 	 *
 	 * @return a <code>boolean</code> value of <code>true</code> if the packet
-	 * has been successfuly added to the queue and <code>false</code> otherwise.
+	 * has been successfully added to the queue and <code>false</code> otherwise.
 	 * @see AbstractMessageReceiver.addPacket(Packet packet)
 	 */
 	@Override
