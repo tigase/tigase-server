@@ -136,9 +136,9 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	public static final String PORT_LOCAL_HOST_PROP_KEY = "local-host";
 	private static ConnectionOpenThread connectThread = ConnectionOpenThread.getInstance();
 
-	// private static SocketThread readThread = SocketThread.getInstance();
-
 	//~--- fields ---------------------------------------------------------------
+
+	// private static SocketThread readThread = SocketThread.getInstance();
 
 	/** Field description */
 	public String[] PORT_IFC_PROP_VAL = { "*" };
@@ -676,20 +676,24 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 			// synchronized (ios) {
 			ios.addPacketToSend(p);
 
-			try {
-				ios.processWaitingPackets();
-				SocketThread.addSocketService(ios);
-
-				return true;
-			} catch (Exception e) {
-				log.log(Level.WARNING, ios + "Exception during writing packets: ", e);
-
+			if (ios.writeInProgress.tryLock()) {
 				try {
-					ios.stop();
-				} catch (Exception e1) {
-					log.log(Level.WARNING, ios + "Exception stopping XMPPIOService: ", e1);
-				}    // end of try-catch
-			}      // end of try-catch
+					ios.processWaitingPackets();
+					SocketThread.addSocketService(ios);
+
+					return true;
+				} catch (Exception e) {
+					log.log(Level.WARNING, ios + "Exception during writing packets: ", e);
+
+					try {
+						ios.stop();
+					} catch (Exception e1) {
+						log.log(Level.WARNING, ios + "Exception stopping XMPPIOService: ", e1);
+					}    // end of try-catch
+				} finally {
+					ios.writeInProgress.unlock();
+				}
+			}
 
 			// }
 		} else {
