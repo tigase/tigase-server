@@ -154,7 +154,6 @@ public class XMPPIOService<RefObject> extends IOService<RefObject> {
 		Packet packet = null;
 
 		// int cnt = 0;
-
 //  while ((packet = waitingPackets.poll()) != null && (cnt < 1000)) {
 		while ((packet = waitingPackets.poll()) != null) {
 
