@@ -454,7 +454,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 		// method is called which is true only during program startup time.
 		// In case of reconfiguration or new node joining this might not be
 		// the case. Low priority issue though.
-		return Math.max(Runtime.getRuntime().availableProcessors(), nodesNo);
+		return Math.max(Runtime.getRuntime().availableProcessors(), nodesNo) * 4;
 	}
 
 	/**
