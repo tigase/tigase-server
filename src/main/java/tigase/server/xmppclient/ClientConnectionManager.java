@@ -313,40 +313,6 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 		xmppStreamClosed(service);
 
-//  // It might be a Bosh service in which case it is ignored here.
-//  if (service.getXMLNS() == XMLNS) {
-//
-//    // XMPPIOService serv = (XMPPIOService)service;
-//    // The method may be called more than one time for a single
-//    // connection but we want to send a notification just once
-//    if (result) {
-//      ipMonitor.addDisconnect(service.getRemoteAddress());
-//
-//      if (service.getDataReceiver() != null) {
-//        Packet command =
-//          Command.STREAM_CLOSED.getPacket(getFromAddress(getUniqueId(service)),
-//            service.getDataReceiver(), StanzaType.set, UUID.randomUUID().toString());
-//
-//        // In case of mass-disconnects, adjust the timeout properly
-//        addOutPacketWithTimeout(command, stoppedHandler, 120l, TimeUnit.SECONDS);
-//
-//        if (log.isLoggable(Level.FINE)) {
-//          log.fine("Service stopped, sending packet: " + command);
-//        }
-//
-//        // // For testing only.
-//        // System.out.println("Service stopped: " + service.getUniqueId());
-//        // Thread.dumpStack();
-////      // For testing only.
-////      System.out.println("Service stopped: " + service.getUniqueId());
-////      Thread.dumpStack();
-//      } else {
-//        if (log.isLoggable(Level.FINE)) {
-//          log.fine("Service stopped, before stream:stream received");
-//        }
-//      }
-//    }
-//  }
 		return result;
 	}
 
