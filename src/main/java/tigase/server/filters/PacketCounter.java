@@ -48,6 +48,7 @@ import java.util.logging.Logger;
  * @version $Rev$
  */
 public class PacketCounter implements PacketFilterIfc {
+	private long clusterCounter = 0;
 	private long[] iqCounters = new long[1];
 	private int lastNodeNo = -1;
 	private Logger log = Logger.getLogger(this.getClass().getName());
@@ -72,10 +73,20 @@ public class PacketCounter implements PacketFilterIfc {
 	public Packet filter(Packet packet) {
 		if (packet.getElemName() == "message") {
 			++msgCounter;
+
+			return packet;
 		}
 
 		if (packet.getElemName() == "presence") {
 			++presCounter;
+
+			return packet;
+		}
+
+		if (packet.getElemName() == "cluster") {
+			++clusterCounter;
+
+			return packet;
 		}
 
 		if (packet.getElemName() == "iq") {
@@ -125,13 +136,14 @@ public class PacketCounter implements PacketFilterIfc {
 	public void getStatistics(StatisticsList list) {
 		list.add(name, qType.name() + " messages", msgCounter, Level.FINER);
 		list.add(name, qType.name() + " presences", presCounter, Level.FINER);
+		list.add(name, qType.name() + " cluster", clusterCounter, Level.FINER);
 		list.add(name, qType.name() + " IQ no XMLNS", iqCounters[0], Level.FINEST);
 
 		long iqs = iqCounters[0];
 
 		for (Entry<String, Integer> iqCounter : iqCounterIdx.entrySet()) {
-			list.add(name, qType.name() + " IQ " + iqCounter.getKey(),
-					iqCounters[iqCounter.getValue()], Level.FINEST);
+			list.add(name, qType.name() + " IQ " + iqCounter.getKey(), iqCounters[iqCounter.getValue()],
+					Level.FINEST);
 			iqs += iqCounters[iqCounter.getValue()];
 		}
 
