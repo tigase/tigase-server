@@ -309,19 +309,38 @@ public class SocketIO implements IOInterface {
 		int result = 0;
 		ByteBuffer dataBuffer = null;
 
-		while ((dataBuffer = dataToSend.peek()) != null) {
-			int res = channel.write(dataBuffer);
+		if (dataToSend.size() > 1) {
+			ByteBuffer[] buffs = dataToSend.toArray(new ByteBuffer[dataToSend.size()]);
+			long res = channel.write(buffs);
 
 			if (res == -1) {
 				throw new EOFException("Channel has been closed.");
-			} else {
-				result += res;
 			}
 
-			if ( !dataBuffer.hasRemaining()) {
-				dataToSend.poll();
-			} else {
-				break;
+			if (res > 0) {
+				result += res;
+
+				for (ByteBuffer byteBuffer : buffs) {
+					if ( !dataBuffer.hasRemaining()) {
+						dataToSend.poll();
+					} else {
+						break;
+					}
+				}
+			}
+		} else {
+			if ((dataBuffer = dataToSend.peek()) != null) {
+				int res = channel.write(dataBuffer);
+
+				if (res == -1) {
+					throw new EOFException("Channel has been closed.");
+				} else {
+					result += res;
+				}
+
+				if ( !dataBuffer.hasRemaining()) {
+					dataToSend.poll();
+				}
 			}
 		}
 
