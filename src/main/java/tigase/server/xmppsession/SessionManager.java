@@ -601,7 +601,7 @@ public class SessionManager extends AbstractMessageReceiver
 	 */
 	@Override
 	public int processingThreads() {
-		return Runtime.getRuntime().availableProcessors() * 4;
+		return Runtime.getRuntime().availableProcessors() * 8;
 	}
 
 	//~--- set methods ----------------------------------------------------------
