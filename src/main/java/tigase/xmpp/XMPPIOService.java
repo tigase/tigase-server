@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -81,6 +82,9 @@ public class XMPPIOService<RefObject> extends IOService<RefObject> {
 	 */
 	private ConcurrentLinkedQueue<Packet> receivedPackets = new ConcurrentLinkedQueue<Packet>();
 	private String xmlns = null;
+
+	/** Field description */
+	public ReentrantLock writeInProgress = new ReentrantLock();
 
 	//~--- constructors ---------------------------------------------------------
 
@@ -149,7 +153,12 @@ public class XMPPIOService<RefObject> extends IOService<RefObject> {
 	public void processWaitingPackets() throws IOException {
 		Packet packet = null;
 
+		// int cnt = 0;
+
+//  while ((packet = waitingPackets.poll()) != null && (cnt < 1000)) {
 		while ((packet = waitingPackets.poll()) != null) {
+
+			// ++cnt;
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "{0}, Sending packet: {1}", new Object[] { toString(), packet });
 			}
