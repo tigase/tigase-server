@@ -59,7 +59,7 @@ import java.util.logging.Logger;
  * @version $Rev$
  */
 public class SocketThread implements Runnable {
-	private static final Logger log = Logger.getLogger("tigase.net.SocketReadThread");
+	private static final Logger log = Logger.getLogger(SocketThread.class.getName());
 
 	/** Field description */
 	public static final int DEF_MAX_THREADS_PER_CPU = 8;
@@ -75,9 +75,10 @@ public class SocketThread implements Runnable {
 	 * separate threads for tasks processing must have access to server thread pool.
 	 */
 	private static CompletionService<IOService<?>> completionService = null;
-	private static int threadNo = 0;
-	private static final int READ_ONLY = SelectionKey.OP_READ;
-	private static final int READ_WRITE = SelectionKey.OP_READ | SelectionKey.OP_WRITE;
+
+//private static int threadNo = 0;
+//private static final int READ_ONLY = SelectionKey.OP_READ;
+//private static final int READ_WRITE = SelectionKey.OP_READ | SelectionKey.OP_WRITE;
 
 	//~--- static initializers --------------------------------------------------
 
@@ -566,7 +567,7 @@ public class SocketThread implements Runnable {
 		 */
 		public ResultsListener() {
 			super();
-			setName("SocketReadThread$ResultsListener");
+			setName("SocketThread$ResultsListener");
 		}
 
 		//~--- methods ------------------------------------------------------------
