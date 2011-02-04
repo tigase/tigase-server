@@ -45,10 +45,12 @@ create table if not exists tig_users (
 			 sha1_user_id char(128) NOT NULL,
 			 -- User password encrypted or not
 			 user_pw varchar(255) default NULL,
+       -- Time the account has been created
+       acc_create_time timestamp DEFAULT CURRENT_TIMESTAMP,
 			 -- Time of the last user login
 			 last_login timestamp DEFAULT CURRENT_TIMESTAMP,
 			 -- Time of the last user logout
-			 last_logout timestamp DEFAULT '1970-01-01 01:01:01',
+			 last_logout timestamp DEFAULT CURRENT_TIMESTAMP,
 			 -- User online status, if > 0 then user is online, the value
 			 -- indicates the number of user connections.
 			 -- It is incremented on each user login and decremented on each
