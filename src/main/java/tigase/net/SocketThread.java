@@ -76,12 +76,11 @@ public class SocketThread implements Runnable {
 	 */
 	private static CompletionService<IOService<?>> completionService = null;
 
+	//~--- static initializers --------------------------------------------------
+
 //private static int threadNo = 0;
 //private static final int READ_ONLY = SelectionKey.OP_READ;
 //private static final int READ_WRITE = SelectionKey.OP_READ | SelectionKey.OP_WRITE;
-
-	//~--- static initializers --------------------------------------------------
-
 	static {
 		if (socketReadThread == null) {
 			int nThreads = (cpus * DEF_MAX_THREADS_PER_CPU) / 2 + 1;
@@ -93,7 +92,7 @@ public class SocketThread implements Runnable {
 			socketWriteThread = new SocketThread[nThreads];
 
 			for (int i = 0; i < socketReadThread.length; i++) {
-				socketReadThread[i] = new SocketThread();
+				socketReadThread[i] = new SocketThread("socketReadThread-" + i);
 				socketReadThread[i].reading = true;
 
 				Thread thrd = new Thread(socketReadThread[i]);
@@ -105,7 +104,7 @@ public class SocketThread implements Runnable {
 			log.log(Level.WARNING, "{0} socketReadThreads started.", socketReadThread.length);
 
 			for (int i = 0; i < socketWriteThread.length; i++) {
-				socketWriteThread[i] = new SocketThread();
+				socketWriteThread[i] = new SocketThread("socketWriteThread-" + i);
 				socketWriteThread[i].writing = true;
 
 				Thread thrd = new Thread(socketWriteThread[i]);
@@ -143,7 +142,7 @@ public class SocketThread implements Runnable {
 	 * Creates a new <code>SocketThread</code> instance.
 	 *
 	 */
-	private SocketThread() {
+	private SocketThread(String name) {
 		try {
 			clientsSel = Selector.open();
 		} catch (Exception e) {
@@ -151,7 +150,7 @@ public class SocketThread implements Runnable {
 			stopping = true;
 		}    // end of try-catch
 
-		new ResultsListener().start();
+		new ResultsListener("ResultsListener-" + name).start();
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -564,10 +563,12 @@ public class SocketThread implements Runnable {
 		/**
 		 * Constructs ...
 		 *
+		 *
+		 * @param name
 		 */
-		public ResultsListener() {
+		public ResultsListener(String name) {
 			super();
-			setName("SocketThread$ResultsListener");
+			setName(name);
 		}
 
 		//~--- methods ------------------------------------------------------------
