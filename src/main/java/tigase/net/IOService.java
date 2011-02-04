@@ -918,8 +918,8 @@ public abstract class IOService<RefObject> implements Callable<IOService<?>>, TL
 				}
 			}
 		} catch (Exception e) {
-			if (log.isLoggable(Level.WARNING)) {
-				log.log(Level.WARNING, "Data writing exception", e);
+			if (log.isLoggable(Level.FINER)) {
+				log.log(Level.FINER, "Data writing exception", e);
 			}
 
 			forceStop();
