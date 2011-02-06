@@ -48,7 +48,7 @@ import java.util.logging.Logger;
 public class ConfigItem extends RepositoryItemAbstract {
 
 	/**
-	 * Private logger for class instance.
+	 * Private logger for class instance. 
 	 */
 	private static final Logger log = Logger.getLogger(ConfigItem.class.getName());
 
