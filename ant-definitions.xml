@@ -102,6 +102,7 @@
       <mkdir dir="${dist}/@{packagename}-${version}/scripts"/>
       <mkdir dir="${dist}/@{packagename}-${version}/scripts/gentoo"/>
       <mkdir dir="${dist}/@{packagename}-${version}/scripts/mandriva"/>
+      <mkdir dir="${dist}/@{packagename}-${version}/scripts/admin"/>
       <copy
         file="${jars}/@{packagename}.jar"
         tofile="${dist}/@{packagename}-${version}/${jars}/@{packagename}.jar"/>
@@ -123,14 +124,16 @@
         file="License.html"
         tofile="${dist}/@{packagename}-${version}/License.html"/>
       <copy
-        file="ChangeLog"
-        tofile="${dist}/@{packagename}-${version}/ChangeLog"/>
+        file="Changelog"
+        tofile="${dist}/@{packagename}-${version}/Changelog"/>
       <mkdir dir="${dist}/@{packagename}-${version}/libs"/>
       <copy todir="${dist}/@{packagename}-${version}/libs">
         <filelist dir="libs">
           <file name="tigase-utils.jar"/>
           <file name="tigase-xmltools.jar"/>
           <file name="jdbc-mysql.jar"/>
+          <file name="groovy-all-1.5.7.jar"/>
+          <file name="groovy-engine.jar"/>
           <file name="jdbc-postgresql.jar"/>
           <file name="derby.jar"/>
           <file name="derbytools.jar"/>
@@ -153,6 +156,8 @@
         <filelist dir="etc">
           <file name="tigase.conf"/>
           <file name="init.properties"/>
+          <file name="jmx.access"/>
+          <file name="jmx.password"/>
         </filelist>
       </copy>
       <mkdir dir="${dist}/@{packagename}-${version}/database"/>
@@ -163,6 +168,11 @@
         </fileset>
       </copy>
       <mkdir dir="${dist}/@{packagename}-${version}/logs"/>
+      <copy todir="${dist}/@{packagename}-${version}/scripts/admin">
+        <fileset dir="src/main/groovy/tigase/admin">
+					<include name="*.groovy"/>
+        </fileset>
+      </copy>
       <copy
         file="scripts/tigase.sh"
         tofile="${dist}/@{packagename}-${version}/scripts/tigase.sh"/>
