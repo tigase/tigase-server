@@ -225,7 +225,10 @@ uvme:vcard-temp,http://jabber.org/protocol/commands,jabber:iq:private,urn:xmpp:p
 			<spec txt="User registration" true="jabber:iq:register" false="off"	set="true"/>
 		</field>
 		<field type="check" variable="rosterPlugin">
-			<spec txt="Presence/Roster management" true="roster-presence" false="off"	set="true"/>
+			<spec txt="Roster management" true="jabber:iq:roster" false="off"	set="true"/>
+		</field>
+		<field type="check" variable="presencePlugin">
+			<spec txt="Presence management" true="presence" false="off"	set="true"/>
 		</field>
 		<field type="check" variable="basicFilterPlugin">
 			<spec txt="Basic filter" true="basic-filter" false="off"	set="true"/>

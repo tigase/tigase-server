@@ -59,7 +59,7 @@ public abstract class TigaseConfigConst {
 
 	public static String[] ALL_PLUGINS =
 	{"nonSaslAuthPlugin", "saslAuthPlugin", "resBindPlugin",
-	 "sessionBindPlugin", "registerPlugin", "rosterPlugin", "privacyPlugin",
+	 "sessionBindPlugin", "registerPlugin", "rosterPlugin", "presencePlugin", "privacyPlugin",
 	 "versionPlugin", "statsPlugin", "tlsPlugin", "msgOfflinePlugin",
 	 "vcardPlugin", "commandsPlugin", "privatePlugin", "pingPlugin",
 	 "basicFilterPlugin", "domainFilterPlugin", "pepPlugin", "zlibPlugin"};
@@ -116,7 +116,8 @@ public abstract class TigaseConfigConst {
 		pluginsMap.put("urn:ietf:params:xml:ns:xmpp-bind", "resBindPlugin");
 		pluginsMap.put("urn:ietf:params:xml:ns:xmpp-session", "sessionBindPlugin");
 		pluginsMap.put("jabber:iq:register", "registerPlugin");
-		pluginsMap.put("roster-presence", "rosterPlugin");
+		pluginsMap.put("jabber:iq:roster", "rosterPlugin");
+		pluginsMap.put("presence", "presencePlugin");
 		pluginsMap.put("jabber:iq:privacy", "privacyPlugin");
 		pluginsMap.put("jabber:iq:version", "versionPlugin");
 		pluginsMap.put("http://jabber.org/protocol/stats", "statsPlugin");

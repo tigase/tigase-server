@@ -146,7 +146,6 @@
           <file name="dummy.cer"/>
           <file name="rsa-keystore"/>
           <file name="truststore"/>
-          <file name="localhost.pem"/>
         </filelist>
       </copy>
       <mkdir dir="${dist}/@{packagename}-${version}/etc"/>
