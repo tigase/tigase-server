@@ -991,7 +991,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		 *
 		 * @param sc
 		 */
-		@SuppressWarnings({ "unchecked" })
 		@Override
 		public void accept(SocketChannel sc) {
 			String cid = "" + port_props.get("local-hostname") + "@" + port_props.get("remote-hostname");
