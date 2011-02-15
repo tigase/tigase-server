@@ -21,14 +21,12 @@
  */
 
 /*
-
-User add script as described in XEP-0133:
-http://xmpp.org/extensions/xep-0133.html#add-user
-
-AS:Description: Add user
-AS:CommandId: add-user
-AS:Component: sess-man
-*/
+ User add script as described in XEP-0133:
+ http://xmpp.org/extensions/xep-0133.html#add-user
+ AS:Description: Add user
+ AS:CommandId: add-user
+ AS:Component: sess-man
+ */
 
 package tigase.admin
 
@@ -60,19 +58,19 @@ def userEmail = Command.getFieldValue(packet, EMAIL)
 if (userJid == null || userPass == null || userPassVer == null || userEmail == null) {
 	def result = p.commandResult(Command.DataType.form);
 
-  Command.addTitle(result, "Adding a User")
+	Command.addTitle(result, "Adding a User")
 	Command.addInstructions(result, "Fill out this form to add a user.")
 
 	Command.addFieldValue(result, "FORM_TYPE", "http://jabber.org/protocol/admin",
-    "hidden")
+			"hidden")
 	Command.addFieldValue(result, JID, userJid ?: "", "jid-single",
-    "The Jabber ID for the account to be added")
+			"The Jabber ID for the account to be added")
 	Command.addFieldValue(result, PASSWORD, userPass ?: "", "text-private",
-	  "The password for this account")
+			"The password for this account")
 	Command.addFieldValue(result, PASSWORD_VERIFY, userPassVer ?: "", "text-private",
-	  "Retype password")
+			"Retype password")
 	Command.addFieldValue(result, EMAIL, userEmail ?: "", "text-single",
-	  "Email address")
+			"Email address")
 
 	return result
 }
@@ -82,7 +80,7 @@ try {
 	bareJID = BareJID.bareJIDInstance(userJid)
 	VHostItem vhost = vhost_man.getVHostItem(bareJID.getDomain())
 	if (isServiceAdmin ||
-		(vhost != null && (vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) {
+	(vhost != null && (vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) {
 		auth_repo.addUser(bareJID, userPass)
 		user_repo.setData(bareJID, "email", userEmail);
 		Command.addTextField(result, "Note", "Operation successful");
@@ -90,9 +88,9 @@ try {
 		Command.addTextField(result, "Error", "You do not have enough permissions to create account for this domain.");
 	}
 } catch (UserExistsException ex) {
-  Command.addTextField(result, "Note", "User already exists, can't be added.");
+	Command.addTextField(result, "Note", "User already exists, can't be added.");
 } catch (TigaseDBException ex) {
-  Command.addTextField(result, "Note", "Problem accessing database, user not added.");
+	Command.addTextField(result, "Note", "Problem accessing database, user not added.");
 }
 
 return result
