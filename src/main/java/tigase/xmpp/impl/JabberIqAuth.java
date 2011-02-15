@@ -26,6 +26,7 @@ package tigase.xmpp.impl;
 
 import tigase.db.AuthRepository;
 import tigase.db.NonAuthUserRepository;
+import tigase.db.TigaseDBException;
 
 import tigase.server.Command;
 import tigase.server.Packet;
@@ -52,10 +53,10 @@ import java.util.logging.Logger;
 
 /**
  * JEP-0078: Non-SASL Authentication
- *
- *
+ * 
+ * 
  * Created: Thu Feb 16 17:46:16 2006
- *
+ * 
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
@@ -69,18 +70,17 @@ public class JabberIqAuth extends XMPPProcessor implements XMPPProcessorIfc {
 	private static final String ID = XMLNS;
 	private static final String[] ELEMENTS = { "query" };
 	private static final String[] XMLNSS = { XMLNS };
-	private static final Element[] FEATURES = {
-		new Element("auth", new String[] { "xmlns" },
-			new String[] { "http://jabber.org/features/iq-auth" }) };
-	private static final Element[] DISCO_FEATURES = {
-		new Element("feature", new String[] { "var" }, new String[] { XMLNS }) };
+	private static final Element[] FEATURES = { new Element("auth",
+			new String[] { "xmlns" }, new String[] { "http://jabber.org/features/iq-auth" }) };
+	private static final Element[] DISCO_FEATURES = { new Element("feature",
+			new String[] { "var" }, new String[] { XMLNS }) };
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -90,8 +90,8 @@ public class JabberIqAuth extends XMPPProcessor implements XMPPProcessorIfc {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -101,48 +101,54 @@ public class JabberIqAuth extends XMPPProcessor implements XMPPProcessorIfc {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packet
 	 * @param session
 	 * @param repo
 	 * @param results
 	 * @param settings
-	 *
+	 * 
 	 * @throws XMPPException
 	 */
 	@Override
 	public void process(final Packet packet, final XMPPResourceConnection session,
 			final NonAuthUserRepository repo, final Queue<Packet> results,
-				final Map<String, Object> settings)
-			throws XMPPException {
+			final Map<String, Object> settings) throws XMPPException {
 		if (session == null) {
 			return;
-		}    // end of if (session == null)
+		} // end of if (session == null)
 
 		Element request = packet.getElement();
 		StanzaType type = packet.getType();
 
 		switch (type) {
-			case get :
+			case get:
 				Map<String, Object> query = new HashMap<String, Object>();
 
 				query.put(AuthRepository.PROTOCOL_KEY, AuthRepository.PROTOCOL_VAL_NONSASL);
-				session.queryAuth(query);
+				try {
+					session.queryAuth(query);
+					String[] auth_mechs = (String[]) query.get(AuthRepository.RESULT_KEY);
+					StringBuilder response = new StringBuilder("<username/>");
 
-				String[] auth_mechs = (String[]) query.get(AuthRepository.RESULT_KEY);
-				StringBuilder response = new StringBuilder("<username/>");
+					for (String mech : auth_mechs) {
+						response.append("<").append(mech).append("/>");
+					} // end of for (String mech: auth_mechs)
 
-				for (String mech : auth_mechs) {
-					response.append("<").append(mech).append("/>");
-				}    // end of for (String mech: auth_mechs)
+					response.append("<resource/>");
+					results.offer(packet.okResult(response.toString(), 1));
+				} catch (TigaseDBException ex) {
+					// TODO Auto-generated catch block
+					log.warning("Database problem: " + ex);
+					results.offer(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet,
+							"Database access problem, please contact administrator.", true));
+				}
 
-				response.append("<resource/>");
-				results.offer(packet.okResult(response.toString(), 1));
 
 				break;
 
-			case set :
+			case set:
 				String user_name = request.getChildCData("/iq/query/username");
 				String resource = request.getChildCData("/iq/query/resource");
 				String password = request.getChildCData("/iq/query/password");
@@ -156,16 +162,17 @@ public class JabberIqAuth extends XMPPProcessor implements XMPPProcessorIfc {
 
 					if (password != null) {
 
-//          user_pass = password;
-//          result = session.loginPlain(user_name, user_pass);
+						// user_pass = password;
+						// result = session.loginPlain(user_name, user_pass);
 						result = session.loginPlain(user_name, password);
-					}    // end of if (password != null)
+					} // end of if (password != null)
 
 					if (digest != null) {
 
 						// user_pass = digest;
-						result = session.loginDigest(user_name, digest, session.getSessionId(), "SHA");
-					}    // end of if (digest != null)
+						result =
+								session.loginDigest(user_name, digest, session.getSessionId(), "SHA");
+					} // end of if (digest != null)
 
 					if (result == Authorization.AUTHORIZED) {
 						session.setResource(resource);
@@ -174,13 +181,13 @@ public class JabberIqAuth extends XMPPProcessor implements XMPPProcessorIfc {
 					} else {
 						results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 								"Authentication failed", false));
-						results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(), StanzaType.set,
-								session.nextStanzaId()));
-					}    // end of else
+						results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
+								StanzaType.set, session.nextStanzaId()));
+					} // end of else
 				} catch (NotAuthorizedException e) {
 					log.info("Authentication failed: " + user_name);
-					results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet, e.getMessage(),
-							false));
+					results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
+							e.getMessage(), false));
 
 					Integer retries = (Integer) session.getSessionData("auth-retries");
 
@@ -191,36 +198,36 @@ public class JabberIqAuth extends XMPPProcessor implements XMPPProcessorIfc {
 					if (retries.intValue() < 3) {
 						session.putSessionData("auth-retries", new Integer(retries.intValue() + 1));
 					} else {
-						results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(), StanzaType.set,
-								session.nextStanzaId()));
+						results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
+								StanzaType.set, session.nextStanzaId()));
 					}
 				} catch (Exception e) {
 					log.info("Authentication failed: " + user_name);
 					log.log(Level.WARNING, "Authentication failed: ", e);
-					results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet, e.getMessage(),
-							false));
-					results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(), StanzaType.set,
-							session.nextStanzaId()));
+					results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
+							e.getMessage(), false));
+					results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
+							StanzaType.set, session.nextStanzaId()));
 				}
 
 				break;
 
-			default :
+			default:
 				results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
 						"Message type is incorrect", false));
-				results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(), StanzaType.set,
-						session.nextStanzaId()));
+				results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
+						StanzaType.set, session.nextStanzaId()));
 
 				break;
-		}    // end of switch (type)
+		} // end of switch (type)
 	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param session
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -230,8 +237,8 @@ public class JabberIqAuth extends XMPPProcessor implements XMPPProcessorIfc {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -241,8 +248,8 @@ public class JabberIqAuth extends XMPPProcessor implements XMPPProcessorIfc {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -252,10 +259,10 @@ public class JabberIqAuth extends XMPPProcessor implements XMPPProcessorIfc {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param session
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -264,12 +271,10 @@ public class JabberIqAuth extends XMPPProcessor implements XMPPProcessorIfc {
 			return null;
 		} else {
 			return FEATURES;
-		}    // end of if (session.isAuthorized()) else
+		} // end of if (session.isAuthorized()) else
 	}
-}    // JabberIqAuth
+} // JabberIqAuth
 
+// ~ Formatted in Sun Code Convention
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+// ~ Formatted by Jindent --- http://www.jindent.com

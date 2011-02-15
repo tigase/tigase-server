@@ -687,8 +687,9 @@ public abstract class RepositoryAccess {
 	 *
 	 *
 	 * @param authProps
+	 * @throws TigaseDBException 
 	 */
-	public void queryAuth(Map<String, Object> authProps) {
+	public void queryAuth(Map<String, Object> authProps) throws TigaseDBException {
 		if (authRepo == null) {
 			log.severe("Authentication repository is not available! Misconfiguration error or "
 					+ "authentication database is not available. Please check your logs from the "
@@ -703,6 +704,10 @@ public abstract class RepositoryAccess {
 		if (domain.isAnonymousEnabled()
 				&& (authProps.get(AuthRepository.PROTOCOL_KEY) == AuthRepository.PROTOCOL_VAL_SASL)) {
 			String[] auth_mechs = (String[]) authProps.get(AuthRepository.RESULT_KEY);
+			if (auth_mechs == null) {
+				throw new TigaseDBException("No euthentication mechanisms found, probably " +
+						"DB misconfiguration problem.");
+			}
 
 			auth_mechs = Arrays.copyOf(auth_mechs, auth_mechs.length + 1);
 			auth_mechs[auth_mechs.length - 1] = ANONYMOUS_MECH;

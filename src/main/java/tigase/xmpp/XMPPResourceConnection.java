@@ -664,9 +664,10 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	 *
 	 *
 	 * @param authProps
+	 * @throws TigaseDBException 
 	 */
 	@Override
-	public void queryAuth(Map<String, Object> authProps) {
+	public void queryAuth(Map<String, Object> authProps) throws TigaseDBException {
 		super.queryAuth(authProps);
 	}
 

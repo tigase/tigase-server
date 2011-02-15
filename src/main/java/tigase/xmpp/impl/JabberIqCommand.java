@@ -100,7 +100,7 @@ public class JabberIqCommand extends XMPPProcessor implements XMPPProcessorIfc {
 			return;
 		}
 
-		// Processing only commands (that should be quaranteed by name space)
+		// Processing only commands (that should be guaranteed by name space)
 		// and only unknown commands. All known commands are processed elsewhere
 //  if (!packet.isCommand() || packet.getCommand() != Command.OTHER) {
 //    return;
@@ -122,6 +122,14 @@ public class JabberIqCommand extends XMPPProcessor implements XMPPProcessorIfc {
 				// No need for that, initVars(...) takes care of that
 				// packet.getElement().setAttribute("to", session.getSMComponentId().toString());
 				packet.initVars(packet.getStanzaFrom(), session.getSMComponentId());
+			} else {
+				if (packet.getStanzaTo().equals(session.getSMComponentId())) {
+					// This should be handled by SM, if it is not then drop it here.
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "Dropping unhandled packet addressed to SM: {0}", packet);
+					}
+					return;
+				}
 			}
 
 			BareJID id = packet.getStanzaTo().getBareJID();

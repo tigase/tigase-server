@@ -255,7 +255,7 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 					"You are not authorized to change registration settings.\n" + e.getMessage(), true));
 		} catch (TigaseDBException e) {
-			log.warning("Database proble, please contact admin: " + e);
+			log.warning("Database problem: " + e);
 			results.offer(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet,
 					"Database access problem, please contact administrator.", true));
 		}    // end of try-catch

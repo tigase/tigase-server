@@ -26,6 +26,7 @@ package tigase.xmpp.impl;
 
 import tigase.db.AuthRepository;
 import tigase.db.NonAuthUserRepository;
+import tigase.db.TigaseDBException;
 
 import tigase.server.Command;
 import tigase.server.Packet;
@@ -271,6 +272,7 @@ public class SaslAuth extends XMPPProcessor implements XMPPProcessorIfc {
 		if ((session == null) || session.isAuthorized()) {
 			return null;
 		} else {
+			try {
 			Map<String, Object> query = new HashMap<String, Object>();
 
 			query.put(AuthRepository.PROTOCOL_KEY, AuthRepository.PROTOCOL_VAL_SASL);
@@ -286,6 +288,11 @@ public class SaslAuth extends XMPPProcessor implements XMPPProcessorIfc {
 
 			return new Element[] {
 				new Element("mechanisms", mechs, new String[] { "xmlns" }, new String[] { XMLNS }) };
+			} catch (TigaseDBException ex) {
+				// TODO Auto-generated catch block
+				log.warning("Database problem: " + ex);
+				return null;
+			}
 		}    // end of if (session.isAuthorized()) else
 	}
 

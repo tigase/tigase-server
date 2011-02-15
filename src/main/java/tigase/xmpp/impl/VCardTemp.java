@@ -55,10 +55,10 @@ import java.util.logging.Logger;
 
 /**
  * Describe class VCardTemp here.
- *
- *
+ * 
+ * 
  * Created: Thu Oct 19 23:37:23 2006
- *
+ * 
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
@@ -78,18 +78,18 @@ public class VCardTemp extends XMPPProcessorAbstract {
 	// name was all upper cases. Now the plugin should catch both cases.
 	private static final String[] ELEMENTS = { "vCard", "VCARD" };
 	private static final String[] XMLNSS = { XMLNS, XMLNS };
-	private static final Element[] DISCO_FEATURES = {
-		new Element("feature", new String[] { "var" }, new String[] { XMLNS }) };
+	private static final Element[] DISCO_FEATURES = { new Element("feature",
+			new String[] { "var" }, new String[] { XMLNS }) };
 	private static final SimpleParser parser = SingletonFactory.getParserInstance();
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	// Implementation of tigase.xmpp.XMPPImplIfc
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -99,37 +99,38 @@ public class VCardTemp extends XMPPProcessorAbstract {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param connectionId
 	 * @param packet
 	 * @param session
 	 * @param repo
 	 * @param results
 	 * @param settings
-	 *
+	 * 
 	 * @throws PacketErrorTypeException
 	 */
 	@Override
 	public void processFromUserToServerPacket(JID connectionId, Packet packet,
 			XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results,
-				Map<String, Object> settings)
-			throws PacketErrorTypeException {
+			Map<String, Object> settings) throws PacketErrorTypeException {
 		if (packet.getType() != null) {
 			try {
+				Packet result = null;
+
 				switch (packet.getType()) {
-					case get :
+					case get:
 						String strvCard = session.getPublicData(ID, VCARD_KEY, null);
 
 						if (strvCard != null) {
-							results.offer(parseXMLData(strvCard, packet));
+							result = parseXMLData(strvCard, packet);
 						} else {
-							results.offer(packet.okResult((String) null, 1));
-						}    // end of if (vcard != null) else
+							result = packet.okResult((String) null, 1);
+						} // end of if (vcard != null) else
 
 						break;
 
-					case set :
+					case set:
 						Element elvCard = packet.getElement().getChild(ELEMENTS[0]);
 
 						// This is added to support old vCard protocol where element
@@ -151,16 +152,26 @@ public class VCardTemp extends XMPPProcessorAbstract {
 							}
 
 							session.removePublicData(ID, VCARD_KEY);
-						}    // end of else
+						} // end of else
 
-						results.offer(packet.okResult((String) null, 0));
+						result = packet.okResult((String) null, 0);
 
 						break;
 
-					default :
+					default:
 
-					// Ignore all others...
+						// Ignore all others...
 				}
+				if (result != null) {
+					result.setPacketTo(session.getConnectionId());
+					results.offer(result);
+				}
+			} catch (NoConnectionIdException ex) {
+
+				// This should not happen unless somebody sends a result vcard packet
+				// to the server itself
+				log.warning("This should not happen, unless this is a vcard result packet "
+						+ "sent to the server, which should not happen: " + packet);
 			} catch (NotAuthorizedException ex) {
 				log.warning("Received vCard request but user session is not authorized yet: "
 						+ packet);
@@ -173,21 +184,23 @@ public class VCardTemp extends XMPPProcessorAbstract {
 			}
 		} else {
 
-			// TODO: if this really happen that this is clearly protocol error, as that would be
-			// vCard packet with no type set, do we really need to handle such an erro? Let's
+			// TODO: if this really happen that this is clearly protocol error, as
+			// that would be
+			// vCard packet with no type set, do we really need to handle such an
+			// erro? Let's
 			// ignore it for now.
 		}
 	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packet
 	 * @param repo
 	 * @param results
 	 * @param settings
-	 *
+	 * 
 	 * @throws PacketErrorTypeException
 	 */
 	@Override
@@ -196,18 +209,18 @@ public class VCardTemp extends XMPPProcessorAbstract {
 			throws PacketErrorTypeException {
 		if (packet.getType() == StanzaType.get) {
 			try {
-				String strvCard = repo.getPublicData(packet.getStanzaTo().getBareJID(), ID, VCARD_KEY,
-					null);
+				String strvCard =
+						repo.getPublicData(packet.getStanzaTo().getBareJID(), ID, VCARD_KEY, null);
 
 				if (strvCard != null) {
 					results.offer(parseXMLData(strvCard, packet));
 				} else {
 					results.offer(packet.okResult((String) null, 1));
-				}    // end of if (vcard != null)
+				} // end of if (vcard != null)
 			} catch (UserNotFoundException e) {
 				results.offer(Authorization.ITEM_NOT_FOUND.getResponseMessage(packet,
 						"User not found", true));
-			}    // end of try-catch
+			} // end of try-catch
 		} else {
 
 			// This is most likely a response to the user from the remote
@@ -218,8 +231,8 @@ public class VCardTemp extends XMPPProcessorAbstract {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packet
 	 * @param session
 	 * @param repo
@@ -235,14 +248,14 @@ public class VCardTemp extends XMPPProcessorAbstract {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packet
 	 * @param session
 	 * @param repo
 	 * @param results
 	 * @param settings
-	 *
+	 * 
 	 * @throws PacketErrorTypeException
 	 */
 	@Override
@@ -251,7 +264,8 @@ public class VCardTemp extends XMPPProcessorAbstract {
 			throws PacketErrorTypeException {
 		processNullSessionPacket(packet, repo, results, settings);
 
-		if ((session != null) && session.isAuthorized() && (packet.getType() != StanzaType.get)) {
+		if ((session != null) && session.isAuthorized()
+				&& (packet.getType() != StanzaType.get)) {
 			try {
 				Packet result = packet.copyElementOnly();
 
@@ -269,10 +283,10 @@ public class VCardTemp extends XMPPProcessorAbstract {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param session
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -282,8 +296,8 @@ public class VCardTemp extends XMPPProcessorAbstract {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -293,8 +307,8 @@ public class VCardTemp extends XMPPProcessorAbstract {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -315,14 +329,12 @@ public class VCardTemp extends XMPPProcessorAbstract {
 
 		for (Element el : elems) {
 			result.getElement().addChild(el);
-		}    // end of for (Element el: elems)
+		} // end of for (Element el: elems)
 
 		return result;
 	}
-}    // VCardTemp
+} // VCardTemp
 
+// ~ Formatted in Sun Code Convention
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+// ~ Formatted by Jindent --- http://www.jindent.com
