@@ -24,34 +24,6 @@ package tigase.server.gateways;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.conf.Configurable;
-
-import tigase.db.RepositoryFactory;
-import tigase.db.TigaseDBException;
-import tigase.db.UserExistsException;
-import tigase.db.UserRepository;
-
-import tigase.disco.ServiceEntity;
-import tigase.disco.ServiceIdentity;
-import tigase.disco.XMPPService;
-
-import tigase.server.AbstractMessageReceiver;
-import tigase.server.Packet;
-
-import tigase.util.DBUtils;
-import tigase.util.TigaseStringprepException;
-
-import tigase.xml.Element;
-import tigase.xml.XMLUtils;
-
-import tigase.xmpp.Authorization;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
-import tigase.xmpp.PacketErrorTypeException;
-import tigase.xmpp.StanzaType;
-
-//~--- JDK imports ------------------------------------------------------------
-
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -59,19 +31,36 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import tigase.conf.Configurable;
+import tigase.db.RepositoryFactory;
+import tigase.db.TigaseDBException;
+import tigase.db.UserExistsException;
+import tigase.db.UserRepository;
+import tigase.disco.ServiceEntity;
+import tigase.disco.ServiceIdentity;
+import tigase.disco.XMPPService;
+import tigase.server.AbstractMessageReceiver;
+import tigase.server.Packet;
+import tigase.util.DBUtils;
+import tigase.util.TigaseStringprepException;
+import tigase.xml.Element;
+import tigase.xml.XMLUtils;
+import tigase.xmpp.Authorization;
+import tigase.xmpp.BareJID;
+import tigase.xmpp.JID;
+import tigase.xmpp.PacketErrorTypeException;
+import tigase.xmpp.StanzaType;
+
 //~--- classes ----------------------------------------------------------------
 
 /**
- * Describe class Gateway here.
- *
- *
- * Created: Thu Nov  8 08:54:23 2007
- *
+ * Describe class Gateway here. Created: Thu Nov 8 08:54:23 2007
+ * 
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class Gateway extends AbstractMessageReceiver
-		implements Configurable, XMPPService, GatewayListener {
+public class Gateway extends AbstractMessageReceiver implements Configurable,
+		XMPPService, GatewayListener {
 	private static final String AUTHORIZED_KEY = "authorized-key";
 
 	/** Field description */
@@ -87,7 +76,8 @@ public class Gateway extends AbstractMessageReceiver
 	public static final String GW_CLASS_NAME_PROP_KEY = "gw-class-name";
 
 	/** Field description */
-	public static final String GW_CLASS_NAME_PROP_VAL = "tigase.extras.gateway.MsnConnection";
+	public static final String GW_CLASS_NAME_PROP_VAL =
+			"tigase.extras.gateway.MsnConnection";
 
 	/** Field description */
 	public static final String GW_DOMAIN_NAME_PROP_KEY = "gw-domain-name";
@@ -106,8 +96,8 @@ public class Gateway extends AbstractMessageReceiver
 	private static final String NAME_KEY = "authorized-key";
 	private static final String PRESENCE_ELNAME = "presence";
 
-//public static final String HOSTNAMES_PROP_KEY = "hostnames";
-//public String[] HOSTNAMES_PROP_VAL =  {"localhost", "hostname"};
+	// public static final String HOSTNAMES_PROP_KEY = "hostnames";
+	// public String[] HOSTNAMES_PROP_VAL = {"localhost", "hostname"};
 	private static final String PRESENCE_SHOW = "presence-show";
 	private static final String PRESENCE_TYPE = "presence-type";
 
@@ -124,11 +114,9 @@ public class Gateway extends AbstractMessageReceiver
 	private static final String password_key = "password-key";
 	private static final String username_key = "user-name-key";
 
-	//~--- fields ---------------------------------------------------------------
-
 	private String[] ADMINS_PROP_VAL = { "admin@localhost", "admin@hostname" };
 
-//private String[] hostnames = HOSTNAMES_PROP_VAL;
+	// private String[] hostnames = HOSTNAMES_PROP_VAL;
 	// private String gw_hostname = GW_DOMAIN_NAME_PROP_VAL;
 	private String gw_desc = "empty";
 	private String gw_name = "Undefined";
@@ -136,31 +124,26 @@ public class Gateway extends AbstractMessageReceiver
 	private UserRepository repository = null;
 	private ServiceEntity serviceEntity = null;
 	private boolean is_moderated = GW_MODERATED_PROP_VAL;
-	private Map<String, GatewayConnection> gw_connections = new LinkedHashMap<String,
-		GatewayConnection>();
+	private Map<String, GatewayConnection> gw_connections =
+			new LinkedHashMap<String, GatewayConnection>();
 	private String gw_class_name = GW_CLASS_NAME_PROP_VAL;
 	private String[] admins = ADMINS_PROP_VAL;
 
-	//~--- methods --------------------------------------------------------------
-
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
 	 * @param jid
-	 *
 	 * @return
 	 */
+	@Override
 	public String decodeLegacyName(String jid) {
 		return jid.split("@")[0].replace("%", "@");
 	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
 	 * @param legacyName
-	 *
 	 * @return
 	 */
 	@Override
@@ -170,23 +153,19 @@ public class Gateway extends AbstractMessageReceiver
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
 	 * @param gc
 	 * @param exc
 	 */
+	@Override
 	public void gatewayException(GatewayConnection gc, Throwable exc) {
 		log.log(Level.WARNING, "Gateway exception", exc);
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
 	 * @param params
-	 *
 	 * @return
 	 */
 	@Override
@@ -209,8 +188,8 @@ public class Gateway extends AbstractMessageReceiver
 		} else {
 			if (params.get(GEN_USER_DB_URI) != null) {
 				repo_uri = (String) params.get(GEN_USER_DB_URI);
-			}    // end of if (params.get(GEN_USER_DB_URI) != null)
-		}      // end of else
+			} // end of if (params.get(GEN_USER_DB_URI) != null)
+		} // end of else
 
 		defs.put(GW_REPO_CLASS_PROP_KEY, repo_class);
 		defs.put(GW_REPO_URL_PROP_KEY, repo_uri);
@@ -224,33 +203,31 @@ public class Gateway extends AbstractMessageReceiver
 				ADMINS_PROP_VAL = new String[1];
 				ADMINS_PROP_VAL[0] = "admin@" + getDefHostName();
 			}
-		}    // end of if (params.get(GEN_SREC_ADMINS) != null) else
+		} // end of if (params.get(GEN_SREC_ADMINS) != null) else
 
 		defs.put(ADMINS_PROP_KEY, ADMINS_PROP_VAL);
 		defs.put(GW_CLASS_NAME_PROP_KEY, GW_CLASS_NAME_PROP_VAL);
 		defs.put(GW_MODERATED_PROP_KEY, GW_MODERATED_PROP_VAL);
 		defs.put(GW_DOMAIN_NAME_PROP_KEY, GW_DOMAIN_NAME_PROP_VAL);
 
-//  if (params.get(GEN_VIRT_HOSTS) != null) {
-//    HOSTNAMES_PROP_VAL = ((String)params.get(GEN_VIRT_HOSTS)).split(",");
-//  } else {
-//    HOSTNAMES_PROP_VAL = DNSResolver.getDefHostNames();
-//  }
-//  hostnames = new String[HOSTNAMES_PROP_VAL.length];
-//  int i = 0;
-//  for (String host: HOSTNAMES_PROP_VAL) {
-//    hostnames[i++] = getName() + "." + host;
-//  }
-//  defs.put(HOSTNAMES_PROP_KEY, hostnames);
+		// if (params.get(GEN_VIRT_HOSTS) != null) {
+		// HOSTNAMES_PROP_VAL = ((String)params.get(GEN_VIRT_HOSTS)).split(",");
+		// } else {
+		// HOSTNAMES_PROP_VAL = DNSResolver.getDefHostNames();
+		// }
+		// hostnames = new String[HOSTNAMES_PROP_VAL.length];
+		// int i = 0;
+		// for (String host: HOSTNAMES_PROP_VAL) {
+		// hostnames[i++] = getName() + "." + host;
+		// }
+		// defs.put(HOSTNAMES_PROP_KEY, hostnames);
 		return defs;
 	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
 	 * @param from
-	 *
 	 * @return
 	 */
 	@Override
@@ -260,12 +237,10 @@ public class Gateway extends AbstractMessageReceiver
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
 	 * @param node
 	 * @param jid
 	 * @param from
-	 *
 	 * @return
 	 */
 	@Override
@@ -279,12 +254,10 @@ public class Gateway extends AbstractMessageReceiver
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
 	 * @param node
 	 * @param jid
 	 * @param from
-	 *
 	 * @return
 	 */
 	@Override
@@ -298,10 +271,8 @@ public class Gateway extends AbstractMessageReceiver
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
 	 * @param jid
-	 *
 	 * @return
 	 */
 	@Override
@@ -315,21 +286,20 @@ public class Gateway extends AbstractMessageReceiver
 		return false;
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
 	 * @param gc
 	 */
+	@Override
 	public void loginCompleted(GatewayConnection gc) {
 		JID[] jids = gc.getAllJids();
 
 		for (JID username : jids) {
 			try {
-				addOutPacket(Packet.packetInstance(new Element(PRESENCE_ELNAME, new String[] { "from",
-						"to" }, new String[] { getComponentId().toString(), username.toString() })));
+				addOutPacket(Packet.packetInstance(new Element(PRESENCE_ELNAME, new String[] {
+						"from", "to" }, new String[] { getComponentId().toString(),
+						username.toString() })));
 			} catch (TigaseStringprepException ex) {
 				Logger.getLogger(Gateway.class.getName()).log(Level.SEVERE, null, ex);
 			}
@@ -338,18 +308,18 @@ public class Gateway extends AbstractMessageReceiver
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
 	 * @param gc
 	 */
+	@Override
 	public void logout(GatewayConnection gc) {
 		JID[] jids = gc.getAllJids();
 
 		for (JID username : jids) {
 			try {
-				addOutPacket(Packet.packetInstance(new Element(PRESENCE_ELNAME, new String[] { "from", "to",
-						"type" }, new String[] { getComponentId().toString(), username.toString(),
-						"unavailable" })));
+				addOutPacket(Packet.packetInstance(new Element(PRESENCE_ELNAME, new String[] {
+						"from", "to", "type" }, new String[] { getComponentId().toString(),
+						username.toString(), "unavailable" })));
 			} catch (TigaseStringprepException ex) {
 				Logger.getLogger(Gateway.class.getName()).log(Level.SEVERE, null, ex);
 			}
@@ -358,9 +328,9 @@ public class Gateway extends AbstractMessageReceiver
 
 			for (RosterItem item : roster) {
 				String from = formatJID(item.getBuddyId());
-				Element pres_el = new Element(PRESENCE_ELNAME, new String[] { "to", "from", "type" },
-					new String[] { username.toString(),
-						from, "unavailable" });
+				Element pres_el =
+						new Element(PRESENCE_ELNAME, new String[] { "to", "from", "type" },
+								new String[] { username.toString(), from, "unavailable" });
 
 				try {
 					Packet presence = Packet.packetInstance(pres_el);
@@ -381,20 +351,20 @@ public class Gateway extends AbstractMessageReceiver
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
 	 * @param packet
 	 */
+	@Override
 	public void packetReceived(Packet packet) {
 		addOutPacket(packet);
 	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
 	 * @param packet
 	 */
+	@Override
 	public void processPacket(final Packet packet) {
 		try {
 			if (packet.getStanzaTo() == null) {
@@ -442,28 +412,25 @@ public class Gateway extends AbstractMessageReceiver
 		}
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
 	 * @param props
 	 */
 	@Override
 	public void setProperties(final Map<String, Object> props) {
 		super.setProperties(props);
 
-//  hostnames = (String[])props.get(HOSTNAMES_PROP_KEY);
-//  if (hostnames == null || hostnames.length == 0) {
-//    log.warning("Hostnames definition is empty, setting 'localhost'");
-//    hostnames = new String[] {getName() + ".localhost"};
-//  } // end of if (hostnames == null || hostnames.length == 0)
-//  Arrays.sort(hostnames);
-//  clearRoutings();
-//  for (String host: hostnames) {
-//    addRouting(host);
-//  } // end of for ()
+		// hostnames = (String[])props.get(HOSTNAMES_PROP_KEY);
+		// if (hostnames == null || hostnames.length == 0) {
+		// log.warning("Hostnames definition is empty, setting 'localhost'");
+		// hostnames = new String[] {getName() + ".localhost"};
+		// } // end of if (hostnames == null || hostnames.length == 0)
+		// Arrays.sort(hostnames);
+		// clearRoutings();
+		// for (String host: hostnames) {
+		// addRouting(host);
+		// } // end of for ()
 		gw_class_name = (String) props.get(GW_CLASS_NAME_PROP_KEY);
 
 		GatewayConnection gc = gwInstance();
@@ -491,29 +458,27 @@ public class Gateway extends AbstractMessageReceiver
 			String cls_name = (String) props.get(GW_REPO_CLASS_PROP_KEY);
 			String res_uri = (String) props.get(GW_REPO_URL_PROP_KEY);
 
-//    if (!res_uri.contains("autoCreateUser=true")) {
-//      res_uri += "&autoCreateUser=true";
-//    } // end of if (!res_uri.contains("autoCreateUser=true"))
+			// if (!res_uri.contains("autoCreateUser=true")) {
+			// res_uri += "&autoCreateUser=true";
+			// } // end of if (!res_uri.contains("autoCreateUser=true"))
 			repository = RepositoryFactory.getUserRepository(cls_name, res_uri, null);
 
 			try {
 				repository.addUser(getComponentId().getBareJID());
-			} catch (UserExistsException e) {    /* Ignore, this is correct and expected */
+			} catch (UserExistsException e) { /* Ignore, this is correct and expected */
 			}
 		} catch (Exception e) {
 			log.log(Level.SEVERE, "Can't initialize repository", e);
-		}                                      // end of try-catch
+		} // end of try-catch
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
 	 * @param gc
 	 * @param item
 	 */
+	@Override
 	public void updateStatus(GatewayConnection gc, RosterItem item) {
 		JID[] jids = gc.getAllJids();
 		JID id = jids[0];
@@ -525,23 +490,25 @@ public class Gateway extends AbstractMessageReceiver
 				repository.setData(getComponentId().getBareJID(), roster_node, PRESENCE_TYPE,
 						item.getStatus().getType());
 			} else {
-				repository.setData(getComponentId().getBareJID(), roster_node, PRESENCE_TYPE, "null");
+				repository.setData(getComponentId().getBareJID(), roster_node, PRESENCE_TYPE,
+						"null");
 			}
 
 			if (item.getStatus().getShow() != null) {
 				repository.setData(getComponentId().getBareJID(), roster_node, PRESENCE_SHOW,
 						item.getStatus().getShow());
 			} else {
-				repository.setData(getComponentId().getBareJID(), roster_node, PRESENCE_SHOW, "null");
+				repository.setData(getComponentId().getBareJID(), roster_node, PRESENCE_SHOW,
+						"null");
 			}
 		} catch (TigaseDBException e) {
 			log.log(Level.WARNING, "Problem updating repository data", e);
 		}
 
 		for (JID username : jids) {
-			Element pres_el = new Element(PRESENCE_ELNAME, new String[] { "to", "from" },
-				new String[] { username.toString(),
-					from });
+			Element pres_el =
+					new Element(PRESENCE_ELNAME, new String[] { "to", "from" }, new String[] {
+							username.toString(), from });
 
 			if (item.getStatus().getType() != null) {
 				pres_el.setAttribute("type", item.getStatus().getType());
@@ -569,10 +536,10 @@ public class Gateway extends AbstractMessageReceiver
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
 	 * @param gc
 	 */
+	@Override
 	public void userRoster(GatewayConnection gc) {
 		JID[] jids = gc.getAllJids();
 		JID id = jids[0];
@@ -586,7 +553,9 @@ public class Gateway extends AbstractMessageReceiver
 			String authorized = "false";
 
 			try {
-				authorized = repository.getData(getComponentId().getBareJID(), roster_node, AUTHORIZED_KEY);
+				authorized =
+						repository
+								.getData(getComponentId().getBareJID(), roster_node, AUTHORIZED_KEY);
 
 				if (authorized == null) {
 
@@ -594,21 +563,24 @@ public class Gateway extends AbstractMessageReceiver
 					authorized = "false";
 					repository.setData(getComponentId().getBareJID(), roster_node, AUTHORIZED_KEY,
 							authorized);
-					repository.setData(getComponentId().getBareJID(), roster_node, NAME_KEY, item.getName());
+					repository.setData(getComponentId().getBareJID(), roster_node, NAME_KEY,
+							item.getName());
 				}
 
 				if (item.getStatus().getType() != null) {
 					repository.setData(getComponentId().getBareJID(), roster_node, PRESENCE_TYPE,
 							item.getStatus().getType());
 				} else {
-					repository.setData(getComponentId().getBareJID(), roster_node, PRESENCE_TYPE, "null");
+					repository.setData(getComponentId().getBareJID(), roster_node, PRESENCE_TYPE,
+							"null");
 				}
 
 				if (item.getStatus().getShow() != null) {
 					repository.setData(getComponentId().getBareJID(), roster_node, PRESENCE_SHOW,
 							item.getStatus().getShow());
 				} else {
-					repository.setData(getComponentId().getBareJID(), roster_node, PRESENCE_SHOW, "null");
+					repository.setData(getComponentId().getBareJID(), roster_node, PRESENCE_SHOW,
+							"null");
 				}
 			} catch (TigaseDBException e) {
 				log.log(Level.WARNING, "Problem updating repository data", e);
@@ -616,8 +588,10 @@ public class Gateway extends AbstractMessageReceiver
 
 			for (JID username : jids) {
 				try {
-					Packet presence = Packet.packetInstance(new Element(PRESENCE_ELNAME, new String[] { "to",
-							"from", "type" }, new String[] { username.toString(), from, "subscribe" }));
+					Packet presence =
+							Packet.packetInstance(new Element(PRESENCE_ELNAME, new String[] { "to",
+									"from", "type" },
+									new String[] { username.toString(), from, "subscribe" }));
 
 					if (log.isLoggable(Level.FINEST)) {
 						log.finest("Sending out presence: " + presence);
@@ -648,12 +622,13 @@ public class Gateway extends AbstractMessageReceiver
 		JID id = packet.getStanzaFrom().copyWithoutResource();
 		GatewayConnection conn = gw_connections.get(id.toString());
 
-		if ((conn != null) ||!create) {
+		if ((conn != null) || !create) {
 			if (conn != null) {
 				conn.addJid(packet.getStanzaFrom());
-				addOutPacket(Packet.packetInstance(new Element(PRESENCE_ELNAME, new String[] { "from",
-						"to" }, new String[] { getComponentId().toString(),
-						packet.getStanzaFrom().toString() }), getComponentId(), packet.getStanzaFrom()));
+				addOutPacket(Packet.packetInstance(new Element(PRESENCE_ELNAME, new String[] {
+						"from", "to" }, new String[] { getComponentId().toString(),
+						packet.getStanzaFrom().toString() }), getComponentId(),
+						packet.getStanzaFrom()));
 				updateRosterPresence(conn.getRoster(), packet.getStanzaFrom());
 			}
 
@@ -662,8 +637,9 @@ public class Gateway extends AbstractMessageReceiver
 
 		try {
 			if (is_moderated) {
-				String moderated = repository.getData(getComponentId().getBareJID(), id.toString(),
-					moderated_key);
+				String moderated =
+						repository.getData(getComponentId().getBareJID(), id.toString(),
+								moderated_key);
 
 				if ((moderated == null) || moderated.equals(moderated_true)) {
 					addOutPacket(Authorization.NOT_ALLOWED.getResponseMessage(packet,
@@ -673,10 +649,10 @@ public class Gateway extends AbstractMessageReceiver
 				}
 			}
 
-			String username = repository.getData(getComponentId().getBareJID(), id.toString(),
-				username_key);
-			String password = repository.getData(getComponentId().getBareJID(), id.toString(),
-				password_key);
+			String username =
+					repository.getData(getComponentId().getBareJID(), id.toString(), username_key);
+			String password =
+					repository.getData(getComponentId().getBareJID(), id.toString(), password_key);
 
 			if ((username != null) && (password != null)) {
 				conn = gwInstance();
@@ -701,11 +677,12 @@ public class Gateway extends AbstractMessageReceiver
 	@SuppressWarnings("unchecked")
 	private GatewayConnection gwInstance() {
 		try {
-			Class<GatewayConnection> cls = (Class<GatewayConnection>) Class.forName(gw_class_name);
+			Class<GatewayConnection> cls =
+					(Class<GatewayConnection>) Class.forName(gw_class_name);
 			GatewayConnection gc = cls.newInstance();
 
 			return gc;
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.log(Level.WARNING, "Problem instantating gateway connection object", e);
 		}
 
@@ -738,8 +715,8 @@ public class Gateway extends AbstractMessageReceiver
 		}
 	}
 
-	private void processLocalPacket(Packet packet)
-			throws PacketErrorTypeException, TigaseStringprepException {
+	private void processLocalPacket(Packet packet) throws PacketErrorTypeException,
+			TigaseStringprepException {
 		if (packet.isXMLNS("/iq/query", "jabber:iq:register")) {
 			processRegister(packet);
 		}
@@ -751,9 +728,9 @@ public class Gateway extends AbstractMessageReceiver
 
 	private void processPresence(Packet packet) throws TigaseStringprepException {
 		if (packet.getStanzaTo().toString().startsWith(getName() + ".")
-				&&!packet.getStanzaTo().toString().contains("@")) {
+				&& !packet.getStanzaTo().toString().contains("@")) {
 
-//    if (Arrays.binarySearch(hostnames, packet.getElemTo()) >= 0) {
+			// if (Arrays.binarySearch(hostnames, packet.getElemTo()) >= 0) {
 			if ((packet.getType() == null) || (packet.getType() == StanzaType.available)) {
 
 				// Open new connection if it does not exist
@@ -793,29 +770,33 @@ public class Gateway extends AbstractMessageReceiver
 				try {
 					repository.setData(getComponentId().getBareJID(), roster_node, AUTHORIZED_KEY,
 							authorized);
-					pres_type = repository.getData(getComponentId().getBareJID(), roster_node, PRESENCE_TYPE);
-					pres_show = repository.getData(getComponentId().getBareJID(), roster_node, PRESENCE_SHOW);
+					pres_type =
+							repository.getData(getComponentId().getBareJID(), roster_node,
+									PRESENCE_TYPE);
+					pres_show =
+							repository.getData(getComponentId().getBareJID(), roster_node,
+									PRESENCE_SHOW);
 					log.fine("Added buddy do repository for: " + buddy);
 				} catch (TigaseDBException e) {
 					log.log(Level.WARNING, "Problem updating repository data", e);
 				}
 
-				Element pres_el = new Element(PRESENCE_ELNAME, new String[] { "to", "from" },
-					new String[] { packet.getStanzaFrom().toString(),
-						packet.getStanzaTo().toString() });
+				Element pres_el =
+						new Element(PRESENCE_ELNAME, new String[] { "to", "from" }, new String[] {
+								packet.getStanzaFrom().toString(), packet.getStanzaTo().toString() });
 
-				if ( !pres_type.equals("null")) {
+				if (!pres_type.equals("null")) {
 					pres_el.setAttribute("type", pres_type);
 				}
 
-				if ( !pres_show.equals("null")) {
+				if (!pres_show.equals("null")) {
 					Element show = new Element("show", pres_show);
 
 					pres_el.addChild(show);
 				}
 
-				Packet presence = Packet.packetInstance(pres_el, packet.getStanzaTo(),
-					packet.getStanzaFrom());
+				Packet presence =
+						Packet.packetInstance(pres_el, packet.getStanzaTo(), packet.getStanzaFrom());
 
 				if (log.isLoggable(Level.FINEST)) {
 					log.finest("Sending out presence: " + presence.toString());
@@ -882,83 +863,80 @@ public class Gateway extends AbstractMessageReceiver
 						conn.removeBuddy(buddy);
 						log.fine("Removed from roster buddy: " + buddy);
 					} catch (GatewayException e) {
-						log.log(Level.WARNING, "Problem with gateway when removing buddy: " + buddy, e);
+						log.log(Level.WARNING, "Problem with gateway when removing buddy: " + buddy,
+								e);
 					}
 				}
 			}
 		}
 	}
 
-	private void processRegister(Packet packet)
-			throws PacketErrorTypeException, TigaseStringprepException {
+	private void processRegister(Packet packet) throws PacketErrorTypeException,
+			TigaseStringprepException {
 		if (packet.getType() != null) {
 			switch (packet.getType()) {
-				case get :
-					addOutPacket(packet.okResult("<instructions>" + "Please enter your "
-							+ gw_type.toUpperCase() + " account details" + " into the fields below."
-								+ "</instructions>" + "<username/>" + "<password/>", 1));
+			case get:
+				addOutPacket(packet.okResult(
+						"<instructions>" + "Please enter your " + gw_type.toUpperCase()
+								+ " account details" + " into the fields below." + "</instructions>"
+								+ "<username/>" + "<password/>", 1));
 
-					break;
+				break;
 
-				case set :
-					JID jid = packet.getStanzaFrom().copyWithoutResource();
-					String new_username = packet.getElemCData("/iq/query/username");
-					String new_password = packet.getElemCData("/iq/query/password");
+			case set:
+				JID jid = packet.getStanzaFrom().copyWithoutResource();
+				String new_username = packet.getElemCData("/iq/query/username");
+				String new_password = packet.getElemCData("/iq/query/password");
 
-					try {
-						repository.setData(getComponentId().getBareJID(), jid.toString(), username_key,
-								new_username);
-						repository.setData(getComponentId().getBareJID(), jid.toString(), password_key,
-								new_password);
-						addOutPacket(packet.okResult((String) null, 0));
-						addOutPacket(Packet.packetInstance(new Element(PRESENCE_ELNAME, new String[] { "to",
-								"from", "type" }, new String[] { jid.toString(), packet.getStanzaTo().toString(),
-								"subscribe" }), packet.getStanzaTo(), jid));
+				try {
+					repository.setData(getComponentId().getBareJID(), jid.toString(), username_key,
+							new_username);
+					repository.setData(getComponentId().getBareJID(), jid.toString(), password_key,
+							new_password);
+					addOutPacket(packet.okResult((String) null, 0));
+					addOutPacket(Packet.packetInstance(new Element(PRESENCE_ELNAME, new String[] {
+							"to", "from", "type" }, new String[] { jid.toString(),
+							packet.getStanzaTo().toString(), "subscribe" }), packet.getStanzaTo(), jid));
 
-						if (is_moderated &&!isAdmin(jid)) {
-							repository.setData(getComponentId().getBareJID(), jid.toString(), moderated_key,
-									moderated_true);
-							addOutPacket(Packet.packetInstance(new Element("message",
-									new Element[] {
-										new Element("body",
-											"Your subscription to the gateway needs administrator approval."
+					if (is_moderated && !isAdmin(jid)) {
+						repository.setData(getComponentId().getBareJID(), jid.toString(),
+								moderated_key, moderated_true);
+						addOutPacket(Packet.packetInstance(
+								new Element("message", new Element[] { new Element("body",
+										"Your subscription to the gateway needs administrator approval."
 												+ " You will be notified when your request has been processed"
-													+ " and you will be able to use the gateway since then.") }, new String[] {
-														"to",
-									"from", "type", "id" }, new String[] { jid.toString(),
-									packet.getStanzaTo().toString(), "chat", "gw-ap-1" }), packet.getStanzaTo(),
-									jid));
-							sendToAdmins(new Element("message",
-									new Element[] {
-										new Element("body",
-											"Gateway subscription request is awaiting for: " + jid) }, new String[] {
-												"from",
-									"type", "id" }, new String[] { packet.getStanzaTo().toString(), "chat",
-									"gw-ap-1" }));
-						} else {
-							repository.setData(getComponentId().getBareJID(), jid.toString(), moderated_key,
-									moderated_false);
-						}
-					} catch (tigase.db.UserNotFoundException e) {
-						log.warning("This is most likely configuration error, please make"
-								+ " sure you have set '&autoCreateUser=true' property in your"
-									+ " database connection string.");
-						addOutPacket(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet,
-								"Please notify administrator with the message below:\n"
-									+ "This is most likely configuration error, please make"
-										+ " sure you have set '&autoCreateUser=true' property in your"
-											+ " database connection string.", true));
-					} catch (TigaseDBException e) {
-						log.log(Level.WARNING, "Database access error: ", e);
-						addOutPacket(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet,
-								"Please notify administrator with the message below:\n" + "Database access error: "
-									+ e, true));
+												+ " and you will be able to use the gateway since then.") },
+										new String[] { "to", "from", "type", "id" }, new String[] {
+												jid.toString(), packet.getStanzaTo().toString(), "chat",
+												"gw-ap-1" }), packet.getStanzaTo(), jid));
+						sendToAdmins(new Element("message", new Element[] { new Element("body",
+								"Gateway subscription request is awaiting for: " + jid) }, new String[] {
+								"from", "type", "id" }, new String[] { packet.getStanzaTo().toString(),
+								"chat", "gw-ap-1" }));
+					} else {
+						repository.setData(getComponentId().getBareJID(), jid.toString(),
+								moderated_key, moderated_false);
 					}
+				} catch (tigase.db.UserNotFoundException e) {
+					log.warning("This is most likely configuration error, please make"
+							+ " sure you have set '&autoCreateUser=true' property in your"
+							+ " database connection string.");
+					addOutPacket(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet,
+							"Please notify administrator with the message below:\n"
+									+ "This is most likely configuration error, please make"
+									+ " sure you have set '&autoCreateUser=true' property in your"
+									+ " database connection string.", true));
+				} catch (TigaseDBException e) {
+					log.log(Level.WARNING, "Database access error: ", e);
+					addOutPacket(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet,
+							"Please notify administrator with the message below:\n"
+									+ "Database access error: " + e, true));
+				}
 
-					break;
+				break;
 
-				default :
-					break;
+			default:
+				break;
 			}
 		}
 	}
@@ -1002,9 +980,9 @@ public class Gateway extends AbstractMessageReceiver
 			String from = formatJID(item.getBuddyId());
 
 			for (JID username : to) {
-				Element pres_el = new Element(PRESENCE_ELNAME, new String[] { "to", "from" },
-					new String[] { username.toString(),
-						from });
+				Element pres_el =
+						new Element(PRESENCE_ELNAME, new String[] { "to", "from" }, new String[] {
+								username.toString(), from });
 
 				if (item.getStatus().getType() != null) {
 					pres_el.setAttribute("type", item.getStatus().getType());
@@ -1028,8 +1006,6 @@ public class Gateway extends AbstractMessageReceiver
 	}
 }
 
+// ~ Formatted in Sun Code Convention
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+// ~ Formatted by Jindent --- http://www.jindent.com
