@@ -69,16 +69,16 @@ import javax.script.Bindings;
 
 /**
  * Describe class ConnectionManager here.
- *
- *
+ * 
+ * 
  * Created: Sun Jan 22 22:52:58 2006
- *
+ * 
  * @param <IO>
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public abstract class ConnectionManager<IO extends XMPPIOService<?>>
-		extends AbstractMessageReceiver implements XMPPIOServiceListener<IO> {
+public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
+		AbstractMessageReceiver implements XMPPIOServiceListener<IO> {
 	private static final Logger log = Logger.getLogger(ConnectionManager.class.getName());
 
 	/** Field description */
@@ -101,32 +101,49 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	protected static final String TLS_REQUIRED_PROP_KEY = TLS_PROP_KEY + "required";
 	protected static final boolean TLS_REQUIRED_PROP_VAL = false;
 
-//protected static final String TLS_KEYS_STORE_PROP_KEY = TLS_PROP_KEY + JKS_KEYSTORE_FILE_KEY;
-//protected static final String TLS_KEYS_STORE_PROP_VAL = JKS_KEYSTORE_FILE_VAL;
-//protected static final String TLS_DEF_CERT_PROP_KEY = TLS_PROP_KEY + DEFAULT_DOMAIN_CERT_KEY;
-//protected static final String TLS_DEF_CERT_PROP_VAL = DEFAULT_DOMAIN_CERT_VAL;
-//protected static final String TLS_KEYS_STORE_PASSWD_PROP_KEY = TLS_PROP_KEY
-//  + JKS_KEYSTORE_PWD_KEY;
-//protected static final String TLS_KEYS_STORE_PASSWD_PROP_VAL = JKS_KEYSTORE_PWD_VAL;
-//protected static final String TLS_TRUSTS_STORE_PASSWD_PROP_KEY = TLS_PROP_KEY
-//  + TRUSTSTORE_PWD_KEY;
-//protected static final String TLS_TRUSTS_STORE_PASSWD_PROP_VAL = TRUSTSTORE_PWD_VAL;
-//protected static final String TLS_TRUSTS_STORE_PROP_KEY = TLS_PROP_KEY + TRUSTSTORE_FILE_KEY;
-//protected static final String TLS_TRUSTS_STORE_PROP_VAL = TRUSTSTORE_FILE_VAL;
-//protected static final String TLS_CONTAINER_CLASS_PROP_KEY = TLS_PROP_KEY
-//  + SSL_CONTAINER_CLASS_KEY;
-//protected static final String TLS_CONTAINER_CLASS_PROP_VAL = SSL_CONTAINER_CLASS_VAL;
-//protected static final String TLS_SERVER_CERTS_DIR_PROP_KEY = TLS_PROP_KEY + SERVER_CERTS_DIR_KEY;
-//protected static final String TLS_SERVER_CERTS_DIR_PROP_VAL = SERVER_CERTS_DIR_VAL;
-//protected static final String TLS_TRUSTED_CERTS_DIR_PROP_KEY = TLS_PROP_KEY
-//  + TRUSTED_CERTS_DIR_KEY;
-//protected static final String TLS_TRUSTED_CERTS_DIR_PROP_VAL = TRUSTED_CERTS_DIR_VAL;
-//protected static final String TLS_ALLOW_SELF_SIGNED_CERTS_PROP_KEY = TLS_PROP_KEY
-//  + ALLOW_SELF_SIGNED_CERTS_KEY;
-//protected static final String TLS_ALLOW_SELF_SIGNED_CERTS_PROP_VAL = ALLOW_SELF_SIGNED_CERTS_VAL;
-//protected static final String TLS_ALLOW_INVALID_CERTS_PROP_KEY = TLS_PROP_KEY
-//  + ALLOW_INVALID_CERTS_KEY;
-//protected static final String TLS_ALLOW_INVALID_CERTS_PROP_VAL = ALLOW_INVALID_CERTS_VAL;
+	// protected static final String TLS_KEYS_STORE_PROP_KEY = TLS_PROP_KEY +
+	// JKS_KEYSTORE_FILE_KEY;
+	// protected static final String TLS_KEYS_STORE_PROP_VAL =
+	// JKS_KEYSTORE_FILE_VAL;
+	// protected static final String TLS_DEF_CERT_PROP_KEY = TLS_PROP_KEY +
+	// DEFAULT_DOMAIN_CERT_KEY;
+	// protected static final String TLS_DEF_CERT_PROP_VAL =
+	// DEFAULT_DOMAIN_CERT_VAL;
+	// protected static final String TLS_KEYS_STORE_PASSWD_PROP_KEY = TLS_PROP_KEY
+	// + JKS_KEYSTORE_PWD_KEY;
+	// protected static final String TLS_KEYS_STORE_PASSWD_PROP_VAL =
+	// JKS_KEYSTORE_PWD_VAL;
+	// protected static final String TLS_TRUSTS_STORE_PASSWD_PROP_KEY =
+	// TLS_PROP_KEY
+	// + TRUSTSTORE_PWD_KEY;
+	// protected static final String TLS_TRUSTS_STORE_PASSWD_PROP_VAL =
+	// TRUSTSTORE_PWD_VAL;
+	// protected static final String TLS_TRUSTS_STORE_PROP_KEY = TLS_PROP_KEY +
+	// TRUSTSTORE_FILE_KEY;
+	// protected static final String TLS_TRUSTS_STORE_PROP_VAL =
+	// TRUSTSTORE_FILE_VAL;
+	// protected static final String TLS_CONTAINER_CLASS_PROP_KEY = TLS_PROP_KEY
+	// + SSL_CONTAINER_CLASS_KEY;
+	// protected static final String TLS_CONTAINER_CLASS_PROP_VAL =
+	// SSL_CONTAINER_CLASS_VAL;
+	// protected static final String TLS_SERVER_CERTS_DIR_PROP_KEY = TLS_PROP_KEY
+	// + SERVER_CERTS_DIR_KEY;
+	// protected static final String TLS_SERVER_CERTS_DIR_PROP_VAL =
+	// SERVER_CERTS_DIR_VAL;
+	// protected static final String TLS_TRUSTED_CERTS_DIR_PROP_KEY = TLS_PROP_KEY
+	// + TRUSTED_CERTS_DIR_KEY;
+	// protected static final String TLS_TRUSTED_CERTS_DIR_PROP_VAL =
+	// TRUSTED_CERTS_DIR_VAL;
+	// protected static final String TLS_ALLOW_SELF_SIGNED_CERTS_PROP_KEY =
+	// TLS_PROP_KEY
+	// + ALLOW_SELF_SIGNED_CERTS_KEY;
+	// protected static final String TLS_ALLOW_SELF_SIGNED_CERTS_PROP_VAL =
+	// ALLOW_SELF_SIGNED_CERTS_VAL;
+	// protected static final String TLS_ALLOW_INVALID_CERTS_PROP_KEY =
+	// TLS_PROP_KEY
+	// + ALLOW_INVALID_CERTS_KEY;
+	// protected static final String TLS_ALLOW_INVALID_CERTS_PROP_VAL =
+	// ALLOW_INVALID_CERTS_VAL;
 	protected static final String MAX_RECONNECTS_PROP_KEY = "max-reconnects";
 	protected static final String NET_BUFFER_PROP_KEY = "net-buffer";
 	protected static final int NET_BUFFER_ST_PROP_VAL = 2 * 1024;
@@ -136,7 +153,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	public static final String PORT_LOCAL_HOST_PROP_KEY = "local-host";
 	private static ConnectionOpenThread connectThread = ConnectionOpenThread.getInstance();
 
-	//~--- fields ---------------------------------------------------------------
+	// ~--- fields ---------------------------------------------------------------
 
 	// private static SocketThread readThread = SocketThread.getInstance();
 
@@ -153,48 +170,49 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	private long watchdogRuns = 0;
 	private long watchdogStopped = 0;
 	private long watchdogTests = 0;
-	private LinkedList<Map<String, Object>> waitingTasks = new LinkedList<Map<String, Object>>();
+	private LinkedList<Map<String, Object>> waitingTasks =
+			new LinkedList<Map<String, Object>>();
 	private ConcurrentHashMap<String, IO> services = new ConcurrentHashMap<String, IO>();
-	private Set<ConnectionListenerImpl> pending_open =
-		Collections.synchronizedSet(new HashSet<ConnectionListenerImpl>());;
+	private Set<ConnectionListenerImpl> pending_open = Collections
+			.synchronizedSet(new HashSet<ConnectionListenerImpl>());;
 	protected int net_buffer = NET_BUFFER_ST_PROP_VAL;
 	private IOServiceStatisticsGetter ioStatsGetter = new IOServiceStatisticsGetter();
 
-//protected long startDelay = 5 * SECOND;
+	// protected long startDelay = 5 * SECOND;
 	private boolean initializationCompleted = false;
 	protected long connectionDelay = 2 * SECOND;
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param serv
-	 *
+	 * 
 	 * @return
 	 */
 	public abstract Queue<Packet> processSocketData(IO serv);
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param port_props
 	 */
 	public abstract void reconnectionFailed(Map<String, Object> port_props);
 
-	//~--- get methods ----------------------------------------------------------
+	// ~--- get methods ----------------------------------------------------------
 
 	protected abstract long getMaxInactiveTime();
 
 	protected abstract IO getXMPPIOServiceInstance();
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
+	 * 
 	 */
 	@Override
 	public synchronized void everyMinute() {
@@ -202,47 +220,56 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		doForAllServices(ioStatsGetter);
 	}
 
-	//~--- get methods ----------------------------------------------------------
+	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param params
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
-		log.log(Level.CONFIG, "{0} defaults: {1}", new Object[] { getName(), params.toString() });
+		log.log(Level.CONFIG, "{0} defaults: {1}",
+				new Object[] { getName(), params.toString() });
 
 		Map<String, Object> props = super.getDefaults(params);
 
 		props.put(TLS_USE_PROP_KEY, TLS_USE_PROP_VAL);
 
-//  props.put(TLS_DEF_CERT_PROP_KEY, TLS_DEF_CERT_PROP_VAL);
-//  props.put(TLS_KEYS_STORE_PROP_KEY, TLS_KEYS_STORE_PROP_VAL);
-//  props.put(TLS_KEYS_STORE_PASSWD_PROP_KEY, TLS_KEYS_STORE_PASSWD_PROP_VAL);
-//  props.put(TLS_TRUSTS_STORE_PROP_KEY, TLS_TRUSTS_STORE_PROP_VAL);
-//  props.put(TLS_TRUSTS_STORE_PASSWD_PROP_KEY, TLS_TRUSTS_STORE_PASSWD_PROP_VAL);
-//  props.put(TLS_SERVER_CERTS_DIR_PROP_KEY, TLS_SERVER_CERTS_DIR_PROP_VAL);
-//  props.put(TLS_TRUSTED_CERTS_DIR_PROP_KEY, TLS_TRUSTED_CERTS_DIR_PROP_VAL);
-//  props.put(TLS_ALLOW_SELF_SIGNED_CERTS_PROP_KEY, TLS_ALLOW_SELF_SIGNED_CERTS_PROP_VAL);
-//  props.put(TLS_ALLOW_INVALID_CERTS_PROP_KEY, TLS_ALLOW_INVALID_CERTS_PROP_VAL);
-//
-//  if (params.get("--" + SSL_CONTAINER_CLASS_KEY) != null) {
-//    props.put(TLS_CONTAINER_CLASS_PROP_KEY, (String) params.get("--" + SSL_CONTAINER_CLASS_KEY));
-//  } else {
-//    props.put(TLS_CONTAINER_CLASS_PROP_KEY, TLS_CONTAINER_CLASS_PROP_VAL);
-//  }
+		// props.put(TLS_DEF_CERT_PROP_KEY, TLS_DEF_CERT_PROP_VAL);
+		// props.put(TLS_KEYS_STORE_PROP_KEY, TLS_KEYS_STORE_PROP_VAL);
+		// props.put(TLS_KEYS_STORE_PASSWD_PROP_KEY,
+		// TLS_KEYS_STORE_PASSWD_PROP_VAL);
+		// props.put(TLS_TRUSTS_STORE_PROP_KEY, TLS_TRUSTS_STORE_PROP_VAL);
+		// props.put(TLS_TRUSTS_STORE_PASSWD_PROP_KEY,
+		// TLS_TRUSTS_STORE_PASSWD_PROP_VAL);
+		// props.put(TLS_SERVER_CERTS_DIR_PROP_KEY, TLS_SERVER_CERTS_DIR_PROP_VAL);
+		// props.put(TLS_TRUSTED_CERTS_DIR_PROP_KEY,
+		// TLS_TRUSTED_CERTS_DIR_PROP_VAL);
+		// props.put(TLS_ALLOW_SELF_SIGNED_CERTS_PROP_KEY,
+		// TLS_ALLOW_SELF_SIGNED_CERTS_PROP_VAL);
+		// props.put(TLS_ALLOW_INVALID_CERTS_PROP_KEY,
+		// TLS_ALLOW_INVALID_CERTS_PROP_VAL);
+		//
+		// if (params.get("--" + SSL_CONTAINER_CLASS_KEY) != null) {
+		// props.put(TLS_CONTAINER_CLASS_PROP_KEY, (String) params.get("--" +
+		// SSL_CONTAINER_CLASS_KEY));
+		// } else {
+		// props.put(TLS_CONTAINER_CLASS_PROP_KEY, TLS_CONTAINER_CLASS_PROP_VAL);
+		// }
 		int buffSize = NET_BUFFER_ST_PROP_VAL;
 
 		if (isHighThroughput()) {
-			buffSize = DataTypes.parseSizeInt((String) params.get(NET_BUFFER_HT_PROP_KEY),
-					NET_BUFFER_HT_PROP_VAL);
+			buffSize =
+					DataTypes.parseSizeInt((String) params.get(NET_BUFFER_HT_PROP_KEY),
+							NET_BUFFER_HT_PROP_VAL);
 		} else {
-			buffSize = DataTypes.parseSizeInt((String) params.get(NET_BUFFER_ST_PROP_KEY),
-					NET_BUFFER_ST_PROP_VAL);
+			buffSize =
+					DataTypes.parseSizeInt((String) params.get(NET_BUFFER_ST_PROP_KEY),
+							NET_BUFFER_ST_PROP_VAL);
 		}
 
 		props.put(NET_BUFFER_PROP_KEY, buffSize);
@@ -273,7 +300,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 			for (int port : ports) {
 				putDefPortParams(props, port, SocketType.plain);
-			}        // end of for (int i = 0; i < idx; i++)
+			} // end of for (int i = 0; i < idx; i++)
 
 			props.put(PORTS_PROP_KEY, ports);
 		} else {
@@ -281,17 +308,17 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 			if (plains != null) {
 				ports_size += plains.length;
-			}        // end of if (plains != null)
+			} // end of if (plains != null)
 
 			int[] ssls = getDefSSLPorts();
 
 			if (ssls != null) {
 				ports_size += ssls.length;
-			}        // end of if (ssls != null)
+			} // end of if (ssls != null)
 
 			if (ports_size > 0) {
 				ports = new int[ports_size];
-			}        // end of if (ports_size > 0)
+			} // end of if (ports_size > 0)
 
 			if (ports != null) {
 				int idx = 0;
@@ -302,18 +329,18 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 					for (int i = 0; i < idx; i++) {
 						ports[i] = plains[i];
 						putDefPortParams(props, ports[i], SocketType.plain);
-					}    // end of for (int i = 0; i < idx; i++)
-				}      // end of if (plains != null)
+					} // end of for (int i = 0; i < idx; i++)
+				} // end of if (plains != null)
 
 				if (ssls != null) {
 					for (int i = idx; i < idx + ssls.length; i++) {
 						ports[i] = ssls[i - idx];
 						putDefPortParams(props, ports[i], SocketType.ssl);
-					}    // end of for (int i = 0; i < idx + ssls.length; i++)
-				}      // end of if (ssls != null)
+					} // end of for (int i = 0; i < idx + ssls.length; i++)
+				} // end of if (ssls != null)
 
 				props.put(PORTS_PROP_KEY, ports);
-			}        // end of if (ports != null)
+			} // end of if (ports != null)
 		}
 
 		return props;
@@ -321,7 +348,9 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 	/**
 	 * Generates the component statistics.
-	 * @param list is a collection to put the component statistics in.
+	 * 
+	 * @param list
+	 *          is a collection to put the component statistics in.
 	 */
 	@Override
 	public void getStatistics(StatisticsList list) {
@@ -345,24 +374,25 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		list.add(getName(), "Watchdog tests", watchdogTests, Level.FINE);
 		list.add(getName(), "Watchdog stopped", watchdogStopped, Level.FINE);
 
-//  StringBuilder sb = new StringBuilder("All connected: ");
-//  for (IOService serv: services.values()) {
-//    sb.append("\nService ID: " + getUniqueId(serv)
-//      + ", local-hostname: " + serv.getSessionData().get("local-hostname")
-//      + ", remote-hostname: " + serv.getSessionData().get("remote-hostname")
-//      + ", is-connected: " + serv.isConnected()
-//      + ", connection-type: " + serv.connectionType());
-//  }
-//  log.finest(sb.toString());
+		// StringBuilder sb = new StringBuilder("All connected: ");
+		// for (IOService serv: services.values()) {
+		// sb.append("\nService ID: " + getUniqueId(serv)
+		// + ", local-hostname: " + serv.getSessionData().get("local-hostname")
+		// + ", remote-hostname: " + serv.getSessionData().get("remote-hostname")
+		// + ", is-connected: " + serv.isConnected()
+		// + ", connection-type: " + serv.connectionType());
+		// }
+		// log.finest(sb.toString());
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * This method can be overwritten in extending classes to get a different
 	 * packets distribution to different threads. For PubSub, probably better
-	 * packets distribution to different threads would be based on the
-	 * sender address rather then destination address.
+	 * packets distribution to different threads would be based on the sender
+	 * address rather then destination address.
+	 * 
 	 * @param packet
 	 * @return
 	 */
@@ -381,8 +411,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param binds
 	 */
 	@Override
@@ -393,10 +423,11 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 	/**
 	 * Method description
-	 *
+	 * 
 	 */
 	@Override
 	public void initializationCompleted() {
+		super.initializationCompleted();
 		initializationCompleted = true;
 
 		for (Map<String, Object> params : waitingTasks) {
@@ -407,28 +438,28 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	}
 
 	// Implementation of tigase.net.PacketListener
-///**
-// * Describe <code>packetsReady</code> method here.
-// *
-// * @param s an <code>IOService</code> value
-// * @throws IOException
-// */
-//@SuppressWarnings({"unchecked"})
-//@Override
-//public void packetsReady(IOService s) throws IOException {
-//  if (log.isLoggable(Level.FINEST)) {
-//    log.finest("packetsReady called");
-//  }
-//  IO serv = (IO)s;
-//  packetsReady(serv);
-//}
+	// /**
+	// * Describe <code>packetsReady</code> method here.
+	// *
+	// * @param s an <code>IOService</code> value
+	// * @throws IOException
+	// */
+	// @SuppressWarnings({"unchecked"})
+	// @Override
+	// public void packetsReady(IOService s) throws IOException {
+	// if (log.isLoggable(Level.FINEST)) {
+	// log.finest("packetsReady called");
+	// }
+	// IO serv = (IO)s;
+	// packetsReady(serv);
+	// }
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param serv
-	 *
+	 * 
 	 * @throws IOException
 	 */
 	@Override
@@ -438,8 +469,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packet
 	 */
 	@Override
@@ -449,8 +480,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -460,7 +491,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 	/**
 	 * Method description
-	 *
+	 * 
 	 */
 	@Override
 	public void release() {
@@ -472,8 +503,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param service
 	 */
 	@TODO(note = "Do something if service with the same unique ID is already started, "
@@ -484,7 +515,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		String id = getUniqueId(service);
 
 		if (log.isLoggable(Level.FINER)) {
-			log.log(Level.FINER, "[[{0}]] Connection started: {1}", new Object[] { getName(), service });
+			log.log(Level.FINER, "[[{0}]] Connection started: {1}", new Object[] { getName(),
+					service });
 		}
 
 		IO serv = services.get(id);
@@ -493,15 +525,14 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 			if (serv == service) {
 				log.log(Level.WARNING,
 						"{0}: That would explain a lot, adding the same service twice, ID: {1}",
-							new Object[] { getName(),
-						serv });
+						new Object[] { getName(), serv });
 			} else {
 
 				// Is it at all possible to happen???
 				// let's log it for now....
-				log.log(Level.WARNING, "{0}: Attempt to add different service with the same ID: {1}",
-						new Object[] { getName(),
-						service });
+				log.log(Level.WARNING,
+						"{0}: Attempt to add different service with the same ID: {1}", new Object[] {
+								getName(), service });
 
 				// And stop the old service....
 				serv.stop();
@@ -514,15 +545,15 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		// }
 	}
 
-//@SuppressWarnings({"unchecked"})
-//@Override
-//public void serviceStopped(IOService s) {
-//  IO ios = (IO)s;
-//  serviceStopped(ios);
-//}
+	// @SuppressWarnings({"unchecked"})
+	// @Override
+	// public void serviceStopped(IOService s) {
+	// IO ios = (IO)s;
+	// serviceStopped(ios);
+	// }
 
 	/**
-	 *
+	 * 
 	 * @param service
 	 * @return
 	 */
@@ -534,14 +565,16 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		try {
 			ioStatsGetter.check(service);
 		} catch (Exception e) {
-			log.log(Level.INFO, "Nothing serious to worry about but please notify the developer.", e);
+			log.log(Level.INFO,
+					"Nothing serious to worry about but please notify the developer.", e);
 		}
 
 		// synchronized(service) {
 		String id = getUniqueId(service);
 
 		if (log.isLoggable(Level.FINER)) {
-			log.log(Level.FINER, "[[{0}]] Connection stopped: {1}", new Object[] { getName(), service });
+			log.log(Level.FINER, "[[{0}]] Connection stopped: {1}", new Object[] { getName(),
+					service });
 		}
 
 		// id might be null if service is stopped in accept method due to
@@ -557,8 +590,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 				// Is it at all possible to happen???
 				// let's log it for now....
 				log.log(Level.WARNING, "[[{0}]] Attempt to stop incorrect service: {1}",
-						new Object[] { getName(),
-						service });
+						new Object[] { getName(), service });
 				Thread.dumpStack();
 			}
 
@@ -570,12 +602,12 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		// }
 	}
 
-	//~--- set methods ----------------------------------------------------------
+	// ~--- set methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param name
 	 */
 	@Override
@@ -588,8 +620,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param props
 	 */
 	@Override
@@ -609,42 +641,51 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 						int idx = entry.getKey().lastIndexOf('/');
 						String key = entry.getKey().substring(idx + 1);
 
-						log.log(Level.CONFIG, "Adding port property key: {0}={1}", new Object[] { key,
-								entry.getValue() });
+						log.log(Level.CONFIG, "Adding port property key: {0}={1}", new Object[] {
+								key, entry.getValue() });
 						port_props.put(key, entry.getValue());
-					}    // end of if (entry.getKey().startsWith())
-				}      // end of for ()
+					} // end of if (entry.getKey().startsWith())
+				} // end of for ()
 
 				port_props.put(PORT_KEY, ports[i]);
 				addWaitingTask(port_props);
 
 				// reconnectService(port_props, startDelay);
-			}        // end of for (int i = 0; i < ports.length; i++)
-		}          // end of if (ports != null)
+			} // end of for (int i = 0; i < ports.length; i++)
+		} // end of if (ports != null)
 
 		if ((Boolean) props.get(TLS_USE_PROP_KEY)) {
 			Map<String, String> tls_params = new LinkedHashMap<String, String>(20);
 
-//    tls_params.put(SSL_CONTAINER_CLASS_KEY, (String) props.get(TLS_CONTAINER_CLASS_PROP_KEY));
-//    tls_params.put(DEFAULT_DOMAIN_CERT_KEY, (String) props.get(TLS_DEF_CERT_PROP_KEY));
-//    tls_params.put(JKS_KEYSTORE_FILE_KEY, (String) props.get(TLS_KEYS_STORE_PROP_KEY));
-//    tls_params.put(JKS_KEYSTORE_PWD_KEY, (String) props.get(TLS_KEYS_STORE_PASSWD_PROP_KEY));
-//    tls_params.put(TRUSTSTORE_FILE_KEY, (String) props.get(TLS_TRUSTS_STORE_PROP_KEY));
-//    tls_params.put(TRUSTSTORE_PWD_KEY, (String) props.get(TLS_TRUSTS_STORE_PASSWD_PROP_KEY));
-//    tls_params.put(SERVER_CERTS_DIR_KEY, (String) props.get(TLS_SERVER_CERTS_DIR_PROP_KEY));
-//    tls_params.put(TRUSTED_CERTS_DIR_KEY, (String) props.get(TLS_TRUSTED_CERTS_DIR_PROP_KEY));
-//    tls_params.put(ALLOW_SELF_SIGNED_CERTS_KEY,
-//        (String) props.get(TLS_ALLOW_SELF_SIGNED_CERTS_PROP_KEY));
-//    tls_params.put(ALLOW_INVALID_CERTS_KEY, (String) props.get(TLS_ALLOW_INVALID_CERTS_PROP_KEY));
-//    TLSUtil.configureSSLContext(getName(), tls_params);
-		}    // end of if (use.equalsIgnoreCase())
+			// tls_params.put(SSL_CONTAINER_CLASS_KEY, (String)
+			// props.get(TLS_CONTAINER_CLASS_PROP_KEY));
+			// tls_params.put(DEFAULT_DOMAIN_CERT_KEY, (String)
+			// props.get(TLS_DEF_CERT_PROP_KEY));
+			// tls_params.put(JKS_KEYSTORE_FILE_KEY, (String)
+			// props.get(TLS_KEYS_STORE_PROP_KEY));
+			// tls_params.put(JKS_KEYSTORE_PWD_KEY, (String)
+			// props.get(TLS_KEYS_STORE_PASSWD_PROP_KEY));
+			// tls_params.put(TRUSTSTORE_FILE_KEY, (String)
+			// props.get(TLS_TRUSTS_STORE_PROP_KEY));
+			// tls_params.put(TRUSTSTORE_PWD_KEY, (String)
+			// props.get(TLS_TRUSTS_STORE_PASSWD_PROP_KEY));
+			// tls_params.put(SERVER_CERTS_DIR_KEY, (String)
+			// props.get(TLS_SERVER_CERTS_DIR_PROP_KEY));
+			// tls_params.put(TRUSTED_CERTS_DIR_KEY, (String)
+			// props.get(TLS_TRUSTED_CERTS_DIR_PROP_KEY));
+			// tls_params.put(ALLOW_SELF_SIGNED_CERTS_KEY,
+			// (String) props.get(TLS_ALLOW_SELF_SIGNED_CERTS_PROP_KEY));
+			// tls_params.put(ALLOW_INVALID_CERTS_KEY, (String)
+			// props.get(TLS_ALLOW_INVALID_CERTS_PROP_KEY));
+			// TLSUtil.configureSSLContext(getName(), tls_params);
+		} // end of if (use.equalsIgnoreCase())
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
+	 * 
 	 */
 	@Override
 	public void start() {
@@ -655,18 +696,18 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param ios
 	 * @param p
-	 *
+	 * 
 	 * @return
 	 */
 	public boolean writePacketToSocket(IO ios, Packet p) {
 		if (ios != null) {
-			if (log.isLoggable(Level.FINER) &&!log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINER, "{0}, Processing packet: {1}, type: {2}", new Object[] { ios,
-						p.getElemName(), p.getType() });
+			if (log.isLoggable(Level.FINER) && !log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINER, "{0}, Processing packet: {1}, type: {2}", new Object[] {
+						ios, p.getElemName(), p.getType() });
 			}
 
 			if (log.isLoggable(Level.FINEST)) {
@@ -689,7 +730,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 						ios.stop();
 					} catch (Exception e1) {
 						log.log(Level.WARNING, ios + "Exception stopping XMPPIOService: ", e1);
-					}    // end of try-catch
+					} // end of try-catch
 				} finally {
 					ios.writeInProgress.unlock();
 				}
@@ -699,18 +740,17 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		} else {
 			if (log.isLoggable(Level.FINE)) {
 				log.log(Level.FINE, "Can''t find service for packet: <{0}> {1}, service id: {2}",
-						new Object[] { p.getElemName(),
-						p.getTo(), getServiceId(p) });
+						new Object[] { p.getElemName(), p.getTo(), getServiceId(p) });
 			}
-		}    // end of if (ios != null) else
+		} // end of if (ios != null) else
 
 		return false;
 	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param serv
 	 * @param packets
 	 */
@@ -722,9 +762,9 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 				Packet p = null;
 
 				while ((p = packets.poll()) != null) {
-					if (log.isLoggable(Level.FINER) &&!log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINER, "{0}, Processing packet: {1}, type: {2}", new Object[] { serv,
-								p.getElemName(), p.getType() });
+					if (log.isLoggable(Level.FINER) && !log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINER, "{0}, Processing packet: {1}, type: {2}", new Object[] {
+								serv, p.getElemName(), p.getType() });
 					}
 
 					if (log.isLoggable(Level.FINEST)) {
@@ -732,7 +772,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 					}
 
 					serv.addPacketToSend(p);
-				}      // end of for ()
+				} // end of for ()
 
 				try {
 					serv.processWaitingPackets();
@@ -744,8 +784,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 						serv.stop();
 					} catch (Exception e1) {
 						log.log(Level.WARNING, serv + "Exception stopping XMPPIOService: ", e1);
-					}    // end of try-catch
-				}      // end of try-catch
+					} // end of try-catch
+				} // end of try-catch
 			}
 
 			// }
@@ -753,7 +793,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 			if (log.isLoggable(Level.FINE)) {
 				log.log(Level.FINE, "Can't find service for packets: [{0}] ", packets);
 			}
-		}          // end of if (ios != null) else
+		} // end of if (ios != null) else
 	}
 
 	protected void addWaitingTask(Map<String, Object> conn) {
@@ -764,44 +804,49 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		}
 	}
 
-//@SuppressWarnings({"unchecked"})
-//@Override
-//public void streamClosed(IO s) {
-//  IO serv = (IO)s;
-//  xmppStreamClosed(serv);
-//}
-//
-//public abstract void xmppStreamClosed(IO serv);
-//
-///**
-// * The method is called upon XMPP stream open event.
-// * @param s is an XMPPIOService object associated with the newly opened network
-// * connection.
-// * @param attribs is a Map with all attributes found in the XMPP Stream open element.
-// * @return A String of raw data which should be sent back to the network
-// * connection.
-// */
-//@SuppressWarnings({"unchecked"})
-//@Override
-//public String streamOpened(IO s, Map<String, String> attribs) {
-//  IO serv = (IO)s;
-//  return xmppStreamOpened(serv, attribs);
-//}
-//
-///**
-// * Method is called on the new XMPP Stream open event. This method is normally
-// * called from streamOpen(...) method.
-// * @param s is an IOService object associated with the network connection
-// * where the XMPP Stream open event occured.
-// * @param attribs is a Map with all attributes found in the XMPP Stream open element.
-// * @return A String of raw data which should be sent back to the network
-// * connection.
-// */
-//public abstract String xmppStreamOpened(IO s, Map<String, String> attribs);
-//
+	// @SuppressWarnings({"unchecked"})
+	// @Override
+	// public void streamClosed(IO s) {
+	// IO serv = (IO)s;
+	// xmppStreamClosed(serv);
+	// }
+	//
+	// public abstract void xmppStreamClosed(IO serv);
+	//
+	// /**
+	// * The method is called upon XMPP stream open event.
+	// * @param s is an XMPPIOService object associated with the newly opened
+	// network
+	// * connection.
+	// * @param attribs is a Map with all attributes found in the XMPP Stream open
+	// element.
+	// * @return A String of raw data which should be sent back to the network
+	// * connection.
+	// */
+	// @SuppressWarnings({"unchecked"})
+	// @Override
+	// public String streamOpened(IO s, Map<String, String> attribs) {
+	// IO serv = (IO)s;
+	// return xmppStreamOpened(serv, attribs);
+	// }
+	//
+	// /**
+	// * Method is called on the new XMPP Stream open event. This method is
+	// normally
+	// * called from streamOpen(...) method.
+	// * @param s is an IOService object associated with the network connection
+	// * where the XMPP Stream open event occured.
+	// * @param attribs is a Map with all attributes found in the XMPP Stream open
+	// element.
+	// * @return A String of raw data which should be sent back to the network
+	// * connection.
+	// */
+	// public abstract String xmppStreamOpened(IO s, Map<String, String> attribs);
+	//
 
 	/**
 	 * Returns number of active network connections (IOServices).
+	 * 
 	 * @return number of active network connections (IOServices).
 	 */
 	protected int countIOServices() {
@@ -811,8 +856,10 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	/**
 	 * Perform a given action defined by ServiceChecker for all active IOService
 	 * objects (active network connections).
-	 * @param checker is a <code>ServiceChecker</code> instance defining an action
-	 * to perform for all IOService objects.
+	 * 
+	 * @param checker
+	 *          is a <code>ServiceChecker</code> instance defining an action to
+	 *          perform for all IOService objects.
 	 */
 	protected void doForAllServices(ServiceChecker<IO> checker) {
 		for (IO service : services.values()) {
@@ -820,7 +867,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		}
 	}
 
-	//~--- get methods ----------------------------------------------------------
+	// ~--- get methods ----------------------------------------------------------
 
 	protected int[] getDefPlainPorts() {
 		return null;
@@ -858,10 +905,10 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		return false;
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
-	 *
+	 * 
 	 * @param p
 	 * @return
 	 */
@@ -898,7 +945,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 				ios.stop();
 			} catch (Exception e1) {
 				log.log(Level.WARNING, ios + "Exception stopping XMPPIOService: ", e1);
-			}    // end of try-catch
+			} // end of try-catch
 		}
 
 		// }
@@ -909,7 +956,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		props.put(PROP_KEY + port + "/" + PORT_TYPE_PROP_KEY, ConnectionType.accept);
 		props.put(PROP_KEY + port + "/" + PORT_SOCKET_PROP_KEY, sock);
 		props.put(PROP_KEY + port + "/" + PORT_IFC_PROP_KEY, PORT_IFC_PROP_VAL);
-		props.put(PROP_KEY + port + "/" + PORT_REMOTE_HOST_PROP_KEY, PORT_REMOTE_HOST_PROP_VAL);
+		props.put(PROP_KEY + port + "/" + PORT_REMOTE_HOST_PROP_KEY,
+				PORT_REMOTE_HOST_PROP_VAL);
 		props.put(PROP_KEY + port + "/" + TLS_REQUIRED_PROP_KEY, TLS_REQUIRED_PROP_VAL);
 
 		Map<String, Object> extra = getParamsForPort(port);
@@ -917,18 +965,18 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		if (extra != null) {
 			for (Map.Entry<String, Object> entry : extra.entrySet()) {
 				props.put(PROP_KEY + port + "/" + entry.getKey(), entry.getValue());
-			}    // end of for ()
-		}      // end of if (extra != null)
+			} // end of for ()
+		} // end of if (extra != null)
 	}
 
 	private void reconnectService(final Map<String, Object> port_props, long delay) {
 		if (log.isLoggable(Level.FINER)) {
-			String cid = "" + port_props.get("local-hostname") + "@" + port_props.get("remote-hostname");
+			String cid =
+					"" + port_props.get("local-hostname") + "@" + port_props.get("remote-hostname");
 
 			log.log(Level.FINER,
 					"Reconnecting service for: {0}, scheduling next try in {1}secs, cid: {2}",
-						new Object[] { getName(),
-					delay / 1000, cid });
+					new Object[] { getName(), delay / 1000, cid });
 		}
 
 		addTimerTask(new TimerTask() {
@@ -943,10 +991,10 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 				int port = (Integer) port_props.get(PORT_KEY);
 
 				if (log.isLoggable(Level.FINE)) {
-					log.log(Level.FINE,
+					log.log(
+							Level.FINE,
 							"Reconnecting service for component: {0}, to remote host: {1} on port: {2}",
-								new Object[] { getName(),
-							host, port });
+							new Object[] { getName(), host, port });
 				}
 
 				startService(port_props);
@@ -972,28 +1020,29 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		connectThread.addConnectionOpenListener(cli);
 	}
 
-	//~--- inner classes --------------------------------------------------------
+	// ~--- inner classes --------------------------------------------------------
 
 	private class ConnectionListenerImpl implements ConnectionOpenListener {
 		private Map<String, Object> port_props = null;
 
-		//~--- constructors -------------------------------------------------------
+		// ~--- constructors -------------------------------------------------------
 
 		private ConnectionListenerImpl(Map<String, Object> port_props) {
 			this.port_props = port_props;
 		}
 
-		//~--- methods ------------------------------------------------------------
+		// ~--- methods ------------------------------------------------------------
 
 		/**
 		 * Method description
-		 *
-		 *
+		 * 
+		 * 
 		 * @param sc
 		 */
 		@Override
 		public void accept(SocketChannel sc) {
-			String cid = "" + port_props.get("local-hostname") + "@" + port_props.get("remote-hostname");
+			String cid =
+					"" + port_props.get("local-hostname") + "@" + port_props.get("remote-hostname");
 
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Accept called for service: {0}", cid);
@@ -1010,7 +1059,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 				if (getSocketType() == SocketType.ssl) {
 					serv.startSSL(false);
-				}    // end of if (socket == SocketType.ssl)
+				} // end of if (socket == SocketType.ssl)
 
 				serviceStarted(serv);
 				SocketThread.addSocketService(serv);
@@ -1021,8 +1070,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 					// Let's wait for a few secs and try again.
 					if (log.isLoggable(Level.FINEST)) {
 						log.log(Level.FINEST, "Problem reconnecting the service: {0}, cid: {1}",
-								new Object[] { serv,
-								cid });
+								new Object[] { serv, cid });
 					}
 
 					boolean reconnect = false;
@@ -1034,7 +1082,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 						if (recon != 0) {
 							port_props.put(MAX_RECONNECTS_PROP_KEY, (--recon));
 							reconnect = true;
-						}    // end of if (recon != 0)
+						} // end of if (recon != 0)
 					}
 
 					if (reconnect) {
@@ -1053,15 +1101,15 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 				log.log(Level.WARNING, "Can not accept connection.", e);
 				serv.stop();
-			}          // end of try-catch
+			} // end of try-catch
 		}
 
-		//~--- get methods --------------------------------------------------------
+		// ~--- get methods --------------------------------------------------------
 
 		/**
 		 * Method description
-		 *
-		 *
+		 * 
+		 * 
 		 * @return
 		 */
 		@Override
@@ -1080,8 +1128,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 		/**
 		 * Method description
-		 *
-		 *
+		 * 
+		 * 
 		 * @return
 		 */
 		@Override
@@ -1091,8 +1139,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 		/**
 		 * Method description
-		 *
-		 *
+		 * 
+		 * 
 		 * @return
 		 */
 		@Override
@@ -1102,8 +1150,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 		/**
 		 * Method description
-		 *
-		 *
+		 * 
+		 * 
 		 * @return
 		 */
 		@Override
@@ -1113,8 +1161,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 		/**
 		 * Method description
-		 *
-		 *
+		 * 
+		 * 
 		 * @return
 		 */
 		public SocketType getSocketType() {
@@ -1123,8 +1171,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 		/**
 		 * Method description
-		 *
-		 *
+		 * 
+		 * 
 		 * @return
 		 */
 		@Override
@@ -1136,12 +1184,12 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 			}
 		}
 
-		//~--- methods ------------------------------------------------------------
+		// ~--- methods ------------------------------------------------------------
 
 		/**
 		 * Method description
-		 *
-		 *
+		 * 
+		 * 
 		 * @return
 		 */
 		@Override
@@ -1150,16 +1198,15 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		}
 	}
 
-
 	private class IOServiceStatisticsGetter implements ServiceChecker<IO> {
 		private StatisticsList list = new StatisticsList(Level.ALL);
 
-		//~--- methods ------------------------------------------------------------
+		// ~--- methods ------------------------------------------------------------
 
 		/**
 		 * Method description
-		 *
-		 *
+		 * 
+		 * 
 		 * @param service
 		 */
 		@Override
@@ -1171,17 +1218,16 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		}
 	}
 
-
 	/**
-	 * Looks in all established connections and checks whether any of them
-	 * is dead....
-	 *
+	 * Looks in all established connections and checks whether any of them is
+	 * dead....
+	 * 
 	 */
 	private class Watchdog implements Runnable {
 
 		/**
 		 * Method description
-		 *
+		 * 
 		 */
 		@Override
 		public void run() {
@@ -1212,9 +1258,9 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 										// Stop the service is max keep-alive time is acceeded
 										// for non-active connections.
 										if (log.isLoggable(Level.INFO)) {
-											log.log(Level.INFO, "{0}: Max inactive time exceeded, stopping: {1}",
-													new Object[] { getName(),
-													service });
+											log.log(Level.INFO,
+													"{0}: Max inactive time exceeded, stopping: {1}", new Object[] {
+															getName(), service });
 										}
 
 										++watchdogStopped;
@@ -1247,15 +1293,13 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 							// }
 						}
 					});
-				} catch (InterruptedException e) {    /* Do nothing here */
+				} catch (InterruptedException e) { /* Do nothing here */
 				}
 			}
 		}
 	}
-}    // ConnectionManager
+} // ConnectionManager
 
+// ~ Formatted in Sun Code Convention
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+// ~ Formatted by Jindent --- http://www.jindent.com
