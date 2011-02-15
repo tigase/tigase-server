@@ -112,15 +112,15 @@ import javax.script.Bindings;
 
 /**
  * Class SessionManager
- *
- *
+ * 
+ * 
  * Created: Tue Nov 22 07:07:11 2005
- *
+ * 
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class SessionManager extends AbstractMessageReceiver
-		implements Configurable, SessionManagerHandler, OnlineJidsReporter {
+public class SessionManager extends AbstractMessageReceiver implements Configurable,
+		SessionManagerHandler, OnlineJidsReporter {
 
 	// protected static final String SESSION_PACKETS = "session-packets";
 	protected static final String ADMIN_COMMAND_NODE = "http://jabber.org/protocol/admin";
@@ -130,7 +130,7 @@ public class SessionManager extends AbstractMessageReceiver
 	 */
 	private static final Logger log = Logger.getLogger(SessionManager.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
+	// ~--- fields ---------------------------------------------------------------
 
 	private long authTimeouts = 0;
 	private AuthRepository auth_repository = null;
@@ -146,7 +146,7 @@ public class SessionManager extends AbstractMessageReceiver
 
 	// private Set<String> anonymous_domains = new HashSet<String>();
 	// private XMPPResourceConnection serverSession = null;
-//private ServiceEntity adminDisco = null;
+	// private ServiceEntity adminDisco = null;
 	private int maxUserSessions = 0;
 	private NonAuthUserRepository naUserRepository = null;
 	private SessionCloseProc sessionCloseProc = null;
@@ -160,45 +160,45 @@ public class SessionManager extends AbstractMessageReceiver
 	private Set<String> trusted = new ConcurrentSkipListSet<String>();
 
 	// {"admin@localhost"};
-	private Map<String, XMPPStopListenerIfc> stopListeners = new ConcurrentHashMap<String,
-		XMPPStopListenerIfc>(10);
+	private Map<String, XMPPStopListenerIfc> stopListeners =
+			new ConcurrentHashMap<String, XMPPStopListenerIfc>(10);
 	private boolean skipPrivacy = false;
 
 	/**
 	 * A Map with bare user JID as a key and a user session object as a value.
 	 */
-	private ConcurrentHashMap<BareJID, XMPPSession> sessionsByNodeId = new ConcurrentHashMap<BareJID,
-		XMPPSession>(100000);
+	private ConcurrentHashMap<BareJID, XMPPSession> sessionsByNodeId =
+			new ConcurrentHashMap<BareJID, XMPPSession>(100000);
 	private Map<String, ProcessingThreads<ProcessorWorkerThread>> workerThreads =
-		new ConcurrentHashMap<String, ProcessingThreads<ProcessorWorkerThread>>(32);
-	private Map<String, XMPPProcessorIfc> processors = new ConcurrentHashMap<String,
-		XMPPProcessorIfc>(32);
-	private Map<String, XMPPPreprocessorIfc> preProcessors = new ConcurrentHashMap<String,
-		XMPPPreprocessorIfc>(10);
-	private Map<String, XMPPPostprocessorIfc> postProcessors = new ConcurrentHashMap<String,
-		XMPPPostprocessorIfc>(10);
-	private Map<String, Map<String, Object>> plugin_config = new ConcurrentHashMap<String,
-		Map<String, Object>>(20);
-	private Map<String, XMPPPacketFilterIfc> outFilters = new ConcurrentHashMap<String,
-		XMPPPacketFilterIfc>(10);
+			new ConcurrentHashMap<String, ProcessingThreads<ProcessorWorkerThread>>(32);
+	private Map<String, XMPPProcessorIfc> processors =
+			new ConcurrentHashMap<String, XMPPProcessorIfc>(32);
+	private Map<String, XMPPPreprocessorIfc> preProcessors =
+			new ConcurrentHashMap<String, XMPPPreprocessorIfc>(10);
+	private Map<String, XMPPPostprocessorIfc> postProcessors =
+			new ConcurrentHashMap<String, XMPPPostprocessorIfc>(10);
+	private Map<String, Map<String, Object>> plugin_config =
+			new ConcurrentHashMap<String, Map<String, Object>>(20);
+	private Map<String, XMPPPacketFilterIfc> outFilters =
+			new ConcurrentHashMap<String, XMPPPacketFilterIfc>(10);
 
 	/**
 	 * A Map with connectionID as a key and an object with all the user connection
 	 * data as a value
 	 */
 	protected ConcurrentHashMap<JID, XMPPResourceConnection> connectionsByFrom =
-		new ConcurrentHashMap<JID, XMPPResourceConnection>(100000);
+			new ConcurrentHashMap<JID, XMPPResourceConnection>(100000);
 	private ConnectionCheckCommandHandler connectionCheckCommandHandler =
-		new ConnectionCheckCommandHandler();
+			new ConnectionCheckCommandHandler();
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param jid
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -206,14 +206,14 @@ public class SessionManager extends AbstractMessageReceiver
 		return sessionsByNodeId.containsKey(jid.getBareJID());
 	}
 
-	//~--- get methods ----------------------------------------------------------
+	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param jid
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -231,10 +231,10 @@ public class SessionManager extends AbstractMessageReceiver
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param params
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -248,8 +248,8 @@ public class SessionManager extends AbstractMessageReceiver
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -259,8 +259,8 @@ public class SessionManager extends AbstractMessageReceiver
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -270,10 +270,10 @@ public class SessionManager extends AbstractMessageReceiver
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param from
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -290,7 +290,7 @@ public class SessionManager extends AbstractMessageReceiver
 
 			if (discoFeatures != null) {
 				features.addAll(Arrays.asList(discoFeatures));
-			}    // end of if (discoFeatures != null)
+			} // end of if (discoFeatures != null)
 		}
 
 		return features;
@@ -298,17 +298,18 @@ public class SessionManager extends AbstractMessageReceiver
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param node
 	 * @param jid
 	 * @param from
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
 	public Element getDiscoInfo(String node, JID jid, JID from) {
-		if ((jid != null) && (getName().equals(jid.getLocalpart()) || isLocalDomain(jid.toString()))) {
+		if ((jid != null)
+				&& (getName().equals(jid.getLocalpart()) || isLocalDomain(jid.toString()))) {
 			Element query = super.getDiscoInfo(node, jid, from);
 
 			if (query == null) {
@@ -322,20 +323,21 @@ public class SessionManager extends AbstractMessageReceiver
 
 					if (discoFeatures != null) {
 						query.addChildren(Arrays.asList(discoFeatures));
-					}    // end of if (discoFeatures != null)
+					} // end of if (discoFeatures != null)
 				}
 			}
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Found disco info: {0}", ((query != null) ? query.toString() : null));
+				log.log(Level.FINEST, "Found disco info: {0}",
+						((query != null) ? query.toString() : null));
 			}
 
 			return query;
 		}
 
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "Not found disco info for node: {0}, jid: {1}", new Object[] { node,
-					jid });
+			log.log(Level.FINEST, "Not found disco info for node: {0}, jid: {1}", new Object[] {
+					node, jid });
 		}
 
 		return null;
@@ -343,10 +345,10 @@ public class SessionManager extends AbstractMessageReceiver
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param jid
-	 *
+	 * 
 	 * @return
 	 */
 	public XMPPResourceConnection getResourceConnection(JID jid) {
@@ -358,7 +360,7 @@ public class SessionManager extends AbstractMessageReceiver
 			}
 
 			return session.getResourceConnection(jid);
-		}    // end of if (session != null)
+		} // end of if (session != null)
 
 		// Maybe this is a call for the server session?
 		if (isLocalDomain(jid.toString(), false)) {
@@ -368,20 +370,20 @@ public class SessionManager extends AbstractMessageReceiver
 		return null;
 	}
 
-//@Override
-//public List<Element> getDiscoItems(String node, String jid) {
-//  List<Element> result = serviceEntity.getDiscoItems(node, jid);
-//  if (log.isLoggable(Level.FINEST)) {
-//    log.finest("Found disco items: " +
-//        (result != null ? result.toString() : null));
-//  }
-//  return result;
-//}
+	// @Override
+	// public List<Element> getDiscoItems(String node, String jid) {
+	// List<Element> result = serviceEntity.getDiscoItems(node, jid);
+	// if (log.isLoggable(Level.FINEST)) {
+	// log.finest("Found disco items: " +
+	// (result != null ? result.toString() : null));
+	// }
+	// return result;
+	// }
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param list
 	 */
 	@Override
@@ -389,7 +391,8 @@ public class SessionManager extends AbstractMessageReceiver
 		super.getStatistics(list);
 
 		if (list.checkLevel(Level.FINEST)) {
-			list.add(getName(), "Registered accounts", user_repository.getUsersCount(), Level.FINEST);
+			list.add(getName(), "Registered accounts", user_repository.getUsersCount(),
+					Level.FINEST);
 		}
 
 		list.add(getName(), "Open user connections", connectionsByFrom.size(), Level.INFO);
@@ -401,51 +404,56 @@ public class SessionManager extends AbstractMessageReceiver
 		list.add(getName(), "Total user sessions", totalUserSessions, Level.FINER);
 		list.add(getName(), "Authentication timouts", authTimeouts, Level.INFO);
 
-		for (Map.Entry<String, ProcessingThreads<ProcessorWorkerThread>> procent :
-				workerThreads.entrySet()) {
+		for (Map.Entry<String, ProcessingThreads<ProcessorWorkerThread>> procent : workerThreads
+				.entrySet()) {
 			ProcessingThreads<ProcessorWorkerThread> proc = procent.getValue();
 
-			if (list.checkLevel(Level.INFO, proc.getTotalQueueSize() + proc.getDroppedPackets())) {
-				list.add(getName(), "Processor: " + procent.getKey(), ", Queue: "
-						+ proc.getTotalQueueSize() + ", AvTime: " + proc.getAverageProcessingTime()
-							+ ", Runs: " + proc.getTotalRuns() + ", Lost: "
-								+ proc.getDroppedPackets(), Level.INFO);
+			if (list
+					.checkLevel(Level.INFO, proc.getTotalQueueSize() + proc.getDroppedPackets())) {
+				list.add(
+						getName(),
+						"Processor: " + procent.getKey(),
+						", Queue: " + proc.getTotalQueueSize() + ", AvTime: "
+								+ proc.getAverageProcessingTime() + ", Runs: " + proc.getTotalRuns()
+								+ ", Lost: " + proc.getDroppedPackets(), Level.INFO);
 			}
 		}
 
-//  if (list.checkLevel(Level.INFO,
-//      sessionCloseProc.getTotalQueueSize() + sessionCloseProc.getDroppedPackets())) {
-//    list.add(getName(), "Processor: " + sessionCloseProc.getName(),
-//        "Queue: " + sessionCloseProc.getTotalQueueSize() + ", AvTime: "
-//          + sessionCloseProc.getAverageProcessingTime() + ", Runs: "
-//            + sessionCloseProc.getTotalRuns() + ", Lost: "
-//              + sessionCloseProc.getDroppedPackets(), Level.INFO);
-//  }
-//
-//  if (list.checkLevel(Level.INFO,
-//      sessionOpenProc.getTotalQueueSize() + sessionOpenProc.getDroppedPackets())) {
-//    list.add(getName(), "Processor: " + sessionOpenProc.getName(),
-//        "Queue: " + sessionOpenProc.getTotalQueueSize() + ", AvTime: "
-//          + sessionOpenProc.getAverageProcessingTime() + ", Runs: "
-//            + sessionOpenProc.getTotalRuns() + ", Lost: "
-//              + sessionOpenProc.getDroppedPackets(), Level.INFO);
-//  }
+		// if (list.checkLevel(Level.INFO,
+		// sessionCloseProc.getTotalQueueSize() +
+		// sessionCloseProc.getDroppedPackets())) {
+		// list.add(getName(), "Processor: " + sessionCloseProc.getName(),
+		// "Queue: " + sessionCloseProc.getTotalQueueSize() + ", AvTime: "
+		// + sessionCloseProc.getAverageProcessingTime() + ", Runs: "
+		// + sessionCloseProc.getTotalRuns() + ", Lost: "
+		// + sessionCloseProc.getDroppedPackets(), Level.INFO);
+		// }
+		//
+		// if (list.checkLevel(Level.INFO,
+		// sessionOpenProc.getTotalQueueSize() +
+		// sessionOpenProc.getDroppedPackets())) {
+		// list.add(getName(), "Processor: " + sessionOpenProc.getName(),
+		// "Queue: " + sessionOpenProc.getTotalQueueSize() + ", AvTime: "
+		// + sessionOpenProc.getAverageProcessingTime() + ", Runs: "
+		// + sessionOpenProc.getTotalRuns() + ", Lost: "
+		// + sessionOpenProc.getDroppedPackets(), Level.INFO);
+		// }
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param userId
 	 * @param conn
 	 */
 	@Override
 	public void handleLogin(BareJID userId, XMPPResourceConnection conn) {
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "handleLogin called for: {0}, conn_id: {1}", new Object[] { userId,
-					conn });
+			log.log(Level.FINEST, "handleLogin called for: {0}, conn_id: {1}", new Object[] {
+					userId, conn });
 		}
 
 		registerNewSession(userId, conn);
@@ -457,8 +465,8 @@ public class SessionManager extends AbstractMessageReceiver
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param userId
 	 * @param conn
 	 */
@@ -468,7 +476,7 @@ public class SessionManager extends AbstractMessageReceiver
 
 		if ((session != null) && (session.getActiveResourcesSize() <= 1)) {
 			sessionsByNodeId.remove(userId);
-		}    // end of if (session.getActiveResourcesSize() == 0)
+		} // end of if (session.getActiveResourcesSize() == 0)
 
 		try {
 			connectionsByFrom.remove(conn.getConnectionId());
@@ -481,26 +489,28 @@ public class SessionManager extends AbstractMessageReceiver
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param conn
 	 */
 	@Override
-	public void handlePresenceSet(XMPPResourceConnection conn) {}
+	public void handlePresenceSet(XMPPResourceConnection conn) {
+	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param conn
 	 */
 	@Override
-	public void handleResourceBind(XMPPResourceConnection conn) {}
+	public void handleResourceBind(XMPPResourceConnection conn) {
+	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -508,17 +518,17 @@ public class SessionManager extends AbstractMessageReceiver
 		return true;
 	}
 
-	//~--- get methods ----------------------------------------------------------
+	// ~--- get methods ----------------------------------------------------------
 
-//@Override
-//public Set<String> getOnlineJids() {
-//  return sessionsByNodeId.keySet();
-//}
+	// @Override
+	// public Set<String> getOnlineJids() {
+	// return sessionsByNodeId.keySet();
+	// }
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -526,12 +536,12 @@ public class SessionManager extends AbstractMessageReceiver
 		return true;
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param binds
 	 */
 	@Override
@@ -543,15 +553,15 @@ public class SessionManager extends AbstractMessageReceiver
 		binds.put(CommandIfc.USER_SESS, sessionsByNodeId);
 	}
 
-	//~--- get methods ----------------------------------------------------------
+	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param domain
 	 * @param includeComponents
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -563,12 +573,12 @@ public class SessionManager extends AbstractMessageReceiver
 		}
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packet
 	 */
 	@Override
@@ -582,7 +592,7 @@ public class SessionManager extends AbstractMessageReceiver
 
 			// No more processing is needed for command packet
 			return;
-		}    // end of if (pc.isCommand())
+		} // end of if (pc.isCommand())
 
 		XMPPResourceConnection conn = getXMPPResourceConnection(packet);
 
@@ -595,8 +605,8 @@ public class SessionManager extends AbstractMessageReceiver
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -604,12 +614,12 @@ public class SessionManager extends AbstractMessageReceiver
 		return Runtime.getRuntime().availableProcessors() * 8;
 	}
 
-	//~--- set methods ----------------------------------------------------------
+	// ~--- set methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param name
 	 */
 	@Override
@@ -620,8 +630,8 @@ public class SessionManager extends AbstractMessageReceiver
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param props
 	 */
 	@Override
@@ -635,8 +645,8 @@ public class SessionManager extends AbstractMessageReceiver
 		user_repository = (UserRepository) props.get(SHARED_USER_REPO_PROP_KEY);
 
 		if (user_repository != null) {
-			log.log(Level.CONFIG, "Using shared repository instance: {0}",
-					user_repository.getClass().getName());
+			log.log(Level.CONFIG, "Using shared repository instance: {0}", user_repository
+					.getClass().getName());
 		} else {
 			Map<String, String> user_repo_params = new LinkedHashMap<String, String>(10);
 
@@ -658,19 +668,20 @@ public class SessionManager extends AbstractMessageReceiver
 				// String cls_name = (String) props.get(USER_REPO_CLASS_PROP_KEY);
 				String res_uri = (String) props.get(USER_REPO_URL_PROP_KEY);
 
-				user_repository = RepositoryFactory.getUserRepository(null, res_uri, user_repo_params);
-				log.log(Level.CONFIG, "Initialized {0} as user repository: {1}", new Object[] { null,
-						res_uri });
+				user_repository =
+						RepositoryFactory.getUserRepository(null, res_uri, user_repo_params);
+				log.log(Level.CONFIG, "Initialized {0} as user repository: {1}", new Object[] {
+						null, res_uri });
 			} catch (Exception e) {
 				log.log(Level.SEVERE, "Can't initialize user repository: ", e);
-			}    // end of try-catch
+			} // end of try-catch
 		}
 
 		auth_repository = (AuthRepository) props.get(SHARED_AUTH_REPO_PROP_KEY);
 
 		if (auth_repository != null) {
-			log.log(Level.CONFIG, "Using shared auth repository instance: {0}",
-					auth_repository.getClass().getName());
+			log.log(Level.CONFIG, "Using shared auth repository instance: {0}", auth_repository
+					.getClass().getName());
 		} else {
 			Map<String, String> auth_repo_params = new LinkedHashMap<String, String>(10);
 
@@ -690,46 +701,51 @@ public class SessionManager extends AbstractMessageReceiver
 			try {
 				String res_uri = (String) props.get(AUTH_REPO_URL_PROP_KEY);
 
-				auth_repository = RepositoryFactory.getAuthRepository(null, res_uri, auth_repo_params);
-				log.log(Level.CONFIG, "Initialized {0} as auth repository: {1}", new Object[] { null,
-						res_uri });
+				auth_repository =
+						RepositoryFactory.getAuthRepository(null, res_uri, auth_repo_params);
+				log.log(Level.CONFIG, "Initialized {0} as auth repository: {1}", new Object[] {
+						null, res_uri });
 			} catch (Exception e) {
 				log.log(Level.SEVERE, "Can't initialize auth repository: ", e);
-			}    // end of try-catch
+			} // end of try-catch
 		}
 
-//  try {
-//    // Add component ID to database if it is not there yet.
-//    auth_repository.addUser(getComponentId(),
-//            UUID.randomUUID().toString());
-//  } catch (UserExistsException e) {
-//    // Just ignore....
-//  } catch (TigaseDBException ex) {
-//    log.log(Level.WARNING, "Problem accessing auth repository: ", ex);
-//  }
-		naUserRepository = new NonAuthUserRepositoryImpl(user_repository, getDefHostName(),
-				Boolean.parseBoolean((String) props.get(AUTO_CREATE_OFFLINE_USER_PROP_KEY)));
+		// try {
+		// // Add component ID to database if it is not there yet.
+		// auth_repository.addUser(getComponentId(),
+		// UUID.randomUUID().toString());
+		// } catch (UserExistsException e) {
+		// // Just ignore....
+		// } catch (TigaseDBException ex) {
+		// log.log(Level.WARNING, "Problem accessing auth repository: ", ex);
+		// }
+		naUserRepository =
+				new NonAuthUserRepositoryImpl(user_repository, getDefHostName(),
+						Boolean.parseBoolean((String) props.get(AUTO_CREATE_OFFLINE_USER_PROP_KEY)));
 
-		LinkedHashMap<String, Integer> plugins_concurrency = new LinkedHashMap<String, Integer>(20);
+		LinkedHashMap<String, Integer> plugins_concurrency =
+				new LinkedHashMap<String, Integer>(20);
 		String[] plugins_conc = ((String) props.get(PLUGINS_CONCURRENCY_PROP_KEY)).split(",");
 
-		log.log(Level.CONFIG, "Loading concurrency plugins list: {0}", Arrays.toString(plugins_conc));
+		log.log(Level.CONFIG, "Loading concurrency plugins list: {0}",
+				Arrays.toString(plugins_conc));
 
 		if ((plugins_conc != null) && (plugins_conc.length > 0)) {
 			for (String plugc : plugins_conc) {
 				log.log(Level.CONFIG, "Loading: {0}", plugc);
 
-				if ( !plugc.trim().isEmpty()) {
+				if (!plugc.trim().isEmpty()) {
 					String[] pc = plugc.split("=");
 
 					try {
 						int conc = Integer.parseInt(pc[1]);
 
 						plugins_concurrency.put(pc[0], conc);
-						log.log(Level.CONFIG, "Concurrency for plugin: {0} set to: {1}", new Object[] { pc[0],
-								conc });
+						log.log(Level.CONFIG, "Concurrency for plugin: {0} set to: {1}",
+								new Object[] { pc[0], conc });
 					} catch (Exception e) {
-						log.log(Level.WARNING, "Plugin concurrency parsing error for: " + plugc + ", ", e);
+						log.log(Level.WARNING, "Plugin concurrency parsing error for: " + plugc
+								+ ", ", e);
 					}
 				}
 			}
@@ -738,7 +754,7 @@ public class SessionManager extends AbstractMessageReceiver
 		try {
 			String sm_threads_pool = (String) props.get(SM_THREADS_POOL_PROP_KEY);
 
-			if ( !sm_threads_pool.equals(SM_THREADS_POOL_PROP_VAL)) {
+			if (!sm_threads_pool.equals(SM_THREADS_POOL_PROP_VAL)) {
 				String[] threads_pool_params = sm_threads_pool.split(":");
 				int def_pool_size = 100;
 
@@ -746,7 +762,8 @@ public class SessionManager extends AbstractMessageReceiver
 					try {
 						def_pool_size = Integer.parseInt(threads_pool_params[1]);
 					} catch (Exception e) {
-						log.log(Level.WARNING, "Incorrect threads pool size: {0}, setting default to 100",
+						log.log(Level.WARNING,
+								"Incorrect threads pool size: {0}, setting default to 100",
 								threads_pool_params[1]);
 						def_pool_size = 100;
 					}
@@ -754,8 +771,8 @@ public class SessionManager extends AbstractMessageReceiver
 
 				ProcessorWorkerThread worker = new ProcessorWorkerThread();
 				ProcessingThreads<ProcessorWorkerThread> pt =
-					new ProcessingThreads<ProcessorWorkerThread>(worker, def_pool_size, maxQueueSize,
-						defPluginsThreadsPool);
+						new ProcessingThreads<ProcessorWorkerThread>(worker, def_pool_size,
+								maxQueueSize, defPluginsThreadsPool);
 
 				workerThreads.put(defPluginsThreadsPool, pt);
 				log.log(Level.CONFIG, "Created a default thread pool: {0}", def_pool_size);
@@ -765,27 +782,29 @@ public class SessionManager extends AbstractMessageReceiver
 
 			log.log(Level.CONFIG, "Loaded plugins list: {0}", Arrays.toString(plugins));
 
-//    sessionOpenProc = new SessionOpenProc();
-//
-//    XMPPProcessorIfc proc = sessionOpenProc;
-//    ProcessorWorkerThread worker = new ProcessorWorkerThread();
-//    ProcessingThreads<ProcessorWorkerThread> pt =
-//      new ProcessingThreads<ProcessorWorkerThread>(worker, proc.concurrentQueuesNo(),
-//        maxQueueSize, proc.id());
-//
-//    workerThreads.put(proc.id(), pt);
-//    log.log(Level.CONFIG, "Added processor: {0} for plugin id: {1}",
-//        new Object[] { proc.getClass().getSimpleName(),
-//        proc.id() });
-//    sessionCloseProc = new SessionCloseProc();
-//    proc = sessionCloseProc;
-//    worker = new ProcessorWorkerThread();
-//    pt = new ProcessingThreads<ProcessorWorkerThread>(worker, proc.concurrentQueuesNo(),
-//        maxQueueSize, proc.id());
-//    workerThreads.put(proc.id(), pt);
-//    log.log(Level.CONFIG, "Added processor: {0} for plugin id: {1}",
-//        new Object[] { proc.getClass().getSimpleName(),
-//        proc.id() });
+			// sessionOpenProc = new SessionOpenProc();
+			//
+			// XMPPProcessorIfc proc = sessionOpenProc;
+			// ProcessorWorkerThread worker = new ProcessorWorkerThread();
+			// ProcessingThreads<ProcessorWorkerThread> pt =
+			// new ProcessingThreads<ProcessorWorkerThread>(worker,
+			// proc.concurrentQueuesNo(),
+			// maxQueueSize, proc.id());
+			//
+			// workerThreads.put(proc.id(), pt);
+			// log.log(Level.CONFIG, "Added processor: {0} for plugin id: {1}",
+			// new Object[] { proc.getClass().getSimpleName(),
+			// proc.id() });
+			// sessionCloseProc = new SessionCloseProc();
+			// proc = sessionCloseProc;
+			// worker = new ProcessorWorkerThread();
+			// pt = new ProcessingThreads<ProcessorWorkerThread>(worker,
+			// proc.concurrentQueuesNo(),
+			// maxQueueSize, proc.id());
+			// workerThreads.put(proc.id(), pt);
+			// log.log(Level.CONFIG, "Added processor: {0} for plugin id: {1}",
+			// new Object[] { proc.getClass().getSimpleName(),
+			// proc.id() });
 			maxPluginsNo = plugins.length;
 			processors.clear();
 
@@ -811,12 +830,13 @@ public class SessionManager extends AbstractMessageReceiver
 						log.log(Level.SEVERE, "Problem initializing plugin: " + plugin.id(), ex);
 					}
 				}
-			}    // end of for (String comp_id: plugins)
+			} // end of for (String comp_id: plugins)
 		} catch (Exception e) {
 			log.log(Level.SEVERE, "Problem with component initialization: " + getName(), e);
 		}
 
-		smResourceConnection = new SMResourceConnection(null, user_repository, auth_repository, this);
+		smResourceConnection =
+				new SMResourceConnection(null, user_repository, auth_repository, this);
 		registerNewSession(getComponentId().getBareJID(), smResourceConnection);
 
 		String[] trusted_tmp = (String[]) props.get(TRUSTED_PROP_KEY);
@@ -828,12 +848,12 @@ public class SessionManager extends AbstractMessageReceiver
 		}
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	public boolean skipPrivacy() {
@@ -843,39 +863,40 @@ public class SessionManager extends AbstractMessageReceiver
 	@Override
 	protected boolean addOutPacket(Packet packet) {
 
-//  String oldto = packet.getAttribute(Packet.OLDTO);
-//
-//  if (oldto != null) {
-//    packet.getElement().setAttribute("from", oldto);
-//    packet.getElement().removeAttribute(Packet.OLDTO);
-//  }
-//
-//  String oldfrom = packet.getAttribute(Packet.OLDFROM);
-//
-//  if (oldfrom != null) {
-//    packet.getElement().setAttribute("to", oldfrom);
-//    packet.getElement().removeAttribute(Packet.OLDFROM);
-//  }
+		// String oldto = packet.getAttribute(Packet.OLDTO);
+		//
+		// if (oldto != null) {
+		// packet.getElement().setAttribute("from", oldto);
+		// packet.getElement().removeAttribute(Packet.OLDTO);
+		// }
+		//
+		// String oldfrom = packet.getAttribute(Packet.OLDFROM);
+		//
+		// if (oldfrom != null) {
+		// packet.getElement().setAttribute("to", oldfrom);
+		// packet.getElement().removeAttribute(Packet.OLDFROM);
+		// }
 		// TODO: make the code below working correctly.
 		// Code below would be nice to have but it causes unexpected
 		// effects, the problem is that it needs much more testing
 		// on border cases.
-//    if (packet.getPacketFrom() == null) {
-//      packet.setPacketFrom(getComponentId());
-//    }
+		// if (packet.getPacketFrom() == null) {
+		// packet.setPacketFrom(getComponentId());
+		// }
 		return super.addOutPacket(packet);
 	}
 
-	protected void addOutPackets(Packet packet, XMPPResourceConnection conn, Queue<Packet> results) {
+	protected void addOutPackets(Packet packet, XMPPResourceConnection conn,
+			Queue<Packet> results) {
 		for (XMPPPacketFilterIfc outfilter : outFilters.values()) {
 			outfilter.filter(packet, conn, naUserRepository, results);
-		}    // end of for (XMPPPostprocessorIfc postproc: postProcessors)
+		} // end of for (XMPPPostprocessorIfc postproc: postProcessors)
 
 		Packet p;
 
-//  while ((p = results.poll()) != null) {
-//    addOutPacket(p);
-//  }
+		// while ((p = results.poll()) != null) {
+		// addOutPacket(p);
+		// }
 		addOutPackets(results);
 	}
 
@@ -883,38 +904,38 @@ public class SessionManager extends AbstractMessageReceiver
 		return trusted.add(jid.getBareJID().toString());
 	}
 
-//@SuppressWarnings("unchecked")
-//protected void sendAllOnHold(XMPPResourceConnection conn) {
-//  String remote_smId = (String)conn.getSessionData("redirect-to");
-//  ArrayDeque<Packet> packets =
-//    (ArrayDeque<Packet>)conn.getSessionData(SESSION_PACKETS);
-//  if (remote_smId == null) {
-//    if (log.isLoggable(Level.FINEST)) {
-//      log.finest("No address for remote SM to redirect packets, processing locally.");
-//    }
-//    if (packets != null) {
-//      Packet sess_pack = null;
-//      while (((sess_pack = packets.poll()) != null) &&
-//              // Temporarily fix, need a better solution. For some reason
-//              // the mode has been sent back from normal to on_hold during
-//              // loop execution leading to infinite loop.
-//              // Possibly buggy client sent a second authentication packet
-//              // executing a second handleLogin call....
-//              (conn.getConnectionStatus() != ConnectionStatus.ON_HOLD)) {
-//        processPacket(sess_pack);
-//      }
-//    }
-//    return;
-//  }
-//  conn.setConnectionStatus(ConnectionStatus.REDIRECT);
-//  if (packets != null) {
-//    Packet sess_pack = null;
-//    while ((sess_pack = packets.poll()) != null) {
-//      sess_pack.setTo(remote_smId);
-//      fastAddOutPacket(sess_pack);
-//    }
-//  }
-//}
+	// @SuppressWarnings("unchecked")
+	// protected void sendAllOnHold(XMPPResourceConnection conn) {
+	// String remote_smId = (String)conn.getSessionData("redirect-to");
+	// ArrayDeque<Packet> packets =
+	// (ArrayDeque<Packet>)conn.getSessionData(SESSION_PACKETS);
+	// if (remote_smId == null) {
+	// if (log.isLoggable(Level.FINEST)) {
+	// log.finest("No address for remote SM to redirect packets, processing locally.");
+	// }
+	// if (packets != null) {
+	// Packet sess_pack = null;
+	// while (((sess_pack = packets.poll()) != null) &&
+	// // Temporarily fix, need a better solution. For some reason
+	// // the mode has been sent back from normal to on_hold during
+	// // loop execution leading to infinite loop.
+	// // Possibly buggy client sent a second authentication packet
+	// // executing a second handleLogin call....
+	// (conn.getConnectionStatus() != ConnectionStatus.ON_HOLD)) {
+	// processPacket(sess_pack);
+	// }
+	// }
+	// return;
+	// }
+	// conn.setConnectionStatus(ConnectionStatus.REDIRECT);
+	// if (packets != null) {
+	// Packet sess_pack = null;
+	// while ((sess_pack = packets.poll()) != null) {
+	// sess_pack.setTo(remote_smId);
+	// fastAddOutPacket(sess_pack);
+	// }
+	// }
+	// }
 	protected void closeConnection(JID connectionId, boolean closeOnly) {
 		if (log.isLoggable(Level.FINER)) {
 			log.log(Level.FINER, "Stream closed from: {0}", connectionId);
@@ -925,32 +946,33 @@ public class SessionManager extends AbstractMessageReceiver
 		if (connection != null) {
 			closeSession(connection, closeOnly);
 		} else {
-			log.log(Level.FINE, "Can not find resource connection for packet: {0}", connectionId);
-		}    // end of if (conn != null) else
+			log.log(Level.FINE, "Can not find resource connection for packet: {0}",
+					connectionId);
+		} // end of if (conn != null) else
 	}
 
 	protected void closeSession(XMPPResourceConnection conn, boolean closeOnly) {
-		if ( !closeOnly) {
+		if (!closeOnly) {
 			Queue<Packet> results = new ArrayDeque<Packet>(50);
 
 			for (XMPPStopListenerIfc stopProc : stopListeners.values()) {
 				stopProc.stopped(conn, results, plugin_config.get(stopProc.id()));
-			}    // end of for ()
+			} // end of for ()
 
-//    // TESTING ONLY, to be removed
-//    try {
-//      String nick = conn.getUserName();
-//      String nick_num = nick.substring("load-tester_".length());
-//      int num = Integer.parseInt(nick_num);
-//      if (num < 11) {
-//        log.warning("Disconnected: " + nick +
-//                ", connId: " + conn.getConnectionId() +
-//                ", sending: " + results.toString());
-//      }
-//    } catch (Exception e) {
-//      log.log(Level.WARNING, "some problem: " + conn.getConnectionId(), e);
-//    }
-//    // TESTING ONLY, to be removed
+			// // TESTING ONLY, to be removed
+			// try {
+			// String nick = conn.getUserName();
+			// String nick_num = nick.substring("load-tester_".length());
+			// int num = Integer.parseInt(nick_num);
+			// if (num < 11) {
+			// log.warning("Disconnected: " + nick +
+			// ", connId: " + conn.getConnectionId() +
+			// ", sending: " + results.toString());
+			// }
+			// } catch (Exception e) {
+			// log.log(Level.WARNING, "some problem: " + conn.getConnectionId(), e);
+			// }
+			// // TESTING ONLY, to be removed
 			addOutPackets(null, conn, results);
 		}
 
@@ -973,12 +995,14 @@ public class SessionManager extends AbstractMessageReceiver
 						session = sessionsByNodeId.remove(userJid.getBareJID());
 
 						if (session == null) {
-							log.log(Level.INFO, "UPS can''t remove, session not found in map: {0}", userJid);
+							log.log(Level.INFO, "UPS can''t remove, session not found in map: {0}",
+									userJid);
 						} else {
 							if (log.isLoggable(Level.FINER)) {
-								log.log(Level.FINER, "Number of user sessions: {0}", sessionsByNodeId.size());
+								log.log(Level.FINER, "Number of user sessions: {0}",
+										sessionsByNodeId.size());
 							}
-						}    // end of else
+						} // end of else
 
 						if (conn.getConnectionStatus() == ConnectionStatus.NORMAL) {
 							auth_repository.logout(userJid.getBareJID());
@@ -992,12 +1016,13 @@ public class SessionManager extends AbstractMessageReceiver
 								sb.append(" (").append(res_con.getConnectionStatus()).append(")");
 							}
 
-							log.log(Level.FINER, "Number of connections is {0} for the user: {1}{2}",
-									new Object[] { session.getActiveResourcesSize(),
-									userJid, sb.toString() });
+							log.log(
+									Level.FINER,
+									"Number of connections is {0} for the user: {1}{2}",
+									new Object[] { session.getActiveResourcesSize(), userJid, sb.toString() });
 						}
-					}    // end of else
-				}      // end of if (session.getActiveResourcesSize() == 0)
+					} // end of else
+				} // end of if (session.getActiveResourcesSize() == 0)
 			}
 		} catch (NotAuthorizedException e) {
 			log.log(Level.INFO, "Closed not authorized session: {0}", e);
@@ -1011,8 +1036,8 @@ public class SessionManager extends AbstractMessageReceiver
 
 	protected XMPPResourceConnection createUserSession(JID conn_id, String domain)
 			throws TigaseStringprepException {
-		XMPPResourceConnection connection = new XMPPResourceConnection(conn_id, user_repository,
-			auth_repository, this);
+		XMPPResourceConnection connection =
+				new XMPPResourceConnection(conn_id, user_repository, auth_repository, this);
 		VHostItem vitem = null;
 
 		if (domain != null) {
@@ -1020,8 +1045,7 @@ public class SessionManager extends AbstractMessageReceiver
 
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Setting hostname {0} for connection: {1}, VHostItem: {2}",
-						new Object[] { domain,
-						conn_id, vitem });
+						new Object[] { domain, conn_id, vitem });
 			}
 		}
 
@@ -1029,9 +1053,9 @@ public class SessionManager extends AbstractMessageReceiver
 
 			// This shouldn't generally happen. Must mean misconfiguration.
 			if (log.isLoggable(Level.INFO)) {
-				log.log(Level.INFO, "Can''t get VHostItem for domain: {0}, using default one instead: {1}",
-						new Object[] { domain,
-						getDefHostName() });
+				log.log(Level.INFO,
+						"Can't get VHostItem for domain: {0}, using default one instead: {1}",
+						new Object[] { domain, getDefHostName() });
 			}
 
 			vitem = new VHostItem(getDefHostName().getDomain());
@@ -1063,13 +1087,13 @@ public class SessionManager extends AbstractMessageReceiver
 
 	protected boolean fastAddOutPacket(Packet packet) {
 
-//  if (packet.getPacketFrom() == null) {
-//    packet.setPacketFrom(getComponentId());
-//  }
+		// if (packet.getPacketFrom() == null) {
+		// packet.setPacketFrom(getComponentId());
+		// }
 		return super.addOutPacket(packet);
 	}
 
-	//~--- get methods ----------------------------------------------------------
+	// ~--- get methods ----------------------------------------------------------
 
 	@Override
 	protected Integer getMaxQueueSize(int def) {
@@ -1114,9 +1138,9 @@ public class SessionManager extends AbstractMessageReceiver
 
 			// Hm, not sure what should I do now....
 			// Maybe I should treat it as message to admin....
-			log.log(Level.INFO, "Message without TO attribute set, don''t know what to do wih this: {0}",
-					p);
-		}    // end of else
+			log.log(Level.INFO,
+					"Message without TO attribute set, don''t know what to do wih this: {0}", p);
+		} // end of else
 
 		return conn;
 	}
@@ -1131,13 +1155,13 @@ public class SessionManager extends AbstractMessageReceiver
 			return true;
 		}
 
-		if ( !p.getFrom().equals(p.getStanzaFrom())
-				&& ( !p.isCommand() || (p.isCommand() && (p.getCommand() == Command.OTHER)))) {
+		if (!p.getFrom().equals(p.getStanzaFrom())
+				&& (!p.isCommand() || (p.isCommand() && (p.getCommand() == Command.OTHER)))) {
 
 			// Sometimes (Bosh) connection is gone and this is an error packet
 			// sent back to the original sender. This original sender might be
 			// not local....
-			if ((p.getStanzaFrom() != null) &&!isLocalDomain(p.getStanzaFrom().getDomain())) {
+			if ((p.getStanzaFrom() != null) && !isLocalDomain(p.getStanzaFrom().getDomain())) {
 
 				// ok just forward it there....
 				p.setPacketFrom(null);
@@ -1153,8 +1177,9 @@ public class SessionManager extends AbstractMessageReceiver
 			log.log(Level.FINE, "Broken packet: {0}", p.toStringSecure());
 
 			try {
-				Packet error = Authorization.SERVICE_UNAVAILABLE.getResponseMessage(p,
-					"Service not available.", true);
+				Packet error =
+						Authorization.SERVICE_UNAVAILABLE.getResponseMessage(p,
+								"Service not available.", true);
 
 				error.setPacketTo(p.getFrom());
 				fastAddOutPacket(error);
@@ -1184,10 +1209,10 @@ public class SessionManager extends AbstractMessageReceiver
 		return false;
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
-	protected XMPPResourceConnection loginUserSession(JID conn_id, String domain, BareJID user_id,
-			String resource, ConnectionStatus conn_st, String xmpp_sessionId) {
+	protected XMPPResourceConnection loginUserSession(JID conn_id, String domain,
+			BareJID user_id, String resource, ConnectionStatus conn_st, String xmpp_sessionId) {
 		try {
 			XMPPResourceConnection conn = createUserSession(conn_id, domain);
 
@@ -1221,7 +1246,8 @@ public class SessionManager extends AbstractMessageReceiver
 	protected boolean processAdminsOrDomains(Packet packet) {
 		if ((packet.getStanzaFrom() == null) && (packet.getPacketFrom() != null)) {
 
-			// The packet, probably did not went through the first state of processing yet.
+			// The packet, probably did not went through the first state of processing
+			// yet.
 			return false;
 		}
 
@@ -1241,30 +1267,34 @@ public class SessionManager extends AbstractMessageReceiver
 				return true;
 			} else {
 				if (log.isLoggable(Level.FINER)) {
-					log.log(Level.FINER, "Packet for hostname, should be handled elsewhere: {0}", packet);
+					log.log(Level.FINER, "Packet for hostname, should be handled elsewhere: {0}",
+							packet);
 				}
 
-//      Packet host_pac = packet.copyElementOnly();
-//
-//      // No need for the line below, initVars takes care of that
-//      // host_pac.getElement().setAttribute("to", getComponentId().toString());
-//      host_pac.getElement().setAttribute(Packet.OLDTO, packet.getStanzaTo().toString());
-//      host_pac.getElement().setAttribute(Packet.OLDFROM, packet.getStanzaFrom().toString());
-//      host_pac.initVars(packet.getStanzaFrom(), getComponentId());
-//      processPacket(host_pac);
+				// Packet host_pac = packet.copyElementOnly();
+				//
+				// // No need for the line below, initVars takes care of that
+				// // host_pac.getElement().setAttribute("to",
+				// getComponentId().toString());
+				// host_pac.getElement().setAttribute(Packet.OLDTO,
+				// packet.getStanzaTo().toString());
+				// host_pac.getElement().setAttribute(Packet.OLDFROM,
+				// packet.getStanzaFrom().toString());
+				// host_pac.initVars(packet.getStanzaFrom(), getComponentId());
+				// processPacket(host_pac);
 			}
-		}    // end of if (isInRoutings(to))
+		} // end of if (isInRoutings(to))
 
 		return false;
 	}
 
-//private boolean isAnonymousEnabled(String domain) {
-//  return vHostManager != null ? vHostManager.isAnonymousEnabled(domain) :
-//    false;
-//}
+	// private boolean isAnonymousEnabled(String domain) {
+	// return vHostManager != null ? vHostManager.isAnonymousEnabled(domain) :
+	// false;
+	// }
 	protected boolean processCommand(Packet pc) {
-		if ( !(pc.getStanzaTo() == null) &&!getComponentId().equals(pc.getStanzaTo())
-				&&!isLocalDomain(pc.getStanzaTo().toString())) {
+		if (!(pc.getStanzaTo() == null) && !getComponentId().equals(pc.getStanzaTo())
+				&& !isLocalDomain(pc.getStanzaTo().toString())) {
 			return false;
 		}
 
@@ -1272,27 +1302,28 @@ public class SessionManager extends AbstractMessageReceiver
 		boolean processing_result = false;
 
 		if (log.isLoggable(Level.FINER)) {
-			log.log(Level.FINER, "{0} command from: {1}", new Object[] { iqc.getCommand().toString(),
-					iqc.getFrom() });
+			log.log(Level.FINER, "{0} command from: {1}", new Object[] {
+					iqc.getCommand().toString(), iqc.getFrom() });
 		}
 
 		// Element command = pc.getElement();
 		XMPPResourceConnection connection = connectionsByFrom.get(iqc.getFrom());
 
 		switch (iqc.getCommand()) {
-			case CLOSE : {
+			case CLOSE: {
 				log.log(Level.WARNING, "Unexpected packet: {0}", pc);
 				processing_result = true;
 			}
 
-			break;
+				break;
 
-			case STREAM_OPENED : {
+			case STREAM_OPENED: {
 
 				// Response is sent from the thread when opening user session is
 				// completed.
 				// fastAddOutPacket(pc.okResult((String) null, 0));
-				ProcessingThreads<ProcessorWorkerThread> pt = workerThreads.get(sessionOpenProc.id());
+				ProcessingThreads<ProcessorWorkerThread> pt =
+						workerThreads.get(sessionOpenProc.id());
 
 				if (pt == null) {
 					pt = workerThreads.get(defPluginsThreadsPool);
@@ -1302,26 +1333,27 @@ public class SessionManager extends AbstractMessageReceiver
 				processing_result = true;
 			}
 
-			break;
+				break;
 
-			case GETFEATURES : {
+			case GETFEATURES: {
 				if (iqc.getType() == StanzaType.get) {
 					List<Element> features = getFeatures(connectionsByFrom.get(iqc.getFrom()));
 					Packet result = iqc.commandResult(null);
 
 					Command.setData(result, features);
 					addOutPacket(result);
-				}    // end of if (pc.getType() == StanzaType.get)
+				} // end of if (pc.getType() == StanzaType.get)
 
 				processing_result = true;
 			}
 
-			break;
+				break;
 
-			case STREAM_CLOSED : {
+			case STREAM_CLOSED: {
 				fastAddOutPacket(iqc.okResult((String) null, 0));
 
-				ProcessingThreads<ProcessorWorkerThread> pt = workerThreads.get(sessionCloseProc.id());
+				ProcessingThreads<ProcessorWorkerThread> pt =
+						workerThreads.get(sessionCloseProc.id());
 
 				if (pt == null) {
 					pt = workerThreads.get(defPluginsThreadsPool);
@@ -1333,19 +1365,19 @@ public class SessionManager extends AbstractMessageReceiver
 				processing_result = true;
 			}
 
-			break;
+				break;
 
-			case STREAM_CLOSED_UPDATE : {
+			case STREAM_CLOSED_UPDATE: {
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0} processing comment, connection: {1}",
-							new Object[] { iqc.getCommand(),
-							((connection != null) ? connection : " is null") });
+					log.log(Level.FINEST, "{0} processing comment, connection: {1}", new Object[] {
+							iqc.getCommand(), ((connection != null) ? connection : " is null") });
 				}
 
 				// Note! We don't send response to this packet....
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0} adding to the processor: {1}", new Object[] { iqc.getCommand(),
-							((connection != null) ? connection : " is null") });
+					log.log(Level.FINEST, "{0} adding to the processor: {1}",
+							new Object[] { iqc.getCommand(),
+									((connection != null) ? connection : " is null") });
 				}
 
 				if (connection == null) {
@@ -1365,9 +1397,11 @@ public class SessionManager extends AbstractMessageReceiver
 						XMPPSession xs = sessionsByNodeId.get(stanzaFrom.getBareJID());
 
 						if (xs == null) {
-							log.log(Level.INFO, "Stream close for the user session which does not exist", iqc);
+							log.log(Level.INFO,
+									"Stream close for the user session which does not exist", iqc);
 						} else {
-							XMPPResourceConnection xcr = xs.getResourceForConnectionId(iqc.getPacketFrom());
+							XMPPResourceConnection xcr =
+									xs.getResourceForConnectionId(iqc.getPacketFrom());
 
 							if (xcr == null) {
 								log.log(Level.INFO,
@@ -1377,14 +1411,14 @@ public class SessionManager extends AbstractMessageReceiver
 
 								if (log.isLoggable(Level.FINEST)) {
 									log.log(Level.FINEST, "{0} removed resource connection: {1}",
-											new Object[] { iqc.getCommand(),
-											xcr });
+											new Object[] { iqc.getCommand(), xcr });
 								}
 							}
 						}
 					}
 				} else {
-					ProcessingThreads<ProcessorWorkerThread> pt = workerThreads.get(sessionCloseProc.id());
+					ProcessingThreads<ProcessorWorkerThread> pt =
+							workerThreads.get(sessionCloseProc.id());
 
 					if (pt == null) {
 						pt = workerThreads.get(defPluginsThreadsPool);
@@ -1397,11 +1431,12 @@ public class SessionManager extends AbstractMessageReceiver
 				processing_result = true;
 			}
 
-			break;
+				break;
 
-			case USER_STATUS :
+			case USER_STATUS:
 				try {
-					if (isTrusted(iqc.getStanzaFrom()) || isTrusted(iqc.getStanzaFrom().getDomain())) {
+					if (isTrusted(iqc.getStanzaFrom())
+							|| isTrusted(iqc.getStanzaFrom().getDomain())) {
 						String av = Command.getFieldValue(pc, "available");
 						boolean available = !((av != null) && av.equalsIgnoreCase("false"));
 
@@ -1411,9 +1446,9 @@ public class SessionManager extends AbstractMessageReceiver
 
 							if (p != null) {
 
-//              +              // use this hack to break XMLNS
-//              +              Element el = new Element("presence");
-//              +              el.setChildren(p.getChildren());
+								// + // use this hack to break XMLNS
+								// + Element el = new Element("presence");
+								// + el.setChildren(p.getChildren());
 								Element elem = p.clone();
 
 								elem.setXMLNS("jabber:client");
@@ -1425,24 +1460,27 @@ public class SessionManager extends AbstractMessageReceiver
 							if (connection == null) {
 								JID user_jid = JID.jidInstance(Command.getFieldValue(iqc, "jid"));
 
-								connection = loginUserSession(iqc.getStanzaFrom(), user_jid.getDomain(),
-										user_jid.getBareJID(), user_jid.getResource(), ConnectionStatus.NORMAL,
-											"USER_STATUS");
+								connection =
+										loginUserSession(iqc.getStanzaFrom(), user_jid.getDomain(),
+												user_jid.getBareJID(), user_jid.getResource(),
+												ConnectionStatus.NORMAL, "USER_STATUS");
 								connection.putSessionData("jingle", "active");
 								fastAddOutPacket(iqc.okResult((String) null, 0));
 
 								if (presence == null) {
-									presence = Packet.packetInstance(new Element("presence",
-											new Element[] { new Element("priority", "-1"),
-											new Element("c", new String[] { "node", "ver", "ext", "xmlns" },
-											new String[] { "http://www.google.com/xmpp/client/caps",
-											XMPPServer.getImplementationVersion(), "voice-v1",
-											"http://jabber.org/protocol/caps" }) }, null, null));
+									presence =
+											Packet.packetInstance(new Element("presence", new Element[] {
+													new Element("priority", "-1"),
+													new Element("c",
+															new String[] { "node", "ver", "ext", "xmlns" },
+															new String[] { "http://www.google.com/xmpp/client/caps",
+																	XMPPServer.getImplementationVersion(), "voice-v1",
+																	"http://jabber.org/protocol/caps" }) }, null, null));
 								}
 							} else {
 
-//              addOutPacket(Authorization.CONFLICT.getResponseMessage(pc,
-//                  "The user resource already exists.", true));
+								// addOutPacket(Authorization.CONFLICT.getResponseMessage(pc,
+								// "The user resource already exists.", true));
 								if (log.isLoggable(Level.FINEST)) {
 									log.finest("USER_STATUS set to true for user who is already available: "
 											+ iqc.toStringSecure());
@@ -1463,7 +1501,8 @@ public class SessionManager extends AbstractMessageReceiver
 							} else {
 								addOutPacket(Authorization.ITEM_NOT_FOUND.getResponseMessage(iqc,
 										"The user resource you want to remove does not exist.", true));
-								log.info("Can not find resource connection for packet: " + iqc.toStringSecure());
+								log.info("Can not find resource connection for packet: "
+										+ iqc.toStringSecure());
 							}
 						}
 					} else {
@@ -1489,32 +1528,32 @@ public class SessionManager extends AbstractMessageReceiver
 
 				break;
 
-			case OTHER :
+			case OTHER:
 				break;
 
-			default :
+			default:
 				break;
-		}    // end of switch (pc.getCommand())
+		} // end of switch (pc.getCommand())
 
 		return processing_result;
 	}
 
 	protected void processPacket(Packet packet, XMPPResourceConnection conn) {
 
-		// TODO: check if this is really necessary, seems to be even harmful in some cases
+		// TODO: check if this is really necessary, seems to be even harmful in some
+		// cases
 		// like when the error is generated as a response to a bad packet.
 		packet.setPacketTo(getComponentId());
 
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "processing packet: {0}, connection: {1}",
-					new Object[] { packet.toStringSecure(),
-					conn });
+			log.log(Level.FINEST, "processing packet: {0}, connection: {1}", new Object[] {
+					packet.toStringSecure(), conn });
 		}
 
 		Queue<Packet> results = new ArrayDeque<Packet>(2);
 		boolean stop = false;
 
-		if ( !stop) {
+		if (!stop) {
 			if (defPacketHandler.preprocess(packet, conn, naUserRepository, results)) {
 				packet.processedBy("filter-foward");
 
@@ -1540,21 +1579,22 @@ public class SessionManager extends AbstractMessageReceiver
 		// If any of them returns true - it means processing should stop now.
 		// That is needed for preprocessors like privacy lists which should
 		// block certain packets.
-		if ( !stop) {
+		if (!stop) {
 			for (XMPPPreprocessorIfc preproc : preProcessors.values()) {
-				stop |= preproc.preProcess(packet, conn, naUserRepository, results,
-						plugin_config.get(preproc.id()));
+				stop |=
+						preproc.preProcess(packet, conn, naUserRepository, results,
+								plugin_config.get(preproc.id()));
 
 				if (stop && log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "Packet blocked by: {0}, packet{1}", new Object[] { preproc.id(),
-							packet });
+					log.log(Level.FINEST, "Packet blocked by: {0}, packet{1}", new Object[] {
+							preproc.id(), packet });
 
 					break;
 				}
-			}    // end of for (XMPPPreprocessorIfc preproc: preProcessors)
+			} // end of for (XMPPPreprocessorIfc preproc: preProcessors)
 		}
 
-		if ( !stop) {
+		if (!stop) {
 			if (defPacketHandler.forward(packet, conn, naUserRepository, results)) {
 				packet.processedBy("filter-foward");
 
@@ -1568,21 +1608,24 @@ public class SessionManager extends AbstractMessageReceiver
 			}
 		}
 
-		if ( !stop) {
+		if (!stop) {
 			walk(packet, conn, packet.getElement(), results);
 		}
 
-		if ( !stop) {
+		if (!stop) {
 			for (XMPPPostprocessorIfc postproc : postProcessors.values()) {
 				postproc.postProcess(packet, conn, naUserRepository, results,
 						plugin_config.get(postproc.id()));
-			}    // end of for (XMPPPostprocessorIfc postproc: postProcessors)
-		}      // end of if (!stop)
+			} // end of for (XMPPPostprocessorIfc postproc: postProcessors)
+		} // end of if (!stop)
 
-		if ( !stop &&!packet.wasProcessed()
-				&& ((packet.getStanzaTo() == null) || ( !isLocalDomain(packet.getStanzaTo().toString())))) {
+		if (!stop
+				&& !packet.wasProcessed()
+				&& ((packet.getStanzaTo() == null) || (!isLocalDomain(packet.getStanzaTo()
+						.toString())))) {
 			if (defPacketHandler.canHandle(packet, conn)) {
-				ProcessingThreads<ProcessorWorkerThread> pt = workerThreads.get(defHandlerProc.id());
+				ProcessingThreads<ProcessorWorkerThread> pt =
+						workerThreads.get(defHandlerProc.id());
 
 				if (pt == null) {
 					pt = workerThreads.get(defPluginsThreadsPool);
@@ -1598,7 +1641,8 @@ public class SessionManager extends AbstractMessageReceiver
 
 		if (packet.wasProcessed() || processAdminsOrDomains(packet)) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Packet processed by: {0}", packet.getProcessorsIds().toString());
+				log.log(Level.FINEST, "Packet processed by: {0}", packet.getProcessorsIds()
+						.toString());
 			}
 		} else {
 			if (log.isLoggable(Level.FINEST)) {
@@ -1608,13 +1652,14 @@ public class SessionManager extends AbstractMessageReceiver
 			Packet error = null;
 
 			if (stop
-					|| ((conn == null) && (packet.getStanzaFrom() != null) && (packet.getStanzaTo() != null)
-						&&!packet.getStanzaTo().equals(getComponentId())
-							&& ((packet.getElemName() == Iq.ELEM_NAME)
-								|| (packet.getElemName() == Message.ELEM_NAME)))) {
+					|| ((conn == null) && (packet.getStanzaFrom() != null)
+							&& (packet.getStanzaTo() != null)
+							&& !packet.getStanzaTo().equals(getComponentId()) && ((packet.getElemName() == Iq.ELEM_NAME) || (packet
+							.getElemName() == Message.ELEM_NAME)))) {
 				try {
-					error = Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet,
-							"Service not available.", true);
+					error =
+							Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet,
+									"Service not available.", true);
 				} catch (PacketErrorTypeException e) {
 					log.log(Level.FINE, "Service not available. Packet is error type already: {0}",
 							packet.toStringSecure());
@@ -1622,10 +1667,12 @@ public class SessionManager extends AbstractMessageReceiver
 			} else {
 				if ((packet.getStanzaFrom() != null) || (conn != null)) {
 					try {
-						error = Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
-								"Feature not supported yet.", true);
+						error =
+								Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
+										"Feature not supported yet.", true);
 					} catch (PacketErrorTypeException e) {
-						log.log(Level.FINE, "Feature not supported yet. Packet is error type already: {0}",
+						log.log(Level.FINE,
+								"Feature not supported yet. Packet is error type already: {0}",
 								packet.toStringSecure());
 					}
 				}
@@ -1634,12 +1681,12 @@ public class SessionManager extends AbstractMessageReceiver
 			if (error != null) {
 				if (error.getStanzaTo() != null) {
 					conn = getResourceConnection(error.getStanzaTo());
-				}      // end of if (error.getElemTo() != null)
+				} // end of if (error.getElemTo() != null)
 
 				try {
 					if (conn != null) {
 						error.setPacketTo(conn.getConnectionId());
-					}    // end of if (conn != null)
+					} // end of if (conn != null)
 
 					addOutPacket(error);
 				} catch (NoConnectionIdException e) {
@@ -1648,7 +1695,7 @@ public class SessionManager extends AbstractMessageReceiver
 					log.log(Level.WARNING, "Error packet to the SM''s own session: {0}", error);
 				}
 			}
-		}    // end of else
+		} // end of else
 	}
 
 	protected void registerNewSession(BareJID userId, XMPPResourceConnection conn) {
@@ -1682,10 +1729,10 @@ public class SessionManager extends AbstractMessageReceiver
 						}
 
 						try {
-							addOutPacketWithTimeout(Command.CHECK_USER_CONNECTION.getPacket(getComponentId(),
-									connection.getConnectionId(), StanzaType.get,
-										UUID.randomUUID().toString()), connectionCheckCommandHandler, 30l,
-											TimeUnit.SECONDS);
+							addOutPacketWithTimeout(Command.CHECK_USER_CONNECTION.getPacket(
+									getComponentId(), connection.getConnectionId(), StanzaType.get, UUID
+											.randomUUID().toString()), connectionCheckCommandHandler, 30l,
+									TimeUnit.SECONDS);
 						} catch (NoConnectionIdException ex) {
 
 							// This actually should not happen... might be a bug:
@@ -1744,7 +1791,8 @@ public class SessionManager extends AbstractMessageReceiver
 		boolean loaded = false;
 
 		if (proc != null) {
-			int concurrency = ((conc != null) ? conc : ((proc != null) ? proc.concurrentQueuesNo() : 0));
+			int concurrency =
+					((conc != null) ? conc : ((proc != null) ? proc.concurrentQueuesNo() : 0));
 
 			System.out.println("Loading plugin: " + plug_id + "=" + concurrency + " ...");
 
@@ -1754,19 +1802,17 @@ public class SessionManager extends AbstractMessageReceiver
 			if ((workerThreads.get(defPluginsThreadsPool) == null) || (conc != null)) {
 				ProcessorWorkerThread worker = new ProcessorWorkerThread();
 				ProcessingThreads<ProcessorWorkerThread> pt =
-					new ProcessingThreads<ProcessorWorkerThread>(worker, concurrency, maxQueueSize,
-						proc.id());
+						new ProcessingThreads<ProcessorWorkerThread>(worker, concurrency,
+								maxQueueSize, proc.id());
 
 				workerThreads.put(proc.id(), pt);
 				log.log(Level.CONFIG, "Created thread pool: {0}, queue: {1} for plugin id: {2}",
-						new Object[] { concurrency,
-						maxQueueSize, proc.id() });
+						new Object[] { concurrency, maxQueueSize, proc.id() });
 			}
 
 			processors.put(proc.id(), proc);
-			log.log(Level.CONFIG, "Added processor: {0} for plugin id: {1}",
-					new Object[] { proc.getClass().getSimpleName(),
-					proc.id() });
+			log.log(Level.CONFIG, "Added processor: {0} for plugin id: {1}", new Object[] {
+					proc.getClass().getSimpleName(), proc.id() });
 			loaded = true;
 			result = proc;
 		}
@@ -1775,9 +1821,8 @@ public class SessionManager extends AbstractMessageReceiver
 
 		if (preproc != null) {
 			preProcessors.put(plug_id, preproc);
-			log.log(Level.CONFIG, "Added preprocessor: {0} for plugin id: {1}",
-					new Object[] { preproc.getClass().getSimpleName(),
-					plug_id });
+			log.log(Level.CONFIG, "Added preprocessor: {0} for plugin id: {1}", new Object[] {
+					preproc.getClass().getSimpleName(), plug_id });
 			loaded = true;
 			result = preproc;
 		}
@@ -1786,9 +1831,8 @@ public class SessionManager extends AbstractMessageReceiver
 
 		if (postproc != null) {
 			postProcessors.put(plug_id, postproc);
-			log.log(Level.CONFIG, "Added postprocessor: {0} for plugin id: {1}",
-					new Object[] { postproc.getClass().getSimpleName(),
-					plug_id });
+			log.log(Level.CONFIG, "Added postprocessor: {0} for plugin id: {1}", new Object[] {
+					postproc.getClass().getSimpleName(), plug_id });
 			loaded = true;
 			result = postproc;
 		}
@@ -1798,8 +1842,7 @@ public class SessionManager extends AbstractMessageReceiver
 		if (stoplist != null) {
 			stopListeners.put(plug_id, stoplist);
 			log.log(Level.CONFIG, "Added stopped processor: {0} for plugin id: {1}",
-					new Object[] { stoplist.getClass().getSimpleName(),
-					plug_id });
+					new Object[] { stoplist.getClass().getSimpleName(), plug_id });
 			loaded = true;
 			result = stoplist;
 		}
@@ -1808,21 +1851,20 @@ public class SessionManager extends AbstractMessageReceiver
 
 		if (filterproc != null) {
 			outFilters.put(plug_id, filterproc);
-			log.log(Level.CONFIG, "Added packet filter: {0} for plugin id: {1}",
-					new Object[] { filterproc.getClass().getSimpleName(),
-					plug_id });
+			log.log(Level.CONFIG, "Added packet filter: {0} for plugin id: {1}", new Object[] {
+					filterproc.getClass().getSimpleName(), plug_id });
 			loaded = true;
 			result = filterproc;
 		}
 
-		if ( !loaded) {
+		if (!loaded) {
 			log.log(Level.WARNING, "No implementation found for plugin id: {0}", plug_id);
-		}    // end of if (!loaded)
+		} // end of if (!loaded)
 
 		return result;
 	}
 
-	//~--- get methods ----------------------------------------------------------
+	// ~--- get methods ----------------------------------------------------------
 
 	private List<Element> getFeatures(XMPPResourceConnection session) {
 		List<Element> results = new LinkedList<Element>();
@@ -1832,16 +1874,18 @@ public class SessionManager extends AbstractMessageReceiver
 
 			if (features != null) {
 				results.addAll(Arrays.asList(features));
-			}    // end of if (features != null)
-		}      // end of for ()
+			} // end of if (features != null)
+		} // end of for ()
 
 		return results;
 	}
 
-	private Map<String, Object> getPluginSettings(String plug_id, Map<String, Object> props) {
+	private Map<String, Object>
+			getPluginSettings(String plug_id, Map<String, Object> props) {
 		Map<String, Object> plugin_settings = new ConcurrentHashMap<String, Object>(10);
 
-		// First set all options common for all plugins and then set all options specific to the
+		// First set all options common for all plugins and then set all options
+		// specific to the
 		// plugin to make sure specific options can overwrite common options
 		for (Map.Entry<String, Object> entry : props.entrySet()) {
 			if (entry.getKey().startsWith(PLUGINS_CONF_PROP_KEY)) {
@@ -1853,8 +1897,7 @@ public class SessionManager extends AbstractMessageReceiver
 				if (nodes.length == 2) {
 					plugin_settings.put(nodes[1], entry.getValue());
 					log.log(Level.CONFIG, "Adding a common plugins option: {0} = {1}",
-							new Object[] { nodes[1],
-							entry.getValue() });
+							new Object[] { nodes[1], entry.getValue() });
 				}
 			}
 		}
@@ -1875,8 +1918,7 @@ public class SessionManager extends AbstractMessageReceiver
 					if (Arrays.binarySearch(ids, plug_id) >= 0) {
 						plugin_settings.put(nodes[2], entry.getValue());
 						log.log(Level.CONFIG, "Adding a specific plugins option [{0}]: {1} = {2}",
-								new Object[] { plug_id,
-								nodes[1], entry.getValue() });
+								new Object[] { plug_id, nodes[1], entry.getValue() });
 					}
 				}
 			}
@@ -1885,7 +1927,7 @@ public class SessionManager extends AbstractMessageReceiver
 		return plugin_settings;
 	}
 
-	//~--- set methods ----------------------------------------------------------
+	// ~--- set methods ----------------------------------------------------------
 
 	private void setPermissions(XMPPResourceConnection conn, Queue<Packet> results) {
 		Permissions perms = Permissions.NONE;
@@ -1921,7 +1963,7 @@ public class SessionManager extends AbstractMessageReceiver
 		}
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	private void walk(final Packet packet, final XMPPResourceConnection connection,
 			final Element elem, final Queue<Packet> results) {
@@ -1936,9 +1978,8 @@ public class SessionManager extends AbstractMessageReceiver
 
 			if (processor.isSupporting(elem.getName(), xmlns)) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST,
-							"XMPPProcessorIfc: {0} ({1}" + ")" + "\n Request: " + "{2}, conn: {3}",
-								new Object[] { processor.getClass().getSimpleName(),
+					log.log(Level.FINEST, "XMPPProcessorIfc: {0} ({1}" + ")" + "\n Request: "
+							+ "{2}, conn: {3}", new Object[] { processor.getClass().getSimpleName(),
 							processor.id(), packet, connection });
 				}
 
@@ -1952,63 +1993,63 @@ public class SessionManager extends AbstractMessageReceiver
 					packet.processedBy(processor.id());
 				} else {
 
-//        proc_t.debugQueue();
+					// proc_t.debugQueue();
 					if (log.isLoggable(Level.FINE)) {
-						log.log(Level.FINE, "Can not add packet: {0} to processor: {1} internal queue full.",
-								new Object[] { packet.toStringSecure(),
-								pt.getName() });
+						log.log(Level.FINE,
+								"Can not add packet: {0} to processor: {1} internal queue full.",
+								new Object[] { packet.toStringSecure(), pt.getName() });
 					}
 				}
-			}    // end of if (proc.isSupporting(elem.getName(), elem.getXMLNS()))
-		}      // end of for ()
+			} // end of if (proc.isSupporting(elem.getName(), elem.getXMLNS()))
+		} // end of for ()
 
 		Collection<Element> children = elem.getChildren();
 
 		if (children != null) {
 			for (Element child : children) {
 				walk(packet, connection, child, results);
-			}    // end of for (Element child: children)
-		}      // end of if (children != null)
+			} // end of for (Element child: children)
+		} // end of if (children != null)
 	}
 
-	//~--- inner classes --------------------------------------------------------
+	// ~--- inner classes --------------------------------------------------------
 
 	private class AuthenticationTimer extends TimerTask {
 		private JID connId = null;
 
-		//~--- constructors -------------------------------------------------------
+		// ~--- constructors -------------------------------------------------------
 
 		private AuthenticationTimer(JID connId) {
 			this.connId = connId;
 		}
 
-		//~--- methods ------------------------------------------------------------
+		// ~--- methods ------------------------------------------------------------
 
 		/**
 		 * Method description
-		 *
+		 * 
 		 */
 		@Override
 		public void run() {
 			XMPPResourceConnection conn = connectionsByFrom.get(connId);
 
-			if ((conn != null) &&!conn.isAuthorized()) {
+			if ((conn != null) && !conn.isAuthorized()) {
 				connectionsByFrom.remove(connId);
 				++authTimeouts;
-				log.log(Level.INFO, "Authentication timeout expired, closing connection: {0}", connId);
-				fastAddOutPacket(Command.CLOSE.getPacket(getComponentId(), connId, StanzaType.set,
-						conn.nextStanzaId()));
+				log.log(Level.INFO, "Authentication timeout expired, closing connection: {0}",
+						connId);
+				fastAddOutPacket(Command.CLOSE.getPacket(getComponentId(), connId,
+						StanzaType.set, conn.nextStanzaId()));
 			}
 		}
 	}
-
 
 	private class ConnectionCheckCommandHandler implements ReceiverTimeoutHandler {
 
 		/**
 		 * Method description
-		 *
-		 *
+		 * 
+		 * 
 		 * @param packet
 		 * @param response
 		 */
@@ -2016,7 +2057,8 @@ public class SessionManager extends AbstractMessageReceiver
 		public void responseReceived(Packet packet, Packet response) {
 			if (response.getType() == StanzaType.error) {
 				if (log.isLoggable(Level.FINER)) {
-					log.log(Level.FINER, "Connection checker error received, closing connection: {0}",
+					log.log(Level.FINER,
+							"Connection checker error received, closing connection: {0}",
 							packet.getTo());
 				}
 
@@ -2027,28 +2069,27 @@ public class SessionManager extends AbstractMessageReceiver
 
 		/**
 		 * Method description
-		 *
-		 *
+		 * 
+		 * 
 		 * @param packet
 		 */
 		@Override
 		public void timeOutExpired(Packet packet) {
 			if (log.isLoggable(Level.FINER)) {
-				log.log(Level.FINER, "Connection checker timeout expired, closing connection: {0}",
-						packet.getTo());
+				log.log(Level.FINER,
+						"Connection checker timeout expired, closing connection: {0}", packet.getTo());
 			}
 
 			closeConnection(packet.getTo(), false);
 		}
 	}
 
-
 	private class DefaultHandlerProc extends XMPPProcessor implements XMPPProcessorIfc {
 
 		/**
 		 * Method description
-		 *
-		 *
+		 * 
+		 * 
 		 * @return
 		 */
 		@Override
@@ -2058,8 +2099,8 @@ public class SessionManager extends AbstractMessageReceiver
 
 		/**
 		 * Method description
-		 *
-		 *
+		 * 
+		 * 
 		 * @return
 		 */
 		@Override
@@ -2069,19 +2110,19 @@ public class SessionManager extends AbstractMessageReceiver
 
 		/**
 		 * Method description
-		 *
-		 *
+		 * 
+		 * 
 		 * @param packet
 		 * @param session
 		 * @param repo
 		 * @param results
 		 * @param settings
-		 *
+		 * 
 		 * @throws XMPPException
 		 */
 		@Override
-		public void process(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
-				Queue<Packet> results, Map<String, Object> settings)
+		public void process(Packet packet, XMPPResourceConnection session,
+				NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
 				throws XMPPException {
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Executing default packet handler for: {0}", packet);
@@ -2091,17 +2132,16 @@ public class SessionManager extends AbstractMessageReceiver
 		}
 	}
 
-
 	private class ProcessorWorkerThread extends WorkerThread {
 		private ArrayDeque<Packet> local_results = new ArrayDeque<Packet>(100);
 
-		//~--- get methods --------------------------------------------------------
+		// ~--- get methods --------------------------------------------------------
 
 		/**
 		 * Method description
-		 *
-		 *
-		 *
+		 * 
+		 * 
+		 * 
 		 * @return
 		 */
 		@Override
@@ -2111,12 +2151,12 @@ public class SessionManager extends AbstractMessageReceiver
 			return worker;
 		}
 
-		//~--- methods ------------------------------------------------------------
+		// ~--- methods ------------------------------------------------------------
 
 		/**
 		 * Method description
-		 *
-		 *
+		 * 
+		 * 
 		 * @param item
 		 */
 		@Override
@@ -2124,8 +2164,8 @@ public class SessionManager extends AbstractMessageReceiver
 			XMPPProcessorIfc processor = item.getProcessor();
 
 			try {
-				processor.process(item.getPacket(), item.getConn(), naUserRepository, local_results,
-						plugin_config.get(processor.id()));
+				processor.process(item.getPacket(), item.getConn(), naUserRepository,
+						local_results, plugin_config.get(processor.id()));
 
 				if (item.getConn() != null) {
 					setPermissions(item.getConn(), local_results);
@@ -2133,22 +2173,21 @@ public class SessionManager extends AbstractMessageReceiver
 
 				addOutPackets(item.getPacket(), item.getConn(), local_results);
 			} catch (PacketErrorTypeException e) {
-				log.log(Level.INFO, "Already error packet, ignoring: {0}",
-						item.getPacket().toStringSecure());
+				log.log(Level.INFO, "Already error packet, ignoring: {0}", item.getPacket()
+						.toStringSecure());
 			} catch (XMPPException e) {
-				log.log(Level.WARNING,
-						"Exception during packet processing: " + item.getPacket().toStringSecure(), e);
+				log.log(Level.WARNING, "Exception during packet processing: "
+						+ item.getPacket().toStringSecure(), e);
 			}
 		}
 	}
-
 
 	private class SessionCloseProc extends XMPPProcessor implements XMPPProcessorIfc {
 
 		/**
 		 * Method description
-		 *
-		 *
+		 * 
+		 * 
 		 * @return
 		 */
 		@Override
@@ -2158,8 +2197,8 @@ public class SessionManager extends AbstractMessageReceiver
 
 		/**
 		 * Method description
-		 *
-		 *
+		 * 
+		 * 
 		 * @return
 		 */
 		@Override
@@ -2169,19 +2208,19 @@ public class SessionManager extends AbstractMessageReceiver
 
 		/**
 		 * Method description
-		 *
-		 *
+		 * 
+		 * 
 		 * @param packet
 		 * @param session
 		 * @param repo
 		 * @param results
 		 * @param settings
-		 *
+		 * 
 		 * @throws XMPPException
 		 */
 		@Override
-		public void process(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
-				Queue<Packet> results, Map<String, Object> settings)
+		public void process(Packet packet, XMPPResourceConnection session,
+				NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
 				throws XMPPException {
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Executing connection close for: {0}", packet);
@@ -2191,13 +2230,12 @@ public class SessionManager extends AbstractMessageReceiver
 		}
 	}
 
-
 	private class SessionOpenProc extends XMPPProcessor implements XMPPProcessorIfc {
 
 		/**
 		 * Method description
-		 *
-		 *
+		 * 
+		 * 
 		 * @return
 		 */
 		@Override
@@ -2207,8 +2245,8 @@ public class SessionManager extends AbstractMessageReceiver
 
 		/**
 		 * Method description
-		 *
-		 *
+		 * 
+		 * 
 		 * @return
 		 */
 		@Override
@@ -2218,19 +2256,19 @@ public class SessionManager extends AbstractMessageReceiver
 
 		/**
 		 * Method description
-		 *
-		 *
+		 * 
+		 * 
 		 * @param packet
 		 * @param session
 		 * @param repo
 		 * @param results
 		 * @param settings
-		 *
+		 * 
 		 * @throws XMPPException
 		 */
 		@Override
-		public void process(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
-				Queue<Packet> results, Map<String, Object> settings)
+		public void process(Packet packet, XMPPResourceConnection session,
+				NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
 				throws XMPPException {
 			XMPPResourceConnection conn = session;
 
@@ -2246,8 +2284,8 @@ public class SessionManager extends AbstractMessageReceiver
 				try {
 					conn = createUserSession(packet.getFrom(), hostname);
 				} catch (TigaseStringprepException ex) {
-					log.log(Level.WARNING, "Incrrect hostname, did not pass stringprep processing: {0}",
-							hostname);
+					log.log(Level.WARNING,
+							"Incrrect hostname, did not pass stringprep processing: {0}", hostname);
 
 					return;
 				}
@@ -2258,15 +2296,14 @@ public class SessionManager extends AbstractMessageReceiver
 					log.log(Level.FINEST, "Stream opened for existing session, authorized: {0}",
 							conn.isAuthorized());
 				}
-			}    // end of else
+			} // end of else
 
 			conn.setSessionId(Command.getFieldValue(packet, "session-id"));
 			conn.setDefLang(Command.getFieldValue(packet, "xml:lang"));
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Setting session-id {0} for connection: {1}",
-						new Object[] { conn.getSessionId(),
-						conn });
+				log.log(Level.FINEST, "Setting session-id {0} for connection: {1}", new Object[] {
+						conn.getSessionId(), conn });
 			}
 
 			fastAddOutPacket(packet.okResult((String) null, 0));
@@ -2274,8 +2311,6 @@ public class SessionManager extends AbstractMessageReceiver
 	}
 }
 
+// ~ Formatted in Sun Code Convention
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+// ~ Formatted by Jindent --- http://www.jindent.com
