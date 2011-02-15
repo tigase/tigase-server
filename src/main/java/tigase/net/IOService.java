@@ -69,7 +69,7 @@ import java.util.logging.Logger;
 /**
  * <code>IOService</code> offers thread safe
  * <code>call()</code> method execution, however you must be prepared that other
- * methods can be called simultanously like <code>stop()</code>,
+ * methods can be called simultaneously like <code>stop()</code>,
  * <code>getProtocol()</code> or <code>isConnected()</code>.
  * <br/>It is recommended that developers extend <code>AbsractServerService</code>
  * rather then implement <code>ServerService</code> interface directly.
@@ -684,7 +684,7 @@ public abstract class IOService<RefObject> implements Callable<IOService<?>>, TL
 		try {
 
 			// resizeInputBuffer();
-			// Maybe we can shring the input buffer??
+			// Maybe we can shrink the input buffer??
 			if ((socketInput.capacity() > socketInputSize)
 					&& (socketInput.remaining() == socketInput.capacity())) {
 
