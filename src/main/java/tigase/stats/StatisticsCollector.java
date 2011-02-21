@@ -69,15 +69,15 @@ import javax.management.ObjectName;
 
 /**
  * Class StatisticsCollector
- *
- *
+ * 
+ * 
  * Created: Tue Nov 22 07:07:11 2005
- *
+ * 
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class StatisticsCollector extends AbstractComponentRegistrator<StatisticsContainer>
-		implements ShutdownHook {
+public class StatisticsCollector extends
+		AbstractComponentRegistrator<StatisticsContainer> implements ShutdownHook {
 
 	/**
 	 *
@@ -90,28 +90,30 @@ public class StatisticsCollector extends AbstractComponentRegistrator<Statistics
 	public static final String STATS_ARCHIVIZERS_PROP_KEY = "stats-archiv";
 
 	/** Field description */
-	public static final String STATISTICS_MBEAN_NAME = "tigase.stats:type=StatisticsProvider";
+	public static final String STATISTICS_MBEAN_NAME =
+			"tigase.stats:type=StatisticsProvider";
 	private static final String STATS_XMLNS = "http://jabber.org/protocol/stats";
 	private static final Logger log = Logger.getLogger(StatisticsCollector.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
+	// ~--- fields ---------------------------------------------------------------
 
 	private ServiceEntity serviceEntity = null;
 	private StatisticsProvider sp = null;
-	private Map<String, StatisticsArchivizerIfc> archivizers = new ConcurrentSkipListMap<String,
-		StatisticsArchivizerIfc>();
+	private Map<String, StatisticsArchivizerIfc> archivizers =
+			new ConcurrentSkipListMap<String, StatisticsArchivizerIfc>();
 	private ArchivizerRunner arch_runner = new ArchivizerRunner();
 
 	// private ServiceEntity stats_modules = null;
 	private Level statsLevel = Level.INFO;
-	private Timer statsArchivTasks = new Timer("stats-archivizer-tasks", true);;
+	private Timer statsArchivTasks = new Timer("stats-archivizer-tasks", true);
+	private TimerTask initializationCompletedTask = null;
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param component
 	 */
 	@Override
@@ -119,29 +121,32 @@ public class StatisticsCollector extends AbstractComponentRegistrator<Statistics
 		ServiceEntity item = serviceEntity.findNode(component.getName());
 
 		if (item == null) {
-			item = new ServiceEntity(getName(), component.getName(), "Component: " + component.getName());
+			item =
+					new ServiceEntity(getName(), component.getName(), "Component: "
+							+ component.getName());
 			item.addFeatures(CMD_FEATURES);
-			item.addIdentities(new ServiceIdentity("automation", "command-node",
-					"Component: " + component.getName()));
+			item.addIdentities(new ServiceIdentity("automation", "command-node", "Component: "
+					+ component.getName()));
 			serviceEntity.addItems(item);
 		}
 	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param component
 	 */
 	@Override
-	public void componentRemoved(StatisticsContainer component) {}
+	public void componentRemoved(StatisticsContainer component) {
+	}
 
-	//~--- get methods ----------------------------------------------------------
+	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	public StatisticsList getAllStats() {
@@ -154,8 +159,8 @@ public class StatisticsCollector extends AbstractComponentRegistrator<Statistics
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param list
 	 */
 	public void getAllStats(StatisticsList list) {
@@ -166,8 +171,8 @@ public class StatisticsCollector extends AbstractComponentRegistrator<Statistics
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param name
 	 * @param list
 	 */
@@ -181,8 +186,8 @@ public class StatisticsCollector extends AbstractComponentRegistrator<Statistics
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	public List<String> getComponentsNames() {
@@ -191,10 +196,10 @@ public class StatisticsCollector extends AbstractComponentRegistrator<Statistics
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param params
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -202,7 +207,7 @@ public class StatisticsCollector extends AbstractComponentRegistrator<Statistics
 		Map<String, Object> defs = super.getDefaults(params);
 		String statsArchivizers = (String) params.get(STATS_ARCHIVIZERS);
 
-		if ((statsArchivizers != null) &&!statsArchivizers.isEmpty()) {
+		if ((statsArchivizers != null) && !statsArchivizers.isEmpty()) {
 			String[] archivs = statsArchivizers.split(",");
 
 			defs.put(STATS_ARCHIVIZERS_PROP_KEY, archivs);
@@ -213,10 +218,10 @@ public class StatisticsCollector extends AbstractComponentRegistrator<Statistics
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param from
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -226,12 +231,12 @@ public class StatisticsCollector extends AbstractComponentRegistrator<Statistics
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param node
 	 * @param jid
 	 * @param from
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -245,12 +250,12 @@ public class StatisticsCollector extends AbstractComponentRegistrator<Statistics
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param node
 	 * @param jid
 	 * @param from
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -261,15 +266,15 @@ public class StatisticsCollector extends AbstractComponentRegistrator<Statistics
 
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "Processing discoItems for node: {0}, result: {1}",
-							new Object[] { node,
-							(items == null) ? null : items.toString() });
+							new Object[] { node, (items == null) ? null : items.toString() });
 				}
 
 				return items;
 			} else {
 				if (node == null) {
-					Element item = serviceEntity.getDiscoItem(null,
-						BareJID.toString(getName(), jid.toString()));
+					Element item =
+							serviceEntity.getDiscoItem(null,
+									BareJID.toString(getName(), jid.toString()));
 
 					if (log.isLoggable(Level.FINEST)) {
 						log.log(Level.FINEST, "Processing discoItems, result: {0}",
@@ -288,8 +293,8 @@ public class StatisticsCollector extends AbstractComponentRegistrator<Statistics
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -299,10 +304,10 @@ public class StatisticsCollector extends AbstractComponentRegistrator<Statistics
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param component
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -310,34 +315,35 @@ public class StatisticsCollector extends AbstractComponentRegistrator<Statistics
 		return component instanceof StatisticsContainer;
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packet
 	 * @param results
 	 */
 	@Override
 	public void processPacket(final Packet packet, final Queue<Packet> results) {
-		if ( !packet.isCommand() || (packet.getType() == StanzaType.result)) {
+		if (!packet.isCommand() || (packet.getType() == StanzaType.result)) {
 			return;
 		}
 
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "{0} command received: {1}", new Object[] { packet.getCommand().name(),
-					packet });
+			log.log(Level.FINEST, "{0} command received: {1}", new Object[] {
+					packet.getCommand().name(), packet });
 		}
 
 		Iq iqc = (Iq) packet;
 
 		switch (iqc.getCommand()) {
-			case GETSTATS : {
+			case GETSTATS: {
 
 				// Element statistics = new Element("statistics");
-				Element iq = ElementUtils.createIqQuery(iqc.getStanzaTo(), iqc.getStanzaFrom(),
-					StanzaType.result, iqc.getStanzaId(), STATS_XMLNS);
+				Element iq =
+						ElementUtils.createIqQuery(iqc.getStanzaTo(), iqc.getStanzaFrom(),
+								StanzaType.result, iqc.getStanzaId(), STATS_XMLNS);
 				Element query = iq.getChild("query");
 				StatisticsList stats = getAllStats();
 
@@ -345,12 +351,13 @@ public class StatisticsCollector extends AbstractComponentRegistrator<Statistics
 					for (StatRecord record : stats) {
 						Element item = new Element("stat");
 
-						item.addAttribute("name", record.getComponent() + "/" + record.getDescription());
+						item.addAttribute("name",
+								record.getComponent() + "/" + record.getDescription());
 						item.addAttribute("units", record.getUnit());
 						item.addAttribute("value", record.getValue());
 						query.addChild(item);
-					}    // end of for ()
-				}      // end of if (stats != null && stats.count() > 0)
+					} // end of for ()
+				} // end of if (stats != null && stats.count() > 0)
 
 				Packet result = Packet.packetInstance(iq, iqc.getStanzaTo(), iqc.getStanzaFrom());
 
@@ -360,14 +367,14 @@ public class StatisticsCollector extends AbstractComponentRegistrator<Statistics
 				break;
 			}
 
-			case OTHER : {
+			case OTHER: {
 				if (iqc.getStrCommand() == null) {
 					return;
 				}
 
 				String nick = iqc.getTo().getLocalpart();
 
-				if ( !getName().equals(nick)) {
+				if (!getName().equals(nick)) {
 					return;
 				}
 
@@ -395,7 +402,8 @@ public class StatisticsCollector extends AbstractComponentRegistrator<Statistics
 
 				if (iqc.getStrCommand().equals("stats")) {
 					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, "Getting all stats for level: {0}", statsLevel.getName());
+						log.log(Level.FINEST, "Getting all stats for level: {0}",
+								statsLevel.getName());
 					}
 
 					getAllStats(list);
@@ -408,16 +416,14 @@ public class StatisticsCollector extends AbstractComponentRegistrator<Statistics
 
 					if (log.isLoggable(Level.FINEST)) {
 						log.log(Level.FINEST, "Getting stats for component: {0}, level: {1}",
-								new Object[] { spl[1],
-								statsLevel.getName() });
+								new Object[] { spl[1], statsLevel.getName() });
 					}
 
 					getComponentStats(spl[1], list);
 
 					if (log.isLoggable(Level.FINEST)) {
 						log.log(Level.FINEST, "Stats loaded for component: {0}, level: {1}",
-								new Object[] { spl[1],
-								statsLevel.getName() });
+								new Object[] { spl[1], statsLevel.getName() });
 					}
 				}
 
@@ -428,20 +434,24 @@ public class StatisticsCollector extends AbstractComponentRegistrator<Statistics
 						if (rec.getType() == StatisticType.LIST) {
 							Command.addFieldMultiValue(result,
 									XMLUtils.escape(rec.getComponent() + "/" + rec.getDescription()),
-										rec.getListValue());
+									rec.getListValue());
 						} else {
 							Command.addFieldValue(result,
 									XMLUtils.escape(rec.getComponent() + "/" + rec.getDescription()),
-										XMLUtils.escape(rec.getValue()));
+									XMLUtils.escape(rec.getValue()));
 						}
 					}
 				}
 
-				Command.addFieldValue(result, "Stats level", statsLevel.getName(), "Stats level",
-						new String[] { Level.INFO.getName(),
-						Level.FINE.getName(), Level.FINER.getName(), Level.FINEST.getName() }, new String[] {
-						Level.INFO.getName(),
-						Level.FINE.getName(), Level.FINER.getName(), Level.FINEST.getName() });
+				Command.addFieldValue(
+						result,
+						"Stats level",
+						statsLevel.getName(),
+						"Stats level",
+						new String[] { Level.INFO.getName(), Level.FINE.getName(),
+								Level.FINER.getName(), Level.FINEST.getName() }, new String[] {
+								Level.INFO.getName(), Level.FINE.getName(), Level.FINER.getName(),
+								Level.FINEST.getName() });
 				results.offer(result);
 
 				if (log.isLoggable(Level.FINEST)) {
@@ -451,48 +461,36 @@ public class StatisticsCollector extends AbstractComponentRegistrator<Statistics
 				break;
 			}
 
-			default :
+			default:
 				break;
-		}    // end of switch (packet.getCommand())
+		} // end of switch (packet.getCommand())
 	}
 
-	//~--- set methods ----------------------------------------------------------
+	// ~--- set methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param name
 	 */
 	@Override
 	public void setName(String name) {
 		super.setName(name);
 		serviceEntity = new ServiceEntity(name, "stats", "Server statistics");
-		serviceEntity.addIdentities(new ServiceIdentity("component", "stats", "Server statistics"),
-				new ServiceIdentity("automation", "command-node", "All statistics"),
-					new ServiceIdentity("automation", "command-list", "Statistics retrieving commands"));
+		serviceEntity.addIdentities(new ServiceIdentity("component", "stats",
+				"Server statistics"), new ServiceIdentity("automation", "command-node",
+				"All statistics"), new ServiceIdentity("automation", "command-list",
+				"Statistics retrieving commands"));
 		serviceEntity.addFeatures(DEF_FEATURES);
 		serviceEntity.addFeatures(CMD_FEATURES);
 
-		try {
-			sp = new StatisticsProvider(this);
-
-			String objName = STATISTICS_MBEAN_NAME;
-			ObjectName on = new ObjectName(objName);
-
-			ManagementFactory.getPlatformMBeanServer().registerMBean(sp, on);
-			ConfiguratorAbstract.putMXBean(objName, sp);
-		} catch (Exception ex) {
-			log.log(Level.SEVERE, "Can not install Statistics MXBean: ", ex);
-		}
-
-		TigaseRuntime.getTigaseRuntime().addShutdownHook(this);
 	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param props
 	 */
 	@Override
@@ -506,12 +504,12 @@ public class StatisticsCollector extends AbstractComponentRegistrator<Statistics
 		}
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -532,7 +530,7 @@ public class StatisticsCollector extends AbstractComponentRegistrator<Statistics
 		}
 	}
 
-	//~--- get methods ----------------------------------------------------------
+	// ~--- get methods ----------------------------------------------------------
 
 	private Map<String, Object> getArchivizerConf(String name, Map<String, Object> props) {
 		Map<String, Object> result = new LinkedHashMap<String, Object>(4);
@@ -551,9 +549,29 @@ public class StatisticsCollector extends AbstractComponentRegistrator<Statistics
 		return result;
 	}
 
-	//~--- methods --------------------------------------------------------------
+	@Override
+	public void initializationCompleted() {
+		super.initializationCompleted();
+		try {
+			sp = new StatisticsProvider(this);
 
-	private void initStatsArchivizers(String[] archivs, Map<String, Object> props) {
+			String objName = STATISTICS_MBEAN_NAME;
+			ObjectName on = new ObjectName(objName);
+
+			ManagementFactory.getPlatformMBeanServer().registerMBean(sp, on);
+			ConfiguratorAbstract.putMXBean(objName, sp);
+		} catch (Exception ex) {
+			log.log(Level.SEVERE, "Can not install Statistics MXBean: ", ex);
+		}
+
+		TigaseRuntime.getTigaseRuntime().addShutdownHook(this);
+
+		if (initializationCompletedTask != null) {
+			initializationCompletedTask.run();
+		}
+	}
+
+	private void initStatsArchivizers(final String[] archivs, final Map<String, Object> props) {
 		for (String stat_arch_key : archivizers.keySet()) {
 			StatisticsArchivizerIfc stat_arch = archivizers.remove(stat_arch_key);
 
@@ -561,53 +579,59 @@ public class StatisticsCollector extends AbstractComponentRegistrator<Statistics
 				stat_arch.release();
 			}
 		}
-
-		for (String arch_prop : archivs) {
-			try {
-				String[] arch_prop_a = arch_prop.split(":");
-				String arch_class = arch_prop_a[0];
-				String arch_name = arch_prop_a[1];
-				final StatisticsArchivizerIfc stat_arch =
-					(StatisticsArchivizerIfc) Class.forName(arch_class).newInstance();
-
-				stat_arch.init(getArchivizerConf(arch_name, props));
-
-				long freq = -1;
-
-				if (arch_prop_a.length > 2) {
+		
+		initializationCompletedTask = new TimerTask() {
+			public void run() {
+				for (String arch_prop : archivs) {
 					try {
-						freq = Long.parseLong(arch_prop_a[2]);
+						String[] arch_prop_a = arch_prop.split(":");
+						String arch_class = arch_prop_a[0];
+						String arch_name = arch_prop_a[1];
+						final StatisticsArchivizerIfc stat_arch =
+								(StatisticsArchivizerIfc) Class.forName(arch_class).newInstance();
+
+						stat_arch.init(getArchivizerConf(arch_name, props));
+
+						long freq = -1;
+
+						if (arch_prop_a.length > 2) {
+							try {
+								freq = Long.parseLong(arch_prop_a[2]);
+							} catch (Exception e) {
+								freq = -1;
+							}
+						}
+
+						// Some archivizers run in regular intervals of time
+						// some others run each time statistics collection has completed.
+						if (freq > 0) {
+							statsArchivTasks.schedule(new TimerTask() {
+								@Override
+								public void run() {
+									stat_arch.execute(sp);
+								}
+							}, freq * 1000, freq * 1000);
+						} else {
+							archivizers.put(arch_name, stat_arch);
+						}
+
+						log.log(Level.CONFIG, "Loaded statistics archivizer: {0} for class: {1}",
+								new Object[] { arch_name, arch_class });
 					} catch (Exception e) {
-						freq = -1;
+						log.log(Level.SEVERE, "Can't initialize statistics archivizer: " + arch_prop, e);
 					}
 				}
-
-				if (freq > 0) {
-					statsArchivTasks.schedule(new TimerTask() {
-						@Override
-						public void run() {
-							stat_arch.execute(sp);
-						}
-					}, freq * 1000, freq * 1000);
-				} else {
-					archivizers.put(arch_name, stat_arch);
-				}
-
-				log.log(Level.CONFIG, "Loaded statistics archivizer: {0} for class: {1}",
-						new Object[] { arch_name,
-						arch_class });
-			} catch (Exception e) {
-				log.log(Level.SEVERE, "Can't initialize statistics archivizer: " + arch_prop, e);
 			}
-		}
+		};
+
 	}
 
-	//~--- inner classes --------------------------------------------------------
+	// ~--- inner classes --------------------------------------------------------
 
 	private class ArchivizerRunner extends Thread {
 		private boolean stopped = false;
 
-		//~--- constructors -------------------------------------------------------
+		// ~--- constructors -------------------------------------------------------
 
 		private ArchivizerRunner() {
 			super("stats-archivizer");
@@ -615,21 +639,22 @@ public class StatisticsCollector extends AbstractComponentRegistrator<Statistics
 			start();
 		}
 
-		//~--- methods ------------------------------------------------------------
+		// ~--- methods ------------------------------------------------------------
 
 		/**
 		 * Method description
-		 *
+		 * 
 		 */
 		@Override
 		public void run() {
-			while ( !stopped) {
+			while (!stopped) {
 				try {
 					synchronized (this) {
 						this.wait();
 					}
 
-					for (Map.Entry<String, StatisticsArchivizerIfc> archiv_entry : archivizers.entrySet()) {
+					for (Map.Entry<String, StatisticsArchivizerIfc> archiv_entry : archivizers
+							.entrySet()) {
 						archiv_entry.getValue().execute(sp);
 					}
 				} catch (InterruptedException ex) {
@@ -641,8 +666,6 @@ public class StatisticsCollector extends AbstractComponentRegistrator<Statistics
 	}
 }
 
+// ~ Formatted in Sun Code Convention
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+// ~ Formatted by Jindent --- http://www.jindent.com
