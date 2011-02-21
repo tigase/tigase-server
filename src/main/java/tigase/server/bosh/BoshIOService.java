@@ -32,6 +32,8 @@ import tigase.xmpp.XMPPIOService;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 
 import java.util.UUID;
@@ -42,10 +44,10 @@ import java.util.logging.Logger;
 
 /**
  * Describe class BoshIOService here.
- *
- *
- * Created: Tue Jun  5 22:33:18 2007
- *
+ * 
+ * 
+ * Created: Tue Jun 5 22:33:18 2007
+ * 
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
@@ -54,27 +56,54 @@ public class BoshIOService extends XMPPIOService<Object> {
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
-	private static final Logger log = Logger.getLogger("tigase.server.bosh.BoshIOService");
+	private static final Logger log = Logger.getLogger(BoshIOService.class.getName());
+	public static final String BOSH_EXTRA_HEADERS_FILE_PROP_KEY = "bosh-extra-headers-file";
+	public static final String BOSH_EXTRA_HEADERS_FILE_PROP_VAL =
+			"etc/bosh-extra-haders.txt";
 	private static final String EOL = "\r\n";
 	private static final String HTTP_OK_RESPONSE = "HTTP/1.1 200 OK" + EOL;
 	private static final String CONTENT_TYPE_HEADER = "Content-Type: ";
 	private static final String CONTENT_TYPE_LENGTH = "Content-Length: ";
 	private static final String CONNECTION = "Connection: ";
 	private static final String SERVER = "Server: Tigase Bosh/"
-		+ tigase.server.XMPPServer.getImplementationVersion();
+			+ tigase.server.XMPPServer.getImplementationVersion();
 
-	//~--- fields ---------------------------------------------------------------
+	// ~--- fields ---------------------------------------------------------------
 
 	private String content_type = "text/xml; charset=utf-8";
+	private static String extra_headers = null;
 	private long rid = -1;
 	private UUID sid = null;
 
-	//~--- get methods ----------------------------------------------------------
+	public BoshIOService() {
+		super();
+		if (extra_headers == null) {
+			String file_name =
+					System.getProperty(BOSH_EXTRA_HEADERS_FILE_PROP_KEY,
+							BOSH_EXTRA_HEADERS_FILE_PROP_VAL);
+			try {
+				BufferedReader br = new BufferedReader(new FileReader(file_name));
+				String line = br.readLine();
+				StringBuilder sb = new StringBuilder();
+				while (line != null) {
+					sb.append(line).append(EOL);
+					line = br.readLine();
+				}
+				br.close();
+				extra_headers = sb.toString();
+			} catch (Exception ex) {
+				log.log(Level.WARNING, "Problem reading Bosh extra headers file: " + file_name,
+						ex);
+			}
+		}
+	}
+
+	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	public long getRid() {
@@ -83,30 +112,31 @@ public class BoshIOService extends XMPPIOService<Object> {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	public UUID getSid() {
 		return this.sid;
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param errorCode
 	 * @param packet
 	 * @param errorMsg
-	 *
+	 * 
 	 * @throws IOException
 	 */
 	public void sendErrorAndStop(Authorization errorCode, Packet packet, String errorMsg)
 			throws IOException {
-		String code = "<body type='terminate'" + " condition='item-not-found'"
-			+ " xmlns='http://jabber.org/protocol/httpbind'/>";
+		String code =
+				"<body type='terminate'" + " condition='item-not-found'"
+						+ " xmlns='http://jabber.org/protocol/httpbind'/>";
 
 		try {
 			Packet error = errorCode.getResponseMessage(packet, errorMsg, false);
@@ -123,12 +153,10 @@ public class BoshIOService extends XMPPIOService<Object> {
 		sb.append(errorMsg).append(EOL);
 		sb.append(CONTENT_TYPE_HEADER).append(content_type).append(EOL);
 		sb.append(CONTENT_TYPE_LENGTH).append(code.getBytes().length).append(EOL);
-		sb.append("Access-Control-Allow-Origin: *" + EOL);
-		sb.append("Access-Control-Allow-Methods: GET, POST, OPTIONS" + EOL);
-		sb.append("Access-Control-Allow-Headers: Content-Type" + EOL);
-		sb.append("Access-Control-Max-Age: 86400" + EOL);
-
-//  sb.append("X-error-code").append(code).append(EOL);
+		if (extra_headers != null) {
+			sb.append(extra_headers);
+		}
+		// sb.append("X-error-code").append(code).append(EOL);
 		sb.append(CONNECTION + "close" + EOL);
 		sb.append(SERVER).append(EOL);
 		sb.append(EOL);
@@ -142,12 +170,12 @@ public class BoshIOService extends XMPPIOService<Object> {
 		stop();
 	}
 
-	//~--- set methods ----------------------------------------------------------
+	// ~--- set methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param ct
 	 */
 	public void setContentType(String ct) {
@@ -156,8 +184,8 @@ public class BoshIOService extends XMPPIOService<Object> {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param rid
 	 */
 	public void setRid(long rid) {
@@ -166,22 +194,22 @@ public class BoshIOService extends XMPPIOService<Object> {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param sid
 	 */
 	public void setSid(UUID sid) {
 		this.sid = sid;
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param data
-	 *
+	 * 
 	 * @throws IOException
 	 */
 	@Override
@@ -192,10 +220,9 @@ public class BoshIOService extends XMPPIOService<Object> {
 			sb.append(HTTP_OK_RESPONSE);
 			sb.append(CONTENT_TYPE_HEADER).append(content_type).append(EOL);
 			sb.append(CONTENT_TYPE_LENGTH).append(data.getBytes().length).append(EOL);
-			sb.append("Access-Control-Allow-Origin: *" + EOL);
-			sb.append("Access-Control-Allow-Methods: GET, POST, OPTIONS" + EOL);
-			sb.append("Access-Control-Allow-Headers: Content-Type" + EOL);
-			sb.append("Access-Control-Max-Age: 86400" + EOL);
+			if (extra_headers != null) {
+				sb.append(extra_headers);
+			}
 			sb.append(SERVER).append(EOL);
 			sb.append(EOL);
 			sb.append(data);
@@ -211,8 +238,6 @@ public class BoshIOService extends XMPPIOService<Object> {
 	}
 }
 
+// ~ Formatted in Sun Code Convention
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+// ~ Formatted by Jindent --- http://www.jindent.com
