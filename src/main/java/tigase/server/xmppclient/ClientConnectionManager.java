@@ -71,12 +71,18 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	private static final String ROUTING_MODE_PROP_KEY = "multi-mode";
 	private static final boolean ROUTING_MODE_PROP_VAL = true;
 	private static final String ROUTING_ENTRY_PROP_KEY = ".+";
+	private static final String WHITE_CHAR_ACK_PROP_KEY = "white-char-ack";
+	private static final boolean WHITE_CHAR_ACK_PROP_VAL = false;
+	private static final String XMPP_ACK_PROP_KEY = "xmpp-ack";
+	private static final boolean XMPP_ACK_PROP_VAL = false;
 
 	protected RoutingsContainer routings = null;
 	private final Map<String, XMPPProcessorIfc> processors =
 			new ConcurrentHashMap<String, XMPPProcessorIfc>();
 	private final ReceiverTimeoutHandler stoppedHandler = newStoppedHandler();
 	private final ReceiverTimeoutHandler startedHandler = newStartedHandler();
+	private boolean white_char_ack = WHITE_CHAR_ACK_PROP_VAL;
+	private boolean xmpp_ack = XMPP_ACK_PROP_VAL;
 
 	/**
 	 * This is mostly for testing purpose. We want to investigate massive (10k per
@@ -119,6 +125,21 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 						+ DNSResolver.getDefaultHostname());
 			}
 		}
+		
+		String acks = (String) params.get(XMPP_STANZA_ACK);
+		if (acks != null) {
+			String[] acks_arr = acks.split(",");
+			for (String ack_type : acks_arr) {
+				if (STANZA_WHITE_CHAR_ACK.equals(ack_type)) {
+					white_char_ack = true;
+				}
+				if (STANZA_XMPP_ACK.equals(ack_type)) {
+					xmpp_ack = true;
+				}
+			}
+		}
+		props.put(WHITE_CHAR_ACK_PROP_KEY, white_char_ack);
+		props.put(XMPP_ACK_PROP_KEY, xmpp_ack);
 
 		return props;
 	}
@@ -192,8 +213,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 										"The user connection is no longer active.", true);
 
 						addOutPacket(error);
-					}
-					catch (PacketErrorTypeException e) {
+					} catch (PacketErrorTypeException e) {
 						if (log.isLoggable(Level.FINEST)) {
 							log.finest("Ups, already error packet. Dropping it to prevent infinite loop.");
 						}
@@ -269,11 +289,47 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 				// Hm, receiver is not set yet..., ignoring
 			}
 
-			// results.offer(new Packet(new Element("OK")));
-			// results.offer(new Packet(new Element("OK")));
+			sendAck(serv, p);
+			// TODO: Implement sending 'req' attributes by the server too
+
 		} // end of while ()
 
 		return null;
+	}
+
+	private void sendAck(XMPPIOService<Object> serv, Packet packet) {
+		// If stanza receiving confirmation is configured, try to send confirmation
+		// back
+		if (white_char_ack || xmpp_ack) {
+			String ack = null;
+			if (white_char_ack) {
+				// If confirming via white space is enabled then prepare space ack.
+				ack = " ";
+			}
+			if (xmpp_ack) {
+				// If confirmation using XMPP is enabled prepare XMPP ack which may
+				// overwrite white space ACK.
+				// TODO: Write documentation about the stuff implemented here.
+				// If the stanza contains 'req' attribute, the server sends 'ack'
+				// response.
+				String req_val = packet.getAttribute("req");
+				if (req_val != null) {
+					// XMPP ack might be enabled in configuration but the client may not
+					// support it. In such a case we do not send XMPP ack.
+					ack = "<ack val=\"" + req_val + "\"/>";
+				}
+			}
+			if (ack != null) {
+				try {
+					serv.writeRawData(ack);
+					log.log(Level.FINEST, "Sent ack confirmation: '" + ack + "'");
+				} catch (Exception ex) {
+					serv.forceStop();
+					log.log(Level.FINE, "Can't send ack confirmation: '" + ack + "'", ex);
+				}
+			}
+		}
+
 	}
 
 	/**
@@ -282,7 +338,8 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	 * @param port_props
 	 */
 	@Override
-	public void reconnectionFailed(Map<String, Object> port_props) {}
+	public void reconnectionFailed(Map<String, Object> port_props) {
+	}
 
 	/**
 	 * Method description
@@ -307,6 +364,9 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	@Override
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
+
+		white_char_ack = (Boolean)props.get(WHITE_CHAR_ACK_PROP_KEY);
+		xmpp_ack = (Boolean)props.get(XMPP_ACK_PROP_KEY);
 
 		boolean routing_mode =
 				(Boolean) props.get(ROUTINGS_PROP_KEY + "/" + ROUTING_MODE_PROP_KEY);
@@ -348,7 +408,8 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	 * @param service
 	 */
 	@Override
-	public void tlsHandshakeCompleted(XMPPIOService<Object> service) {}
+	public void tlsHandshakeCompleted(XMPPIOService<Object> service) {
+	}
 
 	/**
 	 * Method description
@@ -540,175 +601,173 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 		Iq iqc = (Iq) packet;
 
 		switch (iqc.getCommand()) {
-		case GETFEATURES:
-			if (iqc.getType() == StanzaType.result) {
-				List<Element> features = getFeatures(getXMPPSession(iqc));
-				Element elem_features = new Element("stream:features");
+			case GETFEATURES:
+				if (iqc.getType() == StanzaType.result) {
+					List<Element> features = getFeatures(getXMPPSession(iqc));
+					Element elem_features = new Element("stream:features");
 
-				elem_features.addChildren(features);
-				elem_features.addChildren(Command.getData(iqc));
+					elem_features.addChildren(features);
+					elem_features.addChildren(Command.getData(iqc));
 
-				Packet result = Packet.packetInstance(elem_features, null, null);
+					Packet result = Packet.packetInstance(elem_features, null, null);
 
-				// Is it actually needed??
-				// TODO: check it out and remove the line
-				result.setPacketTo(iqc.getTo());
-				writePacketToSocket(result);
-			} // end of if (packet.getType() == StanzaType.get)
+					// Is it actually needed??
+					// TODO: check it out and remove the line
+					result.setPacketTo(iqc.getTo());
+					writePacketToSocket(result);
+				} // end of if (packet.getType() == StanzaType.get)
 
-			break;
+				break;
 
-		case STARTZLIB:
-			if (serv != null) {
-				if (log.isLoggable(Level.FINER)) {
-					log.log(Level.FINER, "Starting zlib compression: {0}", serv.getUniqueId());
+			case STARTZLIB:
+				if (serv != null) {
+					if (log.isLoggable(Level.FINER)) {
+						log.log(Level.FINER, "Starting zlib compression: {0}", serv.getUniqueId());
+					}
+
+					try {
+						Element compressed = Command.getData(iqc, "compressed", null);
+						Packet p_compressed = Packet.packetInstance(compressed, null, null);
+
+						// SocketThread readThread = SocketThread.getInstance();
+						SocketThread.removeSocketService(serv);
+
+						// writePacketToSocket(serv, p_proceed);
+						serv.addPacketToSend(p_compressed);
+						serv.processWaitingPackets();
+						serv.startZLib(Deflater.BEST_COMPRESSION);
+
+						// serv.call();
+						SocketThread.addSocketService(serv);
+					} catch (IOException ex) {
+						log.log(Level.INFO, "Problem enabling zlib compression on the connection: ",
+								ex);
+					}
+				} else {
+					log.log(Level.WARNING, "Can''t find sevice for STARTZLIB command: {0}", iqc);
 				}
 
-				try {
-					Element compressed = Command.getData(iqc, "compressed", null);
-					Packet p_compressed = Packet.packetInstance(compressed, null, null);
+				break;
 
-					// SocketThread readThread = SocketThread.getInstance();
-					SocketThread.removeSocketService(serv);
+			case STARTTLS:
+				if (serv != null) {
+					if (log.isLoggable(Level.FINER)) {
+						log.log(Level.FINER, "Starting TLS for connection: {0}", serv.getUniqueId());
+					}
 
-					// writePacketToSocket(serv, p_proceed);
-					serv.addPacketToSend(p_compressed);
-					serv.processWaitingPackets();
-					serv.startZLib(Deflater.BEST_COMPRESSION);
+					try {
 
-					// serv.call();
-					SocketThread.addSocketService(serv);
-				}
-				catch (IOException ex) {
-					log.log(Level.INFO, "Problem enabling zlib compression on the connection: ", ex);
-				}
-			} else {
-				log.log(Level.WARNING, "Can''t find sevice for STARTZLIB command: {0}", iqc);
-			}
+						// Note:
+						// If you send <proceed> packet to client you must expect
+						// instant response from the client with TLS handshaking
+						// data
+						// before you will call startTLS() on server side.
+						// So the initial handshaking data might be lost as they
+						// will
+						// be processed in another thread reading data from the
+						// socket.
+						// That's why below code first removes service from reading
+						// threads pool and then sends <proceed> packet and starts
+						// TLS.
+						Element proceed = Command.getData(iqc, "proceed", null);
+						Packet p_proceed = Packet.packetInstance(proceed, null, null);
 
-			break;
+						// SocketThread readThread = SocketThread.getInstance();
+						SocketThread.removeSocketService(serv);
 
-		case STARTTLS:
-			if (serv != null) {
-				if (log.isLoggable(Level.FINER)) {
-					log.log(Level.FINER, "Starting TLS for connection: {0}", serv.getUniqueId());
-				}
+						// writePacketToSocket(serv, p_proceed);
+						serv.addPacketToSend(p_proceed);
+						serv.processWaitingPackets();
+						serv.startTLS(false);
+						SocketThread.addSocketService(serv);
+					} catch (Exception e) {
+						log.log(Level.WARNING, "Error starting TLS: {0}", e);
+						serv.forceStop();
+					} // end of try-catch
+				} else {
+					log.log(Level.WARNING, "Can''t find sevice for STARTTLS command: {0}", iqc);
+				} // end of else
 
-				try {
+				break;
 
-					// Note:
-					// If you send <proceed> packet to client you must expect
-					// instant response from the client with TLS handshaking
-					// data
-					// before you will call startTLS() on server side.
-					// So the initial handshaking data might be lost as they
-					// will
-					// be processed in another thread reading data from the
-					// socket.
-					// That's why below code first removes service from reading
-					// threads pool and then sends <proceed> packet and starts
-					// TLS.
-					Element proceed = Command.getData(iqc, "proceed", null);
-					Packet p_proceed = Packet.packetInstance(proceed, null, null);
+			case REDIRECT:
+				String command_sessionId = Command.getFieldValue(iqc, "session-id");
+				JID newAddress = iqc.getFrom();
+				JID old_receiver = changeDataReceiver(iqc, newAddress, command_sessionId, serv);
 
-					// SocketThread readThread = SocketThread.getInstance();
-					SocketThread.removeSocketService(serv);
+				if (old_receiver != null) {
+					if (log.isLoggable(Level.FINE)) {
+						log.log(Level.FINE, "Redirecting data for sessionId: {0}, to: {1}",
+								new Object[] { command_sessionId, newAddress });
+					}
 
-					// writePacketToSocket(serv, p_proceed);
-					serv.addPacketToSend(p_proceed);
-					serv.processWaitingPackets();
-					serv.startTLS(false);
-					SocketThread.addSocketService(serv);
-				}
-				catch (Exception e) {
-					log.log(Level.WARNING, "Error starting TLS: {0}", e);
-					serv.forceStop();
-				} // end of try-catch
-			} else {
-				log.log(Level.WARNING, "Can''t find sevice for STARTTLS command: {0}", iqc);
-			} // end of else
+					Packet response = null;
 
-			break;
-
-		case REDIRECT:
-			String command_sessionId = Command.getFieldValue(iqc, "session-id");
-			JID newAddress = iqc.getFrom();
-			JID old_receiver = changeDataReceiver(iqc, newAddress, command_sessionId, serv);
-
-			if (old_receiver != null) {
-				if (log.isLoggable(Level.FINE)) {
-					log.log(Level.FINE, "Redirecting data for sessionId: {0}, to: {1}",
-							new Object[] { command_sessionId, newAddress });
+					response = iqc.commandResult(null);
+					Command.addFieldValue(response, "session-id", command_sessionId);
+					Command.addFieldValue(response, "action", "activate");
+					response.getElement().setAttribute("to", newAddress.toString());
+					addOutPacket(response);
+				} else {
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST,
+								"Connection for REDIRECT command does not exist, ignoring " + "packet: "
+										+ "{0}", iqc.toStringSecure());
+					}
 				}
 
-				Packet response = null;
+				break;
 
-				response = iqc.commandResult(null);
-				Command.addFieldValue(response, "session-id", command_sessionId);
-				Command.addFieldValue(response, "action", "activate");
-				response.getElement().setAttribute("to", newAddress.toString());
-				addOutPacket(response);
-			} else {
-				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST,
-							"Connection for REDIRECT command does not exist, ignoring " + "packet: "
-									+ "{0}", iqc.toStringSecure());
+			case STREAM_CLOSED:
+				break;
+
+			case GETDISCO:
+				break;
+
+			case CLOSE:
+				if (serv != null) {
+					try {
+						serv.writeRawData("</stream:stream>");
+					} catch (Exception e) {
+					}
+
+					serv.stop();
+				} else {
+					if (log.isLoggable(Level.FINE)) {
+						log.log(
+								Level.FINE,
+								"Attempt to stop non-existen service for packet: {0}, Service already stopped?",
+								iqc);
+					}
+				} // end of if (serv != null) else
+
+				break;
+
+			case CHECK_USER_CONNECTION:
+				if (serv != null) {
+
+					// It's ok, the session has been found, respond with OK.
+					addOutPacket(iqc.okResult((String) null, 0));
+				} else {
+
+					// Session is no longer active, respond with an error.
+					try {
+						addOutPacket(Authorization.ITEM_NOT_FOUND.getResponseMessage(iqc,
+								"Connection gone.", false));
+					} catch (PacketErrorTypeException e) {
+
+						// Hm, error already, ignoring...
+						log.log(Level.INFO, "Error packet is not really expected here: {0}",
+								iqc.toStringSecure());
+					}
 				}
-			}
 
-			break;
+				break;
 
-		case STREAM_CLOSED:
-			break;
+			default:
+				writePacketToSocket(iqc);
 
-		case GETDISCO:
-			break;
-
-		case CLOSE:
-			if (serv != null) {
-				try {
-					serv.writeRawData("</stream:stream>");
-				}
-				catch (Exception e) {}
-
-				serv.stop();
-			} else {
-				if (log.isLoggable(Level.FINE)) {
-					log.log(
-							Level.FINE,
-							"Attempt to stop non-existen service for packet: {0}, Service already stopped?",
-							iqc);
-				}
-			} // end of if (serv != null) else
-
-			break;
-
-		case CHECK_USER_CONNECTION:
-			if (serv != null) {
-
-				// It's ok, the session has been found, respond with OK.
-				addOutPacket(iqc.okResult((String) null, 0));
-			} else {
-
-				// Session is no longer active, respond with an error.
-				try {
-					addOutPacket(Authorization.ITEM_NOT_FOUND.getResponseMessage(iqc,
-							"Connection gone.", false));
-				}
-				catch (PacketErrorTypeException e) {
-
-					// Hm, error already, ignoring...
-					log.log(Level.INFO, "Error packet is not really expected here: {0}",
-							iqc.toStringSecure());
-				}
-			}
-
-			break;
-
-		default:
-			writePacketToSocket(iqc);
-
-			break;
+				break;
 		} // end of switch (pc.getCommand())
 	}
 

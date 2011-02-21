@@ -187,6 +187,10 @@ public interface Configurable extends ServerComponent {
 
 	/** Field description */
 	public static final String USER_REPO_POOL_SIZE = "--user-repo-pool-size";
+	
+	public static final String XMPP_STANZA_ACK = "--stanza-ack";
+	public static final String STANZA_WHITE_CHAR_ACK = "white-char";
+	public static final String STANZA_XMPP_ACK = "xmpp";
 
 	/** Field description */
 	public static final String STRINGPREP_PROCESSOR = "--stringprep-processor";
