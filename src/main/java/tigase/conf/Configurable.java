@@ -195,6 +195,9 @@ public interface Configurable extends ServerComponent {
 	public static final String XML_REPO_CLASS_PROP_VAL = "tigase.db.xml.XMLRepository";
 
 	/** Field description */
+	public static final String DUMMY_REPO_CLASS_PROP_VAL = "tigase.db.DummyRepository";
+
+	/** Field description */
 	public static final String MYSQL_REPO_CLASS_PROP_VAL = "tigase.db.jdbc.JDBCRepository";
 
 	/** Field description */

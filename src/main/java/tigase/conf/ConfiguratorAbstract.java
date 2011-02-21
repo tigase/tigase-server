@@ -298,9 +298,9 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 
 		// System.out.println("Setting logging properties:\n" + defaults.toString());
 		// Default repository implementations
-		String user_repo_class = DERBY_REPO_CLASS_PROP_VAL;
+		String user_repo_class = DUMMY_REPO_CLASS_PROP_VAL;
 		String user_repo_url = DERBY_REPO_URL_PROP_VAL;
-		String auth_repo_class = DERBY_REPO_CLASS_PROP_VAL;
+		String auth_repo_class = DUMMY_REPO_CLASS_PROP_VAL;
 		String auth_repo_url = DERBY_REPO_URL_PROP_VAL;
 
 		if (params.get(GEN_USER_DB) != null) {
