@@ -25,6 +25,7 @@ package tigase.xmpp;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.net.IOService;
+import tigase.net.IOServiceListener;
 
 import tigase.server.Packet;
 
@@ -76,7 +77,8 @@ public class XMPPIOService<RefObject> extends IOService<RefObject> {
 
 	private XMPPDomBuilderHandler<RefObject> domHandler = null;
 	protected SimpleParser parser = SingletonFactory.getParserInstance();
-	private XMPPIOServiceListener<XMPPIOService<?>> serviceListener = null;
+	@SuppressWarnings("rawtypes")
+	private XMPPIOServiceListener serviceListener = null;
 	private static String cross_domain_policy = null;
 
 	/**
@@ -212,11 +214,12 @@ public class XMPPIOService<RefObject> extends IOService<RefObject> {
 	 * Method description
 	 * 
 	 * 
-	 * @param sl
+	 * @param servList
 	 */
-	public void setIOServiceListener(XMPPIOServiceListener<XMPPIOService<?>> sl) {
-		this.serviceListener = sl;
-		super.setIOServiceListener(sl);
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public void setIOServiceListener(XMPPIOServiceListener servList) {
+		this.serviceListener = servList;
+		super.setIOServiceListener(servList);
 	}
 
 	/**
@@ -309,10 +312,10 @@ public class XMPPIOService<RefObject> extends IOService<RefObject> {
 			} else {
 				log.log(Level.FINER, "No cross-domain policy defined to sent.");
 			}
-			firstPacket = false;
 		} else {
 			receivedPackets.offer(packet);
 		}
+		firstPacket = false;
 	}
 
 	/**

@@ -131,7 +131,7 @@ public abstract class IOService<RefObject> implements Callable<IOService<?>>, TL
 	private long[] rdData = new long[60];
 	private RefObject refObject = null;
 	private String remote_address = null;
-	private IOServiceListener<IOService<?>> serviceListener = null;
+	private IOServiceListener<IOService<RefObject>> serviceListener = null;
 	private IOInterface socketIO = null;
 
 	/**
@@ -278,7 +278,7 @@ public abstract class IOService<RefObject> implements Callable<IOService<?>>, TL
 					log.log(Level.FINER, "Calling stop on the listener: {0}", serviceListener);
 				}
 
-				IOServiceListener<IOService<?>> tmp = serviceListener;
+				IOServiceListener<IOService<RefObject>> tmp = serviceListener;
 
 				serviceListener = null;
 
@@ -471,9 +471,9 @@ public abstract class IOService<RefObject> implements Callable<IOService<?>>, TL
 	 *
 	 * @param sl
 	 */
-	@SuppressWarnings("unchecked")
-	public void setIOServiceListener(IOServiceListener<? extends IOService<?>> sl) {
-		this.serviceListener = (IOServiceListener<IOService<?>>)sl;
+//	@SuppressWarnings("unchecked")
+	public void setIOServiceListener(IOServiceListener<IOService<RefObject>> sl) {
+		this.serviceListener = sl;
 	}
 
 	/**
