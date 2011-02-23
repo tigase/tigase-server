@@ -22,16 +22,9 @@
 
 package tigase.db;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.xmpp.BareJID;
-
-//~--- JDK imports ------------------------------------------------------------
-
 import java.util.List;
 import java.util.Map;
-
-//~--- interfaces -------------------------------------------------------------
 
 /**
  * <code>UserRepository</code> interface defines all functionalities required
