@@ -346,8 +346,6 @@ public interface UserRepository {
 	 */
 	void removeUser(BareJID user) throws UserNotFoundException, TigaseDBException;
 
-	//~--- set methods ----------------------------------------------------------
-
 	/**
 	 * <code>setData</code> method sets data value for given user ID in repository
 	 * under given node path and associates it with given key.
