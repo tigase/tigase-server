@@ -431,9 +431,3 @@ public interface UserRepository {
 	 */
 	boolean userExists(BareJID user);
 }    // UserRepository
-
-
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
