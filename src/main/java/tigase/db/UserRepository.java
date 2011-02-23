@@ -80,8 +80,6 @@ public interface UserRepository {
 	 */
 	void addUser(BareJID user) throws UserExistsException, TigaseDBException;
 
-	//~--- get methods ----------------------------------------------------------
-
 	/**
 	 * <code>getData</code> method returns a value associated with given key for
 	 * user repository in given subnode.
