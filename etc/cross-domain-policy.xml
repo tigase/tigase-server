@@ -1,0 +1,5 @@
+<!DOCTYPE cross-domain-policy SYSTEM "http://www.macromedia.com/xml/dtds/cross-domain-policy.dtd">
+<cross-domain-policy>
+  <allow-access-from domain="*" to-ports="80,8080,5222,5223"/>
+  <site-control permitted-cross-domain-policies="all"/>
+</cross-domain-policy>
