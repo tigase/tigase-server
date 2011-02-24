@@ -168,10 +168,14 @@ public class BoshSessionCache {
 	 * @param roster
 	 */
 	public void addRoster(Element roster) {
-		add(ROSTER_ID, Arrays.asList(roster));
+		// Pushing roster with 'result' packet type will not work
+		Element roster_mod = roster.clone();
+		roster_mod.setAttribute("type", "set");
+		
+		add(ROSTER_ID, Arrays.asList(roster_mod));
 
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("ADD_ROSTER, ROSTER: " + roster.toString());
+			log.finest("ADD_ROSTER, ROSTER: " + roster_mod.toString());
 		}
 	}
 
