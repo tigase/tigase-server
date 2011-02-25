@@ -124,8 +124,8 @@
         file="License.html"
         tofile="${dist}/@{packagename}-${version}/License.html"/>
       <copy
-        file="Changelog"
-        tofile="${dist}/@{packagename}-${version}/Changelog"/>
+        file="ChangeLog"
+        tofile="${dist}/@{packagename}-${version}/ChangeLog"/>
       <mkdir dir="${dist}/@{packagename}-${version}/libs"/>
       <copy todir="${dist}/@{packagename}-${version}/libs">
         <filelist dir="libs">
