@@ -55,10 +55,10 @@ import java.util.regex.Pattern;
 
 /**
  * Describe class BoshSession here.
- *
- *
- * Created: Tue Jun  5 18:07:23 2007
- *
+ * 
+ * 
+ * Created: Tue Jun 5 18:07:23 2007
+ * 
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
@@ -73,13 +73,13 @@ public class BoshSession {
 	private static final String MESSAGE_ELEMENT_NAME = "message";
 	private static final String IQ_ELEMENT_NAME = "iq";
 
-	//~--- fields ---------------------------------------------------------------
+	// ~--- fields ---------------------------------------------------------------
 
 	private BoshSessionCache cache = null;
 
 	/**
-	 * <code>current_rid</code> is the table with body rids which are waiting
-	 * for replies.
+	 * <code>current_rid</code> is the table with body rids which are waiting for
+	 * replies.
 	 */
 	private long[] currentRids = null;
 	private JID dataReceiver = null;
@@ -88,7 +88,8 @@ public class BoshSession {
 	private int[] hashCodes = null;
 	private TimerTask inactivityTimer = null;
 	private long previous_received_rid = -1;
-	private String[] replace_with = { "$1&lt;a href=\"http://$2\" target=\"_blank\"&gt;$2&lt;/a&gt;",
+	private String[] replace_with = {
+			"$1&lt;a href=\"http://$2\" target=\"_blank\"&gt;$2&lt;/a&gt;",
 			"$1&lt;a href=\"$2\" target=\"_blank\"&gt;$2&lt;/a&gt;", };
 	private int rids_head = 0;
 	private int rids_tail = 0;
@@ -99,7 +100,8 @@ public class BoshSession {
 	// Requests have been responded to so in most cases the connection should
 	// be closed unless it is reused in keep-alive mode.
 	// Normally there should be no more than max 2 elements in the queue.
-	private Queue<BoshIOService> old_connections = new LinkedBlockingQueue<BoshIOService>(4);
+	private Queue<BoshIOService> old_connections =
+			new LinkedBlockingQueue<BoshIOService>(4);
 
 	// Active connections with pending requests received
 	private Queue<BoshIOService> connections = new ConcurrentLinkedQueue<BoshIOService>();
@@ -117,19 +119,19 @@ public class BoshSession {
 	private long max_pause = MAX_PAUSE_PROP_VAL;
 	private long max_inactivity = MAX_INACTIVITY_PROP_VAL;
 	private Pattern[] links_regexs = {
-		Pattern.compile("([^>/\";]|^)(www\\.[^ ]+)", Pattern.CASE_INSENSITIVE),
-		Pattern.compile("([^\">;]|^)(http://[^ ]+)", Pattern.CASE_INSENSITIVE), };
+			Pattern.compile("([^>/\";]|^)(www\\.[^ ]+)", Pattern.CASE_INSENSITIVE),
+			Pattern.compile("([^\">;]|^)(http://[^ ]+)", Pattern.CASE_INSENSITIVE), };
 	private int hold_requests = HOLD_REQUESTS_PROP_VAL;
 	private String content_type = CONTENT_TYPE_DEF;
 	private int concurrent_requests = CONCURRENT_REQUESTS_PROP_VAL;
 	private boolean cache_on = false;
 
-	//~--- constructors ---------------------------------------------------------
+	// ~--- constructors ---------------------------------------------------------
 
 	/**
 	 * Creates a new <code>BoshSession</code> instance.
-	 *
-	 *
+	 * 
+	 * 
 	 * @param def_domain
 	 * @param dataReceiver
 	 * @param handler
@@ -141,11 +143,11 @@ public class BoshSession {
 		this.handler = handler;
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
+	 * 
 	 */
 	public void close() {
 		terminate = true;
@@ -154,8 +156,8 @@ public class BoshSession {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param bios
 	 */
 	public void disconnected(BoshIOService bios) {
@@ -180,12 +182,12 @@ public class BoshSession {
 		}
 	}
 
-	//~--- get methods ----------------------------------------------------------
+	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	public JID getDataReceiver() {
@@ -194,8 +196,8 @@ public class BoshSession {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	public String getDomain() {
@@ -204,8 +206,8 @@ public class BoshSession {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	public String getSessionId() {
@@ -214,20 +216,20 @@ public class BoshSession {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	public UUID getSid() {
 		return sid;
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packet
 	 * @param service
 	 * @param max_wait
@@ -240,7 +242,7 @@ public class BoshSession {
 	 */
 	public void init(Packet packet, BoshIOService service, long max_wait, long min_polling,
 			long max_inactivity, int concurrent_requests, int hold_requests, long max_pause,
-				Queue<Packet> out_results) {
+			Queue<Packet> out_results) {
 		String cache_action = packet.getAttribute(CACHE_ATTR);
 
 		if ((cache_action != null) && cache_action.equals(CacheAction.on.toString())) {
@@ -288,7 +290,8 @@ public class BoshSession {
 			try {
 				previous_received_rid = Long.parseLong(tmp_str);
 				currentRids[rids_head++] = previous_received_rid;
-			} catch (NumberFormatException e) {}
+			} catch (NumberFormatException e) {
+			}
 		}
 
 		this.hold_requests = Math.max(hold_i, hold_requests);
@@ -314,17 +317,18 @@ public class BoshSession {
 
 		service.setContentType(content_type);
 
-		Element body = new Element(BODY_EL_NAME, new String[] {
-			WAIT_ATTR, INACTIVITY_ATTR, POLLING_ATTR, REQUESTS_ATTR, HOLD_ATTR, MAXPAUSE_ATTR, SID_ATTR,
-			VER_ATTR, FROM_ATTR, SECURE_ATTR, "xmpp:version", "xmlns:xmpp", "xmlns:stream"
-		}, new String[] {
-			Long.valueOf(this.max_wait).toString(), Long.valueOf(this.max_inactivity).toString(),
-			Long.valueOf(this.min_polling).toString(),
-			Integer.valueOf(this.concurrent_requests).toString(),
-			Integer.valueOf(this.hold_requests).toString(), Long.valueOf(this.max_pause).toString(),
-			this.sid.toString(), BOSH_VERSION, this.domain, "true", "1.0", "urn:xmpp:xbosh",
-			"http://etherx.jabber.org/streams"
-		});
+		Element body =
+				new Element(BODY_EL_NAME, new String[] { WAIT_ATTR, INACTIVITY_ATTR,
+						POLLING_ATTR, REQUESTS_ATTR, HOLD_ATTR, MAXPAUSE_ATTR, SID_ATTR, VER_ATTR,
+						FROM_ATTR, SECURE_ATTR, "xmpp:version", "xmlns:xmpp", "xmlns:stream" },
+						new String[] { Long.valueOf(this.max_wait).toString(),
+								Long.valueOf(this.max_inactivity).toString(),
+								Long.valueOf(this.min_polling).toString(),
+								Integer.valueOf(this.concurrent_requests).toString(),
+								Integer.valueOf(this.hold_requests).toString(),
+								Long.valueOf(this.max_pause).toString(), this.sid.toString(),
+								BOSH_VERSION, this.domain, "true", "1.0", "urn:xmpp:xbosh",
+								"http://etherx.jabber.org/streams" });
 
 		sessionId = UUID.randomUUID().toString();
 		body.setAttribute(AUTHID_ATTR, sessionId);
@@ -337,8 +341,9 @@ public class BoshSession {
 		sendBody(service, body);
 
 		// service.writeRawData(body.toString());
-		Packet streamOpen = Command.STREAM_OPENED.getPacket(null, null, StanzaType.set,
-			UUID.randomUUID().toString(), Command.DataType.submit);
+		Packet streamOpen =
+				Command.STREAM_OPENED.getPacket(null, null, StanzaType.set, UUID.randomUUID()
+						.toString(), Command.DataType.submit);
 
 		Command.addFieldValue(streamOpen, "session-id", sessionId);
 		Command.addFieldValue(streamOpen, "hostname", domain);
@@ -350,8 +355,8 @@ public class BoshSession {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packet
 	 * @param out_results
 	 */
@@ -365,7 +370,8 @@ public class BoshSession {
 				waiting_packets.offer(packet.getElement());
 			} else {
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("[" + connections.size() + "] In packet filtered: " + packet.toString());
+					log.finest("[" + connections.size() + "] In packet filtered: "
+							+ packet.toString());
 				}
 			}
 		}
@@ -379,8 +385,8 @@ public class BoshSession {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packet
 	 * @param service
 	 * @param out_results
@@ -388,7 +394,8 @@ public class BoshSession {
 	public synchronized void processSocketPacket(Packet packet, BoshIOService service,
 			Queue<Packet> out_results) {
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("[" + connections.size() + "] Processing socket packet: " + packet.toString());
+			log.finest("[" + connections.size() + "] Processing socket packet: "
+					+ packet.toString());
 		}
 
 		if (waitTimer != null) {
@@ -430,7 +437,7 @@ public class BoshSession {
 					service.setRid(rid);
 					duplicate = isDuplicateMessage(rid, children);
 
-					if ( !duplicate) {
+					if (!duplicate) {
 						processRid(rid, children);
 					}
 				} catch (NumberFormatException e) {
@@ -442,18 +449,19 @@ public class BoshSession {
 			service.setSid(sid);
 			connections.offer(service);
 
-			if ( !duplicate) {
+			if (!duplicate) {
 				if ((packet.getType() != null) && (packet.getType() == StanzaType.terminate)) {
 
 					// We are preparing for session termination.
 					// Some client send IQ stanzas with private data to store some
 					// settings so some confirmation stanzas might be sent back
 					// let's give the client a few secs for session termination
-					max_inactivity = 2;    // Max pause changed to 2 secs
+					max_inactivity = 2; // Max pause changed to 2 secs
 					terminate = true;
 
-					Packet command = Command.STREAM_CLOSED.getPacket(null, null, StanzaType.set,
-						UUID.randomUUID().toString());
+					Packet command =
+							Command.STREAM_CLOSED.getPacket(null, null, StanzaType.set, UUID
+									.randomUUID().toString());
 
 					handler.addOutStreamClosed(command, this);
 
@@ -463,8 +471,8 @@ public class BoshSession {
 				if ((packet.getAttribute(RESTART_ATTR) != null)
 						&& packet.getAttribute(RESTART_ATTR).equals("true")) {
 					log.fine("Found stream restart instruction: " + packet.toString());
-					out_results.offer(Command.GETFEATURES.getPacket(null, null, StanzaType.get, "restart1",
-							null));
+					out_results.offer(Command.GETFEATURES.getPacket(null, null, StanzaType.get,
+							"restart1", null));
 				}
 
 				if (packet.getAttribute(CACHE_ATTR) != null) {
@@ -528,8 +536,9 @@ public class BoshSession {
 				waiting_packets.add(error.getElement());
 				terminate = true;
 
-				Packet command = Command.STREAM_CLOSED.getPacket(null, null, StanzaType.set,
-					UUID.randomUUID().toString());
+				Packet command =
+						Command.STREAM_CLOSED.getPacket(null, null, StanzaType.set, UUID.randomUUID()
+								.toString());
 
 				handler.addOutStreamClosed(command, this);
 
@@ -557,27 +566,27 @@ public class BoshSession {
 		}
 	}
 
-	//~--- set methods ----------------------------------------------------------
+	// ~--- set methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param dataReceiver
 	 */
 	public void setDataReceiver(JID dataReceiver) {
 		this.dataReceiver = dataReceiver;
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param out_results
 	 * @param tt
-	 *
+	 * 
 	 * @return
 	 */
 	public boolean task(Queue<Packet> out_results, TimerTask tt) {
@@ -596,8 +605,8 @@ public class BoshSession {
 
 			for (Element packet : waiting_packets) {
 				try {
-					out_results.offer(Authorization.RECIPIENT_UNAVAILABLE.getResponseMessage(Packet.packetInstance(packet),
-							"Bosh = disconnected", true));
+					out_results.offer(Authorization.RECIPIENT_UNAVAILABLE.getResponseMessage(
+							Packet.packetInstance(packet), "Bosh = disconnected", true));
 				} catch (TigaseStringprepException ex) {
 					log.warning("Packet addressing problem, stringprep processing failed, dropping: "
 							+ packet);
@@ -610,8 +619,9 @@ public class BoshSession {
 				log.finest("Closing session, inactivity timeout expired: " + getSid());
 			}
 
-			Packet command = Command.STREAM_CLOSED.getPacket(null, null, StanzaType.set,
-				UUID.randomUUID().toString());
+			Packet command =
+					Command.STREAM_CLOSED.getPacket(null, null, StanzaType.set, UUID.randomUUID()
+							.toString());
 
 			handler.addOutStreamClosed(command, this);
 
@@ -643,9 +653,9 @@ public class BoshSession {
 			if (body != null) {
 				int count = 0;
 
-//      for (Pattern reg: links_regexs) {
-//        body = reg.matcher(body).replaceAll(replace_with[count++]);
-//      }
+				// for (Pattern reg: links_regexs) {
+				// body = reg.matcher(body).replaceAll(replace_with[count++]);
+				// }
 				result.getChild("body").setCData(body);
 			}
 		}
@@ -669,12 +679,13 @@ public class BoshSession {
 		return true;
 	}
 
-	//~--- get methods ----------------------------------------------------------
+	// ~--- get methods ----------------------------------------------------------
 
 	private Element getBodyElem() {
-		Element body = new Element(BODY_EL_NAME, new String[] { FROM_ATTR, SECURE_ATTR, "xmpp:version",
-				"xmlns:xmpp", "xmlns:stream" }, new String[] { this.domain, "true", "1.0", "urn:xmpp:xbosh",
-				"http://etherx.jabber.org/streams" });
+		Element body =
+				new Element(BODY_EL_NAME, new String[] { FROM_ATTR, SECURE_ATTR, "xmpp:version",
+						"xmlns:xmpp", "xmlns:stream" }, new String[] { this.domain, "true", "1.0",
+						"urn:xmpp:xbosh", "http://etherx.jabber.org/streams" });
 
 		body.setXMLNS(BOSH_XMLNS);
 
@@ -739,7 +750,7 @@ public class BoshSession {
 		return false;
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	private void processAutomaticCache(Packet packet) {
 		if (packet.getElemName() == PRESENCE_ELEMENT_NAME) {
@@ -755,17 +766,22 @@ public class BoshSession {
 		}
 
 		if (packet.isXMLNS("/iq/bind", "urn:ietf:params:xml:ns:xmpp-bind")) {
-			cache.set(BoshSessionCache.RESOURCE_BIND_ID, Collections.singletonList(packet.getElement()));
+			cache.set(BoshSessionCache.RESOURCE_BIND_ID,
+					Collections.singletonList(packet.getElement()));
 		}
 	}
 
+	private long cache_reload_counter = 0;
+
 	private void processCache(CacheAction action, Packet packet) {
+		++cache_reload_counter;
+		int packet_counter = 0;
 		List<Element> children = packet.getElemChildren(BODY_EL_NAME);
 		String cache_id = packet.getAttribute(CACHE_ID_ATTR);
 		List<Element> cache_res = null;
 
 		switch (action) {
-			case on :
+			case on:
 				if (cache == null) {
 					cache = new BoshSessionCache();
 				}
@@ -775,53 +791,57 @@ public class BoshSession {
 
 				break;
 
-			case off :
+			case off:
 				cache_on = false;
 				log.fine("BoshSessionCache set to OFF");
 
 				break;
 
-			case set :
+			case set:
 				cache.set(cache_id, children);
 
 				break;
 
-			case add :
+			case add:
 				cache.add(cache_id, children);
 
 				break;
 
-			case get :
+			case get:
 				cache_res = cache.get(cache_id);
 
 				break;
 
-			case remove :
+			case remove:
 				cache.remove(cache_id);
 
 				break;
 
-			case get_all :
+			case get_all:
 				cache_res = cache.getAll();
 
 				break;
 
-			default :
+			default:
 				log.warning("Unknown cache action: " + action.toString());
 
 				break;
 		}
 
 		if (cache_res != null) {
-			waiting_packets.addAll(cache_res);
+			for (Element elem : cache_res) {
+				elem.addAttribute("reload-counter", ""+cache_reload_counter);
+				elem.addAttribute("packet-counter", ""+(++packet_counter));
+				waiting_packets.add(elem);
+			}
 		}
 	}
 
 	private void processRid(long rid, List<Element> packets) {
 		synchronized (currentRids) {
 			if ((previous_received_rid + 1) != rid) {
-				log.info("Incorrect packet order, last_rid=" + previous_received_rid + ", current_rid="
-						+ rid);
+				log.info("Incorrect packet order, last_rid=" + previous_received_rid
+						+ ", current_rid=" + rid);
 			}
 
 			if ((packets != null) && (packets.size() > 0)) {
@@ -895,8 +915,8 @@ public class BoshSession {
 			// serv.writeRawData(body.toString());
 			// waiting_packets.clear();
 			// serv.stop();
-			if ( !old_connections.contains(serv)) {
-				while ( !old_connections.offer(serv)) {
+			if (!old_connections.contains(serv)) {
+				while (!old_connections.offer(serv)) {
 					BoshIOService old_serv = old_connections.poll();
 
 					if (old_serv != null) {
@@ -913,12 +933,13 @@ public class BoshSession {
 			}
 
 			// } catch (IOException e) {
-//    // I call it anyway at the end of method call
-//    //disconnected(null);
-//    log.log(Level.WARNING, "[" + connections.size() +
-//      "] Exception during writing to socket", e);
+			// // I call it anyway at the end of method call
+			// //disconnected(null);
+			// log.log(Level.WARNING, "[" + connections.size() +
+			// "] Exception during writing to socket", e);
 		} catch (Exception e) {
-			log.log(Level.WARNING, "[" + connections.size() + "] Exception during writing to socket", e);
+			log.log(Level.WARNING, "[" + connections.size()
+					+ "] Exception during writing to socket", e);
 		}
 
 		serv.setSid(null);
@@ -946,8 +967,6 @@ public class BoshSession {
 	}
 }
 
+// ~ Formatted in Sun Code Convention
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+// ~ Formatted by Jindent --- http://www.jindent.com
