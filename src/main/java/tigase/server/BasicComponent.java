@@ -798,6 +798,7 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 	public void updateServiceDiscoveryItem(String jid, String node, String description,
 			String category, String type, boolean admin, String... features) {
 		if (serviceEntity.getJID().equals(jid) && (serviceEntity.getNode() == node)) {
+			serviceEntity.setAdminOnly(admin);
 			serviceEntity.setDescription(description);
 
 			if ((category != null) || (type != null)) {
