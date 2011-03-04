@@ -79,6 +79,9 @@ drop procedure if exists TigGetUserUIDProc;
 drop function if exists TigGetUserUID;
 -- QUERY END:
 -- QUERY START:
+drop function if exists TigSHA1;
+-- QUERY END:
+-- QUERY START:
 drop function if exists TigGetDBProperty;
 -- QUERY END:
 
@@ -91,9 +94,22 @@ READS SQL DATA
 begin
 	declare _result bigint unsigned;
 
-	select uid into _result from tig_users where user_id = _user_id;
+	select uid into _result from tig_users where sha1_user_id = TigSHA1(_user_id);
 
 	return (_result);
+end //
+-- QUERY END:
+
+-- QUERY START:
+-- Get user uid function to make it easier to use it in SQL queries.
+create function TigSHA1(_user_id varchar(2049) CHARSET utf8) returns char(128)
+READS SQL DATA
+begin
+	declare _result char(128);
+
+	select sha1(lower(_user_id)) into _result ;
+
+	return _result;
 end //
 -- QUERY END:
 
@@ -101,7 +117,7 @@ end //
 -- Returns user's UID for an account in the database.
 create procedure TigGetUserUIDProc(_user_id varchar(2049) CHARSET utf8)
 begin
-	select uid from tig_users where user_id = _user_id;
+	select uid from tig_users where sha1_user_id = TigSHA1(_user_id);
 end //
 -- QUERY END:
 
@@ -113,7 +129,7 @@ begin
 	declare _result mediumtext CHARSET utf8;
 
 	select pval into _result from tig_pairs, tig_users
-		where (pkey = _tkey) AND (user_id = 'db-properties')
+		where (pkey = _tkey) AND (sha1_user_id = TigSHA1('db-properties'))
 					AND (tig_pairs.uid = tig_users.uid);
 
 	return (_result);
@@ -125,16 +141,16 @@ end //
 create procedure TigPutDBProperty(_tkey varchar(255) CHARSET utf8, _tval mediumtext CHARSET utf8)
 begin
   if exists( select pval from tig_pairs, tig_users where
-    (user_id = 'db-properties') AND (tig_users.uid = tig_pairs.uid)
+    (sha1_user_id = TigSHA1('db-properties')) AND (tig_users.uid = tig_pairs.uid)
     AND (pkey = _tkey))
   then
     update tig_pairs, tig_users set pval = _tval
-    where (user_id = 'db-properties') AND (tig_users.uid = tig_pairs.uid)
+    where (sha1_user_id = TigSHA1('db-properties')) AND (tig_users.uid = tig_pairs.uid)
       AND (pkey = _tkey);
   else
     insert into tig_pairs (pkey, pval, uid)
       select _tkey, _tval, uid from tig_users
-        where (user_id = 'db-properties');
+        where (sha1_user_id = TigSHA1('db-properties'));
   end if;
 end //
 -- QUERY END:
@@ -161,7 +177,7 @@ begin
 	declare res_uid bigint unsigned;
 
 	insert into tig_users (user_id, sha1_user_id, user_pw)
-		values (_user_id, sha1(_user_id), _user_pw);
+		values (_user_id, TigSHA1(_user_id), _user_pw);
 
 	select LAST_INSERT_ID() into res_uid;
 
@@ -195,7 +211,7 @@ end //
 -- and save database space. Besides JID is too large to server as UID
 create procedure TigGetUserDBUid(_user_id varchar(2049) CHARSET utf8)
 begin
-	select uid from tig_users where sha1_user_id = sha1(_user_id) and user_id = _user_id;
+	select uid from tig_users where sha1_user_id = TigSHA1(_user_id);
 end //
 -- QUERY END:
 
@@ -205,7 +221,7 @@ create procedure TigRemoveUser(_user_id varchar(2049) CHARSET utf8)
 begin
 	declare res_uid bigint unsigned;
 
-	select uid into res_uid from tig_users where sha1_user_id = sha1(_user_id) and user_id = _user_id;
+	select uid into res_uid from tig_users where sha1_user_id = TigSHA1(_user_id);
 
 	delete from tig_pairs where uid = res_uid;
 	delete from tig_nodes where uid = res_uid;
@@ -217,7 +233,7 @@ end //
 -- Returns user's password from the database
 create procedure TigGetPassword(_user_id varchar(2049) CHARSET utf8)
 begin
-	select user_pw from tig_users where sha1_user_id = sha1(_user_id) and user_id = _user_id;
+	select user_pw from tig_users where sha1_user_id = TigSHA1(_user_id);
 end //
 -- QUERY END:
 
@@ -252,7 +268,7 @@ end //
 -- Update user password
 create procedure TigUpdatePassword(_user_id varchar(2049) CHARSET utf8, _user_pw varchar(255) CHARSET utf8)
 begin
-	update tig_users set user_pw = _user_pw where sha1_user_id = sha1(_user_id) and user_id = _user_id;
+	update tig_users set user_pw = _user_pw where sha1_user_id = TigSHA1(_user_id);
 end //
 -- QUERY END:
 
@@ -317,14 +333,14 @@ end //
 create procedure TigUserLogin(_user_id varchar(2049) CHARSET utf8, _user_pw varchar(255) CHARSET utf8)
 begin
 	if exists(select user_id from tig_users
-		where (account_status > 0) AND (sha1_user_id = sha1(_user_id)) AND (user_pw = _user_pw) AND (user_id = _user_id))
+		where (account_status > 0) AND (sha1_user_id = TigSHA1(_user_id)) AND (user_pw = _user_pw) AND (user_id = _user_id))
 	then
 		update tig_users
 			set online_status = online_status + 1, last_login = CURRENT_TIMESTAMP
-			where sha1_user_id = sha1(_user_id);
+			where sha1_user_id = TigSHA1(_user_id);
 		select _user_id as user_id;
 	else
-		update tig_users set failed_logins = failed_logins + 1 where sha1_user_id = sha1(_user_id) AND user_id = _user_id;
+		update tig_users set failed_logins = failed_logins + 1 where sha1_user_id = TigSHA1(_user_id);
 		select NULL as user_id;
 	end if;
 end //
@@ -345,7 +361,7 @@ end //
 -- Disable user account
 create procedure TigDisableAccount(_user_id varchar(2049) CHARSET utf8)
 begin
-	update tig_users set account_status = 0 where sha1_user_id = sha1(_user_id);
+	update tig_users set account_status = 0 where sha1_user_id = TigSHA1(_user_id);
 end //
 -- QUERY END:
 
@@ -353,7 +369,7 @@ end //
 -- Enable user account
 create procedure TigEnableAccount(_user_id varchar(2049) CHARSET utf8)
 begin
-	update tig_users set account_status = 1 where sha1_user_id = sha1(_user_id);
+	update tig_users set account_status = 1 where sha1_user_id = TigSHA1(_user_id);
 end //
 -- QUERY END:
 
