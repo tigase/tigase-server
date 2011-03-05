@@ -183,6 +183,10 @@ begin
 
 	insert into tig_nodes (parent_nid, uid, node)
 		values (NULL, res_uid, 'root');
+		
+	if _user_pw is NULL then
+		update tig_users set account_status = -1 where uid = res_uid;
+	end if;
 
 	select res_uid as uid;
 end //
