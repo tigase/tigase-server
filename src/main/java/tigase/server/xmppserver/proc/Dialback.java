@@ -183,7 +183,7 @@ public class Dialback extends S2SAbstractProcessor {
 						serv.forceStop();
 					} catch (LocalhostException ex) {
 
-						// Shoud not happen....
+						// Should not happen....
 						log.log(Level.INFO, "{0}, Incorrect remote hostname name, packet: {1}",
 								new Object[] { serv,
 								p });

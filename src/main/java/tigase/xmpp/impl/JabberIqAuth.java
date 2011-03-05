@@ -30,20 +30,24 @@ import tigase.db.TigaseDBException;
 
 import tigase.server.Command;
 import tigase.server.Packet;
+import tigase.server.Priority;
 
 import tigase.xml.Element;
 
 import tigase.xmpp.Authorization;
+import tigase.xmpp.BareJID;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPException;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.impl.SaslAuth.ElementType;
 
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
@@ -119,6 +123,41 @@ public class JabberIqAuth extends XMPPProcessor implements XMPPProcessorIfc {
 			return;
 		} // end of if (session == null)
 
+		if (session.isAuthorized()) {
+
+			// Multiple authentication attempts....
+			// Another authentication request on already authenticated connection
+			// This is not allowed and must be forbidden.
+			Packet res =
+					Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
+							"Cannot authenticate twice on the same stream.", false);
+
+			// Make sure it gets delivered before stream close
+			res.setPriority(Priority.SYSTEM);
+			results.offer(res);
+
+			// Optionally close the connection to make sure there is no
+			// confusion about the connection state.
+			results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
+					StanzaType.set, session.nextStanzaId()));
+
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST,
+						"Discovered second authentication attempt: {0}, packet: {1}", new Object[] {
+								session.toString(), packet.toString() });
+			}
+
+			try {
+				session.logout();
+			} catch (NotAuthorizedException ex) {
+				log.log(Level.FINER, "Unsuccessful session logout: {0}", session.toString());
+			}
+
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Session after logout: {0}", session.toString());
+			}
+		}
+
 		Element request = packet.getElement();
 		StanzaType type = packet.getType();
 
@@ -145,35 +184,71 @@ public class JabberIqAuth extends XMPPProcessor implements XMPPProcessorIfc {
 							"Database access problem, please contact administrator.", true));
 				}
 
-
 				break;
 
 			case set:
+				// Now we use loginOther() instead to make it easier to customize
+				// the authentication protocol without a need to replace the
+				// authentication plug-in. The authentication takes place on the
+				// AuthRepository
+				// level so we do not really care here what the user has sent.
+
 				String user_name = request.getChildCData("/iq/query/username");
 				String resource = request.getChildCData("/iq/query/resource");
-				String password = request.getChildCData("/iq/query/password");
-				String digest = request.getChildCData("/iq/query/digest");
-
-				// String user_pass = null;
-				String auth_mod = null;
+				// String password = request.getChildCData("/iq/query/password");
+				// String digest = request.getChildCData("/iq/query/digest");
+				//
+				// // String user_pass = null;
+				// String auth_mod = null;
+				//
+				// try {
+				// Authorization result = null;
+				//
+				// if (password != null) {
+				//
+				// // user_pass = password;
+				// // result = session.loginPlain(user_name, user_pass);
+				// result = session.loginPlain(user_name, password);
+				// } // end of if (password != null)
+				//
+				// if (digest != null) {
+				//
+				// // user_pass = digest;
+				// result =
+				// session.loginDigest(user_name, digest, session.getSessionId(),
+				// "SHA");
+				// } // end of if (digest != null)
+				//
+				// if (result == Authorization.AUTHORIZED) {
+				// session.setResource(resource);
+				// results.offer(session.getAuthState().getResponseMessage(packet,
+				// "Authentication successful.", false));
+				// } else {
+				// results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
+				// "Authentication failed", false));
+				// results.offer(Command.CLOSE.getPacket(packet.getTo(),
+				// packet.getFrom(),
+				// StanzaType.set, session.nextStanzaId()));
+				// } // end of else
 
 				try {
-					Authorization result = null;
 
-					if (password != null) {
-
-						// user_pass = password;
-						// result = session.loginPlain(user_name, user_pass);
-						result = session.loginPlain(user_name, password);
-					} // end of if (password != null)
-
-					if (digest != null) {
-
-						// user_pass = digest;
-						result =
-								session.loginDigest(user_name, digest, session.getSessionId(), "SHA");
-					} // end of if (digest != null)
-
+					List<Element> children = request.getChildren("/iq/query");
+					Map<String, Object> authProps = new HashMap<String, Object>(10, 0.75f);
+					authProps.put(AuthRepository.PROTOCOL_KEY, AuthRepository.PROTOCOL_VAL_NONSASL);
+					authProps.put(AuthRepository.REALM_KEY, session.getDomain().getVhost()
+							.getDomain());
+					authProps.put(AuthRepository.SERVER_NAME_KEY, session.getDomain().getVhost()
+							.getDomain());
+					authProps.put(AuthRepository.DIGEST_ID_KEY, session.getSessionId());
+					BareJID user_id =
+							BareJID.bareJIDInstance(user_name, session.getDomain().getVhost()
+									.getDomain());
+					authProps.put(AuthRepository.USER_ID_KEY, user_id);
+					for (Element child : children) {
+						authProps.put(child.getName(), child.getCData());
+					}
+					Authorization result = session.loginOther(authProps);
 					if (result == Authorization.AUTHORIZED) {
 						session.setResource(resource);
 						results.offer(session.getAuthState().getResponseMessage(packet,
@@ -184,6 +259,7 @@ public class JabberIqAuth extends XMPPProcessor implements XMPPProcessorIfc {
 						results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
 								StanzaType.set, session.nextStanzaId()));
 					} // end of else
+
 				} catch (NotAuthorizedException e) {
 					log.info("Authentication failed: " + user_name);
 					results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,

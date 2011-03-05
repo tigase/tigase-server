@@ -95,6 +95,11 @@ public interface AuthRepository {
 	 * strictly.
 	 */
 	public static final String SERVER_NAME_KEY = "server-name";
+	
+	public static final String USERNAME_KEY = "username";
+	public static final String PASSWORD_KEY = "password";
+	public static final String DIGEST_KEY = "digest";
+	public static final String DIGEST_ID_KEY = "digest-id";
 
 	/**
 	 * Property key name for <code>otherAuth</code> method call. It is used to provide an
@@ -146,6 +151,7 @@ public interface AuthRepository {
 	 * @exception AuthorizationException if an error occurs during authentication
 	 * process.
 	 */
+	@Deprecated
 	boolean digestAuth(BareJID user, String digest, String id, String alg)
 			throws UserNotFoundException, TigaseDBException, AuthorizationException;
 
@@ -227,6 +233,7 @@ public interface AuthRepository {
 	 * @exception AuthorizationException if an error occurs during authentication
 	 * process.
 	 */
+	@Deprecated
 	boolean plainAuth(BareJID user, String password)
 			throws UserNotFoundException, TigaseDBException, AuthorizationException;
 
@@ -257,9 +264,3 @@ public interface AuthRepository {
 	void updatePassword(BareJID user, String password)
 			throws UserNotFoundException, TigaseDBException;
 }    // AuthRepository
-
-
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

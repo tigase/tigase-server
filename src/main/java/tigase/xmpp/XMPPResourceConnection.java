@@ -57,13 +57,13 @@ import java.util.logging.Logger;
 public class XMPPResourceConnection extends RepositoryAccess {
 
 	/**
-	 * Private logger for class instancess.
+	 * Private logger for class instances.
 	 */
 	private static final Logger log = Logger.getLogger("tigase.xmpp.XMPPResourceConnection");
 
 	/**
 	 * Constant <code>PRESENCE_KEY</code> is a key in temporary session data
-	 * where the last presence sent by the userto server is stored,
+	 * where the last presence sent by the user to server is stored,
 	 * either initial presence or off-line presence before disconnecting.
 	 */
 	public static final String PRESENCE_KEY = "user-presence";
@@ -518,6 +518,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	 * @throws TigaseDBException
 	 * @throws TigaseStringprepException
 	 */
+	@Deprecated
 	public final Authorization loginDigest(String user, String digest, String id, String alg)
 			throws NotAuthorizedException, AuthorizationException, TigaseDBException,
 			TigaseStringprepException {
@@ -575,6 +576,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	 * @throws TigaseDBException
 	 * @throws TigaseStringprepException
 	 */
+	@Deprecated
 	public final Authorization loginPlain(String user, String password)
 			throws NotAuthorizedException, AuthorizationException, TigaseDBException,
 			TigaseStringprepException {

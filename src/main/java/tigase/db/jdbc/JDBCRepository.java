@@ -223,6 +223,7 @@ public class JDBCRepository implements AuthRepository, UserRepository {
 	 * @exception TigaseDBException if an error occurs
 	 */
 	@Override
+	@Deprecated
 	public boolean digestAuth(BareJID user, final String digest, final String id, final String alg)
 			throws UserNotFoundException, TigaseDBException, AuthorizationException {
 		return auth.digestAuth(user, digest, id, alg);
@@ -745,6 +746,7 @@ public class JDBCRepository implements AuthRepository, UserRepository {
 	 * @exception TigaseDBException if an error occurs
 	 */
 	@Override
+	@Deprecated
 	public boolean plainAuth(BareJID user, final String password)
 			throws UserNotFoundException, TigaseDBException, AuthorizationException {
 		return auth.plainAuth(user, password);

@@ -102,6 +102,7 @@ public class DummyRepository implements UserRepository, AuthRepository {
 	 * @throws UserNotFoundException
 	 */
 	@Override
+	@Deprecated
 	public boolean digestAuth(BareJID user, String digest, String id, String alg)
 			throws UserNotFoundException, TigaseDBException, AuthorizationException {
 		return false;
@@ -345,6 +346,7 @@ public class DummyRepository implements UserRepository, AuthRepository {
 	 * @throws UserNotFoundException
 	 */
 	@Override
+	@Deprecated
 	public boolean plainAuth(BareJID user, String password)
 			throws UserNotFoundException, TigaseDBException, AuthorizationException {
 		return false;

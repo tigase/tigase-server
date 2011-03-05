@@ -528,6 +528,7 @@ public abstract class RepositoryAccess {
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
 	 */
+	@Deprecated
 	public Authorization loginDigest(BareJID userId, String digest, String id, String alg)
 			throws NotAuthorizedException, AuthorizationException, TigaseDBException {
 		isLoginAllowed();
@@ -601,7 +602,7 @@ public abstract class RepositoryAccess {
 	 * If <code>AUTHORIZED</code> has been returned it means authorization
 	 * process is successful and session has been activated, otherwise session
 	 * hasn't been authorized and return code gives more detailed information
-	 * of fail reason. Please refer to <code>Authorizaion</code> documentation for
+	 * of fail reason. Please refer to <code>Authorization</code> documentation for
 	 * more details.
 	 *
 	 * @param userId
@@ -611,6 +612,7 @@ public abstract class RepositoryAccess {
 	 * @throws AuthorizationException
 	 * @throws TigaseDBException
 	 */
+	@Deprecated
 	public Authorization loginPlain(BareJID userId, String password)
 			throws NotAuthorizedException, AuthorizationException, TigaseDBException {
 		isLoginAllowed();

@@ -103,6 +103,7 @@ public class AuthRepositoryPool implements AuthRepository {
 	 * @throws UserNotFoundException
 	 */
 	@Override
+	@Deprecated
 	public boolean digestAuth(BareJID user, String digest, String id, String alg)
 			throws UserNotFoundException, TigaseDBException, AuthorizationException {
 		AuthRepository repo = takeRepo();
@@ -276,6 +277,7 @@ public class AuthRepositoryPool implements AuthRepository {
 	 * @throws UserNotFoundException
 	 */
 	@Override
+	@Deprecated
 	public boolean plainAuth(BareJID user, String password)
 			throws UserNotFoundException, TigaseDBException, AuthorizationException {
 		AuthRepository repo = takeRepo();

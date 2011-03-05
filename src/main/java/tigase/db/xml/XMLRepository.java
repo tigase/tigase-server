@@ -163,6 +163,7 @@ public class XMLRepository implements AuthRepository, UserRepository {
 	 * @exception TigaseDBException if an error occurs
 	 */
 	@Override
+	@Deprecated
 	public synchronized boolean digestAuth(BareJID user, final String digest, final String id,
 			final String alg)
 			throws UserNotFoundException, TigaseDBException, AuthorizationException {
@@ -554,6 +555,7 @@ public class XMLRepository implements AuthRepository, UserRepository {
 	 * @exception TigaseDBException if an error occurs
 	 */
 	@Override
+	@Deprecated
 	public synchronized boolean plainAuth(BareJID user, final String password)
 			throws UserNotFoundException, TigaseDBException, AuthorizationException {
 		return auth.plainAuth(user, password);

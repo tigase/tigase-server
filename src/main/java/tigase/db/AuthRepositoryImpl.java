@@ -26,6 +26,7 @@ package tigase.db;
 
 import tigase.util.Algorithms;
 import tigase.util.Base64;
+import tigase.util.TigaseStringprepException;
 
 import tigase.xmpp.BareJID;
 
@@ -57,10 +58,10 @@ import javax.security.sasl.SaslServer;
 
 /**
  * Describe class AuthRepositoryImpl here.
- *
- *
+ * 
+ * 
  * Created: Sat Nov 11 21:46:50 2006
- *
+ * 
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
@@ -70,35 +71,39 @@ public class AuthRepositoryImpl implements AuthRepository {
 	private static final String[] non_sasl_mechs = { "password", "digest" };
 	private static final String[] sasl_mechs = { "PLAIN", "DIGEST-MD5", "CRAM-MD5" };
 
-	//~--- fields ---------------------------------------------------------------
+	// ~--- fields ---------------------------------------------------------------
 
 	private UserRepository repo = null;
 
-	//~--- constructors ---------------------------------------------------------
+	// ~--- constructors ---------------------------------------------------------
 
 	/**
 	 * Creates a new <code>AuthRepositoryImpl</code> instance.
-	 *
-	 *
+	 * 
+	 * 
 	 * @param repo
 	 */
 	public AuthRepositoryImpl(UserRepository repo) {
 		this.repo = repo;
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Describe <code>addUser</code> method here.
-	 *
-	 * @param user a <code>String</code> value
-	 * @param password a <code>String</code> value
-	 * @exception UserExistsException if an error occurs
-	 * @exception TigaseDBException if an error occurs
+	 * 
+	 * @param user
+	 *          a <code>String</code> value
+	 * @param password
+	 *          a <code>String</code> value
+	 * @exception UserExistsException
+	 *              if an error occurs
+	 * @exception TigaseDBException
+	 *              if an error occurs
 	 */
 	@Override
-	public void addUser(BareJID user, final String password)
-			throws UserExistsException, TigaseDBException {
+	public void addUser(BareJID user, final String password) throws UserExistsException,
+			TigaseDBException {
 		repo.addUser(user);
 		log.info("Repo user added: " + user);
 		updatePassword(user, password);
@@ -107,20 +112,28 @@ public class AuthRepositoryImpl implements AuthRepository {
 
 	/**
 	 * Describe <code>digestAuth</code> method here.
-	 *
-	 * @param user a <code>String</code> value
-	 * @param digest a <code>String</code> value
-	 * @param id a <code>String</code> value
-	 * @param alg a <code>String</code> value
+	 * 
+	 * @param user
+	 *          a <code>String</code> value
+	 * @param digest
+	 *          a <code>String</code> value
+	 * @param id
+	 *          a <code>String</code> value
+	 * @param alg
+	 *          a <code>String</code> value
 	 * @return a <code>boolean</code> value
-	 * @exception UserNotFoundException if an error occurs
-	 * @exception TigaseDBException if an error occurs
-	 * @exception AuthorizationException if an error occurs
+	 * @exception UserNotFoundException
+	 *              if an error occurs
+	 * @exception TigaseDBException
+	 *              if an error occurs
+	 * @exception AuthorizationException
+	 *              if an error occurs
 	 */
 	@Override
+	@Deprecated
 	public boolean digestAuth(BareJID user, final String digest, final String id,
-			final String alg)
-			throws UserNotFoundException, TigaseDBException, AuthorizationException {
+			final String alg) throws UserNotFoundException, TigaseDBException,
+			AuthorizationException {
 		final String db_password = getPassword(user);
 
 		try {
@@ -133,15 +146,15 @@ public class AuthRepositoryImpl implements AuthRepository {
 			return digest.equals(digest_db_pass);
 		} catch (NoSuchAlgorithmException e) {
 			throw new AuthorizationException("No such algorithm.", e);
-		}    // end of try-catch
+		} // end of try-catch
 	}
 
-	//~--- get methods ----------------------------------------------------------
+	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -151,8 +164,8 @@ public class AuthRepositoryImpl implements AuthRepository {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -162,10 +175,10 @@ public class AuthRepositoryImpl implements AuthRepository {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param domain
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -173,59 +186,87 @@ public class AuthRepositoryImpl implements AuthRepository {
 		return repo.getUsersCount(domain);
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Describe <code>initRepository</code> method here.
-	 *
-	 * @param string a <code>String</code> value
+	 * 
+	 * @param string
+	 *          a <code>String</code> value
 	 * @param params
-	 * @exception DBInitException if an error occurs
+	 * @exception DBInitException
+	 *              if an error occurs
 	 */
 	@Override
 	public void initRepository(final String string, Map<String, String> params)
-			throws DBInitException {}
+			throws DBInitException {
+	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param user
 	 */
 	@Override
-	public void logout(BareJID user) {}
+	public void logout(BareJID user) {
+	}
 
 	/**
 	 * Describe <code>otherAuth</code> method here.
-	 *
-	 * @param props a <code>Map</code> value
+	 * 
+	 * @param props
+	 *          a <code>Map</code> value
 	 * @return a <code>boolean</code> value
-	 * @exception UserNotFoundException if an error occurs
-	 * @exception TigaseDBException if an error occurs
-	 * @exception AuthorizationException if an error occurs
+	 * @exception UserNotFoundException
+	 *              if an error occurs
+	 * @exception TigaseDBException
+	 *              if an error occurs
+	 * @exception AuthorizationException
+	 *              if an error occurs
 	 */
 	@Override
-	public boolean otherAuth(final Map<String, Object> props)
-			throws UserNotFoundException, TigaseDBException, AuthorizationException {
+	public boolean otherAuth(final Map<String, Object> props) throws UserNotFoundException,
+			TigaseDBException, AuthorizationException {
 		String proto = (String) props.get(PROTOCOL_KEY);
 
+		// TODO: this equals should be most likely replaced with == here.
+		// The property value is always set using the constant....
 		if (proto.equals(PROTOCOL_VAL_SASL)) {
 			return saslAuth(props);
-		}    // end of if (proto.equals(PROTOCOL_VAL_SASL))
+		} // end of if (proto.equals(PROTOCOL_VAL_SASL))
+
+		if (proto.equals(PROTOCOL_VAL_NONSASL)) {
+			String password = (String) props.get(PASSWORD_KEY);
+			BareJID user_id = (BareJID) props.get(USER_ID_KEY);
+				if (password != null) {
+					return plainAuth(user_id, password);
+				}
+				String digest = (String) props.get(DIGEST_KEY);
+				if (digest != null) {
+					String digest_id = (String) props.get(DIGEST_ID_KEY);
+					return digestAuth(user_id, digest, digest_id, "SHA");
+				}
+		} // end of if (proto.equals(PROTOCOL_VAL_SASL))
 
 		throw new AuthorizationException("Protocol is not supported.");
 	}
 
 	/**
 	 * Describe <code>plainAuth</code> method here.
-	 *
-	 * @param user a <code>String</code> value
-	 * @param password a <code>String</code> value
+	 * 
+	 * @param user
+	 *          a <code>String</code> value
+	 * @param password
+	 *          a <code>String</code> value
 	 * @return a <code>boolean</code> value
-	 * @exception UserNotFoundException if an error occurs
-	 * @exception TigaseDBException if an error occurs
+	 * @exception UserNotFoundException
+	 *              if an error occurs
+	 * @exception TigaseDBException
+	 *              if an error occurs
 	 */
 	@Override
+	@Deprecated
 	public boolean plainAuth(BareJID user, final String password)
 			throws UserNotFoundException, TigaseDBException {
 		String db_password = getPassword(user);
@@ -237,8 +278,9 @@ public class AuthRepositoryImpl implements AuthRepository {
 
 	/**
 	 * Describe <code>queryAuth</code> method here.
-	 *
-	 * @param authProps a <code>Map</code> value
+	 * 
+	 * @param authProps
+	 *          a <code>Map</code> value
 	 */
 	@Override
 	public void queryAuth(final Map<String, Object> authProps) {
@@ -246,19 +288,22 @@ public class AuthRepositoryImpl implements AuthRepository {
 
 		if (protocol.equals(PROTOCOL_VAL_NONSASL)) {
 			authProps.put(RESULT_KEY, non_sasl_mechs);
-		}    // end of if (protocol.equals(PROTOCOL_VAL_NONSASL))
+		} // end of if (protocol.equals(PROTOCOL_VAL_NONSASL))
 
 		if (protocol.equals(PROTOCOL_VAL_SASL)) {
 			authProps.put(RESULT_KEY, sasl_mechs);
-		}    // end of if (protocol.equals(PROTOCOL_VAL_NONSASL))
+		} // end of if (protocol.equals(PROTOCOL_VAL_NONSASL))
 	}
 
 	/**
 	 * Describe <code>removeUser</code> method here.
-	 *
-	 * @param user a <code>String</code> value
-	 * @exception UserNotFoundException if an error occurs
-	 * @exception TigaseDBException if an error occurs
+	 * 
+	 * @param user
+	 *          a <code>String</code> value
+	 * @exception UserNotFoundException
+	 *              if an error occurs
+	 * @exception TigaseDBException
+	 *              if an error occurs
 	 */
 	@Override
 	public void removeUser(BareJID user) throws UserNotFoundException, TigaseDBException {
@@ -267,23 +312,28 @@ public class AuthRepositoryImpl implements AuthRepository {
 
 	/**
 	 * Describe <code>updatePassword</code> method here.
-	 *
-	 * @param user a <code>String</code> value
-	 * @param password a <code>String</code> value
-	 * @exception TigaseDBException if an error occurs
+	 * 
+	 * @param user
+	 *          a <code>String</code> value
+	 * @param password
+	 *          a <code>String</code> value
+	 * @exception TigaseDBException
+	 *              if an error occurs
 	 */
 	@Override
-	public void updatePassword(BareJID user, final String password) throws TigaseDBException {
+	public void updatePassword(BareJID user, final String password)
+			throws TigaseDBException {
 		repo.setData(user, PASSWORD_KEY, password);
 	}
 
-	//~--- get methods ----------------------------------------------------------
+	// ~--- get methods ----------------------------------------------------------
 
-	private String getPassword(BareJID user) throws UserNotFoundException, TigaseDBException {
+	private String getPassword(BareJID user) throws UserNotFoundException,
+			TigaseDBException {
 		return repo.getData(user, PASSWORD_KEY);
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	private boolean saslAuth(final Map<String, Object> props) throws AuthorizationException {
 		try {
@@ -293,10 +343,12 @@ public class AuthRepositoryImpl implements AuthRepository {
 				Map<String, String> sasl_props = new TreeMap<String, String>();
 
 				sasl_props.put(Sasl.QOP, "auth");
-				ss = Sasl.createSaslServer((String) props.get(MACHANISM_KEY), "xmpp",
-						(String) props.get(SERVER_NAME_KEY), sasl_props, new SaslCallbackHandler(props));
+				ss =
+						Sasl.createSaslServer((String) props.get(MACHANISM_KEY), "xmpp",
+								(String) props.get(SERVER_NAME_KEY), sasl_props, new SaslCallbackHandler(
+										props));
 				props.put("SaslServer", ss);
-			}    // end of if (ss == null)
+			} // end of if (ss == null)
 
 			String data_str = (String) props.get(DATA_KEY);
 			byte[] in_data = ((data_str != null) ? Base64.decode(data_str) : new byte[0]);
@@ -311,8 +363,9 @@ public class AuthRepositoryImpl implements AuthRepository {
 				log.finest("challenge: " + ((challenge != null) ? new String(challenge) : "null"));
 			}
 
-			String challenge_str = (((challenge != null) && (challenge.length > 0))
-				? Base64.encode(challenge) : null);
+			String challenge_str =
+					(((challenge != null) && (challenge.length > 0)) ? Base64.encode(challenge)
+							: null);
 
 			props.put(RESULT_KEY, challenge_str);
 
@@ -320,37 +373,40 @@ public class AuthRepositoryImpl implements AuthRepository {
 				return true;
 			} else {
 				return false;
-			}    // end of if (ss.isComplete()) else
+			} // end of if (ss.isComplete()) else
 		} catch (SaslException e) {
 			throw new AuthorizationException("Sasl exception.", e);
-		}      // end of try-catch
+		} // end of try-catch
 	}
 
-	//~--- inner classes --------------------------------------------------------
+	// ~--- inner classes --------------------------------------------------------
 
 	private class SaslCallbackHandler implements CallbackHandler {
 		private Map<String, Object> options = null;
 
-		//~--- constructors -------------------------------------------------------
+		// ~--- constructors -------------------------------------------------------
 
 		private SaslCallbackHandler(final Map<String, Object> options) {
 			this.options = options;
 		}
 
-		//~--- methods ------------------------------------------------------------
+		// ~--- methods ------------------------------------------------------------
 
 		// Implementation of javax.security.auth.callback.CallbackHandler
 
 		/**
 		 * Describe <code>handle</code> method here.
-		 *
-		 * @param callbacks a <code>Callback[]</code> value
-		 * @exception IOException if an error occurs
-		 * @exception UnsupportedCallbackException if an error occurs
+		 * 
+		 * @param callbacks
+		 *          a <code>Callback[]</code> value
+		 * @exception IOException
+		 *              if an error occurs
+		 * @exception UnsupportedCallbackException
+		 *              if an error occurs
 		 */
 		@Override
-		public void handle(final Callback[] callbacks)
-				throws IOException, UnsupportedCallbackException {
+		public void handle(final Callback[] callbacks) throws IOException,
+				UnsupportedCallbackException {
 			BareJID jid = null;
 
 			for (int i = 0; i < callbacks.length; i++) {
@@ -364,7 +420,7 @@ public class AuthRepositoryImpl implements AuthRepository {
 
 					if (realm != null) {
 						rc.setText(realm);
-					}        // end of if (realm == null)
+					} // end of if (realm == null)
 
 					if (log.isLoggable(Level.FINEST)) {
 						log.finest("RealmCallback: " + realm);
@@ -376,7 +432,7 @@ public class AuthRepositoryImpl implements AuthRepository {
 
 						if (user_name == null) {
 							user_name = nc.getDefaultName();
-						}      // end of if (name == null)
+						} // end of if (name == null)
 
 						jid = BareJID.bareJIDInstanceNS(user_name, (String) options.get(REALM_KEY));
 						options.put(USER_ID_KEY, jid);
@@ -398,7 +454,7 @@ public class AuthRepositoryImpl implements AuthRepository {
 								}
 							} catch (Exception e) {
 								throw new IOException("Password retrieving problem.", e);
-							}    // end of try-catch
+							} // end of try-catch
 						} else {
 							if (callbacks[i] instanceof AuthorizeCallback) {
 								AuthorizeCallback authCallback = ((AuthorizeCallback) callbacks[i]);
@@ -413,9 +469,10 @@ public class AuthRepositoryImpl implements AuthRepository {
 								// if (authenId.equals(authorId)) {
 								authCallback.setAuthorized(true);
 
-								// }    // end of if (authenId.equals(authorId))
+								// } // end of if (authenId.equals(authorId))
 							} else {
-								throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
+								throw new UnsupportedCallbackException(callbacks[i],
+										"Unrecognized Callback");
 							}
 						}
 					}
@@ -423,10 +480,8 @@ public class AuthRepositoryImpl implements AuthRepository {
 			}
 		}
 	}
-}    // AuthRepositoryImpl
+} // AuthRepositoryImpl
 
+// ~ Formatted in Sun Code Convention
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+// ~ Formatted by Jindent --- http://www.jindent.com

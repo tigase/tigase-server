@@ -180,6 +180,7 @@ public class DrupalWPAuth implements AuthRepository {
 	 * @exception AuthorizationException if an error occurs
 	 */
 	@Override
+	@Deprecated
 	public boolean digestAuth(BareJID user, final String digest, final String id, final String alg)
 			throws UserNotFoundException, TigaseDBException, AuthorizationException {
 		throw new AuthorizationException("Not supported.");
@@ -387,6 +388,7 @@ public class DrupalWPAuth implements AuthRepository {
 	 * @exception TigaseDBException if an error occurs
 	 */
 	@Override
+	@Deprecated
 	public boolean plainAuth(BareJID user, final String password)
 			throws UserNotFoundException, TigaseDBException, AuthorizationException {
 		try {

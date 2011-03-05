@@ -133,6 +133,7 @@ public class TigaseAuth implements AuthRepository {
 	 * @exception AuthorizationException if an error occurs
 	 */
 	@Override
+	@Deprecated
 	public boolean digestAuth(BareJID user, final String digest, final String id, final String alg)
 			throws UserNotFoundException, TigaseDBException, AuthorizationException {
 		throw new AuthorizationException("Not supported.");
@@ -311,6 +312,19 @@ public class TigaseAuth implements AuthRepository {
 			throw new AuthorizationException("Mechanism is not supported: " + mech);
 		}      // end of if (proto.equals(PROTOCOL_VAL_SASL))
 
+		if (proto.equals(PROTOCOL_VAL_NONSASL)) {
+			String password = (String) props.get(PASSWORD_KEY);
+			BareJID user_id = (BareJID) props.get(USER_ID_KEY);
+				if (password != null) {
+					return plainAuth(user_id, password);
+				}
+				String digest = (String) props.get(DIGEST_KEY);
+				if (digest != null) {
+					String digest_id = (String) props.get(DIGEST_ID_KEY);
+					return digestAuth(user_id, digest, digest_id, "SHA");
+				}
+		} // end of if (proto.equals(PROTOCOL_VAL_SASL))
+
 		throw new AuthorizationException("Protocol is not supported: " + proto);
 	}
 
@@ -326,6 +340,7 @@ public class TigaseAuth implements AuthRepository {
 	 * @exception TigaseDBException if an error occurs
 	 */
 	@Override
+	@Deprecated
 	public boolean plainAuth(BareJID user, final String password)
 			throws UserNotFoundException, TigaseDBException, AuthorizationException {
 		ResultSet rs = null;

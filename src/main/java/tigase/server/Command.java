@@ -95,7 +95,7 @@ public enum Command {
 	GETFEATURES(Priority.HIGH),
 
 	/**
-	 * This is deprecated command sent between components in the Tigase server
+	 * This is depreciated command sent between components in the Tigase server
 	 * for service discovery handling.
 	 */
 	GETDISCO(Priority.HIGH),
