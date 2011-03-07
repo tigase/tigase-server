@@ -3,7 +3,7 @@
 # Provides:          tigase
 # Required-Start:    networking
 # Required-Stop:     networking
-# Default-Start:     2 3 5
+# Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
 # Short-Description: Start the Tigase XMPP server
 ### END INIT INFO
@@ -16,20 +16,29 @@ then
 	done
 fi
 
-USERNAME=tigase
+# Settings paths and other variables
 PATH=/sbin:/bin:/usr/sbin:/usr/bin:${JAVA_HOME}/bin
 JAVA=${JAVA_HOME}/bin/java
-NAME=tigase
-DESC="Tigase XMPP server"
+
 TIGASE_HOME=/usr/share/tigase
 TIGASE_LIB=${TIGASE_HOME}/libs
 TIGASE_CONFIG=/etc/tigase/tigase-server.xml
 TIGASE_OPTIONS=
 
+USERNAME=tigase
+NAME=tigase
+DESC="Tigase XMPP server"
+
 # Include tigase defaults if available
-if [ -f /etc/default/tigase ] ; then
-	. /etc/default/tigase
+if [ -f "/etc/default/tigase" ] ; then
+	TIGASE_PARAMS="/etc/default/tigase"
+elif [ -f "/etc/tigase/tigase.conf" ] ; then
+	TIGASE_PARAMS="/etc/tigase/tigase.conf"
+elif [ -f "${TIGASE_HOME}/etc/tigase.conf" ] ; then
+	TIGASE_PARAMS="${TIGASE_HOME}/etc/tigase.conf"
 fi
+
+[[ -f "${TIGASE_PARAMS}" ]] && . ${TIGASE_PARAMS}
 
 if [ -z "${JAVA_HOME}" ] ; then
   echo "JAVA_HOME is not set."
@@ -37,6 +46,7 @@ if [ -z "${JAVA_HOME}" ] ; then
   exit 1
 fi
 
+# Find tigase-server jar
 for j in ${TIGASE_HOME}/jars/tigase-server*.jar ; do
         if [ -f ${j} ] ; then
           TIGASE_JAR=${j}
@@ -53,11 +63,13 @@ done
 
 CLASSPATH="${CLASSPATH}${TIGASE_JAR}"
 
-for lib in ${TIGASE_LIB}/* ; do
+for lib in ${TIGASE_LIB}/*.jar ; do
   CLASSPATH="${CLASSPATH}:$lib"
 done
 
 TIGASE_CMD="${JAVA_OPTIONS} -cp ${CLASSPATH} ${TIGASE_RUN}"
+
+PIDFILE="/var/run/$NAME.pid"
 
 cd ${TIGASE_HOME}
 
@@ -67,14 +79,17 @@ set -e
 
 #Helper functions
 start() {
-        start-stop-daemon --start --quiet --background --make-pidfile \
-                --chdir ${TIGASE_HOME} --pidfile /var/run/$NAME.pid --chuid $USERNAME:$USERNAME \
+        start-stop-daemon --start --background --make-pidfile \
+                --chdir ${TIGASE_HOME} --pidfile $PIDFILE --chuid $USERNAME:$USERNAME \
                 --exec $JAVA -- $TIGASE_CMD
 }
 
 stop() {
-        start-stop-daemon --stop --quiet --pidfile /var/run/$NAME.pid \
-		--exec $JAVA --retry 4
+        start-stop-daemon --stop --quiet \
+        	--chdir ${TIGASE_HOME} --pidfile $PIDFILE --chuid $USERNAME:$USERNAME \
+		--exec $JAVA  > /dev/null
+		
+	rm -f "$PIDFILE"
 }
 
 case "$1" in
@@ -88,33 +103,50 @@ case "$1" in
 	;;
   stop)
 	log_daemon_msg "Stopping $DESC"
-	stop
-	log_end_msg 0
-	#else
-	#	log_end_msg 1
-	#fi
+	if stop; then
+		log_end_msg 0
+	else
+		log_end_msg 1
+	fi
 	;;
   restart|force-reload)
-	#
-	#	If the "reload" option is implemented, move the "force-reload"
-	#	option to the "reload" entry above. If not, "force-reload" is
-	#	just the same as "restart".
-	#
 	log_daemon_msg "Restarting $DESC"
-	#set +e
 	stop
-	#set -e
-	#sleep 1
+	sleep 1
 	if start; then
 		log_end_msg 0
 	else
 		log_end_msg 1
 	fi
 	;;
+
+  check)
+	echo "Checking arguments to Tigase: "
+	echo
+	echo "HOST_NAME           =  $HOST_NAME"
+	echo "PIDFILE             =  $PIDFILE"
+	echo "JAVA_OPTIONS        =  $JAVA_OPTIONS"
+	echo "JAVA_HOME           =  $JAVA_HOME"
+	echo "JAVA                =  $JAVA"
+	echo "USERNAME            =  $USERNAME"
+	echo "TIGASE_CMD          =  $TIGASE_CMD"
+	echo "TIGASE_HOME         =  $TIGASE_HOME"
+	echo "TIGASE_JAR          =  $TIGASE_JAR"
+	echo "TIGASE_CONFIG       =  $TIGASE_CONFIG"
+	echo "TIGASE_OPTIONS      =  $TIGASE_OPTIONS"
+	echo "CLASSPATH           =  $CLASSPATH"
+	
+	if [ -f $PIDFILE ] && kill -0 `cat $PIDFILE` 2>/dev/null
+	then
+		echo "Tigase running pid="`cat $PIDFILE`
+		exit 0
+	fi
+	exit 1
+	;;
+
   *)
 	N=/etc/init.d/$NAME
-	# echo "Usage: $N {start|stop|restart|reload|force-reload}" >&2
-	echo "Usage: $N {start|stop|restart|force-reload}" >&2
+	echo "Usage: $N {start|stop|restart|force-reload|check}" >&2
 	exit 1
 	;;
 esac
