@@ -735,7 +735,7 @@ public class TigaseCustomAuth implements AuthRepository {
 
 	//~--- get methods ----------------------------------------------------------
 
-	private String getParamWithDef(Map<String, String> params, String key, String def) {
+	protected String getParamWithDef(Map<String, String> params, String key, String def) {
 		if (params == null) {
 			return def;
 		}
