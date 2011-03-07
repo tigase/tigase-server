@@ -79,7 +79,7 @@ set -e
 
 #Helper functions
 start() {
-        start-stop-daemon --start --background --make-pidfile \
+        start-stop-daemon --start --background --quiet --make-pidfile \
                 --chdir ${TIGASE_HOME} --pidfile $PIDFILE --chuid $USERNAME:$USERNAME \
                 --exec $JAVA -- $TIGASE_CMD
 }
@@ -123,7 +123,6 @@ case "$1" in
   check)
 	echo "Checking arguments to Tigase: "
 	echo
-	echo "HOST_NAME           =  $HOST_NAME"
 	echo "PIDFILE             =  $PIDFILE"
 	echo "JAVA_OPTIONS        =  $JAVA_OPTIONS"
 	echo "JAVA_HOME           =  $JAVA_HOME"
