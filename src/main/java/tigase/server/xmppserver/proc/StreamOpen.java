@@ -1,24 +1,23 @@
-
 /*
-* Tigase Jabber/XMPP Server
-* Copyright (C) 2004-2010 "Artur Hefczyc" <artur.hefczyc@tigase.org>
-*
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, version 3 of the License.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program. Look for COPYING file in the top folder.
-* If not, see http://www.gnu.org/licenses/.
-*
-* $Rev$
-* Last modified by $Author$
-* $Date$
+ * Tigase Jabber/XMPP Server
+ * Copyright (C) 2004-2010 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. Look for COPYING file in the top folder.
+ * If not, see http://www.gnu.org/licenses/.
+ *
+ * $Rev$
+ * Last modified by $Author$
+ * $Date$
  */
 package tigase.server.xmppserver.proc;
 
@@ -44,41 +43,43 @@ import java.util.logging.Logger;
 
 /**
  * Created: Dec 9, 2010 1:59:56 PM
- *
+ * 
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class StreamOpen extends S2SAbstractProcessor {
 	private static final Logger log = Logger.getLogger(StreamOpen.class.getName());
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param serv
 	 */
 	@Override
 	public void serviceStarted(S2SIOService serv) {
 		switch (serv.connectionType()) {
-			case connect :
+			case connect:
 				CID cid = (CID) serv.getSessionData().get("cid");
 
 				serv.getSessionData().put(S2SIOService.HOSTNAME_KEY, cid.getLocalHost());
 
 				// Send init xmpp stream here
 				// XMPPIOService serv = (XMPPIOService)service;
-				String data = "<stream:stream" + " xmlns:stream='http://etherx.jabber.org/streams'"
-					+ " xmlns='jabber:server'" + " xmlns:db='jabber:server:dialback'" + " from='"
-					+ cid.getLocalHost() + "'" + " to='" + cid.getRemoteHost() + "'" + " version='1.0'>";
+				String data =
+						"<stream:stream" + " xmlns:stream='http://etherx.jabber.org/streams'"
+								+ " xmlns='jabber:server'" + " xmlns:db='jabber:server:dialback'"
+								+ " from='" + cid.getLocalHost() + "'" + " to='" + cid.getRemoteHost()
+								+ "'" + " version='1.0'>";
 
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "{0}, sending: {1}", new Object[] { serv, data });
 				}
 
 				S2SConnection s2s_conn =
-					(S2SConnection) serv.getSessionData().get(S2SIOService.S2S_CONNECTION_KEY);
+						(S2SConnection) serv.getSessionData().get(S2SIOService.S2S_CONNECTION_KEY);
 
 				if (s2s_conn == null) {
 					log.log(Level.WARNING,
@@ -93,17 +94,17 @@ public class StreamOpen extends S2SAbstractProcessor {
 
 				break;
 
-			default :
+			default:
 
 				// Do nothing, more data should come soon...
 				break;
-		}    // end of switch (service.connectionType())
+		} // end of switch (service.connectionType())
 	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param serv
 	 */
 	@Override
@@ -112,7 +113,8 @@ public class StreamOpen extends S2SAbstractProcessor {
 
 		if (cid == null) {
 			if (serv.connectionType() == ConnectionType.connect) {
-				log.log(Level.WARNING, "Protocol error cid not set for outgoing connection: {0}", serv);
+				log.log(Level.WARNING, "Protocol error cid not set for outgoing connection: {0}",
+						serv);
 			}
 
 			return;
@@ -122,8 +124,8 @@ public class StreamOpen extends S2SAbstractProcessor {
 			CIDConnections cid_conns = handler.getCIDConnections(cid, false);
 
 			if (cid_conns == null) {
-				log.log(Level.WARNING, "Protocol error cid_conns not found for outgoing connection: {0}",
-						serv);
+				log.log(Level.WARNING,
+						"Protocol error cid_conns not found for outgoing connection: {0}", serv);
 
 				return;
 			} else {
@@ -138,11 +140,11 @@ public class StreamOpen extends S2SAbstractProcessor {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param serv
 	 * @param attribs
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -150,6 +152,10 @@ public class StreamOpen extends S2SAbstractProcessor {
 		CID cid = (CID) serv.getSessionData().get("cid");
 		String remote_hostname = attribs.get("from");
 		String local_hostname = attribs.get("to");
+		String version = attribs.get(VERSION_ATT_NAME);
+		if (version != null) {
+			serv.getSessionData().put(VERSION_ATT_NAME, version);
+		}
 
 		if (cid == null) {
 			if ((remote_hostname != null) && (local_hostname != null)) {
@@ -161,33 +167,37 @@ public class StreamOpen extends S2SAbstractProcessor {
 			CIDConnections cid_conns = handler.getCIDConnections(cid, false);
 
 			switch (serv.connectionType()) {
-				case connect : {
+				case connect: {
 
 					// It must be always set for connect connection type
 					String remote_id = attribs.get("id");
 
 					if (log.isLoggable(Level.FINEST)) {
 						log.log(Level.FINEST, "{0}, Connect Stream opened for: {1}, session id{2}",
-								new Object[] { serv,
-								cid, remote_id });
+								new Object[] { serv, cid, remote_id });
 					}
 
 					if (cid_conns == null) {
 
-						// This should actually not happen. Let's be clear here about handling unexpected
+						// This should actually not happen. Let's be clear here about
+						// handling unexpected
 						// cases.
-						log.log(Level.WARNING,
+						log.log(
+								Level.WARNING,
 								"{0} This might be a bug in s2s code, should not happen."
-									+ " Missing CIDConnections for stream open to ''connect'' service type.", serv);
+										+ " Missing CIDConnections for stream open to ''connect'' service type.",
+								serv);
 						generateStreamError(false, "internal-server-error", serv);
 
 						return null;
 					}
 
 					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, "{0}, stream open for cid: {1}, outgoint: {2}, incoming: {3}",
-								new Object[] { serv,
-								cid, cid_conns.getOutgoingCount(), cid_conns.getIncomingCount() });
+						log.log(
+								Level.FINEST,
+								"{0}, stream open for cid: {1}, outgoint: {2}, incoming: {3}",
+								new Object[] { serv, cid, cid_conns.getOutgoingCount(),
+										cid_conns.getIncomingCount() });
 					}
 
 					serv.setSessionId(remote_id);
@@ -195,7 +205,7 @@ public class StreamOpen extends S2SAbstractProcessor {
 					return null;
 				}
 
-				case accept : {
+				case accept: {
 					if (local_hostname != null) {
 						serv.getSessionData().put(S2SIOService.HOSTNAME_KEY, local_hostname);
 					} else {
@@ -208,44 +218,51 @@ public class StreamOpen extends S2SAbstractProcessor {
 
 					serv.setSessionId(id);
 
-					String stream_open = "<stream:stream"
-						+ " xmlns:stream='http://etherx.jabber.org/streams'" + " xmlns='jabber:server'"
-						+ " xmlns:db='jabber:server:dialback'" + " id='" + id + "'";
+					String stream_open =
+							"<stream:stream" + " xmlns:stream='http://etherx.jabber.org/streams'"
+									+ " xmlns='jabber:server'" + " xmlns:db='jabber:server:dialback'"
+									+ " id='" + id + "'";
 
 					if (cid != null) {
-						stream_open += " from='" + cid.getLocalHost() + "'" + " to='" + cid.getRemoteHost()
-								+ "'";
+						stream_open +=
+								" from='" + cid.getLocalHost() + "'" + " to='" + cid.getRemoteHost()
+										+ "'";
 
 						if (cid_conns == null) {
 							cid_conns = handler.getCIDConnections(cid, true);
 						}
 
 						if (log.isLoggable(Level.FINEST)) {
-							log.log(Level.FINEST, "{0}, Accept Stream opened for: {1}, session id: {2}",
-									new Object[] { serv,
-									cid, id });
+							log.log(Level.FINEST,
+									"{0}, Accept Stream opened for: {1}, session id: {2}", new Object[] {
+											serv, cid, id });
 						}
 
 						serv.getSessionData().put("cid", cid);
 						cid_conns.addIncoming(serv);
 					} else {
 						if (log.isLoggable(Level.FINEST)) {
-							log.log(Level.FINEST, "{0}, Accept Stream opened for unknown CID, session id: {1}",
-									new Object[] { serv,
-									id });
+							log.log(Level.FINEST,
+									"{0}, Accept Stream opened for unknown CID, session id: {1}",
+									new Object[] { serv, id });
 						}
 					}
 
-					stream_open += " version='1.0'>";
+					// Spec examples show that the version should always be included but
+					// this seems to break some servers.
+					if (FORCE_VERSION || attribs.containsKey("version")) {
+						stream_open += " version='1.0'";
+					}
+					stream_open += ">";
 
 					return stream_open;
 				}
 
-				default :
+				default:
 					log.log(Level.SEVERE, "{0}, Warning, program shouldn't reach that point.", serv);
 
 					break;
-			}    // end of switch (serv.connectionType())
+			} // end of switch (serv.connectionType())
 		} catch (NotLocalhostException ex) {
 			generateStreamError(false, "host-unknown", serv);
 		} catch (LocalhostException ex) {
@@ -256,8 +273,6 @@ public class StreamOpen extends S2SAbstractProcessor {
 	}
 }
 
+// ~ Formatted in Sun Code Convention
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+// ~ Formatted by Jindent --- http://www.jindent.com

@@ -64,7 +64,9 @@ public abstract class S2SAbstractProcessor implements S2SProcessor {
 	protected static final String PROCEED_TLS_EL = "proceed";
 	protected static final String START_TLS_NS = "urn:ietf:params:xml:ns:xmpp-tls";
 	protected static final String DIALBACK_TLS_NS = "urn:xmpp:features:dialback";
+	protected static final String VERSION_ATT_NAME = "version";
 	private static final Logger log = Logger.getLogger(S2SAbstractProcessor.class.getName());
+	public static boolean FORCE_VERSION = false;
 
 	//~--- fields ---------------------------------------------------------------
 
