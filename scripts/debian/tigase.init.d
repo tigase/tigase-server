@@ -17,25 +17,33 @@ then
 fi
 
 # Settings paths and other variables
-PATH=/sbin:/bin:/usr/sbin:/usr/bin:${JAVA_HOME}/bin
-JAVA=${JAVA_HOME}/bin/java
+USERNAME=tigase
+USERGROUP=tigase
+NAME=tigase
+DESC="Tigase XMPP server"
 
 TIGASE_HOME=/usr/share/tigase
 TIGASE_LIB=${TIGASE_HOME}/libs
 TIGASE_CONFIG=/etc/tigase/tigase-server.xml
 TIGASE_OPTIONS=
+TIGASE_PARAMS=
 
-USERNAME=tigase
-NAME=tigase
-DESC="Tigase XMPP server"
+PIDFILE=
+TIGASE_CONSOLE_LOG=
+
+#dirty fix for problem with correct user variables with start-stop-daemon
+USER=$USERNAME
+eval HOME="~$USER"
 
 # Include tigase defaults if available
-if [ -f "/etc/default/tigase" ] ; then
-	TIGASE_PARAMS="/etc/default/tigase"
-elif [ -f "/etc/tigase/tigase.conf" ] ; then
-	TIGASE_PARAMS="/etc/tigase/tigase.conf"
-elif [ -f "${TIGASE_HOME}/etc/tigase.conf" ] ; then
-	TIGASE_PARAMS="${TIGASE_HOME}/etc/tigase.conf"
+if [ -z "${TIGASE_PARAMS}" ] ; then
+	if [ -f "/etc/default/tigase" ] ; then
+		TIGASE_PARAMS="/etc/default/tigase"
+	elif [ -f "/etc/tigase/tigase.conf" ] ; then
+		TIGASE_PARAMS="/etc/tigase/tigase.conf"
+	elif [ -f "${TIGASE_HOME}/etc/tigase.conf" ] ; then
+		TIGASE_PARAMS="${TIGASE_HOME}/etc/tigase.conf"
+	fi
 fi
 
 [[ -f "${TIGASE_PARAMS}" ]] && . ${TIGASE_PARAMS}
@@ -46,6 +54,8 @@ if [ -z "${JAVA_HOME}" ] ; then
   exit 1
 fi
 
+PATH=/sbin:/bin:/usr/sbin:/usr/bin:${JAVA_HOME}/bin
+
 # Find tigase-server jar
 for j in ${TIGASE_HOME}/jars/tigase-server*.jar ; do
         if [ -f ${j} ] ; then
@@ -53,6 +63,27 @@ for j in ${TIGASE_HOME}/jars/tigase-server*.jar ; do
           break
         fi
 done
+
+if [ -z "${TIGASE_CONSOLE_LOG}" ] ; then
+    if [ -w "/var/log/${NAME}/" ] ; then
+        TIGASE_CONSOLE_LOG="/var/log/${NAME}/tigase-console.log"
+    elif [ -w "${TIGASE_HOME}/logs/" ] ; then
+        TIGASE_CONSOLE_LOG="${TIGASE_HOME}/logs/tigase-console.log"
+    else
+        TIGASE_CONSOLE_LOG="/dev/null"
+    fi
+fi
+
+if [ -z "${PIDFILE}" ] ; then
+    if [ -w "/var/run/" ] ; then
+        PIDFILE="/var/run/$NAME.pid"
+    elif [ -w "${TIGASE_HOME}/logs/" ] ; then
+        PIDFILE="${TIGASE_HOME}/logs/$NAME.pid"
+    else
+        PIDFILE="/var/tmp/$NAME.pid"
+    fi
+fi
+
 
 [[ -z "${TIGASE_RUN}" ]] && \
   TIGASE_RUN="tigase.server.XMPPServer -c ${TIGASE_CONFIG} ${TIGASE_OPTIONS}"
@@ -69,9 +100,13 @@ done
 
 TIGASE_CMD="${JAVA_OPTIONS} -cp ${CLASSPATH} ${TIGASE_RUN}"
 
-PIDFILE="/var/run/$NAME.pid"
-
-cd ${TIGASE_HOME}
+if [ -d "${TIGASE_HOME}" ] ; then
+        cd ${TIGASE_HOME}
+else
+  echo "${TIGASE_HOME} is not set to correct value"
+  echo "Please set it to correct value before starting the sever."
+  exit 1
+fi
 
 set -e
 
@@ -79,16 +114,23 @@ set -e
 
 #Helper functions
 start() {
-        start-stop-daemon --start --background --quiet --make-pidfile \
-                --chdir ${TIGASE_HOME} --pidfile $PIDFILE --chuid $USERNAME:$USERNAME \
-                --exec $JAVA -- $TIGASE_CMD
+
+        if [ -f ${PIDFILE} ] && kill -0 $(<${PIDFILE}) 2>/dev/null
+        then
+                echo "Tigase is already running!"
+                exit 1
+        fi
+
+        start-stop-daemon --start --quiet --make-pidfile \
+                --chdir ${TIGASE_HOME} --pidfile $PIDFILE --chuid $USERNAME:$USERGROUP \
+                --exec $JAVA -- $TIGASE_CMD >>$TIGASE_CONSOLE_LOG 2>&1 >/dev/null &
 }
 
 stop() {
         start-stop-daemon --stop --quiet \
-        	--chdir ${TIGASE_HOME} --pidfile $PIDFILE --chuid $USERNAME:$USERNAME \
-		--exec $JAVA  > /dev/null
-		
+        	--chdir ${TIGASE_HOME} --pidfile $PIDFILE --chuid $USERNAME:$USERGROUP \
+		--exec $JAVA > /dev/null
+        
 	rm -f "$PIDFILE"
 }
 
@@ -123,18 +165,24 @@ case "$1" in
   check)
 	echo "Checking arguments to Tigase: "
 	echo
-	echo "PIDFILE             =  $PIDFILE"
-	echo "JAVA_OPTIONS        =  $JAVA_OPTIONS"
-	echo "JAVA_HOME           =  $JAVA_HOME"
-	echo "JAVA                =  $JAVA"
 	echo "USERNAME            =  $USERNAME"
-	echo "TIGASE_CMD          =  $TIGASE_CMD"
+	echo "USERGROUP           =  $USERGROUP"
+	echo "USER                =  $USER"
+	echo "HOME                =  $HOME"
+	echo
 	echo "TIGASE_HOME         =  $TIGASE_HOME"
 	echo "TIGASE_JAR          =  $TIGASE_JAR"
+	echo "TIGASE_CMD          =  $TIGASE_CMD"
 	echo "TIGASE_CONFIG       =  $TIGASE_CONFIG"
+	echo "TIGASE_PARAMS       =  $TIGASE_PARAMS"
 	echo "TIGASE_OPTIONS      =  $TIGASE_OPTIONS"
+	echo "TIGASE_CONSOLE_LOG  =  $TIGASE_CONSOLE_LOG"
+	echo "PIDFILE             =  $PIDFILE"
+	echo "JAVA_HOME           =  $JAVA_HOME"
+	echo "JAVA                =  $JAVA"
+	echo "JAVA_OPTIONS        =  $JAVA_OPTIONS"
 	echo "CLASSPATH           =  $CLASSPATH"
-	
+
 	if [ -f $PIDFILE ] && kill -0 `cat $PIDFILE` 2>/dev/null
 	then
 		echo "Tigase running pid="`cat $PIDFILE`
