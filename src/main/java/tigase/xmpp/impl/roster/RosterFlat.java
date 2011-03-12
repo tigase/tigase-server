@@ -62,7 +62,7 @@ public class RosterFlat extends RosterAbstract {
 	/**
 	 * Private logger for class instances.
 	 */
-	private static final Logger log = Logger.getLogger("tigase.xmpp.impl.roster.RosterFlat");
+	private static final Logger log = Logger.getLogger(RosterFlat.class.getName());
 	private static final SimpleParser parser = SingletonFactory.getParserInstance();
 	private static int maxRosterSize = new Long(Runtime.getRuntime().maxMemory()
 		/ 250000L).intValue();
@@ -503,7 +503,13 @@ public class RosterFlat extends RosterAbstract {
 			throws NotAuthorizedException, TigaseDBException {
 		Map<BareJID, RosterElement> roster = getUserRoster(session);
 
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Removing roster buddy: {0}, before removal: {1}", new Object[] { jid, roster });
+		}
 		roster.remove(jid.getBareJID());
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Removing roster buddy: {0}, after removal: {1}", new Object[] { jid, roster });
+		}
 		saveUserRoster(session);
 
 		return true;
