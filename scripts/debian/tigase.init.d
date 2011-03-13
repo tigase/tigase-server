@@ -31,17 +31,16 @@ TIGASE_PARAMS=
 PIDFILE=
 TIGASE_CONSOLE_LOG=
 
-#dirty fix for problem with correct user variables with start-stop-daemon
 USER=$USERNAME
 eval HOME="~$USER"
 
 # Include tigase defaults if available
 if [ -z "${TIGASE_PARAMS}" ] ; then
-	if [ -f "/etc/default/tigase" ] ; then
+	if [ -r "/etc/default/tigase" ] ; then
 		TIGASE_PARAMS="/etc/default/tigase"
-	elif [ -f "/etc/tigase/tigase.conf" ] ; then
+	elif [ -r "/etc/tigase/tigase.conf" ] ; then
 		TIGASE_PARAMS="/etc/tigase/tigase.conf"
-	elif [ -f "${TIGASE_HOME}/etc/tigase.conf" ] ; then
+	elif [ -r "${TIGASE_HOME}/etc/tigase.conf" ] ; then
 		TIGASE_PARAMS="${TIGASE_HOME}/etc/tigase.conf"
 	fi
 fi
@@ -65,25 +64,24 @@ for j in ${TIGASE_HOME}/jars/tigase-server*.jar ; do
 done
 
 if [ -z "${TIGASE_CONSOLE_LOG}" ] ; then
-    if [ -w "/var/log/${NAME}/" ] ; then
-        TIGASE_CONSOLE_LOG="/var/log/${NAME}/tigase-console.log"
-    elif [ -w "${TIGASE_HOME}/logs/" ] ; then
+    if [ -w "${TIGASE_HOME}/logs/" ] ; then
         TIGASE_CONSOLE_LOG="${TIGASE_HOME}/logs/tigase-console.log"
+    elif [ -w "/var/log/${NAME}/" ] ; then
+        TIGASE_CONSOLE_LOG="/var/log/${NAME}/tigase-console.log"
     else
         TIGASE_CONSOLE_LOG="/dev/null"
     fi
 fi
 
 if [ -z "${PIDFILE}" ] ; then
-    if [ -w "/var/run/" ] ; then
-        PIDFILE="/var/run/$NAME.pid"
-    elif [ -w "${TIGASE_HOME}/logs/" ] ; then
+    if [ -w "${TIGASE_HOME}/logs/" ] ; then
         PIDFILE="${TIGASE_HOME}/logs/$NAME.pid"
+    elif [ -w "/var/run/" ] ; then
+        PIDFILE="/var/run/$NAME.pid"
     else
         PIDFILE="/var/tmp/$NAME.pid"
     fi
 fi
-
 
 [[ -z "${TIGASE_RUN}" ]] && \
   TIGASE_RUN="tigase.server.XMPPServer -c ${TIGASE_CONFIG} ${TIGASE_OPTIONS}"
@@ -115,21 +113,29 @@ set -e
 #Helper functions
 start() {
 
-        if [ -f ${PIDFILE} ] && kill -0 $(<${PIDFILE}) 2>/dev/null
+	if [ -f $PIDFILE ] && kill -0 `cat $PIDFILE` 2>/dev/null
         then
-                echo "Tigase is already running!"
-                exit 1
+            echo "Tigase is already running!"
+            return 1
         fi
 
-        start-stop-daemon --start --quiet --make-pidfile \
-                --chdir ${TIGASE_HOME} --pidfile $PIDFILE --chuid $USERNAME:$USERGROUP \
-                --exec $JAVA -- $TIGASE_CMD >>$TIGASE_CONSOLE_LOG 2>&1 >/dev/null &
+	su ${USERNAME} -c "start-stop-daemon --start --quiet --make-pidfile --chdir ${TIGASE_HOME} --pidfile $PIDFILE --chuid $USERNAME:$USERGROUP --exec $JAVA -- $TIGASE_CMD >>${TIGASE_CONSOLE_LOG} 2>&1 &"
+
+	sleep 3
+	PID=`cat $PIDFILE`
+
+	if [[ -z "`ps -p ${PID} -o cmd=`" ]]; then
+		rm -f "$PIDFILE"
+		return 1
+	else
+		return 0
+	fi
+
+
 }
 
 stop() {
-        start-stop-daemon --stop --quiet \
-        	--chdir ${TIGASE_HOME} --pidfile $PIDFILE --chuid $USERNAME:$USERGROUP \
-		--exec $JAVA > /dev/null
+        su ${USERNAME} -c "start-stop-daemon --stop --quiet  --chdir ${TIGASE_HOME} --pidfile $PIDFILE --chuid $USERNAME:$USERGROUP  --exec $JAVA > /dev/null"
         
 	rm -f "$PIDFILE"
 }
