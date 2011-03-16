@@ -1472,7 +1472,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc, XMPPSto
 			throws NotAuthorizedException, TigaseDBException, NoConnectionIdException {
 
 		// According to RFC-3921 I must forward all these kind presence
-		// requests, it allows to resynchronize
+		// requests, it allows to re-synchronize
 		// subscriptions in case of synchronization loss
 		forwardPresence(results, packet, session.getJID().copyWithoutResource());
 
@@ -1509,9 +1509,3 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc, XMPPSto
 		}
 	}
 }    // Presence
-
-
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
