@@ -12,8 +12,8 @@
 	<description>Tigase XMPP Server</description>
 	<url>http://www.tigase.org/</url>
 	<issueManagement>
-		<system>Trac</system>
-		<url>http://projects.tigase.org/server/trac</url>
+		<system>Redmine</system>
+		<url>https://projects.tigase.org/projects/tigase-server</url>
 	</issueManagement>
 	<developers>
 		<developer>
