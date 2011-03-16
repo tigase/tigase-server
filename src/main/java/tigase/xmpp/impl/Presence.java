@@ -1494,7 +1494,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc, XMPPSto
 		}
 	}
 
-	private void buddyOnline(XMPPResourceConnection session, JID buddy, Queue<Packet> results)
+	protected void buddyOnline(XMPPResourceConnection session, JID buddy, Queue<Packet> results)
 			throws NotAuthorizedException, TigaseDBException {
 		roster_util.setOnline(session, buddy, true);
 
