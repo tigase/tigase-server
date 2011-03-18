@@ -229,6 +229,35 @@ public class VCardTemp extends XMPPProcessorAbstract {
 		}
 	}
 
+	@Override
+	public void processFromUserOutPacket(JID connectionId, Packet packet,
+			XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results,
+			Map<String, Object> settings) throws PacketErrorTypeException {
+		if (session.isLocalDomain(packet.getStanzaTo().getDomain(), false)) {
+			// This is a local user so we can quickly get his vCard from the database
+			try {
+				String strvCard =
+						repo.getPublicData(packet.getStanzaTo().getBareJID(), ID, VCARD_KEY, null);
+
+				Packet result = null;
+				if (strvCard != null) {
+					result = parseXMLData(strvCard, packet);
+				} else {
+					result = packet.okResult((String) null, 1);
+				} // end of if (vcard != null)
+				result.setPacketTo(connectionId);
+				results.offer(result);
+			} catch (UserNotFoundException e) {
+				results.offer(Authorization.ITEM_NOT_FOUND.getResponseMessage(packet,
+						"User not found", true));
+			} // end of try-catch
+
+		} else {
+			// Else forward the packet to a remote server
+			results.offer(packet.copyElementOnly());
+		}
+	}
+
 	/**
 	 * Method description
 	 * 
