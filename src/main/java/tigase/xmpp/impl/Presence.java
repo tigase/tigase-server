@@ -1308,6 +1308,11 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc, XMPPSto
 	protected void processInUnsubscribe(Packet packet, XMPPResourceConnection session,
 			Queue<Packet> results, Map<String, Object> settings, PresenceType pres_type)
 			throws NotAuthorizedException, TigaseDBException, NoConnectionIdException {
+		// First forward the request to the client to make sure it stays in sync with
+		// the server.
+		Packet forward_p = packet.copyElementOnly();
+		forward_p.setPacketTo(session.getConnectionId());
+		results.offer(forward_p);
 		boolean subscr_changed = roster_util.updateBuddySubscription(session, pres_type,
 			packet.getStanzaFrom());
 
@@ -1337,6 +1342,11 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc, XMPPSto
 		SubscriptionType curr_sub = roster_util.getBuddySubscription(session, packet.getStanzaFrom());
 
 		if (curr_sub != null) {
+			// First forward the request to the client to make sure it stays in sync with
+			// the server.
+			Packet forward_p = packet.copyElementOnly();
+			forward_p.setPacketTo(session.getConnectionId());
+			results.offer(forward_p);
 			boolean subscr_changed = roster_util.updateBuddySubscription(session, pres_type,
 				packet.getStanzaFrom());
 
