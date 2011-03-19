@@ -53,10 +53,10 @@ import java.util.logging.Logger;
 
 /**
  * Describe class SaslAuth here.
- *
- *
+ * 
+ * 
  * Created: Mon Feb 20 16:28:13 2006
- *
+ * 
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
@@ -64,31 +64,28 @@ public class SaslAuth extends XMPPProcessor implements XMPPProcessorIfc {
 	private static final String XMLNS = "urn:ietf:params:xml:ns:xmpp-sasl";
 	private static final Logger log = Logger.getLogger(SaslAuth.class.getName());
 	private static final String ID = XMLNS;
-	private static final String[] ELEMENTS = {
-		"auth", "response", "challenge", "failure", "success", "abort"
-	};
-	private static final String[] XMLNSS = {
-		XMLNS, XMLNS, XMLNS, XMLNS, XMLNS, XMLNS
-	};
-	private static final Element[] DISCO_FEATURES = {
-		new Element("feature", new String[] { "var" }, new String[] { XMLNS }) };
+	private static final String[] ELEMENTS = { "auth", "response", "challenge", "failure",
+			"success", "abort" };
+	private static final String[] XMLNSS = { XMLNS, XMLNS, XMLNS, XMLNS, XMLNS, XMLNS };
+	private static final Element[] DISCO_FEATURES = { new Element("feature",
+			new String[] { "var" }, new String[] { XMLNS }) };
 
-	//~--- constant enums -------------------------------------------------------
+	// ~--- constant enums -------------------------------------------------------
 
 	/**
 	 * Enum description
-	 *
+	 * 
 	 */
 	public enum ElementType {
 		auth, abort, response, challenge, failure, success;
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -98,8 +95,8 @@ public class SaslAuth extends XMPPProcessor implements XMPPProcessorIfc {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -109,8 +106,8 @@ public class SaslAuth extends XMPPProcessor implements XMPPProcessorIfc {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packet
 	 * @param session
 	 * @param repo
@@ -121,18 +118,19 @@ public class SaslAuth extends XMPPProcessor implements XMPPProcessorIfc {
 	@Override
 	public void process(final Packet packet, final XMPPResourceConnection session,
 			final NonAuthUserRepository repo, final Queue<Packet> results,
-				final Map<String, Object> settings) {
+			final Map<String, Object> settings) {
 		if (session == null) {
 			return;
-		}    // end of if (session == null)
+		} // end of if (session == null)
 
 		if (session.isAuthorized()) {
 
 			// Multiple authentication attempts....
 			// Another authentication request on already authenticated connection
 			// This is not allowed and must be forbidden.
-			Packet res = packet.swapFromTo(createReply(ElementType.failure, "<not-authorized/>"), null,
-				null);
+			Packet res =
+					packet.swapFromTo(createReply(ElementType.failure, "<not-authorized/>"), null,
+							null);
 
 			// Make sure it gets delivered before stream close
 			res.setPriority(Priority.SYSTEM);
@@ -140,13 +138,13 @@ public class SaslAuth extends XMPPProcessor implements XMPPProcessorIfc {
 
 			// Optionally close the connection to make sure there is no
 			// confusion about the connection state.
-			results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(), StanzaType.set,
-					session.nextStanzaId()));
+			results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
+					StanzaType.set, session.nextStanzaId()));
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Discovered second authentication attempt: {0}, packet: {1}",
-						new Object[] { session.toString(),
-						packet.toString() });
+				log.log(Level.FINEST,
+						"Discovered second authentication attempt: {0}, packet: {1}", new Object[] {
+								session.toString(), packet.toString() });
 			}
 
 			try {
@@ -162,28 +160,30 @@ public class SaslAuth extends XMPPProcessor implements XMPPProcessorIfc {
 
 		Element request = packet.getElement();
 
-//  ElementType type = null;
-//  try {
-//    type = ElementType.valueOf(request.getName());
-//  } catch (IllegalArgumentException e) {
-//    log.warning("Incorrect stanza type: " + request.getName());
-//    results.offer(packet.swapFromTo(createReply(ElementType.failure,
-//          "<temporary-auth-failure/>")));
-//    results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
-//        StanzaType.set, packet.getElemId()));
-//    return;
-//  } // end of try-catch
-		Map<String, Object> authProps = (Map<String,
-			Object>) (session.getSessionData(XMLNS + "-authProps"));
+		// ElementType type = null;
+		// try {
+		// type = ElementType.valueOf(request.getName());
+		// } catch (IllegalArgumentException e) {
+		// log.warning("Incorrect stanza type: " + request.getName());
+		// results.offer(packet.swapFromTo(createReply(ElementType.failure,
+		// "<temporary-auth-failure/>")));
+		// results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
+		// StanzaType.set, packet.getElemId()));
+		// return;
+		// } // end of try-catch
+		Map<String, Object> authProps =
+				(Map<String, Object>) (session.getSessionData(XMLNS + "-authProps"));
 
 		if (authProps == null) {
 			authProps = new HashMap<String, Object>(10, 0.75f);
 			authProps.put(AuthRepository.PROTOCOL_KEY, AuthRepository.PROTOCOL_VAL_SASL);
-			authProps.put(AuthRepository.MACHANISM_KEY, request.getAttribute("/auth", "mechanism"));
+			authProps.put(AuthRepository.MACHANISM_KEY,
+					request.getAttribute("/auth", "mechanism"));
 			authProps.put(AuthRepository.REALM_KEY, session.getDomain().getVhost().getDomain());
-			authProps.put(AuthRepository.SERVER_NAME_KEY, session.getDomain().getVhost().getDomain());
+			authProps.put(AuthRepository.SERVER_NAME_KEY, session.getDomain().getVhost()
+					.getDomain());
 			session.putSessionData(XMLNS + "-authProps", authProps);
-		}    // end of if (authProps == null)
+		} // end of if (authProps == null)
 
 		// String user = (String)authProps.get(AuthRepository.USER_ID_KEY);
 		authProps.put(AuthRepository.DATA_KEY, request.getCData());
@@ -193,21 +193,23 @@ public class SaslAuth extends XMPPProcessor implements XMPPProcessorIfc {
 			String challenge_data = (String) authProps.get(AuthRepository.RESULT_KEY);
 
 			if (result == Authorization.AUTHORIZED) {
-				results.offer(packet.swapFromTo(createReply(ElementType.success, challenge_data), null,
-						null));
+				results.offer(packet.swapFromTo(createReply(ElementType.success, challenge_data),
+						null, null));
 				authProps.clear();
 				session.removeSessionData(XMLNS + "-authProps");
 			} else {
-				results.offer(packet.swapFromTo(createReply(ElementType.challenge, challenge_data), null,
-						null));
+				results.offer(packet.swapFromTo(
+						createReply(ElementType.challenge, challenge_data), null, null));
 			}
 		} catch (Exception e) {
 			log.log(Level.INFO, "Authentication failed: ", e);
 
 			// e.printStackTrace();
 			session.removeSessionData(XMLNS + "-authProps");
-			results.offer(packet.swapFromTo(createReply(ElementType.failure, "<not-authorized/>"), null,
-					null));
+			Packet response = packet.swapFromTo(
+					createReply(ElementType.failure, "<not-authorized/>"), null, null); 
+			response.setPriority(Priority.SYSTEM);
+			results.offer(response);
 
 			Integer retries = (Integer) session.getSessionData("auth-retries");
 
@@ -218,18 +220,18 @@ public class SaslAuth extends XMPPProcessor implements XMPPProcessorIfc {
 			if (retries.intValue() < 3) {
 				session.putSessionData("auth-retries", new Integer(retries.intValue() + 1));
 			} else {
-				results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(), StanzaType.set,
-						session.nextStanzaId()));
+				results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
+						StanzaType.set, session.nextStanzaId()));
 			}
-		}    // end of try-catch
+		} // end of try-catch
 	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param session
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -239,8 +241,8 @@ public class SaslAuth extends XMPPProcessor implements XMPPProcessorIfc {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -250,8 +252,8 @@ public class SaslAuth extends XMPPProcessor implements XMPPProcessorIfc {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -261,10 +263,10 @@ public class SaslAuth extends XMPPProcessor implements XMPPProcessorIfc {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param session
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -273,27 +275,26 @@ public class SaslAuth extends XMPPProcessor implements XMPPProcessorIfc {
 			return null;
 		} else {
 			try {
-			Map<String, Object> query = new HashMap<String, Object>();
+				Map<String, Object> query = new HashMap<String, Object>();
 
-			query.put(AuthRepository.PROTOCOL_KEY, AuthRepository.PROTOCOL_VAL_SASL);
-			session.queryAuth(query);
+				query.put(AuthRepository.PROTOCOL_KEY, AuthRepository.PROTOCOL_VAL_SASL);
+				session.queryAuth(query);
 
-			String[] auth_mechs = (String[]) query.get(AuthRepository.RESULT_KEY);
-			Element[] mechs = new Element[auth_mechs.length];
-			int idx = 0;
+				String[] auth_mechs = (String[]) query.get(AuthRepository.RESULT_KEY);
+				Element[] mechs = new Element[auth_mechs.length];
+				int idx = 0;
 
-			for (String mech : auth_mechs) {
-				mechs[idx++] = new Element("mechanism", mech);
-			}    // end of for (String mech: mechs)
+				for (String mech : auth_mechs) {
+					mechs[idx++] = new Element("mechanism", mech);
+				} // end of for (String mech: mechs)
 
-			return new Element[] {
-				new Element("mechanisms", mechs, new String[] { "xmlns" }, new String[] { XMLNS }) };
+				return new Element[] { new Element("mechanisms", mechs, new String[] { "xmlns" },
+						new String[] { XMLNS }) };
 			} catch (TigaseDBException ex) {
-				// TODO Auto-generated catch block
 				log.warning("Database problem: " + ex);
 				return null;
 			}
-		}    // end of if (session.isAuthorized()) else
+		} // end of if (session.isAuthorized()) else
 	}
 
 	private Element createReply(final ElementType type, final String cdata) {
@@ -303,14 +304,12 @@ public class SaslAuth extends XMPPProcessor implements XMPPProcessorIfc {
 
 		if (cdata != null) {
 			reply.setCData(cdata);
-		}    // end of if (cdata != null)
+		} // end of if (cdata != null)
 
 		return reply;
 	}
-}    // SaslAuth
+} // SaslAuth
 
+// ~ Formatted in Sun Code Convention
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+// ~ Formatted by Jindent --- http://www.jindent.com
