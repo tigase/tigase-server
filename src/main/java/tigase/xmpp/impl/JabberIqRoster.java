@@ -594,7 +594,7 @@ public class JabberIqRoster extends XMPPProcessor implements XMPPProcessorIfc, X
 						if ((sub != SubscriptionType.none) && ((type == null) ||!type.equals(ANON))) {
 
 							// Unavailable presence should be sent first, otherwise it will be blocked by
-							// the server after the subscription is cancelled
+							// the server after the subscription is canceled
 							Element pres = new Element("presence");
 
 							pres.setAttribute("to", buddy.toString());
