@@ -22,12 +22,8 @@
 
 package tigase.server;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * This is an archetype of a special types of classes which collect some data
@@ -61,15 +57,11 @@ public abstract class AbstractComponentRegistrator<E extends ServerComponent>
 	 */
 	protected Map<String, E> components = new LinkedHashMap<String, E>();
 
-	//~--- constructors ---------------------------------------------------------
-
 	/**
 	 * Creates a new <code>AbstractComponentRegistrator</code> instance.
 	 *
 	 */
 	public AbstractComponentRegistrator() {}
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method provides a callback mechanism signaling that a new component implementing
@@ -90,8 +82,6 @@ public abstract class AbstractComponentRegistrator<E extends ServerComponent>
 	 */
 	public abstract void componentRemoved(E component);
 
-	//~--- get methods ----------------------------------------------------------
-
 	/**
 	 * Method checks whether the component provides as method parameter is correct type
 	 * that is implements special interface or extends special class. Result of the method
@@ -105,8 +95,6 @@ public abstract class AbstractComponentRegistrator<E extends ServerComponent>
 	 * correct type and <code>false</code> otherwise.
 	 */
 	public abstract boolean isCorrectType(ServerComponent component);
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method checks whether the component is of a correct type, adds it to the internal
@@ -149,8 +137,6 @@ public abstract class AbstractComponentRegistrator<E extends ServerComponent>
 		return true;
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	/**
 	 * Method returns a component for a specified component name from internal
 	 * <code>components</code> collection or <code>null</code> of there is no such
@@ -165,8 +151,6 @@ public abstract class AbstractComponentRegistrator<E extends ServerComponent>
 	public E getComponent(String name) {
 		return components.get(name);
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method generates and returns an unique packet ID. The ID is unique within running
@@ -201,9 +185,3 @@ public abstract class AbstractComponentRegistrator<E extends ServerComponent>
 	@Override
 	public void release() {}
 }    // AbstractComponentRegistrator
-
-
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
