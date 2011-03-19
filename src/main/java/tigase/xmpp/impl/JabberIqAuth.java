@@ -260,10 +260,12 @@ public class JabberIqAuth extends XMPPProcessor implements XMPPProcessorIfc {
 								StanzaType.set, session.nextStanzaId()));
 					} // end of else
 
-				} catch (NotAuthorizedException e) {
+				} catch (Exception e) {
 					log.info("Authentication failed: " + user_name);
-					results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-							e.getMessage(), false));
+					Packet response = Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
+							e.getMessage(), false);
+					response.setPriority(Priority.SYSTEM);
+					results.offer(response);
 
 					Integer retries = (Integer) session.getSessionData("auth-retries");
 
@@ -277,13 +279,13 @@ public class JabberIqAuth extends XMPPProcessor implements XMPPProcessorIfc {
 						results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
 								StanzaType.set, session.nextStanzaId()));
 					}
-				} catch (Exception e) {
-					log.info("Authentication failed: " + user_name);
-					log.log(Level.WARNING, "Authentication failed: ", e);
-					results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-							e.getMessage(), false));
-					results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
-							StanzaType.set, session.nextStanzaId()));
+//				} catch (Exception e) {
+//					log.info("Authentication failed: " + user_name);
+//					log.log(Level.WARNING, "Authentication failed: ", e);
+//					results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
+//							e.getMessage(), false));
+//					results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
+//							StanzaType.set, session.nextStanzaId()));
 				}
 
 				break;
