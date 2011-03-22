@@ -24,6 +24,8 @@ package tigase.cluster;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.cluster.api.ClusterControllerIfc;
+import tigase.cluster.api.ClusteredComponentIfc;
 import tigase.server.ServiceChecker;
 import tigase.server.xmppclient.ClientConnectionManager;
 
@@ -47,7 +49,7 @@ import java.util.logging.Logger;
  * @version $Rev$
  */
 public class ClientConnectionClustered extends ClientConnectionManager
-		implements ClusteredComponent {
+		implements ClusteredComponentIfc {
 
 	/**
 	 * Variable <code>log</code> is a class logger.
@@ -106,7 +108,7 @@ public class ClientConnectionClustered extends ClientConnectionManager
 	 * @param cl_controller
 	 */
 	@Override
-	public void setClusterController(ClusterController cl_controller) {}
+	public void setClusterController(ClusterControllerIfc cl_controller) {}
 }
 
 

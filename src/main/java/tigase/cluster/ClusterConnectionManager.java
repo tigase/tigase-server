@@ -25,6 +25,11 @@ package tigase.cluster;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.annotations.TODO;
+import tigase.cluster.api.ClusterCommandException;
+import tigase.cluster.api.ClusterControllerIfc;
+import tigase.cluster.api.ClusterElement;
+import tigase.cluster.api.ClusteredComponentIfc;
+import tigase.cluster.api.CommandListener;
 
 import tigase.net.ConnectionType;
 
@@ -34,7 +39,9 @@ import tigase.net.SocketType;
 import tigase.server.ConnectionManager;
 import tigase.server.Packet;
 import tigase.server.ServiceChecker;
+import tigase.server.xmppserver.CID;
 
+import tigase.stats.StatisticType;
 import tigase.stats.StatisticsList;
 
 import tigase.util.Algorithms;
@@ -46,6 +53,7 @@ import tigase.xml.Element;
 
 import tigase.xmpp.Authorization;
 import tigase.xmpp.BareJID;
+import tigase.xmpp.JID;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.XMPPIOService;
 
@@ -75,19 +83,20 @@ import javax.script.Bindings;
 
 /**
  * Class ClusterConnectionManager
- *
+ * 
  * Created: Tue Nov 22 07:07:11 2005
- *
+ * 
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Object>>
-		implements ClusteredComponent {
+		implements ClusteredComponentIfc {
 
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
-	private static final Logger log = Logger.getLogger(ClusterConnectionManager.class.getName());
+	private static final Logger log = Logger.getLogger(ClusterConnectionManager.class
+			.getName());
 
 	/** Field description */
 	public static final String SECRET_PROP_KEY = "secret";
@@ -114,13 +123,15 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 	public static final String CONNECT_ALL_PAR = "--cluster-connect-all";
 
 	/** Field description */
-	public static final String CLUSTER_CONNECTIONS_PER_NODE_PAR = "--cluster-connections-per-node";
+	public static final String CLUSTER_CONNECTIONS_PER_NODE_PAR =
+			"--cluster-connections-per-node";
 
 	/** Field description */
 	public static final int CLUSTER_CONNECTIONS_PER_NODE_VAL = 2;
 
 	/** Field description */
-	public static final String CLUSTER_CONNECTIONS_PER_NODE_PROP_KEY = "cluster-connections-per-node";
+	public static final String CLUSTER_CONNECTIONS_PER_NODE_PROP_KEY =
+			"cluster-connections-per-node";
 
 	/** Field description */
 	public static final String CONNECT_ALL_PROP_KEY = "connect-all";
@@ -141,8 +152,6 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 	public static final String XMLNS = "tigase:cluster";
 	private static final String SERVICE_CONNECTED_TIMER = "service-connected-timer";
 
-	//~--- fields ---------------------------------------------------------------
-
 	/** Field description */
 	public int[] PORTS = { 5277 };
 
@@ -151,12 +160,12 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 
 	/** Field description */
 	public String SECRET_PROP_VAL = "someSecret";
-	private ClusterController clusterController = null;
-	private String cluster_controller_id = null;
+	private ClusterControllerIfc clusterController = null;
+	// private String cluster_controller_id = null;
 	private IOServiceStatisticsGetter ioStatsGetter = new IOServiceStatisticsGetter();
 	private String identity_type = IDENTITY_TYPE_VAL;
 	private Map<String, CopyOnWriteArrayList<XMPPIOService<Object>>> connectionsPool =
-		new ConcurrentSkipListMap<String, CopyOnWriteArrayList<XMPPIOService<Object>>>();
+			new ConcurrentSkipListMap<String, CopyOnWriteArrayList<XMPPIOService<Object>>>();
 	private boolean connect_all = CONNECT_ALL_PROP_VAL;
 	private boolean compress_stream = COMPRESS_STREAM_PROP_VAL;
 	private long[] lastDay = new long[24];
@@ -167,15 +176,16 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 	private int per_node_conns = CLUSTER_CONNECTIONS_PER_NODE_VAL;
 	private long servConnectedTimeouts = 0;
 	private long totalNodeDisconnects = 0;
-
-	//~--- get methods ----------------------------------------------------------
+	private long packetsSent = 0;
+	private long packetsReceived = 0;
+	private CommandListener sendPacket = new SendPacket();
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param params
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -186,7 +196,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 		props.put(IDENTITY_TYPE_KEY, IDENTITY_TYPE_VAL);
 
 		if ((params.get(CONNECT_ALL_PAR) == null)
-				||!((String) params.get(CONNECT_ALL_PAR)).equals("true")) {
+				|| !((String) params.get(CONNECT_ALL_PAR)).equals("true")) {
 			props.put(CONNECT_ALL_PROP_KEY, false);
 		} else {
 			props.put(CONNECT_ALL_PROP_KEY, true);
@@ -226,8 +236,8 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -237,8 +247,8 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -248,8 +258,8 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param list
 	 */
 	@Override
@@ -261,20 +271,23 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 		list.add(getName(), "Last hour disconnects", Arrays.toString(lastHour), Level.FINE);
 		ioStatsGetter.reset();
 		doForAllServices(ioStatsGetter);
-		list.add(getName(), "Average compression ratio", ioStatsGetter.getAverageCompressionRatio(),
-				Level.FINE);
+		list.add(getName(), "Average compression ratio",
+				ioStatsGetter.getAverageCompressionRatio(), Level.FINE);
 		list.add(getName(), "Average decompression ratio",
 				ioStatsGetter.getAverageDecompressionRatio(), Level.FINE);
 		list.add(getName(), "Waiting to send", ioStatsGetter.getWaitingToSend(), Level.FINE);
+		list.add(getName(), StatisticType.MSG_RECEIVED_OK.getDescription(), packetsReceived,
+				Level.FINE);
+		list.add(getName(), StatisticType.MSG_SENT_OK.getDescription(), packetsSent,
+				Level.FINE);
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * This method can be overwritten in extending classes to get a different
 	 * packets distribution to different threads. For PubSub, probably better
-	 * packets distribution to different threads would be based on the
-	 * sender address rather then destination address.
+	 * packets distribution to different threads would be based on the sender
+	 * address rather then destination address.
+	 * 
 	 * @param packet
 	 * @return
 	 */
@@ -293,7 +306,8 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 					return stanzaAdd.hashCode();
 				} else {
 
-					// This might be user's initial presence. In such a case we take stanzaFrom instead
+					// This might be user's initial presence. In such a case we take
+					// stanzaFrom instead
 					stanzaAdd = children.get(0).getAttribute("from");
 
 					if (stanzaAdd != null) {
@@ -317,8 +331,8 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param binds
 	 */
 	@Override
@@ -329,26 +343,28 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param node
 	 */
 	@Override
-	public void nodeConnected(String node) {}
+	public void nodeConnected(String node) {
+	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param node
 	 */
 	@Override
-	public void nodeDisconnected(String node) {}
+	public void nodeDisconnected(String node) {
+	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packet
 	 */
 	@Override
@@ -374,19 +390,14 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 			writePacketToSocket(packet.packRouted());
 		}
 
-//  if (packet.getElemName() == ClusterElement.CLUSTER_EL_NAME) {
-//    writePacketToSocket(packet);
-//  } else {
-//    writePacketToSocket(packet.packRouted());
-//  }
 	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param serv
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -401,35 +412,43 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 			if (p.getElemName().equals("handshake")) {
 				processHandshake(p, serv);
 			} else {
+				++packetsReceived;
 				Packet result = p;
 
 				if (p.isRouted()) {
 
-//        processReceivedRid(p, serv);
-//        processReceivedAck(p, serv);
+					// processReceivedRid(p, serv);
+					// processReceivedAck(p, serv);
 					try {
 						result = p.unpackRouted();
 					} catch (TigaseStringprepException ex) {
-						log.log(Level.WARNING, "Packet stringprep addressing problem, dropping packet: {0}", p);
+						log.log(Level.WARNING,
+								"Packet stringprep addressing problem, dropping packet: {0}", p);
 
 						return null;
 					}
-				}    // end of if (p.isRouted())
+				} // end of if (p.isRouted())
 
-				addOutPacket(result);
+				if (result.getElemName() == ClusterElement.CLUSTER_EL_NAME) {
+					clusterController.handleClusterPacket(result.getElement());
+				} else {
+					addOutPacket(result);
+				}
 			}
-		}        // end of while ()
+		} // end of while ()
 
 		return null;
 	}
 
 	/**
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
-	@TODO(note = "The number of threads should be equal or greater to number of cluster nodes.")
-	public int processingThreads() {
+	@TODO(
+			note = "The number of threads should be equal or greater to number of cluster nodes.")
+	public
+			int processingThreads() {
 
 		// This should work well as far as nodesNo is initialized before this
 		// method is called which is true only during program startup time.
@@ -440,8 +459,8 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param port_props
 	 */
 	@Override
@@ -452,8 +471,8 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param serv
 	 */
 	@Override
@@ -463,9 +482,11 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 		serv.getSessionData().put(SERVICE_CONNECTED_TIMER, task);
 		addTimerTask(task, 10, TimeUnit.SECONDS);
 		super.serviceStarted(serv);
-		log.log(Level.INFO, "cluster connection opened: {0}, type: {1}, id={2}",
-				new Object[] { serv.getRemoteAddress(),
-				serv.connectionType().toString(), serv.getUniqueId() });
+		log.log(
+				Level.INFO,
+				"cluster connection opened: {0}, type: {1}, id={2}",
+				new Object[] { serv.getRemoteAddress(), serv.connectionType().toString(),
+						serv.getUniqueId() });
 
 		if (compress_stream) {
 			log.log(Level.INFO, "Starting stream compression for: {0}", serv.getUniqueId());
@@ -473,39 +494,40 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 		}
 
 		switch (serv.connectionType()) {
-			case connect :
+			case connect:
 
 				// Send init xmpp stream here
-				String remote_host = (String) serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
+				String remote_host =
+						(String) serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
 
 				serv.getSessionData().put(XMPPIOService.HOSTNAME_KEY, remote_host);
-				serv.getSessionData().put(PORT_ROUTING_TABLE_PROP_KEY, new String[] { remote_host,
-						".*@" + remote_host, ".*\\." + remote_host });
+				serv.getSessionData().put(PORT_ROUTING_TABLE_PROP_KEY,
+						new String[] { remote_host, ".*@" + remote_host, ".*\\." + remote_host });
 
-				String data = "<stream:stream" + " xmlns='" + XMLNS + "'"
-					+ " xmlns:stream='http://etherx.jabber.org/streams'" + " from='" + getDefHostName() + "'"
-					+ " to='" + remote_host + "'" + ">";
+				String data =
+						"<stream:stream" + " xmlns='" + XMLNS + "'"
+								+ " xmlns:stream='http://etherx.jabber.org/streams'" + " from='"
+								+ getDefHostName() + "'" + " to='" + remote_host + "'" + ">";
 
-				log.log(Level.INFO, "cid: {0}, sending: {1}",
-						new Object[] { (String) serv.getSessionData().get("cid"),
-						data });
+				log.log(Level.INFO, "cid: {0}, sending: {1}", new Object[] {
+						(String) serv.getSessionData().get("cid"), data });
 				serv.xmppStreamOpen(data);
 
 				break;
 
-			default :
+			default:
 
 				// Do nothing, more data should come soon...
 				break;
-		}    // end of switch (service.connectionType())
+		} // end of switch (service.connectionType())
 	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param service
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -545,7 +567,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 
 			if (type == ConnectionType.connect) {
 				addWaitingTask(sessionData);
-			}    // end of if (type == ConnectionType.connect)
+			} // end of if (type == ConnectionType.connect)
 
 			++totalNodeDisconnects;
 
@@ -567,23 +589,25 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 		return result;
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param cl_controller
 	 */
 	@Override
-	public void setClusterController(ClusterController cl_controller) {
-		this.clusterController = cl_controller;
+	public void setClusterController(ClusterControllerIfc cl_controller) {
+		clusterController = cl_controller;
+		clusterController.removeCommandListener(
+				ClusterControllerIfc.DELIVER_CLUSTER_PACKET_CMD, sendPacket);
+		clusterController.setCommandListener(ClusterControllerIfc.DELIVER_CLUSTER_PACKET_CMD,
+				sendPacket);
 	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param props
 	 */
 	@Override
@@ -592,7 +616,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 		identity_type = (String) props.get(IDENTITY_TYPE_KEY);
 		compress_stream = (Boolean) props.get(COMPRESS_STREAM_PROP_KEY);
 		connect_all = (Boolean) props.get(CONNECT_ALL_PROP_KEY);
-		cluster_controller_id = (String) props.get(CLUSTER_CONTR_ID_PROP_KEY);
+		// cluster_controller_id = (String) props.get(CLUSTER_CONTR_ID_PROP_KEY);
 		per_node_conns = (Integer) props.get(CLUSTER_CONNECTIONS_PER_NODE_PROP_KEY);
 		connectionDelay = 5 * SECOND;
 
@@ -611,7 +635,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 
 				log.log(Level.CONFIG, "Found cluster node host: {0}", host);
 
-				if ( !host.equals(getDefHostName().getDomain())
+				if (!host.equals(getDefHostName().getDomain())
 						&& ((host.hashCode() > getDefHostName().hashCode()) || connect_all)) {
 					for (int i = 0; i < per_node_conns; ++i) {
 						log.log(Level.CONFIG, "Trying to connect to cluster node: {0}", host);
@@ -635,21 +659,20 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 		}
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param service
 	 */
 	@Override
-	public void tlsHandshakeCompleted(XMPPIOService<Object> service) {}
+	public void tlsHandshakeCompleted(XMPPIOService<Object> service) {
+	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param serv
 	 */
 	@Override
@@ -659,19 +682,20 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param service
 	 * @param attribs
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
-	public String xmppStreamOpened(XMPPIOService<Object> service, Map<String, String> attribs) {
+	public String xmppStreamOpened(XMPPIOService<Object> service,
+			Map<String, String> attribs) {
 		log.log(Level.INFO, "Stream opened: {0}", attribs);
 
 		switch (service.connectionType()) {
-			case connect : {
+			case connect: {
 				String id = attribs.get("id");
 
 				service.getSessionData().put(XMPPIOService.SESSION_ID_KEY, id);
@@ -683,8 +707,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 
 					if (log.isLoggable(Level.FINEST)) {
 						log.log(Level.FINEST, "Calculating digest: id={0}, secret={1}, digest={2}",
-								new Object[] { id,
-								secret, digest });
+								new Object[] { id, secret, digest });
 					}
 
 					return "<handshake>" + digest + "</handshake>";
@@ -695,33 +718,32 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 				}
 			}
 
-			case accept : {
+			case accept: {
 				String remote_host = attribs.get("from");
 
 				service.getSessionData().put(XMPPIOService.HOSTNAME_KEY, remote_host);
 				service.getSessionData().put(PORT_REMOTE_HOST_PROP_KEY, remote_host);
-				service.getSessionData().put(PORT_ROUTING_TABLE_PROP_KEY, new String[] { remote_host,
-						".*@" + remote_host, ".*\\." + remote_host });
+				service.getSessionData().put(PORT_ROUTING_TABLE_PROP_KEY,
+						new String[] { remote_host, ".*@" + remote_host, ".*\\." + remote_host });
 
 				String id = UUID.randomUUID().toString();
 
 				service.getSessionData().put(XMPPIOService.SESSION_ID_KEY, id);
 
 				return "<stream:stream" + " xmlns='" + XMLNS + "'"
-						+ " xmlns:stream='http://etherx.jabber.org/streams'" + " from='" + getDefHostName()
-							+ "'" + " to='" + remote_host + "'" + " id='" + id + "'" + ">";
+						+ " xmlns:stream='http://etherx.jabber.org/streams'" + " from='"
+						+ getDefHostName() + "'" + " to='" + remote_host + "'" + " id='" + id + "'"
+						+ ">";
 			}
 
-			default :
+			default:
 
 				// Do nothing, more data should come soon...
 				break;
-		}    // end of switch (service.connectionType())
+		} // end of switch (service.connectionType())
 
 		return null;
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	@Override
 	protected int[] getDefPlainPorts() {
@@ -729,10 +751,10 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 	}
 
 	/**
-	 * Method <code>getMaxInactiveTime</code> returns max keep-alive time
-	 * for inactive connection. we shoulnd not really close external component
+	 * Method <code>getMaxInactiveTime</code> returns max keep-alive time for
+	 * inactive connection. we shoulnd not really close external component
 	 * connection at all, so let's say something like: 1000 days...
-	 *
+	 * 
 	 * @return a <code>long</code> value
 	 */
 	@Override
@@ -757,23 +779,6 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 		return defs;
 	}
 
-//@Override
-//protected String getServiceId(Packet packet) {
-//  try {
-//    return DNSResolver.getHostIP(packet.getTo().getDomain());
-//  } catch (UnknownHostException e) {
-//    log.log(Level.WARNING, "Uknown host exception for address: {0}", packet.getTo().getDomain());
-//
-//    return packet.getTo().getDomain();
-//  }
-//}
-//
-//@Override
-//protected String getUniqueId(XMPPIOService<Object> serv) {
-//
-//  // return (String)serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
-//  return serv.getRemoteAddress();
-//}
 	@Override
 	protected XMPPIOService<Object> getXMPPIOServiceInstance() {
 		return new XMPPIOService<Object>();
@@ -783,8 +788,6 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 	protected boolean isHighThroughput() {
 		return true;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	protected void serviceConnected(XMPPIOService<Object> serv) {
 		String[] routings = (String[]) serv.getSessionData().get(PORT_ROUTING_TABLE_PROP_KEY);
@@ -811,7 +814,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 		}
 
 		ServiceConnectedTimer task =
-			(ServiceConnectedTimer) serv.getSessionData().get(SERVICE_CONNECTED_TIMER);
+				(ServiceConnectedTimer) serv.getSessionData().get(SERVICE_CONNECTED_TIMER);
 
 		if (task == null) {
 			log.log(Level.WARNING, "Missing service connected timer task: {0}", serv);
@@ -822,6 +825,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 
 	@Override
 	protected boolean writePacketToSocket(Packet p) {
+		++packetsSent;
 		String ip = p.getTo().getDomain();
 
 		try {
@@ -848,7 +852,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 
 	private void processHandshake(Packet p, XMPPIOService<Object> serv) {
 		switch (serv.connectionType()) {
-			case connect : {
+			case connect: {
 				String data = p.getElemCData();
 
 				if (data == null) {
@@ -860,7 +864,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 				break;
 			}
 
-			case accept : {
+			case accept: {
 				String digest = p.getElemCData();
 				String id = (String) serv.getSessionData().get(XMPPIOService.SESSION_ID_KEY);
 				String secret = (String) serv.getSessionData().get(SECRET_PROP_KEY);
@@ -870,8 +874,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 
 					if (log.isLoggable(Level.FINEST)) {
 						log.log(Level.FINEST, "Calculating digest: id={0}, secret={1}, digest={2}",
-								new Object[] { id,
-								secret, loc_digest });
+								new Object[] { id, secret, loc_digest });
 					}
 
 					if ((digest != null) && digest.equals(loc_digest)) {
@@ -890,11 +893,11 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 				break;
 			}
 
-			default :
+			default:
 
 				// Do nothing, more data should come soon...
 				break;
-		}    // end of switch (service.connectionType())
+		} // end of switch (service.connectionType())
 	}
 
 	private void updateRoutings(String[] routings, boolean add) {
@@ -903,8 +906,8 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 				try {
 					addRegexRouting(route);
 				} catch (Exception e) {
-					log.log(Level.WARNING, "Can not add regex routing ''{0}'' : {1}", new Object[] { route,
-							e });
+					log.log(Level.WARNING, "Can not add regex routing ''{0}'' : {1}", new Object[] {
+							route, e });
 				}
 			}
 		} else {
@@ -912,28 +915,25 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 				try {
 					removeRegexRouting(route);
 				} catch (Exception e) {
-					log.log(Level.WARNING, "Can not remove regex routing ''{0}'' : {1}", new Object[] { route,
-							e });
+					log.log(Level.WARNING, "Can not remove regex routing ''{0}'' : {1}",
+							new Object[] { route, e });
 				}
 			}
 		}
 	}
 
-	//~--- inner classes --------------------------------------------------------
-
-	private class IOServiceStatisticsGetter implements ServiceChecker<XMPPIOService<Object>> {
+	private class IOServiceStatisticsGetter implements
+			ServiceChecker<XMPPIOService<Object>> {
 		private int clIOQueue = 0;
 		private float compressionRatio = 0f;
 		private int counter = 0;
 		private float decompressionRatio = 0f;
 		private StatisticsList list = new StatisticsList(Level.ALL);
 
-		//~--- methods ------------------------------------------------------------
-
 		/**
 		 * Method description
-		 *
-		 *
+		 * 
+		 * 
 		 * @param service
 		 */
 		@Override
@@ -945,12 +945,10 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 			clIOQueue += service.waitingToSendSize();
 		}
 
-		//~--- get methods --------------------------------------------------------
-
 		/**
 		 * Method description
-		 *
-		 *
+		 * 
+		 * 
 		 * @return
 		 */
 		public float getAverageCompressionRatio() {
@@ -959,8 +957,8 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 
 		/**
 		 * Method description
-		 *
-		 *
+		 * 
+		 * 
 		 * @return
 		 */
 		public float getAverageDecompressionRatio() {
@@ -969,26 +967,25 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 
 		/**
 		 * Method description
-		 *
-		 *
+		 * 
+		 * 
 		 * @return
 		 */
 		public int getWaitingToSend() {
 			return clIOQueue;
 		}
 
-		//~--- methods ------------------------------------------------------------
-
 		/**
 		 * Method description
-		 *
+		 * 
 		 */
 		public void reset() {
 
-			// Statistics are reset on the low socket level instead. This way we do not loose
+			// Statistics are reset on the low socket level instead. This way we do
+			// not loose
 			// any stats in case of the disconnection.
-//    bytesReceived = 0;
-//    bytesSent = 0;
+			// bytesReceived = 0;
+			// bytesSent = 0;
 			clIOQueue = 0;
 			counter = 0;
 			compressionRatio = 0f;
@@ -996,33 +993,51 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 		}
 	}
 
-
 	private class ServiceConnectedTimer extends TimerTask {
 		private XMPPIOService<Object> serv = null;
-
-		//~--- constructors -------------------------------------------------------
 
 		private ServiceConnectedTimer(XMPPIOService<Object> serv) {
 			this.serv = serv;
 		}
 
-		//~--- methods ------------------------------------------------------------
-
 		/**
 		 * Method description
-		 *
+		 * 
 		 */
 		@Override
 		public void run() {
 			++servConnectedTimeouts;
-			log.log(Level.INFO, "ServiceConnectedTimer timeout expired, closing connection: {0}", serv);
+			log.log(Level.INFO,
+					"ServiceConnectedTimer timeout expired, closing connection: {0}", serv);
 			serv.forceStop();
 		}
 	}
+
+	private class SendPacket implements CommandListener {
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see tigase.cluster.api.CommandListener#executeCommand(java.util.Map)
+		 */
+		@Override
+		public void executeCommand(JID fromNode, List<JID> visitedNodes,
+				Map<String, String> data, Queue<Element> packets) throws ClusterCommandException {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST,
+						"Called fromNode: {0}, visitedNodes: {1}, data: {2}, packets: {3}",
+						new Object[] { fromNode, visitedNodes, data, packets });
+			}
+			for (Element element : packets) {
+				try {
+					writePacketToSocket(Packet.packetInstance(element));
+				} catch (TigaseStringprepException ex) {
+					log.log(Level.WARNING, "Stringprep exception for packet: {0}", element);
+				}
+			}
+
+		}
+
+	}
+
 }
-
-
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

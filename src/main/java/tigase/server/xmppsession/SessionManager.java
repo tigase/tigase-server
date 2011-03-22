@@ -202,8 +202,8 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 	 * @return
 	 */
 	@Override
-	public boolean containsJid(JID jid) {
-		return sessionsByNodeId.containsKey(jid.getBareJID());
+	public boolean containsJid(BareJID jid) {
+		return sessionsByNodeId.containsKey(jid);
 	}
 
 	// ~--- get methods ----------------------------------------------------------
@@ -217,9 +217,9 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 	 * @return
 	 */
 	@Override
-	public JID[] getConnectionIdsForJid(JID jid) {
+	public JID[] getConnectionIdsForJid(BareJID jid) {
 		if (skipPrivacy()) {
-			XMPPSession session = sessionsByNodeId.get(jid.getBareJID());
+			XMPPSession session = sessionsByNodeId.get(jid);
 
 			if (session != null) {
 				return session.getConnectionIds();

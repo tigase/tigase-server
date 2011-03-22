@@ -22,13 +22,16 @@
 
 package tigase.cluster;
 
-//~--- non-JDK imports --------------------------------------------------------
+import tigase.cluster.api.ClusterCommandException;
+import tigase.cluster.api.ClusterControllerIfc;
+import tigase.cluster.api.ClusteredComponentIfc;
+import tigase.cluster.api.CommandListener;
+import tigase.cluster.strategy.ClusteringStrategyIfc;
+import tigase.cluster.strategy.ConnectionRecord;
 
-import tigase.annotations.TODO;
-
+import tigase.server.Command;
 import tigase.server.Message;
 
-//import tigase.cluster.methodcalls.SessionTransferMC;
 import tigase.server.Packet;
 import tigase.server.xmppsession.SessionManager;
 
@@ -47,12 +50,9 @@ import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.XMPPSession;
-import tigase.xmpp.impl.Presence;
-
-//~--- JDK imports ------------------------------------------------------------
 
 import java.util.ArrayDeque;
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -61,30 +61,38 @@ import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-//~--- classes ----------------------------------------------------------------
-
 /**
  * Class SessionManagerClusteredOld
- *
- *
+ * 
+ * 
  * Created: Tue Nov 22 07:07:11 2005
- *
+ * 
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class SessionManagerClustered extends SessionManager implements ClusteredComponent {
+public class SessionManagerClustered extends SessionManager implements
+		ClusteredComponentIfc {
+	/**
+	 * Variable <code>log</code> is a class logger.
+	 */
+	private static final Logger log = Logger.getLogger(SessionManagerClustered.class
+			.getName());
+
+	private static final String USER_CONNECTED_CMD = "user-connected-sm-cmd";
+	private static final String USER_DISCONNECTED_CMD = "user-disconnected-sm-cmd";
+	private static final String USER_PRESENCE_CMD = "user-presence-sm-cmd";
+	private static final String PACKET_FORWARD_CMD = "packet-forward-sm-cmd";
+	private static final String REQUEST_SYNCONLINE_CMD = "req-sync-online-sm-cmd";
+	public static final String RESPOND_SYNCONLINE_CMD = "resp-sync-online-sm-cmd";
 	private static final String AUTH_TIME = "auth-time";
-	private static final String CL_BR_INITIAL_PRESENCE = "cl-br-init-pres";
-	private static final String CL_BR_USER_CONNECTED = "cl-br-user_conn";
+
+	private static final String PRESENCE_ELEMENT_NAME = "presence";
 
 	/** Field description */
 	public static final String CONNECTION_ID = "connectionId";
-	private static final String CREATION_TIME = "creationTime";
-	private static final String ERROR_CODE = "errorCode";
 
 	/** Field description */
 	public static final String MY_DOMAIN_NAME_PROP_KEY = "domain-name";
-	private static final String PRIORITY = "priority";
 
 	/** Field description */
 	public static final String RESOURCE = "resource";
@@ -100,15 +108,10 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 
 	/** Field description */
 	public static final String STRATEGY_CLASS_PROP_VAL =
-		"tigase.cluster.strategy.SMNonCachingAllNodes";
+			"tigase.cluster.strategy.SMNonCachingAllNodes";
 
 	/** Field description */
 	public static final int SYNC_MAX_BATCH_SIZE = 1000;
-
-	/** Field description */
-	public static final String SYNC_ONLINE_JIDS = "sync-jids";
-	private static final String TOKEN = "token";
-	private static final String TRANSFER = "transfer";
 
 	/** Field description */
 	public static final String USER_ID = "userId";
@@ -116,103 +119,75 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 	/** Field description */
 	public static final String XMPP_SESSION_ID = "xmppSessionId";
 
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
-	private static final Logger log = Logger.getLogger(SessionManagerClustered.class.getName());
-
-	//~--- fields ---------------------------------------------------------------
-
 	private JID my_address = null;
 	private JID my_hostname = null;
 	private int nodesNo = 0;
 	private ClusteringStrategyIfc strategy = null;
-
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param conn
-	 * @param cl_nodes
-	 */
-	public void broadcastUserPresence(XMPPResourceConnection conn, JID... cl_nodes) {
-		try {
-			Map<String, String> params = prepareBroadcastParams(conn, true);
-			Element presence = conn.getPresence();
-
-			sendBroadcastPackets(presence, params, ClusterMethods.USER_INITIAL_PRESENCE, cl_nodes);
-		} catch (Exception e) {
-			log.log(Level.WARNING, "Problem with broadcast user initial presence message for: {0}", conn);
-		}
-	}
+	private ClusterControllerIfc clusterController = null;
+	private CommandListener userConnected = new UserConnectedCommand();
+	private CommandListener userDisconnected = new UserDisconnectedCommand();
+	private CommandListener userPresence = new UserPresenceCommand();
+	private CommandListener packetForward = new PacketForwardCommand();
+	private CommandListener respondSyncOnline = new RespondSyncOnlineCommand();
+	private CommandListener requestSyncOnline = new RequestSyncOnlineCommand();
 
 	/**
-	 * Method description
-	 *
-	 *
-	 * @param conn
-	 * @param cl_nodes
-	 */
-	public void broadcastUserPresence(XMPPResourceConnection conn, List<JID> cl_nodes) {
-		try {
-			Map<String, String> params = prepareBroadcastParams(conn, true);
-			Element presence = conn.getPresence();
-
-			if (presence == null) {
-				log.log(Level.WARNING, "Something wrong. Initial presence NULL!!",
-						Thread.currentThread().getStackTrace());
-			}
-
-			sendBroadcastPackets(presence, params, ClusterMethods.USER_INITIAL_PRESENCE,
-					cl_nodes.toArray(new JID[cl_nodes.size()]));
-		} catch (Exception e) {
-			log.log(Level.WARNING, "Problem with broadcast user initial presence for: " + conn, e);
-		}
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
+	 * The method checks whether the given JID is known to the installation,
+	 * either user connected to local machine or any of the cluster nodes. False
+	 * result does not mean the user is not connected. It means the method does
+	 * not know anything about the JID. Some clustering strategies may not cache
+	 * online users' information.
+	 * 
 	 * @param jid
-	 *
-	 * @return
+	 *          a user's JID for whom we query information.
+	 * 
+	 * @return true if the user is known as online to the installation, false if
+	 *         the method does not know.
 	 */
 	@Override
-	public boolean containsJid(JID jid) {
+	public boolean containsJid(BareJID jid) {
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Called for jid: {0}", jid);
+		}
 		return super.containsJid(jid) || strategy.containsJid(jid);
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	/**
-	 * Method description
-	 *
-	 *
+	 * If the installation knows about user's JID, that he is connected to the
+	 * system, then this method returns all user's connection IDs. As an
+	 * optimization we can forward packets to all user's connections directly from
+	 * a single node.
+	 * 
 	 * @param jid
-	 *
-	 * @return
+	 *          a user's JID for whom we query information.
+	 * 
+	 * @return a list of all user's connection IDs.
 	 */
 	@Override
-	public JID[] getConnectionIdsForJid(JID jid) {
+	public JID[] getConnectionIdsForJid(BareJID jid) {
 		JID[] ids = super.getConnectionIdsForJid(jid);
 
 		if (ids == null) {
 			ids = strategy.getConnectionIdsForJid(jid);
+		}
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Called for jid: {0}, results: {1}", new Object[] { jid,
+					Arrays.toString(ids) });
 		}
 
 		return ids;
 	}
 
 	/**
-	 * Method description
-	 *
-	 *
+	 * Loads the component's default configuration to the configuration management
+	 * subsystem.
+	 * 
 	 * @param params
-	 *
-	 * @return
+	 *          is a Map with system-wide default settings found in
+	 *          init.properties file or similar location.
+	 * 
+	 * @return a Map with all default component settings generated from the
+	 *         default parameters in init.properties file.
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -227,15 +202,15 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 
 		try {
 			ClusteringStrategyIfc strat_tmp =
-				(ClusteringStrategyIfc) Class.forName(strategy_class).newInstance();
+					(ClusteringStrategyIfc) Class.forName(strategy_class).newInstance();
 			Map<String, Object> strat_defs = strat_tmp.getDefaults(params);
 
 			if (strat_defs != null) {
 				props.putAll(strat_defs);
 			}
 		} catch (Exception e) {
-			log.log(Level.SEVERE, "Can not instantiate clustering strategy for class: " + strategy_class,
-					e);
+			log.log(Level.SEVERE, "Can not instantiate clustering strategy for class: "
+					+ strategy_class, e);
 		}
 
 		String[] local_domains = DNSResolver.getDefHostNames();
@@ -244,7 +219,7 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 			local_domains = ((String) params.get(GEN_VIRT_HOSTS)).split(",");
 		}
 
-//  defs.put(LOCAL_DOMAINS_PROP_KEY, LOCAL_DOMAINS_PROP_VAL);
+		// defs.put(LOCAL_DOMAINS_PROP_KEY, LOCAL_DOMAINS_PROP_VAL);
 		props.put(MY_DOMAIN_NAME_PROP_KEY, local_domains[0]);
 
 		if (params.get(CLUSTER_NODES) != null) {
@@ -257,8 +232,11 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 	}
 
 	/**
-	 *
+	 * Method generates and returns component's statistics.
+	 * 
 	 * @param list
+	 *          is a collection with statistics to which this component can add
+	 *          own metrics.
 	 */
 	@Override
 	public void getStatistics(StatisticsList list) {
@@ -267,112 +245,97 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 	}
 
 	/**
-	 * Method description
-	 *
-	 *
-	 * @return
+	 * Returns active clustering strategy object.
+	 * 
+	 * @return active clustering strategy object.
 	 */
 	public ClusteringStrategyIfc getStrategy() {
 		return strategy;
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	/**
-	 * Method description
-	 *
-	 *
+	 * Method intercepts presence set event generated by presence status received
+	 * from a user connected to this node. The presence is then broadcasted to all
+	 * nodes given by the strategy.
+	 * 
 	 * @param conn
+	 *          a user's XMPPResourceConnection on which the event occurred.
 	 */
 	@Override
 	public void handlePresenceSet(XMPPResourceConnection conn) {
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Called for conn: {0}", new Object[] { conn });
+		}
 		super.handlePresenceSet(conn);
 
 		if (conn.getConnectionStatus() == ConnectionStatus.REMOTE) {
 			return;
 		}
-
-		if (conn.getSessionData(CL_BR_INITIAL_PRESENCE) == null) {
-			conn.putSessionData(CL_BR_INITIAL_PRESENCE, CL_BR_INITIAL_PRESENCE);
-
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Handle presence set for Connection: {0}", conn);
+		try {
+			Map<String, String> params = prepareConnectionParams(conn);
+			Element presence = conn.getPresence();
+			List<JID> cl_nodes =
+					strategy.getNodesForPacketForward(Packet.packetInstance(presence));
+			if (cl_nodes != null && cl_nodes.size() > 0) {
+				clusterController.sendToNodes(USER_PRESENCE_CMD, params, presence,
+						getComponentId(), null, cl_nodes.toArray(new JID[cl_nodes.size()]));
 			}
-
-			List<JID> cl_nodes = strategy.getAllNodes();
-
-			broadcastUserPresence(conn, cl_nodes);
+		} catch (Exception e) {
+			log.log(Level.WARNING, "Problem with broadcast user presence for: " + conn, e);
 		}
 	}
 
 	/**
-	 * Method description
-	 *
-	 *
+	 * Method intercepts resource bind event generated for on user's connection.
+	 * This event means that the account authentication process has been
+	 * successfully completed and now the information about the event can be
+	 * distributed to all nodes given by the strategy.
+	 * 
 	 * @param conn
+	 *          a user's XMPPResourceConnection on which the event occurred.
 	 */
 	@Override
 	public void handleResourceBind(XMPPResourceConnection conn) {
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Called for conn: {0}", new Object[] { conn });
+		}
 		super.handleResourceBind(conn);
 
 		if (conn.getConnectionStatus() == ConnectionStatus.REMOTE) {
 			return;
 		}
-
-		if (conn.getSessionData(CL_BR_USER_CONNECTED) == null) {
-			conn.putSessionData(CL_BR_USER_CONNECTED, CL_BR_USER_CONNECTED);
-
-			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Handle resource bind for" + " Connection:: " + conn);
-			}
-
-			List<JID> cl_nodes = strategy.getAllNodes();
-
-			try {
-				Map<String, String> params = prepareBroadcastParams(conn, false);
-
-				sendBroadcastPackets(null, params, ClusterMethods.USER_CONNECTED,
-						cl_nodes.toArray(new JID[cl_nodes.size()]));
-			} catch (Exception e) {
-				log.log(Level.WARNING, "Problem with broadcast user connected for: " + conn, e);
-			}
-		} else {
-			if (log.isLoggable(Level.WARNING)) {
-				log.warning("User resourc-rebind - not implemented yet in the cluster." + " Connection: "
-						+ conn);
-			}
+		try {
+			Map<String, String> params = prepareConnectionParams(conn);
+			List<JID> cl_nodes = strategy.getNodesForUserConnect(conn.getJID());
+			clusterController.sendToNodes(USER_CONNECTED_CMD, params, getComponentId(),
+					cl_nodes.toArray(new JID[cl_nodes.size()]));
+		} catch (Exception e) {
+			log.log(Level.WARNING, "Problem with broadcast user presence for: " + conn, e);
 		}
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
-///**
-// *
-// * @return
-// */
-//@Override
-//public Set<String> getOnlineJids() {
-//  return strategy.getOnlineJids();
-//}
-
 	/**
-	 * Method description
-	 *
-	 *
-	 * @return
+	 * Method checks whether the clustering strategy has a complete JIDs info.
+	 * That is whether the strategy knows about all users connected to all nodes.
+	 * Some strategies may choose not to share this information among nodes, hence
+	 * the methods returns false. Other may synchronize this information and can
+	 * provide it to further optimize cluster traffic.
+	 * 
+	 * 
+	 * @return a true boolean value if the strategy has a complete information
+	 *         about all users connected to all cluster nodes.
 	 */
 	@Override
 	public boolean hasCompleteJidsInfo() {
 		return strategy.hasCompleteJidsInfo();
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	/**
-	 * Method description
-	 *
-	 *
+	 * The method is called on cluster node connection event. This is a
+	 * notification to the component that a new node has connected to the system.
+	 * 
 	 * @param node
+	 *          is a hostname of a new cluster node connected to the system.
 	 */
 	@Override
 	public void nodeConnected(String node) {
@@ -380,7 +343,6 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 
 		JID jid = JID.jidInstanceNS(getName(), node, null);
 
-		addTrusted(jid);
 		strategy.nodeConnected(jid);
 		sendAdminNotification("Cluster node '" + node + "' connected (" + (new Date()) + ")",
 				"New cluster node connected: " + node, node);
@@ -391,10 +353,12 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 	}
 
 	/**
-	 * Method description
-	 *
-	 *
+	 * Method is called on cluster node disconnection event. This is a
+	 * notification to the component that there was network connection lost to one
+	 * of the cluster nodes.
+	 * 
 	 * @param node
+	 *          is a hostname of a cluster node generating the event.
 	 */
 	@Override
 	public void nodeDisconnected(String node) {
@@ -407,85 +371,57 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 		// Not sure what to do here, there might be still packets
 		// from the cluster node waiting....
 		// delTrusted(jid);
-		sendAdminNotification("Cluster node '" + node + "' disconnected (" + (new Date()) + ")",
-				"Cluster node disconnected: " + node, node);
+		sendAdminNotification("Cluster node '" + node + "' disconnected (" + (new Date())
+				+ ")", "Cluster node disconnected: " + node, node);
 	}
 
 	/**
-	 * Method description
-	 *
-	 *
+	 * A utility method used to prepare a Map of data with user session data
+	 * before it can be sent over to another cluster node. This is supposed to
+	 * contain all the user's session essential information which directly
+	 * identify user's resource and network connection. This information allows to
+	 * detect two different user's connection made for the same resource. This may
+	 * happen if both connections are established to different nodes.
+	 * 
 	 * @param conn
-	 * @param full_details
-	 *
-	 * @return
-	 *
+	 *          is user's XMPPResourceConnection for which Map structure is
+	 *          prepare.
+	 * 
+	 * @return a Map structure with all user's connection essential data.
+	 * 
 	 * @throws NoConnectionIdException
 	 * @throws NotAuthorizedException
 	 */
-	public Map<String, String> prepareBroadcastParams(XMPPResourceConnection conn,
-			boolean full_details)
+	protected Map<String, String> prepareConnectionParams(XMPPResourceConnection conn)
 			throws NotAuthorizedException, NoConnectionIdException {
-		BareJID userId = conn.getBareJID();
-		String resource = conn.getResource();
-		JID connectionId = conn.getConnectionId();
 		Map<String, String> params = new LinkedHashMap<String, String>();
 
-		params.put(USER_ID, userId.toString());
-		params.put(RESOURCE, resource);
-		params.put(CONNECTION_ID, connectionId.toString());
+		params.put(USER_ID, conn.getBareJID().toString());
+		params.put(RESOURCE, conn.getResource());
+		params.put(CONNECTION_ID, conn.getConnectionId().toString());
+		params.put(XMPP_SESSION_ID, conn.getSessionId());
+		params.put(AUTH_TIME, "" + conn.getAuthTime());
 
-		if (full_details) {
-			String xmpp_sessionId = conn.getSessionId();
-			long authTime = conn.getAuthTime();
-
-			params.put(XMPP_SESSION_ID, xmpp_sessionId);
-			params.put(AUTH_TIME, "" + authTime);
-
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST,
-						"Sending user: {0} session, resource: {1}, xmpp_sessionId: {2}, connectionId: {3}",
-							new Object[] { userId,
-						resource, xmpp_sessionId, connectionId });
-			}
-		} else {
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Sending user: {0} session, resource: {1}", new Object[] { userId,
-						resource });
-			}
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Called for conn: {0}, result: ",
+					new Object[] { conn, params });
 		}
 
 		return params;
 	}
 
 	/**
-	 * Method description
-	 *
-	 *
+	 * This is a standard component method for processing packets. The method
+	 * takes care of cases where the packet cannot be processed locally, in such a
+	 * case it is forwarded to another node.
+	 * 
+	 * 
 	 * @param packet
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	public void processPacket(Packet packet) {
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Received packet: {0}", packet);
-		}
-
-		if ((packet.getElemName() == ClusterElement.CLUSTER_EL_NAME)
-				&& (packet.getElement().getXMLNS() == ClusterElement.XMLNS)) {
-			if (isTrusted(packet.getStanzaFrom())) {
-				try {
-					processClusterPacket(packet);
-				} catch (TigaseStringprepException ex) {
-					log.log(Level.WARNING, "Packet processing stringprep problem: {0}", packet);
-				}
-			} else {
-				if (log.isLoggable(Level.WARNING)) {
-					log.log(Level.WARNING, "Cluster packet from untrusted source: {0}", packet);
-				}
-			}
-
-			return;
 		}
 
 		if (packet.isCommand() && processCommand(packet)) {
@@ -493,7 +429,13 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 
 			// No more processing is needed for command packet
 			return;
-		}    // end of if (pc.isCommand())
+		} // end of if (pc.isCommand())
+
+		List<JID> toNodes = strategy.getNodesForPacketForward(packet);
+		if (toNodes != null && toNodes.size() > 0) {
+			clusterController.sendToNodes(PACKET_FORWARD_CMD, packet.getElement(),
+					getComponentId(), null, toNodes.toArray(new JID[toNodes.size()]));
+		}
 
 		XMPPResourceConnection conn = getXMPPResourceConnection(packet);
 
@@ -502,7 +444,8 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 		}
 
 		if ((conn == null)
-				&& (isBrokenPacket(packet) || processAdminsOrDomains(packet) || sendToNextNode(packet))) {
+				&& (isBrokenPacket(packet) || processAdminsOrDomains(packet) || sendToNextNode(
+						packet.getElement(), null))) {
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Ignoring/dropping packet: {0}", packet);
 			}
@@ -514,10 +457,41 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 	}
 
 	/**
-	 * Method description
-	 *
-	 *
-	 * @return
+	 * Method attempts to send the packet to the next cluster node. Returns true
+	 * on successful attempt and false on failure. The true result does not mean
+	 * that the packet has been delivered though. Only that it was sent. The send
+	 * attempt may fail if there is no more cluster nodes to send the packet or if
+	 * the clustering strategy logic decided that the packet does not have to be
+	 * sent.
+	 * 
+	 * @param packet
+	 *          to be sent to a next cluster node
+	 * @param visitedNodes
+	 *          a list of nodes already visited by the packet.
+	 * @return true if the packet was sent to next cluster node and false
+	 *         otherwise.
+	 */
+	protected boolean sendToNextNode(Element packet, List<JID> visitedNodes) {
+		boolean result = false;
+		JID nextNode = strategy.selectNextNode(packet, visitedNodes);
+		if (nextNode != null) {
+			clusterController.sendToNodes(PACKET_FORWARD_CMD, packet, getComponentId(),
+					visitedNodes, nextNode);
+			result = true;
+		}
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Called for packet: {0}, visitedNodes: {1}, result: {2}",
+					new Object[] { packet, visitedNodes, result });
+		}
+		return result;
+	}
+
+	/**
+	 * Concurrency control method. Returns preferable number of threads set for
+	 * this component.
+	 * 
+	 * 
+	 * @return preferable number of threads set for this component.
 	 */
 	@Override
 	public int processingThreads() {
@@ -525,65 +499,33 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 	}
 
 	/**
-	 * Method description
-	 *
-	 *
-	 * @param data
-	 * @param params
-	 * @param methodCall
-	 * @param nodes
-	 */
-	public void sendBroadcastPackets(Element data, Map<String, String> params,
-			ClusterMethods methodCall, JID... nodes) {
-		ClusterElement clel = ClusterElement.createClusterMethodCall(getComponentId().toString(),
-			nodes[0].toString(), StanzaType.set, methodCall.toString(), params);
-
-		if (data != null) {
-			clel.addDataPacket(data);
-		}
-
-		Element check_session_el = clel.getClusterElement();
-
-		if ( !nodes[0].equals(getComponentId())) {
-			fastAddOutPacket(Packet.packetInstance(check_session_el, getComponentId(), nodes[0]));
-		}
-
-		for (int i = 1; i < nodes.length; i++) {
-			if ( !nodes[i].equals(getComponentId())) {
-				Element elem = check_session_el.clone();
-
-				elem.setAttribute("to", nodes[i].toString());
-				fastAddOutPacket(Packet.packetInstance(elem, getComponentId(), nodes[i]));
-			}
-		}
-	}
-
-	//~--- set methods ----------------------------------------------------------
-
-//@Override
-//public void release() {
-//  //delayedTasks.cancel();
-//  super.release();
-//}
-//@Override
-//public void start() {
-//  super.start();
-//  //delayedTasks = new Timer("SM Cluster Delayed Tasks", true);
-//}
-
-	/**
-	 * Method description
-	 *
-	 *
+	 * Set's the configures the cluster controller object for cluster
+	 * communication and API.
+	 * 
 	 * @param cl_controller
 	 */
 	@Override
-	public void setClusterController(ClusterController cl_controller) {}
+	public void setClusterController(ClusterControllerIfc cl_controller) {
+		clusterController = cl_controller;
+		clusterController.removeCommandListener(USER_CONNECTED_CMD, userConnected);
+		clusterController.removeCommandListener(USER_DISCONNECTED_CMD, userDisconnected);
+		clusterController.removeCommandListener(USER_PRESENCE_CMD, userPresence);
+		clusterController.removeCommandListener(PACKET_FORWARD_CMD, packetForward);
+		clusterController.removeCommandListener(REQUEST_SYNCONLINE_CMD, requestSyncOnline);
+		clusterController.removeCommandListener(RESPOND_SYNCONLINE_CMD, respondSyncOnline);
+
+		clusterController.setCommandListener(USER_CONNECTED_CMD, userConnected);
+		clusterController.setCommandListener(USER_DISCONNECTED_CMD, userDisconnected);
+		clusterController.setCommandListener(USER_PRESENCE_CMD, userPresence);
+		clusterController.setCommandListener(PACKET_FORWARD_CMD, packetForward);
+		clusterController.setCommandListener(REQUEST_SYNCONLINE_CMD, requestSyncOnline);
+		clusterController.setCommandListener(RESPOND_SYNCONLINE_CMD, respondSyncOnline);
+	}
 
 	/**
-	 * Method description
-	 *
-	 *
+	 * Standard component's configuration method.
+	 * 
+	 * 
 	 * @param props
 	 */
 	@Override
@@ -594,493 +536,100 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 
 		try {
 			ClusteringStrategyIfc strategy_tmp =
-				(ClusteringStrategyIfc) Class.forName(strategy_class).newInstance();
+					(ClusteringStrategyIfc) Class.forName(strategy_class).newInstance();
 
 			strategy_tmp.setProperties(props);
 
 			// strategy_tmp.init(getName());
 			strategy = strategy_tmp;
-			strategy.nodeConnected(getComponentId());
+			strategy.setSessionManagerHandler(this);
+			log.log(Level.CONFIG, "Loaded SM strategy: " + strategy_class);
+			// strategy.nodeConnected(getComponentId());
 			addTrusted(getComponentId());
 		} catch (Exception e) {
-			log.log(Level.SEVERE, "Can not clustering strategy instance for class: " + strategy_class, e);
+			log.log(Level.SEVERE, "Can not clustering strategy instance for class: "
+					+ strategy_class, e);
 		}
 
 		try {
 			my_hostname = JID.jidInstance((String) props.get(MY_DOMAIN_NAME_PROP_KEY));
-			my_address = JID.jidInstance(getName(), (String) props.get(MY_DOMAIN_NAME_PROP_KEY), null);
+			my_address =
+					JID.jidInstance(getName(), (String) props.get(MY_DOMAIN_NAME_PROP_KEY), null);
 		} catch (TigaseStringprepException ex) {
 			log.log(Level.WARNING,
 					"Creating component source address failed stringprep processing: {0}@{1}",
-						new Object[] { getName(),
-					my_hostname });
+					new Object[] { getName(), my_hostname });
 		}
 	}
 
-	//~--- methods --------------------------------------------------------------
-
+	/**
+	 * The method intercept user's disconnect event. On user disconnect the method
+	 * takes a list of cluster nodes from the strategy and sends a notification to
+	 * all those nodes about the event.
+	 * 
+	 * @see tigase.server.xmppsession.SessionManager#closeSession(tigase.xmpp.
+	 *      XMPPResourceConnection, boolean)
+	 */
 	@Override
 	protected void closeSession(XMPPResourceConnection conn, boolean closeOnly) {
-		if ((conn.getConnectionStatus() != ConnectionStatus.REMOTE) && conn.isAuthorized()) {
-			try {
-				JID connectionId = conn.getConnectionId();
-				BareJID userId = conn.getBareJID();
-				String resource = conn.getResource();
-				Map<String, String> params = new LinkedHashMap<String, String>();
-
-				params.put(CONNECTION_ID, connectionId.toString());
-				params.put(USER_ID, userId.toString());
-				params.put(RESOURCE, resource);
-
-				List<JID> cl_nodes = strategy.getAllNodes();
-
-				for (JID node : cl_nodes) {
-					if ( !node.equals(getComponentId())) {
-						Element check_session_el =
-							ClusterElement.createClusterMethodCall(getComponentId().toString(), node.toString(),
-								StanzaType.set, ClusterMethods.USER_DISCONNECTED.toString(),
-								params).getClusterElement();
-
-						fastAddOutPacket(Packet.packetInstance(check_session_el, getComponentId(), node));
-					}
-				}
-			} catch (Exception ex) {
-				log.log(Level.WARNING, "Problem sending user disconnect broadcast for: " + conn, ex);
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Called for conn: {0}, closeOnly: {1}", new Object[] { conn,
+					closeOnly });
+		}
+		// Exception here should not normally happen, but if it does, then
+		// consequences might be severe, let's catch it then
+		try {
+			if (conn.isAuthorized() && conn.isResourceSet()) {
+				Map<String, String> params = prepareConnectionParams(conn);
+				List<JID> cl_nodes = strategy.getNodesForUserDisconnect(conn.getJID());
+				clusterController.sendToNodes(USER_DISCONNECTED_CMD, params, getComponentId(),
+						cl_nodes.toArray(new JID[cl_nodes.size()]));
 			}
+		} catch (Exception ex) {
+			log.log(Level.WARNING, "This should not happen, check it out!, ", ex);
 		}
 
-		XMPPSession parentSession = conn.getParentSession();
-
-		// Exception here should not normally happen, but if it does, then consequences might
-		// be severe, let's catch it then
+		// Exception here should not normally happen, but if it does, then
+		// consequences might be severe, let's catch it then
 		try {
 			super.closeSession(conn, closeOnly);
 		} catch (Exception ex) {
 			log.log(Level.WARNING, "This should not happen, check it out!, ", ex);
 		}
-
-		if ((conn.getConnectionStatus() != ConnectionStatus.REMOTE) && (parentSession != null)
-				&& (parentSession.getActiveResourcesSize()
-					== parentSession.getResSizeForConnStatus(ConnectionStatus.REMOTE))) {
-			List<XMPPResourceConnection> conns = parentSession.getActiveResources();
-
-			for (XMPPResourceConnection xrc : conns) {
-				try {
-					super.closeConnection(xrc.getConnectionId(), true);
-
-					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, "Closed remote connection: {0}", xrc);
-					}
-				} catch (Exception ex) {
-					log.log(Level.WARNING, "This should not happen, check it out!, ", ex);
-				}
-			}
-		}
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
-	protected JID getFirstClusterNode(JID userJid) {
-		JID cluster_node = null;
-		List<JID> nodes = strategy.getNodesForJid(userJid);
-
-		if (nodes != null) {
-			for (JID node : nodes) {
-				if ( !node.equals(getComponentId())) {
-					cluster_node = node;
-
-					break;
-				}
-			}
-		}
-
-		return cluster_node;
-	}
-
-	//~--- methods --------------------------------------------------------------
-
-	@TODO(note = "Possible performance bottleneck if there are many users with multiple "
-			+ "connections to different nodes.")
-	protected void processClusterPacket(Packet packet) throws TigaseStringprepException {
-		Queue<Packet> results = new ArrayDeque<Packet>(10);
-		final ClusterElement clel = new ClusterElement(packet.getElement());
-		ClusterMethods method = ClusterMethods.parseMethod(clel.getMethodName());
-
-		switch (packet.getType()) {
-			case set :
-				if (clel.getMethodName() == null) {
-					processPacket(clel);
-				}
-
-				switch (method) {
-					case USER_INITIAL_PRESENCE : {
-						BareJID userId = BareJID.bareJIDInstanceNS(clel.getMethodParam(USER_ID));
-						String resource = clel.getMethodParam(RESOURCE);
-						XMPPSession session = getSession(userId);
-
-						if ((session != null) && (session.getResourceForResource(resource) == null)) {
-							JID connectionId = JID.jidInstanceNS(clel.getMethodParam(CONNECTION_ID));
-							String xmpp_sessionId = clel.getMethodParam(XMPP_SESSION_ID);
-							String domain = userId.getDomain();
-							XMPPResourceConnection res_con = loginUserSession(connectionId, domain, userId,
-								resource, ConnectionStatus.REMOTE, xmpp_sessionId);
-
-							if (res_con != null) {
-								List<Element> packs = clel.getDataPackets();
-
-								for (Element elem : packs) {
-									if (elem.getName() == Presence.PRESENCE_ELEMENT_NAME) {
-										res_con.setPresence(elem);
-									}
-								}
-
-								res_con.putSessionData(SM_ID, packet.getStanzaFrom());
-
-								// Send the presence from the new user connection to all local
-								// (non-remote) user connections
-								updateUserResources(res_con, results);
-
-								for (XMPPResourceConnection xrc : session.getActiveResources()) {
-									if ((xrc.getConnectionStatus() != ConnectionStatus.REMOTE)
-											&& (xrc.getPresence() != null)) {
-
-										// Notify remote user's connections about this local connection, if it exist
-										broadcastUserPresence(xrc, packet.getStanzaFrom());
-									}
-								}
-
-								if (log.isLoggable(Level.FINEST)) {
-									log.log(Level.FINEST, "Added remote session for: {0}, from: {1}",
-											new Object[] { userId,
-											packet.getStanzaFrom() });
-								}
-							} else {
-								if (log.isLoggable(Level.INFO)) {
-									log.log(Level.INFO,
-											"Couldn''t create user session for: {0}, resource: {1}, connectionId: {2}",
-												new Object[] { userId,
-											resource, connectionId });
-								}
-							}
-						} else {
-
-							// Ignoring this, nothing special to do.
-							if (log.isLoggable(Level.FINEST)) {
-								if (session == null) {
-									log.log(Level.FINEST,
-											"Ignoring USER_INITIAL_PRESENCE for: {0}, from: {1}, there is no other session for the user on this node.",
-												new Object[] { userId,
-											packet.getStanzaFrom() });
-								} else {
-									if (session.getResourceForResource(resource) != null) {
-										log.log(Level.FINEST,
-												"Ignoring USER_INITIAL_PRESENCE for: {0}, from: {1}, there is already a session on this node for this resource.",
-													new Object[] { userId,
-												packet.getStanzaFrom() });
-									} else {
-										log.log(Level.FINEST,
-												"Ignoring USER_INITIAL_PRESENCE for: {0}, from: {1}, reason unknown, please contact devs.",
-													new Object[] { userId,
-												packet.getStanzaFrom() });
-									}
-								}
-							}
-						}
-
-						break;
-					}
-
-					case USER_CONNECTED : {
-						BareJID userId = BareJID.bareJIDInstanceNS(clel.getMethodParam(USER_ID));
-						String resource = clel.getMethodParam(RESOURCE);
-						JID connectionId = JID.jidInstanceNS(clel.getMethodParam(CONNECTION_ID));
-
-						strategy.usersConnected(packet.getStanzaFrom(), results,
-								JID.jidInstanceNS(userId, resource + "#" + connectionId));
-
-						break;
-					}
-
-					case USER_DISCONNECTED : {
-						BareJID userId = BareJID.bareJIDInstanceNS(clel.getMethodParam(USER_ID));
-						String resource = clel.getMethodParam(RESOURCE);
-
-						strategy.userDisconnected(packet.getStanzaFrom(), results,
-								JID.jidInstanceNS(userId, resource));
-
-						XMPPSession session = getSession(userId);
-
-						if (session != null) {
-							JID connectionId = JID.jidInstanceNS(clel.getMethodParam(CONNECTION_ID));
-
-							// Possible performance bottleneck if there are many users with
-							// multiple connections to different nodes. If all disconnect at
-							// the same time we might have a problem here.
-							closeConnection(connectionId, true);
-
-							if (log.isLoggable(Level.FINEST)) {
-								log.finest("Removed remote session for: " + userId + ", from: "
-										+ packet.getStanzaFrom());
-							}
-						}
-
-						break;
-					}
-				}
-
-				break;
-
-			case get :
-				switch (method) {
-					case SYNC_ONLINE :
-
-						// Send back all online users on this node
-						Collection<XMPPResourceConnection> conns = connectionsByFrom.values();
-						int counter = 0;
-						StringBuilder sb = new StringBuilder(40000);
-
-						for (XMPPResourceConnection conn : conns) {
-							String jid = null;
-
-							// Exception would be thrown for all not-authenticated yet connection
-							// We don't have to worry about them, just ignore all of them
-							// They should be synchronized later on using standard cluster
-							// notifications.
-							try {
-								jid = conn.getJID() + "#" + conn.getConnectionId();
-							} catch (Exception e) {
-								jid = null;
-							}
-
-							if (jid != null) {
-								if (sb.length() == 0) {
-									sb.append(jid);
-								} else {
-									sb.append(',').append(jid);
-								}
-
-								if (++counter > SYNC_MAX_BATCH_SIZE) {
-
-									// Send a new batch...
-									ClusterElement resp = clel.createMethodResponse(getComponentId().toString(),
-										StanzaType.result, null);
-
-									resp.addMethodResult(SYNC_ONLINE_JIDS, sb.toString());
-									fastAddOutPacket(Packet.packetInstance(resp.getClusterElement()));
-									counter = 0;
-
-									// Not sure which is better, create a new StringBuilder instance
-									// or clearing existing up...., let's clear it up for now.
-									sb.delete(0, sb.length());
-								}
-							}
-						}
-
-						if (sb.length() > 0) {
-
-							// Send a new batch...
-							ClusterElement resp = clel.createMethodResponse(getComponentId().toString(),
-								StanzaType.result, null);
-
-							resp.addMethodResult(SYNC_ONLINE_JIDS, sb.toString());
-							fastAddOutPacket(Packet.packetInstance(resp.getClusterElement()));
-						}
-
-						break;
-
-					default :
-
-					// Do nothing...
-				}
-
-				break;
-
-			case result :
-				switch (method) {
-					case SYNC_ONLINE :
-
-						// Notify clustering strategy about SYNC_ONLINE response
-						String jids = clel.getMethodResultVal(SYNC_ONLINE_JIDS);
-
-						if (jids != null) {
-							String[] jidsa = jids.split(",");
-							JID[] jid_j = new JID[jidsa.length];
-							int idx = 0;
-
-							for (String jid : jidsa) {
-								jid_j[idx++] = JID.jidInstanceNS(jid);
-							}
-
-							try {
-								strategy.usersConnected(packet.getStanzaFrom(), results, jid_j);
-							} catch (Exception e) {
-								log.log(Level.WARNING, "Problem synchronizing cluster nodes for packet: " + packet,
-										e);
-							}
-						} else {
-							log.warning("Sync online packet with empty jids list! Please check this out: "
-									+ packet.toString());
-						}
-
-						break;
-
-					default :
-
-					// Do nothing...
-				}
-
-				break;
-
-			case error :
-				JID from = packet.getStanzaFrom();
-
-				clel.addVisitedNode(from.toString());
-				processPacket(clel);
-
-				break;
-
-			default :
-				break;
-		}
-
-		addOutPackets(results);
-	}
-
-	@SuppressWarnings("unchecked")
-	protected void processPacket(ClusterElement packet) {
-		List<Element> elems = packet.getDataPackets();
-
-		// String packet_from = packet.getDataPacketFrom();
-		if ((elems != null) && (elems.size() > 0)) {
-			for (Element elem : elems) {
-				try {
-					Packet el_packet = Packet.packetInstance(elem);
-					XMPPResourceConnection conn = getXMPPResourceConnection(el_packet);
-
-					if ((conn != null) ||!sendToNextNode(packet, el_packet.getStanzaTo())) {
-						processPacket(el_packet, conn);
-					}
-				} catch (TigaseStringprepException ex) {
-					log.warning("Addressing problem, stringprep failed for packet: " + elem);
-				}
-			}
-		} else {
-			log.finest("Empty packets list in the cluster packet: " + packet.toString());
-		}
-	}
-
-	protected boolean sendToNextNode(ClusterElement clel, JID userId)
-			throws TigaseStringprepException {
-		ClusterElement next_clel = ClusterElement.createForNextNode(clel,
-			strategy.getNodesForJid(userId), getComponentId());
-
-		if (next_clel != null) {
-			fastAddOutPacket(Packet.packetInstance(next_clel.getClusterElement()));
-
-			return true;
-		} else {
-			String first = clel.getFirstNode();
-
-			if ((first != null) &&!first.equals(getComponentId().toString())) {
-				List<Element> packets = clel.getDataPackets();
-				Element elem = (((packets != null) && (packets.size() == 1)) ? packets.get(0) : null);
-				Packet packet = ((elem != null) ? Packet.packetInstance(elem) : null);
-
-				if ((packet == null)
-						|| ((packet.getType() != StanzaType.result)
-							&& (packet.getType() != StanzaType.available)
-								&& (packet.getType() != StanzaType.unavailable)
-									&& (packet.getType() != StanzaType.error)
-										&&!((packet.getElemName() == "presence") && (packet.getType() == null)))) {
-					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, "Sending back to the first node: {0}", first);
-					}
-
-					ClusterElement result = clel.nextClusterNode(first);
-
-					result.addVisitedNode(getComponentId().toString());
-					fastAddOutPacket(Packet.packetInstance(result.getClusterElement()));
-				}
-
-				return true;
-			} else {
-				return false;
-			}
-		}
-	}
-
-	protected boolean sendToNextNode(Packet packet) {
-		JID cluster_node = getFirstClusterNode(packet.getStanzaTo());
-
+	/**
+	 * Method takes the data received from other cluster node and creates a
+	 * ConnectionRecord with all essential connection information. This might be
+	 * used later to identify user's XMPPResourceConnection or use the clustering
+	 * strategy API.
+	 * 
+	 * @param node
+	 * @param data
+	 * @return
+	 */
+	protected ConnectionRecord getConnectionRecord(JID node, Map<String, String> data) {
+		BareJID userId = BareJID.bareJIDInstanceNS(data.get(USER_ID));
+		String resource = data.get(RESOURCE);
+		JID jid = JID.jidInstanceNS(userId, resource);
+		String sessionId = data.get(XMPP_SESSION_ID);
+		JID connectionId = JID.jidInstanceNS(data.get(CONNECTION_ID));
+		ConnectionRecord rec = new ConnectionRecord(node, jid, sessionId, connectionId);
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "Cluster node found: {0}", cluster_node);
+			log.log(Level.FINEST, "ConnectionRecord created: {0}", new Object[] { rec });
 		}
-
-		if (cluster_node != null) {
-			JID sess_man_id = getComponentId();
-			ClusterElement clel = new ClusterElement(sess_man_id.toString(), cluster_node.toString(),
-				StanzaType.set, packet);
-
-			clel.addVisitedNode(sess_man_id.toString());
-			fastAddOutPacket(Packet.packetInstance(clel.getClusterElement(), sess_man_id, cluster_node));
-
-			return true;
-		}
-
-		return false;
+		return rec;
 	}
 
-	protected void updateUserResources(XMPPResourceConnection res_con, Queue<Packet> results) {
-		try {
-			Element pres_update = res_con.getPresence();
-
-			for (XMPPResourceConnection conn : res_con.getActiveSessions()) {
-				try {
-					if (log.isLoggable(Level.FINER)) {
-						log.log(Level.FINER, "Update presence change to: {0}", conn.getjid());
-					}
-
-					if ((conn != res_con) && conn.isResourceSet()
-							&& (conn.getConnectionStatus() != ConnectionStatus.REMOTE)) {
-						if (pres_update != null) {
-							pres_update = pres_update.clone();
-						} else {
-							pres_update = new Element(Presence.PRESENCE_ELEMENT_NAME);
-						}
-
-						// Below code not needed anymore, packetInstance(...) takes care of it
-//          pres_update.setAttribute("from", res_con.getJID().toString());
-//          pres_update.setAttribute("to", conn.getBareJID().toString());
-						Packet pack_update = Packet.packetInstance(pres_update, res_con.getJID(),
-							conn.getJID().copyWithoutResource());
-
-						pack_update.setPacketTo(conn.getConnectionId());
-						results.offer(pack_update);
-					} else {
-						if (log.isLoggable(Level.FINER)) {
-							log.log(Level.FINER, "Skipping presence update to: {0}", conn.getjid());
-						}
-					}    // end of else
-				} catch (NoConnectionIdException ex) {
-
-					// This actually should not happen... might be a bug:
-					log.log(Level.WARNING, "This should not happen, check it out!, ", ex);
-				} catch (NotAuthorizedException ex) {
-					log.log(Level.WARNING, "This should not happen, unless the connection has been "
-							+ "stopped in a concurrent thread or has not been authenticated yet: " + "{0}", conn);
-				}
-			}    // end of for (XMPPResourceConnection conn: sessions)
-		} catch (NotAuthorizedException ex) {
-			log.log(Level.WARNING, "User session from another cluster node authentication problem: {0}",
-					res_con);
-		}
-	}
-
-	private void requestSync(JID node) {
-		ClusterElement clel = ClusterElement.createClusterMethodCall(getComponentId().toString(),
-			node.toString(), StanzaType.get, ClusterMethods.SYNC_ONLINE.name(), null);
-
-		fastAddOutPacket(Packet.packetInstance(clel.getClusterElement(), getComponentId(), node));
+	/**
+	 * Send synchronization request to a given cluster node. In a response the
+	 * remote node should return a list of JIDs for online users on this node.
+	 * 
+	 * @param node
+	 *          is a JID of the target cluster node.
+	 */
+	protected void requestSync(JID node) {
+		clusterController.sendToNodes(REQUEST_SYNCONLINE_CMD, getComponentId(), node);
 	}
 
 	private void sendAdminNotification(String msg, String subject, String node) {
@@ -1094,15 +643,292 @@ public class SessionManagerClustered extends SessionManager implements Clustered
 
 		message += node + " connected to " + getDefHostName();
 
-		Packet p_msg = Message.getMessage(my_address, my_hostname, StanzaType.normal, message, subject,
-			"xyz", newPacketId(null));
+		Packet p_msg =
+				Message.getMessage(my_address, my_hostname, StanzaType.normal, message, subject,
+						"xyz", newPacketId(null));
 
 		sendToAdmins(p_msg);
 	}
+
+	private class RespondSyncOnlineCommand implements CommandListener {
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see tigase.cluster.api.CommandListener#executeCommand(java.util.Map)
+		 */
+		@Override
+		public void executeCommand(JID fromNode, List<JID> visitedNodes,
+				Map<String, String> data, Queue<Element> packets) throws ClusterCommandException {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST,
+						"Called fromNode: {0}, visitedNodes: {1}, data: {2}, packets: {3}",
+						new Object[] { fromNode, visitedNodes, data, packets });
+			}
+			// TODO: Implement nodes synchronization
+			// // Notify clustering strategy about SYNC_ONLINE response
+			// String jids = clel.getMethodResultVal(SYNC_ONLINE_JIDS);
+			//
+			// if (jids != null) {
+			// String[] jidsa = jids.split(",");
+			// JID[] jid_j = new JID[jidsa.length];
+			// int idx = 0;
+			//
+			// for (String jid : jidsa) {
+			// jid_j[idx++] = JID.jidInstanceNS(jid);
+			// }
+			//
+			// try {
+			// strategy.usersConnected(packet.getStanzaFrom(), results, jid_j);
+			// } catch (Exception e) {
+			// log.log(Level.WARNING,
+			// "Problem synchronizing cluster nodes for packet: "
+			// + packet, e);
+			// }
+			// } else {
+			// log.warning("Sync online packet with empty jids list! Please check this out: "
+			// + packet.toString());
+			// }
+
+		}
+	}
+
+	private class RequestSyncOnlineCommand implements CommandListener {
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see tigase.cluster.api.CommandListener#executeCommand(java.util.Map)
+		 */
+		@Override
+		public void executeCommand(JID fromNode, List<JID> visitedNodes,
+				Map<String, String> data, Queue<Element> packets) throws ClusterCommandException {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST,
+						"Called fromNode: {0}, visitedNodes: {1}, data: {2}, packets: {3}",
+						new Object[] { fromNode, visitedNodes, data, packets });
+			}
+			// TODO: Implement nodes synchronization
+
+			// // Send back all online users on this node
+			// Collection<XMPPResourceConnection> conns = connectionsByFrom.values();
+			// int counter = 0;
+			// StringBuilder sb = new StringBuilder(40000);
+			//
+			// for (XMPPResourceConnection conn : conns) {
+			// String jid = null;
+			//
+			// // Exception would be thrown for all not-authenticated yet
+			// // connection
+			// // We don't have to worry about them, just ignore all of them
+			// // They should be synchronized later on using standard cluster
+			// // notifications.
+			// try {
+			// jid = conn.getJID() + "#" + conn.getConnectionId();
+			// } catch (Exception e) {
+			// jid = null;
+			// }
+			//
+			// if (jid != null) {
+			// if (sb.length() == 0) {
+			// sb.append(jid);
+			// } else {
+			// sb.append(',').append(jid);
+			// }
+			//
+			// if (++counter > SYNC_MAX_BATCH_SIZE) {
+			//
+			// // Send a new batch...
+			// ClusterElement resp =
+			// clel.createMethodResponse(getComponentId().toString(),
+			// StanzaType.result, null);
+			//
+			// resp.addMethodResult(SYNC_ONLINE_JIDS, sb.toString());
+			// fastAddOutPacket(Packet.packetInstance(resp.getClusterElement()));
+			// counter = 0;
+			//
+			// // Not sure which is better, create a new StringBuilder
+			// // instance
+			// // or clearing existing up...., let's clear it up for now.
+			// sb.delete(0, sb.length());
+			// }
+			// }
+			// }
+			//
+			// if (sb.length() > 0) {
+			//
+			// // Send a new batch...
+			// ClusterElement resp =
+			// clel.createMethodResponse(getComponentId().toString(),
+			// StanzaType.result, null);
+			//
+			// resp.addMethodResult(SYNC_ONLINE_JIDS, sb.toString());
+			// fastAddOutPacket(Packet.packetInstance(resp.getClusterElement()));
+			// }
+		}
+
+	}
+
+	private class UserPresenceCommand implements CommandListener {
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see tigase.cluster.api.CommandListener#executeCommand(java.util.Map)
+		 */
+		@Override
+		public void executeCommand(JID fromNode, List<JID> visitedNodes,
+				Map<String, String> data, Queue<Element> packets) throws ClusterCommandException {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST,
+						"Called fromNode: {0}, visitedNodes: {1}, data: {2}, packets: {3}",
+						new Object[] { fromNode, visitedNodes, data, packets });
+			}
+			ConnectionRecord rec = getConnectionRecord(fromNode, data);
+			XMPPSession session = getSession(rec.getUserJid().getBareJID());
+			Element elem = packets.poll();
+			// TODO: the second condition should be handled better here. It is a
+			// presence packet from a connection/resource which has just been
+			// disconnected. Instead of dropping it, a broadcast to all other user's
+			// resources should be sent.
+			if (session != null) {
+				for (XMPPResourceConnection conn : session.getActiveResources()) {
+					Element conn_presence = conn.getPresence();
+					if (conn.isAuthorized() && conn.isResourceSet() && conn_presence != null) {
+						try {
+							// Send user's presence from remote connection to local connection
+							Packet presence = Packet.packetInstance(elem);
+							presence.setPacketTo(conn.getConnectionId());
+							fastAddOutPacket(presence);
+							// Send user's presence from local connection to remote connection
+							presence = Packet.packetInstance(conn_presence);
+							presence.setPacketTo(rec.getConnectionId());
+							fastAddOutPacket(presence);
+						} catch (Exception ex) {
+							// TODO Auto-generated catch block
+							ex.printStackTrace();
+						}
+					}
+				}
+			} else {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(
+							Level.FINEST,
+							"No user session for presence update: {0}, visitedNodes: {1}, data: {2}, packets: {3}",
+							new Object[] { fromNode, visitedNodes, data, packets });
+				}
+			}
+
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("User presence jid: " + rec.getUserJid() + ", fromNode: " + fromNode);
+			}
+		}
+	}
+
+	private class UserConnectedCommand implements CommandListener {
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see tigase.cluster.api.CommandListener#executeCommand(java.util.Map)
+		 */
+		@Override
+		public void executeCommand(JID fromNode, List<JID> visitedNodes,
+				Map<String, String> data, Queue<Element> packets) throws ClusterCommandException {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST,
+						"Called fromNode: {0}, visitedNodes: {1}, data: {2}, packets: {3}",
+						new Object[] { fromNode, visitedNodes, data, packets });
+			}
+			Queue<Packet> results = new ArrayDeque<Packet>(10);
+			ConnectionRecord rec = getConnectionRecord(fromNode, data);
+			strategy.usersConnected(results, rec);
+			addOutPackets(results);
+			// There is one more thing....
+			// If the new connection is for the same resource we have here then the
+			// old
+			// connection must be destroyed.
+			XMPPSession session = getSession(rec.getUserJid().getBareJID());
+			if (session != null) {
+				XMPPResourceConnection conn =
+						session.getResourceForResource(rec.getUserJid().getResource());
+				if (conn != null) {
+					if (log.isLoggable(Level.FINEST)) {
+						log.finest("Duplicate resource connection, logingout the older connection: "
+								+ rec);
+					}
+					try {
+						fastAddOutPacket(Command.CLOSE.getPacket(getComponentId(),
+								conn.getConnectionId(), StanzaType.set, conn.nextStanzaId()));
+					} catch (Exception ex) {
+						// TODO Auto-generated catch block
+						ex.printStackTrace();
+					}
+				}
+			}
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("User connected jid: " + rec.getUserJid() + ", fromNode: " + fromNode);
+			}
+		}
+
+	}
+
+	private class UserDisconnectedCommand implements CommandListener {
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see tigase.cluster.api.CommandListener#executeCommand(java.util.Map)
+		 */
+		@Override
+		public void executeCommand(JID fromNode, List<JID> visitedNodes,
+				Map<String, String> data, Queue<Element> packets) throws ClusterCommandException {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST,
+						"Called fromNode: {0}, visitedNodes: {1}, data: {2}, packets: {3}",
+						new Object[] { fromNode, visitedNodes, data, packets });
+			}
+			Queue<Packet> results = new ArrayDeque<Packet>(10);
+			ConnectionRecord rec = getConnectionRecord(fromNode, data);
+			strategy.userDisconnected(results, rec);
+			addOutPackets(results);
+		}
+
+	}
+
+	private class PacketForwardCommand implements CommandListener {
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see tigase.cluster.api.CommandListener#executeCommand(java.util.Map)
+		 */
+		@Override
+		public void executeCommand(JID fromNode, List<JID> visitedNodes,
+				Map<String, String> data, Queue<Element> packets) throws ClusterCommandException {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST,
+						"Called fromNode: {0}, visitedNodes: {1}, data: {2}, packets: {3}",
+						new Object[] { fromNode, visitedNodes, data, packets });
+			}
+
+			if ((packets != null) && (packets.size() > 0)) {
+				for (Element elem : packets) {
+					try {
+						Packet el_packet = Packet.packetInstance(elem);
+						XMPPResourceConnection conn = getXMPPResourceConnection(el_packet);
+
+						if ((conn != null) || !sendToNextNode(elem, visitedNodes)) {
+							processPacket(el_packet, conn);
+						}
+					} catch (TigaseStringprepException ex) {
+						log.warning("Addressing problem, stringprep failed for packet: " + elem);
+					}
+				}
+			} else {
+				log.finest("Empty packets list in the forward command");
+			}
+		}
+
+	}
 }
-
-
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

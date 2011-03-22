@@ -52,7 +52,7 @@ import java.util.logging.Logger;
 public class XMPPSession {
 
 	/**
-	 * Private logger for class instancess.
+	 * Private logger for class instances.
 	 */
 	private static Logger log = Logger.getLogger("tigase.xmpp.XMPPSession");
 

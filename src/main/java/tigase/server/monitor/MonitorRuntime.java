@@ -103,10 +103,10 @@ public class MonitorRuntime extends TigaseRuntime {
 	@Override
 	public boolean isJidOnline(JID jid) {
 		if (onlineJidsReporters.size() == 1) {
-			return onlineJidsReporters.getFirst().containsJid(jid);
+			return onlineJidsReporters.getFirst().containsJid(jid.getBareJID());
 		} else {
 			for (OnlineJidsReporter onlineJidsReporter : onlineJidsReporters) {
-				if (onlineJidsReporter.containsJid(jid)) {
+				if (onlineJidsReporter.containsJid(jid.getBareJID())) {
 					return true;
 				}
 			}
@@ -122,10 +122,10 @@ public class MonitorRuntime extends TigaseRuntime {
 	@Override
 	public JID[] getConnectionIdsForJid(JID jid) {
 		if (onlineJidsReporters.size() == 1) {
-			return onlineJidsReporters.getFirst().getConnectionIdsForJid(jid);
+			return onlineJidsReporters.getFirst().getConnectionIdsForJid(jid.getBareJID());
 		} else {
 			for (OnlineJidsReporter onlineJidsReporter : onlineJidsReporters) {
-				JID[] connIds = onlineJidsReporter.getConnectionIdsForJid(jid);
+				JID[] connIds = onlineJidsReporter.getConnectionIdsForJid(jid.getBareJID());
 				if (connIds != null) {
 					return connIds;
 				}

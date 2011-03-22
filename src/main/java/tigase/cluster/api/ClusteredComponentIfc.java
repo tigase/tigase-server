@@ -18,7 +18,7 @@
  * Last modified by $Author$
  * $Date$
  */
-package tigase.cluster;
+package tigase.cluster.api;
 
 import tigase.server.ServerComponent;
 
@@ -31,9 +31,9 @@ import tigase.server.ServerComponent;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public interface ClusteredComponent extends ServerComponent {
+public interface ClusteredComponentIfc extends ServerComponent {
 
-	void setClusterController(ClusterController cl_controller);
+	void setClusterController(ClusterControllerIfc cl_controller);
 
 	void nodeConnected(String node);
 

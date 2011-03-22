@@ -24,6 +24,8 @@ package tigase.cluster;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.cluster.api.ClusterControllerIfc;
+import tigase.cluster.api.ClusteredComponentIfc;
 import tigase.server.monitor.MonitorComponent;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -38,7 +40,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class MonitorClustered extends MonitorComponent implements ClusteredComponent {
+public class MonitorClustered extends MonitorComponent implements ClusteredComponentIfc {
 	private static final Logger log = Logger.getLogger(MonitorClustered.class.getName());
 
 	//~--- methods --------------------------------------------------------------
@@ -70,7 +72,7 @@ public class MonitorClustered extends MonitorComponent implements ClusteredCompo
 	 * @param cl_controller
 	 */
 	@Override
-	public void setClusterController(ClusterController cl_controller) {}
+	public void setClusterController(ClusterControllerIfc cl_controller) {}
 }
 
 

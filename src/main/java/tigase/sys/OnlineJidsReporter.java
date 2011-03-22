@@ -22,6 +22,7 @@
 
 package tigase.sys;
 
+import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 
 /**
@@ -36,8 +37,14 @@ public interface OnlineJidsReporter {
 
 	boolean hasCompleteJidsInfo();
 
-	boolean containsJid(JID jid);
+	/**
+	 * Checks whether there is an online session for the given user BareJID.
+	 * 
+	 * @param jid
+	 * @return
+	 */
+	boolean containsJid(BareJID jid);
 
-	JID[] getConnectionIdsForJid(JID jid);
+	JID[] getConnectionIdsForJid(BareJID jid);
 
 }
