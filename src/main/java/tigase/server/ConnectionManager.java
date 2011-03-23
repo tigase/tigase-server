@@ -22,8 +22,6 @@
 
 package tigase.server;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.annotations.TODO;
 
 import tigase.net.ConnectionOpenListener;
@@ -41,8 +39,6 @@ import tigase.util.DataTypes;
 import tigase.xmpp.JID;
 import tigase.xmpp.XMPPIOService;
 import tigase.xmpp.XMPPIOServiceListener;
-
-//~--- JDK imports ------------------------------------------------------------
 
 import java.io.IOException;
 
@@ -64,8 +60,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.script.Bindings;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Describe class ConnectionManager here.
@@ -101,49 +95,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 	protected static final String TLS_REQUIRED_PROP_KEY = TLS_PROP_KEY + "required";
 	protected static final boolean TLS_REQUIRED_PROP_VAL = false;
 
-	// protected static final String TLS_KEYS_STORE_PROP_KEY = TLS_PROP_KEY +
-	// JKS_KEYSTORE_FILE_KEY;
-	// protected static final String TLS_KEYS_STORE_PROP_VAL =
-	// JKS_KEYSTORE_FILE_VAL;
-	// protected static final String TLS_DEF_CERT_PROP_KEY = TLS_PROP_KEY +
-	// DEFAULT_DOMAIN_CERT_KEY;
-	// protected static final String TLS_DEF_CERT_PROP_VAL =
-	// DEFAULT_DOMAIN_CERT_VAL;
-	// protected static final String TLS_KEYS_STORE_PASSWD_PROP_KEY = TLS_PROP_KEY
-	// + JKS_KEYSTORE_PWD_KEY;
-	// protected static final String TLS_KEYS_STORE_PASSWD_PROP_VAL =
-	// JKS_KEYSTORE_PWD_VAL;
-	// protected static final String TLS_TRUSTS_STORE_PASSWD_PROP_KEY =
-	// TLS_PROP_KEY
-	// + TRUSTSTORE_PWD_KEY;
-	// protected static final String TLS_TRUSTS_STORE_PASSWD_PROP_VAL =
-	// TRUSTSTORE_PWD_VAL;
-	// protected static final String TLS_TRUSTS_STORE_PROP_KEY = TLS_PROP_KEY +
-	// TRUSTSTORE_FILE_KEY;
-	// protected static final String TLS_TRUSTS_STORE_PROP_VAL =
-	// TRUSTSTORE_FILE_VAL;
-	// protected static final String TLS_CONTAINER_CLASS_PROP_KEY = TLS_PROP_KEY
-	// + SSL_CONTAINER_CLASS_KEY;
-	// protected static final String TLS_CONTAINER_CLASS_PROP_VAL =
-	// SSL_CONTAINER_CLASS_VAL;
-	// protected static final String TLS_SERVER_CERTS_DIR_PROP_KEY = TLS_PROP_KEY
-	// + SERVER_CERTS_DIR_KEY;
-	// protected static final String TLS_SERVER_CERTS_DIR_PROP_VAL =
-	// SERVER_CERTS_DIR_VAL;
-	// protected static final String TLS_TRUSTED_CERTS_DIR_PROP_KEY = TLS_PROP_KEY
-	// + TRUSTED_CERTS_DIR_KEY;
-	// protected static final String TLS_TRUSTED_CERTS_DIR_PROP_VAL =
-	// TRUSTED_CERTS_DIR_VAL;
-	// protected static final String TLS_ALLOW_SELF_SIGNED_CERTS_PROP_KEY =
-	// TLS_PROP_KEY
-	// + ALLOW_SELF_SIGNED_CERTS_KEY;
-	// protected static final String TLS_ALLOW_SELF_SIGNED_CERTS_PROP_VAL =
-	// ALLOW_SELF_SIGNED_CERTS_VAL;
-	// protected static final String TLS_ALLOW_INVALID_CERTS_PROP_KEY =
-	// TLS_PROP_KEY
-	// + ALLOW_INVALID_CERTS_KEY;
-	// protected static final String TLS_ALLOW_INVALID_CERTS_PROP_VAL =
-	// ALLOW_INVALID_CERTS_VAL;
 	protected static final String MAX_RECONNECTS_PROP_KEY = "max-reconnects";
 	protected static final String NET_BUFFER_PROP_KEY = "net-buffer";
 	protected static final int NET_BUFFER_ST_PROP_VAL = 2 * 1024;
@@ -153,17 +104,11 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 	public static final String PORT_LOCAL_HOST_PROP_KEY = "local-host";
 	private static ConnectionOpenThread connectThread = ConnectionOpenThread.getInstance();
 
-	// ~--- fields ---------------------------------------------------------------
-
-	// private static SocketThread readThread = SocketThread.getInstance();
-
 	/** Field description */
 	public String[] PORT_IFC_PROP_VAL = { "*" };
 	private long bytesReceived = 0;
 	private long bytesSent = 0;
 
-	// services.size() call is very slow due to the implementation details
-	// Therefore for often size retrieval this value is calculated separately.
 	private int services_size = 0;
 	private long socketOverflow = 0;
 	private Thread watchdog = null;
@@ -177,12 +122,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 			.synchronizedSet(new HashSet<ConnectionListenerImpl>());;
 	protected int net_buffer = NET_BUFFER_ST_PROP_VAL;
 	private IOServiceStatisticsGetter ioStatsGetter = new IOServiceStatisticsGetter();
-
-	// protected long startDelay = 5 * SECOND;
 	private boolean initializationCompleted = false;
 	protected long connectionDelay = 2 * SECOND;
-
-	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -202,13 +143,9 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 	 */
 	public abstract void reconnectionFailed(Map<String, Object> port_props);
 
-	// ~--- get methods ----------------------------------------------------------
-
 	protected abstract long getMaxInactiveTime();
 
 	protected abstract IO getXMPPIOServiceInstance();
-
-	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -219,8 +156,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 		super.everyMinute();
 		doForAllServices(ioStatsGetter);
 	}
-
-	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
@@ -239,27 +174,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 
 		props.put(TLS_USE_PROP_KEY, TLS_USE_PROP_VAL);
 
-		// props.put(TLS_DEF_CERT_PROP_KEY, TLS_DEF_CERT_PROP_VAL);
-		// props.put(TLS_KEYS_STORE_PROP_KEY, TLS_KEYS_STORE_PROP_VAL);
-		// props.put(TLS_KEYS_STORE_PASSWD_PROP_KEY,
-		// TLS_KEYS_STORE_PASSWD_PROP_VAL);
-		// props.put(TLS_TRUSTS_STORE_PROP_KEY, TLS_TRUSTS_STORE_PROP_VAL);
-		// props.put(TLS_TRUSTS_STORE_PASSWD_PROP_KEY,
-		// TLS_TRUSTS_STORE_PASSWD_PROP_VAL);
-		// props.put(TLS_SERVER_CERTS_DIR_PROP_KEY, TLS_SERVER_CERTS_DIR_PROP_VAL);
-		// props.put(TLS_TRUSTED_CERTS_DIR_PROP_KEY,
-		// TLS_TRUSTED_CERTS_DIR_PROP_VAL);
-		// props.put(TLS_ALLOW_SELF_SIGNED_CERTS_PROP_KEY,
-		// TLS_ALLOW_SELF_SIGNED_CERTS_PROP_VAL);
-		// props.put(TLS_ALLOW_INVALID_CERTS_PROP_KEY,
-		// TLS_ALLOW_INVALID_CERTS_PROP_VAL);
-		//
-		// if (params.get("--" + SSL_CONTAINER_CLASS_KEY) != null) {
-		// props.put(TLS_CONTAINER_CLASS_PROP_KEY, (String) params.get("--" +
-		// SSL_CONTAINER_CLASS_KEY));
-		// } else {
-		// props.put(TLS_CONTAINER_CLASS_PROP_KEY, TLS_CONTAINER_CLASS_PROP_VAL);
-		// }
 		int buffSize = NET_BUFFER_ST_PROP_VAL;
 
 		if (isHighThroughput()) {
@@ -374,18 +288,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 		list.add(getName(), "Watchdog tests", watchdogTests, Level.FINE);
 		list.add(getName(), "Watchdog stopped", watchdogStopped, Level.FINE);
 
-		// StringBuilder sb = new StringBuilder("All connected: ");
-		// for (IOService serv: services.values()) {
-		// sb.append("\nService ID: " + getUniqueId(serv)
-		// + ", local-hostname: " + serv.getSessionData().get("local-hostname")
-		// + ", remote-hostname: " + serv.getSessionData().get("remote-hostname")
-		// + ", is-connected: " + serv.isConnected()
-		// + ", connection-type: " + serv.connectionType());
-		// }
-		// log.finest(sb.toString());
 	}
-
-	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * This method can be overwritten in extending classes to get a different
@@ -436,23 +339,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 
 		waitingTasks.clear();
 	}
-
-	// Implementation of tigase.net.PacketListener
-	// /**
-	// * Describe <code>packetsReady</code> method here.
-	// *
-	// * @param s an <code>IOService</code> value
-	// * @throws IOException
-	// */
-	// @SuppressWarnings({"unchecked"})
-	// @Override
-	// public void packetsReady(IOService s) throws IOException {
-	// if (log.isLoggable(Level.FINEST)) {
-	// log.finest("packetsReady called");
-	// }
-	// IO serv = (IO)s;
-	// packetsReady(serv);
-	// }
 
 	/**
 	 * Method description
@@ -545,13 +431,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 		// }
 	}
 
-	// @SuppressWarnings({"unchecked"})
-	// @Override
-	// public void serviceStopped(IOService s) {
-	// IO ios = (IO)s;
-	// serviceStopped(ios);
-	// }
-
 	/**
 	 * 
 	 * @param service
@@ -602,8 +481,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 		// }
 	}
 
-	// ~--- set methods ----------------------------------------------------------
-
 	/**
 	 * Method description
 	 * 
@@ -653,45 +530,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 				// reconnectService(port_props, startDelay);
 			} // end of for (int i = 0; i < ports.length; i++)
 		} // end of if (ports != null)
-
-		if ((Boolean) props.get(TLS_USE_PROP_KEY)) {
-			Map<String, String> tls_params = new LinkedHashMap<String, String>(20);
-
-			// tls_params.put(SSL_CONTAINER_CLASS_KEY, (String)
-			// props.get(TLS_CONTAINER_CLASS_PROP_KEY));
-			// tls_params.put(DEFAULT_DOMAIN_CERT_KEY, (String)
-			// props.get(TLS_DEF_CERT_PROP_KEY));
-			// tls_params.put(JKS_KEYSTORE_FILE_KEY, (String)
-			// props.get(TLS_KEYS_STORE_PROP_KEY));
-			// tls_params.put(JKS_KEYSTORE_PWD_KEY, (String)
-			// props.get(TLS_KEYS_STORE_PASSWD_PROP_KEY));
-			// tls_params.put(TRUSTSTORE_FILE_KEY, (String)
-			// props.get(TLS_TRUSTS_STORE_PROP_KEY));
-			// tls_params.put(TRUSTSTORE_PWD_KEY, (String)
-			// props.get(TLS_TRUSTS_STORE_PASSWD_PROP_KEY));
-			// tls_params.put(SERVER_CERTS_DIR_KEY, (String)
-			// props.get(TLS_SERVER_CERTS_DIR_PROP_KEY));
-			// tls_params.put(TRUSTED_CERTS_DIR_KEY, (String)
-			// props.get(TLS_TRUSTED_CERTS_DIR_PROP_KEY));
-			// tls_params.put(ALLOW_SELF_SIGNED_CERTS_KEY,
-			// (String) props.get(TLS_ALLOW_SELF_SIGNED_CERTS_PROP_KEY));
-			// tls_params.put(ALLOW_INVALID_CERTS_KEY, (String)
-			// props.get(TLS_ALLOW_INVALID_CERTS_PROP_KEY));
-			// TLSUtil.configureSSLContext(getName(), tls_params);
-		} // end of if (use.equalsIgnoreCase())
-	}
-
-	// ~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 * 
-	 */
-	@Override
-	public void start() {
-		super.start();
-
-		// delayedTasks = new Timer(getName() + " - delayed connections", true);
 	}
 
 	/**
@@ -804,46 +642,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 		}
 	}
 
-	// @SuppressWarnings({"unchecked"})
-	// @Override
-	// public void streamClosed(IO s) {
-	// IO serv = (IO)s;
-	// xmppStreamClosed(serv);
-	// }
-	//
-	// public abstract void xmppStreamClosed(IO serv);
-	//
-	// /**
-	// * The method is called upon XMPP stream open event.
-	// * @param s is an XMPPIOService object associated with the newly opened
-	// network
-	// * connection.
-	// * @param attribs is a Map with all attributes found in the XMPP Stream open
-	// element.
-	// * @return A String of raw data which should be sent back to the network
-	// * connection.
-	// */
-	// @SuppressWarnings({"unchecked"})
-	// @Override
-	// public String streamOpened(IO s, Map<String, String> attribs) {
-	// IO serv = (IO)s;
-	// return xmppStreamOpened(serv, attribs);
-	// }
-	//
-	// /**
-	// * Method is called on the new XMPP Stream open event. This method is
-	// normally
-	// * called from streamOpen(...) method.
-	// * @param s is an IOService object associated with the network connection
-	// * where the XMPP Stream open event occured.
-	// * @param attribs is a Map with all attributes found in the XMPP Stream open
-	// element.
-	// * @return A String of raw data which should be sent back to the network
-	// * connection.
-	// */
-	// public abstract String xmppStreamOpened(IO s, Map<String, String> attribs);
-	//
-
 	/**
 	 * Returns number of active network connections (IOServices).
 	 * 
@@ -866,8 +664,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 			checker.check(service);
 		}
 	}
-
-	// ~--- get methods ----------------------------------------------------------
 
 	protected int[] getDefPlainPorts() {
 		return null;
@@ -905,8 +701,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 		return false;
 	}
 
-	// ~--- methods --------------------------------------------------------------
-
 	/**
 	 * 
 	 * @param p
@@ -934,7 +728,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 
 	protected void writeRawData(IO ios, String data) {
 
-		// synchronized (ios) {
 		try {
 			ios.writeRawData(data);
 			SocketThread.addSocketService(ios);
@@ -948,7 +741,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 			} // end of try-catch
 		}
 
-		// }
 	}
 
 	private void putDefPortParams(Map<String, Object> props, int port, SocketType sock) {
@@ -1020,18 +812,12 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 		connectThread.addConnectionOpenListener(cli);
 	}
 
-	// ~--- inner classes --------------------------------------------------------
-
 	private class ConnectionListenerImpl implements ConnectionOpenListener {
 		private Map<String, Object> port_props = null;
-
-		// ~--- constructors -------------------------------------------------------
 
 		private ConnectionListenerImpl(Map<String, Object> port_props) {
 			this.port_props = port_props;
 		}
-
-		// ~--- methods ------------------------------------------------------------
 
 		/**
 		 * Method description
@@ -1050,7 +836,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 
 			IO serv = getXMPPIOServiceInstance();
 
-			// serv.setSSLId(getName());
 			serv.setIOServiceListener(ConnectionManager.this);
 			serv.setSessionData(port_props);
 
@@ -1103,8 +888,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 				serv.stop();
 			} // end of try-catch
 		}
-
-		// ~--- get methods --------------------------------------------------------
 
 		/**
 		 * Method description
@@ -1184,8 +967,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 			}
 		}
 
-		// ~--- methods ------------------------------------------------------------
-
 		/**
 		 * Method description
 		 * 
@@ -1200,8 +981,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 
 	private class IOServiceStatisticsGetter implements ServiceChecker<IO> {
 		private StatisticsList list = new StatisticsList(Level.ALL);
-
-		// ~--- methods ------------------------------------------------------------
 
 		/**
 		 * Method description
@@ -1246,8 +1025,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 						@Override
 						public void check(final XMPPIOService service) {
 
-							// for (IO service: services.values()) {
-							// service = (XMPPIOService)serv;
 							try {
 								if (null != service) {
 									long curr_time = System.currentTimeMillis();
@@ -1255,7 +1032,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 
 									if (curr_time - lastTransfer >= getMaxInactiveTime()) {
 
-										// Stop the service is max keep-alive time is acceeded
+										// Stop the service is max keep-alive time is exceeded
 										// for non-active connections.
 										if (log.isLoggable(Level.INFO)) {
 											log.log(Level.INFO,
@@ -1290,7 +1067,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 								}
 							}
 
-							// }
 						}
 					});
 				} catch (InterruptedException e) { /* Do nothing here */
@@ -1299,7 +1075,3 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 		}
 	}
 } // ConnectionManager
-
-// ~ Formatted in Sun Code Convention
-
-// ~ Formatted by Jindent --- http://www.jindent.com

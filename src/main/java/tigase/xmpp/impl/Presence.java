@@ -27,7 +27,6 @@ package tigase.xmpp.impl;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 
-import tigase.server.Iq;
 import tigase.server.Packet;
 
 import tigase.sys.TigaseRuntime;
@@ -37,7 +36,6 @@ import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
 
 import tigase.xmpp.Authorization;
-import tigase.xmpp.ConnectionStatus;
 import tigase.xmpp.JID;
 import tigase.xmpp.NoConnectionIdException;
 import tigase.xmpp.NotAuthorizedException;
@@ -445,8 +443,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 				// We also do not send presence updates to any remote connections on
 				// different cluster nodes. Each node takes care of delivering presence
 				// locally
-				if ((conn != session) && conn.isResourceSet()
-						&& conn.getConnectionStatus() != ConnectionStatus.REMOTE) {
+				if ((conn != session) && conn.isResourceSet()) {
 
 					// Send to old resource presence about new resource
 					Element pres_update = presence.clone();
@@ -573,8 +570,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 			Queue<Packet> results) throws NotAuthorizedException {
 
 		// Preventing sending offline notifications more than once
-		if (session.getSessionData(OFFLINE_RES_SENT) != null
-				|| session.getConnectionStatus() == ConnectionStatus.REMOTE) {
+		if (session.getSessionData(OFFLINE_RES_SENT) != null) {
 			return;
 		}
 

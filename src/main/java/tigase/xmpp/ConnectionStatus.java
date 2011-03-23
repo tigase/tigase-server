@@ -38,6 +38,7 @@ package tigase.xmpp;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Deprecated
 public enum ConnectionStatus {
 
 	INIT, ON_HOLD, REDIRECT, NORMAL,

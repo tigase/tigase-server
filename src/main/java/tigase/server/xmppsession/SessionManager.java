@@ -22,8 +22,6 @@
 
 package tigase.server.xmppsession;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.auth.TigaseSaslProvider;
 
 import tigase.conf.Configurable;
@@ -46,7 +44,6 @@ import tigase.server.Permissions;
 import tigase.server.ReceiverTimeoutHandler;
 import tigase.server.XMPPServer;
 
-//import tigase.auth.TigaseConfiguration;
 import tigase.server.script.CommandIfc;
 
 import tigase.stats.StatisticsList;
@@ -65,7 +62,6 @@ import tigase.xml.Element;
 
 import tigase.xmpp.Authorization;
 import tigase.xmpp.BareJID;
-import tigase.xmpp.ConnectionStatus;
 import tigase.xmpp.JID;
 import tigase.xmpp.NoConnectionIdException;
 import tigase.xmpp.NotAuthorizedException;
@@ -84,8 +80,6 @@ import tigase.xmpp.XMPPSession;
 import tigase.xmpp.XMPPStopListenerIfc;
 
 import static tigase.server.xmppsession.SessionManagerConfig.*;
-
-//~--- JDK imports ------------------------------------------------------------
 
 import java.security.Security;
 
@@ -108,8 +102,6 @@ import java.util.logging.Logger;
 
 import javax.script.Bindings;
 
-//~--- classes ----------------------------------------------------------------
-
 /**
  * Class SessionManager
  * 
@@ -122,7 +114,6 @@ import javax.script.Bindings;
 public class SessionManager extends AbstractMessageReceiver implements Configurable,
 		SessionManagerHandler, OnlineJidsReporter {
 
-	// protected static final String SESSION_PACKETS = "session-packets";
 	protected static final String ADMIN_COMMAND_NODE = "http://jabber.org/protocol/admin";
 
 	/**
@@ -130,23 +121,15 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 	 */
 	private static final Logger log = Logger.getLogger(SessionManager.class.getName());
 
-	// ~--- fields ---------------------------------------------------------------
-
 	private long authTimeouts = 0;
 	private AuthRepository auth_repository = null;
 	private long closedConnections = 0;
 	private DefaultHandlerProc defHandlerProc = null;
 	private PacketDefaultHandler defPacketHandler = null;
 
-	// private long reaperInterval = 60 * 1000;
 	private String defPluginsThreadsPool = "default-threads-pool";
-	private long maxIdleTime = 86400 * 1000;
-	private int maxPluginsNo = 0;
 	private int maxUserConnections = 0;
 
-	// private Set<String> anonymous_domains = new HashSet<String>();
-	// private XMPPResourceConnection serverSession = null;
-	// private ServiceEntity adminDisco = null;
 	private int maxUserSessions = 0;
 	private NonAuthUserRepository naUserRepository = null;
 	private SessionCloseProc sessionCloseProc = null;
@@ -156,10 +139,8 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 	private long totalUserSessions = 0;
 	private UserRepository user_repository = null;
 
-	// {"admin@localhost"};
 	private Set<String> trusted = new ConcurrentSkipListSet<String>();
 
-	// {"admin@localhost"};
 	private Map<String, XMPPStopListenerIfc> stopListeners =
 			new ConcurrentHashMap<String, XMPPStopListenerIfc>(10);
 	private boolean skipPrivacy = false;
@@ -191,8 +172,6 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 	private ConnectionCheckCommandHandler connectionCheckCommandHandler =
 			new ConnectionCheckCommandHandler();
 
-	// ~--- methods --------------------------------------------------------------
-
 	/**
 	 * Method description
 	 * 
@@ -205,8 +184,6 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 	public boolean containsJid(BareJID jid) {
 		return sessionsByNodeId.containsKey(jid);
 	}
-
-	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
@@ -370,16 +347,6 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 		return null;
 	}
 
-	// @Override
-	// public List<Element> getDiscoItems(String node, String jid) {
-	// List<Element> result = serviceEntity.getDiscoItems(node, jid);
-	// if (log.isLoggable(Level.FINEST)) {
-	// log.finest("Found disco items: " +
-	// (result != null ? result.toString() : null));
-	// }
-	// return result;
-	// }
-
 	/**
 	 * Method description
 	 * 
@@ -418,29 +385,7 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 								+ ", Lost: " + proc.getDroppedPackets(), Level.INFO);
 			}
 		}
-
-		// if (list.checkLevel(Level.INFO,
-		// sessionCloseProc.getTotalQueueSize() +
-		// sessionCloseProc.getDroppedPackets())) {
-		// list.add(getName(), "Processor: " + sessionCloseProc.getName(),
-		// "Queue: " + sessionCloseProc.getTotalQueueSize() + ", AvTime: "
-		// + sessionCloseProc.getAverageProcessingTime() + ", Runs: "
-		// + sessionCloseProc.getTotalRuns() + ", Lost: "
-		// + sessionCloseProc.getDroppedPackets(), Level.INFO);
-		// }
-		//
-		// if (list.checkLevel(Level.INFO,
-		// sessionOpenProc.getTotalQueueSize() +
-		// sessionOpenProc.getDroppedPackets())) {
-		// list.add(getName(), "Processor: " + sessionOpenProc.getName(),
-		// "Queue: " + sessionOpenProc.getTotalQueueSize() + ", AvTime: "
-		// + sessionOpenProc.getAverageProcessingTime() + ", Runs: "
-		// + sessionOpenProc.getTotalRuns() + ", Lost: "
-		// + sessionOpenProc.getDroppedPackets(), Level.INFO);
-		// }
 	}
-
-	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -458,9 +403,6 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 		registerNewSession(userId, conn);
 
-		if (conn.getConnectionStatus() != ConnectionStatus.REMOTE) {
-			conn.setConnectionStatus(ConnectionStatus.NORMAL);
-		}
 	}
 
 	/**
@@ -518,13 +460,6 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 		return true;
 	}
 
-	// ~--- get methods ----------------------------------------------------------
-
-	// @Override
-	// public Set<String> getOnlineJids() {
-	// return sessionsByNodeId.keySet();
-	// }
-
 	/**
 	 * Method description
 	 * 
@@ -535,8 +470,6 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 	public boolean hasCompleteJidsInfo() {
 		return true;
 	}
-
-	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -552,8 +485,6 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 		binds.put(CommandIfc.USER_REPO, user_repository);
 		binds.put(CommandIfc.USER_SESS, sessionsByNodeId);
 	}
-
-	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
@@ -572,8 +503,6 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 			return isLocalDomain(domain);
 		}
 	}
-
-	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -613,8 +542,6 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 	public int processingThreads() {
 		return Runtime.getRuntime().availableProcessors() * 8;
 	}
-
-	// ~--- set methods ----------------------------------------------------------
 
 	/**
 	 * Method description
@@ -710,15 +637,6 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 			} // end of try-catch
 		}
 
-		// try {
-		// // Add component ID to database if it is not there yet.
-		// auth_repository.addUser(getComponentId(),
-		// UUID.randomUUID().toString());
-		// } catch (UserExistsException e) {
-		// // Just ignore....
-		// } catch (TigaseDBException ex) {
-		// log.log(Level.WARNING, "Problem accessing auth repository: ", ex);
-		// }
 		naUserRepository =
 				new NonAuthUserRepositoryImpl(user_repository, getDefHostName(),
 						Boolean.parseBoolean((String) props.get(AUTO_CREATE_OFFLINE_USER_PROP_KEY)));
@@ -782,30 +700,7 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 			log.log(Level.CONFIG, "Loaded plugins list: {0}", Arrays.toString(plugins));
 
-			// sessionOpenProc = new SessionOpenProc();
-			//
-			// XMPPProcessorIfc proc = sessionOpenProc;
-			// ProcessorWorkerThread worker = new ProcessorWorkerThread();
-			// ProcessingThreads<ProcessorWorkerThread> pt =
-			// new ProcessingThreads<ProcessorWorkerThread>(worker,
-			// proc.concurrentQueuesNo(),
-			// maxQueueSize, proc.id());
-			//
-			// workerThreads.put(proc.id(), pt);
-			// log.log(Level.CONFIG, "Added processor: {0} for plugin id: {1}",
-			// new Object[] { proc.getClass().getSimpleName(),
-			// proc.id() });
-			// sessionCloseProc = new SessionCloseProc();
-			// proc = sessionCloseProc;
-			// worker = new ProcessorWorkerThread();
-			// pt = new ProcessingThreads<ProcessorWorkerThread>(worker,
-			// proc.concurrentQueuesNo(),
-			// maxQueueSize, proc.id());
-			// workerThreads.put(proc.id(), pt);
-			// log.log(Level.CONFIG, "Added processor: {0} for plugin id: {1}",
-			// new Object[] { proc.getClass().getSimpleName(),
-			// proc.id() });
-			maxPluginsNo = plugins.length;
+			// maxPluginsNo = plugins.length;
 			processors.clear();
 
 			for (String plug_id : plugins) {
@@ -848,8 +743,6 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 		}
 	}
 
-	// ~--- methods --------------------------------------------------------------
-
 	/**
 	 * Method description
 	 * 
@@ -860,32 +753,6 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 		return skipPrivacy;
 	}
 
-	@Override
-	protected boolean addOutPacket(Packet packet) {
-
-		// String oldto = packet.getAttribute(Packet.OLDTO);
-		//
-		// if (oldto != null) {
-		// packet.getElement().setAttribute("from", oldto);
-		// packet.getElement().removeAttribute(Packet.OLDTO);
-		// }
-		//
-		// String oldfrom = packet.getAttribute(Packet.OLDFROM);
-		//
-		// if (oldfrom != null) {
-		// packet.getElement().setAttribute("to", oldfrom);
-		// packet.getElement().removeAttribute(Packet.OLDFROM);
-		// }
-		// TODO: make the code below working correctly.
-		// Code below would be nice to have but it causes unexpected
-		// effects, the problem is that it needs much more testing
-		// on border cases.
-		// if (packet.getPacketFrom() == null) {
-		// packet.setPacketFrom(getComponentId());
-		// }
-		return super.addOutPacket(packet);
-	}
-
 	protected void addOutPackets(Packet packet, XMPPResourceConnection conn,
 			Queue<Packet> results) {
 		for (XMPPPacketFilterIfc outfilter : outFilters.values()) {
@@ -894,9 +761,6 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 		Packet p;
 
-		// while ((p = results.poll()) != null) {
-		// addOutPacket(p);
-		// }
 		addOutPackets(results);
 	}
 
@@ -904,38 +768,6 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 		return trusted.add(jid.getBareJID().toString());
 	}
 
-	// @SuppressWarnings("unchecked")
-	// protected void sendAllOnHold(XMPPResourceConnection conn) {
-	// String remote_smId = (String)conn.getSessionData("redirect-to");
-	// ArrayDeque<Packet> packets =
-	// (ArrayDeque<Packet>)conn.getSessionData(SESSION_PACKETS);
-	// if (remote_smId == null) {
-	// if (log.isLoggable(Level.FINEST)) {
-	// log.finest("No address for remote SM to redirect packets, processing locally.");
-	// }
-	// if (packets != null) {
-	// Packet sess_pack = null;
-	// while (((sess_pack = packets.poll()) != null) &&
-	// // Temporarily fix, need a better solution. For some reason
-	// // the mode has been sent back from normal to on_hold during
-	// // loop execution leading to infinite loop.
-	// // Possibly buggy client sent a second authentication packet
-	// // executing a second handleLogin call....
-	// (conn.getConnectionStatus() != ConnectionStatus.ON_HOLD)) {
-	// processPacket(sess_pack);
-	// }
-	// }
-	// return;
-	// }
-	// conn.setConnectionStatus(ConnectionStatus.REDIRECT);
-	// if (packets != null) {
-	// Packet sess_pack = null;
-	// while ((sess_pack = packets.poll()) != null) {
-	// sess_pack.setTo(remote_smId);
-	// fastAddOutPacket(sess_pack);
-	// }
-	// }
-	// }
 	protected void closeConnection(JID connectionId, boolean closeOnly) {
 		if (log.isLoggable(Level.FINER)) {
 			log.log(Level.FINER, "Stream closed from: {0}", connectionId);
@@ -959,25 +791,11 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 				stopProc.stopped(conn, results, plugin_config.get(stopProc.id()));
 			} // end of for ()
 
-			// // TESTING ONLY, to be removed
-			// try {
-			// String nick = conn.getUserName();
-			// String nick_num = nick.substring("load-tester_".length());
-			// int num = Integer.parseInt(nick_num);
-			// if (num < 11) {
-			// log.warning("Disconnected: " + nick +
-			// ", connId: " + conn.getConnectionId() +
-			// ", sending: " + results.toString());
-			// }
-			// } catch (Exception e) {
-			// log.log(Level.WARNING, "some problem: " + conn.getConnectionId(), e);
-			// }
-			// // TESTING ONLY, to be removed
 			addOutPackets(null, conn, results);
 		}
 
 		try {
-			if (conn.isAuthorized() || (conn.getConnectionStatus() == ConnectionStatus.TEMP)) {
+			if (conn.isAuthorized()) {
 				JID userJid = conn.getJID();
 
 				if (log.isLoggable(Level.FINE)) {
@@ -1004,16 +822,13 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 							}
 						} // end of else
 
-						if (conn.getConnectionStatus() == ConnectionStatus.NORMAL) {
-							auth_repository.logout(userJid.getBareJID());
-						}
+						auth_repository.logout(userJid.getBareJID());
 					} else {
 						if (log.isLoggable(Level.FINER)) {
 							StringBuilder sb = new StringBuilder(100);
 
 							for (XMPPResourceConnection res_con : session.getActiveResources()) {
 								sb.append(", res=").append(res_con.getResource());
-								sb.append(" (").append(res_con.getConnectionStatus()).append(")");
 							}
 
 							log.log(
@@ -1067,7 +882,6 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 			log.log(Level.FINEST, "Domain set for connectionId {0}", conn_id);
 		}
 
-		// connection.setAnonymousPeers(anon_peers);
 		connectionsByFrom.put(conn_id, connection);
 
 		int currSize = connectionsByFrom.size();
@@ -1086,14 +900,8 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 	}
 
 	protected boolean fastAddOutPacket(Packet packet) {
-
-		// if (packet.getPacketFrom() == null) {
-		// packet.setPacketFrom(getComponentId());
-		// }
 		return super.addOutPacket(packet);
 	}
-
-	// ~--- get methods ----------------------------------------------------------
 
 	@Override
 	protected Integer getMaxQueueSize(int def) {
@@ -1116,7 +924,7 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 			conn = connectionsByFrom.get(from);
 
 			if (conn != null) {
-				return (conn.getConnectionStatus() == ConnectionStatus.TEMP) ? null : conn;
+				return conn;
 			}
 		}
 
@@ -1131,7 +939,7 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 			conn = getResourceConnection(to);
 
-			if ((conn != null) && (conn.getConnectionStatus() == ConnectionStatus.TEMP)) {
+			if (conn != null) {
 				conn = null;
 			}
 		} else {
@@ -1209,14 +1017,11 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 		return false;
 	}
 
-	// ~--- methods --------------------------------------------------------------
-
 	protected XMPPResourceConnection loginUserSession(JID conn_id, String domain,
-			BareJID user_id, String resource, ConnectionStatus conn_st, String xmpp_sessionId) {
+			BareJID user_id, String resource, String xmpp_sessionId) {
 		try {
 			XMPPResourceConnection conn = createUserSession(conn_id, domain);
 
-			conn.setConnectionStatus(conn_st);
 			conn.setSessionId(xmpp_sessionId);
 			user_repository.setData(user_id, "tokens", xmpp_sessionId, conn_id.toString());
 
@@ -1225,7 +1030,6 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 			if (auth == Authorization.AUTHORIZED) {
 				handleLogin(user_id, conn);
 
-				// registerNewSession(JIDUtils.getNodeID(user_id), conn);
 				if (resource != null) {
 					conn.setResource(resource);
 				}
@@ -1270,28 +1074,12 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 					log.log(Level.FINER, "Packet for hostname, should be handled elsewhere: {0}",
 							packet);
 				}
-
-				// Packet host_pac = packet.copyElementOnly();
-				//
-				// // No need for the line below, initVars takes care of that
-				// // host_pac.getElement().setAttribute("to",
-				// getComponentId().toString());
-				// host_pac.getElement().setAttribute(Packet.OLDTO,
-				// packet.getStanzaTo().toString());
-				// host_pac.getElement().setAttribute(Packet.OLDFROM,
-				// packet.getStanzaFrom().toString());
-				// host_pac.initVars(packet.getStanzaFrom(), getComponentId());
-				// processPacket(host_pac);
 			}
 		} // end of if (isInRoutings(to))
 
 		return false;
 	}
 
-	// private boolean isAnonymousEnabled(String domain) {
-	// return vHostManager != null ? vHostManager.isAnonymousEnabled(domain) :
-	// false;
-	// }
 	protected boolean processCommand(Packet pc) {
 		if (!(pc.getStanzaTo() == null) && !getComponentId().equals(pc.getStanzaTo())
 				&& !isLocalDomain(pc.getStanzaTo().toString())) {
@@ -1306,7 +1094,6 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 					iqc.getCommand().toString(), iqc.getFrom() });
 		}
 
-		// Element command = pc.getElement();
 		XMPPResourceConnection connection = connectionsByFrom.get(iqc.getFrom());
 
 		switch (iqc.getCommand()) {
@@ -1462,8 +1249,7 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 								connection =
 										loginUserSession(iqc.getStanzaFrom(), user_jid.getDomain(),
-												user_jid.getBareJID(), user_jid.getResource(),
-												ConnectionStatus.NORMAL, "USER_STATUS");
+												user_jid.getBareJID(), user_jid.getResource(), "USER_STATUS");
 								connection.putSessionData("jingle", "active");
 								fastAddOutPacket(iqc.okResult((String) null, 0));
 

@@ -22,11 +22,7 @@
 
 package tigase.xmpp;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.util.TigaseStringprepException;
-
-//~--- JDK imports ------------------------------------------------------------
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -37,8 +33,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Describe class XMPPSession here.
@@ -54,9 +48,7 @@ public class XMPPSession {
 	/**
 	 * Private logger for class instances.
 	 */
-	private static Logger log = Logger.getLogger("tigase.xmpp.XMPPSession");
-
-	//~--- fields ---------------------------------------------------------------
+	private static Logger log = Logger.getLogger(XMPPSession.class.getName());
 
 	private CopyOnWriteArrayList<XMPPResourceConnection> activeResources = null;
 	private long creationTime = 0;
@@ -66,8 +58,6 @@ public class XMPPSession {
 	 * User name - part of user's JID
 	 */
 	private String username = null;
-
-	//~--- constructors ---------------------------------------------------------
 
 	/**
 	 * Creates a new <code>XMPPSession</code> instance.
@@ -81,28 +71,6 @@ public class XMPPSession {
 		this.username = username;
 		this.creationTime = System.currentTimeMillis();
 	}
-
-	//~--- methods --------------------------------------------------------------
-
-//public void resourceSet(XMPPResourceConnection conn) {
-//  //activeResources.remove(conn);
-//  String cur_res = conn.getResource();
-//  XMPPResourceConnection old_conn = getResourceForResource(cur_res);
-//  if (old_conn != conn) {
-//    if (old_conn != null) {
-//      log.finest("Found old resource connection for username : " + username +
-//              ", id: " + old_conn.getConnectionId());
-//      try {
-//        old_conn.logout();
-//      } catch (Exception e) {
-//        log.log(Level.INFO,
-//                "Exception during closing old connection, ignoring.", e);
-//      }
-//      removeResourceConnection(old_conn);
-//    } // end of if (old_res != null)
-//    activeResources.add(conn);
-//  }
-//}
 
 	/**
 	 * This method is called each time the resource is set for connection.
@@ -183,8 +151,6 @@ public class XMPPSession {
 			}      // end of if (activeResources.size() > 1)
 		}
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
@@ -290,26 +256,6 @@ public class XMPPSession {
 		log.info("XMPPSession with no connections for user: " + username);
 
 		return null;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param status
-	 *
-	 * @return
-	 */
-	public int getResSizeForConnStatus(ConnectionStatus status) {
-		int result = 0;
-
-		for (XMPPResourceConnection conn : activeResources) {
-			if (conn.getConnectionStatus() == status) {
-				++result;
-			}
-		}
-
-		return result;
 	}
 
 	/**
@@ -471,8 +417,6 @@ public class XMPPSession {
 		return username;
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	/**
 	 * Method description
 	 *
@@ -502,9 +446,3 @@ public class XMPPSession {
 		return sessionData.remove(key);
 	}
 }    // XMPPSession
-
-
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
