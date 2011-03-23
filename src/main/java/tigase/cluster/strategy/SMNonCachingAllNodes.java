@@ -22,8 +22,6 @@
 
 package tigase.cluster.strategy;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.server.Packet;
 import tigase.server.xmppsession.SessionManagerHandler;
 
@@ -33,16 +31,13 @@ import tigase.xml.Element;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: May 13, 2009 9:53:44 AM
@@ -58,11 +53,8 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 	private static final Logger log = Logger
 			.getLogger(SMNonCachingAllNodes.class.getName());
 
-	// private Set<String> cluster_nodes = new ConcurrentSkipListSet<String>();
 	private CopyOnWriteArrayList<JID> cl_nodes_list = new CopyOnWriteArrayList<JID>();
 	private SessionManagerHandler sm = null;
-
-	// private String smName = null;
 
 	public void setSessionManagerHandler(SessionManagerHandler sm) {
 		this.sm = sm;
@@ -80,8 +72,6 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 	public boolean containsJid(BareJID jid) {
 		return false;
 	}
-
-	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
@@ -130,17 +120,6 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 	 */
 	@Override
 	public List<JID> getNodesForJid(JID jid) {
-
-		// The code below, actually causes problems if there is a high traffic and
-		// disconnects/reconnects occur between nodes. There is a race condition
-		// problem.
-		// Adding a synchronization might be a solution but also a big performance
-		// problem.
-		// Most of small systems have 2 cluster nodes anyway, so the code below is
-		// useless.
-		// For bigger installation I recommend a different clustering strategy
-		// anyway.
-		// Collections.rotate(cl_nodes_list, 1);
 		return getAllNodes();
 	}
 
@@ -165,8 +144,6 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 	public boolean hasCompleteJidsInfo() {
 		return false;
 	}
-
-	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -207,8 +184,6 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 				result });
 	}
 
-	// ~--- set methods ----------------------------------------------------------
-
 	/**
 	 * Method description
 	 * 
@@ -218,8 +193,6 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 	@Override
 	public void setProperties(Map<String, Object> props) {
 	}
-
-	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -275,6 +248,11 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 				|| sm.getComponentId().equals((packet.getStanzaFrom().getBareJID()))) {
 			return null;
 		}
+		// If the packet is to some external domain, it is not forwarded to other
+		// nodes either. It is also not forwarded if it is addressed to some component.
+		if (!sm.isLocalDomain(packet.getStanzaTo().getDomain(), false)) {
+			return null;
+		}
 		return getAllNodes();
 	}
 
@@ -285,7 +263,6 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 	 */
 	@Override
 	public List<JID> getNodesForUserConnect(JID jid) {
-		// TODO Auto-generated method stub
 		return getAllNodes();
 	}
 
@@ -297,33 +274,53 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 	 */
 	@Override
 	public List<JID> getNodesForUserDisconnect(JID jid) {
-		// TODO Auto-generated method stub
 		return getAllNodes();
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * tigase.cluster.strategy.ClusteringStrategyIfc#selectNextNode(tigase.xml
-	 * .Element, java.util.List)
+	 * @see tigase.cluster.strategy.ClusteringStrategyIfc#getInternalCache()
 	 */
 	@Override
-	public JID selectNextNode(Element packet, List<JID> visitedNodes) {
-		JID result = null;
-		// if (visitedNodes == null) {
-		// if (cl_nodes_list.size() > 0) {
-		// result = cl_nodes_list.get(0);
-		// }
-		// } else {
-		// for (JID jid : cl_nodes_list) {
-		// if (!visitedNodes.contains(jid)) {
-		// result = jid;
-		// break;
-		// }
-		// }
-		// }
-		return result;
+	@Deprecated
+	public Object getInternalCacheData() {
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * tigase.cluster.strategy.ClusteringStrategyIfc#getConnectionRecords(tigase
+	 * .xmpp.BareJID)
+	 */
+	@Override
+	public Set<ConnectionRecord> getConnectionRecords(BareJID bareJID) {
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * tigase.cluster.strategy.ClusteringStrategyIfc#getConnectionRecord(tigase
+	 * .xmpp.JID)
+	 */
+	@Override
+	public ConnectionRecord getConnectionRecord(JID jid) {
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * tigase.cluster.strategy.ClusteringStrategyIfc#presenceUpdate(tigase.server
+	 * .Packet, tigase.cluster.strategy.ConnectionRecord)
+	 */
+	@Override
+	public void presenceUpdate(Element presence, ConnectionRecord rec) {
 	}
 
 }

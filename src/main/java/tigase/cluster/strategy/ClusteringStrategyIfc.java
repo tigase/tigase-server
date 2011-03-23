@@ -27,11 +27,13 @@ import tigase.server.xmppsession.SessionManagerHandler;
 import tigase.stats.StatisticsList;
 import tigase.sys.OnlineJidsReporter;
 import tigase.xml.Element;
+import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 
 /**
  * Created: May 2, 2009 4:36:03 PM
@@ -41,16 +43,63 @@ import java.util.Queue;
  */
 public interface ClusteringStrategyIfc extends OnlineJidsReporter {
 
+	/**
+	 * <strong>Note! This is not for a common use method.</strong> This is for
+	 * debugging and diagnostic purposes only and maybe removed or changed at any
+	 * time in the future. It returns a content of an internal cache from the
+	 * strategy. Regardless of the cache data organization inside the strategy, it
+	 * is returned here in a common format. It may be a copy or a direct reference
+	 * to internal data. Therefore this is unmodifiable instance of the cache.
+	 * Generating results of this structure may be a costly operation, therefore
+	 * it must not be called frequently.
+	 * 
+	 * @return an Object with content of an internal cache data.
+	 */
+	@Deprecated
+	Object getInternalCacheData();
+
+	/**
+	 * Returns a set with all ConnectionRecords found in the cache for a given
+	 * user ID, that is BareJID. In other words all user's resources/connectionIDs
+	 * found in the cache associated with user's account.
+	 * 
+	 * @param bareJID
+	 *          is an instance of the user's BareJID, that is account ID.
+	 * @return a Set instance with all ConnectionRecords found for a given
+	 *         BareJID. Note, the result may be null or it maybe an empty Set or
+	 *         non-empty set.
+	 */
+	Set<ConnectionRecord> getConnectionRecords(BareJID bareJID);
+
+	/**
+	 * Returns a ConnectionRecord object associated with this user's full JID if
+	 * it exists in the cache or null if it does not. All parts of the user's JID
+	 * are checked and ConnectionRecord is returned only if there is a match for
+	 * all parts.
+	 * 
+	 * @param jid
+	 *          is an instance of the user's full JID.
+	 * @return ConnectionRecord instance associated with given user's JID or null
+	 *         if there is no ConnectionRecord in the cache.
+	 */
+	ConnectionRecord getConnectionRecord(JID jid);
+
+	/**
+	 * The method allows to obtain SessionManagerHandler object by the strategy.
+	 * The object is mainly used to access local VHosts configuration and check
+	 * the ID of the local session manager.
+	 * 
+	 * @param sm
+	 *          is an instance of the SessionManagerHandler class.
+	 */
 	void setSessionManagerHandler(SessionManagerHandler sm);
-	
+
 	/**
 	 * The method returns all cluster nodes currently connected to the cluster.
 	 * 
 	 * @return List of all cluster nodes currently connected to the cluster.
 	 */
 	List<JID> getAllNodes();
-
-	// void init(String smName);
 
 	/**
 	 * This method is used for configuration purpose. Following the convention
@@ -80,31 +129,13 @@ public interface ClusteringStrategyIfc extends OnlineJidsReporter {
 	 * 'know' where is the user connected at any given time.
 	 * 
 	 * In theory it can also return <code>'null'</code> it it 'knows' the user is
-	 * offline.
+	 * off-line.
 	 * 
 	 * @param jid
 	 *          is a user full JID.
 	 * @return List of cluster nodes to which the user can be connected.
 	 */
 	List<JID> getNodesForJid(JID jid);
-
-	// /**
-	// * If <code>needsSync()</code> returns <code>'true'</code> this method can
-	// be
-	// * called at any time. It normally would update online users in batches of
-	// 100
-	// * users for each node and the synchronization can take any time.
-	// *
-	// * If the list contains a String <code>'COMPLETED'</code> it means that
-	// synchronization
-	// * which the given node has been completed. No more syncOnline methods for
-	// this
-	// * node should be called after that unless the node re-connects.
-	// * @param jids is a list of user full JIDs which are connected to a given
-	// node.
-	// * @param node is a cluster node id which holds all the given user JIDs.
-	// */
-	// void syncOnline(List<String> jids, String node);
 
 	/**
 	 * Add the strategy statistics to the List.
@@ -190,8 +221,8 @@ public interface ClusteringStrategyIfc extends OnlineJidsReporter {
 
 	/**
 	 * The method allows the strategy implementation to control to which cluster
-	 * nodes forward the given packet. It may offer a different algorithm for message
-	 * broadcasting and different for presences, for example.
+	 * nodes forward the given packet. It may offer a different algorithm for
+	 * message broadcasting and different for presences, for example.
 	 * 
 	 * @param packet
 	 *          a packet which is supposed to be sent to other node.
@@ -200,10 +231,23 @@ public interface ClusteringStrategyIfc extends OnlineJidsReporter {
 	List<JID> getNodesForPacketForward(Packet packet);
 
 	/**
+	 * The method is called on user's presence update received from a remote
+	 * cluster node. The clustering strategy may choose to cache the presence
+	 * locally if necessary.
+	 * 
+	 * @param presence
+	 *          Packet received from a remote cluster node.
+	 * @param rec
+	 *          is an instance of the user's ConnectionRecord.
+	 */
+	void presenceUpdate(Element presence, ConnectionRecord rec);
+
+	/**
 	 * The method allows the strategy implementation to control to which cluster
 	 * nodes send the notification about user's new connection event.
 	 * 
-	 * @return a list of cluster nodes JIDs to which the notification should be sent.
+	 * @return a list of cluster nodes JIDs to which the notification should be
+	 *         sent.
 	 */
 	List<JID> getNodesForUserConnect(JID jid);
 
@@ -211,17 +255,9 @@ public interface ClusteringStrategyIfc extends OnlineJidsReporter {
 	 * The method allows the strategy implementation to control to which cluster
 	 * nodes send the notification about user's disconnection event.
 	 * 
-	 * @return a list of cluster nodes JIDs to which the notification should be sent.
+	 * @return a list of cluster nodes JIDs to which the notification should be
+	 *         sent.
 	 */
 	List<JID> getNodesForUserDisconnect(JID jid);
-	
-	/**
-	 * Method selects next node for the packet to be sent based on the packet information
-	 * and a list of already visited/tried nodes.
-	 * 
-	 * @param packet
-	 * @param visitedNodes
-	 * @return
-	 */
-	JID selectNextNode(Element packet, List<JID> visitedNodes);
+
 }
