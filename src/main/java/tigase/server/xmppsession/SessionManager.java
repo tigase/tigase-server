@@ -939,9 +939,6 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 			conn = getResourceConnection(to);
 
-			if (conn != null) {
-				conn = null;
-			}
 		} else {
 
 			// Hm, not sure what should I do now....
