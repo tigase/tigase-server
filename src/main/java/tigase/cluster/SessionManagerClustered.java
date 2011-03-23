@@ -795,6 +795,11 @@ public class SessionManagerClustered extends SessionManager implements
 			strategy.presenceUpdate(elem, rec);
 			// Update all user's resources with the new presence
 			if (session != null) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST,
+							"User's {0} XMPPSession found: {1}",
+							new Object[] { rec.getUserJid().getBareJID(), session });
+				}
 				for (XMPPResourceConnection conn : session.getActiveResources()) {
 					Element conn_presence = conn.getPresence();
 					if (conn.isAuthorized() && conn.isResourceSet() && conn_presence != null) {
