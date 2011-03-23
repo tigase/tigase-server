@@ -445,4 +445,14 @@ public class XMPPSession {
 	protected Object removeCommonSessionData(String key) {
 		return sessionData.remove(key);
 	}
+	
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("XMPPSession=[");
+		sb.append("username: ").append(username);
+		sb.append(", resources: ").append(activeResources.toString());
+		sb.append("]");
+		return sb.toString();
+	}
+	
 }    // XMPPSession
