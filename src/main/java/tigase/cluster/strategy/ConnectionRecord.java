@@ -34,14 +34,14 @@ public class ConnectionRecord implements Comparable<ConnectionRecord> {
 	private static final String TOP_ELEMENT = "conn-rec";
 	private static final String NODE_ELEMENT = "node-jid";
 	private static final String JID_ELEMENT = "user-jid";
-	private static final String SESSION_ID_ELEMENT = "session-id";
 	private static final String CONNECTION_ID_ELEMENT = "connection-id";
+	private static final String SESSION_ID_ELEMENT = "session-id";
 	private static final String PRESENCE_ELEMENT = "presence";
 
 	private JID node;
 	private JID userJid;
-	private String sessionId;
 	private JID connectionId;
+	private String sessionId;
 	private Element lastPresence;
 
 	/**
@@ -54,17 +54,17 @@ public class ConnectionRecord implements Comparable<ConnectionRecord> {
 		super();
 		this.node = node;
 		this.userJid = userJid;
-		this.sessionId = sessionId;
 		this.connectionId = connectionId;
+		this.sessionId = sessionId;
 	}
 
 	public ConnectionRecord(Element elem) {
 		super();
 		this.node = JID.jidInstanceNS(elem.getChild(NODE_ELEMENT).getCData());
 		this.userJid = JID.jidInstanceNS(elem.getChild(JID_ELEMENT).getCData());
-		this.sessionId = elem.getChild(SESSION_ID_ELEMENT).getCData();
 		this.connectionId =
-				JID.jidInstanceNS(elem.getChild(CONNECTION_ID_ELEMENT).getCData());
+			JID.jidInstanceNS(elem.getChild(CONNECTION_ID_ELEMENT).getCData());
+		this.sessionId = elem.getChild(SESSION_ID_ELEMENT).getCData();
 		this.lastPresence = elem.getChild(PRESENCE_ELEMENT);
 	}
 
@@ -72,8 +72,8 @@ public class ConnectionRecord implements Comparable<ConnectionRecord> {
 		Element result = new Element(TOP_ELEMENT);
 		result.addChild(new Element(NODE_ELEMENT, node.toString()));
 		result.addChild(new Element(JID_ELEMENT, userJid.toString()));
-		result.addChild(new Element(SESSION_ID_ELEMENT, sessionId));
 		result.addChild(new Element(CONNECTION_ID_ELEMENT, connectionId.toString()));
+		result.addChild(new Element(SESSION_ID_ELEMENT, sessionId));
 		if (lastPresence != null) {
 			result.addChild(lastPresence);
 		}
@@ -125,10 +125,13 @@ public class ConnectionRecord implements Comparable<ConnectionRecord> {
 
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
+		sb.append("ConnectionRecord=[");
 		sb.append("node: ").append(node);
 		sb.append(", userJid: ").append(userJid);
 		sb.append(", connectionId: ").append(connectionId);
-
+		sb.append(", sessionId: ").append(sessionId);
+		sb.append(", lastPresence: ").append(lastPresence);
+		sb.append("]");
 		return sb.toString();
 	}
 
