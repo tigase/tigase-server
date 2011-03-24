@@ -305,7 +305,8 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 
 		if (params.get(GEN_USER_DB) != null) {
 			user_repo_class = (String) params.get(GEN_USER_DB);
-			auth_repo_class = (String) params.get(GEN_USER_DB);
+			//auth_repo_class = (String) params.get(GEN_USER_DB);
+			auth_repo_class = TIGASE_CUSTOM_AUTH_REPO_CLASS_PROP_VAL;
 		}
 
 		if (params.get(GEN_USER_DB_URI) != null) {
