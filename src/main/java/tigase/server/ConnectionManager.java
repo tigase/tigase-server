@@ -371,7 +371,12 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 	 * @return
 	 */
 	@Override
-	public int processingThreads() {
+	public int processingInThreads() {
+		return Runtime.getRuntime().availableProcessors() * 4;
+	}
+
+	@Override
+	public int processingOutThreads() {
 		return Runtime.getRuntime().availableProcessors() * 4;
 	}
 

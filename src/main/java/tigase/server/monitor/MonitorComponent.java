@@ -126,11 +126,14 @@ public class MonitorComponent extends AbstractMessageReceiver {
 	 * @return
 	 */
 	@Override
-	public int processingThreads() {
+	public int processingInThreads() {
 		return Runtime.getRuntime().availableProcessors();
 	}
 
-	//~--- set methods ----------------------------------------------------------
+	@Override
+	public int processingOutThreads() {
+		return Runtime.getRuntime().availableProcessors();
+	}
 
 	/**
 	 * Method description

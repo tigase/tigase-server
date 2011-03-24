@@ -274,11 +274,20 @@ public class TestComponent extends AbstractMessageReceiver {
 	 * @return
 	 */
 	@Override
-	public int processingThreads() {
+	public int processingInThreads() {
 		return Runtime.getRuntime().availableProcessors();
 	}
 
-	//~--- set methods ----------------------------------------------------------
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public int processingOutThreads() {
+		return Runtime.getRuntime().availableProcessors();
+	}
 
 	/**
 	 * Method description
@@ -306,9 +315,3 @@ public class TestComponent extends AbstractMessageReceiver {
 				"spam-filtering", true, "tigase:x:spam-filter", "tigase:x:spam-reporting");
 	}
 }
-
-
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

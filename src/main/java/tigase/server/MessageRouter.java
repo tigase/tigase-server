@@ -543,8 +543,19 @@ public class MessageRouter extends AbstractMessageReceiver implements MessageRou
 	 * @return
 	 */
 	@Override
-	public int processingThreads() {
+	public int processingInThreads() {
 		return Runtime.getRuntime().availableProcessors() * 4;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public int processingOutThreads() {
+		return 1;
 	}
 
 	//~--- set methods ----------------------------------------------------------

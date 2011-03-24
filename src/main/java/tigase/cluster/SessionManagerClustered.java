@@ -498,8 +498,20 @@ public class SessionManagerClustered extends SessionManager implements
 	 * @return preferable number of threads set for this component.
 	 */
 	@Override
-	public int processingThreads() {
-		return Math.max(nodesNo, super.processingThreads());
+	public int processingInThreads() {
+		return Math.max(nodesNo, super.processingInThreads());
+	}
+
+	/**
+	 * Concurrency control method. Returns preferable number of threads set for
+	 * this component.
+	 * 
+	 * 
+	 * @return preferable number of threads set for this component.
+	 */
+	@Override
+	public int processingOutThreads() {
+		return Math.max(nodesNo, super.processingOutThreads());
 	}
 
 	/**

@@ -125,7 +125,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 						+ DNSResolver.getDefaultHostname());
 			}
 		}
-		
+
 		String acks = (String) params.get(XMPP_STANZA_ACK);
 		if (acks != null) {
 			String[] acks_arr = acks.split(",");
@@ -175,7 +175,12 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	 */
 	@Override
 	public int hashCodeForPacket(Packet packet) {
-		return packet.getTo().hashCode();
+		if (packet.getPacketFrom() != null
+				&& getComponentId().getBareJID().equals(packet.getPacketFrom().getBareJID())) {
+			return packet.getPacketFrom().hashCode();
+		} else {
+			return packet.getTo().hashCode();
+		}
 	}
 
 	/**
@@ -365,8 +370,8 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
 
-		white_char_ack = (Boolean)props.get(WHITE_CHAR_ACK_PROP_KEY);
-		xmpp_ack = (Boolean)props.get(XMPP_ACK_PROP_KEY);
+		white_char_ack = (Boolean) props.get(WHITE_CHAR_ACK_PROP_KEY);
+		xmpp_ack = (Boolean) props.get(XMPP_ACK_PROP_KEY);
 
 		boolean routing_mode =
 				(Boolean) props.get(ROUTINGS_PROP_KEY + "/" + ROUTING_MODE_PROP_KEY);

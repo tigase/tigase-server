@@ -539,7 +539,12 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 	 * @return
 	 */
 	@Override
-	public int processingThreads() {
+	public int processingInThreads() {
+		return Runtime.getRuntime().availableProcessors() * 8;
+	}
+
+	@Override
+	public int processingOutThreads() {
 		return Runtime.getRuntime().availableProcessors() * 8;
 	}
 
@@ -690,7 +695,7 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 				ProcessorWorkerThread worker = new ProcessorWorkerThread();
 				ProcessingThreads<ProcessorWorkerThread> pt =
 						new ProcessingThreads<ProcessorWorkerThread>(worker, def_pool_size,
-								maxQueueSize, defPluginsThreadsPool);
+								maxInQueueSize, defPluginsThreadsPool);
 
 				workerThreads.put(defPluginsThreadsPool, pt);
 				log.log(Level.CONFIG, "Created a default thread pool: {0}", def_pool_size);
@@ -1586,11 +1591,11 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 				ProcessorWorkerThread worker = new ProcessorWorkerThread();
 				ProcessingThreads<ProcessorWorkerThread> pt =
 						new ProcessingThreads<ProcessorWorkerThread>(worker, concurrency,
-								maxQueueSize, proc.id());
+								maxInQueueSize, proc.id());
 
 				workerThreads.put(proc.id(), pt);
 				log.log(Level.CONFIG, "Created thread pool: {0}, queue: {1} for plugin id: {2}",
-						new Object[] { concurrency, maxQueueSize, proc.id() });
+						new Object[] { concurrency, maxInQueueSize, proc.id() });
 			}
 
 			processors.put(proc.id(), proc);
