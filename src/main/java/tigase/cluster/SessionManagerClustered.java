@@ -107,7 +107,7 @@ public class SessionManagerClustered extends SessionManager implements
 	public static final String STRATEGY_CLASS_PROPERTY = "--sm-cluster-strategy-class";
 
 	/** Field description */
-	public static final String STRATEGY_CLASS_PROP_KEY = "cluster-strategy-class";
+	public static final String STRATEGY_CLASS_PROP_KEY = "sm-cluster-strategy-class";
 
 	/** Field description */
 	public static final String STRATEGY_CLASS_PROP_VAL =
