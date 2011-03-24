@@ -176,8 +176,8 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 	private int per_node_conns = CLUSTER_CONNECTIONS_PER_NODE_VAL;
 	private long servConnectedTimeouts = 0;
 	private long totalNodeDisconnects = 0;
-	private long packetsSent = 0;
-	private long packetsReceived = 0;
+	// private long packetsSent = 0;
+	// private long packetsReceived = 0;
 	private CommandListener sendPacket = new SendPacket();
 
 	/**
@@ -276,10 +276,12 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 		list.add(getName(), "Average decompression ratio",
 				ioStatsGetter.getAverageDecompressionRatio(), Level.FINE);
 		list.add(getName(), "Waiting to send", ioStatsGetter.getWaitingToSend(), Level.FINE);
-		list.add(getName(), StatisticType.MSG_RECEIVED_OK.getDescription(), packetsReceived,
-				Level.FINE);
-		list.add(getName(), StatisticType.MSG_SENT_OK.getDescription(), packetsSent,
-				Level.FINE);
+		// list.add(getName(), StatisticType.MSG_RECEIVED_OK.getDescription(),
+		// packetsReceived,
+		// Level.FINE);
+		// list.add(getName(), StatisticType.MSG_SENT_OK.getDescription(),
+		// packetsSent,
+		// Level.FINE);
 	}
 
 	/**
@@ -297,10 +299,15 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 		// If this is a cluster packet let's try to do a bit more smart hashing
 		// based on the stanza from/to addresses
 		if (packet.getElemName() == ClusterElement.CLUSTER_EL_NAME) {
-			List<Element> children = packet.getElemChildren(ClusterElement.CLUSTER_DATA_PATH);
+			// TODO: Look for a simpler, more efficient algorithm to distribute
+			// cluster packets among different threads.
+			// This looks like an overkill to me, however I don't see any better way
+			ClusterElement clel = new ClusterElement(packet.getElement());
+			Queue<Element> children = clel.getDataPackets();
 
 			if ((children != null) && (children.size() > 0)) {
-				String stanzaAdd = children.get(0).getAttribute("to");
+				Element child = children.peek();
+				String stanzaAdd = child.getAttribute("to");
 
 				if (stanzaAdd != null) {
 					return stanzaAdd.hashCode();
@@ -308,7 +315,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 
 					// This might be user's initial presence. In such a case we take
 					// stanzaFrom instead
-					stanzaAdd = children.get(0).getAttribute("from");
+					stanzaAdd = child.getAttribute("from");
 
 					if (stanzaAdd != null) {
 						return stanzaAdd.hashCode();
@@ -316,6 +323,12 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 						log.log(Level.WARNING, "No stanzaTo or from for cluster packet: {0}", packet);
 					}
 				}
+			}
+			// If there is no XMPP stanzas with an address inside the cluster packet,
+			// we can try Map data and User ID inside it if it exists.
+			String userId = clel.getMethodParam("userId");
+			if (userId != null) {
+				return userId.hashCode();
 			}
 		}
 
@@ -412,7 +425,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 			if (p.getElemName().equals("handshake")) {
 				processHandshake(p, serv);
 			} else {
-				++packetsReceived;
+				// ++packetsReceived;
 				Packet result = p;
 
 				if (p.isRouted()) {
@@ -429,15 +442,24 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 					}
 				} // end of if (p.isRouted())
 
-				if (result.getElemName() == ClusterElement.CLUSTER_EL_NAME) {
-					clusterController.handleClusterPacket(result.getElement());
-				} else {
-					addOutPacket(result);
-				}
+				addOutPacket(result);
 			}
 		} // end of while ()
 
 		return null;
+	}
+
+	@Override
+	public void processOutPacket(Packet packet) {
+		if (packet.getElemName() == ClusterElement.CLUSTER_EL_NAME) {
+			clusterController.handleClusterPacket(packet.getElement());
+		} else {
+			// This should, actually, not happen. Let's log it here
+			if (log.isLoggable(Level.INFO)) {
+				log.log(Level.INFO, "Unexpected packet on cluster connection: {0}", packet);
+			}
+			super.processOutPacket(packet);
+		}
 	}
 
 	/**
@@ -445,10 +467,20 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 	 * @return
 	 */
 	@Override
-	@TODO(
-			note = "The number of threads should be equal or greater to number of cluster nodes.")
-	public
-			int processingThreads() {
+	public int processingInThreads() {
+		// TODO: The number of threads should be equal or greater to number of
+		// cluster nodes.
+
+		// This should work well as far as nodesNo is initialized before this
+		// method is called which is true only during program startup time.
+		// In case of reconfiguration or new node joining this might not be
+		// the case. Low priority issue though.
+		return Math.max(Runtime.getRuntime().availableProcessors(), nodesNo) * 8;
+	}
+
+	public int processingOutThreads() {
+		// TODO: The number of threads should be equal or greater to number of
+		// cluster nodes.
 
 		// This should work well as far as nodesNo is initialized before this
 		// method is called which is true only during program startup time.
@@ -825,7 +857,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 
 	@Override
 	protected boolean writePacketToSocket(Packet p) {
-		++packetsSent;
+		// ++packetsSent;
 		String ip = p.getTo().getDomain();
 
 		try {
@@ -1030,7 +1062,8 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 			}
 			for (Element element : packets) {
 				try {
-					writePacketToSocket(Packet.packetInstance(element));
+					addPacketNB(Packet.packetInstance(element));
+					// writePacketToSocket();
 				} catch (TigaseStringprepException ex) {
 					log.log(Level.WARNING, "Stringprep exception for packet: {0}", element);
 				}
