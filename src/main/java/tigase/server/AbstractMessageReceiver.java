@@ -244,8 +244,8 @@ public abstract class AbstractMessageReceiver extends BasicComponent implements
 	 * cases this method should not be overridden.
 	 * 
 	 * @param packet
-	 *          is an output packet which normally has to go to other component for
-	 *          further processing.
+	 *          is an output packet which normally has to go to other component
+	 *          for further processing.
 	 */
 	public void processOutPacket(Packet packet) {
 		if (parent != null) {
@@ -325,7 +325,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent implements
 	 * <code>Packet</code> to in the internal input queue without blocking.
 	 * <p/>
 	 * The method returns a <code>boolean</code> value of <code>true</code> if the
-	 * packet has been successfuly added to the queue and <code>false</code>
+	 * packet has been successful added to the queue and <code>false</code>
 	 * otherwise.
 	 * <p/>
 	 * Use of the non-blocking methods is not recommended for most of the
@@ -451,7 +451,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent implements
 	 *        The routings are passed as Java regular expression strings are the
 	 *        extra addresses accepted by the component. In most cases this is
 	 *        used by the external component protocol implementations which can
-	 *        dinamically change accepted addresses depending on the connected
+	 *        dynamically change accepted addresses depending on the connected
 	 *        external components.
 	 * 
 	 * @param address
@@ -487,7 +487,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent implements
 	 * <p/>
 	 * Note, no extensive calculations should happen in this method nor long
 	 * lasting operations. It is essential that the method processing does not
-	 * exceed 1 hour. The overiding method must call the the super method first
+	 * exceed 1 hour. The overriding method must call the the super method first
 	 * and only then run own code.
 	 */
 	public synchronized void everyHour() {
@@ -501,7 +501,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent implements
 	 * <p/>
 	 * Note, no extensive calculations should happen in this method nor long
 	 * lasting operations. It is essential that the method processing does not
-	 * exceed 1 minute. The overiding method must call the the super method first
+	 * exceed 1 minute. The overriding method must call the the super method first
 	 * and only then run own code.
 	 */
 	public synchronized void everyMinute() {
@@ -516,7 +516,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent implements
 	 * <p/>
 	 * Note, no extensive calculations should happen in this method nor long
 	 * lasting operations. It is essential that the method processing does not
-	 * exceed 1 second. The overiding method must call the the super method first
+	 * exceed 1 second. The overriding method must call the the super method first
 	 * and only then run own code.
 	 */
 	public synchronized void everySecond() {
@@ -718,50 +718,22 @@ public abstract class AbstractMessageReceiver extends BasicComponent implements
 	 */
 	public int hashCodeForPacket(Packet packet) {
 
-		// // Cluster packets make things harder, they all have one source address
-		// and
-		// // one destination address. We have to handle them differently or they
-		// all
-		// // are processed by a single thread which is not good
-		// if (packet.getElemName() == "cluster") {
-		// List<Element> children = packet.getElemChildren("/cluster/data");
-		//
-		// if ((children != null) && (children.size() > 0)) {
-		// String stanzaAdd = children.get(0).getAttribute("to");
-		//
-		// if (stanzaAdd != null) {
-		// return stanzaAdd.hashCode();
-		// } else {
-		//
-		// // This might be user's initial presence. In such a case we take
-		// // stanzaFrom instead
-		// stanzaAdd = children.get(0).getAttribute("from");
-		//
-		// if (stanzaAdd != null) {
-		// return stanzaAdd.hashCode();
-		// } else {
-		// log.log(Level.WARNING, "No stanzaTo or from for cluster packet: {0}",
-		// packet);
-		// }
-		// }
-		// }
-		// }
-
-		if ((packet.getFrom() != null) && (packet.getFrom() != packet.getStanzaFrom())) {
+		if ((packet.getPacketFrom() != null)
+				&& !getComponentId().equals(packet.getPacketFrom())) {
 
 			// This comes from connection manager so the best way is to get hashcode
 			// by the connectionId, which is in the getFrom()
-			return packet.getFrom().hashCode();
+			return packet.getPacketFrom().hashCode();
+		}
+
+		if (packet.getPacketTo() != null && !getComponentId().equals(packet.getPacketTo())) {
+			return packet.getPacketTo().hashCode();
 		}
 
 		// If not, then a better way is to get hashCode from the elemTo address
 		// as this would be by the destination address user name:
 		if (packet.getStanzaTo() != null) {
 			return packet.getStanzaTo().getBareJID().hashCode();
-		}
-
-		if (packet.getTo() != null) {
-			return packet.getTo().hashCode();
 		}
 
 		return 1;

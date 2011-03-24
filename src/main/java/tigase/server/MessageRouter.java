@@ -767,6 +767,32 @@ public class MessageRouter extends AbstractMessageReceiver implements MessageRou
 
 		return null;
 	}
+	
+	@Override
+	public int hashCodeForPacket(Packet packet) {
+
+		if (packet.getStanzaTo() != null) {
+			return packet.getStanzaTo().getBareJID().hashCode();
+		}
+
+		if ((packet.getPacketFrom() != null)
+				&& !getComponentId().equals(packet.getPacketFrom())) {
+
+			// This comes from connection manager so the best way is to get hashcode
+			// by the connectionId, which is in the getFrom()
+			return packet.getPacketFrom().hashCode();
+		}
+
+		if (packet.getPacketTo() != null && !getComponentId().equals(packet.getPacketTo())) {
+			return packet.getPacketTo().hashCode();
+		}
+
+		// If not, then a better way is to get hashCode from the elemTo address
+		// as this would be by the destination address user name:
+		return 1;
+	}
+
+
 
 	private ServerComponent[] getServerComponentsForRegex(String id) {
 		LinkedHashSet<ServerComponent> comps = new LinkedHashSet<ServerComponent>();

@@ -303,6 +303,13 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 			// cluster packets among different threads.
 			// This looks like an overkill to me, however I don't see any better way
 			ClusterElement clel = new ClusterElement(packet.getElement());
+			// If there is no XMPP stanzas with an address inside the cluster packet,
+			// we can try Map data and User ID inside it if it exists.
+			String userId = clel.getMethodParam("userId");
+			if (userId != null) {
+				return userId.hashCode();
+			}
+
 			Queue<Element> children = clel.getDataPackets();
 
 			if ((children != null) && (children.size() > 0)) {
@@ -323,12 +330,6 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 						log.log(Level.WARNING, "No stanzaTo or from for cluster packet: {0}", packet);
 					}
 				}
-			}
-			// If there is no XMPP stanzas with an address inside the cluster packet,
-			// we can try Map data and User ID inside it if it exists.
-			String userId = clel.getMethodParam("userId");
-			if (userId != null) {
-				return userId.hashCode();
 			}
 		}
 
