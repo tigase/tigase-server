@@ -86,7 +86,7 @@ public class SessionManagerClustered extends SessionManager implements
 	private static final String REQUEST_SYNCONLINE_CMD = "req-sync-online-sm-cmd";
 	private static final String RESPOND_SYNCONLINE_CMD = "resp-sync-online-sm-cmd";
 	private static final String AUTH_TIME = "auth-time";
-	
+
 	public static final String CLUSTER_STRATEGY_VAR = "clusterStrategy";
 
 	private static final String PRESENCE_ELEMENT_NAME = "presence";
@@ -234,6 +234,17 @@ public class SessionManagerClustered extends SessionManager implements
 		return props;
 	}
 
+	// private long calcAverage(long[] timings) {
+	// long res = 0;
+	//
+	// for (long ppt : timings) {
+	// res += ppt;
+	// }
+	//
+	// long processingTime = res / timings.length;
+	// return processingTime;
+	// }
+
 	/**
 	 * Method generates and returns component's statistics.
 	 * 
@@ -245,6 +256,17 @@ public class SessionManagerClustered extends SessionManager implements
 	public void getStatistics(StatisticsList list) {
 		super.getStatistics(list);
 		strategy.getStatistics(list);
+
+		// list.add(getName(), "Average commandTime on last " + commandTime.length
+		// + " runs [ms]", calcAverage(commandTime), Level.FINE);
+		// list.add(getName(), "Average clusterTime on last " + clusterTime.length
+		// + " runs [ms]", calcAverage(clusterTime), Level.FINE);
+		// list.add(getName(), "Average checkingTime on last " + checkingTime.length
+		// + " runs [ms]", calcAverage(checkingTime), Level.FINE);
+		// list.add(getName(), "Average smTime on last " + smTime.length +
+		// " runs [ms]",
+		// calcAverage(smTime), Level.FINE);
+
 	}
 
 	/**
@@ -413,6 +435,13 @@ public class SessionManagerClustered extends SessionManager implements
 		return params;
 	}
 
+	// private int tIdx = 0;
+	// private int maxIdx = 100;
+	// private long[] commandTime = new long[maxIdx];
+	// private long[] clusterTime = new long[maxIdx];
+	// private long[] checkingTime = new long[maxIdx];
+	// private long[] smTime = new long[maxIdx];
+
 	/**
 	 * This is a standard component method for processing packets. The method
 	 * takes care of cases where the packet cannot be processed locally, in such a
@@ -426,35 +455,50 @@ public class SessionManagerClustered extends SessionManager implements
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Received packet: {0}", packet);
 		}
+		// long startTime = System.currentTimeMillis();
+		// int idx = tIdx;
+		// tIdx = (tIdx + 1) % maxIdx;
+		// long cmdTm = 0;
+		// long clTm = 0;
+		// long chTm = 0;
+		// long smTm = 0;
 
 		if (packet.isCommand() && processCommand(packet)) {
 			packet.processedBy("SessionManager");
+			// cmdTm = System.currentTimeMillis() - startTime;
 
-			// No more processing is needed for command packet
-			return;
-		} // end of if (pc.isCommand())
+		} else {
 
-		List<JID> toNodes = strategy.getNodesForPacketForward(packet);
-		if (toNodes != null && toNodes.size() > 0) {
-			clusterController.sendToNodes(PACKET_FORWARD_CMD, packet.getElement(),
-					getComponentId(), null, toNodes.toArray(new JID[toNodes.size()]));
-		}
+			List<JID> toNodes = strategy.getNodesForPacketForward(packet);
+			if (toNodes != null && toNodes.size() > 0) {
+				clusterController.sendToNodes(PACKET_FORWARD_CMD, packet.getElement(),
+						getComponentId(), null, toNodes.toArray(new JID[toNodes.size()]));
+			}
+			// clTm = System.currentTimeMillis() - startTime;
 
-		XMPPResourceConnection conn = getXMPPResourceConnection(packet);
+			XMPPResourceConnection conn = getXMPPResourceConnection(packet);
 
-		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "Ressource connection found: {0}", conn);
-		}
-
-		if ((conn == null) && (isBrokenPacket(packet) || processAdminsOrDomains(packet))) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Ignoring/dropping packet: {0}", packet);
+				log.log(Level.FINEST, "Ressource connection found: {0}", conn);
 			}
 
-			return;
-		}
+			if ((conn == null) && (isBrokenPacket(packet) || processAdminsOrDomains(packet))) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "Ignoring/dropping packet: {0}", packet);
+				}
+				// chTm = System.currentTimeMillis() - startTime;
 
-		processPacket(packet, conn);
+			} else {
+
+				processPacket(packet, conn);
+				// smTm = System.currentTimeMillis() - startTime;
+
+			}
+		}
+		// commandTime[idx] = cmdTm;
+		// clusterTime[idx] = clTm;
+		// checkingTime[idx] = chTm;
+		// smTime[idx] = smTm;
 	}
 
 	// /**
@@ -808,9 +852,8 @@ public class SessionManagerClustered extends SessionManager implements
 			// Update all user's resources with the new presence
 			if (session != null) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST,
-							"User's {0} XMPPSession found: {1}",
-							new Object[] { rec.getUserJid().getBareJID(), session });
+					log.log(Level.FINEST, "User's {0} XMPPSession found: {1}", new Object[] {
+							rec.getUserJid().getBareJID(), session });
 				}
 				for (XMPPResourceConnection conn : session.getActiveResources()) {
 					Element conn_presence = conn.getPresence();

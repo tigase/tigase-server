@@ -95,6 +95,7 @@ import java.util.Set;
 import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -347,6 +348,17 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 		return null;
 	}
 
+	private long calcAverage(long[] timings) {
+		long res = 0;
+
+		for (long ppt : timings) {
+			res += ppt;
+		}
+
+		long processingTime = res / timings.length;
+		return processingTime;
+	}
+
 	/**
 	 * Method description
 	 * 
@@ -385,6 +397,30 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 								+ ", Lost: " + proc.getDroppedPackets(), Level.INFO);
 			}
 		}
+		// private long[] defPrepTime = new long[maxIdx];
+		// private long[] prepTime = new long[maxIdx];
+		// private long[] defForwTime = new long[maxIdx];
+		// private long[] walkTime = new long[maxIdx];
+		// private long[] postTime = new long[maxIdx];
+		// list.add(getName(), "Average defPrepTime on last " + defPrepTime.length
+		// + " runs [ms]", calcAverage(defPrepTime), Level.FINE);
+		// list.add(getName(), "Average prepTime on last " + prepTime.length +
+		// " runs [ms]",
+		// calcAverage(prepTime), Level.FINE);
+		// list.add(getName(), "Average defForwTime on last " + defForwTime.length
+		// + " runs [ms]", calcAverage(defForwTime), Level.FINE);
+		// list.add(getName(), "Average walkTime on last " + walkTime.length +
+		// " runs [ms]",
+		// calcAverage(walkTime), Level.FINE);
+		// list.add(getName(), "Average postTime on last " + postTime.length +
+		// " runs [ms]",
+		// calcAverage(postTime), Level.FINE);
+		for (Map.Entry<String, long[]> tmEntry : postTimes.entrySet()) {
+			list.add(getName(),
+					"Average " + tmEntry.getKey() + " on last " + tmEntry.getValue().length
+							+ " runs [ms]", calcAverage(tmEntry.getValue()), Level.FINE);
+		}
+
 	}
 
 	/**
@@ -1326,11 +1362,27 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 		return processing_result;
 	}
 
+	private int tIdx = 0;
+	private int maxIdx = 100;
+//	private long[] defPrepTime = new long[maxIdx];
+//	private long[] prepTime = new long[maxIdx];
+//	private long[] defForwTime = new long[maxIdx];
+//	private long[] walkTime = new long[maxIdx];
+//	private long[] postTime = new long[maxIdx];
+	private Map<String, long[]> postTimes = new ConcurrentSkipListMap<String, long[]>();
+
 	protected void processPacket(Packet packet, XMPPResourceConnection conn) {
+		long startTime = System.currentTimeMillis();
+		int idx = tIdx;
+		tIdx = (tIdx + 1) % maxIdx;
+//		long defPrepTm = 0;
+//		long prepTm = 0;
+//		long defForwTm = 0;
+//		long walkTm = 0;
+//		long postTm = 0;
 
 		// TODO: check if this is really necessary, seems to be even harmful in some
-		// cases
-		// like when the error is generated as a response to a bad packet.
+		// cases like when the error is generated as a response to a bad packet.
 		packet.setPacketTo(getComponentId());
 
 		if (log.isLoggable(Level.FINEST)) {
@@ -1360,6 +1412,7 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 				return;
 			}
 		}
+//		defPrepTm = System.currentTimeMillis() - startTime;
 
 		// Preprocess..., all preprocessors get all messages to look at.
 		// I am not sure if this is correct for now, let's try to do it this
@@ -1381,6 +1434,7 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 				}
 			} // end of for (XMPPPreprocessorIfc preproc: preProcessors)
 		}
+	//	prepTm = System.currentTimeMillis() - startTime;
 
 		if (!stop) {
 			if (defPacketHandler.forward(packet, conn, naUserRepository, results)) {
@@ -1395,17 +1449,31 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 				return;
 			}
 		}
+//		defForwTm = System.currentTimeMillis() - startTime;
 
 		if (!stop) {
 			walk(packet, conn, packet.getElement(), results);
 		}
+		//walkTm = System.currentTimeMillis() - startTime;
 
 		if (!stop) {
 			for (XMPPPostprocessorIfc postproc : postProcessors.values()) {
+				String plug_id = postproc.id();
+				long[] postProcTime = null;
+				synchronized (postTimes) {
+					postProcTime = postTimes.get(plug_id);
+					if (postProcTime == null) {
+						postProcTime = new long[maxIdx];
+						postTimes.put(plug_id, postProcTime);
+					}
+				}
+				long stTime = System.currentTimeMillis();
 				postproc.postProcess(packet, conn, naUserRepository, results,
 						plugin_config.get(postproc.id()));
+				postProcTime[idx] = System.currentTimeMillis() - stTime;
 			} // end of for (XMPPPostprocessorIfc postproc: postProcessors)
 		} // end of if (!stop)
+//		postTm = System.currentTimeMillis() - startTime;
 
 		if (!stop
 				&& !packet.wasProcessed()
@@ -1484,6 +1552,11 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 				}
 			}
 		} // end of else
+//		defPrepTime[idx] = defPrepTm;
+//		prepTime[idx] = prepTm;
+//		defForwTime[idx] = defForwTm;
+//		walkTime[idx] = walkTm;
+//		postTime[idx] = postTm;
 	}
 
 	protected void registerNewSession(BareJID userId, XMPPResourceConnection conn) {

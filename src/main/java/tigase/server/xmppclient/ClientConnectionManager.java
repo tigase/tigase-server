@@ -235,24 +235,35 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 				// offline presences
 				if ((packet.getType() != StanzaType.unavailable)
 						&& (packet.getPacketFrom() != null)) {
-					Packet command =
-							Command.STREAM_CLOSED_UPDATE.getPacket(packet.getStanzaTo(), null,
-									StanzaType.set, UUID.randomUUID().toString());
+					if (packet.getStanzaTo() != null) {
+						Packet command =
+								Command.STREAM_CLOSED_UPDATE.getPacket(packet.getStanzaTo(), null,
+										StanzaType.set, UUID.randomUUID().toString());
 
-					command.setPacketFrom(packet.getPacketTo());
-					command.setPacketTo(packet.getPacketFrom());
+						command.setPacketFrom(packet.getPacketTo());
+						command.setPacketTo(packet.getPacketFrom());
 
-					// Note! we don't want to receive response to this request,
-					// thus
-					// STREAM_CLOSED_UPDATE instead of STREAM_CLOSED
-					addOutPacket(command);
+						// Note! we don't want to receive response to this request,
+						// thus
+						// STREAM_CLOSED_UPDATE instead of STREAM_CLOSED
+						addOutPacket(command);
 
-					// addOutPacketWithTimeout(command, stoppedHandler, 15l,
-					// TimeUnit.SECONDS);
-					log.log(
-							Level.FINE,
-							"Sending a command to close the remote session for non-existen {0} connection: {1}",
-							new Object[] { getName(), command.toStringSecure() });
+						// addOutPacketWithTimeout(command, stoppedHandler, 15l,
+						// TimeUnit.SECONDS);
+						if (log.isLoggable(Level.FINE)) {
+							log.log(
+									Level.FINE,
+									"Sending a command to close the remote session for non-existen {0} connection: {1}",
+									new Object[] { getName(), command.toStringSecure() });
+						}
+					} else {
+						if (log.isLoggable(Level.WARNING)) {
+							log.log(
+									Level.FINE,
+									"Stream close update without an user JID, skipping for packet: {0}",
+									new Object[] { packet });
+						}
+					}
 				}
 			}
 		} // end of else
