@@ -1364,22 +1364,22 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 	private int tIdx = 0;
 	private int maxIdx = 100;
-//	private long[] defPrepTime = new long[maxIdx];
-//	private long[] prepTime = new long[maxIdx];
-//	private long[] defForwTime = new long[maxIdx];
-//	private long[] walkTime = new long[maxIdx];
-//	private long[] postTime = new long[maxIdx];
+	// private long[] defPrepTime = new long[maxIdx];
+	// private long[] prepTime = new long[maxIdx];
+	// private long[] defForwTime = new long[maxIdx];
+	// private long[] walkTime = new long[maxIdx];
+	// private long[] postTime = new long[maxIdx];
 	private Map<String, long[]> postTimes = new ConcurrentSkipListMap<String, long[]>();
 
 	protected void processPacket(Packet packet, XMPPResourceConnection conn) {
 		long startTime = System.currentTimeMillis();
 		int idx = tIdx;
 		tIdx = (tIdx + 1) % maxIdx;
-//		long defPrepTm = 0;
-//		long prepTm = 0;
-//		long defForwTm = 0;
-//		long walkTm = 0;
-//		long postTm = 0;
+		// long defPrepTm = 0;
+		// long prepTm = 0;
+		// long defForwTm = 0;
+		// long walkTm = 0;
+		// long postTm = 0;
 
 		// TODO: check if this is really necessary, seems to be even harmful in some
 		// cases like when the error is generated as a response to a bad packet.
@@ -1412,7 +1412,7 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 				return;
 			}
 		}
-//		defPrepTm = System.currentTimeMillis() - startTime;
+		// defPrepTm = System.currentTimeMillis() - startTime;
 
 		// Preprocess..., all preprocessors get all messages to look at.
 		// I am not sure if this is correct for now, let's try to do it this
@@ -1434,7 +1434,7 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 				}
 			} // end of for (XMPPPreprocessorIfc preproc: preProcessors)
 		}
-	//	prepTm = System.currentTimeMillis() - startTime;
+		// prepTm = System.currentTimeMillis() - startTime;
 
 		if (!stop) {
 			if (defPacketHandler.forward(packet, conn, naUserRepository, results)) {
@@ -1449,12 +1449,12 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 				return;
 			}
 		}
-//		defForwTm = System.currentTimeMillis() - startTime;
+		// defForwTm = System.currentTimeMillis() - startTime;
 
 		if (!stop) {
 			walk(packet, conn, packet.getElement(), results);
 		}
-		//walkTm = System.currentTimeMillis() - startTime;
+		// walkTm = System.currentTimeMillis() - startTime;
 
 		if (!stop) {
 			for (XMPPPostprocessorIfc postproc : postProcessors.values()) {
@@ -1473,7 +1473,7 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 				postProcTime[idx] = System.currentTimeMillis() - stTime;
 			} // end of for (XMPPPostprocessorIfc postproc: postProcessors)
 		} // end of if (!stop)
-//		postTm = System.currentTimeMillis() - startTime;
+		// postTm = System.currentTimeMillis() - startTime;
 
 		if (!stop
 				&& !packet.wasProcessed()
@@ -1552,11 +1552,11 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 				}
 			}
 		} // end of else
-//		defPrepTime[idx] = defPrepTm;
-//		prepTime[idx] = prepTm;
-//		defForwTime[idx] = defForwTm;
-//		walkTime[idx] = walkTm;
-//		postTime[idx] = postTm;
+		// defPrepTime[idx] = defPrepTm;
+		// prepTime[idx] = prepTm;
+		// defForwTime[idx] = defForwTm;
+		// walkTime[idx] = walkTm;
+		// postTime[idx] = postTm;
 	}
 
 	protected void registerNewSession(BareJID userId, XMPPResourceConnection conn) {
@@ -1725,8 +1725,6 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 		return result;
 	}
 
-	// ~--- get methods ----------------------------------------------------------
-
 	private List<Element> getFeatures(XMPPResourceConnection session) {
 		List<Element> results = new LinkedList<Element>();
 
@@ -1788,8 +1786,6 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 		return plugin_settings;
 	}
 
-	// ~--- set methods ----------------------------------------------------------
-
 	private void setPermissions(XMPPResourceConnection conn, Queue<Packet> results) {
 		Permissions perms = Permissions.NONE;
 
@@ -1823,8 +1819,6 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 			res.setPermissions(perms);
 		}
 	}
-
-	// ~--- methods --------------------------------------------------------------
 
 	private void walk(final Packet packet, final XMPPResourceConnection connection,
 			final Element elem, final Queue<Packet> results) {
@@ -1873,18 +1867,12 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 		} // end of if (children != null)
 	}
 
-	// ~--- inner classes --------------------------------------------------------
-
 	private class AuthenticationTimer extends TimerTask {
 		private JID connId = null;
-
-		// ~--- constructors -------------------------------------------------------
 
 		private AuthenticationTimer(JID connId) {
 			this.connId = connId;
 		}
-
-		// ~--- methods ------------------------------------------------------------
 
 		/**
 		 * Method description
