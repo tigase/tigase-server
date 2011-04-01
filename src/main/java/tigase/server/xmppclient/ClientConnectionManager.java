@@ -292,6 +292,13 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Processing socket data: {0}", p.toStringSecure());
 			}
+			
+			// Sometimes xmlns is not set for the packet. Usually it does not
+			// cause any problems but when the packet is sent over the s2s, ext
+			// or cluster connection it may be quite problematic.
+			// Let's force jabber:client xmlns for all packets received from c2s
+			// connection
+			p.getElement().setXMLNS(XMLNS);
 
 			p.setPacketFrom(getFromAddress(id));
 
@@ -303,6 +310,9 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 			} else {
 
 				// Hm, receiver is not set yet..., ignoring
+				if (log.isLoggable(Level.INFO)) {
+					log.log(Level.INFO, "Hm, receiver is not set yet (misconfiguration error)..., ignoring: {0}", p.toStringSecure());
+				}
 			}
 
 			sendAck(serv, p);
