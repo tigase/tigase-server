@@ -1119,8 +1119,8 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 	}
 
 	protected boolean processCommand(Packet pc) {
-		if (!(pc.getStanzaTo() == null) && !getComponentId().equals(pc.getStanzaTo())
-				&& !isLocalDomain(pc.getStanzaTo().toString())) {
+		if ((pc.getStanzaTo() == null) || !(getComponentId().equals(pc.getStanzaTo())
+				|| isLocalDomain(pc.getStanzaTo().toString()))) {
 			return false;
 		}
 
