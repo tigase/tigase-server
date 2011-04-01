@@ -122,14 +122,18 @@ public class JabberIqCommand extends XMPPProcessor implements XMPPProcessorIfc {
 				// No need for that, initVars(...) takes care of that
 				// packet.getElement().setAttribute("to", session.getSMComponentId().toString());
 				packet.initVars(packet.getStanzaFrom(), session.getSMComponentId());
-			} else {
-				if (packet.getStanzaTo().equals(session.getSMComponentId())) {
-					// This should be handled by SM, if it is not then drop it here.
-					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, "Dropping unhandled packet addressed to SM: {0}", packet);
-					}
-					return;
-				}
+				// TODO: Code below prevents from executing commands sent to vhost set to
+				// the same value as the machine hostname. Not sure why it was implemented
+				// that way. Maybe it caused internal, infinite loop in some cases.
+				// More testing is needed....
+//			} else {
+//				if (packet.getStanzaTo().equals(session.getSMComponentId())) {
+//					// This should be handled by SM, if it is not then drop it here.
+//					if (log.isLoggable(Level.FINEST)) {
+//						log.log(Level.FINEST, "Dropping unhandled packet addressed to SM: {0}", packet);
+//					}
+//					return;
+//				}
 			}
 
 			BareJID id = packet.getStanzaTo().getBareJID();
