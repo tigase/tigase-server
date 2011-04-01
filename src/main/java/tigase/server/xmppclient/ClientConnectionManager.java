@@ -258,8 +258,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 						}
 					} else {
 						if (log.isLoggable(Level.WARNING)) {
-							log.log(
-									Level.FINE,
+							log.log(Level.FINE,
 									"Stream close update without an user JID, skipping for packet: {0}",
 									new Object[] { packet });
 						}
@@ -292,13 +291,18 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Processing socket data: {0}", p.toStringSecure());
 			}
-			
+
 			// Sometimes xmlns is not set for the packet. Usually it does not
 			// cause any problems but when the packet is sent over the s2s, ext
 			// or cluster connection it may be quite problematic.
 			// Let's force jabber:client xmlns for all packets received from c2s
 			// connection
-			p.getElement().setXMLNS(XMLNS);
+			// Ups, some packets like starttls or sasl-auth have own XMLNS,
+			// overwriting it here is not really a good idea. We have to check first
+			// if the xmlns is not set and then force it to jabber:client
+			if (p.getAttribute("xmlns") == null) {
+				p.getElement().setXMLNS(XMLNS);
+			}
 
 			p.setPacketFrom(getFromAddress(id));
 
@@ -311,7 +315,9 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 				// Hm, receiver is not set yet..., ignoring
 				if (log.isLoggable(Level.INFO)) {
-					log.log(Level.INFO, "Hm, receiver is not set yet (misconfiguration error)..., ignoring: {0}", p.toStringSecure());
+					log.log(Level.INFO,
+							"Hm, receiver is not set yet (misconfiguration error)..., ignoring: {0}",
+							p.toStringSecure());
 				}
 			}
 
