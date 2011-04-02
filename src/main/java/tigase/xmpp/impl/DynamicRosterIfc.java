@@ -49,12 +49,12 @@ import tigase.xmpp.NotAuthorizedException;
  * of classes instead. If your implementation needs to connect to a database
  * or any other resource or just needs extra configuration parameters you can
  * also specify them in the properties file:
- * <pre>sess-man/plugins-conf/roster-presence/dynamic-roster-classes=tigase.xmpp.impl.AnonymousRoster
- * sess-man/plugins-conf/roster-presence/dbinit=jdbc:jtds:mysql://localhost/roster-db;user=user-name;password=db-passwd
- * sess-man/plugins-conf/roster-presence/max-buddies=1000
+ * <pre>sess-man/plugins-conf/dynamic-roster-classes=tigase.xmpp.impl.AnonymousRoster
+ * sess-man/plugins-conf/dbinit=jdbc:jtds:mysql://localhost/roster-db;user=user-name;password=db-passwd
+ * sess-man/plugins-conf/max-buddies=1000
  * </pre>
  * Basically all parameters starting with string:
- * <code>sess-man/plugins-conf/roster-presence/</code> will be provided at
+ * <code>sess-man/plugins-conf/</code> will be provided at
  * initialization time in the <code>init(....)</code> method.
  * <p/>
  * There is also a simplified form for providing configuration parameters. It is
