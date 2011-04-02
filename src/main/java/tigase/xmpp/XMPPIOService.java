@@ -68,7 +68,7 @@ public class XMPPIOService<RefObject> extends IOService<RefObject> {
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
-	private static final Logger log = Logger.getLogger("tigase.xmpp.XMPPIOService");
+	private static final Logger log = Logger.getLogger(XMPPIOService.class.getName());
 
 	public static final String CROSS_DOMAIN_POLICY_FILE_PROP_KEY =
 			"bosh-extra-headers-file";
@@ -347,7 +347,7 @@ public class XMPPIOService<RefObject> extends IOService<RefObject> {
 							new String(data) });
 				}
 
-				// This is log for debuging only,
+				// This is log for debugging only,
 				// in normal mode don't even call below code
 				assert debug(new String(data), "--RECEIVED:");
 
