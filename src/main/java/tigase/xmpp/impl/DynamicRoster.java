@@ -55,7 +55,7 @@ public abstract class DynamicRoster {
 	private static final String DYNAMIC_ROSTERS_CLASSES = "dynamic-roster-classes";
 
 	/**
-	 * Private logger for class instancess.
+	 * Private logger for class instances.
 	 */
 	private static Logger log = Logger.getLogger("tigase.xmpp.impl.DynamicRoster");
 
