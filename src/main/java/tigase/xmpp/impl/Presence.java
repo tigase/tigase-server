@@ -92,7 +92,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 
 	/** Field description */
 	public static final String SKIP_OFFLINE_PROP_KEY = "skip-offline";
-	protected static final String XMLNS = "jabber:client";
+	protected static final String XMLNS = CLIENT_XMLNS;
 
 	/**
 	 * Private logger for class instance.
@@ -1013,7 +1013,6 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 	 * @param results
 	 * @param settings
 	 */
-	@SuppressWarnings({ "unchecked" })
 	@Override
 	public void stopped(XMPPResourceConnection session, Queue<Packet> results,
 			Map<String, Object> settings) {
@@ -1181,7 +1180,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 		JID presBuddy = packet.getStanzaFrom().copyWithoutResource();
 
 		// If other users are in 'to' or 'both' contacts, broadcast
-		// their preseces to all active resources
+		// their presences to all active resources
 		if (roster_util.isSubscribedTo(session, presBuddy)
 				|| (DynamicRoster.getBuddyItem(session, settings, presBuddy) != null)
 
@@ -1352,8 +1351,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 			Queue<Packet> results, Map<String, Object> settings, PresenceType pres_type)
 			throws NotAuthorizedException, TigaseDBException, NoConnectionIdException {
 		// First forward the request to the client to make sure it stays in sync
-		// with
-		// the server.
+		// with the server.
 		Packet forward_p = packet.copyElementOnly();
 		forward_p.setPacketTo(session.getConnectionId());
 		results.offer(forward_p);
