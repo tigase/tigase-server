@@ -30,6 +30,7 @@ import tigase.stats.StatisticsList;
 import tigase.xml.Element;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
+import tigase.xmpp.StanzaType;
 
 import java.util.List;
 import java.util.Map;
@@ -227,6 +228,11 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 	 */
 	@Override
 	public List<JID> getNodesForPacketForward(Packet packet) {
+		// Do not forward any error packets for now.
+		if (packet.getType() == StanzaType.error) {
+			return null;
+		}
+		
 		// Presence status change set by the user have a special treatment:
 		if (packet.getElemName() == "presence" && packet.getStanzaFrom() != null
 				&& packet.getStanzaTo() == null) {
