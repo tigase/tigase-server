@@ -1,24 +1,23 @@
-
 /*
-* Tigase Jabber/XMPP Server
-* Copyright (C) 2004-2010 "Artur Hefczyc" <artur.hefczyc@tigase.org>
-*
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, version 3 of the License.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program. Look for COPYING file in the top folder.
-* If not, see http://www.gnu.org/licenses/.
-*
-* $Rev$
-* Last modified by $Author$
-* $Date$
+ * Tigase Jabber/XMPP Server
+ * Copyright (C) 2004-2010 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. Look for COPYING file in the top folder.
+ * If not, see http://www.gnu.org/licenses/.
+ *
+ * $Rev$
+ * Last modified by $Author$
+ * $Date$
  */
 package tigase.db;
 
@@ -31,6 +30,7 @@ import java.sql.Statement;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -38,41 +38,78 @@ import java.util.logging.Logger;
 
 /**
  * Created: Sep 4, 2010 2:13:22 PM
- *
+ * 
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class DataRepositoryPool implements DataRepository {
 	private static final Logger log = Logger.getLogger(DataRepositoryPool.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
+	// ~--- fields ---------------------------------------------------------------
 
-	private int idx = 0;
-	private ArrayList<DataRepository> repoPool = new ArrayList<DataRepository>(5);
+	private LinkedBlockingQueue<DataRepository> repoPool =
+			new LinkedBlockingQueue<DataRepository>();
 	private String resource_uri = null;
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param repo
 	 */
 	public void addRepo(DataRepository repo) {
-		synchronized (repoPool) {
-			repoPool.add(repo);
-		}
+		repoPool.offer(repo);
 	}
 
 	/**
 	 * Method description
-	 *
-	 *
-	 * @param tableName
-	 *
+	 * 
+	 * 
 	 * @return
-	 *
+	 */
+	public DataRepository takeRepo() {
+		DataRepository result = takeRepoHandle();
+		addRepo(result);
+		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see tigase.db.DataRepository#takeRepoHandle()
+	 */
+	@Override
+	public DataRepository takeRepoHandle() {
+		DataRepository result = null;
+		while (result == null) {
+			try {
+				result = repoPool.take();
+			} catch (InterruptedException ex) {
+			}
+		}
+		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see tigase.db.DataRepository#releaseRepoHandle()
+	 */
+	@Override
+	public void releaseRepoHandle(DataRepository repo) {
+		addRepo(repo);
+	}
+
+	/**
+	 * Method description
+	 * 
+	 * 
+	 * @param tableName
+	 * 
+	 * @return
+	 * 
 	 * @throws SQLException
 	 */
 	@Override
@@ -90,10 +127,10 @@ public class DataRepositoryPool implements DataRepository {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
-	 *
+	 * 
 	 * @throws SQLException
 	 */
 	@Override
@@ -109,16 +146,16 @@ public class DataRepositoryPool implements DataRepository {
 		return null;
 	}
 
-	//~--- get methods ----------------------------------------------------------
+	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param stIdKey
-	 *
+	 * 
 	 * @return
-	 *
+	 * 
 	 * @throws SQLException
 	 */
 	@Override
@@ -136,8 +173,8 @@ public class DataRepositoryPool implements DataRepository {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -145,15 +182,15 @@ public class DataRepositoryPool implements DataRepository {
 		return resource_uri;
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param stIdKey
 	 * @param query
-	 *
+	 * 
 	 * @throws SQLException
 	 */
 	@Override
@@ -165,15 +202,16 @@ public class DataRepositoryPool implements DataRepository {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param resource_uri
 	 * @param params
-	 *
+	 * 
 	 * @throws SQLException
 	 */
 	@Override
-	public void initRepository(String resource_uri, Map<String, String> params) throws SQLException {
+	public void initRepository(String resource_uri, Map<String, String> params)
+			throws SQLException {
 		this.resource_uri = resource_uri;
 
 		for (DataRepository dataRepository : repoPool) {
@@ -183,8 +221,8 @@ public class DataRepositoryPool implements DataRepository {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param stmt
 	 * @param rs
 	 */
@@ -193,35 +231,64 @@ public class DataRepositoryPool implements DataRepository {
 		if (rs != null) {
 			try {
 				rs.close();
-			} catch (SQLException sqlEx) {}
+			} catch (SQLException sqlEx) {
+			}
 		}
 
 		if (stmt != null) {
 			try {
 				stmt.close();
-			} catch (SQLException sqlEx) {}
-		}
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public DataRepository takeRepo() {
-		synchronized (repoPool) {
-			if (idx >= repoPool.size()) {
-				idx = 0;
+			} catch (SQLException sqlEx) {
 			}
-
-			return repoPool.get(idx++);
 		}
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see tigase.db.DataRepository#startTransaction()
+	 */
+	@Override
+	public void startTransaction() throws SQLException {
+		// TODO Auto-generated method stub
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see tigase.db.DataRepository#commit()
+	 */
+	@Override
+	public void commit() throws SQLException {
+		// TODO Auto-generated method stub
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see tigase.db.DataRepository#rollback()
+	 */
+	@Override
+	public void rollback() throws SQLException {
+		// TODO Auto-generated method stub
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see tigase.db.DataRepository#endTransaction()
+	 */
+	@Override
+	public void endTransaction() throws SQLException {
+		// TODO Auto-generated method stub
+
+	}
+
 }
 
+// ~ Formatted in Sun Code Convention
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+// ~ Formatted by Jindent --- http://www.jindent.com

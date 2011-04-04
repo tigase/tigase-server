@@ -21,11 +21,7 @@
  */
 package tigase.db.jdbc;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.DataRepository;
-
-//~--- JDK imports ------------------------------------------------------------
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -38,8 +34,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Sep 3, 2010 5:55:41 PM
@@ -72,8 +66,6 @@ public class DataRepositoryImpl implements DataRepository {
 	/** Field description */
 	public static final int DB_CONN_TIMEOUT = 5;
 
-	// ~--- fields ---------------------------------------------------------------
-
 	private Connection conn = null;
 	private PreparedStatement conn_valid_st = null;
 	private long connectionValidateInterval = 1000 * 60;
@@ -84,8 +76,6 @@ public class DataRepositoryImpl implements DataRepository {
 			new ConcurrentSkipListMap<String, PreparedStatement>();
 	private Map<String, String> db_queries = new ConcurrentSkipListMap<String, String>();
 	private String check_table_query = MYSQL_CHECK_TABLE_QUERY;
-
-	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -135,11 +125,12 @@ public class DataRepositoryImpl implements DataRepository {
 	@Override
 	public Statement createStatement() throws SQLException {
 		checkConnection();
-
-		return conn.createStatement();
+		// This synchronization is used to prevent call when the connection and
+		// all prepared statements are being recreated.
+		synchronized (db_statements) {
+			return conn.createStatement();
+		}
 	}
-
-	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
@@ -155,7 +146,11 @@ public class DataRepositoryImpl implements DataRepository {
 	public PreparedStatement getPreparedStatement(String stIdKey) throws SQLException {
 		checkConnection();
 
-		return db_statements.get(stIdKey);
+		// This synchronization is used to prevent call when the connection and
+		// all prepared statements are being recreated.
+		synchronized (db_statements) {
+			return db_statements.get(stIdKey);
+		}
 	}
 
 	/**
@@ -169,8 +164,6 @@ public class DataRepositoryImpl implements DataRepository {
 		return db_conn;
 	}
 
-	// ~--- methods --------------------------------------------------------------
-
 	/**
 	 * Method description
 	 * 
@@ -183,10 +176,7 @@ public class DataRepositoryImpl implements DataRepository {
 	@Override
 	public void initPreparedStatement(String key, String query) throws SQLException {
 		db_queries.put(key, query);
-
-		PreparedStatement st = prepareQuery(query);
-
-		db_statements.put(key, st);
+		initStatement(key);
 	}
 
 	/**
@@ -245,24 +235,25 @@ public class DataRepositoryImpl implements DataRepository {
 	 * query. For some database servers (or JDBC drivers) it happens the
 	 * connection is dropped if not in use for a long time or after certain
 	 * timeout passes. This method allows us to detect the problem and
-	 * reinitialize database connection.
+	 * reinitialize database connection. This method must not be called
+	 * concurrently, therefore it is synchronized.
 	 * 
 	 * @return a <code>boolean</code> value if the database connection is working.
 	 * @exception SQLException
 	 *              if an error occurs on database query.
 	 */
-	private boolean checkConnection() throws SQLException {
+	private synchronized boolean checkConnection() throws SQLException {
 		ResultSet rs = null;
 
 		try {
 			long tmp = System.currentTimeMillis();
 
-			synchronized (conn_valid_st) {
-				if ((tmp - lastConnectionValidated) >= connectionValidateInterval) {
-					lastConnectionValidated = tmp;
-					rs = conn_valid_st.executeQuery();
-				} // end of if ()
-			}
+			// synchronized (conn_valid_st) {
+			if ((tmp - lastConnectionValidated) >= connectionValidateInterval) {
+				lastConnectionValidated = tmp;
+				rs = conn_valid_st.executeQuery();
+			} // end of if ()
+			// }
 
 			if (((conn_valid_st == null) || conn_valid_st.isClosed())
 					&& ((tmp - lastConnectionValidated) >= 1000)) {
@@ -296,18 +287,22 @@ public class DataRepositoryImpl implements DataRepository {
 		}
 
 		for (String key : db_queries.keySet()) {
-			query = db_queries.get(key);
-
-			PreparedStatement st = prepareQuery(query);
-
-			try {
-				st.setQueryTimeout(QUERY_TIMEOUT);
-			} catch (SQLException ex) {
-				// Ignore for now, it seems that PostgreSQL does not support this method
-				// call yet
-			}
-			db_statements.put(key, st);
+			initStatement(key);
 		}
+	}
+
+	private void initStatement(String key) throws SQLException {
+		String query = db_queries.get(key);
+
+		PreparedStatement st = prepareQuery(query);
+
+		try {
+			st.setQueryTimeout(QUERY_TIMEOUT);
+		} catch (SQLException ex) {
+			// Ignore for now, it seems that PostgreSQL does not support this method
+			// call yet
+		}
+		db_statements.put(key, st);
 	}
 
 	/**
@@ -323,7 +318,7 @@ public class DataRepositoryImpl implements DataRepository {
 		ResultSet rs = null;
 
 		try {
-			synchronized (db_conn) {
+			synchronized (db_statements) {
 				db_statements.clear();
 				DriverManager.setLoginTimeout(DB_CONN_TIMEOUT);
 				conn = DriverManager.getConnection(db_conn);
@@ -348,6 +343,65 @@ public class DataRepositoryImpl implements DataRepository {
 		} else {
 			return conn.prepareStatement(query);
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see tigase.db.DataRepository#takeRepo()
+	 */
+	@Override
+	public DataRepository takeRepoHandle() {
+		return this;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see tigase.db.DataRepository#startTransaction()
+	 */
+	@Override
+	public void startTransaction() throws SQLException {
+		conn.setAutoCommit(false);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see tigase.db.DataRepository#commit()
+	 */
+	@Override
+	public void commit() throws SQLException {
+		conn.commit();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see tigase.db.DataRepository#rollback()
+	 */
+	@Override
+	public void rollback() throws SQLException {
+		conn.rollback();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see tigase.db.DataRepository#endTransaction()
+	 */
+	@Override
+	public void endTransaction() throws SQLException {
+		conn.setAutoCommit(true);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see tigase.db.DataRepository#releaseRepoHandle(tigase.db.DataRepository)
+	 */
+	@Override
+	public void releaseRepoHandle(DataRepository repo) {
 	}
 }
 
