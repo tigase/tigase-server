@@ -52,12 +52,12 @@ import java.util.logging.Logger;
  * @version $Rev$
  */
 public class UrnXmppPing extends XMPPProcessorAbstract {
+	private static final Logger log = Logger.getLogger(UrnXmppPing.class.getName());
 	private static final String[] ELEMENTS = { "ping" };
 	private static final String XMLNS = "urn:xmpp:ping";
 	private static final String ID = XMLNS;
 	private static final Element[] DISCO_FEATURES = {
 		new Element("feature", new String[] { "var" }, new String[] { XMLNS }) };
-	private static final Logger log = Logger.getLogger("tigase.xmpp.impl.UrnXmppPing");
 	private static final String[] XMLNSS = { XMLNS };
 
 	//~--- methods --------------------------------------------------------------
