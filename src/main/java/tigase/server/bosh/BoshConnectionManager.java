@@ -53,20 +53,21 @@ import java.util.logging.Logger;
 
 /**
  * Describe class BoshConnectionManager here.
- *
- *
- * Created: Sat Jun  2 12:24:29 2007
- *
+ * 
+ * 
+ * Created: Sat Jun 2 12:24:29 2007
+ * 
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class BoshConnectionManager extends ClientConnectionManager
-		implements BoshSessionTaskHandler {
+public class BoshConnectionManager extends ClientConnectionManager implements
+		BoshSessionTaskHandler {
 
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
-	private static final Logger log = Logger.getLogger("tigase.server.bosh.BoshConnectionManager");
+	private static final Logger log = Logger
+			.getLogger("tigase.server.bosh.BoshConnectionManager");
 	private static final String ROUTINGS_PROP_KEY = "routings";
 	private static final String ROUTING_MODE_PROP_KEY = "multi-mode";
 	private static final boolean ROUTING_MODE_PROP_VAL = true;
@@ -74,14 +75,14 @@ public class BoshConnectionManager extends ClientConnectionManager
 	private static final String ROUTING_ENTRY_PROP_VAL = DEF_SM_NAME + "@localhost";
 	private static final int DEF_PORT_NO = 5280;
 
-	//~--- fields ---------------------------------------------------------------
+	// ~--- fields ---------------------------------------------------------------
 
 	private int[] PORTS = { DEF_PORT_NO };
 
-//private static final String HOSTNAMES_PROP_KEY = "hostnames";
-//private String[] HOSTNAMES_PROP_VAL = {"localhost", "hostname"};
-//private RoutingsContainer routings = null;
-//private Set<String> hostnames = new TreeSet<String>();
+	// private static final String HOSTNAMES_PROP_KEY = "hostnames";
+	// private String[] HOSTNAMES_PROP_VAL = {"localhost", "hostname"};
+	// private RoutingsContainer routings = null;
+	// private Set<String> hostnames = new TreeSet<String>();
 	private long max_wait = MAX_WAIT_DEF_PROP_VAL;
 	private long min_polling = MIN_POLLING_PROP_VAL;
 	private long max_pause = MAX_PAUSE_PROP_VAL;
@@ -92,15 +93,15 @@ public class BoshConnectionManager extends ClientConnectionManager
 	private ReceiverTimeoutHandler startedHandler = newStartedHandler();
 	private final Map<UUID, BoshSession> sessions = new LinkedHashMap<UUID, BoshSession>();
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packet
 	 * @param bs
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -112,23 +113,22 @@ public class BoshConnectionManager extends ClientConnectionManager
 	}
 
 	/**
-	 *
+	 * 
 	 * @param packet
 	 * @param bs
 	 * @return
 	 */
 	@Override
 	public boolean addOutStreamOpen(Packet packet, BoshSession bs) {
-		packet.setPacketFrom(getFromAddress(bs.getSid().toString()));
-		packet.setPacketTo(bs.getDataReceiver());
+		packet.initVars(getFromAddress(bs.getSid().toString()), bs.getDataReceiver());
 
 		return addOutPacketWithTimeout(packet, startedHandler, 15l, TimeUnit.SECONDS);
 	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param tt
 	 */
 	@Override
@@ -136,14 +136,14 @@ public class BoshConnectionManager extends ClientConnectionManager
 		tt.cancel();
 	}
 
-	//~--- get methods ----------------------------------------------------------
+	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param params
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -162,8 +162,8 @@ public class BoshConnectionManager extends ClientConnectionManager
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -173,8 +173,8 @@ public class BoshConnectionManager extends ClientConnectionManager
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -182,14 +182,14 @@ public class BoshConnectionManager extends ClientConnectionManager
 		return "Bosh connection manager";
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param srv
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -204,8 +204,8 @@ public class BoshConnectionManager extends ClientConnectionManager
 
 			synchronized (sessions) {
 				if (log.isLoggable(Level.FINER)) {
-					log.log(Level.FINER, "Processing packet: {0}, type: {1}", new Object[] { p.getElemName(),
-							p.getType() });
+					log.log(Level.FINER, "Processing packet: {0}, type: {1}",
+							new Object[] { p.getElemName(), p.getType() });
 				}
 
 				if (log.isLoggable(Level.FINEST)) {
@@ -220,8 +220,9 @@ public class BoshConnectionManager extends ClientConnectionManager
 					String hostname = p.getAttribute("to");
 
 					if ((hostname != null) && isLocalDomain(hostname)) {
-						bs = new BoshSession(getDefHostName().getDomain(),
-								JID.jidInstanceNS(routings.computeRouting(hostname)), this);
+						bs =
+								new BoshSession(getDefHostName().getDomain(), JID.jidInstanceNS(routings
+										.computeRouting(hostname)), this);
 						sid = bs.getSid();
 						sessions.put(sid, bs);
 					} else {
@@ -230,7 +231,8 @@ public class BoshConnectionManager extends ClientConnectionManager
 						try {
 							serv.sendErrorAndStop(Authorization.NOT_ALLOWED, p, "Invalid hostname.");
 						} catch (Exception e) {
-							log.log(Level.WARNING, "Problem sending invalid hostname error for sid =  " + sid, e);
+							log.log(Level.WARNING, "Problem sending invalid hostname error for sid =  "
+									+ sid, e);
 						}
 					}
 				} else {
@@ -243,8 +245,8 @@ public class BoshConnectionManager extends ClientConnectionManager
 				if (bs != null) {
 					synchronized (bs) {
 						if (sid_str == null) {
-							bs.init(p, serv, max_wait, min_polling, max_inactivity, concurrent_requests,
-									hold_requests, max_pause, out_results);
+							bs.init(p, serv, max_wait, min_polling, max_inactivity,
+									concurrent_requests, hold_requests, max_pause, out_results);
 						} else {
 							bs.processSocketPacket(p, serv, out_results);
 						}
@@ -260,18 +262,18 @@ public class BoshConnectionManager extends ClientConnectionManager
 			}
 
 			// addOutPackets(out_results);
-		}    // end of while ()
+		} // end of while ()
 
 		return null;
 	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param bs
 	 * @param delay
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -286,8 +288,8 @@ public class BoshConnectionManager extends ClientConnectionManager
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param service
 	 */
 	public void serviceStarted(BoshIOService service) {
@@ -296,8 +298,8 @@ public class BoshConnectionManager extends ClientConnectionManager
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param service
 	 */
 	public void serviceStopped(BoshIOService service) {
@@ -314,12 +316,12 @@ public class BoshConnectionManager extends ClientConnectionManager
 		}
 	}
 
-	//~--- set methods ----------------------------------------------------------
+	// ~--- set methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param props
 	 */
 	@Override
@@ -333,12 +335,12 @@ public class BoshConnectionManager extends ClientConnectionManager
 		max_pause = (Long) props.get(MAX_PAUSE_PROP_KEY);
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param ios
 	 * @param data
 	 */
@@ -349,8 +351,8 @@ public class BoshConnectionManager extends ClientConnectionManager
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param serv
 	 */
 	public void xmppStreamClosed(BoshIOService serv) {
@@ -361,11 +363,11 @@ public class BoshConnectionManager extends ClientConnectionManager
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param serv
 	 * @param attribs
-	 *
+	 * 
 	 * @return
 	 */
 	public String xmppStreamOpened(BoshIOService serv, Map<String, String> attribs) {
@@ -374,20 +376,25 @@ public class BoshConnectionManager extends ClientConnectionManager
 					+ " c2s and s2s are not supported on the same port as Bosh yet.");
 		}
 
-		return "<?xml version='1.0'?><stream:stream" + " xmlns='jabber:client'"
-				+ " xmlns:stream='http://etherx.jabber.org/streams'" + " id='1'" + " from='"
-					+ getDefHostName() + "'" + " version='1.0' xml:lang='en'>" + "<stream:error>"
-						+ "<invalid-namespace xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>"
-							+ "<text xmlns='urn:ietf:params:xml:ns:xmpp-streams' xml:lang='langcode'>"
-								+ "Ups, what just happened? Stream open. Hey, this is a Bosh connection manager. "
-									+ "c2s and s2s are not supported on the same port... yet." + "</text>"
-										+ "</stream:error>" + "</stream:stream>"
-		;
+		return "<?xml version='1.0'?><stream:stream"
+				+ " xmlns='jabber:client'"
+				+ " xmlns:stream='http://etherx.jabber.org/streams'"
+				+ " id='1'"
+				+ " from='"
+				+ getDefHostName()
+				+ "'"
+				+ " version='1.0' xml:lang='en'>"
+				+ "<stream:error>"
+				+ "<invalid-namespace xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>"
+				+ "<text xmlns='urn:ietf:params:xml:ns:xmpp-streams' xml:lang='langcode'>"
+				+ "Ups, what just happened? Stream open. Hey, this is a Bosh connection manager. "
+				+ "c2s and s2s are not supported on the same port... yet." + "</text>"
+				+ "</stream:error>" + "</stream:stream>";
 	}
 
 	@Override
-	protected JID changeDataReceiver(Packet packet, JID newAddress, String command_sessionId,
-			XMPPIOService<Object> serv) {
+	protected JID changeDataReceiver(Packet packet, JID newAddress,
+			String command_sessionId, XMPPIOService<Object> serv) {
 		BoshSession session = getBoshSession(packet.getTo());
 
 		if (session != null) {
@@ -407,18 +414,18 @@ public class BoshConnectionManager extends ClientConnectionManager
 		return null;
 	}
 
-	//~--- get methods ----------------------------------------------------------
+	// ~--- get methods ----------------------------------------------------------
 
-//public void processPacket(Packet packet) {
-//  log.finer("Processing packet: " + packet.getElemName()
-//    + ", type: " + packet.getType());
-//  log.finest("Processing packet: " + packet.toString());
-//  if (packet.isCommand() && packet.getCommand() != Command.OTHER) {
-//    processCommand(packet);
-//  } else {
-//    writePacketToSocket(packet);
-//  }
-//}
+	// public void processPacket(Packet packet) {
+	// log.finer("Processing packet: " + packet.getElemName()
+	// + ", type: " + packet.getType());
+	// log.finest("Processing packet: " + packet.toString());
+	// if (packet.isCommand() && packet.getCommand() != Command.OTHER) {
+	// processCommand(packet);
+	// } else {
+	// writePacketToSocket(packet);
+	// }
+	// }
 	protected BoshSession getBoshSession(JID jid) {
 		UUID sid = UUID.fromString(jid.getResource());
 
@@ -436,10 +443,10 @@ public class BoshConnectionManager extends ClientConnectionManager
 	}
 
 	/**
-	 * Method <code>getMaxInactiveTime</code> returns max keep-alive time
-	 * for inactive connection. we shoulnd not really close external component
+	 * Method <code>getMaxInactiveTime</code> returns max keep-alive time for
+	 * inactive connection. we shoulnd not really close external component
 	 * connection at all, so let's say something like: 1000 days...
-	 *
+	 * 
 	 * @return a <code>long</code> value
 	 */
 	@Override
@@ -452,7 +459,7 @@ public class BoshConnectionManager extends ClientConnectionManager
 		return new BoshIOService();
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	@Override
 	protected ReceiverTimeoutHandler newStartedHandler() {
@@ -464,7 +471,7 @@ public class BoshConnectionManager extends ClientConnectionManager
 		BoshSession session = getBoshSession(packet.getTo());
 
 		switch (packet.getCommand()) {
-			case CLOSE :
+			case CLOSE:
 				if (session != null) {
 					log.log(Level.FINE, "Closing session for command CLOSE: {0}", session.getSid());
 					session.close();
@@ -475,7 +482,7 @@ public class BoshConnectionManager extends ClientConnectionManager
 
 				break;
 
-			case CHECK_USER_CONNECTION :
+			case CHECK_USER_CONNECTION:
 				if (session != null) {
 
 					// It's ok, the session has been found, respond with OK.
@@ -495,11 +502,11 @@ public class BoshConnectionManager extends ClientConnectionManager
 
 				break;
 
-			default :
+			default:
 				super.processCommand(packet);
 
 				break;
-		}    // end of switch (pc.getCommand())
+		} // end of switch (pc.getCommand())
 	}
 
 	@Override
@@ -526,40 +533,50 @@ public class BoshConnectionManager extends ClientConnectionManager
 		for (Packet res : out_results) {
 			res.setPacketFrom(getFromAddress(bs.getSid().toString()));
 			res.setPacketTo(bs.getDataReceiver());
+			if (res.getCommand() != null) {
+				switch (res.getCommand()) {
+					case STREAM_CLOSED:
+					case GETFEATURES:
+						res.initVars(res.getPacketFrom(), res.getPacketTo());
+						break;
+					default:
+						// Do nothing...
+				}
+			}
 			addOutPacket(res);
 		}
 
 		out_results.clear();
 	}
 
-	//~--- get methods ----------------------------------------------------------
+	// ~--- get methods ----------------------------------------------------------
 
 	private JID getFromAddress(String id) {
 		return JID.jidInstanceNS(getName(), getDefHostName().getDomain(), id);
 	}
 
-	//~--- inner classes --------------------------------------------------------
+	// ~--- inner classes --------------------------------------------------------
 
 	private class BoshTask extends TimerTask {
 		private BoshSession bs = null;
 
-		//~--- constructors -------------------------------------------------------
+		// ~--- constructors -------------------------------------------------------
 
 		/**
 		 * Constructs ...
-		 *
-		 *
+		 * 
+		 * 
 		 * @param bs
 		 */
 		public BoshTask(BoshSession bs) {
 			this.bs = bs;
 		}
 
-		//~--- methods ------------------------------------------------------------
+		// ~--- methods ------------------------------------------------------------
 
 		/**
 		 * Method description
-		 *
+		 * 
 		 */
 		@Override
 		public void run() {
@@ -574,13 +591,12 @@ public class BoshConnectionManager extends ClientConnectionManager
 		}
 	}
 
-
 	private class StartedHandler implements ReceiverTimeoutHandler {
 
 		/**
 		 * Method description
-		 *
-		 *
+		 * 
+		 * 
 		 * @param packet
 		 * @param response
 		 */
@@ -588,14 +604,14 @@ public class BoshConnectionManager extends ClientConnectionManager
 		public void responseReceived(Packet packet, Packet response) {
 
 			// We are now ready to ask for features....
-			addOutPacket(Command.GETFEATURES.getPacket(packet.getFrom(), packet.getTo(), StanzaType.get,
-					UUID.randomUUID().toString(), null));
+			addOutPacket(Command.GETFEATURES.getPacket(packet.getFrom(), packet.getTo(),
+					StanzaType.get, UUID.randomUUID().toString(), null));
 		}
 
 		/**
 		 * Method description
-		 *
-		 *
+		 * 
+		 * 
 		 * @param packet
 		 */
 		@Override
@@ -604,7 +620,8 @@ public class BoshConnectionManager extends ClientConnectionManager
 			// If we still haven't received confirmation from the SM then
 			// the packet either has been lost or the server is overloaded
 			// In either case we disconnect the connection.
-			log.warning("No response within time limit received for a packet: " + packet.toString());
+			log.warning("No response within time limit received for a packet: "
+					+ packet.toString());
 
 			BoshSession session = getBoshSession(packet.getFrom());
 
@@ -619,8 +636,6 @@ public class BoshConnectionManager extends ClientConnectionManager
 	}
 }
 
+// ~ Formatted in Sun Code Convention
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+// ~ Formatted by Jindent --- http://www.jindent.com
