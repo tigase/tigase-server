@@ -45,6 +45,9 @@ import java.util.Map;
  * @version $Rev$
  */
 public interface XMPPImplIfc {
+	
+	public static final String CLIENT_XMLNS = "jabber:client";
+	
 	int concurrentQueuesNo();
 
 	@Deprecated
