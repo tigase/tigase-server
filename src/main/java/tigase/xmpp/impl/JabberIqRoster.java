@@ -476,7 +476,7 @@ public class JabberIqRoster extends XMPPProcessor implements XMPPProcessorIfc, X
 			// Recalculate the roster hash again with dynamic roster content
 			StringBuilder roster_str = new StringBuilder(5000);
 
-			// This may seem to be redindand as this call has already been made
+			// This may seem to be redundant as this call has already been made
 			// but the roster could have been changed.
 			ritems = roster_util.getRosterItems(session);
 
@@ -532,6 +532,7 @@ public class JabberIqRoster extends XMPPProcessor implements XMPPProcessorIfc, X
 				while (items.size() > 0) {
 					Element iq = new Element("iq", new String[] { "type", "id", "to" }, new String[] { "set",
 							session.nextStanzaId(), session.getJID().toString() });
+					iq.setXMLNS(CLIENT_XMLNS);
 					Element query = new Element("query");
 
 					query.setXMLNS(RosterAbstract.XMLNS);
@@ -596,6 +597,7 @@ public class JabberIqRoster extends XMPPProcessor implements XMPPProcessorIfc, X
 							// Unavailable presence should be sent first, otherwise it will be blocked by
 							// the server after the subscription is canceled
 							Element pres = new Element("presence");
+							pres.setXMLNS(CLIENT_XMLNS);
 
 							pres.setAttribute("to", buddy.toString());
 							pres.setAttribute("from", session.getJID().toString());
@@ -608,12 +610,14 @@ public class JabberIqRoster extends XMPPProcessor implements XMPPProcessorIfc, X
 							pres_packet.setPriority(Priority.HIGH);
 							results.offer(pres_packet);
 							pres = new Element("presence");
+							pres.setXMLNS(CLIENT_XMLNS);
 							pres.setAttribute("to", buddy.toString());
 							pres.setAttribute("from", session.getBareJID().toString());
 							pres.setAttribute("type", "unsubscribe");
 							results.offer(Packet.packetInstance(pres, session.getJID().copyWithoutResource(),
 									buddy));
 							pres = new Element("presence");
+							pres.setXMLNS(CLIENT_XMLNS);
 							pres.setAttribute("to", buddy.toString());
 							pres.setAttribute("from", session.getBareJID().toString());
 							pres.setAttribute("type", "unsubscribed");
@@ -661,6 +665,7 @@ public class JabberIqRoster extends XMPPProcessor implements XMPPProcessorIfc, X
 
 							if (pres == null) {
 								pres = new Element("presence");
+								pres.setXMLNS(CLIENT_XMLNS);
 							} else {
 								pres = pres.clone();
 							}
