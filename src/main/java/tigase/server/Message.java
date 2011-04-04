@@ -35,7 +35,7 @@ import tigase.xmpp.StanzaType;
 
 /**
  * Created: Dec 31, 2009 8:38:38 PM
- *
+ * 
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
@@ -44,14 +44,14 @@ public class Message extends Packet {
 	/** Field description */
 	public static final String ELEM_NAME = "message";
 
-	//~--- constructors ---------------------------------------------------------
+	// ~--- constructors ---------------------------------------------------------
 
 	/**
 	 * Constructs ...
-	 *
-	 *
+	 * 
+	 * 
 	 * @param elem
-	 *
+	 * 
 	 * @throws TigaseStringprepException
 	 */
 	public Message(Element elem) throws TigaseStringprepException {
@@ -60,8 +60,8 @@ public class Message extends Packet {
 
 	/**
 	 * Constructs ...
-	 *
-	 *
+	 * 
+	 * 
 	 * @param elem
 	 * @param stanzaFrom
 	 * @param stanzaTo
@@ -70,28 +70,37 @@ public class Message extends Packet {
 		super(elem, stanzaFrom, stanzaTo);
 	}
 
-	//~--- get methods ----------------------------------------------------------
+	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Creates a packet with message stanza.
-	 *
-	 *
-	 * @param from is a <code>JID</code> instance with message source address.
-	 * @param to is a <code>JID</code> instance with message destination address.
-	 * @param type is a <code>StanzaType</code> object with the message type.
-	 * @param body is a <code>String</code> object with message body content.
-	 * @param subject is a <code>String</code> object with message subject.
-	 * @param thread is a <code>String</code> object with message thread.
-	 * @param id is a <code>String</code> object with packet id value. Normally we do not
-	 * set packet IDs for messages but in some cases this might be useful.
-	 *
-	 * @return a new <code>Packet</code> instance (more specificaly <code>Message</code>
-	 * instance) with the message stanza.
+	 * 
+	 * 
+	 * @param from
+	 *          is a <code>JID</code> instance with message source address.
+	 * @param to
+	 *          is a <code>JID</code> instance with message destination address.
+	 * @param type
+	 *          is a <code>StanzaType</code> object with the message type.
+	 * @param body
+	 *          is a <code>String</code> object with message body content.
+	 * @param subject
+	 *          is a <code>String</code> object with message subject.
+	 * @param thread
+	 *          is a <code>String</code> object with message thread.
+	 * @param id
+	 *          is a <code>String</code> object with packet id value. Normally we
+	 *          do not set packet IDs for messages but in some cases this might be
+	 *          useful.
+	 * 
+	 * @return a new <code>Packet</code> instance (more specificaly
+	 *         <code>Message</code> instance) with the message stanza.
 	 */
 	public static Packet getMessage(JID from, JID to, StanzaType type, String body,
 			String subject, String thread, String id) {
 		Element message = new Element("message", new Element[] { new Element("body", body) },
 			null, null);
+		message.setXMLNS(CLIENT_XMLNS);
 
 		if (from != null) {
 			message.addAttribute("from", from.toString());
@@ -121,8 +130,6 @@ public class Message extends Packet {
 	}
 }
 
+// ~ Formatted in Sun Code Convention
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+// ~ Formatted by Jindent --- http://www.jindent.com
