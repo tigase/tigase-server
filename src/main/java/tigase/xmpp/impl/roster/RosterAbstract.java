@@ -348,9 +348,11 @@ public abstract class RosterAbstract {
 	//~--- static fields --------------------------------------------------------
 
 	/**
-	 * Private logger for class instancess.
+	 * Private logger for class instances.
 	 */
-	private static Logger log = Logger.getLogger("tigase.xmpp.impl.RosterAbstract");
+	private static Logger log = Logger.getLogger(RosterAbstract.class.getName());
+
+	public static final String CLIENT_XMLNS = "jabber:client";
 
 	/** Field description */
 	public static final String ROSTER_XMLNS = "jabber:iq:roster";
@@ -1024,6 +1026,8 @@ public abstract class RosterAbstract {
 			final Element item)
 			throws NotAuthorizedException, TigaseDBException, NoConnectionIdException {
 		Element update = new Element("iq");
+		
+		update.setXMLNS(CLIENT_XMLNS);
 
 		update.setAttribute("type", StanzaType.set.toString());
 
@@ -1042,7 +1046,7 @@ public abstract class RosterAbstract {
 			Packet pack_update = Packet.packetInstance(conn_update, null, conn.getJID());
 
 			pack_update.setPacketTo(conn.getConnectionId());
-			pack_update.setPacketFrom(session.getJID());
+			//pack_update.setPacketFrom(session.getJID());
 			results.offer(pack_update);
 		}    // end of for (XMPPResourceConnection conn: sessions)
 	}
