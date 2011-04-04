@@ -1066,13 +1066,20 @@ public class JDBCRepository implements AuthRepository, UserRepository {
 	public void setDataList(BareJID user_id, final String subnode, final String key,
 			final String[] list) throws UserNotFoundException, TigaseDBException {
 
-		removeData(null, user_id, subnode, key);
+		// Transactions may not yet work properly but at least let's make sure
+		// both calls below are executed exclusively on the same DB connection
+		DataRepository repo = data_repo.takeRepoHandle();
 		try {
-			addDataList(null, user_id, subnode, key, list);
-		} catch (SQLException ex) {
-			throw new TigaseDBException("Problem adding data to DBt, user_id: " + user_id
-					+ ", subnode: " + subnode + ", key: " + key + ", list: "
-					+ Arrays.toString(list), ex);
+			removeData(repo, user_id, subnode, key);
+			try {
+				addDataList(repo, user_id, subnode, key, list);
+			} catch (SQLException ex) {
+				throw new TigaseDBException("Problem adding data to DBt, user_id: " + user_id
+						+ ", subnode: " + subnode + ", key: " + key + ", list: "
+						+ Arrays.toString(list), ex);
+			}
+		} finally {
+			data_repo.releaseRepoHandle(repo);
 		}
 
 		// int counter = 0;
