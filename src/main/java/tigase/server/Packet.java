@@ -112,6 +112,7 @@ public class Packet {
 	 * <code>'packet.debug.full'</code> to <code>'true'</code>.
 	 */
 	public static boolean FULL_DEBUG = Boolean.getBoolean("packet.debug.full");
+	public static final String CLIENT_XMLNS = "jabber:client";
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -400,8 +401,8 @@ public class Packet {
 //  if (getAttribute(OLDTO) != null) {
 //    reply.setAttribute(OLDTO, getAttribute(OLDTO));
 //  }
-		if (getAttribute("xmlns") != null) {
-			reply.setAttribute("xmlns", getAttribute("xmlns"));
+		if (getXMLNS() != null) {
+			reply.setXMLNS(getXMLNS());
 		}
 
 		Element error = new Element("error");
@@ -782,6 +783,7 @@ public class Packet {
 
 		stanzaId = elem.getAttribute("id");
 		packetToString = null;
+		packetToStringSecure = null;
 	}
 
 	/**
@@ -820,6 +822,7 @@ public class Packet {
 
 		stanzaId = elem.getAttribute("id");
 		packetToString = null;
+		packetToStringSecure = null;
 	}
 
 	//~--- get methods ----------------------------------------------------------
@@ -863,7 +866,7 @@ public class Packet {
 	 * Method determines whether the stanza represents so called <em>routed</em>
 	 * packet.
 	 * A routed packet is a packet created by a component responsible for
-	 * communcation with external components. In certain work mode it can send
+	 * Communication with external components. In certain work mode it can send
 	 * over the link the whole packet information with all internal states and
 	 * addresses. Such a packet also encloses original stanza with all it's attributes.
 	 *
@@ -910,6 +913,12 @@ public class Packet {
 
 		return false;
 	}
+	
+	public void setXMLNS(String xmlns) {
+		elem.setXMLNS(xmlns);
+		packetToString = null;
+		packetToStringSecure = null;		
+	}
 
 	//~--- methods --------------------------------------------------------------
 
@@ -930,6 +939,10 @@ public class Packet {
 	 */
 	public Packet okResult(final String includeXML, final int originalXML) {
 		Element reply = new Element(elem.getName());
+		
+		if (getXMLNS() != null) {
+			reply.setXMLNS(getXMLNS());
+		}
 
 		reply.setAttribute("type", StanzaType.result.toString());
 
@@ -989,6 +1002,10 @@ public class Packet {
 	 */
 	public Packet okResult(Element includeXML, int originalXML) {
 		Element reply = new Element(elem.getName());
+
+		if (getXMLNS() != null) {
+			reply.setXMLNS(getXMLNS());
+		}
 
 		reply.setAttribute("type", StanzaType.result.toString());
 
