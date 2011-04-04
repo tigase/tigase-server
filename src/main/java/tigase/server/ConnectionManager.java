@@ -350,7 +350,13 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 	 */
 	@Override
 	public void packetsReady(IO serv) throws IOException {
-		writePacketsToSocket(serv, processSocketData(serv));
+		// Under a high load data, especially lots of packets on a single
+		// connection it may happen that one threads started processing
+		// socketData and then another thread reads more packets which
+		// may take over earlier data depending on a thread scheduler used.
+		//synchronized (serv) {
+			writePacketsToSocket(serv, processSocketData(serv));
+		//}
 	}
 
 	/**
