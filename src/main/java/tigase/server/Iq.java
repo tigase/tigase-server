@@ -151,6 +151,7 @@ public class Iq extends Packet {
 				String item_type) {
 		Element iq = new Element("iq", new String[] { "type", "id" }, new String[] { iq_type,
 				iq_id });
+		iq.setXMLNS(CLIENT_XMLNS);
 
 		if (from != null) {
 			iq.addAttribute("from", from.toString());
