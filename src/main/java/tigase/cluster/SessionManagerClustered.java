@@ -909,8 +909,7 @@ public class SessionManagerClustered extends SessionManager implements
 			addOutPackets(results);
 			// There is one more thing....
 			// If the new connection is for the same resource we have here then the
-			// old
-			// connection must be destroyed.
+			// old connection must be destroyed.
 			XMPPSession session = getSession(rec.getUserJid().getBareJID());
 			if (session != null) {
 				XMPPResourceConnection conn =
