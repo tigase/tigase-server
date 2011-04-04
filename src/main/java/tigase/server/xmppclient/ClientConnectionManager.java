@@ -237,7 +237,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 						&& (packet.getPacketFrom() != null)) {
 					if (packet.getStanzaTo() != null) {
 						Packet command =
-								Command.STREAM_CLOSED_UPDATE.getPacket(packet.getStanzaTo(), null,
+								Command.STREAM_CLOSED_UPDATE.getPacket(packet.getStanzaTo(), packet.getPacketFrom(),
 										StanzaType.set, UUID.randomUUID().toString());
 
 						command.setPacketFrom(packet.getPacketTo());
@@ -276,6 +276,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	 */
 	@Override
 	public Queue<Packet> processSocketData(XMPPIOService<Object> serv) {
+		
 		String id = getUniqueId(serv);
 
 		// String hostname =
@@ -283,11 +284,6 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 		Packet p = null;
 
 		while ((p = serv.getReceivedPackets().poll()) != null) {
-			if (log.isLoggable(Level.FINER)) {
-				log.log(Level.FINER, "Processing packet: {0}, type: {1}",
-						new Object[] { p.getElemName(), p.getType() });
-			}
-
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Processing socket data: {0}", p.toStringSecure());
 			}
@@ -301,7 +297,10 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 			// overwriting it here is not really a good idea. We have to check first
 			// if the xmlns is not set and then force it to jabber:client
 			if (p.getAttribute("xmlns") == null) {
-				p.getElement().setXMLNS(XMLNS);
+				p.setXMLNS(XMLNS);
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "XMLNS set for packet: {0}", p.toStringSecure());
+				}
 			}
 
 			p.setPacketFrom(getFromAddress(id));
