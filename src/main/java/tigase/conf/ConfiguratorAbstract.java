@@ -624,6 +624,12 @@ public abstract class ConfiguratorAbstract extends AbstractComponentRegistrator<
 			if (entry.getKey().startsWith("--")) {
 				System.setProperty(entry.getKey().substring(2),
 						((entry.getValue() == null) ? null : entry.getValue().toString()));
+				// In cluster mode we switch DB cache off as this does not play well.
+				if (CLUSTER_MODE.equals(entry.getKey())) {
+					if ("true".equalsIgnoreCase(entry.getValue().toString())) {
+						System.setProperty("tigase.cache", "false");
+					}
+				}
 			}
 		}
 	}
