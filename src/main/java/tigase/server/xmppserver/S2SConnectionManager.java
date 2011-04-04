@@ -545,7 +545,7 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 				// Let's force jabber:client xmlns for all packets received from s2s
 				// connection
 				if (p.getXMLNS() == XMLNS_SERVER_VAL) {
-					p.getElement().setXMLNS(XMLNS_CLIENT_VAL);
+					p.setXMLNS(XMLNS_CLIENT_VAL);
 				}
 
 				try {
