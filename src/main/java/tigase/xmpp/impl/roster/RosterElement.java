@@ -343,11 +343,11 @@ public class RosterElement {
 			if ((this.name == null) || this.name.trim().isEmpty()) {
 				this.name = this.jid.getBareJID().toString();
 			}
+			modified = true;
 		} else {
 			this.name = name;
 		}
 
-		modified = true;
 	}
 
 	/**
