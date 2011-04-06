@@ -814,9 +814,18 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 	protected boolean processScriptCommand(Packet pc, Queue<Packet> results) {
 
 		// TODO: test if this is right
-		if ((pc.getStanzaFrom() == null) || (pc.getPacketFrom() != null)) {
-
-			// The packet has not gone through session manager yet
+		// It is not, the packet should actually have packetFrom set at all times
+		// to ensure the error can be sent back to the original sender.
+//		if ((pc.getStanzaFrom() == null) || (pc.getPacketFrom() != null)) {
+//
+//			// The packet has not gone through session manager yet
+//			return false;
+//		}
+		// This test is more correct as it says whether the packet went through
+		// session manager checking.
+		// TODO: test if commands still work for users from different XMPP servers
+		// with the right permission set.
+		if (pc.getPermissions() == Permissions.NONE) {
 			return false;
 		}
 

@@ -799,9 +799,6 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 		for (XMPPPacketFilterIfc outfilter : outFilters.values()) {
 			outfilter.filter(packet, conn, naUserRepository, results);
 		} // end of for (XMPPPostprocessorIfc postproc: postProcessors)
-
-		Packet p;
-
 		addOutPackets(results);
 	}
 
@@ -941,7 +938,19 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 	}
 
 	protected boolean fastAddOutPacket(Packet packet) {
-		return super.addOutPacket(packet);
+		return addOutPacket(packet);
+	}
+
+	@Override
+	public boolean addOutPacket(Packet packet) {
+		// We actually have to set packetFrom address to the session manager ID
+		// to make sure the connection manager for instance can report problems back
+		// This cause other problems with packets processing which have to be resolved
+		// anyway
+		if (packet.getPacketFrom() == null) {
+			packet.setPacketFrom(getComponentId());
+		}
+		return super.addOutPacket(packet);			
 	}
 
 	@Override
@@ -992,6 +1001,13 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 	}
 
 	protected boolean isBrokenPacket(Packet p) {
+		// TODO: check this out to make sure it does not lead to an infinite processing loop
+		// These are most likely packets generated inside the SM to other users who are 
+		// offline, like presence updates.
+		if (getComponentId().equals(p.getPacketFrom()) && p.getPacketTo() == null) {
+			return false;
+		}
+		
 		if (p.getFrom() == null) {
 
 			// This is actually a broken packet and we can't even return an error
@@ -1119,8 +1135,9 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 	}
 
 	protected boolean processCommand(Packet pc) {
-		if ((pc.getStanzaTo() == null) || !(getComponentId().equals(pc.getStanzaTo())
-				|| isLocalDomain(pc.getStanzaTo().toString()))) {
+		if ((pc.getStanzaTo() == null)
+				|| !(getComponentId().equals(pc.getStanzaTo()) || isLocalDomain(pc.getStanzaTo()
+						.toString()))) {
 			return false;
 		}
 

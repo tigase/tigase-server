@@ -25,6 +25,7 @@ package tigase.server.xmppserver;
 
 import tigase.server.ConnectionManager;
 import tigase.server.Packet;
+import tigase.server.Permissions;
 import tigase.server.xmppserver.proc.Dialback;
 import tigase.server.xmppserver.proc.PacketChecker;
 import tigase.server.xmppserver.proc.StartTLS;
@@ -555,6 +556,9 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 									new Object[] { serv, p });
 						}
 
+						// TODO: not entirely sure if this is a good idea....
+						// Let's check it out.
+						p.setPermissions(Permissions.REMOTE);
 						addOutPacket(p);
 					} else {
 						try {

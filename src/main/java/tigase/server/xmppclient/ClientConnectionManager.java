@@ -237,15 +237,14 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 						&& (packet.getPacketFrom() != null)) {
 					if (packet.getStanzaTo() != null) {
 						Packet command =
-								Command.STREAM_CLOSED_UPDATE.getPacket(packet.getStanzaTo(), packet.getPacketFrom(),
-										StanzaType.set, UUID.randomUUID().toString());
+								Command.STREAM_CLOSED_UPDATE.getPacket(packet.getStanzaTo(),
+										packet.getPacketFrom(), StanzaType.set, UUID.randomUUID().toString());
 
 						command.setPacketFrom(packet.getPacketTo());
 						command.setPacketTo(packet.getPacketFrom());
 
 						// Note! we don't want to receive response to this request,
-						// thus
-						// STREAM_CLOSED_UPDATE instead of STREAM_CLOSED
+						// thus STREAM_CLOSED_UPDATE instead of STREAM_CLOSED
 						addOutPacket(command);
 
 						// addOutPacketWithTimeout(command, stoppedHandler, 15l,
@@ -276,7 +275,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	 */
 	@Override
 	public Queue<Packet> processSocketData(XMPPIOService<Object> serv) {
-		
+
 		String id = getUniqueId(serv);
 
 		// String hostname =

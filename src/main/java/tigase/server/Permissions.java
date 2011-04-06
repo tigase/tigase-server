@@ -34,9 +34,10 @@ public enum Permissions {
 
 	NONE,     // Unknown user JID
   ANONYM,   // Anonymous user
+  REMOTE,   // Packet from a user from a different XMPP installation
 	LOCAL,    // This is local user JID but not authenticated yet
 	AUTH,     // Local authenticated and authorized user
-	TRUSTED,  // Trusted accound, can broadcats packets
+	TRUSTED,  // Trusted account, can broadcast packets
 	ADMIN;    // Admin account already authenticated
 
 }
