@@ -250,7 +250,11 @@ public class JabberIqAuth extends XMPPProcessor implements XMPPProcessorIfc {
 					}
 					Authorization result = session.loginOther(authProps);
 					if (result == Authorization.AUTHORIZED) {
-						session.setResource(resource);
+						// Some clients don't send resource here, instead they send it later
+						// in resource bind packet.
+						if (resource != null && !resource.isEmpty()) {
+							session.setResource(resource);
+						}
 						results.offer(session.getAuthState().getResponseMessage(packet,
 								"Authentication successful.", false));
 					} else {
@@ -262,8 +266,9 @@ public class JabberIqAuth extends XMPPProcessor implements XMPPProcessorIfc {
 
 				} catch (Exception e) {
 					log.info("Authentication failed: " + user_name);
-					Packet response = Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-							e.getMessage(), false);
+					Packet response =
+							Authorization.NOT_AUTHORIZED.getResponseMessage(packet, e.getMessage(),
+									false);
 					response.setPriority(Priority.SYSTEM);
 					results.offer(response);
 
@@ -279,13 +284,14 @@ public class JabberIqAuth extends XMPPProcessor implements XMPPProcessorIfc {
 						results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
 								StanzaType.set, session.nextStanzaId()));
 					}
-//				} catch (Exception e) {
-//					log.info("Authentication failed: " + user_name);
-//					log.log(Level.WARNING, "Authentication failed: ", e);
-//					results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-//							e.getMessage(), false));
-//					results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
-//							StanzaType.set, session.nextStanzaId()));
+					// } catch (Exception e) {
+					// log.info("Authentication failed: " + user_name);
+					// log.log(Level.WARNING, "Authentication failed: ", e);
+					// results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
+					// e.getMessage(), false));
+					// results.offer(Command.CLOSE.getPacket(packet.getTo(),
+					// packet.getFrom(),
+					// StanzaType.set, session.nextStanzaId()));
 				}
 
 				break;
