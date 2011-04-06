@@ -777,7 +777,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 		// This is really unlikely a parent session would be null here but it may
 		// happen when the user disconnects just after sending resource bind.
 		// Due to asynchronous nature of packets processing in the Tigase the
-		// the authorization might be cancelled while resource bind packet still
+		// the authorization might be canceled while resource bind packet still
 		// waits in the queue.....
 		// This has already happened....
 		if (parentSession != null) {
