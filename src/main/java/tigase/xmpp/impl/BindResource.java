@@ -51,32 +51,32 @@ import java.util.logging.Logger;
 
 /**
  * RFC-3920, 7. Resource Binding
- *
- *
+ * 
+ * 
  * Created: Mon Feb 20 21:07:29 2006
- *
+ * 
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class BindResource extends XMPPProcessor implements XMPPProcessorIfc {
 	private static final Logger log = Logger.getLogger(BindResource.class.getName());
-	protected static final String RESOURCE_KEY = "Resource-Binded";
+	// protected static final String RESOURCE_KEY = "Resource-Binded";
 	private static final String XMLNS = "urn:ietf:params:xml:ns:xmpp-bind";
 	private static final String ID = XMLNS;
 	private static final String[] ELEMENTS = { "bind" };
 	private static final String[] XMLNSS = { XMLNS };
-	private static final Element[] FEATURES = {
-		new Element("bind", new String[] { "xmlns" }, new String[] { XMLNS }) };
-	private static final Element[] DISCO_FEATURES = {
-		new Element("feature", new String[] { "var" }, new String[] { XMLNS }) };
+	private static final Element[] FEATURES = { new Element("bind",
+			new String[] { "xmlns" }, new String[] { XMLNS }) };
+	private static final Element[] DISCO_FEATURES = { new Element("feature",
+			new String[] { "var" }, new String[] { XMLNS }) };
 	private static int resGenerator = 0;
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -86,40 +86,40 @@ public class BindResource extends XMPPProcessor implements XMPPProcessorIfc {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packet
 	 * @param session
 	 * @param repo
 	 * @param results
 	 * @param settings
-	 *
+	 * 
 	 * @throws XMPPException
 	 */
 	@Override
 	public void process(final Packet packet, final XMPPResourceConnection session,
 			final NonAuthUserRepository repo, final Queue<Packet> results,
-				final Map<String, Object> settings)
-			throws XMPPException {
+			final Map<String, Object> settings) throws XMPPException {
 		if (session == null) {
 			return;
-		}    // end of if (session == null)
+		} // end of if (session == null)
 
-		if ( !session.isAuthorized()) {
+		if (!session.isAuthorized()) {
 			results.offer(session.getAuthState().getResponseMessage(packet,
 					"Session is not yet authorized.", false));
 
 			return;
-		}    // end of if (!session.isAuthorized())
+		} // end of if (!session.isAuthorized())
 
-		if (session.getSessionData(RESOURCE_KEY) != null) {}
-
+		// TODO: test what happens if resource is bound multiple times for the same
+		// user session. in particular if XMPPSession object removes the old
+		// resource from the list.
 		Element request = packet.getElement();
 		StanzaType type = packet.getType();
 
 		try {
 			switch (type) {
-				case set :
+				case set:
 					String resource = request.getChildCData("/iq/bind/resource");
 
 					try {
@@ -131,43 +131,45 @@ public class BindResource extends XMPPProcessor implements XMPPProcessorIfc {
 								session.setResource(resource);
 							} catch (TigaseStringprepException ex) {
 
-								// User provided resource is invalid, generating different server one
+								// User provided resource is invalid, generating different
+								// server one
 								log.log(Level.INFO,
 										"Incrrect resource provided by the user: {0}, generating a "
-											+ "different one by the server.", resource);
+												+ "different one by the server.", resource);
 								resource = "tigase-" + (++resGenerator);
 								session.setResource(resource);
 							}
-						}    // end of if (resource == null) else
+						} // end of if (resource == null) else
 					} catch (TigaseStringprepException ex) {
-						log.log(Level.WARNING, "stringprep problem with the server generated resource: {0}",
-								resource);
+						log.log(Level.WARNING,
+								"stringprep problem with the server generated resource: {0}", resource);
 					}
 
 					packet.initVars(session.getJID(), packet.getStanzaTo());
-					session.putSessionData(RESOURCE_KEY, "true");
-					results.offer(packet.okResult(new Element("jid", session.getJID().toString()), 1));
+					// session.putSessionData(RESOURCE_KEY, "true");
+					results.offer(packet.okResult(new Element("jid", session.getJID().toString()),
+							1));
 
 					break;
 
-				default :
+				default:
 					results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
 							"Bind type is incorrect", false));
 
 					break;
-			}    // end of switch (type)
+			} // end of switch (type)
 		} catch (NotAuthorizedException e) {
 			results.offer(session.getAuthState().getResponseMessage(packet,
 					"Session is not yet authorized.", false));
-		}    // end of try-catch
+		} // end of try-catch
 	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param session
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -177,8 +179,8 @@ public class BindResource extends XMPPProcessor implements XMPPProcessorIfc {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -188,8 +190,8 @@ public class BindResource extends XMPPProcessor implements XMPPProcessorIfc {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -199,25 +201,22 @@ public class BindResource extends XMPPProcessor implements XMPPProcessorIfc {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param session
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
 	public Element[] supStreamFeatures(final XMPPResourceConnection session) {
-		if ((session != null) && (session.getSessionData(RESOURCE_KEY) == null)
-				&& session.isAuthorized()) {
+		if ((session != null) && (!session.isResourceSet()) && session.isAuthorized()) {
 			return FEATURES;
 		} else {
 			return null;
-		}    // end of if (session.isAuthorized()) else
+		} // end of if (session.isAuthorized()) else
 	}
-}    // BindResource
+} // BindResource
 
+// ~ Formatted in Sun Code Convention
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+// ~ Formatted by Jindent --- http://www.jindent.com
