@@ -432,7 +432,7 @@ public class JabberIqRoster extends XMPPProcessor implements XMPPProcessorIfc, X
 
 	//~--- methods --------------------------------------------------------------
 
-	private void processGetRequest(Packet packet, XMPPResourceConnection session,
+	protected void processGetRequest(Packet packet, XMPPResourceConnection session,
 			Queue<Packet> results, Map<String, Object> settings)
 			throws NotAuthorizedException, TigaseDBException {
 
@@ -558,7 +558,7 @@ public class JabberIqRoster extends XMPPProcessor implements XMPPProcessorIfc, X
 		}
 	}
 
-	private void processSetRequest(Packet packet, XMPPResourceConnection session,
+	protected void processSetRequest(Packet packet, XMPPResourceConnection session,
 			Queue<Packet> results, final Map<String, Object> settings)
 			throws XMPPException, NotAuthorizedException, TigaseDBException {
 
