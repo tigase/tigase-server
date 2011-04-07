@@ -364,6 +364,7 @@ public class MsgRepository implements MsgRepositoryIfc {
 				}
 
 				insert_msg_st.setLong(3, to_uid);
+				// TODO: deal with messages bigger than the database can fit....
 				insert_msg_st.setString(4, msg.toString());
 				insert_msg_st.executeUpdate();
 			}
