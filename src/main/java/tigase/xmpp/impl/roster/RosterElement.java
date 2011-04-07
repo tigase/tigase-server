@@ -274,6 +274,10 @@ public class RosterElement {
 		// }
 		return item;
 	}
+	
+	public String toString() {
+		return getRosterItem().toString();
+	}
 
 	/**
 	 * Method description
