@@ -123,187 +123,150 @@ public class JabberIqAuth extends XMPPProcessor implements XMPPProcessorIfc {
 			return;
 		} // end of if (session == null)
 
-		if (session.isAuthorized()) {
-
-			// Multiple authentication attempts....
-			// Another authentication request on already authenticated connection
-			// This is not allowed and must be forbidden.
-			Packet res =
-					Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-							"Cannot authenticate twice on the same stream.", false);
-
-			// Make sure it gets delivered before stream close
-			res.setPriority(Priority.SYSTEM);
-			results.offer(res);
-
-			// Optionally close the connection to make sure there is no
-			// confusion about the connection state.
-			results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
-					StanzaType.set, session.nextStanzaId()));
-
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST,
-						"Discovered second authentication attempt: {0}, packet: {1}", new Object[] {
-								session.toString(), packet.toString() });
+		synchronized (session) {
+			// If authentication timeout expired, ignore the request....
+			if (session.getSessionData(XMPPResourceConnection.AUTHENTICATION_TIMEOUT_KEY) != null) {
+				return;
 			}
 
-			try {
-				session.logout();
-			} catch (NotAuthorizedException ex) {
-				log.log(Level.FINER, "Unsuccessful session logout: {0}", session.toString());
-			}
+			if (session.isAuthorized()) {
 
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Session after logout: {0}", session.toString());
-			}
-		}
+				// Multiple authentication attempts....
+				// Another authentication request on already authenticated connection
+				// This is not allowed and must be forbidden.
+				Packet res =
+						Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
+								"Cannot authenticate twice on the same stream.", false);
 
-		Element request = packet.getElement();
-		StanzaType type = packet.getType();
+				// Make sure it gets delivered before stream close
+				res.setPriority(Priority.SYSTEM);
+				results.offer(res);
 
-		switch (type) {
-			case get:
-				Map<String, Object> query = new HashMap<String, Object>();
-
-				query.put(AuthRepository.PROTOCOL_KEY, AuthRepository.PROTOCOL_VAL_NONSASL);
-				try {
-					session.queryAuth(query);
-					String[] auth_mechs = (String[]) query.get(AuthRepository.RESULT_KEY);
-					StringBuilder response = new StringBuilder("<username/>");
-
-					for (String mech : auth_mechs) {
-						response.append("<").append(mech).append("/>");
-					} // end of for (String mech: auth_mechs)
-
-					response.append("<resource/>");
-					results.offer(packet.okResult(response.toString(), 1));
-				} catch (TigaseDBException ex) {
-					// TODO Auto-generated catch block
-					log.warning("Database problem: " + ex);
-					results.offer(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet,
-							"Database access problem, please contact administrator.", true));
-				}
-
-				break;
-
-			case set:
-				// Now we use loginOther() instead to make it easier to customize
-				// the authentication protocol without a need to replace the
-				// authentication plug-in. The authentication takes place on the
-				// AuthRepository
-				// level so we do not really care here what the user has sent.
-
-				String user_name = request.getChildCData("/iq/query/username");
-				String resource = request.getChildCData("/iq/query/resource");
-				// String password = request.getChildCData("/iq/query/password");
-				// String digest = request.getChildCData("/iq/query/digest");
-				//
-				// // String user_pass = null;
-				// String auth_mod = null;
-				//
-				// try {
-				// Authorization result = null;
-				//
-				// if (password != null) {
-				//
-				// // user_pass = password;
-				// // result = session.loginPlain(user_name, user_pass);
-				// result = session.loginPlain(user_name, password);
-				// } // end of if (password != null)
-				//
-				// if (digest != null) {
-				//
-				// // user_pass = digest;
-				// result =
-				// session.loginDigest(user_name, digest, session.getSessionId(),
-				// "SHA");
-				// } // end of if (digest != null)
-				//
-				// if (result == Authorization.AUTHORIZED) {
-				// session.setResource(resource);
-				// results.offer(session.getAuthState().getResponseMessage(packet,
-				// "Authentication successful.", false));
-				// } else {
-				// results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-				// "Authentication failed", false));
-				// results.offer(Command.CLOSE.getPacket(packet.getTo(),
-				// packet.getFrom(),
-				// StanzaType.set, session.nextStanzaId()));
-				// } // end of else
-
-				try {
-
-					List<Element> children = request.getChildren("/iq/query");
-					Map<String, Object> authProps = new HashMap<String, Object>(10, 0.75f);
-					authProps.put(AuthRepository.PROTOCOL_KEY, AuthRepository.PROTOCOL_VAL_NONSASL);
-					authProps.put(AuthRepository.REALM_KEY, session.getDomain().getVhost()
-							.getDomain());
-					authProps.put(AuthRepository.SERVER_NAME_KEY, session.getDomain().getVhost()
-							.getDomain());
-					authProps.put(AuthRepository.DIGEST_ID_KEY, session.getSessionId());
-					BareJID user_id =
-							BareJID.bareJIDInstance(user_name, session.getDomain().getVhost()
-									.getDomain());
-					authProps.put(AuthRepository.USER_ID_KEY, user_id);
-					for (Element child : children) {
-						authProps.put(child.getName(), child.getCData());
-					}
-					Authorization result = session.loginOther(authProps);
-					if (result == Authorization.AUTHORIZED) {
-						// Some clients don't send resource here, instead they send it later
-						// in resource bind packet.
-						if (resource != null && !resource.isEmpty()) {
-							session.setResource(resource);
-						}
-						results.offer(session.getAuthState().getResponseMessage(packet,
-								"Authentication successful.", false));
-					} else {
-						results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-								"Authentication failed", false));
-						results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
-								StanzaType.set, session.nextStanzaId()));
-					} // end of else
-
-				} catch (Exception e) {
-					log.info("Authentication failed: " + user_name);
-					Packet response =
-							Authorization.NOT_AUTHORIZED.getResponseMessage(packet, e.getMessage(),
-									false);
-					response.setPriority(Priority.SYSTEM);
-					results.offer(response);
-
-					Integer retries = (Integer) session.getSessionData("auth-retries");
-
-					if (retries == null) {
-						retries = new Integer(0);
-					}
-
-					if (retries.intValue() < 3) {
-						session.putSessionData("auth-retries", new Integer(retries.intValue() + 1));
-					} else {
-						results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
-								StanzaType.set, session.nextStanzaId()));
-					}
-					// } catch (Exception e) {
-					// log.info("Authentication failed: " + user_name);
-					// log.log(Level.WARNING, "Authentication failed: ", e);
-					// results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-					// e.getMessage(), false));
-					// results.offer(Command.CLOSE.getPacket(packet.getTo(),
-					// packet.getFrom(),
-					// StanzaType.set, session.nextStanzaId()));
-				}
-
-				break;
-
-			default:
-				results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
-						"Message type is incorrect", false));
+				// Optionally close the connection to make sure there is no
+				// confusion about the connection state.
 				results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
 						StanzaType.set, session.nextStanzaId()));
 
-				break;
-		} // end of switch (type)
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST,
+							"Discovered second authentication attempt: {0}, packet: {1}", new Object[] {
+									session.toString(), packet.toString() });
+				}
+
+				try {
+					session.logout();
+				} catch (NotAuthorizedException ex) {
+					log.log(Level.FINER, "Unsuccessful session logout: {0}", session.toString());
+				}
+
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "Session after logout: {0}", session.toString());
+				}
+			}
+
+			Element request = packet.getElement();
+			StanzaType type = packet.getType();
+
+			switch (type) {
+				case get:
+					Map<String, Object> query = new HashMap<String, Object>();
+
+					query.put(AuthRepository.PROTOCOL_KEY, AuthRepository.PROTOCOL_VAL_NONSASL);
+					try {
+						session.queryAuth(query);
+						String[] auth_mechs = (String[]) query.get(AuthRepository.RESULT_KEY);
+						StringBuilder response = new StringBuilder("<username/>");
+
+						for (String mech : auth_mechs) {
+							response.append("<").append(mech).append("/>");
+						} // end of for (String mech: auth_mechs)
+
+						response.append("<resource/>");
+						results.offer(packet.okResult(response.toString(), 1));
+					} catch (TigaseDBException ex) {
+						// TODO Auto-generated catch block
+						log.warning("Database problem: " + ex);
+						results.offer(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet,
+								"Database access problem, please contact administrator.", true));
+					}
+
+					break;
+
+				case set:
+					// Now we use loginOther() instead to make it easier to customize
+					// the authentication protocol without a need to replace the
+					// authentication plug-in. The authentication takes place on the
+					// AuthRepository
+					// level so we do not really care here what the user has sent.
+
+					String user_name = request.getChildCData("/iq/query/username");
+					String resource = request.getChildCData("/iq/query/resource");
+					try {
+
+						List<Element> children = request.getChildren("/iq/query");
+						Map<String, Object> authProps = new HashMap<String, Object>(10, 0.75f);
+						authProps.put(AuthRepository.PROTOCOL_KEY, AuthRepository.PROTOCOL_VAL_NONSASL);
+						authProps.put(AuthRepository.REALM_KEY, session.getDomain().getVhost()
+								.getDomain());
+						authProps.put(AuthRepository.SERVER_NAME_KEY, session.getDomain().getVhost()
+								.getDomain());
+						authProps.put(AuthRepository.DIGEST_ID_KEY, session.getSessionId());
+						BareJID user_id =
+								BareJID.bareJIDInstance(user_name, session.getDomain().getVhost()
+										.getDomain());
+						authProps.put(AuthRepository.USER_ID_KEY, user_id);
+						for (Element child : children) {
+							authProps.put(child.getName(), child.getCData());
+						}
+						Authorization result = session.loginOther(authProps);
+						if (result == Authorization.AUTHORIZED) {
+							// Some clients don't send resource here, instead they send it later
+							// in resource bind packet.
+							if (resource != null && !resource.isEmpty()) {
+								session.setResource(resource);
+							}
+							results.offer(session.getAuthState().getResponseMessage(packet,
+									"Authentication successful.", false));
+						} else {
+							results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
+									"Authentication failed", false));
+							results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
+									StanzaType.set, session.nextStanzaId()));
+						} // end of else
+
+					} catch (Exception e) {
+						log.info("Authentication failed: " + user_name);
+						Packet response =
+								Authorization.NOT_AUTHORIZED.getResponseMessage(packet, e.getMessage(),
+										false);
+						response.setPriority(Priority.SYSTEM);
+						results.offer(response);
+
+						Integer retries = (Integer) session.getSessionData("auth-retries");
+
+						if (retries == null) {
+							retries = new Integer(0);
+						}
+
+						if (retries.intValue() < 3) {
+							session.putSessionData("auth-retries", new Integer(retries.intValue() + 1));
+						} else {
+							results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
+									StanzaType.set, session.nextStanzaId()));
+						}
+					}
+
+					break;
+
+				default:
+					results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
+							"Message type is incorrect", false));
+					results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
+							StanzaType.set, session.nextStanzaId()));
+
+					break;
+			} // end of switch (type)			
+		}
 	}
 
 	/**

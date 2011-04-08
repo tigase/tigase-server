@@ -53,8 +53,8 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	/**
 	 * Private logger for class instances.
 	 */
-	private static final Logger log = Logger
-			.getLogger("tigase.xmpp.XMPPResourceConnection");
+	private static final Logger log = Logger.getLogger(XMPPResourceConnection.class
+			.getName());
 
 	/**
 	 * Constant <code>PRESENCE_KEY</code> is a key in temporary session data where
@@ -62,6 +62,8 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	 * presence or off-line presence before disconnecting.
 	 */
 	public static final String PRESENCE_KEY = "user-presence";
+	public static final String CLOSING_KEY = "closing-conn";
+	public static final String AUTHENTICATION_TIMEOUT_KEY = "authentication-timeout";
 
 	private long authenticationTime = 0;
 

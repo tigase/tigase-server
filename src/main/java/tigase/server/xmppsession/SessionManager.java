@@ -814,7 +814,14 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 		XMPPResourceConnection connection = connectionsByFrom.remove(connectionId);
 
 		if (connection != null) {
-			closeSession(connection, closeOnly);
+			// Make sure no other stuff happen on the connection while it is being
+			// closed. The best example is handleLogin, it happens they are called
+			// concurrently and this is where things go wrong....
+			synchronized (connection) {
+				connection.putSessionData(XMPPResourceConnection.CLOSING_KEY,
+						XMPPResourceConnection.CLOSING_KEY);
+				closeSession(connection, closeOnly);
+			}
 		} else {
 			log.log(Level.FINE, "Can not find resource connection for packet: {0}",
 					connectionId);
@@ -945,12 +952,13 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 	public boolean addOutPacket(Packet packet) {
 		// We actually have to set packetFrom address to the session manager ID
 		// to make sure the connection manager for instance can report problems back
-		// This cause other problems with packets processing which have to be resolved
+		// This cause other problems with packets processing which have to be
+		// resolved
 		// anyway
 		if (packet.getPacketFrom() == null) {
 			packet.setPacketFrom(getComponentId());
 		}
-		return super.addOutPacket(packet);			
+		return super.addOutPacket(packet);
 	}
 
 	@Override
@@ -1001,13 +1009,15 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 	}
 
 	protected boolean isBrokenPacket(Packet p) {
-		// TODO: check this out to make sure it does not lead to an infinite processing loop
-		// These are most likely packets generated inside the SM to other users who are 
+		// TODO: check this out to make sure it does not lead to an infinite
+		// processing loop
+		// These are most likely packets generated inside the SM to other users who
+		// are
 		// offline, like presence updates.
 		if (getComponentId().equals(p.getPacketFrom()) && p.getPacketTo() == null) {
 			return false;
 		}
-		
+
 		if (p.getFrom() == null) {
 
 			// This is actually a broken packet and we can't even return an error
@@ -1577,55 +1587,61 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 	}
 
 	protected void registerNewSession(BareJID userId, XMPPResourceConnection conn) {
-		XMPPSession session = sessionsByNodeId.get(userId);
-
-		if (session == null) {
-			session = new XMPPSession(userId.getLocalpart());
-			sessionsByNodeId.put(userId, session);
-
-			int currSize = sessionsByNodeId.size();
-
-			if (currSize > maxUserSessions) {
-				maxUserSessions = currSize;
+		synchronized (conn) {
+			if (conn.getSessionData(XMPPResourceConnection.CLOSING_KEY) != null) {
+				// The user just closed the connection, ignore....
+				return;
 			}
+			XMPPSession session = sessionsByNodeId.get(userId);
 
-			++totalUserSessions;
+			if (session == null) {
+				session = new XMPPSession(userId.getLocalpart());
+				sessionsByNodeId.put(userId, session);
 
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Created new XMPPSession for: {0}", userId);
-			}
-		} else {
+				int currSize = sessionsByNodeId.size();
 
-			// Check all other connections whether they are still alive....
-			List<XMPPResourceConnection> connections = session.getActiveResources();
+				if (currSize > maxUserSessions) {
+					maxUserSessions = currSize;
+				}
 
-			if (connections != null) {
-				for (XMPPResourceConnection connection : connections) {
-					if (connection != conn) {
-						if (log.isLoggable(Level.FINEST)) {
-							log.log(Level.FINEST, "Checking connection: {0}", connection);
-						}
+				++totalUserSessions;
 
-						try {
-							addOutPacketWithTimeout(Command.CHECK_USER_CONNECTION.getPacket(
-									getComponentId(), connection.getConnectionId(), StanzaType.get, UUID
-											.randomUUID().toString()), connectionCheckCommandHandler, 30l,
-									TimeUnit.SECONDS);
-						} catch (NoConnectionIdException ex) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "Created new XMPPSession for: {0}", userId);
+				}
+			} else {
 
-							// This actually should not happen... might be a bug:
-							log.log(Level.WARNING, "This should not happen, check it out!, ", ex);
+				// Check all other connections whether they are still alive....
+				List<XMPPResourceConnection> connections = session.getActiveResources();
+
+				if (connections != null) {
+					for (XMPPResourceConnection connection : connections) {
+						if (connection != conn) {
+							if (log.isLoggable(Level.FINEST)) {
+								log.log(Level.FINEST, "Checking connection: {0}", connection);
+							}
+
+							try {
+								addOutPacketWithTimeout(Command.CHECK_USER_CONNECTION.getPacket(
+										getComponentId(), connection.getConnectionId(), StanzaType.get, UUID
+												.randomUUID().toString()), connectionCheckCommandHandler, 30l,
+										TimeUnit.SECONDS);
+							} catch (NoConnectionIdException ex) {
+
+								// This actually should not happen... might be a bug:
+								log.log(Level.WARNING, "This should not happen, check it out!, ", ex);
+							}
 						}
 					}
 				}
 			}
-		}
 
-		try {
-			session.addResourceConnection(conn);
-		} catch (TigaseStringprepException ex) {
-			log.log(Level.INFO, "Stringprep problem for resource connection: {0}", conn);
-			handleLogout(userId, conn);
+			try {
+				session.addResourceConnection(conn);
+			} catch (TigaseStringprepException ex) {
+				log.log(Level.INFO, "Stringprep problem for resource connection: {0}", conn);
+				handleLogout(userId, conn);
+			}
 		}
 	}
 
@@ -1899,13 +1915,20 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 		public void run() {
 			XMPPResourceConnection conn = connectionsByFrom.get(connId);
 
-			if ((conn != null) && !conn.isAuthorized()) {
-				connectionsByFrom.remove(connId);
-				++authTimeouts;
-				log.log(Level.INFO, "Authentication timeout expired, closing connection: {0}",
-						connId);
-				fastAddOutPacket(Command.CLOSE.getPacket(getComponentId(), connId,
-						StanzaType.set, conn.nextStanzaId()));
+			if (conn != null) {
+				synchronized (conn) {
+					if (!conn.isAuthorized()) {
+						conn.putSessionData(XMPPResourceConnection.AUTHENTICATION_TIMEOUT_KEY,
+								XMPPResourceConnection.AUTHENTICATION_TIMEOUT_KEY);
+						connectionsByFrom.remove(connId);
+						++authTimeouts;
+						log.log(Level.INFO,
+								"Authentication timeout expired, closing connection: {0}", connId);
+						fastAddOutPacket(Command.CLOSE.getPacket(getComponentId(), connId,
+								StanzaType.set, conn.nextStanzaId()));
+
+					}
+				}
 			}
 		}
 	}

@@ -123,107 +123,116 @@ public class SaslAuth extends XMPPProcessor implements XMPPProcessorIfc {
 			return;
 		} // end of if (session == null)
 
-		if (session.isAuthorized()) {
-
-			// Multiple authentication attempts....
-			// Another authentication request on already authenticated connection
-			// This is not allowed and must be forbidden.
-			Packet res =
-					packet.swapFromTo(createReply(ElementType.failure, "<not-authorized/>"), null,
-							null);
-
-			// Make sure it gets delivered before stream close
-			res.setPriority(Priority.SYSTEM);
-			results.offer(res);
-
-			// Optionally close the connection to make sure there is no
-			// confusion about the connection state.
-			results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
-					StanzaType.set, session.nextStanzaId()));
-
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST,
-						"Discovered second authentication attempt: {0}, packet: {1}", new Object[] {
-								session.toString(), packet.toString() });
+		synchronized (session) {
+			// If authentication timeout expired, ignore the request....
+			if (session.getSessionData(XMPPResourceConnection.AUTHENTICATION_TIMEOUT_KEY) != null) {
+				return;
 			}
+			
+			if (session.isAuthorized()) {
 
-			try {
-				session.logout();
-			} catch (NotAuthorizedException ex) {
-				log.log(Level.FINER, "Unsuccessful session logout: {0}", session.toString());
-			}
+				// Multiple authentication attempts....
+				// Another authentication request on already authenticated connection
+				// This is not allowed and must be forbidden.
+				Packet res =
+						packet.swapFromTo(createReply(ElementType.failure, "<not-authorized/>"),
+								null, null);
 
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Session after logout: {0}", session.toString());
-			}
-		}
+				// Make sure it gets delivered before stream close
+				res.setPriority(Priority.SYSTEM);
+				results.offer(res);
 
-		Element request = packet.getElement();
-
-		// ElementType type = null;
-		// try {
-		// type = ElementType.valueOf(request.getName());
-		// } catch (IllegalArgumentException e) {
-		// log.warning("Incorrect stanza type: " + request.getName());
-		// results.offer(packet.swapFromTo(createReply(ElementType.failure,
-		// "<temporary-auth-failure/>")));
-		// results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
-		// StanzaType.set, packet.getElemId()));
-		// return;
-		// } // end of try-catch
-		Map<String, Object> authProps =
-				(Map<String, Object>) (session.getSessionData(XMLNS + "-authProps"));
-
-		if (authProps == null) {
-			authProps = new HashMap<String, Object>(10, 0.75f);
-			authProps.put(AuthRepository.PROTOCOL_KEY, AuthRepository.PROTOCOL_VAL_SASL);
-			authProps.put(AuthRepository.MACHANISM_KEY,
-					request.getAttribute("/auth", "mechanism"));
-			authProps.put(AuthRepository.REALM_KEY, session.getDomain().getVhost().getDomain());
-			authProps.put(AuthRepository.SERVER_NAME_KEY, session.getDomain().getVhost()
-					.getDomain());
-			session.putSessionData(XMLNS + "-authProps", authProps);
-		} // end of if (authProps == null)
-
-		// String user = (String)authProps.get(AuthRepository.USER_ID_KEY);
-		authProps.put(AuthRepository.DATA_KEY, request.getCData());
-
-		try {
-			Authorization result = session.loginOther(authProps);
-			String challenge_data = (String) authProps.get(AuthRepository.RESULT_KEY);
-
-			if (result == Authorization.AUTHORIZED) {
-				results.offer(packet.swapFromTo(createReply(ElementType.success, challenge_data),
-						null, null));
-				authProps.clear();
-				session.removeSessionData(XMLNS + "-authProps");
-			} else {
-				results.offer(packet.swapFromTo(
-						createReply(ElementType.challenge, challenge_data), null, null));
-			}
-		} catch (Exception e) {
-			log.log(Level.INFO, "Authentication failed: ", e);
-
-			// e.printStackTrace();
-			session.removeSessionData(XMLNS + "-authProps");
-			Packet response = packet.swapFromTo(
-					createReply(ElementType.failure, "<not-authorized/>"), null, null); 
-			response.setPriority(Priority.SYSTEM);
-			results.offer(response);
-
-			Integer retries = (Integer) session.getSessionData("auth-retries");
-
-			if (retries == null) {
-				retries = new Integer(0);
-			}
-
-			if (retries.intValue() < 3) {
-				session.putSessionData("auth-retries", new Integer(retries.intValue() + 1));
-			} else {
+				// Optionally close the connection to make sure there is no
+				// confusion about the connection state.
 				results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
 						StanzaType.set, session.nextStanzaId()));
+
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST,
+							"Discovered second authentication attempt: {0}, packet: {1}", new Object[] {
+									session.toString(), packet.toString() });
+				}
+
+				try {
+					session.logout();
+				} catch (NotAuthorizedException ex) {
+					log.log(Level.FINER, "Unsuccessful session logout: {0}", session.toString());
+				}
+
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "Session after logout: {0}", session.toString());
+				}
 			}
-		} // end of try-catch
+
+			Element request = packet.getElement();
+
+			// ElementType type = null;
+			// try {
+			// type = ElementType.valueOf(request.getName());
+			// } catch (IllegalArgumentException e) {
+			// log.warning("Incorrect stanza type: " + request.getName());
+			// results.offer(packet.swapFromTo(createReply(ElementType.failure,
+			// "<temporary-auth-failure/>")));
+			// results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
+			// StanzaType.set, packet.getElemId()));
+			// return;
+			// } // end of try-catch
+			Map<String, Object> authProps =
+					(Map<String, Object>) (session.getSessionData(XMLNS + "-authProps"));
+
+			if (authProps == null) {
+				authProps = new HashMap<String, Object>(10, 0.75f);
+				authProps.put(AuthRepository.PROTOCOL_KEY, AuthRepository.PROTOCOL_VAL_SASL);
+				authProps.put(AuthRepository.MACHANISM_KEY,
+						request.getAttribute("/auth", "mechanism"));
+				authProps.put(AuthRepository.REALM_KEY, session.getDomain().getVhost()
+						.getDomain());
+				authProps.put(AuthRepository.SERVER_NAME_KEY, session.getDomain().getVhost()
+						.getDomain());
+				session.putSessionData(XMLNS + "-authProps", authProps);
+			} // end of if (authProps == null)
+
+			// String user = (String)authProps.get(AuthRepository.USER_ID_KEY);
+			authProps.put(AuthRepository.DATA_KEY, request.getCData());
+
+			try {
+				Authorization result = session.loginOther(authProps);
+				String challenge_data = (String) authProps.get(AuthRepository.RESULT_KEY);
+
+				if (result == Authorization.AUTHORIZED) {
+					results.offer(packet.swapFromTo(
+							createReply(ElementType.success, challenge_data), null, null));
+					authProps.clear();
+					session.removeSessionData(XMLNS + "-authProps");
+				} else {
+					results.offer(packet.swapFromTo(
+							createReply(ElementType.challenge, challenge_data), null, null));
+				}
+			} catch (Exception e) {
+				log.log(Level.INFO, "Authentication failed: ", e);
+
+				// e.printStackTrace();
+				session.removeSessionData(XMLNS + "-authProps");
+				Packet response =
+						packet.swapFromTo(createReply(ElementType.failure, "<not-authorized/>"),
+								null, null);
+				response.setPriority(Priority.SYSTEM);
+				results.offer(response);
+
+				Integer retries = (Integer) session.getSessionData("auth-retries");
+
+				if (retries == null) {
+					retries = new Integer(0);
+				}
+
+				if (retries.intValue() < 3) {
+					session.putSessionData("auth-retries", new Integer(retries.intValue() + 1));
+				} else {
+					results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
+							StanzaType.set, session.nextStanzaId()));
+				}
+			} // end of try-catch
+		}
 	}
 
 	/**
