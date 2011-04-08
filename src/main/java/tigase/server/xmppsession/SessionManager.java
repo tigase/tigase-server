@@ -823,8 +823,22 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 				closeSession(connection, closeOnly);
 			}
 		} else {
-			log.log(Level.FINE, "Can not find resource connection for packet: {0}",
+			log.log(Level.FINE, "Can not find resource connection for connectionId: {0}",
 					connectionId);
+			// Let's make sure there is no stale XMPPResourceConnection in some XMPPSession
+			// object which may cause problems and packets sent to nowhere.
+			// This might an expensive operation though....
+			log.log(Level.WARNING, "Trying to find and remove stale XMPPResourceConnection: {0}",
+					connectionId);
+			for (XMPPSession session : sessionsByNodeId.values()) {
+				connection = session.getResourceForConnectionId(connectionId);
+				if (connection != null) {
+					log.log(Level.WARNING, "Found stale XMPPResourceConnection: {0}, removing...",
+							connection);
+					session.removeResourceConnection(connection);
+					break;
+				}
+			}
 		} // end of if (conn != null) else
 	}
 
