@@ -284,7 +284,8 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 		while ((p = serv.getReceivedPackets().poll()) != null) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Processing socket data: {0}", p.toStringSecure());
+				log.log(Level.FINEST, "Processing socket data: {0} from connection: {1}",
+						new Object[] { p.toStringSecure(), id });
 			}
 
 			// Sometimes xmlns is not set for the packet. Usually it does not
@@ -298,7 +299,8 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 			if (p.getAttribute("xmlns") == null) {
 				p.setXMLNS(XMLNS);
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "XMLNS set for packet: {0}", p.toStringSecure());
+					log.log(Level.FINEST, "XMLNS set for packet: {0} from connection: {1}",
+						new Object[] { p.toStringSecure(), id });
 				}
 			}
 
