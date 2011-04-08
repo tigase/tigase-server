@@ -1300,7 +1300,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 			Queue<Packet> results, Map<String, Object> settings, PresenceType pres_type)
 			throws NotAuthorizedException, TigaseDBException, NoConnectionIdException {
 
-		// If the buddy is already subscribed then auto-reply with sybscribed
+		// If the buddy is already subscribed then auto-reply with subscribed
 		// presence stanza.
 		if (roster_util.isSubscribedFrom(session, packet.getStanzaFrom())) {
 			sendPresence(StanzaType.subscribed, session.getJID().copyWithoutResource(),
@@ -1338,6 +1338,9 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 
 		if (subscr_changed) {
 
+			Packet forward_p = packet.copyElementOnly();
+			forward_p.setPacketTo(session.getConnectionId());
+			results.offer(forward_p);
 			// updatePresenceChange(packet.getElement(), session, results);
 			roster_util.updateBuddyChange(session, results,
 					roster_util.getBuddyItem(session, packet.getStanzaFrom()));
