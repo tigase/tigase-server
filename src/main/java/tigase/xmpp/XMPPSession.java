@@ -238,30 +238,6 @@ public class XMPPSession {
 	 * Method description
 	 *
 	 *
-	 * @return
-	 */
-	public XMPPResourceConnection getOldestConnection() {
-		if (activeResources.size() > 0) {
-			XMPPResourceConnection result = activeResources.get(0);
-
-			for (XMPPResourceConnection conn : activeResources) {
-				if (result.getCreationTime() > conn.getCreationTime()) {
-					result = conn;
-				}    // end of if (resource.equals(conn.getResource()))
-			}      // end of for (XMPPResourceConnection conn: activeResources)
-
-			return result;
-		}
-
-		log.info("XMPPSession with no connections for user: " + username);
-
-		return null;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
 	 * @param jid
 	 *
 	 * @return
