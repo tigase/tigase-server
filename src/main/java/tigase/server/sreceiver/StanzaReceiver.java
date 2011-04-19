@@ -70,61 +70,60 @@ import java.util.logging.Logger;
 //~--- classes ----------------------------------------------------------------
 
 /**
- * This is a sibbling of <code>StanzaSender</code> class and offers just
- * an opposite functionaity. It can receive XMPP packets to do something
- * with them. And what to do it depends on the destination address.
- * Destination address points to certain receiver task and this is up
- * to task to decide what to do with the stanza. Task address is just a
- * usuall Jabber ID: <strong>task-short-name@srec.tigase.org</strong>.
+ * This is a sibling to <code>StanzaSender</code> class and offers just an
+ * opposite functionality. It can receive XMPP packets to do something with
+ * them. And what to do it depends on the destination address. Destination
+ * address points to certain receiver task and this is up to task to decide what
+ * to do with the stanza. Task address is just a usual Jabber ID:
+ * <strong>task-short-name@srec.tigase.org</strong>.
  * <p>
- * Like public chat rooms in <strong>MUC</strong> tasks can be preconfigured
- * in the <code>StanzaReceiver</code> configuration or can be created on
- * demand using <code>ad-hoc</code> commands and <code>service-discovery</code>.
- * User can subscribe to some tasks and can add them to the roster just like
- * a normal contacts. This allows to use the functionality from all existing
- * clients without implementing any special protocols or extensions.
+ * Like public chat rooms in <strong>MUC</strong> tasks can be preconfigured in
+ * the <code>StanzaReceiver</code> configuration or can be created on demand
+ * using <code>ad-hoc</code> commands and <code>service-discovery</code>. User
+ * can subscribe to some tasks and can add them to the roster just like a normal
+ * contacts. This allows to use the functionality from all existing clients
+ * without implementing any special protocols or extensions.
  * </p>
  * <p>
  * Possible tasks are:
  * </p>
  * <ul>
- * <li><strong>Interests groups</strong> - simple stanza (message)
- * distribution to a group of interested ppl. To receive this information
- * user has to subscribe to the task first. It is a bit like a
- * <strong>MUC</strong> without a chat room or like a mailing list.</li>
- * <li><strong>Persistent storage</strong> - which is like an archaive of
- * some information for group of ppl.</li>
- * <li><strong>Web page publishing</strong> - this might be useful for
- * web sites with kind of <em>Short, instant news board</em> where selected
- * users can send information and they are published instantly.
- * (Through the database for example.)</li>
- * <li><strong>Forums integration</strong> - this might be useful for kind
- * of forums where you can post messages from Web site as well as from your
- * Jabber client.</li>
+ * <li><strong>Interests groups</strong> - simple stanza (message) distribution
+ * to a group of interested ppl. To receive this information user has to
+ * subscribe to the task first. It is a bit like a <strong>MUC</strong> without
+ * a chat room or like a mailing list.</li>
+ * <li><strong>Persistent storage</strong> - which is like an archive of some
+ * information for group of ppl.</li>
+ * <li><strong>Web page publishing</strong> - this might be useful for web sites
+ * with kind of <em>Short, instant news board</em> where selected users can send
+ * information and they are published instantly. (Through the database for
+ * example.)</li>
+ * <li><strong>Forums integration</strong> - this might be useful for kind of
+ * forums where you can post messages from Web site as well as from your Jabber
+ * client.</li>
  * </ul>
  * <p>
  * <strong>Task creation parameters:</strong><br/>
  * <ul>
- * <li><strong>Task short name</strong> - the nick name of the task which
- * is used to create Jabber ID for the task.</li>
- * <li><strong>Task description</strong> - description of the task what is
- * the purpose of the task.</li>
+ * <li><strong>Task short name</strong> - the nick name of the task which is
+ * used to create Jabber ID for the task.</li>
+ * <li><strong>Task description</strong> - description of the task what is the
+ * purpose of the task.</li>
  * <li><strong>Task type</strong> - the server, through <code>ad-hoc</code>
- * commands should present available tasks types which can be created.
- * User can select a task to create. There may be some restrictions on
- * tasks creation like certain types can be created only by server
- * administrator or some tasks types can be created only once on single
- * server and so on.</li>
- * <li><strong>Subscrption list</strong> - server admin should be able to add
+ * commands should present available tasks types which can be created. User can
+ * select a task to create. There may be some restrictions on tasks creation
+ * like certain types can be created only by server administrator or some tasks
+ * types can be created only once on single server and so on.</li>
+ * <li><strong>Subscription list</strong> - server admin should be able to add
  * list of users who might be interested in subscription to the task. After task
- * is created <code>subscrive</code> presence is sent to these users and they can
- * accept the subscription or not.</li>
- * <li><strong>Subscription restrictions</strong> - who may subscribe to the task
- * like: <em>public task</em> - anybody can subscribe, <em>local users only</em>
- * - users from the local server (domain) only can subscribe, <em>by regex</em>
- * - regular expresion matching JIDs, <em>moderated subscription</em> - anybody
- * may request subscription but the creator of the task must approve the
- * subscription.</li>
+ * is created <code>subscribe</code> presence is sent to these users and they
+ * can accept the subscription or not.</li>
+ * <li><strong>Subscription restrictions</strong> - who may subscribe to the
+ * task like: <em>public task</em> - anybody can subscribe,
+ * <em>local users only</em> - users from the local server (domain) only can
+ * subscribe, <em>by regex</em> - regular expression matching JIDs,
+ * <em>moderated subscription</em> - anybody may request subscription but the
+ * creator of the task must approve the subscription.</li>
  * <li><strong>On line only</strong> - the task may distribute packets to online
  * users only.</li>
  * <li><strong>Replace sender address</strong> - whether sender address should
@@ -132,8 +131,8 @@ import java.util.logging.Logger;
  * responses should go. If the list is kind on announces board like new version
  * release then maybe replies should go to the sender. If this is more like
  * topic discussion group then the reply should go to all subscribers.</li>
- * <li><strong>Message type</strong> - whether messages should be distributed
- * as a <code>chat</code>, <code>headline</code> or <code>normal</code>.</li>
+ * <li><strong>Message type</strong> - whether messages should be distributed as
+ * a <code>chat</code>, <code>headline</code> or <code>normal</code>.</li>
  * <li><strong>Who can post</strong> - who can send a message for processing,
  * possible options are: <code>all</code>, <code>subscribed</code>,
  * <code>owner</code>, <code>list</code></li>
@@ -141,18 +140,19 @@ import java.util.logging.Logger;
  * There can be also some per task specific settings...
  * </p>
  * <p>
- * Created: Wed May  9 08:27:22 2007
+ * Created: Wed May 9 08:27:22 2007
  * </p>
+ * 
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class StanzaReceiver extends AbstractMessageReceiver
-		implements Configurable, XMPPService, StanzaReceiverIfc {
+public class StanzaReceiver extends AbstractMessageReceiver implements Configurable,
+		XMPPService, StanzaReceiverIfc {
 	private static String[] ADMINS_PROP_VAL = { "admin@localhost", "admin@hostname" };
 	private static final int CREATION_MAX_NO_PROP_VAL = 1;
 
-//private static final String LOCAL_DOMAINS_PROP_KEY = "local-domains";
-//private static String[] LOCAL_DOMAINS_PROP_VAL = {"localhost"};
+	// private static final String LOCAL_DOMAINS_PROP_KEY = "local-domains";
+	// private static String[] LOCAL_DOMAINS_PROP_VAL = {"localhost"};
 
 	/** Field description */
 	public static final String MY_DOMAIN_NAME_PROP_KEY = "domain-name";
@@ -160,8 +160,8 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	/** Field description */
 	public static final String MY_DOMAIN_NAME_PROP_VAL = "srecv.localhost";
 
-//public static final String SIMPLE_JID_PROP_KEY = "simple-jid";
-//public static final String SIMPLE_JID_PROP_VAL =  "srecv@localhost";
+	// public static final String SIMPLE_JID_PROP_KEY = "simple-jid";
+	// public static final String SIMPLE_JID_PROP_VAL = "srecv@localhost";
 	private static final String SREC_REPO_CLASS_PROP_KEY = "srec-repo-class";
 	private static final String SREC_REPO_URL_PROP_KEY = "srec-repo-url";
 	private static final String TASKS_LIST_PROP_KEY = "tasks-list";
@@ -172,46 +172,51 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	private static final String TASK_TYPE_PROP_VAL = "News Distribution";
 	private static final String TESTER_TASK_NAME = "tester_1";
 	private static final String TESTER_TASK_TYPE = "Tester Task";
-	private static final Logger log = Logger.getLogger("tigase.server.sreceiver.StanzaReceiver");
+	private static final Logger log = Logger
+			.getLogger("tigase.server.sreceiver.StanzaReceiver");
 	private static final String[] TASK_TYPES_PROP_VAL = { TASK_TYPE_PROP_VAL };
 	private static final String TASK_TYPES_PROP_KEY = TASK_TYPES_PROP_NODE + "list";
 	private static final boolean TASK_ACTIVE_PROP_VAL = true;
-	private static final TaskCreationPolicy CREATION_POLICY_PROP_VAL = TaskCreationPolicy.ADMIN;
-	private static final String CREATION_POLICY_PROP_KEY = TASK_TYPES_PROP_NODE + "default-policy";
+	private static final TaskCreationPolicy CREATION_POLICY_PROP_VAL =
+			TaskCreationPolicy.ADMIN;
+	private static final String CREATION_POLICY_PROP_KEY = TASK_TYPES_PROP_NODE
+			+ "default-policy";
 	private static final String CREATION_MAX_NO_PROP_KEY = TASK_TYPES_PROP_NODE
-		+ "default-max-number";
+			+ "default-max-number";
 	private static final String params_node = "/params";
 	private static final String task_type_key = "task-type";
 	private static final String tasks_node = "/tasks";
 
-	//~--- fields ---------------------------------------------------------------
+	// ~--- fields ---------------------------------------------------------------
 
 	private String[] admins = { "admin@localhost" };
 
-//private String simpleJid = null;
+	// private String simpleJid = null;
 	private UserRepository repository = null;
 
-///**
-// * Variable <code>defaultPolicy</code> specifies default task creation policy.
-// * In other words who can create task. This is default setting for task types
-// * not specified separately in configuration file.
-// */
-//private TaskCreationPolicy defaultPolicy = CREATION_POLICY_PROP_VAL;
+	// /**
+	// * Variable <code>defaultPolicy</code> specifies default task creation
+	// policy.
+	// * In other words who can create task. This is default setting for task
+	// types
+	// * not specified separately in configuration file.
+	// */
+	// private TaskCreationPolicy defaultPolicy = CREATION_POLICY_PROP_VAL;
 	private ServiceEntity serviceEntity = null;
 
 	/**
-	 * This maps keeps all available task types which can be instantiated
-	 * by the user.
+	 * This maps keeps all available task types which can be instantiated by the
+	 * user.
 	 */
 	private Map<String, TaskType> task_types = new ConcurrentHashMap<String, TaskType>();
 
 	/**
 	 * This map keeps all active tasks instances as pairs: (JabberID, task)
 	 */
-	private Map<String, ReceiverTaskIfc> task_instances = new ConcurrentHashMap<String,
-		ReceiverTaskIfc>();
+	private Map<String, ReceiverTaskIfc> task_instances =
+			new ConcurrentHashMap<String, ReceiverTaskIfc>();
 
-//private Set<String> local_domains = new HashSet<String>();
+	// private Set<String> local_domains = new HashSet<String>();
 	private String my_hostname = MY_DOMAIN_NAME_PROP_VAL;
 
 	/**
@@ -220,26 +225,28 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	 * separately in configuration file.
 	 */
 	private int defaultMaxTasksNo = CREATION_MAX_NO_PROP_VAL;
-	private Map<String, TaskCommandIfc> commands = new ConcurrentHashMap<String, TaskCommandIfc>();
+	private Map<String, TaskCommandIfc> commands =
+			new ConcurrentHashMap<String, TaskCommandIfc>();
 
-	//~--- constructors ---------------------------------------------------------
+	// ~--- constructors ---------------------------------------------------------
 
 	/**
 	 * Constructs ...
-	 *
+	 * 
 	 */
 	public StanzaReceiver() {
 		try {
-			Set<Class<ReceiverTaskIfc>> ctasks = ClassUtil.getClassesImplementing(ReceiverTaskIfc.class);
+			Set<Class<ReceiverTaskIfc>> ctasks =
+					ClassUtil.getClassesImplementing(ReceiverTaskIfc.class);
 
 			for (Class<ReceiverTaskIfc> ctask : ctasks) {
 				ReceiverTaskIfc itask = ctask.newInstance();
 
 				task_types.put(itask.getType(), new TaskType(itask));
-			}    // end of for (Class<ReceiverTaskIfc> ctask: ctasks)
+			} // end of for (Class<ReceiverTaskIfc> ctask: ctasks)
 		} catch (Exception e) {
 			log.log(Level.SEVERE, "Can not load ReceiverTaskIfc implementations", e);
-		}      // end of try-catch
+		} // end of try-catch
 
 		TaskCommandIfc new_task = new NewTaskCommand();
 
@@ -248,14 +255,14 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		commands.put(new_task.getNodeName(), new_task);
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packet
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -263,14 +270,14 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		return super.addOutPacket(packet);
 	}
 
-	//~--- get methods ----------------------------------------------------------
+	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param params
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -281,7 +288,8 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		conf_tasks.addAll(Arrays.asList(TASKS_LIST_PROP_VAL));
 
 		if (params.get(GEN_CONF + "ssend-forum-task") != null) {
-			String[] forum_ids = ((String) params.get(GEN_CONF + "ssend-forum-task")).split(",");
+			String[] forum_ids =
+					((String) params.get(GEN_CONF + "ssend-forum-task")).split(",");
 
 			for (String id : forum_ids) {
 				String task_name = "forum-" + id;
@@ -291,28 +299,31 @@ public class StanzaReceiver extends AbstractMessageReceiver
 				defs.put(task_name + "/" + TASK_TYPE_PROP_KEY, TASK_TYPE_PROP_VAL);
 
 				Map<String, PropertyItem> default_props =
-					task_types.get(TASK_TYPE_PROP_VAL).getTaskType().getDefaultParams();
+						task_types.get(TASK_TYPE_PROP_VAL).getTaskType().getDefaultParams();
 
 				for (Map.Entry<String, PropertyItem> entry : default_props.entrySet()) {
 					defs.put(task_name + "/props/" + entry.getKey(), entry.getValue().toString());
 
 					if (entry.getKey().equals(ALLOWED_SENDERS_PROP_KEY)) {
-						defs.put(task_name + "/props/" + entry.getKey(), SenderRestrictions.OWNER.toString());
+						defs.put(task_name + "/props/" + entry.getKey(),
+								SenderRestrictions.OWNER.toString());
 					}
 
 					if (entry.getKey().equals(MESSAGE_TYPE_PROP_KEY)) {
-						defs.put(task_name + "/props/" + entry.getKey(), MessageType.NORMAL.toString());
+						defs.put(task_name + "/props/" + entry.getKey(),
+								MessageType.NORMAL.toString());
 					}
 
 					if (entry.getKey().equals(REPLACE_SENDER_PROP_KEY)) {
-						defs.put(task_name + "/props/" + entry.getKey(), SenderAddress.REMOVE.toString());
+						defs.put(task_name + "/props/" + entry.getKey(),
+								SenderAddress.REMOVE.toString());
 					}
 
 					if (entry.getKey().equals(TASK_OWNER_PROP_KEY)) {
-						defs.put(task_name + "/props/" + entry.getKey(),
-								"drupal-forum-" + id + "@" + my_hostname);
+						defs.put(task_name + "/props/" + entry.getKey(), "drupal-forum-" + id + "@"
+								+ my_hostname);
 					}
-				}    // end of for ()
+				} // end of for ()
 			}
 		}
 
@@ -321,12 +332,12 @@ public class StanzaReceiver extends AbstractMessageReceiver
 			defs.put(task_name + "/" + TASK_TYPE_PROP_KEY, TASK_TYPE_PROP_VAL);
 
 			Map<String, PropertyItem> default_props =
-				task_types.get(TASK_TYPE_PROP_VAL).getTaskType().getDefaultParams();
+					task_types.get(TASK_TYPE_PROP_VAL).getTaskType().getDefaultParams();
 
 			for (Map.Entry<String, PropertyItem> entry : default_props.entrySet()) {
 				defs.put(task_name + "/props/" + entry.getKey(), entry.getValue().toString());
-			}    // end of for ()
-		}      // end of for (String task_name: TASKS_LIST_PROP_VAL)
+			} // end of for ()
+		} // end of for (String task_name: TASKS_LIST_PROP_VAL)
 
 		if ((Boolean) params.get(GEN_TEST)) {
 			log.config("Activating tester task....");
@@ -335,7 +346,8 @@ public class StanzaReceiver extends AbstractMessageReceiver
 			defs.put(TESTER_TASK_NAME + "/" + TASK_TYPE_PROP_KEY, TESTER_TASK_TYPE);
 			defs.put(TESTER_TASK_NAME + "/props/" + ALLOWED_SENDERS_PROP_KEY,
 					SenderRestrictions.ALL.toString());
-			defs.put(TESTER_TASK_NAME + "/props/" + MESSAGE_TYPE_PROP_KEY, MessageType.NORMAL.toString());
+			defs.put(TESTER_TASK_NAME + "/props/" + MESSAGE_TYPE_PROP_KEY,
+					MessageType.NORMAL.toString());
 		}
 
 		defs.put(TASKS_LIST_PROP_KEY, conf_tasks.toArray(new String[0]));
@@ -349,8 +361,8 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		} else {
 			if (params.get(GEN_USER_DB) != null) {
 				conf_srec_db = (String) params.get(GEN_USER_DB);
-			}    // end of if (params.get(GEN_USER_DB) != null)
-		}      // end of if (params.get(GEN_SREC_DB) != null) else
+			} // end of if (params.get(GEN_USER_DB) != null)
+		} // end of if (params.get(GEN_SREC_DB) != null) else
 
 		if (conf_srec_db != null) {
 			if (conf_srec_db.equals("mysql")) {
@@ -362,15 +374,15 @@ public class StanzaReceiver extends AbstractMessageReceiver
 				srec_repo_class = PGSQL_REPO_CLASS_PROP_VAL;
 				srec_repo_uri = PGSQL_REPO_URL_PROP_VAL;
 			}
-		}    // end of if (conf_srec_db != null)
+		} // end of if (conf_srec_db != null)
 
 		if (params.get(GEN_SREC_DB_URI) != null) {
 			srec_repo_uri = (String) params.get(GEN_SREC_DB_URI);
 		} else {
 			if (params.get(GEN_USER_DB_URI) != null) {
 				srec_repo_uri = (String) params.get(GEN_USER_DB_URI);
-			}    // end of if (params.get(GEN_USER_DB_URI) != null)
-		}      // end of else
+			} // end of if (params.get(GEN_USER_DB_URI) != null)
+		} // end of else
 
 		defs.put(SREC_REPO_CLASS_PROP_KEY, srec_repo_class);
 		defs.put(SREC_REPO_URL_PROP_KEY, srec_repo_uri);
@@ -384,7 +396,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 				ADMINS_PROP_VAL = new String[1];
 				ADMINS_PROP_VAL[0] = "admin@" + getDefHostName();
 			}
-		}    // end of if (params.get(GEN_SREC_ADMINS) != null) else
+		} // end of if (params.get(GEN_SREC_ADMINS) != null) else
 
 		defs.put(ADMINS_PROP_KEY, ADMINS_PROP_VAL);
 
@@ -394,10 +406,10 @@ public class StanzaReceiver extends AbstractMessageReceiver
 			local_domains = ((String) params.get(GEN_VIRT_HOSTS)).split(",");
 		}
 
-//  defs.put(LOCAL_DOMAINS_PROP_KEY, LOCAL_DOMAINS_PROP_VAL);
+		// defs.put(LOCAL_DOMAINS_PROP_KEY, LOCAL_DOMAINS_PROP_VAL);
 		defs.put(MY_DOMAIN_NAME_PROP_KEY, "srecv." + local_domains[0]);
 
-//  defs.put(SIMPLE_JID_PROP_KEY, "srecv@" + local_domains[0]);
+		// defs.put(SIMPLE_JID_PROP_KEY, "srecv@" + local_domains[0]);
 		defs.put(TASK_TYPES_PROP_KEY, TASK_TYPES_PROP_VAL);
 		defs.put(CREATION_POLICY_PROP_KEY, CREATION_POLICY_PROP_VAL.toString());
 		defs.put(CREATION_MAX_NO_PROP_KEY, CREATION_MAX_NO_PROP_VAL);
@@ -410,10 +422,10 @@ public class StanzaReceiver extends AbstractMessageReceiver
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param from
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -423,9 +435,11 @@ public class StanzaReceiver extends AbstractMessageReceiver
 
 	/**
 	 * Describe <code>getDiscoInfo</code> method here.
-	 *
-	 * @param node a <code>String</code> value
-	 * @param jid a <code>String</code> value
+	 * 
+	 * @param node
+	 *          a <code>String</code> value
+	 * @param jid
+	 *          a <code>String</code> value
 	 * @param from
 	 * @return an <code>Element</code> value
 	 */
@@ -440,12 +454,12 @@ public class StanzaReceiver extends AbstractMessageReceiver
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param node
 	 * @param jid
 	 * @param from
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -463,8 +477,8 @@ public class StanzaReceiver extends AbstractMessageReceiver
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param list
 	 */
 	@Override
@@ -478,10 +492,10 @@ public class StanzaReceiver extends AbstractMessageReceiver
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param jidOrName
-	 *
+	 * 
 	 * @return
 	 */
 	public ReceiverTaskIfc getTask(String jidOrName) {
@@ -500,23 +514,26 @@ public class StanzaReceiver extends AbstractMessageReceiver
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param jid
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
 	public boolean isAdmin(JID jid) {
+		log.log(Level.INFO, "Looking for JID: {0} in admins array: {1}", new Object[] {
+				jid.getBareJID().toString(), Arrays.toString(admins) });
 		return Arrays.binarySearch(admins, jid.getBareJID().toString()) >= 0;
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Describe <code>processPacket</code> method here.
-	 *
-	 * @param packet a <code>Packet</code> value
+	 * 
+	 * @param packet
+	 *          a <code>Packet</code> value
 	 */
 	@Override
 	public void processPacket(final Packet packet) {
@@ -532,13 +549,13 @@ public class StanzaReceiver extends AbstractMessageReceiver
 				return;
 			}
 
-//    Packet result = packet.commandResult("result");
-//    TaskCommandIfc command = commands.get("*");
-//    if (command != null) {
-//      command.processCommand(packet, result, this);
-//    } // end of if (command != null)
-//    addOutPacket(result);
-//    return;
+			// Packet result = packet.commandResult("result");
+			// TaskCommandIfc command = commands.get("*");
+			// if (command != null) {
+			// command.processCommand(packet, result, this);
+			// } // end of if (command != null)
+			// addOutPacket(result);
+			// return;
 			Packet result = iqc.commandResult(Command.DataType.result);
 			String str_command = iqc.getStrCommand();
 
@@ -551,9 +568,9 @@ public class StanzaReceiver extends AbstractMessageReceiver
 					if (command != null) {
 						log.fine("Processing task command: " + arr_command[1]);
 						command.processCommand(packet, result, this);
-					}    // end of if (command != null)
-				}      // end of if (arr_command.length > 1)
-			}        // end of if (str_command != null)
+					} // end of if (command != null)
+				} // end of if (arr_command.length > 1)
+			} // end of if (str_command != null)
 
 			addOutPacket(result);
 
@@ -568,7 +585,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 			processIQPacket(packet);
 
 			return;
-		}    // end of if (packet.getElemName().equals("iq"))
+		} // end of if (packet.getElemName().equals("iq"))
 
 		ReceiverTaskIfc task = getTask(packet.getStanzaTo().toString());
 
@@ -593,27 +610,30 @@ public class StanzaReceiver extends AbstractMessageReceiver
 
 			task.processPacket(packet, results);
 			addOutPackets(results);
-		}    // end of if (task != null)
+		} // end of if (task != null)
 	}
 
-	//~--- set methods ----------------------------------------------------------
+	// ~--- set methods ----------------------------------------------------------
 
 	/**
 	 * Describe <code>setProperties</code> method here.
-	 *
-	 * @param props a <code>Map</code> value
+	 * 
+	 * @param props
+	 *          a <code>Map</code> value
 	 */
 	@Override
 	public void setProperties(final Map<String, Object> props) {
 		super.setProperties(props);
 		my_hostname = (String) props.get(MY_DOMAIN_NAME_PROP_KEY);
 
-//  simpleJid = (String)props.get(SIMPLE_JID_PROP_KEY);
+		// simpleJid = (String)props.get(SIMPLE_JID_PROP_KEY);
 		serviceEntity = new ServiceEntity(getName(), null, "Stanza Receiver");
-		serviceEntity.addIdentities(new ServiceIdentity("component", "generic", "Stanza Receiver"));
+		serviceEntity.addIdentities(new ServiceIdentity("component", "generic",
+				"Stanza Receiver"));
 		serviceEntity.addFeatures(DEF_FEATURES);
 
-		ServiceEntity com = new ServiceEntity(my_hostname, "commands", "Tasks management commands");
+		ServiceEntity com =
+				new ServiceEntity(my_hostname, "commands", "Tasks management commands");
 
 		com.addFeatures(DEF_FEATURES);
 		com.addIdentities(new ServiceIdentity("automation", "command-list",
@@ -621,36 +641,37 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		serviceEntity.addItems(com);
 
 		for (TaskCommandIfc comm : commands.values()) {
-			ServiceEntity item = new ServiceEntity(my_hostname, comm.getNodeName(),
-				comm.getDescription());
+			ServiceEntity item =
+					new ServiceEntity(my_hostname, comm.getNodeName(), comm.getDescription());
 
 			item.addFeatures(CMD_FEATURES);
-			item.addIdentities(new ServiceIdentity("automation", "command-node", comm.getDescription()));
+			item.addIdentities(new ServiceIdentity("automation", "command-node", comm
+					.getDescription()));
 			com.addItems(item);
-		}    // end of for (TaskCommandIfc comm: commands.values())
+		} // end of for (TaskCommandIfc comm: commands.values())
 
 		admins = (String[]) props.get(ADMINS_PROP_KEY);
 		Arrays.sort(admins);
 
-//  addRouting(my_hostname);
+		// addRouting(my_hostname);
 		try {
 			String cls_name = (String) props.get(SREC_REPO_CLASS_PROP_KEY);
 			String res_uri = (String) props.get(SREC_REPO_URL_PROP_KEY);
 
-//    if (!res_uri.contains("autoCreateUser=true")) {
-//      res_uri += "&autoCreateUser=true";
-//    } // end of if (!res_uri.contains("autoCreateUser=true"))
+			// if (!res_uri.contains("autoCreateUser=true")) {
+			// res_uri += "&autoCreateUser=true";
+			// } // end of if (!res_uri.contains("autoCreateUser=true"))
 			repository = RepositoryFactory.getUserRepository(cls_name, res_uri, null);
 
 			try {
 				repository.addUser(getComponentId().getBareJID());
-			} catch (UserExistsException e) {    /* Ignore, this is correct and expected */
+			} catch (UserExistsException e) { /* Ignore, this is correct and expected */
 			}
 
 			loadTasksFromRepository();
 		} catch (Exception e) {
 			log.log(Level.SEVERE, "Can't initialize repository: ", e);
-		}                                      // end of try-catch
+		} // end of try-catch
 
 		String[] tasks_list = (String[]) props.get(TASKS_LIST_PROP_KEY);
 
@@ -663,20 +684,20 @@ public class StanzaReceiver extends AbstractMessageReceiver
 				for (Map.Entry<String, Object> entry : props.entrySet()) {
 					if (entry.getKey().startsWith(prep)) {
 						task_params.put(entry.getKey().substring(prep.length()), entry.getValue());
-					}    // end of if (entry.getKey().startsWith())
-				}      // end of for (Map.Entry entry: props.entrySet())
+					} // end of if (entry.getKey().startsWith())
+				} // end of for (Map.Entry entry: props.entrySet())
 
 				try {
-					addTaskInstance(createTask(task_type, JID.jidInstance(task_name + "@" + my_hostname),
-							task_params));
+					addTaskInstance(createTask(task_type,
+							JID.jidInstance(task_name + "@" + my_hostname), task_params));
 				} catch (TigaseStringprepException ex) {
 					Logger.getLogger(StanzaReceiver.class.getName()).log(Level.SEVERE, null, ex);
 				}
-			}    // end of for (String task_name: tasks_list)
+			} // end of for (String task_name: tasks_list)
 		}
 
-//  defaultPolicy =
-//    TaskCreationPolicy.valueOf((String)props.get(CREATION_POLICY_PROP_KEY));
+		// defaultPolicy =
+		// TaskCreationPolicy.valueOf((String)props.get(CREATION_POLICY_PROP_KEY));
 		defaultMaxTasksNo = (Integer) props.get(CREATION_MAX_NO_PROP_KEY);
 
 		String[] task_types_arr = (String[]) props.get(TASK_TYPES_PROP_KEY);
@@ -696,23 +717,24 @@ public class StanzaReceiver extends AbstractMessageReceiver
 			}
 		}
 
-//  local_domains =
-//    new HashSet<String>(Arrays.asList((String[])props.get(LOCAL_DOMAINS_PROP_KEY)));
+		// local_domains =
+		// new
+		// HashSet<String>(Arrays.asList((String[])props.get(LOCAL_DOMAINS_PROP_KEY)));
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	protected void addTaskInstance(String task_type, String task_name,
-			Map<String, Object> task_params)
-			throws TigaseStringprepException {
+			Map<String, Object> task_params) throws TigaseStringprepException {
 		addTaskInstance(createTask(task_type, JID.jidInstance(task_name + "@" + my_hostname),
 				task_params));
 	}
 
 	/**
 	 * Describe <code>addTaskInstance</code> method here.
-	 *
-	 * @param task a <code>ReceiverTaskIfc</code> value
+	 * 
+	 * @param task
+	 *          a <code>ReceiverTaskIfc</code> value
 	 */
 	protected void addTaskInstance(ReceiverTaskIfc task) {
 		if (getTask(task.getJID().toString()) == null) {
@@ -721,18 +743,21 @@ public class StanzaReceiver extends AbstractMessageReceiver
 			try {
 				saveTaskToRepository(task);
 			} catch (TigaseDBException e) {
-				log.log(Level.SEVERE, "Problem with saving task to repository: " + task.getJID(), e);
-			}    // end of try-catch
+				log.log(Level.SEVERE, "Problem with saving task to repository: " + task.getJID(),
+						e);
+			} // end of try-catch
 		} else {
 
-//    Exception exep = new Exception("Attempt to add another task with jid: " +
-//            task.getJID() + ", ignoring.");
-//    exep.fillInStackTrace();
-			log.log(Level.INFO, "Attempt to add another task with jid: " + task.getJID() + ", ignoring.");
-		}    // end of else
+			// Exception exep = new Exception("Attempt to add another task with jid: "
+			// +
+			// task.getJID() + ", ignoring.");
+			// exep.fillInStackTrace();
+			log.log(Level.INFO, "Attempt to add another task with jid: " + task.getJID()
+					+ ", ignoring.");
+		} // end of else
 	}
 
-	//~--- get methods ----------------------------------------------------------
+	// ~--- get methods ----------------------------------------------------------
 
 	protected Map<String, ReceiverTaskIfc> getTaskInstances() {
 		return task_instances;
@@ -742,31 +767,32 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		return task_types;
 	}
 
-//public String getSimpleJid() {
-//  return simpleJid;
-//}
+	// public String getSimpleJid() {
+	// return simpleJid;
+	// }
 	protected boolean isAllowedCreate(JID jid, String task_type) {
 		TaskType tt = task_types.get(task_type);
 
 		switch (tt.getCreationPolicy()) {
-			case ADMIN :
+			case ADMIN:
 				return isAdmin(jid);
 
-			case LOCAL :
+			case LOCAL:
 				return isLocalDomain(jid.getDomain());
 
-			default :
+			default:
 				break;
 		}
 
 		return true;
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	protected void removeTaskInstance(ReceiverTaskIfc task) {
-		ServiceEntity item = new ServiceEntity(task.getJID().toString(), task.getJID().getLocalpart(),
-			task.getDescription());
+		ServiceEntity item =
+				new ServiceEntity(task.getJID().toString(), task.getJID().getLocalpart(),
+						task.getDescription());
 
 		serviceEntity.removeItems(item);
 		task_instances.remove(task.getJID().toString());
@@ -783,7 +809,7 @@ public class StanzaReceiver extends AbstractMessageReceiver
 			repository.removeSubnode(getComponentId().getBareJID(), repo_node);
 		} catch (TigaseDBException e) {
 			log.log(Level.SEVERE, "Problem removing task from repository: " + task.getJID(), e);
-		}    // end of try-catch
+		} // end of try-catch
 	}
 
 	protected void removeTaskSubscribers(ReceiverTaskIfc task, JID... subscr) {
@@ -796,17 +822,18 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	protected void saveTaskToRepository(ReceiverTaskIfc task) throws TigaseDBException {
 		String repo_node = tasks_node + "/" + task.getJID();
 
-		repository.setData(getComponentId().getBareJID(), repo_node, task_type_key, task.getType());
+		repository.setData(getComponentId().getBareJID(), repo_node, task_type_key,
+				task.getType());
 
 		Map<String, PropertyItem> task_params = task.getParams();
 
 		repo_node += params_node;
 
 		for (Map.Entry<String, PropertyItem> entry : task_params.entrySet()) {
-			if ( !entry.getKey().equals(USER_REPOSITORY_PROP_KEY)) {
+			if (!entry.getKey().equals(USER_REPOSITORY_PROP_KEY)) {
 				if (entry.getValue().getValue().getClass().isArray()) {
-					repository.setDataList(getComponentId().getBareJID(), repo_node, entry.getKey(),
-							(String[]) entry.getValue().getValue());
+					repository.setDataList(getComponentId().getBareJID(), repo_node,
+							entry.getKey(), (String[]) entry.getValue().getValue());
 					log.info("Saving task data list: " + entry.getKey() + ", value: "
 							+ Arrays.toString((String[]) entry.getValue().getValue()));
 				} else {
@@ -815,17 +842,19 @@ public class StanzaReceiver extends AbstractMessageReceiver
 					log.info("Saving task data: " + entry.getKey() + ", value: "
 							+ entry.getValue().toString());
 				}
-			}    // end of if (!entry.getKey().equals(USER_REPOSITORY_PROP_KEY))
+			} // end of if (!entry.getKey().equals(USER_REPOSITORY_PROP_KEY))
 		}
 	}
 
 	private void addTaskToInstances(ReceiverTaskIfc task) {
 		task_instances.put(task.getJID().toString(), task);
 
-		ServiceEntity item = new ServiceEntity(task.getJID().toString(), task.getJID().getLocalpart(),
-			task.getDescription());
+		ServiceEntity item =
+				new ServiceEntity(task.getJID().toString(), task.getJID().getLocalpart(),
+						task.getDescription());
 
-		item.addIdentities(new ServiceIdentity("component", "generic", task.getJID().toString()));
+		item.addIdentities(new ServiceIdentity("component", "generic", task.getJID()
+				.toString()));
 		item.addFeatures(CMD_FEATURES);
 		serviceEntity.addItems(item);
 
@@ -851,23 +880,27 @@ public class StanzaReceiver extends AbstractMessageReceiver
 	}
 
 	private void loadTasksFromRepository() throws TigaseDBException {
-		String[] tasks_jids = repository.getSubnodes(getComponentId().getBareJID(), tasks_node);
+		String[] tasks_jids =
+				repository.getSubnodes(getComponentId().getBareJID(), tasks_node);
 
 		if (tasks_jids != null) {
 			for (String task_jid : tasks_jids) {
 				StringBuilder repo_node = new StringBuilder(tasks_node + "/" + task_jid);
-				String task_type = repository.getData(getComponentId().getBareJID(), repo_node.toString(),
-					task_type_key);
+				String task_type =
+						repository.getData(getComponentId().getBareJID(), repo_node.toString(),
+								task_type_key);
 
 				repo_node.append(params_node);
 
-				String[] keys = repository.getKeys(getComponentId().getBareJID(), repo_node.toString());
+				String[] keys =
+						repository.getKeys(getComponentId().getBareJID(), repo_node.toString());
 				Map<String, Object> task_params = new LinkedHashMap<String, Object>();
 
 				if (keys != null) {
 					for (String key : keys) {
-						String[] vals = repository.getDataList(getComponentId().getBareJID(),
-							repo_node.toString(), key);
+						String[] vals =
+								repository.getDataList(getComponentId().getBareJID(),
+										repo_node.toString(), key);
 
 						if (vals.length == 1) {
 							task_params.put(key, vals[0]);
@@ -876,22 +909,23 @@ public class StanzaReceiver extends AbstractMessageReceiver
 							task_params.put(key, vals);
 							log.info("Loaded data list: " + key + ", value: " + Arrays.toString(vals));
 						}
-					}    // end of for (String key: keys)
-				}      // end of if (keys != null)
+					} // end of for (String key: keys)
+				} // end of if (keys != null)
 
 				try {
 					addTaskToInstances(createTask(task_type, JID.jidInstance(task_jid), task_params));
 				} catch (Exception e) {
 					log.log(Level.WARNING, "Can't create task: " + task_jid, e);
 				}
-			}        // end of for (String task_jid: tasks_jids)
-		}          // end of if (tasks_jids != null)
+			} // end of for (String task_jid: tasks_jids)
+		} // end of if (tasks_jids != null)
 	}
 
 	/**
 	 * Describe <code>processIQPacket</code> method here.
-	 *
-	 * @param packet a <code>Packet</code> value
+	 * 
+	 * @param packet
+	 *          a <code>Packet</code> value
 	 * @return a <code>boolean</code> value
 	 */
 	private boolean processIQPacket(Packet packet) {
@@ -903,33 +937,32 @@ public class StanzaReceiver extends AbstractMessageReceiver
 		if ((query != null) && (packet.getType() == StanzaType.get)) {
 			query_rep = serviceEntity.getDiscoInfo(packet.getStanzaTo().getLocalpart());
 			processed = true;
-		}    // end of if (query != null && packet.getType() == StanzaType.get)
+		} // end of if (query != null && packet.getType() == StanzaType.get)
 
 		query = iq.getChild("query", ITEMS_XMLNS);
 
 		if ((query != null) && (packet.getType() == StanzaType.get)) {
 			query_rep = query.clone();
 
-			List<Element> items = serviceEntity.getDiscoItems(packet.getStanzaTo().getLocalpart(),
-				packet.getStanzaTo().toString());
+			List<Element> items =
+					serviceEntity.getDiscoItems(packet.getStanzaTo().getLocalpart(), packet
+							.getStanzaTo().toString());
 
 			if ((items != null) && (items.size() > 0)) {
 				query_rep.addChildren(items);
-			}    // end of if (items != null && items.size() > 0)
+			} // end of if (items != null && items.size() > 0)
 
 			processed = true;
-		}      // end of if (query != null && packet.getType() == StanzaType.get)
+		} // end of if (query != null && packet.getType() == StanzaType.get)
 
 		if (query_rep != null) {
 			addOutPacket(packet.okResult(query_rep, 0));
-		}    // end of if (query_rep != null)
+		} // end of if (query_rep != null)
 
 		return processed;
 	}
-}    // StanzaReceiver
+} // StanzaReceiver
 
+// ~ Formatted in Sun Code Convention
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+// ~ Formatted by Jindent --- http://www.jindent.com
