@@ -224,11 +224,18 @@ public interface ClusteringStrategyIfc extends OnlineJidsReporter {
 	 * nodes forward the given packet. It may offer a different algorithm for
 	 * message broadcasting and different for presences, for example.
 	 * 
+	 * @param fromNode
+	 *          a source address if the packet was forwarded from a different
+	 *          node, this may be null if the packet was generated on this node.
+	 * @param visitedNodes
+	 *          a list of cluster nodes through which the packet already traveled,
+	 *          this parameter can be null if the packet was generated on this
+	 *          node
 	 * @param packet
 	 *          a packet which is supposed to be sent to other node.
 	 * @return a list of cluster nodes JIDs to which the packet should be sent.
 	 */
-	List<JID> getNodesForPacketForward(Packet packet);
+	List<JID> getNodesForPacketForward(JID fromNode, List<JID> visitedNodes, Packet packet);
 
 	/**
 	 * The method is called on user's presence update received from a remote

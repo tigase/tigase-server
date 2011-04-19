@@ -35,6 +35,7 @@ import tigase.xmpp.StanzaType;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
@@ -56,6 +57,9 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 
 	private CopyOnWriteArrayList<JID> cl_nodes_list = new CopyOnWriteArrayList<JID>();
 	private SessionManagerHandler sm = null;
+	// Simple random generator, we do not need a strong randomization here.
+	// Just enough to ensure better traffic distribution
+	private Random rand = new Random();
 
 	public void setSessionManagerHandler(SessionManagerHandler sm) {
 		this.sm = sm;
@@ -227,12 +231,16 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 	 * xml.Element)
 	 */
 	@Override
-	public List<JID> getNodesForPacketForward(Packet packet) {
+	public List<JID> getNodesForPacketForward(JID fromNode, List<JID> visitedNodes,
+			Packet packet) {
+		if (visitedNodes != null) {
+			return selectNodes(fromNode, visitedNodes);
+		}
 		// Do not forward any error packets for now.
 		if (packet.getType() == StanzaType.error) {
 			return null;
 		}
-		
+
 		// Presence status change set by the user have a special treatment:
 		if (packet.getElemName() == "presence" && packet.getStanzaFrom() != null
 				&& packet.getStanzaTo() == null) {
@@ -255,11 +263,35 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 			return null;
 		}
 		// If the packet is to some external domain, it is not forwarded to other
-		// nodes either. It is also not forwarded if it is addressed to some component.
+		// nodes either. It is also not forwarded if it is addressed to some
+		// component.
 		if (!sm.isLocalDomain(packet.getStanzaTo().getDomain(), false)) {
 			return null;
 		}
-		return getAllNodes();
+		return selectNodes(fromNode, visitedNodes);
+	}
+
+	/**
+	 * @param fromNode
+	 * @param visitedNodes
+	 * @return
+	 */
+	private List<JID> selectNodes(JID fromNode, List<JID> visitedNodes) {
+		if (visitedNodes == null || visitedNodes.size() == 0) {
+			int idx = rand.nextInt(cl_nodes_list.size());
+			try {
+				return cl_nodes_list.subList(idx, idx);
+			} catch (IndexOutOfBoundsException ioobe) {
+				// This may happen if the node disconnected in the meantime....
+				try {
+					return cl_nodes_list.subList(0, 0);
+				} catch (IndexOutOfBoundsException ioobe2) {
+					// Yes, this may happen too if there were only 2 nodes before disconnect....
+					return null;
+				}
+			}
+		}
+		return null;
 	}
 
 	/*

@@ -303,7 +303,7 @@ public class SessionManagerClustered extends SessionManager implements
 			Map<String, String> params = prepareConnectionParams(conn);
 			Element presence = conn.getPresence();
 			List<JID> cl_nodes =
-					strategy.getNodesForPacketForward(Packet.packetInstance(presence));
+					strategy.getNodesForPacketForward(getComponentId(), null, Packet.packetInstance(presence));
 			if (cl_nodes != null && cl_nodes.size() > 0) {
 				clusterController.sendToNodes(USER_PRESENCE_CMD, params, presence,
 						getComponentId(), null, cl_nodes.toArray(new JID[cl_nodes.size()]));
@@ -469,7 +469,7 @@ public class SessionManagerClustered extends SessionManager implements
 
 		} else {
 
-			List<JID> toNodes = strategy.getNodesForPacketForward(packet);
+			List<JID> toNodes = strategy.getNodesForPacketForward(getComponentId(), null, packet);
 			if (toNodes != null && toNodes.size() > 0) {
 				clusterController.sendToNodes(PACKET_FORWARD_CMD, packet.getElement(),
 						getComponentId(), null, toNodes.toArray(new JID[toNodes.size()]));
@@ -482,11 +482,19 @@ public class SessionManagerClustered extends SessionManager implements
 				log.log(Level.FINEST, "Ressource connection found: {0}", conn);
 			}
 
-			if ((conn == null) && (isBrokenPacket(packet) || processAdminsOrDomains(packet))) {
-				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "Ignoring/dropping packet: {0}", packet);
+			if (conn == null) {
+				if (isBrokenPacket(packet) || processAdminsOrDomains(packet)) {
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "Ignoring/dropping packet: {0}", packet);
+					}
+				} else {
+					// Process is as packet to offline user only if there are no other
+					// nodes for the packet to be processed.
+					if (toNodes == null || toNodes.size() == 0) {
+						// Process packet for offline user
+						processPacket(packet, (XMPPResourceConnection) null);
+					}
 				}
-				// chTm = System.currentTimeMillis() - startTime;
 
 			} else {
 
@@ -501,38 +509,37 @@ public class SessionManagerClustered extends SessionManager implements
 		// smTime[idx] = smTm;
 	}
 
-	// /**
-	// * Method attempts to send the packet to the next cluster node. Returns true
-	// * on successful attempt and false on failure. The true result does not mean
-	// * that the packet has been delivered though. Only that it was sent. The
-	// send
-	// * attempt may fail if there is no more cluster nodes to send the packet or
-	// if
-	// * the clustering strategy logic decided that the packet does not have to be
-	// * sent.
-	// *
-	// * @param packet
-	// * to be sent to a next cluster node
-	// * @param visitedNodes
-	// * a list of nodes already visited by the packet.
-	// * @return true if the packet was sent to next cluster node and false
-	// * otherwise.
-	// */
-	// protected boolean sendToNextNode(Element packet, List<JID> visitedNodes) {
-	// boolean result = false;
-	// JID nextNode = strategy.selectNextNode(packet, visitedNodes);
-	// if (nextNode != null) {
-	// clusterController.sendToNodes(PACKET_FORWARD_CMD, packet, getComponentId(),
-	// visitedNodes, nextNode);
-	// result = true;
-	// }
-	// if (log.isLoggable(Level.FINEST)) {
-	// log.log(Level.FINEST,
-	// "Called for packet: {0}, visitedNodes: {1}, result: {2}",
-	// new Object[] { packet, visitedNodes, result });
-	// }
-	// return result;
-	// }
+	/**
+	 * Method attempts to send the packet to the next cluster node. Returns true
+	 * on successful attempt and false on failure. The true result does not mean
+	 * that the packet has been delivered though. Only that it was sent. The send
+	 * attempt may fail if there is no more cluster nodes to send the packet or if
+	 * the clustering strategy logic decided that the packet does not have to be
+	 * sent.
+	 * 
+	 * @param packet
+	 *          to be sent to a next cluster node
+	 * @param visitedNodes
+	 *          a list of nodes already visited by the packet.
+	 * @return true if the packet was sent to next cluster node and false
+	 *         otherwise.
+	 */
+	protected boolean sendToNextNode(JID fromNode, List<JID> visitedNodes,
+			Map<String, String> data, Packet packet) {
+		boolean result = false;
+		List<JID> nextNodes =
+				strategy.getNodesForPacketForward(fromNode, visitedNodes, packet);
+		if (nextNodes != null && nextNodes.size() > 0) {
+			clusterController.sendToNodes(PACKET_FORWARD_CMD, data, packet.getElement(),
+					fromNode, visitedNodes, nextNodes.toArray(new JID[nextNodes.size()]));
+			result = true;
+		}
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Called for packet: {0}, visitedNodes: {1}, result: {2}",
+					new Object[] { packet, visitedNodes, result });
+		}
+		return result;
+	}
 
 	/**
 	 * Concurrency control method. Returns preferable number of threads set for
@@ -980,7 +987,7 @@ public class SessionManagerClustered extends SessionManager implements
 						Packet el_packet = Packet.packetInstance(elem);
 						XMPPResourceConnection conn = getXMPPResourceConnection(el_packet);
 
-						if (conn != null) {
+						if (conn != null || !sendToNextNode(fromNode, visitedNodes, data, Packet.packetInstance(elem))) {
 							processPacket(el_packet, conn);
 						}
 					} catch (TigaseStringprepException ex) {
