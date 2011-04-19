@@ -215,4 +215,4 @@ public class NewTaskCommand implements TaskCommandIfc {
 		}
 	}
 
-} // NewTaskCommand
+}
