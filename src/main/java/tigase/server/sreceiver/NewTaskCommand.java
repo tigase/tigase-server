@@ -193,7 +193,7 @@ public class NewTaskCommand implements TaskCommandIfc {
 				+ task_type, "fixed");
 			return;
 		}
-		if (!receiv.isAllowedCreate(packet.getFrom(), task_type)) {
+		if (!receiv.isAllowedCreate(packet.getStanzaFrom(), task_type)) {
 			Command.addFieldValue(result, "Info",
 				"I am sorry, you are not allowed to create task of this type: "
 				+ task_type, "fixed");
