@@ -32,6 +32,7 @@ import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 import tigase.xmpp.StanzaType;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -277,8 +278,12 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 	 * @return
 	 */
 	private List<JID> selectNodes(JID fromNode, List<JID> visitedNodes) {
+		int size = cl_nodes_list.size();
+		if (size == 0) {
+			return null;
+		}
+		int idx = rand.nextInt(size);
 		if (visitedNodes == null || visitedNodes.size() == 0) {
-			int idx = rand.nextInt(cl_nodes_list.size());
 			try {
 				return cl_nodes_list.subList(idx, idx);
 			} catch (IndexOutOfBoundsException ioobe) {
@@ -286,8 +291,15 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 				try {
 					return cl_nodes_list.subList(0, 0);
 				} catch (IndexOutOfBoundsException ioobe2) {
-					// Yes, this may happen too if there were only 2 nodes before disconnect....
+					// Yes, this may happen too if there were only 2 nodes before
+					// disconnect....
 					return null;
+				}
+			}
+		} else {
+			for (JID jid : cl_nodes_list) {
+				if (!visitedNodes.contains(jid)) {
+					return Collections.singletonList(jid);
 				}
 			}
 		}
