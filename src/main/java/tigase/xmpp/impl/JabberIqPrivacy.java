@@ -88,7 +88,7 @@ public class JabberIqPrivacy extends XMPPProcessor
 	private static final String DEFAULT_EL_NAME = "default";
 	private static final String ACTIVE_EL_NAME = "active";
 	private static final String PRESENCE_IN_EL_NAME = "presence-in";
-	private static final String PRESEBCE_OUT_EL_NAME = "presence-out";
+	private static final String PRESENCE_OUT_EL_NAME = "presence-out";
 	private static final String PRESENCE_EL_NAME = "presence";
 	private static RosterAbstract roster_util = RosterFactory.getRosterImplementation(true);
 	private static final Comparator<Element> compar = new Comparator<Element>() {
@@ -293,7 +293,7 @@ public class JabberIqPrivacy extends XMPPProcessor
 			if ((list == null) && (session.getSessionData(PRIVACY_INIT_KEY) == null)) {
 
 				// First mark the session as privacy lists loaded for it, this way if there
-				// is an axception thrown during database call for this user we won't
+				// is an exception thrown during database call for this user we won't
 				// call it again for the same user.
 				session.putSessionData(PRIVACY_INIT_KEY, "");
 
@@ -399,7 +399,7 @@ public class JabberIqPrivacy extends XMPPProcessor
 						}          // end of if (from != null) else
 
 						if ( !type_matched) {
-							break;
+							continue;
 						}          // end of if (!type_matched)
 
 						List<Element> elems = item.getChildren();
@@ -408,12 +408,16 @@ public class JabberIqPrivacy extends XMPPProcessor
 							elem_matched = true;
 						} else {
 							for (Element elem : elems) {
-								if ((packet.getElemName() == PRESENCE_EL_NAME)
-										&& ((packetIn && (elem.getName() == PRESENCE_IN_EL_NAME))
-											|| ( !packetIn
-												&& (elem.getName() == PRESEBCE_OUT_EL_NAME))) && ((packet.getType()
-													== null) || (packet.getType() == StanzaType.unavailable))) {
-									elem_matched = true;
+								if (
+									(packet.getElemName() == PRESENCE_EL_NAME)
+									&& ((packetIn && (elem.getName() == PRESENCE_IN_EL_NAME))
+									        || ( !packetIn && (elem.getName() == PRESENCE_OUT_EL_NAME)))
+									&& ((packet.getType() == null) || (packet.getType() == StanzaType.unavailable))
+
+									)
+								
+								{
+								    elem_matched = true;
 
 									break;
 								}
