@@ -339,7 +339,7 @@ public class XMPPSession {
 				}    // end of if (resource.equals(conn.getResource()))
 			}      // end of for (XMPPResourceConnection conn: activeResources)
 		} catch (NoConnectionIdException ex) {
-			Logger.getLogger(XMPPSession.class.getName()).log(Level.SEVERE, null, ex);
+			//Logger.getLogger(XMPPSession.class.getName()).log(Level.SEVERE, null, ex);
 		}
 
 		return null;
