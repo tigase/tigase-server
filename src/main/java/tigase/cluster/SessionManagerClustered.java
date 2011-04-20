@@ -471,8 +471,19 @@ public class SessionManagerClustered extends SessionManager implements
 
 			List<JID> toNodes = strategy.getNodesForPacketForward(getComponentId(), null, packet);
 			if (toNodes != null && toNodes.size() > 0) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "Forwarding packet {0} to nodes: {1}",
+							new Object[] { packet, toNodes });
+				}
+
 				clusterController.sendToNodes(PACKET_FORWARD_CMD, packet.getElement(),
 						getComponentId(), null, toNodes.toArray(new JID[toNodes.size()]));
+			} else {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "No cluster nodes found for packet forward: {0}",
+							new Object[] { packet });
+				}
+				
 			}
 			// clTm = System.currentTimeMillis() - startTime;
 

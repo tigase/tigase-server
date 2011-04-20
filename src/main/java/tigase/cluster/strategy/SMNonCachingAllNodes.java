@@ -235,18 +235,37 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 	public List<JID> getNodesForPacketForward(JID fromNode, List<JID> visitedNodes,
 			Packet packet) {
 		if (visitedNodes != null) {
-			return selectNodes(fromNode, visitedNodes);
+			List<JID> result = selectNodes(fromNode, visitedNodes);
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Visited nodes not null: {0}, selecting new node: {1}, for packet: {2}",
+						new Object[] { visitedNodes, result, packet });
+			}
+			return result;
 		}
 
 		// Presence status change set by the user have a special treatment:
 		if (packet.getElemName() == "presence" && packet.getType() != StanzaType.error
 				&& packet.getStanzaFrom() != null && packet.getStanzaTo() == null) {
-			return getAllNodes();
+			List<JID> result = getAllNodes();
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Presence packet found: {0}, selecting all nodes: {1}",
+						new Object[] { packet, result });
+			}
+			return result;
 		}
 
 		if (isSuitableForForward(packet)) {
-			return selectNodes(fromNode, visitedNodes);
+			List<JID> result = selectNodes(fromNode, visitedNodes);
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Visited nodes null, selecting new node: {0}, for packet: {1}",
+						new Object[] { result, packet });
+			}
+			return result;
 		} else {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Packet not suitable for forwarding: {0}",
+						new Object[] { packet });
+			}
 			return null;
 		}
 	}
@@ -287,32 +306,45 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 	 * @return
 	 */
 	private List<JID> selectNodes(JID fromNode, List<JID> visitedNodes) {
+		List<JID> result = null;
 		int size = cl_nodes_list.size();
 		if (size == 0) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "No connected cluster nodes found, returning null");
+			}
 			return null;
 		}
 		int idx = rand.nextInt(size);
 		if (visitedNodes == null || visitedNodes.size() == 0) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "No visited nodes yet, trying random idx: " + idx);
+			}
 			try {
-				return cl_nodes_list.subList(idx, idx);
+				result = cl_nodes_list.subList(idx, idx+1);
 			} catch (IndexOutOfBoundsException ioobe) {
 				// This may happen if the node disconnected in the meantime....
 				try {
-					return cl_nodes_list.subList(0, 0);
+					result = cl_nodes_list.subList(0, 1);
 				} catch (IndexOutOfBoundsException ioobe2) {
 					// Yes, this may happen too if there were only 2 nodes before
 					// disconnect....
-					return null;
+					if (log.isLoggable(Level.FINE)) {
+						log.log(Level.FINE, "IndexOutOfBoundsException twice! Should not happen very often, returning null");
+					}
 				}
 			}
 		} else {
 			for (JID jid : cl_nodes_list) {
 				if (!visitedNodes.contains(jid)) {
-					return Collections.singletonList(jid);
+					result = Collections.singletonList(jid);
+					break;
 				}
 			}
 		}
-		return null;
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "List of result nodes: " + result);
+		}
+		return result;
 	}
 
 	/*
