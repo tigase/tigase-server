@@ -157,9 +157,9 @@ public class JDBCRepository implements AuthRepository, UserRepository {
 
 			PreparedStatement insert_key_val_st = null;
 			if (repo == null) {
-				insert_key_val_st = data_repo.getPreparedStatement(INSERT_KEY_VAL_QUERY);
+				insert_key_val_st = data_repo.getPreparedStatement(user_id, INSERT_KEY_VAL_QUERY);
 			} else {
-				insert_key_val_st = repo.getPreparedStatement(INSERT_KEY_VAL_QUERY);
+				insert_key_val_st = repo.getPreparedStatement(user_id, INSERT_KEY_VAL_QUERY);
 			}
 
 			synchronized (insert_key_val_st) {
@@ -308,7 +308,7 @@ public class JDBCRepository implements AuthRepository, UserRepository {
 			}
 
 			PreparedStatement data_for_node_st =
-					data_repo.getPreparedStatement(DATA_FOR_NODE_QUERY);
+					data_repo.getPreparedStatement(user_id, DATA_FOR_NODE_QUERY);
 
 			synchronized (data_for_node_st) {
 				if (nid > 0) {
@@ -405,7 +405,7 @@ public class JDBCRepository implements AuthRepository, UserRepository {
 		try {
 			long nid = getNodeNID(null, user_id, subnode);
 			PreparedStatement data_for_node_st =
-					data_repo.getPreparedStatement(DATA_FOR_NODE_QUERY);
+					data_repo.getPreparedStatement(user_id, DATA_FOR_NODE_QUERY);
 
 			synchronized (data_for_node_st) {
 				if (nid > 0) {
@@ -459,7 +459,7 @@ public class JDBCRepository implements AuthRepository, UserRepository {
 			if (nid > 0) {
 				List<String> results = new ArrayList<String>();
 				PreparedStatement keys_for_node_st =
-						data_repo.getPreparedStatement(KEYS_FOR_NODE_QUERY);
+						data_repo.getPreparedStatement(user_id, KEYS_FOR_NODE_QUERY);
 
 				synchronized (keys_for_node_st) {
 					keys_for_node_st.setLong(1, nid);
@@ -529,7 +529,7 @@ public class JDBCRepository implements AuthRepository, UserRepository {
 		try {
 			long nid = getNodeNID(null, user_id, subnode);
 			PreparedStatement nodes_for_node_st =
-					data_repo.getPreparedStatement(NODES_FOR_NODE_QUERY);
+					data_repo.getPreparedStatement(user_id, NODES_FOR_NODE_QUERY);
 
 			synchronized (nodes_for_node_st) {
 				if (nid > 0) {
@@ -608,9 +608,9 @@ public class JDBCRepository implements AuthRepository, UserRepository {
 		try {
 			PreparedStatement uid_sp = null;
 			if (repo == null) {
-				uid_sp = data_repo.getPreparedStatement(GET_USER_DB_UID_QUERY);
+				uid_sp = data_repo.getPreparedStatement(user_id, GET_USER_DB_UID_QUERY);
 			} else {
-				uid_sp = repo.getPreparedStatement(GET_USER_DB_UID_QUERY);
+				uid_sp = repo.getPreparedStatement(user_id, GET_USER_DB_UID_QUERY);
 			}
 
 			synchronized (uid_sp) {
@@ -643,7 +643,8 @@ public class JDBCRepository implements AuthRepository, UserRepository {
 		List<BareJID> users = null;
 
 		try {
-			PreparedStatement all_users_sp = data_repo.getPreparedStatement(GET_USERS_QUERY);
+			PreparedStatement all_users_sp =
+					data_repo.getPreparedStatement(null, GET_USERS_QUERY);
 
 			synchronized (all_users_sp) {
 
@@ -678,7 +679,7 @@ public class JDBCRepository implements AuthRepository, UserRepository {
 		try {
 			long users = -1;
 			PreparedStatement users_count_sp =
-					data_repo.getPreparedStatement(GET_USERS_COUNT_QUERY);
+					data_repo.getPreparedStatement(null, GET_USERS_COUNT_QUERY);
 
 			synchronized (users_count_sp) {
 
@@ -717,7 +718,7 @@ public class JDBCRepository implements AuthRepository, UserRepository {
 		try {
 			long users = -1;
 			PreparedStatement users_domain_count_st =
-					data_repo.getPreparedStatement(COUNT_USERS_FOR_DOMAIN_QUERY);
+					data_repo.getPreparedStatement(null, COUNT_USERS_FOR_DOMAIN_QUERY);
 
 			synchronized (users_domain_count_st) {
 
@@ -892,9 +893,10 @@ public class JDBCRepository implements AuthRepository, UserRepository {
 			long nid = getNodeNID(repo, user_id, subnode);
 			PreparedStatement remove_key_data_st = null;
 			if (repo == null) {
-				remove_key_data_st = data_repo.getPreparedStatement(REMOVE_KEY_DATA_QUERY);
+				remove_key_data_st =
+						data_repo.getPreparedStatement(user_id, REMOVE_KEY_DATA_QUERY);
 			} else {
-				remove_key_data_st = repo.getPreparedStatement(REMOVE_KEY_DATA_QUERY);
+				remove_key_data_st = repo.getPreparedStatement(user_id, REMOVE_KEY_DATA_QUERY);
 			}
 
 			synchronized (remove_key_data_st) {
@@ -974,7 +976,7 @@ public class JDBCRepository implements AuthRepository, UserRepository {
 		String query = null;
 
 		try {
-			stmt = data_repo.createStatement();
+			stmt = data_repo.createStatement(user_id);
 
 			// Get user account uid
 			long uid = getUserUID(null, user_id, autoCreateUser);
@@ -987,7 +989,8 @@ public class JDBCRepository implements AuthRepository, UserRepository {
 			query = "delete from " + DEF_PAIRS_TBL + " where uid = " + uid;
 			stmt.executeUpdate(query);
 
-			PreparedStatement user_del_sp = data_repo.getPreparedStatement(REMOVE_USER_QUERY);
+			PreparedStatement user_del_sp =
+					data_repo.getPreparedStatement(user_id, REMOVE_USER_QUERY);
 
 			// Remove user account from users table
 			synchronized (user_del_sp) {
@@ -1068,18 +1071,20 @@ public class JDBCRepository implements AuthRepository, UserRepository {
 
 		// Transactions may not yet work properly but at least let's make sure
 		// both calls below are executed exclusively on the same DB connection
-		DataRepository repo = data_repo.takeRepoHandle();
-		try {
-			removeData(repo, user_id, subnode, key);
+		DataRepository repo = data_repo.takeRepoHandle(user_id);
+		synchronized (repo) {
 			try {
-				addDataList(repo, user_id, subnode, key, list);
-			} catch (SQLException ex) {
-				throw new TigaseDBException("Problem adding data to DBt, user_id: " + user_id
-						+ ", subnode: " + subnode + ", key: " + key + ", list: "
-						+ Arrays.toString(list), ex);
+				removeData(repo, user_id, subnode, key);
+				try {
+					addDataList(repo, user_id, subnode, key, list);
+				} catch (SQLException ex) {
+					throw new TigaseDBException("Problem adding data to DBt, user_id: " + user_id
+							+ ", subnode: " + subnode + ", key: " + key + ", list: "
+							+ Arrays.toString(list), ex);
+				}
+			} finally {
+				data_repo.releaseRepoHandle(repo);
 			}
-		} finally {
-			data_repo.releaseRepoHandle(repo);
 		}
 
 		// int counter = 0;
@@ -1157,9 +1162,9 @@ public class JDBCRepository implements AuthRepository, UserRepository {
 		ResultSet rs = null;
 		PreparedStatement node_add_sp = null;
 		if (repo == null) {
-			node_add_sp = data_repo.getPreparedStatement(ADD_NODE_QUERY);
+			node_add_sp = data_repo.getPreparedStatement(null, ADD_NODE_QUERY);
 		} else {
-			node_add_sp = repo.getPreparedStatement(ADD_NODE_QUERY);
+			node_add_sp = repo.getPreparedStatement(null, ADD_NODE_QUERY);
 		}
 
 		synchronized (node_add_sp) {
@@ -1206,9 +1211,9 @@ public class JDBCRepository implements AuthRepository, UserRepository {
 		long uid = -1;
 		PreparedStatement user_add_sp = null;
 		if (repo == null) {
-			user_add_sp = data_repo.getPreparedStatement(ADD_USER_PLAIN_PW_QUERY);
+			user_add_sp = data_repo.getPreparedStatement(user_id, ADD_USER_PLAIN_PW_QUERY);
 		} else {
-			user_add_sp = repo.getPreparedStatement(ADD_USER_PLAIN_PW_QUERY);
+			user_add_sp = repo.getPreparedStatement(user_id, ADD_USER_PLAIN_PW_QUERY);
 		}
 
 		synchronized (user_add_sp) {
@@ -1268,7 +1273,7 @@ public class JDBCRepository implements AuthRepository, UserRepository {
 	private void checkDBSchema() throws SQLException {
 		String schema_version = "1.0";
 		String query = (derby_mode ? DERBY_GETSCHEMAVER_QUERY : JDBC_GETSCHEMAVER_QUERY);
-		Statement stmt = data_repo.createStatement();
+		Statement stmt = data_repo.createStatement(null);
 		ResultSet rs = stmt.executeQuery(query);
 
 		try {
@@ -1337,9 +1342,9 @@ public class JDBCRepository implements AuthRepository, UserRepository {
 
 		try {
 			if (repo == null) {
-				stmt = data_repo.createStatement();
+				stmt = data_repo.createStatement(null);
 			} else {
-				stmt = repo.createStatement();
+				stmt = repo.createStatement(null);
 			}
 			query = "delete from " + DEF_PAIRS_TBL + " where nid = " + nid;
 			stmt.executeUpdate(query);
@@ -1366,9 +1371,9 @@ public class JDBCRepository implements AuthRepository, UserRepository {
 
 		try {
 			if (repo == null) {
-				stmt = data_repo.createStatement();
+				stmt = data_repo.createStatement(null);
 			} else {
-				stmt = repo.createStatement();
+				stmt = repo.createStatement(null);
 			}
 			rs = stmt.executeQuery(query);
 

@@ -828,7 +828,7 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 			// Let's make sure there is no stale XMPPResourceConnection in some XMPPSession
 			// object which may cause problems and packets sent to nowhere.
 			// This might an expensive operation though....
-			log.log(Level.WARNING, "Trying to find and remove stale XMPPResourceConnection: {0}",
+			log.log(Level.INFO, "Trying to find and remove stale XMPPResourceConnection: {0}",
 					connectionId);
 			for (XMPPSession session : sessionsByNodeId.values()) {
 				connection = session.getResourceForConnectionId(connectionId);

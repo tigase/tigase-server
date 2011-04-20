@@ -276,7 +276,7 @@ public class MsgRepository implements MsgRepositoryIfc {
 			}
 
 			PreparedStatement select_to_jid_st =
-					data_repo.getPreparedStatement(MSG_SELECT_TO_JID_QUERY);
+					data_repo.getPreparedStatement(to.getBareJID(), MSG_SELECT_TO_JID_QUERY);
 
 			synchronized (select_to_jid_st) {
 				select_to_jid_st.setLong(1, to_uid);
@@ -298,7 +298,7 @@ public class MsgRepository implements MsgRepositoryIfc {
 
 			if (delete) {
 				PreparedStatement delete_to_jid_st =
-						data_repo.getPreparedStatement(MSG_DELETE_TO_JID_QUERY);
+						data_repo.getPreparedStatement(to.getBareJID(), MSG_DELETE_TO_JID_QUERY);
 
 				synchronized (delete_to_jid_st) {
 					delete_to_jid_st.setLong(1, to_uid);
@@ -346,7 +346,7 @@ public class MsgRepository implements MsgRepositoryIfc {
 				to_uid = addUserJID(to.getBareJID());
 			}
 
-			PreparedStatement insert_msg_st = data_repo.getPreparedStatement(MSG_INSERT_QUERY);
+			PreparedStatement insert_msg_st = data_repo.getPreparedStatement(to.getBareJID(), MSG_INSERT_QUERY);
 
 			synchronized (insert_msg_st) {
 				if (expired == null) {
@@ -388,7 +388,7 @@ public class MsgRepository implements MsgRepositoryIfc {
 		try {
 			String jid_sha = Algorithms.hexDigest(bareJID.toString(), "", "SHA");
 			PreparedStatement add_jid_id_st =
-					data_repo.getPreparedStatement(ADD_USER_JID_ID_QUERY);
+					data_repo.getPreparedStatement(bareJID, ADD_USER_JID_ID_QUERY);
 
 			synchronized (add_jid_id_st) {
 				add_jid_id_st.setString(1, jid_sha);
@@ -418,7 +418,7 @@ public class MsgRepository implements MsgRepositoryIfc {
 
 		try {
 			if (!data_repo.checkTable(MSG_TABLE)) {
-				st = data_repo.createStatement();
+				st = data_repo.createStatement(null);
 				st.executeUpdate(CREATE_MSG_TABLE);;
 			}
 		}
@@ -432,7 +432,7 @@ public class MsgRepository implements MsgRepositoryIfc {
 
 		try {
 			if (!data_repo.checkTable(JID_TABLE)) {
-				st = data_repo.createStatement();
+				st = data_repo.createStatement(null);
 				st.executeUpdate(CREATE_JID_TABLE);
 				st.executeUpdate("delete from " + MSG_TABLE);
 			}
@@ -447,7 +447,7 @@ public class MsgRepository implements MsgRepositoryIfc {
 	private void deleteMessage(long msg_id) {
 		try {
 			PreparedStatement delete_id_st =
-					data_repo.getPreparedStatement(MSG_DELETE_ID_QUERY);
+					data_repo.getPreparedStatement(null, MSG_DELETE_ID_QUERY);
 
 			synchronized (delete_id_st) {
 				delete_id_st.setLong(1, msg_id);
@@ -482,7 +482,7 @@ public class MsgRepository implements MsgRepositoryIfc {
 		}
 
 		try {
-			PreparedStatement uid_st = data_repo.getPreparedStatement(uid_query);
+			PreparedStatement uid_st = data_repo.getPreparedStatement(user_id, uid_query);
 
 			synchronized (uid_st) {
 				uid_st.setString(1, jid_sha);
@@ -540,7 +540,7 @@ public class MsgRepository implements MsgRepositoryIfc {
 
 		try {
 			PreparedStatement select_expired_st =
-					data_repo.getPreparedStatement(MSG_SELECT_EXPIRED_QUERY);
+					data_repo.getPreparedStatement(null, MSG_SELECT_EXPIRED_QUERY);
 
 			synchronized (select_expired_st) {
 				rs = select_expired_st.executeQuery();
@@ -589,7 +589,7 @@ public class MsgRepository implements MsgRepositoryIfc {
 			}
 
 			PreparedStatement select_expired_before_st =
-					data_repo.getPreparedStatement(MSG_SELECT_EXPIRED_BEFORE_QUERY);
+					data_repo.getPreparedStatement(null, MSG_SELECT_EXPIRED_BEFORE_QUERY);
 
 			synchronized (select_expired_before_st) {
 				select_expired_before_st.setTimestamp(1, new Timestamp(expired.getTime()));

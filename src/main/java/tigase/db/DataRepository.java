@@ -30,6 +30,8 @@ import java.sql.Statement;
 
 import java.util.Map;
 
+import tigase.xmpp.BareJID;
+
 //~--- interfaces -------------------------------------------------------------
 
 /**
@@ -62,24 +64,31 @@ public interface DataRepository {
 	 * Creates a SQL statement on which SQL queries can be executed later by the
 	 * higher repository layer.
 	 * 
+	 * @param A user id for which the statement has to be created. This is an optional
+	 * parameter and null can be provided. It is used mainly to group queries for the
+	 * same user on the same DB connection.
 	 * @return a newly created <code>Statement</code>
 	 * @throws SQLException
 	 *           if a JDBC error occurs.
 	 */
-	Statement createStatement() throws SQLException;
+	Statement createStatement(BareJID user_id) throws SQLException;
 
 	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Returns a prepared statement for a given key.
 	 * 
+	 * @param A user id for which the statement has to be created. This is an optional
+	 * parameter and null can be provided. It is used mainly to group queries for the
+	 * same user on the same DB connection.
 	 * @param stIdKey
 	 *          is a statement identification key.
 	 * @return a <code>PreparedStatement</code> for the given id key or null if
 	 *         such a statement does not exist.
 	 * @throws SQLException
 	 */
-	PreparedStatement getPreparedStatement(String stIdKey) throws SQLException;
+	PreparedStatement getPreparedStatement(BareJID user_id, String stIdKey)
+			throws SQLException;
 
 	/**
 	 * Returns a DB connection string or DB connection URI.
@@ -143,12 +152,14 @@ public interface DataRepository {
 	/**
 	 * Returns <code>DataRepository</code> instance. If this is a repository pool
 	 * then it returns particular instance from the pool. It this is a real
-	 * repository instance it returns itself. This is exclusive take, no other thread
-	 * may use this handle until it is returned to the pool.
+	 * repository instance it returns itself. This is exclusive take, no other
+	 * thread may use this handle until it is returned to the pool.
 	 * 
+	 * @param user_id
+	 *          is user account ID for which we acquire the handle.
 	 * @return DataRepository instance.
 	 */
-	DataRepository takeRepoHandle();
+	DataRepository takeRepoHandle(BareJID user_id);
 
 	void releaseRepoHandle(DataRepository repo);
 

@@ -165,7 +165,7 @@ public class MessageArchiveDB {
 	}
 
 	private long addJidID(String jid) throws SQLException {
-		PreparedStatement add_jid_st = data_repo.getPreparedStatement(ADD_JID_QUERY);
+		PreparedStatement add_jid_st = data_repo.getPreparedStatement(null, ADD_JID_QUERY);
 
 		synchronized (add_jid_st) {
 			add_jid_st.setString(1, jid);
@@ -194,7 +194,7 @@ public class MessageArchiveDB {
 			return result;
 		}
 
-		PreparedStatement add_subject_st = data_repo.getPreparedStatement(ADD_SUBJECT_QUERY);
+		PreparedStatement add_subject_st = data_repo.getPreparedStatement(null, ADD_SUBJECT_QUERY);
 
 		synchronized (add_subject_st) {
 			add_subject_st.setString(1, subject);
@@ -215,7 +215,7 @@ public class MessageArchiveDB {
 			return result;
 		}
 
-		PreparedStatement add_thread_st = data_repo.getPreparedStatement(ADD_THREAD_QUERY);
+		PreparedStatement add_thread_st = data_repo.getPreparedStatement(null, ADD_THREAD_QUERY);
 
 		synchronized (add_thread_st) {
 			add_thread_st.setString(1, thread);
@@ -242,7 +242,7 @@ public class MessageArchiveDB {
 			}
 
 			if (jids.length == 1) {
-				PreparedStatement get_jid_id_st = data_repo.getPreparedStatement(GET_JID_ID_QUERY);
+				PreparedStatement get_jid_id_st = data_repo.getPreparedStatement(null, GET_JID_ID_QUERY);
 
 				synchronized (get_jid_id_st) {
 					get_jid_id_st.setString(1, jids[0]);
@@ -257,7 +257,7 @@ public class MessageArchiveDB {
 
 				return null;
 			} else {
-				PreparedStatement get_jids_id_st = data_repo.getPreparedStatement(GET_JID_IDS_QUERY);
+				PreparedStatement get_jids_id_st = data_repo.getPreparedStatement(null, GET_JID_IDS_QUERY);
 
 				synchronized (get_jids_id_st) {
 					for (int i = 0; i < jids.length; i++) {
@@ -297,7 +297,7 @@ public class MessageArchiveDB {
 		ResultSet rs = null;
 
 		try {
-			PreparedStatement get_subject_id_st = data_repo.getPreparedStatement(GET_SUBJECT_ID_QUERY);
+			PreparedStatement get_subject_id_st = data_repo.getPreparedStatement(null, GET_SUBJECT_ID_QUERY);
 
 			synchronized (get_subject_id_st) {
 				get_subject_id_st.setString(1, subject);
@@ -318,7 +318,7 @@ public class MessageArchiveDB {
 		ResultSet rs = null;
 
 		try {
-			PreparedStatement get_thread_id_st = data_repo.getPreparedStatement(GET_THREAD_ID_QUERY);
+			PreparedStatement get_thread_id_st = data_repo.getPreparedStatement(null, GET_THREAD_ID_QUERY);
 
 			synchronized (get_thread_id_st) {
 				get_thread_id_st.setString(1, thread);

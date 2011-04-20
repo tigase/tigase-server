@@ -328,7 +328,7 @@ public class ConfigSQLRepository extends ConfigurationCache {
 
 		private void addItem(ConfigItem item) {
 			try {
-				PreparedStatement addItemSt = data_repo.getPreparedStatement(ADD_ITEM_QUERY);
+				PreparedStatement addItemSt = data_repo.getPreparedStatement(null, ADD_ITEM_QUERY);
 
 				synchronized (addItemSt) {
 					addItemSt.setString(1, ((item.getClusterNode() != null) ? item.getClusterNode() : ""));
@@ -344,7 +344,7 @@ public class ConfigSQLRepository extends ConfigurationCache {
 
 				// Maybe the configuration item is already there, let's try to update it then
 				try {
-					PreparedStatement updateItemSt = data_repo.getPreparedStatement(UPDATE_ITEM_QUERY);
+					PreparedStatement updateItemSt = data_repo.getPreparedStatement(null, UPDATE_ITEM_QUERY);
 
 					synchronized (updateItemSt) {
 						updateItemSt.setString(1, item.getConfigValToString());
@@ -374,7 +374,7 @@ public class ConfigSQLRepository extends ConfigurationCache {
 
 			try {
 				if ( !data_repo.checkTable(TABLE_NAME)) {
-					st = data_repo.createStatement();
+					st = data_repo.createStatement(null);
 					st.executeUpdate(CREATE_TABLE_QUERY);
 				} else {
 					log.info("DB for server configuration OK.");
@@ -409,7 +409,7 @@ public class ConfigSQLRepository extends ConfigurationCache {
 			ResultSet rs = null;
 
 			try {
-				PreparedStatement getAllItemsSt = data_repo.getPreparedStatement(GET_ALL_ITEMS_QUERY);
+				PreparedStatement getAllItemsSt = data_repo.getPreparedStatement(null, GET_ALL_ITEMS_QUERY);
 
 				synchronized (getAllItemsSt) {
 					getAllItemsSt.setString(1, getDefHostname());
@@ -438,7 +438,7 @@ public class ConfigSQLRepository extends ConfigurationCache {
 
 			try {
 				PreparedStatement getCompItemsSt =
-					data_repo.getPreparedStatement(GET_COMPONENT_ITEMS_QUERY);
+					data_repo.getPreparedStatement(null, GET_COMPONENT_ITEMS_QUERY);
 
 				synchronized (getCompItemsSt) {
 					getCompItemsSt.setString(1, getDefHostname());
@@ -468,7 +468,7 @@ public class ConfigSQLRepository extends ConfigurationCache {
 
 			try {
 				PreparedStatement getCompNamesSt =
-					data_repo.getPreparedStatement(GET_COMPONENT_NAMES_QUERY);
+					data_repo.getPreparedStatement(null, GET_COMPONENT_NAMES_QUERY);
 
 				synchronized (getCompNamesSt) {
 					getCompNamesSt.setString(1, getDefHostname());
@@ -492,7 +492,7 @@ public class ConfigSQLRepository extends ConfigurationCache {
 			ResultSet rs = null;
 
 			try {
-				PreparedStatement getItemSt = data_repo.getPreparedStatement(GET_ITEM_QUERY);
+				PreparedStatement getItemSt = data_repo.getPreparedStatement(null, GET_ITEM_QUERY);
 
 				synchronized (getItemSt) {
 					getItemSt.setString(1, getDefHostname());
@@ -525,7 +525,7 @@ public class ConfigSQLRepository extends ConfigurationCache {
 			ResultSet rs = null;
 
 			try {
-				PreparedStatement getKeysSt = data_repo.getPreparedStatement(GET_KEYS_QUERY);
+				PreparedStatement getKeysSt = data_repo.getPreparedStatement(null, GET_KEYS_QUERY);
 
 				synchronized (getKeysSt) {
 					getKeysSt.setString(1, getDefHostname());
@@ -552,7 +552,7 @@ public class ConfigSQLRepository extends ConfigurationCache {
 
 			try {
 				PreparedStatement getPropertiesCountSt =
-					data_repo.getPreparedStatement(GET_PROPERTIES_COUNT_QUERY);
+					data_repo.getPreparedStatement(null, GET_PROPERTIES_COUNT_QUERY);
 
 				synchronized (getPropertiesCountSt) {
 					getPropertiesCountSt.setString(1, getDefHostname());
@@ -575,7 +575,7 @@ public class ConfigSQLRepository extends ConfigurationCache {
 
 		private void removeItem(ConfigItem item) {
 			try {
-				PreparedStatement deleteItemSt = data_repo.getPreparedStatement(DELETE_ITEM_QUERY);
+				PreparedStatement deleteItemSt = data_repo.getPreparedStatement(null, DELETE_ITEM_QUERY);
 
 				synchronized (deleteItemSt) {
 					deleteItemSt.setString(1, ((item.getClusterNode() != null) ? item.getClusterNode() : ""));

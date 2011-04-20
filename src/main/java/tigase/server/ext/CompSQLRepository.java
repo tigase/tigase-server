@@ -63,7 +63,7 @@ import java.util.logging.Logger;
 public class CompSQLRepository implements ComponentRepository<CompRepoItem> {
 
 	/**
-	 * Private logger for class instancess.
+	 * Private logger for class instances.
 	 */
 	private static final Logger log = Logger.getLogger(CompSQLRepository.class.getName());
 
@@ -127,7 +127,7 @@ public class CompSQLRepository implements ComponentRepository<CompRepoItem> {
 	@Override
 	public void addItem(CompRepoItem item) {
 		try {
-			PreparedStatement addItemSt = data_repo.getPreparedStatement(ADD_ITEM_QUERY);
+			PreparedStatement addItemSt = data_repo.getPreparedStatement(null, ADD_ITEM_QUERY);
 
 			synchronized (addItemSt) {
 				if ((item.getDomain() != null) &&!item.getDomain().isEmpty()) {
@@ -196,7 +196,7 @@ public class CompSQLRepository implements ComponentRepository<CompRepoItem> {
 		ResultSet rs = null;
 
 		try {
-			PreparedStatement getAllItemsSt = data_repo.getPreparedStatement(GET_ALL_ITEMS_QUERY);
+			PreparedStatement getAllItemsSt = data_repo.getPreparedStatement(null, GET_ALL_ITEMS_QUERY);
 
 			synchronized (getAllItemsSt) {
 				rs = getAllItemsSt.executeQuery();
@@ -267,7 +267,7 @@ public class CompSQLRepository implements ComponentRepository<CompRepoItem> {
 			ResultSet rs = null;
 
 			try {
-				PreparedStatement getItemSt = data_repo.getPreparedStatement(GET_ITEM_QUERY);
+				PreparedStatement getItemSt = data_repo.getPreparedStatement(null, GET_ITEM_QUERY);
 
 				synchronized (getItemSt) {
 					getItemSt.setString(1, key);
@@ -359,7 +359,7 @@ public class CompSQLRepository implements ComponentRepository<CompRepoItem> {
 		configRepo.removeItem(key);
 
 		try {
-			PreparedStatement deleteItemSt = data_repo.getPreparedStatement(DELETE_ITEM_QUERY);
+			PreparedStatement deleteItemSt = data_repo.getPreparedStatement(null, DELETE_ITEM_QUERY);
 
 			synchronized (deleteItemSt) {
 				deleteItemSt.setString(1, key);
@@ -436,7 +436,7 @@ public class CompSQLRepository implements ComponentRepository<CompRepoItem> {
 		try {
 			if ( !data_repo.checkTable(tableName)) {
 				log.info("DB for external component is not OK, creating missing tables...");
-				st = data_repo.createStatement();
+				st = data_repo.createStatement(null);
 				st.executeUpdate(CREATE_TABLE_QUERY);
 				log.info("DB for external component created OK");
 			}

@@ -165,7 +165,7 @@ public class CounterDataArchivizer implements StatisticsArchivizerIfc {
 	 */
 	public void initData(String key, String value) {
 		try {
-			PreparedStatement initEntry = data_repo.getPreparedStatement(init_entry_query);
+			PreparedStatement initEntry = data_repo.getPreparedStatement(null, init_entry_query);
 
 			synchronized (initEntry) {
 				initEntry.setString(1, key);
@@ -218,7 +218,7 @@ public class CounterDataArchivizer implements StatisticsArchivizerIfc {
 	 */
 	public void updateData(String key, String value) {
 		try {
-			PreparedStatement updateEntry = data_repo.getPreparedStatement(update_entry_query);
+			PreparedStatement updateEntry = data_repo.getPreparedStatement(null, update_entry_query);
 
 			synchronized (updateEntry) {
 				updateEntry.setString(1, value);

@@ -104,7 +104,7 @@ public class TigaseAuth implements AuthRepository {
 
 		try {
 			PreparedStatement add_user_plain_pw_sp =
-				data_repo.getPreparedStatement(ADD_USER_PLAIN_PW_QUERY);
+				data_repo.getPreparedStatement(user, ADD_USER_PLAIN_PW_QUERY);
 
 			synchronized (add_user_plain_pw_sp) {
 				add_user_plain_pw_sp.setString(1, user.toString());
@@ -164,7 +164,7 @@ public class TigaseAuth implements AuthRepository {
 
 		try {
 			long users = -1;
-			PreparedStatement users_count_sp = data_repo.getPreparedStatement(USERS_COUNT_QUERY);
+			PreparedStatement users_count_sp = data_repo.getPreparedStatement(null, USERS_COUNT_QUERY);
 
 			synchronized (users_count_sp) {
 
@@ -202,7 +202,7 @@ public class TigaseAuth implements AuthRepository {
 		try {
 			long users = -1;
 			PreparedStatement users_domain_count_st =
-				data_repo.getPreparedStatement(USERS_DOMAIN_COUNT_QUERY);
+				data_repo.getPreparedStatement(null, USERS_DOMAIN_COUNT_QUERY);
 
 			synchronized (users_domain_count_st) {
 
@@ -252,7 +252,7 @@ public class TigaseAuth implements AuthRepository {
 			data_repo.initPreparedStatement(USERS_DOMAIN_COUNT_QUERY, USERS_DOMAIN_COUNT_QUERY);
 
 			if ((params != null) && (params.get("init-db") != null)) {
-				data_repo.getPreparedStatement(INIT_DB_QUERY).executeQuery();
+				data_repo.getPreparedStatement(null, INIT_DB_QUERY).executeQuery();
 			}
 		} catch (Exception e) {
 			data_repo = null;
@@ -273,7 +273,7 @@ public class TigaseAuth implements AuthRepository {
 	@Override
 	public void logout(BareJID user) throws UserNotFoundException, TigaseDBException {
 		try {
-			PreparedStatement user_logout_sp = data_repo.getPreparedStatement(USER_LOGOUT_QUERY);
+			PreparedStatement user_logout_sp = data_repo.getPreparedStatement(user, USER_LOGOUT_QUERY);
 
 			synchronized (user_logout_sp) {
 				user_logout_sp.setString(1, user.toString());
@@ -348,7 +348,7 @@ public class TigaseAuth implements AuthRepository {
 
 		try {
 			PreparedStatement user_login_plain_pw_sp =
-				data_repo.getPreparedStatement(USER_LOGIN_PLAIN_PW_QUERY);
+				data_repo.getPreparedStatement(user, USER_LOGIN_PLAIN_PW_QUERY);
 
 			synchronized (user_login_plain_pw_sp) {
 
@@ -421,7 +421,7 @@ public class TigaseAuth implements AuthRepository {
 	@Override
 	public void removeUser(BareJID user) throws UserNotFoundException, TigaseDBException {
 		try {
-			PreparedStatement remove_user_sp = data_repo.getPreparedStatement(REMOVE_USER_QUERY);
+			PreparedStatement remove_user_sp = data_repo.getPreparedStatement(user, REMOVE_USER_QUERY);
 
 			synchronized (remove_user_sp) {
 				remove_user_sp.setString(1, user.toString());
@@ -445,7 +445,7 @@ public class TigaseAuth implements AuthRepository {
 			throws UserNotFoundException, TigaseDBException {
 		try {
 			PreparedStatement update_pass_plain_pw_sp =
-				data_repo.getPreparedStatement(UPDATE_PASSWORD_PLAIN_PW_QUERY);
+				data_repo.getPreparedStatement(user, UPDATE_PASSWORD_PLAIN_PW_QUERY);
 
 			synchronized (update_pass_plain_pw_sp) {
 				update_pass_plain_pw_sp.setString(1, user.toString());
@@ -463,7 +463,7 @@ public class TigaseAuth implements AuthRepository {
 		ResultSet rs = null;
 
 		try {
-			PreparedStatement get_pass_sp = data_repo.getPreparedStatement(GET_PASSWORD_QUERY);
+			PreparedStatement get_pass_sp = data_repo.getPreparedStatement(user, GET_PASSWORD_QUERY);
 
 			synchronized (get_pass_sp) {
 				get_pass_sp.setString(1, user.toString());

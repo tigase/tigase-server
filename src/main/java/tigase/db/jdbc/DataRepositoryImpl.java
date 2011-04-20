@@ -22,6 +22,7 @@
 package tigase.db.jdbc;
 
 import tigase.db.DataRepository;
+import tigase.xmpp.BareJID;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -89,7 +90,7 @@ public class DataRepositoryImpl implements DataRepository {
 	 */
 	@Override
 	public boolean checkTable(String tableName) throws SQLException {
-		PreparedStatement checkTableSt = getPreparedStatement(check_table_query);
+		PreparedStatement checkTableSt = getPreparedStatement(null, check_table_query);
 
 		if (checkTableSt == null) {
 			return true;
@@ -123,7 +124,7 @@ public class DataRepositoryImpl implements DataRepository {
 	 * @throws SQLException
 	 */
 	@Override
-	public Statement createStatement() throws SQLException {
+	public Statement createStatement(BareJID user_id) throws SQLException {
 		checkConnection();
 		// This synchronization is used to prevent call when the connection and
 		// all prepared statements are being recreated.
@@ -143,7 +144,8 @@ public class DataRepositoryImpl implements DataRepository {
 	 * @throws SQLException
 	 */
 	@Override
-	public PreparedStatement getPreparedStatement(String stIdKey) throws SQLException {
+	public PreparedStatement getPreparedStatement(BareJID user_id, String stIdKey)
+			throws SQLException {
 		checkConnection();
 
 		// This synchronization is used to prevent call when the connection and
@@ -351,7 +353,7 @@ public class DataRepositoryImpl implements DataRepository {
 	 * @see tigase.db.DataRepository#takeRepo()
 	 */
 	@Override
-	public DataRepository takeRepoHandle() {
+	public DataRepository takeRepoHandle(BareJID user_id) {
 		return this;
 	}
 

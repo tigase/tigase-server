@@ -209,7 +209,7 @@ public class CounterDataLogger implements StatisticsArchivizerIfc {
 				long ext_packets, long presences, long messages, long iqs, long registered, int c2s_conns,
 					int s2s_conns, int bosh_conns) {
 		try {
-			PreparedStatement insert_stats = data_repo.getPreparedStatement(STATS_INSERT_QUERY);
+			PreparedStatement insert_stats = data_repo.getPreparedStatement(null, STATS_INSERT_QUERY);
 
 			synchronized (insert_stats) {
 				insert_stats.setFloat(1, ((cpu_usage >= 0f) ? cpu_usage : 0f));
@@ -324,7 +324,7 @@ public class CounterDataLogger implements StatisticsArchivizerIfc {
 
 		try {
 			if ( !data_repo.checkTable(STATS_TABLE)) {
-				st = data_repo.createStatement();
+				st = data_repo.createStatement(null);
 				st.executeUpdate(CREATE_STATS_TABLE);
 			}
 		} finally {

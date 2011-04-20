@@ -153,7 +153,7 @@ public class DrupalWPAuth implements AuthRepository {
 	public void addUser(BareJID user, final String password)
 			throws UserExistsException, TigaseDBException {
 		try {
-			PreparedStatement user_add_st = data_repo.getPreparedStatement(INSERT_USER_QUERY_KEY);
+			PreparedStatement user_add_st = data_repo.getPreparedStatement(user, INSERT_USER_QUERY_KEY);
 
 			synchronized (user_add_st) {
 				user_add_st.setString(1, user.getLocalpart());
@@ -276,7 +276,7 @@ public class DrupalWPAuth implements AuthRepository {
 
 		try {
 			if (online_status) {
-				Statement stmt = data_repo.createStatement();
+				Statement stmt = data_repo.createStatement(null);
 
 				stmt.executeUpdate("update users set online_status = 0;");
 				stmt.close();
@@ -285,7 +285,7 @@ public class DrupalWPAuth implements AuthRepository {
 		} catch (SQLException e) {
 			if (e.getMessage().contains("'online_status'")) {
 				try {
-					Statement stmt = data_repo.createStatement();
+					Statement stmt = data_repo.createStatement(null);
 
 					stmt.executeUpdate("alter table users add online_status int default 0;");
 					stmt.close();
@@ -495,7 +495,7 @@ public class DrupalWPAuth implements AuthRepository {
 		ResultSet rs = null;
 
 		try {
-			PreparedStatement pass_st = data_repo.getPreparedStatement(SELECT_PASSWORD_QUERY_KEY);
+			PreparedStatement pass_st = data_repo.getPreparedStatement(user, SELECT_PASSWORD_QUERY_KEY);
 
 			synchronized (pass_st) {
 				pass_st.setString(1, user.getLocalpart());
@@ -516,7 +516,7 @@ public class DrupalWPAuth implements AuthRepository {
 		ResultSet rs = null;
 
 		try {
-			PreparedStatement status_st = data_repo.getPreparedStatement(SELECT_STATUS_QUERY_KEY);
+			PreparedStatement status_st = data_repo.getPreparedStatement(user, SELECT_STATUS_QUERY_KEY);
 
 			synchronized (status_st) {
 				status_st.setString(1, user.getLocalpart());
@@ -587,7 +587,7 @@ public class DrupalWPAuth implements AuthRepository {
 		if (last_login) {
 			try {
 				PreparedStatement update_last_login_st =
-					data_repo.getPreparedStatement(UPDATE_LAST_LOGIN_QUERY_KEY);
+					data_repo.getPreparedStatement(user, UPDATE_LAST_LOGIN_QUERY_KEY);
 
 				synchronized (update_last_login_st) {
 					BigDecimal bd = new BigDecimal((System.currentTimeMillis() / 1000));
@@ -607,7 +607,7 @@ public class DrupalWPAuth implements AuthRepository {
 		if (online_status) {
 			try {
 				PreparedStatement update_online_status =
-					data_repo.getPreparedStatement(UPDATE_ONLINE_STATUS_QUERY_KEY);
+					data_repo.getPreparedStatement(user, UPDATE_ONLINE_STATUS_QUERY_KEY);
 
 				synchronized (update_online_status) {
 					update_online_status.setInt(1, status);

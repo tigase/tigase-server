@@ -30,9 +30,12 @@ import java.sql.Statement;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import tigase.xmpp.BareJID;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -47,8 +50,8 @@ public class DataRepositoryPool implements DataRepository {
 
 	// ~--- fields ---------------------------------------------------------------
 
-	private LinkedBlockingQueue<DataRepository> repoPool =
-			new LinkedBlockingQueue<DataRepository>();
+	private CopyOnWriteArrayList<DataRepository> repoPool =
+			new CopyOnWriteArrayList<DataRepository>();
 	private String resource_uri = null;
 
 	// ~--- methods --------------------------------------------------------------
@@ -60,7 +63,7 @@ public class DataRepositoryPool implements DataRepository {
 	 * @param repo
 	 */
 	public void addRepo(DataRepository repo) {
-		repoPool.offer(repo);
+		repoPool.addIfAbsent(repo);
 	}
 
 	/**
@@ -69,9 +72,14 @@ public class DataRepositoryPool implements DataRepository {
 	 * 
 	 * @return
 	 */
-	public DataRepository takeRepo() {
-		DataRepository result = takeRepoHandle();
-		addRepo(result);
+	public DataRepository takeRepo(BareJID user_id) {
+		int idx = user_id != null ? Math.abs(user_id.hashCode() % repoPool.size()) : 0;
+		DataRepository result = null;
+		try {
+			result = repoPool.get(idx);
+		} catch (IndexOutOfBoundsException ioobe) {
+			result = repoPool.get(0);
+		}
 		return result;
 	}
 
@@ -81,15 +89,8 @@ public class DataRepositoryPool implements DataRepository {
 	 * @see tigase.db.DataRepository#takeRepoHandle()
 	 */
 	@Override
-	public DataRepository takeRepoHandle() {
-		DataRepository result = null;
-		while (result == null) {
-			try {
-				result = repoPool.take();
-			} catch (InterruptedException ex) {
-			}
-		}
-		return result;
+	public DataRepository takeRepoHandle(BareJID user_id) {
+		return takeRepo(user_id);
 	}
 
 	/*
@@ -99,7 +100,7 @@ public class DataRepositoryPool implements DataRepository {
 	 */
 	@Override
 	public void releaseRepoHandle(DataRepository repo) {
-		addRepo(repo);
+		// addRepo(repo);
 	}
 
 	/**
@@ -114,7 +115,7 @@ public class DataRepositoryPool implements DataRepository {
 	 */
 	@Override
 	public boolean checkTable(String tableName) throws SQLException {
-		DataRepository repo = takeRepo();
+		DataRepository repo = takeRepo(null);
 
 		if (repo != null) {
 			return repo.checkTable(tableName);
@@ -134,11 +135,11 @@ public class DataRepositoryPool implements DataRepository {
 	 * @throws SQLException
 	 */
 	@Override
-	public Statement createStatement() throws SQLException {
-		DataRepository repo = takeRepo();
+	public Statement createStatement(BareJID user_id) throws SQLException {
+		DataRepository repo = takeRepo(user_id);
 
 		if (repo != null) {
-			return repo.createStatement();
+			return repo.createStatement(user_id);
 		} else {
 			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
 		}
@@ -159,11 +160,11 @@ public class DataRepositoryPool implements DataRepository {
 	 * @throws SQLException
 	 */
 	@Override
-	public PreparedStatement getPreparedStatement(String stIdKey) throws SQLException {
-		DataRepository repo = takeRepo();
+	public PreparedStatement getPreparedStatement(BareJID user_id, String stIdKey) throws SQLException {
+		DataRepository repo = takeRepo(user_id);
 
 		if (repo != null) {
-			return repo.getPreparedStatement(stIdKey);
+			return repo.getPreparedStatement(user_id, stIdKey);
 		} else {
 			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
 		}
