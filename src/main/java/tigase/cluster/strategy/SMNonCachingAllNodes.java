@@ -237,15 +237,24 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 		if (visitedNodes != null) {
 			return selectNodes(fromNode, visitedNodes);
 		}
-		// Do not forward any error packets for now.
-		if (packet.getType() == StanzaType.error) {
-			return null;
-		}
 
 		// Presence status change set by the user have a special treatment:
-		if (packet.getElemName() == "presence" && packet.getStanzaFrom() != null
-				&& packet.getStanzaTo() == null) {
+		if (packet.getElemName() == "presence" && packet.getType() != StanzaType.error
+				&& packet.getStanzaFrom() != null && packet.getStanzaTo() == null) {
 			return getAllNodes();
+		}
+
+		if (isSuitableForForward(packet)) {
+			return selectNodes(fromNode, visitedNodes);
+		} else {
+			return null;
+		}
+	}
+
+	protected boolean isSuitableForForward(Packet packet) {
+		// Do not forward any error packets for now.
+		if (packet.getType() == StanzaType.error) {
+			return false;
 		}
 
 		// This is for packet forwarding logic.
@@ -254,22 +263,22 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 		if ((packet.getStanzaTo() == null)
 				|| sm.isLocalDomain(packet.getStanzaTo().toString(), false)
 				|| sm.getComponentId().equals((packet.getStanzaTo().getBareJID()))) {
-			return null;
+			return false;
 		}
 		// Also packets sent from the server to user are not being forwarded like
 		// service discovery perhaps?
 		if ((packet.getStanzaFrom() == null)
 				|| sm.isLocalDomain(packet.getStanzaFrom().toString(), false)
 				|| sm.getComponentId().equals((packet.getStanzaFrom().getBareJID()))) {
-			return null;
+			return false;
 		}
 		// If the packet is to some external domain, it is not forwarded to other
 		// nodes either. It is also not forwarded if it is addressed to some
 		// component.
 		if (!sm.isLocalDomain(packet.getStanzaTo().getDomain(), false)) {
-			return null;
+			return false;
 		}
-		return selectNodes(fromNode, visitedNodes);
+		return true;
 	}
 
 	/**
