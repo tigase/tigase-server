@@ -64,20 +64,20 @@ for j in ${TIGASE_HOME}/jars/tigase-server*.jar ; do
 done
 
 if [ -z "${TIGASE_CONSOLE_LOG}" ] ; then
-    if [ -w "${TIGASE_HOME}/logs/" ] ; then
-        TIGASE_CONSOLE_LOG="${TIGASE_HOME}/logs/tigase-console.log"
-    elif [ -w "/var/log/${NAME}/" ] ; then
+    if [ -w "/var/log/${NAME}/" ] ; then
         TIGASE_CONSOLE_LOG="/var/log/${NAME}/tigase-console.log"
+    elif [ -w "${TIGASE_HOME}/logs/" ] ; then
+        TIGASE_CONSOLE_LOG="${TIGASE_HOME}/logs/tigase-console.log"
     else
         TIGASE_CONSOLE_LOG="/dev/null"
     fi
 fi
 
 if [ -z "${PIDFILE}" ] ; then
-    if [ -w "${TIGASE_HOME}/logs/" ] ; then
-        PIDFILE="${TIGASE_HOME}/logs/$NAME.pid"
-    elif [ -w "/var/run/" ] ; then
+    if [ -w "/var/run/" ] ; then
         PIDFILE="/var/run/$NAME.pid"
+    elif [ -w "${TIGASE_HOME}/logs/" ] ; then
+        PIDFILE="${TIGASE_HOME}/logs/$NAME.pid"
     else
         PIDFILE="/var/tmp/$NAME.pid"
     fi
