@@ -65,9 +65,9 @@ public class JabberIqIq extends XMPPProcessor
 		implements XMPPProcessorIfc, XMPPPreprocessorIfc {
 
 	/**
-	 * Private logger for class instancess.
+	 * Private logger for class instances.
 	 */
-	private static Logger log = Logger.getLogger("tigase.xmpp.impl.VCardTemp");
+	private static Logger log = Logger.getLogger(JabberIqIq.class.getName());
 	private static final String LEVEL = "level";
 	private static final String XMLNS = "jabber:iq:iq";
 	private static final String ID = XMLNS;
