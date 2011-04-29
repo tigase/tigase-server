@@ -22,8 +22,6 @@
 
 package tigase.xmpp.impl;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.MsgRepositoryIfc;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
@@ -46,8 +44,6 @@ import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import java.text.SimpleDateFormat;
 
 import java.util.Collections;
@@ -58,8 +54,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Describe class OfflineMessages here.
@@ -84,11 +78,7 @@ public class OfflineMessages extends XMPPProcessor
 	private static final Element[] DISCO_FEATURES = {
 		new Element("feature", new String[] { "var" }, new String[] { "msgoffline" }) };
 
-	//~--- fields ---------------------------------------------------------------
-
 	private final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
