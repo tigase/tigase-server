@@ -872,7 +872,7 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 						session = sessionsByNodeId.remove(userJid.getBareJID());
 
 						if (session == null) {
-							log.log(Level.INFO, "UPS can''t remove, session not found in map: {0}",
+							log.log(Level.INFO, "UPS can't remove, session not found in map: {0}",
 									userJid);
 						} else {
 							if (log.isLoggable(Level.FINER)) {
