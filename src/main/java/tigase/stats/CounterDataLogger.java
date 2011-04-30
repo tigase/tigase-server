@@ -319,19 +319,7 @@ public class CounterDataLogger implements StatisticsArchivizerIfc {
 	public void release() {}
 
 	private void checkDB() throws SQLException {
-		ResultSet rs = null;
-		Statement st = null;
-
-		try {
-			if ( !data_repo.checkTable(STATS_TABLE)) {
-				st = data_repo.createStatement(null);
-				st.executeUpdate(CREATE_STATS_TABLE);
-			}
-		} finally {
-			data_repo.release(st, rs);
-			rs = null;
-			st = null;
-		}
+		data_repo.checkTable(STATS_TABLE, CREATE_STATS_TABLE);
 	}
 }
 

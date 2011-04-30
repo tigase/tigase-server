@@ -413,35 +413,8 @@ public class MsgRepository implements MsgRepositoryIfc {
 	}
 
 	private void checkDB() throws SQLException {
-		ResultSet rs = null;
-		Statement st = null;
-
-		try {
-			if (!data_repo.checkTable(MSG_TABLE)) {
-				st = data_repo.createStatement(null);
-				st.executeUpdate(CREATE_MSG_TABLE);;
-			}
-		}
-		finally {
-			data_repo.release(st, rs);
-			rs = null;
-			st = null;
-
-			// stmt = null;
-		}
-
-		try {
-			if (!data_repo.checkTable(JID_TABLE)) {
-				st = data_repo.createStatement(null);
-				st.executeUpdate(CREATE_JID_TABLE);
-				st.executeUpdate("delete from " + MSG_TABLE);
-			}
-		}
-		finally {
-			data_repo.release(st, rs);
-			rs = null;
-			st = null;
-		}
+		data_repo.checkTable(JID_TABLE, CREATE_JID_TABLE);
+		data_repo.checkTable(MSG_TABLE, CREATE_MSG_TABLE);
 	}
 
 	private void deleteMessage(long msg_id) {
@@ -507,7 +480,7 @@ public class MsgRepository implements MsgRepositoryIfc {
 					} else {
 						if (log.isLoggable(Level.FINEST)) {
 							log.log(Level.FINEST,
-									"JIDs don''t match, SHA conflict? JID: {0}, DB JID: {1}", new Object[] {
+									"JIDs don't match, SHA conflict? JID: {0}, DB JID: {1}", new Object[] {
 											user_id, res_jid });
 						}
 					}

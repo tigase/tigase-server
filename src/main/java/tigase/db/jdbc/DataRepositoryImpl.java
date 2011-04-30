@@ -53,7 +53,7 @@ public class DataRepositoryImpl implements DataRepository {
 
 	/** Field description */
 	public static final String MYSQL_CHECK_TABLE_QUERY =
-			"select * from information_schema.tables where table_name = ?";
+			"select * from information_schema.tables where table_name = ? and table_schema = ?";
 
 	/** Field description */
 	public static final String OTHER_CHECK_TABLE_QUERY = "";
@@ -77,6 +77,7 @@ public class DataRepositoryImpl implements DataRepository {
 			new ConcurrentSkipListMap<String, PreparedStatement>();
 	private Map<String, String> db_queries = new ConcurrentSkipListMap<String, String>();
 	private String check_table_query = MYSQL_CHECK_TABLE_QUERY;
+	private String table_schema = null;
 
 	/**
 	 * Method description
@@ -102,6 +103,7 @@ public class DataRepositoryImpl implements DataRepository {
 		synchronized (checkTableSt) {
 			try {
 				checkTableSt.setString(1, tableName);
+				checkTableSt.setString(2, table_schema);
 				rs = checkTableSt.executeQuery();
 
 				if (rs.next()) {
@@ -112,6 +114,35 @@ public class DataRepositoryImpl implements DataRepository {
 			}
 		}
 
+		return result;
+	}
+
+	@Override
+	public boolean checkTable(String tableName, String createTableQuery)
+			throws SQLException {
+		ResultSet rs = null;
+		Statement st = null;
+		boolean result = false;
+
+		try {
+			log.log(Level.INFO, "Checking if table {0} exists in DB {1}.", new Object[] {
+					tableName, table_schema });
+			if (!checkTable(tableName)) {
+				log.log(Level.INFO, "Table {0} not found in database, creating: {1}",
+						new Object[] { tableName, createTableQuery });
+				st = createStatement(null);
+				st.executeUpdate(createTableQuery);
+				result = true;
+			} else {
+				log.log(Level.INFO, "OK table {0} found in database.", tableName);
+			}
+		} finally {
+			release(st, rs);
+			rs = null;
+			st = null;
+
+			// stmt = null;
+		}
 		return result;
 	}
 
@@ -195,6 +226,11 @@ public class DataRepositoryImpl implements DataRepository {
 	public void initRepository(String resource_uri, Map<String, String> params)
 			throws SQLException {
 		db_conn = resource_uri;
+		if (db_conn != null) {
+			String[] slashes = db_conn.split("/");
+			table_schema = slashes[slashes.length - 1].split("\\?")[0];
+			log.log(Level.INFO, "Table schema found: {0}", table_schema);
+		}
 		initRepo();
 
 		if (!db_conn.contains("mysql")) {
@@ -405,6 +441,7 @@ public class DataRepositoryImpl implements DataRepository {
 	@Override
 	public void releaseRepoHandle(DataRepository repo) {
 	}
+
 }
 
 // ~ Formatted in Sun Code Convention

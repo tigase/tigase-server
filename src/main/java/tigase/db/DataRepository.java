@@ -61,6 +61,21 @@ public interface DataRepository {
 	boolean checkTable(String tableName) throws SQLException;
 
 	/**
+	 * The method checks whether a table for the given name exists in the
+	 * database and if it does not, it automatically creates it.
+	 * 
+	 * @param tableName
+	 *          is a <code>String</code> value of the table name to check
+	 * @param createTableQuery
+	 *          is a <code>String</code> with the query to create table
+	 * @return <code>true</code> <code>boolean</code> value if the table exist in
+	 *         the database and <code>false</code> if the table was not found.
+	 * @throws SQLException
+	 *           if there was a problem accessing database.
+	 */
+	boolean checkTable(String tableName, String createTableQuery) throws SQLException;
+
+	/**
 	 * Creates a SQL statement on which SQL queries can be executed later by the
 	 * higher repository layer.
 	 * 

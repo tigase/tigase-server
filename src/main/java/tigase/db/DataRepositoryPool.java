@@ -126,6 +126,19 @@ public class DataRepositoryPool implements DataRepository {
 		return false;
 	}
 
+	@Override
+	public boolean checkTable(String tableName, String createTableQuery) throws SQLException {
+		DataRepository repo = takeRepo(null);
+
+		if (repo != null) {
+			return repo.checkTable(tableName, createTableQuery);
+		} else {
+			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
+		}
+
+		return false;
+	}
+
 	/**
 	 * Method description
 	 * 
