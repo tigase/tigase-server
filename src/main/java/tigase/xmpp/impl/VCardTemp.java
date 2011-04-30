@@ -68,7 +68,7 @@ public class VCardTemp extends XMPPProcessorAbstract {
 	public static final String VCARD_KEY = "vCard";
 
 	/**
-	 * Private logger for class instancess.
+	 * Private logger for class instances.
 	 */
 	private static Logger log = Logger.getLogger(VCardTemp.class.getName());
 	private static final String XMLNS = "vcard-temp";
