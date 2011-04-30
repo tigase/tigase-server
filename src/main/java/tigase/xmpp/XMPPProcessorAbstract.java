@@ -195,8 +195,8 @@ public abstract class XMPPProcessorAbstract extends XMPPProcessor implements XMP
 	 * Note, the default implementation checks whether the packet is addressed to the server
 	 * or is being sent to another XMPP entity. In the first case it calls
 	 * <code>processFromUserToServerPacket(...)</code> method, otherwise it calls
-	 * <code>processFromUserOutPacket</code>. You can overwite the method to change
-	 * the default bahaviour or implement the two called methods to handle each case
+	 * <code>processFromUserOutPacket</code>. You can overwrite the method to change
+	 * the default behavior or implement the two called methods to handle each case
 	 * separately.
 	 *
 	 *
@@ -260,7 +260,7 @@ public abstract class XMPPProcessorAbstract extends XMPPProcessor implements XMP
 	/**
 	 * Method is called for all the packets sent TO the user - owner of the session. The default
 	 * implementation just forwards the packet to the user connection. To change the default
-	 * behavviour the method has to be overwritten.
+	 * behavior the method has to be overwritten.
 	 *
 	 *
 	 * @param session is a <code>XMPPResourceConnection</code> instance with all the receiving
