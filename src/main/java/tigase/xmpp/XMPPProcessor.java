@@ -22,17 +22,12 @@
 
 package tigase.xmpp;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.TigaseDBException;
 
+import tigase.stats.StatisticsList;
 import tigase.xml.Element;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import java.util.Map;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * <code>XMPPProcessor</code> abstract class contains basic definition for
@@ -60,16 +55,10 @@ import java.util.Map;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public abstract class XMPPProcessor implements XMPPImplIfc, Comparable<XMPPProcessor> {
+public abstract class XMPPProcessor implements XMPPImplIfc {
 	protected static final String ALL = "*";
 
-	//~--- constructors ---------------------------------------------------------
-
 	protected XMPPProcessor() {}
-
-	//~--- methods --------------------------------------------------------------
-
-	// Implementation of java.lang.Comparable
 
 	/**
 	 * Method <code>compareTo</code> is used to perform
@@ -78,7 +67,7 @@ public abstract class XMPPProcessor implements XMPPImplIfc, Comparable<XMPPProce
 	 * @return an <code>int</code> value
 	 */
 	@Override
-	public final int compareTo(final XMPPProcessor proc) {
+	public final int compareTo(XMPPImplIfc proc) {
 		return getClass().getName().compareTo(proc.getClass().getName());
 	}
 
@@ -107,8 +96,6 @@ public abstract class XMPPProcessor implements XMPPImplIfc, Comparable<XMPPProce
 		return 1;
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	/**
 	 * Method description
 	 *
@@ -118,8 +105,6 @@ public abstract class XMPPProcessor implements XMPPImplIfc, Comparable<XMPPProce
 	public XMPPProcessor getInstance() {
 		return this;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -132,8 +117,9 @@ public abstract class XMPPProcessor implements XMPPImplIfc, Comparable<XMPPProce
 	 */
 	@Override
 	public void init(Map<String, Object> settings) throws TigaseDBException {}
-
-	//~--- get methods ----------------------------------------------------------
+	
+	@Override
+	public void getStatistics(StatisticsList list) {}
 
 	/**
 	 * Method description
@@ -166,8 +152,6 @@ public abstract class XMPPProcessor implements XMPPImplIfc, Comparable<XMPPProce
 
 		return false;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -217,9 +201,3 @@ public abstract class XMPPProcessor implements XMPPImplIfc, Comparable<XMPPProce
 		return null;
 	}
 }    // XMPPProcessor
-
-
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

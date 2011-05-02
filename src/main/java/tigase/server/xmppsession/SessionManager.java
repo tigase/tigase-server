@@ -141,10 +141,12 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 	private UserRepository user_repository = null;
 
 	private Set<String> trusted = new ConcurrentSkipListSet<String>();
+	private boolean skipPrivacy = false;
+
+	private Set<XMPPImplIfc> allPlugins = new ConcurrentSkipListSet<XMPPImplIfc>();
 
 	private Map<String, XMPPStopListenerIfc> stopListeners =
 			new ConcurrentHashMap<String, XMPPStopListenerIfc>(10);
-	private boolean skipPrivacy = false;
 
 	/**
 	 * A Map with bare user JID as a key and a user session object as a value.
@@ -419,6 +421,9 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 			list.add(getName(),
 					"Average " + tmEntry.getKey() + " on last " + tmEntry.getValue().length
 							+ " runs [ms]", calcAverage(tmEntry.getValue()), Level.FINE);
+		}
+		for (XMPPImplIfc plugin : allPlugins) {
+			plugin.getStatistics(list);
 		}
 
 	}
@@ -748,8 +753,8 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 				log.log(Level.CONFIG, "Loading and configuring plugin: {0}", plug_id);
 
 				XMPPImplIfc plugin = addPlugin(plug_id, plugins_concurrency.get(plug_id));
-
 				if (plugin != null) {
+
 					Map<String, Object> plugin_settings = getPluginSettings(plug_id, props);
 
 					if (plugin_settings.size() > 0) {
@@ -765,6 +770,7 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 					} catch (TigaseDBException ex) {
 						log.log(Level.SEVERE, "Problem initializing plugin: " + plugin.id(), ex);
 					}
+					allPlugins.add(plugin);
 				}
 			} // end of for (String comp_id: plugins)
 		} catch (Exception e) {
@@ -825,7 +831,8 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 		} else {
 			log.log(Level.FINE, "Can not find resource connection for connectionId: {0}",
 					connectionId);
-			// Let's make sure there is no stale XMPPResourceConnection in some XMPPSession
+			// Let's make sure there is no stale XMPPResourceConnection in some
+			// XMPPSession
 			// object which may cause problems and packets sent to nowhere.
 			// This might an expensive operation though....
 			log.log(Level.INFO, "Trying to find and remove stale XMPPResourceConnection: {0}",
