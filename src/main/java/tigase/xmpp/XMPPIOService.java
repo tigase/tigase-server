@@ -71,7 +71,7 @@ public class XMPPIOService<RefObject> extends IOService<RefObject> {
 	private static final Logger log = Logger.getLogger(XMPPIOService.class.getName());
 
 	public static final String CROSS_DOMAIN_POLICY_FILE_PROP_KEY =
-			"bosh-extra-headers-file";
+			"cross-domain-policy-file";
 	public static final String CROSS_DOMAIN_POLICY_FILE_PROP_VAL =
 			"etc/cross-domain-policy.xml";
 
