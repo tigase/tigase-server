@@ -24,21 +24,15 @@ package tigase.stats;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.db.DBInitException;
-import tigase.db.DataRepository;
-import tigase.db.RepositoryFactory;
-import tigase.db.TigaseDBException;
-
-//~--- JDK imports ------------------------------------------------------------
-
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import tigase.db.DBInitException;
+import tigase.db.DataRepository;
+import tigase.db.RepositoryFactory;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -141,6 +135,7 @@ public class CounterDataLogger implements StatisticsArchivizerIfc {
 	 * SQL BIGINT UNSIGNED
 	 */
 	public static final String REGISTERED_COL = "registered";
+	/* @formatter:off */
 	private static final String CREATE_STATS_TABLE = "create table " + STATS_TABLE + " ( "
 		+ " lid serial," + " ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP," + " " + CPU_USAGE_COL
 		+ " float unsigned not null default 0," + " " + MEM_USAGE_COL
@@ -165,8 +160,7 @@ public class CounterDataLogger implements StatisticsArchivizerIfc {
 		+ ", " + S2S_PACKETS_COL + ", " + EXT_PACKETS_COL + ", " + PRESENCES_COL + ", " + MESSAGES_COL
 		+ ", " + IQS_COL + ", " + REGISTERED_COL + ", " + C2S_CONNS_COL + ", " + S2S_CONNS_COL + ", "
 		+ BOSH_CONNS_COL + ") values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-	//~--- fields ---------------------------------------------------------------
+	/* @formatter:on */
 
 	private DataRepository data_repo = null;
 	private long last_c2s_packets = 0;
