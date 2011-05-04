@@ -827,6 +827,7 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 						log.log(Level.WARNING, "{0}, retrying in {1} seconds.",
 								new Object[] { cause.getMessage(),
 								interval / 1000 });
+						log.log(Level.FINEST, e.getMessage(), e);
 					} catch (Exception e) {
 						log.log(Level.WARNING, "Problem retrieving statistics: ", e);
 					}
