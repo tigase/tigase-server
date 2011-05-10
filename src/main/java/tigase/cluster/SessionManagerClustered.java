@@ -999,6 +999,12 @@ public class SessionManagerClustered extends SessionManager implements
 						XMPPResourceConnection conn = getXMPPResourceConnection(el_packet);
 
 						if (conn != null || !sendToNextNode(fromNode, visitedNodes, data, Packet.packetInstance(elem))) {
+							// Hold on! If this is the first node (fromNode) it means the packet was
+							// already processed here....
+							if (getComponentId().equals(fromNode) && conn != null) {
+								// Ignore the packet, it has been processed already
+								break; // Or maybe continue??
+							}
 							processPacket(el_packet, conn);
 						}
 					} catch (TigaseStringprepException ex) {

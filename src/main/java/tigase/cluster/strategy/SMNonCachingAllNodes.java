@@ -234,6 +234,8 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 	@Override
 	public List<JID> getNodesForPacketForward(JID fromNode, List<JID> visitedNodes,
 			Packet packet) {
+		// If the packet visited other nodes already it means it went through other checking
+		// like isSuitableForForward, etc... so there is no need for doing it again
 		if (visitedNodes != null) {
 			List<JID> result = selectNodes(fromNode, visitedNodes);
 			if (log.isLoggable(Level.FINEST)) {
@@ -338,6 +340,14 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 				if (!visitedNodes.contains(jid)) {
 					result = Collections.singletonList(jid);
 					break;
+				}
+			}
+			// All nodes visited already. We have to either send it back to the first node
+			// or if this is the first node return null
+			if (!sm.getComponentId().equals(fromNode)) {
+				result = Collections.singletonList(fromNode);
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "All nodes visited, sending it back to the first node: " + result);
 				}
 			}
 		}

@@ -226,6 +226,11 @@ public class OfflineMessages extends XMPPProcessor
 						|| (type == StanzaType.chat))) || (pac.getElemName().equals("presence")
 							&& ((type == StanzaType.subscribe) || (type == StanzaType.subscribed)
 								|| (type == StanzaType.unsubscribe) || (type == StanzaType.unsubscribed)))) {
+			
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Storing packet for offline user: {0}", pac);
+			}
+			
 			Element elem = pac.getElement().clone();
 			String stamp = null;
 
@@ -243,7 +248,11 @@ public class OfflineMessages extends XMPPProcessor
 			pac.processedBy(ID);
 
 			return true;
-		}    // end of if (pac.getElemName().equals("message"))
+		} else {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Packet for offline user not suitable for storing: {0}", pac);
+			}
+		}
 
 		return false;
 	}
