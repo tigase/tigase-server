@@ -48,6 +48,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -195,7 +196,7 @@ public class S2SConnectionClustered extends S2SConnectionManager implements
 		 * @see tigase.cluster.api.CommandListener#executeCommand(java.util.Map)
 		 */
 		@Override
-		public void executeCommand(JID fromNode, List<JID> visitedNodes,
+		public void executeCommand(JID fromNode, Set<JID> visitedNodes,
 				Map<String, String> data, Queue<Element> packets) throws ClusterCommandException {
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST,
@@ -235,7 +236,7 @@ public class S2SConnectionClustered extends S2SConnectionManager implements
 					fromNode);
 		}
 
-		private JID getNextNode(JID fromNode, List<JID> visitedNodes) {
+		private JID getNextNode(JID fromNode, Set<JID> visitedNodes) {
 			JID result = fromNode;
 			for (JID jid : cl_nodes_array) {
 				if (!fromNode.equals(jid) && !visitedNodes.contains(jid)) {
@@ -256,7 +257,7 @@ public class S2SConnectionClustered extends S2SConnectionManager implements
 		 * @see tigase.cluster.api.CommandListener#executeCommand(java.util.Map)
 		 */
 		@Override
-		public void executeCommand(JID fromNode, List<JID> visitedNodes,
+		public void executeCommand(JID fromNode, Set<JID> visitedNodes,
 				Map<String, String> data, Queue<Element> packets) throws ClusterCommandException {
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST,

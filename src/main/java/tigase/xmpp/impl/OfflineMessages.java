@@ -29,6 +29,7 @@ import tigase.db.UserNotFoundException;
 
 import tigase.server.Packet;
 
+import tigase.util.DNSResolver;
 import tigase.util.TigaseStringprepException;
 
 import tigase.xml.DomBuilderHandler;
@@ -57,15 +58,15 @@ import java.util.logging.Logger;
 
 /**
  * Describe class OfflineMessages here.
- *
- *
+ * 
+ * 
  * Created: Mon Oct 16 13:28:53 2006
- *
+ * 
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class OfflineMessages extends XMPPProcessor
-		implements XMPPPostprocessorIfc, XMPPProcessorIfc {
+public class OfflineMessages extends XMPPProcessor implements XMPPPostprocessorIfc,
+		XMPPProcessorIfc {
 
 	/**
 	 * Private logger for class instances.
@@ -75,15 +76,17 @@ public class OfflineMessages extends XMPPProcessor
 	protected static final String XMLNS = "jabber:client";
 	private static final String[] ELEMENTS = { Presence.PRESENCE_ELEMENT_NAME };
 	private static final String[] XMLNSS = { XMLNS };
-	private static final Element[] DISCO_FEATURES = {
-		new Element("feature", new String[] { "var" }, new String[] { "msgoffline" }) };
+	private static final Element[] DISCO_FEATURES = { new Element("feature",
+			new String[] { "var" }, new String[] { "msgoffline" }) };
+	private static final String defHost = DNSResolver.getDefaultHostname();
 
-	private final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+	private final SimpleDateFormat formatter =
+			new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -93,7 +96,7 @@ public class OfflineMessages extends XMPPProcessor
 
 	/**
 	 * Describe <code>id</code> method here.
-	 *
+	 * 
 	 * @return a <code>String</code> value
 	 */
 	@Override
@@ -105,16 +108,21 @@ public class OfflineMessages extends XMPPProcessor
 
 	/**
 	 * Describe <code>postProcess</code> method here.
-	 *
-	 * @param packet a <code>Packet</code> value
-	 * @param conn a <code>XMPPResourceConnection</code> value
-	 * @param repo a <code>NonAuthUserRepository</code> value
-	 * @param queue a <code>Queue</code> value
+	 * 
+	 * @param packet
+	 *          a <code>Packet</code> value
+	 * @param conn
+	 *          a <code>XMPPResourceConnection</code> value
+	 * @param repo
+	 *          a <code>NonAuthUserRepository</code> value
+	 * @param queue
+	 *          a <code>Queue</code> value
 	 * @param settings
 	 */
 	@Override
 	public void postProcess(final Packet packet, final XMPPResourceConnection conn,
-			final NonAuthUserRepository repo, final Queue<Packet> queue, Map<String, Object> settings) {
+			final NonAuthUserRepository repo, final Queue<Packet> queue,
+			Map<String, Object> settings) {
 		if (conn == null) {
 			try {
 				MsgRepositoryIfc msg_repo = getMsgRepoImpl(repo, conn);
@@ -122,27 +130,31 @@ public class OfflineMessages extends XMPPProcessor
 				savePacketForOffLineUser(packet, msg_repo);
 			} catch (UserNotFoundException e) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("UserNotFoundException at trying to save packet for off-line user." + packet);
+					log.finest("UserNotFoundException at trying to save packet for off-line user."
+							+ packet);
 				}
-			}    // end of try-catch
-		}      // end of if (conn == null)
+			} // end of try-catch
+		} // end of if (conn == null)
 	}
 
 	/**
 	 * Describe <code>process</code> method here.
-	 *
-	 * @param packet a <code>Packet</code> value
-	 * @param conn a <code>XMPPResourceConnection</code> value
-	 * @param repo a <code>NonAuthUserRepository</code> value
-	 * @param results a <code>Queue</code> value
+	 * 
+	 * @param packet
+	 *          a <code>Packet</code> value
+	 * @param conn
+	 *          a <code>XMPPResourceConnection</code> value
+	 * @param repo
+	 *          a <code>NonAuthUserRepository</code> value
+	 * @param results
+	 *          a <code>Queue</code> value
 	 * @param settings
 	 * @throws NotAuthorizedException
 	 */
 	@Override
 	public void process(final Packet packet, final XMPPResourceConnection conn,
 			final NonAuthUserRepository repo, final Queue<Packet> results,
-				final Map<String, Object> settings)
-			throws NotAuthorizedException {
+			final Map<String, Object> settings) throws NotAuthorizedException {
 		if (loadOfflineMessages(packet, conn)) {
 			try {
 				MsgRepositoryIfc msg_repo = getMsgRepoImpl(repo, conn);
@@ -154,27 +166,26 @@ public class OfflineMessages extends XMPPProcessor
 					}
 
 					results.addAll(packets);
-				}    // end of if (packets != null)
+				} // end of if (packets != null)
 			} catch (UserNotFoundException e) {
 				log.info("Something wrong, DB problem, cannot load offline messages. " + e);
-			}      // end of try-catch
+			} // end of try-catch
 		}
 	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param conn
 	 * @param repo
 	 * @return
-	 *
+	 * 
 	 * @throws UserNotFoundException
 	 * @throws NotAuthorizedException
 	 */
 	public Queue<Packet> restorePacketForOffLineUser(XMPPResourceConnection conn,
-			MsgRepositoryIfc repo)
-			throws UserNotFoundException, NotAuthorizedException {
+			MsgRepositoryIfc repo) throws UserNotFoundException, NotAuthorizedException {
 		Queue<Element> elems = repo.loadMessagesToJID(conn.getJID(), true);
 
 		if (elems != null) {
@@ -187,7 +198,7 @@ public class OfflineMessages extends XMPPProcessor
 				} catch (TigaseStringprepException ex) {
 					log.warning("Packet addressing problem, stringprep failed: " + elem);
 				}
-			}    // end of while (elem = elems.poll() != null)
+			} // end of while (elem = elems.poll() != null)
 
 			try {
 				Collections.sort(pacs, new StampComparator());
@@ -207,13 +218,13 @@ public class OfflineMessages extends XMPPProcessor
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param pac
 	 * @param repo
-	 *
+	 * 
 	 * @return
-	 *
+	 * 
 	 * @throws UserNotFoundException
 	 */
 	public boolean savePacketForOffLineUser(Packet pac, MsgRepositoryIfc repo)
@@ -239,7 +250,7 @@ public class OfflineMessages extends XMPPProcessor
 			}
 
 			String from = pac.getStanzaTo().getDomain();
-			Element x = new Element("delay", "Offline Storage",
+			Element x = new Element("delay", "Offline Storage - " + defHost,
 				new String[] { "from", "stamp", "xmlns" }, new String[] { from,
 					stamp, "urn:xmpp:delay" });
 
@@ -259,8 +270,9 @@ public class OfflineMessages extends XMPPProcessor
 
 	/**
 	 * Describe <code>supDiscoFeatures</code> method here.
-	 *
-	 * @param session a <code>XMPPResourceConnection</code> value
+	 * 
+	 * @param session
+	 *          a <code>XMPPResourceConnection</code> value
 	 * @return a <code>String[]</code> value
 	 */
 	@Override
@@ -272,7 +284,7 @@ public class OfflineMessages extends XMPPProcessor
 
 	/**
 	 * Describe <code>supElements</code> method here.
-	 *
+	 * 
 	 * @return a <code>String[]</code> value
 	 */
 	@Override
@@ -282,7 +294,7 @@ public class OfflineMessages extends XMPPProcessor
 
 	/**
 	 * Describe <code>supNamespaces</code> method here.
-	 *
+	 * 
 	 * @return a <code>String[]</code> value
 	 */
 	@Override
@@ -290,14 +302,14 @@ public class OfflineMessages extends XMPPProcessor
 		return XMLNSS;
 	}
 
-	//~--- get methods ----------------------------------------------------------
+	// ~--- get methods ----------------------------------------------------------
 
 	protected MsgRepositoryIfc getMsgRepoImpl(NonAuthUserRepository repo,
 			XMPPResourceConnection conn) {
 		return new MsgRepositoryImpl(repo, conn);
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	// Implementation of tigase.xmpp.XMPPProcessorIfc
 	protected boolean loadOfflineMessages(Packet packet, XMPPResourceConnection conn) {
@@ -306,7 +318,7 @@ public class OfflineMessages extends XMPPProcessor
 		// ignore it.
 		if ((conn == null) || conn.isAnonymous()) {
 			return false;
-		}    // end of if (session == null)
+		} // end of if (session == null)
 
 		// Try to restore the offline messages only once for the user session
 		if (conn.getSessionData(ID) != null) {
@@ -327,42 +339,42 @@ public class OfflineMessages extends XMPPProcessor
 					priority = Integer.decode(priority_str);
 				} catch (NumberFormatException e) {
 					priority = 0;
-				}    // end of try-catch
-			}      // end of if (priority != null)
+				} // end of try-catch
+			} // end of if (priority != null)
 
 			if (priority >= 0) {
 				conn.putSessionData(ID, ID);
 
 				return true;
-			}      // end of if (priority >= 0)
-		}        // end of if (type == null || type == StanzaType.available)
+			} // end of if (priority >= 0)
+		} // end of if (type == null || type == StanzaType.available)
 
 		return false;
 	}
 
-	//~--- inner classes --------------------------------------------------------
+	// ~--- inner classes --------------------------------------------------------
 
 	private class MsgRepositoryImpl implements MsgRepositoryIfc {
 		private XMPPResourceConnection conn = null;
 		private SimpleParser parser = SingletonFactory.getParserInstance();
 		private NonAuthUserRepository repo = null;
 
-		//~--- constructors -------------------------------------------------------
+		// ~--- constructors -------------------------------------------------------
 
 		private MsgRepositoryImpl(NonAuthUserRepository repo, XMPPResourceConnection conn) {
 			this.repo = repo;
 			this.conn = conn;
 		}
 
-		//~--- get methods --------------------------------------------------------
+		// ~--- get methods --------------------------------------------------------
 
 		/**
 		 * Method description
-		 *
-		 *
+		 * 
+		 * 
 		 * @param time
 		 * @param delete
-		 *
+		 * 
 		 * @return
 		 */
 		@Override
@@ -370,21 +382,22 @@ public class OfflineMessages extends XMPPProcessor
 			throw new UnsupportedOperationException("Not supported yet.");
 		}
 
-		//~--- methods ------------------------------------------------------------
+		// ~--- methods ------------------------------------------------------------
 
 		/**
 		 * Method description
-		 *
-		 *
+		 * 
+		 * 
 		 * @param to
 		 * @param delete
-		 *
+		 * 
 		 * @return
-		 *
+		 * 
 		 * @throws UserNotFoundException
 		 */
 		@Override
-		public Queue<Element> loadMessagesToJID(JID to, boolean delete) throws UserNotFoundException {
+		public Queue<Element> loadMessagesToJID(JID to, boolean delete)
+				throws UserNotFoundException {
 			try {
 				DomBuilderHandler domHandler = new DomBuilderHandler();
 				String[] msgs = conn.getOfflineDataList(ID, "messages");
@@ -404,12 +417,12 @@ public class OfflineMessages extends XMPPProcessor
 					parser.parse(domHandler, data, 0, data.length);
 
 					return domHandler.getParsedElements();
-				}    // end of while (elem = elems.poll() != null)
+				} // end of while (elem = elems.poll() != null)
 			} catch (NotAuthorizedException ex) {
 				log.info("User not authrized to retrieve offline messages, "
 						+ "this happens quite often on some installations where there"
-							+ " are a very short living client connections. They can "
-								+ "disconnect at any time. " + ex);
+						+ " are a very short living client connections. They can "
+						+ "disconnect at any time. " + ex);
 			} catch (TigaseDBException ex) {
 				log.warning("Error accessing database for offline message: " + ex);
 			}
@@ -419,32 +432,32 @@ public class OfflineMessages extends XMPPProcessor
 
 		/**
 		 * Method description
-		 *
-		 *
+		 * 
+		 * 
 		 * @param from
 		 * @param to
 		 * @param expired
 		 * @param msg
-		 *
+		 * 
 		 * @throws UserNotFoundException
 		 */
 		@Override
 		public void storeMessage(JID from, JID to, Date expired, Element msg)
 				throws UserNotFoundException {
-			repo.addOfflineDataList(to.getBareJID(), ID, "messages", new String[] { msg.toString() });
+			repo.addOfflineDataList(to.getBareJID(), ID, "messages",
+					new String[] { msg.toString() });
 		}
 	}
-
 
 	private class StampComparator implements Comparator<Packet> {
 
 		/**
 		 * Method description
-		 *
-		 *
+		 * 
+		 * 
 		 * @param p1
 		 * @param p2
-		 *
+		 * 
 		 * @return
 		 */
 		@Override
@@ -477,10 +490,8 @@ public class OfflineMessages extends XMPPProcessor
 			return stamp1.compareTo(stamp2);
 		}
 	}
-}    // OfflineMessages
+} // OfflineMessages
 
+// ~ Formatted in Sun Code Convention
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+// ~ Formatted by Jindent --- http://www.jindent.com

@@ -68,6 +68,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -1054,7 +1055,7 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 		 * @see tigase.cluster.api.CommandListener#executeCommand(java.util.Map)
 		 */
 		@Override
-		public void executeCommand(JID fromNode, List<JID> visitedNodes,
+		public void executeCommand(JID fromNode, Set<JID> visitedNodes,
 				Map<String, String> data, Queue<Element> packets) throws ClusterCommandException {
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST,

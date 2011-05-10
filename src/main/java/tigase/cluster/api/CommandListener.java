@@ -25,6 +25,7 @@ package tigase.cluster.api;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 
 import tigase.xml.Element;
 import tigase.xmpp.JID;
@@ -34,7 +35,7 @@ import tigase.xmpp.JID;
  */
 public interface CommandListener {
 
-	void executeCommand(JID fromNode, List<JID> visitedNodes, Map<String, String> data,
+	void executeCommand(JID fromNode, Set<JID> visitedNodes, Map<String, String> data,
 			Queue<Element> packets) throws ClusterCommandException;
 
 }

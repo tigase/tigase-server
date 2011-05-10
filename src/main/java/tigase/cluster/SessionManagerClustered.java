@@ -57,6 +57,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -121,6 +122,8 @@ public class SessionManagerClustered extends SessionManager implements
 
 	/** Field description */
 	public static final String XMPP_SESSION_ID = "xmppSessionId";
+
+	private static final String SESSION_FOUND_KEY = "user-session-found-key";
 
 	private JID my_address = null;
 	private JID my_hostname = null;
@@ -303,7 +306,8 @@ public class SessionManagerClustered extends SessionManager implements
 			Map<String, String> params = prepareConnectionParams(conn);
 			Element presence = conn.getPresence();
 			List<JID> cl_nodes =
-					strategy.getNodesForPacketForward(getComponentId(), null, Packet.packetInstance(presence));
+					strategy.getNodesForPacketForward(getComponentId(), null,
+							Packet.packetInstance(presence));
 			if (cl_nodes != null && cl_nodes.size() > 0) {
 				clusterController.sendToNodes(USER_PRESENCE_CMD, params, presence,
 						getComponentId(), null, cl_nodes.toArray(new JID[cl_nodes.size()]));
@@ -469,25 +473,31 @@ public class SessionManagerClustered extends SessionManager implements
 
 		} else {
 
-			List<JID> toNodes = strategy.getNodesForPacketForward(getComponentId(), null, packet);
+			XMPPResourceConnection conn = getXMPPResourceConnection(packet);
+
+			List<JID> toNodes =
+					strategy.getNodesForPacketForward(getComponentId(), null, packet);
 			if (toNodes != null && toNodes.size() > 0) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "Forwarding packet {0} to nodes: {1}",
-							new Object[] { packet, toNodes });
+					log.log(Level.FINEST, "Forwarding packet {0} to nodes: {1}", new Object[] {
+							packet, toNodes });
+				}
+				Map<String, String> data = null;
+				if (conn != null) {
+					data = new LinkedHashMap<String, String>();
+					data.put(SESSION_FOUND_KEY, getComponentId().toString());
 				}
 
-				clusterController.sendToNodes(PACKET_FORWARD_CMD, packet.getElement(),
+				clusterController.sendToNodes(PACKET_FORWARD_CMD, data, packet.getElement(),
 						getComponentId(), null, toNodes.toArray(new JID[toNodes.size()]));
 			} else {
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "No cluster nodes found for packet forward: {0}",
 							new Object[] { packet });
 				}
-				
+
 			}
 			// clTm = System.currentTimeMillis() - startTime;
-
-			XMPPResourceConnection conn = getXMPPResourceConnection(packet);
 
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Ressource connection found: {0}", conn);
@@ -535,7 +545,7 @@ public class SessionManagerClustered extends SessionManager implements
 	 * @return true if the packet was sent to next cluster node and false
 	 *         otherwise.
 	 */
-	protected boolean sendToNextNode(JID fromNode, List<JID> visitedNodes,
+	protected boolean sendToNextNode(JID fromNode, Set<JID> visitedNodes,
 			Map<String, String> data, Packet packet) {
 		boolean result = false;
 		List<JID> nextNodes =
@@ -736,7 +746,7 @@ public class SessionManagerClustered extends SessionManager implements
 		 * @see tigase.cluster.api.CommandListener#executeCommand(java.util.Map)
 		 */
 		@Override
-		public void executeCommand(JID fromNode, List<JID> visitedNodes,
+		public void executeCommand(JID fromNode, Set<JID> visitedNodes,
 				Map<String, String> data, Queue<Element> packets) throws ClusterCommandException {
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST,
@@ -779,7 +789,7 @@ public class SessionManagerClustered extends SessionManager implements
 		 * @see tigase.cluster.api.CommandListener#executeCommand(java.util.Map)
 		 */
 		@Override
-		public void executeCommand(JID fromNode, List<JID> visitedNodes,
+		public void executeCommand(JID fromNode, Set<JID> visitedNodes,
 				Map<String, String> data, Queue<Element> packets) throws ClusterCommandException {
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST,
@@ -855,7 +865,7 @@ public class SessionManagerClustered extends SessionManager implements
 		 * @see tigase.cluster.api.CommandListener#executeCommand(java.util.Map)
 		 */
 		@Override
-		public void executeCommand(JID fromNode, List<JID> visitedNodes,
+		public void executeCommand(JID fromNode, Set<JID> visitedNodes,
 				Map<String, String> data, Queue<Element> packets) throws ClusterCommandException {
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST,
@@ -914,7 +924,7 @@ public class SessionManagerClustered extends SessionManager implements
 		 * @see tigase.cluster.api.CommandListener#executeCommand(java.util.Map)
 		 */
 		@Override
-		public void executeCommand(JID fromNode, List<JID> visitedNodes,
+		public void executeCommand(JID fromNode, Set<JID> visitedNodes,
 				Map<String, String> data, Queue<Element> packets) throws ClusterCommandException {
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST,
@@ -961,7 +971,7 @@ public class SessionManagerClustered extends SessionManager implements
 		 * @see tigase.cluster.api.CommandListener#executeCommand(java.util.Map)
 		 */
 		@Override
-		public void executeCommand(JID fromNode, List<JID> visitedNodes,
+		public void executeCommand(JID fromNode, Set<JID> visitedNodes,
 				Map<String, String> data, Queue<Element> packets) throws ClusterCommandException {
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST,
@@ -984,7 +994,7 @@ public class SessionManagerClustered extends SessionManager implements
 		 * @see tigase.cluster.api.CommandListener#executeCommand(java.util.Map)
 		 */
 		@Override
-		public void executeCommand(JID fromNode, List<JID> visitedNodes,
+		public void executeCommand(JID fromNode, Set<JID> visitedNodes,
 				Map<String, String> data, Queue<Element> packets) throws ClusterCommandException {
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST,
@@ -997,15 +1007,44 @@ public class SessionManagerClustered extends SessionManager implements
 					try {
 						Packet el_packet = Packet.packetInstance(elem);
 						XMPPResourceConnection conn = getXMPPResourceConnection(el_packet);
-
-						if (conn != null || !sendToNextNode(fromNode, visitedNodes, data, Packet.packetInstance(elem))) {
-							// Hold on! If this is the first node (fromNode) it means the packet was
-							// already processed here....
-							if (getComponentId().equals(fromNode) && conn != null) {
-								// Ignore the packet, it has been processed already
-								break; // Or maybe continue??
+						Map<String, String> locdata = null;
+						if (conn != null) {
+							locdata = new LinkedHashMap<String, String>();
+							if (data != null) {
+								locdata.putAll(data);
 							}
-							processPacket(el_packet, conn);
+							data.put(SESSION_FOUND_KEY, getComponentId().toString());
+						}
+
+						// The commented if below causes the packet to stop being forwarded
+						// if it reached a host on which there is a user session to handle
+						// it.
+						// This is incorrect though, as there might be multiple users'
+						// connections
+						// to different nodes and each node should receive the packet.
+						// if (conn != null || !sendToNextNode(fromNode, visitedNodes, data,
+						// Packet.packetInstance(elem))) {
+						// Instead, always send the packet to next node:
+						boolean isSent =
+								sendToNextNode(fromNode, visitedNodes, data, Packet.packetInstance(elem));
+						// If there is a user session for the packet, process it
+						if (conn != null) {
+							// Hold on! If this is the first node (fromNode) it means the
+							// packet was already processed here....
+							if (!getComponentId().equals(fromNode)) {
+								processPacket(el_packet, conn);
+							} else {
+								// Ignore the packet, it has been processed already								
+							}
+						} else {
+							// No user session, but if this is the first node the packet has
+							// returned, so maybe this is a packet for offline storage?
+							if (getComponentId().equals(fromNode)) {
+								// However it could have been processed on another node already
+								if (data == null || data.get(SESSION_FOUND_KEY) == null) {
+									processPacket(el_packet, conn);
+								}
+							}
 						}
 					} catch (TigaseStringprepException ex) {
 						log.warning("Addressing problem, stringprep failed for packet: " + elem);
@@ -1015,6 +1054,5 @@ public class SessionManagerClustered extends SessionManager implements
 				log.finest("Empty packets list in the forward command");
 			}
 		}
-
 	}
 }

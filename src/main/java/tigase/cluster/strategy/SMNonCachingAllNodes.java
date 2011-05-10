@@ -232,7 +232,7 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 	 * xml.Element)
 	 */
 	@Override
-	public List<JID> getNodesForPacketForward(JID fromNode, List<JID> visitedNodes,
+	public List<JID> getNodesForPacketForward(JID fromNode, Set<JID> visitedNodes,
 			Packet packet) {
 		// If the packet visited other nodes already it means it went through other checking
 		// like isSuitableForForward, etc... so there is no need for doing it again
@@ -307,7 +307,7 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 	 * @param visitedNodes
 	 * @return
 	 */
-	private List<JID> selectNodes(JID fromNode, List<JID> visitedNodes) {
+	private List<JID> selectNodes(JID fromNode, Set<JID> visitedNodes) {
 		List<JID> result = null;
 		int size = cl_nodes_list.size();
 		if (size == 0) {
@@ -342,9 +342,9 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 					break;
 				}
 			}
-			// All nodes visited already. We have to either send it back to the first node
+			// If all nodes visited already. We have to either send it back to the first node
 			// or if this is the first node return null
-			if (!sm.getComponentId().equals(fromNode)) {
+			if (result == null && !sm.getComponentId().equals(fromNode)) {
 				result = Collections.singletonList(fromNode);
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "All nodes visited, sending it back to the first node: " + result);

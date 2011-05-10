@@ -32,10 +32,12 @@ import tigase.xmpp.StanzaType;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -152,7 +154,7 @@ public class ClusterElement {
 	private Map<String, String> method_params = null;
 	private Map<String, String> method_results = null;
 	private Queue<Element> packets = null;
-	private List<JID> visited_nodes = null;
+	private Set<JID> visited_nodes = null;
 
 	/**
 	 * Creates a new <code>ClusterElement</code> instance.
@@ -180,7 +182,7 @@ public class ClusterElement {
 			log.finest("First node found: " + first_node);
 		}
 
-		visited_nodes = new LinkedList<JID>();
+		visited_nodes = new LinkedHashSet<JID>();
 
 		List<Element> nodes = elem.getChildren(VISITED_NODES_PATH);
 
@@ -220,7 +222,7 @@ public class ClusterElement {
 	public ClusterElement(JID from, JID to, StanzaType type, Packet packet) {
 		if (packet != null) {
 			packets = new ArrayDeque<Element>();
-			visited_nodes = new LinkedList<JID>();
+			visited_nodes = new LinkedHashSet<JID>();
 			elem = createClusterElement(from, to, type, packet.getFrom().toString());
 
 			if (packet.getElement().getXMLNS() == null) {
@@ -429,12 +431,13 @@ public class ClusterElement {
 					new Element(FIRST_NODE_EL_NAME, node_id.toString()));
 		}
 
-		visited_nodes.add(node_id);
-		elem.findChild(VISITED_NODES_PATH).addChild(
-				new Element(NODE_ID_EL_NAME, node_id.toString()));
+		if (visited_nodes.add(node_id)) {
+			elem.findChild(VISITED_NODES_PATH).addChild(
+					new Element(NODE_ID_EL_NAME, node_id.toString()));
+		}
 	}
 
-	public void addVisitedNodes(List<JID> nodes) {
+	public void addVisitedNodes(Set<JID> nodes) {
 		if (nodes != null) {
 			for (JID node : nodes) {
 				addVisitedNode(node);
@@ -517,7 +520,8 @@ public class ClusterElement {
 	 * 
 	 * @return
 	 */
-	public Element getClusterElement() {
+	public Element getClusterElement(String id) {
+		elem.setAttribute("id", id);
 		return elem;
 	}
 
@@ -627,7 +631,7 @@ public class ClusterElement {
 	 * 
 	 * @return
 	 */
-	public List<JID> getVisitedNodes() {
+	public Set<JID> getVisitedNodes() {
 		return visited_nodes;
 	}
 

@@ -25,6 +25,7 @@ package tigase.cluster.api;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 
 import tigase.xml.Element;
 import tigase.xmpp.JID;
@@ -49,13 +50,13 @@ public interface ClusterControllerIfc {
 	void handleClusterPacket(Element packet);
 
 	void sendToNodes(String command, Map<String, String> data, Queue<Element> packets,
-			JID fromNode, List<JID> visitedNodes, JID... toNodes);
+			JID fromNode, Set<JID> visitedNodes, JID... toNodes);
 
 	void sendToNodes(String command, Queue<Element> packets, JID fromNode,
-			List<JID> visitedNodes, JID... toNodes);
+			Set<JID> visitedNodes, JID... toNodes);
 
 	void sendToNodes(String command, Map<String, String> data, JID fromNode,
-			List<JID> visitedNodes, JID... toNodes);
+			Set<JID> visitedNodes, JID... toNodes);
 
 	void
 			sendToNodes(String command, Map<String, String> data, JID fromNode, JID... toNodes);
@@ -66,10 +67,10 @@ public interface ClusterControllerIfc {
 
 	void removeCommandListener(String command, CommandListener listener);
 
-	void sendToNodes(String command, Element packet, JID fromNode, List<JID> visitedNodes,
+	void sendToNodes(String command, Element packet, JID fromNode, Set<JID> visitedNodes,
 			JID... toNodes);
 
 	void sendToNodes(String command, Map<String, String> data, Element packet,
-			JID fromNode, List<JID> visitedNodes, JID... toNodes);
+			JID fromNode, Set<JID> visitedNodes, JID... toNodes);
 
 }

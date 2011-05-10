@@ -235,7 +235,7 @@ public interface ClusteringStrategyIfc extends OnlineJidsReporter {
 	 *          a packet which is supposed to be sent to other node.
 	 * @return a list of cluster nodes JIDs to which the packet should be sent.
 	 */
-	List<JID> getNodesForPacketForward(JID fromNode, List<JID> visitedNodes, Packet packet);
+	List<JID> getNodesForPacketForward(JID fromNode, Set<JID> visitedNodes, Packet packet);
 
 	/**
 	 * The method is called on user's presence update received from a remote

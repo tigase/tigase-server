@@ -46,7 +46,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -69,8 +71,9 @@ public class ClusterController extends
 
 	/** Field description */
 	public static final String MY_DOMAIN_NAME_PROP_VAL = "localhost";
-	ConcurrentSkipListMap<String, CommandListener> commandListeners =
+	private ConcurrentSkipListMap<String, CommandListener> commandListeners =
 			new ConcurrentSkipListMap<String, CommandListener>();
+	private AtomicLong currId = new AtomicLong(1L); 
 
 	/**
 	 * Method description
@@ -200,6 +203,10 @@ public class ClusterController extends
 	public void setProperties(Map<String, Object> properties) {
 		super.setProperties(properties);
 	}
+	
+	private String nextId() {
+		return "cl-" + currId.incrementAndGet();
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -215,7 +222,7 @@ public class ClusterController extends
 		if (cmdList != null) {
 			clel.addVisitedNode(JID.jidInstanceNS(packet.getAttribute("to")));
 			Map<String, String> data = clel.getAllMethodParams();
-			List<JID> visitedNodes = clel.getVisitedNodes();
+			Set<JID> visitedNodes = clel.getVisitedNodes();
 			Queue<Element> packets = clel.getDataPackets();
 			try {
 				cmdList.executeCommand(clel.getFirstNode(), visitedNodes, data, packets);
@@ -239,7 +246,7 @@ public class ClusterController extends
 	 */
 	@Override
 	public void sendToNodes(String command, Map<String, String> data,
-			Queue<Element> packets, JID fromNode, List<JID> visitedNodes, JID... toNodes) {
+			Queue<Element> packets, JID fromNode, Set<JID> visitedNodes, JID... toNodes) {
 		CommandListener packetSender = commandListeners.get(DELIVER_CLUSTER_PACKET_CMD);
 		if (packetSender == null) {
 			log.log(Level.SEVERE, "Misconfiguration or packaging error, can not send a "
@@ -256,7 +263,8 @@ public class ClusterController extends
 							data);
 			clel.addVisitedNodes(visitedNodes);
 			clel.addDataPackets(packets);
-			Element result = clel.getClusterElement();
+			Element result = clel.getClusterElement(nextId());
+
 			results.offer(result);
 		}
 		try {
@@ -275,7 +283,7 @@ public class ClusterController extends
 	 */
 	@Override
 	public void sendToNodes(String command, Queue<Element> packets, JID fromNode,
-			List<JID> visitedNodes, JID... toNodes) {
+			Set<JID> visitedNodes, JID... toNodes) {
 		sendToNodes(command, null, packets, fromNode, visitedNodes, toNodes);
 	}
 
@@ -287,7 +295,7 @@ public class ClusterController extends
 	 */
 	@Override
 	public void sendToNodes(String command, Map<String, String> data, JID fromNode,
-			List<JID> visitedNodes, JID... toNodes) {
+			Set<JID> visitedNodes, JID... toNodes) {
 		sendToNodes(command, data, (Queue<Element>)null, fromNode, visitedNodes, toNodes);
 
 	}
@@ -349,7 +357,7 @@ public class ClusterController extends
 	 */
 	@Override
 	public void sendToNodes(String command, Element packet, JID fromNode,
-			List<JID> visitedNodes, JID... toNodes) {
+			Set<JID> visitedNodes, JID... toNodes) {
 		sendToNodes(command, null, packet, fromNode, visitedNodes, toNodes);
 	}
 
@@ -362,7 +370,7 @@ public class ClusterController extends
 	 */
 	@Override
 	public void sendToNodes(String command, Map<String, String> data, Element packet,
-			JID fromNode, List<JID> visitedNodes, JID... toNodes) {
+			JID fromNode, Set<JID> visitedNodes, JID... toNodes) {
 		Queue<Element> packets = new ArrayDeque<Element>();
 		packets.offer(packet);
 		sendToNodes(command, data, packets, fromNode, visitedNodes, toNodes);
