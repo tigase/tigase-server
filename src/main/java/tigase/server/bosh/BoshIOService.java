@@ -59,7 +59,7 @@ public class BoshIOService extends XMPPIOService<Object> {
 	private static final Logger log = Logger.getLogger(BoshIOService.class.getName());
 	public static final String BOSH_EXTRA_HEADERS_FILE_PROP_KEY = "bosh-extra-headers-file";
 	public static final String BOSH_EXTRA_HEADERS_FILE_PROP_VAL =
-			"etc/bosh-extra-haders.txt";
+			"etc/bosh-extra-headers.txt";
 	private static final String EOL = "\r\n";
 	private static final String HTTP_OK_RESPONSE = "HTTP/1.1 200 OK" + EOL;
 	private static final String CONTENT_TYPE_HEADER = "Content-Type: ";
