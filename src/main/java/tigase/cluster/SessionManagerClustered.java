@@ -124,6 +124,10 @@ public class SessionManagerClustered extends SessionManager implements
 	public static final String XMPP_SESSION_ID = "xmppSessionId";
 
 	private static final String SESSION_FOUND_KEY = "user-session-found-key";
+	private static final String INITIAL_PRESENCE_KEY = "cluster-initial-presence";
+	private static final String PRESENCE_TYPE_KEY = "presence-type";
+	private static final String PRESENCE_TYPE_INITIAL = "initial";
+	private static final String PRESENCE_TYPE_UPDATE = "update";
 
 	private JID my_address = null;
 	private JID my_hostname = null;
@@ -303,7 +307,14 @@ public class SessionManagerClustered extends SessionManager implements
 		super.handlePresenceSet(conn);
 
 		try {
+			boolean initPresence = conn.getSessionData(INITIAL_PRESENCE_KEY) == null;
 			Map<String, String> params = prepareConnectionParams(conn);
+			if (initPresence) {
+				conn.putSessionData(INITIAL_PRESENCE_KEY, INITIAL_PRESENCE_KEY);
+				params.put(PRESENCE_TYPE_KEY, PRESENCE_TYPE_INITIAL);
+			} else {
+				params.put(PRESENCE_TYPE_KEY, PRESENCE_TYPE_UPDATE);
+			}
 			Element presence = conn.getPresence();
 			List<JID> cl_nodes =
 					strategy.getNodesForPacketForward(getComponentId(), null,
@@ -892,9 +903,13 @@ public class SessionManagerClustered extends SessionManager implements
 							presence.setPacketTo(conn.getConnectionId());
 							fastAddOutPacket(presence);
 							// Send user's presence from local connection to remote connection
-							presence = Packet.packetInstance(conn_presence);
-							presence.setPacketTo(rec.getConnectionId());
-							fastAddOutPacket(presence);
+							// but only if this was an initial presence
+							if (data != null
+									&& PRESENCE_TYPE_INITIAL.equals(data.get(PRESENCE_TYPE_KEY))) {
+								presence = Packet.packetInstance(conn_presence);
+								presence.setPacketTo(rec.getConnectionId());
+								fastAddOutPacket(presence);
+							}
 						} catch (Exception ex) {
 							// TODO Auto-generated catch block
 							ex.printStackTrace();
@@ -1034,7 +1049,7 @@ public class SessionManagerClustered extends SessionManager implements
 							if (!getComponentId().equals(fromNode)) {
 								processPacket(el_packet, conn);
 							} else {
-								// Ignore the packet, it has been processed already								
+								// Ignore the packet, it has been processed already
 							}
 						} else {
 							// No user session, but if this is the first node the packet has
