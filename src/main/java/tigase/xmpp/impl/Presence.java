@@ -168,7 +168,8 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 		Element pres = session.getPresence();
 
 		if (pres != null) {
-			pres.setAttribute("type", StanzaType.unavailable.toString());
+			// This code should not be necessary anymore. It is done in the stopped method.
+			//pres.setAttribute("type", StanzaType.unavailable.toString());
 			sendPresenceBroadcast(StanzaType.unavailable, session, FROM_SUBSCRIBED, results,
 					pres, settings, roster_util);
 		} else {
@@ -1025,6 +1026,13 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 			// not be broadcasted if initial presence was not sent by the client.
 			try {
 				if (session.getPresence() != null) {
+					// If this was called without sending unavailable presence
+					// we have to generate it on our own.
+					Element pres = session.getPresence();
+					if (!StanzaType.unavailable.toString().equals(pres.getAttribute("type"))) {
+						pres.setAttribute("type", StanzaType.unavailable.toString());
+						session.setPresence(pres);
+					}
 					broadcastOffline(session, results, settings, roster_util);
 					updateOfflineChange(session, results);
 				} else {
