@@ -128,7 +128,7 @@ public class Privacy {
 	 */
 	public static Element getActiveList(XMPPResourceConnection session)
 			throws NotAuthorizedException {
-		return (Element) session.getCommonSessionData(ACTIVE);
+		return (Element) session.getSessionData(ACTIVE);
 	}
 
 	/**
@@ -307,14 +307,14 @@ public class Privacy {
 		if (lName == null) {
 
 			// User declines to use current actiev list
-			session.removeCommonSessionData(ACTIVE);
+			session.removeSessionData(ACTIVE);
 		} else {
 
 			// User selects a different active list
 			Element list = getList(session, lName);
 
 			if (list != null) {
-				session.putCommonSessionData(ACTIVE, list);
+				session.putSessionData(ACTIVE, list);
 			} else {
 				log.log(Level.INFO,
 						"Setting active list to null, do something better than that, perhaps notify user.");
