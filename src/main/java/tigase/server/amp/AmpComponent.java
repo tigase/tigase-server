@@ -264,9 +264,13 @@ public class AmpComponent extends AbstractMessageReceiver implements ActionResul
 				}
 			} else {
 				log.warning("AMP packet but empty rule-set! " + packet);
+				// In case of such error, let's just drop the packet
+				return;
 			}
 		} else {
 			log.warning("Not an AMP packet! " + packet);
+			// In case of such error, let's just drop the packet
+			return;
 		}
 
 		if (exec_def) {
