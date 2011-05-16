@@ -45,6 +45,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.TimerTask;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -91,7 +92,9 @@ public class BoshConnectionManager extends ClientConnectionManager implements
 	private int concurrent_requests = CONCURRENT_REQUESTS_PROP_VAL;
 	private ReceiverTimeoutHandler stoppedHandler = newStoppedHandler();
 	private ReceiverTimeoutHandler startedHandler = newStartedHandler();
-	private final Map<UUID, BoshSession> sessions = new LinkedHashMap<UUID, BoshSession>();
+	// This should be actually a multi-thread save variable.
+	// Changing it to 
+	private final Map<UUID, BoshSession> sessions = new ConcurrentSkipListMap<UUID, BoshSession>();
 
 	// ~--- methods --------------------------------------------------------------
 
