@@ -56,10 +56,10 @@ import java.util.logging.Logger;
 
 /**
  * JEP-0077: In-Band Registration
- *
- *
+ * 
+ * 
  * Created: Thu Feb 16 13:14:06 2006
- *
+ * 
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
@@ -72,18 +72,18 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 	private static final String ID = "jabber:iq:register";
 	private static final String[] ELEMENTS = { "query" };
 	private static final String[] XMLNSS = { "jabber:iq:register" };
-	private static final Element[] FEATURES = {
-		new Element("register", new String[] { "xmlns" },
-			new String[] { "http://jabber.org/features/iq-register" }) };
-	private static final Element[] DISCO_FEATURES = {
-		new Element("feature", new String[] { "var" }, new String[] { "jabber:iq:register" }) };
+	private static final Element[] FEATURES =
+			{ new Element("register", new String[] { "xmlns" },
+					new String[] { "http://jabber.org/features/iq-register" }) };
+	private static final Element[] DISCO_FEATURES = { new Element("feature",
+			new String[] { "var" }, new String[] { "jabber:iq:register" }) };
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -93,18 +93,18 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packet
 	 * @param session
 	 * @param repo
 	 * @param results
 	 * @param settings
-	 *
+	 * 
 	 * @throws XMPPException
-	 * TODO: Implement registration form configurable and loading all the fields from
-	 * the registration form
-	 * TODO: rewrite the plugin using the XMPPProcessorAbstract API
+	 *           TODO: Implement registration form configurable and loading all
+	 *           the fields from the registration form TODO: rewrite the plugin
+	 *           using the XMPPProcessorAbstract API
 	 */
 	@Override
 	public void process(Packet packet, XMPPResourceConnection session,
@@ -120,7 +120,7 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 			}
 
 			return;
-		}    // end of if (session == null)
+		} // end of if (session == null)
 
 		BareJID id = session.getDomainAsJID().getBareJID();
 
@@ -130,18 +130,21 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 
 		try {
 
-			// I think it does not make sense to check the 'to', just the connection ID
-//    if ((id.equals(session.getDomain()) || id.equals(session.getUserId().toString()))
-//        && packet.getFrom().equals(session.getConnectionId())) {
+			// I think it does not make sense to check the 'to', just the connection
+			// ID
+			// if ((id.equals(session.getDomain()) ||
+			// id.equals(session.getUserId().toString()))
+			// && packet.getFrom().equals(session.getConnectionId())) {
 			// Wrong thinking. The user may send an request from his own account
-			// to register with a transport or any other sevice, then the connection ID
+			// to register with a transport or any other sevice, then the connection
+			// ID
 			// matches the session id but this is still not a request to the local
 			// server. The TO address must be checked too.....
 			// if (packet.getPacketFrom().equals(session.getConnectionId())) {
 			if ((packet.getPacketFrom() != null)
 					&& packet.getPacketFrom().equals(session.getConnectionId())
-						&& ( !session.isAuthorized()
-							|| (session.isUserId(id) || session.isLocalDomain(id.toString(), false)))) {
+					&& (!session.isAuthorized() || (session.isUserId(id) || session.isLocalDomain(
+							id.toString(), false)))) {
 
 				if (!session.getDomain().isRegisterEnabled()) {
 					results.offer(Authorization.NOT_ALLOWED.getResponseMessage(packet,
@@ -154,7 +157,7 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 				StanzaType type = packet.getType();
 
 				switch (type) {
-					case set :
+					case set:
 
 						// Is it registration cancel request?
 						Element elem = request.findChild("/iq/query/remove");
@@ -179,12 +182,21 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 									// client received a response
 									ok_result.setPriority(Priority.SYSTEM);
 									results.offer(ok_result);
-									results.offer(Command.CLOSE.getPacket(session.getSMComponentId(),
-											session.getConnectionId(), StanzaType.set, session.nextStanzaId()));
+									Packet close_cmd =
+											Command.CLOSE.getPacket(session.getSMComponentId(),
+													session.getConnectionId(), StanzaType.set,
+													session.nextStanzaId());
+									// This is cheating a bit, because plugin should not set
+									// priority explicitly for system commands, however it happens
+									// sometimes that the command arrives before the response for the
+									// account removal and the connection is closed before the client
+									// is notified about successful operation.
+									close_cmd.setPriority(Priority.LOW);
+									results.offer(close_cmd);
 								} catch (NotAuthorizedException e) {
 									results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 											"You must authorize session first.", true));
-								}    // end of try-catch
+								} // end of try-catch
 							}
 						} else {
 
@@ -195,7 +207,7 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 							String email = request.getChildCData("/iq/query/email");
 							Map<String, String> reg_params = null;
 
-							if ((email != null) &&!email.trim().isEmpty()) {
+							if ((email != null) && !email.trim().isEmpty()) {
 								reg_params = new LinkedHashMap<String, String>();
 								reg_params.put("email", email);
 							}
@@ -212,15 +224,15 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 
 						break;
 
-					case get :
+					case get:
 						results.offer(packet.okResult("<instructions>"
 								+ "Choose a user name and password for use with this service."
-									+ "Please provide also your e-mail address." + "</instructions>"
-										+ "<username/>" + "<password/>" + "<email/>", 1));
+								+ "Please provide also your e-mail address." + "</instructions>"
+								+ "<username/>" + "<password/>" + "<email/>", 1));
 
 						break;
 
-					case result :
+					case result:
 
 						// It might be a registration request from transport for example...
 						Packet pack_res = packet.copyElementOnly();
@@ -230,12 +242,12 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 
 						break;
 
-					default :
+					default:
 						results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
 								"Message type is incorrect", true));
 
 						break;
-				}    // end of switch (type)
+				} // end of switch (type)
 			} else {
 				if (session.isUserId(id)) {
 
@@ -253,27 +265,28 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 					"Incorrect user name, stringprep processing failed.", true));
 		} catch (NotAuthorizedException e) {
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-					"You are not authorized to change registration settings.\n" + e.getMessage(), true));
+					"You are not authorized to change registration settings.\n" + e.getMessage(),
+					true));
 		} catch (TigaseDBException e) {
 			log.warning("Database problem: " + e);
 			results.offer(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet,
 					"Database access problem, please contact administrator.", true));
-		}    // end of try-catch
+		} // end of try-catch
 	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param session
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
 	public Element[] supDiscoFeatures(XMPPResourceConnection session) {
 		if (log.isLoggable(Level.FINEST) && session != null) {
-				log.finest("VHostItem: " + session.getDomain());
-			}
+			log.finest("VHostItem: " + session.getDomain());
+		}
 
 		if (session != null && session.getDomain().isRegisterEnabled()) {
 			return DISCO_FEATURES;
@@ -284,8 +297,8 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -295,8 +308,8 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -306,28 +319,26 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param session
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
 	public Element[] supStreamFeatures(XMPPResourceConnection session) {
 		if (log.isLoggable(Level.FINEST) && session != null) {
-				log.finest("VHostItem: " + session.getDomain());
-			}
+			log.finest("VHostItem: " + session.getDomain());
+		}
 
 		if (session != null && session.getDomain().isRegisterEnabled()) {
-		return FEATURES;
+			return FEATURES;
 		} else {
 			return null;
 		}
 	}
-}    // JabberIqRegister
+} // JabberIqRegister
 
+// ~ Formatted in Sun Code Convention
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+// ~ Formatted by Jindent --- http://www.jindent.com
