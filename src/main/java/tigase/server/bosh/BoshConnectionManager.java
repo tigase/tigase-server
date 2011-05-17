@@ -76,8 +76,6 @@ public class BoshConnectionManager extends ClientConnectionManager implements
 	private static final String ROUTING_ENTRY_PROP_VAL = DEF_SM_NAME + "@localhost";
 	private static final int DEF_PORT_NO = 5280;
 
-	// ~--- fields ---------------------------------------------------------------
-
 	private int[] PORTS = { DEF_PORT_NO };
 
 	// private static final String HOSTNAMES_PROP_KEY = "hostnames";
@@ -96,8 +94,13 @@ public class BoshConnectionManager extends ClientConnectionManager implements
 	// Changing it to 
 	private final Map<UUID, BoshSession> sessions = new ConcurrentSkipListMap<UUID, BoshSession>();
 
-	// ~--- methods --------------------------------------------------------------
-
+	@Override
+	public void processPacket(final Packet packet) {
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Processing packet: {0}", packet.toString());
+		}
+		super.processPacket(packet);
+	}
 	/**
 	 * Method description
 	 * 
@@ -138,8 +141,6 @@ public class BoshConnectionManager extends ClientConnectionManager implements
 	public void cancelTask(TimerTask tt) {
 		tt.cancel();
 	}
-
-	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
