@@ -186,12 +186,7 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 											Command.CLOSE.getPacket(session.getSMComponentId(),
 													session.getConnectionId(), StanzaType.set,
 													session.nextStanzaId());
-									// This is cheating a bit, because plugin should not set
-									// priority explicitly for system commands, however it happens
-									// sometimes that the command arrives before the response for the
-									// account removal and the connection is closed before the client
-									// is notified about successful operation.
-									close_cmd.setPriority(Priority.LOW);
+									close_cmd.setPacketTo(session.getConnectionId());
 									results.offer(close_cmd);
 								} catch (NotAuthorizedException e) {
 									results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
