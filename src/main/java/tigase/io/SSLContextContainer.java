@@ -1,24 +1,23 @@
-
 /*
-* Tigase Jabber/XMPP Server
-* Copyright (C) 2004-2010 "Artur Hefczyc" <artur.hefczyc@tigase.org>
-*
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, version 3 of the License.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program. Look for COPYING file in the top folder.
-* If not, see http://www.gnu.org/licenses/.
-*
-* $Rev$
-* Last modified by $Author$
-* $Date$
+ * Tigase Jabber/XMPP Server
+ * Copyright (C) 2004-2010 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. Look for COPYING file in the top folder.
+ * If not, see http://www.gnu.org/licenses/.
+ *
+ * $Rev$
+ * Last modified by $Author$
+ * $Date$
  */
 package tigase.io;
 
@@ -60,14 +59,14 @@ import javax.net.ssl.X509TrustManager;
 
 /**
  * Created: Oct 15, 2010 2:40:49 PM
- *
+ * 
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class SSLContextContainer implements SSLContextContainerIfc {
 	private static final Logger log = Logger.getLogger(SSLContextContainer.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
+	// ~--- fields ---------------------------------------------------------------
 
 	private File[] certsDirs = null;
 	private String def_cert_alias = null;
@@ -78,31 +77,35 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 	private SecureRandom secureRandom = null;
 	private KeyStore trustKeyStore = null;
 	private X509TrustManager[] tms = new X509TrustManager[] { new FakeTrustManager() };
-	private Map<String, SSLContext> sslContexts = new ConcurrentSkipListMap<String, SSLContext>();
-	private Map<String, KeyManagerFactory> kmfs = new ConcurrentSkipListMap<String,
-		KeyManagerFactory>();
-	private ArrayList<X509Certificate> acceptedIssuers = new ArrayList<X509Certificate>(200);
+	private Map<String, SSLContext> sslContexts =
+			new ConcurrentSkipListMap<String, SSLContext>();
+	private Map<String, KeyManagerFactory> kmfs =
+			new ConcurrentSkipListMap<String, KeyManagerFactory>();
+	private ArrayList<X509Certificate> acceptedIssuers =
+			new ArrayList<X509Certificate>(200);
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param params
-	 *
+	 * 
 	 * @throws CertificateParsingException
 	 */
 	@Override
-	public void addCertificates(Map<String, String> params) throws CertificateParsingException {
+	public void addCertificates(Map<String, String> params)
+			throws CertificateParsingException {
 		String pemCert = params.get(PEM_CERTIFICATE_KEY);
 		String saveToDiskVal = params.get(CERT_SAVE_TO_DISK_KEY);
-		boolean saveToDisk = (saveToDiskVal != null) && saveToDiskVal.equalsIgnoreCase("true");
+		boolean saveToDisk =
+				(saveToDiskVal != null) && saveToDiskVal.equalsIgnoreCase("true");
 
 		if (pemCert != null) {
 			try {
 				CertificateEntry entry =
-					CertificateUtil.parseCertificate(new CharArrayReader(pemCert.toCharArray()));
+						CertificateUtil.parseCertificate(new CharArrayReader(pemCert.toCharArray()));
 				X509Certificate cert = (X509Certificate) entry.getCertChain()[0];
 				String alias = params.get(CERT_ALIAS_KEY);
 
@@ -118,27 +121,28 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 		}
 	}
 
-	//~--- get methods ----------------------------------------------------------
+	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param protocol
 	 * @param hostname
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
 	public SSLContext getSSLContext(String protocol, String hostname) {
 		SSLContext sslContext = null;
 
+		String alias = hostname;
+
 		try {
-			String alias = hostname;
 
 			if (alias == null) {
 				alias = def_cert_alias;
-			}    // end of if (hostname == null)
+			} // end of if (hostname == null)
 
 			sslContext = sslContexts.get(alias);
 
@@ -147,8 +151,9 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 
 				if (kmf == null) {
 					KeyPair keyPair = CertificateUtil.createKeyPair(1024, "secret");
-					X509Certificate cert = CertificateUtil.createSelfSignedCertificate(email, hostname, ou,
-						o, null, null, null, keyPair);
+					X509Certificate cert =
+							CertificateUtil.createSelfSignedCertificate(email, alias, ou, o, null,
+									null, null, keyPair);
 					CertificateEntry entry = new CertificateEntry();
 
 					entry.setPrivateKey(keyPair.getPrivate());
@@ -162,8 +167,8 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 				sslContexts.put(alias, sslContext);
 			}
 		} catch (Exception e) {
-			log.log(Level.SEVERE,
-					"Can not initialize SSLContext for domain: " + hostname + ", protocol: " + protocol, e);
+			log.log(Level.SEVERE, "Can not initialize SSLContext for domain: " + alias
+					+ ", protocol: " + protocol, e);
 			sslContext = null;
 		}
 
@@ -172,8 +177,8 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -181,12 +186,12 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 		return trustKeyStore;
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param params
 	 */
 	@Override
@@ -211,7 +216,8 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 			int certsDirsIdx = -1;
 
 			for (String pemDir : pemDirs) {
-				log.log(Level.CONFIG, "Loading server certificates from PEM directory: {0}", pemDir);
+				log.log(Level.CONFIG, "Loading server certificates from PEM directory: {0}",
+						pemDir);
 				certsDirs[++certsDirsIdx] = new File(pemDir);
 				secureRandom = new SecureRandom();
 				secureRandom.nextInt();
@@ -223,7 +229,9 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 						String alias = getCertAlias(cert, file);
 
 						addCertificateEntry(certEntry, alias, false);
-						log.log(Level.CONFIG, "Loaded server certificate for alias: {0}", alias);
+						log.log(Level.CONFIG,
+								"Loaded server certificate for alias: {0} from file: {1}", new Object[] {
+										alias, file });
 					} catch (Exception ex) {
 						log.log(Level.WARNING, "Cannot load certficate from file: " + file, ex);
 					}
@@ -250,9 +258,9 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 		}.start();
 	}
 
-	private KeyManagerFactory addCertificateEntry(CertificateEntry entry, String alias, boolean store)
-			throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException,
-			UnrecoverableKeyException {
+	private KeyManagerFactory addCertificateEntry(CertificateEntry entry, String alias,
+			boolean store) throws KeyStoreException, IOException, NoSuchAlgorithmException,
+			CertificateException, UnrecoverableKeyException {
 		KeyStore keys = KeyStore.getInstance("JKS");
 
 		keys.load(null, emptyPass);
@@ -264,13 +272,14 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 		kmfs.put(alias, kmf);
 
 		if (store) {
-			CertificateUtil.storeCertificate(new File(certsDirs[0], alias + ".pem").toString(), entry);
+			CertificateUtil.storeCertificate(new File(certsDirs[0], alias + ".pem").toString(),
+					entry);
 		}
 
 		return kmf;
 	}
 
-	//~--- get methods ----------------------------------------------------------
+	// ~--- get methods ----------------------------------------------------------
 
 	private String getCertAlias(X509Certificate cert, File file) {
 		String name = CertificateUtil.getCertCName(cert);
@@ -283,7 +292,7 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 		return file.getName().substring(0, file.getName().length() - 4);
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	private void loadTrustedCerts(String[] trustLocations) {
 		int counter = 0;
@@ -325,82 +334,82 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 				}
 			}
 		} catch (Exception ex) {
-			log.log(Level.WARNING,
-					"An error loading trusted certificates from locations: "
-						+ Arrays.toString(trustLocations), ex);
+			log.log(Level.WARNING, "An error loading trusted certificates from locations: "
+					+ Arrays.toString(trustLocations), ex);
 		}
 
-		tms = new X509TrustManager[] {
-			new FakeTrustManager(acceptedIssuers.toArray(new X509Certificate[acceptedIssuers.size()])) };
+		tms =
+				new X509TrustManager[] { new FakeTrustManager(
+						acceptedIssuers.toArray(new X509Certificate[acceptedIssuers.size()])) };
 
 		long seconds = (System.currentTimeMillis() - start) / 1000;
 
 		log.log(Level.CONFIG, "Loaded {0} trust certificates, it took {1} seconds.",
-				new Object[] { counter,
-				seconds });
+				new Object[] { counter, seconds });
 	}
 
-	//~--- inner classes --------------------------------------------------------
+	// ~--- inner classes --------------------------------------------------------
 
 	private static class FakeTrustManager implements X509TrustManager {
 		private X509Certificate[] issuers = null;
 
-		//~--- constructors -------------------------------------------------------
+		// ~--- constructors -------------------------------------------------------
 
 		/**
 		 * Constructs ...
-		 *
+		 * 
 		 */
-		FakeTrustManager() {}
+		FakeTrustManager() {
+		}
 
 		/**
 		 * Constructs ...
-		 *
-		 *
+		 * 
+		 * 
 		 * @param ai
 		 */
 		FakeTrustManager(X509Certificate[] ai) {
 			issuers = ai;
 		}
 
-		//~--- methods ------------------------------------------------------------
+		// ~--- methods ------------------------------------------------------------
 
 		// Implementation of javax.net.ssl.X509TrustManager
 
 		/**
 		 * Method description
-		 *
-		 *
+		 * 
+		 * 
 		 * @param x509CertificateArray
 		 * @param string
-		 *
+		 * 
 		 * @throws CertificateException
 		 */
 		@Override
 		public void checkClientTrusted(final X509Certificate[] x509CertificateArray,
-				final String string)
-				throws CertificateException {}
+				final String string) throws CertificateException {
+		}
 
 		/**
 		 * Method description
-		 *
-		 *
+		 * 
+		 * 
 		 * @param x509CertificateArray
 		 * @param string
-		 *
+		 * 
 		 * @throws CertificateException
 		 */
 		@Override
 		public void checkServerTrusted(final X509Certificate[] x509CertificateArray,
-				final String string)
-				throws CertificateException {}
+				final String string) throws CertificateException {
+		}
 
-		//~--- get methods --------------------------------------------------------
+		// ~--- get methods --------------------------------------------------------
 
 		/**
 		 * Method description
-		 *
-		 *
+		 * 
+		 * 
 		 * @return
 		 */
 		@Override
@@ -409,15 +418,14 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 		}
 	}
 
-
 	private class PEMFileFilter implements FileFilter {
 
 		/**
 		 * Method description
-		 *
-		 *
+		 * 
+		 * 
 		 * @param pathname
-		 *
+		 * 
 		 * @return
 		 */
 		@Override
@@ -432,8 +440,6 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 	}
 }
 
+// ~ Formatted in Sun Code Convention
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+// ~ Formatted by Jindent --- http://www.jindent.com
