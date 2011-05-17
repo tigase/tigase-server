@@ -341,7 +341,7 @@ public class DrupalWPAuth implements AuthRepository {
 					if (login_ok) {
 						BareJID user = (BareJID) props.get(USER_ID_KEY);
 
-						// Unforutnately, unlike with painAuth we have to check whether the user
+						// Unfortunately, unlike with plainAuth we have to check whether the user
 						// is active after successful authentication as before it is completed the
 						// user id is not known
 						if ( !isActive(user)) {
@@ -372,6 +372,19 @@ public class DrupalWPAuth implements AuthRepository {
 
 			throw new AuthorizationException("Mechanism is not supported: " + mech);
 		}            // end of if (proto.equals(PROTOCOL_VAL_SASL))
+
+		if (proto.equals(PROTOCOL_VAL_NONSASL)) {
+			String password = (String) props.get(PASSWORD_KEY);
+			BareJID user_id = (BareJID) props.get(USER_ID_KEY);
+			if (password != null) {
+				return plainAuth(user_id, password);
+			}
+			String digest = (String) props.get(DIGEST_KEY);
+			if (digest != null) {
+				String digest_id = (String) props.get(DIGEST_ID_KEY);
+				return digestAuth(user_id, digest, digest_id, "SHA");
+			}
+		} // end of if (proto.equals(PROTOCOL_VAL_SASL))
 
 		throw new AuthorizationException("Protocol is not supported: " + proto);
 	}
