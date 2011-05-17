@@ -190,11 +190,6 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	 */
 	@Override
 	public void processPacket(final Packet packet) {
-		if (log.isLoggable(Level.FINER)) {
-			log.log(Level.FINER, "Processing packet: {0}, type: {1}",
-					new Object[] { packet.getElemName(), packet.getType() });
-		}
-
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Processing packet: {0}", packet.toStringSecure());
 		}
