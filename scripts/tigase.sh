@@ -32,7 +32,6 @@
 # TIGASE_HOME
 # TIGASE_CONSOLE_LOG
 # TIGASE_PID
-# TIGASE_CONFIG
 #
 # If not given the script will try to search for the file and if
 # not found default parameters will be used.
@@ -106,28 +105,9 @@ if [ -z "${TIGASE_PID}" ] ; then
 		fi
   fi
 fi
-if [ -z "${TIGASE_CONFIG}" ] ; then
-  DEF_CONF="tigase-server.xml"
-  # Gentoo style config location
-  if [ -f "/etc/conf.d/${DEF_CONF}" ] ; then
-		TIGASE_CONFIG="/etc/conf.d/${DEF_CONF}"
-  elif [ -f "/etc/${DEF_CONF}" ] ; then
-		TIGASE_CONFIG="/etc/${DEF_CONF}"
-  elif [ -f "/etc/tigase/${DEF_CONF}" ] ; then
-		TIGASE_CONFIG="/etc/tigase/${DEF_CONF}"
-  elif [ -f "${TIGASE_HOME}/etc/${DEF_CONF}" ] ; then
-		TIGASE_CONFIG="${TIGASE_HOME}/etc/${DEF_CONF}"
-  else
-		TIGASE_CONFIG="${TIGASE_HOME}/etc/${DEF_CONF}"
-		echo "Can't find server configuration file."
-		echo "Should be set in TIGASE_CONFIG variable"
-		echo "Creating new configuration file in location:"
-		echo "${TIGASE_CONFIG}"
-  fi
-fi
 
 [[ -z "${TIGASE_RUN}" ]] && \
-  TIGASE_RUN="tigase.server.XMPPServer -c ${TIGASE_CONFIG}  ${TIGASE_OPTIONS}"
+  TIGASE_RUN="tigase.server.XMPPServer ${TIGASE_OPTIONS}"
 
 [[ -z "${JAVA}" ]] && JAVA="${JAVA_HOME}/bin/java"
 
@@ -206,7 +186,6 @@ case "${1}" in
     echo "TIGASE_HOME     =  $TIGASE_HOME"
     echo "TIGASE_JAR      =  $TIGASE_JAR"
     echo "TIGASE_PARAMS   =  $TIGASE_PARAMS"
-    echo "TIGASE_CONFIG   =  $TIGASE_CONFIG"
     echo "TIGASE_RUN      =  $TIGASE_RUN"
     echo "TIGASE_PID      =  $TIGASE_PID"
 		echo "TIGASE_OPTIONS  =  $TIGASE_OPTIONS"
