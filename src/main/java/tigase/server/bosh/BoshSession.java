@@ -161,6 +161,11 @@ public class BoshSession {
 	 * @param bios
 	 */
 	public void disconnected(BoshIOService bios) {
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Disconnected called for: " + bios.getUniqueId());
+		}
+
+		
 		if (bios != null) {
 			connections.remove(bios);
 		}
