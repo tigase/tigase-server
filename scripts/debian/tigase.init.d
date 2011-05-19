@@ -8,15 +8,9 @@
 # Short-Description: Start the Tigase XMPP server
 ### END INIT INFO
 
-# Attempt to locate JAVA_HOME, code borrowed from jabref package
-if [ -z $JAVA_HOME ]
-then
-	for java_dir in /usr/lib/jvm/java-6-* ; do
-		test -d ${java_dir} && JAVA_HOME=${java_dir}
-	done
-fi
-
 # Settings paths and other variables
+JAVA_HOME=
+
 USERNAME=tigase
 USERGROUP=tigase
 NAME=tigase
@@ -33,6 +27,14 @@ TIGASE_CONSOLE_LOG=
 
 USER=$USERNAME
 eval HOME="~$USER"
+
+# Attempt to locate JAVA_HOME, code borrowed from jabref package
+if [ -z $JAVA_HOME ]
+then
+	for java_dir in /usr/lib/jvm/java-6-* ; do
+		test -d ${java_dir} && JAVA_HOME=${java_dir}
+	done
+fi
 
 # Include tigase defaults if available
 if [ -z "${TIGASE_PARAMS}" ] ; then
