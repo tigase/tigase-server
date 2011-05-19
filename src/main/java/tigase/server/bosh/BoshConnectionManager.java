@@ -28,6 +28,7 @@ import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.server.ReceiverTimeoutHandler;
 import tigase.server.xmppclient.ClientConnectionManager;
+import tigase.stats.StatisticsList;
 
 import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
@@ -91,8 +92,9 @@ public class BoshConnectionManager extends ClientConnectionManager implements
 	private ReceiverTimeoutHandler stoppedHandler = newStoppedHandler();
 	private ReceiverTimeoutHandler startedHandler = newStartedHandler();
 	// This should be actually a multi-thread save variable.
-	// Changing it to 
-	private final Map<UUID, BoshSession> sessions = new ConcurrentSkipListMap<UUID, BoshSession>();
+	// Changing it to
+	private final Map<UUID, BoshSession> sessions =
+			new ConcurrentSkipListMap<UUID, BoshSession>();
 
 	@Override
 	public void processPacket(final Packet packet) {
@@ -101,6 +103,7 @@ public class BoshConnectionManager extends ClientConnectionManager implements
 		}
 		super.processPacket(packet);
 	}
+
 	/**
 	 * Method description
 	 * 
@@ -114,6 +117,7 @@ public class BoshConnectionManager extends ClientConnectionManager implements
 	public boolean addOutStreamClosed(Packet packet, BoshSession bs) {
 		packet.setPacketFrom(getFromAddress(bs.getSid().toString()));
 		packet.setPacketTo(bs.getDataReceiver());
+		packet.initVars(packet.getPacketFrom(), packet.getPacketTo());
 
 		return addOutPacketWithTimeout(packet, stoppedHandler, 15l, TimeUnit.SECONDS);
 	}
@@ -448,8 +452,8 @@ public class BoshConnectionManager extends ClientConnectionManager implements
 
 	/**
 	 * Method <code>getMaxInactiveTime</code> returns max keep-alive time for
-	 * inactive connection. we shoulnd not really close external component
-	 * connection at all, so let's say something like: 1000 days...
+	 * inactive connection. For Bosh it does not make sense to keep the idle
+	 * connection longer than 10 minutes.
 	 * 
 	 * @return a <code>long</code> value
 	 */
@@ -463,7 +467,14 @@ public class BoshConnectionManager extends ClientConnectionManager implements
 		return new BoshIOService();
 	}
 
-	// ~--- methods --------------------------------------------------------------
+	@Override
+	public void getStatistics(StatisticsList list) {
+		super.getStatistics(list);
+		if (list.checkLevel(Level.FINEST)) {
+			// Be careful here, the size() for this map is expensive to count
+			list.add(getName(), "Bosh sessions", sessions.size(), Level.FINEST);
+		}
+	}
 
 	@Override
 	protected ReceiverTimeoutHandler newStartedHandler() {

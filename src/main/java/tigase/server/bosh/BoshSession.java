@@ -152,8 +152,18 @@ public class BoshSession {
 	public void close() {
 		terminate = true;
 		processPacket(null, null);
+		closeAllConnections();
 	}
 
+	private void closeAllConnections() {
+		for (BoshIOService conn: old_connections) {
+			conn.stop();
+		}
+		for (BoshIOService conn: connections) {
+			conn.stop();
+		}
+	}
+	
 	/**
 	 * Method description
 	 * 
@@ -165,7 +175,6 @@ public class BoshSession {
 			log.finest("Disconnected called for: " + bios.getUniqueId());
 		}
 
-		
 		if (bios != null) {
 			connections.remove(bios);
 		}
@@ -276,7 +285,7 @@ public class BoshSession {
 		}
 
 		this.max_wait = Math.min(wait_l, max_wait);
-		//this.max_wait = wait_l;
+		// this.max_wait = wait_l;
 
 		int hold_i = hold_requests;
 		String tmp_str = packet.getAttribute(HOLD_ATTR);
@@ -610,8 +619,11 @@ public class BoshSession {
 
 			for (Element packet : waiting_packets) {
 				try {
-					out_results.offer(Authorization.RECIPIENT_UNAVAILABLE.getResponseMessage(
-							Packet.packetInstance(packet), "Bosh = disconnected", true));
+					// Do not send stream:features back with an error
+					if (packet.getName() != "stream:features") {
+						out_results.offer(Authorization.RECIPIENT_UNAVAILABLE.getResponseMessage(
+								Packet.packetInstance(packet), "Bosh = disconnected", true));
+					}
 				} catch (TigaseStringprepException ex) {
 					log.warning("Packet addressing problem, stringprep processing failed, dropping: "
 							+ packet);
@@ -630,6 +642,7 @@ public class BoshSession {
 
 			handler.addOutStreamClosed(command, this);
 
+			closeAllConnections();
 			// out_results.offer(command);
 			return true;
 		}
@@ -835,8 +848,8 @@ public class BoshSession {
 
 		if (cache_res != null) {
 			for (Element elem : cache_res) {
-				elem.addAttribute("reload-counter", ""+cache_reload_counter);
-				elem.addAttribute("packet-counter", ""+(++packet_counter));
+				elem.addAttribute("reload-counter", "" + cache_reload_counter);
+				elem.addAttribute("packet-counter", "" + (++packet_counter));
 				waiting_packets.add(elem);
 			}
 		}
