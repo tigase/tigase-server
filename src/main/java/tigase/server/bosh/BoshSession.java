@@ -275,8 +275,8 @@ public class BoshSession {
 			}
 		}
 
-		// this.max_wait = Math.min(wait_l, max_wait);
-		this.max_wait = wait_l;
+		this.max_wait = Math.min(wait_l, max_wait);
+		//this.max_wait = wait_l;
 
 		int hold_i = hold_requests;
 		String tmp_str = packet.getAttribute(HOLD_ATTR);
