@@ -447,7 +447,7 @@ public abstract class IOService<RefObject> implements Callable<IOService<?>>, TL
 //      thr.fillInStackTrace();
 //      log.log(Level.FINEST, "Socket: " + socketIO + ", Connected: " + result, thr);
 //    }
-			log.log(Level.FINEST, "Socket: {0}, Connected: {1}", new Object[] { socketIO, result });
+			log.log(Level.FINEST, "Socket: {0}, Connected: {1}, id: {2}", new Object[] { socketIO, result, id });
 		}
 
 		return result;
