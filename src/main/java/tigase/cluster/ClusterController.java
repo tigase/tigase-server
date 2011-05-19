@@ -22,28 +22,7 @@
 
 package tigase.cluster;
 
-import tigase.cluster.api.ClusterCommandException;
-import tigase.cluster.api.ClusterControllerIfc;
-import tigase.cluster.api.ClusterElement;
-import tigase.cluster.api.ClusteredComponentIfc;
-import tigase.cluster.api.CommandListener;
-import tigase.conf.Configurable;
-
-import tigase.server.AbstractComponentRegistrator;
-import tigase.server.Message;
-import tigase.server.Packet;
-import tigase.server.ServerComponent;
-
-import tigase.util.DNSResolver;
-import tigase.util.TigaseStringprepException;
-
-import tigase.xml.Element;
-import tigase.xmpp.JID;
-import tigase.xmpp.StanzaType;
-
 import java.util.ArrayDeque;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
@@ -51,6 +30,19 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import tigase.cluster.api.ClusterCommandException;
+import tigase.cluster.api.ClusterControllerIfc;
+import tigase.cluster.api.ClusterElement;
+import tigase.cluster.api.ClusteredComponentIfc;
+import tigase.cluster.api.CommandListener;
+import tigase.conf.Configurable;
+import tigase.server.AbstractComponentRegistrator;
+import tigase.server.Packet;
+import tigase.server.ServerComponent;
+import tigase.xml.Element;
+import tigase.xmpp.JID;
+import tigase.xmpp.StanzaType;
 
 /**
  * Describe class ClusterController here.
