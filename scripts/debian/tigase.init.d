@@ -66,8 +66,8 @@ for j in ${TIGASE_HOME}/jars/tigase-server*.jar ; do
 done
 
 if [ -z "${TIGASE_CONSOLE_LOG}" ] ; then
-    if [ -w "/var/log/${NAME}/" ] ; then
-        TIGASE_CONSOLE_LOG="/var/log/${NAME}/tigase-console.log"
+    if [ -w "/var/log/${USERNAME}/" ] ; then
+        TIGASE_CONSOLE_LOG="/var/log/${USERNAME}/tigase-console.log"
     elif [ -w "${TIGASE_HOME}/logs/" ] ; then
         TIGASE_CONSOLE_LOG="${TIGASE_HOME}/logs/tigase-console.log"
     else
@@ -76,12 +76,17 @@ if [ -z "${TIGASE_CONSOLE_LOG}" ] ; then
 fi
 
 if [ -z "${PIDFILE}" ] ; then
-    if [ -w "/var/run/" ] ; then
-        PIDFILE="/var/run/$NAME.pid"
+    if [ ! -d "/var/run/$USERNAME/" ] ; then
+        mkdir "/var/run/$USERNAME/"
+        chown -R "$USERNAME":"$USERGROUP" "/var/run/$USERNAME/"
+    fi
+
+    if [ -w "/var/run/$USERNAME/" ] ; then
+        PIDFILE="/var/run/$USERNAME/$USERNAME.pid"
     elif [ -w "${TIGASE_HOME}/logs/" ] ; then
-        PIDFILE="${TIGASE_HOME}/logs/$NAME.pid"
+        PIDFILE="${TIGASE_HOME}/logs/$USERNAME.pid"
     else
-        PIDFILE="/var/tmp/$NAME.pid"
+        PIDFILE="/var/tmp/$USERNAME.pid"
     fi
 fi
 
