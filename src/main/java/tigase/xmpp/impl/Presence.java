@@ -168,8 +168,9 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 		Element pres = session.getPresence();
 
 		if (pres != null) {
-			// This code should not be necessary anymore. It is done in the stopped method.
-			//pres.setAttribute("type", StanzaType.unavailable.toString());
+			// This code should not be necessary anymore. It is done in the stopped
+			// method.
+			// pres.setAttribute("type", StanzaType.unavailable.toString());
 			sendPresenceBroadcast(StanzaType.unavailable, session, FROM_SUBSCRIBED, results,
 					pres, settings, roster_util);
 		} else {
@@ -1095,13 +1096,9 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 		return XMLNSS;
 	}
 
-	// ~--- get methods ----------------------------------------------------------
-
 	protected RosterAbstract getRosterUtil() {
 		return RosterFactory.getRosterImplementation(true);
 	}
-
-	// ~--- methods --------------------------------------------------------------
 
 	protected void processError(Packet packet, XMPPResourceConnection session,
 			Queue<Packet> results, Map<String, Object> settings, PresenceType presenceType)
