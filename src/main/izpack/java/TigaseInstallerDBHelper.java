@@ -355,8 +355,9 @@ class TigaseInstallerDBHelper {
 		String pwd = pwdObj.toString();
 		
 		String className = TigaseConfigConst.props.getProperty("--auth-db");
-		if (className == null) 
-			className = TigaseConfigConst.props.getProperty("--user-db");;
+		// currently Tigase use "tigase.db.jdbc.TigaseCustomAuth" if no --auth-db was configured
+		// if (className == null) 
+		//	className = TigaseConfigConst.props.getProperty("--user-db");
 		String resource = TigaseConfigConst.props.getProperty("--auth-db-uri");
 		if (resource == null) 
 			resource = TigaseConfigConst.props.getProperty("root-tigase-db-uri");

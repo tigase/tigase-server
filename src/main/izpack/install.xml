@@ -246,6 +246,8 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 <!-- 					<exclude name="logs/*.log*"/> -->
 					<include name="etc/jmx.access"/>
 					<include name="etc/jmx.password"/>"
+					<include name="etc/cross-domain-policy.xml"/>"
+					<include name="etc/bosh-extra-headers.txt"/>"
 				</fileset>
 				<parsable targetfile="$INSTALL_PATH/etc/init.properties"/>
 				<parsable targetfile="$INSTALL_PATH/etc/tigase.conf"/>

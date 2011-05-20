@@ -138,9 +138,11 @@
           <file name="derby.jar"/>
           <file name="derbytools.jar"/>
           <file name="jtds-1.2.2.jar"/>
+          <file name="jdmkrt.jar"/>
           <file name="tigase-extras.jar"/>
           <file name="tigase-muc.jar"/>
           <file name="tigase-pubsub.jar"/>
+          <file name="bcprov-jdk16-136.jar"/>
         </filelist>
       </copy>
       <mkdir dir="${dist}/@{packagename}-${version}/certs"/>
@@ -158,6 +160,8 @@
           <file name="init.properties"/>
           <file name="jmx.access"/>
           <file name="jmx.password"/>
+          <file name="cross-domain-policy.xml"/>
+          <file name="bosh-extra-headers.txt"/>
         </filelist>
       </copy>
       <mkdir dir="${dist}/@{packagename}-${version}/database"/>
@@ -180,6 +184,9 @@
         file="scripts/config.sh"
         tofile="${dist}/@{packagename}-${version}/scripts/config.sh"/>
       <copy
+        file="scripts/derby-db-create.sh"
+        tofile="${dist}/@{packagename}-${version}/scripts/derby-db-create.sh"/>
+      <copy
         file="scripts/repo.sh"
         tofile="${dist}/@{packagename}-${version}/scripts/repo.sh"/>
       <copy todir="${dist}/@{packagename}-${version}/scripts/gentoo">
@@ -187,6 +194,9 @@
       </copy>
       <copy todir="${dist}/@{packagename}-${version}/scripts/mandriva">
         <fileset dir="scripts/mandriva"/>
+      </copy>
+      <copy todir="${dist}/@{packagename}-${version}/scripts/debian">
+        <fileset dir="scripts/debian"/>
       </copy>
       <move todir="${dist}/@{packagename}-${version}/docs">
         <fileset dir="@{docsdir}"/>

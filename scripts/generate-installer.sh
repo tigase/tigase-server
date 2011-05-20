@@ -1,5 +1,7 @@
 #!/bin/bash
 
+## RUN from main tigase-server directory
+
 IZPACK_DIR="installer/izpack.patched"
 #IZPACK_DIR="/Applications/IzPack"
 
