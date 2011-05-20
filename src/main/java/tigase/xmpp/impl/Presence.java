@@ -58,6 +58,7 @@ import static tigase.xmpp.impl.roster.RosterAbstract.SubscriptionType;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -263,7 +264,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 		// try getting all connection IDs connection manager addresses for the
 		// destination packets if possible and send packets directly without
 		// going through the session manager on other node.
-		// Please note! may cause unneeded behaviour if privacy lists or other
+		// Please note! may cause unneeded behavior if privacy lists or other
 		// blocking mechanism is used
 		// This is actually not such a good idea, it is always better to send the
 		// packets through the SM. The only packets which could be optimized that
@@ -345,13 +346,24 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 		buddies = DynamicRoster.addBuddies(session, settings, buddies);
 
 		if (buddies != null) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Buddies found: " + Arrays.toString(buddies));
+			}
 			for (JID buddy : buddies) {
-				if (requiresPresenceSending(roster_util, buddy, session)) {
-					sendPresence(t, null, buddy, results, pres);
-					roster_util.setPresenceSent(session, buddy, true);
+				if (requiresPresenceSending(roster, buddy, session)) {
+					sendPresence(t, session.getJID(), buddy, results, pres);
+					roster.setPresenceSent(session, buddy, true);
+				} else {
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "Not sending presence to buddy: " + buddy);
+					}
 				}
 			} // end of for (String buddy: buddies)
-		} // end of if (buddies == null)
+		} else {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "No buddies found!!!!");
+			}
+		}
 
 		broadcastDirectPresences(t, session, results, pres);
 	}
