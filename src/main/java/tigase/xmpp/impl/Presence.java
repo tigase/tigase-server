@@ -1193,6 +1193,11 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 
 			return;
 		}
+		
+		if (session.getPresence() == null) {
+			// Just ignore, this user does not want to receive presence updates
+			return;
+		}
 
 		JID presBuddy = packet.getStanzaFrom().copyWithoutResource();
 
@@ -1212,10 +1217,20 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 						"Received initial presence, setting buddy: {0} online status to: {1}",
 						new Object[] { packet.getStanzaFrom(), online });
 			}
+			roster_util.setOnline(session, packet.getStanzaFrom(), online);
 
 			updatePresenceChange(packet, session, results);
 
-			// roster_util.setBuddyOnline(session, packet.getElemFrom(), online);
+			if (skipOffline && !roster_util.presenceSent(session, packet.getStanzaFrom())) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST,
+							"Presence not yet sent to this buddy, sending: {0}",
+							new Object[] { packet.getStanzaFrom()});
+				}
+				sendPresence(null, null, packet.getStanzaFrom().copyWithoutResource(),
+						results, session.getPresence());
+				roster_util.setPresenceSent(session, packet.getStanzaFrom(), true);
+			}
 		} else {
 
 			// The code below looks like a bug to me.
@@ -1286,7 +1301,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 						packet.getStanzaFrom());
 			}
 
-			// roster_util.setBuddyOnline(session, packet.getElemFrom(), true);
+			roster_util.setOnline(session, packet.getStanzaFrom(), true);
 			for (XMPPResourceConnection conn : session.getActiveSessions()) {
 				try {
 					Element pres = conn.getPresence();

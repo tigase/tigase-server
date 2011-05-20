@@ -76,6 +76,7 @@ public class RosterElement {
 	// private Element item = null;
 	private boolean online = false;
 	private boolean modified = false;
+	private boolean persistent = true;
 
 	//~--- constructors ---------------------------------------------------------
 
@@ -416,6 +417,17 @@ public class RosterElement {
 		}
 
 		stringpreped = XMPPStringPrepFactory.STRINGPREP_PROCESSOR;
+	}
+
+	/**
+	 * @return
+	 */
+	public boolean isPersistent() {
+		return persistent;
+	}
+	
+	public void setPersistent(boolean persistent) {
+		this.persistent = persistent;
 	}
 }
 
