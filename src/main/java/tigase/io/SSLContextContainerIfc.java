@@ -62,7 +62,7 @@ public interface SSLContextContainerIfc {
 	public static final String SSL_CONTAINER_CLASS_VAL = "tigase.io.SSLContextContainer";
 
 	/** Field description */
-	public static final String PEM_CERTIFICATE_KEY = "pem-certficate";
+	public static final String PEM_CERTIFICATE_KEY = "pem-certificate";
 
 	/** Field description */
 	public static final String CERT_SAVE_TO_DISK_KEY = "cert-save-to-disk";
