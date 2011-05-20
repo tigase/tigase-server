@@ -107,7 +107,7 @@ public class XMPPSession {
 			while ((old_res = old_ress.poll()) != null) {
 
 				// If they are equal, just ignore this. It may happen only for USER_STATUS
-				// command where the user session is artificialy created....
+				// command where the user session is artificially created....
 				if (old_res != conn) {
 					if (log.isLoggable(Level.FINEST)) {
 						log.finest("Found old resource connection, id: " + old_res);
