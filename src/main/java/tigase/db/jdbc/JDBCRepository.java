@@ -986,7 +986,7 @@ public class JDBCRepository implements AuthRepository, UserRepository {
 			stmt.executeUpdate(query);
 
 			// Remove all user entries from nodes table
-			query = "delete from " + DEF_PAIRS_TBL + " where uid = " + uid;
+			query = "delete from " + DEF_NODES_TBL + " where uid = " + uid;
 			stmt.executeUpdate(query);
 
 			PreparedStatement user_del_sp =
