@@ -28,7 +28,7 @@ Works only for some components which actually use the repository that way.
 
 AS:Description: Update item configuration
 AS:CommandId: comp-repo-item-update
-AS:Component: vhost-man,ext
+AS:Component: vhost-man,ext,basic-conf
 */
 
 package tigase.admin
