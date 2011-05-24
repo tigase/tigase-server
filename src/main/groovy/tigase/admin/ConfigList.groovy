@@ -56,11 +56,10 @@ if (params_set == null) {
 	def res = (Iq)p.commandResult(Command.DataType.result)
   def compNames = []
   conf_repo.getCompNames().each { compNames += it }
-	Command.addFieldValue(res, COMP_NAME, comp_name ?: compNames[0], "Components",
-		(String[])compNames, (String[])compNames)
+	Command.addTextField(res, COMP_NAME, comp_name ?: compNames[0])
   Command.addHiddenField(res, PARAMS_SET, PARAMS_SET)
-	conf_repo.getProperties(comp_name).entrySet().each {
-		Command.addFieldValue(res, it.getKey(), it.getValue().toString())
+	conf_repo.getItemsForComponent(comp_name).each {
+		Command.addFieldValue(res, it.getKey(), it.getConfigValToString())
 	}
 	return res
 }
