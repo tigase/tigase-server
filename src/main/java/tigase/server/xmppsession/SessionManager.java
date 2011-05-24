@@ -611,7 +611,27 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
 		Security.insertProviderAt(new TigaseSaslProvider(), 6);
-		skipPrivacy = (Boolean) props.get(SKIP_PRIVACY_PROP_KEY);
+		if (props.get(SKIP_PRIVACY_PROP_KEY) != null) {
+			skipPrivacy = (Boolean) props.get(SKIP_PRIVACY_PROP_KEY);
+		}
+
+		if (props.get(TRUSTED_PROP_KEY) != null) {
+			String[] trusted_tmp = (String[]) props.get(TRUSTED_PROP_KEY);
+
+			if (trusted_tmp != null) {
+				for (String trust : trusted_tmp) {
+					trusted.add(trust);
+				}
+			}
+		}
+
+		if (props.size() == 1) {
+			// If props.size() == 1, it means this is a single property update 
+			// and this component does not support single property change for the rest
+			// of it's settings
+			return;
+		}
+
 		defPacketHandler = new PacketDefaultHandler();
 
 		// Is there shared user repository instance? If so I want to use it:
@@ -780,14 +800,6 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 		smResourceConnection =
 				new SMResourceConnection(null, user_repository, auth_repository, this);
 		registerNewSession(getComponentId().getBareJID(), smResourceConnection);
-
-		String[] trusted_tmp = (String[]) props.get(TRUSTED_PROP_KEY);
-
-		if (trusted_tmp != null) {
-			for (String trust : trusted_tmp) {
-				trusted.add(trust);
-			}
-		}
 	}
 
 	/**

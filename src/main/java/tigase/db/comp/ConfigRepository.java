@@ -31,6 +31,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import tigase.conf.ConfigItem;
+
 //~--- classes ----------------------------------------------------------------
 
 /**
@@ -44,12 +46,21 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 		implements ComponentRepository<Item> {
 	private static final Logger log = Logger.getLogger(ConfigRepository.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
-
 	protected LinkedHashMap<String, Item> items = new LinkedHashMap<String, Item>(100);
+	private RepositoryChangeListenerIfc<Item> repoChangeList = null;
 
-	//~--- get methods ----------------------------------------------------------
+	@Override
+	public void addRepoChangeListener(
+			RepositoryChangeListenerIfc<Item> repoChangeListener) {
+		this.repoChangeList = repoChangeListener;
+	}
 
+	@Override
+	public void removeRepoChangeListener(
+			RepositoryChangeListenerIfc<Item> repoChangeListener) {
+		this.repoChangeList = null;
+	}
+	
 	/**
 	 * Method description
 	 *

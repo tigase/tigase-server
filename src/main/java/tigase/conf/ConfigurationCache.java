@@ -27,6 +27,7 @@ package tigase.conf;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.db.TigaseDBException;
+import tigase.db.comp.RepositoryChangeListenerIfc;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -67,9 +68,20 @@ public class ConfigurationCache implements ConfigRepositoryIfc {
 	 */
 	private Map<String, Set<ConfigItem>> config = new LinkedHashMap<String, Set<ConfigItem>>();
 	private String hostname = null;
+	private RepositoryChangeListenerIfc<ConfigItem> repoChangeList = null;
 
-	//~--- methods --------------------------------------------------------------
+	@Override
+	public void addRepoChangeListener(
+			RepositoryChangeListenerIfc<ConfigItem> repoChangeListener) {
+		this.repoChangeList = repoChangeListener;
+	}
 
+	@Override
+	public void removeRepoChangeListener(
+			RepositoryChangeListenerIfc<ConfigItem> repoChangeListener) {
+		this.repoChangeList = null;
+	}
+	
 	/**
 	 * Method description
 	 *
@@ -85,7 +97,16 @@ public class ConfigurationCache implements ConfigRepositoryIfc {
 			config.put(compName, confItems);
 		}
 
+		boolean updated = contains(item.getKey());
 		confItems.add(item);
+		
+		if (repoChangeList != null) {
+			if (updated) {
+				repoChangeList.itemUpdated(item);
+			} else {
+				repoChangeList.itemAdded(item);
+			}
+		}
 	}
 
 	/**
@@ -307,6 +328,7 @@ public class ConfigurationCache implements ConfigRepositoryIfc {
 	 *
 	 * @return
 	 */
+	@Override
 	public Set<ConfigItem> getItemsForComponent(String compName) {
 		return config.get(compName);
 	}
@@ -372,6 +394,30 @@ public class ConfigurationCache implements ConfigRepositoryIfc {
 		return result;
 	}
 
+//	@Override
+//	public Map<String, String> getPropertiesAsStrings(String compName) throws ConfigurationException {
+//
+//		// It must not return a null value, even if configuration for the
+//		// component does not exist yet, it has to initialized to create new one.
+//		Map<String, String> result = new LinkedHashMap<String, String>();
+//
+//		// Let's convert the internal representation of the configuration to that
+//		// used by the components.
+//		Set<ConfigItem> confItems = getItemsForComponent(compName);
+//
+//		if (confItems != null) {
+//			for (ConfigItem item : confItems) {
+//				String key = item.getConfigKey();
+//				String value = item.getConfigValToString();
+//
+//				result.put(key, value);
+//			}
+//		}
+//
+//		// Hopefuly this doesn't happen.... or I have a bug somewhere
+//		return result;
+//	}
+
 	//~--- methods --------------------------------------------------------------
 
 	/**
@@ -424,6 +470,17 @@ public class ConfigurationCache implements ConfigRepositoryIfc {
 		}
 	}
 
+//	@Override
+//	public void putPropertiesFromStrings(String compName, Map<String, String> props)
+//			throws ConfigurationException {
+//		for (Map.Entry<String, String> entry : props.entrySet()) {
+//			ConfigItem item = new ConfigItem();
+//
+//			item.setNodeKey(getDefHostname(), compName, entry.getKey(), entry.getValue());
+//			addItem(compName, item);
+//		}
+//	}
+
 	/**
 	 * Method description
 	 *
@@ -465,6 +522,9 @@ public class ConfigurationCache implements ConfigRepositoryIfc {
 
 		if (confItems != null) {
 			confItems.remove(item);
+		}
+		if (repoChangeList != null) {
+			repoChangeList.itemRemoved(item);
 		}
 	}
 
@@ -574,6 +634,7 @@ public class ConfigurationCache implements ConfigRepositoryIfc {
 	public String validateItem(ConfigItem item) {
 		return null;
 	}
+
 }
 
 

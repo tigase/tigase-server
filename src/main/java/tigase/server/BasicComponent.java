@@ -665,13 +665,17 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 	 */
 	@Override
 	public void setProperties(Map<String, Object> props) {
-		try {
-			compId = JID.jidInstance((String) props.get(COMPONENT_ID_PROP_KEY));
-		} catch (TigaseStringprepException ex) {
-			log.log(Level.WARNING, "Problem setting component ID: ", ex);
+		if (props.get(COMPONENT_ID_PROP_KEY) != null) {
+			try {
+				compId = JID.jidInstance((String) props.get(COMPONENT_ID_PROP_KEY));
+			} catch (TigaseStringprepException ex) {
+				log.log(Level.WARNING, "Problem setting component ID: ", ex);
+			}
 		}
 
-		defHostname = BareJID.bareJIDInstanceNS((String) props.get(DEF_HOSTNAME_PROP_KEY));
+		if (props.get(DEF_HOSTNAME_PROP_KEY) != null) {
+			defHostname = BareJID.bareJIDInstanceNS((String) props.get(DEF_HOSTNAME_PROP_KEY));
+		}
 
 		String[] admins_tmp = (String[]) props.get(ADMINS_PROP_KEY);
 
@@ -717,9 +721,11 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 		command = new RemoveScriptCommand();
 		command.init(CommandIfc.DEL_SCRIPT_CMD, "Remove command script");
 		scriptCommands.put(command.getCommandId(), command);
-		scriptsBaseDir = (String) props.get(SCRIPTS_DIR_PROP_KEY);
-		scriptsCompDir = scriptsBaseDir + "/" + getName();
-		loadScripts();
+		if (props.get(SCRIPTS_DIR_PROP_KEY) != null) {
+			scriptsBaseDir = (String) props.get(SCRIPTS_DIR_PROP_KEY);
+			scriptsCompDir = scriptsBaseDir + "/" + getName();
+			loadScripts();
+		}
 	}
 
 	/**
@@ -816,11 +822,11 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 		// TODO: test if this is right
 		// It is not, the packet should actually have packetFrom set at all times
 		// to ensure the error can be sent back to the original sender.
-//		if ((pc.getStanzaFrom() == null) || (pc.getPacketFrom() != null)) {
-//
-//			// The packet has not gone through session manager yet
-//			return false;
-//		}
+		// if ((pc.getStanzaFrom() == null) || (pc.getPacketFrom() != null)) {
+		//
+		// // The packet has not gone through session manager yet
+		// return false;
+		// }
 		// This test is more correct as it says whether the packet went through
 		// session manager checking.
 		// TODO: test if commands still work for users from different XMPP servers

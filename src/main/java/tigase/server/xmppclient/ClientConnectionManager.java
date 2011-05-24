@@ -295,7 +295,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 				p.setXMLNS(XMLNS);
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "XMLNS set for packet: {0} from connection: {1}",
-						new Object[] { p.toStringSecure(), id });
+							new Object[] { p.toStringSecure(), id });
 				}
 			}
 
@@ -392,8 +392,19 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
 
-		white_char_ack = (Boolean) props.get(WHITE_CHAR_ACK_PROP_KEY);
-		xmpp_ack = (Boolean) props.get(XMPP_ACK_PROP_KEY);
+		if (props.get(WHITE_CHAR_ACK_PROP_KEY) != null) {
+			white_char_ack = (Boolean) props.get(WHITE_CHAR_ACK_PROP_KEY);
+		}
+		if (props.get(XMPP_ACK_PROP_KEY) != null) {
+			xmpp_ack = (Boolean) props.get(XMPP_ACK_PROP_KEY);
+		}
+		
+		if (props.size() == 1) {
+			// If props.size() == 1, it means this is a single property update 
+			// and this component does not support single property change for the rest
+			// of it's settings
+			return;
+		}
 
 		boolean routing_mode =
 				(Boolean) props.get(ROUTINGS_PROP_KEY + "/" + ROUTING_MODE_PROP_KEY);

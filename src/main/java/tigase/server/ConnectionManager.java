@@ -354,9 +354,9 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 		// connection it may happen that one threads started processing
 		// socketData and then another thread reads more packets which
 		// may take over earlier data depending on a thread scheduler used.
-		//synchronized (serv) {
-			writePacketsToSocket(serv, processSocketData(serv));
-		//}
+		// synchronized (serv) {
+		writePacketsToSocket(serv, processSocketData(serv));
+		// }
 	}
 
 	/**
@@ -515,7 +515,16 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 	@Override
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
-		net_buffer = (Integer) props.get(NET_BUFFER_PROP_KEY);
+		if (props.get(NET_BUFFER_PROP_KEY) != null) {
+			net_buffer = (Integer) props.get(NET_BUFFER_PROP_KEY);
+		}
+		
+		if (props.size() == 1) {
+			// If props.size() == 1, it means this is a single property update and 
+			// ConnectionManager does not support it yet.
+			return;
+		}
+		
 		releaseListeners();
 
 		int[] ports = (int[]) props.get(PORTS_PROP_KEY);

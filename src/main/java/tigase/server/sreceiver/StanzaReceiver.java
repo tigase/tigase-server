@@ -624,6 +624,12 @@ public class StanzaReceiver extends AbstractMessageReceiver implements Configura
 	@Override
 	public void setProperties(final Map<String, Object> props) {
 		super.setProperties(props);
+		if (props.size() == 1) {
+			// If props.size() == 1, it means this is a single property update 
+			// and this component does not support single property change for the rest
+			// of it's settings
+			return;
+		}
 		my_hostname = (String) props.get(MY_DOMAIN_NAME_PROP_KEY);
 
 		// simpleJid = (String)props.get(SIMPLE_JID_PROP_KEY);

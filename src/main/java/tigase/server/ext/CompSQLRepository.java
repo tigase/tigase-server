@@ -27,6 +27,7 @@ package tigase.server.ext;
 import tigase.db.DataRepository;
 import tigase.db.RepositoryFactory;
 import tigase.db.comp.ComponentRepository;
+import tigase.db.comp.RepositoryChangeListenerIfc;
 
 import tigase.xml.DomBuilderHandler;
 import tigase.xml.Element;
@@ -56,7 +57,7 @@ import java.util.logging.Logger;
 
 /**
  * Created: Nov 7, 2009 11:26:10 AM
- *
+ * 
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
@@ -79,49 +80,50 @@ public class CompSQLRepository implements ComponentRepository<CompRepoItem> {
 	private static final String REMOTE_DOMAIN_COLUMN = "remote_domain";
 	private static final String PROTOCOL_COLUMN = "protocol";
 	private static final String OTHER_DATA_COLUMN = "other_data";
-	private static final String CREATE_TABLE_QUERY = "create table " + TABLE_NAME + " (" + "  "
-		+ DOMAIN_COLUMN + " varchar(512) NOT NULL," + "  " + PASSWORD_COLUMN
-		+ " varchar(255) NOT NULL," + "  " + CONNECTION_TYPE_COLUMN + " varchar(127)," + "  "
-		+ PORT_COLUMN + " int," + "  " + REMOTE_DOMAIN_COLUMN + " varchar(1023)," + "  "
-		+ PROTOCOL_COLUMN + " varchar(127)," + "  " + OTHER_DATA_COLUMN + " varchar(32672),"
-		+ "  primary key(" + DOMAIN_COLUMN + "))";
+	private static final String CREATE_TABLE_QUERY = "create table " + TABLE_NAME + " ("
+			+ "  " + DOMAIN_COLUMN + " varchar(512) NOT NULL," + "  " + PASSWORD_COLUMN
+			+ " varchar(255) NOT NULL," + "  " + CONNECTION_TYPE_COLUMN + " varchar(127),"
+			+ "  " + PORT_COLUMN + " int," + "  " + REMOTE_DOMAIN_COLUMN + " varchar(1023),"
+			+ "  " + PROTOCOL_COLUMN + " varchar(127)," + "  " + OTHER_DATA_COLUMN
+			+ " varchar(32672)," + "  primary key(" + DOMAIN_COLUMN + "))";
 	private static final String CHECK_TABLE_QUERY = "select count(*) from " + TABLE_NAME;
-	private static final String GET_ITEM_QUERY = "select * from " + TABLE_NAME + " where domain = ?";
-	private static final String ADD_ITEM_QUERY = "insert into " + TABLE_NAME + " (" + DOMAIN_COLUMN
-		+ ", " + PASSWORD_COLUMN + ", " + CONNECTION_TYPE_COLUMN + ", " + PORT_COLUMN + ", "
-		+ REMOTE_DOMAIN_COLUMN + ", " + PROTOCOL_COLUMN + ", " + OTHER_DATA_COLUMN + ") "
-		+ " values (?, ?, ?, ?, ?, ?, ?)";
+	private static final String GET_ITEM_QUERY = "select * from " + TABLE_NAME
+			+ " where domain = ?";
+	private static final String ADD_ITEM_QUERY = "insert into " + TABLE_NAME + " ("
+			+ DOMAIN_COLUMN + ", " + PASSWORD_COLUMN + ", " + CONNECTION_TYPE_COLUMN + ", "
+			+ PORT_COLUMN + ", " + REMOTE_DOMAIN_COLUMN + ", " + PROTOCOL_COLUMN + ", "
+			+ OTHER_DATA_COLUMN + ") " + " values (?, ?, ?, ?, ?, ?, ?)";
 	private static final String DELETE_ITEM_QUERY = "delete from " + TABLE_NAME
-		+ " where (domain = ?)";
+			+ " where (domain = ?)";
 	private static final String GET_ALL_ITEMS_QUERY = "select * from " + TABLE_NAME;
-
-	//~--- fields ---------------------------------------------------------------
 
 	private DataRepository data_repo = null;
 
-//private PreparedStatement addItemSt = null;
-//private PreparedStatement checkTableSt = null;
-//private PreparedStatement createTableSt = null;
-//private PreparedStatement deleteItemSt = null;
-//private PreparedStatement getAllItemsSt = null;
-//private PreparedStatement getItemSt = null;
+	// private PreparedStatement addItemSt = null;
+	// private PreparedStatement checkTableSt = null;
+	// private PreparedStatement createTableSt = null;
+	// private PreparedStatement deleteItemSt = null;
+	// private PreparedStatement getAllItemsSt = null;
+	// private PreparedStatement getItemSt = null;
 	private String tableName = TABLE_NAME;
 	private CompConfigRepository configRepo = new CompConfigRepository();
 
-	//~--- methods --------------------------------------------------------------
+	@Override
+	public void addRepoChangeListener(
+			RepositoryChangeListenerIfc<CompRepoItem> repoChangeListener) {
+		configRepo.addRepoChangeListener(repoChangeListener);
+	}
 
-//private static final String ADD_ITEM_QUERY =
-//    "insert into " + TABLE_NAME +
-//    " (" + DOMAIN_COLUMN + ", " + PASSWORD_COLUMN + ", " +
-//    CONNECTION_TYPE_COLUMN + ", " + PORT_COLUMN + ", " +
-//    REMOTE_DOMAIN_COLUMN + ", " + PROTOCOL_COLUMN + ", " +
-//    OTHER_DATA_COLUMN + ") " +
-//    " values (?, ?, ?, ?, ?, ?, ?)";
+	@Override
+	public void removeRepoChangeListener(
+			RepositoryChangeListenerIfc<CompRepoItem> repoChangeListener) {
+		configRepo.removeRepoChangeListener(repoChangeListener);
+	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param item
 	 */
 	@Override
@@ -130,7 +132,7 @@ public class CompSQLRepository implements ComponentRepository<CompRepoItem> {
 			PreparedStatement addItemSt = data_repo.getPreparedStatement(null, ADD_ITEM_QUERY);
 
 			synchronized (addItemSt) {
-				if ((item.getDomain() != null) &&!item.getDomain().isEmpty()) {
+				if ((item.getDomain() != null) && !item.getDomain().isEmpty()) {
 					addItemSt.setString(1, item.getDomain());
 				} else {
 					throw new NullPointerException("Null or empty domain name is not allowed");
@@ -154,7 +156,7 @@ public class CompSQLRepository implements ComponentRepository<CompRepoItem> {
 					addItemSt.setNull(4, Types.INTEGER);
 				}
 
-				if ((item.getRemoteHost() != null) &&!item.getRemoteHost().isEmpty()) {
+				if ((item.getRemoteHost() != null) && !item.getRemoteHost().isEmpty()) {
 					addItemSt.setString(5, item.getRemoteHost());
 				} else {
 					addItemSt.setNull(5, Types.VARCHAR);
@@ -183,8 +185,8 @@ public class CompSQLRepository implements ComponentRepository<CompRepoItem> {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -196,7 +198,8 @@ public class CompSQLRepository implements ComponentRepository<CompRepoItem> {
 		ResultSet rs = null;
 
 		try {
-			PreparedStatement getAllItemsSt = data_repo.getPreparedStatement(null, GET_ALL_ITEMS_QUERY);
+			PreparedStatement getAllItemsSt =
+					data_repo.getPreparedStatement(null, GET_ALL_ITEMS_QUERY);
 
 			synchronized (getAllItemsSt) {
 				rs = getAllItemsSt.executeQuery();
@@ -216,10 +219,10 @@ public class CompSQLRepository implements ComponentRepository<CompRepoItem> {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param key
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -229,12 +232,12 @@ public class CompSQLRepository implements ComponentRepository<CompRepoItem> {
 		return result;
 	}
 
-	//~--- get methods ----------------------------------------------------------
+	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param defs
 	 * @param params
 	 */
@@ -253,10 +256,10 @@ public class CompSQLRepository implements ComponentRepository<CompRepoItem> {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param key
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -267,7 +270,8 @@ public class CompSQLRepository implements ComponentRepository<CompRepoItem> {
 			ResultSet rs = null;
 
 			try {
-				PreparedStatement getItemSt = data_repo.getPreparedStatement(null, GET_ITEM_QUERY);
+				PreparedStatement getItemSt =
+						data_repo.getPreparedStatement(null, GET_ITEM_QUERY);
 
 				synchronized (getItemSt) {
 					getItemSt.setString(1, key);
@@ -289,8 +293,8 @@ public class CompSQLRepository implements ComponentRepository<CompRepoItem> {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -298,18 +302,19 @@ public class CompSQLRepository implements ComponentRepository<CompRepoItem> {
 		return configRepo.getItemInstance();
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param conn_str
 	 * @param params
-	 *
+	 * 
 	 * @throws SQLException
 	 */
-	public void initRepository(String conn_str, Map<String, String> params) throws SQLException {
+	public void initRepository(String conn_str, Map<String, String> params)
+			throws SQLException {
 		try {
 			data_repo = RepositoryFactory.getDataRepository(null, conn_str, params);
 			checkDB();
@@ -329,8 +334,8 @@ public class CompSQLRepository implements ComponentRepository<CompRepoItem> {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -340,7 +345,7 @@ public class CompSQLRepository implements ComponentRepository<CompRepoItem> {
 
 	/**
 	 * Method description
-	 *
+	 * 
 	 */
 	@Override
 	public void reload() {
@@ -350,8 +355,8 @@ public class CompSQLRepository implements ComponentRepository<CompRepoItem> {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param key
 	 */
 	@Override
@@ -359,7 +364,8 @@ public class CompSQLRepository implements ComponentRepository<CompRepoItem> {
 		configRepo.removeItem(key);
 
 		try {
-			PreparedStatement deleteItemSt = data_repo.getPreparedStatement(null, DELETE_ITEM_QUERY);
+			PreparedStatement deleteItemSt =
+					data_repo.getPreparedStatement(null, DELETE_ITEM_QUERY);
 
 			synchronized (deleteItemSt) {
 				deleteItemSt.setString(1, key);
@@ -370,12 +376,12 @@ public class CompSQLRepository implements ComponentRepository<CompRepoItem> {
 		}
 	}
 
-	//~--- set methods ----------------------------------------------------------
+	// ~--- set methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param properties
 	 */
 	@Override
@@ -391,12 +397,12 @@ public class CompSQLRepository implements ComponentRepository<CompRepoItem> {
 		}
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -408,7 +414,7 @@ public class CompSQLRepository implements ComponentRepository<CompRepoItem> {
 
 	/**
 	 * Method description
-	 *
+	 * 
 	 */
 	@Override
 	public void store() {
@@ -418,10 +424,10 @@ public class CompSQLRepository implements ComponentRepository<CompRepoItem> {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param item
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -434,7 +440,7 @@ public class CompSQLRepository implements ComponentRepository<CompRepoItem> {
 		Statement st = null;
 
 		try {
-			if ( !data_repo.checkTable(tableName)) {
+			if (!data_repo.checkTable(tableName)) {
 				log.info("DB for external component is not OK, creating missing tables...");
 				st = data_repo.createStatement(null);
 				st.executeUpdate(CREATE_TABLE_QUERY);
@@ -454,7 +460,7 @@ public class CompSQLRepository implements ComponentRepository<CompRepoItem> {
 		// overwrite fields initialized from other parametrs
 		String other = rs.getString(OTHER_DATA_COLUMN);
 
-		if ((other != null) &&!other.isEmpty()) {
+		if ((other != null) && !other.isEmpty()) {
 			Element elem_item = parseElement(other);
 
 			if (elem_item != null) {
@@ -464,13 +470,13 @@ public class CompSQLRepository implements ComponentRepository<CompRepoItem> {
 
 		String domain = rs.getString(DOMAIN_COLUMN);
 
-		if ((domain != null) &&!domain.isEmpty()) {
+		if ((domain != null) && !domain.isEmpty()) {
 			result.setDomain(domain);
 		}
 
 		String password = rs.getString(PASSWORD_COLUMN);
 
-		if ((password != null) &&!password.isEmpty()) {
+		if ((password != null) && !password.isEmpty()) {
 			result.setPassword(password);
 		}
 
@@ -482,19 +488,19 @@ public class CompSQLRepository implements ComponentRepository<CompRepoItem> {
 
 		String remote_domain = rs.getString(REMOTE_DOMAIN_COLUMN);
 
-		if ((remote_domain != null) &&!remote_domain.isEmpty()) {
+		if ((remote_domain != null) && !remote_domain.isEmpty()) {
 			result.setRemoteDomain(remote_domain);
 		}
 
 		String protocol = rs.getString(PROTOCOL_COLUMN);
 
-		if ((protocol != null) &&!protocol.isEmpty()) {
+		if ((protocol != null) && !protocol.isEmpty()) {
 			result.setProtocol(protocol);
 		}
 
 		String connection_type = rs.getString(CONNECTION_TYPE_COLUMN);
 
-		if ((connection_type != null) &&!connection_type.isEmpty()) {
+		if ((connection_type != null) && !connection_type.isEmpty()) {
 			result.setConnectionType(connection_type);
 		}
 
@@ -515,10 +521,9 @@ public class CompSQLRepository implements ComponentRepository<CompRepoItem> {
 
 		return null;
 	}
+
 }
 
+// ~ Formatted in Sun Code Convention
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+// ~ Formatted by Jindent --- http://www.jindent.com

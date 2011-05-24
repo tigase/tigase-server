@@ -335,12 +335,31 @@ public class BoshConnectionManager extends ClientConnectionManager implements
 	@Override
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
-		max_wait = (Long) props.get(MAX_WAIT_DEF_PROP_KEY);
-		min_polling = (Long) props.get(MIN_POLLING_PROP_KEY);
-		max_inactivity = (Long) props.get(MAX_INACTIVITY_PROP_KEY);
-		concurrent_requests = (Integer) props.get(CONCURRENT_REQUESTS_PROP_KEY);
-		hold_requests = (Integer) props.get(HOLD_REQUESTS_PROP_KEY);
-		max_pause = (Long) props.get(MAX_PAUSE_PROP_KEY);
+
+		if (props.get(MAX_WAIT_DEF_PROP_KEY) != null) {
+			max_wait = (Long) props.get(MAX_WAIT_DEF_PROP_KEY);
+			log.info("Setting max_wait to: " + max_wait);
+		}
+		if (props.get(MIN_POLLING_PROP_KEY) != null) {
+			min_polling = (Long) props.get(MIN_POLLING_PROP_KEY);
+			log.info("Setting min_polling to: " + min_polling);
+		}
+		if (props.get(MAX_INACTIVITY_PROP_KEY) != null) {
+			max_inactivity = (Long) props.get(MAX_INACTIVITY_PROP_KEY);
+			log.info("Setting max_inactivity to: " + max_inactivity);
+		}
+		if (props.get(CONCURRENT_REQUESTS_PROP_KEY) != null) {
+			concurrent_requests = (Integer) props.get(CONCURRENT_REQUESTS_PROP_KEY);
+			log.info("Setting concurrent_requests to: " + concurrent_requests);
+		}
+		if (props.get(HOLD_REQUESTS_PROP_KEY) != null) {
+			hold_requests = (Integer) props.get(HOLD_REQUESTS_PROP_KEY);
+			log.info("Setting hold_requests to: " + hold_requests);
+		}
+		if (props.get(MAX_PAUSE_PROP_KEY) != null) {
+			max_pause = (Long) props.get(MAX_PAUSE_PROP_KEY);
+			log.info("Setting max_pause to: " + max_pause);
+		}
 	}
 
 	// ~--- methods --------------------------------------------------------------

@@ -870,8 +870,26 @@ public enum Command {
 
 		return false;
 	}
+	
+	public static String getFieldKeyStartingWith(Packet packet, String f_name) {
+		Element iq = packet.getElement();
+		Element command = iq.getChild(COMMAND_EL, XMLNS);
+		Element x = command.getChild("x", "jabber:x:data");
 
-	//~--- set methods ----------------------------------------------------------
+		if (x != null) {
+			List<Element> children = x.getChildren();
+
+			if (children != null) {
+				for (Element child : children) {
+					if (child.getName().equals("field") && child.getAttribute("var").startsWith(f_name)) {
+						return child.getAttribute("var");
+					}
+				}
+			}
+		}
+
+		return null;
+	}
 
 	/**
 	 * Method description
@@ -995,15 +1013,11 @@ public enum Command {
 		return iq;
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	private static void setStatusEl(Element iq, Status status) {
 		Element command = iq.getChild(COMMAND_EL);
 
 		command.setAttribute("status", status.name());
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
@@ -1046,9 +1060,3 @@ public enum Command {
 		return result;
 	}
 }    // Command
-
-
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

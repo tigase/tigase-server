@@ -927,15 +927,16 @@ public abstract class AbstractMessageReceiver extends BasicComponent implements
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
 
-		int queueSize = (Integer) props.get(MAX_QUEUE_SIZE_PROP_KEY);
+		if (props.get(MAX_QUEUE_SIZE_PROP_KEY) != null) {
+			int queueSize = (Integer) props.get(MAX_QUEUE_SIZE_PROP_KEY);
 
-		setMaxQueueSize(queueSize);
-		incoming_filters.clear();
-		outgoing_filters.clear();
+			setMaxQueueSize(queueSize);
+		}
 
 		String filters = (String) props.get(INCOMING_FILTERS_PROP_KEY);
 
 		if ((filters != null) && !filters.trim().isEmpty()) {
+			incoming_filters.clear();
 			String[] incoming = filters.trim().split(",");
 
 			for (String inc : incoming) {
@@ -956,6 +957,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent implements
 		filters = (String) props.get(OUTGOING_FILTERS_PROP_KEY);
 
 		if ((filters != null) && !filters.trim().isEmpty()) {
+			outgoing_filters.clear();
 			String[] outgoing = filters.trim().split(",");
 
 			for (String out : outgoing) {

@@ -611,32 +611,27 @@ public class MessageRouter extends AbstractMessageReceiver implements MessageRou
 		connectionManagerNames.add("bosh");
 		connectionManagerNames.add("s2s");
 
-		disco_name = (String) props.get(DISCO_NAME_PROP_KEY);
-		disco_show_version = (Boolean) props.get(DISCO_SHOW_VERSION_PROP_KEY);
-		serviceEntity = new ServiceEntity("Tigase", "server", "Session manager");
-		serviceEntity.addIdentities(new ServiceIdentity[] { new ServiceIdentity("server",
-				"im", disco_name
-						+ (disco_show_version ? (" ver. " + tigase.server.XMPPServer
-								.getImplementationVersion()) : "")) });
-		serviceEntity.addFeatures(XMPPService.DEF_FEATURES);
+		if (props.get(DISCO_SHOW_VERSION_PROP_KEY) != null) {
+			disco_show_version = (Boolean) props.get(DISCO_SHOW_VERSION_PROP_KEY);
+		}
+		if (props.get(DISCO_NAME_PROP_KEY) != null) {
+			disco_name = (String) props.get(DISCO_NAME_PROP_KEY);
+			serviceEntity = new ServiceEntity("Tigase", "server", "Session manager");
+			serviceEntity.addIdentities(new ServiceIdentity[] { new ServiceIdentity("server",
+					"im", disco_name
+							+ (disco_show_version ? (" ver. " + tigase.server.XMPPServer
+									.getImplementationVersion()) : "")) });
+			serviceEntity.addFeatures(XMPPService.DEF_FEATURES);
+		}
 
 		try {
 			super.setProperties(props);
+			if (props.size() == 1) {
+				// If props.size() == 1, it means this is a single property update and MR does
+				// not support it yet.
+				return;
+			}
 
-			// String[] localAddresses =
-			// (String[])props.get(LOCAL_ADDRESSES_PROP_KEY);
-			// this.localAddresses.clear();
-			// if (localAddresses != null && localAddresses.length > 0) {
-			// Collections.addAll(this.localAddresses, localAddresses);
-			// this.localAddresses.add(getDefHostName());
-			// }
-			// Map<String, ComponentRegistrator> tmp_reg = registrators;
-			// Map<String, MessageReceiver> tmp_rec = receivers;
-			//
-			// components = new TreeMap<String, ServerComponent>();
-			// registrators = new TreeMap<String, ComponentRegistrator>();
-			// receivers = new TreeMap<String, MessageReceiver>();
-			// setConfig(config);
 			MessageRouterConfig conf = new MessageRouterConfig(props);
 			String[] reg_names = conf.getRegistrNames();
 
@@ -662,11 +657,6 @@ public class MessageRouter extends AbstractMessageReceiver implements MessageRou
 				} // end of try-catch
 			} // end of for (String name: reg_names)
 
-			// for (ComponentRegistrator cr : tmp_reg.values()) {
-			// cr.release();
-			// } // end of for ()
-			//
-			// tmp_reg.clear();
 			String[] msgrcv_names = conf.getMsgRcvNames();
 
 			for (String name : msgrcv_names) {

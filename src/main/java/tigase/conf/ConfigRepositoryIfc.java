@@ -23,6 +23,8 @@
 package tigase.conf;
 
 import java.util.Map;
+import java.util.Set;
+
 import tigase.db.comp.ComponentRepository;
 
 /**
@@ -51,6 +53,17 @@ public interface ConfigRepositoryIfc extends ComponentRepository<ConfigItem> {
 	 */
 	Map<String, Object> getProperties(String compName) throws ConfigurationException;
 
+	Set<ConfigItem> getItemsForComponent(String compName);
+
+//	/**
+//	 * Returns all known settings for the given component name. And all property values
+//	 * are converted to their string representation.
+//	 * @param compName
+//	 * @return
+//	 * @throws ConfigurationException
+//	 */
+//	Map<String, String> getPropertiesAsStrings(String compName) throws ConfigurationException;
+
 	/**
 	 * Sets/adds properties for the given component name.
 	 * @param compName
@@ -59,6 +72,15 @@ public interface ConfigRepositoryIfc extends ComponentRepository<ConfigItem> {
 	 */
 	void putProperties(String compName, Map<String, Object> props)
 			throws ConfigurationException;
+
+//	/**
+//	 * Sets/adds properties for the given component name.
+//	 * @param compName
+//	 * @param props
+//	 * @throws ConfigurationException
+//	 */
+//	void putPropertiesFromStrings(String compName, Map<String, String> props)
+//			throws ConfigurationException;
 
 	/**
 	 * Returns a configuration setting for a given component, node and key. If the

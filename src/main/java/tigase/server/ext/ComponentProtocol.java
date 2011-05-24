@@ -626,6 +626,13 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 	@Override
 	@SuppressWarnings({ "unchecked" })
 	public void setProperties(Map<String, Object> properties) {
+		if (properties.size() == 1) {
+			// If props.size() == 1, it means this is a single property update 
+			// and this component does not support single property change for the rest
+			// of it's settings
+			return;
+		}
+		
 		identity_type = (String) properties.get(IDENTITY_TYPE_KEY);
 		super.setProperties(properties);
 
