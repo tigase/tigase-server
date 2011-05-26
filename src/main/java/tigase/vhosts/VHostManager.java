@@ -22,23 +22,6 @@
 
 package tigase.vhosts;
 
-//~--- non-JDK imports --------------------------------------------------------
-
-import tigase.db.TigaseDBException;
-import tigase.db.comp.ComponentRepository;
-
-import tigase.server.AbstractComponentRegistrator;
-import tigase.server.Command;
-import tigase.server.Packet;
-import tigase.server.ServerComponent;
-
-import tigase.stats.StatisticsContainer;
-import tigase.stats.StatisticsList;
-
-import tigase.xmpp.JID;
-
-//~--- JDK imports ------------------------------------------------------------
-
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListSet;
@@ -47,7 +30,11 @@ import java.util.logging.Logger;
 
 import javax.script.Bindings;
 
-//~--- classes ----------------------------------------------------------------
+import tigase.db.comp.ComponentRepository;
+import tigase.server.AbstractComponentRegistrator;
+import tigase.server.ServerComponent;
+import tigase.stats.StatisticsContainer;
+import tigase.stats.StatisticsList;
 
 /**
  * Describe class VHostManager here.
@@ -72,8 +59,6 @@ public class VHostManager extends AbstractComponentRegistrator<VHostListener> im
 			"tigase.vhosts.VHostJDBCRepository";
 	private static final Logger log = Logger.getLogger(VHostManager.class.getName());
 
-	// ~--- fields ---------------------------------------------------------------
-
 	private long getComponentsForLocalDomainCalls = 0;
 	private long getComponentsForNonLocalDomainCalls = 0;
 
@@ -91,16 +76,12 @@ public class VHostManager extends AbstractComponentRegistrator<VHostListener> im
 			new ConcurrentSkipListSet<String>();
 	private ComponentRepository<VHostItem> repo = null;
 
-	// ~--- constructors ---------------------------------------------------------
-
 	/**
 	 * Creates a new <code>VHostManager</code> instance.
 	 * 
 	 */
 	public VHostManager() {
 	}
-
-	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -149,8 +130,6 @@ public class VHostManager extends AbstractComponentRegistrator<VHostListener> im
 		nameSubdomainsHandlers.remove(component);
 	}
 
-	// ~--- get methods ----------------------------------------------------------
-
 	/**
 	 * Method description
 	 * 
@@ -191,19 +170,6 @@ public class VHostManager extends AbstractComponentRegistrator<VHostListener> im
 
 			results.addAll(localDomainsHandlers);
 
-			// The code below seems like a bug to me and redundand
-			// localDomainHandlers have been just added above.
-			// String[] comps = vhost.getComps();
-			//
-			// if (comps != null) {
-			// for (String comp_name : comps) {
-			// VHostListener listener = components.get(comp_name);
-			//
-			// if (listener != null) {
-			// results.add(listener);
-			// }
-			// }
-			// }
 			if (results.size() > 0) {
 				return results.toArray(new ServerComponent[results.size()]);
 			} else {
@@ -266,79 +232,6 @@ public class VHostManager extends AbstractComponentRegistrator<VHostListener> im
 		return defs;
 	}
 
-	// /**
-	// * Method description
-	// *
-	// *
-	// * @param from
-	// *
-	// * @return
-	// */
-	// @Override
-	// public List<Element> getDiscoFeatures(JID from) {
-	// return null;
-	// }
-	// /**
-	// * Method description
-	// *
-	// *
-	// * @param node
-	// * @param jid
-	// * @param from
-	// *
-	// * @return
-	// */
-	// @Override
-	// public Element getDiscoInfo(String node, JID jid, JID from) {
-	// if ((jid != null) && getName().equals(jid.getLocalpart()) && isAdmin(from))
-	// {
-	// return serviceEntity.getDiscoInfo(node);
-	// }
-	//
-	// return null;
-	// }
-	// /**
-	// * Method description
-	// *
-	// *
-	// * @param node
-	// * @param jid
-	// * @param from
-	// *
-	// * @return
-	// */
-	// @Override
-	// public List<Element> getDiscoItems(String node, JID jid, JID from) {
-	// if (isAdmin(from)) {
-	// if (getName().equals(jid.getLocalpart()) || getComponentId().equals(jid)) {
-	// List<Element> items = serviceEntity.getDiscoItems(node, jid.toString());
-	//
-	// if (log.isLoggable(Level.FINEST)) {
-	// log.finest("Processing discoItems for node: " + node + ", result: "
-	// + ((items == null) ? null : items.toString()));
-	// }
-	//
-	// return items;
-	// } else {
-	// if (node == null) {
-	// Element item = serviceEntity.getDiscoItem(null,
-	// BareJID.toString(getName(), jid.toString()));
-	//
-	// if (log.isLoggable(Level.FINEST)) {
-	// log.finest("Processing discoItems, result: "
-	// + ((item == null) ? null : item.toString()));
-	// }
-	//
-	// return Arrays.asList(item);
-	// } else {
-	// return null;
-	// }
-	// }
-	// }
-	//
-	// return null;
-	// }
-
 	/**
 	 * Method description
 	 * 
@@ -392,8 +285,6 @@ public class VHostManager extends AbstractComponentRegistrator<VHostListener> im
 		return repo.getItem(domain);
 	}
 
-	// ~--- methods --------------------------------------------------------------
-
 	/**
 	 * Method description
 	 * 
@@ -405,8 +296,6 @@ public class VHostManager extends AbstractComponentRegistrator<VHostListener> im
 		super.initBindings(binds);
 		binds.put(ComponentRepository.COMP_REPO_BIND, repo);
 	}
-
-	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
@@ -500,8 +389,6 @@ public class VHostManager extends AbstractComponentRegistrator<VHostListener> im
 		registeredComponentDomains.remove(domain);
 	}
 
-	// ~--- set methods ----------------------------------------------------------
-
 	/**
 	 * Method description
 	 * 
@@ -540,61 +427,4 @@ public class VHostManager extends AbstractComponentRegistrator<VHostListener> im
 		}
 	}
 
-	// ~--- methods --------------------------------------------------------------
-
-	private void addCompletedVHostsField(Packet result) {
-		Command.addFieldValue(result, "Note", "Current number of VHosts: " + repo.size(),
-				"fixed");
-	}
-
-	private void prepareVHostData(Packet result) {
-		Command.addFieldValue(result, "VHost", "");
-		Command.addFieldValue(result, "Enabled", "true", "Enabled", new String[] { "true",
-				"false" }, new String[] { "true", "false" });
-	}
-
-	private void prepareVHostRemove(Packet result) {
-		Command.addFieldValue(result, "VHost", "");
-	}
-
-	private void updateVHostChanges(Packet packet, Packet result) {
-		String vh = Command.getFieldValue(packet, "VHost");
-
-		if ((vh != null) && !vh.isEmpty()) {
-			VHostItem vhost = new VHostItem(JID.jidInstanceNS(vh));
-			String enabled = Command.getFieldValue(packet, "Enabled");
-
-			vhost.setEnabled((enabled == null) || enabled.isEmpty() || "true".equals(enabled));
-
-			try {
-				repo.addItem(vhost);
-			} catch (TigaseDBException ex) {
-				log.log(Level.WARNING, "Problem adding VHost item to repository: ", ex);
-			}
-
-			addCompletedVHostsField(result);
-		} else {
-			Command.addFieldValue(result, "Note", "Incorrect VHost name given", "fixed");
-		}
-	}
-
-	private void updateVHostRemove(Packet packet, Packet result) {
-		String vh = Command.getFieldValue(packet, "VHost");
-
-		if ((vh != null) && !vh.isEmpty()) {
-			try {
-				repo.removeItem(vh);
-			} catch (TigaseDBException ex) {
-				log.log(Level.WARNING, "Problem removing VHost item from repository: ", ex);
-			}
-
-			addCompletedVHostsField(result);
-		} else {
-			Command.addFieldValue(result, "Note", "Incorrect VHost name given", "fixed");
-		}
-	}
 }
-
-// ~ Formatted in Sun Code Convention
-
-// ~ Formatted by Jindent --- http://www.jindent.com
