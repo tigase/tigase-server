@@ -131,7 +131,7 @@ public abstract class ConfiguratorAbstract extends
 	public void itemAdded(ConfigItem item) {
 		// Ignored, adding configuration settings does not make sense, for now...
 		// right now, just print a log message
-		log.log(Level.INFO, "Adding configuration item not supported yet: {0}", item);
+		//log.log(Level.INFO, "Adding configuration item not supported yet: {0}", item);
 	}
 
 	public void itemUpdated(ConfigItem item) {
@@ -686,8 +686,8 @@ public abstract class ConfiguratorAbstract extends
 	 */
 	@Override
 	public void setProperties(Map<String, Object> props) {
-		super.setProperties(props);
 		setupLogManager(props);
+		super.setProperties(props);
 		TLSUtil.configureSSLContext(props);
 
 		int repo_pool_size = 1;
