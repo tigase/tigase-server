@@ -365,6 +365,19 @@ public class ConfigItem extends RepositoryItemAbstract {
 	public boolean isCompNodeKey(String comp, String node, String key) {
 		return isComponent(comp) && isNode(node) && isKey(key);
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof ConfigItem) {
+			return getKey().equals(((ConfigItem) o).getKey());
+		}
+		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		return getKey().hashCode();
+	}
 
 	/**
 	 * Checks if the given component name is equal to this item compName.
@@ -631,7 +644,7 @@ public class ConfigItem extends RepositoryItemAbstract {
 	 */
 	@Override
 	public String toString() {
-		return compName + "/" + nodeName + "/" + keyName + "=" + value;
+		return getKey() + "=" + value;
 	}
 }
 

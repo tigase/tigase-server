@@ -97,7 +97,7 @@ public class ConfigurationCache implements ConfigRepositoryIfc {
 			config.put(compName, confItems);
 		}
 
-		boolean updated = contains(item.getKey());
+		boolean updated = confItems.remove(item);
 		confItems.add(item);
 		
 		if (repoChangeList != null) {
