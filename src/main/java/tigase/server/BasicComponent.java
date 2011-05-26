@@ -890,6 +890,10 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 	}
 
 	private void loadScripts() {
+
+		log.log(Level.CONFIG, "Loading admin scripts for component: {0}.",
+				new Object[] { getName() });
+
 		File file = null;
 		AddScriptCommand addCommand = new AddScriptCommand();
 		Bindings binds = scriptEngineManager.getBindings();
@@ -899,6 +903,8 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 		String[] dirs = new String[] { scriptsBaseDir, scriptsCompDir };
 
 		for (String scriptsPath : dirs) {
+			log.log(Level.CONFIG, "{0}: Loading scripts from directory: {1}", new Object[] {
+					getName(), scriptsPath });
 			try {
 				File adminDir = new File(scriptsPath);
 
@@ -964,7 +970,8 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 							}
 
 							if (!found) {
-								log.log(Level.INFO, "Admin script for a different component: {0}", comp);
+								log.log(Level.CONFIG, "{0}: skipping admin script for component: {1}",
+										new Object[] { getName(), comp });
 
 								continue;
 							}
@@ -980,9 +987,14 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 						}
 					}
 				} else {
-					log.log(Level.WARNING, "Admin scripts directory is missing: {0}, creating...",
+					log.log(Level.CONFIG, "Admin scripts directory is missing: {0}, creating...",
 							adminDir);
-					adminDir.mkdirs();
+					try {
+						adminDir.mkdirs();
+					} catch (Exception e) {
+						log.log(Level.WARNING,
+								"Can't create scripts directory , read-only filesystem: " + file, e);
+					}
 				}
 			} catch (Exception e) {
 				log.log(Level.WARNING, "Can't load the admin script file: " + file, e);
