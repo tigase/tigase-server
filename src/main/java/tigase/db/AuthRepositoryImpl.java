@@ -66,8 +66,8 @@ import javax.security.sasl.SaslServer;
  * @version $Rev$
  */
 public class AuthRepositoryImpl implements AuthRepository {
-	private static final Logger log = Logger.getLogger("tigase.db.UserAuthRepositoryImpl");
-	private static final String PASSWORD_KEY = "password";
+	protected static final Logger log = Logger.getLogger("tigase.db.UserAuthRepositoryImpl");
+	protected static final String PASSWORD_KEY = "password";
 	private static final String[] non_sasl_mechs = { "password", "digest" };
 	private static final String[] sasl_mechs = { "PLAIN", "DIGEST-MD5", "CRAM-MD5" };
 
