@@ -1,20 +1,20 @@
 /*
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2008 "Artur Hefczyc" <artur.hefczyc@tigase.org>
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
- * 
+ *
  * $Rev$
  * Last modified by $Author$
  * $Date$
@@ -44,8 +44,10 @@ import tigase.server.Packet;
 import tigase.server.ReceiverTimeoutHandler;
 import tigase.util.DNSResolver;
 import tigase.util.RoutingsContainer;
+import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
+import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
@@ -55,7 +57,7 @@ import tigase.xmpp.XMPPResourceConnection;
 
 /**
  * Class ClientConnectionManager Created: Tue Nov 22 07:07:11 2005
- * 
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
@@ -75,6 +77,8 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	private static final boolean WHITE_CHAR_ACK_PROP_VAL = false;
 	private static final String XMPP_ACK_PROP_KEY = "xmpp-ack";
 	private static final boolean XMPP_ACK_PROP_VAL = false;
+
+	private SeeOtherHostIfc see_other_host_strategy = null;
 
 	protected RoutingsContainer routings = null;
 	private final Map<String, XMPPProcessorIfc> processors =
@@ -96,7 +100,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 	/**
 	 * Method description
-	 * 
+	 *
 	 * @param params
 	 * @return
 	 */
@@ -106,6 +110,19 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 		Boolean r_mode =
 				(Boolean) params.get(getName() + "/" + ROUTINGS_PROP_KEY + "/"
 						+ ROUTING_MODE_PROP_KEY);
+
+		String see_other_host_class = (String)params.get(SeeOtherHostIfc.CM_SEE_OTHER_HOST_CLASS_PROPERTY);
+		props.put(SeeOtherHostIfc.CM_SEE_OTHER_HOST_CLASS_PROP_KEY, see_other_host_class);
+
+		if (see_other_host_class != null) {
+		    try {
+			see_other_host_strategy = (SeeOtherHostIfc) Class.forName(see_other_host_class).newInstance();
+			see_other_host_strategy.getDefaults(props, params);
+		    } catch (Exception e) {
+			log.log(Level.SEVERE, "Can not instantiate see_other_host strategy for class: "
+				+ see_other_host_class, e);
+		    }
+		}
 
 		if (r_mode == null) {
 			props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_MODE_PROP_KEY, ROUTING_MODE_PROP_VAL);
@@ -146,7 +163,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 	/**
 	 * Method description
-	 * 
+	 *
 	 * @return
 	 */
 	@Override
@@ -156,7 +173,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 	/**
 	 * Method description
-	 * 
+	 *
 	 * @return
 	 */
 	@Override
@@ -169,7 +186,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	 * packets distribution to different threads. For PubSub, probably better
 	 * packets distribution to different threads would be based on the sender
 	 * address rather then destination address.
-	 * 
+	 *
 	 * @param packet
 	 * @return
 	 */
@@ -185,7 +202,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 	/**
 	 * Method description
-	 * 
+	 *
 	 * @param packet
 	 */
 	@Override
@@ -264,7 +281,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 	/**
 	 * Method description
-	 * 
+	 *
 	 * @param serv
 	 * @return
 	 */
@@ -361,7 +378,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 	/**
 	 * Method description
-	 * 
+	 *
 	 * @param port_props
 	 */
 	@Override
@@ -370,7 +387,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 	/**
 	 * Method description
-	 * 
+	 *
 	 * @param service
 	 * @return
 	 */
@@ -385,7 +402,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 	/**
 	 * Method description
-	 * 
+	 *
 	 * @param props
 	 */
 	@Override
@@ -398,12 +415,24 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 		if (props.get(XMPP_ACK_PROP_KEY) != null) {
 			xmpp_ack = (Boolean) props.get(XMPP_ACK_PROP_KEY);
 		}
-		
+
 		if (props.size() == 1) {
-			// If props.size() == 1, it means this is a single property update 
+			// If props.size() == 1, it means this is a single property update
 			// and this component does not support single property change for the rest
 			// of it's settings
 			return;
+		}
+
+		String see_other_host_class = (String)props.get(SeeOtherHostIfc.CM_SEE_OTHER_HOST_CLASS_PROPERTY);
+
+		if (see_other_host_class != null) {
+		    try {
+			see_other_host_strategy = (SeeOtherHostIfc) Class.forName(see_other_host_class).newInstance();
+			see_other_host_strategy.setProperties(props);
+		    } catch (Exception e) {
+			log.log(Level.SEVERE, "Can not instantiate see_other_host strategy for class: "
+				+ see_other_host_class, e);
+		    }
 		}
 
 		boolean routing_mode =
@@ -442,7 +471,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 	/**
 	 * Method description
-	 * 
+	 *
 	 * @param service
 	 */
 	@Override
@@ -451,7 +480,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 	/**
 	 * Method description
-	 * 
+	 *
 	 * @param serv
 	 */
 	@Override
@@ -495,7 +524,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 	/**
 	 * Method description
-	 * 
+	 *
 	 * @param serv
 	 * @param attribs
 	 * @return
@@ -504,8 +533,27 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	public String xmppStreamOpened(XMPPIOService<Object> serv, Map<String, String> attribs) {
 		log.log(Level.FINER, "Stream opened: {0}", attribs);
 
-		final String hostname = attribs.get("to");
 		String lang = attribs.get("xml:lang");
+		final String hostname = attribs.get("to");
+		final String from = attribs.get("from");
+
+		BareJID fromJID = null;
+
+		if (from != null) {
+		    try {
+			fromJID = BareJID.bareJIDInstance(from);
+			System.out.println(fromJID);
+		    } catch (TigaseStringprepException ex) {
+			log.log(Level.CONFIG, "From JID violates RFC6122 (XMPP:Address Format): ", ex);
+
+			return "<?xml version='1.0'?><stream:stream" + " xmlns='" + XMLNS + "'"
+				+ " xmlns:stream='http://etherx.jabber.org/streams'"
+				+ " id='tigase-error-tigase'" + " from='" + getDefHostName() + "'"
+				+ " version='1.0' xml:lang='en'>" + "<stream:error>"
+				+ "<improper-addressing xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>"
+				+ "</stream:error>" + "</stream:stream>";
+		    } // end of: try-catch
+		} // end of: if (from != null) {
 
 		if (lang == null) {
 			lang = "en";
@@ -528,6 +576,22 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 					+ "<host-unknown xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>"
 					+ "</stream:error>" + "</stream:stream>";
 		} // end of if (!hostnames.contains(hostname))
+
+		if (fromJID != null && see_other_host_strategy != null) {
+
+		    BareJID see_other_host = see_other_host_strategy.findHostForJID(fromJID, getDefHostName());
+
+		    if (see_other_host != null && !see_other_host.equals(getDefHostName())) {
+			return "<?xml version='1.0'?><stream:stream" + " xmlns='" + XMLNS + "'"
+				+ " xmlns:stream='http://etherx.jabber.org/streams'"
+				+ " id='tigase-error-tigase'" + " from='" + getDefHostName() + "'"
+				+ " version='1.0' xml:lang='en'>" + "<stream:error>"
+				+ "<see-other-host xmlns='urn:ietf:params:xml:ns:xmpp-streams'>"
+				+ see_other_host
+				+ "</see-other-host>"
+				+ "</stream:error>" + "</stream:stream>";
+		    }
+		} // of if (from != null )
 
 		String id = (String) serv.getSessionData().get(IOService.SESSION_ID_KEY);
 
@@ -608,7 +672,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	 * Method <code>getMaxInactiveTime</code> returns max keep-alive time for
 	 * inactive connection. Let's assume user should send something at least once
 	 * every 24 hours....
-	 * 
+	 *
 	 * @return a <code>long</code> value
 	 */
 	@Override
@@ -838,7 +902,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 		/**
 		 * Method description
-		 * 
+		 *
 		 * @param packet
 		 * @param response
 		 */
@@ -852,7 +916,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 		/**
 		 * Method description
-		 * 
+		 *
 		 * @param packet
 		 */
 		@Override
@@ -881,7 +945,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 		/**
 		 * Method description
-		 * 
+		 *
 		 * @param packet
 		 * @param response
 		 */
@@ -896,7 +960,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 		/**
 		 * Method description
-		 * 
+		 *
 		 * @param packet
 		 */
 		@Override
