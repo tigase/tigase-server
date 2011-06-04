@@ -28,7 +28,7 @@ import java.util.Map;
 
 /**
  * Created: May 28, 2009 7:39:07 AM
- *
+ * 
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
@@ -42,16 +42,22 @@ public class DataTypes {
 		typesMap.put(Long.class.getName(), 'L');
 		typesMap.put(Integer.class.getName(), 'I');
 		typesMap.put(Boolean.class.getName(), 'B');
+		typesMap.put(Float.class.getName(), 'F');
+		typesMap.put(Double.class.getName(), 'D');
 		typesMap.put(String[].class.getName(), 's');
 		typesMap.put(Long[].class.getName(), 'l');
 		typesMap.put(Integer[].class.getName(), 'i');
 		typesMap.put(Boolean[].class.getName(), 'b');
+		typesMap.put(Float[].class.getName(), 'f');
+		typesMap.put(Double[].class.getName(), 'd');
 		typesMap.put(long[].class.getName(), 'l');
 		typesMap.put(int[].class.getName(), 'i');
 		typesMap.put(boolean[].class.getName(), 'b');
+		typesMap.put(float[].class.getName(), 'f');
+		typesMap.put(double[].class.getName(), 'd');
 	}
 
-	//public static char[] sizeChars = {'k', 'K', 'm', 'M', 'g', 'G', 't', 'T'};
+	// public static char[] sizeChars = {'k', 'K', 'm', 'M', 'g', 'G', 't', 'T'};
 
 	public static int parseSizeInt(String size, int def) {
 		if (size == null) {
@@ -86,11 +92,9 @@ public class DataTypes {
 	}
 
 	public static boolean parseBool(final String val) {
-		return val != null &&
-				(val.equalsIgnoreCase("yes") ||
-				val.equalsIgnoreCase("true") ||
-				val.equalsIgnoreCase("on") ||
-				val.equals("1"));
+		return val != null
+				&& (val.equalsIgnoreCase("yes") || val.equalsIgnoreCase("true")
+						|| val.equalsIgnoreCase("on") || val.equals("1"));
 	}
 
 	public static Object decodeValueType(char typeId, String value)
@@ -109,6 +113,14 @@ public class DataTypes {
 				case 'B':
 					// Boolean value
 					result = parseBool(value.trim());
+					break;
+				case 'F':
+					// Float value
+					result = Float.parseFloat(value.trim());
+					break;
+				case 'D':
+					// Double value
+					result = Double.parseDouble(value.trim());
 					break;
 				case 's':
 					// Comma separated, Strings array
@@ -150,6 +162,26 @@ public class DataTypes {
 					}
 					result = bools;
 					break;
+				case 'f':
+					// Comma separated, float array
+					String[] float_str = value.split(",");
+					float[] floats = new float[float_str.length];
+					int f = 0;
+					for (String s : float_str) {
+						floats[f++] = Float.parseFloat(s.trim());
+					}
+					result = floats;
+					break;
+				case 'd':
+					// Comma separated, double array
+					String[] doubles_str = value.split(",");
+					double[] doubles = new double[doubles_str.length];
+					int d = 0;
+					for (String s : doubles_str) {
+						doubles[d++] = Double.parseDouble(s.trim());
+					}
+					result = doubles;
+					break;
 				default:
 					// Do nothing, default to String
 					break;
@@ -165,23 +197,42 @@ public class DataTypes {
 		String varr = value.toString();
 		switch (t) {
 			case 'l':
-				varr = Arrays.toString((long[])value);
+				varr = Arrays.toString((long[]) value);
 				break;
 			case 'i':
-				varr = Arrays.toString((int[])value);
+				varr = Arrays.toString((int[]) value);
 				break;
 			case 'b':
-				varr = Arrays.toString((boolean[])value);
+				varr = Arrays.toString((boolean[]) value);
+				break;
+			case 'f':
+				varr = Arrays.toString((float[]) value);
+				break;
+			case 'd':
+				varr = Arrays.toString((double[]) value);
 				break;
 			default:
 				if (value.getClass().isArray()) {
-					varr = Arrays.toString((Object[])value);
+					varr = Arrays.toString((Object[]) value);
 				}
 		}
 		if (value.getClass().isArray()) {
 			varr = varr.substring(1, varr.length() - 1);
 		}
 		return varr;
+	}
+
+	public static char decodeTypeIdFromName(String name) {
+		char result = 'S';
+		if (name.endsWith("]")) {
+			result = name.charAt(name.length() - 2);
+		}
+		return result;
+	}
+
+	public static String encodeTypeIdInName(String name, Object value) {
+		char t = DataTypes.getTypeId(value);
+		return name + "[" + t + "]";
 	}
 
 	public static char getTypeId(Object instance) {
