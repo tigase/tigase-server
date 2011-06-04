@@ -746,7 +746,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 								ex);
 					}
 				} else {
-					log.log(Level.WARNING, "Can''t find sevice for STARTZLIB command: {0}", iqc);
+					log.log(Level.WARNING, "Can't find sevice for STARTZLIB command: {0}", iqc);
 				}
 
 				break;
@@ -762,11 +762,9 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 						// Note:
 						// If you send <proceed> packet to client you must expect
 						// instant response from the client with TLS handshaking
-						// data
-						// before you will call startTLS() on server side.
+						// data before you will call startTLS() on server side.
 						// So the initial handshaking data might be lost as they
-						// will
-						// be processed in another thread reading data from the
+						// will be processed in another thread reading data from the
 						// socket.
 						// That's why below code first removes service from reading
 						// threads pool and then sends <proceed> packet and starts
@@ -787,7 +785,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 						serv.forceStop();
 					} // end of try-catch
 				} else {
-					log.log(Level.WARNING, "Can''t find sevice for STARTTLS command: {0}", iqc);
+					log.log(Level.WARNING, "Can't find sevice for STARTTLS command: {0}", iqc);
 				} // end of else
 
 				break;
