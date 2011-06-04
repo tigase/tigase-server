@@ -1,5 +1,5 @@
 /*
- *   Tigase Jabber/XMPP Server
+ *  Tigase Jabber/XMPP Server
  *  Copyright (C) 2004-2008 "Artur Hefczyc" <artur.hefczyc@tigase.org>
  *
  * This program is free software: you can redistribute it and/or modify
