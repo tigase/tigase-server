@@ -1,29 +1,30 @@
 /*
-* Tigase Jabber/XMPP Server
-* Copyright (C) 2004-2010 "Artur Hefczyc" <artur.hefczyc@tigase.org>
-*
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, version 3 of the License.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program. Look for COPYING file in the top folder.
-* If not, see http://www.gnu.org/licenses/.
-*
-* $Rev$
-* Last modified by $Author$
-* $Date$
+ * Tigase Jabber/XMPP Server
+ * Copyright (C) 2004-2010 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. Look for COPYING file in the top folder.
+ * If not, see http://www.gnu.org/licenses/.
+ *
+ * $Rev$
+ * Last modified by $Author$
+ * $Date$
  */
 package tigase.server.amp;
 
 //~--- non-JDK imports --------------------------------------------------------
 
 import java.security.NoSuchAlgorithmException;
+import java.sql.DataTruncation;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -196,8 +197,8 @@ public class MsgRepository implements MsgRepositoryIfc {
 		while (item == null) {
 			try {
 				item = expiredQueue.take();
+			} catch (InterruptedException ex) {
 			}
-			catch (InterruptedException ex) {}
 		}
 
 		if (delete) {
@@ -247,8 +248,7 @@ public class MsgRepository implements MsgRepositoryIfc {
 			data_repo.initPreparedStatement(MSG_SELECT_EXPIRED_BEFORE_QUERY,
 					MSG_SELECT_EXPIRED_BEFORE_QUERY);
 			data_repo.initPreparedStatement(ADD_USER_JID_ID_QUERY, ADD_USER_JID_ID_QUERY);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 
 			// Ignore for now....
 		}
@@ -305,11 +305,9 @@ public class MsgRepository implements MsgRepositoryIfc {
 					delete_to_jid_st.executeUpdate();
 				}
 			}
-		}
-		catch (SQLException e) {
+		} catch (SQLException e) {
 			log.log(Level.WARNING, "Problem getting offline messages for user: " + to, e);
-		}
-		finally {
+		} finally {
 			data_repo.release(null, rs);
 		}
 
@@ -346,7 +344,8 @@ public class MsgRepository implements MsgRepositoryIfc {
 				to_uid = addUserJID(to.getBareJID());
 			}
 
-			PreparedStatement insert_msg_st = data_repo.getPreparedStatement(to.getBareJID(), MSG_INSERT_QUERY);
+			PreparedStatement insert_msg_st =
+					data_repo.getPreparedStatement(to.getBareJID(), MSG_INSERT_QUERY);
 
 			synchronized (insert_msg_st) {
 				if (expired == null) {
@@ -378,8 +377,10 @@ public class MsgRepository implements MsgRepositoryIfc {
 					loadExpiredQueue(1);
 				}
 			}
-		}
-		catch (SQLException e) {
+		} catch (DataTruncation dte) {
+			log.log(Level.FINE, "Data truncated for message from {0} to {1}", new Object[] {
+					from, to });
+		} catch (SQLException e) {
 			log.log(Level.WARNING, "Problem adding new entry to DB: ", e);
 		}
 	}
@@ -402,8 +403,7 @@ public class MsgRepository implements MsgRepositoryIfc {
 			// }catch (InterruptedException ex) {
 			//
 			// // Do nothing
-		}
-		catch (NoSuchAlgorithmException ex) {
+		} catch (NoSuchAlgorithmException ex) {
 			log.log(Level.WARNING, "Configuration error or code bug: ", ex);
 
 			return -1;
@@ -426,8 +426,7 @@ public class MsgRepository implements MsgRepositoryIfc {
 				delete_id_st.setLong(1, msg_id);
 				delete_id_st.executeUpdate();
 			}
-		}
-		catch (SQLException e) {
+		} catch (SQLException e) {
 			log.log(Level.WARNING, "Problem removing entry from DB: ", e);
 		}
 	}
@@ -447,8 +446,7 @@ public class MsgRepository implements MsgRepositoryIfc {
 
 		try {
 			jid_sha = Algorithms.hexDigest(user_id.toString(), "", "SHA");
-		}
-		catch (NoSuchAlgorithmException ex) {
+		} catch (NoSuchAlgorithmException ex) {
 			log.log(Level.WARNING, "Configuration error or code bug: ", ex);
 
 			return -1;
@@ -494,8 +492,7 @@ public class MsgRepository implements MsgRepositoryIfc {
 			// if (result <= 0) {
 			// throw new UserNotFoundException("User does not exist: " + user_id);
 			// } // end of if (isnext) else
-		}
-		finally {
+		} finally {
 			data_repo.release(null, rs);
 		}
 
@@ -542,11 +539,9 @@ public class MsgRepository implements MsgRepositoryIfc {
 					}
 				}
 			}
-		}
-		catch (SQLException e) {
+		} catch (SQLException e) {
 			log.log(Level.WARNING, "Problem getting offline messages from db: ", e);
-		}
-		finally {
+		} finally {
 			data_repo.release(null, rs);
 		}
 
@@ -591,11 +586,9 @@ public class MsgRepository implements MsgRepositoryIfc {
 					}
 				}
 			}
-		}
-		catch (SQLException e) {
+		} catch (SQLException e) {
 			log.log(Level.WARNING, "Problem getting offline messages from db: ", e);
-		}
-		finally {
+		} finally {
 			data_repo.release(null, rs);
 		}
 
