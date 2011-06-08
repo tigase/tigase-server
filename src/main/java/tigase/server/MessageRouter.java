@@ -240,6 +240,11 @@ public class MessageRouter extends AbstractMessageReceiver implements MessageRou
 		list.add(getName(), "Threads count", runtime.getThreadsNumber(), Level.FINEST);
 
 		float cpuUsage = runtime.getCPUUsage();
+		float heapUsage = runtime.getHeapMemUsage();
+		float nonHeapUsage = runtime.getNonHeapMemUsage();
+		list.add(getName(), "CPU usage [%]", cpuUsage, Level.FINE);
+		list.add(getName(), "HEAP usage [%]", heapUsage, Level.FINE);
+		list.add(getName(), "NONHEAP usage [%]", nonHeapUsage, Level.FINE);
 
 		format = NumberFormat.getNumberInstance();
 		format.setMaximumFractionDigits(1);
