@@ -661,12 +661,15 @@ public abstract class AbstractMessageReceiver extends BasicComponent implements
 
 		list.add(getName(), "Total In queues wait", in_queue_size, Level.INFO);
 		list.add(getName(), "Total Out queues wait", out_queue_size, Level.INFO);
+		list.add(getName(), "Total queues wait", (in_queue_size + out_queue_size), Level.INFO);
 		list.add(getName(), StatisticType.MAX_QUEUE_SIZE.getDescription(),
 				(maxInQueueSize * processingInThreads()), Level.FINEST);
 		list.add(getName(), StatisticType.IN_QUEUE_OVERFLOW.getDescription(),
 				statReceivedPacketsEr, Level.INFO);
 		list.add(getName(), StatisticType.OUT_QUEUE_OVERFLOW.getDescription(),
 				statSentPacketsEr, Level.INFO);
+		list.add(getName(), "Total queues overflow",
+				(statReceivedPacketsEr + statSentPacketsEr), Level.INFO);
 
 		long res = 0;
 
