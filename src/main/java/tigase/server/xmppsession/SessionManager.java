@@ -385,10 +385,14 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 		list.add(getName(), "Total user sessions", totalUserSessions, Level.FINER);
 		list.add(getName(), "Authentication timouts", authTimeouts, Level.INFO);
 
+		int totalQueuesWait = list.getValue(getName(), "Total queues wait", 0);
+		long totalQueuesOverflow = list.getValue(getName(), "Total queues overflow", 0l);
+
 		for (Map.Entry<String, ProcessingThreads<ProcessorWorkerThread>> procent : workerThreads
 				.entrySet()) {
 			ProcessingThreads<ProcessorWorkerThread> proc = procent.getValue();
-
+			totalQueuesWait += proc.getTotalQueueSize();
+			totalQueuesOverflow += proc.getDroppedPackets();
 			if (list
 					.checkLevel(Level.INFO, proc.getTotalQueueSize() + proc.getDroppedPackets())) {
 				list.add(
@@ -399,6 +403,8 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 								+ ", Lost: " + proc.getDroppedPackets(), Level.INFO);
 			}
 		}
+		list.add(getName(), "Total queues wait", totalQueuesWait, Level.INFO);
+		list.add(getName(), "Total queues overflow", totalQueuesOverflow, Level.INFO);
 		// private long[] defPrepTime = new long[maxIdx];
 		// private long[] prepTime = new long[maxIdx];
 		// private long[] defForwTime = new long[maxIdx];
@@ -626,7 +632,7 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 		}
 
 		if (props.size() == 1) {
-			// If props.size() == 1, it means this is a single property update 
+			// If props.size() == 1, it means this is a single property update
 			// and this component does not support single property change for the rest
 			// of it's settings
 			return;
@@ -986,8 +992,7 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 		// We actually have to set packetFrom address to the session manager ID
 		// to make sure the connection manager for instance can report problems back
 		// This cause other problems with packets processing which have to be
-		// resolved
-		// anyway
+		// resolved anyway
 		if (packet.getPacketFrom() == null) {
 			packet.setPacketFrom(getComponentId());
 		}
@@ -1043,10 +1048,8 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 	protected boolean isBrokenPacket(Packet p) {
 		// TODO: check this out to make sure it does not lead to an infinite
-		// processing loop
-		// These are most likely packets generated inside the SM to other users who
-		// are
-		// offline, like presence updates.
+		// processing loop These are most likely packets generated inside the SM to
+		// other users who are offline, like presence updates.
 		if (getComponentId().equals(p.getPacketFrom()) && p.getPacketTo() == null) {
 			return false;
 		}
