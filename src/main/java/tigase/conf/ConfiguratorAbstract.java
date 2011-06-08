@@ -826,6 +826,9 @@ public abstract class ConfiguratorAbstract extends
 		}
 
 		String compId = component.getName();
+		
+		log.log(Level.CONFIG, "Setting up component: {0}", compId);
+		
 		Map<String, Object> prop = null;
 
 		try {
@@ -841,6 +844,9 @@ public abstract class ConfiguratorAbstract extends
 		// System.out.println("Properties: " + prop.toString());
 		// }
 		Map<String, Object> defs = component.getDefaults(getDefConfigParams());
+
+		log.log(Level.CONFIG, "Component {0} defaults: {1}", new Object[] {compId, defs});
+
 		Set<Map.Entry<String, Object>> defs_entries = defs.entrySet();
 		boolean modified = false;
 
@@ -853,6 +859,7 @@ public abstract class ConfiguratorAbstract extends
 
 		if (modified) {
 			try {
+				log.log(Level.CONFIG, "Component {0} configuration: {1}", new Object[] {compId, prop});
 				configRepo.putProperties(compId, prop);
 			} catch (ConfigurationException ex) {
 				log.log(Level.WARNING,
