@@ -284,11 +284,7 @@ public class ConfigItem extends RepositoryItemAbstract {
 		}
 
 		String value_label = Command.getFieldKeyStartingWith(packet, VALUE_LABEL);
-		char t = 'S';
-
-		if (value_label.endsWith("]")) {
-			t = value_label.charAt(value_label.length() - 2);
-		}
+		char t = DataTypes.decodeTypeIdFromName(value_label);
 
 		tmp = Command.getFieldValue(packet, value_label);
 
