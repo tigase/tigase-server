@@ -48,17 +48,17 @@ import tigase.xmpp.JID;
  * <p>
  * These tasks are designed to pull XMPP stanzas from specific data source like
  * SQL database, directory in the filesystem and so on. Each of these tasks must
- * extend <code>tigase.server.ssende.SenderTask</code> abstract class.
- * Look in specific tasks implementation for more detailed description how
- * to use them.
+ * extend <code>tigase.server.ssende.SenderTask</code> abstract class. Look in
+ * specific tasks implementation for more detailed description how to use them.
  * <p>
  * Created: Fri Apr 20 11:11:25 2007
  * </p>
+ * 
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class StanzaSender extends AbstractMessageReceiver
-	implements Configurable, StanzaHandler {
+public class StanzaSender extends AbstractMessageReceiver implements Configurable,
+		StanzaHandler {
 
 	private static final String INTERVAL_PROP_KEY = "default-interval";
 	private static final long INTERVAL_PROP_VAL = 10;
@@ -69,52 +69,50 @@ public class StanzaSender extends AbstractMessageReceiver
 	private static final String JDBC_TASK_NAME = "jdbc";
 	private static final String JDBC_TASK_CLASS = "tigase.server.ssender.JDBCTask";
 	private static final String JDBC_TASK_INIT =
-		"jdbc:mysql://localhost/tigase?user=root&password=mypass&table=xmpp_stanza";
+			"jdbc:mysql://localhost/tigase?user=root&password=mypass&table=xmpp_stanza";
 	private static final long JDBC_INTERVAL = 10;
 
 	private static final String DRUPAL_FORUM_TASK_NAME = "drupal-forum";
 	private static final String DRUPAL_FORUM_TASK_CLASS =
-		"tigase.server.ssender.DrupalForumTask";
+			"tigase.server.ssender.DrupalForumTask";
 	private static final String DRUPAL_FORUM_TASK_INIT =
-		"drupal_forum:mysql://localhost/tigase?user=root&password=mypass";
+			"drupal_forum:mysql://localhost/tigase?user=root&password=mypass";
 	private static final long DRUPAL_FORUM_INTERVAL = 30;
 
 	private static final String DRUPAL_COMMENTS_TASK_NAME = "drupal-comments";
 	private static final String DRUPAL_COMMENTS_TASK_CLASS =
-		"tigase.server.ssender.DrupalCommentsTask";
+			"tigase.server.ssender.DrupalCommentsTask";
 	private static final String DRUPAL_COMMENTS_TASK_INIT =
-		"drupal_comments:mysql://localhost/tigase?user=root&password=mypass";
+			"drupal_comments:mysql://localhost/tigase?user=root&password=mypass";
 	private static final long DRUPAL_COMMENTS_INTERVAL = 10;
 
 	private static final String FILE_TASK_NAME = "file";
 	private static final String FILE_TASK_CLASS = "tigase.server.ssender.FileTask";
-	private static final String FILE_TASK_INIT =
-		File.separator + "var" + File.separator + "spool" + File.separator +
-		"jabber" + File.separator + "*.stanza";
+	private static final String FILE_TASK_INIT = File.separator + "var" + File.separator
+			+ "spool" + File.separator + "jabber" + File.separator + "*.stanza";
 	private static final long FILE_INTERVAL = 10;
-	private static final String[] STANZA_LISTENERS_PROP_VAL =
-	{JDBC_TASK_NAME, FILE_TASK_NAME, DRUPAL_COMMENTS_TASK_NAME};
+	private static final String[] STANZA_LISTENERS_PROP_VAL = { JDBC_TASK_NAME,
+			FILE_TASK_NAME, DRUPAL_COMMENTS_TASK_NAME };
 	private static final String TASK_ACTIVE_PROP_KEY = "active";
 	private static final boolean TASK_ACTIVE_PROP_VAL = false;
 	public static final String MY_DOMAIN_NAME_PROP_KEY = "domain-name";
-	public static String MY_DOMAIN_NAME_PROP_VAL =	"srecv.localhost";
+	public static String MY_DOMAIN_NAME_PROP_VAL = "srecv.localhost";
 
 	/**
-   * Variable <code>log</code> is a class logger.
-   */
-  private static final Logger log = Logger.getLogger(StanzaSender.class.getName());
+	 * Variable <code>log</code> is a class logger.
+	 */
+	private static final Logger log = Logger.getLogger(StanzaSender.class.getName());
 
 	private static final SimpleParser parser = SingletonFactory.getParserInstance();
-	//private long interval = INTERVAL_PROP_VAL;
-	private Map<String, SenderTask> tasks_list =
-		new LinkedHashMap<String, SenderTask>();
+	// private long interval = INTERVAL_PROP_VAL;
+	private Map<String, SenderTask> tasks_list = new LinkedHashMap<String, SenderTask>();
 	private Timer tasks = new Timer("StanzaSender", true);
 
 	// Implementation of tigase.server.ServerComponent
 
 	/**
 	 * Describe <code>release</code> method here.
-	 *
+	 * 
 	 */
 	@Override
 	public void release() {
@@ -123,8 +121,9 @@ public class StanzaSender extends AbstractMessageReceiver
 
 	/**
 	 * Describe <code>processPacket</code> method here.
-	 *
-	 * @param packet a <code>Packet</code> value
+	 * 
+	 * @param packet
+	 *          a <code>Packet</code> value
 	 */
 	@Override
 	public void processPacket(final Packet packet) {
@@ -136,16 +135,21 @@ public class StanzaSender extends AbstractMessageReceiver
 
 	/**
 	 * Describe <code>setProperties</code> method here.
-	 *
-	 * @param props a <code>Map</code> value
+	 * 
+	 * @param props
+	 *          a <code>Map</code> value
 	 */
 	@Override
 	public void setProperties(final Map<String, Object> props) {
 		super.setProperties(props);
 
-		//interval = (Long)props.get(INTERVAL_PROP_KEY);
-		String[] config_tasks = (String[])props.get(STANZA_LISTENERS_PROP_KEY);
-		for (String task_name: config_tasks) {
+		if (props.size() == 1) {
+			return;
+		}
+
+		// interval = (Long)props.get(INTERVAL_PROP_KEY);
+		String[] config_tasks = (String[]) props.get(STANZA_LISTENERS_PROP_KEY);
+		for (String task_name : config_tasks) {
 
 			// Reconfiguration code. Turn-off old task with that name.
 			SenderTask old_task = tasks_list.get(task_name);
@@ -153,26 +157,22 @@ public class StanzaSender extends AbstractMessageReceiver
 				old_task.cancel();
 			}
 
-			if ((Boolean)props.get(task_name + "/" + TASK_ACTIVE_PROP_KEY)) {
-				String task_class =
-					(String)props.get(task_name + "/" + TASK_CLASS_PROP_KEY);
-				String task_init =
-					(String)props.get(task_name + "/" + TASK_INIT_PROP_KEY);
-				long task_interval =
-					(Long)props.get(task_name + "/" + TASK_INTERVAL_PROP_KEY);
+			if ((Boolean) props.get(task_name + "/" + TASK_ACTIVE_PROP_KEY)) {
+				String task_class = (String) props.get(task_name + "/" + TASK_CLASS_PROP_KEY);
+				String task_init = (String) props.get(task_name + "/" + TASK_INIT_PROP_KEY);
+				long task_interval = (Long) props.get(task_name + "/" + TASK_INTERVAL_PROP_KEY);
 				try {
-					SenderTask task = (SenderTask)Class.forName(task_class).newInstance();
+					SenderTask task = (SenderTask) Class.forName(task_class).newInstance();
 					JID taskName = getComponentId().copyWithResource(task_name);
 					task.setName(taskName);
 					task.init(this, task_init);
 
 					// Install new task
 					tasks_list.put(task_name, task);
-					tasks.scheduleAtFixedRate(task, task_interval*SECOND,
-						task_interval*SECOND);
+					tasks.scheduleAtFixedRate(task, task_interval * SECOND, task_interval * SECOND);
 
 					log.config("Initialized task: " + task_name + ", class: " + task_class
-						+ ", init: " + task_init + ", interval: " + task_interval);
+							+ ", init: " + task_init + ", interval: " + task_interval);
 				} catch (Exception e) {
 					log.log(Level.SEVERE, "Can not initialize stanza listener: ", e);
 				}
@@ -182,8 +182,9 @@ public class StanzaSender extends AbstractMessageReceiver
 
 	/**
 	 * Describe <code>getDefaults</code> method here.
-	 *
-	 * @param params a <code>Map</code> value
+	 * 
+	 * @param params
+	 *          a <code>Map</code> value
 	 * @return a <code>Map</code> value
 	 */
 	@Override
@@ -191,7 +192,7 @@ public class StanzaSender extends AbstractMessageReceiver
 		Map<String, Object> defs = super.getDefaults(params);
 		defs.put(INTERVAL_PROP_KEY, INTERVAL_PROP_VAL);
 
-		if ((Boolean)params.get(GEN_TEST)) {
+		if ((Boolean) params.get(GEN_TEST)) {
 			defs.put(FILE_TASK_NAME + "/" + TASK_ACTIVE_PROP_KEY, true);
 		} else {
 			defs.put(FILE_TASK_NAME + "/" + TASK_ACTIVE_PROP_KEY, TASK_ACTIVE_PROP_VAL);
@@ -200,7 +201,7 @@ public class StanzaSender extends AbstractMessageReceiver
 		defs.put(FILE_TASK_NAME + "/" + TASK_INIT_PROP_KEY, FILE_TASK_INIT);
 		defs.put(FILE_TASK_NAME + "/" + TASK_INTERVAL_PROP_KEY, FILE_INTERVAL);
 
-		if ((Boolean)params.get(GEN_TEST)) {
+		if ((Boolean) params.get(GEN_TEST)) {
 			defs.put(JDBC_TASK_NAME + "/" + TASK_ACTIVE_PROP_KEY, true);
 		} else {
 			defs.put(JDBC_TASK_NAME + "/" + TASK_ACTIVE_PROP_KEY, TASK_ACTIVE_PROP_VAL);
@@ -211,10 +212,10 @@ public class StanzaSender extends AbstractMessageReceiver
 
 		String repo_uri = DRUPAL_COMMENTS_TASK_INIT;
 		if (params.get(GEN_CONF + "drupal-db-uri") != null) {
-				repo_uri = (String)params.get(GEN_CONF + "drupal-db-uri");
+			repo_uri = (String) params.get(GEN_CONF + "drupal-db-uri");
 		} else {
 			if (params.get(GEN_USER_DB_URI) != null) {
-				repo_uri = (String)params.get(GEN_USER_DB_URI);
+				repo_uri = (String) params.get(GEN_USER_DB_URI);
 			} // end of if (params.get(GEN_USER_DB_URI) != null)
 		}
 
@@ -226,13 +227,13 @@ public class StanzaSender extends AbstractMessageReceiver
 		defs.put(task_name + "/" + TASK_ACTIVE_PROP_KEY, false);
 		defs.put(task_name + "/" + TASK_CLASS_PROP_KEY, DRUPAL_COMMENTS_TASK_CLASS);
 		defs.put(task_name + "/" + TASK_INTERVAL_PROP_KEY, DRUPAL_COMMENTS_INTERVAL);
-		defs.put(task_name + "/" + TASK_INIT_PROP_KEY,
-			repo_uri + "&jid=drupal-comments@srecv." + getDefHostName());
+		defs.put(task_name + "/" + TASK_INIT_PROP_KEY, repo_uri
+				+ "&jid=drupal-comments@srecv." + getDefHostName());
 
 		defs.put(STANZA_LISTENERS_PROP_KEY, listeners.toArray(new String[0]));
 		if (params.get(GEN_VIRT_HOSTS) != null) {
 			MY_DOMAIN_NAME_PROP_VAL =
-        "ssend." + ((String)params.get(GEN_VIRT_HOSTS)).split(",")[0];
+					"ssend." + ((String) params.get(GEN_VIRT_HOSTS)).split(",")[0];
 		} else {
 			MY_DOMAIN_NAME_PROP_VAL = "ssend." + DNSResolver.getDefHostNames()[0];
 		}
