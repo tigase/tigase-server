@@ -271,14 +271,14 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 		super.getStatistics(list);
 		list.add(getName(), "Open connections", services_size, Level.INFO);
 
-		if (list.checkLevel(Level.FINEST)) {
+		if (list.checkLevel(Level.FINEST) || services.size() < 1000) {
 			int waitingToSendSize = 0;
 
 			for (IO serv : services.values()) {
 				waitingToSendSize += serv.waitingToSendSize();
 			}
 
-			list.add(getName(), "Waiting to send", waitingToSendSize, Level.FINEST);
+			list.add(getName(), "Waiting to send", waitingToSendSize, Level.FINE);
 		}
 
 		list.add(getName(), "Bytes sent", bytesSent, Level.FINE);
