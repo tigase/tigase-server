@@ -56,8 +56,6 @@ import javax.management.remote.JMXServiceURL;
 public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListener {
 	private static final Logger log = Logger.getLogger(JavaJMXProxy.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
-
 	private float clCompressionRatio = 0;
 	private int clIOQueueSize = 0;
 	private long clNetworkBytes = 0;
@@ -348,7 +346,7 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	 * @return
 	 */
 	@Override
-	public List getComponentsNames() {
+	public List<String> getComponentsNames() {
 		if (tigBean != null) {
 			return tigBean.getComponentsNames();
 		}
@@ -834,6 +832,24 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 				}
 			}, delay, interval);
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see tigase.stats.StatisticsProviderMBean#getStatsHistory(java.lang.String[])
+	 */
+	@Override
+	public Map<String, LinkedList<Object>> getStatsHistory(String[] statsKeys) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see tigase.stats.StatisticsProviderMBean#getCurStats(java.lang.String[])
+	 */
+	@Override
+	public Map<String, Object> getCurStats(String[] statsKeys) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
 

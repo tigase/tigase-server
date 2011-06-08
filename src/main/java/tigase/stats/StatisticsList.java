@@ -25,6 +25,7 @@ package tigase.stats;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.server.QueueType;
+import tigase.util.DataTypes;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -32,43 +33,45 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.NoSuchElementException;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 //~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Jul 10, 2009 3:23:23 PM
- *
+ * 
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class StatisticsList implements Iterable<StatRecord> {
+	private static final Logger log = Logger.getLogger(StatisticsList.class.getName());
 	private Level statLevel = Level.ALL;
 	private LinkedHashMap<String, LinkedHashMap<String, StatRecord>> stats =
-		new LinkedHashMap<String, LinkedHashMap<String, StatRecord>>();
+			new LinkedHashMap<String, LinkedHashMap<String, StatRecord>>();
 
-	//~--- constructors ---------------------------------------------------------
+	// ~--- constructors ---------------------------------------------------------
 
 	/**
 	 * Constructs ...
-	 *
-	 *
+	 * 
+	 * 
 	 * @param level
 	 */
 	public StatisticsList(Level level) {
 		this.statLevel = level;
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param comp
 	 * @param description
 	 * @param value
 	 * @param recordLevel
-	 *
+	 * 
 	 * @return
 	 */
 	public boolean add(String comp, String description, long value, Level recordLevel) {
@@ -79,8 +82,8 @@ public class StatisticsList implements Iterable<StatRecord> {
 				compStats = addCompStats(comp);
 			}
 
-			compStats.put(description,
-					new StatRecord(comp, description, "long", value, recordLevel));
+			compStats.put(description, new StatRecord(comp, description, "long", value,
+					recordLevel));
 
 			return true;
 		}
@@ -90,13 +93,13 @@ public class StatisticsList implements Iterable<StatRecord> {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param comp
 	 * @param description
 	 * @param value
 	 * @param recordLevel
-	 *
+	 * 
 	 * @return
 	 */
 	public boolean add(String comp, String description, int value, Level recordLevel) {
@@ -107,7 +110,8 @@ public class StatisticsList implements Iterable<StatRecord> {
 				compStats = addCompStats(comp);
 			}
 
-			compStats.put(description, new StatRecord(comp, description, "int", value, recordLevel));
+			compStats.put(description, new StatRecord(comp, description, "int", value,
+					recordLevel));
 
 			return true;
 		}
@@ -117,13 +121,13 @@ public class StatisticsList implements Iterable<StatRecord> {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param comp
 	 * @param description
 	 * @param value
 	 * @param recordLevel
-	 *
+	 * 
 	 * @return
 	 */
 	public boolean add(String comp, String description, String value, Level recordLevel) {
@@ -134,8 +138,8 @@ public class StatisticsList implements Iterable<StatRecord> {
 				compStats = addCompStats(comp);
 			}
 
-			compStats.put(description,
-					new StatRecord(comp, description, "String", value, recordLevel));
+			compStats.put(description, new StatRecord(comp, description, "String", value,
+					recordLevel));
 
 			return true;
 		}
@@ -145,13 +149,13 @@ public class StatisticsList implements Iterable<StatRecord> {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param comp
 	 * @param description
 	 * @param value
 	 * @param recordLevel
-	 *
+	 * 
 	 * @return
 	 */
 	public boolean add(String comp, String description, float value, Level recordLevel) {
@@ -162,8 +166,8 @@ public class StatisticsList implements Iterable<StatRecord> {
 				compStats = addCompStats(comp);
 			}
 
-			compStats.put(description,
-					new StatRecord(comp, description, "float", value, recordLevel));
+			compStats.put(description, new StatRecord(comp, description, "float", value,
+					recordLevel));
 
 			return true;
 		}
@@ -173,10 +177,10 @@ public class StatisticsList implements Iterable<StatRecord> {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param comp
-	 *
+	 * 
 	 * @return
 	 */
 	public LinkedHashMap<String, StatRecord> addCompStats(String comp) {
@@ -189,10 +193,10 @@ public class StatisticsList implements Iterable<StatRecord> {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param recordLevel
-	 *
+	 * 
 	 * @return
 	 */
 	public boolean checkLevel(Level recordLevel) {
@@ -201,11 +205,11 @@ public class StatisticsList implements Iterable<StatRecord> {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param recordLevel
 	 * @param value
-	 *
+	 * 
 	 * @return
 	 */
 	public boolean checkLevel(Level recordLevel, long value) {
@@ -222,11 +226,11 @@ public class StatisticsList implements Iterable<StatRecord> {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param recordLevel
 	 * @param value
-	 *
+	 * 
 	 * @return
 	 */
 	public boolean checkLevel(Level recordLevel, int value) {
@@ -241,14 +245,14 @@ public class StatisticsList implements Iterable<StatRecord> {
 		return false;
 	}
 
-	//~--- get methods ----------------------------------------------------------
+	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param comp
-	 *
+	 * 
 	 * @return
 	 */
 	public int getCompConnections(String comp) {
@@ -257,10 +261,10 @@ public class StatisticsList implements Iterable<StatRecord> {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param comp
-	 *
+	 * 
 	 * @return
 	 */
 	public long getCompIq(String comp) {
@@ -269,10 +273,10 @@ public class StatisticsList implements Iterable<StatRecord> {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param comp
-	 *
+	 * 
 	 * @return
 	 */
 	public long getCompIqReceived(String comp) {
@@ -281,10 +285,10 @@ public class StatisticsList implements Iterable<StatRecord> {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param comp
-	 *
+	 * 
 	 * @return
 	 */
 	public long getCompIqSent(String comp) {
@@ -293,10 +297,10 @@ public class StatisticsList implements Iterable<StatRecord> {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param comp
-	 *
+	 * 
 	 * @return
 	 */
 	public long getCompMsg(String comp) {
@@ -305,10 +309,10 @@ public class StatisticsList implements Iterable<StatRecord> {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param comp
-	 *
+	 * 
 	 * @return
 	 */
 	public long getCompMsgReceived(String comp) {
@@ -317,10 +321,10 @@ public class StatisticsList implements Iterable<StatRecord> {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param comp
-	 *
+	 * 
 	 * @return
 	 */
 	public long getCompMsgSent(String comp) {
@@ -329,10 +333,10 @@ public class StatisticsList implements Iterable<StatRecord> {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param comp
-	 *
+	 * 
 	 * @return
 	 */
 	public long getCompPackets(String comp) {
@@ -341,10 +345,10 @@ public class StatisticsList implements Iterable<StatRecord> {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param comp
-	 *
+	 * 
 	 * @return
 	 */
 	public long getCompPres(String comp) {
@@ -353,10 +357,10 @@ public class StatisticsList implements Iterable<StatRecord> {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param comp
-	 *
+	 * 
 	 * @return
 	 */
 	public long getCompPresReceived(String comp) {
@@ -365,10 +369,10 @@ public class StatisticsList implements Iterable<StatRecord> {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param comp
-	 *
+	 * 
 	 * @return
 	 */
 	public long getCompPresSent(String comp) {
@@ -377,10 +381,10 @@ public class StatisticsList implements Iterable<StatRecord> {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param comp
-	 *
+	 * 
 	 * @return
 	 */
 	public long getCompReceivedPackets(String comp) {
@@ -389,10 +393,10 @@ public class StatisticsList implements Iterable<StatRecord> {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param comp
-	 *
+	 * 
 	 * @return
 	 */
 	public long getCompSentPackets(String comp) {
@@ -401,10 +405,10 @@ public class StatisticsList implements Iterable<StatRecord> {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param comp
-	 *
+	 * 
 	 * @return
 	 */
 	public LinkedHashMap<String, StatRecord> getCompStats(String comp) {
@@ -413,12 +417,12 @@ public class StatisticsList implements Iterable<StatRecord> {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param comp
 	 * @param description
 	 * @param def
-	 *
+	 * 
 	 * @return
 	 */
 	public long getValue(String comp, String description, long def) {
@@ -438,12 +442,12 @@ public class StatisticsList implements Iterable<StatRecord> {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param comp
 	 * @param description
 	 * @param def
-	 *
+	 * 
 	 * @return
 	 */
 	public float getValue(String comp, String description, float def) {
@@ -463,12 +467,12 @@ public class StatisticsList implements Iterable<StatRecord> {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param comp
 	 * @param description
 	 * @param def
-	 *
+	 * 
 	 * @return
 	 */
 	public int getValue(String comp, String description, int def) {
@@ -488,12 +492,12 @@ public class StatisticsList implements Iterable<StatRecord> {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param comp
 	 * @param description
 	 * @param def
-	 *
+	 * 
 	 * @return
 	 */
 	public String getValue(String comp, String description, String def) {
@@ -511,12 +515,33 @@ public class StatisticsList implements Iterable<StatRecord> {
 		return result;
 	}
 
-	//~--- methods --------------------------------------------------------------
+	public Object getValue(String dataId) {
+		char dataType = DataTypes.decodeTypeIdFromName(dataId);
+		String dataName = DataTypes.stripNameFromTypeId(dataId);
+		int idx = dataName.indexOf('/');
+		String comp = dataName.substring(0, idx);
+		String descr = dataName.substring(idx + 1);
+		log.log(Level.FINER,
+				"Returning metrics for component: {0}, description: {1} and type: {2}",
+				new Object[] { comp, descr, dataType });
+		switch (dataType) {
+			case 'L':
+				return getValue(comp, descr, 0l);
+			case 'I':
+				return getValue(comp, descr, 0);
+			case 'F':
+				return getValue(comp, descr, 0f);
+			default:
+				return getValue(comp, descr, " ");
+		}
+	}
+
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -526,8 +551,8 @@ public class StatisticsList implements Iterable<StatRecord> {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -535,23 +560,23 @@ public class StatisticsList implements Iterable<StatRecord> {
 		return stats.toString();
 	}
 
-	//~--- inner classes --------------------------------------------------------
+	// ~--- inner classes --------------------------------------------------------
 
 	private class StatsIterator implements Iterator<StatRecord> {
 		Iterator<LinkedHashMap<String, StatRecord>> compsIt = stats.values().iterator();
 		Iterator<StatRecord> recIt = null;
 
-		//~--- get methods --------------------------------------------------------
+		// ~--- get methods --------------------------------------------------------
 
 		/**
 		 * Method description
-		 *
-		 *
+		 * 
+		 * 
 		 * @return
 		 */
 		@Override
 		public boolean hasNext() {
-			if ((recIt == null) ||!recIt.hasNext()) {
+			if ((recIt == null) || !recIt.hasNext()) {
 				if (compsIt.hasNext()) {
 					recIt = compsIt.next().values().iterator();
 				} else {
@@ -562,19 +587,19 @@ public class StatisticsList implements Iterable<StatRecord> {
 			return recIt.hasNext();
 		}
 
-		//~--- methods ------------------------------------------------------------
+		// ~--- methods ------------------------------------------------------------
 
 		/**
 		 * Method description
-		 *
-		 *
+		 * 
+		 * 
 		 * @return
-		 *
+		 * 
 		 * @throws NoSuchElementException
 		 */
 		@Override
 		public StatRecord next() throws NoSuchElementException {
-			if ((recIt == null) ||!recIt.hasNext()) {
+			if ((recIt == null) || !recIt.hasNext()) {
 				if (compsIt.hasNext()) {
 					recIt = compsIt.next().values().iterator();
 				} else {
@@ -587,7 +612,7 @@ public class StatisticsList implements Iterable<StatRecord> {
 
 		/**
 		 * Method description
-		 *
+		 * 
 		 */
 		@Override
 		public void remove() {
@@ -596,8 +621,6 @@ public class StatisticsList implements Iterable<StatRecord> {
 	}
 }
 
+// ~ Formatted in Sun Code Convention
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+// ~ Formatted by Jindent --- http://www.jindent.com

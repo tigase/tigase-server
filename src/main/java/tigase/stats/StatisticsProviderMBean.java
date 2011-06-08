@@ -24,6 +24,7 @@ package tigase.stats;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -159,7 +160,7 @@ public interface StatisticsProviderMBean {
 	 *
 	 * @return
 	 */
-	public List getComponentsNames();
+	public List<String> getComponentsNames();
 
 	/**
 	 * Method description
@@ -351,6 +352,15 @@ public interface StatisticsProviderMBean {
 	 * @return
 	 */
 	public long getUptime();
+	
+	public Map<String, LinkedList<Object>> getStatsHistory(String[] statsKeys);
+
+	/**
+	 * @param array
+	 * @return
+	 */
+	public Map<String, Object> getCurStats(String[] statsKeys);
+
 }
 
 

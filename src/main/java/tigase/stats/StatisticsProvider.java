@@ -26,6 +26,7 @@ package tigase.stats;
 
 import tigase.sys.TigaseRuntime;
 
+import tigase.util.AllHistoryCache;
 import tigase.util.FloatHistoryCache;
 import tigase.util.IntHistoryCache;
 
@@ -33,6 +34,7 @@ import tigase.util.IntHistoryCache;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
@@ -52,40 +54,42 @@ import javax.management.StandardMBean;
 
 /**
  * Class StatisticsProvider
- *
+ * 
  * @author kobit
  */
 public class StatisticsProvider extends StandardMBean implements StatisticsProviderMBean {
 	private static final Logger log = Logger.getLogger(StatisticsProvider.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
+	// ~--- fields ---------------------------------------------------------------
 
-	private StatisticsCache cache = new StatisticsCache();
+	private StatisticsCache cache = null;
 	private StatisticsCollector theRef;
 
-	//~--- constructors ---------------------------------------------------------
+	// ~--- constructors ---------------------------------------------------------
 
 	/**
 	 * Constructs ...
-	 *
-	 *
+	 * 
+	 * 
 	 * @param theRef
-	 *
+	 * 
 	 * @throws NotCompliantMBeanException
 	 */
-	public StatisticsProvider(StatisticsCollector theRef) throws NotCompliantMBeanException {
+	public StatisticsProvider(StatisticsCollector theRef, int historySize,
+			long updateInterval) throws NotCompliantMBeanException {
 
 		// WARNING Uncomment the following call to super() to make this class
 		// compile (see BUG ID 122377)
 		super(StatisticsProviderMBean.class, false);
 		this.theRef = theRef;
+		cache = new StatisticsCache(historySize, updateInterval);
 	}
 
-	//~--- get methods ----------------------------------------------------------
+	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Operation exposed for management
-	 *
+	 * 
 	 * @param level
 	 * @return java.util.Map<String, String>
 	 */
@@ -100,8 +104,8 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -111,19 +115,20 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
 	public float[] getCLPacketsPerSecHistory() {
-		return cache.clpacks_history.getCurrentHistory();
+		return cache.clpacks_history != null ? cache.clpacks_history.getCurrentHistory()
+				: null;
 	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -133,8 +138,8 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -144,19 +149,20 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
 	public float[] getCPUUsageHistory() {
-		return cache.cpu_usage_history.getCurrentHistory();
+		return cache.cpu_usage_history != null ? cache.cpu_usage_history.getCurrentHistory()
+				: null;
 	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -166,8 +172,8 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -179,8 +185,8 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -190,8 +196,8 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -201,8 +207,8 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -212,8 +218,8 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -225,8 +231,8 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -236,10 +242,10 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param comp
-	 *
+	 * 
 	 * @return
 	 */
 	public int getCompConnections(String comp) {
@@ -248,10 +254,10 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param comp
-	 *
+	 * 
 	 * @return
 	 */
 	public long getCompIqs(String comp) {
@@ -260,10 +266,10 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param comp
-	 *
+	 * 
 	 * @return
 	 */
 	public long getCompMessages(String comp) {
@@ -272,10 +278,10 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param comp
-	 *
+	 * 
 	 * @return
 	 */
 	public long getCompPackets(String comp) {
@@ -284,10 +290,10 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param comp
-	 *
+	 * 
 	 * @return
 	 */
 	public long getCompPresences(String comp) {
@@ -296,7 +302,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 
 	/**
 	 * Operation exposed for management
-	 *
+	 * 
 	 * @param compName
 	 * @param level
 	 * @return java.util.Map<String, String>
@@ -310,29 +316,29 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 		return getMapFromList(list);
 	}
 
-///**
-// * Get Attribute exposed for management
-// * @return java.util.Map<String, String>
-// */
-//@Override
-//public Map getAllStats() {
-//  return getAllStats(0);
-//}
+	// /**
+	// * Get Attribute exposed for management
+	// * @return java.util.Map<String, String>
+	// */
+	// @Override
+	// public Map getAllStats() {
+	// return getAllStats(0);
+	// }
 
 	/**
 	 * Get Attribute exposed for management
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
-	public List getComponentsNames() {
+	public List<String> getComponentsNames() {
 		return theRef.getComponentsNames();
 	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -344,19 +350,19 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
 	public int[] getConnectionsNumberHistory() {
-		return cache.conns_history.getCurrentHistory();
+		return cache.conns_history != null ? cache.conns_history.getCurrentHistory() : null;
 	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -366,19 +372,20 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
 	public float[] getHeapUsageHistory() {
-		return cache.heap_usage_history.getCurrentHistory();
+		return cache.heap_usage_history != null ? cache.heap_usage_history
+				.getCurrentHistory() : null;
 	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -390,8 +397,8 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -403,8 +410,8 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -414,22 +421,23 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
 	public MBeanInfo getMBeanInfo() {
 		MBeanInfo mbinfo = super.getMBeanInfo();
 
-		return new MBeanInfo(mbinfo.getClassName(), mbinfo.getDescription(), mbinfo.getAttributes(),
-				mbinfo.getConstructors(), mbinfo.getOperations(), getNotificationInfo());
+		return new MBeanInfo(mbinfo.getClassName(), mbinfo.getDescription(),
+				mbinfo.getAttributes(), mbinfo.getConstructors(), mbinfo.getOperations(),
+				getNotificationInfo());
 	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -441,8 +449,8 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -452,7 +460,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 
 	/**
 	 * Get Attribute exposed for management
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -462,8 +470,8 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -473,8 +481,8 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	public MBeanNotificationInfo[] getNotificationInfo() {
@@ -483,8 +491,8 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -496,8 +504,8 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -507,8 +515,8 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -518,8 +526,8 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -531,8 +539,8 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -544,8 +552,8 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	public long getRegistered() {
@@ -554,8 +562,8 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -565,8 +573,8 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -576,19 +584,20 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
 	public float[] getSMPacketsPerSecHistory() {
-		return cache.smpacks_history.getCurrentHistory();
+		return cache.smpacks_history != null ? cache.smpacks_history.getCurrentHistory()
+				: null;
 	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -598,8 +607,8 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -611,23 +620,24 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
 	public int[] getServerConnectionsHistory() {
-		return cache.server_conns_history.getCurrentHistory();
+		return cache.server_conns_history != null ? cache.server_conns_history
+				.getCurrentHistory() : null;
 	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param cmp_name
 	 * @param stat
 	 * @param def
-	 *
+	 * 
 	 * @return
 	 */
 	public long getStats(String cmp_name, String stat, long def) {
@@ -636,12 +646,12 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param cmp_name
 	 * @param stat
 	 * @param def
-	 *
+	 * 
 	 * @return
 	 */
 	public float getStats(String cmp_name, String stat, float def) {
@@ -650,12 +660,12 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param cmp_name
 	 * @param stat
 	 * @param def
-	 *
+	 * 
 	 * @return
 	 */
 	public String getStats(String cmp_name, String stat, String def) {
@@ -664,12 +674,12 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param cmp_name
 	 * @param stat
 	 * @param def
-	 *
+	 * 
 	 * @return
 	 */
 	public int getStats(String cmp_name, String stat, int def) {
@@ -678,8 +688,8 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -691,8 +701,8 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -701,9 +711,9 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	}
 
 	/**
-	 * Override customization hook:
-	 * You can supply a customized description for MBeanInfo.getDescription()
-	 *
+	 * Override customization hook: You can supply a customized description for
+	 * MBeanInfo.getDescription()
+	 * 
 	 * @param info
 	 * @return
 	 */
@@ -713,9 +723,9 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	}
 
 	/**
-	 * Override customization hook:
-	 * You can supply a customized description for MBeanAttributeInfo.getDescription()
-	 *
+	 * Override customization hook: You can supply a customized description for
+	 * MBeanAttributeInfo.getDescription()
+	 * 
 	 * @param info
 	 * @return
 	 */
@@ -730,7 +740,8 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 				description = "List of components names for which statistics are available";
 			} else {
 				if (info.getName().equals("Name")) {
-					description = "This is a component name - name of the statistics collector component,";
+					description =
+							"This is a component name - name of the statistics collector component,";
 				} else {
 					if (info.getName().equals("getUptime")) {
 						description = "Returns JVM uptime.";
@@ -747,34 +758,35 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	}
 
 	/**
-	 * Override customization hook:
-	 * You can supply a customized description for MBeanParameterInfo.getDescription()
-	 *
+	 * Override customization hook: You can supply a customized description for
+	 * MBeanParameterInfo.getDescription()
+	 * 
 	 * @param op
 	 * @param param
 	 * @param sequence
 	 * @return
 	 */
 	@Override
-	protected String getDescription(MBeanOperationInfo op, MBeanParameterInfo param, int sequence) {
+	protected String getDescription(MBeanOperationInfo op, MBeanParameterInfo param,
+			int sequence) {
 		if (op.getName().equals("getAllStats")) {
 			switch (sequence) {
-				case 0 :
+				case 0:
 					return "Statistics level, 0 - All, 500 - Medium, 800 - Minimal";
 
-				default :
+				default:
 					return null;
 			}
 		} else {
 			if (op.getName().equals("getComponentStats")) {
 				switch (sequence) {
-					case 0 :
+					case 0:
 						return "The component name to provide statistics for";
 
-					case 1 :
+					case 1:
 						return "Statistics level, 0 - All, 500 - Medium, 800 - Minimal";
 
-					default :
+					default:
 						return null;
 				}
 			}
@@ -784,9 +796,9 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	}
 
 	/**
-	 * Override customization hook:
-	 * You can supply a customized description for MBeanOperationInfo.getDescription()
-	 *
+	 * Override customization hook: You can supply a customized description for
+	 * MBeanOperationInfo.getDescription()
+	 * 
 	 * @param info
 	 * @return
 	 */
@@ -808,45 +820,48 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 			description = "Provides statistics for all components for a given level.";
 		}
 
-		methodSignature = new String[] { java.lang.String.class.getName(),
-				java.lang.Integer.TYPE.getName() };
+		methodSignature =
+				new String[] { java.lang.String.class.getName(), java.lang.Integer.TYPE.getName() };
 
-		if (info.getName().equals("getComponentStats") && Arrays.equals(signature, methodSignature)) {
-			description = "Provides statistics for a given component name and statistics level.";
+		if (info.getName().equals("getComponentStats")
+				&& Arrays.equals(signature, methodSignature)) {
+			description =
+					"Provides statistics for a given component name and statistics level.";
 		}
 
 		return description;
 	}
 
 	/**
-	 * Override customization hook:
-	 * You can supply a customized description for MBeanParameterInfo.getName()
-	 *
+	 * Override customization hook: You can supply a customized description for
+	 * MBeanParameterInfo.getName()
+	 * 
 	 * @param op
 	 * @param param
 	 * @param sequence
 	 * @return
 	 */
 	@Override
-	protected String getParameterName(MBeanOperationInfo op, MBeanParameterInfo param, int sequence) {
+	protected String getParameterName(MBeanOperationInfo op, MBeanParameterInfo param,
+			int sequence) {
 		if (op.getName().equals("getAllStats")) {
 			switch (sequence) {
-				case 0 :
+				case 0:
 					return "level";
 
-				default :
+				default:
 					return null;
 			}
 		} else {
 			if (op.getName().equals("getComponentStats")) {
 				switch (sequence) {
-					case 0 :
+					case 0:
 						return "compName";
 
-					case 1 :
+					case 1:
 						return "level";
 
-					default :
+					default:
 						return null;
 				}
 			}
@@ -876,20 +891,51 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 		}
 	}
 
-	//~--- inner classes --------------------------------------------------------
+	public Map<String, LinkedList<Object>> getStatsHistory(String[] statsKeys) {
+		log.log(Level.INFO, "Generating history for metrics: {0}", Arrays.toString(statsKeys));
+		Map<String, LinkedList<Object>> result = null;
+		if (cache.allHistory != null) {
+			result = new LinkedHashMap<String, LinkedList<Object>>();
+			for (StatisticsList stHist : cache.allHistory.getCurrentHistory()) {
+				for (String key : statsKeys) {
+					LinkedList<Object> statsForKey = result.get(key);
+					if (statsForKey == null) {
+						statsForKey = new LinkedList<Object>();
+						result.put(key, statsForKey);
+					}
+					statsForKey.add(stHist.getValue(key));
+				}
+			}
+		} else {
+			log.log(Level.INFO, "The server does not keep metrics history.");
+		}
+		// log.log(Level.INFO, "History generated: {0}", result);
+		return result;
+	}
+
+	public Map<String, Object> getCurStats(String[] statsKeys) {
+		Map<String, Object> result = new LinkedHashMap<String, Object>();
+		for (String key : statsKeys) {
+			result.put(key, cache.allStats.getValue(key));
+		}
+		return result;
+	}
+
+	// ~--- inner classes --------------------------------------------------------
 
 	private class StatisticsCache {
 		private static final String BOSH_COMP = "bosh";
 		private static final String C2S_COMP = "c2s";
 		private static final String S2S_COMP = "s2s";
 		private static final String CL_COMP = "cl-comp";
-		private static final int HISTORY_SIZE = 14400;
+		// private static final int HISTORY_SIZE = 8640;
+		private static final int HISTORY_SIZE = 30;
 		private static final long SECOND = 1000;
 		private static final String SM_COMP = "sess-man";
 		private static final long MINUTE = 60 * SECOND;
 		private static final long HOUR = 60 * MINUTE;
 
-		//~--- fields -------------------------------------------------------------
+		// ~--- fields -------------------------------------------------------------
 
 		private int clIOQueue = 0;
 		private int clQueue = 0;
@@ -941,19 +987,30 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 		private int smQueue = 0;
 		private String systemDetails = "";
 		private Timer updateTimer = null;
-		private FloatHistoryCache smpacks_history = new FloatHistoryCache(HISTORY_SIZE);
-		private IntHistoryCache server_conns_history = new IntHistoryCache(HISTORY_SIZE);
-		private FloatHistoryCache heap_usage_history = new FloatHistoryCache(HISTORY_SIZE);
-		private FloatHistoryCache cpu_usage_history = new FloatHistoryCache(HISTORY_SIZE);
-		private IntHistoryCache conns_history = new IntHistoryCache(HISTORY_SIZE);
-		private FloatHistoryCache clpacks_history = new FloatHistoryCache(HISTORY_SIZE);
+		private FloatHistoryCache smpacks_history = null;
+		private IntHistoryCache server_conns_history = null;
+		private FloatHistoryCache heap_usage_history = null;
+		private FloatHistoryCache cpu_usage_history = null;
+		private IntHistoryCache conns_history = null;
+		private FloatHistoryCache clpacks_history = null;
+		private AllHistoryCache allHistory = null;
 
 		// private long lastUpdate = 0;
 		private StatisticsList allStats = new StatisticsList(Level.FINER);
 
-		//~--- constructors -------------------------------------------------------
+		// ~--- constructors -------------------------------------------------------
 
-		private StatisticsCache() {
+		private StatisticsCache(int historySize, long cacheUpdate) {
+			if (historySize > 0) {
+				smpacks_history = new FloatHistoryCache(historySize);
+				server_conns_history = new IntHistoryCache(historySize);
+				heap_usage_history = new FloatHistoryCache(historySize);
+				cpu_usage_history = new FloatHistoryCache(historySize);
+				conns_history = new IntHistoryCache(historySize);
+				clpacks_history = new FloatHistoryCache(historySize);
+				allHistory = new AllHistoryCache(historySize);
+			}
+
 			updateTimer = new Timer("stats-cache", true);
 			updateTimer.scheduleAtFixedRate(new TimerTask() {
 				@Override
@@ -966,67 +1023,21 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 						log.log(Level.WARNING, "Problem retrieving statistics: ", e);
 					}
 				}
-			}, 10 * 1000, 1000);
-
-//    updateTimer.scheduleAtFixedRate(new TimerTask() {
-//      @Override
-//      public void run() {
-//        try {
-//          File f = new File("stats-dumps");
-//          if (!f.exists()) {
-//            f.mkdir();
-//          }
-//          SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HHmmss");
-//          File output_file = new File(f, sdf.format(new Date()));
-//          FileWriter fos = new FileWriter(output_file);
-//          float[] cpu_history = cpu_usage_history.getCurrentHistory();
-//          float[] heap_history = heap_usage_history.getCurrentHistory();
-//          float[] sm_history = smpacks_history.getCurrentHistory();
-//          float[] cl_history = clpacks_history.getCurrentHistory();
-//          int[] conns = conns_history.getCurrentHistory();
-//          for (int c : conns) {
-//            fos.write(","+c);
-//          }
-//          fos.write('\n');
-//          for (float fl : cpu_history) {
-//            fos.write(","+fl);
-//          }
-//          fos.write('\n');
-//          for (float fl : heap_history) {
-//            fos.write(","+fl);
-//          }
-//          fos.write('\n');
-//          for (float fl : sm_history) {
-//            fos.write(","+fl);
-//          }
-//          fos.write('\n');
-//          for (float fl : cl_history) {
-//            fos.write(","+fl);
-//          }
-//          fos.write('\n');
-//          fos.close();
-//        } catch (Exception e) {
-//          log.log(Level.WARNING, "Problem dumping statistics: ", e);
-//        }
-//      }
-//    }, HOUR, HOUR);
+			}, 10 * 1000, cacheUpdate * 1000);
 		}
 
-		//~--- methods ------------------------------------------------------------
-
-//  private synchronized void updateIfOlder(long time) {
-//    if (System.currentTimeMillis() - lastUpdate > time) {
-//      update();
-//      updateSystemDetails();
-//    }
-//  }
 		private void update() {
 			float temp = cpuUsage;
 
-			cpuUsage = (prevCpuUsage + (temp * 2) + TigaseRuntime.getTigaseRuntime().getCPUUsage()) / 4;
-			cpu_usage_history.addItem(cpuUsage);
+			cpuUsage =
+					(prevCpuUsage + (temp * 2) + TigaseRuntime.getTigaseRuntime().getCPUUsage()) / 4;
+			if (cpu_usage_history != null) {
+				cpu_usage_history.addItem(cpuUsage);
+			}
 			prevCpuUsage = temp;
-			heap_usage_history.addItem(getHeapMemUsage());
+			if (heap_usage_history != null) {
+				heap_usage_history.addItem(getHeapMemUsage());
+			}
 
 			if (++runs_counter >= 100) {
 				allStats = new StatisticsList(Level.FINEST);
@@ -1036,6 +1047,9 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 			}
 
 			theRef.getAllStats(allStats);
+			if (allHistory != null) {
+				allHistory.addItem(allStats);
+			}
 
 			long tmp_reg = allStats.getValue(SM_COMP, "Registered accounts", -1L);
 
@@ -1044,42 +1058,52 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 			}
 
 			// System.out.println(allStats.toString());
-			clusterCompressionRatio = (allStats.getValue(CL_COMP, "Average compression ratio", -1f)
-					+ allStats.getValue(CL_COMP, "Average decompression ratio", -1f)) / 2f;
+			clusterCompressionRatio =
+					(allStats.getValue(CL_COMP, "Average compression ratio", -1f) + allStats
+							.getValue(CL_COMP, "Average decompression ratio", -1f)) / 2f;
 			clusterPacketsReceived = allStats.getCompReceivedPackets(CL_COMP);
 			clusterPacketsSent = allStats.getCompSentPackets(CL_COMP);
 			clusterPackets = clusterPacketsSent + clusterPacketsReceived;
 			temp = clusterPacketsPerSec;
-			clusterPacketsPerSec = (prevClusterPacketsPerSec + (temp * 2f)
-					+ (clusterPackets - prevClusterPackets)) / 4f;
-			clpacks_history.addItem(clusterPacketsPerSec);
+			clusterPacketsPerSec =
+					(prevClusterPacketsPerSec + (temp * 2f) + (clusterPackets - prevClusterPackets)) / 4f;
+			if (clpacks_history != null) {
+				clpacks_history.addItem(clusterPacketsPerSec);
+			}
 			prevClusterPacketsPerSec = temp;
 			prevClusterPackets = clusterPackets;
 			smPackets = allStats.getCompPackets(SM_COMP);
 			temp = smPacketsPerSec;
-			smPacketsPerSec = (prevSmPacketsPerSec + (temp * 2f) + (smPackets - prevSmPackets)) / 4f;
-			smpacks_history.addItem(smPacketsPerSec);
+			smPacketsPerSec =
+					(prevSmPacketsPerSec + (temp * 2f) + (smPackets - prevSmPackets)) / 4f;
+			if (smpacks_history != null) {
+				smpacks_history.addItem(smPacketsPerSec);
+			}
 			prevSmPacketsPerSec = temp;
 			prevSmPackets = smPackets;
-			clientConnections = allStats.getCompConnections(C2S_COMP)
-					+ allStats.getCompConnections(BOSH_COMP);
-			conns_history.addItem(clientConnections);
+			clientConnections =
+					allStats.getCompConnections(C2S_COMP) + allStats.getCompConnections(BOSH_COMP);
+			if (conns_history != null) {
+				conns_history.addItem(clientConnections);
+			}
 			serverConnections = allStats.getCompConnections(S2S_COMP);
-			server_conns_history.addItem(serverConnections);
+			if (server_conns_history != null) {
+				server_conns_history.addItem(serverConnections);
+			}
 			clIOQueue = allStats.getValue(CL_COMP, "Waiting to send", 0);
 			clusterCache = allStats.getValue("cl-caching-strat", "Cached JIDs", 0);
 			messagesNumber = allStats.getCompMsg(SM_COMP);
 			temp = messagesPerSec;
-			messagesPerSec = (prevMessagesPerSec + (temp * 2f) + (messagesNumber - prevMessagesNumber))
-					/ 4f;
+			messagesPerSec =
+					(prevMessagesPerSec + (temp * 2f) + (messagesNumber - prevMessagesNumber)) / 4f;
 			prevMessagesPerSec = temp;
 			prevMessagesNumber = messagesNumber;
 			clusterNetworkBytesSent = allStats.getValue(CL_COMP, "Bytes sent", 0L);
 			clusterNetworkBytesReceived = allStats.getValue(CL_COMP, "Bytes received", 0L);
 			clusterNetworkBytes = clusterNetworkBytesSent + clusterNetworkBytesReceived;
 			temp = clusterNetworkBytesPerSecond;
-			clusterNetworkBytesPerSecond = (prevClusterNetworkBytesPerSecond + (temp * 2f)
-					+ (clusterNetworkBytes - prevClusterNetworkBytes)) / 4f;
+			clusterNetworkBytesPerSecond =
+					(prevClusterNetworkBytesPerSecond + (temp * 2f) + (clusterNetworkBytes - prevClusterNetworkBytes)) / 4f;
 			prevClusterNetworkBytesPerSecond = temp;
 			prevClusterNetworkBytes = clusterNetworkBytes;
 
@@ -1088,14 +1112,15 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 
 			presencesNumber = currPresencesReceived + currPresencesSent;
 			temp = presencesPerSec;
-			presencesPerSec = (prevPresencesPerSec + (temp * 2f)
-					+ (presencesNumber - prevPresencesNumber)) / 4f;
+			presencesPerSec =
+					(prevPresencesPerSec + (temp * 2f) + (presencesNumber - prevPresencesNumber)) / 4f;
 			prevPresencesPerSec = temp;
 			prevPresencesNumber = presencesNumber;
 
 			if (++cnt >= inter) {
 				presences_sent_per_update = (currPresencesSent - lastPresencesSent) / 10;
-				presences_received_per_update = (currPresencesReceived - lastPresencesReceived) / 10;
+				presences_received_per_update =
+						(currPresencesReceived - lastPresencesReceived) / 10;
 				lastPresencesSent = currPresencesSent;
 				lastPresencesReceived = currPresencesReceived;
 				cnt = 0;
@@ -1126,7 +1151,8 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 					}
 
 					if (rec.getIntValue() > 10000) {
-						largeQueues += rec.getComponent() + " - queue size: " + rec.getIntValue() + "\n";
+						largeQueues +=
+								rec.getComponent() + " - queue size: " + rec.getIntValue() + "\n";
 					}
 				}
 			}
@@ -1212,7 +1238,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 			sb.append("\nCluster packets: [S] ").append(clusterPacketsSent);
 			sb.append(" / [R] ").append(clusterPacketsReceived);
 
-			if ( !largeQueues.isEmpty()) {
+			if (!largeQueues.isEmpty()) {
 				sb.append("\n").append(largeQueues);
 			}
 
@@ -1220,9 +1246,3 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 		}
 	}
 }
-
-
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

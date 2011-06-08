@@ -83,11 +83,16 @@ public class StatisticsCollector extends
 	 *
 	 */
 	public static final String STATS_ARCHIVIZERS = "--stats-archiv";
+	public static final String STATS_HISTORY = "--stats-history";
 
 	/**
 	 *
 	 */
 	public static final String STATS_ARCHIVIZERS_PROP_KEY = "stats-archiv";
+	public static final String STATS_HISTORY_SIZE_PROP_KEY = "stats-history-size";
+	public static final int STATS_HISTORY_SIZE_PROP_VAL = 8640;
+	public static final String STATS_UPDATE_INTERVAL_PROP_KEY = "stats-update-interval";
+	public static final long STATS_UPDATE_INTERVAL_PROP_VAL = 10l;
 
 	/** Field description */
 	public static final String STATISTICS_MBEAN_NAME =
@@ -107,6 +112,8 @@ public class StatisticsCollector extends
 	private Level statsLevel = Level.INFO;
 	private Timer statsArchivTasks = new Timer("stats-archivizer-tasks", true);
 	private TimerTask initializationCompletedTask = null;
+	private int historySize = 0;
+	private long updateInterval = 10;
 
 	// ~--- methods --------------------------------------------------------------
 
@@ -167,6 +174,14 @@ public class StatisticsCollector extends
 		for (StatisticsContainer comp : components.values()) {
 			getComponentStats(comp.getName(), list);
 		}
+		int totalQueuesWait = 0;
+		long totalQueuesOverflow = 0;
+		for (StatisticsContainer comp : components.values()) {
+			totalQueuesWait += list.getValue(comp.getName(), "Total queues wait", 0);
+			totalQueuesOverflow += list.getValue(comp.getName(), "Total queues overflow", 0L);
+		}
+		list.add("total", "Total queues wait", totalQueuesWait, Level.INFO);
+		list.add("total", "Total queues overflow", totalQueuesOverflow, Level.INFO);
 	}
 
 	/**
@@ -212,6 +227,26 @@ public class StatisticsCollector extends
 
 			defs.put(STATS_ARCHIVIZERS_PROP_KEY, archivs);
 		}
+		int hSize = historySize;
+		long updateInt = updateInterval;
+		String stats_history = (String) params.get(STATS_HISTORY);
+		if (stats_history != null) {
+			String[] st_pars = stats_history.split(",");
+			try {
+				hSize = Integer.parseInt(st_pars[0]);
+			} catch (Exception ex) {
+				log.config("Invalid statistics history size settings: " + st_pars[0]);
+			}
+			if (st_pars.length > 1) {
+				try {
+					updateInt = Long.parseLong(st_pars[1]);
+				} catch (Exception ex) {
+					log.config("Invalid statistics update interval: " + st_pars[1]);
+				}
+			}
+		}
+		defs.put(STATS_HISTORY_SIZE_PROP_KEY, hSize);
+		defs.put(STATS_UPDATE_INTERVAL_PROP_KEY, updateInt);
 
 		return defs;
 	}
@@ -502,6 +537,13 @@ public class StatisticsCollector extends
 		if (archivs != null) {
 			initStatsArchivizers(archivs, props);
 		}
+		if (props.get(STATS_HISTORY_SIZE_PROP_KEY) != null) {
+			historySize = (Integer) props.get(STATS_HISTORY_SIZE_PROP_KEY);
+		}
+		if (props.get(STATS_UPDATE_INTERVAL_PROP_KEY) != null) {
+			updateInterval = (Long) props.get(STATS_UPDATE_INTERVAL_PROP_KEY);
+		}
+
 	}
 
 	// ~--- methods --------------------------------------------------------------
@@ -553,7 +595,7 @@ public class StatisticsCollector extends
 	public void initializationCompleted() {
 		super.initializationCompleted();
 		try {
-			sp = new StatisticsProvider(this);
+			sp = new StatisticsProvider(this, historySize, updateInterval);
 
 			String objName = STATISTICS_MBEAN_NAME;
 			ObjectName on = new ObjectName(objName);
@@ -571,7 +613,8 @@ public class StatisticsCollector extends
 		}
 	}
 
-	private void initStatsArchivizers(final String[] archivs, final Map<String, Object> props) {
+	private void initStatsArchivizers(final String[] archivs,
+			final Map<String, Object> props) {
 		for (String stat_arch_key : archivizers.keySet()) {
 			StatisticsArchivizerIfc stat_arch = archivizers.remove(stat_arch_key);
 
@@ -579,7 +622,7 @@ public class StatisticsCollector extends
 				stat_arch.release();
 			}
 		}
-		
+
 		initializationCompletedTask = new TimerTask() {
 			public void run() {
 				for (String arch_prop : archivs) {
@@ -618,7 +661,8 @@ public class StatisticsCollector extends
 						log.log(Level.CONFIG, "Loaded statistics archivizer: {0} for class: {1}",
 								new Object[] { arch_name, arch_class });
 					} catch (Exception e) {
-						log.log(Level.SEVERE, "Can't initialize statistics archivizer: " + arch_prop, e);
+						log.log(Level.SEVERE, "Can't initialize statistics archivizer: " + arch_prop,
+								e);
 					}
 				}
 			}

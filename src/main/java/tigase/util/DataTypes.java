@@ -230,6 +230,14 @@ public class DataTypes {
 		return result;
 	}
 
+	public static String stripNameFromTypeId(String name) {
+		if (name.endsWith("]")) {
+			return name.substring(0, name.length() - 3);
+		} else {
+			return name;
+		}
+	}
+
 	public static String encodeTypeIdInName(String name, Object value) {
 		char t = DataTypes.getTypeId(value);
 		return name + "[" + t + "]";
