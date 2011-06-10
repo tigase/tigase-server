@@ -631,29 +631,33 @@ public class SessionManagerClustered extends SessionManager implements
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
 
-		String strategy_class = (String) props.get(STRATEGY_CLASS_PROP_KEY);
+		if (props.get(STRATEGY_CLASS_PROP_KEY) != null) {
+			String strategy_class = (String) props.get(STRATEGY_CLASS_PROP_KEY);
 
-		try {
-			ClusteringStrategyIfc strategy_tmp =
-					(ClusteringStrategyIfc) Class.forName(strategy_class).newInstance();
+			try {
+				ClusteringStrategyIfc strategy_tmp =
+						(ClusteringStrategyIfc) Class.forName(strategy_class).newInstance();
 
-			strategy_tmp.setProperties(props);
+				strategy_tmp.setProperties(props);
 
-			// strategy_tmp.init(getName());
-			strategy = strategy_tmp;
-			strategy.setSessionManagerHandler(this);
-			log.log(Level.CONFIG, "Loaded SM strategy: " + strategy_class);
-			// strategy.nodeConnected(getComponentId());
-			addTrusted(getComponentId());
-		} catch (Exception e) {
-			log.log(Level.SEVERE, "Can not clustering strategy instance for class: "
-					+ strategy_class, e);
+				// strategy_tmp.init(getName());
+				strategy = strategy_tmp;
+				strategy.setSessionManagerHandler(this);
+				log.log(Level.CONFIG, "Loaded SM strategy: " + strategy_class);
+				// strategy.nodeConnected(getComponentId());
+				addTrusted(getComponentId());
+			} catch (Exception e) {
+				log.log(Level.SEVERE, "Can not clustering strategy instance for class: "
+						+ strategy_class, e);
+			}
 		}
 
 		try {
-			my_hostname = JID.jidInstance((String) props.get(MY_DOMAIN_NAME_PROP_KEY));
-			my_address =
-					JID.jidInstance(getName(), (String) props.get(MY_DOMAIN_NAME_PROP_KEY), null);
+			if (props.get(MY_DOMAIN_NAME_PROP_KEY) != null) {
+				my_hostname = JID.jidInstance((String) props.get(MY_DOMAIN_NAME_PROP_KEY));
+				my_address =
+						JID.jidInstance(getName(), (String) props.get(MY_DOMAIN_NAME_PROP_KEY), null);
+			}
 		} catch (TigaseStringprepException ex) {
 			log.log(Level.WARNING,
 					"Creating component source address failed stringprep processing: {0}@{1}",
