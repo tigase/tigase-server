@@ -137,13 +137,13 @@ public class PacketCounter implements PacketFilterIfc {
 		list.add(name, qType.name() + " messages", msgCounter, Level.FINER);
 		list.add(name, qType.name() + " presences", presCounter, Level.FINER);
 		list.add(name, qType.name() + " cluster", clusterCounter, Level.FINER);
-		list.add(name, qType.name() + " IQ no XMLNS", iqCounters[0], Level.FINEST);
+		list.add(name, qType.name() + " IQ no XMLNS", iqCounters[0], Level.FINER);
 
 		long iqs = iqCounters[0];
 
 		for (Entry<String, Integer> iqCounter : iqCounterIdx.entrySet()) {
 			list.add(name, qType.name() + " IQ " + iqCounter.getKey(), iqCounters[iqCounter.getValue()],
-					Level.FINEST);
+					Level.FINER);
 			iqs += iqCounters[iqCounter.getValue()];
 		}
 
