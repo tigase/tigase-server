@@ -268,8 +268,8 @@ public class JavaJMXProxyOpt implements NotificationListener {
 							cause = cause.getCause();
 						}
 
-						log.log(Level.WARNING, "{0}, retrying in {1} seconds.",
-								new Object[] { cause.getMessage(), interval / 1000 });
+						log.log(Level.WARNING, "{0}, {1}, retrying in {2} seconds.",
+								new Object[] { cause.getMessage(), hostname, interval / 1000 });
 						log.log(Level.FINEST, e.getMessage(), e);
 					} catch (Exception e) {
 						log.log(Level.WARNING, "Problem retrieving statistics: ", e);
