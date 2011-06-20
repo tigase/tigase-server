@@ -36,6 +36,10 @@ public interface SeeOtherHostIfc {
 
     public static final String CM_SEE_OTHER_HOST_CLASS_PROP_DEF_VAL = "tigase.server.xmppclient.SeeOtherHost";
 
+    // default properties
+    public static final String CM_SEE_OTHER_HOST_DEFAULT_HOST = CM_SEE_OTHER_HOST_CLASS_PROP_KEY + "/" + "defaul-host";
+    public static final String CM_SEE_OTHER_HOST_DEFAULT_PORT = CM_SEE_OTHER_HOST_CLASS_PROP_KEY + "/" + "defaul-port";
+
     //~--- methods -------------------------------------------------------------
     /**
      * Finds an appropriate host for a given JID

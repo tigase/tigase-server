@@ -423,7 +423,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 			return;
 		}
 
-		String see_other_host_class = (String)props.get(SeeOtherHostIfc.CM_SEE_OTHER_HOST_CLASS_PROPERTY);
+		String see_other_host_class = (String)props.get(SeeOtherHostIfc.CM_SEE_OTHER_HOST_CLASS_PROP_KEY);
 
 		if (see_other_host_class != null) {
 		    try {
@@ -542,7 +542,6 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 		if (from != null) {
 		    try {
 			fromJID = BareJID.bareJIDInstance(from);
-			System.out.println(fromJID);
 		    } catch (TigaseStringprepException ex) {
 			log.log(Level.CONFIG, "From JID violates RFC6122 (XMPP:Address Format): ", ex);
 
