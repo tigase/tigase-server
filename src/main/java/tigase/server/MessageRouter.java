@@ -347,7 +347,9 @@ public class MessageRouter extends AbstractMessageReceiver implements MessageRou
 		// 2008-06-16
 		if (((packet.getType() == StanzaType.error) && (packet.getFrom() != null) && packet
 				.getFrom().equals(packet.getTo()))) {
-			log.warning("Possible infinite loop, dropping packet: " + packet.toStringSecure());
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Possible infinite loop, dropping packet: " + packet.toStringSecure());
+			}
 
 			return;
 		}
@@ -632,7 +634,8 @@ public class MessageRouter extends AbstractMessageReceiver implements MessageRou
 		try {
 			super.setProperties(props);
 			if (props.size() == 1) {
-				// If props.size() == 1, it means this is a single property update and MR does
+				// If props.size() == 1, it means this is a single property update and
+				// MR does
 				// not support it yet.
 				return;
 			}
