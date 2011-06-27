@@ -70,7 +70,7 @@ public class S2SConnectionClustered extends S2SConnectionManager implements
 			.getName());
 
 	private static final String CHECK_DB_KEY_CMD = "check-db-key-s2s-cmd";
-	private static final String CHECK_DB_KEY_RESULT_CMD = "check-db-key-s2s-cmd";
+	private static final String CHECK_DB_KEY_RESULT_CMD = "check-db-key-result-s2s-cmd";
 
 	private static final String CONN_CID = "connection-cid";
 	private static final String KEY_CID = "key-cid";
@@ -123,11 +123,12 @@ public class S2SConnectionClustered extends S2SConnectionManager implements
 			params.put(ASKING_SESSION_ID, asking_sessionId);
 
 			clusterController.sendToNodes(CHECK_DB_KEY_CMD, params, getComponentId(), toNode);
-			// If null is returned then the underlying API waits for the key to be delivered
+			// If null is returned then the underlying API waits for the key to be
+			// delivered
 			// at later time
 			return null;
 		} else {
-			// If there is no cluster node available to ask for the db key then we 
+			// If there is no cluster node available to ask for the db key then we
 			// just return something here to generate invalid key result.
 			return "invalid-key";
 		}
@@ -210,8 +211,18 @@ public class S2SConnectionClustered extends S2SConnectionManager implements
 			String asking_sessionId = data.get(ASKING_SESSION_ID);
 			if (fromNode.equals(getComponentId())) {
 				// If the request came back to the first sending node then no one had a
-				// valid
-				// key for this connection, therefore we are sending invalid back
+				// valid key for this connection, therefore we are sending invalid back
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(
+							Level.FINEST,
+							"the request came back to the first sending node then no one had a "
+									+ "valid key for this connection, therefore we are sending invalid back. "
+									+ "fromNode: {0}, compId: {1}, connCid: {2}, keyCid: {3}, "
+									+ "forkey_sessionId: {4}, asking_sessionId: {5}", new Object[] {
+									fromNode, getComponentId(), connCid, keyCid, forkey_sessionId,
+									asking_sessionId });
+				}
+
 				sendVerifyResult(DB_VERIFY_EL_NAME, connCid, keyCid, false, forkey_sessionId,
 						asking_sessionId, null, false);
 				return;
@@ -220,11 +231,18 @@ public class S2SConnectionClustered extends S2SConnectionManager implements
 			String local_key =
 					S2SConnectionClustered.super.getLocalDBKey(connCid, keyCid, key,
 							forkey_sessionId, asking_sessionId);
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "LocalDBKey: {0}", local_key);
+			}
+
 			boolean valid = false;
 
 			if (local_key == null) {
 				// Forward the request to the next node
 				JID nextNode = getNextNode(fromNode, visitedNodes);
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "No local db key, sending to next node: {0}", nextNode);
+				}
 				clusterController.sendToNodes(CHECK_DB_KEY_CMD, data, fromNode, visitedNodes,
 						nextNode);
 				return;
