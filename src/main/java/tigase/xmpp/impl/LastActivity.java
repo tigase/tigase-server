@@ -141,7 +141,7 @@ public class LastActivity extends XMPPProcessorAbstract implements XMPPStopListe
 	}
 
 	/*
-	 * User docelowy jest pod¸ˆczony
+	 * User docelowy jest podÅ‚Ä…czony
 	 */
 	@Override
 	public void processToUserPacket(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
