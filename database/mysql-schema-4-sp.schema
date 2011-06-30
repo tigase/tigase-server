@@ -79,9 +79,6 @@ drop procedure if exists TigGetUserUIDProc;
 drop function if exists TigGetUserUID;
 -- QUERY END:
 -- QUERY START:
-drop function if exists TigSHA1;
--- QUERY END:
--- QUERY START:
 drop function if exists TigGetDBProperty;
 -- QUERY END:
 
@@ -97,19 +94,6 @@ begin
 	select uid into _result from tig_users where sha1_user_id = sha1(lower(_user_id));
 
 	return (_result);
-end //
--- QUERY END:
-
--- QUERY START:
--- Get user uid function to make it easier to use it in SQL queries.
-create function TigSHA1(_user_id varchar(2049) CHARSET utf8) returns char(128)
-READS SQL DATA
-begin
-	declare _result char(128);
-
-	select sha1(lower(_user_id)) into _result ;
-
-	return _result;
 end //
 -- QUERY END:
 
