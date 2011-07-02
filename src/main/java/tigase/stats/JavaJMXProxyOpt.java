@@ -169,8 +169,10 @@ public class JavaJMXProxyOpt implements NotificationListener {
 				if (loadHistory) {
 					String[] metrics_arr = metrics.toArray(new String[metrics.size()]);
 					history = tigBean.getStatsHistory(metrics_arr);
-					System.out.println(hostname + " loaded history, size: "
-							+ (history != null ? history.get(metrics_arr[0]).size() : "null"));
+					System.out.println(hostname
+							+ " loaded history, size: "
+							+ (history != null && history.get(metrics_arr[0]) != null ? history.get(
+									metrics_arr[0]).size() : "null"));
 				} else {
 					System.out.println(hostname + " loading history switched off.");
 				}
@@ -234,9 +236,11 @@ public class JavaJMXProxyOpt implements NotificationListener {
 					tigBean.getCurStats(metrics.toArray(new String[metrics.size()]));
 			for (Map.Entry<String, Object> e : curMetrics.entrySet()) {
 				LinkedList<Object> list = history.get(e.getKey());
-				list.add(e.getValue());
-				if (list.size() > 1) {
-					list.removeFirst();
+				if (list != null) {
+					list.add(e.getValue());
+					if (list.size() > 1) {
+						list.removeFirst();
+					}
 				}
 			}
 			sysDetails = tigBean.getSystemDetails();
@@ -268,9 +272,9 @@ public class JavaJMXProxyOpt implements NotificationListener {
 							cause = cause.getCause();
 						}
 
-						log.log(Level.WARNING, "{0}, {1}, retrying in {2} seconds.",
-								new Object[] { cause.getMessage(), hostname, interval / 1000 });
-						log.log(Level.FINEST, e.getMessage(), e);
+						log.log(Level.WARNING, "{0}, {1}, retrying in {2} seconds.", new Object[] {
+								cause.getMessage(), hostname, interval / 1000 });
+						//log.log(Level.FINEST, e.getMessage(), e);
 					} catch (Exception e) {
 						log.log(Level.WARNING, "Problem retrieving statistics: ", e);
 					}
@@ -301,7 +305,7 @@ public class JavaJMXProxyOpt implements NotificationListener {
 		}
 		return null;
 	}
-	
+
 	public String getHostname() {
 		return hostname;
 	}
@@ -311,7 +315,11 @@ public class JavaJMXProxyOpt implements NotificationListener {
 	 * @return
 	 */
 	public Object getMetricData(String key) {
-		return history.get(key).getLast();
+		LinkedList<Object> h = history.get(key);
+		if (h != null) {
+			return h.getLast();
+		}
+		return null;
 	}
 
 	/**
