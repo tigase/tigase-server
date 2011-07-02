@@ -798,9 +798,8 @@ public class SessionManagerClustered extends SessionManager implements
 						new Object[] { fromNode, visitedNodes, data, packets });
 			}
 			// Send back all online users on this node
-			Collection<XMPPResourceConnection> conns = connectionsByFrom.values();
 			LinkedList<Element> usrConns = new LinkedList<Element>();
-			for (XMPPResourceConnection conn : conns) {
+			for (XMPPResourceConnection conn : connectionsByFrom.values()) {
 				try {
 					if (conn.isResourceSet()) {
 						ConnectionRecord cr =
@@ -808,6 +807,11 @@ public class SessionManagerClustered extends SessionManager implements
 										conn.getSessionId(), conn.getConnectionId());
 						cr.setLastPresence(conn.getPresence());
 						usrConns.add(cr.toElement());
+						if (usrConns.size() > SYNC_MAX_BATCH_SIZE) {
+							clusterController.sendToNodes(RESPOND_SYNCONLINE_CMD, usrConns, getComponentId(),
+									null, fromNode);
+							usrConns = new LinkedList<Element>();
+						}
 					}
 				} catch (NotAuthorizedException ex) {
 					// Ignore, only authenticated connections are synchronized
