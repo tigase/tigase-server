@@ -605,7 +605,7 @@ public class RosterFlat extends RosterAbstract {
 			relem = addTempBuddy(buddy, session);
 		}
 
-		relem.setOnline(online);
+		relem.setOnline(buddy.getResource(), online);
 	}
 
 	/**

@@ -37,7 +37,9 @@ import static tigase.xmpp.impl.roster.RosterAbstract.SubscriptionType;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -45,15 +47,16 @@ import java.util.logging.Logger;
 
 /**
  * Describe class RosterElement here.
- *
- *
+ * 
+ * 
  * Created: Wed Oct 29 14:21:16 2008
- *
+ * 
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class RosterElement {
-	private static final Logger log = Logger.getLogger("tigase.xmpp.impl.roster.RosterElement");
+	private static final Logger log = Logger
+			.getLogger("tigase.xmpp.impl.roster.RosterElement");
 	private static final String ELEM_NAME = "contact";
 	private static final String JID_ATT = "jid";
 	private static final String NAME_ATT = "name";
@@ -62,7 +65,7 @@ public class RosterElement {
 	private static final String OTHER_ATT = "other";
 	private static final String STRINGPREP_ATT = "preped";
 
-	//~--- fields ---------------------------------------------------------------
+	// ~--- fields ---------------------------------------------------------------
 
 	private String[] groups = null;
 	private JID jid = null;
@@ -72,18 +75,19 @@ public class RosterElement {
 	private String stringpreped = null;
 	private SubscriptionType subscription = null;
 	private boolean presence_sent = false;
+	private Map<String, Boolean> onlineMap = new HashMap<String, Boolean>();
 
 	// private Element item = null;
-	private boolean online = false;
+	//private boolean online = false;
 	private boolean modified = false;
 	private boolean persistent = true;
 
-	//~--- constructors ---------------------------------------------------------
+	// ~--- constructors ---------------------------------------------------------
 
 	/**
 	 * Creates a new <code>RosterElement</code> instance.
-	 *
-	 *
+	 * 
+	 * 
 	 * @param roster_el
 	 * @param session
 	 * @throws TigaseStringprepException
@@ -105,13 +109,13 @@ public class RosterElement {
 
 			String grps = roster_el.getAttribute(GRP_ATT);
 
-			if ((grps != null) &&!grps.trim().isEmpty()) {
+			if ((grps != null) && !grps.trim().isEmpty()) {
 				groups = grps.split(",");
 			}
 
 			String other_data = roster_el.getAttribute(OTHER_ATT);
 
-			if ((other_data != null) &&!other_data.trim().isEmpty()) {
+			if ((other_data != null) && !other_data.trim().isEmpty()) {
 				otherData = other_data;
 			}
 		} else {
@@ -121,14 +125,15 @@ public class RosterElement {
 
 	/**
 	 * Constructs ...
-	 *
-	 *
+	 * 
+	 * 
 	 * @param jid
 	 * @param name
 	 * @param groups
 	 * @param session
 	 */
-	public RosterElement(JID jid, String name, String[] groups, XMPPResourceConnection session) {
+	public RosterElement(JID jid, String name, String[] groups,
+			XMPPResourceConnection session) {
 		this.stringpreped = XMPPStringPrepFactory.STRINGPREP_PROCESSOR;
 		this.session = session;
 		setJid(jid);
@@ -137,12 +142,12 @@ public class RosterElement {
 		this.subscription = SubscriptionType.none;
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param groups
 	 */
 	public void addGroups(String[] groups) {
@@ -169,12 +174,12 @@ public class RosterElement {
 		// item = null;
 	}
 
-	//~--- get methods ----------------------------------------------------------
+	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	public String[] getGroups() {
@@ -183,8 +188,8 @@ public class RosterElement {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	public JID getJid() {
@@ -193,8 +198,8 @@ public class RosterElement {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	public String getName() {
@@ -203,8 +208,8 @@ public class RosterElement {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	public String getOtherData() {
@@ -213,14 +218,15 @@ public class RosterElement {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	public Element getRosterElement() {
-		Element elem = new Element(ELEM_NAME, new String[] { JID_ATT, SUBS_ATT, NAME_ATT,
-				STRINGPREP_ATT }, new String[] { jid.toString(), subscription.toString(), name,
-				"" + stringpreped });
+		Element elem =
+				new Element(ELEM_NAME,
+						new String[] { JID_ATT, SUBS_ATT, NAME_ATT, STRINGPREP_ATT }, new String[] {
+								jid.toString(), subscription.toString(), name, "" + stringpreped });
 
 		if ((groups != null) && (groups.length > 0)) {
 			String grps = "";
@@ -244,8 +250,8 @@ public class RosterElement {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	public Element getRosterItem() {
@@ -269,21 +275,21 @@ public class RosterElement {
 
 				group.setCData(XMLUtils.escape(gr));
 				item.addChild(group);
-			}    // end of for ()
-		}      // end of if-else
+			} // end of for ()
+		} // end of if-else
 
 		// }
 		return item;
 	}
-	
+
 	public String toString() {
 		return getRosterItem().toString();
 	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	public SubscriptionType getSubscription() {
@@ -292,8 +298,8 @@ public class RosterElement {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	public boolean isModified() {
@@ -302,30 +308,30 @@ public class RosterElement {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	public boolean isOnline() {
-		return online;
+		return onlineMap.size() > 0;
 	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	public boolean isPresence_sent() {
 		return presence_sent;
 	}
 
-	//~--- set methods ----------------------------------------------------------
+	// ~--- set methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param groups
 	 */
 	public void setGroups(String[] groups) {
@@ -337,8 +343,8 @@ public class RosterElement {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param name
 	 */
 	public void setName(String name) {
@@ -357,18 +363,24 @@ public class RosterElement {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param online
 	 */
-	public void setOnline(boolean online) {
-		this.online = online;
+	public void setOnline(String resource, boolean online) {
+		if (onlineMap != null) {
+			if (online) {
+				onlineMap.put(resource, Boolean.TRUE);
+			} else {
+				onlineMap.remove(resource);
+			}
+		}
 	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param other_data
 	 */
 	public void setOtherData(String other_data) {
@@ -377,8 +389,8 @@ public class RosterElement {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param presence_sent
 	 */
 	public void setPresence_sent(boolean presence_sent) {
@@ -387,8 +399,8 @@ public class RosterElement {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param subscription
 	 */
 	public void setSubscription(SubscriptionType subscription) {
@@ -425,14 +437,12 @@ public class RosterElement {
 	public boolean isPersistent() {
 		return persistent;
 	}
-	
+
 	public void setPersistent(boolean persistent) {
 		this.persistent = persistent;
 	}
 }
 
+// ~ Formatted in Sun Code Convention
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+// ~ Formatted by Jindent --- http://www.jindent.com
