@@ -237,7 +237,8 @@ public class RosterFlat extends RosterAbstract {
 	@Override
 	public boolean containsBuddy(XMPPResourceConnection session, JID buddy)
 			throws NotAuthorizedException, TigaseDBException {
-		return getRosterElement(session, buddy) != null;
+		RosterElement relem = getRosterElement(session, buddy);
+		return relem != null && relem.isPersistent();
 	}
 
 	// ~--- get methods ----------------------------------------------------------
@@ -419,21 +420,19 @@ public class RosterFlat extends RosterAbstract {
 	 * @throws TigaseDBException
 	 */
 	@Override
-	// public List<Element> getRosterItems(XMPPResourceConnection session, boolean
-	// onlineOnly)
-	// throws NotAuthorizedException, TigaseDBException {
-			public
-			List<Element> getRosterItems(XMPPResourceConnection session)
-					throws NotAuthorizedException, TigaseDBException {
+	public List<Element> getRosterItems(XMPPResourceConnection session)
+			throws NotAuthorizedException, TigaseDBException {
 		LinkedList<Element> items = new LinkedList<Element>();
 		Map<BareJID, RosterElement> roster = getUserRoster(session);
 
 		for (RosterElement relem : roster.values()) {
 
-			// if (relem.isOnline() || !onlineOnly) {
-			items.add(getBuddyItem(relem));
+			// Skip temporary roster elements added only for online presence tracking
+			// from dynamic roster
+			if (relem.isPersistent()) {
+				items.add(getBuddyItem(relem));
+			}
 
-			// }
 		}
 
 		return items;
