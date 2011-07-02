@@ -51,9 +51,12 @@ import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.XMPPSession;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -762,37 +765,20 @@ public class SessionManagerClustered extends SessionManager implements
 		 */
 		@Override
 		public void executeCommand(JID fromNode, Set<JID> visitedNodes,
-				Map<String, String> data, Queue<Element> packets) throws ClusterCommandException {
+				Map<String, String> data, Queue<Element> elements) throws ClusterCommandException {
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST,
 						"Called fromNode: {0}, visitedNodes: {1}, data: {2}, packets: {3}",
-						new Object[] { fromNode, visitedNodes, data, packets });
+						new Object[] { fromNode, visitedNodes, data, elements });
 			}
-			// TODO: Implement nodes synchronization
-			// // Notify clustering strategy about SYNC_ONLINE response
-			// String jids = clel.getMethodResultVal(SYNC_ONLINE_JIDS);
-			//
-			// if (jids != null) {
-			// String[] jidsa = jids.split(",");
-			// JID[] jid_j = new JID[jidsa.length];
-			// int idx = 0;
-			//
-			// for (String jid : jidsa) {
-			// jid_j[idx++] = JID.jidInstanceNS(jid);
-			// }
-			//
-			// try {
-			// strategy.usersConnected(packet.getStanzaFrom(), results, jid_j);
-			// } catch (Exception e) {
-			// log.log(Level.WARNING,
-			// "Problem synchronizing cluster nodes for packet: "
-			// + packet, e);
-			// }
-			// } else {
-			// log.warning("Sync online packet with empty jids list! Please check this out: "
-			// + packet.toString());
-			// }
-
+			Queue<Packet> results = new ArrayDeque<Packet>();
+			ArrayList<ConnectionRecord> usrConns =
+					new ArrayList<ConnectionRecord>(elements.size());
+			for (Element elem : elements) {
+				usrConns.add(new ConnectionRecord(elem));
+			}
+			strategy.usersConnected(results,
+					usrConns.toArray(new ConnectionRecord[usrConns.size()]));
 		}
 	}
 
@@ -811,63 +797,29 @@ public class SessionManagerClustered extends SessionManager implements
 						"Called fromNode: {0}, visitedNodes: {1}, data: {2}, packets: {3}",
 						new Object[] { fromNode, visitedNodes, data, packets });
 			}
-			// TODO: Implement nodes synchronization
+			// Send back all online users on this node
+			Collection<XMPPResourceConnection> conns = connectionsByFrom.values();
+			LinkedList<Element> usrConns = new LinkedList<Element>();
+			for (XMPPResourceConnection conn : conns) {
+				try {
+					if (conn.isResourceSet()) {
+						ConnectionRecord cr =
+								new ConnectionRecord(getComponentId(), conn.getJID(),
+										conn.getSessionId(), conn.getConnectionId());
+						cr.setLastPresence(conn.getPresence());
+						usrConns.add(cr.toElement());
+					}
+				} catch (NotAuthorizedException ex) {
+					// Ignore, only authenticated connections are synchronized
+				} catch (NoConnectionIdException ex) {
+					// Ignore, only connections with valid connection ID are synchronized
+				}
+			}
+			if (usrConns.size() > 0) {
+				clusterController.sendToNodes(RESPOND_SYNCONLINE_CMD, usrConns, getComponentId(),
+						null, fromNode);
+			}
 
-			// // Send back all online users on this node
-			// Collection<XMPPResourceConnection> conns = connectionsByFrom.values();
-			// int counter = 0;
-			// StringBuilder sb = new StringBuilder(40000);
-			//
-			// for (XMPPResourceConnection conn : conns) {
-			// String jid = null;
-			//
-			// // Exception would be thrown for all not-authenticated yet
-			// // connection
-			// // We don't have to worry about them, just ignore all of them
-			// // They should be synchronized later on using standard cluster
-			// // notifications.
-			// try {
-			// jid = conn.getJID() + "#" + conn.getConnectionId();
-			// } catch (Exception e) {
-			// jid = null;
-			// }
-			//
-			// if (jid != null) {
-			// if (sb.length() == 0) {
-			// sb.append(jid);
-			// } else {
-			// sb.append(',').append(jid);
-			// }
-			//
-			// if (++counter > SYNC_MAX_BATCH_SIZE) {
-			//
-			// // Send a new batch...
-			// ClusterElement resp =
-			// clel.createMethodResponse(getComponentId().toString(),
-			// StanzaType.result, null);
-			//
-			// resp.addMethodResult(SYNC_ONLINE_JIDS, sb.toString());
-			// fastAddOutPacket(Packet.packetInstance(resp.getClusterElement()));
-			// counter = 0;
-			//
-			// // Not sure which is better, create a new StringBuilder
-			// // instance
-			// // or clearing existing up...., let's clear it up for now.
-			// sb.delete(0, sb.length());
-			// }
-			// }
-			// }
-			//
-			// if (sb.length() > 0) {
-			//
-			// // Send a new batch...
-			// ClusterElement resp =
-			// clel.createMethodResponse(getComponentId().toString(),
-			// StanzaType.result, null);
-			//
-			// resp.addMethodResult(SYNC_ONLINE_JIDS, sb.toString());
-			// fastAddOutPacket(Packet.packetInstance(resp.getClusterElement()));
-			// }
 		}
 
 	}
