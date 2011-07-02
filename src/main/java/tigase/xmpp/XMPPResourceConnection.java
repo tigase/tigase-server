@@ -90,7 +90,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	private String resource = null;
 
 	/**
-	 * Session temporary data. All data stored in this <code>Map</code> disapear
+	 * Session temporary data. All data stored in this <code>Map</code> disappear
 	 * when session finishes.
 	 */
 	private Map<String, Object> sessionData = null;
