@@ -45,48 +45,51 @@ import java.util.Collections;
 
 /**
  * Describe class ClientConnectionClustered here.
- *
- *
+ * 
+ * 
  * Created: Sat Jun 21 22:23:18 2008
- *
+ * 
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class ClientConnectionClustered extends ClientConnectionManager
-		implements ClusteredComponentIfc {
+public class ClientConnectionClustered extends ClientConnectionManager implements
+		ClusteredComponentIfc {
 
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
-	private static final Logger log = Logger.getLogger(ClientConnectionClustered.class.getName());
+	private static final Logger log = Logger.getLogger(ClientConnectionClustered.class
+			.getName());
 
 	private SeeOtherHostIfc see_other_host_strategy = null;
 
-	final ArrayList<BareJID> connectedNodes = new ArrayList<BareJID>() {{
-	    add( getDefHostName() );
-	}} ;
+	final ArrayList<BareJID> connectedNodes = new ArrayList<BareJID>() {
+		{
+			add(getDefHostName());
+		}
+	};
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param node
 	 */
 	@Override
 	public void nodeConnected(String node) {
-	    BareJID nodeJID = BareJID.bareJIDInstanceNS(null, node);
+		BareJID nodeJID = BareJID.bareJIDInstanceNS(null, node);
 
-	    if (!connectedNodes.contains(nodeJID)) {
-		connectedNodes.add(nodeJID);
+		if (!connectedNodes.contains(nodeJID)) {
+			connectedNodes.add(nodeJID);
 
-		Collections.sort(connectedNodes);
-	    }
+			Collections.sort(connectedNodes);
+		}
 	}
 
 	/**
-	 *
+	 * 
 	 * @param node
 	 */
 	@Override
@@ -97,8 +100,8 @@ public class ClientConnectionClustered extends ClientConnectionManager
 
 		BareJID nodeJID = BareJID.bareJIDInstanceNS(null, node);
 
-		if ( connectedNodes.contains(nodeJID) ) {
-		    connectedNodes.remove( nodeJID );
+		if (connectedNodes.contains(nodeJID)) {
+			connectedNodes.remove(nodeJID);
 		}
 
 		final String hostname = node;
@@ -123,38 +126,40 @@ public class ClientConnectionClustered extends ClientConnectionManager
 		});
 	}
 
-    @Override
-    public SeeOtherHostIfc getSeeOtherHostInstance(String see_other_host_class) {
+	@Override
+	public SeeOtherHostIfc getSeeOtherHostInstance(String see_other_host_class) {
 
-	if (see_other_host_strategy == null) {
-	    if (see_other_host_class == null) {
-		see_other_host_class = SeeOtherHostIfc.CM_SEE_OTHER_HOST_CLASS_PROP_DEF_VAL_CLUSTER;
-	    }
-	    try {
-		see_other_host_strategy = (SeeOtherHostIfc) Class.forName(see_other_host_class).newInstance();
-	    } catch (Exception e) {
-		log.log(Level.SEVERE, "Can not instantiate see_other_host strategy for class: "
-				      + see_other_host_class, e);
-	    }
+		if (see_other_host_strategy == null) {
+			if (see_other_host_class == null) {
+				see_other_host_class =
+						SeeOtherHostIfc.CM_SEE_OTHER_HOST_CLASS_PROP_DEF_VAL_CLUSTER;
+			}
+			try {
+				see_other_host_strategy =
+						(SeeOtherHostIfc) Class.forName(see_other_host_class).newInstance();
+			} catch (Exception e) {
+				log.log(Level.SEVERE, "Can not instantiate see_other_host strategy for class: "
+						+ see_other_host_class, e);
+			}
 
-	    see_other_host_strategy.setNodes(connectedNodes);
+			see_other_host_strategy.setNodes(connectedNodes);
+		}
+		return see_other_host_strategy;
 	}
-	return see_other_host_strategy;
-    }
-	//~--- set methods ----------------------------------------------------------
+
+	// ~--- set methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param cl_controller
 	 */
 	@Override
-	public void setClusterController(ClusterControllerIfc cl_controller) {}
+	public void setClusterController(ClusterControllerIfc cl_controller) {
+	}
 }
 
+// ~ Formatted in Sun Code Convention
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+// ~ Formatted by Jindent --- http://www.jindent.com
