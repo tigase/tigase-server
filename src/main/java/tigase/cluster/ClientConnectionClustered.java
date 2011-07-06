@@ -38,17 +38,17 @@ import tigase.xmpp.BareJID;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.Collections;
 
 //~--- classes ----------------------------------------------------------------
 
 /**
  * Describe class ClientConnectionClustered here.
- * 
- * 
+ *
+ *
  * Created: Sat Jun 21 22:23:18 2008
- * 
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
@@ -63,7 +63,7 @@ public class ClientConnectionClustered extends ClientConnectionManager implement
 
 	private SeeOtherHostIfc see_other_host_strategy = null;
 
-	final ArrayList<BareJID> connectedNodes = new ArrayList<BareJID>() {
+	final CopyOnWriteArrayList<BareJID> connectedNodes = new CopyOnWriteArrayList<BareJID>() {
 		{
 			add(getDefHostName());
 		}
@@ -73,8 +73,8 @@ public class ClientConnectionClustered extends ClientConnectionManager implement
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param node
 	 */
 	@Override
@@ -89,7 +89,7 @@ public class ClientConnectionClustered extends ClientConnectionManager implement
 	}
 
 	/**
-	 * 
+	 *
 	 * @param node
 	 */
 	@Override
@@ -128,31 +128,25 @@ public class ClientConnectionClustered extends ClientConnectionManager implement
 
 	@Override
 	public SeeOtherHostIfc getSeeOtherHostInstance(String see_other_host_class) {
+	    if (see_other_host_class == null) {
+		see_other_host_class = SeeOtherHostIfc.CM_SEE_OTHER_HOST_CLASS_PROP_DEF_VAL_CLUSTER;
+	    }
 
-		if (see_other_host_strategy == null) {
-			if (see_other_host_class == null) {
-				see_other_host_class =
-						SeeOtherHostIfc.CM_SEE_OTHER_HOST_CLASS_PROP_DEF_VAL_CLUSTER;
-			}
-			try {
-				see_other_host_strategy =
-						(SeeOtherHostIfc) Class.forName(see_other_host_class).newInstance();
-			} catch (Exception e) {
-				log.log(Level.SEVERE, "Can not instantiate see_other_host strategy for class: "
-						+ see_other_host_class, e);
-			}
+	    see_other_host_strategy = super.getSeeOtherHostInstance(see_other_host_class);
 
-			see_other_host_strategy.setNodes(connectedNodes);
-		}
-		return see_other_host_strategy;
+	    if (see_other_host_strategy != null) {
+		see_other_host_strategy.setNodes(connectedNodes);
+	    }
+
+	    return see_other_host_strategy;
 	}
 
 	// ~--- set methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param cl_controller
 	 */
 	@Override

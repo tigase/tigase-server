@@ -23,8 +23,9 @@
 
 package tigase.server.xmppclient;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+
 import tigase.xmpp.BareJID;
 
 /**
@@ -59,7 +60,7 @@ public interface SeeOtherHostIfc {
 	 */
 	BareJID findHostForJID(BareJID jid, BareJID host);
 
-	void setNodes(ArrayList<BareJID> nodes);
+    void setNodes(List<BareJID> nodes);
 
 	// ~--- properties ----------------------------------------------------------
 	// Map<String, Object> getDefaults(Map<String, Object> params);

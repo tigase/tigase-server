@@ -29,7 +29,7 @@ import tigase.util.TigaseStringprepException;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -72,7 +72,7 @@ public class SeeOtherHost implements SeeOtherHostIfc {
     }
 
     @Override
-    public void setNodes(ArrayList<BareJID> nodes) {
-	throw new UnsupportedOperationException("Action invalid for current implementation.");
+    public void setNodes(List<BareJID> nodes) {
+//	throw new UnsupportedOperationException("Action invalid for current implementation.");
     }
 }

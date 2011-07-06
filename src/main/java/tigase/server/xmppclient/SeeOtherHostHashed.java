@@ -29,9 +29,9 @@ import tigase.xmpp.BareJID;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 
 //~--- classes ----------------------------------------------------------------
@@ -39,44 +39,30 @@ import java.util.logging.Logger;
 /**
  * Default and basic implementation of SeeOtherHost returning same host as the
  * initial one
- * 
+ *
  * @author Wojtek
  */
 public class SeeOtherHostHashed implements SeeOtherHostIfc {
 
-	BareJID defaulHost = null;
-	private ArrayList<BareJID> connectedNodes = null;
-	private static final Logger log = Logger.getLogger(SeeOtherHostHashed.class.getName());
+    BareJID defaulHost = null;
+    private List<BareJID> connectedNodes = new CopyOnWriteArrayList<BareJID>();
+    private static final Logger log = Logger.getLogger(SeeOtherHostHashed.class.getName());
 
-	@Override
-	public BareJID findHostForJID(BareJID jid, BareJID host) {
-		if (defaulHost != null) {
-			return defaulHost;
-		} else {
-			return connectedNodes.get(Math.abs(jid.toString().hashCode())
-					% connectedNodes.size());
-		}
-	}
+    @Override
+    public BareJID findHostForJID(BareJID jid, BareJID host) {
+	return connectedNodes.get( Math.abs(jid.hashCode() ) % connectedNodes.size() );
+    }
 
-	@Override
-	public void getDefaults(Map<String, Object> defs, Map<String, Object> params) {
-	}
+    @Override
+    public void getDefaults(Map<String, Object> defs, Map<String, Object> params) {
+    }
 
-	@Override
-	public void setProperties(Map<String, Object> props) {
-		if (props.get(SeeOtherHostIfc.CM_SEE_OTHER_HOST_DEFAULT_HOST) != null) {
-			try {
-				defaulHost =
-						BareJID.bareJIDInstance((String) props
-								.get(SeeOtherHostIfc.CM_SEE_OTHER_HOST_DEFAULT_HOST));
-			} catch (TigaseStringprepException ex) {
-				log.log(Level.CONFIG, "From JID violates RFC6122 (XMPP:Address Format): ", ex);
-			}
-		}
-	}
+    @Override
+    public void setProperties(Map<String, Object> props) {
+    }
 
-	@Override
-	public void setNodes(ArrayList<BareJID> connectedNodes) {
-		this.connectedNodes = connectedNodes;
-	}
+    @Override
+    public void setNodes( List<BareJID> connectedNodes) {
+	this.connectedNodes = connectedNodes;
+    }
 }

@@ -113,9 +113,11 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 		String see_other_host_class =
 				(String) params.get(SeeOtherHostIfc.CM_SEE_OTHER_HOST_CLASS_PROPERTY);
-		props.put(SeeOtherHostIfc.CM_SEE_OTHER_HOST_CLASS_PROP_KEY, see_other_host_class);
 
 		see_other_host_strategy = getSeeOtherHostInstance(see_other_host_class);
+
+		props.put(SeeOtherHostIfc.CM_SEE_OTHER_HOST_CLASS_PROP_KEY, see_other_host_strategy.getClass().getName());
+
 		see_other_host_strategy.getDefaults(props, params);
 
 		if (r_mode == null) {
@@ -176,20 +178,15 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	}
 
 	public SeeOtherHostIfc getSeeOtherHostInstance(String see_other_host_class) {
+		if (see_other_host_class == null)  see_other_host_class = SeeOtherHostIfc.CM_SEE_OTHER_HOST_CLASS_PROP_DEF_VAL;
 
-		if (see_other_host_strategy == null) {
-			if (see_other_host_class == null) {
-				see_other_host_class = SeeOtherHostIfc.CM_SEE_OTHER_HOST_CLASS_PROP_DEF_VAL;
-			}
-			try {
-				see_other_host_strategy =
-						(SeeOtherHostIfc) Class.forName(see_other_host_class).newInstance();
-			} catch (Exception e) {
-				log.log(Level.SEVERE, "Can not instantiate see_other_host strategy for class: "
-						+ see_other_host_class, e);
-			}
+		try {
+		    see_other_host_strategy = (SeeOtherHostIfc) Class.forName(see_other_host_class).newInstance();
+		} catch (Exception e) {
+		    log.log(Level.SEVERE, "Can not instantiate see_other_host strategy for class: "
+					  + see_other_host_class, e);
 		}
-		return see_other_host_strategy;
+	    return see_other_host_strategy;
 	}
 
 	/**
