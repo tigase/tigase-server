@@ -28,14 +28,18 @@ import tigase.cluster.api.ClusterControllerIfc;
 import tigase.cluster.api.ClusteredComponentIfc;
 import tigase.server.ServiceChecker;
 import tigase.server.xmppclient.ClientConnectionManager;
+import tigase.server.xmppclient.SeeOtherHostIfc;
 
 import tigase.xmpp.JID;
 import tigase.xmpp.XMPPIOService;
+import tigase.xmpp.BareJID;
 
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.ArrayList;
+import java.util.Collections;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -56,6 +60,12 @@ public class ClientConnectionClustered extends ClientConnectionManager
 	 */
 	private static final Logger log = Logger.getLogger(ClientConnectionClustered.class.getName());
 
+	private SeeOtherHostIfc see_other_host_strategy = null;
+
+	final ArrayList<BareJID> connectedNodes = new ArrayList<BareJID>() {{
+	    add( getDefHostName() );
+	}} ;
+
 	//~--- methods --------------------------------------------------------------
 
 	/**
@@ -65,7 +75,15 @@ public class ClientConnectionClustered extends ClientConnectionManager
 	 * @param node
 	 */
 	@Override
-	public void nodeConnected(String node) {}
+	public void nodeConnected(String node) {
+	    BareJID nodeJID = BareJID.bareJIDInstanceNS(null, node);
+
+	    if (!connectedNodes.contains(nodeJID)) {
+		connectedNodes.add(nodeJID);
+
+		Collections.sort(connectedNodes);
+	    }
+	}
 
 	/**
 	 *
@@ -75,6 +93,12 @@ public class ClientConnectionClustered extends ClientConnectionManager
 	public void nodeDisconnected(String node) {
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Disconnected nodes: {0}", node);
+		}
+
+		BareJID nodeJID = BareJID.bareJIDInstanceNS(null, node);
+
+		if ( connectedNodes.contains(nodeJID) ) {
+		    connectedNodes.remove( nodeJID );
 		}
 
 		final String hostname = node;
@@ -99,6 +123,24 @@ public class ClientConnectionClustered extends ClientConnectionManager
 		});
 	}
 
+    @Override
+    public SeeOtherHostIfc getSeeOtherHostInstance(String see_other_host_class) {
+
+	if (see_other_host_strategy == null) {
+	    if (see_other_host_class == null) {
+		see_other_host_class = SeeOtherHostIfc.CM_SEE_OTHER_HOST_CLASS_PROP_DEF_VAL_CLUSTER;
+	    }
+	    try {
+		see_other_host_strategy = (SeeOtherHostIfc) Class.forName(see_other_host_class).newInstance();
+	    } catch (Exception e) {
+		log.log(Level.SEVERE, "Can not instantiate see_other_host strategy for class: "
+				      + see_other_host_class, e);
+	    }
+
+	    see_other_host_strategy.setNodes(connectedNodes);
+	}
+	return see_other_host_strategy;
+    }
 	//~--- set methods ----------------------------------------------------------
 
 	/**

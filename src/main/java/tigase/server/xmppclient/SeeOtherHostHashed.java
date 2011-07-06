@@ -24,8 +24,8 @@ package tigase.server.xmppclient;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.xmpp.BareJID;
 import tigase.util.TigaseStringprepException;
+import tigase.xmpp.BareJID;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -36,22 +36,24 @@ import java.util.logging.Logger;
 
 //~--- classes ----------------------------------------------------------------
 
+
 /**
  * Default and basic implementation of SeeOtherHost returning same host as the
  * initial one
  * @author Wojtek
  */
-public class SeeOtherHost implements SeeOtherHostIfc {
+public class SeeOtherHostHashed implements SeeOtherHostIfc {
 
     BareJID defaulHost = null;
-    private static final Logger log = Logger.getLogger(SeeOtherHost.class.getName());
+    private ArrayList<BareJID> connectedNodes = null;
+    private static final Logger log = Logger.getLogger(SeeOtherHostHashed.class.getName());
 
     @Override
     public BareJID findHostForJID(BareJID jid, BareJID host) {
 	if (defaulHost != null) {
 	    return defaulHost;
 	} else {
-	    return host;
+	    return connectedNodes.get( Math.abs(jid.toString().hashCode() ) % connectedNodes.size() );
 	}
     }
 
@@ -72,7 +74,7 @@ public class SeeOtherHost implements SeeOtherHostIfc {
     }
 
     @Override
-    public void setNodes(ArrayList<BareJID> nodes) {
-	throw new UnsupportedOperationException("Action invalid for current implementation.");
+    public void setNodes( ArrayList<BareJID> connectedNodes) {
+	this.connectedNodes = connectedNodes;
     }
 }

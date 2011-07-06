@@ -114,15 +114,8 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 		String see_other_host_class = (String)params.get(SeeOtherHostIfc.CM_SEE_OTHER_HOST_CLASS_PROPERTY);
 		props.put(SeeOtherHostIfc.CM_SEE_OTHER_HOST_CLASS_PROP_KEY, see_other_host_class);
 
-		if (see_other_host_class != null) {
-		    try {
-			see_other_host_strategy = (SeeOtherHostIfc) Class.forName(see_other_host_class).newInstance();
-			see_other_host_strategy.getDefaults(props, params);
-		    } catch (Exception e) {
-			log.log(Level.SEVERE, "Can not instantiate see_other_host strategy for class: "
-				+ see_other_host_class, e);
-		    }
-		}
+		see_other_host_strategy = getSeeOtherHostInstance(see_other_host_class);
+		see_other_host_strategy.getDefaults(props, params);
 
 		if (r_mode == null) {
 			props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_MODE_PROP_KEY, ROUTING_MODE_PROP_VAL);
@@ -179,6 +172,23 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	@Override
 	public String getDiscoDescription() {
 		return "Client connection manager";
+	}
+
+	public SeeOtherHostIfc getSeeOtherHostInstance(String see_other_host_class) {
+
+
+	    if (see_other_host_strategy == null) {
+		if (see_other_host_class == null) {
+		    see_other_host_class = SeeOtherHostIfc.CM_SEE_OTHER_HOST_CLASS_PROP_DEF_VAL;
+		}
+		try {
+		    see_other_host_strategy = (SeeOtherHostIfc) Class.forName(see_other_host_class).newInstance();
+		} catch (Exception e) {
+		    log.log(Level.SEVERE, "Can not instantiate see_other_host strategy for class: "
+					  + see_other_host_class, e);
+		}
+	    }
+	    return see_other_host_strategy;
 	}
 
 	/**
@@ -424,16 +434,8 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 		}
 
 		String see_other_host_class = (String)props.get(SeeOtherHostIfc.CM_SEE_OTHER_HOST_CLASS_PROP_KEY);
-
-		if (see_other_host_class != null) {
-		    try {
-			see_other_host_strategy = (SeeOtherHostIfc) Class.forName(see_other_host_class).newInstance();
-			see_other_host_strategy.setProperties(props);
-		    } catch (Exception e) {
-			log.log(Level.SEVERE, "Can not instantiate see_other_host strategy for class: "
-				+ see_other_host_class, e);
-		    }
-		}
+		see_other_host_strategy = getSeeOtherHostInstance(see_other_host_class);
+		see_other_host_strategy.setProperties(props);
 
 		boolean routing_mode =
 				(Boolean) props.get(ROUTINGS_PROP_KEY + "/" + ROUTING_MODE_PROP_KEY);

@@ -23,6 +23,7 @@
 
 package tigase.server.xmppclient;
 
+import java.util.ArrayList;
 import java.util.Map;
 import tigase.xmpp.BareJID;
 
@@ -35,6 +36,7 @@ public interface SeeOtherHostIfc {
     public static final String CM_SEE_OTHER_HOST_CLASS_PROP_KEY = "cm-see-other-host";
 
     public static final String CM_SEE_OTHER_HOST_CLASS_PROP_DEF_VAL = "tigase.server.xmppclient.SeeOtherHost";
+    public static final String CM_SEE_OTHER_HOST_CLASS_PROP_DEF_VAL_CLUSTER = "tigase.server.xmppclient.SeeOtherHostHashed";
 
     // default properties
     public static final String CM_SEE_OTHER_HOST_DEFAULT_HOST = CM_SEE_OTHER_HOST_CLASS_PROP_KEY + "/" + "defaul-host";
@@ -49,6 +51,8 @@ public interface SeeOtherHostIfc {
      * @return BareJID of possible host to which the user should connect or NULL
      */
     BareJID findHostForJID(BareJID jid, BareJID host);
+
+    void setNodes(ArrayList<BareJID> nodes);
 
     //~--- properties ----------------------------------------------------------
 //    Map<String, Object> getDefaults(Map<String, Object> params);
