@@ -114,6 +114,7 @@ public class XMPPSession {
 					}
 
 					try {
+						old_res.putSessionData(XMPPResourceConnection.ERROR_KEY, "conflict");
 						old_res.logout();
 					} catch (Exception e) {
 						log.log(Level.INFO, "Exception during closing old connection, ignoring.", e);

@@ -60,7 +60,7 @@ public interface SeeOtherHostIfc {
 	 */
 	BareJID findHostForJID(BareJID jid, BareJID host);
 
-    void setNodes(List<BareJID> nodes);
+	void setNodes(List<BareJID> nodes);
 
 	// ~--- properties ----------------------------------------------------------
 	// Map<String, Object> getDefaults(Map<String, Object> params);

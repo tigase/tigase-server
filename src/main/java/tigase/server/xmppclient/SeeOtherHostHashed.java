@@ -39,30 +39,30 @@ import java.util.logging.Logger;
 /**
  * Default and basic implementation of SeeOtherHost returning same host as the
  * initial one
- *
+ * 
  * @author Wojtek
  */
 public class SeeOtherHostHashed implements SeeOtherHostIfc {
 
-    BareJID defaulHost = null;
-    private List<BareJID> connectedNodes = new CopyOnWriteArrayList<BareJID>();
-    private static final Logger log = Logger.getLogger(SeeOtherHostHashed.class.getName());
+	BareJID defaulHost = null;
+	private List<BareJID> connectedNodes = new CopyOnWriteArrayList<BareJID>();
+	private static final Logger log = Logger.getLogger(SeeOtherHostHashed.class.getName());
 
-    @Override
-    public BareJID findHostForJID(BareJID jid, BareJID host) {
-	return connectedNodes.get( Math.abs(jid.hashCode() ) % connectedNodes.size() );
-    }
+	@Override
+	public BareJID findHostForJID(BareJID jid, BareJID host) {
+		return connectedNodes.get(Math.abs(jid.hashCode()) % connectedNodes.size());
+	}
 
-    @Override
-    public void getDefaults(Map<String, Object> defs, Map<String, Object> params) {
-    }
+	@Override
+	public void getDefaults(Map<String, Object> defs, Map<String, Object> params) {
+	}
 
-    @Override
-    public void setProperties(Map<String, Object> props) {
-    }
+	@Override
+	public void setProperties(Map<String, Object> props) {
+	}
 
-    @Override
-    public void setNodes( List<BareJID> connectedNodes) {
-	this.connectedNodes = connectedNodes;
-    }
+	@Override
+	public void setNodes(List<BareJID> connectedNodes) {
+		this.connectedNodes = connectedNodes;
+	}
 }

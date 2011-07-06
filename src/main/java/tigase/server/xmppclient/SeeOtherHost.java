@@ -39,40 +39,43 @@ import java.util.logging.Logger;
 /**
  * Default and basic implementation of SeeOtherHost returning same host as the
  * initial one
+ * 
  * @author Wojtek
  */
 public class SeeOtherHost implements SeeOtherHostIfc {
 
-    BareJID defaulHost = null;
-    private static final Logger log = Logger.getLogger(SeeOtherHost.class.getName());
+	BareJID defaulHost = null;
+	private static final Logger log = Logger.getLogger(SeeOtherHost.class.getName());
 
-    @Override
-    public BareJID findHostForJID(BareJID jid, BareJID host) {
-	if (defaulHost != null) {
-	    return defaulHost;
-	} else {
-	    return host;
+	@Override
+	public BareJID findHostForJID(BareJID jid, BareJID host) {
+		if (defaulHost != null) {
+			return defaulHost;
+		} else {
+			return host;
+		}
 	}
-    }
 
-    @Override
-    public void getDefaults(Map<String, Object> defs,
-			    Map<String, Object> params) {
-    }
-
-    @Override
-    public void setProperties(Map<String, Object> props) {
-	if (props.get(SeeOtherHostIfc.CM_SEE_OTHER_HOST_DEFAULT_HOST) != null) {
-	    try {
-		defaulHost = BareJID.bareJIDInstance((String) props.get(SeeOtherHostIfc.CM_SEE_OTHER_HOST_DEFAULT_HOST));
-	    } catch (TigaseStringprepException ex) {
-		log.log(Level.CONFIG, "From JID violates RFC6122 (XMPP:Address Format): ", ex);
-	    }
+	@Override
+	public void getDefaults(Map<String, Object> defs, Map<String, Object> params) {
 	}
-    }
 
-    @Override
-    public void setNodes(List<BareJID> nodes) {
-//	throw new UnsupportedOperationException("Action invalid for current implementation.");
-    }
+	@Override
+	public void setProperties(Map<String, Object> props) {
+		if (props.get(SeeOtherHostIfc.CM_SEE_OTHER_HOST_DEFAULT_HOST) != null) {
+			try {
+				defaulHost =
+						BareJID.bareJIDInstance((String) props
+								.get(SeeOtherHostIfc.CM_SEE_OTHER_HOST_DEFAULT_HOST));
+			} catch (TigaseStringprepException ex) {
+				log.log(Level.CONFIG, "From JID violates RFC6122 (XMPP:Address Format): ", ex);
+			}
+		}
+	}
+
+	@Override
+	public void setNodes(List<BareJID> nodes) {
+		// throw new
+		// UnsupportedOperationException("Action invalid for current implementation.");
+	}
 }

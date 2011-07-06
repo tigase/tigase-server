@@ -826,8 +826,26 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 			case CLOSE:
 				if (serv != null) {
+					String streamClose = "</stream:stream>";
+					List<Element> err_el = packet.getElement().getChildren("/iq/command");
+					boolean moreToSend = false;
+					if (err_el != null && err_el.size() > 0) {
+						streamClose = err_el.get(0).toString() + streamClose;
+						moreToSend = true;
+					}
 					try {
-						serv.writeRawData("</stream:stream>");
+						if (log.isLoggable(Level.FINEST)) {
+							log.log(Level.FINEST, "Sending stream close to the client: {0}",
+									streamClose);
+						}
+						serv.writeRawData(streamClose);
+						if (moreToSend) {
+							// This is kind of a workaround. serv.stop() is supposed to wait
+							// until all data are sent to the client, however, even then there
+							// is still a chance, that the connection is closed before data
+							// reached the client
+							Thread.currentThread().sleep(1);
+						}
 					} catch (Exception e) {
 					}
 

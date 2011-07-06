@@ -64,6 +64,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	public static final String PRESENCE_KEY = "user-presence";
 	public static final String CLOSING_KEY = "closing-conn";
 	public static final String AUTHENTICATION_TIMEOUT_KEY = "authentication-timeout";
+	public static final String ERROR_KEY = "error-key";
 
 	private long authenticationTime = 0;
 

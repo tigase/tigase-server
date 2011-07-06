@@ -469,8 +469,15 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 		try {
 			connectionsByFrom.remove(conn.getConnectionId());
-			fastAddOutPacket(Command.CLOSE.getPacket(getComponentId(), conn.getConnectionId(),
-					StanzaType.set, conn.nextStanzaId()));
+			Packet cmd = Command.CLOSE.getPacket(getComponentId(), conn.getConnectionId(),
+					StanzaType.set, conn.nextStanzaId());
+			String error = (String) conn.getSessionData(XMPPResourceConnection.ERROR_KEY);
+			if (error != null) {
+				Element err_el = new Element(error);
+				err_el.setXMLNS("urn:ietf:params:xml:ns:xmpp-streams");
+				cmd.getElement().getChild("command").addChild(err_el);
+			}
+			fastAddOutPacket(cmd);
 		} catch (NoConnectionIdException ex) {
 			log.log(Level.WARNING, "Connection ID not set for session: {0}", conn);
 		}
