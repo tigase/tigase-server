@@ -24,7 +24,6 @@ package tigase.server.xmppclient;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.util.TigaseStringprepException;
 import tigase.xmpp.BareJID;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -39,7 +38,7 @@ import java.util.logging.Logger;
 /**
  * Default and basic implementation of SeeOtherHost returning same host as the
  * initial one
- * 
+ *
  * @author Wojtek
  */
 public class SeeOtherHostHashed implements SeeOtherHostIfc {

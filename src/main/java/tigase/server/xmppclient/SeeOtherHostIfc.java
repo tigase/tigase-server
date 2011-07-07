@@ -50,7 +50,7 @@ public interface SeeOtherHostIfc {
 	// ~--- methods -------------------------------------------------------------
 	/**
 	 * Finds an appropriate host for a given JID
-	 * 
+	 *
 	 * @param jid
 	 *          is a user JID extracted from the stream open attributes
 	 * @param host

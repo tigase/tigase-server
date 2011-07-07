@@ -36,10 +36,12 @@ import tigase.xmpp.BareJID;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -63,11 +65,10 @@ public class ClientConnectionClustered extends ClientConnectionManager implement
 
 	private SeeOtherHostIfc see_other_host_strategy = null;
 
-	final CopyOnWriteArrayList<BareJID> connectedNodes = new CopyOnWriteArrayList<BareJID>() {
-		{
+	List<BareJID> connectedNodes =  new CopyOnWriteArrayList<BareJID>()
+		    {{
 			add(getDefHostName());
-		}
-	};
+		    }};
 
 	// ~--- methods --------------------------------------------------------------
 
@@ -84,7 +85,12 @@ public class ClientConnectionClustered extends ClientConnectionManager implement
 		if (!connectedNodes.contains(nodeJID)) {
 			connectedNodes.add(nodeJID);
 
-			Collections.sort(connectedNodes);
+			// ugly workaround to sort CopyOnWriteArrayList
+			BareJID[] arr_list = connectedNodes.toArray(new BareJID[connectedNodes.size()]);
+			Arrays.sort(arr_list);
+			connectedNodes = new CopyOnWriteArrayList(arr_list);
+
+			see_other_host_strategy.setNodes(connectedNodes);
 		}
 	}
 
