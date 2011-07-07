@@ -39,7 +39,7 @@ import java.util.logging.Logger;
 /**
  * Default and basic implementation of SeeOtherHost returning same host as the
  * initial one
- * 
+ *
  * @author Wojtek
  */
 public class SeeOtherHost implements SeeOtherHostIfc {
@@ -62,14 +62,15 @@ public class SeeOtherHost implements SeeOtherHostIfc {
 
 	@Override
 	public void setProperties(Map<String, Object> props) {
-		if (props.get(SeeOtherHostIfc.CM_SEE_OTHER_HOST_DEFAULT_HOST) != null) {
+		if ((props.containsKey(SeeOtherHostIfc.CM_SEE_OTHER_HOST_DEFAULT_HOST))
+			&& !props.get(SeeOtherHostIfc.CM_SEE_OTHER_HOST_DEFAULT_HOST).toString().trim().isEmpty()) {
 			try {
-				defaulHost =
-						BareJID.bareJIDInstance((String) props
-								.get(SeeOtherHostIfc.CM_SEE_OTHER_HOST_DEFAULT_HOST));
+				defaulHost = BareJID.bareJIDInstance((String) props.get(SeeOtherHostIfc.CM_SEE_OTHER_HOST_DEFAULT_HOST));
 			} catch (TigaseStringprepException ex) {
 				log.log(Level.CONFIG, "From JID violates RFC6122 (XMPP:Address Format): ", ex);
 			}
+		} else {
+			defaulHost = null;
 		}
 	}
 
