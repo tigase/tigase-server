@@ -47,10 +47,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Describe class ClientConnectionClustered here.
- *
- *
+ * 
+ * 
  * Created: Sat Jun 21 22:23:18 2008
- *
+ * 
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
@@ -65,37 +65,42 @@ public class ClientConnectionClustered extends ClientConnectionManager implement
 
 	private SeeOtherHostIfc see_other_host_strategy = null;
 
-	List<BareJID> connectedNodes =  new CopyOnWriteArrayList<BareJID>()
-		    {{
+	private List<BareJID> connectedNodes = new CopyOnWriteArrayList<BareJID>() {
+		{
 			add(getDefHostName());
-		    }};
+		}
+	};
 
 	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param node
 	 */
 	@Override
 	public void nodeConnected(String node) {
 		BareJID nodeJID = BareJID.bareJIDInstanceNS(null, node);
 
-		if (!connectedNodes.contains(nodeJID)) {
-			connectedNodes.add(nodeJID);
+		// connectedNodes must be synchronized here. If it is executed concurrently,
+		// then most likely only one connected node will endup in the collection
+		synchronized (connectedNodes) {
+			if (!connectedNodes.contains(nodeJID)) {
+				connectedNodes.add(nodeJID);
 
-			// ugly workaround to sort CopyOnWriteArrayList
-			BareJID[] arr_list = connectedNodes.toArray(new BareJID[connectedNodes.size()]);
-			Arrays.sort(arr_list);
-			connectedNodes = new CopyOnWriteArrayList(arr_list);
+				// ugly workaround to sort CopyOnWriteArrayList
+				BareJID[] arr_list = connectedNodes.toArray(new BareJID[connectedNodes.size()]);
+				Arrays.sort(arr_list);
+				connectedNodes = new CopyOnWriteArrayList<BareJID>(arr_list);
 
-			see_other_host_strategy.setNodes(connectedNodes);
+				see_other_host_strategy.setNodes(connectedNodes);
+			}
 		}
 	}
 
 	/**
-	 *
+	 * 
 	 * @param node
 	 */
 	@Override
@@ -106,9 +111,9 @@ public class ClientConnectionClustered extends ClientConnectionManager implement
 
 		BareJID nodeJID = BareJID.bareJIDInstanceNS(null, node);
 
-		if (connectedNodes.contains(nodeJID)) {
+//		if (connectedNodes.contains(nodeJID)) {
 			connectedNodes.remove(nodeJID);
-		}
+//		}
 
 		final String hostname = node;
 
@@ -134,25 +139,25 @@ public class ClientConnectionClustered extends ClientConnectionManager implement
 
 	@Override
 	public SeeOtherHostIfc getSeeOtherHostInstance(String see_other_host_class) {
-	    if (see_other_host_class == null) {
-		see_other_host_class = SeeOtherHostIfc.CM_SEE_OTHER_HOST_CLASS_PROP_DEF_VAL_CLUSTER;
-	    }
+		if (see_other_host_class == null) {
+			see_other_host_class = SeeOtherHostIfc.CM_SEE_OTHER_HOST_CLASS_PROP_DEF_VAL_CLUSTER;
+		}
 
-	    see_other_host_strategy = super.getSeeOtherHostInstance(see_other_host_class);
+		see_other_host_strategy = super.getSeeOtherHostInstance(see_other_host_class);
 
-	    if (see_other_host_strategy != null) {
-		see_other_host_strategy.setNodes(connectedNodes);
-	    }
+		if (see_other_host_strategy != null) {
+			see_other_host_strategy.setNodes(connectedNodes);
+		}
 
-	    return see_other_host_strategy;
+		return see_other_host_strategy;
 	}
 
 	// ~--- set methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param cl_controller
 	 */
 	@Override
