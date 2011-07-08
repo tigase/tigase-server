@@ -446,7 +446,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 	 *              if an error occurs
 	 */
 	public static void updateUserResources(Element presence,
-			XMPPResourceConnection session, Queue<Packet> results)
+			XMPPResourceConnection session, Queue<Packet> results, boolean initial)
 			throws NotAuthorizedException {
 		for (XMPPResourceConnection conn : session.getActiveSessions()) {
 			try {
@@ -457,7 +457,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 				// We also do not send presence updates to any remote connections on
 				// different cluster nodes. Each node takes care of delivering presence
 				// locally
-				if ((conn != session) && conn.isResourceSet()) {
+				if (conn.isResourceSet()) {
 
 					// Send to old resource presence about new resource
 					Element pres_update = presence.clone();
@@ -476,7 +476,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 					Element presence_el = conn.getPresence();
 
 					// Send to new resource last presence sent by the old resource
-					if (presence_el != null) {
+					if (presence_el != null && initial && conn != session) {
 						pres_update = presence_el.clone();
 
 						// Below is not necessary, initVars(...) which is called from
@@ -1523,7 +1523,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 				// Element presence = packet.getElement().clone();
 				// Already done above, don't need to set it again here
 				// presence.setAttribute("from", session.getJID());
-				updateUserResources(packet.getElement(), session, results);
+				updateUserResources(packet.getElement(), session, results, first);
 			} else {
 				stopped(session, results, settings);
 			}
