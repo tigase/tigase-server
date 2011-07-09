@@ -30,18 +30,21 @@ import tigase.net.ConnectionType;
 
 import tigase.server.Command;
 import tigase.server.Packet;
+import tigase.server.ext.lb.LoadBalancerIfc;
+import tigase.server.ext.lb.ReceiverBareJidLB;
 
 import tigase.xml.Element;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 //~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Oct 3, 2009 4:39:51 PM
- *
+ * 
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
@@ -76,6 +79,8 @@ public class CompRepoItem extends RepositoryItemAbstract {
 	/** Field description */
 	public static final String ROUTINGS_ATTR = "routings";
 
+	public static final String LB_NAME_ATTR = "lb-class";
+
 	/** Field description */
 	public static final String DOMAIN_NAME_LABEL = "Domain name";
 
@@ -97,7 +102,11 @@ public class CompRepoItem extends RepositoryItemAbstract {
 	/** Field description */
 	public static final String ROUTINGS_LABEL = "(Optional) Routings";
 
-	//~--- fields ---------------------------------------------------------------
+	public static final String LB_CLASS_LABEL = "Load balancer class";
+
+	public static final LoadBalancerIfc DEF_LB_CLASS = new ReceiverBareJidLB();
+
+	// ~--- fields ---------------------------------------------------------------
 
 	private String auth_pass = null;
 
@@ -109,19 +118,21 @@ public class CompRepoItem extends RepositoryItemAbstract {
 	private String[] routings = null;
 	private ConnectionType type = ConnectionType.accept;
 	private String xmlns = null;
+	private LoadBalancerIfc lb = DEF_LB_CLASS;
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packet
 	 */
 	@Override
 	public void addCommandFields(Packet packet) {
 		Command.addFieldValue(packet, DOMAIN_NAME_LABEL, ((domain != null) ? domain : ""));
-		Command.addFieldValue(packet, DOMAIN_PASS_LABEL, ((auth_pass != null) ? auth_pass : ""));
+		Command.addFieldValue(packet, DOMAIN_PASS_LABEL, ((auth_pass != null) ? auth_pass
+				: ""));
 
 		String[] types = new String[ConnectionType.values().length];
 		int i = 0;
@@ -130,21 +141,25 @@ public class CompRepoItem extends RepositoryItemAbstract {
 			types[i++] = t.name();
 		}
 
-		Command.addFieldValue(packet, CONNECTION_TYPE_LABEL, type.name(), CONNECTION_TYPE_LABEL, types,
-				types);
+		Command.addFieldValue(packet, CONNECTION_TYPE_LABEL, type.name(),
+				CONNECTION_TYPE_LABEL, types, types);
 		Command.addFieldValue(packet, PORT_NO_LABEL, ((port > 0) ? "" + port : ""));
-		Command.addFieldValue(packet, REMOTE_HOST_LABEL, ((remoteHost != null) ? remoteHost : ""));
-		Command.addFieldValue(packet, PROTO_XMLNS_LABEL, ((prop_xmlns != null) ? prop_xmlns : ""));
+		Command.addFieldValue(packet, REMOTE_HOST_LABEL, ((remoteHost != null) ? remoteHost
+				: ""));
+		Command.addFieldValue(packet, PROTO_XMLNS_LABEL, ((prop_xmlns != null) ? prop_xmlns
+				: ""));
+		Command.addFieldValue(packet, LB_CLASS_LABEL, ((lb != null) ? lb.getClass().getName()
+				: ""));
 		Command.addFieldValue(packet, ROUTINGS_LABEL, "");
 		super.addCommandFields(packet);
 	}
 
-	//~--- get methods ----------------------------------------------------------
+	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	public String getAuthPasswd() {
@@ -153,18 +168,22 @@ public class CompRepoItem extends RepositoryItemAbstract {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	public ConnectionType getConnectionType() {
 		return type;
 	}
 
+	public LoadBalancerIfc getLoadBalancer() {
+		return lb;
+	}
+
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	public String getDomain() {
@@ -173,8 +192,8 @@ public class CompRepoItem extends RepositoryItemAbstract {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -184,8 +203,8 @@ public class CompRepoItem extends RepositoryItemAbstract {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -195,8 +214,8 @@ public class CompRepoItem extends RepositoryItemAbstract {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	public int getPort() {
@@ -205,8 +224,8 @@ public class CompRepoItem extends RepositoryItemAbstract {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	public String getRemoteHost() {
@@ -215,8 +234,8 @@ public class CompRepoItem extends RepositoryItemAbstract {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	public String[] getRoutings() {
@@ -225,20 +244,20 @@ public class CompRepoItem extends RepositoryItemAbstract {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	public String getXMLNS() {
 		return xmlns;
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packet
 	 */
 	@Override
@@ -250,40 +269,77 @@ public class CompRepoItem extends RepositoryItemAbstract {
 
 		String tmp = Command.getFieldValue(packet, REMOTE_HOST_LABEL);
 
-		if ((tmp != null) &&!tmp.isEmpty()) {
+		if ((tmp != null) && !tmp.isEmpty()) {
 			remoteHost = tmp;
 		}
 
 		tmp = Command.getFieldValue(packet, CONNECTION_TYPE_LABEL);
 
-		if ((tmp != null) &&!tmp.isEmpty()) {
+		if ((tmp != null) && !tmp.isEmpty()) {
 			type = parseConnectionType(tmp);
 		}
 
 		tmp = Command.getFieldValue(packet, PORT_NO_LABEL);
 
-		if ((tmp != null) &&!tmp.isEmpty()) {
+		if ((tmp != null) && !tmp.isEmpty()) {
 			port = parsePortNo(tmp);
 		}
 
 		tmp = Command.getFieldValue(packet, PROTO_XMLNS_LABEL);
 
-		if ((tmp != null) &&!tmp.isEmpty()) {
+		if ((tmp != null) && !tmp.isEmpty()) {
 			prop_xmlns = tmp;
 			xmlns = parseProtoXMLNS(prop_xmlns);
 		}
 
+		tmp = Command.getFieldValue(packet, LB_CLASS_LABEL);
+
+		if ((tmp != null) && !tmp.trim().isEmpty()) {
+			lb = lbInstance(tmp);
+		}
+
 		tmp = Command.getFieldValue(packet, ROUTINGS_LABEL);
 
-		if ((tmp != null) &&!tmp.isEmpty()) {
+		if ((tmp != null) && !tmp.isEmpty()) {
 			routings = tmp.split(",");
 		}
 	}
 
 	/**
+	 * @param tmp
+	 * @return
+	 */
+	private LoadBalancerIfc lbInstance(String cls_name) {
+		String class_name = cls_name;
+		if (!class_name.endsWith(".class")) {
+			class_name = class_name + ".class";
+		}
+		log.log(Level.INFO, "Activating load-balancer for domain: {0}, class: {1}",
+				new Object[] { domain, class_name });
+		LoadBalancerIfc result = null;
+		try {
+			result = (LoadBalancerIfc) Class.forName(class_name).newInstance();
+		} catch (Exception ex1) {
+			class_name = "tigase.server.ext.lb." + cls_name;
+			log.log(Level.INFO, "Cannot active load balancer for class: {0}, trying: {1}",
+					new Object[] { cls_name, class_name });
+			try {
+				result = (LoadBalancerIfc) Class.forName(class_name).newInstance();
+			} catch (Exception ex2) {
+				class_name = "tigase.server.ext.lb." + cls_name;
+				log.log(Level.WARNING, "Cannot active load balancer for class:"
+						+ " {0}, or: {1}, errors: {2} or {3}, using default LB: {4}", new Object[] {
+						cls_name, class_name, ex1, ex2, DEF_LB_CLASS.getClass().getName() });
+				result = DEF_LB_CLASS;
+			}
+		}
+		return result;
+	}
+
+	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param elem
 	 */
 	@Override
@@ -316,6 +372,12 @@ public class CompRepoItem extends RepositoryItemAbstract {
 			setProtocol(tmp);
 		}
 
+		tmp = elem.getAttribute(LB_NAME_ATTR);
+
+		if (tmp != null) {
+			lb = lbInstance(tmp);
+		}
+
 		tmp = elem.getAttribute(ROUTINGS_ATTR);
 
 		if (tmp != null) {
@@ -325,8 +387,8 @@ public class CompRepoItem extends RepositoryItemAbstract {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param propString
 	 */
 	@Override
@@ -356,14 +418,18 @@ public class CompRepoItem extends RepositoryItemAbstract {
 		if (props.length > 5) {
 			setProtocol(props[5]);
 		}
-	}
 
-	//~--- set methods ----------------------------------------------------------
+		if (props.length > 6) {
+			lb = lbInstance(props[6]);
+		}
+}
+
+	// ~--- set methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param domain
 	 */
 	public void setDomain(String domain) {
@@ -371,12 +437,12 @@ public class CompRepoItem extends RepositoryItemAbstract {
 		routings = new String[] { domain, ".*@" + domain, ".*\\." + domain };
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -386,7 +452,7 @@ public class CompRepoItem extends RepositoryItemAbstract {
 		elem.addAttribute(DOMAIN_ATTR, domain);
 		elem.addAttribute(PASSWORD_ATTR, auth_pass);
 
-		if ((remoteHost != null) &&!remoteHost.isEmpty()) {
+		if ((remoteHost != null) && !remoteHost.isEmpty()) {
 			elem.addAttribute(REMOTE_HOST_ATTR, remoteHost);
 		}
 
@@ -397,6 +463,8 @@ public class CompRepoItem extends RepositoryItemAbstract {
 		}
 
 		elem.addAttribute(PROTO_XMLNS_ATTR, prop_xmlns);
+
+		elem.addAttribute(LB_NAME_ATTR, lb.getClass().getName());
 
 		StringBuilder route = new StringBuilder();
 
@@ -415,20 +483,20 @@ public class CompRepoItem extends RepositoryItemAbstract {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
 	public String toPropertyString() {
-		return domain + ":" + auth_pass + ":" + type.name() + ":" + port + ":" + remoteHost + ":"
-				+ prop_xmlns;
+		return domain + ":" + auth_pass + ":" + type.name() + ":" + port + ":" + remoteHost
+				+ ":" + prop_xmlns + ":" + lb.getClass().getName();
 	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -436,7 +504,7 @@ public class CompRepoItem extends RepositoryItemAbstract {
 		return toPropertyString();
 	}
 
-	//~--- set methods ----------------------------------------------------------
+	// ~--- set methods ----------------------------------------------------------
 
 	void setConnectionType(String connection_type) {
 		this.type = parseConnectionType(connection_type);
@@ -459,7 +527,7 @@ public class CompRepoItem extends RepositoryItemAbstract {
 		this.remoteHost = remote_domain;
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	private ConnectionType parseConnectionType(String input) {
 		ConnectionType result = ConnectionType.accept;
@@ -507,8 +575,6 @@ public class CompRepoItem extends RepositoryItemAbstract {
 	}
 }
 
+// ~ Formatted in Sun Code Convention
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+// ~ Formatted by Jindent --- http://www.jindent.com

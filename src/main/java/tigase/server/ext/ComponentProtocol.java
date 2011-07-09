@@ -40,6 +40,7 @@ import tigase.server.ext.handlers.SASLProcessor;
 import tigase.server.ext.handlers.StartTLSProcessor;
 import tigase.server.ext.handlers.StreamFeaturesProcessor;
 import tigase.server.ext.handlers.UnknownXMLNSStreamOpenHandler;
+import tigase.server.ext.lb.LoadBalancerIfc;
 
 import tigase.stats.StatisticsList;
 
@@ -73,12 +74,12 @@ import javax.script.Bindings;
 
 /**
  * Created: Sep 30, 2009 8:28:13 PM
- *
+ * 
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class ComponentProtocol extends ConnectionManager<ComponentIOService>
-		implements ComponentProtocolHandler {
+public class ComponentProtocol extends ConnectionManager<ComponentIOService> implements
+		ComponentProtocolHandler {
 
 	/**
 	 * Variable <code>log</code> is a class logger.
@@ -92,7 +93,8 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 	public static final String EXTCOMP_REPO_CLASS_PROP_KEY = "repository-class";
 
 	/** Field description */
-	public static final String EXTCOMP_REPO_CLASS_PROP_VAL = "tigase.server.ext.CompDBRepository";
+	public static final String EXTCOMP_REPO_CLASS_PROP_VAL =
+			"tigase.server.ext.CompDBRepository";
 
 	/** Field description */
 	public static final String EXTCOMP_BIND_HOSTNAMES = "--bind-ext-hostnames";
@@ -121,8 +123,6 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 	/** Field description */
 	public static final String AUTHENTICATION_TIMEOUT_PROP_KEY = "auth-timeout";
 
-	//~--- fields ---------------------------------------------------------------
-
 	/** Field description */
 	public boolean PACK_ROUTED_VAL = false;
 
@@ -130,36 +130,36 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 	private long authenticationTimeOut = 15;
 
 	/**
-	 * A map keeping all active connections by a connection JID or domain
-	 * name.
-	 * Since for each domain we can have 1..N connections the Map value
-	 * is a List of connections.
+	 * A map keeping all active connections by a connection JID or domain name.
+	 * Since for each domain we can have 1..N connections the Map value is a List
+	 * of connections.
 	 */
-	private Map<String, ArrayList<ComponentConnection>> connections = new ConcurrentHashMap<String,
-		ArrayList<ComponentConnection>>();
+	private Map<String, ArrayList<ComponentConnection>> connections =
+			new ConcurrentHashMap<String, ArrayList<ComponentConnection>>();
 	private String[] hostnamesToBind = null;
 	private int maxAuthenticationAttempts = 1;
 	private ComponentRepository<CompRepoItem> repo = null;
-	private Map<String, StreamOpenHandler> streamOpenHandlers = new LinkedHashMap<String,
-		StreamOpenHandler>();
+	private Map<String, StreamOpenHandler> streamOpenHandlers =
+			new LinkedHashMap<String, StreamOpenHandler>();
 
 	/**
 	 * List of processors which should handle all traffic incoming from the
-	 * network. In most cases if not all, these processors handle just
-	 * protocol traffic, all the rest traffic should be passed on to MR.
+	 * network. In most cases if not all, these processors handle just protocol
+	 * traffic, all the rest traffic should be passed on to MR.
 	 */
-	private Map<String, ExtProcessor> processors = new LinkedHashMap<String, ExtProcessor>(10);
-	private UnknownXMLNSStreamOpenHandler unknownXMLNSHandler = new UnknownXMLNSStreamOpenHandler();
+	private Map<String, ExtProcessor> processors = new LinkedHashMap<String, ExtProcessor>(
+			10);
+	private UnknownXMLNSStreamOpenHandler unknownXMLNSHandler =
+			new UnknownXMLNSStreamOpenHandler();
 	private String identity_type = IDENTITY_TYPE_VAL;
 
 	// private ServiceEntity serviceEntity = null;
 	private boolean closeOnSequenceError = true;
-
-	//~--- constructors ---------------------------------------------------------
+	private boolean experimental = false;
 
 	/**
 	 * Constructs ...
-	 *
+	 * 
 	 */
 	public ComponentProtocol() {
 		super();
@@ -189,12 +189,12 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 		}
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param serv
 	 */
 	@Override
@@ -221,8 +221,8 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param serv
 	 * @param packet
 	 */
@@ -245,8 +245,8 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param hostname
 	 * @param serv
 	 */
@@ -257,7 +257,8 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 		if (serv.connectionType() == ConnectionType.connect) {
 
 			// Most likely we have an external component here which doesn't have any
-			// connections managers. In such a case the best routings settings would be: .*
+			// connections managers. In such a case the best routings settings would
+			// be: .*
 			routings = new String[] { ".*" };
 		}
 
@@ -267,19 +268,33 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 			log.fine("Authenticated: " + hostname);
 		}
 
-		updateServiceDiscoveryItem(hostname, null, "XEP-0114 connected", false);
+		updateServiceDiscoveryItem(hostname, null, "ext-comp connected", false);
+		// Now kind of trick to allow access to the external component in a more
+		// direct way. However, we have to careful here to avoid disaster.
+		if (experimental) {
+			updateServiceDiscoForConnection(hostname, serv);
+		}
 		addComponentConnection(hostname, serv);
 		addComponentDomain(hostname);
 	}
 
-	//~--- get methods ----------------------------------------------------------
+	private void updateServiceDiscoForConnection(String hostname, ComponentIOService serv) {
+		// Cut off the first, component part
+		int idx = hostname.indexOf(".");
+		String newhostname = hostname.substring(idx + 1);
+		if (!isLocalDomain(newhostname)) {
+			updateServiceDiscoveryItem(newhostname, "ext", serv.getUniqueId(), true);
+		} else {
+			// We don't do the trick because this would break stuff
+		}
+	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param hostname
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -289,16 +304,19 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param params
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
 	@SuppressWarnings({ "unchecked" })
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> defs = super.getDefaults(params);
+
+		experimental = Boolean.parseBoolean((String) params.get("--experimental"));
+
 		String repo_class = (String) params.get(EXTCOMP_REPO_CLASS_PROPERTY);
 
 		if (repo_class == null) {
@@ -311,7 +329,8 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 			repo = (ComponentRepository<CompRepoItem>) Class.forName(repo_class).newInstance();
 			repo.getDefaults(defs, params);
 		} catch (Exception e) {
-			log.log(Level.SEVERE, "Can not instantiate items repository for class: " + repo_class, e);
+			log.log(Level.SEVERE, "Can not instantiate items repository for class: "
+					+ repo_class, e);
 		}
 
 		defs.put(PACK_ROUTED_KEY, PACK_ROUTED_VAL);
@@ -326,10 +345,6 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 			defs.put(EXTCOMP_BIND_HOSTNAMES_PROP_KEY, new String[] { "" });
 		}
 
-//  private boolean closeOnSequenceError = true;
-//  private int maxAuthenticationAttempts = 1;
-//  // In seconds
-//  private long authenticationTimeOut = 15;
 		defs.put(CLOSE_ON_SEQUENCE_ERROR_PROP_KEY, closeOnSequenceError);
 		defs.put(MAX_AUTH_ATTEMPTS_PROP_KEY, maxAuthenticationAttempts);
 		defs.put(AUTHENTICATION_TIMEOUT_PROP_KEY, authenticationTimeOut);
@@ -339,8 +354,8 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -350,8 +365,8 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -361,10 +376,10 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param key
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -374,15 +389,16 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param list
 	 */
 	@Override
 	public void getStatistics(StatisticsList list) {
-
+		super.getStatistics(list);
 		// Warning size() for ConcurrentHashMap is very slow
-		// unless we have a huge number of domains this should not be a problem though.
+		// unless we have a huge number of domains this should not be a problem
+		// though.
 		list.add(getName(), "Number of external domains", connections.size(), Level.FINE);
 
 		int size = 0;
@@ -396,10 +412,10 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param serv
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -419,10 +435,10 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param xmlns
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -430,12 +446,12 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 		return streamOpenHandlers.get(xmlns);
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param binds
 	 */
 	@Override
@@ -446,10 +462,10 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param serv
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -470,7 +486,7 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 				writePacketsToSocket(serv, results);
 			}
 
-			if ( !processed) {
+			if (!processed) {
 
 				// This might be a bit slow, need to be tested.
 				// Possibly a local variable in XMPPIOService might be needed
@@ -482,25 +498,27 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 						try {
 							result = p.unpackRouted();
 						} catch (TigaseStringprepException ex) {
-							log.log(Level.WARNING, "Packet stringprep addressing problem, dropping packet: {0}",
-									p);
+							log.log(Level.WARNING,
+									"Packet stringprep addressing problem, dropping packet: {0}", p);
 
 							return null;
 						}
-					}    // end of if (p.isRouted())
+					} // end of if (p.isRouted())
 
 					result.getElement().setXMLNS("jabber:client");
 					addOutPacket(result);
 				} else {
 					try {
-						Packet error = Authorization.NOT_AUTHORIZED.getResponseMessage(p,
-							"Connection not yet authorized to send this packet.", true);
+						Packet error =
+								Authorization.NOT_AUTHORIZED.getResponseMessage(p,
+										"Connection not yet authorized to send this packet.", true);
 
 						writePacketToSocket(serv, error);
 					} catch (PacketErrorTypeException ex) {
 
 						// Already error packet, just ignore to prevent infinite loop
-						log.log(Level.FINE, "Received an error packet from unauthorized connection: {0}", p);
+						log.log(Level.FINE,
+								"Received an error packet from unauthorized connection: {0}", p);
 					}
 
 					if (closeOnSequenceError) {
@@ -508,15 +526,15 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 					}
 				}
 			}
-		}    // end of while ()
+		} // end of while ()
 
 		return null;
 	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param port_props
 	 */
 	@Override
@@ -527,8 +545,8 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param serv
 	 */
 	@Override
@@ -552,7 +570,8 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 			log.fine("XMLNS not set, accepting a new connection with xmlns auto-detection.");
 		} else {
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("cid: " + (String) serv.getSessionData().get("cid") + ", sending: " + result);
+				log.finest("cid: " + (String) serv.getSessionData().get("cid") + ", sending: "
+						+ result);
 			}
 
 			result = handler.serviceStarted(serv);
@@ -565,10 +584,10 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param service
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -579,14 +598,14 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 			Map<String, Object> sessionData = service.getSessionData();
 			String hostname = (String) sessionData.get(ComponentIOService.HOSTNAME_KEY);
 
-			if ((hostname != null) &&!hostname.isEmpty()) {
+			if ((hostname != null) && !hostname.isEmpty()) {
 				List<ComponentConnection> conns = service.getRefObject();
 
 				if (conns != null) {
 					for (ComponentConnection conn : conns) {
 						boolean moreConnections = removeComponentConnection(conn.getDomain(), conn);
 
-						if ( !moreConnections) {
+						if (!moreConnections) {
 							removeRoutings(conn.getDomain());
 						}
 					}
@@ -609,30 +628,30 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 				addWaitingTask(sessionData);
 
 				// reconnectService(sessionData, connectionDelay);
-			}    // end of if (type == ConnectionType.connect)
+			} // end of if (type == ConnectionType.connect)
 		}
 
 		return result;
 	}
 
-	//~--- set methods ----------------------------------------------------------
+	// ~--- set methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param properties
 	 */
 	@Override
 	@SuppressWarnings({ "unchecked" })
 	public void setProperties(Map<String, Object> properties) {
 		if (properties.size() == 1) {
-			// If props.size() == 1, it means this is a single property update 
+			// If props.size() == 1, it means this is a single property update
 			// and this component does not support single property change for the rest
 			// of it's settings
 			return;
 		}
-		
+
 		identity_type = (String) properties.get(IDENTITY_TYPE_KEY);
 		super.setProperties(properties);
 
@@ -640,15 +659,17 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 
 		try {
 			ComponentRepository<CompRepoItem> repo_tmp =
-				(ComponentRepository<CompRepoItem>) Class.forName(repo_class).newInstance();
+					(ComponentRepository<CompRepoItem>) Class.forName(repo_class).newInstance();
 
 			repo_tmp.setProperties(properties);
 			repo = repo_tmp;
 		} catch (Exception e) {
-			log.log(Level.SEVERE, "Can not create items repository instance for class: " + repo_class, e);
+			log.log(Level.SEVERE, "Can not create items repository instance for class: "
+					+ repo_class, e);
 		}
 
-		// Activate all connections for which parameters are defined in the repository
+		// Activate all connections for which parameters are defined in the
+		// repository
 		for (CompRepoItem repoItem : repo) {
 			log.info("Loaded repoItem: " + repoItem.toString());
 
@@ -700,21 +721,20 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 		processors.put(proc.getId(), proc);
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param service
 	 */
 	@Override
-	public void tlsHandshakeCompleted(ComponentIOService service) {}
+	public void tlsHandshakeCompleted(ComponentIOService service) {
+	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param hostname
 	 * @param serv
 	 */
@@ -734,7 +754,7 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 			if (conn != null) {
 				boolean moreConnections = removeComponentConnection(conn.getDomain(), conn);
 
-				if ( !moreConnections) {
+				if (!moreConnections) {
 					removeRoutings(conn.getDomain());
 				}
 			}
@@ -743,20 +763,20 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param ios
 	 * @param p
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
 	public boolean writePacketToSocket(ComponentIOService ios, Packet p) {
 
-//  String xmlns = (String)ios.getSessionData().get("xmlns");
-//  if (xmlns != null) {
-//    p.getElement().setXMLNS(xmlns);
-//  }
+		// String xmlns = (String)ios.getSessionData().get("xmlns");
+		// if (xmlns != null) {
+		// p.getElement().setXMLNS(xmlns);
+		// }
 		p.getElement().removeAttribute("xmlns");
 
 		return super.writePacketToSocket(ios, p);
@@ -764,28 +784,29 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param serv
 	 */
 	@Override
-	public void xmppStreamClosed(ComponentIOService serv) {}
+	public void xmppStreamClosed(ComponentIOService serv) {
+	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param serv
 	 * @param attribs
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
 	public String xmppStreamOpened(ComponentIOService serv, Map<String, String> attribs) {
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Stream opened: " + serv.getRemoteAddress() + ", xmlns: " + attribs.get("xmlns")
-					+ ", type: " + serv.connectionType().toString() + ", uniqueId=" + serv.getUniqueId()
-						+ ", to=" + attribs.get("to"));
+			log.finest("Stream opened: " + serv.getRemoteAddress() + ", xmlns: "
+					+ attribs.get("xmlns") + ", type: " + serv.connectionType().toString()
+					+ ", uniqueId=" + serv.getUniqueId() + ", to=" + attribs.get("to"));
 		}
 
 		String s_xmlns = attribs.get("xmlns");
@@ -807,7 +828,7 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 		return result;
 	}
 
-	//~--- get methods ----------------------------------------------------------
+	// ~--- get methods ----------------------------------------------------------
 
 	@Override
 	protected long getMaxInactiveTime() {
@@ -832,21 +853,38 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 		ArrayList<ComponentConnection> conns = connections.get(hostname);
 
 		if (conns != null) {
-			for (ComponentConnection componentConnection : conns) {
-				ComponentIOService serv = componentConnection.getService();
+			// Let's try optimal traffic distribution, packets from certain users
+			// go through certain connections. This way we use all connections
+			// and avoid packet re-ordering
+//			int idx = Math.abs(p.getStanzaFrom().hashCode() % conns.size());
+//			ComponentConnection conn = conns.get(idx);
+//			if (conn.getService() != null && conn.getService().isConnected()) {
+//				result = conn.getService();
+//			}
+			LoadBalancerIfc lb = repo.getItem(hostname).getLoadBalancer();
+			result = lb.selectConnection(p, conns);
 
-				if (serv != null) {
-					if (serv.isConnected()) {
-						result = serv;
+			// The above algorithm did not work for some reason. Now trying
+			// traditional way to send a packet to the first available and working
+			// connection
+			if (result == null) {
+				for (ComponentConnection componentConnection : conns) {
+					ComponentIOService serv = componentConnection.getService();
+
+					if (serv != null) {
+						if (serv.isConnected()) {
+							result = serv;
+						} else {
+							log.info("Service is not connected for connection for hostname: "
+									+ hostname);
+						}
 					} else {
-						log.info("Service is not connected for connection for hostname: " + hostname);
+						log.info("Service is null for connection for hostname: " + hostname);
 					}
-				} else {
-					log.info("Service is null for connection for hostname: " + hostname);
-				}
 
-				if (result != null) {
-					break;
+					if (result != null) {
+						break;
+					}
 				}
 			}
 		} else {
@@ -866,7 +904,7 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 		return true;
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	private synchronized void addComponentConnection(String hostname, ComponentIOService s) {
 		ComponentConnection conn = new ComponentConnection(hostname, s);
@@ -924,7 +962,8 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 					// There is still an active connection for this host
 					result = true;
 				} else {
-					log.warning("Null or disconnected service for ComponentConnection for host: " + hostname);
+					log.warning("Null or disconnected service for ComponentConnection for host: "
+							+ hostname);
 				}
 			}
 		} else {
@@ -973,34 +1012,32 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService>
 		log.finest("All regex routings: " + getRegexRoutings().toString());
 	}
 
-	//~--- inner classes --------------------------------------------------------
+	// ~--- inner classes --------------------------------------------------------
 
 	private class AuthenticationTimer extends TimerTask {
 		private ComponentIOService serv = null;
 
-		//~--- constructors -------------------------------------------------------
+		// ~--- constructors -------------------------------------------------------
 
 		private AuthenticationTimer(ComponentIOService serv) {
 			this.serv = serv;
 		}
 
-		//~--- methods ------------------------------------------------------------
+		// ~--- methods ------------------------------------------------------------
 
 		/**
 		 * Method description
-		 *
+		 * 
 		 */
 		@Override
 		public void run() {
-			if ( !serv.isAuthenticated()) {
+			if (!serv.isAuthenticated()) {
 				serv.stop();
 			}
 		}
 	}
 }
 
+// ~ Formatted in Sun Code Convention
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+// ~ Formatted by Jindent --- http://www.jindent.com
