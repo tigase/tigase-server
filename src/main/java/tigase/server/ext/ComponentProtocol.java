@@ -861,7 +861,12 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService> imp
 //			if (conn.getService() != null && conn.getService().isConnected()) {
 //				result = conn.getService();
 //			}
-			LoadBalancerIfc lb = repo.getItem(hostname).getLoadBalancer();
+			//log.finest("repo: " + repo.toString());
+			CompRepoItem cmp_repo_item =repo.getItem(hostname); 
+			if (cmp_repo_item == null) {
+				cmp_repo_item =repo.getItem(p.getStanzaFrom().getDomain());
+			}
+			LoadBalancerIfc lb = cmp_repo_item.getLoadBalancer();
 			result = lb.selectConnection(p, conns);
 
 			// The above algorithm did not work for some reason. Now trying

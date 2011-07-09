@@ -311,28 +311,29 @@ public class CompRepoItem extends RepositoryItemAbstract {
 	 */
 	private LoadBalancerIfc lbInstance(String cls_name) {
 		String class_name = cls_name;
-		if (!class_name.endsWith(".class")) {
-			class_name = class_name + ".class";
-		}
+//		if (!class_name.endsWith(".class")) {
+//			class_name = class_name + ".class";
+//		}
 		log.log(Level.INFO, "Activating load-balancer for domain: {0}, class: {1}",
 				new Object[] { domain, class_name });
 		LoadBalancerIfc result = null;
 		try {
 			result = (LoadBalancerIfc) Class.forName(class_name).newInstance();
 		} catch (Exception ex1) {
-			class_name = "tigase.server.ext.lb." + cls_name;
+			class_name = "tigase.server.ext.lb." + class_name;
 			log.log(Level.INFO, "Cannot active load balancer for class: {0}, trying: {1}",
 					new Object[] { cls_name, class_name });
 			try {
 				result = (LoadBalancerIfc) Class.forName(class_name).newInstance();
 			} catch (Exception ex2) {
-				class_name = "tigase.server.ext.lb." + cls_name;
 				log.log(Level.WARNING, "Cannot active load balancer for class:"
 						+ " {0}, or: {1}, errors: {2} or {3}, using default LB: {4}", new Object[] {
 						cls_name, class_name, ex1, ex2, DEF_LB_CLASS.getClass().getName() });
 				result = DEF_LB_CLASS;
 			}
 		}
+		log.log(Level.INFO, "Activated load-balancer for domain: {0}, class: {1}",
+				new Object[] { domain, result.getClass().getName()});
 		return result;
 	}
 
