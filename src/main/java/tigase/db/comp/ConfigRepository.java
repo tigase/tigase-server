@@ -61,6 +61,11 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 		this.repoChangeList = null;
 	}
 	
+	@Override
+	public String toString() {
+		return items.toString();
+	}
+
 	/**
 	 * Method description
 	 *

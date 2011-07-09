@@ -1,73 +1,84 @@
-
 /*
-* Tigase Jabber/XMPP Server
-* Copyright (C) 2004-2010 "Artur Hefczyc" <artur.hefczyc@tigase.org>
-*
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, version 3 of the License.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program. Look for COPYING file in the top folder.
-* If not, see http://www.gnu.org/licenses/.
-*
-* $Rev$
-* Last modified by $Author$
-* $Date$
+ * Tigase Jabber/XMPP Server
+ * Copyright (C) 2004-2010 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. Look for COPYING file in the top folder.
+ * If not, see http://www.gnu.org/licenses/.
+ *
+ * $Rev$
+ * Last modified by $Author$
+ * $Date$
  */
 package tigase.server.ext;
 
-//~--- non-JDK imports --------------------------------------------------------
-
+import tigase.net.ConnectionType;
+import tigase.util.SizedCache;
 import tigase.xmpp.XMPPIOService;
-
-//~--- JDK imports ------------------------------------------------------------
+import tigase.xmpp.JID;
 
 import java.util.List;
 
-//~--- classes ----------------------------------------------------------------
-
 /**
  * Created: Jun 14, 2010 12:05:41 PM
- *
+ * 
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class ComponentIOService extends XMPPIOService<List<ComponentConnection>> {
-	private boolean authenticated = false;
+	private static final int MAX_RECENT_JIDS = 10000;
+	private static final long MAX_CACHE_TIME = 100000;
 
-	//~--- get methods ----------------------------------------------------------
+	private boolean authenticated = false;
+	private String routings = null;
+	private SizedCache<JID, JID> recentJIDs = new SizedCache<JID, JID>(MAX_RECENT_JIDS);
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	public boolean isAuthenticated() {
 		return authenticated;
 	}
 
-	//~--- set methods ----------------------------------------------------------
+	public String getRoutings() {
+		return routings;
+	}
+
+	public void addRecentJID(JID jid) {
+		// We only save recent JIDs on the external component side
+		if (connectionType() == ConnectionType.connect) {
+			recentJIDs.put(jid, jid);
+		}
+	}
+
+	public boolean isRecentJID(JID jid) {
+		return jid != null && recentJIDs.get(jid) != null;
+	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param authenticated
 	 */
 	public void setAuthenticated(boolean authenticated) {
 		this.authenticated = authenticated;
 	}
+
+	public void setRoutings(String r) {
+		routings = r;
+	}
+
 }
-
-
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

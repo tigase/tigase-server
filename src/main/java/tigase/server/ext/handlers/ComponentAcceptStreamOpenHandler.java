@@ -94,9 +94,10 @@ public class ComponentAcceptStreamOpenHandler implements StreamOpenHandler {
 		switch (serv.connectionType()) {
 			case connect :
 				CompRepoItem repoItem = (CompRepoItem) serv.getSessionData().get(REPO_ITEM_KEY);
+				String r_host = (String) serv.getSessionData().get("remote-host");
 
 				// Send init xmpp stream here
-				serv.getSessionData().put(ComponentIOService.HOSTNAME_KEY, repoItem.getRemoteHost());
+				serv.getSessionData().put(ComponentIOService.HOSTNAME_KEY, r_host);
 
 				// This should be done only, after authentication is completed
 				// addComponentConnection(hostname, serv);

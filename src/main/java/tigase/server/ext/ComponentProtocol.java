@@ -262,6 +262,8 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService> imp
 			routings = new String[] { ".*" };
 		}
 
+		serv.setRoutings(routings[0]);
+
 		updateRoutings(routings, true);
 
 		if (log.isLoggable(Level.FINE)) {
@@ -476,7 +478,8 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService> imp
 
 		while ((p = packets.poll()) != null) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Processing socket data: {0}", p);
+				log.log(Level.FINEST, "Processing socket: {0}, data: {0}",
+						new Object[] { serv, p });
 			}
 
 			boolean processed = false;
@@ -506,6 +509,9 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService> imp
 					} // end of if (p.isRouted())
 
 					result.getElement().setXMLNS("jabber:client");
+					if (result.getStanzaFrom() != null) {
+						serv.addRecentJID(result.getStanzaFrom());
+					}
 					addOutPacket(result);
 				} else {
 					try {
@@ -674,28 +680,44 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService> imp
 			log.info("Loaded repoItem: " + repoItem.toString());
 
 			if (repoItem.getPort() > 0) {
-				Map<String, Object> port_props = new LinkedHashMap<String, Object>();
-
-				port_props.put(PORT_KEY, repoItem.getPort());
-
-				if (repoItem.getDomain() != null) {
-					port_props.put(PORT_LOCAL_HOST_PROP_KEY, repoItem.getDomain());
-				}
-
 				String[] remote_host = PORT_IFC_PROP_VAL;
-
+				String remote_domain = repoItem.getRemoteHost();
 				if (repoItem.getRemoteHost() != null) {
-					port_props.put(PORT_REMOTE_HOST_PROP_KEY, repoItem.getRemoteHost());
-					remote_host = new String[] { repoItem.getRemoteHost() };
+					remote_host = repoItem.getRemoteHost().split(";");
+					// The first item on the list is always the remote domain name, if
+					// there are
+					// more entries, the rest is just addresses to connect to for this
+					// domain
+					remote_domain = remote_host[0];
+					if (remote_host.length > 1) {
+						// Remove the first entry as this is domain name, whereas the rest
+						// is the
+						// address to connect to.
+						String[] remote_host_copy = new String[remote_host.length - 1];
+						System
+								.arraycopy(remote_host, 1, remote_host_copy, 0, remote_host_copy.length);
+						remote_host = remote_host_copy;
+					}
 				}
 
-				port_props.put(PORT_TYPE_PROP_KEY, repoItem.getConnectionType());
-				port_props.put(PORT_SOCKET_PROP_KEY, SocketType.plain);
-				port_props.put(PORT_IFC_PROP_KEY, remote_host);
-				port_props.put(MAX_RECONNECTS_PROP_KEY, (int) (120 * MINUTE));
-				port_props.put(REPO_ITEM_KEY, repoItem);
-				log.info("Starting connection: " + port_props);
-				addWaitingTask(port_props);
+				for (String r_host : remote_host) {
+					Map<String, Object> port_props = new LinkedHashMap<String, Object>();
+
+					port_props.put(PORT_KEY, repoItem.getPort());
+
+					if (repoItem.getDomain() != null) {
+						port_props.put(PORT_LOCAL_HOST_PROP_KEY, repoItem.getDomain());
+					}
+
+					port_props.put(PORT_REMOTE_HOST_PROP_KEY, remote_domain);
+					port_props.put(PORT_TYPE_PROP_KEY, repoItem.getConnectionType());
+					port_props.put(PORT_SOCKET_PROP_KEY, SocketType.plain);
+					port_props.put(PORT_IFC_PROP_KEY, new String[] { r_host });
+					port_props.put(MAX_RECONNECTS_PROP_KEY, (int) (120 * MINUTE));
+					port_props.put(REPO_ITEM_KEY, repoItem);
+					log.info("Starting connection: " + port_props);
+					addWaitingTask(port_props);
+				}
 			}
 		}
 
@@ -851,19 +873,30 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService> imp
 		ComponentIOService result = null;
 		String hostname = p.getStanzaTo().getDomain();
 		ArrayList<ComponentConnection> conns = connections.get(hostname);
+		// If there is no connections list for this domain and routings are set to *
+		// we use the first available list.
+		for (ArrayList<ComponentConnection> c : connections.values()) {
+			// Is there a better way to take the first available element?
+			if (c.size() > 0 && ".*".equals(c.get(0).getService().getRoutings())) {
+				conns = c;
+				break;
+			}
+		}
 
 		if (conns != null) {
-			// Let's try optimal traffic distribution, packets from certain users
-			// go through certain connections. This way we use all connections
-			// and avoid packet re-ordering
-			// int idx = Math.abs(p.getStanzaFrom().hashCode() % conns.size());
-			// ComponentConnection conn = conns.get(idx);
-			// if (conn.getService() != null && conn.getService().isConnected()) {
-			// result = conn.getService();
-			// }
-			// log.finest("repo: " + repo.toString());
-			if (conns.size() > 1) {
-				CompRepoItem cmp_repo_item = repo.getItem(hostname);
+			// First we check whether the receiver has sent to us a packet through one
+			// of connections as this would be wise to send response on the same connection
+			for (ComponentConnection componentConnection : conns) {
+				ComponentIOService serv = componentConnection.getService();
+				if (serv != null && serv.isConnected() && serv.isRecentJID(p.getStanzaTo())) {
+					result = serv;
+					break;
+				}
+			}
+			
+			// Now, load balancer selects the best connection to send the packet
+			if (result == null && conns.size() > 1) {
+				CompRepoItem cmp_repo_item = getCompRepoItem(hostname);
 				if (cmp_repo_item == null) {
 					cmp_repo_item = repo.getItem(p.getStanzaFrom().getDomain());
 				}
@@ -875,6 +908,9 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService> imp
 			// traditional way to send a packet to the first available and working
 			// connection
 			if (result == null) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("LB could not select connection, trying traditional way");
+				}
 				for (ComponentConnection componentConnection : conns) {
 					ComponentIOService serv = componentConnection.getService();
 
@@ -896,6 +932,10 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService> imp
 			}
 		} else {
 			log.info("No ext connection for hostname: " + hostname);
+		}
+
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Selected connection: " + result);
 		}
 
 		return result;

@@ -93,15 +93,16 @@ public class JabberClientStreamOpenHandler implements StreamOpenHandler {
 			case connect :
 				CompRepoItem repoItem = (CompRepoItem) serv.getSessionData().get(REPO_ITEM_KEY);
 
+				String r_host = (String) serv.getSessionData().get("remote-host");
 				// Send init xmpp stream here
-				serv.getSessionData().put(ComponentIOService.HOSTNAME_KEY, repoItem.getRemoteHost());
+				serv.getSessionData().put(ComponentIOService.HOSTNAME_KEY, r_host);
 
 				// This should be done only, after authentication is completed
 				// addComponentConnection(hostname, serv);
 				String data = "<stream:stream" + " xmlns='" + XMLNS + "'"
 					+ " xmlns:stream='http://etherx.jabber.org/streams'" + " version ='1.0'"
 					+ " xml:lang='en'" + " from='" + repoItem.getDomain() + "'" + " to ='"
-					+ repoItem.getRemoteHost() + "'" + ">";
+					+ r_host + "'" + ">";
 
 				return data;
 
