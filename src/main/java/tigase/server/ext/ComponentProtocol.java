@@ -856,18 +856,20 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService> imp
 			// Let's try optimal traffic distribution, packets from certain users
 			// go through certain connections. This way we use all connections
 			// and avoid packet re-ordering
-//			int idx = Math.abs(p.getStanzaFrom().hashCode() % conns.size());
-//			ComponentConnection conn = conns.get(idx);
-//			if (conn.getService() != null && conn.getService().isConnected()) {
-//				result = conn.getService();
-//			}
-			//log.finest("repo: " + repo.toString());
-			CompRepoItem cmp_repo_item =repo.getItem(hostname); 
-			if (cmp_repo_item == null) {
-				cmp_repo_item =repo.getItem(p.getStanzaFrom().getDomain());
+			// int idx = Math.abs(p.getStanzaFrom().hashCode() % conns.size());
+			// ComponentConnection conn = conns.get(idx);
+			// if (conn.getService() != null && conn.getService().isConnected()) {
+			// result = conn.getService();
+			// }
+			// log.finest("repo: " + repo.toString());
+			if (conns.size() > 1) {
+				CompRepoItem cmp_repo_item = repo.getItem(hostname);
+				if (cmp_repo_item == null) {
+					cmp_repo_item = repo.getItem(p.getStanzaFrom().getDomain());
+				}
+				LoadBalancerIfc lb = cmp_repo_item.getLoadBalancer();
+				result = lb.selectConnection(p, conns);
 			}
-			LoadBalancerIfc lb = cmp_repo_item.getLoadBalancer();
-			result = lb.selectConnection(p, conns);
 
 			// The above algorithm did not work for some reason. Now trying
 			// traditional way to send a packet to the first available and working
