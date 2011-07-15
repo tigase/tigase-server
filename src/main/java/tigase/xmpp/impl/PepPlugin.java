@@ -36,51 +36,52 @@ import java.util.logging.Logger;
 
 /**
  * Class description
- *
- *
- * @version        5.0.0, 2010.03.01 at 03:12:30 GMT
- * @author         Artur Hefczyc <artur.hefczyc@tigase.org>
+ * 
+ * 
+ * @version 5.0.0, 2010.03.01 at 03:12:30 GMT
+ * @author Artur Hefczyc <artur.hefczyc@tigase.org>
  */
 public class PepPlugin extends XMPPProcessorAbstract {
 	private static final String _XMLNS = "http://jabber.org/protocol/pubsub";
-	private static final Element[] DISCO_FEATURES = {
-		new Element("feature", new String[] { "var" }, new String[] { _XMLNS }),
-		new Element("feature", new String[] { "var" }, new String[] { _XMLNS + "#owner" }),
-		new Element("feature", new String[] { "var" }, new String[] { _XMLNS + "#publish" }),
-		new Element("identity", new String[] { "category", "type" }, new String[] { "pubsub",
-			"pep" }), };
+	private static final Element[] DISCO_FEATURES = { new Element("feature", new String[] { "var" }, new String[] { _XMLNS }),
+			new Element("feature", new String[] { "var" }, new String[] { _XMLNS + "#owner" }),
+			new Element("feature", new String[] { "var" }, new String[] { _XMLNS + "#publish" }),
+			new Element("identity", new String[] { "category", "type" }, new String[] { "pubsub", "pep" }), };
 	private static final String[] ELEMENTS = { "pubsub" };
 	private static final String ID = "pep";
 	private static final Logger log = Logger.getLogger("tigase.xmpp.impl.PepPlugin");
 	private static final String PUBSUB_COMPONENT_URL = "pubsub-component";
 	private static RosterAbstract roster = RosterFactory.getRosterImplementation(true);
-	private static final EnumSet<SubscriptionType> SUBSCRITION_TYPES =
-		EnumSet.of(SubscriptionType.both, SubscriptionType.from);
+	private static final EnumSet<SubscriptionType> SUBSCRITION_TYPES = EnumSet.of(SubscriptionType.both, SubscriptionType.from);
 	private static final String[] XMLNSS = { _XMLNS };
 
-	//~--- fields ---------------------------------------------------------------
+	// ~--- fields
+	// ---------------------------------------------------------------
 
 	private final HashSet<String> supportedNodes = new HashSet<String>();
 
-	//~--- constructors ---------------------------------------------------------
+	// ~--- constructors
+	// ---------------------------------------------------------
 
 	/**
 	 * Constructs ...
-	 *
+	 * 
 	 */
 	public PepPlugin() {
 		this.supportedNodes.add("http://jabber.org/protocol/tune");
 		this.supportedNodes.add("http://jabber.org/protocol/mood");
 		this.supportedNodes.add("http://jabber.org/protocol/activity");
 		this.supportedNodes.add("http://jabber.org/protocol/geoloc");
+		this.supportedNodes.add("urn:xmpp:avatar:data");
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods
+	// --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -90,22 +91,20 @@ public class PepPlugin extends XMPPProcessorAbstract {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param connectionId
 	 * @param packet
 	 * @param session
 	 * @param repo
 	 * @param results
 	 * @param settings
-	 *
+	 * 
 	 * @throws PacketErrorTypeException
 	 */
 	@Override
-	public void processFromUserToServerPacket(JID connectionId, Packet packet,
-			XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results,
-				Map<String, Object> settings)
-			throws PacketErrorTypeException {
+	public void processFromUserToServerPacket(JID connectionId, Packet packet, XMPPResourceConnection session,
+			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) throws PacketErrorTypeException {
 		try {
 			List<Element> x = packet.getElemChildren("/iq/pubsub");
 			boolean processed = false;
@@ -148,8 +147,7 @@ public class PepPlugin extends XMPPProcessorAbstract {
 			}
 		} catch (NotAuthorizedException ex) {
 			log.warning("NotAuthorizedException for packet: " + packet);
-			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-					"You must authorize session first.", true));
+			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet, "You must authorize session first.", true));
 		} catch (TigaseDBException ex) {
 			Logger.getLogger(PepPlugin.class.getName()).log(Level.SEVERE, null, ex);
 		}
@@ -157,49 +155,47 @@ public class PepPlugin extends XMPPProcessorAbstract {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packet
 	 * @param repo
 	 * @param results
 	 * @param settings
-	 *
+	 * 
 	 * @throws PacketErrorTypeException
 	 */
 	@Override
-	public void processNullSessionPacket(Packet packet, NonAuthUserRepository repo,
-			Queue<Packet> results, Map<String, Object> settings)
-			throws PacketErrorTypeException {
-		results.offer(Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet,
-				"Service not available.", true));
+	public void processNullSessionPacket(Packet packet, NonAuthUserRepository repo, Queue<Packet> results,
+			Map<String, Object> settings) throws PacketErrorTypeException {
+		results.offer(Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet, "Service not available.", true));
 	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packet
 	 * @param session
 	 * @param repo
 	 * @param results
 	 * @param settings
-	 *
+	 * 
 	 * @throws PacketErrorTypeException
 	 */
 	@Override
-	public void processServerSessionPacket(Packet packet, XMPPResourceConnection session,
-			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
-			throws PacketErrorTypeException {
+	public void processServerSessionPacket(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
+			Queue<Packet> results, Map<String, Object> settings) throws PacketErrorTypeException {
 
-		// I guess we ignore such packets here, no pep support for the server itself yet
+		// I guess we ignore such packets here, no pep support for the server
+		// itself yet
 	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param session
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -209,8 +205,8 @@ public class PepPlugin extends XMPPProcessorAbstract {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -220,8 +216,8 @@ public class PepPlugin extends XMPPProcessorAbstract {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -229,11 +225,9 @@ public class PepPlugin extends XMPPProcessorAbstract {
 		return XMLNSS;
 	}
 
-	private void forward(Packet packet, XMPPResourceConnection session,
-			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
-			throws XMPPException {
-		String pubSubComponentUrl = (settings == null)
-			? null : (String) settings.get(PUBSUB_COMPONENT_URL);
+	private void forward(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results,
+			Map<String, Object> settings) throws XMPPException {
+		String pubSubComponentUrl = (settings == null) ? null : (String) settings.get(PUBSUB_COMPONENT_URL);
 
 		if ((session == null) || (pubSubComponentUrl == null)) {
 			if (log.isLoggable(Level.FINE)) {
@@ -241,7 +235,7 @@ public class PepPlugin extends XMPPProcessorAbstract {
 			}
 
 			return;
-		}    // end of if (session == null)
+		} // end of if (session == null)
 
 		try {
 			packet.getElement().setAttribute("to", pubSubComponentUrl);
@@ -260,21 +254,19 @@ public class PepPlugin extends XMPPProcessorAbstract {
 
 				// This is message to some other client
 				results.offer(packet.copyElementOnly());
-			}    // end of else
+			} // end of else
 		} catch (NotAuthorizedException e) {
 			log.warning("NotAuthorizedException for packet: " + packet);
-			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-					"You must authorize session first.", true));
-		}    // end of try-catch
+			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet, "You must authorize session first.", true));
+		} // end of try-catch
 	}
 
-	private void processPEPPublish(Packet packet, String node, Element pepItem,
-			XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results,
-				Map<String, Object> settings)
-			throws NotAuthorizedException, TigaseDBException {
+	private void processPEPPublish(Packet packet, String node, Element pepItem, XMPPResourceConnection session,
+			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) throws NotAuthorizedException,
+			TigaseDBException {
 		JID[] buddies = roster.getBuddies(session, SUBSCRITION_TYPES);
 		Element event = new Element("event", new String[] { "xmlns" },
-			new String[] { "http://jabber.org/protocol/pubsub#event" });
+				new String[] { "http://jabber.org/protocol/pubsub#event" });
 		Element items = new Element("items", new String[] { "node" }, new String[] { node });
 
 		event.addChild(items);
@@ -283,16 +275,14 @@ public class PepPlugin extends XMPPProcessorAbstract {
 		JID from = packet.getStanzaFrom();
 
 		for (JID buddy : buddies) {
-			Element message = new Element("message", new String[] { "from", "to", "type", "id" },
-				new String[] { from.toString(),
-					buddy.toString(), "headline", packet.getStanzaId() });
+			Element message = new Element("message", new String[] { "from", "to", "type", "id" }, new String[] {
+					from.toString(), buddy.toString(), "headline", packet.getStanzaId() });
 
 			message.addChild(event);
 			results.offer(Packet.packetInstance(message, from, buddy));
 		}
 
-		Element message = new Element("message", new String[] { "from", "to", "type", "id" },
-			new String[] { from.toString(),
+		Element message = new Element("message", new String[] { "from", "to", "type", "id" }, new String[] { from.toString(),
 				from.toString(), "headline", packet.getStanzaId() });
 
 		message.addChild(event);
@@ -300,8 +290,6 @@ public class PepPlugin extends XMPPProcessorAbstract {
 	}
 }
 
+// ~ Formatted in Sun Code Convention
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+// ~ Formatted by Jindent --- http://www.jindent.com
