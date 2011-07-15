@@ -73,6 +73,8 @@ public class PepPlugin extends XMPPProcessorAbstract {
 		this.supportedNodes.add("http://jabber.org/protocol/activity");
 		this.supportedNodes.add("http://jabber.org/protocol/geoloc");
 		this.supportedNodes.add("urn:xmpp:avatar:data");
+		this.supportedNodes.add("urn:xmpp:avatar:metadata");
+
 	}
 
 	// ~--- methods
