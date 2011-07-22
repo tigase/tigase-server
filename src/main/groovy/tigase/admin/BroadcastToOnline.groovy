@@ -22,11 +22,11 @@
 
 /*
 
-User add script as described in XEP-0133:
-http://xmpp.org/extensions/xep-0133.html#add-user
+4.23 Send Announcement to Online Users as described in XEP-0133:
+http://xmpp.org/extensions/xep-0133.html#announce
 
-AS:Description: Broadcast to online
-AS:CommandId: online-broadcast
+AS:Description: Send Announcement to Online Users
+AS:CommandId: http://jabber.org/protocol/admin#announce
 AS:Component: sess-man
 */
 
@@ -41,7 +41,7 @@ import tigase.xml.*
 def FROM_JID = "from-jid"
 def SUBJECT = "subject"
 def MSG_TYPE = "msg-type"
-def MSG_BODY = "Body"
+def MSG_BODY = "announcement"
 
 def p = (Iq)packet
 
@@ -52,18 +52,22 @@ def body = Command.getFieldValues(p, MSG_BODY)
 
 if (fromJid == null || subject == null || msg_type == null || body == null) {
 	def res = (Iq)p.commandResult(Command.DataType.form);
-  Command.addTitle(res, "Message to online users")
-	Command.addInstructions(res, "Please provide message details to be sent to all online users' connections")
+        Command.addTitle(res, "Message to online users")
+        Command.addInstructions(res, "Fill out this form to make an announcement to all active users of this service.")
 
-	Command.addFieldValue(res, FROM_JID, fromJid ?: p.getStanzaFrom().getDomain().toString(),
-    "jid-single", "From address")
-	Command.addFieldValue(res, SUBJECT, subject ?: "Message from administrators", "Subject")
-	def msg_types = ["chat", "headline", "normal"]
-	Command.addFieldValue(res, MSG_TYPE, msg_type ?: msg_types[0], "Type",
-		(String[])msg_types, (String[])msg_types)
-	if (body == null) {
-		body = ["", "", "", "", ""]
-	}
+        Command.addFieldValue(res, "FORM_TYPE", "http://jabber.org/protocol/admin", "hidden")
+
+        Command.addFieldValue(res, FROM_JID, fromJid ?: p.getStanzaFrom().getDomain().toString(), "jid-single", "From address")
+
+        Command.addFieldValue(res, SUBJECT, subject ?: "Message from administrators", "Subject")
+
+        def msg_types = ["normal", "headline", "chat" ]
+        Command.addFieldValue(res, MSG_TYPE, msg_type ?: msg_types[0], "Type", (String[])msg_types, (String[])msg_types)
+
+        if (body == null) {
+          body = [""]
+        }
+
 	Command.addFieldMultiValue(res, MSG_BODY, body)
 
 	return res
@@ -76,7 +80,7 @@ def msg_body = body.join('\n')
 def msg = Message.getMessage(null, null, type, msg_body, subject, null, "admin")
 Queue results = new LinkedList()
 def result = p.commandResult(Command.DataType.result)
-Command.addTextField(result, "Note", "Message sent.");
+Command.addTextField(result, "Note", "Operation successful");
 results += result
 def conns = (Map)userConnections
 conns.each { key, value ->

@@ -1,20 +1,20 @@
 /*
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2008 "Artur Hefczyc" <artur.hefczyc@tigase.org>
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
- * 
+ *
  * $Rev: $
  * Last modified by $Author: $
  * $Date: $
@@ -55,7 +55,7 @@ def UPDATE_EXT = "update-ext"
 def REMOVE_EXT = "remove-ext"
 def subscriptions = ["both", "from", "to", "none"]
 def actions = [UPDATE, REMOVE, UPDATE_EXT, REMOVE_EXT]
-def actions_descr = ["Add/Update item", "Remove item", 
+def actions_descr = ["Add/Update item", "Remove item",
   "Add/Update both rosters", "Remove from both rosters"]
 //def notify_cluster = ["no", "yes"]
 
@@ -122,7 +122,7 @@ def updateRoster = { jid, i_jid, i_name, i_groups, i_subscr ->
 		String rosterStr = repository.getData(jid.getBareJID(), null,
 			RosterAbstract.ROSTER, null) ?: ""
 		Map<BareJID, RosterElement> roster = new LinkedHashMap<BareJID, RosterElement>()
-		RosterFlat.parseRoster(rosterStr, roster, null)
+		RosterFlat.parseRosterUtil(rosterStr, roster, null)
 		if (remove_item) {
 			roster.remove(i_jid)
 		} else {
@@ -152,12 +152,12 @@ if (rosterAction == UPDATE_EXT || rosterAction == REMOVE_EXT) {
 }
 
 if (!remove_item) {
-	Element pres = new Element("presence", 
+	Element pres = new Element("presence",
 		(String[])["from", "to", "type"], (String[])[rosterOwnerJid, rosterItemJid,
       "probe"])
   results.offer(Packet.packetInstance(pres))
-	pres = new Element("presence", 
-		(String[])["from", "to", "type"], (String[])[rosterItemJid, rosterOwnerJid, 
+	pres = new Element("presence",
+		(String[])["from", "to", "type"], (String[])[rosterItemJid, rosterOwnerJid,
 			"probe"])
   results.offer(Packet.packetInstance(pres))
 }
@@ -167,3 +167,4 @@ Command.addTextField(result, "Note", "Operation successful");
 results.add(result)
 
 return results
+

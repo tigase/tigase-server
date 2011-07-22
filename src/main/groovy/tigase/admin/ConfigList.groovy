@@ -41,6 +41,16 @@ def conf_repo = (ConfigRepositoryIfc)comp_repo
 def p = (Iq)packet
 def comp_name = Command.getFieldValue(p, COMP_NAME)
 
+def admins = (Set)adminsSet
+def stanzaFromBare = p.getStanzaFrom().getBareJID()
+def isServiceAdmin = admins.contains(stanzaFromBare)
+
+if (!isServiceAdmin) {
+    def result = p.commandResult(Command.DataType.result)
+    Command.addTextField(result, "Error", "You do not have enough permissions to access this data.");
+    return result
+}
+
 if (comp_name == null) {
 	def res = (Iq)p.commandResult(Command.DataType.form)
   def compNames = []

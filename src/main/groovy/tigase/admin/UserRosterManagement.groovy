@@ -40,7 +40,7 @@ import tigase.db.UserRepository
 class Field { String name; String label; String type; String defVal = ""}
 
 class RosterChangesControler {
-	UserRepository repository 
+	UserRepository repository
 	Map<String, XMPPSession> sessions
 
 	Field addOperation = new Field(name: "addJid", label: "Add")
@@ -55,16 +55,16 @@ class RosterChangesControler {
 
 	Field ownerJid = new Field(name: "rosterOwnerJID", label: "Roster owner JID", type: "jid-single")
 	Field jidToChange= new Field(name: "jidToManipulate", label: "JID to manipulate", type: "jid-single")
-	Field groups = new Field(name: "groups", label: "Comma separated groups")
-	Field operationType = new Field(name: "operationType", label: "Operation type", 
+	Field groups = new Field(name: "groups", label: "Comma separated groups", type: "text-single")
+	Field operationType = new Field(name: "operationType", label: "Operation type",
 			defVal: addOperation.name)
-	Field subscriptionType = new Field(name: "subscriptionType", 
+	Field subscriptionType = new Field(name: "subscriptionType",
 			label: "Subscription type", defVal: subscriptionBoth.name)
 	List<Field> formFields = [ownerJid, jidToChange, groups, operationType, subscriptionType]
-	
+
 	def addField(Packet form, Field field, List<Field> listFields = []) {
 		if (listFields != null && listFields.size() == 0)
-			Command.addFieldValue(form, field.name, field.defVal, field.type, field.label) 	
+			Command.addFieldValue(form, field.name, field.defVal, field.type, field.label)
 		else {
 			def listValues = (listFields.collect { it.name }).toArray(new String[0])
 			def listLabels = (listFields.collect { it.label }).toArray(new String[0])
@@ -72,8 +72,8 @@ class RosterChangesControler {
 		}
 	}
 
-	def getFieldValue(Packet form, Field field) { return Command.getFieldValue(form, field.name) }		
-		
+	def getFieldValue(Packet form, Field field) { return Command.getFieldValue(form, field.name) }
+
 	def processPacket(Packet p) {
 		if ((formFields.find { it.name != groups.name && Command.getFieldValue(p, it.name) == null}) == null) {
 			String ownerJidStr = getFieldValue(p, ownerJid)
@@ -81,13 +81,13 @@ class RosterChangesControler {
 			String[] groups = (getFieldValue(p, groups) ?: "").split(",")
 			String operationTypeStr = getFieldValue(p, operationType)
 			String subscriptionTypeStr = getFieldValue(p, subscriptionType)
-			
+
 			Queue<Packet> results;
 			if (operationTypeStr == addOperation.name)
 				results = addJidToRoster(ownerJidStr, jidToManipulate, groups, subscriptionTypeStr)
 			else
-				results = removeJidFromRoster(ownerJidStr, jidToManipulate)	
-			
+				results = removeJidFromRoster(ownerJidStr, jidToManipulate)
+
 			Packet result = p.commandResult(Command.DataType.result)
 			Command.addTextField(result, "Note", "Operation successful");
 			results.add(result)
@@ -99,19 +99,19 @@ class RosterChangesControler {
 			addField(result, jidToChange)
 			addField(result, groups)
 			addField(result, operationType, operationTypes)
-			addField(result, subscriptionType, subscriptionTypes)		
+			addField(result, subscriptionType, subscriptionTypes)
 			return result
 		}
 	}
-		
+
 	def getActiveConnections(String ownerJid) {
 		XMPPSession session = sessions.get(ownerJid)
 		return (session == null) ? [] : session.getActiveResources()
 	}
-	
+
 	def subscription(String str) { return RosterAbstract.SubscriptionType.valueOf(str) }
 
-	Queue<Packet> updateLiveRoster(String jid, String jidToChange, boolean remove, 
+	Queue<Packet> updateLiveRoster(String jid, String jidToChange, boolean remove,
 			String[] groups = null, String subStr = null) {
 		RosterAbstract rosterUtil = RosterFactory.getRosterImplementation(true)
 		Queue<Packet> packets = new LinkedList<Packet>()
@@ -121,53 +121,56 @@ class RosterChangesControler {
 				rosterUtil.addBuddy(conn, jidToChange, jidToChange, groups)
 				rosterUtil.setBuddySubscription(conn, subscription(subStr), jidToChange)
 				rosterUtil.updateBuddyChange(conn, packets,
-						rosterUtil.getBuddyItem(conn, jidToChange))				
+						rosterUtil.getBuddyItem(conn, jidToChange))
 			} else {
 				Element it = new Element("item")
 				it.setAttribute("jid", jidToChange)
 				it.setAttribute("subscription", "remove")
 				rosterUtil.updateBuddyChange(conn, packets, it)
-				rosterUtil.removeBuddy(conn, jidToChange) 
+				rosterUtil.removeBuddy(conn, jidToChange)
 			}
 		}
 		return packets
-	}	
-	
+	}
+
 	def modifyDbRoster(String ownerJid, modifyFunc) {
-		String rosterStr = repository.getData(ownerJid, null, RosterAbstract.ROSTER, null)
+		BareJID ownerBareJID = BareJID.bareJIDInstance(ownerJid)
+		String rosterStr = repository.getData(ownerBareJID, null, RosterAbstract.ROSTER, null)
 		rosterStr = (rosterStr == null) ? "" : rosterStr
-		Map<String, RosterElement> roster = new LinkedHashMap<String, RosterElement>()
-		RosterFlat.parseRoster(rosterStr, roster, null)
+		Map<BareJID, RosterElement> roster = new LinkedHashMap<BareJID, RosterElement>()
+
+		RosterFlat.parseRosterUtil(rosterStr, roster, null)
 		modifyFunc(roster)
 		StringBuilder sb = new StringBuilder()
 		for (RosterElement relem: roster.values())
 			sb.append(relem.getRosterElement().toString())
-		repository.setData(ownerJid, null, RosterAbstract.ROSTER, sb.toString());		
+		repository.setData(ownerBareJID, null, RosterAbstract.ROSTER, sb.toString());
 	}
-	
+
 	Queue<Packet> addJidToRoster(ownerJid, jidToAdd, groups, subscriptionType) {
+		JID ownerBareJID = JID.jidInstance(ownerJid)
 		List<XMPPResourceConnection> activeConnections = getActiveConnections(ownerJid)
 		if (activeConnections.size() == 0) {
-			modifyDbRoster(ownerJid, { roster -> 
+			modifyDbRoster(ownerJid, { roster ->
 				RosterElement userToAdd = roster.get(jidToAdd)
 				if (userToAdd == null) {
 					userToAdd = new RosterElement(
-							jidToAdd, jidToAdd, groups, null)
+							ownerBareJID, jidToAdd, groups, null)
 				}
 				userToAdd.setSubscription(subscription(subscriptionType))
 				userToAdd.setGroups(groups)
-				roster.put(jidToAdd, userToAdd)								
+				roster.put(jidToAdd, userToAdd)
 			})
 			return new LinkedList<Packet>()
-		} 
+		}
 		else
 			return updateLiveRoster(ownerJid, jidToAdd, false, groups, subscriptionType)
 	}
-	
+
 	Queue<Packet> removeJidFromRoster(ownerJid, jidToRemove) {
 		List<XMPPResourceConnection> activeConnections = getActiveConnections(ownerJid)
 		if (activeConnections.size() == 0) {
-			modifyDbRoster(ownerJid, { roster -> 
+			modifyDbRoster(ownerJid, { roster ->
 				RosterElement userToRemove = roster.get(jidToRemove)
 				if (userToRemove == null) {
 					throw new Exception("User to be deleted is not on roster")
@@ -175,11 +178,11 @@ class RosterChangesControler {
 				roster.remove(jidToRemove)
 			})
 			return new LinkedList<Packet>()
-		} 
+		}
 		else
 			return updateLiveRoster(ownerJid, jidToRemove, true)
-	}	
+	}
 }
 
-new RosterChangesControler(repository: userRepository, 
+new RosterChangesControler(repository: userRepository,
 		sessions: userSessions).processPacket((Packet)packet)

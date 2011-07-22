@@ -21,7 +21,7 @@
  */
 
 /*
-AS:Description: Command to change user inter-domain communication permission.
+AS:Description: Change user inter-domain communication permission.
 AS:CommandId: user-domain-perm
 AS:Component: sess-man
 */
@@ -30,6 +30,7 @@ package tigase.admin
 
 import tigase.server.*
 import tigase.util.*
+import tigase.xmpp.*
 import tigase.xmpp.impl.DomainFilter
 import tigase.db.UserRepository
 import tigase.db.UserNotFoundException
@@ -57,17 +58,19 @@ if (jid == null || domain == null ||
 
 jid = JIDUtils.getNodeID(jid)
 
+bareJID = BareJID.bareJIDInstance(jid)
+
 def repo = (UserRepository)userRepository
 
 try {
-	def old_value = repo.getData(jid, null,
+	def old_value = repo.getData(bareJID, null,
 		DomainFilter.ALLOWED_DOMAINS_KEY, null)
 
 	def new_value = domain
 	if (domain == DomainFilter.DOMAINS.LIST.name()) {
 		new_value = domainList
 	}
-	repo.setData(jid, null, DomainFilter.ALLOWED_DOMAINS_KEY, new_value)
+	repo.setData(bareJID, null, DomainFilter.ALLOWED_DOMAINS_KEY, new_value)
 
 	return "Changed an old value: $old_value to a new value: $new_value for user: $jid"
 } catch (e) {
