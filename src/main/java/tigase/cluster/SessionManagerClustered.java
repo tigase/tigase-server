@@ -923,8 +923,12 @@ public class SessionManagerClustered extends SessionManager implements
 								+ rec);
 					}
 					try {
-						fastAddOutPacket(Command.CLOSE.getPacket(getComponentId(),
-								conn.getConnectionId(), StanzaType.set, conn.nextStanzaId()));
+						Packet cmd = Command.CLOSE.getPacket(getComponentId(), conn.getConnectionId(),
+								StanzaType.set, conn.nextStanzaId());
+						Element err_el = new Element("conflict");
+						err_el.setXMLNS("urn:ietf:params:xml:ns:xmpp-streams");
+						cmd.getElement().getChild("command").addChild(err_el);
+						fastAddOutPacket(cmd);
 					} catch (Exception ex) {
 						// TODO Auto-generated catch block
 						ex.printStackTrace();
