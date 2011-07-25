@@ -65,6 +65,7 @@ public class ClientConnectionClustered extends ClientConnectionManager implement
 
 	private SeeOtherHostIfc see_other_host_strategy = null;
 
+	@SuppressWarnings("serial")
 	private List<BareJID> connectedNodes = new CopyOnWriteArrayList<BareJID>() {
 		{
 			add(getDefHostName());
@@ -111,9 +112,9 @@ public class ClientConnectionClustered extends ClientConnectionManager implement
 
 		BareJID nodeJID = BareJID.bareJIDInstanceNS(null, node);
 
-//		if (connectedNodes.contains(nodeJID)) {
-			connectedNodes.remove(nodeJID);
-//		}
+		// if (connectedNodes.contains(nodeJID)) {
+		connectedNodes.remove(nodeJID);
+		// }
 
 		final String hostname = node;
 
